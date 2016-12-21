@@ -219,6 +219,8 @@ header('Content-Type: text/html; charset=utf-8');
         <ul id="color-schemes-submenu" class="dropdown submenu">
           <li data-color="default">Type</li>
           <li data-color="velocity">Velocity</li>
+          <li data-color="rcs">Radar Cross Section</li>
+          <li data-color="smallsats">Small Satellites</li>
           <li data-color="near-earth">Near Earth</li>
           <li data-color="deep-space">Deep Space</li>
           <li data-color="lost-objects">Lost Objects</li>
@@ -284,15 +286,17 @@ header('Content-Type: text/html; charset=utf-8');
           <div class="menu-title">About</div>
           <div id="about-box" class="menubox submenu">
             <span class="box-header">Keep Track</span>
-            <p>This tool allows users to find objects in orbit and
-               determing details such as rise/set times, rcs, and history. The main
+            <p>Created by <a href="mailto:kruczek@keeptrack.space">Theodore Kruczek</a>
+               to help visualize Ground Based Radars and Optical Telescopes.
+               This tool allows users to find objects in orbit and
+               determing details such as rise/set times, RCS, and history. The main
                power of this tool is in compiling many open-source databases into one
-               interface, not in any unique capability.</p>
+               interface.</p>
             <span class="box-header">Sources</span>
             <p>All information is open source publically available information. Orbits are derived from
               the catalogue published at space-track.org. Payload information is compiled from various
-              public sources. Sensor data was derived from MDA reports on enviromental impacts and congressional
-              reports.</p>
+              public sources. US Sensor data was derived from MDA reports on enviromental impacts and congressional
+              budget reports.</p>
             <span class="box-header">Original Author</span>
             <p>The original source code for this tool and much of the credit goes
                to <a href="http://stuffin.space">James Yoder</a>. He is an alumnus of
@@ -316,6 +320,7 @@ header('Content-Type: text/html; charset=utf-8');
       </div>
       <div id="sat-info-title">This is a title</div>
       <div id="all-objects-link" class="link">Find all objects from this launch...</div>
+      <div id="near-objects-link" class="link">Find all objects near this object...</div>
       <div class="sat-info-row">
         <div class="sat-info-key">Int'l Designator</div>
         <div class="sat-info-value" id="sat-intl-des">1998-067A</div>
@@ -399,6 +404,10 @@ header('Content-Type: text/html; charset=utf-8');
       <div class="sat-info-row">
         <div class="sat-info-key">Age of ELSET</div>
         <div class="sat-info-value" title="" id="sat-elset-age">365.1264</div>
+      </div>
+      <div class="sat-info-row">
+        <div class="sat-info-key">RCS</div>
+        <div class="sat-info-value" title="" id="sat-rcs">MEDIUM</div>
       </div>
     </div>
     <div id="datetime">

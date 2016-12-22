@@ -3,9 +3,9 @@ JavaScript Application to view orbital data about satellites:
 
 keeptrack.space
 =======================
-In 2015 @jeyoder released stuffin.space to visualize satellites around the earth. Since then a few members of MIT Lincoln Labs altered the code to combine files together, provide ability to adjust rate of time, and fix minor errors.
+In 2015 [@jeyoder](https://github.com/jeyoder) released stuffin.space to visualize satellites around the earth. Since then a few members of MIT Lincoln Labs altered the code to combine files together, provide ability to adjust rate of time, and fix minor errors.
 
-In 2016 @thkruz forked the MIT Lincoln Labs version and began adding details about the satellites relevant to the tracking stations around the world. Additionally a few features have been added including: changing current date/time, viewing sensor details, viewing current weather at a sensor, and searching by launch vehicle.
+In 2016 [@thkruz](https://github.com/thkruz) forked the MIT Lincoln Labs version and began adding details about the satellites relevant to the tracking stations around the world. Additionally a few features have been added including: changing current date/time, viewing sensor details, viewing current weather at a sensor, and searching by launch vehicle.
 
 This project is both for practical purposes as a member of Air Force Space Command and as a practical exercise in learning how to manage a large software project.
 
@@ -27,4 +27,4 @@ Xampp is a very practical way to test on Windows.
 
 Contributing
 ----------------------
-Contributions are welcome! Currently the project is private, but will likely become public at some point. If you know someone that you would like to invite to the project before it is private message @thkruz.
+Contributions are welcome! Currently the project is private, but will likely become public at some point. If you know someone that you would like to invite to the project before it is private message [@thkruz](https://github.com/thkruz).

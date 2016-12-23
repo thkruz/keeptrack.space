@@ -141,55 +141,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
           pickable: false
         };
       }
-<<<<<<< HEAD
-		});
-
-    ColorScheme.smallsats = new ColorScheme(function(satId) {
-      if (satSet.getSat(satId).RCS_SIZE == "SMALL" && satSet.getSat(satId).OBJECT_TYPE == "PAYLOAD") {
-  			return {
-          color : [0.2, 1.0, 0.0, 0.65],
-          pickable : true
-        }
-      }
-      else {
-          return {
-            color : [1.0, 1.0, 1.0, 0.1],
-            pickable : false
-          }
-        }
-		});
-
-    ColorScheme.rcs = new ColorScheme(function(satId) {
-			var rcs = satSet.getSat(satId).RCS_SIZE;
-      if (rcs == "SMALL") {
-  			return {
-          color : [1.0, 0, 0, 0.6],
-          pickable : true
-        }
-      }
-      if (rcs == "MEDIUM") {
-  			return {
-          color : [1.0, 1.0, 0, 0.6],
-          pickable : true
-        }
-      }
-      if (rcs == "LARGE") {
-  			return {
-          color : [0, 1.0, 0, 0.6],
-          pickable : true
-        }
-      }
-      else {
-          return {
-            color : [0.5, 0.5, 0.5, 0.6],
-            pickable : true
-          }
-        }
-		});
-
-    ColorScheme.lostobjects = new ColorScheme(function(satId) {
-			var pe = satSet.getSat(satId).perigee;
-=======
     });
     ColorScheme.rcs = new ColorScheme(function (satId) {
       var rcs = satSet.getSat(satId).RCS_SIZE;
@@ -219,7 +170,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
     });
     ColorScheme.lostobjects = new ColorScheme(function (satId) {
       var pe = satSet.getSat(satId).perigee;
->>>>>>> refs/remotes/origin/master
       var now = new Date();
       now = now.getFullYear();
       now = now.toString().substr(2, 2);
@@ -230,59 +180,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
         daysold = jday() - satSet.getSat(satId).TLE_LINE1.substr(20, 3) + (satSet.getSat(satId).TLE_LINE1.substr(17, 2) * 365);
       }
       if (pe > lookangles.obsmaxrange || daysold < 100) {
-<<<<<<< HEAD
-  			return {
-          color : [1.0, 1.0, 1.0, 0.1],
-          pickable : false
-        }
-      }
-      else {
-          return {
-            color : [0.2, 1.0, 0.0, 0.65],
-            pickable : true
-          }
-        }
-		});
-
-    ColorScheme.leo = new ColorScheme(function(satId) {
-			var ap = satSet.getSat(satId).apogee;
-      if (ap > 2000) {
-  			return {
-          color : [1.0, 1.0, 1.0, 0.1],
-          pickable : false
-        }
-      }
-      else {
-          return {
-            color : [0.2, 1.0, 0.0, 0.65],
-            pickable : true
-          }
-        }
-		});
-
-    ColorScheme.geo = new ColorScheme(function(satId) {
-			var pe = satSet.getSat(satId).perigee;
-      if (pe < 35000) {
-  			return {
-          color : [1.0, 1.0, 1.0, 0.1],
-          pickable : false
-        }
-      }
-      else {
-          return {
-            color : [0.2, 1.0, 0.0, 0.65],
-            pickable : true
-          }
-        }
-		});
-
-		ColorScheme.velocity = new ColorScheme(function(satId) {
-			var vel = satSet.getSat(satId).velocity;
-			var gradientAmt = Math.min(vel / 15, 1.0);
-			return {
-        color : [1.0 - gradientAmt, gradientAmt, 0.0, 1.0],
-        pickable : true
-=======
         return {
           color: [1.0, 1.0, 1.0, 0.1],
           pickable: false
@@ -328,7 +225,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
       return {
         color: [1.0 - gradientAmt, gradientAmt, 0.0, 1.0],
         pickable: true
->>>>>>> refs/remotes/origin/master
       };
     });
     ColorScheme.group = new ColorScheme(function (satId) {
@@ -830,11 +726,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
         searchBox.doSearch(searchStr);
     });
 
-<<<<<<< HEAD
-    $('#all-objects-link').click(function() {
-=======
     $('#all-objects-link').click(function () {
->>>>>>> refs/remotes/origin/master
       if(selectedSat == -1)
         return;
       var intldes = satSet.getSat(selectedSat).intlDes;
@@ -842,11 +734,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
       searchBox.doSearch(searchStr);
       $('#search').val(searchStr);
     });
-<<<<<<< HEAD
-    $('#near-objects-link').click(function() {
-=======
     $('#near-objects-link').click(function () {
->>>>>>> refs/remotes/origin/master
       if(selectedSat == -1)
         return;
       var sat = selectedSat;
@@ -929,15 +817,13 @@ var currentSelectId = -1;
 var orbitMvMat = mat4.create();
 
 var div = document.getElementById("tle-source");
-//var arr = div.textContent.trim().split(' ');
-console.log("Start orbitWorker");
-var orbitWorker = new Worker('js/orbit-calculation-worker.js');
-console.log("Start orbitWorker2");
+var arr = div.textContent.trim().split(' ');
+var orbitWorker = new Worker(arr[0] + 'js/orbit-calculation-worker.js');
+
 var initialized = false;
 
 orbitDisplay.init = function () {
 
-  console.log("Start orbitWorker5");
   var startTime = performance.now();
 
   var vs = gl.createShader(gl.VERTEX_SHADER);
@@ -970,13 +856,11 @@ orbitDisplay.init = function () {
   for(var i=0; i<satSet.numSats; i++) {
     glBuffers.push(allocateBuffer());
   }
-  console.log("Start orbitWorker3");
   orbitWorker.postMessage({
     isInit : true,
     satData : satSet.satDataString,
     numSegs : NUM_SEGS,
   });
-  console.log("Start orbitWorker4");
   initialized = true;
 
   var time = performance.now() - startTime;
@@ -1218,11 +1102,7 @@ earth.init = function () {
 
   texture = gl.createTexture();
   var img = new Image();
-<<<<<<< HEAD
-  img.onload = function() {
-=======
   img.onload = function () {
->>>>>>> refs/remotes/origin/master
     $('#loader-text').text('Painting the Earth...');
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
@@ -1556,17 +1436,10 @@ window.sun = {
   var selectedColor = [0.0, 1.0, 1.0, 1.0];
 
   try {
-<<<<<<< HEAD
-    //var div = document.getElementById("tle-source");
-    //var arr = div.textContent.trim().split(' ');
-    $('#loader-text').text('Locating ELSETs...');
-    satCruncher = new Worker('js/sat-cruncher.js');
-=======
     var div = document.getElementById('tle-source');
     var arr = div.textContent.trim().split(' ');
     $('#loader-text').text('Locating ELSETs...');
     satCruncher = new Worker(arr[0] + 'js/sat-cruncher.js');
->>>>>>> refs/remotes/origin/master
   } catch (E) {
     browserUnsupported();
   }
@@ -1581,7 +1454,7 @@ window.sun = {
     if (!gotExtraData) { // store extra data that comes from crunching
       // var start = performance.now();
 
-      satExtraData = m.data.extraData;
+      satExtraData = JSON.parse(m.data.extraData);
 
       for (var i = 0; i < satSet.numSats; i++) {
         satData[i].inclination = satExtraData[i].inclination;
@@ -1645,18 +1518,6 @@ window.sun = {
     dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
     dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
 
-<<<<<<< HEAD
-    var div = document.getElementById("tle-source");
-    //var arr = div.textContent.trim().split(' ');
-    $.get(div.textContent +  '?fakeparameter=to_avoid_browser_cache2', function(resp) {
-      var startTime = new Date().getTime();
-
-      //console.log('sat.js downloaded data');
-      satData = TLEData;
-      //console.log(resp);
-      //console.log(TLEData);
-      satSet.satDataString = satData;
-=======
     var div = document.getElementById('tle-source');
     var arr = div.textContent.trim().split(' ');
     $.get(arr[0] + arr[1] + '?fakeparameter=to_avoid_browser_cache2', function (resp) {
@@ -1665,7 +1526,6 @@ window.sun = {
       // console.log('sat.js downloaded data');
       satData = resp;
       satSet.satDataString = JSON.stringify(satData);
->>>>>>> refs/remotes/origin/master
 
       // var postStart = performance.now();
       // send satCruncher starting_time_msec, time scale factor
@@ -1744,19 +1604,11 @@ window.sun = {
         dat: satSet.satDataString
       });
 
-<<<<<<< HEAD
-      //do some processing on our satData response
-      for(var i = 0; i < satData.length; i++) {
-        //console.log(satData);
-        console.log(satData[i]);
-        var year = satData[i].INTLDES.substring(0,2); //clean up intl des for display
-=======
       // var postEnd = performance.now();
       // do some processing on our satData response
 
       for (i = 0; i < satData.length; i++) {
         var year = satData[i].INTLDES.substring(0, 2); // clean up intl des for display
->>>>>>> refs/remotes/origin/master
         // console.log('year is',year);
         if (year === '') {
           satData[i].intlDes = 'none';
@@ -1772,11 +1624,7 @@ window.sun = {
 
       $('#loader-text').text('Drawing Satellites...');
 
-<<<<<<< HEAD
-      //populate GPU mem buffers, now that we know how many sats there are
-=======
       // populate GPU mem buffers, now that we know how many sats there are
->>>>>>> refs/remotes/origin/master
 
       satPosBuf = gl.createBuffer();
       satPos = new Float32Array(satData.length * 3);
@@ -1804,11 +1652,7 @@ window.sun = {
       // console.log('sat.js init: ' + (end - startTime) + ' ms (incl post: ' + (postEnd - postStart) + ' ms)');
 
       shadersReady = true;
-<<<<<<< HEAD
-      if(satsReadyCallback) {
-=======
       if (satsReadyCallback) {
->>>>>>> refs/remotes/origin/master
         $('#loader-text').text('Coloring Inside the Lines...');
         satsReadyCallback(satData);
       }
@@ -2219,17 +2063,10 @@ var camAngleSnappedOnSat = false;
 // var camDistTarget = 10000;
 var zoomLevel = 0.5;
 
-<<<<<<< HEAD
-//var div = document.getElementById("tle-source");
-//var arr = div.textContent.trim().split(' ');
-var zoomTarget = Number(0.5);
-//console.log('zoomTarget now ',zoomTarget);
-=======
 var div = document.getElementById('tle-source');
 var arr = div.textContent.trim().split(' ');
 var zoomTarget = Number(arr[2]);
 // console.log('zoomTarget now ',zoomTarget);
->>>>>>> refs/remotes/origin/master
 
 var ZOOM_EXP = 3;
 var DIST_MIN = 6400;
@@ -2519,20 +2356,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     }
   });
 
-<<<<<<< HEAD
-  $("#sensor-info-title").html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html'>Cape Cod AFS</a>");
-  $('a.iframe').colorbox({iframe: true, width:"80%", height:"80%", fastIframe: false, closeButton: false});
-  $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
-  whichRadar = 'COD';
-  radarType = 'Phased Array';
-  $('#menu-weather img').removeClass("bmenu-item-disabled");
-  $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
-
-  camSnap(latToPitch(41.754785),longToYaw(-70.539151));
-  changeZoom('leo');
-  lookangles.getsensorinfo();
-=======
   // USAF Radars
   $('#radar-beale').click(function () { // Select Beale's Radar Coverage
     satCruncher.postMessage({
@@ -2549,7 +2372,6 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsminrange: 500,
       obsmaxrange: 5555
     });
->>>>>>> refs/remotes/origin/master
 
     lookangles.setobs({
       lat: 39.136064,

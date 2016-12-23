@@ -130,16 +130,11 @@ ul {
   bottom: 0;
   margin-top: auto;
   margin-bottom: auto;
-  height: 560px;
-  width: 340px;
+  height: 520px;
+  width: 300px;
 }
 
 #all-objects-link {
-  font-size: 12px;
-  margin: 5px 0;
-}
-
-#near-objects-link {
   font-size: 12px;
   margin: 5px 0;
 }

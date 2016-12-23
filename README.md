@@ -1,6 +1,4 @@
 # 
-JavaScript Application to view orbital data about satellites:
-
 keeptrack.space
 =======================
 In 2015 [@jeyoder](https://github.com/jeyoder) released stuffin.space to visualize satellites around the earth. Since then a few members of MIT Lincoln Labs altered the code to combine files together, provide ability to adjust rate of time, and fix minor errors.
@@ -11,11 +9,13 @@ This project is both for practical purposes as a member of Air Force Space Comma
 
 How the Code Works
 ----------------------
-index.php - Controls the structure of the front-end and loads all the CSS and JS files.
-script-loader.js - Primary JS files that runs the website. All unique code is in this file.
-TLE.json - The main database on satellites and orbits.
-All Other .js Files - Dependencies that can be found elsewhere. Provide functions like the calender and spinner.
-Everything Else - Basic website CSS/images/icons.
+* index.htm - Controls the structure of the front-end and loads all the CSS and JS files.
+* main.js - Primary JS files that runs the website.
+* satCruncher.js - Web Worker that provides x, y, z coordinates of the satellites and if it is in a sensor's FOV.
+* orbit-calculation-worker.js - Web Worker that generates future orbits for satellites.
+* TLE.json - The main database on satellites and orbits.
+* All Other .js Files - Dependencies that can be found elsewhere. Provide functions like the calender and spinner.
+* Everything Else - Basic website CSS/images/icons.
 
 Install
 ----------------------

@@ -60,6 +60,8 @@ var isLaunchMenuOpen = false;
 var isBottomMenuOpen = false;
 var isAstronautsSelected = false;
 var isMilSatSelected = false;
+var isSatCollisionSelected = false; // TODO: Use this for the collision menu
+var socratesNum = -1;
 var isEditTime = false;
 
 var lastBoxUpdateTime = 0;
@@ -318,9 +320,9 @@ $(document).ready(function () { // Code Once index.php is loaded
  //   debugImageData = debugContext.createImageData(debugContext.canvas.width, debugContext.canvas.height);
 
   $('#bottom-menu').on('click', '.FOV-object', function (evt) {
-    var satId = $(this)['context']['textContent']; // TODO: Find correct code for this.
-    satId = satId.slice(-5);
-    satId = satSet.getIdFromObjnum(satId);
+    var objNum = $(this)['context']['textContent']; // TODO: Find correct code for this.
+    objNum = objNum.slice(-5);
+    var satId = satSet.getIdFromObjNum(objNum);
     if (satId !== null) {
       selectSat(satId);
     }
@@ -1244,14 +1246,116 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   $('#canvas').on('keypress', keyHandler); // On Key Press Event Run keyHandler Function
   $('#bottom-icons').on('click', '.bmenu-item', bottomIconPress); // Bottom Button Pressed
+  // TODO: Tie SOCRATES code into a Button
+  // socrates(0);
   $('#canvas').attr('tabIndex', 0);
   $('#canvas').focus();
 
   drawLoop(); // kick off the animationFrame()s
 });
 
+function socrates (row) {
+  // SOCRATES.htm is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
+  // If it ever becomes unavailable a similar, but less accurate (maybe?) cron job could be
+  // created using satCruncer.
+
+  // The variable row determines which set of objects on SOCRATES.htm we are using. First
+  // row is 0 and last one is 19.
+
+  $.get('/SOCRATES.htm', function (socratesHTM) { // Load SOCRATES.htm so we can use it instead of index.htm
+    var socratesObjOne = []; // Array for tr containing CATNR1
+    var socratesObjTwo = []; // Array for tr containing CATNR2
+    var tableRowOne = $("[name='CATNR1']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR1
+    var tableRowTwo = $("[name='CATNR2']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR2
+    tableRowOne.each(function (rowIndex, r) {
+      var cols = [];
+      $(this).find('td').each(function (colIndex, c) {
+        cols.push(c.textContent);
+      });
+      socratesObjOne.push(cols);
+    });
+    tableRowTwo.each(function (rowIndex, r) {
+      var cols = [];
+      $(this).find('td').each(function (colIndex, c) {
+        cols.push(c.textContent);
+      });
+      socratesObjTwo.push(cols);
+    });
+
+    // Use these to figure out SOCRATES values
+    // console.log(socratesObjOne);
+    // console.log(socratesObjTwo);
+
+    findFutureDate(socratesObjTwo); // Jump to the date/time of the collision
+    function findFutureDate (socratesObjTwo) {
+      var socratesDate = socratesObjTwo[row][4].split(' '); // Date/time is on the second line 5th column
+      var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
+
+      var sYear = parseInt(socratesDate[0]); // UTC Year
+      var sMon = MMMtoInt(socratesDate[1]); // UTC Month in MMM prior to converting
+      var sDay = parseInt(socratesDate[2]); // UTC Day
+      var sHour = parseInt(socratesTime[0]); // UTC Hour
+      var sMin = parseInt(socratesTime[1]); // UTC Min
+      var sSec = parseInt(socratesTime[2]); // UTC Sec - This is a decimal, but when we convert to int we drop those
+
+      function MMMtoInt (month) {
+        switch (month) {
+          case 'Jan':
+            return 0;
+          case 'Feb':
+            return 1;
+          case 'Mar':
+            return 2;
+          case 'Apr':
+            return 3;
+          case 'May':
+            return 4;
+          case 'Jun':
+            return 5;
+          case 'Jul':
+            return 6;
+          case 'Aug':
+            return 7;
+          case 'Sep':
+            return 8;
+          case 'Oct':
+            return 9;
+          case 'Nov':
+            return 10;
+          case 'Dec':
+            return 11;
+        }
+      } // Convert MMM format to an int for Date() constructor
+
+      var selectedDate = new Date(sYear, sMon, sDay, sHour, sMin, sSec); // New Date object of the future collision
+      // Date object defaults to local time.
+      selectedDate.setUTCDate(sDay); // Move to UTC day.
+      selectedDate.setUTCHours(sHour); // Move to UTC Hour
+
+      var today = new Date(); // Need to know today for offset calculation
+      propOffset = selectedDate - today; // Find the offset from today
+      satCruncher.postMessage({ // Tell satCruncher we have changed times for orbit calculations
+        typ: 'offset',
+        dat: (propOffset).toString() + ' ' + (1.0).toString()
+      });
+      // NOTE: Camera Rotates
+      propRealTime = Date.now(); // Reset realtime TODO: This might not be necessary...
+    }
+
+    $('#search').val(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Fill in the serach box with the two objects
+    searchBox.doSearch(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Actually perform the search of the two objects
+    // NOTE: Camera Rotates
+    // console.log(socratesObjOne[row][1]);
+    // console.log(satSet.getIdFromObjNum(socratesObjOne[row][1]));
+    selectSat(satSet.getIdFromObjNum(socratesObjOne[row][1])); // Select the first object listed in SOCRATES
+    // NOTE: Camera Rotates
+    // TODO: Three camera rotations back to back looks clunky and may slow down IE on older computers
+    // There might be a way to make a top level function that locks the camera?
+  });
+}
 function keyHandler (evt) {
   var ratechange = false;
+  console.log(evt);
   switch (Number(evt.charCode)) {
     case 114: // r
       initialRotation = !initialRotation;
@@ -1486,7 +1590,6 @@ function bottomIconPress (evt) {
     $('#menu-weather img').removeClass('bmenu-item-selected');
     $('#menu-space-weather img').removeClass('bmenu-item-selected');
   }
-
   switch ($(this)['context']['id']) {
     case 'menu-in-coverage': // B
       if (isBottomMenuOpen) {
@@ -1633,6 +1736,7 @@ function bottomIconPress (evt) {
         $('#search').val('25544,41765');
         searchBox.doSearch('25544,41765');
         isAstronautsSelected = true;
+        $('#menu-space-stations img').removeClass('bmenu-item-selected');
         $('#menu-astronauts img').addClass('bmenu-item-selected');
         break;
       }
@@ -1647,7 +1751,25 @@ function bottomIconPress (evt) {
         $('#search').val('40420,41394,32783,35943,36582,40353,40555,41032,38010,38008,38007,38009,37806,41121,41579,39030,39234,28492,36124,39194,36095,40358,40258,37212,37398,38995,40296,40900,39650,27434,31601,36608,28380,28521,36519,39177,40699,34264,36358,39375,38248,34807,28908,32954,32955,32956,35498,35500,37152,37154,38733,39057,39058,39059,39483,39484,39485,39761,39762,39763,40920,40921,40922,39765,29658,31797,32283,32750,33244,39208,26694,40614,20776,25639,26695,30794,32294,33055,39034,28946,33751,33752,27056,27057,27464,27465,27868,27869,28419,28420,28885,29273,32476,31792,36834,37165,37875,37941,38257,38354,39011,39012,39013,39239,39240,39241,39363,39410,40109,40111,40143,40275,40305,40310,40338,40339,40340,40362,40878,41026,41038,41473,28470,37804,37234,29398,40110,39209,39210,36596');
         searchBox.doSearch('40420,41394,32783,35943,36582,40353,40555,41032,38010,38008,38007,38009,37806,41121,41579,39030,39234,28492,36124,39194,36095,40358,40258,37212,37398,38995,40296,40900,39650,27434,31601,36608,28380,28521,36519,39177,40699,34264,36358,39375,38248,34807,28908,32954,32955,32956,35498,35500,37152,37154,38733,39057,39058,39059,39483,39484,39485,39761,39762,39763,40920,40921,40922,39765,29658,31797,32283,32750,33244,39208,26694,40614,20776,25639,26695,30794,32294,33055,39034,28946,33751,33752,27056,27057,27464,27465,27868,27869,28419,28420,28885,29273,32476,31792,36834,37165,37875,37941,38257,38354,39011,39012,39013,39239,39240,39241,39363,39410,40109,40111,40143,40275,40305,40310,40338,40339,40340,40362,40878,41026,41038,41473,28470,37804,37234,29398,40110,39209,39210,36596');
         isMilSatSelected = true;
+        $('#menu-astronauts img').removeClass('bmenu-item-selected');
         $('#menu-space-stations img').addClass('bmenu-item-selected');
+        break;
+      }
+    case 'menu-satellite-collision': // No Keyboard Shortcut
+      if (false) { // TODO: Add actual menu for satellite collisions.
+        $('#search').val('');
+        searchBox.hideResults();
+        isSatCollisionSelected = false;
+        $('#menu-satellite-collision img').removeClass('bmenu-item-selected');
+        break;
+      } else {
+        socratesNum = socratesNum + 1;
+        if (socratesNum === 20) {
+          socratesNum = 0;
+        }
+        socrates(socratesNum);
+        isSatCollisionSelected = true;
+        $('#menu-satellite-collision img').addClass('bmenu-item-selected');
         break;
       }
   }
@@ -2830,7 +2952,7 @@ dateFormat.i18n = {
       }
     } else if (groupType === 'objNum') {
       for (i = 0; i < data.length; i++) {
-        var theSatId = satSet.getIdFromObjnum(data[i]);
+        var theSatId = satSet.getIdFromObjNum(data[i]);
         if (theSatId === null) continue;
         this.sats.push({
           satId: theSatId,
@@ -4292,7 +4414,7 @@ function propTime () {
   };
 
   // TODO: if OBS UCT #s > 100K are to be handled, need to add code for that
-  satSet.getIdFromObjnum = function (objNum) {
+  satSet.getIdFromObjNum = function (objNum) {
     for (var i = 0; i < satData.length; i++) {
       if (satData[i].SCC_NUM.toString().indexOf(objNum) === 0 && satData[i].OBJECT_TYPE !== 'unknown') {
         return i;

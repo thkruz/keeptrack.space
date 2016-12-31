@@ -3358,15 +3358,15 @@ dateFormat.i18n = {
         html += '</span>';
         html += sat.OBJECT_NAME.substring(results[i].strIndex + results[i].patlen);
       }
-      html += '<div class="search-result-intldes">';
-      if (results[i].isIntlDes) {
-        html += sat.intlDes.substring(0, results[i].strIndex);
+      html += '<div class="search-result-scc">';
+      if (results[i].isObjnum) {
+        html += sat.SCC_NUM.substring(0, results[i].strIndex);
         html += '<span class="search-hilight">';
-        html += sat.intlDes.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
+        html += sat.SCC_NUM.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
         html += '</span>';
-        html += sat.intlDes.substring(results[i].strIndex + results[i].patlen);
+        html += sat.SCC_NUM.substring(results[i].strIndex + results[i].patlen);
       } else {
-        html += sat.intlDes;
+        html += sat.SCC_NUM;
       }
       html += '</div></div>';
     }

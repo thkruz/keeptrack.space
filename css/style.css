@@ -418,6 +418,55 @@ iframe {
   margin-top: -10px;
 }
 
+/* Look Angles Menus */
+#socrates-menu {
+  display: none;
+  background: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  width: 400px;
+  max-height: 100%;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 10;
+  left: 0;
+  top: 150px;
+  bottom: 150px;
+  color: white;
+}
+.socrates-title{
+  text-align: center;
+  font-size: 12;
+  opacity: 1;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  position: fixed;
+  width: 400px;
+}
+.title-text{
+  vertical-align: middle;
+}
+
+/* Div for Look Angles Table */
+#socrates-content {
+  position: absolute;
+  width: 400px;
+  max-height: 100%;
+  top: 30px;
+  bottom: 0px;
+  overflow: auto;
+}
+
+/* Look Angles Table */
+#socrates-table{
+  margin: 0 auto;
+  margin-top: -10px;
+}
+
+.socrates-object:hover{
+  cursor: pointer;
+  color: red;
+}
+
 /* Find By Look Angles Menus */
 #findByLooks-menu {
   display: none;

@@ -1246,8 +1246,6 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   $('#canvas').on('keypress', keyHandler); // On Key Press Event Run keyHandler Function
   $('#bottom-icons').on('click', '.bmenu-item', bottomIconPress); // Bottom Button Pressed
-  // TODO: Tie SOCRATES code into a Button
-  // socrates(0);
   $('#canvas').attr('tabIndex', 0);
   $('#canvas').focus();
 
@@ -1286,8 +1284,9 @@ function socrates (row) {
     // console.log(socratesObjOne);
     // console.log(socratesObjTwo);
 
-    findFutureDate(socratesObjTwo); // Jump to the date/time of the collision
-    function findFutureDate (socratesObjTwo) {
+    if (row !== -1) {
+      findFutureDate(socratesObjTwo); // Jump to the date/time of the collision
+      function findFutureDate (socratesObjTwo) {
       var socratesDate = socratesObjTwo[row][4].split(' '); // Date/time is on the second line 5th column
       var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
 
@@ -1334,25 +1333,60 @@ function socrates (row) {
 
       var today = new Date(); // Need to know today for offset calculation
       propOffset = selectedDate - today; // Find the offset from today
+      camSnapMode = false;
       satCruncher.postMessage({ // Tell satCruncher we have changed times for orbit calculations
         typ: 'offset',
         dat: (propOffset).toString() + ' ' + (1.0).toString()
       });
-      // NOTE: Camera Rotates
       propRealTime = Date.now(); // Reset realtime TODO: This might not be necessary...
+    } // Allows passing -1 argument to socrates function to skip these steps
+
+      $('#search').val(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Fill in the serach box with the two objects
+      searchBox.doSearch(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Actually perform the search of the two objects
+      setTimeout(socratesSelectSat, 1000); // Wait 1 second before selecting the sat because satcruncher updates on 1 second intervals
+                                           // and will cause the camera to rotate twice
+      function socratesSelectSat () {
+        selectSat(satSet.getIdFromObjNum(socratesObjOne[row][1])); // Select the first object listed in SOCRATES
+      }
     }
 
-    $('#search').val(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Fill in the serach box with the two objects
-    searchBox.doSearch(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Actually perform the search of the two objects
-    // NOTE: Camera Rotates
-    // console.log(socratesObjOne[row][1]);
-    // console.log(satSet.getIdFromObjNum(socratesObjOne[row][1]));
-    selectSat(satSet.getIdFromObjNum(socratesObjOne[row][1])); // Select the first object listed in SOCRATES
-    // NOTE: Camera Rotates
-    // TODO: Three camera rotations back to back looks clunky and may slow down IE on older computers
-    // There might be a way to make a top level function that locks the camera?
+    if (row === -1) { // Only generate the table if receiving the -1 argument
+      // SOCRATES Menu
+      var tbl = document.getElementById('socrates-table'); // Identify the table to update
+      tbl.innerHTML = '';                                  // Clear the table from old object data
+      var tblLength = 0;                                   // Iniially no rows to the table
+
+      function pad (str, max) {
+        return str.length < max ? pad("0" + str, max) : str;
+      }
+
+      for (var i = 0; i < 20; i++) {                       // 20 rows
+        var tr = tbl.insertRow();
+        tr.setAttribute("class", "socrates-object");
+        tr.setAttribute("hiddenrow", i);
+        var tdT = tr.insertCell();
+        var socratesDate = socratesObjTwo[i][4].split(' '); // Date/time is on the second line 5th column
+        var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
+        var socratesTimeS = socratesTime[2].split('.'); // Split time from date for easier management
+        tdT.appendChild(document.createTextNode(socratesDate[2] + ' ' + socratesDate[1] + ' ' + socratesDate[0] + ' - ' + pad(socratesTime[0], 2) + ':' +
+                        pad(socratesTime[1], 2) + ':' + pad(socratesTimeS[0], 2) + 'Z'));
+        var tdS1 = tr.insertCell();
+        tdS1.appendChild(document.createTextNode(socratesObjOne[i][1]));
+        var tdS2 = tr.insertCell();
+        tdS2.appendChild(document.createTextNode(socratesObjTwo[i][0]));
+      }
+    }
   });
 }
+
+$('#socrates-menu').on('click', '.socrates-object', function (evt) {
+  var hiddenRow = $(this)['context']['attributes']['hiddenrow']['value']; // TODO: Find correct code for this.
+  console.log(hiddenRow);
+  if (hiddenRow !== null) {
+    socrates(hiddenRow);
+  }
+});
+
 function keyHandler (evt) {
   var ratechange = false;
   console.log(evt);
@@ -1756,19 +1790,15 @@ function bottomIconPress (evt) {
         break;
       }
     case 'menu-satellite-collision': // No Keyboard Shortcut
-      if (false) { // TODO: Add actual menu for satellite collisions.
-        $('#search').val('');
-        searchBox.hideResults();
+      if (isSatCollisionSelected) { // TODO: Add actual menu for satellite collisions.
         isSatCollisionSelected = false;
+        $('#socrates-menu').fadeOut();
         $('#menu-satellite-collision img').removeClass('bmenu-item-selected');
         break;
       } else {
-        socratesNum = socratesNum + 1;
-        if (socratesNum === 20) {
-          socratesNum = 0;
-        }
-        socrates(socratesNum);
+        $('#socrates-menu').fadeIn();
         isSatCollisionSelected = true;
+        socrates(-1);
         $('#menu-satellite-collision img').addClass('bmenu-item-selected');
         break;
       }
@@ -2172,7 +2202,8 @@ function longToYaw (long) {
 
   selectedDate = selectedDate.split(' ');
   selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
-  today.setUTCHours(selectedDate.getUTCHours() + 9.5);
+  today.setUTCHours(selectedDate.getUTCHours() + 12); // Used to be 9.5.
+                                                      // 12 Seems to be the offset from the earth draw script, but this is guesswork.
   today.setUTCMinutes(selectedDate.getUTCMinutes());
   today.setUTCSeconds(selectedDate.getUTCSeconds());
   selectedDate.setUTCHours(0);

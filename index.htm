@@ -30,116 +30,20 @@
 
   </head>
   <body>
-  <div id="sensor-info-menu">
-    <div id="sensor-info-title">Sensor Name</div>
-    <div class="sensor-info-row">
-      <div class="sensor-info-key">Country</div>
-      <div class="sensor-info-value" id="sensor-country">USA</div>
-    </div>
-    <div class="sensor-info-row">
-      <div class="sensor-info-key">Radar Type</div>
-      <div class="sensor-info-value" id="sensor-type">Unknown</div>
-    </div>
-    <div class="sensor-info-row">
-      <div class="sensor-info-key">Latitude</div>
-      <div class="sensor-info-value" id="sensor-latitude">0</div>
-    </div>
-    <div class="sensor-info-row">
-      <div class="sensor-info-key">Longitude</div>
-      <div class="sensor-info-value" id="sensor-longitude">0</div>
-    </div>
-    <div class="sensor-info-row">
-      <div class="sensor-info-key">Sun Exclusion</div>
-      <div class="sensor-info-value" id="sensor-sun">Sun Stuff</div>
-    </div>
-    <div class="sensor-info-row">
-      <div class="sensor-info-key">Min Azimuth</div>
-      <div class="sensor-info-value" id="sensor-minazimuth">30 deg</div>
-    </div>
-    <div class="sensor-info-row">
-      <div class="sensor-info-key">Max Azimuth</div>
-      <div class="sensor-info-value" id="sensor-maxazimuth">30 deg</div>
-    </div>
-    <div class="sensor-info-row">
-      <div class="sensor-info-key">Min Elevation</div>
-      <div class="sensor-info-value" id="sensor-minelevation">60 deg</div>
-    </div>
-    <div class="sensor-info-row">
-      <div class="sensor-info-key">Max Elevation</div>
-      <div class="sensor-info-value" id="sensor-maxelevation">60 deg</div>
-    </div>
-    <div class="sensor-info-row">
-      <div class="sensor-info-key">Min Range</div>
-      <div class="sensor-info-value" id="sensor-minrange">1000 km</div>
-    </div>
-    <div class="sensor-info-row">
-      <div class="sensor-info-key">Max Range</div>
-      <div class="sensor-info-value" id="sensor-maxrange">1000 km</div>
-    </div>
-  </div>
-  <div id="findByLooks-menu">
-    <div class="fbl-title"><span class="title-text">Find By Looks</span></div>
-    <div id="findByLooks-content">
-      <fieldset>
-        <form id="findByLooks">
-          <div class="center">
-            <span class="vertcenter">Azimuth: </span>
-            <input type="text" class="ghost-input" id="fbl-azimuth" value="XXX.X">
-          </div>
-          <div class="center">
-            <span class="vertcenter">Margin: </span>
-            <input type="text" class="ghost-input" id="fbl-azimuth-margin" value="XX">
-          </div>
-          <div class="center">
-            <span class="vertcenter">Elevation: </span>
-            <input type="text" class="ghost-input" id="fbl-elevation" value="XX.X"></div>
-          <div class="center">
-            <span class="vertcenter">Margin: </span>
-            <input type="text" class="ghost-input" id="fbl-elevation-margin" value="XX"></div>
-          <div class="center">
-            <span class="vertcenter">Range: </span>
-            <input type="text" class="ghost-input" id="fbl-range" value="XXXX.X"></div>
-          <div class="center">
-            <span class="vertcenter">Margin: </span>
-            <input type="text" class="ghost-input" id="fbl-range-margin" value="XXXX"></div>
-          <div class="center">
-            <span class="vertcenter">Inclination: </span>
-            <input type="text" class="ghost-input" id="fbl-inc" value="XX.X"></div>
-          <div class="center">
-            <span class="vertcenter">Margin: </span>
-            <input type="text" class="ghost-input" id="fbl-inc-margin" value="XX.X"></div>
-          <div class="center">
-            <input type="submit" id="findByLooks-submit" class="ghost-button" value="Search">
-          </div>
-        </form>
-      </fieldset>
-      <span id="findByLooks-results"></span>
-    </div>
-  </div>
-  <div id="lookangles-menu">
-    <div class="looks-title"><span class="title-text">Look Angles</span></div>
-    <div id="lookangles-content">
-      <table id="looks"  cellpadding="5"></table>
-    </div>
-  </div>
-  <div id="twitter-menu">
-    <a class="twitter-timeline" data-theme="dark" data-link-color="#2B7BB9" href="https://twitter.com/RedKosmonaut/lists/space-news">A Twitter List by RedKosmonaut</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-  </div>
-  <div id="launch-menu">
-  </div>
-  <div id="bottom-menu">Current Objects
-  </div>
-  <div id="weather-menu">
-    <img id="weather-image">
-  </div>
-  <div id="space-weather-menu">
-    <img id="space-weather-image">
-  </div>
   <div id="no-webgl">
     Stuff in Space requires <a href="http://caniuse.com/#feat=webgl">WebGL</a> and <a href="http://caniuse.com/#feat=webworkers">Web Worker</a> support.
   </div>
   <div id="canvas-holder">
     <canvas id="canvas"></canvas>
+    <div id="load-cover">
+      <div id="loader">
+        <div id="spinner"></div>
+        <div id="loader-text">
+          Downloading Science...
+        </div>
+      </div>
+    </div>
+    <div id="search-results"></div>
     <div id="menu-left" class="menubar">
       <div id="search-holder" class="menu-item">
         <span class="icon-search"></span>
@@ -168,7 +72,7 @@
           <li data-group="UnitedStates">United States</li>
         </ul>
       </div>
-      <div id="menu-radar" class="menu-item">
+      <div id="menu-radar-us" class="menu-item">
         <div class="menu-title">US Radar</div>
           <ul id="radar-coverage" class="dropdown submenu">
             <li id="radar-altair">ALTAIR</li>
@@ -182,7 +86,7 @@
             <li id="radar-thule">Thule</li>
           </ul>
       </div>
-      <div id="menu-radar" class="menu-item">
+      <div id="menu-optical" class="menu-item">
         <div class="menu-title">US Optical</div>
           <ul id="radar-coverage" class="dropdown submenu">
             <li id="optical-diego-garcia">Diego Garcia</li>
@@ -191,7 +95,7 @@
             <li id="optical-spain">Spain</li>
           </ul>
       </div>
-      <div id="menu-radar" class="menu-item">
+      <div id="menu-radar-rus" class="menu-item">
         <div class="menu-title">Russian</div>
           <ul id="radar-coverage" class="dropdown submenu">
             <li id="russian-armavir">Armavir</li>
@@ -204,7 +108,7 @@
             <li id="russian-pionersky">Pionersky</li>
           </ul>
       </div>
-      <div id="menu-radar" class="menu-item">
+      <div id="menu-radar-prc" class="menu-item">
         <div class="menu-title">Chinese</div>
           <ul id="radar-coverage" class="dropdown submenu">
             <li id="chinese-xuanhua">Xuanhua</li>
@@ -308,8 +212,116 @@
         </div>
       </div>
     </div>
-      <div id="search-results"></div>
     <div id="sat-hoverbox">(none)</div>
+    <div id="sensor-info-menu">
+      <div id="sensor-info-title">Sensor Name</div>
+      <div class="sensor-info-row">
+        <div class="sensor-info-key">Country</div>
+        <div class="sensor-info-value" id="sensor-country">USA</div>
+      </div>
+      <div class="sensor-info-row">
+        <div class="sensor-info-key">Radar Type</div>
+        <div class="sensor-info-value" id="sensor-type">Unknown</div>
+      </div>
+      <div class="sensor-info-row">
+        <div class="sensor-info-key">Latitude</div>
+        <div class="sensor-info-value" id="sensor-latitude">0</div>
+      </div>
+      <div class="sensor-info-row">
+        <div class="sensor-info-key">Longitude</div>
+        <div class="sensor-info-value" id="sensor-longitude">0</div>
+      </div>
+      <div class="sensor-info-row">
+        <div class="sensor-info-key">Sun Exclusion</div>
+        <div class="sensor-info-value" id="sensor-sun">Sun Stuff</div>
+      </div>
+      <div class="sensor-info-row">
+        <div class="sensor-info-key">Min Azimuth</div>
+        <div class="sensor-info-value" id="sensor-minazimuth">30 deg</div>
+      </div>
+      <div class="sensor-info-row">
+        <div class="sensor-info-key">Max Azimuth</div>
+        <div class="sensor-info-value" id="sensor-maxazimuth">30 deg</div>
+      </div>
+      <div class="sensor-info-row">
+        <div class="sensor-info-key">Min Elevation</div>
+        <div class="sensor-info-value" id="sensor-minelevation">60 deg</div>
+      </div>
+      <div class="sensor-info-row">
+        <div class="sensor-info-key">Max Elevation</div>
+        <div class="sensor-info-value" id="sensor-maxelevation">60 deg</div>
+      </div>
+      <div class="sensor-info-row">
+        <div class="sensor-info-key">Min Range</div>
+        <div class="sensor-info-value" id="sensor-minrange">1000 km</div>
+      </div>
+      <div class="sensor-info-row">
+        <div class="sensor-info-key">Max Range</div>
+        <div class="sensor-info-value" id="sensor-maxrange">1000 km</div>
+      </div>
+    </div>
+    <div id="findByLooks-menu">
+      <div class="fbl-title"><span class="title-text">Find By Looks</span></div>
+      <div id="findByLooks-content">
+        <fieldset>
+          <form id="findByLooks">
+            <div class="center">
+              <span class="vertcenter">Azimuth: </span>
+              <input type="text" class="ghost-input" id="fbl-azimuth" value="XXX.X">
+            </div>
+            <div class="center">
+              <span class="vertcenter">Margin: </span>
+              <input type="text" class="ghost-input" id="fbl-azimuth-margin" value="XX">
+            </div>
+            <div class="center">
+              <span class="vertcenter">Elevation: </span>
+              <input type="text" class="ghost-input" id="fbl-elevation" value="XX.X"></div>
+            <div class="center">
+              <span class="vertcenter">Margin: </span>
+              <input type="text" class="ghost-input" id="fbl-elevation-margin" value="XX"></div>
+            <div class="center">
+              <span class="vertcenter">Range: </span>
+              <input type="text" class="ghost-input" id="fbl-range" value="XXXX.X"></div>
+            <div class="center">
+              <span class="vertcenter">Margin: </span>
+              <input type="text" class="ghost-input" id="fbl-range-margin" value="XXXX"></div>
+            <div class="center">
+              <span class="vertcenter">Inclination: </span>
+              <input type="text" class="ghost-input" id="fbl-inc" value="XX.X"></div>
+            <div class="center">
+              <span class="vertcenter">Margin: </span>
+              <input type="text" class="ghost-input" id="fbl-inc-margin" value="XX.X"></div>
+            <div class="center">
+              <input type="submit" id="findByLooks-submit" class="ghost-button" value="Search">
+            </div>
+          </form>
+        </fieldset>
+        <span id="findByLooks-results"></span>
+      </div>
+    </div>
+    <div id="lookangles-menu">
+      <div class="looks-title"><span class="title-text">Look Angles</span></div>
+      <div id="lookangles-content">
+        <table id="looks"  cellpadding="5"></table>
+      </div>
+    </div>
+    <div id="twitter-menu">
+      <a class="twitter-timeline" data-theme="dark" data-link-color="#2B7BB9" href="https://twitter.com/RedKosmonaut/lists/space-news">A Twitter List by RedKosmonaut</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </div>
+    <div id="launch-menu"></div>
+    <div id="bottom-menu">Current Objects</div>
+    <div id="weather-menu">
+      <img id="weather-image">
+    </div>
+    <div id="space-weather-menu">
+      <img id="space-weather-image">
+    </div>
+    <div id="socrates-menu">
+      <div class="socrates-title"><span class="title-text">Possible Collisions</span></div>
+      <div id="socrates-content">
+        <table id="socrates-table"  width="400px" cellpadding="5"></table>
+      </div>
+    </div>
     <div id="sat-infobox">
       <div id="sat-vehicle-image-container">
         <img id="sat-vehicle-image">
@@ -407,14 +419,14 @@
       </div>
     </div>
     <div id="datetime">
-      <div id="datetime-text"></div>
-      <div id="datetime-input">
-        <form id="datetime-input-form">
-          <input type="text" id="datetime-input-tb">
-        </form>
-      </div>
-   </div>
-   <div id="bottom-icons">
+        <div id="datetime-text"></div>
+        <div id="datetime-input">
+          <form id="datetime-input-form">
+            <input type="text" id="datetime-input-tb">
+          </form>
+        </div>
+    </div>
+    <div id="bottom-icons">
      <div id="menu-sensor-info" class="bmenu-item">
        <img src="/images/radar.png" class="bmenu-item-disabled" alt="Sensor Info">
      </div>
@@ -452,14 +464,6 @@
     <div id="zoom-controls">
       <div id="zoom-in" class="zoom-button">+</div>
       <div id="zoom-out" class="zoom-button">-</div>
-    </div>
-    <div id="load-cover">
-      <div id="loader">
-        <div id="spinner"></div>
-        <div id="loader-text">
-          Downloading Science...
-        </div>
-      </div>
     </div>
   </div>
   <!-- Load UI Dependencies -->

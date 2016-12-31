@@ -1974,8 +1974,13 @@ function selectSat (satId) {
     $('#sat-perigee').html(sat.perigee.toFixed(0) + ' km');
     $('#sat-inclination').html((sat.inclination * R2D).toFixed(2) + '°');
     $('#sat-eccentricity').html((sat.eccentricity).toFixed(3));
+
     $('#sat-period').html(sat.period.toFixed(2) + ' min');
-    $('#sat-period').prop('title', 'Mean Motion: ' + 60 * 24 / sat.period.toFixed(2));
+    $('#sat-period').hover(function() {
+      $('#sat-period').html('Mean Motion: ' + 60 * 24 / sat.period.toFixed(2));
+    }, function() {
+      $('#sat-period').html(sat.period.toFixed(2) + ' min');
+    });
 
     var now = new Date();
     now = now.getFullYear();
@@ -1986,9 +1991,12 @@ function selectSat (satId) {
     } else {
       daysold = jday() - satSet.getSat(satId).TLE_LINE1.substr(20, 3) + (satSet.getSat(satId).TLE_LINE1.substr(17, 2) * 365);
     }
-
     $('#sat-elset-age').html(daysold + ' Days');
-    $('#sat-elset-age').prop('title', 'Epoch Year: ' + sat.TLE_LINE1.substr(18, 2).toString() + ' Epoch Day: ' + sat.TLE_LINE1.substr(20, 8).toString());
+    $('#sat-elset-age').hover(function() {
+      $('#sat-elset-age').html('Epoch Year: ' + sat.TLE_LINE1.substr(18, 2).toString() + ' Day: ' + sat.TLE_LINE1.substr(20, 8).toString());
+    }, function() {
+      $('#sat-elset-age').html(daysold + ' Days');
+    });
     if (jday() !== sat.TLE_LINE1.substr(20, 3).toString()) {
     }
 

@@ -54,6 +54,7 @@ var socratesObjOne = []; // Array for tr containing CATNR1
 var socratesObjTwo = []; // Array for tr containing CATNR2
 
 var whichRadar = '';
+var isBottomIconsEnabled = false;
 var isLookanglesMenuOpen = false;
 var isTwitterMenuOpen = false;
 var isWeatherMenuOpen = false;
@@ -373,8 +374,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').removeClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(39.136064), longToYaw(-121.351237));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -414,8 +413,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     whichRadar = 'COD';
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').removeClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(41.754785), longToYaw(-70.539151));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -454,8 +451,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').removeClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(64.290556), longToYaw(-149.186944));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -494,8 +489,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').removeClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(30.572411), longToYaw(-86.214836));
     changeZoom('geo');
     lookangles.getsensorinfo();
@@ -534,8 +527,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').removeClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(54.361758), longToYaw(-0.670051));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -574,8 +565,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').removeClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(48.724567), longToYaw(-97.899755));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -615,8 +604,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-type').html('Phased Array');
     // No Weather
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(76.570322), longToYaw(-68.299211));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -657,8 +644,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Mechanical');
     $('#menu-weather img').removeClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(8.716667), longToYaw(167.733333));
     changeZoom('geo');
     lookangles.getsensorinfo();
@@ -697,8 +682,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Mechanical');
     $('#menu-weather img').removeClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(42.6233), longToYaw(-71.4882));
     changeZoom('geo');
     lookangles.getsensorinfo();
@@ -739,8 +722,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
 
     $('#menu-weather img').removeClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(-7.296480), longToYaw(72.390153));
     changeZoom('geo');
     lookangles.getsensorinfo();
@@ -780,8 +761,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-type').html('Optical');
     // No Weather
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(20.708350), longToYaw(-156.257595));
     changeZoom('geo');
     lookangles.getsensorinfo();
@@ -821,8 +800,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-type').html('Optical');
     // No Weather
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(33.817233), longToYaw(-106.659961));
     changeZoom('geo');
     lookangles.getsensorinfo();
@@ -862,8 +839,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-type').html('Optical');
     // No Weather
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(37.166962), longToYaw(-5.600839));
     changeZoom('geo');
     lookangles.getsensorinfo();
@@ -904,8 +879,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(44.925106), longToYaw(40.983894));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -944,7 +917,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
     camSnap(latToPitch(46.603076), longToYaw(74.530985));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -983,7 +955,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
     camSnap(latToPitch(52.850000), longToYaw(26.480000));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -1022,8 +993,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(60.275458), longToYaw(30.546017));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -1062,8 +1031,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(52.855500), longToYaw(103.231700));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -1102,8 +1069,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(68.114100), longToYaw(33.910200));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -1142,8 +1107,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-
     camSnap(latToPitch(65.210000), longToYaw(57.295000));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -1182,7 +1145,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
     camSnap(latToPitch(54.857294), longToYaw(20.182350));
     changeZoom('leo');
     lookangles.getsensorinfo();
@@ -1223,10 +1185,15 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
     $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
     camSnap(latToPitch(40.446944), longToYaw(115.116389));
     changeZoom('leo');
     lookangles.getsensorinfo();
+  });
+
+  $('.sensor-selected').click(function () {
+    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
+    $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+    $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
   });
 
   $('#datetime-input-form').change(function (e) {
@@ -1606,27 +1573,15 @@ function hideSideMenus () {
   isLookanglesMenuOpen = false;
 }
 function bottomIconPress (evt) {
+  if (isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
   switch ($(this)['context']['id']) {
-    case 'menu-in-coverage': // B
-      if (isBottomMenuOpen) {
-        $('#bottom-menu').fadeOut();
-        $('#menu-in-coverage img').removeClass('bmenu-item-selected');
-        isBottomMenuOpen = false;
-        break;
-      } else {
-        $('#bottom-menu').fadeIn();
-        isBottomMenuOpen = true;
-        $('#menu-in-coverage img').addClass('bmenu-item-selected');
-        break;
-      }
     case 'menu-sensor-info': // No Keyboard Commands
       if (lookangles.obslat == null) { // No Sensor Selected
         break;
       }
       if (isSensorInfoMenuOpen) {
-        $('#sensor-info-menu').fadeOut();
+        hideSideMenus();
         isSensorInfoMenuOpen = false;
-        deselectColor();
         break;
       } else {
         hideSideMenus();
@@ -1636,16 +1591,38 @@ function bottomIconPress (evt) {
         $('#menu-sensor-info img').addClass('bmenu-item-selected');
         break;
       }
-    case 'menu-launches': // L
-      if (isLaunchMenuOpen) {
-        isLaunchMenuOpen = false;
-        deselectColor();
+    case 'menu-in-coverage': // B
+      if (lookangles.obslat == null) { // No Sensor Selected
+        break;
+      }
+      if (isBottomMenuOpen) {
+        $('#bottom-menu').fadeOut();
+        $('#menu-in-coverage img').removeClass('bmenu-item-selected');
+        isBottomMenuOpen = false;
+        break;
+      } else {
+        $('#bottom-menu').fadeIn();
+        $('#menu-in-coverage img').addClass('bmenu-item-selected');
+        isBottomMenuOpen = true;
+        break;
+      }
+    case 'menu-lookangles': // S
+      if (lookangles.obslat == null) { // No Sensor Selected
+        break;
+      }
+      if (isLookanglesMenuOpen) {
+        isLookanglesMenuOpen = false;
+        hideSideMenus();
         break;
       } else {
         hideSideMenus();
-        $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2017.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-        isLaunchMenuOpen = true;
-        $('#menu-launches img').addClass('bmenu-item-selected');
+        $('#lookangles-menu').fadeIn();
+        isLookanglesMenuOpen = true;
+        $('#menu-lookangles img').addClass('bmenu-item-selected');
+        if (selectedSat !== -1) {
+          var sat = satSet.getSat(selectedSat);
+          lookangles.getlookangles(sat, isLookanglesMenuOpen);
+        }
         break;
       }
     case 'menu-find-sat': // F
@@ -1723,21 +1700,16 @@ function bottomIconPress (evt) {
       isSpaceWeatherMenuOpen = true;
       $('#menu-space-weather img').addClass('bmenu-item-selected');
       break;
-    case 'menu-lookangles': // S
-      if (isLookanglesMenuOpen) {
-        $('#lookangles-menu').fadeOut();
-        isLookanglesMenuOpen = false;
-        deselectColor();
+    case 'menu-launches': // L
+      if (isLaunchMenuOpen) {
+        isLaunchMenuOpen = false;
+        hideSideMenus();
         break;
       } else {
         hideSideMenus();
-        $('#lookangles-menu').fadeIn();
-        isLookanglesMenuOpen = true;
-        $('#menu-lookangles img').addClass('bmenu-item-selected');
-        if (selectedSat !== -1) {
-          var sat = satSet.getSat(selectedSat);
-          lookangles.getlookangles(sat, isLookanglesMenuOpen);
-        }
+        $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2017.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+        isLaunchMenuOpen = true;
+        $('#menu-launches img').addClass('bmenu-item-selected');
         break;
       }
     case 'menu-astronauts': // No Keyboard Shortcut
@@ -4123,7 +4095,20 @@ function propTime () {
     satSet.setColorScheme(currentColorScheme); // force color recalc
 
     if (!cruncherReady) {
+      // NOTE: This is called right after all the objects load on the screen.
       $('#load-cover').fadeOut();
+      // $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
+      // $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
+      // $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+      $('#menu-find-sat img').removeClass('bmenu-item-disabled');
+      $('#menu-twitter img').removeClass('bmenu-item-disabled');
+      // $('#menu-weather img').removeClass('bmenu-item-disabled');
+      $('#menu-space-weather img').removeClass('bmenu-item-disabled');
+      $('#menu-launches img').removeClass('bmenu-item-disabled');
+      $('#menu-astronauts img').removeClass('bmenu-item-disabled');
+      $('#menu-space-stations img').removeClass('bmenu-item-disabled');
+      $('#menu-satellite-collision img').removeClass('bmenu-item-disabled');
+      isBottomIconsEnabled = true;
       satSet.setColorScheme(currentColorScheme); // force color recalc
       cruncherReady = true;
       if (cruncherReadyCallback) {

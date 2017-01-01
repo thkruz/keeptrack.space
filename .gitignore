@@ -45,3 +45,12 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Remote-FTP config files
+.ftpconfig
+ftpignore
+
+# Admin Files for Updates
+admin/cron-RCSUpdate.php
+admin/cron-TLEUpdate.php
+admin/TLEUpdate.php

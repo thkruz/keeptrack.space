@@ -49,6 +49,10 @@ var ZOOM_EXP = 3;
 var DIST_MIN = 6400;
 var DIST_MAX = 200000;
 
+// SOCRATES Variables
+var socratesObjOne = []; // Array for tr containing CATNR1
+var socratesObjTwo = []; // Array for tr containing CATNR2
+
 var whichRadar = '';
 var isLookanglesMenuOpen = false;
 var isTwitterMenuOpen = false;
@@ -61,7 +65,6 @@ var isBottomMenuOpen = false;
 var isAstronautsSelected = false;
 var isMilSatSelected = false;
 var isSatCollisionSelected = false; // TODO: Use this for the collision menu
-var socratesNum = -1;
 var isEditTime = false;
 
 var lastBoxUpdateTime = 0;
@@ -1230,7 +1233,8 @@ $(document).ready(function () { // Code Once index.php is loaded
     propRealTime = Date.now();
     e.preventDefault();
   });
-  $('#launch-menu').load('launch-schedule.htm #chronlist');
+  $('#launch-menu').load('launch-schedule.htm');
+  $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
   $('#findByLooks').submit(function (e) {
     var fblAzimuth = $('#fbl-azimuth').val();
     var fblElevation = $('#fbl-elevation').val();
@@ -1253,135 +1257,124 @@ $(document).ready(function () { // Code Once index.php is loaded
 });
 
 function socrates (row) {
-  // SOCRATES.htm is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
-  // If it ever becomes unavailable a similar, but less accurate (maybe?) cron job could be
-  // created using satCruncer.
+  /* SOCRATES.htm is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
+  If it ever becomes unavailable a similar, but less accurate (maybe?) cron job could be
+  created using satCruncer.
 
-  // The variable row determines which set of objects on SOCRATES.htm we are using. First
-  // row is 0 and last one is 19.
-
-  $.get('/SOCRATES.htm', function (socratesHTM) { // Load SOCRATES.htm so we can use it instead of index.htm
-    var socratesObjOne = []; // Array for tr containing CATNR1
-    var socratesObjTwo = []; // Array for tr containing CATNR2
-    var tableRowOne = $("[name='CATNR1']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR1
-    var tableRowTwo = $("[name='CATNR2']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR2
-    tableRowOne.each(function (rowIndex, r) {
-      var cols = [];
-      $(this).find('td').each(function (colIndex, c) {
-        cols.push(c.textContent);
+  The variable row determines which set of objects on SOCRATES.htm we are using. First
+  row is 0 and last one is 19. */
+  if (row === -1 && socratesObjOne.length === 0 && socratesObjTwo.length === 0) { // Only generate the table if receiving the -1 argument for the first time
+    $.get('/SOCRATES.htm', function (socratesHTM) { // Load SOCRATES.htm so we can use it instead of index.htm
+      var tableRowOne = $("[name='CATNR1']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR1
+      var tableRowTwo = $("[name='CATNR2']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR2
+      tableRowOne.each(function (rowIndex, r) {
+        var cols = [];
+        $(this).find('td').each(function (colIndex, c) {
+          cols.push(c.textContent);
+        });
+        socratesObjOne.push(cols);
       });
-      socratesObjOne.push(cols);
-    });
-    tableRowTwo.each(function (rowIndex, r) {
-      var cols = [];
-      $(this).find('td').each(function (colIndex, c) {
-        cols.push(c.textContent);
+      tableRowTwo.each(function (rowIndex, r) {
+        var cols = [];
+        $(this).find('td').each(function (colIndex, c) {
+          cols.push(c.textContent);
+        });
+        socratesObjTwo.push(cols);
       });
-      socratesObjTwo.push(cols);
-    });
-
-    // Use these to figure out SOCRATES values
-    // console.log(socratesObjOne);
-    // console.log(socratesObjTwo);
-
-    if (row !== -1) {
-      findFutureDate(socratesObjTwo); // Jump to the date/time of the collision
-      function findFutureDate (socratesObjTwo) {
-      var socratesDate = socratesObjTwo[row][4].split(' '); // Date/time is on the second line 5th column
-      var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
-
-      var sYear = parseInt(socratesDate[0]); // UTC Year
-      var sMon = MMMtoInt(socratesDate[1]); // UTC Month in MMM prior to converting
-      var sDay = parseInt(socratesDate[2]); // UTC Day
-      var sHour = parseInt(socratesTime[0]); // UTC Hour
-      var sMin = parseInt(socratesTime[1]); // UTC Min
-      var sSec = parseInt(socratesTime[2]); // UTC Sec - This is a decimal, but when we convert to int we drop those
-
-      function MMMtoInt (month) {
-        switch (month) {
-          case 'Jan':
-            return 0;
-          case 'Feb':
-            return 1;
-          case 'Mar':
-            return 2;
-          case 'Apr':
-            return 3;
-          case 'May':
-            return 4;
-          case 'Jun':
-            return 5;
-          case 'Jul':
-            return 6;
-          case 'Aug':
-            return 7;
-          case 'Sep':
-            return 8;
-          case 'Oct':
-            return 9;
-          case 'Nov':
-            return 10;
-          case 'Dec':
-            return 11;
-        }
-      } // Convert MMM format to an int for Date() constructor
-
-      var selectedDate = new Date(sYear, sMon, sDay, sHour, sMin, sSec); // New Date object of the future collision
-      // Date object defaults to local time.
-      selectedDate.setUTCDate(sDay); // Move to UTC day.
-      selectedDate.setUTCHours(sHour); // Move to UTC Hour
-
-      var today = new Date(); // Need to know today for offset calculation
-      propOffset = selectedDate - today; // Find the offset from today
-      camSnapMode = false;
-      satCruncher.postMessage({ // Tell satCruncher we have changed times for orbit calculations
-        typ: 'offset',
-        dat: (propOffset).toString() + ' ' + (1.0).toString()
-      });
-      propRealTime = Date.now(); // Reset realtime TODO: This might not be necessary...
-    } // Allows passing -1 argument to socrates function to skip these steps
-
-      $('#search').val(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Fill in the serach box with the two objects
-      searchBox.doSearch(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Actually perform the search of the two objects
-      setTimeout(socratesSelectSat, 1000); // Wait 1 second before selecting the sat because satcruncher updates on 1 second intervals
-                                           // and will cause the camera to rotate twice
-      function socratesSelectSat () {
-        selectSat(satSet.getIdFromObjNum(socratesObjOne[row][1])); // Select the first object listed in SOCRATES
-      }
-    }
-
-    if (row === -1) { // Only generate the table if receiving the -1 argument
       // SOCRATES Menu
       var tbl = document.getElementById('socrates-table'); // Identify the table to update
       tbl.innerHTML = '';                                  // Clear the table from old object data
-      var tblLength = 0;                                   // Iniially no rows to the table
-
-      function pad (str, max) {
-        return str.length < max ? pad("0" + str, max) : str;
-      }
+      // var tblLength = 0;                                   // Iniially no rows to the table
 
       for (var i = 0; i < 20; i++) {                       // 20 rows
         var tr = tbl.insertRow();
-        tr.setAttribute("class", "socrates-object");
-        tr.setAttribute("hiddenrow", i);
+        tr.setAttribute('class', 'socrates-object');
+        tr.setAttribute('hiddenrow', i);
         var tdT = tr.insertCell();
         var socratesDate = socratesObjTwo[i][4].split(' '); // Date/time is on the second line 5th column
         var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
         var socratesTimeS = socratesTime[2].split('.'); // Split time from date for easier management
         tdT.appendChild(document.createTextNode(socratesDate[2] + ' ' + socratesDate[1] + ' ' + socratesDate[0] + ' - ' + pad(socratesTime[0], 2) + ':' +
-                        pad(socratesTime[1], 2) + ':' + pad(socratesTimeS[0], 2) + 'Z'));
+        pad(socratesTime[1], 2) + ':' + pad(socratesTimeS[0], 2) + 'Z'));
         var tdS1 = tr.insertCell();
         tdS1.appendChild(document.createTextNode(socratesObjOne[i][1]));
         var tdS2 = tr.insertCell();
         tdS2.appendChild(document.createTextNode(socratesObjTwo[i][0]));
       }
-    }
-  });
+    });
+  }
+  if (row !== -1) { // If an object was selected from the menu
+    findFutureDate(socratesObjTwo); // Jump to the date/time of the collision
+
+    $('#search').val(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Fill in the serach box with the two objects
+    searchBox.doSearch(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Actually perform the search of the two objects
+    setTimeout(function () {
+      selectSat(satSet.getIdFromObjNum(socratesObjOne[row][1])); // Select the first object listed in SOCRATES
+    }, 1000); // Wait 1 second before selecting the sat because satcruncher updates on 1 second intervals
+              // and will cause the camera to rotate twice
+  } // If a row was selected
+
+  function findFutureDate (socratesObjTwo) {
+    var socratesDate = socratesObjTwo[row][4].split(' '); // Date/time is on the second line 5th column
+    var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
+
+    var sYear = parseInt(socratesDate[0]); // UTC Year
+    var sMon = MMMtoInt(socratesDate[1]); // UTC Month in MMM prior to converting
+    var sDay = parseInt(socratesDate[2]); // UTC Day
+    var sHour = parseInt(socratesTime[0]); // UTC Hour
+    var sMin = parseInt(socratesTime[1]); // UTC Min
+    var sSec = parseInt(socratesTime[2]); // UTC Sec - This is a decimal, but when we convert to int we drop those
+
+    function MMMtoInt (month) {
+      switch (month) {
+        case 'Jan':
+          return 0;
+        case 'Feb':
+          return 1;
+        case 'Mar':
+          return 2;
+        case 'Apr':
+          return 3;
+        case 'May':
+          return 4;
+        case 'Jun':
+          return 5;
+        case 'Jul':
+          return 6;
+        case 'Aug':
+          return 7;
+        case 'Sep':
+          return 8;
+        case 'Oct':
+          return 9;
+        case 'Nov':
+          return 10;
+        case 'Dec':
+          return 11;
+      }
+    } // Convert MMM format to an int for Date() constructor
+
+    var selectedDate = new Date(sYear, sMon, sDay, sHour, sMin, sSec); // New Date object of the future collision
+    // Date object defaults to local time.
+    selectedDate.setUTCDate(sDay); // Move to UTC day.
+    selectedDate.setUTCHours(sHour); // Move to UTC Hour
+
+    var today = new Date(); // Need to know today for offset calculation
+    propOffset = selectedDate - today; // Find the offset from today
+    camSnapMode = false;
+    satCruncher.postMessage({ // Tell satCruncher we have changed times for orbit calculations
+      typ: 'offset',
+      dat: (propOffset).toString() + ' ' + (1.0).toString()
+    });
+    propRealTime = Date.now(); // Reset realtime TODO: This might not be necessary...
+  } // Allows passing -1 argument to socrates function to skip these steps
+  function pad (str, max) {
+    return str.length < max ? pad('0' + str, max) : str;
+  }
 }
 
 $('#socrates-menu').on('click', '.socrates-object', function (evt) {
   var hiddenRow = $(this)['context']['attributes']['hiddenrow']['value']; // TODO: Find correct code for this.
-  console.log(hiddenRow);
   if (hiddenRow !== null) {
     socrates(hiddenRow);
   }
@@ -1836,6 +1829,8 @@ function selectSat (satId) {
   selectedSat = satId;
   if (satId === -1) {
     $('#sat-infobox').fadeOut();
+    $('#iss-stream').html('');
+    $('#iss-stream-menu').fadeOut();
     orbitDisplay.clearSelectOrbit();
   } else {
     camZoomSnappedOnSat = true;
@@ -1976,9 +1971,9 @@ function selectSat (satId) {
     $('#sat-eccentricity').html((sat.eccentricity).toFixed(3));
 
     $('#sat-period').html(sat.period.toFixed(2) + ' min');
-    $('#sat-period').hover(function() {
+    $('#sat-period').hover(function () {
       $('#sat-period').html('Mean Motion: ' + 60 * 24 / sat.period.toFixed(2));
-    }, function() {
+    }, function () {
       $('#sat-period').html(sat.period.toFixed(2) + ' min');
     });
 
@@ -1992,9 +1987,9 @@ function selectSat (satId) {
       daysold = jday() - satSet.getSat(satId).TLE_LINE1.substr(20, 3) + (satSet.getSat(satId).TLE_LINE1.substr(17, 2) * 365);
     }
     $('#sat-elset-age').html(daysold + ' Days');
-    $('#sat-elset-age').hover(function() {
+    $('#sat-elset-age').hover(function () {
       $('#sat-elset-age').html('Epoch Year: ' + sat.TLE_LINE1.substr(18, 2).toString() + ' Day: ' + sat.TLE_LINE1.substr(20, 8).toString());
-    }, function() {
+    }, function () {
       $('#sat-elset-age').html(daysold + ' Days');
     });
     if (jday() !== sat.TLE_LINE1.substr(20, 3).toString()) {
@@ -2011,6 +2006,17 @@ function selectSat (satId) {
     }
 
     lookangles.getlookangles(sat, isLookanglesMenuOpen);
+  }
+
+  if (satId !== -1) {
+    if (sat.SCC_NUM === '25544') { // Something selected and that something is the ISS
+      $('#iss-stream-menu').fadeIn();
+      $('#iss-stream').html('<iframe src="http://www.ustream.tv/embed/17074538?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://www.ustream.tv/embed/9408562?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><br />' +
+                            '<iframe src="http://www.ustream.tv/embed/6540154?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://cdn.livestream.com/embed/spaceflightnow?layout=4&amp;height=340&amp;width=560&amp;autoplay=false" style="border:0;outline:0" frameborder="0" scrolling="no"></iframe>');
+    } else {
+      $('#iss-stream').html('');
+      $('#iss-stream-menu').fadeOut();
+    }
   }
 
   updateUrl();

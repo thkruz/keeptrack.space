@@ -235,7 +235,14 @@ $(document).ready(function () { // Code Once index.php is loaded
   });
 
   $('#canvas').click(function (evt) {
-    $('#sat-vehicle').colorbox.close();
+    $.colorbox.close();
+  });
+
+  $(document).bind('cbox_closed', function () {
+    if (isLaunchMenuOpen) {
+      isLaunchMenuOpen = false;
+      $('#menu-launches img').removeClass('bmenu-item-selected');
+    }
   });
 
   $('#canvas').contextmenu(function () {
@@ -1233,8 +1240,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     propRealTime = Date.now();
     e.preventDefault();
   });
-  $('#launch-menu').load('launch-schedule.htm');
-  $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
   $('#findByLooks').submit(function (e) {
     var fblAzimuth = $('#fbl-azimuth').val();
     var fblElevation = $('#fbl-elevation').val();
@@ -1400,12 +1405,11 @@ function keyHandler (evt) {
       }
     case 76: // L
       if (isLaunchMenuOpen) {
-        $('#launch-menu').fadeOut();
         isLaunchMenuOpen = false;
         break;
       } else {
         hideSideMenus();
-        $('#launch-menu').fadeIn();
+        $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2017.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
         isLaunchMenuOpen = true;
         break;
       }
@@ -1551,21 +1555,6 @@ function keyHandler (evt) {
       ratechange = true;
       break;
   }
-
-  function hideSideMenus () {
-    $('#lookangles-menu').fadeOut();
-    $('#findByLooks-menu').fadeOut();
-    $('#launch-menu').fadeOut();
-    $('#twitter-menu').fadeOut();
-    $('#weather-menu').fadeOut();
-    $('#space-weather-menu').fadeOut();
-    isLaunchMenuOpen = false;
-    isTwitterMenuOpen = false;
-    isFindByLooksMenuOpen = false;
-    isWeatherMenuOpen = false;
-    isSpaceWeatherMenuOpen = false;
-    isLookanglesMenuOpen = false;
-  }
   function getPropOffset () {
     var selectedDate = $('#datetime-text').text().substr(0, 19);
     selectedDate = selectedDate.split(' ');
@@ -1584,39 +1573,39 @@ function keyHandler (evt) {
     propRealTime = Date.now();
   }
 }
+function deselectColor () {
+  $('#menu-sensor-info img').removeClass('bmenu-item-selected');
+  $('#menu-lookangles img').removeClass('bmenu-item-selected');
+  $('#menu-launches img').removeClass('bmenu-item-selected');
+  $('#menu-find-sat img').removeClass('bmenu-item-selected');
+  $('#menu-twitter img').removeClass('bmenu-item-selected');
+  $('#menu-weather img').removeClass('bmenu-item-selected');
+  $('#menu-space-weather img').removeClass('bmenu-item-selected');
+}
+function hideSideMenus () {
+  $.colorbox.close();
+  $('#sensor-info-menu').fadeOut();
+  $('#lookangles-menu').fadeOut();
+  $('#findByLooks-menu').fadeOut();
+  $('#twitter-menu').fadeOut();
+  $('#weather-menu').fadeOut();
+  $('#space-weather-menu').fadeOut();
+  $('#menu-sensor-info img').removeClass('bmenu-item-selected');
+  $('#menu-lookangles img').removeClass('bmenu-item-selected');
+  $('#menu-launches img').removeClass('bmenu-item-selected');
+  $('#menu-find-sat img').removeClass('bmenu-item-selected');
+  $('#menu-twitter img').removeClass('bmenu-item-selected');
+  $('#menu-weather img').removeClass('bmenu-item-selected');
+  $('#menu-space-weather img').removeClass('bmenu-item-selected');
+  isSensorInfoMenuOpen = false;
+  isLaunchMenuOpen = false;
+  isTwitterMenuOpen = false;
+  isFindByLooksMenuOpen = false;
+  isWeatherMenuOpen = false;
+  isSpaceWeatherMenuOpen = false;
+  isLookanglesMenuOpen = false;
+}
 function bottomIconPress (evt) {
-  function hideSideMenus () {
-    $('#sensor-info-menu').fadeOut();
-    $('#lookangles-menu').fadeOut();
-    $('#findByLooks-menu').fadeOut();
-    $('#launch-menu').fadeOut();
-    $('#twitter-menu').fadeOut();
-    $('#weather-menu').fadeOut();
-    $('#space-weather-menu').fadeOut();
-    $('#menu-sensor-info img').removeClass('bmenu-item-selected');
-    $('#menu-lookangles img').removeClass('bmenu-item-selected');
-    $('#menu-launches img').removeClass('bmenu-item-selected');
-    $('#menu-find-sat img').removeClass('bmenu-item-selected');
-    $('#menu-twitter img').removeClass('bmenu-item-selected');
-    $('#menu-weather img').removeClass('bmenu-item-selected');
-    $('#menu-space-weather img').removeClass('bmenu-item-selected');
-    isSensorInfoMenuOpen = false;
-    isLaunchMenuOpen = false;
-    isTwitterMenuOpen = false;
-    isFindByLooksMenuOpen = false;
-    isWeatherMenuOpen = false;
-    isSpaceWeatherMenuOpen = false;
-    isLookanglesMenuOpen = false;
-  }
-  function deselectColor () {
-    $('#menu-sensor-info img').removeClass('bmenu-item-selected');
-    $('#menu-lookangles img').removeClass('bmenu-item-selected');
-    $('#menu-launches img').removeClass('bmenu-item-selected');
-    $('#menu-find-sat img').removeClass('bmenu-item-selected');
-    $('#menu-twitter img').removeClass('bmenu-item-selected');
-    $('#menu-weather img').removeClass('bmenu-item-selected');
-    $('#menu-space-weather img').removeClass('bmenu-item-selected');
-  }
   switch ($(this)['context']['id']) {
     case 'menu-in-coverage': // B
       if (isBottomMenuOpen) {
@@ -1649,13 +1638,12 @@ function bottomIconPress (evt) {
       }
     case 'menu-launches': // L
       if (isLaunchMenuOpen) {
-        $('#launch-menu').fadeOut();
         isLaunchMenuOpen = false;
         deselectColor();
         break;
       } else {
         hideSideMenus();
-        $('#launch-menu').fadeIn();
+        $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2017.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
         isLaunchMenuOpen = true;
         $('#menu-launches img').addClass('bmenu-item-selected');
         break;

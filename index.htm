@@ -19,10 +19,8 @@
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
     ga('create', 'UA-85015093-1', 'auto');
     ga('send', 'pageview');
-
     </script>
     <!--Google Analytics -->
 
@@ -319,6 +317,23 @@
       <div class="socrates-title"><span class="title-text">Possible Collisions</span></div>
       <div id="socrates-content">
         <table id="socrates-table"  width="400px" cellpadding="5"></table>
+      </div>
+    </div>
+    <div id="settings-menu">
+      <div class="settings-title"><span class="title-text">Settings</span></div>
+      <div id="settings-content">
+        <fieldset>
+          <form id="settings-form">
+            <div class="center">
+              <input id="settings-hos" type="checkbox" class="css-checkbox" value="false">
+              <label for="settings-hos" class="css-label">Hide Other Satellites</label>
+            </div>
+            <div class="center">
+              <input type="submit" id="settings-submit" class="ghost-button" value="Update">
+            </div>
+          </form>
+        </fieldset>
+        <span id="findByLooks-results"></span>
       </div>
     </div>
     <div id="iss-stream-menu">

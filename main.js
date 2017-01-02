@@ -1219,6 +1219,10 @@ $(document).ready(function () { // Code Once index.php is loaded
     satSet.searchAzElRange(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM);
     e.preventDefault();
   });
+  $('#settings-form').submit(function (e) {
+    // var fblIncM = $('#fbl-inc-margin').val();
+    e.preventDefault();
+  });
 
   $('#canvas').on('keypress', keyHandler); // On Key Press Event Run keyHandler Function
   $('#bottom-icons').on('click', '.bmenu-item', bottomIconPress); // Bottom Button Pressed

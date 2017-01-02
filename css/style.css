@@ -457,9 +457,6 @@ ul {
   position: fixed;
   width: 400px;
 }
-.title-text{
-  vertical-align: middle;
-}
 
 /* Div for Look Angles Table */
 #socrates-content {
@@ -505,9 +502,6 @@ ul {
   padding-bottom: 5px;
   position: fixed;
   width: 290px;
-}
-.title-text{
-  vertical-align: middle;
 }
 
 /* Div for Find by Look Angles Table */
@@ -588,6 +582,68 @@ fieldset {
 .ghost-button:hover {
   background: #c33;
   color: #fff;
+}
+
+/* Settings Menu */
+#settings-menu {
+  display: block;
+  background: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  width: 290px;
+  max-height: 100%;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 10;
+  left: 0;
+  top: 60px;
+  bottom: 60px;
+  color: white;
+}
+.settings-title{
+  text-align: center;
+  font-size: 12;
+  opacity: 1;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  position: fixed;
+  width: 290px;
+}
+
+/* Div for Settings Table */
+#settings-content {
+  position: absolute;
+  width: 290px;
+  max-height: 100%;
+  top: 0px;
+  bottom: 0px;
+  overflow: auto;
+  margin: 0 auto;
+}
+input[type=checkbox].css-checkbox {
+	position:absolute; z-index:-1000; left:-1000px; overflow: hidden; clip: rect(0 0 0 0); height:1px; width:1px; margin:-1px; padding:0; border:0;
+}
+input[type=checkbox].css-checkbox + label.css-label {
+	padding-left:25px;
+	height:20px;
+	display:inline-block;
+	line-height:20px;
+	background-repeat:no-repeat;
+	background-position: 0px 0px;
+	font-size:16px;
+	vertical-align:middle;
+	cursor:pointer;
+}
+input[type=checkbox].css-checkbox:checked + label.css-label {
+	background-position: 0px -20px;
+}
+label.css-label {
+	background-image:url(/images/csscheckbox-sm.png);
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 #bottom-menu {

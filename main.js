@@ -89,6 +89,8 @@ var mouseX = 0;
 var mouseY = 0;
 var mouseSat = -1;
 
+var radiusOfEarth = 6371.0;
+
 var dragPoint = [0, 0, 0];
 var screenDragPoint = [0, 0];
 var dragStartPitch = 0;
@@ -277,7 +279,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     screenDragPoint = [x, y];
     dragStartPitch = camPitch;
     dragStartYaw = camYaw;
-     //   debugLine.set(dragPoint, getCamPos());
+    // debugLine.set(dragPoint, getCamPos());
     isDragging = true;
     camSnapMode = false;
     initialRotation = false;
@@ -288,6 +290,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     if (!dragHasMoved) {
       var clickedSat = getSatIdFromCoord(evt.clientX, evt.clientY);
       if (clickedSat === -1 && evt.button === 2) {
+        clearMenuCountries();
         $('#search').val('');
         searchBox.hideResults();
         isAstronautsSelected = false;
@@ -2974,6 +2977,16 @@ dateFormat.i18n = {
   window.ColorScheme = ColorScheme;
 })();
 // **** groups.js ***
+function clearMenuCountries () {
+  groups.clearSelect();
+  // $('#menu-groups .menu-title').text('Groups');
+  $('#menu-countries .menu-title').text('Countries');
+
+  searchBox.fillResultBox('');
+
+  $('#menu-countries .clear-option').css({display: 'none'}); // Hide Clear Option
+  $('#menu-countries .country-option').css({display: 'block'}); // Show Country Options
+}
 (function () {
   var groups = {};
   groups.selectedGroup = null;
@@ -3077,49 +3090,24 @@ dateFormat.i18n = {
   groups.init = function () {
     // var start = performance.now();
 
-    var clicked = false;
-    $('#groups-display').mouseout(function () {
-      if (!clicked) {
-        if (searchBox.isResultBoxOpen()) {
-          groups.selectGroup(searchBox.getLastResultGroup());
-        } else {
-          groups.clearSelect();
-        }
-      }
-    });
-
-    $('#groups-display>li').mouseover(function () {
-      clicked = false;
-      var groupName = $(this).data('group');
-      if (groupName === '<clear>') {
-        groups.clearSelect();
-      } else {
-       // console.log('calling selectGroup with group ' + groupName);
-       // groups.selectGroup(groups[groupName]); TODO: Play with this!
-      }
-    });
+    // $('#groups-display>li').mouseover(function () {
+    // NOTE: This runs on mouseover of any li elements
+    //
+    // });
 
     $('#groups-display>li').click(function () {
-      clicked = true;
       var groupName = $(this).data('group');
       if (groupName === '<clear>') {
-        groups.clearSelect();
-        $('#menu-groups .menu-title').text('Groups');
-        $('#menu-countries .menu-title').text('Countries');
-        $(this).css('display', 'none');
+        clearMenuCountries();
       } else {
-        selectSat(-1); // clear selected sat
+        selectSat(-1); // Clear selected sat
         groups.selectGroup(groups[groupName]);
-
         searchBox.fillResultBox(groups[groupName].sats, '');
 
-        $('#menu-groups .clear-option').css({
-          display: 'block'
-        });
-        $('#menu-countries .clear-option').css({
-          display: 'block'
-        });
-        $('#menu-groups .menu-title').text('Groups (' + $(this).text() + ')');
+        $('#menu-countries .clear-option').css({display: 'block'}); // Show Clear Option
+        $('#menu-countries .country-option').css({display: 'none'}); // Hide Country Options
+        // $('#menu-groups .clear-option').css({display: 'block'});
+        // $('#menu-groups .menu-title').text('Groups (' + $(this).text() + ')');
         $('#menu-countries .menu-title').text('Countries (' + $(this).text() + ')');
       }
 
@@ -3127,11 +3115,10 @@ dateFormat.i18n = {
         display: 'none'
       });
     });
-
     $('#color-schemes-submenu>li').click(function () {
-      clicked = true;
       selectSat(-1); // clear selected sat
       var colorName = $(this).data('color');
+      clearMenuCountries();
       switch (colorName) {
         case 'default':
           satSet.setColorScheme(ColorScheme.default);
@@ -3157,30 +3144,22 @@ dateFormat.i18n = {
       }
     });
 
-    groups.GPSGroup = new SatGroup('intlDes', [
-      '90103A',
-      '93068A'
-    ]);
-
     // COUNTRIES
-    groups.UnitedStates = new SatGroup('countryRegex', /United States/);
-    groups.Russia = new SatGroup('countryRegex', /Russia/);
     groups.Canada = new SatGroup('countryRegex', /Canada/);
-    groups.Japan = new SatGroup('countryRegex', /Japan/);
     groups.China = new SatGroup('countryRegex', /China/);
     groups.France = new SatGroup('countryRegex', /France/);
-    groups.Israel = new SatGroup('countryRegex', /Israel/);
-    groups.UnitedKingdom = new SatGroup('countryRegex', /United Kingdom/);
     groups.India = new SatGroup('countryRegex', /India/);
+    groups.Israel = new SatGroup('countryRegex', /Israel/);
+    groups.Japan = new SatGroup('countryRegex', /Japan/);
+    groups.Russia = new SatGroup('countryRegex', /Russia/);
+    groups.UnitedKingdom = new SatGroup('countryRegex', /United Kingdom/);
+    groups.UnitedStates = new SatGroup('countryRegex', /United States/);
 
     // GROUPS
-    groups.Iridium33DebrisGroup = new SatGroup('nameRegex', /(COSMOS 2251|IRIDIUM 33) DB/);
-    groups.GlonassGroup = new SatGroup('nameRegex', /GLONASS/);
-    groups.GalileoGroup = new SatGroup('nameRegex', /GALILEO/);
-    groups.FunGroup = new SatGroup('nameRegex', /SYLDA/);
-    groups.WestfordNeedlesGroup = new SatGroup('nameRegex', /WESTFORD NEEDLES/);
-    groups.SpaceXGroup = new SatGroup('nameRegex', /FALCON [19]/);
-
+      // Not currently used but could be useful in the future
+      // groups.GlonassGroup = new SatGroup('nameRegex', /GLONASS/);
+      // groups.GalileoGroup = new SatGroup('nameRegex', /GALILEO/);
+      // groups.GPSGroup = new SatGroup('intlDes', ['90103A', '93068A']);
     // SCC#s based on Uninon of Concerned Scientists
     groups.MilitarySatellites = new SatGroup('objNum', [40420, 41394, 32783, 35943, 36582, 40353, 40555, 41032, 38010, 38008, 38007, 38009,
       37806, 41121, 41579, 39030, 39234, 28492, 36124, 39194, 36095, 40358, 40258, 37212,
@@ -3354,7 +3333,7 @@ dateFormat.i18n = {
       results.length = SEARCH_LIMIT;
     }
 
-    // make a group to hilight results
+    // Make a group to hilight results
     var idList = [];
     for (i = 0; i < results.length; i++) {
       idList.push(results[i].satId);
@@ -3369,11 +3348,6 @@ dateFormat.i18n = {
   };
 
   searchBox.fillResultBox = function (results) {
-    // results:
-    // [
-    //   { sat: { id: <id>, } }
-    // ]
-
     var resultBox = $('#search-results');
     var html = '';
     for (var i = 0; i < results.length; i++) {
@@ -3401,7 +3375,6 @@ dateFormat.i18n = {
       html += '</div></div>';
     }
     // var resultStart = performance.now();
-    //  resultBox.append(html);
     resultBox[0].innerHTML = html;
     resultBox.slideDown();
     resultsOpen = true;
@@ -3412,7 +3385,6 @@ dateFormat.i18n = {
     $('#search-results').on('click', '.search-result', function (evt) {
       var satId = $(this).data('sat-id');
       selectSat(satId);
-     // hideResults();
     });
 
     $('#search-results').on('mouseover', '.search-result', function (evt) {
@@ -3427,7 +3399,6 @@ dateFormat.i18n = {
     $('#search-results').mouseout(function () {
       orbitDisplay.clearHoverOrbit();
       satSet.setHover(-1);
-  //    hoverBoxOnSat(-1);
       hovering = false;
     });
 
@@ -3454,9 +3425,6 @@ dateFormat.i18n = {
       var sat = selectedSat;
       var SCCs = [];
       var pos = satSet.getSat(sat).position;
-      // console.log(pos.x);
-      // console.log(pos.y);
-      // console.log(pos.z);
       $('#search').val('');
       for (var i = 0; i < satSet.numSats; i++) {
         var posXmin = satSet.getSat(i).position.x - 100;
@@ -3465,15 +3433,8 @@ dateFormat.i18n = {
         var posYmax = satSet.getSat(i).position.y + 100;
         var posZmin = satSet.getSat(i).position.z - 100;
         var posZmax = satSet.getSat(i).position.z + 100;
-        // if (pos.x < posXmax && pos.x > posXmin)
-        //   console.log(i + ": X");
-        // if (pos.y < posYmax && pos.y > posYmin)
-        //   console.log(i + ": Y");
-        // if (pos.z < posZmax && pos.z > posZmin)
-        //   console.log(i + ": Z");
         if (pos.x < posXmax && pos.x > posXmin && pos.y < posYmax && pos.y > posYmin && pos.z < posZmax && pos.z > posZmin) {
           SCCs.push(satSet.getSat(i).SCC_NUM);
-          // console.log("X: " + satSet.getSat(i).position.x + " - Y: " + satSet.getSat(i).position.y + " - Z: " + satSet.getSat(i).position.z);
         }
       }
 
@@ -3732,14 +3693,8 @@ function propTime () {
 // **** earth.js ***
 (function () {
   var earth = {};
-
-  // var R2D = 180 / Math.PI;
-  // var D2R = Math.PI / 180;
-
   var NUM_LAT_SEGS = 64;
   var NUM_LON_SEGS = 64;
-  // var pos = [3.0, 0.0, 1.0];
-  var radius = 6371.0;
 
   var vertPosBuf, vertNormBuf, texCoordBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
   var vertCount;
@@ -3845,9 +3800,9 @@ function propTime () {
         // console.log('u: ' + u + ' v: ' + v);
         // normals: should just be a vector from center to point (aka the point itself!
 
-        vertPos.push(x * radius);
-        vertPos.push(y * radius);
-        vertPos.push(z * radius);
+        vertPos.push(x * radiusOfEarth);
+        vertPos.push(y * radiusOfEarth);
+        vertPos.push(z * radiusOfEarth);
         texCoord.push(u);
         texCoord.push(v);
         vertNorm.push(x);

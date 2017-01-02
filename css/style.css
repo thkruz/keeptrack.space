@@ -586,7 +586,7 @@ fieldset {
 
 /* Settings Menu */
 #settings-menu {
-  display: block;
+  display: none;
   background: rgba(0, 0, 0, 0.5);
   position: absolute;
   width: 290px;

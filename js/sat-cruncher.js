@@ -20,7 +20,6 @@ var obsmaxel = 0;
 var obsminrange = 0;
 var obsmaxrange = 0;
 
-
 // offset letting us propagate in the future (or past)
 var propOffset = 0;
 

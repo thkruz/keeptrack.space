@@ -65,8 +65,11 @@ var isLaunchMenuOpen = false;
 var isBottomMenuOpen = false;
 var isAstronautsSelected = false;
 var isMilSatSelected = false;
-var isSocratesMenuOpen = false; // TODO: Use this for the collision menu
+var isSocratesMenuOpen = false;
+var isSettingsMenuOpen = false;
 var isEditTime = false;
+
+var otherSatsA = 0.1;
 
 var lastBoxUpdateTime = 0;
 
@@ -1220,7 +1223,42 @@ $(document).ready(function () { // Code Once index.php is loaded
     e.preventDefault();
   });
   $('#settings-form').submit(function (e) {
-    // var fblIncM = $('#fbl-inc-margin').val();
+    var isResetSensorChecked = document.getElementById('settings-resetSensor').checked;
+    var isHOSChecked = document.getElementById('settings-hos').checked;
+    if (isResetSensorChecked) {
+      // Return to default settings with nothing 'inview'
+      satCruncher.postMessage({
+        typ: 'offset',
+        dat: (propOffset).toString() + ' ' + (propRate).toString(),
+        setlatlong: true,
+        lat: 0,
+        long: 0,
+        hei: 0,
+        obsminaz: 0,
+        obsmaxaz: 0,
+        obsminel: 0,
+        obsmaxel: 0,
+        obsminrange: 0,
+        obsmaxrange: 0
+      });
+      lookangles.setobs({
+        lat: 0,
+        long: 0,
+        hei: 0,
+        obsminaz: 0,
+        obsmaxaz: 0,
+        obsminel: 0,
+        obsmaxel: 0,
+        obsminrange: undefined,
+        obsmaxrange: undefined
+      });
+    }
+    if (isHOSChecked) {
+      otherSatsA = 0;
+    } else {
+      otherSatsA = 0.1;
+    }
+    document.getElementById('settings-resetSensor').checked = false;
     e.preventDefault();
   });
 
@@ -1553,6 +1591,7 @@ function hideSideMenus () {
   $('#weather-menu').fadeOut();
   $('#space-weather-menu').fadeOut();
   $('#socrates-menu').fadeOut();
+  $('#settings-menu').fadeOut();
   $('#menu-sensor-info img').removeClass('bmenu-item-selected');
   $('#menu-lookangles img').removeClass('bmenu-item-selected');
   $('#menu-launches img').removeClass('bmenu-item-selected');
@@ -1561,6 +1600,7 @@ function hideSideMenus () {
   $('#menu-weather img').removeClass('bmenu-item-selected');
   $('#menu-space-weather img').removeClass('bmenu-item-selected');
   $('#menu-satellite-collision img').removeClass('bmenu-item-selected');
+  $('#menu-settings img').removeClass('bmenu-item-selected');
   isSensorInfoMenuOpen = false;
   isLaunchMenuOpen = false;
   isTwitterMenuOpen = false;
@@ -1569,6 +1609,7 @@ function hideSideMenus () {
   isSpaceWeatherMenuOpen = false;
   isLookanglesMenuOpen = false;
   isSocratesMenuOpen = false;
+  isSettingsMenuOpen = false;
 }
 function bottomIconPress (evt) {
   if (isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
@@ -1747,6 +1788,18 @@ function bottomIconPress (evt) {
         isSocratesMenuOpen = true;
         socrates(-1);
         $('#menu-satellite-collision img').addClass('bmenu-item-selected');
+        break;
+      }
+    case 'menu-settings': // T
+      if (isSettingsMenuOpen) {
+        isSettingsMenuOpen = false;
+        hideSideMenus();
+        break;
+      } else {
+        hideSideMenus();
+        $('#settings-menu').fadeIn();
+        isSettingsMenuOpen = true;
+        $('#menu-settings img').addClass('bmenu-item-selected');
         break;
       }
   }
@@ -2775,7 +2828,7 @@ dateFormat.i18n = {
 
       if ((pe > lookangles.obsmaxrange || ap < lookangles.obsminrange)) {
         return {
-          color: [1.0, 1.0, 1.0, 0.2],
+          color: [1.0, 1.0, 1.0, otherSatsA],
           pickable: false
         };
       }
@@ -2801,7 +2854,7 @@ dateFormat.i18n = {
         };
       } else {
         return {
-          color: [1.0, 1.0, 1.0, 0.1],
+          color: [1.0, 1.0, 1.0, otherSatsA],
           pickable: false
         };
       }
@@ -2845,7 +2898,7 @@ dateFormat.i18n = {
       }
       if (pe > lookangles.obsmaxrange || daysold < 100) {
         return {
-          color: [1.0, 1.0, 1.0, 0.1],
+          color: [1.0, 1.0, 1.0, otherSatsA],
           pickable: false
         };
       } else {
@@ -2859,7 +2912,7 @@ dateFormat.i18n = {
       var ap = satSet.getSat(satId).apogee;
       if (ap > 2000) {
         return {
-          color: [1.0, 1.0, 1.0, 0.1],
+          color: [1.0, 1.0, 1.0, otherSatsA],
           pickable: false
         };
       } else {
@@ -2873,7 +2926,7 @@ dateFormat.i18n = {
       var pe = satSet.getSat(satId).perigee;
       if (pe < 35000) {
         return {
-          color: [1.0, 1.0, 1.0, 0.1],
+          color: [1.0, 1.0, 1.0, otherSatsA],
           pickable: false
         };
       } else {
@@ -2899,7 +2952,7 @@ dateFormat.i18n = {
         };
       } else {
         return {
-          color: [1.0, 1.0, 1.0, 0.1],
+          color: [1.0, 1.0, 1.0, otherSatsA],
           pickable: false
         };
       }
@@ -4102,6 +4155,7 @@ function propTime () {
       $('#menu-astronauts img').removeClass('bmenu-item-disabled');
       $('#menu-space-stations img').removeClass('bmenu-item-disabled');
       $('#menu-satellite-collision img').removeClass('bmenu-item-disabled');
+      $('#menu-settings img').removeClass('bmenu-item-disabled');
       isBottomIconsEnabled = true;
       satSet.setColorScheme(currentColorScheme); // force color recalc
       cruncherReady = true;

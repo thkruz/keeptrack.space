@@ -1,24 +1,28 @@
-/* global satSet,
-          searchBox,
-          shaderData,
-          $,
-          satellite,
-          Image,
-          ColorScheme,
-          orbitDisplay,
-          shaderLoader,
-          sun,
-          SunCalc,
-          earth,
-          Line,
-          Spinner,
-          groups,
-          mat3,
-          mat4,
-          vec3,
-          vec4,
-          Worker,
-          requestAnimationFrame */
+/* global
+
+    satSet
+    searchBox
+    shaderData
+    $
+    satellite
+    Image
+    ColorScheme
+    orbitDisplay
+    shaderLoader
+    sun
+    SunCalc
+    earth
+    Line
+    Spinner
+    groups
+    mat3
+    mat4
+    vec3
+    vec4
+    Worker
+    requestAnimationFrame
+
+*/
 
 // **** main.js ***
 var maxOrbitsDisplayed = 100000; // Used in sat.js and orbit-display.js
@@ -1242,7 +1246,7 @@ $(document).ready(function () { // Code Once index.php is loaded
         obsmaxrange: 0
       });
       lookangles.setobs({
-        lat: 0,
+        lat: null,
         long: 0,
         hei: 0,
         obsminaz: 0,
@@ -1252,6 +1256,11 @@ $(document).ready(function () { // Code Once index.php is loaded
         obsminrange: undefined,
         obsmaxrange: undefined
       });
+      whichRadar = ''; // Disable Weather
+      $('#menu-sensor-info img').addClass('bmenu-item-disabled');
+      $('#menu-in-coverage img').addClass('bmenu-item-disabled');
+      $('#menu-lookangles img').addClass('bmenu-item-disabled');
+      $('#menu-weather img').addClass('bmenu-item-disabled');
     }
     if (isHOSChecked) {
       otherSatsA = 0;

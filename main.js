@@ -65,7 +65,7 @@ var isLaunchMenuOpen = false;
 var isBottomMenuOpen = false;
 var isAstronautsSelected = false;
 var isMilSatSelected = false;
-var isSatCollisionSelected = false; // TODO: Use this for the collision menu
+var isSocratesMenuOpen = false; // TODO: Use this for the collision menu
 var isEditTime = false;
 
 var lastBoxUpdateTime = 0;
@@ -1540,15 +1540,6 @@ function keyHandler (evt) {
     propRealTime = Date.now();
   }
 }
-function deselectColor () {
-  $('#menu-sensor-info img').removeClass('bmenu-item-selected');
-  $('#menu-lookangles img').removeClass('bmenu-item-selected');
-  $('#menu-launches img').removeClass('bmenu-item-selected');
-  $('#menu-find-sat img').removeClass('bmenu-item-selected');
-  $('#menu-twitter img').removeClass('bmenu-item-selected');
-  $('#menu-weather img').removeClass('bmenu-item-selected');
-  $('#menu-space-weather img').removeClass('bmenu-item-selected');
-}
 function hideSideMenus () {
   $.colorbox.close();
   $('#sensor-info-menu').fadeOut();
@@ -1557,6 +1548,7 @@ function hideSideMenus () {
   $('#twitter-menu').fadeOut();
   $('#weather-menu').fadeOut();
   $('#space-weather-menu').fadeOut();
+  $('#socrates-menu').fadeOut();
   $('#menu-sensor-info img').removeClass('bmenu-item-selected');
   $('#menu-lookangles img').removeClass('bmenu-item-selected');
   $('#menu-launches img').removeClass('bmenu-item-selected');
@@ -1564,6 +1556,7 @@ function hideSideMenus () {
   $('#menu-twitter img').removeClass('bmenu-item-selected');
   $('#menu-weather img').removeClass('bmenu-item-selected');
   $('#menu-space-weather img').removeClass('bmenu-item-selected');
+  $('#menu-satellite-collision img').removeClass('bmenu-item-selected');
   isSensorInfoMenuOpen = false;
   isLaunchMenuOpen = false;
   isTwitterMenuOpen = false;
@@ -1571,6 +1564,7 @@ function hideSideMenus () {
   isWeatherMenuOpen = false;
   isSpaceWeatherMenuOpen = false;
   isLookanglesMenuOpen = false;
+  isSocratesMenuOpen = false;
 }
 function bottomIconPress (evt) {
   if (isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
@@ -1627,9 +1621,8 @@ function bottomIconPress (evt) {
       }
     case 'menu-find-sat': // F
       if (isFindByLooksMenuOpen) {
-        $('#findByLooks-menu').fadeOut();
         isFindByLooksMenuOpen = false;
-        deselectColor();
+        hideSideMenus();
         break;
       } else {
         hideSideMenus();
@@ -1640,9 +1633,8 @@ function bottomIconPress (evt) {
       }
     case 'menu-twitter': // T
       if (isTwitterMenuOpen) {
-        $('#twitter-menu').fadeOut();
         isTwitterMenuOpen = false;
-        deselectColor();
+        hideSideMenus();
         break;
       } else {
         hideSideMenus();
@@ -1653,9 +1645,8 @@ function bottomIconPress (evt) {
       }
     case 'menu-weather': // W
       if (isWeatherMenuOpen) {
-        $('#weather-menu').fadeOut();
         isWeatherMenuOpen = false;
-        deselectColor();
+        hideSideMenus();
         break;
       }
       if (!isWeatherMenuOpen && whichRadar !== '') {
@@ -1689,9 +1680,8 @@ function bottomIconPress (evt) {
       break;
     case 'menu-space-weather': // Q
       if (isSpaceWeatherMenuOpen) {
-        $('#space-weather-menu').fadeOut();
         isSpaceWeatherMenuOpen = false;
-        deselectColor();
+        hideSideMenus();
         break;
       }
       $('#space-weather-image').attr('src', 'http://services.swpc.noaa.gov/images/animations/ovation-north/latest.png');
@@ -1743,14 +1733,14 @@ function bottomIconPress (evt) {
         break;
       }
     case 'menu-satellite-collision': // No Keyboard Shortcut
-      if (isSatCollisionSelected) { // TODO: Add actual menu for satellite collisions.
-        isSatCollisionSelected = false;
-        $('#socrates-menu').fadeOut();
-        $('#menu-satellite-collision img').removeClass('bmenu-item-selected');
+      if (isSocratesMenuOpen) { // TODO: Add actual menu for satellite collisions.
+        isSocratesMenuOpen = false;
+        hideSideMenus();
         break;
       } else {
+        hideSideMenus();
         $('#socrates-menu').fadeIn();
-        isSatCollisionSelected = true;
+        isSocratesMenuOpen = true;
         socrates(-1);
         $('#menu-satellite-collision img').addClass('bmenu-item-selected');
         break;

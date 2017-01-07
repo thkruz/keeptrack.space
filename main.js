@@ -25,7 +25,7 @@
 */
 
 // **** main.js ***
-var maxOrbitsDisplayed = 10000; // Used in sat.js and orbit-display.js
+var maxOrbitsDisplayed = 10000; // Used in sat.js and orbit-display.js TODO: issues:23 Add settings option to change maxOrbitsDisplayed
 var satCruncher;
 var gl;
 
@@ -819,9 +819,9 @@ $(document).ready(function () { // Code Once index.php is loaded
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
       setlatlong: true,
-      lat: 37.166962, // TODO: Check this.
-      long: -5.600839, // TODO: Check this.
-      hei: 0.5, // TODO: Check this.
+      lat: 37.166962, // ENHANCEMENT: Verify this information.
+      long: -5.600839, // ENHANCEMENT: Verify this information.
+      hei: 0.5, // ENHANCEMENT: Verify this information.
       obsminaz: 0,
       obsmaxaz: 360,
       obsminel: 20,
@@ -831,9 +831,9 @@ $(document).ready(function () { // Code Once index.php is loaded
     });
 
     lookangles.setobs({
-      lat: 37.166962, // TODO: Check this.
-      long: -5.600839, // TODO: Check this.
-      hei: 0.5, // TODO: Check this.
+      lat: 37.166962, // ENHANCEMENT: Verify this information.
+      long: -5.600839, // ENHANCEMENT: Verify this information.
+      hei: 0.5, // ENHANCEMENT: Verify this information.
       obsminaz: 0,
       obsmaxaz: 360,
       obsminel: 20,
@@ -1790,7 +1790,7 @@ function bottomIconPress (evt) {
         break;
       }
     case 'menu-satellite-collision': // No Keyboard Shortcut
-      if (isSocratesMenuOpen) { // TODO: Add actual menu for satellite collisions.
+      if (isSocratesMenuOpen) {
         isSocratesMenuOpen = false;
         hideSideMenus();
         break;
@@ -2506,7 +2506,7 @@ var lookangles = (function () {
     var satrec = satellite.twoline2satrec(sat.TLE_LINE1, sat.TLE_LINE2);// perform and store sat init calcs
     var now = propTime(propOffset2, propRealTime);
     var j = jday(now.getUTCFullYear(),
-                 now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+                 now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
                  now.getUTCHours(),
                  now.getUTCMinutes(),
@@ -2788,7 +2788,7 @@ var lookangles = (function () {
     var propRealTime = Date.now();
     var now = propTime(propOffset2, propRealTime);
     var j = jday(now.getUTCFullYear(),
-                 now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+                 now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
                  now.getUTCHours(),
                  now.getUTCMinutes(),
@@ -2855,7 +2855,7 @@ var lookangles = (function () {
     var propRealTime = Date.now();
     var now = propTime(propOffset2, propRealTime);
     var j = jday(now.getUTCFullYear(),
-                 now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+                 now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
                  now.getUTCHours(),
                  now.getUTCMinutes(),
@@ -2960,7 +2960,7 @@ function jday () {
  * (c) 2007-2009 Steven Levithan <stevenlevithan.com>
  * MIT license
  *
- * Includes enhancements by Scott Trenda <scott.trenda.net>
+ * Includes ENHANCEMENT by Scott Trenda <scott.trenda.net>
  * and Kris Kowal <cixar.com/~kris.kowal/>
  *
  * Accepts a date, a mask, or a date and a mask.
@@ -3392,7 +3392,7 @@ function clearMenuCountries () {
     // var start = performance.now();
 
     // $('#groups-display>li').mouseover(function () {
-    // NOTE: This runs on mouseover of any li elements
+    // NOTE:: This runs on mouseover of any li elements
     //
     // });
 
@@ -4183,7 +4183,7 @@ function propTime () {
     $('#datetime-input-tb').val(textstr);
 
     var j = jday(now.getUTCFullYear(),
-                 now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+                 now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
                  now.getUTCHours(),
                  now.getUTCMinutes(),
@@ -4266,7 +4266,7 @@ function propTime () {
   function currentDirection () {
     var now = propTime();
     var j = jday(now.getUTCFullYear(),
-                 now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+                 now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
                  now.getUTCHours(),
                  now.getUTCMinutes(),
@@ -4407,7 +4407,7 @@ function propTime () {
     satSet.setColorScheme(currentColorScheme); // force color recalc
 
     if (!cruncherReady) {
-      // NOTE: This is called right after all the objects load on the screen.
+      // NOTE:: This is called right after all the objects load on the screen.
       $('#load-cover').fadeOut();
       // $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
       // $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
@@ -4682,7 +4682,7 @@ function propTime () {
           }
         }
       }
-      var j; // NOTE: temparray was defined here but seems unneeded and i was already declared.
+      var j;
       var curObjsHTMLText = '';
       for (i = 0, j = inViewObs.length; i < j; i++) {
       /* TODO: Add color to selected SCC_NUM
@@ -4744,15 +4744,15 @@ function propTime () {
     return null;
   };
 
-  // TODO: if OBS UCT #s > 100K are to be handled, need to add code for that
-  satSet.getIdFromObjNum = function (objNum) {
-    for (var i = 0; i < satData.length; i++) {
-      if (satData[i].SCC_NUM.toString().indexOf(objNum) === 0 && satData[i].OBJECT_TYPE !== 'unknown') {
-        return i;
-      }
-    }
-    return null;
-  };
+  // OPTIMIZATION: Determine if this code can be removed.
+  // satSet.getIdFromObjNum = function (objNum) {
+  //   for (var i = 0; i < satData.length; i++) {
+  //     if (satData[i].SCC_NUM.toString().indexOf(objNum) === 0 && satData[i].OBJECT_TYPE !== 'unknown') {
+  //       return i;
+  //     }
+  //   }
+  //   return null;
+  // };
 
   satSet.getScreenCoords = function (i, pMatrix, camMatrix) {
     var pos = satSet.getSat(i).position;

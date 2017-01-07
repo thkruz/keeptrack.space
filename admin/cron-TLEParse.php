@@ -104,7 +104,7 @@ function ParseLocalCatalogue($serverTime, $TLE_dict, $nSCC, $nYear, $nDay, $nTLE
       $oDay = substr($oTLE1, 21-1, 32-21+1);
       //send_message($serverTime, $nYear . " --- " . $oYear);
       //send_message($serverTime, $nDay . " --- " . $oDay);
-      if ($nYear >= $oYear && $nDay > $oDay){ //New Epoch
+      if ($nYear > $oYear || $nYear == $oYear && $nDay > $oDay){ //New Epoch
         //send_message($serverTime, "SCC: $oSCC has been updated.");
         $TLE_dict_updated[$key]["TLE_LINE1"] = $nTLE1;
         $TLE_dict_updated[$key]["TLE_LINE2"] = $nTLE2;

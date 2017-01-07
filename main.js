@@ -25,7 +25,7 @@
 */
 
 // **** main.js ***
-var maxOrbitsDisplayed = 100000; // Used in sat.js and orbit-display.js
+var maxOrbitsDisplayed = 10000; // Used in sat.js and orbit-display.js
 var satCruncher;
 var gl;
 

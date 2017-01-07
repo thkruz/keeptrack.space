@@ -50,6 +50,9 @@ Temporary Items
 .ftpconfig
 ftpignore
 
+#.imdone Files
+.imdone
+
 # Admin Files for Updates
 admin/cron-RCSUpdate.php
 admin/cron-TLEUpdate.php

@@ -1203,7 +1203,9 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   $('.sensor-selected').click(function () {
     $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-    $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+    if (selectedSat !== -1) {
+      $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+    }
     $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
   });
 
@@ -1667,7 +1669,7 @@ function bottomIconPress (evt) {
         hideSideMenus();
         break;
       } else {
-        if (lookangles.obslat == null) { // No Sensor Selected
+        if (lookangles.obslat == null || selectedSat === -1) { // No Sensor or Satellite Selected
           break;
         }
         hideSideMenus();
@@ -1875,6 +1877,7 @@ function selectSat (satId) {
     $('#iss-stream-menu').fadeOut();
     orbitDisplay.clearSelectOrbit();
     $('#menu-lookanglesmultisite img').addClass('bmenu-item-disabled');
+    $('#menu-lookangles img').addClass('bmenu-item-disabled');
   } else {
     camZoomSnappedOnSat = true;
     camAngleSnappedOnSat = true;
@@ -4983,6 +4986,9 @@ function propTime () {
       gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(selectedColor));
     }
     selectedSat = i;
+    if (!(lookangles.obslat === null || lookangles.obslat === undefined)) {
+      $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+    }
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
   };
 

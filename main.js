@@ -1634,6 +1634,7 @@ function bottomIconPress (evt) {
   switch ($(this)['context']['id']) {
     case 'menu-sensor-info': // No Keyboard Commands
       if (lookangles.obslat == null) { // No Sensor Selected
+        $('#menu-sensor-info img').effect('shake', {distance: 10, direction: 'up'});
         break;
       }
       if (isSensorInfoMenuOpen) {
@@ -1650,6 +1651,7 @@ function bottomIconPress (evt) {
       }
     case 'menu-in-coverage': // B
       if (lookangles.obslat == null) { // No Sensor Selected
+        $('#menu-in-coverage img').effect('shake', {distance: 10, direction: 'up'});
         break;
       }
       if (isBottomMenuOpen) {
@@ -1670,6 +1672,7 @@ function bottomIconPress (evt) {
         break;
       } else {
         if (lookangles.obslat == null || selectedSat === -1) { // No Sensor or Satellite Selected
+          $('#menu-lookangles img').effect('shake', {distance: 10, direction: 'up'});
           break;
         }
         hideSideMenus();
@@ -1689,6 +1692,7 @@ function bottomIconPress (evt) {
         break;
       } else {
         if (selectedSat === -1) { // No Satellite Selected
+          $('#menu-lookanglesmultisite img').effect('shake', {distance: 10, direction: 'up'});
           break;
         }
         hideSideMenus();
@@ -1758,6 +1762,8 @@ function bottomIconPress (evt) {
         isWeatherMenuOpen = true;
         $('#menu-weather img').addClass('bmenu-item-selected');
         break;
+      } else {
+        $('#menu-weather img').effect('shake', {distance: 10, direction: 'up'});
       }
       break;
     case 'menu-space-weather': // Q

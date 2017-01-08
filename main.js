@@ -60,6 +60,7 @@ var socratesObjTwo = []; // Array for tr containing CATNR2
 var whichRadar = '';
 var isBottomIconsEnabled = false;
 var isLookanglesMenuOpen = false;
+var isLookanglesMultiSiteMenuOpen = false;
 var isTwitterMenuOpen = false;
 var isWeatherMenuOpen = false;
 var isSpaceWeatherMenuOpen = false;
@@ -1598,6 +1599,7 @@ function hideSideMenus () {
   $.colorbox.close();
   $('#sensor-info-menu').fadeOut();
   $('#lookangles-menu').fadeOut();
+  $('#lookanglesmultisite-menu').fadeOut();
   $('#findByLooks-menu').fadeOut();
   $('#twitter-menu').fadeOut();
   $('#weather-menu').fadeOut();
@@ -1606,6 +1608,7 @@ function hideSideMenus () {
   $('#settings-menu').fadeOut();
   $('#menu-sensor-info img').removeClass('bmenu-item-selected');
   $('#menu-lookangles img').removeClass('bmenu-item-selected');
+  $('#menu-lookanglesmultisite img').removeClass('bmenu-item-selected');
   $('#menu-launches img').removeClass('bmenu-item-selected');
   $('#menu-find-sat img').removeClass('bmenu-item-selected');
   $('#menu-twitter img').removeClass('bmenu-item-selected');
@@ -1620,6 +1623,7 @@ function hideSideMenus () {
   isWeatherMenuOpen = false;
   isSpaceWeatherMenuOpen = false;
   isLookanglesMenuOpen = false;
+  isLookanglesMultiSiteMenuOpen = false;
   isSocratesMenuOpen = false;
   isSettingsMenuOpen = false;
 }
@@ -1658,14 +1662,14 @@ function bottomIconPress (evt) {
         break;
       }
     case 'menu-lookangles': // S
-      if (lookangles.obslat == null) { // No Sensor Selected
-        break;
-      }
       if (isLookanglesMenuOpen) {
         isLookanglesMenuOpen = false;
         hideSideMenus();
         break;
       } else {
+        if (lookangles.obslat == null) { // No Sensor Selected
+          break;
+        }
         hideSideMenus();
         $('#lookangles-menu').fadeIn();
         isLookanglesMenuOpen = true;
@@ -1673,6 +1677,25 @@ function bottomIconPress (evt) {
         if (selectedSat !== -1) {
           var sat = satSet.getSat(selectedSat);
           lookangles.getlookangles(sat, isLookanglesMenuOpen);
+        }
+        break;
+      }
+    case 'menu-lookanglesmultisite':
+      if (isLookanglesMultiSiteMenuOpen) {
+        isLookanglesMultiSiteMenuOpen = false;
+        hideSideMenus();
+        break;
+      } else {
+        if (selectedSat === -1) { // No Satellite Selected
+          break;
+        }
+        hideSideMenus();
+        $('#lookanglesmultisite-menu').fadeIn();
+        isLookanglesMultiSiteMenuOpen = true;
+        $('#menu-lookanglesmultisite img').addClass('bmenu-item-selected');
+        if (selectedSat !== -1) {
+          sat = satSet.getSat(selectedSat);
+          lookangles.getlookanglesMultiSite(sat, isLookanglesMultiSiteMenuOpen);
         }
         break;
       }
@@ -1851,6 +1874,7 @@ function selectSat (satId) {
     $('#iss-stream').html('');
     $('#iss-stream-menu').fadeOut();
     orbitDisplay.clearSelectOrbit();
+    $('#menu-lookanglesmultisite img').addClass('bmenu-item-disabled');
   } else {
     camZoomSnappedOnSat = true;
     camAngleSnappedOnSat = true;
@@ -2024,7 +2048,9 @@ function selectSat (satId) {
       $('#sat-sun').html('Sun Exclusion');
     }
 
-    lookangles.getlookangles(sat, isLookanglesMenuOpen);
+    if (lookangles.obslat !== undefined) {
+      lookangles.getlookangles(sat, isLookanglesMenuOpen);
+    }
   }
 
   if (satId !== -1) {
@@ -2557,49 +2583,52 @@ var lookangles = (function () {
     return propOffset;
   }
 
-  var getlookanglesMultiSite = function (sat, isLookanglesMenuOpen) {
-    if (!isLookanglesMenuOpen) {
+  var getlookanglesMultiSite = function (sat, isLookanglesMultiSiteMenuOpen) {
+    if (!isLookanglesMultiSiteMenuOpen) {
       return;
     }
-    if (latitude != null && longitude != null && height != null) {
-      // Set default timing settings. These will be changed to find look angles at different times in future.
-      var propOffset2 = 0;               // offset letting us propagate in the future (or past)
-      // var propRealTime = Date.now();      // Set current time
+    var resetWhenDone = false;
+    if (latitude === null || latitude === undefined) {
+      resetWhenDone = true;
+    }
+    // Set default timing settings. These will be changed to find look angles at different times in future.
+    var propOffset2 = 0;               // offset letting us propagate in the future (or past)
+    // var propRealTime = Date.now();      // Set current time
 
-      var curPropOffset = getPropOffset();
-      setTempSensor();
-      setSensor(0);
+    var curPropOffset = getPropOffset();
+    setTempSensor();
+    setSensor(0);
 
-      var satrec = satellite.twoline2satrec(sat.TLE_LINE1, sat.TLE_LINE2);// perform and store sat init calcs
-      var tbl = document.getElementById('looks');           // Identify the table to update
-      tbl.innerHTML = '';                                   // Clear the table from old object data
-      var tblLength = 0;                                   // Iniially no rows to the table
-      var lastTblLength = 0;                               // Tracks when to change sensors
-      var sensor = 0;
-      var howManyPasses = 3; // Complete 3 passes before switching sensors
+    var satrec = satellite.twoline2satrec(sat.TLE_LINE1, sat.TLE_LINE2);// perform and store sat init calcs
+    var tbl = document.getElementById('looksmultisite');           // Identify the table to update
+    tbl.innerHTML = '';                                   // Clear the table from old object data
+    var tblLength = 0;                                   // Iniially no rows to the table
+    var lastTblLength = 0;                               // Tracks when to change sensors
+    var sensor = 0;
+    var howManyPasses = 3; // Complete 3 passes before switching sensors
 
-      for (var i = 0; i < (7 * 24 * 60 * 60); i += 5) {         // 5second Looks
-        propOffset2 = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
-        tblLength += propagateMultiSite(propOffset2, tbl, satrec, sensor);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
-        if (tblLength > lastTblLength) {                           // Maximum of 1500 lines in the look angles table
-          lastTblLength++;
-          if (howManyPasses === 1) { // When 3 passes have been complete - looks weird with 1 instead of 0
-            sensor++;
-            setSensor(sensor);
-            i = 0;
-            howManyPasses = 3; // Reset to 3 passes
-          } else {
-            howManyPasses = howManyPasses - 1;
-            i = i + (60 * 60); // Jump an hour into the future to ensure its the next pass.
-            // TODO: Consider Deep Space
-          }
-        }
-        if (sensor === 9) {
-          getTempSensor();
-          break;
+    for (var i = 0; i < (7 * 24 * 60 * 60); i += 5) {         // 5second Looks
+      propOffset2 = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
+      tblLength += propagateMultiSite(propOffset2, tbl, satrec, sensor);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
+      if (tblLength > lastTblLength) {                           // Maximum of 1500 lines in the look angles table
+        lastTblLength++;
+        if (howManyPasses === 1) { // When 3 passes have been complete - looks weird with 1 instead of 0
+          sensor++;
+          setSensor(sensor);
+          i = 0;
+          howManyPasses = 3; // Reset to 3 passes
+        } else {
+          howManyPasses = howManyPasses - 1;
+          i = i + (60 * 60); // Jump an hour into the future to ensure its the next pass.
+          // TODO: Consider Deep Space
         }
       }
+      if (sensor === 9) {
+        getTempSensor(resetWhenDone);
+        break;
+      }
     }
+    getTempSensor(resetWhenDone);
   };
 
   var getlookangles = function (sat, isLookanglesMenuOpen) {
@@ -2640,21 +2669,35 @@ var lookangles = (function () {
     tempMaxaz = obsmaxaz;
   }
 
-  function getTempSensor () {
-    this.latitude = tempLat;
-    this.longitude = tempLon;
-    this.height = tempHei;
-    this.obsminel = tempMinel;
-    this.obsmaxel = tempMaxel;
-    this.obsminrange = tempMinrange;
-    this.obsmaxrange = tempMaxrange;
-    this.obsminaz = tempMinaz;
-    this.obsmaxaz = tempMaxaz;
-    this.observerGd = {                        // Array to calculate look angles in propagate()
-      longitude: longitude * deg2rad,
-      latitude: latitude * deg2rad,
-      height: height * 1                  // Converts from string to number TODO: Find correct way to convert string to integer
-    };
+  function getTempSensor (resetWhenDone) {
+    if (resetWhenDone) {
+      lookangles.setobs({
+        lat: null,
+        long: 0,
+        hei: 0,
+        obsminaz: 0,
+        obsmaxaz: 0,
+        obsminel: 0,
+        obsmaxel: 0,
+        obsminrange: undefined,
+        obsmaxrange: undefined
+      });
+    } else {
+      this.latitude = tempLat;
+      this.longitude = tempLon;
+      this.height = tempHei;
+      this.obsminel = tempMinel;
+      this.obsmaxel = tempMaxel;
+      this.obsminrange = tempMinrange;
+      this.obsmaxrange = tempMaxrange;
+      this.obsminaz = tempMinaz;
+      this.obsmaxaz = tempMaxaz;
+      this.observerGd = {                        // Array to calculate look angles in propagate()
+        longitude: longitude * deg2rad,
+        latitude: latitude * deg2rad,
+        height: height * 1                  // Converts from string to number TODO: Find correct way to convert string to integer
+      };
+    }
   }
 
   function setSensor (sensor) {
@@ -4412,6 +4455,7 @@ function propTime () {
       // $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
       // $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
       // $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+      // $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
       $('#menu-find-sat img').removeClass('bmenu-item-disabled');
       $('#menu-twitter img').removeClass('bmenu-item-disabled');
       // $('#menu-weather img').removeClass('bmenu-item-disabled');
@@ -4744,15 +4788,14 @@ function propTime () {
     return null;
   };
 
-  // OPTIMIZATION: Determine if this code can be removed.
-  // satSet.getIdFromObjNum = function (objNum) {
-  //   for (var i = 0; i < satData.length; i++) {
-  //     if (satData[i].SCC_NUM.toString().indexOf(objNum) === 0 && satData[i].OBJECT_TYPE !== 'unknown') {
-  //       return i;
-  //     }
-  //   }
-  //   return null;
-  // };
+  satSet.getIdFromObjNum = function (objNum) {
+    for (var i = 0; i < satData.length; i++) {
+      if (satData[i].SCC_NUM.toString().indexOf(objNum) === 0) { // && satData[i].OBJECT_TYPE !== 'unknown') { // OPTIMIZATION: Determine if this code can be removed.
+        return i;
+      }
+    }
+    return null;
+  };
 
   satSet.getScreenCoords = function (i, pMatrix, camMatrix) {
     var pos = satSet.getSat(i).position;
@@ -4940,6 +4983,7 @@ function propTime () {
       gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(selectedColor));
     }
     selectedSat = i;
+    $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
   };
 
   satSet.onCruncherReady = function (cb) {

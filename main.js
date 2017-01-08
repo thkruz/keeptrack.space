@@ -210,6 +210,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     }
 
     searchBox.init(satData);
+    satSet.satDataString = null; // Clears stringified json file and clears 7MB of memory.
   });
 
   $('#canvas').on('touchmove', function (evt) {
@@ -2462,7 +2463,17 @@ function hoverBoxOnSat (satId, satX, satY) {
   } else {
     try {
     //    console.log(pos);
-      $('#sat-hoverbox').html(satSet.getSat(satId).OBJECT_NAME + '<br /><center>' + satSet.getSat(satId).SCC_NUM + '</center>');
+      var sat = satSet.getSat(satId);
+
+      // FEATURE TODO: Processor intensive code that might be offered as a setting
+      //
+      // if (!(lookangles.obslat === undefined || lookangles.obslat === null)) {
+      //   $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
+      // } else {
+      //   $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '</center>');
+      // }
+
+      $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '</center>');
       $('#sat-hoverbox').css({ // TODO: Make the centering CSS not HTML
         display: 'block',
         position: 'absolute',
@@ -2582,6 +2593,40 @@ var lookangles = (function () {
       this.inview = false;
     }
   };
+
+  function nextpass (sat) {
+    var propRealTime = Date.now();
+    var curPropOffset = getPropOffset();
+    var propOffset2 = 0;
+    var satrec = satellite.twoline2satrec(sat.TLE_LINE1, sat.TLE_LINE2);// perform and store sat init calcs
+    for (var i = 0; i < (7 * 24 * 60 * 60); i += 5) {         // 5second Looks
+      propOffset2 = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
+      var now = propTime(propOffset2, propRealTime);
+      var j = jday(now.getUTCFullYear(),
+      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+      j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+      var gmst = satellite.gstime_from_jday(j);
+
+      var m = (j - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+      var pv = satellite.sgp4(satrec, m);
+      var positionEcf, lookAngles, azimuth, elevation, rangeSat;
+
+      positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
+      lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
+      azimuth = lookAngles.azimuth / deg2rad;
+      elevation = lookAngles.elevation / deg2rad;
+      rangeSat = lookAngles.range_sat;
+
+      if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
+        return dateFormat(now, 'isoDateTime', true);
+      }
+    }
+    return 'No Passes in 7 Days';
+  }
 
   function getPropOffset () {
     var selectedDate = $('#datetime-text').text().substr(0, 19);
@@ -2990,6 +3035,7 @@ var lookangles = (function () {
 
   return {
     setobs: setobs,
+    nextpass: nextpass,
     getlookangles: getlookangles,
     getlookanglesMultiSite: getlookanglesMultiSite,
     jday: jday,
@@ -3175,8 +3221,8 @@ dateFormat.i18n = {
   ColorScheme.init = function () {
     ColorScheme.default = new ColorScheme(function (satId) {
       var sat = satSet.getSat(satId);
-      var ap = satSet.getSat(satId).apogee;
-      var pe = satSet.getSat(satId).perigee;
+      var ap = sat.apogee;
+      var pe = sat.perigee;
       var color;
       if (sat.inview) {
         color = [0.85, 0.5, 0.0, 1.0];
@@ -3780,12 +3826,12 @@ function clearMenuCountries () {
       var pos = satSet.getSat(sat).position;
       $('#search').val('');
       for (var i = 0; i < satSet.numSats; i++) {
-        var posXmin = satSet.getSat(i).position.x - 100;
-        var posXmax = satSet.getSat(i).position.x + 100;
-        var posYmin = satSet.getSat(i).position.y - 100;
-        var posYmax = satSet.getSat(i).position.y + 100;
-        var posZmin = satSet.getSat(i).position.z - 100;
-        var posZmax = satSet.getSat(i).position.z + 100;
+        var posXmin = pos.x - 100;
+        var posXmax = pos.x + 100;
+        var posYmin = pos.y - 100;
+        var posYmax = pos.y + 100;
+        var posZmin = pos.z - 100;
+        var posZmax = pos.z + 100;
         if (pos.x < posXmax && pos.x > posXmin && pos.y < posYmax && pos.y > posYmin && pos.z < posZmax && pos.z > posZmin) {
           SCCs.push(satSet.getSat(i).SCC_NUM);
         }

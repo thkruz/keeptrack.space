@@ -885,29 +885,10 @@ label.css-label {
   height: 540px;
 }
 
-#legend-box {
+#version-box {
   background: transparent;
   right: 10px;
-  width: 130px;
-  height: 120px;
-}
-
-.box-header {
-  font-size: 20px;
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
-#legend li {
-  height: 25px;
-  line-height: 25px;
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
-.dot {
-  vertical-align: middle;
-  margin-right: 5px;
+  width: 115px;
 }
 
 .box-header {

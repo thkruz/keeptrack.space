@@ -1634,7 +1634,9 @@ function bottomIconPress (evt) {
   switch ($(this)['context']['id']) {
     case 'menu-sensor-info': // No Keyboard Commands
       if (lookangles.obslat == null) { // No Sensor Selected
-        $('#menu-sensor-info img').effect('shake', {distance: 10, direction: 'up'});
+        if (!$('#menu-sensor-info img:animated').length) {
+          $('#menu-sensor-info img').effect('shake', {distance: 10});
+        }
         break;
       }
       if (isSensorInfoMenuOpen) {
@@ -1651,7 +1653,9 @@ function bottomIconPress (evt) {
       }
     case 'menu-in-coverage': // B
       if (lookangles.obslat == null) { // No Sensor Selected
-        $('#menu-in-coverage img').effect('shake', {distance: 10, direction: 'up'});
+        if (!$('#menu-in-coverage img:animated').length) {
+          $('#menu-in-coverage img').effect('shake', {distance: 10});
+        }
         break;
       }
       if (isBottomMenuOpen) {
@@ -1672,7 +1676,9 @@ function bottomIconPress (evt) {
         break;
       } else {
         if (lookangles.obslat == null || selectedSat === -1) { // No Sensor or Satellite Selected
-          $('#menu-lookangles img').effect('shake', {distance: 10, direction: 'up'});
+          if (!$('#menu-lookangles img:animated').length) {
+            $('#menu-lookangles img').effect('shake', {distance: 10});
+          }
           break;
         }
         hideSideMenus();
@@ -1692,7 +1698,9 @@ function bottomIconPress (evt) {
         break;
       } else {
         if (selectedSat === -1) { // No Satellite Selected
-          $('#menu-lookanglesmultisite img').effect('shake', {distance: 10, direction: 'up'});
+          if (!$('#menu-lookanglesmultisite img:animated').length) {
+            $('#menu-lookanglesmultisite img').effect('shake', {distance: 10});
+          }
           break;
         }
         hideSideMenus();
@@ -1763,7 +1771,9 @@ function bottomIconPress (evt) {
         $('#menu-weather img').addClass('bmenu-item-selected');
         break;
       } else {
-        $('#menu-weather img').effect('shake', {distance: 10, direction: 'up'});
+        if (!$('#menu-weather img:animated').length) {
+          $('#menu-weather img').effect('shake', {distance: 10});
+        }
       }
       break;
     case 'menu-space-weather': // Q

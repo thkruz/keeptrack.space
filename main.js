@@ -12,7 +12,6 @@
     sun
     SunCalc
     earth
-    Line
     Spinner
     groups
     mat3
@@ -25,7 +24,13 @@
 */
 
 // **** main.js ***
-var maxOrbitsDisplayed = 10000; // Used in sat.js and orbit-display.js TODO: issues:23 Add settings option to change maxOrbitsDisplayed
+// Constants
+var ZOOM_EXP = 3;
+var DIST_MIN = 6800;
+var DIST_MAX = 200000;
+var RADIUS_OF_EARTH = 6371.0;
+// var maxOrbitsDisplayed = 100; // Used in sat.js and orbit-display.js TODO: issues:23 Add settings option to change maxOrbitsDisplayed
+
 var satCruncher;
 var gl;
 
@@ -49,10 +54,6 @@ var zoomTarget = 0.5;
 var camPitchSpeed = 0;
 var camYawSpeed = 0;
 
-var ZOOM_EXP = 3;
-var DIST_MIN = 6400;
-var DIST_MAX = 200000;
-
 // SOCRATES Variables
 var socratesObjOne = []; // Array for tr containing CATNR1
 var socratesObjTwo = []; // Array for tr containing CATNR2
@@ -74,7 +75,7 @@ var isSocratesMenuOpen = false;
 var isSettingsMenuOpen = false;
 var isEditTime = false;
 
-var otherSatsA = 0.1;
+var otherSatelliteTransparency = 0.1;
 
 var lastBoxUpdateTime = 0;
 
@@ -90,8 +91,6 @@ var mouseX = 0;
 var mouseY = 0;
 var mouseSat = -1;
 
-var radiusOfEarth = 6371.0;
-
 var dragPoint = [0, 0, 0];
 var screenDragPoint = [0, 0];
 var dragStartPitch = 0;
@@ -99,11 +98,11 @@ var dragStartYaw = 0;
 var isDragging = false;
 var dragHasMoved = false;
 
-var initialRotation = true;
-var initialRotSpeed = 0.000075;
+var rotateTheEarth = true; // Set to False to disable initial rotation
+var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotating around earth
 
 // var debugContext, debugImageData;
-var debugLine, debugLine2, debugLine3;
+// var debugLine, debugLine2, debugLine3;
 // var spinner;
 
 $(document).ready(function () { // Code Once index.php is loaded
@@ -150,9 +149,9 @@ $(document).ready(function () { // Code Once index.php is loaded
     groups.init();
     searchBox.init(satData);
 
-    debugLine = new Line();
-    debugLine2 = new Line();
-    debugLine3 = new Line();
+    // debugLine = new Line();
+    // debugLine2 = new Line();
+    // debugLine3 = new Line();
   });
 
   $('#datetime-input-tb').datetimepicker({
@@ -242,7 +241,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     zoomTarget += delta * 0.0002;
     if (zoomTarget > 1) zoomTarget = 1;
     if (zoomTarget < 0) zoomTarget = 0;
-    initialRotation = false;
+    rotateTheEarth = false;
     camZoomSnappedOnSat = false;
   });
 
@@ -270,7 +269,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     // debugLine.set(dragPoint, getCamPos());
     isDragging = true;
     camSnapMode = false;
-    initialRotation = false;
+    rotateTheEarth = false;
     // }
   });
 
@@ -284,7 +283,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     // debugLine.set(dragPoint, getCamPos());
     isDragging = true;
     camSnapMode = false;
-    initialRotation = false;
+    rotateTheEarth = false;
   });
 
   $('#canvas').mouseup(function (evt) {
@@ -304,14 +303,14 @@ $(document).ready(function () { // Code Once index.php is loaded
     }
     dragHasMoved = false;
     isDragging = false;
-    initialRotation = false;
+    rotateTheEarth = false;
     // }
   });
 
   $('#canvas').on('touchend', function (evt) {
     dragHasMoved = false;
     isDragging = false;
-    initialRotation = false;
+    rotateTheEarth = false;
   });
 
   $('.menu-item').mouseover(function (evt) {
@@ -329,14 +328,14 @@ $(document).ready(function () { // Code Once index.php is loaded
   $('#zoom-in').click(function () {
     zoomTarget -= 0.04;
     if (zoomTarget < 0) zoomTarget = 0;
-    initialRotation = false;
+    rotateTheEarth = false;
     camZoomSnappedOnSat = false;
   });
 
   $('#zoom-out').click(function () {
     zoomTarget += 0.04;
     if (zoomTarget > 1) zoomTarget = 1;
-    initialRotation = false;
+    rotateTheEarth = false;
     camZoomSnappedOnSat = false;
   });
  //   debugContext = $('#debug-canvas')[0].getContext('2d');
@@ -1270,9 +1269,9 @@ $(document).ready(function () { // Code Once index.php is loaded
       $('#menu-weather img').addClass('bmenu-item-disabled');
     }
     if (isHOSChecked) {
-      otherSatsA = 0;
+      otherSatelliteTransparency = 0;
     } else {
-      otherSatsA = 0.1;
+      otherSatelliteTransparency = 0.1;
     }
     document.getElementById('settings-resetSensor').checked = false;
     e.preventDefault();
@@ -1415,7 +1414,7 @@ function keyHandler (evt) {
   // console.log(evt);
   switch (Number(evt.charCode)) {
     case 114: // r
-      initialRotation = !initialRotation;
+      rotateTheEarth = !rotateTheEarth;
       // console.log('toggled rotation');
       break;
     case 66: // B
@@ -2343,8 +2342,8 @@ function drawLoop () {
   camPitch += camPitchSpeed * dt;
   camYaw += camYawSpeed * dt;
 
-  if (initialRotation) {
-    camYaw -= initialRotSpeed * dt;
+  if (rotateTheEarth) {
+    camYaw -= rotateTheEarthSpeed * dt;
   }
 
   if (camSnapMode) {
@@ -2366,8 +2365,8 @@ function drawLoop () {
   // camYaw = (camYaw % (Math.PI*2));
   camYaw = normalizeAngle(camYaw);
   if (selectedSat !== -1) {
-    var sat = satSet.getSat(selectedSat);
-    debugLine.set(sat, [0, 0, 0]);
+    // var sat = satSet.getSat(selectedSat);
+    // debugLine.set(sat, [0, 0, 0]);
     camSnapToSat(selectedSat);
   }
 
@@ -2397,9 +2396,9 @@ function drawScene () {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  if (debugLine) debugLine.draw();
-  if (debugLine2)debugLine2.draw();
-  if (debugLine3)debugLine3.draw();
+  // if (debugLine) debugLine.draw();
+  // if (debugLine2)debugLine2.draw();
+  // if (debugLine3)debugLine3.draw();
   earth.draw(pMatrix, camMatrix);
   satSet.draw(pMatrix, camMatrix);
   orbitDisplay.draw(pMatrix, camMatrix);
@@ -2548,7 +2547,7 @@ var lookangles = (function () {
   var getTEARR = function (sat) {
     // Set default timing settings. These will be changed to find look angles at different times in future.
     var propOffset2 = getPropOffset();               // offset letting us propagate in the future (or past)
-    var propRealTime = Date.now();      // Set current time
+    propRealTime = Date.now();      // Set current time
     var satrec = satellite.twoline2satrec(sat.TLE_LINE1, sat.TLE_LINE2);// perform and store sat init calcs
     var now = propTime(propOffset2, propRealTime);
     var j = jday(now.getUTCFullYear(),
@@ -2595,7 +2594,7 @@ var lookangles = (function () {
   };
 
   function nextpass (sat) {
-    var propRealTime = Date.now();
+    propRealTime = Date.now();
     var curPropOffset = getPropOffset();
     var propOffset2 = 0;
     var satrec = satellite.twoline2satrec(sat.TLE_LINE1, sat.TLE_LINE2);// perform and store sat init calcs
@@ -2882,7 +2881,7 @@ var lookangles = (function () {
   }
 
   function propagate (propOffset2, tbl, satrec) {
-    var propRealTime = Date.now();
+    propRealTime = Date.now();
     var now = propTime(propOffset2, propRealTime);
     var j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -2949,7 +2948,7 @@ var lookangles = (function () {
         sensor = 'ALTAIR';
         break;
     }
-    var propRealTime = Date.now();
+    propRealTime = Date.now();
     var now = propTime(propOffset2, propRealTime);
     var j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -3239,7 +3238,7 @@ dateFormat.i18n = {
 
       if ((pe > lookangles.obsmaxrange || ap < lookangles.obsminrange)) {
         return {
-          color: [1.0, 1.0, 1.0, otherSatsA],
+          color: [1.0, 1.0, 1.0, otherSatelliteTransparency],
           pickable: false
         };
       }
@@ -3265,7 +3264,7 @@ dateFormat.i18n = {
         };
       } else {
         return {
-          color: [1.0, 1.0, 1.0, otherSatsA],
+          color: [1.0, 1.0, 1.0, otherSatelliteTransparency],
           pickable: false
         };
       }
@@ -3309,7 +3308,7 @@ dateFormat.i18n = {
       }
       if (pe > lookangles.obsmaxrange || daysold < 100) {
         return {
-          color: [1.0, 1.0, 1.0, otherSatsA],
+          color: [1.0, 1.0, 1.0, otherSatelliteTransparency],
           pickable: false
         };
       } else {
@@ -3323,7 +3322,7 @@ dateFormat.i18n = {
       var ap = satSet.getSat(satId).apogee;
       if (ap > 2000) {
         return {
-          color: [1.0, 1.0, 1.0, otherSatsA],
+          color: [1.0, 1.0, 1.0, otherSatelliteTransparency],
           pickable: false
         };
       } else {
@@ -3337,7 +3336,7 @@ dateFormat.i18n = {
       var pe = satSet.getSat(satId).perigee;
       if (pe < 35000) {
         return {
-          color: [1.0, 1.0, 1.0, otherSatsA],
+          color: [1.0, 1.0, 1.0, otherSatelliteTransparency],
           pickable: false
         };
       } else {
@@ -3363,7 +3362,7 @@ dateFormat.i18n = {
         };
       } else {
         return {
-          color: [1.0, 1.0, 1.0, otherSatsA],
+          color: [1.0, 1.0, 1.0, otherSatelliteTransparency],
           pickable: false
         };
       }
@@ -3455,6 +3454,7 @@ function clearMenuCountries () {
   };
 
   SatGroup.prototype.updateOrbits = function () {
+    // What calls the orbit buffer when selected a group from the menu.
     for (var i = 0; i < this.sats.length; i++) {
       orbitDisplay.updateOrbitBuffer(this.sats[i].satId);
     }
@@ -3932,6 +3932,7 @@ function clearMenuCountries () {
         rate: propRate
       });
       inProgress[satId] = true;
+    } else {
     }
   };
 
@@ -4023,11 +4024,11 @@ function clearMenuCountries () {
     if (groups.selectedGroup !== null) {
       gl.uniform4fv(pathShader.uColor, groupColor);
       groups.selectedGroup.forEach(function (id) {
-        if (groups.selectedGroup.sats.length <= maxOrbitsDisplayed) {
-          gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
-          gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
-          gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-        }
+        // if (groups.selectedGroup.sats.length <= maxOrbitsDisplayed) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
+        gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+        gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+        // }
       });
     }
 
@@ -4199,9 +4200,9 @@ function propTime () {
         // console.log('u: ' + u + ' v: ' + v);
         // normals: should just be a vector from center to point (aka the point itself!
 
-        vertPos.push(x * radiusOfEarth);
-        vertPos.push(y * radiusOfEarth);
-        vertPos.push(z * radiusOfEarth);
+        vertPos.push(x * RADIUS_OF_EARTH);
+        vertPos.push(y * RADIUS_OF_EARTH);
+        vertPos.push(z * RADIUS_OF_EARTH);
         texCoord.push(u);
         texCoord.push(v);
         vertNorm.push(x);
@@ -4579,9 +4580,9 @@ function propTime () {
         var key = params[i].split('=')[0];
         var val = params[i].split('=')[1];
         switch (key) {
-          case 'maxsats':
-            maxOrbitsDisplayed = val;
-            break;
+          // case 'maxsats':
+          //   maxOrbitsDisplayed = val;
+          //   break;
           case 'lat':
             obslatitude = val;
             break;

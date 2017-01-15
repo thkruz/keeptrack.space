@@ -4,6 +4,7 @@
     <!-- Change this to use alternate TLE Source -->
     <div id="tle-source" style="display: none;">TLE.json</div>
 
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="css/droidsans.css" type="text/css">
@@ -334,6 +335,40 @@
         <span id="findByLooks-results"></span>
       </div>
     </div>
+    <div id="editSat-menu">
+      <div class="editSat-title"><span class="title-text">Edit Satellite</span></div>
+      <div id="editSat-content">
+        <fieldset>
+          <form id="editSat">
+            <div class="center">
+              <span class="vertcenter">SCC#: </span>
+              <input type="text" class="ghost-input" id="es-scc" value="AAAAA">
+            </div>
+            <div class="center">
+              <span class="vertcenter">Inclination: </span>
+              <input type="text" class="ghost-input" id="es-inc" value="AAA.AAAA"></div>
+            <div class="center">
+              <span class="vertcenter">Right Ascension: </span>
+              <input type="text" class="ghost-input" id="es-rasc" value="AAA.AAAA"></div>
+            <div class="center">
+              <span class="vertcenter">Mean Motion: </span>
+              <input type="text" class="ghost-input" id="es-meanmo" value="AA.AAAAAAAA"></div>
+            <div class="center">
+              <span class="vertcenter">Eccentricity: </span>
+              <input type="text" class="ghost-input" id="es-ecen" value="AA.AAAAAAAA"></div>
+            <div class="center">
+              <span class="vertcenter">Arg. of Perigee: </span>
+              <input type="text" class="ghost-input" id="es-argPe" value="AA.AAAAAAAA"></div>
+            <div class="center">
+              <span class="vertcenter">Mean Anomaly: </span>
+              <input type="text" class="ghost-input" id="es-meana" value="AAA.AAAA"></div>
+            <div class="center">
+              <input type="submit" id="editSat-submit" class="ghost-button" value="Update Satellite">
+            </div>
+          </form>
+        </fieldset>
+      </div>
+    </div>
     <div id="iss-stream-menu">
       <div id="iss-stream"></div>
     </div>
@@ -481,7 +516,11 @@
      <div id="menu-settings" class="bmenu-item">
        <img src="/images/gear-icon.png" class="bmenu-item-disabled" alt="Settings">
      </div>
+     <div id="menu-editSat" class="bmenu-item">
+       <img src="/images/editPencil.png" class="bmenu-item-disabled" alt="Edit satellite">
+     </div>
    </div>
+ </div>
     <div id="zoom-controls">
       <div id="zoom-in" class="zoom-button">+</div>
       <div id="zoom-out" class="zoom-button">-</div>

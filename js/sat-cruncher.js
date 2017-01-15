@@ -66,46 +66,74 @@ onmessage = function (m) {
       propRealTime = start;
       return;
     case 'satdata':
-      // console.log('sat-cruncher satdata');
+      var satData = JSON.parse(m.data.dat);
+      var len = satData.length;
+
+      var extraData = [];
+      for (var i = 0; i < len; i++) {
+        var extra = {};
+        var satrec = satellite.twoline2satrec( // perform and store sat init calcs
+          satData[i].TLE_LINE1, satData[i].TLE_LINE2);
+
+        // TODO: This should be moved to the lookangles function instead of the sat-cruncher
+        // keplerian elements
+        extra.inclination = satrec.inclo; // rads
+        extra.eccentricity = satrec.ecco;
+        extra.raan = satrec.nodeo;        // rads
+        extra.argPe = satrec.argpo;       // rads
+        extra.meanMotion = satrec.no * 60 * 24 / (2 * Math.PI); // convert rads/minute to rev/day
+
+        // fun other data
+        extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, (2 / 3));
+        extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));
+        extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - 6371;
+        extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - 6371;
+        extra.period = 1440.0 / extra.meanMotion;
+
+        extraData.push(extra);
+        satCache.push(satrec);
+      }
+
+      satPos = new Float32Array(len * 3);
+      satVel = new Float32Array(len * 3);
+      satInView = new Float32Array(len);
+
+      // var postStart = Date.now();
+      postMessage({
+        extraData: JSON.stringify(extraData)
+      });
+      break;
+    case 'satEdit':
+      // TODO: This code is not optimized yet. Making arrays for one object is unnecessary
+      // and I am not sure if there is any reason to convert to JSON back and forth from the web workers.
+      satCache[m.data.id] = satellite.twoline2satrec( // replace old TLEs
+        m.data.TLE_LINE1, m.data.TLE_LINE2);
+      satrec = satCache[m.data.id];
+      extraData = [];
+      extra = {};
+      // keplerian elements
+      extra.inclination = satrec.inclo; // rads
+      extra.eccentricity = satrec.ecco;
+      extra.raan = satrec.nodeo;        // rads
+      extra.argPe = satrec.argpo;       // rads
+      extra.meanMotion = satrec.no * 60 * 24 / (2 * Math.PI); // convert rads/minute to rev/day
+
+      // fun other data
+      extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, (2 / 3));
+      extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));
+      extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - 6371;
+      extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - 6371;
+      extra.period = 1440.0 / extra.meanMotion;
+      extra.TLE_LINE1 = m.data.TLE_LINE1;
+      extra.TLE_LINE2 = m.data.TLE_LINE2;
+      extraData.push(extra);
+      postMessage({
+        extraUpdate: true,
+        extraData: JSON.stringify(extraData),
+        satId: m.data.id
+      });
       break;
   }
-
-  var satData = JSON.parse(m.data.dat);
-  var len = satData.length;
-
-  var extraData = [];
-  for (var i = 0; i < len; i++) {
-    var extra = {};
-    var satrec = satellite.twoline2satrec( // perform and store sat init calcs
-      satData[i].TLE_LINE1, satData[i].TLE_LINE2);
-
-    // TODO: This should be moved to the lookangles function instead of the sat-cruncher
-    // keplerian elements
-    extra.inclination = satrec.inclo; // rads
-    extra.eccentricity = satrec.ecco;
-    extra.raan = satrec.nodeo;        // rads
-    extra.argPe = satrec.argpo;       // rads
-    extra.meanMotion = satrec.no * 60 * 24 / (2 * Math.PI); // convert rads/minute to rev/day
-
-    // fun other data
-    extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, (2 / 3));
-    extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));
-    extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - 6371;
-    extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - 6371;
-    extra.period = 1440.0 / extra.meanMotion;
-
-    extraData.push(extra);
-    satCache.push(satrec);
-  }
-
-  satPos = new Float32Array(len * 3);
-  satVel = new Float32Array(len * 3);
-  satInView = new Float32Array(len);
-
-  // var postStart = Date.now();
-  postMessage({
-    extraData: JSON.stringify(extraData)
-  });
   // console.log('sat-cruncher init: ' + (Date.now() - start) + ' ms  (incl post: ' + (Date.now() - postStart) + ' ms)');
   propagate();
 };
@@ -194,8 +222,12 @@ function propagate () {
     }
   }
 
-  postMessage({satPos: satPos.buffer, satVel: satVel.buffer, satInView: satInView.buffer},
-              [satPos.buffer, satVel.buffer, satInView.buffer]);
+  postMessage({
+    satPos: satPos.buffer,
+    satVel: satVel.buffer,
+    satInView: satInView.buffer},
+              [satPos.buffer, satVel.buffer, satInView.buffer]
+  );
 
   satPos = new Float32Array(satCache.length * 3);
   satVel = new Float32Array(satCache.length * 3);

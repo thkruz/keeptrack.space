@@ -652,6 +652,43 @@ fieldset {
   overflow: auto;
   margin: 0 auto;
 }
+
+/* Edit Satellite Menu */
+#editSat-menu {
+  display: none;
+  background: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  width: 290px;
+  max-height: 100%;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 10;
+  left: 0;
+  top: 60px;
+  bottom: 60px;
+  color: white;
+}
+.editSat-title{
+  text-align: center;
+  font-size: 12;
+  opacity: 1;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  position: fixed;
+  width: 290px;
+}
+
+/* Div for Edit Satellite Table */
+#editSat-content {
+  position: absolute;
+  width: 290px;
+  max-height: 100%;
+  top: 0px;
+  bottom: 0px;
+  overflow: auto;
+  margin: 0 auto;
+}
+
 input[type=checkbox].css-checkbox {
 	position:absolute; z-index:-1000; left:-1000px; overflow: hidden; clip: rect(0 0 0 0); height:1px; width:1px; margin:-1px; padding:0; border:0;
 }

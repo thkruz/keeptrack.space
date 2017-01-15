@@ -58,6 +58,8 @@ var camYawSpeed = 0;
 var socratesObjOne = []; // Array for tr containing CATNR1
 var socratesObjTwo = []; // Array for tr containing CATNR2
 
+var TLEUpdateNeeded = false;
+
 var whichRadar = '';
 var isBottomIconsEnabled = false;
 var isLookanglesMenuOpen = false;
@@ -73,6 +75,7 @@ var isAstronautsSelected = false;
 var isMilSatSelected = false;
 var isSocratesMenuOpen = false;
 var isSettingsMenuOpen = false;
+var isEditSatMenuOpen = false;
 var isEditTime = false;
 
 var otherSatelliteTransparency = 0.1;
@@ -1277,6 +1280,41 @@ $(document).ready(function () { // Code Once index.php is loaded
     e.preventDefault();
   });
 
+  $('#editSat').submit(function (e) {
+    var scc = $('#es-scc').val();
+    var satId = satSet.getIdFromObjNum(scc);
+    var sat = satSet.getSat(satId);
+    var intl = sat.INTLDES.trim();
+
+    // TODO: Calculate current J-Day to change Epoch Date
+
+    var inc = $('#es-inc').val();
+    var meanmo = $('#es-meanmo').val();
+    var rasc = $('#es-rasc').val();
+    var ecen = $('#es-ecen').val();
+    var argPe = $('#es-argPe').val();
+    var argPe = $('#es-argPe').val();
+    var meana = $('#es-meana').val();
+
+    var TLE1 = '1 ' + scc + 'U ' + intl + '   16339.76789353 -.00000000 +00000-0 -00000+0 0  0010'; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+                                                                                              // B* value also set to 0 to keep orbit stable over a few days/weeks
+    var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
+
+    console.log(TLE2);
+
+    satCruncher.postMessage({
+      typ: 'satEdit',
+      id: satId,
+      TLE_LINE1: TLE1,
+      TLE_LINE2: TLE2
+    });
+    TLEUpdateNeeded = true; // NOTE: Might be depricated
+    orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
+
+    var sat = satSet.getSat(satId);
+    e.preventDefault();
+  });
+
   $('#canvas').on('keypress', keyHandler); // On Key Press Event Run keyHandler Function
   $('#bottom-icons').on('click', '.bmenu-item', bottomIconPress); // Bottom Button Pressed
   $('#canvas').attr('tabIndex', 0);
@@ -1598,7 +1636,10 @@ function keyHandler (evt) {
   }
 }
 function hideSideMenus () {
+  // Close any open colorboxes
   $.colorbox.close();
+
+  // Hide all side menus
   $('#sensor-info-menu').fadeOut();
   $('#lookangles-menu').fadeOut();
   $('#lookanglesmultisite-menu').fadeOut();
@@ -1608,6 +1649,9 @@ function hideSideMenus () {
   $('#space-weather-menu').fadeOut();
   $('#socrates-menu').fadeOut();
   $('#settings-menu').fadeOut();
+  $('#editSat-menu').fadeOut();
+
+  // Remove red color from all menu icons
   $('#menu-sensor-info img').removeClass('bmenu-item-selected');
   $('#menu-lookangles img').removeClass('bmenu-item-selected');
   $('#menu-lookanglesmultisite img').removeClass('bmenu-item-selected');
@@ -1618,6 +1662,9 @@ function hideSideMenus () {
   $('#menu-space-weather img').removeClass('bmenu-item-selected');
   $('#menu-satellite-collision img').removeClass('bmenu-item-selected');
   $('#menu-settings img').removeClass('bmenu-item-selected');
+  $('#menu-editSat img').removeClass('bmenu-item-selected');
+
+  // Unflag all open menu variables
   isSensorInfoMenuOpen = false;
   isLaunchMenuOpen = false;
   isTwitterMenuOpen = false;
@@ -1628,6 +1675,7 @@ function hideSideMenus () {
   isLookanglesMultiSiteMenuOpen = false;
   isSocratesMenuOpen = false;
   isSettingsMenuOpen = false;
+  isEditSatMenuOpen = false;
 }
 function bottomIconPress (evt) {
   if (isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
@@ -1844,16 +1892,50 @@ function bottomIconPress (evt) {
         break;
       }
     case 'menu-settings': // T
-      if (isSettingsMenuOpen) {
-        isSettingsMenuOpen = false;
+        if (isSettingsMenuOpen) {
+          isSettingsMenuOpen = false;
+          hideSideMenus();
+          break;
+        } else {
+          hideSideMenus();
+          $('#settings-menu').fadeIn();
+          isSettingsMenuOpen = true;
+          $('#menu-settings img').addClass('bmenu-item-selected');
+          break;
+        }
+    case 'menu-editSat':
+      if (isEditSatMenuOpen) {
+        isEditSatMenuOpen = false;
         hideSideMenus();
         break;
       } else {
-        hideSideMenus();
-        $('#settings-menu').fadeIn();
-        isSettingsMenuOpen = true;
-        $('#menu-settings img').addClass('bmenu-item-selected');
-        break;
+        $('#editSat-menu').fadeIn();
+        isEditSatMenuOpen = true;
+        if (selectedSat !== -1) {
+          var sat = satSet.getSat(selectedSat);
+          $('#es-scc').val(sat.SCC_NUM);
+
+          var inc = (sat.inclination * R2D).toFixed(4);
+          inc = pad(inc, 8);
+          $('#es-inc').val(inc);
+
+          $('#es-meanmo').val(sat.meanMotion.toFixed(8));
+          $('#es-rasc').val((sat.raan * R2D).toFixed(4));
+          $('#es-ecen').val(sat.eccentricity.toFixed(7).substr(2, 8));
+
+          var argPe = (sat.argPe * R2D).toFixed(4);
+          argPe = pad(argPe, 8);
+          $('#es-argPe').val(argPe);
+          $('#es-meana').val(sat.TLE_LINE2.substr(44 - 1, 7 + 1));
+          // $('#es-rasc').val(sat.TLE_LINE2.substr(18 - 1, 7 + 1).toString());
+
+          function pad(num, size) {
+            var s = "000" + num;
+            return s.substr(s.length-size);
+          }
+
+        }
+        $('#menu-editSat img').addClass('bmenu-item-selected');
       }
   }
 }
@@ -2253,12 +2335,31 @@ function camSnapToSat (satId) {
     var r = Math.sqrt(pos.x * pos.x + pos.y * pos.y);
     var yaw = Math.atan2(pos.y, pos.x) + Math.PI / 2;
     var pitch = Math.atan2(pos.z, r);
+    if (!pitch) {
+      console.log('Pitch Calculation Error');
+      pitch = 0;
+      camZoomSnappedOnSat = false;
+      camAngleSnappedOnSat = false;
+    }
+    if (!yaw) {
+      console.log('Yaw Calculation Error');
+      yaw = 0;
+      camZoomSnappedOnSat = false;
+      camAngleSnappedOnSat = false;
+    }
     camSnap(pitch, yaw);
   }
 
   if (camZoomSnappedOnSat) {
     lookangles.getTEARR(sat);
-    var camDistTarget = lookangles.altitude + 6371 + 2000;
+    if (lookangles.altitude) {
+      var camDistTarget = lookangles.altitude + 6371 + 2000;
+    } else {
+      camDistTarget = 6371 + 2000  // Stay out of the center of the earth. You will get stuck there.
+      console.log('Zoom Calculation Error');
+      camZoomSnappedOnSat = false;
+      camAngleSnappedOnSat = false;
+    }
     zoomTarget = Math.pow((camDistTarget - DIST_MIN) / (DIST_MAX - DIST_MIN), 1 / ZOOM_EXP);
   }
 }
@@ -2424,6 +2525,9 @@ function updateSelectBox () {
   var now = Date.now();
   var satData = satSet.getSat(selectedSat);
   lookangles.getTEARR(satData);
+
+  // TODO: Include updates when satellite edited regardless of time.
+
   if (now > lastBoxUpdateTime + 1000) {
     $('#sat-longitude').html((((lookangles.lon * 180 / Math.PI) + 360) % 360).toFixed(3) + '°');
     $('#sat-latitude').html((lookangles.lat * 180 / Math.PI).toFixed(3) + '°');
@@ -3884,7 +3988,7 @@ function clearMenuCountries () {
 
   var orbitMvMat = mat4.create();
 
-  var orbitWorker = new Worker('/js/orbit-calculation-worker.js');
+  var orbitWorker = new Worker('js/orbit-calculation-worker.js');
 
   var initialized = false;
 
@@ -3932,21 +4036,41 @@ function clearMenuCountries () {
     // console.log('orbitDisplay init: ' + time + ' ms');
   };
 
-  orbitDisplay.updateOrbitBuffer = function (satId) {
+  orbitDisplay.updateOrbitBuffer = function (satId, force = false, TLE1 = 0, TLE2 = 0) {
     if (!inProgress[satId]) {
-      orbitWorker.postMessage({
-        isInit: false,
-        satId: satId,
-        realTime: propRealTime,
-        offset: propOffset,
-        rate: propRate
-      });
-      inProgress[satId] = true;
+      if (force) {
+        console.log(satId);
+        orbitWorker.postMessage({
+          isInit: false,
+          isUpdate: true,
+          satId: satId,
+          realTime: propRealTime,
+          offset: propOffset,
+          rate: propRate,
+          // NOTE: STATIC TLE
+          TLE_LINE1: TLE1,
+          TLE_LINE2: TLE2
+        });
+      } else {
+        orbitWorker.postMessage({
+          isInit: false,
+          satId: satId,
+          realTime: propRealTime,
+          offset: propOffset,
+          rate: propRate
+        });
+        inProgress[satId] = true;
+      }
     } else {
     }
   };
 
   orbitWorker.onmessage = function (m) {
+    if (m.data.TLEupdateComplete) {
+      TLEUpdateNeeded = false;
+      return;
+    }
+
     var satId = m.data.satId;
     var pointsOut = new Float32Array(m.data.pointsOut);
     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[satId]);
@@ -4467,7 +4591,7 @@ function propTime () {
 
   try {
     $('#loader-text').text('Locating ELSETs...');
-    satCruncher = new Worker('/js/sat-cruncher.js');
+    satCruncher = new Worker('js/sat-cruncher.js');
   } catch (E) {
     browserUnsupported();
   }
@@ -4480,6 +4604,7 @@ function propTime () {
 
   satCruncher.onmessage = function (m) {
     if (!gotExtraData) { // store extra data that comes from crunching
+      // Only do this once
       // var start = performance.now();
 
       satExtraData = JSON.parse(m.data.extraData);
@@ -4500,6 +4625,26 @@ function propTime () {
 
       // console.log('sat.js copied extra data in ' + (performance.now() - start) + ' ms');
       gotExtraData = true;
+      return;
+    }
+
+    if (m.data.extraUpdate) {
+      satExtraData = JSON.parse(m.data.extraData);
+      i = m.data.satId;
+
+      satData[i].inclination = satExtraData[0].inclination;
+      satData[i].eccentricity = satExtraData[0].eccentricity;
+      satData[i].raan = satExtraData[0].raan;
+      satData[i].argPe = satExtraData[0].argPe;
+      satData[i].meanMotion = satExtraData[0].meanMotion;
+
+      satData[i].semiMajorAxis = satExtraData[0].semiMajorAxis;
+      satData[i].semiMinorAxis = satExtraData[0].semiMinorAxis;
+      satData[i].apogee = satExtraData[0].apogee;
+      satData[i].perigee = satExtraData[0].perigee;
+      satData[i].period = satExtraData[0].period;
+      satData[i].TLE_LINE1 = satExtraData[0].TLE_LINE1;
+      satData[i].TLE_LINE2 = satExtraData[0].TLE_LINE2;
       return;
     }
 
@@ -4538,6 +4683,9 @@ function propTime () {
         cruncherReadyCallback(satData);
       }
     }
+
+    satExtraData = null;
+
   };
 
   satSet.init = function (satsReadyCallback) {
@@ -4562,7 +4710,7 @@ function propTime () {
     dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
 
     var tleSource = $('#tle-source').text();
-    $.get('/' + tleSource + '?fakeparameter=to_avoid_browser_cache2', function (resp) {
+    $.get('' + tleSource + '?fakeparameter=to_avoid_browser_cache2', function (resp) {
       // var startTime = new Date().getTime();
 
       // console.log('sat.js downloaded data');
@@ -4822,7 +4970,7 @@ function propTime () {
     var ret = satData[i];
     if (!ret) return null;
     if (gotExtraData) {
-      ret.perigee = satExtraData[i].perigee;
+      // ret.perigee = satData[i].perigee;
       ret.inview = satInView[i];
       ret.velocity = Math.sqrt(
         satVel[i * 3] * satVel[i * 3] +

@@ -4092,14 +4092,15 @@ function clearMenuCountries () {
       var sat = selectedSat;
       var SCCs = [];
       var pos = satSet.getSat(sat).position;
+      var posXmin = pos.x - 100;
+      var posXmax = pos.x + 100;
+      var posYmin = pos.y - 100;
+      var posYmax = pos.y + 100;
+      var posZmin = pos.z - 100;
+      var posZmax = pos.z + 100;
       $('#search').val('');
       for (var i = 0; i < satSet.numSats; i++) {
-        var posXmin = pos.x - 100;
-        var posXmax = pos.x + 100;
-        var posYmin = pos.y - 100;
-        var posYmax = pos.y + 100;
-        var posZmin = pos.z - 100;
-        var posZmax = pos.z + 100;
+        pos = satSet.getSat(i).position;
         if (pos.x < posXmax && pos.x > posXmin && pos.y < posYmax && pos.y > posYmin && pos.z < posZmax && pos.z > posZmin) {
           SCCs.push(satSet.getSat(i).SCC_NUM);
         }

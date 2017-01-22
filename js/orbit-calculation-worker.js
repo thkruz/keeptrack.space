@@ -14,8 +14,6 @@ onmessage = function(m) {
     satCache[m.data.satId] = satellite.twoline2satrec(
       m.data.TLE_LINE1, m.data.TLE_LINE2
     );
-    postMessage({
-      TLEupdateComplete : true});
   }
 
   if(m.data.isInit) {

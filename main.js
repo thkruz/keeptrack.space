@@ -38,6 +38,7 @@ var gl;
 var propRealTime = Date.now(); // actual time we're running it
 var propOffset = 0.0; // offset we're propagating to, msec
 var propRate = 1.0; // time rate multiplier for propagation
+var propFrozen = Date.now(); // for when propRate 0
 var oldT = new Date(); // Only used in drawLoop function
 
 // Camera Variables
@@ -58,8 +59,6 @@ var camYawSpeed = 0;
 var socratesObjOne = []; // Array for tr containing CATNR1
 var socratesObjTwo = []; // Array for tr containing CATNR2
 
-var TLEUpdateNeeded = false;
-
 var whichRadar = '';
 var isBottomIconsEnabled = false;
 var isLookanglesMenuOpen = false;
@@ -76,6 +75,7 @@ var isMilSatSelected = false;
 var isSocratesMenuOpen = false;
 var isSettingsMenuOpen = false;
 var isEditSatMenuOpen = false;
+var isNewLaunchMenuOpen = false;
 var isEditTime = false;
 
 var otherSatelliteTransparency = 0.1;
@@ -1283,23 +1283,97 @@ $(document).ready(function () { // Code Once index.php is loaded
   $('#editSat').submit(function (e) {
     var scc = $('#es-scc').val();
     var satId = satSet.getIdFromObjNum(scc);
+    if (satId === null) {
+      console.log('Not a Real Satellite');
+      e.preventDefault();
+      return;
+    }
     var sat = satSet.getSat(satId);
-    var intl = sat.INTLDES.trim();
+
+    var intl = sat.TLE_LINE1.substr(9, 8);
 
     // TODO: Calculate current J-Day to change Epoch Date
 
+    function pad (str, max) {
+      return str.length < max ? pad(' ' + str, max) : str;
+    }
+
     var inc = $('#es-inc').val();
+
+    inc = parseFloat(inc).toPrecision(7);
+    inc = inc.split('.');
+    inc[0] = inc[0].substr(-3, 3);
+    if (inc[1]) {
+      inc[1] = inc[1].substr(0, 4);
+    } else {
+      inc[1] = '0000';
+    }
+    inc = (inc[0] + '.' + inc[1]).toString();
+    inc = pad(inc, 8);
+
     var meanmo = $('#es-meanmo').val();
+
+    meanmo = parseFloat(meanmo).toPrecision(10);
+    meanmo = meanmo.split('.');
+    meanmo[0] = meanmo[0].substr(-2, 2);
+    if (meanmo[1]) {
+      meanmo[1] = meanmo[1].substr(0, 8);
+    } else {
+      meanmo[1] = '00000000';
+    }
+    meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
+    meanmo = pad(meanmo, 8);
+
     var rasc = $('#es-rasc').val();
+
+    rasc = parseFloat(rasc).toPrecision(7);
+    rasc = rasc.split('.');
+    rasc[0] = rasc[0].substr(-3, 3);
+    if (rasc[1]) {
+      rasc[1] = rasc[1].substr(0, 4);
+    } else {
+      rasc[1] = '0000';
+    }
+    rasc = (rasc[0] + '.' + rasc[1]).toString();
+    rasc = pad(rasc, 8);
+
     var ecen = $('#es-ecen').val();
     var argPe = $('#es-argPe').val();
-    var argPe = $('#es-argPe').val();
+
+    argPe = parseFloat(argPe).toPrecision(7);
+    argPe = argPe.split('.');
+    argPe[0] = argPe[0].substr(-3, 3);
+    if (argPe[1]) {
+      argPe[1] = argPe[1].substr(0, 4);
+    } else {
+      argPe[1] = '0000';
+    }
+    argPe = (argPe[0] + '.' + argPe[1]).toString();
+    argPe = pad(argPe, 8);
+
     var meana = $('#es-meana').val();
 
-    var TLE1 = '1 ' + scc + 'U ' + intl + '   16339.76789353 -.00000000 +00000-0 -00000+0 0  0010'; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-                                                                                              // B* value also set to 0 to keep orbit stable over a few days/weeks
-    var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
+    meana = parseFloat(meana).toPrecision(7);
+    meana = meana.split('.');
+    meana[0] = meana[0].substr(-3, 3);
+    if (meana[1]) {
+      meana[1] = meana[1].substr(0, 4);
+    } else {
+      meana[1] = '0000';
+    }
+    meana = (meana[0] + '.' + meana[1]).toString();
+    meana = pad(meana, 8);
 
+    var epochyr = $('#es-year').val();
+    var epochday = $('#es-day').val();
+
+    var TLE1Ending = sat.TLE_LINE1.substr(32, 39);
+
+    var TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+    var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
+    console.log(sat.TLE_LINE1);
+    console.log(sat.TLE_LINE2);
+    console.log(TLE1);
     console.log(TLE2);
 
     satCruncher.postMessage({
@@ -1308,12 +1382,52 @@ $(document).ready(function () { // Code Once index.php is loaded
       TLE_LINE1: TLE1,
       TLE_LINE2: TLE2
     });
-    TLEUpdateNeeded = true; // NOTE: Might be depricated
     orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
-    var sat = satSet.getSat(satId);
+    sat = satSet.getSat(satId);
     e.preventDefault();
   });
+
+  /* $('#newLaunch').submit(function (e) {
+    var scc = $('#nl-scc').val();
+    var satId = satSet.getIdFromObjNum(scc);
+    var sat = satSet.getSat(satId);
+    var intl = sat.INTLDES.trim();
+
+    // TODO: Calculate current J-Day to change Epoch Date
+
+    var inc = $('#nl-inc').val();
+    var apogee = $('#nl-apogee').val();
+    var perigee = $('#nl-perigee').val();
+    var launchLat = $('#nl-perigee').val();
+    var launchLon = $('#nl-perigee').val();
+
+    var Ra = RADIUS_OF_EARTH + apogee;
+    var Rp = RADIUS_OF_EARTH + perigee;
+    var SMa = (Ra + Rp) / 2;
+
+    var ecen = (Ra - Rp) / (Ra + Rp);
+    var meanmo = sqrt(398600.4 / (SMa ^ 3));
+
+    // var argPe =
+
+    var rasc = $('#es-rasc').val();
+    var meana = $('#es-meana').val();
+
+    var TLE1 = '1 ' + scc + 'U ' + intl + '   16339.76789353 -.00000000 +00000-0 -00000+0 0  0010'; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+    var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
+
+    satCruncher.postMessage({
+      typ: 'satEdit',
+      id: satId,
+      TLE_LINE1: TLE1,
+      TLE_LINE2: TLE2
+    });
+    orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
+
+    sat = satSet.getSat(satId);
+    e.preventDefault();
+  }); */
 
   $('#canvas').on('keypress', keyHandler); // On Key Press Event Run keyHandler Function
   $('#bottom-icons').on('click', '.bmenu-item', bottomIconPress); // Bottom Button Pressed
@@ -1355,7 +1469,7 @@ function socrates (row) {
 
       for (var i = 0; i < 20; i++) {                       // 20 rows
         var tr = tbl.insertRow();
-        tr.setAttribute('class', 'socrates-object');
+        tr.setAttribute('class', 'socrates-object link');
         tr.setAttribute('hiddenrow', i);
         var tdT = tr.insertCell();
         var socratesDate = socratesObjTwo[i][4].split(' '); // Date/time is on the second line 5th column
@@ -1571,6 +1685,7 @@ function keyHandler (evt) {
       break;
     case 48: // 0
       propRate = 0;
+      propFrozen = new Date();
       propOffset = getPropOffset();
       ratechange = true;
       break;
@@ -1892,52 +2007,73 @@ function bottomIconPress (evt) {
         break;
       }
     case 'menu-settings': // T
-        if (isSettingsMenuOpen) {
-          isSettingsMenuOpen = false;
-          hideSideMenus();
-          break;
-        } else {
-          hideSideMenus();
-          $('#settings-menu').fadeIn();
-          isSettingsMenuOpen = true;
-          $('#menu-settings img').addClass('bmenu-item-selected');
-          break;
-        }
+      if (isSettingsMenuOpen) {
+        isSettingsMenuOpen = false;
+        hideSideMenus();
+        break;
+      } else {
+        hideSideMenus();
+        $('#settings-menu').fadeIn();
+        isSettingsMenuOpen = true;
+        $('#menu-settings img').addClass('bmenu-item-selected');
+        break;
+      }
     case 'menu-editSat':
       if (isEditSatMenuOpen) {
         isEditSatMenuOpen = false;
         hideSideMenus();
         break;
       } else {
-        $('#editSat-menu').fadeIn();
-        isEditSatMenuOpen = true;
         if (selectedSat !== -1) {
-          var sat = satSet.getSat(selectedSat);
+          hideSideMenus();
+          $('#editSat-menu').fadeIn();
+          $('#menu-editSat img').addClass('bmenu-item-selected');
+          isEditSatMenuOpen = true;
+
+          sat = satSet.getSat(selectedSat);
           $('#es-scc').val(sat.SCC_NUM);
 
-          var inc = (sat.inclination * R2D).toFixed(4);
-          inc = pad(inc, 8);
-          $('#es-inc').val(inc);
+          var inc = (sat.inclination * R2D).toPrecision(7);
+          inc = inc.split('.');
+          inc[0] = inc[0].substr(-3, 3);
+          inc[1] = inc[1].substr(0, 4);
+          inc = (inc[0] + '.' + inc[1]).toString();
 
-          $('#es-meanmo').val(sat.meanMotion.toFixed(8));
-          $('#es-rasc').val((sat.raan * R2D).toFixed(4));
-          $('#es-ecen').val(sat.eccentricity.toFixed(7).substr(2, 8));
+          $('#es-inc').val(pad(inc, 8));
+          $('#es-year').val(sat.TLE_LINE1.substr(18, 2));
+          $('#es-day').val(sat.TLE_LINE1.substr(20, 12));
+          $('#es-meanmo').val(sat.TLE_LINE2.substr(52, 11));
 
-          var argPe = (sat.argPe * R2D).toFixed(4);
-          argPe = pad(argPe, 8);
-          $('#es-argPe').val(argPe);
+          var rasc = (sat.raan * R2D).toPrecision(7);
+          rasc = rasc.split('.');
+          rasc[0] = rasc[0].substr(-3, 3);
+          rasc[1] = rasc[1].substr(0, 4);
+          rasc = (rasc[0] + '.' + rasc[1]).toString();
+
+          $('#es-rasc').val(pad(rasc, 8));
+          $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
+
+          var argPe = (sat.argPe * R2D).toPrecision(7);
+          argPe = argPe.split('.');
+          argPe[0] = argPe[0].substr(-3, 3);
+          argPe[1] = argPe[1].substr(0, 4);
+          argPe = (argPe[0] + '.' + argPe[1]).toString();
+
+          $('#es-argPe').val(pad(argPe, 8));
           $('#es-meana').val(sat.TLE_LINE2.substr(44 - 1, 7 + 1));
           // $('#es-rasc').val(sat.TLE_LINE2.substr(18 - 1, 7 + 1).toString());
-
-          function pad(num, size) {
-            var s = "000" + num;
-            return s.substr(s.length-size);
+        } else {
+          if (!$('#menu-editSat img:animated').length) {
+            $('#menu-editSat img').effect('shake', {distance: 10});
           }
-
         }
-        $('#menu-editSat img').addClass('bmenu-item-selected');
       }
   }
+}
+function pad (num, size) {
+  console.log(num);
+  var s = '   ' + num;
+  return s.substr(s.length - size);
 }
 function updateUrl () { // URL Updater
   var arr = window.location.href.split('?');
@@ -1974,8 +2110,22 @@ function selectSat (satId) {
     $('#iss-stream').html('');
     $('#iss-stream-menu').fadeOut();
     orbitDisplay.clearSelectOrbit();
+    // Remove Red Box
+    $('#menu-lookanglesmultisite img').removeClass('bmenu-item-selected');
+    $('#menu-lookangles img').removeClass('bmenu-item-selected');
+    $('#menu-editSat img').removeClass('bmenu-item-selected');
+    // Add Grey Out
     $('#menu-lookanglesmultisite img').addClass('bmenu-item-disabled');
     $('#menu-lookangles img').addClass('bmenu-item-disabled');
+    $('#menu-editSat img').addClass('bmenu-item-disabled');
+    // Remove Side Menus
+    $('#lookanglesmultisite-menu').fadeOut();
+    $('#lookangles-menu').fadeOut();
+    $('#editSat-menu').fadeOut();
+    // Toggle the side menus as closed
+    isEditSatMenuOpen = false;
+    isLookanglesMenuOpen = false;
+    isLookanglesMultiSiteMenuOpen = false;
   } else {
     camZoomSnappedOnSat = true;
     camAngleSnappedOnSat = true;
@@ -2355,7 +2505,7 @@ function camSnapToSat (satId) {
     if (lookangles.altitude) {
       var camDistTarget = lookangles.altitude + 6371 + 2000;
     } else {
-      camDistTarget = 6371 + 2000  // Stay out of the center of the earth. You will get stuck there.
+      camDistTarget = 6371 + 2000;  // Stay out of the center of the earth. You will get stuck there.
       console.log('Zoom Calculation Error');
       camZoomSnappedOnSat = false;
       camAngleSnappedOnSat = false;
@@ -3142,7 +3292,11 @@ var lookangles = (function () {
   function propTime (propOffset2, propRealTime) {
     'use strict';                                             // May be unnescessary but doesn't hurt anything atm.
     var now = new Date();                                     // Make a time variable
-    now.setTime(Number(propRealTime) + propOffset2);           // Set the time variable to the time in the future
+    if (propRate === 0) {
+      now.setTime(Number(propFrozen) + propOffset);           // Set the time variable to the time in the future
+    } else {
+      now.setTime(Number(propRealTime) + propOffset2);           // Set the time variable to the time in the future
+    }
     return now;
   }
 
@@ -4039,7 +4193,6 @@ function clearMenuCountries () {
   orbitDisplay.updateOrbitBuffer = function (satId, force = false, TLE1 = 0, TLE2 = 0) {
     if (!inProgress[satId]) {
       if (force) {
-        console.log(satId);
         orbitWorker.postMessage({
           isInit: false,
           isUpdate: true,
@@ -4066,11 +4219,6 @@ function clearMenuCountries () {
   };
 
   orbitWorker.onmessage = function (m) {
-    if (m.data.TLEupdateComplete) {
-      TLEUpdateNeeded = false;
-      return;
-    }
-
     var satId = m.data.satId;
     var pointsOut = new Float32Array(m.data.pointsOut);
     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[satId]);
@@ -4220,7 +4368,11 @@ function propTime () {
   var now = new Date();
   var realElapsedMsec = Number(now) - Number(propRealTime);
   var scaledMsec = realElapsedMsec * propRate;
-  now.setTime(Number(propRealTime) + propOffset + scaledMsec);
+  if (propRate === 0) {
+    now.setTime(Number(propFrozen) + propOffset);
+  } else {
+    now.setTime(Number(propRealTime) + propOffset + scaledMsec);
+  }
   // console.log('propTime: ' + now + ' elapsed=' + realElapsedMsec/1000);
   return now;
 }
@@ -4621,6 +4773,17 @@ function propTime () {
         satData[i].apogee = satExtraData[i].apogee;
         satData[i].perigee = satExtraData[i].perigee;
         satData[i].period = satExtraData[i].period;
+
+        // Converts JSON File into Words NOTE: This allows shrinking the JSON file
+        if (satExtraData[i].OBJECT_TYPE) {
+          satData[i].OBJECT_TYPE = satExtraData[i].OBJECT_TYPE;
+        }
+        satData[i].SCC_NUM = satExtraData[i].SCC_NUM;
+        satData[i].RCS_SIZE = satExtraData[i].RCS_SIZE;
+        satData[i].LAUNCH_SITE = satExtraData[i].LAUNCH_SITE;
+        satData[i].LAUNCH_SITEC = satExtraData[i].LAUNCH_SITEC;
+        satData[i].COUNTRY = satExtraData[i].COUNTRY;
+        satData[i].INTLDES = satExtraData[i].INTLDES;
       }
 
       // console.log('sat.js copied extra data in ' + (performance.now() - start) + ' ms');
@@ -4685,7 +4848,6 @@ function propTime () {
     }
 
     satExtraData = null;
-
   };
 
   satSet.init = function (satsReadyCallback) {
@@ -4798,14 +4960,14 @@ function propTime () {
       // do some processing on our satData response
 
       for (i = 0; i < satData.length; i++) {
-        var year = satData[i].INTLDES.substring(0, 2); // clean up intl des for display
+        var year = satData[i].TLE_LINE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
         // console.log('year is',year);
         if (year === '') {
           satData[i].intlDes = 'none';
         } else {
           var prefix = (year > 50) ? '19' : '20';
           year = prefix + year;
-          var rest = satData[i].INTLDES.substring(2);
+          var rest = satData[i].TLE_LINE1.substr(9, 8).trim().substring(2);
           satData[i].intlDes = year + '-' + rest;
         }
 
@@ -4943,21 +5105,7 @@ function propTime () {
       var j;
       var curObjsHTMLText = '';
       for (i = 0, j = inViewObs.length; i < j; i++) {
-      /* TODO: Add color to selected SCC_NUM
-      if (curSCC !== null) {
-          if (inViewObs[i] === curSCC){
-            console.log("Cant overide class.");
-            curObjsHTMLText += "<span style='color: blue;' class='FOV-object'>" + inViewObs[i] + '</span>\n';
-          }
-          else{
-            curObjsHTMLText += "<span class='FOV-object'>" + inViewObs[i] + '</span>\n';
-          }
-        }
-        else{
-          curObjsHTMLText += "<span class='FOV-object'>" + inViewObs[i] + '</span>\n';
-        }
-      } */
-        curObjsHTMLText += "<span class='FOV-object'>" + inViewObs[i] + '</span>\n';
+        curObjsHTMLText += "<span class='FOV-object link'>" + inViewObs[i] + '</span>\n';
       }
       curObjsHTML.innerHTML = curObjsHTMLText;
       lastFOVUpdateTime = now;
@@ -5002,9 +5150,15 @@ function propTime () {
     return null;
   };
 
+  function pad (str, max) {
+    return str.length < max ? pad('0' + str, max) : str;
+  }
+
   satSet.getIdFromObjNum = function (objNum) {
     for (var i = 0; i < satData.length; i++) {
-      if (satData[i].SCC_NUM.toString().indexOf(objNum) === 0) { // && satData[i].OBJECT_TYPE !== 'unknown') { // OPTIMIZATION: Determine if this code can be removed.
+      var scc = pad(satData[i].TLE_LINE1.substr(2, 5).trim(), 5);
+
+      if (scc.indexOf(objNum) === 0) { // && satData[i].OBJECT_TYPE !== 'unknown') { // OPTIMIZATION: Determine if this code can be removed.
         return i;
       }
     }
@@ -5201,6 +5355,7 @@ function propTime () {
       $('#menu-lookangles img').removeClass('bmenu-item-disabled');
     }
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
+    $('#menu-editSat img').removeClass('bmenu-item-disabled');
   };
 
   satSet.onCruncherReady = function (cb) {

@@ -4191,7 +4191,7 @@ function clearMenuCountries () {
     // console.log('orbitDisplay init: ' + time + ' ms');
   };
 
-  orbitDisplay.updateOrbitBuffer = function (satId, force = false, TLE1 = 0, TLE2 = 0) {
+  orbitDisplay.updateOrbitBuffer = function (satId, force, TLE1, TLE2) {
     if (!inProgress[satId]) {
       if (force) {
         orbitWorker.postMessage({

@@ -77,6 +77,7 @@ var isSettingsMenuOpen = false;
 var isEditSatMenuOpen = false;
 var isNewLaunchMenuOpen = false;
 var isEditTime = false;
+var isShowNextPass = false;
 
 var otherSatelliteTransparency = 0.1;
 
@@ -1238,6 +1239,7 @@ $(document).ready(function () { // Code Once index.php is loaded
   $('#settings-form').submit(function (e) {
     var isResetSensorChecked = document.getElementById('settings-resetSensor').checked;
     var isHOSChecked = document.getElementById('settings-hos').checked;
+    var isSNPChecked = document.getElementById('settings-snp').checked;
     if (isResetSensorChecked) {
       // Return to default settings with nothing 'inview'
       satCruncher.postMessage({
@@ -1275,6 +1277,11 @@ $(document).ready(function () { // Code Once index.php is loaded
       otherSatelliteTransparency = 0;
     } else {
       otherSatelliteTransparency = 0.1;
+    }
+    if (isSNPChecked) {
+      isShowNextPass = true;
+    } else {
+      isShowNextPass = false;
     }
     document.getElementById('settings-resetSensor').checked = false;
     e.preventDefault();
@@ -2729,12 +2736,12 @@ function hoverBoxOnSat (satId, satX, satY) {
       var sat = satSet.getSat(satId);
 
       // FEATURE TODO: Processor intensive code that might be offered as a setting
-      //
-      // if (!(lookangles.obslat === undefined || lookangles.obslat === null)) {
-      //   $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
-      // } else {
-      //   $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '</center>');
-      // }
+
+      if (!(lookangles.obslat === undefined || lookangles.obslat === null) && isShowNextPass) {
+        $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
+      } else {
+        $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '</center>');
+      }
 
       $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '</center>');
       $('#sat-hoverbox').css({ // TODO: Make the centering CSS not HTML

@@ -3292,11 +3292,7 @@ var lookangles = (function () {
   function propTime (propOffset2, propRealTime) {
     'use strict';                                             // May be unnescessary but doesn't hurt anything atm.
     var now = new Date();                                     // Make a time variable
-    if (propRate === 0) {
-      now.setTime(Number(propFrozen) + propOffset);           // Set the time variable to the time in the future
-    } else {
-      now.setTime(Number(propRealTime) + propOffset2);           // Set the time variable to the time in the future
-    }
+    now.setTime(Number(propRealTime) + propOffset2);           // Set the time variable to the time in the future
     return now;
   }
 
@@ -4191,7 +4187,7 @@ function clearMenuCountries () {
     // console.log('orbitDisplay init: ' + time + ' ms');
   };
 
-  orbitDisplay.updateOrbitBuffer = function (satId, force = false, TLE1 = 0, TLE2 = 0) {
+  orbitDisplay.updateOrbitBuffer = function (satId, force, TLE1, TLE2) {
     if (!inProgress[satId]) {
       if (force) {
         orbitWorker.postMessage({

@@ -130,8 +130,8 @@
           <div class="menu-title">Version</div>
           <div id="version-box" class="menubox submenu">
             <center>
-              Version: 0.8.1<br />
-              January 8, 2017
+              Version: 0.9.3<br />
+              March 8, 2017
             </center>
           </div>
         </div>
@@ -327,6 +327,13 @@
               <label for="settings-hos" class="css-label">Hide Other Satellites</label>
             </div>
             <div class="center">
+              <input id="settings-onlyfov" type="checkbox" class="css-checkbox">
+              <label for="settings-onlyfov" class="css-label">Show Only Sensor FOV</label>
+            </div>
+            <div class="center">
+              <br /><br />
+              <span>Only on Fast Computers:</span>
+              <br /><br />
               <input id="settings-snp" type="checkbox" class="css-checkbox">
               <label for="settings-snp" class="css-label">Show Next Pass on Hover</label>
             </div>
@@ -387,8 +394,18 @@
               <input type="text" class="ghost-input" id="nl-scc" value="AAAAA">
             </div>
             <div class="center">
-              <span class="vertcenter">Inclination: </span>
-              <input type="text" class="ghost-input" id="nl-inc" value="AAA.AAAA"></div>
+              <ul class='dropdown'>
+        		     <li id="launch-site-dropdown"><a href='index.html'>Launch Site</a>
+        		     	<span></span>
+        		        <ul class="dropdown-box">
+        		           <li><a href='#'>Jiuquan Satellite Launch Center</a></li>
+        		           <li><a href='#'>Taiyuan Satellite Launch Center</a></li>
+        		           <li><a href='#'>Xichang Satellite Launch Center</a></li>
+        		           <li><a href='#'>Wenchang Satellite Launch Center</a></li>
+        		        </ul>
+        		     </li>
+        		  </ul>
+            </div>
             <div class="center">
               <span class="vertcenter">Apogee: </span>
               <input type="text" class="ghost-input" id="nl-apogee" value="AA.AAAAAAAA"></div>

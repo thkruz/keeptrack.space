@@ -77,6 +77,8 @@ var isSettingsMenuOpen = false;
 var isEditSatMenuOpen = false;
 var isNewLaunchMenuOpen = false;
 var isEditTime = false;
+var isShowNextPass = false;
+var isOnlyFOVChecked = false;
 
 var otherSatelliteTransparency = 0.1;
 
@@ -293,7 +295,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     // if(evt.which === 3) {//RMB
     if (!dragHasMoved) {
       var clickedSat = getSatIdFromCoord(evt.clientX, evt.clientY);
-      if (clickedSat === -1 && evt.button === 2) {
+      if (clickedSat === -1 && evt.button === 2) { // Right Mouse Buttom Click
         clearMenuCountries();
         $('#search').val('');
         searchBox.hideResults();
@@ -1238,6 +1240,8 @@ $(document).ready(function () { // Code Once index.php is loaded
   $('#settings-form').submit(function (e) {
     var isResetSensorChecked = document.getElementById('settings-resetSensor').checked;
     var isHOSChecked = document.getElementById('settings-hos').checked;
+    isOnlyFOVChecked = document.getElementById('settings-onlyfov').checked;
+    var isSNPChecked = document.getElementById('settings-snp').checked;
     if (isResetSensorChecked) {
       // Return to default settings with nothing 'inview'
       satCruncher.postMessage({
@@ -1275,6 +1279,14 @@ $(document).ready(function () { // Code Once index.php is loaded
       otherSatelliteTransparency = 0;
     } else {
       otherSatelliteTransparency = 0.1;
+    }
+    if (isOnlyFOVChecked) {
+      satSet.setColorScheme(ColorScheme.onlyFOV);
+    }
+    if (isSNPChecked) {
+      isShowNextPass = true;
+    } else {
+      isShowNextPass = false;
     }
     document.getElementById('settings-resetSensor').checked = false;
     e.preventDefault();
@@ -2531,7 +2543,7 @@ function longToYaw (long) {
 
   selectedDate = selectedDate.split(' ');
   selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
-  today.setUTCHours(selectedDate.getUTCHours() + 12); // Used to be 9.5.
+  today.setUTCHours(selectedDate.getUTCHours() + 17); // Used to be 9.5.
                                                       // 12 Seems to be the offset from the earth draw script, but this is guesswork.
   today.setUTCMinutes(selectedDate.getUTCMinutes());
   today.setUTCSeconds(selectedDate.getUTCSeconds());
@@ -2729,14 +2741,13 @@ function hoverBoxOnSat (satId, satX, satY) {
       var sat = satSet.getSat(satId);
 
       // FEATURE TODO: Processor intensive code that might be offered as a setting
-      //
-      // if (!(lookangles.obslat === undefined || lookangles.obslat === null)) {
-      //   $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
-      // } else {
-      //   $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '</center>');
-      // }
 
-      $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '</center>');
+      if (!(lookangles.obslat === undefined || lookangles.obslat === null) && isShowNextPass) {
+        $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
+      } else {
+        $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '</center>');
+      }
+      // $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '</center>');
       $('#sat-hoverbox').css({ // TODO: Make the centering CSS not HTML
         display: 'block',
         position: 'absolute',
@@ -3512,6 +3523,20 @@ dateFormat.i18n = {
         pickable: true
       };
     });
+    ColorScheme.onlyFOV = new ColorScheme(function (satId) {
+      var sat = satSet.getSat(satId);
+      if (sat.inview) {
+        return {
+          color: [0.85, 0.5, 0.0, 1.0],
+          pickable: true
+        };
+      } else {
+        return {
+          color: [1.0, 1.0, 1.0, otherSatelliteTransparency],
+          pickable: false
+        };
+      }
+    });
     ColorScheme.apogee = new ColorScheme(function (satId) {
       var ap = satSet.getSat(satId).apogee;
       var gradientAmt = Math.min(ap / 45000, 1.0);
@@ -3747,7 +3772,8 @@ function clearMenuCountries () {
 
   groups.clearSelect = function () {
     groups.selectedGroup = null;
-    satSet.setColorScheme(ColorScheme.default);
+    if (isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.onlyFOV); }
+    if (!isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.default); }
   };
 
   groups.init = function () {

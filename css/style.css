@@ -612,6 +612,123 @@ fieldset {
   background: #c33;
   color: #fff;
 }
+#newLaunch-menu {
+  display: none;
+  background: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  width: 400px;
+  max-height: 100%;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 10;
+  left: 0px;
+  top: 60px;
+  bottom: 60px;
+  color: white;
+}
+  #newLaunch-content {
+    position: absolute;
+    width: 400px;
+    max-height: 100%;
+    top: 0px;
+    bottom: 0px;
+    overflow: auto;
+    margin: 0 auto;
+  }
+
+@import "compass/css3";
+
+$solid: #f0f0f0;
+$flat: #e74c3c;
+$dark: #1E1E1E;
+
+@mixin size{
+	padding: 13px 30px;
+	width: 300px;
+	vertical-align: middle;
+}
+
+@mixin position{
+	margin-left: -30px;
+}
+
+a{
+	text-decoration: none;
+	color: inherit;
+}
+
+ul li{
+	list-style: none;
+  padding: 10px;
+}
+
+.dropdown{
+	@include size;
+	margin: 0 auto;
+	background-color: $flat;
+	text-align: center;
+}
+
+.dropdown #top{
+	color: $solid;
+	position: relative;
+}
+
+.dropdown li ul li:hover{
+	color: $solid;
+	background-color: darken($flat, 5%);
+	@include size;
+	@include position;
+}
+
+.dropdown li ul li{
+	@include size;
+	@include position;
+	color: $dark;
+	border-bottom: 1px solid darken($solid, 5%);
+}
+
+.dropdown li ul li:first-child{
+margin-top: -13px;
+}
+
+.dropdown li .dropdown-box{
+	height: 0;
+	overflow: hidden;
+    display: none;
+    background-color: $solid;
+    width: 100%;
+    @include position;
+    margin-bottom: -15px;
+    margin-top: 13px;
+    border-top: 20px solid $dark;
+    padding: 0;
+    @include size;
+}
+
+.dropdown li:hover .dropdown-box, .dropdown li:active .dropdown-box {
+	display:block;
+	background-color: $solid;
+	animation: box 2s ease;
+	animation-iteration-count: 1;
+	animation-fill-mode: forwards;
+}
+
+@keyframes box {
+  from {height: 0;}
+  to {height: 203px;}
+}
+
+.dropdown li:hover span{
+	width: 0;
+	height: 0;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-bottom: 10px solid $solid;
+	margin-top: 42px;
+	position: absolute;
+	margin-left: -40px;
+	}
 
 #colorbox {
     padding: 5px;

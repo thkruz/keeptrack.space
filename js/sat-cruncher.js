@@ -89,13 +89,14 @@ onmessage = function (m) {
         if (satData[i].OBJECT_TYPE === 2) { extra.OBJECT_TYPE = 'ROCKET BODY'; }
         if (satData[i].OBJECT_TYPE === 3) { extra.OBJECT_TYPE = 'DEBRIS'; }
 
+        extra.RCS_SIZE = satData[i].RCS_SIZE;
         if (satData[i].RCS_SIZE === 0) { extra.RCS_SIZE = 'SMALL'; }
         if (satData[i].RCS_SIZE === 1) { extra.RCS_SIZE = 'MEDIUM'; }
         if (satData[i].RCS_SIZE === 2) { extra.RCS_SIZE = 'LARGE'; }
 
         // Launch Site and Country Corelation Table
         var site = satData[i].LAUNCH_SITE;
-        var sitec;
+        var sitec = satData[i].LAUNCH_SITEC;
 
         if (site === 'AFETR') {
           site = 'Cape Canaveral AFS';

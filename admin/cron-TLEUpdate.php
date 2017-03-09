@@ -4,7 +4,7 @@
   header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
 
   // Declare Global File Locations
-  $GLOBALS['TLE_Update_Files'] = '/home/kruczek/keeptrack.space/admin/TLE/update';
+  $GLOBALS['TLE_Update_Files'] = '/var/www/html/admin/TLE/update';
 
   if ($_GET["type"]) {
     $updateType = $_GET["type"];
@@ -34,8 +34,8 @@
 
 function getCookie() {
   $url="https://www.space-track.org/ajaxauth/login";
-  $username="YOUR_USERNAME_GOES_HERE";
-  $password="YOUR_PASSWORD_GOES_HERE";
+  $username="USERNAME";
+  $password="PASSWORD";
   $postdata = "identity=".$username."&password=".$password;
   $ch = curl_init();
   curl_setopt ($ch, CURLOPT_URL, $url);

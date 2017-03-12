@@ -113,6 +113,14 @@ var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotati
 // var spinner;
 
 $(document).ready(function () { // Code Once index.php is loaded
+  // Load the Stylesheets
+  $('head').append('<link rel="stylesheet" type="text/css" href="css/style.css">');
+
+  // Load ALl The Images Now
+  $('img').each(function () {
+    $(this).attr('src', $(this).attr('delayedsrc'));
+  });
+
   var opts = {
     lines: 11, // The number of lines to draw
     length: 8, // The length of each line
@@ -1913,6 +1921,9 @@ function bottomIconPress (evt) {
         break;
       } else {
         hideSideMenus();
+        if ($('#twitter-menu').is(':empty')) {
+          $('#twitter-menu').html('<a class="twitter-timeline" data-theme="dark" data-link-color="#2B7BB9" href="https://twitter.com/RedKosmonaut/lists/space-news">A Twitter List by RedKosmonaut</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>');
+        }
         $('#twitter-menu').fadeIn();
         isTwitterMenuOpen = true;
         $('#menu-twitter img').addClass('bmenu-item-selected');
@@ -2093,7 +2104,8 @@ function bottomIconPress (evt) {
         hideSideMenus();
         break;
       } else {
-        if (selectedSat !== -1) {
+        // TODO: NEW LAUNCH
+        if (selectedSat !== -1 && 1 === 2) {
           hideSideMenus();
           $('#newLaunch-menu').fadeIn();
           $('#menu-newLaunch img').addClass('bmenu-item-selected');
@@ -2236,353 +2248,459 @@ function selectSat (satId) {
 
     var objtype;
     if (sat.OT === 0) { objtype = 'TBA'; }
-    if (sat.OT === 1) { objtype = 'PAYLOAD'; }
-    if (sat.OT === 2) { objtype = 'ROCKET BODY'; }
-    if (sat.OT === 3) { objtype = 'DEBRIS'; }
+    if (sat.OT === 1) { objtype = 'Payload'; }
+    if (sat.OT === 2) { objtype = 'Rocket Body'; }
+    if (sat.OT === 3) { objtype = 'Debris'; }
     $('#sat-type').html(objtype);
 
-    var country;
+    // /////////////////////////////////////////////////////////////////////////
     // Country Correlation Table
-    if (sat.C === 'AB') // Headquartered in Riyadh, Saudi Arabia
-      country = 'Saudi Arabia';
-    if (sat.C === 'AC')
-      country = 'AsiaSat Corp';
-    if (sat.C === 'ALG')
-      country = 'Algeria';
-    if (sat.C === 'ALL')
-      country = 'All';
-    if (sat.C === 'ARGN')
-      country = 'Argentina';
-    if (sat.C === 'ASRA')
-      country = 'Austria';
-    if (sat.C === 'AUS')
-      country = 'Australia';
-    if (sat.C === 'AZER')
-      country = 'Azerbaijan';
-    if (sat.C === 'BEL')
-      country = 'Belgium';
-    if (sat.C === 'BELA')
-      country = 'Belarus';
-    if (sat.C === 'BERM')
-      country = 'Bermuda';
-    if (sat.C === 'BOL')
-      country = 'Bolivia';
-    if (sat.C === 'BRAZ')
-      country = 'Brazil';
-    if (sat.C === 'CA')
-      country = 'Canada';
-    if (sat.C === 'CHBZ')
-      country = 'China/Brazil';
-    if (sat.C === 'CHLE')
-      country = 'Chile';
-    if (sat.C === 'CIS')
-      country = 'Commonwealth of Ind States';
-    if (sat.C === 'COL')
-      country = 'Colombia';
-    if (sat.C === 'CZCH')
-      country = 'Czechoslovakia';
-    if (sat.C === 'DEN')
-      country = 'Denmark';
-    if (sat.C === 'ECU')
-      country = 'Ecuador';
-    if (sat.C === 'EGYP')
-      country = 'Egypt';
-    if (sat.C === 'ESA')
-      country = 'European Space Agency';
-    if (sat.C === 'ESA')
-      country = 'European Space Research Org';
-    if (sat.C === 'EST')
-      country = 'Estonia';
-    if (sat.C === 'EUME')
-      country = 'EUMETSAT';
-    if (sat.C === 'EUTE')
-      country = 'EUTELSAT';
-    if (sat.C === 'FGER')
-      country = 'France/Germany';
-    if (sat.C === 'FR')
-      country = 'France';
-    if (sat.C === 'FRIT')
-      country = 'France/Italy';
-    if (sat.C === 'GER')
-      country = 'Germany';
-    if (sat.C === 'GLOB') // Headquartered in Louisiana, USA
-      country = 'United States';
-    if (sat.C === 'GREC')
-      country = 'Greece';
-    if (sat.C === 'HUN')
-      country = 'Hungary';
-    if (sat.C === 'IM') // Headquartered in London, UK
-      country = 'United Kingdom';
-    if (sat.C === 'IND')
-      country = 'India';
-    if (sat.C === 'INDO')
-      country = 'Indonesia';
-    if (sat.C === 'IRAN')
-      country = 'Iran';
-    if (sat.C === 'IRAQ')
-      country = 'Iraq';
-    if (sat.C === 'ISRA')
-      country = 'Israel';
-    if (sat.C === 'ISS')
-      country = 'International';
-    if (sat.C === 'IT')
-      country = 'Italy';
-    if (sat.C === 'ITSO') // Headquartered in Luxembourg District, Luxembourg
-      country = 'Luxembourg';
-    if (sat.C === 'JPN')
-      country = 'Japan';
-    if (sat.C === 'KAZ')
-      country = 'Kazakhstan';
-    if (sat.C === 'LAOS')
-      country = 'Laos';
-    if (sat.C === 'LTU')
-      country = 'Lithuania';
-    if (sat.C === 'LUXE')
-      country = 'Luxembourg';
-    if (sat.C === 'MALA')
-      country = 'Malaysia';
-    if (sat.C === 'MEX')
-      country = 'Mexico';
-    if (sat.C === 'NATO')
-      country = 'North Atlantic Treaty Org';
-    if (sat.C === 'NETH')
-      country = 'Netherlands';
-    if (sat.C === 'NICO') // Headquartered in Washington, USA
-      country = 'United States';
-    if (sat.C === 'NIG')
-      country = 'Nigeria';
-    if (sat.C === 'NKOR')
-      country = 'North Korea';
-    if (sat.C === 'NOR')
-      country = 'Norway';
-    if (sat.C === 'O3B') // Majority Shareholder Based in Luxembourg
-      country = 'Luxembourg';
-    if (sat.C === 'ORB') // Headquartered in Louisiana, USA
-      country = 'United States';
-    if (sat.C === 'PAKI')
-      country = 'Pakistan';
-    if (sat.C === 'PERU')
-      country = 'Peru';
-    if (sat.C === 'POL')
-      country = 'Poland';
-    if (sat.C === 'POR')
-      country = 'Portugal';
-    if (sat.C === 'PRC')
-      country = 'China';
-    if (sat.C === 'PRC')
-      country = 'China';
-    if (sat.C === 'RASC') // Headquartered in Mauritius
-      country = 'Mauritius';
-    if (sat.C === 'ROC')
-      country = 'Taiwan';
-    if (sat.C === 'ROM')
-      country = 'Romania';
-    if (sat.C === 'RP')
-      country = 'Philippines';
-    if (sat.C === 'SAFR')
-      country = 'South Africa';
-    if (sat.C === 'SAUD')
-      country = 'Saudi Arabia';
-    if (sat.C === 'SEAL') // Primary Shareholder Russian
-      country = 'Russia';
-    if (sat.C === 'RP')
-      country = 'Philippines';
-    if (sat.C === 'SES')
-      country = 'Luxembourg';
-    if (sat.C === 'SING')
-      country = 'Singapore';
-    if (sat.C === 'SKOR')
-      country = 'South Korea';
-    if (sat.C === 'SPN')
-      country = 'Spain';
-    if (sat.C === 'STCT')
-      country = 'Singapore/Taiwan';
-    if (sat.C === 'SWED')
-      country = 'Sweden';
-    if (sat.C === 'SWTZ')
-      country = 'Switzerland';
-    if (sat.C === 'THAI')
-      country = 'Thailand';
-    if (sat.C === 'TMMC')
-      country = 'Turkmenistan/Monaco';
-    if (sat.C === 'TURK')
-      country = 'Turkey';
-    if (sat.C === 'UAE')
-      country = 'United Arab Emirates';
-    if (sat.C === 'UK')
-      country = 'United Kingdom';
-    if (sat.C === 'UKR')
-      country = 'Ukraine';
-    if (sat.C === 'URY')
-      country = 'Uruguay';
-    if (sat.C === 'US')
-      country = 'United States';
-    if (sat.C === 'USBZ')
-      country = 'United States/Brazil';
-    if (sat.C === 'VENZ')
-      country = 'Venezuela';
-    if (sat.C === 'VTNM')
-      country = 'Vietnam';
-
-    if (sat.C === 'U')
+    // /////////////////////////////////////////////////////////////////////////
+    var country;
+    if (sat.C === 'U') {
       country = 'Unknown';
+    // Table Nested in ELSE to Make Hiding it Easier
+    } else {
+      if (sat.C === 'AB') { // Headquartered in Riyadh, Saudi Arabia
+        country = 'Saudi Arabia';
+      }
+      if (sat.C === 'AC') {
+        country = 'AsiaSat Corp';
+      }
+      if (sat.C === 'ALG') {
+        country = 'Algeria';
+      }
+      if (sat.C === 'ALL') {
+        country = 'All';
+      }
+      if (sat.C === 'ARGN') {
+        country = 'Argentina';
+      }
+      if (sat.C === 'ASRA') {
+        country = 'Austria';
+      }
+      if (sat.C === 'AUS') {
+        country = 'Australia';
+      }
+      if (sat.C === 'AZER') {
+        country = 'Azerbaijan';
+      }
+      if (sat.C === 'BEL') {
+        country = 'Belgium';
+      }
+      if (sat.C === 'BELA') {
+        country = 'Belarus';
+      }
+      if (sat.C === 'BERM') {
+        country = 'Bermuda';
+      }
+      if (sat.C === 'BOL') {
+        country = 'Bolivia';
+      }
+      if (sat.C === 'BRAZ') {
+        country = 'Brazil';
+      }
+      if (sat.C === 'CA') {
+        country = 'Canada';
+      }
+      if (sat.C === 'CHBZ') {
+        country = 'China/Brazil';
+      }
+      if (sat.C === 'CHLE') {
+        country = 'Chile';
+      }
+      if (sat.C === 'CIS') {
+        country = 'Commonwealth of Ind States';
+      }
+      if (sat.C === 'COL') {
+        country = 'Colombia';
+      }
+      if (sat.C === 'CZCH') {
+        country = 'Czechoslovakia';
+      }
+      if (sat.C === 'DEN') {
+        country = 'Denmark';
+      }
+      if (sat.C === 'ECU') {
+        country = 'Ecuador';
+      }
+      if (sat.C === 'EGYP') {
+        country = 'Egypt';
+      }
+      if (sat.C === 'ESA') {
+        country = 'European Space Agency';
+      }
+      if (sat.C === 'ESA') {
+        country = 'European Space Research Org';
+      }
+      if (sat.C === 'EST') {
+        country = 'Estonia';
+      }
+      if (sat.C === 'EUME') {
+        country = 'EUMETSAT';
+      }
+      if (sat.C === 'EUTE') {
+        country = 'EUTELSAT';
+      }
+      if (sat.C === 'FGER') {
+        country = 'France/Germany';
+      }
+      if (sat.C === 'FR') {
+        country = 'France';
+      }
+      if (sat.C === 'FRIT') {
+        country = 'France/Italy';
+      }
+      if (sat.C === 'GER') {
+        country = 'Germany';
+      }
+      if (sat.C === 'GLOB') { // Headquartered in Louisiana, USA
+        country = 'United States';
+      }
+      if (sat.C === 'GREC') {
+        country = 'Greece';
+      }
+      if (sat.C === 'HUN') {
+        country = 'Hungary';
+      }
+      if (sat.C === 'IM') { // Headquartered in London, UK
+        country = 'United Kingdom';
+      }
+      if (sat.C === 'IND') {
+        country = 'India';
+      }
+      if (sat.C === 'INDO') {
+        country = 'Indonesia';
+      }
+      if (sat.C === 'IRAN') {
+        country = 'Iran';
+      }
+      if (sat.C === 'IRAQ') {
+        country = 'Iraq';
+      }
+      if (sat.C === 'ISRA') {
+        country = 'Israel';
+      }
+      if (sat.C === 'ISS') {
+        country = 'International';
+      }
+      if (sat.C === 'IT') {
+        country = 'Italy';
+      }
+      if (sat.C === 'ITSO') { // Headquartered in Luxembourg District, Luxembourg
+        country = 'Luxembourg';
+      }
+      if (sat.C === 'JPN') {
+        country = 'Japan';
+      }
+      if (sat.C === 'KAZ') {
+        country = 'Kazakhstan';
+      }
+      if (sat.C === 'LAOS') {
+        country = 'Laos';
+      }
+      if (sat.C === 'LTU') {
+        country = 'Lithuania';
+      }
+      if (sat.C === 'LUXE') {
+        country = 'Luxembourg';
+      }
+      if (sat.C === 'MALA') {
+        country = 'Malaysia';
+      }
+      if (sat.C === 'MEX') {
+        country = 'Mexico';
+      }
+      if (sat.C === 'NATO') {
+        country = 'North Atlantic Treaty Org';
+      }
+      if (sat.C === 'NETH') {
+        country = 'Netherlands';
+      }
+      if (sat.C === 'NICO') { // Headquartered in Washington, USA
+        country = 'United States';
+      }
+      if (sat.C === 'NIG') {
+        country = 'Nigeria';
+      }
+      if (sat.C === 'NKOR') {
+        country = 'North Korea';
+      }
+      if (sat.C === 'NOR') {
+        country = 'Norway';
+      }
+      if (sat.C === 'O3B') { // Majority Shareholder Based in Luxembourg
+        country = 'Luxembourg';
+      }
+      if (sat.C === 'ORB') { // Headquartered in Louisiana, USA
+        country = 'United States';
+      }
+      if (sat.C === 'PAKI') {
+        country = 'Pakistan';
+      }
+      if (sat.C === 'PERU') {
+        country = 'Peru';
+      }
+      if (sat.C === 'POL') {
+        country = 'Poland';
+      }
+      if (sat.C === 'POR') {
+        country = 'Portugal';
+      }
+      if (sat.C === 'PRC') {
+        country = 'China';
+      }
+      if (sat.C === 'PRC') {
+        country = 'China';
+      }
+      if (sat.C === 'RASC') { // Headquartered in Mauritius
+        country = 'Mauritius';
+      }
+      if (sat.C === 'ROC') {
+        country = 'Taiwan';
+      }
+      if (sat.C === 'ROM') {
+        country = 'Romania';
+      }
+      if (sat.C === 'RP') {
+        country = 'Philippines';
+      }
+      if (sat.C === 'SAFR') {
+        country = 'South Africa';
+      }
+      if (sat.C === 'SAUD') {
+        country = 'Saudi Arabia';
+      }
+      if (sat.C === 'SEAL') { // Primary Shareholder Russian
+        country = 'Russia';
+      }
+      if (sat.C === 'RP') {
+        country = 'Philippines';
+      }
+      if (sat.C === 'SES') {
+        country = 'Luxembourg';
+      }
+      if (sat.C === 'SING') {
+        country = 'Singapore';
+      }
+      if (sat.C === 'SKOR') {
+        country = 'South Korea';
+      }
+      if (sat.C === 'SPN') {
+        country = 'Spain';
+      }
+      if (sat.C === 'STCT') {
+        country = 'Singapore/Taiwan';
+      }
+      if (sat.C === 'SWED') {
+        country = 'Sweden';
+      }
+      if (sat.C === 'SWTZ') {
+        country = 'Switzerland';
+      }
+      if (sat.C === 'THAI') {
+        country = 'Thailand';
+      }
+      if (sat.C === 'TMMC') {
+        country = 'Turkmenistan/Monaco';
+      }
+      if (sat.C === 'TURK') {
+        country = 'Turkey';
+      }
+      if (sat.C === 'UAE') {
+        country = 'United Arab Emirates';
+      }
+      if (sat.C === 'UK') {
+        country = 'United Kingdom';
+      }
+      if (sat.C === 'UKR') {
+        country = 'Ukraine';
+      }
+      if (sat.C === 'URY') {
+        country = 'Uruguay';
+      }
+      if (sat.C === 'US') {
+        country = 'United States';
+      }
+      if (sat.C === 'USBZ') {
+        country = 'United States/Brazil';
+      }
+      if (sat.C === 'VENZ') {
+        country = 'Venezuela';
+      }
+      if (sat.C === 'VTNM') {
+        country = 'Vietnam';
+      }
+    }
     $('#sat-country').html(country);
 
-    var site, sitec;
+    // /////////////////////////////////////////////////////////////////////////
     // Launch Site Correlation Table
-    if (sat.LS === 'AFETR') {
-      site = 'Cape Canaveral AFS';
-      sitec = 'United States';
-    }
-    if (sat.LS === 'AFWTR') {
-      site = 'Vandenberg AFB';
-      sitec = 'United States';
-    }
-    if (sat.LS === 'CAS') {
-      site = 'Canary Islands';
-      sitec = 'United States';
-    }
-    if (sat.LS === 'FRGUI') {
-      site = 'French Guiana';
-      sitec = 'United States';
-    }
-    if (sat.LS === 'HGSTR') {
-      site = 'Hammaguira STR';
-      sitec = 'Algeria';
-    }
-    if (sat.LS === 'KSCUT') {
-      site = 'Uchinoura Space Center';
-      sitec = 'Japan';
-    }
-    if (sat.LS === 'KYMTR') {
-      site = 'Kapustin Yar MSC';
-      sitec = 'Russia';
-    }
-    if (sat.LS === 'PKMTR') {
-      site = 'Plesetsk MSC';
-      sitec = 'Russia';
-    }
-    if (sat.LS === 'WSC') {
-      site = 'Wenchang SLC';
-      sitec = 'China';
-    }
-    if (sat.LS === 'SNMLP') {
-      site = 'San Marco LP';
-      sitec = 'Kenya';
-    }
-    if (sat.LS === 'SRI') {
-      site = 'Satish Dhawan SC';
-      sitec = 'India';
-    }
-    if (sat.LS === 'TNSTA') {
-      site = 'Tanegashima SC';
-      sitec = 'Japan';
-    }
-    if (sat.LS === 'TTMTR') {
-      site = 'Baikonur Cosmodrome';
-      sitec = 'Kazakhstan';
-    }
-    if (sat.LS === 'WLPIS') {
-      site = 'Wallops Island';
-      sitec = 'United States';
-    }
-    if (sat.LS === 'WOMRA') {
-      site = 'Woomera';
-      sitec = 'Australia';
-    }
-    if (sat.LS === 'VOSTO') {
-      site = 'Vostochny Cosmodrome';
-      sitec = 'Russia';
-    }
-    if (sat.LS === 'PMRF') {
-      site = 'PMRF Barking Sands';
-      sitec = 'United States';
-    }
-    if (sat.LS === 'SEAL') {
-      site = 'Sea Launch Odyssey';
-      sitec = 'Russia';
-    }
-    if (sat.LS === 'KWAJ') {
-      site = 'Kwajalein';
-      sitec = 'United States';
-    }
-    if (sat.LS === 'ERAS') {
-      site = 'Pegasus East';
-      sitec = 'United States';
-    }
-    if (sat.LS === 'JSC') {
-      site = 'Jiuquan SLC';
-      sitec = 'China';
-    }
-    if (sat.LS === 'SVOB') {
-      site = 'Svobodny';
-      sitec = 'Russia';
-    }
-    if (sat.LS === 'UNKN') {
-      site = 'Unknown';
-      sitec = 'Unknown';
-    }
-    if (sat.LS === 'TSC') {
-      site = 'Taiyaun SC';
-      sitec = 'China';
-    }
-    if (sat.LS === 'WRAS') {
-      site = 'Pegasus West';
-      sitec = 'United States';
-    }
-    if (sat.LS === 'XSC') {
-      site = 'Xichang SC';
-      sitec = 'China';
-    }
-    if (sat.LS === 'YAVNE') {
-      site = 'Yavne';
-      sitec = 'Israel';
-    }
-    if (sat.LS === 'OREN') {
-      site = 'Orenburg';
-      sitec = 'Russia';
-    }
-    if (sat.LS === 'SADOL') {
-      site = 'Submarine Launch';
-      sitec = 'Russia';
-    }
-    if (sat.LS === 'KODAK') {
-      site = 'Kodiak Island';
-      sitec = 'United States';
-    }
-    if (sat.LS === 'SEM') {
-      site = 'Semnan';
-      sitec = 'Iran';
-    }
-    if (sat.LS === 'YUN') {
-      site = 'Yunsong';
-      sitec = 'North Korea';
-    }
-    if (sat.LS === 'NSC') {
-      site = 'Naro Space Center';
-      sitec = 'South Korea';
-    }
-
+    // /////////////////////////////////////////////////////////////////////////
+    var site, sitec;
     if (sat.LS === 'U') {
       site = 'Unknown';
       sitec = 'Unknown';
+    // Table Nested in ELSE to Make Hiding it Easier
+    } else {
+      if (sat.LS === 'AFETR') {
+        site = 'Cape Canaveral AFS';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'AFWTR') {
+        site = 'Vandenberg AFB';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'CAS') {
+        site = 'Canary Islands';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'FRGUI') {
+        site = 'French Guiana';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'HGSTR') {
+        site = 'Hammaguira STR';
+        sitec = 'Algeria';
+      }
+      if (sat.LS === 'KSCUT') {
+        site = 'Uchinoura Space Center';
+        sitec = 'Japan';
+      }
+      if (sat.LS === 'KYMTR') {
+        site = 'Kapustin Yar MSC';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'PKMTR') {
+        site = 'Plesetsk MSC';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'WSC') {
+        site = 'Wenchang SLC';
+        sitec = 'China';
+      }
+      if (sat.LS === 'SNMLP') {
+        site = 'San Marco LP';
+        sitec = 'Kenya';
+      }
+      if (sat.LS === 'SRI') {
+        site = 'Satish Dhawan SC';
+        sitec = 'India';
+      }
+      if (sat.LS === 'TNSTA') {
+        site = 'Tanegashima SC';
+        sitec = 'Japan';
+      }
+      if (sat.LS === 'TTMTR') {
+        site = 'Baikonur Cosmodrome';
+        sitec = 'Kazakhstan';
+      }
+      if (sat.LS === 'WLPIS') {
+        site = 'Wallops Island';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'WOMRA') {
+        site = 'Woomera';
+        sitec = 'Australia';
+      }
+      if (sat.LS === 'VOSTO') {
+        site = 'Vostochny Cosmodrome';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'PMRF') {
+        site = 'PMRF Barking Sands';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'SEAL') {
+        site = 'Sea Launch Odyssey';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'KWAJ') {
+        site = 'Kwajalein';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'ERAS') {
+        site = 'Pegasus East';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'JSC') {
+        site = 'Jiuquan SLC';
+        sitec = 'China';
+      }
+      if (sat.LS === 'SVOB') {
+        site = 'Svobodny';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'UNKN') {
+        site = 'Unknown';
+        sitec = 'Unknown';
+      }
+      if (sat.LS === 'TSC') {
+        site = 'Taiyaun SC';
+        sitec = 'China';
+      }
+      if (sat.LS === 'WRAS') {
+        site = 'Pegasus West';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'XSC') {
+        site = 'Xichang SC';
+        sitec = 'China';
+      }
+      if (sat.LS === 'YAVNE') {
+        site = 'Yavne';
+        sitec = 'Israel';
+      }
+      if (sat.LS === 'OREN') {
+        site = 'Orenburg';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'SADOL') {
+        site = 'Submarine Launch';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'KODAK') {
+        site = 'Kodiak Island';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'SEM') {
+        site = 'Semnan';
+        sitec = 'Iran';
+      }
+      if (sat.LS === 'YUN') {
+        site = 'Yunsong';
+        sitec = 'North Korea';
+      }
+      if (sat.LS === 'NSC') {
+        site = 'Naro Space Center';
+        sitec = 'South Korea';
+      }
     }
     $('#sat-site').html(site);
     $('#sat-sitec').html(sitec);
 
-    $('#sat-vehicle').html(sat.LV);
-    if (sat.LV === 'U') { $('#sat-vehicle').html('Unknown'); }
+    // /////////////////////////////////////////////////////////////////////////
+    // RCS Correlation Table
+    // /////////////////////////////////////////////////////////////////////////
     if (sat.R == null) {
       $('#sat-rcs').html('Unknown');
     } else {
       var rcs;
-      if (sat.R === 0) { rcs = 'SMALL'; }
-      if (sat.R === 1) { rcs = 'MEDIUM'; }
-      if (sat.R === 2) { rcs = 'LARGE'; }
+      if (sat.R === 0) { rcs = 'Small'; }
+      if (sat.R === 1) { rcs = 'Medium'; }
+      if (sat.R === 2) { rcs = 'Large'; }
       $('#sat-rcs').html(rcs);
     }
+
+    // /////////////////////////////////////////////////////////////////////////
+    // Launch Vehicle Correlation Table
+    // /////////////////////////////////////////////////////////////////////////
+    $('#sat-vehicle').html(sat.LV);
+    if (sat.LV === 'U') { $('#sat-vehicle').html('Unknown'); }
     switch (sat.LV) {
+      // ///////////////////////////////////////////////////////////////////////
       // UNITED STATES
+      // ///////////////////////////////////////////////////////////////////////
       case 'Scout B':
         $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutb.html'>" + sat.LV + '</a>');
         break;
@@ -2610,7 +2728,16 @@ function selectSat (satId) {
       case 'Falcon 9 v1.1':
         $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/f/falcon9v11.html'>" + sat.LV + '</a>');
         break;
+      case 'Atlas Agena B':
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/a/atlasagenab.html'>" + sat.LV + '</a>');
+        break;
+      case 'Thor Ablestar':
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/t/thorablestar.html'>" + sat.LV + '</a>');
+        break;
+
+      // ///////////////////////////////////////////////////////////////////////
       // RUSSIA
+      // ///////////////////////////////////////////////////////////////////////
       case 'Soyuz-ST-A':
         $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-st-a.html'>" + sat.LV + '</a>');
         break;
@@ -2653,7 +2780,9 @@ function selectSat (satId) {
       case 'Vostok 8K72K':
         $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/v/vostok8k72k.html'>" + sat.LV + '</a>');
         break;
+      // ///////////////////////////////////////////////////////////////////////
       // CHINA
+      // ///////////////////////////////////////////////////////////////////////
       case 'Chang Zheng 1':
         $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng1.html'>" + sat.LV + '</a>');
         break;
@@ -2675,8 +2804,8 @@ function selectSat (satId) {
       case 'Chang Zheng 2C':
         $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng2c.html'>" + sat.LV + '</a>');
         break;
-      case 'Long March 6':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng6.html'> Chang Zheng 6</a>");
+      case 'Chang Zheng 6':
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng6.html'>" + sat.LV + '</a>');
         break;
     }
 
@@ -5260,7 +5389,10 @@ function propTime () {
 
     if (!cruncherReady) {
       // NOTE:: This is called right after all the objects load on the screen.
-      $('#load-cover').fadeOut();
+      // $('#load-cover').fadeOut();
+      $('#logo-container').fadeOut();
+      $('body').attr('style', 'background:black');
+      $('#canvas-holder').attr('style', 'display:block');
       // $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
       // $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
       // $('#menu-lookangles img').removeClass('bmenu-item-disabled');
@@ -5307,7 +5439,7 @@ function propTime () {
     dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
 
     var tleSource = $('#tle-source').text();
-    $.get('' + tleSource + '?fakeparameter=to_avoid_browser_cache2', function (resp) {
+    $.get('' + tleSource, function (resp) { // + '?fakeparameter=to_avoid_browser_cache'
       // var startTime = new Date().getTime();
 
       // console.log('sat.js downloaded data');
@@ -5791,7 +5923,8 @@ function propTime () {
     }
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
     $('#menu-editSat img').removeClass('bmenu-item-disabled');
-    $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
+    // TODO: NEW LAUNCH
+    // $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
   };
 
   satSet.onCruncherReady = function (cb) {

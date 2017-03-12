@@ -12,7 +12,7 @@ onmessage = function(m) {
 
   if(m.data.isUpdate) {
     satCache[m.data.satId] = satellite.twoline2satrec(
-      m.data.TLE_LINE1, m.data.TLE_LINE2
+      m.data.TLE1, m.data.TLE2
     );
   }
 
@@ -22,7 +22,7 @@ onmessage = function(m) {
 
     for(var i=0; i < satData.length; i++) {
       satCache[i] = satellite.twoline2satrec(
-        satData[i].TLE_LINE1, satData[i].TLE_LINE2
+        satData[i].TLE1, satData[i].TLE2
       );
     }
 

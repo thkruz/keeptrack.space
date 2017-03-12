@@ -48,6 +48,7 @@ Temporary Items
 
 # Remote-FTP config files
 .ftpconfig
+.ftpconfig_L
 ftpignore
 
 #.imdone Files

@@ -39,7 +39,7 @@ var propRealTime = Date.now(); // actual time we're running it
 var propOffset = 0.0; // offset we're propagating to, msec
 var propRate = 1.0; // time rate multiplier for propagation
 var propFrozen = Date.now(); // for when propRate 0
-var oldT = new Date(); // Only used in drawLoop function
+var time; // Only used in drawLoop function
 
 // Camera Variables
 var R2D = 180 / Math.PI;
@@ -54,6 +54,8 @@ var zoomLevel = 0.5;
 var zoomTarget = 0.5;
 var camPitchSpeed = 0;
 var camYawSpeed = 0;
+
+var timeMouseDown;
 
 // SOCRATES Variables
 var socratesObjOne = []; // Array for tr containing CATNR1
@@ -111,6 +113,14 @@ var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotati
 // var spinner;
 
 $(document).ready(function () { // Code Once index.php is loaded
+  // Load the Stylesheets
+  $('head').append('<link rel="stylesheet" type="text/css" href="css/style.css">');
+
+  // Load ALl The Images Now
+  $('img').each(function () {
+    $(this).attr('src', $(this).attr('delayedsrc'));
+  });
+
   var opts = {
     lines: 11, // The number of lines to draw
     length: 8, // The length of each line
@@ -219,7 +229,7 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   $('#canvas').on('touchmove', function (evt) {
     evt.preventDefault();
-    if (isDragging) {
+    if (isDragging && screenDragPoint !== [evt.originalEvent.touches[0].clientX, evt.originalEvent.touches[0].clientY]) {
       dragHasMoved = true;
       camAngleSnappedOnSat = false;
       camZoomSnappedOnSat = false;
@@ -229,7 +239,7 @@ $(document).ready(function () { // Code Once index.php is loaded
   });
 
   $('#canvas').mousemove(function (evt) {
-    if (isDragging) {
+    if (isDragging && screenDragPoint !== [evt.clientX, evt.clientY]) {
       dragHasMoved = true;
       camAngleSnappedOnSat = false;
       camZoomSnappedOnSat = false;
@@ -303,6 +313,7 @@ $(document).ready(function () { // Code Once index.php is loaded
         $('#menu-astronauts img').removeClass('bmenu-item-selected');
         isMilSatSelected = false;
         $('#menu-space-stations img').removeClass('bmenu-item-selected');
+        $('#search-results').attr('style', 'max-height:95%');
       }
       selectSat(clickedSat);
     }
@@ -1302,7 +1313,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     }
     var sat = satSet.getSat(satId);
 
-    var intl = sat.TLE_LINE1.substr(9, 8);
+    var intl = sat.TLE1.substr(9, 8);
 
     // TODO: Calculate current J-Day to change Epoch Date
 
@@ -1379,20 +1390,20 @@ $(document).ready(function () { // Code Once index.php is loaded
     var epochyr = $('#es-year').val();
     var epochday = $('#es-day').val();
 
-    var TLE1Ending = sat.TLE_LINE1.substr(32, 39);
+    var TLE1Ending = sat.TLE1.substr(32, 39);
 
     var TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
     var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
-    console.log(sat.TLE_LINE1);
-    console.log(sat.TLE_LINE2);
+    console.log(sat.TLE1);
+    console.log(sat.TLE2);
     console.log(TLE1);
     console.log(TLE2);
 
     satCruncher.postMessage({
       typ: 'satEdit',
       id: satId,
-      TLE_LINE1: TLE1,
-      TLE_LINE2: TLE2
+      TLE1: TLE1,
+      TLE2: TLE2
     });
     orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
@@ -1400,7 +1411,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     e.preventDefault();
   });
 
-  /* $('#newLaunch').submit(function (e) {
+  $('#newLaunch').submit(function (e) {
     var scc = $('#nl-scc').val();
     var satId = satSet.getIdFromObjNum(scc);
     var sat = satSet.getSat(satId);
@@ -1432,14 +1443,14 @@ $(document).ready(function () { // Code Once index.php is loaded
     satCruncher.postMessage({
       typ: 'satEdit',
       id: satId,
-      TLE_LINE1: TLE1,
-      TLE_LINE2: TLE2
+      TLE1: TLE1,
+      TLE2: TLE2
     });
     orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
     sat = satSet.getSat(satId);
     e.preventDefault();
-  }); */
+  });
 
   $('#canvas').on('keypress', keyHandler); // On Key Press Event Run keyHandler Function
   $('#bottom-icons').on('click', '.bmenu-item', bottomIconPress); // Bottom Button Pressed
@@ -1777,6 +1788,7 @@ function hideSideMenus () {
   $('#socrates-menu').fadeOut();
   $('#settings-menu').fadeOut();
   $('#editSat-menu').fadeOut();
+  $('#newLaunch-menu').fadeOut();
 
   // Remove red color from all menu icons
   $('#menu-sensor-info img').removeClass('bmenu-item-selected');
@@ -1790,6 +1802,7 @@ function hideSideMenus () {
   $('#menu-satellite-collision img').removeClass('bmenu-item-selected');
   $('#menu-settings img').removeClass('bmenu-item-selected');
   $('#menu-editSat img').removeClass('bmenu-item-selected');
+  $('#menu-newLaunch img').removeClass('bmenu-item-selected');
 
   // Unflag all open menu variables
   isSensorInfoMenuOpen = false;
@@ -1803,6 +1816,7 @@ function hideSideMenus () {
   isSocratesMenuOpen = false;
   isSettingsMenuOpen = false;
   isEditSatMenuOpen = false;
+  isNewLaunchMenuOpen = false;
 }
 function bottomIconPress (evt) {
   if (isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
@@ -1907,6 +1921,9 @@ function bottomIconPress (evt) {
         break;
       } else {
         hideSideMenus();
+        if ($('#twitter-menu').is(':empty')) {
+          $('#twitter-menu').html('<a class="twitter-timeline" data-theme="dark" data-link-color="#2B7BB9" href="https://twitter.com/RedKosmonaut/lists/space-news">A Twitter List by RedKosmonaut</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>');
+        }
         $('#twitter-menu').fadeIn();
         isTwitterMenuOpen = true;
         $('#menu-twitter img').addClass('bmenu-item-selected');
@@ -2052,9 +2069,9 @@ function bottomIconPress (evt) {
           inc = (inc[0] + '.' + inc[1]).toString();
 
           $('#es-inc').val(pad(inc, 8));
-          $('#es-year').val(sat.TLE_LINE1.substr(18, 2));
-          $('#es-day').val(sat.TLE_LINE1.substr(20, 12));
-          $('#es-meanmo').val(sat.TLE_LINE2.substr(52, 11));
+          $('#es-year').val(sat.TLE1.substr(18, 2));
+          $('#es-day').val(sat.TLE1.substr(20, 12));
+          $('#es-meanmo').val(sat.TLE2.substr(52, 11));
 
           var rasc = (sat.raan * R2D).toPrecision(7);
           rasc = rasc.split('.');
@@ -2072,18 +2089,70 @@ function bottomIconPress (evt) {
           argPe = (argPe[0] + '.' + argPe[1]).toString();
 
           $('#es-argPe').val(pad(argPe, 8));
-          $('#es-meana').val(sat.TLE_LINE2.substr(44 - 1, 7 + 1));
-          // $('#es-rasc').val(sat.TLE_LINE2.substr(18 - 1, 7 + 1).toString());
+          $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
+          // $('#es-rasc').val(sat.TLE2.substr(18 - 1, 7 + 1).toString());
         } else {
           if (!$('#menu-editSat img:animated').length) {
             $('#menu-editSat img').effect('shake', {distance: 10});
           }
         }
       }
+      break;
+    case 'menu-newLaunch':
+      if (isNewLaunchMenuOpen) {
+        isNewLaunchMenuOpen = false;
+        hideSideMenus();
+        break;
+      } else {
+        // TODO: NEW LAUNCH
+        if (selectedSat !== -1 && 1 === 2) {
+          hideSideMenus();
+          $('#newLaunch-menu').fadeIn();
+          $('#menu-newLaunch img').addClass('bmenu-item-selected');
+          isNewLaunchMenuOpen = true;
+
+          sat = satSet.getSat(selectedSat);
+          $('#es-scc').val(sat.SCC_NUM);
+
+          var inc = (sat.inclination * R2D).toPrecision(7);
+          inc = inc.split('.');
+          inc[0] = inc[0].substr(-3, 3);
+          inc[1] = inc[1].substr(0, 4);
+          inc = (inc[0] + '.' + inc[1]).toString();
+
+          $('#es-inc').val(pad(inc, 8));
+          $('#es-year').val(sat.TLE1.substr(18, 2));
+          $('#es-day').val(sat.TLE1.substr(20, 12));
+          $('#es-meanmo').val(sat.TLE2.substr(52, 11));
+
+          var rasc = (sat.raan * R2D).toPrecision(7);
+          rasc = rasc.split('.');
+          rasc[0] = rasc[0].substr(-3, 3);
+          rasc[1] = rasc[1].substr(0, 4);
+          rasc = (rasc[0] + '.' + rasc[1]).toString();
+
+          $('#es-rasc').val(pad(rasc, 8));
+          $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
+
+          var argPe = (sat.argPe * R2D).toPrecision(7);
+          argPe = argPe.split('.');
+          argPe[0] = argPe[0].substr(-3, 3);
+          argPe[1] = argPe[1].substr(0, 4);
+          argPe = (argPe[0] + '.' + argPe[1]).toString();
+
+          $('#es-argPe').val(pad(argPe, 8));
+          $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
+          // $('#es-rasc').val(sat.TLE2.substr(18 - 1, 7 + 1).toString());
+        } else {
+          if (!$('#menu-newLaunch img:animated').length) {
+            $('#menu-newLaunch img').effect('shake', {distance: 10});
+          }
+        }
+      }
   }
 }
 function pad (num, size) {
-  console.log(num);
+  // console.log(num);
   var s = '   ' + num;
   return s.substr(s.length - size);
 }
@@ -2119,6 +2188,11 @@ function selectSat (satId) {
   selectedSat = satId;
   if (satId === -1) {
     $('#sat-infobox').fadeOut();
+    if ($('#search-results').css('display') === 'block') {
+      $('#search-results').attr('style', 'display:block; max-height:95%');
+    } else {
+      $('#search-results').attr('style', 'max-height:95%');
+    }
     $('#iss-stream').html('');
     $('#iss-stream-menu').fadeOut();
     orbitDisplay.clearSelectOrbit();
@@ -2126,18 +2200,22 @@ function selectSat (satId) {
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-selected');
     $('#menu-lookangles img').removeClass('bmenu-item-selected');
     $('#menu-editSat img').removeClass('bmenu-item-selected');
+    $('#menu-newLaunch img').removeClass('bmenu-item-selected');
     // Add Grey Out
     $('#menu-lookanglesmultisite img').addClass('bmenu-item-disabled');
     $('#menu-lookangles img').addClass('bmenu-item-disabled');
     $('#menu-editSat img').addClass('bmenu-item-disabled');
+    $('#menu-newLaunch img').addClass('bmenu-item-disabled');
     // Remove Side Menus
     $('#lookanglesmultisite-menu').fadeOut();
     $('#lookangles-menu').fadeOut();
     $('#editSat-menu').fadeOut();
+    $('#newLaunch-menu').fadeOut();
     // Toggle the side menus as closed
     isEditSatMenuOpen = false;
     isLookanglesMenuOpen = false;
     isLookanglesMultiSiteMenuOpen = false;
+    isNewLaunchMenuOpen = false;
   } else {
     camZoomSnappedOnSat = true;
     camAngleSnappedOnSat = true;
@@ -2145,128 +2223,589 @@ function selectSat (satId) {
     satSet.selectSat(satId);
     camSnapToSat(satId);
     var sat = satSet.getSat(satId);
+    console.log(sat);
     if (!sat) return;
     orbitDisplay.setSelectOrbit(satId);
+    if ($('#search-results').css('display') === 'block') {
+      $('#search-results').attr('style', 'display:block; max-height:250px');
+    } else {
+      $('#search-results').attr('style', 'max-height:250px');
+    }
     $('#sat-infobox').fadeIn();
-    $('#sat-info-title').html(sat.OBJECT_NAME);
+    $('#sat-info-title').html(sat.ON);
 
     if (sat.OBJECT_URL) {
-      $('#sat-info-title').html("<a class='iframe' href='" + sat.OBJECT_URL + "'>" + sat.OBJECT_NAME + '</a>');
+      $('#sat-info-title').html("<a class='iframe' href='" + sat.OBJECT_URL + "'>" + sat.ON + '</a>');
     }
 
     $('#sat-intl-des').html(sat.intlDes);
-    if (sat.OBJECT_TYPE === 'unknown') {
-      $('#sat-objnum').html(1 + sat.TLE_LINE2.substr(2, 7).toString());
+    if (sat.OT === 'unknown') {
+      $('#sat-objnum').html(1 + sat.TLE2.substr(2, 7).toString());
     } else {
-      //      $('#sat-objnum').html(sat.TLE_LINE2.substr(2,7));
+      //      $('#sat-objnum').html(sat.TLE2.substr(2,7));
       $('#sat-objnum').html(sat.SCC_NUM);
     }
-    $('#sat-type').html(sat.OBJECT_TYPE);
-    $('#sat-country').html(sat.COUNTRY);
-    $('#sat-site').html(sat.LAUNCH_SITE);
-    $('#sat-sitec').html(sat.LAUNCH_SITEC);
-    $('#sat-vehicle').html(sat.LAUNCH_VEHICLE);
-    if (sat.RCS_SIZE == null) {
+
+    var objtype;
+    if (sat.OT === 0) { objtype = 'TBA'; }
+    if (sat.OT === 1) { objtype = 'Payload'; }
+    if (sat.OT === 2) { objtype = 'Rocket Body'; }
+    if (sat.OT === 3) { objtype = 'Debris'; }
+    $('#sat-type').html(objtype);
+
+    // /////////////////////////////////////////////////////////////////////////
+    // Country Correlation Table
+    // /////////////////////////////////////////////////////////////////////////
+    var country;
+    if (sat.C === 'U') {
+      country = 'Unknown';
+    // Table Nested in ELSE to Make Hiding it Easier
+    } else {
+      if (sat.C === 'AB') { // Headquartered in Riyadh, Saudi Arabia
+        country = 'Saudi Arabia';
+      }
+      if (sat.C === 'AC') {
+        country = 'AsiaSat Corp';
+      }
+      if (sat.C === 'ALG') {
+        country = 'Algeria';
+      }
+      if (sat.C === 'ALL') {
+        country = 'All';
+      }
+      if (sat.C === 'ARGN') {
+        country = 'Argentina';
+      }
+      if (sat.C === 'ASRA') {
+        country = 'Austria';
+      }
+      if (sat.C === 'AUS') {
+        country = 'Australia';
+      }
+      if (sat.C === 'AZER') {
+        country = 'Azerbaijan';
+      }
+      if (sat.C === 'BEL') {
+        country = 'Belgium';
+      }
+      if (sat.C === 'BELA') {
+        country = 'Belarus';
+      }
+      if (sat.C === 'BERM') {
+        country = 'Bermuda';
+      }
+      if (sat.C === 'BOL') {
+        country = 'Bolivia';
+      }
+      if (sat.C === 'BRAZ') {
+        country = 'Brazil';
+      }
+      if (sat.C === 'CA') {
+        country = 'Canada';
+      }
+      if (sat.C === 'CHBZ') {
+        country = 'China/Brazil';
+      }
+      if (sat.C === 'CHLE') {
+        country = 'Chile';
+      }
+      if (sat.C === 'CIS') {
+        country = 'Commonwealth of Ind States';
+      }
+      if (sat.C === 'COL') {
+        country = 'Colombia';
+      }
+      if (sat.C === 'CZCH') {
+        country = 'Czechoslovakia';
+      }
+      if (sat.C === 'DEN') {
+        country = 'Denmark';
+      }
+      if (sat.C === 'ECU') {
+        country = 'Ecuador';
+      }
+      if (sat.C === 'EGYP') {
+        country = 'Egypt';
+      }
+      if (sat.C === 'ESA') {
+        country = 'European Space Agency';
+      }
+      if (sat.C === 'ESA') {
+        country = 'European Space Research Org';
+      }
+      if (sat.C === 'EST') {
+        country = 'Estonia';
+      }
+      if (sat.C === 'EUME') {
+        country = 'EUMETSAT';
+      }
+      if (sat.C === 'EUTE') {
+        country = 'EUTELSAT';
+      }
+      if (sat.C === 'FGER') {
+        country = 'France/Germany';
+      }
+      if (sat.C === 'FR') {
+        country = 'France';
+      }
+      if (sat.C === 'FRIT') {
+        country = 'France/Italy';
+      }
+      if (sat.C === 'GER') {
+        country = 'Germany';
+      }
+      if (sat.C === 'GLOB') { // Headquartered in Louisiana, USA
+        country = 'United States';
+      }
+      if (sat.C === 'GREC') {
+        country = 'Greece';
+      }
+      if (sat.C === 'HUN') {
+        country = 'Hungary';
+      }
+      if (sat.C === 'IM') { // Headquartered in London, UK
+        country = 'United Kingdom';
+      }
+      if (sat.C === 'IND') {
+        country = 'India';
+      }
+      if (sat.C === 'INDO') {
+        country = 'Indonesia';
+      }
+      if (sat.C === 'IRAN') {
+        country = 'Iran';
+      }
+      if (sat.C === 'IRAQ') {
+        country = 'Iraq';
+      }
+      if (sat.C === 'ISRA') {
+        country = 'Israel';
+      }
+      if (sat.C === 'ISS') {
+        country = 'International';
+      }
+      if (sat.C === 'IT') {
+        country = 'Italy';
+      }
+      if (sat.C === 'ITSO') { // Headquartered in Luxembourg District, Luxembourg
+        country = 'Luxembourg';
+      }
+      if (sat.C === 'JPN') {
+        country = 'Japan';
+      }
+      if (sat.C === 'KAZ') {
+        country = 'Kazakhstan';
+      }
+      if (sat.C === 'LAOS') {
+        country = 'Laos';
+      }
+      if (sat.C === 'LTU') {
+        country = 'Lithuania';
+      }
+      if (sat.C === 'LUXE') {
+        country = 'Luxembourg';
+      }
+      if (sat.C === 'MALA') {
+        country = 'Malaysia';
+      }
+      if (sat.C === 'MEX') {
+        country = 'Mexico';
+      }
+      if (sat.C === 'NATO') {
+        country = 'North Atlantic Treaty Org';
+      }
+      if (sat.C === 'NETH') {
+        country = 'Netherlands';
+      }
+      if (sat.C === 'NICO') { // Headquartered in Washington, USA
+        country = 'United States';
+      }
+      if (sat.C === 'NIG') {
+        country = 'Nigeria';
+      }
+      if (sat.C === 'NKOR') {
+        country = 'North Korea';
+      }
+      if (sat.C === 'NOR') {
+        country = 'Norway';
+      }
+      if (sat.C === 'O3B') { // Majority Shareholder Based in Luxembourg
+        country = 'Luxembourg';
+      }
+      if (sat.C === 'ORB') { // Headquartered in Louisiana, USA
+        country = 'United States';
+      }
+      if (sat.C === 'PAKI') {
+        country = 'Pakistan';
+      }
+      if (sat.C === 'PERU') {
+        country = 'Peru';
+      }
+      if (sat.C === 'POL') {
+        country = 'Poland';
+      }
+      if (sat.C === 'POR') {
+        country = 'Portugal';
+      }
+      if (sat.C === 'PRC') {
+        country = 'China';
+      }
+      if (sat.C === 'PRC') {
+        country = 'China';
+      }
+      if (sat.C === 'RASC') { // Headquartered in Mauritius
+        country = 'Mauritius';
+      }
+      if (sat.C === 'ROC') {
+        country = 'Taiwan';
+      }
+      if (sat.C === 'ROM') {
+        country = 'Romania';
+      }
+      if (sat.C === 'RP') {
+        country = 'Philippines';
+      }
+      if (sat.C === 'SAFR') {
+        country = 'South Africa';
+      }
+      if (sat.C === 'SAUD') {
+        country = 'Saudi Arabia';
+      }
+      if (sat.C === 'SEAL') { // Primary Shareholder Russian
+        country = 'Russia';
+      }
+      if (sat.C === 'RP') {
+        country = 'Philippines';
+      }
+      if (sat.C === 'SES') {
+        country = 'Luxembourg';
+      }
+      if (sat.C === 'SING') {
+        country = 'Singapore';
+      }
+      if (sat.C === 'SKOR') {
+        country = 'South Korea';
+      }
+      if (sat.C === 'SPN') {
+        country = 'Spain';
+      }
+      if (sat.C === 'STCT') {
+        country = 'Singapore/Taiwan';
+      }
+      if (sat.C === 'SWED') {
+        country = 'Sweden';
+      }
+      if (sat.C === 'SWTZ') {
+        country = 'Switzerland';
+      }
+      if (sat.C === 'THAI') {
+        country = 'Thailand';
+      }
+      if (sat.C === 'TMMC') {
+        country = 'Turkmenistan/Monaco';
+      }
+      if (sat.C === 'TURK') {
+        country = 'Turkey';
+      }
+      if (sat.C === 'UAE') {
+        country = 'United Arab Emirates';
+      }
+      if (sat.C === 'UK') {
+        country = 'United Kingdom';
+      }
+      if (sat.C === 'UKR') {
+        country = 'Ukraine';
+      }
+      if (sat.C === 'URY') {
+        country = 'Uruguay';
+      }
+      if (sat.C === 'US') {
+        country = 'United States';
+      }
+      if (sat.C === 'USBZ') {
+        country = 'United States/Brazil';
+      }
+      if (sat.C === 'VENZ') {
+        country = 'Venezuela';
+      }
+      if (sat.C === 'VTNM') {
+        country = 'Vietnam';
+      }
+    }
+    $('#sat-country').html(country);
+
+    // /////////////////////////////////////////////////////////////////////////
+    // Launch Site Correlation Table
+    // /////////////////////////////////////////////////////////////////////////
+    var site, sitec;
+    if (sat.LS === 'U') {
+      site = 'Unknown';
+      sitec = 'Unknown';
+    // Table Nested in ELSE to Make Hiding it Easier
+    } else {
+      if (sat.LS === 'AFETR') {
+        site = 'Cape Canaveral AFS';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'AFWTR') {
+        site = 'Vandenberg AFB';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'CAS') {
+        site = 'Canary Islands';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'FRGUI') {
+        site = 'French Guiana';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'HGSTR') {
+        site = 'Hammaguira STR';
+        sitec = 'Algeria';
+      }
+      if (sat.LS === 'KSCUT') {
+        site = 'Uchinoura Space Center';
+        sitec = 'Japan';
+      }
+      if (sat.LS === 'KYMTR') {
+        site = 'Kapustin Yar MSC';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'PKMTR') {
+        site = 'Plesetsk MSC';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'WSC') {
+        site = 'Wenchang SLC';
+        sitec = 'China';
+      }
+      if (sat.LS === 'SNMLP') {
+        site = 'San Marco LP';
+        sitec = 'Kenya';
+      }
+      if (sat.LS === 'SRI') {
+        site = 'Satish Dhawan SC';
+        sitec = 'India';
+      }
+      if (sat.LS === 'TNSTA') {
+        site = 'Tanegashima SC';
+        sitec = 'Japan';
+      }
+      if (sat.LS === 'TTMTR') {
+        site = 'Baikonur Cosmodrome';
+        sitec = 'Kazakhstan';
+      }
+      if (sat.LS === 'WLPIS') {
+        site = 'Wallops Island';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'WOMRA') {
+        site = 'Woomera';
+        sitec = 'Australia';
+      }
+      if (sat.LS === 'VOSTO') {
+        site = 'Vostochny Cosmodrome';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'PMRF') {
+        site = 'PMRF Barking Sands';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'SEAL') {
+        site = 'Sea Launch Odyssey';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'KWAJ') {
+        site = 'Kwajalein';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'ERAS') {
+        site = 'Pegasus East';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'JSC') {
+        site = 'Jiuquan SLC';
+        sitec = 'China';
+      }
+      if (sat.LS === 'SVOB') {
+        site = 'Svobodny';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'UNKN') {
+        site = 'Unknown';
+        sitec = 'Unknown';
+      }
+      if (sat.LS === 'TSC') {
+        site = 'Taiyaun SC';
+        sitec = 'China';
+      }
+      if (sat.LS === 'WRAS') {
+        site = 'Pegasus West';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'XSC') {
+        site = 'Xichang SC';
+        sitec = 'China';
+      }
+      if (sat.LS === 'YAVNE') {
+        site = 'Yavne';
+        sitec = 'Israel';
+      }
+      if (sat.LS === 'OREN') {
+        site = 'Orenburg';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'SADOL') {
+        site = 'Submarine Launch';
+        sitec = 'Russia';
+      }
+      if (sat.LS === 'KODAK') {
+        site = 'Kodiak Island';
+        sitec = 'United States';
+      }
+      if (sat.LS === 'SEM') {
+        site = 'Semnan';
+        sitec = 'Iran';
+      }
+      if (sat.LS === 'YUN') {
+        site = 'Yunsong';
+        sitec = 'North Korea';
+      }
+      if (sat.LS === 'NSC') {
+        site = 'Naro Space Center';
+        sitec = 'South Korea';
+      }
+    }
+    $('#sat-site').html(site);
+    $('#sat-sitec').html(sitec);
+
+    // /////////////////////////////////////////////////////////////////////////
+    // RCS Correlation Table
+    // /////////////////////////////////////////////////////////////////////////
+    if (sat.R == null) {
       $('#sat-rcs').html('Unknown');
     } else {
-      $('#sat-rcs').html(sat.RCS_SIZE);
+      var rcs;
+      if (sat.R === 0) { rcs = 'Small'; }
+      if (sat.R === 1) { rcs = 'Medium'; }
+      if (sat.R === 2) { rcs = 'Large'; }
+      $('#sat-rcs').html(rcs);
     }
-    switch (sat.LAUNCH_VEHICLE) {
+
+    // /////////////////////////////////////////////////////////////////////////
+    // Launch Vehicle Correlation Table
+    // /////////////////////////////////////////////////////////////////////////
+    $('#sat-vehicle').html(sat.LV);
+    if (sat.LV === 'U') { $('#sat-vehicle').html('Unknown'); }
+    switch (sat.LV) {
+      // ///////////////////////////////////////////////////////////////////////
       // UNITED STATES
+      // ///////////////////////////////////////////////////////////////////////
       case 'Scout B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutb.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutb.html'>" + sat.LV + '</a>');
         break;
       case 'Scout X-1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutx-1.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutx-1.html'>" + sat.LV + '</a>');
         break;
       case 'Scout X-4':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutx-4.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutx-4.html'>" + sat.LV + '</a>');
         break;
       case 'Scout A':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scouta.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scouta.html'>" + sat.LV + '</a>');
         break;
       case 'Scout G-1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutg-1.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutg-1.html'>" + sat.LV + '</a>');
         break;
       case 'Scout S-1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scout.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scout.html'>" + sat.LV + '</a>');
         break;
       case 'Delta 0300':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/d/delta0300.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/d/delta0300.html'>" + sat.LV + '</a>');
         break;
       case 'Falcon 9':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/f/falcon9.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/f/falcon9.html'>" + sat.LV + '</a>');
         break;
       case 'Falcon 9 v1.1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/f/falcon9v11.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/f/falcon9v11.html'>" + sat.LV + '</a>');
         break;
+      case 'Atlas Agena B':
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/a/atlasagenab.html'>" + sat.LV + '</a>');
+        break;
+      case 'Thor Ablestar':
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/t/thorablestar.html'>" + sat.LV + '</a>');
+        break;
+
+      // ///////////////////////////////////////////////////////////////////////
       // RUSSIA
+      // ///////////////////////////////////////////////////////////////////////
       case 'Soyuz-ST-A':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-st-a.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-st-a.html'>" + sat.LV + '</a>');
         break;
       case 'Soyuz-ST-B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-st-b.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-st-b.html'>" + sat.LV + '</a>');
         break;
       case 'Soyuz 11A511L':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz11a511l.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz11a511l.html'>" + sat.LV + '</a>');
         break;
       case 'Soyuz-U':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-u.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-u.html'>" + sat.LV + '</a>');
         break;
       case 'Soyuz-U-PVB':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-u-pvb.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-u-pvb.html'>" + sat.LV + '</a>');
         break;
       case 'Soyuz-FG':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-fg.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-fg.html'>" + sat.LV + '</a>');
         break;
       case 'Soyuz-2-1A':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-2-1a.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-2-1a.html'>" + sat.LV + '</a>');
         break;
       case 'Soyuz-2-1B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-2-1b.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-2-1b.html'>" + sat.LV + '</a>');
         break;
       case 'Kosmos 11K65M':
         $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/k/kosmos11k65m.html'>Kosmos 3M</a>");
         break;
       case 'Kosmos 65S3':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/k/kosmos65s3.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/k/kosmos65s3.html'>" + sat.LV + '</a>');
         break;
       case 'Tsiklon-2':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/t/tsiklon-2.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/t/tsiklon-2.html'>" + sat.LV + '</a>');
         break;
       case 'Tsiklon-3':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/t/tsiklon-3.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/t/tsiklon-3.html'>" + sat.LV + '</a>');
         break;
       case 'Vostok 8A92M':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/v/vostok8a92m.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/v/vostok8a92m.html'>" + sat.LV + '</a>');
         break;
       case 'Vostok 8K72K':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/v/vostok8k72k.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/v/vostok8k72k.html'>" + sat.LV + '</a>');
         break;
+      // ///////////////////////////////////////////////////////////////////////
       // CHINA
+      // ///////////////////////////////////////////////////////////////////////
       case 'Chang Zheng 1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng1.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng1.html'>" + sat.LV + '</a>');
         break;
       case 'Chang Zheng 3':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng3.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng3.html'>" + sat.LV + '</a>');
         break;
       case 'Chang Zheng 3A':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng3a.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng3a.html'>" + sat.LV + '</a>');
         break;
       case 'Chang Zheng 4':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng4.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng4.html'>" + sat.LV + '</a>');
         break;
       case 'Chang Zheng 4B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng4b.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng4b.html'>" + sat.LV + '</a>');
         break;
       case 'Chang Zheng 2C-III/SD':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng2c-iiisd.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng2c-iiisd.html'>" + sat.LV + '</a>');
         break;
       case 'Chang Zheng 2C':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng2c.html'>" + sat.LAUNCH_VEHICLE + '</a>');
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng2c.html'>" + sat.LV + '</a>');
         break;
-      case 'Long March 6':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng6.html'> Chang Zheng 6</a>");
+      case 'Chang Zheng 6':
+        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng6.html'>" + sat.LV + '</a>');
         break;
     }
 
@@ -2287,18 +2826,18 @@ function selectSat (satId) {
     now = now.getFullYear();
     now = now.toString().substr(2, 2);
     var daysold;
-    if (satSet.getSat(satId).TLE_LINE1.substr(18, 2) === now) {
-      daysold = jday() - satSet.getSat(satId).TLE_LINE1.substr(20, 3);
+    if (satSet.getSat(satId).TLE1.substr(18, 2) === now) {
+      daysold = jday() - satSet.getSat(satId).TLE1.substr(20, 3);
     } else {
-      daysold = jday() - satSet.getSat(satId).TLE_LINE1.substr(20, 3) + (satSet.getSat(satId).TLE_LINE1.substr(17, 2) * 365);
+      daysold = jday() - satSet.getSat(satId).TLE1.substr(20, 3) + (satSet.getSat(satId).TLE1.substr(17, 2) * 365);
     }
     $('#sat-elset-age').html(daysold + ' Days');
     $('#sat-elset-age').hover(function () {
-      $('#sat-elset-age').html('Epoch Year: ' + sat.TLE_LINE1.substr(18, 2).toString() + ' Day: ' + sat.TLE_LINE1.substr(20, 8).toString());
+      $('#sat-elset-age').html('Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString());
     }, function () {
       $('#sat-elset-age').html(daysold + ' Days');
     });
-    if (jday() !== sat.TLE_LINE1.substr(20, 3).toString()) {
+    if (jday() !== sat.TLE1.substr(20, 3).toString()) {
     }
 
     now = new Date();
@@ -2578,9 +3117,11 @@ function changeZoom (zoom) {
 }
 
 function drawLoop () {
-  var newT = new Date();
-  var dt = Math.min(newT - oldT, 1000);
-  oldT = newT;
+  requestAnimationFrame(drawLoop);
+  var now = new Date().getTime();
+  var dt = now - (time || now);
+  time = now;
+
   var dragTarget = getEarthScreenPoint(mouseX, mouseY);
   if (isDragging) {
     if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
@@ -2646,7 +3187,6 @@ function drawLoop () {
   drawScene();
   updateHover();
   updateSelectBox();
-  requestAnimationFrame(drawLoop);
 }
 function drawScene () {
   gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
@@ -2743,11 +3283,11 @@ function hoverBoxOnSat (satId, satX, satY) {
       // FEATURE TODO: Processor intensive code that might be offered as a setting
 
       if (!(lookangles.obslat === undefined || lookangles.obslat === null) && isShowNextPass) {
-        $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
+        $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
       } else {
-        $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '</center>');
+        $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
       }
-      // $('#sat-hoverbox').html(sat.OBJECT_NAME + '<br /><center>' + sat.SCC_NUM + '</center>');
+      // $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
       $('#sat-hoverbox').css({ // TODO: Make the centering CSS not HTML
         display: 'block',
         position: 'absolute',
@@ -2823,7 +3363,7 @@ var lookangles = (function () {
     // Set default timing settings. These will be changed to find look angles at different times in future.
     var propOffset2 = getPropOffset();               // offset letting us propagate in the future (or past)
     propRealTime = Date.now();      // Set current time
-    var satrec = satellite.twoline2satrec(sat.TLE_LINE1, sat.TLE_LINE2);// perform and store sat init calcs
+    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
     var now = propTime(propOffset2, propRealTime);
     var j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -2872,7 +3412,7 @@ var lookangles = (function () {
     propRealTime = Date.now();
     var curPropOffset = getPropOffset();
     var propOffset2 = 0;
-    var satrec = satellite.twoline2satrec(sat.TLE_LINE1, sat.TLE_LINE2);// perform and store sat init calcs
+    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
     for (var i = 0; i < (7 * 24 * 60 * 60); i += 5) {         // 5second Looks
       propOffset2 = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
       var now = propTime(propOffset2, propRealTime);
@@ -2927,7 +3467,7 @@ var lookangles = (function () {
     setTempSensor();
     setSensor(0);
 
-    var satrec = satellite.twoline2satrec(sat.TLE_LINE1, sat.TLE_LINE2);// perform and store sat init calcs
+    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
     var tbl = document.getElementById('looksmultisite');           // Identify the table to update
     tbl.innerHTML = '';                                   // Clear the table from old object data
     var tblLength = 0;                                   // Iniially no rows to the table
@@ -2970,7 +3510,7 @@ var lookangles = (function () {
 
       var curPropOffset = getPropOffset();
 
-      var satrec = satellite.twoline2satrec(sat.TLE_LINE1, sat.TLE_LINE2);// perform and store sat init calcs
+      var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
       var tbl = document.getElementById('looks');           // Identify the table to update
       tbl.innerHTML = '';                                   // Clear the table from old object data
       var tblLength = 0;                                   // Iniially no rows to the table
@@ -3500,12 +4040,12 @@ dateFormat.i18n = {
       var color;
       if (sat.inview) {
         color = [0.85, 0.5, 0.0, 1.0];
-      } else if (sat.OBJECT_TYPE === 'PAYLOAD') {
+      } else if (sat.OT === 1) { // Payload
         color = [0.2, 1.0, 0.0, 0.5];
-      } else if (sat.OBJECT_TYPE === 'ROCKET BODY') {
+      } else if (sat.OT === 2) { // Rocket Body
         color = [0.2, 0.5, 1.0, 0.85];
         //  return [0.6, 0.6, 0.6];
-      } else if (sat.OBJECT_TYPE === 'DEBRIS') {
+      } else if (sat.OT === 3) { // Debris
         color = [0.5, 0.5, 0.5, 0.85];
       } else {
         color = [0.5, 0.5, 0.5, 0.85];
@@ -3546,7 +4086,7 @@ dateFormat.i18n = {
       };
     });
     ColorScheme.smallsats = new ColorScheme(function (satId) {
-      if (satSet.getSat(satId).RCS_SIZE === 'SMALL' && satSet.getSat(satId).OBJECT_TYPE === 'PAYLOAD') {
+      if (satSet.getSat(satId).R === 0 && satSet.getSat(satId).OT === 1) {
         return {
           color: [0.2, 1.0, 0.0, 0.65],
           pickable: true
@@ -3559,20 +4099,20 @@ dateFormat.i18n = {
       }
     });
     ColorScheme.rcs = new ColorScheme(function (satId) {
-      var rcs = satSet.getSat(satId).RCS_SIZE;
-      if (rcs === 'SMALL') {
+      var rcs = satSet.getSat(satId).R;
+      if (rcs === 0) {
         return {
           color: [1.0, 0, 0, 0.6],
           pickable: true
         };
       }
-      if (rcs === 'MEDIUM') {
+      if (rcs === 1) {
         return {
           color: [1.0, 1.0, 0, 0.6],
           pickable: true
         };
       }
-      if (rcs === 'LARGE') {
+      if (rcs === 2) {
         return {
           color: [0, 1.0, 0, 0.6],
           pickable: true
@@ -3590,10 +4130,10 @@ dateFormat.i18n = {
       now = now.getFullYear();
       now = now.toString().substr(2, 2);
       var daysold;
-      if (satSet.getSat(satId).TLE_LINE1.substr(18, 2) === now) {
-        daysold = jday() - satSet.getSat(satId).TLE_LINE1.substr(20, 3);
+      if (satSet.getSat(satId).TLE1.substr(18, 2) === now) {
+        daysold = jday() - satSet.getSat(satId).TLE1.substr(20, 3);
       } else {
-        daysold = jday() - satSet.getSat(satId).TLE_LINE1.substr(20, 3) + (satSet.getSat(satId).TLE_LINE1.substr(17, 2) * 365);
+        daysold = jday() - satSet.getSat(satId).TLE1.substr(20, 3) + (satSet.getSat(satId).TLE1.substr(17, 2) * 365);
       }
       if (pe > lookangles.obsmaxrange || daysold < 100) {
         return {
@@ -3932,37 +4472,37 @@ function clearMenuCountries () {
       var len = arr[j].length;
 
       for (var i = 0; i < satData.length; i++) {
-        if ((satData[i].OBJECT_NAME.indexOf(str) !== -1) || (satData[i].OBJECT_NAME.indexOf(bigstr) !== -1)) {
+        if ((satData[i].ON.indexOf(str) !== -1) || (satData[i].ON.indexOf(bigstr) !== -1)) {
           results.push({
             isIntlDes: false,
             isInView: satData[i].inview,
             isObjnum: false,
-            strIndex: satData[i].OBJECT_NAME.indexOf(str),
+            strIndex: satData[i].ON.indexOf(str),
             SCC_NUM: satData[i].SCC_NUM,
             patlen: len,
             satId: i
           });
         }
 
-        if (satData[i].OBJECT_TYPE.indexOf(bigstr) !== -1) {
-          SEARCH_LIMIT = 5000;
-          results.push({
-            isIntlDes: false,
-            isInView: satData[i].inview,
-            isObjnum: false,
-            strIndex: satData[i].OBJECT_TYPE.indexOf(bigstr),
-            SCC_NUM: satData[i].SCC_NUM,
-            patlen: len,
-            satId: i
-          });
-        }
+        // if (satData[i].OT.indexOf(bigstr) !== -1) {
+        //   SEARCH_LIMIT = 5000;
+        //   results.push({
+        //     isIntlDes: false,
+        //     isInView: satData[i].inview,
+        //     isObjnum: false,
+        //     strIndex: satData[i].OT.indexOf(bigstr),
+        //     SCC_NUM: satData[i].SCC_NUM,
+        //     patlen: len,
+        //     satId: i
+        //   });
+        // }
 
-        if ((satData[i].LAUNCH_VEHICLE.indexOf(str) !== -1) || (satData[i].LAUNCH_VEHICLE.indexOf(bigstr) !== -1)) {
+        if ((satData[i].LV.indexOf(str) !== -1) || (satData[i].LV.indexOf(bigstr) !== -1)) {
           results.push({
             isIntlDes: false,
             isInView: satData[i].inview,
             isObjnum: false,
-            strIndex: satData[i].LAUNCH_VEHICLE.indexOf(str),
+            strIndex: satData[i].LV.indexOf(str),
             SCC_NUM: satData[i].SCC_NUM,
             patlen: len,
             satId: i
@@ -4043,13 +4583,13 @@ function clearMenuCountries () {
       var sat = satData[results[i].satId];
       html += '<div class="search-result" data-sat-id="' + sat.id + '">';
       if (results[i].isIntlDes || results[i].isObjnum) {
-        html += sat.OBJECT_NAME;
+        html += sat.ON;
       } else {
-        html += sat.OBJECT_NAME.substring(0, results[i].strIndex);
+        html += sat.ON.substring(0, results[i].strIndex);
         html += '<span class="search-hilight">';
-        html += sat.OBJECT_NAME.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
+        html += sat.ON.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
         html += '</span>';
-        html += sat.OBJECT_NAME.substring(results[i].strIndex + results[i].patlen);
+        html += sat.ON.substring(results[i].strIndex + results[i].patlen);
       }
       html += '<div class="search-result-scc">';
       if (results[i].isObjnum) {
@@ -4224,8 +4764,8 @@ function clearMenuCountries () {
           offset: propOffset,
           rate: propRate,
           // NOTE: STATIC TLE
-          TLE_LINE1: TLE1,
-          TLE_LINE2: TLE2
+          TLE1: TLE1,
+          TLE2: TLE2
         });
       } else {
         orbitWorker.postMessage({
@@ -4469,7 +5009,7 @@ function propTime () {
       texLoaded = true;
       onImageLoaded();
     };
-    img.src = 'images/mercator-tex.jpg';
+    img.src = 'images/dayearth-4096.jpg';
   //  img.src = '/mercator-tex-512.jpg';
 
     nightTexture = gl.createTexture();
@@ -4798,15 +5338,16 @@ function propTime () {
         satData[i].period = satExtraData[i].period;
 
         // Converts JSON File into Words NOTE: This allows shrinking the JSON file
-        if (satExtraData[i].OBJECT_TYPE) {
-          satData[i].OBJECT_TYPE = satExtraData[i].OBJECT_TYPE;
-        }
+        // if (satExtraData[i].OBJECT_TYPE) {
+        //   satData[i].OBJECT_TYPE = satExtraData[i].OBJECT_TYPE;
+        // }
         satData[i].SCC_NUM = satExtraData[i].SCC_NUM;
-        satData[i].RCS_SIZE = satExtraData[i].RCS_SIZE;
-        satData[i].LAUNCH_SITE = satExtraData[i].LAUNCH_SITE;
-        satData[i].LAUNCH_SITEC = satExtraData[i].LAUNCH_SITEC;
-        satData[i].COUNTRY = satExtraData[i].COUNTRY;
-        satData[i].INTLDES = satExtraData[i].INTLDES;
+        // satData[i].RCS_SIZE = satExtraData[i].RCS_SIZE;
+        // satData[i].LAUNCH_SITE = satExtraData[i].LAUNCH_SITE;
+        // satData[i].LAUNCH_SITEC = satExtraData[i].LAUNCH_SITEC;
+        // satData[i].LAUNCH_VEHICLE = satExtraData[i].LAUNCH_VEHICLE;
+        // satData[i].COUNTRY = satExtraData[i].COUNTRY;
+        // satData[i].INTLDES = satExtraData[i].INTLDES;
       }
 
       // console.log('sat.js copied extra data in ' + (performance.now() - start) + ' ms');
@@ -4829,8 +5370,8 @@ function propTime () {
       satData[i].apogee = satExtraData[0].apogee;
       satData[i].perigee = satExtraData[0].perigee;
       satData[i].period = satExtraData[0].period;
-      satData[i].TLE_LINE1 = satExtraData[0].TLE_LINE1;
-      satData[i].TLE_LINE2 = satExtraData[0].TLE_LINE2;
+      satData[i].TLE1 = satExtraData[0].TLE1;
+      satData[i].TLE2 = satExtraData[0].TLE2;
       return;
     }
 
@@ -4848,7 +5389,10 @@ function propTime () {
 
     if (!cruncherReady) {
       // NOTE:: This is called right after all the objects load on the screen.
-      $('#load-cover').fadeOut();
+      // $('#load-cover').fadeOut();
+      $('#logo-container').fadeOut();
+      $('body').attr('style', 'background:black');
+      $('#canvas-holder').attr('style', 'display:block');
       // $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
       // $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
       // $('#menu-lookangles img').removeClass('bmenu-item-disabled');
@@ -4895,7 +5439,7 @@ function propTime () {
     dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
 
     var tleSource = $('#tle-source').text();
-    $.get('' + tleSource + '?fakeparameter=to_avoid_browser_cache2', function (resp) {
+    $.get('' + tleSource, function (resp) { // + '?fakeparameter=to_avoid_browser_cache'
       // var startTime = new Date().getTime();
 
       // console.log('sat.js downloaded data');
@@ -4983,14 +5527,14 @@ function propTime () {
       // do some processing on our satData response
 
       for (i = 0; i < satData.length; i++) {
-        var year = satData[i].TLE_LINE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+        var year = satData[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
         // console.log('year is',year);
         if (year === '') {
           satData[i].intlDes = 'none';
         } else {
           var prefix = (year > 50) ? '19' : '20';
           year = prefix + year;
-          var rest = satData[i].TLE_LINE1.substr(9, 8).trim().substring(2);
+          var rest = satData[i].TLE1.substr(9, 8).trim().substring(2);
           satData[i].intlDes = year + '-' + rest;
         }
 
@@ -5166,7 +5710,7 @@ function propTime () {
 
   satSet.getIdFromIntlDes = function (intlDes) {
     for (var i = 0; i < satData.length; i++) {
-      if (satData[i].INTLDES === intlDes || satData[i].intlDes === intlDes) {
+      if (satData[i].intlDes === intlDes) {
         return i;
       }
     }
@@ -5179,7 +5723,7 @@ function propTime () {
 
   satSet.getIdFromObjNum = function (objNum) {
     for (var i = 0; i < satData.length; i++) {
-      var scc = pad(satData[i].TLE_LINE1.substr(2, 5).trim(), 5);
+      var scc = pad(satData[i].TLE1.substr(2, 5).trim(), 5);
 
       if (scc.indexOf(objNum) === 0) { // && satData[i].OBJECT_TYPE !== 'unknown') { // OPTIMIZATION: Determine if this code can be removed.
         return i;
@@ -5211,7 +5755,7 @@ function propTime () {
   satSet.searchNameRegex = function (regex) {
     var res = [];
     for (var i = 0; i < satData.length; i++) {
-      if (regex.test(satData[i].OBJECT_NAME)) {
+      if (regex.test(satData[i].ON)) {
         res.push(i);
       }
     }
@@ -5221,7 +5765,7 @@ function propTime () {
   satSet.searchCountryRegex = function (regex) {
     var res = [];
     for (var i = 0; i < satData.length; i++) {
-      if (regex.test(satData[i].COUNTRY)) {
+      if (regex.test(satData[i].C)) {
         res.push(i);
       }
     }
@@ -5379,6 +5923,8 @@ function propTime () {
     }
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
     $('#menu-editSat img').removeClass('bmenu-item-disabled');
+    // TODO: NEW LAUNCH
+    // $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
   };
 
   satSet.onCruncherReady = function (cb) {

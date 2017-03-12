@@ -1,0 +1,50 @@
+body {
+    font-family: 'Droid Sans', sans-serif;
+    color: white;
+    background: #bb3a2d;
+    background: -moz-linear-gradient(45deg, #bb3a2d 0%, #ff5151 100%);
+    background: -webkit-linear-gradient(45deg, #bb3a2d 0%,#ff5151 100%);
+    background: linear-gradient(45deg, #bb3a2d 0%,#ff5151 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#bb3a2d', endColorstr='#ff5151',GradientType=1 );
+}
+
+#canvas-holder {
+    display: none;
+}
+
+#logo-container {
+  width: 100%;
+  position: absolute;
+  min-height: 100%;
+  padding: 0;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100000;
+  text-align: center;
+  background: #bb3a2d;
+  background: -moz-linear-gradient(45deg, #bb3a2d 0%, #ff5151 100%);
+  background: -webkit-linear-gradient(45deg, #bb3a2d 0%,#ff5151 100%);
+  background: linear-gradient(45deg, #bb3a2d 0%,#ff5151 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#bb3a2d', endColorstr='#ff5151',GradientType=1 );
+}
+
+#logo-text {
+  font-family: 'Varela Round', sans-serif;
+  font-size: 120px;
+  display: block;
+  margin: 20% auto 0px auto;
+}
+
+#loader-text {
+    display: block;
+    line-height: 50px;
+}
+#spinner {
+    display: inline-block;
+    height: 50px;
+    width: 50px;
+    position: relative;
+}

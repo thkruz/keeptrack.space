@@ -3,12 +3,6 @@
 ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.5); }
 
-body {
-    font-family: 'Droid Sans', sans-serif;
-    color: white;
-    background: black;
-}
-
 a, .link {
     color: white;
     cursor: pointer;
@@ -85,17 +79,6 @@ ul {
     margin: auto;
     text-align: center;
 }
-#loader-text {
-    display: inline-block;
-    vertical-align: text-bottom;
-    line-height: 50px;
-}
-#spinner {
-    display: inline-block;
-    height: 50px;
-    width: 50px;
-    position: relative;
-}
 
 #sat-hoverbox {
     background: black;
@@ -111,7 +94,7 @@ ul {
 #search-results {
     display: none;
     position: absolute;
-    left: 130px;
+    right: 90px;
     width: 250px;
     //background: black;
     color: white;
@@ -120,7 +103,7 @@ ul {
     z-index: 1;
     top: 30px;
     overflow: auto;
-    max-height: 100%;
+    max-height: 95%;
 }
 .search-hilight {
     font-weight: bold;
@@ -299,7 +282,7 @@ ul {
     z-index: 10;
     left: 0;
     top: 60px;
-    bottom: 60px;
+    bottom: 80px;
     overflow: auto;
     color: white;
 }
@@ -429,7 +412,7 @@ ul {
     z-index: 10;
     left: 0;
     top: 60px;
-    bottom: 60px;
+    bottom: 80px;
     color: white;
 }
   #lookanglesmultisite-content {
@@ -455,7 +438,7 @@ ul {
     z-index: 10;
     left: 0;
     top: 60px;
-    bottom: 60px;
+    bottom: 80px;
     color: white;
 }
   #findByLooks-content {
@@ -478,7 +461,7 @@ ul {
   z-index: 10;
   left: 0;
   top: 60px;
-  bottom: 60px;
+  bottom: 80px;
   color: white;
 }
   #settings-content {
@@ -536,7 +519,7 @@ ul {
   z-index: 10;
   left: 0;
   top: 60px;
-  bottom: 60px;
+  bottom: 80px;
   color: white;
 }
   #editSat-content {
@@ -623,7 +606,7 @@ fieldset {
   z-index: 10;
   left: 0px;
   top: 60px;
-  bottom: 60px;
+  bottom: 80px;
   color: white;
 }
   #newLaunch-content {
@@ -755,10 +738,10 @@ margin-top: -13px;
     padding: 10px;
     border-radius: 5px;
     right: 0px;
-    top: 0;
-    bottom: 0;
-    margin-top: auto;
-    margin-bottom: auto;
+    /*top: 0;*/
+    bottom: 100px;
+    /*margin-top: auto;*/
+    /*margin-bottom: auto;*/
     height: 560px;
     width: 340px;
 }
@@ -848,13 +831,18 @@ margin-top: -13px;
   text-align: center;
 }
 
-#bottom-icons {
+#bottom-icons-container {
     position: absolute;
-    left: 22%;
-    height: 40px;
     bottom: 0px;
-    padding: 5px;
+    width: 100%;
     display: flex;
+    justify-content: center;
+}
+
+#bottom-icons {
+    height: 40px;
+    padding: 5px;
+    display: inline-flex;
     flex-direction: row;
     align-items: stretch;
     align-content: stretch;

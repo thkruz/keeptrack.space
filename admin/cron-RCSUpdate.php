@@ -3,7 +3,7 @@
   header('Content-Type: text/event-stream');
   header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
 
-  $GLOBALS['RCS_Update_Files'] = '/home/kruczek/keeptrack.space/admin/TLE/rcs'; // Declare Global File Locations
+  $GLOBALS['RCS_Update_Files'] = '/var/www/html/admin/TLE/rcs'; // Declare Global File Locations
   $serverTime = time();
 
   getCookie();
@@ -21,8 +21,8 @@
 
 function getCookie() {
   $url="https://www.space-track.org/ajaxauth/login";
-  $username="YOUR_USERNAME_GOES_HERE";
-  $password="YOUR_PASSWORD_GOES_HERE";
+  $username="USERNAME";
+  $password="PASSWORD";
   $postdata = "identity=".$username."&password=".$password;
   $ch = curl_init();
   curl_setopt ($ch, CURLOPT_URL, $url);

@@ -121,26 +121,30 @@ $(document).ready(function () { // Code Once index.php is loaded
     $(this).attr('src', $(this).attr('delayedsrc'));
   });
 
-  var opts = {
-    lines: 11, // The number of lines to draw
-    length: 8, // The length of each line
-    width: 5, // The line thickness
-    radius: 8, // The radius of the inner circle
-    corners: 1, // Corner roundness (0..1)
-    rotate: 0, // The rotation offset
-    direction: 1, // 1: clockwise, -1: counterclockwise
-    color: '#fff', // #rgb or #rrggbb or array of colors
-    speed: 1, // Rounds per second
-    trail: 50, // Afterglow percentage
-    shadow: false, // Whether to render a shadow
-    hwaccel: false, // Whether to use hardware acceleration
-    className: 'spinner', // The CSS class to assign to the spinner
-    zIndex: 2e9, // The z-index (defaults to 2000000000)
-    top: '50%', // Top position relative to parent
-    left: '50%' // Left position relative to parent
-  };
-  var target = document.getElementById('spinner');
-  new Spinner(opts).spin(target);
+  // Initialize Navigation Menu
+  $(".dropdown-button").dropdown();
+  $('.tooltipped').tooltip({delay: 50});
+
+  // var opts = {
+  //   lines: 11, // The number of lines to draw
+  //   length: 8, // The length of each line
+  //   width: 5, // The line thickness
+  //   radius: 8, // The radius of the inner circle
+  //   corners: 1, // Corner roundness (0..1)
+  //   rotate: 0, // The rotation offset
+  //   direction: 1, // 1: clockwise, -1: counterclockwise
+  //   color: '#fff', // #rgb or #rrggbb or array of colors
+  //   speed: 1, // Rounds per second
+  //   trail: 50, // Afterglow percentage
+  //   shadow: false, // Whether to render a shadow
+  //   hwaccel: false, // Whether to use hardware acceleration
+  //   className: 'spinner', // The CSS class to assign to the spinner
+  //   zIndex: 2e9, // The z-index (defaults to 2000000000)
+  //   top: '50%', // Top position relative to parent
+  //   left: '50%' // Left position relative to parent
+  // };
+  // var target = document.getElementById('spinner');
+  // new Spinner(opts).spin(target);
 
   $('#search-results').perfectScrollbar();
 
@@ -305,6 +309,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     // if(evt.which === 3) {//RMB
     if (!dragHasMoved) {
       var clickedSat = getSatIdFromCoord(evt.clientX, evt.clientY);
+      console.log(clickedSat);
       if (clickedSat === -1 && evt.button === 2) { // Right Mouse Buttom Click
         clearMenuCountries();
         $('#search').val('');
@@ -313,7 +318,7 @@ $(document).ready(function () { // Code Once index.php is loaded
         $('#menu-astronauts img').removeClass('bmenu-item-selected');
         isMilSatSelected = false;
         $('#menu-space-stations img').removeClass('bmenu-item-selected');
-        $('#search-results').attr('style', 'max-height:95%');
+        $('#search-results').attr('style', 'max-height:90%');
       }
       selectSat(clickedSat);
     }
@@ -2189,9 +2194,9 @@ function selectSat (satId) {
   if (satId === -1) {
     $('#sat-infobox').fadeOut();
     if ($('#search-results').css('display') === 'block') {
-      $('#search-results').attr('style', 'display:block; max-height:95%');
+      $('#search-results').attr('style', 'display:block; max-height:90%');
     } else {
-      $('#search-results').attr('style', 'max-height:95%');
+      $('#search-results').attr('style', 'max-height:90%');
     }
     $('#iss-stream').html('');
     $('#iss-stream-menu').fadeOut();
@@ -2223,13 +2228,12 @@ function selectSat (satId) {
     satSet.selectSat(satId);
     camSnapToSat(satId);
     var sat = satSet.getSat(satId);
-    console.log(sat);
     if (!sat) return;
     orbitDisplay.setSelectOrbit(satId);
     if ($('#search-results').css('display') === 'block') {
-      $('#search-results').attr('style', 'display:block; max-height:250px');
+      $('#search-results').attr('style', 'display:block; max-height:15%');
     } else {
-      $('#search-results').attr('style', 'max-height:250px');
+      $('#search-results').attr('style', 'max-height:15%x');
     }
     $('#sat-infobox').fadeIn();
     $('#sat-info-title').html(sat.ON);
@@ -2446,9 +2450,6 @@ function selectSat (satId) {
       }
       if (sat.C === 'POR') {
         country = 'Portugal';
-      }
-      if (sat.C === 'PRC') {
-        country = 'China';
       }
       if (sat.C === 'PRC') {
         country = 'China';
@@ -2682,7 +2683,7 @@ function selectSat (satId) {
     // /////////////////////////////////////////////////////////////////////////
     // RCS Correlation Table
     // /////////////////////////////////////////////////////////////////////////
-    if (sat.R == null) {
+    if (sat.R === null) {
       $('#sat-rcs').html('Unknown');
     } else {
       var rcs;
@@ -4100,6 +4101,7 @@ dateFormat.i18n = {
     });
     ColorScheme.rcs = new ColorScheme(function (satId) {
       var rcs = satSet.getSat(satId).R;
+      var SCC = satSet.getSat(satId).SCC_NUM;
       if (rcs === 0) {
         return {
           color: [1.0, 0, 0, 0.6],
@@ -4117,12 +4119,11 @@ dateFormat.i18n = {
           color: [0, 1.0, 0, 0.6],
           pickable: true
         };
-      } else {
-        return {
-          color: [0.5, 0.5, 0.5, 0.6],
-          pickable: true
-        };
       }
+      return {
+        color: [0, 0, 1.0, 0.6],
+        pickable: true
+      };
     });
     ColorScheme.lostobjects = new ColorScheme(function (satId) {
       var pe = satSet.getSat(satId).perigee;
@@ -4324,7 +4325,7 @@ function clearMenuCountries () {
     //
     // });
 
-    $('#groups-display>li').click(function () {
+    $('#countries-menu>li').click(function () {
       var groupName = $(this).data('group');
       if (groupName === '<clear>') {
         clearMenuCountries();
@@ -4344,7 +4345,7 @@ function clearMenuCountries () {
         display: 'none'
       });
     });
-    $('#color-schemes-submenu>li').click(function () {
+    $('#colors-menu>li').click(function () {
       selectSat(-1); // clear selected sat
       var colorName = $(this).data('color');
       clearMenuCountries();
@@ -4374,15 +4375,15 @@ function clearMenuCountries () {
     });
 
     // COUNTRIES
-    groups.Canada = new SatGroup('countryRegex', /Canada/);
-    groups.China = new SatGroup('countryRegex', /China/);
-    groups.France = new SatGroup('countryRegex', /France/);
-    groups.India = new SatGroup('countryRegex', /India/);
-    groups.Israel = new SatGroup('countryRegex', /Israel/);
-    groups.Japan = new SatGroup('countryRegex', /Japan/);
-    groups.Russia = new SatGroup('countryRegex', /Russia/);
-    groups.UnitedKingdom = new SatGroup('countryRegex', /United Kingdom/);
-    groups.UnitedStates = new SatGroup('countryRegex', /United States/);
+    groups.Canada = new SatGroup('countryRegex', /CA/);
+    groups.China = new SatGroup('countryRegex', /PRC/);
+    groups.France = new SatGroup('countryRegex', /FR/);
+    groups.India = new SatGroup('countryRegex', /IND/);
+    groups.Israel = new SatGroup('countryRegex', /ISRA/);
+    groups.Japan = new SatGroup('countryRegex', /JPN/);
+    groups.Russia = new SatGroup('countryRegex', /CIS/);
+    groups.UnitedKingdom = new SatGroup('countryRegex', /UK/);
+    groups.UnitedStates = new SatGroup('countryRegex', /US/);
 
     // GROUPS
       // Not currently used but could be useful in the future

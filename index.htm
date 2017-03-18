@@ -9,7 +9,12 @@
 
     <link rel="stylesheet" href="css/loading-screen.css" type="text/css">
 
-    <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet">
+    <!--Import Loading Screen Font-->
+    <link href="css/fonts.css" rel="stylesheet">
+    <!--Import Materialize CSS-->
+    <link rel="stylesheet" href="css/materialize.min.css">
+    <!--Import Google Material Icons CSS-->
+    <link rel="stylesheet" href="css/material-icons.css">
 
     <link rel="stylesheet" href="css/droidsans.css" type="text/css">
     <link rel="stylesheet" href="css/icomoon.css" type="text/css">
@@ -20,100 +25,112 @@
   <div id="logo-container">
     <div id="logo-inner-container">
       <span id="logo-text">Keeptrack</span>
-      <div id="spinner"></div>
+      <div class="preloader-wrapper active">
+        <div class="spinner-layer spinner-blue-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div><div class="gap-patch">
+            <div class="circle"></div>
+          </div><div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>
       <span id="loader-text">Downloading Science...</span>
     </div>
   </div>
   <div id="no-webgl">
     Stuff in Space requires <a href="http://caniuse.com/#feat=webgl">WebGL</a> and <a href="http://caniuse.com/#feat=webworkers">Web Worker</a> support.
   </div>
+  <nav>
+    <div class="nav-wrapper red darken-2">
+      <ul id="nav-mobile" class="left hide-on-med-and-down">
+        <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Countries<i class="material-icons right">arrow_drop_down</i></a></li>
+        <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-radar-menu">US Radar<i class="material-icons right">arrow_drop_down</i></a></li>
+        <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-optical-menu">US Optical<i class="material-icons right">arrow_drop_down</i></a></li>
+        <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="russian-menu">Russian<i class="material-icons right">arrow_drop_down</i></a></li>
+        <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="chinese-menu">Chinese<i class="material-icons right">arrow_drop_down</i></a></li>
+        <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="colors-menu">Color Schemes<i class="material-icons right">arrow_drop_down</i></a></li>
+      </ul>
+      <ul id="nav-mobile" class="right">
+        <div id="search-holder" class="menu-item">
+          <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+          <input id="search" type="search" required>
+          <i class="material-icons">close</i>
+        </div>
+      </ul>
+    </div>
+  </nav>
+  <!--  -->
+  <!-- Dropdown Menus  -->
+  <!--  -->
+
+  <!-- Countries Menu -->
+  <ul id="countries-menu" class="dropdown-content">
+    <li data-group="<clear>" class="clear-option" style="display: none">Clear</li>
+    <li data-group="Canada" class="country-option">Canada</li>
+    <li data-group="China" class="country-option">China</li>
+    <li data-group="France" class="country-option">France</li>
+    <li data-group="India" class="country-option">India</li>
+    <li data-group="Israel" class="country-option">Israel</li>
+    <li data-group="Japan" class="country-option">Japan</li>
+    <li data-group="Russia" class="country-option">Russia / USSR</li>
+    <li data-group="UnitedKingdom" class="country-option">United Kingdom</li>
+    <li data-group="UnitedStates" class="country-option">United States</li>
+  </ul>
+
+  <ul id="us-radar-menu" class="dropdown-content">
+    <li id="radar-altair">ALTAIR</li>
+    <li id="radar-beale">Beale</li>
+    <li id="radar-capecod">Cape Cod</li>
+    <li id="radar-parcs">Cavalier</li>
+    <li id="radar-clear">Clear</li>
+    <li id="radar-eglin">Eglin</li>
+    <li id="radar-fylingdales">Fylingdales</li>
+    <li id="radar-millstone">Millstone</li>
+    <li id="radar-thule">Thule</li>
+  </ul>
+
+  <ul id="us-optical-menu" class="dropdown-content">
+    <li id="optical-diego-garcia">Diego Garcia</li>
+    <li id="optical-maui">Maui</li>
+    <li id="optical-socorro">Socorro</li>
+    <li id="optical-spain">Spain</li>
+  </ul>
+
+  <ul id="russian-menu" class="dropdown-content">
+    <li id="russian-armavir">Armavir</li>
+    <li id="russian-balkhash">Balkhash</li>
+    <li id="russian-gantsevichi">Gantsevichi</li>
+    <li id="russian-lekhtusi">Lekhtusi</li>
+    <li id="russian-mishelevka-d">Mishelevka</li>
+    <li id="russian-olenegorsk">Olenegorsk</li>
+    <li id="russian-pechora">Pechora</li>
+    <li id="russian-pionersky">Pionersky</li>
+  </ul>
+
+  <ul id="chinese-menu" class="dropdown-content">
+    <li id="chinese-xuanhua">Xuanhua</li>
+  </ul>
+
+  <ul id="colors-menu" class="dropdown-content">
+    <li data-color="default">Type</li>
+    <li data-color="velocity">Velocity</li>
+    <li data-color="rcs">Radar Cross Section</li>
+    <li data-color="smallsats">Small Satellites</li>
+    <li data-color="near-earth">Near Earth</li>
+    <li data-color="deep-space">Deep Space</li>
+    <li data-color="lost-objects">Lost Objects</li>
+  </ul>
+
+  <!--  -->
+  <!-- Dropdown Menus  -->
+  <!--  -->
+
   <div id="canvas-holder">
     <canvas id="canvas"></canvas>
     <div id="search-results"></div>
-    <div id="menu-left" class="menubar">
-      <!-- <div id="menu-groups" class="menu-item">
-        <div class="menu-title">Groups</div>
-        <ul id="groups-display" class="dropdown submenu">
-          <li data-group="<clear>" class="clear-option">Clear</li>
-          <li data-group="WestfordNeedlesGroup">Westford Needles</li>
-          <li data-group="Tag4">Test Custom List</li>
-        </ul>
-      </div> -->
-      <div id="menu-countries" class="menu-item">
-        <div class="menu-title">Countries</div>
-        <ul id="groups-display" class="dropdown submenu">
-          <li data-group="<clear>" class="clear-option">Clear</li>
-          <li data-group="Canada" class="country-option">Canada</li>
-          <li data-group="China" class="country-option">China</li>
-          <li data-group="France" class="country-option">France</li>
-          <li data-group="India" class="country-option">India</li>
-          <li data-group="Israel" class="country-option">Israel</li>
-          <li data-group="Japan" class="country-option">Japan</li>
-          <li data-group="Russia" class="country-option">Russia / Soviet Union</li>
-          <li data-group="UnitedKingdom" class="country-option">United Kingdom</li>
-          <li data-group="UnitedStates" class="country-option">United States</li>
-        </ul>
-      </div>
-      <div id="menu-radar-us" class="menu-item">
-        <div class="menu-title">US Radar</div>
-          <ul id="radar-coverage" class="dropdown submenu sensor-selected">
-            <li id="radar-altair">ALTAIR</li>
-            <li id="radar-beale">Beale</li>
-            <li id="radar-capecod">Cape Cod</li>
-            <li id="radar-parcs">Cavalier</li>
-            <li id="radar-clear">Clear</li>
-            <li id="radar-eglin">Eglin</li>
-            <li id="radar-fylingdales">Fylingdales</li>
-            <li id="radar-millstone">Millstone</li>
-            <li id="radar-thule">Thule</li>
-          </ul>
-      </div>
-      <div id="menu-optical" class="menu-item">
-        <div class="menu-title">US Optical</div>
-          <ul id="radar-coverage" class="dropdown submenu sensor-selected">
-            <li id="optical-diego-garcia">Diego Garcia</li>
-            <li id="optical-maui">Maui</li>
-            <li id="optical-socorro">Socorro</li>
-            <li id="optical-spain">Spain</li>
-          </ul>
-      </div>
-      <div id="menu-radar-rus" class="menu-item">
-        <div class="menu-title">Russian</div>
-          <ul id="radar-coverage" class="dropdown submenu sensor-selected">
-            <li id="russian-armavir">Armavir</li>
-            <li id="russian-balkhash">Balkhash</li>
-            <li id="russian-gantsevichi">Gantsevichi</li>
-            <li id="russian-lekhtusi">Lekhtusi</li>
-            <li id="russian-mishelevka-d">Mishelevka</li>
-            <li id="russian-olenegorsk">Olenegorsk</li>
-            <li id="russian-pechora">Pechora</li>
-            <li id="russian-pionersky">Pionersky</li>
-          </ul>
-      </div>
-      <div id="menu-radar-prc" class="menu-item">
-        <div class="menu-title">Chinese</div>
-          <ul id="radar-coverage" class="dropdown submenu sensor-selected">
-            <li id="chinese-xuanhua">Xuanhua</li>
-          </ul>
-      </div>
-      <div id="menu-color-schemes" class="menu-item">
-        <div class="menu-title">Color Schemes</div>
-        <ul id="color-schemes-submenu" class="dropdown submenu">
-          <li data-color="default">Type</li>
-          <li data-color="velocity">Velocity</li>
-          <li data-color="rcs">Radar Cross Section</li>
-          <li data-color="smallsats">Small Satellites</li>
-          <li data-color="near-earth">Near Earth</li>
-          <li data-color="deep-space">Deep Space</li>
-          <li data-color="lost-objects">Lost Objects</li>
-        </ul>
-      </div>
-    </div>
     <div id="menu-right" class="menubar">
-      <div id="search-holder" class="menu-item">
-        <span class="icon-search"></span>
-        <input type="text" id="search"></input>
-      </div>
       <div id="menu-version" class="menu-item">
           <div class="menu-title">Version</div>
           <div id="version-box" class="menubox submenu">
@@ -122,7 +139,7 @@
               March 12, 2017
             </center>
           </div>
-        </div>
+      </div>
       <div id="menu-about" class="menu-item">
           <div class="menu-title">About</div>
           <div id="about-box" class="menubox submenu">
@@ -338,7 +355,7 @@
       </div>
     </div>
     <div id="newLaunch-menu">
-      <div><span class="title-text">New Launch</span></div>
+      <div class="title-text">New Launch</div>
       <div id="newLaunch-content">
         <fieldset>
           <form id="newLaunch">
@@ -372,10 +389,7 @@
               <span class="vertcenter">Launch Longitude: </span>
               <input type="text" class="ghost-input" id="nl-lon" value="AA.AAAAAAAA"></div>
             <div class="center">
-              <span class="vertcenter">Mean Anomaly: </span>
-              <input type="text" class="ghost-input" id="es-meana" value="AAA.AAAA"></div>
-            <div class="center">
-              <input type="submit" id="newLaunch-submit" class="ghost-button" value="Calculate New Launch ELSET">
+              <input type="submit" id="newLaunch-submit" class="ghost-button" value="Calculate New ELSET">
             </div>
           </form>
         </fieldset>
@@ -491,50 +505,50 @@
     <div id="bottom-menu">Current Objects</div>
     <div id="bottom-icons-container">
       <div id="bottom-icons">
-       <div id="menu-sensor-info" class="bmenu-item">
-         <img src="" delayedsrc="/images/radar.png" class="bmenu-item-disabled" alt="Sensor Info">
+       <div id="menu-sensor-info" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Sensor Information">
+         <img src="" delayedsrc="images/radar.png" class="bmenu-item-disabled" alt="Sensor Info">
        </div>
-       <div id="menu-in-coverage" class="bmenu-item">
-         <img src="" delayedsrc="/images/radar-1.png" class="bmenu-item-disabled" alt="Look Angles">
+       <div id="menu-in-coverage" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Current Sensor Coverage">
+         <img src="" delayedsrc="images/radar-1.png" class="bmenu-item-disabled" alt="Look Angles">
        </div>
-       <div id="menu-lookangles" class="bmenu-item">
-         <img src="" delayedsrc="/images/telescope.png" class="bmenu-item-disabled" alt="Look Angles">
+       <div id="menu-lookangles" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Sensor Lookangles">
+         <img src="" delayedsrc="images/telescope.png" class="bmenu-item-disabled" alt="Look Angles">
        </div>
-       <div id="menu-lookanglesmultisite" class="bmenu-item">
-         <img src="" delayedsrc="/images/orbit.png" class="bmenu-item-disabled" alt="Look Angles">
+       <div id="menu-lookanglesmultisite" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="SSN Lookangles">
+         <img src="" delayedsrc="images/orbit.png" class="bmenu-item-disabled" alt="Look Angles">
        </div>
-       <div id="menu-find-sat" class="bmenu-item">
-         <img src="" delayedsrc="/images/findOrbit.png" class="bmenu-item-disabled" alt="Twitter">
+       <div id="menu-find-sat" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Search Orbit">
+         <img src="" delayedsrc="images/findOrbit.png" class="bmenu-item-disabled" alt="Twitter">
        </div>
-       <div id="menu-twitter" class="bmenu-item">
-         <img src="" delayedsrc="/images/twitter.png" class="bmenu-item-disabled" alt="Twitter">
+       <div id="menu-twitter" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Space News on Twitter">
+         <img src="" delayedsrc="images/twitter.png" class="bmenu-item-disabled" alt="Twitter">
        </div>
-       <div id="menu-weather" class="bmenu-item">
-         <img src="" delayedsrc="/images/sun.png" class="bmenu-item-disabled" alt="Weather">
+       <div id="menu-weather" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Terrestrial Weather">
+         <img src="" delayedsrc="images/sun.png" class="bmenu-item-disabled" alt="Weather">
        </div>
-       <div id="menu-space-weather" class="bmenu-item">
-         <img src="" delayedsrc="/images/geomagnetic.png" class="bmenu-item-disabled" alt="Weather">
+       <div id="menu-space-weather" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Geomagnetic Information">
+         <img src="" delayedsrc="images/geomagnetic.png" class="bmenu-item-disabled" alt="Weather">
        </div>
-       <div id="menu-launches" class="bmenu-item">
-         <img src="" delayedsrc="/images/rocket-ship-1.png" class="bmenu-item-disabled" alt="Launches">
+       <div id="menu-launches" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Launch Schedule">
+         <img src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item-disabled" alt="Launches">
        </div>
-       <div id="menu-astronauts" class="bmenu-item">
-         <img src="" delayedsrc="/images/astronaut.png" class="bmenu-item-disabled" alt="Astronauts">
+       <div id="menu-astronauts" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Objects that can Support Humans">
+         <img src="" delayedsrc="images/astronaut.png" class="bmenu-item-disabled" alt="Astronauts">
        </div>
-       <div id="menu-space-stations" class="bmenu-item">
-         <img src="" delayedsrc="/images/space-station-1.png" class="bmenu-item-disabled" alt="Interesting Satellites">
+       <div id="menu-space-stations" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist">
+         <img src="" delayedsrc="images/space-station-1.png" class="bmenu-item-disabled" alt="Interesting Satellites">
        </div>
-       <div id="menu-satellite-collision" class="bmenu-item">
-         <img src="" delayedsrc="/images/satellite-collision.png" class="bmenu-item-disabled" alt="Collision">
+       <div id="menu-satellite-collision" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
+         <img src="" delayedsrc="images/satellite-collision.png" class="bmenu-item-disabled" alt="Collision">
        </div>
-       <div id="menu-settings" class="bmenu-item">
-         <img src="" delayedsrc="/images/gear-icon.png" class="bmenu-item-disabled" alt="Settings">
+       <div id="menu-settings" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Settings">
+         <img src="" delayedsrc="images/gear-icon.png" class="bmenu-item-disabled" alt="Settings">
        </div>
-       <div id="menu-editSat" class="bmenu-item">
-         <img src="" delayedsrc="/images/editPencil.png" class="bmenu-item-disabled" alt="Edit satellite">
+       <div id="menu-editSat" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Edit Satellites">
+         <img src="" delayedsrc="images/editPencil.png" class="bmenu-item-disabled" alt="Edit satellite">
        </div>
-       <div id="menu-newLaunch" class="bmenu-item">
-         <img src="" delayedsrc="/images/rocket-ship.png" class="bmenu-item-disabled" alt="New Launches">
+       <div id="menu-newLaunch" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Create Launch Nominal">
+         <img src="" delayedsrc="images/rocket-ship.png" class="bmenu-item-disabled" alt="New Launches">
        </div>
       </div>
     </div>
@@ -550,7 +564,8 @@
   <link rel="stylesheet" href="css/jquery-ui-timepicker-addon.css" type="text/css">
   <!-- Load Satellite Dependencies -->
   <script src="js/jquery.min.js"></script>
-  <script src="js/spin.min.js"></script>
+  <script src="js/materialize.min.js"></script>
+  <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/gl-matrix-min.js"></script>
   <script src="js/satellite.min.js"></script>
   <script src="js/suncalc.js"></script>

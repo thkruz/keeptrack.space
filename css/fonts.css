@@ -1,0 +1,14 @@
+@font-face {
+  font-family: 'Varela Round';
+  font-weight: 400;
+  font-style: normal;
+  src: url('/fonts/Varela-Round-regular/Varela-Round-regular.eot');
+  src: url('/fonts/Varela-Round-regular/Varela-Round-regular.eot?#iefix') format('embedded-opentype'),
+       local('Varela Round Regular'),
+       local('Varela-Round-regular'),
+       url('/fonts/Varela-Round-regular/Varela-Round-regular.woff2') format('woff2'),
+       url('/fonts/Varela-Round-regular/Varela-Round-regular.woff') format('woff'),
+       url('/fonts/Varela-Round-regular/Varela-Round-regular.ttf') format('truetype'),
+       url('/fonts/Varela-Round-regular/Varela-Round-regular.svg#VarelaRound') format('svg');
+}
+

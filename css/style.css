@@ -3,13 +3,13 @@
 ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.5); }
 
-a, .link {
+/*a, .link {
     color: white;
     cursor: pointer;
 }
 a:hover, .link:hover {
     color: red;
-}
+}*/
 
 ul {
     list-style-type: none;
@@ -46,6 +46,7 @@ ul {
     right: 0;
 }
 #canvas-holder {
+    z-index: -1;
     padding: 0;
     position: absolute;
     top: 0;
@@ -80,6 +81,11 @@ ul {
     text-align: center;
 }
 
+#countries-menu li, #us-radar-menu li, #us-optical-menu li, #russian-menu li, #chinese-menu li, #colors-menu li {
+  min-height: 15px;
+  text-align: center;
+}
+
 #sat-hoverbox {
     background: black;
     cursor: default;
@@ -96,14 +102,14 @@ ul {
     position: absolute;
     right: 90px;
     width: 250px;
-    //background: black;
+    background: black;
     color: white;
     border-radius: 5px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     z-index: 1;
-    top: 30px;
+    top: 67px;
     overflow: auto;
-    max-height: 95%;
+    max-height: 90%;
 }
 .search-hilight {
     font-weight: bold;
@@ -124,14 +130,14 @@ ul {
     float: right;
     margin-right: 10px;
 }
+
+#search-holder {
+  display: inline-flex;
+}
+
 #search {
-    background: rgba(0, 0, 0, 0);
-    border: none;
-    border-bottom: 1px solid white;
-    color: white;
-    font-family: 'Droid Sans', sans-serif;
-    font-size: 16px;
-    outline: none;
+    height: 25px;
+    margin: 15px 0;
 }
 
 .menubar {
@@ -840,6 +846,7 @@ margin-top: -13px;
 }
 
 #bottom-icons {
+    box-sizing: content-box;
     height: 40px;
     padding: 5px;
     display: inline-flex;

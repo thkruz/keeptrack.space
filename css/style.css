@@ -925,3 +925,8 @@ margin-top: -13px;
 #controls-info>li {
     margin-top: 10px;
 }
+
+.ui_tpicker_time {
+  height: 15px;
+  text-align: center;
+}

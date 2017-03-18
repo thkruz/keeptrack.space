@@ -2,9 +2,9 @@
 //a new content type. make sure apache does not gzip this type, else it would get buffered
 header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
-$GLOBALS['TLE_Temp_File'] = '/var/www/html/admin/TLE/TLE.json';
-$GLOBALS['TLE_Main_File'] = '/var/www/html/TLE.json';
-$GLOBALS['LV_DATABASE'] = '/var/www/html/admin/LV.txt';
+$GLOBALS['TLE_Temp_File'] = '/home/kruczek/keeptrack.space/admin/TLE/TLE.json';
+$GLOBALS['TLE_Main_File'] = '/home/kruczek/keeptrack.space/TLE.json';
+$GLOBALS['LV_DATABASE'] = '/home/kruczek/keeptrack.space/admin/LV.txt';
 $serverTime = time();
 //$progress = 0;
 echo "Catalogue Update Initiated\n\n";

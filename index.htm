@@ -222,42 +222,70 @@
         </div>
       </div>
       <div id="findByLooks-menu">
-        <div class="title-text">Find By Looks</div>
-        <div id="findByLooks-content">
-          <fieldset>
+        <div class="side-menu" id="findByLooks-content">
+          <div class="row">
+            <h5 class="center-align">Find By Looks</h5>
             <form id="findByLooks">
-              <div class="center">
-                <span class="vertcenter">Azimuth: </span>
-                <input type="text" class="ghost-input" id="fbl-azimuth" value="XXX.X">
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XXX.X" id="fbl-azimuth" type="text">
+                  <label for="fbl-azimuth">Azimuth</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX" id="fbl-azimuth-margin" type="text">
+                  <label for="fbl-azimuth-margin">Margin</label>
+                </div>
               </div>
-              <div class="center">
-                <span class="vertcenter">Margin: </span>
-                <input type="text" class="ghost-input" id="fbl-azimuth-margin" value="XX">
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-elevation" type="text">
+                  <label for="fbl-elevation">Elevation</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX" id="fbl-elevation-margin" type="text">
+                  <label for="fbl-elevation-margin">Margin</label>
+                </div>
               </div>
-              <div class="center">
-                <span class="vertcenter">Elevation: </span>
-                <input type="text" class="ghost-input" id="fbl-elevation" value="XX.X"></div>
-              <div class="center">
-                <span class="vertcenter">Margin: </span>
-                <input type="text" class="ghost-input" id="fbl-elevation-margin" value="XX"></div>
-              <div class="center">
-                <span class="vertcenter">Range: </span>
-                <input type="text" class="ghost-input" id="fbl-range" value="XXXX.X"></div>
-              <div class="center">
-                <span class="vertcenter">Margin: </span>
-                <input type="text" class="ghost-input" id="fbl-range-margin" value="XXXX"></div>
-              <div class="center">
-                <span class="vertcenter">Inclination: </span>
-                <input type="text" class="ghost-input" id="fbl-inc" value="XX.X"></div>
-              <div class="center">
-                <span class="vertcenter">Margin: </span>
-                <input type="text" class="ghost-input" id="fbl-inc-margin" value="XX.X"></div>
-              <div class="center">
-                <input type="submit" id="findByLooks-submit" class="ghost-button" value="Search">
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XXXX.X" id="fbl-range" type="text">
+                  <label for="fbl-range">Range</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XXXX" id="fbl-range-margin" type="text">
+                  <label for="fbl-range-margin">Margin</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-inc" type="text">
+                  <label for="fbl-inc">Inclination</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX" id="fbl-inc-margin" type="text">
+                  <label for="fbl-inc-margin">Margin</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-period" type="text">
+                  <label for="fbl-period">Period</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX" id="fbl-period-margin" type="text">
+                  <label for="fbl-period-margin">Margin</label>
+                </div>
+              </div>
+              <div class="center-align">
+                <button id="findByLooks-submit" class="btn waves-effect waves-light" type="submit" name="action">Find Satellite(s)
+                  <i class="material-icons right">send</i>
+                </button>
               </div>
             </form>
-          </fieldset>
-          <span id="findByLooks-results"></span>
+            <div class="row center-align" style="margin-top=10px;">
+              <span id="findByLooks-results"></span>
+            </div>
+          </div>
         </div>
       </div>
       <div id="lookangles-menu">
@@ -460,63 +488,93 @@
           <div class="sat-info-value" id="sat-vehicle">VEHICLE</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Apogee</div>
+          <div class="sat-info-key tooltipped" data-position="left" data-delay="50" data-tooltip="Highest Point in the Orbit">
+            Apogee
+          </div>
           <div class="sat-info-value" id="sat-apogee">XXX km</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Perigee</div>
+          <div class="sat-info-key tooltipped" data-position="left" data-delay="50" data-tooltip="Lowest Point in the Orbit">
+            Perigee
+          </div>
           <div class="sat-info-value" id="sat-perigee">XXX km</div>
         </div>
          <div class="sat-info-row">
-          <div class="sat-info-key">Inclination</div>
+          <div class="sat-info-key tooltipped" data-position="left" data-delay="50" data-tooltip="Angle Measured from Equator on the Ascending Node">
+            Inclination
+          </div>
           <div class="sat-info-value" id="sat-inclination">XXX.XX</div>
         </div>
          <div class="sat-info-row">
-          <div class="sat-info-key">Eccentricity</div>
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="How Circular the Orbit Is (0 is a Circle)">
+            Eccentricity
+          </div>
           <div class="sat-info-value" id="sat-eccentricity">X.XX</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Longitude</div>
-          <div class="sat-info-value" id="sat-longitude">X.XX</div>
-        </div>
-        <div class="sat-info-row">
-          <div class="sat-info-key">Latitude</div>
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Latitude Over Earth">
+            Latitude
+          </div>
           <div class="sat-info-value" id="sat-latitude">X.XX</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Sun</div>
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Longitude Over Earth">
+            Longitude
+          </div>
+          <div class="sat-info-value" id="sat-longitude">X.XX</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Is the Sun Affected the Sensor">
+            Sun
+          </div>
           <div class="sat-info-value" id="sat-sun">Sun Stuff</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Altitude</div>
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Altitude Above Sea Level">
+            Altitude
+          </div>
           <div class="sat-info-value" id="sat-altitude">XXX km</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Velocity</div>
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Velocity of the Satellite (Higher the Closer to Earth it Is)">
+            Velocity
+          </div>
           <div class="sat-info-value" id="sat-velocity">XXX km/s</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Azimuth</div>
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Angle (Left/Right) from the Sensor">
+            Azimuth
+          </div>
           <div class="sat-info-value" id="sat-azimuth">XX deg</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Elevation</div>
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Angle (Up/Down) from the Sensor">
+            Elevation
+          </div>
           <div class="sat-info-value" id="sat-elevation">XX deg</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Range</div>
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Distance from the Sensor">
+            Range
+          </div>
           <div class="sat-info-value" id="sat-range">XXXX km</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Period</div>
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Time for One Complete Revolution Around Earth">
+            Period
+          </div>
           <div class="sat-info-value" id="sat-period">XXX min</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Age of ELSET</div>
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Time Since Official Orbit Calculated (Older ELSETs are Less Accuarate Usually)">
+            Age of ELSET
+          </div>
           <div class="sat-info-value" id="sat-elset-age">XXX.XXXX</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">RCS</div>
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Large are > 1^2 meter, Small are < 0.1^2 meters">
+            RCS
+          </div>
           <div class="sat-info-value" id="sat-rcs">MEDIUM</div>
         </div>
       </div>

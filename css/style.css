@@ -3,6 +3,15 @@
 ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.5); }
 
+/*Hide yellow coloring in Chrome*/
+/*TODO: The bug seems to be with chrome not the site*/
+/*input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  background-color: #0a97d6 !important;
+  -webkit-text-fill-color: white !important;
+  color: white !important;
+}*/
+
 a, .link {
     cursor: pointer;
 }
@@ -109,20 +118,18 @@ ul {
 #search-results {
     display: none;
     position: absolute;
-    right: 5px;
-    width: 250px;
-    background: black;
-    color: white;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    right: 0px;
+    width: 300px;
+    background: #0a97d6;
     z-index: 1;
-    top: 55px;
-    overflow: auto;
-    max-height: 85%;
+    top: 0px;
+    margin-top: 50px;
+    bottom: 50px;
+    max-height: 100%;
 }
 .search-hilight {
     font-weight: bold;
-    color: #0277bd;
+    color: #01579b;
 }
 .search-result {
     padding: 5px;
@@ -375,19 +382,9 @@ ul {
   }
 #findByLooks-menu {
     display: none;
-    background: rgba(0, 0, 0, 0.5);
-    position: absolute;
-    width: 290px;
-    max-height: 100%;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
     z-index: 10;
-    left: 0;
-    top: 60px;
-    bottom: 80px;
-    color: white;
 }
-  #findByLooks-content {
+  /*#findByLooks-content {
     position: absolute;
     width: 290px;
     max-height: 100%;
@@ -395,7 +392,7 @@ ul {
     bottom: 0px;
     overflow: auto;
     margin: 0 auto;
-  }
+  }*/
 
   #settings-menu {
     display: none;
@@ -565,19 +562,19 @@ ul li{
 
 #sat-infobox {
     display: none;
-    background: rgba(0, 0, 0, 0.5);
+    background: #0a97d6;
     cursor: default;
-    color: white;
     position: absolute;
-    padding: 10px;
-    border-radius: 5px;
+    top: 27%;
+    bottom: 50px;
+    margin-top: 50px;
+    padding: 0 10px 0 10px;
     right: 0px;
-    /*top: 0;*/
-    bottom: 100px;
-    /*margin-top: auto;*/
-    /*margin-bottom: auto;*/
-    height: 560px;
-    width: 340px;
+    width: 300px;
+    border-top: 5px;
+    border-top-color: #0277bd;
+    border-top-style: solid;
+    overflow: auto;
 }
 
 #sat-infobox a {
@@ -601,7 +598,8 @@ ul li{
 }
 .sat-info-key {
     font-size: 14px;
-    color: #aaa;
+    color: #01579b;
+    font-weight: bold;
     float: left;
 }
 .sat-info-value {

@@ -306,7 +306,7 @@ $(document).ready(function () { // Code Once index.php is loaded
         $('#menu-astronauts img').removeClass('bmenu-item-selected');
         isMilSatSelected = false;
         $('#menu-space-stations img').removeClass('bmenu-item-selected');
-        $('#search-results').attr('style', 'max-height:90%');
+        $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
       }
       selectSat(clickedSat);
     }
@@ -1234,11 +1234,13 @@ $(document).ready(function () { // Code Once index.php is loaded
     var fblElevation = $('#fbl-elevation').val();
     var fblRange = $('#fbl-range').val();
     var fblInc = $('#fbl-inc').val();
+    var fblPeriod = $('#fbl-period').val();
     var fblAzimuthM = $('#fbl-azimuth-margin').val();
     var fblElevationM = $('#fbl-elevation-margin').val();
     var fblRangeM = $('#fbl-range-margin').val();
     var fblIncM = $('#fbl-inc-margin').val();
-    satSet.searchAzElRange(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM);
+    var fblPeriodM = $('#fbl-period-margin').val();
+    satSet.searchAzElRange(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM, fblPeriod, fblPeriodM);
     e.preventDefault();
   });
   $('#settings-form').submit(function (e) {
@@ -2178,9 +2180,9 @@ function selectSat (satId) {
   if (satId === -1) {
     $('#sat-infobox').fadeOut();
     if ($('#search-results').css('display') === 'block') {
-      $('#search-results').attr('style', 'display:block; max-height:90%');
+      $('#search-results').attr('style', 'display:block;max-height:100%;margin-bottom:-50px;');
     } else {
-      $('#search-results').attr('style', 'max-height:90%');
+      $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
     }
     $('#iss-stream').html('');
     $('#iss-stream-menu').fadeOut();
@@ -2215,9 +2217,9 @@ function selectSat (satId) {
     if (!sat) return;
     orbitDisplay.setSelectOrbit(satId);
     if ($('#search-results').css('display') === 'block') {
-      $('#search-results').attr('style', 'display:block; max-height:15%');
+      $('#search-results').attr('style', 'display:block; max-height:27%');
     } else {
-      $('#search-results').attr('style', 'max-height:15%x');
+      $('#search-results').attr('style', 'max-height:27%');
     }
     $('#sat-infobox').fadeIn();
     $('#sat-info-title').html(sat.ON);
@@ -5788,21 +5790,24 @@ function propTime () {
     return res;
   };
 
-  satSet.searchAzElRange = function (azimuth, elevation, range, inclination, azMarg, elMarg, rangeMarg, incMarg) {
+  satSet.searchAzElRange = function (azimuth, elevation, range, inclination, azMarg, elMarg, rangeMarg, incMarg, period, periodMarg) {
     var isCheckAz = !isNaN(parseFloat(azimuth)) && isFinite(azimuth);
     var isCheckEl = !isNaN(parseFloat(elevation)) && isFinite(elevation);
     var isCheckRange = !isNaN(parseFloat(range)) && isFinite(range);
     var isCheckInclination = !isNaN(parseFloat(inclination)) && isFinite(inclination);
+    var isCheckPeriod = !isNaN(parseFloat(period)) && isFinite(period);
     var isCheckAzMarg = !isNaN(parseFloat(azMarg)) && isFinite(azMarg);
     var isCheckElMarg = !isNaN(parseFloat(elMarg)) && isFinite(elMarg);
     var isCheckRangeMarg = !isNaN(parseFloat(rangeMarg)) && isFinite(rangeMarg);
     var isCheckIncMarg = !isNaN(parseFloat(incMarg)) && isFinite(incMarg);
-    if (!isCheckEl && !isCheckRange && !isCheckAz && !isCheckInclination) return; // Ensure there is a number typed.
+    var isCheckPeriodMarg = !isNaN(parseFloat(periodMarg)) && isFinite(periodMarg);
+    if (!isCheckEl && !isCheckRange && !isCheckAz && !isCheckInclination && !isCheckPeriod) return; // Ensure there is a number typed.
 
     if (!isCheckAzMarg) { azMarg = 5; }
     if (!isCheckElMarg) { elMarg = 5; }
     if (!isCheckRangeMarg) { rangeMarg = 200; }
     if (!isCheckIncMarg) { incMarg = 1; }
+    if (!isCheckPeriodMarg) { periodMarg = 0.5; }
     var res = [];
 
     for (var i = 0; i < satData.length; i++) {
@@ -5814,7 +5819,7 @@ function propTime () {
       res[i]['inview'] = lookangles.inview;
     }
 
-    if (!isCheckInclination) {
+    if (!isCheckInclination && !isCheckPeriod) {
       res = checkInview(res);
     }
 
@@ -5843,11 +5848,19 @@ function propTime () {
     }
 
     if (isCheckInclination) {
-      inclination = inclination * 1; // Convert range to int
+      inclination = inclination * 1; // Convert inclination to int
       incMarg = incMarg * 1;
       var minInc = inclination - incMarg;
       var maxInc = inclination + incMarg;
       res = checkInc(res, minInc, maxInc);
+    }
+
+    if (isCheckPeriod) {
+      period = period * 1; // Convert period to int
+      periodMarg = periodMarg * 1;
+      var minPeriod = period - periodMarg;
+      var maxPeriod = period + periodMarg;
+      res = checkPeriod(res, minPeriod, maxPeriod);
     }
 
     function checkInview (possibles) {
@@ -5896,10 +5909,23 @@ function propTime () {
       }
       return IncRes;
     }
-    $('#findByLooks-results').text('');
+    function checkPeriod (possibles, minPeriod, maxPeriod) {
+      var PeriodRes = [];
+      for (var i = 0; i < possibles.length; i++) {
+        if (possibles[i].period < maxPeriod && possibles[i].period > minPeriod && PeriodRes.length <= 200) { // Don't display more than 200 results - this is because LEO and GEO belt have a lot of satellites
+          PeriodRes.push(possibles[i]);
+        }
+      }
+      if (PeriodRes.length >= 200) {
+        $('#findByLooks-results').text('Limited to 200 Results!');
+      }
+      return PeriodRes;
+    }
+    // $('#findByLooks-results').text('');
+    // TODO: Intentionally doesn't clear previous searches. Could be an option later.
     var SCCs = [];
     for (i = 0; i < res.length; i++) {
-      $('#findByLooks-results').append(res[i].SCC_NUM + '<br />');
+      // $('#findByLooks-results').append(res[i].SCC_NUM + '<br />');
       if (i < res.length - 1) {
         $('#search').val($('#search').val() + res[i].SCC_NUM + ',');
       } else {

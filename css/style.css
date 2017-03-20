@@ -1,15 +1,36 @@
-/* Minimalist Scrollbar for Webkit Browsers */
+/*Min Scrollbar for Webkit Browsers */
 ::-webkit-scrollbar { width: 12px; height: 12px; }
 ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.5); }
 
-/*a, .link {
-    color: white;
+/*Hide yellow coloring in Chrome*/
+/*TODO: The bug seems to be with chrome not the site*/
+/*input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  background-color: #0a97d6 !important;
+  -webkit-text-fill-color: white !important;
+  color: white !important;
+}*/
+
+a, .link {
     cursor: pointer;
 }
 a:hover, .link:hover {
-    color: red;
-}*/
+    background: #0288d1;
+}
+
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+footer {
+  margin-top: -100px;
+  position: absolute;
+  bottom: 0px;
+  height: 50px;
+  width: 100%;
+}
 
 ul {
     list-style-type: none;
@@ -21,9 +42,6 @@ ul {
     text-align: center;
 }
 
-.center {
-    margin: 15px auto;
-}
 .vertcenter {
     line-height: 36px
 }
@@ -100,20 +118,18 @@ ul {
 #search-results {
     display: none;
     position: absolute;
-    right: 90px;
-    width: 250px;
-    background: black;
-    color: white;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    right: 0px;
+    width: 300px;
+    background: #0a97d6;
     z-index: 1;
-    top: 67px;
-    overflow: auto;
-    max-height: 90%;
+    top: 0px;
+    margin-top: 50px;
+    bottom: 50px;
+    max-height: 100%;
 }
 .search-hilight {
     font-weight: bold;
-    color: #faa
+    color: #01579b;
 }
 .search-result {
     padding: 5px;
@@ -121,7 +137,7 @@ ul {
     line-height: 16px;
 }
 .search-result:hover {
-    background: #c33;
+    background: #0277bd;
     cursor: pointer;
 }
 .search-result-scc {
@@ -136,7 +152,7 @@ ul {
 }
 
 #search {
-    height: 25px;
+    height: 16px;
     margin: 15px 0;
 }
 
@@ -176,7 +192,7 @@ ul {
     margin-left: 2px;
 }
 .menu-item:hover .menu-title {
-    color: #faa;
+    color: #0277bd;
 }
 
 .menu-title {
@@ -196,7 +212,7 @@ ul {
     position: absolute;
 }
 
-.dropdown {
+/*.dropdown {
     width: 200px;
 }
 .dropdown>li {
@@ -213,7 +229,7 @@ ul {
 .dropdown>li.clear-option {
   background: #511;
   display: none;
-}
+}*/
 
 #about-box {
     background: black;
@@ -241,28 +257,10 @@ ul {
 #sensor-info-menu {
     display: none;
     z-index: 1;
-    background: rgba(0, 0, 0, 0.5);
-    cursor: default;
-    color: white;
-    position: absolute;
-    padding: 10px;
-    border-radius: 5px;
-    left: 0px;
-    top: 0;
-    bottom: 0;
-    margin-top: auto;
-    margin-bottom: auto;
-    height: 520px;
-    width: 300px;
-}
-  #sensor-info-title {
-    text-align: center;
-    margin-bottom: 5px;
-    font-size: 18px;
 }
   .sensor-info-row {
       text-align: center;
-      margin-bottom: 5px;
+      margin: 20px;
       height: 18px;
   }
   .sensor-info-key, .sensor-info-value {
@@ -271,7 +269,6 @@ ul {
   }
   .sensor-info-key {
       font-size: 14px;
-      color: #aaa;
       float: left;
   }
   .sensor-info-value {
@@ -279,19 +276,13 @@ ul {
   }
 #twitter-menu {
     display: none;
-    background: rgba(0, 0, 0, 0.5);
-    position: absolute;
-    width: 400px;
-    max-height: 100%;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
     z-index: 10;
-    left: 0;
-    top: 60px;
-    bottom: 80px;
-    overflow: auto;
-    color: white;
 }
+
+.timeline-Header {
+  display: none;
+}
+
 #weather-menu {
     display: none;
     background: rgba(0, 0, 0, 0);
@@ -340,29 +331,18 @@ ul {
 }
 #lookangles-menu {
   display: none;
-  background: rgba(0, 0, 0, 0.5);
-  position: absolute;
-  width: 400px;
-  max-height: 100%;
-  border-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 10;
-  left: 0;
-  top: 60px;
-  bottom: 60px;
-  color: white;
 }
-  #lookangles-content {
+  /*#lookangles-content {
     position: absolute;
     width: 400px;
     max-height: 100%;
     top: 30px;
     bottom: 0px;
     overflow: auto;
-  }
+  }*/
   #looks {
     margin: 0 auto;
-    margin-top: -10px;
   }
 #space-weather-menu {
     display: none;
@@ -383,102 +363,53 @@ ul {
   }
 #socrates-menu {
     display: none;
-    background: rgba(0, 0, 0, 0.5);
-    position: absolute;
-    width: 400px;
-    max-height: 100%;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
     z-index: 10;
-    left: 0;
-    top: 150px;
-    bottom: 150px;
-    color: white;
 }
-  #socrates-content {
-    position: absolute;
-    width: 400px;
-    max-height: 100%;
-    top: 30px;
-    bottom: 0px;
-    overflow: auto;
-  }
   #socrates-table {
-    margin: 0 auto;
-    margin-top: -10px;
+    line-height: 0.05;
   }
+
+  #socrates-table td {
+    text-align: center;
+  }
+
 #lookanglesmultisite-menu {
     display: none;
-    background: rgba(0, 0, 0, 0.5);
-    position: absolute;
-    width: 400px;
-    max-height: 100%;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
     z-index: 10;
-    left: 0;
-    top: 60px;
-    bottom: 80px;
-    color: white;
 }
   #lookanglesmultisite-content {
-    position: absolute;
-    width: 400px;
-    max-height: 100%;
-    top: 30px;
-    bottom: 0px;
-    overflow: auto;
-  }
-  #looksmultisite {
-    margin: 0 auto;
-    margin-top: -10px;
+    width: 375px;
   }
 #findByLooks-menu {
     display: none;
-    background: rgba(0, 0, 0, 0.5);
-    position: absolute;
-    width: 290px;
-    max-height: 100%;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
     z-index: 10;
-    left: 0;
-    top: 60px;
-    bottom: 80px;
+}
+  /*#findByLooks-content {
+    position: absolute;
+    width: 290px;
+    max-height: 100%;
+    top: 0px;
+    bottom: 0px;
+    overflow: auto;
+    margin: 0 auto;
+  }*/
+
+  #settings-menu {
+    display: none;
+    z-index: 10;
+  }
+
+  .side-menu {
+    position: absolute;
+    background: #0a97d6;
     color: white;
-}
-  #findByLooks-content {
-    position: absolute;
-    width: 290px;
-    max-height: 100%;
-    top: 0px;
-    bottom: 0px;
+    width: 300px;
+    height: 100%;
+    top: 50px;
+    bottom: 50px;
     overflow: auto;
-    margin: 0 auto;
   }
-#settings-menu {
-  display: none;
-  background: rgba(0, 0, 0, 0.5);
-  position: absolute;
-  width: 290px;
-  max-height: 100%;
-  border-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  z-index: 10;
-  left: 0;
-  top: 60px;
-  bottom: 80px;
-  color: white;
-}
-  #settings-content {
-    position: absolute;
-    width: 290px;
-    max-height: 100%;
-    top: 0px;
-    bottom: 0px;
-    overflow: auto;
-    margin: 0 auto;
-  }
+
   input[type=checkbox].css-checkbox {
     position: absolute;
     z-index: -1000;
@@ -516,19 +447,9 @@ ul {
   }
 #editSat-menu {
   display: none;
-  background: rgba(0, 0, 0, 0.5);
-  position: absolute;
-  width: 290px;
-  max-height: 100%;
-  border-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 10;
-  left: 0;
-  top: 60px;
-  bottom: 80px;
-  color: white;
 }
-  #editSat-content {
+  /*#editSat-content {
     position: absolute;
     width: 290px;
     max-height: 100%;
@@ -536,7 +457,7 @@ ul {
     bottom: 0px;
     overflow: auto;
     margin: 0 auto;
-  }
+  }*/
 fieldset {
     display: block;
     -webkit-margin-start: 0px;
@@ -603,19 +524,9 @@ fieldset {
 }
 #newLaunch-menu {
   display: none;
-  background: rgba(0, 0, 0, 0.5);
-  position: absolute;
-  width: 400px;
-  max-height: 100%;
-  border-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 10;
-  left: 0px;
-  top: 60px;
-  bottom: 80px;
-  color: white;
 }
-  #newLaunch-content {
+  /*#newLaunch-content {
     position: absolute;
     width: 400px;
     max-height: 100%;
@@ -623,23 +534,7 @@ fieldset {
     bottom: 0px;
     overflow: auto;
     margin: 0 auto;
-  }
-
-@import "compass/css3";
-
-$solid: #f0f0f0;
-$flat: #e74c3c;
-$dark: #1E1E1E;
-
-@mixin size{
-	padding: 13px 30px;
-	width: 300px;
-	vertical-align: middle;
-}
-
-@mixin position{
-	margin-left: -30px;
-}
+  }*/
 
 a{
 	text-decoration: none;
@@ -651,80 +546,10 @@ ul li{
   padding: 10px;
 }
 
-.dropdown{
-	@include size;
-	margin: 0 auto;
-	background-color: $flat;
-	text-align: center;
-}
-
-.dropdown #top{
-	color: $solid;
-	position: relative;
-}
-
-.dropdown li ul li:hover{
-	color: $solid;
-	background-color: darken($flat, 5%);
-	@include size;
-	@include position;
-}
-
-.dropdown li ul li{
-	@include size;
-	@include position;
-	color: $dark;
-	border-bottom: 1px solid darken($solid, 5%);
-}
-
-.dropdown li ul li:first-child{
-margin-top: -13px;
-}
-
-.dropdown li .dropdown-box{
-	height: 0;
-	overflow: hidden;
-    display: none;
-    background-color: $solid;
-    width: 100%;
-    @include position;
-    margin-bottom: -15px;
-    margin-top: 13px;
-    border-top: 20px solid $dark;
-    padding: 0;
-    @include size;
-}
-
-.dropdown li:hover .dropdown-box, .dropdown li:active .dropdown-box {
-	display:block;
-	background-color: $solid;
-	animation: box 2s ease;
-	animation-iteration-count: 1;
-	animation-fill-mode: forwards;
-}
-
-@keyframes box {
-  from {height: 0;}
-  to {height: 203px;}
-}
-
-.dropdown li:hover span{
-	width: 0;
-	height: 0;
-	border-left: 5px solid transparent;
-	border-right: 5px solid transparent;
-	border-bottom: 10px solid $solid;
-	margin-top: 42px;
-	position: absolute;
-	margin-left: -40px;
-	}
-
 #colorbox {
-    padding: 5px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 10px solid rgb(2,119,189);
     z-index: 10;
+    box-sizing: content-box;
 }
 #cboxLoadedContent {
   overflow: hidden !important;
@@ -737,20 +562,25 @@ margin-top: -13px;
 
 #sat-infobox {
     display: none;
-    background: rgba(0, 0, 0, 0.5);
+    background: #0a97d6;
     cursor: default;
-    color: white;
     position: absolute;
-    padding: 10px;
-    border-radius: 5px;
+    top: 27%;
+    bottom: 50px;
+    margin-top: 50px;
+    padding: 0 10px 0 10px;
     right: 0px;
-    /*top: 0;*/
-    bottom: 100px;
-    /*margin-top: auto;*/
-    /*margin-bottom: auto;*/
-    height: 560px;
-    width: 340px;
+    width: 300px;
+    border-top: 5px;
+    border-top-color: #0277bd;
+    border-top-style: solid;
+    overflow: auto;
 }
+
+#sat-infobox a {
+  color: white;
+}
+
 .sat-infobox-links {
     font-size: 12px;
     margin: 5px 0;
@@ -768,7 +598,8 @@ margin-top: -13px;
 }
 .sat-info-key {
     font-size: 14px;
-    color: #aaa;
+    color: #01579b;
+    font-weight: bold;
     float: left;
 }
 .sat-info-value {
@@ -778,7 +609,8 @@ margin-top: -13px;
 #datetime {
     position: absolute;
     left: 20px;
-    bottom: 20px;
+    bottom: -5px;
+    z-index: 11;
     width: 170px;
     height: 50px;
     background: transparent;
@@ -791,12 +623,11 @@ margin-top: -13px;
     display: none;
 }
   #datetime-input-tb {
-      background-color: black;
       color: white;
-      border: rgba(0, 0, 0, 0);
       font-family: 'Droid Sans', sans-serif;
-      font-size: 16px;
-      padding: 10px 10px 11px 10px
+      padding: 10px 10px 11px 10px;
+      height: 0px !important;
+      margin: 0 0 8px 0 !important;
   }
     #datetime-input-tb:focus, input:focus {
         outline: none;
@@ -810,7 +641,8 @@ margin-top: -13px;
   background: transparent;
   overflow: hidden;
   text-align: center;
-  font-weight: bold font-size: 15px;
+  font-weight: bold;
+  font-size: 15px;
 }
   #datetime-text {
       padding: 10px
@@ -821,41 +653,27 @@ margin-top: -13px;
     }
 
 #bottom-menu {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0,105,165);
   display: none;
-  left: 22%;
   position: absolute;
-  width: 56%;
-  border-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
   z-index: 10;
-  top: 75%;
-  bottom: 60px;
+  bottom: 50px;
   overflow: auto;
-  max-height: 100%;
+  max-height: 88px;
   color: white;
   text-align: center;
 }
 
 #bottom-icons-container {
-    position: absolute;
-    bottom: 0px;
+    margin-top: -15px;
     width: 100%;
-    display: flex;
-    justify-content: center;
 }
 
 #bottom-icons {
     box-sizing: content-box;
-    height: 40px;
-    padding: 5px;
     display: inline-flex;
-    flex-direction: row;
-    align-items: stretch;
-    align-content: stretch;
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
     z-index: 11;
 }
 #bottom-icons div:first-of-type {
@@ -917,6 +735,12 @@ margin-top: -13px;
 }
 .zoom-button:active {
     background: #511;
+}
+
+.ui_tpicker_time_input {
+  height: 15px !important;
+  border-bottom: 0px !important;
+  text-align: center !important;
 }
 
 #controls-info {

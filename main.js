@@ -12,7 +12,6 @@
     sun
     SunCalc
     earth
-    Spinner
     groups
     mat3
     mat4
@@ -54,8 +53,6 @@ var zoomLevel = 0.5;
 var zoomTarget = 0.5;
 var camPitchSpeed = 0;
 var camYawSpeed = 0;
-
-var timeMouseDown;
 
 // SOCRATES Variables
 var socratesObjOne = []; // Array for tr containing CATNR1
@@ -122,29 +119,11 @@ $(document).ready(function () { // Code Once index.php is loaded
   });
 
   // Initialize Navigation Menu
-  $(".dropdown-button").dropdown();
+  $('.dropdown-button').dropdown();
   $('.tooltipped').tooltip({delay: 50});
 
-  // var opts = {
-  //   lines: 11, // The number of lines to draw
-  //   length: 8, // The length of each line
-  //   width: 5, // The line thickness
-  //   radius: 8, // The radius of the inner circle
-  //   corners: 1, // Corner roundness (0..1)
-  //   rotate: 0, // The rotation offset
-  //   direction: 1, // 1: clockwise, -1: counterclockwise
-  //   color: '#fff', // #rgb or #rrggbb or array of colors
-  //   speed: 1, // Rounds per second
-  //   trail: 50, // Afterglow percentage
-  //   shadow: false, // Whether to render a shadow
-  //   hwaccel: false, // Whether to use hardware acceleration
-  //   className: 'spinner', // The CSS class to assign to the spinner
-  //   zIndex: 2e9, // The z-index (defaults to 2000000000)
-  //   top: '50%', // Top position relative to parent
-  //   left: '50%' // Left position relative to parent
-  // };
-  // var target = document.getElementById('spinner');
-  // new Spinner(opts).spin(target);
+  // Initialize Materialize Select Menus
+  $('select').material_select();
 
   $('#search-results').perfectScrollbar();
 
@@ -287,6 +266,9 @@ $(document).ready(function () { // Code Once index.php is loaded
     dragStartYaw = camYaw;
     // debugLine.set(dragPoint, getCamPos());
     isDragging = true;
+    if ($(document).width() <= 992) {
+      isDragging = false;
+    }
     camSnapMode = false;
     rotateTheEarth = false;
     // }
@@ -297,10 +279,16 @@ $(document).ready(function () { // Code Once index.php is loaded
     var y = evt.originalEvent.touches[0].clientY;
     dragPoint = getEarthScreenPoint(x, y);
     screenDragPoint = [x, y];
+    if ($(document).width() <= 992) {
+      console.log($(document).width());
+    }
     dragStartPitch = camPitch;
     dragStartYaw = camYaw;
     // debugLine.set(dragPoint, getCamPos());
     isDragging = true;
+    if ($(document).width() <= 992) {
+      isDragging = false;
+    }
     camSnapMode = false;
     rotateTheEarth = false;
   });
@@ -318,7 +306,7 @@ $(document).ready(function () { // Code Once index.php is loaded
         $('#menu-astronauts img').removeClass('bmenu-item-selected');
         isMilSatSelected = false;
         $('#menu-space-stations img').removeClass('bmenu-item-selected');
-        $('#search-results').attr('style', 'max-height:90%');
+        $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
       }
       selectSat(clickedSat);
     }
@@ -1246,11 +1234,13 @@ $(document).ready(function () { // Code Once index.php is loaded
     var fblElevation = $('#fbl-elevation').val();
     var fblRange = $('#fbl-range').val();
     var fblInc = $('#fbl-inc').val();
+    var fblPeriod = $('#fbl-period').val();
     var fblAzimuthM = $('#fbl-azimuth-margin').val();
     var fblElevationM = $('#fbl-elevation-margin').val();
     var fblRangeM = $('#fbl-range-margin').val();
     var fblIncM = $('#fbl-inc-margin').val();
-    satSet.searchAzElRange(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM);
+    var fblPeriodM = $('#fbl-period-margin').val();
+    satSet.searchAzElRange(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM, fblPeriod, fblPeriodM);
     e.preventDefault();
   });
   $('#settings-form').submit(function (e) {
@@ -1420,38 +1410,23 @@ $(document).ready(function () { // Code Once index.php is loaded
     var scc = $('#nl-scc').val();
     var satId = satSet.getIdFromObjNum(scc);
     var sat = satSet.getSat(satId);
-    var intl = sat.INTLDES.trim();
+    // var intl = sat.INTLDES.trim();
 
     // TODO: Calculate current J-Day to change Epoch Date
 
-    var inc = $('#nl-inc').val();
-    var apogee = $('#nl-apogee').val();
-    var perigee = $('#nl-perigee').val();
-    var launchLat = $('#nl-perigee').val();
-    var launchLon = $('#nl-perigee').val();
+    // var launchLat = $('#nl-perigee').val();
+    // var launchLon = $('#nl-perigee').val();
 
-    var Ra = RADIUS_OF_EARTH + apogee;
-    var Rp = RADIUS_OF_EARTH + perigee;
-    var SMa = (Ra + Rp) / 2;
+    // var TLE1 = '1 ' + scc + 'U ' + intl + '   16339.76789353 -.00000000 +00000-0 -00000+0 0  0010'; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+    // var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
 
-    var ecen = (Ra - Rp) / (Ra + Rp);
-    var meanmo = sqrt(398600.4 / (SMa ^ 3));
-
-    // var argPe =
-
-    var rasc = $('#es-rasc').val();
-    var meana = $('#es-meana').val();
-
-    var TLE1 = '1 ' + scc + 'U ' + intl + '   16339.76789353 -.00000000 +00000-0 -00000+0 0  0010'; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
-
-    satCruncher.postMessage({
-      typ: 'satEdit',
-      id: satId,
-      TLE1: TLE1,
-      TLE2: TLE2
-    });
-    orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
+    // satCruncher.postMessage({
+    //   typ: 'satEdit',
+    //   id: satId,
+    //   TLE1: TLE1,
+    //   TLE2: TLE2
+    // });
+    // orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
     sat = satSet.getSat(satId);
     e.preventDefault();
@@ -1495,19 +1470,30 @@ function socrates (row) {
       tbl.innerHTML = '';                                  // Clear the table from old object data
       // var tblLength = 0;                                   // Iniially no rows to the table
 
+      var tr = tbl.insertRow();
+      var tdT = tr.insertCell();
+      tdT.appendChild(document.createTextNode('Time'));
+      tdT.setAttribute('style', 'text-decoration: underline');
+      var tdS1 = tr.insertCell();
+      tdS1.appendChild(document.createTextNode('#1'));
+      tdS1.setAttribute('style', 'text-decoration: underline');
+      var tdS2 = tr.insertCell();
+      tdS2.appendChild(document.createTextNode('#2'));
+      tdS2.setAttribute('style', 'text-decoration: underline');
+
       for (var i = 0; i < 20; i++) {                       // 20 rows
-        var tr = tbl.insertRow();
+        tr = tbl.insertRow();
         tr.setAttribute('class', 'socrates-object link');
         tr.setAttribute('hiddenrow', i);
-        var tdT = tr.insertCell();
+        tdT = tr.insertCell();
         var socratesDate = socratesObjTwo[i][4].split(' '); // Date/time is on the second line 5th column
         var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
         var socratesTimeS = socratesTime[2].split('.'); // Split time from date for easier management
         tdT.appendChild(document.createTextNode(socratesDate[2] + ' ' + socratesDate[1] + ' ' + socratesDate[0] + ' - ' + pad(socratesTime[0], 2) + ':' +
         pad(socratesTime[1], 2) + ':' + pad(socratesTimeS[0], 2) + 'Z'));
-        var tdS1 = tr.insertCell();
+        tdS1 = tr.insertCell();
         tdS1.appendChild(document.createTextNode(socratesObjOne[i][1]));
-        var tdS2 = tr.insertCell();
+        tdS2 = tr.insertCell();
         tdS2.appendChild(document.createTextNode(socratesObjTwo[i][0]));
       }
     });
@@ -2110,7 +2096,7 @@ function bottomIconPress (evt) {
         break;
       } else {
         // TODO: NEW LAUNCH
-        if (selectedSat !== -1 && 1 === 2) {
+        if (selectedSat !== -1) {
           hideSideMenus();
           $('#newLaunch-menu').fadeIn();
           $('#menu-newLaunch img').addClass('bmenu-item-selected');
@@ -2194,9 +2180,9 @@ function selectSat (satId) {
   if (satId === -1) {
     $('#sat-infobox').fadeOut();
     if ($('#search-results').css('display') === 'block') {
-      $('#search-results').attr('style', 'display:block; max-height:90%');
+      $('#search-results').attr('style', 'display:block;max-height:100%;margin-bottom:-50px;');
     } else {
-      $('#search-results').attr('style', 'max-height:90%');
+      $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
     }
     $('#iss-stream').html('');
     $('#iss-stream-menu').fadeOut();
@@ -2231,9 +2217,9 @@ function selectSat (satId) {
     if (!sat) return;
     orbitDisplay.setSelectOrbit(satId);
     if ($('#search-results').css('display') === 'block') {
-      $('#search-results').attr('style', 'display:block; max-height:15%');
+      $('#search-results').attr('style', 'display:block; max-height:27%');
     } else {
-      $('#search-results').attr('style', 'max-height:15%x');
+      $('#search-results').attr('style', 'max-height:27%');
     }
     $('#sat-infobox').fadeIn();
     $('#sat-info-title').html(sat.ON);
@@ -3474,7 +3460,24 @@ var lookangles = (function () {
     var tblLength = 0;                                   // Iniially no rows to the table
     var lastTblLength = 0;                               // Tracks when to change sensors
     var sensor = 0;
-    var howManyPasses = 3; // Complete 3 passes before switching sensors
+    var howManyPasses = 6; // Complete 3 passes before switching sensors
+
+    var tr = tbl.insertRow();
+    var tdT = tr.insertCell();
+    tdT.appendChild(document.createTextNode('Time'));
+    tdT.setAttribute('style', 'text-decoration: underline');
+    var tdE = tr.insertCell();
+    tdE.appendChild(document.createTextNode('El'));
+    tdE.setAttribute('style', 'text-decoration: underline');
+    var tdA = tr.insertCell();
+    tdA.appendChild(document.createTextNode('Az'));
+    tdA.setAttribute('style', 'text-decoration: underline');
+    var tdR = tr.insertCell();
+    tdR.appendChild(document.createTextNode('Rng'));
+    tdR.setAttribute('style', 'text-decoration: underline');
+    var tdS = tr.insertCell();
+    tdS.appendChild(document.createTextNode('Sensor'));
+    tdS.setAttribute('style', 'text-decoration: underline');
 
     for (var i = 0; i < (7 * 24 * 60 * 60); i += 5) {         // 5second Looks
       propOffset2 = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
@@ -3485,7 +3488,7 @@ var lookangles = (function () {
           sensor++;
           setSensor(sensor);
           i = 0;
-          howManyPasses = 3; // Reset to 3 passes
+          howManyPasses = 6; // Reset to 3 passes
         } else {
           howManyPasses = howManyPasses - 1;
           i = i + (60 * 60); // Jump an hour into the future to ensure its the next pass.
@@ -3515,6 +3518,20 @@ var lookangles = (function () {
       var tbl = document.getElementById('looks');           // Identify the table to update
       tbl.innerHTML = '';                                   // Clear the table from old object data
       var tblLength = 0;                                   // Iniially no rows to the table
+
+      var tr = tbl.insertRow();
+      var tdT = tr.insertCell();
+      tdT.appendChild(document.createTextNode('Time'));
+      tdT.setAttribute('style', 'text-decoration: underline');
+      var tdE = tr.insertCell();
+      tdE.appendChild(document.createTextNode('El'));
+      tdE.setAttribute('style', 'text-decoration: underline');
+      var tdA = tr.insertCell();
+      tdA.appendChild(document.createTextNode('Az'));
+      tdA.setAttribute('style', 'text-decoration: underline');
+      var tdR = tr.insertCell();
+      tdR.appendChild(document.createTextNode('Rng'));
+      tdR.setAttribute('style', 'text-decoration: underline');
 
       for (var i = 0; i < (7 * 24 * 60 * 60); i += 5) {         // 5second Looks
         propOffset2 = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
@@ -3724,11 +3741,11 @@ var lookangles = (function () {
       tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
       // tdT.style.border = '1px solid black';
       var tdE = tr.insertCell();
-      tdE.appendChild(document.createTextNode('El: ' + elevation.toFixed(1)));
+      tdE.appendChild(document.createTextNode(elevation.toFixed(1)));
       var tdA = tr.insertCell();
-      tdA.appendChild(document.createTextNode('Az: ' + azimuth.toFixed(0)));
+      tdA.appendChild(document.createTextNode(azimuth.toFixed(0)));
       var tdR = tr.insertCell();
-      tdR.appendChild(document.createTextNode('Rng: ' + rangeSat.toFixed(0)));
+      tdR.appendChild(document.createTextNode(rangeSat.toFixed(0)));
       return 1;
     }
     return 0;
@@ -3819,11 +3836,11 @@ var lookangles = (function () {
       tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
       // tdT.style.border = '1px solid black';
       var tdE = tr.insertCell();
-      tdE.appendChild(document.createTextNode('El: ' + elevation.toFixed(1)));
+      tdE.appendChild(document.createTextNode(elevation.toFixed(1)));
       var tdA = tr.insertCell();
-      tdA.appendChild(document.createTextNode('Az: ' + azimuth.toFixed(0)));
+      tdA.appendChild(document.createTextNode(azimuth.toFixed(0)));
       var tdR = tr.insertCell();
-      tdR.appendChild(document.createTextNode('Rng: ' + rangeSat.toFixed(0)));
+      tdR.appendChild(document.createTextNode(rangeSat.toFixed(0)));
       var tdS = tr.insertCell();
       tdS.appendChild(document.createTextNode(sensor));
       return 1;
@@ -5773,21 +5790,24 @@ function propTime () {
     return res;
   };
 
-  satSet.searchAzElRange = function (azimuth, elevation, range, inclination, azMarg, elMarg, rangeMarg, incMarg) {
+  satSet.searchAzElRange = function (azimuth, elevation, range, inclination, azMarg, elMarg, rangeMarg, incMarg, period, periodMarg) {
     var isCheckAz = !isNaN(parseFloat(azimuth)) && isFinite(azimuth);
     var isCheckEl = !isNaN(parseFloat(elevation)) && isFinite(elevation);
     var isCheckRange = !isNaN(parseFloat(range)) && isFinite(range);
     var isCheckInclination = !isNaN(parseFloat(inclination)) && isFinite(inclination);
+    var isCheckPeriod = !isNaN(parseFloat(period)) && isFinite(period);
     var isCheckAzMarg = !isNaN(parseFloat(azMarg)) && isFinite(azMarg);
     var isCheckElMarg = !isNaN(parseFloat(elMarg)) && isFinite(elMarg);
     var isCheckRangeMarg = !isNaN(parseFloat(rangeMarg)) && isFinite(rangeMarg);
     var isCheckIncMarg = !isNaN(parseFloat(incMarg)) && isFinite(incMarg);
-    if (!isCheckEl && !isCheckRange && !isCheckAz && !isCheckInclination) return; // Ensure there is a number typed.
+    var isCheckPeriodMarg = !isNaN(parseFloat(periodMarg)) && isFinite(periodMarg);
+    if (!isCheckEl && !isCheckRange && !isCheckAz && !isCheckInclination && !isCheckPeriod) return; // Ensure there is a number typed.
 
     if (!isCheckAzMarg) { azMarg = 5; }
     if (!isCheckElMarg) { elMarg = 5; }
     if (!isCheckRangeMarg) { rangeMarg = 200; }
     if (!isCheckIncMarg) { incMarg = 1; }
+    if (!isCheckPeriodMarg) { periodMarg = 0.5; }
     var res = [];
 
     for (var i = 0; i < satData.length; i++) {
@@ -5799,7 +5819,7 @@ function propTime () {
       res[i]['inview'] = lookangles.inview;
     }
 
-    if (!isCheckInclination) {
+    if (!isCheckInclination && !isCheckPeriod) {
       res = checkInview(res);
     }
 
@@ -5828,11 +5848,19 @@ function propTime () {
     }
 
     if (isCheckInclination) {
-      inclination = inclination * 1; // Convert range to int
+      inclination = inclination * 1; // Convert inclination to int
       incMarg = incMarg * 1;
       var minInc = inclination - incMarg;
       var maxInc = inclination + incMarg;
       res = checkInc(res, minInc, maxInc);
+    }
+
+    if (isCheckPeriod) {
+      period = period * 1; // Convert period to int
+      periodMarg = periodMarg * 1;
+      var minPeriod = period - periodMarg;
+      var maxPeriod = period + periodMarg;
+      res = checkPeriod(res, minPeriod, maxPeriod);
     }
 
     function checkInview (possibles) {
@@ -5881,10 +5909,23 @@ function propTime () {
       }
       return IncRes;
     }
-    $('#findByLooks-results').text('');
+    function checkPeriod (possibles, minPeriod, maxPeriod) {
+      var PeriodRes = [];
+      for (var i = 0; i < possibles.length; i++) {
+        if (possibles[i].period < maxPeriod && possibles[i].period > minPeriod && PeriodRes.length <= 200) { // Don't display more than 200 results - this is because LEO and GEO belt have a lot of satellites
+          PeriodRes.push(possibles[i]);
+        }
+      }
+      if (PeriodRes.length >= 200) {
+        $('#findByLooks-results').text('Limited to 200 Results!');
+      }
+      return PeriodRes;
+    }
+    // $('#findByLooks-results').text('');
+    // TODO: Intentionally doesn't clear previous searches. Could be an option later.
     var SCCs = [];
     for (i = 0; i < res.length; i++) {
-      $('#findByLooks-results').append(res[i].SCC_NUM + '<br />');
+      // $('#findByLooks-results').append(res[i].SCC_NUM + '<br />');
       if (i < res.length - 1) {
         $('#search').val($('#search').val() + res[i].SCC_NUM + ',');
       } else {

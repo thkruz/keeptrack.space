@@ -17,8 +17,8 @@
     <title>Keep Track</title>
   </head>
   <body>
-  <div id="logo-container">
-    <div id="logo-inner-container">
+  <div id="logo-container" class="valign-wrapper">
+    <div id="logo-inner-container" class="valign">
       <span id="logo-text">Keeptrack</span>
       <div class="preloader-wrapper active">
         <div class="spinner-layer spinner-white-only">
@@ -37,457 +37,554 @@
   <div id="no-webgl">
     Stuff in Space requires <a href="http://caniuse.com/#feat=webgl">WebGL</a> and <a href="http://caniuse.com/#feat=webworkers">Web Worker</a> support.
   </div>
-  <nav>
-    <div class="nav-wrapper light-blue darken-3">
-      <ul id="nav-mobile" class="left hide-on-med-and-down">
-        <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Countries<i class="material-icons right">arrow_drop_down</i></a></li>
-        <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-radar-menu">US Radar<i class="material-icons right">arrow_drop_down</i></a></li>
-        <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-optical-menu">US Optical<i class="material-icons right">arrow_drop_down</i></a></li>
-        <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="russian-menu">Russian<i class="material-icons right">arrow_drop_down</i></a></li>
-        <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="chinese-menu">Chinese<i class="material-icons right">arrow_drop_down</i></a></li>
-        <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="colors-menu">Color Schemes<i class="material-icons right">arrow_drop_down</i></a></li>
-      </ul>
-      <ul id="nav-mobile" class="right">
-        <div id="search-holder" class="menu-item">
-          <label class="label-icon" for="search"><i class="material-icons">search</i></label>
-          <input id="search" type="search" required>
-          <i class="material-icons">close</i>
+  <header>
+    <nav>
+      <div class="nav-wrapper light-blue darken-3">
+        <ul id="nav-mobile" class="left hide-on-med-and-down">
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Countries<i class="material-icons right">arrow_drop_down</i></a></li>
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-radar-menu">US Radar<i class="material-icons right">arrow_drop_down</i></a></li>
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-optical-menu">US Optical<i class="material-icons right">arrow_drop_down</i></a></li>
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="russian-menu">Russian<i class="material-icons right">arrow_drop_down</i></a></li>
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="chinese-menu">Chinese<i class="material-icons right">arrow_drop_down</i></a></li>
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="colors-menu">Color Schemes<i class="material-icons right">arrow_drop_down</i></a></li>
+        </ul>
+        <ul id="nav-mobile" class="right">
+          <div id="search-holder" class="menu-item">
+            <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+            <input id="search" type="search" required>
+            <i class="material-icons">close</i>
+          </div>
+        </ul>
+      </div>
+    </nav>
+    <!--  -->
+    <!-- Dropdown Menus  -->
+    <!--  -->
+
+    <!-- Countries Menu -->
+    <ul id="countries-menu" class="dropdown-content">
+      <li data-group="<clear>" class="clear-option" style="display: none">Clear</li>
+      <li data-group="Canada" class="country-option">Canada</li>
+      <li data-group="China" class="country-option">China</li>
+      <li data-group="France" class="country-option">France</li>
+      <li data-group="India" class="country-option">India</li>
+      <li data-group="Israel" class="country-option">Israel</li>
+      <li data-group="Japan" class="country-option">Japan</li>
+      <li data-group="Russia" class="country-option">Russia / USSR</li>
+      <li data-group="UnitedKingdom" class="country-option">United Kingdom</li>
+      <li data-group="UnitedStates" class="country-option">United States</li>
+    </ul>
+
+    <ul id="us-radar-menu" class="dropdown-content">
+      <li id="radar-altair">ALTAIR</li>
+      <li id="radar-beale">Beale</li>
+      <li id="radar-capecod">Cape Cod</li>
+      <li id="radar-parcs">Cavalier</li>
+      <li id="radar-clear">Clear</li>
+      <li id="radar-eglin">Eglin</li>
+      <li id="radar-fylingdales">Fylingdales</li>
+      <li id="radar-millstone">Millstone</li>
+      <li id="radar-thule">Thule</li>
+    </ul>
+
+    <ul id="us-optical-menu" class="dropdown-content">
+      <li id="optical-diego-garcia">Diego Garcia</li>
+      <li id="optical-maui">Maui</li>
+      <li id="optical-socorro">Socorro</li>
+      <li id="optical-spain">Spain</li>
+    </ul>
+
+    <ul id="russian-menu" class="dropdown-content">
+      <li id="russian-armavir">Armavir</li>
+      <li id="russian-balkhash">Balkhash</li>
+      <li id="russian-gantsevichi">Gantsevichi</li>
+      <li id="russian-lekhtusi">Lekhtusi</li>
+      <li id="russian-mishelevka-d">Mishelevka</li>
+      <li id="russian-olenegorsk">Olenegorsk</li>
+      <li id="russian-pechora">Pechora</li>
+      <li id="russian-pionersky">Pionersky</li>
+    </ul>
+
+    <ul id="chinese-menu" class="dropdown-content">
+      <li id="chinese-xuanhua">Xuanhua</li>
+    </ul>
+
+    <ul id="colors-menu" class="dropdown-content">
+      <li data-color="default">Type</li>
+      <li data-color="velocity">Velocity</li>
+      <li data-color="rcs">Radar Cross Section</li>
+      <li data-color="smallsats">Small Satellites</li>
+      <li data-color="near-earth">Near Earth</li>
+      <li data-color="deep-space">Deep Space</li>
+      <li data-color="lost-objects">Lost Objects</li>
+    </ul>
+
+    <!--  -->
+    <!-- Dropdown Menus  -->
+    <!--  -->
+  </header>
+
+  <main>
+    <div id="canvas-holder">
+      <canvas id="canvas"></canvas>
+      <div id="search-results"></div>
+      <div id="menu-right" class="menubar">
+        <div id="menu-version" class="menu-item">
+            <div class="menu-title">Version</div>
+            <div id="version-box" class="menubox submenu">
+              <center>
+                Version: 0.10.0<br />
+                March 12, 2017
+              </center>
+            </div>
         </div>
-      </ul>
-    </div>
-  </nav>
-  <!--  -->
-  <!-- Dropdown Menus  -->
-  <!--  -->
-
-  <!-- Countries Menu -->
-  <ul id="countries-menu" class="dropdown-content">
-    <li data-group="<clear>" class="clear-option" style="display: none">Clear</li>
-    <li data-group="Canada" class="country-option">Canada</li>
-    <li data-group="China" class="country-option">China</li>
-    <li data-group="France" class="country-option">France</li>
-    <li data-group="India" class="country-option">India</li>
-    <li data-group="Israel" class="country-option">Israel</li>
-    <li data-group="Japan" class="country-option">Japan</li>
-    <li data-group="Russia" class="country-option">Russia / USSR</li>
-    <li data-group="UnitedKingdom" class="country-option">United Kingdom</li>
-    <li data-group="UnitedStates" class="country-option">United States</li>
-  </ul>
-
-  <ul id="us-radar-menu" class="dropdown-content">
-    <li id="radar-altair">ALTAIR</li>
-    <li id="radar-beale">Beale</li>
-    <li id="radar-capecod">Cape Cod</li>
-    <li id="radar-parcs">Cavalier</li>
-    <li id="radar-clear">Clear</li>
-    <li id="radar-eglin">Eglin</li>
-    <li id="radar-fylingdales">Fylingdales</li>
-    <li id="radar-millstone">Millstone</li>
-    <li id="radar-thule">Thule</li>
-  </ul>
-
-  <ul id="us-optical-menu" class="dropdown-content">
-    <li id="optical-diego-garcia">Diego Garcia</li>
-    <li id="optical-maui">Maui</li>
-    <li id="optical-socorro">Socorro</li>
-    <li id="optical-spain">Spain</li>
-  </ul>
-
-  <ul id="russian-menu" class="dropdown-content">
-    <li id="russian-armavir">Armavir</li>
-    <li id="russian-balkhash">Balkhash</li>
-    <li id="russian-gantsevichi">Gantsevichi</li>
-    <li id="russian-lekhtusi">Lekhtusi</li>
-    <li id="russian-mishelevka-d">Mishelevka</li>
-    <li id="russian-olenegorsk">Olenegorsk</li>
-    <li id="russian-pechora">Pechora</li>
-    <li id="russian-pionersky">Pionersky</li>
-  </ul>
-
-  <ul id="chinese-menu" class="dropdown-content">
-    <li id="chinese-xuanhua">Xuanhua</li>
-  </ul>
-
-  <ul id="colors-menu" class="dropdown-content">
-    <li data-color="default">Type</li>
-    <li data-color="velocity">Velocity</li>
-    <li data-color="rcs">Radar Cross Section</li>
-    <li data-color="smallsats">Small Satellites</li>
-    <li data-color="near-earth">Near Earth</li>
-    <li data-color="deep-space">Deep Space</li>
-    <li data-color="lost-objects">Lost Objects</li>
-  </ul>
-
-  <!--  -->
-  <!-- Dropdown Menus  -->
-  <!--  -->
-
-  <div id="canvas-holder">
-    <canvas id="canvas"></canvas>
-    <div id="search-results"></div>
-    <div id="menu-right" class="menubar">
-      <div id="menu-version" class="menu-item">
-          <div class="menu-title">Version</div>
-          <div id="version-box" class="menubox submenu">
-            <center>
-              Version: 0.10.0<br />
-              March 12, 2017
-            </center>
+        <div id="menu-about" class="menu-item">
+            <div class="menu-title">About</div>
+            <div id="about-box" class="menubox submenu">
+              <span class="box-header">Keep Track</span>
+              <p>Created by <a href="mailto:kruczek@keeptrack.space">Theodore Kruczek</a>
+                 to help visualize Ground Based Radars and Optical Telescopes.
+                 This tool allows users to find objects in orbit and
+                 determine details such as rise/set times, RCS, and history. The main
+                 power of this tool is visualizing many open-source databases into one
+                 interface.</p>
+              <span class="box-header">Sources</span>
+              <p>All information is open source publically available information. Orbits are derived from
+                the catalogue published at space-track.org. Payload information is compiled from various
+                public sources. US Sensor data was derived from MDA reports on enviromental impacts and congressional
+                budget reports.</p>
+              <span class="box-header">Original Author</span>
+              <p>The original source code for this tool and much of the credit goes
+                 to <a href="http://stuffin.space">James Yoder</a>. He is an alumnus of
+                 <i>FIRST</i> Robotics Competition (FRC) Team 624 and an Electrical and Computer
+                 Engineering major at the University of Texas at Austin. Without his work none of this
+                 would be possible.</p>
+               <!--<span class="box-header">MIT Lincoln Labs Support</span>
+               <p>Special thanks to Tim Wallace, David Rysdam, Chirag Bhutt, and the
+                  team at MIT Lincoln Labs who updated and fixed the original code.
+                  They provided a great starting point for expanding the features of
+                  this tool to do more than just display orbits.</p>-->
+            </div>
           </div>
       </div>
-      <div id="menu-about" class="menu-item">
-          <div class="menu-title">About</div>
-          <div id="about-box" class="menubox submenu">
-            <span class="box-header">Keep Track</span>
-            <p>Created by <a href="mailto:kruczek@keeptrack.space">Theodore Kruczek</a>
-               to help visualize Ground Based Radars and Optical Telescopes.
-               This tool allows users to find objects in orbit and
-               determine details such as rise/set times, RCS, and history. The main
-               power of this tool is visualizing many open-source databases into one
-               interface.</p>
-            <span class="box-header">Sources</span>
-            <p>All information is open source publically available information. Orbits are derived from
-              the catalogue published at space-track.org. Payload information is compiled from various
-              public sources. US Sensor data was derived from MDA reports on enviromental impacts and congressional
-              budget reports.</p>
-            <span class="box-header">Original Author</span>
-            <p>The original source code for this tool and much of the credit goes
-               to <a href="http://stuffin.space">James Yoder</a>. He is an alumnus of
-               <i>FIRST</i> Robotics Competition (FRC) Team 624 and an Electrical and Computer
-               Engineering major at the University of Texas at Austin. Without his work none of this
-               would be possible.</p>
-             <!--<span class="box-header">MIT Lincoln Labs Support</span>
-             <p>Special thanks to Tim Wallace, David Rysdam, Chirag Bhutt, and the
-                team at MIT Lincoln Labs who updated and fixed the original code.
-                They provided a great starting point for expanding the features of
-                this tool to do more than just display orbits.</p>-->
+
+      <div id="sat-hoverbox">(none)</div>
+
+      <div id="sensor-info-menu">
+        <div class="side-menu" id="lookangles-content">
+          <div class="row">
+            <h5 class="center-align">Sensor Name</h5>
+            <div class="sensor-info-row" style="margin-top: 0px;">
+              <div class="sensor-info-key">Country</div>
+              <div class="sensor-info-value" id="sensor-country">USA</div>
+            </div>
+            <div class="sensor-info-row">
+              <div class="sensor-info-key">Radar Type</div>
+              <div class="sensor-info-value" id="sensor-type">Unknown</div>
+            </div>
+            <div class="sensor-info-row">
+              <div class="sensor-info-key">Latitude</div>
+              <div class="sensor-info-value" id="sensor-latitude">0</div>
+            </div>
+            <div class="sensor-info-row">
+              <div class="sensor-info-key">Longitude</div>
+              <div class="sensor-info-value" id="sensor-longitude">0</div>
+            </div>
+            <div class="sensor-info-row">
+              <div class="sensor-info-key">Sun Exclusion</div>
+              <div class="sensor-info-value" id="sensor-sun">Sun Stuff</div>
+            </div>
+            <div class="sensor-info-row">
+              <div class="sensor-info-key">Min Azimuth</div>
+              <div class="sensor-info-value" id="sensor-minazimuth">30 deg</div>
+            </div>
+            <div class="sensor-info-row">
+              <div class="sensor-info-key">Max Azimuth</div>
+              <div class="sensor-info-value" id="sensor-maxazimuth">30 deg</div>
+            </div>
+            <div class="sensor-info-row">
+              <div class="sensor-info-key">Min Elevation</div>
+              <div class="sensor-info-value" id="sensor-minelevation">60 deg</div>
+            </div>
+            <div class="sensor-info-row">
+              <div class="sensor-info-key">Max Elevation</div>
+              <div class="sensor-info-value" id="sensor-maxelevation">60 deg</div>
+            </div>
+            <div class="sensor-info-row">
+              <div class="sensor-info-key">Min Range</div>
+              <div class="sensor-info-value" id="sensor-minrange">1000 km</div>
+            </div>
+            <div class="sensor-info-row">
+              <div class="sensor-info-key">Max Range</div>
+              <div class="sensor-info-value" id="sensor-maxrange">1000 km</div>
+            </div>
           </div>
         </div>
-    </div>
+      </div>
+      <div id="findByLooks-menu">
+        <div class="side-menu" id="findByLooks-content">
+          <div class="row">
+            <h5 class="center-align">Find By Looks</h5>
+            <form id="findByLooks">
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XXX.X" id="fbl-azimuth" type="text">
+                  <label for="fbl-azimuth">Azimuth</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX" id="fbl-azimuth-margin" type="text">
+                  <label for="fbl-azimuth-margin">Margin</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-elevation" type="text">
+                  <label for="fbl-elevation">Elevation</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX" id="fbl-elevation-margin" type="text">
+                  <label for="fbl-elevation-margin">Margin</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XXXX.X" id="fbl-range" type="text">
+                  <label for="fbl-range">Range</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XXXX" id="fbl-range-margin" type="text">
+                  <label for="fbl-range-margin">Margin</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-inc" type="text">
+                  <label for="fbl-inc">Inclination</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX" id="fbl-inc-margin" type="text">
+                  <label for="fbl-inc-margin">Margin</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX.X" id="fbl-period" type="text">
+                  <label for="fbl-period">Period</label>
+                </div>
+                <div class="input-field col s12 m6 l6">
+                  <input placeholder="XX" id="fbl-period-margin" type="text">
+                  <label for="fbl-period-margin">Margin</label>
+                </div>
+              </div>
+              <div class="center-align">
+                <button id="findByLooks-submit" class="btn waves-effect waves-light" type="submit" name="action">Find Satellite(s)
+                  <i class="material-icons right">send</i>
+                </button>
+              </div>
+            </form>
+            <div class="row center-align" style="margin-top=10px;">
+              <span id="findByLooks-results"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="lookangles-menu">
+        <div class="side-menu" id="lookangles-content">
+          <div class="row">
+            <h5 class="center-align">Sensor Look Angles</h5>
+            <table id="looks"  class="center-align striped-light centered"></table>
+          </div>
+        </div>
+      </div>
+      <div id="lookanglesmultisite-menu">
+        <div class="side-menu" id="lookanglesmultisite-content">
+          <div class="row">
+            <h5 class="center-align">Multi-Sensor Look Angles</h5>
+            <table id="looksmultisite" class="center-align striped-light centered"></table>
+          </div>
+        </div>
+      </div>
+      <div id="twitter-menu" class="side-menu"></div>
+      <div id="weather-menu">
+        <img id="weather-image">
+      </div>
+      <div id="space-weather-menu">
+        <img id="space-weather-image">
+      </div>
+      <div id="socrates-menu">
+        <div class="side-menu" id="socrates-content">
+          <div class="row">
+            <h5 class="center-align">Possible collisions</h5>
+            <table id="socrates-table" class="center-align"></table>
+          </div>
+        </div>
+      </div>
+      <div id="settings-menu">
+        <div class="side-menu" id="settings-content">
+          <div class="row">
+            <h5 class="center-align">Settings</h5>
+            <form id="settings-form">
+              <div class="switch row">
+                <label>
+                  <input id="settings-resetSensor" type="checkbox">
+                  <span class="lever"></span>
+                  Reset Sensor
+                </label>
+              </div>
+              <div class="switch row">
+                <label>
+                  <input id="settings-hos" type="checkbox">
+                  <span class="lever"></span>
+                  Hide Other Satellites
+                </label>
+              </div>
+              <div class="switch row">
+                <label>
+                  <input id="settings-onlyfov" type="checkbox">
+                  <span class="lever"></span>
+                  Show Only Sensor FOV
+                </label>
+              </div>
+              <div class="row"></div>
+              <h6 class="center-align">Only On Fast Computers</h6>
+              <div class="row"></div>
+              <div class="switch row">
+                <label>
+                  <input id="settings-snp" type="checkbox">
+                  <span class="lever"></span>
+                  Show Next Pass on Hover
+                </label>
+              </div>
+              <div class="row"></div>
+              <div class="row center">
+                <button id="settings-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Settings
+                  <i class="material-icons right">send</i>
+                </button>
+              </div>
+            </form>
+            <span id="findByLooks-results"></span>
+          </div>
+        </div>
+      </div>
+      <div id="editSat-menu">
+        <div id="editSat-content" class="side-menu">
+          <div class="row">
+            <h5 class="center-align">Edit Satellite</h5>
+            <form id="editSat">
+              <div class="input-field col s12">
+                <input disabled value="AAAAA" id="es-scc" type="text">
+                <label for="disabled">Satellite SCC#</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AA" id="es-year" type="text">
+                <label for="es-year">Epoch Year</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AAA.AAAAAAAA" id="es-day" type="text">
+                <label for="es-day">Epoch Day</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AAA.AAAA" id="es-inc" type="text">
+                <label for="es-inc">Inclination</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AAA.AAAA" id="es-rasc" type="text">
+                <label for="es-rasc">Right Ascension</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AAA.AAAA" id="es-meanmo" type="text">
+                <label for="es-meanmo">Mean Motion</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AA.AAAAAAAA" id="es-ecen" type="text">
+                <label for="es-ecen">Eccentricity</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AA.AAAAAAAA" id="es-argPe" type="text">
+                <label for="es-argPe">Argument of Perigee</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="AAA.AAAA" id="es-meana" type="text">
+                <label for="es-meana">Mean Anomaly</label>
+              </div>
+              <div class="center-align">
+                <button id="editSat-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Satellite
+                  <i class="material-icons right">send</i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div id="newLaunch-menu">
+        <div id="newLaunch-content" class="side-menu">
+          <div class="row">
+            <h5 class="center-align">New Launch</h5>
+            <form id="newLaunch" class="col s12">
+              <div class="input-field col s12">
+                <input disabled value="25544" id="disabled" type="text">
+                <label for="disabled">Satellite SCC#</label>
+              </div>
+              <div class="input-field col s12">
+                <select>
+                  <optgroup label="United States">
+                    <option value="1">Vandenberg AFB</option>
+                    <option value="2">Cape Canaveral AFS</option>
+                    <option value="3">Wallops Flight Facility</option>
+                  </optgroup>
+                  <optgroup label="China">
+                    <option value="4">Jiuquan SLC</option>
+                    <option value="5">Taiyuan SLC</option>
+                    <option value="6">Xichang SLC</option>
+                    <option value="7">Wenchang SLC</option>
+                  </optgroup>
+                </select>
+                <label>Launch Facility</label>
+              </div>
+              <div class="center-align">
+                <button class="btn waves-effect waves-light" type="submit" name="action">Create Launch Nominal
+                  <i class="material-icons right">send</i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
 
-    <div id="sat-hoverbox">(none)</div>
+      <div id="iss-stream-menu">
+        <div id="iss-stream"></div>
+      </div>
 
-    <div id="sensor-info-menu">
-      <div id="sensor-info-title">Sensor Name</div>
-      <div class="sensor-info-row">
-        <div class="sensor-info-key">Country</div>
-        <div class="sensor-info-value" id="sensor-country">USA</div>
+      <div id="sat-infobox">
+        <div id="sat-info-title" class="center-text">This is a title</div>
+        <div id="all-objects-link" class="link sat-infobox-links">Find all objects from this launch...</div>
+        <div id="near-objects-link" class="link sat-infobox-links">Find all objects near this object...</div>
+        <div class="sat-info-row">
+          <div class="sat-info-key">Int'l Designator</div>
+          <div class="sat-info-value" id="sat-intl-des">XXXX-XXXA</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key">Object number</div>
+          <div class="sat-info-value" id="sat-objnum">99999</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key">Type</div>
+          <div class="sat-info-value" id="sat-type">PAYLOAD</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key">Country</div>
+          <div class="sat-info-value" id="sat-country">COUNTRY</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key">Launch Site</div>
+          <div class="sat-info-value" id="sat-site">SITE</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key"></div>
+          <div class="sat-info-value" id="sat-sitec">LAUNCH COUNTRY</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key">Launch Vehicle</div>
+          <div class="sat-info-value" id="sat-vehicle">VEHICLE</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key tooltipped" data-position="left" data-delay="50" data-tooltip="Highest Point in the Orbit">
+            Apogee
+          </div>
+          <div class="sat-info-value" id="sat-apogee">XXX km</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key tooltipped" data-position="left" data-delay="50" data-tooltip="Lowest Point in the Orbit">
+            Perigee
+          </div>
+          <div class="sat-info-value" id="sat-perigee">XXX km</div>
+        </div>
+         <div class="sat-info-row">
+          <div class="sat-info-key tooltipped" data-position="left" data-delay="50" data-tooltip="Angle Measured from Equator on the Ascending Node">
+            Inclination
+          </div>
+          <div class="sat-info-value" id="sat-inclination">XXX.XX</div>
+        </div>
+         <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="How Circular the Orbit Is (0 is a Circle)">
+            Eccentricity
+          </div>
+          <div class="sat-info-value" id="sat-eccentricity">X.XX</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Latitude Over Earth">
+            Latitude
+          </div>
+          <div class="sat-info-value" id="sat-latitude">X.XX</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Longitude Over Earth">
+            Longitude
+          </div>
+          <div class="sat-info-value" id="sat-longitude">X.XX</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Is the Sun Affected the Sensor">
+            Sun
+          </div>
+          <div class="sat-info-value" id="sat-sun">Sun Stuff</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Altitude Above Sea Level">
+            Altitude
+          </div>
+          <div class="sat-info-value" id="sat-altitude">XXX km</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Velocity of the Satellite (Higher the Closer to Earth it Is)">
+            Velocity
+          </div>
+          <div class="sat-info-value" id="sat-velocity">XXX km/s</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Angle (Left/Right) from the Sensor">
+            Azimuth
+          </div>
+          <div class="sat-info-value" id="sat-azimuth">XX deg</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Angle (Up/Down) from the Sensor">
+            Elevation
+          </div>
+          <div class="sat-info-value" id="sat-elevation">XX deg</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Distance from the Sensor">
+            Range
+          </div>
+          <div class="sat-info-value" id="sat-range">XXXX km</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Time for One Complete Revolution Around Earth">
+            Period
+          </div>
+          <div class="sat-info-value" id="sat-period">XXX min</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Time Since Official Orbit Calculated (Older ELSETs are Less Accuarate Usually)">
+            Age of ELSET
+          </div>
+          <div class="sat-info-value" id="sat-elset-age">XXX.XXXX</div>
+        </div>
+        <div class="sat-info-row">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Large are > 1^2 meter, Small are < 0.1^2 meters">
+            RCS
+          </div>
+          <div class="sat-info-value" id="sat-rcs">MEDIUM</div>
+        </div>
       </div>
-      <div class="sensor-info-row">
-        <div class="sensor-info-key">Radar Type</div>
-        <div class="sensor-info-value" id="sensor-type">Unknown</div>
-      </div>
-      <div class="sensor-info-row">
-        <div class="sensor-info-key">Latitude</div>
-        <div class="sensor-info-value" id="sensor-latitude">0</div>
-      </div>
-      <div class="sensor-info-row">
-        <div class="sensor-info-key">Longitude</div>
-        <div class="sensor-info-value" id="sensor-longitude">0</div>
-      </div>
-      <div class="sensor-info-row">
-        <div class="sensor-info-key">Sun Exclusion</div>
-        <div class="sensor-info-value" id="sensor-sun">Sun Stuff</div>
-      </div>
-      <div class="sensor-info-row">
-        <div class="sensor-info-key">Min Azimuth</div>
-        <div class="sensor-info-value" id="sensor-minazimuth">30 deg</div>
-      </div>
-      <div class="sensor-info-row">
-        <div class="sensor-info-key">Max Azimuth</div>
-        <div class="sensor-info-value" id="sensor-maxazimuth">30 deg</div>
-      </div>
-      <div class="sensor-info-row">
-        <div class="sensor-info-key">Min Elevation</div>
-        <div class="sensor-info-value" id="sensor-minelevation">60 deg</div>
-      </div>
-      <div class="sensor-info-row">
-        <div class="sensor-info-key">Max Elevation</div>
-        <div class="sensor-info-value" id="sensor-maxelevation">60 deg</div>
-      </div>
-      <div class="sensor-info-row">
-        <div class="sensor-info-key">Min Range</div>
-        <div class="sensor-info-value" id="sensor-minrange">1000 km</div>
-      </div>
-      <div class="sensor-info-row">
-        <div class="sensor-info-key">Max Range</div>
-        <div class="sensor-info-value" id="sensor-maxrange">1000 km</div>
-      </div>
-    </div>
-    <div id="findByLooks-menu">
-      <div class="title-text">Find By Looks</div>
-      <div id="findByLooks-content">
-        <fieldset>
-          <form id="findByLooks">
-            <div class="center">
-              <span class="vertcenter">Azimuth: </span>
-              <input type="text" class="ghost-input" id="fbl-azimuth" value="XXX.X">
-            </div>
-            <div class="center">
-              <span class="vertcenter">Margin: </span>
-              <input type="text" class="ghost-input" id="fbl-azimuth-margin" value="XX">
-            </div>
-            <div class="center">
-              <span class="vertcenter">Elevation: </span>
-              <input type="text" class="ghost-input" id="fbl-elevation" value="XX.X"></div>
-            <div class="center">
-              <span class="vertcenter">Margin: </span>
-              <input type="text" class="ghost-input" id="fbl-elevation-margin" value="XX"></div>
-            <div class="center">
-              <span class="vertcenter">Range: </span>
-              <input type="text" class="ghost-input" id="fbl-range" value="XXXX.X"></div>
-            <div class="center">
-              <span class="vertcenter">Margin: </span>
-              <input type="text" class="ghost-input" id="fbl-range-margin" value="XXXX"></div>
-            <div class="center">
-              <span class="vertcenter">Inclination: </span>
-              <input type="text" class="ghost-input" id="fbl-inc" value="XX.X"></div>
-            <div class="center">
-              <span class="vertcenter">Margin: </span>
-              <input type="text" class="ghost-input" id="fbl-inc-margin" value="XX.X"></div>
-            <div class="center">
-              <input type="submit" id="findByLooks-submit" class="ghost-button" value="Search">
-            </div>
-          </form>
-        </fieldset>
-        <span id="findByLooks-results"></span>
-      </div>
-    </div>
-    <div id="lookangles-menu">
-      <div class="title-text">Sensor Look Angles</div>
-      <div id="lookangles-content">
-        <table id="looks"  cellpadding="5"></table>
-      </div>
-    </div>
-    <div id="lookanglesmultisite-menu">
-      <div class="title-text">Multi-Sensor Look Angles</div>
-      <div id="lookanglesmultisite-content">
-        <table id="looksmultisite"  cellpadding="5"></table>
-      </div>
-    </div>
-    <div id="twitter-menu"></div>
-    <div id="weather-menu">
-      <img id="weather-image">
-    </div>
-    <div id="space-weather-menu">
-      <img id="space-weather-image">
-    </div>
-    <div id="socrates-menu">
-      <div class="title-text">Possible Collisions</div>
-      <div id="socrates-content">
-        <table id="socrates-table"  width="400px" cellpadding="5"></table>
-      </div>
-    </div>
-    <div id="settings-menu">
-      <div class="title-text">Settings</div>
-      <div id="settings-content">
-        <fieldset>
-          <form id="settings-form">
-            <div class="center">
-              <input id="settings-resetSensor" type="checkbox" class="css-checkbox">
-              <label for="settings-resetSensor" class="css-label">Reset Sensor</label>
-            </div>
-            <div class="center">
-              <input id="settings-hos" type="checkbox" class="css-checkbox">
-              <label for="settings-hos" class="css-label">Hide Other Satellites</label>
-            </div>
-            <div class="center">
-              <input id="settings-onlyfov" type="checkbox" class="css-checkbox">
-              <label for="settings-onlyfov" class="css-label">Show Only Sensor FOV</label>
-            </div>
-            <div class="center">
-              <br /><br />
-              <span>Only on Fast Computers:</span>
-              <br /><br />
-              <input id="settings-snp" type="checkbox" class="css-checkbox">
-              <label for="settings-snp" class="css-label">Show Next Pass on Hover</label>
-            </div>
-            <div class="center">
-              <input type="submit" id="settings-submit" class="ghost-button" value="Update">
-            </div>
-          </form>
-        </fieldset>
-        <span id="findByLooks-results"></span>
-      </div>
-    </div>
-    <div id="editSat-menu">
-      <div class="title-text">Edit Satellite</div>
-      <div id="editSat-content">
-        <fieldset>
-          <form id="editSat">
-            <div class="center">
-              <span class="vertcenter">SCC#: </span>
-              <input type="text" class="ghost-input" id="es-scc" value="AAAAA"></div>
-            <div class="center">
-              <span class="vertcenter">Epoch Year: </span>
-              <input type="text" class="ghost-input" id="es-year" value="AA"></div>
-            <div class="center">
-              <span class="vertcenter">Epoch Day: </span>
-              <input type="text" class="ghost-input" id="es-day" value="AAA.AAAAAAAA"></div>
-            <div class="center">
-              <span class="vertcenter">Inclination: </span>
-              <input type="text" class="ghost-input" id="es-inc" value="AAA.AAAA"></div>
-            <div class="center">
-              <span class="vertcenter">Right Ascension: </span>
-              <input type="text" class="ghost-input" id="es-rasc" value="AAA.AAAA"></div>
-            <div class="center">
-              <span class="vertcenter">Mean Motion: </span>
-              <input type="text" class="ghost-input" id="es-meanmo" value="AA.AAAAAAAA"></div>
-            <div class="center">
-              <span class="vertcenter">Eccentricity: </span>
-              <input type="text" class="ghost-input" id="es-ecen" value="AA.AAAAAAAA"></div>
-            <div class="center">
-              <span class="vertcenter">Arg. of Perigee: </span>
-              <input type="text" class="ghost-input" id="es-argPe" value="AA.AAAAAAAA"></div>
-            <div class="center">
-              <span class="vertcenter">Mean Anomaly: </span>
-              <input type="text" class="ghost-input" id="es-meana" value="AAA.AAAA"></div>
-            <div class="center">
-              <input type="submit" id="editSat-submit" class="ghost-button" value="Update Satellite">
-            </div>
-          </form>
-        </fieldset>
-      </div>
-    </div>
-    <div id="newLaunch-menu">
-      <div class="title-text">New Launch</div>
-      <div id="newLaunch-content">
-        <fieldset>
-          <form id="newLaunch">
-            <div class="center">
-              <span class="vertcenter">SCC#: </span>
-              <input type="text" class="ghost-input" id="nl-scc" value="AAAAA">
-            </div>
-            <div class="center">
-              <ul class='dropdown'>
-        		     <li id="launch-site-dropdown"><a href='index.html'>Launch Site</a>
-        		     	<span></span>
-        		        <ul class="dropdown-box">
-        		           <li><a href='#'>Jiuquan Satellite Launch Center</a></li>
-        		           <li><a href='#'>Taiyuan Satellite Launch Center</a></li>
-        		           <li><a href='#'>Xichang Satellite Launch Center</a></li>
-        		           <li><a href='#'>Wenchang Satellite Launch Center</a></li>
-        		        </ul>
-        		     </li>
-        		  </ul>
-            </div>
-            <div class="center">
-              <span class="vertcenter">Apogee: </span>
-              <input type="text" class="ghost-input" id="nl-apogee" value="AA.AAAAAAAA"></div>
-            <div class="center">
-              <span class="vertcenter">Perigee: </span>
-              <input type="text" class="ghost-input" id="nl-perigee" value="AA.AAAAAAAA"></div>
-            <div class="center">
-              <span class="vertcenter">Launch Latitude: </span>
-              <input type="text" class="ghost-input" id="nl-lat" value="AAA.AAAA"></div>
-            <div class="center">
-              <span class="vertcenter">Launch Longitude: </span>
-              <input type="text" class="ghost-input" id="nl-lon" value="AA.AAAAAAAA"></div>
-            <div class="center">
-              <input type="submit" id="newLaunch-submit" class="ghost-button" value="Calculate New ELSET">
-            </div>
-          </form>
-        </fieldset>
-      </div>
-    </div>
-    <div id="iss-stream-menu">
-      <div id="iss-stream"></div>
-    </div>
 
-    <div id="sat-infobox">
-      <div id="sat-info-title" class="center-text">This is a title</div>
-      <div id="all-objects-link" class="link sat-infobox-links">Find all objects from this launch...</div>
-      <div id="near-objects-link" class="link sat-infobox-links">Find all objects near this object...</div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Int'l Designator</div>
-        <div class="sat-info-value" id="sat-intl-des">XXXX-XXXA</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Object number</div>
-        <div class="sat-info-value" id="sat-objnum">99999</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Type</div>
-        <div class="sat-info-value" id="sat-type">PAYLOAD</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Country</div>
-        <div class="sat-info-value" id="sat-country">COUNTRY</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Launch Site</div>
-        <div class="sat-info-value" id="sat-site">SITE</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key"></div>
-        <div class="sat-info-value" id="sat-sitec">LAUNCH COUNTRY</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Launch Vehicle</div>
-        <div class="sat-info-value" id="sat-vehicle">VEHICLE</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Apogee</div>
-        <div class="sat-info-value" id="sat-apogee">XXX km</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Perigee</div>
-        <div class="sat-info-value" id="sat-perigee">XXX km</div>
-      </div>
-       <div class="sat-info-row">
-        <div class="sat-info-key">Inclination</div>
-        <div class="sat-info-value" id="sat-inclination">XXX.XX</div>
-      </div>
-       <div class="sat-info-row">
-        <div class="sat-info-key">Eccentricity</div>
-        <div class="sat-info-value" id="sat-eccentricity">X.XX</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Longitude</div>
-        <div class="sat-info-value" id="sat-longitude">X.XX</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Latitude</div>
-        <div class="sat-info-value" id="sat-latitude">X.XX</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Sun</div>
-        <div class="sat-info-value" id="sat-sun">Sun Stuff</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Altitude</div>
-        <div class="sat-info-value" id="sat-altitude">XXX km</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Velocity</div>
-        <div class="sat-info-value" id="sat-velocity">XXX km/s</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Azimuth</div>
-        <div class="sat-info-value" id="sat-azimuth">XX deg</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Elevation</div>
-        <div class="sat-info-value" id="sat-elevation">XX deg</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Range</div>
-        <div class="sat-info-value" id="sat-range">XXXX km</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Period</div>
-        <div class="sat-info-value" id="sat-period">XXX min</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">Age of ELSET</div>
-        <div class="sat-info-value" id="sat-elset-age">XXX.XXXX</div>
-      </div>
-      <div class="sat-info-row">
-        <div class="sat-info-key">RCS</div>
-        <div class="sat-info-value" id="sat-rcs">MEDIUM</div>
-      </div>
-    </div>
+      <div id="bottom-menu">Current Objects</div>
 
+    </div>
+  </main>
+
+  <footer class="page-footer">
     <div id="datetime">
         <div id="datetime-text"></div>
         <div id="datetime-input">
@@ -496,63 +593,61 @@
           </form>
         </div>
     </div>
-
-    <div id="bottom-menu">Current Objects</div>
-    <div id="bottom-icons-container">
+    <div id="bottom-icons-container" class="container center">
       <div id="bottom-icons">
-       <div id="menu-sensor-info" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Sensor Information">
-         <img src="" delayedsrc="images/radar.png" class="bmenu-item-disabled" alt="Sensor Info">
-       </div>
-       <div id="menu-in-coverage" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Current Sensor Coverage">
-         <img src="" delayedsrc="images/radar-1.png" class="bmenu-item-disabled" alt="Look Angles">
-       </div>
-       <div id="menu-lookangles" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Sensor Lookangles">
-         <img src="" delayedsrc="images/telescope.png" class="bmenu-item-disabled" alt="Look Angles">
-       </div>
-       <div id="menu-lookanglesmultisite" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="SSN Lookangles">
-         <img src="" delayedsrc="images/orbit.png" class="bmenu-item-disabled" alt="Look Angles">
-       </div>
-       <div id="menu-find-sat" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Search Orbit">
-         <img src="" delayedsrc="images/findOrbit.png" class="bmenu-item-disabled" alt="Twitter">
-       </div>
-       <div id="menu-twitter" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Space News on Twitter">
-         <img src="" delayedsrc="images/twitter.png" class="bmenu-item-disabled" alt="Twitter">
-       </div>
-       <div id="menu-weather" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Terrestrial Weather">
-         <img src="" delayedsrc="images/sun.png" class="bmenu-item-disabled" alt="Weather">
-       </div>
-       <div id="menu-space-weather" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Geomagnetic Information">
-         <img src="" delayedsrc="images/geomagnetic.png" class="bmenu-item-disabled" alt="Weather">
-       </div>
-       <div id="menu-launches" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Launch Schedule">
-         <img src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item-disabled" alt="Launches">
-       </div>
-       <div id="menu-astronauts" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Objects that can Support Humans">
-         <img src="" delayedsrc="images/astronaut.png" class="bmenu-item-disabled" alt="Astronauts">
-       </div>
-       <div id="menu-space-stations" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist">
-         <img src="" delayedsrc="images/space-station-1.png" class="bmenu-item-disabled" alt="Interesting Satellites">
-       </div>
-       <div id="menu-satellite-collision" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
-         <img src="" delayedsrc="images/satellite-collision.png" class="bmenu-item-disabled" alt="Collision">
-       </div>
-       <div id="menu-settings" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Settings">
-         <img src="" delayedsrc="images/gear-icon.png" class="bmenu-item-disabled" alt="Settings">
-       </div>
-       <div id="menu-editSat" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Edit Satellites">
-         <img src="" delayedsrc="images/editPencil.png" class="bmenu-item-disabled" alt="Edit satellite">
-       </div>
-       <div id="menu-newLaunch" class="bmenu-item tooltipped" data-position="bottom" data-delay="50" data-tooltip="Create Launch Nominal">
-         <img src="" delayedsrc="images/rocket-ship.png" class="bmenu-item-disabled" alt="New Launches">
-       </div>
+        <div id="menu-sensor-info" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Sensor Information">
+          <img src="" delayedsrc="images/radar.png" class="bmenu-item-disabled" alt="Sensor Info">
+        </div>
+        <div id="menu-in-coverage" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Current Sensor Coverage">
+          <img src="" delayedsrc="images/radar-1.png" class="bmenu-item-disabled" alt="Look Angles">
+        </div>
+        <div id="menu-lookangles" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Sensor Lookangles">
+          <img src="" delayedsrc="images/telescope.png" class="bmenu-item-disabled" alt="Look Angles">
+        </div>
+        <div id="menu-lookanglesmultisite" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="SSN Lookangles">
+          <img src="" delayedsrc="images/orbit.png" class="bmenu-item-disabled" alt="Look Angles">
+        </div>
+        <div id="menu-find-sat" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Search Orbit">
+          <img src="" delayedsrc="images/findOrbit.png" class="bmenu-item-disabled" alt="Twitter">
+        </div>
+        <div id="menu-twitter" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
+          <img src="" delayedsrc="images/twitter.png" class="bmenu-item-disabled" alt="Twitter">
+        </div>
+        <div id="menu-weather" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Terrestrial Weather">
+          <img src="" delayedsrc="images/sun.png" class="bmenu-item-disabled" alt="Weather">
+        </div>
+        <div id="menu-space-weather" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Geomagnetic Information">
+          <img src="" delayedsrc="images/geomagnetic.png" class="bmenu-item-disabled" alt="Weather">
+        </div>
+        <div id="menu-launches" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
+          <img src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item-disabled" alt="Launches">
+        </div>
+        <div id="menu-astronauts" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Objects that can Support Humans">
+          <img src="" delayedsrc="images/astronaut.png" class="bmenu-item-disabled" alt="Astronauts">
+        </div>
+        <div id="menu-space-stations" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist">
+          <img src="" delayedsrc="images/space-station-1.png" class="bmenu-item-disabled" alt="Interesting Satellites">
+        </div>
+        <div id="menu-satellite-collision" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
+          <img src="" delayedsrc="images/satellite-collision.png" class="bmenu-item-disabled" alt="Collision">
+        </div>
+        <div id="menu-settings" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Settings">
+          <img src="" delayedsrc="images/gear-icon.png" class="bmenu-item-disabled" alt="Settings">
+        </div>
+        <div id="menu-editSat" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Edit Satellites">
+          <img src="" delayedsrc="images/editPencil.png" class="bmenu-item-disabled" alt="Edit satellite">
+        </div>
+        <div id="menu-newLaunch" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Create Launch Nominal">
+          <img src="" delayedsrc="images/rocket-ship.png" class="bmenu-item-disabled" alt="New Launches">
+        </div>
       </div>
     </div>
-
-    <div id="zoom-controls">
+    <div id="zoom-controls" style="display:none;">
       <div id="zoom-in" class="zoom-button">+</div>
       <div id="zoom-out" class="zoom-button">-</div>
     </div>
-  </div>
+  </footer>
+
   <!-- Load jquery CSS -->
   <link rel="stylesheet" href="css/perfect-scrollbar.min.css" type="text/css">
   <link rel="stylesheet" href="css/jquery-ui.min.css" type="text/css">

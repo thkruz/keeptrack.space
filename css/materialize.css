@@ -4040,7 +4040,7 @@ nav a {
 nav i,
 nav [class^="mdi-"], nav [class*="mdi-"],
 nav i.material-icons {
-  display: block;
+  display: inline-block;
   font-size: 24px;
   height: 56px;
   line-height: 56px;
@@ -4141,7 +4141,7 @@ nav ul a {
   transition: background-color .3s;
   font-size: 1rem;
   color: #fff;
-  display: block;
+  display: inline-block;
   padding: 0 15px;
   cursor: pointer;
 }
@@ -5257,7 +5257,7 @@ button.btn-floating {
   color: #0277bd;
   display: block;
   line-height: 22px;
-  padding: 14px 16px;
+  /*padding: 14px 16px;*/
 }
 
 .dropdown-content li > span > label {

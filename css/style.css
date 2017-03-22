@@ -258,6 +258,11 @@ ul {
     display: none;
     z-index: 1;
 }
+
+#sensor-info-menu a {
+  color: white !important;
+}
+
   .sensor-info-row {
       text-align: center;
       margin: 20px;
@@ -303,17 +308,17 @@ ul {
 #iss-stream-menu {
   display: none;
   position: absolute;
-  background: rgba(0, 0, 0, 1);
-  width: 300px;
+  width: 270px;
   height: 620px;
-  border-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 10;
-  left: 0;
-  top: 8%;
-  overflow: none;
-  color: white;
+  margin-left: -15px;
 }
+
+#iss-stream-menu iframe {
+  width: 285px;
+  margin-bottom: -6px;
+}
+
 #launch-menu {
   display: none;
   background: rgba(0, 0, 0, 0.5);
@@ -598,8 +603,7 @@ ul li{
 }
 .sat-info-key {
     font-size: 14px;
-    color: #01579b;
-    font-weight: bold;
+    color: white;
     float: left;
 }
 .sat-info-value {
@@ -611,7 +615,7 @@ ul li{
     left: 20px;
     bottom: -5px;
     z-index: 11;
-    width: 170px;
+    width: 210px;
     height: 50px;
     background: transparent;
     overflow: hidden;
@@ -676,30 +680,58 @@ ul li{
     cursor: pointer;
     z-index: 11;
 }
+
+@media only screen and (max-width: 992px) {
+  #bottom-icons {
+    position: absolute;
+    right: 0px;
+  }
+}
+
 #bottom-icons div:first-of-type {
     margin-left: 0px;
 }
 .bmenu-item {
     height: 30px;
-    margin-left: 10px;
+    /*margin-left: 10px;*/
 }
 .bmenu-item img {
+    background: transparent;
     height: 30px;
-    padding: 5px;
+    padding: 10px;
+    position: relative;
+    border-right: 2px;
+    border-right-style: solid;
+    border-right-color: steelblue;
+    bottom: 5px;
     width: 30px;
 }
+
+#menu-sensor-info img {
+  border-left: 2px;
+  border-left-style: solid;
+  border-left-color: steelblue;
+}
+
 .bmenu-item img:hover {
     background: rgba(255, 255, 255, 0.4);
-    border-radius: 5px;
+    /*border-radius: 5px;*/
 }
 .bmenu-item-selected {
-    border-radius: 5px;
+    /*border-radius: 5px;*/
     height: 30px;
-    background: #c33;
+    background: #c33 !important;
 }
 .bmenu-item-disabled {
-    opacity: 0.4;
+    /*opacity: 0.4;*/
+    background: lightslategrey !important;
     filter: grayscale();
+}
+
+@media only screen and (max-width: 992px) {
+  .bmenu-item-disabled {
+      display: none;
+  }
 }
 
 #zoom-controls {

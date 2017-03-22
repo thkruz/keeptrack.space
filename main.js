@@ -1401,10 +1401,6 @@ $(document).ready(function () { // Code Once index.php is loaded
 
     var TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
     var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
-    console.log(sat.TLE1);
-    console.log(sat.TLE2);
-    console.log(TLE1);
-    console.log(TLE2);
 
     satCruncher.postMessage({
       typ: 'satEdit',
@@ -1424,10 +1420,11 @@ $(document).ready(function () { // Code Once index.php is loaded
     var sat = satSet.getSat(satId);
     // var intl = sat.INTLDES.trim();
 
+    var upOrDown = $('#nl-updown').val();
+
     // TODO: Calculate current J-Day to change Epoch Date
 
     var launchFac = $('#nl-facility').val();
-    console.log(launchFac);
     launchFac = launchFac * 1; //Convert to number
 
     switch (launchFac) {
@@ -1498,7 +1495,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       break;
     }
 
-    var TLEs = lookangles.getOrbitByLatLon(sat, launchLat, launchLon);
+    var TLEs = lookangles.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown);
 
     var TLE1 = TLEs[0];
     var TLE2 = TLEs[1];
@@ -2187,6 +2184,7 @@ function bottomIconPress (evt) {
 
           sat = satSet.getSat(selectedSat);
           $('#nl-scc').val(sat.SCC_NUM);
+          $('#nl-inc').val((sat.inclination * R2D).toPrecision(2));
         } else {
           if (!$('#menu-newLaunch img:animated').length) {
             $('#menu-newLaunch img').effect('shake', {distance: 10});
@@ -3557,7 +3555,6 @@ var lookangles = (function () {
       tblLength += propagateMultiSite(propOffset2, tbl, satrec, sensor);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
       if (tblLength > lastTblLength) {                           // Maximum of 1500 lines in the look angles table
         lastTblLength++;
-        console.log(howManyPasses);
         if (howManyPasses === 1) { // When 3 passes have been complete - looks weird with 1 instead of 0
           sensor++;
           setSensor(sensor);
@@ -3570,8 +3567,6 @@ var lookangles = (function () {
         }
       }
       if (sensor === 9) {
-        console.log(howManyPasses);
-        console.log("Reset Sensor");
         getTempSensor(resetWhenDone);
         break;
       }
@@ -3585,27 +3580,43 @@ var lookangles = (function () {
     getTempSensor(resetWhenDone);
   };
 
-  var getOrbitByLatLon = function (sat, goalLat, goalLon) {
-    // Set default timing settings. These will be changed to find look angles at different times in future.
-    var propOffset2 = 0;               // offset letting us propagate in the future (or past)
-    // var propRealTime = Date.now();      // Set current time
+  var getOrbitByLatLon = function (sat, goalLat, goalLon, upOrDown) {
     var curPropOffset = getPropOffset();
+    var propRealTime = Date.now();
     var mainTLE1;
     var mainTLE2;
     var mainMeana;
     var mainRasc;
+    var lastLat
+    var isUpOrDown;
+    var rascOffset = false;
+
+    // Longitude is passed in 0 to 360 instead of -180 to 180.
+
+    if (upOrDown === undefined || upOrDown === null) {
+      upOrDown = 'Up';
+    }
 
     goalLat = goalLat * 1;
+    goalLon = goalLon * 1;
 
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);
 
-    for (var i = 0; i < (360 * 10); i += 1) {         // 360 degress in 0.1 increments TODO More precise?
-      if (meanaCalc(i)){
-        break;
+    for (var i = 0; i < (400 * 10); i += 1) {         // 400 degress in 0.1 increments. Going extra 40 degrees to be safe. TODO More precise?
+      if (meanaCalc(i, rascOffset)){
+        if (isUpOrDown !== upOrDown) {
+          rascOffset = true;
+          i = i + 20; // Move a little ahead in the orbit to prevent being close on the next lattiude check
+        } else {
+          break; //Stop changing the Mean Anomaly
+        }
       }
     }
 
-    for (var i = 0; i < (520 * 100); i += 1) {         // 360 degress in 0.01 increments TODO More precise?
+    for (var i = 0; i < (700 * 100); i += 1) {         // 520 degress in 0.01 increments TODO More precise?
+      if (rascOffset && i === 0) {
+        i = (mainRasc - 10) * 100;
+      }
       if (rascCalc(i)){
         break;
       }
@@ -3617,7 +3628,7 @@ var lookangles = (function () {
       return str.length < max ? pad('0' + str, max) : str;
     }
 
-    function meanaCalc (meana) {
+    function meanaCalc (meana, rascOffset) {
       var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
 
       var meana = meana / 10;
@@ -3625,7 +3636,14 @@ var lookangles = (function () {
       meana = pad(meana, 8);
 
       var rasc = (sat.raan * R2D).toPrecision(7);
-      rasc = rasc.split('.');
+      if (rascOffset) {
+        rasc = (rasc * 1) + 180; // Spin the orbit 180 degrees.
+        if (rasc > 360) {
+          rasc = (rasc * 1) - 360; // angle can't be bigger than 360
+        }
+      }
+      mainRasc = rasc;
+      rasc = rasc.toString().split('.');
       rasc[0] = rasc[0].substr(-3, 3);
       rasc[1] = rasc[1].substr(0, 4);
       rasc = (rasc[0] + '.' + rasc[1]).toString();
@@ -3661,6 +3679,7 @@ var lookangles = (function () {
       var TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
       var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
 
+
       satrec = satellite.twoline2satrec(TLE1, TLE2);
       if (propagate(curPropOffset, satrec, 1)) {
         mainTLE1 = TLE1;
@@ -3677,12 +3696,16 @@ var lookangles = (function () {
       var meana = mainMeana;
 
       rasc = rasc / 100;
+      if (rasc > 360) {
+        rasc = rasc - 360; // angle can't be bigger than 360
+      }
       rasc = rasc.toPrecision(7);
       rasc = rasc.split('.');
       rasc[0] = rasc[0].substr(-3, 3);
       rasc[1] = rasc[1].substr(0, 4);
       rasc = (rasc[0] + '.' + rasc[1]).toString();
       rasc = pad(rasc, 8);
+      mainRasc = rasc;
 
       var scc = sat.SCC_NUM;
 
@@ -3714,6 +3737,7 @@ var lookangles = (function () {
       mainTLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
       mainTLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
 
+
       satrec = satellite.twoline2satrec(mainTLE1, mainTLE2);
 
       if (propagate(curPropOffset, satrec, 2)) {
@@ -3722,9 +3746,8 @@ var lookangles = (function () {
       return 0;
     }
 
-    function propagate (propOffset2, satrec, type) {
-      propRealTime = Date.now();
-      var now = propTime(propOffset2, propRealTime);
+    function propagate (curPropOffset, satrec, type) {
+      var now = propTime(curPropOffset, propRealTime);
       var j = jday(now.getUTCFullYear(),
                    now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                    now.getUTCDate(),
@@ -3744,11 +3767,27 @@ var lookangles = (function () {
       lat = (gpos.latitude * 180 / Math.PI).toFixed(3);
       lon = (((gpos.longitude * 180 / Math.PI) + 360) % 360).toFixed(3);
 
+      // if (lon < -180) {
+      //   lon = ((lon * 1) + 360).toFixed(3);
+      // }
+
+      if (type === 1) {
+        if (lat > lastLat) {
+          isUpOrDown = 'Up';
+        } else {
+          isUpOrDown = 'Down';
+        }
+        lastLat = lat;
+      }
+
+      if (type === 2) {
+      }
+
       if (lat > (goalLat - 0.05) && lat < (goalLat + 0.05) && type === 1) {
         return 1;
       }
 
-      if (lon > (goalLon - 0.05) && lon < (goalLon + 0.05) && type === 2) {
+      if (lon > (goalLon - 0.1) && lon < (goalLon + 0.1) && type === 2) {
         return 1;
       }
       return 0;
@@ -3841,7 +3880,6 @@ var lookangles = (function () {
   function setSensor (sensor) {
     switch (sensor) {
       case 0:// Cod
-        console.log("Set Cod");
         setobs({
           lat: 41.754785,
           long: -70.539151,
@@ -3855,7 +3893,6 @@ var lookangles = (function () {
         });
         break;
       case 1:// Clear
-        console.log("Set Clear");
         setobs({
           lat: 64.290556,
           long: -149.186944,
@@ -3869,7 +3906,6 @@ var lookangles = (function () {
         });
         break;
       case 2:// Beale
-        console.log("Set Beale");
         setobs({
           lat: 39.136064,
           long: -121.351237,
@@ -3883,7 +3919,6 @@ var lookangles = (function () {
         });
         break;
       case 3:// Cavalier
-        console.log("Set Cavalier");
         setobs({
           lat: 48.724567,
           long: -97.899755,
@@ -3897,7 +3932,6 @@ var lookangles = (function () {
         });
         break;
       case 4:// Fylingdales
-        console.log("Set Fylingdales");
         setobs({
           lat: 54.361758,
           long: -0.670051,
@@ -3911,7 +3945,6 @@ var lookangles = (function () {
         });
         break;
       case 5:// Eglin
-        console.log("Set Eglin");
         setobs({
           lat: 30.572411,
           long: -86.214836,
@@ -3925,7 +3958,6 @@ var lookangles = (function () {
         });
         break;
       case 6:// Thule
-        console.log("Set Thule");
         setobs({
           lat: 76.570322,
           long: -68.299211,
@@ -3939,7 +3971,6 @@ var lookangles = (function () {
         });
         break;
       case 7:// Millstone
-        console.log("Set Millstone");
         setobs({
           lat: 42.6233,
           long: -71.4882,
@@ -3953,7 +3984,6 @@ var lookangles = (function () {
         });
         break;
       case 8:// ALTAIR
-        console.log("Set ALTAIR");
         setobs({
           lat: 8.716667,
           long: 167.733333,

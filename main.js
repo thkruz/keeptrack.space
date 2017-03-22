@@ -297,9 +297,8 @@ $(document).ready(function () { // Code Once index.php is loaded
     // if(evt.which === 3) {//RMB
     if (!dragHasMoved) {
       var clickedSat = getSatIdFromCoord(evt.clientX, evt.clientY);
-      console.log(clickedSat);
       if (clickedSat === -1 && evt.button === 2) { // Right Mouse Buttom Click
-        clearMenuCountries();
+        // clearMenuCountries();
         $('#search').val('');
         searchBox.hideResults();
         isAstronautsSelected = false;
@@ -307,6 +306,11 @@ $(document).ready(function () { // Code Once index.php is loaded
         isMilSatSelected = false;
         $('#menu-space-stations img').removeClass('bmenu-item-selected');
         $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
+
+        if (lookangles.obslat !== null) {
+          $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
+        }
+
       }
       selectSat(clickedSat);
     }
@@ -466,7 +470,8 @@ $(document).ready(function () { // Code Once index.php is loaded
     });
 
     whichRadar = 'CLR';
-    $('#sensor-info-title').html('Clear AFS');
+    $('#sensor-info-title').html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html'>Clear AFS</a>");
+    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
     $('#sensor-country').html('United States');
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
@@ -504,7 +509,8 @@ $(document).ready(function () { // Code Once index.php is loaded
     });
 
     whichRadar = 'EGL';
-    $('#sensor-info-title').html('Eglin AFB');
+    $('#sensor-info-title').html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte002.en.html'>Eglin AFB</a>");
+    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
     $('#sensor-country').html('United States');
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
@@ -542,7 +548,8 @@ $(document).ready(function () { // Code Once index.php is loaded
     });
 
     whichRadar = 'FYL';
-    $('#sensor-info-title').html('RAF Fylingdales');
+    $('#sensor-info-title').html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html'>RAF Fylingdales</a>");
+    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
     $('#sensor-country').html('United Kingdom');
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
@@ -580,7 +587,8 @@ $(document).ready(function () { // Code Once index.php is loaded
     });
 
     whichRadar = 'PAR';
-    $('#sensor-info-title').html('Cavalier AFS');
+    $('#sensor-info-title').html("<a class='iframe' href='https://mostlymissiledefense.com/2012/04/12/parcs-cavalier-radar-april-12-2012/'>Cavalier AFS</a>");
+    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
     $('#sensor-country').html('United States');
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
@@ -618,7 +626,8 @@ $(document).ready(function () { // Code Once index.php is loaded
     });
 
     whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('Thule Air Base');
+    $('#sensor-info-title').html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html'>Thule AFB</a>");
+    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
     $('#sensor-country').html('United States');
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Phased Array');
@@ -659,7 +668,8 @@ $(document).ready(function () { // Code Once index.php is loaded
     });
 
     whichRadar = '';
-    $('#sensor-info-title').html('ARPA Long-Range Tracking and Instrumentation Radar');
+    $('#sensor-info-title').html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte005.en.html'>ALTAIR</a>");
+    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
     $('#sensor-country').html('United States');
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Mechanical');
@@ -697,7 +707,8 @@ $(document).ready(function () { // Code Once index.php is loaded
     });
 
     whichRadar = 'MIL';
-    $('#sensor-info-title').html('Millstone Hill Steerable Antenna');
+    $('#sensor-info-title').html("<a class='iframe' href='https://mostlymissiledefense.com/2012/05/05/space-surveillance-sensors-millstone-hill-radar/'>Millstone Hill Steerable Antenna</a>");
+    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
     $('#sensor-country').html('United States');
     $('#sensor-sun').html('No Impact');
     $('#sensor-type').html('Mechanical');
@@ -737,7 +748,8 @@ $(document).ready(function () { // Code Once index.php is loaded
     });
 
     whichRadar = 'DGC';
-    $('#sensor-info-title').html('Diego Garcia GEODSS');
+    $('#sensor-info-title').html("<a class='iframe' href='https://mostlymissiledefense.com/2012/08/20/space-surveillance-sensors-geodss-ground-based-electro-optical-deep-space-surveillance-system-august-20-2012/'>Diego Garcia GEODSS</a>");
+    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
     $('#sensor-country').html('United States');
     $('#sensor-sun').html('No Impact');
 
@@ -1414,19 +1426,90 @@ $(document).ready(function () { // Code Once index.php is loaded
 
     // TODO: Calculate current J-Day to change Epoch Date
 
-    // var launchLat = $('#nl-perigee').val();
-    // var launchLon = $('#nl-perigee').val();
+    var launchFac = $('#nl-facility').val();
+    console.log(launchFac);
+    launchFac = launchFac * 1; //Convert to number
 
-    // var TLE1 = '1 ' + scc + 'U ' + intl + '   16339.76789353 -.00000000 +00000-0 -00000+0 0  0010'; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    // var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
+    switch (launchFac) {
+      // If Longitude is west then subtract from 360
+      case 1: //Cape Canaveral
+        var launchLat = 28.466;
+        var launchLon = (360 - 80.558);
+      break;
+      case 2: //Vandenberg
+        var launchLat = 34.772;
+        var launchLon = (360 - 120.601);
+      break;
+      case 3: //Wallops
+        var launchLat = 37.846;
+        var launchLon = (360 - 75.479);
+      break;
+      case 4: //Kodiak
+        var launchLat = 57.435;
+        var launchLon = (360 - 152.339);
+      break;
+      case 5: //Baikonur
+        var launchLat = 45.955;
+        var launchLon = (63.350);
+      break;
+      case 6: //Plesetsk
+        var launchLat = 62.925;
+        var launchLon = (40.577);
+      break;
+      case 7: //Jiuquan SLC
+        var launchLat = 41.118;
+        var launchLon = (100.463);
+      break;
+      case 8: //Taiyuan SLC
+        var launchLat = 39.143;
+        var launchLon = (111.967);
+      break;
+      case 9: //Xichang
+        var launchLat = 28.246;
+        var launchLon = (102.028);
+      break;
+      case 10: //Wenchang
+        var launchLat = 19.614;
+        var launchLon = (110.951);
+      break;
+      case 11: //Tanegashima
+        var launchLat = 39.389;
+        var launchLon = (130.968);
+      break;
+      case 12: //Uchinoura
+        var launchLat = 31.251;
+        var launchLon = (131.079);
+      break;
+      case 13: //Koruou, French Guiana
+        var launchLat = 5.237;
+        var launchLon = (360 - 52.769);
+      break;
+      case 14: //Onenui Station, NZ
+        var launchLat = -39.260;
+        var launchLon = (177.865);
+      break;
+      case 15: //Sriharikota, India
+        var launchLat = 13.737;
+        var launchLon = (80.235);
+      break;
+      case 16: //Semnan, Iran
+        var launchLat = 35.234;
+        var launchLon = (53.920);
+      break;
+    }
 
-    // satCruncher.postMessage({
-    //   typ: 'satEdit',
-    //   id: satId,
-    //   TLE1: TLE1,
-    //   TLE2: TLE2
-    // });
-    // orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
+    var TLEs = lookangles.getOrbitByLatLon(sat, launchLat, launchLon);
+
+    var TLE1 = TLEs[0];
+    var TLE2 = TLEs[1];
+
+    satCruncher.postMessage({
+       typ: 'satEdit',
+       id: satId,
+       TLE1: TLE1,
+       TLE2: TLE2
+    });
+    orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
     sat = satSet.getSat(satId);
     e.preventDefault();
@@ -2103,37 +2186,7 @@ function bottomIconPress (evt) {
           isNewLaunchMenuOpen = true;
 
           sat = satSet.getSat(selectedSat);
-          $('#es-scc').val(sat.SCC_NUM);
-
-          var inc = (sat.inclination * R2D).toPrecision(7);
-          inc = inc.split('.');
-          inc[0] = inc[0].substr(-3, 3);
-          inc[1] = inc[1].substr(0, 4);
-          inc = (inc[0] + '.' + inc[1]).toString();
-
-          $('#es-inc').val(pad(inc, 8));
-          $('#es-year').val(sat.TLE1.substr(18, 2));
-          $('#es-day').val(sat.TLE1.substr(20, 12));
-          $('#es-meanmo').val(sat.TLE2.substr(52, 11));
-
-          var rasc = (sat.raan * R2D).toPrecision(7);
-          rasc = rasc.split('.');
-          rasc[0] = rasc[0].substr(-3, 3);
-          rasc[1] = rasc[1].substr(0, 4);
-          rasc = (rasc[0] + '.' + rasc[1]).toString();
-
-          $('#es-rasc').val(pad(rasc, 8));
-          $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
-
-          var argPe = (sat.argPe * R2D).toPrecision(7);
-          argPe = argPe.split('.');
-          argPe[0] = argPe[0].substr(-3, 3);
-          argPe[1] = argPe[1].substr(0, 4);
-          argPe = (argPe[0] + '.' + argPe[1]).toString();
-
-          $('#es-argPe').val(pad(argPe, 8));
-          $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
-          // $('#es-rasc').val(sat.TLE2.substr(18 - 1, 7 + 1).toString());
+          $('#nl-scc').val(sat.SCC_NUM);
         } else {
           if (!$('#menu-newLaunch img:animated').length) {
             $('#menu-newLaunch img').effect('shake', {distance: 10});
@@ -2166,6 +2219,18 @@ function updateUrl () { // URL Updater
 
   if (propOffset < -1000 || propOffset > 1000) {
     paramSlices.push('hrs=' + (propOffset / 1000.0 / 3600.0).toString());
+  }
+
+  if (lookangles.obslat != null) {
+    paramSlices.push('lat=' + lookangles.obslat);
+    paramSlices.push('long=' + lookangles.obslong);
+    paramSlices.push('hei=' + lookangles.hei);
+    paramSlices.push('minaz=' + lookangles.obsminaz);
+    paramSlices.push('maxaz=' + lookangles.obsmaxaz);
+    paramSlices.push('minel=' + lookangles.obsminel);
+    paramSlices.push('maxel=' + lookangles.obsmaxel);
+    paramSlices.push('minrange=' + lookangles.obsminrange);
+    paramSlices.push('maxrange=' + lookangles.obsmaxrange);
   }
 
   if (paramSlices.length > 0) {
@@ -2210,6 +2275,14 @@ function selectSat (satId) {
   } else {
     camZoomSnappedOnSat = true;
     camAngleSnappedOnSat = true;
+
+    if (lookangles.obslat !== undefined) {
+      $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+    }
+
+    $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
+    $('#menu-editSat img').removeClass('bmenu-item-disabled');
+    $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
 
     satSet.selectSat(satId);
     camSnapToSat(satId);
@@ -3484,6 +3557,7 @@ var lookangles = (function () {
       tblLength += propagateMultiSite(propOffset2, tbl, satrec, sensor);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
       if (tblLength > lastTblLength) {                           // Maximum of 1500 lines in the look angles table
         lastTblLength++;
+        console.log(howManyPasses);
         if (howManyPasses === 1) { // When 3 passes have been complete - looks weird with 1 instead of 0
           sensor++;
           setSensor(sensor);
@@ -3496,11 +3570,189 @@ var lookangles = (function () {
         }
       }
       if (sensor === 9) {
+        console.log(howManyPasses);
+        console.log("Reset Sensor");
         getTempSensor(resetWhenDone);
         break;
       }
+      if (sensor < 9 && i === (7 * 24 * 60 * 60) - 5) { // Move to next sensor if this sensor doesn't have enough passes.
+        sensor++;
+        setSensor(sensor);
+        i = 0;
+        howManyPasses = 6;
+      }
     }
     getTempSensor(resetWhenDone);
+  };
+
+  var getOrbitByLatLon = function (sat, goalLat, goalLon) {
+    // Set default timing settings. These will be changed to find look angles at different times in future.
+    var propOffset2 = 0;               // offset letting us propagate in the future (or past)
+    // var propRealTime = Date.now();      // Set current time
+    var curPropOffset = getPropOffset();
+    var mainTLE1;
+    var mainTLE2;
+    var mainMeana;
+    var mainRasc;
+
+    goalLat = goalLat * 1;
+
+    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);
+
+    for (var i = 0; i < (360 * 10); i += 1) {         // 360 degress in 0.1 increments TODO More precise?
+      if (meanaCalc(i)){
+        break;
+      }
+    }
+
+    for (var i = 0; i < (520 * 100); i += 1) {         // 360 degress in 0.01 increments TODO More precise?
+      if (rascCalc(i)){
+        break;
+      }
+    }
+
+    return [mainTLE1, mainTLE2];
+
+    function pad (str, max) {
+      return str.length < max ? pad('0' + str, max) : str;
+    }
+
+    function meanaCalc (meana) {
+      var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
+
+      var meana = meana / 10;
+      meana = parseFloat(meana).toPrecision(7);
+      meana = pad(meana, 8);
+
+      var rasc = (sat.raan * R2D).toPrecision(7);
+      rasc = rasc.split('.');
+      rasc[0] = rasc[0].substr(-3, 3);
+      rasc[1] = rasc[1].substr(0, 4);
+      rasc = (rasc[0] + '.' + rasc[1]).toString();
+      rasc = pad(rasc, 8);
+
+      var scc = sat.SCC_NUM;
+
+      var intl = sat.TLE1.substr(9, 8);
+      var inc = (sat.inclination * R2D).toPrecision(7);
+      inc = inc.split('.');
+      inc[0] = inc[0].substr(-3, 3);
+      inc[1] = inc[1].substr(0, 4);
+      inc = (inc[0] + '.' + inc[1]).toString();
+
+      inc = pad(inc, 8);
+      var epochyr = sat.TLE1.substr(18, 2);
+      var epochday = sat.TLE1.substr(20, 12);
+
+      var meanmo = sat.TLE2.substr(52, 11);
+
+      var ecen = sat.eccentricity.toPrecision(7).substr(2, 7);
+
+      var argPe = (sat.argPe * R2D).toPrecision(7);
+      argPe = argPe.split('.');
+      argPe[0] = argPe[0].substr(-3, 3);
+      argPe[1] = argPe[1].substr(0, 4);
+      argPe = (argPe[0] + '.' + argPe[1]).toString();
+      argPe = pad(argPe, 8);
+
+
+      var TLE1Ending = sat.TLE1.substr(32, 39);
+
+      var TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+      var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
+
+      satrec = satellite.twoline2satrec(TLE1, TLE2);
+      if (propagate(curPropOffset, satrec, 1)) {
+        mainTLE1 = TLE1;
+        mainTLE2 = TLE2;
+        mainMeana = meana;
+        return 1;
+      }
+      return 0;
+    }
+
+    function rascCalc (rasc) {
+      var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
+
+      var meana = mainMeana;
+
+      rasc = rasc / 100;
+      rasc = rasc.toPrecision(7);
+      rasc = rasc.split('.');
+      rasc[0] = rasc[0].substr(-3, 3);
+      rasc[1] = rasc[1].substr(0, 4);
+      rasc = (rasc[0] + '.' + rasc[1]).toString();
+      rasc = pad(rasc, 8);
+
+      var scc = sat.SCC_NUM;
+
+      var intl = sat.TLE1.substr(9, 8);
+      var inc = (sat.inclination * R2D).toPrecision(7);
+      inc = inc.split('.');
+      inc[0] = inc[0].substr(-3, 3);
+      inc[1] = inc[1].substr(0, 4);
+      inc = (inc[0] + '.' + inc[1]).toString();
+
+      inc = pad(inc, 8);
+      var epochyr = sat.TLE1.substr(18, 2);
+      var epochday = sat.TLE1.substr(20, 12);
+
+      var meanmo = sat.TLE2.substr(52, 11);
+
+      var ecen = sat.eccentricity.toPrecision(7).substr(2, 7);
+
+      var argPe = (sat.argPe * R2D).toPrecision(7);
+      argPe = argPe.split('.');
+      argPe[0] = argPe[0].substr(-3, 3);
+      argPe[1] = argPe[1].substr(0, 4);
+      argPe = (argPe[0] + '.' + argPe[1]).toString();
+      argPe = pad(argPe, 8);
+
+
+      var TLE1Ending = sat.TLE1.substr(32, 39);
+
+      mainTLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+      mainTLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
+
+      satrec = satellite.twoline2satrec(mainTLE1, mainTLE2);
+
+      if (propagate(curPropOffset, satrec, 2)) {
+        return 1;
+      }
+      return 0;
+    }
+
+    function propagate (propOffset2, satrec, type) {
+      propRealTime = Date.now();
+      var now = propTime(propOffset2, propRealTime);
+      var j = jday(now.getUTCFullYear(),
+                   now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+                   now.getUTCDate(),
+                   now.getUTCHours(),
+                   now.getUTCMinutes(),
+                   now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+      j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+      var gmst = satellite.gstime_from_jday(j);
+
+      var m = (j - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+      var pv = satellite.sgp4(satrec, m);
+
+      var gpos, lat, lon;
+
+      gpos = satellite.eci_to_geodetic(pv.position, gmst);
+
+      lat = (gpos.latitude * 180 / Math.PI).toFixed(3);
+      lon = (((gpos.longitude * 180 / Math.PI) + 360) % 360).toFixed(3);
+
+      if (lat > (goalLat - 0.05) && lat < (goalLat + 0.05) && type === 1) {
+        return 1;
+      }
+
+      if (lon > (goalLon - 0.05) && lon < (goalLon + 0.05) && type === 2) {
+        return 1;
+      }
+      return 0;
+    }
   };
 
   var getlookangles = function (sat, isLookanglesMenuOpen) {
@@ -3589,6 +3841,7 @@ var lookangles = (function () {
   function setSensor (sensor) {
     switch (sensor) {
       case 0:// Cod
+        console.log("Set Cod");
         setobs({
           lat: 41.754785,
           long: -70.539151,
@@ -3602,7 +3855,8 @@ var lookangles = (function () {
         });
         break;
       case 1:// Clear
-        lookangles.setobs({
+        console.log("Set Clear");
+        setobs({
           lat: 64.290556,
           long: -149.186944,
           hei: 0.060966,
@@ -3615,7 +3869,8 @@ var lookangles = (function () {
         });
         break;
       case 2:// Beale
-        lookangles.setobs({
+        console.log("Set Beale");
+        setobs({
           lat: 39.136064,
           long: -121.351237,
           hei: 0.060966, // TODO: Find correct height
@@ -3628,7 +3883,8 @@ var lookangles = (function () {
         });
         break;
       case 3:// Cavalier
-        lookangles.setobs({
+        console.log("Set Cavalier");
+        setobs({
           lat: 48.724567,
           long: -97.899755,
           hei: 0.060966, // TODO: Find correct height
@@ -3641,7 +3897,8 @@ var lookangles = (function () {
         });
         break;
       case 4:// Fylingdales
-        lookangles.setobs({
+        console.log("Set Fylingdales");
+        setobs({
           lat: 54.361758,
           long: -0.670051,
           hei: 0.060966, // TODO: Find correct height
@@ -3654,7 +3911,8 @@ var lookangles = (function () {
         });
         break;
       case 5:// Eglin
-        lookangles.setobs({
+        console.log("Set Eglin");
+        setobs({
           lat: 30.572411,
           long: -86.214836,
           hei: 0.060966, // TODO: Confirm Altitude
@@ -3667,7 +3925,8 @@ var lookangles = (function () {
         });
         break;
       case 6:// Thule
-        lookangles.setobs({
+        console.log("Set Thule");
+        setobs({
           lat: 76.570322,
           long: -68.299211,
           hei: 0.060966, // TODO: Find correct height
@@ -3680,7 +3939,8 @@ var lookangles = (function () {
         });
         break;
       case 7:// Millstone
-        lookangles.setobs({
+        console.log("Set Millstone");
+        setobs({
           lat: 42.6233,
           long: -71.4882,
           hei: 0.131,
@@ -3693,7 +3953,8 @@ var lookangles = (function () {
         });
         break;
       case 8:// ALTAIR
-        lookangles.setobs({
+        console.log("Set ALTAIR");
+        setobs({
           lat: 8.716667,
           long: 167.733333,
           hei: 0,
@@ -3870,6 +4131,7 @@ var lookangles = (function () {
     nextpass: nextpass,
     getlookangles: getlookangles,
     getlookanglesMultiSite: getlookanglesMultiSite,
+    getOrbitByLatLon: getOrbitByLatLon,
     jday: jday,
     getTEARR: getTEARR,
     getsensorinfo: getsensorinfo
@@ -4153,12 +4415,17 @@ dateFormat.i18n = {
       } else {
         daysold = jday() - satSet.getSat(satId).TLE1.substr(20, 3) + (satSet.getSat(satId).TLE1.substr(17, 2) * 365);
       }
-      if (pe > lookangles.obsmaxrange || daysold < 100) {
+      if (pe > lookangles.obsmaxrange || daysold < 31) {
         return {
           color: [1.0, 1.0, 1.0, otherSatelliteTransparency],
           pickable: false
         };
       } else {
+        if ($('#search').val() === '') {
+          $('#search').val($('#search').val() + satSet.getSat(satId).SCC_NUM);
+        } else {
+          $('#search').val($('#search').val() + ',' + satSet.getSat(satId).SCC_NUM);
+        }
         return {
           color: [0.2, 1.0, 0.0, 0.65],
           pickable: true
@@ -4222,16 +4489,16 @@ dateFormat.i18n = {
   window.ColorScheme = ColorScheme;
 })();
 // **** groups.js ***
-function clearMenuCountries () {
-  groups.clearSelect();
-  // $('#menu-groups .menu-title').text('Groups');
-  $('#menu-countries .menu-title').text('Countries');
-
-  searchBox.fillResultBox('');
-
-  $('#menu-countries .clear-option').css({display: 'none'}); // Hide Clear Option
-  $('#menu-countries .country-option').css({display: 'block'}); // Show Country Options
-}
+// function clearMenuCountries () {
+//   groups.clearSelect();
+//   $('#menu-groups .menu-title').text('Groups');
+//   $('#menu-countries .menu-title').text('Countries');
+//
+//   searchBox.fillResultBox('');
+//
+//   $('#menu-countries .clear-option').css({display: 'none'}); // Hide Clear Option
+//   $('#menu-countries .country-option').css({display: 'block'}); // Show Country Options
+// }
 (function () {
   var groups = {};
   groups.selectedGroup = null;
@@ -4351,6 +4618,19 @@ function clearMenuCountries () {
         groups.selectGroup(groups[groupName]);
         searchBox.fillResultBox(groups[groupName].sats, '');
 
+        $('#search').val('');
+
+        var results = groups[groupName].sats;
+        for (var i = 0; i < results.length; i++) {
+          var satId = groups[groupName].sats[i].satId;
+          var scc = satSet.getSat(satId).SCC_NUM;
+          if (i === results.length - 1) {
+            $('#search').val($('#search').val() + scc);
+          } else {
+            $('#search').val($('#search').val() + scc + ',');
+          }
+        }
+
         $('#menu-countries .clear-option').css({display: 'block'}); // Show Clear Option
         $('#menu-countries .country-option').css({display: 'none'}); // Hide Country Options
         // $('#menu-groups .clear-option').css({display: 'block'});
@@ -4361,11 +4641,12 @@ function clearMenuCountries () {
       $('#groups-display').css({
         display: 'none'
       });
+
     });
     $('#colors-menu>li').click(function () {
       selectSat(-1); // clear selected sat
       var colorName = $(this).data('color');
-      clearMenuCountries();
+      // clearMenuCountries();
       switch (colorName) {
         case 'default':
           satSet.setColorScheme(ColorScheme.default);
@@ -4380,7 +4661,9 @@ function clearMenuCountries () {
           satSet.setColorScheme(ColorScheme.geo);
           break;
         case 'lost-objects':
+          $('#search').val('');
           satSet.setColorScheme(ColorScheme.lostobjects);
+          searchBox.doSearch($('#search').val());
           break;
         case 'rcs':
           satSet.setColorScheme(ColorScheme.rcs);
@@ -4404,9 +4687,15 @@ function clearMenuCountries () {
 
     // GROUPS
       // Not currently used but could be useful in the future
-      // groups.GlonassGroup = new SatGroup('nameRegex', /GLONASS/);
-      // groups.GalileoGroup = new SatGroup('nameRegex', /GALILEO/);
-      // groups.GPSGroup = new SatGroup('intlDes', ['90103A', '93068A']);
+      groups.GlonassGroup = new SatGroup('nameRegex', /GLONASS/);
+      groups.GalileoGroup = new SatGroup('nameRegex', /GALILEO/);
+      groups.GPSGroup = new SatGroup('nameRegex', /NAVSTAR/);
+      groups.AmatuerRadio = new SatGroup('objNum', [07530, 14781, 20442, 22826, 24278, 25338, 25397, 25544, 26931,
+        27607, 27844, 27848, 28895, 32785, 32788, 32789, 32791, 33493, 33498, 33499, 35932, 35933, 35935, 37224,
+        37839, 37841, 37855, 38760, 39090, 39134, 39136, 39161, 39417, 39430, 39436, 39439, 39440, 39444, 39469,
+        39770, 40014, 40021, 40024, 40025, 40030, 40032, 40042, 40043, 40057, 40071, 40074, 40377, 40378, 40379,
+        40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928, 40931,
+        40967, 40968, 41168, 41171, 41340, 41459, 41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017]);
     // SCC#s based on Uninon of Concerned Scientists
     groups.MilitarySatellites = new SatGroup('objNum', [40420, 41394, 32783, 35943, 36582, 40353, 40555, 41032, 38010, 38008, 38007, 38009,
       37806, 41121, 41579, 39030, 39234, 28492, 36124, 39194, 36095, 40358, 40258, 37212,
@@ -5518,20 +5807,40 @@ function propTime () {
         }
       }
 
-      satCruncher.postMessage({
-        typ: 'offset',
-        dat: (propOffset).toString() + ' ' + (propRate).toString(),
-        setlatlong: true,
-        lat: obslatitude,
-        long: obslongitude,
-        hei: obsheight,
-        obsminaz: obsminaz,
-        obsmaxaz: obsmaxaz,
-        obsminel: obsminel,
-        obsmaxel: obsmaxel,
-        obsminrange: obsminrange,
-        obsmaxrange: obsmaxrange
-      });
+      // TODO: Create logical checks to prevent 'bad' sesnors from being generated
+
+      if (obslatitude !== undefined && obslongitude !== undefined && obsheight !== undefined && obsminaz !== undefined && obsmaxaz !== undefined && obsminel !== undefined &&
+          obsmaxel !== undefined && obsminrange !== undefined && obsmaxrange !== undefined) {
+
+        lookangles.setobs({
+          lat: obslatitude,
+          long: obslongitude,
+          hei: obsheight,
+          obsminaz: obsminaz,
+          obsmaxaz: obsmaxaz,
+          obsminel: obsminel,
+          obsmaxel: obsmaxel,
+          obsminrange: obsminrange,
+          obsmaxrange: obsmaxrange
+        });
+
+        satCruncher.postMessage({
+          typ: 'offset',
+          dat: (propOffset).toString() + ' ' + (propRate).toString(),
+          setlatlong: true,
+          lat: obslatitude,
+          long: obslongitude,
+          hei: obsheight,
+          obsminaz: obsminaz,
+          obsmaxaz: obsmaxaz,
+          obsminel: obsminel,
+          obsmaxel: obsmaxel,
+          obsminrange: obsminrange,
+          obsmaxrange: obsmaxrange
+        });
+
+        $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
+      }
 
        // kick off satCruncher
        // console.log('posting satdata msg');
@@ -5965,8 +6274,7 @@ function propTime () {
     }
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
     $('#menu-editSat img').removeClass('bmenu-item-disabled');
-    // TODO: NEW LAUNCH
-    // $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
+    $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
   };
 
   satSet.onCruncherReady = function (cb) {

@@ -41,11 +41,11 @@
     <nav>
       <div class="nav-wrapper light-blue darken-3">
         <ul id="nav-mobile" class="left hide-on-med-and-down">
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Countries<i class="material-icons right">arrow_drop_down</i></a></li>
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-radar-menu">US Radar<i class="material-icons right">arrow_drop_down</i></a></li>
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-optical-menu">US Optical<i class="material-icons right">arrow_drop_down</i></a></li>
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="russian-menu">Russian<i class="material-icons right">arrow_drop_down</i></a></li>
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="chinese-menu">Chinese<i class="material-icons right">arrow_drop_down</i></a></li>
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Satellites<i class="material-icons right">arrow_drop_down</i></a></li>
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-radar-menu">SSN Sensors<i class="material-icons right">arrow_drop_down</i></a></li>
+          <!-- <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-optical-menu">US Optical<i class="material-icons right">arrow_drop_down</i></a></li> -->
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="russian-menu">Foreign Sensors<i class="material-icons right">arrow_drop_down</i></a></li>
+          <!-- <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="chinese-menu">Chinese<i class="material-icons right">arrow_drop_down</i></a></li> -->
           <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="colors-menu">Color Schemes<i class="material-icons right">arrow_drop_down</i></a></li>
         </ul>
         <ul id="nav-mobile" class="right">
@@ -63,51 +63,58 @@
 
     <!-- Countries Menu -->
     <ul id="countries-menu" class="dropdown-content">
-      <li data-group="<clear>" class="clear-option" style="display: none">Clear</li>
-      <li data-group="Canada" class="country-option">Canada</li>
-      <li data-group="China" class="country-option">China</li>
-      <li data-group="France" class="country-option">France</li>
-      <li data-group="India" class="country-option">India</li>
-      <li data-group="Israel" class="country-option">Israel</li>
-      <li data-group="Japan" class="country-option">Japan</li>
-      <li data-group="Russia" class="country-option">Russia / USSR</li>
-      <li data-group="UnitedKingdom" class="country-option">United Kingdom</li>
-      <li data-group="UnitedStates" class="country-option">United States</li>
+      <!-- <li data-group="<clear>" class="clear-option" style="display: none">Clear</li> -->
+      <li data-group="Canada" class="country-option">Canadian</li>
+      <li data-group="China" class="country-option">Chinese</li>
+      <li data-group="France" class="country-option">French</li>
+      <li data-group="India" class="country-option">Indian</li>
+      <li data-group="Israel" class="country-option">Israeli</li>
+      <li data-group="Japan" class="country-option">Japanese</li>
+      <li data-group="Russia" class="country-option">Russian / USSR</li>
+      <li data-group="UnitedKingdom" class="country-option">British</li>
+      <li data-group="UnitedStates" class="country-option">American</li>
+      <li class="divider"></li>
+      <li data-group="GPSGroup" class="group-option">GPS Satellites</li>
+      <li data-group="GalileoGroup" class="group-option">Galileo Satellites</li>
+      <li data-group="GlonassGroup" class="group-option">Glonass Satellites</li>
+      <li data-group="AmatuerRadio" class="group-option">Amateur Radio</li>
     </ul>
 
-    <ul id="us-radar-menu" class="dropdown-content">
-      <li id="radar-altair">ALTAIR</li>
-      <li id="radar-beale">Beale</li>
-      <li id="radar-capecod">Cape Cod</li>
-      <li id="radar-parcs">Cavalier</li>
-      <li id="radar-clear">Clear</li>
-      <li id="radar-eglin">Eglin</li>
-      <li id="radar-fylingdales">Fylingdales</li>
-      <li id="radar-millstone">Millstone</li>
-      <li id="radar-thule">Thule</li>
+    <ul id="us-radar-menu" class="dropdown-content sensor-selected">
+      <li id="radar-altair">ALTAIR<span class="badge" data-badge-caption="USA"></span></li>
+      <li id="radar-beale">Beale<span class="badge" data-badge-caption="USAF"></span></li>
+      <li id="radar-capecod">Cape Cod<span class="badge" data-badge-caption="USAF"></span></li>
+      <li id="radar-parcs">Cavalier<span class="badge" data-badge-caption="USAF"></span></li>
+      <li id="radar-clear">Clear<span class="badge" data-badge-caption="USAF"></span></li>
+      <li id="radar-eglin">Eglin<span class="badge" data-badge-caption="USAF"></span></li>
+      <li id="radar-fylingdales">Fylingdales<span class="badge" data-badge-caption="RAF"></span></li>
+      <li id="radar-millstone">Millstone<span class="badge" data-badge-caption="MIT"></span></li>
+      <li id="radar-thule">Thule<span class="badge" data-badge-caption="USAF"></span></li>
+      <li class="divider"></li>
+      <li id="optical-diego-garcia">Diego Garcia<span class="badge" data-badge-caption="USAF"></span></li>
+      <li id="optical-maui">Maui<span class="badge" data-badge-caption="USAF"></span></li>
+      <li id="optical-socorro">Socorro<span class="badge" data-badge-caption="USAF"></span></li>
+      <!-- <li id="optical-spain">Spain</li> Closed in 2012-->
     </ul>
 
-    <ul id="us-optical-menu" class="dropdown-content">
-      <li id="optical-diego-garcia">Diego Garcia</li>
-      <li id="optical-maui">Maui</li>
-      <li id="optical-socorro">Socorro</li>
-      <li id="optical-spain">Spain</li>
-    </ul>
+    <!-- <ul id="us-optical-menu" class="dropdown-content">
+    </ul> -->
 
     <ul id="russian-menu" class="dropdown-content">
-      <li id="russian-armavir">Armavir</li>
-      <li id="russian-balkhash">Balkhash</li>
-      <li id="russian-gantsevichi">Gantsevichi</li>
-      <li id="russian-lekhtusi">Lekhtusi</li>
-      <li id="russian-mishelevka-d">Mishelevka</li>
-      <li id="russian-olenegorsk">Olenegorsk</li>
-      <li id="russian-pechora">Pechora</li>
-      <li id="russian-pionersky">Pionersky</li>
+      <li id="russian-armavir">Armavir<span class="badge" data-badge-caption="RUS"></span></li>
+      <li id="russian-balkhash">Balkhash<span class="badge" data-badge-caption="RUS"></span></li>
+      <li id="russian-gantsevichi">Gantsevichi<span class="badge" data-badge-caption="RUS"></span></li>
+      <li id="russian-lekhtusi">Lekhtusi<span class="badge" data-badge-caption="RUS"></span></li>
+      <li id="russian-mishelevka-d">Mishelevka<span class="badge" data-badge-caption="RUS"></span></li>
+      <li id="russian-olenegorsk">Olenegorsk<span class="badge" data-badge-caption="RUS"></span></li>
+      <li id="russian-pechora">Pechora<span class="badge" data-badge-caption="RUS"></span></li>
+      <li id="russian-pionersky">Pionersky<span class="badge" data-badge-caption="RUS"></span></li>
+      <li class="divider"></li>
+      <li id="chinese-xuanhua">Xuanhua<span class="badge" data-badge-caption="PRC"></span></li>
     </ul>
 
-    <ul id="chinese-menu" class="dropdown-content">
-      <li id="chinese-xuanhua">Xuanhua</li>
-    </ul>
+    <!-- <ul id="chinese-menu" class="dropdown-content">
+    </ul> -->
 
     <ul id="colors-menu" class="dropdown-content">
       <li data-color="default">Type</li>
@@ -171,9 +178,9 @@
       <div id="sat-hoverbox">(none)</div>
 
       <div id="sensor-info-menu">
-        <div class="side-menu" id="lookangles-content">
+        <div class="side-menu" id="sensor-content">
           <div class="row">
-            <h5 class="center-align">Sensor Name</h5>
+            <h5 id="sensor-info-title" class="center-align">Sensor Name</h5>
             <div class="sensor-info-row" style="margin-top: 0px;">
               <div class="sensor-info-key">Country</div>
               <div class="sensor-info-value" id="sensor-country">USA</div>
@@ -422,21 +429,36 @@
             <h5 class="center-align">New Launch</h5>
             <form id="newLaunch" class="col s12">
               <div class="input-field col s12">
-                <input disabled value="25544" id="disabled" type="text">
+                <input disabled value="00005" id="nl-scc" type="text">
                 <label for="disabled">Satellite SCC#</label>
               </div>
               <div class="input-field col s12">
-                <select>
+                <select id="nl-facility">
                   <optgroup label="United States">
-                    <option value="1">Vandenberg AFB</option>
-                    <option value="2">Cape Canaveral AFS</option>
+                    <option value="1">Cape Canaveral AFS</option>
+                    <option value="2">Vandenberg AFB</option>
                     <option value="3">Wallops Flight Facility</option>
+                    <option value="4">Kodiak</option>
+                  </optgroup>
+                  <optgroup label="Russia">
+                    <option value="5">Baikonur Kosmodrome</option>
+                    <option value="6">Plesetsk Kosmodrome</option>
                   </optgroup>
                   <optgroup label="China">
-                    <option value="4">Jiuquan SLC</option>
-                    <option value="5">Taiyuan SLC</option>
-                    <option value="6">Xichang SLC</option>
-                    <option value="7">Wenchang SLC</option>
+                    <option value="7">Jiuquan SLC</option>
+                    <option value="8">Taiyuan SLC</option>
+                    <option value="9">Xichang SLC</option>
+                    <option value="10">Wenchang SLC</option>
+                  </optgroup>
+                  <optgroup label="Japan">
+                    <option value="11">Tanegashima</option>
+                    <option value="12">Uchinoura</option>
+                  </optgroup>
+                  <optgroup label="Other">
+                    <option value="13">Kourou, French Guiana</option>
+                    <option value="14">Onenui Station, NZ</option>
+                    <option value="15">Sriharikota, India</option>
+                    <option value="16">Semnan SLC, Iran</option>
                   </optgroup>
                 </select>
                 <label>Launch Facility</label>
@@ -449,10 +471,6 @@
             </form>
           </div>
         </div>
-      </div>
-
-      <div id="iss-stream-menu">
-        <div id="iss-stream"></div>
       </div>
 
       <div id="sat-infobox">
@@ -577,6 +595,9 @@
           </div>
           <div class="sat-info-value" id="sat-rcs">MEDIUM</div>
         </div>
+        <div id="iss-stream-menu">
+          <div id="iss-stream"></div>
+        </div>
       </div>
 
       <div id="bottom-menu">Current Objects</div>
@@ -631,14 +652,14 @@
         <div id="menu-satellite-collision" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
           <img src="" delayedsrc="images/satellite-collision.png" class="bmenu-item-disabled" alt="Collision">
         </div>
-        <div id="menu-settings" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Settings">
-          <img src="" delayedsrc="images/gear-icon.png" class="bmenu-item-disabled" alt="Settings">
-        </div>
         <div id="menu-editSat" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Edit Satellites">
           <img src="" delayedsrc="images/editPencil.png" class="bmenu-item-disabled" alt="Edit satellite">
         </div>
         <div id="menu-newLaunch" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Create Launch Nominal">
           <img src="" delayedsrc="images/rocket-ship.png" class="bmenu-item-disabled" alt="New Launches">
+        </div>
+        <div id="menu-settings" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Settings">
+          <img src="" delayedsrc="images/gear-icon.png" class="bmenu-item-disabled" alt="Settings">
         </div>
       </div>
     </div>

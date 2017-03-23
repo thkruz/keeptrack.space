@@ -177,8 +177,8 @@
 
       <div id="sat-hoverbox">(none)</div>
 
-      <div id="sensor-info-menu">
-        <div class="side-menu" id="sensor-content">
+      <div id="sensor-info-menu" class="start-hidden">
+        <div id="sensor-content" class="side-menu">
           <div class="row">
             <h5 id="sensor-info-title" class="center-align">Sensor Name</h5>
             <div class="sensor-info-row" style="margin-top: 0px;">
@@ -228,8 +228,8 @@
           </div>
         </div>
       </div>
-      <div id="findByLooks-menu">
-        <div class="side-menu" id="findByLooks-content">
+      <div id="findByLooks-menu" class="start-hidden">
+        <div id="findByLooks-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Find By Looks</h5>
             <form id="findByLooks">
@@ -295,39 +295,39 @@
           </div>
         </div>
       </div>
-      <div id="lookangles-menu">
-        <div class="side-menu" id="lookangles-content">
+      <div id="lookangles-menu" class="start-hidden">
+        <div id="lookangles-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Sensor Look Angles</h5>
             <table id="looks"  class="center-align striped-light centered"></table>
           </div>
         </div>
       </div>
-      <div id="lookanglesmultisite-menu">
-        <div class="side-menu" id="lookanglesmultisite-content">
+      <div id="lookanglesmultisite-menu" class="start-hidden">
+        <div id="lookanglesmultisite-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Multi-Sensor Look Angles</h5>
             <table id="looksmultisite" class="center-align striped-light centered"></table>
           </div>
         </div>
       </div>
-      <div id="twitter-menu" class="side-menu"></div>
-      <div id="weather-menu">
+      <div id="twitter-menu" class="start-hidden side-menu"></div>
+      <div id="weather-menu" class="start-hidden side-menu">
         <img id="weather-image">
       </div>
-      <div id="space-weather-menu">
+      <!-- <div id="space-weather-menu" class="start-hidden side-menu">
         <img id="space-weather-image">
-      </div>
-      <div id="socrates-menu">
-        <div class="side-menu" id="socrates-content">
+      </div> -->
+      <div id="socrates-menu" class="start-hidden">
+        <div id="socrates-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Possible collisions</h5>
             <table id="socrates-table" class="center-align"></table>
           </div>
         </div>
       </div>
-      <div id="settings-menu">
-        <div class="side-menu" id="settings-content">
+      <div id="settings-menu" class="start-hidden">
+        <div id="settings-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Settings</h5>
             <form id="settings-form">
@@ -373,7 +373,7 @@
           </div>
         </div>
       </div>
-      <div id="editSat-menu">
+      <div id="editSat-menu" class="start-hidden">
         <div id="editSat-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Edit Satellite</h5>
@@ -423,7 +423,7 @@
           </div>
         </div>
       </div>
-      <div id="newLaunch-menu">
+      <div id="newLaunch-menu" class="start-hidden">
         <div id="newLaunch-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">New Launch</h5>
@@ -476,6 +476,57 @@
               </div>
               <div class="center-align">
                 <button class="btn waves-effect waves-light" type="submit" name="action">Create Launch Nominal
+                  <i class="material-icons right">send</i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="customSensor-menu" class="start-hidden">
+        <div id="customSensor-content" class="side-menu">
+          <div class="row">
+            <h5 class="center-align">Custom Sensor</h5>
+            <form id="customSensor">
+              <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Latitude in Decimal Form (ex: 43.283)">
+                <input id="cs-lat" type="text">
+                <label for="cs-lat">Latitude</label>
+              </div>
+              <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Longitude in Decimal Form (ex: -73.283)">
+                <input id="cs-lon" type="text">
+                <label for="cs-lon">Longitude</label>
+              </div>
+              <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in kilometers (ex: 0.645)">
+                <input id="cs-hei" type="text">
+                <label for="cs-hei">Elevation Above Sea Level</label>
+              </div>
+              <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
+                <input id="cs-minaz" type="text">
+                <label for="cs-minaz">Minimum Azimuth (Left Most Azimuth)</label>
+              </div>
+              <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 120)">
+                <input id="cs-maxaz" type="text">
+                <label for="cs-maxaz">Maximum Azimuth (Right Most Azimuth)</label>
+              </div>
+              <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 10)">
+                <input id="cs-minel" type="text">
+                <label for="cs-minel">Minimum Elevation</label>
+              </div>
+              <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 90)">
+                <input id="cs-maxel" type="text">
+                <label for="cs-maxel">Maximum Elevation</label>
+              </div>
+              <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 500)">
+                <input id="cs-minrange" type="text">
+                <label for="cs-minrange">Minimum Range</label>
+              </div>
+              <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 20000)">
+                <input id="cs-maxrange" type="text">
+                <label for="cs-maxrange">Maximum Range</label>
+              </div>
+              <div class="center-align">
+                <button id="editSat-submit" class="btn waves-effect waves-light" type="submit" name="action">Create Custom Sensor
                   <i class="material-icons right">send</i>
                 </button>
               </div>
@@ -648,9 +699,9 @@
         <div id="menu-weather" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Terrestrial Weather">
           <img src="" delayedsrc="images/sun.png" class="bmenu-item-disabled" alt="Weather">
         </div>
-        <div id="menu-space-weather" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Geomagnetic Information">
+        <!-- <div id="menu-space-weather" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Geomagnetic Information">
           <img src="" delayedsrc="images/geomagnetic.png" class="bmenu-item-disabled" alt="Weather">
-        </div>
+        </div> -->
         <div id="menu-launches" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
           <img src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item-disabled" alt="Launches">
         </div>
@@ -668,6 +719,9 @@
         </div>
         <div id="menu-newLaunch" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Create Launch Nominal">
           <img src="" delayedsrc="images/rocket-ship.png" class="bmenu-item-disabled" alt="New Launches">
+        </div>
+        <div id="menu-customSensor" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Use Custom Sensor/Telescope">
+          <img src="" delayedsrc="images/observatory.png" class="bmenu-item-disabled" alt="Custom Sensor">
         </div>
         <div id="menu-settings" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Settings">
           <img src="" delayedsrc="images/gear-icon.png" class="bmenu-item-disabled" alt="Settings">

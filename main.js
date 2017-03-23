@@ -299,7 +299,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     if (!dragHasMoved) {
       var clickedSat = getSatIdFromCoord(evt.clientX, evt.clientY);
       if (clickedSat === -1 && evt.button === 2) { // Right Mouse Buttom Click
-        console.log("Right Mouse CLick");
         // clearMenuCountries();
         $('#search').val('');
         searchBox.hideResults();

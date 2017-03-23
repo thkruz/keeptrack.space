@@ -213,7 +213,7 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   $('#canvas').on('touchmove', function (evt) {
     evt.preventDefault();
-    if (isDragging && screenDragPoint !== [evt.originalEvent.touches[0].clientX, evt.originalEvent.touches[0].clientY]) {
+    if (isDragging && screenDragPoint[0] !== evt.originalEvent.touches[0].clientX && screenDragPoint[1] !== evt.originalEvent.touches[0].clientY) {
       dragHasMoved = true;
       camAngleSnappedOnSat = false;
       camZoomSnappedOnSat = false;
@@ -223,7 +223,7 @@ $(document).ready(function () { // Code Once index.php is loaded
   });
 
   $('#canvas').mousemove(function (evt) {
-    if (isDragging && screenDragPoint !== [evt.clientX, evt.clientY]) {
+    if (isDragging && screenDragPoint[0] !== evt.clientX && screenDragPoint[1] !== evt.clientY) {
       dragHasMoved = true;
       camAngleSnappedOnSat = false;
       camZoomSnappedOnSat = false;
@@ -299,6 +299,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     if (!dragHasMoved) {
       var clickedSat = getSatIdFromCoord(evt.clientX, evt.clientY);
       if (clickedSat === -1 && evt.button === 2) { // Right Mouse Buttom Click
+        console.log("Right Mouse CLick");
         // clearMenuCountries();
         $('#search').val('');
         searchBox.hideResults();

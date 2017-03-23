@@ -135,45 +135,6 @@
     <div id="canvas-holder">
       <canvas id="canvas"></canvas>
       <div id="search-results"></div>
-      <div id="menu-right" class="menubar">
-        <div id="menu-version" class="menu-item">
-            <div class="menu-title">Version</div>
-            <div id="version-box" class="menubox submenu">
-              <center>
-                Version: 0.10.0<br />
-                March 12, 2017
-              </center>
-            </div>
-        </div>
-        <div id="menu-about" class="menu-item">
-            <div class="menu-title">About</div>
-            <div id="about-box" class="menubox submenu">
-              <span class="box-header">Keep Track</span>
-              <p>Created by <a href="mailto:kruczek@keeptrack.space">Theodore Kruczek</a>
-                 to help visualize Ground Based Radars and Optical Telescopes.
-                 This tool allows users to find objects in orbit and
-                 determine details such as rise/set times, RCS, and history. The main
-                 power of this tool is visualizing many open-source databases into one
-                 interface.</p>
-              <span class="box-header">Sources</span>
-              <p>All information is open source publically available information. Orbits are derived from
-                the catalogue published at space-track.org. Payload information is compiled from various
-                public sources. US Sensor data was derived from MDA reports on enviromental impacts and congressional
-                budget reports.</p>
-              <span class="box-header">Original Author</span>
-              <p>The original source code for this tool and much of the credit goes
-                 to <a href="http://stuffin.space">James Yoder</a>. He is an alumnus of
-                 <i>FIRST</i> Robotics Competition (FRC) Team 624 and an Electrical and Computer
-                 Engineering major at the University of Texas at Austin. Without his work none of this
-                 would be possible.</p>
-               <!--<span class="box-header">MIT Lincoln Labs Support</span>
-               <p>Special thanks to Tim Wallace, David Rysdam, Chirag Bhutt, and the
-                  team at MIT Lincoln Labs who updated and fixed the original code.
-                  They provided a great starting point for expanding the features of
-                  this tool to do more than just display orbits.</p>-->
-            </div>
-          </div>
-      </div>
 
       <div id="sat-hoverbox">(none)</div>
 
@@ -369,7 +330,23 @@
                 </button>
               </div>
             </form>
-            <span id="findByLooks-results"></span>
+            <div class="row">
+              <h5 class="center-align">Author</h5>
+              <div class="col s12">
+                Created by <a class="white-text" href="https://github.com/thkruz/">Theodore Kruczek</a>
+                 to help visualize orbital calculations for application to Ground Based Radars and Optical Telescopes.
+                 Based on the original work of <a class="white-text" href="https://github.com/jeyoder/">James Yoder</a>
+              </div>
+            </div>
+            <div class="row">
+              <h5 class="center-align">Sources</h5>
+              <div class="col s12">
+                All information is open source publically available information. Orbits are derived from
+                the catalogue published at space-track.org. Payload information is compiled from various
+                public sources. US Sensor data was derived from MDA reports on enviromental impacts and congressional
+                budget reports.
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -734,10 +711,16 @@
         </div>
       </div>
     </div>
-    <div id="zoom-controls" style="display:none;">
+
+    <span style="margin-top:-45px;margin-right:10px" class="right tooltipped" data-position="top" data-delay="50" data-tooltip="March 23, 2017">
+      v0.11.0
+    </span>
+
+    <!-- <div id="zoom-controls" style="display:none;">
       <div id="zoom-in" class="zoom-button">+</div>
       <div id="zoom-out" class="zoom-button">-</div>
-    </div>
+    </div> -->
+
   </footer>
 
   <!-- Load jquery CSS -->

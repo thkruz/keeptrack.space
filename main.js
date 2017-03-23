@@ -3369,12 +3369,18 @@ function updateSelectBox () {
       $('#sat-range').html(lookangles.range.toFixed(2) + ' km');
     } else {
       $('#sat-azimuth').html('Out of Bounds');
-      $('#sat-azimuth').prop('title', 'Azimuth: ' + lookangles.azimuth.toFixed(0) + '°');
+      // $('#sat-azimuth').prop('title', 'Azimuth: ' + lookangles.azimuth.toFixed(0) + '°');
       $('#sat-elevation').html('Out of Bounds');
-      $('#sat-elevation').prop('title', 'Elevation: ' + lookangles.elevation.toFixed(1) + '°');
+      // $('#sat-elevation').prop('title', 'Elevation: ' + lookangles.elevation.toFixed(1) + '°');
       $('#sat-range').html('Out of Bounds');
-      $('#sat-range').prop('title', 'Range: ' + lookangles.range.toFixed(2) + ' km');
+      // $('#sat-range').prop('title', 'Range: ' + lookangles.range.toFixed(2) + ' km');
     }
+    if (lookangles.obslat !== null) {
+      $('#sat-nextpass').html(lookangles.nextpass(satData));
+    } else {
+      $('#sat-nextpass').html('Unavailable');
+    }
+
     lastBoxUpdateTime = now;
   }
 }

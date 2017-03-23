@@ -75,6 +75,7 @@ var isSocratesMenuOpen = false;
 var isSettingsMenuOpen = false;
 var isEditSatMenuOpen = false;
 var isNewLaunchMenuOpen = false;
+var isCustomSensorMenuOpen = false;
 var isEditTime = false;
 var isShowNextPass = false;
 var isOnlyFOVChecked = false;
@@ -306,6 +307,8 @@ $(document).ready(function () { // Code Once index.php is loaded
         isMilSatSelected = false;
         $('#menu-space-stations img').removeClass('bmenu-item-selected');
         $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
+
+        satSet.setColorScheme(ColorScheme.default);
 
         if (lookangles.obslat !== null) {
           $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
@@ -1512,6 +1515,56 @@ $(document).ready(function () { // Code Once index.php is loaded
     e.preventDefault();
   });
 
+  $('#customSensor').submit(function (e) {
+    var lat = $('#cs-lat').val();
+    var lon = $('#cs-lon').val();
+    var hei = $('#cs-hei').val();
+    var minaz = $('#cs-minaz').val();
+    var maxaz = $('#cs-maxaz').val();
+    var minel = $('#cs-minel').val();
+    var maxel = $('#cs-maxel').val();
+    var minrange = $('#cs-minrange').val();
+    var maxrange = $('#cs-maxrange').val();
+
+    satCruncher.postMessage({ // Send SatCruncher File information on this radar
+      typ: 'offset', // Tell satcruncher to update something
+      dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
+      setlatlong: true, // Tell satcruncher we are changing observer location
+      lat: lat,
+      long: lon,
+      hei: hei,
+      obsminaz: minaz,
+      obsmaxaz: maxaz,
+      obsminel: minel,
+      obsmaxel: maxel,
+      obsminrange: minrange,
+      obsmaxrange: maxrange
+    });
+
+    lookangles.setobs({
+      lat: lat,
+      long: lon,
+      hei: hei,
+      obsminaz: minaz,
+      obsmaxaz: maxaz,
+      obsminel: minel,
+      obsmaxel: maxel,
+      obsminrange: minrange,
+      obsmaxrange: maxrange
+    });
+
+    lat = lat * 1;
+    lon = lon * 1;
+    camSnap(latToPitch(lat), longToYaw(lon));
+    if (maxrange > 6000) {
+      changeZoom('geo');
+    } else {
+      changeZoom('leo');
+    }
+
+    e.preventDefault();
+  });
+
   $('#canvas').on('keypress', keyHandler); // On Key Press Event Run keyHandler Function
   $('#bottom-icons').on('click', '.bmenu-item', bottomIconPress); // Bottom Button Pressed
   $('#canvas').attr('tabIndex', 0);
@@ -1860,6 +1913,7 @@ function hideSideMenus () {
   $('#settings-menu').fadeOut();
   $('#editSat-menu').fadeOut();
   $('#newLaunch-menu').fadeOut();
+  $('#customSensor-menu').fadeOut();
 
   // Remove red color from all menu icons
   $('#menu-sensor-info img').removeClass('bmenu-item-selected');
@@ -1874,6 +1928,7 @@ function hideSideMenus () {
   $('#menu-settings img').removeClass('bmenu-item-selected');
   $('#menu-editSat img').removeClass('bmenu-item-selected');
   $('#menu-newLaunch img').removeClass('bmenu-item-selected');
+  $('#menu-customSensor img').removeClass('bmenu-item-selected');
 
   // Unflag all open menu variables
   isSensorInfoMenuOpen = false;
@@ -1888,6 +1943,7 @@ function hideSideMenus () {
   isSettingsMenuOpen = false;
   isEditSatMenuOpen = false;
   isNewLaunchMenuOpen = false;
+  isCustomSensorMenuOpen = false;
 }
 function bottomIconPress (evt) {
   if (isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
@@ -2191,6 +2247,18 @@ function bottomIconPress (evt) {
           }
         }
       }
+    case 'menu-customSensor': // T
+      if (isCustomSensorMenuOpen) {
+        isCustomSensorMenuOpen = false;
+        hideSideMenus();
+        break;
+      } else {
+        hideSideMenus();
+        $('#customSensor-menu').fadeIn();
+        isCustomSensorMenuOpen = true;
+        $('#menu-customSensor img').addClass('bmenu-item-selected');
+        break;
+      }
   }
 }
 function pad (num, size) {
@@ -2265,11 +2333,13 @@ function selectSat (satId) {
     $('#lookangles-menu').fadeOut();
     $('#editSat-menu').fadeOut();
     $('#newLaunch-menu').fadeOut();
+    $('#customSensor-menu').fadeOut();
     // Toggle the side menus as closed
     isEditSatMenuOpen = false;
     isLookanglesMenuOpen = false;
     isLookanglesMultiSiteMenuOpen = false;
     isNewLaunchMenuOpen = false;
+    isCustomSensorMenuOpen = false;
   } else {
     camZoomSnappedOnSat = true;
     camAngleSnappedOnSat = true;
@@ -3140,8 +3210,8 @@ function longToYaw (long) {
 
   selectedDate = selectedDate.split(' ');
   selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
-  today.setUTCHours(selectedDate.getUTCHours() + 17); // Used to be 9.5.
-                                                      // 12 Seems to be the offset from the earth draw script, but this is guesswork.
+  today.setUTCHours(selectedDate.getUTCHours() + ((selectedDate.getUTCMonth() + 1) * 2) - 12);  //Earth center point seems to drift throughout the year. Possibly tied to the time of year? TODO: WTF?
+
   today.setUTCMinutes(selectedDate.getUTCMinutes());
   today.setUTCSeconds(selectedDate.getUTCSeconds());
   selectedDate.setUTCHours(0);
@@ -5742,6 +5812,7 @@ function propTime () {
       $('#menu-astronauts img').removeClass('bmenu-item-disabled');
       $('#menu-space-stations img').removeClass('bmenu-item-disabled');
       $('#menu-satellite-collision img').removeClass('bmenu-item-disabled');
+      $('#menu-customSensor img').removeClass('bmenu-item-disabled');
       $('#menu-settings img').removeClass('bmenu-item-disabled');
       isBottomIconsEnabled = true;
       satSet.setColorScheme(currentColorScheme); // force color recalc

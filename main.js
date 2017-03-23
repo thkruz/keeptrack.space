@@ -310,7 +310,7 @@ $(document).ready(function () { // Code Once index.php is loaded
 
         satSet.setColorScheme(ColorScheme.default);
 
-        if (lookangles.obslat !== null) {
+        if (lookangles.sensorSelected()) {
           $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
         }
 
@@ -1949,7 +1949,7 @@ function bottomIconPress (evt) {
   if (isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
   switch ($(this)['context']['id']) {
     case 'menu-sensor-info': // No Keyboard Commands
-      if (lookangles.obslat == null) { // No Sensor Selected
+      if (whichRadar === '') { // No Sensor Selected
         if (!$('#menu-sensor-info img:animated').length) {
           $('#menu-sensor-info img').effect('shake', {distance: 10});
         }
@@ -2246,6 +2246,7 @@ function bottomIconPress (evt) {
             $('#menu-newLaunch img').effect('shake', {distance: 10});
           }
         }
+        break;
       }
     case 'menu-customSensor': // T
       if (isCustomSensorMenuOpen) {
@@ -2287,7 +2288,7 @@ function updateUrl () { // URL Updater
     paramSlices.push('hrs=' + (propOffset / 1000.0 / 3600.0).toString());
   }
 
-  if (lookangles.obslat != null) {
+  if (lookangles.sensorSelected()) {
     paramSlices.push('lat=' + lookangles.obslat);
     paramSlices.push('long=' + lookangles.obslong);
     paramSlices.push('hei=' + lookangles.hei);
@@ -2344,7 +2345,7 @@ function selectSat (satId) {
     camZoomSnappedOnSat = true;
     camAngleSnappedOnSat = true;
 
-    if (lookangles.obslat !== undefined) {
+    if (lookangles.sensorSelected()) {
       $('#menu-lookangles img').removeClass('bmenu-item-disabled');
     }
 
@@ -2978,7 +2979,7 @@ function selectSat (satId) {
       $('#sat-sun').html('Sun Exclusion');
     }
 
-    if (lookangles.obslat !== undefined) {
+    if (lookangles.sensorSelected()) {
       lookangles.getlookangles(sat, isLookanglesMenuOpen);
     }
   }
@@ -3375,7 +3376,8 @@ function updateSelectBox () {
       $('#sat-range').html('Out of Bounds');
       // $('#sat-range').prop('title', 'Range: ' + lookangles.range.toFixed(2) + ' km');
     }
-    if (lookangles.obslat !== null) {
+
+    if (lookangles.sensorSelected()) {
       $('#sat-nextpass').html(lookangles.nextpass(satData));
     } else {
       $('#sat-nextpass').html('Unavailable');
@@ -3453,6 +3455,15 @@ var lookangles = (function () {
   this.range = 0;
   this.inview = false;
   var observerGd = {};
+
+
+  var sensorSelected =  function () {
+    if (this.obslat !== null && this.obslat !== undefined) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   var getsensorinfo = function () {
     $('#sensor-latitude').html(this.obslat);
@@ -4233,6 +4244,7 @@ var lookangles = (function () {
   }
 
   return {
+    sensorSelected: sensorSelected,
     setobs: setobs,
     nextpass: nextpass,
     getlookangles: getlookangles,

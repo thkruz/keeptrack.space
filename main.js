@@ -341,6 +341,15 @@ $(document).ready(function () { // Code Once index.php is loaded
     });
   });
 
+  $('#search-close').click(function () {
+    $('#search').val('');
+    searchBox.hideResults();
+    isAstronautsSelected = false;
+    $('#menu-astronauts img').removeClass('bmenu-item-selected');
+    isMilSatSelected = false;
+    $('#menu-space-stations img').removeClass('bmenu-item-selected');
+  });
+
   $('#zoom-in').click(function () {
     zoomTarget -= 0.04;
     if (zoomTarget < 0) zoomTarget = 0;
@@ -1498,7 +1507,21 @@ $(document).ready(function () { // Code Once index.php is loaded
       break;
     }
 
-    var TLEs = lookangles.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown);
+    // Set time to 0000z for relative time.
+
+    var today = new Date(); // Need to know today for offset calculation
+    var quadZTime = new Date(today.getFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0); // New Date object of the future collision
+    // Date object defaults to local time.
+    quadZTime.setUTCHours(0); // Move to UTC Hour
+
+    propOffset = quadZTime - today; // Find the offset from today
+    camSnapMode = false;
+    satCruncher.postMessage({ // Tell satCruncher we have changed times for orbit calculations
+      typ: 'offset',
+      dat: (propOffset).toString() + ' ' + (1.0).toString()
+    });
+
+    var TLEs = lookangles.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, propOffset);
 
     var TLE1 = TLEs[0];
     var TLE2 = TLEs[1];
@@ -3667,8 +3690,8 @@ var lookangles = (function () {
     getTempSensor(resetWhenDone);
   };
 
-  var getOrbitByLatLon = function (sat, goalLat, goalLon, upOrDown) {
-    var curPropOffset = getPropOffset();
+  var getOrbitByLatLon = function (sat, goalLat, goalLon, upOrDown, curPropOffset) {
+    // var curPropOffset = getPropOffset();
     var propRealTime = Date.now();
     var mainTLE1;
     var mainTLE2;
@@ -3688,6 +3711,7 @@ var lookangles = (function () {
     goalLon = goalLon * 1;
 
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);
+    // console.log(sat.TLE2);
 
     for (var i = 0; i < (400 * 10); i += 1) {         // 400 degress in 0.1 increments. Going extra 40 degrees to be safe. TODO More precise?
       if (meanaCalc(i, rascOffset)){
@@ -3695,16 +3719,18 @@ var lookangles = (function () {
           rascOffset = true;
           i = i + 20; // Move a little ahead in the orbit to prevent being close on the next lattiude check
         } else {
+          // console.log(mainTLE2);
           break; //Stop changing the Mean Anomaly
         }
       }
     }
 
-    for (var i = 0; i < (700 * 100); i += 1) {         // 520 degress in 0.01 increments TODO More precise?
+    for (var i = 0; i < (1400 * 100); i += 1) {         // 520 degress in 0.01 increments TODO More precise?
       if (rascOffset && i === 0) {
         i = (mainRasc - 10) * 100;
       }
       if (rascCalc(i)){
+        // console.log(mainTLE2);
         break;
       }
     }

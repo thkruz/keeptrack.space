@@ -41,18 +41,17 @@
     <nav>
       <div class="nav-wrapper light-blue darken-3">
         <ul id="nav-mobile" class="left hide-on-med-and-down">
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Satellites<i class="material-icons right">arrow_drop_down</i></a></li>
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-radar-menu">SSN Sensors<i class="material-icons right">arrow_drop_down</i></a></li>
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Satellites &#x25BC;</a></li>
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-radar-menu">SSN Sensors &#x25BC;</a></li>
           <!-- <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-optical-menu">US Optical<i class="material-icons right">arrow_drop_down</i></a></li> -->
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="russian-menu">Foreign Sensors<i class="material-icons right">arrow_drop_down</i></a></li>
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="russian-menu">Foreign Sensors &#x25BC;</a></li>
           <!-- <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="chinese-menu">Chinese<i class="material-icons right">arrow_drop_down</i></a></li> -->
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="colors-menu">Color Schemes<i class="material-icons right">arrow_drop_down</i></a></li>
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="colors-menu">Color Schemes &#x25BC;</a></li>
         </ul>
         <ul id="nav-mobile" class="right">
           <div id="search-holder" class="menu-item">
-            <label class="label-icon" for="search"><i class="material-icons">search</i></label>
             <input id="search" type="search" required>
-            <i class="material-icons">close</i>
+            <span id="search-close" style="margin-left:5px">X</span>
           </div>
         </ul>
       </div>
@@ -245,8 +244,7 @@
                 </div>
               </div>
               <div class="center-align">
-                <button id="findByLooks-submit" class="btn waves-effect waves-light" type="submit" name="action">Find Satellite(s)
-                  <i class="material-icons right">send</i>
+                <button id="findByLooks-submit" class="btn waves-effect waves-light" type="submit" name="action">Find Satellite(s) &#9658;
                 </button>
               </div>
             </form>
@@ -325,8 +323,7 @@
               </div>
               <div class="row"></div>
               <div class="row center">
-                <button id="settings-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Settings
-                  <i class="material-icons right">send</i>
+                <button id="settings-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Settings &#9658;
                 </button>
               </div>
             </form>
@@ -392,8 +389,7 @@
                 <label for="es-meana">Mean Anomaly</label>
               </div>
               <div class="center-align">
-                <button id="editSat-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Satellite
-                  <i class="material-icons right">send</i>
+                <button id="editSat-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Satellite &#9658;
                 </button>
               </div>
             </form>
@@ -452,8 +448,7 @@
                 <label>Launch Facility</label>
               </div>
               <div class="center-align">
-                <button class="btn waves-effect waves-light" type="submit" name="action">Create Launch Nominal
-                  <i class="material-icons right">send</i>
+                <button class="btn waves-effect waves-light" type="submit" name="action">Create Launch Nominal &#9658;
                 </button>
               </div>
             </form>
@@ -503,8 +498,7 @@
                 <label for="cs-maxrange">Maximum Range</label>
               </div>
               <div class="center-align">
-                <button id="editSat-submit" class="btn waves-effect waves-light" type="submit" name="action">Create Custom Sensor
-                  <i class="material-icons right">send</i>
+                <button id="editSat-submit" class="btn waves-effect waves-light" type="submit" name="action">Create Custom Sensor &#9658;
                 </button>
               </div>
             </form>
@@ -712,8 +706,8 @@
       </div>
     </div>
 
-    <span style="margin-top:-45px;margin-right:10px" class="right tooltipped" data-position="top" data-delay="50" data-tooltip="March 23, 2017">
-      v0.11.0
+    <span style="margin-top:-45px;margin-right:10px" class="right tooltipped" data-position="top" data-delay="50" data-tooltip="March 31, 2017">
+      v0.11.1
     </span>
 
     <!-- <div id="zoom-controls" style="display:none;">

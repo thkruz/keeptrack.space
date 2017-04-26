@@ -1505,6 +1505,18 @@ $(document).ready(function () { // Code Once index.php is loaded
         var launchLat = 35.234;
         var launchLon = (53.920);
       break;
+      case 20: // Sohae, North Korea
+        launchLat = 39.665457;
+        launchLon = 124.701897;
+        break;
+      case 21: // Tonghae, North Korea
+        launchLat = 40.8555995;
+        launchLon = 129.6660233;
+        break;
+      case 22: // AF Test Range, Palmachim, Israel
+        launchLat = 31.897778;
+        launchLon = 34.690556000000015;
+        break;
     }
 
     // Set time to 0000z for relative time.

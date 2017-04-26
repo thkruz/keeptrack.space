@@ -61,4 +61,13 @@ admin/TLEUpdate.php
 admin/cron-DecayParse.php
 admin/cron-DecayUpdate.php
 admin/TLEmin.php
+admin/TLE/TLE.json
+admin/TLE/TLEAlt.json
+admin/TLE/elsets.json
+admin/satcat.txt
+admin/LV.txt
+admin/PayloadInfo.txt
+admin/RCSParse.php
+admin/PayloadInfoParse.php
 TLE.json
+TLEAltNemo.json

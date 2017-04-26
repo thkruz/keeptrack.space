@@ -69,5 +69,9 @@ admin/LV.txt
 admin/PayloadInfo.txt
 admin/RCSParse.php
 admin/PayloadInfoParse.php
+admin/cron-TLEParseAlt.php
+admin/cron-TLEUpdateAlt.php
+admin/cron-RCSParse.php
+admin/cron-TLEParse.php
 TLE.json
 TLEAltNemo.json

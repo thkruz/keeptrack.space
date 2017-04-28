@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
   <head>
+    <meta name="description" content="A 3D visualtion tool to learn about satellites and tracking radars." />
     <!-- Change this to use alternate TLE Source -->
     <div id="tle-source" style="display: none;">TLE.json</div>
 
@@ -35,14 +36,14 @@
     </div>
   </div>
   <div id="no-webgl">
-    Stuff in Space requires <a href="http://caniuse.com/#feat=webgl">WebGL</a> and <a href="http://caniuse.com/#feat=webworkers">Web Worker</a> support.
+    Keeptrack.Space requires <a href="http://caniuse.com/#feat=webgl">WebGL</a> and <a href="http://caniuse.com/#feat=webworkers">Web Worker</a> support.
   </div>
   <header>
     <nav>
       <div class="nav-wrapper light-blue darken-3">
         <ul id="nav-mobile" class="left hide-on-med-and-down">
           <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Satellites &#x25BC;</a></li>
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-radar-menu">SSN Sensors &#x25BC;</a></li>
+          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-radar-menu" style="padding-right: 25px;padding-left: 25px;">SSN Sensors &#x25BC;</a></li>
           <!-- <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-optical-menu">US Optical<i class="material-icons right">arrow_drop_down</i></a></li> -->
           <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="russian-menu">Foreign Sensors &#x25BC;</a></li>
           <!-- <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="chinese-menu">Chinese<i class="material-icons right">arrow_drop_down</i></a></li> -->
@@ -73,6 +74,7 @@
       <li data-group="UnitedKingdom" class="country-option">British</li>
       <li data-group="UnitedStates" class="country-option">American</li>
       <li class="divider"></li>
+      <li data-group="SpaceStations" class="group-option">Space Stations</li>
       <li data-group="GPSGroup" class="group-option">GPS Satellites</li>
       <li data-group="GalileoGroup" class="group-option">Galileo Satellites</li>
       <li data-group="GlonassGroup" class="group-option">Glonass Satellites</li>
@@ -327,12 +329,26 @@
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      </div>
+      <div id="about-menu" class="start-hidden text-select">
+        <div id="about-content" class="side-menu">
+          <div class="row">
+            <h5 class="center-align">About Keeptrack.Space</h5>
             <div class="row">
               <h5 class="center-align">Author</h5>
               <div class="col s12">
-                Created by <a class="white-text" href="https://github.com/thkruz/">Theodore Kruczek</a>
+                Created by <a style="color: #48f3e3 !important;" href="https://github.com/thkruz/">Theodore Kruczek</a>
                  to help visualize orbital calculations for application to Ground Based Radars and Optical Telescopes.
-                 Based on the original work of <a class="white-text" href="https://github.com/jeyoder/">James Yoder</a>
+                 Based on the original work of <a style="color: #48f3e3 !important;" href="https://github.com/jeyoder/">James Yoder</a>
+              </div>
+            </div>
+            <div class="row">
+              <h5 class="center-align">Issues</h5>
+              <div class="col s12">
+                Please contribute to development by posting your ideas/issues/bugs to the
+                <a style="color: #48f3e3 !important;" href="https://github.com/thkruz/keeptrack.space-Issues">public github repository</a>.
               </div>
             </div>
             <div class="row">
@@ -635,7 +651,9 @@
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Large are > 1^2 meter, Small are < 0.1^2 meters">
             RCS
           </div>
-          <div class="sat-info-value" id="sat-rcs">MEDIUM</div>
+          <div class="sat-info-value" id="sat-rcs">
+            MEDIUM
+          </div>
         </div>
         <div id="iss-stream-menu">
           <div id="iss-stream"></div>
@@ -685,9 +703,6 @@
         <div id="menu-launches" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
           <img src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item-disabled" alt="Launches">
         </div>
-        <div id="menu-astronauts" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Objects that can Support Humans">
-          <img src="" delayedsrc="images/astronaut.png" class="bmenu-item-disabled" alt="Astronauts">
-        </div>
         <div id="menu-space-stations" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist">
           <img src="" delayedsrc="images/space-station-1.png" class="bmenu-item-disabled" alt="Interesting Satellites">
         </div>
@@ -705,6 +720,9 @@
         </div>
         <div id="menu-settings" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Settings">
           <img src="" delayedsrc="images/gear-icon.png" class="bmenu-item-disabled" alt="Settings">
+        </div>
+        <div id="menu-about" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Author Information">
+          <img src="" delayedsrc="images/about.png" class="bmenu-item-disabled" alt="Information">
         </div>
       </div>
     </div>

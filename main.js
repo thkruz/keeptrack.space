@@ -1,3 +1,43 @@
+/* /////////////////////////////////////////////////////////////////////////////
+
+(c) 2016-2017, Theodore Kruczek
+main.js is the primary javascript file for keeptrack.space. It manages all user
+interaction with the application.
+http://keeptrack.space
+
+Unless otherwise noted, all of the code contained within is Copyright © 2016-2017
+by Theodore Kruczek. All rights reserved. No part of this web site may be reproduced,
+published, distributed, displayed, performed, copied or stored for public or private
+use in any information retrieval system, or transmitted in any form by any mechanical,
+photographic or electronic process, including electronically or digitally on the
+Internet or World Wide Web, or over any network, or local area network, without
+written permission of the author.
+
+No part of this code may be modified or changed or exploited in any way used
+for derivative works, or offered for sale, or used to construct any kind of database
+or mirrored at any other location without the express written permission of the author.
+
+Thank you for respecting the intellectual property rights protected by the copyright
+laws of the United States and International Copyright Treaty.
+
+///////////////////////////////////////////////////////////////////////////// */
+
+/* /////////////////////////////////////////////////////////////////////////////
+
+                                INDEX OF CODE
+1 - main
+2 - shader-loader
+3 - color-scheme
+4 - groups
+5 - search-box
+6 - orbit-display
+7 - line
+8 - earth
+9 - sun
+10 - sat
+
+///////////////////////////////////////////////////////////////////////////// */
+
 /* global
 
     satSet
@@ -22,7 +62,8 @@
 
 */
 
-// **** main.js ***
+// **** 1 - main ***
+
 // Constants
 var ZOOM_EXP = 3;
 var DIST_MIN = 6800;
@@ -69,7 +110,7 @@ var isFindByLooksMenuOpen = false;
 var isSensorInfoMenuOpen = false;
 var isLaunchMenuOpen = false;
 var isBottomMenuOpen = false;
-var isAstronautsSelected = false;
+var isAboutSelected = false;
 var isMilSatSelected = false;
 var isSocratesMenuOpen = false;
 var isSettingsMenuOpen = false;
@@ -302,8 +343,6 @@ $(document).ready(function () { // Code Once index.php is loaded
         // clearMenuCountries();
         $('#search').val('');
         searchBox.hideResults();
-        isAstronautsSelected = false;
-        $('#menu-astronauts img').removeClass('bmenu-item-selected');
         isMilSatSelected = false;
         $('#menu-space-stations img').removeClass('bmenu-item-selected');
         $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
@@ -313,7 +352,6 @@ $(document).ready(function () { // Code Once index.php is loaded
         if (lookangles.sensorSelected()) {
           $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
         }
-
       }
       selectSat(clickedSat);
     }
@@ -344,8 +382,6 @@ $(document).ready(function () { // Code Once index.php is loaded
   $('#search-close').click(function () {
     $('#search').val('');
     searchBox.hideResults();
-    isAstronautsSelected = false;
-    $('#menu-astronauts img').removeClass('bmenu-item-selected');
     isMilSatSelected = false;
     $('#menu-space-stations img').removeClass('bmenu-item-selected');
   });
@@ -1437,74 +1473,74 @@ $(document).ready(function () { // Code Once index.php is loaded
     // TODO: Calculate current J-Day to change Epoch Date
 
     var launchFac = $('#nl-facility').val();
-    launchFac = launchFac * 1; //Convert to number
+    launchFac = launchFac * 1; // Convert to number
 
     switch (launchFac) {
       // If Longitude is west then subtract from 360
-      case 1: //Cape Canaveral
+      case 1: // Cape Canaveral
         var launchLat = 28.466;
         var launchLon = (360 - 80.558);
-      break;
-      case 2: //Vandenberg
-        var launchLat = 34.772;
-        var launchLon = (360 - 120.601);
-      break;
-      case 3: //Wallops
-        var launchLat = 37.846;
-        var launchLon = (360 - 75.479);
-      break;
-      case 4: //Kodiak
-        var launchLat = 57.435;
-        var launchLon = (360 - 152.339);
-      break;
-      case 5: //Baikonur
-        var launchLat = 45.955;
-        var launchLon = (63.350);
-      break;
-      case 6: //Plesetsk
-        var launchLat = 62.925;
-        var launchLon = (40.577);
-      break;
-      case 7: //Jiuquan SLC
-        var launchLat = 41.118;
-        var launchLon = (100.463);
-      break;
-      case 8: //Taiyuan SLC
-        var launchLat = 39.143;
-        var launchLon = (111.967);
-      break;
-      case 9: //Xichang
-        var launchLat = 28.246;
-        var launchLon = (102.028);
-      break;
-      case 10: //Wenchang
-        var launchLat = 19.614;
-        var launchLon = (110.951);
-      break;
-      case 11: //Tanegashima
-        var launchLat = 39.389;
-        var launchLon = (130.968);
-      break;
-      case 12: //Uchinoura
-        var launchLat = 31.251;
-        var launchLon = (131.079);
-      break;
-      case 13: //Koruou, French Guiana
-        var launchLat = 5.237;
-        var launchLon = (360 - 52.769);
-      break;
-      case 14: //Onenui Station, NZ
-        var launchLat = -39.260;
-        var launchLon = (177.865);
-      break;
-      case 15: //Sriharikota, India
-        var launchLat = 13.737;
-        var launchLon = (80.235);
-      break;
-      case 16: //Semnan, Iran
-        var launchLat = 35.234;
-        var launchLon = (53.920);
-      break;
+        break;
+      case 2: // Vandenberg
+        launchLat = 34.772;
+        launchLon = (360 - 120.601);
+        break;
+      case 3: // Wallops
+        launchLat = 37.846;
+        launchLon = (360 - 75.479);
+        break;
+      case 4: // Kodiak
+        launchLat = 57.435;
+        launchLon = (360 - 152.339);
+        break;
+      case 5: // Baikonur
+        launchLat = 45.955;
+        launchLon = (63.350);
+        break;
+      case 6: // Plesetsk
+        launchLat = 62.925;
+        launchLon = (40.577);
+        break;
+      case 7: // Jiuquan SLC
+        launchLat = 41.118;
+        launchLon = (100.463);
+        break;
+      case 8: // Taiyuan SLC
+        launchLat = 39.143;
+        launchLon = (111.967);
+        break;
+      case 9: // Xichang
+        launchLat = 28.246;
+        launchLon = (102.028);
+        break;
+      case 10: // Wenchang
+        launchLat = 19.614;
+        launchLon = (110.951);
+        break;
+      case 11: // Tanegashima
+        launchLat = 39.389;
+        launchLon = (130.968);
+        break;
+      case 12: // Uchinoura
+        launchLat = 31.251;
+        launchLon = (131.079);
+        break;
+      case 13: // Koruou, French Guiana
+        launchLat = 5.237;
+        launchLon = (360 - 52.769);
+        break;
+      case 14: // Onenui Station, NZ
+        launchLat = -39.260;
+        launchLon = (177.865);
+        break;
+      case 15: // Sriharikota, India
+        launchLat = 13.737;
+        launchLon = (80.235);
+        break;
+      case 16: // Semnan, Iran
+        launchLat = 35.234;
+        launchLon = (53.920);
+        break;
       case 20: // Sohae, North Korea
         launchLat = 39.665457;
         launchLon = 124.701897;
@@ -1539,10 +1575,10 @@ $(document).ready(function () { // Code Once index.php is loaded
     var TLE2 = TLEs[1];
 
     satCruncher.postMessage({
-       typ: 'satEdit',
-       id: satId,
-       TLE1: TLE1,
-       TLE2: TLE2
+      typ: 'satEdit',
+      id: satId,
+      TLE1: TLE1,
+      TLE2: TLE2
     });
     orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
@@ -1949,6 +1985,7 @@ function hideSideMenus () {
   $('#editSat-menu').fadeOut();
   $('#newLaunch-menu').fadeOut();
   $('#customSensor-menu').fadeOut();
+  $('#about-menu').fadeOut();
 
   // Remove red color from all menu icons
   $('#menu-sensor-info img').removeClass('bmenu-item-selected');
@@ -1964,6 +2001,7 @@ function hideSideMenus () {
   $('#menu-editSat img').removeClass('bmenu-item-selected');
   $('#menu-newLaunch img').removeClass('bmenu-item-selected');
   $('#menu-customSensor img').removeClass('bmenu-item-selected');
+  $('#menu-about img').removeClass('bmenu-item-selected');
 
   // Unflag all open menu variables
   isSensorInfoMenuOpen = false;
@@ -1979,6 +2017,7 @@ function hideSideMenus () {
   isEditSatMenuOpen = false;
   isNewLaunchMenuOpen = false;
   isCustomSensorMenuOpen = false;
+  isAboutSelected = false;
 }
 function bottomIconPress (evt) {
   if (isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
@@ -2154,19 +2193,16 @@ function bottomIconPress (evt) {
         $('#menu-launches img').addClass('bmenu-item-selected');
         break;
       }
-    case 'menu-astronauts': // No Keyboard Shortcut
-      if (isAstronautsSelected) {
-        $('#search').val('');
-        searchBox.hideResults();
-        isAstronautsSelected = false;
-        $('#menu-astronauts img').removeClass('bmenu-item-selected');
+    case 'menu-about': // No Keyboard Shortcut
+      if (isAboutSelected) {
+        isAboutSelected = false;
+        hideSideMenus();
         break;
       } else {
-        $('#search').val('25544,41765');
-        searchBox.doSearch('25544,41765');
-        isAstronautsSelected = true;
-        $('#menu-space-stations img').removeClass('bmenu-item-selected');
-        $('#menu-astronauts img').addClass('bmenu-item-selected');
+        hideSideMenus();
+        $('#about-menu').fadeIn();
+        isAboutSelected = true;
+        $('#menu-about img').addClass('bmenu-item-selected');
         break;
       }
     case 'menu-space-stations': // No Keyboard Shortcut
@@ -2180,7 +2216,7 @@ function bottomIconPress (evt) {
         $('#search').val('40420,41394,32783,35943,36582,40353,40555,41032,38010,38008,38007,38009,37806,41121,41579,39030,39234,28492,36124,39194,36095,40358,40258,37212,37398,38995,40296,40900,39650,27434,31601,36608,28380,28521,36519,39177,40699,34264,36358,39375,38248,34807,28908,32954,32955,32956,35498,35500,37152,37154,38733,39057,39058,39059,39483,39484,39485,39761,39762,39763,40920,40921,40922,39765,29658,31797,32283,32750,33244,39208,26694,40614,20776,25639,26695,30794,32294,33055,39034,28946,33751,33752,27056,27057,27464,27465,27868,27869,28419,28420,28885,29273,32476,31792,36834,37165,37875,37941,38257,38354,39011,39012,39013,39239,39240,39241,39363,39410,40109,40111,40143,40275,40305,40310,40338,40339,40340,40362,40878,41026,41038,41473,28470,37804,37234,29398,40110,39209,39210,36596');
         searchBox.doSearch('40420,41394,32783,35943,36582,40353,40555,41032,38010,38008,38007,38009,37806,41121,41579,39030,39234,28492,36124,39194,36095,40358,40258,37212,37398,38995,40296,40900,39650,27434,31601,36608,28380,28521,36519,39177,40699,34264,36358,39375,38248,34807,28908,32954,32955,32956,35498,35500,37152,37154,38733,39057,39058,39059,39483,39484,39485,39761,39762,39763,40920,40921,40922,39765,29658,31797,32283,32750,33244,39208,26694,40614,20776,25639,26695,30794,32294,33055,39034,28946,33751,33752,27056,27057,27464,27465,27868,27869,28419,28420,28885,29273,32476,31792,36834,37165,37875,37941,38257,38354,39011,39012,39013,39239,39240,39241,39363,39410,40109,40111,40143,40275,40305,40310,40338,40339,40340,40362,40878,41026,41038,41473,28470,37804,37234,29398,40110,39209,39210,36596');
         isMilSatSelected = true;
-        $('#menu-astronauts img').removeClass('bmenu-item-selected');
+        $('#menu-about img').removeClass('bmenu-item-selected');
         $('#menu-space-stations img').addClass('bmenu-item-selected');
         break;
       }
@@ -2339,7 +2375,7 @@ function updateUrl () { // URL Updater
     url += '?' + paramSlices.join('&');
   }
 
-  window.history.replaceState(null, 'Stuff in Space', url);
+  window.history.replaceState(null, 'Keeptrack', url);
 }
 
 function selectSat (satId) {
@@ -2401,8 +2437,8 @@ function selectSat (satId) {
     $('#sat-infobox').fadeIn();
     $('#sat-info-title').html(sat.ON);
 
-    if (sat.OBJECT_URL) {
-      $('#sat-info-title').html("<a class='iframe' href='" + sat.OBJECT_URL + "'>" + sat.ON + '</a>');
+    if (sat.URL) {
+      $('#sat-info-title').html("<a class='iframe' href='" + sat.URL + "'>" + sat.ON + '</a>');
     }
 
     $('#sat-intl-des').html(sat.intlDes);
@@ -2850,10 +2886,11 @@ function selectSat (satId) {
       $('#sat-rcs').html('Unknown');
     } else {
       var rcs;
-      if (sat.R === 0) { rcs = 'Small'; }
-      if (sat.R === 1) { rcs = 'Medium'; }
-      if (sat.R === 2) { rcs = 'Large'; }
+      if (sat.R < 0.1) { rcs = 'Small'; }
+      if (sat.R >= 0.1) { rcs = 'Medium'; }
+      if (sat.R > 1) { rcs = 'Large'; }
       $('#sat-rcs').html(rcs);
+      $('#sat-rcs').tooltip({delay: 50, tooltip: sat.R, position: 'left'});
     }
 
     // /////////////////////////////////////////////////////////////////////////
@@ -2980,11 +3017,7 @@ function selectSat (satId) {
     $('#sat-eccentricity').html((sat.eccentricity).toFixed(3));
 
     $('#sat-period').html(sat.period.toFixed(2) + ' min');
-    $('#sat-period').hover(function () {
-      $('#sat-period').html('Mean Motion: ' + 60 * 24 / sat.period.toFixed(2));
-    }, function () {
-      $('#sat-period').html(sat.period.toFixed(2) + ' min');
-    });
+    $('#sat-period').tooltip({delay: 50, tooltip: 'Mean Motion: ' + 60 * 24 / sat.period.toFixed(2), position: 'left'});
 
     var now = new Date();
     now = now.getFullYear();
@@ -2996,13 +3029,7 @@ function selectSat (satId) {
       daysold = jday() - satSet.getSat(satId).TLE1.substr(20, 3) + (satSet.getSat(satId).TLE1.substr(17, 2) * 365);
     }
     $('#sat-elset-age').html(daysold + ' Days');
-    $('#sat-elset-age').hover(function () {
-      $('#sat-elset-age').html('Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString());
-    }, function () {
-      $('#sat-elset-age').html(daysold + ' Days');
-    });
-    if (jday() !== sat.TLE1.substr(20, 3).toString()) {
-    }
+    $('#sat-elset-age').tooltip({delay: 50, tooltip: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(), position: 'left'});
 
     now = new Date();
     var sunTime = SunCalc.getTimes(Date.now(), lookangles.obslat, lookangles.obslong);
@@ -3246,7 +3273,7 @@ function longToYaw (long) {
 
   selectedDate = selectedDate.split(' ');
   selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
-  today.setUTCHours(selectedDate.getUTCHours() + ((selectedDate.getUTCMonth() + 1) * 2) - 12);  //Earth center point seems to drift throughout the year. Possibly tied to the time of year? TODO: WTF?
+  today.setUTCHours(selectedDate.getUTCHours() + ((selectedDate.getUTCMonth() + 1) * 2) - 12);  // Earth center point seems to drift throughout the year. Possibly tied to the time of year? TODO: WTF?
 
   today.setUTCMinutes(selectedDate.getUTCMinutes());
   today.setUTCSeconds(selectedDate.getUTCSeconds());
@@ -3491,14 +3518,13 @@ var lookangles = (function () {
   this.inview = false;
   var observerGd = {};
 
-
-  var sensorSelected =  function () {
+  var sensorSelected = function () {
     if (this.obslat !== null && this.obslat !== undefined) {
       return true;
     } else {
       return false;
     }
-  }
+  };
 
   var getsensorinfo = function () {
     $('#sensor-latitude').html(this.obslat);
@@ -3709,7 +3735,7 @@ var lookangles = (function () {
     var mainTLE2;
     var mainMeana;
     var mainRasc;
-    var lastLat
+    var lastLat;
     var isUpOrDown;
     var rascOffset = false;
 
@@ -3722,26 +3748,26 @@ var lookangles = (function () {
     goalLat = goalLat * 1;
     goalLon = goalLon * 1;
 
-    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);
+    // var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);
     // console.log(sat.TLE2);
 
     for (var i = 0; i < (400 * 10); i += 1) {         // 400 degress in 0.1 increments. Going extra 40 degrees to be safe. TODO More precise?
-      if (meanaCalc(i, rascOffset)){
+      if (meanaCalc(i, rascOffset)) {
         if (isUpOrDown !== upOrDown) {
           rascOffset = true;
           i = i + 20; // Move a little ahead in the orbit to prevent being close on the next lattiude check
         } else {
           // console.log(mainTLE2);
-          break; //Stop changing the Mean Anomaly
+          break; // Stop changing the Mean Anomaly
         }
       }
     }
 
-    for (var i = 0; i < (1400 * 100); i += 1) {         // 520 degress in 0.01 increments TODO More precise?
+    for (i = 0; i < (1400 * 100); i += 1) {         // 520 degress in 0.01 increments TODO More precise?
       if (rascOffset && i === 0) {
         i = (mainRasc - 10) * 100;
       }
-      if (rascCalc(i)){
+      if (rascCalc(i)) {
         // console.log(mainTLE2);
         break;
       }
@@ -3756,7 +3782,7 @@ var lookangles = (function () {
     function meanaCalc (meana, rascOffset) {
       var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
 
-      var meana = meana / 10;
+      meana = meana / 10;
       meana = parseFloat(meana).toPrecision(7);
       meana = pad(meana, 8);
 
@@ -3798,12 +3824,10 @@ var lookangles = (function () {
       argPe = (argPe[0] + '.' + argPe[1]).toString();
       argPe = pad(argPe, 8);
 
-
       var TLE1Ending = sat.TLE1.substr(32, 39);
 
       var TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
       var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
-
 
       satrec = satellite.twoline2satrec(TLE1, TLE2);
       if (propagate(curPropOffset, satrec, 1)) {
@@ -3856,12 +3880,10 @@ var lookangles = (function () {
       argPe = (argPe[0] + '.' + argPe[1]).toString();
       argPe = pad(argPe, 8);
 
-
       var TLE1Ending = sat.TLE1.substr(32, 39);
 
       mainTLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
       mainTLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
-
 
       satrec = satellite.twoline2satrec(mainTLE1, mainTLE2);
 
@@ -4423,7 +4445,7 @@ dateFormat.i18n = {
   ]
 };
 
-// **** shader-loader.js ***
+// **** 2 - shader-loader ***
 (function () {
   var shaderLoader = {};
 
@@ -4438,7 +4460,8 @@ dateFormat.i18n = {
 
   window.shaderLoader = shaderLoader;
 })();
-// **** color-scheme.js ***
+
+// **** 3 - color-scheme ***
 (function () {
   var ColorScheme = function (colorizer) {
     this.colorizer = colorizer;
@@ -4536,7 +4559,7 @@ dateFormat.i18n = {
     });
     ColorScheme.rcs = new ColorScheme(function (satId) {
       var rcs = satSet.getSat(satId).R;
-      var SCC = satSet.getSat(satId).SCC_NUM;
+      // var SCC = satSet.getSat(satId).SCC_NUM;
       if (rcs === 0) {
         return {
           color: [1.0, 0, 0, 0.6],
@@ -4644,7 +4667,9 @@ dateFormat.i18n = {
 
   window.ColorScheme = ColorScheme;
 })();
-// **** groups.js ***
+
+// **** 4 - groups ***
+
 // function clearMenuCountries () {
 //   groups.clearSelect();
 //   $('#menu-groups .menu-title').text('Groups');
@@ -4768,7 +4793,7 @@ dateFormat.i18n = {
     $('#countries-menu>li').click(function () {
       var groupName = $(this).data('group');
       if (groupName === '<clear>') {
-        clearMenuCountries();
+        // clearMenuCountries();
       } else {
         selectSat(-1); // Clear selected sat
         groups.selectGroup(groups[groupName]);
@@ -4797,7 +4822,6 @@ dateFormat.i18n = {
       $('#groups-display').css({
         display: 'none'
       });
-
     });
     $('#colors-menu>li').click(function () {
       selectSat(-1); // clear selected sat
@@ -4842,16 +4866,16 @@ dateFormat.i18n = {
     groups.UnitedStates = new SatGroup('countryRegex', /US/);
 
     // GROUPS
-      // Not currently used but could be useful in the future
-      groups.GlonassGroup = new SatGroup('nameRegex', /GLONASS/);
-      groups.GalileoGroup = new SatGroup('nameRegex', /GALILEO/);
-      groups.GPSGroup = new SatGroup('nameRegex', /NAVSTAR/);
-      groups.AmatuerRadio = new SatGroup('objNum', [07530, 14781, 20442, 22826, 24278, 25338, 25397, 25544, 26931,
-        27607, 27844, 27848, 28895, 32785, 32788, 32789, 32791, 33493, 33498, 33499, 35932, 35933, 35935, 37224,
-        37839, 37841, 37855, 38760, 39090, 39134, 39136, 39161, 39417, 39430, 39436, 39439, 39440, 39444, 39469,
-        39770, 40014, 40021, 40024, 40025, 40030, 40032, 40042, 40043, 40057, 40071, 40074, 40377, 40378, 40379,
-        40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928, 40931,
-        40967, 40968, 41168, 41171, 41340, 41459, 41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017]);
+    groups.SpaceStations = new SatGroup('objNum', [25544, 41765]);
+    groups.GlonassGroup = new SatGroup('nameRegex', /GLONASS/);
+    groups.GalileoGroup = new SatGroup('nameRegex', /GALILEO/);
+    groups.GPSGroup = new SatGroup('nameRegex', /NAVSTAR/);
+    groups.AmatuerRadio = new SatGroup('objNum', [7530, 14781, 20442, 22826, 24278, 25338, 25397, 25544, 26931,
+      27607, 27844, 27848, 28895, 32785, 32788, 32789, 32791, 33493, 33498, 33499, 35932, 35933, 35935, 37224,
+      37839, 37841, 37855, 38760, 39090, 39134, 39136, 39161, 39417, 39430, 39436, 39439, 39440, 39444, 39469,
+      39770, 40014, 40021, 40024, 40025, 40030, 40032, 40042, 40043, 40057, 40071, 40074, 40377, 40378, 40379,
+      40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928, 40931,
+      40967, 40968, 41168, 41171, 41340, 41459, 41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017]);
     // SCC#s based on Uninon of Concerned Scientists
     groups.MilitarySatellites = new SatGroup('objNum', [40420, 41394, 32783, 35943, 36582, 40353, 40555, 41032, 38010, 38008, 38007, 38009,
       37806, 41121, 41579, 39030, 39234, 28492, 36124, 39194, 36095, 40358, 40258, 37212,
@@ -4870,7 +4894,7 @@ dateFormat.i18n = {
   };
   window.groups = groups;
 })();
-// **** search-box.js ***
+// **** 5 - search-box ***
 (function () {
   var searchBox = {};
   var SEARCH_LIMIT = 200; // Set Maximum Number of Satellites for Search
@@ -5145,7 +5169,7 @@ dateFormat.i18n = {
   };
   window.searchBox = searchBox;
 })();
-// **** orbit-display.js ***
+// **** 6 - orbit-display ***
 (function () {
   var NUM_SEGS = 255;
 
@@ -5357,7 +5381,7 @@ dateFormat.i18n = {
 
   window.orbitDisplay = orbitDisplay;
 })();
-// **** line.js ***
+// **** 7 - line ***
 (function () {
   function Line () {
     this.vertBuf = gl.createBuffer();
@@ -5402,7 +5426,7 @@ function propTime () {
   // console.log('propTime: ' + now + ' elapsed=' + realElapsedMsec/1000);
   return now;
 }
-// **** earth.js ***
+// **** 8 - earth ***
 (function () {
   var earth = {};
   var NUM_LAT_SEGS = 64;
@@ -5670,7 +5694,7 @@ function propTime () {
 
   window.earth = earth;
 })();
-// **** sun.js ***
+// **** 9 - sun ***
 (function () {
   var D2R = Math.PI / 180.0;
 
@@ -5746,7 +5770,7 @@ function propTime () {
     currentDirection: currentDirection
   };
 })();
-// **** sat.js ***
+// **** 10 - sat ***
 (function () {
   var satSet = {};
   var dotShader;
@@ -5865,7 +5889,7 @@ function propTime () {
       // $('#menu-weather img').removeClass('bmenu-item-disabled');
       $('#menu-space-weather img').removeClass('bmenu-item-disabled');
       $('#menu-launches img').removeClass('bmenu-item-disabled');
-      $('#menu-astronauts img').removeClass('bmenu-item-disabled');
+      $('#menu-about img').removeClass('bmenu-item-disabled');
       $('#menu-space-stations img').removeClass('bmenu-item-disabled');
       $('#menu-satellite-collision img').removeClass('bmenu-item-disabled');
       $('#menu-customSensor img').removeClass('bmenu-item-disabled');
@@ -5968,7 +5992,6 @@ function propTime () {
 
       if (obslatitude !== undefined && obslongitude !== undefined && obsheight !== undefined && obsminaz !== undefined && obsmaxaz !== undefined && obsminel !== undefined &&
           obsmaxel !== undefined && obsminrange !== undefined && obsmaxrange !== undefined) {
-
         lookangles.setobs({
           lat: obslatitude,
           long: obslongitude,

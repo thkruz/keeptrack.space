@@ -1373,6 +1373,7 @@ $(document).ready(function () { // Code Once index.php is loaded
   });
 
   $('#editSat').submit(function (e) {
+    $('#es-error').hide();
     var scc = $('#es-scc').val();
     var satId = satSet.getIdFromObjNum(scc);
     if (satId === null) {
@@ -1464,19 +1465,30 @@ $(document).ready(function () { // Code Once index.php is loaded
     var TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
     var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
 
-    satCruncher.postMessage({
-      typ: 'satEdit',
-      id: satId,
-      TLE1: TLE1,
-      TLE2: TLE2
-    });
-    orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
-    sat = satSet.getSat(satId);
+    if (lookangles.altitudeCheck(TLE1, TLE2, propOffset) > 1) {
+      satCruncher.postMessage({
+        typ: 'satEdit',
+        id: satId,
+        TLE1: TLE1,
+        TLE2: TLE2
+      });
+      orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
+
+      sat = satSet.getSat(satId);
+    } else {
+      $('#es-error').html('Failed Altitude Check</br>Try Different Parameters');
+      $('#es-error').show();
+    }
     e.preventDefault();
   });
 
+  $('#es-error').click(function () {
+    $('#es-error').hide();
+  });
+
   $('#newLaunch').submit(function (e) {
+    $('#nl-error').hide();
     var scc = $('#nl-scc').val();
     var satId = satSet.getIdFromObjNum(scc);
     var sat = satSet.getSat(satId);
@@ -1588,16 +1600,25 @@ $(document).ready(function () { // Code Once index.php is loaded
     var TLE1 = TLEs[0];
     var TLE2 = TLEs[1];
 
-    satCruncher.postMessage({
-      typ: 'satEdit',
-      id: satId,
-      TLE1: TLE1,
-      TLE2: TLE2
-    });
-    orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
+    if (lookangles.altitudeCheck(TLE1, TLE2, propOffset) > 1) {
+      satCruncher.postMessage({
+        typ: 'satEdit',
+        id: satId,
+        TLE1: TLE1,
+        TLE2: TLE2
+      });
+      orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
-    sat = satSet.getSat(satId);
+      sat = satSet.getSat(satId);
+    } else {
+      $('#nl-error').html('Failed Altitude Check</br>Try Editing Manually');
+      $('#nl-error').show();
+    }
     e.preventDefault();
+  });
+
+  $('#nl-error').click(function () {
+    $('#nl-error').hide();
   });
 
   $('#customSensor').submit(function (e) {
@@ -3579,6 +3600,31 @@ var lookangles = (function () {
     };
   };
 
+  var altitudeCheck = function (TLE1, TLE2, propOffset) {
+    propRealTime = Date.now();      // Set current time
+    var satrec = satellite.twoline2satrec(TLE1, TLE2);// perform and store sat init calcs
+    var now = propTime(propOffset, propRealTime);
+    var j = jday(now.getUTCFullYear(),
+                 now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+                 now.getUTCDate(),
+                 now.getUTCHours(),
+                 now.getUTCMinutes(),
+                 now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+    j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+    var gmst = satellite.gstime_from_jday(j);
+
+    var m = (j - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+    var pv = satellite.sgp4(satrec, m);
+    var gpos;
+
+    try {
+      gpos = satellite.eci_to_geodetic(pv.position, gmst);
+    } catch (e) {
+      return 0; // Auto fail the altitude check
+    }
+    return gpos.height;
+  };
+
   var getTEARR = function (sat) {
     // Set default timing settings. These will be changed to find look angles at different times in future.
     var propOffset2 = getPropOffset();               // offset letting us propagate in the future (or past)
@@ -4405,7 +4451,8 @@ var lookangles = (function () {
     getOrbitByLatLon: getOrbitByLatLon,
     jday: jday,
     getTEARR: getTEARR,
-    getsensorinfo: getsensorinfo
+    getsensorinfo: getsensorinfo,
+    altitudeCheck: altitudeCheck
   };
 })();
 

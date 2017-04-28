@@ -1,10 +1,11 @@
 <?php
+ini_set("memory_limit", "50M");
 //a new content type. make sure apache does not gzip this type, else it would get buffered
 header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
-$GLOBALS['TLE_Temp_File'] = '/var/www/html/admin/TLE/TLE.json';
-$GLOBALS['TLE_Main_File'] = '/var/www/html/TLE.json';
-$GLOBALS['TLE_Update_Files'] = '/var/www/html/admin/TLE/update';
+$GLOBALS['TLE_Temp_File'] = '/home/kruczek/keeptrack.space/admin/TLE/TLE.json';
+$GLOBALS['TLE_Main_File'] = '/home/kruczek/keeptrack.space/TLEAltNemo.json';
+$GLOBALS['TLE_Update_Files'] = '/home/kruczek/keeptrack.space/admin/TLE/update';
 $serverTime = time();
 //$progress = 0;
 echo "Catalogue Update Initiated\n\n";
@@ -93,9 +94,10 @@ function ParseLocalCatalogue($serverTime, $TLE_dict, $nSCC, $nYear, $nDay, $nTLE
   }
   $TLE_dict_updated = $TLE_dict;
   foreach ($TLE_dict as $key => $id) {             //Search each JSON File
-    $oSCC = substr($oTLE1, 3-1, 7-3+1);
+    $oSCC = substr($id['TLE1'], 3-1, 7-3+1);
     if (!is_array($id)) {
         echo "Glitch in the Matrix\n\n";
+        return $TLE_dict_updated;
     }
     else if ($nSCC == $oSCC){            //Parse each object in File
       $oTLE1 = $id['TLE1'];

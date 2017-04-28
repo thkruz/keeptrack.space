@@ -2,9 +2,9 @@
 //a new content type. make sure apache does not gzip this type, else it would get buffered
 header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
-$GLOBALS['TLE_Temp_File'] = '/var/www/html/admin/TLE/TLE.json';
-$GLOBALS['TLE_Main_File'] = '/var/www/html/TLE.json';
-$GLOBALS['RCS_Update_Files'] = '/var/www/html/admin/TLE/rcs';
+$GLOBALS['TLE_Temp_File'] = '/home/kruczek/keeptrack.space/admin/TLE/TLEAlt.json';
+$GLOBALS['TLE_Main_File'] = '/home/kruczek/keeptrack.space/TLE.json';
+$GLOBALS['RCS_Update_Files'] = '/home/kruczek/keeptrack.space/admin/TLE/rcs';
 $serverTime = time();
 
 echo "Catalogue Update Initiated\n";
@@ -29,13 +29,13 @@ for ($i = 0; $i <= 20; $i++) {
             $LAUNCH = $id['LAUNCH'];
             $SITE = $id['SITE'];
             $COUNTRY = $id['COUNTRY'];
-            $RCS = $id['RCS_SIZE'];
-            if ($RCS == 'Unknown') { $RCS = "U"; }
-            if ($RCS == 'SMALL') { $RCS = 0; }
-            if ($RCS == 'MEDIUM') { $RCS = 1; }
-            if ($RCS == 'LARGE') { $RCS = 2; }
+            // $RCS = $id['RCS_SIZE'];
+            // if ($RCS == 'Unknown') { $RCS = "U"; }
+            // if ($RCS == 'SMALL') { $RCS = 0; }
+            // if ($RCS == 'MEDIUM') { $RCS = 1; }
+            // if ($RCS == 'LARGE') { $RCS = 2; }
             $SCC = $id['NORAD_CAT_ID'];
-            $TLE_dict = ParseLocalCatalogue($serverTime, $TLE_dict, $SCC, $LAUNCH, $SITE, $SITEC, $RCS, $COUNTRY);
+            $TLE_dict = ParseLocalCatalogue($serverTime, $TLE_dict, $SCC, $LAUNCH, $SITE, $SITEC, $COUNTRY);
             set_time_limit(60);
           }
       }
@@ -83,7 +83,7 @@ function delete_upate_list($filename){
   unlink($filename);
 }
 
-function ParseLocalCatalogue($serverTime, $TLE_dict, $nSCC, $nLAUNCH, $nSITE, $nSITEC, $nRCS_SIZE, $nCOUNTRY){
+function ParseLocalCatalogue($serverTime, $TLE_dict, $nSCC, $nLAUNCH, $nSITE, $nSITEC, $nCOUNTRY){
   if (!is_array($TLE_dict)) {
     echo "\nBad TLE File - " . date("h:i:s", time()) . " - Trying to Reopen.\n";
     $TLE_dict = open_catalogue();
@@ -105,24 +105,31 @@ function ParseLocalCatalogue($serverTime, $TLE_dict, $nSCC, $nLAUNCH, $nSITE, $n
           $TLE_dict_updated[$key]["LS"] = $nSITE;
         echo 'SCC#: ' . sprintf('%05d', $nSCC) . ' - ' . date("h:i:s", time()) . " -  NEW LAUNCH SITE\n";
       }
-      // if ($TLE_dict_updated[$key]["LSC"] == "U" || $TLE_dict_updated[$key]["LSC"] == null){
-      //   if ($nSITEC == "Unknown")
-      //     $TLE_dict_updated[$key]["LSC"] = "U";
-      //   if ($nSITEC != "Unknown")
-      //     $TLE_dict_updated[$key]["LSC"] = $nSITEC;
-      //   echo 'SCC#: ' . sprintf('%05d', $nSCC) . ' - ' . date("h:i:s", time()) . " -  NEW LAUNCH COUNTRY\n";
+      if (isset($TLE_dict_updated[$key]["LSC"])){
+        unset($TLE_dict_updated[$key]["LSC"]);
+        echo 'SCC#: ' . sprintf('%05d', $nSCC) . ' - ' . date("h:i:s", time()) . " -  LAUNCH COUNTRY REMOVED\n";
+      }
+      if (isset($TLE_dict_updated[$key]["LD"])){
+        unset($TLE_dict_updated[$key]["LD"]);
+        echo 'SCC#: ' . sprintf('%05d', $nSCC) . ' - ' . date("h:i:s", time()) . " -  LAUNCH DATE REMOVED\n";
+      }
+
+      // CODE FOR ADDING A LAUNCH DATE ////////////
+
+      // if ($TLE_dict_updated[$key]["LD"] == "U" || $TLE_dict_updated[$key]["LD"] == null){
+      //   if ($nLAUNCH == "Unknown")
+      //     $TLE_dict_updated[$key]["LD"] = "Unknown";
+      //   if ($nLAUNCH != "Unknown")
+      //     $TLE_dict_updated[$key]["LD"] = $nLAUNCH;
+      //   echo 'SCC#: ' . sprintf('%05d', $nSCC) . ' - ' . date("h:i:s", time()) . " -  NEW LAUNCH DATE\n";
       // }
-      if ($TLE_dict_updated[$key]["LD"] == "U" || $TLE_dict_updated[$key]["LD"] == null){
-        if ($nLAUNCH == "Unknown")
-          $TLE_dict_updated[$key]["LD"] = "Unknown";
-        if ($nLAUNCH != "Unknown")
-          $TLE_dict_updated[$key]["LD"] = $nLAUNCH;
-        echo 'SCC#: ' . sprintf('%05d', $nSCC) . ' - ' . date("h:i:s", time()) . " -  NEW LAUNCH DATE\n";
-      }
-      if ($TLE_dict_updated[$key]["R"] == "U" || $TLE_dict_updated[$key]["R"] == null){
-        $TLE_dict_updated[$key]["R"] = $nRCS_SIZE;
-        echo 'SCC#: ' . sprintf('%05d', $nSCC) . ' - ' . date("h:i:s", time()) . " -  NEW RCS SIZE\n";
-      }
+
+      ///////////////////////////////////////////
+
+      // if ($TLE_dict_updated[$key]["R"] == "U" || $TLE_dict_updated[$key]["R"] == null){
+      //   $TLE_dict_updated[$key]["R"] = $nRCS_SIZE;
+      //   echo 'SCC#: ' . sprintf('%05d', $nSCC) . ' - ' . date("h:i:s", time()) . " -  NEW RCS SIZE\n";
+      // }
       if ($TLE_dict_updated[$key]["C"] == "U" || $TLE_dict_updated[$key]["C"] == null){
         if ($nCOUNTRY == "Unkown")
           $TLE_dict_updated[$key]["C"] = "U";

@@ -313,6 +313,21 @@
                   Show Only Sensor FOV
                 </label>
               </div>
+              <div class="switch row">
+                <label>
+                  <input id="settings-riseset" type="checkbox">
+                  <span class="lever"></span>
+                  Show Only Rise Set Times in Lookangles
+                </label>
+              </div>
+              <div class="input-field col s6">
+                <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated">
+                <label for="lookanglesLength">Lookangles Length</label>
+              </div>
+              <div class="input-field col s6">
+                <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
+                <label for="lookanglesInterval">Lookangles Interval</label>
+              </div>
               <div class="row"></div>
               <h6 class="center-align">Only On Fast Computers</h6>
               <div class="row"></div>
@@ -726,8 +741,8 @@
         </div>
       </div>
     </div>
-    <span style="margin-top:-45px;margin-right:10px" class="right tooltipped" data-position="top" data-delay="50" data-tooltip="April 26, 2017">
-      v0.11.4
+    <span style="margin-top:-45px;margin-right:10px" class="right tooltipped" data-position="top" data-delay="50" data-tooltip="April 27, 2017">
+      v0.12.0
     </span>
 
     <!-- <div id="zoom-controls" style="display:none;">

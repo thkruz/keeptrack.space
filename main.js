@@ -120,10 +120,13 @@ var isCustomSensorMenuOpen = false;
 var isEditTime = false;
 var isShowNextPass = false;
 var isOnlyFOVChecked = false;
+var isRiseSetLookangles = false;
 
 var otherSatelliteTransparency = 0.1;
 
 var lastBoxUpdateTime = 0;
+var lookanglesInterval = 5;
+var lookanglesLength = 7;
 
 var pickFb, pickTex;
 var pickColorBuf;
@@ -424,7 +427,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 6,
       obsminel: 3,
       obsmaxel: 85,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 5555
     });
 
@@ -436,7 +439,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 6,
       obsminel: 3,
       obsmaxel: 85,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 5555
     });
 
@@ -462,7 +465,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 227,
       obsminel: 3,
       obsmaxel: 85,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 5555
     });
 
@@ -474,7 +477,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 227,
       obsminel: 3,
       obsmaxel: 85,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 5555
     });
 
@@ -501,7 +504,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 64,
       obsminel: 3,
       obsmaxel: 85,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 4910
     });
 
@@ -513,7 +516,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 64,
       obsminel: 3,
       obsmaxel: 85,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 4910
     });
 
@@ -540,7 +543,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 240,
       obsminel: 3,
       obsmaxel: 105,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 50000
     });
 
@@ -552,7 +555,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 240,
       obsminel: 3,
       obsmaxel: 105,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 50000
     });
 
@@ -579,7 +582,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 360,
       obsminel: 3,
       obsmaxel: 85,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 4820
     });
 
@@ -591,7 +594,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 360,
       obsminel: 3,
       obsmaxel: 85,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 4820
     });
 
@@ -618,7 +621,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 78,
       obsminel: 1.9,
       obsmaxel: 95,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 3300 // TODO: Double check this
     });
 
@@ -630,7 +633,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 78,
       obsminel: 1.9,
       obsmaxel: 95,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 3300 // TODO: Double check this
     });
 
@@ -657,7 +660,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 177,
       obsminel: 3,
       obsmaxel: 85,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 5555
     });
 
@@ -669,7 +672,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 177,
       obsminel: 3,
       obsmaxel: 85,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 5555
     });
 
@@ -699,7 +702,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 360,
       obsminel: 1,
       obsmaxel: 90,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 50000
     });
 
@@ -711,7 +714,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 360,
       obsminel: 1,
       obsmaxel: 90,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 50000
     });
 
@@ -738,7 +741,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 360,
       obsminel: 1,
       obsmaxel: 90,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 50000
     });
 
@@ -750,7 +753,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       obsmaxaz: 360,
       obsminel: 1,
       obsmaxel: 90,
-      obsminrange: 500,
+      obsminrange: 200,
       obsmaxrange: 50000
     });
 
@@ -1308,6 +1311,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     var isHOSChecked = document.getElementById('settings-hos').checked;
     isOnlyFOVChecked = document.getElementById('settings-onlyfov').checked;
     var isSNPChecked = document.getElementById('settings-snp').checked;
+    var isRiseSetChecked = document.getElementById('settings-riseset').checked;
     if (isResetSensorChecked) {
       // Return to default settings with nothing 'inview'
       satCruncher.postMessage({
@@ -1354,6 +1358,16 @@ $(document).ready(function () { // Code Once index.php is loaded
     } else {
       isShowNextPass = false;
     }
+
+    if (isRiseSetChecked) {
+      isRiseSetLookangles = true;
+    } else {
+      isRiseSetLookangles = false;
+    }
+
+    lookanglesLength = $('#lookanglesLength').val() * 1;
+    lookanglesInterval = $('#lookanglesInterval').val() * 1;
+
     document.getElementById('settings-resetSensor').checked = false;
     e.preventDefault();
   });
@@ -3971,12 +3985,21 @@ var lookangles = (function () {
       tdR.appendChild(document.createTextNode('Rng'));
       tdR.setAttribute('style', 'text-decoration: underline');
 
-      for (var i = 0; i < (7 * 24 * 60 * 60); i += 5) {         // 5second Looks
+      if (isRiseSetLookangles) {
+        var tempLookanglesInterval = lookanglesInterval;
+        lookanglesInterval = 1;
+      }
+
+      for (var i = 0; i < (lookanglesLength * 24 * 60 * 60); i += lookanglesInterval) {         // lookanglesInterval in seconds
         propOffset2 = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
         if (tblLength >= 1500) {                           // Maximum of 1500 lines in the look angles table
           break;                                            // No more updates to the table (Prevent GEO object slowdown)
         }
         tblLength += propagate(propOffset2, tbl, satrec);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
+      }
+
+      if (isRiseSetLookangles) {
+        lookanglesInterval = tempLookanglesInterval;
       }
     }
   };
@@ -4035,7 +4058,7 @@ var lookangles = (function () {
           obsmaxaz: 227,
           obsminel: 3,
           obsmaxel: 85,
-          obsminrange: 500,
+          obsminrange: 200,
           obsmaxrange: 5555
         });
         break;
@@ -4048,7 +4071,7 @@ var lookangles = (function () {
           obsmaxaz: 64,
           obsminel: 3,
           obsmaxel: 85,
-          obsminrange: 500,
+          obsminrange: 200,
           obsmaxrange: 4910
         });
         break;
@@ -4061,7 +4084,7 @@ var lookangles = (function () {
           obsmaxaz: 6,
           obsminel: 3,
           obsmaxel: 85,
-          obsminrange: 500,
+          obsminrange: 200,
           obsmaxrange: 5555
         });
         break;
@@ -4074,7 +4097,7 @@ var lookangles = (function () {
           obsmaxaz: 78,
           obsminel: 1.9,
           obsmaxel: 95,
-          obsminrange: 500,
+          obsminrange: 200,
           obsmaxrange: 3300 // TODO: Double check this
         });
         break;
@@ -4087,7 +4110,7 @@ var lookangles = (function () {
           obsmaxaz: 360,
           obsminel: 3,
           obsmaxel: 85,
-          obsminrange: 500,
+          obsminrange: 200,
           obsmaxrange: 4820
         });
         break;
@@ -4100,7 +4123,7 @@ var lookangles = (function () {
           obsmaxaz: 240,
           obsminel: 3,
           obsmaxel: 105,
-          obsminrange: 500,
+          obsminrange: 200,
           obsmaxrange: 50000
         });
         break;
@@ -4113,7 +4136,7 @@ var lookangles = (function () {
           obsmaxaz: 177,
           obsminel: 3,
           obsmaxel: 85,
-          obsminrange: 500,
+          obsminrange: 200,
           obsmaxrange: 5555
         });
         break;
@@ -4126,7 +4149,7 @@ var lookangles = (function () {
           obsmaxaz: 360,
           obsminel: 1,
           obsmaxel: 90,
-          obsminrange: 500,
+          obsminrange: 200,
           obsmaxrange: 50000
         });
         break;
@@ -4139,7 +4162,7 @@ var lookangles = (function () {
           obsmaxaz: 360,
           obsminel: 1,
           obsmaxel: 90,
-          obsminrange: 500,
+          obsminrange: 200,
           obsmaxrange: 50000
         });
         break;
@@ -4174,15 +4197,85 @@ var lookangles = (function () {
     rangeSat = lookAngles.range_sat;
 
     if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
-      var tr = tbl.insertRow();
-      var tdT = tr.insertCell();
+      if (isRiseSetLookangles) {
+        // Previous Pass to Calculate first line of coverage
+        var now1 = propTime(propOffset2 - (lookanglesInterval * 1000), propRealTime);
+        var j1 = jday(now1.getUTCFullYear(),
+                     now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+                     now1.getUTCDate(),
+                     now1.getUTCHours(),
+                     now1.getUTCMinutes(),
+                     now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+        j1 += now1.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+        var gmst1 = satellite.gstime_from_jday(j1);
+
+        var m1 = (j1 - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+        var pv1 = satellite.sgp4(satrec, m1);
+        var positionEcf1, lookAngles1, azimuth1, elevation1, rangeSat1;
+
+        positionEcf1 = satellite.eci_to_ecf(pv1.position, gmst1); // pv.position is called positionEci originally
+        lookAngles1 = satellite.ecf_to_look_angles(observerGd, positionEcf1);
+        azimuth1 = lookAngles1.azimuth / deg2rad;
+        elevation1 = lookAngles1.elevation / deg2rad;
+        rangeSat1 = lookAngles1.range_sat;
+        if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange))) {
+          var tr = tbl.insertRow();
+          var tdT = tr.insertCell();
+          tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
+          // tdT.style.border = '1px solid black';
+          var tdE = tr.insertCell();
+          tdE.appendChild(document.createTextNode(elevation.toFixed(1)));
+          var tdA = tr.insertCell();
+          tdA.appendChild(document.createTextNode(azimuth.toFixed(0)));
+          var tdR = tr.insertCell();
+          tdR.appendChild(document.createTextNode(rangeSat.toFixed(0)));
+          return 1;
+        } else {
+          // Next Pass to Calculate Last line of coverage
+          now1 = propTime(propOffset2 + (lookanglesInterval * 1000), propRealTime);
+          j1 = jday(now1.getUTCFullYear(),
+                       now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+                       now1.getUTCDate(),
+                       now1.getUTCHours(),
+                       now1.getUTCMinutes(),
+                       now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+          j1 += now1.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+          gmst1 = satellite.gstime_from_jday(j1);
+
+          m1 = (j1 - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+          pv1 = satellite.sgp4(satrec, m1);
+
+          positionEcf1 = satellite.eci_to_ecf(pv1.position, gmst1); // pv.position is called positionEci originally
+          lookAngles1 = satellite.ecf_to_look_angles(observerGd, positionEcf1);
+          azimuth1 = lookAngles1.azimuth / deg2rad;
+          elevation1 = lookAngles1.elevation / deg2rad;
+          rangeSat1 = lookAngles1.range_sat;
+          if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange))) {
+            tr = tbl.insertRow();
+            tdT = tr.insertCell();
+            tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
+            // tdT.style.border = '1px solid black';
+            tdE = tr.insertCell();
+            tdE.appendChild(document.createTextNode(elevation.toFixed(1)));
+            tdA = tr.insertCell();
+            tdA.appendChild(document.createTextNode(azimuth.toFixed(0)));
+            tdR = tr.insertCell();
+            tdR.appendChild(document.createTextNode(rangeSat.toFixed(0)));
+            return 1;
+          }
+        }
+        return 0;
+      }
+
+      tr = tbl.insertRow();
+      tdT = tr.insertCell();
       tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
       // tdT.style.border = '1px solid black';
-      var tdE = tr.insertCell();
+      tdE = tr.insertCell();
       tdE.appendChild(document.createTextNode(elevation.toFixed(1)));
-      var tdA = tr.insertCell();
+      tdA = tr.insertCell();
       tdA.appendChild(document.createTextNode(azimuth.toFixed(0)));
-      var tdR = tr.insertCell();
+      tdR = tr.insertCell();
       tdR.appendChild(document.createTextNode(rangeSat.toFixed(0)));
       return 1;
     }

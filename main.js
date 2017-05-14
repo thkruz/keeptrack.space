@@ -97,6 +97,10 @@ var zoomTarget = 0.5;
 var camPitchSpeed = 0;
 var camYawSpeed = 0;
 
+// Map Variables
+var mapWidth = 800;
+var mapHeight = 600;
+
 // SOCRATES Variables
 var socratesObjOne = []; // Array for tr containing CATNR1
 var socratesObjTwo = []; // Array for tr containing CATNR2
@@ -260,6 +264,23 @@ $(document).ready(function () { // Code Once index.php is loaded
     satSet.satDataString = null; // Clears stringified json file and clears 7MB of memory.
   });
 
+  // Resize Window Detection
+  $(window).resize(function () {
+    if ($(window).width() > $(window).height()) {
+      mapWidth = $(window).width(); // Subtract 12 px for the scroll
+      $('#map-image').width(mapWidth);
+      mapHeight = mapWidth * 3 / 4;
+      $('#map-image').height(mapHeight);
+      $('#map-menu').width($(window).width());
+    } else {
+      mapHeight = $(window).height() - 100; // Subtract 12 px for the scroll
+      $('#map-image').height(mapHeight);
+      mapWidth = mapHeight * 4 / 3;
+      $('#map-image').width(mapWidth);
+      $('#map-menu').width($(window).width());
+    }
+  });
+
   $('#canvas').on('touchmove', function (evt) {
     evt.preventDefault();
     if (isDragging && screenDragPoint[0] !== evt.originalEvent.touches[0].clientX && screenDragPoint[1] !== evt.originalEvent.touches[0].clientY) {
@@ -329,9 +350,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     var y = evt.originalEvent.touches[0].clientY;
     dragPoint = getEarthScreenPoint(x, y);
     screenDragPoint = [x, y];
-    if ($(document).width() <= 992) {
-      console.log($(document).width());
-    }
     dragStartPitch = camPitch;
     dragStartYaw = camYaw;
     // debugLine.set(dragPoint, getCamPos());
@@ -353,7 +371,11 @@ $(document).ready(function () { // Code Once index.php is loaded
         searchBox.hideResults();
         isMilSatSelected = false;
         $('#menu-space-stations img').removeClass('bmenu-item-selected');
-        $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
+        if ($(document).width() <= 992) {
+          $('#search-results').attr('style', 'max-height:20%;margin-bottom:-50px;width:100%;bottom:auto;margin-top:56px;');
+        } else {
+          $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
+        }
 
         satSet.setColorScheme(ColorScheme.default);
 
@@ -429,6 +451,14 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   $('#reddit-share').click(function () {
     ga('send', 'social', 'Reddit', 'share', 'http://keeptrack.com');
+  });
+
+  $('#us-radar-menu').click(function () {
+    updateMap();
+  });
+
+  $('#russian-menu').click(function () {
+    updateMap();
   });
 
   // USAF Radars
@@ -1701,6 +1731,16 @@ $(document).ready(function () { // Code Once index.php is loaded
   });
 
   $('#customSensor').submit(function (e) {
+    $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
+    whichRadar = 'CUSTOM';
+    if ($('#cs-telescope').val()) {
+      $('#sensor-type').html('Telescope');
+    } else {
+      $('#sensor-type').html('Radar');
+    }
+    $('#sensor-info-title').html('Custom Sensor');
+    $('#sensor-country').html('Custom Sensor');
+
     var lon = $('#cs-lon').val();
     var lat = $('#cs-lat').val();
     var hei = $('#cs-hei').val();
@@ -2466,6 +2506,15 @@ function bottomIconPress (evt) {
         break;
       } else {
         hideSideMenus();
+
+        // TODO: Requires https on chrome, but I will come back to this idea another time
+        // if (navigator.geolocation) {
+        //   navigator.geolocation.getCurrentPosition(function (position) {
+        //     console.log('Latitude: ' + position.coords.latitude);
+        //     console.log('Longitude: ' + position.coords.longitude);
+        //   });
+        // }
+
         $('#customSensor-menu').fadeIn();
         isCustomSensorMenuOpen = true;
         $('#menu-customSensor img').addClass('bmenu-item-selected');
@@ -2523,9 +2572,17 @@ function selectSat (satId) {
   if (satId === -1) {
     $('#sat-infobox').fadeOut();
     if ($('#search-results').css('display') === 'block') {
-      $('#search-results').attr('style', 'display:block;max-height:100%;margin-bottom:-50px;');
+      if ($(document).width() <= 992) {
+        $('#search-results').attr('style', 'display:block;max-height:20%;margin-bottom:-50px;width:100%;bottom:auto;margin-top:56px;');
+      } else {
+        $('#search-results').attr('style', 'display:block;max-height:100%;margin-bottom:-50px;');
+      }
     } else {
-      $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
+      if ($(document).width() <= 992) {
+        $('#search-results').attr('style', 'max-height:20%;margin-bottom:-50px;width:100%;bottom:auto;margin-top:56px;');
+      } else {
+        $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
+      }
     }
     $('#iss-stream').html('');
     $('#iss-stream-menu').fadeOut();
@@ -2575,9 +2632,17 @@ function selectSat (satId) {
     if (!sat) return;
     orbitDisplay.setSelectOrbit(satId);
     if ($('#search-results').css('display') === 'block') {
-      $('#search-results').attr('style', 'display:block; max-height:27%');
+      if ($(document).width() <= 992) {
+        $('#search-results').attr('style', 'display:block; max-height:20%; width: 100%;bottom:auto;margin-top:56px;');
+      } else {
+        $('#search-results').attr('style', 'display:block; max-height:27%');
+      }
     } else {
-      $('#search-results').attr('style', 'max-height:27%');
+      if ($(document).width() <= 992) {
+        $('#search-results').attr('style', 'max-height:20%; width: 100%;bottom:auto;margin-top:56px;');
+      } else {
+        $('#search-results').attr('style', 'max-height:27%');
+      }
     }
     $('#sat-infobox').fadeIn();
     $('#sat-info-title').html(sat.ON);
@@ -3569,20 +3634,20 @@ function updateMap () {
   var satData = satSet.getSat(selectedSat);
   lookangles.getTEARR(satData);
   var map = braun({lon: satellite.degrees_long(lookangles.lon), lat: satellite.degrees_lat(lookangles.lat)}, {meridian: 0, latLimit: 90});
-  map.x = map.x * 800 - 10;
-  map.y = map.y / 0.6366197723675813 * 600 - 10;
+  map.x = map.x * mapWidth - 10;
+  map.y = map.y / 0.6366197723675813 * mapHeight - 10;
   $('#map-sat').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
   if (!(lookangles.obslat === undefined || lookangles.obslat === null)) {
     map = braun({lon: lookangles.obslong, lat: lookangles.obslat}, {meridian: 0, latLimit: 90});
-    map.x = map.x * 800 - 10;
-    map.y = map.y / 0.6366197723675813 * 600 - 10;
+    map.x = map.x * mapWidth - 10;
+    map.y = map.y / 0.6366197723675813 * mapHeight - 10;
     $('#map-sensor').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;z-index:11;'); // Set to size of the map image (800x600)
   }
   for (var i = 1; i <= 50; i++) {
     map = braun({lon: lookangles.map(satData, i).lon, lat: lookangles.map(satData, i).lat}, {meridian: 0, latLimit: 90});
-    map.x = map.x * 800 - 3.5;
-    map.y = map.y / 0.6366197723675813 * 600 - 3.5;
-    if (map.y > 300) {
+    map.x = map.x * mapWidth - 3.5;
+    map.y = map.y / 0.6366197723675813 * mapHeight - 3.5;
+    if (map.y > mapHeight / 2) {
       $('#map-look' + i).tooltip({delay: 50, tooltip: lookangles.map(satData, i).time, position: 'top'});
     } else {
       $('#map-look' + i).tooltip({delay: 50, tooltip: lookangles.map(satData, i).time, position: 'bottom'});
@@ -6283,6 +6348,61 @@ function propTime () {
 
     if (!cruncherReady) {
       // NOTE:: This is called right after all the objects load on the screen.
+
+      // Hide Menus on Small Screens
+      if ($(document).width() <= 992) {
+        // TODO FullScreen Option
+        // document.documentElement.webkitRequestFullScreen();
+        $('#menu-sensor-info img').hide();
+        $('#menu-in-coverage img').hide();
+        // $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+        // $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
+        $('#zoom-in').show();
+        $('#zoom-out').show();
+        $('#zoom-in img').removeClass('bmenu-item-disabled');
+        $('#zoom-out img').removeClass('bmenu-item-disabled');
+        $('#menu-find-sat img').removeClass('bmenu-item-disabled');
+        $('#menu-twitter img').hide();
+        $('#menu-weather img').hide();
+        // $('#menu-map img').removeClass('bmenu-item-disabled');
+        $('#menu-launches img').hide();
+        $('#menu-about img').removeClass('bmenu-item-disabled');
+        $('#menu-about img').attr('style', 'border-right:0px;');
+        $('#menu-space-stations img').hide();
+        $('#menu-satellite-collision img').removeClass('bmenu-item-disabled');
+        $('#menu-customSensor img').removeClass('bmenu-item-disabled');
+        $('#menu-settings').hide();
+        $('#menu-editSat img').hide();
+        $('#menu-newLaunch img').hide();
+        $('#social').hide();
+        $('#version-info').hide();
+        $('#mobile-warning').show();
+        $('#changelog-row').addClass('center-align');
+        $('#fastCompSettings').hide();
+        $('#social-alt').show();
+        $('.side-menu').attr('style', 'width:100%;height:auto;');
+        $('#canvas-holder').attr('style', 'overflow:auto;');
+        $('#datetime').attr('style', 'position:fixed;left:130px;top:10px;width:141px;height:32px');
+        $('#datetime-text').attr('style', 'padding:6px;height:100%;');
+        $('#datetime-input').attr('style', 'bottom:0px;');
+        $('#bottom-icons').attr('style', 'position:inherit;');
+        $('#search').attr('style', 'width:55px;');
+        if ($(document).height() >= 600) {
+          $('#sat-infobox').attr('style', 'width:100%;top:60%;');
+        } else {
+          $('#sat-infobox').attr('style', 'width:100%;top:50%;');
+        }
+      }
+
+      // Hide More Stuff on Little Screens
+      if ($(document).width() <= 400) {
+        $('#menu-satellite-collision img').hide();
+        $('#reddit-share').hide();
+        $('#menu-find-sat').hide();
+        $('#sat-infobox').attr('style', 'width:100%;top:60%;');
+        $('#datetime').attr('style', 'position:fixed;left:85px;top:10px;width:141px;height:32px');
+      }
+
       // $('#load-cover').fadeOut();
       $('#logo-container').fadeOut();
       $('body').attr('style', 'background:black');
@@ -6307,6 +6427,20 @@ function propTime () {
       cruncherReady = true;
       if (cruncherReadyCallback) {
         cruncherReadyCallback(satData);
+      }
+
+      if ($(window).width() > $(window).height()) {
+        mapWidth = $(window).width(); // Subtract 12 px for the scroll
+        $('#map-image').width(mapWidth);
+        mapHeight = mapWidth * 3 / 4;
+        $('#map-image').height(mapHeight);
+        $('#map-menu').width($(window).width());
+      } else {
+        mapHeight = $(window).height() - 100; // Subtract 12 px for the scroll
+        $('#map-image').height(mapHeight);
+        mapWidth = mapHeight * 4 / 3;
+        $('#map-image').width(mapWidth);
+        $('#map-menu').width($(window).width());
       }
     }
 

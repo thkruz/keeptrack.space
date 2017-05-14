@@ -285,8 +285,13 @@ ul {
     width: 800px;
     z-index: 10;
     left: 0;
-    overflow: none;
     color: white;
+}
+
+@media only screen and (max-width: 992px) {
+  ::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 #map-sensor {
@@ -682,7 +687,7 @@ ul li{
   }
 }
 
-#zoom-controls {
+/*#zoom-controls {
     position: absolute;
     right: 20px;
     bottom: 20px;
@@ -715,7 +720,7 @@ ul li{
 }
 .zoom-button:active {
     background: #511;
-}
+}*/
 
 .ui_tpicker_time_input {
   height: 15px !important;

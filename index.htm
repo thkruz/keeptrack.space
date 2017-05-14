@@ -9,6 +9,9 @@
     <meta property='og:title' content='Keeptrack'/>
     <meta property='og:description' content='A 3D visualtion tool to learn about satellites and tracking radars.'/>
     <meta property='og:url' content='http://keeptrack.space'>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
     <!-- Change this to use alternate TLE Source -->
     <div id="tle-source" style="display: none;">TLE.json</div>
 
@@ -48,6 +51,11 @@
   <header>
     <nav>
       <div class="nav-wrapper light-blue darken-3">
+        <div id="social-alt" style="display:none;top: 10px;left: 10px;position: absolute;" class="left">
+          <a id="facebook-share" href="https://www.facebook.com/sharer/sharer.php?u=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Facebook"><img src="https://static.addtoany.com/buttons/facebook.svg" width="32" height="32"></a>
+          <a id="twitter-share" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Twitter"><img src="https://static.addtoany.com/buttons/twitter.svg" width="32" height="32"></a>
+          <a id="reddit-share" href="https://www.reddit.com/submit?url=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Reddit"><img src="https://static.addtoany.com/buttons/reddit.svg" width="32" height="32"></a>
+        </div>
         <ul id="nav-mobile" class="left hide-on-med-and-down">
           <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Satellites &#x25BC;</a></li>
           <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-radar-menu" style="padding-right: 25px;padding-left: 25px;">SSN Sensors &#x25BC;</a></li>
@@ -155,7 +163,7 @@
               <div class="sensor-info-value" id="sensor-country">USA</div>
             </div>
             <div class="sensor-info-row">
-              <div class="sensor-info-key">Radar Type</div>
+              <div class="sensor-info-key">Sensor Type</div>
               <div class="sensor-info-value" id="sensor-type">Unknown</div>
             </div>
             <div class="sensor-info-row">
@@ -286,7 +294,7 @@
       <div id="map-menu" class="start-hidden side-menu valign-wrapper">
         <img id="map-image" src="images/braun-stereographic.jpg" width="800px" height="600px">
         <img id="map-sat" class="map-item map-look" src="images/satellite-2.png" width="20px" height="20px">
-        <img id="map-sensor" class="map-item map-look" src="images/radar-1.png" width="20px" height="20px">
+        <img id="map-sensor" class="map-item map-look" src="images/radar-1.png" style="display:none;" width="20px" height="20px">
         <img id="map-look1" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
         <img id="map-look2" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
         <img id="map-look3" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
@@ -337,8 +345,8 @@
         <img id="map-look48" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
         <img id="map-look49" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
         <img id="map-look50" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-        <div style="width:100%;height:22px;margin-top:-6px;background-color:black;">
-          <a style="right:10px;position:absolute;" href="http://map-projections.net/license/braun-stereographic:mapimg-ssw" target="_blank">Braun Stereographic Projection (c) Tobias Jung</a>
+        <div id="braun-credit" style="position:absolute;right:10px;bottom:10px;z-index:5;color:#0a97d6;">
+          Braun Stereographic Projection (c) Tobias Jung
         </div>
       </div>
       <!-- <div id="space-weather-menu" class="start-hidden side-menu">
@@ -393,17 +401,19 @@
                 <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
                 <label for="lookanglesInterval">Lookangles Interval</label>
               </div>
-              <div class="row"></div>
-              <h6 class="center-align">Only On Fast Computers</h6>
-              <div class="row"></div>
-              <div class="switch row">
-                <label>
-                  <input id="settings-snp" type="checkbox">
-                  <span class="lever"></span>
-                  Show Next Pass on Hover
-                </label>
+              <div id="fastCompSettings">
+                <div class="row"></div>
+                <h6 class="center-align">Only On Fast Computers</h6>
+                <div class="row"></div>
+                <div class="switch row">
+                  <label>
+                    <input id="settings-snp" type="checkbox">
+                    <span class="lever"></span>
+                    Show Next Pass on Hover
+                  </label>
+                </div>
+                <div class="row"></div>
               </div>
-              <div class="row"></div>
               <div class="row center">
                 <button id="settings-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Settings &#9658;
                 </button>
@@ -415,21 +425,23 @@
       <div id="about-menu" class="start-hidden text-select">
         <div id="about-content" style="font-size: small;" class="side-menu">
           <div class="row">
-            <div class="row">
+            <div id="mobile-warning" style="display:none;margin-top:10px;color:#48f3e3 !important;" class="center-align">
+              You are using the mobile version. Please try the desktop version for full functionality.
+            </div>
+            <div id="changelog-row" class="row">
               <h5 class="center-align">Changelog</h5>
+              <h6>v0.15.0</h6>
+              <div class="col s12">
+                - First Mobile Version</br></br>
+              </div>
               <h6>v0.14.0</h6>
               <div class="col s12">
                 - Stereographic Map added.</br>
-                - Longitude calculation fixed.
+                - Longitude calculation fixed.</br></br>
               </div>
               <h6>v0.13.1</h6>
               <div class="col s12">
-                - Preview Image for Sharing Added.</br>
-              </div>
-              <h6>v0.13.0</h6>
-              <div class="col s12">
-                - Social Media Integration.</br>
-                - Error Checking on Satellite Edit.</br></br>
+                - Preview Image for Sharing Added.</br></br>
               </div>
             </div>
             <div class="row">
@@ -785,6 +797,12 @@
     </div>
     <div id="bottom-icons-container" class="container center">
       <div id="bottom-icons">
+        <div id="zoom-in" class="bmenu-item" style="display:none;">
+          <img src="" delayedsrc="images/zoom-in.png" class="bmenu-item-disabled">
+        </div>
+        <div id="zoom-out" class="bmenu-item" style="display:none;">
+          <img src="" delayedsrc="images/zoom-out.png" class="bmenu-item-disabled">
+        </div>
         <div id="menu-sensor-info" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Sensor Information">
           <img src="" delayedsrc="images/radar.png" class="bmenu-item-disabled" alt="Sensor Info">
         </div>
@@ -838,13 +856,13 @@
         </div>
       </div>
     </div>
-    <div style="margin-top:-50px;margin-right:70px;" class="right">
+    <div id="social" style="margin-top:-50px;margin-right:70px;" class="right">
       <a id="facebook-share" href="https://www.facebook.com/sharer/sharer.php?u=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Facebook"><img src="https://static.addtoany.com/buttons/facebook.svg" width="32" height="32"></a>
       <a id="twitter-share" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Twitter"><img src="https://static.addtoany.com/buttons/twitter.svg" width="32" height="32"></a>
       <a id="reddit-share" href="https://www.reddit.com/submit?url=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Reddit"><img src="https://static.addtoany.com/buttons/reddit.svg" width="32" height="32"></a>
     </div>
-    <span style="margin-top:-45px;margin-right:10px" class="right tooltipped" data-position="top" data-delay="50" data-tooltip="May 13, 2017">
-      v0.14.0
+    <span id="version-info" style="margin-top:-45px;margin-right:10px" class="right tooltipped" data-position="top" data-delay="50" data-tooltip="May 13, 2017">
+      v0.15.0
     </span>
 
     <!-- <div id="zoom-controls" style="display:none;">

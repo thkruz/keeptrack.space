@@ -279,6 +279,34 @@ ul {
   display: none;
 }
 
+#map-menu {
+    display: none;
+    position: absolute;
+    width: 800px;
+    z-index: 10;
+    left: 0;
+    overflow: none;
+    color: white;
+}
+
+#map-sensor {
+  position: absolute;
+  z-index: -1;
+}
+
+#map-sat {
+  z-index: 15;
+}
+
+.map-look {
+  cursor: pointer;
+}
+
+.map-item {
+    position: absolute;
+    z-index: 11;
+}
+
 #weather-menu {
     display: none;
     background: rgba(0, 0, 0, 0);

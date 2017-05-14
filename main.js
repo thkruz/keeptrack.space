@@ -59,6 +59,8 @@ laws of the United States and International Copyright Treaty.
     vec4
     Worker
     requestAnimationFrame
+    ga
+    braun
 
 */
 
@@ -105,7 +107,8 @@ var isLookanglesMenuOpen = false;
 var isLookanglesMultiSiteMenuOpen = false;
 var isTwitterMenuOpen = false;
 var isWeatherMenuOpen = false;
-var isSpaceWeatherMenuOpen = false;
+var isMapMenuOpen = false;
+// var isSpaceWeatherMenuOpen = false;
 var isFindByLooksMenuOpen = false;
 var isSensorInfoMenuOpen = false;
 var isLaunchMenuOpen = false;
@@ -125,6 +128,8 @@ var isRiseSetLookangles = false;
 var otherSatelliteTransparency = 0.1;
 
 var lastBoxUpdateTime = 0;
+var lastMapUpdateTime = 0;
+var mapUpdateOverride = false;
 var lookanglesInterval = 5;
 var lookanglesLength = 7;
 
@@ -414,8 +419,21 @@ $(document).ready(function () { // Code Once index.php is loaded
     }
   });
 
+  $('#facebook-share').click(function () {
+    ga('send', 'social', 'Facebook', 'share', 'http://keeptrack.com');
+  });
+
+  $('#twitter-share').click(function () {
+    ga('send', 'social', 'Twitter', 'share', 'http://keeptrack.com');
+  });
+
+  $('#reddit-share').click(function () {
+    ga('send', 'social', 'Reddit', 'share', 'http://keeptrack.com');
+  });
+
   // USAF Radars
   $('#radar-beale').click(function () { // Select Beale's Radar Coverage
+    ga('send', 'event', 'Sensor', 'Beale', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -454,6 +472,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#radar-capecod').click(function () { // Select Cape Cod's Radar Coverage
+    ga('send', 'event', 'Sensor', 'Cape Cod', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -493,6 +512,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#radar-clear').click(function () { // Select Clear's Radar Coverage
+    ga('send', 'event', 'Sensor', 'Clear', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -532,6 +552,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#radar-eglin').click(function () { // Select Clear's Radar Coverage
+    ga('send', 'event', 'Sensor', 'Eglin', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -571,6 +592,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#radar-fylingdales').click(function () { // Select Fylingdales's Radar Coverage
+    ga('send', 'event', 'Sensor', 'Fylingdales', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -610,6 +632,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#radar-parcs').click(function () { // Select PARCS' Radar Coverage
+    ga('send', 'event', 'Sensor', 'Cavalier', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -649,6 +672,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#radar-thule').click(function () { // Select Thule's Radar Coverage
+    ga('send', 'event', 'Sensor', 'Thule', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -691,6 +715,7 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   // US Contributing Radars
   $('#radar-altair').click(function () { // Select Altair's Radar Coverage
+    ga('send', 'event', 'Sensor', 'Altair', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -730,6 +755,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#radar-millstone').click(function () { // Select Millstone's Radar Coverage
+    ga('send', 'event', 'Sensor', 'Millstone', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -771,6 +797,7 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   // Optical
   $('#optical-diego-garcia').click(function () { // Select Diego Garcia's Optical Coverage
+    ga('send', 'event', 'Sensor', 'Diego Garcia', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -810,6 +837,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#optical-maui').click(function () { // Select Maui's Optical Coverage
+    ga('send', 'event', 'Sensor', 'Maui', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -849,6 +877,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#optical-socorro').click(function () { // Select Socorro's Optical Coverage
+    ga('send', 'event', 'Sensor', 'Socorro', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -929,6 +958,7 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   // Russian Radars
   $('#russian-armavir').click(function () {
+    ga('send', 'event', 'Sensor', 'Armavir', 'Selected');
     satCruncher.postMessage({ // Send SatCruncher File information on this radar
       typ: 'offset', // Tell satcruncher to update something
       dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
@@ -967,6 +997,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#russian-balkhash').click(function () {
+    ga('send', 'event', 'Sensor', 'Balkhash', 'Selected');
     satCruncher.postMessage({ // Send SatCruncher File information on this radar
       typ: 'offset', // Tell satcruncher to update something
       dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
@@ -1005,6 +1036,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#russian-gantsevichi').click(function () {
+    ga('send', 'event', 'Sensor', 'Gantsevichi', 'Selected');
     satCruncher.postMessage({ // Send SatCruncher File information on this radar
       typ: 'offset', // Tell satcruncher to update something
       dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
@@ -1043,6 +1075,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#russian-lekhtusi').click(function () {
+    ga('send', 'event', 'Sensor', 'Lekhtusi', 'Selected');
     satCruncher.postMessage({ // Send SatCruncher File information on this radar
       typ: 'offset', // Tell satcruncher to update something
       dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
@@ -1081,6 +1114,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#russian-mishelevka-d').click(function () {
+    ga('send', 'event', 'Sensor', 'Mishelevka', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -1119,6 +1153,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#russian-olenegorsk').click(function () {
+    ga('send', 'event', 'Sensor', 'Olenegorsk', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -1157,6 +1192,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#russian-pechora').click(function () {
+    ga('send', 'event', 'Sensor', 'Pechora', 'Selected');
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString(),
@@ -1195,6 +1231,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.getsensorinfo();
   });
   $('#russian-pionersky').click(function () {
+    ga('send', 'event', 'Sensor', 'Pionersky', 'Selected');
     satCruncher.postMessage({ // Send SatCruncher File information on this radar
       typ: 'offset', // Tell satcruncher to update something
       dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
@@ -1235,6 +1272,7 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   // Chinese Radars
   $('#chinese-xuanhua').click(function () {
+    ga('send', 'event', 'Sensor', 'Xuanhua', 'Selected');
     satCruncher.postMessage({ // Send SatCruncher File information on this radar
       typ: 'offset', // Tell satcruncher to update something
       dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
@@ -1347,20 +1385,25 @@ $(document).ready(function () { // Code Once index.php is loaded
     }
     if (isHOSChecked) {
       otherSatelliteTransparency = 0;
+      ga('send', 'event', 'Settings Menu', 'Hide Other Satellites', 'Option Selected');
     } else {
       otherSatelliteTransparency = 0.1;
     }
     if (isOnlyFOVChecked) {
       satSet.setColorScheme(ColorScheme.onlyFOV);
+      ga('send', 'event', 'Settings Menu', 'Show Only FOV', 'Option Selected');
+      ga('send', 'event', 'ColorScheme Menu', 'Only FOV', 'Selected');
     }
     if (isSNPChecked) {
       isShowNextPass = true;
+      ga('send', 'event', 'Settings Menu', 'Show Next Pass on Hover', 'Option Selected');
     } else {
       isShowNextPass = false;
     }
 
     if (isRiseSetChecked) {
       isRiseSetLookangles = true;
+      ga('send', 'event', 'Settings Menu', 'Show Only Rise/Set Times', 'Option Selected');
     } else {
       isRiseSetLookangles = false;
     }
@@ -1465,7 +1508,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     var TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
     var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
 
-
     if (lookangles.altitudeCheck(TLE1, TLE2, propOffset) > 1) {
       satCruncher.postMessage({
         typ: 'satEdit',
@@ -1500,6 +1542,7 @@ $(document).ready(function () { // Code Once index.php is loaded
 
     var launchFac = $('#nl-facility').val();
     launchFac = launchFac * 1; // Convert to number
+    ga('send', 'event', 'New Launch', launchFac, 'Launch Site');
 
     switch (launchFac) {
       // If Longitude is west then subtract from 360
@@ -1621,9 +1664,45 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#nl-error').hide();
   });
 
+  $('#cs-telescope').click(function (e) {
+    if ($('#cs-telescope').is(':checked')) {
+      $('#cs-minaz').attr('disabled', true);
+      $('#cs-maxaz').attr('disabled', true);
+      $('#cs-minel').attr('disabled', true);
+      $('#cs-maxel').attr('disabled', true);
+      $('#cs-minrange').attr('disabled', true);
+      $('#cs-maxrange').attr('disabled', true);
+      $('#cs-minaz-div').hide();
+      $('#cs-maxaz-div').hide();
+      $('#cs-minel-div').hide();
+      $('#cs-maxel-div').hide();
+      $('#cs-minrange-div').hide();
+      $('#cs-maxrange-div').hide();
+      $('#cs-minaz').val(0);
+      $('#cs-maxaz').val(360);
+      $('#cs-minel').val(10);
+      $('#cs-maxel').val(90);
+      $('#cs-minrange').val(100);
+      $('#cs-maxrange').val(50000);
+    } else {
+      $('#cs-minaz').attr('disabled', false);
+      $('#cs-maxaz').attr('disabled', false);
+      $('#cs-minel').attr('disabled', false);
+      $('#cs-maxel').attr('disabled', false);
+      $('#cs-minrange').attr('disabled', false);
+      $('#cs-maxrange').attr('disabled', false);
+      $('#cs-minaz-div').show();
+      $('#cs-maxaz-div').show();
+      $('#cs-minel-div').show();
+      $('#cs-maxel-div').show();
+      $('#cs-minrange-div').show();
+      $('#cs-maxrange-div').show();
+    }
+  });
+
   $('#customSensor').submit(function (e) {
-    var lat = $('#cs-lat').val();
     var lon = $('#cs-lon').val();
+    var lat = $('#cs-lat').val();
     var hei = $('#cs-hei').val();
     var minaz = $('#cs-minaz').val();
     var maxaz = $('#cs-maxaz').val();
@@ -2014,7 +2093,8 @@ function hideSideMenus () {
   $('#findByLooks-menu').fadeOut();
   $('#twitter-menu').fadeOut();
   $('#weather-menu').fadeOut();
-  $('#space-weather-menu').fadeOut();
+  $('#map-menu').fadeOut();
+  // $('#space-weather-menu').fadeOut();
   $('#socrates-menu').fadeOut();
   $('#settings-menu').fadeOut();
   $('#editSat-menu').fadeOut();
@@ -2030,7 +2110,8 @@ function hideSideMenus () {
   $('#menu-find-sat img').removeClass('bmenu-item-selected');
   $('#menu-twitter img').removeClass('bmenu-item-selected');
   $('#menu-weather img').removeClass('bmenu-item-selected');
-  $('#menu-space-weather img').removeClass('bmenu-item-selected');
+  $('#menu-map img').removeClass('bmenu-item-selected');
+  // $('#menu-space-weather img').removeClass('bmenu-item-selected');
   $('#menu-satellite-collision img').removeClass('bmenu-item-selected');
   $('#menu-settings img').removeClass('bmenu-item-selected');
   $('#menu-editSat img').removeClass('bmenu-item-selected');
@@ -2044,7 +2125,8 @@ function hideSideMenus () {
   isTwitterMenuOpen = false;
   isFindByLooksMenuOpen = false;
   isWeatherMenuOpen = false;
-  isSpaceWeatherMenuOpen = false;
+  isMapMenuOpen = false;
+  // isSpaceWeatherMenuOpen = false;
   isLookanglesMenuOpen = false;
   isLookanglesMultiSiteMenuOpen = false;
   isSocratesMenuOpen = false;
@@ -2056,6 +2138,7 @@ function hideSideMenus () {
 }
 function bottomIconPress (evt) {
   if (isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
+  ga('send', 'event', 'Bottom Icon', $(this)['context']['id'], 'Selected');
   switch ($(this)['context']['id']) {
     case 'menu-sensor-info': // No Keyboard Commands
       if (whichRadar === '') { // No Sensor Selected
@@ -2204,18 +2287,40 @@ function bottomIconPress (evt) {
         }
       }
       break;
-    case 'menu-space-weather': // Q
-      if (isSpaceWeatherMenuOpen) {
-        isSpaceWeatherMenuOpen = false;
+    case 'menu-map': // W
+      if (isMapMenuOpen) {
+        isMapMenuOpen = false;
         hideSideMenus();
         break;
       }
-      $('#space-weather-image').attr('src', 'http://services.swpc.noaa.gov/images/animations/ovation-north/latest.png');
-      hideSideMenus();
-      $('#space-weather-menu').fadeIn();
-      isSpaceWeatherMenuOpen = true;
-      $('#menu-space-weather img').addClass('bmenu-item-selected');
+      if (!isMapMenuOpen) {
+        if (selectedSat === -1) { // No Satellite Selected
+          if (!$('#menu-map img:animated').length) {
+            $('#menu-map img').effect('shake', {distance: 10});
+          }
+          break;
+        }
+        hideSideMenus();
+        $('#map-menu').fadeIn();
+        isMapMenuOpen = true;
+        var satData = satSet.getSat(selectedSat);
+        $('#map-sat').tooltip({delay: 50, tooltip: satData.SCC_NUM, position: 'left'});
+        $('#menu-map img').addClass('bmenu-item-selected');
+        break;
+      }
       break;
+    // case 'menu-space-weather': // Q
+    //   if (isSpaceWeatherMenuOpen) {
+    //     isSpaceWeatherMenuOpen = false;
+    //     hideSideMenus();
+    //     break;
+    //   }
+    //   $('#space-weather-image').attr('src', 'http://services.swpc.noaa.gov/images/animations/ovation-north/latest.png');
+    //   hideSideMenus();
+    //   $('#space-weather-menu').fadeIn();
+    //   isSpaceWeatherMenuOpen = true;
+    //   $('#menu-space-weather img').addClass('bmenu-item-selected');
+    //   break;
     case 'menu-launches': // L
       if (isLaunchMenuOpen) {
         isLaunchMenuOpen = false;
@@ -2429,21 +2534,25 @@ function selectSat (satId) {
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-selected');
     $('#menu-lookangles img').removeClass('bmenu-item-selected');
     $('#menu-editSat img').removeClass('bmenu-item-selected');
+    $('#menu-map img').removeClass('bmenu-item-selected');
     $('#menu-newLaunch img').removeClass('bmenu-item-selected');
     // Add Grey Out
     $('#menu-lookanglesmultisite img').addClass('bmenu-item-disabled');
     $('#menu-lookangles img').addClass('bmenu-item-disabled');
     $('#menu-editSat img').addClass('bmenu-item-disabled');
+    $('#menu-map img').addClass('bmenu-item-disabled');
     $('#menu-newLaunch img').addClass('bmenu-item-disabled');
     // Remove Side Menus
     $('#lookanglesmultisite-menu').fadeOut();
     $('#lookangles-menu').fadeOut();
     $('#editSat-menu').fadeOut();
+    $('#map-menu').fadeOut();
     $('#newLaunch-menu').fadeOut();
     $('#customSensor-menu').fadeOut();
     // Toggle the side menus as closed
     isEditSatMenuOpen = false;
     isLookanglesMenuOpen = false;
+    isMapMenuOpen = false;
     isLookanglesMultiSiteMenuOpen = false;
     isNewLaunchMenuOpen = false;
     isCustomSensorMenuOpen = false;
@@ -2457,6 +2566,7 @@ function selectSat (satId) {
 
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
     $('#menu-editSat img').removeClass('bmenu-item-disabled');
+    $('#menu-map img').removeClass('bmenu-item-disabled');
     $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
 
     satSet.selectSat(satId);
@@ -2482,6 +2592,7 @@ function selectSat (satId) {
     } else {
       //      $('#sat-objnum').html(sat.TLE2.substr(2,7));
       $('#sat-objnum').html(sat.SCC_NUM);
+      ga('send', 'event', 'Satellite', 'SCC: ' + sat.SCC_NUM, 'SCC Number');
     }
 
     var objtype;
@@ -2914,6 +3025,9 @@ function selectSat (satId) {
     $('#sat-site').html(site);
     $('#sat-sitec').html(sitec);
 
+    ga('send', 'event', 'Satellite', 'Country: ' + country, 'Country');
+    ga('send', 'event', 'Satellite', 'Site: ' + site, 'Site');
+
     // /////////////////////////////////////////////////////////////////////////
     // RCS Correlation Table
     // /////////////////////////////////////////////////////////////////////////
@@ -3081,7 +3195,9 @@ function selectSat (satId) {
     }
   }
 
+
   if (satId !== -1) {
+    updateMap();
     if (sat.SCC_NUM === '25544') { // Something selected and that something is the ISS
       $('#iss-stream-menu').fadeIn();
       $('#iss-stream').html('<iframe src="http://www.ustream.tv/embed/17074538?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://www.ustream.tv/embed/9408562?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><br />' +
@@ -3448,6 +3564,53 @@ function drawScene () {
   debugContext.putImageData(debugImageData, 0, 0); */
 }
 
+function updateMap () {
+  if (selectedSat === -1) return;
+  var satData = satSet.getSat(selectedSat);
+  lookangles.getTEARR(satData);
+  var map = braun({lon: satellite.degrees_long(lookangles.lon), lat: satellite.degrees_lat(lookangles.lat)}, {meridian: 0, latLimit: 90});
+  map.x = map.x * 800 - 10;
+  map.y = map.y / 0.6366197723675813 * 600 - 10;
+  $('#map-sat').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
+  if (!(lookangles.obslat === undefined || lookangles.obslat === null)) {
+    map = braun({lon: lookangles.obslong, lat: lookangles.obslat}, {meridian: 0, latLimit: 90});
+    map.x = map.x * 800 - 10;
+    map.y = map.y / 0.6366197723675813 * 600 - 10;
+    $('#map-sensor').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;z-index:11;'); // Set to size of the map image (800x600)
+  }
+  for (var i = 1; i <= 50; i++) {
+    map = braun({lon: lookangles.map(satData, i).lon, lat: lookangles.map(satData, i).lat}, {meridian: 0, latLimit: 90});
+    map.x = map.x * 800 - 3.5;
+    map.y = map.y / 0.6366197723675813 * 600 - 3.5;
+    if (map.y > 300) {
+      $('#map-look' + i).tooltip({delay: 50, tooltip: lookangles.map(satData, i).time, position: 'top'});
+    } else {
+      $('#map-look' + i).tooltip({delay: 50, tooltip: lookangles.map(satData, i).time, position: 'bottom'});
+    }
+    if (lookangles.map(satData, i).inview === 1) {
+      $('#map-look' + i).attr('src', 'images/yellow-square.png'); // If inview then make yellow
+    } else {
+      $('#map-look' + i).attr('src', 'images/red-square.png'); // If not inview then make red
+    }
+    $('#map-look' + i).attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
+    $('#map-look' + i).attr('time', lookangles.map(satData, i).time);
+  }
+}
+
+$('#map-menu').on('click', '.map-look', function (evt) {
+  mapUpdateOverride = true;
+  var time = $(this)['context']['attributes']['time']['value']; // TODO: Find correct code for this.
+  if (time !== null) {
+    time = Date.parse(time + ' UTC');
+    var today = new Date(); // Need to know today for offset calculation
+    propOffset = time - today; // Find the offset from today
+    satCruncher.postMessage({ // Tell satCruncher we have changed times for orbit calculations
+      typ: 'offset',
+      dat: (propOffset).toString() + ' ' + (1.0).toString()
+    });
+  }
+});
+
 function updateSelectBox () {
   if (selectedSat === -1) return;
   var now = Date.now();
@@ -3457,8 +3620,22 @@ function updateSelectBox () {
   // TODO: Include updates when satellite edited regardless of time.
 
   if (now > lastBoxUpdateTime + 1000) {
-    $('#sat-longitude').html((((lookangles.lon * 180 / Math.PI) + 360) % 360).toFixed(3) + '°');
-    $('#sat-latitude').html((lookangles.lat * 180 / Math.PI).toFixed(3) + '°');
+    if (satellite.degrees_long(lookangles.lon) >= 0) {
+      $('#sat-longitude').html(satellite.degrees_long(lookangles.lon).toFixed(3) + '°E');
+    } else {
+      $('#sat-longitude').html((satellite.degrees_long(lookangles.lon) * -1).toFixed(3) + '°W');
+    }
+    if (satellite.degrees_lat(lookangles.lat) >= 0) {
+      $('#sat-latitude').html(satellite.degrees_lat(lookangles.lat).toFixed(3) + '°N');
+    } else {
+      $('#sat-latitude').html((satellite.degrees_lat(lookangles.lat) * -1).toFixed(3) + '°S');
+    }
+
+    if (isMapMenuOpen && now > lastMapUpdateTime + 30000) {
+      updateMap();
+      lastMapUpdateTime = now;
+    }
+
     $('#sat-altitude').html(lookangles.altitude.toFixed(2) + ' km');
     $('#sat-velocity').html(satData.velocity.toFixed(2) + ' km/s');
     if (lookangles.inview) {
@@ -3667,10 +3844,18 @@ var lookangles = (function () {
       this.range = 0;
     }
 
-    if ((this.azimuth >= obsminaz || this.azimuth <= obsmaxaz) && (this.elevation >= obsminel && this.elevation <= obsmaxel) && (this.range <= obsmaxrange && this.range >= obsminrange)) {
-      this.inview = true;
+    if (obsminaz < obsmaxaz) {
+      if ((this.azimuth >= obsminaz && this.azimuth <= obsmaxaz) && (this.elevation >= obsminel && this.elevation <= obsmaxel) && (this.range <= obsmaxrange && this.range >= obsminrange)) {
+        this.inview = true;
+      } else {
+        this.inview = false;
+      }
     } else {
-      this.inview = false;
+      if ((this.azimuth >= obsminaz || this.azimuth <= obsmaxaz) && (this.elevation >= obsminel && this.elevation <= obsmaxel) && (this.range <= obsmaxrange && this.range >= obsminrange)) {
+        this.inview = true;
+      } else {
+        this.inview = false;
+      }
     }
   };
 
@@ -3701,8 +3886,14 @@ var lookangles = (function () {
       elevation = lookAngles.elevation / deg2rad;
       rangeSat = lookAngles.range_sat;
 
-      if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
-        return dateFormat(now, 'isoDateTime', true);
+      if (obsminaz > obsmaxaz) {
+        if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
+          return dateFormat(now, 'isoDateTime', true);
+        }
+      } else {
+        if ((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
+          return dateFormat(now, 'isoDateTime', true);
+        }
       }
     }
     return 'No Passes in 7 Days';
@@ -4242,6 +4433,11 @@ var lookangles = (function () {
     elevation = lookAngles.elevation / deg2rad;
     rangeSat = lookAngles.range_sat;
 
+    if (obsminaz < obsmaxaz) {
+      if (!((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange))) {
+        return 0;
+      }
+    }
     if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
       if (isRiseSetLookangles) {
         // Previous Pass to Calculate first line of coverage
@@ -4379,6 +4575,11 @@ var lookangles = (function () {
     elevation = lookAngles.elevation / deg2rad;
     rangeSat = lookAngles.range_sat;
 
+    if (obsminaz < obsmaxaz) {
+      if (!((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange))) {
+        return 0;
+      }
+    }
     if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
       var tr;
       if (tbl.rows.length > 0) {
@@ -4425,6 +4626,57 @@ var lookangles = (function () {
     return 0;
   }
 
+  var map = function (sat, i) {
+    // Set default timing settings. These will be changed to find look angles at different times in future.
+    var curPropOffset = getPropOffset();
+    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
+    var propOffset2 = i * sat.period / 50 * 60 * 1000 + curPropOffset;             // Offset in seconds (msec * 1000)
+    return propagate(propOffset2, satrec);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
+
+    function propagate (curPropOffset, satrec) {
+      var now = propTime(curPropOffset, propRealTime);
+      var j = jday(now.getUTCFullYear(),
+                   now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+                   now.getUTCDate(),
+                   now.getUTCHours(),
+                   now.getUTCMinutes(),
+                   now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+      j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+      var gmst = satellite.gstime_from_jday(j);
+
+      var m = (j - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+      var pv = satellite.sgp4(satrec, m);
+
+      var gpos, lat, lon;
+
+      gpos = satellite.eci_to_geodetic(pv.position, gmst);
+
+      lat = satellite.degrees_lat(gpos.latitude);
+      lon = satellite.degrees_long(gpos.longitude);
+      var time = dateFormat(now, 'isoDateTime', true);
+
+      var positionEcf, lookAngles, azimuth, elevation, rangeSat;
+      positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
+      lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
+      azimuth = lookAngles.azimuth / deg2rad;
+      elevation = lookAngles.elevation / deg2rad;
+      rangeSat = lookAngles.range_sat;
+      var inview = 0;
+
+      if (obsminaz > obsmaxaz) {
+        if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
+          inview = 1;
+        }
+      } else {
+        if ((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
+          inview = 1;
+        }
+      }
+
+      return {lat: lat, lon: lon, time: time, inview: inview};
+    }
+  };
+
   var jday = function (year, mon, day, hr, minute, sec) { // from satellite.js
     'use strict';
     return (367.0 * year -
@@ -4452,7 +4704,8 @@ var lookangles = (function () {
     jday: jday,
     getTEARR: getTEARR,
     getsensorinfo: getsensorinfo,
-    altitudeCheck: altitudeCheck
+    altitudeCheck: altitudeCheck,
+    map: map
   };
 })();
 
@@ -4970,26 +5223,33 @@ dateFormat.i18n = {
       switch (colorName) {
         case 'default':
           satSet.setColorScheme(ColorScheme.default);
+          ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
           break;
         case 'velocity':
           satSet.setColorScheme(ColorScheme.velocity);
+          ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
           break;
         case 'near-earth':
           satSet.setColorScheme(ColorScheme.leo);
+          ga('send', 'event', 'ColorScheme Menu', 'near-earth', 'Selected');
           break;
         case 'deep-space':
           satSet.setColorScheme(ColorScheme.geo);
+          ga('send', 'event', 'ColorScheme Menu', 'Deep-Space', 'Selected');
           break;
         case 'lost-objects':
           $('#search').val('');
           satSet.setColorScheme(ColorScheme.lostobjects);
+          ga('send', 'event', 'ColorScheme Menu', 'Lost Objects', 'Selected');
           searchBox.doSearch($('#search').val());
           break;
         case 'rcs':
           satSet.setColorScheme(ColorScheme.rcs);
+          ga('send', 'event', 'ColorScheme Menu', 'RCS', 'Selected');
           break;
         case 'smallsats':
           satSet.setColorScheme(ColorScheme.smallsats);
+          ga('send', 'event', 'ColorScheme Menu', 'Small Satellites', 'Selected');
           break;
       }
     });
@@ -6012,6 +6272,13 @@ function propTime () {
     // satRange = new Float32Array(m.data.satRange);
     satInView = new Float32Array(m.data.satInView);
 
+    var now = Date.now();
+    if (isMapMenuOpen && now > lastMapUpdateTime + 30000 || mapUpdateOverride) {
+      updateMap();
+      lastMapUpdateTime = now;
+      mapUpdateOverride = false;
+    }
+
     satSet.setColorScheme(currentColorScheme); // force color recalc
 
     if (!cruncherReady) {
@@ -6027,7 +6294,8 @@ function propTime () {
       $('#menu-find-sat img').removeClass('bmenu-item-disabled');
       $('#menu-twitter img').removeClass('bmenu-item-disabled');
       // $('#menu-weather img').removeClass('bmenu-item-disabled');
-      $('#menu-space-weather img').removeClass('bmenu-item-disabled');
+      // $('#menu-map img').removeClass('bmenu-item-disabled');
+      // $('#menu-space-weather img').removeClass('bmenu-item-disabled');
       $('#menu-launches img').removeClass('bmenu-item-disabled');
       $('#menu-about img').removeClass('bmenu-item-disabled');
       $('#menu-space-stations img').removeClass('bmenu-item-disabled');
@@ -6593,6 +6861,7 @@ function propTime () {
       $('#menu-lookangles img').removeClass('bmenu-item-disabled');
     }
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
+    $('#menu-map img').removeClass('bmenu-item-disabled');
     $('#menu-editSat img').removeClass('bmenu-item-disabled');
     $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
   };

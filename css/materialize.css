@@ -2803,13 +2803,13 @@ ul.staggered-list li {
 /*********************
   Media Query Classes
 **********************/
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 625px) {
   .hide-on-small-only, .hide-on-small-and-down {
     display: none !important;
   }
 }
 
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 1000px) {
   .hide-on-med-and-down {
     display: none !important;
   }
@@ -4015,8 +4015,8 @@ nav {
   color: #fff;
   background-color: inherit;
   width: 100%;
-  height: 56px;
-  line-height: 56px;
+  height: 50px;
+  line-height: 50px;
 }
 
 nav.nav-extended {
@@ -4024,7 +4024,7 @@ nav.nav-extended {
 }
 
 nav.nav-extended .nav-wrapper {
-  min-height: 56px;
+  min-height: 50px;
   height: auto;
 }
 
@@ -4042,8 +4042,8 @@ nav [class^="mdi-"], nav [class*="mdi-"],
 nav i.material-icons {
   display: inline-block;
   font-size: 24px;
-  height: 56px;
-  line-height: 56px;
+  height: 50px;
+  line-height: 50px;
 }
 
 nav .nav-wrapper {
@@ -4061,13 +4061,13 @@ nav .button-collapse {
   float: left;
   position: relative;
   z-index: 1;
-  height: 56px;
+  height: 50px;
   margin: 0 18px;
 }
 
 nav .button-collapse i {
-  height: 56px;
-  line-height: 56px;
+  height: 50px;
+  line-height: 50px;
 }
 
 nav .brand-logo {
@@ -4202,7 +4202,7 @@ nav .input-field label.active i {
 
 .navbar-fixed {
   position: relative;
-  height: 56px;
+  height: 50px;
   z-index: 997;
 }
 

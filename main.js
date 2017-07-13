@@ -5020,7 +5020,7 @@ dateFormat.i18n = {
       };
     });
     ColorScheme.smallsats = new ColorScheme(function (satId) {
-      if (satSet.getSat(satId).R === 0 && satSet.getSat(satId).OT === 1) {
+      if (satSet.getSat(satId).R < 0.1 && satSet.getSat(satId).OT === 1) {
         return {
           color: [0.2, 1.0, 0.0, 0.65],
           pickable: true

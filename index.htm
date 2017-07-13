@@ -10,8 +10,6 @@
     <meta property='og:description' content='A 3D visualtion tool to learn about satellites and tracking radars.'/>
     <meta property='og:url' content='http://keeptrack.space'>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
     <!-- Change this to use alternate TLE Source -->
     <div id="tle-source" style="display: none;">TLE.json</div>
 
@@ -65,6 +63,7 @@
           <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="colors-menu">Color Schemes &#x25BC;</a></li>
         </ul>
         <ul id="nav-mobile" class="right">
+          <li><a id="legend-menu" href="#!">Legend &#x25BC;</a></li>
           <div id="search-holder" class="menu-item">
             <input id="search" type="search" required>
             <span id="search-close" style="margin-left:5px">X</span>
@@ -113,9 +112,6 @@
       <!-- <li id="optical-spain">Spain</li> Closed in 2012-->
     </ul>
 
-    <!-- <ul id="us-optical-menu" class="dropdown-content">
-    </ul> -->
-
     <ul id="russian-menu" class="dropdown-content">
       <li id="russian-armavir">Armavir<span class="badge" data-badge-caption="RUS"></span></li>
       <li id="russian-balkhash">Balkhash<span class="badge" data-badge-caption="RUS"></span></li>
@@ -128,9 +124,6 @@
       <li class="divider"></li>
       <li id="chinese-xuanhua">Xuanhua<span class="badge" data-badge-caption="PRC"></span></li>
     </ul>
-
-    <!-- <ul id="chinese-menu" class="dropdown-content">
-    </ul> -->
 
     <ul id="colors-menu" class="dropdown-content">
       <li data-color="default">Type</li>
@@ -153,6 +146,14 @@
       <div id="search-results"></div>
 
       <div id="sat-hoverbox">(none)</div>
+
+      <div id="legend-hover-menu" class="start-hidden">
+        <ul id="legend-list-type">
+          <li><div class="Square-Box" id="legend-green-box"></div>Payload</li>
+          <li><div class="Square-Box" id="legend-blue-box"></div>Rocket Body</li>
+          <li><div class="Square-Box" id="legend-gray-box"></div>Debris</li>
+        </ul>
+      </div>
 
       <div id="sensor-info-menu" class="start-hidden text-select">
         <div id="sensor-content" class="side-menu">
@@ -861,15 +862,9 @@
       <a id="twitter-share" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Twitter"><img src="https://static.addtoany.com/buttons/twitter.svg" width="32" height="32"></a>
       <a id="reddit-share" href="https://www.reddit.com/submit?url=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Reddit"><img src="https://static.addtoany.com/buttons/reddit.svg" width="32" height="32"></a>
     </div>
-    <span id="version-info" style="margin-top:-45px;margin-right:10px" class="right tooltipped" data-position="top" data-delay="50" data-tooltip="May 13, 2017">
-      v0.15.0
+    <span id="version-info" style="margin-top:-45px;margin-right:10px" class="right tooltipped" data-position="top" data-delay="50" data-tooltip="July 13, 2017">
+      v0.16.1
     </span>
-
-    <!-- <div id="zoom-controls" style="display:none;">
-      <div id="zoom-in" class="zoom-button">+</div>
-      <div id="zoom-out" class="zoom-button">-</div>
-    </div> -->
-
   </footer>
 
   <!-- Load jquery CSS -->

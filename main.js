@@ -337,7 +337,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     dragStartYaw = camYaw;
     // debugLine.set(dragPoint, getCamPos());
     isDragging = true;
-    if ($(document).width() <= 992) {
+    if ($(document).width() <= 1000) {
       isDragging = false;
     }
     camSnapMode = false;
@@ -354,7 +354,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     dragStartYaw = camYaw;
     // debugLine.set(dragPoint, getCamPos());
     isDragging = true;
-    if ($(document).width() <= 992) {
+    if ($(document).width() <= 1000) {
       isDragging = false;
     }
     camSnapMode = false;
@@ -371,10 +371,11 @@ $(document).ready(function () { // Code Once index.php is loaded
         searchBox.hideResults();
         isMilSatSelected = false;
         $('#menu-space-stations img').removeClass('bmenu-item-selected');
-        if ($(document).width() <= 992) {
-          $('#search-results').attr('style', 'max-height:20%;margin-bottom:-50px;width:100%;bottom:auto;margin-top:56px;');
+        if ($(document).width() <= 1000) {
+          $('#search-results').attr('style', 'max-height:20%;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
         } else {
           $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
+          $('#legend-hover-menu').hide();
         }
 
         satSet.setColorScheme(ColorScheme.default);
@@ -459,6 +460,20 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   $('#russian-menu').click(function () {
     updateMap();
+  });
+
+  $('#legend-menu').click(function () {
+    if ($('#legend-hover-menu').css('display') === 'block') {
+      $('#legend-hover-menu').hide();
+    } else {
+      $('#legend-hover-menu').show();
+      $('#search').val('');
+      searchBox.hideResults();
+      $('#search-results').hide();
+      $('#legend-hover-menu').css({
+        height: 'inherit'
+      });
+    }
   });
 
   // USAF Radars
@@ -2572,14 +2587,14 @@ function selectSat (satId) {
   if (satId === -1) {
     $('#sat-infobox').fadeOut();
     if ($('#search-results').css('display') === 'block') {
-      if ($(document).width() <= 992) {
-        $('#search-results').attr('style', 'display:block;max-height:20%;margin-bottom:-50px;width:100%;bottom:auto;margin-top:56px;');
+      if ($(document).width() <= 1000) {
+        $('#search-results').attr('style', 'display:block;max-height:20%;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
       } else {
         $('#search-results').attr('style', 'display:block;max-height:100%;margin-bottom:-50px;');
       }
     } else {
-      if ($(document).width() <= 992) {
-        $('#search-results').attr('style', 'max-height:20%;margin-bottom:-50px;width:100%;bottom:auto;margin-top:56px;');
+      if ($(document).width() <= 1000) {
+        $('#search-results').attr('style', 'max-height:20%;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
       } else {
         $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
       }
@@ -2632,16 +2647,18 @@ function selectSat (satId) {
     if (!sat) return;
     orbitDisplay.setSelectOrbit(satId);
     if ($('#search-results').css('display') === 'block') {
-      if ($(document).width() <= 992) {
-        $('#search-results').attr('style', 'display:block; max-height:20%; width: 100%;bottom:auto;margin-top:56px;');
+      if ($(document).width() <= 1000) {
+        $('#search-results').attr('style', 'display:block; max-height:20%; width: 100%;bottom:auto;margin-top:50px;');
       } else {
         $('#search-results').attr('style', 'display:block; max-height:27%');
+        $('#legend-hover-menu').hide();
       }
     } else {
-      if ($(document).width() <= 992) {
-        $('#search-results').attr('style', 'max-height:20%; width: 100%;bottom:auto;margin-top:56px;');
+      if ($(document).width() <= 1000) {
+        $('#search-results').attr('style', 'max-height:20%; width: 100%;bottom:auto;margin-top:50px;');
       } else {
         $('#search-results').attr('style', 'max-height:27%');
+        $('#legend-hover-menu').hide();
       }
     }
     $('#sat-infobox').fadeIn();
@@ -5524,6 +5541,7 @@ dateFormat.i18n = {
     groups.selectGroup(dispGroup);
 
     searchBox.fillResultBox(results);
+    $('#legend-hover-menu').hide();
     // searchBox.filterInView(results);
     updateUrl();
   };
@@ -6350,7 +6368,7 @@ function propTime () {
       // NOTE:: This is called right after all the objects load on the screen.
 
       // Hide Menus on Small Screens
-      if ($(document).width() <= 992) {
+      if ($(document).width() <= 1000) {
         // TODO FullScreen Option
         // document.documentElement.webkitRequestFullScreen();
         $('#menu-sensor-info img').hide();

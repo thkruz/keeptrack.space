@@ -27,19 +27,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 'use strict';
 
-const rad = (deg) => deg * Math.PI / 180;
-const sin = (deg) => Math.sin(rad(deg));
-const cos = (deg) => Math.cos(rad(deg));
-const tan = (deg) => Math.tan(rad(deg));
-const deg = (rad) => rad * 180 / Math.PI;
+var rad = (deg) => deg * Math.PI / 180;
+var sin = (deg) => Math.sin(rad(deg));
+var cos = (deg) => Math.cos(rad(deg));
+var tan = (deg) => Math.tan(rad(deg));
+var deg = (rad) => rad * 180 / Math.PI;
 
-const defaults = {
+var defaults = {
   meridian: 0,
   standardParallel: 0,
   latLimit: 90
 };
 
-const check = (point) => {
+var check = (point) => {
   if (point.x !== undefined && point.x >= 0 && point.x <= 1 && point.y !== undefined && point.lon === undefined && point.lat === undefined) {
     return {x: +point.x, y: +point.y, wgs: false};
   }
@@ -49,11 +49,11 @@ const check = (point) => {
   throw new Error('Invalid input point.');
 };
 
-const options = (opt) => {
+var options = (opt) => {
   return Object.assign({}, defaults, opt || {});
 };
 
-const addMeridian = (point, meridian) => {
+var addMeridian = (point, meridian) => {
   point = check(point);
   if (meridian !== 0) {
     return check({lon: ((point.lon + 180 + 360 - meridian) % 360) - 180, lat: point.lat});
@@ -61,7 +61,7 @@ const addMeridian = (point, meridian) => {
   return point;
 };
 
-const braun = (point, opt) => {
+var braun = (point, opt) => {
   point = check(point);
   opt = options(opt);
   if (point.wgs) {
@@ -71,7 +71,7 @@ const braun = (point, opt) => {
       y: (tan(opt.latLimit / 2) - tan(point.lat / 2)) / (Math.PI)
     };
   } else {
-    const result = {
+    var result = {
       lon: deg((2 * point.x - 1) * Math.PI),
       lat: deg(2 * Math.atan(tan(opt.latLimit / 2) - point.y * Math.PI))
     };

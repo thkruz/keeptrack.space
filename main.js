@@ -6482,6 +6482,11 @@ function propTime () {
         }
       }
 
+      /** Hide SOCRATES menu if not all the satellites are currently available to view */
+      if (limitSats !== '') {
+        $('#menu-satellite-collision img').hide();
+      }
+
       // Hide More Stuff on Little Screens
       if ($(document).width() <= 400) {
         $('#menu-satellite-collision img').hide();

@@ -128,6 +128,7 @@ var isEditTime = false;
 var isShowNextPass = false;
 var isOnlyFOVChecked = false;
 var isRiseSetLookangles = false;
+var limitSats;
 
 var otherSatelliteTransparency = 0.1;
 
@@ -226,7 +227,6 @@ $(document).ready(function () { // Code Once index.php is loaded
       var val = params[i].split('=')[1];
       switch (key) {
         case 'intldes':
-          // console.log('url snapping to ' + val);
           var urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
           if (urlSatId !== null) {
             selectSat(urlSatId);
@@ -1393,8 +1393,19 @@ $(document).ready(function () { // Code Once index.php is loaded
     var isResetSensorChecked = document.getElementById('settings-resetSensor').checked;
     var isHOSChecked = document.getElementById('settings-hos').checked;
     isOnlyFOVChecked = document.getElementById('settings-onlyfov').checked;
+    var isLimitSats = document.getElementById('limitSats-enabled').checked;
     var isSNPChecked = document.getElementById('settings-snp').checked;
-    var isRiseSetChecked = document.getElementById('settings-riseset').checked;
+    var isRiseSetChecked = $('#settings-riseset').checked;
+
+    if (isLimitSats && limitSats !== $('#limitSats').val()) {
+      limitSats = $('#limitSats').val();
+      window.location = '/index.htm?limitSats=' + limitSats;
+    }
+
+    if (!isLimitSats && limitSats !== '') {
+      window.location = '/index.htm';
+    }
+
     if (isResetSensorChecked) {
       // Return to default settings with nothing 'inview'
       satCruncher.postMessage({
@@ -6556,7 +6567,7 @@ function propTime () {
       var obsmaxel;
       var obsminrange;
       var obsmaxrange;
-      var limitSats = [];
+      var limitSatsArray = [];
 
       /** Parses GET variables for SatCruncher initialization */
       (function parseFromGETVariables () {
@@ -6567,7 +6578,11 @@ function propTime () {
           var val = params[i].split('=')[1];
           switch (key) {
             case 'limitSats':
-              limitSats = val.split(',');
+              limitSats = val;
+              $('#limitSats').val(val);
+              document.getElementById('limitSats-enabled').checked = true;
+              $('#limitSats-Label').addClass('active');
+              limitSatsArray = val.split(',');
               break;
             case 'lat':
               obslatitude = val;
@@ -6603,18 +6618,21 @@ function propTime () {
 
       /**
        * Filters out extra satellites if limitSats is set
-       * @param  limitSats comma separated string of satellites
+       * @param  limitSats Array of satellites
        * @return Returns only requested satellites if limitSats is setobs
        */
-      function filterTLEDatabase (limitSats) {
+      function filterTLEDatabase (limitSatsArray) {
         var tempSatData = [];
+        if (limitSatsArray[0] == null) { // If there are no limits then just process like normal
+          limitSats = '';
+        }
 
         for (var i = 0; i < resp.length; i++) {
           var SCC_NUM = pad(resp[i].TLE1.substr(2, 5).trim(), 5);
           var year;
           var prefix;
           var rest;
-          if (limitSats[0] == null) { // If there are no limits then just process like normal
+          if (limitSats === '') { // If there are no limits then just process like normal
             year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
             if (year === '') {
               resp[i].intlDes = 'none';
@@ -6628,8 +6646,8 @@ function propTime () {
             tempSatData.push(resp[i]);
             continue;
           } else { // If there are limited satellites
-            for (var x = 0; x < limitSats.length; x++) {
-              if (SCC_NUM === limitSats[x]) {
+            for (var x = 0; x < limitSatsArray.length; x++) {
+              if (SCC_NUM === limitSatsArray[x]) {
                 year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
                 if (year === '') {
                   resp[i].intlDes = 'none';
@@ -6648,7 +6666,7 @@ function propTime () {
         return tempSatData;
       }
 
-      satData = filterTLEDatabase(limitSats);
+      satData = filterTLEDatabase(limitSatsArray);
       resp = null;
       satSet.satDataString = JSON.stringify(satData);
 

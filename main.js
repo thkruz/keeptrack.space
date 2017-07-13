@@ -5035,19 +5035,19 @@ dateFormat.i18n = {
     ColorScheme.rcs = new ColorScheme(function (satId) {
       var rcs = satSet.getSat(satId).R;
       // var SCC = satSet.getSat(satId).SCC_NUM;
-      if (rcs === 0) {
+      if (rcs < 0.1) {
         return {
           color: [1.0, 0, 0, 0.6],
           pickable: true
         };
       }
-      if (rcs === 1) {
+      if (rcs >= 0.1 && rcs <= 1) {
         return {
           color: [1.0, 1.0, 0, 0.6],
           pickable: true
         };
       }
-      if (rcs === 2) {
+      if (rcs > 1) {
         return {
           color: [0, 1.0, 0, 0.6],
           pickable: true

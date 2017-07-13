@@ -3711,6 +3711,7 @@ function drawScene () {
 
 function updateMap () {
   if (selectedSat === -1) return;
+  if (!isMapMenuOpen) return;
   var satData = satSet.getSat(selectedSat);
   lookangles.getTEARR(satData);
   var map = braun({lon: satellite.degrees_long(lookangles.lon), lat: satellite.degrees_lat(lookangles.lat)}, {meridian: 0, latLimit: 90});
@@ -6546,18 +6547,6 @@ function propTime () {
 
     var tleSource = $('#tle-source').text();
     $.get('' + tleSource, function (resp) { // + '?fakeparameter=to_avoid_browser_cache'
-      // var startTime = new Date().getTime();
-
-      // console.log('sat.js downloaded data');
-      satData = resp;
-      satSet.satDataString = JSON.stringify(satData);
-
-      // var postStart = performance.now();
-      // send satCruncher starting_time_msec, time scale factor
-      // console.log('posting offset msg');
-      propRealTime = Date.now(); // assumed same as value in Worker, not passing
-
-      // Get Lat Long Coordinates
       var obslatitude;
       var obslongitude;
       var obsheight;
@@ -6567,47 +6556,105 @@ function propTime () {
       var obsmaxel;
       var obsminrange;
       var obsmaxrange;
-      var queryStr = window.location.search.substring(1);
-      var params = queryStr.split('&');
-      for (var i = 0; i < params.length; i++) {
-        var key = params[i].split('=')[0];
-        var val = params[i].split('=')[1];
-        switch (key) {
-          // case 'maxsats':
-          //   maxOrbitsDisplayed = val;
-          //   break;
-          case 'lat':
-            obslatitude = val;
-            break;
-          case 'long':
-            obslongitude = val;
-            break;
-          case 'hei':
-            obsheight = val;
-            break;
-          case 'minaz':
-            obsminaz = val;
-            break;
-          case 'maxaz':
-            obsmaxaz = val;
-            break;
-          case 'minel':
-            obsminel = val;
-            break;
-          case 'maxel':
-            obsmaxel = val;
-            break;
-          case 'minrange':
-            obsminrange = val;
-            break;
-          case 'maxrange':
-            obsmaxrange = val;
-            break;
+      var limitSats = [];
+
+      /** Parses GET variables for SatCruncher initialization */
+      (function parseFromGETVariables () {
+        var queryStr = window.location.search.substring(1);
+        var params = queryStr.split('&');
+        for (var i = 0; i < params.length; i++) {
+          var key = params[i].split('=')[0];
+          var val = params[i].split('=')[1];
+          switch (key) {
+            case 'limitSats':
+              limitSats = val.split(',');
+              break;
+            case 'lat':
+              obslatitude = val;
+              break;
+            case 'long':
+              obslongitude = val;
+              break;
+            case 'hei':
+              obsheight = val;
+              break;
+            case 'minaz':
+              obsminaz = val;
+              break;
+            case 'maxaz':
+              obsmaxaz = val;
+              break;
+            case 'minel':
+              obsminel = val;
+              break;
+            case 'maxel':
+              obsmaxel = val;
+              break;
+            case 'minrange':
+              obsminrange = val;
+              break;
+            case 'maxrange':
+              obsmaxrange = val;
+              break;
+          }
         }
+        // TODO: Create logical checks to prevent 'bad' sesnors from being generated
+      })();
+
+      /**
+       * Filters out extra satellites if limitSats is set
+       * @param  limitSats comma separated string of satellites
+       * @return Returns only requested satellites if limitSats is setobs
+       */
+      function filterTLEDatabase (limitSats) {
+        var tempSatData = [];
+
+        for (var i = 0; i < resp.length; i++) {
+          var SCC_NUM = pad(resp[i].TLE1.substr(2, 5).trim(), 5);
+          var year;
+          var prefix;
+          var rest;
+          if (limitSats[0] == null) { // If there are no limits then just process like normal
+            year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+            if (year === '') {
+              resp[i].intlDes = 'none';
+            } else {
+              prefix = (year > 50) ? '19' : '20';
+              year = prefix + year;
+              rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
+              resp[i].intlDes = year + '-' + rest;
+            }
+            resp[i].id = i;
+            tempSatData.push(resp[i]);
+            continue;
+          } else { // If there are limited satellites
+            for (var x = 0; x < limitSats.length; x++) {
+              if (SCC_NUM === limitSats[x]) {
+                year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+                if (year === '') {
+                  resp[i].intlDes = 'none';
+                } else {
+                  prefix = (year > 50) ? '19' : '20';
+                  year = prefix + year;
+                  rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
+                  resp[i].intlDes = year + '-' + rest;
+                }
+                resp[i].id = i;
+                tempSatData.push(resp[i]);
+              }
+            }
+          }
+        }
+        return tempSatData;
       }
 
-      // TODO: Create logical checks to prevent 'bad' sesnors from being generated
+      satData = filterTLEDatabase(limitSats);
+      resp = null;
+      satSet.satDataString = JSON.stringify(satData);
 
+      propRealTime = Date.now(); // assumed same as value in Worker, not passing
+
+      /** If custom sensor set then send parameters to lookangles and satCruncher */
       if (obslatitude !== undefined && obslongitude !== undefined && obsheight !== undefined && obsminaz !== undefined && obsmaxaz !== undefined && obsminel !== undefined &&
           obsmaxel !== undefined && obsminrange !== undefined && obsmaxrange !== undefined) {
         lookangles.setobs({
@@ -6640,42 +6687,20 @@ function propTime () {
         $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
       }
 
-       // kick off satCruncher
-       // console.log('posting satdata msg');
-
+      /** Send satDataString to satCruncher to begin propagation loop */
       satCruncher.postMessage({
         typ: 'satdata',
         dat: satSet.satDataString
       });
-
-      // var postEnd = performance.now();
-      // do some processing on our satData response
-
-      for (i = 0; i < satData.length; i++) {
-        var year = satData[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
-        // console.log('year is',year);
-        if (year === '') {
-          satData[i].intlDes = 'none';
-        } else {
-          var prefix = (year > 50) ? '19' : '20';
-          year = prefix + year;
-          var rest = satData[i].TLE1.substr(9, 8).trim().substring(2);
-          satData[i].intlDes = year + '-' + rest;
-        }
-
-        satData[i].id = i;
-      }
-
       $('#loader-text').text('Drawing Satellites...');
 
       // populate GPU mem buffers, now that we know how many sats there are
-
       satPosBuf = gl.createBuffer();
       satPos = new Float32Array(satData.length * 3);
 
       var pickColorData = [];
       pickColorBuf = gl.createBuffer();
-      for (i = 0; i < satData.length; i++) {
+      for (var i = 0; i < satData.length; i++) {
         var byteR = (i + 1) & 0xff;
         var byteG = ((i + 1) & 0xff00) >> 8;
         var byteB = ((i + 1) & 0xff0000) >> 16;
@@ -6689,11 +6714,6 @@ function propTime () {
       satSet.numSats = satData.length;
 
       satSet.setColorScheme(ColorScheme.default);
-      // satSet.setColorScheme(ColorScheme.apogee);
-      // satSet.setColorScheme(ColorScheme.velocity);
-
-      // var end = new Date().getTime();
-      // console.log('sat.js init: ' + (end - startTime) + ' ms (incl post: ' + (postEnd - postStart) + ' ms)');
 
       shadersReady = true;
       if (satsReadyCallback) {

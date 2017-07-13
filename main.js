@@ -3923,9 +3923,8 @@ var lookangles = (function () {
   };
 
   var altitudeCheck = function (TLE1, TLE2, propOffset) {
-    propRealTime = Date.now();      // Set current time
     var satrec = satellite.twoline2satrec(TLE1, TLE2);// perform and store sat init calcs
-    var now = propTime(propOffset, propRealTime);
+    var now = propTimeCheck(propOffset, propRealTime);
     var j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
@@ -3950,9 +3949,8 @@ var lookangles = (function () {
   var getTEARR = function (sat) {
     // Set default timing settings. These will be changed to find look angles at different times in future.
     var propOffset2 = getPropOffset();               // offset letting us propagate in the future (or past)
-    propRealTime = Date.now();      // Set current time
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-    var now = propTime(propOffset2, propRealTime);
+    var now = propTimeCheck(propOffset2, propRealTime);
     var j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
@@ -4005,13 +4003,12 @@ var lookangles = (function () {
   };
 
   function nextpass (sat) {
-    propRealTime = Date.now();
     var curPropOffset = getPropOffset();
     var propOffset2 = 0;
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
     for (var i = 0; i < (7 * 24 * 60 * 60); i += 5) {         // 5second Looks
       propOffset2 = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
-      var now = propTime(propOffset2, propRealTime);
+      var now = propTimeCheck(propOffset2, propRealTime);
       var j = jday(now.getUTCFullYear(),
       now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
       now.getUTCDate(),
@@ -4126,7 +4123,7 @@ var lookangles = (function () {
 
   var getOrbitByLatLon = function (sat, goalLat, goalLon, upOrDown, curPropOffset) {
     // var curPropOffset = getPropOffset();
-    var propRealTime = Date.now();
+    // var propRealTime = Date.now();
     var mainTLE1;
     var mainTLE2;
     var mainMeana;
@@ -4290,7 +4287,7 @@ var lookangles = (function () {
     }
 
     function propagate (curPropOffset, satrec, type) {
-      var now = propTime(curPropOffset, propRealTime);
+      var now = propTimeCheck(curPropOffset, propRealTime);
       var j = jday(now.getUTCFullYear(),
                    now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                    now.getUTCDate(),
@@ -4557,8 +4554,7 @@ var lookangles = (function () {
   }
 
   function propagate (propOffset2, tbl, satrec) {
-    propRealTime = Date.now();
-    var now = propTime(propOffset2, propRealTime);
+    var now = propTimeCheck(propOffset2, propRealTime);
     var j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
@@ -4586,7 +4582,7 @@ var lookangles = (function () {
     if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
       if (isRiseSetLookangles) {
         // Previous Pass to Calculate first line of coverage
-        var now1 = propTime(propOffset2 - (lookanglesInterval * 1000), propRealTime);
+        var now1 = propTimeCheck(propOffset2 - (lookanglesInterval * 1000), propRealTime);
         var j1 = jday(now1.getUTCFullYear(),
                      now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                      now1.getUTCDate(),
@@ -4619,7 +4615,7 @@ var lookangles = (function () {
           return 1;
         } else {
           // Next Pass to Calculate Last line of coverage
-          now1 = propTime(propOffset2 + (lookanglesInterval * 1000), propRealTime);
+          now1 = propTimeCheck(propOffset2 + (lookanglesInterval * 1000), propRealTime);
           j1 = jday(now1.getUTCFullYear(),
                        now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                        now1.getUTCDate(),
@@ -4699,8 +4695,7 @@ var lookangles = (function () {
         sensor = 'ALTAIR';
         break;
     }
-    propRealTime = Date.now();
-    var now = propTime(propOffset2, propRealTime);
+    var now = propTimeCheck(propOffset2, propRealTime);
     var j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
@@ -4779,7 +4774,7 @@ var lookangles = (function () {
     return propagate(propOffset2, satrec);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
 
     function propagate (curPropOffset, satrec) {
-      var now = propTime(curPropOffset, propRealTime);
+      var now = propTimeCheck(curPropOffset, propRealTime);
       var j = jday(now.getUTCFullYear(),
                    now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                    now.getUTCDate(),
@@ -4832,7 +4827,7 @@ var lookangles = (function () {
           );
   };
 
-  function propTime (propOffset2, propRealTime) {
+  function propTimeCheck (propOffset2, propRealTime) {
     'use strict';                                             // May be unnescessary but doesn't hurt anything atm.
     var now = new Date();                                     // Make a time variable
     now.setTime(Number(propRealTime) + propOffset2);           // Set the time variable to the time in the future

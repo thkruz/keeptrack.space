@@ -5219,7 +5219,6 @@ button.btn-floating {
   background-color: #fff;
   margin: 0;
   margin-bottom: -50px;
-  padding-bottom: 50px;
   display: none;
   min-width: 100px;
   max-height: 650px;
@@ -5228,6 +5227,11 @@ button.btn-floating {
   position: absolute;
   z-index: 999;
   will-change: width, height;
+}
+
+/* Workaround to apply to only one dynamic dropdown-content menu */
+#nl-launch-menu .select-wrapper .dropdown-content {
+  padding-bottom: 50px;
 }
 
 .dropdown-content li {

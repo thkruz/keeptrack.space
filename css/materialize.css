@@ -5219,6 +5219,7 @@ button.btn-floating {
   background-color: #fff;
   margin: 0;
   margin-bottom: -50px;
+  padding-bottom: 50px;
   display: none;
   min-width: 100px;
   max-height: 650px;

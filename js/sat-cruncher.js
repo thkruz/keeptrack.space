@@ -128,6 +128,7 @@ onmessage = function (m) {
       postMessage({
         extraData: JSON.stringify(extraData)
       });
+      satData = null;
       break;
     case 'satEdit':
       // TODO: This code is not optimized yet. Making arrays for one object is unnecessary

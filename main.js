@@ -1589,84 +1589,148 @@ $(document).ready(function () { // Code Once index.php is loaded
     launchFac = launchFac * 1; // Convert to number
     ga('send', 'event', 'New Launch', launchFac, 'Launch Site');
 
+    var launchLat, launchLon;
+
     switch (launchFac) {
-      // If Longitude is west then subtract from 360
-      case 1: // Cape Canaveral
-        var launchLat = 28.466;
-        var launchLon = (360 - 80.558);
+      case 'AFETR':
+        launchLat = 28.46;
+        launchLon = 279.45;
         break;
-      case 2: // Vandenberg
-        launchLat = 34.772;
-        launchLon = (360 - 120.601);
+      case 'AFWTR':
+        launchLat = 34.77;
+        launchLon = 239.4;
         break;
-      case 3: // Wallops
-        launchLat = 37.846;
-        launchLon = (360 - 75.479);
+      case 'CAS':
+        launchLat = 28.1;
+        launchLon = 344.6;
         break;
-      case 4: // Kodiak
-        launchLat = 57.435;
-        launchLon = (360 - 152.339);
+      case 'ERAS':
+        launchLat = 28.46;
+        launchLon = 279.45;
         break;
-      case 5: // Baikonur
-        launchLat = 45.955;
-        launchLon = (63.350);
+      case 'FRGUI':
+        launchLat = 5.23;
+        launchLon = 307.24;
         break;
-      case 6: // Plesetsk
-        launchLat = 62.925;
-        launchLon = (40.577);
+      case 'HGSTR':
+        launchLat = 31.09;
+        launchLon = 357.17;
         break;
-      case 7: // Jiuquan SLC
-        launchLat = 41.118;
-        launchLon = (100.463);
+      case 'JSC':
+        launchLat = 41.11;
+        launchLon = 100.46;
         break;
-      case 8: // Taiyuan SLC
-        launchLat = 39.143;
-        launchLon = (111.967);
+      case 'KODAK':
+        launchLat = 57.43;
+        launchLon = 207.67;
         break;
-      case 9: // Xichang
-        launchLat = 28.246;
-        launchLon = (102.028);
+      case 'KSCUT':
+        launchLat = 31.25;
+        launchLon = 131.07;
         break;
-      case 10: // Wenchang
-        launchLat = 19.614;
-        launchLon = (110.951);
+      case 'KWAJ':
+        launchLat = 9.04;
+        launchLon = 167.74;
         break;
-      case 11: // Tanegashima
-        launchLat = 39.389;
-        launchLon = (130.968);
+      case 'KYMTR':
+        launchLat = 48.57;
+        launchLon = 46.25;
         break;
-      case 12: // Uchinoura
-        launchLat = 31.251;
-        launchLon = (131.079);
+      case 'NSC':
+        launchLat = 34.42;
+        launchLon = 127.52;
         break;
-      case 13: // Koruou, French Guiana
-        launchLat = 5.237;
-        launchLon = (360 - 52.769);
+      case 'OREN':
+        launchLat = 51.2;
+        launchLon = 59.85;
         break;
-      case 14: // Onenui Station, NZ
-        launchLat = -39.260;
-        launchLon = (177.865);
+      case 'PKMTR':
+        launchLat = 62.92;
+        launchLon = 40.57;
         break;
-      case 15: // Sriharikota, India
-        launchLat = 13.737;
-        launchLon = (80.235);
+      case 'PMRF':
+        launchLat = 22.02;
+        launchLon = 200.22;
         break;
-      case 16: // Semnan, Iran
-        launchLat = 35.234;
-        launchLon = (53.920);
+      case 'RLLC':
+        launchLat = 39.26;
+        launchLon = 177.86;
         break;
-      case 20: // Sohae, North Korea
-        launchLat = 39.665457;
-        launchLon = 124.701897;
+      case 'SADOL':
+        launchLat = 75;
+        launchLon = 40;
         break;
-      case 21: // Tonghae, North Korea
-        launchLat = 40.8555995;
-        launchLon = 129.6660233;
+      case 'SEAL':
+        launchLat = 0;
+        launchLon = 210;
         break;
-      case 22: // AF Test Range, Palmachim, Israel
-        launchLat = 31.897778;
-        launchLon = 34.690556000000015;
+      case 'SEM':
+        launchLat = 35.23;
+        launchLon = 53.92;
         break;
+      case 'SNMLP':
+        launchLat = 2.94;
+        launchLon = 40.21;
+        break;
+      case 'SRI':
+        launchLat = 13.73;
+        launchLon = 80.23;
+        break;
+      case 'SVOB':
+        launchLat = 51.83;
+        launchLon = 128.27;
+        break;
+      case 'TNSTA':
+        launchLat = 30.39;
+        launchLon = 130.96;
+        break;
+      case 'TSC':
+        launchLat = 39.14;
+        launchLon = 111.96;
+        break;
+      case 'TTMTR':
+        launchLat = 45.95;
+        launchLon = 63.35;
+        break;
+      case 'TNGH':
+        launchLat = 40.85;
+        launchLon = 129.66;
+        break;
+      case 'VOSTO':
+        launchLat = 51.88;
+        launchLon = 128.33;
+        break;
+      case 'WLPIS':
+        launchLat = 37.84;
+        launchLon = 284.53;
+        break;
+      case 'WOMRA':
+        launchLat = 30.95;
+        launchLon = 136.5;
+        break;
+      case 'WRAS':
+        launchLat = 34.77;
+        launchLon = 239.4;
+        break;
+      case 'WSC':
+        launchLat = 19.61;
+        launchLon = 110.95;
+        break;
+      case 'XSC':
+        launchLat = 28.24;
+        launchLon = 102.02;
+        break;
+      case 'YAVNE':
+        launchLat = 31.88;
+        launchLon = 34.68;
+        break;
+      case 'YUN':
+        launchLat = 39.66;
+        launchLon = 124.7;
+        break;
+    }
+    if (launchLon > 180) { // if West not East
+      launchLon -= 360; // Convert from 0-360 to -180-180
     }
 
     // Set time to 0000z for relative time.
@@ -3276,7 +3340,6 @@ function selectSat (satId) {
       lookangles.getlookangles(sat, isLookanglesMenuOpen);
     }
   }
-
 
   if (satId !== -1) {
     updateMap();

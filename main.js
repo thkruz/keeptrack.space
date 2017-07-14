@@ -1620,6 +1620,8 @@ $(document).ready(function () { // Code Once index.php is loaded
     var TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
     var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
 
+    console.log(TLE2);
+
     if (lookangles.altitudeCheck(TLE1, TLE2, propOffset) > 1) {
       satCruncher.postMessage({
         typ: 'satEdit',
@@ -1653,7 +1655,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     // TODO: Calculate current J-Day to change Epoch Date
 
     var launchFac = $('#nl-facility').val();
-    launchFac = launchFac * 1; // Convert to number
     ga('send', 'event', 'New Launch', launchFac, 'Launch Site');
 
     var launchLat, launchLon;
@@ -2087,108 +2088,6 @@ function keyHandler (evt) {
       rotateTheEarth = !rotateTheEarth;
       // console.log('toggled rotation');
       break;
-    case 66: // B
-      if (isBottomMenuOpen) {
-        $('#bottom-menu').fadeOut();
-        isBottomMenuOpen = false;
-        break;
-      } else {
-        $('#bottom-menu').fadeIn();
-        isBottomMenuOpen = true;
-        break;
-      }
-    case 76: // L
-      if (isLaunchMenuOpen) {
-        isLaunchMenuOpen = false;
-        break;
-      } else {
-        hideSideMenus();
-        $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2017.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-        isLaunchMenuOpen = true;
-        break;
-      }
-    case 70: // F
-      if (isFindByLooksMenuOpen) {
-        $('#findByLooks-menu').fadeOut();
-        isFindByLooksMenuOpen = false;
-        break;
-      } else {
-        hideSideMenus();
-        $('#findByLooks-menu').fadeIn();
-        isFindByLooksMenuOpen = true;
-        break;
-      }
-    case 84: // T
-      if (isTwitterMenuOpen) {
-        $('#twitter-menu').fadeOut();
-        isTwitterMenuOpen = false;
-        break;
-      } else {
-        hideSideMenus();
-        $('#twitter-menu').fadeIn();
-        isTwitterMenuOpen = true;
-        break;
-      }
-    case 87: // W
-      if (isWeatherMenuOpen) {
-        $('#weather-menu').fadeOut();
-        isWeatherMenuOpen = false;
-        break;
-      }
-      if (!isWeatherMenuOpen && whichRadar !== '') {
-        if (whichRadar === 'COD' || whichRadar === 'MIL') {
-          $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/BOX_0.png');
-        }
-        if (whichRadar === 'EGL') {
-          $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/EVX_0.png');
-        }
-        if (whichRadar === 'CLR') {
-          $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/APD_0.png');
-        }
-        if (whichRadar === 'PAR') {
-          $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/MVX_0.png');
-        }
-        if (whichRadar === 'BLE') {
-          $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/DAX_0.png');
-        }
-        if (whichRadar === 'FYL') {
-          $('#weather-image').attr('src', 'http://i.cdn.turner.com/cnn/.element/img/3.0/weather/maps/satuseurf.gif');
-        }
-        if (whichRadar === 'DGC') {
-          $('#weather-image').attr('src', 'http://images.myforecast.com/images/cw/satellite/CentralAsia/CentralAsia.jpeg');
-        }
-        hideSideMenus();
-        $('#weather-menu').fadeIn();
-        isWeatherMenuOpen = true;
-        break;
-      }
-      break;
-    case 81: // Q
-      if (isSpaceWeatherMenuOpen) {
-        $('#space-weather-menu').fadeOut();
-        isSpaceWeatherMenuOpen = false;
-        break;
-      }
-      $('#space-weather-image').attr('src', 'http://services.swpc.noaa.gov/images/animations/ovation-north/latest.png');
-      hideSideMenus();
-      $('#space-weather-menu').fadeIn();
-      isSpaceWeatherMenuOpen = true;
-      break;
-    case 83: // S
-      if (isLookanglesMenuOpen) {
-        $('#lookangles-menu').fadeOut();
-        isLookanglesMenuOpen = false;
-        break;
-      } else {
-        hideSideMenus();
-        $('#lookangles-menu').fadeIn();
-        isLookanglesMenuOpen = true;
-        if (selectedSat !== -1) {
-          var sat = satSet.getSat(selectedSat);
-          lookangles.getlookanglesMultiSite(sat, isLookanglesMenuOpen);
-        }
-        break;
-      }
     case 33: // !
       propOffset = 0; // Reset to Current Time
       ratechange = true;
@@ -2255,8 +2154,7 @@ function keyHandler (evt) {
     selectedDate = selectedDate.split(' ');
     selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
     var today = new Date();
-    propOffset = selectedDate - today;// - (selectedDate.getTimezoneOffset() * 60 * 1000);
-    // console.log(propOffset);
+    propOffset = selectedDate - today;
     return propOffset;
   }
 
@@ -2669,7 +2567,6 @@ function bottomIconPress (evt) {
   }
 }
 function pad (num, size) {
-  // console.log(num);
   var s = '   ' + num;
   return s.substr(s.length - size);
 }
@@ -3548,8 +3445,6 @@ function getEarthScreenPoint (x, y) {
   vec3.scale(ptSurf, rayDir, dSurf);
   vec3.add(ptSurf, ptSurf, rayOrigin);
 
- // console.log('earthscreenpt: ' + (performance.now() - start) + ' ms');
-
   return ptSurf;
 }
 function getSatIdFromCoord (x, y) {
@@ -3562,7 +3457,6 @@ function getSatIdFromCoord (x, y) {
   var pickG = pickColorBuf[1];
   var pickB = pickColorBuf[2];
 
- // console.log('picking op: ' + (performance.now() - start) + ' ms');
   return ((pickB << 16) | (pickG << 8) | (pickR)) - 1;
 }
 function getCamDist () {
@@ -3591,13 +3485,13 @@ function camSnapToSat (satId) {
     var yaw = Math.atan2(pos.y, pos.x) + Math.PI / 2;
     var pitch = Math.atan2(pos.z, r);
     if (!pitch) {
-      console.log('Pitch Calculation Error');
+      console.warn('Pitch Calculation Error');
       pitch = 0;
       camZoomSnappedOnSat = false;
       camAngleSnappedOnSat = false;
     }
     if (!yaw) {
-      console.log('Yaw Calculation Error');
+      console.warn('Yaw Calculation Error');
       yaw = 0;
       camZoomSnappedOnSat = false;
       camAngleSnappedOnSat = false;
@@ -3611,7 +3505,7 @@ function camSnapToSat (satId) {
       var camDistTarget = lookangles.altitude + 6371 + 2000;
     } else {
       camDistTarget = 6371 + 2000;  // Stay out of the center of the earth. You will get stuck there.
-      console.log('Zoom Calculation Error');
+      console.warn('Zoom Calculation Error');
       camZoomSnappedOnSat = false;
       camAngleSnappedOnSat = false;
     }
@@ -3900,7 +3794,6 @@ function hoverBoxOnSat (satId, satX, satY) {
     $('#canvas').css({cursor: 'default'});
   } else {
     try {
-    //    console.log(pos);
       var sat = satSet.getSat(satId);
 
       // FEATURE TODO: Processor intensive code that might be offered as a setting
@@ -3944,7 +3837,7 @@ var lookangles = (function () {
   var observerGd = {};
 
   var sensorSelected = function () {
-    if (this.obslat !== null && this.obslat !== undefined) {
+    if (this.obslat != null) {
       return true;
     } else {
       return false;
@@ -4189,9 +4082,20 @@ var lookangles = (function () {
     getTempSensor(resetWhenDone);
   };
 
+  /**
+   * Function to brute force find an orbit over a sites lattiude and longitude
+   * @param  object       sat             satellite object with satrec
+   * @param  long         goalLat         Goal Latitude
+   * @param  long         goalLon         Goal Longitude
+   * @param  string       upOrDown        'Up' or 'Down'
+   * @param  integer      curPropOffset   milliseconds between now and 0000z
+   * @return Array                        [0] is TLE1 and [1] is TLE2
+   * @method pad                          pads front of string with 0's for TLEs
+   * @method meanaCalc                    returns 1 when latitude found 2 if error
+   * @method rascCalc                     returns 1 when longitude found 2 if error and 5 if it is not close
+   * @method propagate                    calculates a modified TLEs latitude and longitude
+   */
   var getOrbitByLatLon = function (sat, goalLat, goalLon, upOrDown, curPropOffset) {
-    // var curPropOffset = getPropOffset();
-    // var propRealTime = Date.now();
     var mainTLE1;
     var mainTLE2;
     var mainMeana;
@@ -4200,37 +4104,30 @@ var lookangles = (function () {
     var isUpOrDown;
     var rascOffset = false;
 
-    // Longitude is passed in 0 to 360 instead of -180 to 180.
-
-    if (upOrDown === undefined || upOrDown === null) {
-      upOrDown = 'Up';
-    }
-
-    goalLat = goalLat * 1;
-    goalLon = goalLon * 1;
-
-    // var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);
-    // console.log(sat.TLE2);
-
-    for (var i = 0; i < (400 * 10); i += 1) {         // 400 degress in 0.1 increments. Going extra 40 degrees to be safe. TODO More precise?
-      if (meanaCalc(i, rascOffset)) {
-        if (isUpOrDown !== upOrDown) {
+    for (var i = 0; i < (400 * 10); i += 1) { /** Rotate Mean Anomaly 0.1 Degree at a Time for Up To 400 Degrees */
+      var meanACalcResults = meanaCalc(i, rascOffset);
+      if (meanACalcResults === 1) {
+        if (isUpOrDown !== upOrDown) { // If Object is moving opposite of the goal direction (upOrDown)
           rascOffset = true;
-          i = i + 20; // Move a little ahead in the orbit to prevent being close on the next lattiude check
+          i = i + 20;                 // Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
         } else {
-          // console.log(mainTLE2);
           break; // Stop changing the Mean Anomaly
         }
       }
+      if (meanACalcResults === 5) { i += (10 * 100); } // Change meanA faster
+      if (meanACalcResults === 2) { return ['Error', '']; }
     }
 
-    for (i = 0; i < (1400 * 100); i += 1) {         // 520 degress in 0.01 increments TODO More precise?
+    for (i = 0; i < (3600 * 100); i += 1) {         // 520 degress in 0.01 increments TODO More precise?
       if (rascOffset && i === 0) {
         i = (mainRasc - 10) * 100;
       }
-      if (rascCalc(i)) {
-        // console.log(mainTLE2);
+      var rascCalcResults = rascCalc(i);
+      if (rascCalcResults === 1) {
         break;
+      }
+      if (rascCalcResults === 5) {
+        i += (10 * 100);
       }
     }
 
@@ -4291,18 +4188,21 @@ var lookangles = (function () {
       var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
 
       satrec = satellite.twoline2satrec(TLE1, TLE2);
-      if (propagate(curPropOffset, satrec, 1)) {
+      var propagateResults = getOrbitByLatLonPropagate(curPropOffset, satrec, 1);
+      if (propagateResults === 1) {
         mainTLE1 = TLE1;
         mainTLE2 = TLE2;
         mainMeana = meana;
         return 1;
+      }
+      if (propagateResults === 2) {
+        return 2;
       }
       return 0;
     }
 
     function rascCalc (rasc) {
       var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-
       var meana = mainMeana;
 
       rasc = rasc / 100;
@@ -4348,13 +4248,19 @@ var lookangles = (function () {
 
       satrec = satellite.twoline2satrec(mainTLE1, mainTLE2);
 
-      if (propagate(curPropOffset, satrec, 2)) {
+      var propNewRasc = getOrbitByLatLonPropagate(curPropOffset, satrec, 2);
+      // If RASC within 0.15 degrees then good enough
+      if (propNewRasc === 1) {
         return 1;
+      }
+      // If RASC outside 15 degrees then rotate RASC faster
+      if (propNewRasc === 5) {
+        return 5;
       }
       return 0;
     }
 
-    function propagate (curPropOffset, satrec, type) {
+    function getOrbitByLatLonPropagate (curPropOffset, satrec, type) {
       var now = propTimeCheck(curPropOffset, propRealTime);
       var j = jday(now.getUTCFullYear(),
                    now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -4370,34 +4276,52 @@ var lookangles = (function () {
 
       var gpos, lat, lon;
 
-      gpos = satellite.eci_to_geodetic(pv.position, gmst);
+      try {
+        gpos = satellite.eci_to_geodetic(pv.position, gmst);
+      } catch (err) {
+        return 2;
+      }
 
-      lat = (gpos.latitude * 180 / Math.PI).toFixed(3);
-      lon = (((gpos.longitude * 180 / Math.PI) + 360) % 360).toFixed(3);
+      lat = satellite.degrees_lat(gpos.latitude) * 1;
+      lon = satellite.degrees_long(gpos.longitude) * 1;
 
-      // if (lon < -180) {
-      //   lon = ((lon * 1) + 360).toFixed(3);
-      // }
-
-      if (type === 1) {
-        if (lat > lastLat) {
-          isUpOrDown = 'Up';
-        } else {
-          isUpOrDown = 'Down';
-        }
+      if (lastLat == null) { // Set it the first time
         lastLat = lat;
       }
 
-      if (type === 2) {
+      if (type === 1) {
+        if (lat === lastLat) {
+          return 0; // Not enough movement, skip this
+        }
+
+        if (lat > lastLat) {
+          isUpOrDown = 'N';
+        }
+        if (lat < lastLat) {
+          isUpOrDown = 'S';
+        }
+
+        lastLat = lat;
       }
 
-      if (lat > (goalLat - 0.05) && lat < (goalLat + 0.05) && type === 1) {
+      if (lat > (goalLat - 0.15) && lat < (goalLat + 0.15) && type === 1) {
         return 1;
       }
 
-      if (lon > (goalLon - 0.1) && lon < (goalLon + 0.1) && type === 2) {
+      if (lon > (goalLon - 0.15) && lon < (goalLon + 0.15) && type === 2) {
         return 1;
       }
+
+      // If current longitude greater than 11 degrees off rotate RASC faster
+      if (!(lon > (goalLon - 11) && lon < (goalLon + 11)) && type === 2) {
+        return 5;
+      }
+
+      // If current latitude greater than 11 degrees off rotate meanA faster
+      if (!(lat > (goalLat - 11) && lat < (goalLat + 11)) && type === 1) {
+        return 5;
+      }
+
       return 0;
     }
   };

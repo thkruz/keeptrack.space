@@ -71,6 +71,7 @@ var ZOOM_EXP = 3;
 var DIST_MIN = 6800;
 var DIST_MAX = 200000;
 var RADIUS_OF_EARTH = 6371.0;
+var DEG2RAD = 0.017453292519943295;       // (angle / 180) * Math.PI --- Divide by deg2rad to get rad2deg
 // var maxOrbitsDisplayed = 100; // Used in sat.js and orbit-display.js TODO: issues:23 Add settings option to change maxOrbitsDisplayed
 
 var satCruncher;
@@ -1381,6 +1382,7 @@ $(document).ready(function () { // Code Once index.php is loaded
   $('.sensor-selected').click(function () {
     $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
     if (selectedSat !== -1) {
+      console.log('problem');
       $('#menu-lookangles img').removeClass('bmenu-item-disabled');
     }
     $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
@@ -1419,12 +1421,6 @@ $(document).ready(function () { // Code Once index.php is loaded
     var isChangeSharperShaders = document.getElementById('settings-shaders').checked;
     var isSNPChecked = document.getElementById('settings-snp').checked;
     var isRiseSetChecked = $('#settings-riseset').checked;
-
-    console.log(isChangeSharperShaders);
-    console.log(isLimitSats);
-    console.log(limitSats);
-    console.log($('#limitSats').val());
-    console.log(isSharperShaders);
 
     /** Filter On and Shaders On */
     if (!isSharperShaders && isChangeSharperShaders && isLimitSats) {
@@ -1488,7 +1484,7 @@ $(document).ready(function () { // Code Once index.php is loaded
         obsmaxel: 0,
         obsminrange: undefined,
         obsmaxrange: undefined
-      });
+      }, true);
       whichRadar = ''; // Disable Weather
       $('#menu-sensor-info img').addClass('bmenu-item-disabled');
       $('#menu-in-coverage img').addClass('bmenu-item-disabled');
@@ -2244,7 +2240,7 @@ function bottomIconPress (evt) {
         break;
       }
     case 'menu-in-coverage': // B
-      if (lookangles.obslat == null) { // No Sensor Selected
+      if (!lookangles.sensorSelected()) { // No Sensor Selected
         if (!$('#menu-in-coverage img:animated').length) {
           $('#menu-in-coverage img').effect('shake', {distance: 10});
         }
@@ -2267,7 +2263,7 @@ function bottomIconPress (evt) {
         hideSideMenus();
         break;
       } else {
-        if (lookangles.obslat == null || selectedSat === -1) { // No Sensor or Satellite Selected
+        if (!lookangles.sensorSelected() || selectedSat === -1) { // No Sensor or Satellite Selected
           if (!$('#menu-lookangles img:animated').length) {
             $('#menu-lookangles img').effect('shake', {distance: 10});
           }
@@ -2661,6 +2657,7 @@ function selectSat (satId) {
     camAngleSnappedOnSat = true;
 
     if (lookangles.sensorSelected()) {
+      console.log('problem');
       $('#menu-lookangles img').removeClass('bmenu-item-disabled');
     }
 
@@ -3294,7 +3291,7 @@ function selectSat (satId) {
     var sunTime = SunCalc.getTimes(Date.now(), lookangles.obslat, lookangles.obslong);
     if (sunTime.dawn.getTime() - now > 0 || sunTime.dusk.getTime() - now < 0) {
       $('#sat-sun').html('No Sun');
-    } else if (lookangles.obslat == null) {
+    } else if (!lookangles.sensorSelected()) {
       $('#sat-sun').html('Unknown');
     } else {
       $('#sat-sun').html('Sun Exclusion');
@@ -3679,7 +3676,7 @@ function updateMap () {
   map.x = map.x * mapWidth - 10;
   map.y = map.y / 0.6366197723675813 * mapHeight - 10;
   $('#map-sat').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
-  if (!(lookangles.obslat === undefined || lookangles.obslat === null)) {
+  if (lookangles.sensorSelected()) {
     map = braun({lon: lookangles.obslong, lat: lookangles.obslat}, {meridian: 0, latLimit: 90});
     map.x = map.x * mapWidth - 10;
     map.y = map.y / 0.6366197723675813 * mapHeight - 10;
@@ -3798,7 +3795,7 @@ function hoverBoxOnSat (satId, satX, satY) {
 
       // FEATURE TODO: Processor intensive code that might be offered as a setting
 
-      if (!(lookangles.obslat === undefined || lookangles.obslat === null) && isShowNextPass) {
+      if (lookangles.sensorSelected() && isShowNextPass) {
         $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
       } else {
         $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
@@ -3825,7 +3822,7 @@ function earthHitTest (x, y) {
 }
 
 var lookangles = (function () {
-  var latitude, longitude, height, obsminaz, obsmaxaz, obsminel, obsmaxel, obsminrange, obsmaxrange, deg2rad;
+  var obslat, obslong, hei, obsminaz, obsmaxaz, obsminel, obsmaxel, obsminrange, obsmaxrange;
   var tempLat, tempLon, tempHei, tempMinaz, tempMaxaz, tempMinel, tempMaxel, tempMinrange, tempMaxrange;
   this.lat = 0;
   this.lon = 0;
@@ -3837,7 +3834,7 @@ var lookangles = (function () {
   var observerGd = {};
 
   var sensorSelected = function () {
-    if (this.obslat != null) {
+    if (obslat != null) {
       return true;
     } else {
       return false;
@@ -3845,41 +3842,37 @@ var lookangles = (function () {
   };
 
   var getsensorinfo = function () {
-    $('#sensor-latitude').html(this.obslat);
-    $('#sensor-longitude').html(this.obslong);
-    $('#sensor-minazimuth').html(this.obsminaz);
-    $('#sensor-maxazimuth').html(this.obsmaxaz);
-    $('#sensor-minelevation').html(this.obsminel);
-    $('#sensor-maxelevation').html(this.obsmaxel);
-    $('#sensor-minrange').html(this.obsminrange);
-    $('#sensor-maxrange').html(this.obsmaxrange);
+    $('#sensor-latitude').html(obslat);
+    $('#sensor-longitude').html(obslong);
+    $('#sensor-minazimuth').html(obsminaz);
+    $('#sensor-maxazimuth').html(obsmaxaz);
+    $('#sensor-minelevation').html(obsminel);
+    $('#sensor-maxelevation').html(obsmaxel);
+    $('#sensor-minrange').html(obsminrange);
+    $('#sensor-maxrange').html(obsmaxrange);
   };
 
-  var setobs = function (obs) {
+  var setobs = function (obs, reset) {
     // Set the Observer Location and variable to convert to RADIANS TODO: Change these to variables received in a method call.
-    latitude = obs.lat;                   // Observer Lattitude - use Google Maps
-    longitude = obs.long;                 // Observer Longitude - use Google Maps
-    this.obslat = obs.lat;
-    this.obslong = obs.long;
-    height = obs.hei;                     // Observer Height in Km
-    this.hei = obs.hei;
-    obsminaz = obs.obsminaz;              // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
-    obsmaxaz = obs.obsmaxaz;              // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
-    this.obsminaz = obs.obsminaz;
-    this.obsmaxaz = obs.obsmaxaz;
-    obsminel = obs.obsminel;              // Observer min elevation
-    obsmaxel = obs.obsmaxel;              // Observer max elevation TODO: Determine if radars with 105deg elevation work correctly
-    this.obsminel = obs.obsminel;
-    this.obsmaxel = obs.obsmaxel;
-    obsminrange = obs.obsminrange;        // Observer min range TODO: Determine how to calculate min range with transmit cycle information
-    obsmaxrange = obs.obsmaxrange;        // Observer max range TODO: Determine how to calculate max range with transmit cycle information
-    this.obsminrange = obs.obsminrange;
-    this.obsmaxrange = obs.obsmaxrange;
-    deg2rad = 0.017453292519943295;       // (angle / 180) * Math.PI --- Divide by deg2rad to get rad2deg
+    if (reset) {
+      obslat = null;
+    } else {
+      obslat = obs.lat * DEG2RAD;                // Observer Lattitude - use Google Maps
+      this.obslat = obslat;
+    }
+    obslong = obs.long * DEG2RAD;              // Observer Longitude - use Google Maps
+    this.obslong = obslong;
+    hei = obs.hei * 1;                   // Observer Height in Km
+    obsminaz = obs.obsminaz;         // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
+    obsmaxaz = obs.obsmaxaz;         // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
+    obsminel = obs.obsminel;         // Observer min elevation
+    obsmaxel = obs.obsmaxel;         // Observer max elevation TODO: Determine if radars with 105deg elevation work correctly
+    obsminrange = obs.obsminrange;   // Observer min range TODO: Determine how to calculate min range with transmit cycle information
+    obsmaxrange = obs.obsmaxrange;   // Observer max range TODO: Determine how to calculate max range with transmit cycle information
     observerGd = {                        // Array to calculate look angles in propagate()
-      longitude: this.obslong * deg2rad,
-      latitude: this.obslat * deg2rad,
-      height: this.hei * 1                  // Converts from string to number TODO: Find correct way to convert string to integer
+      latitude: obslat,
+      longitude: obslong,
+      height: hei                  // Converts from string to number TODO: Find correct way to convert string to integer
     };
   };
 
@@ -3909,9 +3902,9 @@ var lookangles = (function () {
 
   var getTEARR = function (sat) {
     // Set default timing settings. These will be changed to find look angles at different times in future.
-    var propOffset2 = getPropOffset();               // offset letting us propagate in the future (or past)
+    var propOffsetTemp = getPropOffset();               // offset letting us propagate in the future (or past)
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-    var now = propTimeCheck(propOffset2, propRealTime);
+    var now = propTimeCheck(propOffsetTemp, propRealTime);
     var j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
@@ -3931,11 +3924,10 @@ var lookangles = (function () {
       this.altitude = gpos.height;
       this.lon = gpos.longitude;
       this.lat = gpos.latitude;
-
       positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
       lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
-      this.azimuth = lookAngles.azimuth / deg2rad;
-      this.elevation = lookAngles.elevation / deg2rad;
+      this.azimuth = lookAngles.azimuth / DEG2RAD;
+      this.elevation = lookAngles.elevation / DEG2RAD;
       this.range = lookAngles.range_sat;
     } catch (e) {
       this.altitude = 0;
@@ -3965,11 +3957,11 @@ var lookangles = (function () {
 
   function nextpass (sat) {
     var curPropOffset = getPropOffset();
-    var propOffset2 = 0;
+    var propOffsetTemp = 0;
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
     for (var i = 0; i < (7 * 24 * 60 * 60); i += 5) {         // 5second Looks
-      propOffset2 = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
-      var now = propTimeCheck(propOffset2, propRealTime);
+      propOffsetTemp = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
+      var now = propTimeCheck(propOffsetTemp, propRealTime);
       var j = jday(now.getUTCFullYear(),
       now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
       now.getUTCDate(),
@@ -3985,8 +3977,8 @@ var lookangles = (function () {
 
       positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
       lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
-      azimuth = lookAngles.azimuth / deg2rad;
-      elevation = lookAngles.elevation / deg2rad;
+      azimuth = lookAngles.azimuth / DEG2RAD;
+      elevation = lookAngles.elevation / DEG2RAD;
       rangeSat = lookAngles.range_sat;
 
       if (obsminaz > obsmaxaz) {
@@ -4016,11 +4008,10 @@ var lookangles = (function () {
       return;
     }
     var resetWhenDone = false;
-    if (latitude === null || latitude === undefined) {
-      resetWhenDone = true;
-    }
+    if (sensorSelected()) { resetWhenDone = true; }
+
     // Set default timing settings. These will be changed to find look angles at different times in future.
-    var propOffset2 = 0;               // offset letting us propagate in the future (or past)
+    var propOffsetTemp = 0;               // offset letting us propagate in the future (or past)
     // var propRealTime = Date.now();      // Set current time
 
     var curPropOffset = getPropOffset();
@@ -4053,8 +4044,8 @@ var lookangles = (function () {
     tdS.setAttribute('style', 'text-decoration: underline');
 
     for (var i = 0; i < (7 * 24 * 60 * 60); i += 5) {         // 5second Looks
-      propOffset2 = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
-      tblLength += propagateMultiSite(propOffset2, tbl, satrec, sensor);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
+      propOffsetTemp = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
+      tblLength += propagateMultiSite(propOffsetTemp, tbl, satrec, sensor);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
       if (tblLength > lastTblLength) {                           // Maximum of 1500 lines in the look angles table
         lastTblLength++;
         if (howManyPasses === 1) { // When 3 passes have been complete - looks weird with 1 instead of 0
@@ -4330,9 +4321,9 @@ var lookangles = (function () {
     if (!isLookanglesMenuOpen) {
       return;
     }
-    if (latitude != null && longitude != null && height != null) {
+    if (sensorSelected()) {
       // Set default timing settings. These will be changed to find look angles at different times in future.
-      var propOffset2 = 0;               // offset letting us propagate in the future (or past)
+      var propOffsetTemp = 0;               // offset letting us propagate in the future (or past)
       // var propRealTime = Date.now();      // Set current time
 
       var curPropOffset = getPropOffset();
@@ -4362,11 +4353,11 @@ var lookangles = (function () {
       }
 
       for (var i = 0; i < (lookanglesLength * 24 * 60 * 60); i += lookanglesInterval) {         // lookanglesInterval in seconds
-        propOffset2 = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
+        propOffsetTemp = i * 1000 + curPropOffset;                 // Offset in seconds (msec * 1000)
         if (tblLength >= 1500) {                           // Maximum of 1500 lines in the look angles table
           break;                                            // No more updates to the table (Prevent GEO object slowdown)
         }
-        tblLength += propagate(propOffset2, tbl, satrec);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
+        tblLength += propagate(propOffsetTemp, tbl, satrec);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
       }
 
       if (isRiseSetLookangles) {
@@ -4376,9 +4367,9 @@ var lookangles = (function () {
   };
 
   function setTempSensor () {
-    tempLat = latitude;
-    tempLon = longitude;
-    tempHei = height;
+    tempLat = obslat;
+    tempLon = obslong;
+    tempHei = hei;
     tempMinel = obsminel;
     tempMaxel = obsmaxel;
     tempMinrange = obsminrange;
@@ -4401,19 +4392,19 @@ var lookangles = (function () {
         obsmaxrange: undefined
       });
     } else {
-      this.latitude = tempLat;
-      this.longitude = tempLon;
-      this.height = tempHei;
-      this.obsminel = tempMinel;
-      this.obsmaxel = tempMaxel;
-      this.obsminrange = tempMinrange;
-      this.obsmaxrange = tempMaxrange;
-      this.obsminaz = tempMinaz;
-      this.obsmaxaz = tempMaxaz;
-      this.observerGd = {                        // Array to calculate look angles in propagate()
-        longitude: longitude * deg2rad,
-        latitude: latitude * deg2rad,
-        height: height * 1                  // Converts from string to number TODO: Find correct way to convert string to integer
+      obslat = tempLat;
+      obslong = tempLon;
+      hei = tempHei;
+      obsminel = tempMinel;
+      obsmaxel = tempMaxel;
+      obsminrange = tempMinrange;
+      obsmaxrange = tempMaxrange;
+      obsminaz = tempMinaz;
+      obsmaxaz = tempMaxaz;
+      observerGd = {                        // Array to calculate look angles in propagate()
+        latitude: obslat * DEG2RAD,
+        longitude: obslong * DEG2RAD,
+        height: hei * 1                  // Converts from string to number TODO: Find correct way to convert string to integer
       };
     }
   }
@@ -4539,14 +4530,14 @@ var lookangles = (function () {
         break;
     }
     observerGd = {                        // Array to calculate look angles in propagate()
-      longitude: longitude * deg2rad,
-      latitude: latitude * deg2rad,
-      height: height * 1                  // Converts from string to number TODO: Find correct way to convert string to integer
+      latitude: obslat * DEG2RAD,
+      longitude: obslong * DEG2RAD,
+      height: hei * 1                  // Converts from string to number TODO: Find correct way to convert string to integer
     };
   }
 
-  function propagate (propOffset2, tbl, satrec) {
-    var now = propTimeCheck(propOffset2, propRealTime);
+  function propagate (propOffsetTemp, tbl, satrec) {
+    var now = propTimeCheck(propOffsetTemp, propRealTime);
     var j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
@@ -4562,8 +4553,8 @@ var lookangles = (function () {
 
     positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
     lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
-    azimuth = lookAngles.azimuth / deg2rad;
-    elevation = lookAngles.elevation / deg2rad;
+    azimuth = lookAngles.azimuth / DEG2RAD;
+    elevation = lookAngles.elevation / DEG2RAD;
     rangeSat = lookAngles.range_sat;
 
     if (obsminaz < obsmaxaz) {
@@ -4574,7 +4565,7 @@ var lookangles = (function () {
     if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
       if (isRiseSetLookangles) {
         // Previous Pass to Calculate first line of coverage
-        var now1 = propTimeCheck(propOffset2 - (lookanglesInterval * 1000), propRealTime);
+        var now1 = propTimeCheck(propOffsetTemp - (lookanglesInterval * 1000), propRealTime);
         var j1 = jday(now1.getUTCFullYear(),
                      now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                      now1.getUTCDate(),
@@ -4590,8 +4581,8 @@ var lookangles = (function () {
 
         positionEcf1 = satellite.eci_to_ecf(pv1.position, gmst1); // pv.position is called positionEci originally
         lookAngles1 = satellite.ecf_to_look_angles(observerGd, positionEcf1);
-        azimuth1 = lookAngles1.azimuth / deg2rad;
-        elevation1 = lookAngles1.elevation / deg2rad;
+        azimuth1 = lookAngles1.azimuth / DEG2RAD;
+        elevation1 = lookAngles1.elevation / DEG2RAD;
         rangeSat1 = lookAngles1.range_sat;
         if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange))) {
           var tr = tbl.insertRow();
@@ -4607,7 +4598,7 @@ var lookangles = (function () {
           return 1;
         } else {
           // Next Pass to Calculate Last line of coverage
-          now1 = propTimeCheck(propOffset2 + (lookanglesInterval * 1000), propRealTime);
+          now1 = propTimeCheck(propOffsetTemp + (lookanglesInterval * 1000), propRealTime);
           j1 = jday(now1.getUTCFullYear(),
                        now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                        now1.getUTCDate(),
@@ -4622,8 +4613,8 @@ var lookangles = (function () {
 
           positionEcf1 = satellite.eci_to_ecf(pv1.position, gmst1); // pv.position is called positionEci originally
           lookAngles1 = satellite.ecf_to_look_angles(observerGd, positionEcf1);
-          azimuth1 = lookAngles1.azimuth / deg2rad;
-          elevation1 = lookAngles1.elevation / deg2rad;
+          azimuth1 = lookAngles1.azimuth / DEG2RAD;
+          elevation1 = lookAngles1.elevation / DEG2RAD;
           rangeSat1 = lookAngles1.range_sat;
           if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange))) {
             tr = tbl.insertRow();
@@ -4657,7 +4648,7 @@ var lookangles = (function () {
     return 0;
   }
 
-  function propagateMultiSite (propOffset2, tbl, satrec, sensor) {
+  function propagateMultiSite (propOffsetTemp, tbl, satrec, sensor) {
     switch (sensor) {
       case 0:
         sensor = 'Cape Cod';
@@ -4687,7 +4678,7 @@ var lookangles = (function () {
         sensor = 'ALTAIR';
         break;
     }
-    var now = propTimeCheck(propOffset2, propRealTime);
+    var now = propTimeCheck(propOffsetTemp, propRealTime);
     var j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
@@ -4703,8 +4694,8 @@ var lookangles = (function () {
 
     positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
     lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
-    azimuth = lookAngles.azimuth / deg2rad;
-    elevation = lookAngles.elevation / deg2rad;
+    azimuth = lookAngles.azimuth / DEG2RAD;
+    elevation = lookAngles.elevation / DEG2RAD;
     rangeSat = lookAngles.range_sat;
 
     if (obsminaz < obsmaxaz) {
@@ -4762,8 +4753,8 @@ var lookangles = (function () {
     // Set default timing settings. These will be changed to find look angles at different times in future.
     var curPropOffset = getPropOffset();
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-    var propOffset2 = i * sat.period / 50 * 60 * 1000 + curPropOffset;             // Offset in seconds (msec * 1000)
-    return propagate(propOffset2, satrec);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
+    var propOffsetTemp = i * sat.period / 50 * 60 * 1000 + curPropOffset;             // Offset in seconds (msec * 1000)
+    return propagate(propOffsetTemp, satrec);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
 
     function propagate (curPropOffset, satrec) {
       var now = propTimeCheck(curPropOffset, propRealTime);
@@ -4790,8 +4781,8 @@ var lookangles = (function () {
       var positionEcf, lookAngles, azimuth, elevation, rangeSat;
       positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
       lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
-      azimuth = lookAngles.azimuth / deg2rad;
-      elevation = lookAngles.elevation / deg2rad;
+      azimuth = lookAngles.azimuth / DEG2RAD;
+      elevation = lookAngles.elevation / DEG2RAD;
       rangeSat = lookAngles.range_sat;
       var inview = 0;
 
@@ -4819,10 +4810,10 @@ var lookangles = (function () {
           );
   };
 
-  function propTimeCheck (propOffset2, propRealTime) {
+  function propTimeCheck (propOffsetTemp, propRealTime) {
     'use strict';                                             // May be unnescessary but doesn't hurt anything atm.
     var now = new Date();                                     // Make a time variable
-    now.setTime(Number(propRealTime) + propOffset2);           // Set the time variable to the time in the future
+    now.setTime(Number(propRealTime) + propOffsetTemp);           // Set the time variable to the time in the future
     return now;
   }
 
@@ -7123,7 +7114,8 @@ function propTime () {
       gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(selectedColor));
     }
     selectedSat = i;
-    if (!(lookangles.obslat === null || lookangles.obslat === undefined)) {
+    if (lookangles.sensorSelected()) {
+      console.log('problem');
       $('#menu-lookangles img').removeClass('bmenu-item-disabled');
     }
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');

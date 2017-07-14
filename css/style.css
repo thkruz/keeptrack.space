@@ -256,8 +256,17 @@ ul {
     vertical-align: middle;
 }
 
+@media (max-width: 1000px) {
+  #legend-hover-menu {
+    width: 100%;
+  }
+}
+@media (min-width: 1001px) {
+  #legend-hover-menu {
+    width: 300px;
+  }
+}
 #legend-hover-menu {
-  width: 300px;
   padding-left: 35px;
   color: white;
   background: #0a97d6;
@@ -291,6 +300,18 @@ ul {
 
 #legend-gray-box {
   background: rgb(157, 157, 157);
+  margin-right: 35px;
+}
+#legend-red-box {
+  background: rgb(166, 5, 5);
+  margin-right: 35px;
+}
+#legend-orange-box {
+  background: rgb(255, 92, 0);
+  margin-right: 35px;
+}
+#legend-yellow-box {
+  background: rgb(200, 198, 9);
   margin-right: 35px;
 }
 

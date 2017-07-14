@@ -378,11 +378,23 @@ $(document).ready(function () { // Code Once index.php is loaded
           $('#legend-hover-menu').hide();
         }
 
-        satSet.setColorScheme(ColorScheme.default);
+        // Hide All legends
+        $('#legend-list-default').hide();
+        $('#legend-list-default-sensor').hide();
+        $('#legend-list-rcs').hide();
+        $('#legend-list-small').hide();
+        $('#legend-list-near').hide();
+        $('#legend-list-deep').hide();
+        $('#legend-list-velocity').hide();
 
         if (lookangles.sensorSelected()) {
           $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
+          $('#legend-list-default-sensor').show();
+        } else {
+          $('#legend-list-default').show();
         }
+
+        satSet.setColorScheme(ColorScheme.default);
       }
       selectSat(clickedSat);
     }
@@ -455,10 +467,18 @@ $(document).ready(function () { // Code Once index.php is loaded
   });
 
   $('#us-radar-menu').click(function () {
+    if ($('#legend-list-default').css('display') === 'block') {
+      $('#legend-list-default').hide();
+      $('#legend-list-default-sensor').show();
+    }
     updateMap();
   });
 
   $('#russian-menu').click(function () {
+    if ($('#legend-list-default').css('display') === 'block') {
+      $('#legend-list-default').hide();
+      $('#legend-list-default-sensor').show();
+    }
     updateMap();
   });
 
@@ -5371,21 +5391,36 @@ dateFormat.i18n = {
     $('#colors-menu>li').click(function () {
       selectSat(-1); // clear selected sat
       var colorName = $(this).data('color');
-      // clearMenuCountries();
+      // Hide All legends
+      $('#legend-list-default').hide();
+      $('#legend-list-default-sensor').hide();
+      $('#legend-list-rcs').hide();
+      $('#legend-list-small').hide();
+      $('#legend-list-near').hide();
+      $('#legend-list-deep').hide();
+      $('#legend-list-velocity').hide();
       switch (colorName) {
         case 'default':
+          if (lookangles.sensorSelected()) {
+            $('#legend-list-default-sensor').show();
+          } else {
+            $('#legend-list-default').show();
+          }
           satSet.setColorScheme(ColorScheme.default);
           ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
           break;
         case 'velocity':
+          $('#legend-list-velocity').show();
           satSet.setColorScheme(ColorScheme.velocity);
           ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
           break;
         case 'near-earth':
+          $('#legend-list-near').show();
           satSet.setColorScheme(ColorScheme.leo);
           ga('send', 'event', 'ColorScheme Menu', 'near-earth', 'Selected');
           break;
         case 'deep-space':
+          $('#legend-list-deep').show();
           satSet.setColorScheme(ColorScheme.geo);
           ga('send', 'event', 'ColorScheme Menu', 'Deep-Space', 'Selected');
           break;
@@ -5396,10 +5431,12 @@ dateFormat.i18n = {
           searchBox.doSearch($('#search').val());
           break;
         case 'rcs':
+          $('#legend-list-rcs').show();
           satSet.setColorScheme(ColorScheme.rcs);
           ga('send', 'event', 'ColorScheme Menu', 'RCS', 'Selected');
           break;
         case 'smallsats':
+          $('#legend-list-small').show();
           satSet.setColorScheme(ColorScheme.smallsats);
           ga('send', 'event', 'ColorScheme Menu', 'Small Satellites', 'Selected');
           break;
@@ -6813,7 +6850,6 @@ function propTime () {
     gl.drawArrays(gl.POINTS, 0, satData.length); // draw pick
 
     lastDrawTime = now;
-    // satSet.setColorScheme(ColorScheme.default);
     satSet.updateFOV(null);
   };
 

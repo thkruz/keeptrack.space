@@ -436,14 +436,21 @@
                 <div class="row"></div>
                 <div class="switch row">
                   <label>
-                    <input id="limitSats-enabled" type="checkbox">
+                    <input id="settings-limitSats-enabled" type="checkbox">
                     <span class="lever"></span>
                     Enable Filter
                   </label>
-                </div>
                 <div class="input-field col s12">
                   <input value="" id="limitSats" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Use NORAD Numbers">
                   <label id="limitSats-Label" for="limitSats">Remove All Satellites Except</label>
+                </div>
+                <div class="row"></div>
+                <div class="switch row">
+                  <label>
+                    <input id="settings-shaders" type="checkbox">
+                    <span class="lever"></span>
+                    Enable Sharper Shaders (Fix Fuzzy Satellites)
+                  </label>
                 </div>
               </div>
               <div id="fastCompSettings">
@@ -921,7 +928,7 @@
       <a id="reddit-share" href="https://www.reddit.com/submit?url=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Reddit"><img src="https://static.addtoany.com/buttons/reddit.svg" width="32" height="32"></a>
     </div>
     <span id="version-info" style="margin-top:-45px;margin-right:10px" class="right tooltipped" data-position="top" data-delay="50" data-tooltip="July 13, 2017">
-      v0.17.3
+      v0.18.0
     </span>
   </footer>
 

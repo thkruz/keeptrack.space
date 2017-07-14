@@ -128,7 +128,9 @@ var isEditTime = false;
 var isShowNextPass = false;
 var isOnlyFOVChecked = false;
 var isRiseSetLookangles = false;
+
 var limitSats;
+var isSharperShaders = false;
 
 var otherSatelliteTransparency = 0.1;
 
@@ -1413,18 +1415,52 @@ $(document).ready(function () { // Code Once index.php is loaded
     var isResetSensorChecked = document.getElementById('settings-resetSensor').checked;
     var isHOSChecked = document.getElementById('settings-hos').checked;
     isOnlyFOVChecked = document.getElementById('settings-onlyfov').checked;
-    var isLimitSats = document.getElementById('limitSats-enabled').checked;
+    var isLimitSats = document.getElementById('settings-limitSats-enabled').checked;
+    var isChangeSharperShaders = document.getElementById('settings-shaders').checked;
     var isSNPChecked = document.getElementById('settings-snp').checked;
     var isRiseSetChecked = $('#settings-riseset').checked;
 
-    if (isLimitSats && limitSats !== $('#limitSats').val()) {
+    console.log(isChangeSharperShaders);
+    console.log(isLimitSats);
+    console.log(limitSats);
+    console.log($('#limitSats').val());
+    console.log(isSharperShaders);
+
+    /** Filter On and Shaders On */
+    if (!isSharperShaders && isChangeSharperShaders && isLimitSats) {
+      shadersOnFilterOn();
+    } else if (isLimitSats && limitSats !== $('#limitSats').val() && !isChangeSharperShaders) {
+      shadersOffFilterOn();
+    } else if (!isSharperShaders && isChangeSharperShaders && !isLimitSats) {
+      shadersOnFilterOff();
+    } else if (!isLimitSats && limitSats !== '') {
+    /** Filter turned off was previously on */
+      if (isChangeSharperShaders === false) {
+        shadersOffFilterOff();
+      } else {
+        shadersOnFilterOff();
+      }
+    } else if (isSharperShaders !== isChangeSharperShaders) {
+    /** If shaders change */
+      if (!isLimitSats || limitSats === '') {
+        if (isChangeSharperShaders) { shadersOnFilterOff(); }
+        if (!isChangeSharperShaders) { shadersOffFilterOff(); }
+      } else {
+        if (isChangeSharperShaders) { shadersOnFilterOn(); }
+        if (!isChangeSharperShaders) { shadersOffFilterOn(); }
+      }
+    }
+
+    function shadersOnFilterOn () {
+      limitSats = $('#limitSats').val();
+      window.location = '/index.htm?sharperShaders=true&limitSats=' + limitSats;
+    }
+    function shadersOnFilterOff () { window.location = '/index.htm?sharperShaders=true'; }
+    function shadersOffFilterOn () {
       limitSats = $('#limitSats').val();
       window.location = '/index.htm?limitSats=' + limitSats;
     }
-
-    if (!isLimitSats && limitSats !== '') {
-      window.location = '/index.htm';
-    }
+    function shadersOffFilterOff () { window.location = '/index.htm'; }
 
     if (isResetSensorChecked) {
       // Return to default settings with nothing 'inview'
@@ -6578,10 +6614,27 @@ function propTime () {
   };
 
   satSet.init = function (satsReadyCallback) {
+    /** Parses GET variables for Possible sharperShaders */
+    (function parseFromGETVariables () {
+      var queryStr = window.location.search.substring(1);
+      var params = queryStr.split('&');
+      for (var i = 0; i < params.length; i++) {
+        var key = params[i].split('=')[0];
+        if (key === 'sharperShaders') {
+          isSharperShaders = true;
+          document.getElementById('settings-shaders').checked = true;
+        }
+      }
+    })();
+
     dotShader = gl.createProgram();
 
     var vertShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex.glsl'));
+    if (isSharperShaders) {
+      gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-sharp.glsl'));
+    } else {
+      gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex.glsl'));
+    }
     gl.compileShader(vertShader);
 
     var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -6622,7 +6675,7 @@ function propTime () {
             case 'limitSats':
               limitSats = val;
               $('#limitSats').val(val);
-              document.getElementById('limitSats-enabled').checked = true;
+              document.getElementById('settings-limitSats-enabled').checked = true;
               $('#limitSats-Label').addClass('active');
               limitSatsArray = val.split(',');
               break;

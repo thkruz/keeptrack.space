@@ -392,7 +392,7 @@
       <div id="settings-menu" class="start-hidden text-select">
         <div id="settings-content" class="side-menu">
           <div class="row">
-            <h5 class="center-align">Settings</h5>
+            <h5 class="center-align">General Settings</h5>
             <form id="settings-form">
               <div class="switch row">
                 <label>
@@ -415,11 +415,13 @@
                   Show Only Sensor FOV
                 </label>
               </div>
+              <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
+              <h5 class="center-align">Lookangles Settings</h5>
               <div class="switch row">
                 <label>
                   <input id="settings-riseset" type="checkbox">
                   <span class="lever"></span>
-                  Show Only Rise Set Times in Lookangles
+                  Show Only Rise and Set Times
                 </label>
               </div>
               <div class="input-field col s6">
@@ -430,10 +432,17 @@
                 <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
                 <label for="lookanglesInterval">Lookangles Interval</label>
               </div>
+              <div class="row"></div>
+              <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
               <div id="restartRequiredSettings">
-                <div class="row"></div>
-                <h6 class="center-align">Restart Required</h6>
-                <div class="row"></div>
+                <h5 class="center-align">Restart Required</h5>
+                <div class="switch row">
+                  <label>
+                    <input id="settings-shaders" type="checkbox">
+                    <span class="lever"></span>
+                    Enable Sharper Satellite Shaders
+                  </label>
+                </div>
                 <div class="switch row">
                   <label>
                     <input id="settings-limitSats-enabled" type="checkbox">
@@ -445,19 +454,11 @@
                   <input value="" id="limitSats" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Use NORAD Numbers">
                   <label id="limitSats-Label" for="limitSats">Remove All Satellites Except</label>
                 </div>
-                <div class="row"></div>
-                <div class="switch row">
-                  <label>
-                    <input id="settings-shaders" type="checkbox">
-                    <span class="lever"></span>
-                    Enable Sharper Satellite Shaders
-                  </label>
-                </div>
               </div>
+              <div class="row"></div>
+              <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
               <div id="fastCompSettings">
-                <div class="row"></div>
-                <h6 class="center-align">Only On Fast Computers</h6>
-                <div class="row"></div>
+                <h5 class="center-align">Fast CPU Required</h5>
                 <div class="switch row">
                   <label>
                     <input id="settings-snp" type="checkbox">

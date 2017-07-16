@@ -256,6 +256,19 @@ ul {
     vertical-align: middle;
 }
 
+#camera-status-box {
+  background: rgba(0, 0, 0, 0.0);
+  color: white;
+  font-family: "Segoe UI", Times, serif;
+  font-size: 28px;
+  position: absolute;
+  top: 85%;
+  z-index: 10002;
+  width: 100%;
+  text-align: center;
+}
+
+
 @media (max-width: 1000px) {
   #legend-hover-menu {
     width: 100%;

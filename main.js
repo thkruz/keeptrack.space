@@ -2166,6 +2166,21 @@ function keyHandler (evt) {
       break;
     case 99: // c
       CAMERA_TYPE += 1;
+      switch (CAMERA_TYPE) {
+        case 0:
+          $('#camera-status-box').html('Earth Centered Camera Mode');
+          break;
+        case 1:
+          $('#camera-status-box').html('Offset Camera Mode');
+          break;
+        case 2:
+          $('#camera-status-box').html('Free Camera Mode');
+          break;
+      }
+      $('#camera-status-box').show();
+      setTimeout(function () {
+        $('#camera-status-box').hide();
+      }, 3000);
       if (CAMERA_TYPE === 3) {
         CAMERA_TYPE = 0;
         FPSPitch = 0;

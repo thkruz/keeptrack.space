@@ -98,6 +98,18 @@ var zoomTarget = 0.5;
 var camPitchSpeed = 0;
 var camYawSpeed = 0;
 
+var FPSPitch = 0;
+var FPSPitchRate = 0;
+var FPSYaw = 0;
+var FPSYawRate = 0;
+var FPSxPos = 0;
+var FPSyPos = 25000;
+var FPSzPos = 0;
+var FPSForwardSpeed = 0;
+var FPSSideSpeed = 0;
+var FPSRun = 1;
+var FPSLastTime = 1;
+
 // Map Variables
 var mapWidth = 800;
 var mapHeight = 600;
@@ -162,6 +174,8 @@ var dragHasMoved = false;
 
 var rotateTheEarth = true; // Set to False to disable initial rotation
 var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotating around earth
+
+var CAMERA_TYPE = 0;
 
 // var debugContext, debugImageData;
 // var debugLine, debugLine2, debugLine3;
@@ -334,6 +348,7 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   $('#canvas').mousedown(function (evt) {
     // if(evt.which === 3) {//RMB
+    // CAMERA_OVERIDE_ENABLED = false;
     dragPoint = getEarthScreenPoint(evt.clientX, evt.clientY);
     screenDragPoint = [evt.clientX, evt.clientY];
     dragStartPitch = camPitch;
@@ -1934,6 +1949,8 @@ $(document).ready(function () { // Code Once index.php is loaded
   });
 
   $('#canvas').on('keypress', keyHandler); // On Key Press Event Run keyHandler Function
+  $('#canvas').on('keydown', keyDownHandler); // On Key Press Event Run keyHandler Function
+  $('#canvas').on('keyup', keyUpHandler); // On Key Press Event Run keyHandler Function
   $('#bottom-icons').on('click', '.bmenu-item', bottomIconPress); // Bottom Button Pressed
   $('#canvas').attr('tabIndex', 0);
   $('#canvas').focus();
@@ -2076,13 +2093,88 @@ $('#socrates-menu').on('click', '.socrates-object', function (evt) {
   }
 });
 
+function keyUpHandler (evt) {
+  console.log(Number(evt.keyCode));
+  if (Number(evt.keyCode) === 65 || Number(evt.keyCode) === 68) {
+    FPSSideSpeed = 0;
+  }
+  if (Number(evt.keyCode) === 83 || Number(evt.keyCode) === 87) {
+    FPSForwardSpeed = 0;
+  }
+  if (Number(evt.keyCode) === 69 || Number(evt.keyCode) === 81) {
+    FPSYawRate = 0;
+  }
+  if (Number(evt.keyCode) === 16) {
+    FPSRun = 1;
+  }
+}
+
+function keyDownHandler (evt) {
+  if (Number(evt.keyCode) === 16) {
+    if (CAMERA_TYPE === 2) {
+      FPSRun = 3;
+    }
+  }
+}
+
 function keyHandler (evt) {
   var ratechange = false;
-  // console.log(evt);
+  console.log(Number(evt.charCode));
+  switch (Number(evt.charCode)) {
+    case 87: // W
+    case 119: // w
+      if (CAMERA_TYPE === 2) {
+        FPSForwardSpeed = 10;
+      }
+      break;
+    case 65: // A
+    case 97: // a
+      if (CAMERA_TYPE === 2) {
+        FPSSideSpeed = -10;
+      }
+      break;
+    case 83: // S
+    case 115: // s
+      if (CAMERA_TYPE === 2) {
+        FPSForwardSpeed = -10;
+      }
+      break;
+    case 68: // D
+    case 100: // d
+      if (CAMERA_TYPE === 2) {
+        FPSSideSpeed = 10;
+      }
+      break;
+    case 81: // Q
+    case 113: // q
+      if (CAMERA_TYPE === 2) {
+        FPSYawRate = -0.1;
+      }
+      break;
+    case 69: // E
+    case 101: // e
+      if (CAMERA_TYPE === 2) {
+        FPSYawRate = 0.1;
+      }
+      break;
+  }
+
   switch (Number(evt.charCode)) {
     case 114: // r
       rotateTheEarth = !rotateTheEarth;
       // console.log('toggled rotation');
+      break;
+    case 99: // c
+      CAMERA_TYPE += 1;
+      if (CAMERA_TYPE === 3) {
+        CAMERA_TYPE = 0;
+        FPSPitch = 0;
+        FPSYaw = 0;
+        FPSxPos = 0;
+        FPSyPos = 25000;
+        FPSzPos = 0;
+      }
+      console.log('Camera Type: ' + CAMERA_TYPE);
       break;
     case 33: // !
       propOffset = 0; // Reset to Current Time
@@ -3417,6 +3509,8 @@ function unProject (mx, my) {
   return [worldVec[0] / worldVec[3], worldVec[1] / worldVec[3], worldVec[2] / worldVec[3]];
 }
 
+/** TODO: Heavily Comment this code to understand how to add red markers on the
+earth and possibly create the ability to rotate around a satellite */
 function getEarthScreenPoint (x, y) {
   var rayOrigin = getCamPos();
   var ptThru = unProject(x, y);
@@ -3435,7 +3529,7 @@ function getEarthScreenPoint (x, y) {
   vec3.add(ptThru, rayOrigin, longDir); // ptThru is now on the plane going through the center of sphere
   var dPerp = vec3.len(ptThru);
 
-  var dSubSurf = Math.sqrt(6371 * 6371 - dPerp * dPerp);
+  var dSubSurf = Math.sqrt(RADIUS_OF_EARTH * RADIUS_OF_EARTH - dPerp * dPerp);
   var dSurf = dParallel - dSubSurf;
 
   var ptSurf = vec3.create();
@@ -3459,6 +3553,8 @@ function getSatIdFromCoord (x, y) {
 function getCamDist () {
   return Math.pow(zoomLevel, ZOOM_EXP) * (DIST_MAX - DIST_MIN) + DIST_MIN;
 }
+
+/** TODO: Use this to calculate a launch sites X, Y, Z */
 function getCamPos () {
   var r = getCamDist();
   var z = r * Math.sin(camPitch);
@@ -3499,9 +3595,9 @@ function camSnapToSat (satId) {
   if (camZoomSnappedOnSat) {
     lookangles.getTEARR(sat);
     if (lookangles.altitude) {
-      var camDistTarget = lookangles.altitude + 6371 + 2000;
+      var camDistTarget = lookangles.altitude + RADIUS_OF_EARTH + 2000;
     } else {
-      camDistTarget = 6371 + 2000;  // Stay out of the center of the earth. You will get stuck there.
+      camDistTarget = RADIUS_OF_EARTH + 2000;  // Stay out of the center of the earth. You will get stuck there.
       console.warn('Zoom Calculation Error');
       camZoomSnappedOnSat = false;
       camAngleSnappedOnSat = false;
@@ -3570,7 +3666,7 @@ function drawLoop () {
   var dragTarget = getEarthScreenPoint(mouseX, mouseY);
   if (isDragging) {
     if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
-    isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2])) { // random screen drag
+    isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) || CAMERA_TYPE === 2) { // random screen drag
       var xDif = screenDragPoint[0] - mouseX;
       var yDif = screenDragPoint[1] - mouseY;
       var yawTarget = dragStartYaw + xDif * 0.005;
@@ -3600,6 +3696,9 @@ function drawLoop () {
 
   camPitch += camPitchSpeed * dt;
   camYaw += camYawSpeed * dt;
+
+  FPSPitch -= 20 * camPitchSpeed * dt;
+  FPSYaw -= 20 * camYawSpeed * dt;
 
   if (rotateTheEarth) {
     camYaw -= rotateTheEarthSpeed * dt;
@@ -3635,17 +3734,16 @@ function drawLoop () {
 }
 function drawScene () {
   gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
- // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
- // gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
+  // gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
 
-  camMatrix = mat4.create();
-  mat4.identity(camMatrix);
-  mat4.translate(camMatrix, camMatrix, [0, getCamDist(), 0]);
-  mat4.rotateX(camMatrix, camMatrix, camPitch);
-  mat4.rotateZ(camMatrix, camMatrix, -camYaw);
+  if (CAMERA_TYPE === 2) {
+    FPSMovement();
+  }
+  camMatrix = drawCamera();
 
   gl.useProgram(gl.pickShaderProgram);
   gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
@@ -3665,6 +3763,60 @@ function drawScene () {
  // debugImageData.data = pickColorMap;
  /* debugImageData.data.set(pickColorMap);
   debugContext.putImageData(debugImageData, 0, 0); */
+}
+function FPSMovement () {
+  var timeNow = new Date().getTime();
+  if (FPSLastTime !== 0) {
+    var elapsed = timeNow - FPSLastTime;
+    if (FPSForwardSpeed !== 0) {
+      FPSxPos -= Math.sin(degToRad(FPSYaw)) * FPSForwardSpeed * FPSRun * elapsed;
+      FPSyPos -= Math.cos(degToRad(FPSYaw)) * FPSForwardSpeed * FPSRun * elapsed;
+      FPSzPos += Math.sin(degToRad(FPSPitch)) * FPSForwardSpeed * FPSRun * elapsed;
+    }
+    if (FPSSideSpeed !== 0) {
+      FPSxPos -= Math.cos(-degToRad(FPSYaw)) * FPSSideSpeed * FPSRun * elapsed;
+      FPSyPos -= Math.sin(-degToRad(FPSYaw)) * FPSSideSpeed * FPSRun * elapsed;
+    }
+    FPSYaw += FPSYawRate * elapsed;
+    FPSPitch += FPSPitchRate * elapsed;
+  }
+  FPSLastTime = timeNow;
+}
+
+function drawCamera () {
+  var camMatrix = mat4.create();
+  mat4.identity(camMatrix);
+
+  /**
+  * For FPS style movement rotate the camera and then translate it
+  * for traditional view, move the camera and then rotate it
+  */
+
+  switch (CAMERA_TYPE) {
+    /** @type 0 pivot around the earth with earth in the center */
+    case 0:
+      mat4.translate(camMatrix, camMatrix, [0, getCamDist(), 0]);
+      mat4.rotateX(camMatrix, camMatrix, camPitch);
+      mat4.rotateZ(camMatrix, camMatrix, -camYaw);
+      break;
+      /** @type 1 pivot around the earth with earth offset to the bottom right */
+    case 1:
+      mat4.translate(camMatrix, camMatrix, [15000, getCamDist(), -6000]);
+      mat4.rotateX(camMatrix, camMatrix, camPitch);
+      mat4.rotateZ(camMatrix, camMatrix, -camYaw);
+      break;
+    /** @type 2 FPS style movement */
+    case 2:
+      mat4.rotate(camMatrix, camMatrix, degToRad(-FPSPitch), [1, 0, 0]);
+      mat4.rotate(camMatrix, camMatrix, degToRad(FPSYaw), [0, 0, 1]);
+      mat4.translate(camMatrix, camMatrix, [FPSxPos, FPSyPos, -FPSzPos]);
+      break;
+  }
+  return camMatrix;
+}
+
+function degToRad (degrees) {
+  return degrees * Math.PI / 180;
 }
 
 function updateMap () {
@@ -3793,15 +3945,12 @@ function hoverBoxOnSat (satId, satX, satY) {
     try {
       var sat = satSet.getSat(satId);
 
-      // FEATURE TODO: Processor intensive code that might be offered as a setting
-
       if (lookangles.sensorSelected() && isShowNextPass) {
         $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
       } else {
         $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
       }
-      // $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
-      $('#sat-hoverbox').css({ // TODO: Make the centering CSS not HTML
+      $('#sat-hoverbox').css({
         display: 'block',
         position: 'absolute',
         left: satX + 20,
@@ -3853,26 +4002,26 @@ var lookangles = (function () {
   };
 
   var setobs = function (obs, reset) {
-    // Set the Observer Location and variable to convert to RADIANS TODO: Change these to variables received in a method call.
+    /** obslat is what is used to determine if a site is set or not. If this is null sensorSelected() will return false */
     if (reset) {
       obslat = null;
     } else {
-      obslat = obs.lat * DEG2RAD;                // Observer Lattitude - use Google Maps
+      obslat = obs.lat * DEG2RAD;         // Observer Lattitude - use Google Maps
       this.obslat = obslat;
     }
-    obslong = obs.long * DEG2RAD;              // Observer Longitude - use Google Maps
+    obslong = obs.long * DEG2RAD;         // Observer Longitude - use Google Maps
     this.obslong = obslong;
-    hei = obs.hei * 1;                   // Observer Height in Km
-    obsminaz = obs.obsminaz;         // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
-    obsmaxaz = obs.obsmaxaz;         // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
-    obsminel = obs.obsminel;         // Observer min elevation
-    obsmaxel = obs.obsmaxel;         // Observer max elevation TODO: Determine if radars with 105deg elevation work correctly
-    obsminrange = obs.obsminrange;   // Observer min range TODO: Determine how to calculate min range with transmit cycle information
-    obsmaxrange = obs.obsmaxrange;   // Observer max range TODO: Determine how to calculate max range with transmit cycle information
+    hei = obs.hei * 1;                    // Observer Height in Km
+    obsminaz = obs.obsminaz;              // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
+    obsmaxaz = obs.obsmaxaz;              // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
+    obsminel = obs.obsminel;              // Observer min elevation
+    obsmaxel = obs.obsmaxel;              // Observer max elevation
+    obsminrange = obs.obsminrange;        // Observer min range NOTE: These are functionally useful guesses for spacetrack purposes in order to avoid classification issues
+    obsmaxrange = obs.obsmaxrange;        // Observer max range TODO: Determine how to calculate max range with transmit cycle information
     observerGd = {                        // Array to calculate look angles in propagate()
       latitude: obslat,
       longitude: obslong,
-      height: hei                  // Converts from string to number TODO: Find correct way to convert string to integer
+      height: hei                         // Converts from string to number TODO: Find correct way to convert string to integer
     };
   };
 
@@ -5830,7 +5979,7 @@ dateFormat.i18n = {
     //step 3. rotate to argument of periapsis
     mat4.rotateZ(orbitMvMat, orbitMvMat, sat.argPe - Math.PI/2);
     //step 2. put earth at the focus
-    mat4.translate(orbitMvMat, orbitMvMat, [sat.semiMajorAxis - sat.apogee - 6371, 0, 0]);
+    mat4.translate(orbitMvMat, orbitMvMat, [sat.semiMajorAxis - sat.apogee - RADIUS_OF_EARTH, 0, 0]);
     //step 1. stretch to ellipse
     mat4.scale(orbitMvMat, orbitMvMat, [sat.semiMajorAxis, sat.semiMinorAxis, 0]);
 

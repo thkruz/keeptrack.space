@@ -76,45 +76,28 @@ onmessage = function (m) {
 
       var extraData = [];
       for (var i = 0; i < len; i++) {
+        var satrec;
         var extra = {};
-        var satrec = satellite.twoline2satrec( // perform and store sat init calcs
-          satData[i].TLE1, satData[i].TLE2);
+        if (satData[i].static) {
+          satrec = satData[i];
+          extra.name = 'test launch name';
+        } else {
+          satrec = satellite.twoline2satrec( // perform and store sat init calcs
+            satData[i].TLE1, satData[i].TLE2);
 
-        // TODO: This should be moved to the lookangles function instead of the sat-cruncher
-        // keplerian elements
+          extra.SCC_NUM = pad(satData[i].TLE1.substr(2, 5).trim(), 5);
 
-        // NOTE: This is the section that allows shrinking the TLE.json file
-        // extra.OBJECT_TYPE = satData[i].OT;
-        // extra.RCS_SIZE = satData[i].R;
-
-        // Launch Site and Country Corelation Table
-        // extra.LAUNCH_SITE = satData[i].LS;
-        // extra.LAUNCH_SITEC = satData[i].LSC;
-
-        // extra.LAUNCH_VEHICLE = satData[i].LV;
-
-        // Country Correlation Table
-        // extra.COUNTRY = satData[i].C;
-
-        extra.SCC_NUM = pad(satData[i].TLE1.substr(2, 5).trim(), 5);
-        // var year = parseInt(satData[i].TLE1.substr(9, 8).trim());
-        // var prefix = (year > 50) ? '19' : '20';
-        // year = prefix + year;
-        // var rest = satData[i].TLE1.substr(9, 8).trim().substring(2);
-        // extra.INTLDES = year + '-' + rest;
-
-        extra.inclination = satrec.inclo; // rads
-        extra.eccentricity = satrec.ecco;
-        extra.raan = satrec.nodeo;        // rads
-        extra.argPe = satrec.argpo;       // rads
-        extra.meanMotion = satrec.no * 60 * 24 / (2 * Math.PI); // convert rads/minute to rev/day
-
-        // fun other data
-        extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, (2 / 3));
-        extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));
-        extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - 6371;
-        extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - 6371;
-        extra.period = 1440.0 / extra.meanMotion;
+          extra.inclination = satrec.inclo; // rads
+          extra.eccentricity = satrec.ecco;
+          extra.raan = satrec.nodeo;        // rads
+          extra.argPe = satrec.argpo;       // rads
+          extra.meanMotion = satrec.no * 60 * 24 / (2 * Math.PI); // convert rads/minute to rev/day
+          extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, (2 / 3));
+          extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));
+          extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - 6371;
+          extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - 6371;
+          extra.period = 1440.0 / extra.meanMotion;
+        }
 
         extraData.push(extra);
         satCache.push(satrec);
@@ -179,72 +162,82 @@ function propagate () {
   var gmst = satellite.gstime_from_jday(j);
 
   for (var i = 0; i < satCache.length; i++) {
-    var m = (j - satCache[i].jdsatepoch) * 1440.0; // 1440 = minutes_per_day
-    var pv = satellite.sgp4(satCache[i], m);
-    var x, y, z, vx, vy, vz;
-    var positionEcf, lookAngles, azimuth, elevation, rangeSat;
+    if (satCache[i].static) {
+      satPos[i * 3] = satCache[i].position.x;
+      satPos[i * 3 + 1] = satCache[i].position.y;
+      satPos[i * 3 + 2] = satCache[i].position.z;
 
-    try {
-      x = pv.position.x; // translation of axes from earth-centered inertial
-      y = pv.position.y; // to OpenGL is done in shader with projection matrix
-      z = pv.position.z; // so we don't have to worry about it
-      vx = pv.velocity.x;
-      vy = pv.velocity.y;
-      vz = pv.velocity.z;
-      // gpos = satellite.eci_to_geodetic(pv.position, gmst);
-
-      // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
-      positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
-      // observerEcf   = satellite.geodetic_to_ecf(observerGd);
-      // positionGd    = satellite.eciToGeodetic(positionEci, gmst),
-      lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
-      // TODO: Might add dopplerFactor back in or to lookangles for HAM Radio use
-      // dopplerFactor = satellite.dopplerFactor(observerCoordsEcf, positionEcf, velocityEcf);
-
-      // Look Angles may be accessed by `azimuth`, `elevation`, `range_sat` properties.
-      azimuth = lookAngles.azimuth;
-      elevation = lookAngles.elevation;
-      rangeSat = lookAngles.range_sat;
-    } catch (e) {
-      x = 0;
-      y = 0;
-      z = 0;
-      vx = 0;
-      vy = 0;
-      vz = 0;
-      positionEcf = 0;
-      lookAngles = 0;
-      azimuth = 0;
-      elevation = 0;
-      rangeSat = 0;
-    }
-  //    console.log('x: ' + x + ' y: ' + y + ' z: ' + z);
-    satPos[i * 3] = x;
-    satPos[i * 3 + 1] = y;
-    satPos[i * 3 + 2] = z;
-
-    satVel[i * 3] = vx;
-    satVel[i * 3 + 1] = vy;
-    satVel[i * 3 + 2] = vz;
-
-    // satAlt[i] = alt;
-    // satLon[i] = lon;
-    // satLat[i] = lat;
-    azimuth = azimuth / deg2rad; // Convert to Degrees
-    elevation = elevation / deg2rad; // Convert to Degrees
-    // satRange[i] = rangeSat;
-
-    if (obsminaz > obsmaxaz) {
-      if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
-        satInView[i] = true;
-      } else {
-        satInView[i] = false;
-      }
+      satVel[i * 3] = 0;
+      satVel[i * 3 + 1] = 0;
+      satVel[i * 3 + 2] = 0;
     } else {
-      if ((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
-        satInView[i] = true;
+      var m = (j - satCache[i].jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+      var pv = satellite.sgp4(satCache[i], m);
+      var x, y, z, vx, vy, vz;
+      var positionEcf, lookAngles, azimuth, elevation, rangeSat;
+
+      try {
+        x = pv.position.x; // translation of axes from earth-centered inertial
+        y = pv.position.y; // to OpenGL is done in shader with projection matrix
+        z = pv.position.z; // so we don't have to worry about it
+        vx = pv.velocity.x;
+        vy = pv.velocity.y;
+        vz = pv.velocity.z;
+        // gpos = satellite.eci_to_geodetic(pv.position, gmst);
+
+        // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
+        positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
+        // observerEcf   = satellite.geodetic_to_ecf(observerGd);
+        // positionGd    = satellite.eciToGeodetic(positionEci, gmst),
+        lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
+        // TODO: Might add dopplerFactor back in or to lookangles for HAM Radio use
+        // dopplerFactor = satellite.dopplerFactor(observerCoordsEcf, positionEcf, velocityEcf);
+
+        // Look Angles may be accessed by `azimuth`, `elevation`, `range_sat` properties.
+        azimuth = lookAngles.azimuth;
+        elevation = lookAngles.elevation;
+        rangeSat = lookAngles.range_sat;
+      } catch (e) {
+        x = 0;
+        y = 0;
+        z = 0;
+        vx = 0;
+        vy = 0;
+        vz = 0;
+        positionEcf = 0;
+        lookAngles = 0;
+        azimuth = 0;
+        elevation = 0;
+        rangeSat = 0;
+      }
+    //    console.log('x: ' + x + ' y: ' + y + ' z: ' + z);
+      satPos[i * 3] = x;
+      satPos[i * 3 + 1] = y;
+      satPos[i * 3 + 2] = z;
+
+      satVel[i * 3] = vx;
+      satVel[i * 3 + 1] = vy;
+      satVel[i * 3 + 2] = vz;
+
+      // satAlt[i] = alt;
+      // satLon[i] = lon;
+      // satLat[i] = lat;
+      azimuth = azimuth / deg2rad; // Convert to Degrees
+      elevation = elevation / deg2rad; // Convert to Degrees
+      // satRange[i] = rangeSat;
+
+      if (obsminaz > obsmaxaz) {
+        if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
+          satInView[i] = true;
+        } else {
+          satInView[i] = false;
+        }
       } else {
-        satInView[i] = false;
+        if ((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
+          satInView[i] = true;
+        } else {
+          satInView[i] = false;
+        }
       }
     }
   }

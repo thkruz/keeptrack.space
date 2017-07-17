@@ -11,9 +11,11 @@ var satCache = [];
 onmessage = function(m) {
 
   if(m.data.isUpdate) {
-    satCache[m.data.satId] = satellite.twoline2satrec(
-      m.data.TLE1, m.data.TLE2
-    );
+    if (!m.data.static) {
+      satCache[m.data.satId] = satellite.twoline2satrec(
+        m.data.TLE1, m.data.TLE2
+      );
+    }
   }
 
   if(m.data.isInit) {
@@ -21,9 +23,13 @@ onmessage = function(m) {
     var satData = JSON.parse(m.data.satData);
 
     for(var i=0; i < satData.length; i++) {
-      satCache[i] = satellite.twoline2satrec(
-        satData[i].TLE1, satData[i].TLE2
-      );
+      if (satData[i].static) {
+        satCache[i] = satData[i];
+      } else {
+        satCache[i] = satellite.twoline2satrec(
+          satData[i].TLE1, satData[i].TLE2
+        );
+      }
     }
 
     NUM_SEGS = m.data.numSegs;

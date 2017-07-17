@@ -61,6 +61,7 @@ laws of the United States and International Copyright Treaty.
     requestAnimationFrame
     ga
     braun
+    staticSet
 
 */
 
@@ -5174,6 +5175,13 @@ dateFormat.i18n = {
   ColorScheme.init = function () {
     ColorScheme.default = new ColorScheme(function (satId) {
       var sat = satSet.getSat(satId);
+      console.log(sat);
+      if (sat.static) {
+        return {
+          color: [1.0, 0.0, 0.0, 1.0],
+          pickable: false
+        };
+      }
       var ap = sat.apogee;
       var pe = sat.perigee;
       var color;
@@ -6837,6 +6845,10 @@ function propTime () {
             }
           }
         }
+        for (i = 0; i < staticSet.length; i++) {
+          tempSatData.push(staticSet[i]);
+        }
+        console.log(tempSatData);
         return tempSatData;
       }
 
@@ -7059,7 +7071,11 @@ function propTime () {
 
   satSet.getIdFromObjNum = function (objNum) {
     for (var i = 0; i < satData.length; i++) {
-      var scc = pad(satData[i].TLE1.substr(2, 5).trim(), 5);
+      if (satData[i].static) {
+        return null;
+      } else {
+        var scc = pad(satData[i].TLE1.substr(2, 5).trim(), 5);
+      }
 
       if (scc.indexOf(objNum) === 0) { // && satData[i].OBJECT_TYPE !== 'unknown') { // OPTIMIZATION: Determine if this code can be removed.
         return i;

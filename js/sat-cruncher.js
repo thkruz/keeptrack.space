@@ -18,7 +18,8 @@ var satCache = [];
 var satPos, satVel;
 var satInView;
 // Set the Observer Location and then convert to RADIANS
-var deg2rad = 0.017453292519943295; // (angle / 180) * Math.PI
+var DEG2RAD = 0.017453292519943295; // (angle / 180) * Math.PI
+var RADIUS_OF_EARTH = 6371.0;
 
 var latitude = 0;
 var longitude = 0;
@@ -30,6 +31,12 @@ var obsminel = 0;
 var obsmaxel = 0;
 var obsminrange = 0;
 var obsmaxrange = 0;
+var obsminaz2 = 0;
+var obsmaxaz2 = 0;
+var obsminel2 = 0;
+var obsmaxel2 = 0;
+var obsminrange2 = 0;
+var obsmaxrange2 = 0;
 
 // offset letting us propagate in the future (or past)
 var propOffset = 0;
@@ -46,8 +53,8 @@ onmessage = function (m) {
   if (m.data.hei) { height = m.data.hei; } // string
   if (m.data.setlatlong) {
     observerGd = {
-      longitude: longitude * deg2rad,
-      latitude: latitude * deg2rad,
+      longitude: longitude * DEG2RAD,
+      latitude: latitude * DEG2RAD,
       height: height * 1 // Convert from string
     };
     if (m.data.obsminaz != null) { obsminaz = m.data.obsminaz * 1; }
@@ -56,6 +63,18 @@ onmessage = function (m) {
     if (m.data.obsmaxel != null) { obsmaxel = m.data.obsmaxel * 1; }
     if (m.data.obsminrange != null) { obsminrange = m.data.obsminrange * 1; }
     if (m.data.obsmaxrange != null) { obsmaxrange = m.data.obsmaxrange * 1; }
+    if (m.data.obsminaz2 != null) { obsminaz2 = m.data.obsminaz * 1; }
+    if (m.data.obsmaxaz2 != null) { obsmaxaz2 = m.data.obsmaxaz * 1; }
+    if (m.data.obsminel2 != null) { obsminel2 = m.data.obsminel * 1; }
+    if (m.data.obsmaxel2 != null) { obsmaxel2 = m.data.obsmaxel * 1; }
+    if (m.data.obsminrange2 != null) { obsminrange2 = m.data.obsminrange * 1; }
+    if (m.data.obsmaxrange2 != null) { obsmaxrange2 = m.data.obsmaxrange * 1; }
+    if (m.data.obsminaz2 == null) { obsminaz2 = 0; }
+    if (m.data.obsmaxaz2 == null) { obsmaxaz2 = 0; }
+    if (m.data.obsminel2 == null) { obsminel2 = 0; }
+    if (m.data.obsmaxel2 == null) { obsmaxel2 = 0; }
+    if (m.data.obsminrange2 == null) { obsminrange2 = 0; }
+    if (m.data.obsmaxrange2 == null) { obsmaxrange2 = 0; }
   }
 
   function pad (num, size) {
@@ -163,16 +182,21 @@ function propagate () {
 
   for (var i = 0; i < satCache.length; i++) {
     if (satCache[i].static) {
-      satPos[i * 3] = satCache[i].position.x;
-      satPos[i * 3 + 1] = satCache[i].position.y;
-      satPos[i * 3 + 2] = satCache[i].position.z;
+      var cosLat = Math.cos(satCache[i].lat * Math.PI / 180.0);
+      var sinLat = Math.sin(satCache[i].lat * Math.PI / 180.0);
+      var cosLon = Math.cos((satCache[i].lon * Math.PI / 180.0) + gmst);
+      var sinLon = Math.sin((satCache[i].lon * Math.PI / 180.0) + gmst);
+
+      satPos[i * 3] = (RADIUS_OF_EARTH + 3) * cosLat * cosLon;
+      satPos[i * 3 + 1] = (RADIUS_OF_EARTH + 3) * cosLat * sinLon;
+      satPos[i * 3 + 2] = (RADIUS_OF_EARTH + 3) * sinLat;
 
       satVel[i * 3] = 0;
       satVel[i * 3 + 1] = 0;
       satVel[i * 3 + 2] = 0;
     } else {
       var m = (j - satCache[i].jdsatepoch) * 1440.0; // 1440 = minutes_per_day
-      var pv = satellite.sgp4(satCache[i], m);
+      pv = satellite.sgp4(satCache[i], m);
       var x, y, z, vx, vy, vz;
       var positionEcf, lookAngles, azimuth, elevation, rangeSat;
 
@@ -222,18 +246,18 @@ function propagate () {
       // satAlt[i] = alt;
       // satLon[i] = lon;
       // satLat[i] = lat;
-      azimuth = azimuth / deg2rad; // Convert to Degrees
-      elevation = elevation / deg2rad; // Convert to Degrees
+      azimuth = azimuth / DEG2RAD; // Convert to Degrees
+      elevation = elevation / DEG2RAD; // Convert to Degrees
       // satRange[i] = rangeSat;
 
       if (obsminaz > obsmaxaz) {
-        if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
+        if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange) || (azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
           satInView[i] = true;
         } else {
           satInView[i] = false;
         }
       } else {
-        if ((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
+        if ((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange) || (azimuth >= obsminaz2 && azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
           satInView[i] = true;
         } else {
           satInView[i] = false;

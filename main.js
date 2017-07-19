@@ -62,6 +62,7 @@ laws of the United States and International Copyright Treaty.
     ga
     braun
     staticSet
+    sensorManager
 
 */
 
@@ -166,6 +167,9 @@ var mouseX = 0;
 var mouseY = 0;
 var mouseSat = -1;
 
+var curRadarTrackNum = 0;
+var lastRadarTrackTime = 0;
+
 var dragPoint = [0, 0, 0];
 var screenDragPoint = [0, 0];
 var dragStartPitch = 0;
@@ -179,7 +183,8 @@ var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotati
 var CAMERA_TYPE = 0;
 
 // var debugContext, debugImageData;
-// var debugLine, debugLine2, debugLine3;
+var debugLine;
+// var debugLine2, debugLine3;
 // var spinner;
 
 $(document).ready(function () { // Code Once index.php is loaded
@@ -220,7 +225,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     groups.init();
     searchBox.init(satData);
 
-    // debugLine = new Line();
+    debugLine = new Line();
     // debugLine2 = new Line();
     // debugLine3 = new Line();
   });
@@ -517,882 +522,81 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   // USAF Radars
   $('#radar-beale').click(function () { // Select Beale's Radar Coverage
-    ga('send', 'event', 'Sensor', 'Beale', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 39.136064,
-      long: -121.351237,
-      hei: 0.060966, // TODO: Find correct height
-      obsminaz: 126,
-      obsmaxaz: 6,
-      obsminel: 3,
-      obsmaxel: 85,
-      obsminrange: 200,
-      obsmaxrange: 5555
-    });
-
-    lookangles.setobs({
-      lat: 39.136064,
-      long: -121.351237,
-      hei: 0.060966, // TODO: Find correct height
-      obsminaz: 126,
-      obsmaxaz: 6,
-      obsminel: 3,
-      obsmaxel: 85,
-      obsminrange: 200,
-      obsmaxrange: 5555
-    });
-
-    whichRadar = 'BLE';
-    $('#sensor-info-title').html('Beale AFB');
-    $('#sensor-country').html('United States');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').removeClass('bmenu-item-disabled');
-    camSnap(latToPitch(39.136064), longToYaw(-121.351237));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Beale AFB, CA');
   });
   $('#radar-capecod').click(function () { // Select Cape Cod's Radar Coverage
-    ga('send', 'event', 'Sensor', 'Cape Cod', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 41.754785,
-      long: -70.539151,
-      hei: 0.060966,
-      obsminaz: 347,
-      obsmaxaz: 227,
-      obsminel: 3,
-      obsmaxel: 85,
-      obsminrange: 200,
-      obsmaxrange: 5555
-    });
-
-    lookangles.setobs({
-      lat: 41.754785,
-      long: -70.539151,
-      hei: 0.060966,
-      obsminaz: 347,
-      obsmaxaz: 227,
-      obsminel: 3,
-      obsmaxel: 85,
-      obsminrange: 200,
-      obsmaxrange: 5555
-    });
-
-    $('#sensor-info-title').html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html'>Cape Cod AFS</a>");
-    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-    $('#sensor-country').html('United States');
-    $('#sensor-sun').html('No Impact');
-    whichRadar = 'COD';
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').removeClass('bmenu-item-disabled');
-    camSnap(latToPitch(41.754785), longToYaw(-70.539151));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Cape Cod AFS, MA');
   });
   $('#radar-clear').click(function () { // Select Clear's Radar Coverage
-    ga('send', 'event', 'Sensor', 'Clear', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 64.290556,
-      long: -149.186944,
-      hei: 0.060966,
-      obsminaz: 184,
-      obsmaxaz: 64,
-      obsminel: 3,
-      obsmaxel: 85,
-      obsminrange: 200,
-      obsmaxrange: 4910
-    });
-
-    lookangles.setobs({
-      lat: 64.290556,
-      long: -149.186944,
-      hei: 0.060966,
-      obsminaz: 184,
-      obsmaxaz: 64,
-      obsminel: 3,
-      obsmaxel: 85,
-      obsminrange: 200,
-      obsmaxrange: 4910
-    });
-
-    whichRadar = 'CLR';
-    $('#sensor-info-title').html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html'>Clear AFS</a>");
-    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-    $('#sensor-country').html('United States');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').removeClass('bmenu-item-disabled');
-    camSnap(latToPitch(64.290556), longToYaw(-149.186944));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Clear AFS, AK');
   });
   $('#radar-eglin').click(function () { // Select Clear's Radar Coverage
-    ga('send', 'event', 'Sensor', 'Eglin', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 30.572411,
-      long: -86.214836,
-      hei: 0.060966, // TODO: Confirm Altitude
-      obsminaz: 120,
-      obsmaxaz: 240,
-      obsminel: 3,
-      obsmaxel: 105,
-      obsminrange: 200,
-      obsmaxrange: 50000
-    });
-
-    lookangles.setobs({
-      lat: 30.572411,
-      long: -86.214836,
-      hei: 0.060966, // TODO: Confirm Altitude
-      obsminaz: 120,
-      obsmaxaz: 240,
-      obsminel: 3,
-      obsmaxel: 105,
-      obsminrange: 200,
-      obsmaxrange: 50000
-    });
-
-    whichRadar = 'EGL';
-    $('#sensor-info-title').html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte002.en.html'>Eglin AFB</a>");
-    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-    $('#sensor-country').html('United States');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').removeClass('bmenu-item-disabled');
-    camSnap(latToPitch(30.572411), longToYaw(-86.214836));
-    changeZoom('geo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Eglin AFB, FL');
   });
   $('#radar-fylingdales').click(function () { // Select Fylingdales's Radar Coverage
-    ga('send', 'event', 'Sensor', 'Fylingdales', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 54.361758,
-      long: -0.670051,
-      hei: 0.060966, // TODO: Find correct height
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 3,
-      obsmaxel: 85,
-      obsminrange: 200,
-      obsmaxrange: 4820
-    });
-
-    lookangles.setobs({
-      lat: 54.361758,
-      long: -0.670051,
-      hei: 0.060966, // TODO: Find correct height
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 3,
-      obsmaxel: 85,
-      obsminrange: 200,
-      obsmaxrange: 4820
-    });
-
-    whichRadar = 'FYL';
-    $('#sensor-info-title').html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html'>RAF Fylingdales</a>");
-    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-    $('#sensor-country').html('United Kingdom');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').removeClass('bmenu-item-disabled');
-    camSnap(latToPitch(54.361758), longToYaw(-0.670051));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('RAF Fylingdales, UK');
   });
   $('#radar-parcs').click(function () { // Select PARCS' Radar Coverage
-    ga('send', 'event', 'Sensor', 'Cavalier', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 48.724567,
-      long: -97.899755,
-      hei: 0.060966, // TODO: Find correct height
-      obsminaz: 298,
-      obsmaxaz: 78,
-      obsminel: 1.9,
-      obsmaxel: 95,
-      obsminrange: 200,
-      obsmaxrange: 3300 // TODO: Double check this
-    });
-
-    lookangles.setobs({
-      lat: 48.724567,
-      long: -97.899755,
-      hei: 0.060966, // TODO: Find correct height
-      obsminaz: 298,
-      obsmaxaz: 78,
-      obsminel: 1.9,
-      obsmaxel: 95,
-      obsminrange: 200,
-      obsmaxrange: 3300 // TODO: Double check this
-    });
-
-    whichRadar = 'PAR';
-    $('#sensor-info-title').html("<a class='iframe' href='https://mostlymissiledefense.com/2012/04/12/parcs-cavalier-radar-april-12-2012/'>Cavalier AFS</a>");
-    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-    $('#sensor-country').html('United States');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').removeClass('bmenu-item-disabled');
-    camSnap(latToPitch(48.724567), longToYaw(-97.899755));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Cavalier, AFS, ND');
   });
   $('#radar-thule').click(function () { // Select Thule's Radar Coverage
-    ga('send', 'event', 'Sensor', 'Thule', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 76.570322,
-      long: -68.299211,
-      hei: 0.060966, // TODO: Find correct height
-      obsminaz: 297,
-      obsmaxaz: 177,
-      obsminel: 3,
-      obsmaxel: 85,
-      obsminrange: 200,
-      obsmaxrange: 5555
-    });
-
-    lookangles.setobs({
-      lat: 76.570322,
-      long: -68.299211,
-      hei: 0.060966, // TODO: Find correct height
-      obsminaz: 297,
-      obsmaxaz: 177,
-      obsminel: 3,
-      obsmaxel: 85,
-      obsminrange: 200,
-      obsmaxrange: 5555
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html'>Thule AFB</a>");
-    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-    $('#sensor-country').html('United States');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    // No Weather
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(76.570322), longToYaw(-68.299211));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Thule AFB, GL');
+  });
+  $('#radar-cobradane').click(function () { // Select Cobra Dane's Radar Coverage
+    sensorManager.setSensor('Cobra Dane, AK');
   });
 
   // US Contributing Radars
   $('#radar-altair').click(function () { // Select Altair's Radar Coverage
-    ga('send', 'event', 'Sensor', 'Altair', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 8.716667,
-      long: 167.733333,
-      hei: 0,
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 1,
-      obsmaxel: 90,
-      obsminrange: 200,
-      obsmaxrange: 50000
-    });
-
-    lookangles.setobs({
-      lat: 8.716667,
-      long: 167.733333,
-      hei: 0,
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 1,
-      obsmaxel: 90,
-      obsminrange: 200,
-      obsmaxrange: 50000
-    });
-
-    whichRadar = '';
-    $('#sensor-info-title').html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte005.en.html'>ALTAIR</a>");
-    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-    $('#sensor-country').html('United States');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Mechanical');
-    $('#menu-weather img').removeClass('bmenu-item-disabled');
-    camSnap(latToPitch(8.716667), longToYaw(167.733333));
-    changeZoom('geo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('ALTAIR, Kwaj');
   });
   $('#radar-millstone').click(function () { // Select Millstone's Radar Coverage
-    ga('send', 'event', 'Sensor', 'Millstone', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 42.6233,
-      long: -71.4882,
-      hei: 0.131,
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 1,
-      obsmaxel: 90,
-      obsminrange: 200,
-      obsmaxrange: 50000
-    });
-
-    lookangles.setobs({
-      lat: 42.6233,
-      long: -71.4882,
-      hei: 0.131,
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 1,
-      obsmaxel: 90,
-      obsminrange: 200,
-      obsmaxrange: 50000
-    });
-
-    whichRadar = 'MIL';
-    $('#sensor-info-title').html("<a class='iframe' href='https://mostlymissiledefense.com/2012/05/05/space-surveillance-sensors-millstone-hill-radar/'>Millstone Hill Steerable Antenna</a>");
-    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-    $('#sensor-country').html('United States');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Mechanical');
-    $('#menu-weather img').removeClass('bmenu-item-disabled');
-    camSnap(latToPitch(42.6233), longToYaw(-71.4882));
-    changeZoom('geo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Millstone, MA');
   });
 
   // Optical
   $('#optical-diego-garcia').click(function () { // Select Diego Garcia's Optical Coverage
-    ga('send', 'event', 'Sensor', 'Diego Garcia', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: -7.296480,
-      long: 72.390153,
-      hei: 0.0,
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 20,
-      obsmaxel: 90,
-      obsminrange: 20000,
-      obsmaxrange: 500000
-    });
-
-    lookangles.setobs({
-      lat: -7.296480,
-      long: 72.390153,
-      hei: 0.0,
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 20,
-      obsmaxel: 90,
-      obsminrange: 20000,
-      obsmaxrange: 500000
-    });
-
-    whichRadar = 'DGC';
-    $('#sensor-info-title').html("<a class='iframe' href='https://mostlymissiledefense.com/2012/08/20/space-surveillance-sensors-geodss-ground-based-electro-optical-deep-space-surveillance-system-august-20-2012/'>Diego Garcia GEODSS</a>");
-    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-    $('#sensor-country').html('United States');
-    $('#sensor-sun').html('No Impact');
-
-    $('#menu-weather img').removeClass('bmenu-item-disabled');
-    camSnap(latToPitch(-7.296480), longToYaw(72.390153));
-    changeZoom('geo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Diego Garcia');
   });
   $('#optical-maui').click(function () { // Select Maui's Optical Coverage
-    ga('send', 'event', 'Sensor', 'Maui', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 20.708350,
-      long: -156.257595,
-      hei: 3.0,
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 20,
-      obsmaxel: 90,
-      obsminrange: 20000,
-      obsmaxrange: 500000
-    });
-
-    lookangles.setobs({
-      lat: 20.708350,
-      long: -156.257595,
-      hei: 3.0,
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 20,
-      obsmaxel: 90,
-      obsminrange: 20000,
-      obsmaxrange: 500000
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('Maui GEODSS');
-    $('#sensor-country').html('United States');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Optical');
-    // No Weather
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(20.708350), longToYaw(-156.257595));
-    changeZoom('geo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Maui, HI');
   });
   $('#optical-socorro').click(function () { // Select Socorro's Optical Coverage
-    ga('send', 'event', 'Sensor', 'Socorro', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 33.817233,
-      long: -106.659961,
-      hei: 1.24,
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 20,
-      obsmaxel: 90,
-      obsminrange: 20000,
-      obsmaxrange: 500000
-    });
-
-    lookangles.setobs({
-      lat: 33.817233,
-      long: -106.659961,
-      hei: 1.24,
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 20,
-      obsmaxel: 90,
-      obsminrange: 20000,
-      obsmaxrange: 500000
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('Socorro GEODSS');
-    $('#sensor-country').html('United States');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Optical');
-    // No Weather
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(33.817233), longToYaw(-106.659961));
-    changeZoom('geo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Socorrom NM');
   });
   $('#optical-spain').click(function () { // Select Spain's Optical Coverage
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 37.166962, // ENHANCEMENT: Verify this information.
-      long: -5.600839, // ENHANCEMENT: Verify this information.
-      hei: 0.5, // ENHANCEMENT: Verify this information.
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 20,
-      obsmaxel: 90,
-      obsminrange: 20000,
-      obsmaxrange: 500000
-    });
-
-    lookangles.setobs({
-      lat: 37.166962, // ENHANCEMENT: Verify this information.
-      long: -5.600839, // ENHANCEMENT: Verify this information.
-      hei: 0.5, // ENHANCEMENT: Verify this information.
-      obsminaz: 0,
-      obsmaxaz: 360,
-      obsminel: 20,
-      obsmaxel: 90,
-      obsminrange: 20000,
-      obsmaxrange: 500000
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('Moron Air Base');
-    $('#sensor-country').html('United States');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Optical');
-    // No Weather
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(37.166962), longToYaw(-5.600839));
-    changeZoom('geo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Moron AFB, SP');
   });
 
   // Russian Radars
   $('#russian-armavir').click(function () {
-    ga('send', 'event', 'Sensor', 'Armavir', 'Selected');
-    satCruncher.postMessage({ // Send SatCruncher File information on this radar
-      typ: 'offset', // Tell satcruncher to update something
-      dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
-      setlatlong: true, // Tell satcruncher we are changing observer location
-      lat: 44.925106,
-      long: 40.983894,
-      hei: 0.0,
-      obsminaz: 55, // All Information via russianforces.org
-      obsmaxaz: 295,
-      obsminel: 2,
-      obsmaxel: 60,
-      obsminrange: 100,
-      obsmaxrange: 4200
-    });
-
-    lookangles.setobs({
-      lat: 44.925106,
-      long: 40.983894,
-      hei: 0.0,
-      obsminaz: 55, // All Information via russianforces.org
-      obsmaxaz: 295,
-      obsminel: 2,
-      obsmaxel: 60,
-      obsminrange: 100,
-      obsmaxrange: 4200
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('Armavir Radar Station');
-    $('#sensor-country').html('Russia');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(44.925106), longToYaw(40.983894));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Armavir, RUS');
   });
   $('#russian-balkhash').click(function () {
-    ga('send', 'event', 'Sensor', 'Balkhash', 'Selected');
-    satCruncher.postMessage({ // Send SatCruncher File information on this radar
-      typ: 'offset', // Tell satcruncher to update something
-      dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
-      setlatlong: true, // Tell satcruncher we are changing observer location
-      lat: 46.603076,
-      long: 74.530985,
-      hei: 0.0,
-      obsminaz: 91, // All Information via russianforces.org
-      obsmaxaz: 151,
-      obsminel: 5.5,
-      obsmaxel: 34.5,
-      obsminrange: 385,
-      obsmaxrange: 4600
-    });
-
-    lookangles.setobs({
-      lat: 46.603076,
-      long: 74.530985,
-      hei: 0.0,
-      obsminaz: 91, // All Information via russianforces.org
-      obsmaxaz: 151,
-      obsminel: 5.5,
-      obsmaxel: 34.5,
-      obsminrange: 385,
-      obsmaxrange: 4600
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('Balkhash Radar Station');
-    $('#sensor-country').html('Russia');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(46.603076), longToYaw(74.530985));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Balkhash, RUS');
   });
   $('#russian-gantsevichi').click(function () {
-    ga('send', 'event', 'Sensor', 'Gantsevichi', 'Selected');
-    satCruncher.postMessage({ // Send SatCruncher File information on this radar
-      typ: 'offset', // Tell satcruncher to update something
-      dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
-      setlatlong: true, // Tell satcruncher we are changing observer location
-      lat: 52.850000,
-      long: 26.480000,
-      hei: 0.0,
-      obsminaz: 190, // All Information via russianforces.org
-      obsmaxaz: 310,
-      obsminel: 3,
-      obsmaxel: 80,
-      obsminrange: 300,
-      obsmaxrange: 6500
-    });
-
-    lookangles.setobs({
-      lat: 52.850000,
-      long: 26.480000,
-      hei: 0.0,
-      obsminaz: 190, // All Information via russianforces.org
-      obsmaxaz: 310,
-      obsminel: 3,
-      obsmaxel: 80,
-      obsminrange: 300,
-      obsmaxrange: 6500
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('Gantsevichi Radar Station');
-    $('#sensor-country').html('Russia');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(52.850000), longToYaw(26.480000));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Gantsevichi, RUS');
   });
   $('#russian-lekhtusi').click(function () {
-    ga('send', 'event', 'Sensor', 'Lekhtusi', 'Selected');
-    satCruncher.postMessage({ // Send SatCruncher File information on this radar
-      typ: 'offset', // Tell satcruncher to update something
-      dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
-      setlatlong: true, // Tell satcruncher we are changing observer location
-      lat: 60.275458,
-      long: 30.546017,
-      hei: 0.0,
-      obsminaz: 245, // All Information via russianforces.org
-      obsmaxaz: 355,
-      obsminel: 2,
-      obsmaxel: 70,
-      obsminrange: 100,
-      obsmaxrange: 4200
-    });
-
-    lookangles.setobs({
-      lat: 60.275458,
-      long: 30.546017,
-      hei: 0.0,
-      obsminaz: 245,
-      obsmaxaz: 355,
-      obsminel: 2,
-      obsmaxel: 70,
-      obsminrange: 100,
-      obsmaxrange: 4200
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('Lehktusi Radar Station');
-    $('#sensor-country').html('Russia');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(60.275458), longToYaw(30.546017));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Lekhtusi, RUS');
   });
   $('#russian-mishelevka-d').click(function () {
-    ga('send', 'event', 'Sensor', 'Mishelevka', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 52.855500,
-      long: 103.231700,
-      hei: 0.0,
-      obsminaz: 41, // All Information via russianforces.org
-      obsmaxaz: 219,
-      obsminel: 5.5,
-      obsmaxel: 34.5,
-      obsminrange: 250,
-      obsmaxrange: 4600
-    });
-
-    lookangles.setobs({
-      lat: 52.855500,
-      long: 103.231700,
-      hei: 0.0,
-      obsminaz: 41, // All Information via russianforces.org
-      obsmaxaz: 219,
-      obsminel: 5.5,
-      obsmaxel: 34.5,
-      obsminrange: 250,
-      obsmaxrange: 4600
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('Mishelevka Radar Station');
-    $('#sensor-country').html('Russia');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(52.855500), longToYaw(103.231700));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Mishelevka-D, RUS');
   });
   $('#russian-olenegorsk').click(function () {
-    ga('send', 'event', 'Sensor', 'Olenegorsk', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 68.114100,
-      long: 33.910200,
-      hei: 0.0,
-      obsminaz: 280, // All Information via russianforces.org
-      obsmaxaz: 340,
-      obsminel: 5.5,
-      obsmaxel: 34.5,
-      obsminrange: 250,
-      obsmaxrange: 4600
-    });
-
-    lookangles.setobs({
-      lat: 68.114100,
-      long: 33.910200,
-      hei: 0.0,
-      obsminaz: 280, // All Information via russianforces.org
-      obsmaxaz: 340,
-      obsminel: 5.5,
-      obsmaxel: 34.5,
-      obsminrange: 250,
-      obsmaxrange: 4600
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('Olenegorsk Radar Station');
-    $('#sensor-country').html('Russia');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(68.114100), longToYaw(33.910200));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Olenegorsk, RUS');
   });
   $('#russian-pechora').click(function () {
-    ga('send', 'event', 'Sensor', 'Pechora', 'Selected');
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (propRate).toString(),
-      setlatlong: true,
-      lat: 65.210000,
-      long: 57.295000,
-      hei: 0.0,
-      obsminaz: 305, // All Information via russianforces.org
-      obsmaxaz: 55,
-      obsminel: 2,
-      obsmaxel: 55,
-      obsminrange: 300,
-      obsmaxrange: 7200
-    });
-
-    lookangles.setobs({
-      lat: 65.210000,
-      long: 57.295000,
-      hei: 0.0,
-      obsminaz: 305, // All Information via russianforces.org
-      obsmaxaz: 55,
-      obsminel: 2,
-      obsmaxel: 55,
-      obsminrange: 300,
-      obsmaxrange: 7200
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('Pechora Radar Station');
-    $('#sensor-country').html('Russia');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(65.210000), longToYaw(57.295000));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Pechora, RUS');
   });
   $('#russian-pionersky').click(function () {
-    ga('send', 'event', 'Sensor', 'Pionersky', 'Selected');
-    satCruncher.postMessage({ // Send SatCruncher File information on this radar
-      typ: 'offset', // Tell satcruncher to update something
-      dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
-      setlatlong: true, // Tell satcruncher we are changing observer location
-      lat: 54.857294,
-      long: 20.182350,
-      hei: 0.0,
-      obsminaz: 187.5, // All Information via russianforces.org
-      obsmaxaz: 292.5,
-      obsminel: 2,
-      obsmaxel: 60,
-      obsminrange: 100,
-      obsmaxrange: 4200
-    });
-
-    lookangles.setobs({
-      lat: 54.857294,
-      long: 20.182350,
-      hei: 0.0,
-      obsminaz: 187.5, // All Information via russianforces.org
-      obsmaxaz: 292.5,
-      obsminel: 2,
-      obsmaxel: 60,
-      obsminrange: 100,
-      obsmaxrange: 4200
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('Armavir Radar Station');
-    $('#sensor-country').html('Russia');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(54.857294), longToYaw(20.182350));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Pionersky, RUS');
   });
 
   // Chinese Radars
   $('#chinese-xuanhua').click(function () {
-    ga('send', 'event', 'Sensor', 'Xuanhua', 'Selected');
-    satCruncher.postMessage({ // Send SatCruncher File information on this radar
-      typ: 'offset', // Tell satcruncher to update something
-      dat: (propOffset).toString() + ' ' + (propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
-      setlatlong: true, // Tell satcruncher we are changing observer location
-      lat: 40.446944,
-      long: 115.116389,
-      hei: 1.6,
-      obsminaz: 300,    // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
-      obsmaxaz: 60,     // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
-      obsminel: 2,      // Information via globalsecurity.org
-      obsmaxel: 80,     // Information via globalsecurity.org
-      obsminrange: 300, // TODO: Verify
-      obsmaxrange: 3000 // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
-    });
-
-    lookangles.setobs({
-      lat: 40.446944,
-      long: 115.116389,
-      hei: 1.6,
-      obsminaz: 300,    // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
-      obsmaxaz: 60,     // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
-      obsminel: 2,      // Information via globalsecurity.org
-      obsmaxel: 80,     // Information via globalsecurity.org
-      obsminrange: 300, // TODO: Verify
-      obsmaxrange: 3000 // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
-    });
-
-    whichRadar = ''; // Disables Weather Menu from Opening
-    $('#sensor-info-title').html('7010 Large Phased Array Radar (LPAR)');
-    $('#sensor-country').html('China');
-    $('#sensor-sun').html('No Impact');
-    $('#sensor-type').html('Phased Array');
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    camSnap(latToPitch(40.446944), longToYaw(115.116389));
-    changeZoom('leo');
-    lookangles.getsensorinfo();
+    sensorManager.setSensor('Xuanhua, PRC');
   });
 
   $('.sensor-selected').click(function () {
@@ -2383,7 +1587,14 @@ function bottomIconPress (evt) {
         $('#menu-lookangles img').addClass('bmenu-item-selected');
         if (selectedSat !== -1) {
           var sat = satSet.getSat(selectedSat);
-          lookangles.getlookangles(sat, isLookanglesMenuOpen);
+          if (sat.static) {
+            if (!$('#menu-lookangles img:animated').length) {
+              $('#menu-lookangles img').effect('shake', {distance: 10});
+            }
+            break;
+          } else {
+            lookangles.getlookangles(sat, isLookanglesMenuOpen);
+          }
         }
         break;
       }
@@ -2761,6 +1972,14 @@ function selectSat (satId) {
     isNewLaunchMenuOpen = false;
     isCustomSensorMenuOpen = false;
   } else {
+    var sat = satSet.getSat(satId);
+    if (!sat) return;
+    if (sat.static) {
+      sensorManager.setSensor(sat.name);
+      sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
+      selectedsat = -1;
+      return;
+    }
     camZoomSnappedOnSat = true;
     camAngleSnappedOnSat = true;
 
@@ -2776,8 +1995,6 @@ function selectSat (satId) {
 
     satSet.selectSat(satId);
     camSnapToSat(satId);
-    var sat = satSet.getSat(satId);
-    if (!sat) return;
     orbitDisplay.setSelectOrbit(satId);
     if ($('#search-results').css('display') === 'block') {
       if ($(document).width() <= 1000) {
@@ -2821,424 +2038,17 @@ function selectSat (satId) {
     // Country Correlation Table
     // /////////////////////////////////////////////////////////////////////////
     var country;
-    if (sat.C === 'U') {
-      country = 'Unknown';
-    // Table Nested in ELSE to Make Hiding it Easier
-    } else {
-      if (sat.C === 'AB') { // Headquartered in Riyadh, Saudi Arabia
-        country = 'Saudi Arabia';
-      }
-      if (sat.C === 'AC') {
-        country = 'AsiaSat Corp';
-      }
-      if (sat.C === 'ALG') {
-        country = 'Algeria';
-      }
-      if (sat.C === 'ALL') {
-        country = 'All';
-      }
-      if (sat.C === 'ARGN') {
-        country = 'Argentina';
-      }
-      if (sat.C === 'ASRA') {
-        country = 'Austria';
-      }
-      if (sat.C === 'AUS') {
-        country = 'Australia';
-      }
-      if (sat.C === 'AZER') {
-        country = 'Azerbaijan';
-      }
-      if (sat.C === 'BEL') {
-        country = 'Belgium';
-      }
-      if (sat.C === 'BELA') {
-        country = 'Belarus';
-      }
-      if (sat.C === 'BERM') {
-        country = 'Bermuda';
-      }
-      if (sat.C === 'BOL') {
-        country = 'Bolivia';
-      }
-      if (sat.C === 'BRAZ') {
-        country = 'Brazil';
-      }
-      if (sat.C === 'CA') {
-        country = 'Canada';
-      }
-      if (sat.C === 'CHBZ') {
-        country = 'China/Brazil';
-      }
-      if (sat.C === 'CHLE') {
-        country = 'Chile';
-      }
-      if (sat.C === 'CIS') {
-        country = 'Commonwealth of Ind States';
-      }
-      if (sat.C === 'COL') {
-        country = 'Colombia';
-      }
-      if (sat.C === 'CZCH') {
-        country = 'Czechoslovakia';
-      }
-      if (sat.C === 'DEN') {
-        country = 'Denmark';
-      }
-      if (sat.C === 'ECU') {
-        country = 'Ecuador';
-      }
-      if (sat.C === 'EGYP') {
-        country = 'Egypt';
-      }
-      if (sat.C === 'ESA') {
-        country = 'European Space Agency';
-      }
-      if (sat.C === 'ESA') {
-        country = 'European Space Research Org';
-      }
-      if (sat.C === 'EST') {
-        country = 'Estonia';
-      }
-      if (sat.C === 'EUME') {
-        country = 'EUMETSAT';
-      }
-      if (sat.C === 'EUTE') {
-        country = 'EUTELSAT';
-      }
-      if (sat.C === 'FGER') {
-        country = 'France/Germany';
-      }
-      if (sat.C === 'FR') {
-        country = 'France';
-      }
-      if (sat.C === 'FRIT') {
-        country = 'France/Italy';
-      }
-      if (sat.C === 'GER') {
-        country = 'Germany';
-      }
-      if (sat.C === 'GLOB') { // Headquartered in Louisiana, USA
-        country = 'United States';
-      }
-      if (sat.C === 'GREC') {
-        country = 'Greece';
-      }
-      if (sat.C === 'HUN') {
-        country = 'Hungary';
-      }
-      if (sat.C === 'IM') { // Headquartered in London, UK
-        country = 'United Kingdom';
-      }
-      if (sat.C === 'IND') {
-        country = 'India';
-      }
-      if (sat.C === 'INDO') {
-        country = 'Indonesia';
-      }
-      if (sat.C === 'IRAN') {
-        country = 'Iran';
-      }
-      if (sat.C === 'IRAQ') {
-        country = 'Iraq';
-      }
-      if (sat.C === 'ISRA') {
-        country = 'Israel';
-      }
-      if (sat.C === 'ISS') {
-        country = 'International';
-      }
-      if (sat.C === 'IT') {
-        country = 'Italy';
-      }
-      if (sat.C === 'ITSO') { // Headquartered in Luxembourg District, Luxembourg
-        country = 'Luxembourg';
-      }
-      if (sat.C === 'JPN') {
-        country = 'Japan';
-      }
-      if (sat.C === 'KAZ') {
-        country = 'Kazakhstan';
-      }
-      if (sat.C === 'LAOS') {
-        country = 'Laos';
-      }
-      if (sat.C === 'LTU') {
-        country = 'Lithuania';
-      }
-      if (sat.C === 'LUXE') {
-        country = 'Luxembourg';
-      }
-      if (sat.C === 'MALA') {
-        country = 'Malaysia';
-      }
-      if (sat.C === 'MEX') {
-        country = 'Mexico';
-      }
-      if (sat.C === 'NATO') {
-        country = 'North Atlantic Treaty Org';
-      }
-      if (sat.C === 'NETH') {
-        country = 'Netherlands';
-      }
-      if (sat.C === 'NICO') { // Headquartered in Washington, USA
-        country = 'United States';
-      }
-      if (sat.C === 'NIG') {
-        country = 'Nigeria';
-      }
-      if (sat.C === 'NKOR') {
-        country = 'North Korea';
-      }
-      if (sat.C === 'NOR') {
-        country = 'Norway';
-      }
-      if (sat.C === 'O3B') { // Majority Shareholder Based in Luxembourg
-        country = 'Luxembourg';
-      }
-      if (sat.C === 'ORB') { // Headquartered in Louisiana, USA
-        country = 'United States';
-      }
-      if (sat.C === 'PAKI') {
-        country = 'Pakistan';
-      }
-      if (sat.C === 'PERU') {
-        country = 'Peru';
-      }
-      if (sat.C === 'POL') {
-        country = 'Poland';
-      }
-      if (sat.C === 'POR') {
-        country = 'Portugal';
-      }
-      if (sat.C === 'PRC') {
-        country = 'China';
-      }
-      if (sat.C === 'RASC') { // Headquartered in Mauritius
-        country = 'Mauritius';
-      }
-      if (sat.C === 'ROC') {
-        country = 'Taiwan';
-      }
-      if (sat.C === 'ROM') {
-        country = 'Romania';
-      }
-      if (sat.C === 'RP') {
-        country = 'Philippines';
-      }
-      if (sat.C === 'SAFR') {
-        country = 'South Africa';
-      }
-      if (sat.C === 'SAUD') {
-        country = 'Saudi Arabia';
-      }
-      if (sat.C === 'SEAL') { // Primary Shareholder Russian
-        country = 'Russia';
-      }
-      if (sat.C === 'RP') {
-        country = 'Philippines';
-      }
-      if (sat.C === 'SES') {
-        country = 'Luxembourg';
-      }
-      if (sat.C === 'SING') {
-        country = 'Singapore';
-      }
-      if (sat.C === 'SKOR') {
-        country = 'South Korea';
-      }
-      if (sat.C === 'SPN') {
-        country = 'Spain';
-      }
-      if (sat.C === 'STCT') {
-        country = 'Singapore/Taiwan';
-      }
-      if (sat.C === 'SWED') {
-        country = 'Sweden';
-      }
-      if (sat.C === 'SWTZ') {
-        country = 'Switzerland';
-      }
-      if (sat.C === 'THAI') {
-        country = 'Thailand';
-      }
-      if (sat.C === 'TMMC') {
-        country = 'Turkmenistan/Monaco';
-      }
-      if (sat.C === 'TURK') {
-        country = 'Turkey';
-      }
-      if (sat.C === 'UAE') {
-        country = 'United Arab Emirates';
-      }
-      if (sat.C === 'UK') {
-        country = 'United Kingdom';
-      }
-      if (sat.C === 'UKR') {
-        country = 'Ukraine';
-      }
-      if (sat.C === 'URY') {
-        country = 'Uruguay';
-      }
-      if (sat.C === 'US') {
-        country = 'United States';
-      }
-      if (sat.C === 'USBZ') {
-        country = 'United States/Brazil';
-      }
-      if (sat.C === 'VENZ') {
-        country = 'Venezuela';
-      }
-      if (sat.C === 'VTNM') {
-        country = 'Vietnam';
-      }
-    }
+    country = extractCountry(sat.C);
     $('#sat-country').html(country);
 
     // /////////////////////////////////////////////////////////////////////////
     // Launch Site Correlation Table
     // /////////////////////////////////////////////////////////////////////////
-    var site, sitec;
-    if (sat.LS === 'U') {
-      site = 'Unknown';
-      sitec = 'Unknown';
-    // Table Nested in ELSE to Make Hiding it Easier
-    } else {
-      if (sat.LS === 'AFETR') {
-        site = 'Cape Canaveral AFS';
-        sitec = 'United States';
-      }
-      if (sat.LS === 'AFWTR') {
-        site = 'Vandenberg AFB';
-        sitec = 'United States';
-      }
-      if (sat.LS === 'CAS') {
-        site = 'Canary Islands';
-        sitec = 'United States';
-      }
-      if (sat.LS === 'FRGUI') {
-        site = 'French Guiana';
-        sitec = 'United States';
-      }
-      if (sat.LS === 'HGSTR') {
-        site = 'Hammaguira STR';
-        sitec = 'Algeria';
-      }
-      if (sat.LS === 'KSCUT') {
-        site = 'Uchinoura Space Center';
-        sitec = 'Japan';
-      }
-      if (sat.LS === 'KYMTR') {
-        site = 'Kapustin Yar MSC';
-        sitec = 'Russia';
-      }
-      if (sat.LS === 'PKMTR') {
-        site = 'Plesetsk MSC';
-        sitec = 'Russia';
-      }
-      if (sat.LS === 'WSC') {
-        site = 'Wenchang SLC';
-        sitec = 'China';
-      }
-      if (sat.LS === 'SNMLP') {
-        site = 'San Marco LP';
-        sitec = 'Kenya';
-      }
-      if (sat.LS === 'SRI') {
-        site = 'Satish Dhawan SC';
-        sitec = 'India';
-      }
-      if (sat.LS === 'TNSTA') {
-        site = 'Tanegashima SC';
-        sitec = 'Japan';
-      }
-      if (sat.LS === 'TTMTR') {
-        site = 'Baikonur Cosmodrome';
-        sitec = 'Kazakhstan';
-      }
-      if (sat.LS === 'WLPIS') {
-        site = 'Wallops Island';
-        sitec = 'United States';
-      }
-      if (sat.LS === 'WOMRA') {
-        site = 'Woomera';
-        sitec = 'Australia';
-      }
-      if (sat.LS === 'VOSTO') {
-        site = 'Vostochny Cosmodrome';
-        sitec = 'Russia';
-      }
-      if (sat.LS === 'PMRF') {
-        site = 'PMRF Barking Sands';
-        sitec = 'United States';
-      }
-      if (sat.LS === 'SEAL') {
-        site = 'Sea Launch Odyssey';
-        sitec = 'Russia';
-      }
-      if (sat.LS === 'KWAJ') {
-        site = 'Kwajalein';
-        sitec = 'United States';
-      }
-      if (sat.LS === 'ERAS') {
-        site = 'Pegasus East';
-        sitec = 'United States';
-      }
-      if (sat.LS === 'JSC') {
-        site = 'Jiuquan SLC';
-        sitec = 'China';
-      }
-      if (sat.LS === 'SVOB') {
-        site = 'Svobodny';
-        sitec = 'Russia';
-      }
-      if (sat.LS === 'UNKN') {
-        site = 'Unknown';
-        sitec = 'Unknown';
-      }
-      if (sat.LS === 'TSC') {
-        site = 'Taiyaun SC';
-        sitec = 'China';
-      }
-      if (sat.LS === 'WRAS') {
-        site = 'Pegasus West';
-        sitec = 'United States';
-      }
-      if (sat.LS === 'XSC') {
-        site = 'Xichang SC';
-        sitec = 'China';
-      }
-      if (sat.LS === 'YAVNE') {
-        site = 'Yavne';
-        sitec = 'Israel';
-      }
-      if (sat.LS === 'OREN') {
-        site = 'Orenburg';
-        sitec = 'Russia';
-      }
-      if (sat.LS === 'SADOL') {
-        site = 'Submarine Launch';
-        sitec = 'Russia';
-      }
-      if (sat.LS === 'KODAK') {
-        site = 'Kodiak Island';
-        sitec = 'United States';
-      }
-      if (sat.LS === 'SEM') {
-        site = 'Semnan';
-        sitec = 'Iran';
-      }
-      if (sat.LS === 'YUN') {
-        site = 'Yunsong';
-        sitec = 'North Korea';
-      }
-      if (sat.LS === 'NSC') {
-        site = 'Naro Space Center';
-        sitec = 'South Korea';
-      }
-    }
-    $('#sat-site').html(site);
-    $('#sat-sitec').html(sitec);
+    var site = [];
+    site = extractLaunchSite(sat.LS);
+
+    $('#sat-site').html(site[0]);
+    $('#sat-sitec').html(site[1]);
 
     ga('send', 'event', 'Satellite', 'Country: ' + country, 'Country');
     ga('send', 'event', 'Satellite', 'Site: ' + site, 'Site');
@@ -3262,117 +2072,7 @@ function selectSat (satId) {
     // /////////////////////////////////////////////////////////////////////////
     $('#sat-vehicle').html(sat.LV);
     if (sat.LV === 'U') { $('#sat-vehicle').html('Unknown'); }
-    switch (sat.LV) {
-      // ///////////////////////////////////////////////////////////////////////
-      // UNITED STATES
-      // ///////////////////////////////////////////////////////////////////////
-      case 'Scout B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutb.html'>" + sat.LV + '</a>');
-        break;
-      case 'Scout X-1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutx-1.html'>" + sat.LV + '</a>');
-        break;
-      case 'Scout X-4':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutx-4.html'>" + sat.LV + '</a>');
-        break;
-      case 'Scout A':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scouta.html'>" + sat.LV + '</a>');
-        break;
-      case 'Scout G-1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutg-1.html'>" + sat.LV + '</a>');
-        break;
-      case 'Scout S-1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scout.html'>" + sat.LV + '</a>');
-        break;
-      case 'Delta 0300':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/d/delta0300.html'>" + sat.LV + '</a>');
-        break;
-      case 'Falcon 9':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/f/falcon9.html'>" + sat.LV + '</a>');
-        break;
-      case 'Falcon 9 v1.1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/f/falcon9v11.html'>" + sat.LV + '</a>');
-        break;
-      case 'Atlas Agena B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/a/atlasagenab.html'>" + sat.LV + '</a>');
-        break;
-      case 'Thor Ablestar':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/t/thorablestar.html'>" + sat.LV + '</a>');
-        break;
-
-      // ///////////////////////////////////////////////////////////////////////
-      // RUSSIA
-      // ///////////////////////////////////////////////////////////////////////
-      case 'Soyuz-ST-A':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-st-a.html'>" + sat.LV + '</a>');
-        break;
-      case 'Soyuz-ST-B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-st-b.html'>" + sat.LV + '</a>');
-        break;
-      case 'Soyuz 11A511L':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz11a511l.html'>" + sat.LV + '</a>');
-        break;
-      case 'Soyuz-U':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-u.html'>" + sat.LV + '</a>');
-        break;
-      case 'Soyuz-U-PVB':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-u-pvb.html'>" + sat.LV + '</a>');
-        break;
-      case 'Soyuz-FG':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-fg.html'>" + sat.LV + '</a>');
-        break;
-      case 'Soyuz-2-1A':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-2-1a.html'>" + sat.LV + '</a>');
-        break;
-      case 'Soyuz-2-1B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-2-1b.html'>" + sat.LV + '</a>');
-        break;
-      case 'Kosmos 11K65M':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/k/kosmos11k65m.html'>Kosmos 3M</a>");
-        break;
-      case 'Kosmos 65S3':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/k/kosmos65s3.html'>" + sat.LV + '</a>');
-        break;
-      case 'Tsiklon-2':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/t/tsiklon-2.html'>" + sat.LV + '</a>');
-        break;
-      case 'Tsiklon-3':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/t/tsiklon-3.html'>" + sat.LV + '</a>');
-        break;
-      case 'Vostok 8A92M':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/v/vostok8a92m.html'>" + sat.LV + '</a>');
-        break;
-      case 'Vostok 8K72K':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/v/vostok8k72k.html'>" + sat.LV + '</a>');
-        break;
-      // ///////////////////////////////////////////////////////////////////////
-      // CHINA
-      // ///////////////////////////////////////////////////////////////////////
-      case 'Chang Zheng 1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng1.html'>" + sat.LV + '</a>');
-        break;
-      case 'Chang Zheng 3':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng3.html'>" + sat.LV + '</a>');
-        break;
-      case 'Chang Zheng 3A':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng3a.html'>" + sat.LV + '</a>');
-        break;
-      case 'Chang Zheng 4':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng4.html'>" + sat.LV + '</a>');
-        break;
-      case 'Chang Zheng 4B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng4b.html'>" + sat.LV + '</a>');
-        break;
-      case 'Chang Zheng 2C-III/SD':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng2c-iiisd.html'>" + sat.LV + '</a>');
-        break;
-      case 'Chang Zheng 2C':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng2c.html'>" + sat.LV + '</a>');
-        break;
-      case 'Chang Zheng 6':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng6.html'>" + sat.LV + '</a>');
-        break;
-    }
+    extractLiftVehicle(sat.LV);
 
     $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
     $('#sat-apogee').html(sat.apogee.toFixed(0) + ' km');
@@ -3739,15 +2439,51 @@ function drawLoop () {
   // camYaw = (camYaw % (Math.PI*2));
   camYaw = normalizeAngle(camYaw);
   if (selectedSat !== -1) {
-    // var sat = satSet.getSat(selectedSat);
-    // debugLine.set(sat, [0, 0, 0]);
-    camSnapToSat(selectedSat);
+    var sat = satSet.getSat(selectedSat);
+    if (!sat.static) {
+      camSnapToSat(selectedSat);
+    }
+    // var satposition = [sat.position.x, sat.position.y, sat.position.z];
+    // debugLine.set(satposition, [0, 0, 0]);
   }
 
   drawScene();
+  // drawLines();
   updateHover();
   updateSelectBox();
 }
+
+function drawLines () {
+  var satData = satSet.getSatData();
+  var propTime = new Date();
+  var realElapsedMsec = Number(propTime) - Number(propRealTime);
+  var scaledMsec = realElapsedMsec * propRate;
+  if (propRate === 0) {
+    propTime.setTime(Number(propFrozen) + propOffset);
+  } else {
+    propTime.setTime(Number(propRealTime) + propOffset + scaledMsec);
+  }
+  if (satData && lookangles.sensorSelected()) {
+    while (curRadarTrackNum < satData.length) {
+      if (satData[curRadarTrackNum]) {
+        if (satData[curRadarTrackNum].inview) {
+          var debugLine = new Line();
+          var sat = satData[curRadarTrackNum];
+          var satposition = [sat.position.x, sat.position.y, sat.position.z];
+          debugLine.set(satposition, sensorManager.curSensorPositon);
+          debugLine.draw();
+          curRadarTrackNum++;
+          lastRadarTrackTime = propTime;
+          return;
+        } else { curRadarTrackNum++; }
+      } else { curRadarTrackNum++; }
+    }
+    if (curRadarTrackNum === satData.length) {
+      curRadarTrackNum = 0;
+    }
+  }
+}
+
 function drawScene () {
   gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
   // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -3887,6 +2623,8 @@ function updateSelectBox () {
   if (selectedSat === -1) return;
   var now = Date.now();
   var satData = satSet.getSat(selectedSat);
+  if (satData.static) return;
+
   lookangles.getTEARR(satData);
 
   // TODO: Include updates when satellite edited regardless of time.
@@ -3960,11 +2698,14 @@ function hoverBoxOnSat (satId, satX, satY) {
   } else {
     try {
       var sat = satSet.getSat(satId);
-
-      if (lookangles.sensorSelected() && isShowNextPass) {
-        $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
+      if (sat.static) {
+        $('#sat-hoverbox').html(sat.name + '<br /><center>' + sat.type + '</center>');
       } else {
-        $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
+        if (lookangles.sensorSelected() && isShowNextPass) {
+          $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
+        } else {
+          $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
+        }
       }
       $('#sat-hoverbox').css({
         display: 'block',
@@ -3988,7 +2729,9 @@ function earthHitTest (x, y) {
 
 var lookangles = (function () {
   var obslat, obslong, hei, obsminaz, obsmaxaz, obsminel, obsmaxel, obsminrange, obsmaxrange;
+  var obsminaz2, obsmaxaz2, obsminel2, obsmaxel2, obsminrange2, obsmaxrange2;
   var tempLat, tempLon, tempHei, tempMinaz, tempMaxaz, tempMinel, tempMaxel, tempMinrange, tempMaxrange;
+  var tempLat2, tempLon2, tempHei2, tempMinaz2, tempMaxaz2, tempMinel2, tempMaxel2, tempMinrange2, tempMaxrange2;
   this.lat = 0;
   this.lon = 0;
   this.altitude = 0;
@@ -4007,8 +2750,8 @@ var lookangles = (function () {
   };
 
   var getsensorinfo = function () {
-    $('#sensor-latitude').html(obslat);
-    $('#sensor-longitude').html(obslong);
+    $('#sensor-latitude').html(obslat / DEG2RAD);
+    $('#sensor-longitude').html(obslong / DEG2RAD);
     $('#sensor-minazimuth').html(obsminaz);
     $('#sensor-maxazimuth').html(obsmaxaz);
     $('#sensor-minelevation').html(obsminel);
@@ -4027,13 +2770,50 @@ var lookangles = (function () {
     }
     obslong = obs.long * DEG2RAD;         // Observer Longitude - use Google Maps
     this.obslong = obslong;
+
     hei = obs.hei * 1;                    // Observer Height in Km
+    this.hei = hei;
     obsminaz = obs.obsminaz;              // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
     obsmaxaz = obs.obsmaxaz;              // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
     obsminel = obs.obsminel;              // Observer min elevation
     obsmaxel = obs.obsmaxel;              // Observer max elevation
     obsminrange = obs.obsminrange;        // Observer min range NOTE: These are functionally useful guesses for spacetrack purposes in order to avoid classification issues
     obsmaxrange = obs.obsmaxrange;        // Observer max range TODO: Determine how to calculate max range with transmit cycle information
+    this.obsminaz = obsminaz;              // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
+    this.obsmaxaz = obsmaxaz;              // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
+    this.obsminel = obsminel;              // Observer min elevation
+    this.obsmaxel = obsmaxel;              // Observer max elevation
+    this.obsminrange = obsminrange;        // Observer min range NOTE: These are functionally useful guesses for spacetrack purposes in order to avoid classification issues
+    this.obsmaxrange = obsmaxrange;        // Observer max range TODO: Determine how to calculate max range with transmit cycle information
+
+    if (!obs.obsmaxrange2) {
+      obsminaz2 = 0;
+      obsmaxaz2 = 0;
+      obsminel2 = 0;
+      obsmaxel2 = 0;
+      obsminrange2 = 0;
+      obsmaxrange2 = 0;
+      this.obsminaz2 = 0;
+      this.obsmaxaz2 = 0;
+      this.obsminel2 = 0;
+      this.obsmaxel2 = 0;
+      this.obsminrange2 = 0;
+      this.obsmaxrange2 = 0;
+    } else {
+      obsminaz2 = obs.obsminaz2;              // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
+      obsmaxaz2 = obs.obsmaxaz2;              // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
+      obsminel2 = obs.obsminel2;              // Observer min elevation
+      obsmaxel2 = obs.obsmaxel2;              // Observer max elevation
+      obsminrange2 = obs.obsminrange2;        // Observer min range NOTE: These are functionally useful guesses for spacetrack purposes in order to avoid classification issues
+      obsmaxrange2 = obs.obsmaxrange2;        // Observer max range TODO: Determine how to calculate max range with transmit cycle information
+      this.obsminaz2 = obsminaz2;              // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
+      this.obsmaxaz2 = obsmaxaz2;              // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
+      this.obsminel2 = obsminel2;              // Observer min elevation
+      this.obsmaxel2 = obsmaxel2;              // Observer max elevation
+      this.obsminrange2 = obsminrange2;        // Observer min range NOTE: These are functionally useful guesses for spacetrack purposes in order to avoid classification issues
+      this.obsmaxrange2 = obsmaxrange2;        // Observer max range TODO: Determine how to calculate max range with transmit cycle information
+    }
+
     observerGd = {                        // Array to calculate look angles in propagate()
       latitude: obslat,
       longitude: obslong,
@@ -4173,7 +2953,7 @@ var lookangles = (function () {
       return;
     }
     var resetWhenDone = false;
-    if (sensorSelected()) { resetWhenDone = true; }
+    if (!sensorSelected()) { resetWhenDone = true; }
 
     // Set default timing settings. These will be changed to find look angles at different times in future.
     var propOffsetTemp = 0;               // offset letting us propagate in the future (or past)
@@ -4184,6 +2964,8 @@ var lookangles = (function () {
     setSensor(0);
 
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
+    var orbitalPeriod = 1440 * 60 / (satrec.no * 60 * 24 / (2 * Math.PI)); // Seconds in a day divided by mean motion
+    console.log(orbitalPeriod);
     var tbl = document.getElementById('looksmultisite');           // Identify the table to update
     tbl.innerHTML = '';                                   // Clear the table from old object data
     var tblLength = 0;                                   // Iniially no rows to the table
@@ -4220,15 +3002,14 @@ var lookangles = (function () {
           howManyPasses = 6; // Reset to 3 passes
         } else {
           howManyPasses = howManyPasses - 1;
-          i = i + (60 * 60); // Jump an hour into the future to ensure its the next pass.
-          // TODO: Consider Deep Space
+          i = i + (orbitalPeriod * 0.75); // Jump 3/4th to the next orbit
         }
       }
-      if (sensor === 9) {
+      if (sensor === 10) {
         getTempSensor(resetWhenDone);
         break;
       }
-      if (sensor < 9 && i === (7 * 24 * 60 * 60) - 5) { // Move to next sensor if this sensor doesn't have enough passes.
+      if (sensor < 10 && i >= (7 * 24 * 60 * 60) - 5) { // Move to next sensor if this sensor doesn't have enough passes.
         sensor++;
         setSensor(sensor);
         i = 0;
@@ -4541,6 +3322,12 @@ var lookangles = (function () {
     tempMaxrange = obsmaxrange;
     tempMinaz = obsminaz;
     tempMaxaz = obsmaxaz;
+    tempMinel2 = obsminel2;
+    tempMaxel2 = obsmaxel2;
+    tempMinrange2 = obsminrange2;
+    tempMaxrange2 = obsmaxrange2;
+    tempMinaz2 = obsminaz2;
+    tempMaxaz2 = obsmaxaz2;
   }
 
   function getTempSensor (resetWhenDone) {
@@ -4566,6 +3353,12 @@ var lookangles = (function () {
       obsmaxrange = tempMaxrange;
       obsminaz = tempMinaz;
       obsmaxaz = tempMaxaz;
+      obsminel2 = tempMinel2;
+      obsmaxel2 = tempMaxel2;
+      obsminrange2 = tempMinrange2;
+      obsmaxrange2 = tempMaxrange2;
+      obsminaz2 = tempMinaz2;
+      obsmaxaz2 = tempMaxaz2;
       observerGd = {                        // Array to calculate look angles in propagate()
         latitude: obslat * DEG2RAD,
         longitude: obslong * DEG2RAD,
@@ -4586,7 +3379,13 @@ var lookangles = (function () {
           obsminel: 3,
           obsmaxel: 85,
           obsminrange: 200,
-          obsmaxrange: 5555
+          obsmaxrange: 5555,
+          obsminaz2: 0,
+          obsmaxaz2: 0,
+          obsminel2: 0,
+          obsmaxel2: 0,
+          obsminrange2: 0,
+          obsmaxrange2: 0
         });
         break;
       case 1:// Clear
@@ -4599,7 +3398,13 @@ var lookangles = (function () {
           obsminel: 3,
           obsmaxel: 85,
           obsminrange: 200,
-          obsmaxrange: 4910
+          obsmaxrange: 4910,
+          obsminaz2: 0,
+          obsmaxaz2: 0,
+          obsminel2: 0,
+          obsmaxel2: 0,
+          obsminrange2: 0,
+          obsmaxrange2: 0
         });
         break;
       case 2:// Beale
@@ -4612,7 +3417,13 @@ var lookangles = (function () {
           obsminel: 3,
           obsmaxel: 85,
           obsminrange: 200,
-          obsmaxrange: 5555
+          obsmaxrange: 5555,
+          obsminaz2: 0,
+          obsmaxaz2: 0,
+          obsminel2: 0,
+          obsmaxel2: 0,
+          obsminrange2: 0,
+          obsmaxrange2: 0
         });
         break;
       case 3:// Cavalier
@@ -4625,7 +3436,13 @@ var lookangles = (function () {
           obsminel: 1.9,
           obsmaxel: 95,
           obsminrange: 200,
-          obsmaxrange: 3300 // TODO: Double check this
+          obsmaxrange: 3300,
+          obsminaz2: 0,
+          obsmaxaz2: 0,
+          obsminel2: 0,
+          obsmaxel2: 0,
+          obsminrange2: 0,
+          obsmaxrange2: 0
         });
         break;
       case 4:// Fylingdales
@@ -4638,7 +3455,13 @@ var lookangles = (function () {
           obsminel: 3,
           obsmaxel: 85,
           obsminrange: 200,
-          obsmaxrange: 4820
+          obsmaxrange: 4820,
+          obsminaz2: 0,
+          obsmaxaz2: 0,
+          obsminel2: 0,
+          obsmaxel2: 0,
+          obsminrange2: 0,
+          obsmaxrange2: 0
         });
         break;
       case 5:// Eglin
@@ -4651,7 +3474,13 @@ var lookangles = (function () {
           obsminel: 3,
           obsmaxel: 105,
           obsminrange: 200,
-          obsmaxrange: 50000
+          obsmaxrange: 50000,
+          obsminaz2: 0,
+          obsmaxaz2: 0,
+          obsminel2: 0,
+          obsmaxel2: 0,
+          obsminrange2: 0,
+          obsmaxrange2: 0
         });
         break;
       case 6:// Thule
@@ -4664,7 +3493,13 @@ var lookangles = (function () {
           obsminel: 3,
           obsmaxel: 85,
           obsminrange: 200,
-          obsmaxrange: 5555
+          obsmaxrange: 5555,
+          obsminaz2: 0,
+          obsmaxaz2: 0,
+          obsminel2: 0,
+          obsmaxel2: 0,
+          obsminrange2: 0,
+          obsmaxrange2: 0
         });
         break;
       case 7:// Millstone
@@ -4677,7 +3512,13 @@ var lookangles = (function () {
           obsminel: 1,
           obsmaxel: 90,
           obsminrange: 200,
-          obsmaxrange: 50000
+          obsmaxrange: 50000,
+          obsminaz2: 0,
+          obsmaxaz2: 0,
+          obsminel2: 0,
+          obsmaxel2: 0,
+          obsminrange2: 0,
+          obsmaxrange2: 0
         });
         break;
       case 8:// ALTAIR
@@ -4690,13 +3531,39 @@ var lookangles = (function () {
           obsminel: 1,
           obsmaxel: 90,
           obsminrange: 200,
-          obsmaxrange: 50000
+          obsmaxrange: 50000,
+          obsminaz2: 0,
+          obsmaxaz2: 0,
+          obsminel2: 0,
+          obsmaxel2: 0,
+          obsminrange2: 0,
+          obsmaxrange2: 0
+        });
+        break;
+      case 9:// Cobra Dane
+        setobs({
+          lat: 52.737,
+          long: 174.092,
+          hei: 0.010966, // TODO: Find correct height
+          obsminaz: 259,
+          obsmaxaz: 19,
+          obsminel: 2,
+          obsmaxel: 30,
+          obsminrange: 200,
+          obsmaxrange: 4200,
+          obsminaz2: 251,
+          obsmaxaz2: 27,
+          obsminel2: 30,
+          obsmaxel2: 80,
+          obsminrange2: 200,
+          obsmaxrange2: 4200
         });
         break;
     }
+
     observerGd = {                        // Array to calculate look angles in propagate()
-      latitude: obslat * DEG2RAD,
-      longitude: obslong * DEG2RAD,
+      latitude: obslat, // * DEG2RAD,
+      longitude: obslong, // * DEG2RAD,
       height: hei * 1                  // Converts from string to number TODO: Find correct way to convert string to integer
     };
   }
@@ -4723,11 +3590,11 @@ var lookangles = (function () {
     rangeSat = lookAngles.range_sat;
 
     if (obsminaz < obsmaxaz) {
-      if (!((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange))) {
+      if (!((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) && !((azimuth >= obsminaz2 && azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2))) {
         return 0;
       }
     }
-    if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
+    if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)||(azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
       if (isRiseSetLookangles) {
         // Previous Pass to Calculate first line of coverage
         var now1 = propTimeCheck(propOffsetTemp - (lookanglesInterval * 1000), propRealTime);
@@ -4749,7 +3616,7 @@ var lookangles = (function () {
         azimuth1 = lookAngles1.azimuth / DEG2RAD;
         elevation1 = lookAngles1.elevation / DEG2RAD;
         rangeSat1 = lookAngles1.range_sat;
-        if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange))) {
+        if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange))||!((azimuth1 >= obsminaz2 || azimuth1 <= obsmaxaz2) && (elevation1 >= obsminel2 && elevation1 <= obsmaxel2) && (rangeSat1 <= obsmaxrange2 && rangeSat1 >= obsminrange2))) {
           var tr = tbl.insertRow();
           var tdT = tr.insertCell();
           tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
@@ -4781,7 +3648,7 @@ var lookangles = (function () {
           azimuth1 = lookAngles1.azimuth / DEG2RAD;
           elevation1 = lookAngles1.elevation / DEG2RAD;
           rangeSat1 = lookAngles1.range_sat;
-          if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange))) {
+          if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange))&&!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz2) && (elevation1 >= obsminel2 && elevation1 <= obsmaxel2) && (rangeSat1 <= obsmaxrange2 && rangeSat1 >= obsminrange2))) {
             tr = tbl.insertRow();
             tdT = tr.insertCell();
             tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
@@ -4814,6 +3681,7 @@ var lookangles = (function () {
   }
 
   function propagateMultiSite (propOffsetTemp, tbl, satrec, sensor) {
+    // Changes Sensor Name for Lookangles Table
     switch (sensor) {
       case 0:
         sensor = 'Cape Cod';
@@ -4842,8 +3710,12 @@ var lookangles = (function () {
       case 8:
         sensor = 'ALTAIR';
         break;
+      case 9:
+        sensor = 'Cobra Dane';
+        break;
     }
-    var now = propTimeCheck(propOffsetTemp, propRealTime);
+    var propRealTimeTemp = Date.now();
+    var now = propTimeCheck(propOffsetTemp, propRealTimeTemp);
     var j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
@@ -4864,11 +3736,11 @@ var lookangles = (function () {
     rangeSat = lookAngles.range_sat;
 
     if (obsminaz < obsmaxaz) {
-      if (!((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange))) {
+      if (!((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) && !((azimuth >= obsminaz2 && azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2))) {
         return 0;
       }
     }
-    if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) {
+    if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange) || (azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
       var tr;
       if (tbl.rows.length > 0) {
         // console.log(tbl.rows[0].cells[0].textContent);
@@ -5175,11 +4047,10 @@ dateFormat.i18n = {
   ColorScheme.init = function () {
     ColorScheme.default = new ColorScheme(function (satId) {
       var sat = satSet.getSat(satId);
-      console.log(sat);
       if (sat.static) {
         return {
           color: [1.0, 0.0, 0.0, 1.0],
-          pickable: false
+          pickable: true
         };
       }
       var ap = sat.apogee;
@@ -5671,6 +4542,7 @@ dateFormat.i18n = {
       var len = arr[j].length;
 
       for (var i = 0; i < satData.length; i++) {
+        if (satData[i].static) { continue; }
         if ((satData[i].ON.indexOf(str) !== -1) || (satData[i].ON.indexOf(bigstr) !== -1)) {
           results.push({
             isIntlDes: false,
@@ -6848,7 +5720,6 @@ function propTime () {
         for (i = 0; i < staticSet.length; i++) {
           tempSatData.push(staticSet[i]);
         }
-        console.log(tempSatData);
         return tempSatData;
       }
 
@@ -6925,6 +5796,10 @@ function propTime () {
         satsReadyCallback(satData);
       }
     });
+  };
+
+  satSet.getSatData = function () {
+    return satData;
   };
 
   satSet.setColorScheme = function (scheme) {

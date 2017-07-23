@@ -27,11 +27,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 'use strict';
 
-var rad = (deg) => deg * Math.PI / 180;
-var sin = (deg) => Math.sin(rad(deg));
-var cos = (deg) => Math.cos(rad(deg));
-var tan = (deg) => Math.tan(rad(deg));
-var deg = (rad) => rad * 180 / Math.PI;
+var rad = function (deg) { return deg * Math.PI / 180; };
+var sin = function (deg) { return Math.sin(rad(deg)); };
+var cos = function (deg) { return Math.cos(rad(deg)); };
+var tan = function (deg) { return Math.tan(rad(deg)); };
+var deg = function (rad) { return rad * 180 / Math.PI; };
 
 var defaults = {
   meridian: 0,
@@ -39,7 +39,7 @@ var defaults = {
   latLimit: 90
 };
 
-var check = (point) => {
+var check = function (point) {
   if (point.x !== undefined && point.x >= 0 && point.x <= 1 && point.y !== undefined && point.lon === undefined && point.lat === undefined) {
     return {x: +point.x, y: +point.y, wgs: false};
   }
@@ -49,11 +49,11 @@ var check = (point) => {
   throw new Error('Invalid input point.');
 };
 
-var options = (opt) => {
+var options = function (opt) {
   return Object.assign({}, defaults, opt || {});
 };
 
-var addMeridian = (point, meridian) => {
+var addMeridian = function (point, meridian) {
   point = check(point);
   if (meridian !== 0) {
     return check({lon: ((point.lon + 180 + 360 - meridian) % 360) - 180, lat: point.lat});
@@ -61,9 +61,9 @@ var addMeridian = (point, meridian) => {
   return point;
 };
 
-var braun = (point, opt) => {
+var braun = function (point, opt) {
   point = check(point);
-  opt = options(opt);
+  // opt = options(opt);
   if (point.wgs) {
     point = addMeridian(point, opt.meridian);
     return {

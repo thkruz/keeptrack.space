@@ -13,7 +13,7 @@
 
  */
 
-staticSet = [
+var staticSet = [
   {
     static: true,
     name: 'Beale AFB, CA',
@@ -696,8 +696,8 @@ function extractLaunchSite (LS) {
     }
   }
   return {
-    site,
-    sitec
+    site: site,
+    sitec: sitec
   };
 }
 

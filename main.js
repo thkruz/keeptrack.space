@@ -63,6 +63,9 @@ laws of the United States and International Copyright Treaty.
     braun
     staticSet
     sensorManager
+    extractCountry
+    extractLaunchSite
+    extractLiftVehicle
 
 */
 
@@ -72,8 +75,12 @@ laws of the United States and International Copyright Treaty.
 var ZOOM_EXP = 3;
 var DIST_MIN = 6800;
 var DIST_MAX = 200000;
+var TAU = 2 * Math.PI;
+var DEG2RAD = TAU / 360;
+var RAD2DEG = 360 / TAU;
 var RADIUS_OF_EARTH = 6371.0;
-var DEG2RAD = 0.017453292519943295;       // (angle / 180) * Math.PI --- Divide by deg2rad to get rad2deg
+var MINUTES_PER_DAY = 1440;
+var MILLISECONDS_PER_DAY = 1.15741e-8;
 // var maxOrbitsDisplayed = 100; // Used in sat.js and orbit-display.js TODO: issues:23 Add settings option to change maxOrbitsDisplayed
 
 var satCruncher;
@@ -87,7 +94,6 @@ var propFrozen = Date.now(); // for when propRate 0
 var time; // Only used in drawLoop function
 
 // Camera Variables
-var R2D = 180 / Math.PI;
 var camYaw = 0;
 var camPitch = 0.5;
 var camYawTarget = 0;
@@ -686,7 +692,7 @@ $(document).ready(function () { // Code Once index.php is loaded
         setlatlong: true,
         lat: 0,
         long: 0,
-        hei: 0,
+        obshei: 0,
         obsminaz: 0,
         obsmaxaz: 0,
         obsminel: 0,
@@ -697,7 +703,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       lookangles.setobs({
         lat: null,
         long: 0,
-        hei: 0,
+        obshei: 0,
         obsminaz: 0,
         obsmaxaz: 0,
         obsminel: 0,
@@ -1104,7 +1110,7 @@ $(document).ready(function () { // Code Once index.php is loaded
 
     var lon = $('#cs-lon').val();
     var lat = $('#cs-lat').val();
-    var hei = $('#cs-hei').val();
+    var obshei = $('#cs-hei').val();
     var minaz = $('#cs-minaz').val();
     var maxaz = $('#cs-maxaz').val();
     var minel = $('#cs-minel').val();
@@ -1118,7 +1124,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       setlatlong: true, // Tell satcruncher we are changing observer location
       lat: lat,
       long: lon,
-      hei: hei,
+      obshei: obshei,
       obsminaz: minaz,
       obsmaxaz: maxaz,
       obsminel: minel,
@@ -1130,7 +1136,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     lookangles.setobs({
       lat: lat,
       long: lon,
-      hei: hei,
+      obshei: obshei,
       obsminaz: minaz,
       obsmaxaz: maxaz,
       obsminel: minel,
@@ -1797,7 +1803,7 @@ function bottomIconPress (evt) {
           sat = satSet.getSat(selectedSat);
           $('#es-scc').val(sat.SCC_NUM);
 
-          var inc = (sat.inclination * R2D).toPrecision(7);
+          var inc = (sat.inclination * RAD2DEG).toPrecision(7);
           inc = inc.split('.');
           inc[0] = inc[0].substr(-3, 3);
           inc[1] = inc[1].substr(0, 4);
@@ -1808,7 +1814,7 @@ function bottomIconPress (evt) {
           $('#es-day').val(sat.TLE1.substr(20, 12));
           $('#es-meanmo').val(sat.TLE2.substr(52, 11));
 
-          var rasc = (sat.raan * R2D).toPrecision(7);
+          var rasc = (sat.raan * RAD2DEG).toPrecision(7);
           rasc = rasc.split('.');
           rasc[0] = rasc[0].substr(-3, 3);
           rasc[1] = rasc[1].substr(0, 4);
@@ -1817,7 +1823,7 @@ function bottomIconPress (evt) {
           $('#es-rasc').val(pad(rasc, 8));
           $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
 
-          var argPe = (sat.argPe * R2D).toPrecision(7);
+          var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
           argPe = argPe.split('.');
           argPe[0] = argPe[0].substr(-3, 3);
           argPe[1] = argPe[1].substr(0, 4);
@@ -1848,7 +1854,7 @@ function bottomIconPress (evt) {
 
           sat = satSet.getSat(selectedSat);
           $('#nl-scc').val(sat.SCC_NUM);
-          $('#nl-inc').val((sat.inclination * R2D).toPrecision(2));
+          $('#nl-inc').val((sat.inclination * RAD2DEG).toPrecision(2));
         } else {
           if (!$('#menu-newLaunch img:animated').length) {
             $('#menu-newLaunch img').effect('shake', {distance: 10});
@@ -1907,7 +1913,7 @@ function updateUrl () { // URL Updater
   if (lookangles.sensorSelected()) {
     paramSlices.push('lat=' + lookangles.obslat);
     paramSlices.push('long=' + lookangles.obslong);
-    paramSlices.push('hei=' + lookangles.hei);
+    paramSlices.push('hei=' + lookangles.obshei);
     paramSlices.push('minaz=' + lookangles.obsminaz);
     paramSlices.push('maxaz=' + lookangles.obsmaxaz);
     paramSlices.push('minel=' + lookangles.obsminel);
@@ -1982,7 +1988,6 @@ function selectSat (satId) {
     camAngleSnappedOnSat = true;
 
     if (lookangles.sensorSelected()) {
-      console.log('problem');
       $('#menu-lookangles img').removeClass('bmenu-item-disabled');
     }
 
@@ -2045,8 +2050,8 @@ function selectSat (satId) {
     var site = [];
     site = extractLaunchSite(sat.LS);
 
-    $('#sat-site').html(site[0]);
-    $('#sat-sitec').html(site[1]);
+    $('#sat-site').html(site.site);
+    $('#sat-sitec').html(site.sitec);
 
     ga('send', 'event', 'Satellite', 'Country: ' + country, 'Country');
     ga('send', 'event', 'Satellite', 'Site: ' + site, 'Site');
@@ -2075,7 +2080,7 @@ function selectSat (satId) {
     $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
     $('#sat-apogee').html(sat.apogee.toFixed(0) + ' km');
     $('#sat-perigee').html(sat.perigee.toFixed(0) + ' km');
-    $('#sat-inclination').html((sat.inclination * R2D).toFixed(2) + '°');
+    $('#sat-inclination').html((sat.inclination * RAD2DEG).toFixed(2) + '°');
     $('#sat-eccentricity').html((sat.eccentricity).toFixed(3));
 
     $('#sat-period').html(sat.period.toFixed(2) + ' min');
@@ -2727,18 +2732,20 @@ function earthHitTest (x, y) {
 }
 
 var lookangles = (function () {
-  var obslat, obslong, hei, obsminaz, obsmaxaz, obsminel, obsmaxel, obsminrange, obsmaxrange;
+  var obslat;   // Observer Latitude
+  var obslong;  // Observer Longitude
+  var obshei;      // Observer Height
+
+  // Observer FOV
+  var obsminaz, obsmaxaz, obsminel, obsmaxel, obsminrange, obsmaxrange;
+  // Observer Secondary FOV
   var obsminaz2, obsmaxaz2, obsminel2, obsmaxel2, obsminrange2, obsmaxrange2;
+
+  // For saving current sensor information while propagating other sensors
   var tempLat, tempLon, tempHei, tempMinaz, tempMaxaz, tempMinel, tempMaxel, tempMinrange, tempMaxrange;
-  var tempLat2, tempLon2, tempHei2, tempMinaz2, tempMaxaz2, tempMinel2, tempMaxel2, tempMinrange2, tempMaxrange2;
-  this.lat = 0;
-  this.lon = 0;
-  this.altitude = 0;
-  this.azimuth = 0;
-  this.elevation = 0;
-  this.range = 0;
-  this.inview = false;
-  var observerGd = {};
+  var tempMinaz2, tempMaxaz2, tempMinel2, tempMaxel2, tempMinrange2, tempMaxrange2;
+
+  var observerGd = {}; // Used to store obslat, obslon, and hei for satellite.js calculations
 
   var sensorSelected = function () {
     if (obslat != null) {
@@ -2749,8 +2756,8 @@ var lookangles = (function () {
   };
 
   var getsensorinfo = function () {
-    $('#sensor-latitude').html(obslat / DEG2RAD);
-    $('#sensor-longitude').html(obslong / DEG2RAD);
+    $('#sensor-latitude').html(obslat * RAD2DEG);
+    $('#sensor-longitude').html(obslong * RAD2DEG);
     $('#sensor-minazimuth').html(obsminaz);
     $('#sensor-maxazimuth').html(obsmaxaz);
     $('#sensor-minelevation').html(obsminel);
@@ -2765,25 +2772,16 @@ var lookangles = (function () {
       obslat = null;
     } else {
       obslat = obs.lat * DEG2RAD;         // Observer Lattitude - use Google Maps
-      this.obslat = obslat;
     }
     obslong = obs.long * DEG2RAD;         // Observer Longitude - use Google Maps
-    this.obslong = obslong;
 
-    hei = obs.hei * 1;                    // Observer Height in Km
-    this.hei = hei;
+    obshei = obs.hei * 1;                    // Observer Height in Km
     obsminaz = obs.obsminaz;              // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
     obsmaxaz = obs.obsmaxaz;              // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
     obsminel = obs.obsminel;              // Observer min elevation
     obsmaxel = obs.obsmaxel;              // Observer max elevation
     obsminrange = obs.obsminrange;        // Observer min range NOTE: These are functionally useful guesses for spacetrack purposes in order to avoid classification issues
     obsmaxrange = obs.obsmaxrange;        // Observer max range TODO: Determine how to calculate max range with transmit cycle information
-    this.obsminaz = obsminaz;              // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
-    this.obsmaxaz = obsmaxaz;              // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
-    this.obsminel = obsminel;              // Observer min elevation
-    this.obsmaxel = obsmaxel;              // Observer max elevation
-    this.obsminrange = obsminrange;        // Observer min range NOTE: These are functionally useful guesses for spacetrack purposes in order to avoid classification issues
-    this.obsmaxrange = obsmaxrange;        // Observer max range TODO: Determine how to calculate max range with transmit cycle information
 
     if (!obs.obsmaxrange2) {
       obsminaz2 = 0;
@@ -2792,12 +2790,6 @@ var lookangles = (function () {
       obsmaxel2 = 0;
       obsminrange2 = 0;
       obsmaxrange2 = 0;
-      this.obsminaz2 = 0;
-      this.obsmaxaz2 = 0;
-      this.obsminel2 = 0;
-      this.obsmaxel2 = 0;
-      this.obsminrange2 = 0;
-      this.obsmaxrange2 = 0;
     } else {
       obsminaz2 = obs.obsminaz2;              // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
       obsmaxaz2 = obs.obsmaxaz2;              // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
@@ -2805,18 +2797,12 @@ var lookangles = (function () {
       obsmaxel2 = obs.obsmaxel2;              // Observer max elevation
       obsminrange2 = obs.obsminrange2;        // Observer min range NOTE: These are functionally useful guesses for spacetrack purposes in order to avoid classification issues
       obsmaxrange2 = obs.obsmaxrange2;        // Observer max range TODO: Determine how to calculate max range with transmit cycle information
-      this.obsminaz2 = obsminaz2;              // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
-      this.obsmaxaz2 = obsmaxaz2;              // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
-      this.obsminel2 = obsminel2;              // Observer min elevation
-      this.obsmaxel2 = obsmaxel2;              // Observer max elevation
-      this.obsminrange2 = obsminrange2;        // Observer min range NOTE: These are functionally useful guesses for spacetrack purposes in order to avoid classification issues
-      this.obsmaxrange2 = obsmaxrange2;        // Observer max range TODO: Determine how to calculate max range with transmit cycle information
     }
 
     observerGd = {                        // Array to calculate look angles in propagate()
       latitude: obslat,
       longitude: obslong,
-      height: hei                         // Converts from string to number TODO: Find correct way to convert string to integer
+      height: obshei                         // Converts from string to number TODO: Find correct way to convert string to integer
     };
   };
 
@@ -2829,10 +2815,10 @@ var lookangles = (function () {
                  propTime.getUTCHours(),
                  propTime.getUTCMinutes(),
                  propTime.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-    j += propTime.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+    j += propTime.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
     var gmst = satellite.gstime_from_jday(j);
 
-    var m = (j - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+    var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
     var pv = satellite.sgp4(satrec, m);
     var gpos;
 
@@ -2855,10 +2841,10 @@ var lookangles = (function () {
                  now.getUTCHours(),
                  now.getUTCMinutes(),
                  now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-    j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
     var gmst = satellite.gstime_from_jday(j);
 
-    var m = (j - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+    var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
     var pv = satellite.sgp4(satrec, m);
     var positionEcf, lookAngles;
     var gpos;
@@ -2870,8 +2856,8 @@ var lookangles = (function () {
       this.lat = gpos.latitude;
       positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
       lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
-      this.azimuth = lookAngles.azimuth / DEG2RAD;
-      this.elevation = lookAngles.elevation / DEG2RAD;
+      this.azimuth = lookAngles.azimuth * RAD2DEG;
+      this.elevation = lookAngles.elevation * RAD2DEG;
       this.range = lookAngles.range_sat;
     } catch (e) {
       this.altitude = 0;
@@ -2912,17 +2898,17 @@ var lookangles = (function () {
       now.getUTCHours(),
       now.getUTCMinutes(),
       now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
       var gmst = satellite.gstime_from_jday(j);
 
-      var m = (j - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
       var pv = satellite.sgp4(satrec, m);
       var positionEcf, lookAngles, azimuth, elevation, rangeSat;
 
       positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
       lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
-      azimuth = lookAngles.azimuth / DEG2RAD;
-      elevation = lookAngles.elevation / DEG2RAD;
+      azimuth = lookAngles.azimuth * RAD2DEG;
+      elevation = lookAngles.elevation * RAD2DEG;
       rangeSat = lookAngles.range_sat;
 
       if (obsminaz > obsmaxaz) {
@@ -2963,7 +2949,7 @@ var lookangles = (function () {
     setSensor(0);
 
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-    var orbitalPeriod = 1440 * 60 / (satrec.no * 60 * 24 / (2 * Math.PI)); // Seconds in a day divided by mean motion
+    var orbitalPeriod = MINUTES_PER_DAY * 60 / (satrec.no * 60 * 24 / (2 * Math.PI)); // Seconds in a day divided by mean motion
     console.log(orbitalPeriod);
     var tbl = document.getElementById('looksmultisite');           // Identify the table to update
     tbl.innerHTML = '';                                   // Clear the table from old object data
@@ -3080,7 +3066,7 @@ var lookangles = (function () {
       meana = parseFloat(meana).toPrecision(7);
       meana = pad(meana, 8);
 
-      var rasc = (sat.raan * R2D).toPrecision(7);
+      var rasc = (sat.raan * RAD2DEG).toPrecision(7);
       if (rascOffset) {
         rasc = (rasc * 1) + 180; // Spin the orbit 180 degrees.
         if (rasc > 360) {
@@ -3097,7 +3083,7 @@ var lookangles = (function () {
       var scc = sat.SCC_NUM;
 
       var intl = sat.TLE1.substr(9, 8);
-      var inc = (sat.inclination * R2D).toPrecision(7);
+      var inc = (sat.inclination * RAD2DEG).toPrecision(7);
       inc = inc.split('.');
       inc[0] = inc[0].substr(-3, 3);
       inc[1] = inc[1].substr(0, 4);
@@ -3111,7 +3097,7 @@ var lookangles = (function () {
 
       var ecen = sat.eccentricity.toPrecision(7).substr(2, 7);
 
-      var argPe = (sat.argPe * R2D).toPrecision(7);
+      var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
       argPe = argPe.split('.');
       argPe[0] = argPe[0].substr(-3, 3);
       argPe[1] = argPe[1].substr(0, 4);
@@ -3156,7 +3142,7 @@ var lookangles = (function () {
       var scc = sat.SCC_NUM;
 
       var intl = sat.TLE1.substr(9, 8);
-      var inc = (sat.inclination * R2D).toPrecision(7);
+      var inc = (sat.inclination * RAD2DEG).toPrecision(7);
       inc = inc.split('.');
       inc[0] = inc[0].substr(-3, 3);
       inc[1] = inc[1].substr(0, 4);
@@ -3170,7 +3156,7 @@ var lookangles = (function () {
 
       var ecen = sat.eccentricity.toPrecision(7).substr(2, 7);
 
-      var argPe = (sat.argPe * R2D).toPrecision(7);
+      var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
       argPe = argPe.split('.');
       argPe[0] = argPe[0].substr(-3, 3);
       argPe[1] = argPe[1].substr(0, 4);
@@ -3204,10 +3190,10 @@ var lookangles = (function () {
                    now.getUTCHours(),
                    now.getUTCMinutes(),
                    now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
       var gmst = satellite.gstime_from_jday(j);
 
-      var m = (j - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
       var pv = satellite.sgp4(satrec, m);
 
       var gpos, lat, lon;
@@ -3314,7 +3300,7 @@ var lookangles = (function () {
   function setTempSensor () {
     tempLat = obslat;
     tempLon = obslong;
-    tempHei = hei;
+    tempHei = obshei;
     tempMinel = obsminel;
     tempMaxel = obsmaxel;
     tempMinrange = obsminrange;
@@ -3334,7 +3320,7 @@ var lookangles = (function () {
       lookangles.setobs({
         lat: null,
         long: 0,
-        hei: 0,
+        obshei: 0,
         obsminaz: 0,
         obsmaxaz: 0,
         obsminel: 0,
@@ -3345,7 +3331,7 @@ var lookangles = (function () {
     } else {
       obslat = tempLat;
       obslong = tempLon;
-      hei = tempHei;
+      obshei = tempHei;
       obsminel = tempMinel;
       obsmaxel = tempMaxel;
       obsminrange = tempMinrange;
@@ -3361,7 +3347,7 @@ var lookangles = (function () {
       observerGd = {                        // Array to calculate look angles in propagate()
         latitude: obslat * DEG2RAD,
         longitude: obslong * DEG2RAD,
-        height: hei * 1                  // Converts from string to number TODO: Find correct way to convert string to integer
+        height: obshei * 1                  // Converts from string to number TODO: Find correct way to convert string to integer
       };
     }
   }
@@ -3372,7 +3358,7 @@ var lookangles = (function () {
         setobs({
           lat: 41.754785,
           long: -70.539151,
-          hei: 0.060966,
+          obshei: 0.060966,
           obsminaz: 347,
           obsmaxaz: 227,
           obsminel: 3,
@@ -3391,7 +3377,7 @@ var lookangles = (function () {
         setobs({
           lat: 64.290556,
           long: -149.186944,
-          hei: 0.060966,
+          obshei: 0.060966,
           obsminaz: 184,
           obsmaxaz: 64,
           obsminel: 3,
@@ -3410,7 +3396,7 @@ var lookangles = (function () {
         setobs({
           lat: 39.136064,
           long: -121.351237,
-          hei: 0.060966, // TODO: Find correct height
+          obshei: 0.060966, // TODO: Find correct height
           obsminaz: 126,
           obsmaxaz: 6,
           obsminel: 3,
@@ -3429,7 +3415,7 @@ var lookangles = (function () {
         setobs({
           lat: 48.724567,
           long: -97.899755,
-          hei: 0.060966, // TODO: Find correct height
+          obshei: 0.060966, // TODO: Find correct height
           obsminaz: 298,
           obsmaxaz: 78,
           obsminel: 1.9,
@@ -3448,7 +3434,7 @@ var lookangles = (function () {
         setobs({
           lat: 54.361758,
           long: -0.670051,
-          hei: 0.060966, // TODO: Find correct height
+          obshei: 0.060966, // TODO: Find correct height
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 3,
@@ -3467,7 +3453,7 @@ var lookangles = (function () {
         setobs({
           lat: 30.572411,
           long: -86.214836,
-          hei: 0.060966, // TODO: Confirm Altitude
+          obshei: 0.060966, // TODO: Confirm Altitude
           obsminaz: 120,
           obsmaxaz: 240,
           obsminel: 3,
@@ -3486,7 +3472,7 @@ var lookangles = (function () {
         setobs({
           lat: 76.570322,
           long: -68.299211,
-          hei: 0.060966, // TODO: Find correct height
+          obshei: 0.060966, // TODO: Find correct height
           obsminaz: 297,
           obsmaxaz: 177,
           obsminel: 3,
@@ -3505,7 +3491,7 @@ var lookangles = (function () {
         setobs({
           lat: 42.6233,
           long: -71.4882,
-          hei: 0.131,
+          obshei: 0.131,
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 1,
@@ -3524,7 +3510,7 @@ var lookangles = (function () {
         setobs({
           lat: 8.716667,
           long: 167.733333,
-          hei: 0,
+          obshei: 0,
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 1,
@@ -3543,7 +3529,7 @@ var lookangles = (function () {
         setobs({
           lat: 52.737,
           long: 174.092,
-          hei: 0.010966, // TODO: Find correct height
+          obshei: 0.010966, // TODO: Find correct height
           obsminaz: 259,
           obsmaxaz: 19,
           obsminel: 2,
@@ -3563,7 +3549,7 @@ var lookangles = (function () {
     observerGd = {                        // Array to calculate look angles in propagate()
       latitude: obslat, // * DEG2RAD,
       longitude: obslong, // * DEG2RAD,
-      height: hei * 1                  // Converts from string to number TODO: Find correct way to convert string to integer
+      height: obshei * 1                  // Converts from string to number TODO: Find correct way to convert string to integer
     };
   }
 
@@ -3575,17 +3561,17 @@ var lookangles = (function () {
                  now.getUTCHours(),
                  now.getUTCMinutes(),
                  now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-    j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
     var gmst = satellite.gstime_from_jday(j);
 
-    var m = (j - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+    var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
     var pv = satellite.sgp4(satrec, m);
     var positionEcf, lookAngles, azimuth, elevation, rangeSat;
 
     positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
     lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
-    azimuth = lookAngles.azimuth / DEG2RAD;
-    elevation = lookAngles.elevation / DEG2RAD;
+    azimuth = lookAngles.azimuth * RAD2DEG;
+    elevation = lookAngles.elevation * RAD2DEG;
     rangeSat = lookAngles.range_sat;
 
     if (obsminaz < obsmaxaz) {
@@ -3593,7 +3579,7 @@ var lookangles = (function () {
         return 0;
       }
     }
-    if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)||(azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
+    if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange) || (azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
       if (isRiseSetLookangles) {
         // Previous Pass to Calculate first line of coverage
         var now1 = propTimeCheck(propTempOffset - (lookanglesInterval * 1000), propRealTime);
@@ -3603,19 +3589,19 @@ var lookangles = (function () {
                      now1.getUTCHours(),
                      now1.getUTCMinutes(),
                      now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-        j1 += now1.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+        j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
         var gmst1 = satellite.gstime_from_jday(j1);
 
-        var m1 = (j1 - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+        var m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
         var pv1 = satellite.sgp4(satrec, m1);
         var positionEcf1, lookAngles1, azimuth1, elevation1, rangeSat1;
 
         positionEcf1 = satellite.eci_to_ecf(pv1.position, gmst1); // pv.position is called positionEci originally
         lookAngles1 = satellite.ecf_to_look_angles(observerGd, positionEcf1);
-        azimuth1 = lookAngles1.azimuth / DEG2RAD;
-        elevation1 = lookAngles1.elevation / DEG2RAD;
+        azimuth1 = lookAngles1.azimuth * RAD2DEG;
+        elevation1 = lookAngles1.elevation * RAD2DEG;
         rangeSat1 = lookAngles1.range_sat;
-        if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange))||!((azimuth1 >= obsminaz2 || azimuth1 <= obsmaxaz2) && (elevation1 >= obsminel2 && elevation1 <= obsmaxel2) && (rangeSat1 <= obsmaxrange2 && rangeSat1 >= obsminrange2))) {
+        if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange)) || !((azimuth1 >= obsminaz2 || azimuth1 <= obsmaxaz2) && (elevation1 >= obsminel2 && elevation1 <= obsmaxel2) && (rangeSat1 <= obsmaxrange2 && rangeSat1 >= obsminrange2))) {
           var tr = tbl.insertRow();
           var tdT = tr.insertCell();
           tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
@@ -3636,18 +3622,18 @@ var lookangles = (function () {
                        now1.getUTCHours(),
                        now1.getUTCMinutes(),
                        now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-          j1 += now1.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+          j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
           gmst1 = satellite.gstime_from_jday(j1);
 
-          m1 = (j1 - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+          m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
           pv1 = satellite.sgp4(satrec, m1);
 
           positionEcf1 = satellite.eci_to_ecf(pv1.position, gmst1); // pv.position is called positionEci originally
           lookAngles1 = satellite.ecf_to_look_angles(observerGd, positionEcf1);
-          azimuth1 = lookAngles1.azimuth / DEG2RAD;
-          elevation1 = lookAngles1.elevation / DEG2RAD;
+          azimuth1 = lookAngles1.azimuth * RAD2DEG;
+          elevation1 = lookAngles1.elevation * RAD2DEG;
           rangeSat1 = lookAngles1.range_sat;
-          if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange))&&!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz2) && (elevation1 >= obsminel2 && elevation1 <= obsmaxel2) && (rangeSat1 <= obsmaxrange2 && rangeSat1 >= obsminrange2))) {
+          if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange)) && !((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz2) && (elevation1 >= obsminel2 && elevation1 <= obsmaxel2) && (rangeSat1 <= obsmaxrange2 && rangeSat1 >= obsminrange2))) {
             tr = tbl.insertRow();
             tdT = tr.insertCell();
             tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
@@ -3721,17 +3707,17 @@ var lookangles = (function () {
                  now.getUTCHours(),
                  now.getUTCMinutes(),
                  now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-    j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
     var gmst = satellite.gstime_from_jday(j);
 
-    var m = (j - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+    var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
     var pv = satellite.sgp4(satrec, m);
     var positionEcf, lookAngles, azimuth, elevation, rangeSat;
 
     positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
     lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
-    azimuth = lookAngles.azimuth / DEG2RAD;
-    elevation = lookAngles.elevation / DEG2RAD;
+    azimuth = lookAngles.azimuth * RAD2DEG;
+    elevation = lookAngles.elevation * RAD2DEG;
     rangeSat = lookAngles.range_sat;
 
     if (obsminaz < obsmaxaz) {
@@ -3800,10 +3786,10 @@ var lookangles = (function () {
                    now.getUTCHours(),
                    now.getUTCMinutes(),
                    now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
       var gmst = satellite.gstime_from_jday(j);
 
-      var m = (j - satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
       var pv = satellite.sgp4(satrec, m);
 
       var gpos, lat, lon;
@@ -3817,8 +3803,8 @@ var lookangles = (function () {
       var positionEcf, lookAngles, azimuth, elevation, rangeSat;
       positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
       lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
-      azimuth = lookAngles.azimuth / DEG2RAD;
-      elevation = lookAngles.elevation / DEG2RAD;
+      azimuth = lookAngles.azimuth * RAD2DEG;
+      elevation = lookAngles.elevation * RAD2DEG;
       rangeSat = lookAngles.range_sat;
       var inview = 0;
 
@@ -4117,7 +4103,6 @@ dateFormat.i18n = {
     });
     ColorScheme.rcs = new ColorScheme(function (satId) {
       var rcs = satSet.getSat(satId).R;
-      // var SCC = satSet.getSat(satId).SCC_NUM;
       if (rcs < 0.1) {
         return {
           color: [1.0, 0, 0, 0.6],
@@ -5106,13 +5091,13 @@ function propTime () {
       var latAngle = (Math.PI / NUM_LAT_SEGS) * lat - (Math.PI / 2);
       var diskRadius = Math.cos(Math.abs(latAngle));
       var z = Math.sin(latAngle);
-      // console.log('LAT: ' + latAngle * R2D + ' , Z: ' + z);
+      // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
       // var i = 0;
       for (var lon = 0; lon <= NUM_LON_SEGS; lon++) { // add an extra vertex for texture funness
         var lonAngle = (Math.PI * 2 / NUM_LON_SEGS) * lon;
         var x = Math.cos(lonAngle) * diskRadius;
         var y = Math.sin(lonAngle) * diskRadius;
-        // console.log('i: ' + i + '    LON: ' + lonAngle * R2D + ' X: ' + x + ' Y: ' + y)
+        // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
 
         // mercator cylindrical projection (simple angle interpolation)
         var v = 1 - (lat / NUM_LAT_SEGS);
@@ -5207,7 +5192,7 @@ function propTime () {
                  now.getUTCHours(),
                  now.getUTCMinutes(),
                  now.getUTCSeconds());
-    j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
 
     var era = satellite.gstime_from_jday(j);
 
@@ -5290,7 +5275,7 @@ function propTime () {
                  now.getUTCHours(),
                  now.getUTCMinutes(),
                  now.getUTCSeconds());
-    j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
 
     return getDirection(j);
   }
@@ -5391,7 +5376,6 @@ function propTime () {
   satCruncher.onmessage = function (m) {
     if (!gotExtraData) { // store extra data that comes from crunching
       // Only do this once
-      // var start = performance.now();
 
       satExtraData = JSON.parse(m.data.extraData);
 
@@ -5407,21 +5391,8 @@ function propTime () {
         satData[i].apogee = satExtraData[i].apogee;
         satData[i].perigee = satExtraData[i].perigee;
         satData[i].period = satExtraData[i].period;
-
-        // Converts JSON File into Words NOTE: This allows shrinking the JSON file
-        // if (satExtraData[i].OBJECT_TYPE) {
-        //   satData[i].OBJECT_TYPE = satExtraData[i].OBJECT_TYPE;
-        // }
-        satData[i].SCC_NUM = satExtraData[i].SCC_NUM;
-        // satData[i].RCS_SIZE = satExtraData[i].RCS_SIZE;
-        // satData[i].LAUNCH_SITE = satExtraData[i].LAUNCH_SITE;
-        // satData[i].LAUNCH_SITEC = satExtraData[i].LAUNCH_SITEC;
-        // satData[i].LAUNCH_VEHICLE = satExtraData[i].LAUNCH_VEHICLE;
-        // satData[i].COUNTRY = satExtraData[i].COUNTRY;
-        // satData[i].INTLDES = satExtraData[i].INTLDES;
       }
 
-      // console.log('sat.js copied extra data in ' + (performance.now() - start) + ' ms');
       gotExtraData = true;
       return;
     }
@@ -5448,12 +5419,6 @@ function propTime () {
 
     satPos = new Float32Array(m.data.satPos);
     satVel = new Float32Array(m.data.satVel);
-    // satAlt = new Float32Array(m.data.satAlt);
-    // satLon = new Float32Array(m.data.satLon);
-    // satLat = new Float32Array(m.data.satLat);
-    // satAzimuth = new Float32Array(m.data.satAzimuth);
-    // satElevation = new Float32Array(m.data.satElevation);
-    // satRange = new Float32Array(m.data.satRange);
     satInView = new Float32Array(m.data.satInView);
 
     var now = Date.now();
@@ -5681,7 +5646,7 @@ function propTime () {
         }
 
         for (var i = 0; i < resp.length; i++) {
-          var SCC_NUM = pad(resp[i].TLE1.substr(2, 5).trim(), 5);
+          resp[i].SCC_NUM = pad(resp[i].TLE1.substr(2, 5).trim(), 5);
           var year;
           var prefix;
           var rest;
@@ -5700,7 +5665,7 @@ function propTime () {
             continue;
           } else { // If there are limited satellites
             for (var x = 0; x < limitSatsArray.length; x++) {
-              if (SCC_NUM === limitSatsArray[x]) {
+              if (resp[i].SCC_NUM === limitSatsArray[x]) {
                 year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
                 if (year === '') {
                   resp[i].intlDes = 'none';
@@ -5734,7 +5699,7 @@ function propTime () {
         lookangles.setobs({
           lat: obslatitude,
           long: obslongitude,
-          hei: obsheight,
+          obshei: obsheight,
           obsminaz: obsminaz,
           obsmaxaz: obsmaxaz,
           obsminel: obsminel,
@@ -5749,7 +5714,7 @@ function propTime () {
           setlatlong: true,
           lat: obslatitude,
           long: obslongitude,
-          hei: obsheight,
+          obshei: obsheight,
           obsminaz: obsminaz,
           obsmaxaz: obsmaxaz,
           obsminel: obsminel,
@@ -6111,7 +6076,7 @@ function propTime () {
     function checkInc (possibles, minInc, maxInc) {
       var IncRes = [];
       for (var i = 0; i < possibles.length; i++) {
-        if ((possibles[i].inclination * R2D).toFixed(2) < maxInc && (possibles[i].inclination * R2D).toFixed(2) > minInc) {
+        if ((possibles[i].inclination * RAD2DEG).toFixed(2) < maxInc && (possibles[i].inclination * RAD2DEG).toFixed(2) > minInc) {
           IncRes.push(possibles[i]);
         }
       }
@@ -6169,7 +6134,6 @@ function propTime () {
     }
     selectedSat = i;
     if (lookangles.sensorSelected()) {
-      console.log('problem');
       $('#menu-lookangles img').removeClass('bmenu-item-disabled');
     }
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');

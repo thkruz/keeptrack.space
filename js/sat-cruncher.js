@@ -13,49 +13,51 @@
 */
 importScripts('satellite.min.js');
 
-// var satInView = [];
-var satCache = [];
-var satPos, satVel;
-var satInView;
-// Set the Observer Location and then convert to RADIANS
-var DEG2RAD = 0.017453292519943295; // (angle / 180) * Math.PI
-var RADIUS_OF_EARTH = 6371.0;
+/** CONSTANTS */
+var TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
+var DEG2RAD = TAU / 360;          // Used to convert degrees to radians
+var RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
+var RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
 
-var latitude = 0;
-var longitude = 0;
-var height = 0;
-var observerGd = {};
-var obsminaz = 0;
-var obsmaxaz = 0;
-var obsminel = 0;
-var obsmaxel = 0;
-var obsminrange = 0;
-var obsmaxrange = 0;
-var obsminaz2 = 0;
-var obsmaxaz2 = 0;
-var obsminel2 = 0;
-var obsmaxel2 = 0;
-var obsminrange2 = 0;
-var obsmaxrange2 = 0;
+/** ARRAYS */
+var satCache = [];                // Cache of Satellite Data from TLE.json and Static Data from variable.js
+var satPos, satVel;               // Array of current Satellite and Static Positions and Velocities
+var satInView;                    // Array of booleans showing if current Satellite is in view of Sensor
 
-// offset letting us propagate in the future (or past)
-var propOffset = 0;
+/** OBSERVER VARIABLES */
+var latitude = 0;                 // latitude of Sensor
+var longitude = 0;                // longitude of Sensor
+var obshei = 0;                   // Height of Sensor
+var observerGd = {};              // Latitude, Longitude, and Height in an Array for Satellite.js Calculations
+var obsminaz = 0;                 // Minimum Azimuth of Sensor FOV
+var obsmaxaz = 0;                 // Maximum Azimuth of Sensor FOV
+var obsminel = 0;                 // Minimum Elevation of Sensor FOV
+var obsmaxel = 0;                 // Maximum Elevation of Sensor FOV
+var obsminrange = 0;              // Minimum Range of Sensor FOV
+var obsmaxrange = 0;              // Maximum Range of Sensor FOV
+var obsminaz2 = 0;                // Minimum Azimuth of Secondary Sensor FOV
+var obsmaxaz2 = 0;                // Maximum Azimuth of Secondary Sensor FOV
+var obsminel2 = 0;                // Minimum Elevation of Secondary Sensor FOV
+var obsmaxel2 = 0;                // Maximum Elevation of Secondary Sensor FOV
+var obsminrange2 = 0;              // Minimum Range of Secondary Sensor FOV
+var obsmaxrange2 = 0;              // Maximum Range of Secondary Sensor FOV
 
-// these let us run time faster (or slower) than normal
-var propRate = 1;
-var propRealTime = Date.now();
+/** TIME VARIABLES */
+var propOffset = 0;                 // offset letting us propagate in the future (or past)
+var propRate = 1;                   // lets us run time faster (or slower) than normal
+var propRealTime = Date.now();      // lets us run time faster (or slower) than normal
 
 onmessage = function (m) {
-  var start = Date.now();
+  propRealTime = Date.now();
 
   if (m.data.lat) { latitude = m.data.lat; }
   if (m.data.long) { longitude = m.data.long; }
-  if (m.data.hei) { height = m.data.hei; } // string
+  if (m.data.obshei) { obshei = m.data.obshei; } // string
   if (m.data.setlatlong) {
     observerGd = {
       longitude: longitude * DEG2RAD,
       latitude: latitude * DEG2RAD,
-      height: height * 1 // Convert from string
+      obshei: obshei * 1 // Convert from string
     };
     if (m.data.obsminaz != null) { obsminaz = m.data.obsminaz * 1; }
     if (m.data.obsmaxaz != null) { obsmaxaz = m.data.obsmaxaz * 1; }
@@ -69,25 +71,12 @@ onmessage = function (m) {
     if (m.data.obsmaxel2 != null) { obsmaxel2 = m.data.obsmaxel * 1; }
     if (m.data.obsminrange2 != null) { obsminrange2 = m.data.obsminrange * 1; }
     if (m.data.obsmaxrange2 != null) { obsmaxrange2 = m.data.obsmaxrange * 1; }
-    if (m.data.obsminaz2 == null) { obsminaz2 = 0; }
-    if (m.data.obsmaxaz2 == null) { obsmaxaz2 = 0; }
-    if (m.data.obsminel2 == null) { obsminel2 = 0; }
-    if (m.data.obsmaxel2 == null) { obsmaxel2 = 0; }
-    if (m.data.obsminrange2 == null) { obsminrange2 = 0; }
-    if (m.data.obsmaxrange2 == null) { obsmaxrange2 = 0; }
-  }
-
-  function pad (num, size) {
-    var s = '00000' + num;
-    return s.substr(s.length - size);
   }
 
   switch (m.data.typ) {
     case 'offset':
       propOffset = Number(m.data.dat.split(' ')[0]);
       propRate = Number(m.data.dat.split(' ')[1]);
-      // console.log('sat-cruncher offset: ' + propOffset + ' rate: ' + propRate);
-      propRealTime = start;
       return;
     case 'satdata':
       var satData = JSON.parse(m.data.dat);
@@ -104,17 +93,17 @@ onmessage = function (m) {
           satrec = satellite.twoline2satrec( // perform and store sat init calcs
             satData[i].TLE1, satData[i].TLE2);
 
-          extra.SCC_NUM = pad(satData[i].TLE1.substr(2, 5).trim(), 5);
+          // extra.SCC_NUM = pad(satData[i].TLE1.substr(2, 5).trim(), 5);
 
           extra.inclination = satrec.inclo; // rads
           extra.eccentricity = satrec.ecco;
           extra.raan = satrec.nodeo;        // rads
           extra.argPe = satrec.argpo;       // rads
-          extra.meanMotion = satrec.no * 60 * 24 / (2 * Math.PI); // convert rads/minute to rev/day
+          extra.meanMotion = satrec.no * 60 * 24 / TAU; // convert rads/minute to rev/day
           extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, (2 / 3));
           extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));
-          extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - 6371;
-          extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - 6371;
+          extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - RADIUS_OF_EARTH;
+          extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - RADIUS_OF_EARTH;
           extra.period = 1440.0 / extra.meanMotion;
         }
 
@@ -126,7 +115,6 @@ onmessage = function (m) {
       satVel = new Float32Array(len * 3);
       satInView = new Float32Array(len);
 
-      // var postStart = Date.now();
       postMessage({
         extraData: JSON.stringify(extraData)
       });
@@ -150,8 +138,8 @@ onmessage = function (m) {
       // fun other data
       extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, (2 / 3));
       extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));
-      extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - 6371;
-      extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - 6371;
+      extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - RADIUS_OF_EARTH;
+      extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - RADIUS_OF_EARTH;
       extra.period = 1440.0 / extra.meanMotion;
       extra.TLE1 = m.data.TLE1;
       extra.TLE2 = m.data.TLE2;
@@ -163,12 +151,10 @@ onmessage = function (m) {
       });
       break;
   }
-  // console.log('sat-cruncher init: ' + (Date.now() - start) + ' ms  (incl post: ' + (Date.now() - postStart) + ' ms)');
   propagate();
 };
 
 function propagate () {
-  // profile  var start = performance.now();
   var now = propTime();
   // console.log('sat-cruncher propagate: ' + now);
   var j = jday(now.getUTCFullYear(),
@@ -182,10 +168,10 @@ function propagate () {
 
   for (var i = 0; i < satCache.length; i++) {
     if (satCache[i].static) {
-      var cosLat = Math.cos(satCache[i].lat * Math.PI / 180.0);
-      var sinLat = Math.sin(satCache[i].lat * Math.PI / 180.0);
-      var cosLon = Math.cos((satCache[i].lon * Math.PI / 180.0) + gmst);
-      var sinLon = Math.sin((satCache[i].lon * Math.PI / 180.0) + gmst);
+      var cosLat = Math.cos(satCache[i].lat * DEG2RAD);
+      var sinLat = Math.sin(satCache[i].lat * DEG2RAD);
+      var cosLon = Math.cos((satCache[i].lon * DEG2RAD) + gmst);
+      var sinLon = Math.sin((satCache[i].lon * DEG2RAD) + gmst);
 
       satPos[i * 3] = (RADIUS_OF_EARTH + 3) * cosLat * cosLon;
       satPos[i * 3 + 1] = (RADIUS_OF_EARTH + 3) * cosLat * sinLon;
@@ -196,9 +182,9 @@ function propagate () {
       satVel[i * 3 + 2] = 0;
     } else {
       var m = (j - satCache[i].jdsatepoch) * 1440.0; // 1440 = minutes_per_day
-      pv = satellite.sgp4(satCache[i], m);
+      var pv = satellite.sgp4(satCache[i], m);
       var x, y, z, vx, vy, vz;
-      var positionEcf, lookAngles, azimuth, elevation, rangeSat;
+      var positionEcf, lookangles, azimuth, elevation, rangeSat;
 
       try {
         x = pv.position.x; // translation of axes from earth-centered inertial
@@ -207,20 +193,15 @@ function propagate () {
         vx = pv.velocity.x;
         vy = pv.velocity.y;
         vz = pv.velocity.z;
-        // gpos = satellite.eci_to_geodetic(pv.position, gmst);
 
-        // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
         positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
-        // observerEcf   = satellite.geodetic_to_ecf(observerGd);
-        // positionGd    = satellite.eciToGeodetic(positionEci, gmst),
-        lookAngles = satellite.ecf_to_look_angles(observerGd, positionEcf);
+        lookangles = satellite.ecf_to_look_angles(observerGd, positionEcf);
         // TODO: Might add dopplerFactor back in or to lookangles for HAM Radio use
         // dopplerFactor = satellite.dopplerFactor(observerCoordsEcf, positionEcf, velocityEcf);
 
-        // Look Angles may be accessed by `azimuth`, `elevation`, `range_sat` properties.
-        azimuth = lookAngles.azimuth;
-        elevation = lookAngles.elevation;
-        rangeSat = lookAngles.range_sat;
+        azimuth = lookangles.azimuth;
+        elevation = lookangles.elevation;
+        rangeSat = lookangles.range_sat;
       } catch (e) {
         x = 0;
         y = 0;
@@ -229,12 +210,11 @@ function propagate () {
         vy = 0;
         vz = 0;
         positionEcf = 0;
-        lookAngles = 0;
+        lookangles = 0;
         azimuth = 0;
         elevation = 0;
         rangeSat = 0;
       }
-    //    console.log('x: ' + x + ' y: ' + y + ' z: ' + z);
       satPos[i * 3] = x;
       satPos[i * 3 + 1] = y;
       satPos[i * 3 + 2] = z;
@@ -243,12 +223,8 @@ function propagate () {
       satVel[i * 3 + 1] = vy;
       satVel[i * 3 + 2] = vz;
 
-      // satAlt[i] = alt;
-      // satLon[i] = lon;
-      // satLat[i] = lat;
-      azimuth = azimuth / DEG2RAD; // Convert to Degrees
-      elevation = elevation / DEG2RAD; // Convert to Degrees
-      // satRange[i] = rangeSat;
+      azimuth *= RAD2DEG;
+      elevation *= RAD2DEG;
 
       if (obsminaz > obsmaxaz) {
         if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange) || (azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
@@ -277,23 +253,28 @@ function propagate () {
   satVel = new Float32Array(satCache.length * 3);
   satInView = new Float32Array(satCache.length);
 
-// profile  console.log('sat-cruncher propagate: ' + (performance.now() - start) + ' ms');
-
   var divisor = Math.max(propRate, 0.1);
   setTimeout(propagate, 500 / divisor);
 }
 
-function jday (year, mon, day, hr, minute, sec) { // from satellite.js
+/** Returns number with 0s in front */
+function pad (num, size) {
+  var s = '00000' + num;
+  return s.substr(s.length - size);
+}
+
+/** Returns Ordinal Day (Commonly Called J Day) */
+function jday (year, mon, day, hr, minute, sec) {
   'use strict';
   return (367.0 * year -
         Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
         Math.floor(275 * mon / 9.0) +
         day + 1721013.5 +
         ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
-        // #  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
         );
 }
 
+/** Returns Current Propagation Time */
 function propTime () {
   'use strict';
 
@@ -301,6 +282,5 @@ function propTime () {
   var realElapsedMsec = Number(now) - Number(propRealTime);
   var scaledMsec = realElapsedMsec * propRate;
   now.setTime(Number(propRealTime) + propOffset + scaledMsec);
-  // console.log('sgp4 propTime: ' + now + ' elapsed=' + realElapsedMsec/1000);
   return now;
 }

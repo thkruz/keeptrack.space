@@ -2084,7 +2084,7 @@ function selectSat (satId) {
     $('#sat-eccentricity').html((sat.eccentricity).toFixed(3));
 
     $('#sat-period').html(sat.period.toFixed(2) + ' min');
-    $('#sat-period').tooltip({delay: 50, tooltip: 'Mean Motion: ' + 60 * 24 / sat.period.toFixed(2), position: 'left'});
+    $('#sat-period').tooltip({delay: 50, tooltip: 'Mean Motion: ' + MINUTES_PER_DAY / sat.period.toFixed(2), position: 'left'});
 
     var now = new Date();
     now = now.getFullYear();
@@ -2115,7 +2115,7 @@ function selectSat (satId) {
 
   if (satId !== -1) {
     updateMap();
-    if (sat.SCC_NUM === '25544') { // Something selected and that something is the ISS
+    if (sat.SCC_NUM === '25544') { // ISS is Selected
       $('#iss-stream-menu').fadeIn();
       $('#iss-stream').html('<iframe src="http://www.ustream.tv/embed/17074538?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://www.ustream.tv/embed/9408562?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><br />' +
                             '<iframe src="http://www.ustream.tv/embed/6540154?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://cdn.livestream.com/embed/spaceflightnow?layout=4&amp;height=340&amp;width=560&amp;autoplay=false" style="border:0;outline:0" frameborder="0" scrolling="no"></iframe>');
@@ -2228,12 +2228,9 @@ function unProject (mx, my) {
   return [worldVec[0] / worldVec[3], worldVec[1] / worldVec[3], worldVec[2] / worldVec[3]];
 }
 
-/** TODO: Heavily Comment this code to understand how to add red markers on the
-earth and possibly create the ability to rotate around a satellite */
 function getEarthScreenPoint (x, y) {
   var rayOrigin = getCamPos();
   var ptThru = unProject(x, y);
-  //  var start = performance.now();
 
   var rayDir = vec3.create();
   vec3.subtract(rayDir, ptThru, rayOrigin); // rayDir = ptThru - rayOrigin
@@ -2279,7 +2276,7 @@ function getCamPos () {
   var z = r * Math.sin(camPitch);
   var rYaw = r * Math.cos(camPitch);
   var x = rYaw * Math.sin(camYaw);
-  var y = rYaw * Math.cos(camYaw) * -1;
+  var y = rYaw * -Math.cos(camYaw);
   return [x, y, z];
 }
 
@@ -2294,7 +2291,7 @@ function camSnapToSat (satId) {
   if (camAngleSnappedOnSat) {
     var pos = sat.position;
     var r = Math.sqrt(pos.x * pos.x + pos.y * pos.y);
-    var yaw = Math.atan2(pos.y, pos.x) + Math.PI / 2;
+    var yaw = Math.atan2(pos.y, pos.x) + TAU / 4;
     var pitch = Math.atan2(pos.z, r);
     if (!pitch) {
       console.warn('Pitch Calculation Error');
@@ -2330,9 +2327,9 @@ function camSnap (pitch, yaw) {
   camSnapMode = true;
 }
 function normalizeAngle (angle) {
-  angle %= Math.PI * 2;
-  if (angle > Math.PI) angle -= Math.PI * 2;
-  if (angle < -Math.PI) angle += Math.PI * 2;
+  angle %= TAU;
+  if (angle > Math.PI) angle -= TAU;
+  if (angle < -Math.PI) angle += TAU;
   return angle;
 }
 function longToYaw (long) {
@@ -2342,26 +2339,25 @@ function longToYaw (long) {
 
   selectedDate = selectedDate.split(' ');
   selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
-  today.setUTCHours(selectedDate.getUTCHours() + ((selectedDate.getUTCMonth() + 1) * 2) - 12);  // Earth center point seems to drift throughout the year. Possibly tied to the time of year? TODO: WTF?
+  // TODO: Find a formula using the date variable for this.
+  today.setUTCHours(selectedDate.getUTCHours() + ((selectedDate.getUTCMonth() + 1) * 2) - 12);  // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
 
   today.setUTCMinutes(selectedDate.getUTCMinutes());
   today.setUTCSeconds(selectedDate.getUTCSeconds());
   selectedDate.setUTCHours(0);
   selectedDate.setUTCMinutes(0);
   selectedDate.setUTCSeconds(0);
-  var longOffset = (((today - selectedDate) / 60 / 60 / 1000));
-  longOffset = longOffset * 15; // 15 degress per longitude offset
+  var longOffset = (((today - selectedDate) / 60 / 60 / 1000)); // In Hours
+  longOffset = longOffset * 15; // 15 Degress Per Hour longitude Offset
 
-  angle = (long + longOffset) / 180 * (Math.PI);
+  angle = (long + longOffset) * DEG2RAD;
   angle = normalizeAngle(angle);
   return angle;
 }
 function latToPitch (lat) {
-  var pitch = 0;
-  lat = lat * ((Math.PI / 2) / 90);
-  pitch = lat;// / (Math.PI/2);
-  if (pitch > Math.PI / 2) pitch = Math.PI / 2;
-  if (pitch < -Math.PI / 2) pitch = -Math.PI / 2;
+  var pitch = lat * DEG2RAD;
+  if (pitch > TAU / 4) pitch = TAU / 4;     // Max 90 Degrees
+  if (pitch < -TAU / 4) pitch = -TAU / 4;   // Min -90 Degrees
   return pitch;
 }
 function changeZoom (zoom) {
@@ -2404,8 +2400,8 @@ function drawLoop () {
 
       var pitchDif = dragPointLat - dragTargetLat;
       var yawDif = normalizeAngle(dragPointLon - dragTargetLon);
-      camPitchSpeed = pitchDif * 0.015;
-      camYawSpeed = yawDif * 0.015;
+      camPitchSpeed = pitchDif * 0.005;
+      camYawSpeed = yawDif * 0.005;
     }
     camSnapMode = false;
   } else {
@@ -2437,8 +2433,8 @@ function drawLoop () {
     zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dt * 0.0075;
   }
 
-  if (camPitch > Math.PI / 2) camPitch = Math.PI / 2;
-  if (camPitch < -Math.PI / 2) camPitch = -Math.PI / 2;
+  if (camPitch > TAU / 4) camPitch = TAU / 4;
+  if (camPitch < -TAU / 4) camPitch = -TAU / 4;
   // camYaw = (camYaw % (Math.PI*2));
   camYaw = normalizeAngle(camYaw);
   if (selectedSat !== -1) {
@@ -2489,11 +2485,9 @@ function drawLines () {
 
 function drawScene () {
   gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-  // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  // gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
 
   if (CAMERA_TYPE === 2) {
     FPSMovement();
@@ -2508,8 +2502,6 @@ function drawScene () {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   // if (debugLine) debugLine.draw();
-  // if (debugLine2)debugLine2.draw();
-  // if (debugLine3)debugLine3.draw();
   earth.draw(pMatrix, camMatrix);
   satSet.draw(pMatrix, camMatrix);
   orbitDisplay.draw(pMatrix, camMatrix);
@@ -2949,7 +2941,7 @@ var lookangles = (function () {
     setSensor(0);
 
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-    var orbitalPeriod = MINUTES_PER_DAY * 60 / (satrec.no * 60 * 24 / (2 * Math.PI)); // Seconds in a day divided by mean motion
+    var orbitalPeriod = MINUTES_PER_DAY * 60 / (satrec.no * MINUTES_PER_DAY / TAU); // Seconds in a day divided by mean motion
     console.log(orbitalPeriod);
     var tbl = document.getElementById('looksmultisite');           // Identify the table to update
     tbl.innerHTML = '';                                   // Clear the table from old object data
@@ -3853,15 +3845,6 @@ var lookangles = (function () {
     map: map
   };
 })();
-
-function jday () {
-  var now = new Date();
-  var start = new Date(now.getFullYear(), 0, 0);
-  var diff = now - start;
-  var oneDay = 1000 * 60 * 60 * 24;
-  var day = Math.floor(diff / oneDay);
-  return day;
-}
 
 /* **** start Date Format ***
  * Date Format 1.2.3
@@ -5250,23 +5233,10 @@ function propTime () {
     gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
   };
 
-  function jday (year, mon, day, hr, minute, sec) { // from satellite.js
-    'use strict';
-    return (367.0 * year -
-          Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
-          Math.floor(275 * mon / 9.0) +
-          day + 1721013.5 +
-          ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
-          // #  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
-          );
-  }
-
   window.earth = earth;
 })();
 // **** 9 - sun ***
 (function () {
-  var D2R = Math.PI / 180.0;
-
   function currentDirection () {
     var now = propTime();
     var j = jday(now.getUTCFullYear(),
@@ -5287,12 +5257,12 @@ function propTime () {
     L = L % 360.0;
     g = g % 360.0;
 
-    var ecLon = L + 1.915 * Math.sin(g * D2R) + 0.020 * Math.sin(2 * g * D2R);
+    var ecLon = L + 1.915 * Math.sin(g * DEG2RAD) + 0.020 * Math.sin(2 * g * DEG2RAD);
     var ob = getObliquity(jd);
 
-    var x = Math.cos(ecLon * D2R);
-    var y = Math.cos(ob * D2R) * Math.sin(ecLon * D2R);
-    var z = Math.sin(ob * D2R) * Math.sin(ecLon * D2R);
+    var x = Math.cos(ecLon * DEG2RAD);
+    var y = Math.cos(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
+    var z = Math.sin(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
 
     return [x, y, z];
    // return [1, 0, 0];
@@ -5323,8 +5293,23 @@ function propTime () {
     return ob / 3600.0;
   }
 
-  function jday (year, mon, day, hr, minute, sec) { // from satellite.js
-    'use strict';
+  window.sun = {
+    getDirection: getDirection,
+    currentDirection: currentDirection
+  };
+})();
+
+function jday (year, mon, day, hr, minute, sec) { // from satellite.js
+  'use strict';
+
+  if (!year) {
+    var now = new Date();
+    var start = new Date(now.getFullYear(), 0, 0);
+    var diff = now - start;
+    var oneDay = MILLISECONDS_PER_DAY;
+    var jday = Math.floor(diff / oneDay);
+    return jday;
+  } else {
     return (367.0 * year -
           Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
           Math.floor(275 * mon / 9.0) +
@@ -5333,12 +5318,8 @@ function propTime () {
           // #  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
           );
   }
+}
 
-  window.sun = {
-    getDirection: getDirection,
-    currentDirection: currentDirection
-  };
-})();
 // **** 10 - sat ***
 (function () {
   var satSet = {};

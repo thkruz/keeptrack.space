@@ -57,7 +57,7 @@ onmessage = function (m) {
     observerGd = {
       longitude: longitude * DEG2RAD,
       latitude: latitude * DEG2RAD,
-      obshei: obshei * 1 // Convert from string
+      height: obshei * 1 // Convert from string
     };
     if (m.data.obsminaz != null) { obsminaz = m.data.obsminaz * 1; }
     if (m.data.obsmaxaz != null) { obsmaxaz = m.data.obsmaxaz * 1; }
@@ -92,8 +92,6 @@ onmessage = function (m) {
         } else {
           satrec = satellite.twoline2satrec( // perform and store sat init calcs
             satData[i].TLE1, satData[i].TLE2);
-
-          // extra.SCC_NUM = pad(satData[i].TLE1.substr(2, 5).trim(), 5);
 
           extra.inclination = satrec.inclo; // rads
           extra.eccentricity = satrec.ecco;
@@ -156,7 +154,6 @@ onmessage = function (m) {
 
 function propagate () {
   var now = propTime();
-  // console.log('sat-cruncher propagate: ' + now);
   var j = jday(now.getUTCFullYear(),
                now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
                now.getUTCDate(),

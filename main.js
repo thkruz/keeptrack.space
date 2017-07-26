@@ -5965,6 +5965,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
     var res = [];
 
     for (var i = 0; i < satData.length; i++) {
+      if (satData[i].static) { continue; }
       res.push(satData[i]);
       lookangles.getTEARR(res[i]);
       res[i]['azimuth'] = lookangles.azimuth;

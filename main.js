@@ -147,6 +147,7 @@ var isNewLaunchMenuOpen = false;
 var isCustomSensorMenuOpen = false;
 var isEditTime = false;
 var isShowNextPass = false;
+var isShowDistance = false;
 var isOnlyFOVChecked = false;
 var isRiseSetLookangles = false;
 
@@ -646,6 +647,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     var isLimitSats = document.getElementById('settings-limitSats-enabled').checked;
     var isChangeSharperShaders = document.getElementById('settings-shaders').checked;
     var isSNPChecked = document.getElementById('settings-snp').checked;
+    var isSDChecked = document.getElementById('settings-sd').checked;
     var isRiseSetChecked = $('#settings-riseset').checked;
 
     /** Filter On and Shaders On */
@@ -733,6 +735,13 @@ $(document).ready(function () { // Code Once index.php is loaded
       ga('send', 'event', 'Settings Menu', 'Show Next Pass on Hover', 'Option Selected');
     } else {
       isShowNextPass = false;
+    }
+
+    if (isSDChecked) {
+      isShowDistance = true;
+      ga('send', 'event', 'Settings Menu', 'Show Distance on Hover', 'Option Selected');
+    } else {
+      isShowDistance = false;
     }
 
     if (isRiseSetChecked) {
@@ -1910,17 +1919,17 @@ function updateUrl () { // URL Updater
     paramSlices.push('hrs=' + (propOffset / 1000.0 / 3600.0).toString());
   }
 
-  if (lookangles.sensorSelected()) {
-    paramSlices.push('lat=' + lookangles.obslat);
-    paramSlices.push('long=' + lookangles.obslong);
-    paramSlices.push('hei=' + lookangles.obshei);
-    paramSlices.push('minaz=' + lookangles.obsminaz);
-    paramSlices.push('maxaz=' + lookangles.obsmaxaz);
-    paramSlices.push('minel=' + lookangles.obsminel);
-    paramSlices.push('maxel=' + lookangles.obsmaxel);
-    paramSlices.push('minrange=' + lookangles.obsminrange);
-    paramSlices.push('maxrange=' + lookangles.obsmaxrange);
-  }
+  // if (lookangles.sensorSelected()) {
+  //   paramSlices.push('lat=' + lookangles.obslat);
+  //   paramSlices.push('long=' + lookangles.obslong);
+  //   paramSlices.push('hei=' + lookangles.obshei);
+  //   paramSlices.push('minaz=' + lookangles.obsminaz);
+  //   paramSlices.push('maxaz=' + lookangles.obsmaxaz);
+  //   paramSlices.push('minel=' + lookangles.obsminel);
+  //   paramSlices.push('maxel=' + lookangles.obsmaxel);
+  //   paramSlices.push('minrange=' + lookangles.obsminrange);
+  //   paramSlices.push('maxrange=' + lookangles.obsmaxrange);
+  // }
 
   if (paramSlices.length > 0) {
     url += '?' + paramSlices.join('&');
@@ -2087,13 +2096,16 @@ function selectSat (satId) {
     $('#sat-period').tooltip({delay: 50, tooltip: 'Mean Motion: ' + MINUTES_PER_DAY / sat.period.toFixed(2), position: 'left'});
 
     var now = new Date();
+    var jday = getDOY(now);
     now = now.getFullYear();
     now = now.toString().substr(2, 2);
     var daysold;
     if (satSet.getSat(satId).TLE1.substr(18, 2) === now) {
-      daysold = jday() - satSet.getSat(satId).TLE1.substr(20, 3);
+      daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3);
+      console.log(daysold);
     } else {
-      daysold = jday() - satSet.getSat(satId).TLE1.substr(20, 3) + (satSet.getSat(satId).TLE1.substr(17, 2) * 365);
+      daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3) + (satSet.getSat(satId).TLE1.substr(17, 2) * 365);
+      console.log(daysold);
     }
     $('#sat-elset-age').html(daysold + ' Days');
     $('#sat-elset-age').tooltip({delay: 50, tooltip: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(), position: 'left'});
@@ -2621,11 +2633,10 @@ function updateSelectBox () {
   var satData = satSet.getSat(selectedSat);
   if (satData.static) return;
 
-  lookangles.getTEARR(satData);
-
   // TODO: Include updates when satellite edited regardless of time.
 
   if (now > lastBoxUpdateTime + 1000) {
+    lookangles.getTEARR(satData);
     if (satellite.degrees_long(lookangles.lon) >= 0) {
       $('#sat-longitude').html(satellite.degrees_long(lookangles.lon).toFixed(3) + '°E');
     } else {
@@ -2694,10 +2705,15 @@ function hoverBoxOnSat (satId, satX, satY) {
   } else {
     try {
       var sat = satSet.getSat(satId);
+      var selectedSatData = satSet.getSat(selectedSat);
       if (sat.static) {
-        $('#sat-hoverbox').html(sat.name + '<br /><center>' + sat.type + '</center>');
+        $('#sat-hoverbox').html(sat.name + '<br /><center>' + sat.type + lookangles.distance(sat, selectedSatData) + '</center>');
       } else {
-        if (lookangles.sensorSelected() && isShowNextPass) {
+        if (lookangles.sensorSelected() && isShowNextPass && isShowDistance) {
+          $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + lookangles.distance(sat, selectedSatData) + '</center>');
+        } else if (isShowDistance) {
+          $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + lookangles.distance(sat, selectedSatData) + '</center>');
+        } else if (lookangles.sensorSelected() && isShowNextPass) {
           $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
         } else {
           $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
@@ -2745,6 +2761,17 @@ var lookangles = (function () {
     } else {
       return false;
     }
+  };
+
+  var distance = function (hoverSat, selectedSat) {
+    if (selectedSat == null || hoverSat == null) {
+      return '';
+    }
+    var distanceApartX = Math.pow(hoverSat.position.x - selectedSat.position.x, 2);
+    var distanceApartY = Math.pow(hoverSat.position.y - selectedSat.position.y, 2);
+    var distanceApartZ = Math.pow(hoverSat.position.z - selectedSat.position.z, 2);
+    var distanceApart = Math.sqrt(distanceApartX + distanceApartY + distanceApartZ).toFixed(0);
+    return '<br />' + distanceApart + ' km';
   };
 
   var getsensorinfo = function () {
@@ -3832,6 +3859,22 @@ var lookangles = (function () {
   }
 
   return {
+    obslat: obslat,
+    obslong: obslong,
+    obshei: obshei,
+    obsminaz: obsminaz,
+    obsmaxaz: obsmaxaz,
+    obsminel: obsminel,
+    obsmaxel: obsmaxel,
+    obsminrange: obsminrange,
+    obsmaxrange: obsmaxrange,
+    obsminaz2: obsminaz2,
+    obsmaxaz2: obsmaxaz2,
+    obsminel2: obsminel2,
+    obsmaxel2: obsmaxel2,
+    obsminrange2: obsminrange2,
+    obsmaxrange2: obsmaxrange2,
+    distance: distance,
     sensorSelected: sensorSelected,
     setobs: setobs,
     nextpass: nextpass,
@@ -4112,13 +4155,14 @@ dateFormat.i18n = {
     ColorScheme.lostobjects = new ColorScheme(function (satId) {
       var pe = satSet.getSat(satId).perigee;
       var now = new Date();
+      var jday = getDOY(now);
       now = now.getFullYear();
       now = now.toString().substr(2, 2);
       var daysold;
       if (satSet.getSat(satId).TLE1.substr(18, 2) === now) {
-        daysold = jday() - satSet.getSat(satId).TLE1.substr(20, 3);
+        daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3);
       } else {
-        daysold = jday() - satSet.getSat(satId).TLE1.substr(20, 3) + (satSet.getSat(satId).TLE1.substr(17, 2) * 365);
+        daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3) + (satSet.getSat(satId).TLE1.substr(17, 2) * 365);
       }
       if (pe > lookangles.obsmaxrange || daysold < 31) {
         return {
@@ -5337,7 +5381,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
   var satData;
   var satExtraData;
   var hoveringSat = -1;
-  var selectedSat = -1;
+  // var selectedSat = -1;
   var hoverColor = [0.1, 1.0, 0.0, 1.0];
   var selectedColor = [0.0, 1.0, 1.0, 1.0];
 
@@ -6131,3 +6175,19 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
 
   window.satSet = satSet;
 })();
+
+function isLeapYear (date) {
+  var year = date.getFullYear();
+  if ((year & 3) !== 0) return false;
+  return ((year % 100) !== 0 || (year % 400) === 0);
+}
+
+// Get Day of Year
+function getDOY (date) {
+  var dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+  var mn = date.getMonth();
+  var dn = date.getDate();
+  var dayOfYear = dayCount[mn] + dn;
+  if (mn > 1 && isLeapYear(date)) dayOfYear++;
+  return dayOfYear;
+}

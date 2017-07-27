@@ -2102,10 +2102,8 @@ function selectSat (satId) {
     var daysold;
     if (satSet.getSat(satId).TLE1.substr(18, 2) === now) {
       daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3);
-      console.log(daysold);
     } else {
       daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3) + (satSet.getSat(satId).TLE1.substr(17, 2) * 365);
-      console.log(daysold);
     }
     $('#sat-elset-age').html(daysold + ' Days');
     $('#sat-elset-age').tooltip({delay: 50, tooltip: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(), position: 'left'});
@@ -3045,21 +3043,24 @@ var lookangles = (function () {
     var isUpOrDown;
     var rascOffset = false;
 
-    for (var i = 0; i < (400 * 10); i += 1) { /** Rotate Mean Anomaly 0.1 Degree at a Time for Up To 400 Degrees */
+    for (var i = 0; i < (520 * 10); i += 1) { /** Rotate Mean Anomaly 0.1 Degree at a Time for Up To 400 Degrees */
       var meanACalcResults = meanaCalc(i, rascOffset);
       if (meanACalcResults === 1) {
         if (isUpOrDown !== upOrDown) { // If Object is moving opposite of the goal direction (upOrDown)
-          rascOffset = true;
+          // rascOffset = true;
           i = i + 20;                 // Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
         } else {
+          console.log(isUpOrDown);
           break; // Stop changing the Mean Anomaly
         }
       }
-      if (meanACalcResults === 5) { i += (10 * 100); } // Change meanA faster
+      if (meanACalcResults === 5) {
+        i += (5 * 10); // Change meanA faster
+      }
       if (meanACalcResults === 2) { return ['Error', '']; }
     }
 
-    for (i = 0; i < (3600 * 100); i += 1) {         // 520 degress in 0.01 increments TODO More precise?
+    for (i = 0; i < (5200 * 100); i += 1) {         // 520 degress in 0.01 increments TODO More precise?
       if (rascOffset && i === 0) {
         i = (mainRasc - 10) * 100;
       }
@@ -3086,12 +3087,12 @@ var lookangles = (function () {
       meana = pad(meana, 8);
 
       var rasc = (sat.raan * RAD2DEG).toPrecision(7);
-      if (rascOffset) {
-        rasc = (rasc * 1) + 180; // Spin the orbit 180 degrees.
-        if (rasc > 360) {
-          rasc = (rasc * 1) - 360; // angle can't be bigger than 360
-        }
-      }
+      // if (rascOffset) {
+      //   rasc = (rasc * 1) + 180; // Spin the orbit 180 degrees.
+      //   if (rasc > 360) {
+      //     rasc = (rasc * 1) - 360; // angle can't be bigger than 360
+      //   }
+      // }
       mainRasc = rasc;
       rasc = rasc.toString().split('.');
       rasc[0] = rasc[0].substr(-3, 3);
@@ -3136,10 +3137,7 @@ var lookangles = (function () {
         mainMeana = meana;
         return 1;
       }
-      if (propagateResults === 2) {
-        return 2;
-      }
-      return 0;
+      return propagateResults;
     }
 
     function rascCalc (rasc) {
@@ -3190,15 +3188,9 @@ var lookangles = (function () {
       satrec = satellite.twoline2satrec(mainTLE1, mainTLE2);
 
       var propNewRasc = getOrbitByLatLonPropagate(propOffset, satrec, 2);
-      // If RASC within 0.15 degrees then good enough
-      if (propNewRasc === 1) {
-        return 1;
-      }
-      // If RASC outside 15 degrees then rotate RASC faster
-      if (propNewRasc === 5) {
-        return 5;
-      }
-      return 0;
+      // 1 === If RASC within 0.15 degrees then good enough
+      // 5 === If RASC outside 15 degrees then rotate RASC faster
+      return propNewRasc;
     }
 
     function getOrbitByLatLonPropagate (propOffset, satrec, type) {
@@ -3246,20 +3238,24 @@ var lookangles = (function () {
       }
 
       if (lat > (goalLat - 0.15) && lat < (goalLat + 0.15) && type === 1) {
+        console.log(lat + ', ' + lon + ' -- ' + isUpOrDown);
         return 1;
       }
 
       if (lon > (goalLon - 0.15) && lon < (goalLon + 0.15) && type === 2) {
+        console.log(lat + ', ' + lon + ' -- ' + isUpOrDown);
         return 1;
-      }
-
-      // If current longitude greater than 11 degrees off rotate RASC faster
-      if (!(lon > (goalLon - 11) && lon < (goalLon + 11)) && type === 2) {
-        return 5;
       }
 
       // If current latitude greater than 11 degrees off rotate meanA faster
       if (!(lat > (goalLat - 11) && lat < (goalLat + 11)) && type === 1) {
+        console.log(lat + ', ' + lon + ' -- ' + isUpOrDown);
+        return 5;
+      }
+
+      // If current longitude greater than 11 degrees off rotate RASC faster
+      if (!(lon > (goalLon - 11) && lon < (goalLon + 11)) && type === 2) {
+        console.log(lat + ', ' + lon + ' -- ' + isUpOrDown);
         return 5;
       }
 

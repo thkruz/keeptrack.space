@@ -2792,7 +2792,7 @@ var lookangles = (function () {
     }
     obslong = obs.long * DEG2RAD;         // Observer Longitude - use Google Maps
 
-    obshei = obs.hei * 1;                    // Observer Height in Km
+    obshei = obs.obshei * 1;                    // Observer Height in Km
     obsminaz = obs.obsminaz;              // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
     obsmaxaz = obs.obsmaxaz;              // Observer max azimuth (satellite azimuth must be smaller) right extent looking towards target
     obsminel = obs.obsminel;              // Observer min elevation
@@ -2966,8 +2966,7 @@ var lookangles = (function () {
     setSensor(0);
 
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-    var orbitalPeriod = MINUTES_PER_DAY * 60 / (satrec.no * MINUTES_PER_DAY / TAU); // Seconds in a day divided by mean motion
-    console.log(orbitalPeriod);
+    var orbitalPeriod = MINUTES_PER_DAY / (satrec.no * MINUTES_PER_DAY / TAU); // Seconds in a day divided by mean motion
     var tbl = document.getElementById('looksmultisite');           // Identify the table to update
     tbl.innerHTML = '';                                   // Clear the table from old object data
     var tblLength = 0;                                   // Iniially no rows to the table
@@ -3004,7 +3003,7 @@ var lookangles = (function () {
           howManyPasses = 6; // Reset to 3 passes
         } else {
           howManyPasses = howManyPasses - 1;
-          i = i + (orbitalPeriod * 0.75); // Jump 3/4th to the next orbit
+          i = i + (orbitalPeriod * 60 * 0.75); // Jump 3/4th to the next orbit
         }
       }
       if (sensor === 10) {

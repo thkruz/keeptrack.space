@@ -713,7 +713,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 39.136064,
           long: -121.351237,
-          hei: 0.060966, // TODO: Find correct height
+          obshei: 0.060966, // TODO: Find correct height
           obsminaz: 126,
           obsmaxaz: 6,
           obsminel: 3,
@@ -725,7 +725,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 39.136064,
           long: -121.351237,
-          hei: 0.060966, // TODO: Find correct height
+          obshei: 0.060966, // TODO: Find correct height
           obsminaz: 126,
           obsmaxaz: 6,
           obsminel: 3,
@@ -752,7 +752,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 41.754785,
           long: -70.539151,
-          hei: 0.060966,
+          obshei: 0.060966,
           obsminaz: 347,
           obsmaxaz: 227,
           obsminel: 3,
@@ -764,7 +764,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 41.754785,
           long: -70.539151,
-          hei: 0.060966,
+          obshei: 0.060966,
           obsminaz: 347,
           obsmaxaz: 227,
           obsminel: 3,
@@ -792,7 +792,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 64.290556,
           long: -149.186944,
-          hei: 0.060966,
+          obshei: 0.060966,
           obsminaz: 184,
           obsmaxaz: 64,
           obsminel: 3,
@@ -804,7 +804,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 64.290556,
           long: -149.186944,
-          hei: 0.060966,
+          obshei: 0.060966,
           obsminaz: 184,
           obsmaxaz: 64,
           obsminel: 3,
@@ -832,7 +832,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 30.572411,
           long: -86.214836,
-          hei: 0.060966, // TODO: Confirm Altitude
+          obshei: 0.060966, // TODO: Confirm Altitude
           obsminaz: 120,
           obsmaxaz: 240,
           obsminel: 3,
@@ -844,7 +844,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 30.572411,
           long: -86.214836,
-          hei: 0.060966, // TODO: Confirm Altitude
+          obshei: 0.060966, // TODO: Confirm Altitude
           obsminaz: 120,
           obsmaxaz: 240,
           obsminel: 3,
@@ -872,7 +872,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 54.361758,
           long: -0.670051,
-          hei: 0.060966, // TODO: Find correct height
+          obshei: 0.060966, // TODO: Find correct height
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 3,
@@ -884,7 +884,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 54.361758,
           long: -0.670051,
-          hei: 0.060966, // TODO: Find correct height
+          obshei: 0.060966, // TODO: Find correct height
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 3,
@@ -912,7 +912,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 48.724567,
           long: -97.899755,
-          hei: 0.060966, // TODO: Find correct height
+          obshei: 0.060966, // TODO: Find correct height
           obsminaz: 298,
           obsmaxaz: 78,
           obsminel: 1.9,
@@ -924,7 +924,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 48.724567,
           long: -97.899755,
-          hei: 0.060966, // TODO: Find correct height
+          obshei: 0.060966, // TODO: Find correct height
           obsminaz: 298,
           obsmaxaz: 78,
           obsminel: 1.9,
@@ -952,7 +952,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 76.570322,
           long: -68.299211,
-          hei: 0.060966, // TODO: Find correct height
+          obshei: 0.060966, // TODO: Find correct height
           obsminaz: 297,
           obsmaxaz: 177,
           obsminel: 3,
@@ -964,7 +964,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 76.570322,
           long: -68.299211,
-          hei: 0.060966, // TODO: Find correct height
+          obshei: 0.060966, // TODO: Find correct height
           obsminaz: 297,
           obsmaxaz: 177,
           obsminel: 3,
@@ -993,7 +993,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 52.737,
           long: 174.092,
-          hei: 0.010966, // TODO: Find correct height
+          obshei: 0.010966, // TODO: Find correct height
           obsminaz: 259,
           obsmaxaz: 19,
           obsminel: 2,
@@ -1011,7 +1011,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 52.737,
           long: 174.092,
-          hei: 0.010966, // TODO: Find correct height
+          obshei: 0.010966, // TODO: Find correct height
           obsminaz: 259,
           obsmaxaz: 19,
           obsminel: 2,
@@ -1046,7 +1046,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 8.716667,
           long: 167.733333,
-          hei: 0,
+          obshei: 0,
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 1,
@@ -1058,7 +1058,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 8.716667,
           long: 167.733333,
-          hei: 0,
+          obshei: 0,
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 1,
@@ -1086,7 +1086,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 42.6233,
           long: -71.4882,
-          hei: 0.131,
+          obshei: 0.131,
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 1,
@@ -1098,7 +1098,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 42.6233,
           long: -71.4882,
-          hei: 0.131,
+          obshei: 0.131,
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 1,
@@ -1126,7 +1126,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: -7.296480,
           long: 72.390153,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 20,
@@ -1138,7 +1138,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: -7.296480,
           long: 72.390153,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 20,
@@ -1166,7 +1166,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 20.708350,
           long: -156.257595,
-          hei: 3.0,
+          obshei: 3.0,
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 20,
@@ -1178,7 +1178,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 20.708350,
           long: -156.257595,
-          hei: 3.0,
+          obshei: 3.0,
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 20,
@@ -1206,7 +1206,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 33.817233,
           long: -106.659961,
-          hei: 1.24,
+          obshei: 1.24,
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 20,
@@ -1218,7 +1218,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 33.817233,
           long: -106.659961,
-          hei: 1.24,
+          obshei: 1.24,
           obsminaz: 0,
           obsmaxaz: 360,
           obsminel: 20,
@@ -1287,7 +1287,7 @@ sensorManager = (function () {
           setlatlong: true, // Tell satcruncher we are changing observer location
           lat: 44.925106,
           long: 40.983894,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 55, // All Information via russianforces.org
           obsmaxaz: 295,
           obsminel: 2,
@@ -1299,7 +1299,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 44.925106,
           long: 40.983894,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 55, // All Information via russianforces.org
           obsmaxaz: 295,
           obsminel: 2,
@@ -1326,7 +1326,7 @@ sensorManager = (function () {
           setlatlong: true, // Tell satcruncher we are changing observer location
           lat: 46.603076,
           long: 74.530985,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 91, // All Information via russianforces.org
           obsmaxaz: 151,
           obsminel: 5.5,
@@ -1338,7 +1338,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 46.603076,
           long: 74.530985,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 91, // All Information via russianforces.org
           obsmaxaz: 151,
           obsminel: 5.5,
@@ -1365,7 +1365,7 @@ sensorManager = (function () {
           setlatlong: true, // Tell satcruncher we are changing observer location
           lat: 52.850000,
           long: 26.480000,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 190, // All Information via russianforces.org
           obsmaxaz: 310,
           obsminel: 3,
@@ -1377,7 +1377,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 52.850000,
           long: 26.480000,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 190, // All Information via russianforces.org
           obsmaxaz: 310,
           obsminel: 3,
@@ -1404,7 +1404,7 @@ sensorManager = (function () {
           setlatlong: true, // Tell satcruncher we are changing observer location
           lat: 60.275458,
           long: 30.546017,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 245, // All Information via russianforces.org
           obsmaxaz: 355,
           obsminel: 2,
@@ -1416,7 +1416,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 60.275458,
           long: 30.546017,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 245,
           obsmaxaz: 355,
           obsminel: 2,
@@ -1443,7 +1443,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 52.855500,
           long: 103.231700,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 41, // All Information via russianforces.org
           obsmaxaz: 219,
           obsminel: 5.5,
@@ -1455,7 +1455,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 52.855500,
           long: 103.231700,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 41, // All Information via russianforces.org
           obsmaxaz: 219,
           obsminel: 5.5,
@@ -1482,7 +1482,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 68.114100,
           long: 33.910200,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 280, // All Information via russianforces.org
           obsmaxaz: 340,
           obsminel: 5.5,
@@ -1494,7 +1494,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 68.114100,
           long: 33.910200,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 280, // All Information via russianforces.org
           obsmaxaz: 340,
           obsminel: 5.5,
@@ -1521,7 +1521,7 @@ sensorManager = (function () {
           setlatlong: true,
           lat: 65.210000,
           long: 57.295000,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 305, // All Information via russianforces.org
           obsmaxaz: 55,
           obsminel: 2,
@@ -1533,7 +1533,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 65.210000,
           long: 57.295000,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 305, // All Information via russianforces.org
           obsmaxaz: 55,
           obsminel: 2,
@@ -1560,7 +1560,7 @@ sensorManager = (function () {
           setlatlong: true, // Tell satcruncher we are changing observer location
           lat: 54.857294,
           long: 20.182350,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 187.5, // All Information via russianforces.org
           obsmaxaz: 292.5,
           obsminel: 2,
@@ -1572,7 +1572,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 54.857294,
           long: 20.182350,
-          hei: 0.0,
+          obshei: 0.0,
           obsminaz: 187.5, // All Information via russianforces.org
           obsmaxaz: 292.5,
           obsminel: 2,
@@ -1599,7 +1599,7 @@ sensorManager = (function () {
           setlatlong: true, // Tell satcruncher we are changing observer location
           lat: 40.446944,
           long: 115.116389,
-          hei: 1.6,
+          obshei: 1.6,
           obsminaz: 300,    // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
           obsmaxaz: 60,     // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
           obsminel: 2,      // Information via globalsecurity.org
@@ -1611,7 +1611,7 @@ sensorManager = (function () {
         lookangles.setobs({
           lat: 40.446944,
           long: 115.116389,
-          hei: 1.6,
+          obshei: 1.6,
           obsminaz: 300,    // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
           obsmaxaz: 60,     // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
           obsminel: 2,      // Information via globalsecurity.org

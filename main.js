@@ -85,6 +85,8 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
 
 var satCruncher;
 var gl;
+var shadersReady = false;
+var cruncherReady = false;
 
 // Time Variables
 var propRealTime = Date.now(); // actual time we're running it
@@ -609,7 +611,6 @@ $(document).ready(function () { // Code Once index.php is loaded
   $('.sensor-selected').click(function () {
     $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
     if (selectedSat !== -1) {
-      console.log('problem');
       $('#menu-lookangles img').removeClass('bmenu-item-disabled');
     }
     $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
@@ -1312,7 +1313,7 @@ $('#socrates-menu').on('click', '.socrates-object', function (evt) {
 });
 
 function keyUpHandler (evt) {
-  console.log(Number(evt.keyCode));
+  // console.log(Number(evt.keyCode));
   if (Number(evt.keyCode) === 65 || Number(evt.keyCode) === 68) {
     FPSSideSpeed = 0;
   }
@@ -1337,7 +1338,7 @@ function keyDownHandler (evt) {
 
 function keyHandler (evt) {
   var ratechange = false;
-  console.log(Number(evt.charCode));
+  // console.log(Number(evt.charCode));
   switch (Number(evt.charCode)) {
     case 87: // W
     case 119: // w
@@ -1990,7 +1991,7 @@ function selectSat (satId) {
     if (sat.static) {
       sensorManager.setSensor(sat.name);
       sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
-      selectedsat = -1;
+      selectedSat = -1;
       return;
     }
     camZoomSnappedOnSat = true;
@@ -2458,6 +2459,9 @@ function drawLoop () {
 
   drawScene();
   // drawLines();
+  // var bubble = new FOVBubble();
+  // bubble.set();
+  // bubble.draw();
   updateHover();
   updateSelectBox();
 }
@@ -2704,8 +2708,10 @@ function hoverBoxOnSat (satId, satX, satY) {
     try {
       var sat = satSet.getSat(satId);
       var selectedSatData = satSet.getSat(selectedSat);
-      if (sat.static) {
+      if (sat.static && isShowDistance) {
         $('#sat-hoverbox').html(sat.name + '<br /><center>' + sat.type + lookangles.distance(sat, selectedSatData) + '</center>');
+      } else if (sat.static) {
+        $('#sat-hoverbox').html(sat.name + '<br /><center>' + sat.type + '</center>');
       } else {
         if (lookangles.sensorSelected() && isShowNextPass && isShowDistance) {
           $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + lookangles.distance(sat, selectedSatData) + '</center>');
@@ -2849,6 +2855,7 @@ var lookangles = (function () {
 
   var getTEARR = function (sat) {
     // Set default timing settings. These will be changed to find look angles at different times in future.
+    var propRealTime = Date.now();
     var propOffset = getPropOffset();               // offset letting us propagate in the future (or past)
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
     var now = propTimeCheck(propOffset, propRealTime);
@@ -3568,6 +3575,7 @@ var lookangles = (function () {
   }
 
   function propagate (propTempOffset, tbl, satrec) {
+    var propRealTime = Date.now();
     var now = propTimeCheck(propTempOffset, propRealTime);
     var j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -5003,6 +5011,75 @@ dateFormat.i18n = {
 
   window.Line = Line;
 })();
+
+(function () {
+  function FOVBubble () {
+    this.vertBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(72), gl.STATIC_DRAW);
+  }
+
+  FOVBubble.prototype.set = function () {
+    var buf = [
+      // Front face
+      -100.0, -100.0, 100.0,
+      100.0, -100.0, 100.0,
+      100.0, 100.0, 100.0,
+      -100.0, 100.0, 100.0,
+
+      // Back face
+      -100.0, -100.0, -100.0,
+      -100.0, 100.0, -100.0,
+      100.0, 100.0, -100.0,
+      100.0, 100.0, -100.0,
+
+      // Top face
+      -100.0, 100.0, -100.0,
+      -100.0, 100.0, 100.0,
+      100.0, 100.0, 100.0,
+      100.0, 100.0, -100.0,
+
+      // Bottom face
+      -100.0, -100.0, -100.0,
+      100.0, -100.0, -100.0,
+      100.0, -100.0, 100.0,
+      -100.0, -100.0, 100.0,
+
+      // Right face
+      100.0, -100.0, -100.0,
+      100.0, 100.0, -100.0,
+      100.0, 100.0, 100.0,
+      100.0, -100.0, 100.0,
+
+      // Left face
+      -100.0, -100.0, -100.0,
+      -100.0, -100.0, 100.0,
+      -100.0, 100.0, 100.0,
+      -100.0, 100.0, -100.0
+    ];
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(buf), gl.STATIC_DRAW);
+  };
+
+  FOVBubble.prototype.draw = function () {
+    if (!shadersReady || !cruncherReady) return;
+    var bubbleShader = orbitDisplay.getPathShader();
+
+    gl.useProgram(bubbleShader);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LESS);
+
+    gl.uniform4fv(bubbleShader.uColor, [0.0, 1.0, 1.0, 0.5]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
+    gl.vertexAttribPointer(bubbleShader.aPos, 3, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.TRIANGLE_FANS, 0, 24); // Mode, First Vertex, Number of Vertex
+  };
+
+  window.FOVBubble = FOVBubble;
+})();
+
 // **** propTime used by sun and earth.js
 function propTime () {
   'use strict';
@@ -5368,7 +5445,6 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
   var pickColorBuf;
   var pickableBuf;
   var currentColorScheme;
-  var shadersReady = false;
 
   var satPos;
   var satVel;
@@ -5387,7 +5463,6 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
     browserUnsupported();
   }
 
-  var cruncherReady = false;
   var lastDrawTime = 0;
   var lastFOVUpdateTime = 0;
   var cruncherReadyCallback;

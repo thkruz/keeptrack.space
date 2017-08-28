@@ -62,6 +62,7 @@ laws of the United States and International Copyright Treaty.
     ga
     braun
     staticSet
+    missileSet
     sensorManager
     extractCountry
     extractLaunchSite
@@ -146,6 +147,7 @@ var isSocratesMenuOpen = false;
 var isSettingsMenuOpen = false;
 var isEditSatMenuOpen = false;
 var isNewLaunchMenuOpen = false;
+var isMissileMenuOpen = false;
 var isCustomSensorMenuOpen = false;
 var isEditTime = false;
 var isShowNextPass = false;
@@ -1071,6 +1073,85 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#nl-error').hide();
   });
 
+  $('#missile').submit(function (e) {
+    $('#ms-error').hide();
+    var type = $('#ms-type').val() * 1;
+    var attacker = $('#ms-attacker').val() * 1;
+    var tgtLat = $('#ms-lat').val() * 1;
+    var tgtLon = $('#ms-lon').val() * 1;
+    var result = false;
+
+    var launchTime = $('#datetime-text').text().substr(0, 19);
+    launchTime = launchTime.split(' ');
+    launchTime = new Date(launchTime[0] + 'T' + launchTime[1] + 'Z').getTime();
+
+    if (type > 0) {
+      if (type === 1) MassRaidPre(launchTime, 'Russia2USA.json');
+      if (type === 2) MassRaidPre(launchTime, 'China2USA.json');
+      if (type === 3) MassRaidPre(launchTime, 'NorthKorea2USA.json');
+      if (type === 4) MassRaidPre(launchTime, 'USA2Russia.json');
+      if (type === 5) MassRaidPre(launchTime, 'USA2China.json');
+      if (type === 6) MassRaidPre(launchTime, 'USA2NorthKorea.json');
+      $('#ms-error').html('Large Scale Attack Loaded');
+      $('#ms-error').show();
+    } else {
+      if (Number.isNaN(tgtLat)) {
+        $('#ms-error').html('Please enter a number<br>for Target Latitude');
+        $('#ms-error').show();
+        e.preventDefault();
+        return;
+      }
+      if (Number.isNaN(tgtLon)) {
+        $('#ms-error').html('Please enter a number<br>for Target Longitude');
+        $('#ms-error').show();
+        e.preventDefault();
+        return;
+      }
+
+      if (attacker < 200) { // USA
+        var a = attacker - 100;
+        var b = 500 - missilesInUse;
+        console.log(a);
+        var attackerName = UsaICBM[a * 4 + 2];
+        console.log(attackerName);
+        Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, UsaICBM[a * 4 + 2], 30, 2.9, 0.07, UsaICBM[a * 4 + 3]);
+      } else if (attacker < 300) { // Russian
+        var a = attacker - 200;
+        var b = 500 - missilesInUse;
+        var attackerName = RussianICBM[a * 4 + 2];
+        Missile(RussianICBM[a * 4], RussianICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, RussianICBM[a * 4 + 2], 30, 2.9, 0.07, RussianICBM[a * 4 + 3]);
+      } else if (attacker < 400) { // Chinese
+        a = attacker - 300;
+        var b = 500 - missilesInUse;
+        attackerName = ChinaICBM[a * 4 + 2];
+        Missile(ChinaICBM[a * 4], ChinaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, ChinaICBM[a * 4 + 2], 30, 2.9, 0.07, ChinaICBM[a * 4 + 3]);
+      } else if (attacker < 500) { // North Korean
+        a = attacker - 400;
+        var b = 500 - missilesInUse;
+        attackerName = NorthKoreanBM[a * 4 + 2];
+        Missile(NorthKoreanBM[a * 4], NorthKoreanBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, NorthKoreanBM[a * 4 + 2], 30, 2.9, 0.07, NorthKoreanBM[a * 4 + 3]);
+      }
+      ga('send', 'event', 'New Missile', attackerName, 'Attacker');
+      ga('send', 'event', 'New Missile', tgtLat + ', ' + tgtLon, 'Target');
+
+      $('#ms-error').html(lastMissileError);
+      $('#ms-error').show();
+    }
+    e.preventDefault();
+  });
+
+  $('#ms-error').click(function () {
+    $('#ms-error').hide();
+  });
+
+  $('#missile').change(function (e) {
+    if ($('#ms-type').val() * 1 !== 0) {
+      $('#ms-custom-opt').hide();
+    } else {
+      $('#ms-custom-opt').show();
+    }
+  });
+
   $('#cs-telescope').click(function (e) {
     if ($('#cs-telescope').is(':checked')) {
       $('#cs-minaz').attr('disabled', true);
@@ -1539,6 +1620,7 @@ function hideSideMenus () {
   isSettingsMenuOpen = false;
   isEditSatMenuOpen = false;
   isNewLaunchMenuOpen = false;
+  isMissileMenuOpen = false;
   isCustomSensorMenuOpen = false;
   isAboutSelected = false;
 }
@@ -1601,7 +1683,7 @@ function bottomIconPress (evt) {
         $('#menu-lookangles img').addClass('bmenu-item-selected');
         if (selectedSat !== -1) {
           var sat = satSet.getSat(selectedSat);
-          if (sat.static) {
+          if (sat.static || sat.missile) {
             if (!$('#menu-lookangles img:animated').length) {
               $('#menu-lookangles img').effect('shake', {distance: 10});
             }
@@ -1893,6 +1975,19 @@ function bottomIconPress (evt) {
         $('#menu-customSensor img').addClass('bmenu-item-selected');
         break;
       }
+    case 'menu-missile':
+      if (isMissileMenuOpen) {
+        isMissileMenuOpen = false;
+        hideSideMenus();
+        break;
+      } else {
+        // TODO: NEW LAUNCH
+        hideSideMenus();
+        $('#missile-menu').fadeIn();
+        $('#menu-missile img').addClass('bmenu-item-selected');
+        isMissileMenuOpen = true;
+        break;
+      }
   }
 }
 function pad (num, size) {
@@ -1984,6 +2079,7 @@ function selectSat (satId) {
     isMapMenuOpen = false;
     isLookanglesMultiSiteMenuOpen = false;
     isNewLaunchMenuOpen = false;
+    isMissileMenuOpen = false;
     isCustomSensorMenuOpen = false;
   } else {
     var sat = satSet.getSat(satId);
@@ -1997,6 +2093,11 @@ function selectSat (satId) {
     camZoomSnappedOnSat = true;
     camAngleSnappedOnSat = true;
 
+    satSet.selectSat(satId);
+    camSnapToSat(satId);
+    orbitDisplay.setSelectOrbit(satId);
+    if (sat.missile) return;
+
     if (lookangles.sensorSelected()) {
       $('#menu-lookangles img').removeClass('bmenu-item-disabled');
     }
@@ -2006,9 +2107,6 @@ function selectSat (satId) {
     $('#menu-map img').removeClass('bmenu-item-disabled');
     $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
 
-    satSet.selectSat(satId);
-    camSnapToSat(satId);
-    orbitDisplay.setSelectOrbit(satId);
     if ($('#search-results').css('display') === 'block') {
       if ($(document).width() <= 1000) {
         $('#search-results').attr('style', 'display:block; max-height:20%; width: 100%;bottom:auto;margin-top:50px;');
@@ -2320,9 +2418,16 @@ function camSnapToSat (satId) {
   }
 
   if (camZoomSnappedOnSat) {
-    lookangles.getTEARR(sat);
-    if (lookangles.altitude) {
-      var camDistTarget = lookangles.altitude + RADIUS_OF_EARTH + 2000;
+    var altitude;
+    if (!sat.missile && !sat.static) {               // if this is a satellite not a missile
+      lookangles.getTEARR(sat);       // do lookangles on the satellite
+      altitude = lookangles.altitude; // and set the altitude
+    } if (sat.missile) {
+      altitude = sat.maxAlt + 1000;             // if it is a missile use its altitude
+      orbitDisplay.setSelectOrbit(satId);
+    }
+    if (altitude) {
+      var camDistTarget = altitude + RADIUS_OF_EARTH + 2000;
     } else {
       camDistTarget = RADIUS_OF_EARTH + 2000;  // Stay out of the center of the earth. You will get stuck there.
       console.warn('Zoom Calculation Error');
@@ -2477,7 +2582,11 @@ function drawLines () {
     propTime.setTime(Number(propRealTime) + propOffset + scaledMsec);
   }
   if (satData && lookangles.sensorSelected()) {
-    while (curRadarTrackNum < satData.length) {
+    if (propTime - lastRadarTrackTime > staticSet[lookangles.staticNum].changeObjectInterval) {
+      lastRadarTrackTime = 0;
+      curRadarTrackNum++;
+    }
+    if (curRadarTrackNum < satData.length) {
       if (satData[curRadarTrackNum]) {
         if (satData[curRadarTrackNum].inview) {
           var debugLine = new Line();
@@ -2485,15 +2594,11 @@ function drawLines () {
           var satposition = [sat.position.x, sat.position.y, sat.position.z];
           debugLine.set(satposition, sensorManager.curSensorPositon);
           debugLine.draw();
-          curRadarTrackNum++;
-          lastRadarTrackTime = propTime;
+          if (lastRadarTrackTime === 0) { lastRadarTrackTime = propTime; }
           return;
         } else { curRadarTrackNum++; }
       } else { curRadarTrackNum++; }
-    }
-    if (curRadarTrackNum === satData.length) {
-      curRadarTrackNum = 0;
-    }
+    } else { curRadarTrackNum = 0; }
   }
 }
 
@@ -2633,7 +2738,7 @@ function updateSelectBox () {
   if (selectedSat === -1) return;
   var now = Date.now();
   var satData = satSet.getSat(selectedSat);
-  if (satData.static) return;
+  if (satData.static || satData.missile) return;
 
   // TODO: Include updates when satellite edited regardless of time.
 
@@ -2759,6 +2864,8 @@ var lookangles = (function () {
 
   var observerGd = {}; // Used to store obslat, obslon, and hei for satellite.js calculations
 
+  var staticNum;
+
   var sensorSelected = function () {
     if (obslat != null) {
       return true;
@@ -2827,6 +2934,8 @@ var lookangles = (function () {
       longitude: obslong,
       height: obshei                         // Converts from string to number TODO: Find correct way to convert string to integer
     };
+
+    this.staticNum = obs.staticNum;
   };
 
   var altitudeCheck = function (TLE1, TLE2, propOffset) {
@@ -3061,7 +3170,7 @@ var lookangles = (function () {
         }
       }
       if (meanACalcResults === 5) {
-        i += (5 * 10); // Change meanA faster
+        i += (2 * 10); // Change meanA faster
       }
       if (meanACalcResults === 2) { return ['Error', '']; }
     }
@@ -3862,21 +3971,22 @@ var lookangles = (function () {
   }
 
   return {
-    obslat: obslat,
-    obslong: obslong,
-    obshei: obshei,
-    obsminaz: obsminaz,
-    obsmaxaz: obsmaxaz,
-    obsminel: obsminel,
-    obsmaxel: obsmaxel,
-    obsminrange: obsminrange,
-    obsmaxrange: obsmaxrange,
-    obsminaz2: obsminaz2,
-    obsmaxaz2: obsmaxaz2,
-    obsminel2: obsminel2,
-    obsmaxel2: obsmaxel2,
-    obsminrange2: obsminrange2,
-    obsmaxrange2: obsmaxrange2,
+    // TODO: Verify these are unneeded and then remove
+    // obslat: obslat,
+    // obslong: obslong,
+    // obshei: obshei,
+    // obsminaz: obsminaz,
+    // obsmaxaz: obsmaxaz,
+    // obsminel: obsminel,
+    // obsmaxel: obsmaxel,
+    // obsminrange: obsminrange,
+    // obsmaxrange: obsmaxrange,
+    // obsminaz2: obsminaz2,
+    // obsmaxaz2: obsmaxaz2,
+    // obsminel2: obsminel2,
+    // obsmaxel2: obsmaxel2,
+    // obsminrange2: obsminrange2,
+    // obsmaxrange2: obsmaxrange2,
     distance: distance,
     sensorSelected: sensorSelected,
     setobs: setobs,
@@ -3888,7 +3998,8 @@ var lookangles = (function () {
     getTEARR: getTEARR,
     getsensorinfo: getsensorinfo,
     altitudeCheck: altitudeCheck,
-    map: map
+    map: map,
+    staticNum: staticNum
   };
 })();
 
@@ -4064,6 +4175,12 @@ dateFormat.i18n = {
       if (sat.static) {
         return {
           color: [1.0, 0.0, 0.0, 1.0],
+          pickable: true
+        };
+      }
+      if (sat.missile && !sat.inview) {
+        return {
+          color: [1.0, 1.0, 0.0, 1.0],
           pickable: true
         };
       }
@@ -4557,6 +4674,7 @@ dateFormat.i18n = {
 
       for (var i = 0; i < satData.length; i++) {
         if (satData[i].static) { continue; }
+        if (!satData[i].ON) { continue; }
         if ((satData[i].ON.indexOf(str) !== -1) || (satData[i].ON.indexOf(bigstr) !== -1)) {
           results.push({
             isIntlDes: false,
@@ -4564,10 +4682,12 @@ dateFormat.i18n = {
             isObjnum: false,
             strIndex: satData[i].ON.indexOf(str),
             SCC_NUM: satData[i].SCC_NUM,
+            desc: satData[i].desc,
             patlen: len,
             satId: i
           });
         }
+        if (satData[i].missile) { continue; }
 
         // if (satData[i].OT.indexOf(bigstr) !== -1) {
         //   SEARCH_LIMIT = 5000;
@@ -4684,6 +4804,8 @@ dateFormat.i18n = {
         html += sat.SCC_NUM.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
         html += '</span>';
         html += sat.SCC_NUM.substring(results[i].strIndex + results[i].patlen);
+      } else if (results[i].desc) {
+        html += sat.desc;
       } else {
         html += sat.SCC_NUM;
       }
@@ -4839,7 +4961,7 @@ dateFormat.i18n = {
     // console.log('orbitDisplay init: ' + time + ' ms');
   };
 
-  orbitDisplay.updateOrbitBuffer = function (satId, force, TLE1, TLE2) {
+  orbitDisplay.updateOrbitBuffer = function (satId, force, TLE1, TLE2, missile, latList, lonList, altList) {
     if (!inProgress[satId]) {
       if (force) {
         orbitWorker.postMessage({
@@ -4852,6 +4974,16 @@ dateFormat.i18n = {
           // NOTE: STATIC TLE
           TLE1: TLE1,
           TLE2: TLE2
+        });
+      } else if (missile) {
+        orbitWorker.postMessage({
+          isInit: false,
+          isUpdate: true,
+          missile: true,
+          satId: satId,
+          latList: latList,
+          lonList: lonList,
+          altList: altList
         });
       } else {
         orbitWorker.postMessage({
@@ -5016,7 +5148,7 @@ dateFormat.i18n = {
   function FOVBubble () {
     this.vertBuf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(72), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(72), gl.STREAM_DRAW);
   }
 
   FOVBubble.prototype.set = function () {
@@ -5058,7 +5190,7 @@ dateFormat.i18n = {
       -100.0, 100.0, -100.0
     ];
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(buf), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(buf), gl.STREAM_DRAW);
   };
 
   FOVBubble.prototype.draw = function () {
@@ -5066,15 +5198,14 @@ dateFormat.i18n = {
     var bubbleShader = orbitDisplay.getPathShader();
 
     gl.useProgram(bubbleShader);
-    gl.enable(gl.BLEND);
+    gl.disable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthFunc(gl.LESS);
 
-    gl.uniform4fv(bubbleShader.uColor, [0.0, 1.0, 1.0, 0.5]);
+    gl.uniform4fv(bubbleShader.uColor, [0.0, 1.0, 1.0, 0.2]);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
     gl.vertexAttribPointer(bubbleShader.aPos, 3, gl.FLOAT, false, 0, 0);
-    gl.drawArrays(gl.TRIANGLE_FANS, 0, 24); // Mode, First Vertex, Number of Vertex
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, 24); // Mode, First Vertex, Number of Vertex
+    gl.enable(gl.BLEND);
   };
 
   window.FOVBubble = FOVBubble;
@@ -5779,6 +5910,10 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
         for (i = 0; i < staticSet.length; i++) {
           tempSatData.push(staticSet[i]);
         }
+        for (i = 0; i < missileSet.length; i++) {
+          tempSatData.push(missileSet[i]);
+        }
+        console.log(tempSatData.length);
         return tempSatData;
       }
 
@@ -5961,6 +6096,11 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
     }
   };
 
+  satSet.setSat = function (i, satObject) {
+    if (!satData) return null;
+    satData[i] = satObject;
+  };
+
   satSet.getSat = function (i) {
     if (!satData) return null;
 
@@ -6005,7 +6145,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
 
   satSet.getIdFromObjNum = function (objNum) {
     for (var i = 0; i < satData.length; i++) {
-      if (satData[i].static) {
+      if (satData[i].static || satData[i].missile) {
         return null;
       } else {
         var scc = pad(satData[i].TLE1.substr(2, 5).trim(), 5);
@@ -6079,7 +6219,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
     var res = [];
 
     for (var i = 0; i < satData.length; i++) {
-      if (satData[i].static) { continue; }
+      if (satData[i].static || satData[i].missile) { continue; }
       res.push(satData[i]);
       lookangles.getTEARR(res[i]);
       res[i]['azimuth'] = lookangles.azimuth;

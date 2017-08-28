@@ -669,6 +669,98 @@
         </div>
       </div>
 
+      <div id="missile-menu" class="start-hidden text-select">
+        <div id="missile-content" class="side-menu">
+          <div class="row">
+            <h5 class="center-align">Create Missile Attack</h5>
+            <form id="missile" class="col s12">
+              <div class="input-field col s12">
+                <select id="ms-type">
+                  <option value="0">Custom Missile</option>
+                  <option value="1">Russian to USA</option>
+                  <option value="2">Chinese to USA</option>
+                  <option value="3">North Korean to USA</option>
+                  <option value="4">USA to Russia</option>
+                  <option value="5">USA to China</option>
+                  <option value="6">USA to North Korea</option>
+                </select>
+                <label>Type of Attack</label>
+              </div>
+              <div id="ms-custom-opt">
+                <div class="input-field col s12">
+                  <select id="ms-attacker">
+                    <optgroup label="United States">
+                      <option value="100">Minot</option>
+                      <option value="101">Malmstrom</option>
+                      <option value="102">F.E. Warren</option>
+                    </optgroup>
+                    <optgroup label="Russia">
+                      <option value="200">Aleysk</option>
+                      <option value="201">Dombarovskiy</option>
+                      <option value="202">Uzhur</option>
+                      <option value="203">Kartaly</option>
+                      <option value="204">Irkutsk</option>
+                      <option value="205">Kansk</option>
+                      <option value="206">Krasnoyarsk</option>
+                      <option value="207">Nizhniy Tagil</option>
+                      <option value="208">Novosibirsk</option>
+                      <option value="209">Tatischevo (SS-19)</option>
+                      <option value="210">Tatischevo (SS-27)</option>
+                      <option value="211">Teykovo</option>
+                      <option value="212">Yoshkar Ola</option>
+                    </optgroup>
+                    <optgroup label="China">
+                      <option value="300">Nanyang</option>
+                      <option value="301">Xining</option>
+                      <option value="302">Delingha</option>
+                      <option value="303">Haiyan</option>
+                      <option value="304">Datong</option>
+                      <option value="305">Tainshui</option>
+                      <option value="306">Xixia</option>
+                      <option value="307">Shaoyang</option>
+                      <option value="308">Yuxi</option>
+                      <option value="309">Luoyang</option>
+                      <option value="310">Wuzhai</option>
+                      <option value="311">Xuanhua</option>
+                      <option value="312">Tongdao</option>
+                      <option value="313">Lushi</option>
+                      <option value="314">Jingxian A</option>
+                      <option value="315">Jingxian B</option>
+                      <option value="316">Hunan</option>
+                      <option value="317">Daqing City</option>
+                      <option value="318">Xinyang City</option>
+                      <option value="319">Xinjiang Province</option>
+                      <option value="320">Tibet Province</option>
+                    </optgroup>
+                    <optgroup label="North Korea">
+                      <option value="400">Sinpo</option>
+                      <option value="401">P'yong'an</option>
+                      <option value="402">Pyongyang</option>
+                    </optgroup>
+                  </select>
+                  <label>Launch Location</label>
+                </div>
+                <div class="input-field col s12">
+                  <input placeholder="00.000" id="ms-lat" type="text">
+                  <label for="ms-lat">Target Latitude</label>
+                </div>
+                <div class="input-field col s12">
+                  <input placeholder="00.000" id="ms-lon" type="text">
+                  <label for="ms-lon">Target Longitude</label>
+                </div>
+              </div>
+              <div class="center-align">
+                <button class="btn waves-effect waves-light" type="submit" name="action">Launch Missile Attack &#9658;
+                </button>
+              </div>
+            </form>
+          </div>
+          <div id="ms-error" style="display: none;margin-top: 10px;cursor: pointer; cursor: hand;" class="center-align">
+            <h6 class="center-align">Error</h6>
+          </div>
+        </div>
+      </div>
+
       <div id="customSensor-menu" class="start-hidden text-select">
         <div id="customSensor-content" class="side-menu">
           <div class="row">
@@ -925,6 +1017,9 @@
         <div id="menu-newLaunch" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Create Launch Nominal">
           <img src="" delayedsrc="images/rocket-ship.png" class="bmenu-item-disabled" alt="New Launches">
         </div>
+        <div id="menu-missile" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Create Missile Attack">
+          <img src="" delayedsrc="images/rocket-ship-2.png" class="bmenu-item-disabled" alt="New Missile">
+        </div>
         <div id="menu-customSensor" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Use Custom Sensor/Telescope">
           <img src="" delayedsrc="images/observatory.png" class="bmenu-item-disabled" alt="Custom Sensor">
         </div>
@@ -942,7 +1037,7 @@
       <a id="reddit-share" href="https://www.reddit.com/submit?url=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Reddit"><img src="https://static.addtoany.com/buttons/reddit.svg" width="32" height="32"></a>
     </div>
     <span id="version-info" style="margin-top:-45px;margin-right:10px" class="right tooltipped" data-position="top" data-delay="50" data-tooltip="July 13, 2017">
-      v0.20.1
+      v0.21.0
     </span>
   </footer>
 
@@ -962,6 +1057,9 @@
   <script src="js/braun-projection.js"></script>
   <!-- Load Extra Variables -->
   <script src="variables.js"></script>
+  <script src="js/file-saver.min.js"></script>
+  <!-- Load Ballistic Missile Functions -->
+  <script src="ballistic-missile.js"></script>
   <!-- Load Main JavaScript Code -->
   <script src="main.js"></script>
   <!-- Load UI Dependencies -->

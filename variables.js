@@ -13,153 +13,201 @@
 
  */
 
+function saveVariable (variable) {
+  variable = JSON.stringify(variable);
+  var blob = new Blob([variable], {type: 'text/plain;charset=utf-8'});
+  saveAs(blob, 'variable.txt');
+}
+
+$.ajaxSetup({
+  cache:false
+});
+
+var MAX_MISSILES = 500;
+var missileSet = [];
+for (var i = 0; i < MAX_MISSILES; i++) {
+  var missileInfo = {
+    static: false,
+    missile: true,
+    active: false,
+    type: '',
+    name: i,
+    latList: [],
+    lonList: [],
+    altList: [],
+    timeList: []
+  };
+  missileSet.push(missileInfo);
+}
+
 var staticSet = [
   {
     static: true,
     name: 'Beale AFB, CA',
     type: 'Phased Array Radar',
     lat: 39.136064,
-    lon: -121.351236
+    lon: -121.351236,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'Cape Cod AFS, MA',
     type: 'Phased Array Radar',
     lat: 41.754785,
-    lon: -70.539151
+    lon: -70.539151,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'Clear AFS, AK',
     type: 'Phased Array Radar',
     lat: 64.290556,
-    lon: -149.186944
+    lon: -149.186944,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'Eglin AFB, FL',
     type: 'Phased Array Radar',
     lat: 30.572411,
-    lon: -86.214836
+    lon: -86.214836,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'RAF Fylingdales, UK',
     type: 'Phased Array Radar',
     lat: 54.361758,
-    lon: -0.670051
+    lon: -0.670051,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'Cavalier AFS, ND',
     type: 'Phased Array Radar',
     lat: 48.724567,
-    lon: -97.899755
+    lon: -97.899755,
+    changeObjectInterval: 250
   },
   {
     static: true,
     name: 'Thule AFB, GL',
     type: 'Phased Array Radar',
     lat: 76.570322,
-    lon: -68.299211
+    lon: -68.299211,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'Cobra Dane, AK',
     type: 'Phased Array Radar',
     lat: 52.737,
-    lon: 174.092
+    lon: 174.092,
+    changeObjectInterval: 250
   },
   {
     static: true,
     name: 'ALTAIR, Kwaj',
     type: 'Mechanical Tracking Radar',
     lat: 8.716667,
-    lon: 167.733333
+    lon: 167.733333,
+    changeObjectInterval: 30000
   },
   {
     static: true,
     name: 'Millstone, MA',
     type: 'Mechanical Tracking Radar',
     lat: 42.6233,
-    lon: -71.4882
+    lon: -71.4882,
+    changeObjectInterval: 30000
   },
   {
     static: true,
     name: 'Diego Garcia',
     type: 'Optical Sensor',
     lat: -7.296480,
-    lon: 72.390153
+    lon: 72.390153,
+    changeObjectInterval: 30000
   },
   {
     static: true,
     name: 'Maui, HI',
     type: 'Optical Sensor',
     lat: 20.708350,
-    lon: -156.257595
+    lon: -156.257595,
+    changeObjectInterval: 30000
   },
   {
     static: true,
     name: 'Socorro, NM',
     type: 'Optical Sensor',
     lat: 33.817233,
-    lon: -106.659961
+    lon: -106.659961,
+    changeObjectInterval: 30000
   },
   {
     static: true,
     name: 'Armavir, RUS',
     type: 'Phased Array Radar',
     lat: 44.925106,
-    lon: 40.983894
+    lon: 40.983894,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'Gantsevichi, RUS',
     type: 'Phased Array Radar',
     lat: 52.850000,
-    lon: 26.480000
+    lon: 26.480000,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'Lekhtusi, RUS',
     type: 'Phased Array Radar',
     lat: 60.275458,
-    lon: 30.546017
+    lon: 30.546017,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'Mishelevka-D, RUS',
     type: 'Phased Array Radar',
     lat: 52.855500,
-    lon: 103.231700
+    lon: 103.231700,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'Olenegorsk, RUS',
     type: 'Phased Array Radar',
     lat: 68.114100,
-    lon: 33.910200
+    lon: 33.910200,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'Pechora, RUS',
     type: 'Phased Array Radar',
     lat: 65.210000,
-    lon: 57.295000
+    lon: 57.295000,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'Pionersky, RUS',
     type: 'Phased Array Radar',
     lat: 54.857294,
-    lon: 20.182350
+    lon: 20.182350,
+    changeObjectInterval: 1000
   },
   {
     static: true,
     name: 'Xuanhua, PRC',
     type: 'Phased Array Radar',
     lat: 40.446944,
-    lon: 115.116389
+    lon: 115.116389,
+    changeObjectInterval: 1000
   }
 ];
 
@@ -731,7 +779,8 @@ sensorManager = (function () {
           obsminel: 3,
           obsmaxel: 85,
           obsminrange: 200,
-          obsmaxrange: 5555
+          obsmaxrange: 5555,
+          staticNum: 0
         });
 
         whichRadar = 'BLE';
@@ -770,7 +819,8 @@ sensorManager = (function () {
           obsminel: 3,
           obsmaxel: 85,
           obsminrange: 200,
-          obsmaxrange: 5555
+          obsmaxrange: 5555,
+          staticNum: 1
         });
 
         $('#sensor-info-title').html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html'>Cape Cod AFS</a>");
@@ -810,7 +860,8 @@ sensorManager = (function () {
           obsminel: 3,
           obsmaxel: 85,
           obsminrange: 200,
-          obsmaxrange: 4910
+          obsmaxrange: 4910,
+          staticNum: 2
         });
 
         whichRadar = 'CLR';
@@ -850,7 +901,8 @@ sensorManager = (function () {
           obsminel: 3,
           obsmaxel: 105,
           obsminrange: 200,
-          obsmaxrange: 50000
+          obsmaxrange: 50000,
+          staticNum: 3
         });
 
         whichRadar = 'EGL';
@@ -890,7 +942,8 @@ sensorManager = (function () {
           obsminel: 3,
           obsmaxel: 85,
           obsminrange: 200,
-          obsmaxrange: 4820
+          obsmaxrange: 4820,
+          staticNum: 4
         });
 
         whichRadar = 'FYL';
@@ -930,7 +983,8 @@ sensorManager = (function () {
           obsminel: 1.9,
           obsmaxel: 95,
           obsminrange: 200,
-          obsmaxrange: 3300 // TODO: Double check this
+          obsmaxrange: 3300, // TODO: Double check this
+          staticNum: 5
         });
 
         whichRadar = 'PAR';
@@ -970,7 +1024,8 @@ sensorManager = (function () {
           obsminel: 3,
           obsmaxel: 85,
           obsminrange: 200,
-          obsmaxrange: 5555
+          obsmaxrange: 5555,
+          staticNum: 6
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening
@@ -1023,7 +1078,8 @@ sensorManager = (function () {
           obsminel2: 30,
           obsmaxel2: 80,
           obsminrange2: 200,
-          obsmaxrange2: 4200
+          obsmaxrange2: 4200,
+          staticNum: 7
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening
@@ -1064,7 +1120,8 @@ sensorManager = (function () {
           obsminel: 1,
           obsmaxel: 90,
           obsminrange: 200,
-          obsmaxrange: 50000
+          obsmaxrange: 50000,
+          staticNum: 8
         });
 
         whichRadar = '';
@@ -1104,7 +1161,8 @@ sensorManager = (function () {
           obsminel: 1,
           obsmaxel: 90,
           obsminrange: 200,
-          obsmaxrange: 50000
+          obsmaxrange: 50000,
+          staticNum: 9
         });
 
         whichRadar = 'MIL';
@@ -1144,7 +1202,8 @@ sensorManager = (function () {
           obsminel: 20,
           obsmaxel: 90,
           obsminrange: 20000,
-          obsmaxrange: 500000
+          obsmaxrange: 500000,
+          staticNum: 10
         });
 
         whichRadar = 'DGC';
@@ -1184,7 +1243,8 @@ sensorManager = (function () {
           obsminel: 20,
           obsmaxel: 90,
           obsminrange: 20000,
-          obsmaxrange: 500000
+          obsmaxrange: 500000,
+          staticNum: 11
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening
@@ -1224,7 +1284,8 @@ sensorManager = (function () {
           obsminel: 20,
           obsmaxel: 90,
           obsminrange: 20000,
-          obsmaxrange: 500000
+          obsmaxrange: 500000,
+          staticNum: 12
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening
@@ -1305,7 +1366,8 @@ sensorManager = (function () {
           obsminel: 2,
           obsmaxel: 60,
           obsminrange: 100,
-          obsmaxrange: 4200
+          obsmaxrange: 4200,
+          staticNum: 13
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening
@@ -1344,7 +1406,8 @@ sensorManager = (function () {
           obsminel: 5.5,
           obsmaxel: 34.5,
           obsminrange: 385,
-          obsmaxrange: 4600
+          obsmaxrange: 4600,
+          staticNum: 14
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening
@@ -1383,7 +1446,8 @@ sensorManager = (function () {
           obsminel: 3,
           obsmaxel: 80,
           obsminrange: 300,
-          obsmaxrange: 6500
+          obsmaxrange: 6500,
+          staticNum: 15
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening
@@ -1422,7 +1486,8 @@ sensorManager = (function () {
           obsminel: 2,
           obsmaxel: 70,
           obsminrange: 100,
-          obsmaxrange: 4200
+          obsmaxrange: 4200,
+          staticNum: 16
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening
@@ -1461,7 +1526,8 @@ sensorManager = (function () {
           obsminel: 5.5,
           obsmaxel: 34.5,
           obsminrange: 250,
-          obsmaxrange: 4600
+          obsmaxrange: 4600,
+          staticNum: 17
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening
@@ -1500,7 +1566,8 @@ sensorManager = (function () {
           obsminel: 5.5,
           obsmaxel: 34.5,
           obsminrange: 250,
-          obsmaxrange: 4600
+          obsmaxrange: 4600,
+          staticNum: 18
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening
@@ -1539,7 +1606,8 @@ sensorManager = (function () {
           obsminel: 2,
           obsmaxel: 55,
           obsminrange: 300,
-          obsmaxrange: 7200
+          obsmaxrange: 7200,
+          staticNum: 19
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening
@@ -1578,7 +1646,8 @@ sensorManager = (function () {
           obsminel: 2,
           obsmaxel: 60,
           obsminrange: 100,
-          obsmaxrange: 4200
+          obsmaxrange: 4200,
+          staticNum: 20
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening
@@ -1617,7 +1686,8 @@ sensorManager = (function () {
           obsminel: 2,      // Information via globalsecurity.org
           obsmaxel: 80,     // Information via globalsecurity.org
           obsminrange: 300, // TODO: Verify
-          obsmaxrange: 3000 // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
+          obsmaxrange: 3000, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
+          staticNum: 21
         });
 
         whichRadar = ''; // Disables Weather Menu from Opening

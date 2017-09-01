@@ -1092,16 +1092,17 @@ $(document).ready(function () { // Code Once index.php is loaded
       if (type === 4) MassRaidPre(launchTime, 'USA2Russia.json');
       if (type === 5) MassRaidPre(launchTime, 'USA2China.json');
       if (type === 6) MassRaidPre(launchTime, 'USA2NorthKorea.json');
+      ga('send', 'event', 'Missile Sim', type, 'Sim Number');
       $('#ms-error').html('Large Scale Attack Loaded');
       $('#ms-error').show();
     } else {
-      if (Number.isNaN(tgtLat)) {
+      if (tgtLat == NaN) {
         $('#ms-error').html('Please enter a number<br>for Target Latitude');
         $('#ms-error').show();
         e.preventDefault();
         return;
       }
-      if (Number.isNaN(tgtLon)) {
+      if (tgtLon == NaN) {
         $('#ms-error').html('Please enter a number<br>for Target Longitude');
         $('#ms-error').show();
         e.preventDefault();
@@ -1111,9 +1112,7 @@ $(document).ready(function () { // Code Once index.php is loaded
       if (attacker < 200) { // USA
         var a = attacker - 100;
         var b = 500 - missilesInUse;
-        console.log(a);
         var attackerName = UsaICBM[a * 4 + 2];
-        console.log(attackerName);
         Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, UsaICBM[a * 4 + 2], 30, 2.9, 0.07, UsaICBM[a * 4 + 3]);
       } else if (attacker < 300) { // Russian
         var a = attacker - 200;
@@ -1586,6 +1585,7 @@ function hideSideMenus () {
   $('#settings-menu').fadeOut();
   $('#editSat-menu').fadeOut();
   $('#newLaunch-menu').fadeOut();
+  $('#missile-menu').fadeOut();
   $('#customSensor-menu').fadeOut();
   $('#about-menu').fadeOut();
 
@@ -1603,6 +1603,7 @@ function hideSideMenus () {
   $('#menu-settings img').removeClass('bmenu-item-selected');
   $('#menu-editSat img').removeClass('bmenu-item-selected');
   $('#menu-newLaunch img').removeClass('bmenu-item-selected');
+  $('#menu-missile img').removeClass('bmenu-item-selected');
   $('#menu-customSensor img').removeClass('bmenu-item-selected');
   $('#menu-about img').removeClass('bmenu-item-selected');
 
@@ -2817,6 +2818,8 @@ function hoverBoxOnSat (satId, satX, satY) {
         $('#sat-hoverbox').html(sat.name + '<br /><center>' + sat.type + lookangles.distance(sat, selectedSatData) + '</center>');
       } else if (sat.static) {
         $('#sat-hoverbox').html(sat.name + '<br /><center>' + sat.type + '</center>');
+      } else if (sat.missile) {
+        $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.desc + '</center>');
       } else {
         if (lookangles.sensorSelected() && isShowNextPass && isShowDistance) {
           $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + lookangles.distance(sat, selectedSatData) + '</center>');
@@ -4674,6 +4677,7 @@ dateFormat.i18n = {
 
       for (var i = 0; i < satData.length; i++) {
         if (satData[i].static) { continue; }
+        if (satData[i].missile && !satData[i].active) { continue; }
         if (!satData[i].ON) { continue; }
         if ((satData[i].ON.indexOf(str) !== -1) || (satData[i].ON.indexOf(bigstr) !== -1)) {
           results.push({
@@ -5684,8 +5688,10 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
         $('#menu-settings').hide();
         $('#menu-editSat img').hide();
         $('#menu-newLaunch img').hide();
+        $('#menu-missile img').hide();
         $('#social').hide();
         $('#version-info').hide();
+        $('#legend-menu').hide();
         $('#mobile-warning').show();
         $('#changelog-row').addClass('center-align');
         $('#fastCompSettings').hide();
@@ -5736,6 +5742,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
       $('#menu-space-stations img').removeClass('bmenu-item-disabled');
       $('#menu-satellite-collision img').removeClass('bmenu-item-disabled');
       $('#menu-customSensor img').removeClass('bmenu-item-disabled');
+      $('#menu-missile img').removeClass('bmenu-item-disabled');
       $('#menu-settings img').removeClass('bmenu-item-disabled');
       isBottomIconsEnabled = true;
       satSet.setColorScheme(currentColorScheme); // force color recalc
@@ -5913,7 +5920,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
         for (i = 0; i < missileSet.length; i++) {
           tempSatData.push(missileSet[i]);
         }
-        console.log(tempSatData.length);
+        // console.log(tempSatData.length);
         return tempSatData;
       }
 

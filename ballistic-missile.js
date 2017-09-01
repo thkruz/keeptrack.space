@@ -138,6 +138,7 @@ var USATargets = [
 ];
 
 function MassRaidPre (time, simFile) {
+  clearMissiles();
   $.get(simFile, function (missileArray) {
     MassRaidArray = missileArray;
     var satSetLen = satSet.getSatData().length;
@@ -1280,7 +1281,7 @@ function Missile (CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongi
     return Math.max(a, b);
   });
 
-  console.log('Max Altitude: ' + MaxAltitude);
+  // console.log('Max Altitude: ' + MaxAltitude);
 
   for (var i = 0; i < AltitudeList.length; i++) { if (AltitudeList[i] === MaxAltitude) var MaxAltitudePossition = i; }
   for (i = 0; i < drdtList.length; i++) { if (drdtList[i] === MaxVerticalVelocity) var MaxVerticalVelocityPossition = i; }
@@ -1345,7 +1346,6 @@ function Missile (CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongi
 
     if (MissileDesc) MissileObject.desc = MissileDesc;
     missileArray.push(MissileObject);
-    console.log(MissileObject.ON);
     satCruncher.postMessage({
       id: MissileObject.id,
       typ: 'newMissile',
@@ -1371,4 +1371,33 @@ function Missile (CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongi
   missilesInUse++;
   lastMissileError = 'Missile Named RV_' + MissileObject.name + '<br>has been created.';
   return 1; // Successful Launch
+}
+
+function clearMissiles () {
+  $('#search').val('');
+  missilesInUse = 0;
+  searchBox.hideResults();
+  var satSetLen = satSet.getSatData().length;
+  for (var i = 0; i < 500; i++) {
+    var x = satSetLen - 500 + i;
+    // satSet.setSat(x, missileArray[i]);
+    var MissileObject = satSet.getSat(x);
+    MissileObject.active = false;
+
+    satCruncher.postMessage({
+      id: MissileObject.id,
+      typ: 'newMissile',
+      ON: 'RV_' + MissileObject.name,
+      satId: MissileObject.id,
+      static: MissileObject.static,
+      missile: MissileObject.missile,
+      active: MissileObject.active,
+      type: MissileObject.type,
+      name: MissileObject.name,
+      latList: MissileObject.latList,
+      lonList: MissileObject.lonList,
+      altList: MissileObject.altList,
+      startTime: MissileObject.startTime
+    });
+  }
 }

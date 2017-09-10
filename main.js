@@ -478,28 +478,28 @@ $(document).ready(function () { // Code Once index.php is loaded
     camZoomSnappedOnSat = false;
   });
   $('#controls-up').click(function () {
-    camPitch += 0.05;
-    if (camPitch > Math.PI / 2) camPitch = Math.PI / 2;
+    camPitchSpeed += 0.001 * zoomLevel;
+    if (camPitch > Math.PI / 2) camPitchSpeed = 0;
     rotateTheEarth = false;
     camZoomSnappedOnSat = false;
   });
 
   $('#controls-down').click(function () {
-    camPitch -= 0.05;
-    if (camPitch < -Math.PI / 2) camPitch = -Math.PI / 2;
+    camPitchSpeed -= 0.001 * zoomLevel;
+    if (camPitch < -Math.PI / 2) camPitchSpeed = 0;
     rotateTheEarth = false;
     camZoomSnappedOnSat = false;
   });
 
   $('#controls-left').click(function () {
-    camYaw -= 0.1;
+    camYawSpeed -= 0.001 * zoomLevel;
     // if (camYaw < -1) camYaw = -1;
     rotateTheEarth = false;
     camZoomSnappedOnSat = false;
   });
 
   $('#controls-right').click(function () {
-    camYaw += 0.1;
+    camYawSpeed += 0.001 * zoomLevel;
     // if (camYaw > 1) camYaw = 1;
     rotateTheEarth = false;
     camZoomSnappedOnSat = false;

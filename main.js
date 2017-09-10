@@ -464,19 +464,47 @@ $(document).ready(function () { // Code Once index.php is loaded
     $('#menu-space-stations img').removeClass('bmenu-item-selected');
   });
 
-  $('#zoom-in').click(function () {
+  $('#controls-zoom-in').click(function () {
     zoomTarget -= 0.04;
     if (zoomTarget < 0) zoomTarget = 0;
     rotateTheEarth = false;
     camZoomSnappedOnSat = false;
   });
 
-  $('#zoom-out').click(function () {
+  $('#controls-zoom-out').click(function () {
     zoomTarget += 0.04;
     if (zoomTarget > 1) zoomTarget = 1;
     rotateTheEarth = false;
     camZoomSnappedOnSat = false;
   });
+  $('#controls-up').click(function () {
+    camPitch += 0.05;
+    if (camPitch > Math.PI / 2) camPitch = Math.PI / 2;
+    rotateTheEarth = false;
+    camZoomSnappedOnSat = false;
+  });
+
+  $('#controls-down').click(function () {
+    camPitch -= 0.05;
+    if (camPitch < -Math.PI / 2) camPitch = -Math.PI / 2;
+    rotateTheEarth = false;
+    camZoomSnappedOnSat = false;
+  });
+
+  $('#controls-left').click(function () {
+    camYaw -= 0.1;
+    // if (camYaw < -1) camYaw = -1;
+    rotateTheEarth = false;
+    camZoomSnappedOnSat = false;
+  });
+
+  $('#controls-right').click(function () {
+    camYaw += 0.1;
+    // if (camYaw > 1) camYaw = 1;
+    rotateTheEarth = false;
+    camZoomSnappedOnSat = false;
+  });
+
  //   debugContext = $('#debug-canvas')[0].getContext('2d');
  //   debugImageData = debugContext.createImageData(debugContext.canvas.width, debugContext.canvas.height);
 
@@ -5686,9 +5714,9 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
         $('#menu-satellite-collision img').removeClass('bmenu-item-disabled');
         $('#menu-customSensor img').removeClass('bmenu-item-disabled');
         $('#menu-settings').hide();
-        $('#menu-editSat img').hide();
+        $('#menu-editSat img').show();
         $('#menu-newLaunch img').hide();
-        $('#menu-missile img').hide();
+        $('#menu-missile img').show();
         $('#social').hide();
         $('#version-info').hide();
         $('#legend-menu').hide();
@@ -5702,6 +5730,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
         $('#datetime-text').attr('style', 'padding:6px;height:100%;');
         $('#datetime-input').attr('style', 'bottom:0px;');
         $('#bottom-icons').attr('style', 'position:inherit;');
+        $('#mobile-controls').show();
         $('#search').attr('style', 'width:55px;');
         if ($(document).height() >= 600) {
           $('#sat-infobox').attr('style', 'width:100%;top:60%;');

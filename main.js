@@ -176,7 +176,9 @@ var selectedSat = -1;
 
 var mouseX = 0;
 var mouseY = 0;
+var mouseTimeout = null;
 var mouseSat = -1;
+var isMouseMoving = false;
 
 var curRadarTrackNum = 0;
 var lastRadarTrackTime = 0;
@@ -324,6 +326,11 @@ $(document).ready(function () { // Code Once index.php is loaded
     }
     mouseX = evt.originalEvent.touches[0].clientX;
     mouseY = evt.originalEvent.touches[0].clientY;
+    isMouseMoving = true;
+    clearTimeout(mouseTimeout);
+    mouseTimeout = setTimeout(function () {
+      isMouseMoving = false;
+    }, 250);
   });
 
   $('#canvas').mousemove(function (evt) {
@@ -334,6 +341,11 @@ $(document).ready(function () { // Code Once index.php is loaded
     }
     mouseX = evt.clientX;
     mouseY = evt.clientY;
+    isMouseMoving = true;
+    clearTimeout(mouseTimeout);
+    mouseTimeout = setTimeout(function () {
+      isMouseMoving = false;
+    }, 250);
   });
 
   $('#canvas').on('wheel', function (evt) {
@@ -2122,7 +2134,7 @@ function selectSat (satId) {
     camZoomSnappedOnSat = true;
     camAngleSnappedOnSat = true;
 
-    satSet.selectSat(satId);
+    // satSet.selectSat(satId);
     camSnapToSat(satId);
     orbitDisplay.setSelectOrbit(satId);
     if (sat.missile) return;
@@ -2823,6 +2835,7 @@ function updateHover () {
       hoverBoxOnSat(-1, 0, 0);
     }
   } else {
+    if (!isMouseMoving) { return; }
     mouseSat = getSatIdFromCoord(mouseX, mouseY);
     if (mouseSat !== -1) {
       orbitDisplay.setHoverOrbit(mouseSat);

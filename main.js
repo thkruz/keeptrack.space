@@ -1126,12 +1126,12 @@ $(document).ready(function () { // Code Once index.php is loaded
     launchTime = new Date(launchTime[0] + 'T' + launchTime[1] + 'Z').getTime();
 
     if (type > 0) {
-      if (type === 1) MassRaidPre(launchTime, 'Russia2USA.json');
-      if (type === 2) MassRaidPre(launchTime, 'China2USA.json');
-      if (type === 3) MassRaidPre(launchTime, 'NorthKorea2USA.json');
-      if (type === 4) MassRaidPre(launchTime, 'USA2Russia.json');
-      if (type === 5) MassRaidPre(launchTime, 'USA2China.json');
-      if (type === 6) MassRaidPre(launchTime, 'USA2NorthKorea.json');
+      if (type === 1) MassRaidPre(launchTime, 'simulation/Russia2USA.json');
+      if (type === 2) MassRaidPre(launchTime, 'simulation/China2USA.json');
+      if (type === 3) MassRaidPre(launchTime, 'simulation/NorthKorea2USA.json');
+      if (type === 4) MassRaidPre(launchTime, 'simulation/USA2Russia.json');
+      if (type === 5) MassRaidPre(launchTime, 'simulation/USA2China.json');
+      if (type === 6) MassRaidPre(launchTime, 'simulation/USA2NorthKorea.json');
       ga('send', 'event', 'Missile Sim', type, 'Sim Number');
       $('#ms-error').html('Large Scale Attack Loaded');
       $('#ms-error').show();

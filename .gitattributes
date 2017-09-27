@@ -1,4 +1,5 @@
 # Auto detect text files and perform LF normalization
+# This line was added to remove the default commit
 * text=auto
 
 # Custom for Visual Studio

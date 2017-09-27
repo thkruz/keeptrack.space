@@ -62,6 +62,7 @@ laws of the United States and International Copyright Treaty.
     ga
     braun
     staticSet
+    analSatSet
     missileSet
     sensorManager
     extractCountry
@@ -898,10 +899,12 @@ $(document).ready(function () { // Code Once index.php is loaded
       satCruncher.postMessage({
         typ: 'satEdit',
         id: satId,
+        active: true,
         TLE1: TLE1,
         TLE2: TLE2
       });
       orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
+      sat.active = true;
 
       sat = satSet.getSat(satId);
     } else {
@@ -909,6 +912,59 @@ $(document).ready(function () { // Code Once index.php is loaded
       $('#es-error').show();
     }
     e.preventDefault();
+  });
+
+  $('#editSat-save').click(function (e) {
+    var scc = $('#es-scc').val();
+    var satId = satSet.getIdFromObjNum(scc);
+    var sat = satSet.getSat(satId);
+    var sat2 = {
+      TLE1: sat.TLE1,
+      TLE2: sat.TLE2
+    };
+    var variable = JSON.stringify(sat2);
+    var blob = new Blob([variable], {type: 'text/plain;charset=utf-8'});
+    saveAs(blob, scc + '.tle');
+    e.preventDefault();
+  });
+
+  $('#editSat-open').click(function (e) {
+    $('#editSat-file').trigger('click');
+  });
+
+  $('#editSat-file').change(function (evt) {
+    if (!window.FileReader) return; // Browser is not compatible
+
+    var reader = new FileReader();
+
+    reader.onload = function (evt) {
+      if (evt.target.readyState !== 2) return;
+      if (evt.target.error) {
+        console.log('error');
+        return;
+      }
+
+      var object = JSON.parse(evt.target.result);
+      var scc = parseInt(pad(object.TLE1.substr(2, 5).trim(), 5));
+      var satId = satSet.getIdFromObjNum(scc);
+      var sat = satSet.getSat(satId);
+      if (lookangles.altitudeCheck(object.TLE1, object.TLE2, propOffset) > 1) {
+        satCruncher.postMessage({
+          typ: 'satEdit',
+          id: sat.id,
+          active: true,
+          TLE1: object.TLE1,
+          TLE2: object.TLE2
+        });
+        orbitDisplay.updateOrbitBuffer(sat.id, true, object.TLE1, object.TLE2);
+        sat.active = true;
+      } else {
+        $('#es-error').html('Failed Altitude Check</br>Try Different Parameters');
+        $('#es-error').show();
+      }
+    };
+    reader.readAsText(evt.target.files[0]);
+    evt.preventDefault();
   });
 
   $('#es-error').click(function () {
@@ -4747,18 +4803,6 @@ dateFormat.i18n = {
         //   });
         // }
 
-        if ((satData[i].LV.indexOf(str) !== -1) || (satData[i].LV.indexOf(bigstr) !== -1)) {
-          results.push({
-            isIntlDes: false,
-            isInView: satData[i].inview,
-            isObjnum: false,
-            strIndex: satData[i].LV.indexOf(str),
-            SCC_NUM: satData[i].SCC_NUM,
-            patlen: len,
-            satId: i
-          });
-        }
-
         if (satData[i].intlDes.indexOf(str) !== -1) {
           if (satData[i].SCC_NUM.indexOf(str) !== -1) {
             results.push({
@@ -4803,6 +4847,18 @@ dateFormat.i18n = {
               satId: i
             });
           }
+        }
+        if (parseInt(satData[i].SCC_NUM) >= 80000) { continue; }
+        if ((satData[i].LV.indexOf(str) !== -1) || (satData[i].LV.indexOf(bigstr) !== -1)) {
+          results.push({
+            isIntlDes: false,
+            isInView: satData[i].inview,
+            isObjnum: false,
+            strIndex: satData[i].LV.indexOf(str),
+            SCC_NUM: satData[i].SCC_NUM,
+            patlen: len,
+            satId: i
+          });
         }
       }
     } // end for j
@@ -5959,6 +6015,10 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
         for (i = 0; i < staticSet.length; i++) {
           tempSatData.push(staticSet[i]);
         }
+        for (i = 0; i < analSatSet.length; i++) {
+          analSatSet[i].id = tempSatData.length;
+          tempSatData.push(analSatSet[i]);
+        }
         for (i = 0; i < missileSet.length; i++) {
           tempSatData.push(missileSet[i]);
         }
@@ -6195,7 +6255,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
   satSet.getIdFromObjNum = function (objNum) {
     for (var i = 0; i < satData.length; i++) {
       if (satData[i].static || satData[i].missile) {
-        return null;
+        continue;
       } else {
         var scc = pad(satData[i].TLE1.substr(2, 5).trim(), 5);
       }

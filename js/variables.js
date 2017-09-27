@@ -24,6 +24,8 @@ $.ajaxSetup({
 });
 
 var MAX_MISSILES = 500;
+var MAX_ANALSATS = 30;
+
 var missileSet = [];
 for (var i = 0; i < MAX_MISSILES; i++) {
   var missileInfo = {
@@ -38,6 +40,26 @@ for (var i = 0; i < MAX_MISSILES; i++) {
     timeList: []
   };
   missileSet.push(missileInfo);
+}
+
+var analSatSet = [];
+for (i = 0; i < MAX_ANALSATS; i++) {
+  var analSatInfo = {
+    static: false,
+    missile: false,
+    active: false,
+    ON: 'Analyst Sat ' + i,
+    C: 'ANALSAT',
+    LV: 'Analyst Satellite',
+    LS: 'ANALSAT',
+    SCC_NUM: (80000 + i).toString(),
+    TLE1: '1 ' + (80000 + i).toString() + 'U 58002B   17115.48668720 +.00000144 +00000-0 +16234-3 0  9994',
+    TLE2: '2 ' + (80000 + i).toString() + ' 034.2502 167.2636 0042608 222.6554 121.5501 24.84703551080477',
+    intlDes: (80000 + i).toString(),
+    type: 'sat',
+    id: i
+  };
+  analSatSet.push(analSatInfo);
 }
 
 var staticSet = [
@@ -216,6 +238,8 @@ function extractCountry (C) {
   if (C === 'U') {
     country = 'Unknown';
   // Table Nested in ELSE to Make Hiding it Easier
+  } else if (C === 'ANALSAT') {
+    country = 'Analyst Satellite';
   } else {
     if (C === 'AB') { // Headquartered in Riyadh, Saudi Arabia
       country = 'Saudi Arabia';
@@ -609,6 +633,9 @@ function extractLaunchSite (LS) {
     site = 'Unknown';
     sitec = 'Unknown';
   // Table Nested in ELSE to Make Hiding it Easier
+} else if (LS === 'ANALSAT') {
+    site = 'Analyst Satellite';
+    sitec = 'Analyst Satellite';
   } else {
     if (LS === 'AFETR') {
       site = 'Cape Canaveral AFS';

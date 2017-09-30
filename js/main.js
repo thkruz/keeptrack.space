@@ -84,6 +84,10 @@ laws of the United States and International Copyright Treaty.
 
 // **** 1 - main ***
 
+//  Version Control
+var VERSION_NUMBER = 'v0.23.2';
+var VERSION_DATE = 'September 30, 2017';
+
 // Constants
 var ZOOM_EXP = 3;
 var DIST_MIN = 6800;
@@ -3297,12 +3301,11 @@ var lookangles = (function () {
           // rascOffset = true;
           i = i + 20;                 // Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
         } else {
-          console.log(isUpOrDown);
           break; // Stop changing the Mean Anomaly
         }
       }
       if (meanACalcResults === 5) {
-        i += (2 * 10); // Change meanA faster
+        i += (10 * 10); // Change meanA faster
       }
       if (meanACalcResults === 2) { return ['Error', '']; }
     }
@@ -3441,6 +3444,7 @@ var lookangles = (function () {
     }
 
     function getOrbitByLatLonPropagate (propOffset, satrec, type) {
+      propRealTime = Date.now();
       var now = propTimeCheck(propOffset, propRealTime);
       var j = jday(now.getUTCFullYear(),
                    now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -3485,24 +3489,22 @@ var lookangles = (function () {
       }
 
       if (lat > (goalLat - 0.15) && lat < (goalLat + 0.15) && type === 1) {
-        console.log(lat + ', ' + lon + ' -- ' + isUpOrDown);
+        console.log('Lat: ' + lat);
         return 1;
       }
 
       if (lon > (goalLon - 0.15) && lon < (goalLon + 0.15) && type === 2) {
-        console.log(lat + ', ' + lon + ' -- ' + isUpOrDown);
+        console.log('Lon: ' + lon);
         return 1;
       }
 
       // If current latitude greater than 11 degrees off rotate meanA faster
       if (!(lat > (goalLat - 11) && lat < (goalLat + 11)) && type === 1) {
-        console.log(lat + ', ' + lon + ' -- ' + isUpOrDown);
         return 5;
       }
 
       // If current longitude greater than 11 degrees off rotate RASC faster
       if (!(lon > (goalLon - 11) && lon < (goalLon + 11)) && type === 2) {
-        console.log(lat + ', ' + lon + ' -- ' + isUpOrDown);
         return 5;
       }
 
@@ -5796,6 +5798,10 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
 
     if (!cruncherReady) {
       // NOTE:: This is called right after all the objects load on the screen.
+
+      // Version Info Updated
+      $('#version-info').html(VERSION_NUMBER);
+      $('#version-info').tooltip({delay: 50, tooltip: VERSION_DATE, position: 'top'});
 
       // Hide Menus on Small Screens
       if ($(document).width() <= 1000) {

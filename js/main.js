@@ -68,7 +68,18 @@ laws of the United States and International Copyright Treaty.
     extractCountry
     extractLaunchSite
     extractLiftVehicle
-
+    MassRaidPre
+    saveAs
+    Blob
+    Line
+    FileReader
+    UsaICBM
+    RussianICBM
+    NorthKoreanBM
+    ChinaICBM
+    Missile
+    missilesInUse
+    lastMissileError
 */
 
 // **** 1 - main ***
@@ -96,6 +107,8 @@ var propOffset = 0.0; // offset we're propagating to, msec
 var propRate = 1.0; // time rate multiplier for propagation
 var propFrozen = Date.now(); // for when propRate 0
 var time; // Only used in drawLoop function
+var drawNow;
+var dt;
 
 // Camera Variables
 var camYaw = 0;
@@ -109,6 +122,17 @@ var zoomLevel = 0.5;
 var zoomTarget = 0.5;
 var camPitchSpeed = 0;
 var camYawSpeed = 0;
+var isZoomChanging = false;
+var dragTarget;
+
+var earthJ;
+var earthNow;
+var earthEra;
+var timeTextStr;
+var timeDateStr;
+var mvMatrix;
+var nMatrix;
+var lightDirection;
 
 var FPSPitch = 0;
 var FPSPitchRate = 0;
@@ -350,6 +374,8 @@ $(document).ready(function () { // Code Once index.php is loaded
   });
 
   $('#canvas').on('wheel', function (evt) {
+    // if (isZoomChanging) return;
+    // isZoomChanging = true;
     var delta = evt.originalEvent.deltaY;
     if (evt.originalEvent.deltaMode === 1) {
       delta *= 33.3333333;
@@ -1726,7 +1752,7 @@ function bottomIconPress (evt) {
   ga('send', 'event', 'Bottom Icon', $(this)['context']['id'], 'Selected');
   switch ($(this)['context']['id']) {
     case 'menu-sensor-info': // No Keyboard Commands
-      if (whichRadar === '') { // No Sensor Selected
+      if (!lookangles.sensorSelected()) { // No Sensor Selected
         if (!$('#menu-sensor-info img:animated').length) {
           $('#menu-sensor-info img').effect('shake', {distance: 10});
         }
@@ -2466,11 +2492,11 @@ function getSatIdFromCoord (x, y) {
   gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
   gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
 
-  var pickR = pickColorBuf[0];
-  var pickG = pickColorBuf[1];
-  var pickB = pickColorBuf[2];
+  // var pickR = pickColorBuf[0];
+  // var pickG = pickColorBuf[1];
+  // var pickB = pickColorBuf[2];
 
-  return ((pickB << 16) | (pickG << 8) | (pickR)) - 1;
+  return ((pickColorBuf[2] << 16) | (pickColorBuf[1] << 8) | (pickColorBuf[0])) - 1;
 }
 function getCamDist () {
   return Math.pow(zoomLevel, ZOOM_EXP) * (DIST_MAX - DIST_MIN) + DIST_MIN;
@@ -2516,7 +2542,7 @@ function camSnapToSat (satId) {
 
   if (camZoomSnappedOnSat) {
     var altitude;
-    if (!sat.missile && !sat.static) {               // if this is a satellite not a missile
+    if (!sat.missile && !sat.static && sat.active) { // if this is a satellite not a missile
       lookangles.getTEARR(sat);       // do lookangles on the satellite
       altitude = lookangles.altitude; // and set the altitude
     } if (sat.missile) {
@@ -2587,11 +2613,11 @@ function changeZoom (zoom) {
 
 function drawLoop () {
   requestAnimationFrame(drawLoop);
-  var now = new Date().getTime();
-  var dt = now - (time || now);
-  time = now;
+  drawNow = new Date().getTime();
+  dt = drawNow - (time || drawNow);
+  time = drawNow;
 
-  var dragTarget = getEarthScreenPoint(mouseX, mouseY);
+  dragTarget = getEarthScreenPoint(mouseX, mouseY);
   if (isDragging) {
     if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
     isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) || CAMERA_TYPE === 2) { // random screen drag
@@ -2644,6 +2670,10 @@ function drawLoop () {
     zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dt * 0.0025;
   } else {
     zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dt * 0.0075;
+    if (zoomLevel >= zoomTarget - 0.001 && zoomLevel <= zoomTarget + 0.001) {
+      zoomLevel = zoomTarget;
+      // isZoomChanging = false;
+    }
   }
 
   if (camPitch > TAU / 4) camPitch = TAU / 4;
@@ -2747,7 +2777,7 @@ function FPSMovement () {
 }
 
 function drawCamera () {
-  var camMatrix = mat4.create();
+  camMatrix = mat4.create();
   mat4.identity(camMatrix);
 
   /**
@@ -2792,6 +2822,8 @@ function updateMap () {
   map.y = map.y / 0.6366197723675813 * mapHeight - 10;
   $('#map-sat').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
   if (lookangles.sensorSelected()) {
+    console.log(lookangles.obslong);
+    console.log(lookangles.obslat);
     map = braun({lon: lookangles.obslong, lat: lookangles.obslat}, {meridian: 0, latLimit: 90});
     map.x = map.x * mapWidth - 10;
     map.y = map.y / 0.6366197723675813 * mapHeight - 10;
@@ -4478,7 +4510,7 @@ dateFormat.i18n = {
     this.sats = [];
     if (groupType === 'intlDes') {
       for (var i = 0; i < data.length; i++) {
-        theSatId = satSet.getIdFromIntlDes(data[i]);
+        var theSatId = satSet.getIdFromIntlDes(data[i]);
         if (theSatId === null) continue;
         this.sats.push({
           satId: theSatId,
@@ -4509,7 +4541,7 @@ dateFormat.i18n = {
       }
     } else if (groupType === 'objNum') {
       for (i = 0; i < data.length; i++) {
-        var theSatId = satSet.getIdFromObjNum(data[i]);
+        theSatId = satSet.getIdFromObjNum(data[i]);
         if (theSatId === null) continue;
         this.sats.push({
           satId: theSatId,
@@ -4986,7 +5018,6 @@ dateFormat.i18n = {
       }
 
       searchBox.doSearch($('#search').val());
-      return;
     });
   };
   window.searchBox = searchBox;
@@ -5489,52 +5520,52 @@ function propTime () {
     // console.log('earth init: ' + end + ' ms');
   };
 
+  $('#datetime-text').click(function () {
+    if (!isEditTime) {
+      $('#datetime-text').fadeOut();
+      $('#datetime-input').fadeIn();
+      $('#datetime-input-tb').focus();
+      isEditTime = true;
+    }
+  });
+
   earth.draw = function (pMatrix, camMatrix) {
     if (!loaded) return;
 
     // var now = new Date();
-    var now = propTime();
-
-    $('#datetime-text').click(function () {
-      if (!isEditTime) {
-        $('#datetime-text').fadeOut();
-        $('#datetime-input').fadeIn();
-        $('#datetime-input-tb').focus();
-        isEditTime = true;
-      }
-    });
+    earthNow = propTime();
 
     // wall time is not propagation time, so better print it
-    var datestr = now.toJSON();
-    var textstr = datestr.substring(0, 10) + ' ' + datestr.substring(11, 19);
+    timeDateStr = earthNow.toJSON();
+    timeTextStr = timeDateStr.substring(0, 10) + ' ' + timeDateStr.substring(11, 19);
     if (propRate > 1.01 || propRate < 0.99) {
       var digits = 1;
       if (propRate < 10) {
         digits = 2;
       }
-      textstr = textstr + ' ' + propRate.toFixed(digits) + 'x';
+      timeTextStr = timeTextStr + ' ' + propRate.toFixed(digits) + 'x';
     }
-    $('#datetime-text').text(textstr);
-    $('#datetime-input-tb').val(textstr);
+    $('#datetime-text').text(timeTextStr);
+    $('#datetime-input-tb').val(timeTextStr);
 
-    var j = jday(now.getUTCFullYear(),
-                 now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-                 now.getUTCDate(),
-                 now.getUTCHours(),
-                 now.getUTCMinutes(),
-                 now.getUTCSeconds());
-    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+    earthJ = jday(earthNow.getUTCFullYear(),
+                 earthNow.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+                 earthNow.getUTCDate(),
+                 earthNow.getUTCHours(),
+                 earthNow.getUTCMinutes(),
+                 earthNow.getUTCSeconds());
+    earthJ += earthNow.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
 
-    var era = satellite.gstime_from_jday(j);
+    earthEra = satellite.gstime_from_jday(earthJ);
 
-    var lightDirection = sun.currentDirection();
+    lightDirection = sun.currentDirection();
     vec3.normalize(lightDirection, lightDirection);
 
-    var mvMatrix = mat4.create();
+    mvMatrix = mat4.create();
     mat4.identity(mvMatrix);
-    mat4.rotateZ(mvMatrix, mvMatrix, era);
+    mat4.rotateZ(mvMatrix, mvMatrix, earthEra);
     mat4.translate(mvMatrix, mvMatrix, earth.pos);
-    var nMatrix = mat3.create();
+    nMatrix = mat3.create();
     mat3.normalFromMat4(nMatrix, mvMatrix);
 
     gl.useProgram(earthShader);
@@ -5748,14 +5779,20 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
     satVel = new Float32Array(m.data.satVel);
     satInView = new Float32Array(m.data.satInView);
 
-    var now = Date.now();
-    if (isMapMenuOpen && now > lastMapUpdateTime + 30000 || mapUpdateOverride) {
-      updateMap();
-      lastMapUpdateTime = now;
-      mapUpdateOverride = false;
+    if (isMapMenuOpen || mapUpdateOverride) {
+      var now = Date.now();
+      if (now > lastMapUpdateTime + 30000) {
+        updateMap();
+        lastMapUpdateTime = now;
+        mapUpdateOverride = false;
+      }
     }
 
-    satSet.setColorScheme(currentColorScheme); // force color recalc
+    if (currentColorScheme === ColorScheme.default && !lookangles.sensorSelected()) {
+      // Don't force color recalc if default colors and no sensor for inview color
+    } else {
+      satSet.setColorScheme(currentColorScheme); // force color recalc
+    }
 
     if (!cruncherReady) {
       // NOTE:: This is called right after all the objects load on the screen.
@@ -5992,6 +6029,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
               resp[i].intlDes = year + '-' + rest;
             }
             resp[i].id = i;
+            resp[i].active = true;
             tempSatData.push(resp[i]);
             continue;
           } else { // If there are limited satellites
@@ -6007,6 +6045,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
                   resp[i].intlDes = year + '-' + rest;
                 }
                 resp[i].id = i;
+                resp[i].active = true;
                 tempSatData.push(resp[i]);
               }
             }
@@ -6327,14 +6366,16 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
     if (!isCheckPeriodMarg) { periodMarg = 0.5; }
     var res = [];
 
+    var s = 0;
     for (var i = 0; i < satData.length; i++) {
-      if (satData[i].static || satData[i].missile) { continue; }
+      if (satData[i].static || satData[i].missile || !satData[i].active) { continue; }
       res.push(satData[i]);
-      lookangles.getTEARR(res[i]);
-      res[i]['azimuth'] = lookangles.azimuth;
-      res[i]['elevation'] = lookangles.elevation;
-      res[i]['range'] = lookangles.range;
-      res[i]['inview'] = lookangles.inview;
+      lookangles.getTEARR(res[s]);
+      res[s]['azimuth'] = lookangles.azimuth;
+      res[s]['elevation'] = lookangles.elevation;
+      res[s]['range'] = lookangles.range;
+      res[s]['inview'] = lookangles.inview;
+      s++;
     }
 
     if (!isCheckInclination && !isCheckPeriod) {

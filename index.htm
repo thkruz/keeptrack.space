@@ -14,7 +14,7 @@
     <div id="tle-source" style="display: none;">TLE.json</div>
 
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <link rel="stylesheet" href="css/loading-screen.css" type="text/css">
 
@@ -26,7 +26,7 @@
     <title>Keep Track</title>
   </head>
   <body class="no-text-select">
-  <div id="logo-container" class="valign-wrapper">
+  <div id="loading-screen" class="valign-wrapper full-loader">
     <div id="logo-inner-container" class="valign">
       <span id="logo-text">Keeptrack</span>
       <div class="preloader-wrapper active">
@@ -148,8 +148,11 @@
 
       <div id="sat-hoverbox">(none)</div>
 
-      <div id="camera-status-box" class="start-hidden">
+      <div id="camera-status-box" class="start-hidden status-box">
         Earth Centered Camera Mode
+      </div>
+      <div id="propRate-status-box" class="start-hidden status-box">
+        Propagation Rate: 1.00x
       </div>
 
       <div id="legend-hover-menu" class="start-hidden">
@@ -1067,7 +1070,7 @@
       <a id="reddit-share" href="https://www.reddit.com/submit?url=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Reddit"><img src="https://static.addtoany.com/buttons/reddit.svg" width="32" height="32"></a>
     </div>
     <span id="version-info" style="margin-top:-45px;margin-right:10px" class="right">
-      v0.23.1
+      vX.XX.XX
     </span>
   </footer>
 
@@ -1094,6 +1097,7 @@
   <script src="js/main.js"></script>
   <!-- Load UI Dependencies -->
   <script src="js/jquery-ui.min.js"></script>
+  <script src="js/jquery-ui-slideraccess.js"></script>
   <script src="js/jquery-ui-timepicker.js"></script>
   <script src="js/perfect-scrollbar.min.js"></script>
   <!-- Load Extras Last to Speed Loading -->

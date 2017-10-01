@@ -85,8 +85,8 @@ laws of the United States and International Copyright Treaty.
 // **** 1 - main ***
 
 //  Version Control
-var VERSION_NUMBER = 'v0.23.2';
-var VERSION_DATE = 'September 30, 2017';
+var VERSION_NUMBER = 'v0.23.4';
+var VERSION_DATE = 'October 01, 2017';
 
 // Constants
 var ZOOM_EXP = 3;
@@ -193,7 +193,7 @@ var lastBoxUpdateTime = 0;
 var lastMapUpdateTime = 0;
 var mapUpdateOverride = false;
 var lookanglesInterval = 5;
-var lookanglesLength = 7;
+var lookanglesLength = 2;
 
 var pickFb, pickTex;
 var pickColorBuf;
@@ -202,6 +202,7 @@ var pMatrix = mat4.create();
 var camMatrix = mat4.create();
 
 var selectedSat = -1;
+var lastSelectedSat = -1;
 
 var mouseX = 0;
 var mouseY = 0;
@@ -276,6 +277,8 @@ $(document).ready(function () { // Code Once index.php is loaded
     dateFormat: 'yy-mm-dd',
     timeFormat: 'HH:mm:ss',
     timezone: '+0000',
+    addSliderAccess: true,
+    sliderAccessArgs: { touchonly: false },
     minDate: -14, // No more than 7 days in the past
     maxDate: 14 }).on('change.dp', function (e) { // or 7 days in the future to make sure ELSETs are valid
       $('#datetime-input').fadeOut();
@@ -450,7 +453,8 @@ $(document).ready(function () { // Code Once index.php is loaded
         isMilSatSelected = false;
         $('#menu-space-stations img').removeClass('bmenu-item-selected');
         if ($(document).width() <= 1000) {
-          $('#search-results').attr('style', 'max-height:20%;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
+          $('#search-results').attr('style', 'height:110px;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
+          $('#controls-up-wrapper').css('top', '80px');
         } else {
           $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
           $('#legend-hover-menu').hide();
@@ -505,6 +509,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     searchBox.hideResults();
     isMilSatSelected = false;
     $('#menu-space-stations img').removeClass('bmenu-item-selected');
+    $('#controls-up-wrapper').css('top', '80px');
   });
 
   $('#controls-zoom-in').click(function () {
@@ -722,7 +727,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     var isChangeSharperShaders = document.getElementById('settings-shaders').checked;
     var isSNPChecked = document.getElementById('settings-snp').checked;
     var isSDChecked = document.getElementById('settings-sd').checked;
-    var isRiseSetChecked = $('#settings-riseset').checked;
+    var isRiseSetChecked = document.getElementById('settings-riseset').checked;
 
     /** Filter On and Shaders On */
     if (!isSharperShaders && isChangeSharperShaders && isLimitSats) {
@@ -1002,196 +1007,199 @@ $(document).ready(function () { // Code Once index.php is loaded
   });
 
   $('#newLaunch').submit(function (e) {
-    $('#nl-error').hide();
-    var scc = $('#nl-scc').val();
-    var satId = satSet.getIdFromObjNum(scc);
-    var sat = satSet.getSat(satId);
-    // var intl = sat.INTLDES.trim();
+    $('#loading-screen').fadeIn('slow', function () {
+      $('#nl-error').hide();
+      var scc = $('#nl-scc').val();
+      var satId = satSet.getIdFromObjNum(scc);
+      var sat = satSet.getSat(satId);
+      // var intl = sat.INTLDES.trim();
 
-    var upOrDown = $('#nl-updown').val();
+      var upOrDown = $('#nl-updown').val();
 
-    // TODO: Calculate current J-Day to change Epoch Date
+      // TODO: Calculate current J-Day to change Epoch Date
 
-    var launchFac = $('#nl-facility').val();
-    ga('send', 'event', 'New Launch', launchFac, 'Launch Site');
+      var launchFac = $('#nl-facility').val();
+      ga('send', 'event', 'New Launch', launchFac, 'Launch Site');
 
-    var launchLat, launchLon;
+      var launchLat, launchLon;
 
-    switch (launchFac) {
-      case 'AFETR':
-        launchLat = 28.46;
-        launchLon = 279.45;
-        break;
-      case 'AFWTR':
-        launchLat = 34.77;
-        launchLon = 239.4;
-        break;
-      case 'CAS':
-        launchLat = 28.1;
-        launchLon = 344.6;
-        break;
-      case 'ERAS':
-        launchLat = 28.46;
-        launchLon = 279.45;
-        break;
-      case 'FRGUI':
-        launchLat = 5.23;
-        launchLon = 307.24;
-        break;
-      case 'HGSTR':
-        launchLat = 31.09;
-        launchLon = 357.17;
-        break;
-      case 'JSC':
-        launchLat = 41.11;
-        launchLon = 100.46;
-        break;
-      case 'KODAK':
-        launchLat = 57.43;
-        launchLon = 207.67;
-        break;
-      case 'KSCUT':
-        launchLat = 31.25;
-        launchLon = 131.07;
-        break;
-      case 'KWAJ':
-        launchLat = 9.04;
-        launchLon = 167.74;
-        break;
-      case 'KYMTR':
-        launchLat = 48.57;
-        launchLon = 46.25;
-        break;
-      case 'NSC':
-        launchLat = 34.42;
-        launchLon = 127.52;
-        break;
-      case 'OREN':
-        launchLat = 51.2;
-        launchLon = 59.85;
-        break;
-      case 'PKMTR':
-        launchLat = 62.92;
-        launchLon = 40.57;
-        break;
-      case 'PMRF':
-        launchLat = 22.02;
-        launchLon = 200.22;
-        break;
-      case 'RLLC':
-        launchLat = 39.26;
-        launchLon = 177.86;
-        break;
-      case 'SADOL':
-        launchLat = 75;
-        launchLon = 40;
-        break;
-      case 'SEAL':
-        launchLat = 0;
-        launchLon = 210;
-        break;
-      case 'SEM':
-        launchLat = 35.23;
-        launchLon = 53.92;
-        break;
-      case 'SNMLP':
-        launchLat = 2.94;
-        launchLon = 40.21;
-        break;
-      case 'SRI':
-        launchLat = 13.73;
-        launchLon = 80.23;
-        break;
-      case 'SVOB':
-        launchLat = 51.83;
-        launchLon = 128.27;
-        break;
-      case 'TNSTA':
-        launchLat = 30.39;
-        launchLon = 130.96;
-        break;
-      case 'TSC':
-        launchLat = 39.14;
-        launchLon = 111.96;
-        break;
-      case 'TTMTR':
-        launchLat = 45.95;
-        launchLon = 63.35;
-        break;
-      case 'TNGH':
-        launchLat = 40.85;
-        launchLon = 129.66;
-        break;
-      case 'VOSTO':
-        launchLat = 51.88;
-        launchLon = 128.33;
-        break;
-      case 'WLPIS':
-        launchLat = 37.84;
-        launchLon = 284.53;
-        break;
-      case 'WOMRA':
-        launchLat = 30.95;
-        launchLon = 136.5;
-        break;
-      case 'WRAS':
-        launchLat = 34.77;
-        launchLon = 239.4;
-        break;
-      case 'WSC':
-        launchLat = 19.61;
-        launchLon = 110.95;
-        break;
-      case 'XSC':
-        launchLat = 28.24;
-        launchLon = 102.02;
-        break;
-      case 'YAVNE':
-        launchLat = 31.88;
-        launchLon = 34.68;
-        break;
-      case 'YUN':
-        launchLat = 39.66;
-        launchLon = 124.7;
-        break;
-    }
-    if (launchLon > 180) { // if West not East
-      launchLon -= 360; // Convert from 0-360 to -180-180
-    }
+      switch (launchFac) {
+        case 'AFETR':
+          launchLat = 28.46;
+          launchLon = 279.45;
+          break;
+        case 'AFWTR':
+          launchLat = 34.77;
+          launchLon = 239.4;
+          break;
+        case 'CAS':
+          launchLat = 28.1;
+          launchLon = 344.6;
+          break;
+        case 'ERAS':
+          launchLat = 28.46;
+          launchLon = 279.45;
+          break;
+        case 'FRGUI':
+          launchLat = 5.23;
+          launchLon = 307.24;
+          break;
+        case 'HGSTR':
+          launchLat = 31.09;
+          launchLon = 357.17;
+          break;
+        case 'JSC':
+          launchLat = 41.11;
+          launchLon = 100.46;
+          break;
+        case 'KODAK':
+          launchLat = 57.43;
+          launchLon = 207.67;
+          break;
+        case 'KSCUT':
+          launchLat = 31.25;
+          launchLon = 131.07;
+          break;
+        case 'KWAJ':
+          launchLat = 9.04;
+          launchLon = 167.74;
+          break;
+        case 'KYMTR':
+          launchLat = 48.57;
+          launchLon = 46.25;
+          break;
+        case 'NSC':
+          launchLat = 34.42;
+          launchLon = 127.52;
+          break;
+        case 'OREN':
+          launchLat = 51.2;
+          launchLon = 59.85;
+          break;
+        case 'PKMTR':
+          launchLat = 62.92;
+          launchLon = 40.57;
+          break;
+        case 'PMRF':
+          launchLat = 22.02;
+          launchLon = 200.22;
+          break;
+        case 'RLLC':
+          launchLat = 39.26;
+          launchLon = 177.86;
+          break;
+        case 'SADOL':
+          launchLat = 75;
+          launchLon = 40;
+          break;
+        case 'SEAL':
+          launchLat = 0;
+          launchLon = 210;
+          break;
+        case 'SEM':
+          launchLat = 35.23;
+          launchLon = 53.92;
+          break;
+        case 'SNMLP':
+          launchLat = 2.94;
+          launchLon = 40.21;
+          break;
+        case 'SRI':
+          launchLat = 13.73;
+          launchLon = 80.23;
+          break;
+        case 'SVOB':
+          launchLat = 51.83;
+          launchLon = 128.27;
+          break;
+        case 'TNSTA':
+          launchLat = 30.39;
+          launchLon = 130.96;
+          break;
+        case 'TSC':
+          launchLat = 39.14;
+          launchLon = 111.96;
+          break;
+        case 'TTMTR':
+          launchLat = 45.95;
+          launchLon = 63.35;
+          break;
+        case 'TNGH':
+          launchLat = 40.85;
+          launchLon = 129.66;
+          break;
+        case 'VOSTO':
+          launchLat = 51.88;
+          launchLon = 128.33;
+          break;
+        case 'WLPIS':
+          launchLat = 37.84;
+          launchLon = 284.53;
+          break;
+        case 'WOMRA':
+          launchLat = 30.95;
+          launchLon = 136.5;
+          break;
+        case 'WRAS':
+          launchLat = 34.77;
+          launchLon = 239.4;
+          break;
+        case 'WSC':
+          launchLat = 19.61;
+          launchLon = 110.95;
+          break;
+        case 'XSC':
+          launchLat = 28.24;
+          launchLon = 102.02;
+          break;
+        case 'YAVNE':
+          launchLat = 31.88;
+          launchLon = 34.68;
+          break;
+        case 'YUN':
+          launchLat = 39.66;
+          launchLon = 124.7;
+          break;
+      }
+      if (launchLon > 180) { // if West not East
+        launchLon -= 360; // Convert from 0-360 to -180-180
+      }
 
-    // Set time to 0000z for relative time.
+      // Set time to 0000z for relative time.
 
-    var today = new Date(); // Need to know today for offset calculation
-    var quadZTime = new Date(today.getFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0); // New Date object of the future collision
-    // Date object defaults to local time.
-    quadZTime.setUTCHours(0); // Move to UTC Hour
+      var today = new Date(); // Need to know today for offset calculation
+      var quadZTime = new Date(today.getFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0); // New Date object of the future collision
+      // Date object defaults to local time.
+      quadZTime.setUTCHours(0); // Move to UTC Hour
 
-    propOffset = quadZTime - today; // Find the offset from today
-    camSnapMode = false;
-    satCruncher.postMessage({ // Tell satCruncher we have changed times for orbit calculations
-      typ: 'offset',
-      dat: (propOffset).toString() + ' ' + (1.0).toString()
-    });
-
-    var TLEs = lookangles.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, propOffset);
-
-    var TLE1 = TLEs[0];
-    var TLE2 = TLEs[1];
-
-    if (lookangles.altitudeCheck(TLE1, TLE2, propOffset) > 1) {
-      satCruncher.postMessage({
-        typ: 'satEdit',
-        id: satId,
-        TLE1: TLE1,
-        TLE2: TLE2
+      propOffset = quadZTime - today; // Find the offset from today
+      camSnapMode = false;
+      satCruncher.postMessage({ // Tell satCruncher we have changed times for orbit calculations
+        typ: 'offset',
+        dat: (propOffset).toString() + ' ' + (1.0).toString()
       });
-      orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
-      sat = satSet.getSat(satId);
-    } else {
-      $('#nl-error').html('Failed Altitude Check</br>Try Editing Manually');
-      $('#nl-error').show();
-    }
+      var TLEs = lookangles.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, propOffset);
+
+      var TLE1 = TLEs[0];
+      var TLE2 = TLEs[1];
+
+      if (lookangles.altitudeCheck(TLE1, TLE2, propOffset) > 1) {
+        satCruncher.postMessage({
+          typ: 'satEdit',
+          id: satId,
+          TLE1: TLE1,
+          TLE2: TLE2
+        });
+        orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
+
+        sat = satSet.getSat(satId);
+      } else {
+        $('#nl-error').html('Failed Altitude Check</br>Try Editing Manually');
+        $('#nl-error').show();
+      }
+      $('#loading-screen').fadeOut();
+    });
     e.preventDefault();
   });
 
@@ -1614,7 +1622,6 @@ function keyHandler (evt) {
         FPSyPos = 25000;
         FPSzPos = 0;
       }
-      console.log('Camera Type: ' + CAMERA_TYPE);
       break;
     case 33: // !
       propOffset = 0; // Reset to Current Time
@@ -1816,7 +1823,10 @@ function bottomIconPress (evt) {
             }
             break;
           } else {
-            lookangles.getlookangles(sat, isLookanglesMenuOpen);
+            $('#loading-screen').fadeIn('slow', function () {
+              lookangles.getlookangles(sat, isLookanglesMenuOpen);
+              $('#loading-screen').fadeOut();
+            });
           }
         }
         break;
@@ -1838,8 +1848,11 @@ function bottomIconPress (evt) {
         isLookanglesMultiSiteMenuOpen = true;
         $('#menu-lookanglesmultisite img').addClass('bmenu-item-selected');
         if (selectedSat !== -1) {
-          sat = satSet.getSat(selectedSat);
-          lookangles.getlookanglesMultiSite(sat, isLookanglesMultiSiteMenuOpen);
+          $('#loading-screen').fadeIn('slow', function () {
+            sat = satSet.getSat(selectedSat);
+            lookangles.getlookanglesMultiSite(sat, isLookanglesMultiSiteMenuOpen);
+            $('#loading-screen').fadeOut();
+          });
         }
         break;
       }
@@ -2167,13 +2180,15 @@ function selectSat (satId) {
     $('#sat-infobox').fadeOut();
     if ($('#search-results').css('display') === 'block') {
       if ($(document).width() <= 1000) {
-        $('#search-results').attr('style', 'display:block;max-height:20%;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
+        $('#search-results').attr('style', 'display:block;height:110px;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
+        $('#controls-up-wrapper').css('top', '180px');
       } else {
         $('#search-results').attr('style', 'display:block;max-height:100%;margin-bottom:-50px;');
       }
     } else {
       if ($(document).width() <= 1000) {
-        $('#search-results').attr('style', 'max-height:20%;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
+        $('#search-results').attr('style', 'height:110px;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
+        $('#controls-up-wrapper').css('top', '80px');
       } else {
         $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
       }
@@ -2236,14 +2251,16 @@ function selectSat (satId) {
 
     if ($('#search-results').css('display') === 'block') {
       if ($(document).width() <= 1000) {
-        $('#search-results').attr('style', 'display:block; max-height:20%; width: 100%;bottom:auto;margin-top:50px;');
+        $('#search-results').attr('style', 'display:block; height:110px; width: 100%;bottom:auto;margin-top:50px;');
+        $('#controls-up-wrapper').css('top', '180px');
       } else {
         $('#search-results').attr('style', 'display:block; max-height:27%');
         $('#legend-hover-menu').hide();
       }
     } else {
       if ($(document).width() <= 1000) {
-        $('#search-results').attr('style', 'max-height:20%; width: 100%;bottom:auto;margin-top:50px;');
+        $('#search-results').attr('style', 'height:110px; width: 100%;bottom:auto;margin-top:50px;');
+        $('#controls-up-wrapper').css('top', '80px');
       } else {
         $('#search-results').attr('style', 'max-height:27%');
         $('#legend-hover-menu').hide();
@@ -2909,7 +2926,10 @@ function updateSelectBox () {
     }
 
     if (lookangles.sensorSelected()) {
-      $('#sat-nextpass').html(lookangles.nextpass(satData));
+      if (selectedSat !== lastSelectedSat) {
+        $('#sat-nextpass').html(lookangles.nextpass(satData));
+      }
+      lastSelectedSat = selectedSat;
     } else {
       $('#sat-nextpass').html('Unavailable');
     }
@@ -3158,7 +3178,7 @@ var lookangles = (function () {
     var propOffset = getPropOffset();
     var propTempOffset = 0;
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-    for (var i = 0; i < (7 * 24 * 60 * 60); i += 5) {         // 5second Looks
+    for (var i = 0; i < (lookanglesLength * 24 * 60 * 60); i += lookanglesInterval) {         // 5second Looks
       propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
       var now = propTimeCheck(propTempOffset, propRealTime);
       var j = jday(now.getUTCFullYear(),
@@ -3190,7 +3210,7 @@ var lookangles = (function () {
         }
       }
     }
-    return 'No Passes in 7 Days';
+    return 'No Passes in ' + lookanglesLength + ' Days';
   }
 
   function getPropOffset () {
@@ -3243,7 +3263,7 @@ var lookangles = (function () {
     tdS.appendChild(document.createTextNode('Sensor'));
     tdS.setAttribute('style', 'text-decoration: underline');
 
-    for (var i = 0; i < (7 * 24 * 60 * 60); i += 5) {         // 5second Looks
+    for (var i = 0; i < (lookanglesLength * 24 * 60 * 60); i += lookanglesInterval) {         // 5second Looks
       propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
       tblLength += propagateMultiSite(propTempOffset, tbl, satrec, sensor);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
       if (tblLength > lastTblLength) {                           // Maximum of 1500 lines in the look angles table
@@ -3262,7 +3282,7 @@ var lookangles = (function () {
         getTempSensor(resetWhenDone);
         break;
       }
-      if (sensor < 10 && i >= (7 * 24 * 60 * 60) - 5) { // Move to next sensor if this sensor doesn't have enough passes.
+      if (sensor < 10 && i >= (lookanglesLength * 24 * 60 * 60) - lookanglesInterval) { // Move to next sensor if this sensor doesn't have enough passes.
         sensor++;
         setSensor(sensor);
         i = 0;
@@ -3845,6 +3865,7 @@ var lookangles = (function () {
       }
     }
     if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange) || (azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
+      console.log(isRiseSetLookangles);
       if (isRiseSetLookangles) {
         // Previous Pass to Calculate first line of coverage
         var now1 = propTimeCheck(propTempOffset - (lookanglesInterval * 1000), propRealTime);
@@ -3866,7 +3887,7 @@ var lookangles = (function () {
         azimuth1 = lookAngles1.azimuth * RAD2DEG;
         elevation1 = lookAngles1.elevation * RAD2DEG;
         rangeSat1 = lookAngles1.range_sat;
-        if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange)) || !((azimuth1 >= obsminaz2 || azimuth1 <= obsmaxaz2) && (elevation1 >= obsminel2 && elevation1 <= obsmaxel2) && (rangeSat1 <= obsmaxrange2 && rangeSat1 >= obsminrange2))) {
+        if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange)) && !((azimuth1 >= obsminaz2 || azimuth1 <= obsmaxaz2) && (elevation1 >= obsminel2 && elevation1 <= obsmaxel2) && (rangeSat1 <= obsmaxrange2 && rangeSat1 >= obsminrange2))) {
           var tr = tbl.insertRow();
           var tdT = tr.insertCell();
           tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
@@ -3898,7 +3919,7 @@ var lookangles = (function () {
           azimuth1 = lookAngles1.azimuth * RAD2DEG;
           elevation1 = lookAngles1.elevation * RAD2DEG;
           rangeSat1 = lookAngles1.range_sat;
-          if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange)) && !((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz2) && (elevation1 >= obsminel2 && elevation1 <= obsmaxel2) && (rangeSat1 <= obsmaxrange2 && rangeSat1 >= obsminrange2))) {
+          if (!((azimuth1 >= obsminaz || azimuth1 <= obsmaxaz) && (elevation1 >= obsminel && elevation1 <= obsmaxel) && (rangeSat1 <= obsmaxrange && rangeSat1 >= obsminrange)) && !((azimuth1 >= obsminaz && azimuth1 <= obsmaxaz2) && (elevation1 >= obsminel2 && elevation1 <= obsmaxel2) && (rangeSat1 <= obsmaxrange2 && rangeSat1 >= obsminrange2))) {
             tr = tbl.insertRow();
             tdT = tr.insertCell();
             tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
@@ -5545,7 +5566,10 @@ function propTime () {
       if (propRate < 10) {
         digits = 2;
       }
-      timeTextStr = timeTextStr + ' ' + propRate.toFixed(digits) + 'x';
+      $('#propRate-status-box').html('Propagation Speed: ' + propRate.toFixed(digits) + 'x');
+      $('#propRate-status-box').show();
+    } else {
+      $('#propRate-status-box').hide();
     }
     $('#datetime-text').text(timeTextStr);
     $('#datetime-input-tb').val(timeTextStr);
@@ -5803,6 +5827,13 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
       $('#version-info').html(VERSION_NUMBER);
       $('#version-info').tooltip({delay: 50, tooltip: VERSION_DATE, position: 'top'});
 
+      // Loading Screen Resized
+      $('#loading-screen').removeClass('full-loader');
+      $('#loading-screen').addClass('mini-loader-container');
+      $('#logo-inner-container').addClass('mini-loader');
+      $('#logo-text').html('');
+      $('#loader-text').html('Attempting to Math...');
+
       // Hide Menus on Small Screens
       if ($(document).width() <= 1000) {
         // TODO FullScreen Option
@@ -5866,7 +5897,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
       }
 
       // $('#load-cover').fadeOut();
-      $('#logo-container').fadeOut();
+      $('#loading-screen').fadeOut();
       $('body').attr('style', 'background:black');
       $('#canvas-holder').attr('style', 'display:block');
       // $('#menu-sensor-info img').removeClass('bmenu-item-disabled');

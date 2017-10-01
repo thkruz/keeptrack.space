@@ -256,18 +256,23 @@ ul {
     vertical-align: middle;
 }
 
-#camera-status-box {
+.status-box {
   background: rgba(0, 0, 0, 0.0);
   color: white;
   font-family: "Segoe UI", Times, serif;
   font-size: 28px;
   position: absolute;
-  top: 85%;
+  height: 100px !important;
+  bottom: 50px;
   z-index: 10002;
   width: 100%;
   text-align: center;
 }
 
+#camera-status-box {
+  z-index: 10003;
+  bottom: 100px;
+}
 
 @media (max-width: 1000px) {
   #legend-hover-menu {
@@ -641,7 +646,7 @@ ul li{
     left: 20px;
     bottom: -5px;
     z-index: 11;
-    width: 210px;
+    width: 160px;
     height: 50px;
     background: transparent;
     overflow: hidden;
@@ -681,6 +686,45 @@ ul li{
         background: rgba(255, 255, 255, .2);
         border-radius: 5px;
     }
+
+.ui-icon-minus {
+  margin: auto !important;
+}
+.ui-icon-plus {
+  margin: auto !important;
+}
+
+.ui-datepicker-calendar tbody tr td a {
+  text-align: center;
+}
+
+@media (max-width: 1000px) {
+  #ui-datepicker-div {
+    top: auto !important;
+    width: 100% !important;
+    bottom: 0px !important;
+    left: 0px !important;
+    border-radius: 0px !important;
+  }
+  .ui-timepicker-div dl dd div {
+    width: 0px !important;
+    margin-left: -10px !important;
+  }
+  .ui-timepicker-div dl dd div span {
+    border: 0px !important;
+  }
+  .ui-timepicker-div dl  {
+    text-align: center !important;
+  }
+}
+
+@media (min-width: 1001px) {
+  #ui-datepicker-div {
+    top: auto !important;
+    bottom: 55px !important;
+    left: 5px !important;
+  }
+}
 
 #bottom-menu {
   background: rgb(0,105,165);

@@ -711,7 +711,8 @@ ul li{
     margin-left: -10px !important;
   }
   .ui-timepicker-div dl dd div span {
-    border: 0px !important;
+    border: 0px solid #ffffff !important;
+    background: #ffffff !important;
   }
   .ui-timepicker-div dl  {
     text-align: center !important;

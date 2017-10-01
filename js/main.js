@@ -1188,6 +1188,7 @@ $(document).ready(function () { // Code Once index.php is loaded
         satCruncher.postMessage({
           typ: 'satEdit',
           id: satId,
+          active: true,
           TLE1: TLE1,
           TLE2: TLE2
         });
@@ -1205,6 +1206,92 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   $('#nl-error').click(function () {
     $('#nl-error').hide();
+  });
+
+  $('#breakup').submit(function (e) {
+    $('#loading-screen').fadeIn('slow', function () {
+      var scc = $('#hc-scc').val();
+      var satId = satSet.getIdFromObjNum(scc);
+      var mainsat = satSet.getSat(satId);
+      var currentEpoch = lookangles.currentEpoch(time);
+      mainsat['TLE1'] = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
+
+      // TODO: Calculate current J-Day to change Epoch Date
+
+      var launchFac = $('#nl-facility').val();
+      ga('send', 'event', 'New Launch', launchFac, 'Launch Site');
+
+      var launchLat, launchLon;
+      launchLon = satellite.degrees_long(lookangles.lon);
+      launchLat = satellite.degrees_lat(lookangles.lat);
+
+      camSnapMode = false;
+
+      var upOrDown = 'S';
+
+      var TLEs = lookangles.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, propOffset);
+      var TLE1 = TLEs[0];
+      var TLE2 = TLEs[1];
+
+      for (var i = 0; i < 30; i++) {
+        satId = satSet.getIdFromObjNum(80000 + i);
+        var sat = satSet.getSat(satId);
+        var iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7);
+
+        var inc = TLE2.substr(8, 8);
+        inc = parseFloat(inc - 0.3 + (0.6 / (15 / (i + 1)))).toPrecision(7);
+        inc = inc.split('.');
+        inc[0] = inc[0].substr(-3, 3);
+        if (inc[1]) {
+          inc[1] = inc[1].substr(0, 4);
+        } else {
+          inc[1] = '0000';
+        }
+        inc = (inc[0] + '.' + inc[1]).toString();
+        inc = pad(inc, 8);
+        console.log(inc);
+
+        var meanmo = TLE2.substr(52, 10);
+        meanmo = parseFloat(meanmo - (0.03 / 15) + (0.06 * ((i + 1) / 15))).toPrecision(10);
+        console.log(meanmo);
+        meanmo = meanmo.split('.');
+        console.log(meanmo);
+        meanmo[0] = meanmo[0].substr(-2, 2);
+        console.log(meanmo[0]);
+        if (meanmo[1]) {
+          meanmo[1] = meanmo[1].substr(0, 8);
+        } else {
+          meanmo[1] = '00000000';
+        }
+        meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
+        console.log(meanmo);
+
+        var iTLE2 = '2 ' + (80000 + i) + ' ' + inc + ' ' + TLE2.substr(17, 35) + meanmo + TLE2.substr(63);
+        console.log(iTLE2);
+        sat['TLE1'] = iTLE1;
+        sat['TLE2'] = iTLE2;
+        console.log(sat);
+        var iTLEs = lookangles.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, propOffset);
+        iTLE1 = iTLEs[0];
+        iTLE2 = iTLEs[1];
+        console.log(sat);
+        if (lookangles.altitudeCheck(iTLE1, iTLE2, propOffset) > 1) {
+          satCruncher.postMessage({
+            typ: 'satEdit',
+            id: satId,
+            TLE1: iTLE1,
+            TLE2: iTLE2
+          });
+          orbitDisplay.updateOrbitBuffer(satId, true, iTLE1, iTLE2);
+
+          sat = satSet.getSat(satId);
+        } else {
+          console.error('Breakup Generator Failed');
+        }
+      }
+      $('#loading-screen').fadeOut();
+    });
+    e.preventDefault();
   });
 
   $('#missile').submit(function (e) {
@@ -3030,6 +3117,14 @@ var lookangles = (function () {
     }
   };
 
+  var currentEpoch = function (currentDate) {
+    currentDate = new Date(currentDate);
+    var epochYear = currentDate.getUTCFullYear();
+    epochYear = parseInt(epochYear.toString().substr(2, 2));
+    var epochDay = getDOY(currentDate) + (currentDate.getUTCHours() * 3600 + currentDate.getUTCMinutes() * 60 + currentDate.getUTCSeconds()) / (1440 * 60);
+    return [epochYear, epochDay];
+  };
+
   var distance = function (hoverSat, selectedSat) {
     if (selectedSat == null || hoverSat == null) {
       return '';
@@ -3509,12 +3604,12 @@ var lookangles = (function () {
       }
 
       if (lat > (goalLat - 0.15) && lat < (goalLat + 0.15) && type === 1) {
-        console.log('Lat: ' + lat);
+        // console.log('Lat: ' + lat);
         return 1;
       }
 
       if (lon > (goalLon - 0.15) && lon < (goalLon + 0.15) && type === 2) {
-        console.log('Lon: ' + lon);
+        // console.log('Lon: ' + lon);
         return 1;
       }
 
@@ -4142,6 +4237,7 @@ var lookangles = (function () {
     // obsmaxel2: obsmaxel2,
     // obsminrange2: obsminrange2,
     // obsmaxrange2: obsmaxrange2,
+    currentEpoch: currentEpoch,
     distance: distance,
     sensorSelected: sensorSelected,
     setobs: setobs,

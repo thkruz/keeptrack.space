@@ -114,6 +114,20 @@ var time; // Only used in drawLoop function
 var drawNow;
 var dt;
 
+// drawLoop Variables
+var xDif;
+var yDif;
+var yawTarget;
+var pitchTarget;
+var dragPointR;
+var dragTargetR;
+var dragPointLon;
+var dragTargetLon;
+var dragPointLat;
+var dragTargetLat;
+var pitchDif;
+var yawDif;
+
 // Camera Variables
 var camYaw = 0;
 var camPitch = 0.5;
@@ -126,14 +140,14 @@ var zoomLevel = 0.5;
 var zoomTarget = 0.5;
 var camPitchSpeed = 0;
 var camYawSpeed = 0;
-var isZoomChanging = false;
+// var isZoomChanging = false;
 var dragTarget;
 
 var earthJ;
 var earthNow;
 var earthEra;
 var timeTextStr;
-var timeDateStr;
+var tDS; // time Date String
 var mvMatrix;
 var nMatrix;
 var lightDirection;
@@ -226,7 +240,7 @@ var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotati
 var CAMERA_TYPE = 0;
 
 // var debugContext, debugImageData;
-var debugLine;
+// var debugLine;
 // var debugLine2, debugLine3;
 // var spinner;
 
@@ -268,7 +282,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     groups.init();
     searchBox.init(satData);
 
-    debugLine = new Line();
+    // debugLine = new Line();
     // debugLine2 = new Line();
     // debugLine3 = new Line();
   });
@@ -288,6 +302,7 @@ $(document).ready(function () { // Code Once index.php is loaded
 
   satSet.onCruncherReady(function (satData) {
     // do querystring stuff
+
     var queryStr = window.location.search.substring(1);
     var params = queryStr.split('&');
     for (var i = 0; i < params.length; i++) {
@@ -1300,7 +1315,7 @@ $(document).ready(function () { // Code Once index.php is loaded
     var attacker = $('#ms-attacker').val() * 1;
     var tgtLat = $('#ms-lat').val() * 1;
     var tgtLon = $('#ms-lon').val() * 1;
-    var result = false;
+    // var result = false;
 
     var launchTime = $('#datetime-text').text().substr(0, 19);
     launchTime = launchTime.split(' ');
@@ -1317,13 +1332,13 @@ $(document).ready(function () { // Code Once index.php is loaded
       $('#ms-error').html('Large Scale Attack Loaded');
       $('#ms-error').show();
     } else {
-      if (tgtLat == NaN) {
+      if (tgtLat == NaN) { // isNaN() broke IE9
         $('#ms-error').html('Please enter a number<br>for Target Latitude');
         $('#ms-error').show();
         e.preventDefault();
         return;
       }
-      if (tgtLon == NaN) {
+      if (tgtLon == NaN) { // isNaN() broke IE9
         $('#ms-error').html('Please enter a number<br>for Target Longitude');
         $('#ms-error').show();
         e.preventDefault();
@@ -1336,18 +1351,18 @@ $(document).ready(function () { // Code Once index.php is loaded
         var attackerName = UsaICBM[a * 4 + 2];
         Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, UsaICBM[a * 4 + 2], 30, 2.9, 0.07, UsaICBM[a * 4 + 3]);
       } else if (attacker < 300) { // Russian
-        var a = attacker - 200;
-        var b = 500 - missilesInUse;
-        var attackerName = RussianICBM[a * 4 + 2];
+        a = attacker - 200;
+        b = 500 - missilesInUse;
+        attackerName = RussianICBM[a * 4 + 2];
         Missile(RussianICBM[a * 4], RussianICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, RussianICBM[a * 4 + 2], 30, 2.9, 0.07, RussianICBM[a * 4 + 3]);
       } else if (attacker < 400) { // Chinese
         a = attacker - 300;
-        var b = 500 - missilesInUse;
+        b = 500 - missilesInUse;
         attackerName = ChinaICBM[a * 4 + 2];
         Missile(ChinaICBM[a * 4], ChinaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, ChinaICBM[a * 4 + 2], 30, 2.9, 0.07, ChinaICBM[a * 4 + 3]);
       } else if (attacker < 500) { // North Korean
         a = attacker - 400;
-        var b = 500 - missilesInUse;
+        b = 500 - missilesInUse;
         attackerName = NorthKoreanBM[a * 4 + 2];
         Missile(NorthKoreanBM[a * 4], NorthKoreanBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, NorthKoreanBM[a * 4 + 2], 30, 2.9, 0.07, NorthKoreanBM[a * 4 + 3]);
       }
@@ -2721,7 +2736,7 @@ function changeZoom (zoom) {
 
 function drawLoop () {
   requestAnimationFrame(drawLoop);
-  drawNow = new Date().getTime();
+  drawNow = Date.now();
   dt = drawNow - (time || drawNow);
   time = drawNow;
 
@@ -2729,24 +2744,24 @@ function drawLoop () {
   if (isDragging) {
     if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
     isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) || CAMERA_TYPE === 2) { // random screen drag
-      var xDif = screenDragPoint[0] - mouseX;
-      var yDif = screenDragPoint[1] - mouseY;
-      var yawTarget = dragStartYaw + xDif * 0.005;
-      var pitchTarget = dragStartPitch + yDif * -0.005;
+      xDif = screenDragPoint[0] - mouseX;
+      yDif = screenDragPoint[1] - mouseY;
+      yawTarget = dragStartYaw + xDif * 0.005;
+      pitchTarget = dragStartPitch + yDif * -0.005;
       camPitchSpeed = normalizeAngle(camPitch - pitchTarget) * -0.005;
       camYawSpeed = normalizeAngle(camYaw - yawTarget) * -0.005;
     } else {  // earth surface point drag
-      var dragPointR = Math.sqrt(dragPoint[0] * dragPoint[0] + dragPoint[1] * dragPoint[1]);
-      var dragTargetR = Math.sqrt(dragTarget[0] * dragTarget[0] + dragTarget[1] * dragTarget[1]);
+      dragPointR = Math.sqrt(dragPoint[0] * dragPoint[0] + dragPoint[1] * dragPoint[1]);
+      dragTargetR = Math.sqrt(dragTarget[0] * dragTarget[0] + dragTarget[1] * dragTarget[1]);
 
-      var dragPointLon = Math.atan2(dragPoint[1], dragPoint[0]);
-      var dragTargetLon = Math.atan2(dragTarget[1], dragTarget[0]);
+      dragPointLon = Math.atan2(dragPoint[1], dragPoint[0]);
+      dragTargetLon = Math.atan2(dragTarget[1], dragTarget[0]);
 
-      var dragPointLat = Math.atan2(dragPoint[2], dragPointR);
-      var dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
+      dragPointLat = Math.atan2(dragPoint[2], dragPointR);
+      dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
 
-      var pitchDif = dragPointLat - dragTargetLat;
-      var yawDif = normalizeAngle(dragPointLon - dragTargetLon);
+      pitchDif = dragPointLat - dragTargetLat;
+      yawDif = normalizeAngle(dragPointLon - dragTargetLon);
       camPitchSpeed = pitchDif * 0.005;
       camYawSpeed = yawDif * 0.005;
     }
@@ -2797,45 +2812,47 @@ function drawLoop () {
     // debugLine.set(satposition, [0, 0, 0]);
   }
 
+  // TODO: drawScene creates a new unattached NODE each iteration
   drawScene();
+  updateHover();
+  updateSelectBox();
+
   // drawLines();
   // var bubble = new FOVBubble();
   // bubble.set();
   // bubble.draw();
-  updateHover();
-  updateSelectBox();
 }
 
-function drawLines () {
-  var satData = satSet.getSatData();
-  var propTime = new Date();
-  var realElapsedMsec = Number(propTime) - Number(propRealTime);
-  var scaledMsec = realElapsedMsec * propRate;
-  if (propRate === 0) {
-    propTime.setTime(Number(propFrozen) + propOffset);
-  } else {
-    propTime.setTime(Number(propRealTime) + propOffset + scaledMsec);
-  }
-  if (satData && lookangles.sensorSelected()) {
-    if (propTime - lastRadarTrackTime > staticSet[lookangles.staticNum].changeObjectInterval) {
-      lastRadarTrackTime = 0;
-      curRadarTrackNum++;
-    }
-    if (curRadarTrackNum < satData.length) {
-      if (satData[curRadarTrackNum]) {
-        if (satData[curRadarTrackNum].inview) {
-          var debugLine = new Line();
-          var sat = satData[curRadarTrackNum];
-          var satposition = [sat.position.x, sat.position.y, sat.position.z];
-          debugLine.set(satposition, sensorManager.curSensorPositon);
-          debugLine.draw();
-          if (lastRadarTrackTime === 0) { lastRadarTrackTime = propTime; }
-          return;
-        } else { curRadarTrackNum++; }
-      } else { curRadarTrackNum++; }
-    } else { curRadarTrackNum = 0; }
-  }
-}
+// function drawLines () {
+//   var satData = satSet.getSatData();
+//   var propTime = new Date();
+//   var realElapsedMsec = Number(propTime) - Number(propRealTime);
+//   var scaledMsec = realElapsedMsec * propRate;
+//   if (propRate === 0) {
+//     propTime.setTime(Number(propFrozen) + propOffset);
+//   } else {
+//     propTime.setTime(Number(propRealTime) + propOffset + scaledMsec);
+//   }
+//   if (satData && lookangles.sensorSelected()) {
+//     if (propTime - lastRadarTrackTime > staticSet[lookangles.staticNum].changeObjectInterval) {
+//       lastRadarTrackTime = 0;
+//       curRadarTrackNum++;
+//     }
+//     if (curRadarTrackNum < satData.length) {
+//       if (satData[curRadarTrackNum]) {
+//         if (satData[curRadarTrackNum].inview) {
+//           var debugLine = new Line();
+//           var sat = satData[curRadarTrackNum];
+//           var satposition = [sat.position.x, sat.position.y, sat.position.z];
+//           debugLine.set(satposition, sensorManager.curSensorPositon);
+//           debugLine.draw();
+//           if (lastRadarTrackTime === 0) { lastRadarTrackTime = propTime; }
+//           return;
+//         } else { curRadarTrackNum++; }
+//       } else { curRadarTrackNum++; }
+//     } else { curRadarTrackNum = 0; }
+//   }
+// }
 
 function drawScene () {
   gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
@@ -2971,10 +2988,13 @@ $('#map-menu').on('click', '.map-look', function (evt) {
   }
 });
 
+var now;
+var satData;
+
 function updateSelectBox () {
   if (selectedSat === -1) return;
-  var now = Date.now();
-  var satData = satSet.getSat(selectedSat);
+  now = drawNow;
+  satData = satSet.getSat(selectedSat);
   if (satData.static || satData.missile) return;
 
   // TODO: Include updates when satellite edited regardless of time.
@@ -3024,12 +3044,14 @@ function updateSelectBox () {
     lastBoxUpdateTime = now;
   }
 }
+var updateHoverSatId;
+var updateHoverSatPos;
 function updateHover () {
   if (searchBox.isHovering()) {
-    var satId = searchBox.getHoverSat();
-    var satPos = satSet.getScreenCoords(satId, pMatrix, camMatrix);
-    if (!earthHitTest(satPos.x, satPos.y)) {
-      hoverBoxOnSat(satId, satPos.x, satPos.y);
+    updateHoverSatId = searchBox.getHoverSat();
+    updateHoverSatPos = satSet.getScreenCoords(updateHoverSatId, pMatrix, camMatrix);
+    if (!earthHitTest(updateHoverSatPos.x, updateHoverSatPos.y)) {
+      hoverBoxOnSat(updateHoverSatId, updateHoverSatPos.x, updateHoverSatPos.y);
     } else {
       hoverBoxOnSat(-1, 0, 0);
     }
@@ -5655,8 +5677,8 @@ function propTime () {
     earthNow = propTime();
 
     // wall time is not propagation time, so better print it
-    timeDateStr = earthNow.toJSON();
-    timeTextStr = timeDateStr.substring(0, 10) + ' ' + timeDateStr.substring(11, 19);
+    tDS = earthNow.toJSON();
+    timeTextStr = tDS.substring(0, 10) + ' ' + tDS.substring(11, 19);
     if (propRate > 1.01 || propRate < 0.99) {
       var digits = 1;
       if (propRate < 10) {
@@ -5848,7 +5870,27 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
     browserUnsupported();
   }
 
+  /**
+   * NOTE: These variables are here rather inside the function because as they
+   * loop each iteration it was causing the jsHeap to grow. This isn't noticeable
+   * on faster computers because the garbage collector takes care of it, but on
+   * slower computers it would noticeably lag when the garbage collector ran.
+   *
+   * The arbitrary convention used is to put the name of the loop/function the
+   * variable is part of at the front of what the name used to be
+   * (ex: now --> drawNow) (ex: i --> SCi)
+  */
+
+  // draw Loop
+  var drawNow = 0;
   var lastDrawTime = 0;
+  var drawDivisor;
+  var drawDt;
+  var drawI;
+
+  var SCi; // Sat Cruncher i loop
+  var SCnow = 0;
+
   var lastFOVUpdateTime = 0;
   var cruncherReadyCallback;
   var gotExtraData = false;
@@ -5859,18 +5901,18 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
 
       satExtraData = JSON.parse(m.data.extraData);
 
-      for (var i = 0; i < satSet.numSats; i++) {
-        satData[i].inclination = satExtraData[i].inclination;
-        satData[i].eccentricity = satExtraData[i].eccentricity;
-        satData[i].raan = satExtraData[i].raan;
-        satData[i].argPe = satExtraData[i].argPe;
-        satData[i].meanMotion = satExtraData[i].meanMotion;
+      for (SCi = 0; SCi < satSet.numSats; SCi++) {
+        satData[SCi].inclination = satExtraData[SCi].inclination;
+        satData[SCi].eccentricity = satExtraData[SCi].eccentricity;
+        satData[SCi].raan = satExtraData[SCi].raan;
+        satData[SCi].argPe = satExtraData[SCi].argPe;
+        satData[SCi].meanMotion = satExtraData[SCi].meanMotion;
 
-        satData[i].semiMajorAxis = satExtraData[i].semiMajorAxis;
-        satData[i].semiMinorAxis = satExtraData[i].semiMinorAxis;
-        satData[i].apogee = satExtraData[i].apogee;
-        satData[i].perigee = satExtraData[i].perigee;
-        satData[i].period = satExtraData[i].period;
+        satData[SCi].semiMajorAxis = satExtraData[SCi].semiMajorAxis;
+        satData[SCi].semiMinorAxis = satExtraData[SCi].semiMinorAxis;
+        satData[SCi].apogee = satExtraData[SCi].apogee;
+        satData[SCi].perigee = satExtraData[SCi].perigee;
+        satData[SCi].period = satExtraData[SCi].period;
       }
 
       gotExtraData = true;
@@ -5879,21 +5921,21 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
 
     if (m.data.extraUpdate) {
       satExtraData = JSON.parse(m.data.extraData);
-      i = m.data.satId;
+      SCi = m.data.satId;
 
-      satData[i].inclination = satExtraData[0].inclination;
-      satData[i].eccentricity = satExtraData[0].eccentricity;
-      satData[i].raan = satExtraData[0].raan;
-      satData[i].argPe = satExtraData[0].argPe;
-      satData[i].meanMotion = satExtraData[0].meanMotion;
+      satData[SCi].inclination = satExtraData[0].inclination;
+      satData[SCi].eccentricity = satExtraData[0].eccentricity;
+      satData[SCi].raan = satExtraData[0].raan;
+      satData[SCi].argPe = satExtraData[0].argPe;
+      satData[SCi].meanMotion = satExtraData[0].meanMotion;
 
-      satData[i].semiMajorAxis = satExtraData[0].semiMajorAxis;
-      satData[i].semiMinorAxis = satExtraData[0].semiMinorAxis;
-      satData[i].apogee = satExtraData[0].apogee;
-      satData[i].perigee = satExtraData[0].perigee;
-      satData[i].period = satExtraData[0].period;
-      satData[i].TLE1 = satExtraData[0].TLE1;
-      satData[i].TLE2 = satExtraData[0].TLE2;
+      satData[SCi].semiMajorAxis = satExtraData[0].semiMajorAxis;
+      satData[SCi].semiMinorAxis = satExtraData[0].semiMinorAxis;
+      satData[SCi].apogee = satExtraData[0].apogee;
+      satData[SCi].perigee = satExtraData[0].perigee;
+      satData[SCi].period = satExtraData[0].period;
+      satData[SCi].TLE1 = satExtraData[0].TLE1;
+      satData[SCi].TLE2 = satExtraData[0].TLE2;
       return;
     }
 
@@ -5902,10 +5944,10 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
     satInView = new Float32Array(m.data.satInView);
 
     if (isMapMenuOpen || mapUpdateOverride) {
-      var now = Date.now();
-      if (now > lastMapUpdateTime + 30000) {
+      SCnow = Date.now();
+      if (SCnow > lastMapUpdateTime + 30000) {
         updateMap();
-        lastMapUpdateTime = now;
+        lastMapUpdateTime = SCnow;
         mapUpdateOverride = false;
       }
     }
@@ -6287,13 +6329,13 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
   satSet.draw = function (pMatrix, camMatrix) {
     if (!shadersReady || !cruncherReady) return;
 
-    var now = Date.now();
-    var divisor = Math.max(propRate, 0.001);
-    var dt = Math.min((now - lastDrawTime) / 1000.0, 1.0 / divisor);
-    for (var i = 0; i < (satData.length * 3); i++) {
-      satPos[i] += satVel[i] * dt * propRate;
+    drawNow = Date.now();
+    drawDivisor = Math.max(propRate, 0.001);
+    drawDt = Math.min((drawNow - lastDrawTime) / 1000.0, 1.0 / drawDivisor);
+    for (drawI = 0; drawI < (satData.length * 3); drawI++) {
+      satPos[drawI] += satVel[drawI] * drawDt * propRate;
     }
-    // console.log('interp dt=' + dt + ' ' + now);
+    // console.log('interp dt=' + dt + ' ' + drawNow);
 
     gl.useProgram(dotShader);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -6343,7 +6385,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
 
     gl.drawArrays(gl.POINTS, 0, satData.length); // draw pick
 
-    lastDrawTime = now;
+    lastDrawTime = drawNow;
     satSet.updateFOV(null);
   };
 
@@ -6661,9 +6703,8 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
     $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
   };
 
-  satSet.onCruncherReady = function (cb) {
-    cruncherReadyCallback = cb;
-    if (cruncherReady) cb;
+  satSet.onCruncherReady = function (cruncherReadyCallback) {
+    if (cruncherReady) cruncherReadyCallback; // Prevent cruncher callbacks until cruncher ready.
   };
 
   window.satSet = satSet;

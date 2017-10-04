@@ -85,7 +85,7 @@ laws of the United States and International Copyright Treaty.
 // **** 1 - main ***
 
 //  Version Control
-var VERSION_NUMBER = 'v0.23.5';
+var VERSION_NUMBER = 'v0.23.6';
 var VERSION_DATE = 'October 04, 2017';
 
 // Constants

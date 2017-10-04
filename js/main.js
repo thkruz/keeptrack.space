@@ -85,7 +85,7 @@ laws of the United States and International Copyright Treaty.
 // **** 1 - main ***
 
 //  Version Control
-var VERSION_NUMBER = 'v0.23.6';
+var VERSION_NUMBER = 'v0.23.7';
 var VERSION_DATE = 'October 04, 2017';
 
 // Constants
@@ -2948,7 +2948,6 @@ function updateMap () {
   map.y = map.y / 0.6366197723675813 * mapHeight - 10;
   $('#map-sat').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
   if (lookangles.sensorSelected()) {
-    console.log(lookangles.obslong);
     map = braun({lon: lookangles.obslong, lat: lookangles.obslat}, {meridian: 0, latLimit: 90});
     map.x = map.x * mapWidth - 10;
     map.y = map.y / 0.6366197723675813 * mapHeight - 10;
@@ -5949,6 +5948,10 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
     if (isMapMenuOpen || mapUpdateOverride) {
       SCnow = Date.now();
       if (SCnow > lastMapUpdateTime + 30000) {
+        updateMap();
+        lastMapUpdateTime = SCnow;
+        mapUpdateOverride = false;
+      } else if (mapUpdateOverride) {
         updateMap();
         lastMapUpdateTime = SCnow;
         mapUpdateOverride = false;

@@ -2040,6 +2040,7 @@ function bottomIconPress (evt) {
         hideSideMenus();
         $('#map-menu').fadeIn();
         isMapMenuOpen = true;
+        updateMap();
         var satData = satSet.getSat(selectedSat);
         $('#map-sat').tooltip({delay: 50, tooltip: satData.SCC_NUM, position: 'left'});
         $('#menu-map img').addClass('bmenu-item-selected');
@@ -2948,7 +2949,6 @@ function updateMap () {
   $('#map-sat').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
   if (lookangles.sensorSelected()) {
     console.log(lookangles.obslong);
-    console.log(lookangles.obslat);
     map = braun({lon: lookangles.obslong, lat: lookangles.obslat}, {meridian: 0, latLimit: 90});
     map.x = map.x * mapWidth - 10;
     map.y = map.y / 0.6366197723675813 * mapHeight - 10;
@@ -3177,6 +3177,9 @@ var lookangles = (function () {
       obslat = obs.lat * DEG2RAD;         // Observer Lattitude - use Google Maps
     }
     obslong = obs.long * DEG2RAD;         // Observer Longitude - use Google Maps
+
+    this.obslat = obslat * RAD2DEG;
+    this.obslong = obslong * RAD2DEG;
 
     obshei = obs.obshei * 1;                    // Observer Height in Km
     obsminaz = obs.obsminaz;              // Observer min azimuth (satellite azimuth must be greater) left extent looking towards target
@@ -4244,8 +4247,8 @@ var lookangles = (function () {
 
   return {
     // TODO: Verify these are unneeded and then remove
-    // obslat: obslat,
-    // obslong: obslong,
+    obslat: obslat,
+    obslong: obslong,
     // obshei: obshei,
     // obsminaz: obsminaz,
     // obsmaxaz: obsmaxaz,

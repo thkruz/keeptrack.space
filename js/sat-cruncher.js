@@ -42,6 +42,7 @@ var obsmaxel2 = 0;                // Maximum Elevation of Secondary Sensor FOV
 var obsminrange2 = 0;              // Minimum Range of Secondary Sensor FOV
 var obsmaxrange2 = 0;              // Maximum Range of Secondary Sensor FOV
 var propagationRunning = false;
+var divisor = 1;
 
 /** TIME VARIABLES */
 var propOffset = 0;                 // offset letting us propagate in the future (or past)
@@ -78,6 +79,7 @@ onmessage = function (m) {
     case 'offset':
       propOffset = Number(m.data.dat.split(' ')[0]);
       propRate = Number(m.data.dat.split(' ')[1]);
+      divisor = Math.max(propRate, 0.1);
       return;
     case 'satdata':
       var satData = JSON.parse(m.data.dat);
@@ -322,9 +324,7 @@ function propagate () {
 
   // var pTime2 = Date.now();
   // console.log('Total Time: ' + (pTime2 - pTime));
-
-  var divisor = Math.max(propRate, 0.1);
-  setTimeout(propagate, 500 / divisor);
+  setTimeout(propagate, 1 * 500 / divisor);
 }
 
 /** Returns number with 0s in front */

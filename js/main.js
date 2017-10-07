@@ -71,7 +71,6 @@ laws of the United States and International Copyright Treaty.
     MassRaidPre
     saveAs
     Blob
-    Line
     FileReader
     UsaICBM
     RussianICBM
@@ -111,6 +110,7 @@ var propOffset = 0.0; // offset we're propagating to, msec
 var propRate = 1.0; // time rate multiplier for propagation
 var propFrozen = Date.now(); // for when propRate 0
 var time; // Only used in drawLoop function
+var now;
 var drawNow;
 var dt;
 
@@ -127,6 +127,13 @@ var dragPointLat;
 var dragTargetLat;
 var pitchDif;
 var yawDif;
+
+// DOM Variables
+var curObjsHTML;
+var curObjsHTMLText = '';
+
+var uFOVi;  // Update FOV function iteration i variable
+var uFOVs;  // Update FOV function iteration S variable
 
 // Camera Variables
 var camYaw = 0;
@@ -198,10 +205,26 @@ var isShowDistance = false;
 var isOnlyFOVChecked = false;
 var isRiseSetLookangles = false;
 
+var isPropRateVisible = false;
+var isPropRateChange = false;
+var isHoverBoxVisible = false;
+
 var limitSats;
 var isSharperShaders = false;
 
 var otherSatelliteTransparency = 0.1;
+
+// getEarthScreenPointvar rayOrigin;
+var rayOrigin;
+var ptThru;
+var rayDir;
+var toCenterVec;
+var dParallel;
+var longDir;
+var dPerp;
+var dSubSurf;
+var dSurf;
+var ptSurf;
 
 var lastBoxUpdateTime = 0;
 var lastMapUpdateTime = 0;
@@ -224,8 +247,8 @@ var mouseTimeout = null;
 var mouseSat = -1;
 var isMouseMoving = false;
 
-var curRadarTrackNum = 0;
-var lastRadarTrackTime = 0;
+// var curRadarTrackNum = 0;
+// var lastRadarTrackTime = 0;
 
 var dragPoint = [0, 0, 0];
 var screenDragPoint = [0, 0];
@@ -239,12 +262,9 @@ var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotati
 
 var CAMERA_TYPE = 0;
 
-// var debugContext, debugImageData;
 // var debugLine;
-// var debugLine2, debugLine3;
-// var spinner;
 
-$(document).ready(function () { // Code Once index.php is loaded
+$(document).ready(function () { // Code Once index.htm is loaded
   // Load the Stylesheets
   $('head').append('<link rel="stylesheet" type="text/css" href="css/style.css">');
 
@@ -1332,13 +1352,13 @@ $(document).ready(function () { // Code Once index.php is loaded
       $('#ms-error').html('Large Scale Attack Loaded');
       $('#ms-error').show();
     } else {
-      if (tgtLat == NaN) { // isNaN() broke IE9
+      if (isNaN(tgtLat)) {
         $('#ms-error').html('Please enter a number<br>for Target Latitude');
         $('#ms-error').show();
         e.preventDefault();
         return;
       }
-      if (tgtLon == NaN) { // isNaN() broke IE9
+      if (isNaN(tgtLon)) {
         $('#ms-error').html('Please enter a number<br>for Target Longitude');
         $('#ms-error').show();
         e.preventDefault();
@@ -1653,7 +1673,6 @@ function keyDownHandler (evt) {
 }
 
 function keyHandler (evt) {
-  var ratechange = false;
   // console.log(Number(evt.charCode));
   switch (Number(evt.charCode)) {
     case 87: // W
@@ -1727,21 +1746,21 @@ function keyHandler (evt) {
       break;
     case 33: // !
       propOffset = 0; // Reset to Current Time
-      ratechange = true;
+      isPropRateChange = true;
       break;
     case 60: // <
       propOffset -= 60000; // Move back 60 seconds
-      ratechange = true;
+      isPropRateChange = true;
       break;
     case 62: // >
       propOffset += 60000; // Move forward 60 seconds
-      ratechange = true;
+      isPropRateChange = true;
       break;
     case 48: // 0
       propRate = 0;
       propFrozen = new Date();
       propOffset = getPropOffset();
-      ratechange = true;
+      isPropRateChange = true;
       break;
     case 43: // +
     case 61: // =
@@ -1759,7 +1778,7 @@ function keyHandler (evt) {
         propRate *= 1.5;
       }
       propOffset = getPropOffset();
-      ratechange = true;
+      isPropRateChange = true;
       break;
     case 45: // -
     case 95: // _
@@ -1778,12 +1797,12 @@ function keyHandler (evt) {
       }
 
       propOffset = getPropOffset();
-      ratechange = true;
+      isPropRateChange = true;
       break;
     case 49: // 1
       propRate = 1.0;
       propOffset = getPropOffset();
-      ratechange = true;
+      isPropRateChange = true;
       break;
   }
   function getPropOffset () {
@@ -1795,7 +1814,7 @@ function keyHandler (evt) {
     return propOffset;
   }
 
-  if (ratechange) {
+  if (isPropRateChange) {
     satCruncher.postMessage({
       typ: 'offset',
       dat: (propOffset).toString() + ' ' + (propRate).toString()
@@ -1803,6 +1822,7 @@ function keyHandler (evt) {
     propRealTime = Date.now();
   }
 }
+
 function hideSideMenus () {
   // Close any open colorboxes
   $.colorbox.close();
@@ -1860,6 +1880,7 @@ function hideSideMenus () {
   isCustomSensorMenuOpen = false;
   isAboutSelected = false;
 }
+
 function bottomIconPress (evt) {
   if (isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
   ga('send', 'event', 'Bottom Icon', $(this)['context']['id'], 'Selected');
@@ -2233,10 +2254,12 @@ function bottomIconPress (evt) {
       }
   }
 }
+
 function pad (num, size) {
   var s = '   ' + num;
   return s.substr(s.length - size);
 }
+
 function updateUrl () { // URL Updater
   var arr = window.location.href.split('?');
   var url = arr[0];
@@ -2257,18 +2280,6 @@ function updateUrl () { // URL Updater
   if (propOffset < -1000 || propOffset > 1000) {
     paramSlices.push('hrs=' + (propOffset / 1000.0 / 3600.0).toString());
   }
-
-  // if (lookangles.sensorSelected()) {
-  //   paramSlices.push('lat=' + lookangles.obslat);
-  //   paramSlices.push('long=' + lookangles.obslong);
-  //   paramSlices.push('hei=' + lookangles.obshei);
-  //   paramSlices.push('minaz=' + lookangles.obsminaz);
-  //   paramSlices.push('maxaz=' + lookangles.obsmaxaz);
-  //   paramSlices.push('minel=' + lookangles.obsminel);
-  //   paramSlices.push('maxel=' + lookangles.obsmaxel);
-  //   paramSlices.push('minrange=' + lookangles.obsminrange);
-  //   paramSlices.push('maxrange=' + lookangles.obsmaxrange);
-  // }
 
   if (paramSlices.length > 0) {
     url += '?' + paramSlices.join('&');
@@ -2569,42 +2580,49 @@ function webGlInit () {
   window.gl = gl;
 }
 
-function unProject (mx, my) {
-  var glScreenX = (mx / gl.drawingBufferWidth * 2) - 1.0;
-  var glScreenY = 1.0 - (my / gl.drawingBufferHeight * 2);
-  var screenVec = [glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
+var glScreenX;
+var glScreenY;
+var screenVec;
+var comboPMat;
+var invMat;
+var worldVec;
 
-  var comboPMat = mat4.create();
+function unProject (mx, my) {
+  glScreenX = (mx / gl.drawingBufferWidth * 2) - 1.0;
+  glScreenY = 1.0 - (my / gl.drawingBufferHeight * 2);
+  screenVec = [glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
+
+  comboPMat = mat4.create();
   mat4.mul(comboPMat, pMatrix, camMatrix);
-  var invMat = mat4.create();
+  invMat = mat4.create();
   mat4.invert(invMat, comboPMat);
-  var worldVec = vec4.create();
+  worldVec = vec4.create();
   vec4.transformMat4(worldVec, screenVec, invMat);
 
   return [worldVec[0] / worldVec[3], worldVec[1] / worldVec[3], worldVec[2] / worldVec[3]];
 }
 
 function getEarthScreenPoint (x, y) {
-  var rayOrigin = getCamPos();
-  var ptThru = unProject(x, y);
+  rayOrigin = getCamPos();
+  ptThru = unProject(x, y);
 
-  var rayDir = vec3.create();
+  rayDir = vec3.create();
   vec3.subtract(rayDir, ptThru, rayOrigin); // rayDir = ptThru - rayOrigin
   vec3.normalize(rayDir, rayDir);
 
-  var toCenterVec = vec3.create();
+  toCenterVec = vec3.create();
   vec3.scale(toCenterVec, rayOrigin, -1); // toCenter is just -camera pos because center is at [0,0,0]
-  var dParallel = vec3.dot(rayDir, toCenterVec);
+  dParallel = vec3.dot(rayDir, toCenterVec);
 
-  var longDir = vec3.create();
+  longDir = vec3.create();
   vec3.scale(longDir, rayDir, dParallel); // longDir = rayDir * distParallel
   vec3.add(ptThru, rayOrigin, longDir); // ptThru is now on the plane going through the center of sphere
-  var dPerp = vec3.len(ptThru);
+  dPerp = vec3.len(ptThru);
 
-  var dSubSurf = Math.sqrt(RADIUS_OF_EARTH * RADIUS_OF_EARTH - dPerp * dPerp);
-  var dSurf = dParallel - dSubSurf;
+  dSubSurf = Math.sqrt(RADIUS_OF_EARTH * RADIUS_OF_EARTH - dPerp * dPerp);
+  dSurf = dParallel - dSubSurf;
 
-  var ptSurf = vec3.create();
+  ptSurf = vec3.create();
   vec3.scale(ptSurf, rayDir, dSurf);
   vec3.add(ptSurf, ptSurf, rayOrigin);
 
@@ -2627,13 +2645,20 @@ function getCamDist () {
 }
 
 /** TODO: Use this to calculate a launch sites X, Y, Z */
+
+var gCPr;
+var gCPz;
+var gCPrYaw;
+var gCPx;
+var gCPy;
+
 function getCamPos () {
-  var r = getCamDist();
-  var z = r * Math.sin(camPitch);
-  var rYaw = r * Math.cos(camPitch);
-  var x = rYaw * Math.sin(camYaw);
-  var y = rYaw * -Math.cos(camYaw);
-  return [x, y, z];
+  gCPr = getCamDist();
+  gCPz = gCPr * Math.sin(camPitch);
+  gCPrYaw = gCPr * Math.cos(camPitch);
+  gCPx = gCPrYaw * Math.sin(camYaw);
+  gCPy = gCPrYaw * -Math.cos(camYaw);
+  return [gCPx, gCPy, gCPz];
 }
 
 // Camera Functions
@@ -2883,23 +2908,27 @@ function drawScene () {
  /* debugImageData.data.set(pickColorMap);
   debugContext.putImageData(debugImageData, 0, 0); */
 }
+
+var FPStimeNow;
+var FPSelapsed;
+
 function FPSMovement () {
-  var timeNow = new Date().getTime();
+  FPStimeNow = Date.now();
   if (FPSLastTime !== 0) {
-    var elapsed = timeNow - FPSLastTime;
+    FPSelapsed = FPStimeNow - FPSLastTime;
     if (FPSForwardSpeed !== 0) {
-      FPSxPos -= Math.sin(degToRad(FPSYaw)) * FPSForwardSpeed * FPSRun * elapsed;
-      FPSyPos -= Math.cos(degToRad(FPSYaw)) * FPSForwardSpeed * FPSRun * elapsed;
-      FPSzPos += Math.sin(degToRad(FPSPitch)) * FPSForwardSpeed * FPSRun * elapsed;
+      FPSxPos -= Math.sin(degToRad(FPSYaw)) * FPSForwardSpeed * FPSRun * FPSelapsed;
+      FPSyPos -= Math.cos(degToRad(FPSYaw)) * FPSForwardSpeed * FPSRun * FPSelapsed;
+      FPSzPos += Math.sin(degToRad(FPSPitch)) * FPSForwardSpeed * FPSRun * FPSelapsed;
     }
     if (FPSSideSpeed !== 0) {
-      FPSxPos -= Math.cos(-degToRad(FPSYaw)) * FPSSideSpeed * FPSRun * elapsed;
-      FPSyPos -= Math.sin(-degToRad(FPSYaw)) * FPSSideSpeed * FPSRun * elapsed;
+      FPSxPos -= Math.cos(-degToRad(FPSYaw)) * FPSSideSpeed * FPSRun * FPSelapsed;
+      FPSyPos -= Math.sin(-degToRad(FPSYaw)) * FPSSideSpeed * FPSRun * FPSelapsed;
     }
-    FPSYaw += FPSYawRate * elapsed;
-    FPSPitch += FPSPitchRate * elapsed;
+    FPSYaw += FPSYawRate * FPSelapsed;
+    FPSPitch += FPSPitchRate * FPSelapsed;
   }
-  FPSLastTime = timeNow;
+  FPSLastTime = FPStimeNow;
 }
 
 function drawCamera () {
@@ -2987,7 +3016,6 @@ $('#map-menu').on('click', '.map-look', function (evt) {
   }
 });
 
-var now;
 var satData;
 
 function updateSelectBox () {
@@ -3055,7 +3083,7 @@ function updateHover () {
       hoverBoxOnSat(-1, 0, 0);
     }
   } else {
-    if (!isMouseMoving) { return; }
+    if (!isMouseMoving || isDragging) { return; }
     mouseSat = getSatIdFromCoord(mouseX, mouseY);
     if (mouseSat !== -1) {
       orbitDisplay.setHoverOrbit(mouseSat);
@@ -3066,15 +3094,19 @@ function updateHover () {
     hoverBoxOnSat(mouseSat, mouseX, mouseY);
   }
 }
+
 function hoverBoxOnSat (satId, satX, satY) {
   if (satId === -1) {
+    if (!isHoverBoxVisible) return;
     $('#sat-hoverbox').html('(none)');
     $('#sat-hoverbox').css({display: 'none'});
     $('#canvas').css({cursor: 'default'});
-  } else {
+    isHoverBoxVisible = false;
+  } else if (!isDragging) {
     try {
       var sat = satSet.getSat(satId);
       var selectedSatData = satSet.getSat(selectedSat);
+      isHoverBoxVisible = true;
       if (sat.static && isShowDistance) {
         $('#sat-hoverbox').html(sat.name + '<br /><center>' + sat.type + lookangles.distance(sat, selectedSatData) + '</center>');
       } else if (sat.static) {
@@ -3983,8 +4015,7 @@ var lookangles = (function () {
         return 0;
       }
     }
-    if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange) || (azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
-      console.log(isRiseSetLookangles);
+    if (((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) || ((azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2))) {
       if (isRiseSetLookangles) {
         // Previous Pass to Calculate first line of coverage
         var now1 = propTimeCheck(propTempOffset - (lookanglesInterval * 1000), propRealTime);
@@ -4130,7 +4161,7 @@ var lookangles = (function () {
         return 0;
       }
     }
-    if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange) || (azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
+    if (((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange)) || ((azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2))) {
       var tr;
       if (tbl.rows.length > 0) {
         // console.log(tbl.rows[0].cells[0].textContent);
@@ -4657,29 +4688,29 @@ dateFormat.i18n = {
         if (theSatId === null) continue;
         this.sats.push({
           satId: theSatId,
-          isIntlDes: true,
-          isObjnum: false,
-          strIndex: 0
+          isIntlDes: true
+          // isObjnum: false,
+          // strIndex: 0
         });
       }
     } else if (groupType === 'nameRegex') {
       var satIdList = satSet.searchNameRegex(data);
       for (i = 0; i < satIdList.length; i++) {
         this.sats.push({
-          satId: satIdList[i],
-          isIntlDes: false,
-          isObjnum: false,
-          strIndex: 0
+          satId: satIdList[i]
+          // isIntlDes: false,
+          // isObjnum: false,
+          // strIndex: 0
         });
       }
     } else if (groupType === 'countryRegex') {
       satIdList = satSet.searchCountryRegex(data);
       for (i = 0; i < satIdList.length; i++) {
         this.sats.push({
-          satId: satIdList[i],
-          isIntlDes: false,
-          isObjnum: false,
-          strIndex: 0
+          satId: satIdList[i]
+          // isIntlDes: false,
+          // isObjnum: false,
+          // strIndex: 0
         });
       }
     } else if (groupType === 'objNum') {
@@ -4688,18 +4719,18 @@ dateFormat.i18n = {
         if (theSatId === null) continue;
         this.sats.push({
           satId: theSatId,
-          isIntlDes: false,
-          isObjnum: true,
-          strIndex: 0
+          // isIntlDes: false,
+          isObjnum: true
+          // strIndex: 0
         });
       }
     } else if (groupType === 'idList') {
       for (i = 0; i < data.length; i++) {
         this.sats.push({
-          satId: data[i],
-          isIntlDes: false,
-          isObjnum: false,
-          strIndex: 0
+          satId: data[i]
+          // isIntlDes: false,
+          // isObjnum: false,
+          // strIndex: 0
         });
       }
     }
@@ -5487,11 +5518,13 @@ dateFormat.i18n = {
 })();
 
 // **** propTime used by sun and earth.js
+var realElapsedMsec;
+var scaledMsec;
 function propTime () {
   'use strict';
-  var now = new Date();
-  var realElapsedMsec = Number(now) - Number(propRealTime);
-  var scaledMsec = realElapsedMsec * propRate;
+  now = new Date();
+  realElapsedMsec = Number(now) - Number(propRealTime);
+  scaledMsec = realElapsedMsec * propRate;
   if (propRate === 0) {
     now.setTime(Number(propFrozen) + propOffset);
   } else {
@@ -5679,20 +5712,31 @@ function propTime () {
     earthNow = propTime();
 
     // wall time is not propagation time, so better print it
+    // TODO substring causes 12kb memory leak every frame.
     tDS = earthNow.toJSON();
     timeTextStr = tDS.substring(0, 10) + ' ' + tDS.substring(11, 19);
-    if (propRate > 1.01 || propRate < 0.99) {
-      var digits = 1;
-      if (propRate < 10) {
-        digits = 2;
+    if (isPropRateChange) {
+      if (propRate > 1.01 || propRate < 0.99) {
+        if (propRate < 10) $('#propRate-status-box').html('Propagation Speed: ' + propRate.toFixed(1) + 'x');
+        if (propRate >= 10) $('#propRate-status-box').html('Propagation Speed: ' + propRate.toFixed(2) + 'x');
+        $('#propRate-status-box').show();
+        isPropRateVisible = true;
+      } else {
+        if (isPropRateVisible) {
+          $('#propRate-status-box').hide();
+          isPropRateVisible = false;
+        }
       }
-      $('#propRate-status-box').html('Propagation Speed: ' + propRate.toFixed(digits) + 'x');
-      $('#propRate-status-box').show();
-    } else {
-      $('#propRate-status-box').hide();
+      isPropRateChange = false;
     }
-    $('#datetime-text').text(timeTextStr);
-    $('#datetime-input-tb').val(timeTextStr);
+
+    // NOTE: jQuery call was causing additional Node every iteration.
+    document.getElementById('datetime-text').innerText = timeTextStr;
+
+    // Don't update the time input unless it is currently being viewed.
+    if (isEditTime) {
+      $('#datetime-input-tb').val(timeTextStr);
+    }
 
     earthJ = jday(earthNow.getUTCFullYear(),
                  earthNow.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -5762,9 +5806,10 @@ function propTime () {
 })();
 // **** 9 - sun ***
 (function () {
+  var j, n, L, g, ecLon, ob, x, y, z, obliq, t;
   function currentDirection () {
-    var now = propTime();
-    var j = jday(now.getUTCFullYear(),
+    now = propTime();
+    j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
                  now.getUTCHours(),
@@ -5776,30 +5821,31 @@ function propTime () {
   }
 
   function getDirection (jd) {
-    var n = jd - 2451545;
-    var L = (280.460) + (0.9856474 * n); // mean longitude of sun
-    var g = (357.528) + (0.9856003 * n); // mean anomaly
+    n = jd - 2451545;
+    L = (280.460) + (0.9856474 * n); // mean longitude of sun
+    g = (357.528) + (0.9856003 * n); // mean anomaly
     L = L % 360.0;
     g = g % 360.0;
 
-    var ecLon = L + 1.915 * Math.sin(g * DEG2RAD) + 0.020 * Math.sin(2 * g * DEG2RAD);
-    var ob = getObliquity(jd);
+    ecLon = L + 1.915 * Math.sin(g * DEG2RAD) + 0.020 * Math.sin(2 * g * DEG2RAD);
+    ob = getObliquity(jd);
 
-    var x = Math.cos(ecLon * DEG2RAD);
-    var y = Math.cos(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
-    var z = Math.sin(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
+    x = Math.cos(ecLon * DEG2RAD);
+    y = Math.cos(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
+    z = Math.sin(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
 
     return [x, y, z];
    // return [1, 0, 0];
   }
 
   function getObliquity (jd) {
-    var t = (jd - 2451545) / 3652500;
+    t = (jd - 2451545) / 3652500;
 
-    var ob = 84381.448 - 4680.93 * t - 1.55 * Math.pow(t, 2) + 1999.25 *
+    obliq = 84381.448 - 4680.93 * t - 1.55 * Math.pow(t, 2) + 1999.25 *
     Math.pow(t, 3) - 51.38 * Math.pow(t, 4) - 249.67 * Math.pow(t, 5) -
     39.05 * Math.pow(t, 6) + 7.12 * Math.pow(t, 7) + 27.87 * Math.pow(t, 8) +
     5.79 * Math.pow(t, 9) + 2.45 * Math.pow(t, 10);
+
     /* Human Readable Version
     var ob =  // arcseconds
       84381.448
@@ -5815,7 +5861,7 @@ function propTime () {
      +    2.45  * Math.pow(t, 10);
      */
 
-    return ob / 3600.0;
+    return obliq / 3600.0;
   }
 
   window.sun = {
@@ -5824,16 +5870,17 @@ function propTime () {
   };
 })();
 
+var jDayStart;
+var jDayDiff;
+
 function jday (year, mon, day, hr, minute, sec) { // from satellite.js
   'use strict';
 
   if (!year) {
-    var now = new Date();
-    var start = new Date(now.getFullYear(), 0, 0);
-    var diff = now - start;
-    var oneDay = MILLISECONDS_PER_DAY;
-    var jday = Math.floor(diff / oneDay);
-    return jday;
+    now = Date.now();
+    jDayStart = new Date(now.getFullYear(), 0, 0);
+    jDayDiff = now - jDayStart;
+    return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);
   } else {
     return (367.0 * year -
           Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
@@ -6333,6 +6380,8 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
   };
 
   satSet.draw = function (pMatrix, camMatrix) {
+    // NOTE: 640 byte leak.
+
     if (!shadersReady || !cruncherReady) return;
 
     drawNow = Date.now();
@@ -6392,33 +6441,33 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
     gl.drawArrays(gl.POINTS, 0, satData.length); // draw pick
 
     lastDrawTime = drawNow;
-    satSet.updateFOV(null);
+    satSet.updateFOV(null, drawNow);
   };
 
-  satSet.updateFOV = function (curSCC) {
-    var now = Date.now();
+  var uFOVSearchItems;
+  var inViewObs = [];
+  satSet.updateFOV = function (curSCC, now) {
     if (now - lastFOVUpdateTime > 1 * 1000 / propRate && isBottomMenuOpen === true) { // If it has been 1 seconds since last update that the menu is open
-      var curObjsHTML = document.getElementById('bottom-menu');
-      var inViewObs = [];
+      curObjsHTML = document.getElementById('bottom-menu');
+      inViewObs = [];
       curObjsHTML.innerHTML = '';
-      for (var i = 0; i < (satData.length); i++) {
+      for (uFOVi = 0; uFOVi < (satData.length); uFOVi++) {
         if ($('#search').val() === '') {
-          if (satData[i].inview) {
-            inViewObs.push(satData[i].SCC_NUM);
+          if (satData[uFOVi].inview) {
+            inViewObs.push(satData[uFOVi].SCC_NUM);
           }
         } else {
-          var searchItems = $('#search').val().split(',');
-          for (var s = 0; s < (searchItems.length); s++) {
-            if (satData[i].inview && satData[i].SCC_NUM === searchItems[s]) {
-              inViewObs.push(satData[i].SCC_NUM);
+          uFOVSearchItems = $('#search').val().split(',');
+          for (uFOVs = 0; uFOVs < ($('#datetime-text').length); uFOVs++) {
+            if (satData[uFOVi].inview && satData[uFOVi].SCC_NUM === uFOVSearchItems[uFOVs]) {
+              inViewObs.push(satData[uFOVi].SCC_NUM);
             }
           }
         }
       }
-      var j;
-      var curObjsHTMLText = '';
-      for (i = 0, j = inViewObs.length; i < j; i++) {
-        curObjsHTMLText += "<span class='FOV-object link'>" + inViewObs[i] + '</span>\n';
+      curObjsHTMLText = '';
+      for (uFOVi = 0; uFOVi < inViewObs.length; uFOVi++) {
+        curObjsHTMLText += "<span class='FOV-object link'>" + inViewObs[uFOVi] + '</span>\n';
       }
       curObjsHTML.innerHTML = curObjsHTMLText;
       lastFOVUpdateTime = now;
@@ -6710,7 +6759,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
   };
 
   satSet.onCruncherReady = function (cruncherReadyCallback) {
-    if (cruncherReady) cruncherReadyCallback; // Prevent cruncher callbacks until cruncher ready.
+    if (cruncherReady) cruncherReadyCallback(); // Prevent cruncher callbacks until cruncher ready.
   };
 
   window.satSet = satSet;

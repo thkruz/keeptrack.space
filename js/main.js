@@ -2350,7 +2350,7 @@ function selectSat (satId) {
     camAngleSnappedOnSat = true;
 
     // satSet.selectSat(satId);
-    camSnapToSat(satId);
+    // camSnapToSat(satId);
     orbitDisplay.setSelectOrbit(satId);
     if (sat.missile) return;
 

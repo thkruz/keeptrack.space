@@ -84,8 +84,8 @@ laws of the United States and International Copyright Treaty.
 // **** 1 - main ***
 
 //  Version Control
-var VERSION_NUMBER = 'v0.23.7';
-var VERSION_DATE = 'October 04, 2017';
+var VERSION_NUMBER = 'v0.23.10';
+var VERSION_DATE = 'October 06, 2017';
 
 // Constants
 var ZOOM_EXP = 3;
@@ -178,6 +178,7 @@ var mapHeight = 600;
 // SOCRATES Variables
 var socratesObjOne = []; // Array for tr containing CATNR1
 var socratesObjTwo = []; // Array for tr containing CATNR2
+var socratesOnSatCruncher;
 
 var whichRadar = '';
 var isBottomIconsEnabled = false;
@@ -1576,10 +1577,7 @@ function socrates (row) {
 
     $('#search').val(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Fill in the serach box with the two objects
     searchBox.doSearch(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Actually perform the search of the two objects
-    setTimeout(function () {
-      selectSat(satSet.getIdFromObjNum(socratesObjOne[row][1])); // Select the first object listed in SOCRATES
-    }, 1000); // Wait 1 second before selecting the sat because satcruncher updates on 1 second intervals
-              // and will cause the camera to rotate twice
+    socratesOnSatCruncher = satSet.getIdFromObjNum(socratesObjOne[row][1]);
   } // If a row was selected
 
   function findFutureDate (socratesObjTwo) {
@@ -2350,7 +2348,6 @@ function selectSat (satId) {
     camAngleSnappedOnSat = true;
 
     // satSet.selectSat(satId);
-    // camSnapToSat(satId);
     orbitDisplay.setSelectOrbit(satId);
     if (sat.missile) return;
 
@@ -4972,13 +4969,13 @@ dateFormat.i18n = {
 
     var bigarr = bigstr.split(',');
     var results = [];
-    for (var j = 0; j < arr.length; j++) {
-      bigstr = bigarr[j];
-      str = arr[j];
-      if (str.length <= 2) { return; }
-      var len = arr[j].length;
 
-      for (var i = 0; i < satData.length; i++) {
+    for (var i = 0; i < satData.length; i++) {
+      for (var j = 0; j < arr.length; j++) {
+        bigstr = bigarr[j];
+        str = arr[j];
+        if (str.length <= 2) { return; }
+        var len = arr[j].length;
         if (satData[i].static) { continue; }
         if (satData[i].missile && !satData[i].active) { continue; }
         if (!satData[i].ON) { continue; }
@@ -4996,25 +4993,12 @@ dateFormat.i18n = {
         }
         if (satData[i].missile) { continue; }
 
-        // if (satData[i].OT.indexOf(bigstr) !== -1) {
-        //   SEARCH_LIMIT = 5000;
-        //   results.push({
-        //     isIntlDes: false,
-        //     isInView: satData[i].inview,
-        //     isObjnum: false,
-        //     strIndex: satData[i].OT.indexOf(bigstr),
-        //     SCC_NUM: satData[i].SCC_NUM,
-        //     patlen: len,
-        //     satId: i
-        //   });
-        // }
-
         if (satData[i].intlDes.indexOf(str) !== -1) {
           if (satData[i].SCC_NUM.indexOf(str) !== -1) {
             results.push({
-              isIntlDes: true,
+              // isIntlDes: true,
               isInView: satData[i].inview,
-              isObjnum: true,
+              // isObjnum: true,
               strIndex: satData[i].intlDes.indexOf(str),
               SCC_NUM: satData[i].SCC_NUM,
               patlen: len,
@@ -5022,9 +5006,9 @@ dateFormat.i18n = {
             });
           } else {
             results.push({
-              isIntlDes: true,
+              // isIntlDes: true,
               isInView: satData[i].inview,
-              isObjnum: false,
+              // isObjnum: false,
               strIndex: satData[i].intlDes.indexOf(str),
               SCC_NUM: satData[i].SCC_NUM,
               patlen: len,
@@ -5034,9 +5018,9 @@ dateFormat.i18n = {
         } else if (satData[i].SCC_NUM.indexOf(str) !== -1) {
           if (satData[i].intlDes.indexOf(str) !== -1) {
             results.push({
-              isIntlDes: true,
+              // isIntlDes: true,
               isInView: satData[i].inview,
-              isObjnum: true,
+              // isObjnum: true,
               strIndex: satData[i].intlDes.indexOf(str),
               SCC_NUM: satData[i].SCC_NUM,
               patlen: len,
@@ -5044,9 +5028,9 @@ dateFormat.i18n = {
             });
           } else {
             results.push({
-              isIntlDes: false,
+              // isIntlDes: false,
               isInView: satData[i].inview,
-              isObjnum: true,
+              // isObjnum: true,
               strIndex: satData[i].SCC_NUM.indexOf(str),
               SCC_NUM: satData[i].SCC_NUM,
               patlen: len,
@@ -5057,9 +5041,9 @@ dateFormat.i18n = {
         if (parseInt(satData[i].SCC_NUM) >= 80000) { continue; }
         if ((satData[i].LV.indexOf(str) !== -1) || (satData[i].LV.indexOf(bigstr) !== -1)) {
           results.push({
-            isIntlDes: false,
+            // isIntlDes: false,
             isInView: satData[i].inview,
-            isObjnum: false,
+            // isObjnum: false,
             strIndex: satData[i].LV.indexOf(str),
             SCC_NUM: satData[i].SCC_NUM,
             patlen: len,
@@ -5067,8 +5051,7 @@ dateFormat.i18n = {
           });
         }
       }
-    } // end for j
-    // var resultCount = results.length;
+    }
 
     if (results.length > SEARCH_LIMIT) {
       results.length = SEARCH_LIMIT;
@@ -6003,6 +5986,11 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
         lastMapUpdateTime = SCnow;
         mapUpdateOverride = false;
       }
+    }
+
+    if (socratesOnSatCruncher) {
+      selectSat(socratesOnSatCruncher);
+      socratesOnSatCruncher = null;
     }
 
     if (currentColorScheme === ColorScheme.default && !lookangles.sensorSelected()) {

@@ -26,15 +26,17 @@ laws of the United States and International Copyright Treaty.
 
                                 INDEX OF CODE
 1 - main
-2 - shader-loader
-3 - color-scheme
-4 - groups
-5 - search-box
-6 - orbit-display
-7 - line
-8 - earth
-9 - sun
-10 - sat
+2 - lookangles
+3 - shader-loader
+4 - color-scheme
+5 - groups
+6 - search-box
+7 - orbit-display
+8 - line
+9 - earth
+10 - timeManager
+11 - sun
+12 - sat
 
 ///////////////////////////////////////////////////////////////////////////// */
 
@@ -79,7 +81,7 @@ laws of the United States and International Copyright Treaty.
 // **** 1 - main ***
 
 //  Version Control
-var VERSION_NUMBER = 'v0.24.0';
+var VERSION_NUMBER = 'v0.24.1';
 var VERSION_DATE = 'October 08, 2017';
 
 // Constants
@@ -3003,6 +3005,7 @@ function earthHitTest (x, y) {
           pickColorBuf[2] === 0);
 }
 
+// **** 2 - lookangles ***
 (function () {
   var lookangles = {};
   lookangles.currentSensor = {};
@@ -3823,7 +3826,6 @@ function earthHitTest (x, y) {
 
   window.lookangles = lookangles;
 })();
-
 // **** 3 - shader-loader ***
 (function () {
   var shaderLoader = {};
@@ -4921,7 +4923,6 @@ function earthHitTest (x, y) {
 
   window.FOVBubble = FOVBubble;
 })();
-
 // **** 10 - timeManager ***
 (function () {
   var timeManager = {};
@@ -5052,7 +5053,7 @@ function earthHitTest (x, y) {
   }
   window.timeManager = timeManager;
 })();
-// **** 10 - earth ***
+// **** 11 - earth ***
 (function () {
   var earth = {};
   var NUM_LAT_SEGS = 64;
@@ -5323,7 +5324,7 @@ function earthHitTest (x, y) {
 
   window.earth = earth;
 })();
-// **** 11 - sun ***
+// **** 12 - sun ***
 (function () {
   var j, n, L, g, ecLon, ob, x, y, z, obliq, t;
   function currentDirection () {

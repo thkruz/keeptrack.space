@@ -214,6 +214,8 @@ var isSharperShaders = false;
 
 var otherSatelliteTransparency = 0.1;
 
+var currentColorScheme;
+
 // getEarthScreenPointvar rayOrigin;
 var rayOrigin;
 var ptThru;
@@ -807,6 +809,7 @@ $(document).ready(function () { // Code Once index.htm is loaded
       satCruncher.postMessage({
         typ: 'offset',
         dat: (propOffset).toString() + ' ' + (propRate).toString(),
+        setlatlong: true,
         sensor: lookangles.defaultSensor
       });
       lookangles.setobs(null, true);
@@ -852,6 +855,7 @@ $(document).ready(function () { // Code Once index.htm is loaded
     lookanglesInterval = $('#lookanglesInterval').val() * 1;
 
     document.getElementById('settings-resetSensor').checked = false;
+    satSet.setColorScheme(currentColorScheme); // force color recalc
     e.preventDefault();
   });
 
@@ -2194,6 +2198,11 @@ function selectSat (satId) {
       sensorManager.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
       sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
       selectedSat = -1;
+      $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
+      if (selectedSat !== -1) {
+        $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+      }
+      $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
       return;
     }
     camZoomSnappedOnSat = true;
@@ -5410,7 +5419,6 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
   var satColorBuf;
   var pickColorBuf;
   var pickableBuf;
-  var currentColorScheme;
 
   var satPos;
   var satVel;

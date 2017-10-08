@@ -1,4 +1,16 @@
-/* global satellite postMessage importScripts */
+/* global
+
+  satellite
+  postMessage
+  importScripts
+  onmessage: true
+
+*/
+/* exported
+
+    onmessage
+
+*/
 importScripts('satellite.min.js');
 
 var propRealTime;
@@ -8,7 +20,7 @@ var propRate;
 /** CONSTANTS */
 var TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
 var DEG2RAD = TAU / 360;          // Used to convert degrees to radians
-var RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
+// var RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
 var RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
 
 var NUM_SEGS;
@@ -16,7 +28,7 @@ var satCache = [];
 
 onmessage = function (m) {
   if (m.data.isUpdate) {
-    if (!m.data.static && !m.data.missile) {
+    if (!m.data.missile) {
       satCache[m.data.satId] = satellite.twoline2satrec(
         m.data.TLE1, m.data.TLE2
       );

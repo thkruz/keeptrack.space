@@ -138,11 +138,6 @@ $.ajaxSetup({
     lat: 13.73,
     lon: 80.23
   };
-  launchSiteList.SVOB = {
-    name: 'SVOB',
-    lat: 51.83,
-    lon: 128.27
-  };
   launchSiteList.TNSTA = {
     name: 'TNSTA',
     lat: 30.39,
@@ -748,7 +743,7 @@ $.ajaxSetup({
   sensorManager.selectedSensor = {};
   sensorManager.whichRadar = '';
   sensorManager.setSensor = function (selectedSensor, staticNum) {
-    console.log(staticNum);
+    if (selectedSensor == null && staticNum == null) return;
     for (var sensor in sensorList) {
       if (sensorList[sensor] === selectedSensor || sensorList[sensor].staticNum === staticNum) {
         sensorManager.selectedSensor = sensorList[sensor];
@@ -829,32 +824,28 @@ $.ajaxSetup({
 
     var sensorList = window.sensorManager.sensorList;
     for (var sensor in sensorList) {
-      if (sensorList.hasOwnProperty(sensor)) {
-        var sensorInfo = {
-          static: true,
-          staticNum: sensorList[sensor].staticNum,
-          name: sensorList[sensor].name,
-          type: sensorList[sensor].type,
-          lat: sensorList[sensor].lat,
-          lon: sensorList[sensor].long,
-          changeObjectInterval: sensorList[sensor].changeObjectInterval
-        };
-        tleManager.staticSet.push(sensorInfo);
-      }
+      var sensorInfo = {
+        static: true,
+        staticNum: sensorList[sensor].staticNum,
+        name: sensorList[sensor].name,
+        type: sensorList[sensor].type,
+        lat: sensorList[sensor].lat,
+        lon: sensorList[sensor].long,
+        changeObjectInterval: sensorList[sensor].changeObjectInterval
+      };
+      tleManager.staticSet.push(sensorInfo);
     }
 
     var launchSiteList = window.launchSiteManager.launchSiteList;
     for (var launchSite in launchSiteList) {
-      if (launchSiteList.hasOwnProperty(launchSite)) {
-        var launchSiteInfo = {
-          static: true,
-          name: launchSiteList[launchSite].name,
-          type: 'Launch Facility',
-          lat: launchSiteList[launchSite].lat,
-          lon: launchSiteList[launchSite].lon
-        };
-        tleManager.staticSet.push(launchSiteInfo);
-      }
+      var launchSiteInfo = {
+        static: true,
+        name: launchSiteList[launchSite].name,
+        type: 'Launch Facility',
+        lat: launchSiteList[launchSite].lat,
+        lon: launchSiteList[launchSite].lon
+      };
+      tleManager.staticSet.push(launchSiteInfo);
     }
   };
   tleManager.init();

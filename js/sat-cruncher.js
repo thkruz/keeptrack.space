@@ -25,22 +25,12 @@ var satPos, satVel;               // Array of current Satellite and Static Posit
 var satInView;                    // Array of booleans showing if current Satellite is in view of Sensor
 
 /** OBSERVER VARIABLES */
-var latitude = 0;                 // latitude of Sensor
-var longitude = 0;                // longitude of Sensor
-var obshei = 0;                   // Height of Sensor
-var observerGd = {};              // Latitude, Longitude, and Height in an Array for Satellite.js Calculations
-var obsminaz = 0;                 // Minimum Azimuth of Sensor FOV
-var obsmaxaz = 0;                 // Maximum Azimuth of Sensor FOV
-var obsminel = 0;                 // Minimum Elevation of Sensor FOV
-var obsmaxel = 0;                 // Maximum Elevation of Sensor FOV
-var obsminrange = 0;              // Minimum Range of Sensor FOV
-var obsmaxrange = 0;              // Maximum Range of Sensor FOV
-var obsminaz2 = 0;                // Minimum Azimuth of Secondary Sensor FOV
-var obsmaxaz2 = 0;                // Maximum Azimuth of Secondary Sensor FOV
-var obsminel2 = 0;                // Minimum Elevation of Secondary Sensor FOV
-var obsmaxel2 = 0;                // Maximum Elevation of Secondary Sensor FOV
-var obsminrange2 = 0;              // Minimum Range of Secondary Sensor FOV
-var obsmaxrange2 = 0;              // Maximum Range of Secondary Sensor FOV
+var sensor = {};
+sensor.observerGd = {
+  longitude: 0,
+  latitude: 0,
+  height: 0
+};
 var propagationRunning = false;
 var divisor = 1;
 
@@ -52,27 +42,15 @@ var propRealTime = Date.now();      // lets us run time faster (or slower) than 
 onmessage = function (m) {
   propRealTime = Date.now();
 
-  if (m.data.lat) { latitude = m.data.lat; }
-  if (m.data.long) { longitude = m.data.long; }
-  if (m.data.obshei) { obshei = m.data.obshei; } // string
-  if (m.data.setlatlong) {
-    observerGd = {
-      longitude: longitude * DEG2RAD,
-      latitude: latitude * DEG2RAD,
-      height: obshei * 1 // Convert from string
-    };
-    if (m.data.obsminaz != null) { obsminaz = m.data.obsminaz * 1; }
-    if (m.data.obsmaxaz != null) { obsmaxaz = m.data.obsmaxaz * 1; }
-    if (m.data.obsminel != null) { obsminel = m.data.obsminel * 1; }
-    if (m.data.obsmaxel != null) { obsmaxel = m.data.obsmaxel * 1; }
-    if (m.data.obsminrange != null) { obsminrange = m.data.obsminrange * 1; }
-    if (m.data.obsmaxrange != null) { obsmaxrange = m.data.obsmaxrange * 1; }
-    if (m.data.obsminaz2 != null) { obsminaz2 = m.data.obsminaz * 1; }
-    if (m.data.obsmaxaz2 != null) { obsmaxaz2 = m.data.obsmaxaz * 1; }
-    if (m.data.obsminel2 != null) { obsminel2 = m.data.obsminel * 1; }
-    if (m.data.obsmaxel2 != null) { obsmaxel2 = m.data.obsmaxel * 1; }
-    if (m.data.obsminrange2 != null) { obsminrange2 = m.data.obsminrange * 1; }
-    if (m.data.obsmaxrange2 != null) { obsmaxrange2 = m.data.obsmaxrange * 1; }
+  if (m.data.sensor) {
+    sensor = m.data.sensor;
+    if (m.data.setlatlong) {
+      sensor.observerGd = {
+        longitude: m.data.sensor.long * DEG2RAD,
+        latitude: m.data.sensor.lat * DEG2RAD,
+        height: m.data.sensor.obshei * 1 // Convert from string
+      };
+    }
   }
 
   switch (m.data.typ) {
@@ -229,7 +207,7 @@ function propagate () {
       sinLon = null;
 
       positionEcf = satellite.eci_to_ecf({x: x, y: y, z: z}, gmst); // pv.position is called positionEci originally
-      lookangles = satellite.ecf_to_look_angles(observerGd, positionEcf);
+      lookangles = satellite.ecf_to_look_angles(sensor.observerGd, positionEcf);
 
       azimuth = lookangles.azimuth;
       elevation = lookangles.elevation;
@@ -237,15 +215,18 @@ function propagate () {
 
       azimuth *= RAD2DEG;
       elevation *= RAD2DEG;
+      satInView[i] = false; // Default in case no sensor selected
 
-      if (obsminaz > obsmaxaz) {
-        if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange) || (azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
+      if (sensor.obsminaz > sensor.obsmaxaz) {
+        if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+           ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
           satInView[i] = true;
         } else {
           satInView[i] = false;
         }
       } else {
-        if ((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange) || (azimuth >= obsminaz2 && azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
+        if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+           ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
           satInView[i] = true;
         } else {
           satInView[i] = false;
@@ -264,7 +245,7 @@ function propagate () {
         vz = pv.velocity.z;
 
         positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
-        lookangles = satellite.ecf_to_look_angles(observerGd, positionEcf);
+        lookangles = satellite.ecf_to_look_angles(sensor.observerGd, positionEcf);
         // TODO: Might add dopplerFactor back in or to lookangles for HAM Radio use
         // dopplerFactor = satellite.dopplerFactor(observerCoordsEcf, positionEcf, velocityEcf);
 
@@ -294,18 +275,20 @@ function propagate () {
 
       azimuth *= RAD2DEG;
       elevation *= RAD2DEG;
+      satInView[i] = false; // Default in case no sensor selected
 
-      if (obsminaz > obsmaxaz) {
-        if ((azimuth >= obsminaz || azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange) || (azimuth >= obsminaz2 || azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
+      if (i === 0) {
+      }
+
+      if (sensor.obsminaz > sensor.obsmaxaz) {
+        if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+           ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
           satInView[i] = true;
-        } else {
-          satInView[i] = false;
         }
       } else {
-        if ((azimuth >= obsminaz && azimuth <= obsmaxaz) && (elevation >= obsminel && elevation <= obsmaxel) && (rangeSat <= obsmaxrange && rangeSat >= obsminrange) || (azimuth >= obsminaz2 && azimuth <= obsmaxaz2) && (elevation >= obsminel2 && elevation <= obsmaxel2) && (rangeSat <= obsmaxrange2 && rangeSat >= obsminrange2)) {
+        if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+           ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
           satInView[i] = true;
-        } else {
-          satInView[i] = false;
         }
       }
     }

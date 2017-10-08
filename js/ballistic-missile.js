@@ -1336,7 +1336,8 @@ function Missile (CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongi
     if (MissileObject.argPe) delete MissileObject.argPe;
     if (MissileObject.eccentricity) delete MissileObject.eccentricity;
     if (MissileObject.inclination) delete MissileObject.inclination;
-    if (MissileObject.maxAlt) delete MissileObject.maxAlt;
+    // maxAlt is used for zoom controls
+    // if (MissileObject.maxAlt) delete MissileObject.maxAlt;
     if (MissileObject.meanMotion) delete MissileObject.meanMotion;
     if (MissileObject.perigee) delete MissileObject.perigee;
     if (MissileObject.period) delete MissileObject.period;

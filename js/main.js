@@ -79,8 +79,8 @@ laws of the United States and International Copyright Treaty.
 // **** 1 - main ***
 
 //  Version Control
-var VERSION_NUMBER = 'v0.23.10';
-var VERSION_DATE = 'October 06, 2017';
+var VERSION_NUMBER = 'v0.24.0';
+var VERSION_DATE = 'October 08, 2017';
 
 // Constants
 var ZOOM_EXP = 3;
@@ -93,6 +93,8 @@ var RADIUS_OF_EARTH = 6371.0;
 var MINUTES_PER_DAY = 1440;
 var MILLISECONDS_PER_DAY = 1.15741e-8;
 // var maxOrbitsDisplayed = 100; // Used in sat.js and orbit-display.js TODO: issues:23 Add settings option to change maxOrbitsDisplayed
+
+var timeManager = window.timeManager;
 
 var satCruncher;
 var gl;
@@ -124,8 +126,9 @@ var pitchDif;
 var yawDif;
 
 // DOM Variables
-var curObjsHTML;
+var DOMcurObjsHTML = document.getElementById('bottom-menu');
 var curObjsHTMLText = '';
+var $satHoverbox = $('#sat-hoverbox');
 
 var uFOVi;  // Update FOV function iteration i variable
 var uFOVs;  // Update FOV function iteration S variable
@@ -228,6 +231,8 @@ var lastMapUpdateTime = 0;
 var mapUpdateOverride = false;
 var lookanglesInterval = 5;
 var lookanglesLength = 2;
+
+var updateHoverDelay = 0;
 
 var pickFb, pickTex;
 var pickColorBuf;
@@ -2184,7 +2189,6 @@ function selectSat (satId) {
     isCustomSensorMenuOpen = false;
   } else {
     var sat = satSet.getSat(satId);
-    console.log(sat);
     if (!sat) return;
     if (sat.static) {
       sensorManager.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
@@ -2474,15 +2478,8 @@ function getEarthScreenPoint (x, y) {
   return ptSurf;
 }
 function getSatIdFromCoord (x, y) {
- // var start = performance.now();
-
   gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
   gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
-
-  // var pickR = pickColorBuf[0];
-  // var pickG = pickColorBuf[1];
-  // var pickB = pickColorBuf[2];
-
   return ((pickColorBuf[2] << 16) | (pickColorBuf[1] << 8) | (pickColorBuf[0])) - 1;
 }
 function getCamDist () {
@@ -2929,6 +2926,9 @@ function updateHover () {
     }
   } else {
     if (!isMouseMoving || isDragging) { return; }
+    updateHoverDelay++;
+    if (updateHoverDelay === 8) updateHoverDelay = 0;
+    if (updateHoverDelay > 0) return;
     mouseSat = getSatIdFromCoord(mouseX, mouseY);
     if (mouseSat !== -1) {
       orbitDisplay.setHoverOrbit(mouseSat);
@@ -2943,8 +2943,8 @@ function updateHover () {
 function hoverBoxOnSat (satId, satX, satY) {
   if (satId === -1) {
     if (!isHoverBoxVisible) return;
-    $('#sat-hoverbox').html('(none)');
-    $('#sat-hoverbox').css({display: 'none'});
+    $satHoverbox.html('(none)');
+    $satHoverbox.css({display: 'none'});
     $('#canvas').css({cursor: 'default'});
     isHoverBoxVisible = false;
   } else if (!isDragging) {
@@ -2953,28 +2953,28 @@ function hoverBoxOnSat (satId, satX, satY) {
       var selectedSatData = satSet.getSat(selectedSat);
       isHoverBoxVisible = true;
       if (sat.static && isShowDistance) {
-        $('#sat-hoverbox').html(sat.name + '<br /><center>' + sat.type + lookangles.distance(sat, selectedSatData) + '</center>');
+        $satHoverbox.html(sat.name + '<br /><center>' + sat.type + lookangles.distance(sat, selectedSatData) + '</center>');
       } else if (sat.static) {
         if (sat.type === 'Launch Facility') {
           var launchSite = tleManager.extractLaunchSite(sat.name);
-          $('#sat-hoverbox').html(launchSite.site + ', ' + launchSite.sitec + '<br /><center>' + sat.type + '</center>');
+          $satHoverbox.html(launchSite.site + ', ' + launchSite.sitec + '<br /><center>' + sat.type + '</center>');
         } else {
-          $('#sat-hoverbox').html(sat.name + '<br /><center>' + sat.type + '</center>');
+          $satHoverbox.html(sat.name + '<br /><center>' + sat.type + '</center>');
         }
       } else if (sat.missile) {
-        $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.desc + '</center>');
+        $satHoverbox.html(sat.ON + '<br /><center>' + sat.desc + '</center>');
       } else {
         if (lookangles.sensorSelected() && isShowNextPass && isShowDistance) {
-          $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + lookangles.distance(sat, selectedSatData) + '</center>');
+          $satHoverbox.html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + lookangles.distance(sat, selectedSatData) + '</center>');
         } else if (isShowDistance) {
-          $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + lookangles.distance(sat, selectedSatData) + '</center>');
+          $satHoverbox.html(sat.ON + '<br /><center>' + sat.SCC_NUM + lookangles.distance(sat, selectedSatData) + '</center>');
         } else if (lookangles.sensorSelected() && isShowNextPass) {
-          $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
+          $satHoverbox.html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + lookangles.nextpass(sat) + '</center>');
         } else {
-          $('#sat-hoverbox').html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
+          $satHoverbox.html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
         }
       }
-      $('#sat-hoverbox').css({
+      $satHoverbox.css({
         display: 'block',
         position: 'absolute',
         left: satX + 20,
@@ -3186,12 +3186,12 @@ function earthHitTest (x, y) {
       if (lookangles.currentSensor.obsminaz > lookangles.currentSensor.obsmaxaz) {
         if (((azimuth >= lookangles.currentSensor.obsminaz || azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
            ((azimuth >= lookangles.currentSensor.obsminaz2 || azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
-          return dateFormat(now, 'isoDateTime', true);
+          return timeManager.dateFormat(now, 'isoDateTime', true);
         }
       } else {
         if (((azimuth >= lookangles.currentSensor.obsminaz && azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
            ((azimuth >= lookangles.currentSensor.obsminaz2 && azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
-          return dateFormat(now, 'isoDateTime', true);
+          return timeManager.dateFormat(now, 'isoDateTime', true);
         }
       }
     }
@@ -3579,7 +3579,7 @@ function earthHitTest (x, y) {
 
       lat = satellite.degrees_lat(gpos.latitude);
       lon = satellite.degrees_long(gpos.longitude);
-      var time = dateFormat(now, 'isoDateTime', true);
+      var time = timeManager.dateFormat(now, 'isoDateTime', true);
 
       var positionEcf, lookAngles, azimuth, elevation, range;
       positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
@@ -3668,7 +3668,7 @@ function earthHitTest (x, y) {
         ((azimuth >= lookangles.currentSensor.obsminaz2 || azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
           var tr = tbl.insertRow();
           var tdT = tr.insertCell();
-          tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
+          tdT.appendChild(document.createTextNode(timeManager.dateFormat(now, 'isoDateTime', true)));
           // tdT.style.border = '1px solid black';
           var tdE = tr.insertCell();
           tdE.appendChild(document.createTextNode(elevation.toFixed(1)));
@@ -3701,7 +3701,7 @@ function earthHitTest (x, y) {
           ((azimuth1 >= lookangles.currentSensor.obsminaz2 || azimuth1 <= lookangles.currentSensor.obsmaxaz2) && (elevation1 >= lookangles.currentSensor.obsminel2 && elevation1 <= lookangles.currentSensor.obsmaxel2) && (range1 <= lookangles.currentSensor.obsmaxrange2 && range1 >= lookangles.currentSensor.obsminrange2))) {
             tr = tbl.insertRow();
             tdT = tr.insertCell();
-            tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
+            tdT.appendChild(document.createTextNode(timeManager.dateFormat(now, 'isoDateTime', true)));
             // tdT.style.border = '1px solid black';
             tdE = tr.insertCell();
             tdE.appendChild(document.createTextNode(elevation.toFixed(1)));
@@ -3717,7 +3717,7 @@ function earthHitTest (x, y) {
 
       tr = tbl.insertRow();
       tdT = tr.insertCell();
-      tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
+      tdT.appendChild(document.createTextNode(timeManager.dateFormat(now, 'isoDateTime', true)));
       // tdT.style.border = '1px solid black';
       tdE = tr.insertCell();
       tdE.appendChild(document.createTextNode(elevation.toFixed(1)));
@@ -3791,7 +3791,7 @@ function earthHitTest (x, y) {
       }
 
       var tdT = tr.insertCell();
-      tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
+      tdT.appendChild(document.createTextNode(timeManager.dateFormat(now, 'isoDateTime', true)));
       // tdT.style.border = '1px solid black';
       var tdE = tr.insertCell();
       tdE.appendChild(document.createTextNode(elevation.toFixed(1)));
@@ -3815,127 +3815,7 @@ function earthHitTest (x, y) {
   window.lookangles = lookangles;
 })();
 
-/* **** start Date Format ***
- * Date Format 1.2.3
- * (c) 2007-2009 Steven Levithan <stevenlevithan.com>
- * MIT license
- *
- * Includes ENHANCEMENT by Scott Trenda <scott.trenda.net>
- * and Kris Kowal <cixar.com/~kris.kowal/>
- *
- * Accepts a date, a mask, or a date and a mask.
- * Returns a formatted version of the given date.
- * The date defaults to the current date/time.
- * The mask defaults to dateFormat.masks.default.
- */
-var dateFormat = (function () {
-  var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g;
-  var timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g;
-  var timezoneClip = /[^-+\dA-Z]/g;
-  var pad = function (val, len) {
-    val = String(val);
-    len = len || 2;
-    while (val.length < len) val = '0' + val;
-    return val;
-  };
-
-  // Regexes and supporting functions are cached through closure
-  return function (date, mask, utc) {
-    var dF = dateFormat;
-
-    // You can't provide utc if you skip other args (use the "UTC:" mask prefix)
-    if (arguments.length === 1 && Object.prototype.toString.call(date) === '[object String]' && !/\d/.test(date)) {
-      mask = date;
-      date = undefined;
-    }
-
-    // Passing date through Date applies Date.parse, if necessary
-    date = date ? new Date(date) : new Date();
-    if (isNaN(date)) throw SyntaxError('invalid date');
-
-    mask = String(dF.masks[mask] || mask || dF.masks['default']);
-
-    // Allow setting the utc argument via the mask
-    if (mask.slice(0, 4) === 'UTC:') {
-      mask = mask.slice(4);
-      utc = true;
-    }
-
-    var _ = utc ? 'getUTC' : 'get';
-    var d = date[_ + 'Date']();
-    var D = date[_ + 'Day']();
-    var m = date[_ + 'Month']();
-    var y = date[_ + 'FullYear']();
-    var H = date[_ + 'Hours']();
-    var M = date[_ + 'Minutes']();
-    var s = date[_ + 'Seconds']();
-    var L = date[_ + 'Milliseconds']();
-    var o = utc ? 0 : date.getTimezoneOffset();
-    var flags = {
-      d: d,
-      dd: pad(d),
-      ddd: dF.i18n.dayNames[D],
-      dddd: dF.i18n.dayNames[D + 7],
-      m: m + 1,
-      mm: pad(m + 1),
-      mmm: dF.i18n.monthNames[m],
-      mmmm: dF.i18n.monthNames[m + 12],
-      yy: String(y).slice(2),
-      yyyy: y,
-      h: H % 12 || 12,
-      hh: pad(H % 12 || 12),
-      H: H,
-      HH: pad(H),
-      M: M,
-      MM: pad(M),
-      s: s,
-      ss: pad(s),
-      l: pad(L, 3),
-      L: pad(L > 99 ? Math.round(L / 10) : L),
-      t: H < 12 ? 'a' : 'p',
-      tt: H < 12 ? 'am' : 'pm',
-      T: H < 12 ? 'A' : 'P',
-      TT: H < 12 ? 'AM' : 'PM',
-      Z: utc ? 'UTC' : (String(date).match(timezone) || ['']).pop().replace(timezoneClip, ''),
-      o: (o > 0 ? '-' : '+') + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
-      S: ['th', 'st', 'nd', 'rd'][d % 10 > 3 ? 0 : (d % 100 - d % 10 !== 10) * d % 10]
-    };
-
-    return mask.replace(token, function ($0) {
-      return $0 in flags ? flags[$0] : $0.slice(1, $0.length - 1);
-    });
-  };
-})();
-
-// Some common format strings
-dateFormat.masks = {
-  'default': 'ddd mmm dd yyyy HH:MM:ss',
-  shortDate: 'm/d/yy',
-  mediumDate: 'mmm d, yyyy',
-  longDate: 'mmmm d, yyyy',
-  fullDate: 'dddd, mmmm d, yyyy',
-  shortTime: 'h:MM TT',
-  mediumTime: 'h:MM:ss TT',
-  longTime: 'h:MM:ss TT Z',
-  isoDate: 'yyyy-mm-dd',
-  isoTime: 'HH:MM:ss',
-  isoDateTime: "yyyy-mm-dd' 'HH:MM:ss",
-  isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
-};
-
-// Internationalization strings
-dateFormat.i18n = {
-  dayNames: [
-    'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
-    'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
-  ],
-  monthNames: [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-  ]
-};
-
-// **** 2 - shader-loader ***
+// **** 3 - shader-loader ***
 (function () {
   var shaderLoader = {};
 
@@ -3950,8 +3830,7 @@ dateFormat.i18n = {
 
   window.shaderLoader = shaderLoader;
 })();
-
-// **** 3 - color-scheme ***
+// **** 4 - color-scheme ***
 (function () {
   var ColorScheme = function (colorizer) {
     this.colorizer = colorizer;
@@ -4206,19 +4085,7 @@ dateFormat.i18n = {
 
   window.ColorScheme = ColorScheme;
 })();
-
-// **** 4 - groups ***
-
-// function clearMenuCountries () {
-//   groups.clearSelect();
-//   $('#menu-groups .menu-title').text('Groups');
-//   $('#menu-countries .menu-title').text('Countries');
-//
-//   searchBox.fillResultBox('');
-//
-//   $('#menu-countries .clear-option').css({display: 'none'}); // Hide Clear Option
-//   $('#menu-countries .country-option').css({display: 'block'}); // Show Country Options
-// }
+// **** 5 - groups ***
 (function () {
   var groups = {};
   groups.selectedGroup = null;
@@ -4457,7 +4324,7 @@ dateFormat.i18n = {
   };
   window.groups = groups;
 })();
-// **** 5 - search-box ***
+// **** 6 - search-box ***
 (function () {
   var searchBox = {};
   var SEARCH_LIMIT = 200; // Set Maximum Number of Satellites for Search
@@ -4725,7 +4592,7 @@ dateFormat.i18n = {
   };
   window.searchBox = searchBox;
 })();
-// **** 6 - orbit-display ***
+// **** 7 - orbit-display ***
 (function () {
   var NUM_SEGS = 255;
 
@@ -4947,7 +4814,7 @@ dateFormat.i18n = {
 
   window.orbitDisplay = orbitDisplay;
 })();
-// **** 7 - line ***
+// **** 8 - line ***
 (function () {
   function Line () {
     this.vertBuf = gl.createBuffer();
@@ -4978,7 +4845,7 @@ dateFormat.i18n = {
 
   window.Line = Line;
 })();
-
+// **** 9 - earth ***
 (function () {
   function FOVBubble () {
     this.vertBuf = gl.createBuffer();
@@ -5046,23 +4913,137 @@ dateFormat.i18n = {
   window.FOVBubble = FOVBubble;
 })();
 
-// **** propTime used by sun and earth.js
-var realElapsedMsec;
-var scaledMsec;
-function propTime () {
-  'use strict';
-  now = new Date();
-  realElapsedMsec = Number(now) - Number(propRealTime);
-  scaledMsec = realElapsedMsec * propRate;
-  if (propRate === 0) {
-    now.setTime(Number(propFrozen) + propOffset);
-  } else {
-    now.setTime(Number(propRealTime) + propOffset + scaledMsec);
+// **** 10 - timeManager ***
+(function () {
+  var timeManager = {};
+  var realElapsedMsec;
+  var scaledMsec;
+  var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g;
+  var timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g;
+  var timezoneClip = /[^-+\dA-Z]/g;
+  /* Date Format 1.2.3
+  * (c) 2007-2009 Steven Levithan <stevenlevithan.com>
+  * MIT license
+  *
+  * Includes ENHANCEMENT by Scott Trenda <scott.trenda.net>
+  * and Kris Kowal <cixar.com/~kris.kowal/>
+  *
+  * Accepts a date, a mask, or a date and a mask.
+  * Returns a formatted version of the given date.
+  * The date defaults to the current date/time.
+  * The mask defaults to dateFormat.masks.default.
+  */
+  timeManager.dateFormat = function (date, mask, utc) {
+    var dF = timeManager.dateFormat;
+
+    // You can't provide utc if you skip other args (use the "UTC:" mask prefix)
+    if (arguments.length === 1 && Object.prototype.toString.call(date) === '[object String]' && !/\d/.test(date)) {
+      mask = date;
+      date = undefined;
+    }
+
+    // Passing date through Date applies Date.parse, if necessary
+    date = date ? new Date(date) : new Date();
+    if (isNaN(date)) throw SyntaxError('invalid date');
+
+    mask = String(dF.masks[mask] || mask || dF.masks['default']);
+
+    // Allow setting the utc argument via the mask
+    if (mask.slice(0, 4) === 'UTC:') {
+      mask = mask.slice(4);
+      utc = true;
+    }
+
+    var _ = utc ? 'getUTC' : 'get';
+    var d = date[_ + 'Date']();
+    var D = date[_ + 'Day']();
+    var m = date[_ + 'Month']();
+    var y = date[_ + 'FullYear']();
+    var H = date[_ + 'Hours']();
+    var M = date[_ + 'Minutes']();
+    var s = date[_ + 'Seconds']();
+    var L = date[_ + 'Milliseconds']();
+    var o = utc ? 0 : date.getTimezoneOffset();
+    var flags = {
+      d: d,
+      dd: pad(d),
+      ddd: dF.i18n.dayNames[D],
+      dddd: dF.i18n.dayNames[D + 7],
+      m: m + 1,
+      mm: pad(m + 1),
+      mmm: dF.i18n.monthNames[m],
+      mmmm: dF.i18n.monthNames[m + 12],
+      yy: String(y).slice(2),
+      yyyy: y,
+      h: H % 12 || 12,
+      hh: pad(H % 12 || 12),
+      H: H,
+      HH: pad(H),
+      M: M,
+      MM: pad(M),
+      s: s,
+      ss: pad(s),
+      l: pad(L, 3),
+      L: pad(L > 99 ? Math.round(L / 10) : L),
+      t: H < 12 ? 'a' : 'p',
+      tt: H < 12 ? 'am' : 'pm',
+      T: H < 12 ? 'A' : 'P',
+      TT: H < 12 ? 'AM' : 'PM',
+      Z: utc ? 'UTC' : (String(date).match(timezone) || ['']).pop().replace(timezoneClip, ''),
+      o: (o > 0 ? '-' : '+') + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
+      S: ['th', 'st', 'nd', 'rd'][d % 10 > 3 ? 0 : (d % 100 - d % 10 !== 10) * d % 10]
+    };
+
+    return mask.replace(token, function ($0) {
+      return $0 in flags ? flags[$0] : $0.slice(1, $0.length - 1);
+    });
+  };
+  timeManager.dateFormat.masks = { // Common Formats
+    'default': 'ddd mmm dd yyyy HH:MM:ss',
+    shortDate: 'm/d/yy',
+    mediumDate: 'mmm d, yyyy',
+    longDate: 'mmmm d, yyyy',
+    fullDate: 'dddd, mmmm d, yyyy',
+    shortTime: 'h:MM TT',
+    mediumTime: 'h:MM:ss TT',
+    longTime: 'h:MM:ss TT Z',
+    isoDate: 'yyyy-mm-dd',
+    isoTime: 'HH:MM:ss',
+    isoDateTime: "yyyy-mm-dd' 'HH:MM:ss",
+    isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
+  };
+  timeManager.dateFormat.i18n = { // Internationalization strings
+    dayNames: [
+      'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
+      'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+    ],
+    monthNames: [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+    ]
+  };
+  timeManager.propTime = function () {
+    'use strict';
+    now = new Date();
+    realElapsedMsec = Number(now) - Number(propRealTime);
+    scaledMsec = realElapsedMsec * propRate;
+    if (propRate === 0) {
+      now.setTime(Number(propFrozen) + propOffset);
+    } else {
+      now.setTime(Number(propRealTime) + propOffset + scaledMsec);
+    }
+    // console.log('propTime: ' + now + ' elapsed=' + realElapsedMsec/1000);
+    return now;
+  };
+  function pad (val, len) {
+    val = String(val);
+    len = len || 2;
+    while (val.length < len) val = '0' + val;
+    return val;
   }
-  // console.log('propTime: ' + now + ' elapsed=' + realElapsedMsec/1000);
-  return now;
-}
-// **** 8 - earth ***
+  window.timeManager = timeManager;
+})();
+// **** 10 - earth ***
 (function () {
   var earth = {};
   var NUM_LAT_SEGS = 64;
@@ -5238,7 +5219,7 @@ function propTime () {
     if (!loaded) return;
 
     // var now = new Date();
-    earthNow = propTime();
+    earthNow = timeManager.propTime();
 
     // wall time is not propagation time, so better print it
     // TODO substring causes 12kb memory leak every frame.
@@ -5333,11 +5314,11 @@ function propTime () {
 
   window.earth = earth;
 })();
-// **** 9 - sun ***
+// **** 11 - sun ***
 (function () {
   var j, n, L, g, ecLon, ob, x, y, z, obliq, t;
   function currentDirection () {
-    now = propTime();
+    now = timeManager.propTime();
     j = jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
@@ -5421,7 +5402,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
   }
 }
 
-// **** 10 - sat ***
+// **** 12 - sat ***
 (function () {
   var satSet = {};
   var dotShader;
@@ -5982,9 +5963,8 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
   var inViewObs = [];
   satSet.updateFOV = function (curSCC, now) {
     if (now - lastFOVUpdateTime > 1 * 1000 / propRate && isBottomMenuOpen === true) { // If it has been 1 seconds since last update that the menu is open
-      curObjsHTML = document.getElementById('bottom-menu');
       inViewObs = [];
-      curObjsHTML.innerHTML = '';
+      DOMcurObjsHTML.innerHTML = '';
       for (uFOVi = 0; uFOVi < (satData.length); uFOVi++) {
         if ($('#search').val() === '') {
           if (satData[uFOVi].inview) {
@@ -6003,7 +5983,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
       for (uFOVi = 0; uFOVi < inViewObs.length; uFOVi++) {
         curObjsHTMLText += "<span class='FOV-object link'>" + inViewObs[uFOVi] + '</span>\n';
       }
-      curObjsHTML.innerHTML = curObjsHTMLText;
+      DOMcurObjsHTML.innerHTML = curObjsHTMLText;
       lastFOVUpdateTime = now;
     }
   };

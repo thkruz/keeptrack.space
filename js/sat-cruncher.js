@@ -310,12 +310,6 @@ function propagate () {
   setTimeout(propagate, 1 * 500 / divisor);
 }
 
-/** Returns number with 0s in front */
-function pad (num, size) {
-  var s = '00000' + num;
-  return s.substr(s.length - size);
-}
-
 /** Returns Ordinal Day (Commonly Called J Day) */
 function jday (year, mon, day, hr, minute, sec) {
   'use strict';

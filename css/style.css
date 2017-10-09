@@ -358,6 +358,15 @@ ul {
   display: none;
 }
 
+.remove-icon img {
+  width: 15px;
+}
+
+.add-icon img {
+  padding-top: 35px;
+  width: 15px;
+}
+
 #map-menu {
     display: none;
     position: absolute;

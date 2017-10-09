@@ -244,6 +244,30 @@
           </div>
         </div>
       </div>
+      <div id="watchlist-menu" class="start-hidden text-select">
+        <div id="watchlist-content" class="side-menu">
+          <div class="row">
+            <h5 class="center-align">Satellite Watchlist</h5>
+            <div id="watchlist-list">
+              <div class="row">
+                <div class="col s3 m3 l3">25544</div>
+                <div class="col s7 m7 l7">ISS (ZARYA)</div>
+                <div class="col s2 m2 l2 center-align remove-icon"><img src="images/remove.png"></img></div>
+              </div>
+            </div>
+            <br />
+            <div class="row">
+              <div class="input-field col s10 m10 l10">
+                <form id="watchlist-submit">
+                  <input placeholder="XXXXX" id="watchlist-new" type="text">
+                  <label for="watchlist-new">New Satellite</label>
+                </form>
+              </div>
+              <div class="col s2 m2 l2 center-align add-icon"><img class="watchlist-add" src="images/add.png"></img></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div id="findByLooks-menu" class="start-hidden text-select">
         <div id="findByLooks-content" class="side-menu">
           <div class="row">
@@ -1033,6 +1057,9 @@
         </div>
         <div id="menu-in-coverage" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Current Sensor Coverage">
           <img src="" delayedsrc="images/radar-1.png" class="bmenu-item-disabled" alt="Look Angles">
+        </div>
+        <div id="menu-watchlist" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Satellite Watchlist">
+          <img src="" delayedsrc="images/star.png" class="bmenu-item-disabled" alt="Watchlist">
         </div>
         <div id="menu-lookangles" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Sensor Lookangles">
           <img src="" delayedsrc="images/telescope.png" class="bmenu-item-disabled" alt="Look Angles">

@@ -81,7 +81,7 @@ laws of the United States and International Copyright Treaty.
 // **** 1 - main ***
 
 //  Version Control
-var VERSION_NUMBER = 'v0.24.1';
+var VERSION_NUMBER = 'v0.25.0';
 var VERSION_DATE = 'October 08, 2017';
 
 // Constants
@@ -177,6 +177,9 @@ var FPSLastTime = 1;
 var mapWidth = 800;
 var mapHeight = 600;
 
+// Watchlist Variables
+var watchlistList = [];
+
 // SOCRATES Variables
 var socratesObjOne = []; // Array for tr containing CATNR1
 var socratesObjTwo = []; // Array for tr containing CATNR2
@@ -191,6 +194,7 @@ var isMapMenuOpen = false;
 // var isSpaceWeatherMenuOpen = false;
 var isFindByLooksMenuOpen = false;
 var isSensorInfoMenuOpen = false;
+var isWatchlistMenuOpen = false;
 var isLaunchMenuOpen = false;
 var isBottomMenuOpen = false;
 var isAboutSelected = false;
@@ -1685,6 +1689,7 @@ function hideSideMenus () {
 
   // Hide all side menus
   $('#sensor-info-menu').fadeOut();
+  $('#watchlist-menu').fadeOut();
   $('#lookangles-menu').fadeOut();
   $('#lookanglesmultisite-menu').fadeOut();
   $('#findByLooks-menu').fadeOut();
@@ -1808,6 +1813,76 @@ function bottomIconPress (evt) {
             });
           }
         }
+        break;
+      }
+    case 'menu-watchlist': // S
+      if (isWatchlistMenuOpen) {
+        isWatchlistMenuOpen = false;
+        $('#menu-watchlist img').removeClass('bmenu-item-selected');
+        $('#search-holder').show();
+        hideSideMenus();
+        break;
+      } else {
+        hideSideMenus();
+        $('#watchlist-menu').fadeIn();
+        $('#search-holder').hide();
+        function updateWatchlist () {
+          if (!watchlistList) return;
+          var watchlistString = '';
+          var watchlistListHTML = '';
+          for (var i = 0; i < watchlistList.length; i++) {
+            sat = satSet.getSat(watchlistList[i]);
+            if (sat == null) {
+              watchlistList.splice(i, 1);
+              continue;
+            }
+            watchlistListHTML += '<div class="row">' +
+              '<div class="col s3 m3 l3">' + sat.SCC_NUM + '</div>' +
+              '<div class="col s7 m7 l7">' + sat.ON + '</div>' +
+              '<div class="col s2 m2 l2 center-align remove-icon"><img class="watchlist-remove" data-sat-id="' + sat.id + '" src="images/remove.png"></img></div>' +
+            '</div>';
+          }
+          $('#watchlist-list').html(watchlistListHTML);
+          for (i = 0; i < watchlistList.length; i++) { // No duplicates
+            watchlistString += satSet.getSat(watchlistList[i]).SCC_NUM;
+            if (i !== watchlistList.length - 1) watchlistString += ',';
+          }
+          $('#search').val(watchlistString);
+          searchBox.doSearch(watchlistString);
+        }
+        $('#watchlist-list').on('click', '.watchlist-remove', function (evt) {
+          var satId = $(this).data('sat-id');
+          for (var i = 0; i < watchlistList.length; i++) {
+            if (watchlistList[i] === satId) {
+              watchlistList.splice(i, 1);
+            }
+          }
+          updateWatchlist();
+        });
+        $('#watchlist-content').on('click', '.watchlist-add', function (evt) {
+          var satId = satSet.getIdFromObjNum(parseInt($('#watchlist-new').val()));
+          for (var i = 0; i < watchlistList.length; i++) { // No duplicates
+            if (watchlistList[i] === satId) return;
+          }
+          watchlistList.push(satId);
+          updateWatchlist();
+        });
+        $('#watchlist-content').submit(function (e) {
+          var satId = satSet.getIdFromObjNum(parseInt($('#watchlist-new').val()));
+          var duplicate = false;
+          for (var i = 0; i < watchlistList.length; i++) { // No duplicates
+            if (watchlistList[i] === satId) duplicate = true;
+          }
+          if (!duplicate) {
+            watchlistList.push(satId);
+            updateWatchlist();
+          }
+          e.preventDefault();
+        });
+
+        updateWatchlist();
+        isWatchlistMenuOpen = true;
+        $('#menu-watchlist img').addClass('bmenu-item-selected');
         break;
       }
     case 'menu-lookanglesmultisite':
@@ -5254,7 +5329,7 @@ function earthHitTest (x, y) {
     document.getElementById('datetime-text').innerText = timeTextStr;
 
     // Don't update the time input unless it is currently being viewed.
-    if (isEditTime) {
+    if (isEditTime || !cruncherReady) {
       $('#datetime-input-tb').val(timeTextStr);
     }
 
@@ -5619,6 +5694,7 @@ function jday (year, mon, day, hr, minute, sec) { // from satellite.js
       // $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
       // $('#menu-lookangles img').removeClass('bmenu-item-disabled');
       // $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
+      $('#menu-watchlist img').removeClass('bmenu-item-disabled');
       $('#menu-find-sat img').removeClass('bmenu-item-disabled');
       $('#menu-twitter img').removeClass('bmenu-item-disabled');
       // $('#menu-weather img').removeClass('bmenu-item-disabled');

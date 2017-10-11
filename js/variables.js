@@ -8,8 +8,6 @@
   camSnap
   latToPitch
   longToYaw
-  propOffset
-  propRate
   saveAs
   Blob
   satCruncher
@@ -752,7 +750,7 @@ $.ajaxSetup({
         sensorManager.whichRadar = sensorManager.selectedSensor.shortName;
         satCruncher.postMessage({
           typ: 'offset',
-          dat: (propOffset).toString() + ' ' + (propRate).toString(),
+          dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
           setlatlong: true,
           sensor: sensorManager.selectedSensor
         });

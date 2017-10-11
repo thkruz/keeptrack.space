@@ -1,0 +1,251 @@
+/* global
+  $
+
+  ga
+  ColorScheme
+  selectSat
+
+  satSet
+  orbitDisplay
+  settingsManager
+  searchBox
+  lookangles
+*/
+(function () {
+  var groups = {};
+  groups.selectedGroup = null;
+
+  function SatGroup (groupType, data) {
+    this.sats = [];
+    if (groupType === 'intlDes') {
+      for (var i = 0; i < data.length; i++) {
+        var theSatId = satSet.getIdFromIntlDes(data[i]);
+        if (theSatId === null) continue;
+        this.sats.push({
+          satId: theSatId,
+          isIntlDes: true
+          // isObjnum: false,
+          // strIndex: 0
+        });
+      }
+    } else if (groupType === 'nameRegex') {
+      var satIdList = satSet.searchNameRegex(data);
+      for (i = 0; i < satIdList.length; i++) {
+        this.sats.push({
+          satId: satIdList[i]
+          // isIntlDes: false,
+          // isObjnum: false,
+          // strIndex: 0
+        });
+      }
+    } else if (groupType === 'countryRegex') {
+      satIdList = satSet.searchCountryRegex(data);
+      for (i = 0; i < satIdList.length; i++) {
+        this.sats.push({
+          satId: satIdList[i]
+          // isIntlDes: false,
+          // isObjnum: false,
+          // strIndex: 0
+        });
+      }
+    } else if (groupType === 'objNum') {
+      for (i = 0; i < data.length; i++) {
+        theSatId = satSet.getIdFromObjNum(data[i]);
+        if (theSatId === null) continue;
+        this.sats.push({
+          satId: theSatId,
+          // isIntlDes: false,
+          isObjnum: true
+          // strIndex: 0
+        });
+      }
+    } else if (groupType === 'idList') {
+      for (i = 0; i < data.length; i++) {
+        this.sats.push({
+          satId: data[i]
+          // isIntlDes: false,
+          // isObjnum: false,
+          // strIndex: 0
+        });
+      }
+    }
+  }
+
+  SatGroup.prototype.hasSat = function (id) {
+    var len = this.sats.length;
+    for (var i = 0; i < len; i++) {
+      if (this.sats[i].satId === id) return true;
+    }
+    return false;
+  };
+
+  SatGroup.prototype.updateOrbits = function () {
+    // What calls the orbit buffer when selected a group from the menu.
+    for (var i = 0; i < this.sats.length; i++) {
+      orbitDisplay.updateOrbitBuffer(this.sats[i].satId);
+    }
+  };
+
+  SatGroup.prototype.forEach = function (callback) {
+    for (var i = 0; i < this.sats.length; i++) {
+      callback(this.sats[i].satId);
+    }
+  };
+
+  groups.SatGroup = SatGroup;
+
+  groups.selectGroup = function (group) {
+    // console.log('selectGroup with ' + group);
+    if (group === null || group === undefined) {
+      return;
+    }
+    // var start = performance.now();
+    groups.selectedGroup = group;
+    group.updateOrbits();
+    satSet.setColorScheme(ColorScheme.group);
+    // var t = performance.now() - start;
+    // console.log('selectGroup: ' + t + ' ms');
+  };
+
+  groups.clearSelect = function () {
+    groups.selectedGroup = null;
+    if (settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.onlyFOV); }
+    if (!settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.default); }
+  };
+
+  groups.init = function () {
+    // var start = performance.now();
+
+    // $('#groups-display>li').mouseover(function () {
+    // NOTE:: This runs on mouseover of any li elements
+    //
+    // });
+
+    $('#countries-menu>li').click(function () {
+      var groupName = $(this).data('group');
+      if (groupName === '<clear>') {
+        // clearMenuCountries();
+      } else {
+        selectSat(-1); // Clear selected sat
+        groups.selectGroup(groups[groupName]);
+        searchBox.fillResultBox(groups[groupName].sats, '');
+
+        $('#search').val('');
+
+        var results = groups[groupName].sats;
+        for (var i = 0; i < results.length; i++) {
+          var satId = groups[groupName].sats[i].satId;
+          var scc = satSet.getSat(satId).SCC_NUM;
+          if (i === results.length - 1) {
+            $('#search').val($('#search').val() + scc);
+          } else {
+            $('#search').val($('#search').val() + scc + ',');
+          }
+        }
+
+        $('#menu-countries .clear-option').css({display: 'block'}); // Show Clear Option
+        $('#menu-countries .country-option').css({display: 'none'}); // Hide Country Options
+        // $('#menu-groups .clear-option').css({display: 'block'});
+        // $('#menu-groups .menu-title').text('Groups (' + $(this).text() + ')');
+        $('#menu-countries .menu-title').text('Countries (' + $(this).text() + ')');
+      }
+
+      $('#groups-display').css({
+        display: 'none'
+      });
+    });
+    $('#colors-menu>li').click(function () {
+      selectSat(-1); // clear selected sat
+      var colorName = $(this).data('color');
+      // Hide All legends
+      $('#legend-list-default').hide();
+      $('#legend-list-default-sensor').hide();
+      $('#legend-list-rcs').hide();
+      $('#legend-list-small').hide();
+      $('#legend-list-near').hide();
+      $('#legend-list-deep').hide();
+      $('#legend-list-velocity').hide();
+      switch (colorName) {
+        case 'default':
+          if (lookangles.sensorSelected()) {
+            $('#legend-list-default-sensor').show();
+          } else {
+            $('#legend-list-default').show();
+          }
+          satSet.setColorScheme(ColorScheme.default);
+          ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
+          break;
+        case 'velocity':
+          $('#legend-list-velocity').show();
+          satSet.setColorScheme(ColorScheme.velocity);
+          ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
+          break;
+        case 'near-earth':
+          $('#legend-list-near').show();
+          satSet.setColorScheme(ColorScheme.leo);
+          ga('send', 'event', 'ColorScheme Menu', 'near-earth', 'Selected');
+          break;
+        case 'deep-space':
+          $('#legend-list-deep').show();
+          satSet.setColorScheme(ColorScheme.geo);
+          ga('send', 'event', 'ColorScheme Menu', 'Deep-Space', 'Selected');
+          break;
+        case 'lost-objects':
+          $('#search').val('');
+          satSet.setColorScheme(ColorScheme.lostobjects);
+          ga('send', 'event', 'ColorScheme Menu', 'Lost Objects', 'Selected');
+          searchBox.doSearch($('#search').val());
+          break;
+        case 'rcs':
+          $('#legend-list-rcs').show();
+          satSet.setColorScheme(ColorScheme.rcs);
+          ga('send', 'event', 'ColorScheme Menu', 'RCS', 'Selected');
+          break;
+        case 'smallsats':
+          $('#legend-list-small').show();
+          satSet.setColorScheme(ColorScheme.smallsats);
+          ga('send', 'event', 'ColorScheme Menu', 'Small Satellites', 'Selected');
+          break;
+      }
+    });
+
+    // COUNTRIES
+    groups.Canada = new SatGroup('countryRegex', /CA/);
+    groups.China = new SatGroup('countryRegex', /PRC/);
+    groups.France = new SatGroup('countryRegex', /FR/);
+    groups.India = new SatGroup('countryRegex', /IND/);
+    groups.Israel = new SatGroup('countryRegex', /ISRA/);
+    groups.Japan = new SatGroup('countryRegex', /JPN/);
+    groups.Russia = new SatGroup('countryRegex', /CIS/);
+    groups.UnitedKingdom = new SatGroup('countryRegex', /UK/);
+    groups.UnitedStates = new SatGroup('countryRegex', /US/);
+
+    // GROUPS
+    groups.SpaceStations = new SatGroup('objNum', [25544, 41765]);
+    groups.GlonassGroup = new SatGroup('nameRegex', /GLONASS/);
+    groups.GalileoGroup = new SatGroup('nameRegex', /GALILEO/);
+    groups.GPSGroup = new SatGroup('nameRegex', /NAVSTAR/);
+    groups.AmatuerRadio = new SatGroup('objNum', [7530, 14781, 20442, 22826, 24278, 25338, 25397, 25544, 26931,
+      27607, 27844, 27848, 28895, 32785, 32788, 32789, 32791, 33493, 33498, 33499, 35932, 35933, 35935, 37224,
+      37839, 37841, 37855, 38760, 39090, 39134, 39136, 39161, 39417, 39430, 39436, 39439, 39440, 39444, 39469,
+      39770, 40014, 40021, 40024, 40025, 40030, 40032, 40042, 40043, 40057, 40071, 40074, 40377, 40378, 40379,
+      40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928, 40931,
+      40967, 40968, 41168, 41171, 41340, 41459, 41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017]);
+    // SCC#s based on Uninon of Concerned Scientists
+    groups.MilitarySatellites = new SatGroup('objNum', [40420, 41394, 32783, 35943, 36582, 40353, 40555, 41032, 38010, 38008, 38007, 38009,
+      37806, 41121, 41579, 39030, 39234, 28492, 36124, 39194, 36095, 40358, 40258, 37212,
+      37398, 38995, 40296, 40900, 39650, 27434, 31601, 36608, 28380, 28521, 36519, 39177,
+      40699, 34264, 36358, 39375, 38248, 34807, 28908, 32954, 32955, 32956, 35498, 35500,
+      37152, 37154, 38733, 39057, 39058, 39059, 39483, 39484, 39485, 39761, 39762, 39763,
+      40920, 40921, 40922, 39765, 29658, 31797, 32283, 32750, 33244, 39208, 26694, 40614,
+      20776, 25639, 26695, 30794, 32294, 33055, 39034, 28946, 33751, 33752, 27056, 27057,
+      27464, 27465, 27868, 27869, 28419, 28420, 28885, 29273, 32476, 31792, 36834, 37165,
+      37875, 37941, 38257, 38354, 39011, 39012, 39013, 39239, 39240, 39241, 39363, 39410,
+      40109, 40111, 40143, 40275, 40305, 40310, 40338, 40339, 40340, 40362, 40878, 41026,
+      41038, 41473, 28470, 37804, 37234, 29398, 40110, 39209, 39210, 36596]);
+    groups.Tag42 = new SatGroup('objNum', ['25544']);
+
+    // console.log('groups init: ' + (performance.now() - start) + ' ms');
+  };
+  window.groups = groups;
+})();

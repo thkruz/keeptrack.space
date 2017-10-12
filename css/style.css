@@ -302,6 +302,8 @@ ul {
 .Square-Box {
   width: 22px;
   height: 22px;
+  border-width: 2px;
+  border-style: solid;
   border-radius: 10px;
   box-shadow: 0 0px 6px 0 rgba(0, 0, 0, 0.2), 0 0px 8px 0 rgba(0, 0, 0, 0.19)
 }
@@ -322,6 +324,10 @@ ul {
 }
 #legend-red-box {
   background: rgb(166, 5, 5);
+  margin-right: 35px;
+}
+#legend-purple-box {
+  background: rgb(108, 30, 103);
   margin-right: 35px;
 }
 #legend-orange-box {

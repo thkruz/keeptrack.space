@@ -57,7 +57,7 @@ laws of the United States and International Copyright Treaty.
     vec4
     requestAnimationFrame
     ga
-    braun
+    mapManager
     sensorManager
     tleManager
     MassRaidPre
@@ -2954,19 +2954,20 @@ function updateMap () {
   if (selectedSat === -1) return;
   if (!settingsManager.isMapMenuOpen) return;
   var satData = satSet.getSat(selectedSat);
+  var map;
   lookangles.getTEARR(satData);
-  var map = braun({lon: satellite.degrees_long(lookangles.currentTEARR.lon), lat: satellite.degrees_lat(lookangles.currentTEARR.lat)}, {meridian: 0, latLimit: 90});
+  map = mapManager.braun({lon: satellite.degrees_long(lookangles.currentTEARR.lon), lat: satellite.degrees_lat(lookangles.currentTEARR.lat)}, {meridian: 0, latLimit: 90});
   map.x = map.x * settingsManager.mapWidth - 10;
   map.y = map.y / 0.6366197723675813 * settingsManager.mapHeight - 10;
   $('#map-sat').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
   if (lookangles.sensorSelected()) {
-    map = braun({lon: lookangles.currentSensor.long, lat: lookangles.currentSensor.lat}, {meridian: 0, latLimit: 90});
+    map = mapManager.braun({lon: lookangles.currentSensor.long, lat: lookangles.currentSensor.lat}, {meridian: 0, latLimit: 90});
     map.x = map.x * settingsManager.mapWidth - 10;
     map.y = map.y / 0.6366197723675813 * settingsManager.mapHeight - 10;
     $('#map-sensor').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;z-index:11;'); // Set to size of the map image (800x600)
   }
   for (var i = 1; i <= 50; i++) {
-    map = braun({lon: lookangles.map(satData, i).lon, lat: lookangles.map(satData, i).lat}, {meridian: 0, latLimit: 90});
+    map = mapManager.braun({lon: lookangles.map(satData, i).lon, lat: lookangles.map(satData, i).lat}, {meridian: 0, latLimit: 90});
     map.x = map.x * settingsManager.mapWidth - 3.5;
     map.y = map.y / 0.6366197723675813 * settingsManager.mapHeight - 3.5;
     if (map.y > settingsManager.mapHeight / 2) {

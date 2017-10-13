@@ -11,7 +11,7 @@
     onmessage
 
 */
-importScripts('satellite.min.js');
+importScripts('lib/satellite.min.js');
 
 /** CONSTANTS */
 var TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier

@@ -2,7 +2,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.25.6';
+  settingsManager.versionNumber = 'v0.25.7';
   settingsManager.versionDate = 'October 12, 2017';
 
   settingsManager.shadersReady = false;

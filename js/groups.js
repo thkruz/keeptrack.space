@@ -14,8 +14,10 @@
 (function () {
   var groups = {};
   groups.selectedGroup = null;
+  groups.SatGroup = SatGroup;
 
   function SatGroup (groupType, data) {
+    var satId;
     this.sats = [];
     if (groupType === 'intlDes') {
       for (var i = 0; i < data.length; i++) {
@@ -24,48 +26,35 @@
         this.sats.push({
           satId: theSatId,
           isIntlDes: true
-          // isObjnum: false,
-          // strIndex: 0
         });
       }
     } else if (groupType === 'nameRegex') {
-      var satIdList = satSet.searchNameRegex(data);
-      for (i = 0; i < satIdList.length; i++) {
+      data = satSet.searchNameRegex(data);
+      for (i = 0; i < data.length; i++) {
         this.sats.push({
-          satId: satIdList[i]
-          // isIntlDes: false,
-          // isObjnum: false,
-          // strIndex: 0
+          satId: data[i]
         });
       }
     } else if (groupType === 'countryRegex') {
-      satIdList = satSet.searchCountryRegex(data);
-      for (i = 0; i < satIdList.length; i++) {
+      data = satSet.searchCountryRegex(data);
+      for (i = 0; i < data.length; i++) {
         this.sats.push({
-          satId: satIdList[i]
-          // isIntlDes: false,
-          // isObjnum: false,
-          // strIndex: 0
+          satId: data[i]
         });
       }
     } else if (groupType === 'objNum') {
       for (i = 0; i < data.length; i++) {
-        theSatId = satSet.getIdFromObjNum(data[i]);
-        if (theSatId === null) continue;
+        satId = satSet.getIdFromObjNum(data[i]);
+        if (satId === null) continue;
         this.sats.push({
-          satId: theSatId,
-          // isIntlDes: false,
+          satId: satId,
           isObjnum: true
-          // strIndex: 0
         });
       }
     } else if (groupType === 'idList') {
       for (i = 0; i < data.length; i++) {
         this.sats.push({
           satId: data[i]
-          // isIntlDes: false,
-          // isObjnum: false,
-          // strIndex: 0
         });
       }
     }
@@ -78,77 +67,55 @@
     }
     return false;
   };
-
   SatGroup.prototype.updateOrbits = function () {
     // What calls the orbit buffer when selected a group from the menu.
     for (var i = 0; i < this.sats.length; i++) {
       orbitDisplay.updateOrbitBuffer(this.sats[i].satId);
     }
   };
-
   SatGroup.prototype.forEach = function (callback) {
     for (var i = 0; i < this.sats.length; i++) {
       callback(this.sats[i].satId);
     }
   };
 
-  groups.SatGroup = SatGroup;
-
   groups.selectGroup = function (group) {
-    // console.log('selectGroup with ' + group);
     if (group === null || group === undefined) {
       return;
     }
-    // var start = performance.now();
     groups.selectedGroup = group;
     group.updateOrbits();
     satSet.setColorScheme(ColorScheme.group);
-    // var t = performance.now() - start;
-    // console.log('selectGroup: ' + t + ' ms');
   };
-
   groups.clearSelect = function () {
     groups.selectedGroup = null;
     if (settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.onlyFOV); }
     if (!settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.default); }
   };
-
   groups.init = function () {
-    // var start = performance.now();
-
-    // $('#groups-display>li').mouseover(function () {
-    // NOTE:: This runs on mouseover of any li elements
-    //
-    // });
-
+    var $search = $('#search');
     $('#countries-menu>li').click(function () {
       var groupName = $(this).data('group');
-      if (groupName === '<clear>') {
-        // clearMenuCountries();
-      } else {
-        selectSat(-1); // Clear selected sat
-        groups.selectGroup(groups[groupName]);
-        searchBox.fillResultBox(groups[groupName].sats, '');
+      selectSat(-1); // Clear selected sat
+      groups.selectGroup(groups[groupName]);
+      searchBox.fillResultBox(groups[groupName].sats, '');
 
-        $('#search').val('');
+      $search.val('');
 
-        var results = groups[groupName].sats;
-        for (var i = 0; i < results.length; i++) {
-          var satId = groups[groupName].sats[i].satId;
-          var scc = satSet.getSat(satId).SCC_NUM;
-          if (i === results.length - 1) {
-            $('#search').val($('#search').val() + scc);
-          } else {
-            $('#search').val($('#search').val() + scc + ',');
-          }
+      var results = groups[groupName].sats;
+      for (var i = 0; i < results.length; i++) {
+        var satId = groups[groupName].sats[i].satId;
+        var scc = satSet.getSat(satId).SCC_NUM;
+        if (i === results.length - 1) {
+          $search.val($search.val() + scc);
+        } else {
+          $search.val($search.val() + scc + ',');
         }
-
-        $('#menu-countries .clear-option').css({display: 'block'}); // Show Clear Option
-        $('#menu-countries .country-option').css({display: 'none'}); // Hide Country Options
-        // $('#menu-groups .clear-option').css({display: 'block'});
-        // $('#menu-groups .menu-title').text('Groups (' + $(this).text() + ')');
-        $('#menu-countries .menu-title').text('Countries (' + $(this).text() + ')');
       }
+
+      $('#menu-countries .clear-option').css({display: 'block'}); // Show Clear Option
+      $('#menu-countries .country-option').css({display: 'none'}); // Hide Country Options
+      $('#menu-countries .menu-title').text('Countries (' + $(this).text() + ')');
 
       $('#groups-display').css({
         display: 'none'
@@ -243,9 +210,7 @@
       37875, 37941, 38257, 38354, 39011, 39012, 39013, 39239, 39240, 39241, 39363, 39410,
       40109, 40111, 40143, 40275, 40305, 40310, 40338, 40339, 40340, 40362, 40878, 41026,
       41038, 41473, 28470, 37804, 37234, 29398, 40110, 39209, 39210, 36596]);
-    groups.Tag42 = new SatGroup('objNum', ['25544']);
-
-    // console.log('groups init: ' + (performance.now() - start) + ' ms');
   };
+
   window.groups = groups;
 })();

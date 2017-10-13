@@ -2925,18 +2925,13 @@ function getSatIdFromCoord (x, y) {
   return ((pickColorBuf[2] << 16) | (pickColorBuf[1] << 8) | (pickColorBuf[0])) - 1;
 }
 
+// var lastRadarTrackTime = 0;
+// var curRadarTrackNum = 0;
 // function drawLines () {
 //   var satData = satSet.getSatData();
-//   var propTime = new Date();
-//   var realElapsedMsec = Number(propTime) - Number(propRealTime);
-//   var scaledMsec = realElapsedMsec * propRate;
-//   if (propRate === 0) {
-//     propTime.setTime(Number(propFrozen) + propOffset);
-//   } else {
-//     propTime.setTime(Number(propRealTime) + propOffset + scaledMsec);
-//   }
+//   var propTime = timeManager.propTime();
 //   if (satData && lookangles.sensorSelected()) {
-//     if (propTime - lastRadarTrackTime > staticSet[lookangles.staticNum].changeObjectInterval) {
+//     if (propTime - lastRadarTrackTime > 54) {
 //       lastRadarTrackTime = 0;
 //       curRadarTrackNum++;
 //     }
@@ -2949,7 +2944,6 @@ function getSatIdFromCoord (x, y) {
 //           debugLine.set(satposition, sensorManager.curSensorPositon);
 //           debugLine.draw();
 //           if (lastRadarTrackTime === 0) { lastRadarTrackTime = propTime; }
-//           return;
 //         } else { curRadarTrackNum++; }
 //       } else { curRadarTrackNum++; }
 //     } else { curRadarTrackNum = 0; }

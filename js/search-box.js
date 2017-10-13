@@ -7,10 +7,10 @@
   satSet
   orbitDisplay
   selectedSat
+  settingsManager
 */
 (function () {
   var searchBox = {};
-  var SEARCH_LIMIT = 200; // Set Maximum Number of Satellites for Search
   var satData;
 
   var hovering = false;
@@ -22,11 +22,9 @@
   searchBox.isResultBoxOpen = function () {
     return resultsOpen;
   };
-
   searchBox.getLastResultGroup = function () {
     return lastResultGroup;
   };
-
   searchBox.getCurrentSearch = function () {
     if (resultsOpen) {
       return $('#search').val();
@@ -34,18 +32,14 @@
       return null;
     }
   };
-
   searchBox.isHovering = function () {
     return hovering;
   };
-
   searchBox.getHoverSat = function () {
     return hoverSatId;
   };
-
   searchBox.hideResults = function () {
-    var sr = $('#search-results');
-    sr.slideUp();
+    $('#search-results').slideUp();
     groups.clearSelect();
     resultsOpen = false;
   };
@@ -57,8 +51,6 @@
       searchBox.hideResults();
       return;
     }
-
-    // var searchStart = performance.now();
 
     var bigstr = str.toUpperCase();
     var arr = str.split(',');
@@ -92,9 +84,7 @@
         if (satData[i].intlDes.indexOf(str) !== -1) {
           if (satData[i].SCC_NUM.indexOf(str) !== -1) {
             results.push({
-              // isIntlDes: true,
               isInView: satData[i].inview,
-              // isObjnum: true,
               strIndex: satData[i].intlDes.indexOf(str),
               SCC_NUM: satData[i].SCC_NUM,
               patlen: len,
@@ -102,9 +92,7 @@
             });
           } else {
             results.push({
-              // isIntlDes: true,
               isInView: satData[i].inview,
-              // isObjnum: false,
               strIndex: satData[i].intlDes.indexOf(str),
               SCC_NUM: satData[i].SCC_NUM,
               patlen: len,
@@ -114,9 +102,7 @@
         } else if (satData[i].SCC_NUM.indexOf(str) !== -1) {
           if (satData[i].intlDes.indexOf(str) !== -1) {
             results.push({
-              // isIntlDes: true,
               isInView: satData[i].inview,
-              // isObjnum: true,
               strIndex: satData[i].intlDes.indexOf(str),
               SCC_NUM: satData[i].SCC_NUM,
               patlen: len,
@@ -124,9 +110,7 @@
             });
           } else {
             results.push({
-              // isIntlDes: false,
               isInView: satData[i].inview,
-              // isObjnum: true,
               strIndex: satData[i].SCC_NUM.indexOf(str),
               SCC_NUM: satData[i].SCC_NUM,
               patlen: len,
@@ -137,9 +121,7 @@
         if (parseInt(satData[i].SCC_NUM) >= 80000) { continue; }
         if ((satData[i].LV.indexOf(str) !== -1) || (satData[i].LV.indexOf(bigstr) !== -1)) {
           results.push({
-            // isIntlDes: false,
             isInView: satData[i].inview,
-            // isObjnum: false,
             strIndex: satData[i].LV.indexOf(str),
             SCC_NUM: satData[i].SCC_NUM,
             patlen: len,
@@ -149,8 +131,8 @@
       }
     }
 
-    if (results.length > SEARCH_LIMIT) {
-      results.length = SEARCH_LIMIT;
+    if (results.length > settingsManager.searchLimit) {
+      results.length = settingsManager.searchLimit;
     }
 
     // Make a group to hilight results
@@ -167,7 +149,6 @@
     // searchBox.filterInView(results);
     updateUrl();
   };
-
   searchBox.fillResultBox = function (results) {
     var resultBox = $('#search-results');
     var html = '';
@@ -197,14 +178,12 @@
       }
       html += '</div></div>';
     }
-    // var resultStart = performance.now();
     resultBox[0].innerHTML = html;
     resultBox.slideDown();
     resultsOpen = true;
   };
 
-  searchBox.init = function (_satData) {
-    satData = _satData;
+  searchBox.init = function (satData) {
     $('#search-results').on('click', '.search-result', function (evt) {
       var satId = $(this).data('sat-id');
       selectSat(satId);
@@ -218,7 +197,6 @@
       hovering = true;
       hoverSatId = satId;
     });
-
     $('#search-results').mouseout(function () {
       orbitDisplay.clearHoverOrbit();
       satSet.setHover(-1);
@@ -226,9 +204,7 @@
     });
 
     $('#search').on('input', function () {
-      // var initStart = performance.now();
       var searchStr = $('#search').val();
-
       searchBox.doSearch(searchStr);
     });
 
@@ -273,5 +249,6 @@
       searchBox.doSearch($('#search').val());
     });
   };
+
   window.searchBox = searchBox;
 })();

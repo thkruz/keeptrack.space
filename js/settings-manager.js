@@ -2,11 +2,14 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.25.5';
+  settingsManager.versionNumber = 'v0.25.6';
   settingsManager.versionDate = 'October 12, 2017';
 
   settingsManager.shadersReady = false;
   settingsManager.cruncherReady = false;
+
+  // Search Variables
+  settingsManager.searchLimit = 200;
 
   // Map Variables
   settingsManager.mapWidth = 800;

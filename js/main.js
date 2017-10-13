@@ -2055,8 +2055,7 @@ function keyHandler (evt) {
       settingsManager.isPropRateChange = true;
       break;
     case 48: // 0
-      timeManager.propRate = 0;
-      timeManager.propFrozen = new Date();
+      timeManager.setPropRateZero();
       timeManager.propOffset = timeManager.getPropOffset();
       settingsManager.isPropRateChange = true;
       break;
@@ -2793,7 +2792,7 @@ function selectSat (satId) {
     $('#sat-period').tooltip({delay: 50, tooltip: 'Mean Motion: ' + MINUTES_PER_DAY / sat.period.toFixed(2), position: 'left'});
 
     var now = new Date();
-    var jday = timeManager.getDOY(now);
+    var jday = timeManager.getDayOfYear(now);
     now = now.getFullYear();
     now = now.toString().substr(2, 2);
     var daysold;

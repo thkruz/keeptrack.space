@@ -56,7 +56,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     currentDate = new Date(currentDate);
     var epochYear = currentDate.getUTCFullYear();
     epochYear = parseInt(epochYear.toString().substr(2, 2));
-    var epochDay = timeManager.getDOY(currentDate) + (currentDate.getUTCHours() * 3600 + currentDate.getUTCMinutes() * 60 + currentDate.getUTCSeconds()) / (1440 * 60);
+    var epochDay = timeManager.getDayOfYear(currentDate) + (currentDate.getUTCHours() * 3600 + currentDate.getUTCMinutes() * 60 + currentDate.getUTCSeconds()) / (1440 * 60);
     return [epochYear, epochDay];
   };
   lookangles.distance = function (hoverSat, selectedSat) {
@@ -119,7 +119,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
   lookangles.getTEARR = function (sat) {
     // Set default timing settings. These will be changed to find look angles at different times in future.
     timeManager.propRealTime = Date.now();
-    var propOffset = getPropOffset();               // offset letting us propagate in the future (or past)
+    var propOffset = timeManager.getPropOffset();               // offset letting us propagate in the future (or past)
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
     var now = propTimeCheck(propOffset, timeManager.propRealTime);
     var j = timeManager.jday(now.getUTCFullYear(),
@@ -182,7 +182,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     }
   };
   lookangles.nextpass = function (sat) {
-    var propOffset = getPropOffset();
+    var propOffset = timeManager.getPropOffset();
     var propTempOffset = 0;
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
     for (var i = 0; i < (lookangles.lookanglesLength * 24 * 60 * 60); i += lookangles.lookanglesInterval) {         // 5second Looks
@@ -231,7 +231,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     var propTempOffset = 0;               // offset letting us propagate in the future (or past)
     // timeManager.propRealTime = Date.now();      // Set current time
 
-    var propOffset = getPropOffset();
+    var propOffset = timeManager.getPropOffset();
     lookangles.tempSensor = lookangles.currentSensor;
     lookangles.setobs(lookangles.sensorListUS[0]);
 
@@ -537,7 +537,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       var propTempOffset = 0;               // offset letting us propagate in the future (or past)
       // timeManager.propRealTime = Date.now();      // Set current time
 
-      var propOffset = getPropOffset();
+      var propOffset = timeManager.getPropOffset();
 
       var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
       var tbl = document.getElementById('looks');           // Identify the table to update
@@ -578,7 +578,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
   };
   lookangles.map = function (sat, i) {
     // Set default timing settings. These will be changed to find look angles at different times in future.
-    var propOffset = getPropOffset();
+    var propOffset = timeManager.getPropOffset();
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
     var propTempOffset = i * sat.period / 50 * 60 * 1000 + propOffset;             // Offset in seconds (msec * 1000)
     return propagate(propTempOffset, satrec);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
@@ -629,14 +629,6 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     }
   };
 
-  function getPropOffset () {
-    var selectedDate = $('#datetime-text').text().substr(0, 19);
-    selectedDate = selectedDate.split(' ');
-    selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
-    var today = new Date();
-    var propOffset = selectedDate - today;// - (selectedDate.getTimezoneOffset() * 60 * 1000);
-    return propOffset;
-  }
   function propagate (propTempOffset, tbl, satrec) {
     timeManager.propRealTime = Date.now();
     var now = propTimeCheck(propTempOffset, timeManager.propRealTime);

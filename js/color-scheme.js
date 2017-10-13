@@ -180,7 +180,7 @@
       }
       var pe = sat.perigee;
       var now = new Date();
-      var jday = timeManager.getDOY(now);
+      var jday = timeManager.getDayOfYear(now);
       now = now.getFullYear();
       now = now.toString().substr(2, 2);
       var daysold;

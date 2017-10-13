@@ -8,8 +8,10 @@
 */
 
 (function () {
+  var sun = {};
   var j, n, L, g, ecLon, ob, x, y, z, obliq, t;
-  function currentDirection () {
+
+  sun.currentDirection = function () {
     timeManager.now = timeManager.propTime();
     j = timeManager.jday(timeManager.now.getUTCFullYear(),
                  timeManager.now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -19,10 +21,9 @@
                  timeManager.now.getUTCSeconds());
     j += timeManager.now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
 
-    return getDirection(j);
-  }
-
-  function getDirection (jd) {
+    return sun.getDirection(j);
+  };
+  sun.getDirection = function (jd) {
     n = jd - 2451545;
     L = (280.460) + (0.9856474 * n); // mean longitude of sun
     g = (357.528) + (0.9856003 * n); // mean anomaly
@@ -30,17 +31,16 @@
     g = g % 360.0;
 
     ecLon = L + 1.915 * Math.sin(g * DEG2RAD) + 0.020 * Math.sin(2 * g * DEG2RAD);
-    ob = getObliquity(jd);
+    ob = _getObliquity(jd);
 
     x = Math.cos(ecLon * DEG2RAD);
     y = Math.cos(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
     z = Math.sin(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
 
     return [x, y, z];
-   // return [1, 0, 0];
-  }
+  };
 
-  function getObliquity (jd) {
+  function _getObliquity (jd) {
     t = (jd - 2451545) / 3652500;
 
     obliq = 84381.448 - 4680.93 * t - 1.55 * Math.pow(t, 2) + 1999.25 *
@@ -66,8 +66,5 @@
     return obliq / 3600.0;
   }
 
-  window.sun = {
-    getDirection: getDirection,
-    currentDirection: currentDirection
-  };
+  window.sun = sun;
 })();

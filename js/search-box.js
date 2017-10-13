@@ -183,7 +183,8 @@
     resultsOpen = true;
   };
 
-  searchBox.init = function (satData) {
+  searchBox.init = function (_satData) {
+    satData = _satData; // Copies satData to searchBox. Might be a more efficient way to access satData
     $('#search-results').on('click', '.search-result', function (evt) {
       var satId = $(this).data('sat-id');
       selectSat(satId);

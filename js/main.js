@@ -22,26 +22,7 @@ laws of the United States and International Copyright Treaty.
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-/* /////////////////////////////////////////////////////////////////////////////
-
-                                INDEX OF CODE
-1 - main
-2 - lookangles
-3 - shader-loader
-4 - color-scheme
-5 - groups
-6 - search-box
-7 - orbit-display
-8 - line
-9 - earth
-10 - timeManager
-11 - sun
-12 - sat
-
-///////////////////////////////////////////////////////////////////////////// */
-
 /* global
-
     satSet
     searchBox
     $
@@ -83,11 +64,12 @@ var DEG2RAD = TAU / 360;
 var RAD2DEG = 360 / TAU;
 var RADIUS_OF_EARTH = 6371.0;
 var MINUTES_PER_DAY = 1440;
-// var maxOrbitsDisplayed = 100; // Used in sat.js and orbit-display.js TODO: issues:23 Add settings option to change maxOrbitsDisplayed
 
+// Frequently Used Manager Variables
 var timeManager = window.timeManager;
-
 var satCruncher = window.satCruncher;
+var limitSats = settingsManager.limitSats;
+var lookangles = window.lookangles;
 var gl;
 
 // Camera Variables
@@ -102,106 +84,66 @@ var zoomLevel = 0.5;
 var zoomTarget = 0.5;
 var camPitchSpeed = 0;
 var camYawSpeed = 0;
-// var isZoomChanging = false;
-var dragTarget;
 
-var lookangles = window.lookangles;
-
-var FPSPitch = 0;
-var FPSPitchRate = 0;
-var FPSYaw = 0;
-var FPSYawRate = 0;
-var FPSxPos = 0;
-var FPSyPos = 25000;
-var FPSzPos = 0;
-var FPSForwardSpeed = 0;
-var FPSSideSpeed = 0;
-var FPSRun = 1;
-var FPSLastTime = 1;
-
-// Watchlist Variables
-var watchlistList = [];
+// Menu Variables
+var isEditSatMenuOpen = false;
+var isLookanglesMenuOpen = false;
+var isLookanglesMultiSiteMenuOpen = false;
+var isNewLaunchMenuOpen = false;
+var isMissileMenuOpen = false;
+var isCustomSensorMenuOpen = false;
 
 // SOCRATES Variables
 var socratesObjOne = []; // Array for tr containing CATNR1
 var socratesObjTwo = []; // Array for tr containing CATNR2
 
-var isLookanglesMenuOpen = false;
-var isLookanglesMultiSiteMenuOpen = false;
-var isTwitterMenuOpen = false;
-var isWeatherMenuOpen = false;
-// var isSpaceWeatherMenuOpen = false;
-var isFindByLooksMenuOpen = false;
-var isSensorInfoMenuOpen = false;
-var isWatchlistMenuOpen = false;
-var isLaunchMenuOpen = false;
-var isAboutSelected = false;
-var isMilSatSelected = false;
-var isSocratesMenuOpen = false;
-var isSettingsMenuOpen = false;
-var isEditSatMenuOpen = false;
-var isNewLaunchMenuOpen = false;
-var isMissileMenuOpen = false;
-var isCustomSensorMenuOpen = false;
-var isShowNextPass = false;
-var isShowDistance = false;
-
-var isHoverBoxVisible = false;
-
-var limitSats = settingsManager.limitSats;
-
-// getEarthScreenPointvar rayOrigin;
-var rayOrigin;
-var ptThru;
-var rayDir;
-var toCenterVec;
-var dParallel;
-var longDir;
-var dPerp;
-var dSubSurf;
-var dSurf;
-var ptSurf;
-
-var lastBoxUpdateTime = 0;
-
-var updateHoverDelay = 0;
-
 var pickFb, pickTex;
-var pickColorBuf;
-
 var pMatrix = mat4.create();
 var camMatrix = mat4.create();
-
 var selectedSat = -1;
 var lastSelectedSat = -1;
 
-var mouseX = 0;
-var mouseY = 0;
-var mouseTimeout = null;
-var mouseSat = -1;
-var isMouseMoving = false;
-
+// getEarthScreenPoint;
+// var rayOrigin;
 // var curRadarTrackNum = 0;
 // var lastRadarTrackTime = 0;
-
-var dragPoint = [0, 0, 0];
-var screenDragPoint = [0, 0];
-var dragStartPitch = 0;
-var dragStartYaw = 0;
-var isDragging = false;
-var dragHasMoved = false;
-
-var rotateTheEarth = true; // Set to False to disable initial rotation
-var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotating around earth
-
-var CAMERA_TYPE = 0;
-
 // var debugLine;
 
 (function () {
   var time;
   var drawNow;
   var dt;
+
+  var watchlistList = [];
+
+  var lastBoxUpdateTime = 0;
+  var updateHoverDelay = 0;
+
+  var pickColorBuf;
+  var cameraType = 0;
+
+  var rayOrigin;
+  var ptThru;
+  var rayDir;
+  var toCenterVec;
+  var dParallel;
+  var longDir;
+  var dPerp;
+  var dSubSurf;
+  var dSurf;
+  var ptSurf;
+
+  var mouseX = 0;
+  var mouseY = 0;
+  var mouseTimeout = null;
+  var mouseSat = -1;
+  var isMouseMoving = false;
+  var dragPoint = [0, 0, 0];
+  var screenDragPoint = [0, 0];
+  var dragStartPitch = 0;
+  var dragStartYaw = 0;
+  var isDragging = false;
+  var dragHasMoved = false;
   var xDif;
   var yDif;
   var yawTarget;
@@ -215,6 +157,20 @@ var CAMERA_TYPE = 0;
   var pitchDif;
   var yawDif;
   var $satHoverbox = $('#sat-hoverbox');
+
+  // var isZoomChanging = false;
+  var dragTarget;
+  var FPSPitch = 0;
+  var FPSPitchRate = 0;
+  var FPSYaw = 0;
+  var FPSYawRate = 0;
+  var FPSxPos = 0;
+  var FPSyPos = 25000;
+  var FPSzPos = 0;
+  var FPSForwardSpeed = 0;
+  var FPSSideSpeed = 0;
+  var FPSRun = 1;
+  var FPSLastTime = 1;
 
   var glScreenX;
   var glScreenY;
@@ -234,6 +190,24 @@ var CAMERA_TYPE = 0;
   // updateHover
   var updateHoverSatId;
   var updateHoverSatPos;
+
+  var isTwitterMenuOpen = false;
+  var isWeatherMenuOpen = false;
+  // var isSpaceWeatherMenuOpen = false;
+  var isFindByLooksMenuOpen = false;
+  var isSensorInfoMenuOpen = false;
+  var isWatchlistMenuOpen = false;
+  var isLaunchMenuOpen = false;
+  var isAboutSelected = false;
+  var isMilSatSelected = false;
+  var isSocratesMenuOpen = false;
+  var isSettingsMenuOpen = false;
+  var isShowNextPass = false;
+  var isShowDistance = false;
+  var isHoverBoxVisible = false;
+
+  var rotateTheEarth = true; // Set to False to disable initial rotation
+  var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotating around earth
 
   $(document).ready(function () { // Code Once index.htm is loaded
     var resizing = false;
@@ -258,13 +232,13 @@ var CAMERA_TYPE = 0;
       if (!resizing) {
         window.setTimeout(function () {
           resizing = false;
-          webGlInit();
+          _webGlInit();
         }, 500);
       }
       resizing = true;
     });
 
-    webGlInit();
+    _webGlInit();
     earth.init();
     ColorScheme.init();
     satSet.init(function (satData) {
@@ -450,7 +424,7 @@ var CAMERA_TYPE = 0;
     $('#canvas').mouseup(function (evt) {
       // if(evt.which === 3) {//RMB
       if (!dragHasMoved) {
-        var clickedSat = getSatIdFromCoord(evt.clientX, evt.clientY);
+        var clickedSat = _getSatIdFromCoord(evt.clientX, evt.clientY);
         if (clickedSat === -1 && evt.button === 2) { // Right Mouse Buttom Click
           // clearMenuCountries();
           $('#search').val('');
@@ -851,7 +825,7 @@ var CAMERA_TYPE = 0;
         inc[1] = '0000';
       }
       inc = (inc[0] + '.' + inc[1]).toString();
-      inc = padEmpty(inc, 8);
+      inc = _padEmpty(inc, 8);
 
       var meanmo = $('#es-meanmo').val();
 
@@ -864,7 +838,7 @@ var CAMERA_TYPE = 0;
         meanmo[1] = '00000000';
       }
       meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
-      meanmo = padEmpty(meanmo, 8);
+      meanmo = _padEmpty(meanmo, 8);
 
       var rasc = $('#es-rasc').val();
 
@@ -877,7 +851,7 @@ var CAMERA_TYPE = 0;
         rasc[1] = '0000';
       }
       rasc = (rasc[0] + '.' + rasc[1]).toString();
-      rasc = padEmpty(rasc, 8);
+      rasc = _padEmpty(rasc, 8);
 
       var ecen = $('#es-ecen').val();
       var argPe = $('#es-argPe').val();
@@ -891,7 +865,7 @@ var CAMERA_TYPE = 0;
         argPe[1] = '0000';
       }
       argPe = (argPe[0] + '.' + argPe[1]).toString();
-      argPe = padEmpty(argPe, 8);
+      argPe = _padEmpty(argPe, 8);
 
       var meana = $('#es-meana').val();
 
@@ -904,7 +878,7 @@ var CAMERA_TYPE = 0;
         meana[1] = '0000';
       }
       meana = (meana[0] + '.' + meana[1]).toString();
-      meana = padEmpty(meana, 8);
+      meana = _padEmpty(meana, 8);
 
       var epochyr = $('#es-year').val();
       var epochday = $('#es-day').val();
@@ -964,7 +938,7 @@ var CAMERA_TYPE = 0;
         }
 
         var object = JSON.parse(evt.target.result);
-        var scc = parseInt(pad0(object.TLE1.substr(2, 5).trim(), 5));
+        var scc = parseInt(_pad0(object.TLE1.substr(2, 5).trim(), 5));
         var satId = satSet.getIdFromObjNum(scc);
         var sat = satSet.getSat(satId);
         if (lookangles.altitudeCheck(object.TLE1, object.TLE2, timeManager.propOffset) > 1) {
@@ -1018,28 +992,28 @@ var CAMERA_TYPE = 0;
           watchlistList.splice(i, 1);
         }
       }
-      updateWatchlist();
+      _updateWatchlist();
     });
     $('#watchlist-content').on('click', '.watchlist-add', function (evt) {
-      var satId = satSet.getIdFromObjNum(pad0($('#watchlist-new').val(), 5));
+      var satId = satSet.getIdFromObjNum(_pad0($('#watchlist-new').val(), 5));
       var duplicate = false;
       for (var i = 0; i < watchlistList.length; i++) { // No duplicates
         if (watchlistList[i] === satId) duplicate = true;
       }
       if (!duplicate) {
         watchlistList.push(satId);
-        updateWatchlist();
+        _updateWatchlist();
       }
     });
     $('#watchlist-content').submit(function (e) {
-      var satId = satSet.getIdFromObjNum(pad0($('#watchlist-new').val(), 5));
+      var satId = satSet.getIdFromObjNum(_pad0($('#watchlist-new').val(), 5));
       var duplicate = false;
       for (var i = 0; i < watchlistList.length; i++) { // No duplicates
         if (watchlistList[i] === satId) duplicate = true;
       }
       if (!duplicate) {
         watchlistList.push(satId);
-        updateWatchlist();
+        _updateWatchlist();
       }
       e.preventDefault();
     });
@@ -1154,7 +1128,7 @@ var CAMERA_TYPE = 0;
             inc[1] = '0000';
           }
           inc = (inc[0] + '.' + inc[1]).toString();
-          inc = padEmpty(inc, 8);
+          inc = _padEmpty(inc, 8);
           console.log(inc);
 
           var meanmo = TLE2.substr(52, 10);
@@ -1376,10 +1350,10 @@ var CAMERA_TYPE = 0;
       e.preventDefault();
     });
 
-    $('#canvas').on('keypress', keyHandler); // On Key Press Event Run keyHandler Function
-    $('#canvas').on('keydown', keyDownHandler); // On Key Press Event Run keyHandler Function
-    $('#canvas').on('keyup', keyUpHandler); // On Key Press Event Run keyHandler Function
-    $('#bottom-icons').on('click', '.bmenu-item', bottomIconPress); // Bottom Button Pressed
+    $('#canvas').on('keypress', _keyHandler); // On Key Press Event Run _keyHandler Function
+    $('#canvas').on('keydown', _keyDownHandler); // On Key Press Event Run _keyHandler Function
+    $('#canvas').on('keyup', _keyUpHandler); // On Key Press Event Run _keyHandler Function
+    $('#bottom-icons').on('click', '.bmenu-item', _bottomIconPress); // Bottom Button Pressed
     $('#canvas').attr('tabIndex', 0);
     $('#canvas').focus();
 
@@ -1394,13 +1368,13 @@ var CAMERA_TYPE = 0;
     dragTarget = getEarthScreenPoint(mouseX, mouseY);
     if (isDragging) {
       if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
-      isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) || CAMERA_TYPE === 2) { // random screen drag
+      isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) || cameraType === 2) { // random screen drag
         xDif = screenDragPoint[0] - mouseX;
         yDif = screenDragPoint[1] - mouseY;
         yawTarget = dragStartYaw + xDif * 0.005;
         pitchTarget = dragStartPitch + yDif * -0.005;
-        camPitchSpeed = normalizeAngle(camPitch - pitchTarget) * -0.005;
-        camYawSpeed = normalizeAngle(camYaw - yawTarget) * -0.005;
+        camPitchSpeed = _normalizeAngle(camPitch - pitchTarget) * -0.005;
+        camYawSpeed = _normalizeAngle(camYaw - yawTarget) * -0.005;
       } else {  // earth surface point drag
         dragPointR = Math.sqrt(dragPoint[0] * dragPoint[0] + dragPoint[1] * dragPoint[1]);
         dragTargetR = Math.sqrt(dragTarget[0] * dragTarget[0] + dragTarget[1] * dragTarget[1]);
@@ -1412,7 +1386,7 @@ var CAMERA_TYPE = 0;
         dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
 
         pitchDif = dragPointLat - dragTargetLat;
-        yawDif = normalizeAngle(dragPointLon - dragTargetLon);
+        yawDif = _normalizeAngle(dragPointLon - dragTargetLon);
         camPitchSpeed = pitchDif * 0.005;
         camYawSpeed = yawDif * 0.005;
       }
@@ -1435,7 +1409,7 @@ var CAMERA_TYPE = 0;
     if (camSnapMode) {
       camPitch += (camPitchTarget - camPitch) * 0.003 * dt;
 
-      var yawErr = normalizeAngle(camYawTarget - camYaw);
+      var yawErr = _normalizeAngle(camYawTarget - camYaw);
       camYaw += yawErr * 0.003 * dt;
 
       /*   if(Math.abs(camPitchTarget - camPitch) < 0.002 && Math.abs(camYawTarget - camYaw) < 0.002 && Math.abs(zoomTarget - zoomLevel) < 0.002) {
@@ -1453,7 +1427,7 @@ var CAMERA_TYPE = 0;
     if (camPitch > TAU / 4) camPitch = TAU / 4;
     if (camPitch < -TAU / 4) camPitch = -TAU / 4;
     // camYaw = (camYaw % (Math.PI*2));
-    camYaw = normalizeAngle(camYaw);
+    camYaw = _normalizeAngle(camYaw);
     if (selectedSat !== -1) {
       var sat = satSet.getSat(selectedSat);
       if (!sat.static) {
@@ -1479,7 +1453,7 @@ var CAMERA_TYPE = 0;
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-    if (CAMERA_TYPE === 2) {
+    if (cameraType === 2) {
       FPSMovement();
     }
     camMatrix = drawCamera();
@@ -1558,7 +1532,7 @@ var CAMERA_TYPE = 0;
     if (searchBox.isHovering()) {
       updateHoverSatId = searchBox.getHoverSat();
       updateHoverSatPos = satSet.getScreenCoords(updateHoverSatId, pMatrix, camMatrix);
-      if (!earthHitTest(updateHoverSatPos.x, updateHoverSatPos.y)) {
+      if (!_earthHitTest(updateHoverSatPos.x, updateHoverSatPos.y)) {
         hoverBoxOnSat(updateHoverSatId, updateHoverSatPos.x, updateHoverSatPos.y);
       } else {
         hoverBoxOnSat(-1, 0, 0);
@@ -1568,7 +1542,7 @@ var CAMERA_TYPE = 0;
       updateHoverDelay++;
       if (updateHoverDelay === 8) updateHoverDelay = 0;
       if (updateHoverDelay > 0) return;
-      mouseSat = getSatIdFromCoord(mouseX, mouseY);
+      mouseSat = _getSatIdFromCoord(mouseX, mouseY);
       if (mouseSat !== -1) {
         orbitDisplay.setHoverOrbit(mouseSat);
       } else {
@@ -1586,7 +1560,7 @@ var CAMERA_TYPE = 0;
     * For FPS style movement rotate the camera and then translate it
     * for traditional view, move the camera and then rotate it
     */
-    switch (CAMERA_TYPE) {
+    switch (cameraType) {
       /** @type 0 pivot around the earth with earth in the center */
       case 0:
         mat4.translate(camMatrix, camMatrix, [0, getCamDist(), 0]);
@@ -1770,19 +1744,746 @@ var CAMERA_TYPE = 0;
     }
     FPSLastTime = FPStimeNow;
   }
+  function _getSatIdFromCoord (x, y) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
+    gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
+    return ((pickColorBuf[2] << 16) | (pickColorBuf[1] << 8) | (pickColorBuf[0])) - 1;
+  }
+  function _earthHitTest (x, y) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
+    gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
+
+    return (pickColorBuf[0] === 0 &&
+      pickColorBuf[1] === 0 &&
+      pickColorBuf[2] === 0);
+  }
+  function _webGlInit () {
+    var can = $('#canvas')[0];
+
+    can.width = window.innerWidth;
+    can.height = window.innerHeight;
+
+    var gl = can.getContext('webgl', {alpha: false}) || can.getContext('experimental-webgl', {alpha: false});
+    if (!gl) {
+      browserUnsupported();
+    }
+
+    gl.viewport(0, 0, can.width, can.height);
+
+    gl.enable(gl.DEPTH_TEST);
+
+    // gl.enable(0x8642);
+    /* enable point sprites(?!) This might get browsers with
+       underlying OpenGL to behave
+       although it's not technically a part of the WebGL standard
+    */
+
+    var pFragShader = gl.createShader(gl.FRAGMENT_SHADER);
+    var pFragCode = shaderLoader.getShaderCode('pick-fragment.glsl');
+    gl.shaderSource(pFragShader, pFragCode);
+    gl.compileShader(pFragShader);
+
+    var pVertShader = gl.createShader(gl.VERTEX_SHADER);
+    var pVertCode = shaderLoader.getShaderCode('pick-vertex.glsl');
+    gl.shaderSource(pVertShader, pVertCode);
+    gl.compileShader(pVertShader);
+
+    var pickShaderProgram = gl.createProgram();
+    gl.attachShader(pickShaderProgram, pVertShader);
+    gl.attachShader(pickShaderProgram, pFragShader);
+    gl.linkProgram(pickShaderProgram);
+
+    pickShaderProgram.aPos = gl.getAttribLocation(pickShaderProgram, 'aPos');
+    pickShaderProgram.aColor = gl.getAttribLocation(pickShaderProgram, 'aColor');
+    pickShaderProgram.aPickable = gl.getAttribLocation(pickShaderProgram, 'aPickable');
+    pickShaderProgram.uCamMatrix = gl.getUniformLocation(pickShaderProgram, 'uCamMatrix');
+    pickShaderProgram.uMvMatrix = gl.getUniformLocation(pickShaderProgram, 'uMvMatrix');
+    pickShaderProgram.uPMatrix = gl.getUniformLocation(pickShaderProgram, 'uPMatrix');
+
+    gl.pickShaderProgram = pickShaderProgram;
+
+    pickFb = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, pickFb);
+
+    pickTex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, pickTex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); // makes clearing work
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.drawingBufferWidth, gl.drawingBufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+    var rb = gl.createRenderbuffer(); // create RB to store the depth buffer
+    gl.bindRenderbuffer(gl.RENDERBUFFER, rb);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickTex, 0);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, rb);
+
+    gl.pickFb = pickFb;
+
+    pickColorBuf = new Uint8Array(4);
+
+    pMatrix = mat4.create();
+    mat4.perspective(pMatrix, 1.01, gl.drawingBufferWidth / gl.drawingBufferHeight, 20.0, 600000.0);
+    var eciToOpenGlMat = [
+      1, 0, 0, 0,
+      0, 0, -1, 0,
+      0, 1, 0, 0,
+      0, 0, 0, 1
+    ];
+    mat4.mul(pMatrix, pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
+
+    window.gl = gl;
+  }
+  function _padEmpty (num, size) {
+    var s = '   ' + num;
+    return s.substr(s.length - size);
+  }
+  function _bottomIconPress (evt) {
+    if (settingsManager.isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
+    ga('send', 'event', 'Bottom Icon', $(this)['context']['id'], 'Selected');
+    switch ($(this)['context']['id']) {
+      case 'menu-sensor-info': // No Keyboard Commands
+        if (!lookangles.sensorSelected()) { // No Sensor Selected
+          if (!$('#menu-sensor-info img:animated').length) {
+            $('#menu-sensor-info img').effect('shake', {distance: 10});
+          }
+          break;
+        }
+        if (isSensorInfoMenuOpen) {
+          _hideSideMenus();
+          isSensorInfoMenuOpen = false;
+          break;
+        } else {
+          _hideSideMenus();
+          lookangles.getsensorinfo();
+          $('#sensor-info-menu').fadeIn();
+          isSensorInfoMenuOpen = true;
+          $('#menu-sensor-info img').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-in-coverage': // B
+        if (!lookangles.sensorSelected()) { // No Sensor Selected
+          if (!$('#menu-in-coverage img:animated').length) {
+            $('#menu-in-coverage img').effect('shake', {distance: 10});
+          }
+          break;
+        }
+        if (settingsManager.isBottomMenuOpen) {
+          $('#bottom-menu').fadeOut();
+          $('#menu-in-coverage img').removeClass('bmenu-item-selected');
+          settingsManager.isBottomMenuOpen = false;
+          break;
+        } else {
+          $('#bottom-menu').fadeIn();
+          $('#menu-in-coverage img').addClass('bmenu-item-selected');
+          settingsManager.isBottomMenuOpen = true;
+          break;
+        }
+      case 'menu-lookangles': // S
+        if (isLookanglesMenuOpen) {
+          isLookanglesMenuOpen = false;
+          _hideSideMenus();
+          break;
+        } else {
+          if (!lookangles.sensorSelected() || selectedSat === -1) { // No Sensor or Satellite Selected
+            if (!$('#menu-lookangles img:animated').length) {
+              $('#menu-lookangles img').effect('shake', {distance: 10});
+            }
+            break;
+          }
+          _hideSideMenus();
+          $('#lookangles-menu').fadeIn();
+          isLookanglesMenuOpen = true;
+          $('#menu-lookangles img').addClass('bmenu-item-selected');
+          if (selectedSat !== -1) {
+            var sat = satSet.getSat(selectedSat);
+            if (sat.static || sat.missile) {
+              if (!$('#menu-lookangles img:animated').length) {
+                $('#menu-lookangles img').effect('shake', {distance: 10});
+              }
+              break;
+            } else {
+              $('#loading-screen').fadeIn('slow', function () {
+                lookangles.getlookangles(sat, isLookanglesMenuOpen);
+                $('#loading-screen').fadeOut();
+              });
+            }
+          }
+          break;
+        }
+      case 'menu-watchlist': // S
+        if (isWatchlistMenuOpen) {
+          isWatchlistMenuOpen = false;
+          $('#menu-watchlist img').removeClass('bmenu-item-selected');
+          $('#search-holder').show();
+          _hideSideMenus();
+          break;
+        } else {
+          _hideSideMenus();
+          $('#watchlist-menu').fadeIn();
+          $('#search-holder').hide();
+          _updateWatchlist();
+          isWatchlistMenuOpen = true;
+          $('#menu-watchlist img').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-lookanglesmultisite':
+        if (isLookanglesMultiSiteMenuOpen) {
+          isLookanglesMultiSiteMenuOpen = false;
+          _hideSideMenus();
+          break;
+        } else {
+          if (selectedSat === -1) { // No Satellite Selected
+            if (!$('#menu-lookanglesmultisite img:animated').length) {
+              $('#menu-lookanglesmultisite img').effect('shake', {distance: 10});
+            }
+            break;
+          }
+          _hideSideMenus();
+          $('#lookanglesmultisite-menu').fadeIn();
+          isLookanglesMultiSiteMenuOpen = true;
+          $('#menu-lookanglesmultisite img').addClass('bmenu-item-selected');
+          if (selectedSat !== -1) {
+            $('#loading-screen').fadeIn('slow', function () {
+              sat = satSet.getSat(selectedSat);
+              lookangles.getlookanglesMultiSite(sat, isLookanglesMultiSiteMenuOpen);
+              $('#loading-screen').fadeOut();
+            });
+          }
+          break;
+        }
+      case 'menu-find-sat': // F
+        if (isFindByLooksMenuOpen) {
+          isFindByLooksMenuOpen = false;
+          _hideSideMenus();
+          break;
+        } else {
+          _hideSideMenus();
+          $('#findByLooks-menu').fadeIn();
+          isFindByLooksMenuOpen = true;
+          $('#menu-find-sat img').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-twitter': // T
+        if (isTwitterMenuOpen) {
+          isTwitterMenuOpen = false;
+          _hideSideMenus();
+          break;
+        } else {
+          _hideSideMenus();
+          if ($('#twitter-menu').is(':empty')) {
+            $('#twitter-menu').html('<a class="twitter-timeline" data-theme="dark" data-link-color="#2B7BB9" href="https://twitter.com/RedKosmonaut/lists/space-news">A Twitter List by RedKosmonaut</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>');
+          }
+          $('#twitter-menu').fadeIn();
+          isTwitterMenuOpen = true;
+          $('#menu-twitter img').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-weather': // W
+        if (isWeatherMenuOpen) {
+          isWeatherMenuOpen = false;
+          _hideSideMenus();
+          break;
+        }
+        if (!isWeatherMenuOpen && sensorManager.whichRadar !== '') {
+          if (sensorManager.whichRadar === 'COD' || sensorManager.whichRadar === 'MIL') {
+            $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/BOX_0.png');
+          }
+          if (sensorManager.whichRadar === 'EGL') {
+            $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/EVX_0.png');
+          }
+          if (sensorManager.whichRadar === 'CLR') {
+            $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/APD_0.png');
+          }
+          if (sensorManager.whichRadar === 'PAR') {
+            $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/MVX_0.png');
+          }
+          if (sensorManager.whichRadar === 'BLE') {
+            $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/DAX_0.png');
+          }
+          if (sensorManager.whichRadar === 'FYL') {
+            $('#weather-image').attr('src', 'http://i.cdn.turner.com/cnn/.element/img/3.0/weather/maps/satuseurf.gif');
+          }
+          if (sensorManager.whichRadar === 'DGC') {
+            $('#weather-image').attr('src', 'http://images.myforecast.com/images/cw/satellite/CentralAsia/CentralAsia.jpeg');
+          }
+          _hideSideMenus();
+          $('#weather-menu').fadeIn();
+          isWeatherMenuOpen = true;
+          $('#menu-weather img').addClass('bmenu-item-selected');
+          break;
+        } else {
+          if (!$('#menu-weather img:animated').length) {
+            $('#menu-weather img').effect('shake', {distance: 10});
+          }
+        }
+        break;
+      case 'menu-map': // W
+        if (settingsManager.isMapMenuOpen) {
+          settingsManager.isMapMenuOpen = false;
+          _hideSideMenus();
+          break;
+        }
+        if (!settingsManager.isMapMenuOpen) {
+          if (selectedSat === -1) { // No Satellite Selected
+            if (!$('#menu-map img:animated').length) {
+              $('#menu-map img').effect('shake', {distance: 10});
+            }
+            break;
+          }
+          _hideSideMenus();
+          $('#map-menu').fadeIn();
+          settingsManager.isMapMenuOpen = true;
+          updateMap();
+          var satData = satSet.getSat(selectedSat);
+          $('#map-sat').tooltip({delay: 50, tooltip: satData.SCC_NUM, position: 'left'});
+          $('#menu-map img').addClass('bmenu-item-selected');
+          break;
+        }
+        break;
+      // case 'menu-space-weather': // Q
+      //   if (isSpaceWeatherMenuOpen) {
+      //     isSpaceWeatherMenuOpen = false;
+      //     _hideSideMenus();
+      //     break;
+      //   }
+      //   $('#space-weather-image').attr('src', 'http://services.swpc.noaa.gov/images/animations/ovation-north/latest.png');
+      //   _hideSideMenus();
+      //   $('#space-weather-menu').fadeIn();
+      //   isSpaceWeatherMenuOpen = true;
+      //   $('#menu-space-weather img').addClass('bmenu-item-selected');
+      //   break;
+      case 'menu-launches': // L
+        if (isLaunchMenuOpen) {
+          isLaunchMenuOpen = false;
+          _hideSideMenus();
+          break;
+        } else {
+          _hideSideMenus();
+          $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2017.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+          isLaunchMenuOpen = true;
+          $('#menu-launches img').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-about': // No Keyboard Shortcut
+        if (isAboutSelected) {
+          isAboutSelected = false;
+          _hideSideMenus();
+          break;
+        } else {
+          _hideSideMenus();
+          $('#about-menu').fadeIn();
+          isAboutSelected = true;
+          $('#menu-about img').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-space-stations': // No Keyboard Shortcut
+        if (isMilSatSelected) {
+          $('#search').val('');
+          searchBox.hideResults();
+          isMilSatSelected = false;
+          $('#menu-space-stations img').removeClass('bmenu-item-selected');
+          break;
+        } else {
+          $('#search').val('40420,41394,32783,35943,36582,40353,40555,41032,38010,38008,38007,38009,37806,41121,41579,39030,39234,28492,36124,39194,36095,40358,40258,37212,37398,38995,40296,40900,39650,27434,31601,36608,28380,28521,36519,39177,40699,34264,36358,39375,38248,34807,28908,32954,32955,32956,35498,35500,37152,37154,38733,39057,39058,39059,39483,39484,39485,39761,39762,39763,40920,40921,40922,39765,29658,31797,32283,32750,33244,39208,26694,40614,20776,25639,26695,30794,32294,33055,39034,28946,33751,33752,27056,27057,27464,27465,27868,27869,28419,28420,28885,29273,32476,31792,36834,37165,37875,37941,38257,38354,39011,39012,39013,39239,39240,39241,39363,39410,40109,40111,40143,40275,40305,40310,40338,40339,40340,40362,40878,41026,41038,41473,28470,37804,37234,29398,40110,39209,39210,36596');
+          searchBox.doSearch('40420,41394,32783,35943,36582,40353,40555,41032,38010,38008,38007,38009,37806,41121,41579,39030,39234,28492,36124,39194,36095,40358,40258,37212,37398,38995,40296,40900,39650,27434,31601,36608,28380,28521,36519,39177,40699,34264,36358,39375,38248,34807,28908,32954,32955,32956,35498,35500,37152,37154,38733,39057,39058,39059,39483,39484,39485,39761,39762,39763,40920,40921,40922,39765,29658,31797,32283,32750,33244,39208,26694,40614,20776,25639,26695,30794,32294,33055,39034,28946,33751,33752,27056,27057,27464,27465,27868,27869,28419,28420,28885,29273,32476,31792,36834,37165,37875,37941,38257,38354,39011,39012,39013,39239,39240,39241,39363,39410,40109,40111,40143,40275,40305,40310,40338,40339,40340,40362,40878,41026,41038,41473,28470,37804,37234,29398,40110,39209,39210,36596');
+          isMilSatSelected = true;
+          $('#menu-about img').removeClass('bmenu-item-selected');
+          $('#menu-space-stations img').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-satellite-collision': // No Keyboard Shortcut
+        if (isSocratesMenuOpen) {
+          isSocratesMenuOpen = false;
+          _hideSideMenus();
+          break;
+        } else {
+          _hideSideMenus();
+          $('#socrates-menu').fadeIn();
+          isSocratesMenuOpen = true;
+          socrates(-1);
+          $('#menu-satellite-collision img').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-settings': // T
+        if (isSettingsMenuOpen) {
+          isSettingsMenuOpen = false;
+          _hideSideMenus();
+          break;
+        } else {
+          _hideSideMenus();
+          $('#settings-menu').fadeIn();
+          isSettingsMenuOpen = true;
+          $('#menu-settings img').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-editSat':
+        if (isEditSatMenuOpen) {
+          isEditSatMenuOpen = false;
+          _hideSideMenus();
+          break;
+        } else {
+          if (selectedSat !== -1) {
+            _hideSideMenus();
+            $('#editSat-menu').fadeIn();
+            $('#menu-editSat img').addClass('bmenu-item-selected');
+            isEditSatMenuOpen = true;
+
+            sat = satSet.getSat(selectedSat);
+            $('#es-scc').val(sat.SCC_NUM);
+
+            var inc = (sat.inclination * RAD2DEG).toPrecision(7);
+            inc = inc.split('.');
+            inc[0] = inc[0].substr(-3, 3);
+            inc[1] = inc[1].substr(0, 4);
+            inc = (inc[0] + '.' + inc[1]).toString();
+
+            $('#es-inc').val(_padEmpty(inc, 8));
+            $('#es-year').val(sat.TLE1.substr(18, 2));
+            $('#es-day').val(sat.TLE1.substr(20, 12));
+            $('#es-meanmo').val(sat.TLE2.substr(52, 11));
+
+            var rasc = (sat.raan * RAD2DEG).toPrecision(7);
+            rasc = rasc.split('.');
+            rasc[0] = rasc[0].substr(-3, 3);
+            rasc[1] = rasc[1].substr(0, 4);
+            rasc = (rasc[0] + '.' + rasc[1]).toString();
+
+            $('#es-rasc').val(_padEmpty(rasc, 8));
+            $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
+
+            var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
+            argPe = argPe.split('.');
+            argPe[0] = argPe[0].substr(-3, 3);
+            argPe[1] = argPe[1].substr(0, 4);
+            argPe = (argPe[0] + '.' + argPe[1]).toString();
+
+            $('#es-argPe').val(_padEmpty(argPe, 8));
+            $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
+            // $('#es-rasc').val(sat.TLE2.substr(18 - 1, 7 + 1).toString());
+          } else {
+            if (!$('#menu-editSat img:animated').length) {
+              $('#menu-editSat img').effect('shake', {distance: 10});
+            }
+          }
+        }
+        break;
+      case 'menu-newLaunch':
+        if (isNewLaunchMenuOpen) {
+          isNewLaunchMenuOpen = false;
+          _hideSideMenus();
+          break;
+        } else {
+          // TODO: NEW LAUNCH
+          if (selectedSat !== -1) {
+            _hideSideMenus();
+            $('#newLaunch-menu').fadeIn();
+            $('#menu-newLaunch img').addClass('bmenu-item-selected');
+            isNewLaunchMenuOpen = true;
+
+            sat = satSet.getSat(selectedSat);
+            $('#nl-scc').val(sat.SCC_NUM);
+            $('#nl-inc').val((sat.inclination * RAD2DEG).toPrecision(2));
+          } else {
+            if (!$('#menu-newLaunch img:animated').length) {
+              $('#menu-newLaunch img').effect('shake', {distance: 10});
+            }
+          }
+          break;
+        }
+      case 'menu-customSensor': // T
+        if (isCustomSensorMenuOpen) {
+          isCustomSensorMenuOpen = false;
+          _hideSideMenus();
+          break;
+        } else {
+          _hideSideMenus();
+
+          // TODO: Requires https on chrome, but I will come back to this idea another time
+          // if (navigator.geolocation) {
+          //   navigator.geolocation.getCurrentPosition(function (position) {
+          //     console.log('Latitude: ' + position.coords.latitude);
+          //     console.log('Longitude: ' + position.coords.longitude);
+          //   });
+          // }
+
+          $('#customSensor-menu').fadeIn();
+          isCustomSensorMenuOpen = true;
+          $('#menu-customSensor img').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-missile':
+        if (isMissileMenuOpen) {
+          isMissileMenuOpen = false;
+          _hideSideMenus();
+          break;
+        } else {
+          // TODO: NEW LAUNCH
+          _hideSideMenus();
+          $('#missile-menu').fadeIn();
+          $('#menu-missile img').addClass('bmenu-item-selected');
+          isMissileMenuOpen = true;
+          break;
+        }
+    }
+    function _hideSideMenus () {
+      // Close any open colorboxes
+      $.colorbox.close();
+
+      // Hide all side menus
+      $('#sensor-info-menu').fadeOut();
+      $('#watchlist-menu').fadeOut();
+      $('#lookangles-menu').fadeOut();
+      $('#lookanglesmultisite-menu').fadeOut();
+      $('#findByLooks-menu').fadeOut();
+      $('#twitter-menu').fadeOut();
+      $('#weather-menu').fadeOut();
+      $('#map-menu').fadeOut();
+      // $('#space-weather-menu').fadeOut();
+      $('#socrates-menu').fadeOut();
+      $('#settings-menu').fadeOut();
+      $('#editSat-menu').fadeOut();
+      $('#newLaunch-menu').fadeOut();
+      $('#missile-menu').fadeOut();
+      $('#customSensor-menu').fadeOut();
+      $('#about-menu').fadeOut();
+
+      // Remove red color from all menu icons
+      $('#menu-sensor-info img').removeClass('bmenu-item-selected');
+      $('#menu-lookangles img').removeClass('bmenu-item-selected');
+      $('#menu-lookanglesmultisite img').removeClass('bmenu-item-selected');
+      $('#menu-launches img').removeClass('bmenu-item-selected');
+      $('#menu-find-sat img').removeClass('bmenu-item-selected');
+      $('#menu-twitter img').removeClass('bmenu-item-selected');
+      $('#menu-weather img').removeClass('bmenu-item-selected');
+      $('#menu-map img').removeClass('bmenu-item-selected');
+      // $('#menu-space-weather img').removeClass('bmenu-item-selected');
+      $('#menu-satellite-collision img').removeClass('bmenu-item-selected');
+      $('#menu-settings img').removeClass('bmenu-item-selected');
+      $('#menu-editSat img').removeClass('bmenu-item-selected');
+      $('#menu-newLaunch img').removeClass('bmenu-item-selected');
+      $('#menu-missile img').removeClass('bmenu-item-selected');
+      $('#menu-customSensor img').removeClass('bmenu-item-selected');
+      $('#menu-about img').removeClass('bmenu-item-selected');
+
+      // Unflag all open menu variables
+      isSensorInfoMenuOpen = false;
+      isLaunchMenuOpen = false;
+      isTwitterMenuOpen = false;
+      isFindByLooksMenuOpen = false;
+      isWeatherMenuOpen = false;
+      settingsManager.isMapMenuOpen = false;
+      // isSpaceWeatherMenuOpen = false;
+      isLookanglesMenuOpen = false;
+      isLookanglesMultiSiteMenuOpen = false;
+      isSocratesMenuOpen = false;
+      isSettingsMenuOpen = false;
+      isEditSatMenuOpen = false;
+      isNewLaunchMenuOpen = false;
+      isMissileMenuOpen = false;
+      isCustomSensorMenuOpen = false;
+      isAboutSelected = false;
+    }
+  }
+  function _updateWatchlist () {
+    if (!watchlistList) return;
+    var watchlistString = '';
+    var watchlistListHTML = '';
+    for (var i = 0; i < watchlistList.length; i++) {
+      var sat = satSet.getSat(watchlistList[i]);
+      if (sat == null) {
+        watchlistList.splice(i, 1);
+        continue;
+      }
+      watchlistListHTML += '<div class="row">' +
+        '<div class="col s3 m3 l3">' + sat.SCC_NUM + '</div>' +
+        '<div class="col s7 m7 l7">' + sat.ON + '</div>' +
+        '<div class="col s2 m2 l2 center-align remove-icon"><img class="watchlist-remove" data-sat-id="' + sat.id + '" src="images/remove.png"></img></div>' +
+      '</div>';
+    }
+    $('#watchlist-list').html(watchlistListHTML);
+    for (i = 0; i < watchlistList.length; i++) { // No duplicates
+      watchlistString += satSet.getSat(watchlistList[i]).SCC_NUM;
+      if (i !== watchlistList.length - 1) watchlistString += ',';
+    }
+    $('#search').val(watchlistString);
+    searchBox.doSearch(watchlistString);
+  }
+  function _keyUpHandler (evt) {
+    // console.log(Number(evt.keyCode));
+    if (Number(evt.keyCode) === 65 || Number(evt.keyCode) === 68) {
+      FPSSideSpeed = 0;
+    }
+    if (Number(evt.keyCode) === 83 || Number(evt.keyCode) === 87) {
+      FPSForwardSpeed = 0;
+    }
+    if (Number(evt.keyCode) === 69 || Number(evt.keyCode) === 81) {
+      FPSYawRate = 0;
+    }
+    if (Number(evt.keyCode) === 16) {
+      FPSRun = 1;
+    }
+  }
+  function _keyDownHandler (evt) {
+    if (Number(evt.keyCode) === 16) {
+      if (cameraType === 2) {
+        FPSRun = 3;
+      }
+    }
+  }
+  function _keyHandler (evt) {
+    // console.log(Number(evt.charCode));
+    switch (Number(evt.charCode)) {
+      case 87: // W
+      case 119: // w
+        if (cameraType === 2) {
+          FPSForwardSpeed = 10;
+        }
+        break;
+      case 65: // A
+      case 97: // a
+        if (cameraType === 2) {
+          FPSSideSpeed = -10;
+        }
+        break;
+      case 83: // S
+      case 115: // s
+        if (cameraType === 2) {
+          FPSForwardSpeed = -10;
+        }
+        break;
+      case 68: // D
+      case 100: // d
+        if (cameraType === 2) {
+          FPSSideSpeed = 10;
+        }
+        break;
+      case 81: // Q
+      case 113: // q
+        if (cameraType === 2) {
+          FPSYawRate = -0.1;
+        }
+        break;
+      case 69: // E
+      case 101: // e
+        if (cameraType === 2) {
+          FPSYawRate = 0.1;
+        }
+        break;
+    }
+
+    switch (Number(evt.charCode)) {
+      case 114: // r
+        rotateTheEarth = !rotateTheEarth;
+        // console.log('toggled rotation');
+        break;
+      case 99: // c
+        cameraType += 1;
+        switch (cameraType) {
+          case 0:
+            $('#camera-status-box').html('Earth Centered Camera Mode');
+            break;
+          case 1:
+            $('#camera-status-box').html('Offset Camera Mode');
+            break;
+          case 2:
+            $('#camera-status-box').html('Free Camera Mode');
+            break;
+        }
+        $('#camera-status-box').show();
+        setTimeout(function () {
+          $('#camera-status-box').hide();
+        }, 3000);
+        if (cameraType === 3) {
+          cameraType = 0;
+          FPSPitch = 0;
+          FPSYaw = 0;
+          FPSxPos = 0;
+          FPSyPos = 25000;
+          FPSzPos = 0;
+        }
+        break;
+      case 33: // !
+        timeManager.propOffset = 0; // Reset to Current Time
+        settingsManager.isPropRateChange = true;
+        break;
+      case 60: // <
+        timeManager.propOffset -= 60000; // Move back 60 seconds
+        settingsManager.isPropRateChange = true;
+        break;
+      case 62: // >
+        timeManager.propOffset += 60000; // Move forward 60 seconds
+        settingsManager.isPropRateChange = true;
+        break;
+      case 48: // 0
+        timeManager.setPropRateZero();
+        timeManager.propOffset = timeManager.getPropOffset();
+        settingsManager.isPropRateChange = true;
+        break;
+      case 43: // +
+      case 61: // =
+        if (timeManager.propRate < 0.001 && timeManager.propRate > -0.001) {
+          timeManager.propRate = 0.001;
+        }
+
+        if (timeManager.propRate > 1000) {
+          timeManager.propRate = 1000;
+        }
+
+        if (timeManager.propRate < 0) {
+          timeManager.propRate *= 0.666666;
+        } else {
+          timeManager.propRate *= 1.5;
+        }
+        timeManager.propOffset = timeManager.getPropOffset();
+        settingsManager.isPropRateChange = true;
+        break;
+      case 45: // -
+      case 95: // _
+        if (timeManager.propRate < 0.001 && timeManager.propRate > -0.001) {
+          timeManager.propRate = -0.001;
+        }
+
+        if (timeManager.propRate < -1000) {
+          timeManager.propRate = -1000;
+        }
+
+        if (timeManager.propRate > 0) {
+          timeManager.propRate *= 0.666666;
+        } else {
+          timeManager.propRate *= 1.5;
+        }
+
+        timeManager.propOffset = timeManager.getPropOffset();
+        settingsManager.isPropRateChange = true;
+        break;
+      case 49: // 1
+        timeManager.propRate = 1.0;
+        timeManager.propOffset = timeManager.getPropOffset();
+        settingsManager.isPropRateChange = true;
+        break;
+    }
+
+    if (settingsManager.isPropRateChange) {
+      satCruncher.postMessage({
+        typ: 'offset',
+        dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
+      });
+      timeManager.propRealTime = Date.now();
+    }
+  }
 })();
 
-// Used by variable.js and main.js
-function changeZoom (zoom) {
-  if (zoom === 'geo') {
-    zoomTarget = 0.82;
-    return;
-  }
-  if (zoom === 'leo') {
-    zoomTarget = 0.45;
-    return;
-  }
-  zoomTarget = zoom;
+function _pad0 (str, max) {
+  return str.length < max ? _pad0('0' + str, max) : str;
+}
+function _normalizeAngle (angle) {
+  angle %= TAU;
+  if (angle > Math.PI) angle -= TAU;
+  if (angle < -Math.PI) angle += TAU;
+  return angle;
 }
 function longToYaw (long) {
   var selectedDate = $('#datetime-text').text().substr(0, 19);
@@ -1803,7 +2504,7 @@ function longToYaw (long) {
   longOffset = longOffset * 15; // 15 Degress Per Hour longitude Offset
 
   angle = (long + longOffset) * DEG2RAD;
-  angle = normalizeAngle(angle);
+  angle = _normalizeAngle(angle);
   return angle;
 }
 function latToPitch (lat) {
@@ -1812,18 +2513,22 @@ function latToPitch (lat) {
   if (pitch < -TAU / 4) pitch = -TAU / 4;   // Min -90 Degrees
   return pitch;
 }
-function normalizeAngle (angle) {
-  angle %= TAU;
-  if (angle > Math.PI) angle -= TAU;
-  if (angle < -Math.PI) angle += TAU;
-  return angle;
-}
 function camSnap (pitch, yaw) {
   camPitchTarget = pitch;
-  camYawTarget = normalizeAngle(yaw);
+  camYawTarget = _normalizeAngle(yaw);
   camSnapMode = true;
 }
-
+function changeZoom (zoom) {
+  if (zoom === 'geo') {
+    zoomTarget = 0.82;
+    return;
+  }
+  if (zoom === 'leo') {
+    zoomTarget = 0.45;
+    return;
+  }
+  zoomTarget = zoom;
+}
 function socrates (row) {
   /* SOCRATES.htm is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
   If it ever becomes unavailable a similar, but less accurate (maybe?) cron job could be
@@ -1873,8 +2578,8 @@ function socrates (row) {
         var socratesDate = socratesObjTwo[i][4].split(' '); // Date/time is on the second line 5th column
         var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
         var socratesTimeS = socratesTime[2].split('.'); // Split time from date for easier management
-        tdT.appendChild(document.createTextNode(socratesDate[2] + ' ' + socratesDate[1] + ' ' + socratesDate[0] + ' - ' + pad0(socratesTime[0], 2) + ':' +
-        pad0(socratesTime[1], 2) + ':' + pad0(socratesTimeS[0], 2) + 'Z'));
+        tdT.appendChild(document.createTextNode(socratesDate[2] + ' ' + socratesDate[1] + ' ' + socratesDate[0] + ' - ' + _pad0(socratesTime[0], 2) + ':' +
+        _pad0(socratesTime[1], 2) + ':' + _pad0(socratesTimeS[0], 2) + 'Z'));
         tdS1 = tr.insertCell();
         tdS1.appendChild(document.createTextNode(socratesObjOne[i][1]));
         tdS2 = tr.insertCell();
@@ -1945,656 +2650,6 @@ function socrates (row) {
     timeManager.propRealTime = Date.now(); // Reset realtime TODO: This might not be necessary...
   } // Allows passing -1 argument to socrates function to skip these steps
 }
-
-function keyUpHandler (evt) {
-  // console.log(Number(evt.keyCode));
-  if (Number(evt.keyCode) === 65 || Number(evt.keyCode) === 68) {
-    FPSSideSpeed = 0;
-  }
-  if (Number(evt.keyCode) === 83 || Number(evt.keyCode) === 87) {
-    FPSForwardSpeed = 0;
-  }
-  if (Number(evt.keyCode) === 69 || Number(evt.keyCode) === 81) {
-    FPSYawRate = 0;
-  }
-  if (Number(evt.keyCode) === 16) {
-    FPSRun = 1;
-  }
-}
-
-function keyDownHandler (evt) {
-  if (Number(evt.keyCode) === 16) {
-    if (CAMERA_TYPE === 2) {
-      FPSRun = 3;
-    }
-  }
-}
-
-function keyHandler (evt) {
-  // console.log(Number(evt.charCode));
-  switch (Number(evt.charCode)) {
-    case 87: // W
-    case 119: // w
-      if (CAMERA_TYPE === 2) {
-        FPSForwardSpeed = 10;
-      }
-      break;
-    case 65: // A
-    case 97: // a
-      if (CAMERA_TYPE === 2) {
-        FPSSideSpeed = -10;
-      }
-      break;
-    case 83: // S
-    case 115: // s
-      if (CAMERA_TYPE === 2) {
-        FPSForwardSpeed = -10;
-      }
-      break;
-    case 68: // D
-    case 100: // d
-      if (CAMERA_TYPE === 2) {
-        FPSSideSpeed = 10;
-      }
-      break;
-    case 81: // Q
-    case 113: // q
-      if (CAMERA_TYPE === 2) {
-        FPSYawRate = -0.1;
-      }
-      break;
-    case 69: // E
-    case 101: // e
-      if (CAMERA_TYPE === 2) {
-        FPSYawRate = 0.1;
-      }
-      break;
-  }
-
-  switch (Number(evt.charCode)) {
-    case 114: // r
-      rotateTheEarth = !rotateTheEarth;
-      // console.log('toggled rotation');
-      break;
-    case 99: // c
-      CAMERA_TYPE += 1;
-      switch (CAMERA_TYPE) {
-        case 0:
-          $('#camera-status-box').html('Earth Centered Camera Mode');
-          break;
-        case 1:
-          $('#camera-status-box').html('Offset Camera Mode');
-          break;
-        case 2:
-          $('#camera-status-box').html('Free Camera Mode');
-          break;
-      }
-      $('#camera-status-box').show();
-      setTimeout(function () {
-        $('#camera-status-box').hide();
-      }, 3000);
-      if (CAMERA_TYPE === 3) {
-        CAMERA_TYPE = 0;
-        FPSPitch = 0;
-        FPSYaw = 0;
-        FPSxPos = 0;
-        FPSyPos = 25000;
-        FPSzPos = 0;
-      }
-      break;
-    case 33: // !
-      timeManager.propOffset = 0; // Reset to Current Time
-      settingsManager.isPropRateChange = true;
-      break;
-    case 60: // <
-      timeManager.propOffset -= 60000; // Move back 60 seconds
-      settingsManager.isPropRateChange = true;
-      break;
-    case 62: // >
-      timeManager.propOffset += 60000; // Move forward 60 seconds
-      settingsManager.isPropRateChange = true;
-      break;
-    case 48: // 0
-      timeManager.setPropRateZero();
-      timeManager.propOffset = timeManager.getPropOffset();
-      settingsManager.isPropRateChange = true;
-      break;
-    case 43: // +
-    case 61: // =
-      if (timeManager.propRate < 0.001 && timeManager.propRate > -0.001) {
-        timeManager.propRate = 0.001;
-      }
-
-      if (timeManager.propRate > 1000) {
-        timeManager.propRate = 1000;
-      }
-
-      if (timeManager.propRate < 0) {
-        timeManager.propRate *= 0.666666;
-      } else {
-        timeManager.propRate *= 1.5;
-      }
-      timeManager.propOffset = timeManager.getPropOffset();
-      settingsManager.isPropRateChange = true;
-      break;
-    case 45: // -
-    case 95: // _
-      if (timeManager.propRate < 0.001 && timeManager.propRate > -0.001) {
-        timeManager.propRate = -0.001;
-      }
-
-      if (timeManager.propRate < -1000) {
-        timeManager.propRate = -1000;
-      }
-
-      if (timeManager.propRate > 0) {
-        timeManager.propRate *= 0.666666;
-      } else {
-        timeManager.propRate *= 1.5;
-      }
-
-      timeManager.propOffset = timeManager.getPropOffset();
-      settingsManager.isPropRateChange = true;
-      break;
-    case 49: // 1
-      timeManager.propRate = 1.0;
-      timeManager.propOffset = timeManager.getPropOffset();
-      settingsManager.isPropRateChange = true;
-      break;
-  }
-
-  if (settingsManager.isPropRateChange) {
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
-    });
-    timeManager.propRealTime = Date.now();
-  }
-}
-
-function hideSideMenus () {
-  // Close any open colorboxes
-  $.colorbox.close();
-
-  // Hide all side menus
-  $('#sensor-info-menu').fadeOut();
-  $('#watchlist-menu').fadeOut();
-  $('#lookangles-menu').fadeOut();
-  $('#lookanglesmultisite-menu').fadeOut();
-  $('#findByLooks-menu').fadeOut();
-  $('#twitter-menu').fadeOut();
-  $('#weather-menu').fadeOut();
-  $('#map-menu').fadeOut();
-  // $('#space-weather-menu').fadeOut();
-  $('#socrates-menu').fadeOut();
-  $('#settings-menu').fadeOut();
-  $('#editSat-menu').fadeOut();
-  $('#newLaunch-menu').fadeOut();
-  $('#missile-menu').fadeOut();
-  $('#customSensor-menu').fadeOut();
-  $('#about-menu').fadeOut();
-
-  // Remove red color from all menu icons
-  $('#menu-sensor-info img').removeClass('bmenu-item-selected');
-  $('#menu-lookangles img').removeClass('bmenu-item-selected');
-  $('#menu-lookanglesmultisite img').removeClass('bmenu-item-selected');
-  $('#menu-launches img').removeClass('bmenu-item-selected');
-  $('#menu-find-sat img').removeClass('bmenu-item-selected');
-  $('#menu-twitter img').removeClass('bmenu-item-selected');
-  $('#menu-weather img').removeClass('bmenu-item-selected');
-  $('#menu-map img').removeClass('bmenu-item-selected');
-  // $('#menu-space-weather img').removeClass('bmenu-item-selected');
-  $('#menu-satellite-collision img').removeClass('bmenu-item-selected');
-  $('#menu-settings img').removeClass('bmenu-item-selected');
-  $('#menu-editSat img').removeClass('bmenu-item-selected');
-  $('#menu-newLaunch img').removeClass('bmenu-item-selected');
-  $('#menu-missile img').removeClass('bmenu-item-selected');
-  $('#menu-customSensor img').removeClass('bmenu-item-selected');
-  $('#menu-about img').removeClass('bmenu-item-selected');
-
-  // Unflag all open menu variables
-  isSensorInfoMenuOpen = false;
-  isLaunchMenuOpen = false;
-  isTwitterMenuOpen = false;
-  isFindByLooksMenuOpen = false;
-  isWeatherMenuOpen = false;
-  settingsManager.isMapMenuOpen = false;
-  // isSpaceWeatherMenuOpen = false;
-  isLookanglesMenuOpen = false;
-  isLookanglesMultiSiteMenuOpen = false;
-  isSocratesMenuOpen = false;
-  isSettingsMenuOpen = false;
-  isEditSatMenuOpen = false;
-  isNewLaunchMenuOpen = false;
-  isMissileMenuOpen = false;
-  isCustomSensorMenuOpen = false;
-  isAboutSelected = false;
-}
-
-function bottomIconPress (evt) {
-  if (settingsManager.isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
-  ga('send', 'event', 'Bottom Icon', $(this)['context']['id'], 'Selected');
-  switch ($(this)['context']['id']) {
-    case 'menu-sensor-info': // No Keyboard Commands
-      if (!lookangles.sensorSelected()) { // No Sensor Selected
-        if (!$('#menu-sensor-info img:animated').length) {
-          $('#menu-sensor-info img').effect('shake', {distance: 10});
-        }
-        break;
-      }
-      if (isSensorInfoMenuOpen) {
-        hideSideMenus();
-        isSensorInfoMenuOpen = false;
-        break;
-      } else {
-        hideSideMenus();
-        lookangles.getsensorinfo();
-        $('#sensor-info-menu').fadeIn();
-        isSensorInfoMenuOpen = true;
-        $('#menu-sensor-info img').addClass('bmenu-item-selected');
-        break;
-      }
-    case 'menu-in-coverage': // B
-      if (!lookangles.sensorSelected()) { // No Sensor Selected
-        if (!$('#menu-in-coverage img:animated').length) {
-          $('#menu-in-coverage img').effect('shake', {distance: 10});
-        }
-        break;
-      }
-      if (settingsManager.isBottomMenuOpen) {
-        $('#bottom-menu').fadeOut();
-        $('#menu-in-coverage img').removeClass('bmenu-item-selected');
-        settingsManager.isBottomMenuOpen = false;
-        break;
-      } else {
-        $('#bottom-menu').fadeIn();
-        $('#menu-in-coverage img').addClass('bmenu-item-selected');
-        settingsManager.isBottomMenuOpen = true;
-        break;
-      }
-    case 'menu-lookangles': // S
-      if (isLookanglesMenuOpen) {
-        isLookanglesMenuOpen = false;
-        hideSideMenus();
-        break;
-      } else {
-        if (!lookangles.sensorSelected() || selectedSat === -1) { // No Sensor or Satellite Selected
-          if (!$('#menu-lookangles img:animated').length) {
-            $('#menu-lookangles img').effect('shake', {distance: 10});
-          }
-          break;
-        }
-        hideSideMenus();
-        $('#lookangles-menu').fadeIn();
-        isLookanglesMenuOpen = true;
-        $('#menu-lookangles img').addClass('bmenu-item-selected');
-        if (selectedSat !== -1) {
-          var sat = satSet.getSat(selectedSat);
-          if (sat.static || sat.missile) {
-            if (!$('#menu-lookangles img:animated').length) {
-              $('#menu-lookangles img').effect('shake', {distance: 10});
-            }
-            break;
-          } else {
-            $('#loading-screen').fadeIn('slow', function () {
-              lookangles.getlookangles(sat, isLookanglesMenuOpen);
-              $('#loading-screen').fadeOut();
-            });
-          }
-        }
-        break;
-      }
-    case 'menu-watchlist': // S
-      if (isWatchlistMenuOpen) {
-        isWatchlistMenuOpen = false;
-        $('#menu-watchlist img').removeClass('bmenu-item-selected');
-        $('#search-holder').show();
-        hideSideMenus();
-        break;
-      } else {
-        hideSideMenus();
-        $('#watchlist-menu').fadeIn();
-        $('#search-holder').hide();
-        updateWatchlist();
-        isWatchlistMenuOpen = true;
-        $('#menu-watchlist img').addClass('bmenu-item-selected');
-        break;
-      }
-    case 'menu-lookanglesmultisite':
-      if (isLookanglesMultiSiteMenuOpen) {
-        isLookanglesMultiSiteMenuOpen = false;
-        hideSideMenus();
-        break;
-      } else {
-        if (selectedSat === -1) { // No Satellite Selected
-          if (!$('#menu-lookanglesmultisite img:animated').length) {
-            $('#menu-lookanglesmultisite img').effect('shake', {distance: 10});
-          }
-          break;
-        }
-        hideSideMenus();
-        $('#lookanglesmultisite-menu').fadeIn();
-        isLookanglesMultiSiteMenuOpen = true;
-        $('#menu-lookanglesmultisite img').addClass('bmenu-item-selected');
-        if (selectedSat !== -1) {
-          $('#loading-screen').fadeIn('slow', function () {
-            sat = satSet.getSat(selectedSat);
-            lookangles.getlookanglesMultiSite(sat, isLookanglesMultiSiteMenuOpen);
-            $('#loading-screen').fadeOut();
-          });
-        }
-        break;
-      }
-    case 'menu-find-sat': // F
-      if (isFindByLooksMenuOpen) {
-        isFindByLooksMenuOpen = false;
-        hideSideMenus();
-        break;
-      } else {
-        hideSideMenus();
-        $('#findByLooks-menu').fadeIn();
-        isFindByLooksMenuOpen = true;
-        $('#menu-find-sat img').addClass('bmenu-item-selected');
-        break;
-      }
-    case 'menu-twitter': // T
-      if (isTwitterMenuOpen) {
-        isTwitterMenuOpen = false;
-        hideSideMenus();
-        break;
-      } else {
-        hideSideMenus();
-        if ($('#twitter-menu').is(':empty')) {
-          $('#twitter-menu').html('<a class="twitter-timeline" data-theme="dark" data-link-color="#2B7BB9" href="https://twitter.com/RedKosmonaut/lists/space-news">A Twitter List by RedKosmonaut</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>');
-        }
-        $('#twitter-menu').fadeIn();
-        isTwitterMenuOpen = true;
-        $('#menu-twitter img').addClass('bmenu-item-selected');
-        break;
-      }
-    case 'menu-weather': // W
-      if (isWeatherMenuOpen) {
-        isWeatherMenuOpen = false;
-        hideSideMenus();
-        break;
-      }
-      if (!isWeatherMenuOpen && sensorManager.whichRadar !== '') {
-        if (sensorManager.whichRadar === 'COD' || sensorManager.whichRadar === 'MIL') {
-          $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/BOX_0.png');
-        }
-        if (sensorManager.whichRadar === 'EGL') {
-          $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/EVX_0.png');
-        }
-        if (sensorManager.whichRadar === 'CLR') {
-          $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/APD_0.png');
-        }
-        if (sensorManager.whichRadar === 'PAR') {
-          $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/MVX_0.png');
-        }
-        if (sensorManager.whichRadar === 'BLE') {
-          $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/DAX_0.png');
-        }
-        if (sensorManager.whichRadar === 'FYL') {
-          $('#weather-image').attr('src', 'http://i.cdn.turner.com/cnn/.element/img/3.0/weather/maps/satuseurf.gif');
-        }
-        if (sensorManager.whichRadar === 'DGC') {
-          $('#weather-image').attr('src', 'http://images.myforecast.com/images/cw/satellite/CentralAsia/CentralAsia.jpeg');
-        }
-        hideSideMenus();
-        $('#weather-menu').fadeIn();
-        isWeatherMenuOpen = true;
-        $('#menu-weather img').addClass('bmenu-item-selected');
-        break;
-      } else {
-        if (!$('#menu-weather img:animated').length) {
-          $('#menu-weather img').effect('shake', {distance: 10});
-        }
-      }
-      break;
-    case 'menu-map': // W
-      if (settingsManager.isMapMenuOpen) {
-        settingsManager.isMapMenuOpen = false;
-        hideSideMenus();
-        break;
-      }
-      if (!settingsManager.isMapMenuOpen) {
-        if (selectedSat === -1) { // No Satellite Selected
-          if (!$('#menu-map img:animated').length) {
-            $('#menu-map img').effect('shake', {distance: 10});
-          }
-          break;
-        }
-        hideSideMenus();
-        $('#map-menu').fadeIn();
-        settingsManager.isMapMenuOpen = true;
-        updateMap();
-        var satData = satSet.getSat(selectedSat);
-        $('#map-sat').tooltip({delay: 50, tooltip: satData.SCC_NUM, position: 'left'});
-        $('#menu-map img').addClass('bmenu-item-selected');
-        break;
-      }
-      break;
-    // case 'menu-space-weather': // Q
-    //   if (isSpaceWeatherMenuOpen) {
-    //     isSpaceWeatherMenuOpen = false;
-    //     hideSideMenus();
-    //     break;
-    //   }
-    //   $('#space-weather-image').attr('src', 'http://services.swpc.noaa.gov/images/animations/ovation-north/latest.png');
-    //   hideSideMenus();
-    //   $('#space-weather-menu').fadeIn();
-    //   isSpaceWeatherMenuOpen = true;
-    //   $('#menu-space-weather img').addClass('bmenu-item-selected');
-    //   break;
-    case 'menu-launches': // L
-      if (isLaunchMenuOpen) {
-        isLaunchMenuOpen = false;
-        hideSideMenus();
-        break;
-      } else {
-        hideSideMenus();
-        $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2017.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-        isLaunchMenuOpen = true;
-        $('#menu-launches img').addClass('bmenu-item-selected');
-        break;
-      }
-    case 'menu-about': // No Keyboard Shortcut
-      if (isAboutSelected) {
-        isAboutSelected = false;
-        hideSideMenus();
-        break;
-      } else {
-        hideSideMenus();
-        $('#about-menu').fadeIn();
-        isAboutSelected = true;
-        $('#menu-about img').addClass('bmenu-item-selected');
-        break;
-      }
-    case 'menu-space-stations': // No Keyboard Shortcut
-      if (isMilSatSelected) {
-        $('#search').val('');
-        searchBox.hideResults();
-        isMilSatSelected = false;
-        $('#menu-space-stations img').removeClass('bmenu-item-selected');
-        break;
-      } else {
-        $('#search').val('40420,41394,32783,35943,36582,40353,40555,41032,38010,38008,38007,38009,37806,41121,41579,39030,39234,28492,36124,39194,36095,40358,40258,37212,37398,38995,40296,40900,39650,27434,31601,36608,28380,28521,36519,39177,40699,34264,36358,39375,38248,34807,28908,32954,32955,32956,35498,35500,37152,37154,38733,39057,39058,39059,39483,39484,39485,39761,39762,39763,40920,40921,40922,39765,29658,31797,32283,32750,33244,39208,26694,40614,20776,25639,26695,30794,32294,33055,39034,28946,33751,33752,27056,27057,27464,27465,27868,27869,28419,28420,28885,29273,32476,31792,36834,37165,37875,37941,38257,38354,39011,39012,39013,39239,39240,39241,39363,39410,40109,40111,40143,40275,40305,40310,40338,40339,40340,40362,40878,41026,41038,41473,28470,37804,37234,29398,40110,39209,39210,36596');
-        searchBox.doSearch('40420,41394,32783,35943,36582,40353,40555,41032,38010,38008,38007,38009,37806,41121,41579,39030,39234,28492,36124,39194,36095,40358,40258,37212,37398,38995,40296,40900,39650,27434,31601,36608,28380,28521,36519,39177,40699,34264,36358,39375,38248,34807,28908,32954,32955,32956,35498,35500,37152,37154,38733,39057,39058,39059,39483,39484,39485,39761,39762,39763,40920,40921,40922,39765,29658,31797,32283,32750,33244,39208,26694,40614,20776,25639,26695,30794,32294,33055,39034,28946,33751,33752,27056,27057,27464,27465,27868,27869,28419,28420,28885,29273,32476,31792,36834,37165,37875,37941,38257,38354,39011,39012,39013,39239,39240,39241,39363,39410,40109,40111,40143,40275,40305,40310,40338,40339,40340,40362,40878,41026,41038,41473,28470,37804,37234,29398,40110,39209,39210,36596');
-        isMilSatSelected = true;
-        $('#menu-about img').removeClass('bmenu-item-selected');
-        $('#menu-space-stations img').addClass('bmenu-item-selected');
-        break;
-      }
-    case 'menu-satellite-collision': // No Keyboard Shortcut
-      if (isSocratesMenuOpen) {
-        isSocratesMenuOpen = false;
-        hideSideMenus();
-        break;
-      } else {
-        hideSideMenus();
-        $('#socrates-menu').fadeIn();
-        isSocratesMenuOpen = true;
-        socrates(-1);
-        $('#menu-satellite-collision img').addClass('bmenu-item-selected');
-        break;
-      }
-    case 'menu-settings': // T
-      if (isSettingsMenuOpen) {
-        isSettingsMenuOpen = false;
-        hideSideMenus();
-        break;
-      } else {
-        hideSideMenus();
-        $('#settings-menu').fadeIn();
-        isSettingsMenuOpen = true;
-        $('#menu-settings img').addClass('bmenu-item-selected');
-        break;
-      }
-    case 'menu-editSat':
-      if (isEditSatMenuOpen) {
-        isEditSatMenuOpen = false;
-        hideSideMenus();
-        break;
-      } else {
-        if (selectedSat !== -1) {
-          hideSideMenus();
-          $('#editSat-menu').fadeIn();
-          $('#menu-editSat img').addClass('bmenu-item-selected');
-          isEditSatMenuOpen = true;
-
-          sat = satSet.getSat(selectedSat);
-          $('#es-scc').val(sat.SCC_NUM);
-
-          var inc = (sat.inclination * RAD2DEG).toPrecision(7);
-          inc = inc.split('.');
-          inc[0] = inc[0].substr(-3, 3);
-          inc[1] = inc[1].substr(0, 4);
-          inc = (inc[0] + '.' + inc[1]).toString();
-
-          $('#es-inc').val(padEmpty(inc, 8));
-          $('#es-year').val(sat.TLE1.substr(18, 2));
-          $('#es-day').val(sat.TLE1.substr(20, 12));
-          $('#es-meanmo').val(sat.TLE2.substr(52, 11));
-
-          var rasc = (sat.raan * RAD2DEG).toPrecision(7);
-          rasc = rasc.split('.');
-          rasc[0] = rasc[0].substr(-3, 3);
-          rasc[1] = rasc[1].substr(0, 4);
-          rasc = (rasc[0] + '.' + rasc[1]).toString();
-
-          $('#es-rasc').val(padEmpty(rasc, 8));
-          $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
-
-          var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
-          argPe = argPe.split('.');
-          argPe[0] = argPe[0].substr(-3, 3);
-          argPe[1] = argPe[1].substr(0, 4);
-          argPe = (argPe[0] + '.' + argPe[1]).toString();
-
-          $('#es-argPe').val(padEmpty(argPe, 8));
-          $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
-          // $('#es-rasc').val(sat.TLE2.substr(18 - 1, 7 + 1).toString());
-        } else {
-          if (!$('#menu-editSat img:animated').length) {
-            $('#menu-editSat img').effect('shake', {distance: 10});
-          }
-        }
-      }
-      break;
-    case 'menu-newLaunch':
-      if (isNewLaunchMenuOpen) {
-        isNewLaunchMenuOpen = false;
-        hideSideMenus();
-        break;
-      } else {
-        // TODO: NEW LAUNCH
-        if (selectedSat !== -1) {
-          hideSideMenus();
-          $('#newLaunch-menu').fadeIn();
-          $('#menu-newLaunch img').addClass('bmenu-item-selected');
-          isNewLaunchMenuOpen = true;
-
-          sat = satSet.getSat(selectedSat);
-          $('#nl-scc').val(sat.SCC_NUM);
-          $('#nl-inc').val((sat.inclination * RAD2DEG).toPrecision(2));
-        } else {
-          if (!$('#menu-newLaunch img:animated').length) {
-            $('#menu-newLaunch img').effect('shake', {distance: 10});
-          }
-        }
-        break;
-      }
-    case 'menu-customSensor': // T
-      if (isCustomSensorMenuOpen) {
-        isCustomSensorMenuOpen = false;
-        hideSideMenus();
-        break;
-      } else {
-        hideSideMenus();
-
-        // TODO: Requires https on chrome, but I will come back to this idea another time
-        // if (navigator.geolocation) {
-        //   navigator.geolocation.getCurrentPosition(function (position) {
-        //     console.log('Latitude: ' + position.coords.latitude);
-        //     console.log('Longitude: ' + position.coords.longitude);
-        //   });
-        // }
-
-        $('#customSensor-menu').fadeIn();
-        isCustomSensorMenuOpen = true;
-        $('#menu-customSensor img').addClass('bmenu-item-selected');
-        break;
-      }
-    case 'menu-missile':
-      if (isMissileMenuOpen) {
-        isMissileMenuOpen = false;
-        hideSideMenus();
-        break;
-      } else {
-        // TODO: NEW LAUNCH
-        hideSideMenus();
-        $('#missile-menu').fadeIn();
-        $('#menu-missile img').addClass('bmenu-item-selected');
-        isMissileMenuOpen = true;
-        break;
-      }
-  }
-}
-
-function updateWatchlist () {
-  if (!watchlistList) return;
-  var watchlistString = '';
-  var watchlistListHTML = '';
-  for (var i = 0; i < watchlistList.length; i++) {
-    var sat = satSet.getSat(watchlistList[i]);
-    if (sat == null) {
-      watchlistList.splice(i, 1);
-      continue;
-    }
-    watchlistListHTML += '<div class="row">' +
-      '<div class="col s3 m3 l3">' + sat.SCC_NUM + '</div>' +
-      '<div class="col s7 m7 l7">' + sat.ON + '</div>' +
-      '<div class="col s2 m2 l2 center-align remove-icon"><img class="watchlist-remove" data-sat-id="' + sat.id + '" src="images/remove.png"></img></div>' +
-    '</div>';
-  }
-  $('#watchlist-list').html(watchlistListHTML);
-  for (i = 0; i < watchlistList.length; i++) { // No duplicates
-    watchlistString += satSet.getSat(watchlistList[i]).SCC_NUM;
-    if (i !== watchlistList.length - 1) watchlistString += ',';
-  }
-  $('#search').val(watchlistString);
-  searchBox.doSearch(watchlistString);
-}
-
-function padEmpty (num, size) {
-  var s = '   ' + num;
-  return s.substr(s.length - size);
-}
-
-function pad0 (str, max) {
-  return str.length < max ? pad0('0' + str, max) : str;
-}
-
 function updateUrl () { // URL Updater
   var arr = window.location.href.split('?');
   var url = arr[0];
@@ -2622,7 +2677,6 @@ function updateUrl () { // URL Updater
 
   window.history.replaceState(null, 'Keeptrack', url);
 }
-
 function selectSat (satId) {
   selectedSat = satId;
   if (satId === -1) {
@@ -2833,123 +2887,10 @@ function selectSat (satId) {
 
   updateUrl();
 }
-
 function browserUnsupported () {
   $('#canvas-holder').hide();
   $('#no-webgl').css('display', 'block');
 }
-
-function webGlInit () {
-  var can = $('#canvas')[0];
-
-  can.width = window.innerWidth;
-  can.height = window.innerHeight;
-
-  var gl = can.getContext('webgl', {alpha: false}) || can.getContext('experimental-webgl', {alpha: false});
-  if (!gl) {
-    browserUnsupported();
-  }
-
-  gl.viewport(0, 0, can.width, can.height);
-
-  gl.enable(gl.DEPTH_TEST);
-
-  // gl.enable(0x8642);
-  /* enable point sprites(?!) This might get browsers with
-     underlying OpenGL to behave
-     although it's not technically a part of the WebGL standard
-  */
-
-  var pFragShader = gl.createShader(gl.FRAGMENT_SHADER);
-  var pFragCode = shaderLoader.getShaderCode('pick-fragment.glsl');
-  gl.shaderSource(pFragShader, pFragCode);
-  gl.compileShader(pFragShader);
-
-  var pVertShader = gl.createShader(gl.VERTEX_SHADER);
-  var pVertCode = shaderLoader.getShaderCode('pick-vertex.glsl');
-  gl.shaderSource(pVertShader, pVertCode);
-  gl.compileShader(pVertShader);
-
-  var pickShaderProgram = gl.createProgram();
-  gl.attachShader(pickShaderProgram, pVertShader);
-  gl.attachShader(pickShaderProgram, pFragShader);
-  gl.linkProgram(pickShaderProgram);
-
-  pickShaderProgram.aPos = gl.getAttribLocation(pickShaderProgram, 'aPos');
-  pickShaderProgram.aColor = gl.getAttribLocation(pickShaderProgram, 'aColor');
-  pickShaderProgram.aPickable = gl.getAttribLocation(pickShaderProgram, 'aPickable');
-  pickShaderProgram.uCamMatrix = gl.getUniformLocation(pickShaderProgram, 'uCamMatrix');
-  pickShaderProgram.uMvMatrix = gl.getUniformLocation(pickShaderProgram, 'uMvMatrix');
-  pickShaderProgram.uPMatrix = gl.getUniformLocation(pickShaderProgram, 'uPMatrix');
-
-  gl.pickShaderProgram = pickShaderProgram;
-
-  pickFb = gl.createFramebuffer();
-  gl.bindFramebuffer(gl.FRAMEBUFFER, pickFb);
-
-  pickTex = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, pickTex);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); // makes clearing work
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.drawingBufferWidth, gl.drawingBufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-
-  var rb = gl.createRenderbuffer(); // create RB to store the depth buffer
-  gl.bindRenderbuffer(gl.RENDERBUFFER, rb);
-  gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickTex, 0);
-  gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, rb);
-
-  gl.pickFb = pickFb;
-
-  pickColorBuf = new Uint8Array(4);
-
-  pMatrix = mat4.create();
-  mat4.perspective(pMatrix, 1.01, gl.drawingBufferWidth / gl.drawingBufferHeight, 20.0, 600000.0);
-  var eciToOpenGlMat = [
-    1, 0, 0, 0,
-    0, 0, -1, 0,
-    0, 1, 0, 0,
-    0, 0, 0, 1
-  ];
-  mat4.mul(pMatrix, pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
-
-  window.gl = gl;
-}
-
-function getSatIdFromCoord (x, y) {
-  gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-  gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
-  return ((pickColorBuf[2] << 16) | (pickColorBuf[1] << 8) | (pickColorBuf[0])) - 1;
-}
-
-// var lastRadarTrackTime = 0;
-// var curRadarTrackNum = 0;
-// function drawLines () {
-//   var satData = satSet.getSatData();
-//   var propTime = timeManager.propTime();
-//   if (satData && lookangles.sensorSelected()) {
-//     if (propTime - lastRadarTrackTime > 54) {
-//       lastRadarTrackTime = 0;
-//       curRadarTrackNum++;
-//     }
-//     if (curRadarTrackNum < satData.length) {
-//       if (satData[curRadarTrackNum]) {
-//         if (satData[curRadarTrackNum].inview) {
-//           var debugLine = new Line();
-//           var sat = satData[curRadarTrackNum];
-//           var satposition = [sat.position.x, sat.position.y, sat.position.z];
-//           debugLine.set(satposition, sensorManager.curSensorPositon);
-//           debugLine.draw();
-//           if (lastRadarTrackTime === 0) { lastRadarTrackTime = propTime; }
-//         } else { curRadarTrackNum++; }
-//       } else { curRadarTrackNum++; }
-//     } else { curRadarTrackNum = 0; }
-//   }
-// }
-
 function updateMap () {
   if (selectedSat === -1) return;
   if (!settingsManager.isMapMenuOpen) return;
@@ -2984,12 +2925,27 @@ function updateMap () {
     $('#map-look' + i).attr('time', lookangles.map(satData, i).time);
   }
 }
-
-function earthHitTest (x, y) {
-  gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-  gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
-
-  return (pickColorBuf[0] === 0 &&
-          pickColorBuf[1] === 0 &&
-          pickColorBuf[2] === 0);
-}
+// var lastRadarTrackTime = 0;
+// var curRadarTrackNum = 0;
+// function drawLines () {
+//   var satData = satSet.getSatData();
+//   var propTime = timeManager.propTime();
+//   if (satData && lookangles.sensorSelected()) {
+//     if (propTime - lastRadarTrackTime > 54) {
+//       lastRadarTrackTime = 0;
+//       curRadarTrackNum++;
+//     }
+//     if (curRadarTrackNum < satData.length) {
+//       if (satData[curRadarTrackNum]) {
+//         if (satData[curRadarTrackNum].inview) {
+//           var debugLine = new Line();
+//           var sat = satData[curRadarTrackNum];
+//           var satposition = [sat.position.x, sat.position.y, sat.position.z];
+//           debugLine.set(satposition, sensorManager.curSensorPositon);
+//           debugLine.draw();
+//           if (lastRadarTrackTime === 0) { lastRadarTrackTime = propTime; }
+//         } else { curRadarTrackNum++; }
+//       } else { curRadarTrackNum++; }
+//     } else { curRadarTrackNum = 0; }
+//   }
+// }

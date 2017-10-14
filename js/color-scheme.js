@@ -73,7 +73,6 @@
         color = [0.2, 1.0, 0.0, 0.5];
       } else if (sat.OT === 2) { // Rocket Body
         color = [0.2, 0.5, 1.0, 0.85];
-        //  return [0.6, 0.6, 0.6];
       } else if (sat.OT === 3) { // Debris
         color = [0.5, 0.5, 0.5, 0.85];
       } else {

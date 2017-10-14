@@ -1017,6 +1017,48 @@ var lastSelectedSat = -1;
       }
       e.preventDefault();
     });
+    $('#watchlist-save').click(function (e) {
+      var saveWatchlist = [];
+      for (var i = 0; i < watchlistList.length; i++) {
+        var sat = satSet.getSat(watchlistList[i]);
+        saveWatchlist[i] = sat.SCC_NUM;
+      }
+      var variable = JSON.stringify(saveWatchlist);
+      var blob = new Blob([variable], {type: 'text/plain;charset=utf-8'});
+      saveAs(blob, 'watchlist.json');
+      e.preventDefault();
+    });
+    $('#watchlist-open').click(function (e) {
+      $('#watchlist-file').trigger('click');
+    });
+    $('#watchlist-file').change(function (evt) {
+      if (!window.FileReader) return; // Browser is not compatible
+
+      var reader = new FileReader();
+
+      reader.onload = function (evt) {
+        if (evt.target.readyState !== 2) return;
+        if (evt.target.error) {
+          console.log('error');
+          return;
+        }
+
+        var newWatchlist = JSON.parse(evt.target.result);
+        for (var i = 0; i < newWatchlist.length; i++) {
+          var sat = satSet.getSat(satSet.getIdFromObjNum(newWatchlist[i]));
+          if (sat !== null) {
+            newWatchlist[i] = sat.id;
+          } else {
+            console.error('Watchlist File Format Incorret');
+            return;
+          }
+        }
+        watchlistList = newWatchlist;
+        _updateWatchlist();
+      };
+      reader.readAsText(evt.target.files[0]);
+      evt.preventDefault();
+    });
 
     $('#newLaunch').submit(function (e) {
       $('#loading-screen').fadeIn('slow', function () {

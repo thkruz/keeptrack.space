@@ -159,9 +159,12 @@
           break;
         case 'lost-objects':
           $('#search').val('');
-          satSet.setColorScheme(ColorScheme.lostobjects);
-          ga('send', 'event', 'ColorScheme Menu', 'Lost Objects', 'Selected');
-          searchBox.doSearch($('#search').val());
+          $('#loading-screen').fadeIn('slow', function () {
+            satSet.setColorScheme(ColorScheme.lostobjects);
+            ga('send', 'event', 'ColorScheme Menu', 'Lost Objects', 'Selected');
+            searchBox.doSearch($('#search').val());
+            $('#loading-screen').fadeOut();
+          });
           break;
         case 'rcs':
           $('#legend-list-rcs').show();

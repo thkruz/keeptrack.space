@@ -122,6 +122,8 @@ var lastSelectedSat = -1;
   var pickColorBuf;
   var cameraType = 0;
 
+  var touchHoldButton = '';
+
   var rayOrigin;
   var ptThru;
   var rayDir;
@@ -330,13 +332,13 @@ var lastSelectedSat = -1;
 
     $('#canvas').on('touchmove', function (evt) {
       evt.preventDefault();
-      if (isDragging && screenDragPoint[0] !== evt.originalEvent.touches[0].clientX && screenDragPoint[1] !== evt.originalEvent.touches[0].clientY) {
+      mouseX = evt.originalEvent.touches[0].clientX;
+      mouseY = evt.originalEvent.touches[0].clientY;
+      if (isDragging && screenDragPoint[0] !== mouseX && screenDragPoint[1] !== mouseY) {
         dragHasMoved = true;
         camAngleSnappedOnSat = false;
         camZoomSnappedOnSat = false;
       }
-      mouseX = evt.originalEvent.touches[0].clientX;
-      mouseY = evt.originalEvent.touches[0].clientY;
       isMouseMoving = true;
       clearTimeout(mouseTimeout);
       mouseTimeout = setTimeout(function () {
@@ -345,13 +347,13 @@ var lastSelectedSat = -1;
     });
 
     $('#canvas').mousemove(function (evt) {
-      if (isDragging && screenDragPoint[0] !== evt.clientX && screenDragPoint[1] !== evt.clientY) {
+      mouseX = evt.clientX;
+      mouseY = evt.clientY;
+      if (isDragging && screenDragPoint[0] !== mouseX && screenDragPoint[1] !== mouseY) {
         dragHasMoved = true;
         camAngleSnappedOnSat = false;
         camZoomSnappedOnSat = false;
       }
-      mouseX = evt.clientX;
-      mouseY = evt.clientY;
       isMouseMoving = true;
       clearTimeout(mouseTimeout);
       mouseTimeout = setTimeout(function () {
@@ -360,8 +362,6 @@ var lastSelectedSat = -1;
     });
 
     $('#canvas').on('wheel', function (evt) {
-      // if (isZoomChanging) return;
-      // isZoomChanging = true;
       var delta = evt.originalEvent.deltaY;
       if (evt.originalEvent.deltaMode === 1) {
         delta *= 33.3333333;
@@ -374,7 +374,9 @@ var lastSelectedSat = -1;
     });
 
     $('#canvas').click(function (evt) {
-      $.colorbox.close();
+      if ($('#colorbox').css('display') === 'block') {
+        $.colorbox.close(); // Close colorbox if it was open
+      }
     });
 
     $(document).bind('cbox_closed', function () {
@@ -384,15 +386,15 @@ var lastSelectedSat = -1;
       }
     });
 
-    $('#canvas').contextmenu(function () {
-      return false; // stop right-click menu
-    });
+    window.oncontextmenu = function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      return false;
+    };
 
     $('#canvas').mousedown(function (evt) {
-      // if(evt.which === 3) {//RMB
-      // CAMERA_OVERIDE_ENABLED = false;
-      dragPoint = getEarthScreenPoint(evt.clientX, evt.clientY);
-      screenDragPoint = [evt.clientX, evt.clientY];
+      dragPoint = getEarthScreenPoint(mouseX, mouseY);
+      screenDragPoint = [mouseX, mouseY];
       dragStartPitch = camPitch;
       dragStartYaw = camYaw;
       // debugLine.set(dragPoint, getCamPos());
@@ -402,7 +404,6 @@ var lastSelectedSat = -1;
       }
       camSnapMode = false;
       rotateTheEarth = false;
-      // }
     });
 
     $('#canvas').on('touchstart', function (evt) {
@@ -422,11 +423,9 @@ var lastSelectedSat = -1;
     });
 
     $('#canvas').mouseup(function (evt) {
-      // if(evt.which === 3) {//RMB
       if (!dragHasMoved) {
-        var clickedSat = _getSatIdFromCoord(evt.clientX, evt.clientY);
-        if (clickedSat === -1 && evt.button === 2) { // Right Mouse Buttom Click
-          // clearMenuCountries();
+        var clickedSat = _getSatIdFromCoord(mouseX, mouseY);
+        if (clickedSat === -1 && evt.button === 2) { // Right Mouse Button Click
           $('#search').val('');
           searchBox.hideResults();
           isMilSatSelected = false;
@@ -462,7 +461,6 @@ var lastSelectedSat = -1;
       dragHasMoved = false;
       isDragging = false;
       rotateTheEarth = false;
-      // }
     });
 
     $('#canvas').on('touchend', function (evt) {
@@ -491,43 +489,41 @@ var lastSelectedSat = -1;
       $('#controls-up-wrapper').css('top', '80px');
     });
 
-    $('#controls-zoom-in').click(function () {
-      zoomTarget -= 0.04;
-      if (zoomTarget < 0) zoomTarget = 0;
+    $('#mobile-controls').on('touchstop mouseup', function () {
+      touchHoldButton = '';
+    });
+
+    $('#controls-zoom-in').on('touchstart mousedown', function () {
+      touchHoldButton = 'zoom-in';
       rotateTheEarth = false;
       camZoomSnappedOnSat = false;
     });
 
-    $('#controls-zoom-out').click(function () {
-      zoomTarget += 0.04;
-      if (zoomTarget > 1) zoomTarget = 1;
+    $('#controls-zoom-out').on('touchstart mousedown', function () {
+      touchHoldButton = 'zoom-out';
       rotateTheEarth = false;
       camZoomSnappedOnSat = false;
     });
-    $('#controls-up').click(function () {
-      camPitchSpeed += 0.001 * zoomLevel;
-      if (camPitch > Math.PI / 2) camPitchSpeed = 0;
-      rotateTheEarth = false;
-      camZoomSnappedOnSat = false;
-    });
-
-    $('#controls-down').click(function () {
-      camPitchSpeed -= 0.001 * zoomLevel;
-      if (camPitch < -Math.PI / 2) camPitchSpeed = 0;
+    $('#controls-up').on('touchstart mousedown', function () {
+      touchHoldButton = 'move-up';
       rotateTheEarth = false;
       camZoomSnappedOnSat = false;
     });
 
-    $('#controls-left').click(function () {
-      camYawSpeed -= 0.001 * zoomLevel;
-      // if (camYaw < -1) camYaw = -1;
+    $('#controls-down').on('touchstart mousedown', function () {
+      touchHoldButton = 'move-down';
       rotateTheEarth = false;
       camZoomSnappedOnSat = false;
     });
 
-    $('#controls-right').click(function () {
-      camYawSpeed += 0.001 * zoomLevel;
-      // if (camYaw > 1) camYaw = 1;
+    $('#controls-left').on('touchstart mousedown', function () {
+      touchHoldButton = 'move-left';
+      rotateTheEarth = false;
+      camZoomSnappedOnSat = false;
+    });
+
+    $('#controls-right').on('touchstart mousedown', function () {
+      touchHoldButton = 'move-right';
       rotateTheEarth = false;
       camZoomSnappedOnSat = false;
     });
@@ -1406,6 +1402,7 @@ var lastSelectedSat = -1;
     drawNow = Date.now();
     dt = drawNow - (time || drawNow);
     time = drawNow;
+    _mobileScreenControls();
 
     dragTarget = getEarthScreenPoint(mouseX, mouseY);
     if (isDragging) {
@@ -1489,6 +1486,33 @@ var lastSelectedSat = -1;
     // bubble.set();
     // bubble.draw();
   }
+
+  function _mobileScreenControls () {
+    if (touchHoldButton === '') return;
+    if (touchHoldButton === 'zoom-in') {
+      zoomTarget -= 0.0025;
+      if (zoomTarget < 0) zoomTarget = 0;
+    }
+    if (touchHoldButton === 'zoom-out') {
+      zoomTarget += 0.0025;
+      if (zoomTarget > 1) zoomTarget = 1;
+    }
+    if (touchHoldButton === 'move-up') {
+      camPitchSpeed += 0.000075 * zoomLevel;
+      if (camPitch > Math.PI / 2) camPitchSpeed = 0;
+    }
+    if (touchHoldButton === 'move-down') {
+      camPitchSpeed -= 0.000075 * zoomLevel;
+      if (camPitch < -Math.PI / 2) camPitchSpeed = 0;
+    }
+    if (touchHoldButton === 'move-left') {
+      camYawSpeed -= 0.0002 * zoomLevel;
+    }
+    if (touchHoldButton === 'move-right') {
+      camYawSpeed += 0.0002 * zoomLevel;
+    }
+  }
+
   function drawScene () {
     gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);

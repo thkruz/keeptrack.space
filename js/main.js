@@ -821,7 +821,7 @@ var lastSelectedSat = -1;
         inc[1] = '0000';
       }
       inc = (inc[0] + '.' + inc[1]).toString();
-      inc = _padEmpty(inc, 8);
+      inc = _pad0(inc, 8);
 
       var meanmo = $('#es-meanmo').val();
 
@@ -834,7 +834,7 @@ var lastSelectedSat = -1;
         meanmo[1] = '00000000';
       }
       meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
-      meanmo = _padEmpty(meanmo, 8);
+      meanmo = _pad0(meanmo, 8);
 
       var rasc = $('#es-rasc').val();
 
@@ -847,7 +847,7 @@ var lastSelectedSat = -1;
         rasc[1] = '0000';
       }
       rasc = (rasc[0] + '.' + rasc[1]).toString();
-      rasc = _padEmpty(rasc, 8);
+      rasc = _pad0(rasc, 8);
 
       var ecen = $('#es-ecen').val();
       var argPe = $('#es-argPe').val();
@@ -861,7 +861,7 @@ var lastSelectedSat = -1;
         argPe[1] = '0000';
       }
       argPe = (argPe[0] + '.' + argPe[1]).toString();
-      argPe = _padEmpty(argPe, 8);
+      argPe = _pad0(argPe, 8);
 
       var meana = $('#es-meana').val();
 
@@ -874,7 +874,7 @@ var lastSelectedSat = -1;
         meana[1] = '0000';
       }
       meana = (meana[0] + '.' + meana[1]).toString();
-      meana = _padEmpty(meana, 8);
+      meana = _pad0(meana, 8);
 
       var epochyr = $('#es-year').val();
       var epochday = $('#es-day').val();

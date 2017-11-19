@@ -257,14 +257,23 @@ var lastSelectedSat = -1;
       dateFormat: 'yy-mm-dd',
       timeFormat: 'HH:mm:ss',
       timezone: '+0000',
+      gotoCurrent: true,
       addSliderAccess: true,
-      sliderAccessArgs: { touchonly: false },
-      minDate: -14, // No more than 7 days in the past
-      maxDate: 14 }).on('change.dp', function (e) { // or 7 days in the future to make sure ELSETs are valid
+      // minDate: -14, // No more than 7 days in the past
+      // maxDate: 14,
+      sliderAccessArgs: { touchonly: false }}).on('change.dp', function (e) { // or 7 days in the future to make sure ELSETs are valid
         $('#datetime-input').fadeOut();
         $('#datetime-text').fadeIn();
         settingsManager.isEditTime = false;
       });
+    if (settingsManager.retro) {
+      timeManager.propOffset = new Date(2000, 2, 13) - Date.now();
+      $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
+      satCruncher.postMessage({
+        typ: 'offset',
+        dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
+      });
+    }
 
     satSet.onCruncherReady(function (satData) {
       // do querystring stuff
@@ -1167,32 +1176,24 @@ var lastSelectedSat = -1;
           }
           inc = (inc[0] + '.' + inc[1]).toString();
           inc = _padEmpty(inc, 8);
-          console.log(inc);
 
           var meanmo = TLE2.substr(52, 10);
           meanmo = parseFloat(meanmo - (0.03 / 15) + (0.06 * ((i + 1) / 15))).toPrecision(10);
-          console.log(meanmo);
           meanmo = meanmo.split('.');
-          console.log(meanmo);
           meanmo[0] = meanmo[0].substr(-2, 2);
-          console.log(meanmo[0]);
           if (meanmo[1]) {
             meanmo[1] = meanmo[1].substr(0, 8);
           } else {
             meanmo[1] = '00000000';
           }
           meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
-          console.log(meanmo);
 
           var iTLE2 = '2 ' + (80000 + i) + ' ' + inc + ' ' + TLE2.substr(17, 35) + meanmo + TLE2.substr(63);
-          console.log(iTLE2);
           sat['TLE1'] = iTLE1;
           sat['TLE2'] = iTLE2;
-          console.log(sat);
           var iTLEs = lookangles.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, timeManager.propOffset);
           iTLE1 = iTLEs[0];
           iTLE2 = iTLEs[1];
-          console.log(sat);
           if (lookangles.altitudeCheck(iTLE1, iTLE2, timeManager.propOffset) > 1) {
             satCruncher.postMessage({
               typ: 'satEdit',
@@ -2476,12 +2477,14 @@ var lastSelectedSat = -1;
         settingsManager.isPropRateChange = true;
         break;
       case 60: // <
-        timeManager.propOffset -= 60000; // Move back 60 seconds
+        timeManager.propOffset -= 1000 * 60 * 60 * 24 * 365.25; // Move back a year
         settingsManager.isPropRateChange = true;
+        $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
         break;
       case 62: // >
-        timeManager.propOffset += 60000; // Move forward 60 seconds
+        timeManager.propOffset += 1000 * 60 * 60 * 24 * 365.25; // Move forward a year
         settingsManager.isPropRateChange = true;
+        $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
         break;
       case 48: // 0
         timeManager.setPropRateZero();

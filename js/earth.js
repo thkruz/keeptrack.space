@@ -111,6 +111,7 @@
       onImageLoaded();
     };
     nightImg.src = 'images/nightearth-4096.png';
+    if (settingsManager.retro) nightImg.src = 'images/dayearth-4096.jpg';
    // nightImg.src = '/nightearth-512.jpg';
 
     // generate a uvsphere bottom up, CCW order

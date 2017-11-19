@@ -11,6 +11,7 @@
   saveAs
   Blob
   satCruncher
+  timeManager
 
  */
 
@@ -108,7 +109,7 @@ $.ajaxSetup({
   };
   launchSiteList.RLLC = {
     name: 'RLLC',
-    lat: 39.26,
+    lat: -39.26,
     lon: 177.86
   };
   launchSiteList.SADOL = {
@@ -1374,12 +1375,20 @@ $.ajaxSetup({
         sitec = 'Iran';
       }
       if (LS === 'YUN') {
-        site = 'Yunsong';
+        site = 'Sohae SLS';
+        sitec = 'North Korea';
+      }
+      if (LS === 'TNGH') {
+        site = 'Tonghae SLG';
         sitec = 'North Korea';
       }
       if (LS === 'NSC') {
         site = 'Naro Space Center';
         sitec = 'South Korea';
+      }
+      if (LS === 'RLLC') {
+        site = 'Rocket Labs LC';
+        sitec = 'New Zealand';
       }
     }
     return {

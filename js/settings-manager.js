@@ -2,8 +2,14 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.26.2';
-  settingsManager.versionDate = 'October 28, 2017';
+  settingsManager.versionNumber = 'v0.27.1';
+  settingsManager.versionDate = 'November 19, 2017';
+
+  (function _getVersion () {
+    var url = window.location.pathname;
+    var filename = url.substring(url.lastIndexOf('/') + 1);
+    if (filename === 'retro.htm') settingsManager.retro = true;
+  })();
 
   settingsManager.shadersReady = false;
   settingsManager.cruncherReady = false;

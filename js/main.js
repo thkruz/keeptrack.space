@@ -115,6 +115,7 @@ var lastSelectedSat = -1;
   var dt;
 
   var watchlistList = [];
+  var watchlistInViewList = [];
 
   var lastBoxUpdateTime = 0;
   var updateHoverDelay = 0;
@@ -442,9 +443,19 @@ var lastSelectedSat = -1;
           if ($(document).width() <= 1000) {
             $('#search-results').attr('style', 'height:110px;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
             $('#controls-up-wrapper').css('top', '80px');
+            if (settingsManager.redTheme) {
+              $('.search-hilight').css('color', 'DarkRed');
+              $('#search-results').css('background', 'LightCoral');
+              $('#search-result:hover').css('background', 'DarkRed');
+            }
           } else {
             $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
             $('#legend-hover-menu').hide();
+            if (settingsManager.redTheme) {
+              $('.search-hilight').css('color', 'DarkRed');
+              $('#search-results').css('background', 'LightCoral');
+              $('#search-result:hover').css('background', 'DarkRed');
+            }
           }
 
           // Hide All legends
@@ -995,6 +1006,7 @@ var lastSelectedSat = -1;
       for (var i = 0; i < watchlistList.length; i++) {
         if (watchlistList[i] === satId) {
           watchlistList.splice(i, 1);
+          watchlistInViewList.splice(i, 1);
         }
       }
       _updateWatchlist();
@@ -1007,6 +1019,7 @@ var lastSelectedSat = -1;
       }
       if (!duplicate) {
         watchlistList.push(satId);
+        watchlistInViewList.push(false);
         _updateWatchlist();
       }
     });
@@ -1018,6 +1031,7 @@ var lastSelectedSat = -1;
       }
       if (!duplicate) {
         watchlistList.push(satId);
+        watchlistInViewList.push(false);
         _updateWatchlist();
       }
       e.preventDefault();
@@ -1481,6 +1495,7 @@ var lastSelectedSat = -1;
     drawScene();
     updateHover();
     updateSelectBox();
+    _checkWatchlist();
 
     // drawLines();
     // var bubble = new FOVBubble();
@@ -2354,6 +2369,24 @@ var lastSelectedSat = -1;
       isAboutSelected = false;
     }
   }
+
+  function _checkWatchlist () {
+    if (watchlistList.length <= 0) return;
+    for (var i = 0; i < watchlistList.length; i++) {
+      var sat = satSet.getSat(watchlistList[i]);
+      if (sat.inview === 1 && watchlistInViewList[i] === false) { // Is inview and wasn't previously
+        settingsManager.redTheme = true;
+        settingsManager.themeChange(settingsManager.redTheme);
+        watchlistInViewList[i] = true;
+      }
+      if (sat.inview === 0 && watchlistInViewList[i] === true) { // Isn't inview and was previously
+        settingsManager.redTheme = false;
+        settingsManager.themeChange(settingsManager.redTheme);
+        watchlistInViewList[i] = false;
+      }
+    }
+  }
+
   function _updateWatchlist () {
     if (!watchlistList) return;
     var watchlistString = '';
@@ -2753,16 +2786,36 @@ function selectSat (satId) {
     if ($('#search-results').css('display') === 'block') {
       if ($(document).width() <= 1000) {
         $('#search-results').attr('style', 'display:block;height:110px;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
+        if (settingsManager.redTheme) {
+          $('.search-hilight').css('color', 'DarkRed');
+          $('#search-results').css('background', 'LightCoral');
+          $('#search-result:hover').css('background', 'DarkRed');
+        }
         $('#controls-up-wrapper').css('top', '180px');
       } else {
         $('#search-results').attr('style', 'display:block;max-height:100%;margin-bottom:-50px;');
+        if (settingsManager.redTheme) {
+          $('.search-hilight').css('color', 'DarkRed');
+          $('#search-results').css('background', 'LightCoral');
+          $('#search-result:hover').css('background', 'DarkRed');
+        }
       }
     } else {
       if ($(document).width() <= 1000) {
         $('#search-results').attr('style', 'height:110px;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
         $('#controls-up-wrapper').css('top', '80px');
+        if (settingsManager.redTheme) {
+          $('.search-hilight').css('color', 'DarkRed');
+          $('#search-results').css('background', 'LightCoral');
+          $('#search-result:hover').css('background', 'DarkRed');
+        }
       } else {
         $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
+        if (settingsManager.redTheme) {
+          $('.search-hilight').css('color', 'DarkRed');
+          $('#search-results').css('background', 'LightCoral');
+          $('#search-result:hover').css('background', 'DarkRed');
+        }
       }
     }
     $('#iss-stream').html('');
@@ -2829,9 +2882,19 @@ function selectSat (satId) {
       if ($(document).width() <= 1000) {
         $('#search-results').attr('style', 'display:block; height:110px; width: 100%;bottom:auto;margin-top:50px;');
         $('#controls-up-wrapper').css('top', '180px');
+        if (settingsManager.redTheme) {
+          $('.search-hilight').css('color', 'DarkRed');
+          $('#search-results').css('background', 'LightCoral');
+          $('#search-result:hover').css('background', 'DarkRed');
+        }
       } else {
         $('#search-results').attr('style', 'display:block; max-height:27%');
         $('#legend-hover-menu').hide();
+        if (settingsManager.redTheme) {
+          $('.search-hilight').css('color', 'DarkRed');
+          $('#search-results').css('background', 'LightCoral');
+          $('#search-result:hover').css('background', 'DarkRed');
+        }
       }
     } else {
       if ($(document).width() <= 1000) {

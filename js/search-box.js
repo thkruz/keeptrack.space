@@ -180,6 +180,11 @@
     }
     resultBox[0].innerHTML = html;
     resultBox.slideDown();
+    if (settingsManager.redTheme) {
+      $('.search-hilight').css('color', 'DarkRed');
+      $('#search-results').css('background', 'LightCoral');
+      $('#search-result:hover').css('background', 'DarkRed');
+    }
     resultsOpen = true;
   };
 

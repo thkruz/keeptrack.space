@@ -16,7 +16,7 @@ a, .link {
     cursor: pointer;
 }
 a:hover, .link:hover {
-    background: #0288d1;
+    background: rgba(0, 0, 0, 0.2);
 }
 
 body {
@@ -157,7 +157,7 @@ ul {
     line-height: 16px;
 }
 .search-result:hover {
-    background: #0277bd;
+    background: rgba(0, 0, 0, 0.2);
     cursor: pointer;
 }
 .search-result-scc {

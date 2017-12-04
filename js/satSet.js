@@ -745,10 +745,10 @@
       if (satData[i].static || satData[i].missile || !satData[i].active) { continue; }
       res.push(satData[i]);
       lookangles.getTEARR(res[s]);
-      res[s]['azimuth'] = lookangles.azimuth;
-      res[s]['elevation'] = lookangles.elevation;
-      res[s]['range'] = lookangles.range;
-      res[s]['inview'] = lookangles.inview;
+      res[s]['azimuth'] = lookangles.currentTEARR.azimuth;
+      res[s]['elevation'] = lookangles.currentTEARR.elevation;
+      res[s]['range'] = lookangles.currentTEARR.range;
+      res[s]['inview'] = lookangles.currentTEARR.inview;
       s++;
     }
 

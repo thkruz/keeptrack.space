@@ -1010,6 +1010,10 @@ var lastSelectedSat = -1;
         }
       }
       _updateWatchlist();
+      if (watchlistList.length <= 0) {
+        settingsManager.redTheme = false;
+        settingsManager.themeChange(settingsManager.redTheme);
+      }
     });
     $('#watchlist-content').on('click', '.watchlist-add', function (evt) {
       var satId = satSet.getIdFromObjNum(_pad0($('#watchlist-new').val(), 5));

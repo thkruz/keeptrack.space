@@ -149,7 +149,7 @@
       settingsManager.socratesOnSatCruncher = null;
     }
 
-    if (settingsManager.currentColorScheme === ColorScheme.default && !lookangles.sensorSelected()) {
+    if (settingsManager.currentColorScheme === ColorScheme.default && !satellite.sensorSelected()) {
       // Don't force color recalc if default colors and no sensor for inview color
     } else {
       satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
@@ -447,7 +447,7 @@
       /** If custom sensor set then send parameters to lookangles and satCruncher */
       if (obslatitude !== undefined && obslongitude !== undefined && obsheight !== undefined && obsminaz !== undefined && obsmaxaz !== undefined && obsminel !== undefined &&
           obsmaxel !== undefined && obsminrange !== undefined && obsmaxrange !== undefined) {
-        lookangles.setobs({
+        satellite.setobs({
           lat: obslatitude,
           long: obslongitude,
           obshei: obsheight,
@@ -744,11 +744,11 @@
     for (var i = 0; i < satData.length; i++) {
       if (satData[i].static || satData[i].missile || !satData[i].active) { continue; }
       res.push(satData[i]);
-      lookangles.getTEARR(res[s]);
-      res[s]['azimuth'] = lookangles.currentTEARR.azimuth;
-      res[s]['elevation'] = lookangles.currentTEARR.elevation;
-      res[s]['range'] = lookangles.currentTEARR.range;
-      res[s]['inview'] = lookangles.currentTEARR.inview;
+      satellite.getTEARR(res[s]);
+      res[s]['azimuth'] = satellite.currentTEARR.azimuth;
+      res[s]['elevation'] = satellite.currentTEARR.elevation;
+      res[s]['range'] = satellite.currentTEARR.range;
+      res[s]['inview'] = satellite.currentTEARR.inview;
       s++;
     }
 
@@ -893,7 +893,7 @@
       gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(selectedColor));
     }
     selectedSat = i;
-    if (lookangles.sensorSelected()) {
+    if (satellite.sensorSelected()) {
       $('#menu-lookangles img').removeClass('bmenu-item-disabled');
     }
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');

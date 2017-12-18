@@ -79,7 +79,7 @@
         color = [0.5, 0.5, 0.5, 0.85];
       }
 
-      if ((pe > lookangles.obsmaxrange || ap < lookangles.obsminrange)) {
+      if ((pe > satellite.obsmaxrange || ap < satellite.obsminrange)) {
         return {
           color: [1.0, 1.0, 1.0, settingsManager.otherSatelliteTransparency],
           pickable: false
@@ -188,7 +188,7 @@
       } else {
         daysold = jday - sat.TLE1.substr(20, 3) + (sat.TLE1.substr(17, 2) * 365);
       }
-      if (pe > lookangles.obsmaxrange || daysold < 31) {
+      if (pe > satellite.obsmaxrange || daysold < 31) {
         return {
           color: [1.0, 1.0, 1.0, settingsManager.otherSatelliteTransparency],
           pickable: false

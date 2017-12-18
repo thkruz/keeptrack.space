@@ -14,24 +14,23 @@ var MINUTES_PER_DAY = 1440;
 var MILLISECONDS_PER_DAY = 1.15741e-8;
 
 (function () {
-  var lookangles = {};
   // Settings
-  lookangles.lookanglesInterval = 5;
-  lookangles.lookanglesLength = 2;
-  lookangles.isRiseSetLookangles = false;
+  satellite.lookanglesInterval = 5;
+  satellite.lookanglesLength = 2;
+  satellite.isRiseSetLookangles = false;
 
-  lookangles.currentSensor = {};
-  lookangles.tempSensor = {};
-  lookangles.currentTEARR = {};
-  lookangles.defaultSensor = {};
-  lookangles.defaultSensor.observerGd = {
+  satellite.currentSensor = {};
+  satellite.tempSensor = {};
+  satellite.currentTEARR = {};
+  satellite.defaultSensor = {};
+  satellite.defaultSensor.observerGd = {
     lat: null,
     longitude: 0,
     latitude: 0,
     height: 0
   };
-  lookangles.currentSensor = lookangles.defaultSensor;
-  lookangles.sensorListUS = [
+  satellite.currentSensor = satellite.defaultSensor;
+  satellite.sensorListUS = [
     window.sensorManager.sensorList.COD,
     window.sensorManager.sensorList.BLE,
     window.sensorManager.sensorList.CAV,
@@ -45,21 +44,21 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     window.sensorManager.sensorList.CDN
   ];
 
-  lookangles.sensorSelected = function () {
-    if (lookangles.currentSensor.lat != null) {
+  satellite.sensorSelected = function () {
+    if (satellite.currentSensor.lat != null) {
       return true;
     } else {
       return false;
     }
   };
-  lookangles.currentEpoch = function (currentDate) {
+  satellite.currentEpoch = function (currentDate) {
     currentDate = new Date(currentDate);
     var epochYear = currentDate.getUTCFullYear();
     epochYear = parseInt(epochYear.toString().substr(2, 2));
     var epochDay = timeManager.getDayOfYear(currentDate) + (currentDate.getUTCHours() * 3600 + currentDate.getUTCMinutes() * 60 + currentDate.getUTCSeconds()) / (1440 * 60);
     return [epochYear, epochDay];
   };
-  lookangles.distance = function (hoverSat, selectedSat) {
+  satellite.distance = function (hoverSat, selectedSat) {
     if (selectedSat == null || hoverSat == null) {
       return '';
     }
@@ -69,31 +68,31 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     var distanceApart = Math.sqrt(distanceApartX + distanceApartY + distanceApartZ).toFixed(0);
     return '<br />' + distanceApart + ' km';
   };
-  lookangles.getsensorinfo = function () {
-    $('#sensor-latitude').html(lookangles.currentSensor.lat);
-    $('#sensor-longitude').html(lookangles.currentSensor.long);
-    $('#sensor-minazimuth').html(lookangles.currentSensor.obsminaz);
-    $('#sensor-maxazimuth').html(lookangles.currentSensor.obsmaxaz);
-    $('#sensor-minelevation').html(lookangles.currentSensor.obsminel);
-    $('#sensor-maxelevation').html(lookangles.currentSensor.obsmaxel);
-    $('#sensor-minrange').html(lookangles.currentSensor.obsminrange);
-    $('#sensor-maxrange').html(lookangles.currentSensor.obsmaxrange);
+  satellite.getsensorinfo = function () {
+    $('#sensor-latitude').html(satellite.currentSensor.lat);
+    $('#sensor-longitude').html(satellite.currentSensor.long);
+    $('#sensor-minazimuth').html(satellite.currentSensor.obsminaz);
+    $('#sensor-maxazimuth').html(satellite.currentSensor.obsmaxaz);
+    $('#sensor-minelevation').html(satellite.currentSensor.obsminel);
+    $('#sensor-maxelevation').html(satellite.currentSensor.obsmaxel);
+    $('#sensor-minrange').html(satellite.currentSensor.obsminrange);
+    $('#sensor-maxrange').html(satellite.currentSensor.obsmaxrange);
   };
-  lookangles.setobs = function (sensor, reset) {
+  satellite.setobs = function (sensor, reset) {
     /** obslat is what is used to determine if a site is set or not. If this is null sensorSelected() will return false */
     if (reset) {
-      lookangles.currentSensor = lookangles.defaultSensor;
+      satellite.currentSensor = satellite.defaultSensor;
       return;
     }
 
-    lookangles.currentSensor = sensor;
-    lookangles.currentSensor.observerGd = {   // Array to calculate look angles in propagate()
+    satellite.currentSensor = sensor;
+    satellite.currentSensor.observerGd = {   // Array to calculate look angles in propagate()
       latitude: sensor.lat * DEG2RAD,
       longitude: sensor.long * DEG2RAD,
       height: sensor.obshei * 1               // Converts from string to number TODO: Find correct way to convert string to integer
     };
   };
-  lookangles.altitudeCheck = function (TLE1, TLE2, propOffset) {
+  satellite.altitudeCheck = function (TLE1, TLE2, propOffset) {
     var satrec = satellite.twoline2satrec(TLE1, TLE2);// perform and store sat init calcs
     var propTime = propTimeCheck(propOffset, timeManager.propRealTime);
     var j = timeManager.jday(propTime.getUTCFullYear(),
@@ -116,7 +115,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     }
     return gpos.height;
   };
-  lookangles.getTEARR = function (sat) {
+  satellite.getTEARR = function (sat) {
     // Set default timing settings. These will be changed to find look angles at different times in future.
     timeManager.propRealTime = Date.now();
     var propOffset = getPropOffset();               // offset letting us propagate in the future (or past)
@@ -138,54 +137,54 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
 
     try {
       gpos = satellite.eciToGeodetic(pv.position, gmst);
-      lookangles.currentTEARR.altitude = gpos.height;
-      lookangles.currentTEARR.lon = gpos.longitude;
-      lookangles.currentTEARR.lat = gpos.latitude;
+      satellite.currentTEARR.altitude = gpos.height;
+      satellite.currentTEARR.lon = gpos.longitude;
+      satellite.currentTEARR.lat = gpos.latitude;
       positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
-      lookAngles = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf);
-      lookangles.currentTEARR.azimuth = lookAngles.azimuth * RAD2DEG;
-      lookangles.currentTEARR.elevation = lookAngles.elevation * RAD2DEG;
-      lookangles.currentTEARR.range = lookAngles.rangeSat;
+      lookAngles = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf);
+      satellite.currentTEARR.azimuth = lookAngles.azimuth * RAD2DEG;
+      satellite.currentTEARR.elevation = lookAngles.elevation * RAD2DEG;
+      satellite.currentTEARR.range = lookAngles.rangeSat;
     } catch (e) {
-      lookangles.currentTEARR.altitude = 0;
-      lookangles.currentTEARR.lon = 0;
-      lookangles.currentTEARR.lat = 0;
+      satellite.currentTEARR.altitude = 0;
+      satellite.currentTEARR.lon = 0;
+      satellite.currentTEARR.lat = 0;
       positionEcf = 0;
       lookAngles = 0;
-      lookangles.currentTEARR.azimuth = 0;
-      lookangles.currentTEARR.elevation = 0;
-      lookangles.currentTEARR.range = 0;
+      satellite.currentTEARR.azimuth = 0;
+      satellite.currentTEARR.elevation = 0;
+      satellite.currentTEARR.range = 0;
     }
 
-    if (lookangles.currentSensor.obsminaz > lookangles.currentSensor.obsmaxaz) {
-      if (((lookangles.currentTEARR.azimuth >= lookangles.currentSensor.obsminaz || lookangles.currentTEARR.azimuth <= lookangles.currentSensor.obsmaxaz) &&
-           (lookangles.currentTEARR.elevation >= lookangles.currentSensor.obsminel && lookangles.currentTEARR.elevation <= lookangles.currentSensor.obsmaxel) &&
-           (lookangles.currentTEARR.range <= lookangles.currentSensor.obsmaxrange && lookangles.currentTEARR.range >= lookangles.currentSensor.obsminrange)) ||
-           ((lookangles.currentTEARR.azimuth >= lookangles.currentSensor.obsminaz2 || lookangles.currentTEARR.azimuth <= lookangles.currentSensor.obsmaxaz2) &&
-           (lookangles.currentTEARR.elevation >= lookangles.currentSensor.obsminel2 && lookangles.currentTEARR.elevation <= lookangles.currentSensor.obsmaxel2) &&
-           (lookangles.currentTEARR.range <= lookangles.currentSensor.obsmaxrange2 && lookangles.currentTEARR.range >= lookangles.currentSensor.obsminrange2))) {
-        lookangles.currentTEARR.inview = true;
+    if (satellite.currentSensor.obsminaz > satellite.currentSensor.obsmaxaz) {
+      if (((satellite.currentTEARR.azimuth >= satellite.currentSensor.obsminaz || satellite.currentTEARR.azimuth <= satellite.currentSensor.obsmaxaz) &&
+           (satellite.currentTEARR.elevation >= satellite.currentSensor.obsminel && satellite.currentTEARR.elevation <= satellite.currentSensor.obsmaxel) &&
+           (satellite.currentTEARR.range <= satellite.currentSensor.obsmaxrange && satellite.currentTEARR.range >= satellite.currentSensor.obsminrange)) ||
+           ((satellite.currentTEARR.azimuth >= satellite.currentSensor.obsminaz2 || satellite.currentTEARR.azimuth <= satellite.currentSensor.obsmaxaz2) &&
+           (satellite.currentTEARR.elevation >= satellite.currentSensor.obsminel2 && satellite.currentTEARR.elevation <= satellite.currentSensor.obsmaxel2) &&
+           (satellite.currentTEARR.range <= satellite.currentSensor.obsmaxrange2 && satellite.currentTEARR.range >= satellite.currentSensor.obsminrange2))) {
+        satellite.currentTEARR.inview = true;
       } else {
-        lookangles.currentTEARR.inview = false;
+        satellite.currentTEARR.inview = false;
       }
     } else {
-      if (((lookangles.currentTEARR.azimuth >= lookangles.currentSensor.obsminaz && lookangles.currentTEARR.azimuth <= lookangles.currentSensor.obsmaxaz) &&
-           (lookangles.currentTEARR.elevation >= lookangles.currentSensor.obsminel && lookangles.currentTEARR.elevation <= lookangles.currentSensor.obsmaxel) &&
-           (lookangles.currentTEARR.range <= lookangles.currentSensor.obsmaxrange && lookangles.currentTEARR.range >= lookangles.currentSensor.obsminrange)) ||
-           ((lookangles.currentTEARR.azimuth >= lookangles.currentSensor.obsminaz2 && lookangles.currentTEARR.azimuth <= lookangles.currentSensor.obsmaxaz2) &&
-           (lookangles.currentTEARR.elevation >= lookangles.currentSensor.obsminel2 && lookangles.currentTEARR.elevation <= lookangles.currentSensor.obsmaxel2) &&
-           (lookangles.currentTEARR.range <= lookangles.currentSensor.obsmaxrange2 && lookangles.currentTEARR.range >= lookangles.currentSensor.obsminrange2))) {
-        lookangles.currentTEARR.inview = true;
+      if (((satellite.currentTEARR.azimuth >= satellite.currentSensor.obsminaz && satellite.currentTEARR.azimuth <= satellite.currentSensor.obsmaxaz) &&
+           (satellite.currentTEARR.elevation >= satellite.currentSensor.obsminel && satellite.currentTEARR.elevation <= satellite.currentSensor.obsmaxel) &&
+           (satellite.currentTEARR.range <= satellite.currentSensor.obsmaxrange && satellite.currentTEARR.range >= satellite.currentSensor.obsminrange)) ||
+           ((satellite.currentTEARR.azimuth >= satellite.currentSensor.obsminaz2 && satellite.currentTEARR.azimuth <= satellite.currentSensor.obsmaxaz2) &&
+           (satellite.currentTEARR.elevation >= satellite.currentSensor.obsminel2 && satellite.currentTEARR.elevation <= satellite.currentSensor.obsmaxel2) &&
+           (satellite.currentTEARR.range <= satellite.currentSensor.obsmaxrange2 && satellite.currentTEARR.range >= satellite.currentSensor.obsminrange2))) {
+        satellite.currentTEARR.inview = true;
       } else {
-        lookangles.currentTEARR.inview = false;
+        satellite.currentTEARR.inview = false;
       }
     }
   };
-  lookangles.nextpass = function (sat) {
+  satellite.nextpass = function (sat) {
     var propOffset = getPropOffset();
     var propTempOffset = 0;
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-    for (var i = 0; i < (lookangles.lookanglesLength * 24 * 60 * 60); i += lookangles.lookanglesInterval) {         // 5second Looks
+    for (var i = 0; i < (satellite.lookanglesLength * 24 * 60 * 60); i += satellite.lookanglesInterval) {         // 5second Looks
       propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
       var now = propTimeCheck(propTempOffset, timeManager.propRealTime);
       var j = timeManager.jday(now.getUTCFullYear(),
@@ -202,38 +201,38 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       var positionEcf, lookAngles, azimuth, elevation, range;
 
       positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
-      lookAngles = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf);
+      lookAngles = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf);
       azimuth = lookAngles.azimuth * RAD2DEG;
       elevation = lookAngles.elevation * RAD2DEG;
       range = lookAngles.rangeSat;
 
-      if (lookangles.currentSensor.obsminaz > lookangles.currentSensor.obsmaxaz) {
-        if (((azimuth >= lookangles.currentSensor.obsminaz || azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
-           ((azimuth >= lookangles.currentSensor.obsminaz2 || azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
+      if (satellite.currentSensor.obsminaz > satellite.currentSensor.obsmaxaz) {
+        if (((azimuth >= satellite.currentSensor.obsminaz || azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
+           ((azimuth >= satellite.currentSensor.obsminaz2 || azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
           return timeManager.dateFormat(now, 'isoDateTime', true);
         }
       } else {
-        if (((azimuth >= lookangles.currentSensor.obsminaz && azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
-           ((azimuth >= lookangles.currentSensor.obsminaz2 && azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
+        if (((azimuth >= satellite.currentSensor.obsminaz && azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
+           ((azimuth >= satellite.currentSensor.obsminaz2 && azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
           return timeManager.dateFormat(now, 'isoDateTime', true);
         }
       }
     }
-    return 'No Passes in ' + lookangles.lookanglesLength + ' Days';
+    return 'No Passes in ' + satellite.lookanglesLength + ' Days';
   };
-  lookangles.getlookanglesMultiSite = function (sat, isLookanglesMultiSiteMenuOpen) {
+  satellite.getlookanglesMultiSite = function (sat, isLookanglesMultiSiteMenuOpen) {
     if (!isLookanglesMultiSiteMenuOpen) return;
 
     var resetWhenDone = false;
-    if (!lookangles.sensorSelected()) { resetWhenDone = true; }
+    if (!satellite.sensorSelected()) { resetWhenDone = true; }
 
     // Set default timing settings. These will be changed to find look angles at different times in future.
     var propTempOffset = 0;               // offset letting us propagate in the future (or past)
     // timeManager.propRealTime = Date.now();      // Set current time
 
     var propOffset = getPropOffset();
-    lookangles.tempSensor = lookangles.currentSensor;
-    lookangles.setobs(lookangles.sensorListUS[0]);
+    satellite.tempSensor = satellite.currentSensor;
+    satellite.setobs(satellite.sensorListUS[0]);
 
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
     var orbitalPeriod = MINUTES_PER_DAY / (satrec.no * MINUTES_PER_DAY / TAU); // Seconds in a day divided by mean motion
@@ -261,14 +260,14 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     tdS.appendChild(document.createTextNode('Sensor'));
     tdS.setAttribute('style', 'text-decoration: underline');
 
-    for (var i = 0; i < (lookangles.lookanglesLength * 24 * 60 * 60); i += lookangles.lookanglesInterval) {         // 5second Looks
+    for (var i = 0; i < (satellite.lookanglesLength * 24 * 60 * 60); i += satellite.lookanglesInterval) {         // 5second Looks
       propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
       tblLength += propagateMultiSite(propTempOffset, tbl, satrec, sensor);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
       if (tblLength > lastTblLength) {                           // Maximum of 1500 lines in the look angles table
         lastTblLength++;
         if (howManyPasses === 1) { // When 3 passes have been complete - looks weird with 1 instead of 0
           sensor++;
-          lookangles.setobs(lookangles.sensorListUS[sensor]);
+          satellite.setobs(satellite.sensorListUS[sensor]);
           i = 0;
           howManyPasses = 6; // Reset to 3 passes
         } else {
@@ -276,20 +275,20 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
           i = i + (orbitalPeriod * 60 * 0.75); // Jump 3/4th to the next orbit
         }
       }
-      if (sensor === lookangles.sensorListUS.length - 1) {
-        (resetWhenDone) ? lookangles.currentSensor = lookangles.defaultSensor : lookangles.currentSensor = lookangles.tempSensor;
+      if (sensor === satellite.sensorListUS.length - 1) {
+        (resetWhenDone) ? satellite.currentSensor = satellite.defaultSensor : satellite.currentSensor = satellite.tempSensor;
         break;
       }
-      if (sensor < lookangles.sensorListUS.length - 1 && i >= (lookangles.lookanglesLength * 24 * 60 * 60) - lookangles.lookanglesInterval) { // Move to next sensor if this sensor doesn't have enough passes.
+      if (sensor < satellite.sensorListUS.length - 1 && i >= (satellite.lookanglesLength * 24 * 60 * 60) - satellite.lookanglesInterval) { // Move to next sensor if this sensor doesn't have enough passes.
         sensor++;
-        lookangles.setobs(lookangles.sensorListUS[sensor]);
+        satellite.setobs(satellite.sensorListUS[sensor]);
         i = 0;
         howManyPasses = 6;
       }
     }
-    (resetWhenDone) ? lookangles.currentSensor = lookangles.defaultSensor : lookangles.currentSensor = lookangles.tempSensor;
+    (resetWhenDone) ? satellite.currentSensor = satellite.defaultSensor : satellite.currentSensor = satellite.tempSensor;
   };
-  lookangles.getOrbitByLatLon = function (sat, goalLat, goalLon, upOrDown, propOffset) {
+  satellite.getOrbitByLatLon = function (sat, goalLat, goalLon, upOrDown, propOffset) {
     /**
      * Function to brute force find an orbit over a sites lattiude and longitude
      * @param  object       sat             satellite object with satrec
@@ -483,8 +482,8 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
         return 2;
       }
 
-      lat = satellite.degrees_lat(gpos.latitude) * 1;
-      lon = satellite.degrees_long(gpos.longitude) * 1;
+      lat = satellite.degreesLat(gpos.latitude) * 1;
+      lon = satellite.degreesLong(gpos.longitude) * 1;
 
       if (lastLat == null) { // Set it the first time
         lastLat = lat;
@@ -528,11 +527,11 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       return 0;
     }
   };
-  lookangles.getlookangles = function (sat, isLookanglesMenuOpen) {
+  satellite.getlookangles = function (sat, isLookanglesMenuOpen) {
     if (!isLookanglesMenuOpen) {
       return;
     }
-    if (lookangles.sensorSelected()) {
+    if (satellite.sensorSelected()) {
       // Set default timing settings. These will be changed to find look angles at different times in future.
       var propTempOffset = 0;               // offset letting us propagate in the future (or past)
       // timeManager.propRealTime = Date.now();      // Set current time
@@ -558,12 +557,12 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       tdR.appendChild(document.createTextNode('Rng'));
       tdR.setAttribute('style', 'text-decoration: underline');
 
-      if (lookangles.isRiseSetLookangles) {
-        var tempLookanglesInterval = lookangles.lookanglesInterval;
-        lookangles.lookanglesInterval = 1;
+      if (satellite.isRiseSetLookangles) {
+        var tempLookanglesInterval = satellite.lookanglesInterval;
+        satellite.lookanglesInterval = 1;
       }
 
-      for (var i = 0; i < (lookangles.lookanglesLength * 24 * 60 * 60); i += lookangles.lookanglesInterval) {         // lookangles.lookanglesInterval in seconds
+      for (var i = 0; i < (satellite.lookanglesLength * 24 * 60 * 60); i += satellite.lookanglesInterval) {         // satellite.lookanglesInterval in seconds
         propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
         if (tblLength >= 1500) {                           // Maximum of 1500 lines in the look angles table
           break;                                            // No more updates to the table (Prevent GEO object slowdown)
@@ -571,12 +570,12 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
         tblLength += propagate(propTempOffset, tbl, satrec);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
       }
 
-      if (lookangles.isRiseSetLookangles) {
-        lookangles.lookanglesInterval = tempLookanglesInterval;
+      if (satellite.isRiseSetLookangles) {
+        satellite.lookanglesInterval = tempLookanglesInterval;
       }
     }
   };
-  lookangles.map = function (sat, i) {
+  satellite.map = function (sat, i) {
     // Set default timing settings. These will be changed to find look angles at different times in future.
     var propOffset = getPropOffset();
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
@@ -601,26 +600,26 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
 
       gpos = satellite.eciToGeodetic(pv.position, gmst);
 
-      lat = satellite.degrees_lat(gpos.latitude);
-      lon = satellite.degrees_long(gpos.longitude);
+      lat = satellite.degreesLat(gpos.latitude);
+      lon = satellite.degreesLong(gpos.longitude);
       var time = timeManager.dateFormat(now, 'isoDateTime', true);
 
       var positionEcf, lookAngles, azimuth, elevation, range;
       positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
-      lookAngles = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf);
+      lookAngles = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf);
       azimuth = lookAngles.azimuth * RAD2DEG;
       elevation = lookAngles.elevation * RAD2DEG;
       range = lookAngles.rangeSat;
       var inview = 0;
 
-      if (lookangles.currentSensor.obsminaz < lookangles.currentSensor.obsmaxaz) {
-        if (((azimuth >= lookangles.currentSensor.obsminaz && azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
-           ((azimuth >= lookangles.currentSensor.obsminaz2 && azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
+      if (satellite.currentSensor.obsminaz < satellite.currentSensor.obsmaxaz) {
+        if (((azimuth >= satellite.currentSensor.obsminaz && azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
+           ((azimuth >= satellite.currentSensor.obsminaz2 && azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
           inview = 1;
         }
       } else {
-        if (((azimuth >= lookangles.currentSensor.obsminaz || azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
-           ((azimuth >= lookangles.currentSensor.obsminaz2 || azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
+        if (((azimuth >= satellite.currentSensor.obsminaz || azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
+           ((azimuth >= satellite.currentSensor.obsminaz2 || azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
           inview = 1;
         }
       }
@@ -654,22 +653,22 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     var positionEcf, lookAngles, azimuth, elevation, range;
 
     positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
-    lookAngles = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf);
+    lookAngles = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf);
     azimuth = lookAngles.azimuth * RAD2DEG;
     elevation = lookAngles.elevation * RAD2DEG;
     range = lookAngles.rangeSat;
 
-    if (lookangles.currentSensor.obsminaz < lookangles.currentSensor.obsmaxaz) {
-      if (!((azimuth >= lookangles.currentSensor.obsminaz && azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
-      ((azimuth >= lookangles.currentSensor.obsminaz2 && azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
+    if (satellite.currentSensor.obsminaz < satellite.currentSensor.obsmaxaz) {
+      if (!((azimuth >= satellite.currentSensor.obsminaz && azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
+      ((azimuth >= satellite.currentSensor.obsminaz2 && azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
         return 0;
       }
     }
-    if (((azimuth >= lookangles.currentSensor.obsminaz || azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
-    ((azimuth >= lookangles.currentSensor.obsminaz2 || azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
-      if (lookangles.isRiseSetLookangles) {
+    if (((azimuth >= satellite.currentSensor.obsminaz || azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
+    ((azimuth >= satellite.currentSensor.obsminaz2 || azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
+      if (satellite.isRiseSetLookangles) {
         // Previous Pass to Calculate first line of coverage
-        var now1 = propTimeCheck(propTempOffset - (lookangles.lookanglesInterval * 1000), timeManager.propRealTime);
+        var now1 = propTimeCheck(propTempOffset - (satellite.lookanglesInterval * 1000), timeManager.propRealTime);
         var j1 = timeManager.jday(now1.getUTCFullYear(),
         now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
         now1.getUTCDate(),
@@ -684,12 +683,12 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
         var positionEcf1, lookAngles1, azimuth1, elevation1, range1;
 
         positionEcf1 = satellite.eciToEcf(pv1.position, gmst1); // pv.position is called positionEci originally
-        lookAngles1 = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf1);
+        lookAngles1 = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf1);
         azimuth1 = lookAngles1.azimuth * RAD2DEG;
         elevation1 = lookAngles1.elevation * RAD2DEG;
         range1 = lookAngles1.rangeSat;
-        if (!((azimuth >= lookangles.currentSensor.obsminaz || azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
-        ((azimuth >= lookangles.currentSensor.obsminaz2 || azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
+        if (!((azimuth >= satellite.currentSensor.obsminaz || azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
+        ((azimuth >= satellite.currentSensor.obsminaz2 || azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
           var tr = tbl.insertRow();
           var tdT = tr.insertCell();
           tdT.appendChild(document.createTextNode(timeManager.dateFormat(now, 'isoDateTime', true)));
@@ -703,7 +702,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
           return 1;
         } else {
           // Next Pass to Calculate Last line of coverage
-          now1 = propTimeCheck(propTempOffset + (lookangles.lookanglesInterval * 1000), timeManager.propRealTime);
+          now1 = propTimeCheck(propTempOffset + (satellite.lookanglesInterval * 1000), timeManager.propRealTime);
           j1 = timeManager.jday(now1.getUTCFullYear(),
           now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
           now1.getUTCDate(),
@@ -717,12 +716,12 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
           pv1 = satellite.sgp4(satrec, m1);
 
           positionEcf1 = satellite.eciToEcf(pv1.position, gmst1); // pv.position is called positionEci originally
-          lookAngles1 = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf1);
+          lookAngles1 = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf1);
           azimuth1 = lookAngles1.azimuth * RAD2DEG;
           elevation1 = lookAngles1.elevation * RAD2DEG;
           range1 = lookAngles1.rangeSat;
-          if (!((azimuth1 >= lookangles.currentSensor.obsminaz || azimuth1 <= lookangles.currentSensor.obsmaxaz) && (elevation1 >= lookangles.currentSensor.obsminel && elevation1 <= lookangles.currentSensor.obsmaxel) && (range1 <= lookangles.currentSensor.obsmaxrange && range1 >= lookangles.currentSensor.obsminrange)) ||
-          ((azimuth1 >= lookangles.currentSensor.obsminaz2 || azimuth1 <= lookangles.currentSensor.obsmaxaz2) && (elevation1 >= lookangles.currentSensor.obsminel2 && elevation1 <= lookangles.currentSensor.obsmaxel2) && (range1 <= lookangles.currentSensor.obsmaxrange2 && range1 >= lookangles.currentSensor.obsminrange2))) {
+          if (!((azimuth1 >= satellite.currentSensor.obsminaz || azimuth1 <= satellite.currentSensor.obsmaxaz) && (elevation1 >= satellite.currentSensor.obsminel && elevation1 <= satellite.currentSensor.obsmaxel) && (range1 <= satellite.currentSensor.obsmaxrange && range1 >= satellite.currentSensor.obsminrange)) ||
+          ((azimuth1 >= satellite.currentSensor.obsminaz2 || azimuth1 <= satellite.currentSensor.obsmaxaz2) && (elevation1 >= satellite.currentSensor.obsminel2 && elevation1 <= satellite.currentSensor.obsmaxel2) && (range1 <= satellite.currentSensor.obsmaxrange2 && range1 >= satellite.currentSensor.obsminrange2))) {
             tr = tbl.insertRow();
             tdT = tr.insertCell();
             tdT.appendChild(document.createTextNode(timeManager.dateFormat(now, 'isoDateTime', true)));
@@ -755,7 +754,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
   }
   function propagateMultiSite (propTempOffset, tbl, satrec, sensor) {
     // Changes Sensor Name for Lookangles Table
-    sensor = lookangles.sensorListUS[sensor].googleName;
+    sensor = satellite.sensorListUS[sensor].googleName;
     var propRealTimeTemp = Date.now();
     var now = propTimeCheck(propTempOffset, propRealTimeTemp);
     var j = timeManager.jday(now.getUTCFullYear(),
@@ -772,19 +771,19 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     var positionEcf, lookAngles, azimuth, elevation, range;
 
     positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
-    lookAngles = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf);
+    lookAngles = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf);
     azimuth = lookAngles.azimuth * RAD2DEG;
     elevation = lookAngles.elevation * RAD2DEG;
     range = lookAngles.rangeSat;
 
-    if (lookangles.currentSensor.obsminaz < lookangles.currentSensor.obsmaxaz) {
-      if (!((azimuth >= lookangles.currentSensor.obsminaz && azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
-      ((azimuth >= lookangles.currentSensor.obsminaz2 && azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
+    if (satellite.currentSensor.obsminaz < satellite.currentSensor.obsmaxaz) {
+      if (!((azimuth >= satellite.currentSensor.obsminaz && azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
+      ((azimuth >= satellite.currentSensor.obsminaz2 && azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
         return 0;
       }
     }
-    if (((azimuth >= lookangles.currentSensor.obsminaz || azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
-    ((azimuth >= lookangles.currentSensor.obsminaz2 || azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
+    if (((azimuth >= satellite.currentSensor.obsminaz || azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
+    ((azimuth >= satellite.currentSensor.obsminaz2 || azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
       var tr;
       if (tbl.rows.length > 0) {
         // console.log(tbl.rows[0].cells[0].textContent);

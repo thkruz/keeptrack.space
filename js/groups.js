@@ -134,7 +134,7 @@
       $('#legend-list-velocity').hide();
       switch (colorName) {
         case 'default':
-          if (lookangles.sensorSelected()) {
+          if (satellite.sensorSelected()) {
             $('#legend-list-default-sensor').show();
           } else {
             $('#legend-list-default').show();

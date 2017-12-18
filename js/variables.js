@@ -755,7 +755,7 @@ $.ajaxSetup({
           setlatlong: true,
           sensor: sensorManager.selectedSensor
         });
-        lookangles.setobs(sensorManager.selectedSensor);
+        satellite.setobs(sensorManager.selectedSensor);
 
         $('#sensor-info-title').html("<a class='iframe' href='" + sensorManager.selectedSensor.url + "'>" + sensorManager.selectedSensor.name + '</a>');
         $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
@@ -769,7 +769,7 @@ $.ajaxSetup({
         }
         camSnap(latToPitch(sensorManager.selectedSensor.lat), longToYaw(sensorManager.selectedSensor.long));
         changeZoom(sensorManager.selectedSensor.zoom);
-        lookangles.getsensorinfo();
+        satellite.getsensorinfo();
       }
     }
   };

@@ -239,7 +239,7 @@
                  earthNow.getUTCSeconds());
     earthJ += earthNow.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
 
-    earthEra = satellite.gstime_from_jday(earthJ);
+    earthEra = satellite.gstime(earthJ);
 
     lightDirection = sun.currentDirection();
     vec3.normalize(lightDirection, lightDirection);

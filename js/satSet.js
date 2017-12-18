@@ -636,12 +636,12 @@
         satVel[i * 3 + 1] * satVel[i * 3 + 1] +
         satVel[i * 3 + 2] * satVel[i * 3 + 2]
       );
-      // ret.altitude = lookangles.altitude;
-      // ret.longitude = lookangles.lon;
-      // ret.latitude = lookangles.lat;
-      // ret.azimuth = lookangles.azimuth;
-      // ret.elevation = lookangles.elevation;
-      // ret.range = lookangles.range;
+      // ret.altitude = satellite.altitude;
+      // ret.longitude = satellite.lon;
+      // ret.latitude = satellite.lat;
+      // ret.azimuth = satellite.azimuth;
+      // ret.elevation = satellite.elevation;
+      // ret.range = satellite.range;
       ret.position = {
         x: satPos[i * 3],
         y: satPos[i * 3 + 1],

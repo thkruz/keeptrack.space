@@ -103,14 +103,14 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
                  propTime.getUTCMinutes(),
                  propTime.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
     j += propTime.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-    var gmst = satellite.gstime_from_jday(j);
+    var gmst = satellite.gstime(j);
 
     var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
     var pv = satellite.sgp4(satrec, m);
     var gpos;
 
     try {
-      gpos = satellite.eci_to_geodetic(pv.position, gmst);
+      gpos = satellite.eciToGeodetic(pv.position, gmst);
     } catch (e) {
       return 0; // Auto fail the altitude check
     }
@@ -129,7 +129,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
                  now.getUTCMinutes(),
                  now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
     j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-    var gmst = satellite.gstime_from_jday(j);
+    var gmst = satellite.gstime(j);
 
     var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
     var pv = satellite.sgp4(satrec, m);
@@ -137,15 +137,15 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     var gpos;
 
     try {
-      gpos = satellite.eci_to_geodetic(pv.position, gmst);
+      gpos = satellite.eciToGeodetic(pv.position, gmst);
       lookangles.currentTEARR.altitude = gpos.height;
       lookangles.currentTEARR.lon = gpos.longitude;
       lookangles.currentTEARR.lat = gpos.latitude;
-      positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
-      lookAngles = satellite.ecf_to_look_angles(lookangles.currentSensor.observerGd, positionEcf);
+      positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
+      lookAngles = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf);
       lookangles.currentTEARR.azimuth = lookAngles.azimuth * RAD2DEG;
       lookangles.currentTEARR.elevation = lookAngles.elevation * RAD2DEG;
-      lookangles.currentTEARR.range = lookAngles.range_sat;
+      lookangles.currentTEARR.range = lookAngles.rangeSat;
     } catch (e) {
       lookangles.currentTEARR.altitude = 0;
       lookangles.currentTEARR.lon = 0;
@@ -195,17 +195,17 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       now.getUTCMinutes(),
       now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
       j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-      var gmst = satellite.gstime_from_jday(j);
+      var gmst = satellite.gstime(j);
 
       var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
       var pv = satellite.sgp4(satrec, m);
       var positionEcf, lookAngles, azimuth, elevation, range;
 
-      positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
-      lookAngles = satellite.ecf_to_look_angles(lookangles.currentSensor.observerGd, positionEcf);
+      positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
+      lookAngles = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf);
       azimuth = lookAngles.azimuth * RAD2DEG;
       elevation = lookAngles.elevation * RAD2DEG;
-      range = lookAngles.range_sat;
+      range = lookAngles.rangeSat;
 
       if (lookangles.currentSensor.obsminaz > lookangles.currentSensor.obsmaxaz) {
         if (((azimuth >= lookangles.currentSensor.obsminaz || azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
@@ -470,7 +470,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
                    now.getUTCMinutes(),
                    now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
       j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-      var gmst = satellite.gstime_from_jday(j);
+      var gmst = satellite.gstime(j);
 
       var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
       var pv = satellite.sgp4(satrec, m);
@@ -478,7 +478,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       var gpos, lat, lon;
 
       try {
-        gpos = satellite.eci_to_geodetic(pv.position, gmst);
+        gpos = satellite.eciToGeodetic(pv.position, gmst);
       } catch (err) {
         return 2;
       }
@@ -592,25 +592,25 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
                    now.getUTCMinutes(),
                    now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
       j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-      var gmst = satellite.gstime_from_jday(j);
+      var gmst = satellite.gstime(j);
 
       var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
       var pv = satellite.sgp4(satrec, m);
 
       var gpos, lat, lon;
 
-      gpos = satellite.eci_to_geodetic(pv.position, gmst);
+      gpos = satellite.eciToGeodetic(pv.position, gmst);
 
       lat = satellite.degrees_lat(gpos.latitude);
       lon = satellite.degrees_long(gpos.longitude);
       var time = timeManager.dateFormat(now, 'isoDateTime', true);
 
       var positionEcf, lookAngles, azimuth, elevation, range;
-      positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
-      lookAngles = satellite.ecf_to_look_angles(lookangles.currentSensor.observerGd, positionEcf);
+      positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
+      lookAngles = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf);
       azimuth = lookAngles.azimuth * RAD2DEG;
       elevation = lookAngles.elevation * RAD2DEG;
-      range = lookAngles.range_sat;
+      range = lookAngles.rangeSat;
       var inview = 0;
 
       if (lookangles.currentSensor.obsminaz < lookangles.currentSensor.obsmaxaz) {
@@ -647,17 +647,17 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     now.getUTCMinutes(),
     now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
     j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-    var gmst = satellite.gstime_from_jday(j);
+    var gmst = satellite.gstime(j);
 
     var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
     var pv = satellite.sgp4(satrec, m);
     var positionEcf, lookAngles, azimuth, elevation, range;
 
-    positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
-    lookAngles = satellite.ecf_to_look_angles(lookangles.currentSensor.observerGd, positionEcf);
+    positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
+    lookAngles = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf);
     azimuth = lookAngles.azimuth * RAD2DEG;
     elevation = lookAngles.elevation * RAD2DEG;
-    range = lookAngles.range_sat;
+    range = lookAngles.rangeSat;
 
     if (lookangles.currentSensor.obsminaz < lookangles.currentSensor.obsmaxaz) {
       if (!((azimuth >= lookangles.currentSensor.obsminaz && azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
@@ -677,17 +677,17 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
         now1.getUTCMinutes(),
         now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
         j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-        var gmst1 = satellite.gstime_from_jday(j1);
+        var gmst1 = satellite.gstime(j1);
 
         var m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
         var pv1 = satellite.sgp4(satrec, m1);
         var positionEcf1, lookAngles1, azimuth1, elevation1, range1;
 
-        positionEcf1 = satellite.eci_to_ecf(pv1.position, gmst1); // pv.position is called positionEci originally
-        lookAngles1 = satellite.ecf_to_look_angles(lookangles.currentSensor.observerGd, positionEcf1);
+        positionEcf1 = satellite.eciToEcf(pv1.position, gmst1); // pv.position is called positionEci originally
+        lookAngles1 = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf1);
         azimuth1 = lookAngles1.azimuth * RAD2DEG;
         elevation1 = lookAngles1.elevation * RAD2DEG;
-        range1 = lookAngles1.range_sat;
+        range1 = lookAngles1.rangeSat;
         if (!((azimuth >= lookangles.currentSensor.obsminaz || azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||
         ((azimuth >= lookangles.currentSensor.obsminaz2 || azimuth <= lookangles.currentSensor.obsmaxaz2) && (elevation >= lookangles.currentSensor.obsminel2 && elevation <= lookangles.currentSensor.obsmaxel2) && (range <= lookangles.currentSensor.obsmaxrange2 && range >= lookangles.currentSensor.obsminrange2))) {
           var tr = tbl.insertRow();
@@ -711,16 +711,16 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
           now1.getUTCMinutes(),
           now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
           j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-          gmst1 = satellite.gstime_from_jday(j1);
+          gmst1 = satellite.gstime(j1);
 
           m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
           pv1 = satellite.sgp4(satrec, m1);
 
-          positionEcf1 = satellite.eci_to_ecf(pv1.position, gmst1); // pv.position is called positionEci originally
-          lookAngles1 = satellite.ecf_to_look_angles(lookangles.currentSensor.observerGd, positionEcf1);
+          positionEcf1 = satellite.eciToEcf(pv1.position, gmst1); // pv.position is called positionEci originally
+          lookAngles1 = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf1);
           azimuth1 = lookAngles1.azimuth * RAD2DEG;
           elevation1 = lookAngles1.elevation * RAD2DEG;
-          range1 = lookAngles1.range_sat;
+          range1 = lookAngles1.rangeSat;
           if (!((azimuth1 >= lookangles.currentSensor.obsminaz || azimuth1 <= lookangles.currentSensor.obsmaxaz) && (elevation1 >= lookangles.currentSensor.obsminel && elevation1 <= lookangles.currentSensor.obsmaxel) && (range1 <= lookangles.currentSensor.obsmaxrange && range1 >= lookangles.currentSensor.obsminrange)) ||
           ((azimuth1 >= lookangles.currentSensor.obsminaz2 || azimuth1 <= lookangles.currentSensor.obsmaxaz2) && (elevation1 >= lookangles.currentSensor.obsminel2 && elevation1 <= lookangles.currentSensor.obsmaxel2) && (range1 <= lookangles.currentSensor.obsmaxrange2 && range1 >= lookangles.currentSensor.obsminrange2))) {
             tr = tbl.insertRow();
@@ -765,17 +765,17 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     now.getUTCMinutes(),
     now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
     j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-    var gmst = satellite.gstime_from_jday(j);
+    var gmst = satellite.gstime(j);
 
     var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
     var pv = satellite.sgp4(satrec, m);
     var positionEcf, lookAngles, azimuth, elevation, range;
 
-    positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
-    lookAngles = satellite.ecf_to_look_angles(lookangles.currentSensor.observerGd, positionEcf);
+    positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
+    lookAngles = satellite.ecfToLookAngles(lookangles.currentSensor.observerGd, positionEcf);
     azimuth = lookAngles.azimuth * RAD2DEG;
     elevation = lookAngles.elevation * RAD2DEG;
-    range = lookAngles.range_sat;
+    range = lookAngles.rangeSat;
 
     if (lookangles.currentSensor.obsminaz < lookangles.currentSensor.obsmaxaz) {
       if (!((azimuth >= lookangles.currentSensor.obsminaz && azimuth <= lookangles.currentSensor.obsmaxaz) && (elevation >= lookangles.currentSensor.obsminel && elevation <= lookangles.currentSensor.obsmaxel) && (range <= lookangles.currentSensor.obsmaxrange && range >= lookangles.currentSensor.obsminrange)) ||

@@ -149,7 +149,7 @@ function propagate () {
                now.getUTCMinutes(),
                now.getUTCSeconds());
   j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-  var gmst = satellite.gstime_from_jday(j);
+  var gmst = satellite.gstime(j);
   var len = satCache.length - 1;
   var i = -1;
   while (i < len) {
@@ -206,12 +206,12 @@ function propagate () {
       sinLat = null;
       sinLon = null;
 
-      positionEcf = satellite.eci_to_ecf({x: x, y: y, z: z}, gmst); // pv.position is called positionEci originally
-      lookangles = satellite.ecf_to_look_angles(sensor.observerGd, positionEcf);
+      positionEcf = satellite.eciToEcf({x: x, y: y, z: z}, gmst); // pv.position is called positionEci originally
+      lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
 
       azimuth = lookangles.azimuth;
       elevation = lookangles.elevation;
-      rangeSat = lookangles.range_sat;
+      rangeSat = lookangles.rangeSat;
 
       azimuth *= RAD2DEG;
       elevation *= RAD2DEG;
@@ -244,14 +244,14 @@ function propagate () {
         vy = pv.velocity.y;
         vz = pv.velocity.z;
 
-        positionEcf = satellite.eci_to_ecf(pv.position, gmst); // pv.position is called positionEci originally
-        lookangles = satellite.ecf_to_look_angles(sensor.observerGd, positionEcf);
+        positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
+        lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
         // TODO: Might add dopplerFactor back in or to lookangles for HAM Radio use
         // dopplerFactor = satellite.dopplerFactor(observerCoordsEcf, positionEcf, velocityEcf);
 
         azimuth = lookangles.azimuth;
         elevation = lookangles.elevation;
-        rangeSat = lookangles.range_sat;
+        rangeSat = lookangles.rangeSat;
       } catch (e) {
         x = 0;
         y = 0;

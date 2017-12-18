@@ -90,7 +90,7 @@ onmessage = function (m) {
                      missileTime.getUTCMinutes(),
                      missileTime.getUTCSeconds());
         j += missileTime.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-        var gmst = satellite.gstime_from_jday(j);
+        var gmst = satellite.gstime(j);
 
         var cosLat = Math.cos(satCache[satId].latList[x] * DEG2RAD);
         var sinLat = Math.sin(satCache[satId].latList[x] * DEG2RAD);

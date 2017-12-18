@@ -232,6 +232,19 @@ var lastSelectedSat = -1;
     $('#search-results').perfectScrollbar();
 
     $(window).resize(function () {
+      if ($(window).width() > $(window).height()) {
+        settingsManager.mapWidth = $(window).width(); // Subtract 12 px for the scroll
+        $('#map-image').width(settingsManager.mapWidth);
+        settingsManager.mapHeight = settingsManager.mapWidth * 3 / 4;
+        $('#map-image').height(settingsManager.mapHeight);
+        $('#map-menu').width($(window).width());
+      } else {
+        settingsManager.mapHeight = $(window).height() - 100; // Subtract 12 px for the scroll
+        $('#map-image').height(settingsManager.mapHeight);
+        settingsManager.mapWidth = settingsManager.mapHeight * 4 / 3;
+        $('#map-image').width(settingsManager.mapWidth);
+        $('#map-menu').width($(window).width());
+      }
       if (!resizing) {
         window.setTimeout(function () {
           resizing = false;
@@ -323,22 +336,19 @@ var lastSelectedSat = -1;
       satSet.satDataString = null; // Clears stringified json file and clears 7MB of memory.
     });
 
-    // Resize Window Detection
-    $(window).resize(function () {
-      if ($(window).width() > $(window).height()) {
-        settingsManager.mapWidth = $(window).width(); // Subtract 12 px for the scroll
-        $('#map-image').width(settingsManager.mapWidth);
-        settingsManager.mapHeight = settingsManager.mapWidth * 3 / 4;
-        $('#map-image').height(settingsManager.mapHeight);
-        $('#map-menu').width($(window).width());
-      } else {
-        settingsManager.mapHeight = $(window).height() - 100; // Subtract 12 px for the scroll
-        $('#map-image').height(settingsManager.mapHeight);
-        settingsManager.mapWidth = settingsManager.mapHeight * 4 / 3;
-        $('#map-image').width(settingsManager.mapWidth);
-        $('#map-menu').width($(window).width());
-      }
-    });
+    if ($(window).width() > $(window).height()) {
+      settingsManager.mapWidth = $(window).width(); // Subtract 12 px for the scroll
+      $('#map-image').width(settingsManager.mapWidth);
+      settingsManager.mapHeight = settingsManager.mapWidth * 3 / 4;
+      $('#map-image').height(settingsManager.mapHeight);
+      $('#map-menu').width($(window).width());
+    } else {
+      settingsManager.mapHeight = $(window).height() - 100; // Subtract 12 px for the scroll
+      $('#map-image').height(settingsManager.mapHeight);
+      settingsManager.mapWidth = settingsManager.mapHeight * 4 / 3;
+      $('#map-image').width(settingsManager.mapWidth);
+      $('#map-menu').width($(window).width());
+    }
 
     $('#canvas').on('touchmove', function (evt) {
       evt.preventDefault();
@@ -549,7 +559,7 @@ var lastSelectedSat = -1;
     });
 
     $('#bottom-menu').on('click', '.FOV-object', function (evt) {
-      var objNum = $(this)['context']['textContent']; // TODO: Find correct code for this.
+      var objNum = $(this).context.textContent; // TODO: Find correct code for this.
       objNum = objNum.slice(-5);
       var satId = satSet.getIdFromObjNum(objNum);
       if (satId !== null) {
@@ -982,7 +992,7 @@ var lastSelectedSat = -1;
 
     $('#map-menu').on('click', '.map-look', function (evt) {
       settingsManager.mapUpdateOverride = true;
-      var time = $(this)['context']['attributes']['time']['value']; // TODO: Find correct code for this.
+      var time = $(this).context.attributes.time.value; // TODO: Find correct code for this.
       if (time !== null) {
         time = time.split(' ');
         time = new Date(time[0] + 'T' + time[1] + 'Z');
@@ -996,7 +1006,7 @@ var lastSelectedSat = -1;
     });
 
     $('#socrates-menu').on('click', '.socrates-object', function (evt) {
-      var hiddenRow = $(this)['context']['attributes']['hiddenrow']['value']; // TODO: Find correct code for this.
+      var hiddenRow = $(this).context.attributes.hiddenrow.value; // TODO: Find correct code for this.
       if (hiddenRow !== null) {
         socrates(hiddenRow);
       }
@@ -1159,7 +1169,7 @@ var lastSelectedSat = -1;
         var satId = satSet.getIdFromObjNum(scc);
         var mainsat = satSet.getSat(satId);
         var currentEpoch = lookangles.currentEpoch(time);
-        mainsat['TLE1'] = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
+        mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
 
         // TODO: Calculate current J-Day to change Epoch Date
 
@@ -1167,8 +1177,8 @@ var lastSelectedSat = -1;
         ga('send', 'event', 'New Launch', launchFac, 'Launch Site');
 
         var launchLat, launchLon;
-        launchLon = satellite.degrees_long(lookangles.lon);
-        launchLat = satellite.degrees_lat(lookangles.lat);
+        launchLon = satellite.degreesLong(lookangles.lon);
+        launchLat = satellite.degreesLat(lookangles.lat);
 
         camSnapMode = false;
 
@@ -1207,8 +1217,8 @@ var lastSelectedSat = -1;
           meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
 
           var iTLE2 = '2 ' + (80000 + i) + ' ' + inc + ' ' + TLE2.substr(17, 35) + meanmo + TLE2.substr(63);
-          sat['TLE1'] = iTLE1;
-          sat['TLE2'] = iTLE2;
+          sat.TLE1 = iTLE1;
+          sat.TLE2 = iTLE2;
           var iTLEs = lookangles.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, timeManager.propOffset);
           iTLE1 = iTLEs[0];
           iTLE2 = iTLEs[1];
@@ -1267,10 +1277,12 @@ var lastSelectedSat = -1;
           return;
         }
 
+        var a, b, attackerName;
+
         if (attacker < 200) { // USA
-          var a = attacker - 100;
-          var b = 500 - missilesInUse;
-          var attackerName = UsaICBM[a * 4 + 2];
+          a = attacker - 100;
+          b = 500 - missilesInUse;
+          attackerName = UsaICBM[a * 4 + 2];
           Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, UsaICBM[a * 4 + 2], 30, 2.9, 0.07, UsaICBM[a * 4 + 3]);
         } else if (attacker < 300) { // Russian
           a = attacker - 200;
@@ -1571,15 +1583,15 @@ var lastSelectedSat = -1;
 
     if (timeManager.now > lastBoxUpdateTime + 1000) {
       lookangles.getTEARR(satData);
-      if (satellite.degrees_long(lookangles.currentTEARR.lon) >= 0) {
-        $('#sat-longitude').html(satellite.degrees_long(lookangles.currentTEARR.lon).toFixed(3) + '°E');
+      if (satellite.degreesLong(lookangles.currentTEARR.lon) >= 0) {
+        $('#sat-longitude').html(satellite.degreesLong(lookangles.currentTEARR.lon).toFixed(3) + '°E');
       } else {
-        $('#sat-longitude').html((satellite.degrees_long(lookangles.currentTEARR.lon) * -1).toFixed(3) + '°W');
+        $('#sat-longitude').html((satellite.degreesLong(lookangles.currentTEARR.lon) * -1).toFixed(3) + '°W');
       }
-      if (satellite.degrees_lat(lookangles.currentTEARR.lat) >= 0) {
-        $('#sat-latitude').html(satellite.degrees_lat(lookangles.currentTEARR.lat).toFixed(3) + '°N');
+      if (satellite.degreesLat(lookangles.currentTEARR.lat) >= 0) {
+        $('#sat-latitude').html(satellite.degreesLat(lookangles.currentTEARR.lat).toFixed(3) + '°N');
       } else {
-        $('#sat-latitude').html((satellite.degrees_lat(lookangles.currentTEARR.lat) * -1).toFixed(3) + '°S');
+        $('#sat-latitude').html((satellite.degreesLat(lookangles.currentTEARR.lat) * -1).toFixed(3) + '°S');
       }
 
       if (settingsManager.isMapMenuOpen && timeManager.now > settingsManager.lastMapUpdateTime + 30000) {
@@ -1743,6 +1755,7 @@ var lastSelectedSat = -1;
 
     if (camZoomSnappedOnSat) {
       var altitude;
+      var camDistTarget;
       if (!sat.missile && !sat.static && sat.active) { // if this is a satellite not a missile
         lookangles.getTEARR(sat);       // do lookangles on the satellite
         altitude = lookangles.currentTEARR.altitude; // and set the altitude
@@ -1751,7 +1764,7 @@ var lastSelectedSat = -1;
         orbitDisplay.setSelectOrbit(satId);
       }
       if (altitude) {
-        var camDistTarget = altitude + RADIUS_OF_EARTH + 2000;
+        camDistTarget = altitude + RADIUS_OF_EARTH + 2000;
       } else {
         camDistTarget = RADIUS_OF_EARTH + 2000;  // Stay out of the center of the earth. You will get stuck there.
         console.warn('Zoom Calculation Error');
@@ -1927,9 +1940,10 @@ var lastSelectedSat = -1;
     return s.substr(s.length - size);
   }
   function _bottomIconPress (evt) {
+    var sat;
     if (settingsManager.isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
-    ga('send', 'event', 'Bottom Icon', $(this)['context']['id'], 'Selected');
-    switch ($(this)['context']['id']) {
+    ga('send', 'event', 'Bottom Icon', $(this).context.id, 'Selected');
+    switch ($(this).context.id) {
       case 'menu-sensor-info': // No Keyboard Commands
         if (!lookangles.sensorSelected()) { // No Sensor Selected
           if (!$('#menu-sensor-info img:animated').length) {
@@ -1949,6 +1963,7 @@ var lastSelectedSat = -1;
           $('#menu-sensor-info img').addClass('bmenu-item-selected');
           break;
         }
+        break;
       case 'menu-in-coverage': // B
         if (!lookangles.sensorSelected()) { // No Sensor Selected
           if (!$('#menu-in-coverage img:animated').length) {
@@ -1967,6 +1982,7 @@ var lastSelectedSat = -1;
           settingsManager.isBottomMenuOpen = true;
           break;
         }
+        break;
       case 'menu-lookangles': // S
         if (isLookanglesMenuOpen) {
           isLookanglesMenuOpen = false;
@@ -1984,7 +2000,7 @@ var lastSelectedSat = -1;
           isLookanglesMenuOpen = true;
           $('#menu-lookangles img').addClass('bmenu-item-selected');
           if (selectedSat !== -1) {
-            var sat = satSet.getSat(selectedSat);
+            sat = satSet.getSat(selectedSat);
             if (sat.static || sat.missile) {
               if (!$('#menu-lookangles img:animated').length) {
                 $('#menu-lookangles img').effect('shake', {distance: 10});
@@ -1999,6 +2015,7 @@ var lastSelectedSat = -1;
           }
           break;
         }
+        break;
       case 'menu-watchlist': // S
         if (isWatchlistMenuOpen) {
           isWatchlistMenuOpen = false;
@@ -2015,6 +2032,7 @@ var lastSelectedSat = -1;
           $('#menu-watchlist img').addClass('bmenu-item-selected');
           break;
         }
+        break;
       case 'menu-lookanglesmultisite':
         if (isLookanglesMultiSiteMenuOpen) {
           isLookanglesMultiSiteMenuOpen = false;
@@ -2040,6 +2058,7 @@ var lastSelectedSat = -1;
           }
           break;
         }
+        break;
       case 'menu-find-sat': // F
         if (isFindByLooksMenuOpen) {
           isFindByLooksMenuOpen = false;
@@ -2052,6 +2071,7 @@ var lastSelectedSat = -1;
           $('#menu-find-sat img').addClass('bmenu-item-selected');
           break;
         }
+        break;
       case 'menu-twitter': // T
         if (isTwitterMenuOpen) {
           isTwitterMenuOpen = false;
@@ -2067,6 +2087,7 @@ var lastSelectedSat = -1;
           $('#menu-twitter img').addClass('bmenu-item-selected');
           break;
         }
+        break;
       case 'menu-weather': // W
         if (isWeatherMenuOpen) {
           isWeatherMenuOpen = false;
@@ -2153,6 +2174,7 @@ var lastSelectedSat = -1;
           $('#menu-launches img').addClass('bmenu-item-selected');
           break;
         }
+        break;
       case 'menu-about': // No Keyboard Shortcut
         if (isAboutSelected) {
           isAboutSelected = false;
@@ -2165,6 +2187,7 @@ var lastSelectedSat = -1;
           $('#menu-about img').addClass('bmenu-item-selected');
           break;
         }
+        break;
       case 'menu-space-stations': // No Keyboard Shortcut
         if (isMilSatSelected) {
           $('#search').val('');
@@ -2180,6 +2203,7 @@ var lastSelectedSat = -1;
           $('#menu-space-stations img').addClass('bmenu-item-selected');
           break;
         }
+        break;
       case 'menu-satellite-collision': // No Keyboard Shortcut
         if (isSocratesMenuOpen) {
           isSocratesMenuOpen = false;
@@ -2193,6 +2217,7 @@ var lastSelectedSat = -1;
           $('#menu-satellite-collision img').addClass('bmenu-item-selected');
           break;
         }
+        break;
       case 'menu-settings': // T
         if (isSettingsMenuOpen) {
           isSettingsMenuOpen = false;
@@ -2205,6 +2230,7 @@ var lastSelectedSat = -1;
           $('#menu-settings img').addClass('bmenu-item-selected');
           break;
         }
+        break;
       case 'menu-editSat':
         if (isEditSatMenuOpen) {
           isEditSatMenuOpen = false;
@@ -2279,6 +2305,7 @@ var lastSelectedSat = -1;
           }
           break;
         }
+        break;
       case 'menu-customSensor': // T
         if (isCustomSensorMenuOpen) {
           isCustomSensorMenuOpen = false;
@@ -2300,6 +2327,7 @@ var lastSelectedSat = -1;
           $('#menu-customSensor img').addClass('bmenu-item-selected');
           break;
         }
+        break;
       case 'menu-missile':
         if (isMissileMenuOpen) {
           isMissileMenuOpen = false;
@@ -2785,6 +2813,7 @@ function updateUrl () { // URL Updater
 }
 function selectSat (satId) {
   selectedSat = satId;
+  var sat;
   if (satId === -1) {
     $('#sat-infobox').fadeOut();
     if ($('#search-results').css('display') === 'block') {
@@ -2853,7 +2882,7 @@ function selectSat (satId) {
     isMissileMenuOpen = false;
     isCustomSensorMenuOpen = false;
   } else {
-    var sat = satSet.getSat(satId);
+    sat = satSet.getSat(satId);
     if (!sat) return;
     if (sat.static) {
       sensorManager.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
@@ -3033,7 +3062,7 @@ function updateMap () {
   var satData = satSet.getSat(selectedSat);
   var map;
   lookangles.getTEARR(satData);
-  map = mapManager.braun({lon: satellite.degrees_long(lookangles.currentTEARR.lon), lat: satellite.degrees_lat(lookangles.currentTEARR.lat)}, {meridian: 0, latLimit: 90});
+  map = mapManager.braun({lon: satellite.degreesLong(lookangles.currentTEARR.lon), lat: satellite.degreesLat(lookangles.currentTEARR.lat)}, {meridian: 0, latLimit: 90});
   map.x = map.x * settingsManager.mapWidth - 10;
   map.y = map.y / 0.6366197723675813 * settingsManager.mapHeight - 10;
   $('#map-sat').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
@@ -3066,7 +3095,7 @@ function updateMap () {
 // function drawLines () {
 //   var satData = satSet.getSatData();
 //   var propTime = timeManager.propTime();
-//   if (satData && lookangles.sensorSelected()) {
+//   if (satData && satellite.sensorSelected()) {
 //     if (propTime - lastRadarTrackTime > 54) {
 //       lastRadarTrackTime = 0;
 //       curRadarTrackNum++;

@@ -5,14 +5,14 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.28.2';
+  settingsManager.versionNumber = 'v0.29.0';
   settingsManager.versionDate = 'December 19, 2017';
 
   (function _getVersion () {
     var url = window.location.pathname;
     var filename = url.substring(url.lastIndexOf('/') + 1);
     if (filename === 'retro.htm') settingsManager.retro = true;
-    // if (filename === 'mw.htm') settingsManager.missilesOnly = true;
+    if (filename === 'offline.htm') settingsManager.offline = true;
   })();
 
   settingsManager.themeChange = function (isRedTheme) {

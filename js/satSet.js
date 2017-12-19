@@ -316,8 +316,18 @@
     dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
     dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
 
-    var tleSource = $('#tle-source').text();
-    $.get('' + tleSource, function (resp) { // + '?fakeparameter=to_avoid_browser_cache'
+    if (!settingsManager.offline) {
+      var tleSource = $('#tle-source').text();
+      $.get('' + tleSource, function (resp) {
+        loadTLEs(resp);
+      });
+      jsTLEfile = null;
+    } else {
+      loadTLEs(jsTLEfile);
+      jsTLEfile = null;
+    }
+
+    function loadTLEs (resp) { // + '?fakeparameter=to_avoid_browser_cache'
       var obslatitude;
       var obslongitude;
       var obsheight;
@@ -511,7 +521,7 @@
         $('#loader-text').text('Coloring Inside the Lines...');
         satsReadyCallback(satData);
       }
-    });
+    }
   };
 
   satSet.getSatData = function () {

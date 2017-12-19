@@ -821,6 +821,7 @@ var lastSelectedSat = -1;
       satellite.lookanglesInterval = $('#lookanglesInterval').val() * 1;
 
       document.getElementById('settings-resetSensor').checked = false;
+      settingsManager.forceColorScheme = true;
       satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
       e.preventDefault();
     });
@@ -1599,7 +1600,7 @@ var lastSelectedSat = -1;
         settingsManager.lastMapUpdateTime = timeManager.now;
       }
 
-      $('#sat-altitude').html(satellite.currentTEARR.altitude.toFixed(2) + ' km');
+      $('#sat-altitude').html(satellite.currentTEARR.alt.toFixed(2) + ' km');
       $('#sat-velocity').html(satData.velocity.toFixed(2) + ' km/s');
       if (satellite.currentTEARR.inview) {
         $('#sat-azimuth').html(satellite.currentTEARR.azimuth.toFixed(0) + '°'); // Convert to Degrees
@@ -1758,7 +1759,7 @@ var lastSelectedSat = -1;
       var camDistTarget;
       if (!sat.missile && !sat.static && sat.active) { // if this is a satellite not a missile
         satellite.getTEARR(sat);       // do lookangles on the satellite
-        altitude = satellite.currentTEARR.altitude; // and set the altitude
+        altitude = satellite.currentTEARR.alt; // and set the altitude
       } if (sat.missile) {
         altitude = sat.maxAlt + 1000;             // if it is a missile use its altitude
         orbitDisplay.setSelectOrbit(satId);

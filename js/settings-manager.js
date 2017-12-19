@@ -5,8 +5,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.27.1';
-  settingsManager.versionDate = 'November 19, 2017';
+  settingsManager.versionNumber = 'v0.28.0';
+  settingsManager.versionDate = 'December 19, 2017';
 
   (function _getVersion () {
     var url = window.location.pathname;
@@ -73,6 +73,7 @@
   settingsManager.isBottomIconsEnabled = false;
   settingsManager.isBottomMenuOpen = false;
   settingsManager.isMapMenuOpen = false;
+  settingsManager.forceColorScheme = false;
 
   settingsManager.watchlistPopups = true;
 

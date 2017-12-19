@@ -59,13 +59,39 @@ var ChinaICBM = [
 var NorthKoreanBM = [
   40.019, 128.193, 'Sinpo (KN-14)', 8000,
   39.365, 126.165, 'P`yong`an (KN-20)', 10000,
-  39.046, 125.667, 'Pyongyang (KN-20)', 10000
+  39.046, 125.667, 'Pyongyang (KN-22)', 13000
 ];
 
 var UsaICBM = [
   48.420079, -101.333560, 'Minot (Minuteman III)', 13000,
   47.505958, -111.181776, 'Malmstrom (Minuteman III)', 13000,
   41.149931, -104.860645, 'F.E. Warren (Minuteman III)', 13000
+];
+
+var globalBMTargets = [
+  38.951, -77.013, 'Washington DC',
+  40.679, -73.947, 'New York City',
+  34.073, -118.248, 'Los Angeles',
+  41.877, -87.622, 'Chicago',
+  42.361, -71.058, 'Boston',
+  47.749, -122.317, 'Seattle',
+  25.784, -80.196, 'Miami',
+  32.828, -96.759, 'Dallas',
+  38.765, -104.837, 'Colorado Springs',
+  41.330, -96.054, 'Omaha',
+  19.832, -155.491, 'Hawaii',
+  13.588, 144.922,  'Guam',
+  51.506340, -0.097485, 'London',
+  48.874195, 2.378987, 'Paris',
+  40.449889, -3.717309, 'Madrid',
+  41.931955, 12.520198, 'Rome',
+  52.501746, 13.416486, 'Berlin',
+  43.706946, -79.423854, 'Toronto',
+  55.750246, 37.691525, 'Moscow',
+  59.887535, 30.384090, 'St. Petersburg',
+  55.017165, 82.965879, 'Novosibirsk',
+  39.974338, 116.396057, 'Beijing',
+  39.044051, 125.735244, 'Pyongyang'
 ];
 
 var USATargets = [

@@ -536,17 +536,6 @@
             <div id="mobile-warning" style="display:none;margin-top:10px;color:#48f3e3 !important;" class="center-align">
               You are using the mobile version. Please try the desktop version for full functionality.
             </div>
-            <!-- <div id="changelog-row" class="row">
-              <h5 class="center-align">Changelog</h5>
-              <h6>v0.21.1</h6>
-              <div class="col s12">
-                - Fixed bug that prevented old missiles from being cleared<br/><br/>
-              </div>
-              <h6>v0.21.0</h6>
-              <div class="col s12">
-                - Added missile simulator<br/><br/>
-              </div>
-            </div> -->
             <div class="row">
               <h5 class="center-align">Author</h5>
               <div class="col s12">
@@ -803,12 +792,47 @@
                   <label>Launch Location</label>
                 </div>
                 <div class="input-field col s12">
+                  <select id="ms-target">
+                    <option value="-1">Use Custom</option>
+                    <optgroup label="United States">
+                      <option value="0">Washington DC</option>
+                      <option value="1">New York City</option>
+                      <option value="2">Los Angeles</option>
+                      <option value="3">Chicago</option>
+                      <option value="4">Boston</option>
+                      <option value="5">Seattle</option>
+                      <option value="6">Miami</option>
+                      <option value="7">Dallas</option>
+                      <option value="8">Colorado Springs</option>
+                      <option value="9">Omaha</option>
+                      <option value="10">Hawaii</option>
+                      <option value="11">Guam</option>
+                    </optgroup>
+                    <optgroup label="NATO Countries">
+                      <option value="12">London</option>
+                      <option value="13">Paris</option>
+                      <option value="14">Madrid</option>
+                      <option value="15">Rome</option>
+                      <option value="16">Berlin</option>
+                      <option value="17">Toronto</option>
+                    </optgroup>
+                    <optgroup label="Non-NATO Countries">
+                      <option value="18">Moscow</option>
+                      <option value="19">St. Petersburg</option>
+                      <option value="20">Novosibirsk</option>
+                      <option value="21">Beijing</option>
+                      <option value="22">Pyongyang</option>
+                    </optgroup>
+                  </select>
+                  <label>Target Location</label>
+                </div>
+                <div class="input-field col s12">
                   <input placeholder="00.000" id="ms-lat" type="text">
-                  <label for="ms-lat">Target Latitude</label>
+                  <label for="ms-lat">Custom Target Latitude</label>
                 </div>
                 <div class="input-field col s12">
                   <input placeholder="00.000" id="ms-lon" type="text">
-                  <label for="ms-lon">Target Longitude</label>
+                  <label for="ms-lon">Custom Target Longitude</label>
                 </div>
               </div>
               <div class="center-align">
@@ -816,6 +840,11 @@
                 </button>
               </div>
             </form>
+            <div class="row"></div>
+            <div class="center-align">
+              <button class="btn waves-effect waves-light" onclick="searchBox.doSearch('RV_');" name="search">Show All Missiles &#9658;
+              </button>
+            </div>
           </div>
           <div id="ms-error" style="display: none;margin-top: 10px;cursor: pointer; cursor: hand;" class="center-align">
             <h6 class="center-align">Error</h6>

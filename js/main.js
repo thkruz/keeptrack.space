@@ -1246,6 +1246,7 @@ var lastSelectedSat = -1;
       $('#ms-error').hide();
       var type = $('#ms-type').val() * 1;
       var attacker = $('#ms-attacker').val() * 1;
+      var target = $('#ms-target').val() * 1;
       var tgtLat = $('#ms-lat').val() * 1;
       var tgtLon = $('#ms-lon').val() * 1;
       // var result = false;
@@ -1265,17 +1266,22 @@ var lastSelectedSat = -1;
         $('#ms-error').html('Large Scale Attack Loaded');
         $('#ms-error').show();
       } else {
-        if (isNaN(tgtLat)) {
-          $('#ms-error').html('Please enter a number<br>for Target Latitude');
-          $('#ms-error').show();
-          e.preventDefault();
-          return;
-        }
-        if (isNaN(tgtLon)) {
-          $('#ms-error').html('Please enter a number<br>for Target Longitude');
-          $('#ms-error').show();
-          e.preventDefault();
-          return;
+        if (target === -1) { // Custom Target
+          if (isNaN(tgtLat)) {
+            $('#ms-error').html('Please enter a number<br>for Target Latitude');
+            $('#ms-error').show();
+            e.preventDefault();
+            return;
+          }
+          if (isNaN(tgtLon)) {
+            $('#ms-error').html('Please enter a number<br>for Target Longitude');
+            $('#ms-error').show();
+            e.preventDefault();
+            return;
+          }
+        } else { // Premade Target
+          tgtLat = globalBMTargets[target * 3];
+          tgtLon = globalBMTargets[(target * 3) + 1];
         }
 
         var a, b, attackerName;

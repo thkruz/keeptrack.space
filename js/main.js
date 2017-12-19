@@ -3024,12 +3024,14 @@ function selectSat (satId) {
     $('#sat-elset-age').html(daysold + ' Days');
     $('#sat-elset-age').tooltip({delay: 50, tooltip: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(), position: 'left'});
 
-    now = new Date();
-    var sunTime = SunCalc.getTimes(Date.now(), satellite.obslat, satellite.obslong);
-    if (sunTime.dawn.getTime() - now > 0 || sunTime.dusk.getTime() - now < 0) {
-      $('#sat-sun').html('No Sun');
-    } else if (!satellite.sensorSelected()) {
+    now = new Date(timeManager.propRealTime + timeManager.propOffset);
+    var sunTime = SunCalc.getTimes(now, satellite.currentSensor.lat, satellite.currentSensor.long);
+    if (!satellite.sensorSelected()) {
       $('#sat-sun').html('Unknown');
+    } else if (satellite.currentSensor.type !== 'Optical') {
+      $('#sat-sun').html('Unaffected by Sun');
+    } else if (sunTime.dawn.getTime() - now > 0 || sunTime.dusk.getTime() - now < 0) {
+      $('#sat-sun').html('No Impact from Sun');
     } else {
       $('#sat-sun').html('Sun Exclusion');
     }

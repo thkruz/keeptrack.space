@@ -150,10 +150,8 @@
     }
 
     if (settingsManager.currentColorScheme === ColorScheme.default && !satellite.sensorSelected() && !settingsManager.forceColorScheme) {
-      console.log(1);
       // Don't force color recalc if default colors and no sensor for inview color
     } else {
-      console.log(2);
       satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
       settingsManager.forceColorScheme = false;
     }

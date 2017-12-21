@@ -435,6 +435,41 @@
             }
           }
         }
+        if (satelliteList.length >= 1) { // If extra catalogue
+          for (s = 0; s < satelliteList.length; s++) {
+            var isMatchFound = false;
+            for (i = 0; i < resp.length; i++) {
+              if (tempSatData[i].SCC_NUM === satelliteList[s].SCC.toString()) {
+                tempSatData[i].TLE1 = satelliteList[s].TLE1;
+                tempSatData[i].TLE2 = satelliteList[s].TLE2;
+                isMatchFound = true;
+              }
+            }
+            if (!isMatchFound) {
+              var year = satelliteList[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+              var prefix = (year > 50) ? '19' : '20';
+              year = prefix + year;
+              var rest = satelliteList[s].TLE1.substr(9, 8).trim().substring(2);
+              var extrasSatInfo = {
+                static: false,
+                missile: false,
+                active: false,
+                ON: 'Unknown',
+                C: 'Unknown',
+                LV: 'Unknown',
+                LS: 'Unknown',
+                SCC_NUM: satelliteList[s].SCC.toString(),
+                TLE1: satelliteList[s].TLE1,
+                TLE2: satelliteList[s].TLE2,
+                intlDes: year + '-' + rest,
+                type: 'sat',
+                id: tempSatData.length
+              };
+              tempSatData.push(extrasSatInfo);
+            }
+          }
+        }
+        console.log(tempSatData);
         for (i = 0; i < tleManager.staticSet.length; i++) {
           tempSatData.push(tleManager.staticSet[i]);
         }

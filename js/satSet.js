@@ -397,11 +397,11 @@
           limitSats = '';
         }
 
+        var year;
+        var prefix;
+        var rest;
         for (var i = 0; i < resp.length; i++) {
           resp[i].SCC_NUM = pad(resp[i].TLE1.substr(2, 5).trim(), 5);
-          var year;
-          var prefix;
-          var rest;
           if (limitSats === '') { // If there are no limits then just process like normal
             year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
             if (year === '') {
@@ -435,10 +435,11 @@
             }
           }
         }
-        if (satelliteList.length >= 1) { // If extra catalogue
+        var isMatchFound = false;
+        if (typeof satelliteList !== 'undefined') { // If extra catalogue
           for (s = 0; s < satelliteList.length; s++) {
-            var isMatchFound = false;
-            for (i = 0; i < resp.length; i++) {
+            isMatchFound = false;
+            for (i = 0; i < tempSatData.length; i++) {
               if (tempSatData[i].SCC_NUM === satelliteList[s].SCC.toString()) {
                 tempSatData[i].TLE1 = satelliteList[s].TLE1;
                 tempSatData[i].TLE2 = satelliteList[s].TLE2;
@@ -446,11 +447,11 @@
               }
             }
             if (!isMatchFound) {
-              var year = satelliteList[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
-              var prefix = (year > 50) ? '19' : '20';
+              year = satelliteList[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+              prefix = (year > 50) ? '19' : '20';
               year = prefix + year;
-              var rest = satelliteList[s].TLE1.substr(9, 8).trim().substring(2);
-              var extrasSatInfo = {
+              rest = satelliteList[s].TLE1.substr(9, 8).trim().substring(2);
+              extrasSatInfo = {
                 static: false,
                 missile: false,
                 active: false,
@@ -468,8 +469,24 @@
               tempSatData.push(extrasSatInfo);
             }
           }
+          satelliteList = null;
         }
-        console.log(tempSatData);
+        if (typeof satInfoList !== 'undefined') { // If extra catalogue
+          for (s = 0; s < satInfoList.length; s++) {
+            isMatchFound = false;
+            for (i = 0; i < tempSatData.length; i++) {
+              if (satInfoList[s].SCC === tempSatData[i].SCC_NUM || satInfoList[s].SCC === parseInt(tempSatData[i].SCC_NUM).toString()) {
+                tempSatData[i].ON = satInfoList[s].ON;
+                tempSatData[i].C = satInfoList[s].C;
+                tempSatData[i].LV = satInfoList[s].LV;
+                tempSatData[i].LS = satInfoList[s].LS;
+                tempSatData[i].URL = satInfoList[s].URL;
+                isMatchFound = true;
+              }
+            }
+          }
+          satInfoList = null;
+        }
         for (i = 0; i < tleManager.staticSet.length; i++) {
           tempSatData.push(tleManager.staticSet[i]);
         }
@@ -791,10 +808,10 @@
       if (satData[i].static || satData[i].missile || !satData[i].active) { continue; }
       res.push(satData[i]);
       satellite.getTEARR(res[s]);
-      res[s]['azimuth'] = satellite.currentTEARR.azimuth;
-      res[s]['elevation'] = satellite.currentTEARR.elevation;
-      res[s]['range'] = satellite.currentTEARR.range;
-      res[s]['inview'] = satellite.currentTEARR.inview;
+      res[s].azimuth = satellite.currentTEARR.azimuth;
+      res[s].elevation = satellite.currentTEARR.elevation;
+      res[s].range = satellite.currentTEARR.range;
+      res[s].inview = satellite.currentTEARR.inview;
       s++;
     }
 

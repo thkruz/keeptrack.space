@@ -850,6 +850,7 @@ $.ajaxSetup({
   tleManager.init();
   tleManager.extractCountry = function (C) {
     var country;
+    country = C; // Assume it is right and overwrite if it is a code below.
     if (C === 'U') {
       country = 'Unknown';
     // Table Nested in ELSE to Make Hiding it Easier
@@ -1242,7 +1243,7 @@ $.ajaxSetup({
   tleManager.extractLaunchSite = function (LS) {
     var site;
     var sitec;
-    if (LS === 'U') {
+    if (LS === 'U' || 'Unknown') {
       site = 'Unknown';
       sitec = 'Unknown';
     // Table Nested in ELSE to Make Hiding it Easier

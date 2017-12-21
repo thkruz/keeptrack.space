@@ -5233,7 +5233,9 @@ button.btn-floating {
 #nl-launch-menu .select-wrapper .dropdown-content {
   padding-bottom: 50px;
 }
-
+#editor-LS-menu .select-wrapper .dropdown-content {
+  padding-bottom: 50px;
+}
 .dropdown-content li {
   clear: both;
   color: rgba(0, 0, 0, 0.87);

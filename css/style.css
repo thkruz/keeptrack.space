@@ -476,6 +476,12 @@ ul {
   height: 100%;
 }
 
+#editor-menu {
+  background: #0a97d6;
+  color: white;
+  overflow: auto;
+}
+
 .side-menu {
   position: absolute;
   /*display: block;*/
@@ -945,6 +951,26 @@ ul li{
 }
 #controls-info>li {
     margin-top: 10px;
+}
+
+#editorForm label {
+  top: 20px;
+  font-size: 1em;
+}
+
+#editorForm div {
+  margin-top: 2em;
+}
+
+#editor-LS-menu label {
+  top: -25px;
+  font-size: 1em;
+}
+
+#editor-LS {
+  display: block !important;
+  background: steelblue;
+  height: 2em;
 }
 
 .ui_tpicker_time {

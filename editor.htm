@@ -1,4 +1,11 @@
 <html>
+<!-- =============================================================================== -->
+<!--                                         OFFLINE                                 -->
+<!-- =============================================================================== -->
+<!-- THIS FILE IS FOR OFFLINE USE ONLY AND SHOULD NOT BE USED ON A PRODUCTION SERVER -->
+<!-- =============================================================================== -->
+<!--                                         OFFLINE                                 -->
+<!-- =============================================================================== -->
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
@@ -6,57 +13,89 @@
   <link href="css/fonts.css" rel="stylesheet">
   <!--Import Materialize CSS-->
   <link rel="stylesheet" href="css/materialize.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div id="editor-menu" class="text-select">
     <div id="editor-content">
       <div class="row">
-        <h5 class="center-align">Edit Satellite</h5>
+        <h5 class="center-align">Edit Satellite Info</h5>
         <form id="editorForm">
           <div class="input-field col s12">
-            <input disabled value="AAAAA" id="es-scc" type="text">
-            <label for="disabled">Satellite SCC#</label>
+            <input placeholder="00005" id="editor-scc" type="text">
+            <label for="editor-scc">Satellite SCC#</label>
           </div>
           <div class="input-field col s12">
-            <input placeholder="AA" id="es-year" type="text">
-            <label for="es-year">Epoch Year</label>
+            <input placeholder="Payload A" id="editor-ON" type="text">
+            <label for="editor-ON">Object Name</label>
           </div>
           <div class="input-field col s12">
-            <input placeholder="AAA.AAAAAAAA" id="es-day" type="text">
-            <label for="es-day">Epoch Day</label>
+            <input placeholder="Unknown" id="editor-C" type="text">
+            <label for="editor-C">Country</label>
+          </div>
+          <div class="input-field col s12" id="editor-LS-menu">
+            <select id="editor-LS">
+                <option value="U">Unknown</option>
+              <optgroup label="United States">
+                <option value="CAS">Canary Island Air Space (Pegasus)</option>
+                <option value="AFETR">Cape Canaveral AFS | Kennedy Space Center</option>
+                <option value="ERAS">Eastern Range Air Space (Pegasus)</option>
+                <option value="KODAK">Kodiak Launch Complex</option>
+                <option value="KWAJ">Reagan Test Site</option>
+                <option value="AFWTR">Vandenberg AFB</option>
+                <option value="WLPIS">Wallops Flight Facility</option>
+                <option value="WRAS">Western Range Air Space (Pegasus)</option>
+              </optgroup>
+              <optgroup label="Russia">
+                <option value="KYMTR">Kasputin Yar MSC</option>
+                <option value="PKMTR">Plesetsk MSC</option>
+                <option value="SEAL">Sea Launch Platform</option>
+                <option value="SADOL">Submarine Launch, Barents Sea</option>
+                <option value="TTMTR">Tyuratam MSC | Baikonur Cosmodrome</option>
+                <option value="VOSTO">Vostochny Cosmodrome</option>
+                <option value="OREN">Yasny (Dombarovskiy) Cosmodrome</option>
+              </optgroup>
+              <optgroup label="China">
+                <option value="JSC">Jiuquan SLC</option>
+                <option value="TSC">Taiyuan SLC</option>
+                <option value="WSC">Wenchang SLC</option>
+                <option value="XSC">Xichang SLC</option>
+              </optgroup>
+              <optgroup label="Japan">
+                <option value="TNSTA">Tanegashima Space Center</option>
+                <option value="KSCUT">Uchinoura Space Center</option>
+              </optgroup>
+              <optgroup label="North Korea">
+                <option value="YUN">Sohae Satellite Launch Station</option>
+                <option value="TNGH">Tonghae Satellite Launching Ground</option>
+              </optgroup>
+              <optgroup label="Other">
+                <option value="FRGUI">Guiana Space Centre (Kourou FG)</option>
+                <option value="HGSTR">Hammaguira Space Track Range</option>
+                <option value="NSC">Naro Space Center</option>
+                <option value="YAVNE">Palmachim Air Force Base</option>
+                <option value="RLLC">Rocket Labs Launch Complex</option>
+                <option value="SNMLP">San Marco Launch Platform</option>
+                <option value="SRI">Satish Dhawan Space Centre (Sriharikota IN)</option>
+                <option value="SEM">Semnan Spaceport</option>
+                <option value="WOMRA">Woomera Test Range</option>
+              </optgroup>
+            </select>
+            <label>Launch Site</label>
           </div>
           <div class="input-field col s12">
-            <input placeholder="AAA.AAAA" id="es-inc" type="text">
-            <label for="es-inc">Inclination</label>
+            <input placeholder="Unknown" id="editor-LV" type="text">
+            <label for="editor-LV">Launch Vehicle</label>
           </div>
           <div class="input-field col s12">
-            <input placeholder="AAA.AAAA" id="es-rasc" type="text">
-            <label for="es-rasc">Right Ascension</label>
+            <input placeholder="http://" id="editor-URL" type="text">
+            <label for="editor-URL">Website</label>
           </div>
-          <div class="input-field col s12">
-            <input placeholder="AAA.AAAA" id="es-meanmo" type="text">
-            <label for="es-meanmo">Mean Motion</label>
+          <div class="input-field col s6 center-align">
+            <button id="editor-save" class="btn waves-effect waves-light" type="button" name="action">Save Catalogue &#9658;</button>
           </div>
-          <div class="input-field col s12">
-            <input placeholder="AA.AAAAAAAA" id="es-ecen" type="text">
-            <label for="es-ecen">Eccentricity</label>
-          </div>
-          <div class="input-field col s12">
-            <input placeholder="AA.AAAAAAAA" id="es-argPe" type="text">
-            <label for="es-argPe">Argument of Perigee</label>
-          </div>
-          <div class="input-field col s12">
-            <input placeholder="AAA.AAAA" id="es-meana" type="text">
-            <label for="es-meana">Mean Anomaly</label>
-          </div>
-          <div class="center-align row">
-            <button id="editor-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Satellite &#9658;</button>
-          </div>
-          <div class="center-align row">
-            <button id="editor-save" class="btn waves-effect waves-light" type="button" name="action">Save TLE &#9658;</button>
-          </div>
-          <div class="center-align row">
-            <button id="editor-open" class="btn waves-effect waves-light" type="button" name="action">Update TLEs &#9658;</button>
+          <div class="input-field col s6 center-align">
+            <button id="editor-open" class="btn waves-effect waves-light" type="button" name="action">Convert Text File TLEs &#9658;</button>
             <input id="editor-file" type="file" name="files[]" style="display: none;" />
           </div>
         </form>
@@ -70,6 +109,8 @@
   <script src="js/lib/jquery.min.js"></script>
   <script src="js/lib/materialize.min.js"></script>
   <script src="js/lib/file-saver.min.js"></script>
+  <script src="TLE.js"></script>
+  <script src="satInfo.js"></script>
   <script src="js/editor.js"></script>
 </body>
 </html>

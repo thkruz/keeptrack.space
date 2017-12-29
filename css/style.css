@@ -482,6 +482,17 @@ ul {
   overflow: auto;
 }
 
+#info-overlay-content {
+  position: absolute;
+  background: rgba(0,0,0,0);
+  color: white;
+  width: 300px;
+  top: 50px;
+  bottom: 50px;
+  overflow: auto;
+  z-index: 10;
+}
+
 .side-menu {
   position: absolute;
   /*display: block;*/
@@ -793,7 +804,7 @@ ul li{
     width: 30px;
 }
 
-#menu-sensor-info img {
+#menu-info-overlay img {
   border-left: 2px;
   border-left-style: solid;
   border-left-color: steelblue;

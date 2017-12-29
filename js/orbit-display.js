@@ -23,10 +23,12 @@
 
   var selectColor = [1.0, 0.0, 0.0, 1.0];
   var hoverColor = [0.5, 0.5, 1.0, 1.0];
+  var inViewColor = [1.0, 1.0, 0.0, 1.0];
   var groupColor = [0.3, 0.5, 1.0, 0.4];
 
   var currentHoverId = -1;
   var currentSelectId = -1;
+  var currentInView = [];
 
   var orbitMvMat = mat4.create();
 
@@ -160,6 +162,35 @@
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 3), gl.DYNAMIC_DRAW);
   };
 
+  orbitDisplay.addInViewOrbit = function (satId) {
+    for (var i = 0; i < currentInView.length; i++) {
+      if (satId === currentInView[i]) return;
+    }
+    currentInView.push(satId);
+    orbitDisplay.updateOrbitBuffer(satId);
+  };
+
+  orbitDisplay.removeInViewOrbit = function (satId) {
+    var r = null;
+    for (var i = 0; i < currentInView.length; i++) {
+      if (satId === currentInView[i]) {
+        r = i;
+      }
+    }
+    if (r === null) return;
+    currentInView.splice(r, 1);
+    orbitDisplay.updateOrbitBuffer(satId);
+  };
+
+  orbitDisplay.clearInViewOrbit = function (satId) {
+    if (currentInView === []) return;
+    currentInView = [];
+
+    // NOTE might need this
+    // gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
+    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 3), gl.DYNAMIC_DRAW);
+  };
+
   orbitDisplay.setHoverOrbit = function (satId) {
     if (satId === currentHoverId) return;
     currentHoverId = satId;
@@ -201,6 +232,16 @@
       gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
       gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
     }
+
+    if (currentInView.length >= 1) { // NOTE There might be some z-fighting
+      gl.uniform4fv(pathShader.uColor, inViewColor);
+      currentInView.forEach(function (id) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
+        gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+        gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+      });
+    }
+
     if (groups.selectedGroup !== null) {
       gl.uniform4fv(pathShader.uColor, groupColor);
       groups.selectedGroup.forEach(function (id) {

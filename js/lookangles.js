@@ -215,6 +215,16 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     satellite.currentTEARR = currentTEARR;
     return currentTEARR;
   };
+  satellite.nextpassList = function (satArray) {
+    var nextPassArray = [];
+    for (var s = 0; s < satArray.length; s++) {
+      var time = satellite.next5passes(satArray[s]);
+      for (var i = 0; i < time.length; i++) {
+        nextPassArray.push({'SCC_NUM': satArray[s].SCC_NUM, 'time': time[i]});
+      }
+    }
+    return nextPassArray;
+  };
   satellite.nextpass = function (sat, sensor, searchLength, interval) {
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensor == 'undefined') {
@@ -278,6 +288,79 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       }
     }
     return 'No Passes in ' + satellite.lookanglesLength + ' Days';
+  };
+
+  // TODO: Convert this into nextNpasses
+  satellite.next5passes = function (sat, sensor, searchLength, interval) {
+    // If no sensor passed to function then try to use the 'currentSensor'
+    if (typeof sensor == 'undefined') {
+      if (typeof satellite.currentSensor == 'undefined') {
+        throw 'getTEARR requires a sensor or for a sensor to be currently selected.';
+      } else {
+        sensor = satellite.currentSensor;
+      }
+    }
+    // If sensor's observerGd is not set try to set it using it parameters
+    if (typeof sensor.observerGd == 'undefined') {
+      try {
+        sensor.observerGd = {
+          height: sensor.obshei,
+          latitude: sensor.lat,
+          longitude: sensor.long
+        };
+      } catch (e) {
+        throw 'observerGd is not set and could not be guessed.';
+      }
+    }
+    // If length and interval not set try to use defaults
+    if (typeof searchLength == 'undefined') searchLength = satellite.lookanglesLength;
+    if (typeof interval == 'undefined') interval = satellite.lookanglesInterval;
+
+    var passTimesArray = [];
+    var propOffset = getPropOffset();
+    var propTempOffset = 0;
+    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
+    var orbitalPeriod = MINUTES_PER_DAY / (satrec.no * MINUTES_PER_DAY / TAU); // Seconds in a day divided by mean motion
+    for (var i = 0; i < (searchLength * 24 * 60 * 60); i += interval) {         // 5second Looks
+      // Only pass a maximum of 5 passes
+      if (passTimesArray.length >= 5) { return passTimesArray; }
+
+      propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
+      var now = propTimeCheck(propTempOffset, timeManager.propRealTime);
+      var j = timeManager.jday(now.getUTCFullYear(),
+      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+      var gmst = satellite.gstime(j);
+
+      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+      var positionEci = satellite.sgp4(satrec, m);
+      var positionEcf, lookAngles, azimuth, elevation, range;
+
+      positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
+      lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+      azimuth = lookAngles.azimuth * RAD2DEG;
+      elevation = lookAngles.elevation * RAD2DEG;
+      range = lookAngles.rangeSat;
+
+      if (sensor.obsminaz > sensor.obsmaxaz) {
+        if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+           ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+          passTimesArray.push(now);
+          i = i + (orbitalPeriod * 60 * 0.75); // Jump 3/4th to the next orbit
+        }
+      } else {
+        if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+           ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+          passTimesArray.push(now);
+          i = i + (orbitalPeriod * 60 * 0.75); // Jump 3/4th to the next orbit
+        }
+      }
+    }
+    return passTimesArray;
   };
 
   // TODO: Replace the tables in these functions with arrays that are then turned into tables in main.js

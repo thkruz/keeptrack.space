@@ -116,8 +116,10 @@ var lastSelectedSat = -1;
 
   var watchlistList = [];
   var watchlistInViewList = [];
+  var nextPassArray = [];
 
   var lastBoxUpdateTime = 0;
+  var lastOverlayUpdateTime = 0;
   var updateHoverDelay = 0;
 
   var pickColorBuf;
@@ -194,6 +196,7 @@ var lastSelectedSat = -1;
   var updateHoverSatId;
   var updateHoverSatPos;
 
+  var isInfoOverlayMenuOpen = false;
   var isTwitterMenuOpen = false;
   var isWeatherMenuOpen = false;
   // var isSpaceWeatherMenuOpen = false;
@@ -279,6 +282,10 @@ var lastSelectedSat = -1;
         $('#datetime-input').fadeOut();
         $('#datetime-text').fadeIn();
         settingsManager.isEditTime = false;
+
+        // Reset last update times when going backwards in time
+        lastOverlayUpdateTime = 0;
+        lastBoxUpdateTime = 0;
       });
     if (settingsManager.retro) {
       timeManager.propOffset = new Date(2000, 2, 13) - Date.now();
@@ -1035,6 +1042,8 @@ var lastSelectedSat = -1;
       if (!duplicate) {
         watchlistList.push(satId);
         watchlistInViewList.push(false);
+        console.log(watchlistList);
+        console.log(watchlistInViewList);
         _updateWatchlist();
       }
     });
@@ -1078,16 +1087,20 @@ var lastSelectedSat = -1;
         }
 
         var newWatchlist = JSON.parse(evt.target.result);
+        watchlistInViewList = [];
         for (var i = 0; i < newWatchlist.length; i++) {
           var sat = satSet.getSat(satSet.getIdFromObjNum(newWatchlist[i]));
           if (sat !== null) {
             newWatchlist[i] = sat.id;
+            watchlistInViewList.push(false);
           } else {
             console.error('Watchlist File Format Incorret');
             return;
           }
         }
         watchlistList = newWatchlist;
+        console.log(watchlistList);
+        console.log(watchlistInViewList);
         _updateWatchlist();
       };
       reader.readAsText(evt.target.files[0]);
@@ -1519,6 +1532,7 @@ var lastSelectedSat = -1;
     updateHover();
     updateSelectBox();
     _checkWatchlist();
+    _updateNextPassOverlay();
 
     // drawLines();
     // var bubble = new FOVBubble();
@@ -1951,6 +1965,37 @@ var lastSelectedSat = -1;
     if (settingsManager.isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
     ga('send', 'event', 'Bottom Icon', $(this).context.id, 'Selected');
     switch ($(this).context.id) {
+      case 'menu-info-overlay':
+        if (!satellite.sensorSelected()) { // No Sensor Selected
+          if (!$('#menu-info-overlay img:animated').length) {
+            $('#menu-info-overlay img').effect('shake', {distance: 10});
+          }
+          break;
+        }
+        if (isInfoOverlayMenuOpen) {
+          isInfoOverlayMenuOpen = false;
+          _hideSideMenus();
+          break;
+        } else {
+          // TODO: NEW LAUNCH
+          _hideSideMenus();
+          nextPassArray = [];
+          $('#loading-screen').fadeIn('slow', function () {
+            for (var x = 0; x < watchlistList.length; x++) {
+              nextPassArray.push(satSet.getSat(watchlistList[x]));
+            }
+            nextPassArray = satellite.nextpassList(nextPassArray);
+            nextPassArray.sort(function(a, b) {
+                return new Date(a.time) - new Date(b.time);
+            });
+            _updateNextPassOverlay(true);
+            $('#loading-screen').fadeOut();
+          });
+          $('#info-overlay-menu').fadeIn();
+          $('#menu-info-overlay img').addClass('bmenu-item-selected');
+          isInfoOverlayMenuOpen = true;
+          break;
+        }
       case 'menu-sensor-info': // No Keyboard Commands
         if (!satellite.sensorSelected()) { // No Sensor Selected
           if (!$('#menu-sensor-info img:animated').length) {
@@ -2354,6 +2399,7 @@ var lastSelectedSat = -1;
       $.colorbox.close();
 
       // Hide all side menus
+      $('#info-overlay-menu').fadeOut();
       $('#sensor-info-menu').fadeOut();
       $('#watchlist-menu').fadeOut();
       $('#lookangles-menu').fadeOut();
@@ -2372,6 +2418,7 @@ var lastSelectedSat = -1;
       $('#about-menu').fadeOut();
 
       // Remove red color from all menu icons
+      $('#menu-info-overlay img').removeClass('bmenu-item-selected');
       $('#menu-sensor-info img').removeClass('bmenu-item-selected');
       $('#menu-lookangles img').removeClass('bmenu-item-selected');
       $('#menu-lookanglesmultisite img').removeClass('bmenu-item-selected');
@@ -2409,21 +2456,63 @@ var lastSelectedSat = -1;
     }
   }
 
+  function _updateNextPassOverlay (isForceUpdate) {
+    if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
+    // Update once every 10 seconds
+    if (timeManager.now > (lastOverlayUpdateTime * 1 + 10000) || isForceUpdate) {
+      $('#info-overlay-content').html('');
+      for (var s = 0; s < nextPassArray.length; s++) {
+        // If old time and not in view, skip it
+        if (nextPassArray[s].time < timeManager.now && !satSet.getSat(satSet.getIdFromObjNum(nextPassArray[s].SCC_NUM)).inview) continue;
+
+        // Yellow - In View and Time to Next Pass is Less Than an Hour
+        // NOTE Less than an hour is probably excessive.
+        if ((satSet.getSat(satSet.getIdFromObjNum(nextPassArray[s].SCC_NUM)).inview && (nextPassArray[s].time - timeManager.propTime() < 1000 * 60 * 60))) {
+          $('#info-overlay-content').append('<div class="row">' +
+                        '<h5 class="center-align" style="color: yellow">' + nextPassArray[s].SCC_NUM + ': ' + timeManager.dateFormat(nextPassArray[s].time, 'isoTime', true) + '</h5>' +
+                        '</div>');
+          continue;
+        }
+        // Green - Next 10 Minutes
+        if (nextPassArray[s].time - timeManager.propTime() < 1000 * 60 * 10) {
+          $('#info-overlay-content').append('<div class="row">' +
+                        '<h5 class="center-align" style="color: green">' + nextPassArray[s].SCC_NUM + ': ' + timeManager.dateFormat(nextPassArray[s].time, 'isoTime', true) + '</h5>' +
+                        '</div>');
+          continue;
+        }
+        // White - Later
+        $('#info-overlay-content').append('<div class="row">' +
+                      '<h5 class="center-align" style="color: white">' + nextPassArray[s].SCC_NUM + ': ' + timeManager.dateFormat(nextPassArray[s].time, 'isoTime', true) + '</h5>' +
+                      '</div>');
+      }
+      lastOverlayUpdateTime = timeManager.now;
+    }
+  }
+
   function _checkWatchlist () {
     if (watchlistList.length <= 0) return;
     for (var i = 0; i < watchlistList.length; i++) {
       var sat = satSet.getSat(watchlistList[i]);
       if (sat.inview === 1 && watchlistInViewList[i] === false) { // Is inview and wasn't previously
-        settingsManager.redTheme = true;
-        settingsManager.themeChange(settingsManager.redTheme);
         watchlistInViewList[i] = true;
+        orbitDisplay.addInViewOrbit(watchlistList[i]);
       }
       if (sat.inview === 0 && watchlistInViewList[i] === true) { // Isn't inview and was previously
-        settingsManager.redTheme = false;
-        settingsManager.themeChange(settingsManager.redTheme);
         watchlistInViewList[i] = false;
+        orbitDisplay.removeInViewOrbit(watchlistList[i]);
       }
     }
+    for (i = 0; i < watchlistInViewList.length; i++) {
+      if (watchlistInViewList[i] === true) {
+        // Someone is still in view on the watchlist
+        settingsManager.redTheme = true;
+        settingsManager.themeChange(settingsManager.redTheme);
+        return;
+      }
+    }
+    // None of the sats on the watchlist are in view
+    settingsManager.redTheme = false;
+    settingsManager.themeChange(settingsManager.redTheme);
   }
 
   function _updateWatchlist () {

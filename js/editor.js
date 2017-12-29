@@ -3,7 +3,7 @@
 // ===============================================================================
 // THIS FILE IS FOR OFFLINE USE ONLY AND SHOULD NOT BE USED ON A PRODUCTION SERVER
 // ===============================================================================
-//                                          OFFLINE                                
+//                                          OFFLINE
 // ===============================================================================
 $(document).ready(function () {
   $('#editor-scc').change(function (e) {
@@ -93,7 +93,7 @@ $(document).ready(function () {
         var satellite = {};
         satellite.TLE1 = array[i * 2];
         satellite.TLE2 = array[i * 2 + 1];
-        var SCC = parseInt(_pad0(satellite.TLE1.substr(2, 5).trim(), 5));
+        var SCC = _pad0(parseInt(satellite.TLE1.substr(2, 5).trim()).toString(), 5);
         satellite.SCC = SCC;
         satelliteList[i] = satellite;
       }

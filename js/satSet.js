@@ -400,8 +400,9 @@
         var year;
         var prefix;
         var rest;
+
         for (var i = 0; i < resp.length; i++) {
-          resp[i].SCC_NUM = pad(resp[i].TLE1.substr(2, 5).trim(), 5);
+          resp[i].SCC_NUM = pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
           if (limitSats === '') { // If there are no limits then just process like normal
             year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
             if (year === '') {
@@ -440,13 +441,16 @@
           for (s = 0; s < satelliteList.length; s++) {
             isMatchFound = false;
             for (i = 0; i < tempSatData.length; i++) {
-              if (tempSatData[i].SCC_NUM === satelliteList[s].SCC.toString()) {
+              if (satelliteList[s].SCC == undefined) continue;
+              if (tempSatData[i].SCC_NUM === satelliteList[s].SCC) {
                 tempSatData[i].TLE1 = satelliteList[s].TLE1;
                 tempSatData[i].TLE2 = satelliteList[s].TLE2;
                 isMatchFound = true;
+                break;
               }
             }
             if (!isMatchFound) {
+              if (satelliteList[s].TLE1 == undefined) continue;
               year = satelliteList[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
               prefix = (year > 50) ? '19' : '20';
               year = prefix + year;
@@ -475,18 +479,21 @@
           for (s = 0; s < satInfoList.length; s++) {
             isMatchFound = false;
             for (i = 0; i < tempSatData.length; i++) {
-              if (satInfoList[s].SCC === tempSatData[i].SCC_NUM || satInfoList[s].SCC === parseInt(tempSatData[i].SCC_NUM).toString()) {
+              if (satInfoList[s].SCC === tempSatData[i].SCC_NUM) {
                 tempSatData[i].ON = satInfoList[s].ON;
                 tempSatData[i].C = satInfoList[s].C;
                 tempSatData[i].LV = satInfoList[s].LV;
                 tempSatData[i].LS = satInfoList[s].LS;
                 tempSatData[i].URL = satInfoList[s].URL;
                 isMatchFound = true;
+                break;
               }
             }
           }
           satInfoList = null;
         }
+
+        loggerStop = Date.now();
         for (i = 0; i < tleManager.staticSet.length; i++) {
           tempSatData.push(tleManager.staticSet[i]);
         }
@@ -724,16 +731,17 @@
     return null;
   };
 
-  function pad (str, max) {
-    return str.length < max ? pad('0' + str, max) : str;
+  function pad0 (str, max) {
+    return str.length < max ? pad0('0' + str, max) : str;
   }
 
   satSet.getIdFromObjNum = function (objNum) {
+    var scc;
     for (var i = 0; i < satData.length; i++) {
       if (satData[i].static || satData[i].missile) {
         continue;
       } else {
-        var scc = pad(satData[i].TLE1.substr(2, 5).trim(), 5);
+        scc = pad0(satData[i].TLE1.substr(2, 5).trim(), 5);
       }
 
       if (scc.indexOf(objNum) === 0) { // && satData[i].OBJECT_TYPE !== 'unknown') { // OPTIMIZATION: Determine if this code can be removed.

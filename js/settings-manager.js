@@ -5,8 +5,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.30.0';
-  settingsManager.versionDate = 'December 29, 2017';
+  settingsManager.versionNumber = 'v0.30.1';
+  settingsManager.versionDate = 'December 30, 2017';
 
   (function _getVersion () {
     var url = window.location.pathname;
@@ -15,15 +15,16 @@
     if (filename === 'offline.htm') settingsManager.offline = true;
   })();
 
-  settingsManager.themeChange = function (isRedTheme) {
-    if (isRedTheme) {
+  settingsManager.themes = {};
+  settingsManager.themes.currentTheme = 'Blue';
+  settingsManager.themes.redTheme = function () {
       document.getElementById('nav-wrapper').classList.remove('light-blue');
       document.getElementById('nav-wrapper').classList.add('red');
       document.getElementById('nav-footer').classList.add('red');
       document.getElementById('nav-footer').classList.add('darken-3');
       $('#bottom-menu').css('background', 'rgb(165, 0, 0)');
       $('.bmenu-item img').css('border-right-color', 'orangered');
-      $('#menu-sensor-info img ').css('border-left-color', 'orangered');
+      $('#menu-info-overlay img ').css('border-left-color', 'orangered');
       $('.side-menu').css('background', 'LightCoral');
       $('#sat-infobox').css('background', 'LightCoral');
       $('#sat-infobox').css('border-top-color', 'DarkRed');
@@ -31,23 +32,31 @@
       $('#search-result:hover').css('background', 'DarkRed');
       $('.search-hilight').css('color', 'DarkRed');
       $('.btn').css('background-color', 'red');
-    } else {
-      document.getElementById('nav-wrapper').classList.remove('red');
-      document.getElementById('nav-footer').classList.remove('red');
-      document.getElementById('nav-footer').classList.remove('darken-3');
-      document.getElementById('nav-wrapper').classList.add('light-blue');
-      $('#nav-footer').css('background-color', '#0277bd');
-      $('#bottom-menu').css('background', 'rgb(0,105,165)');
-      $('.bmenu-item img').css('border-right-color', 'steelblue');
-      $('#menu-sensor-info img ').css('border-left-color', 'steelblue');
-      $('.side-menu').css('background', '#0a97d6');
-      $('#sat-infobox').css('background', '#0a97d6');
-      $('#sat-infobox').css('border-top-color', '#0277bd');
-      $('#search-results').css('background', '#0a97d6');
-      $('#search-results:hover').css('background', '#0277bd');
-      $('.search-hilight').css('color', '#01579b');
-      $('.btn').css('background-color', '#0091ea');
-    }
+      settingsManager.themes.currentTheme = 'Red';
+    };
+  settingsManager.themes.redThemeSearch = function () {
+    if (settingsManager.themes.currentTheme !== 'Red') return;
+    $('#search-results').css('background', 'LightCoral');
+    $('#search-result:hover').css('background', 'DarkRed');
+    $('.search-hilight').css('color', 'DarkRed');
+  };
+  settingsManager.themes.blueTheme = function () {
+    document.getElementById('nav-wrapper').classList.remove('red');
+    document.getElementById('nav-footer').classList.remove('red');
+    document.getElementById('nav-footer').classList.remove('darken-3');
+    document.getElementById('nav-wrapper').classList.add('light-blue');
+    $('#nav-footer').css('background-color', '#0277bd');
+    $('#bottom-menu').css('background', 'rgb(0,105,165)');
+    $('.bmenu-item img').css('border-right-color', 'steelblue');
+    $('#menu-info-overlay img ').css('border-left-color', 'steelblue');
+    $('.side-menu').css('background', '#0a97d6');
+    $('#sat-infobox').css('background', '#0a97d6');
+    $('#sat-infobox').css('border-top-color', '#0277bd');
+    $('#search-results').css('background', '#0a97d6');
+    $('#search-results:hover').css('background', '#0277bd');
+    $('.search-hilight').css('color', '#01579b');
+    $('.btn').css('background-color', '#0091ea');
+    settingsManager.themes.currentTheme = 'Blue';
   };
 
   settingsManager.shadersReady = false;
@@ -61,6 +70,8 @@
   settingsManager.mapWidth = 800;
   settingsManager.mapHeight = 600;
 
+  settingsManager.minimumSearchCharacters = 2;
+
   settingsManager.currentColorScheme = null;
   settingsManager.otherSatelliteTransparency = 0.1;
 
@@ -73,11 +84,9 @@
   settingsManager.isBottomIconsEnabled = false;
   settingsManager.isBottomMenuOpen = false;
   settingsManager.isMapMenuOpen = false;
-  settingsManager.forceColorScheme = false;
+  settingsManager.isForceColorScheme = false;
 
-  settingsManager.watchlistPopups = true;
-
-  settingsManager.mapUpdateOverride = false;
+  settingsManager.isMapUpdateOverride = false;
   settingsManager.lastMapUpdateTime = 0;
 
   window.settingsManager = settingsManager;

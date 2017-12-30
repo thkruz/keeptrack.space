@@ -131,16 +131,16 @@
     satVel = new Float32Array(m.data.satVel);
     satInView = new Float32Array(m.data.satInView);
 
-    if (settingsManager.isMapMenuOpen || settingsManager.mapUpdateOverride) {
+    if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
       SCnow = Date.now();
       if (SCnow > settingsManager.lastMapUpdateTime + 30000) {
         updateMap();
         settingsManager.lastMapUpdateTime = SCnow;
-        settingsManager.mapUpdateOverride = false;
-      } else if (settingsManager.mapUpdateOverride) {
+        settingsManager.isMapUpdateOverride = false;
+      } else if (settingsManager.isMapUpdateOverride) {
         updateMap();
         settingsManager.lastMapUpdateTime = SCnow;
-        settingsManager.mapUpdateOverride = false;
+        settingsManager.isMapUpdateOverride = false;
       }
     }
 
@@ -149,11 +149,11 @@
       settingsManager.socratesOnSatCruncher = null;
     }
 
-    if (settingsManager.currentColorScheme === ColorScheme.default && !satellite.sensorSelected() && !settingsManager.forceColorScheme) {
+    if (settingsManager.currentColorScheme === ColorScheme.default && !satellite.sensorSelected() && !settingsManager.isForceColorScheme) {
       // Don't force color recalc if default colors and no sensor for inview color
     } else {
       satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
-      settingsManager.forceColorScheme = false;
+      settingsManager.isForceColorScheme = false;
     }
 
     if (!settingsManager.cruncherReady) {

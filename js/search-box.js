@@ -44,93 +44,91 @@
     resultsOpen = false;
   };
 
-  searchBox.doSearch = function (str) {
+  searchBox.doSearch = function (searchString) {
     selectSat(-1);
 
-    if (str.length === 0) {
+    if (searchString.length === 0) {
       searchBox.hideResults();
       return;
     }
 
-    var bigstr = str.toUpperCase();
-    var arr = str.split(',');
+    // Uppercase to make this search not case sensitive
+    searchString = searchString.toUpperCase();
+    var searchList = searchString.split(',');
 
-    var bigarr = bigstr.split(',');
     var results = [];
 
     for (var i = 0; i < satData.length; i++) {
-      for (var j = 0; j < arr.length; j++) {
-        bigstr = bigarr[j];
-        str = arr[j];
-        if (str.length <= 2) { return; }
-        var len = arr[j].length;
+      for (var j = 0; j < searchList.length; j++) {
+        // Move one search string at a time (separated by ',')
+        searchString = searchList[j];
+
+        // Don't search for things until at least the minimum characters
+        // are typed otherwise there are just too many search results.
+        if (searchString.length <= settingsManager.minimumSearchCharacters) { return; }
+        var len = searchList[j].length; // How many characters is in this search string
+
+        // Skip static dots (Maybe these should be searchable?)
         if (satData[i].static) { continue; }
+        // Skip inactive missiles.
         if (satData[i].missile && !satData[i].active) { continue; }
+
+        // Everything has a name. If it doesn't then assume it isn't what we are
+        // searching for.
         if (!satData[i].ON) { continue; }
-        if ((satData[i].ON.indexOf(str) !== -1) || (satData[i].ON.indexOf(bigstr) !== -1)) {
+
+        //
+        if (satData[i].ON.toUpperCase().indexOf(searchString) !== -1) {
           results.push({
-            isIntlDes: false,
-            isInView: satData[i].inview,
-            isObjnum: false,
-            strIndex: satData[i].ON.indexOf(str),
-            SCC_NUM: satData[i].SCC_NUM,
-            desc: satData[i].desc,
+            strIndex: satData[i].ON.indexOf(searchString),
+            isON: true,
             patlen: len,
             satId: i
           });
+          continue; // Prevent's duplicate results
         }
+
+        // Missiles are only searchable by name, at this point we can assume
+        // if it is a missile it isn't what we were searching for
         if (satData[i].missile) { continue; }
 
-        if (satData[i].intlDes.indexOf(str) !== -1) {
-          if (satData[i].SCC_NUM.indexOf(str) !== -1) {
-            results.push({
-              isInView: satData[i].inview,
-              strIndex: satData[i].intlDes.indexOf(str),
-              SCC_NUM: satData[i].SCC_NUM,
-              patlen: len,
-              satId: i
-            });
-          } else {
-            results.push({
-              isInView: satData[i].inview,
-              strIndex: satData[i].intlDes.indexOf(str),
-              SCC_NUM: satData[i].SCC_NUM,
-              patlen: len,
-              satId: i
-            });
-          }
-        } else if (satData[i].SCC_NUM.indexOf(str) !== -1) {
-          if (satData[i].intlDes.indexOf(str) !== -1) {
-            results.push({
-              isInView: satData[i].inview,
-              strIndex: satData[i].intlDes.indexOf(str),
-              SCC_NUM: satData[i].SCC_NUM,
-              patlen: len,
-              satId: i
-            });
-          } else {
-            results.push({
-              isInView: satData[i].inview,
-              strIndex: satData[i].SCC_NUM.indexOf(str),
-              SCC_NUM: satData[i].SCC_NUM,
-              patlen: len,
-              satId: i
-            });
-          }
-        }
-        if (parseInt(satData[i].SCC_NUM) >= 80000) { continue; }
-        if ((satData[i].LV.indexOf(str) !== -1) || (satData[i].LV.indexOf(bigstr) !== -1)) {
+        if (satData[i].SCC_NUM.indexOf(searchString) !== -1) {
           results.push({
-            isInView: satData[i].inview,
-            strIndex: satData[i].LV.indexOf(str),
-            SCC_NUM: satData[i].SCC_NUM,
+            strIndex: satData[i].SCC_NUM.indexOf(searchString),
+            isSCC_NUM: true,
             patlen: len,
             satId: i
           });
+          continue; // Prevent's duplicate results
         }
+
+        // Analyst satellites only have names and SCC_NUMs
+        if (parseInt(satData[i].SCC_NUM) >= 80000) { continue; }
+
+        if (satData[i].intlDes.indexOf(searchString) !== -1) {
+            results.push({
+              strIndex: satData[i].intlDes.indexOf(searchString),
+              isIntlDes: true,
+              patlen: len,
+              satId: i
+            });
+          continue; // Prevent's duplicate results
+        }
+
+        if (satData[i].LV.toUpperCase().indexOf(searchString) !== -1) {
+          results.push({
+            strIndex: satData[i].LV.indexOf(searchString),
+            isLV: true,
+            patlen: len,
+            satId: i
+          });
+          continue; // Prevent's duplicate results
+        }
+        // At this point the item didn't match our search
       }
     }
 
+    // NOTE Removing this can result in a heavy performance lag
     if (results.length > settingsManager.searchLimit) {
       results.length = settingsManager.searchLimit;
     }
@@ -144,47 +142,50 @@
     lastResultGroup = dispGroup;
     groups.selectGroup(dispGroup);
 
-    searchBox.fillResultBox(results);
+    // Don't let the search overlap with the legend
     $('#legend-hover-menu').hide();
-    // searchBox.filterInView(results);
+
+    searchBox.fillResultBox(results);
     updateUrl();
   };
+
+
   searchBox.fillResultBox = function (results) {
     var resultBox = $('#search-results');
     var html = '';
     for (var i = 0; i < results.length; i++) {
       var sat = satData[results[i].satId];
       html += '<div class="search-result" data-sat-id="' + sat.id + '">';
-      if (results[i].isIntlDes || results[i].isObjnum) {
-        html += sat.ON;
-      } else {
+      if (results[i].isON) { // If the name matched - highlight it
         html += sat.ON.substring(0, results[i].strIndex);
         html += '<span class="search-hilight">';
         html += sat.ON.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
         html += '</span>';
         html += sat.ON.substring(results[i].strIndex + results[i].patlen);
+      } else { // If not, just write the name
+        html += sat.ON;
       }
       html += '<div class="search-result-scc">';
-      if (results[i].isObjnum) {
+      if (results[i].isSCC_NUM) { // If the object number matched
         html += sat.SCC_NUM.substring(0, results[i].strIndex);
         html += '<span class="search-hilight">';
         html += sat.SCC_NUM.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
         html += '</span>';
         html += sat.SCC_NUM.substring(results[i].strIndex + results[i].patlen);
-      } else if (results[i].desc) {
-        html += sat.desc;
-      } else {
+      } else if (results[i].isIntlDes) { // If the international designator matched
+        html += sat.intlDes.substring(0, results[i].strIndex);
+        html += '<span class="search-hilight">';
+        html += sat.intlDes.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
+        html += '</span>';
+        html += sat.intlDes.substring(results[i].strIndex + results[i].patlen);
+      } else { // Don't Write the lift vehicle - maybe it should?
         html += sat.SCC_NUM;
       }
       html += '</div></div>';
     }
     resultBox[0].innerHTML = html;
     resultBox.slideDown();
-    if (settingsManager.redTheme) {
-      $('.search-hilight').css('color', 'DarkRed');
-      $('#search-results').css('background', 'LightCoral');
-      $('#search-result:hover').css('background', 'DarkRed');
-    }
+    settingsManager.themes.redThemeSearch();
     resultsOpen = true;
   };
 

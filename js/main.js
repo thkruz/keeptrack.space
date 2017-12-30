@@ -828,7 +828,7 @@ var lastSelectedSat = -1;
       satellite.lookanglesInterval = $('#lookanglesInterval').val() * 1;
 
       document.getElementById('settings-resetSensor').checked = false;
-      settingsManager.forceColorScheme = true;
+      settingsManager.isForceColorScheme = true;
       satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
       e.preventDefault();
     });
@@ -999,7 +999,7 @@ var lastSelectedSat = -1;
     });
 
     $('#map-menu').on('click', '.map-look', function (evt) {
-      settingsManager.mapUpdateOverride = true;
+      settingsManager.isMapUpdateOverride = true;
       var time = $(this).context.attributes.time.value; // TODO: Find correct code for this.
       if (time !== null) {
         time = time.split(' ');
@@ -1030,7 +1030,7 @@ var lastSelectedSat = -1;
       _updateWatchlist();
       if (watchlistList.length <= 0) {
         settingsManager.redTheme = false;
-        settingsManager.themeChange(settingsManager.redTheme);
+        settingsManager.themes.blueTheme();
       }
     });
     $('#watchlist-content').on('click', '.watchlist-add', function (evt) {
@@ -2505,14 +2505,12 @@ var lastSelectedSat = -1;
     for (i = 0; i < watchlistInViewList.length; i++) {
       if (watchlistInViewList[i] === true) {
         // Someone is still in view on the watchlist
-        settingsManager.redTheme = true;
-        settingsManager.themeChange(settingsManager.redTheme);
+        settingsManager.themes.redTheme();
         return;
       }
     }
     // None of the sats on the watchlist are in view
-    settingsManager.redTheme = false;
-    settingsManager.themeChange(settingsManager.redTheme);
+    settingsManager.themes.blueTheme();
   }
 
   function _updateWatchlist () {

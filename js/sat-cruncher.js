@@ -266,7 +266,6 @@ function propagate () {
           rangeSat = lookangles.rangeSat;
         }
       } catch (e) {
-        console.info(e);
         // This is probably a reentry and should be skipped from now on.
         satCache[i].skip = true;
         x = 0;

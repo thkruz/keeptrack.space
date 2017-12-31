@@ -210,7 +210,7 @@ var lastSelectedSat = -1;
   var isSocratesMenuOpen = false;
   var isSettingsMenuOpen = false;
   var isShowNextPass = false;
-  var isShowDistance = false;
+  var isShowDistance = true;
   var isHoverBoxVisible = false;
 
   var rotateTheEarth = true; // Set to False to disable initial rotation
@@ -840,13 +840,6 @@ var lastSelectedSat = -1;
         ga('send', 'event', 'Settings Menu', 'Show Next Pass on Hover', 'Option Selected');
       } else {
         isShowNextPass = false;
-      }
-
-      if (isSDChecked) {
-        isShowDistance = true;
-        ga('send', 'event', 'Settings Menu', 'Show Distance on Hover', 'Option Selected');
-      } else {
-        isShowDistance = false;
       }
 
       if (isRiseSetChecked) {

@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.30.4';
+  settingsManager.versionNumber = 'v0.30.5';
   settingsManager.versionDate = 'December 31, 2017';
 
   (function _getVersion () {

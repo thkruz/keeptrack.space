@@ -89,8 +89,11 @@
   };
   groups.clearSelect = function () {
     groups.selectedGroup = null;
-    if (settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.onlyFOV); }
-    if (!settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.default); }
+    if (satSet.currentThe)
+    if (settingsManager.currentColorScheme === ColorScheme.default || settingsManager.currentColorScheme === ColorScheme.onlyFOV) {
+      if (settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.onlyFOV); }
+      if (!settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.default); }
+    }
   };
   groups.init = function () {
     var $search = $('#search');

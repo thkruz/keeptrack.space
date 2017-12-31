@@ -772,6 +772,13 @@ $.ajaxSetup({
         satellite.getsensorinfo();
       }
     }
+    $('#legend-list-default').hide();
+    $('#legend-list-rcs').hide();
+    $('#legend-list-small').hide();
+    $('#legend-list-near').hide();
+    $('#legend-list-deep').hide();
+    $('#legend-list-velocity').hide();
+    $('#legend-list-default-sensor').show();
   };
 
   sensorManager.sensorList = sensorList;

@@ -157,6 +157,7 @@
 
     searchBox.fillResultBox(results);
     updateUrl();
+    settingsManager.themes.retheme();
   };
 
 
@@ -199,7 +200,7 @@
     }
     resultBox[0].innerHTML = html;
     resultBox.slideDown();
-    settingsManager.themes.redThemeSearch();
+    settingsManager.themes.retheme();
     resultsOpen = true;
   };
 

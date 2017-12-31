@@ -588,19 +588,20 @@
     return satData;
   };
 
+  // Removed to reduce garbage collection
+  var buffers;
   satSet.setColorScheme = function (scheme) {
     settingsManager.currentColorScheme = scheme;
-    var buffers = scheme.calculateColorBuffers();
+    buffers = scheme.calculateColorBuffers();
     satColorBuf = buffers.colorBuf;
     pickableBuf = buffers.pickableBuf;
   };
 
-  satSet.draw = function (pMatrix, camMatrix) {
+  satSet.draw = function (pMatrix, camMatrix, drawNow) {
     // NOTE: 640 byte leak.
 
     if (!settingsManager.shadersReady || !settingsManager.cruncherReady) return;
 
-    drawNow = Date.now();
     drawDivisor = Math.max(timeManager.propRate, 0.001);
     drawDt = Math.min((drawNow - lastDrawTime) / 1000.0, 1.0 / drawDivisor);
     for (drawI = 0; drawI < (satData.length * 3); drawI++) {

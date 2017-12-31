@@ -5,8 +5,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.30.3';
-  settingsManager.versionDate = 'December 30, 2017';
+  settingsManager.versionNumber = 'v0.30.4';
+  settingsManager.versionDate = 'December 31, 2017';
 
   (function _getVersion () {
     var url = window.location.pathname;
@@ -17,7 +17,12 @@
 
   settingsManager.themes = {};
   settingsManager.themes.currentTheme = 'Blue';
+  settingsManager.themes.retheme = function () {
+    if (settingsManager.themes.currentTheme === 'Blue') settingsManager.themes.blueTheme();
+    if (settingsManager.themes.currentTheme === 'Red') settingsManager.themes.redTheme();
+  };
   settingsManager.themes.redTheme = function () {
+    if (settingsManager.themes.currentTheme === 'Red') return;
       document.getElementById('nav-wrapper').classList.remove('light-blue');
       document.getElementById('nav-wrapper').classList.add('red');
       document.getElementById('nav-footer').classList.add('red');
@@ -34,13 +39,14 @@
       $('.btn').css('background-color', 'red');
       settingsManager.themes.currentTheme = 'Red';
     };
-  settingsManager.themes.redThemeSearch = function () {
-    if (settingsManager.themes.currentTheme !== 'Red') return;
+  settingsManager.themes.redThemeSearch = function (isForce) {
+    if (settingsManager.themes.currentTheme !== 'Red' && !isForce) return;
     $('#search-results').css('background', 'LightCoral');
     $('#search-result:hover').css('background', 'DarkRed');
     $('.search-hilight').css('color', 'DarkRed');
   };
   settingsManager.themes.blueTheme = function () {
+    if (settingsManager.themes.currentTheme === 'Blue') return;
     document.getElementById('nav-wrapper').classList.remove('red');
     document.getElementById('nav-footer').classList.remove('red');
     document.getElementById('nav-footer').classList.remove('darken-3');

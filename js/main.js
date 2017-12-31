@@ -161,7 +161,8 @@ var lastSelectedSat = -1;
   var dragTargetLat;
   var pitchDif;
   var yawDif;
-  var $satHoverbox = $('#sat-hoverbox');
+  var satHoverBoxDOM = $('#sat-hoverbox');
+  var canvasDOM = $('#canvas');
 
   // var isZoomChanging = false;
   var dragTarget;
@@ -377,7 +378,7 @@ var lastSelectedSat = -1;
       $('#map-menu').width($(window).width());
     }
 
-    $('#canvas').on('touchmove', function (evt) {
+    canvasDOM.on('touchmove', function (evt) {
       evt.preventDefault();
       mouseX = evt.originalEvent.touches[0].clientX;
       mouseY = evt.originalEvent.touches[0].clientY;
@@ -393,7 +394,7 @@ var lastSelectedSat = -1;
       }, 250);
     });
 
-    $('#canvas').mousemove(function (evt) {
+    canvasDOM.mousemove(function (evt) {
       mouseX = evt.clientX;
       mouseY = evt.clientY;
       if (isDragging && screenDragPoint[0] !== mouseX && screenDragPoint[1] !== mouseY) {
@@ -408,7 +409,7 @@ var lastSelectedSat = -1;
       }, 250);
     });
 
-    $('#canvas').on('wheel', function (evt) {
+    canvasDOM.on('wheel', function (evt) {
       var delta = evt.originalEvent.deltaY;
       if (evt.originalEvent.deltaMode === 1) {
         delta *= 33.3333333;
@@ -420,7 +421,7 @@ var lastSelectedSat = -1;
       camZoomSnappedOnSat = false;
     });
 
-    $('#canvas').click(function (evt) {
+    canvasDOM.click(function (evt) {
       if ($('#colorbox').css('display') === 'block') {
         $.colorbox.close(); // Close colorbox if it was open
       }
@@ -439,7 +440,7 @@ var lastSelectedSat = -1;
       return false;
     };
 
-    $('#canvas').mousedown(function (evt) {
+    canvasDOM.mousedown(function (evt) {
       dragPoint = getEarthScreenPoint(mouseX, mouseY);
       screenDragPoint = [mouseX, mouseY];
       dragStartPitch = camPitch;
@@ -453,7 +454,7 @@ var lastSelectedSat = -1;
       rotateTheEarth = false;
     });
 
-    $('#canvas').on('touchstart', function (evt) {
+    canvasDOM.on('touchstart', function (evt) {
       var x = evt.originalEvent.touches[0].clientX;
       var y = evt.originalEvent.touches[0].clientY;
       dragPoint = getEarthScreenPoint(x, y);
@@ -469,7 +470,7 @@ var lastSelectedSat = -1;
       rotateTheEarth = false;
     });
 
-    $('#canvas').mouseup(function (evt) {
+    canvasDOM.mouseup(function (evt) {
       if (!dragHasMoved) {
         var clickedSat = _getSatIdFromCoord(mouseX, mouseY);
         if (clickedSat === -1 && evt.button === 2) { // Right Mouse Button Click
@@ -480,19 +481,9 @@ var lastSelectedSat = -1;
           if ($(document).width() <= 1000) {
             $('#search-results').attr('style', 'height:110px;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
             $('#controls-up-wrapper').css('top', '80px');
-            if (settingsManager.redTheme) {
-              $('.search-hilight').css('color', 'DarkRed');
-              $('#search-results').css('background', 'LightCoral');
-              $('#search-result:hover').css('background', 'DarkRed');
-            }
           } else {
             $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
             $('#legend-hover-menu').hide();
-            if (settingsManager.redTheme) {
-              $('.search-hilight').css('color', 'DarkRed');
-              $('#search-results').css('background', 'LightCoral');
-              $('#search-result:hover').css('background', 'DarkRed');
-            }
           }
 
           // Hide All legends
@@ -515,12 +506,16 @@ var lastSelectedSat = -1;
         }
         selectSat(clickedSat);
       }
+      // Repaint the theme to ensure it is the right color
+      settingsManager.themes.retheme();
+      // Force the serach bar to get repainted because it gets overwrote a lot
+      settingsManager.themes.redThemeSearch();
       dragHasMoved = false;
       isDragging = false;
       rotateTheEarth = false;
     });
 
-    $('#canvas').on('touchend', function (evt) {
+    canvasDOM.on('touchend', function (evt) {
       dragHasMoved = false;
       isDragging = false;
       rotateTheEarth = false;
@@ -585,8 +580,17 @@ var lastSelectedSat = -1;
       camZoomSnappedOnSat = false;
     });
 
+    $('#info-overlay-content').on('click', '.watchlist-object', function (evt) {
+      var objNum = $(this).context.textContent.split(':');
+      objNum = objNum[0];
+      var satId = satSet.getIdFromObjNum(objNum);
+      if (satId !== null) {
+        selectSat(satId);
+      }
+    });
+
     $('#bottom-menu').on('click', '.FOV-object', function (evt) {
-      var objNum = $(this).context.textContent; // TODO: Find correct code for this.
+      var objNum = $(this).context.textContent;
       objNum = objNum.slice(-5);
       var satId = satSet.getIdFromObjNum(objNum);
       if (satId !== null) {
@@ -740,6 +744,8 @@ var lastSelectedSat = -1;
         dat: (timeManager.propOffset).toString() + ' ' + (1.0).toString()
       });
       timeManager.propRealTime = Date.now();
+      lastOverlayUpdateTime = 0;
+      _updateNextPassOverlay(true);
       e.preventDefault();
     });
     $('#findByLooks').submit(function (e) {
@@ -1055,7 +1061,6 @@ var lastSelectedSat = -1;
       }
       _updateWatchlist();
       if (watchlistList.length <= 0) {
-        settingsManager.redTheme = false;
         settingsManager.themes.blueTheme();
       }
       if (!satellite.sensorSelected() || watchlistList.length <= 0) {
@@ -1477,12 +1482,12 @@ var lastSelectedSat = -1;
       e.preventDefault();
     });
 
-    $('#canvas').on('keypress', _keyHandler); // On Key Press Event Run _keyHandler Function
-    $('#canvas').on('keydown', _keyDownHandler); // On Key Press Event Run _keyHandler Function
-    $('#canvas').on('keyup', _keyUpHandler); // On Key Press Event Run _keyHandler Function
+    canvasDOM.on('keypress', _keyHandler); // On Key Press Event Run _keyHandler Function
+    canvasDOM.on('keydown', _keyDownHandler); // On Key Press Event Run _keyHandler Function
+    canvasDOM.on('keyup', _keyUpHandler); // On Key Press Event Run _keyHandler Function
     $('#bottom-icons').on('click', '.bmenu-item', _bottomIconPress); // Bottom Button Pressed
-    $('#canvas').attr('tabIndex', 0);
-    $('#canvas').focus();
+    canvasDOM.attr('tabIndex', 0);
+    canvasDOM.focus();
 
     drawLoop(); // kick off the animationFrame()s
   });
@@ -1624,7 +1629,7 @@ var lastSelectedSat = -1;
 
     // if (debugLine) debugLine.draw();
     earth.draw(pMatrix, camMatrix);
-    satSet.draw(pMatrix, camMatrix);
+    satSet.draw(pMatrix, camMatrix, drawNow);
     orbitDisplay.draw(pMatrix, camMatrix);
 
     /* DEBUG - show the pickbuffer on a canvas */
@@ -1754,9 +1759,9 @@ var lastSelectedSat = -1;
   function hoverBoxOnSat (satId, satX, satY) {
     if (satId === -1) {
       if (!isHoverBoxVisible) return;
-      $satHoverbox.html('(none)');
-      $satHoverbox.css({display: 'none'});
-      $('#canvas').css({cursor: 'default'});
+      satHoverBoxDOM.html('(none)');
+      satHoverBoxDOM.css({display: 'none'});
+      canvasDOM.css({cursor: 'default'});
       isHoverBoxVisible = false;
     } else if (!isDragging) {
       try {
@@ -1764,34 +1769,34 @@ var lastSelectedSat = -1;
         var selectedSatData = satSet.getSat(selectedSat);
         isHoverBoxVisible = true;
         if (sat.static && isShowDistance) {
-          $satHoverbox.html(sat.name + '<br /><center>' + sat.type + satellite.distance(sat, selectedSatData) + '</center>');
+          satHoverBoxDOM.html(sat.name + '<br /><center>' + sat.type + satellite.distance(sat, selectedSatData) + '</center>');
         } else if (sat.static) {
           if (sat.type === 'Launch Facility') {
             var launchSite = tleManager.extractLaunchSite(sat.name);
-            $satHoverbox.html(launchSite.site + ', ' + launchSite.sitec + '<br /><center>' + sat.type + '</center>');
+            satHoverBoxDOM.html(launchSite.site + ', ' + launchSite.sitec + '<br /><center>' + sat.type + '</center>');
           } else {
-            $satHoverbox.html(sat.name + '<br /><center>' + sat.type + '</center>');
+            satHoverBoxDOM.html(sat.name + '<br /><center>' + sat.type + '</center>');
           }
         } else if (sat.missile) {
-          $satHoverbox.html(sat.ON + '<br /><center>' + sat.desc + '</center>');
+          satHoverBoxDOM.html(sat.ON + '<br /><center>' + sat.desc + '</center>');
         } else {
           if (satellite.sensorSelected() && isShowNextPass && isShowDistance) {
-            $satHoverbox.html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '</center>');
+            satHoverBoxDOM.html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '</center>');
           } else if (isShowDistance) {
-            $satHoverbox.html(sat.ON + '<br /><center>' + sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '</center>');
+            satHoverBoxDOM.html(sat.ON + '<br /><center>' + sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '</center>');
           } else if (satellite.sensorSelected() && isShowNextPass) {
-            $satHoverbox.html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + satellite.nextpass(sat) + '</center>');
+            satHoverBoxDOM.html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + satellite.nextpass(sat) + '</center>');
           } else {
-            $satHoverbox.html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
+            satHoverBoxDOM.html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
           }
         }
-        $satHoverbox.css({
+        satHoverBoxDOM.css({
           display: 'block',
           position: 'absolute',
           left: satX + 20,
           top: satY - 10
         });
-        $('#canvas').css({cursor: 'pointer'});
+        canvasDOM.css({cursor: 'pointer'});
       } catch (e) {}
     }
   }
@@ -1928,7 +1933,7 @@ var lastSelectedSat = -1;
       pickColorBuf[2] === 0);
   }
   function _webGlInit () {
-    var can = $('#canvas')[0];
+    var can = canvasDOM[0];
 
     can.width = window.innerWidth;
     can.height = window.innerHeight;
@@ -2509,33 +2514,39 @@ var lastSelectedSat = -1;
     }
   }
 
+  var infoOverlayDOM = $('#info-overlay-content');
   function _updateNextPassOverlay (isForceUpdate) {
     if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
     // Update once every 10 seconds
     if (timeManager.now > (lastOverlayUpdateTime * 1 + 10000) || isForceUpdate) {
-      $('#info-overlay-content').html('');
+      var propTime = timeManager.propTime();
+      infoOverlayDOM.html('');
       for (var s = 0; s < nextPassArray.length; s++) {
+        var satInView = satSet.getSat(satSet.getIdFromObjNum(nextPassArray[s].SCC_NUM)).inview;
         // If old time and not in view, skip it
-        if (nextPassArray[s].time < timeManager.now && !satSet.getSat(satSet.getIdFromObjNum(nextPassArray[s].SCC_NUM)).inview) continue;
+        if (nextPassArray[s].time - propTime < -1000 * 60 * 5 && !satInView) continue;
+
+        // Get the pass Time
+        var time = timeManager.dateFormat(nextPassArray[s].time, 'isoTime', true);
 
         // Yellow - In View and Time to Next Pass is Less Than an Hour
         // NOTE Less than an hour is probably excessive.
-        if ((satSet.getSat(satSet.getIdFromObjNum(nextPassArray[s].SCC_NUM)).inview && (nextPassArray[s].time - timeManager.propTime() < 1000 * 60 * 60))) {
-          $('#info-overlay-content').append('<div class="row">' +
-                        '<h5 class="center-align" style="color: yellow">' + nextPassArray[s].SCC_NUM + ': ' + timeManager.dateFormat(nextPassArray[s].time, 'isoTime', true) + '</h5>' +
+        if ((satInView && (nextPassArray[s].time - propTime < 1000 * 60 * 60))) {
+          infoOverlayDOM.append('<div class="row">' +
+                        '<h5 class="center-align watchlist-object link" style="color: yellow">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
                         '</div>');
           continue;
         }
-        // Green - Next 10 Minutes
-        if (nextPassArray[s].time - timeManager.propTime() < 1000 * 60 * 10) {
-          $('#info-overlay-content').append('<div class="row">' +
-                        '<h5 class="center-align" style="color: green">' + nextPassArray[s].SCC_NUM + ': ' + timeManager.dateFormat(nextPassArray[s].time, 'isoTime', true) + '</h5>' +
+        // Blue - Next 10 Minutes
+        if (nextPassArray[s].time - propTime < 1000 * 60 * 10) {
+          infoOverlayDOM.append('<div class="row">' +
+                        '<h5 class="center-align watchlist-object link" style="color: blue">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
                         '</div>');
           continue;
         }
         // White - Later
-        $('#info-overlay-content').append('<div class="row">' +
-                      '<h5 class="center-align" style="color: white">' + nextPassArray[s].SCC_NUM + ': ' + timeManager.dateFormat(nextPassArray[s].time, 'isoTime', true) + '</h5>' +
+        infoOverlayDOM.append('<div class="row">' +
+                      '<h5 class="center-align watchlist-object link" style="color: white">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
                       '</div>');
       }
       lastOverlayUpdateTime = timeManager.now;
@@ -2966,36 +2977,16 @@ function selectSat (satId) {
     if ($('#search-results').css('display') === 'block') {
       if ($(document).width() <= 1000) {
         $('#search-results').attr('style', 'display:block;height:110px;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
-        if (settingsManager.redTheme) {
-          $('.search-hilight').css('color', 'DarkRed');
-          $('#search-results').css('background', 'LightCoral');
-          $('#search-result:hover').css('background', 'DarkRed');
-        }
         $('#controls-up-wrapper').css('top', '180px');
       } else {
         $('#search-results').attr('style', 'display:block;max-height:100%;margin-bottom:-50px;');
-        if (settingsManager.redTheme) {
-          $('.search-hilight').css('color', 'DarkRed');
-          $('#search-results').css('background', 'LightCoral');
-          $('#search-result:hover').css('background', 'DarkRed');
-        }
       }
     } else {
       if ($(document).width() <= 1000) {
         $('#search-results').attr('style', 'height:110px;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
         $('#controls-up-wrapper').css('top', '80px');
-        if (settingsManager.redTheme) {
-          $('.search-hilight').css('color', 'DarkRed');
-          $('#search-results').css('background', 'LightCoral');
-          $('#search-result:hover').css('background', 'DarkRed');
-        }
       } else {
         $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
-        if (settingsManager.redTheme) {
-          $('.search-hilight').css('color', 'DarkRed');
-          $('#search-results').css('background', 'LightCoral');
-          $('#search-result:hover').css('background', 'DarkRed');
-        }
       }
     }
     $('#iss-stream').html('');
@@ -3061,19 +3052,9 @@ function selectSat (satId) {
       if ($(document).width() <= 1000) {
         $('#search-results').attr('style', 'display:block; height:110px; width: 100%;bottom:auto;margin-top:50px;');
         $('#controls-up-wrapper').css('top', '180px');
-        if (settingsManager.redTheme) {
-          $('.search-hilight').css('color', 'DarkRed');
-          $('#search-results').css('background', 'LightCoral');
-          $('#search-result:hover').css('background', 'DarkRed');
-        }
       } else {
         $('#search-results').attr('style', 'display:block; max-height:27%');
         $('#legend-hover-menu').hide();
-        if (settingsManager.redTheme) {
-          $('.search-hilight').css('color', 'DarkRed');
-          $('#search-results').css('background', 'LightCoral');
-          $('#search-result:hover').css('background', 'DarkRed');
-        }
       }
     } else {
       if ($(document).width() <= 1000) {
@@ -3224,6 +3205,7 @@ function selectSat (satId) {
     }
   }
 
+  settingsManager.themes.retheme();
   updateUrl();
 }
 function browserUnsupported () {

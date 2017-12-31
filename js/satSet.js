@@ -236,7 +236,7 @@
       $('#loading-screen').fadeOut();
       $('body').attr('style', 'background:black');
       $('#canvas-holder').attr('style', 'display:block');
-      $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
+      // $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
       // $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
       // $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
       // $('#menu-lookangles img').removeClass('bmenu-item-disabled');

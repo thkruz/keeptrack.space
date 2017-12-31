@@ -28,8 +28,13 @@ var RussianICBM = [
   51 + (40 * 0.01666667), 45 + (34 * 0.01666667), 'Tatishchevo (SS-19)', 10000,
   51 + (40 * 0.01666667), 45 + (34 * 0.01666667), 'Tatishchevo (SS-27)', 10500,
   56 + (51 * 0.01666667), 40 + (32 * 0.01666667), 'Teykovo (SS-25)', 10500,
-  56 + (38 * 0.01666667), 47 + (51 * 0.01666667), 'Yoshkar Ola (SS-25)', 10500
-  // 58.677, -22.765, 'North Atlantic (Delta IV)'
+  56 + (38 * 0.01666667), 47 + (51 * 0.01666667), 'Yoshkar Ola (SS-25)', 10500,
+  72.039545, 42.696683, 'Verkhoturye (SS-N-23A)', 8300,
+  73.902056, 3.133463, 'Ekaterinburg (SS-N-23A)', 8300,
+  76.502284, -158.871984, 'Tula (SS-N-23A)', 8300,
+  82.256810, -10.161045, 'Bryansk (SS-N-23A)', 8300,
+  81.564646, 32.553796, 'Karelia (SS-N-23A)', 8300,
+  74.673660, 6.538173, 'Novomoskovsk (SS-N-23A)', 8300,
 ];
 
 var ChinaICBM = [
@@ -160,7 +165,14 @@ var USATargets = [
   64.940, -147.881, // Fairbanks AK
   58.488, -134.238, // Juneau AK
   30.460, -86.549, // Eglin AFB FL
-  41.330, -96.054 // Omaha NE
+  41.330, -96.054, // Omaha NE
+  39.113276, -121.356137, // Beale AFB
+  64.303735, -149.148768, // Clear AFS
+  76.534322, -68.718288, // Thule AFB
+  41.875523, -87.634038, // Chicago IL
+  35.145865, -89.979153, // Memphis TN
+  43.663448, -70.278127, // Portland MA
+  43.612156, -116.231845 // Boise ID
 ];
 
 function MassRaidPre (time, simFile) {
@@ -198,113 +210,132 @@ function MassRaidPre (time, simFile) {
 
 function MassRaid (time, BurnRate, RaidType) {
 
+  var a = 0;
   var b = 500 - missilesInUse;
+  var i = 0;
+  var missilesLaunched = 0;
+  var isResetMissilesLaunched = false;
+  var launchTime = 0;
+  var success = 0;
 
   if (RaidType === 'Russia') {
-    var resetMissilesLaunched = false;
-    var missilesLaunched = 0;
-    for (var a = 0; a < RussianICBM.length / 4; a++) {
-      if (resetMissilesLaunched) {
+    console.info('Russian Mass Raid Start: ' + Date.now());
+    isResetMissilesLaunched = false;
+    missilesLaunched = 0;
+    for (a = 0; a < RussianICBM.length / 4; a++) {
+      if (isResetMissilesLaunched) {
         missilesLaunched = 0;
-        resetMissilesLaunched = false;
+        isResetMissilesLaunched = false;
       }
-      for (var i = 0; i < USATargets.length / 2; i++) {
+      for (i = 0; i < USATargets.length / 2; i++) {
         if (b <= 500 - MAX_RUSSIAN_MISSILES) continue; // Don't Launch more than 252 Missiles
-        if (missilesLaunched > 30) continue; // 30 missiles per site
+        if ((RussianICBM[a * 4 + 3] !== 8300) && (missilesLaunched > 19)) continue; // 20 missiles per site
+        if ((RussianICBM[a * 4 + 3] === 8300) && (missilesLaunched > 11)) continue; // 12 missiles per sub
         if (Math.random() < 0.3) { // Skip over 70% of the cities to make it more random
-          var LaunchTime = time + Math.random() * 240 * 1000;
-          var success = Missile(RussianICBM[a * 4], RussianICBM[a * 4 + 1], USATargets[i * 2], USATargets[i * 2 + 1], 3, satSet.getSatData().length - b, LaunchTime, RussianICBM[a * 4 + 2], 30, 2.9, BurnRate, RussianICBM[a * 4 + 3]);
+          launchTime = (time * 1) + Math.random() * 240 * 1000;
+          success = Missile(RussianICBM[a * 4], RussianICBM[a * 4 + 1], USATargets[i * 2], USATargets[i * 2 + 1], 3, satSet.getSatData().length - b, launchTime,
+                                RussianICBM[a * 4 + 2], 30, 2.9, BurnRate, RussianICBM[a * 4 + 3], 'Russia');
           missilesLaunched += success; // Add 1 if missile passed range checks
           b -= success;
+          console.info('Missiles Launched: ' + (500 - b) + ' - ' + RussianICBM[a * 4 + 2]);
         }
       }
       if (b <= 500 - MAX_RUSSIAN_MISSILES) continue;
-      if (missilesLaunched <= 12 && i >= USATargets.length / 2) { // If less than 12 missiles launched redo that brigade
+      if ((RussianICBM[a * 4 + 3] !== 8300 && missilesLaunched <= 18 && i >= USATargets.length / 2) || // If less than 25 missiles launched redo that brigade
+        (RussianICBM[a * 4 + 3] === 8300 && missilesLaunched <= 10 && i >= USATargets.length / 2)) { // If submarine then limit to 16 missiles
         a--;
-        resetMissilesLaunched = false;
+        isResetMissilesLaunched = false;
       } else {
-        resetMissilesLaunched = true;
+        isResetMissilesLaunched = true;
       }
     }
   } else if (RaidType === 'China') {
-    resetMissilesLaunched = false;
+    console.info('Chinese Mass Raid Start: ' + Date.now());
+    isResetMissilesLaunched = false;
     missilesLaunched = 0;
     for (a = 0; a < ChinaICBM.length / 4; a++) {
-      if (resetMissilesLaunched) {
+      if (isResetMissilesLaunched) {
         missilesLaunched = 0;
-        resetMissilesLaunched = false;
+        isResetMissilesLaunched = false;
       }
       for (i = 0; i < USATargets.length / 2; i++) {
         if (b <= 500 - MAX_CHINESE_MISSILES) continue; // Don't Launch more than 252 Missiles
         if (missilesLaunched > 12) continue; // 12 missiles per brigade
         if (Math.random() < 0.3) { // Skip over 70% of the cities to make it more random
-          LaunchTime = time + Math.random() * 240 * 1000;
-          success = Missile(ChinaICBM[a * 4], ChinaICBM[a * 4 + 1], USATargets[i * 2], USATargets[i * 2 + 1], 3, satSet.getSatData().length - b, LaunchTime, ChinaICBM[a * 4 + 2], 30, 2.9, BurnRate, ChinaICBM[a * 4 + 3]);
+          launchTime = time + Math.random() * 240 * 1000;
+          success = Missile(ChinaICBM[a * 4], ChinaICBM[a * 4 + 1], USATargets[i * 2], USATargets[i * 2 + 1], 3, satSet.getSatData().length - b, launchTime,
+                            ChinaICBM[a * 4 + 2], 30, 2.9, BurnRate, ChinaICBM[a * 4 + 3], 'China');
           missilesLaunched += success; // Add 1 if missile passed range checks
           b -= success;
+          console.info('Missiles Launched: ' + (500 - b));
         }
       }
       if (b <= 500 - MAX_CHINESE_MISSILES) continue;
       if (missilesLaunched <= 11 && i >= USATargets.length / 2) { // If less than 12 missiles launched redo that brigade
         a--;
-        resetMissilesLaunched = false;
+        isResetMissilesLaunched = false;
       } else {
-        resetMissilesLaunched = true;
+        isResetMissilesLaunched = true;
       }
     }
   } else if (RaidType === 'North Korea') {
-    resetMissilesLaunched = false;
+    console.info('North Korea Mass Raid Start: ' + Date.now());
+    isResetMissilesLaunched = false;
     missilesLaunched = 0;
     for (a = 0; a < NorthKoreanBM.length / 4; a++) {
-      if (resetMissilesLaunched) {
+      if (isResetMissilesLaunched) {
         missilesLaunched = 0;
-        resetMissilesLaunched = false;
+        isResetMissilesLaunched = false;
       }
       for (i = 0; i < USATargets.length / 2; i++) {
         if (b <= 500 - MAX_NORTH_KOREAN_MISSILES) continue; // Don't Launch more than 252 Missiles
         if (missilesLaunched > 12) continue; // 12 missiles per brigade
         if (Math.random() < 0.3) { // Skip over 70% of the cities to make it more random
-          LaunchTime = time + Math.random() * 240 * 1000;
-          success = Missile(NorthKoreanBM[a * 4], NorthKoreanBM[a * 4 + 1], USATargets[i * 2], USATargets[i * 2 + 1], 3, satSet.getSatData().length - b, LaunchTime, NorthKoreanBM[a * 4 + 2], 30, 2.9, BurnRate, NorthKoreanBM[a * 4 + 3]);
+          launchTime = time + Math.random() * 240 * 1000;
+          success = Missile(NorthKoreanBM[a * 4], NorthKoreanBM[a * 4 + 1], USATargets[i * 2], USATargets[i * 2 + 1], 3, satSet.getSatData().length - b, launchTime,
+                            NorthKoreanBM[a * 4 + 2], 30, 2.9, BurnRate, NorthKoreanBM[a * 4 + 3], "North Korea");
           missilesLaunched += success; // Add 1 if missile passed range checks
           b -= success;
+          console.info('Missiles Launched: ' + (500 - b));
         }
       }
       if (b <= 500 - MAX_NORTH_KOREAN_MISSILES) continue;
       if (missilesLaunched <= 4 && i >= USATargets.length / 2) { // If less than 5 missiles launched redo that brigade
         a--;
-        resetMissilesLaunched = false;
+        isResetMissilesLaunched = false;
       } else {
-        resetMissilesLaunched = true;
+        isResetMissilesLaunched = true;
       }
     }
   } else if (RaidType === 'USA2Russia' || RaidType === 'USA2China' || RaidType === 'USA2NorthKorea') {
-    var resetMissilesLaunched = false;
-    var missilesLaunched = 0;
-    for (var a = 0; a < UsaICBM.length / 4; a++) {
-      var i = 0;
-      console.log(a);
-      if (resetMissilesLaunched) {
+    console.info('USA Mass Raid Start: ' + Date.now());
+    isResetMissilesLaunched = false;
+    missilesLaunched = 0;
+    for (a = 0; a < UsaICBM.length / 4; a++) {
+      i = 0;
+      if (isResetMissilesLaunched) {
         missilesLaunched = 0;
-        resetMissilesLaunched = false;
+        isResetMissilesLaunched = false;
       }
       if (RaidType === 'USA2Russia') {
         for (i = 0; i < RussianICBM.length / 4; i++) {
           if (b <= 500 - MAX_USA_MISSILES) continue; // Don't Launch more than 350 Missiles
           if (missilesLaunched > 50) continue; // 50 missiles per site
           if (Math.random() < 0.3) { // Skip over 70% of the cities to make it more random
-            var LaunchTime = time + Math.random() * 240 * 1000;
-            var success = Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], RussianICBM[i * 4], RussianICBM[i * 4 + 1], 3, satSet.getSatData().length - b, LaunchTime, UsaICBM[a * 4 + 2], 30, 2.9, BurnRate, UsaICBM[a * 4 + 3]);
+            launchTime = time + Math.random() * 240 * 1000;
+            success = Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], RussianICBM[i * 4], RussianICBM[i * 4 + 1], 3, satSet.getSatData().length - b, launchTime,
+                              UsaICBM[a * 4 + 2], 30, 2.9, BurnRate, UsaICBM[a * 4 + 3], 'United States');
             missilesLaunched += success; // Add 1 if missile passed range checks
             b -= success;
+            console.info('Missiles Launched: ' + (500 - b));
           }
         }
         if (b > 500 - MAX_USA_MISSILES) {
           if (missilesLaunched <= 50) {
             a--;
-            resetMissilesLaunched = false;
+            isResetMissilesLaunched = false;
           } else {
-            resetMissilesLaunched = true;
+            isResetMissilesLaunched = true;
           }
         }
       } else if (RaidType === 'USA2China') {
@@ -312,18 +343,20 @@ function MassRaid (time, BurnRate, RaidType) {
           if (b <= 500 - MAX_USA_MISSILES) continue; // Don't Launch more than 350 Missiles
           if (missilesLaunched > 50) continue; // 50 missiles per site
           if (Math.random() < 0.3) { // Skip over 70% of the cities to make it more random
-            var LaunchTime = time + Math.random() * 240 * 1000;
-            var success = Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], ChinaICBM[i * 4], ChinaICBM[i * 4 + 1], 3, satSet.getSatData().length - b, LaunchTime, UsaICBM[a * 4 + 2], 30, 2.9, BurnRate, UsaICBM[a * 4 + 3]);
+            launchTime = time + Math.random() * 240 * 1000;
+            success = Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], ChinaICBM[i * 4], ChinaICBM[i * 4 + 1], 3, satSet.getSatData().length - b, launchTime,
+                              UsaICBM[a * 4 + 2], 30, 2.9, BurnRate, UsaICBM[a * 4 + 3], 'United States');
             missilesLaunched += success; // Add 1 if missile passed range checks
             b -= success;
+            console.info('Missiles Launched: ' + (500 - b));
           }
         }
         if (b > 500 - MAX_USA_MISSILES) {
           if (missilesLaunched <= 50) {
             a--;
-            resetMissilesLaunched = false;
+            isResetMissilesLaunched = false;
           } else {
-            resetMissilesLaunched = true;
+            isResetMissilesLaunched = true;
           }
         }
       } else if (RaidType === 'USA2NorthKorea') {
@@ -331,18 +364,20 @@ function MassRaid (time, BurnRate, RaidType) {
           if (b <= 500 - 18) continue; // Don't Launch more than 15 Missiles
           if (missilesLaunched > 5) continue; // 30 missiles per site
           if (Math.random() < 0.3) { // Skip over 70% of the cities to make it more random
-            var LaunchTime = time + Math.random() * 240 * 1000;
-            var success = Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], NorthKoreanBM[i * 4], NorthKoreanBM[i * 4 + 1], 3, satSet.getSatData().length - b, LaunchTime, UsaICBM[a * 4 + 2], 30, 2.9, BurnRate, UsaICBM[a * 4 + 3]);
+            launchTime = time + Math.random() * 240 * 1000;
+            success = Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], NorthKoreanBM[i * 4], NorthKoreanBM[i * 4 + 1], 3, satSet.getSatData().length - b, launchTime,
+                              UsaICBM[a * 4 + 2], 30, 2.9, BurnRate, UsaICBM[a * 4 + 3], 'United States');
             missilesLaunched += success; // Add 1 if missile passed range checks
             b -= success;
+            console.info('Missiles Launched: ' + (500 - b));
           }
         }
         if (b > 500 - MAX_USA_MISSILES) {
           if (missilesLaunched <= 5) {
             a--;
-            resetMissilesLaunched = false;
+            isResetMissilesLaunched = false;
           } else {
-            resetMissilesLaunched = true;
+            isResetMissilesLaunched = true;
           }
         }
       }
@@ -518,11 +553,12 @@ function CoordinateCalculator (CurrentLatitude, CurrentLongitude, TargetLatitude
   var LongList2 = [];
   var LongList3 = [];
   var EstDistanceList = [];
+  var GoalDistance;
   for (var i = 0; i <= 2400; i++) {
     var Sigma = DeltaSigma01 + (i * (DeltaSigma02 - DeltaSigma01)) / 2000; // (Rad)
     var Phi = (Math.asin(Math.cos(Alphao) * Math.sin(Sigma)) * 180 / Math.PI); // (Degrees)
     var Lambda = (Lambdao + Math.atan2((Math.sin(Alphao) * Math.sin(Sigma)), (Math.cos(Sigma)))) * 180 / Math.PI; // (Degrees)
-    if (i === 2000) var GoalDistance = ((Sigma - DeltaSigma01) * r);
+    if (i === 2000) GoalDistance = ((Sigma - DeltaSigma01) * r);
     EstDistanceList.push(((Sigma - DeltaSigma01) * r) / 1000);
     if (Lambda >= -180 && Lambda <= 180) {
       LongList1.push(Lambda);        // (Degrees)
@@ -603,7 +639,8 @@ function IterationFun (FuelArea, FuelMass, RocketArea, Altitude, RocketCasingMas
   // in order to understand the flight of the missile and its governing principles
 
   // This governs the thrust angle as a function of altitude
-  if (Altitude < 1200000) var ThrustAngle = (90 - (AngleCoefficient) * (1.5336118956 + 0.00443173537387 * Altitude - (9.30373890848 * Math.pow(10, -8)) * Math.pow(Altitude, 2) +
+  var ThrustAngle;
+  if (Altitude < 1200000) ThrustAngle = (90 - (AngleCoefficient) * (1.5336118956 + 0.00443173537387 * Altitude - (9.30373890848 * Math.pow(10, -8)) * Math.pow(Altitude, 2) +
                                            (8.37838197732 * Math.pow(10, -13)) * Math.pow(Altitude, 3) - (2.71228576626 * Math.pow(10, -18)) * Math.pow(Altitude, 4))) * 0.0174533; // (Degrees)
   else ThrustAngle = 30;
 
@@ -870,7 +907,7 @@ function QuickRun (FuelArea1, FuelArea2, FuelMass, FuelVolume, RocketArea, Altit
 
   return Distance;
 }
-function Missile (CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude, NumberWarheads, MissileObjectNum, CurrentTime, MissileDesc, Length, Diameter, NewBurnRate, MaxMissileRange) {
+function Missile (CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude, NumberWarheads, MissileObjectNum, CurrentTime, MissileDesc, Length, Diameter, NewBurnRate, MaxMissileRange, country) {
   // This is the main function for this program. It calculates and designs the flight path of an intercontinental
   // ballistic missile (ICBM). This function calls upon many sub-functions to help it iteratively calculate many of the
   // changing variables as the rocket makes its path around the world. Changing variables that had to be taken into
@@ -1357,6 +1394,7 @@ function Missile (CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongi
     MissileObject.id = MissileObjectNum;
     MissileObject.maxAlt = MaxAltitude;
     MissileObject.startTime = CurrentTime;
+    if (country) MissileObject.C = country;
 
     if (MissileObject.apogee) delete MissileObject.apogee;
     if (MissileObject.argPe) delete MissileObject.argPe;
@@ -1376,7 +1414,7 @@ function Missile (CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongi
     satCruncher.postMessage({
       id: MissileObject.id,
       typ: 'newMissile',
-      ON: 'RV_' + MissileObject.name,
+      ON: 'RV_' + MissileObject.name, // Don't think satCruncher needs this
       satId: MissileObject.id,
       static: MissileObject.static,
       missile: MissileObject.missile,
@@ -1428,3 +1466,107 @@ function clearMissiles () {
     });
   }
 }
+
+getMissileTEARR = function (missile, sensor) {
+  var currentTEARR = {}; // Most current TEARR data that is set in satellite object and returned.
+  // Set default timing settings. These will be changed to find look angles at different times in future.
+  timeManager.propRealTime = Date.now();
+  var propOffset = timeManager.getPropOffset();               // offset letting us propagate in the future (or past)
+  var now = timeManager.propTimeCheck(propOffset, timeManager.propRealTime);
+  var j = timeManager.jday(now.getUTCFullYear(),
+               now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+               now.getUTCDate(),
+               now.getUTCHours(),
+               now.getUTCMinutes(),
+               now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+  j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+  var gmst = satellite.gstime(j);
+
+  // If no sensor passed to function then try to use the 'currentSensor'
+  if (typeof sensor == 'undefined') {
+    if (typeof satellite.currentSensor == 'undefined') {
+      throw 'getTEARR requires a sensor or for a sensor to be currently selected.';
+    } else {
+      sensor = satellite.currentSensor;
+    }
+  }
+  // If sensor's observerGd is not set try to set it using it parameters
+  if (typeof sensor.observerGd == 'undefined') {
+    try {
+      sensor.observerGd = {
+        height: sensor.obshei,
+        latitude: sensor.lat,
+        longitude: sensor.long
+      };
+    } catch (e) {
+      throw 'observerGd is not set and could not be guessed.';
+    }
+  }
+
+  // Set default timing settings. These will be changed to find look angles at different times in future.
+  timeManager.propRealTime = Date.now();
+  var propOffset = timeManager.getPropOffset();               // offset letting us propagate in the future (or past)
+  var tLen = missile.altList.length;
+  for (var t = 0; t < tLen; t++) {
+    if (missile.startTime + t * 1000 > now) {
+      curMissileTime = t;
+      break;
+    }
+  }
+  cosLat = Math.cos(missile.latList[curMissileTime] * DEG2RAD);
+  sinLat = Math.sin(missile.latList[curMissileTime] * DEG2RAD);
+  cosLon = Math.cos((missile.lonList[curMissileTime] * DEG2RAD) + gmst);
+  sinLon = Math.sin((missile.lonList[curMissileTime] * DEG2RAD) + gmst);
+
+  x = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * cosLon;
+  y = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * sinLon;
+  z = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * sinLat;
+
+  try {
+    gpos = satellite.eciToGeodetic({x: x, y: y, z: z}, gmst);
+    currentTEARR.alt = gpos.height;
+    currentTEARR.lon = gpos.longitude;
+    currentTEARR.lat = gpos.latitude;
+    positionEcf = satellite.eciToEcf({x: x, y: y, z: z}, gmst);
+    lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+    currentTEARR.azimuth = lookAngles.azimuth * RAD2DEG;
+    currentTEARR.elevation = lookAngles.elevation * RAD2DEG;
+    currentTEARR.range = lookAngles.rangeSat;
+  } catch (e) {
+    currentTEARR.alt = 0;
+    currentTEARR.lon = 0;
+    currentTEARR.lat = 0;
+    positionEcf = 0;
+    lookAngles = 0;
+    currentTEARR.azimuth = 0;
+    currentTEARR.elevation = 0;
+    currentTEARR.range = 0;
+  }
+
+  // Check if satellite is in field of view of a sensor.
+  if (sensor.obsminaz > sensor.obsmaxaz) {
+    if (((currentTEARR.azimuth >= sensor.obsminaz || currentTEARR.azimuth <= sensor.obsmaxaz) &&
+         (currentTEARR.elevation >= sensor.obsminel && currentTEARR.elevation <= sensor.obsmaxel) &&
+         (currentTEARR.range <= sensor.obsmaxrange && currentTEARR.range >= sensor.obsminrange)) ||
+         ((currentTEARR.azimuth >= sensor.obsminaz2 || currentTEARR.azimuth <= sensor.obsmaxaz2) &&
+         (currentTEARR.elevation >= sensor.obsminel2 && currentTEARR.elevation <= sensor.obsmaxel2) &&
+         (currentTEARR.range <= sensor.obsmaxrange2 && currentTEARR.range >= sensor.obsminrange2))) {
+      currentTEARR.inview = true;
+    } else {
+      currentTEARR.inview = false;
+    }
+  } else {
+    if (((currentTEARR.azimuth >= sensor.obsminaz && currentTEARR.azimuth <= sensor.obsmaxaz) &&
+         (currentTEARR.elevation >= sensor.obsminel && currentTEARR.elevation <= sensor.obsmaxel) &&
+         (currentTEARR.range <= sensor.obsmaxrange && currentTEARR.range >= sensor.obsminrange)) ||
+         ((currentTEARR.azimuth >= sensor.obsminaz2 && currentTEARR.azimuth <= sensor.obsmaxaz2) &&
+         (currentTEARR.elevation >= sensor.obsminel2 && currentTEARR.elevation <= sensor.obsmaxel2) &&
+         (currentTEARR.range <= sensor.obsmaxrange2 && currentTEARR.range >= sensor.obsminrange2))) {
+      currentTEARR.inview = true;
+    } else {
+      currentTEARR.inview = false;
+    }
+  }
+  satellite.currentTEARR = currentTEARR;
+  return currentTEARR;
+};

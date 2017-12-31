@@ -728,12 +728,13 @@
               <div class="input-field col s12">
                 <select id="ms-type">
                   <option value="0">Custom Missile</option>
-                  <option value="1">Russian to USA</option>
-                  <option value="2">Chinese to USA</option>
-                  <option value="3">North Korean to USA</option>
-                  <option value="4">USA to Russia</option>
-                  <option value="5">USA to China</option>
-                  <option value="6">USA to North Korea</option>
+                  <option value="1">Russia to USA</option>
+                  <option value="2">Russia to USA w/ Subs</option>
+                  <option value="3">China to USA</option>
+                  <option value="4">North Korea to USA</option>
+                  <option value="5">USA to Russia</option>
+                  <option value="6">USA to China</option>
+                  <option value="7">USA to North Korea</option>
                 </select>
                 <label>Type of Attack</label>
               </div>
@@ -916,13 +917,13 @@
 
       <div id="sat-infobox" class="text-select">
         <div id="sat-info-title" class="center-text">This is a title</div>
-        <div id="all-objects-link" class="link sat-infobox-links">Find all objects from this launch...</div>
+        <div id="all-objects-link" class="link sat-infobox-links sat-only-info">Find all objects from this launch...</div>
         <div id="near-objects-link" class="link sat-infobox-links">Find all objects near this object...</div>
-        <div class="sat-info-row">
+        <div class="sat-info-row sat-only-info">
           <div class="sat-info-key">Int'l Designator</div>
           <div class="sat-info-value" id="sat-intl-des">XXXX-XXXA</div>
         </div>
-        <div class="sat-info-row">
+        <div class="sat-info-row sat-only-info">
           <div class="sat-info-key">Object number</div>
           <div class="sat-info-value" id="sat-objnum">99999</div>
         </div>
@@ -930,7 +931,7 @@
           <div class="sat-info-key">Type</div>
           <div class="sat-info-value" id="sat-type">PAYLOAD</div>
         </div>
-        <div class="sat-info-row">
+        <div class="sat-info-row sat-only-info">
           <div class="sat-info-key">Country</div>
           <div class="sat-info-value" id="sat-country">COUNTRY</div>
         </div>
@@ -946,25 +947,25 @@
           <div class="sat-info-key">Launch Vehicle</div>
           <div class="sat-info-value" id="sat-vehicle">VEHICLE</div>
         </div>
-        <div class="sat-info-row">
+        <div class="sat-info-row sat-only-info">
           <div class="sat-info-key tooltipped" data-position="left" data-delay="50" data-tooltip="Highest Point in the Orbit">
             Apogee
           </div>
           <div class="sat-info-value" id="sat-apogee">XXX km</div>
         </div>
-        <div class="sat-info-row">
+        <div class="sat-info-row sat-only-info">
           <div class="sat-info-key tooltipped" data-position="left" data-delay="50" data-tooltip="Lowest Point in the Orbit">
             Perigee
           </div>
           <div class="sat-info-value" id="sat-perigee">XXX km</div>
         </div>
-         <div class="sat-info-row">
+         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key tooltipped" data-position="left" data-delay="50" data-tooltip="Angle Measured from Equator on the Ascending Node">
             Inclination
           </div>
           <div class="sat-info-value" id="sat-inclination">XXX.XX</div>
         </div>
-         <div class="sat-info-row">
+         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="How Circular the Orbit Is (0 is a Circle)">
             Eccentricity
           </div>
@@ -982,7 +983,7 @@
           </div>
           <div class="sat-info-value" id="sat-longitude">X.XX</div>
         </div>
-        <div class="sat-info-row">
+        <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Is the Sun Affected the Sensor">
             Sun
           </div>
@@ -994,7 +995,7 @@
           </div>
           <div class="sat-info-value" id="sat-altitude">XXX km</div>
         </div>
-        <div class="sat-info-row">
+        <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Velocity of the Satellite (Higher the Closer to Earth it Is)">
             Velocity
           </div>
@@ -1018,25 +1019,25 @@
           </div>
           <div class="sat-info-value" id="sat-range">XXXX km</div>
         </div>
-        <div class="sat-info-row">
+        <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Next Time in Coverage">
             Next Pass
           </div>
           <div class="sat-info-value" id="sat-nextpass">00:00:00z</div>
         </div>
-        <div class="sat-info-row">
+        <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Time for One Complete Revolution Around Earth">
             Period
           </div>
           <div class="sat-info-value" id="sat-period">XXX min</div>
         </div>
-        <div class="sat-info-row">
+        <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Time Since Official Orbit Calculated (Older ELSETs are Less Accuarate Usually)">
             Age of ELSET
           </div>
           <div class="sat-info-value" id="sat-elset-age">XXX.XXXX</div>
         </div>
-        <div class="sat-info-row">
+        <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Large are > 1^2 meter, Small are < 0.1^2 meters">
             RCS
           </div>

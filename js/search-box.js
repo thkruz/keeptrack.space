@@ -88,9 +88,18 @@
           continue; // Prevent's duplicate results
         }
 
-        // Missiles are only searchable by name, at this point we can assume
-        // if it is a missile it isn't what we were searching for
-        if (satData[i].missile) { continue; }
+        if (!satData[i].desc) { // Do nothing there is no description property
+        } else if (satData[i].desc.toUpperCase().indexOf(searchString) !== -1) {
+          results.push({
+            strIndex: satData[i].desc.indexOf(searchString),
+            isMissile: true,
+            patlen: len,
+            satId: i
+          });
+          continue; // Prevent's duplicate results
+        } else {
+          continue; // Last check for missiles
+        }
 
         if (satData[i].SCC_NUM.indexOf(searchString) !== -1) {
           results.push({
@@ -124,6 +133,7 @@
           });
           continue; // Prevent's duplicate results
         }
+
         // At this point the item didn't match our search
       }
     }
@@ -156,7 +166,9 @@
     for (var i = 0; i < results.length; i++) {
       var sat = satData[results[i].satId];
       html += '<div class="search-result" data-sat-id="' + sat.id + '">';
-      if (results[i].isON) { // If the name matched - highlight it
+      if (results[i].isMissile) {
+        html += sat.desc;
+      } else if (results[i].isON) { // If the name matched - highlight it
         html += sat.ON.substring(0, results[i].strIndex);
         html += '<span class="search-hilight">';
         html += sat.ON.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
@@ -166,7 +178,9 @@
         html += sat.ON;
       }
       html += '<div class="search-result-scc">';
-      if (results[i].isSCC_NUM) { // If the object number matched
+      if (results[i].isMissile) {
+        html += sat.ON;
+      } else if (results[i].isSCC_NUM) { // If the object number matched
         html += sat.SCC_NUM.substring(0, results[i].strIndex);
         html += '<span class="search-hilight">';
         html += sat.SCC_NUM.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);

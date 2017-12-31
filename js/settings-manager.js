@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.30.1';
+  settingsManager.versionNumber = 'v0.30.2';
   settingsManager.versionDate = 'December 30, 2017';
 
   (function _getVersion () {
@@ -65,7 +65,7 @@
   settingsManager.redTheme = false;
 
   settingsManager.limitSats = '';
-  settingsManager.searchLimit = 200;
+  settingsManager.searchLimit = 400;
 
   settingsManager.mapWidth = 800;
   settingsManager.mapHeight = 600;

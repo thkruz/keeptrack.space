@@ -1243,7 +1243,8 @@ $.ajaxSetup({
   tleManager.extractLaunchSite = function (LS) {
     var site;
     var sitec;
-    if (LS === 'U' || 'Unknown') {
+    console.log(LS);
+    if (LS === 'U' || LS === 'Unknown') {
       site = 'Unknown';
       sitec = 'Unknown';
     // Table Nested in ELSE to Make Hiding it Easier
@@ -1392,6 +1393,8 @@ $.ajaxSetup({
         sitec = 'New Zealand';
       }
     }
+    console.log(site);
+    console.log(sitec);
     return {
       site: site,
       sitec: sitec

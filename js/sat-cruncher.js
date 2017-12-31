@@ -26,11 +26,12 @@ var satInView;                    // Array of booleans showing if current Satell
 
 /** OBSERVER VARIABLES */
 var sensor = {};
-sensor.observerGd = {
+sensor.defaultGd = {
   longitude: 0,
   latitude: 0,
   height: 0
 };
+sensor.observerGd = sensor.defaultGd;
 var propagationRunning = false;
 var divisor = 1;
 
@@ -65,16 +66,20 @@ onmessage = function (m) {
       var i = 0;
 
       var extraData = [];
+      var extra = {};
+      var satrec;
       while (i < len) {
-        var satrec;
-        var extra = {};
-        if (satData[i].static || satData[i].missile) {
+        extra = {};
+        satrec = null;
+        if ((satData[i].static) || (satData[i].missile)) {
           satrec = satData[i];
-          // extra.name = 'test launch name';
+          extraData.push(extra);
+          satCache.push(satrec);
+          i++;
+          continue;
         } else {
           satrec = satellite.twoline2satrec( // perform and store sat init calcs
             satData[i].TLE1, satData[i].TLE2);
-
           extra.inclination = satrec.inclo; // rads
           extra.eccentricity = satrec.ecco;
           extra.raan = satrec.nodeo;        // rads
@@ -85,11 +90,11 @@ onmessage = function (m) {
           extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - RADIUS_OF_EARTH;
           extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - RADIUS_OF_EARTH;
           extra.period = 1440.0 / extra.meanMotion;
-        }
 
-        extraData.push(extra);
-        satCache.push(satrec);
-        i++;
+          extraData.push(extra);
+          satCache.push(satrec);
+          i++;
+        }
       }
 
       satPos = new Float32Array(len * 3);
@@ -153,15 +158,21 @@ function propagate () {
   var len = satCache.length - 1;
   var i = -1;
   while (i < len) {
+    // TODO More Accuracy at Higher Speeds but Processor Intensive
+    // Should be an optional thing
+    // now = propTime();
+
     i++;
     var positionEcf, lookangles, azimuth, elevation, rangeSat;
     var x, y, z, vx, vy, vz;
+    var cosLat, sinLat, cosLon, sinLon;
+    var curMissileTime;
 
     if (satCache[i].static) {
-      var cosLat = Math.cos(satCache[i].lat * DEG2RAD);
-      var sinLat = Math.sin(satCache[i].lat * DEG2RAD);
-      var cosLon = Math.cos((satCache[i].lon * DEG2RAD) + gmst);
-      var sinLon = Math.sin((satCache[i].lon * DEG2RAD) + gmst);
+      cosLat = Math.cos(satCache[i].lat * DEG2RAD);
+      sinLat = Math.sin(satCache[i].lat * DEG2RAD);
+      cosLon = Math.cos((satCache[i].lon * DEG2RAD) + gmst);
+      sinLon = Math.sin((satCache[i].lon * DEG2RAD) + gmst);
 
       satPos[i * 3] = (RADIUS_OF_EARTH + 3) * cosLat * cosLon;
       satPos[i * 3 + 1] = (RADIUS_OF_EARTH + 3) * cosLat * sinLon;
@@ -180,7 +191,7 @@ function propagate () {
       var tLen = satCache[i].altList.length;
       for (var t = 0; t < tLen; t++) {
         if (satCache[i].startTime + t * 1000 > now) {
-          var curMissileTime = t;
+          curMissileTime = t;
           break;
         }
       }
@@ -233,6 +244,8 @@ function propagate () {
         }
       }
     } else {
+      // Skip reentries
+      if (satCache[i].skip) continue;
       var m = (j - satCache[i].jdsatepoch) * 1440.0; // 1440 = minutes_per_day
       var pv = satellite.sgp4(satCache[i], m);
 
@@ -245,14 +258,17 @@ function propagate () {
         vz = pv.velocity.z;
 
         positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
-        lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-        // TODO: Might add dopplerFactor back in or to lookangles for HAM Radio use
-        // dopplerFactor = satellite.dopplerFactor(observerCoordsEcf, positionEcf, velocityEcf);
 
-        azimuth = lookangles.azimuth;
-        elevation = lookangles.elevation;
-        rangeSat = lookangles.rangeSat;
+        if (sensor.observerGd !== sensor.defaultGd) {
+          lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+          azimuth = lookangles.azimuth;
+          elevation = lookangles.elevation;
+          rangeSat = lookangles.rangeSat;
+        }
       } catch (e) {
+        console.info(e);
+        // This is probably a reentry and should be skipped from now on.
+        satCache[i].skip = true;
         x = 0;
         y = 0;
         z = 0;
@@ -273,22 +289,22 @@ function propagate () {
       satVel[i * 3 + 1] = vy;
       satVel[i * 3 + 2] = vz;
 
-      azimuth *= RAD2DEG;
-      elevation *= RAD2DEG;
       satInView[i] = false; // Default in case no sensor selected
 
-      if (i === 0) {
-      }
+      if (sensor.observerGd !== sensor.defaultGd) {
+        azimuth *= RAD2DEG;
+        elevation *= RAD2DEG;
 
-      if (sensor.obsminaz > sensor.obsmaxaz) {
-        if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
-           ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
-          satInView[i] = true;
-        }
-      } else {
-        if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
-           ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
-          satInView[i] = true;
+        if (sensor.obsminaz > sensor.obsmaxaz) {
+          if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+             ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+            satInView[i] = true;
+          }
+        } else {
+          if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+             ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+            satInView[i] = true;
+          }
         }
       }
     }
@@ -305,8 +321,7 @@ function propagate () {
   satVel = new Float32Array(satCache.length * 3);
   satInView = new Float32Array(satCache.length);
 
-  // var pTime2 = Date.now();
-  // console.log('Total Time: ' + (pTime2 - pTime));
+  // NOTE The longer the delay the more jitter at higher speeds of propagation
   setTimeout(propagate, 1 * 500 / divisor);
 }
 

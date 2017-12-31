@@ -145,6 +145,14 @@
     }
     return timeManager.now;
   };
+
+  timeManager.propTimeCheck = function (propTempOffset, propRealTime) {
+    'use strict';
+    var now = new Date();                                     // Make a time variable
+    now.setTime(Number(propRealTime) + propTempOffset);           // Set the time variable to the time in the future
+    return now;
+  };
+
   timeManager.setPropRateZero = function () {
     timeManager.propRate = 0;
     propFrozen = Date.now();

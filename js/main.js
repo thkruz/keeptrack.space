@@ -703,6 +703,9 @@ var lastSelectedSat = -1;
       if (selectedSat !== -1) {
         $('#menu-lookangles img').removeClass('bmenu-item-disabled');
       }
+      if (satellite.sensorSelected() && watchlistList.length > 0) {
+        $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
+      }
       $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
     });
 
@@ -1032,6 +1035,9 @@ var lastSelectedSat = -1;
         settingsManager.redTheme = false;
         settingsManager.themes.blueTheme();
       }
+      if (!satellite.sensorSelected() || watchlistList.length <= 0) {
+        $('#menu-info-overlay img').addClass('bmenu-item-disabled');
+      }
     });
     $('#watchlist-content').on('click', '.watchlist-add', function (evt) {
       var satId = satSet.getIdFromObjNum(_pad0($('#watchlist-new').val(), 5));
@@ -1046,6 +1052,9 @@ var lastSelectedSat = -1;
         console.log(watchlistInViewList);
         _updateWatchlist();
       }
+      if (satellite.sensorSelected()) {
+        $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
+      }
     });
     $('#watchlist-content').submit(function (e) {
       var satId = satSet.getIdFromObjNum(_pad0($('#watchlist-new').val(), 5));
@@ -1057,6 +1066,9 @@ var lastSelectedSat = -1;
         watchlistList.push(satId);
         watchlistInViewList.push(false);
         _updateWatchlist();
+      }
+      if (satellite.sensorSelected()) {
+        $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
       }
       e.preventDefault();
     });
@@ -1270,11 +1282,12 @@ var lastSelectedSat = -1;
 
       if (type > 0) {
         if (type === 1) MassRaidPre(launchTime, 'simulation/Russia2USA.json');
-        if (type === 2) MassRaidPre(launchTime, 'simulation/China2USA.json');
-        if (type === 3) MassRaidPre(launchTime, 'simulation/NorthKorea2USA.json');
-        if (type === 4) MassRaidPre(launchTime, 'simulation/USA2Russia.json');
-        if (type === 5) MassRaidPre(launchTime, 'simulation/USA2China.json');
-        if (type === 6) MassRaidPre(launchTime, 'simulation/USA2NorthKorea.json');
+        if (type === 2) MassRaidPre(launchTime, 'simulation/Russia2USAalt.json');
+        if (type === 3) MassRaidPre(launchTime, 'simulation/China2USA.json');
+        if (type === 4) MassRaidPre(launchTime, 'simulation/NorthKorea2USA.json');
+        if (type === 5) MassRaidPre(launchTime, 'simulation/USA2Russia.json');
+        if (type === 6) MassRaidPre(launchTime, 'simulation/USA2China.json');
+        if (type === 7) MassRaidPre(launchTime, 'simulation/USA2NorthKorea.json');
         ga('send', 'event', 'Missile Sim', type, 'Sim Number');
         $('#ms-error').html('Large Scale Attack Loaded');
         $('#ms-error').show();
@@ -1303,22 +1316,22 @@ var lastSelectedSat = -1;
           a = attacker - 100;
           b = 500 - missilesInUse;
           attackerName = UsaICBM[a * 4 + 2];
-          Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, UsaICBM[a * 4 + 2], 30, 2.9, 0.07, UsaICBM[a * 4 + 3]);
+          Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, UsaICBM[a * 4 + 2], 30, 2.9, 0.07, UsaICBM[a * 4 + 3], 'United States');
         } else if (attacker < 300) { // Russian
           a = attacker - 200;
           b = 500 - missilesInUse;
           attackerName = RussianICBM[a * 4 + 2];
-          Missile(RussianICBM[a * 4], RussianICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, RussianICBM[a * 4 + 2], 30, 2.9, 0.07, RussianICBM[a * 4 + 3]);
+          Missile(RussianICBM[a * 4], RussianICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, RussianICBM[a * 4 + 2], 30, 2.9, 0.07, RussianICBM[a * 4 + 3], 'Russia');
         } else if (attacker < 400) { // Chinese
           a = attacker - 300;
           b = 500 - missilesInUse;
           attackerName = ChinaICBM[a * 4 + 2];
-          Missile(ChinaICBM[a * 4], ChinaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, ChinaICBM[a * 4 + 2], 30, 2.9, 0.07, ChinaICBM[a * 4 + 3]);
+          Missile(ChinaICBM[a * 4], ChinaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, ChinaICBM[a * 4 + 2], 30, 2.9, 0.07, ChinaICBM[a * 4 + 3], 'China');
         } else if (attacker < 500) { // North Korean
           a = attacker - 400;
           b = 500 - missilesInUse;
           attackerName = NorthKoreanBM[a * 4 + 2];
-          Missile(NorthKoreanBM[a * 4], NorthKoreanBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, NorthKoreanBM[a * 4 + 2], 30, 2.9, 0.07, NorthKoreanBM[a * 4 + 3]);
+          Missile(NorthKoreanBM[a * 4], NorthKoreanBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, NorthKoreanBM[a * 4 + 2], 30, 2.9, 0.07, NorthKoreanBM[a * 4 + 3], 'North Korea');
         }
         ga('send', 'event', 'New Missile', attackerName, 'Attacker');
         ga('send', 'event', 'New Missile', tgtLat + ', ' + tgtLon, 'Target');
@@ -1595,15 +1608,25 @@ var lastSelectedSat = -1;
     debugContext.putImageData(debugImageData, 0, 0); */
   }
   function updateSelectBox () {
+    // Don't update if no object is selected
     if (selectedSat === -1) return;
-    timeManager.now = drawNow;
+
     satData = satSet.getSat(selectedSat);
-    if (satData.static || satData.missile) return;
+
+    // Don't bring up the update box for static dots
+    if (satData.static) return;
+
+
+    timeManager.now = drawNow;
 
     // TODO: Include updates when satellite edited regardless of time.
 
     if (timeManager.now > lastBoxUpdateTime + 1000) {
-      satellite.getTEARR(satData);
+      if (!satData.missile) {
+        satellite.getTEARR(satData);
+      } else {
+        getMissileTEARR(satData);
+      }
       if (satellite.degreesLong(satellite.currentTEARR.lon) >= 0) {
         $('#sat-longitude').html(satellite.degreesLong(satellite.currentTEARR.lon).toFixed(3) + '°E');
       } else {
@@ -1636,7 +1659,7 @@ var lastSelectedSat = -1;
       }
 
       if (satellite.sensorSelected()) {
-        if (selectedSat !== lastSelectedSat) {
+        if (selectedSat !== lastSelectedSat && !satData.missile) {
           $('#sat-nextpass').html(satellite.nextpass(satData));
         }
         lastSelectedSat = selectedSat;
@@ -1788,7 +1811,7 @@ var lastSelectedSat = -1;
         camDistTarget = altitude + RADIUS_OF_EARTH + 2000;
       } else {
         camDistTarget = RADIUS_OF_EARTH + 2000;  // Stay out of the center of the earth. You will get stuck there.
-        console.warn('Zoom Calculation Error');
+        console.warn('Zoom Calculation Error: ' + altitude + ' -- ' + camDistTarget);
         camZoomSnappedOnSat = false;
         camAngleSnappedOnSat = false;
       }
@@ -2420,6 +2443,7 @@ var lastSelectedSat = -1;
       // Remove red color from all menu icons
       $('#menu-info-overlay img').removeClass('bmenu-item-selected');
       $('#menu-sensor-info img').removeClass('bmenu-item-selected');
+      $('#menu-watchlist img').removeClass('bmenu-item-selected');
       $('#menu-lookangles img').removeClass('bmenu-item-selected');
       $('#menu-lookanglesmultisite img').removeClass('bmenu-item-selected');
       $('#menu-launches img').removeClass('bmenu-item-selected');
@@ -2437,7 +2461,9 @@ var lastSelectedSat = -1;
       $('#menu-about img').removeClass('bmenu-item-selected');
 
       // Unflag all open menu variables
+      isInfoOverlayMenuOpen = false;
       isSensorInfoMenuOpen = false;
+      isWatchlistMenuOpen = false;
       isLaunchMenuOpen = false;
       isTwitterMenuOpen = false;
       isFindByLooksMenuOpen = false;
@@ -2994,7 +3020,6 @@ function selectSat (satId) {
 
     // satSet.selectSat(satId);
     orbitDisplay.setSelectOrbit(satId);
-    if (sat.missile) return;
 
     if (satellite.sensorSelected()) {
       $('#menu-lookangles img').removeClass('bmenu-item-disabled');
@@ -3032,6 +3057,13 @@ function selectSat (satId) {
         $('#legend-hover-menu').hide();
       }
     }
+
+    if (!sat.missile) {
+      $('.sat-only-info').show();
+    } else {
+      $('.sat-only-info').hide();
+    }
+
     $('#sat-infobox').fadeIn();
     $('#sat-info-title').html(sat.ON);
 
@@ -3053,6 +3085,7 @@ function selectSat (satId) {
     if (sat.OT === 1) { objtype = 'Payload'; }
     if (sat.OT === 2) { objtype = 'Rocket Body'; }
     if (sat.OT === 3) { objtype = 'Debris'; }
+    if (sat.missile) { objtype = 'Ballistic Missile'; }
     $('#sat-type').html(objtype);
 
     // /////////////////////////////////////////////////////////////////////////
@@ -3066,13 +3099,36 @@ function selectSat (satId) {
     // Launch Site Correlation Table
     // /////////////////////////////////////////////////////////////////////////
     var site = [];
-    site = tleManager.extractLaunchSite(sat.LS);
+    var missileLV;
+    var missileOrigin;
+    if (sat.missile) {
+      site = sat.desc.split('(');
+      missileOrigin = site[0].substr(0, (site[0].length - 1));
+      missileLV = sat.desc.split('(')[1].split(')')[0]; // Remove the () from the booster type
+
+      site.site = missileOrigin;
+      site.sitec = sat.C;
+    } else {
+      site = tleManager.extractLaunchSite(sat.LS);
+    }
 
     $('#sat-site').html(site.site);
     $('#sat-sitec').html(site.sitec);
 
     ga('send', 'event', 'Satellite', 'Country: ' + country, 'Country');
     ga('send', 'event', 'Satellite', 'Site: ' + site, 'Site');
+
+    // /////////////////////////////////////////////////////////////////////////
+    // Launch Vehicle Correlation Table
+    // /////////////////////////////////////////////////////////////////////////
+    if (sat.missile) {
+      sat.LV = missileLV;
+      $('#sat-vehicle').html(sat.LV);
+    } else {
+      $('#sat-vehicle').html(sat.LV); // Set to JSON record
+      if (sat.LV === 'U') { $('#sat-vehicle').html('Unknown'); } // Replace with Unknown if necessary
+      tleManager.extractLiftVehicle(sat.LV); // Replace with link if available FIXME this should be a separate file
+    }
 
     // /////////////////////////////////////////////////////////////////////////
     // RCS Correlation Table
@@ -3088,45 +3144,40 @@ function selectSat (satId) {
       $('#sat-rcs').tooltip({delay: 50, tooltip: sat.R, position: 'left'});
     }
 
-    // /////////////////////////////////////////////////////////////////////////
-    // Launch Vehicle Correlation Table
-    // /////////////////////////////////////////////////////////////////////////
-    $('#sat-vehicle').html(sat.LV);
-    if (sat.LV === 'U') { $('#sat-vehicle').html('Unknown'); }
-    tleManager.extractLiftVehicle(sat.LV);
+    if (!sat.missile) {
+      $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+      $('#sat-apogee').html(sat.apogee.toFixed(0) + ' km');
+      $('#sat-perigee').html(sat.perigee.toFixed(0) + ' km');
+      $('#sat-inclination').html((sat.inclination * RAD2DEG).toFixed(2) + '°');
+      $('#sat-eccentricity').html((sat.eccentricity).toFixed(3));
 
-    $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-    $('#sat-apogee').html(sat.apogee.toFixed(0) + ' km');
-    $('#sat-perigee').html(sat.perigee.toFixed(0) + ' km');
-    $('#sat-inclination').html((sat.inclination * RAD2DEG).toFixed(2) + '°');
-    $('#sat-eccentricity').html((sat.eccentricity).toFixed(3));
+      $('#sat-period').html(sat.period.toFixed(2) + ' min');
+      $('#sat-period').tooltip({delay: 50, tooltip: 'Mean Motion: ' + MINUTES_PER_DAY / sat.period.toFixed(2), position: 'left'});
 
-    $('#sat-period').html(sat.period.toFixed(2) + ' min');
-    $('#sat-period').tooltip({delay: 50, tooltip: 'Mean Motion: ' + MINUTES_PER_DAY / sat.period.toFixed(2), position: 'left'});
+      var now = new Date();
+      var jday = timeManager.getDayOfYear(now);
+      now = now.getFullYear();
+      now = now.toString().substr(2, 2);
+      var daysold;
+      if (satSet.getSat(satId).TLE1.substr(18, 2) === now) {
+        daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3);
+      } else {
+        daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3) + (satSet.getSat(satId).TLE1.substr(17, 2) * 365);
+      }
+      $('#sat-elset-age').html(daysold + ' Days');
+      $('#sat-elset-age').tooltip({delay: 50, tooltip: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(), position: 'left'});
 
-    var now = new Date();
-    var jday = timeManager.getDayOfYear(now);
-    now = now.getFullYear();
-    now = now.toString().substr(2, 2);
-    var daysold;
-    if (satSet.getSat(satId).TLE1.substr(18, 2) === now) {
-      daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3);
-    } else {
-      daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3) + (satSet.getSat(satId).TLE1.substr(17, 2) * 365);
-    }
-    $('#sat-elset-age').html(daysold + ' Days');
-    $('#sat-elset-age').tooltip({delay: 50, tooltip: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(), position: 'left'});
-
-    now = new Date(timeManager.propRealTime + timeManager.propOffset);
-    var sunTime = SunCalc.getTimes(now, satellite.currentSensor.lat, satellite.currentSensor.long);
-    if (!satellite.sensorSelected()) {
-      $('#sat-sun').html('Unknown');
-    } else if (satellite.currentSensor.type !== 'Optical') {
-      $('#sat-sun').html('Unaffected by Sun');
-    } else if (sunTime.dawn.getTime() - now > 0 || sunTime.dusk.getTime() - now < 0) {
-      $('#sat-sun').html('No Impact from Sun');
-    } else {
-      $('#sat-sun').html('Sun Exclusion');
+      now = new Date(timeManager.propRealTime + timeManager.propOffset);
+      var sunTime = SunCalc.getTimes(now, satellite.currentSensor.lat, satellite.currentSensor.long);
+      if (!satellite.sensorSelected()) {
+        $('#sat-sun').html('Unknown');
+      } else if (satellite.currentSensor.type !== 'Optical') {
+        $('#sat-sun').html('Unaffected by Sun');
+      } else if (sunTime.dawn.getTime() - now > 0 || sunTime.dusk.getTime() - now < 0) {
+        $('#sat-sun').html('No Impact from Sun');
+      } else {
+        $('#sat-sun').html('Sun Exclusion');
+      }
     }
 
     if (satellite.sensorSelected()) {

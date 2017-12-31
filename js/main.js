@@ -216,6 +216,13 @@ var lastSelectedSat = -1;
   var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotating around earth
 
   $(document).ready(function () { // Code Once index.htm is loaded
+    if (typeof satel === 'undefined') satel = null;
+    if (settingsManager.offline && !_clk(satel)) {
+      $('#loader-text').html('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
+      ga('send', 'event', 'Expired Offline Software', 'Expired', 'Expired');
+      return;
+    }
+
     var resizing = false;
     // Load the Stylesheets
     $('head').append('<link rel="stylesheet" type="text/css" href="css/style.css">');
@@ -3222,6 +3229,11 @@ function selectSat (satId) {
 function browserUnsupported () {
   $('#canvas-holder').hide();
   $('#no-webgl').css('display', 'block');
+}
+function _clk (lk) {
+  if (lk == 'undefined') return false;
+  if (settingsManager.lkVerify < lk) return true;
+  return false;
 }
 function updateMap () {
   if (selectedSat === -1) return;

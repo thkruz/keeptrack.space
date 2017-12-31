@@ -62,6 +62,8 @@
   settingsManager.shadersReady = false;
   settingsManager.cruncherReady = false;
 
+  settingsManager.lkVerify = Date.now();
+
   settingsManager.redTheme = false;
 
   settingsManager.limitSats = '';

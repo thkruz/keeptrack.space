@@ -166,11 +166,21 @@
     timeManager.propOffset = selectedDate - today;
     return timeManager.propOffset;
   };
+
+  timeManager.localToZulu = function (date) {
+    date = timeManager.dateFormat(date, 'isoDateTime', true);
+    date = date.split(' ');
+    date = new Date(date[0] + 'T' + date[1] + 'Z');
+    return date;
+  };
+
   // Get Day of Year
   timeManager.getDayOfYear = function (date) {
+    date = date || new Date();
+
     var dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
     var mn = date.getMonth();
-    var dn = date.getDate();
+    var dn = date.getUTCDate();
     var dayOfYear = dayCount[mn] + dn;
     if (mn > 1 && _isLeapYear(date)) dayOfYear++;
     return dayOfYear;

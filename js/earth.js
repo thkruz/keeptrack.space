@@ -189,15 +189,6 @@
     // console.log('earth init: ' + end + ' ms');
   };
 
-  $('#datetime-text').click(function () {
-    if (!settingsManager.isEditTime) {
-      $('#datetime-text').fadeOut();
-      $('#datetime-input').fadeIn();
-      $('#datetime-input-tb').focus();
-      settingsManager.isEditTime = true;
-    }
-  });
-
   earth.draw = function (pMatrix, camMatrix) {
     if (!loaded) return;
 

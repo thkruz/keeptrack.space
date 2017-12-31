@@ -55,7 +55,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     currentDate = new Date(currentDate);
     var epochYear = currentDate.getUTCFullYear();
     epochYear = parseInt(epochYear.toString().substr(2, 2));
-    var epochDay = timeManager.getDayOfYear(currentDate) + (currentDate.getUTCHours() * 3600 + currentDate.getUTCMinutes() * 60 + currentDate.getUTCSeconds()) / (1440 * 60);
+    var epochDay = timeManager.getDayOfYear(currentDate);
     return [epochYear, epochDay];
   };
   satellite.distance = function (hoverSat, selectedSat) {

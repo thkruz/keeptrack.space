@@ -257,6 +257,10 @@ var lastSelectedSat = -1;
       resizing = true;
     });
 
+    // Set the jday
+    var jday = 'JDAY: ' + timeManager.getDayOfYear(timeManager.propTime());
+    $('#jday').html(jday);
+
     _webGlInit();
     earth.init();
     ColorScheme.init();
@@ -268,6 +272,15 @@ var lastSelectedSat = -1;
       // debugLine = new Line();
       // debugLine2 = new Line();
       // debugLine3 = new Line();
+    });
+
+    $('#datetime-text').click(function () {
+      if (!settingsManager.isEditTime) {
+        $('#datetime-text').fadeOut();
+        $('#datetime-input').fadeIn();
+        $('#datetime-input-tb').focus();
+        settingsManager.isEditTime = true;
+      }
     });
 
     $('#datetime-input-tb').datetimepicker({
@@ -712,6 +725,8 @@ var lastSelectedSat = -1;
     $('#datetime-input-form').change(function (e) {
       var selectedDate = $('#datetime-input-tb').datepicker('getDate');
       var today = new Date();
+      var jday = 'JDAY: ' + timeManager.getDayOfYear(timeManager.propTime());
+      $('#jday').html(jday);
       timeManager.propOffset = selectedDate - today;
       satCruncher.postMessage({
         typ: 'offset',
@@ -731,6 +746,7 @@ var lastSelectedSat = -1;
       var fblRangeM = $('#fbl-range-margin').val();
       var fblIncM = $('#fbl-inc-margin').val();
       var fblPeriodM = $('#fbl-period-margin').val();
+      $('#search').val(''); // Reset the search first
       satSet.searchAzElRange(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM, fblPeriod, fblPeriodM);
       e.preventDefault();
     });
@@ -1039,6 +1055,7 @@ var lastSelectedSat = -1;
         $('#menu-info-overlay img').addClass('bmenu-item-disabled');
       }
     });
+    // Add button selected on watchlist menu
     $('#watchlist-content').on('click', '.watchlist-add', function (evt) {
       var satId = satSet.getIdFromObjNum(_pad0($('#watchlist-new').val(), 5));
       var duplicate = false;
@@ -1048,14 +1065,14 @@ var lastSelectedSat = -1;
       if (!duplicate) {
         watchlistList.push(satId);
         watchlistInViewList.push(false);
-        console.log(watchlistList);
-        console.log(watchlistInViewList);
         _updateWatchlist();
       }
       if (satellite.sensorSelected()) {
         $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
       }
+      $('#watchlist-new').val(''); // Clear the search box after enter pressed/selected
     });
+    // Enter pressed/selected on watchlist menu
     $('#watchlist-content').submit(function (e) {
       var satId = satSet.getIdFromObjNum(_pad0($('#watchlist-new').val(), 5));
       var duplicate = false;
@@ -1070,6 +1087,7 @@ var lastSelectedSat = -1;
       if (satellite.sensorSelected()) {
         $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
       }
+      $('#watchlist-new').val(''); // Clear the search box after enter pressed/selected
       e.preventDefault();
     });
     $('#watchlist-save').click(function (e) {
@@ -1637,6 +1655,8 @@ var lastSelectedSat = -1;
       } else {
         $('#sat-latitude').html((satellite.degreesLat(satellite.currentTEARR.lat) * -1).toFixed(3) + '°S');
       }
+      var jday = 'JDAY: ' + timeManager.getDayOfYear(timeManager.propTime());
+      $('#jday').html(jday);
 
       if (settingsManager.isMapMenuOpen && timeManager.now > settingsManager.lastMapUpdateTime + 30000) {
         updateMap();

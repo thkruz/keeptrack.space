@@ -26,6 +26,8 @@ var satInView;                    // Array of booleans showing if current Satell
 
 /** OBSERVER VARIABLES */
 var sensor = {};
+var mSensor;
+var multiSensor = false;
 sensor.defaultGd = {
   longitude: 0,
   latitude: 0,
@@ -43,7 +45,10 @@ var propRealTime = Date.now();      // lets us run time faster (or slower) than 
 onmessage = function (m) {
   propRealTime = Date.now();
 
-  if (m.data.sensor) {
+  if (m.data.multiSensor) {
+    multiSensor = true;
+    mSensor = m.data.sensor;
+  } else if (m.data.sensor) {
     sensor = m.data.sensor;
     if (m.data.setlatlong) {
       sensor.observerGd = {
@@ -52,6 +57,7 @@ onmessage = function (m) {
         height: m.data.sensor.obshei * 1 // Convert from string
       };
     }
+    multiSensor = false;
   }
 
   switch (m.data.typ) {
@@ -290,19 +296,49 @@ function propagate () {
 
       satInView[i] = false; // Default in case no sensor selected
 
-      if (sensor.observerGd !== sensor.defaultGd) {
-        azimuth *= RAD2DEG;
-        elevation *= RAD2DEG;
+      if (multiSensor) {
+        for (var s = 0; s < mSensor.length; s++) {
+          if (satInView[i]) break;
+          sensor = mSensor[s];
+          sensor.observerGd = {
+            longitude: sensor.long * DEG2RAD,
+            latitude: sensor.lat * DEG2RAD,
+            height: sensor.obshei * 1 // Convert from string
+          };
+          lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+          azimuth = lookangles.azimuth;
+          elevation = lookangles.elevation;
+          rangeSat = lookangles.rangeSat;
+          azimuth *= RAD2DEG;
+          elevation *= RAD2DEG;
 
-        if (sensor.obsminaz > sensor.obsmaxaz) {
-          if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
-             ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
-            satInView[i] = true;
+          if (sensor.obsminaz > sensor.obsmaxaz) {
+            if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+            ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+              satInView[i] = true;
+            }
+          } else {
+            if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+            ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+              satInView[i] = true;
+            }
           }
-        } else {
-          if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
-             ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
-            satInView[i] = true;
+        }
+      } else {
+        if (sensor.observerGd !== sensor.defaultGd) {
+          azimuth *= RAD2DEG;
+          elevation *= RAD2DEG;
+
+          if (sensor.obsminaz > sensor.obsmaxaz) {
+            if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+               ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+              satInView[i] = true;
+            }
+          } else {
+            if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+               ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+              satInView[i] = true;
+            }
           }
         }
       }

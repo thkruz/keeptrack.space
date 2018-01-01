@@ -743,6 +743,26 @@ $.ajaxSetup({
   sensorManager.whichRadar = '';
   sensorManager.setSensor = function (selectedSensor, staticNum) {
     if (selectedSensor == null && staticNum == null) return;
+    if (selectedSensor === 'SSN') {
+      console.log('setSensor - SSN');
+      var allSSNSensors = [];
+      for (var sensor in sensorList) {
+        if ((sensorList[sensor].country === 'United States') ||
+        (sensorList[sensor].country === 'United Kingdom') ||
+        (sensorList[sensor].country === 'Norway')) {
+          allSSNSensors.push(sensorList[sensor]);
+        }
+      }
+      console.log(allSSNSensors);
+      satCruncher.postMessage({
+        typ: 'offset',
+        dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
+        setlatlong: true,
+        sensor: allSSNSensors,
+        multiSensor: true
+      });
+      return;
+    }
     for (var sensor in sensorList) {
       if (sensorList[sensor] === selectedSensor || sensorList[sensor].staticNum === staticNum) {
         sensorManager.selectedSensor = sensorList[sensor];

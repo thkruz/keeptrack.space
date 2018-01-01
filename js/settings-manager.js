@@ -18,11 +18,11 @@
   settingsManager.themes = {};
   settingsManager.themes.currentTheme = 'Blue';
   settingsManager.themes.retheme = function () {
-    if (settingsManager.themes.currentTheme === 'Blue') settingsManager.themes.blueTheme();
-    if (settingsManager.themes.currentTheme === 'Red') settingsManager.themes.redTheme();
+    if (settingsManager.themes.currentTheme === 'Blue') settingsManager.themes.blueTheme(true);
+    if (settingsManager.themes.currentTheme === 'Red') settingsManager.themes.redTheme(true);
   };
-  settingsManager.themes.redTheme = function () {
-    if (settingsManager.themes.currentTheme === 'Red') return;
+  settingsManager.themes.redTheme = function (isForce) {
+    if (settingsManager.themes.currentTheme === 'Red' && !isForce) return;
       document.getElementById('nav-wrapper').classList.remove('light-blue');
       document.getElementById('nav-wrapper').classList.add('red');
       document.getElementById('nav-footer').classList.add('red');
@@ -45,8 +45,8 @@
     $('#search-result:hover').css('background', 'DarkRed');
     $('.search-hilight').css('color', 'DarkRed');
   };
-  settingsManager.themes.blueTheme = function () {
-    if (settingsManager.themes.currentTheme === 'Blue') return;
+  settingsManager.themes.blueTheme = function (isForce) {
+    if (settingsManager.themes.currentTheme === 'Blue' && !isForce) return;
     document.getElementById('nav-wrapper').classList.remove('red');
     document.getElementById('nav-footer').classList.remove('red');
     document.getElementById('nav-footer').classList.remove('darken-3');

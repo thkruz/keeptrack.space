@@ -2511,7 +2511,7 @@ var lastSelectedSat = -1;
   function _updateNextPassOverlay (isForceUpdate) {
     if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
     // Update once every 10 seconds
-    if (timeManager.now > (lastOverlayUpdateTime * 1 + 10000) || isForceUpdate) {
+    if (timeManager.now > (lastOverlayUpdateTime * 1 + 10000) && selectedSat === -1 || isForceUpdate) {
       var propTime = timeManager.propTime();
       infoOverlayDOM.html('');
       for (var s = 0; s < nextPassArray.length; s++) {
@@ -2522,25 +2522,27 @@ var lastSelectedSat = -1;
         // Get the pass Time
         var time = timeManager.dateFormat(nextPassArray[s].time, 'isoTime', true);
 
-        // Yellow - In View and Time to Next Pass is Less Than an Hour
-        // NOTE Less than an hour is probably excessive.
-        if ((satInView && (nextPassArray[s].time - propTime < 1000 * 60 * 60))) {
+        // Yellow - In View and Time to Next Pass is +/- 30 minutes
+        if ((satInView && (nextPassArray[s].time - propTime < 1000 * 60 * 30) && (propTime - nextPassArray[s].time < 1000 * 60 * 30))) {
           infoOverlayDOM.append('<div class="row">' +
                         '<h5 class="center-align watchlist-object link" style="color: yellow">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
                         '</div>');
           continue;
         }
-        // Blue - Next 10 Minutes
-        if (nextPassArray[s].time - propTime < 1000 * 60 * 10) {
+        // Blue - Time to Next Pass is between 10 minutes before and 20 minutes after the current time
+        // This makes recent objects stay at the top of the list in blue
+        if ((nextPassArray[s].time - propTime < 1000 * 60 * 10) && (propTime - nextPassArray[s].time < 1000 * 60 * 20)) {
           infoOverlayDOM.append('<div class="row">' +
                         '<h5 class="center-align watchlist-object link" style="color: blue">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
                         '</div>');
           continue;
         }
-        // White - Later
-        infoOverlayDOM.append('<div class="row">' +
+        // White - Any future pass not fitting the above requirements
+        if (nextPassArray[s].time - propTime > 0) {
+          infoOverlayDOM.append('<div class="row">' +
                       '<h5 class="center-align watchlist-object link" style="color: white">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
                       '</div>');
+        }
       }
       lastOverlayUpdateTime = timeManager.now;
     }

@@ -9,16 +9,15 @@
   groups
 */
 (function () {
-  var ColorScheme = function (colorizer, isInViewChange) {
+  var ColorScheme = function (colorizer) {
     this.colorizer = colorizer;
-    this.isInViewChange = isInViewChange;
     this.colorBuf = gl.createBuffer();
     this.pickableBuf = gl.createBuffer();
   };
 
   // Removed from function to reduce memory leak
   var numSats, colorData, pickableData, colors, i;
-  ColorScheme.prototype.calculateColorBuffers = function () {
+  ColorScheme.prototype.calculateColorBuffers = function (isInViewChange) {
     // TODO This should be done as an initialization somewhere else
     if (!pickableData || !colorData) {
       console.log('Calculate colorData && pickableData');
@@ -28,7 +27,7 @@
     }
     for (i = 0; i < numSats; i++) {
       sat = satSet.getSat(i);
-      if (sat.inViewChange && this.isInViewChange || !this.isInViewChange) {
+      if (sat.inViewChange && isInViewChange || !isInViewChange) {
         colors = this.colorizer(sat); // Run the colorscheme below
         colorData[i * 4] = colors.color[0];  // R
         colorData[i * 4 + 1] = colors.color[1]; // G

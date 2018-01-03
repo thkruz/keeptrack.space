@@ -641,7 +641,7 @@ var satHoverBoxDOM = $('#sat-hoverbox');
           settingsManager.otherSatelliteTransparency = 0.1;
         }
         if (settingsManager.isOnlyFOVChecked) {
-          satSet.setColorScheme(ColorScheme.onlyFOV);
+          satSet.setColorScheme(ColorScheme.onlyFOV, true);
           ga('send', 'event', 'Settings Menu', 'Show Only FOV', 'Option Selected');
           ga('send', 'event', 'ColorScheme Menu', 'Only FOV', 'Selected');
         }

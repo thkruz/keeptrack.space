@@ -153,7 +153,11 @@
     if (settingsManager.currentColorScheme === ColorScheme.default && !satellite.sensorSelected() && !settingsManager.isForceColorScheme) {
       // Don't force color recalc if default colors and no sensor for inview color
     } else {
-      satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
+      if ((settingsManager.currentColorScheme === ColorScheme.default) || (settingsManager.currentColorScheme === ColorScheme.onlyFOV)) {
+        satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+      } else {
+        satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
+      }
       settingsManager.isForceColorScheme = false;
     }
 
@@ -588,9 +592,9 @@
     return satData;
   };
 
-  satSet.setColorScheme = function (scheme) {
+  satSet.setColorScheme = function (scheme, isInViewChange) {
     settingsManager.currentColorScheme = scheme;
-    buffers = scheme.calculateColorBuffers();
+    buffers = scheme.calculateColorBuffers(isInViewChange);
     satColorBuf = buffers.colorBuf;
     pickableBuf = buffers.pickableBuf;
   };

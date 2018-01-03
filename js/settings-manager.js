@@ -78,6 +78,9 @@
   settingsManager.mapWidth = 800;
   settingsManager.mapHeight = 600;
 
+  settingsManager.hoverColor = [0.1, 1.0, 0.0, 1.0]; // Green
+  settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0]; // Red
+
   settingsManager.minimumSearchCharacters = 2;
 
   settingsManager.currentColorScheme = null;

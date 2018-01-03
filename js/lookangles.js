@@ -966,7 +966,4 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       return {lat: lat, lon: lon, time: time, inview: inview};
     }
   };
-
-
-  window.lookangles = lookangles;
 })();

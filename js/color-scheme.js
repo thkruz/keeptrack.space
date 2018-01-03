@@ -9,23 +9,33 @@
   groups
 */
 (function () {
-  var ColorScheme = function (colorizer) {
+  var ColorScheme = function (colorizer, isInViewChange) {
     this.colorizer = colorizer;
+    this.isInViewChange = isInViewChange;
     this.colorBuf = gl.createBuffer();
     this.pickableBuf = gl.createBuffer();
   };
 
+  // Removed from function to reduce memory leak
+  var numSats, colorData, pickableData, colors, i;
   ColorScheme.prototype.calculateColorBuffers = function () {
-    var numSats = satSet.numSats;
-    var colorData = new Float32Array(numSats * 4);
-    var pickableData = new Float32Array(numSats);
-    for (var i = 0; i < numSats; i++) {
-      var colors = this.colorizer(i);
-      colorData[i * 4] = colors.color[0];  // R
-      colorData[i * 4 + 1] = colors.color[1]; // G
-      colorData[i * 4 + 2] = colors.color[2]; // B
-      colorData[i * 4 + 3] = colors.color[3]; // A
-      pickableData[i] = colors.pickable ? 1 : 0;
+    // TODO This should be done as an initialization somewhere else
+    if (!pickableData || !colorData) {
+      console.log('Calculate colorData && pickableData');
+      numSats = satSet.numSats;
+      colorData = new Float32Array(numSats * 4);
+      pickableData = new Float32Array(numSats);
+    }
+    for (i = 0; i < numSats; i++) {
+      sat = satSet.getSat(i);
+      if (sat.inViewChange && this.isInViewChange || !this.isInViewChange) {
+        colors = this.colorizer(sat); // Run the colorscheme below
+        colorData[i * 4] = colors.color[0];  // R
+        colorData[i * 4 + 1] = colors.color[1]; // G
+        colorData[i * 4 + 2] = colors.color[2]; // B
+        colorData[i * 4 + 3] = colors.color[3]; // A
+        pickableData[i] = colors.pickable ? 1 : 0;
+      }
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuf);
     gl.bufferData(gl.ARRAY_BUFFER, colorData, gl.STATIC_DRAW);
@@ -37,9 +47,9 @@
     };
   };
 
+  var sat, color;
   ColorScheme.init = function () {
-    ColorScheme.default = new ColorScheme(function (satId) {
-      var sat = satSet.getSat(satId);
+    ColorScheme.default = new ColorScheme(function (sat) {
       if (sat.static && sat.type === 'Launch Facility') {
         return {
           color: [0.54, 0.0, 0.54, 1.0],
@@ -64,9 +74,6 @@
           pickable: true
         };
       }
-      var ap = sat.apogee;
-      var pe = sat.perigee;
-      var color;
       if (sat.inview) {
         color = [0.85, 0.5, 0.0, 1.0];
       } else if (sat.OT === 1) { // Payload
@@ -79,7 +86,7 @@
         color = [0.5, 0.5, 0.5, 0.85];
       }
 
-      if ((pe > satellite.obsmaxrange || ap < satellite.obsminrange)) {
+      if ((sat.perigee > satellite.obsmaxrange || sat.apogee < satellite.obsminrange)) {
         return {
           color: [1.0, 1.0, 1.0, settingsManager.otherSatelliteTransparency],
           pickable: false
@@ -91,7 +98,7 @@
         pickable: true
       };
     });
-    ColorScheme.onlyFOV = new ColorScheme(function (satId) {
+    ColorScheme.onlyFOV = new ColorScheme(function (sat) {
       var sat = satSet.getSat(satId);
       if (sat.inview) {
         return {
@@ -105,16 +112,16 @@
         };
       }
     });
-    ColorScheme.apogee = new ColorScheme(function (satId) {
-      var ap = satSet.getSat(satId).apogee;
+    ColorScheme.apogee = new ColorScheme(function (sat) {
+      var ap = sat.apogee;
       var gradientAmt = Math.min(ap / 45000, 1.0);
       return {
         color: [1.0 - gradientAmt, gradientAmt, 0.0, 1.0],
         pickable: true
       };
     });
-    ColorScheme.smallsats = new ColorScheme(function (satId) {
-      if (satSet.getSat(satId).R < 0.1 && satSet.getSat(satId).OT === 1) {
+    ColorScheme.smallsats = new ColorScheme(function (sat) {
+      if (sat.R < 0.1 && sat.OT === 1) {
         return {
           color: [0.2, 1.0, 0.0, 0.65],
           pickable: true
@@ -126,8 +133,8 @@
         };
       }
     });
-    ColorScheme.rcs = new ColorScheme(function (satId) {
-      var rcs = satSet.getSat(satId).R;
+    ColorScheme.rcs = new ColorScheme(function (sat) {
+      var rcs = sat.R;
       if (rcs < 0.1) {
         return {
           color: [1.0, 0, 0, 0.6],
@@ -151,8 +158,7 @@
         pickable: true
       };
     });
-    ColorScheme.lostobjects = new ColorScheme(function (satId) {
-      var sat = satSet.getSat(satId);
+    ColorScheme.lostobjects = new ColorScheme(function (sat) {
       if (sat.static && sat.type === 'Launch Facility') {
         return {
           color: [0.54, 0.0, 0.54, 1.0],
@@ -205,8 +211,8 @@
         };
       }
     });
-    ColorScheme.leo = new ColorScheme(function (satId) {
-      var ap = satSet.getSat(satId).apogee;
+    ColorScheme.leo = new ColorScheme(function (sat) {
+      var ap = sat.apogee;
       if (ap > 2000) {
         return {
           color: [1.0, 1.0, 1.0, settingsManager.otherSatelliteTransparency],
@@ -219,8 +225,8 @@
         };
       }
     });
-    ColorScheme.geo = new ColorScheme(function (satId) {
-      var pe = satSet.getSat(satId).perigee;
+    ColorScheme.geo = new ColorScheme(function (sat) {
+      var pe = sat.perigee;
       if (pe < 35000) {
         return {
           color: [1.0, 1.0, 1.0, settingsManager.otherSatelliteTransparency],
@@ -233,16 +239,16 @@
         };
       }
     });
-    ColorScheme.velocity = new ColorScheme(function (satId) {
-      var vel = satSet.getSat(satId).velocity;
+    ColorScheme.velocity = new ColorScheme(function (sat) {
+      var vel = sat.velocity;
       var gradientAmt = Math.min(vel / 15, 1.0);
       return {
         color: [1.0 - gradientAmt, gradientAmt, 0.0, 1.0],
         pickable: true
       };
     });
-    ColorScheme.group = new ColorScheme(function (satId) {
-      if (groups.selectedGroup.hasSat(satId)) {
+    ColorScheme.group = new ColorScheme(function (sat) {
+      if (groups.selectedGroup.hasSat(sat.id)) {
         return {
           color: [0.2, 1.0, 0.0, 0.5],
           pickable: true

@@ -35,6 +35,9 @@
   var dotShader;
   var satPosBuf;
   var satColorBuf;
+
+  // Removed to reduce garbage collection
+  var buffers;
   var pickColorBuf;
   var pickableBuf;
 
@@ -48,8 +51,6 @@
   var satExtraData;
   var hoveringSat = -1;
   // var selectedSat = -1;
-  var hoverColor = [0.1, 1.0, 0.0, 1.0];
-  var selectedColor = [0.0, 1.0, 1.0, 1.0];
 
   try {
     $('#loader-text').text('Locating ELSETs...');
@@ -574,11 +575,10 @@
 
       satSet.numSats = satData.length;
 
-      satSet.setColorScheme(ColorScheme.default);
+      satSet.setColorScheme(ColorScheme.default, true);
 
       settingsManager.shadersReady = true;
       if (satsReadyCallback) {
-        $('#loader-text').text('Coloring Inside the Lines...');
         satsReadyCallback(satData);
       }
     }
@@ -588,8 +588,6 @@
     return satData;
   };
 
-  // Removed to reduce garbage collection
-  var buffers;
   satSet.setColorScheme = function (scheme) {
     settingsManager.currentColorScheme = scheme;
     buffers = scheme.calculateColorBuffers();
@@ -698,30 +696,24 @@
   satSet.getSat = function (i) {
     if (!satData) return null;
 
-    var ret = satData[i];
-    if (!ret) return null;
+    if (!satData[i]) return null;
     if (gotExtraData) {
-      // ret.perigee = satData[i].perigee;
-      ret.inview = satInView[i];
-      ret.velocity = Math.sqrt(
+      satData[i].inViewChange = false;
+      if (satData[i].inview !== satInView[i]) satData[i].inViewChange = true;
+      satData[i].inview = satInView[i];
+      satData[i].velocity = Math.sqrt(
         satVel[i * 3] * satVel[i * 3] +
         satVel[i * 3 + 1] * satVel[i * 3 + 1] +
         satVel[i * 3 + 2] * satVel[i * 3 + 2]
       );
-      // ret.altitude = satellite.altitude;
-      // ret.longitude = satellite.lon;
-      // ret.latitude = satellite.lat;
-      // ret.azimuth = satellite.azimuth;
-      // ret.elevation = satellite.elevation;
-      // ret.range = satellite.range;
-      ret.position = {
+      satData[i].position = {
         x: satPos[i * 3],
         y: satPos[i * 3 + 1],
         z: satPos[i * 3 + 2]
       };
     }
 
-    return ret;
+    return satData[i];
   };
 
   satSet.getIdFromIntlDes = function (intlDes) {
@@ -948,10 +940,10 @@
     if (i === hoveringSat) return;
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
     if (hoveringSat !== -1 && hoveringSat !== selectedSat) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(hoveringSat).color));
+      gl.bufferSubData(gl.ARRAY_BUFFER, hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(hoveringSat)).color));
     }
     if (i !== -1) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(hoverColor));
+      gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.hoverColor));
     }
     hoveringSat = i;
   };
@@ -960,10 +952,10 @@
     if (i === selectedSat) return;
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
     if (selectedSat !== -1) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(selectedSat).color));
+      gl.bufferSubData(gl.ARRAY_BUFFER, selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(selectedSat)).color));
     }
     if (i !== -1) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(selectedColor));
+      gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
     }
     selectedSat = i;
     if (satellite.sensorSelected()) {

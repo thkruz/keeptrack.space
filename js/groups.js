@@ -91,8 +91,8 @@
     groups.selectedGroup = null;
     if (satSet.currentThe)
     if (settingsManager.currentColorScheme === ColorScheme.default || settingsManager.currentColorScheme === ColorScheme.onlyFOV) {
-      if (settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.onlyFOV); }
-      if (!settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.default); }
+      if (settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.onlyFOV, true); }
+      if (!settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.default, true); }
     }
   };
   groups.init = function () {
@@ -142,7 +142,7 @@
           } else {
             $('#legend-list-default').show();
           }
-          satSet.setColorScheme(ColorScheme.default);
+          satSet.setColorScheme(ColorScheme.default, true);
           ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
           break;
         case 'velocity':

@@ -163,16 +163,18 @@ function propagate () {
   var gmst = satellite.gstime(j);
   var len = satCache.length - 1;
   var i = -1;
+
+  var positionEcf, lookangles, azimuth, elevation, rangeSat;
+  var x, y, z, vx, vy, vz;
+  var cosLat, sinLat, cosLon, sinLon;
+  var curMissileTime;
+  var s, m, pv, tLen, t;
+
   while (i < len) {
-    // TODO More Accuracy at Higher Speeds but Processor Intensive
-    // Should be an optional thing
-    // now = propTime();
+    // TODO Redoing the gmst calculation is more accurate at but processor
+    // intensive and should be an optional thing
 
     i++;
-    var positionEcf, lookangles, azimuth, elevation, rangeSat;
-    var x, y, z, vx, vy, vz;
-    var cosLat, sinLat, cosLon, sinLon;
-    var curMissileTime;
 
     if (satCache[i].static) {
       cosLat = Math.cos(satCache[i].lat * DEG2RAD);
@@ -194,8 +196,8 @@ function propagate () {
       sinLon = null;
     } else if (satCache[i].missile) {
       if (!satCache[i].active) { continue; } // Skip inactive missiles
-      var tLen = satCache[i].altList.length;
-      for (var t = 0; t < tLen; t++) {
+      tLen = satCache[i].altList.length;
+      for (t = 0; t < tLen; t++) {
         if (satCache[i].startTime + t * 1000 > now) {
           curMissileTime = t;
           break;
@@ -252,8 +254,8 @@ function propagate () {
     } else {
       // Skip reentries
       if (satCache[i].skip) continue;
-      var m = (j - satCache[i].jdsatepoch) * 1440.0; // 1440 = minutes_per_day
-      var pv = satellite.sgp4(satCache[i], m);
+      m = (j - satCache[i].jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+      pv = satellite.sgp4(satCache[i], m);
 
       try {
         x = pv.position.x; // translation of axes from earth-centered inertial
@@ -263,9 +265,9 @@ function propagate () {
         vy = pv.velocity.y;
         vz = pv.velocity.z;
 
-        positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
 
-        if (sensor.observerGd !== sensor.defaultGd) {
+        if (sensor.observerGd !== sensor.defaultGd || multiSensor) {
+          positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
           lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
           azimuth = lookangles.azimuth;
           elevation = lookangles.elevation;
@@ -297,7 +299,7 @@ function propagate () {
       satInView[i] = false; // Default in case no sensor selected
 
       if (multiSensor) {
-        for (var s = 0; s < mSensor.length; s++) {
+        for (s = 0; s < mSensor.length; s++) {
           if (satInView[i]) break;
           sensor = mSensor[s];
           sensor.observerGd = {
@@ -357,7 +359,7 @@ function propagate () {
   satInView = new Float32Array(satCache.length);
 
   // NOTE The longer the delay the more jitter at higher speeds of propagation
-  setTimeout(propagate, 1 * 500 / divisor);
+  setTimeout(propagate, 1 * 100 / divisor);
 }
 
 /** Returns Ordinal Day (Commonly Called J Day) */

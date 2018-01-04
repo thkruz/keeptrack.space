@@ -105,6 +105,7 @@
       }
 
       gotExtraData = true;
+      satExtraData = null;
       return;
     }
 
@@ -125,6 +126,7 @@
       satData[SCi].period = satExtraData[0].period;
       satData[SCi].TLE1 = satExtraData[0].TLE1;
       satData[SCi].TLE2 = satExtraData[0].TLE2;
+      satExtraData = null;
       return;
     }
 
@@ -153,12 +155,7 @@
     if (settingsManager.currentColorScheme === ColorScheme.default && !satellite.sensorSelected() && !settingsManager.isForceColorScheme) {
       // Don't force color recalc if default colors and no sensor for inview color
     } else {
-      if ((settingsManager.currentColorScheme === ColorScheme.default) || (settingsManager.currentColorScheme === ColorScheme.onlyFOV)) {
-        satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-      } else {
-        satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
-      }
-      settingsManager.isForceColorScheme = false;
+      satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
     }
 
     if (!settingsManager.cruncherReady) {
@@ -280,8 +277,6 @@
         $('#map-menu').width($(window).width());
       }
     }
-
-    satExtraData = null;
   };
 
   satSet.init = function (satsReadyCallback) {

@@ -300,7 +300,7 @@ var drawLoopCallback;
       // debugLine.set(satposition, [0, 0, 0]);
     }
 
-    _drawScene(); // FIXME: drawScene creates a new unattached NODE each iteration
+    _drawScene();
     _updateHover();
     _onDrawLoopComplete(drawLoopCallback);
 
@@ -626,7 +626,7 @@ function getSatIdFromCoord (x, y) {
 }
 
 function getEarthScreenPoint (x, y) {
-  rayOrigin = _getCamPos();
+  rayOrigin = getCamPos();
   ptThru = _unProject(x, y);
 
   rayDir = vec3.create();
@@ -650,14 +650,14 @@ function getEarthScreenPoint (x, y) {
   vec3.add(ptSurf, ptSurf, rayOrigin);
 
   return ptSurf;
-  function _getCamPos () {
-    gCPr = _getCamDist();
-    gCPz = gCPr * Math.sin(camPitch);
-    gCPrYaw = gCPr * Math.cos(camPitch);
-    gCPx = gCPrYaw * Math.sin(camYaw);
-    gCPy = gCPrYaw * -Math.cos(camYaw);
-    return [gCPx, gCPy, gCPz];
-  }
+}
+function getCamPos () {
+  gCPr = _getCamDist();
+  gCPz = gCPr * Math.sin(camPitch);
+  gCPrYaw = gCPr * Math.cos(camPitch);
+  gCPx = gCPrYaw * Math.sin(camYaw);
+  gCPy = gCPrYaw * -Math.cos(camYaw);
+  return [gCPx, gCPy, gCPz];
 }
 function longToYaw (long) {
   var selectedDate = $('#datetime-text').text().substr(0, 19);

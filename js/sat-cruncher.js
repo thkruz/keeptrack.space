@@ -359,7 +359,7 @@ function propagate () {
   satInView = new Float32Array(satCache.length);
 
   // NOTE The longer the delay the more jitter at higher speeds of propagation
-  setTimeout(propagate, 1 * 100 / divisor);
+  setTimeout(propagate, 1 * 1000 / divisor);
 }
 
 /** Returns Ordinal Day (Commonly Called J Day) */

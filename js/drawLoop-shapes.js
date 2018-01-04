@@ -11,10 +11,13 @@
 (function () {
   function FOVBubble () {
     this.vertBuf = gl.createBuffer();
+    this.vertexCount = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(72), gl.STREAM_DRAW);
   }
   FOVBubble.prototype.set = function () {
+    var camPos = getCamPos();
+
     var buf = [
       // Front face
       -100.0, -100.0, 100.0,
@@ -50,24 +53,31 @@
       -100.0, -100.0, -100.0,
       -100.0, -100.0, 100.0,
       -100.0, 100.0, 100.0,
-      -100.0, 100.0, -100.0
+      -100.0, 100.0, -100.0,
     ];
+
+    this.vertexCount = buf.length / 3;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(buf), gl.STREAM_DRAW);
   };
   FOVBubble.prototype.draw = function () {
-    if (!shadersReady || !cruncherReady) return;
+    if (!settingsManager.shadersReady || !settingsManager.cruncherReady) return;
     var bubbleShader = orbitDisplay.getPathShader();
 
     gl.useProgram(bubbleShader);
-    gl.disable(gl.BLEND);
+    // Disable depth test
+    gl.enable(gl.DEPTH_TEST);
+    // Accept fragment if it closer to the camera than the former one
+    gl.depthFunc(gl.LESS);
+    gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     gl.uniform4fv(bubbleShader.uColor, [0.0, 1.0, 1.0, 0.2]);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
     gl.vertexAttribPointer(bubbleShader.aPos, 3, gl.FLOAT, false, 0, 0);
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 24); // Mode, First Vertex, Number of Vertex
-    gl.enable(gl.BLEND);
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, this.vertexCount); // Mode, First Vertex, Number of Vertex
+
+    // RESET GL for EARTH
   };
 
   window.FOVBubble = FOVBubble;

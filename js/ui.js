@@ -2122,7 +2122,7 @@ var satHoverBoxDOM = $('#sat-hoverbox');
   function _updateNextPassOverlay (isForceUpdate) {
     if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
     // Update once every 10 seconds
-    if (timeManager.now > (lastOverlayUpdateTime * 1 + 10000) && selectedSat === -1 || isForceUpdate) {
+    if (timeManager.now > (lastOverlayUpdateTime * 1 + 10000) && (selectedSat === -1 || isForceUpdate)) {
       var propTime = timeManager.propTime();
       infoOverlayDOM.html('');
       for (var s = 0; s < nextPassArray.length; s++) {

@@ -58,7 +58,6 @@ laws of the United States and International Copyright Treaty.
 var canvasDOM = $('#canvas');
 var mapImageDOM = $('#map-image');
 var mapMenuDOM = $('#map-menu');
-var infoOverlayDOM = $('#info-overlay-content');
 var satHoverBoxDOM = $('#sat-hoverbox');
 
 (function () {
@@ -161,10 +160,6 @@ var satHoverBoxDOM = $('#sat-hoverbox');
           $('#datetime-input').fadeOut();
           $('#datetime-text').fadeIn();
           settingsManager.isEditTime = false;
-
-          // Reset last update times when going backwards in time
-          lastOverlayUpdateTime = 0;
-          lastBoxUpdateTime = 0;
         });
 
       window.oncontextmenu = function (event) {
@@ -537,7 +532,7 @@ var satHoverBoxDOM = $('#sat-hoverbox');
         if (selectedSat !== -1) {
           $('#menu-lookangles img').removeClass('bmenu-item-disabled');
         }
-        if (satellite.sensorSelected() && watchlistList.length > 0) {
+        if (watchlistList.length > 0) {
           $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
         }
         $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
@@ -554,7 +549,10 @@ var satHoverBoxDOM = $('#sat-hoverbox');
           dat: (timeManager.propOffset).toString() + ' ' + (1.0).toString()
         });
         timeManager.propRealTime = Date.now();
-        lastOverlayUpdateTime = 0;
+        timeManager.propTime();
+        // Reset last update times when going backwards in time
+        lastOverlayUpdateTime = timeManager.now * 1 - 7000;
+        lastBoxUpdateTime = timeManager.now;
         _updateNextPassOverlay(true);
         e.preventDefault();
       });
@@ -864,6 +862,8 @@ var satHoverBoxDOM = $('#sat-hoverbox');
         }
         _updateWatchlist();
         if (watchlistList.length <= 0) {
+          searchBox.doSearch('');
+          satSet.setColorScheme(ColorScheme.default, true);
           settingsManager.themes.blueTheme();
         }
         if (!satellite.sensorSelected() || watchlistList.length <= 0) {
@@ -944,9 +944,10 @@ var satHoverBoxDOM = $('#sat-hoverbox');
             }
           }
           watchlistList = newWatchlist;
-          console.log(watchlistList);
-          console.log(watchlistInViewList);
           _updateWatchlist();
+          if (satellite.sensorSelected()) {
+            $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
+          }
         };
         reader.readAsText(evt.target.files[0]);
         evt.preventDefault();
@@ -1410,6 +1411,7 @@ var satHoverBoxDOM = $('#sat-hoverbox');
           dat: (timeManager.propOffset).toString() + ' ' + (1.0).toString()
         });
         timeManager.propRealTime = Date.now(); // Reset realtime TODO: This might not be necessary...
+        timeManager.propTime();
       } // Allows passing -1 argument to socrates function to skip these steps
     }
     function _bottomIconPress (evt) {
@@ -1440,6 +1442,7 @@ var satHoverBoxDOM = $('#sat-hoverbox');
               nextPassArray.sort(function(a, b) {
                   return new Date(a.time) - new Date(b.time);
               });
+              lastOverlayUpdateTime = 0;
               _updateNextPassOverlay(true);
               $('#loading-screen').fadeOut();
             });
@@ -2097,6 +2100,7 @@ var satHoverBoxDOM = $('#sat-hoverbox');
           dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
         });
         timeManager.propRealTime = Date.now();
+        timeManager.propTime();
       }
     }
     function browserUnsupported () {
@@ -2119,12 +2123,16 @@ var satHoverBoxDOM = $('#sat-hoverbox');
   }
 
   // Callbacks from DrawLoop
+  var infoOverlayDOM = [];
   function _updateNextPassOverlay (isForceUpdate) {
     if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
     // Update once every 10 seconds
-    if (timeManager.now > (lastOverlayUpdateTime * 1 + 10000) && (selectedSat === -1 || isForceUpdate)) {
+    if ((timeManager.now > (lastOverlayUpdateTime * 1 + 10000)) &&
+                           (selectedSat === -1 || isForceUpdate) &&
+                           !isDragging && zoomLevel === zoomTarget) {
       var propTime = timeManager.propTime();
-      infoOverlayDOM.html('');
+      infoOverlayDOM = [];
+      infoOverlayDOM.push('<div>');
       for (var s = 0; s < nextPassArray.length; s++) {
         var satInView = satSet.getSat(satSet.getIdFromObjNum(nextPassArray[s].SCC_NUM)).inview;
         // If old time and not in view, skip it
@@ -2135,7 +2143,7 @@ var satHoverBoxDOM = $('#sat-hoverbox');
 
         // Yellow - In View and Time to Next Pass is +/- 30 minutes
         if ((satInView && (nextPassArray[s].time - propTime < 1000 * 60 * 30) && (propTime - nextPassArray[s].time < 1000 * 60 * 30))) {
-          infoOverlayDOM.append('<div class="row">' +
+          infoOverlayDOM.push('<div class="row">' +
                         '<h5 class="center-align watchlist-object link" style="color: yellow">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
                         '</div>');
           continue;
@@ -2143,18 +2151,20 @@ var satHoverBoxDOM = $('#sat-hoverbox');
         // Blue - Time to Next Pass is between 10 minutes before and 20 minutes after the current time
         // This makes recent objects stay at the top of the list in blue
         if ((nextPassArray[s].time - propTime < 1000 * 60 * 10) && (propTime - nextPassArray[s].time < 1000 * 60 * 20)) {
-          infoOverlayDOM.append('<div class="row">' +
+          infoOverlayDOM.push('<div class="row">' +
                         '<h5 class="center-align watchlist-object link" style="color: blue">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
                         '</div>');
           continue;
         }
         // White - Any future pass not fitting the above requirements
         if (nextPassArray[s].time - propTime > 0) {
-          infoOverlayDOM.append('<div class="row">' +
+          infoOverlayDOM.push('<div class="row">' +
                       '<h5 class="center-align watchlist-object link" style="color: white">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
                       '</div>');
         }
       }
+      infoOverlayDOM.push('</div>');
+      document.getElementById('info-overlay-content').innerHTML = infoOverlayDOM.join('');
       lastOverlayUpdateTime = timeManager.now;
     }
   }

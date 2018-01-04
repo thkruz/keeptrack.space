@@ -283,7 +283,7 @@ var drawLoopCallback;
       zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dt * 0.0025;
     } else {
       zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dt * 0.0075;
-      if (zoomLevel >= zoomTarget - 0.001 && zoomLevel <= zoomTarget + 0.001) {
+      if (zoomLevel >= zoomTarget - 0.005 && zoomLevel <= zoomTarget + 0.005) {
         zoomLevel = zoomTarget;
       }
     }

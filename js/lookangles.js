@@ -218,7 +218,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
   satellite.nextpassList = function (satArray) {
     var nextPassArray = [];
     for (var s = 0; s < satArray.length; s++) {
-      var time = satellite.next5passes(satArray[s]);
+      var time = satellite.next5passes(satArray[s], undefined, (1000 * 60 * 60 * 24)); // Only do 1 day looks
       for (var i = 0; i < time.length; i++) {
         nextPassArray.push({'SCC_NUM': satArray[s].SCC_NUM, 'time': time[i]});
       }

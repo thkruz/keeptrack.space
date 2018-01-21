@@ -5,8 +5,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.30.5';
-  settingsManager.versionDate = 'December 31, 2017';
+  settingsManager.versionNumber = 'v0.30.6';
+  settingsManager.versionDate = 'January 21, 2018';
 
   (function _getVersion () {
     var url = window.location.pathname;
@@ -22,6 +22,7 @@
     if (settingsManager.themes.currentTheme === 'Red') settingsManager.themes.redTheme(true);
   };
   settingsManager.themes.redTheme = function (isForce) {
+    if (settingsManager.retro) return;
     if (settingsManager.themes.currentTheme === 'Red' && !isForce) return;
       document.getElementById('nav-wrapper').classList.remove('light-blue');
       document.getElementById('nav-wrapper').classList.add('red');
@@ -40,12 +41,14 @@
       settingsManager.themes.currentTheme = 'Red';
     };
   settingsManager.themes.redThemeSearch = function (isForce) {
+    if (settingsManager.retro) return;
     if (settingsManager.themes.currentTheme !== 'Red' && !isForce) return;
     $('#search-results').css('background', 'LightCoral');
     $('#search-result:hover').css('background', 'DarkRed');
     $('.search-hilight').css('color', 'DarkRed');
   };
   settingsManager.themes.blueTheme = function (isForce) {
+    if (settingsManager.retro) return;
     if (settingsManager.themes.currentTheme === 'Blue' && !isForce) return;
     document.getElementById('nav-wrapper').classList.remove('red');
     document.getElementById('nav-footer').classList.remove('red');

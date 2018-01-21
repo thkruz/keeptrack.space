@@ -1,11 +1,11 @@
 /* global
   $
 */
+var MILLISECONDS_PER_DAY = 1.15741e-8;
 
 (function () {
   var timeManager = {};
 
-  var MILLISECONDS_PER_DAY = 1.15741e-8;
   var propFrozen = Date.now(); // for when propRate 0
   var realElapsedMsec;
   var scaledMsec;

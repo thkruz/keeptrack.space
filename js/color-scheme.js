@@ -245,6 +245,7 @@
       };
     });
     ColorScheme.group = new ColorScheme(function (sat) {
+      if (groups.selectedGroup === null) return;
       if (groups.selectedGroup.hasSat(sat.id)) {
         return {
           color: [0.2, 1.0, 0.0, 0.5],

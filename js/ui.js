@@ -80,6 +80,8 @@ var satHoverBoxDOM = $('#sat-hoverbox');
   var watchlistList = [];
   var watchlistInViewList = [];
   var nextPassArray = [];
+  var nextPassEarliestTime;
+  var isWatchlistChanged = false;
 
   var uiController = {};
 
@@ -157,8 +159,10 @@ var satHoverBoxDOM = $('#sat-hoverbox');
         // minDate: -14, // No more than 7 days in the past
         // maxDate: 14,
         sliderAccessArgs: { touchonly: false }}).on('change.dp', function (e) { // or 7 days in the future to make sure ELSETs are valid
+          // NOTE: This code gets called when the done button is pressed or the time sliders are closed
           $('#datetime-input').fadeOut();
           $('#datetime-text').fadeIn();
+          _updateNextPassOverlay(true);
           settingsManager.isEditTime = false;
         });
 
@@ -1431,21 +1435,28 @@ var satHoverBoxDOM = $('#sat-hoverbox');
             _hideSideMenus();
             break;
           } else {
-            // TODO: NEW LAUNCH
             _hideSideMenus();
-            nextPassArray = [];
-            $('#loading-screen').fadeIn('slow', function () {
-              for (var x = 0; x < watchlistList.length; x++) {
-                nextPassArray.push(satSet.getSat(watchlistList[x]));
-              }
-              nextPassArray = satellite.nextpassList(nextPassArray);
-              nextPassArray.sort(function(a, b) {
-                  return new Date(a.time) - new Date(b.time);
+            if ((nextPassArray.length === 0 || nextPassEarliestTime > timeManager.now ||
+                new Date(nextPassEarliestTime * 1 + (1000 * 60 * 60 * 24)) < timeManager.now) ||
+                isWatchlistChanged) {
+              $('#loading-screen').fadeIn('slow', function () {
+                  nextPassArray = [];
+                  for (var x = 0; x < watchlistList.length; x++) {
+                    nextPassArray.push(satSet.getSat(watchlistList[x]));
+                  }
+                  nextPassArray = satellite.nextpassList(nextPassArray);
+                  nextPassArray.sort(function(a, b) {
+                      return new Date(a.time) - new Date(b.time);
+                  });
+                  nextPassEarliestTime = timeManager.now;
+                  lastOverlayUpdateTime = 0;
+                _updateNextPassOverlay(true);
+                $('#loading-screen').fadeOut();
+                isWatchlistChanged = false;
               });
-              lastOverlayUpdateTime = 0;
+            } else {
               _updateNextPassOverlay(true);
-              $('#loading-screen').fadeOut();
-            });
+            }
             $('#info-overlay-menu').fadeIn();
             $('#menu-info-overlay img').addClass('bmenu-item-selected');
             isInfoOverlayMenuOpen = true;
@@ -1915,6 +1926,7 @@ var satHoverBoxDOM = $('#sat-hoverbox');
     }
     function _updateWatchlist () {
       if (!watchlistList) return;
+      isWatchlistChanged = true;
       var watchlistString = '';
       var watchlistListHTML = '';
       for (var i = 0; i < watchlistList.length; i++) {
@@ -2126,10 +2138,13 @@ var satHoverBoxDOM = $('#sat-hoverbox');
   var infoOverlayDOM = [];
   function _updateNextPassOverlay (isForceUpdate) {
     if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
+
+    // FIXME This should auto update the overlay when the time changes outside the original search window
+
     // Update once every 10 seconds
-    if ((timeManager.now > (lastOverlayUpdateTime * 1 + 10000)) &&
-                           (selectedSat === -1 || isForceUpdate) &&
-                           !isDragging && zoomLevel === zoomTarget) {
+    if (((timeManager.now > (lastOverlayUpdateTime * 1 + 10000) &&
+                           selectedSat === -1) &&
+                           !isDragging && zoomLevel === zoomTarget) || isForceUpdate) {
       var propTime = timeManager.propTime();
       infoOverlayDOM = [];
       infoOverlayDOM.push('<div>');

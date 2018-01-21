@@ -479,7 +479,8 @@
         if (typeof satInfoList !== 'undefined') { // If extra catalogue
           for (s = 0; s < satInfoList.length; s++) {
             isMatchFound = false;
-            for (i = 0; i < tempSatData.length; i++) {
+            // NOTE i=s may need to be i=0, but this should be more effecient
+            for (i = s; i < tempSatData.length; i++) {
               if (satInfoList[s].SCC === tempSatData[i].SCC_NUM) {
                 tempSatData[i].ON = satInfoList[s].ON;
                 tempSatData[i].C = satInfoList[s].C;

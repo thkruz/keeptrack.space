@@ -95,8 +95,8 @@
       texLoaded = true;
       onImageLoaded();
     };
-    img.src = 'images/dayearth-4096.jpg';
-  //  img.src = '/mercator-tex-512.jpg';
+    if (!settingsManager.vectorImages) img.src = 'images/dayearth-4096.jpg';
+    if (settingsManager.vectorImages) img.src = 'images/dayearthvector-4096.jpg';
 
     nightTexture = gl.createTexture();
     var nightImg = new Image();
@@ -110,9 +110,8 @@
       nightLoaded = true;
       onImageLoaded();
     };
-    nightImg.src = 'images/nightearth-4096.png';
-    if (settingsManager.retro) nightImg.src = 'images/dayearth-4096.jpg';
-   // nightImg.src = '/nightearth-512.jpg';
+    if (!settingsManager.vectorImages) nightImg.src = 'images/nightearth-4096.png';
+    if (settingsManager.vectorImages) nightImg.src = 'images/dayearthvector-4096.jpg';
 
     // generate a uvsphere bottom up, CCW order
     var vertPos = [];

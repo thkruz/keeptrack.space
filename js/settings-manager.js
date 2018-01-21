@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.30.7';
+  settingsManager.versionNumber = 'v0.30.8';
   settingsManager.versionDate = 'January 21, 2018';
 
   (function _getVersion () {
@@ -13,6 +13,10 @@
     var filename = url.substring(url.lastIndexOf('/') + 1);
     if (filename === 'retro.htm') settingsManager.retro = true;
     if (filename === 'offline.htm') settingsManager.offline = true;
+    if (filename === 'offlineVec.htm') {
+      settingsManager.offline = true;
+      settingsManager.vectorImages = true;
+    }
   })();
 
   settingsManager.themes = {};

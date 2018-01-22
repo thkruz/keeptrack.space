@@ -20,7 +20,6 @@
   ColorScheme.prototype.calculateColorBuffers = function () {
     // TODO This should be done as an initialization somewhere else
     if (!pickableData || !colorData) {
-      console.log('Calculate colorData && pickableData');
       numSats = satSet.numSats;
       colorData = new Float32Array(numSats * 4);
       pickableData = new Float32Array(numSats);

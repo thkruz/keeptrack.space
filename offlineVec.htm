@@ -1116,10 +1116,10 @@
         <div id="menu-find-sat" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Search Orbit">
           <img src="" delayedsrc="images/findOrbit.png" class="bmenu-item-disabled" alt="Twitter">
         </div>
-        <div id="menu-twitter" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
+        <div id="menu-twitter" style="display: none;" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
           <img src="" delayedsrc="images/twitter.png" class="bmenu-item-disabled" alt="Twitter">
         </div>
-        <div id="menu-weather" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Terrestrial Weather">
+        <div id="menu-weather" style="display: none;" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Terrestrial Weather">
           <img src="" delayedsrc="images/sun.png" class="bmenu-item-disabled" alt="Weather">
         </div>
         <div id="menu-map" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Stereographic Map">
@@ -1128,13 +1128,13 @@
         <!-- <div id="menu-space-weather" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Geomagnetic Information">
           <img src="" delayedsrc="images/geomagnetic.png" class="bmenu-item-disabled" alt="Weather">
         </div> -->
-        <div id="menu-launches" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
+        <div id="menu-launches" style="display: none;" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
           <img src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item-disabled" alt="Launches">
         </div>
         <div id="menu-space-stations" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist">
           <img src="" delayedsrc="images/space-station-1.png" class="bmenu-item-disabled" alt="Interesting Satellites">
         </div>
-        <div id="menu-satellite-collision" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
+        <div id="menu-satellite-collision" style="display: none;" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
           <img src="" delayedsrc="images/satellite-collision.png" class="bmenu-item-disabled" alt="Collision">
         </div>
         <div id="menu-editSat" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Edit Satellites">
@@ -1157,11 +1157,11 @@
         </div>
       </div>
     </div>
-    <div id="social" style="margin-top:-50px;margin-right:70px;" class="right">
+    <!-- <div id="social" style="margin-top:-50px;margin-right:70px;" class="right">
       <a id="facebook-share" href="https://www.facebook.com/sharer/sharer.php?u=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Facebook"><img src="https://static.addtoany.com/buttons/facebook.svg" width="32" height="32"></a>
       <a id="twitter-share" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Twitter"><img src="https://static.addtoany.com/buttons/twitter.svg" width="32" height="32"></a>
       <a id="reddit-share" href="https://www.reddit.com/submit?url=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Reddit"><img src="https://static.addtoany.com/buttons/reddit.svg" width="32" height="32"></a>
-    </div>
+    </div> -->
     <span id="version-info" style="margin-top:-45px;margin-right:10px" class="right">
       vX.XX.XX
     </span>
@@ -1197,7 +1197,6 @@
   <script src="satInfo.js"></script>
   <!-- Load Main JavaScript Code -->
   <script src="js/color-scheme.js"></script>
-  <script src="js/main.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/lookangles.js"></script>
   <script src="js/orbit-display.js"></script>
@@ -1213,6 +1212,7 @@
   <script src="js/lib/jquery.colorbox.min.js"></script>
   <!-- OFFLINE VERSION ONLY -->
   <script src="TLE.js"></script>
+  <script src="js/main.js"></script>
   <!-- OFFLINE VERSION ONLY -->
   <!--Google Analytics -->
   <script>

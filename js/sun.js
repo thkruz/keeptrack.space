@@ -10,16 +10,17 @@
 (function () {
   var sun = {};
   var j, n, L, g, ecLon, ob, x, y, z, obliq, t;
+  var now;
 
   sun.currentDirection = function () {
-    timeManager.now = timeManager.propTime();
-    j = timeManager.jday(timeManager.now.getUTCFullYear(),
-                 timeManager.now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-                 timeManager.now.getUTCDate(),
-                 timeManager.now.getUTCHours(),
-                 timeManager.now.getUTCMinutes(),
-                 timeManager.now.getUTCSeconds());
-    j += timeManager.now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+    now = timeManager.propTime();
+    j = timeManager.jday(now.getUTCFullYear(),
+                 now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+                 now.getUTCDate(),
+                 now.getUTCHours(),
+                 now.getUTCMinutes(),
+                 now.getUTCSeconds());
+    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
 
     return sun.getDirection(j);
   };

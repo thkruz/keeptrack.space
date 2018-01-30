@@ -688,6 +688,19 @@
     }
   };
 
+  satSet.mergeSat = function (satObject) {
+    if (!satData) return null;
+    var i = satSet.getIdFromObjNum(satObject.SCC);
+    satData[i].ON = satObject.ON;
+    satData[i].C = satObject.C;
+    satData[i].LV = satObject.LV;
+    satData[i].LS = satObject.LS;
+    satData[i].R = satObject.R;
+    satData[i].URL = satObject.URL;
+    satData[i].NOTES = satObject.NOTES;
+    satData[i].TTP = satObject.TTP;
+  };
+
   satSet.setSat = function (i, satObject) {
     if (!satData) return null;
     satData[i] = satObject;
@@ -728,6 +741,11 @@
   function pad0 (str, max) {
     return str.length < max ? pad0('0' + str, max) : str;
   }
+
+  satSet.getSatFromObjNum = function (objNum) {
+      var satID = satSet.getIdFromObjNum (objNum);
+      return satSet.getSat(satID);
+  };
 
   satSet.getIdFromObjNum = function (objNum) {
     var scc;

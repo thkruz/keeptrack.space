@@ -194,9 +194,10 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
   timeManager.jday = function (year, mon, day, hr, minute, sec) { // from satellite.js
     if (!year) {
       // console.error('timeManager.jday should always have a date passed to it!');
-      timeManager.now = Date.now();
-      jDayStart = new Date(timeManager.now.getFullYear(), 0, 0);
-      jDayDiff = timeManager.now - jDayStart;
+      var now;
+      now = Date.now();
+      jDayStart = new Date(now.getFullYear(), 0, 0);
+      jDayDiff = now - jDayStart;
       return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);
     } else {
       return (367.0 * year -

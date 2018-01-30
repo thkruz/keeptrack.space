@@ -6,8 +6,26 @@
 //                                          OFFLINE
 // ===============================================================================
 $(document).ready(function () {
-  $('#editor-scc').change(function (e) {
+  var scc = getParameterByName('scc');
+  var isPopup = getParameterByName('popup');
+  if (scc != null) {
+    $('#editor-scc').val(scc);
+    updateSelectedObjectInfo();
+  }
+  if (isPopup == undefined) {
+    $('#editor-open').css('display', 'block');
+    updateSelectedObjectInfo();
+  }
+
+  $('#editor-scc').bind('input', function(){ updateSelectedObjectInfo(); });
+
+  function updateSelectedObjectInfo () {
     if (typeof satInfoList === 'undefined') { console.error('No satInfo.js File'); return; }
+    if (parent.window.satInfoList !== null) {
+      satInfoList = parent.window.satInfoList;
+    } else {
+      parent.window.satInfoList = satInfoList;
+    }
     if (typeof jsTLEfile === 'undefined') { console.error('No TLE.js File'); return; }
     var i;
     for (i = 0; i < jsTLEfile.length; i++) {
@@ -16,7 +34,10 @@ $(document).ready(function () {
         $('#editor-ON').val(jsTLEfile[i].ON || 'Unknown');
         $('#editor-C').val(jsTLEfile[i].C || 'Unknown');
         $('#editor-LV').val(jsTLEfile[i].LV || 'Unknown');
-        $('#editor-URL').val(jsTLEfile[i].URL || 'Unknown');
+        $('#editor-URL').val(jsTLEfile[i].URL || '');
+        $('#editor-R').val(jsTLEfile[i].R || '0.1');
+        $('#editor-NOTES').val(jsTLEfile[i].NOTES || 'NSTR');
+        $('#editor-TTP').val(jsTLEfile[i].TTP || 'NSTR');
         if (typeof jsTLEfile[i].LS !== 'undefined') {
           $('#editor-LS').val(jsTLEfile[i].LS);
         }
@@ -27,19 +48,24 @@ $(document).ready(function () {
         $('#editor-ON').val(satInfoList[i].ON || 'Unknown');
         $('#editor-C').val(satInfoList[i].C || 'Unknown');
         $('#editor-LV').val(satInfoList[i].LV || 'Unknown');
-        $('#editor-URL').val(satInfoList[i].URL || 'Unknown');
+        $('#editor-URL').val(satInfoList[i].URL || '');
+        $('#editor-R').val(satInfoList[i].R || '0.1');
+        $('#editor-NOTES').val(satInfoList[i].NOTES || 'NSTR');
+        $('#editor-TTP').val(satInfoList[i].TTP || 'NSTR');
         if (typeof satInfoList[i].LS !== 'undefined') {
           $('#editor-LS').val(satInfoList[i].LS);
         }
       }
     }
-  });
+  }
 
-  $('#editor-ON').change(function (e) { satInfoChange(); });
-  $('#editor-C').change(function (e) { satInfoChange(); });
-  $('#editor-LV').change(function (e) { satInfoChange(); });
-  $('#editor-LS').change(function (e) { satInfoChange(); });
-  $('#editor-URL').change(function (e) { satInfoChange(); });
+  $('#editor-ON').bind('input', function(){ satInfoChange(); });
+  $('#editor-C').bind('input', function(){ satInfoChange(); });
+  $('#editor-LV').bind('input', function(){ satInfoChange(); });
+  $('#editor-LS').bind('input', function(){ satInfoChange(); });
+  $('#editor-URL').bind('input', function(){ satInfoChange(); });
+  $('#editor-TTP').bind('input', function(){ satInfoChange(); });
+  $('#editor-NOTES').bind('input', function(){ satInfoChange(); });
 
   function satInfoChange () {
     var isFoundMatch = false;
@@ -49,7 +75,13 @@ $(document).ready(function () {
         satInfoList[i].C = $('#editor-C').val();
         satInfoList[i].LV = $('#editor-LV').val();
         satInfoList[i].LS = $('#editor-LS').val();
+        satInfoList[i].R = $('#editor-R').val();
         satInfoList[i].URL = $('#editor-URL').val();
+        satInfoList[i].NOTES = $('#editor-NOTES').val();
+        satInfoList[i].TTP = $('#editor-TTP').val();
+        if (typeof parent.window.satSet != undefined) {
+          parent.window.satSet.mergeSat(satInfoList[i]);
+        }
         isFoundMatch = true;
       }
     }
@@ -60,8 +92,14 @@ $(document).ready(function () {
       newSatInfo.C = $('#editor-C').val();
       newSatInfo.LV = $('#editor-LV').val();
       newSatInfo.LS = $('#editor-LS').val();
+      newSatInfo.R = $('#editor-R').val();
       newSatInfo.URL = $('#editor-URL').val();
+      newSatInfo.NOTES = $('#editor-NOTES').val();
+      newSatInfo.TTP = $('#editor-TTP').val();
       satInfoList.push(newSatInfo);
+      if (typeof parent.window.satSet != undefined) {
+        parent.window.satSet.mergeSat(newSatInfo);
+      }
     }
   }
 
@@ -99,12 +137,23 @@ $(document).ready(function () {
       }
       var variable = 'var satelliteList = ' + JSON.stringify(satelliteList);
       var blob = new Blob([variable], {type: 'octet/stream'});
-      saveAs(blob, 'TLE.js');
+      saveAs(blob, 'extra.js');
     };
     reader.readAsText(evt.target.files[0]);
     evt.preventDefault();
   });
 });
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
 function _pad0 (str, max) {
   return str.length < max ? _pad0('0' + str, max) : str;
 }

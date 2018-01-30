@@ -10,30 +10,41 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
   <!--Import Fonts-->
-  <link href="css/fonts.css" rel="stylesheet">
+  <link href="/css/fonts.css" rel="stylesheet">
   <!--Import Materialize CSS-->
-  <link rel="stylesheet" href="css/materialize.css">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/materialize.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
-  <div id="editor-menu" class="text-select">
+<body id="editor-menu">
+  <div class="text-select">
     <div id="editor-content">
-      <div class="row">
-        <h5 class="center-align">Edit Satellite Info</h5>
-        <form id="editorForm">
-          <div class="input-field col s12">
+      <form id="editorForm">
+        <div class="row">
+          <div class="col s6"><h5 class="center-align">Edit Satellite Info</h5></div>
+          <div class="input-field col s3 center-align">
+            <button id="editor-open" class="btn waves-effect waves-light" type="button" name="action" style="display: none;">Convert Text File TLEs &#9658;</button>
+            <input id="editor-file" type="file" name="files[]" style="display: none;" />
+          </div>
+          <div class="input-field col s3 center-align">
+            <button id="editor-save" class="btn waves-effect waves-light" type="button" name="action">Save Catalogue &#9658;</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
             <input placeholder="00005" id="editor-scc" type="text">
             <label for="editor-scc">Satellite SCC#</label>
           </div>
-          <div class="input-field col s12">
+          <div class="input-field col s6">
             <input placeholder="Payload A" id="editor-ON" type="text">
             <label for="editor-ON">Object Name</label>
           </div>
-          <div class="input-field col s12">
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
             <input placeholder="Unknown" id="editor-C" type="text">
-            <label for="editor-C">Country</label>
+            <label for="editor-C">Country (Payload Owner)</label>
           </div>
-          <div class="input-field col s12" id="editor-LS-menu">
+          <div class="input-field col s6" id="editor-LS-menu">
             <select id="editor-LS">
                 <option value="U">Unknown</option>
               <optgroup label="United States">
@@ -83,23 +94,34 @@
             </select>
             <label>Launch Site</label>
           </div>
-          <div class="input-field col s12">
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
             <input placeholder="Unknown" id="editor-LV" type="text">
             <label for="editor-LV">Launch Vehicle</label>
           </div>
+          <div class="input-field col s6">
+            <input placeholder="0.1" id="editor-R" type="text">
+            <label for="editor-LV">RCS (m^2)</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
+            <input placeholder="Recent POSMAN" id="editor-NOTES" type="text">
+            <label for="editor-NOTES">Notes</label>
+          </div>
+          <div class="input-field col s6">
+            <input placeholder="RPO Ops" id="editor-TTP" type="text">
+            <label for="editor-TTP">Tactics</label>
+          </div>
+        </div>
+        <div class="row">
           <div class="input-field col s12">
-            <input placeholder="http://" id="editor-URL" type="text">
-            <label for="editor-URL">Website</label>
+            <input placeholder="resources/images/00011.jpg" id="editor-URL" type="text">
+            <label for="editor-URL">Link (This Can be HTML or an Image)</label>
           </div>
-          <div class="input-field col s6 center-align">
-            <button id="editor-save" class="btn waves-effect waves-light" type="button" name="action">Save Catalogue &#9658;</button>
-          </div>
-          <div class="input-field col s6 center-align">
-            <button id="editor-open" class="btn waves-effect waves-light" type="button" name="action">Convert Text File TLEs &#9658;</button>
-            <input id="editor-file" type="file" name="files[]" style="display: none;" />
-          </div>
-        </form>
-      </div>
+        </div>
+      </form>
       <div id="editor-error" style="display: none;margin-top: 10px;cursor: pointer; cursor: hand;" class="center-align">
         <h6 class="center-align">Error</h6>
       </div>
@@ -112,5 +134,6 @@
   <script src="TLE.js"></script>
   <script src="satInfo.js"></script>
   <script src="js/editor.js"></script>
+  <!--  -->
 </body>
 </html>

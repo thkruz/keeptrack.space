@@ -918,6 +918,9 @@
 
       <div id="sat-infobox" class="text-select">
         <div id="sat-info-title" class="center-text">This is a title</div>
+        <div id="edit-satinfo-link" class="link sat-infobox-links sat-only-info">
+          <a class='iframe' href='editor.htm'>Edit Satellite Info</a>
+        </div>
         <div id="all-objects-link" class="link sat-infobox-links sat-only-info">Find all objects from this launch...</div>
         <div id="near-objects-link" class="link sat-infobox-links">Find all objects near this object...</div>
         <div class="sat-info-row sat-only-info">
@@ -1044,6 +1047,22 @@
           </div>
           <div class="sat-info-value" id="sat-rcs">
             MEDIUM
+          </div>
+        </div>
+        <div id="sat-notes-wrapper" class="sat-info-row" style="display: none;">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Interesting Notes on Object">
+            NOTES
+          </div>
+          <div class="sat-info-value" id="sat-notes">
+            Purple in Color
+          </div>
+        </div>
+        <div id="sat-ttp-wrapper" class="sat-info-row" style="display: none;">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Best Practices for Finding">
+            TTPs
+          </div>
+          <div class="sat-info-value" id="sat-ttp">
+            Find with Telescope
           </div>
         </div>
         <div id="iss-stream-menu">

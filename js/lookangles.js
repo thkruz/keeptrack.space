@@ -149,10 +149,8 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     }
 
     // Set default timing settings. These will be changed to find look angles at different times in future.
-    timeManager.propRealTime = Date.now();
-    var propOffset = timeManager.getPropOffset();               // offset letting us propagate in the future (or past)
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
-    var now = timeManager.propTimeCheck(propOffset, timeManager.propRealTime);
+    var now = timeManager.propTime();
     var j = timeManager.jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),

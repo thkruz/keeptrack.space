@@ -836,9 +836,11 @@ function selectSat (satId) {
     $('#sat-infobox').fadeIn();
     $('#sat-info-title').html(sat.ON);
 
-    if (sat.URL) {
+    if (sat.URL && sat.URL !== '') {
       $('#sat-info-title').html("<a class='iframe' href='" + sat.URL + "'>" + sat.ON + '</a>');
     }
+
+    $('#edit-satinfo-link').html("<a class='iframe' href='editor.htm?scc=" + sat.SCC_NUM + "&popup=true'>Edit Satellite Info"+'</a>');
 
     $('#sat-intl-des').html(sat.intlDes);
     if (sat.OT === 'unknown') {
@@ -955,14 +957,26 @@ function selectSat (satId) {
   }
 
   if (satId !== -1) {
+    if (typeof sat.TTP != 'undefined') {
+      $('#sat-ttp-wrapper').show();
+      $('#sat-ttp').html(sat.TTP);
+    } else {
+      $('#sat-ttp-wrapper').hide();
+    }
+    if (typeof sat.NOTES != 'undefined') {
+      $('#sat-notes-wrapper').show();
+      $('#sat-notes').html(sat.NOTES);
+    } else {
+      $('#sat-notes-wrapper').hide();
+    }
     uiController.updateMap();
     if (sat.SCC_NUM === '25544') { // ISS is Selected
-      $('#iss-stream-menu').fadeIn();
+      $('#iss-stream-menu').show();
       $('#iss-stream').html('<iframe src="http://www.ustream.tv/embed/17074538?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://www.ustream.tv/embed/9408562?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><br />' +
                             '<iframe src="http://www.ustream.tv/embed/6540154?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://cdn.livestream.com/embed/spaceflightnow?layout=4&amp;height=340&amp;width=560&amp;autoplay=false" style="border:0;outline:0" frameborder="0" scrolling="no"></iframe>');
     } else {
       $('#iss-stream').html('');
-      $('#iss-stream-menu').fadeOut();
+      $('#iss-stream-menu').hide();
     }
   }
 

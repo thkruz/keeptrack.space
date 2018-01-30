@@ -2216,8 +2216,7 @@ var satHoverBoxDOM = $('#sat-hoverbox');
     if (sat.static) return;
 
     // TODO: Include updates when satellite edited regardless of time.
-
-    if (timeManager.now > (lastBoxUpdateTime + 1000)) {
+    if (timeManager.now > (lastBoxUpdateTime * 1 + 1000)) {
       if (!sat.missile) {
         satellite.getTEARR(sat);
       } else {

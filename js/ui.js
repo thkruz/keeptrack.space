@@ -83,15 +83,17 @@ var satHoverBoxDOM = $('#sat-hoverbox');
   var nextPassEarliestTime;
   var isWatchlistChanged = false;
 
+  var updateInterval = 1000;
+
   var uiController = {};
 
   var touchHoldButton = '';
   $(document).ready(function () { // Code Once index.htm is loaded
+    if (settingsManager.offline) updateInterval = 250;
     (function _licenseCheck () {
       if (typeof satel === 'undefined') satel = null;
       if (settingsManager.offline && !_clk(satel)) {
-        $('#loader-text').html('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
-        ga('send', 'event', 'Expired Offline Software', 'Expired', 'Expired');
+        _offlineMessage();
         return;
       }
     })();
@@ -2216,7 +2218,7 @@ var satHoverBoxDOM = $('#sat-hoverbox');
     if (sat.static) return;
 
     // TODO: Include updates when satellite edited regardless of time.
-    if (timeManager.now > (lastBoxUpdateTime * 1 + 1000)) {
+    if (timeManager.now > (lastBoxUpdateTime * 1 + updateInterval)) {
       if (!sat.missile) {
         satellite.getTEARR(sat);
       } else {
@@ -2293,6 +2295,10 @@ var satHoverBoxDOM = $('#sat-hoverbox');
     }
   }
 
+  _offlineMessage = function () {
+    $('#loader-text').html('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
+    ga('send', 'event', 'Expired Offline Software', 'Expired', 'Expired');
+  };
 
   uiController.updateMap = function () {
     if (selectedSat === -1) return;

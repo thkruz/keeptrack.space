@@ -38,6 +38,11 @@ $(document).ready(function () {
         $('#editor-R').val(jsTLEfile[i].R || '0.1');
         $('#editor-NOTES').val(jsTLEfile[i].NOTES || 'NSTR');
         $('#editor-TTP').val(jsTLEfile[i].TTP || 'NSTR');
+        $('#editor-fmissed').val(jsTLEfile[i].fmissed || 'No');
+        $('#editor-oRPO').val(jsTLEfile[i].oRPO || 'No');
+        $('#editor-constellation').val(jsTLEfile[i].constellation || 'NSTR');
+        $('#editor-associates').val(jsTLEfile[i].associates || 'NSTR');
+        $('#editor-maneuver').val(jsTLEfile[i].maneuver || 'No');
         if (typeof jsTLEfile[i].LS !== 'undefined') {
           $('#editor-LS').val(jsTLEfile[i].LS);
         }
@@ -52,6 +57,11 @@ $(document).ready(function () {
         $('#editor-R').val(satInfoList[i].R || '0.1');
         $('#editor-NOTES').val(satInfoList[i].NOTES || 'NSTR');
         $('#editor-TTP').val(satInfoList[i].TTP || 'NSTR');
+        $('#editor-fmissed').val(satInfoList[i].fmissed || 'No');
+        $('#editor-oRPO').val(satInfoList[i].oRPO || 'No');
+        $('#editor-constellation').val(satInfoList[i].constellation || 'NSTR');
+        $('#editor-associates').val(satInfoList[i].associates || 'NSTR');
+        $('#editor-maneuver').val(satInfoList[i].maneuver || 'No');
         if (typeof satInfoList[i].LS !== 'undefined') {
           $('#editor-LS').val(satInfoList[i].LS);
         }
@@ -65,7 +75,11 @@ $(document).ready(function () {
   $('#editor-LS').bind('input', function(){ satInfoChange(); });
   $('#editor-URL').bind('input', function(){ satInfoChange(); });
   $('#editor-TTP').bind('input', function(){ satInfoChange(); });
-  $('#editor-NOTES').bind('input', function(){ satInfoChange(); });
+  $('#editor-fmissed').bind('input', function(){ satInfoChange(); });
+  $('#editor-oRPO').bind('input', function(){ satInfoChange(); });
+  $('#editor-constellation').bind('input', function(){ satInfoChange(); });
+  $('#editor-associates').bind('input', function(){ satInfoChange(); });
+  $('#editor-maneuver').bind('input', function(){ satInfoChange(); });
 
   function satInfoChange () {
     var isFoundMatch = false;
@@ -79,6 +93,11 @@ $(document).ready(function () {
         satInfoList[i].URL = $('#editor-URL').val();
         satInfoList[i].NOTES = $('#editor-NOTES').val();
         satInfoList[i].TTP = $('#editor-TTP').val();
+        satInfoList[i].FMISSED = $('#editor-fmissed').val();
+        satInfoList[i].ORPO = $('#editor-oRPO').val();
+        satInfoList[i].constellation = $('#editor-constellation').val();
+        satInfoList[i].associates = $('#editor-associates').val();
+        satInfoList[i].maneuver = $('#editor-maneuver').val();
         if (typeof parent.window.satSet != undefined) {
           parent.window.satSet.mergeSat(satInfoList[i]);
         }
@@ -96,6 +115,11 @@ $(document).ready(function () {
       newSatInfo.URL = $('#editor-URL').val();
       newSatInfo.NOTES = $('#editor-NOTES').val();
       newSatInfo.TTP = $('#editor-TTP').val();
+      newSatInfo.FMISSED = $('#editor-fmissed').val();
+      newSatInfo.ORPO = $('#editor-oRPO').val();
+      newSatInfo.constellation = $('#editor-constellation').val();
+      newSatInfo.associates = $('#editor-associates').val();
+      newSatInfo.maneuver = $('#editor-maneuver').val();
       satInfoList.push(newSatInfo);
       if (typeof parent.window.satSet != undefined) {
         parent.window.satSet.mergeSat(newSatInfo);

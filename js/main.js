@@ -969,6 +969,36 @@ function selectSat (satId) {
     } else {
       $('#sat-notes-wrapper').hide();
     }
+    if (typeof sat.FMISSED != 'undefined') {
+      $('#sat-fmissed-wrapper').show();
+      $('#sat-fmissed').html(sat.FMISSED);
+    } else {
+      $('#sat-fmissed-wrapper').hide();
+    }
+    if (typeof sat.ORPO != 'undefined') {
+      $('#sat-oRPO-wrapper').show();
+      $('#sat-oRPO').html(sat.ORPO);
+    } else {
+      $('#sat-oRPO-wrapper').hide();
+    }
+    if (typeof sat.constellation != 'undefined') {
+      $('#sat-constellation-wrapper').show();
+      $('#sat-constellation').html(sat.constellation);
+    } else {
+      $('#sat-constellation-wrapper').hide();
+    }
+    if (typeof sat.maneuver != 'undefined') {
+      $('#sat-maneuver-wrapper').show();
+      $('#sat-maneuver').html(sat.maneuver);
+    } else {
+      $('#sat-maneuver-wrapper').hide();
+    }
+    if (typeof sat.associates != 'undefined') {
+      $('#sat-associates-wrapper').show();
+      $('#sat-associates').html(sat.associates);
+    } else {
+      $('#sat-associates-wrapper').hide();
+    }
     uiController.updateMap();
     if (sat.SCC_NUM === '25544') { // ISS is Selected
       $('#iss-stream-menu').show();

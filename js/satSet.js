@@ -443,6 +443,8 @@
             isMatchFound = false;
             for (i = 0; i < tempSatData.length; i++) {
               if (satelliteList[s].SCC == undefined) continue;
+              if (satelliteList[s].TLE1 == undefined) continue; // Don't Process Bad Satellite Information
+              if (satelliteList[s].TLE2 == undefined) continue; // Don't Process Bad Satellite Information
               if (tempSatData[i].SCC_NUM === satelliteList[s].SCC) {
                 tempSatData[i].TLE1 = satelliteList[s].TLE1;
                 tempSatData[i].TLE2 = satelliteList[s].TLE2;
@@ -451,7 +453,8 @@
               }
             }
             if (!isMatchFound) {
-              if (satelliteList[s].TLE1 == undefined) continue;
+              if (satelliteList[s].TLE1 == undefined) continue; // Don't Process Bad Satellite Information
+              if (satelliteList[s].TLE2 == undefined) continue; // Don't Process Bad Satellite Information
               year = satelliteList[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
               prefix = (year > 50) ? '19' : '20';
               year = prefix + year;
@@ -699,6 +702,12 @@
     satData[i].URL = satObject.URL;
     satData[i].NOTES = satObject.NOTES;
     satData[i].TTP = satObject.TTP;
+    satData[i].FMISSED = satObject.FMISSED;
+    satData[i].ORPO = satObject.ORPO;
+    satData[i].constellation = satObject.constellation;
+    satData[i].associates = satObject.associates;
+    satData[i].maneuver = satObject.maneuver;
+
   };
 
   satSet.setSat = function (i, satObject) {

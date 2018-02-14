@@ -166,11 +166,11 @@
       $('#version-info').tooltip({delay: 50, tooltip: settingsManager.versionDate, position: 'top'});
 
       // Loading Screen Resized
-      $('#loading-screen').removeClass('full-loader');
-      $('#loading-screen').addClass('mini-loader-container');
-      $('#logo-inner-container').addClass('mini-loader');
-      $('#logo-text').html('');
-      $('#loader-text').html('Attempting to Math...');
+        $('#loading-screen').removeClass('full-loader');
+        $('#loading-screen').addClass('mini-loader-container');
+        $('#logo-inner-container').addClass('mini-loader');
+        $('#logo-text').html('');
+        $('#loader-text').html('Attempting to Math...');
 
       // Hide Menus on Small Screens
       if ($(document).width() <= 1000) {

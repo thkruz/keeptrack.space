@@ -59,6 +59,7 @@ var canvasDOM = $('#canvas');
 var mapImageDOM = $('#map-image');
 var mapMenuDOM = $('#map-menu');
 var satHoverBoxDOM = $('#sat-hoverbox');
+var lkpassed = false;
 
 (function () {
   var lastBoxUpdateTime = 0;
@@ -92,9 +93,9 @@ var satHoverBoxDOM = $('#sat-hoverbox');
     if (settingsManager.offline) updateInterval = 250;
     (function _licenseCheck () {
       if (typeof satel === 'undefined') satel = null;
-      if (settingsManager.offline && !_clk(satel)) {
+      if (settingsManager.offline && !_clk(satel, olia)) {
         _offlineMessage();
-        return;
+        throw new Error('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
       }
     })();
     (function _resizeWindow () {
@@ -2121,9 +2122,14 @@ var satHoverBoxDOM = $('#sat-hoverbox');
       $('#canvas-holder').hide();
       $('#no-webgl').css('display', 'block');
     }
-    function _clk (lk) {
+    function _clk (lk, lk2) {
       if (lk == 'undefined') return false;
-      if (settingsManager.lkVerify < lk) return true;
+      if (settingsManager.lkVerify > lk) return false;
+      var olcv = 0;
+      for (x = 0; x < settingsManager.offlineLocation.length; x++) {
+        olcv += settingsManager.offlineLocation.charCodeAt(x);
+      }
+      if (olcv === lk2) return true;
       return false;
     }
   });

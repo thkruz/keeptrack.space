@@ -5,11 +5,11 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.31.2';
+  settingsManager.versionNumber = 'v0.31.3';
   settingsManager.versionDate = 'February 14, 2018';
 
   // Offline management
-  settingsManager.offlineLocation = '';
+  settingsManager.offlineLocation = 'AETCV';
 
   (function _getVersion () {
     var url = window.location.pathname;

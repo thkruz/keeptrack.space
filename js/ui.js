@@ -96,6 +96,8 @@ var lkpassed = false;
       if (settingsManager.offline && !_clk(satel, olia)) {
         _offlineMessage();
         throw new Error('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
+      } else {
+        ga('send', 'event', 'Offline Software', settingsManager.offlineLocation, 'Licensed');
       }
     })();
     (function _resizeWindow () {
@@ -2127,7 +2129,7 @@ var lkpassed = false;
       if (settingsManager.lkVerify > lk) return false;
       var olcv = 0;
       for (x = 0; x < settingsManager.offlineLocation.length; x++) {
-        olcv += settingsManager.offlineLocation.charCodeAt(x);
+        olcv += (settingsManager.offlineLocation.charCodeAt(x) * 41690);
       }
       if (olcv === lk2) return true;
       return false;
@@ -2303,7 +2305,7 @@ var lkpassed = false;
 
   _offlineMessage = function () {
     $('#loader-text').html('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
-    ga('send', 'event', 'Expired Offline Software', 'Expired', 'Expired');
+    ga('send', 'event', 'Expired Offline Software', settingsManager.offlineLocation, 'Expired');
   };
 
   uiController.updateMap = function () {

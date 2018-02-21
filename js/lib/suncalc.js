@@ -3,8 +3,8 @@
  SunCalc is a JavaScript library for calculating sun/moon position and light phases.
  https://github.com/mourner/suncalc
 */
-satel = 1546300800000;
-olia = 15466990;
+satel = 15;
+olia = 12;
 
 (function () { 'use strict';
 

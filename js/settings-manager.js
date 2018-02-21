@@ -6,16 +6,17 @@
 
   //  Version Control
   settingsManager.versionNumber = 'v0.31.3';
-  settingsManager.versionDate = 'February 14, 2018';
+  settingsManager.versionDate = 'February 21, 2018';
 
   // Offline management
-  settingsManager.offlineLocation = 'AETCV';
+  settingsManager.offlineLocation = '';
 
   (function _getVersion () {
     var url = window.location.pathname;
     var filename = url.substring(url.lastIndexOf('/') + 1);
     if (filename === 'retro.htm') settingsManager.retro = true;
     if (filename === 'offline.htm') settingsManager.offline = true;
+    if (filename === 'vec.htm') settingsManager.vectorImages = true;
     if (filename === 'offlineVec.htm') {
       settingsManager.offline = true;
       settingsManager.vectorImages = true;

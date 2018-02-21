@@ -16,6 +16,7 @@
     var filename = url.substring(url.lastIndexOf('/') + 1);
     if (filename === 'retro.htm') settingsManager.retro = true;
     if (filename === 'offline.htm') settingsManager.offline = true;
+    if (filename === 'vec.htm') settingsManager.vectorImages = true;
     if (filename === 'offlineVec.htm') {
       settingsManager.offline = true;
       settingsManager.vectorImages = true;

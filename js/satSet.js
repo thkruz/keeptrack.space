@@ -21,6 +21,15 @@
 
 */
 
+var multThreadCruncher1 = {};
+var multThreadCruncher2 = {};
+var multThreadCruncher3 = {};
+var multThreadCruncher4 = {};
+var multThreadCruncher5 = {};
+var multThreadCruncher6 = {};
+var multThreadCruncher7 = {};
+var multThreadCruncher8 = {};
+
 (function () {
   var TAU = 2 * Math.PI;
   var RAD2DEG = 360 / TAU;
@@ -55,6 +64,15 @@
   try {
     $('#loader-text').text('Locating ELSETs...');
     satCruncher = new Worker('js/sat-cruncher.js');
+    multThreadCruncher1 = new Worker('js/mSat.js');
+    console.log(1);
+    multThreadCruncher2 = new Worker('js/mSat.js');
+    multThreadCruncher3 = new Worker('js/mSat.js');
+    multThreadCruncher4 = new Worker('js/mSat.js');
+    multThreadCruncher5 = new Worker('js/mSat.js');
+    multThreadCruncher6 = new Worker('js/mSat.js');
+    multThreadCruncher7 = new Worker('js/mSat.js');
+    multThreadCruncher8 = new Worker('js/mSat.js');
   } catch (E) {
     browserUnsupported();
   }
@@ -557,6 +575,14 @@
         typ: 'satdata',
         dat: satSet.satDataString
       });
+      multThreadCruncher1.postMessage({type: 'init', data: satSet.satDataString});
+      multThreadCruncher2.postMessage({type: 'init', data: satSet.satDataString});
+      multThreadCruncher3.postMessage({type: 'init', data: satSet.satDataString});
+      multThreadCruncher4.postMessage({type: 'init', data: satSet.satDataString});
+      multThreadCruncher5.postMessage({type: 'init', data: satSet.satDataString});
+      multThreadCruncher6.postMessage({type: 'init', data: satSet.satDataString});
+      multThreadCruncher7.postMessage({type: 'init', data: satSet.satDataString});
+      multThreadCruncher8.postMessage({type: 'init', data: satSet.satDataString});
       $('#loader-text').text('Drawing Satellites...');
 
       // populate GPU mem buffers, now that we know how many sats there are

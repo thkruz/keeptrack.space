@@ -65,14 +65,13 @@ var multThreadCruncher8 = {};
     $('#loader-text').text('Locating ELSETs...');
     satCruncher = new Worker('js/sat-cruncher.js');
     multThreadCruncher1 = new Worker('js/mSat.js');
-    console.log(1);
-    multThreadCruncher2 = new Worker('js/mSat.js');
-    multThreadCruncher3 = new Worker('js/mSat.js');
-    multThreadCruncher4 = new Worker('js/mSat.js');
-    multThreadCruncher5 = new Worker('js/mSat.js');
-    multThreadCruncher6 = new Worker('js/mSat.js');
-    multThreadCruncher7 = new Worker('js/mSat.js');
-    multThreadCruncher8 = new Worker('js/mSat.js');
+    // multThreadCruncher2 = new Worker('js/mSat.js');
+    // multThreadCruncher3 = new Worker('js/mSat.js');
+    // multThreadCruncher4 = new Worker('js/mSat.js');
+    // multThreadCruncher5 = new Worker('js/mSat.js');
+    // multThreadCruncher6 = new Worker('js/mSat.js');
+    // multThreadCruncher7 = new Worker('js/mSat.js');
+    // multThreadCruncher8 = new Worker('js/mSat.js');
   } catch (E) {
     browserUnsupported();
   }
@@ -274,6 +273,7 @@ var multThreadCruncher8 = {};
       $('#menu-customSensor img').removeClass('bmenu-item-disabled');
       $('#menu-missile img').removeClass('bmenu-item-disabled');
       $('#menu-settings img').removeClass('bmenu-item-disabled');
+      $('#menu-planetarium img').removeClass('bmenu-item-disabled');
       settingsManager.isBottomIconsEnabled = true;
       satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
       settingsManager.cruncherReady = true;
@@ -576,13 +576,13 @@ var multThreadCruncher8 = {};
         dat: satSet.satDataString
       });
       multThreadCruncher1.postMessage({type: 'init', data: satSet.satDataString});
-      multThreadCruncher2.postMessage({type: 'init', data: satSet.satDataString});
-      multThreadCruncher3.postMessage({type: 'init', data: satSet.satDataString});
-      multThreadCruncher4.postMessage({type: 'init', data: satSet.satDataString});
-      multThreadCruncher5.postMessage({type: 'init', data: satSet.satDataString});
-      multThreadCruncher6.postMessage({type: 'init', data: satSet.satDataString});
-      multThreadCruncher7.postMessage({type: 'init', data: satSet.satDataString});
-      multThreadCruncher8.postMessage({type: 'init', data: satSet.satDataString});
+      // multThreadCruncher2.postMessage({type: 'init', data: satSet.satDataString});
+      // multThreadCruncher3.postMessage({type: 'init', data: satSet.satDataString});
+      // multThreadCruncher4.postMessage({type: 'init', data: satSet.satDataString});
+      // multThreadCruncher5.postMessage({type: 'init', data: satSet.satDataString});
+      // multThreadCruncher6.postMessage({type: 'init', data: satSet.satDataString});
+      // multThreadCruncher7.postMessage({type: 'init', data: satSet.satDataString});
+      // multThreadCruncher8.postMessage({type: 'init', data: satSet.satDataString});
       $('#loader-text').text('Drawing Satellites...');
 
       // populate GPU mem buffers, now that we know how many sats there are

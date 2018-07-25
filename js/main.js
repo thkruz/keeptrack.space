@@ -90,6 +90,7 @@ var isLookanglesMenuOpen = false;
 var isLookanglesMultiSiteMenuOpen = false;
 var isNewLaunchMenuOpen = false;
 var isMissileMenuOpen = false;
+var isPlanetariumView = false;
 var isCustomSensorMenuOpen = false;
 
 var pickFb, pickTex;
@@ -296,6 +297,9 @@ var drawLoopCallback;
       if (!sat.static) {
         _camSnapToSat(selectedSat);
       }
+      if (sat.static && cameraType === 3) {
+        // _camSnapToSat(selectedSat);
+      }
       // var satposition = [sat.position.x, sat.position.y, sat.position.z];
       // debugLine.set(satposition, [0, 0, 0]);
     }
@@ -334,7 +338,11 @@ var drawLoopCallback;
         camZoomSnappedOnSat = false;
         camAngleSnappedOnSat = false;
       }
-      camSnap(pitch, yaw);
+      if (cameraType === 3) {
+        // camSnap(-pitch, -yaw);
+      } else {
+        camSnap(pitch, yaw);
+      }
     }
 
     if (camZoomSnappedOnSat) {
@@ -356,6 +364,10 @@ var drawLoopCallback;
         camAngleSnappedOnSat = false;
       }
       zoomTarget = Math.pow((camDistTarget - DIST_MIN) / (DIST_MAX - DIST_MIN), 1 / ZOOM_EXP);
+    }
+
+    if (cameraType === 3) {
+      zoomTarget = 0.01;
     }
   }
   function _drawScene () {
@@ -411,6 +423,44 @@ var drawLoopCallback;
           mat4.rotate(camMatrix, camMatrix, -FPSPitch * DEG2RAD, [1, 0, 0]);
           mat4.rotate(camMatrix, camMatrix, FPSYaw * DEG2RAD, [0, 0, 1]);
           mat4.translate(camMatrix, camMatrix, [FPSxPos, FPSyPos, -FPSzPos]);
+          console.log(FPSxPos + ' ' + FPSyPos + ' ' + FPSzPos);
+          break;
+        /** @type 3 pivot around the earth looking away from the earth */
+        case 3:
+          var now = timeManager.propTime();
+          var j = jday(now.getUTCFullYear(),
+                       now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+                       now.getUTCDate(),
+                       now.getUTCHours(),
+                       now.getUTCMinutes(),
+                       now.getUTCSeconds());
+          j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+          function jday (year, mon, day, hr, minute, sec) {
+            return (367.0 * year -
+                  Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
+                  Math.floor(275 * mon / 9.0) +
+                  day + 1721013.5 +
+                  ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
+                  );
+          }
+          var gmst = satellite.gstime(j);
+          var pos = {};
+
+          var cosLat = Math.cos(satellite.currentSensor.lat * DEG2RAD);
+          var sinLat = Math.sin(satellite.currentSensor.lat * DEG2RAD);
+          var cosLon = Math.cos((satellite.currentSensor.long * DEG2RAD) + gmst);
+          var sinLon = Math.sin((satellite.currentSensor.long * DEG2RAD) + gmst);
+
+          pos.x = (RADIUS_OF_EARTH + 3) * cosLat * cosLon;
+          pos.y = (RADIUS_OF_EARTH + 3) * cosLat * sinLon;
+          pos.z = (RADIUS_OF_EARTH + 3) * sinLat;
+
+          // camSnap(latToPitch(satellite.currentSensor.lat), longToYaw(satellite.currentSensor.lon));
+          mat4.rotate(camMatrix, camMatrix, -camPitch - (90 * DEG2RAD), [1, 0, 0]);
+          mat4.rotate(camMatrix, camMatrix, camYaw + (90 * DEG2RAD), [0, 0, 1]);
+
+          mat4.translate(camMatrix, camMatrix, [-pos.x, -pos.y, -pos.z]);
+
           break;
       }
       return camMatrix;
@@ -780,6 +830,7 @@ function selectSat (satId) {
     isLookanglesMultiSiteMenuOpen = false;
     isNewLaunchMenuOpen = false;
     isMissileMenuOpen = false;
+    isPlanetariumView = false;
     isCustomSensorMenuOpen = false;
   } else {
     sat = satSet.getSat(satId);

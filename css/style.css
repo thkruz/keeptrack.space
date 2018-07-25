@@ -794,14 +794,14 @@ ul li{
 }
 .bmenu-item img {
     background: transparent;
-    height: 30px;
+    height: 25px;
     padding: 10px;
     position: relative;
     border-right: 2px;
     border-right-style: solid;
     border-right-color: steelblue;
-    bottom: 5px;
-    width: 30px;
+    bottom: 2.5px;
+    width: 25px;
 }
 
 #menu-info-overlay img {

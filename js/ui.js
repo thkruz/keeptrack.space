@@ -1864,6 +1864,21 @@ var lkpassed = false;
             isMissileMenuOpen = true;
             break;
           }
+          break;
+        case 'menu-planetarium':
+          if (isPlanetariumView) {
+            isPlanetariumView = false;
+            _hideSideMenus();
+            cameraType = 0; // Back to normal Camera Mode
+            break;
+          } else {
+            _hideSideMenus();
+            if (satellite.sensorSelected()) cameraType = 3; // Activate Planetarium Camera Mode
+            $('#menu-planetarium img').addClass('bmenu-item-selected');
+            isPlanetariumView = true;
+            break;
+          }
+          break;
       }
       function _hideSideMenus () {
         // Close any open colorboxes
@@ -1907,6 +1922,7 @@ var lkpassed = false;
         $('#menu-missile img').removeClass('bmenu-item-selected');
         $('#menu-customSensor img').removeClass('bmenu-item-selected');
         $('#menu-about img').removeClass('bmenu-item-selected');
+        $('#menu-planetarium img').removeClass('bmenu-item-selected');
 
         // Unflag all open menu variables
         isInfoOverlayMenuOpen = false;
@@ -1927,6 +1943,7 @@ var lkpassed = false;
         isMissileMenuOpen = false;
         isCustomSensorMenuOpen = false;
         isAboutSelected = false;
+        isPlanetariumView = false;
       }
     }
     function _updateWatchlist () {
@@ -2023,6 +2040,7 @@ var lkpassed = false;
           // console.log('toggled rotation');
           break;
         case 99: // c
+          console.log(cameraType);
           cameraType += 1;
           switch (cameraType) {
             case 0:
@@ -2039,7 +2057,12 @@ var lkpassed = false;
           setTimeout(function () {
             $('#camera-status-box').hide();
           }, 3000);
-          if (cameraType === 3) {
+          if (cameraType === 3 && satellite.sensorSelected()) {
+            cameraType = 3;
+          } else if (cameraType === 3) {
+            cameraType = 4;
+          }
+          if (cameraType === 4) {
             cameraType = 0;
             FPSPitch = 0;
             FPSYaw = 0;

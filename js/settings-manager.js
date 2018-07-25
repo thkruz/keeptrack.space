@@ -5,8 +5,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.31.3';
-  settingsManager.versionDate = 'February 21, 2018';
+  settingsManager.versionNumber = 'v0.32.0';
+  settingsManager.versionDate = 'July 24, 2018';
 
   // Offline management
   settingsManager.offlineLocation = '';

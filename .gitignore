@@ -58,3 +58,6 @@ ftpignore
 admin/
 TLE.json
 TLEAltNemo.json
+
+# James Yoder Email
+license/jamesyoderemail.txt

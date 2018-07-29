@@ -98,23 +98,12 @@ var lkpassed = false;
       } else {
         ga('send', 'event', 'Offline Software', settingsManager.offlineLocation, 'Licensed');
       }
+      _resize2DMap();
     })();
     (function _resizeWindow () {
       var resizing = false;
       $(window).resize(function () {
-        if ($(window).width() > $(window).height()) {
-          settingsManager.mapWidth = $(window).width(); // Subtract 12 px for the scroll
-          mapImageDOM.width(settingsManager.mapWidth);
-          settingsManager.mapHeight = settingsManager.mapWidth * 3 / 4;
-          mapImageDOM.height(settingsManager.mapHeight);
-          mapMenuDOM.width($(window).width());
-        } else {
-          settingsManager.mapHeight = $(window).height() - 100; // Subtract 12 px for the scroll
-          mapImageDOM.height(settingsManager.mapHeight);
-          settingsManager.mapWidth = settingsManager.mapHeight * 4 / 3;
-          mapImageDOM.width(settingsManager.mapWidth);
-          mapMenuDOM.width($(window).width());
-        }
+        _resize2DMap();
         if (!resizing) {
           window.setTimeout(function () {
             resizing = false;
@@ -124,6 +113,22 @@ var lkpassed = false;
         resizing = true;
       });
     })();
+
+    function _resize2DMap () {
+      if ($(window).width() > $(window).height()) { // If widescreen
+        settingsManager.mapWidth = $(window).width();
+        mapImageDOM.width(settingsManager.mapWidth);
+        settingsManager.mapHeight = settingsManager.mapWidth * 3 / 4;
+        mapImageDOM.height(settingsManager.mapHeight);
+        mapMenuDOM.width($(window).width());
+      } else {
+        settingsManager.mapHeight = $(window).height() - 100; // Subtract 100 portrait (mobile)
+        mapImageDOM.height(settingsManager.mapHeight);
+        settingsManager.mapWidth = settingsManager.mapHeight * 4 / 3;
+        mapImageDOM.width(settingsManager.mapWidth);
+        mapMenuDOM.width($(window).width());
+      }
+    }
 
     (function _uiInit () {
       // Register all UI callback functions with drawLoop in main.js

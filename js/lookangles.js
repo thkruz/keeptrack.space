@@ -369,7 +369,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       if (sensor.obsminaz > sensor.obsmaxaz) {
         if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
            ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
-          return timeManager.dateFormat(now, 'iso$Time', true);
+          return timeManager.dateFormat(now, 'isoDateTime', true);
         }
       } else {
         if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||

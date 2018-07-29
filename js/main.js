@@ -108,7 +108,13 @@ var lastSelectedSat = -1;
 var updateHoverDelay = 0;
 
 var pickColorBuf;
-var cameraType = 0;
+var cameraType = {};
+cameraType.current = 0;
+cameraType.DEFAULT = 0;
+cameraType.OFFSET = 1;
+cameraType.FPS = 2;
+cameraType.PLANETARIUM = 3;
+cameraType.SATELLITE = 4;
 
 var mouseX = 0;
 var mouseY = 0;
@@ -234,7 +240,7 @@ var drawLoopCallback;
     if (isDragging) {
       dragTarget = getEarthScreenPoint(mouseX, mouseY);
       if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
-      isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) || cameraType === 2) { // random screen drag
+      isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) || cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE) { // random screen drag
         xDif = screenDragPoint[0] - mouseX;
         yDif = screenDragPoint[1] - mouseY;
         yawTarget = dragStartYaw + xDif * 0.005;
@@ -262,7 +268,7 @@ var drawLoopCallback;
       camYawSpeed -= (camYawSpeed * dt * 0.005);
     }
 
-    if (cameraType === 2) {
+    if (cameraType.current=== cameraType.FPS || cameraType.current=== cameraType.SATELLITE) {
       FPSPitch -= 20 * camPitchSpeed * dt;
       FPSYaw -= 20 * camYawSpeed * dt;
     } else {
@@ -297,7 +303,7 @@ var drawLoopCallback;
       if (!sat.static) {
         _camSnapToSat(selectedSat);
       }
-      if (sat.static && cameraType === 3) {
+      if (sat.static && cameraType.current=== cameraType.PLANETARIUM) {
         // _camSnapToSat(selectedSat);
       }
       // var satposition = [sat.position.x, sat.position.y, sat.position.z];
@@ -338,7 +344,7 @@ var drawLoopCallback;
         camZoomSnappedOnSat = false;
         camAngleSnappedOnSat = false;
       }
-      if (cameraType === 3) {
+      if (cameraType.current=== cameraType.PLANETARIUM) {
         // camSnap(-pitch, -yaw);
       } else {
         camSnap(pitch, yaw);
@@ -366,7 +372,7 @@ var drawLoopCallback;
       zoomTarget = Math.pow((camDistTarget - DIST_MIN) / (DIST_MAX - DIST_MIN), 1 / ZOOM_EXP);
     }
 
-    if (cameraType === 3) {
+    if (cameraType.current=== cameraType.PLANETARIUM) {
       zoomTarget = 0.01;
     }
   }
@@ -376,7 +382,7 @@ var drawLoopCallback;
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-    if (cameraType === 2) {
+    if (cameraType.current=== cameraType.FPS || cameraType.current=== cameraType.SATELLITE) {
       _FPSMovement();
     }
     camMatrix = _drawCamera();
@@ -397,86 +403,108 @@ var drawLoopCallback;
     // debugImageData.data = pickColorMap;
     /* debugImageData.data.set(pickColorMap);
     debugContext.putImageData(debugImageData, 0, 0); */
+    var pitchRotate;
+    var yawRotate;
     function _drawCamera () {
       camMatrix = mat4.create();
       mat4.identity(camMatrix);
+      var pos = {};
 
       /**
       * For FPS style movement rotate the camera and then translate it
       * for traditional view, move the camera and then rotate it
       */
-      switch (cameraType) {
-        /** @type 0 pivot around the earth with earth in the center */
-        case 0:
+      switch (cameraType.current) {
+        case cameraType.DEFAULT: // pivot around the earth with earth in the center
           mat4.translate(camMatrix, camMatrix, [0, _getCamDist(), 0]);
           mat4.rotateX(camMatrix, camMatrix, camPitch);
           mat4.rotateZ(camMatrix, camMatrix, -camYaw);
           break;
-          /** @type 1 pivot around the earth with earth offset to the bottom right */
-        case 1:
+        case cameraType.OFFSET: // pivot around the earth with earth offset to the bottom right
           mat4.translate(camMatrix, camMatrix, [15000, _getCamDist(), -6000]);
           mat4.rotateX(camMatrix, camMatrix, camPitch);
           mat4.rotateZ(camMatrix, camMatrix, -camYaw);
           break;
-        /** @type 2 FPS style movement */
-        case 2:
+        case cameraType.FPS: // FPS style movement
           mat4.rotate(camMatrix, camMatrix, -FPSPitch * DEG2RAD, [1, 0, 0]);
           mat4.rotate(camMatrix, camMatrix, FPSYaw * DEG2RAD, [0, 0, 1]);
           mat4.translate(camMatrix, camMatrix, [FPSxPos, FPSyPos, -FPSzPos]);
-          console.log(FPSxPos + ' ' + FPSyPos + ' ' + FPSzPos);
           break;
-        /** @type 3 pivot around the earth looking away from the earth */
-        case 3:
-          var now = timeManager.propTime();
-          var j = jday(now.getUTCFullYear(),
-                       now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
-                       now.getUTCDate(),
-                       now.getUTCHours(),
-                       now.getUTCMinutes(),
-                       now.getUTCSeconds());
-          j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-          function jday (year, mon, day, hr, minute, sec) {
-            return (367.0 * year -
-                  Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
-                  Math.floor(275 * mon / 9.0) +
-                  day + 1721013.5 +
-                  ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
-                  );
-          }
-          var gmst = satellite.gstime(j);
-          var pos = {};
+        case cameraType.PLANETARIUM: // pivot around the earth looking away from the earth
+          pos = _calculateSensorPos(pos);
 
-          var cosLat = Math.cos(satellite.currentSensor.lat * DEG2RAD);
-          var sinLat = Math.sin(satellite.currentSensor.lat * DEG2RAD);
-          var cosLon = Math.cos((satellite.currentSensor.long * DEG2RAD) + gmst);
-          var sinLon = Math.sin((satellite.currentSensor.long * DEG2RAD) + gmst);
-
-          pos.x = (RADIUS_OF_EARTH + 3) * cosLat * cosLon;
-          pos.y = (RADIUS_OF_EARTH + 3) * cosLat * sinLon;
-          pos.z = (RADIUS_OF_EARTH + 3) * sinLat;
-
-          // camSnap(latToPitch(satellite.currentSensor.lat), longToYaw(satellite.currentSensor.lon));
-          mat4.rotate(camMatrix, camMatrix, -camPitch - (90 * DEG2RAD), [1, 0, 0]);
-          mat4.rotate(camMatrix, camMatrix, camYaw + (90 * DEG2RAD), [0, 0, 1]);
+          // Pitch is the opposite of the angle to the latitude
+          // Yaw is 90 degrees to the left of the angle to the longitude
+          pitchRotate = ((-1 * satellite.currentSensor.lat) * DEG2RAD);
+          yawRotate = ((-90 - satellite.currentSensor.long) * DEG2RAD);
+          mat4.rotate(camMatrix, camMatrix, pitchRotate, [1, 0, 0]);
+          mat4.rotate(camMatrix, camMatrix, yawRotate, [0, 0, 1]);
 
           mat4.translate(camMatrix, camMatrix, [-pos.x, -pos.y, -pos.z]);
 
+          // Display Orbits of all objects above (elevation > 32)
+            // orbitDisplay.clearInViewOrbit();
+            // for (var i = 0; i < satSet.satAbove.length; i++) {
+            //   if (satSet.satAbove[i] === 1) orbitDisplay.addInViewOrbit(i);
+            // }
+          //
+
+          break;
+        case cameraType.SATELLITE:
+          yawRotate = ((-90 - satellite.currentSensor.long) * DEG2RAD);
+          mat4.rotate(camMatrix, camMatrix, -FPSPitch * DEG2RAD, [1, 0, 0]);
+          mat4.rotate(camMatrix, camMatrix, FPSYaw * DEG2RAD, [0, 0, 1]);
+
+          orbitDisplay.updateOrbitBuffer(selectedSat);
+          pos = satSet.getSat(selectedSat).position;
+          mat4.translate(camMatrix, camMatrix, [-pos.x, -pos.y, -pos.z]);
           break;
       }
       return camMatrix;
+      function _calculateSensorPos (pos) {
+        var now = timeManager.propTime();
+        var j = jday(now.getUTCFullYear(),
+                     now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+                     now.getUTCDate(),
+                     now.getUTCHours(),
+                     now.getUTCMinutes(),
+                     now.getUTCSeconds());
+        j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+        function jday (year, mon, day, hr, minute, sec) {
+          return (367.0 * year -
+                Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
+                Math.floor(275 * mon / 9.0) +
+                day + 1721013.5 +
+                ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
+                );
+        }
+        var gmst = satellite.gstime(j);
+
+        var cosLat = Math.cos(satellite.currentSensor.lat * DEG2RAD);
+        var sinLat = Math.sin(satellite.currentSensor.lat * DEG2RAD);
+        var cosLon = Math.cos((satellite.currentSensor.long * DEG2RAD) + gmst);
+        var sinLon = Math.sin((satellite.currentSensor.long * DEG2RAD) + gmst);
+
+        pos.x = (RADIUS_OF_EARTH + 3) * cosLat * cosLon;
+        pos.y = (RADIUS_OF_EARTH + 3) * cosLat * sinLon;
+        pos.z = (RADIUS_OF_EARTH + 3) * sinLat;
+        return pos;
+      }
     }
     function _FPSMovement () {
       FPStimeNow = Date.now();
       if (FPSLastTime !== 0) {
         FPSelapsed = FPStimeNow - FPSLastTime;
-        if (FPSForwardSpeed !== 0) {
-          FPSxPos -= Math.sin(FPSYaw * DEG2RAD) * FPSForwardSpeed * FPSRun * FPSelapsed;
-          FPSyPos -= Math.cos(FPSYaw * DEG2RAD) * FPSForwardSpeed * FPSRun * FPSelapsed;
-          FPSzPos += Math.sin(FPSPitch * DEG2RAD) * FPSForwardSpeed * FPSRun * FPSelapsed;
-        }
-        if (FPSSideSpeed !== 0) {
-          FPSxPos -= Math.cos(-FPSYaw * DEG2RAD) * FPSSideSpeed * FPSRun * FPSelapsed;
-          FPSyPos -= Math.sin(-FPSYaw * DEG2RAD) * FPSSideSpeed * FPSRun * FPSelapsed;
+        if (cameraType.FPS) {
+          if (FPSForwardSpeed !== 0) {
+            FPSxPos -= Math.sin(FPSYaw * DEG2RAD) * FPSForwardSpeed * FPSRun * FPSelapsed;
+            FPSyPos -= Math.cos(FPSYaw * DEG2RAD) * FPSForwardSpeed * FPSRun * FPSelapsed;
+            FPSzPos += Math.sin(FPSPitch * DEG2RAD) * FPSForwardSpeed * FPSRun * FPSelapsed;
+          }
+          if (FPSSideSpeed !== 0) {
+            FPSxPos -= Math.cos(-FPSYaw * DEG2RAD) * FPSSideSpeed * FPSRun * FPSelapsed;
+            FPSyPos -= Math.sin(-FPSYaw * DEG2RAD) * FPSSideSpeed * FPSRun * FPSelapsed;
+          }
         }
         FPSYaw += FPSYawRate * FPSelapsed;
         FPSPitch += FPSPitchRate * FPSelapsed;
@@ -484,6 +512,7 @@ var drawLoopCallback;
       FPSLastTime = FPStimeNow;
     }
   }
+
   function _updateHover () {
     if (searchBox.isHovering()) {
       updateHoverSatId = searchBox.getHoverSat();

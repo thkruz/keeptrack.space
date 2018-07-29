@@ -97,6 +97,7 @@
     };
     if (!settingsManager.vectorImages) img.src = 'images/dayearth-4096.jpg';
     if (settingsManager.vectorImages) img.src = 'images/dayearthvector-4096.jpg';
+    if (settingsManager.hiresImages) img.src = 'images/dayearth-10800.jpg';
 
     nightTexture = gl.createTexture();
     var nightImg = new Image();
@@ -112,6 +113,7 @@
     };
     if (!settingsManager.vectorImages) nightImg.src = 'images/nightearth-4096.png';
     if (settingsManager.vectorImages) nightImg.src = 'images/dayearthvector-4096.jpg';
+    if (settingsManager.hiresImages) nightImg.src = 'images/dayearth-10800.jpg';
 
     // generate a uvsphere bottom up, CCW order
     var vertPos = [];

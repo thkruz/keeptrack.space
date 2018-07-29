@@ -64,6 +64,7 @@ var lkpassed = false;
 (function () {
   var lastBoxUpdateTime = 0;
   var lastOverlayUpdateTime = 0;
+  var lastSatUpdateTime = 0;
 
   var isInfoOverlayMenuOpen = false;
   var isTwitterMenuOpen = false;
@@ -128,7 +129,7 @@ var lkpassed = false;
 
     (function _uiInit () {
       // Register all UI callback functions with drawLoop in main.js
-      drawLoopCallback = function () { _updateNextPassOverlay(); _checkWatchlist(); _updateSelectBox(); _mobileScreenControls(); };
+      drawLoopCallback = function () { _showSatTest(); _updateNextPassOverlay(); _checkWatchlist(); _updateSelectBox(); _mobileScreenControls(); };
     })();
     (function _menuInit () {
       // Load the current JDAY
@@ -1869,11 +1870,13 @@ var lkpassed = false;
           if (isPlanetariumView) {
             isPlanetariumView = false;
             _hideSideMenus();
-            cameraType = 0; // Back to normal Camera Mode
+            cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
             break;
           } else {
             _hideSideMenus();
-            if (satellite.sensorSelected()) cameraType = 3; // Activate Planetarium Camera Mode
+            if (satellite.sensorSelected()) {
+              cameraType.current = cameraType.PLANETARIUM; // Activate Planetarium Camera Mode
+            }
             $('#menu-planetarium img').addClass('bmenu-item-selected');
             isPlanetariumView = true;
             break;
@@ -1988,7 +1991,7 @@ var lkpassed = false;
     }
     function _keyDownHandler (evt) {
       if (Number(evt.keyCode) === 16) {
-        if (cameraType === 2) {
+        if (cameraType.current === cameraType.FPS) {
           FPSRun = 3;
         }
       }
@@ -1998,37 +2001,37 @@ var lkpassed = false;
       switch (Number(evt.charCode)) {
         case 87: // W
         case 119: // w
-          if (cameraType === 2) {
+          if (cameraType.current === cameraType.FPS) {
             FPSForwardSpeed = 10;
           }
           break;
         case 65: // A
         case 97: // a
-          if (cameraType === 2) {
+          if (cameraType.current === cameraType.FPS) {
             FPSSideSpeed = -10;
           }
           break;
         case 83: // S
         case 115: // s
-          if (cameraType === 2) {
+          if (cameraType.current === cameraType.FPS) {
             FPSForwardSpeed = -10;
           }
           break;
         case 68: // D
         case 100: // d
-          if (cameraType === 2) {
+          if (cameraType.current === cameraType.FPS) {
             FPSSideSpeed = 10;
           }
           break;
         case 81: // Q
         case 113: // q
-          if (cameraType === 2) {
+          if (cameraType.current === cameraType.FPS) {
             FPSYawRate = -0.1;
           }
           break;
         case 69: // E
         case 101: // e
-          if (cameraType === 2) {
+          if (cameraType.current === cameraType.FPS) {
             FPSYawRate = 0.1;
           }
           break;
@@ -2040,36 +2043,45 @@ var lkpassed = false;
           // console.log('toggled rotation');
           break;
         case 99: // c
-          console.log(cameraType);
-          cameraType += 1;
-          switch (cameraType) {
-            case 0:
-              $('#camera-status-box').html('Earth Centered Camera Mode');
-              break;
-            case 1:
-              $('#camera-status-box').html('Offset Camera Mode');
-              break;
-            case 2:
-              $('#camera-status-box').html('Free Camera Mode');
-              break;
+          cameraType.current += 1;
+          if (cameraType.current === cameraType.PLANETARIUM && !satellite.sensorSelected()) {
+            cameraType.current = cameraType.SATELLITE;
           }
-          $('#camera-status-box').show();
-          setTimeout(function () {
-            $('#camera-status-box').hide();
-          }, 3000);
-          if (cameraType === 3 && satellite.sensorSelected()) {
-            cameraType = 3;
-          } else if (cameraType === 3) {
-            cameraType = 4;
+
+          if (cameraType.current === cameraType.SATELLITE && selectedSat === -1) {
+            cameraType.current = 5; // 5 is a placeholder to reset camera type
           }
-          if (cameraType === 4) {
-            cameraType = 0;
+
+          if (cameraType.current === 5) { // 5 is a placeholder to reset camera type
+            cameraType.current = 0;
             FPSPitch = 0;
             FPSYaw = 0;
             FPSxPos = 0;
             FPSyPos = 25000;
             FPSzPos = 0;
           }
+
+          switch (cameraType.current) {
+            case cameraType.DEFAULT:
+              $('#camera-status-box').html('Earth Centered Camera Mode');
+              break;
+            case cameraType.OFFSET:
+              $('#camera-status-box').html('Offset Camera Mode');
+              break;
+            case cameraType.FPS:
+              $('#camera-status-box').html('Free Camera Mode');
+              break;
+            case cameraType.PLANETARIUM:
+              $('#camera-status-box').html('Planetarium Camera Mode');
+              break;
+            case cameraType.SATELLITE:
+              $('#camera-status-box').html('Satellite Camera Mode');
+              break;
+          }
+          $('#camera-status-box').show();
+          setTimeout(function () {
+            $('#camera-status-box').hide();
+          }, 3000);
           break;
         case 33: // !
           timeManager.propOffset = 0; // Reset to Current Time
@@ -2169,6 +2181,18 @@ var lkpassed = false;
 
   // Callbacks from DrawLoop
   var infoOverlayDOM = [];
+  var satNumberOverlay = [];
+  function _showSatTest () {
+    // if (timeManager.now > (lastSatUpdateTime * 1 + 10000)) {
+    //   for (var i = 0; i < satSet.getSatData().length; i++) {
+    //     satNumberOverlay[i] = satSet.getScreenCoords(i, pMatrix, camMatrix);
+    //     if (satNumberOverlay[i] !== 1) console.log(satNumberOverlay[i]);
+    //     lastSatUpdateTime = timeManager.now;
+    //   }
+    // }
+
+  }
+
   function _updateNextPassOverlay (isForceUpdate) {
     if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
 

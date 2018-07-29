@@ -56,6 +56,7 @@ var multThreadCruncher8 = {};
   var satPos;
   var satVel;
   var satInView;
+  var satAbove;
   var satData;
   var satExtraData;
   var hoveringSat = -1;
@@ -150,6 +151,8 @@ var multThreadCruncher8 = {};
     satPos = new Float32Array(m.data.satPos);
     satVel = new Float32Array(m.data.satVel);
     satInView = new Float32Array(m.data.satInView);
+    satAbove = new Float32Array(m.data.satAbove);
+    satSet.satAbove = satAbove;
 
     if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
       SCnow = Date.now();
@@ -624,6 +627,8 @@ var multThreadCruncher8 = {};
     pickableBuf = buffers.pickableBuf;
   };
 
+  var screenLocation = [];
+
   satSet.draw = function (pMatrix, camMatrix, drawNow) {
     // NOTE: 640 byte leak.
 
@@ -812,10 +817,18 @@ var multThreadCruncher8 = {};
       z: (posVec4[2] / posVec4[3])
     };
 
-    return {
-      x: (glScreenPos.x + 1) * 0.5 * window.innerWidth,
-      y: (-glScreenPos.y + 1) * 0.5 * window.innerHeight
-    };
+    var x = (glScreenPos.x + 1) * 0.5 * window.innerWidth;
+    var y = (-glScreenPos.y + 1) * 0.5 * window.innerHeight;
+
+    if (x >= 0 && y >= 0 && glScreenPos.z >= 0 && glScreenPos.z <= 1) {
+      return {
+        x: x,
+        y: y,
+        z: glScreenPos.z
+      };
+    } else {
+      return 1; // Return 1 for failure
+    }
   };
 
   satSet.searchNameRegex = function (regex) {

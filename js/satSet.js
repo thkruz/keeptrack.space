@@ -1,3 +1,26 @@
+/* /////////////////////////////////////////////////////////////////////////////
+
+(c) 2016-2018, Theodore Kruczek
+(c) 2015-2017, James Yoder
+
+satSet.js is the primary interface between sat-cruncher and the main application.
+It manages all interaction with the satellite catalogue.
+http://keeptrack.space
+
+Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
+under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
+
+All additions and modifications of original code is Copyright © 2016-2018 by
+Theodore Kruczek. All rights reserved. No part of this web site may be reproduced,
+published, distributed, displayed, performed, copied or stored for public or private
+use, without written permission of the author.
+
+No part of this code may be modified or changed or exploited in any way used
+for derivative works, or offered for sale, or used to construct any kind of database
+or mirrored at any other location without the express written permission of the author.
+
+///////////////////////////////////////////////////////////////////////////// */
+
 /* global
 
   $

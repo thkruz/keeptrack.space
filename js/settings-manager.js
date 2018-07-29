@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.33.0';
+  settingsManager.versionNumber = 'v0.33.1';
   settingsManager.versionDate = 'July 29, 2018';
 
   // Offline management
@@ -17,7 +17,7 @@
     if (filename === 'retro.htm') settingsManager.retro = true;
     if (filename === 'offline.htm') settingsManager.offline = true;
     if (filename === 'vec.htm') settingsManager.vectorImages = true;
-    settingsManager.hiresImages = true;
+    // settingsManager.hiresImages = true; // USE OFFLINE ONLY
     if (filename === 'offlineVec.htm') {
       settingsManager.offline = true;
       settingsManager.vectorImages = true;

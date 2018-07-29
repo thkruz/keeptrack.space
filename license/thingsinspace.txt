@@ -1,0 +1,60 @@
+MIT License
+
+Copyright (c) 2015-2017 James Yoder
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+-----------------------------------------------
+From: James Yoder <james@jyoder.com>
+Date: Mon, 31 Oct 2016 12:12:09 -0500
+Message-ID: <CAHX+L_KbiPw_66mQ_FhpBnzSCMoow=fS+r1Tf5syuOtFsW+rXA@mail.gmail.com>
+Subject: Re: Stuffin.Space Source Code License
+To: Theodore Kruczek <theodore.kruczek@gmail.com>
+Content-Type: multipart/alternative; boundary=001a114a88c84c442805402c512e
+
+--001a114a88c84c442805402c512e
+Content-Type: text/plain; charset=UTF-8
+
+Hi,
+
+I meant to release the code under the MIT license but never got around to
+adding the license file to the git repo. So yes, you can assume it's under
+the MIT Licence.
+
+Thanks for your concern!
+
+James Yoder
+
+On Mon, Oct 31, 2016 at 6:28 AM, Theodore Kruczek <
+theodore.kruczek@gmail.com> wrote:
+
+> James,
+>
+> It looks like you have moved on from stuffin.space, but I was curious if
+> you could clarify the license you released the source code under on github?
+> Most/all of the libraries you used are marked with the MIT License, but I
+> don't want to falsely assume your code is under that too.
+>
+> Thanks for your awesome work.
+>
+> -Ted
+>
+>
+
+--001a114a88c84c442805402c512e

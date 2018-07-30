@@ -232,7 +232,7 @@ var lkpassed = false;
           settingsManager.fieldOfView += delta * 0.0002;
           if (settingsManager.fieldOfView > 2.12) settingsManager.fieldOfView = 2.12;
           if (settingsManager.fieldOfView < 0.5) settingsManager.fieldOfView = 0.5;
-          webGlInit();
+           webGlInit();
         }
       });
       canvasDOM.click(function (evt) {

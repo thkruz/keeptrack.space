@@ -230,12 +230,9 @@ var lkpassed = false;
 
         if (cameraType.current === cameraType.PLANETARIUM) {
           settingsManager.fieldOfView += delta * 0.0002;
-          if (settingsManager.fieldOfView > 3) settingsManager.fieldOfView = 3;
+          if (settingsManager.fieldOfView > 2.12) settingsManager.fieldOfView = 2.12;
           if (settingsManager.fieldOfView < 0.5) settingsManager.fieldOfView = 0.5;
-<<<<<<< HEAD
-          webGlInit ();
-=======
->>>>>>> 28886d3550811c0f7afb68ea8c2b2b215c234f41
+          webGlInit();
         }
       });
       canvasDOM.click(function (evt) {

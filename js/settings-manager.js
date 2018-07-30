@@ -5,8 +5,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.33.1';
-  settingsManager.versionDate = 'July 29, 2018';
+  settingsManager.versionNumber = 'v0.33.2';
+  settingsManager.versionDate = 'July 30, 2018';
 
   // Offline management
   settingsManager.offlineLocation = '';
@@ -86,6 +86,8 @@
 
   settingsManager.limitSats = '';
   settingsManager.searchLimit = 400;
+
+  settingsManager.fieldOfView = 1.01;
 
   settingsManager.mapWidth = 800;
   settingsManager.mapHeight = 600;

@@ -232,7 +232,10 @@ var lkpassed = false;
           settingsManager.fieldOfView += delta * 0.0002;
           if (settingsManager.fieldOfView > 3) settingsManager.fieldOfView = 3;
           if (settingsManager.fieldOfView < 0.5) settingsManager.fieldOfView = 0.5;
+<<<<<<< HEAD
           webGlInit ();
+=======
+>>>>>>> 28886d3550811c0f7afb68ea8c2b2b215c234f41
         }
       });
       canvasDOM.click(function (evt) {

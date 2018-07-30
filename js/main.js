@@ -63,6 +63,7 @@ var DEG2RAD = TAU / 360;
 var RAD2DEG = 360 / TAU;
 var RADIUS_OF_EARTH = 6371.0;
 var MINUTES_PER_DAY = 1440;
+var PLANETARIUM_DIST = 3;
 
 // Frequently Used Manager Variables
 var timeManager = window.timeManager;
@@ -435,7 +436,7 @@ var drawLoopCallback;
           // Pitch is the opposite of the angle to the latitude
           // Yaw is 90 degrees to the left of the angle to the longitude
           pitchRotate = ((-1 * satellite.currentSensor.lat) * DEG2RAD);
-          yawRotate = ((-90 - satellite.currentSensor.long) * DEG2RAD);
+          yawRotate = ((90 - satellite.currentSensor.long) * DEG2RAD) - pos.gmst;
           mat4.rotate(camMatrix, camMatrix, pitchRotate, [1, 0, 0]);
           mat4.rotate(camMatrix, camMatrix, yawRotate, [0, 0, 1]);
 
@@ -446,11 +447,11 @@ var drawLoopCallback;
             // for (var i = 0; i < satSet.satAbove.length; i++) {
             //   if (satSet.satAbove[i] === 1) orbitDisplay.addInViewOrbit(i);
             // }
-          //
+
 
           break;
         case cameraType.SATELLITE:
-          yawRotate = ((-90 - satellite.currentSensor.long) * DEG2RAD);
+          // yawRotate = ((-90 - satellite.currentSensor.long) * DEG2RAD);
           mat4.rotate(camMatrix, camMatrix, -FPSPitch * DEG2RAD, [1, 0, 0]);
           mat4.rotate(camMatrix, camMatrix, FPSYaw * DEG2RAD, [0, 0, 1]);
 
@@ -484,9 +485,10 @@ var drawLoopCallback;
         var cosLon = Math.cos((satellite.currentSensor.long * DEG2RAD) + gmst);
         var sinLon = Math.sin((satellite.currentSensor.long * DEG2RAD) + gmst);
 
-        pos.x = (RADIUS_OF_EARTH + 3) * cosLat * cosLon;
-        pos.y = (RADIUS_OF_EARTH + 3) * cosLat * sinLon;
-        pos.z = (RADIUS_OF_EARTH + 3) * sinLat;
+        pos.x = (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * cosLon;
+        pos.y = (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * sinLon;
+        pos.z = (RADIUS_OF_EARTH + PLANETARIUM_DIST) * sinLat;
+        pos.gmst = gmst;
         return pos;
       }
     }
@@ -662,7 +664,7 @@ function webGlInit () {
   pickColorBuf = new Uint8Array(4);
 
   pMatrix = mat4.create();
-  mat4.perspective(pMatrix, 1.01, gl.drawingBufferWidth / gl.drawingBufferHeight, 20.0, 600000.0);
+  mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, 20.0, 600000.0);
   var eciToOpenGlMat = [
     1, 0, 0, 0,
     0, 0, -1, 0,

@@ -227,6 +227,13 @@ var lkpassed = false;
         if (zoomTarget < 0) zoomTarget = 0;
         rotateTheEarth = false;
         camZoomSnappedOnSat = false;
+
+        if (cameraType.current === cameraType.PLANETARIUM) {
+          settingsManager.fieldOfView += delta * 0.0002;
+          if (settingsManager.fieldOfView > 3) settingsManager.fieldOfView = 2.12;
+          if (settingsManager.fieldOfView < 0.5) settingsManager.fieldOfView = 0.5;
+          webGlInit();
+        }
       });
       canvasDOM.click(function (evt) {
         if ($('#colorbox').css('display') === 'block') {

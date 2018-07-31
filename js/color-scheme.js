@@ -27,6 +27,7 @@
     for (i = 0; i < numSats; i++) {
       sat = satSet.getSat(i);
       colors = this.colorizer(sat); // Run the colorscheme below
+      if (typeof colors == 'undefined') continue;
       colorData[i * 4] = colors.color[0];  // R
       colorData[i * 4 + 1] = colors.color[1]; // G
       colorData[i * 4 + 2] = colors.color[2]; // B

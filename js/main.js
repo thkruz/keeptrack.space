@@ -167,6 +167,21 @@ var drawLoopCallback;
       dSurf, ptSurf;
 
   $(document).ready(function () { // Code Once index.htm is loaded
+    (function initParseFromGETVariables () {
+      // This is an initial parse of the GET variables
+      // A satSet focused one happens later.
+      var queryStr = window.location.search.substring(1);
+      var params = queryStr.split('&');
+      for (var i = 0; i < params.length; i++) {
+        var key = params[i].split('=')[0];
+        var val = params[i].split('=')[1];
+        switch (key) {
+          case 'hires':
+            settingsManager.hiresImages = true;
+            break;
+          }
+        }
+      })();
     webGlInit();
     earth.init();
     ColorScheme.init();
@@ -455,8 +470,9 @@ var drawLoopCallback;
           mat4.rotate(camMatrix, camMatrix, -FPSPitch * DEG2RAD, [1, 0, 0]);
           mat4.rotate(camMatrix, camMatrix, FPSYaw * DEG2RAD, [0, 0, 1]);
 
-          orbitDisplay.updateOrbitBuffer(selectedSat);
-          pos = satSet.getSat(selectedSat).position;
+          if (selectSat !== -1) lastSelectedSat = selectedSat;
+          orbitDisplay.updateOrbitBuffer(lastSelectedSat);
+          pos = satSet.getSat(lastSelectedSat).position;
           mat4.translate(camMatrix, camMatrix, [-pos.x, -pos.y, -pos.z]);
           break;
       }
@@ -1081,14 +1097,17 @@ function selectSat (satId) {
       $('#sat-associates-wrapper').hide();
     }
     uiController.updateMap();
-    if (sat.SCC_NUM === '25544') { // ISS is Selected
-      $('#iss-stream-menu').show();
-      $('#iss-stream').html('<iframe src="http://www.ustream.tv/embed/17074538?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://www.ustream.tv/embed/9408562?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><br />' +
-                            '<iframe src="http://www.ustream.tv/embed/6540154?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://cdn.livestream.com/embed/spaceflightnow?layout=4&amp;height=340&amp;width=560&amp;autoplay=false" style="border:0;outline:0" frameborder="0" scrolling="no"></iframe>');
-    } else {
-      $('#iss-stream').html('');
-      $('#iss-stream-menu').hide();
-    }
+
+    // NOTE: ISS Stream Slows Down a Lot Of Computers
+
+    // if (sat.SCC_NUM === '25544') { // ISS is Selected
+    //   $('#iss-stream-menu').show();
+    //   $('#iss-stream').html('<iframe src="http://www.ustream.tv/embed/17074538?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://www.ustream.tv/embed/9408562?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><br />' +
+    //                         '<iframe src="http://www.ustream.tv/embed/6540154?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://cdn.livestream.com/embed/spaceflightnow?layout=4&amp;height=340&amp;width=560&amp;autoplay=false" style="border:0;outline:0" frameborder="0" scrolling="no"></iframe>');
+    // } else {
+    //   $('#iss-stream').html('');
+    //   $('#iss-stream-menu').hide();
+    // }
   }
 
   settingsManager.themes.retheme();

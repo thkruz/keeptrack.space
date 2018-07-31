@@ -17,7 +17,6 @@
     if (filename === 'retro.htm') settingsManager.retro = true;
     if (filename === 'offline.htm') settingsManager.offline = true;
     if (filename === 'vec.htm') settingsManager.vectorImages = true;
-    // settingsManager.hiresImages = true; // USE OFFLINE ONLY
     if (filename === 'offlineVec.htm') {
       settingsManager.offline = true;
       settingsManager.vectorImages = true;
@@ -76,6 +75,8 @@
     $('.btn').css('background-color', '#0091ea');
     settingsManager.themes.currentTheme = 'Blue';
   };
+
+  settingsManager.hiresImages = false; // USE OFFLINE ONLY
 
   settingsManager.shadersReady = false;
   settingsManager.cruncherReady = false;

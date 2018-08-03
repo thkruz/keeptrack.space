@@ -903,8 +903,9 @@
                 <label for="cs-maxrange">Maximum Range</label>
               </div>
               <div class="center-align">
-                <button id="editSat-submit" class="btn waves-effect waves-light" type="submit" name="action">Create Custom Sensor &#9658;
-                </button>
+                <button id="cs-submit" class="btn waves-effect waves-light" type="submit" name="action">Create Custom Sensor &#9658;</button>
+                <br><br>
+                <button id="cs-geolocation" class="btn waves-effect waves-light" onclick="uiController.useCurrentGeolocationAsSensor();" name="search">Use Geolocation &#9658;</button>
               </div>
             </form>
           </div>
@@ -1185,28 +1186,29 @@
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js"></script>
-  <script src="js/time-manager.js"></script>
-  <script src="js/earth.js"></script>
-  <script src="js/satSet.js"></script>
-  <script src="js/sun.js"></script>
+  <script src="js/settings-manager.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/time-manager.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/earth.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/https.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/satSet.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/sun.js?ver=<%= settingsManager.versionNumber %>"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js"></script>
+  <script src="js/variables.js?ver=<%= settingsManager.versionNumber %>"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js"></script>
+  <script src="js/ballistic-missile.js?ver=<%= settingsManager.versionNumber %>"></script>
   <!-- Load Extra Satellites -->
   <!-- <script src="extra.js"></script>
   <script src="satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js"></script>
-  <script src="js/main.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/lookangles.js"></script>
-  <script src="js/orbit-display.js"></script>
-  <script src="js/drawLoop-shapes.js"></script>
-  <script src="js/groups.js"></script>
-  <script src="js/search-box.js"></script>
+  <script src="js/color-scheme.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/main.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/ui.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/lookangles.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/orbit-display.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/drawLoop-shapes.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/groups.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/search-box.js?ver=<%= settingsManager.versionNumber %>"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

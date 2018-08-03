@@ -179,6 +179,9 @@ var drawLoopCallback;
           case 'hires':
             settingsManager.hiresImages = true;
             break;
+          case 'vec':
+            settingsManager.vectorImages = true;
+            break;
           }
         }
       })();
@@ -197,7 +200,6 @@ var drawLoopCallback;
     });
     satSet.onCruncherReady(function (satData) {
       // do querystring stuff
-
       var queryStr = window.location.search.substring(1);
       var params = queryStr.split('&');
       for (var i = 0; i < params.length; i++) {
@@ -763,7 +765,8 @@ function longToYaw (long) {
   selectedDate = selectedDate.split(' ');
   selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
   // TODO: Find a formula using the date variable for this.
-  today.setUTCHours(selectedDate.getUTCHours() + ((selectedDate.getUTCMonth() + 1) * 2) - 12);  // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
+  // TODO: This formula is still a pain
+  today.setUTCHours(selectedDate.getUTCHours() + ((selectedDate.getUTCMonth()) * 2) - 12);  // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
 
   today.setUTCMinutes(selectedDate.getUTCMinutes());
   today.setUTCSeconds(selectedDate.getUTCSeconds());
@@ -771,6 +774,7 @@ function longToYaw (long) {
   selectedDate.setUTCMinutes(0);
   selectedDate.setUTCSeconds(0);
   var longOffset = (((today - selectedDate) / 60 / 60 / 1000)); // In Hours
+  if (longOffset > 24) longOffset = longOffset - 24;
   longOffset = longOffset * 15; // 15 Degress Per Hour longitude Offset
 
   angle = (long + longOffset) * DEG2RAD;

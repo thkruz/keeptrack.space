@@ -100,6 +100,11 @@ var lkpassed = false;
       }
       _resize2DMap();
     })();
+    (function _httpsCheck () {
+        if (location.protocol !== 'https:') {
+          $('#cs-geolocation').hide();
+        }
+    })();
     (function _resizeWindow () {
       var resizing = false;
       $(window).resize(function () {
@@ -1848,14 +1853,6 @@ var lkpassed = false;
           } else {
             _hideSideMenus();
 
-            // TODO: Requires https on chrome, but I will come back to this idea another time
-            // if (navigator.geolocation) {
-            //   navigator.geolocation.getCurrentPosition(function (position) {
-            //     console.log('Latitude: ' + position.coords.latitude);
-            //     console.log('Longitude: ' + position.coords.longitude);
-            //   });
-            // }
-
             $('#customSensor-menu').fadeIn();
             isCustomSensorMenuOpen = true;
             $('#menu-customSensor img').addClass('bmenu-item-selected');
@@ -2359,6 +2356,99 @@ var lkpassed = false;
       camYawSpeed += 0.0002 * zoomLevel;
     }
   }
+
+  uiController.useCurrentGeolocationAsSensor = function () {
+    if (location.protocol === 'https:' && !settingsManager.geolocationUsed) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        settingsManager.geolocation.lat = position.coords.latitude;
+        settingsManager.geolocation.long = position.coords.longitude;
+        settingsManager.geolocation.obshei = 0;
+        settingsManager.geolocation.minaz = 0;
+        settingsManager.geolocation.maxaz = 360;
+        settingsManager.geolocation.minel = 30;
+        settingsManager.geolocation.maxel = 90;
+        settingsManager.geolocation.minrange = 0;
+        settingsManager.geolocation.maxrange = 100000;
+        sensorManager.whichRadar = 'CUSTOM';
+
+        $('#cs-lat').val(settingsManager.geolocation.lat).trigger("change");
+        $('#cs-lon').val(settingsManager.geolocation.long).trigger("change");
+        $('#cs-hei').val(settingsManager.geolocation.obshei).trigger("change");
+
+        $('#cs-telescope').attr('checked','checked');
+        $('#cs-minaz').attr('disabled', true);
+        $('#cs-maxaz').attr('disabled', true);
+        $('#cs-minel').attr('disabled', true);
+        $('#cs-maxel').attr('disabled', true);
+        $('#cs-minrange').attr('disabled', true);
+        $('#cs-maxrange').attr('disabled', true);
+        $('#cs-minaz-div').hide();
+        $('#cs-maxaz-div').hide();
+        $('#cs-minel-div').hide();
+        $('#cs-maxel-div').hide();
+        $('#cs-minrange-div').hide();
+        $('#cs-maxrange-div').hide();
+        $('#cs-minaz').val(0);
+        $('#cs-maxaz').val(360);
+        $('#cs-minel').val(10);
+        $('#cs-maxel').val(90);
+        $('#cs-minrange').val(100);
+        $('#cs-maxrange').val(50000);
+
+        $('#sensor-type').html('Telescope');
+        $('#sensor-info-title').html('Custom Sensor');
+        $('#sensor-country').html('Custom Sensor');
+
+        var lon = settingsManager.geolocation.long;
+        var lat = settingsManager.geolocation.lat;
+        var obshei = settingsManager.geolocation.obshei;
+        var minaz = settingsManager.geolocation.minaz;
+        var maxaz = settingsManager.geolocation.maxaz;
+        var minel = settingsManager.geolocation.minel;
+        var maxel = settingsManager.geolocation.maxel;
+        var minrange = settingsManager.geolocation.minrange;
+        var maxrange = settingsManager.geolocation.maxrange;
+
+        satCruncher.postMessage({ // Send SatCruncher File information on this radar
+          typ: 'offset', // Tell satcruncher to update something
+          dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(), // Tell satcruncher what time it is and how fast time is moving
+          setlatlong: true, // Tell satcruncher we are changing observer location
+          sensor: {
+            lat: lat,
+            long: lon,
+            obshei: obshei,
+            obsminaz: minaz,
+            obsmaxaz: maxaz,
+            obsminel: minel,
+            obsmaxel: maxel,
+            obsminrange: minrange,
+            obsmaxrange: maxrange
+          }
+        });
+
+        satellite.setobs({
+          lat: lat,
+          long: lon,
+          obshei: obshei,
+          obsminaz: minaz,
+          obsmaxaz: maxaz,
+          obsminel: minel,
+          obsmaxel: maxel,
+          obsminrange: minrange,
+          obsmaxrange: maxrange
+        });
+
+        lat = lat * 1;
+        lon = lon * 1;
+        camSnap(latToPitch(lat), longToYaw(lon));
+        if (maxrange > 6000) {
+          changeZoom('geo');
+        } else {
+          changeZoom('leo');
+        }
+      });
+    }
+  };
 
   _offlineMessage = function () {
     $('#loader-text').html('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');

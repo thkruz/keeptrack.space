@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.33.3';
+  settingsManager.versionNumber = 'v0.33.4';
   settingsManager.versionDate = 'August 2, 2018';
 
   // Offline management
@@ -14,7 +14,13 @@
   (function _getVersion () {
     var url = window.location.pathname;
     var filename = url.substring(url.lastIndexOf('/') + 1);
-    if (filename === 'retro.htm') settingsManager.retro = true;
+    if (filename === 'retro.htm') {
+      settingsManager.retro = true;
+      settingsManager.tleSource = 'TLERetro.json';
+    }
+    if (filename === 'mw.htm') {
+      settingsManager.tleSource = 'mw.json';
+    }
     if (filename === 'offline.htm') settingsManager.offline = true;
     if (filename === 'vec.htm') settingsManager.vectorImages = true;
     if (filename === 'offlineVec.htm') {

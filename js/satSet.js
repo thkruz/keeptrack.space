@@ -362,7 +362,7 @@ var multThreadCruncher8 = {};
     dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
 
     if (!settingsManager.offline) {
-      var tleSource = $('#tle-source').text();
+      var tleSource = settingsManager.tleSource;
       $.get('' + tleSource, function (resp) {
         loadTLEs(resp);
       });

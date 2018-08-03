@@ -182,6 +182,16 @@ var drawLoopCallback;
           case 'vec':
             settingsManager.vectorImages = true;
             break;
+          case 'retro':
+            settingsManager.retro = true;
+            settingsManager.tleSource = 'TLERetro.json';
+            break;
+          case 'offline':
+            settingsManager.offline = true;
+            break;
+          case 'mw':
+            settingsManager.tleSource = 'mw.json';
+            break;
           }
         }
       })();

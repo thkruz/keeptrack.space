@@ -64,6 +64,7 @@
           <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="colors-menu">Color Schemes &#x25BC;</a></li>
         </ul>
         <ul id="nav-mobile" class="right">
+          <li><a id="geolocation-btn" class="start-hidden" href="#!"><i class="material-icons">location_on</i></a></li>
           <li><a id="legend-menu" href="#!">Legend &#x25BC;</a></li>
           <div id="search-holder" class="menu-item">
             <input id="search" type="search" required>
@@ -97,6 +98,8 @@
     </ul>
 
     <ul id="us-radar-menu" class="dropdown-content sensor-selected">
+      <li id="radar-reset" class="start-hidden sensor-reset-menu">No Sensor<span class="badge badge-reset" data-badge-caption="RESET"></li>
+      <li class="divider sensor-reset-menu"></li>
       <li id="radar-beale">Beale<span class="badge" data-badge-caption="USAF"></span></li>
       <li id="radar-capecod">Cape Cod<span class="badge" data-badge-caption="USAF"></span></li>
       <li id="radar-parcs">Cavalier<span class="badge" data-badge-caption="USAF"></span></li>
@@ -117,6 +120,8 @@
     </ul>
 
     <ul id="russian-menu" class="dropdown-content">
+      <li id="radar-reset2" class="start-hidden sensor-reset-menu">No Sensor<span class="badge badge-reset" data-badge-caption="RESET"></li>
+      <li class="divider sensor-reset-menu"></li>
       <li id="russian-armavir">Armavir<span class="badge" data-badge-caption="RUS"></span></li>
       <li id="russian-balkhash">Balkhash<span class="badge" data-badge-caption="RUS"></span></li>
       <li id="russian-gantsevichi">Gantsevichi<span class="badge" data-badge-caption="RUS"></span></li>
@@ -1189,7 +1194,6 @@
   <script src="js/settings-manager.js?ver=<%= settingsManager.versionNumber %>"></script>
   <script src="js/time-manager.js?ver=<%= settingsManager.versionNumber %>"></script>
   <script src="js/earth.js?ver=<%= settingsManager.versionNumber %>"></script>
-  <script src="js/https.js?ver=<%= settingsManager.versionNumber %>"></script>
   <script src="js/satSet.js?ver=<%= settingsManager.versionNumber %>"></script>
   <script src="js/sun.js?ver=<%= settingsManager.versionNumber %>"></script>
   <!-- Load Extra Variables -->

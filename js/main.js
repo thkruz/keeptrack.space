@@ -167,6 +167,10 @@ var drawLoopCallback;
       dSurf, ptSurf;
 
   $(document).ready(function () { // Code Once index.htm is loaded
+
+    // Set Default TLE
+    settingsManager.tleSource = 'TLE.json';
+
     (function initParseFromGETVariables () {
       // This is an initial parse of the GET variables
       // A satSet focused one happens later.

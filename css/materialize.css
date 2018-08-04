@@ -5268,6 +5268,10 @@ button.btn-floating {
   /*padding: 14px 16px;*/
 }
 
+.dropdown-content li > span.badge-reset {
+  color: red;
+}
+
 .dropdown-content li > span > label {
   top: 1px;
   left: 0;

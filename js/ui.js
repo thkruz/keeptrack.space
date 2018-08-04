@@ -103,6 +103,7 @@ var lkpassed = false;
     (function _httpsCheck () {
         if (location.protocol !== 'https:') {
           $('#cs-geolocation').hide();
+          $('#geolocation-btn').hide();
         }
     })();
     (function _resizeWindow () {
@@ -470,6 +471,14 @@ var lkpassed = false;
         }
       });
 
+      $('#radars-reset').click(function () {
+        _resetSensorSelected();
+      });
+
+      $('#radars-reset2').click(function () {
+        _resetSensorSelected();
+      });
+
       // USAF Radars
       $('#radar-beale').click(function () { // Select Beale's Radar Coverage
         sensorManager.setSensor(sensorManager.sensorList.BLE);
@@ -553,6 +562,7 @@ var lkpassed = false;
       });
 
       $('.sensor-selected').click(function () {
+        satSet.setColorScheme(ColorScheme.default, true);
         $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
         if (selectedSat !== -1) {
           $('#menu-lookangles img').removeClass('bmenu-item-disabled');
@@ -643,19 +653,7 @@ var lkpassed = false;
         function shadersOffFilterOff () { window.location = '/index.htm'; }
 
         if (isResetSensorChecked) {
-          // Return to default settings with nothing 'inview'
-          satCruncher.postMessage({
-            typ: 'offset',
-            dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
-            setlatlong: true,
-            sensor: satellite.defaultSensor
-          });
-          satellite.setobs(null, true);
-          sensorManager.whichRadar = ''; // Disable Weather
-          $('#menu-sensor-info img').addClass('bmenu-item-disabled');
-          $('#menu-in-coverage img').addClass('bmenu-item-disabled');
-          $('#menu-lookangles img').addClass('bmenu-item-disabled');
-          $('#menu-weather img').addClass('bmenu-item-disabled');
+          _resetSensorSelected();
         }
         if (isHOSChecked) {
           settingsManager.otherSatelliteTransparency = 0;
@@ -2449,6 +2447,35 @@ var lkpassed = false;
       });
     }
   };
+
+  _resetSensorSelected = function () {
+    // Return to default settings with nothing 'inview'
+    satCruncher.postMessage({
+      typ: 'offset',
+      dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
+      setlatlong: true,
+      sensor: satellite.defaultSensor
+    });
+    satellite.setobs(null, true);
+    sensorManager.whichRadar = ''; // Disable Weather
+    $('#menu-sensor-info img').addClass('bmenu-item-disabled');
+    $('#menu-in-coverage img').addClass('bmenu-item-disabled');
+    $('#menu-lookangles img').addClass('bmenu-item-disabled');
+    $('#menu-weather img').addClass('bmenu-item-disabled');
+
+    // setColorScheme ignores calls to recolor satellites when there is no sensor.
+    // This is fixed by enabling isForceColorScheme
+    settingsManager.isForceColorScheme = true;
+    satSet.setColorScheme(ColorScheme.default, true);
+  };
+
+  $("#radar-reset").on('click', function () {
+    _resetSensorSelected();
+  });
+
+  $("#radar-reset2").on('click', function () {
+    _resetSensorSelected();
+  });
 
   _offlineMessage = function () {
     $('#loader-text').html('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');

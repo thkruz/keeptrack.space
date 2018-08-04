@@ -309,7 +309,7 @@ var lkpassed = false;
             satSet.setColorScheme(ColorScheme.default, true);
           }
           if (cameraType.current === cameraType.SATELLITE) {
-            if (clickedSat !== -1) { selectSat(clickedSat); }
+            if (clickedSat !== -1 && !satSet.getSat(clickedSat).static) { selectSat(clickedSat); }
           } else {
             selectSat(clickedSat);
           }

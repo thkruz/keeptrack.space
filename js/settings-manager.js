@@ -12,6 +12,7 @@
   settingsManager.offlineLocation = '';
 
   (function _getVersion () {
+    // NOTE: This is for backwards compatibility but will be phased out.
     var url = window.location.pathname;
     var filename = url.substring(url.lastIndexOf('/') + 1);
     if (filename === 'retro.htm') {

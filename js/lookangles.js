@@ -100,9 +100,11 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     /** obslat is what is used to determine if a site is set or not. If this is null sensorSelected() will return false */
     if (reset) {
       satellite.currentSensor = satellite.defaultSensor;
+      $('.sensor-reset-menu').hide(); // TODO: This belongs in UI.js somewhere
       return;
+    } else {
+      $('.sensor-reset-menu').show(); // TODO: This belongs in UI.js somewhere
     }
-
     satellite.currentSensor = sensor;
     satellite.currentSensor.observerGd = {   // Array to calculate look angles in propagate()
       latitude: sensor.lat * DEG2RAD,

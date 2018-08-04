@@ -308,7 +308,11 @@ var lkpassed = false;
 
             satSet.setColorScheme(ColorScheme.default, true);
           }
-          selectSat(clickedSat);
+          if (cameraType.current === cameraType.SATELLITE) {
+            if (clickedSat !== -1) { selectSat(clickedSat); }
+          } else {
+            selectSat(clickedSat);
+          }
         }
         // Repaint the theme to ensure it is the right color
         settingsManager.themes.retheme();
@@ -1989,6 +1993,7 @@ var lkpassed = false;
       }
       if (Number(evt.keyCode) === 69 || Number(evt.keyCode) === 81) {
         FPSYawRate = 0;
+        FPSRotateRate = 0;
       }
       if (Number(evt.keyCode) === 16) {
         FPSRun = 1;
@@ -2033,11 +2038,17 @@ var lkpassed = false;
           if (cameraType.current === cameraType.FPS) {
             FPSYawRate = -0.1;
           }
+          if (cameraType.current === cameraType.SATELLITE) {
+            FPSRotateRate = -0.1;
+          }
           break;
         case 69: // E
         case 101: // e
           if (cameraType.current === cameraType.FPS) {
             FPSYawRate = 0.1;
+          }
+          if (cameraType.current === cameraType.SATELLITE) {
+            FPSRotateRate = 0.1;
           }
           break;
       }

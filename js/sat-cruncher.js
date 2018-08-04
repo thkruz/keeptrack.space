@@ -192,9 +192,9 @@ function propagate () {
       cosLon = Math.cos((satCache[i].lon * DEG2RAD) + gmst);
       sinLon = Math.sin((satCache[i].lon * DEG2RAD) + gmst);
 
-      satPos[i * 3] = (RADIUS_OF_EARTH + 3) * cosLat * cosLon;
-      satPos[i * 3 + 1] = (RADIUS_OF_EARTH + 3) * cosLat * sinLon;
-      satPos[i * 3 + 2] = (RADIUS_OF_EARTH + 3) * sinLat;
+      satPos[i * 3] = (RADIUS_OF_EARTH + 0.25) * cosLat * cosLon;
+      satPos[i * 3 + 1] = (RADIUS_OF_EARTH + 0.25) * cosLat * sinLon;
+      satPos[i * 3 + 2] = (RADIUS_OF_EARTH + 0.25) * sinLat;
 
       satVel[i * 3] = 0;
       satVel[i * 3 + 1] = 0;

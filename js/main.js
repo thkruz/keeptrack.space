@@ -83,6 +83,7 @@ var zoomLevel = 0.5;
 var zoomTarget = 0.5;
 var camPitchSpeed = 0;
 var camYawSpeed = 0;
+var camRotateSpeed = 0;
 
 // Menu Variables
 var isEditSatMenuOpen = false;
@@ -130,6 +131,8 @@ var dragHasMoved = false;
 
 var FPSPitch = 0;
 var FPSPitchRate = 0;
+var FPSRotate = 0;
+var FPSRotateRate = 0;
 var FPSYaw = 0;
 var FPSYawRate = 0;
 var FPSxPos = 0;
@@ -299,12 +302,16 @@ var drawLoopCallback;
       camYawSpeed -= (camYawSpeed * dt * 0.005);
     }
 
-    if (cameraType.current=== cameraType.FPS || cameraType.current=== cameraType.SATELLITE) {
+    camRotateSpeed -= (camRotateSpeed * dt * 0.005);
+
+    if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE) {
       FPSPitch -= 20 * camPitchSpeed * dt;
       FPSYaw -= 20 * camYawSpeed * dt;
+      FPSRotate -= 20 * camRotateSpeed * dt;
     } else {
       camPitch += camPitchSpeed * dt;
       camYaw += camYawSpeed * dt;
+      FPSRotate += camRotateSpeed * dt;
     }
 
     if (rotateTheEarth) { camYaw -= rotateTheEarthSpeed * dt; }
@@ -483,12 +490,15 @@ var drawLoopCallback;
           break;
         case cameraType.SATELLITE:
           // yawRotate = ((-90 - satellite.currentSensor.long) * DEG2RAD);
+          if (selectedSat !== -1) lastSelectedSat = selectedSat;
+          var sat = satSet.getSat(lastSelectedSat);
+          // mat4.rotate(camMatrix, camMatrix, sat.inclination * DEG2RAD, [0, 1, 0]);
           mat4.rotate(camMatrix, camMatrix, -FPSPitch * DEG2RAD, [1, 0, 0]);
           mat4.rotate(camMatrix, camMatrix, FPSYaw * DEG2RAD, [0, 0, 1]);
+          mat4.rotate(camMatrix, camMatrix, FPSRotate * DEG2RAD, [0, 1, 0]);
 
-          if (selectSat !== -1) lastSelectedSat = selectedSat;
           orbitDisplay.updateOrbitBuffer(lastSelectedSat);
-          pos = satSet.getSat(lastSelectedSat).position;
+          pos = sat.position;
           mat4.translate(camMatrix, camMatrix, [-pos.x, -pos.y, -pos.z]);
           break;
       }
@@ -539,8 +549,9 @@ var drawLoopCallback;
             FPSyPos -= Math.sin(-FPSYaw * DEG2RAD) * FPSSideSpeed * FPSRun * FPSelapsed;
           }
         }
-        FPSYaw += FPSYawRate * FPSelapsed;
         FPSPitch += FPSPitchRate * FPSelapsed;
+        FPSRotate += FPSRotateRate * FPSelapsed;
+        FPSYaw += FPSYawRate * FPSelapsed;
       }
       FPSLastTime = FPStimeNow;
     }

@@ -11,7 +11,7 @@
     onmessage
 
 */
-importScripts('lib/satellite.min.js');
+importScripts('lib/satellite-1.3.min.js');
 
 /** CONSTANTS */
 var TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
@@ -156,10 +156,10 @@ onmessage = function (m) {
       satCache[m.data.id] = m.data;
       break;
   }
-  if (!propagationRunning) propagate();
+  if (!propagationRunning) propagateCruncher();
 };
 
-function propagate () {
+function propagateCruncher () {
   // var pTime = Date.now();
   propagationRunning = true;
   var now = propTime();
@@ -170,7 +170,8 @@ function propagate () {
                now.getUTCMinutes(),
                now.getUTCSeconds());
   j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-  var gmst = satellite.gstime(j);
+  var gmst = satellite.gstimeFromJday(j);
+  // var gmst = satellite.gstime(j);
   var len = satCache.length - 1;
   var i = -1;
 
@@ -379,7 +380,7 @@ function propagate () {
   satAbove = new Float32Array(satCache.length);
 
   // NOTE The longer the delay the more jitter at higher speeds of propagation
-  setTimeout(propagate, 1 * 1000 / divisor);
+  setTimeout(propagateCruncher, 1 * 1000 / divisor);
 }
 
 /** Returns Ordinal Day (Commonly Called J Day) */

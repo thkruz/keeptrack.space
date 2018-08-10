@@ -88,7 +88,7 @@ var multThreadCruncher8 = {};
   try {
     $('#loader-text').text('Locating ELSETs...');
     satCruncher = new Worker('js/sat-cruncher.js');
-    multThreadCruncher1 = new Worker('js/mSat.js');
+    // multThreadCruncher1 = new Worker('js/mSat.js');
     // multThreadCruncher2 = new Worker('js/mSat.js');
     // multThreadCruncher3 = new Worker('js/mSat.js');
     // multThreadCruncher4 = new Worker('js/mSat.js');

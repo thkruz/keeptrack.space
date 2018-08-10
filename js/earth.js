@@ -84,6 +84,7 @@
 
     texture = gl.createTexture();
     var img = new Image();
+    var imgHiRes = new Image();
     img.onload = function () {
       $('#loader-text').text('Painting the Earth...');
       gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -97,7 +98,26 @@
     };
     if (!settingsManager.vectorImages) img.src = 'images/dayearth-4096.jpg';
     if (settingsManager.vectorImages) img.src = 'images/dayearthvector-4096.jpg';
-    if (settingsManager.hiresImages) img.src = 'images/dayearth-10800.jpg';
+    if (settingsManager.hiresImages) {
+      setTimeout(function () {
+        imgHiRes.src = 'images/dayearth-10800.jpg';
+      }, 20000);
+      imgHiRes.onload = function () {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgHiRes);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+
+        gl.bindTexture(gl.TEXTURE_2D, nightTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgHiRes);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      };
+    } else {
+      imgHiRes = null;
+    }
 
     nightTexture = gl.createTexture();
     var nightImg = new Image();
@@ -113,7 +133,6 @@
     };
     if (!settingsManager.vectorImages) nightImg.src = 'images/nightearth-4096.png';
     if (settingsManager.vectorImages) nightImg.src = 'images/dayearthvector-4096.jpg';
-    if (settingsManager.hiresImages) nightImg.src = 'images/dayearth-10800.jpg';
 
     // generate a uvsphere bottom up, CCW order
     var vertPos = [];

@@ -621,11 +621,11 @@ var lkpassed = false;
         var isRiseSetChecked = document.getElementById('settings-riseset').checked;
 
         /** Filter On and Shaders On */
-        if (!settingsManager.isSharperShaders && isChangeSharperShaders && isLimitSats) {
+        if (settingsManager.vertShadersSize >= 12 && isChangeSharperShaders && isLimitSats) {
           shadersOnFilterOn();
         } else if (isLimitSats && limitSats !== $('#limitSats').val() && !isChangeSharperShaders) {
           shadersOffFilterOn();
-        } else if (!settingsManager.isSharperShaders && isChangeSharperShaders && !isLimitSats) {
+        } else if (settingsManager.vertShadersSize >= 12 && isChangeSharperShaders && !isLimitSats) {
           shadersOnFilterOff();
         } else if (!isLimitSats && limitSats !== '') {
         /** Filter turned off was previously on */
@@ -634,7 +634,7 @@ var lkpassed = false;
           } else {
             shadersOnFilterOff();
           }
-        } else if (settingsManager.isSharperShaders !== isChangeSharperShaders) {
+        } else if (settingsManager.vertShadersSize < 12 !== isChangeSharperShaders) {
         /** If shaders change */
           if (!isLimitSats || limitSats === '') {
             if (isChangeSharperShaders) { shadersOnFilterOff(); }

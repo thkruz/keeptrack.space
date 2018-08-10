@@ -248,84 +248,84 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     console.timeEnd('satrecCache');
   };
 
-  satellite.calculateTimeInCoverage = function () {
-    console.time('TIC');
-    console.log(Date.now());
-    var calcTICArray = [];
-    var ready1, ready2, ready3, ready4, ready5, ready6, ready7, ready8;
-    var debugCalculations = 17868;
-    ready1 = false;
-    ready2 = false;
-    ready3 = false;
-    ready4 = false;
-    ready5 = false;
-    ready6 = false;
-    ready7 = false;
-    ready8 = false;
-
-    // multThreadCruncher1.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 0, endNum: 0, sensor: satellite.currentSensor});
-    // multThreadCruncher2.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 1, endNum: 1, sensor: satellite.currentSensor});
-    // multThreadCruncher3.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 2, endNum: 2, sensor: satellite.currentSensor});
-    // multThreadCruncher4.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 3, endNum: 3, sensor: satellite.currentSensor});
-    // multThreadCruncher5.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 4, endNum: 4, sensor: satellite.currentSensor});
-    // multThreadCruncher6.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 5, endNum: 5, sensor: satellite.currentSensor});
-    // multThreadCruncher7.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 6, endNum: 6, sensor: satellite.currentSensor});
-    // multThreadCruncher8.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 7, endNum: 1599, sensor: satellite.currentSensor});
-
-    multThreadCruncher1.postMessage({thread: 1, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 0, endNum: debugCalculations/8*1, sensor: satellite.currentSensor});
-    multThreadCruncher2.postMessage({thread: 2, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*1+1, endNum: debugCalculations/8*2, sensor: satellite.currentSensor});
-    multThreadCruncher3.postMessage({thread: 3, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*2+1, endNum: debugCalculations/8*3, sensor: satellite.currentSensor});
-    multThreadCruncher4.postMessage({thread: 4, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*3+1, endNum: debugCalculations/8*4, sensor: satellite.currentSensor});
-    multThreadCruncher5.postMessage({thread: 5, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*4+1, endNum: debugCalculations/8*5, sensor: satellite.currentSensor});
-    multThreadCruncher6.postMessage({thread: 6, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*5+1, endNum: debugCalculations/8*6, sensor: satellite.currentSensor});
-    multThreadCruncher7.postMessage({thread: 7, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*6+1, endNum: debugCalculations/8*7, sensor: satellite.currentSensor});
-    multThreadCruncher8.postMessage({thread: 8, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*7+1, endNum: debugCalculations/8*8, sensor: satellite.currentSensor});
-
-    multThreadCruncher1.onmessage = function (m) {
-      for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-      ready1 = true;
-      if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-    };
-    multThreadCruncher2.onmessage = function (m) {
-      for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-      ready2 = true;
-      if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-    };
-    multThreadCruncher3.onmessage = function (m) {
-      for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-      ready3 = true;
-      if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-    };
-    multThreadCruncher4.onmessage = function (m) {
-      for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-      ready4 = true;
-      if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-    };
-    multThreadCruncher5.onmessage = function (m) {
-      for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-      ready5 = true;
-      if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-    };
-    multThreadCruncher6.onmessage = function (m) {
-      for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-      ready6 = true;
-      if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-    };
-    multThreadCruncher7.onmessage = function (m) {
-      for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-      ready7 = true;
-      if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-    };
-    multThreadCruncher8.onmessage = function (m) {
-      for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-      ready8 = true;
-      if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-    };
-    function multThreadComplete () {
-      console.log(calcTICArray);
-      console.timeEnd('TIC');
-    }
-  };
+  // satellite.calculateTimeInCoverage = function () {
+  //   console.time('TIC');
+  //   console.log(Date.now());
+  //   var calcTICArray = [];
+  //   var ready1, ready2, ready3, ready4, ready5, ready6, ready7, ready8;
+  //   var debugCalculations = 17868;
+  //   ready1 = false;
+  //   ready2 = false;
+  //   ready3 = false;
+  //   ready4 = false;
+  //   ready5 = false;
+  //   ready6 = false;
+  //   ready7 = false;
+  //   ready8 = false;
+  //
+  //   // multThreadCruncher1.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 0, endNum: 0, sensor: satellite.currentSensor});
+  //   // multThreadCruncher2.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 1, endNum: 1, sensor: satellite.currentSensor});
+  //   // multThreadCruncher3.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 2, endNum: 2, sensor: satellite.currentSensor});
+  //   // multThreadCruncher4.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 3, endNum: 3, sensor: satellite.currentSensor});
+  //   // multThreadCruncher5.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 4, endNum: 4, sensor: satellite.currentSensor});
+  //   // multThreadCruncher6.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 5, endNum: 5, sensor: satellite.currentSensor});
+  //   // multThreadCruncher7.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 6, endNum: 6, sensor: satellite.currentSensor});
+  //   // multThreadCruncher8.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 7, endNum: 1599, sensor: satellite.currentSensor});
+  //
+  //   multThreadCruncher1.postMessage({thread: 1, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 0, endNum: debugCalculations/8*1, sensor: satellite.currentSensor});
+  //   multThreadCruncher2.postMessage({thread: 2, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*1+1, endNum: debugCalculations/8*2, sensor: satellite.currentSensor});
+  //   multThreadCruncher3.postMessage({thread: 3, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*2+1, endNum: debugCalculations/8*3, sensor: satellite.currentSensor});
+  //   multThreadCruncher4.postMessage({thread: 4, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*3+1, endNum: debugCalculations/8*4, sensor: satellite.currentSensor});
+  //   multThreadCruncher5.postMessage({thread: 5, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*4+1, endNum: debugCalculations/8*5, sensor: satellite.currentSensor});
+  //   multThreadCruncher6.postMessage({thread: 6, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*5+1, endNum: debugCalculations/8*6, sensor: satellite.currentSensor});
+  //   multThreadCruncher7.postMessage({thread: 7, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*6+1, endNum: debugCalculations/8*7, sensor: satellite.currentSensor});
+  //   multThreadCruncher8.postMessage({thread: 8, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*7+1, endNum: debugCalculations/8*8, sensor: satellite.currentSensor});
+  //
+  //   multThreadCruncher1.onmessage = function (m) {
+  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+  //     ready1 = true;
+  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+  //   };
+  //   multThreadCruncher2.onmessage = function (m) {
+  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+  //     ready2 = true;
+  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+  //   };
+  //   multThreadCruncher3.onmessage = function (m) {
+  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+  //     ready3 = true;
+  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+  //   };
+  //   multThreadCruncher4.onmessage = function (m) {
+  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+  //     ready4 = true;
+  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+  //   };
+  //   multThreadCruncher5.onmessage = function (m) {
+  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+  //     ready5 = true;
+  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+  //   };
+  //   multThreadCruncher6.onmessage = function (m) {
+  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+  //     ready6 = true;
+  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+  //   };
+  //   multThreadCruncher7.onmessage = function (m) {
+  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+  //     ready7 = true;
+  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+  //   };
+  //   multThreadCruncher8.onmessage = function (m) {
+  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+  //     ready8 = true;
+  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+  //   };
+  //   function multThreadComplete () {
+  //     console.log(calcTICArray);
+  //     console.timeEnd('TIC');
+  //   }
+  // };
   satellite.nextpassList = function (satArray) {
     var nextPassArray = [];
     for (var s = 0; s < satArray.length; s++) {

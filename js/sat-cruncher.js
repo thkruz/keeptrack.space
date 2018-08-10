@@ -357,7 +357,7 @@ function propagateCruncher () {
       }
 
       // Determine if satellite is within planetarium view
-      if (elevation >= 32) {
+      if (elevation >= 50) {
         satAbove[i] = true;
       } else {
         satAbove[i] = false;

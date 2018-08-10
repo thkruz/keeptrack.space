@@ -113,7 +113,7 @@
 
   settingsManager.socratesOnSatCruncher = null;
 
-  settingsManager.isSharperShaders = false;
+  settingsManager.vertShadersSize = 12;
   settingsManager.isEditTime = false;
   settingsManager.isPropRateChange = false;
   settingsManager.isOnlyFOVChecked = false;

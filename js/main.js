@@ -481,10 +481,12 @@ var drawLoopCallback;
           mat4.translate(camMatrix, camMatrix, [-pos.x, -pos.y, -pos.z]);
 
           // Display Orbits of all objects above (elevation > 32)
-            // orbitDisplay.clearInViewOrbit();
-            // for (var i = 0; i < satSet.satAbove.length; i++) {
-            //   if (satSet.satAbove[i] === 1) orbitDisplay.addInViewOrbit(i);
-            // }
+            orbitDisplay.clearInViewOrbit();
+            for (var i = 0; i < satSet.satAbove.length; i++) {
+              if (satSet.satAbove[i] === 1 && satSet.getSat(i).OT === 3) {
+                orbitDisplay.addInViewOrbit(i);
+              }
+            }
 
 
           break;

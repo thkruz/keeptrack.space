@@ -44,14 +44,14 @@ or mirrored at any other location without the express written permission of the 
 
 */
 
-var multThreadCruncher1 = {};
-var multThreadCruncher2 = {};
-var multThreadCruncher3 = {};
-var multThreadCruncher4 = {};
-var multThreadCruncher5 = {};
-var multThreadCruncher6 = {};
-var multThreadCruncher7 = {};
-var multThreadCruncher8 = {};
+// var multThreadCruncher1 = {};
+// var multThreadCruncher2 = {};
+// var multThreadCruncher3 = {};
+// var multThreadCruncher4 = {};
+// var multThreadCruncher5 = {};
+// var multThreadCruncher6 = {};
+// var multThreadCruncher7 = {};
+// var multThreadCruncher8 = {};
 
 (function () {
   var TAU = 2 * Math.PI;
@@ -323,6 +323,38 @@ var multThreadCruncher8 = {};
     }
   };
 
+  satSet.changeShaders = function (newShaders) {
+    gl.detachShader(dotShader, vertShader);
+    gl.detachShader(dotShader, fragShader);
+    switch (newShaders) {
+      case 12:
+        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-12.glsl'));
+        break;
+      case 6:
+        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-6.glsl'));
+        break;
+      case 2:
+        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-2.glsl'));
+        break;
+    }
+    gl.compileShader(vertShader);
+
+    gl.shaderSource(fragShader, shaderLoader.getShaderCode('dot-fragment.glsl'));
+    gl.compileShader(fragShader);
+
+    gl.attachShader(dotShader, vertShader);
+    gl.attachShader(dotShader, fragShader);
+    gl.linkProgram(dotShader);
+    dotShader.aPos = gl.getAttribLocation(dotShader, 'aPos');
+    dotShader.aColor = gl.getAttribLocation(dotShader, 'aColor');
+    dotShader.uMvMatrix = gl.getUniformLocation(dotShader, 'uMvMatrix');
+    dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
+    dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
+  };
+
+  var vertShader;
+  var fragShader;
+
   satSet.init = function (satsReadyCallback) {
     /** Parses GET variables for Possible sharperShaders */
     (function parseFromGETVariables () {
@@ -330,8 +362,8 @@ var multThreadCruncher8 = {};
       var params = queryStr.split('&');
       for (var i = 0; i < params.length; i++) {
         var key = params[i].split('=')[0];
-        if (key === 'sharperShaders') {
-          settingsManager.isSharperShaders = true;
+        if (key === 'vertShadersSize') {
+          settingsManager.vertShadersSize = 6;
           document.getElementById('settings-shaders').checked = true;
         }
       }
@@ -339,15 +371,24 @@ var multThreadCruncher8 = {};
 
     dotShader = gl.createProgram();
 
-    var vertShader = gl.createShader(gl.VERTEX_SHADER);
-    if (settingsManager.isSharperShaders) {
-      gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-sharp.glsl'));
-    } else {
-      gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex.glsl'));
+    vertShader = gl.createShader(gl.VERTEX_SHADER);
+    switch (settingsManager.vertShadersSize) {
+      case 12:
+        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-12.glsl'));
+        break;
+      case 6:
+        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-6.glsl'));
+        break;
+      case 2:
+        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-2.glsl'));
+        break;
+      default:
+        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-12.glsl'));
+        break;
     }
     gl.compileShader(vertShader);
 
-    var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+    fragShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(fragShader, shaderLoader.getShaderCode('dot-fragment.glsl'));
     gl.compileShader(fragShader);
 
@@ -601,7 +642,7 @@ var multThreadCruncher8 = {};
         typ: 'satdata',
         dat: satSet.satDataString
       });
-      multThreadCruncher1.postMessage({type: 'init', data: satSet.satDataString});
+      // multThreadCruncher1.postMessage({type: 'init', data: satSet.satDataString});
       // multThreadCruncher2.postMessage({type: 'init', data: satSet.satDataString});
       // multThreadCruncher3.postMessage({type: 'init', data: satSet.satDataString});
       // multThreadCruncher4.postMessage({type: 'init', data: satSet.satDataString});

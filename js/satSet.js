@@ -372,20 +372,7 @@ or mirrored at any other location without the express written permission of the 
     dotShader = gl.createProgram();
 
     vertShader = gl.createShader(gl.VERTEX_SHADER);
-    switch (settingsManager.vertShadersSize) {
-      case 12:
-        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-12.glsl'));
-        break;
-      case 6:
-        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-6.glsl'));
-        break;
-      case 2:
-        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-2.glsl'));
-        break;
-      default:
-        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-12.glsl'));
-        break;
-    }
+    gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-var.glsl'));
     gl.compileShader(vertShader);
 
     fragShader = gl.createShader(gl.FRAGMENT_SHADER);

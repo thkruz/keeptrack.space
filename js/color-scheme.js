@@ -15,6 +15,15 @@
     this.pickableBuf = gl.createBuffer();
   };
 
+  ColorScheme.objectTypeFlags = {};
+  ColorScheme.objectTypeFlags.green = true;
+  ColorScheme.objectTypeFlags.blue = true;
+  ColorScheme.objectTypeFlags.gray = true;
+  ColorScheme.objectTypeFlags.orange = true;
+  ColorScheme.objectTypeFlags.yellow = true;
+  ColorScheme.objectTypeFlags.red = true;
+  ColorScheme.objectTypeFlags.purple = true;
+
   // Removed from function to reduce memory leak
   var numSats, colorData, pickableData, colors, i;
   ColorScheme.prototype.calculateColorBuffers = function () {
@@ -71,6 +80,30 @@
           pickable: true
         };
       }
+
+      // NOTE: ColorScheme.objectTypeFlags code
+
+      if (sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
+      if (sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
+      if (sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
+
+
+
       if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
         color = [0.85, 0.5, 0.0, 1.0];
       } else if (sat.OT === 1) { // Payload
@@ -108,6 +141,9 @@
         };
       }
     });
+    /// //////////////////////////////
+    // NOTE: Doesn't appear to be used
+    // ///////////////////////////////
     ColorScheme.apogee = new ColorScheme(function (sat) {
       var ap = sat.apogee;
       var gradientAmt = Math.min(ap / 45000, 1.0);
@@ -116,7 +152,15 @@
         pickable: true
       };
     });
+    // ///////////////////////////////
+
     ColorScheme.smallsats = new ColorScheme(function (sat) {
+      if (sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
       if (sat.R < 0.1 && sat.OT === 1) {
         return {
           color: [0.2, 1.0, 0.0, 0.65],
@@ -131,6 +175,30 @@
     });
     ColorScheme.rcs = new ColorScheme(function (sat) {
       var rcs = sat.R;
+      if (rcs < 0.1 && ColorScheme.objectTypeFlags.red === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
+      if ((rcs >= 0.1 && rcs <= 1) && ColorScheme.objectTypeFlags.blue === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
+      if (rcs > 1 && ColorScheme.objectTypeFlags.green === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
+      if ((typeof rcs == 'undefined' || typeof rcs == null) && ColorScheme.objectTypeFlags.yellow === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
       if (rcs < 0.1) {
         return {
           color: [1.0, 0, 0, 0.6],
@@ -139,7 +207,7 @@
       }
       if (rcs >= 0.1 && rcs <= 1) {
         return {
-          color: [1.0, 1.0, 0, 0.6],
+          color: [0, 0, 1.0, 0.6],
           pickable: true
         };
       }
@@ -149,8 +217,9 @@
           pickable: true
         };
       }
+      // Unknowns
       return {
-        color: [0, 0, 1.0, 0.6],
+        color: [1.0, 1.0, 0, 0.6],
         pickable: true
       };
     });
@@ -237,7 +306,26 @@
     });
     ColorScheme.velocity = new ColorScheme(function (sat) {
       var vel = sat.velocity;
+      if (vel > 5.5 && ColorScheme.objectTypeFlags.yellow === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
+      if ((vel >= 2.5 && vel <= 5.5) && ColorScheme.objectTypeFlags.orange === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
+      if (vel < 2.5 && ColorScheme.objectTypeFlags.red === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
       var gradientAmt = Math.min(vel / 15, 1.0);
+
       return {
         color: [1.0 - gradientAmt, gradientAmt, 0.0, 1.0],
         pickable: true

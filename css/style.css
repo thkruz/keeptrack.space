@@ -308,33 +308,33 @@ ul {
   box-shadow: 0 0px 6px 0 rgba(0, 0, 0, 0.2), 0 0px 8px 0 rgba(0, 0, 0, 0.19)
 }
 
-#legend-green-box {
+.legend-green-box {
   background: rgb(68, 193, 47);
   margin-right: 35px;
 }
 
-#legend-blue-box {
+.legend-blue-box {
   background: rgb(0, 48, 255);
   margin-right: 35px;
 }
 
-#legend-gray-box {
+.legend-gray-box {
   background: rgb(157, 157, 157);
   margin-right: 35px;
 }
-#legend-red-box {
+.legend-red-box {
   background: rgb(166, 5, 5);
   margin-right: 35px;
 }
-#legend-purple-box {
+.legend-purple-box {
   background: rgb(108, 30, 103);
   margin-right: 35px;
 }
-#legend-orange-box {
+.legend-orange-box {
   background: rgb(255, 92, 0);
   margin-right: 35px;
 }
-#legend-yellow-box {
+.legend-yellow-box {
   background: rgb(200, 198, 9);
   margin-right: 35px;
 }

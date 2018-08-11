@@ -453,6 +453,103 @@ var lkpassed = false;
         uiController.updateMap();
       });
 
+      // NOTE: MOVE THIS
+        $('#legend-hover-menu').click(function (e) {
+          switch (e.target.classList[1]) {
+            case "legend-green-box":
+              if (ColorScheme.objectTypeFlags.green) {
+                ColorScheme.objectTypeFlags.green = false;
+                $('.legend-green-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.green = true;
+                $('.legend-green-box').css('background', 'green');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
+            case "legend-blue-box":
+              if (ColorScheme.objectTypeFlags.blue) {
+                ColorScheme.objectTypeFlags.blue = false;
+                $('.legend-blue-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.blue = true;
+                $('.legend-blue-box').css('background', 'blue');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
+            case "legend-gray-box":
+              if (ColorScheme.objectTypeFlags.gray) {
+                ColorScheme.objectTypeFlags.gray = false;
+                $('.legend-gray-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.gray = true;
+                $('.legend-gray-box').css('background', 'gray');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
+            case "legend-orange-box":
+              if (ColorScheme.objectTypeFlags.orange) {
+                ColorScheme.objectTypeFlags.orange = false;
+                $('.legend-orange-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.orange = true;
+                $('.legend-orange-box').css('background', 'orange');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
+            case "legend-yellow-box":
+              if (ColorScheme.objectTypeFlags.yellow) {
+                ColorScheme.objectTypeFlags.yellow = false;
+                $('.legend-yellow-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.yellow = true;
+                $('.legend-yellow-box').css('background', 'yellow');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
+            case "legend-red-box":
+              if (ColorScheme.objectTypeFlags.red) {
+                ColorScheme.objectTypeFlags.red = false;
+                $('.legend-red-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.red = true;
+                $('.legend-red-box').css('background', 'red');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
+            case "legend-purple-box":
+              if (ColorScheme.objectTypeFlags.purple) {
+                ColorScheme.objectTypeFlags.purple = false;
+                $('.legend-purple-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.purple = true;
+                $('.legend-purple-box').css('background', 'purple');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
+          }
+        });
+
       $('#russian-menu').click(function () {
         if ($('#legend-list-default').css('display') === 'block') {
           $('#legend-list-default').hide();

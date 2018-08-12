@@ -125,10 +125,13 @@
   settingsManager.isMapUpdateOverride = false;
   settingsManager.lastMapUpdateTime = 0;
 
+  settingsManager.cameraMovementSpeed = 0.005;
+
   // /////////////////
   // Mobile settings
   // /////////////////
   settingsManager.desktopMinimumWidth = 1000;
+  settingsManager.isMobileModeEnabled = false;
 
   window.settingsManager = settingsManager;
 })();

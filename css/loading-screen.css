@@ -57,15 +57,18 @@ body {
   margin: auto;
 }
 
+#logo-text {
+  display: block;
+}
+
 .logo-font {
   font-family: 'nasalization', sans-serif;
-  font-size: 5em;
-  display: block;
+  font-size: 8em;
 }
 
 @media (max-width: 800px) {
   #logo-text {
-    font-size: 60px;
+    font-size: 4em;
   }
 }
 

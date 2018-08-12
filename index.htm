@@ -28,7 +28,7 @@
   <body class="no-text-select">
   <div id="loading-screen" class="valign-wrapper full-loader">
     <div id="logo-inner-container" class="valign">
-      <span class="logo-font">KEEP TRACK</span>
+      <span id="logo-text" class="logo-font">KEEP TRACK</span>
       <div class="preloader-wrapper active">
         <div class="spinner-layer spinner-white-only">
           <div class="circle-clipper left">
@@ -623,7 +623,7 @@
               </div>
             </form>
           </div>
-          <div id="es-error" style="display: none;margin-top: 10px;cursor: pointer; cursor: hand;" class="center-align">
+          <div id="es-error" style="display: none;margin-top: 10px;cursor: 'pointer'; cursor: hand;" class="center-align">
             <h6 class="center-align">Error</h6>
           </div>
         </div>
@@ -703,7 +703,7 @@
               </div>
             </form>
           </div>
-          <div id="nl-error" style="display: none;margin-top: 10px;cursor: pointer; cursor: hand;" class="center-align">
+          <div id="nl-error" style="display: none;margin-top: 10px;cursor: 'pointer'; cursor: hand;" class="center-align">
             <h6 class="center-align">Error</h6>
           </div>
         </div>
@@ -854,7 +854,7 @@
               </button>
             </div>
           </div>
-          <div id="ms-error" style="display: none;margin-top: 10px;cursor: pointer; cursor: hand;" class="center-align">
+          <div id="ms-error" style="display: none;margin-top: 10px;cursor: 'pointer'; cursor: hand;" class="center-align">
             <h6 class="center-align">Error</h6>
           </div>
         </div>
@@ -1057,32 +1057,6 @@
           <div id="iss-stream"></div>
         </div>
       </div>
-      <div id="mobile-controls">
-        <div id="controls-up-wrapper">
-          <center>
-            <div id="controls-up">
-                <div id="up" class="zoom-button"><img src="images/up-arrow.png"></img></div>
-            </div>
-          </center>
-        </div>
-        <div id="controls-left">
-          <div id="left" class="zoom-button"><img src="images/left-arrow.png"></img></div>
-        </div>
-        <div id="controls-down-wrapper">
-            <div id="controls-zoom-in">
-              <div id="zoom-in" class="zoom-button">+</div>
-            </div>
-            <div id="controls-zoom-out">
-              <div id="zoom-out" class="zoom-button">-</div>
-            </div>
-            <div id="controls-down">
-                <div id="down" class="zoom-button"><img src="images/down-arrow.png"></img></div>
-            </div>
-        </div>
-        <div id="controls-right">
-          <div id="right" class="zoom-button"><img src="images/right-arrow.png"></img></div>
-        </div>
-      </div>
       <div id="bottom-menu">Current Objects</div>
     </div>
     <div id="demo-logo" class="logo-font start-hidden">Keeptrack.space</div>
@@ -1204,6 +1178,7 @@
   <script src="satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
   <script src="js/color-scheme.js?ver=<%= settingsManager.versionNumber %>"></script>
+  <script src="js/mobile.js?ver=<%= settingsManager.versionNumber %>"></script>
   <script src="js/main.js?ver=<%= settingsManager.versionNumber %>"></script>
   <script src="js/ui.js?ver=<%= settingsManager.versionNumber %>"></script>
   <script src="js/lookangles.js?ver=<%= settingsManager.versionNumber %>"></script>

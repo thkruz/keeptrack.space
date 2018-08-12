@@ -125,5 +125,10 @@
   settingsManager.isMapUpdateOverride = false;
   settingsManager.lastMapUpdateTime = 0;
 
+  // /////////////////
+  // Mobile settings
+  // /////////////////
+  settingsManager.desktopMinimumWidth = 1000;
+
   window.settingsManager = settingsManager;
 })();

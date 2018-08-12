@@ -167,6 +167,7 @@
     for (var i = 0; i < results.length; i++) {
       var sat = satData[results[i].satId];
       html += '<div class="search-result" data-sat-id="' + sat.id + '">';
+      html += '<div class="truncate-search">';
       if (results[i].isMissile) {
         html += sat.desc;
       } else if (results[i].isON) { // If the name matched - highlight it
@@ -178,6 +179,7 @@
       } else { // If not, just write the name
         html += sat.ON;
       }
+      html += '</div>';
       html += '<div class="search-result-scc">';
       if (results[i].isMissile) {
         html += sat.ON;

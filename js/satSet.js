@@ -216,7 +216,7 @@ or mirrored at any other location without the express written permission of the 
         $('#loader-text').html('Attempting to Math...');
 
       // Hide Menus on Small Screens
-      if ($(document).width() <= 1000) {
+      if ($(document).width() <= settingsManager.desktopMinimumWidth) {
         // TODO FullScreen Option
         // document.documentElement.webkitRequestFullScreen();
         $('#menu-sensor-info img').hide();
@@ -257,10 +257,11 @@ or mirrored at any other location without the express written permission of the 
         $('#mobile-controls').show();
         $('#search').attr('style', 'width:55px;');
         if ($(document).height() >= 600) {
-          $('#sat-infobox').attr('style', 'width:100%;top:60%;');
+          $('#sat-infobox').attr('style', 'width:100%;top:75%; padding: 0px 5%;');
         } else {
-          $('#sat-infobox').attr('style', 'width:100%;top:50%;');
+          $('#sat-infobox').attr('style', 'width:100%;top:60%; padding: 0px 5%;');
         }
+        $('.sat-info-value').attr('style', 'width:45%;float: right; text-overflow: ellipsis; overflow: hidden;');
       }
 
       /** Hide SOCRATES menu if not all the satellites are currently available to view */
@@ -1082,6 +1083,24 @@ or mirrored at any other location without the express written permission of the 
     $('#menu-map img').removeClass('bmenu-item-disabled');
     $('#menu-editSat img').removeClass('bmenu-item-disabled');
     $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
+    // Mobile Controls
+    if ($(document).width() <= settingsManager.desktopMinimumWidth) {
+      if (i !== -1) {
+        $('#controls-down-wrapper').addClass('bottom-controls-high');
+        $('#controls-down-wrapper').removeClass('bottom-controls-low');
+        $('#controls-left').addClass('side-controls-high');
+        $('#controls-left').removeClass('side-controls-low');
+        $('#controls-right').addClass('side-controls-high');
+        $('#controls-right').removeClass('side-controls-low');
+      } else {
+        $('#controls-down-wrapper').addClass('bottom-controls-low');
+        $('#controls-down-wrapper').removeClass('bottom-controls-high');
+        $('#controls-left').addClass('side-controls-low');
+        $('#controls-left').removeClass('side-controls-high');
+        $('#controls-right').addClass('side-controls-low');
+        $('#controls-right').removeClass('side-controls-high');
+      }
+    }
   };
 
   satSet.onCruncherReady = function (cruncherReadyCallback) {

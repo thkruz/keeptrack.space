@@ -199,6 +199,9 @@ var drawLoopCallback;
           case 'mw':
             settingsManager.tleSource = 'mw.json';
             break;
+          case 'logo':
+            $('#demo-logo').show();
+            break;
           }
         }
       })();
@@ -865,17 +868,17 @@ function selectSat (satId) {
     $('#sat-infobox').fadeOut();
     if ($('#search-results').css('display') === 'block') {
       if ($(document).width() <= 1000) {
-        $('#search-results').attr('style', 'display:block;height:110px;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
+        $('#search-results').attr('style', 'display:block;height:110px;margin-bottom:-25px;width:100%;bottom:auto;margin-top:25px;');
         $('#controls-up-wrapper').css('top', '180px');
       } else {
-        $('#search-results').attr('style', 'display:block;max-height:100%;margin-bottom:-50px;');
+        $('#search-results').attr('style', 'display:block;max-height:100%;margin-bottom:-25px;');
       }
     } else {
       if ($(document).width() <= 1000) {
-        $('#search-results').attr('style', 'height:110px;margin-bottom:-50px;width:100%;bottom:auto;margin-top:50px;');
+        $('#search-results').attr('style', 'height:110px;margin-bottom:-25px;width:100%;bottom:auto;margin-top:25px;');
         $('#controls-up-wrapper').css('top', '80px');
       } else {
-        $('#search-results').attr('style', 'max-height:100%;margin-bottom:-50px;');
+        $('#search-results').attr('style', 'max-height:100%;margin-bottom:-25px;');
       }
     }
     $('#iss-stream').html('');
@@ -939,7 +942,7 @@ function selectSat (satId) {
 
     if ($('#search-results').css('display') === 'block') {
       if ($(document).width() <= 1000) {
-        $('#search-results').attr('style', 'display:block; height:110px; width: 100%;bottom:auto;margin-top:50px;');
+        $('#search-results').attr('style', 'display:block; height:110px; width: 100%;bottom:auto;margin-top:25px;');
         $('#controls-up-wrapper').css('top', '180px');
       } else {
         $('#search-results').attr('style', 'display:block; max-height:27%');
@@ -947,7 +950,7 @@ function selectSat (satId) {
       }
     } else {
       if ($(document).width() <= 1000) {
-        $('#search-results').attr('style', 'height:110px; width: 100%;bottom:auto;margin-top:50px;');
+        $('#search-results').attr('style', 'height:110px; width: 100%;bottom:auto;margin-top:25px;');
         $('#controls-up-wrapper').css('top', '80px');
       } else {
         $('#search-results').attr('style', 'max-height:27%');

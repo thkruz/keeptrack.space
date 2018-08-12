@@ -57,9 +57,9 @@ body {
   margin: auto;
 }
 
-#logo-text {
-  font-family: 'Varela Round', sans-serif;
-  font-size: 120px;
+.logo-font {
+  font-family: 'nasalization', sans-serif;
+  font-size: 5em;
   display: block;
 }
 

@@ -139,12 +139,12 @@ ul {
     display: none;
     position: absolute;
     right: 0px;
-    width: 300px;
-    background: #0a97d6;
+    width: 230px;
+    background: #0a97d6 !important;
     z-index: 1;
     top: 0px;
-    margin-top: 50px;
-    bottom: 50px;
+    margin-top: 25px;
+    bottom: 75px;
     max-height: 100%;
 }
 .search-hilight {
@@ -161,10 +161,16 @@ ul {
     cursor: pointer;
 }
 .search-result-scc {
-    font-size: 12px;
-    height: 28px;
     float: right;
-    margin-right: 10px;
+    margin-right: 5px;
+    margin-top: -15px;
+}
+
+.truncate-search {
+  width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #search-holder {
@@ -173,7 +179,8 @@ ul {
 
 #search {
     height: 16px;
-    margin: 15px 0;
+    margin: 0;
+    padding-top: 5px;
 }
 
 .menubar {
@@ -461,6 +468,7 @@ ul {
 }
 #socrates-table {
   line-height: 0.05;
+  font-size: 13px;
 }
 
 #socrates-table td {
@@ -469,6 +477,11 @@ ul {
 
 #lookanglesmultisite-content {
   width: 375px;
+}
+
+#lookangles-content td{
+  padding: 5px;
+  font-size: 13px;
 }
 
 .start-hidden {
@@ -486,8 +499,8 @@ ul {
   position: absolute;
   background: rgba(0,0,0,0);
   color: white;
-  width: 300px;
-  top: 50px;
+  width: 260px;
+  top: 25px;
   bottom: 50px;
   overflow: auto;
   z-index: 10;
@@ -498,8 +511,8 @@ ul {
   /*display: block;*/
   background: #0a97d6;
   color: white;
-  width: 300px;
-  top: 50px;
+  width: 260px;
+  top: 25px;
   bottom: 50px;
   overflow: auto;
   z-index: 10;
@@ -636,10 +649,10 @@ ul li{
     position: absolute;
     top: 27%;
     bottom: 50px;
-    margin-top: 50px;
+    margin-top: 25px;
     padding: 0 10px 0 10px;
     right: 0px;
-    width: 300px;
+    width: 230px;
     border-top: 5px;
     border-top-color: #0277bd;
     border-top-style: solid;
@@ -672,6 +685,18 @@ ul li{
 }
 .sat-info-value {
     float: right;
+    width: 100px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+#sat-info-nextpass-row {
+  height: 42px;
+  white-space: normal;
+}
+
+#sat-info-nextpass {
+  margin-top: 25px;
 }
 
 #datetime {
@@ -843,14 +868,26 @@ ul li{
   display: none;
 }
 
+.bottom-controls-high {
+  bottom: 25% !important;
+}
+
+.bottom-controls-low {
+  bottom: 60px !important;
+}
+
+.side-controls-high {
+  top: 35% !important;
+}
+
+.side-controls-low {
+  top: 50% !important;
+}
+
 #controls-zoom-out {
-    position: absolute;
-    right: 20px;
-    bottom: 60px;
+    float: right;
+    margin-right: 20px;
     z-index: 2;
-    display: block;
-    width: 50px;
-    height: 50px;
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 10px;
@@ -858,13 +895,9 @@ ul li{
 }
 
 #controls-zoom-in {
-    position: absolute;
-    left: 20px;
-    bottom: 60px;
+    float: left;
+    margin-left: 20px;
     z-index: 2;
-    display: block;
-    width: 50px;
-    height: 50px;
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 10px;
@@ -875,9 +908,6 @@ ul li{
     position: absolute;
     left: 20px;
     top: 50%;
-    display: block;
-    width: 50px;
-    height: 50px;
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 10px;
@@ -887,35 +917,29 @@ ul li{
     position: absolute;
     right: 20px;
     top: 50%;
-    display: block;
-    width: 50px;
-    height: 50px;
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 10px;
     overflow: hidden;
 }
+#down {
+  margin: 0px auto;
+}
+
 #controls-up-wrapper {
   width: 100%;
   top: 80px;
   position: absolute;
 }
-#controls-up {
-    display: block;
-    width: 50px;
-    height: 50px;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    overflow: hidden;
-}
+
 #controls-down-wrapper {
   width: 100%;
   bottom: 60px;
   z-index: 1;
   position: absolute;
 }
-#controls-down {
+
+.zoom-button {
     display: block;
     width: 50px;
     height: 50px;
@@ -923,15 +947,6 @@ ul li{
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 10px;
     overflow: hidden;
-}
-/*#zoom-in {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-#zoom-out {}*/
-.zoom-button {
-    display: block;
-    width: 50px;
-    height: 50px;
     font-size: 35px;
     /*padding: 0px 5px;*/
     font-weight: bold;
@@ -982,6 +997,14 @@ ul li{
   display: block !important;
   background: steelblue;
   height: 2em;
+}
+
+#demo-logo {
+  position: absolute;
+  display: none;
+  bottom: 50px;
+  font-size: 35px;
+  height: auto !important;
 }
 
 .ui_tpicker_time {

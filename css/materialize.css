@@ -3397,7 +3397,7 @@ nav ul a span.badge {
 .row {
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 20px;
+  margin-bottom: 3px;
 }
 
 .row:after {
@@ -4215,11 +4215,11 @@ nav .input-field label.active i {
     min-height: 64px;
   }
   nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
-    height: 50px;
-    line-height: 50px;
+    height: 25px;
+    line-height: 25px;
   }
   .navbar-fixed {
-    height: 50px;
+    height: 25px;
   }
 }
 
@@ -4321,9 +4321,9 @@ h4 {
 }
 
 h5 {
-  font-size: 1.64rem;
+  font-size: 1.34rem;
   line-height: 110%;
-  margin: 0.82rem 0 0.656rem 0;
+  margin: 0.3rem 0 0.3rem 0;
 }
 
 h6 {
@@ -6559,8 +6559,8 @@ form p:last-child {
   content: "";
   display: inline-block;
   position: relative;
-  width: 40px;
-  height: 15px;
+  width: 37px;
+  height: 10px;
   background-color: #818181;
   border-radius: 15px;
   margin-right: 10px;
@@ -6573,12 +6573,12 @@ form p:last-child {
   content: "";
   position: absolute;
   display: inline-block;
-  width: 21px;
-  height: 21px;
+  width: 14px;
+  height: 14px;
   background-color: #F1F1F1;
   border-radius: 21px;
   box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.4);
-  left: -5px;
+  left: 0px;
   top: -3px;
   transition: left 0.3s ease, background .3s ease, box-shadow 0.1s ease;
 }

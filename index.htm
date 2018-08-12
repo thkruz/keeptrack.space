@@ -23,12 +23,12 @@
     <!--Import Materialize CSS-->
     <link rel="stylesheet" href="css/materialize.css">
 
-    <title>Keep Track</title>
+    <title>Keeptrack.space</title>
   </head>
   <body class="no-text-select">
   <div id="loading-screen" class="valign-wrapper full-loader">
     <div id="logo-inner-container" class="valign">
-      <span id="logo-text">Keeptrack</span>
+      <span class="logo-font">KEEP TRACK</span>
       <div class="preloader-wrapper active">
         <div class="spinner-layer spinner-white-only">
           <div class="circle-clipper left">
@@ -944,7 +944,7 @@
           <div class="sat-info-value" id="sat-country">COUNTRY</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Launch Site</div>
+          <div class="sat-info-key">Site</div>
           <div class="sat-info-value" id="sat-site">SITE</div>
         </div>
         <div class="sat-info-row">
@@ -952,7 +952,7 @@
           <div class="sat-info-value" id="sat-sitec">LAUNCH COUNTRY</div>
         </div>
         <div class="sat-info-row">
-          <div class="sat-info-key">Launch Vehicle</div>
+          <div class="sat-info-key">Rocket</div>
           <div class="sat-info-value" id="sat-vehicle">VEHICLE</div>
         </div>
         <div class="sat-info-row sat-only-info">
@@ -1027,11 +1027,11 @@
           </div>
           <div class="sat-info-value" id="sat-range">XXXX km</div>
         </div>
-        <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Next Time in Coverage">
+        <div id="sat-info-nextpass-row" class="sat-info-row sat-only-info">
+          <div id="sat-info-nextpass" class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Next Time in Coverage">
             Next Pass
           </div>
-          <div class="sat-info-value" id="sat-nextpass">00:00:00z</div>
+          <div class="sat-info-value">00:00:00z</div>
         </div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Time for One Complete Revolution Around Earth">
@@ -1058,12 +1058,6 @@
         </div>
       </div>
       <div id="mobile-controls">
-        <div id="controls-zoom-in">
-          <div id="zoom-in" class="zoom-button">+</div>
-        </div>
-        <div id="controls-zoom-out">
-          <div id="zoom-out" class="zoom-button">-</div>
-        </div>
         <div id="controls-up-wrapper">
           <center>
             <div id="controls-up">
@@ -1075,20 +1069,23 @@
           <div id="left" class="zoom-button"><img src="images/left-arrow.png"></img></div>
         </div>
         <div id="controls-down-wrapper">
-          <center>
+            <div id="controls-zoom-in">
+              <div id="zoom-in" class="zoom-button">+</div>
+            </div>
+            <div id="controls-zoom-out">
+              <div id="zoom-out" class="zoom-button">-</div>
+            </div>
             <div id="controls-down">
                 <div id="down" class="zoom-button"><img src="images/down-arrow.png"></img></div>
             </div>
-          </center>
         </div>
         <div id="controls-right">
           <div id="right" class="zoom-button"><img src="images/right-arrow.png"></img></div>
         </div>
       </div>
-
       <div id="bottom-menu">Current Objects</div>
-
     </div>
+    <div id="demo-logo" class="logo-font start-hidden">Keeptrack.space</div>
   </main>
 
   <footer id="nav-footer" class="page-footer">

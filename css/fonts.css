@@ -80,6 +80,13 @@
   	font-style: normal;
   }
 
+  @font-face {
+    font-family: 'nasalization';
+    font-style: normal;
+    font-weight: 400;
+    src: url('fonts/nasalization-rg.ttf') format('truetype');
+  }
+
   .ui-icon {
   	font-family: 'icomoon';
   	speak: none;

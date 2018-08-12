@@ -5,8 +5,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.34.1';
-  settingsManager.versionDate = 'August 11, 2018';
+  settingsManager.versionNumber = 'v0.35.0';
+  settingsManager.versionDate = 'August 12, 2018';
 
   // Offline management
   settingsManager.offlineLocation = '';
@@ -125,10 +125,13 @@
   settingsManager.isMapUpdateOverride = false;
   settingsManager.lastMapUpdateTime = 0;
 
+  settingsManager.cameraMovementSpeed = 0.005;
+
   // /////////////////
   // Mobile settings
   // /////////////////
   settingsManager.desktopMinimumWidth = 1000;
+  settingsManager.isMobileModeEnabled = false;
 
   window.settingsManager = settingsManager;
 })();

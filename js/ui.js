@@ -196,18 +196,27 @@ var lkpassed = false;
     (function _canvasController () {
       canvasDOM.on('touchmove', function (evt) {
         evt.preventDefault();
-        mouseX = evt.originalEvent.touches[0].clientX;
-        mouseY = evt.originalEvent.touches[0].clientY;
-        if (isDragging && screenDragPoint[0] !== mouseX && screenDragPoint[1] !== mouseY) {
-          dragHasMoved = true;
-          camAngleSnappedOnSat = false;
-          camZoomSnappedOnSat = false;
+        if (isPinching) {
+          var currentPinchDistance = Math.hypot(
+            evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX,
+            evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY);
+          deltaPinchDistance = ((startPinchDistance - currentPinchDistance) / maxPinchSize);
+          zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed + 0.002);
+          zoomTarget = Math.min(Math.max(zoomTarget, 0), 1); // Force between 0 and 1
+        } else { // Dont Move While Zooming
+          mouseX = evt.originalEvent.touches[0].clientX;
+          mouseY = evt.originalEvent.touches[0].clientY;
+          if (isDragging && screenDragPoint[0] !== mouseX && screenDragPoint[1] !== mouseY) {
+            dragHasMoved = true;
+            camAngleSnappedOnSat = false;
+            camZoomSnappedOnSat = false;
+          }
+          isMouseMoving = true;
+          clearTimeout(mouseTimeout);
+          mouseTimeout = setTimeout(function () {
+            isMouseMoving = false;
+          }, 250);
         }
-        isMouseMoving = true;
-        clearTimeout(mouseTimeout);
-        mouseTimeout = setTimeout(function () {
-          isMouseMoving = false;
-        }, 250);
       });
       canvasDOM.mousemove(function (evt) {
         mouseX = evt.clientX;
@@ -229,8 +238,7 @@ var lkpassed = false;
           delta *= 33.3333333;
         }
         zoomTarget += delta * 0.0002;
-        if (zoomTarget > 1) zoomTarget = 1;
-        if (zoomTarget < 0) zoomTarget = 0;
+        zoomTarget = Math.min(Math.max(zoomTarget, 0), 1); // Force between 0 and 1
         rotateTheEarth = false;
         camZoomSnappedOnSat = false;
 
@@ -253,26 +261,36 @@ var lkpassed = false;
         dragStartYaw = camYaw;
         // debugLine.set(dragPoint, getCamPos());
         isDragging = true;
-        if ($(document).width() <= 1000) {
-          isDragging = false;
-        }
+        // if ($(document).width() <= 1000) {
+        //   isDragging = false;
+        // }
         camSnapMode = false;
         rotateTheEarth = false;
       });
       canvasDOM.on('touchstart', function (evt) {
-        var x = evt.originalEvent.touches[0].clientX;
-        var y = evt.originalEvent.touches[0].clientY;
-        dragPoint = getEarthScreenPoint(x, y);
-        screenDragPoint = [x, y];
-        dragStartPitch = camPitch;
-        dragStartYaw = camYaw;
-        // debugLine.set(dragPoint, getCamPos());
-        isDragging = true;
-        if ($(document).width() <= 1000) {
-          isDragging = false;
+        if (evt.originalEvent.touches.length > 1) { // Two Finger Touch
+            isPinching = true;
+            startPinchDistance = Math.hypot(
+              evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX,
+              evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY);
+            // _pinchStart(evt);
+        } else { // Single Finger Touch
+          var x = evt.originalEvent.touches[0].clientX;
+          var y = evt.originalEvent.touches[0].clientY;
+          settingsManager.cameraMovementSpeed = Math.max(0.01 * zoomLevel, 0.0005);
+          screenDragPoint = [x, y];
+          // dragPoint = getEarthScreenPoint(x, y);
+          dragPoint = screenDragPoint; // NOTE: Ignore the earth on mobile
+          dragStartPitch = camPitch;
+          dragStartYaw = camYaw;
+          // debugLine.set(dragPoint, getCamPos());
+          isDragging = true;
+          // if ($(document).width() <= 1000) {
+          //   isDragging = false;
+          // }
+          camSnapMode = false;
+          rotateTheEarth = false;
         }
-        camSnapMode = false;
-        rotateTheEarth = false;
       });
       canvasDOM.mouseup(function (evt) {
         if (!dragHasMoved) {
@@ -323,6 +341,12 @@ var lkpassed = false;
         rotateTheEarth = false;
       });
       canvasDOM.on('touchend', function (evt) {
+        if (isPinching) {
+            // pinchEnd(e);
+            isPinching = false;
+        }
+        mouseY = 0;
+        mouseX = 0;
         dragHasMoved = false;
         isDragging = false;
         rotateTheEarth = false;
@@ -2446,20 +2470,6 @@ var lkpassed = false;
     if (touchHoldButton === 'zoom-out') {
       zoomTarget += 0.0025;
       if (zoomTarget > 1) zoomTarget = 1;
-    }
-    if (touchHoldButton === 'move-up') {
-      camPitchSpeed += 0.000075 * zoomLevel;
-      if (camPitch > Math.PI / 2) camPitchSpeed = 0;
-    }
-    if (touchHoldButton === 'move-down') {
-      camPitchSpeed -= 0.000075 * zoomLevel;
-      if (camPitch < -Math.PI / 2) camPitchSpeed = 0;
-    }
-    if (touchHoldButton === 'move-left') {
-      camYawSpeed -= 0.0002 * zoomLevel;
-    }
-    if (touchHoldButton === 'move-right') {
-      camYawSpeed += 0.0002 * zoomLevel;
     }
   }
 

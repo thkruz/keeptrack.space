@@ -129,6 +129,10 @@ var dragStartYaw = 0;
 var isDragging = false;
 var dragHasMoved = false;
 
+var isPinching = false;
+var deltaPinchDistance = 0;
+var startPinchDistance = 0;
+
 var FPSPitch = 0;
 var FPSPitchRate = 0;
 var FPSRotate = 0;
@@ -209,10 +213,18 @@ var drawLoopCallback;
     earth.init();
     ColorScheme.init();
     satSet.init(function satSetInitCallBack (satData) {
+      console.log(satData.length + 4);
       $('#loader-text').text('Coloring Inside the Lines...');
+      console.log(satData.length + 5);
       orbitDisplay.init();
+      console.log(satData.length + 6);
       groups.init();
+      console.log(satData.length + 7);
       searchBox.init(satData);
+      console.log(satData.length + 8);
+      // if (settingsManager.isMobileModeEnabled) {
+        mobile.init();
+      // }
 
       // debugLine = new Line();
       // debugLine2 = new Line();
@@ -274,16 +286,19 @@ var drawLoopCallback;
     time = drawNow;
     timeManager.now = drawNow;
 
-    if (isDragging) {
+    if ((isDragging && !settingsManager.isMobileModeEnabled) ||
+         isDragging && settingsManager.isMobileModeEnabled && (mouseX !== 0 || mouseY !== 0)) {
       dragTarget = getEarthScreenPoint(mouseX, mouseY);
       if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
-      isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) || cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE) { // random screen drag
+      isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
+      cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE ||
+      settingsManager.isMobileModeEnabled) { // random screen drag
         xDif = screenDragPoint[0] - mouseX;
         yDif = screenDragPoint[1] - mouseY;
-        yawTarget = dragStartYaw + xDif * 0.005;
-        pitchTarget = dragStartPitch + yDif * -0.005;
-        camPitchSpeed = _normalizeAngle(camPitch - pitchTarget) * -0.005;
-        camYawSpeed = _normalizeAngle(camYaw - yawTarget) * -0.005;
+        yawTarget = dragStartYaw + xDif * settingsManager.cameraMovementSpeed;
+        pitchTarget = dragStartPitch + yDif * -settingsManager.cameraMovementSpeed;
+        camPitchSpeed = _normalizeAngle(camPitch - pitchTarget) * -settingsManager.cameraMovementSpeed;
+        camYawSpeed = _normalizeAngle(camYaw - yawTarget) * -settingsManager.cameraMovementSpeed;
       } else {  // earth surface point drag
         dragPointR = Math.sqrt(dragPoint[0] * dragPoint[0] + dragPoint[1] * dragPoint[1]);
         dragTargetR = Math.sqrt(dragTarget[0] * dragTarget[0] + dragTarget[1] * dragTarget[1]);
@@ -296,16 +311,16 @@ var drawLoopCallback;
 
         pitchDif = dragPointLat - dragTargetLat;
         yawDif = _normalizeAngle(dragPointLon - dragTargetLon);
-        camPitchSpeed = pitchDif * 0.005;
-        camYawSpeed = yawDif * 0.005;
+        camPitchSpeed = pitchDif * settingsManager.cameraMovementSpeed;
+        camYawSpeed = yawDif * settingsManager.cameraMovementSpeed;
       }
       camSnapMode = false;
     } else {
-      camPitchSpeed -= (camPitchSpeed * dt * 0.005); // decay speeds when globe is "thrown"
-      camYawSpeed -= (camYawSpeed * dt * 0.005);
+      camPitchSpeed -= (camPitchSpeed * dt * settingsManager.cameraMovementSpeed); // decay speeds when globe is "thrown"
+      camYawSpeed -= (camYawSpeed * dt * settingsManager.cameraMovementSpeed);
     }
 
-    camRotateSpeed -= (camRotateSpeed * dt * 0.005);
+    camRotateSpeed -= (camRotateSpeed * dt * settingsManager.cameraMovementSpeed);
 
     if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE) {
       FPSPitch -= 20 * camPitchSpeed * dt;
@@ -331,7 +346,7 @@ var drawLoopCallback;
       zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dt * 0.0025;
     } else {
       zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dt * 0.0075;
-      if (zoomLevel >= zoomTarget - 0.005 && zoomLevel <= zoomTarget + 0.005) {
+      if (zoomLevel >= zoomTarget - settingsManager.cameraMovementSpeed && zoomLevel <= zoomTarget + settingsManager.cameraMovementSpeed) {
         zoomLevel = zoomTarget;
       }
     }

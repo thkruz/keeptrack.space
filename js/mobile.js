@@ -78,6 +78,7 @@ var maxPinchSize = 1;
     } else if (document.documentElement.webkitRequestFullscreen) {
       document.documentElement.webkitRequestFullscreen();
     }
+    uiController.resize2DMap();
   };
 
   window.mobile = mobile;

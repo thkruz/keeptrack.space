@@ -180,11 +180,11 @@ or mirrored at any other location without the express written permission of the 
     if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
       SCnow = Date.now();
       if (SCnow > settingsManager.lastMapUpdateTime + 30000) {
-        updateMap();
+        uiController.updateMap();
         settingsManager.lastMapUpdateTime = SCnow;
         settingsManager.isMapUpdateOverride = false;
       } else if (settingsManager.isMapUpdateOverride) {
-        updateMap();
+        uiController.updateMap();
         settingsManager.lastMapUpdateTime = SCnow;
         settingsManager.isMapUpdateOverride = false;
       }

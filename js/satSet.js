@@ -208,63 +208,6 @@ or mirrored at any other location without the express written permission of the 
       $('#version-info').html(settingsManager.versionNumber);
       $('#version-info').tooltip({delay: 50, tooltip: settingsManager.versionDate, position: 'top'});
 
-      // Loading Screen Resized
-        $('#loading-screen').removeClass('full-loader');
-        $('#loading-screen').addClass('mini-loader-container');
-        $('#logo-inner-container').addClass('mini-loader');
-        $('#logo-text').html('');
-        $('#loader-text').html('Attempting to Math...');
-
-      // Hide Menus on Small Screens
-      if ($(document).width() <= settingsManager.desktopMinimumWidth) {
-        settingsManager.isMobileModeEnabled = true;
-        // TODO FullScreen Option
-        // document.documentElement.webkitRequestFullScreen();
-        $('#menu-sensor-info img').hide();
-        $('#menu-in-coverage img').hide();
-        // $('#menu-lookangles img').removeClass('bmenu-item-disabled');
-        // $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
-        $('#zoom-in').show();
-        $('#zoom-out').show();
-        $('#zoom-in img').removeClass('bmenu-item-disabled');
-        $('#zoom-out img').removeClass('bmenu-item-disabled');
-        $('#menu-find-sat img').removeClass('bmenu-item-disabled');
-        $('#menu-twitter img').hide();
-        $('#menu-weather img').hide();
-        // $('#menu-map img').removeClass('bmenu-item-disabled');
-        $('#menu-launches img').hide();
-        $('#menu-about img').removeClass('bmenu-item-disabled');
-        $('#menu-about img').attr('style', 'border-right:0px;');
-        $('#menu-space-stations img').hide();
-        $('#menu-satellite-collision img').removeClass('bmenu-item-disabled');
-        $('#menu-customSensor img').removeClass('bmenu-item-disabled');
-        $('#menu-settings').hide();
-        $('#menu-editSat img').show();
-        $('#menu-newLaunch img').hide();
-        $('#menu-missile img').show();
-        $('#social').hide();
-        $('#version-info').hide();
-        $('#legend-menu').hide();
-        $('#mobile-warning').show();
-        $('#changelog-row').addClass('center-align');
-        $('#fastCompSettings').hide();
-        $('#social-alt').show();
-        $('.side-menu').attr('style', 'width:100%;height:auto;');
-        $('#canvas-holder').attr('style', 'overflow:auto;');
-        $('#datetime').attr('style', 'position:fixed;left:130px;top:10px;width:141px;height:32px');
-        $('#datetime-text').attr('style', 'padding:6px;height:100%;');
-        $('#datetime-input').attr('style', 'bottom:0px;');
-        $('#bottom-icons').attr('style', 'position:inherit;');
-        $('#mobile-controls').show();
-        $('#search').attr('style', 'width:55px;');
-        if ($(document).height() >= 600) {
-          $('#sat-infobox').attr('style', 'width:100%;top:75%; padding: 0px 5%;');
-        } else {
-          $('#sat-infobox').attr('style', 'width:100%;top:60%; padding: 0px 5%;');
-        }
-        $('.sat-info-value').attr('style', 'width:45%;float: right; text-overflow: ellipsis; overflow: hidden;');
-      }
-
       /** Hide SOCRATES menu if not all the satellites are currently available to view */
       if (limitSats !== '') {
         $('#menu-satellite-collision img').hide();
@@ -280,7 +223,6 @@ or mirrored at any other location without the express written permission of the 
       }
 
       // $('#load-cover').fadeOut();
-      $('#loading-screen').fadeOut();
       $('body').attr('style', 'background:black');
       $('#canvas-holder').attr('style', 'display:block');
       // $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
@@ -303,6 +245,20 @@ or mirrored at any other location without the express written permission of the 
       $('#menu-settings img').removeClass('bmenu-item-disabled');
       $('#menu-planetarium img').removeClass('bmenu-item-disabled');
       settingsManager.isBottomIconsEnabled = true;
+
+      if (settingsManager.isMobileModeEnabled) { // Start Button Displayed
+        $('#mobile-start-button').show();
+        $('#spinner').hide();
+        $('#loader-text').html('');
+      } else { // Loading Screen Resized and Hidden
+        $('#loading-screen').removeClass('full-loader');
+        $('#loading-screen').addClass('mini-loader-container');
+        $('#logo-inner-container').addClass('mini-loader');
+        $('#logo-text').html('');
+        $('#loader-text').html('Attempting to Math...');
+        $('#loading-screen').fadeOut();
+      }
+
       satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
       settingsManager.cruncherReady = true;
       if (cruncherReadyCallback) {

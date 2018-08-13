@@ -82,3 +82,8 @@ body {
     width: 50px;
     position: relative;
 }
+
+#mobile-start-button {
+  display: none;
+  margin-top: 10px;
+}

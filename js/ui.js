@@ -259,10 +259,10 @@ var lkpassed = false;
               evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY);
             // _pinchStart(evt);
         } else { // Single Finger Touch
-          var x = evt.originalEvent.touches[0].clientX;
-          var y = evt.originalEvent.touches[0].clientY;
-          settingsManager.cameraMovementSpeed = Math.max(0.01 * zoomLevel, 0.0005);
-          screenDragPoint = [x, y];
+          mouseX = evt.originalEvent.touches[0].clientX;
+          mouseY = evt.originalEvent.touches[0].clientY;
+          settingsManager.cameraMovementSpeed = Math.max(0.005 * zoomLevel, settingsManager.cameraMovementSpeedMin);
+          screenDragPoint = [mouseX, mouseY];
           // dragPoint = getEarthScreenPoint(x, y);
           dragPoint = screenDragPoint; // NOTE: Ignore the earth on mobile
           dragStartPitch = camPitch;

@@ -309,8 +309,14 @@ var drawLoopCallback;
       }
       camSnapMode = false;
     } else {
-      camPitchSpeed -= (camPitchSpeed * dt * settingsManager.cameraMovementSpeed); // decay speeds when globe is "thrown"
-      camYawSpeed -= (camYawSpeed * dt * settingsManager.cameraMovementSpeed);
+      // DESKTOP ONLY
+      if (!settingsManager.isMobileModeEnabled) {
+        camPitchSpeed -= (camPitchSpeed * dt * settingsManager.cameraMovementSpeed); // decay speeds when globe is "thrown"
+        camYawSpeed -= (camYawSpeed * dt * settingsManager.cameraMovementSpeed);
+      } else if (settingsManager.isMobileModeEnabled) { // MOBILE
+        camPitchSpeed -= (camPitchSpeed * dt * settingsManager.cameraMovementSpeed * 5); // decay speeds when globe is "thrown"
+        camYawSpeed -= (camYawSpeed * dt * settingsManager.cameraMovementSpeed  * 5);
+      }
     }
 
     camRotateSpeed -= (camRotateSpeed * dt * settingsManager.cameraMovementSpeed);

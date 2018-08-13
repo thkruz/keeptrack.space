@@ -351,7 +351,7 @@ or mirrored at any other location without the express written permission of the 
 
     if (!settingsManager.offline) {
       var tleSource = settingsManager.tleSource;
-      $.get('' + tleSource, function (resp) {
+      $.get('' + tleSource + '?v=' + settingsManager.versionNumber, function (resp) {
         loadTLEs(resp);
       });
       jsTLEfile = null;
@@ -360,7 +360,7 @@ or mirrored at any other location without the express written permission of the 
       jsTLEfile = null;
     }
 
-    function loadTLEs (resp) { // + '?fakeparameter=to_avoid_browser_cache'
+    function loadTLEs (resp) {
       var obslatitude;
       var obslongitude;
       var obsheight;

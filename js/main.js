@@ -117,8 +117,8 @@ cameraType.FPS = 2;
 cameraType.PLANETARIUM = 3;
 cameraType.SATELLITE = 4;
 
-var mouseX;
-var mouseY;
+var mouseX = 0;
+var mouseY = 0;
 var mouseTimeout = null;
 var mouseSat = -1;
 var isMouseMoving = false;

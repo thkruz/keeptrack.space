@@ -295,7 +295,7 @@ ul {
   padding-left: 35px;
   color: white;
   background: #0a97d6;
-  top: 50px;
+  top: 25px;
   right: 0px;
   z-index: 100;
   position: absolute;
@@ -307,6 +307,7 @@ ul {
 }
 
 .Square-Box {
+  cursor: pointer;
   width: 22px;
   height: 22px;
   border-width: 2px;

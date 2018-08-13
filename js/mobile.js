@@ -58,6 +58,7 @@ var maxPinchSize = 1;
   });
   mobile.init = function () {
     maxPinchSize = Math.hypot($(document).width(),$(document).height());
+    settingsManager.cameraMovementSpeed = 0.005;
   };
   mobile.start = function () {
     $('#loading-screen').removeClass('full-loader');

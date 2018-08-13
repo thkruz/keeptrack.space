@@ -56,10 +56,24 @@
   var sat, color;
   ColorScheme.init = function () {
     ColorScheme.default = new ColorScheme(function (sat) {
+      if (sat.static && sat.type === 'Launch Facility' && ColorScheme.objectTypeFlags.purple === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
+
       if (sat.static && sat.type === 'Launch Facility') {
         return {
-          color: [0.54, 0.0, 0.54, 1.0],
+          color: [0.64, 0.0, 0.64, 1.0],
           pickable: true
+        };
+      }
+
+      if (sat.static && ColorScheme.objectTypeFlags.red === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
         };
       }
       if (sat.static) {
@@ -83,26 +97,31 @@
 
       // NOTE: ColorScheme.objectTypeFlags code
 
-      if (sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) {
+      if (!sat.inview && sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) {
         return {
           color: [1.0, 1.0, 1.0, 0],
           pickable: false
         };
       }
-      if (sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) {
+      if (!sat.inview && sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) {
         return {
           color: [1.0, 1.0, 1.0, 0],
           pickable: false
         };
       }
-      if (sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) {
+      if (!sat.inview && sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) {
         return {
           color: [1.0, 1.0, 1.0, 0],
           pickable: false
         };
       }
 
-
+      if (sat.inview && ColorScheme.objectTypeFlags.orange === false) {
+        return {
+          color: [1.0, 1.0, 1.0, 0],
+          pickable: false
+        };
+      }
 
       if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
         color = [0.85, 0.5, 0.0, 1.0];

@@ -329,7 +329,6 @@ or mirrored at any other location without the express written permission of the 
         }
       }
     })();
-    console.log(0);
     dotShader = gl.createProgram();
 
     vertShader = gl.createShader(gl.VERTEX_SHADER);
@@ -349,7 +348,6 @@ or mirrored at any other location without the express written permission of the 
     dotShader.uMvMatrix = gl.getUniformLocation(dotShader, 'uMvMatrix');
     dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
     dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
-    console.log(1);
 
     if (!settingsManager.offline) {
       var tleSource = settingsManager.tleSource;
@@ -599,8 +597,6 @@ or mirrored at any other location without the express written permission of the 
       // multThreadCruncher6.postMessage({type: 'init', data: satSet.satDataString});
       // multThreadCruncher7.postMessage({type: 'init', data: satSet.satDataString});
       // multThreadCruncher8.postMessage({type: 'init', data: satSet.satDataString});
-      $('#loader-text').text('Drawing Satellites...');
-      console.log(2);
 
       // populate GPU mem buffers, now that we know how many sats there are
       satPosBuf = gl.createBuffer();
@@ -609,7 +605,6 @@ or mirrored at any other location without the express written permission of the 
       var pickColorData = [];
       pickColorBuf = gl.createBuffer();
       for (var i = 0; i < satData.length; i++) {
-        console.log(i);
         var byteR = (i + 1) & 0xff;
         var byteG = ((i + 1) & 0xff00) >> 8;
         var byteB = ((i + 1) & 0xff0000) >> 16;
@@ -621,14 +616,10 @@ or mirrored at any other location without the express written permission of the 
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pickColorData), gl.STATIC_DRAW);
 
       satSet.numSats = satData.length;
-      console.log(satData.length + 1);
       satSet.setColorScheme(ColorScheme.default, true);
-      console.log(satData.length + 2);
       settingsManager.shadersReady = true;
       if (satsReadyCallback) {
-        console.log(satData.length + 3);
         satsReadyCallback(satData);
-        console.log(satData.length + 9);
       }
     }
   };

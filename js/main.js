@@ -213,18 +213,11 @@ var drawLoopCallback;
     earth.init();
     ColorScheme.init();
     satSet.init(function satSetInitCallBack (satData) {
-      console.log(satData.length + 4);
       $('#loader-text').text('Coloring Inside the Lines...');
-      console.log(satData.length + 5);
       orbitDisplay.init();
-      console.log(satData.length + 6);
       groups.init();
-      console.log(satData.length + 7);
       searchBox.init(satData);
-      console.log(satData.length + 8);
-      // if (settingsManager.isMobileModeEnabled) {
-        mobile.init();
-      // }
+      mobile.init();
 
       // debugLine = new Line();
       // debugLine2 = new Line();

@@ -243,7 +243,7 @@ or mirrored at any other location without the express written permission of the 
       $('#menu-customSensor img').removeClass('bmenu-item-disabled');
       $('#menu-missile img').removeClass('bmenu-item-disabled');
       $('#menu-settings img').removeClass('bmenu-item-disabled');
-      $('#menu-planetarium img').removeClass('bmenu-item-disabled');
+      // $('#menu-planetarium img').removeClass('bmenu-item-disabled');
       settingsManager.isBottomIconsEnabled = true;
 
       if (settingsManager.isMobileModeEnabled) { // Start Button Displayed

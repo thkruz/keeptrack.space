@@ -117,8 +117,8 @@ cameraType.FPS = 2;
 cameraType.PLANETARIUM = 3;
 cameraType.SATELLITE = 4;
 
-var mouseX = 0;
-var mouseY = 0;
+var mouseX;
+var mouseY;
 var mouseTimeout = null;
 var mouseSat = -1;
 var isMouseMoving = false;
@@ -928,6 +928,7 @@ function selectSat (satId) {
       sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
       selectedSat = -1;
       $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
+      $('#menu-planetarium img').removeClass('bmenu-item-disabled');
       if (selectedSat !== -1) {
         $('#menu-lookangles img').removeClass('bmenu-item-disabled');
       }

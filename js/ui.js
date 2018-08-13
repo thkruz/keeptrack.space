@@ -686,9 +686,11 @@ var lkpassed = false;
         sensorManager.setSensor(sensorManager.sensorList.XUA);
       });
 
-      $('.sensor-selected').click(function () {
+      $('.sensor-selected').click(function (e) {
+        if (e.target.id === 'radar-reset' || e.target.id === 'radar-reset2') return;
         satSet.setColorScheme(ColorScheme.default, true);
         $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
+        $('#menu-planetarium img').removeClass('bmenu-item-disabled');
         if (selectedSat !== -1) {
           $('#menu-lookangles img').removeClass('bmenu-item-disabled');
         }
@@ -1374,6 +1376,7 @@ var lkpassed = false;
 
       $('#customSensor').submit(function (e) {
         $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
+        $('#menu-planetarium img').removeClass('bmenu-item-disabled');
         sensorManager.whichRadar = 'CUSTOM';
         if ($('#cs-telescope').val()) {
           $('#sensor-type').html('Telescope');
@@ -2000,15 +2003,20 @@ var lkpassed = false;
           if (isPlanetariumView) {
             isPlanetariumView = false;
             _hideSideMenus();
+            orbitDisplay.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
             cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
             break;
           } else {
             _hideSideMenus();
             if (satellite.sensorSelected()) {
               cameraType.current = cameraType.PLANETARIUM; // Activate Planetarium Camera Mode
+              $('#menu-planetarium img').addClass('bmenu-item-selected');
+              isPlanetariumView = true;
+            } else {
+              if (!$('#menu-planetarium img:animated').length) {
+                $('#menu-planetarium img').effect('shake', {distance: 10});
+              }
             }
-            $('#menu-planetarium img').addClass('bmenu-item-selected');
-            isPlanetariumView = true;
             break;
           }
           break;
@@ -2180,6 +2188,8 @@ var lkpassed = false;
           // console.log('toggled rotation');
           break;
         case 99: // c
+          if (cameraType.current === cameraType.PLANETARIUM) orbitDisplay.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
+
           cameraType.current += 1;
           if (cameraType.current === cameraType.PLANETARIUM && !satellite.sensorSelected()) {
             cameraType.current = cameraType.SATELLITE;
@@ -2580,6 +2590,7 @@ var lkpassed = false;
     $('#menu-in-coverage img').addClass('bmenu-item-disabled');
     $('#menu-lookangles img').addClass('bmenu-item-disabled');
     $('#menu-weather img').addClass('bmenu-item-disabled');
+    $('#menu-planetarium img').addClass('bmenu-item-disabled');
 
     // setColorScheme ignores calls to recolor satellites when there is no sensor.
     // This is fixed by enabling isForceColorScheme

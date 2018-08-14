@@ -219,7 +219,7 @@ or mirrored at any other location without the express written permission of the 
         $('#reddit-share').hide();
         $('#menu-find-sat').hide();
         $('#sat-infobox').attr('style', 'width:100%;top:60%;');
-        $('#datetime').attr('style', 'position:fixed;left:85px;top:10px;width:141px;height:32px');
+        // $('#datetime').attr('style', 'position:fixed;left:85px;top:10px;width:141px;height:32px');
       }
 
       // $('#load-cover').fadeOut();

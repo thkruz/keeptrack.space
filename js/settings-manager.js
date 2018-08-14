@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.35.5';
+  settingsManager.versionNumber = 'v0.35.6';
   settingsManager.versionDate = 'August 13, 2018';
 
   // Offline management
@@ -133,6 +133,9 @@
   // /////////////////
   settingsManager.desktopMinimumWidth = 1000;
   settingsManager.isMobileModeEnabled = false;
+  if ($(document).width() <= settingsManager.desktopMinimumWidth) {
+    settingsManager.isMobileModeEnabled = true;
+  }
 
   window.settingsManager = settingsManager;
 })();

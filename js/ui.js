@@ -160,7 +160,7 @@ var lkpassed = false;
         sliderAccessArgs: { touchonly: false }}).on('change.dp', function (e) { // or 7 days in the future to make sure ELSETs are valid
           // NOTE: This code gets called when the done button is pressed or the time sliders are closed
           $('#datetime-input').fadeOut();
-          $('#datetime-text').fadeIn();
+          // $('#datetime-text').fadeIn();
           _updateNextPassOverlay(true);
           settingsManager.isEditTime = false;
         });
@@ -355,7 +355,7 @@ var lkpassed = false;
 
       $('#datetime-text').click(function () {
         if (!settingsManager.isEditTime) {
-          $('#datetime-text').fadeOut();
+          // $('#datetime-text').fadeOut();
           $('#datetime-input').fadeIn();
           $('#datetime-input-tb').focus();
           settingsManager.isEditTime = true;

@@ -125,6 +125,7 @@ ul {
 }
 
 #sat-hoverbox {
+    display: none;
     background: black;
     cursor: default;
     color: white;
@@ -687,6 +688,7 @@ ul li{
 .sat-info-value {
     float: right;
     width: 100px;
+    height: 20px;
     text-overflow: ellipsis;
     overflow: hidden;
 }
@@ -700,13 +702,23 @@ ul li{
   margin-top: 25px;
 }
 
+.ui-priority-secondary {
+  font-weight: bold !important;
+  opacity: 1 !important;
+}
+
+@media (max-width: 600px) {
+.material-tooltip {
+  display: none !important;
+}
 #datetime {
-    position: absolute;
-    left: 20px;
-    bottom: -5px;
     z-index: 11;
-    width: 160px;
-    height: 50px;
+    position: fixed;
+    left: 115px;
+    top: 0px;
+    width: 85px;
+    height: 45px;
+    text-align: center;
     background: transparent;
     overflow: hidden;
 }
@@ -719,9 +731,9 @@ ul li{
   #datetime-input-tb {
       color: white;
       font-family: 'Droid Sans', sans-serif;
-      padding: 10px 10px 11px 10px;
+      /* Hides it above the top of the screen */
       height: 0px !important;
-      margin: 0 0 8px 0 !important;
+      margin: 0 0 55px 0 !important;
   }
     #datetime-input-tb:focus, input:focus {
         outline: none;
@@ -741,10 +753,60 @@ ul li{
   #datetime-text {
       padding: 10px
   }
+  #datetime-text:hover {
+      background: rgba(255, 255, 255, .2);
+      border-radius: 5px;
+  }
+}
+
+@media (min-width: 601px) {
+  #datetime {
+      position: absolute;
+      left: 20px;
+      bottom: -5px;
+      z-index: 11;
+      width: 160px;
+      height: 50px;
+      background: transparent;
+      overflow: hidden;
+  }
+  #datetime-input {
+      position: absolute;
+      left: 0px;
+      bottom: 10px;
+      display: none;
+  }
+    #datetime-input-tb {
+        color: white;
+        font-family: 'Droid Sans', sans-serif;
+        padding: 10px 10px 11px 10px;
+        /* Moves it below screen */
+        height: 0px !important;
+        margin: 0 0 55px 0 !important;
+    }
+      #datetime-input-tb:focus, input:focus {
+          outline: none;
+      }
+  #datetime-title {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    width: 220px;
+    height: 30px;
+    background: transparent;
+    overflow: hidden;
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+  }
+    #datetime-text {
+        padding: 10px
+    }
     #datetime-text:hover {
         background: rgba(255, 255, 255, .2);
         border-radius: 5px;
     }
+}
 
 .ui-icon-minus {
   margin: auto !important;

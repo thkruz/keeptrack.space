@@ -41,7 +41,7 @@ var maxPinchSize = 1;
       $('#social-alt').show();
       $('.side-menu').attr('style', 'width:100%;height:auto;');
       $('#canvas-holder').attr('style', 'overflow:auto;');
-      $('#datetime').attr('style', 'position:fixed;left:130px;top:10px;width:141px;height:32px');
+      // $('#datetime').attr('style', 'position:fixed;left:130px;top:10px;width:141px;height:32px');
       $('#datetime-text').attr('style', 'padding:6px;height:100%;');
       $('#datetime-input').attr('style', 'bottom:0px;');
       $('#bottom-icons').attr('style', 'position:inherit;');

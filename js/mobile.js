@@ -47,21 +47,19 @@ var maxPinchSize = 1;
       $('#bottom-icons').attr('style', 'position:inherit;');
       $('#mobile-controls').show();
       $('#search').attr('style', 'width:55px;');
-      if ($(document).height() >= 600) {
-        $('#sat-infobox').attr('style', 'width:100%;top:75%; padding: 0px 5%;');
-      } else {
-        $('#sat-infobox').attr('style', 'width:100%;top:60%; padding: 0px 5%;');
-      }
+      // if ($(document).height() >= 600) {
+      //   $('#sat-infobox').attr('style', 'width:100%;top:75%; padding: 0px 5%;');
+      // } else {
+      //   $('#sat-infobox').attr('style', 'width:100%;top:60%; padding: 0px 5%;');
+      // }
       $('.sat-info-value').attr('style', 'width:45%;float: right; text-overflow: ellipsis; overflow: hidden;');
   }
 
   });
-  mobile.init = function () {
+  mobile.start = function () {
     maxPinchSize = Math.hypot($(document).width(),$(document).height());
     settingsManager.cameraMovementSpeed = 0.0001;
     settingsManager.cameraMovementSpeedMin = 0.0001;
-  };
-  mobile.start = function () {
     $('#loading-screen').removeClass('full-loader');
     $('#loading-screen').addClass('mini-loader-container');
     $('#logo-inner-container').addClass('mini-loader');

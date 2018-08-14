@@ -17,11 +17,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=0.35.6" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=0.35.7" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=0.35.6" rel="stylesheet">
+    <link href="css/fonts.css?v=0.35.7" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=0.35.6">
+    <link rel="stylesheet" href="css/materialize.css?v=0.35.7">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -942,11 +942,11 @@
         <div id="all-objects-link" class="link sat-infobox-links sat-only-info">Find all objects from this launch...</div>
         <div id="near-objects-link" class="link sat-infobox-links">Find all objects near this object...</div>
         <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key">Int'l Designator</div>
+          <div class="sat-info-key">COSPAR</div>
           <div class="sat-info-value" id="sat-intl-des">XXXX-XXXA</div>
         </div>
         <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key">Object number</div>
+          <div class="sat-info-key">NORAD</div>
           <div class="sat-info-value" id="sat-objnum">99999</div>
         </div>
         <div class="sat-info-row">
@@ -1045,7 +1045,7 @@
           <div id="sat-info-nextpass" class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Next Time in Coverage">
             Next Pass
           </div>
-          <div class="sat-info-value">00:00:00z</div>
+          <div id="sat-nextpass" class="sat-info-value">00:00:00z</div>
         </div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Time for One Complete Revolution Around Earth">
@@ -1171,35 +1171,35 @@
   <script src="js/lib/materialize.min.js"></script>
   <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.min.js?v=0.35.6"></script>
+  <script src="js/lib/satellite.min.js?v=0.35.7"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=0.35.6"></script>
+  <script src="js/lib/shader-loader.min.js?v=0.35.7"></script>
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=0.35.6"></script>
-  <script src="js/time-manager.js?v=0.35.6"></script>
-  <script src="js/earth.js?v=0.35.6"></script>
-  <script src="js/satSet.js?v=0.35.6"></script>
-  <script src="js/sun.js?v=0.35.6"></script>
+  <script src="js/settings-manager.js?v=0.35.7"></script>
+  <script src="js/time-manager.js?v=0.35.7"></script>
+  <script src="js/earth.js?v=0.35.7"></script>
+  <script src="js/satSet.js?v=0.35.7"></script>
+  <script src="js/sun.js?v=0.35.7"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js?v=0.35.6"></script>
+  <script src="js/variables.js?v=0.35.7"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=0.35.6"></script>
+  <script src="js/ballistic-missile.js?v=0.35.7"></script>
   <!-- Load Extra Satellites -->
   <!-- <script src="extra.js"></script>
   <script src="satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=0.35.6"></script>
-  <script src="js/mobile.js?v=0.35.6"></script>
-  <script src="js/main.js?v=0.35.6"></script>
-  <script src="js/ui.js?v=0.35.6"></script>
-  <script src="js/lookangles.js?v=0.35.6"></script>
-  <script src="js/orbit-display.js?v=0.35.6"></script>
-  <script src="js/drawLoop-shapes.js?v=0.35.6"></script>
-  <script src="js/groups.js?v=0.35.6"></script>
-  <script src="js/search-box.js?v=0.35.6"></script>
+  <script src="js/color-scheme.js?v=0.35.7"></script>
+  <script src="js/mobile.js?v=0.35.7"></script>
+  <script src="js/main.js?v=0.35.7"></script>
+  <script src="js/ui.js?v=0.35.7"></script>
+  <script src="js/lookangles.js?v=0.35.7"></script>
+  <script src="js/orbit-display.js?v=0.35.7"></script>
+  <script src="js/drawLoop-shapes.js?v=0.35.7"></script>
+  <script src="js/groups.js?v=0.35.7"></script>
+  <script src="js/search-box.js?v=0.35.7"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

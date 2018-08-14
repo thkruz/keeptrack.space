@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.35.6';
+  settingsManager.versionNumber = 'v0.35.7';
   settingsManager.versionDate = 'August 13, 2018';
 
   // Offline management
@@ -125,7 +125,7 @@
   settingsManager.isMapUpdateOverride = false;
   settingsManager.lastMapUpdateTime = 0;
 
-  settingsManager.cameraMovementSpeed = 0.005;
+  settingsManager.cameraMovementSpeed = 0.003;
   settingsManager.cameraMovementSpeedMin = 0.005;
 
   // /////////////////

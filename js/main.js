@@ -217,7 +217,6 @@ var drawLoopCallback;
       orbitDisplay.init();
       groups.init();
       searchBox.init(satData);
-      mobile.init();
 
       // debugLine = new Line();
       // debugLine2 = new Line();

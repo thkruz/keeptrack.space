@@ -5,8 +5,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.35.7';
-  settingsManager.versionDate = 'August 13, 2018';
+  settingsManager.versionNumber = 'v0.35.8';
+  settingsManager.versionDate = 'August 14, 2018';
 
   // Offline management
   settingsManager.offlineLocation = '';
@@ -108,9 +108,6 @@
 
   settingsManager.minimumSearchCharacters = 2;
 
-  settingsManager.currentColorScheme = null;
-  settingsManager.otherSatelliteTransparency = 0.1;
-
   settingsManager.socratesOnSatCruncher = null;
 
   settingsManager.vertShadersSize = 12;
@@ -128,14 +125,50 @@
   settingsManager.cameraMovementSpeed = 0.003;
   settingsManager.cameraMovementSpeedMin = 0.005;
 
+  settingsManager.daysUntilObjectLost = 60;
+
   // /////////////////
-  // Mobile settings
+  // Mobile Settings
   // /////////////////
   settingsManager.desktopMinimumWidth = 1000;
   settingsManager.isMobileModeEnabled = false;
   if ($(document).width() <= settingsManager.desktopMinimumWidth) {
     settingsManager.isMobileModeEnabled = true;
+    settingsManager.cameraMovementSpeed = 0.0001;
+    settingsManager.cameraMovementSpeedMin = 0.0001;
   }
+
+  // /////////////////
+  // Color Settings
+  // /////////////////
+  settingsManager.currentColorScheme = null;
+  settingsManager.colors = {};
+  settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
+  settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
+  settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
+  settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
+  settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
+  settingsManager.colors.rocket = [0.2, 0.5, 1.0, 0.85];
+  settingsManager.colors.debris = [0.5, 0.5, 0.5, 0.85];
+  settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
+  settingsManager.colors.missile = [1.0, 1.0, 0.0, 1.0];
+  settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];
+  settingsManager.colors.otherSatellite = 0.1;
+  settingsManager.colors.transparent = [1.0, 1.0, 1.0, settingsManager.colors.otherSatellite];
+  settingsManager.colors.gradientAmt = 0;
+  // TODO: Gradients Must be Edited in color-scheme.js
+  // settingsManager.colors.apogeeGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
+  // settingsManager.colors.velGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
+  settingsManager.colors.smallSats = [0.2, 1.0, 0.0, 0.65];
+  settingsManager.colors.smallRCS = [1.0, 0, 0, 0.6];
+  settingsManager.colors.mediumRCS = [0, 0, 1.0, 0.6];
+  settingsManager.colors.largeRCS = [0, 1.0, 0, 0.6];
+  settingsManager.colors.unknownRCS = [1.0, 1.0, 0, 0.6];
+  settingsManager.colors.lostobjects = [0.2, 1.0, 0.0, 0.65];
+  settingsManager.colors.leo = [0.2, 1.0, 0.0, 0.65];
+  settingsManager.colors.geo = [0.2, 1.0, 0.0, 0.65];
+  settingsManager.colors.inGroup = [0.2, 1.0, 0.0, 0.5];
+
 
   window.settingsManager = settingsManager;
 })();

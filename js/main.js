@@ -204,7 +204,7 @@ var drawLoopCallback;
             settingsManager.tleSource = 'mw.json';
             break;
           case 'logo':
-            $('#demo-logo').show();
+            $('#demo-logo').removeClass('start-hidden');
             break;
           }
         }

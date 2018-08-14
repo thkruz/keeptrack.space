@@ -58,8 +58,6 @@ var maxPinchSize = 1;
   });
   mobile.start = function () {
     maxPinchSize = Math.hypot($(document).width(),$(document).height());
-    settingsManager.cameraMovementSpeed = 0.0001;
-    settingsManager.cameraMovementSpeedMin = 0.0001;
     $('#loading-screen').removeClass('full-loader');
     $('#loading-screen').addClass('mini-loader-container');
     $('#logo-inner-container').addClass('mini-loader');

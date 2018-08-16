@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.35.8';
+  settingsManager.versionNumber = 'v0.36.0b';
   settingsManager.versionDate = 'August 14, 2018';
 
   // Offline management
@@ -127,6 +127,8 @@
 
   settingsManager.daysUntilObjectLost = 60;
 
+  settingsManager.camDistBuffer = 2000;
+
   // /////////////////
   // Mobile Settings
   // /////////////////
@@ -134,9 +136,11 @@
   settingsManager.isMobileModeEnabled = false;
   if ($(document).width() <= settingsManager.desktopMinimumWidth) {
     settingsManager.isMobileModeEnabled = true;
-    settingsManager.cameraMovementSpeed = 0.0001;
-    settingsManager.cameraMovementSpeedMin = 0.0001;
+    settingsManager.camDistBuffer = 3500;
+    // settingsManager.cameraMovementSpeed = 0.0001;
+    // settingsManager.cameraMovementSpeedMin = 0.0001;
   }
+  settingsManager.isDisableSatHoverBox = false;
 
   // /////////////////
   // Color Settings

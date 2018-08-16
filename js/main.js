@@ -416,9 +416,9 @@ var drawLoopCallback;
         orbitDisplay.setSelectOrbit(satId);
       }
       if (altitude) {
-        camDistTarget = altitude + RADIUS_OF_EARTH + 2000;
+        camDistTarget = altitude + RADIUS_OF_EARTH + settingsManager.camDistBuffer;
       } else {
-        camDistTarget = RADIUS_OF_EARTH + 2000;  // Stay out of the center of the earth. You will get stuck there.
+        camDistTarget = RADIUS_OF_EARTH + settingsManager.camDistBuffer;  // Stay out of the center of the earth. You will get stuck there.
         console.warn('Zoom Calculation Error: ' + altitude + ' -- ' + camDistTarget);
         camZoomSnappedOnSat = false;
         camAngleSnappedOnSat = false;
@@ -600,12 +600,12 @@ var drawLoopCallback;
     }
     function _hoverBoxOnSat (satId, satX, satY) {
       if (satId === -1) {
-        if (!isHoverBoxVisible) return;
+        if (!isHoverBoxVisible || settingsManager.isDisableSatHoverBox) return;
         satHoverBoxDOM.html('(none)');
         satHoverBoxDOM.css({display: 'none'});
         canvasDOM.css({cursor: 'default'});
         isHoverBoxVisible = false;
-      } else if (!isDragging) {
+      } else if (!isDragging && !settingsManager.isDisableSatHoverBox) {
         try {
           var sat = satSet.getSat(satId);
           var selectedSatData = satSet.getSat(selectedSat);
@@ -879,23 +879,8 @@ function selectSat (satId) {
   var sat;
   if (satId === -1) {
     $('#sat-infobox').fadeOut();
-    if ($('#search-results').css('display') === 'block') {
-      if ($(document).width() <= 1000) {
-        $('#search-results').attr('style', 'display:block;height:110px;margin-bottom:-25px;width:100%;bottom:auto;margin-top:25px;');
-        $('#controls-up-wrapper').css('top', '180px');
-      } else {
-        $('#search-results').attr('style', 'display:block;max-height:100%;margin-bottom:-25px;');
-      }
-    } else {
-      if ($(document).width() <= 1000) {
-        $('#search-results').attr('style', 'height:110px;margin-bottom:-25px;width:100%;bottom:auto;margin-top:25px;');
-        $('#controls-up-wrapper').css('top', '80px');
-      } else {
-        $('#search-results').attr('style', 'max-height:100%;margin-bottom:-25px;');
-      }
-    }
     $('#iss-stream').html('');
-    $('#iss-stream-menu').fadeOut();
+    $('#iss-stream-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     orbitDisplay.clearSelectOrbit();
     // Remove Red Box
     $('#menu-lookanglesmultisite img').removeClass('bmenu-item-selected');
@@ -910,12 +895,12 @@ function selectSat (satId) {
     $('#menu-map img').addClass('bmenu-item-disabled');
     $('#menu-newLaunch img').addClass('bmenu-item-disabled');
     // Remove Side Menus
-    $('#lookanglesmultisite-menu').fadeOut();
-    $('#lookangles-menu').fadeOut();
-    $('#editSat-menu').fadeOut();
-    $('#map-menu').fadeOut();
-    $('#newLaunch-menu').fadeOut();
-    $('#customSensor-menu').fadeOut();
+    $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+    $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+    $('#editSat-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+    $('#map-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+    $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+    $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     // Toggle the side menus as closed
     isEditSatMenuOpen = false;
     isLookanglesMenuOpen = false;
@@ -956,16 +941,12 @@ function selectSat (satId) {
 
     if ($('#search-results').css('display') === 'block') {
       if ($(document).width() <= 1000) {
-        $('#search-results').attr('style', 'display:block; height:110px; width: 100%;bottom:auto;margin-top:25px;');
-        $('#controls-up-wrapper').css('top', '180px');
       } else {
         $('#search-results').attr('style', 'display:block; max-height:27%');
         $('#legend-hover-menu').hide();
       }
     } else {
       if ($(document).width() <= 1000) {
-        $('#search-results').attr('style', 'height:110px; width: 100%;bottom:auto;margin-top:25px;');
-        $('#controls-up-wrapper').css('top', '80px');
       } else {
         $('#search-results').attr('style', 'max-height:27%');
         $('#legend-hover-menu').hide();

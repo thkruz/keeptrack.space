@@ -4210,7 +4210,7 @@ nav .input-field label.active i {
   position: fixed;
 }
 
-@media only screen and (min-width: 601px) {
+@media only screen and (min-width: 1001px) {
   nav.nav-extended .nav-wrapper {
     min-height: 64px;
   }

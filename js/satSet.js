@@ -216,7 +216,6 @@ or mirrored at any other location without the express written permission of the 
       // Hide More Stuff on Little Screens
       if ($(document).width() <= 400) {
         $('#menu-satellite-collision img').hide();
-        $('#reddit-share').hide();
         $('#menu-find-sat').hide();
         $('#sat-infobox').attr('style', 'width:100%;top:60%;');
         // $('#datetime').attr('style', 'position:fixed;left:85px;top:10px;width:141px;height:32px');
@@ -1024,6 +1023,7 @@ or mirrored at any other location without the express written permission of the 
 
   satSet.selectSat = function (i) {
     if (i === selectedSat) return;
+    if (settingsManager.isMobileModeEnabled) mobile.searchToggle(true);
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
     if (selectedSat !== -1) {
       gl.bufferSubData(gl.ARRAY_BUFFER, selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(selectedSat)).color));
@@ -1039,24 +1039,6 @@ or mirrored at any other location without the express written permission of the 
     $('#menu-map img').removeClass('bmenu-item-disabled');
     $('#menu-editSat img').removeClass('bmenu-item-disabled');
     $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
-    // Mobile Controls
-    if ($(document).width() <= settingsManager.desktopMinimumWidth) {
-      if (i !== -1) {
-        $('#controls-down-wrapper').addClass('bottom-controls-high');
-        $('#controls-down-wrapper').removeClass('bottom-controls-low');
-        $('#controls-left').addClass('side-controls-high');
-        $('#controls-left').removeClass('side-controls-low');
-        $('#controls-right').addClass('side-controls-high');
-        $('#controls-right').removeClass('side-controls-low');
-      } else {
-        $('#controls-down-wrapper').addClass('bottom-controls-low');
-        $('#controls-down-wrapper').removeClass('bottom-controls-high');
-        $('#controls-left').addClass('side-controls-low');
-        $('#controls-left').removeClass('side-controls-high');
-        $('#controls-right').addClass('side-controls-low');
-        $('#controls-right').removeClass('side-controls-high');
-      }
-    }
   };
 
   satSet.onCruncherReady = function (cruncherReadyCallback) {

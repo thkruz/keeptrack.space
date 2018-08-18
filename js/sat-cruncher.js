@@ -237,6 +237,10 @@ function propagateCruncher () {
       sinLon = null;
 
       positionEcf = satellite.eciToEcf({x: x, y: y, z: z}, gmst); // pv.position is called positionEci originally
+      if (satellite.eciToGeodetic({x: x, y: y, z: z}, gmst).height <= 150) {
+        console.error(satellite.SCC_NUM);
+        satCache[i].skip = true;
+      }
       lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
 
       azimuth = lookangles.azimuth;

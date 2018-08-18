@@ -177,6 +177,12 @@
     // ///////////////////////////////
 
     ColorScheme.smallsats = new ColorScheme(function (sat) {
+      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+        return {
+          color: colorTheme.inviewAlt,
+          pickable: true
+        };
+      }
       if (sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) {
         return {
           color: colorTheme.deselected,
@@ -197,6 +203,12 @@
     });
     ColorScheme.rcs = new ColorScheme(function (sat) {
       var rcs = sat.R;
+      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+        return {
+          color: colorTheme.inview,
+          pickable: true
+        };
+      }
       if (rcs < 0.1 && ColorScheme.objectTypeFlags.sensor === false) {
         return {
           color: colorTheme.deselected,
@@ -246,6 +258,12 @@
       };
     });
     ColorScheme.lostobjects = new ColorScheme(function (sat) {
+      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+        return {
+          color: colorTheme.inview,
+          pickable: true
+        };
+      }
       if (sat.static && sat.type === 'Launch Facility') {
         return {
           color: colorTheme.facility,
@@ -299,6 +317,12 @@
       }
     });
     ColorScheme.leo = new ColorScheme(function (sat) {
+      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+        return {
+          color: colorTheme.inview,
+          pickable: true
+        };
+      }
       var ap = sat.apogee;
       if (ap > 2000) {
         return {
@@ -313,6 +337,12 @@
       }
     });
     ColorScheme.geo = new ColorScheme(function (sat) {
+      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+        return {
+          color: colorTheme.inview,
+          pickable: true
+        };
+      }
       var pe = sat.perigee;
       if (pe < 35000) {
         return {
@@ -327,6 +357,12 @@
       }
     });
     ColorScheme.velocity = new ColorScheme(function (sat) {
+      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM && ColorScheme.objectTypeFlags.rocket !== false) {
+        return {
+          color: colorTheme.inviewAlt,
+          pickable: true
+        };
+      }
       var vel = sat.velocity;
       if (vel > 5.5 && ColorScheme.objectTypeFlags.unknown === false) {
         return {

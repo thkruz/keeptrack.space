@@ -1425,6 +1425,17 @@ var lkpassed = false;
           changeZoom('leo');
         }
 
+        // Hide All legends
+        $('#legend-list-default').hide();
+        $('#legend-list-default-sensor').hide();
+        $('#legend-list-rcs').hide();
+        $('#legend-list-small').hide();
+        $('#legend-list-near').hide();
+        $('#legend-list-deep').hide();
+        $('#legend-list-velocity').hide();
+
+        $('#legend-list-default-sensor').show();
+
         e.preventDefault();
       });
 

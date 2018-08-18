@@ -269,6 +269,7 @@ ul {
 @media (min-width: 1001px) {
   #legend-menu span {
     display: block;
+    margin-right: 200px;
   }
 
   .top-menu-icons {
@@ -288,6 +289,9 @@ ul {
       max-height: 100%;
   }
   #search-holder {
+    position: absolute;
+    right: 0px;
+    top: 0px;
     display: inline-flex;
   }
   #search {

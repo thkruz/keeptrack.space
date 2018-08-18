@@ -5,8 +5,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.36.0b';
-  settingsManager.versionDate = 'August 14, 2018';
+  settingsManager.versionNumber = 'v0.36.0';
+  settingsManager.versionDate = 'August 18, 2018';
 
   // Offline management
   settingsManager.offlineLocation = '';
@@ -151,6 +151,7 @@
   settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
   settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
   settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
+  settingsManager.colors.inviewAlt = [0.2, 0.5, 1.0, 0.85];
   settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
   settingsManager.colors.rocket = [0.2, 0.5, 1.0, 0.85];
   settingsManager.colors.debris = [0.5, 0.5, 0.5, 0.85];

@@ -58,9 +58,11 @@ ftpignore
 admin/
 
 #TLEs
-TLE.json
+tle/*
 TLEAltNemo.json
-TLE.js
+
+#Offline
+offline/*
 
 # James Yoder Email
 license/jamesyoderemail.txt

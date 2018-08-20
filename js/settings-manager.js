@@ -5,30 +5,11 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.36.0';
+  settingsManager.versionNumber = 'v0.36.1';
   settingsManager.versionDate = 'August 18, 2018';
 
   // Offline management
   settingsManager.offlineLocation = '';
-
-  (function _getVersion () {
-    // NOTE: This is for backwards compatibility but will be phased out.
-    var url = window.location.pathname;
-    var filename = url.substring(url.lastIndexOf('/') + 1);
-    if (filename === 'retro.htm') {
-      settingsManager.retro = true;
-      settingsManager.tleSource = 'TLERetro.json';
-    }
-    if (filename === 'mw.htm') {
-      settingsManager.tleSource = 'mw.json';
-    }
-    if (filename === 'offline.htm') settingsManager.offline = true;
-    if (filename === 'vec.htm') settingsManager.vectorImages = true;
-    if (filename === 'offlineVec.htm') {
-      settingsManager.offline = true;
-      settingsManager.vectorImages = true;
-    }
-  })();
 
   settingsManager.themes = {};
   settingsManager.themes.currentTheme = 'Blue';

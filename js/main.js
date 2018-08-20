@@ -195,13 +195,13 @@ var drawLoopCallback;
             break;
           case 'retro':
             settingsManager.retro = true;
-            settingsManager.tleSource = 'TLERetro.json';
+            settingsManager.tleSource = 'tle/retro.json';
             break;
           case 'offline':
             settingsManager.offline = true;
             break;
           case 'mw':
-            settingsManager.tleSource = 'mw.json';
+            settingsManager.tleSource = 'tle/mw.json';
             break;
           case 'logo':
             $('#demo-logo').removeClass('start-hidden');

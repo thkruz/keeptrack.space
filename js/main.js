@@ -610,14 +610,12 @@ var drawLoopCallback;
           var sat = satSet.getSat(satId);
           var selectedSatData = satSet.getSat(selectedSat);
           isHoverBoxVisible = true;
-          if (sat.static && isShowDistance) {
-            satHoverBoxDOM.html(sat.name + '<br /><center>' + sat.type + satellite.distance(sat, selectedSatData) + '</center>');
-          } else if (sat.static) {
+          if (sat.static) {
             if (sat.type === 'Launch Facility') {
               var launchSite = tleManager.extractLaunchSite(sat.name);
-              satHoverBoxDOM.html(launchSite.site + ', ' + launchSite.sitec + '<br /><center>' + sat.type + '</center>');
+              satHoverBoxDOM.html(launchSite.site + ', ' + launchSite.sitec + '<br /><center>' + sat.type + satellite.distance(sat, selectedSatData) + '</center>');
             } else {
-              satHoverBoxDOM.html(sat.name + '<br /><center>' + sat.type + '</center>');
+              satHoverBoxDOM.html(sat.name + '<br /><center>' + sat.type + satellite.distance(sat, selectedSatData) + '</center>');
             }
           } else if (sat.missile) {
             satHoverBoxDOM.html(sat.ON + '<br /><center>' + sat.desc + '</center>');

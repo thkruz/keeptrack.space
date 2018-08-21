@@ -21,10 +21,10 @@
   var selectOrbitBuf;
   var hoverOrbitBuf;
 
-  var selectColor = [1.0, 0.0, 0.0, 1.0];
-  var hoverColor = [0.5, 0.5, 1.0, 1.0];
-  var inViewColor = [1.0, 1.0, 0.0, 1.0];
-  var groupColor = [0.3, 0.5, 1.0, 0.4];
+  var selectColor = settingsManager.orbitSelectColor;
+  var hoverColor = settingsManager.orbitHoverColor;
+  var inViewColor = settingsManager.orbitInViewColor;
+  var groupColor = settingsManager.orbitGroupColor;
 
   var currentHoverId = -1;
   var currentSelectId = -1;

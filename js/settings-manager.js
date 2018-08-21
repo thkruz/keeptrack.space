@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.36.2';
+  settingsManager.versionNumber = 'v0.37.0';
   settingsManager.versionDate = 'August 18, 2018';
 
   // Offline management
@@ -76,7 +76,9 @@
   settingsManager.limitSats = '';
   settingsManager.searchLimit = 400;
 
-  settingsManager.fieldOfView = 1.01;
+  settingsManager.fieldOfView = 0.6;
+  settingsManager.fieldOfViewMin = 0.5;
+  settingsManager.fieldOfViewMax = 1.0; // 2.12 shows GEO
 
   settingsManager.geolocation = {};
   settingsManager.geolocationUsed = false;
@@ -99,6 +101,15 @@
   settingsManager.isBottomMenuOpen = false;
   settingsManager.isMapMenuOpen = false;
   settingsManager.isForceColorScheme = false;
+
+  settingsManager.isDemoModeOn = false;
+  settingsManager.demoModeInterval = 3000; // in ms (3 second default)
+  settingsManager.isSatLabelModeOn = true;
+  settingsManager.satLabelInterval = 500; //  in ms (0.5 second default)
+  settingsManager.maxOrbits = 20000; // TODO: BROKEN
+  settingsManager.maxLabels = 20000;  // TODO: BROKEN
+
+  settingsManager.isAlwaysHidePropRate = false;
 
   settingsManager.isMapUpdateOverride = false;
   settingsManager.lastMapUpdateTime = 0;
@@ -154,6 +165,15 @@
   settingsManager.colors.leo = [0.2, 1.0, 0.0, 0.65];
   settingsManager.colors.geo = [0.2, 1.0, 0.0, 0.65];
   settingsManager.colors.inGroup = [0.2, 1.0, 0.0, 0.5];
+
+  // /////////////////
+  // Orbit Color Settings
+  // /////////////////
+  settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 1.0];
+  settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0];
+  settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.6]; // WHITE
+  // settingsManager.orbitInViewColor = [1.0, 1.0, 0.0, 1.0]; // Applies to Planetarium View
+  settingsManager.orbitGroupColor = [0.3, 0.5, 1.0, 0.4];
 
 
   window.settingsManager = settingsManager;

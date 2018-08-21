@@ -237,8 +237,8 @@ var lkpassed = false;
 
         if (cameraType.current === cameraType.PLANETARIUM) {
           settingsManager.fieldOfView += delta * 0.0002;
-          if (settingsManager.fieldOfView > 2.12) settingsManager.fieldOfView = 2.12;
-          if (settingsManager.fieldOfView < 0.5) settingsManager.fieldOfView = 0.5;
+          if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+          if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
           webGlInit();
         }
       });
@@ -291,9 +291,7 @@ var lkpassed = false;
       });
       canvasDOM.mouseup(function (evt) {
         if (!dragHasMoved) {
-          console.log(mouseX + ' - ' + mouseY);
           var clickedSat = getSatIdFromCoord(mouseX, mouseY);
-          console.log(clickedSat);
           if (clickedSat === -1 && evt.button === 2) { // Right Mouse Button Click
             $('#search').val('');
             searchBox.hideResults();
@@ -301,13 +299,7 @@ var lkpassed = false;
             $('#menu-space-stations img').removeClass('bmenu-item-selected');
 
             // Hide All legends
-            $('#legend-list-default').hide();
-            $('#legend-list-default-sensor').hide();
-            $('#legend-list-rcs').hide();
-            $('#legend-list-small').hide();
-            $('#legend-list-near').hide();
-            $('#legend-list-deep').hide();
-            $('#legend-list-velocity').hide();
+            _hideAllLegendMenus();
 
             if (satellite.sensorSelected()) {
               $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
@@ -570,6 +562,10 @@ var lkpassed = false;
           $('#legend-list-default').hide();
           $('#legend-list-default-sensor').show();
         }
+        $('#menu-weather img').addClass('bmenu-item-disabled');
+        $('#weather-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+        sensorManager.whichRadar = '';
+
         uiController.updateMap();
       });
 
@@ -724,65 +720,43 @@ var lkpassed = false;
         satSet.searchAzElRange(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM, fblPeriod, fblPeriodM);
         e.preventDefault();
       });
+      $('#settings-form').change(function (e) {
+        var isDMChecked = document.getElementById('settings-demo-mode').checked;
+        var isSLMChecked = document.getElementById('settings-sat-label-mode').checked;
+        if (isSLMChecked && e.target.id === 'settings-demo-mode') {
+          document.getElementById('settings-sat-label-mode').checked = false;
+          $('#settings-demo-mode').removeClass('lever:after');
+        }
+
+        if (isDMChecked && e.target.id === 'settings-sat-label-mode') {
+          document.getElementById('settings-demo-mode').checked = false;
+          $('#settings-sat-label-mode').removeClass('lever:after');
+        }
+      });
       $('#settings-form').submit(function (e) {
-        var isResetSensorChecked = document.getElementById('settings-resetSensor').checked;
         var isHOSChecked = document.getElementById('settings-hos').checked;
-        settingsManager.isOnlyFOVChecked = document.getElementById('settings-onlyfov').checked;
-        var isLimitSats = document.getElementById('settings-limitSats-enabled').checked;
-        var isChangeSharperShaders = document.getElementById('settings-shaders').checked;
+        var isDMChecked = document.getElementById('settings-demo-mode').checked;
+        var isSLMChecked = document.getElementById('settings-sat-label-mode').checked;
         var isSNPChecked = document.getElementById('settings-snp').checked;
-        var isSDChecked = document.getElementById('settings-sd').checked;
         var isRiseSetChecked = document.getElementById('settings-riseset').checked;
 
-        /** Filter On and Shaders On */
-        if (settingsManager.vertShadersSize >= 12 && isChangeSharperShaders && isLimitSats) {
-          shadersOnFilterOn();
-        } else if (isLimitSats && limitSats !== $('#limitSats').val() && !isChangeSharperShaders) {
-          shadersOffFilterOn();
-        } else if (settingsManager.vertShadersSize >= 12 && isChangeSharperShaders && !isLimitSats) {
-          shadersOnFilterOff();
-        } else if (!isLimitSats && limitSats !== '') {
-        /** Filter turned off was previously on */
-          if (isChangeSharperShaders === false) {
-            shadersOffFilterOff();
-          } else {
-            shadersOnFilterOff();
-          }
-        } else if (settingsManager.vertShadersSize < 12 !== isChangeSharperShaders) {
-        /** If shaders change */
-          if (!isLimitSats || limitSats === '') {
-            if (isChangeSharperShaders) { shadersOnFilterOff(); }
-            if (!isChangeSharperShaders) { shadersOffFilterOff(); }
-          } else {
-            if (isChangeSharperShaders) { shadersOnFilterOn(); }
-            if (!isChangeSharperShaders) { shadersOffFilterOn(); }
-          }
+        if (isSLMChecked) {
+          settingsManager.isSatLabelModeOn = true;
+        } else {
+          settingsManager.isSatLabelModeOn = false;
         }
 
-        function shadersOnFilterOn () {
-          limitSats = $('#limitSats').val();
-          window.location = '/index.htm?sharperShaders=true&limitSats=' + limitSats;
+        if (isDMChecked) {
+          settingsManager.isDemoModeOn = true;
+        } else {
+          settingsManager.isDemoModeOn = false;
         }
-        function shadersOnFilterOff () { window.location = '/index.htm?sharperShaders=true'; }
-        function shadersOffFilterOn () {
-          limitSats = $('#limitSats').val();
-          window.location = '/index.htm?limitSats=' + limitSats;
-        }
-        function shadersOffFilterOff () { window.location = '/index.htm'; }
 
-        if (isResetSensorChecked) {
-          _resetSensorSelected();
-        }
         if (isHOSChecked) {
           settingsManager.colors.otherSatellite = 0;
           ga('send', 'event', 'Settings Menu', 'Hide Other Satellites', 'Option Selected');
         } else {
           settingsManager.colors.otherSatellite = 0.1;
-        }
-        if (settingsManager.isOnlyFOVChecked) {
-          satSet.setColorScheme(ColorScheme.onlyFOV, true);
-          ga('send', 'event', 'Settings Menu', 'Show Only FOV', 'Option Selected');
-          ga('send', 'event', 'ColorScheme Menu', 'Only FOV', 'Selected');
         }
         if (isSNPChecked) {
           isShowNextPass = true;
@@ -801,7 +775,6 @@ var lkpassed = false;
         satellite.lookanglesLength = $('#lookanglesLength').val() * 1;
         satellite.lookanglesInterval = $('#lookanglesInterval').val() * 1;
 
-        document.getElementById('settings-resetSensor').checked = false;
         settingsManager.isForceColorScheme = true;
         satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
         e.preventDefault();
@@ -1348,7 +1321,7 @@ var lkpassed = false;
           $('#cs-minel').val(10);
           $('#cs-maxel').val(90);
           $('#cs-minrange').val(100);
-          $('#cs-maxrange').val(50000);
+          $('#cs-maxrange').val(1000000);
         } else {
           $('#cs-minaz').attr('disabled', false);
           $('#cs-maxaz').attr('disabled', false);
@@ -1426,13 +1399,7 @@ var lkpassed = false;
         }
 
         // Hide All legends
-        $('#legend-list-default').hide();
-        $('#legend-list-default-sensor').hide();
-        $('#legend-list-rcs').hide();
-        $('#legend-list-small').hide();
-        $('#legend-list-near').hide();
-        $('#legend-list-deep').hide();
-        $('#legend-list-velocity').hide();
+        _hideAllLegendMenus();
 
         $('#legend-list-default-sensor').show();
 
@@ -2007,11 +1974,14 @@ var lkpassed = false;
             uiController.hideSideMenus();
             orbitDisplay.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
             cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
+            $('#menu-planetarium img').removeClass('bmenu-item-selected');
             break;
           } else {
             uiController.hideSideMenus();
             if (satellite.sensorSelected()) {
               cameraType.current = cameraType.PLANETARIUM; // Activate Planetarium Camera Mode
+              _hideAllLegendMenus();
+              $('#legend-list-planetarium').show();
               $('#menu-planetarium img').addClass('bmenu-item-selected');
               isPlanetariumView = true;
             } else {
@@ -2067,7 +2037,7 @@ var lkpassed = false;
       $('#menu-missile img').removeClass('bmenu-item-selected');
       $('#menu-customSensor img').removeClass('bmenu-item-selected');
       $('#menu-about img').removeClass('bmenu-item-selected');
-      $('#menu-planetarium img').removeClass('bmenu-item-selected');
+      // $('#menu-planetarium img').removeClass('bmenu-item-selected');
 
       // Unflag all open menu variables
       isInfoOverlayMenuOpen = false;
@@ -2088,7 +2058,7 @@ var lkpassed = false;
       isMissileMenuOpen = false;
       isCustomSensorMenuOpen = false;
       isAboutSelected = false;
-      isPlanetariumView = false;
+      // isPlanetariumView = false;
     };
 
     function _updateWatchlist () {
@@ -2224,6 +2194,8 @@ var lkpassed = false;
               break;
             case cameraType.PLANETARIUM:
               $('#camera-status-box').html('Planetarium Camera Mode');
+              _hideAllLegendMenus();
+              $('#legend-list-planetarium').show();
               break;
             case cameraType.SATELLITE:
               $('#camera-status-box').html('Satellite Camera Mode');
@@ -2594,6 +2566,17 @@ var lkpassed = false;
         }
       });
     }
+  };
+
+  _hideAllLegendMenus = function () {
+    $('#legend-list-default').hide();
+    $('#legend-list-default-sensor').hide();
+    $('#legend-list-rcs').hide();
+    $('#legend-list-small').hide();
+    $('#legend-list-near').hide();
+    $('#legend-list-deep').hide();
+    $('#legend-list-velocity').hide();
+    $('#legend-list-planetarium').hide();
   };
 
   _resetSensorSelected = function () {

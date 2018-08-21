@@ -23,7 +23,6 @@ var RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
 var satCache = [];                // Cache of Satellite Data from TLE.json and Static Data from variable.js
 var satPos, satVel;               // Array of current Satellite and Static Positions and Velocities
 var satInView;                    // Array of booleans showing if current Satellite is in view of Sensor
-var satAbove;
 
 /** OBSERVER VARIABLES */
 var sensor = {};
@@ -115,7 +114,6 @@ onmessage = function (m) {
       satPos = new Float32Array(len * 3);
       satVel = new Float32Array(len * 3);
       satInView = new Float32Array(len);
-      satAbove = new Float32Array(len);
 
       postMessage({
         extraData: JSON.stringify(extraData)
@@ -359,29 +357,18 @@ function propagateCruncher () {
           }
         }
       }
-
-      // Determine if satellite is within planetarium view
-      if (elevation >= 50) {
-        satAbove[i] = true;
-      } else {
-        satAbove[i] = false;
-      }
     }
   }
 
   postMessage({
     satPos: satPos.buffer,
     satVel: satVel.buffer,
-    satInView: satInView.buffer,
-    satAbove: satAbove.buffer}
-    // ,
-    // [satPos.buffer, satVel.buffer, satInView.buffer]
+    satInView: satInView.buffer}
   );
 
   satPos = new Float32Array(satCache.length * 3);
   satVel = new Float32Array(satCache.length * 3);
   satInView = new Float32Array(satCache.length);
-  satAbove = new Float32Array(satCache.length);
 
   // NOTE The longer the delay the more jitter at higher speeds of propagation
   setTimeout(propagateCruncher, 1 * 1000 / divisor);

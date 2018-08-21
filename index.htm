@@ -14,11 +14,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=0.36.2b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=0.37.0b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=0.36.2b" rel="stylesheet">
+    <link href="css/fonts.css?v=0.37.0b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=0.36.2b">
+    <link rel="stylesheet" href="css/materialize.css?v=0.37.0b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -176,6 +176,7 @@
       <div id="search-results"></div>
 
       <div id="sat-hoverbox">(none)</div>
+      <div id="sat-minibox">(none)</div>
 
       <div id="camera-status-box" class="start-hidden status-box">
         Earth Centered Camera Mode
@@ -191,6 +192,11 @@
           <li><div class="Square-Box legend-gray-box"></div>Debris</li>
           <li><div class="Square-Box legend-red-box"></div>Sensor</li>
           <li><div class="Square-Box legend-purple-box"></div>Launch Site</li>
+        </ul>
+        <ul id="legend-list-planetarium" class="start-hidden">
+          <li><div class="Square-Box legend-green-box"></div>Payload</li>
+          <li><div class="Square-Box legend-blue-box"></div>Rocket Body</li>
+          <li><div class="Square-Box legend-gray-box"></div>Debris</li>
         </ul>
         <ul id="legend-list-default-sensor" class="start-hidden">
           <li><div class="Square-Box legend-green-box"></div>Payload</li>
@@ -475,24 +481,24 @@
             <h5 class="center-align">General Settings</h5>
             <form id="settings-form">
               <div class="switch row">
-                <label>
-                  <input id="settings-resetSensor" type="checkbox">
-                  <span class="lever"></span>
-                  Reset Sensor
-                </label>
-              </div>
-              <div class="switch row">
-                <label>
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Non-selectable satellites will be hidden instead of grayed out.">
                   <input id="settings-hos" type="checkbox">
                   <span class="lever"></span>
                   Hide Other Satellites
                 </label>
               </div>
               <div class="switch row">
-                <label>
-                  <input id="settings-onlyfov" type="checkbox">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Every 3 seconds a new satellite will be selected from FOV">
+                  <input id="settings-demo-mode" type="checkbox">
                   <span class="lever"></span>
-                  Show Only Sensor FOV
+                  Enable Demo Mode
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Small text labels will appear next to all satellites in FOV.">
+                  <input id="settings-sat-label-mode" type="checkbox" checked>
+                  <span class="lever"></span>
+                  Enable Satellite Label Mode
                 </label>
               </div>
               <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
@@ -514,29 +520,6 @@
               </div>
               <div class="row"></div>
               <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-              <div id="restartRequiredSettings">
-                <h5 class="center-align">Restart Required</h5>
-                <div class="switch row">
-                  <label>
-                    <input id="settings-shaders" type="checkbox">
-                    <span class="lever"></span>
-                    Enable Sharper Satellite Shaders
-                  </label>
-                </div>
-                <div class="switch row">
-                  <label>
-                    <input id="settings-limitSats-enabled" type="checkbox">
-                    <span class="lever"></span>
-                    Enable Filter
-                  </label>
-                </div>
-                <div class="input-field col s12">
-                  <input value="" id="limitSats" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Use NORAD Numbers">
-                  <label id="limitSats-Label" for="limitSats">Remove All Satellites Except</label>
-                </div>
-              </div>
-              <div class="row"></div>
-              <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
               <div id="fastCompSettings">
                 <h5 class="center-align">Fast CPU Required</h5>
                 <div class="switch row">
@@ -544,13 +527,6 @@
                     <input id="settings-snp" type="checkbox">
                     <span class="lever"></span>
                     Show Next Pass on Hover
-                  </label>
-                </div>
-                <div class="switch row">
-                  <label>
-                    <input id="settings-sd" type="checkbox">
-                    <span class="lever"></span>
-                    Show Distance on Hover
                   </label>
                 </div>
                 <div class="row"></div>
@@ -1185,35 +1161,35 @@
   <script src="js/lib/materialize.min.js"></script>
   <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.min.js?v=0.36.2b"></script>
+  <script src="js/lib/satellite.min.js?v=0.37.0b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=0.36.2b"></script>
+  <script src="js/lib/shader-loader.min.js?v=0.37.0b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=0.36.2b"></script>
-  <script src="js/time-manager.js?v=0.36.2b"></script>
-  <script src="js/earth.js?v=0.36.2b"></script>
-  <script src="js/satSet.js?v=0.36.2b"></script>
-  <script src="js/sun.js?v=0.36.2b"></script>
+  <script src="js/settings-manager.js?v=0.37.0b"></script>
+  <script src="js/time-manager.js?v=0.37.0b"></script>
+  <script src="js/earth.js?v=0.37.0b"></script>
+  <script src="js/satSet.js?v=0.37.0b"></script>
+  <script src="js/sun.js?v=0.37.0b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js?v=0.36.2b"></script>
+  <script src="js/variables.js?v=0.37.0b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=0.36.2b"></script>
+  <script src="js/ballistic-missile.js?v=0.37.0b"></script>
   <!-- Load Extra Satellites -->
   <!-- <script src="offline/extra.js"></script>
   <script src="offline/satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=0.36.2b"></script>
-  <script src="js/mobile.js?v=0.36.2b"></script>
-  <script src="js/main.js?v=0.36.2b"></script>
-  <script src="js/ui.js?v=0.36.2b"></script>
-  <script src="js/lookangles.js?v=0.36.2b"></script>
-  <script src="js/orbit-display.js?v=0.36.2b"></script>
-  <script src="js/drawLoop-shapes.js?v=0.36.2b"></script>
-  <script src="js/groups.js?v=0.36.2b"></script>
-  <script src="js/search-box.js?v=0.36.2b"></script>
+  <script src="js/color-scheme.js?v=0.37.0b"></script>
+  <script src="js/mobile.js?v=0.37.0b"></script>
+  <script src="js/main.js?v=0.37.0b"></script>
+  <script src="js/ui.js?v=0.37.0b"></script>
+  <script src="js/lookangles.js?v=0.37.0b"></script>
+  <script src="js/orbit-display.js?v=0.37.0b"></script>
+  <script src="js/drawLoop-shapes.js?v=0.37.0b"></script>
+  <script src="js/groups.js?v=0.37.0b"></script>
+  <script src="js/search-box.js?v=0.37.0b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

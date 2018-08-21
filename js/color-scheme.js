@@ -99,26 +99,29 @@
 
       // NOTE: ColorScheme.objectTypeFlags code
 
-      if (!sat.inview && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) {
+      if (!sat.inview && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false ||
+          cameraType.current === cameraType.PLANETARIUM && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if (!sat.inview && sat.OT === 2 && ColorScheme.objectTypeFlags.rocket === false) {
+      if (!sat.inview && sat.OT === 2 && ColorScheme.objectTypeFlags.rocket === false ||
+          cameraType.current === cameraType.PLANETARIUM && sat.OT === 2 && ColorScheme.objectTypeFlags.rocket === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if (!sat.inview && sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) {
+      if (!sat.inview && sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false ||
+          cameraType.current === cameraType.PLANETARIUM && sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
 
-      if (sat.inview && ColorScheme.objectTypeFlags.inview === false) {
+      if (sat.inview && ColorScheme.objectTypeFlags.inview === false && cameraType.current !== cameraType.PLANETARIUM) {
         return {
           color: colorTheme.deselected,
           pickable: false

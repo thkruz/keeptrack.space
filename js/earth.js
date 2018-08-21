@@ -100,16 +100,10 @@
     if (settingsManager.vectorImages) img.src = 'images/dayearthvector-4096.jpg';
     if (settingsManager.hiresImages) {
       setTimeout(function () {
-        imgHiRes.src = 'images/dayearth-10800.jpg';
+        imgHiRes.src = 'images/2_earth_16k.jpg';
       }, 20000);
       imgHiRes.onload = function () {
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgHiRes);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-
-        gl.bindTexture(gl.TEXTURE_2D, nightTexture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgHiRes);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -121,6 +115,7 @@
 
     nightTexture = gl.createTexture();
     var nightImg = new Image();
+    var nightImgHiRes = new Image();
     nightImg.onload = function () {
       gl.bindTexture(gl.TEXTURE_2D, nightTexture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImg);
@@ -133,6 +128,21 @@
     };
     if (!settingsManager.vectorImages) nightImg.src = 'images/nightearth-4096.png';
     if (settingsManager.vectorImages) nightImg.src = 'images/dayearthvector-4096.jpg';
+
+    if (settingsManager.hiresImages) {
+      setTimeout(function () {
+        nightImgHiRes.src = 'images/6_night_16k.jpg';
+      }, 20000);
+      nightImgHiRes.onload = function () {
+        gl.bindTexture(gl.TEXTURE_2D, nightTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImgHiRes);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      };
+    } else {
+      imgHiRes = null;
+    }
 
     // generate a uvsphere bottom up, CCW order
     var vertPos = [];
@@ -219,7 +229,7 @@
     // TODO substring causes 12kb memory leak every frame.
     tDS = earthNow.toJSON();
     timeTextStr = tDS.substring(0, 10) + ' ' + tDS.substring(11, 19);
-    if (settingsManager.isPropRateChange) {
+    if (settingsManager.isPropRateChange && !settingsManager.isAlwaysHidePropRate) {
       if (timeManager.propRate > 1.01 || timeManager.propRate < 0.99) {
         if (timeManager.propRate < 10) $('#propRate-status-box').html('Propagation Speed: ' + timeManager.propRate.toFixed(1) + 'x');
         if (timeManager.propRate >= 10) $('#propRate-status-box').html('Propagation Speed: ' + timeManager.propRate.toFixed(2) + 'x');
@@ -272,6 +282,7 @@
     gl.uniform3fv(earthShader.uLightDirection, lightDirection);
     gl.uniform3fv(earthShader.uAmbientLightColor, [0.03, 0.03, 0.03]); // RGB ambient light
     gl.uniform3fv(earthShader.uDirectionalLightColor, [1, 1, 0.9]); // RGB directional light
+
 
     gl.uniform1i(earthShader.uSampler, 0); // point sampler to TEXTURE0
     gl.activeTexture(gl.TEXTURE0);

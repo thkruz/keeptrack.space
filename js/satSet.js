@@ -79,7 +79,6 @@ or mirrored at any other location without the express written permission of the 
   var satPos;
   var satVel;
   var satInView;
-  var satAbove;
   var satData;
   var satExtraData;
   var hoveringSat = -1;
@@ -174,8 +173,6 @@ or mirrored at any other location without the express written permission of the 
     satPos = new Float32Array(m.data.satPos);
     satVel = new Float32Array(m.data.satVel);
     satInView = new Float32Array(m.data.satInView);
-    satAbove = new Float32Array(m.data.satAbove);
-    satSet.satAbove = satAbove;
 
     if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
       SCnow = Date.now();

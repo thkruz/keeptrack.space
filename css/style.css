@@ -1058,6 +1058,7 @@ ul li{
 #bottom-icons-container {
     margin-top: -15px;
     width: 100%;
+    overflow-x: auto;
 }
 
 #bottom-icons {

@@ -207,12 +207,12 @@ or mirrored at any other location without the express written permission of the 
 
       /** Hide SOCRATES menu if not all the satellites are currently available to view */
       if (limitSats !== '') {
-        $('#menu-satellite-collision img').hide();
+        $('#menu-satellite-collision').hide();
       }
 
       // Hide More Stuff on Little Screens
       if ($(document).width() <= 400) {
-        $('#menu-satellite-collision img').hide();
+        $('#menu-satellite-collision').hide();
         $('#menu-find-sat').hide();
         $('#sat-infobox').attr('style', 'width:100%;top:60%;');
         // $('#datetime').attr('style', 'position:fixed;left:85px;top:10px;width:141px;height:32px');
@@ -221,25 +221,26 @@ or mirrored at any other location without the express written permission of the 
       // $('#load-cover').fadeOut();
       $('body').attr('style', 'background:black');
       $('#canvas-holder').attr('style', 'display:block');
-      // $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
-      // $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-      // $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
-      // $('#menu-lookangles img').removeClass('bmenu-item-disabled');
-      // $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
-      $('#menu-watchlist img').removeClass('bmenu-item-disabled');
-      $('#menu-find-sat img').removeClass('bmenu-item-disabled');
-      $('#menu-twitter img').removeClass('bmenu-item-disabled');
-      // $('#menu-weather img').removeClass('bmenu-item-disabled');
-      // $('#menu-map img').removeClass('bmenu-item-disabled');
-      // $('#menu-space-weather img').removeClass('bmenu-item-disabled');
-      $('#menu-launches img').removeClass('bmenu-item-disabled');
-      $('#menu-about img').removeClass('bmenu-item-disabled');
-      $('#menu-space-stations img').removeClass('bmenu-item-disabled');
-      $('#menu-satellite-collision img').removeClass('bmenu-item-disabled');
-      $('#menu-customSensor img').removeClass('bmenu-item-disabled');
-      $('#menu-missile img').removeClass('bmenu-item-disabled');
-      $('#menu-settings img').removeClass('bmenu-item-disabled');
-      // $('#menu-planetarium img').removeClass('bmenu-item-disabled');
+      $('#menu-sensor-list').removeClass('bmenu-item-disabled');
+      // $('#menu-info-overlay').removeClass('bmenu-item-disabled');
+      // $('#menu-sensor-info').removeClass('bmenu-item-disabled');
+      // $('#menu-in-coverage').removeClass('bmenu-item-disabled');
+      // $('#menu-lookangles').removeClass('bmenu-item-disabled');
+      // $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');
+      $('#menu-watchlist').removeClass('bmenu-item-disabled');
+      $('#menu-find-sat').removeClass('bmenu-item-disabled');
+      $('#menu-twitter').removeClass('bmenu-item-disabled');
+      // $('#menu-weather').removeClass('bmenu-item-disabled');
+      // $('#menu-map').removeClass('bmenu-item-disabled');
+      // $('#menu-space-weather').removeClass('bmenu-item-disabled');
+      $('#menu-launches').removeClass('bmenu-item-disabled');
+      $('#menu-about').removeClass('bmenu-item-disabled');
+      $('#menu-space-stations').removeClass('bmenu-item-disabled');
+      $('#menu-satellite-collision').removeClass('bmenu-item-disabled');
+      $('#menu-customSensor').removeClass('bmenu-item-disabled');
+      $('#menu-missile').removeClass('bmenu-item-disabled');
+      $('#menu-settings').removeClass('bmenu-item-disabled');
+      // $('#menu-planetarium').removeClass('bmenu-item-disabled');
       settingsManager.isBottomIconsEnabled = true;
 
       if (settingsManager.isMobileModeEnabled) { // Start Button Displayed
@@ -577,7 +578,7 @@ or mirrored at any other location without the express written permission of the 
           obsmaxrange: obsmaxrange
         });
 
-        $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
+        $('#menu-in-coverage').removeClass('bmenu-item-disabled');
       }
 
       /** Send satDataString to satCruncher to begin propagation loop */
@@ -1030,12 +1031,12 @@ or mirrored at any other location without the express written permission of the 
     }
     selectedSat = i;
     if (satellite.sensorSelected()) {
-      $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+      $('#menu-lookangles').removeClass('bmenu-item-disabled');
     }
-    $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
-    $('#menu-map img').removeClass('bmenu-item-disabled');
-    $('#menu-editSat img').removeClass('bmenu-item-disabled');
-    $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
+    $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');
+    $('#menu-map').removeClass('bmenu-item-disabled');
+    $('#menu-editSat').removeClass('bmenu-item-disabled');
+    $('#menu-newLaunch').removeClass('bmenu-item-disabled');
   };
 
   satSet.onCruncherReady = function (cruncherReadyCallback) {

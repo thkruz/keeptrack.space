@@ -399,7 +399,7 @@ $.ajaxSetup({
     obsminel: 1,
     obsmaxel: 90,
     obsminrange: 200,
-    obsmaxrange: 50000,
+    obsmaxrange: 500000,
     changeObjectInterval: 20000,
     staticNum: 8,
     zoom: 'geo',
@@ -421,7 +421,7 @@ $.ajaxSetup({
     obsminel: 1,
     obsmaxel: 90,
     obsminrange: 200,
-    obsmaxrange: 50000,
+    obsmaxrange: 500000,
     changeObjectInterval: 20000,
     staticNum: 9,
     zoom: 'geo',
@@ -509,7 +509,7 @@ $.ajaxSetup({
     obsminel: 1,
     obsmaxel: 90,
     obsminrange: 200,
-    obsmaxrange: 50000,
+    obsmaxrange: 500000,
     changeObjectInterval: 20000,
     staticNum: 22,
     zoom: 'geo',
@@ -531,7 +531,7 @@ $.ajaxSetup({
     obsminel: 1,
     obsmaxel: 90,
     obsminrange: 200,
-    obsmaxrange: 50000,
+    obsmaxrange: 500000,
     changeObjectInterval: 20000,
     staticNum: 23,
     zoom: 'geo',
@@ -539,6 +539,129 @@ $.ajaxSetup({
     country: 'Norway',
     sun: 'No Impact'
   };
+  // //////////////////////
+  // ESOC RADARS
+  // //////////////////////
+  sensorList.GRV = {
+    name: 'Grand Réseau Adapté à la Veille Spatiale, FRA',
+    googleName: 'GRAVES',
+    shortName: 'GRV',
+    weather: '',
+    type: 'Phased Array',
+    lat: 47.347778,
+    long: 5.51638,
+    obshei: 0.0,
+    obsminaz: 90,
+    obsmaxaz: 270,
+    obsminel: 20,
+    obsmaxel: 40,
+    obsminrange: 0,
+    obsmaxrange: 1700, // http://emits.sso.esa.int/emits-doc/AO5059RD1.pdf
+    changeObjectInterval: 20000,
+    staticNum: 24,
+    zoom: 'leo',
+    url: '',
+    country: 'France',
+    sun: 'No Impact'
+  };
+  sensorList.TIR = {
+    name: 'Tracking and Imaging Radar, GER',
+    googleName: 'TIRA',
+    shortName: 'TIR',
+    weather: '',
+    type: 'Mechanical',
+    lat: 50.6166,
+    long: 7.1296,
+    obshei: 0.0,
+    obsminaz: 0,
+    obsmaxaz: 360,
+    obsminel: 1.5, // http://www.issfd.org/ISSFD_2012/ISSFD23_CRSD2_3.pdf
+    obsmaxel: 90,
+    obsminrange: 0,
+    obsmaxrange: 500000, // http://emits.sso.esa.int/emits-doc/AO5059RD1.pdf
+    changeObjectInterval: 20000,
+    staticNum: 25,
+    zoom: 'geo',
+    url: '',
+    country: 'Germany',
+    sun: 'No Impact'
+  };
+  sensorList.NRC = {
+    name: 'Croce del Nord, ITA',
+    googleName: 'Northern Cross',
+    shortName: 'NRC',
+    weather: '',
+    type: 'Bistatic Radio Telescope',
+    lat: 44.5208,
+    long: 11.6469,
+    obshei: 0.025,
+    obsminaz: 89.1,
+    obsmaxaz: 90.9,
+    obsminel: 45,
+    obsmaxel: 90,
+    obsminrange: 0,
+    obsmaxrange: 1700,
+    obsminaz2: 179.1,
+    obsmaxaz2: 180.9,
+    obsminel2: 45,
+    obsmaxel2: 90,
+    obsminrange2: 0,
+    obsmaxrange2: 1700,
+    changeObjectInterval: 20000,
+    staticNum: 26,
+    zoom: 'leo',
+    url: '',
+    country: 'Italy',
+    sun: 'No Impact'
+  };
+  sensorList.TRO = {
+    name: 'RAF Troodos, UK',
+    googleName: 'RAF Troodos',
+    shortName: 'TRO',
+    weather: '',
+    type: 'Optical',
+    lat: 34.912778,
+    long: 32.883889,
+    obshei: 0,
+    obsminaz: 0,
+    obsmaxaz: 360,
+    obsminel: 10,
+    obsmaxel: 90,
+    obsminrange: 25000,
+    obsmaxrange: 500000,
+    changeObjectInterval: 20000,
+    staticNum: 27,
+    zoom: 'geo',
+    url: '',
+    country: 'United Kingdom',
+    sun: 'No Impact'
+  };
+  sensorList.SDT = {
+    name: 'ESA Space Debris Telescope, ESP',
+    googleName: 'ESA Space Debris Telescope',
+    shortName: 'SDT',
+    weather: '',
+    type: 'Optical',
+    lat: 28.3,
+    long: -16.5097,
+    obshei: 0,
+    obsminaz: 0,
+    obsmaxaz: 360,
+    obsminel: 10,
+    obsmaxel: 90,
+    obsminrange: 25000,
+    obsmaxrange: 500000,
+    changeObjectInterval: 20000,
+    staticNum: 27,
+    zoom: 'geo',
+    url: '',
+    country: 'Spain',
+    sun: 'No Impact'
+  };
+
+  // //////////////////////
+  // RUSSIAN RADARS
+  // //////////////////////
   sensorList.ARM = {
     name: 'Armavir, RUS',
     googleName: 'Armavir',
@@ -783,9 +906,9 @@ $.ajaxSetup({
         $('#sensor-country').html(sensorManager.selectedSensor.country);
         $('#sensor-sun').html(sensorManager.selectedSensor.sun);
         if (sensorManager.selectedSensor.whichRadar !== '') {
-          $('#menu-weather img').removeClass('bmenu-item-disabled');
+          $('#menu-weather').removeClass('bmenu-item-disabled');
         } else {
-          $('#menu-weather img').addClass('bmenu-item-disabled');
+          $('#menu-weather').addClass('bmenu-item-disabled');
         }
         camSnap(latToPitch(sensorManager.selectedSensor.lat), longToYaw(sensorManager.selectedSensor.long));
         changeZoom(sensorManager.selectedSensor.zoom);

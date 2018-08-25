@@ -14,11 +14,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=0.37.1b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=0.38.0b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=0.37.1b" rel="stylesheet">
+    <link href="css/fonts.css?v=0.38.0b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=0.37.1b">
+    <link rel="stylesheet" href="css/materialize.css?v=0.38.0b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -52,6 +52,7 @@
       </div>
       <span id="loader-text">Downloading Science...</span>
       <button id="mobile-start-button" class="btn waves-effect waves-light" type="button" name="action" onclick="mobile.start();">Click to Begin &#9658;</button>
+      <!-- <span id="loader-text">v0.38.0 ESA Sensor Expansion</span> -->
     </div>
   </div>
   <div id="no-webgl">
@@ -64,10 +65,6 @@
         <ul id="nav-mobile" class="left hide-on-med-and-down">
           <li id="jday" style="padding-right: 25px;padding-left: 25px;"></li>
           <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Satellites &#x25BC;</a></li>
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-radar-menu" style="padding-right: 25px;padding-left: 25px;">SSN Sensors &#x25BC;</a></li>
-          <!-- <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="us-optical-menu">US Optical<i class="material-icons right">arrow_drop_down</i></a></li> -->
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="russian-menu">Foreign Sensors &#x25BC;</a></li>
-          <!-- <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="chinese-menu">Chinese<i class="material-icons right">arrow_drop_down</i></a></li> -->
           <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="colors-menu">Color Schemes &#x25BC;</a></li>
         </ul>
         <ul id="nav-mobile" class="right">
@@ -94,13 +91,8 @@
       <input id="search" type="search" required>
       <span id="search-close" style="margin-left:5px">X</span>
     </div>
-    <!--  -->
-    <!-- Dropdown Menus  -->
-    <!--  -->
-
     <!-- Countries Menu -->
     <ul id="countries-menu" class="dropdown-content">
-      <!-- <li data-group="<clear>" class="clear-option" style="display: none">Clear</li> -->
       <li data-group="Canada" class="country-option">Canadian</li>
       <li data-group="China" class="country-option">Chinese</li>
       <li data-group="France" class="country-option">French</li>
@@ -118,43 +110,6 @@
       <li data-group="AmatuerRadio" class="group-option">Amateur Radio</li>
     </ul>
 
-    <ul id="us-radar-menu" class="dropdown-content sensor-selected">
-      <li id="radar-reset" class="start-hidden sensor-reset-menu">No Sensor<span class="badge badge-reset" data-badge-caption="RESET"></li>
-      <li class="divider sensor-reset-menu"></li>
-      <li id="radar-beale">Beale<span class="badge" data-badge-caption="USAF"></span></li>
-      <li id="radar-capecod">Cape Cod<span class="badge" data-badge-caption="USAF"></span></li>
-      <li id="radar-parcs">Cavalier<span class="badge" data-badge-caption="USAF"></span></li>
-      <li id="radar-clear">Clear<span class="badge" data-badge-caption="USAF"></span></li>
-      <li id="radar-eglin">Eglin<span class="badge" data-badge-caption="USAF"></span></li>
-      <li id="radar-thule">Thule<span class="badge" data-badge-caption="USAF"></span></li>
-      <li id="radar-cobradane">Cobra Dane<span class="badge" data-badge-caption="USAF"></span></li>
-      <li class="divider"></li>
-      <li id="radar-fylingdales">Fylingdales<span class="badge" data-badge-caption="RAF"></span></li>
-      <li id="radar-millstone">Millstone<span class="badge" data-badge-caption="MIT"></span></li>
-      <li id="radar-altair">ALTAIR<span class="badge" data-badge-caption="USA"></span></li>
-      <li id="radar-ascension">Ascension<span class="badge" data-badge-caption="USAF"></span></li>
-      <li id="radar-globus">Globus II<span class="badge" data-badge-caption="NOR"></span></li>
-      <li class="divider"></li>
-      <li id="optical-diego-garcia">Diego Garcia<span class="badge" data-badge-caption="USAF"></span></li>
-      <li id="optical-maui">Maui<span class="badge" data-badge-caption="USAF"></span></li>
-      <li id="optical-socorro">Socorro<span class="badge" data-badge-caption="USAF"></span></li>
-    </ul>
-
-    <ul id="russian-menu" class="dropdown-content sensor-selected">
-      <li id="radar-reset2" class="start-hidden sensor-reset-menu">No Sensor<span class="badge badge-reset" data-badge-caption="RESET"></li>
-      <li class="divider sensor-reset-menu"></li>
-      <li id="russian-armavir">Armavir<span class="badge" data-badge-caption="RUS"></span></li>
-      <li id="russian-balkhash">Balkhash<span class="badge" data-badge-caption="RUS"></span></li>
-      <li id="russian-gantsevichi">Gantsevichi<span class="badge" data-badge-caption="RUS"></span></li>
-      <li id="russian-lekhtusi">Lekhtusi<span class="badge" data-badge-caption="RUS"></span></li>
-      <li id="russian-mishelevka-d">Mishelevka<span class="badge" data-badge-caption="RUS"></span></li>
-      <li id="russian-olenegorsk">Olenegorsk<span class="badge" data-badge-caption="RUS"></span></li>
-      <li id="russian-pechora">Pechora<span class="badge" data-badge-caption="RUS"></span></li>
-      <li id="russian-pionersky">Pionersky<span class="badge" data-badge-caption="RUS"></span></li>
-      <li class="divider"></li>
-      <li id="chinese-xuanhua">Xuanhua<span class="badge" data-badge-caption="PRC"></span></li>
-    </ul>
-
     <ul id="colors-menu" class="dropdown-content">
       <li data-color="default">Type</li>
       <li data-color="velocity">Velocity</li>
@@ -164,10 +119,6 @@
       <li data-color="deep-space">Deep Space</li>
       <li data-color="lost-objects">Lost Objects</li>
     </ul>
-
-    <!--  -->
-    <!-- Dropdown Menus  -->
-    <!--  -->
   </header>
 
   <main>
@@ -236,6 +187,60 @@
           <li><div class="Square-Box legend-red-box"></div>~1 km/s Velocity</li>
           <li><div class="Square-Box legend-blue-box"></div>Satellite In View</li>
         </ul>
+      </div>
+
+      <div id="sensor-list-menu" class="start-hidden text-select">
+        <div id="sensor-list-content" class="side-menu">
+          <div class="row">
+            <ul id="reset-sensor-text" class="sensor-reset-menu">
+              <h5 id="reset-sensor-button" class="center-align menu-selectable">Reset Sensor</h5>
+              <li class="divider"></li>
+            </ul>
+            <ul>
+              <h5 class="center-align">CSpOC Sensors</h5>
+              <li class="divider"></li>
+              <li class="menu-selectable" id="radar-ascension">Ascension<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+              <li class="menu-selectable" id="radar-altair">ALTAIR<span class="badge dark-blue-badge" data-badge-caption="USA"></span></li>
+              <li class="menu-selectable" id="radar-beale">Beale<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+              <li class="menu-selectable" id="radar-capecod">Cape Cod<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+              <li class="menu-selectable" id="radar-parcs">Cavalier<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+              <li class="menu-selectable" id="radar-clear">Clear<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+              <li class="menu-selectable" id="radar-cobradane">Cobra Dane<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+              <li class="menu-selectable" id="radar-eglin">Eglin<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+              <li class="menu-selectable radar-fylingdales">Fylingdales<span class="badge dark-blue-badge" data-badge-caption="RAF"></span></li>
+              <li class="menu-selectable" id="radar-globus">Globus II<span class="badge dark-blue-badge" data-badge-caption="NOR"></span></li>
+              <li class="menu-selectable" id="radar-millstone">Millstone<span class="badge dark-blue-badge" data-badge-caption="MIT"></span></li>
+              <li class="menu-selectable" id="radar-thule">Thule<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+              <li class="menu-selectable" id="optical-diego-garcia">Diego Garcia<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+              <li class="menu-selectable" id="optical-maui">Maui<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+              <li class="menu-selectable" id="optical-socorro">Socorro<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+              <li class="divider"></li>
+              <h5 class="center-align">ESOC Sensors</h5>
+              <li class="divider"></li>
+              <li class="menu-selectable" id="esoc-graves">GRAVES<span class="badge dark-blue-badge" data-badge-caption="FRA"></span></li>
+              <li class="menu-selectable radar-fylingdales">Fylingdales<span class="badge dark-blue-badge" data-badge-caption="RAF"></span></li>
+              <li class="menu-selectable" id="esoc-tira">TIRA<span class="badge dark-blue-badge" data-badge-caption="GER"></span></li>
+              <li class="menu-selectable" id="esoc-northern-cross">Northern Cross<span class="badge dark-blue-badge" data-badge-caption="ITA"></span></li>
+              <li class="menu-selectable" id="esoc-troodos">Troodos<span class="badge dark-blue-badge" data-badge-caption="RAF"></span></li>
+              <li class="menu-selectable" id="esoc-space-debris-telescope">Space Debris Telescope<span class="badge dark-blue-badge" data-badge-caption="ESA"></span></li>
+              <li class="divider"></li>
+              <h5 class="center-align">Russian Sensors</h5>
+              <li class="divider"></li>
+              <li class="menu-selectable" id="russian-armavir">Armavir<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" id="russian-balkhash">Balkhash<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" id="russian-gantsevichi">Gantsevichi<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" id="russian-lekhtusi">Lekhtusi<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" id="russian-mishelevka-d">Mishelevka<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" id="russian-olenegorsk">Olenegorsk<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" id="russian-pechora">Pechora<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" id="russian-pionersky">Pionersky<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+              <li class="divider"></li>
+              <h5 class="center-align">Chinese Sensors</h5>
+              <li class="divider"></li>
+              <li class="menu-selectable" id="chinese-xuanhua">Xuanhua<span class="badge dark-blue-badge" data-badge-caption="PRC"></span></li>
+            </ul>
+          </div>
+        </div>
       </div>
 
       <div id="sensor-info-menu" class="start-hidden text-select">
@@ -1077,69 +1082,26 @@
     </div>
     <div id="bottom-icons-container" class="container center">
       <div id="bottom-icons">
-        <div id="menu-info-overlay" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Information Overlay">
-          <img src="" delayedsrc="images/info.png" class="bmenu-item-disabled" alt="Info Overlay">
-        </div>
-        <div id="menu-sensor-info" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Sensor Information">
-          <img src="" delayedsrc="images/radar.png" class="bmenu-item-disabled" alt="Sensor Info">
-        </div>
-        <div id="menu-in-coverage" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Current Sensor Coverage">
-          <img src="" delayedsrc="images/radar-1.png" class="bmenu-item-disabled" alt="Look Angles">
-        </div>
-        <div id="menu-watchlist" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Satellite Watchlist">
-          <img src="" delayedsrc="images/star.png" class="bmenu-item-disabled" alt="Watchlist">
-        </div>
-        <div id="menu-lookangles" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Sensor Lookangles">
-          <img src="" delayedsrc="images/telescope.png" class="bmenu-item-disabled" alt="Look Angles">
-        </div>
-        <div id="menu-lookanglesmultisite" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="SSN Lookangles">
-          <img src="" delayedsrc="images/orbit.png" class="bmenu-item-disabled" alt="Look Angles">
-        </div>
-        <div id="menu-find-sat" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Search Orbit">
-          <img src="" delayedsrc="images/findOrbit.png" class="bmenu-item-disabled" alt="Twitter">
-        </div>
-        <div id="menu-twitter" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
-          <img src="" delayedsrc="images/twitter.png" class="bmenu-item-disabled" alt="Twitter">
-        </div>
-        <div id="menu-weather" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Terrestrial Weather">
-          <img src="" delayedsrc="images/sun.png" class="bmenu-item-disabled" alt="Weather">
-        </div>
-        <div id="menu-map" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Stereographic Map">
-          <img src="" delayedsrc="images/map.png" class="bmenu-item-disabled" alt="Map">
-        </div>
-        <!-- <div id="menu-space-weather" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Geomagnetic Information">
-          <img src="" delayedsrc="images/geomagnetic.png" class="bmenu-item-disabled" alt="Weather">
-        </div> -->
-        <div id="menu-launches" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
-          <img src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item-disabled" alt="Launches">
-        </div>
-        <div id="menu-space-stations" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist">
-          <img src="" delayedsrc="images/space-station-1.png" class="bmenu-item-disabled" alt="Interesting Satellites">
-        </div>
-        <div id="menu-satellite-collision" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
-          <img src="" delayedsrc="images/satellite-collision.png" class="bmenu-item-disabled" alt="Collision">
-        </div>
-        <div id="menu-editSat" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Edit Satellites">
-          <img src="" delayedsrc="images/editPencil.png" class="bmenu-item-disabled" alt="Edit satellite">
-        </div>
-        <div id="menu-newLaunch" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Create Launch Nominal">
-          <img src="" delayedsrc="images/rocket-ship.png" class="bmenu-item-disabled" alt="New Launches">
-        </div>
-        <div id="menu-missile" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Create Missile Attack">
-          <img src="" delayedsrc="images/rocket-ship-2.png" class="bmenu-item-disabled" alt="New Missile">
-        </div>
-        <div id="menu-customSensor" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Use Custom Sensor/Telescope">
-          <img src="" delayedsrc="images/observatory.png" class="bmenu-item-disabled" alt="Custom Sensor">
-        </div>
-        <div id="menu-settings" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Settings">
-          <img src="" delayedsrc="images/gear-icon.png" class="bmenu-item-disabled" alt="Settings">
-        </div>
-        <div id="menu-about" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Author Information">
-          <img src="" delayedsrc="images/about.png" class="bmenu-item-disabled" alt="Information">
-        </div>
-        <div id="menu-planetarium" class="bmenu-item tooltipped" data-position="top" data-delay="50" data-tooltip="Planetarium View">
-          <img src="" delayedsrc="images/astronaut.png" class="bmenu-item-disabled" alt="Planetarium View">
-        </div>
+        <img id="menu-sensor-list" src="" delayedsrc="images/space-station-2.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Sensor List" data-position="top" data-delay="50" data-tooltip="Sensor List">
+        <img id="menu-info-overlay" src="" delayedsrc="images/info.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Information Overlay" data-position="top" data-delay="50" data-tooltip="Information Overlay">
+        <img id="menu-sensor-info" src="" delayedsrc="images/radar.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Sensor Information" data-position="top" data-delay="50" data-tooltip="Sensor Information">
+        <img id="menu-in-coverage" src="" delayedsrc="images/radar-1.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Current Sensor Coverage" data-position="top" data-delay="50" data-tooltip="Current Sensor Coverage">
+        <img id="menu-watchlist" src="" delayedsrc="images/star.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Satellite Watchlist" data-position="top" data-delay="50" data-tooltip="Satellite Watchlist">
+        <img id="menu-lookangles" src="" delayedsrc="images/telescope.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Look Angles" data-position="top" data-delay="50" data-tooltip="Look Angles">
+        <img id="menu-lookanglesmultisite" src="" delayedsrc="images/orbit.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="SSN Lookangles" data-position="top" data-delay="50" data-tooltip="SSN Lookangles">
+        <img id="menu-find-sat" src="" delayedsrc="images/findOrbit.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Search Orbit" data-position="top" data-delay="50" data-tooltip="Search Orbit">
+        <img id="menu-twitter" src="" delayedsrc="images/twitter.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Space News on Twitter" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
+        <img id="menu-weather" src="" delayedsrc="images/sun.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Terrestrial Weather" data-position="top" data-delay="50" data-tooltip="Terrestrial Weather">
+        <img id="menu-map" src="" delayedsrc="images/map.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Stereographic Map" data-position="top" data-delay="50" data-tooltip="Stereographic Map">
+        <img id="menu-launches" src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Launch Schedule" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
+        <img id="menu-space-stations" src="" delayedsrc="images/space-station-1.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Union of Concerned Scientists Watchlist" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist">
+        <img id="menu-satellite-collision" src="" delayedsrc="images/satellite-collision.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="SOCRATES Prediction of Near Conjunctions" data-position="top" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
+        <img id="menu-editSat" src="" delayedsrc="images/editPencil.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Edit Satellites" data-position="top" data-delay="50" data-tooltip="Edit Satellites">
+        <img id="menu-newLaunch" src="" delayedsrc="images/rocket-ship.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Create Launch Nominal" data-position="top" data-delay="50" data-tooltip="Create Launch Nominal">
+        <img id="menu-missile" src="" delayedsrc="images/rocket-ship-2.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Create Missile Attack" data-position="top" data-delay="50" data-tooltip="Create Missile Attack">
+        <img id="menu-customSensor" src="" delayedsrc="images/gear-icon.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Settings" data-position="top" data-delay="50" data-tooltip="Settings">
+        <img id="menu-about" src="" delayedsrc="images/about.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Author Information" data-position="top" data-delay="50" data-tooltip="Author Information">
+        <img id="menu-planetarium" src="" delayedsrc="images/astronaut.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Planetarium View" data-position="top" data-delay="50" data-tooltip="Planetarium View">
       </div>
     </div>
     <div id="social" class="right">
@@ -1161,35 +1123,35 @@
   <script src="js/lib/materialize.min.js"></script>
   <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.min.js?v=0.37.1b"></script>
+  <script src="js/lib/satellite.min.js?v=0.38.0b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=0.37.1b"></script>
+  <script src="js/lib/shader-loader.min.js?v=0.38.0b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=0.37.1b"></script>
-  <script src="js/time-manager.js?v=0.37.1b"></script>
-  <script src="js/earth.js?v=0.37.1b"></script>
-  <script src="js/satSet.js?v=0.37.1b"></script>
-  <script src="js/sun.js?v=0.37.1b"></script>
+  <script src="js/settings-manager.js?v=0.38.0b"></script>
+  <script src="js/time-manager.js?v=0.38.0b"></script>
+  <script src="js/earth.js?v=0.38.0b"></script>
+  <script src="js/satSet.js?v=0.38.0b"></script>
+  <script src="js/sun.js?v=0.38.0b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js?v=0.37.1b"></script>
+  <script src="js/variables.js?v=0.38.0b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=0.37.1b"></script>
+  <script src="js/ballistic-missile.js?v=0.38.0b"></script>
   <!-- Load Extra Satellites -->
   <!-- <script src="offline/extra.js"></script>
   <script src="offline/satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=0.37.1b"></script>
-  <script src="js/mobile.js?v=0.37.1b"></script>
-  <script src="js/main.js?v=0.37.1b"></script>
-  <script src="js/ui.js?v=0.37.1b"></script>
-  <script src="js/lookangles.js?v=0.37.1b"></script>
-  <script src="js/orbit-display.js?v=0.37.1b"></script>
-  <script src="js/drawLoop-shapes.js?v=0.37.1b"></script>
-  <script src="js/groups.js?v=0.37.1b"></script>
-  <script src="js/search-box.js?v=0.37.1b"></script>
+  <script src="js/color-scheme.js?v=0.38.0b"></script>
+  <script src="js/mobile.js?v=0.38.0b"></script>
+  <script src="js/main.js?v=0.38.0b"></script>
+  <script src="js/ui.js?v=0.38.0b"></script>
+  <script src="js/lookangles.js?v=0.38.0b"></script>
+  <script src="js/orbit-display.js?v=0.38.0b"></script>
+  <script src="js/drawLoop-shapes.js?v=0.38.0b"></script>
+  <script src="js/groups.js?v=0.38.0b"></script>
+  <script src="js/search-box.js?v=0.38.0b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

@@ -1003,17 +1003,17 @@ function selectSat (satId) {
     $('#iss-stream-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     orbitDisplay.clearSelectOrbit();
     // Remove Red Box
-    $('#menu-lookanglesmultisite img').removeClass('bmenu-item-selected');
-    $('#menu-lookangles img').removeClass('bmenu-item-selected');
-    $('#menu-editSat img').removeClass('bmenu-item-selected');
-    $('#menu-map img').removeClass('bmenu-item-selected');
-    $('#menu-newLaunch img').removeClass('bmenu-item-selected');
+    $('#menu-lookanglesmultisite').removeClass('bmenu-item-selected');
+    $('#menu-lookangles').removeClass('bmenu-item-selected');
+    $('#menu-editSat').removeClass('bmenu-item-selected');
+    $('#menu-map').removeClass('bmenu-item-selected');
+    $('#menu-newLaunch').removeClass('bmenu-item-selected');
     // Add Grey Out
-    $('#menu-lookanglesmultisite img').addClass('bmenu-item-disabled');
-    $('#menu-lookangles img').addClass('bmenu-item-disabled');
-    $('#menu-editSat img').addClass('bmenu-item-disabled');
-    $('#menu-map img').addClass('bmenu-item-disabled');
-    $('#menu-newLaunch img').addClass('bmenu-item-disabled');
+    $('#menu-lookanglesmultisite').addClass('bmenu-item-disabled');
+    $('#menu-lookangles').addClass('bmenu-item-disabled');
+    $('#menu-editSat').addClass('bmenu-item-disabled');
+    $('#menu-map').addClass('bmenu-item-disabled');
+    $('#menu-newLaunch').addClass('bmenu-item-disabled');
     // Remove Side Menus
     $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
@@ -1036,12 +1036,12 @@ function selectSat (satId) {
       sensorManager.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
       sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
       selectedSat = -1;
-      $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-      $('#menu-planetarium img').removeClass('bmenu-item-disabled');
+      $('#menu-sensor-info').removeClass('bmenu-item-disabled');
+      $('#menu-planetarium').removeClass('bmenu-item-disabled');
       if (selectedSat !== -1) {
-        $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+        $('#menu-lookangles').removeClass('bmenu-item-disabled');
       }
-      $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
+      $('#menu-in-coverage').removeClass('bmenu-item-disabled');
       return;
     }
     camZoomSnappedOnSat = true;
@@ -1050,13 +1050,13 @@ function selectSat (satId) {
     orbitDisplay.setSelectOrbit(satId);
 
     if (satellite.sensorSelected()) {
-      $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+      $('#menu-lookangles').removeClass('bmenu-item-disabled');
     }
 
-    $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
-    $('#menu-editSat img').removeClass('bmenu-item-disabled');
-    $('#menu-map img').removeClass('bmenu-item-disabled');
-    $('#menu-newLaunch img').removeClass('bmenu-item-disabled');
+    $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');
+    $('#menu-editSat').removeClass('bmenu-item-disabled');
+    $('#menu-map').removeClass('bmenu-item-disabled');
+    $('#menu-newLaunch').removeClass('bmenu-item-disabled');
 
     if ($('#search-results').css('display') === 'block') {
       if ($(document).width() <= 1000) {

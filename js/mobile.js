@@ -8,45 +8,17 @@ var maxPinchSize = 1;
     // Hide Menus on Small Screens
     if ($(document).width() <= settingsManager.desktopMinimumWidth) {
       settingsManager.isMobileModeEnabled = true;
-      // TODO FullScreen Option
-      // document.documentElement.webkitRequestFullScreen();
-      $('#menu-sensor-info img').show();
-      $('#menu-in-coverage img').hide();
-      // $('#menu-lookangles img').removeClass('bmenu-item-disabled');
-      // $('#menu-lookanglesmultisite img').removeClass('bmenu-item-disabled');
-      $('#menu-find-sat img').removeClass('bmenu-item-disabled');
-      $('#menu-twitter img').hide();
-      $('#menu-weather img').hide();
-      // $('#menu-map img').removeClass('bmenu-item-disabled');
-      $('#menu-launches img').hide();
-      $('#menu-about img').removeClass('bmenu-item-disabled');
-      $('#menu-about img').attr('style', 'border-right:0px;');
-      $('#menu-space-stations img').hide();
-      $('#menu-satellite-collision img').removeClass('bmenu-item-disabled');
-      $('#menu-customSensor img').removeClass('bmenu-item-disabled');
-      $('#menu-settings').show();
-      $('#menu-settings img').removeClass('bmenu-item-disabled');
-      $('#menu-editSat img').show();
-      $('#menu-newLaunch img').show();
-      $('#menu-missile img').show();
+      $('#menu-launches').hide();
+      $('#menu-space-stations').hide();
+
       $('#social').hide();
       $('#version-info').hide();
       $('#mobile-warning').show();
       $('#changelog-row').addClass('center-align');
       $('#fastCompSettings').hide();
       $('#social-alt').show();
-      $('.side-menu').attr('style', 'width:100%;height:auto;');
       $('#canvas-holder').attr('style', 'overflow:auto;');
-      // $('#datetime').attr('style', 'position:fixed;left:130px;top:10px;width:141px;height:32px');
-      $('#datetime-text').attr('style', 'padding:6px;height:100%;');
-      $('#datetime-input').attr('style', 'bottom:0px;');
-      $('#bottom-icons').attr('style', 'position:inherit;');
       $('#mobile-controls').show();
-      // if ($(document).height() >= 600) {
-      //   $('#sat-infobox').attr('style', 'width:100%;top:75%; padding: 0px 5%;');
-      // } else {
-      //   $('#sat-infobox').attr('style', 'width:100%;top:60%; padding: 0px 5%;');
-      // }
       $('.sat-info-value').attr('style', 'width:45%;float: right; text-overflow: ellipsis; overflow: hidden;');
   }
 
@@ -88,7 +60,7 @@ var maxPinchSize = 1;
       $('#search').val('');
       searchBox.hideResults();
       isMilSatSelected = false;
-      $('#menu-space-stations img').removeClass('bmenu-item-selected');
+      $('#menu-space-stations').removeClass('bmenu-item-selected');
       satSet.setColorScheme(ColorScheme.default, true);
     }
   };

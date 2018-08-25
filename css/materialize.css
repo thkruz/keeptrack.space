@@ -2809,7 +2809,7 @@ ul.staggered-list li {
   }
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 1200px) {
   .hide-on-med-and-down {
     display: none !important;
   }
@@ -2821,7 +2821,7 @@ ul.staggered-list li {
   }
 }
 
-@media only screen and (min-width: 600px) and (max-width: 992px) {
+@media only screen and (min-width: 600px) and (max-width: 1200px) {
   .hide-on-med-only {
     display: none !important;
   }
@@ -3828,7 +3828,7 @@ nav ul a span.badge {
   }
 }
 
-@media only screen and (min-width: 993px) {
+@media only screen and (min-width: 1200px) {
   .row .col.l1 {
     width: 8.3333333333%;
     margin-left: auto;
@@ -4051,7 +4051,7 @@ nav .nav-wrapper {
   height: 100%;
 }
 
-@media only screen and (min-width: 993px) {
+@media only screen and (min-width: 1200px) {
   nav a.button-collapse {
     display: none;
   }
@@ -4210,7 +4210,7 @@ nav .input-field label.active i {
   position: fixed;
 }
 
-@media only screen and (min-width: 1001px) {
+@media only screen and (min-width: 1201px) {
   nav.nav-extended .nav-wrapper {
     min-height: 64px;
   }

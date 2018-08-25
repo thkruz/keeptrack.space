@@ -5,12 +5,12 @@
 
 /*Hide yellow coloring in Chrome*/
 /*TODO: The bug seems to be with chrome not the site*/
-/*input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0px 1000px white inset;
-  background-color: #0a97d6 !important;
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px #0a97d6 inset;
+  background-color: #0a97d6;
   -webkit-text-fill-color: white !important;
   color: white !important;
-}*/
+}
 
 a, .link {
     cursor: pointer;
@@ -170,7 +170,7 @@ ul {
     pointer-events: none;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1200px) {
   #sat-hoverbox {
     display: none !important;
   }
@@ -227,6 +227,14 @@ ul {
       padding-top: 5px;
       width: 75%;
   }
+
+  #search-holder input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #0277bd inset;
+    background-color: #0277bd !important;
+    -webkit-text-fill-color: white !important;
+    color: white !important;
+  }
+
   #search-close {
     padding: 0px 6.25%;
     font-size: 24px;
@@ -266,7 +274,7 @@ ul {
     top: 0px !important;
   }
 }
-@media (min-width: 1001px) {
+@media (min-width: 1201px) {
   #legend-menu span {
     display: block;
     margin-right: 200px;
@@ -424,7 +432,7 @@ ul {
   bottom: 100px;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1200px) {
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
@@ -438,7 +446,7 @@ ul {
     width: 100%;
   }
 }
-@media (min-width: 1001px) {
+@media (min-width: 1201px) {
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
@@ -658,19 +666,33 @@ ul {
   z-index: 10;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 540px) {
+  .side-menu {
+    position: absolute;
+    background: #0a97d6;
+    color: white;
+    width: 100%;
+    top: 50px;
+    bottom: 150px;
+    overflow: auto;
+    z-index: 10;
+    padding: 0px 5px;
+  }
+}
+@media (min-width: 541px) and (max-width: 1200px) {
   .side-menu {
     position: absolute;
     background: #0a97d6;
     color: white;
     width: 260px;
     top: 50px;
-    bottom: 50px;
+    bottom: 100px;
     overflow: auto;
     z-index: 10;
+    padding: 0px 5px;
   }
 }
-@media (min-width: 1001px) {
+@media (min-width: 1201px) {
   .side-menu {
     position: absolute;
     background: #0a97d6;
@@ -680,6 +702,7 @@ ul {
     bottom: 50px;
     overflow: auto;
     z-index: 10;
+    padding: 0px 5px;
   }
 }
 
@@ -806,7 +829,8 @@ ul li{
   width: 100%;
   height: 100%;
 }
-@media (max-width: 1000px) {
+
+@media (max-width: 540px) {
   #sat-infobox {
       display: none;
       background: #0a97d6;
@@ -815,7 +839,7 @@ ul li{
       top: 60%;
       bottom: 0px;
       margin-top: 25px;
-      padding: 0 10px 50px 10px;
+      padding: 0 10px 150px 10px;
       right: 0px;
       width: 100%;
       border-top: 5px;
@@ -828,7 +852,29 @@ ul li{
   }
 }
 
-@media (min-width: 1001px) {
+@media (min-width: 541px) and (max-width: 1200px) {
+  #sat-infobox {
+      display: none;
+      background: #0a97d6;
+      cursor: default;
+      position: absolute;
+      top: 60%;
+      bottom: 0px;
+      margin-top: 25px;
+      padding: 0 10px 100px 10px;
+      right: 0px;
+      width: 100%;
+      border-top: 5px;
+      border-top-color: #0277bd;
+      border-top-style: solid;
+      overflow: auto;
+  }
+  .sat-infobox-fullsize {
+    padding: 0 10px 0px 10px !important;
+  }
+}
+
+@media (min-width: 1201px) {
   #sat-infobox {
       display: none;
       background: #0a97d6;
@@ -845,6 +891,7 @@ ul li{
       border-top-style: solid;
       overflow: auto;
   }
+  .sat-infobox-fullsize {}
 }
 
 #sat-infobox a {
@@ -893,7 +940,7 @@ ul li{
   opacity: 1 !important;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1200px) {
 .material-tooltip {
   display: none !important;
 }
@@ -909,6 +956,7 @@ ul li{
     text-align: center;
     background: transparent;
     overflow: hidden;
+    margin-top: -5px;
 }
 #datetime-input {
     position: absolute;
@@ -947,7 +995,7 @@ ul li{
   }
 }
 
-@media (min-width: 1001px) {
+@media (min-width: 1201px) {
   #fullscreen-icon {
     display: none;
   }
@@ -1013,7 +1061,7 @@ ul li{
   text-align: center;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1200px) {
   #ui-datepicker-div {
     top: auto !important;
     width: 100% !important;
@@ -1034,7 +1082,7 @@ ul li{
   }
 }
 
-@media (min-width: 1001px) {
+@media (min-width: 1201px) {
   #ui-datepicker-div {
     top: auto !important;
     bottom: 55px !important;
@@ -1050,20 +1098,19 @@ ul li{
   z-index: 10;
   bottom: 50px;
   overflow: auto;
-  max-height: 88px;
   color: white;
   text-align: center;
 }
 
 #bottom-icons-container {
     margin-top: -15px;
-    width: 100%;
-    overflow-x: auto;
+    height: 50px;
+    width: 1000px;
 }
 
 #bottom-icons {
-    box-sizing: content-box;
-    display: inline-flex;
+    /* box-sizing: content-box; */
+    /* display: inline-flex; */
     cursor: pointer;
     z-index: 11;
 }
@@ -1072,8 +1119,8 @@ ul li{
     margin-left: 0px;
 }
 .bmenu-item {
-    height: 30px;
-    /*margin-left: 10px;*/
+    height: 42px;
+    padding: 5px;
 }
 .bmenu-item img {
     background: transparent;
@@ -1086,35 +1133,118 @@ ul li{
     bottom: 2.5px;
     width: 25px;
 }
+.bmenu-item:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
 
-#menu-info-overlay img {
+/* #menu-info-overlay img {
   border-left: 2px;
   border-left-style: solid;
   border-left-color: steelblue;
-}
+} */
 
-.bmenu-item img:hover {
-    background: rgba(255, 255, 255, 0.4);
-    /*border-radius: 5px;*/
-}
 .bmenu-item-selected {
-    /*border-radius: 5px;*/
-    height: 30px;
     background: #c33 !important;
 }
 .bmenu-item-disabled {
-    /*opacity: 0.4;*/
     background: lightslategrey !important;
     filter: grayscale();
 }
 
-@media (max-width: 1200px) {
-  .bmenu-item-disabled {
-      display: none;
+@media (min-width: 1201px) {
+  #bottom-icons-container {
+      margin-top: -15px;
+      width: 870px;
+      height: 50px;
+
+  }
+  #footer-toggle-wrapper {
+    width: 100%;
+    bottom: 50px;
+    z-index: 1;
+    position: absolute;
+  }
+  .footer-slide-down {
+    transition: 1s;
+    bottom: -50px !important;
+  }
+  .footer-slide-up {
+    transition: 1s;
+    bottom: 0px !important;
+  }
+
+  footer {
+    margin-top: -100px;
+    position: absolute;
+    bottom: 0px;
+    height: 50px;
+    width: 100%;
   }
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1200px) {
+  #bottom-icons-container {
+      margin-top: -15px;
+      width: 450px;
+      height: 100px;
+
+  }
+  #footer-toggle-wrapper {
+    width: 100%;
+    bottom: 100px;
+    z-index: 1;
+    position: absolute;
+  }
+  .footer-slide-down {
+    transition: 1s;
+    bottom: -100px !important;
+  }
+  .footer-slide-up {
+    transition: 1s;
+    bottom: 0px !important;
+  }
+
+  footer {
+    margin-top: -100px;
+    position: absolute;
+    bottom: 0px;
+    height: 100px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 540px) {
+  #bottom-icons-container {
+      margin-top: -15px;
+      width: 315px;
+      height: 150px;
+
+  }
+  #footer-toggle-wrapper {
+    width: 100%;
+    bottom: 150px;
+    z-index: 1;
+    position: absolute;
+  }
+  .footer-slide-down {
+    transition: 1s;
+    bottom: -150px !important;
+  }
+  .footer-slide-up {
+    transition: 1s;
+    bottom: 0px !important;
+  }
+
+  footer {
+    margin-top: -100px;
+    position: absolute;
+    bottom: 0px;
+    height: 150px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 1200px) {
   #social-alt {
     display: block;
     position: absolute;
@@ -1128,13 +1258,12 @@ ul li{
   }
   #version-info {
     display: none;
-    margin-top: -25px !important;
-    margin-right: 10px !important;
   }
 }
 
-@media (min-width: 1001px) {
+@media (min-width: 1201px) {
   #social {
+    display: block;
     margin-top:-45px;
     margin-right:70px;
   }
@@ -1142,10 +1271,11 @@ ul li{
     display:none;
     position: absolute;
   }
-}
-
-#mobile-controls {
-  display: none;
+  #version-info {
+    display: block;
+    margin-top: -40px !important;
+    margin-right: 10px !important;
+  }
 }
 
 #down {
@@ -1156,13 +1286,6 @@ ul li{
   height: 15px !important;
   border-bottom: 0px !important;
   text-align: center !important;
-}
-
-#controls-info {
-    margin-top: 10px;
-}
-#controls-info>li {
-    margin-top: 10px;
 }
 
 #editorForm label {
@@ -1190,6 +1313,28 @@ ul li{
   bottom: 50px;
   font-size: 35px;
   height: auto !important;
+}
+
+#reset-sensor-text {
+  display: none;
+}
+
+#reset-sensor-button {
+  color: red;
+}
+
+#sensor-list-content ul li{
+  padding: 2px !important;
+}
+
+.menu-selectable:hover{
+  background-color: gray;
+  cursor: pointer;
+}
+
+.dark-blue-badge {
+  color: #00568a !important;
+  font-weight: bold;
 }
 
 .ui_tpicker_time {

@@ -64,6 +64,7 @@ var lkpassed = false;
   var lastOverlayUpdateTime = 0;
   var lastSatUpdateTime = 0;
 
+  var isSensorListMenuOpen = false;
   var isInfoOverlayMenuOpen = false;
   var isTwitterMenuOpen = false;
   var isWeatherMenuOpen = false;
@@ -182,7 +183,7 @@ var lkpassed = false;
       $(document).bind('cbox_closed', function () {
         if (isLaunchMenuOpen) {
           isLaunchMenuOpen = false;
-          $('#menu-launches img').removeClass('bmenu-item-selected');
+          $('#menu-launches').removeClass('bmenu-item-selected');
         }
       });
     })();
@@ -296,13 +297,13 @@ var lkpassed = false;
             $('#search').val('');
             searchBox.hideResults();
             isMilSatSelected = false;
-            $('#menu-space-stations img').removeClass('bmenu-item-selected');
+            $('#menu-space-stations').removeClass('bmenu-item-selected');
 
             // Hide All legends
             _hideAllLegendMenus();
 
             if (satellite.sensorSelected()) {
-              $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
+              $('#menu-in-coverage').removeClass('bmenu-item-disabled');
               $('#legend-list-default-sensor').show();
             } else {
               $('#legend-list-default').show();
@@ -378,7 +379,7 @@ var lkpassed = false;
         $('#search').val('');
         searchBox.hideResults();
         isMilSatSelected = false;
-        $('#menu-space-stations img').removeClass('bmenu-item-selected');
+        $('#menu-space-stations').removeClass('bmenu-item-selected');
       });
 
       $('#mobile-controls').on('touchstop mouseup', function () {
@@ -562,7 +563,7 @@ var lkpassed = false;
           $('#legend-list-default').hide();
           $('#legend-list-default-sensor').show();
         }
-        $('#menu-weather img').addClass('bmenu-item-disabled');
+        $('#menu-weather').addClass('bmenu-item-disabled');
         $('#weather-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
         sensorManager.whichRadar = '';
 
@@ -583,108 +584,68 @@ var lkpassed = false;
         }
       });
 
-      $('#radars-reset').click(function () {
-        _resetSensorSelected();
-      });
-
-      $('#radars-reset2').click(function () {
-        _resetSensorSelected();
-      });
-
       // USAF Radars
-      $('#radar-beale').click(function () { // Select Beale's Radar Coverage
-        sensorManager.setSensor(sensorManager.sensorList.BLE);
-      });
-      $('#radar-capecod').click(function () { // Select Cape Cod's Radar Coverage
-        sensorManager.setSensor(sensorManager.sensorList.COD);
-      });
-      $('#radar-clear').click(function () { // Select Clear's Radar Coverage
-        sensorManager.setSensor(sensorManager.sensorList.CLR);
-      });
-      $('#radar-eglin').click(function () { // Select Clear's Radar Coverage
-        sensorManager.setSensor(sensorManager.sensorList.EGL);
-      });
-      $('#radar-fylingdales').click(function () { // Select Fylingdales's Radar Coverage
-        sensorManager.setSensor(sensorManager.sensorList.FYL);
-      });
-      $('#radar-parcs').click(function () { // Select PARCS' Radar Coverage
-        sensorManager.setSensor(sensorManager.sensorList.CAV);
-      });
-      $('#radar-thule').click(function () { // Select Thule's Radar Coverage
-        sensorManager.setSensor(sensorManager.sensorList.THL);
-      });
-      $('#radar-cobradane').click(function () { // Select Cobra Dane's Radar Coverage
-        sensorManager.setSensor(sensorManager.sensorList.CDN);
-      });
+      $('#radar-beale').click(function () { sensorManager.setSensor(sensorManager.sensorList.BLE); });
+      $('#radar-capecod').click(function () { sensorManager.setSensor(sensorManager.sensorList.COD); });
+      $('#radar-clear').click(function () { sensorManager.setSensor(sensorManager.sensorList.CLR); });
+      $('#radar-eglin').click(function () { sensorManager.setSensor(sensorManager.sensorList.EGL); });
+      $('.radar-fylingdales').click(function () { sensorManager.setSensor(sensorManager.sensorList.FYL); });
+      $('#radar-parcs').click(function () { sensorManager.setSensor(sensorManager.sensorList.CAV); });
+      $('#radar-thule').click(function () { sensorManager.setSensor(sensorManager.sensorList.THL); });
+      $('#radar-cobradane').click(function () { sensorManager.setSensor(sensorManager.sensorList.CDN); });
+      $('#radar-altair').click(function () { sensorManager.setSensor(sensorManager.sensorList.ALT); });
+      $('#radar-millstone').click(function () { sensorManager.setSensor(sensorManager.sensorList.MIL); });
+      $('#radar-ascension').click(function () { sensorManager.setSensor(sensorManager.sensorList.ASC); });
+      $('#radar-globus').click(function () { sensorManager.setSensor(sensorManager.sensorList.GLB); });
+      $('#optical-diego-garcia').click(function () { sensorManager.setSensor(sensorManager.sensorList.DGC); });
+      $('#optical-maui').click(function () { sensorManager.setSensor(sensorManager.sensorList.MAU); });
+      $('#optical-socorro').click(function () { sensorManager.setSensor(sensorManager.sensorList.SOC); });
 
-      // US Contributing Radars
-      $('#radar-altair').click(function () { // Select Altair's Radar Coverage
-        sensorManager.setSensor(sensorManager.sensorList.ALT);
-      });
-      $('#radar-millstone').click(function () { // Select Millstone's Radar Coverage
-        sensorManager.setSensor(sensorManager.sensorList.MIL);
-      });
-      $('#radar-ascension').click(function () { // Select Ascension's Radar Coverage
-        sensorManager.setSensor(sensorManager.sensorList.ASC);
-      });
-      $('#radar-globus').click(function () { // Select Globus II's Radar Coverage
-        sensorManager.setSensor(sensorManager.sensorList.GLB);
-      });
-
-      // Optical
-      $('#optical-diego-garcia').click(function () { // Select Diego Garcia's Optical Coverage
-        sensorManager.setSensor(sensorManager.sensorList.DGC);
-      });
-      $('#optical-maui').click(function () { // Select Maui's Optical Coverage
-        sensorManager.setSensor(sensorManager.sensorList.MAU);
-      });
-      $('#optical-socorro').click(function () { // Select Socorro's Optical Coverage
-        sensorManager.setSensor(sensorManager.sensorList.SOC);
-      });
+      // ESOC Radars
+      $('#esoc-graves').click(function () { sensorManager.setSensor(sensorManager.sensorList.GRV); });
+      $('#esoc-tira').click(function () { sensorManager.setSensor(sensorManager.sensorList.TIR); });
+      $('#esoc-northern-cross').click(function () { sensorManager.setSensor(sensorManager.sensorList.NRC); });
+      $('#esoc-troodos').click(function () { sensorManager.setSensor(sensorManager.sensorList.TRO); });
+      $('#esoc-space-debris-telescope').click(function () { sensorManager.setSensor(sensorManager.sensorList.SDT); });
 
       // Russian Radars
-      $('#russian-armavir').click(function () {
-        sensorManager.setSensor(sensorManager.sensorList.ARM);
-      });
-      $('#russian-balkhash').click(function () {
-        sensorManager.setSensor(sensorManager.sensorList.BAL);
-      });
-      $('#russian-gantsevichi').click(function () {
-        sensorManager.setSensor(sensorManager.sensorList.GAN);
-      });
-      $('#russian-lekhtusi').click(function () {
-        sensorManager.setSensor(sensorManager.sensorList.LEK);
-      });
-      $('#russian-mishelevka-d').click(function () {
-        sensorManager.setSensor(sensorManager.sensorList.MIS);
-      });
-      $('#russian-olenegorsk').click(function () {
-        sensorManager.setSensor(sensorManager.sensorList.OLE);
-      });
-      $('#russian-pechora').click(function () {
-        sensorManager.setSensor(sensorManager.sensorList.PEC);
-      });
-      $('#russian-pionersky').click(function () {
-        sensorManager.setSensor(sensorManager.sensorList.PIO);
-      });
+      $('#russian-armavir').click(function () { sensorManager.setSensor(sensorManager.sensorList.ARM); });
+      $('#russian-balkhash').click(function () { sensorManager.setSensor(sensorManager.sensorList.BAL); });
+      $('#russian-gantsevichi').click(function () { sensorManager.setSensor(sensorManager.sensorList.GAN); });
+      $('#russian-lekhtusi').click(function () { sensorManager.setSensor(sensorManager.sensorList.LEK); });
+      $('#russian-mishelevka-d').click(function () { sensorManager.setSensor(sensorManager.sensorList.MIS); });
+      $('#russian-olenegorsk').click(function () { sensorManager.setSensor(sensorManager.sensorList.OLE); });
+      $('#russian-pechora').click(function () { sensorManager.setSensor(sensorManager.sensorList.PEC); });
+      $('#russian-pionersky').click(function () { sensorManager.setSensor(sensorManager.sensorList.PIO); });
 
       // Chinese Radars
-      $('#chinese-xuanhua').click(function () {
-        sensorManager.setSensor(sensorManager.sensorList.XUA);
-      });
+      $('#chinese-xuanhua').click(function () { sensorManager.setSensor(sensorManager.sensorList.XUA); });
 
-      $('.sensor-selected').click(function (e) {
-        if (e.target.id === 'radar-reset' || e.target.id === 'radar-reset2') return;
+      $('#reset-sensor-button').click(function () {
         satSet.setColorScheme(ColorScheme.default, true);
-        $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-        $('#menu-planetarium img').removeClass('bmenu-item-disabled');
+        $('#menu-sensor-info').removeClass('bmenu-item-disabled');
+        $('#menu-planetarium').removeClass('bmenu-item-disabled');
         if (selectedSat !== -1) {
-          $('#menu-lookangles img').removeClass('bmenu-item-disabled');
+          $('#menu-lookangles').removeClass('bmenu-item-disabled');
         }
         if (watchlistList.length > 0) {
-          $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
+          $('#menu-info-overlay').removeClass('bmenu-item-disabled');
         }
-        $('#menu-in-coverage img').removeClass('bmenu-item-disabled');
+        $('#menu-in-coverage').removeClass('bmenu-item-disabled');
+        _resetSensorSelected();
+      });
+
+      $('#reset-sensor-button').click(function (e) {
+        satSet.setColorScheme(ColorScheme.default, true);
+        $('#menu-sensor-info').removeClass('bmenu-item-disabled');
+        $('#menu-planetarium').removeClass('bmenu-item-disabled');
+        if (selectedSat !== -1) {
+          $('#menu-lookangles').removeClass('bmenu-item-disabled');
+        }
+        if (watchlistList.length > 0) {
+          $('#menu-info-overlay').removeClass('bmenu-item-disabled');
+        }
+        $('#menu-in-coverage').removeClass('bmenu-item-disabled');
       });
 
       $('#datetime-input-form').change(function (e) {
@@ -981,7 +942,7 @@ var lkpassed = false;
           settingsManager.themes.blueTheme();
         }
         if (!satellite.sensorSelected() || watchlistList.length <= 0) {
-          $('#menu-info-overlay img').addClass('bmenu-item-disabled');
+          $('#menu-info-overlay').addClass('bmenu-item-disabled');
         }
       });
       // Add button selected on watchlist menu
@@ -997,7 +958,7 @@ var lkpassed = false;
           _updateWatchlist();
         }
         if (satellite.sensorSelected()) {
-          $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
+          $('#menu-info-overlay').removeClass('bmenu-item-disabled');
         }
         $('#watchlist-new').val(''); // Clear the search box after enter pressed/selected
       });
@@ -1014,7 +975,7 @@ var lkpassed = false;
           _updateWatchlist();
         }
         if (satellite.sensorSelected()) {
-          $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
+          $('#menu-info-overlay').removeClass('bmenu-item-disabled');
         }
         $('#watchlist-new').val(''); // Clear the search box after enter pressed/selected
         e.preventDefault();
@@ -1060,7 +1021,7 @@ var lkpassed = false;
           watchlistList = newWatchlist;
           _updateWatchlist();
           if (satellite.sensorSelected()) {
-            $('#menu-info-overlay img').removeClass('bmenu-item-disabled');
+            $('#menu-info-overlay').removeClass('bmenu-item-disabled');
           }
         };
         reader.readAsText(evt.target.files[0]);
@@ -1339,8 +1300,8 @@ var lkpassed = false;
       });
 
       $('#customSensor').submit(function (e) {
-        $('#menu-sensor-info img').removeClass('bmenu-item-disabled');
-        $('#menu-planetarium img').removeClass('bmenu-item-disabled');
+        $('#menu-sensor-info').removeClass('bmenu-item-disabled');
+        $('#menu-planetarium').removeClass('bmenu-item-disabled');
         sensorManager.whichRadar = 'CUSTOM';
         if ($('#cs-telescope').val()) {
           $('#sensor-type').html('Telescope');
@@ -1539,10 +1500,23 @@ var lkpassed = false;
       if (settingsManager.isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
       ga('send', 'event', 'Bottom Icon', $(this).context.id, 'Selected');
       switch ($(this).context.id) {
+        case 'menu-sensor-list': // No Keyboard Commands
+          if (isSensorListMenuOpen) {
+            uiController.hideSideMenus();
+            isSensorListMenuOpen = false;
+            break;
+          } else {
+            uiController.hideSideMenus();
+            $('#sensor-list-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+            isSensorListMenuOpen = true;
+            $('#menu-sensor-list').addClass('bmenu-item-selected');
+            break;
+          }
+          break;
         case 'menu-info-overlay':
           if (!satellite.sensorSelected()) { // No Sensor Selected
-            if (!$('#menu-info-overlay img:animated').length) {
-              $('#menu-info-overlay img').effect('shake', {distance: 10});
+            if (!$('#menu-info-overlay:animated').length) {
+              $('#menu-info-overlay').effect('shake', {distance: 10});
             }
             break;
           }
@@ -1574,14 +1548,14 @@ var lkpassed = false;
               _updateNextPassOverlay(true);
             }
             $('#info-overlay-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            $('#menu-info-overlay img').addClass('bmenu-item-selected');
+            $('#menu-info-overlay').addClass('bmenu-item-selected');
             isInfoOverlayMenuOpen = true;
             break;
           }
         case 'menu-sensor-info': // No Keyboard Commands
           if (!satellite.sensorSelected()) { // No Sensor Selected
-            if (!$('#menu-sensor-info img:animated').length) {
-              $('#menu-sensor-info img').effect('shake', {distance: 10});
+            if (!$('#menu-sensor-info:animated').length) {
+              $('#menu-sensor-info').effect('shake', {distance: 10});
             }
             break;
           }
@@ -1594,25 +1568,25 @@ var lkpassed = false;
             satellite.getsensorinfo();
             $('#sensor-info-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             isSensorInfoMenuOpen = true;
-            $('#menu-sensor-info img').addClass('bmenu-item-selected');
+            $('#menu-sensor-info').addClass('bmenu-item-selected');
             break;
           }
           break;
         case 'menu-in-coverage': // B
           if (!satellite.sensorSelected()) { // No Sensor Selected
-            if (!$('#menu-in-coverage img:animated').length) {
-              $('#menu-in-coverage img').effect('shake', {distance: 10});
+            if (!$('#menu-in-coverage:animated').length) {
+              $('#menu-in-coverage').effect('shake', {distance: 10});
             }
             break;
           }
           if (settingsManager.isBottomMenuOpen) {
             $('#bottom-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-            $('#menu-in-coverage img').removeClass('bmenu-item-selected');
+            $('#menu-in-coverage').removeClass('bmenu-item-selected');
             settingsManager.isBottomMenuOpen = false;
             break;
           } else {
             $('#bottom-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            $('#menu-in-coverage img').addClass('bmenu-item-selected');
+            $('#menu-in-coverage').addClass('bmenu-item-selected');
             settingsManager.isBottomMenuOpen = true;
             break;
           }
@@ -1624,20 +1598,20 @@ var lkpassed = false;
             break;
           } else {
             if (!satellite.sensorSelected() || selectedSat === -1) { // No Sensor or Satellite Selected
-              if (!$('#menu-lookangles img:animated').length) {
-                $('#menu-lookangles img').effect('shake', {distance: 10});
+              if (!$('#menu-lookangles:animated').length) {
+                $('#menu-lookangles').effect('shake', {distance: 10});
               }
               break;
             }
             uiController.hideSideMenus();
             $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             isLookanglesMenuOpen = true;
-            $('#menu-lookangles img').addClass('bmenu-item-selected');
+            $('#menu-lookangles').addClass('bmenu-item-selected');
             if (selectedSat !== -1) {
               sat = satSet.getSat(selectedSat);
               if (sat.static || sat.missile) {
-                if (!$('#menu-lookangles img:animated').length) {
-                  $('#menu-lookangles img').effect('shake', {distance: 10});
+                if (!$('#menu-lookangles:animated').length) {
+                  $('#menu-lookangles').effect('shake', {distance: 10});
                 }
                 break;
               } else {
@@ -1653,7 +1627,7 @@ var lkpassed = false;
         case 'menu-watchlist': // S
           if (isWatchlistMenuOpen) {
             isWatchlistMenuOpen = false;
-            $('#menu-watchlist img').removeClass('bmenu-item-selected');
+            $('#menu-watchlist').removeClass('bmenu-item-selected');
             $('#search-holder').show();
             uiController.hideSideMenus();
             break;
@@ -1663,7 +1637,7 @@ var lkpassed = false;
             $('#search-holder').hide();
             _updateWatchlist();
             isWatchlistMenuOpen = true;
-            $('#menu-watchlist img').addClass('bmenu-item-selected');
+            $('#menu-watchlist').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -1674,15 +1648,15 @@ var lkpassed = false;
             break;
           } else {
             if (selectedSat === -1) { // No Satellite Selected
-              if (!$('#menu-lookanglesmultisite img:animated').length) {
-                $('#menu-lookanglesmultisite img').effect('shake', {distance: 10});
+              if (!$('#menu-lookanglesmultisite:animated').length) {
+                $('#menu-lookanglesmultisite').effect('shake', {distance: 10});
               }
               break;
             }
             uiController.hideSideMenus();
             $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             isLookanglesMultiSiteMenuOpen = true;
-            $('#menu-lookanglesmultisite img').addClass('bmenu-item-selected');
+            $('#menu-lookanglesmultisite').addClass('bmenu-item-selected');
             if (selectedSat !== -1) {
               $('#loading-screen').fadeIn('slow', function () {
                 sat = satSet.getSat(selectedSat);
@@ -1702,7 +1676,7 @@ var lkpassed = false;
             uiController.hideSideMenus();
             $('#findByLooks-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             isFindByLooksMenuOpen = true;
-            $('#menu-find-sat img').addClass('bmenu-item-selected');
+            $('#menu-find-sat').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -1718,7 +1692,7 @@ var lkpassed = false;
             }
             $('#twitter-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             isTwitterMenuOpen = true;
-            $('#menu-twitter img').addClass('bmenu-item-selected');
+            $('#menu-twitter').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -1753,11 +1727,11 @@ var lkpassed = false;
             uiController.hideSideMenus();
             $('#weather-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             isWeatherMenuOpen = true;
-            $('#menu-weather img').addClass('bmenu-item-selected');
+            $('#menu-weather').addClass('bmenu-item-selected');
             break;
           } else {
-            if (!$('#menu-weather img:animated').length) {
-              $('#menu-weather img').effect('shake', {distance: 10});
+            if (!$('#menu-weather:animated').length) {
+              $('#menu-weather').effect('shake', {distance: 10});
             }
           }
           break;
@@ -1769,8 +1743,8 @@ var lkpassed = false;
           }
           if (!settingsManager.isMapMenuOpen) {
             if (selectedSat === -1) { // No Satellite Selected
-              if (!$('#menu-map img:animated').length) {
-                $('#menu-map img').effect('shake', {distance: 10});
+              if (!$('#menu-map:animated').length) {
+                $('#menu-map').effect('shake', {distance: 10});
               }
               break;
             }
@@ -1780,7 +1754,7 @@ var lkpassed = false;
             uiController.updateMap();
             var satData = satSet.getSat(selectedSat);
             $('#map-sat').tooltip({delay: 50, tooltip: satData.SCC_NUM, position: 'left'});
-            $('#menu-map img').addClass('bmenu-item-selected');
+            $('#menu-map').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -1794,7 +1768,7 @@ var lkpassed = false;
         //   uiController.hideSideMenus();
         //   $('#space-weather-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
         //   isSpaceWeatherMenuOpen = true;
-        //   $('#menu-space-weather img').addClass('bmenu-item-selected');
+        //   $('#menu-space-weather').addClass('bmenu-item-selected');
         //   break;
         case 'menu-launches': // L
           if (isLaunchMenuOpen) {
@@ -1805,7 +1779,7 @@ var lkpassed = false;
             uiController.hideSideMenus();
             $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2017.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
             isLaunchMenuOpen = true;
-            $('#menu-launches img').addClass('bmenu-item-selected');
+            $('#menu-launches').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -1818,7 +1792,7 @@ var lkpassed = false;
             uiController.hideSideMenus();
             $('#about-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             isAboutSelected = true;
-            $('#menu-about img').addClass('bmenu-item-selected');
+            $('#menu-about').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -1827,14 +1801,14 @@ var lkpassed = false;
             $('#search').val('');
             searchBox.hideResults();
             isMilSatSelected = false;
-            $('#menu-space-stations img').removeClass('bmenu-item-selected');
+            $('#menu-space-stations').removeClass('bmenu-item-selected');
             break;
           } else {
             $('#search').val('40420,41394,32783,35943,36582,40353,40555,41032,38010,38008,38007,38009,37806,41121,41579,39030,39234,28492,36124,39194,36095,40358,40258,37212,37398,38995,40296,40900,39650,27434,31601,36608,28380,28521,36519,39177,40699,34264,36358,39375,38248,34807,28908,32954,32955,32956,35498,35500,37152,37154,38733,39057,39058,39059,39483,39484,39485,39761,39762,39763,40920,40921,40922,39765,29658,31797,32283,32750,33244,39208,26694,40614,20776,25639,26695,30794,32294,33055,39034,28946,33751,33752,27056,27057,27464,27465,27868,27869,28419,28420,28885,29273,32476,31792,36834,37165,37875,37941,38257,38354,39011,39012,39013,39239,39240,39241,39363,39410,40109,40111,40143,40275,40305,40310,40338,40339,40340,40362,40878,41026,41038,41473,28470,37804,37234,29398,40110,39209,39210,36596');
             searchBox.doSearch('40420,41394,32783,35943,36582,40353,40555,41032,38010,38008,38007,38009,37806,41121,41579,39030,39234,28492,36124,39194,36095,40358,40258,37212,37398,38995,40296,40900,39650,27434,31601,36608,28380,28521,36519,39177,40699,34264,36358,39375,38248,34807,28908,32954,32955,32956,35498,35500,37152,37154,38733,39057,39058,39059,39483,39484,39485,39761,39762,39763,40920,40921,40922,39765,29658,31797,32283,32750,33244,39208,26694,40614,20776,25639,26695,30794,32294,33055,39034,28946,33751,33752,27056,27057,27464,27465,27868,27869,28419,28420,28885,29273,32476,31792,36834,37165,37875,37941,38257,38354,39011,39012,39013,39239,39240,39241,39363,39410,40109,40111,40143,40275,40305,40310,40338,40339,40340,40362,40878,41026,41038,41473,28470,37804,37234,29398,40110,39209,39210,36596');
             isMilSatSelected = true;
-            $('#menu-about img').removeClass('bmenu-item-selected');
-            $('#menu-space-stations img').addClass('bmenu-item-selected');
+            $('#menu-about').removeClass('bmenu-item-selected');
+            $('#menu-space-stations').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -1848,7 +1822,7 @@ var lkpassed = false;
             $('#socrates-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             isSocratesMenuOpen = true;
             _socrates(-1);
-            $('#menu-satellite-collision img').addClass('bmenu-item-selected');
+            $('#menu-satellite-collision').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -1861,7 +1835,7 @@ var lkpassed = false;
             uiController.hideSideMenus();
             $('#settings-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             isSettingsMenuOpen = true;
-            $('#menu-settings img').addClass('bmenu-item-selected');
+            $('#menu-settings').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -1874,7 +1848,7 @@ var lkpassed = false;
             if (selectedSat !== -1) {
               uiController.hideSideMenus();
               $('#editSat-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-              $('#menu-editSat img').addClass('bmenu-item-selected');
+              $('#menu-editSat').addClass('bmenu-item-selected');
               isEditSatMenuOpen = true;
 
               sat = satSet.getSat(selectedSat);
@@ -1910,8 +1884,8 @@ var lkpassed = false;
               $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
               // $('#es-rasc').val(sat.TLE2.substr(18 - 1, 7 + 1).toString());
             } else {
-              if (!$('#menu-editSat img:animated').length) {
-                $('#menu-editSat img').effect('shake', {distance: 10});
+              if (!$('#menu-editSat:animated').length) {
+                $('#menu-editSat').effect('shake', {distance: 10});
               }
             }
           }
@@ -1926,15 +1900,15 @@ var lkpassed = false;
             if (selectedSat !== -1) {
               uiController.hideSideMenus();
               $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-              $('#menu-newLaunch img').addClass('bmenu-item-selected');
+              $('#menu-newLaunch').addClass('bmenu-item-selected');
               isNewLaunchMenuOpen = true;
 
               sat = satSet.getSat(selectedSat);
               $('#nl-scc').val(sat.SCC_NUM);
               $('#nl-inc').val((sat.inclination * RAD2DEG).toPrecision(2));
             } else {
-              if (!$('#menu-newLaunch img:animated').length) {
-                $('#menu-newLaunch img').effect('shake', {distance: 10});
+              if (!$('#menu-newLaunch:animated').length) {
+                $('#menu-newLaunch').effect('shake', {distance: 10});
               }
             }
             break;
@@ -1950,7 +1924,7 @@ var lkpassed = false;
 
             $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             isCustomSensorMenuOpen = true;
-            $('#menu-customSensor img').addClass('bmenu-item-selected');
+            $('#menu-customSensor').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -1963,7 +1937,7 @@ var lkpassed = false;
             // TODO: NEW LAUNCH
             uiController.hideSideMenus();
             $('#missile-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            $('#menu-missile img').addClass('bmenu-item-selected');
+            $('#menu-missile').addClass('bmenu-item-selected');
             isMissileMenuOpen = true;
             break;
           }
@@ -1974,7 +1948,7 @@ var lkpassed = false;
             uiController.hideSideMenus();
             orbitDisplay.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
             cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
-            $('#menu-planetarium img').removeClass('bmenu-item-selected');
+            $('#menu-planetarium').removeClass('bmenu-item-selected');
             break;
           } else {
             uiController.hideSideMenus();
@@ -1982,11 +1956,11 @@ var lkpassed = false;
               cameraType.current = cameraType.PLANETARIUM; // Activate Planetarium Camera Mode
               _hideAllLegendMenus();
               $('#legend-list-planetarium').show();
-              $('#menu-planetarium img').addClass('bmenu-item-selected');
+              $('#menu-planetarium').addClass('bmenu-item-selected');
               isPlanetariumView = true;
             } else {
-              if (!$('#menu-planetarium img:animated').length) {
-                $('#menu-planetarium img').effect('shake', {distance: 10});
+              if (!$('#menu-planetarium:animated').length) {
+                $('#menu-planetarium').effect('shake', {distance: 10});
               }
             }
             break;
@@ -2000,6 +1974,7 @@ var lkpassed = false;
       $.colorbox.close();
 
       // Hide all side menus
+      $('#sensor-list-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#info-overlay-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#sensor-info-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#watchlist-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
@@ -2019,27 +1994,29 @@ var lkpassed = false;
       $('#about-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
 
       // Remove red color from all menu icons
-      $('#menu-info-overlay img').removeClass('bmenu-item-selected');
-      $('#menu-sensor-info img').removeClass('bmenu-item-selected');
-      $('#menu-watchlist img').removeClass('bmenu-item-selected');
-      $('#menu-lookangles img').removeClass('bmenu-item-selected');
-      $('#menu-lookanglesmultisite img').removeClass('bmenu-item-selected');
-      $('#menu-launches img').removeClass('bmenu-item-selected');
-      $('#menu-find-sat img').removeClass('bmenu-item-selected');
-      $('#menu-twitter img').removeClass('bmenu-item-selected');
-      $('#menu-weather img').removeClass('bmenu-item-selected');
-      $('#menu-map img').removeClass('bmenu-item-selected');
-      // $('#menu-space-weather img').removeClass('bmenu-item-selected');
-      $('#menu-satellite-collision img').removeClass('bmenu-item-selected');
-      $('#menu-settings img').removeClass('bmenu-item-selected');
-      $('#menu-editSat img').removeClass('bmenu-item-selected');
-      $('#menu-newLaunch img').removeClass('bmenu-item-selected');
-      $('#menu-missile img').removeClass('bmenu-item-selected');
-      $('#menu-customSensor img').removeClass('bmenu-item-selected');
-      $('#menu-about img').removeClass('bmenu-item-selected');
-      // $('#menu-planetarium img').removeClass('bmenu-item-selected');
+      $('#menu-sensor-list').removeClass('bmenu-item-selected');
+      $('#menu-info-overlay').removeClass('bmenu-item-selected');
+      $('#menu-sensor-info').removeClass('bmenu-item-selected');
+      $('#menu-watchlist').removeClass('bmenu-item-selected');
+      $('#menu-lookangles').removeClass('bmenu-item-selected');
+      $('#menu-lookanglesmultisite').removeClass('bmenu-item-selected');
+      $('#menu-launches').removeClass('bmenu-item-selected');
+      $('#menu-find-sat').removeClass('bmenu-item-selected');
+      $('#menu-twitter').removeClass('bmenu-item-selected');
+      $('#menu-weather').removeClass('bmenu-item-selected');
+      $('#menu-map').removeClass('bmenu-item-selected');
+      // $('#menu-space-weather').removeClass('bmenu-item-selected');
+      $('#menu-satellite-collision').removeClass('bmenu-item-selected');
+      $('#menu-settings').removeClass('bmenu-item-selected');
+      $('#menu-editSat').removeClass('bmenu-item-selected');
+      $('#menu-newLaunch').removeClass('bmenu-item-selected');
+      $('#menu-missile').removeClass('bmenu-item-selected');
+      $('#menu-customSensor').removeClass('bmenu-item-selected');
+      $('#menu-about').removeClass('bmenu-item-selected');
+      // $('#menu-planetarium').removeClass('bmenu-item-selected');
 
       // Unflag all open menu variables
+      isSensorListMenuOpen = false;
       isInfoOverlayMenuOpen = false;
       isSensorInfoMenuOpen = false;
       isWatchlistMenuOpen = false;
@@ -2589,25 +2566,17 @@ var lkpassed = false;
     });
     satellite.setobs(null, true);
     sensorManager.whichRadar = ''; // Disable Weather
-    $('#menu-sensor-info img').addClass('bmenu-item-disabled');
-    $('#menu-in-coverage img').addClass('bmenu-item-disabled');
-    $('#menu-lookangles img').addClass('bmenu-item-disabled');
-    $('#menu-weather img').addClass('bmenu-item-disabled');
-    $('#menu-planetarium img').addClass('bmenu-item-disabled');
+    $('#menu-sensor-info').addClass('bmenu-item-disabled');
+    $('#menu-in-coverage').addClass('bmenu-item-disabled');
+    $('#menu-lookangles').addClass('bmenu-item-disabled');
+    $('#menu-weather').addClass('bmenu-item-disabled');
+    $('#menu-planetarium').addClass('bmenu-item-disabled');
 
     // setColorScheme ignores calls to recolor satellites when there is no sensor.
     // This is fixed by enabling isForceColorScheme
     settingsManager.isForceColorScheme = true;
     satSet.setColorScheme(ColorScheme.default, true);
   };
-
-  $("#radar-reset").on('click', function () {
-    _resetSensorSelected();
-  });
-
-  $("#radar-reset2").on('click', function () {
-    _resetSensorSelected();
-  });
 
   _offlineMessage = function () {
     $('#loader-text').html('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');

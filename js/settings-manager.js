@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.37.1';
+  settingsManager.versionNumber = 'v0.38.0';
   settingsManager.versionDate = 'August 18, 2018';
 
   // Offline management
@@ -25,8 +25,8 @@
       document.getElementById('nav-footer').classList.add('red');
       document.getElementById('nav-footer').classList.add('darken-3');
       $('#bottom-menu').css('background', 'rgb(165, 0, 0)');
-      $('.bmenu-item img').css('border-right-color', 'orangered');
-      $('#menu-info-overlay img ').css('border-left-color', 'orangered');
+      $('.bmenu-item').css('border-right-color', 'orangered');
+      $('#menu-info-overlay ').css('border-left-color', 'orangered');
       $('.side-menu').css('background', 'LightCoral');
       $('#sat-infobox').css('background', 'LightCoral');
       $('#sat-infobox').css('border-top-color', 'DarkRed');
@@ -52,8 +52,8 @@
     document.getElementById('nav-wrapper').classList.add('light-blue');
     $('#nav-footer').css('background-color', '#0277bd');
     $('#bottom-menu').css('background', 'rgb(0,105,165)');
-    $('.bmenu-item img').css('border-right-color', 'steelblue');
-    $('#menu-info-overlay img ').css('border-left-color', 'steelblue');
+    $('.bmenu-item').css('border-right-color', 'steelblue');
+    $('#menu-info-overlay ').css('border-left-color', 'steelblue');
     $('.side-menu').css('background', '#0a97d6');
     $('#sat-infobox').css('background', '#0a97d6');
     $('#sat-infobox').css('border-top-color', '#0277bd');

@@ -127,36 +127,28 @@
     $('#colors-menu>li').click(function () {
       selectSat(-1); // clear selected sat
       var colorName = $(this).data('color');
-      // Hide All legends
-      $('#legend-list-default').hide();
-      $('#legend-list-default-sensor').hide();
-      $('#legend-list-rcs').hide();
-      $('#legend-list-small').hide();
-      $('#legend-list-near').hide();
-      $('#legend-list-deep').hide();
-      $('#legend-list-velocity').hide();
       switch (colorName) {
         case 'default':
           if (satellite.sensorSelected()) {
-            $('#legend-list-default-sensor').show();
+            uiController.legendMenuChange('default');
           } else {
-            $('#legend-list-default').show();
+            uiController.legendMenuChange('default');
           }
           satSet.setColorScheme(ColorScheme.default, true);
           ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
           break;
         case 'velocity':
-          $('#legend-list-velocity').show();
+          uiController.legendMenuChange('velocity');
           satSet.setColorScheme(ColorScheme.velocity);
           ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
           break;
         case 'near-earth':
-          $('#legend-list-near').show();
+          uiController.legendMenuChange('near');
           satSet.setColorScheme(ColorScheme.leo);
           ga('send', 'event', 'ColorScheme Menu', 'near-earth', 'Selected');
           break;
         case 'deep-space':
-          $('#legend-list-deep').show();
+          uiController.legendMenuChange('deep');
           satSet.setColorScheme(ColorScheme.geo);
           ga('send', 'event', 'ColorScheme Menu', 'Deep-Space', 'Selected');
           break;
@@ -170,12 +162,12 @@
           });
           break;
         case 'rcs':
-          $('#legend-list-rcs').show();
+          uiController.legendMenuChange('rcs');
           satSet.setColorScheme(ColorScheme.rcs);
           ga('send', 'event', 'ColorScheme Menu', 'RCS', 'Selected');
           break;
         case 'smallsats':
-          $('#legend-list-small').show();
+          uiController.legendMenuChange('small');
           satSet.setColorScheme(ColorScheme.smallsats);
           ga('send', 'event', 'ColorScheme Menu', 'Small Satellites', 'Selected');
           break;

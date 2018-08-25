@@ -14,11 +14,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=0.38.0b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=0.38.1b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=0.38.0b" rel="stylesheet">
+    <link href="css/fonts.css?v=0.38.1b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=0.38.0b">
+    <link rel="stylesheet" href="css/materialize.css?v=0.38.1b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -52,7 +52,6 @@
       </div>
       <span id="loader-text">Downloading Science...</span>
       <button id="mobile-start-button" class="btn waves-effect waves-light" type="button" name="action" onclick="mobile.start();">Click to Begin &#9658;</button>
-      <!-- <span id="loader-text">v0.38.0 ESA Sensor Expansion</span> -->
     </div>
   </div>
   <div id="no-webgl">
@@ -408,9 +407,6 @@
         </div>
       </div>
       <div id="twitter-menu" class="start-hidden side-menu text-select"></div>
-      <div id="weather-menu" class="start-hidden side-menu">
-        <img id="weather-image">
-      </div>
       <div id="map-menu" class="start-hidden side-menu valign-wrapper">
         <img id="map-image" src="images/braun-stereographic.jpg" width="800px" height="600px">
         <img id="map-sat" class="map-item map-look" src="images/satellite-2.png" width="20px" height="20px">
@@ -469,9 +465,6 @@
           Braun Stereographic Projection (c) Tobias Jung
         </div>
       </div>
-      <!-- <div id="space-weather-menu" class="start-hidden side-menu">
-        <img id="space-weather-image">
-      </div> -->
       <div id="socrates-menu" class="start-hidden text-select">
         <div id="socrates-content" class="side-menu">
           <div class="row">
@@ -1057,7 +1050,7 @@
             RCS
           </div>
           <div class="sat-info-value" id="sat-rcs">
-            MEDIUM
+            NO DATA
           </div>
         </div>
         <div id="iss-stream-menu">
@@ -1091,7 +1084,6 @@
         <img id="menu-lookanglesmultisite" src="" delayedsrc="images/orbit.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="SSN Lookangles" data-position="top" data-delay="50" data-tooltip="SSN Lookangles">
         <img id="menu-find-sat" src="" delayedsrc="images/findOrbit.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Search Orbit" data-position="top" data-delay="50" data-tooltip="Search Orbit">
         <img id="menu-twitter" src="" delayedsrc="images/twitter.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Space News on Twitter" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
-        <img id="menu-weather" src="" delayedsrc="images/sun.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Terrestrial Weather" data-position="top" data-delay="50" data-tooltip="Terrestrial Weather">
         <img id="menu-map" src="" delayedsrc="images/map.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Stereographic Map" data-position="top" data-delay="50" data-tooltip="Stereographic Map">
         <img id="menu-launches" src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Launch Schedule" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
         <img id="menu-space-stations" src="" delayedsrc="images/space-station-1.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Union of Concerned Scientists Watchlist" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist">
@@ -1123,35 +1115,35 @@
   <script src="js/lib/materialize.min.js"></script>
   <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.min.js?v=0.38.0b"></script>
+  <script src="js/lib/satellite.min.js?v=0.38.1b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=0.38.0b"></script>
+  <script src="js/lib/shader-loader.min.js?v=0.38.1b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=0.38.0b"></script>
-  <script src="js/time-manager.js?v=0.38.0b"></script>
-  <script src="js/earth.js?v=0.38.0b"></script>
-  <script src="js/satSet.js?v=0.38.0b"></script>
-  <script src="js/sun.js?v=0.38.0b"></script>
+  <script src="js/settings-manager.js?v=0.38.1b"></script>
+  <script src="js/time-manager.js?v=0.38.1b"></script>
+  <script src="js/earth.js?v=0.38.1b"></script>
+  <script src="js/satSet.js?v=0.38.1b"></script>
+  <script src="js/sun.js?v=0.38.1b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js?v=0.38.0b"></script>
+  <script src="js/variables.js?v=0.38.1b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=0.38.0b"></script>
+  <script src="js/ballistic-missile.js?v=0.38.1b"></script>
   <!-- Load Extra Satellites -->
   <!-- <script src="offline/extra.js"></script>
   <script src="offline/satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=0.38.0b"></script>
-  <script src="js/mobile.js?v=0.38.0b"></script>
-  <script src="js/main.js?v=0.38.0b"></script>
-  <script src="js/ui.js?v=0.38.0b"></script>
-  <script src="js/lookangles.js?v=0.38.0b"></script>
-  <script src="js/orbit-display.js?v=0.38.0b"></script>
-  <script src="js/drawLoop-shapes.js?v=0.38.0b"></script>
-  <script src="js/groups.js?v=0.38.0b"></script>
-  <script src="js/search-box.js?v=0.38.0b"></script>
+  <script src="js/color-scheme.js?v=0.38.1b"></script>
+  <script src="js/mobile.js?v=0.38.1b"></script>
+  <script src="js/main.js?v=0.38.1b"></script>
+  <script src="js/ui.js?v=0.38.1b"></script>
+  <script src="js/lookangles.js?v=0.38.1b"></script>
+  <script src="js/orbit-display.js?v=0.38.1b"></script>
+  <script src="js/drawLoop-shapes.js?v=0.38.1b"></script>
+  <script src="js/groups.js?v=0.38.1b"></script>
+  <script src="js/search-box.js?v=0.38.1b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

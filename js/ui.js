@@ -67,8 +67,6 @@ var lkpassed = false;
   var isSensorListMenuOpen = false;
   var isInfoOverlayMenuOpen = false;
   var isTwitterMenuOpen = false;
-  var isWeatherMenuOpen = false;
-  // var isSpaceWeatherMenuOpen = false;
   var isFindByLooksMenuOpen = false;
   var isSensorInfoMenuOpen = false;
   var isWatchlistMenuOpen = false;
@@ -299,14 +297,11 @@ var lkpassed = false;
             isMilSatSelected = false;
             $('#menu-space-stations').removeClass('bmenu-item-selected');
 
-            // Hide All legends
-            _hideAllLegendMenus();
-
             if (satellite.sensorSelected()) {
               $('#menu-in-coverage').removeClass('bmenu-item-disabled');
-              $('#legend-list-default-sensor').show();
+              uiController.legendMenuChange('default');
             } else {
-              $('#legend-list-default').show();
+              uiController.legendMenuChange('default');
             }
 
             satSet.setColorScheme(ColorScheme.default, true);
@@ -453,14 +448,6 @@ var lkpassed = false;
         ga('send', 'social', 'Reddit', 'share', 'http://keeptrack.com');
       });
 
-      $('#us-radar-menu').click(function () {
-        if ($('#legend-list-default').css('display') === 'block') {
-          $('#legend-list-default').hide();
-          $('#legend-list-default-sensor').show();
-        }
-        uiController.updateMap();
-      });
-
       // NOTE: MOVE THIS
         $('#legend-hover-menu').click(function (e) {
           switch (e.target.classList[1]) {
@@ -557,18 +544,6 @@ var lkpassed = false;
               break;
           }
         });
-
-      $('#russian-menu').click(function () {
-        if ($('#legend-list-default').css('display') === 'block') {
-          $('#legend-list-default').hide();
-          $('#legend-list-default-sensor').show();
-        }
-        $('#menu-weather').addClass('bmenu-item-disabled');
-        $('#weather-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-        sensorManager.whichRadar = '';
-
-        uiController.updateMap();
-      });
 
       $('#legend-menu').click(function () {
         if ($('#legend-hover-menu').css('display') === 'block') {
@@ -1359,10 +1334,7 @@ var lkpassed = false;
           changeZoom('leo');
         }
 
-        // Hide All legends
-        _hideAllLegendMenus();
-
-        $('#legend-list-default-sensor').show();
+        uiController.legendMenuChange('default');
 
         e.preventDefault();
       });
@@ -1696,45 +1668,6 @@ var lkpassed = false;
             break;
           }
           break;
-        case 'menu-weather': // W
-          if (isWeatherMenuOpen) {
-            isWeatherMenuOpen = false;
-            uiController.hideSideMenus();
-            break;
-          }
-          if (!isWeatherMenuOpen && sensorManager.whichRadar !== '') {
-            if (sensorManager.whichRadar === 'COD' || sensorManager.whichRadar === 'MIL') {
-              $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/BOX_0.png');
-            }
-            if (sensorManager.whichRadar === 'EGL') {
-              $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/EVX_0.png');
-            }
-            if (sensorManager.whichRadar === 'CLR') {
-              $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/APD_0.png');
-            }
-            if (sensorManager.whichRadar === 'PAR') {
-              $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/MVX_0.png');
-            }
-            if (sensorManager.whichRadar === 'BLE') {
-              $('#weather-image').attr('src', 'http://radar.weather.gov/lite/NCR/DAX_0.png');
-            }
-            if (sensorManager.whichRadar === 'FYL') {
-              $('#weather-image').attr('src', 'http://i.cdn.turner.com/cnn/.element/img/3.0/weather/maps/satuseurf.gif');
-            }
-            if (sensorManager.whichRadar === 'DGC') {
-              $('#weather-image').attr('src', 'http://images.myforecast.com/images/cw/satellite/CentralAsia/CentralAsia.jpeg');
-            }
-            uiController.hideSideMenus();
-            $('#weather-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            isWeatherMenuOpen = true;
-            $('#menu-weather').addClass('bmenu-item-selected');
-            break;
-          } else {
-            if (!$('#menu-weather:animated').length) {
-              $('#menu-weather').effect('shake', {distance: 10});
-            }
-          }
-          break;
         case 'menu-map': // W
           if (settingsManager.isMapMenuOpen) {
             settingsManager.isMapMenuOpen = false;
@@ -1758,18 +1691,6 @@ var lkpassed = false;
             break;
           }
           break;
-        // case 'menu-space-weather': // Q
-        //   if (isSpaceWeatherMenuOpen) {
-        //     isSpaceWeatherMenuOpen = false;
-        //     uiController.hideSideMenus();
-        //     break;
-        //   }
-        //   $('#space-weather-image').attr('src', 'http://services.swpc.noaa.gov/images/animations/ovation-north/latest.png');
-        //   uiController.hideSideMenus();
-        //   $('#space-weather-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-        //   isSpaceWeatherMenuOpen = true;
-        //   $('#menu-space-weather').addClass('bmenu-item-selected');
-        //   break;
         case 'menu-launches': // L
           if (isLaunchMenuOpen) {
             isLaunchMenuOpen = false;
@@ -1954,8 +1875,7 @@ var lkpassed = false;
             uiController.hideSideMenus();
             if (satellite.sensorSelected()) {
               cameraType.current = cameraType.PLANETARIUM; // Activate Planetarium Camera Mode
-              _hideAllLegendMenus();
-              $('#legend-list-planetarium').show();
+              uiController.legendMenuChange('planetarium');
               $('#menu-planetarium').addClass('bmenu-item-selected');
               isPlanetariumView = true;
             } else {
@@ -1982,9 +1902,7 @@ var lkpassed = false;
       $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#findByLooks-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#twitter-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#weather-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#map-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      // $('#space-weather-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#socrates-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#settings-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#editSat-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
@@ -2003,9 +1921,7 @@ var lkpassed = false;
       $('#menu-launches').removeClass('bmenu-item-selected');
       $('#menu-find-sat').removeClass('bmenu-item-selected');
       $('#menu-twitter').removeClass('bmenu-item-selected');
-      $('#menu-weather').removeClass('bmenu-item-selected');
       $('#menu-map').removeClass('bmenu-item-selected');
-      // $('#menu-space-weather').removeClass('bmenu-item-selected');
       $('#menu-satellite-collision').removeClass('bmenu-item-selected');
       $('#menu-settings').removeClass('bmenu-item-selected');
       $('#menu-editSat').removeClass('bmenu-item-selected');
@@ -2013,7 +1929,6 @@ var lkpassed = false;
       $('#menu-missile').removeClass('bmenu-item-selected');
       $('#menu-customSensor').removeClass('bmenu-item-selected');
       $('#menu-about').removeClass('bmenu-item-selected');
-      // $('#menu-planetarium').removeClass('bmenu-item-selected');
 
       // Unflag all open menu variables
       isSensorListMenuOpen = false;
@@ -2023,9 +1938,7 @@ var lkpassed = false;
       isLaunchMenuOpen = false;
       isTwitterMenuOpen = false;
       isFindByLooksMenuOpen = false;
-      isWeatherMenuOpen = false;
       settingsManager.isMapMenuOpen = false;
-      // isSpaceWeatherMenuOpen = false;
       isLookanglesMenuOpen = false;
       isLookanglesMultiSiteMenuOpen = false;
       isSocratesMenuOpen = false;
@@ -2171,8 +2084,7 @@ var lkpassed = false;
               break;
             case cameraType.PLANETARIUM:
               $('#camera-status-box').html('Planetarium Camera Mode');
-              _hideAllLegendMenus();
-              $('#legend-list-planetarium').show();
+              uiController.legendMenuChange('planetarium');
               break;
             case cameraType.SATELLITE:
               $('#camera-status-box').html('Satellite Camera Mode');
@@ -2545,7 +2457,7 @@ var lkpassed = false;
     }
   };
 
-  _hideAllLegendMenus = function () {
+  uiController.legendMenuChange = function (menu) {
     $('#legend-list-default').hide();
     $('#legend-list-default-sensor').hide();
     $('#legend-list-rcs').hide();
@@ -2554,6 +2466,33 @@ var lkpassed = false;
     $('#legend-list-deep').hide();
     $('#legend-list-velocity').hide();
     $('#legend-list-planetarium').hide();
+    switch (menu) {
+      case 'default':
+        if (satellite.sensorSelected()) {
+          $('#legend-list-default-sensor').show();
+        } else {
+          $('#legend-list-default').show();
+        }
+        break;
+      case 'rcs':
+        $('#legend-list-rcs').show();
+        break;
+      case 'small':
+        $('#legend-list-small').show();
+        break;
+      case 'near':
+        $('#legend-list-near').show();
+        break;
+      case 'deep':
+        $('#legend-list-deep').show();
+        break;
+      case 'velocity':
+        $('#legend-list-velocity').show();
+        break;
+      case 'planetarium':
+        $('#legend-list-planetarium').show();
+        break;
+    }
   };
 
   _resetSensorSelected = function () {
@@ -2565,11 +2504,9 @@ var lkpassed = false;
       sensor: satellite.defaultSensor
     });
     satellite.setobs(null, true);
-    sensorManager.whichRadar = ''; // Disable Weather
     $('#menu-sensor-info').addClass('bmenu-item-disabled');
     $('#menu-in-coverage').addClass('bmenu-item-disabled');
     $('#menu-lookangles').addClass('bmenu-item-disabled');
-    $('#menu-weather').addClass('bmenu-item-disabled');
     $('#menu-planetarium').addClass('bmenu-item-disabled');
 
     // setColorScheme ignores calls to recolor satellites when there is no sensor.

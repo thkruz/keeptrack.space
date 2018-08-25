@@ -275,9 +275,11 @@ ul {
   }
 }
 @media (min-width: 1201px) {
-  #legend-menu span {
+  #legend-menu {
     display: block;
-    margin-right: 200px;
+    position: absolute;
+    top: 0;
+    right: 200px;
   }
 
   .top-menu-icons {
@@ -573,23 +575,6 @@ ul {
     z-index: 11;
 }
 
-#weather-menu {
-    display: none;
-    background: rgba(0, 0, 0, 0);
-    position: absolute;
-    width: 600px;
-    max-height: 550px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    z-index: 10;
-    left: 0;
-    top: 15%;
-    overflow: none;
-    color: white;
-}
-  #weather-image {
-    opacity: 0.75;
-  }
 #iss-stream-menu {
   display: none;
   position: absolute;
@@ -622,9 +607,6 @@ ul {
 
 #looks {
   margin: 0 auto;
-}
-#space-weather-image {
-  opacity: 0.75;
 }
 #socrates-table {
   line-height: 0.05;

@@ -153,7 +153,7 @@
     groups.selectGroup(dispGroup);
 
     // Don't let the search overlap with the legend
-    $('#legend-hover-menu').hide();
+    uiController.legendMenuChange('clear');
 
     searchBox.fillResultBox(results);
     updateUrl();

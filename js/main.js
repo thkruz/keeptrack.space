@@ -1062,13 +1062,13 @@ function selectSat (satId) {
       if ($(document).width() <= 1000) {
       } else {
         $('#search-results').attr('style', 'display:block; max-height:27%');
-        $('#legend-hover-menu').hide();
+        uiController.legendMenuChange('default');
       }
     } else {
       if ($(document).width() <= 1000) {
       } else {
         $('#search-results').attr('style', 'max-height:27%');
-        $('#legend-hover-menu').hide();
+        uiController.legendMenuChange('default');
       }
     }
 

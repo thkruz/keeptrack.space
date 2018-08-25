@@ -210,7 +210,6 @@ $.ajaxSetup({
     name: 'Cape Cod AFS, MA',
     googleName: 'Cape Cod',
     shortName: 'COD',
-    weather: 'COD',
     type: 'Phased Array Radar',
     lat: 41.754785,
     long: -70.539151,
@@ -232,7 +231,6 @@ $.ajaxSetup({
     name: 'Beale AFB, CA',
     googleName: 'Beale',
     shortName: 'BLE',
-    weather: 'BLE',
     type: 'Phased Array Radar',
     lat: 39.136064,
     long: -121.351237,
@@ -253,7 +251,6 @@ $.ajaxSetup({
     name: 'Clear AFS, AK',
     googleName: 'Clear',
     shortName: 'CLR',
-    weather: 'CLR',
     type: 'Phased Array Radar',
     lat: 64.290556,
     long: -149.186944,
@@ -274,7 +271,6 @@ $.ajaxSetup({
     name: 'Eglin AFB, FL',
     googleName: 'Eglin',
     shortName: 'EGL',
-    weather: 'EGL',
     type: 'Phased Array Radar',
     lat: 30.572411,
     long: -86.214836,
@@ -296,7 +292,6 @@ $.ajaxSetup({
     name: 'RAF Fylingdales, UK',
     googleName: 'Fylingdales',
     shortName: 'FYL',
-    weather: 'FYL',
     type: 'Phased Array Radar',
     lat: 54.361758,
     long: -0.670051,
@@ -317,7 +312,6 @@ $.ajaxSetup({
     name: 'Cavalier AFS, ND',
     googleName: 'Cavalier',
     shortName: 'CAV',
-    weather: 'PAR',
     type: 'Phased Array Radar',
     lat: 48.724567,
     long: -97.899755,
@@ -339,7 +333,6 @@ $.ajaxSetup({
     name: 'Thule AFB, GL',
     googleName: 'Thule',
     shortName: 'THL',
-    weather: '',
     type: 'Phased Array Radar',
     lat: 76.570322,
     long: -68.299211,
@@ -361,7 +354,6 @@ $.ajaxSetup({
     name: 'Cobra Dane, AK',
     googleName: 'Cobra Dane',
     shortName: 'CDN',
-    weather: '',
     type: 'Phased Array Radar',
     lat: 52.737,
     long: 174.092,
@@ -389,7 +381,6 @@ $.ajaxSetup({
     name: 'ALTAIR, Kwaj',
     googleName: 'ALTAIR',
     shortName: 'ALT',
-    weather: '',
     type: 'Mechanical',
     lat: 8.716667,
     long: 167.733333,
@@ -411,7 +402,6 @@ $.ajaxSetup({
     name: 'Millstone, MA',
     googleName: 'Millstone',
     shortName: 'MIL',
-    weather: '',
     type: 'Mechanical',
     lat: 42.6233,
     long: -71.4882,
@@ -433,7 +423,6 @@ $.ajaxSetup({
     name: 'Diego Garcia',
     googleName: 'Diego Garcia',
     shortName: 'DGC',
-    weather: 'DGC',
     type: 'Optical',
     lat: -7.296480,
     long: 72.390153,
@@ -455,7 +444,6 @@ $.ajaxSetup({
     name: 'Maui, HI',
     googleName: 'Maui',
     shortName: 'MAU',
-    weather: '',
     type: 'Optical',
     lat: 20.708350,
     long: -156.257595,
@@ -477,7 +465,6 @@ $.ajaxSetup({
     name: 'Socorro, NM',
     googleName: 'Socorro',
     shortName: 'SOC',
-    weather: '',
     type: 'Optical',
     lat: 33.817233,
     long: -106.659961,
@@ -499,7 +486,6 @@ $.ajaxSetup({
     name: 'Ascension',
     googleName: 'Ascension',
     shortName: 'ASC',
-    weather: '',
     type: 'Mechanical',
     lat: -7.969444,
     long: -14.393889,
@@ -521,7 +507,6 @@ $.ajaxSetup({
     name: 'Globus II, NOR',
     googleName: 'Globus II',
     shortName: 'GLB',
-    weather: '',
     type: 'Mechanical',
     lat: 70.3671,
     long: 31.1271,
@@ -546,7 +531,6 @@ $.ajaxSetup({
     name: 'Grand Réseau Adapté à la Veille Spatiale, FRA',
     googleName: 'GRAVES',
     shortName: 'GRV',
-    weather: '',
     type: 'Phased Array',
     lat: 47.347778,
     long: 5.51638,
@@ -568,7 +552,6 @@ $.ajaxSetup({
     name: 'Tracking and Imaging Radar, GER',
     googleName: 'TIRA',
     shortName: 'TIR',
-    weather: '',
     type: 'Mechanical',
     lat: 50.6166,
     long: 7.1296,
@@ -590,7 +573,6 @@ $.ajaxSetup({
     name: 'Croce del Nord, ITA',
     googleName: 'Northern Cross',
     shortName: 'NRC',
-    weather: '',
     type: 'Bistatic Radio Telescope',
     lat: 44.5208,
     long: 11.6469,
@@ -618,7 +600,6 @@ $.ajaxSetup({
     name: 'RAF Troodos, UK',
     googleName: 'RAF Troodos',
     shortName: 'TRO',
-    weather: '',
     type: 'Optical',
     lat: 34.912778,
     long: 32.883889,
@@ -640,7 +621,6 @@ $.ajaxSetup({
     name: 'ESA Space Debris Telescope, ESP',
     googleName: 'ESA Space Debris Telescope',
     shortName: 'SDT',
-    weather: '',
     type: 'Optical',
     lat: 28.3,
     long: -16.5097,
@@ -666,7 +646,6 @@ $.ajaxSetup({
     name: 'Armavir, RUS',
     googleName: 'Armavir',
     shortName: 'ARM',
-    weather: '',
     type: 'Phased Array Radar',
     lat: 44.925106,
     long: 40.983894,
@@ -687,7 +666,6 @@ $.ajaxSetup({
     name: 'Balkhash, RUS',
     googleName: 'Balkhash',
     shortName: 'BAL',
-    weather: '',
     type: 'Phased Array Radar',
     lat: 46.603076,
     long: 74.530985,
@@ -708,7 +686,6 @@ $.ajaxSetup({
     name: 'Gantsevichi, RUS',
     googleName: 'Gantsevichi',
     shortName: 'GAN',
-    weather: '',
     type: 'Phased Array Radar',
     lat: 52.850000,
     long: 26.480000,
@@ -729,7 +706,6 @@ $.ajaxSetup({
     name: 'Lekhtusi, RUS',
     googleName: 'Lekhtusi',
     shortName: 'LEK',
-    weather: '',
     type: 'Phased Array Radar',
     lat: 60.275458,
     long: 30.546017,
@@ -750,7 +726,6 @@ $.ajaxSetup({
     name: 'Mishelevka-D',
     googleName: 'Mishelevka',
     shortName: 'MIS',
-    weather: '',
     type: 'Phased Array Radar',
     lat: 52.855500,
     long: 103.231700,
@@ -771,7 +746,6 @@ $.ajaxSetup({
     name: 'Olenegorsk',
     googleName: 'Olenegorsk',
     shortName: 'OLE',
-    weather: '',
     type: 'Phased Array Radar',
     lat: 68.114100,
     long: 33.910200,
@@ -792,7 +766,6 @@ $.ajaxSetup({
     name: 'Pechora',
     googleName: 'Pechora',
     shortName: 'PEC',
-    weather: '',
     type: 'Phased Array Radar',
     lat: 65.210000,
     long: 57.295000,
@@ -813,7 +786,6 @@ $.ajaxSetup({
     name: 'Pionersky',
     googleName: 'Pionersky',
     shortName: 'PIO',
-    weather: '',
     type: 'Phased Array Radar',
     lat: 54.857294,
     long: 20.182350,
@@ -834,7 +806,6 @@ $.ajaxSetup({
     name: 'Xuanhua, PRC',
     googleName: 'Xuanhua',
     shortName: 'XUA',
-    weather: '',
     type: 'Phased Array Radar',
     lat: 40.446944,
     long: 115.116389,
@@ -905,23 +876,13 @@ $.ajaxSetup({
         $('#sensor-type').html(sensorManager.selectedSensor.type);
         $('#sensor-country').html(sensorManager.selectedSensor.country);
         $('#sensor-sun').html(sensorManager.selectedSensor.sun);
-        if (sensorManager.selectedSensor.whichRadar !== '') {
-          $('#menu-weather').removeClass('bmenu-item-disabled');
-        } else {
-          $('#menu-weather').addClass('bmenu-item-disabled');
-        }
         camSnap(latToPitch(sensorManager.selectedSensor.lat), longToYaw(sensorManager.selectedSensor.long));
         changeZoom(sensorManager.selectedSensor.zoom);
         satellite.getsensorinfo();
       }
     }
-    $('#legend-list-default').hide();
-    $('#legend-list-rcs').hide();
-    $('#legend-list-small').hide();
-    $('#legend-list-near').hide();
-    $('#legend-list-deep').hide();
-    $('#legend-list-velocity').hide();
-    $('#legend-list-default-sensor').show();
+
+    uiController.legendMenuChange('default');
   };
 
   sensorManager.sensorList = sensorList;

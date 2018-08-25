@@ -215,24 +215,14 @@ or mirrored at any other location without the express written permission of the 
         $('#menu-satellite-collision').hide();
         $('#menu-find-sat').hide();
         $('#sat-infobox').attr('style', 'width:100%;top:60%;');
-        // $('#datetime').attr('style', 'position:fixed;left:85px;top:10px;width:141px;height:32px');
       }
 
-      // $('#load-cover').fadeOut();
       $('body').attr('style', 'background:black');
       $('#canvas-holder').attr('style', 'display:block');
       $('#menu-sensor-list').removeClass('bmenu-item-disabled');
-      // $('#menu-info-overlay').removeClass('bmenu-item-disabled');
-      // $('#menu-sensor-info').removeClass('bmenu-item-disabled');
-      // $('#menu-in-coverage').removeClass('bmenu-item-disabled');
-      // $('#menu-lookangles').removeClass('bmenu-item-disabled');
-      // $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');
       $('#menu-watchlist').removeClass('bmenu-item-disabled');
       $('#menu-find-sat').removeClass('bmenu-item-disabled');
       $('#menu-twitter').removeClass('bmenu-item-disabled');
-      // $('#menu-weather').removeClass('bmenu-item-disabled');
-      // $('#menu-map').removeClass('bmenu-item-disabled');
-      // $('#menu-space-weather').removeClass('bmenu-item-disabled');
       $('#menu-launches').removeClass('bmenu-item-disabled');
       $('#menu-about').removeClass('bmenu-item-disabled');
       $('#menu-space-stations').removeClass('bmenu-item-disabled');
@@ -240,7 +230,6 @@ or mirrored at any other location without the express written permission of the 
       $('#menu-customSensor').removeClass('bmenu-item-disabled');
       $('#menu-missile').removeClass('bmenu-item-disabled');
       $('#menu-settings').removeClass('bmenu-item-disabled');
-      // $('#menu-planetarium').removeClass('bmenu-item-disabled');
       settingsManager.isBottomIconsEnabled = true;
 
       if (settingsManager.isMobileModeEnabled) { // Start Button Displayed

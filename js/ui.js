@@ -559,6 +559,18 @@ var lkpassed = false;
         }
       });
 
+      $('.menu-selectable').click(function () {
+        $('#menu-sensor-info').removeClass('bmenu-item-disabled');
+        $('#menu-planetarium').removeClass('bmenu-item-disabled');
+        if (selectedSat !== -1) {
+          $('#menu-lookangles').removeClass('bmenu-item-disabled');
+        }
+        if (watchlistList.length > 0) {
+          $('#menu-info-overlay').removeClass('bmenu-item-disabled');
+        }
+        $('#menu-in-coverage').removeClass('bmenu-item-disabled');
+      });
+
       // USAF Radars
       $('#radar-beale').click(function () { sensorManager.setSensor(sensorManager.sensorList.BLE); });
       $('#radar-capecod').click(function () { sensorManager.setSensor(sensorManager.sensorList.COD); });
@@ -598,29 +610,9 @@ var lkpassed = false;
 
       $('#reset-sensor-button').click(function () {
         satSet.setColorScheme(ColorScheme.default, true);
-        $('#menu-sensor-info').removeClass('bmenu-item-disabled');
-        $('#menu-planetarium').removeClass('bmenu-item-disabled');
-        if (selectedSat !== -1) {
-          $('#menu-lookangles').removeClass('bmenu-item-disabled');
-        }
-        if (watchlistList.length > 0) {
-          $('#menu-info-overlay').removeClass('bmenu-item-disabled');
-        }
-        $('#menu-in-coverage').removeClass('bmenu-item-disabled');
+        $('#menu-sensor-info').addClass('bmenu-item-disabled');
+        $('#menu-planetarium').addClass('bmenu-item-disabled');
         _resetSensorSelected();
-      });
-
-      $('#reset-sensor-button').click(function (e) {
-        satSet.setColorScheme(ColorScheme.default, true);
-        $('#menu-sensor-info').removeClass('bmenu-item-disabled');
-        $('#menu-planetarium').removeClass('bmenu-item-disabled');
-        if (selectedSat !== -1) {
-          $('#menu-lookangles').removeClass('bmenu-item-disabled');
-        }
-        if (watchlistList.length > 0) {
-          $('#menu-info-overlay').removeClass('bmenu-item-disabled');
-        }
-        $('#menu-in-coverage').removeClass('bmenu-item-disabled');
       });
 
       $('#datetime-input-form').change(function (e) {
@@ -1626,7 +1618,6 @@ var lkpassed = false;
               break;
             }
             uiController.hideSideMenus();
-            $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             isLookanglesMultiSiteMenuOpen = true;
             $('#menu-lookanglesmultisite').addClass('bmenu-item-selected');
             if (selectedSat !== -1) {
@@ -1634,6 +1625,7 @@ var lkpassed = false;
                 sat = satSet.getSat(selectedSat);
                 satellite.getlookanglesMultiSite(sat, isLookanglesMultiSiteMenuOpen);
                 $('#loading-screen').fadeOut();
+                $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
               });
             }
             break;
@@ -2524,7 +2516,7 @@ var lkpassed = false;
   uiController.footerToggle = function () {
     if (isFooterShown) {
       isFooterShown = false;
-      uiController.hideSideMenus();
+      // uiController.hideSideMenus();
       $('#sat-infobox').addClass('sat-infobox-fullsize');
       $('#nav-footer').removeClass('footer-slide-up');
       $('#nav-footer').addClass('footer-slide-down');

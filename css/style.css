@@ -551,7 +551,7 @@ ul {
     color: white;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1200px) {
   ::-webkit-scrollbar {
     display: none;
   }
@@ -617,10 +617,6 @@ ul {
   text-align: center;
 }
 
-#lookanglesmultisite-content {
-  width: 375px;
-}
-
 #lookangles-content td{
   padding: 5px;
   font-size: 13px;
@@ -655,10 +651,10 @@ ul {
     color: white;
     width: 100%;
     top: 50px;
-    bottom: 150px;
+    bottom: 0px;
     overflow: auto;
     z-index: 10;
-    padding: 0px 5px;
+    padding: 0px 5px 150px 0px;
   }
 }
 @media (min-width: 541px) and (max-width: 1200px) {
@@ -668,10 +664,13 @@ ul {
     color: white;
     width: 260px;
     top: 50px;
-    bottom: 100px;
+    bottom: 0px;
     overflow: auto;
     z-index: 10;
-    padding: 0px 5px;
+    padding: 0px 5px 100px 0px;
+  }
+  #lookanglesmultisite-content {
+    width: 375px;
   }
 }
 @media (min-width: 1201px) {
@@ -681,10 +680,13 @@ ul {
     color: white;
     width: 260px;
     top: 25px;
-    bottom: 50px;
+    bottom: 0px;
     overflow: auto;
     z-index: 10;
-    padding: 0px 5px;
+    padding: 0px 5px 50px 0px;
+  }
+  #lookanglesmultisite-content {
+    width: 375px;
   }
 }
 
@@ -1167,7 +1169,7 @@ ul li{
 @media (max-width: 1200px) {
   #bottom-icons-container {
       margin-top: -15px;
-      width: 450px;
+      width: 500px;
       height: 100px;
 
   }
@@ -1198,7 +1200,7 @@ ul li{
 @media (max-width: 540px) {
   #bottom-icons-container {
       margin-top: -15px;
-      width: 315px;
+      width: 400px;
       height: 150px;
 
   }

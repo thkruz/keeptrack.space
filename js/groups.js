@@ -171,6 +171,11 @@
           satSet.setColorScheme(ColorScheme.smallsats);
           ga('send', 'event', 'ColorScheme Menu', 'Small Satellites', 'Selected');
           break;
+        case 'countries':
+          uiController.legendMenuChange('countries');
+          satSet.setColorScheme(ColorScheme.countries);
+          ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
+          break;
       }
     });
 

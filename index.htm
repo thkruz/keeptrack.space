@@ -14,11 +14,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=0.38.3b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=0.39.0b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=0.38.3b" rel="stylesheet">
+    <link href="css/fonts.css?v=0.39.0b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=0.38.3b">
+    <link rel="stylesheet" href="css/materialize.css?v=0.39.0b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -114,6 +114,7 @@
       <li data-color="velocity">Velocity</li>
       <li data-color="rcs">Radar Cross Section</li>
       <li data-color="smallsats">Small Satellites</li>
+      <li data-color="countries">Countries</li>
       <li data-color="near-earth">Near Earth</li>
       <li data-color="deep-space">Deep Space</li>
       <li data-color="lost-objects">Lost Objects</li>
@@ -185,6 +186,13 @@
           <li><div class="Square-Box legend-orange-box"></div>~4 km/s Velocity</li>
           <li><div class="Square-Box legend-red-box"></div>~1 km/s Velocity</li>
           <li><div class="Square-Box legend-blue-box"></div>Satellite In View</li>
+        </ul>
+        <ul id="legend-list-countries" class="start-hidden">
+          <li><div class="Square-Box legend-blue-box"></div>United States</li>
+          <li><div class="Square-Box legend-white-box"></div>Russia</li>
+          <li><div class="Square-Box legend-red-box"></div>China</li>
+          <li><div class="Square-Box legend-green-box"></div>Other</li>
+          <li><div class="Square-Box legend-orange-box"></div>Satellite In View</li>
         </ul>
       </div>
 
@@ -1116,35 +1124,35 @@
   <script src="js/lib/materialize.min.js"></script>
   <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.min.js?v=0.38.3b"></script>
+  <script src="js/lib/satellite.min.js?v=0.39.0b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=0.38.3b"></script>
+  <script src="js/lib/shader-loader.min.js?v=0.39.0b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=0.38.3b"></script>
-  <script src="js/time-manager.js?v=0.38.3b"></script>
-  <script src="js/earth.js?v=0.38.3b"></script>
-  <script src="js/satSet.js?v=0.38.3b"></script>
-  <script src="js/sun.js?v=0.38.3b"></script>
+  <script src="js/settings-manager.js?v=0.39.0b"></script>
+  <script src="js/time-manager.js?v=0.39.0b"></script>
+  <script src="js/earth.js?v=0.39.0b"></script>
+  <script src="js/satSet.js?v=0.39.0b"></script>
+  <script src="js/sun.js?v=0.39.0b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js?v=0.38.3b"></script>
+  <script src="js/variables.js?v=0.39.0b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=0.38.3b"></script>
+  <script src="js/ballistic-missile.js?v=0.39.0b"></script>
   <!-- Load Extra Satellites -->
   <!-- <script src="offline/extra.js"></script>
   <script src="offline/satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=0.38.3b"></script>
-  <script src="js/mobile.js?v=0.38.3b"></script>
-  <script src="js/main.js?v=0.38.3b"></script>
-  <script src="js/ui.js?v=0.38.3b"></script>
-  <script src="js/lookangles.js?v=0.38.3b"></script>
-  <script src="js/orbit-display.js?v=0.38.3b"></script>
-  <script src="js/drawLoop-shapes.js?v=0.38.3b"></script>
-  <script src="js/groups.js?v=0.38.3b"></script>
-  <script src="js/search-box.js?v=0.38.3b"></script>
+  <script src="js/color-scheme.js?v=0.39.0b"></script>
+  <script src="js/mobile.js?v=0.39.0b"></script>
+  <script src="js/main.js?v=0.39.0b"></script>
+  <script src="js/ui.js?v=0.39.0b"></script>
+  <script src="js/lookangles.js?v=0.39.0b"></script>
+  <script src="js/orbit-display.js?v=0.39.0b"></script>
+  <script src="js/drawLoop-shapes.js?v=0.39.0b"></script>
+  <script src="js/groups.js?v=0.39.0b"></script>
+  <script src="js/search-box.js?v=0.39.0b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

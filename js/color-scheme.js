@@ -18,13 +18,14 @@
   };
 
   ColorScheme.objectTypeFlags = {};
-  ColorScheme.objectTypeFlags.payload = true;
-  ColorScheme.objectTypeFlags.rocket = true;
-  ColorScheme.objectTypeFlags.debris = true;
-  ColorScheme.objectTypeFlags.inview = true;
-  ColorScheme.objectTypeFlags.unknown = true;
-  ColorScheme.objectTypeFlags.sensor = true;
-  ColorScheme.objectTypeFlags.facility = true;
+  ColorScheme.objectTypeFlags.green = true;
+  ColorScheme.objectTypeFlags.blue = true;
+  ColorScheme.objectTypeFlags.gray = true;
+  ColorScheme.objectTypeFlags.orange = true;
+  ColorScheme.objectTypeFlags.yellow = true;
+  ColorScheme.objectTypeFlags.red = true;
+  ColorScheme.objectTypeFlags.purple = true;
+  ColorScheme.objectTypeFlags.white = true;
 
   // Removed from function to reduce memory leak
   var numSats, colorData, pickableData, colors, i;
@@ -62,7 +63,7 @@
   var sat, color;
   ColorScheme.init = function () {
     ColorScheme.default = new ColorScheme(function (sat) {
-      if (sat.static && sat.type === 'Launch Facility' && ColorScheme.objectTypeFlags.facility === false) {
+      if (sat.static && sat.type === 'Launch Facility' && ColorScheme.objectTypeFlags.purple === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
@@ -76,7 +77,7 @@
         };
       }
 
-      if (sat.static && ColorScheme.objectTypeFlags.sensor === false) {
+      if (sat.static && ColorScheme.objectTypeFlags.red === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
@@ -103,29 +104,29 @@
 
       // NOTE: ColorScheme.objectTypeFlags code
 
-      if (!sat.inview && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false ||
-          cameraType.current === cameraType.PLANETARIUM && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) {
+      if (!sat.inview && sat.OT === 1 && ColorScheme.objectTypeFlags.green === false ||
+          cameraType.current === cameraType.PLANETARIUM && sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if (!sat.inview && sat.OT === 2 && ColorScheme.objectTypeFlags.rocket === false ||
-          cameraType.current === cameraType.PLANETARIUM && sat.OT === 2 && ColorScheme.objectTypeFlags.rocket === false) {
+      if (!sat.inview && sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false ||
+          cameraType.current === cameraType.PLANETARIUM && sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if (!sat.inview && sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false ||
-          cameraType.current === cameraType.PLANETARIUM && sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) {
+      if (!sat.inview && sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false ||
+          cameraType.current === cameraType.PLANETARIUM && sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
 
-      if (sat.inview && ColorScheme.objectTypeFlags.inview === false && cameraType.current !== cameraType.PLANETARIUM) {
+      if (sat.inview && ColorScheme.objectTypeFlags.orange === false && cameraType.current !== cameraType.PLANETARIUM) {
         return {
           color: colorTheme.deselected,
           pickable: false
@@ -190,7 +191,7 @@
           pickable: true
         };
       }
-      if (sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) {
+      if (sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
@@ -216,25 +217,25 @@
           pickable: true
         };
       }
-      if (rcs < 0.1 && ColorScheme.objectTypeFlags.sensor === false) {
+      if (rcs < 0.1 && ColorScheme.objectTypeFlags.red === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if ((rcs >= 0.1 && rcs <= 1) && ColorScheme.objectTypeFlags.rocket === false) {
+      if ((rcs >= 0.1 && rcs <= 1) && ColorScheme.objectTypeFlags.blue === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if (rcs > 1 && ColorScheme.objectTypeFlags.payload === false) {
+      if (rcs > 1 && ColorScheme.objectTypeFlags.green === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if ((typeof rcs == 'undefined' || typeof rcs == null) && ColorScheme.objectTypeFlags.unknown === false) {
+      if ((typeof rcs == 'undefined' || typeof rcs == null) && ColorScheme.objectTypeFlags.yellow === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
@@ -261,6 +262,66 @@
       // Unknowns
       return {
         color: colorTheme.unknownRCS,
+        pickable: true
+      };
+    });
+    ColorScheme.countries = new ColorScheme(function (sat) {
+      var country = sat.C;
+      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+        return {
+          color: colorTheme.inview,
+          pickable: true
+        };
+      }
+      if (!sat.inview && country === 'US' && ColorScheme.objectTypeFlags.blue === false ||
+          cameraType.current === cameraType.PLANETARIUM && country === 'US' && ColorScheme.objectTypeFlags.blue === false) {
+        return {
+          color: colorTheme.deselected,
+          pickable: false
+        };
+      }
+      if (!sat.inview && country === 'PRC' && ColorScheme.objectTypeFlags.red === false ||
+          cameraType.current === cameraType.PLANETARIUM && country === 'PRC' && ColorScheme.objectTypeFlags.red === false) {
+        return {
+          color: colorTheme.deselected,
+          pickable: false
+        };
+      }
+      if (!sat.inview && country === 'CIS' && ColorScheme.objectTypeFlags.white === false ||
+          cameraType.current === cameraType.PLANETARIUM && country === 'CIS' && ColorScheme.objectTypeFlags.white === false) {
+        return {
+          color: colorTheme.deselected,
+          pickable: false
+        };
+      }
+      if (country === 'US') {
+        return {
+          color: colorTheme.usa,
+          pickable: true
+        };
+      }
+      if (country === 'PRC') {
+        return {
+          color: colorTheme.china,
+          pickable: true
+        };
+      }
+      if (country === 'CIS') {
+        return {
+          color: colorTheme.russia,
+          pickable: true
+        };
+      }
+      // Other Countries
+      if (!sat.inview && ColorScheme.objectTypeFlags.green === false ||
+          cameraType.current === cameraType.PLANETARIUM && ColorScheme.objectTypeFlags.green === false) {
+        return {
+          color: colorTheme.deselected,
+          pickable: false
+        };
+      }
+      return {
+        color: colorTheme.otherCountries,
         pickable: true
       };
     });
@@ -364,26 +425,26 @@
       }
     });
     ColorScheme.velocity = new ColorScheme(function (sat) {
-      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM && ColorScheme.objectTypeFlags.rocket !== false) {
+      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM && ColorScheme.objectTypeFlags.blue !== false) {
         return {
           color: colorTheme.inviewAlt,
           pickable: true
         };
       }
       var vel = sat.velocity;
-      if (vel > 5.5 && ColorScheme.objectTypeFlags.unknown === false) {
+      if (vel > 5.5 && ColorScheme.objectTypeFlags.yellow === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if ((vel >= 2.5 && vel <= 5.5) && ColorScheme.objectTypeFlags.inview === false) {
+      if ((vel >= 2.5 && vel <= 5.5) && ColorScheme.objectTypeFlags.orange === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if (vel < 2.5 && ColorScheme.objectTypeFlags.sensor === false) {
+      if (vel < 2.5 && ColorScheme.objectTypeFlags.red === false) {
         return {
           color: colorTheme.deselected,
           pickable: false

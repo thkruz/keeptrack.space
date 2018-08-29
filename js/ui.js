@@ -413,91 +413,104 @@ var lkpassed = false;
         $('#legend-hover-menu').click(function (e) {
           switch (e.target.classList[1]) {
             case "legend-green-box":
-              if (ColorScheme.objectTypeFlags.payload) {
-                ColorScheme.objectTypeFlags.payload = false;
+              if (ColorScheme.objectTypeFlags.green) {
+                ColorScheme.objectTypeFlags.green = false;
                 $('.legend-green-box').css('background', 'black');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               } else {
-                ColorScheme.objectTypeFlags.payload = true;
+                ColorScheme.objectTypeFlags.green = true;
                 $('.legend-green-box').css('background', 'green');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               }
               break;
             case "legend-blue-box":
-              if (ColorScheme.objectTypeFlags.rocket) {
-                ColorScheme.objectTypeFlags.rocket = false;
+              if (ColorScheme.objectTypeFlags.blue) {
+                ColorScheme.objectTypeFlags.blue = false;
                 $('.legend-blue-box').css('background', 'black');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               } else {
-                ColorScheme.objectTypeFlags.rocket = true;
+                ColorScheme.objectTypeFlags.blue = true;
                 $('.legend-blue-box').css('background', 'blue');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               }
               break;
             case "legend-gray-box":
-              if (ColorScheme.objectTypeFlags.debris) {
-                ColorScheme.objectTypeFlags.debris = false;
+              if (ColorScheme.objectTypeFlags.gray) {
+                ColorScheme.objectTypeFlags.gray = false;
                 $('.legend-gray-box').css('background', 'black');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               } else {
-                ColorScheme.objectTypeFlags.debris = true;
+                ColorScheme.objectTypeFlags.gray = true;
                 $('.legend-gray-box').css('background', 'gray');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               }
               break;
             case "legend-orange-box":
-              if (ColorScheme.objectTypeFlags.inview) {
-                ColorScheme.objectTypeFlags.inview = false;
+              if (ColorScheme.objectTypeFlags.orange) {
+                ColorScheme.objectTypeFlags.orange = false;
                 $('.legend-orange-box').css('background', 'black');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               } else {
-                ColorScheme.objectTypeFlags.inview = true;
+                ColorScheme.objectTypeFlags.orange = true;
                 $('.legend-orange-box').css('background', 'orange');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               }
               break;
             case "legend-yellow-box":
-              if (ColorScheme.objectTypeFlags.unknown) {
-                ColorScheme.objectTypeFlags.unknown = false;
+              if (ColorScheme.objectTypeFlags.yellow) {
+                ColorScheme.objectTypeFlags.yellow = false;
                 $('.legend-yellow-box').css('background', 'black');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               } else {
-                ColorScheme.objectTypeFlags.unknown = true;
+                ColorScheme.objectTypeFlags.yellow = true;
                 $('.legend-yellow-box').css('background', 'yellow');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               }
               break;
+            case "legend-white-box":
+              if (ColorScheme.objectTypeFlags.white) {
+                ColorScheme.objectTypeFlags.white = false;
+                $('.legend-white-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.white = true;
+                $('.legend-white-box').css('background', 'white');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
             case "legend-red-box":
-              if (ColorScheme.objectTypeFlags.sensor) {
-                ColorScheme.objectTypeFlags.sensor = false;
+              if (ColorScheme.objectTypeFlags.red) {
+                ColorScheme.objectTypeFlags.red = false;
                 $('.legend-red-box').css('background', 'black');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               } else {
-                ColorScheme.objectTypeFlags.sensor = true;
+                ColorScheme.objectTypeFlags.red = true;
                 $('.legend-red-box').css('background', 'red');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               }
               break;
             case "legend-purple-box":
-              if (ColorScheme.objectTypeFlags.facility) {
-                ColorScheme.objectTypeFlags.facility = false;
+              if (ColorScheme.objectTypeFlags.purple) {
+                ColorScheme.objectTypeFlags.purple = false;
                 $('.legend-purple-box').css('background', 'black');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               } else {
-                ColorScheme.objectTypeFlags.facility = true;
+                ColorScheme.objectTypeFlags.purple = true;
                 $('.legend-purple-box').css('background', 'purple');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
@@ -2417,6 +2430,7 @@ var lkpassed = false;
     $('#legend-list-near').hide();
     $('#legend-list-deep').hide();
     $('#legend-list-velocity').hide();
+    $('#legend-list-countries').hide();
     $('#legend-list-planetarium').hide();
     switch (menu) {
       case 'default':
@@ -2441,6 +2455,9 @@ var lkpassed = false;
       case 'velocity':
         $('#legend-list-velocity').show();
         break;
+      case 'countries':
+        $('#legend-list-countries').show();
+        break;
       case 'planetarium':
         $('#legend-list-planetarium').show();
         break;
@@ -2453,6 +2470,25 @@ var lkpassed = false;
         }
         break;
     }
+    if (settingsManager.currentLegend !== menu) {
+      $('.legend-green-box').css('background', 'green');
+      $('.legend-blue-box').css('background', 'blue');
+      $('.legend-gray-box').css('background', 'gray');
+      $('.legend-orange-box').css('background', 'orange');
+      $('.legend-yellow-box').css('background', 'yellow');
+      $('.legend-white-box').css('background', 'white');
+      $('.legend-red-box').css('background', 'red');
+      $('.legend-purple-box').css('background', 'purple');
+      ColorScheme.objectTypeFlags.green = true;
+      ColorScheme.objectTypeFlags.blue = true;
+      ColorScheme.objectTypeFlags.gray = true;
+      ColorScheme.objectTypeFlags.orange = true;
+      ColorScheme.objectTypeFlags.yellow = true;
+      ColorScheme.objectTypeFlags.white = true;
+      ColorScheme.objectTypeFlags.red = true;
+      ColorScheme.objectTypeFlags.purple = true;
+    }
+    settingsManager.currentLegend = menu;
   };
 
   _resetSensorSelected = function () {

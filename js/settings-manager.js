@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.38.3';
+  settingsManager.versionNumber = 'v0.39.0';
   settingsManager.versionDate = 'August 28, 2018';
 
   // Offline management
@@ -91,6 +91,8 @@
 
   settingsManager.minimumSearchCharacters = 2;
 
+  settingsManager.currentLegend = 'default';
+
   settingsManager.socratesOnSatCruncher = null;
 
   settingsManager.vertShadersSize = 12;
@@ -157,13 +159,17 @@
   // settingsManager.colors.velGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
   settingsManager.colors.smallSats = [0.2, 1.0, 0.0, 0.65];
   settingsManager.colors.smallRCS = [1.0, 0, 0, 0.6];
-  settingsManager.colors.mediumRCS = [0, 0, 1.0, 0.6];
+  settingsManager.colors.mediumRCS = [0.2, 0.5, 1.0, 0.85];
   settingsManager.colors.largeRCS = [0, 1.0, 0, 0.6];
   settingsManager.colors.unknownRCS = [1.0, 1.0, 0, 0.6];
   settingsManager.colors.lostobjects = [0.2, 1.0, 0.0, 0.65];
   settingsManager.colors.leo = [0.2, 1.0, 0.0, 0.65];
   settingsManager.colors.geo = [0.2, 1.0, 0.0, 0.65];
   settingsManager.colors.inGroup = [0.2, 1.0, 0.0, 0.5];
+  settingsManager.colors.china = [1.0, 0, 0, 0.6];
+  settingsManager.colors.usa = [0.2, 0.5, 1.0, 0.85];
+  settingsManager.colors.russia = [1.0, 1.0, 1.0, 1.0];
+  settingsManager.colors.otherCountries = [0, 1.0, 0, 0.6];
 
   // /////////////////
   // Orbit Color Settings

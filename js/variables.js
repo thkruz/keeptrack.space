@@ -1037,9 +1037,9 @@ $.ajaxSetup({
       if (C === 'ESA') {
         country = 'European Space Agency';
       }
-      if (C === 'ESA') {
-        country = 'European Space Research Org';
-      }
+      // if (C === 'ESA') {
+      //   country = 'European Space Research Org';
+      // }
       if (C === 'EST') {
         country = 'Estonia';
       }

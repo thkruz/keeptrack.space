@@ -377,45 +377,6 @@ var lkpassed = false;
         $('#menu-space-stations').removeClass('bmenu-item-selected');
       });
 
-      $('#mobile-controls').on('touchstop mouseup', function () {
-        touchHoldButton = '';
-      });
-
-      $('#controls-zoom-in').on('touchstart mousedown', function () {
-        touchHoldButton = 'zoom-in';
-        rotateTheEarth = false;
-        camZoomSnappedOnSat = false;
-      });
-
-      $('#controls-zoom-out').on('touchstart mousedown', function () {
-        touchHoldButton = 'zoom-out';
-        rotateTheEarth = false;
-        camZoomSnappedOnSat = false;
-      });
-      $('#controls-up').on('touchstart mousedown', function () {
-        touchHoldButton = 'move-up';
-        rotateTheEarth = false;
-        camZoomSnappedOnSat = false;
-      });
-
-      $('#controls-down').on('touchstart mousedown', function () {
-        touchHoldButton = 'move-down';
-        rotateTheEarth = false;
-        camZoomSnappedOnSat = false;
-      });
-
-      $('#controls-left').on('touchstart mousedown', function () {
-        touchHoldButton = 'move-left';
-        rotateTheEarth = false;
-        camZoomSnappedOnSat = false;
-      });
-
-      $('#controls-right').on('touchstart mousedown', function () {
-        touchHoldButton = 'move-right';
-        rotateTheEarth = false;
-        camZoomSnappedOnSat = false;
-      });
-
       $('#info-overlay-content').on('click', '.watchlist-object', function (evt) {
         var objNum = $(this).context.textContent.split(':');
         objNum = objNum[0];
@@ -553,9 +514,6 @@ var lkpassed = false;
           $('#search').val('');
           searchBox.hideResults();
           $('#search-results').hide();
-          $('#legend-hover-menu').css({
-            height: 'inherit'
-          });
         }
       });
 
@@ -681,11 +639,13 @@ var lkpassed = false;
         }
 
         if (isHOSChecked) {
-          settingsManager.colors.otherSatellite = 0;
+          settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0];
           ga('send', 'event', 'Settings Menu', 'Hide Other Satellites', 'Option Selected');
         } else {
-          settingsManager.colors.otherSatellite = 0.1;
+          settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.1];
         }
+        ColorScheme.reloadColors();
+
         if (isSNPChecked) {
           isShowNextPass = true;
           ga('send', 'event', 'Settings Menu', 'Show Next Pass on Hover', 'Option Selected');
@@ -891,7 +851,7 @@ var lkpassed = false;
       $('#socrates-menu').on('click', '.socrates-object', function (evt) {
         var hiddenRow = $(this).context.attributes.hiddenrow.value; // TODO: Find correct code for this.
         if (hiddenRow !== null) {
-          socrates(hiddenRow);
+          _socrates(hiddenRow);
         }
       });
       $('#watchlist-list').on('click', '.watchlist-remove', function (evt) {
@@ -1333,10 +1293,10 @@ var lkpassed = false;
 
     })();
 
+    var socratesObjOne = []; // Array for tr containing CATNR1
+    var socratesObjTwo = []; // Array for tr containing CATNR2
     function _socrates (row) {
       // SOCRATES Variables
-      var socratesObjOne = []; // Array for tr containing CATNR1
-      var socratesObjTwo = []; // Array for tr containing CATNR2
 
       /* SOCRATES.htm is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
       If it ever becomes unavailable a similar, but less accurate (maybe?) cron job could be
@@ -1690,7 +1650,7 @@ var lkpassed = false;
             break;
           } else {
             uiController.hideSideMenus();
-            $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2017.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+            $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2018.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
             isLaunchMenuOpen = true;
             $('#menu-launches').addClass('bmenu-item-selected');
             break;
@@ -1966,7 +1926,7 @@ var lkpassed = false;
         if (i !== watchlistList.length - 1) watchlistString += ',';
       }
       $('#search').val(watchlistString);
-      searchBox.doSearch(watchlistString);
+      searchBox.doSearch(watchlistString, true);
     }
     function _keyUpHandler (evt) {
       // console.log(Number(evt.keyCode));
@@ -2483,6 +2443,14 @@ var lkpassed = false;
         break;
       case 'planetarium':
         $('#legend-list-planetarium').show();
+        break;
+      case 'clear':
+        $('#legend-hover-menu').hide();
+        if (satellite.sensorSelected()) {
+          $('#legend-list-default-sensor').show();
+        } else {
+          $('#legend-list-default').show();
+        }
         break;
     }
   };

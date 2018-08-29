@@ -55,6 +55,10 @@
     };
   };
 
+  ColorScheme.reloadColors = function () {
+    colorTheme = settingsManager.colors;
+  };
+
   var sat, color;
   ColorScheme.init = function () {
     ColorScheme.default = new ColorScheme(function (sat) {

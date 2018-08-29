@@ -4,25 +4,8 @@ var maxPinchSize = 1;
   var mobile = {};
   $(document).ready(function () { // Code Once index.htm is loaded
     $('#mobile-start-button').hide();
-
-    // Hide Menus on Small Screens
-    if ($(document).width() <= settingsManager.desktopMinimumWidth) {
-      settingsManager.isMobileModeEnabled = true;
-      $('#menu-launches').hide();
-      $('#menu-space-stations').hide();
-
-      $('#social').hide();
-      $('#version-info').hide();
-      $('#mobile-warning').show();
-      $('#changelog-row').addClass('center-align');
-      $('#fastCompSettings').hide();
-      $('#social-alt').show();
-      $('#canvas-holder').attr('style', 'overflow:auto;');
-      $('#mobile-controls').show();
-      $('.sat-info-value').attr('style', 'width:45%;float: right; text-overflow: ellipsis; overflow: hidden;');
-  }
-
   });
+  
   mobile.fullscreenToggle = function () {
     if ((document.fullScreenElement && document.fullScreenElement !== null) ||
      (!document.mozFullScreen && !document.webkitIsFullScreen)) {

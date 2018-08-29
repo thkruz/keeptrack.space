@@ -14,11 +14,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=0.38.2b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=0.38.3b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=0.38.2b" rel="stylesheet">
+    <link href="css/fonts.css?v=0.38.3b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=0.38.2b">
+    <link rel="stylesheet" href="css/materialize.css?v=0.38.3b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -62,7 +62,7 @@
       <div id="nav-wrapper" class="nav-wrapper light-blue darken-3">
         <a id="share-icon" class="top-menu-icons" onclick="mobile.socialToggle();"><img src="images/share-icon.png"></a>
         <ul id="nav-mobile" class="left hide-on-med-and-down">
-          <li id="jday" style="padding-right: 25px;padding-left: 25px;"></li>
+          <li id="jday"></li>
           <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Satellites &#x25BC;</a></li>
           <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="colors-menu">Color Schemes &#x25BC;</a></li>
         </ul>
@@ -410,7 +410,7 @@
       <div id="map-menu" class="start-hidden side-menu valign-wrapper">
         <img id="map-image" src="images/braun-stereographic.jpg" width="800px" height="600px">
         <img id="map-sat" class="map-item map-look" src="images/satellite-2.png" width="20px" height="20px">
-        <img id="map-sensor" class="map-item map-look" src="images/radar-1.png" style="display:none;" width="20px" height="20px">
+        <img id="map-sensor" class="map-item map-look start-hidden" src="images/radar-1.png" width="20px" height="20px">
         <img id="map-look1" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
         <img id="map-look2" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
         <img id="map-look3" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
@@ -538,9 +538,9 @@
         </div>
       </div>
       <div id="about-menu" class="start-hidden text-select">
-        <div id="about-content" style="font-size: small;" class="side-menu">
+        <div id="about-content" class="side-menu">
           <div class="row">
-            <div id="mobile-warning" style="display:none;margin-top:10px;color:#48f3e3 !important;" class="center-align">
+            <div id="mobile-warning" class="center-align">
               You are using the mobile version. Please try the desktop version for full functionality.
             </div>
             <div class="row">
@@ -619,11 +619,11 @@
               </div>
               <div class="center-align row">
                 <button id="editSat-open" class="btn waves-effect waves-light" type="button" name="action">Load TLE &#9658;</button>
-                <input id="editSat-file" type="file" name="files[]" style="display: none;" />
+                <input id="editSat-file" class="start-hidden" type="file" name="files[]"/>
               </div>
             </form>
           </div>
-          <div id="es-error" style="display: none;margin-top: 10px;cursor: 'pointer'; cursor: hand;" class="center-align">
+          <div id="es-error" class="center-align start-hidden">
             <h6 class="center-align">Error</h6>
           </div>
         </div>
@@ -703,7 +703,7 @@
               </div>
             </form>
           </div>
-          <div id="nl-error" style="display: none;margin-top: 10px;cursor: 'pointer'; cursor: hand;" class="center-align">
+          <div id="nl-error" class="center-align start-hidden">
             <h6 class="center-align">Error</h6>
           </div>
         </div>
@@ -854,7 +854,7 @@
               </button>
             </div>
           </div>
-          <div id="ms-error" style="display: none;margin-top: 10px;cursor: 'pointer'; cursor: hand;" class="center-align">
+          <div id="ms-error" class="center-align start-hidden">
             <h6 class="center-align">Error</h6>
           </div>
         </div>
@@ -884,27 +884,27 @@
                   Telescope
                 </label>
               </div>
-              <div id="cs-minaz-div" style="display:none;" class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
+              <div id="cs-minaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
                 <input id="cs-minaz" type="text" disabled value="0">
                 <label for="cs-minaz">Minimum Azimuth (Left Most Azimuth)</label>
               </div>
-              <div id="cs-maxaz-div" style="display:none;" class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 120)">
+              <div id="cs-maxaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 120)">
                 <input id="cs-maxaz" type="text" disabled value="360">
                 <label for="cs-maxaz">Maximum Azimuth (Right Most Azimuth)</label>
               </div>
-              <div id="cs-minel-div" style="display:none;" class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 10)">
+              <div id="cs-minel-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 10)">
                 <input id="cs-minel" type="text" disabled value="10">
                 <label for="cs-minel">Minimum Elevation</label>
               </div>
-              <div id="cs-maxel-div" style="display:none;" class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 90)">
+              <div id="cs-maxel-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 90)">
                 <input id="cs-maxel" type="text" disabled value="90">
                 <label for="cs-maxel">Maximum Elevation</label>
               </div>
-              <div id="cs-minrange-div" style="display:none;" class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 500)">
+              <div id="cs-minrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 500)">
                 <input id="cs-minrange" type="text" disabled value="100">
                 <label for="cs-minrange">Minimum Range</label>
               </div>
-              <div id="cs-maxrange-div" style="display:none;" class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 20000)">
+              <div id="cs-maxrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 20000)">
                 <input id="cs-maxrange" type="text" disabled value="50000">
                 <label for="cs-maxrange">Maximum Range</label>
               </div>
@@ -1102,7 +1102,7 @@
       <a id="twitter-share" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Twitter"><img src="https://static.addtoany.com/buttons/twitter.svg" width="32" height="32"></a>
       <a id="reddit-share" href="https://www.reddit.com/submit?url=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Reddit"><img src="https://static.addtoany.com/buttons/reddit.svg" width="32" height="32"></a>
     </div>
-    <span id="version-info" style="margin-top:-40px;margin-right:10px" class="right">
+    <span id="version-info" class="right">
       vX.XX.XX
     </span>
   </footer>
@@ -1116,35 +1116,35 @@
   <script src="js/lib/materialize.min.js"></script>
   <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.min.js?v=0.38.2b"></script>
+  <script src="js/lib/satellite.min.js?v=0.38.3b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=0.38.2b"></script>
+  <script src="js/lib/shader-loader.min.js?v=0.38.3b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=0.38.2b"></script>
-  <script src="js/time-manager.js?v=0.38.2b"></script>
-  <script src="js/earth.js?v=0.38.2b"></script>
-  <script src="js/satSet.js?v=0.38.2b"></script>
-  <script src="js/sun.js?v=0.38.2b"></script>
+  <script src="js/settings-manager.js?v=0.38.3b"></script>
+  <script src="js/time-manager.js?v=0.38.3b"></script>
+  <script src="js/earth.js?v=0.38.3b"></script>
+  <script src="js/satSet.js?v=0.38.3b"></script>
+  <script src="js/sun.js?v=0.38.3b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js?v=0.38.2b"></script>
+  <script src="js/variables.js?v=0.38.3b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=0.38.2b"></script>
+  <script src="js/ballistic-missile.js?v=0.38.3b"></script>
   <!-- Load Extra Satellites -->
   <!-- <script src="offline/extra.js"></script>
   <script src="offline/satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=0.38.2b"></script>
-  <script src="js/mobile.js?v=0.38.2b"></script>
-  <script src="js/main.js?v=0.38.2b"></script>
-  <script src="js/ui.js?v=0.38.2b"></script>
-  <script src="js/lookangles.js?v=0.38.2b"></script>
-  <script src="js/orbit-display.js?v=0.38.2b"></script>
-  <script src="js/drawLoop-shapes.js?v=0.38.2b"></script>
-  <script src="js/groups.js?v=0.38.2b"></script>
-  <script src="js/search-box.js?v=0.38.2b"></script>
+  <script src="js/color-scheme.js?v=0.38.3b"></script>
+  <script src="js/mobile.js?v=0.38.3b"></script>
+  <script src="js/main.js?v=0.38.3b"></script>
+  <script src="js/ui.js?v=0.38.3b"></script>
+  <script src="js/lookangles.js?v=0.38.3b"></script>
+  <script src="js/orbit-display.js?v=0.38.3b"></script>
+  <script src="js/drawLoop-shapes.js?v=0.38.3b"></script>
+  <script src="js/groups.js?v=0.38.3b"></script>
+  <script src="js/search-box.js?v=0.38.3b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

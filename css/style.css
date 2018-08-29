@@ -203,7 +203,10 @@ ul {
     z-index: 1;
     top: 100px;
     bottom: 250px;
-    max-height: 100%;
+    max-height: 20%;
+    border-width: 0px 0px 5px 0px;
+    border-style: solid;
+    border-color: #0277bd;
   }
   #search-holder {
     display: block;
@@ -297,6 +300,9 @@ ul {
       margin-top: 25px;
       margin-bottom: -50px;
       max-height: 100%;
+      border-width: 0px 0px 5px 5px;
+      border-style: solid;
+      border-color: #0277bd;
   }
   #search-holder {
     position: absolute;
@@ -398,6 +404,9 @@ ul {
     width: 500px;
     height: 470px;
 }
+#about-content {
+  font-size: small;
+}
 .box-header {
     font-size: 20px;
     margin-top: 5px;
@@ -439,13 +448,15 @@ ul {
     padding-left: 35px;
     color: white;
     background: #0a97d6;
-    width: 300px;
     top: 50px;
     right: 0px;
     z-index: 100;
     position: absolute;
     overflow: auto;
     width: 100%;
+    border-width: 0px 0px 5px 0px;
+    border-style: solid;
+    border-color: #0277bd;
   }
 }
 @media (min-width: 1201px) {
@@ -459,6 +470,9 @@ ul {
     z-index: 100;
     position: absolute;
     overflow: auto;
+    border-width: 0px 0px 5px 5px;
+    border-style: solid;
+    border-color: #0277bd;
   }
 }
 
@@ -624,13 +638,19 @@ ul {
 
 .start-hidden {
   display: none;
-  height: 100%;
+  /* height: 100%; */
 }
 
 #editor-menu {
   background: #0a97d6;
   color: white;
   overflow: auto;
+}
+
+#es-error, #nl-error, #ms-error {
+  margin-top: 10px;
+  padding-bottom: 10px;
+  cursor: 'pointer';
 }
 
 #info-overlay-content {
@@ -684,6 +704,9 @@ ul {
     overflow: auto;
     z-index: 10;
     padding: 0px 5px 50px 0px;
+    border-width: 0px 5px 0px 0px;
+    border-color: #0277bd;
+    border-style: solid;
   }
   #lookanglesmultisite-content {
     width: 375px;
@@ -834,6 +857,13 @@ ul li{
   .sat-infobox-fullsize {
     padding: 0 10px 0px 10px !important;
   }
+  .sat-info-value {
+      float: right;
+      width: 45%;
+      height: 20px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+  }
 }
 
 @media (min-width: 541px) and (max-width: 1200px) {
@@ -856,6 +886,13 @@ ul li{
   .sat-infobox-fullsize {
     padding: 0 10px 0px 10px !important;
   }
+  .sat-info-value {
+      float: right;
+      width: 45%;
+      height: 20px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+  }
 }
 
 @media (min-width: 1201px) {
@@ -870,12 +907,19 @@ ul li{
       padding: 0 10px 0 10px;
       right: 0px;
       width: 230px;
-      border-top: 5px;
-      border-top-color: #0277bd;
-      border-top-style: solid;
-      overflow: auto;
+      border-width: 5px 0px 0px 5px;
+      border-color: #0277bd;
+      border-style: solid;
+      overflow: hidden;
   }
   .sat-infobox-fullsize {}
+  .sat-info-value {
+      float: right;
+      width: 100px;
+      height: 20px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+  }
 }
 
 #sat-infobox a {
@@ -901,13 +945,6 @@ ul li{
     font-size: 14px;
     color: white;
     float: left;
-}
-.sat-info-value {
-    float: right;
-    width: 100px;
-    height: 20px;
-    text-overflow: ellipsis;
-    overflow: hidden;
 }
 
 #sat-info-nextpass-row {
@@ -1235,25 +1272,44 @@ ul li{
     top: 0px;
     height: 50px;
   }
-  #social {
+  #menu-space-stations,
+  #menu-launches,
+  #social,
+  #version-info,
+  #fastCompSettings {
     display: none;
-    margin-top: -30px !important;
-    margin-right: 10px !important;
   }
-  #version-info {
+  #mobile-warning {
+    display: block;
+    margin-top:10px;
+    color:#48f3e3 !important
+  }
+  #jday {
     display: none;
   }
 }
 
 @media (min-width: 1201px) {
+  #jday {
+    display: block;
+    padding-right: 25px;
+    padding-left: 25px;
+  }
   #social {
     display: block;
     margin-top:-45px;
     margin-right:70px;
   }
-  #social-alt {
-    display:none;
-    position: absolute;
+  #menu-space-stations,
+  #menu-launches {
+    display: inline;
+  }
+  #fastCompSettings {
+    display: block;
+  }
+  #social-alt,
+  #mobile-warning {
+    display: none;
   }
   #version-info {
     display: block;

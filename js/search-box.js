@@ -42,9 +42,11 @@
     $('#search-results').slideUp();
     groups.clearSelect();
     resultsOpen = false;
+    selectSat(-1);
+    satSet.setColorScheme(settingsManager.currentColorScheme, true);
   };
 
-  searchBox.doSearch = function (searchString) {
+  searchBox.doSearch = function (searchString, isPreventDropDown) {
     selectSat(-1);
 
     if (searchString.length === 0) {
@@ -155,7 +157,9 @@
     // Don't let the search overlap with the legend
     uiController.legendMenuChange('clear');
 
-    searchBox.fillResultBox(results);
+    if (!isPreventDropDown) {
+      searchBox.fillResultBox(results);
+    }
     updateUrl();
     settingsManager.themes.retheme();
   };

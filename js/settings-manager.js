@@ -5,8 +5,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.38.2';
-  settingsManager.versionDate = 'August 18, 2018';
+  settingsManager.versionNumber = 'v0.38.3';
+  settingsManager.versionDate = 'August 28, 2018';
 
   // Offline management
   settingsManager.offlineLocation = '';
@@ -150,8 +150,7 @@
   settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
   settingsManager.colors.missile = [1.0, 1.0, 0.0, 1.0];
   settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];
-  settingsManager.colors.otherSatellite = 0.1;
-  settingsManager.colors.transparent = [1.0, 1.0, 1.0, settingsManager.colors.otherSatellite];
+  settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.1];
   settingsManager.colors.gradientAmt = 0;
   // TODO: Gradients Must be Edited in color-scheme.js
   // settingsManager.colors.apogeeGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];

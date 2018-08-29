@@ -2809,7 +2809,7 @@ ul.staggered-list li {
   }
 }
 
-@media only screen and (max-width: 1200px) {
+@media only screen and (max-width: 1300px) {
   .hide-on-med-and-down {
     display: none !important;
   }
@@ -2821,7 +2821,7 @@ ul.staggered-list li {
   }
 }
 
-@media only screen and (min-width: 600px) and (max-width: 1200px) {
+@media only screen and (min-width: 600px) and (max-width: 1300px) {
   .hide-on-med-only {
     display: none !important;
   }
@@ -4210,7 +4210,7 @@ nav .input-field label.active i {
   position: fixed;
 }
 
-@media only screen and (min-width: 1201px) {
+@media only screen and (min-width: 1301px) {
   nav.nav-extended .nav-wrapper {
     min-height: 64px;
   }
@@ -4281,7 +4281,7 @@ html {
   }
 }
 
-@media only screen and (min-width: 1201px) {
+@media only screen and (min-width: 1301px) {
   html {
     font-size: 15px;
   }

@@ -50,7 +50,9 @@
     selectSat(-1);
 
     if (searchString.length === 0) {
+      $('#search').val('');
       searchBox.hideResults();
+      satSet.setColorScheme(ColorScheme.default, true);
       return;
     }
 

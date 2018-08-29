@@ -153,7 +153,7 @@ ul {
     text-align: center;
 }
 
-#countries-menu li, #us-radar-menu li, #us-optical-menu li, #russian-menu li, #chinese-menu li, #colors-menu li {
+#countries-menu li {
   min-height: 15px;
   text-align: center;
 }
@@ -170,7 +170,7 @@ ul {
     pointer-events: none;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
   #sat-hoverbox {
     display: none !important;
   }
@@ -277,7 +277,7 @@ ul {
     top: 0px !important;
   }
 }
-@media (min-width: 1201px) {
+@media (min-width: 1301px) {
   #legend-menu {
     display: block;
     position: absolute;
@@ -443,7 +443,7 @@ ul {
   bottom: 100px;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
@@ -459,7 +459,7 @@ ul {
     border-color: #0277bd;
   }
 }
-@media (min-width: 1201px) {
+@media (min-width: 1301px) {
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
@@ -560,7 +560,7 @@ ul {
     color: white;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
   ::-webkit-scrollbar {
     display: none;
   }
@@ -659,6 +659,10 @@ ul {
   z-index: 10;
 }
 
+.side-menu-parent {
+  height: 100%;
+}
+
 @media (max-width: 540px) {
   .side-menu {
     position: absolute;
@@ -671,8 +675,11 @@ ul {
     z-index: 10;
     padding: 0px 5px 150px 0px;
   }
+  #menu-satellite-collision, #menu-find-sat {
+    display: none;
+  }
 }
-@media (min-width: 541px) and (max-width: 1200px) {
+@media (min-width: 541px) and (max-width: 1300px) {
   .side-menu {
     position: absolute;
     background: #0a97d6;
@@ -687,8 +694,11 @@ ul {
   #lookanglesmultisite-content {
     width: 375px;
   }
+  #menu-satellite-collision, #menu-find-sat {
+    display: inline;
+  }
 }
-@media (min-width: 1201px) {
+@media (min-width: 1301px) {
   .side-menu {
     position: absolute;
     background: #0a97d6;
@@ -705,6 +715,9 @@ ul {
   }
   #lookanglesmultisite-content {
     width: 375px;
+  }
+  #menu-satellite-collision, #menu-find-sat {
+    display: inline;
   }
 }
 
@@ -861,7 +874,7 @@ ul li{
   }
 }
 
-@media (min-width: 541px) and (max-width: 1200px) {
+@media (min-width: 541px) and (max-width: 1300px) {
   #sat-infobox {
       display: none;
       background: #0a97d6;
@@ -890,7 +903,7 @@ ul li{
   }
 }
 
-@media (min-width: 1201px) {
+@media (min-width: 1301px) {
   #sat-infobox {
       display: none;
       background: #0a97d6;
@@ -956,7 +969,7 @@ ul li{
   opacity: 1 !important;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
 .material-tooltip {
   display: none !important;
 }
@@ -1011,7 +1024,7 @@ ul li{
   }
 }
 
-@media (min-width: 1201px) {
+@media (min-width: 1301px) {
   #fullscreen-icon {
     display: none;
   }
@@ -1077,7 +1090,7 @@ ul li{
   text-align: center;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
   #ui-datepicker-div {
     top: auto !important;
     width: 100% !important;
@@ -1098,7 +1111,7 @@ ul li{
   }
 }
 
-@media (min-width: 1201px) {
+@media (min-width: 1301px) {
   #ui-datepicker-div {
     top: auto !important;
     bottom: 55px !important;
@@ -1167,10 +1180,10 @@ ul li{
     filter: grayscale();
 }
 
-@media (min-width: 1201px) {
+@media (min-width: 1301px) {
   #bottom-icons-container {
       margin-top: -15px;
-      width: 870px;
+      width: 1000px;
       height: 50px;
 
   }
@@ -1198,7 +1211,7 @@ ul li{
   }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
   #bottom-icons-container {
       margin-top: -15px;
       width: 500px;
@@ -1260,7 +1273,7 @@ ul li{
   }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
   #social-alt {
     display: block;
     position: absolute;
@@ -1284,7 +1297,7 @@ ul li{
   }
 }
 
-@media (min-width: 1201px) {
+@media (min-width: 1301px) {
   #jday {
     display: block;
     padding-right: 25px;
@@ -1358,7 +1371,12 @@ ul li{
   color: red;
 }
 
-#sensor-list-content ul li{
+#sensor-list-content ul li {
+  padding: 2px !important;
+}
+
+#colors-menu ul li {
+  text-align: center;
   padding: 2px !important;
 }
 

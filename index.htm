@@ -14,11 +14,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=0.39.0b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=0.39.1b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=0.39.0b" rel="stylesheet">
+    <link href="css/fonts.css?v=0.39.1b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=0.39.0b">
+    <link rel="stylesheet" href="css/materialize.css?v=0.39.1b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -64,7 +64,6 @@
         <ul id="nav-mobile" class="left hide-on-med-and-down">
           <li id="jday"></li>
           <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Satellites &#x25BC;</a></li>
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="colors-menu">Color Schemes &#x25BC;</a></li>
         </ul>
         <ul id="nav-mobile" class="right">
           <li><a id="geolocation-btn" class="start-hidden" href="#!"><i class="material-icons">location_on</i></a></li>
@@ -107,17 +106,6 @@
       <li data-group="GalileoGroup" class="group-option">Galileo Satellites</li>
       <li data-group="GlonassGroup" class="group-option">Glonass Satellites</li>
       <li data-group="AmatuerRadio" class="group-option">Amateur Radio</li>
-    </ul>
-
-    <ul id="colors-menu" class="dropdown-content">
-      <li data-color="default">Type</li>
-      <li data-color="velocity">Velocity</li>
-      <li data-color="rcs">Radar Cross Section</li>
-      <li data-color="smallsats">Small Satellites</li>
-      <li data-color="countries">Countries</li>
-      <li data-color="near-earth">Near Earth</li>
-      <li data-color="deep-space">Deep Space</li>
-      <li data-color="lost-objects">Lost Objects</li>
     </ul>
   </header>
 
@@ -169,7 +157,7 @@
         <ul id="legend-list-small" class="start-hidden">
           <li><div class="Square-Box legend-green-box"></div>Small Satellite</li>
           <li><div class="Square-Box legend-gray-box"></div>Other Satellite</li>
-          <li><div class="Square-Box legend-orange-box"></div>Satellite In View</li>
+          <li><div class="Square-Box legend-blue-box"></div>Satellite In View</li>
         </ul>
         <ul id="legend-list-near" class="start-hidden">
           <li><div class="Square-Box legend-green-box"></div>Period Less Than 225 min</li>
@@ -196,7 +184,7 @@
         </ul>
       </div>
 
-      <div id="sensor-list-menu" class="start-hidden text-select">
+      <div id="sensor-list-menu" class="side-menu-parent start-hidden text-select">
         <div id="sensor-list-content" class="side-menu">
           <div class="row">
             <ul id="reset-sensor-text" class="sensor-reset-menu">
@@ -250,7 +238,24 @@
         </div>
       </div>
 
-      <div id="sensor-info-menu" class="start-hidden text-select">
+      <div id="color-scheme-menu" class="side-menu-parent start-hidden text-select">
+        <div id="colors-menu" class="side-menu">
+          <ul>
+            <h5 class="center-align">Color Schemes</h5>
+            <li class="divider"></li>
+            <li class="menu-selectable" data-color="default">Object Type</li>
+            <li class="menu-selectable" data-color="velocity">Velocity</li>
+            <li class="menu-selectable" data-color="rcs">Radar Cross Section</li>
+            <li class="menu-selectable" data-color="smallsats">Small Satellites</li>
+            <li class="menu-selectable" data-color="countries">Countries</li>
+            <li class="menu-selectable" data-color="near-earth">Near Earth</li>
+            <li class="menu-selectable" data-color="deep-space">Deep Space</li>
+            <li class="menu-selectable" data-color="lost-objects">Lost Objects</li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="sensor-info-menu" class="side-menu-parent start-hidden text-select">
         <div id="sensor-content" class="side-menu">
           <div class="row">
             <h5 id="sensor-info-title" class="center-align">Sensor Name</h5>
@@ -301,7 +306,7 @@
           </div>
         </div>
       </div>
-      <div id="watchlist-menu" class="start-hidden text-select">
+      <div id="watchlist-menu" class="side-menu-parent start-hidden text-select">
         <div id="watchlist-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Satellite Watchlist</h5>
@@ -332,7 +337,7 @@
           </div>
         </div>
       </div>
-      <div id="findByLooks-menu" class="start-hidden text-select">
+      <div id="findByLooks-menu" class="side-menu-parent start-hidden text-select">
         <div id="findByLooks-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Find By Looks</h5>
@@ -398,7 +403,7 @@
           </div>
         </div>
       </div>
-      <div id="lookangles-menu" class="start-hidden text-select">
+      <div id="lookangles-menu" class="side-menu-parent start-hidden text-select">
         <div id="lookangles-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Sensor Look Angles</h5>
@@ -406,7 +411,7 @@
           </div>
         </div>
       </div>
-      <div id="lookanglesmultisite-menu" class="start-hidden text-select">
+      <div id="lookanglesmultisite-menu" class="side-menu-parent start-hidden text-select">
         <div id="lookanglesmultisite-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Multi-Sensor Look Angles</h5>
@@ -414,8 +419,8 @@
           </div>
         </div>
       </div>
-      <div id="twitter-menu" class="start-hidden side-menu text-select"></div>
-      <div id="map-menu" class="start-hidden side-menu valign-wrapper">
+      <div id="twitter-menu" class="side-menu-parent start-hidden side-menu text-select"></div>
+      <div id="map-menu" class="side-menu-parent start-hidden side-menu valign-wrapper">
         <img id="map-image" src="images/braun-stereographic.jpg" width="800px" height="600px">
         <img id="map-sat" class="map-item map-look" src="images/satellite-2.png" width="20px" height="20px">
         <img id="map-sensor" class="map-item map-look start-hidden" src="images/radar-1.png" width="20px" height="20px">
@@ -473,7 +478,7 @@
           Braun Stereographic Projection (c) Tobias Jung
         </div>
       </div>
-      <div id="socrates-menu" class="start-hidden text-select">
+      <div id="socrates-menu" class="side-menu-parent start-hidden text-select">
         <div id="socrates-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Possible collisions</h5>
@@ -481,7 +486,7 @@
           </div>
         </div>
       </div>
-      <div id="settings-menu" class="start-hidden text-select">
+      <div id="settings-menu" class="side-menu-parent start-hidden text-select">
         <div id="settings-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">General Settings</h5>
@@ -545,7 +550,7 @@
           </div>
         </div>
       </div>
-      <div id="about-menu" class="start-hidden text-select">
+      <div id="about-menu" class="side-menu-parent start-hidden text-select">
         <div id="about-content" class="side-menu">
           <div class="row">
             <div id="mobile-warning" class="center-align">
@@ -578,7 +583,7 @@
           </div>
         </div>
       </div>
-      <div id="editSat-menu" class="start-hidden text-select">
+      <div id="editSat-menu" class="side-menu-parent start-hidden text-select">
         <div id="editSat-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Edit Satellite</h5>
@@ -636,7 +641,7 @@
           </div>
         </div>
       </div>
-      <div id="newLaunch-menu" class="start-hidden text-select">
+      <div id="newLaunch-menu" class="side-menu-parent start-hidden text-select">
         <div id="newLaunch-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">New Launch</h5>
@@ -717,7 +722,7 @@
         </div>
       </div>
 
-      <div id="breakup-menu" class="start-hidden text-select">
+      <div id="breakup-menu" class="side-menu-parent start-hidden text-select">
         <div id="breakup-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Breakup Simulator</h5>
@@ -735,7 +740,7 @@
         </div>
       </div>
 
-      <div id="missile-menu" class="start-hidden text-select">
+      <div id="missile-menu" class="side-menu-parent start-hidden text-select">
         <div id="missile-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Create Missile Attack</h5>
@@ -868,7 +873,7 @@
         </div>
       </div>
 
-      <div id="customSensor-menu" class="start-hidden text-select">
+      <div id="customSensor-menu" class="side-menu-parent start-hidden text-select">
         <div id="customSensor-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">Custom Sensor</h5>
@@ -1083,25 +1088,26 @@
     </div>
     <div id="bottom-icons-container" class="container center">
       <div id="bottom-icons">
-        <img id="menu-sensor-list" src="" delayedsrc="images/space-station-2.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Sensor List" data-position="top" data-delay="50" data-tooltip="Sensor List">
+        <img id="menu-sensor-list" src="" delayedsrc="images/space-station-2.png" class="bmenu-item tooltipped" alt="Sensor List" data-position="top" data-delay="50" data-tooltip="Sensor List">
         <img id="menu-info-overlay" src="" delayedsrc="images/info.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Information Overlay" data-position="top" data-delay="50" data-tooltip="Information Overlay">
         <img id="menu-sensor-info" src="" delayedsrc="images/radar.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Sensor Information" data-position="top" data-delay="50" data-tooltip="Sensor Information">
         <img id="menu-in-coverage" src="" delayedsrc="images/radar-1.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Current Sensor Coverage" data-position="top" data-delay="50" data-tooltip="Current Sensor Coverage">
-        <img id="menu-watchlist" src="" delayedsrc="images/star.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Satellite Watchlist" data-position="top" data-delay="50" data-tooltip="Satellite Watchlist">
+        <img id="menu-watchlist" src="" delayedsrc="images/star.png" class="bmenu-item tooltipped" alt="Satellite Watchlist" data-position="top" data-delay="50" data-tooltip="Satellite Watchlist">
         <img id="menu-lookangles" src="" delayedsrc="images/telescope.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Look Angles" data-position="top" data-delay="50" data-tooltip="Look Angles">
         <img id="menu-lookanglesmultisite" src="" delayedsrc="images/orbit.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="SSN Lookangles" data-position="top" data-delay="50" data-tooltip="SSN Lookangles">
-        <img id="menu-find-sat" src="" delayedsrc="images/findOrbit.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Search Orbit" data-position="top" data-delay="50" data-tooltip="Search Orbit">
-        <img id="menu-twitter" src="" delayedsrc="images/twitter.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Space News on Twitter" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
+        <img id="menu-find-sat" src="" delayedsrc="images/findOrbit.png" class="bmenu-item tooltipped" alt="Search Orbit" data-position="top" data-delay="50" data-tooltip="Search Orbit">
+        <img id="menu-twitter" src="" delayedsrc="images/twitter.png" class="bmenu-item tooltipped" alt="Space News on Twitter" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
         <img id="menu-map" src="" delayedsrc="images/map.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Stereographic Map" data-position="top" data-delay="50" data-tooltip="Stereographic Map">
-        <img id="menu-launches" src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Launch Schedule" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
-        <img id="menu-space-stations" src="" delayedsrc="images/space-station-1.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Union of Concerned Scientists Watchlist" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist">
-        <img id="menu-satellite-collision" src="" delayedsrc="images/satellite-collision.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="SOCRATES Prediction of Near Conjunctions" data-position="top" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
+        <img id="menu-launches" src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item tooltipped" alt="Launch Schedule" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
+        <img id="menu-space-stations" src="" delayedsrc="images/space-station-1.png" class="bmenu-item tooltipped" alt="Union of Concerned Scientists Watchlist" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist">
+        <img id="menu-satellite-collision" src="" delayedsrc="images/satellite-collision.png" class="bmenu-item tooltipped" alt="SOCRATES Prediction of Near Conjunctions" data-position="top" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
         <img id="menu-editSat" src="" delayedsrc="images/editPencil.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Edit Satellites" data-position="top" data-delay="50" data-tooltip="Edit Satellites">
         <img id="menu-newLaunch" src="" delayedsrc="images/rocket-ship.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Create Launch Nominal" data-position="top" data-delay="50" data-tooltip="Create Launch Nominal">
-        <img id="menu-missile" src="" delayedsrc="images/rocket-ship-2.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Create Missile Attack" data-position="top" data-delay="50" data-tooltip="Create Missile Attack">
-        <img id="menu-customSensor" src="" delayedsrc="images/observatory.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Custom Sensor">
-        <img id="menu-settings" src="" delayedsrc="images/gear-icon.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Settings" data-position="top" data-delay="50" data-tooltip="Settings">
-        <img id="menu-about" src="" delayedsrc="images/about.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Author Information" data-position="top" data-delay="50" data-tooltip="Author Information">
+        <img id="menu-missile" src="" delayedsrc="images/rocket-ship-2.png" class="bmenu-item tooltipped" alt="Create Missile Attack" data-position="top" data-delay="50" data-tooltip="Create Missile Attack">
+        <img id="menu-customSensor" src="" delayedsrc="images/observatory.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Custom Sensor">
+        <img id="menu-settings" src="" delayedsrc="images/gear-icon.png" class="bmenu-item tooltipped" alt="Settings" data-position="top" data-delay="50" data-tooltip="Settings">
+        <img id="menu-color-scheme" src="" delayedsrc="images/brush.png" class="bmenu-item tooltipped" alt="Color Schemes" data-position="top" data-delay="50" data-tooltip="Color Schemes">
+        <img id="menu-about" src="" delayedsrc="images/about.png" class="bmenu-item tooltipped" alt="Author Information" data-position="top" data-delay="50" data-tooltip="Author Information">
         <img id="menu-planetarium" src="" delayedsrc="images/astronaut.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Planetarium View" data-position="top" data-delay="50" data-tooltip="Planetarium View">
       </div>
     </div>
@@ -1124,35 +1130,35 @@
   <script src="js/lib/materialize.min.js"></script>
   <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.min.js?v=0.39.0b"></script>
+  <script src="js/lib/satellite.min.js?v=0.39.1b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=0.39.0b"></script>
+  <script src="js/lib/shader-loader.min.js?v=0.39.1b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=0.39.0b"></script>
-  <script src="js/time-manager.js?v=0.39.0b"></script>
-  <script src="js/earth.js?v=0.39.0b"></script>
-  <script src="js/satSet.js?v=0.39.0b"></script>
-  <script src="js/sun.js?v=0.39.0b"></script>
+  <script src="js/settings-manager.js?v=0.39.1b"></script>
+  <script src="js/time-manager.js?v=0.39.1b"></script>
+  <script src="js/earth.js?v=0.39.1b"></script>
+  <script src="js/satSet.js?v=0.39.1b"></script>
+  <script src="js/sun.js?v=0.39.1b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js?v=0.39.0b"></script>
+  <script src="js/variables.js?v=0.39.1b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=0.39.0b"></script>
+  <script src="js/ballistic-missile.js?v=0.39.1b"></script>
   <!-- Load Extra Satellites -->
   <!-- <script src="offline/extra.js"></script>
   <script src="offline/satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=0.39.0b"></script>
-  <script src="js/mobile.js?v=0.39.0b"></script>
-  <script src="js/main.js?v=0.39.0b"></script>
-  <script src="js/ui.js?v=0.39.0b"></script>
-  <script src="js/lookangles.js?v=0.39.0b"></script>
-  <script src="js/orbit-display.js?v=0.39.0b"></script>
-  <script src="js/drawLoop-shapes.js?v=0.39.0b"></script>
-  <script src="js/groups.js?v=0.39.0b"></script>
-  <script src="js/search-box.js?v=0.39.0b"></script>
+  <script src="js/color-scheme.js?v=0.39.1b"></script>
+  <script src="js/mobile.js?v=0.39.1b"></script>
+  <script src="js/main.js?v=0.39.1b"></script>
+  <script src="js/ui.js?v=0.39.1b"></script>
+  <script src="js/lookangles.js?v=0.39.1b"></script>
+  <script src="js/orbit-display.js?v=0.39.1b"></script>
+  <script src="js/drawLoop-shapes.js?v=0.39.1b"></script>
+  <script src="js/groups.js?v=0.39.1b"></script>
+  <script src="js/search-box.js?v=0.39.1b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

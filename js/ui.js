@@ -72,6 +72,7 @@ var lkpassed = false;
   var isWatchlistMenuOpen = false;
   var isLaunchMenuOpen = false;
   var isAboutSelected = false;
+  var isColorSchemeMenuOpen = false;
   var isMilSatSelected = false;
   var isSocratesMenuOpen = false;
   var isSettingsMenuOpen = false;
@@ -1828,6 +1829,19 @@ var lkpassed = false;
             break;
           }
           break;
+        case 'menu-color-scheme': // No Keyboard Commands
+          if (isColorSchemeMenuOpen) {
+            uiController.hideSideMenus();
+            isColorSchemeMenuOpen = false;
+            break;
+          } else {
+            uiController.hideSideMenus();
+            $('#color-scheme-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+            isColorSchemeMenuOpen = true;
+            $('#menu-color-scheme').addClass('bmenu-item-selected');
+            break;
+          }
+          break;
         case 'menu-planetarium':
           if (isPlanetariumView) {
             isPlanetariumView = false;
@@ -1874,6 +1888,7 @@ var lkpassed = false;
       $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#missile-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+      $('#color-scheme-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#about-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
 
       // Remove red color from all menu icons
@@ -1893,6 +1908,7 @@ var lkpassed = false;
       $('#menu-newLaunch').removeClass('bmenu-item-selected');
       $('#menu-missile').removeClass('bmenu-item-selected');
       $('#menu-customSensor').removeClass('bmenu-item-selected');
+      $('#menu-color-scheme').removeClass('bmenu-item-selected');
       $('#menu-about').removeClass('bmenu-item-selected');
 
       // Unflag all open menu variables
@@ -1912,6 +1928,7 @@ var lkpassed = false;
       isNewLaunchMenuOpen = false;
       isMissileMenuOpen = false;
       isCustomSensorMenuOpen = false;
+      isColorSchemeMenuOpen = false;
       isAboutSelected = false;
       // isPlanetariumView = false;
     };
@@ -2328,6 +2345,61 @@ var lkpassed = false;
       if (zoomTarget > 1) zoomTarget = 1;
     }
   }
+
+  $('#colors-menu>ul>li').click(function () {
+    selectSat(-1); // clear selected sat
+    var colorName = $(this).data('color');
+    switch (colorName) {
+      case 'default':
+        if (satellite.sensorSelected()) {
+          uiController.legendMenuChange('default');
+        } else {
+          uiController.legendMenuChange('default');
+        }
+        satSet.setColorScheme(ColorScheme.default, true);
+        ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
+        break;
+      case 'velocity':
+        uiController.legendMenuChange('velocity');
+        satSet.setColorScheme(ColorScheme.velocity);
+        ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
+        break;
+      case 'near-earth':
+        uiController.legendMenuChange('near');
+        satSet.setColorScheme(ColorScheme.leo);
+        ga('send', 'event', 'ColorScheme Menu', 'near-earth', 'Selected');
+        break;
+      case 'deep-space':
+        uiController.legendMenuChange('deep');
+        satSet.setColorScheme(ColorScheme.geo);
+        ga('send', 'event', 'ColorScheme Menu', 'Deep-Space', 'Selected');
+        break;
+      case 'lost-objects':
+        $('#search').val('');
+        $('#loading-screen').fadeIn('slow', function () {
+          satSet.setColorScheme(ColorScheme.lostobjects);
+          ga('send', 'event', 'ColorScheme Menu', 'Lost Objects', 'Selected');
+          searchBox.doSearch($('#search').val());
+          $('#loading-screen').fadeOut();
+        });
+        break;
+      case 'rcs':
+        uiController.legendMenuChange('rcs');
+        satSet.setColorScheme(ColorScheme.rcs);
+        ga('send', 'event', 'ColorScheme Menu', 'RCS', 'Selected');
+        break;
+      case 'smallsats':
+        uiController.legendMenuChange('small');
+        satSet.setColorScheme(ColorScheme.smallsats);
+        ga('send', 'event', 'ColorScheme Menu', 'Small Satellites', 'Selected');
+        break;
+      case 'countries':
+        uiController.legendMenuChange('countries');
+        satSet.setColorScheme(ColorScheme.countries);
+        ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
+        break;
+    }
+  });
 
   uiController.useCurrentGeolocationAsSensor = function () {
     if (location.protocol === 'https:' && !settingsManager.geolocationUsed) {

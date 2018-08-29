@@ -210,27 +210,9 @@ or mirrored at any other location without the express written permission of the 
         $('#menu-satellite-collision').hide();
       }
 
-      // Hide More Stuff on Little Screens
-      if ($(document).width() <= 400) {
-        $('#menu-satellite-collision').hide();
-        $('#menu-find-sat').hide();
-        $('#sat-infobox').attr('style', 'width:100%;top:60%;');
-      }
-
       $('body').attr('style', 'background:black');
       $('#canvas-holder').attr('style', 'display:block');
-      $('#menu-sensor-list').removeClass('bmenu-item-disabled');
-      $('#menu-watchlist').removeClass('bmenu-item-disabled');
-      $('#menu-find-sat').removeClass('bmenu-item-disabled');
-      $('#menu-twitter').removeClass('bmenu-item-disabled');
-      $('#menu-launches').removeClass('bmenu-item-disabled');
-      $('#menu-about').removeClass('bmenu-item-disabled');
-      $('#menu-space-stations').removeClass('bmenu-item-disabled');
-      $('#menu-satellite-collision').removeClass('bmenu-item-disabled');
-      $('#menu-customSensor').removeClass('bmenu-item-disabled');
-      $('#menu-missile').removeClass('bmenu-item-disabled');
-      $('#menu-settings').removeClass('bmenu-item-disabled');
-      settingsManager.isBottomIconsEnabled = true;
+      settingsManager.isBottomIconsEnabled = true; // NOTE: Probably depricated (8/29/2018)
 
       if (settingsManager.isMobileModeEnabled) { // Start Button Displayed
         $('#mobile-start-button').show();
@@ -999,11 +981,14 @@ or mirrored at any other location without the express written permission of the 
   satSet.setHover = function (i) {
     if (i === hoveringSat) return;
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
-    if (hoveringSat !== -1 && hoveringSat !== selectedSat) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(hoveringSat)).color));
-    }
+
     if (i !== -1) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.hoverColor));
+      if (hoveringSat !== -1 && hoveringSat !== selectedSat) {
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(hoveringSat)).color));
+      }
+      if (i !== -1) {
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.hoverColor));
+      }
     }
     hoveringSat = i;
   };
@@ -1012,11 +997,13 @@ or mirrored at any other location without the express written permission of the 
     if (i === selectedSat) return;
     if (settingsManager.isMobileModeEnabled) mobile.searchToggle(true);
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
-    if (selectedSat !== -1) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(selectedSat)).color));
-    }
     if (i !== -1) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
+      if (selectedSat !== -1) {
+        gl.bufferSubData(gl.ARRAY_BUFFER, selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(selectedSat)).color));
+      }
+      if (i !== -1) {
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
+      }
     }
     selectedSat = i;
     if (satellite.sensorSelected()) {

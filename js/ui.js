@@ -1664,7 +1664,11 @@ var lkpassed = false;
             break;
           } else {
             uiController.hideSideMenus();
-            $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2018.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+            if (location.protocol === 'https:') {
+              $.colorbox({href: 'https://space.skyrocket.de/doc_chr/lau2018.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+            } else {
+              $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2018.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+            }
             isLaunchMenuOpen = true;
             $('#menu-launches').addClass('bmenu-item-selected');
             break;

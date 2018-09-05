@@ -77,6 +77,13 @@
         };
       }
 
+      if (sat.marker) {
+        return {
+          color: colorTheme.marker,
+          pickable: false
+        };
+      }
+
       if (sat.static && ColorScheme.objectTypeFlags.red === false) {
         return {
           color: colorTheme.deselected,

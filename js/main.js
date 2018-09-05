@@ -372,6 +372,7 @@ var drawLoopCallback;
     _onDrawLoopComplete(drawLoopCallback);
     _demoMode(settingsManager.isDemoModeOn);
     _satLabelMode(settingsManager.isSatLabelModeOn);
+    // _fieldOfViewMarkers(settingsManager.isFieldOfViewModeOn);
 
     // drawLines();
     // var bubble = new FOVBubble();
@@ -716,6 +717,7 @@ var drawLoopCallback;
     if (typeof cb == 'undefined') return;
     cb();
   }
+
   var satLabelModeLastTime = 0;
   function _satLabelMode (isSatLabelModeOn) {
     if (!isSatLabelModeOn || cameraType.current !== cameraType.PLANETARIUM) {

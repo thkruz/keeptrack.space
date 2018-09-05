@@ -634,6 +634,7 @@ var lkpassed = false;
         }
       });
       $('#settings-form').submit(function (e) {
+        var isFOVBubbleChecked = document.getElementById('settings-fov-bubble').checked;
         var isHOSChecked = document.getElementById('settings-hos').checked;
         var isDMChecked = document.getElementById('settings-demo-mode').checked;
         var isSLMChecked = document.getElementById('settings-sat-label-mode').checked;
@@ -650,6 +651,16 @@ var lkpassed = false;
           settingsManager.isDemoModeOn = true;
         } else {
           settingsManager.isDemoModeOn = false;
+        }
+
+        if (isFOVBubbleChecked) {
+          satCruncher.postMessage({
+            isShowFOVBubble: 'enable'
+          });
+        } else {
+          satCruncher.postMessage({
+            isShowFOVBubble: 'reset'
+          });
         }
 
         if (isHOSChecked) {

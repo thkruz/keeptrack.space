@@ -5,8 +5,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.39.1';
-  settingsManager.versionDate = 'August 29, 2018';
+  settingsManager.versionNumber = 'v0.40.0';
+  settingsManager.versionDate = 'September 4, 2018';
 
   // Offline management
   settingsManager.offlineLocation = '';
@@ -108,6 +108,9 @@
   settingsManager.demoModeInterval = 3000; // in ms (3 second default)
   settingsManager.isSatLabelModeOn = true;
   settingsManager.satLabelInterval = 500; //  in ms (0.5 second default)
+
+  settingsManager.isFieldOfViewModeOn = true;
+
   settingsManager.maxOrbits = 20000; // TODO: BROKEN
   settingsManager.maxLabels = 20000;  // TODO: BROKEN
 
@@ -143,6 +146,7 @@
   settingsManager.colors = {};
   settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
   settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
+  settingsManager.colors.marker = [0.2, 1.0, 1.0, 1.0];
   settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
   settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
   settingsManager.colors.inviewAlt = [0.2, 0.5, 1.0, 0.85];

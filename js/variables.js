@@ -17,6 +17,7 @@
 
 var MAX_MISSILES = 500;
 var MAX_ANALSATS = 30;
+var MAX_FIELD_OF_VIEW_MARKERS = 20000;
 
 function saveVariable (variable) {
   variable = JSON.stringify(variable);
@@ -280,7 +281,7 @@ $.ajaxSetup({
     obsminel: 3,
     obsmaxel: 105,
     obsminrange: 200,
-    obsmaxrange: 50000,
+    obsmaxrange: 200000,
     changeObjectInterval: 1000,
     staticNum: 3,
     zoom: 'geo',
@@ -390,7 +391,7 @@ $.ajaxSetup({
     obsminel: 1,
     obsmaxel: 90,
     obsminrange: 200,
-    obsmaxrange: 500000,
+    obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 8,
     zoom: 'geo',
@@ -411,7 +412,7 @@ $.ajaxSetup({
     obsminel: 1,
     obsmaxel: 90,
     obsminrange: 200,
-    obsmaxrange: 500000,
+    obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 9,
     zoom: 'geo',
@@ -432,7 +433,7 @@ $.ajaxSetup({
     obsminel: 20,
     obsmaxel: 90,
     obsminrange: 20000,
-    obsmaxrange: 500000,
+    obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 10,
     zoom: 'geo',
@@ -453,7 +454,7 @@ $.ajaxSetup({
     obsminel: 20,
     obsmaxel: 90,
     obsminrange: 20000,
-    obsmaxrange: 500000,
+    obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 11,
     zoom: 'geo',
@@ -474,7 +475,7 @@ $.ajaxSetup({
     obsminel: 20,
     obsmaxel: 90,
     obsminrange: 20000,
-    obsmaxrange: 500000,
+    obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 12,
     zoom: 'geo',
@@ -495,7 +496,7 @@ $.ajaxSetup({
     obsminel: 1,
     obsmaxel: 90,
     obsminrange: 200,
-    obsmaxrange: 500000,
+    obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 22,
     zoom: 'geo',
@@ -516,7 +517,7 @@ $.ajaxSetup({
     obsminel: 1,
     obsmaxel: 90,
     obsminrange: 200,
-    obsmaxrange: 500000,
+    obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 23,
     zoom: 'geo',
@@ -561,7 +562,7 @@ $.ajaxSetup({
     obsminel: 1.5, // http://www.issfd.org/ISSFD_2012/ISSFD23_CRSD2_3.pdf
     obsmaxel: 90,
     obsminrange: 0,
-    obsmaxrange: 500000, // http://emits.sso.esa.int/emits-doc/AO5059RD1.pdf
+    obsmaxrange: 200000, // http://emits.sso.esa.int/emits-doc/AO5059RD1.pdf
     changeObjectInterval: 20000,
     staticNum: 25,
     zoom: 'geo',
@@ -609,7 +610,7 @@ $.ajaxSetup({
     obsminel: 10,
     obsmaxel: 90,
     obsminrange: 25000,
-    obsmaxrange: 500000,
+    obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 27,
     zoom: 'geo',
@@ -630,7 +631,7 @@ $.ajaxSetup({
     obsminel: 10,
     obsmaxel: 90,
     obsminrange: 25000,
-    obsmaxrange: 500000,
+    obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 27,
     zoom: 'geo',
@@ -895,6 +896,7 @@ $.ajaxSetup({
   tleManager.missileSet = [];
   tleManager.analSatSet = [];
   tleManager.staticSet = [];
+  tleManager.fieldOfViewSet = [];
 
   tleManager.init = function () {
     var i;
@@ -956,6 +958,18 @@ $.ajaxSetup({
         lon: launchSiteList[launchSite].lon
       };
       tleManager.staticSet.push(launchSiteInfo);
+    }
+
+    for (i = 0; i < MAX_FIELD_OF_VIEW_MARKERS; i++) {
+      var fieldOfViewMarker = {
+        static: true,
+        marker: true,
+        missile: false,
+        active: false,
+        type: 'fieldOfView',
+        id: i
+      };
+      tleManager.fieldOfViewSet.push(fieldOfViewMarker);
     }
   };
   tleManager.init();

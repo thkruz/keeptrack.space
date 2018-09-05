@@ -509,6 +509,10 @@ or mirrored at any other location without the express written permission of the 
         for (i = 0; i < tleManager.missileSet.length; i++) {
           tempSatData.push(tleManager.missileSet[i]);
         }
+        for (i = 0; i < tleManager.fieldOfViewSet.length; i++) {
+          tleManager.fieldOfViewSet[i].id = tempSatData.length;
+          tempSatData.push(tleManager.fieldOfViewSet[i]);
+        }
         // console.log(tempSatData.length);
         return tempSatData;
       }

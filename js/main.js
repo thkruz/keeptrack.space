@@ -999,6 +999,9 @@ function selectSat (satId) {
   satSet.selectSat(satId);
   selectedSat = satId;
   var sat;
+  satCruncher.postMessage({
+    satelliteSelected: satId
+  });
   if (satId === -1) {
     $('#sat-infobox').fadeOut();
     $('#iss-stream').html('');

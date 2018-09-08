@@ -6,9 +6,9 @@
  */
 
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(global.satellite = factory());
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global.satellite = factory());
 }(this, (function () { 'use strict';
 
 var pi = Math.PI;
@@ -27,20 +27,20 @@ var j3oj2 = j3 / j2;
 var x2o3 = 2.0 / 3.0;
 
 var constants = Object.freeze({
-	pi: pi,
-	twoPi: twoPi,
-	deg2rad: deg2rad,
-	rad2deg: rad2deg,
-	minutesPerDay: minutesPerDay,
-	mu: mu,
-	earthRadius: earthRadius,
-	xke: xke,
-	tumin: tumin,
-	j2: j2,
-	j3: j3,
-	j4: j4,
-	j3oj2: j3oj2,
-	x2o3: x2o3
+  pi: pi,
+  twoPi: twoPi,
+  deg2rad: deg2rad,
+  rad2deg: rad2deg,
+  minutesPerDay: minutesPerDay,
+  mu: mu,
+  earthRadius: earthRadius,
+  xke: xke,
+  tumin: tumin,
+  j2: j2,
+  j3: j3,
+  j4: j4,
+  j3oj2: j3oj2,
+  x2o3: x2o3
 });
 
 /* -----------------------------------------------------------------------------

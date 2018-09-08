@@ -623,6 +623,9 @@ var lkpassed = false;
       $('#settings-form').change(function (e) {
         var isDMChecked = document.getElementById('settings-demo-mode').checked;
         var isSLMChecked = document.getElementById('settings-sat-label-mode').checked;
+        var isFOVBubbleChecked = document.getElementById('settings-fov-bubble').checked;
+        var isSatFOVChecked = document.getElementById('settings-sat-fov').checked;
+
         if (isSLMChecked && e.target.id === 'settings-demo-mode') {
           document.getElementById('settings-sat-label-mode').checked = false;
           $('#settings-demo-mode').removeClass('lever:after');
@@ -632,9 +635,20 @@ var lkpassed = false;
           document.getElementById('settings-demo-mode').checked = false;
           $('#settings-sat-label-mode').removeClass('lever:after');
         }
+
+        if (isSatFOVChecked && e.target.id === 'settings-fov-bubble') {
+          document.getElementById('settings-sat-fov').checked = false;
+          $('#settings-sat-fov').removeClass('lever:after');
+        }
+
+        if (isFOVBubbleChecked && e.target.id === 'settings-sat-fov') {
+          document.getElementById('settings-fov-bubble').checked = false;
+          $('#settings-fov-bubble').removeClass('lever:after');
+        }
       });
       $('#settings-form').submit(function (e) {
         var isFOVBubbleChecked = document.getElementById('settings-fov-bubble').checked;
+        var isSatFOVChecked = document.getElementById('settings-sat-fov').checked;
         var isHOSChecked = document.getElementById('settings-hos').checked;
         var isDMChecked = document.getElementById('settings-demo-mode').checked;
         var isSLMChecked = document.getElementById('settings-sat-label-mode').checked;
@@ -651,6 +665,18 @@ var lkpassed = false;
           settingsManager.isDemoModeOn = true;
         } else {
           settingsManager.isDemoModeOn = false;
+        }
+
+        if (isSatFOVChecked) {
+          var satFieldOfView = $('#satFieldOfView').val() * 1;
+          satCruncher.postMessage({
+            isShowSatOverfly: 'enable',
+            selectedSatFOV: satFieldOfView
+          });
+        } else {
+          satCruncher.postMessage({
+            isShowSatOverfly: 'reset'
+          });
         }
 
         if (isFOVBubbleChecked) {

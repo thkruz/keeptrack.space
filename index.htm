@@ -506,12 +506,33 @@
                 </label>
               </div>
               <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Sensor Field Of View Will Be Shown">
+                  <input id="settings-fov-bubble" type="checkbox">
+                  <span class="lever"></span>
+                  Show Sensor FOV Bubble
+                </label>
+              </div>
+              <div class="switch row">
                 <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Small text labels will appear next to all satellites in FOV.">
                   <input id="settings-sat-label-mode" type="checkbox" checked>
                   <span class="lever"></span>
                   Enable Satellite Label Mode
                 </label>
               </div>
+              <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
+              <h5 class="center-align">Satellite Overfly Settings</h5>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Satellite Field Of View Will Be Shown">
+                  <input id="settings-sat-fov" type="checkbox">
+                  <span class="lever"></span>
+                  Show Satellite FOV
+                </label>
+              </div>
+              <div class="input-field col s12">
+                <input value="30" id="satFieldOfView" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="What is the satellite's field of view in degrees">
+                <label for="satFieldOfView">Satellite Field of View</label>
+              </div>
+              <div class="row"></div>
               <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
               <h5 class="center-align">Lookangles Settings</h5>
               <div class="switch row">
@@ -538,13 +559,6 @@
                     <input id="settings-snp" type="checkbox">
                     <span class="lever"></span>
                     Show Next Pass on Hover
-                  </label>
-                </div>
-                <div class="switch row">
-                  <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Sensor Field Of View Will Be Shown">
-                    <input id="settings-fov-bubble" type="checkbox">
-                    <span class="lever"></span>
-                    Show Sensor FOV Bubble
                   </label>
                 </div>
                 <div class="row"></div>

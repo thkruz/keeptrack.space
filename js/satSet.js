@@ -351,7 +351,7 @@ or mirrored at any other location without the express written permission of the 
             case 'limitSats':
               limitSats = val;
               $('#limitSats').val(val);
-              document.getElementById('settings-limitSats-enabled').checked = true;
+              // document.getElementById('settings-limitSats-enabled').checked = true;
               $('#limitSats-Label').addClass('active');
               limitSatsArray = val.split(',');
               break;

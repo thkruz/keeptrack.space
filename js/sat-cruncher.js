@@ -27,10 +27,15 @@ var satInView;                    // Array of booleans showing if current Satell
 /** OBSERVER VARIABLES */
 var sensor = {};
 var mSensor;
+
+var satelliteSelected = -1;
+var selectedSatFOV = 90; // FOV in Degrees
+
 var isShowFOVBubble = false;
 var isResetFOVBubble = false;
+var isShowSatOverfly = false;
+var isResetSatOverfly = false;
 var isMultiSensor = false;
-var isFieldOfViewModeOn = true;
 var planetariumView = false;
 sensor.defaultGd = {
   longitude: 0,
@@ -54,6 +59,19 @@ onmessage = function (m) {
   }
   if (m.data.nonPlanetariumView){
     planetariumView = false;
+  }
+
+  if (m.data.satelliteSelected){
+    satelliteSelected = m.data.satelliteSelected;
+  }
+
+  if (m.data.isShowSatOverfly === 'enable') {
+    isShowSatOverfly = true;
+    selectedSatFOV = m.data.selectedSatFOV;
+  }
+  if (m.data.isSatOverfly === 'reset') {
+    isResetSatOverfly = true;
+    isShowSatOverfly = false;
   }
 
   if (m.data.isShowFOVBubble === 'enable') {
@@ -325,6 +343,7 @@ function propagateCruncher () {
         vz = pv.velocity.z;
 
 
+        // Skip Calculating Lookangles if No Sensor is Selected
         if (sensor.observerGd !== sensor.defaultGd || isMultiSensor) {
           positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
           lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
@@ -405,6 +424,9 @@ function propagateCruncher () {
       }
     }
 
+    // //////////////////////////////////
+    // FOV Bubble Drawing Code - START
+    // //////////////////////////////////
     if (isShowFOVBubble || isResetFOVBubble) {
       if (satCache[i].marker) {
         if (isResetFOVBubble) {
@@ -418,7 +440,7 @@ function propagateCruncher () {
           continue;
         }
 
-        if (!isFieldOfViewModeOn) continue;
+        if (!isShowFOVBubble) continue;
         if (sensor.observerGd === sensor.defaultGd) continue;
 
         var az, el, rng, pos;
@@ -538,6 +560,106 @@ function propagateCruncher () {
         }
       }
     }
+    // //////////////////////////////////
+    // FOV Bubble Drawing Code - STOP
+    // //////////////////////////////////
+
+    // //////////////////////////////////
+    // Satellite Overfly Drawing Code - START
+    // //////////////////////////////////
+    if (isShowSatOverfly || isResetSatOverfly) {
+      if (satCache[i].marker) {
+        if (isResetSatOverfly) {
+          satPos[i * 3] = 0;
+          satPos[i * 3 + 1] = 0;
+          satPos[i * 3 + 2] = 0;
+
+          satVel[i * 3] = 0;
+          satVel[i * 3 + 1] = 0;
+          satVel[i * 3 + 2] = 0;
+          continue;
+        }
+
+        if (!isShowSatOverfly) continue;
+
+        // Find the ECI position of the Selected Satellite
+        var satSelPosX = satPos[satelliteSelected * 3];
+        var satSelPosY = satPos[satelliteSelected * 3 + 1];
+        var satSelPosZ = satPos[satelliteSelected * 3 + 2];
+        var satSelPosEcf = {x: satSelPosX, y: satSelPosY, z: satSelPosZ};
+        var satSelPos = satellite.ecfToEci(satSelPosEcf, gmst);
+
+        // Find the Lat/Long of the Selected Satellite
+        var satSelGeodetic = satellite.eciToGeodetic(satSelPos, gmst); // pv.position is called positionEci originally
+        var satHeight = satSelGeodetic.height;
+        var satSelPosEarth = {longitude: satSelGeodetic.longitude, latitude: satSelGeodetic.latitude, height: 1};
+
+        var deltaLatInt = 1;
+        // TODO: Change 7000 to a setting variable
+        if (satHeight < 7000) deltaLatInt = 0.5;
+        for (var deltaLat = -60; deltaLat < 60; deltaLat+=deltaLatInt) {
+          var lat = Math.max(Math.min(Math.round((satSelGeodetic.latitude * RAD2DEG)) + deltaLat,90),-90) * DEG2RAD;
+          if (lat > 90) continue;
+          var deltaLonInt = 1; // Math.max((Math.abs(lat)*RAD2DEG/15),1);
+          if (satHeight < 7000) deltaLonInt = 0.5;
+          for (var deltaLon = 0; deltaLon < 181; deltaLon+=deltaLonInt) {
+            // //////////
+            // Add Long
+            // //////////
+            var long = satSelGeodetic.longitude + (deltaLon * DEG2RAD);
+            satSelPosEarth = {longitude: long, latitude: lat, height: 15};
+            // Find the Az/El of the position on the earth
+            lookangles = satellite.ecfToLookAngles(satSelPosEarth, satSelPosEcf);
+            // azimuth = lookangles.azimuth;
+            elevation = lookangles.elevation;
+            // rangeSat = lookangles.rangeSat;
+
+            if ((elevation * RAD2DEG > 0) && (90 - (elevation * RAD2DEG)) < selectedSatFOV) {
+              satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
+
+              satPos[i * 3] = satSelPosEarth.x;
+              satPos[i * 3 + 1] = satSelPosEarth.y;
+              satPos[i * 3 + 2] = satSelPosEarth.z;
+
+              satVel[i * 3] = 0;
+              satVel[i * 3 + 1] = 0;
+              satVel[i * 3 + 2] = 0;
+              i++;
+            }
+            // //////////
+            // Minus Long
+            // //////////
+            if (deltaLon === 0 || deltaLon === 180) continue; // Don't Draw Two Dots On the Center Line
+            long = satSelGeodetic.longitude - (deltaLon * DEG2RAD);
+            satSelPosEarth = {longitude: long, latitude: lat, height: 15};
+            // Find the Az/El of the position on the earth
+            lookangles = satellite.ecfToLookAngles(satSelPosEarth, satSelPosEcf);
+            // azimuth = lookangles.azimuth;
+            elevation = lookangles.elevation;
+            // rangeSat = lookangles.rangeSat;
+
+            if ((elevation * RAD2DEG > 0) && (90 - (elevation * RAD2DEG)) < selectedSatFOV) {
+              satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
+
+              satPos[i * 3] = satSelPosEarth.x;
+              satPos[i * 3 + 1] = satSelPosEarth.y;
+              satPos[i * 3 + 2] = satSelPosEarth.z;
+
+              satVel[i * 3] = 0;
+              satVel[i * 3 + 1] = 0;
+              satVel[i * 3 + 2] = 0;
+              i++;
+            }
+
+            if (lat === 90 || lat === -90) break; // One Dot for the Poles
+          }
+        }
+        i = satCache.length;
+      }
+    }
+    // //////////////////////////////////
+    // Satellite Overfly Drawing Code - STOP
+    // //////////////////////////////////
   }
   if (isResetFOVBubble) isResetFOVBubble = false;
 

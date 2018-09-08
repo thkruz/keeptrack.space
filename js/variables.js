@@ -17,7 +17,7 @@
 
 var MAX_MISSILES = 500;
 var MAX_ANALSATS = 30;
-var MAX_FIELD_OF_VIEW_MARKERS = 20000;
+var MAX_FIELD_OF_VIEW_MARKERS = 35000;
 
 function saveVariable (variable) {
   variable = JSON.stringify(variable);

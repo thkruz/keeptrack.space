@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.41.1';
+  settingsManager.versionNumber = 'v0.41.2';
   settingsManager.versionDate = 'September 8, 2018';
 
   // Offline management
@@ -109,7 +109,7 @@
   settingsManager.isSatLabelModeOn = true;
   settingsManager.satLabelInterval = 500; //  in ms (0.5 second default)
 
-  settingsManager.isFieldOfViewModeOn = true;
+  settingsManager.isSatOverflyModeOn = false;
 
   settingsManager.maxOrbits = 20000; // TODO: BROKEN
   settingsManager.maxLabels = 20000;  // TODO: BROKEN

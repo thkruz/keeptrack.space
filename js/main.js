@@ -372,7 +372,6 @@ var drawLoopCallback;
     _onDrawLoopComplete(drawLoopCallback);
     _demoMode(settingsManager.isDemoModeOn);
     _satLabelMode(settingsManager.isSatLabelModeOn);
-    // _fieldOfViewMarkers(settingsManager.isFieldOfViewModeOn);
 
     // drawLines();
     // var bubble = new FOVBubble();

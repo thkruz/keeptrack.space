@@ -73,6 +73,8 @@
 
         // Skip static dots (Maybe these should be searchable?)
         if (satData[i].static) { continue; }
+        // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
+        if (settingsManager.isSatOverflyModeOn && satData[i].OT > 1) { continue; }
         // Skip inactive missiles.
         if (satData[i].missile && !satData[i].active) { continue; }
 

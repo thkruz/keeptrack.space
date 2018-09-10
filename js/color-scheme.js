@@ -472,12 +472,19 @@
           color: colorTheme.inGroup,
           pickable: true
         };
-      } else {
+      }
+
+      if (sat.marker) {
         return {
-          color: colorTheme.transparent,
+          color: colorTheme.marker,
           pickable: false
         };
       }
+      
+      return {
+        color: colorTheme.transparent,
+        pickable: false
+      };
     });
 
     $('#color-schemes-submenu').mouseover(function () {

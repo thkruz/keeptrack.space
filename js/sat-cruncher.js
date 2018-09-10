@@ -604,7 +604,8 @@ function propagateCruncher () {
             var lat = Math.max(Math.min(Math.round((satSelGeodetic.latitude * RAD2DEG)) + deltaLat,90),-90) * DEG2RAD;
             if (lat > 90) continue;
             var deltaLonInt = 1; // Math.max((Math.abs(lat)*RAD2DEG/15),1);
-            if (satHeight < 7000) deltaLonInt = 0.5;
+            if (satHeight < 2500 && selectedSatFOV <= 60) deltaLonInt = 0.5;
+            if (satHeight > 7000 || selectedSatFOV >= 90) deltaLonInt = 2;
             for (var deltaLon = 0; deltaLon < 181; deltaLon+=deltaLonInt) {
               // //////////
               // Add Long
@@ -620,6 +621,7 @@ function propagateCruncher () {
               if ((elevation * RAD2DEG > 0) && (90 - (elevation * RAD2DEG)) < selectedSatFOV) {
                 satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
 
+                if (i === len) continue; // Only get so many markers.
                 satCache[i].active = true;
 
                 satPos[i * 3] = satSelPosEarth.x;
@@ -646,6 +648,7 @@ function propagateCruncher () {
               if ((elevation * RAD2DEG > 0) && (90 - (elevation * RAD2DEG)) < selectedSatFOV) {
                 satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
 
+                if (i === len) continue; // Only get so many markers.
                 satCache[i].active = true;
 
                 satPos[i * 3] = satSelPosEarth.x;

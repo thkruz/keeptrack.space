@@ -668,12 +668,14 @@ var lkpassed = false;
         }
 
         if (isSatFOVChecked) {
+          settingsManager.isSatOverflyModeOn = true;
           var satFieldOfView = $('#satFieldOfView').val() * 1;
           satCruncher.postMessage({
             isShowSatOverfly: 'enable',
             selectedSatFOV: satFieldOfView
           });
         } else {
+          settingsManager.isSatOverflyModeOn = false;
           satCruncher.postMessage({
             isShowSatOverfly: 'reset'
           });

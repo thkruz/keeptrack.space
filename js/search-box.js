@@ -42,14 +42,13 @@
     $('#search-results').slideUp();
     groups.clearSelect();
     resultsOpen = false;
-    selectSat(-1);
+    // selectSat(-1);
     satSet.setColorScheme(settingsManager.currentColorScheme, true);
   };
 
   searchBox.doSearch = function (searchString, isPreventDropDown) {
-    selectSat(-1);
-
     if (searchString.length === 0) {
+      selectSat(-1);
       $('#search').val('');
       searchBox.hideResults();
       satSet.setColorScheme(ColorScheme.default, true);
@@ -116,7 +115,7 @@
         }
 
         // Analyst satellites only have names and SCC_NUMs
-        if (parseInt(satData[i].SCC_NUM) >= 80000) { continue; }
+        if (+satData[i].SCC_NUM >= 60000) { continue; }
 
         if (satData[i].intlDes.indexOf(searchString) !== -1) {
             results.push({
@@ -154,6 +153,7 @@
     }
     var dispGroup = new groups.SatGroup('idList', idList);
     lastResultGroup = dispGroup;
+    selectSat(-1);
     groups.selectGroup(dispGroup);
 
     // Don't let the search overlap with the legend

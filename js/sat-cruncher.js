@@ -63,6 +63,7 @@ onmessage = function (m) {
 
   if (m.data.satelliteSelected){
     satelliteSelected = m.data.satelliteSelected;
+    if (satelliteSelected === -1) isResetSatOverfly = true;
   }
 
   if (m.data.isShowSatOverfly === 'enable') {
@@ -569,7 +570,9 @@ function propagateCruncher () {
     // //////////////////////////////////
     if (isShowSatOverfly || isResetSatOverfly) {
       if (satCache[i].marker) {
-        if (isResetSatOverfly) {
+        if (isResetSatOverfly && satCache[i].active === true) {
+          satCache[i].active = false;
+
           satPos[i * 3] = 0;
           satPos[i * 3 + 1] = 0;
           satPos[i * 3 + 2] = 0;
@@ -580,82 +583,90 @@ function propagateCruncher () {
           continue;
         }
 
-        if (!isShowSatOverfly) continue;
+        if (satelliteSelected !== -1) {
+          if (!isShowSatOverfly) continue;
+          // Find the ECI position of the Selected Satellite
+          var satSelPosX = satPos[satelliteSelected * 3];
+          var satSelPosY = satPos[satelliteSelected * 3 + 1];
+          var satSelPosZ = satPos[satelliteSelected * 3 + 2];
+          var satSelPosEcf = {x: satSelPosX, y: satSelPosY, z: satSelPosZ};
+          var satSelPos = satellite.ecfToEci(satSelPosEcf, gmst);
 
-        // Find the ECI position of the Selected Satellite
-        var satSelPosX = satPos[satelliteSelected * 3];
-        var satSelPosY = satPos[satelliteSelected * 3 + 1];
-        var satSelPosZ = satPos[satelliteSelected * 3 + 2];
-        var satSelPosEcf = {x: satSelPosX, y: satSelPosY, z: satSelPosZ};
-        var satSelPos = satellite.ecfToEci(satSelPosEcf, gmst);
+          // Find the Lat/Long of the Selected Satellite
+          var satSelGeodetic = satellite.eciToGeodetic(satSelPos, gmst); // pv.position is called positionEci originally
+          var satHeight = satSelGeodetic.height;
+          var satSelPosEarth = {longitude: satSelGeodetic.longitude, latitude: satSelGeodetic.latitude, height: 1};
 
-        // Find the Lat/Long of the Selected Satellite
-        var satSelGeodetic = satellite.eciToGeodetic(satSelPos, gmst); // pv.position is called positionEci originally
-        var satHeight = satSelGeodetic.height;
-        var satSelPosEarth = {longitude: satSelGeodetic.longitude, latitude: satSelGeodetic.latitude, height: 1};
+          var deltaLatInt = 1;
+          // TODO: Change 7000 to a setting variable
+          if (satHeight < 7000) deltaLatInt = 0.5;
+          for (var deltaLat = -60; deltaLat < 60; deltaLat+=deltaLatInt) {
+            var lat = Math.max(Math.min(Math.round((satSelGeodetic.latitude * RAD2DEG)) + deltaLat,90),-90) * DEG2RAD;
+            if (lat > 90) continue;
+            var deltaLonInt = 1; // Math.max((Math.abs(lat)*RAD2DEG/15),1);
+            if (satHeight < 7000) deltaLonInt = 0.5;
+            for (var deltaLon = 0; deltaLon < 181; deltaLon+=deltaLonInt) {
+              // //////////
+              // Add Long
+              // //////////
+              var long = satSelGeodetic.longitude + (deltaLon * DEG2RAD);
+              satSelPosEarth = {longitude: long, latitude: lat, height: 15};
+              // Find the Az/El of the position on the earth
+              lookangles = satellite.ecfToLookAngles(satSelPosEarth, satSelPosEcf);
+              // azimuth = lookangles.azimuth;
+              elevation = lookangles.elevation;
+              // rangeSat = lookangles.rangeSat;
 
-        var deltaLatInt = 1;
-        // TODO: Change 7000 to a setting variable
-        if (satHeight < 7000) deltaLatInt = 0.5;
-        for (var deltaLat = -60; deltaLat < 60; deltaLat+=deltaLatInt) {
-          var lat = Math.max(Math.min(Math.round((satSelGeodetic.latitude * RAD2DEG)) + deltaLat,90),-90) * DEG2RAD;
-          if (lat > 90) continue;
-          var deltaLonInt = 1; // Math.max((Math.abs(lat)*RAD2DEG/15),1);
-          if (satHeight < 7000) deltaLonInt = 0.5;
-          for (var deltaLon = 0; deltaLon < 181; deltaLon+=deltaLonInt) {
-            // //////////
-            // Add Long
-            // //////////
-            var long = satSelGeodetic.longitude + (deltaLon * DEG2RAD);
-            satSelPosEarth = {longitude: long, latitude: lat, height: 15};
-            // Find the Az/El of the position on the earth
-            lookangles = satellite.ecfToLookAngles(satSelPosEarth, satSelPosEcf);
-            // azimuth = lookangles.azimuth;
-            elevation = lookangles.elevation;
-            // rangeSat = lookangles.rangeSat;
+              if ((elevation * RAD2DEG > 0) && (90 - (elevation * RAD2DEG)) < selectedSatFOV) {
+                satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
 
-            if ((elevation * RAD2DEG > 0) && (90 - (elevation * RAD2DEG)) < selectedSatFOV) {
-              satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
+                satCache[i].active = true;
 
-              satPos[i * 3] = satSelPosEarth.x;
-              satPos[i * 3 + 1] = satSelPosEarth.y;
-              satPos[i * 3 + 2] = satSelPosEarth.z;
+                satPos[i * 3] = satSelPosEarth.x;
+                satPos[i * 3 + 1] = satSelPosEarth.y;
+                satPos[i * 3 + 2] = satSelPosEarth.z;
 
-              satVel[i * 3] = 0;
-              satVel[i * 3 + 1] = 0;
-              satVel[i * 3 + 2] = 0;
-              i++;
+                satVel[i * 3] = 0;
+                satVel[i * 3 + 1] = 0;
+                satVel[i * 3 + 2] = 0;
+                i++;
+              }
+              // //////////
+              // Minus Long
+              // //////////
+              if (deltaLon === 0 || deltaLon === 180) continue; // Don't Draw Two Dots On the Center Line
+              long = satSelGeodetic.longitude - (deltaLon * DEG2RAD);
+              satSelPosEarth = {longitude: long, latitude: lat, height: 15};
+              // Find the Az/El of the position on the earth
+              lookangles = satellite.ecfToLookAngles(satSelPosEarth, satSelPosEcf);
+              // azimuth = lookangles.azimuth;
+              elevation = lookangles.elevation;
+              // rangeSat = lookangles.rangeSat;
+
+              if ((elevation * RAD2DEG > 0) && (90 - (elevation * RAD2DEG)) < selectedSatFOV) {
+                satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
+
+                satCache[i].active = true;
+
+                satPos[i * 3] = satSelPosEarth.x;
+                satPos[i * 3 + 1] = satSelPosEarth.y;
+                satPos[i * 3 + 2] = satSelPosEarth.z;
+
+                satVel[i * 3] = 0;
+                satVel[i * 3 + 1] = 0;
+                satVel[i * 3 + 2] = 0;
+                i++;
+              }
+
+              if (lat === 90 || lat === -90) break; // One Dot for the Poles
             }
-            // //////////
-            // Minus Long
-            // //////////
-            if (deltaLon === 0 || deltaLon === 180) continue; // Don't Draw Two Dots On the Center Line
-            long = satSelGeodetic.longitude - (deltaLon * DEG2RAD);
-            satSelPosEarth = {longitude: long, latitude: lat, height: 15};
-            // Find the Az/El of the position on the earth
-            lookangles = satellite.ecfToLookAngles(satSelPosEarth, satSelPosEcf);
-            // azimuth = lookangles.azimuth;
-            elevation = lookangles.elevation;
-            // rangeSat = lookangles.rangeSat;
-
-            if ((elevation * RAD2DEG > 0) && (90 - (elevation * RAD2DEG)) < selectedSatFOV) {
-              satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
-
-              satPos[i * 3] = satSelPosEarth.x;
-              satPos[i * 3 + 1] = satSelPosEarth.y;
-              satPos[i * 3 + 2] = satSelPosEarth.z;
-
-              satVel[i * 3] = 0;
-              satVel[i * 3 + 1] = 0;
-              satVel[i * 3 + 2] = 0;
-              i++;
-            }
-
-            if (lat === 90 || lat === -90) break; // One Dot for the Poles
           }
         }
-        i = satCache.length;
       }
+    }
+    if (satCache[i].marker && !satCache[i].active) {
+      isResetSatOverfly = false;
+      break;
     }
     // //////////////////////////////////
     // Satellite Overfly Drawing Code - STOP

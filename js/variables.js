@@ -964,9 +964,6 @@ $.ajaxSetup({
       var fieldOfViewMarker = {
         static: true,
         marker: true,
-        missile: false,
-        active: false,
-        type: 'fieldOfView',
         id: i
       };
       tleManager.fieldOfViewSet.push(fieldOfViewMarker);

@@ -999,6 +999,9 @@ or mirrored at any other location without the express written permission of the 
 
   satSet.selectSat = function (i) {
     if (i === selectedSat) return;
+    satCruncher.postMessage({
+      satelliteSelected: i
+    });
     if (settingsManager.isMobileModeEnabled) mobile.searchToggle(true);
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
     if (i !== -1) {

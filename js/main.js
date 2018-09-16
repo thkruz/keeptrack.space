@@ -215,10 +215,10 @@ var drawLoopCallback;
     webGlInit();
     earth.init();
     ColorScheme.init();
+    groups.init();
     satSet.init(function satSetInitCallBack (satData) {
       $('#loader-text').text('Coloring Inside the Lines...');
       orbitDisplay.init();
-      groups.init();
       searchBox.init(satData);
 
       // debugLine = new Line();

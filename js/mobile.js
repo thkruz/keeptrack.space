@@ -5,7 +5,7 @@ var maxPinchSize = 1;
   $(document).ready(function () { // Code Once index.htm is loaded
     $('#mobile-start-button').hide();
   });
-  
+
   mobile.fullscreenToggle = function () {
     if ((document.fullScreenElement && document.fullScreenElement !== null) ||
      (!document.mozFullScreen && !document.webkitIsFullScreen)) {

@@ -66,7 +66,7 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 3), gl.STATIC_DRAW);
 
-    for (var i = 0; i < satSet.numSats; i++) {
+    for (var i = 0; i < satSet.orbitalSats; i++) {
       glBuffers.push(allocateBuffer());
     }
     orbitWorker.postMessage({
@@ -81,7 +81,7 @@
   };
 
   orbitDisplay.updateOrbitBuffer = function (satId, force, TLE1, TLE2, missile, latList, lonList, altList) {
-    if (!inProgress[satId]) {
+    if (!inProgress[satId] && !satSet.getSat(satId).static) {
       if (force) {
         orbitWorker.postMessage({
           isInit: false,
@@ -219,14 +219,14 @@
     gl.uniformMatrix4fv(pathShader.uCamMatrix, false, camMatrix);
     gl.uniformMatrix4fv(pathShader.uPMatrix, false, pMatrix);
 
-    if (currentSelectId !== -1) {
+    if (currentSelectId !== -1 && !satSet.getSat(currentSelectId).static) {
       gl.uniform4fv(pathShader.uColor, selectColor);
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
       gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
       gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
     }
 
-    if (currentHoverId !== -1 && currentHoverId !== currentSelectId) { // avoid z-fighting
+    if (currentHoverId !== -1 && currentHoverId !== currentSelectId && !satSet.getSat(currentHoverId).static) { // avoid z-fighting
       gl.uniform4fv(pathShader.uColor, hoverColor);
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
       gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);

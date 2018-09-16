@@ -156,6 +156,11 @@
     var dispGroup = new groups.SatGroup('idList', idList);
     lastResultGroup = dispGroup;
     selectSat(-1);
+    if (settingsManager.isSatOverflyModeOn) {
+      satCruncher.postMessage({
+        satelliteSelected: idList
+      });
+    }
     groups.selectGroup(dispGroup);
 
     // Don't let the search overlap with the legend

@@ -305,6 +305,9 @@ var lkpassed = false;
               uiController.legendMenuChange('default');
             }
 
+            satCruncher.postMessage({
+              satelliteSelected: [clickedSat]
+            });
             satSet.setColorScheme(ColorScheme.default, true);
           }
           if (cameraType.current === cameraType.SATELLITE) {
@@ -2388,6 +2391,34 @@ var lkpassed = false;
       if (zoomTarget > 1) zoomTarget = 1;
     }
   }
+
+  $('#countries-menu>li').click(function () {
+    var groupName = $(this).data('group');
+    selectSat(-1); // Clear selected sat
+    groups.selectGroup(groups.list[groupName]);
+    searchBox.fillResultBox(groups[groupName].sats, '');
+
+    $search.val('');
+
+    var results = groups[groupName].sats;
+    for (var i = 0; i < results.length; i++) {
+      var satId = groups[groupName].sats[i].satId;
+      var scc = satSet.getSat(satId).SCC_NUM;
+      if (i === results.length - 1) {
+        $search.val($search.val() + scc);
+      } else {
+        $search.val($search.val() + scc + ',');
+      }
+    }
+
+    $('#menu-countries .clear-option').css({display: 'block'}); // Show Clear Option
+    $('#menu-countries .country-option').css({display: 'none'}); // Hide Country Options
+    $('#menu-countries .menu-title').text('Countries (' + $(this).text() + ')');
+
+    $('#groups-display').css({
+      display: 'none'
+    });
+  });
 
   $('#colors-menu>ul>li').click(function () {
     selectSat(-1); // clear selected sat

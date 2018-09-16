@@ -86,7 +86,7 @@ or mirrored at any other location without the express written permission of the 
 
   try {
     $('#loader-text').text('Locating ELSETs...');
-    satCruncher = new Worker('js/sat-cruncher.js');
+    satCruncher = new Worker('js/sat-cruncher.min.js');
     // multThreadCruncher1 = new Worker('js/mSat.js');
     // multThreadCruncher2 = new Worker('js/mSat.js');
     // multThreadCruncher3 = new Worker('js/mSat.js');
@@ -498,6 +498,8 @@ or mirrored at any other location without the express written permission of the 
           satInfoList = null;
         }
 
+        satSet.orbitalSats = tempSatData.length;
+
         loggerStop = Date.now();
         for (i = 0; i < tleManager.staticSet.length; i++) {
           tempSatData.push(tleManager.staticSet[i]);
@@ -569,6 +571,10 @@ or mirrored at any other location without the express written permission of the 
       // multThreadCruncher6.postMessage({type: 'init', data: satSet.satDataString});
       // multThreadCruncher7.postMessage({type: 'init', data: satSet.satDataString});
       // multThreadCruncher8.postMessage({type: 'init', data: satSet.satDataString});
+
+      groupsCruncher.postMessage({
+        satData: satSet.satDataString
+      });
 
       // populate GPU mem buffers, now that we know how many sats there are
       satPosBuf = gl.createBuffer();
@@ -1000,7 +1006,7 @@ or mirrored at any other location without the express written permission of the 
   satSet.selectSat = function (i) {
     if (i === selectedSat) return;
     satCruncher.postMessage({
-      satelliteSelected: i
+      satelliteSelected: [i]
     });
     if (settingsManager.isMobileModeEnabled) mobile.searchToggle(true);
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);

@@ -194,6 +194,8 @@ or mirrored at any other location without the express written permission of the 
 
     if (settingsManager.currentColorScheme === ColorScheme.default && !satellite.sensorSelected() && !settingsManager.isForceColorScheme) {
       // Don't force color recalc if default colors and no sensor for inview color
+    } else if (isDragging) {
+      // Don't change colors while dragging
     } else {
       satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
     }
@@ -572,10 +574,6 @@ or mirrored at any other location without the express written permission of the 
       // multThreadCruncher7.postMessage({type: 'init', data: satSet.satDataString});
       // multThreadCruncher8.postMessage({type: 'init', data: satSet.satDataString});
 
-      groupsCruncher.postMessage({
-        satData: satSet.satDataString
-      });
-
       // populate GPU mem buffers, now that we know how many sats there are
       satPosBuf = gl.createBuffer();
       satPos = new Float32Array(satData.length * 3);
@@ -779,10 +777,11 @@ or mirrored at any other location without the express written permission of the 
       if (satData[i].static || satData[i].missile) {
         continue;
       } else {
-        scc = pad0(satData[i].TLE1.substr(2, 5).trim(), 5);
+        scc = parseInt(satData[i].SCC_NUM);
+        // scc = pad0(satData[i].TLE1.substr(2, 5).trim(), 5);
       }
 
-      if (scc.indexOf(objNum) === 0) { // && satData[i].OBJECT_TYPE !== 'unknown') { // OPTIMIZATION: Determine if this code can be removed.
+      if (parseInt(objNum) === scc) {
         return i;
       }
     }

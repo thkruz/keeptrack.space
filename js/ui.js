@@ -86,7 +86,6 @@ var lkpassed = false;
   var updateInterval = 1000;
 
   var uiController = {};
-  uiController.watchlistList = watchlistList;
 
   var touchHoldButton = '';
   $(document).ready(function () { // Code Once index.htm is loaded
@@ -306,9 +305,6 @@ var lkpassed = false;
               uiController.legendMenuChange('default');
             }
 
-            satCruncher.postMessage({
-              satelliteSelected: [clickedSat]
-            });
             satSet.setColorScheme(ColorScheme.default, true);
           }
           if (cameraType.current === cameraType.SATELLITE) {
@@ -376,8 +372,8 @@ var lkpassed = false;
       });
 
       $('#search-close').click(function () {
-        $('#search').val('');
         searchBox.hideResults();
+        $('#search').val('');
         isMilSatSelected = false;
         $('#menu-space-stations').removeClass('bmenu-item-selected');
       });
@@ -2393,34 +2389,6 @@ var lkpassed = false;
     }
   }
 
-  $('#countries-menu>li').click(function () {
-    var groupName = $(this).data('group');
-    selectSat(-1); // Clear selected sat
-    groups.selectGroup(groups[groupName]);
-    searchBox.fillResultBox(groups[groupName].sats, '');
-    var $search = $('#search');
-    $search.val('');
-
-    var results = groups[groupName].sats;
-    for (var i = 0; i < results.length; i++) {
-      var satId = groups[groupName].sats[i].satId;
-      var scc = satSet.getSat(satId).SCC_NUM;
-      if (i === results.length - 1) {
-        $search.val($search.val() + scc);
-      } else {
-        $search.val($search.val() + scc + ',');
-      }
-    }
-
-    $('#menu-countries .clear-option').css({display: 'block'}); // Show Clear Option
-    $('#menu-countries .country-option').css({display: 'none'}); // Hide Country Options
-    $('#menu-countries .menu-title').text('Countries (' + $(this).text() + ')');
-
-    $('#groups-display').css({
-      display: 'none'
-    });
-  });
-
   $('#colors-menu>ul>li').click(function () {
     selectSat(-1); // clear selected sat
     var colorName = $(this).data('color');
@@ -2637,6 +2605,130 @@ var lkpassed = false;
     }
     settingsManager.currentLegend = menu;
   };
+
+  var $search = $('#search');
+  $('#countries-menu>li').click(function () {
+    var groupName = $(this).data('group');
+    selectSat(-1); // Clear selected sat
+
+    switch (groupName) {
+      case 'Canada':
+        if (typeof groups.Canada == 'undefined') {
+          groups.Canada = new groups.SatGroup('countryRegex', /CA/);
+        }
+        break;
+      case 'China':
+        if (typeof groups.China == 'undefined') {
+          groups.China = new groups.SatGroup('countryRegex', /PRC/);
+        }
+        break;
+      case 'France':
+        if (typeof groups.France == 'undefined') {
+          groups.France = new groups.SatGroup('countryRegex', /FR/);
+        }
+        break;
+      case 'India':
+        if (typeof groups.India == 'undefined') {
+          groups.India = new groups.SatGroup('countryRegex', /IND/);
+        }
+        break;
+      case 'Israel':
+        if (typeof groups.Israel == 'undefined') {
+          groups.Israel = new groups.SatGroup('countryRegex', /ISRA/);
+        }
+        break;
+      case 'Japan':
+        if (typeof groups.Japan == 'undefined') {
+          groups.Japan = new groups.SatGroup('countryRegex', /JPN/);
+        }
+        break;
+      case 'Russia':
+        if (typeof groups.Russia == 'undefined') {
+          groups.Russia = new groups.SatGroup('countryRegex', /CIS/);
+        }
+        break;
+      case 'UnitedKingdom':
+        if (typeof groups.UnitedKingdom == 'undefined') {
+          groups.UnitedKingdom = new groups.SatGroup('countryRegex', /UK/);
+        }
+        break;
+      case 'UnitedStates':
+        if (typeof groups.UnitedStates == 'undefined') {
+          groups.UnitedStates = new groups.SatGroup('countryRegex', /US/);
+        }
+        break;
+      case 'SpaceStations':
+        if (typeof groups.SpaceStations == 'undefined') {
+          groups.SpaceStations = new groups.SatGroup('objNum', [25544, 41765]);
+        }
+        break;
+      case 'GlonassGroup':
+        if (typeof groups.GlonassGroup == 'undefined') {
+          groups.GlonassGroup = new groups.SatGroup('nameRegex', /GLONASS/);
+        }
+        break;
+      case 'GalileoGroup':
+        if (typeof groups.GalileoGroup == 'undefined') {
+          groups.GalileoGroup = new groups.SatGroup('nameRegex', /GALILEO/);
+        }
+        break;
+      case 'GPSGroup':
+        if (typeof groups.GPSGroup == 'undefined') {
+          groups.GPSGroup = new groups.SatGroup('nameRegex', /NAVSTAR/);
+        }
+        break;
+      case 'AmatuerRadio':
+        if (typeof groups.AmatuerRadio == 'undefined') {
+          groups.AmatuerRadio = new groups.SatGroup('objNum', [7530, 14781, 20442, 22826, 24278, 25338, 25397, 25544, 26931,
+            27607, 27844, 27848, 28895, 32785, 32788, 32789, 32791, 33493, 33498, 33499, 35932, 35933, 35935, 37224,
+            37839, 37841, 37855, 38760, 39090, 39134, 39136, 39161, 39417, 39430, 39436, 39439, 39440, 39444, 39469,
+            39770, 40014, 40021, 40024, 40025, 40030, 40032, 40042, 40043, 40057, 40071, 40074, 40377, 40378, 40379,
+            40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928, 40931,
+            40967, 40968, 41168, 41171, 41340, 41459, 41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017]);
+        }
+        break;
+      case 'MilitarySatellites':
+        if (typeof groups.MilitarySatellites == 'undefined') {
+          // SCC#s based on Uninon of Concerned Scientists
+          groups.MilitarySatellites = new groups.SatGroup('objNum', [40420, 41394, 32783, 35943, 36582, 40353, 40555, 41032, 38010, 38008, 38007, 38009,
+            37806, 41121, 41579, 39030, 39234, 28492, 36124, 39194, 36095, 40358, 40258, 37212,
+            37398, 38995, 40296, 40900, 39650, 27434, 31601, 36608, 28380, 28521, 36519, 39177,
+            40699, 34264, 36358, 39375, 38248, 34807, 28908, 32954, 32955, 32956, 35498, 35500,
+            37152, 37154, 38733, 39057, 39058, 39059, 39483, 39484, 39485, 39761, 39762, 39763,
+            40920, 40921, 40922, 39765, 29658, 31797, 32283, 32750, 33244, 39208, 26694, 40614,
+            20776, 25639, 26695, 30794, 32294, 33055, 39034, 28946, 33751, 33752, 27056, 27057,
+            27464, 27465, 27868, 27869, 28419, 28420, 28885, 29273, 32476, 31792, 36834, 37165,
+            37875, 37941, 38257, 38354, 39011, 39012, 39013, 39239, 39240, 39241, 39363, 39410,
+            40109, 40111, 40143, 40275, 40305, 40310, 40338, 40339, 40340, 40362, 40878, 41026,
+            41038, 41473, 28470, 37804, 37234, 29398, 40110, 39209, 39210, 36596]);
+        }
+        break;
+    }
+
+    groups.selectGroup(groups[groupName]);
+    searchBox.fillResultBox(groups[groupName].sats, '');
+
+    $search.val('');
+
+    var results = groups[groupName].sats;
+    for (var i = 0; i < results.length; i++) {
+      var satId = groups[groupName].sats[i].satId;
+      var scc = satSet.getSat(satId).SCC_NUM;
+      if (i === results.length - 1) {
+        $search.val($search.val() + scc);
+      } else {
+        $search.val($search.val() + scc + ',');
+      }
+    }
+
+    $('#menu-countries .clear-option').css({display: 'block'}); // Show Clear Option
+    $('#menu-countries .country-option').css({display: 'none'}); // Hide Country Options
+    $('#menu-countries .menu-title').text('Countries (' + $(this).text() + ')');
+
+    $('#groups-display').css({
+      display: 'none'
+    });
+  });
 
   _resetSensorSelected = function () {
     // Return to default settings with nothing 'inview'

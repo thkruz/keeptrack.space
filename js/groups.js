@@ -13,145 +13,109 @@
 */
 (function () {
   var groups = {};
-  var i;
   groups.selectedGroup = null;
   groups.SatGroup = SatGroup;
 
   function SatGroup (groupType, data) {
     var satId;
+    var i = 0;
     this.sats = [];
-    this.sats2 = [];
     if (groupType === 'intlDes') {
       for (i = 0; i < data.length; i++) {
-        var theSatId = getIdFromIntlDes(data[i]);
+        var theSatId = satSet.getIdFromIntlDes(data[i]);
         if (theSatId === null) continue;
-        // TODO: Ugly Fix Later
         this.sats.push({
-          satId: data[i],
+          satId: theSatId,
           isIntlDes: true
         });
-        this.sats2[theSatId] = {
-          satId: data[i],
-          isIntlDes: true
-        };
       }
     } else if (groupType === 'nameRegex') {
-      data = searchNameRegex(data);
+      data = satSet.searchNameRegex(data);
       for (i = 0; i < data.length; i++) {
-        // TODO: Ugly Fix Later
         this.sats.push({
-          satId: data[i],
-          isSCC_NUM: true //Forces Highlighting of Obj Num
+          satId: data[i]
         });
-        this.sats2[data[i]] = {
-          satId: data[i],
-          isSCC_NUM: true //Forces Highlighting of Obj Num
-        };
       }
     } else if (groupType === 'countryRegex') {
-      data = searchCountryRegex(data);
+      data = satSet.searchCountryRegex(data);
       for (i = 0; i < data.length; i++) {
-        // TODO: Ugly Fix Later
         this.sats.push({
-          satId: data[i],
-          isSCC_NUM: true //Forces Highlighting of Obj Num
+          satId: data[i]
         });
-        this.sats2[data[i]] = {
-          satId: data[i],
-          isSCC_NUM: true //Forces Highlighting of Obj Num
-        };
       }
     } else if (groupType === 'objNum') {
       for (i = 0; i < data.length; i++) {
-        satId = getIdFromObjNum(data[i]);
+        satId = satSet.getIdFromObjNum(data[i]);
         if (satId === null) continue;
-        // TODO: Ugly Fix Later
         this.sats.push({
           satId: satId,
-          isSCC_NUM: true //Forces Highlighting of Obj Num
+          isObjnum: true
         });
-        this.sats2[satId] = {
-          satId: satId,
-          isSCC_NUM: true //Forces Highlighting of Obj Num
-        };
       }
     } else if (groupType === 'idList') {
       for (i = 0; i < data.length; i++) {
-        // TODO: Ugly Fix Later
         this.sats.push({
-          satId: data[i],
-          isSCC_NUM: true //Forces Highlighting of Obj Num
+          satId: data[i]
         });
-        this.sats2[data[i]] = {
-          satId: data[i],
-          isSCC_NUM: true //Forces Highlighting of Obj Num
-        };
       }
     }
   }
 
-  groups.hasSat = function (id) {
-      if (groups.selectedGroup.sats2[id]) {
-        return true;
-      } else {
-        return false;
-      }
-    // var len = groups.selectedGroup.sats.length;
-    // for (var i = 0; i < len; i++) {
-    //   if (groups.selectedGroup.sats[i].satId === id) return true;
-    // }
-    // return false;
+  SatGroup.prototype.hasSat = function (id) {
+    var len = this.sats.length;
+    for (var i = 0; i < len; i++) {
+      if (this.sats[i].satId === id) return true;
+    }
+    return false;
   };
-  groups.updateOrbits = function (group) {
+  SatGroup.prototype.updateOrbits = function () {
     // What calls the orbit buffer when selected a group from the menu.
-    for (var i = 0; i < group.sats.length; i++) {
-      orbitDisplay.updateOrbitBuffer(group.sats[i].satId);
+    for (var i = 0; i < this.sats.length; i++) {
+      orbitDisplay.updateOrbitBuffer(this.sats[i].satId);
     }
   };
-  groups.forEach = function (callback, group) {
-    for (var i = 0; i < group.sats.length; i++) {
-      callback(group.sats[i].satId);
+  SatGroup.prototype.forEach = function (callback) {
+    for (var i = 0; i < this.sats.length; i++) {
+      callback(this.sats[i].satId);
     }
   };
 
+  // Make this available to other functions without renamming it
+  groups.SatGroup = SatGroup;
+
   groups.selectGroup = function (group) {
-    if (group === null || group === undefined) {
-      return;
-    }
+    if (group === null || group === undefined) { return; }
+    groups.updateIsInGroup(groups.selectedGroup, group);
     groups.selectedGroup = group;
-    groups.updateOrbits(groups.selectedGroup);
+    group.updateOrbits();
     satSet.setColorScheme(ColorScheme.group);
   };
+  groups.updateIsInGroup = function (oldgroup, newgroup) {
+    var sat;
+    if (oldgroup !== null && oldgroup !== undefined) {
+      for (i = 0; i < oldgroup.sats.length; i++) {
+         sat = satSet.getSat(oldgroup.sats[i].satId);
+        sat.isInGroup = false;
+      }
+    }
+
+    if (newgroup === null || newgroup === undefined) { return; }
+
+    for (i = 0; i < newgroup.sats.length; i++) {
+      sat = satSet.getSat(newgroup.sats[i].satId);
+      sat.isInGroup = true;
+    }
+  };
   groups.clearSelect = function () {
+    groups.updateIsInGroup(groups.selectedGroup, null);
     groups.selectedGroup = null;
-    if (satSet.currentThe)
     if (settingsManager.currentColorScheme === ColorScheme.default || settingsManager.currentColorScheme === ColorScheme.onlyFOV) {
       if (settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.onlyFOV, true); }
       if (!settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.default, true); }
     }
   };
   groups.init = function () {
-    groupsCruncher = new Worker('js/group-cruncher.js');
-    groupsCruncher.onmessage = function (m) {
-      groups.Canada = m.data.Canada;
-      groups.China = m.data.China;
-      groups.France = m.data.France;
-      groups.India = m.data.India;
-      groups.Israel = m.data.Israel;
-      groups.Japan = m.data.Japan;
-      groups.Russia = m.data.Russia;
-      groups.UnitedKingdom = m.data.UnitedKingdom;
-      groups.UnitedStates = m.data.UnitedStates;
-      groups.SpaceStations = m.data.SpaceStations;
-      groups.GlonassGroup = m.data.GlonassGroup;
-      groups.GalileoGroup = m.data.GalileoGroup;
-      groups.GPSGroup = m.data.GPSGroup;
-      groups.AmatuerRadio = m.data.AmatuerRadio;
-      groups.MilitarySatellites = m.data.MilitarySatellites;
-      $('#countries-menu-button').show();
-      groupsCruncher.terminate();
-    };
-
+    // Might not be needed anymore
   };
 
   window.groups = groups;

@@ -467,13 +467,11 @@
     });
     ColorScheme.group = new ColorScheme(function (sat) {
       if (groups.selectedGroup === null) return;
-      if (typeof sat.id != 'undefined') {
-        if (groups.hasSat(sat.id)) {
-          return {
-            color: colorTheme.inGroup,
-            pickable: true
-          };
-        }
+      if (sat.isInGroup) {
+        return {
+          color: colorTheme.inGroup,
+          pickable: true
+        };
       }
 
       if (sat.marker) {
@@ -487,9 +485,6 @@
         color: colorTheme.transparent,
         pickable: false
       };
-    });
-
-    $('#color-schemes-submenu').mouseover(function () {
     });
   };
 

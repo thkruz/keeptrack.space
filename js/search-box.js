@@ -42,8 +42,12 @@
     $('#search-results').slideUp();
     groups.clearSelect();
     resultsOpen = false;
-    // selectSat(-1);
-    satSet.setColorScheme(settingsManager.currentColorScheme, true);
+
+    if (settingsManager.currentColorScheme === ColorScheme.group) {
+      satSet.setColorScheme(ColorScheme.default, true);
+    } else {
+      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+    }
   };
 
   searchBox.doSearch = function (searchString, isPreventDropDown) {

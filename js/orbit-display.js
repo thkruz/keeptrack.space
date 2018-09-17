@@ -244,13 +244,13 @@
 
     if (groups.selectedGroup !== null) {
       gl.uniform4fv(pathShader.uColor, groupColor);
-      groups.forEach(function (id) {
+      groups.selectedGroup.forEach(function (id) {
         // if (groups.selectedGroup.sats.length <= maxOrbitsDisplayed) {
         gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
         gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
         gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
         // }
-      }, groups.selectedGroup);
+      });
     }
 
     //  gl.depthMask(true);

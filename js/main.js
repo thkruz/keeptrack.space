@@ -273,11 +273,23 @@ var drawLoopCallback;
     drawLoop(); // kick off the animationFrame()s
   });
 
+  var drawLoopCount = 0;
+
   function drawLoop () {
     // NOTE 7kb memory leak -- No Impact
     requestAnimationFrame(drawLoop);
     drawNow = Date.now();
     dt = drawNow - (time || drawNow);
+    if (typeof drawLoopCount != 'undefined') {
+      drawLoopCount++;
+      if (drawLoopCount > 100) {
+        drawLoopCount = null;
+        return;
+      }
+      if (drawLoopCount > 10) {
+        if (dt > 500 && !settingsManager.isSlowCPUModeEnabled) enableSlowCPUMode();
+      }
+    }
     time = drawNow;
     timeManager.now = drawNow;
 
@@ -1261,6 +1273,15 @@ function selectSat (satId) {
 
   settingsManager.themes.retheme();
   updateUrl();
+}
+
+function enableSlowCPUMode () {
+  if (!settingsManager.cruncherReady) return;
+  settingsManager.isSlowCPUModeEnabled = true;
+
+  satCruncher.postMessage({
+    isSlowCPUModeEnabled: true
+  });
 }
 // var lastRadarTrackTime = 0;
 // var curRadarTrackNum = 0;

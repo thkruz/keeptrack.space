@@ -18,6 +18,7 @@ var TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the form
 var DEG2RAD = TAU / 360;          // Used to convert degrees to radians
 var RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
 var RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
+var globalPropagationRate = 1000;
 
 /** ARRAYS */
 var satCache = [];                // Cache of Satellite Data from TLE.json and Static Data from variable.js
@@ -66,6 +67,10 @@ onmessage = function (m) {
     if (satelliteSelected[0] === -1) {
       isResetSatOverfly = true;
     }
+  }
+
+  if (m.data.isSlowCPUModeEnabled) {
+    globalPropagationRate = 5000;
   }
 
   if (m.data.isShowSatOverfly === 'enable') {
@@ -698,7 +703,7 @@ function propagateCruncher () {
   satInView = new Float32Array(satCache.length);
 
   // NOTE The longer the delay the more jitter at higher speeds of propagation
-  setTimeout(propagateCruncher, 1 * 1000 / divisor);
+  setTimeout(propagateCruncher, 1 * globalPropagationRate / divisor);
 }
 
 /** Returns Ordinal Day (Commonly Called J Day) */

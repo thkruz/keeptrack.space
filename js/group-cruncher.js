@@ -53,49 +53,79 @@
 
 
   function SatGroup (groupType, data) {
-  var satId;
-  var i;
-  this.sats = [];
-  if (groupType === 'intlDes') {
-    for (i = 0; i < data.length; i++) {
-      var theSatId = getIdFromIntlDes(data[i]);
-      if (theSatId === null) continue;
-      this.sats.push({
-        satId: theSatId,
-        isIntlDes: true
-      });
-    }
-  } else if (groupType === 'nameRegex') {
-    data = searchNameRegex(data);
-    for (i = 0; i < data.length; i++) {
-      this.sats.push({
-        satId: data[i]
-      });
-    }
-  } else if (groupType === 'countryRegex') {
-    data = searchCountryRegex(data);
-    for (i = 0; i < data.length; i++) {
-      this.sats.push({
-        satId: data[i]
-      });
-    }
-  } else if (groupType === 'objNum') {
-    for (i = 0; i < data.length; i++) {
-      satId = getIdFromObjNum(data[i]);
-      if (satId === null) continue;
-      this.sats.push({
-        satId: satId,
-        isSCC_NUM: true
-      });
-    }
-  } else if (groupType === 'idList') {
-    for (i = 0; i < data.length; i++) {
-      this.sats.push({
-        satId: data[i]
-      });
+    var satId;
+    var i;
+    this.sats = [];
+    this.sats2 = [];
+    if (groupType === 'intlDes') {
+      for (i = 0; i < data.length; i++) {
+        var theSatId = getIdFromIntlDes(data[i]);
+        if (theSatId === null) continue;
+        // TODO: Ugly Fix Later
+        this.sats.push({
+          satId: data[i],
+          isIntlDes: true
+        });
+        this.sats2[theSatId] = {
+          satId: data[i],
+          isIntlDes: true
+        };
+      }
+    } else if (groupType === 'nameRegex') {
+      data = searchNameRegex(data);
+      for (i = 0; i < data.length; i++) {
+        // TODO: Ugly Fix Later
+        this.sats.push({
+          satId: data[i],
+          isSCC_NUM: true //Forces Highlighting of Obj Num
+        });
+        this.sats2[data[i]] = {
+          satId: data[i],
+          isSCC_NUM: true //Forces Highlighting of Obj Num
+        };
+      }
+    } else if (groupType === 'countryRegex') {
+      data = searchCountryRegex(data);
+      for (i = 0; i < data.length; i++) {
+        // TODO: Ugly Fix Later
+        this.sats.push({
+          satId: data[i],
+          isSCC_NUM: true //Forces Highlighting of Obj Num
+        });
+        this.sats2[data[i]] = {
+          satId: data[i],
+          isSCC_NUM: true //Forces Highlighting of Obj Num
+        };
+      }
+    } else if (groupType === 'objNum') {
+      for (i = 0; i < data.length; i++) {
+        satId = getIdFromObjNum(data[i]);
+        if (satId === null) continue;
+        // TODO: Ugly Fix Later
+        this.sats.push({
+          satId: satId,
+          isSCC_NUM: true //Forces Highlighting of Obj Num
+        });
+        this.sats2[satId] = {
+          satId: satId,
+          isSCC_NUM: true //Forces Highlighting of Obj Num
+        };
+      }
+    } else if (groupType === 'idList') {
+      for (i = 0; i < data.length; i++) {
+        // TODO: Ugly Fix Later
+        this.sats.push({
+          satId: data[i],
+          isSCC_NUM: true //Forces Highlighting of Obj Num
+        });
+        this.sats2[i] = {
+          satId: data[i],
+          isSCC_NUM: true //Forces Highlighting of Obj Num
+        };
+      }
     }
   }
-}
+
   function init () {
     // COUNTRIES
     groups.Canada = new SatGroup('countryRegex', /CA/);
@@ -133,6 +163,20 @@
       41038, 41473, 28470, 37804, 37234, 29398, 40110, 39209, 39210, 36596]);
 
       postMessage({
-        groups: groups}
-      );
+        Canada: groups.Canada,
+        China: groups.China,
+        France: groups.France,
+        India: groups.India,
+        Israel: groups.Israel,
+        Japan: groups.Japan,
+        Russia: groups.Russia,
+        UnitedKingdom: groups.UnitedKingdom,
+        UnitedStates: groups.UnitedStates,
+        SpaceStations: groups.SpaceStations,
+        GlonassGroup: groups.GlonassGroup,
+        GalileoGroup: groups.GalileoGroup,
+        GPSGroup: groups.GPSGroup,
+        AmatuerRadio: groups.AmatuerRadio,
+        MilitarySatellites: groups.MilitarySatellites
+      });
   }

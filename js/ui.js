@@ -86,6 +86,7 @@ var lkpassed = false;
   var updateInterval = 1000;
 
   var uiController = {};
+  uiController.watchlistList = watchlistList;
 
   var touchHoldButton = '';
   $(document).ready(function () { // Code Once index.htm is loaded
@@ -2395,9 +2396,9 @@ var lkpassed = false;
   $('#countries-menu>li').click(function () {
     var groupName = $(this).data('group');
     selectSat(-1); // Clear selected sat
-    groups.selectGroup(groups.list[groupName]);
+    groups.selectGroup(groups[groupName]);
     searchBox.fillResultBox(groups[groupName].sats, '');
-
+    var $search = $('#search');
     $search.val('');
 
     var results = groups[groupName].sats;

@@ -5,7 +5,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.41.3';
+  settingsManager.versionNumber = 'v0.41.4';
   settingsManager.versionDate = 'September 16, 2018';
 
   // Offline management
@@ -14,6 +14,7 @@
   settingsManager.themes = {};
   settingsManager.themes.currentTheme = 'Blue';
   settingsManager.themes.retheme = function () {
+    if (uiController.watchlistList.length === 0) return;
     if (settingsManager.themes.currentTheme === 'Blue') settingsManager.themes.blueTheme(true);
     if (settingsManager.themes.currentTheme === 'Red') settingsManager.themes.redTheme(true);
   };

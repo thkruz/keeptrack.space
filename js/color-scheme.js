@@ -467,11 +467,13 @@
     });
     ColorScheme.group = new ColorScheme(function (sat) {
       if (groups.selectedGroup === null) return;
-      if (groups.selectedGroup.hasSat(sat.id)) {
-        return {
-          color: colorTheme.inGroup,
-          pickable: true
-        };
+      if (typeof sat.id != 'undefined') {
+        if (groups.hasSat(sat.id)) {
+          return {
+            color: colorTheme.inGroup,
+            pickable: true
+          };
+        }
       }
 
       if (sat.marker) {
@@ -480,7 +482,7 @@
           pickable: false
         };
       }
-      
+
       return {
         color: colorTheme.transparent,
         pickable: false

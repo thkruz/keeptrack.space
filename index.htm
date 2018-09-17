@@ -14,11 +14,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=0.41.3b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=0.41.4b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=0.41.3b" rel="stylesheet">
+    <link href="css/fonts.css?v=0.41.4b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=0.41.3b">
+    <link rel="stylesheet" href="css/materialize.css?v=0.41.4b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -63,7 +63,7 @@
         <a id="share-icon" class="top-menu-icons" onclick="mobile.socialToggle();"><img src="images/share-icon.png"></a>
         <ul id="nav-mobile" class="left hide-on-med-and-down">
           <li id="jday"></li>
-          <li><a class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Satellites &#x25BC;</a></li>
+          <li><a id="countries-menu-button" class="dropdown-button start-hidden" href="#!" data-beloworigin="true" data-activates="countries-menu">Satellites &#x25BC;</a></li>
         </ul>
         <ul id="nav-mobile" class="right">
           <li><a id="geolocation-btn" class="start-hidden" href="#!"><i class="material-icons">location_on</i></a></li>
@@ -1151,35 +1151,35 @@
   <script src="js/lib/materialize.min.js"></script>
   <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.min.js?v=0.41.3b"></script>
+  <script src="js/lib/satellite.min.js?v=0.41.4b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=0.41.3b"></script>
+  <script src="js/lib/shader-loader.min.js?v=0.41.4b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=0.41.3b"></script>
-  <script src="js/time-manager.js?v=0.41.3b"></script>
-  <script src="js/earth.js?v=0.41.3b"></script>
-  <script src="js/groups.js?v=0.41.3b"></script>
-  <script src="js/satSet.js?v=0.41.3b"></script>
-  <script src="js/sun.js?v=0.41.3b"></script>
+  <script src="js/settings-manager.js?v=0.41.4b"></script>
+  <script src="js/time-manager.js?v=0.41.4b"></script>
+  <script src="js/earth.js?v=0.41.4b"></script>
+  <script src="js/groups.js?v=0.41.4b"></script>
+  <script src="js/satSet.js?v=0.41.4b"></script>
+  <script src="js/sun.js?v=0.41.4b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js?v=0.41.3b"></script>
+  <script src="js/variables.js?v=0.41.4b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=0.41.3b"></script>
+  <script src="js/ballistic-missile.js?v=0.41.4b"></script>
   <!-- Load Extra Satellites -->
   <!-- <script src="offline/extra.js"></script>
   <script src="offline/satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=0.41.3b"></script>
-  <script src="js/mobile.js?v=0.41.3b"></script>
-  <script src="js/main.min.js?v=0.41.3b"></script>
-  <script src="js/ui.js?v=0.41.3b"></script>
-  <script src="js/lookangles.min.js?v=0.41.3b"></script>
-  <script src="js/orbit-display.js?v=0.41.3b"></script>
-  <script src="js/drawLoop-shapes.js?v=0.41.3b"></script>
-  <script src="js/search-box.js?v=0.41.3b"></script>
+  <script src="js/color-scheme.js?v=0.41.4b"></script>
+  <script src="js/mobile.js?v=0.41.4b"></script>
+  <script src="js/main.min.js?v=0.41.4b"></script>
+  <script src="js/ui.js?v=0.41.4b"></script>
+  <script src="js/lookangles.min.js?v=0.41.4b"></script>
+  <script src="js/orbit-display.js?v=0.41.4b"></script>
+  <script src="js/drawLoop-shapes.js?v=0.41.4b"></script>
+  <script src="js/search-box.js?v=0.41.4b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

@@ -106,6 +106,9 @@
           continue; // Last check for missiles
         }
 
+        // Analyst satellites only have names and SCC_NUMs
+        if (+satData[i].SCC_NUM >= 60000) { continue; }
+
         if (satData[i].SCC_NUM.indexOf(searchString) !== -1) {
           results.push({
             strIndex: satData[i].SCC_NUM.indexOf(searchString),
@@ -115,9 +118,6 @@
           });
           continue; // Prevent's duplicate results
         }
-
-        // Analyst satellites only have names and SCC_NUMs
-        if (+satData[i].SCC_NUM >= 60000) { continue; }
 
         if (satData[i].intlDes.indexOf(searchString) !== -1) {
             results.push({
@@ -197,12 +197,18 @@
       if (results[i].isMissile) {
         html += sat.ON;
       } else if (results[i].isSCC_NUM) { // If the object number matched
+        results[i].strIndex = results[i].strIndex || 0;
+        results[i].patlen = results[i].patlen || 5;
+
         html += sat.SCC_NUM.substring(0, results[i].strIndex);
         html += '<span class="search-hilight">';
         html += sat.SCC_NUM.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
         html += '</span>';
         html += sat.SCC_NUM.substring(results[i].strIndex + results[i].patlen);
       } else if (results[i].isIntlDes) { // If the international designator matched
+        results[i].strIndex = results[i].strIndex || 0;
+        results[i].patlen = results[i].patlen || 5;
+
         html += sat.intlDes.substring(0, results[i].strIndex);
         html += '<span class="search-hilight">';
         html += sat.intlDes.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);

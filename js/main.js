@@ -376,6 +376,7 @@ var drawLoopCallback;
     if (selectedSat !== -1) {
       var sat = satSet.getSat(selectedSat);
       if (!sat.static) {
+        console.log('1: ' + Date.now());
         _camSnapToSat(selectedSat);
       }
       if (sat.static && cameraType.current=== cameraType.PLANETARIUM) {

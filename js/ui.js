@@ -230,7 +230,14 @@ var lkpassed = false;
         if (evt.originalEvent.deltaMode === 1) {
           delta *= 33.3333333;
         }
-        zoomTarget += delta * 0.0002;
+
+        if (delta < 0) {
+          isZoomIn = true;
+        } else {
+          isZoomIn = false;
+        }
+
+        zoomTarget += delta / 100 / 50; // delta is +/- 100
         zoomTarget = Math.min(Math.max(zoomTarget, 0), 1); // Force between 0 and 1
         rotateTheEarth = false;
         camZoomSnappedOnSat = false;
@@ -1333,14 +1340,16 @@ var lkpassed = false;
           obsmaxrange: maxrange
         });
 
+        selectSat(-1);
         lat = lat * 1;
         lon = lon * 1;
-        camSnap(latToPitch(lat), longToYaw(lon));
         if (maxrange > 6000) {
           changeZoom('geo');
         } else {
           changeZoom('leo');
         }
+        console.log('2: ' + Date.now());
+        camSnap(latToPitch(lat), longToYaw(lon));
 
         uiController.legendMenuChange('default');
 
@@ -2528,14 +2537,16 @@ var lkpassed = false;
           obsmaxrange: maxrange
         });
 
+        selectSat(-1);
         lat = lat * 1;
         lon = lon * 1;
-        camSnap(latToPitch(lat), longToYaw(lon));
         if (maxrange > 6000) {
           changeZoom('geo');
         } else {
           changeZoom('leo');
         }
+        console.log('2: ' + Date.now());
+        camSnap(latToPitch(lat), longToYaw(lon));
       });
     }
   };
@@ -2735,10 +2746,12 @@ var lkpassed = false;
 
   _resetSensorSelected = function () {
     // Return to default settings with nothing 'inview'
+    console.log(1);
     satCruncher.postMessage({
       typ: 'offset',
       dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
       setlatlong: true,
+      resetObserverGd: true,
       sensor: satellite.defaultSensor
     });
     satellite.setobs(null, true);

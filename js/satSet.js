@@ -195,7 +195,7 @@ or mirrored at any other location without the express written permission of the 
     // Don't force color recalc if default colors and no sensor for inview color
     if (satellite.sensorSelected() || settingsManager.isForceColorScheme) {
       // Don't change colors while dragging
-      if (!isDragging && settingsManager.currentColorScheme) {
+      if (!isDragging) {
         satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
       }
     }
@@ -603,6 +603,16 @@ or mirrored at any other location without the express written permission of the 
 
   satSet.getSatData = function () {
     return satData;
+  };
+
+  satSet.getSatInView = function () {
+    if (typeof satInView == 'undefined') return false;
+    return satInView;
+  };
+
+  satSet.getSatVel = function () {
+    if (typeof satVel == 'undefined') return false;
+    return satVel;
   };
 
   satSet.setColorScheme = function (scheme, isInViewChange) {

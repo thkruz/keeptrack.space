@@ -13,6 +13,10 @@
 */
 importScripts('lib/satellite-1.3.min.js');
 
+// /////////////////////////////////////////////
+// TODO: Clean the top of this file up, it's a mess
+// /////////////////////////////////////////////
+
 /** CONSTANTS */
 var TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
 var DEG2RAD = TAU / 360;          // Used to convert degrees to radians
@@ -73,6 +77,12 @@ onmessage = function (m) {
     globalPropagationRate = 5000;
   }
 
+// //////////////////////////////
+// SAT OVERFLY AND FOV BUBBLE
+// /////////////////////////////
+  if (m.data.fieldOfViewSetLength) {
+    fieldOfViewSetLength = m.data.fieldOfViewSetLength;
+  }
   if (m.data.isShowSatOverfly === 'enable') {
     isShowSatOverfly = true;
     selectedSatFOV = m.data.selectedSatFOV;
@@ -89,6 +99,7 @@ onmessage = function (m) {
     isResetFOVBubble = true;
     isShowFOVBubble = false;
   }
+// ////////////////////////////////
 
   if (m.data.multiSensor) {
     isMultiSensor = true;
@@ -113,7 +124,7 @@ onmessage = function (m) {
       return;
     case 'satdata':
       var satData = JSON.parse(m.data.dat);
-      var len = satData.length;
+      len = satData.length;
       var i = 0;
 
       var extraData = [];
@@ -191,7 +202,10 @@ onmessage = function (m) {
       satCache[m.data.id] = m.data;
       break;
   }
-  if (!propagationRunning) propagateCruncher();
+  if (!propagationRunning) {
+    len =- 1; // propagteCruncher needs to start at -1 not 0
+    propagateCruncher();
+  }
 };
 
 function _lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long, obs_alt) {
@@ -243,6 +257,11 @@ function propagateCruncher () {
   var gmst = satellite.gstimeFromJday(j);
   // var gmst = satellite.gstime(j);
   var len = satCache.length - 1;
+
+if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBubble) {
+  len -= fieldOfViewSetLength;
+}
+
   var i = -1;
 
   var positionEcf, lookangles, azimuth, elevation, rangeSat;
@@ -684,13 +703,17 @@ function propagateCruncher () {
     }
     if (satCache[i].marker && !satCache[i].active) {
       isResetSatOverfly = false;
+      len -= fieldOfViewSetLength;
       break;
     }
     // //////////////////////////////////
     // Satellite Overfly Drawing Code - STOP
     // //////////////////////////////////
   }
-  if (isResetFOVBubble) isResetFOVBubble = false;
+  if (isResetFOVBubble) {
+    isResetFOVBubble = false;
+    len -= fieldOfViewSetLength;
+  }
 
   postMessage({
     satPos: satPos.buffer,

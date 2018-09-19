@@ -563,7 +563,8 @@ or mirrored at any other location without the express written permission of the 
       /** Send satDataString to satCruncher to begin propagation loop */
       satCruncher.postMessage({
         typ: 'satdata',
-        dat: satSet.satDataString
+        dat: satSet.satDataString,
+        fieldOfViewSetLength: tleManager.fieldOfViewSet.length
       });
       // multThreadCruncher1.postMessage({type: 'init', data: satSet.satDataString});
       // multThreadCruncher2.postMessage({type: 'init', data: satSet.satDataString});

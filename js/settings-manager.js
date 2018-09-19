@@ -10,8 +10,8 @@ var MAX_FIELD_OF_VIEW_MARKERS = 200000;
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.41.5';
-  settingsManager.versionDate = 'September 17, 2018';
+  settingsManager.versionNumber = 'v0.41.6';
+  settingsManager.versionDate = 'September 19, 2018';
 
   // Offline management
   settingsManager.offlineLocation = '';

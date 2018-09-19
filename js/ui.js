@@ -682,10 +682,12 @@ var lkpassed = false;
         }
 
         if (isFOVBubbleChecked) {
+          settingsManager.isFOVBubbleModeOn = true;
           satCruncher.postMessage({
             isShowFOVBubble: 'enable'
           });
         } else {
+          settingsManager.isFOVBubbleModeOn = false;
           satCruncher.postMessage({
             isShowFOVBubble: 'reset'
           });

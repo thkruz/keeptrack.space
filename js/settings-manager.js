@@ -1,6 +1,11 @@
 /* globals
   $
 */
+
+var MAX_MISSILES = 500;
+var MAX_ANALSATS = 30;
+var MAX_FIELD_OF_VIEW_MARKERS = 200000;
+
 (function () {
   var settingsManager = {};
 
@@ -110,6 +115,7 @@
   settingsManager.satLabelInterval = 500; //  in ms (0.5 second default)
 
   settingsManager.isSatOverflyModeOn = false;
+  settingsManager.isFOVBubbleModeOn = false;
 
   settingsManager.maxOrbits = 20000; // TODO: BROKEN
   settingsManager.maxLabels = 20000;  // TODO: BROKEN

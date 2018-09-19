@@ -81,6 +81,7 @@ var camZoomSnappedOnSat = false;
 var camAngleSnappedOnSat = false;
 var zoomLevel = 0.5;
 var zoomTarget = 0.5;
+var isZoomIn = false;
 var camPitchSpeed = 0;
 var camYawSpeed = 0;
 var camRotateSpeed = 0;
@@ -358,8 +359,13 @@ var drawLoopCallback;
     } */
       zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dt * 0.0025;
     } else {
-      zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dt * 0.0075;
-      if (zoomLevel >= zoomTarget - settingsManager.cameraMovementSpeed && zoomLevel <= zoomTarget + settingsManager.cameraMovementSpeed) {
+      if (isZoomIn) {
+        zoomLevel -= zoomLevel * dt / 100 * Math.abs(zoomTarget - zoomLevel);
+      } else {
+        zoomLevel += zoomLevel * dt / 100 * Math.abs(zoomTarget - zoomLevel);
+      }
+      if ((zoomLevel >= zoomTarget && !isZoomIn) ||
+          (zoomLevel <= zoomTarget && isZoomIn)) {
         zoomLevel = zoomTarget;
       }
     }
@@ -370,6 +376,7 @@ var drawLoopCallback;
     if (selectedSat !== -1) {
       var sat = satSet.getSat(selectedSat);
       if (!sat.static) {
+        console.log('1: ' + Date.now());
         _camSnapToSat(selectedSat);
       }
       if (sat.static && cameraType.current=== cameraType.PLANETARIUM) {
@@ -1006,11 +1013,14 @@ function updateUrl () { // URL Updater
 
   window.history.replaceState(null, 'Keeptrack', url);
 }
+
+var isSelectedSatNegativeOne = false;
 function selectSat (satId) {
   satSet.selectSat(satId);
-  selectedSat = satId;
   var sat;
-  if (satId === -1) {
+  camSnapMode = false;
+  if (satId === -1 && !isSelectedSatNegativeOne) {
+    isSelectedSatNegativeOne = true;
     $('#sat-infobox').fadeOut();
     $('#iss-stream').html('');
     $('#iss-stream-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
@@ -1043,6 +1053,8 @@ function selectSat (satId) {
     isMissileMenuOpen = false;
     isCustomSensorMenuOpen = false;
   } else {
+    isSelectedSatNegativeOne = false;
+    selectedSat = satId;
     sat = satSet.getSat(satId);
     if (!sat) return;
     if (sat.static) {
@@ -1214,6 +1226,8 @@ function selectSat (satId) {
     }
   }
 
+  selectedSat = satId;
+
   if (satId !== -1) {
     if (typeof sat.TTP != 'undefined') {
       $('#sat-ttp-wrapper').show();
@@ -1279,7 +1293,7 @@ function enableSlowCPUMode () {
   if (!settingsManager.cruncherReady) return;
   settingsManager.isSlowCPUModeEnabled = true;
   settingsManager.minimumSearchCharacters = 3;
-  
+
   satCruncher.postMessage({
     isSlowCPUModeEnabled: true
   });

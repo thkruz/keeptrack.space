@@ -834,10 +834,11 @@ $.ajaxSetup({
   sensorManager.whichRadar = '';
   sensorManager.setSensor = function (selectedSensor, staticNum) {
     if (selectedSensor == null && staticNum == null) return;
+    var sensor;
     if (selectedSensor === 'SSN') {
       console.log('setSensor - SSN');
       var allSSNSensors = [];
-      for (var sensor in sensorList) {
+      for (sensor in sensorList) {
         if ((sensorList[sensor].country === 'United States') ||
         (sensorList[sensor].country === 'United Kingdom') ||
         (sensorList[sensor].country === 'Norway')) {
@@ -854,7 +855,7 @@ $.ajaxSetup({
       });
       return;
     }
-    for (var sensor in sensorList) {
+    for (sensor in sensorList) {
       if (sensorList[sensor] === selectedSensor || sensorList[sensor].staticNum === staticNum) {
         sensorManager.selectedSensor = sensorList[sensor];
         ga('send', 'event', 'Sensor', sensorList[sensor].googleName, 'Selected');
@@ -873,8 +874,10 @@ $.ajaxSetup({
         $('#sensor-type').html(sensorManager.selectedSensor.type);
         $('#sensor-country').html(sensorManager.selectedSensor.country);
         $('#sensor-sun').html(sensorManager.selectedSensor.sun);
-        camSnap(latToPitch(sensorManager.selectedSensor.lat), longToYaw(sensorManager.selectedSensor.long));
+        selectSat(-1);
         changeZoom(sensorManager.selectedSensor.zoom);
+        console.log('2: ' + Date.now());
+        camSnap(latToPitch(sensorManager.selectedSensor.lat), longToYaw(sensorManager.selectedSensor.long));
         satellite.getsensorinfo();
       }
     }

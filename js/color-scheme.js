@@ -30,6 +30,7 @@
   // Removed from function to reduce memory leak
   var numSats, colorData, pickableData, colors, i;
   var lastCalculation = 0;
+  var satData;
   ColorScheme.prototype.calculateColorBuffers = function () {
     var now = Date.now();
     if (!pickableData || !colorData) {
@@ -48,8 +49,23 @@
     lastCalculation = now;
 
     var isFirstMarkerChecked = false;
+    satData = satSet.getSatData();
+    satInView = satSet.getSatInView();
+    if (this.isVelocityColorScheme) {
+      satVel = satSet.getSatVel();
+    }
     for (i = 0; i < numSats; i++) {
-      sat = satSet.getSat(i);
+      sat = satData[i];
+      if (satInView) sat.inView = satInView[i];
+
+      if (this.isVelocityColorScheme) {
+        sat.velocity = Math.sqrt(
+          satVel[i * 3] * satVel[i * 3] +
+          satVel[i * 3 + 1] * satVel[i * 3 + 1] +
+          satVel[i * 3 + 2] * satVel[i * 3 + 2]
+        );
+      }
+
       if (!isFirstMarkerChecked) { // Markers Color Can't Change so Don't Keep Checking
         colors = this.colorizer(sat); // Run the colorscheme below
       }
@@ -113,13 +129,13 @@
           pickable: true
         };
       }
-      if (sat.missile && !sat.inview) {
+      if (sat.missile && !sat.inView) {
         return {
           color: colorTheme.missile,
           pickable: true
         };
       }
-      if (sat.missile && sat.inview) {
+      if (sat.missile && sat.inView) {
         return {
           color: colorTheme.missileInview,
           pickable: true
@@ -128,21 +144,21 @@
 
       // NOTE: ColorScheme.objectTypeFlags code
 
-      if (!sat.inview && sat.OT === 1 && ColorScheme.objectTypeFlags.green === false ||
+      if (!sat.inView && sat.OT === 1 && ColorScheme.objectTypeFlags.green === false ||
           cameraType.current === cameraType.PLANETARIUM && sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if (!sat.inview && sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false ||
+      if (!sat.inView && sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false ||
           cameraType.current === cameraType.PLANETARIUM && sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if (!sat.inview && sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false ||
+      if (!sat.inView && sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false ||
           cameraType.current === cameraType.PLANETARIUM && sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) {
         return {
           color: colorTheme.deselected,
@@ -150,14 +166,14 @@
         };
       }
 
-      if (sat.inview && ColorScheme.objectTypeFlags.orange === false && cameraType.current !== cameraType.PLANETARIUM) {
+      if (sat.inView && ColorScheme.objectTypeFlags.orange === false && cameraType.current !== cameraType.PLANETARIUM) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
 
-      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
         color = colorTheme.inview;
       } else if (sat.OT === 1) { // Payload
         color = colorTheme.payload;
@@ -182,7 +198,7 @@
       };
     });
     ColorScheme.onlyFOV = new ColorScheme(function (sat) {
-      if (sat.inview) {
+      if (sat.inView) {
         return {
           color: colorTheme.inview,
           pickable: true
@@ -209,7 +225,7 @@
     // ///////////////////////////////
 
     ColorScheme.smallsats = new ColorScheme(function (sat) {
-      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
         return {
           color: colorTheme.inviewAlt,
           pickable: true
@@ -235,7 +251,7 @@
     });
     ColorScheme.rcs = new ColorScheme(function (sat) {
       var rcs = sat.R;
-      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
         return {
           color: colorTheme.inview,
           pickable: true
@@ -291,27 +307,27 @@
     });
     ColorScheme.countries = new ColorScheme(function (sat) {
       var country = sat.C;
-      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
         return {
           color: colorTheme.inview,
           pickable: true
         };
       }
-      if (!sat.inview && country === 'US' && ColorScheme.objectTypeFlags.blue === false ||
+      if (!sat.inView && country === 'US' && ColorScheme.objectTypeFlags.blue === false ||
           cameraType.current === cameraType.PLANETARIUM && country === 'US' && ColorScheme.objectTypeFlags.blue === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if (!sat.inview && country === 'PRC' && ColorScheme.objectTypeFlags.red === false ||
+      if (!sat.inView && country === 'PRC' && ColorScheme.objectTypeFlags.red === false ||
           cameraType.current === cameraType.PLANETARIUM && country === 'PRC' && ColorScheme.objectTypeFlags.red === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if (!sat.inview && country === 'CIS' && ColorScheme.objectTypeFlags.white === false ||
+      if (!sat.inView && country === 'CIS' && ColorScheme.objectTypeFlags.white === false ||
           cameraType.current === cameraType.PLANETARIUM && country === 'CIS' && ColorScheme.objectTypeFlags.white === false) {
         return {
           color: colorTheme.deselected,
@@ -337,7 +353,7 @@
         };
       }
       // Other Countries
-      if (!sat.inview && ColorScheme.objectTypeFlags.green === false ||
+      if (!sat.inView && ColorScheme.objectTypeFlags.green === false ||
           cameraType.current === cameraType.PLANETARIUM && ColorScheme.objectTypeFlags.green === false) {
         return {
           color: colorTheme.deselected,
@@ -350,7 +366,7 @@
       };
     });
     ColorScheme.lostobjects = new ColorScheme(function (sat) {
-      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
         return {
           color: colorTheme.inview,
           pickable: true
@@ -368,13 +384,13 @@
           pickable: true
         };
       }
-      if (sat.missile && !sat.inview) {
+      if (sat.missile && !sat.inView) {
         return {
           color: colorTheme.missile,
           pickable: true
         };
       }
-      if (sat.missile && sat.inview) {
+      if (sat.missile && sat.inView) {
         return {
           color: colorTheme.missileInview,
           pickable: true
@@ -409,7 +425,7 @@
       }
     });
     ColorScheme.leo = new ColorScheme(function (sat) {
-      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
         return {
           color: colorTheme.inview,
           pickable: true
@@ -429,7 +445,7 @@
       }
     });
     ColorScheme.geo = new ColorScheme(function (sat) {
-      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM) {
+      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
         return {
           color: colorTheme.inview,
           pickable: true
@@ -449,7 +465,7 @@
       }
     });
     ColorScheme.velocity = new ColorScheme(function (sat) {
-      if (sat.inview && cameraType.current !== cameraType.PLANETARIUM && ColorScheme.objectTypeFlags.blue !== false) {
+      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM && ColorScheme.objectTypeFlags.blue !== false) {
         return {
           color: colorTheme.inviewAlt,
           pickable: true
@@ -482,6 +498,7 @@
         pickable: true
       };
     });
+    ColorScheme.velocity.isVelocityColorScheme = true;
     ColorScheme.group = new ColorScheme(function (sat) {
       if (groups.selectedGroup === null) return;
       if (sat.isInGroup) {

@@ -29,16 +29,31 @@
 
   // Removed from function to reduce memory leak
   var numSats, colorData, pickableData, colors, i;
+  var lastCalculation = 0;
   ColorScheme.prototype.calculateColorBuffers = function () {
-    // TODO This should be done as an initialization somewhere else
+    var now = Date.now();
     if (!pickableData || !colorData) {
+      this.lastCalculation = now;
       numSats = satSet.numSats;
       colorData = new Float32Array(numSats * 4);
       pickableData = new Float32Array(numSats);
     }
+
+    if (now - lastCalculation < settingsManager.reColorMinimumTime && lastCalculation !== 0) {
+      return {
+        colorBuf: this.colorBuf,
+        pickableBuf: this.pickableBuf
+      };
+    }
+    lastCalculation = now;
+
+    var isFirstMarkerChecked = false;
     for (i = 0; i < numSats; i++) {
       sat = satSet.getSat(i);
-      colors = this.colorizer(sat); // Run the colorscheme below
+      if (!isFirstMarkerChecked) { // Markers Color Can't Change so Don't Keep Checking
+        colors = this.colorizer(sat); // Run the colorscheme below
+      }
+      isFirstMarkerChecked = colors.marker; // First Marker Checked Returns True
       if (typeof colors == 'undefined') continue;
       colorData[i * 4] = colors.color[0];  // R
       colorData[i * 4 + 1] = colors.color[1]; // G
@@ -46,6 +61,7 @@
       colorData[i * 4 + 3] = colors.color[3]; // A
       pickableData[i] = colors.pickable ? 1 : 0;
     }
+
     gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuf);
     gl.bufferData(gl.ARRAY_BUFFER, colorData, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.pickableBuf);
@@ -80,6 +96,7 @@
       if (sat.marker) {
         return {
           color: colorTheme.marker,
+          marker: true,
           pickable: false
         };
       }
@@ -477,6 +494,7 @@
       if (sat.marker) {
         return {
           color: colorTheme.marker,
+          marker: true,
           pickable: false
         };
       }

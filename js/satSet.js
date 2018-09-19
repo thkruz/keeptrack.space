@@ -192,12 +192,12 @@ or mirrored at any other location without the express written permission of the 
       settingsManager.socratesOnSatCruncher = null;
     }
 
-    if (settingsManager.currentColorScheme === ColorScheme.default && !satellite.sensorSelected() && !settingsManager.isForceColorScheme) {
-      // Don't force color recalc if default colors and no sensor for inview color
-    } else if (isDragging) {
+    // Don't force color recalc if default colors and no sensor for inview color
+    if (satellite.sensorSelected() || settingsManager.isForceColorScheme) {
       // Don't change colors while dragging
-    } else {
-      satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
+      if (!isDragging && settingsManager.currentColorScheme) {
+        satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
+      }
     }
 
     if (!settingsManager.cruncherReady) {
@@ -998,16 +998,15 @@ or mirrored at any other location without the express written permission of the 
   satSet.setHover = function (i) {
     if (i === hoveringSat) return;
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
-
-    if (i !== -1) {
-      if (hoveringSat !== -1 && hoveringSat !== selectedSat) {
-        gl.bufferSubData(gl.ARRAY_BUFFER, hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(hoveringSat)).color));
-      }
-      if (i !== -1) {
-        gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.hoverColor));
-      }
+    // If Old Select Sat Picked Color it Correct Color
+    if (hoveringSat !== -1) {
+      gl.bufferSubData(gl.ARRAY_BUFFER, hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(hoveringSat)).color));
     }
-    hoveringSat = i;
+    // If New Select Sat Picked Color it
+    if (i !== -1) {
+      gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.hoverColor));
+    }
+      hoveringSat = i;
   };
 
   satSet.selectSat = function (i) {
@@ -1017,13 +1016,13 @@ or mirrored at any other location without the express written permission of the 
     });
     if (settingsManager.isMobileModeEnabled) mobile.searchToggle(true);
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
+    // If Old Select Sat Picked Color it Correct Color
+    if (selectedSat !== -1) {
+      gl.bufferSubData(gl.ARRAY_BUFFER, selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(selectedSat)).color));
+    }
+    // If New Select Sat Picked Color it
     if (i !== -1) {
-      if (selectedSat !== -1) {
-        gl.bufferSubData(gl.ARRAY_BUFFER, selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(selectedSat)).color));
-      }
-      if (i !== -1) {
-        gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
-      }
+      gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
     }
     selectedSat = i;
     if (satellite.sensorSelected()) {

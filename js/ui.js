@@ -581,7 +581,8 @@ var lkpassed = false;
       $('#chinese-xuanhua').click(function () { sensorManager.setSensor(sensorManager.sensorList.XUA); });
 
       $('#reset-sensor-button').click(function () {
-        satSet.setColorScheme(ColorScheme.default, true);
+        satSet.setColorScheme(ColorScheme.default);
+        settingsManager.isForceColorScheme = false;
         $('#menu-sensor-info').addClass('bmenu-item-disabled');
         $('#menu-planetarium').addClass('bmenu-item-disabled');
         _resetSensorSelected();
@@ -2746,10 +2747,7 @@ var lkpassed = false;
     $('#menu-lookangles').addClass('bmenu-item-disabled');
     $('#menu-planetarium').addClass('bmenu-item-disabled');
 
-    // setColorScheme ignores calls to recolor satellites when there is no sensor.
-    // This is fixed by enabling isForceColorScheme
-    settingsManager.isForceColorScheme = true;
-    satSet.setColorScheme(ColorScheme.default, true);
+    setTimeout(function(){ satSet.setColorScheme(ColorScheme.default, true); }, 1500);
   };
 
   _offlineMessage = function () {

@@ -10,7 +10,7 @@ var MAX_FIELD_OF_VIEW_MARKERS = 200000;
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.41.6';
+  settingsManager.versionNumber = 'v0.41.7';
   settingsManager.versionDate = 'September 19, 2018';
 
   // Offline management
@@ -150,6 +150,9 @@ var MAX_FIELD_OF_VIEW_MARKERS = 200000;
   // /////////////////
   settingsManager.currentColorScheme = null;
   settingsManager.colors = {};
+
+  settingsManager.reColorMinimumTime = 1000;
+
   settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
   settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
   settingsManager.colors.marker = [0.2, 1.0, 1.0, 1.0];

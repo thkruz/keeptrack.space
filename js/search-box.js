@@ -185,8 +185,8 @@
       var sat = satData[results[i].satId];
       html += '<div class="search-result" data-sat-id="' + sat.id + '">';
       html += '<div class="truncate-search">';
-      if (results[i].isMissile) {
-        html += sat.desc;
+      if (sat.missile) {
+        html += sat.ON;
       } else if (results[i].isON) { // If the name matched - highlight it
         html += sat.ON.substring(0, results[i].strIndex);
         html += '<span class="search-hilight">';
@@ -198,8 +198,8 @@
       }
       html += '</div>';
       html += '<div class="search-result-scc">';
-      if (results[i].isMissile) {
-        html += sat.ON;
+      if (sat.missile) {
+        html += sat.desc;
       } else if (results[i].isSCC_NUM) { // If the object number matched
         results[i].strIndex = results[i].strIndex || 0;
         results[i].patlen = results[i].patlen || 5;

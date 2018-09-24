@@ -66,7 +66,7 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 3), gl.STATIC_DRAW);
 
-    for (var i = 0; i < satSet.orbitalSats; i++) {
+    for (var i = 0; i < satSet.missileSats; i++) {
       glBuffers.push(allocateBuffer());
     }
     orbitWorker.postMessage({

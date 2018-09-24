@@ -86,7 +86,7 @@ or mirrored at any other location without the express written permission of the 
 
   try {
     $('#loader-text').text('Locating ELSETs...');
-    satCruncher = new Worker('js/sat-cruncher.min.js');
+    satCruncher = new Worker('js/sat-cruncher.js');
     // multThreadCruncher1 = new Worker('js/mSat.js');
     // multThreadCruncher2 = new Worker('js/mSat.js');
     // multThreadCruncher3 = new Worker('js/mSat.js');
@@ -513,6 +513,9 @@ or mirrored at any other location without the express written permission of the 
         for (i = 0; i < tleManager.missileSet.length; i++) {
           tempSatData.push(tleManager.missileSet[i]);
         }
+
+        satSet.missileSats = tempSatData.length;
+
         for (i = 0; i < tleManager.fieldOfViewSet.length; i++) {
           tleManager.fieldOfViewSet[i].id = tempSatData.length;
           tempSatData.push(tleManager.fieldOfViewSet[i]);

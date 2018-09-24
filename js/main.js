@@ -376,7 +376,6 @@ var drawLoopCallback;
     if (selectedSat !== -1) {
       var sat = satSet.getSat(selectedSat);
       if (!sat.static) {
-        console.log('1: ' + Date.now());
         _camSnapToSat(selectedSat);
       }
       if (sat.static && cameraType.current=== cameraType.PLANETARIUM) {
@@ -737,9 +736,13 @@ var drawLoopCallback;
   }
 
   var satLabelModeLastTime = 0;
+  var isSatMiniBoxInUse = false;
   function _satLabelMode (isSatLabelModeOn) {
-    if (!isSatLabelModeOn || cameraType.current !== cameraType.PLANETARIUM) {
-      $('#sat-minibox').html('');
+    if ((!isSatLabelModeOn || cameraType.current !== cameraType.PLANETARIUM)) {
+      if (isSatMiniBoxInUse) {
+        $('#sat-minibox').html('');
+      }
+      isSatMiniBoxInUse = false;
       return;
     }
     if (!satellite.sensorSelected()) return;
@@ -765,6 +768,7 @@ var drawLoopCallback;
       _hoverBoxOnSatMini(i, updateHoverSatPos.x, updateHoverSatPos.y);
       labelCount++;
     }
+    isSatMiniBoxInUse = true;
   }
 
   var demoModeSatellite = 0;

@@ -179,7 +179,7 @@ function MassRaidPre (time, simFile) {
   clearMissiles();
   $.get(simFile, function (missileArray) {
     MassRaidArray = missileArray;
-    var satSetLen = satSet.getSatData().length;
+    var satSetLen = satSet.missileSats;
     for (var i = 0; i < missileArray.length; i++) {
       var x = satSetLen - 500 + i;
       missileArray[i].startTime = time;

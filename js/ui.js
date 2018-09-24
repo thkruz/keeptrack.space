@@ -1215,22 +1215,22 @@ var lkpassed = false;
             a = attacker - 100;
             b = 500 - missilesInUse;
             attackerName = UsaICBM[a * 4 + 2];
-            Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, UsaICBM[a * 4 + 2], 30, 2.9, 0.07, UsaICBM[a * 4 + 3], 'United States');
+            Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, UsaICBM[a * 4 + 2], 30, 2.9, 0.07, UsaICBM[a * 4 + 3], 'United States');
           } else if (attacker < 300) { // Russian
             a = attacker - 200;
             b = 500 - missilesInUse;
             attackerName = RussianICBM[a * 4 + 2];
-            Missile(RussianICBM[a * 4], RussianICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, RussianICBM[a * 4 + 2], 30, 2.9, 0.07, RussianICBM[a * 4 + 3], 'Russia');
+            Missile(RussianICBM[a * 4], RussianICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, RussianICBM[a * 4 + 2], 30, 2.9, 0.07, RussianICBM[a * 4 + 3], 'Russia');
           } else if (attacker < 400) { // Chinese
             a = attacker - 300;
             b = 500 - missilesInUse;
             attackerName = ChinaICBM[a * 4 + 2];
-            Missile(ChinaICBM[a * 4], ChinaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, ChinaICBM[a * 4 + 2], 30, 2.9, 0.07, ChinaICBM[a * 4 + 3], 'China');
+            Missile(ChinaICBM[a * 4], ChinaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, ChinaICBM[a * 4 + 2], 30, 2.9, 0.07, ChinaICBM[a * 4 + 3], 'China');
           } else if (attacker < 500) { // North Korean
             a = attacker - 400;
             b = 500 - missilesInUse;
             attackerName = NorthKoreanBM[a * 4 + 2];
-            Missile(NorthKoreanBM[a * 4], NorthKoreanBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.getSatData().length - b, launchTime, NorthKoreanBM[a * 4 + 2], 30, 2.9, 0.07, NorthKoreanBM[a * 4 + 3], 'North Korea');
+            Missile(NorthKoreanBM[a * 4], NorthKoreanBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, NorthKoreanBM[a * 4 + 2], 30, 2.9, 0.07, NorthKoreanBM[a * 4 + 3], 'North Korea');
           }
           ga('send', 'event', 'New Missile', attackerName, 'Attacker');
           ga('send', 'event', 'New Missile', tgtLat + ', ' + tgtLon, 'Target');
@@ -1541,6 +1541,7 @@ var lkpassed = false;
             isInfoOverlayMenuOpen = true;
             break;
           }
+          break;
         case 'menu-sensor-info': // No Keyboard Commands
           if (!satellite.sensorSelected()) { // No Sensor Selected
             if (!$('#menu-sensor-info:animated').length) {

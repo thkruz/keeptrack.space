@@ -31,7 +31,7 @@
   var numSats, colorData, pickableData, colors, i;
   var lastCalculation = 0;
   var satData;
-  ColorScheme.prototype.calculateColorBuffers = function () {
+  ColorScheme.prototype.calculateColorBuffers = function (isForceRecolor) {
     var now = Date.now();
     if (!pickableData || !colorData) {
       this.lastCalculation = now;
@@ -40,7 +40,7 @@
       pickableData = new Float32Array(numSats);
     }
 
-    if (now - lastCalculation < settingsManager.reColorMinimumTime && lastCalculation !== 0) {
+    if (!isForceRecolor && now - lastCalculation < settingsManager.reColorMinimumTime && lastCalculation !== 0) {
       return {
         colorBuf: this.colorBuf,
         pickableBuf: this.pickableBuf

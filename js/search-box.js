@@ -173,6 +173,8 @@
     if (!isPreventDropDown) {
       searchBox.fillResultBox(results);
     }
+
+    satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
     updateUrl();
     settingsManager.themes.retheme();
   };

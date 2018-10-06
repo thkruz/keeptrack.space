@@ -618,9 +618,9 @@ or mirrored at any other location without the express written permission of the 
     return satVel;
   };
 
-  satSet.setColorScheme = function (scheme, isInViewChange) {
+  satSet.setColorScheme = function (scheme, isForceRecolor) {
     settingsManager.currentColorScheme = scheme;
-    buffers = scheme.calculateColorBuffers(isInViewChange);
+    buffers = scheme.calculateColorBuffers(isForceRecolor);
     satColorBuf = buffers.colorBuf;
     pickableBuf = buffers.pickableBuf;
   };
@@ -774,6 +774,27 @@ or mirrored at any other location without the express written permission of the 
     return satData[i];
   };
 
+  satSet.getSatPosOnly = function (i) {
+    if (!satData) return null;
+    if (!satData[i]) return null;
+
+    if (gotExtraData) {
+      satData[i].position = {
+        x: satPos[i * 3],
+        y: satPos[i * 3 + 1],
+        z: satPos[i * 3 + 2]
+      };
+    }
+
+    return satData[i];
+  };
+
+  satSet.getSatExtraOnly = function (i) {
+    if (!satData) return null;
+    if (!satData[i]) return null;
+    return satData[i];
+  };
+
   satSet.getIdFromIntlDes = function (intlDes) {
     for (var i = 0; i < satData.length; i++) {
       if (satData[i].intlDes === intlDes) {
@@ -810,7 +831,7 @@ or mirrored at any other location without the express written permission of the 
   };
 
   satSet.getScreenCoords = function (i, pMatrix, camMatrix) {
-    var pos = satSet.getSat(i).position;
+    var pos = satSet.getSatPosOnly(i).position;
     var posVec4 = vec4.fromValues(pos.x, pos.y, pos.z, 1);
     // var transform = mat4.create();
 

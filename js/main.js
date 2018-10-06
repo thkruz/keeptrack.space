@@ -354,9 +354,6 @@ var drawLoopCallback;
       var yawErr = _normalizeAngle(camYawTarget - camYaw);
       camYaw += yawErr * 0.003 * dt;
 
-      /*   if(Math.abs(camPitchTarget - camPitch) < 0.002 && Math.abs(camYawTarget - camYaw) < 0.002 && Math.abs(zoomTarget - zoomLevel) < 0.002) {
-      camSnapMode = false; Stay in camSnapMode forever. Is this a good idea? dunno....
-    } */
       zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dt * 0.0025;
     } else {
       if (isZoomIn) {
@@ -623,43 +620,15 @@ var drawLoopCallback;
         pickColorBuf[2] === 0);
     }
   }
-  function _hoverBoxOnSatMini (satId, satX, satY) {
-    var satHoverMini = document.createElement("div");
-    document.body.appendChild(satHoverMini);
-    satHoverMini.setAttribute('id', 'sat-minibox-' + satId);
-    var satHoverMiniDOM = $('#sat-minibox-' + satId);
-    $('#sat-minibox').append(satHoverMiniDOM);
-    if (satId === -1) {
-      if (!isHoverBoxVisible || settingsManager.isDisableSatHoverBox) return;
-      satHoverMiniDOM.html('(none)');
-      satHoverMiniDOM.css({display: 'none'});
-      canvasDOM.css({cursor: 'default'});
-      isHoverBoxVisible = false;
-    } else if (!isDragging && !settingsManager.isDisableSatHoverBox) {
-      try {
-        var sat = satSet.getSat(satId);
-        var selectedSatData = satSet.getSat(selectedSat);
-        isHoverBoxVisible = true;
-        if (!sat.static && !sat.missile) {
-          satHoverMiniDOM.html('<center>' + sat.SCC_NUM + '</center>');
-        }
-        satHoverMiniDOM.css({
-          display: 'block',
-          position: 'absolute',
-          left: satX + 10,
-          top: satY
-        });
-      } catch (e) {}
-    }
-  }
-
   function _showOrbitsAbove () {
     // Display Orbits of Satellites In View
       orbitDisplay.clearInViewOrbit();
       var orbitCount = 0;
-      for (var i = 0; i < satSet.getSatData().length; i++) {
-        if (orbitCount > settingsManager.maxOrbits) return;
-        var sat = satSet.getSat(i);
+      var len = satSet.getSatData().length;
+      var maxOrbits = settingsManager.maxOrbits;
+      for (var i = 0; i < len; i++) {
+        if (orbitCount > maxOrbits) return;
+        var sat = satSet.getSatExtraOnly(i);
         // if (sat.inview && ColorScheme.objectTypeFlags.orange === true) {
           if (sat.static) continue;
           if (sat.missile) continue;
@@ -746,28 +715,42 @@ var drawLoopCallback;
       return;
     }
     if (!satellite.sensorSelected()) return;
+    if (settingsManager.isDisableSatHoverBox) return;
     if (drawNow - satLabelModeLastTime < settingsManager.satLabelInterval) return;
 
     satLabelModeLastTime = drawNow;
-    $('#sat-minibox').html('');
+    // $('#sat-minibox').html('');
 
     var labelCount = 0;
-    for (var i = 0; i < satSet.getSatData().length; i++) {
-      if (labelCount > settingsManager.maxLabels) return;
-      var sat = satSet.getSat(i);
+    var hoverBoxOnSatMiniElements = [];
+    var len = satSet.getSatData().length;
+    var maxLabels = settingsManager.maxLabels;
+    isHoverBoxVisible = true;
+    for (var i = 0; i < len && labelCount < maxLabels; i++) {
+      var sat = satSet.getSatExtraOnly(i);
+
       if (sat.static) continue;
       if (sat.missile) continue;
-      // if (!sat.inview) continue;
       if (sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) continue;
       if (sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) continue;
       if (sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) continue;
       if (sat.inview && ColorScheme.objectTypeFlags.orange === false) continue;
+
       updateHoverSatPos = satSet.getScreenCoords(i, pMatrix, camMatrix);
       if (typeof updateHoverSatPos.x == 'undefined' || typeof updateHoverSatPos.y == 'undefined') continue;
       if (updateHoverSatPos.x > window.innerWidth || updateHoverSatPos.y > window.innerHeight) continue;
-      _hoverBoxOnSatMini(i, updateHoverSatPos.x, updateHoverSatPos.y);
+
+      var satHoverMiniDOM = $('<div>', { id: 'sat-minibox-' + i, text: sat.SCC_NUM });
+      satHoverMiniDOM.css({
+            display: 'block',
+            position: 'absolute',
+            left: updateHoverSatPos.x + 10,
+            top: updateHoverSatPos.y
+          });
+      hoverBoxOnSatMiniElements.push(satHoverMiniDOM);
       labelCount++;
     }
+    $('#sat-minibox').html(hoverBoxOnSatMiniElements);
     isSatMiniBoxInUse = true;
   }
 

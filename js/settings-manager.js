@@ -112,7 +112,7 @@ var MAX_FIELD_OF_VIEW_MARKERS = 200000;
   settingsManager.isDemoModeOn = false;
   settingsManager.demoModeInterval = 3000; // in ms (3 second default)
   settingsManager.isSatLabelModeOn = true;
-  settingsManager.satLabelInterval = 500; //  in ms (0.5 second default)
+  settingsManager.satLabelInterval = 250; //  in ms (0.5 second default)
 
   settingsManager.isSatOverflyModeOn = false;
   settingsManager.isFOVBubbleModeOn = false;

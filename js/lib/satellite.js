@@ -465,7 +465,13 @@ define('constants',[], function() {
         j3: j3,
         j4: -0.00000161098761,
         j3oj2: j3 / j2,
-        x2o3: 2.0 / 3.0
+        x2o3: 2.0 / 3.0,
+        vkmpersec: earthRadius * xke / 60.0,
+        /* ------------------ set mathematical constants --------------- */
+        // sgp4fix divisor for divide by zero check on inclination
+        // the old check used 1.0 + cos(pi-1.0e-9), but then compared it to
+        // 1.5 e-12, so the threshold was changed to 1.5e-12 for consistency
+        temp4: 1.5e-12
     };
 });
 /*
@@ -1552,23 +1558,12 @@ define('sgp4',[
             xinc, xincp, xl, xlm, mp, xmdf, xmx, xmy,
             nodedf, xnode, nodep;
 
-        // TODO: defined but never used
-        //var cosomm, sinomm, eccm, eccp, omgadf, rtemsq, np;
 
         var mrt = 0.0;
 
-        /* ------------------ set mathematical constants --------------- */
-        // sgp4fix divisor for divide by zero check on inclination
-        // the old check used 1.0 + cos(pi-1.0e-9), but then compared it to
-        // 1.5 e-12, so the threshold was changed to 1.5e-12 for consistency
-
-        var temp4 = 1.5e-12;
-
-        var vkmpersec = constants.earthRadius * constants.xke / 60.0;
-
         //  --------------------- clear sgp4 error flag -----------------
         satrec.t = tsince;
-        satrec.error = 0;
+        // satrec.error = 0;
 
         //  ------- update for secular gravity and atmospheric drag -----
         xmdf = satrec.mo + satrec.mdot * satrec.t;
@@ -1654,15 +1649,7 @@ define('sgp4',[
             em = dspaceResult.em;
             argpm = dspaceResult.argpm;
             inclm = dspaceResult.inclm;
-
-            // TODO: defined but never used
-            //var xli = dspaceResult.xli;
-
             mm = dspaceResult.mm;
-
-            // TODO: defined but never used
-            //var xni = dspaceResult.xni;
-
             nodem = dspaceResult.nodem;
             dndt = dspaceResult.dndt;
             nm = dspaceResult.nm;
@@ -1670,7 +1657,7 @@ define('sgp4',[
 
         if (nm <= 0.0) {
             //  printf("// error nm %f\n", nm);
-            satrec.error = 2;
+            // satrec.error = 2;
             //  sgp4fix add return
             return [false, false];
         }
@@ -1682,7 +1669,7 @@ define('sgp4',[
         //  sgp4fix am is fixed from the previous nm check
         if (em >= 1.0 || em < -0.001) {  // || (am < 0.95)
             //  printf("// error em %f\n", em);
-            satrec.error = 1;
+            // satrec.error = 1;
             //  sgp4fix to return if there is an error in eccentricity
             return [false, false];
         }
@@ -1738,8 +1725,7 @@ define('sgp4',[
                 argpp = argpp - constants.pi;
             }
             if (ep < 0.0 || ep > 1.0) {
-                //  printf("// error ep %f\n", ep);
-                satrec.error = 3;
+                // satrec.error = 3;
                 //  sgp4fix add return
                 return [false, false];
             }
@@ -1754,7 +1740,7 @@ define('sgp4',[
                 satrec.xlcof = -0.25 * constants.j3oj2 * sinip * (3.0 + 5.0 * cosip) / (1.0 + cosip);
             }
             else {
-                satrec.xlcof = -0.25 * constants.j3oj2 * sinip * (3.0 + 5.0 * cosip) / temp4;
+                satrec.xlcof = -0.25 * constants.j3oj2 * sinip * (3.0 + 5.0 * cosip) / constants.temp4;
             }
         }
         axnl = ep * Math.cos(argpp);
@@ -1774,13 +1760,10 @@ define('sgp4',[
             coseo1 = Math.cos(eo1);
             tem5 = 1.0 - coseo1 * axnl - sineo1 * aynl;
             tem5 = (u - aynl * coseo1 + axnl * sineo1 - eo1) / tem5;
-            if (Math.abs(tem5) >= 0.95) {
-                if (tem5 > 0.0) {
-                    tem5 = 0.95;
-                }
-                else {
-                    tem5 = -0.95;
-                }
+            if (tem5 > 0.95) {
+              tem5 = 0.95;
+            } else if (tem5 < -0.95) {
+              tem5 = -0.95;
             }
             eo1 = eo1 + tem5;
             ktr = ktr + 1;
@@ -1792,8 +1775,7 @@ define('sgp4',[
         pl = am * (1.0 - el2);
         if (pl < 0.0) {
 
-            //  printf("// error pl %f\n", pl);
-            satrec.error = 4;
+            // satrec.error = 4;
             //  sgp4fix add return
             return [false, false];
         }
@@ -1850,14 +1832,13 @@ define('sgp4',[
             r.y = (mrt * uy) * constants.earthRadius;
             r.z = (mrt * uz) * constants.earthRadius;
             v = {x: 0.0, y: 0.0, z: 0.0};
-            v.x = (mvt * ux + rvdot * vx) * vkmpersec;
-            v.y = (mvt * uy + rvdot * vy) * vkmpersec;
-            v.z = (mvt * uz + rvdot * vz) * vkmpersec;
+            v.x = (mvt * ux + rvdot * vx) * constants.vkmpersec;
+            v.y = (mvt * uy + rvdot * vy) * constants.vkmpersec;
+            v.z = (mvt * uz + rvdot * vz) * constants.vkmpersec;
         }
         //  sgp4fix for decaying satellites
         if (mrt < 1.0) {
-            // printf("// decay condition %11.6f \n",mrt);
-            satrec.error = 6;
+            // satrec.error = 6;
             return {position: false, velocity: false};
         }
         return {position: r, velocity: v};
@@ -3005,16 +2986,10 @@ define('sgp4init',[
             ss1,ss2,    ss3,    ss4,    ss5,    ss6,    ss7,
             sz1, sz2, sz3,
             sz11, sz12, sz13, sz21, sz22, sz23, sz31, sz32, sz33,
-            tc, temp,   temp1,  temp2,  temp3,  temp4, tsi,
+            tc, temp,   temp1,  temp2,  temp3, tsi,
             xpidot, xhdot1,
             z1, z2, z3,
             z11, z12, z13, z21, z22, z23, z31, z32, z33;
-        /* ------------------------ initialization --------------------- */
-        // sgp4fix divisor for divide by zero check on inclination
-        // the old check used 1.0 + Math.cos(pi-1.0e-9), but then compared it to
-        // 1.5 e-12, so the threshold was changed to 1.5e-12 for consistency
-
-        temp4    =   1.5e-12;
 
         //  ----------- set all near earth variables to zero ------------
         satrec.isimp   = 0;   satrec.method = 'n'; satrec.aycof    = 0.0;
@@ -3026,28 +3001,6 @@ define('sgp4init',[
         satrec.t4cof   = 0.0; satrec.t5cof  = 0.0; satrec.x1mth2   = 0.0;
         satrec.x7thm1  = 0.0; satrec.mdot   = 0.0; satrec.nodedot  = 0.0;
         satrec.xlcof   = 0.0; satrec.xmcof  = 0.0; satrec.nodecf   = 0.0;
-
-        //  ----------- set all deep space variables to zero ------------
-        satrec.irez  = 0;   satrec.d2201 = 0.0; satrec.d2211 = 0.0;
-        satrec.d3210 = 0.0; satrec.d3222 = 0.0; satrec.d4410 = 0.0;
-        satrec.d4422 = 0.0; satrec.d5220 = 0.0; satrec.d5232 = 0.0;
-        satrec.d5421 = 0.0; satrec.d5433 = 0.0; satrec.dedt  = 0.0;
-        satrec.del1  = 0.0; satrec.del2  = 0.0; satrec.del3  = 0.0;
-        satrec.didt  = 0.0; satrec.dmdt  = 0.0; satrec.dnodt = 0.0;
-        satrec.domdt = 0.0; satrec.e3    = 0.0; satrec.ee2   = 0.0;
-        satrec.peo   = 0.0; satrec.pgho  = 0.0; satrec.pho   = 0.0;
-        satrec.pinco = 0.0; satrec.plo   = 0.0; satrec.se2   = 0.0;
-        satrec.se3   = 0.0; satrec.sgh2  = 0.0; satrec.sgh3  = 0.0;
-        satrec.sgh4  = 0.0; satrec.sh2   = 0.0; satrec.sh3   = 0.0;
-        satrec.si2   = 0.0; satrec.si3   = 0.0; satrec.sl2   = 0.0;
-        satrec.sl3   = 0.0; satrec.sl4   = 0.0; satrec.gsto  = 0.0;
-        satrec.xfact = 0.0; satrec.xgh2  = 0.0; satrec.xgh3  = 0.0;
-        satrec.xgh4  = 0.0; satrec.xh2   = 0.0; satrec.xh3   = 0.0;
-        satrec.xi2   = 0.0; satrec.xi3   = 0.0; satrec.xl2   = 0.0;
-        satrec.xl3   = 0.0; satrec.xl4   = 0.0; satrec.xlamo = 0.0;
-        satrec.zmol  = 0.0; satrec.zmos  = 0.0; satrec.atime = 0.0;
-        satrec.xli   = 0.0; satrec.xni   = 0.0;
-
 
         // sgp4fix - note the following variables are also passed directly via satrec.
         // it is possible to streamline the sgp4init call by deleting the "x"
@@ -3094,10 +3047,6 @@ define('sgp4init',[
 
         satrec.no       = initlResult.no;
 
-        // TODO: defined but never used
-        //var method      = initlResult.method;
-        //var ainv        = initlResult.ainv;
-
         var ao          = initlResult.ao;
         satrec.con41    = initlResult.con41;
         var con42       = initlResult.con42;
@@ -3111,17 +3060,7 @@ define('sgp4init',[
         var sinio       = initlResult.sinio;
         satrec.gsto     = initlResult.gsto;
 
-        satrec.error = 0;
-
-        // sgp4fix remove this check as it is unnecessary
-        // the mrt check in sgp4 handles decaying satellite cases even if the starting
-        // condition is below the surface of te earth
-        //     if (rp < 1.0)
-        //       {
-        //         printf("// *** satn%d epoch elts sub-orbital ***\n", satn);
-        //         satrec.error = 5;
-        //       }
-
+        // satrec.error = 0;
 
         if (omeosq >= 0.0 || satrec.no >= 0.0){
             satrec.isimp = 0;
@@ -3194,7 +3133,7 @@ define('sgp4init',[
                 satrec.xlcof = -0.25 * constants.j3oj2 * sinio * (3.0 + 5.0 * cosio) / (1.0 + cosio);
             }
             else{
-                satrec.xlcof = -0.25 * constants.j3oj2 * sinio * (3.0 + 5.0 * cosio) / temp4;
+                satrec.xlcof = -0.25 * constants.j3oj2 * sinio * (3.0 + 5.0 * cosio) / constants.temp4;
             }
             satrec.aycof   = -0.5 * constants.j3oj2 * sinio;
             //  sgp4fix use multiply for speed instead of pow
@@ -3205,6 +3144,28 @@ define('sgp4init',[
 
             //  --------------- deep space initialization -------------
             if (2*constants.pi / satrec.no >= 225.0){
+
+                //  ----------- set all deep space variables to zero ------------
+                satrec.irez  = 0;   satrec.d2201 = 0.0; satrec.d2211 = 0.0;
+                satrec.d3210 = 0.0; satrec.d3222 = 0.0; satrec.d4410 = 0.0;
+                satrec.d4422 = 0.0; satrec.d5220 = 0.0; satrec.d5232 = 0.0;
+                satrec.d5421 = 0.0; satrec.d5433 = 0.0; satrec.dedt  = 0.0;
+                satrec.del1  = 0.0; satrec.del2  = 0.0; satrec.del3  = 0.0;
+                satrec.didt  = 0.0; satrec.dmdt  = 0.0; satrec.dnodt = 0.0;
+                satrec.domdt = 0.0; satrec.e3    = 0.0; satrec.ee2   = 0.0;
+                satrec.peo   = 0.0; satrec.pgho  = 0.0; satrec.pho   = 0.0;
+                satrec.pinco = 0.0; satrec.plo   = 0.0; satrec.se2   = 0.0;
+                satrec.se3   = 0.0; satrec.sgh2  = 0.0; satrec.sgh3  = 0.0;
+                satrec.sgh4  = 0.0; satrec.sh2   = 0.0; satrec.sh3   = 0.0;
+                satrec.si2   = 0.0; satrec.si3   = 0.0; satrec.sl2   = 0.0;
+                satrec.sl3   = 0.0; satrec.sl4   = 0.0; satrec.gsto  = 0.0;
+                satrec.xfact = 0.0; satrec.xgh2  = 0.0; satrec.xgh3  = 0.0;
+                satrec.xgh4  = 0.0; satrec.xh2   = 0.0; satrec.xh3   = 0.0;
+                satrec.xi2   = 0.0; satrec.xi3   = 0.0; satrec.xl2   = 0.0;
+                satrec.xl3   = 0.0; satrec.xl4   = 0.0; satrec.xlamo = 0.0;
+                satrec.zmol  = 0.0; satrec.zmos  = 0.0; satrec.atime = 0.0;
+                satrec.xli   = 0.0; satrec.xni   = 0.0;
+
                 satrec.method = 'd';
                 satrec.isimp  = 1;
                 tc    =  0.0;
@@ -3570,7 +3531,7 @@ define('propagate/twoline2satrec',[
         var year = 0;
 
         var satrec = {};
-        satrec.error = 0;
+        // satrec.error = 0;
 
         // TODO: defined but never used
         //var cardnumb        = parseInt(longstr1.substring(0, 1), 10);
@@ -3715,7 +3676,7 @@ define('satellite',[
     'use strict';
 
     return {
-        version: '1.2.0',
+        version: '1.0.3',
         constants: constants,
 
         // Coordinate transforms
@@ -3728,7 +3689,7 @@ define('satellite',[
         geodeticToEcf: geodeticToEcf,
 
         dopplerFactor: dopplerFactor,
-        gstimeFromJday: gstime,
+        gstime: gstime,
         gstimeFromDate: function() {
             return gstime(jday.apply(null, arguments));
         },

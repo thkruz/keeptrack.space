@@ -1,4 +1,4 @@
-importScripts('lib/satellite.min.js');
+importScripts('lib/satellite-1.3.min.js');
 
 // Constants
 var TAU = 2 * Math.PI;

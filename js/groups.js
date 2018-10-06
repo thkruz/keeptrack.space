@@ -94,7 +94,7 @@
     var sat;
     if (oldgroup !== null && oldgroup !== undefined) {
       for (i = 0; i < oldgroup.sats.length; i++) {
-         sat = satSet.getSat(oldgroup.sats[i].satId);
+        sat = satSet.getSatExtraOnly(oldgroup.sats[i].satId);
         sat.isInGroup = false;
       }
     }
@@ -102,7 +102,7 @@
     if (newgroup === null || newgroup === undefined) { return; }
 
     for (i = 0; i < newgroup.sats.length; i++) {
-      sat = satSet.getSat(newgroup.sats[i].satId);
+      sat = satSet.getSatExtraOnly(newgroup.sats[i].satId);
       sat.isInGroup = true;
     }
   };

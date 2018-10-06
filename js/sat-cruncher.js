@@ -11,7 +11,7 @@
     onmessage
 
 */
-importScripts('lib/satellite-1.3.min.js');
+importScripts('lib/satellite.js');
 
 // /////////////////////////////////////////////
 // TODO: Clean the top of this file up, it's a mess
@@ -249,20 +249,30 @@ function _lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_lon
   return {'x': x, 'y': y, 'z': z};
 }
 
+var averageTimeForCrunchLoop = 0;
+var totalCrunchTime1 = 0;
+var averageTimeForPropagate = 0;
+var totalCrunchTime2 = 0;
+var numOfCrunches = 0;
 function propagateCruncher () {
-  // var pTime = Date.now();
+  // OPTIMIZE: 25.9ms
+
+  let startTime1 = performance.now();
+  numOfCrunches++;
   propagationRunning = true;
+
   var now = propTime();
-  var j = jday(now.getUTCFullYear(),
+
+  j = jday(now.getUTCFullYear(),
                now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
                now.getUTCDate(),
                now.getUTCHours(),
                now.getUTCMinutes(),
                now.getUTCSeconds());
   j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-  var gmst = satellite.gstimeFromJday(j);
-  // var gmst = satellite.gstime(j);
-  var len = satCache.length - 1;
+
+  var gmst = satellite.gstime(j);
+  let len = satCache.length - 1;
 
 if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBubble) {
   len -= fieldOfViewSetLength;
@@ -270,30 +280,123 @@ if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBu
 
   var i = -1;
 
+  // var startTime2 = 0;
+  // var stopTime2 = 0;
+
   var positionEcf, lookangles, azimuth, elevation, rangeSat;
   var x, y, z, vx, vy, vz;
   var cosLat, sinLat, cosLon, sinLon;
   var curMissileTime;
   var s, m, pv, tLen, t;
   while (i < len) {
-    // TODO Redoing the gmst calculation is more accurate but processor
-    // intensive and should be an optional thing
-
     i++; // At the beginning so i starts at 0
+    var i3 = i * 3;
+    // totalCrunchTime2 += (stopTime2 - startTime2);
 
-    if (satCache[i].static) {
+    if (satCache[i].satnum) {
+      // Skip reentries
+      if (satCache[i].skip) continue;
+      m = (j - satCache[i].jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+      // startTime2 = performance.now();
+      pv = satellite.sgp4(satCache[i], m);
+      // stopTime2 = performance.now();
+
+      if (pv[0] !== false) {
+        satPos[i3] = pv.position.x;
+        satPos[i3 + 1] = pv.position.y;
+        satPos[i3 + 2] = pv.position.z;
+
+        satVel[i3] = pv.velocity.x;
+        satVel[i3 + 1] = pv.velocity.y;
+        satVel[i3 + 2] = pv.velocity.z;
+
+        // Skip Calculating Lookangles if No Sensor is Selected
+        if (sensor.observerGd !== defaultGd && !isMultiSensor) {
+          positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
+          lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+          azimuth = lookangles.azimuth;
+          elevation = lookangles.elevation;
+          rangeSat = lookangles.rangeSat;
+        }
+      } else {
+        // This is probably a reentry and should be skipped from now on.
+        satCache[i].skip = true;
+        satPos[i3] = 0;
+        satPos[i3 + 1] = 0;
+        satPos[i3 + 2] = 0;
+
+        satVel[i3] = 0;
+        satVel[i3 + 1] = 0;
+        satVel[i3 + 2] = 0;
+
+        positionEcf = 0;
+        lookangles = 0;
+        azimuth = 0;
+        elevation = 0;
+        rangeSat = 0;
+      }
+
+      satInView[i] = false; // Default in case no sensor selected
+
+      if (sensor.observerGd !== defaultGd) {
+        if (isMultiSensor) {
+          for (s = 0; s < mSensor.length; s++) {
+            if (satInView[i]) break;
+            sensor = mSensor[s];
+            sensor.observerGd = {
+              longitude: sensor.long * DEG2RAD,
+              latitude: sensor.lat * DEG2RAD,
+              height: sensor.obshei * 1 // Convert from string
+            };
+            lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+            azimuth = lookangles.azimuth;
+            elevation = lookangles.elevation;
+            rangeSat = lookangles.rangeSat;
+            azimuth *= RAD2DEG;
+            elevation *= RAD2DEG;
+
+            if (sensor.obsminaz > sensor.obsmaxaz) {
+              if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+              ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+                satInView[i] = true;
+              }
+            } else {
+              if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+              ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+                satInView[i] = true;
+              }
+            }
+          }
+        } else {
+          azimuth *= RAD2DEG;
+          elevation *= RAD2DEG;
+
+          if (sensor.obsminaz > sensor.obsmaxaz) {
+            if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+               ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+              satInView[i] = true;
+            }
+          } else {
+            if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+               ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+              satInView[i] = true;
+            }
+          }
+        }
+      }
+    } else if (satCache[i].static) {
       cosLat = Math.cos(satCache[i].lat * DEG2RAD);
       sinLat = Math.sin(satCache[i].lat * DEG2RAD);
       cosLon = Math.cos((satCache[i].lon * DEG2RAD) + gmst);
       sinLon = Math.sin((satCache[i].lon * DEG2RAD) + gmst);
 
-      satPos[i * 3] = (RADIUS_OF_EARTH + 0.25) * cosLat * cosLon;
-      satPos[i * 3 + 1] = (RADIUS_OF_EARTH + 0.25) * cosLat * sinLon;
-      satPos[i * 3 + 2] = (RADIUS_OF_EARTH + 0.25) * sinLat;
+      satPos[i3] = (6371 + 0.25) * cosLat * cosLon; // 6371 is radius of earth
+      satPos[i3 + 1] = (6371 + 0.25) * cosLat * sinLon;
+      satPos[i3 + 2] = (6371 + 0.25) * sinLat;
 
-      satVel[i * 3] = 0;
-      satVel[i * 3 + 1] = 0;
-      satVel[i * 3 + 2] = 0;
+      satVel[i3] = 0;
+      satVel[i3 + 1] = 0;
+      satVel[i3 + 2] = 0;
 
       cosLat = null;
       cosLon = null;
@@ -304,26 +407,26 @@ if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBu
         tLen = satCache[i].altList.length;
         for (t = 0; t < tLen; t++) {
           if (satCache[i].startTime + t * 1000 > now) {
-            curMissileTime = t;
+            let curMissileTime = t;
             break;
           }
         }
-        cosLat = Math.cos(satCache[i].latList[curMissileTime] * DEG2RAD);
-        sinLat = Math.sin(satCache[i].latList[curMissileTime] * DEG2RAD);
-        cosLon = Math.cos((satCache[i].lonList[curMissileTime] * DEG2RAD) + gmst);
-        sinLon = Math.sin((satCache[i].lonList[curMissileTime] * DEG2RAD) + gmst);
+        let cosLat = Math.cos(satCache[i].latList[curMissileTime] * DEG2RAD);
+        let sinLat = Math.sin(satCache[i].latList[curMissileTime] * DEG2RAD);
+        let cosLon = Math.cos((satCache[i].lonList[curMissileTime] * DEG2RAD) + gmst);
+        let sinLon = Math.sin((satCache[i].lonList[curMissileTime] * DEG2RAD) + gmst);
 
-        satPos[i * 3] = (RADIUS_OF_EARTH + satCache[i].altList[curMissileTime]) * cosLat * cosLon;
-        satPos[i * 3 + 1] = (RADIUS_OF_EARTH + satCache[i].altList[curMissileTime]) * cosLat * sinLon;
-        satPos[i * 3 + 2] = (RADIUS_OF_EARTH + satCache[i].altList[curMissileTime]) * sinLat;
+        satPos[i3] = (6371 + satCache[i].altList[curMissileTime]) * cosLat * cosLon;
+        satPos[i3 + 1] = (6371 + satCache[i].altList[curMissileTime]) * cosLat * sinLon;
+        satPos[i3 + 2] = (6371 + satCache[i].altList[curMissileTime]) * sinLat;
 
-        x = satPos[i * 3];
-        y = satPos[i * 3 + 1];
-        z = satPos[i * 3 + 2];
+        x = satPos[i3];
+        y = satPos[i3 + 1];
+        z = satPos[i3 + 2];
 
-        satVel[i * 3] = 0;
-        satVel[i * 3 + 1] = 0;
-        satVel[i * 3 + 2] = 0;
+        satVel[i3] = 0;
+        satVel[i3 + 1] = 0;
+        satVel[i3 + 2] = 0;
 
         cosLat = null;
         cosLon = null;
@@ -360,115 +463,19 @@ if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBu
             satInView[i] = false;
           }
         }
-    } else {
-      // Skip reentries
-      if (satCache[i].skip) continue;
-      m = (j - satCache[i].jdsatepoch) * 1440.0; // 1440 = minutes_per_day
-      pv = satellite.sgp4(satCache[i], m);
-
-      try {
-        x = pv.position.x; // translation of axes from earth-centered inertial
-        y = pv.position.y; // to OpenGL is done in shader with projection matrix
-        z = pv.position.z; // so we don't have to worry about it
-        vx = pv.velocity.x;
-        vy = pv.velocity.y;
-        vz = pv.velocity.z;
-
-
-        // Skip Calculating Lookangles if No Sensor is Selected
-        if (sensor.observerGd !== defaultGd || isMultiSensor) {
-          positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
-          lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-          azimuth = lookangles.azimuth;
-          elevation = lookangles.elevation;
-          rangeSat = lookangles.rangeSat;
-        }
-      } catch (e) {
-        // This is probably a reentry and should be skipped from now on.
-        satCache[i].skip = true;
-        x = 0;
-        y = 0;
-        z = 0;
-        vx = 0;
-        vy = 0;
-        vz = 0;
-        positionEcf = 0;
-        lookangles = 0;
-        azimuth = 0;
-        elevation = 0;
-        rangeSat = 0;
-      }
-      satPos[i * 3] = x;
-      satPos[i * 3 + 1] = y;
-      satPos[i * 3 + 2] = z;
-
-      satVel[i * 3] = vx;
-      satVel[i * 3 + 1] = vy;
-      satVel[i * 3 + 2] = vz;
-
-      satInView[i] = false; // Default in case no sensor selected
-
-      if (isMultiSensor) {
-        for (s = 0; s < mSensor.length; s++) {
-          if (satInView[i]) break;
-          sensor = mSensor[s];
-          sensor.observerGd = {
-            longitude: sensor.long * DEG2RAD,
-            latitude: sensor.lat * DEG2RAD,
-            height: sensor.obshei * 1 // Convert from string
-          };
-          lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-          azimuth = lookangles.azimuth;
-          elevation = lookangles.elevation;
-          rangeSat = lookangles.rangeSat;
-          azimuth *= RAD2DEG;
-          elevation *= RAD2DEG;
-
-          if (sensor.obsminaz > sensor.obsmaxaz) {
-            if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
-            ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
-              satInView[i] = true;
-            }
-          } else {
-            if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
-            ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
-              satInView[i] = true;
-            }
-          }
-        }
-      } else {
-        if (sensor.observerGd !== defaultGd) {
-          azimuth *= RAD2DEG;
-          elevation *= RAD2DEG;
-
-          if (sensor.obsminaz > sensor.obsmaxaz) {
-            if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
-               ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
-              satInView[i] = true;
-            }
-          } else {
-            if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
-               ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
-              satInView[i] = true;
-            }
-          }
-        }
-      }
-    }
-
-    // //////////////////////////////////
-    // FOV Bubble Drawing Code - START
-    // //////////////////////////////////
-    if (isShowFOVBubble || isResetFOVBubble) {
+    } else if (isShowFOVBubble || isResetFOVBubble) {
+      // //////////////////////////////////
+      // FOV Bubble Drawing Code - START
+      // //////////////////////////////////
       if (satCache[i].marker) {
         if (isResetFOVBubble) {
-          satPos[i * 3] = 0;
-          satPos[i * 3 + 1] = 0;
-          satPos[i * 3 + 2] = 0;
+          satPos[i3] = 0;
+          satPos[i3 + 1] = 0;
+          satPos[i3 + 2] = 0;
 
-          satVel[i * 3] = 0;
-          satVel[i * 3 + 1] = 0;
-          satVel[i * 3 + 2] = 0;
+          satVel[i3] = 0;
+          satVel[i3 + 1] = 0;
+          satVel[i3 + 2] = 0;
           continue;
         }
 
@@ -476,7 +483,7 @@ if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBu
         if (sensor.observerGd === sensor.defaultGd) continue;
 
         var az, el, rng, pos;
-        var q = 20;
+        q = 20;
 
         // Only on non-360 FOV
         if (sensor.obsminaz !== 0 && sensor.obsmaxaz !== 360) {
@@ -487,13 +494,13 @@ if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBu
           az = sensor.obsminaz;
           for (el = sensor.obsminel; el < sensor.obsmaxel; el+=2) {
             pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
-            satPos[i * 3] = pos.x;
-            satPos[i * 3 + 1] = pos.y;
-            satPos[i * 3 + 2] = pos.z;
+            satPos[i3] = pos.x;
+            satPos[i3 + 1] = pos.y;
+            satPos[i3 + 2] = pos.z;
 
-            satVel[i * 3] = 0;
-            satVel[i * 3 + 1] = 0;
-            satVel[i * 3 + 2] = 0;
+            satVel[i3] = 0;
+            satVel[i3 + 1] = 0;
+            satVel[i3 + 2] = 0;
             i++;
           }
         }
@@ -505,13 +512,13 @@ if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBu
           az = sensor.obsmaxaz;
           for (el = sensor.obsminel; el < sensor.obsmaxel; el+=2) {
             pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
-            satPos[i * 3] = pos.x;
-            satPos[i * 3 + 1] = pos.y;
-            satPos[i * 3 + 2] = pos.z;
+            satPos[i3] = pos.x;
+            satPos[i3 + 1] = pos.y;
+            satPos[i3 + 2] = pos.z;
 
-            satVel[i * 3] = 0;
-            satVel[i * 3 + 1] = 0;
-            satVel[i * 3 + 2] = 0;
+            satVel[i3] = 0;
+            satVel[i3 + 1] = 0;
+            satVel[i3 + 2] = 0;
             i++;
           }
         }
@@ -521,13 +528,13 @@ if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBu
           el = sensor.obsmaxel;
           for (az = sensor.obsminaz; az < sensor.obsmaxaz; az+=2) {
             pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
-            satPos[i * 3] = pos.x;
-            satPos[i * 3 + 1] = pos.y;
-            satPos[i * 3 + 2] = pos.z;
+            satPos[i3] = pos.x;
+            satPos[i3 + 1] = pos.y;
+            satPos[i3 + 2] = pos.z;
 
-            satVel[i * 3] = 0;
-            satVel[i * 3 + 1] = 0;
-            satVel[i * 3 + 2] = 0;
+            satVel[i3] = 0;
+            satVel[i3 + 1] = 0;
+            satVel[i3 + 2] = 0;
             i++;
           }
         }
@@ -551,13 +558,13 @@ if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBu
               }
             }
             pos = satellite.ecfToEci(_lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
-            satPos[i * 3] = pos.x;
-            satPos[i * 3 + 1] = pos.y;
-            satPos[i * 3 + 2] = pos.z;
+            satPos[i3] = pos.x;
+            satPos[i3 + 1] = pos.y;
+            satPos[i3 + 2] = pos.z;
 
-            satVel[i * 3] = 0;
-            satVel[i * 3 + 1] = 0;
-            satVel[i * 3 + 2] = 0;
+            satVel[i3] = 0;
+            satVel[i3 + 1] = 0;
+            satVel[i3 + 2] = 0;
             i++;
           }
         }
@@ -580,71 +587,69 @@ if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBu
           }
           for (el = sensor.obsminel; el < sensor.obsmaxel; el+=2) {
             pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
-            satPos[i * 3] = pos.x;
-            satPos[i * 3 + 1] = pos.y;
-            satPos[i * 3 + 2] = pos.z;
+            satPos[i3] = pos.x;
+            satPos[i3 + 1] = pos.y;
+            satPos[i3 + 2] = pos.z;
 
-            satVel[i * 3] = 0;
-            satVel[i * 3 + 1] = 0;
-            satVel[i * 3 + 2] = 0;
+            satVel[i3] = 0;
+            satVel[i3 + 1] = 0;
+            satVel[i3 + 2] = 0;
             i++;
           }
         }
       }
-    }
-    // //////////////////////////////////
-    // FOV Bubble Drawing Code - STOP
-    // //////////////////////////////////
-
+      // //////////////////////////////////
+      // FOV Bubble Drawing Code - STOP
+      // //////////////////////////////////
+    } else if (isShowSatOverfly || isResetSatOverfly) {
     // //////////////////////////////////
     // Satellite Overfly Drawing Code - START
     // //////////////////////////////////
-    if (isShowSatOverfly || isResetSatOverfly) {
       if (satCache[i].marker) {
         if (isResetSatOverfly && satCache[i].active === true) {
           satCache[i].active = false;
 
-          satPos[i * 3] = 0;
-          satPos[i * 3 + 1] = 0;
-          satPos[i * 3 + 2] = 0;
+          satPos[i3] = 0;
+          satPos[i3 + 1] = 0;
+          satPos[i3 + 2] = 0;
 
-          satVel[i * 3] = 0;
-          satVel[i * 3 + 1] = 0;
-          satVel[i * 3 + 2] = 0;
+          satVel[i3] = 0;
+          satVel[i3 + 1] = 0;
+          satVel[i3 + 2] = 0;
           continue;
         }
-        for (var snum = 0; snum < satelliteSelected.length; snum++) {
+        for (snum = 0; snum < satelliteSelected.length; snum++) {
           if (satelliteSelected[snum] !== -1) {
             if (!isShowSatOverfly) continue;
             // Find the ECI position of the Selected Satellite
-            var satSelPosX = satPos[satelliteSelected[snum] * 3];
-            var satSelPosY = satPos[satelliteSelected[snum] * 3 + 1];
-            var satSelPosZ = satPos[satelliteSelected[snum] * 3 + 2];
-            var satSelPosEcf = {x: satSelPosX, y: satSelPosY, z: satSelPosZ};
-            var satSelPos = satellite.ecfToEci(satSelPosEcf, gmst);
+            satSelPosX = satPos[satelliteSelected[snum] * 3];
+            satSelPosY = satPos[satelliteSelected[snum] * 3 + 1];
+            satSelPosZ = satPos[satelliteSelected[snum] * 3 + 2];
+            satSelPosEcf = {x: satSelPosX, y: satSelPosY, z: satSelPosZ};
+            satSelPos = satellite.ecfToEci(satSelPosEcf, gmst);
 
             // Find the Lat/Long of the Selected Satellite
-            var satSelGeodetic = satellite.eciToGeodetic(satSelPos, gmst); // pv.position is called positionEci originally
-            var satHeight = satSelGeodetic.height;
-            var satSelPosEarth = {longitude: satSelGeodetic.longitude, latitude: satSelGeodetic.latitude, height: 1};
+            satSelGeodetic = satellite.eciToGeodetic(satSelPos, gmst); // pv.position is called positionEci originally
+            satHeight = satSelGeodetic.height;
+            satSelPosEarth = {longitude: satSelGeodetic.longitude, latitude: satSelGeodetic.latitude, height: 1};
 
-            var deltaLatInt = 1;
+            deltaLatInt = 1;
             // TODO: Change 7000 to a setting variable
             if (satHeight < 2500 && selectedSatFOV <= 60) deltaLatInt = 0.5;
             if (satHeight > 7000 || selectedSatFOV >= 90) deltaLatInt = 2;
             if (satelliteSelected.length > 1) deltaLatInt = 2;
-            for (var deltaLat = -60; deltaLat < 60; deltaLat+=deltaLatInt) {
-              var lat = Math.max(Math.min(Math.round((satSelGeodetic.latitude * RAD2DEG)) + deltaLat,90),-90) * DEG2RAD;
+            for ( deltaLat = -60; deltaLat < 60; deltaLat+=deltaLatInt) {
+              lat = Math.max(Math.min(Math.round((satSelGeodetic.latitude * RAD2DEG)) + deltaLat,90),-90) * DEG2RAD;
               if (lat > 90) continue;
-              var deltaLonInt = 1; // Math.max((Math.abs(lat)*RAD2DEG/15),1);
+              deltaLonInt = 1; // Math.max((Math.abs(lat)*RAD2DEG/15),1);
               if (satHeight < 2500 && selectedSatFOV <= 60) deltaLonInt = 0.5;
               if (satHeight > 7000 || selectedSatFOV >= 90) deltaLonInt = 2;
               if (satelliteSelected.length > 1) deltaLonInt = 2;
-              for (var deltaLon = 0; deltaLon < 181; deltaLon+=deltaLonInt) {
+              for (deltaLon = 0; deltaLon < 181; deltaLon+=deltaLonInt) {
                 // //////////
                 // Add Long
                 // //////////
-                var long = satSelGeodetic.longitude + (deltaLon * DEG2RAD);
+                long = satSelGeodetic.longitude + (deltaLon * DEG2RAD);
                 satSelPosEarth = {longitude: long, latitude: lat, height: 15};
                 // Find the Az/El of the position on the earth
                 lookangles = satellite.ecfToLookAngles(satSelPosEarth, satSelPosEcf);
@@ -660,13 +665,13 @@ if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBu
                   }
                   satCache[i].active = true;
 
-                  satPos[i * 3] = satSelPosEarth.x;
-                  satPos[i * 3 + 1] = satSelPosEarth.y;
-                  satPos[i * 3 + 2] = satSelPosEarth.z;
+                  satPos[i3] = satSelPosEarth.x;
+                  satPos[i3 + 1] = satSelPosEarth.y;
+                  satPos[i3 + 2] = satSelPosEarth.z;
 
-                  satVel[i * 3] = 0;
-                  satVel[i * 3 + 1] = 0;
-                  satVel[i * 3 + 2] = 0;
+                  satVel[i3] = 0;
+                  satVel[i3 + 1] = 0;
+                  satVel[i3 + 2] = 0;
                   i++;
                 }
                 // //////////
@@ -689,13 +694,13 @@ if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBu
                   }
                   satCache[i].active = true;
 
-                  satPos[i * 3] = satSelPosEarth.x;
-                  satPos[i * 3 + 1] = satSelPosEarth.y;
-                  satPos[i * 3 + 2] = satSelPosEarth.z;
+                  satPos[i3] = satSelPosEarth.x;
+                  satPos[i3 + 1] = satSelPosEarth.y;
+                  satPos[i3 + 2] = satSelPosEarth.z;
 
-                  satVel[i * 3] = 0;
-                  satVel[i * 3 + 1] = 0;
-                  satVel[i * 3 + 2] = 0;
+                  satVel[i3] = 0;
+                  satVel[i3 + 1] = 0;
+                  satVel[i3 + 2] = 0;
                   i++;
                 }
 
@@ -726,12 +731,20 @@ if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBu
     satInView: satInView.buffer}
   );
 
-  satPos = new Float32Array(satCache.length * 3);
-  satVel = new Float32Array(satCache.length * 3);
-  satInView = new Float32Array(satCache.length);
+  // OPTIMIZE: 5.8ms
+  // satPos = new Float32Array(satCache.length * 3);
+  // satVel = new Float32Array(satCache.length * 3);
+  // satInView = new Float32Array(satCache.length);
 
   // NOTE The longer the delay the more jitter at higher speeds of propagation
   setTimeout(propagateCruncher, 1 * globalPropagationRate / divisor);
+  let stopTime1 = performance.now();
+  if (numOfCrunches > 5) {
+    totalCrunchTime1 += (stopTime1 - startTime1);
+    averageTimeForCrunchLoop = totalCrunchTime1 / (numOfCrunches - 5);
+
+    // averageTimeForPropagate = totalCrunchTime2 / (numOfCrunches - 5);
+  }
 }
 
 /** Returns Ordinal Day (Commonly Called J Day) */

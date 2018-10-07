@@ -70,7 +70,20 @@ var maxPinchSize = 1;
     }
   };
 
+  mobile.checkMobileMode = function () {
+    if ($(document).width() <= settingsManager.desktopMinimumWidth) {
+      settingsManager.isMobileModeEnabled = true;
+      settingsManager.cameraMovementSpeed = 0.0001;
+      settingsManager.cameraMovementSpeedMin = 0.0001;
+    } else {
+      settingsManager.isMobileModeEnabled = false;
+      settingsManager.cameraMovementSpeed = 0.003;
+      settingsManager.cameraMovementSpeedMin = 0.005;
+    }
+  };
+
   mobile.start = function () {
+    mobile.checkMobileMode();
     maxPinchSize = Math.hypot($(document).width(),$(document).height());
     $('#loading-screen').removeClass('full-loader');
     $('#loading-screen').addClass('mini-loader-container');

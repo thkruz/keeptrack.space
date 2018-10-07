@@ -596,7 +596,7 @@ var drawLoopCallback;
         _hoverBoxOnSat(-1, 0, 0);
       }
     } else {
-      if (!isMouseMoving || isDragging) { return; }
+      if (!isMouseMoving || isDragging || settingsManager.isMobileModeEnabled) { return; }
       updateHoverDelay++;
       if (updateHoverDelay === 8) updateHoverDelay = 0;
       if (updateHoverDelay > 0) return;

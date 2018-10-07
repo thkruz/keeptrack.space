@@ -89,6 +89,7 @@ var lkpassed = false;
 
   var touchHoldButton = '';
   $(document).ready(function () { // Code Once index.htm is loaded
+    mobile.checkMobileMode();
     if (settingsManager.offline) updateInterval = 250;
     (function _licenseCheck () {
       if (typeof satel === 'undefined') satel = null;
@@ -110,15 +111,7 @@ var lkpassed = false;
       var resizing = false;
       $(window).resize(function () {
         uiController.resize2DMap();
-        if ($(document).width() <= settingsManager.desktopMinimumWidth) {
-          settingsManager.isMobileModeEnabled = true;
-          settingsManager.cameraMovementSpeed = 0.0001;
-          settingsManager.cameraMovementSpeedMin = 0.0001;
-        } else {
-          settingsManager.isMobileModeEnabled = false;
-          settingsManager.cameraMovementSpeed = 0.003;
-          settingsManager.cameraMovementSpeedMin = 0.005;
-        }
+        mobile.checkMobileMode();
         if (!resizing) {
           window.setTimeout(function () {
             resizing = false;
@@ -194,7 +187,7 @@ var lkpassed = false;
             evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX,
             evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY);
           deltaPinchDistance = ((startPinchDistance - currentPinchDistance) / maxPinchSize);
-          zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed + 0.002);
+          zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed + 0.006);
           zoomTarget = Math.min(Math.max(zoomTarget, 0), 1); // Force between 0 and 1
         } else { // Dont Move While Zooming
           mouseX = evt.originalEvent.touches[0].clientX;
@@ -281,6 +274,7 @@ var lkpassed = false;
         } else { // Single Finger Touch
           mouseX = evt.originalEvent.touches[0].clientX;
           mouseY = evt.originalEvent.touches[0].clientY;
+          mouseSat = getSatIdFromCoord(mouseX, mouseY);
           settingsManager.cameraMovementSpeed = Math.max(0.005 * zoomLevel, settingsManager.cameraMovementSpeedMin);
           screenDragPoint = [mouseX, mouseY];
           // dragPoint = getEarthScreenPoint(x, y);

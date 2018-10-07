@@ -213,6 +213,7 @@ or mirrored at any other location without the express written permission of the 
       $('#canvas-holder').attr('style', 'display:block');
       settingsManager.isBottomIconsEnabled = true; // NOTE: Probably depricated (8/29/2018)
 
+      mobile.checkMobileMode();
       if (settingsManager.isMobileModeEnabled) { // Start Button Displayed
         $('#mobile-start-button').show();
         $('#spinner').hide();
@@ -1048,7 +1049,10 @@ or mirrored at any other location without the express written permission of the 
   };
 
   satSet.selectSat = function (i) {
+    console.log(i);
+    console.log(selectedSat);
     if (i === selectedSat) return;
+    console.log(2);
     satCruncher.postMessage({
       satelliteSelected: [i]
     });

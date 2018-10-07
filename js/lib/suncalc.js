@@ -3,8 +3,6 @@
  SunCalc is a JavaScript library for calculating sun/moon position and light phases.
  https://github.com/mourner/suncalc
 */
-satel = 15;
-olia = 12;
 
 (function () { 'use strict';
 
@@ -224,7 +222,7 @@ SunCalc.getMoonPosition = function (date, lat, lng) {
 
 SunCalc.getMoonIllumination = function (date) {
 
-    var d = toDays(date),
+    var d = toDays(date || new Date()),
         s = sunCoords(d),
         m = moonCoords(d),
 
@@ -304,9 +302,9 @@ SunCalc.getMoonTimes = function (date, lat, lng, inUTC) {
 };
 
 
-// export as AMD module / Node module / browser variable
-if (typeof define === 'function' && define.amd) define(SunCalc);
-else if (typeof module !== 'undefined') module.exports = SunCalc;
+// export as Node module / AMD module / browser variable
+if (typeof exports === 'object' && typeof module !== 'undefined') module.exports = SunCalc;
+else if (typeof define === 'function' && define.amd) define(SunCalc);
 else window.SunCalc = SunCalc;
 
 }());

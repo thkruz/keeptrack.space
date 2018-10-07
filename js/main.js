@@ -373,7 +373,7 @@ var drawLoopCallback;
     if (selectedSat !== -1) {
       var sat = satSet.getSat(selectedSat);
       if (!sat.static) {
-        _camSnapToSat(selectedSat);
+        _camSnapToSat(sat);
       }
       if (sat.static && cameraType.current=== cameraType.PLANETARIUM) {
         // _camSnapToSat(selectedSat);
@@ -394,12 +394,10 @@ var drawLoopCallback;
     // bubble.draw();
   }
 
-  function _camSnapToSat (satId) {
+  function _camSnapToSat (sat) {
     /* this function runs every frame that a satellite is selected.
     However, the user might have broken out of the zoom snap or angle snap.
     If so, don't change those targets. */
-
-    var sat = satSet.getSat(satId);
 
     if (camAngleSnappedOnSat) {
       var pos = sat.position;
@@ -433,7 +431,7 @@ var drawLoopCallback;
         altitude = satellite.currentTEARR.alt; // and set the altitude
       } if (sat.missile) {
         altitude = sat.maxAlt + 1000;             // if it is a missile use its altitude
-        orbitDisplay.setSelectOrbit(satId);
+        orbitDisplay.setSelectOrbit(sat.satId);
       }
       if (altitude) {
         camDistTarget = altitude + RADIUS_OF_EARTH + settingsManager.camDistBuffer;
@@ -888,6 +886,7 @@ function _normalizeAngle (angle) {
 }
 
 function getSatIdFromCoord (x, y) {
+  // OPTIMIZE: Find a way to do this without using gl.readPixels!
   gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
   gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
   return ((pickColorBuf[2] << 16) | (pickColorBuf[1] << 8) | (pickColorBuf[0])) - 1;
@@ -978,8 +977,8 @@ function updateUrl () { // URL Updater
   var url = arr[0];
   var paramSlices = [];
 
-  if (selectedSat !== -1 && satSet.getSat(selectedSat).intlDes !== 'none') {
-    paramSlices.push('intldes=' + satSet.getSat(selectedSat).intlDes);
+  if (selectedSat !== -1 && satSet.getSatExtraOnly(selectedSat).intlDes !== 'none') {
+    paramSlices.push('intldes=' + satSet.getSatExtraOnly(selectedSat).intlDes);
   }
 
   var currentSearch = searchBox.getCurrentSearch();
@@ -1009,8 +1008,8 @@ function selectSat (satId) {
   if (satId === -1 && !isSelectedSatNegativeOne) {
     isSelectedSatNegativeOne = true;
     $('#sat-infobox').fadeOut();
-    $('#iss-stream').html('');
-    $('#iss-stream-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+    // $('#iss-stream').html('');
+    // $('#iss-stream-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     orbitDisplay.clearSelectOrbit();
     // Remove Red Box
     $('#menu-lookanglesmultisite').removeClass('bmenu-item-selected');
@@ -1025,8 +1024,8 @@ function selectSat (satId) {
     $('#menu-map').addClass('bmenu-item-disabled');
     $('#menu-newLaunch').addClass('bmenu-item-disabled');
     // Remove Side Menus
-    $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+    // $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+    // $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#editSat-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#map-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
@@ -1042,9 +1041,10 @@ function selectSat (satId) {
   } else {
     isSelectedSatNegativeOne = false;
     selectedSat = satId;
-    sat = satSet.getSat(satId);
+    sat = satSet.getSatExtraOnly(satId);
     if (!sat) return;
     if (sat.static) {
+      sat = satSet.getSat(satId);
       sensorManager.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
       sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
       selectedSat = -1;
@@ -1053,7 +1053,6 @@ function selectSat (satId) {
       if (selectedSat !== -1) {
         $('#menu-lookangles').removeClass('bmenu-item-disabled');
       }
-      $('#menu-in-coverage').removeClass('bmenu-item-disabled');
       return;
     }
     camZoomSnappedOnSat = true;
@@ -1272,7 +1271,8 @@ function selectSat (satId) {
     // }
   }
 
-  settingsManager.themes.retheme();
+  // settingsManager.themes.retheme();
+  // TODO: Make this a setting that is disabled by default
   updateUrl();
 }
 

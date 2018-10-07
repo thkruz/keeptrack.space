@@ -876,7 +876,6 @@ $.ajaxSetup({
         $('#sensor-sun').html(sensorManager.selectedSensor.sun);
         selectSat(-1);
         changeZoom(sensorManager.selectedSensor.zoom);
-        console.log('2: ' + Date.now());
         camSnap(latToPitch(sensorManager.selectedSensor.lat), longToYaw(sensorManager.selectedSensor.long));
         satellite.getsensorinfo();
       }

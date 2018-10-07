@@ -55,7 +55,7 @@
       selectSat(-1);
       $('#search').val('');
       searchBox.hideResults();
-      satSet.setColorScheme(ColorScheme.default, true);
+      // satSet.setColorScheme(ColorScheme.default, true);
       return;
     }
 
@@ -65,31 +65,32 @@
 
     var results = [];
 
-    for (var i = 0; i < satData.length; i++) {
+    for (var i = 0; i < satSet.missileSats; i++) { // Stop once you get to the markers to save time
+      var sat = satData[i];
       for (var j = 0; j < searchList.length; j++) {
         // Move one search string at a time (separated by ',')
         searchString = searchList[j];
 
         // Don't search for things until at least the minimum characters
         // are typed otherwise there are just too many search results.
-        if (searchString.length <= settingsManager.minimumSearchCharacters) { return; }
+        if (searchString.length <= settingsManager.minimumSearchCharacters && searchString !== 'RV_') { return; }
         var len = searchList[j].length; // How many characters is in this search string
 
         // Skip static dots (Maybe these should be searchable?)
-        if (satData[i].static) { continue; }
+        if (sat.static) { continue; }
         // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
-        if (settingsManager.isSatOverflyModeOn && satData[i].OT > 1) { continue; }
+        if (settingsManager.isSatOverflyModeOn && sat.OT > 1) { continue; }
         // Skip inactive missiles.
-        if (satData[i].missile && !satData[i].active) { continue; }
+        if (sat.missile && !sat.active) { continue; }
 
         // Everything has a name. If it doesn't then assume it isn't what we are
         // searching for.
-        if (!satData[i].ON) { continue; }
+        if (!sat.ON) { continue; }
 
         //
-        if (satData[i].ON.toUpperCase().indexOf(searchString) !== -1) {
+        if (sat.ON.toUpperCase().indexOf(searchString) !== -1) {
           results.push({
-            strIndex: satData[i].ON.indexOf(searchString),
+            strIndex: sat.ON.indexOf(searchString),
             isON: true,
             patlen: len,
             satId: i
@@ -97,10 +98,10 @@
           continue; // Prevent's duplicate results
         }
 
-        if (!satData[i].desc) { // Do nothing there is no description property
-        } else if (satData[i].desc.toUpperCase().indexOf(searchString) !== -1) {
+        if (!sat.desc) { // Do nothing there is no description property
+        } else if (sat.desc.toUpperCase().indexOf(searchString) !== -1) {
           results.push({
-            strIndex: satData[i].desc.indexOf(searchString),
+            strIndex: sat.desc.indexOf(searchString),
             isMissile: true,
             patlen: len,
             satId: i
@@ -111,11 +112,11 @@
         }
 
         // Analyst satellites only have names and SCC_NUMs
-        if (+satData[i].SCC_NUM >= 60000) { continue; }
+        if (+sat.SCC_NUM >= 60000) { continue; }
 
-        if (satData[i].SCC_NUM.indexOf(searchString) !== -1) {
+        if (sat.SCC_NUM.indexOf(searchString) !== -1) {
           results.push({
-            strIndex: satData[i].SCC_NUM.indexOf(searchString),
+            strIndex: sat.SCC_NUM.indexOf(searchString),
             isSCC_NUM: true,
             patlen: len,
             satId: i
@@ -123,9 +124,9 @@
           continue; // Prevent's duplicate results
         }
 
-        if (satData[i].intlDes.indexOf(searchString) !== -1) {
+        if (sat.intlDes.indexOf(searchString) !== -1) {
             results.push({
-              strIndex: satData[i].intlDes.indexOf(searchString),
+              strIndex: sat.intlDes.indexOf(searchString),
               isIntlDes: true,
               patlen: len,
               satId: i
@@ -133,9 +134,9 @@
           continue; // Prevent's duplicate results
         }
 
-        if (satData[i].LV.toUpperCase().indexOf(searchString) !== -1) {
+        if (sat.LV.toUpperCase().indexOf(searchString) !== -1) {
           results.push({
-            strIndex: satData[i].LV.indexOf(searchString),
+            strIndex: sat.LV.indexOf(searchString),
             isLV: true,
             patlen: len,
             satId: i
@@ -174,7 +175,6 @@
       searchBox.fillResultBox(results);
     }
 
-    satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
     updateUrl();
     settingsManager.themes.retheme();
   };
@@ -229,6 +229,7 @@
     resultBox.slideDown();
     settingsManager.themes.retheme();
     resultsOpen = true;
+    satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
   };
 
   searchBox.init = function (_satData) {
@@ -261,7 +262,7 @@
       if (selectedSat === -1) {
         return;
       }
-      var intldes = satSet.getSat(selectedSat).intlDes;
+      var intldes = satSet.getSatExtraOnly(selectedSat).intlDes;
       var searchStr = intldes.slice(0, 8);
       searchBox.doSearch(searchStr);
       $('#search').val(searchStr);
@@ -272,7 +273,7 @@
       }
       var sat = selectedSat;
       var SCCs = [];
-      var pos = satSet.getSat(sat).position;
+      var pos = satSet.getSatPosOnly(sat).position;
       var posXmin = pos.x - 100;
       var posXmax = pos.x + 100;
       var posYmin = pos.y - 100;
@@ -281,9 +282,9 @@
       var posZmax = pos.z + 100;
       $('#search').val('');
       for (var i = 0; i < satSet.numSats; i++) {
-        pos = satSet.getSat(i).position;
+        pos = satSet.getSatPosOnly(i).position;
         if (pos.x < posXmax && pos.x > posXmin && pos.y < posYmax && pos.y > posYmin && pos.z < posZmax && pos.z > posZmin) {
-          SCCs.push(satSet.getSat(i).SCC_NUM);
+          SCCs.push(satSet.getSatExtraOnly(i).SCC_NUM);
         }
       }
 

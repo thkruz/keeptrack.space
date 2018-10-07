@@ -4,7 +4,7 @@
 
 var MAX_MISSILES = 500;
 var MAX_ANALSATS = 30;
-var MAX_FIELD_OF_VIEW_MARKERS = 200000;
+var MAX_FIELD_OF_VIEW_MARKERS = 500000;
 
 (function () {
   var settingsManager = {};
@@ -17,8 +17,10 @@ var MAX_FIELD_OF_VIEW_MARKERS = 200000;
   settingsManager.offlineLocation = '';
 
   settingsManager.themes = {};
+  settingsManager.isThemesNeeded = false;
   settingsManager.themes.currentTheme = 'Blue';
   settingsManager.themes.retheme = function () {
+    if (!settingsManager.isThemesNeeded) return;
     if (settingsManager.themes.currentTheme === 'Blue') settingsManager.themes.blueTheme(true);
     if (settingsManager.themes.currentTheme === 'Red') settingsManager.themes.redTheme(true);
   };
@@ -94,7 +96,7 @@ var MAX_FIELD_OF_VIEW_MARKERS = 200000;
   settingsManager.hoverColor = [0.1, 1.0, 0.0, 1.0]; // Green
   settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0]; // Red
 
-  settingsManager.minimumSearchCharacters = 2;
+  settingsManager.minimumSearchCharacters = 2; // Searches after 3 characters typed
 
   settingsManager.currentLegend = 'default';
 

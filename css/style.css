@@ -1119,18 +1119,6 @@ ul li{
   }
 }
 
-#bottom-menu {
-  background: rgb(0,105,165);
-  display: none;
-  position: absolute;
-  width: 100%;
-  z-index: 10;
-  bottom: 50px;
-  overflow: auto;
-  color: white;
-  text-align: center;
-}
-
 #bottom-icons-container {
     margin-top: -15px;
     height: 50px;

@@ -60,9 +60,6 @@ or mirrored at any other location without the express written permission of the 
   var satCruncher = {};
   var limitSats = settingsManager.limitSats;
 
-  var DOMcurObjsHTML = document.getElementById('bottom-menu');
-  var curObjsHTMLText = '';
-
   var satSet = {};
   var dotShader;
   var satPosBuf;
@@ -559,8 +556,6 @@ or mirrored at any other location without the express written permission of the 
           obsminrange: obsminrange,
           obsmaxrange: obsmaxrange
         });
-
-        $('#menu-in-coverage').removeClass('bmenu-item-disabled');
       }
 
       /** Send satDataString to satCruncher to begin propagation loop */
@@ -680,10 +675,11 @@ or mirrored at any other location without the express written permission of the 
     gl.uniformMatrix4fv(gl.pickShaderProgram.uCamMatrix, false, camMatrix);
     gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, satPosBuf);
-    gl.enableVertexAttribArray(gl.pickShaderProgram.aPos);
-    gl.vertexAttribPointer(gl.pickShaderProgram.aPos, 3, gl.FLOAT, false, 0, 0);
-
+    // NOTE: Might not be needed 10-6-2018
+    // gl.bindBuffer(gl.ARRAY_BUFFER, satPosBuf);
+    // gl.enableVertexAttribArray(gl.pickShaderProgram.aPos);
+    // gl.vertexAttribPointer(gl.pickShaderProgram.aPos, 3, gl.FLOAT, false, 0, 0);
+    //
     gl.enableVertexAttribArray(gl.pickShaderProgram.aColor);
     gl.bindBuffer(gl.ARRAY_BUFFER, pickColorBuf);
     gl.vertexAttribPointer(gl.pickShaderProgram.aColor, 3, gl.FLOAT, false, 0, 0);
@@ -695,37 +691,37 @@ or mirrored at any other location without the express written permission of the 
     gl.drawArrays(gl.POINTS, 0, satData.length); // draw pick
 
     lastDrawTime = drawNow;
-    satSet.updateFOV(null, drawNow);
+    // satSet.updateFOV(null, drawNow);
   };
 
-  var uFOVSearchItems;
-  var inViewObs = [];
-  satSet.updateFOV = function (curSCC, now) {
-    if (now - lastFOVUpdateTime > 1 * 1000 / timeManager.propRate && settingsManager.isBottomMenuOpen === true) { // If it has been 1 seconds since last update that the menu is open
-      inViewObs = [];
-      DOMcurObjsHTML.innerHTML = '';
-      for (uFOVi = 0; uFOVi < (satData.length); uFOVi++) {
-        if ($('#search').val() === '') {
-          if (satData[uFOVi].inview) {
-            inViewObs.push(satData[uFOVi].SCC_NUM);
-          }
-        } else {
-          uFOVSearchItems = $('#search').val().split(',');
-          for (uFOVs = 0; uFOVs < ($('#datetime-text').length); uFOVs++) {
-            if (satData[uFOVi].inview && satData[uFOVi].SCC_NUM === uFOVSearchItems[uFOVs]) {
-              inViewObs.push(satData[uFOVi].SCC_NUM);
-            }
-          }
-        }
-      }
-      curObjsHTMLText = '';
-      for (uFOVi = 0; uFOVi < inViewObs.length; uFOVi++) {
-        curObjsHTMLText += "<span class='FOV-object link'>" + inViewObs[uFOVi] + '</span>\n';
-      }
-      DOMcurObjsHTML.innerHTML = curObjsHTMLText;
-      lastFOVUpdateTime = now;
-    }
-  };
+  // var uFOVSearchItems;
+  // var inViewObs = [];
+  // satSet.updateFOV = function (curSCC, now) {
+  //   if (now - lastFOVUpdateTime > 1 * 1000 / timeManager.propRate && settingsManager.isBottomMenuOpen === true) { // If it has been 1 seconds since last update that the menu is open
+  //     inViewObs = [];
+  //     DOMcurObjsHTML.innerHTML = '';
+  //     for (uFOVi = 0; uFOVi < (satData.length); uFOVi++) {
+  //       if ($('#search').val() === '') {
+  //         if (satData[uFOVi].inview) {
+  //           inViewObs.push(satData[uFOVi].SCC_NUM);
+  //         }
+  //       } else {
+  //         uFOVSearchItems = $('#search').val().split(',');
+  //         for (uFOVs = 0; uFOVs < ($('#datetime-text').length); uFOVs++) {
+  //           if (satData[uFOVi].inview && satData[uFOVi].SCC_NUM === uFOVSearchItems[uFOVs]) {
+  //             inViewObs.push(satData[uFOVi].SCC_NUM);
+  //           }
+  //         }
+  //       }
+  //     }
+  //     curObjsHTMLText = '';
+  //     for (uFOVi = 0; uFOVi < inViewObs.length; uFOVi++) {
+  //       curObjsHTMLText += "<span class='FOV-object link'>" + inViewObs[uFOVi] + '</span>\n';
+  //     }
+  //     DOMcurObjsHTML.innerHTML = curObjsHTMLText;
+  //     lastFOVUpdateTime = now;
+  //   }
+  // };
 
   satSet.mergeSat = function (satObject) {
     if (!satData) return null;
@@ -771,6 +767,14 @@ or mirrored at any other location without the express written permission of the 
       };
     }
 
+    return satData[i];
+  };
+
+  satSet.getSatInViewOnly = function (i) {
+    if (!satData) return null;
+    if (!satData[i]) return null;
+
+    satData[i].inview = satInView[i];
     return satData[i];
   };
 

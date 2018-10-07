@@ -88,7 +88,7 @@
     groups.updateIsInGroup(groups.selectedGroup, group);
     groups.selectedGroup = group;
     group.updateOrbits();
-    satSet.setColorScheme(ColorScheme.group);
+    settingsManager.currentColorScheme = ColorScheme.group;
   };
   groups.updateIsInGroup = function (oldgroup, newgroup) {
     var sat;
@@ -109,10 +109,6 @@
   groups.clearSelect = function () {
     groups.updateIsInGroup(groups.selectedGroup, null);
     groups.selectedGroup = null;
-    if (settingsManager.currentColorScheme === ColorScheme.default || settingsManager.currentColorScheme === ColorScheme.onlyFOV) {
-      if (settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.onlyFOV, true); }
-      if (!settingsManager.isOnlyFOVChecked) { satSet.setColorScheme(ColorScheme.default, true); }
-    }
   };
   groups.init = function () {
     // Might not be needed anymore

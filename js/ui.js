@@ -298,7 +298,7 @@ var lkpassed = false;
       });
       canvasDOM.mouseup(function (evt) {
         if (!dragHasMoved) {
-          var clickedSat = getSatIdFromCoord(mouseX, mouseY);
+          var clickedSat = mouseSat;
           if (clickedSat === -1 && evt.button === 2) { // Right Mouse Button Click
             $('#search').val('');
             searchBox.hideResults();
@@ -306,16 +306,15 @@ var lkpassed = false;
             $('#menu-space-stations').removeClass('bmenu-item-selected');
 
             if (satellite.sensorSelected()) {
-              $('#menu-in-coverage').removeClass('bmenu-item-disabled');
               uiController.legendMenuChange('default');
             } else {
               uiController.legendMenuChange('default');
             }
 
-            satSet.setColorScheme(ColorScheme.default, true);
+            // satSet.setColorScheme(ColorScheme.default);
           }
           if (cameraType.current === cameraType.SATELLITE) {
-            if (clickedSat !== -1 && !satSet.getSat(clickedSat).static) { selectSat(clickedSat); }
+            if (clickedSat !== -1 && !satSet.getSatExtraOnly(clickedSat).static) { selectSat(clickedSat); }
           } else {
             selectSat(clickedSat);
           }
@@ -547,7 +546,6 @@ var lkpassed = false;
         if (watchlistList.length > 0) {
           $('#menu-info-overlay').removeClass('bmenu-item-disabled');
         }
-        $('#menu-in-coverage').removeClass('bmenu-item-disabled');
       });
 
       // USAF Radars
@@ -740,7 +738,7 @@ var lkpassed = false;
           e.preventDefault();
           return;
         }
-        var sat = satSet.getSat(satId);
+        var sat = satSet.getSatExtraOnly(satId);
 
         var intl = sat.TLE1.substr(9, 8);
 
@@ -831,7 +829,8 @@ var lkpassed = false;
           orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
           sat.active = true;
 
-          sat = satSet.getSat(satId);
+          // FIXME: Why?
+          // sat = satSet.getSat(satId);
         } else {
           $('#es-error').html('Failed Altitude Check</br>Try Different Parameters');
           $('#es-error').show();
@@ -842,7 +841,7 @@ var lkpassed = false;
       $('#editSat-save').click(function (e) {
         var scc = $('#es-scc').val();
         var satId = satSet.getIdFromObjNum(scc);
-        var sat = satSet.getSat(satId);
+        var sat = satSet.getSatExtraOnly(satId);
         var sat2 = {
           TLE1: sat.TLE1,
           TLE2: sat.TLE2
@@ -872,7 +871,7 @@ var lkpassed = false;
           var object = JSON.parse(evt.target.result);
           var scc = parseInt(_pad0(object.TLE1.substr(2, 5).trim(), 5));
           var satId = satSet.getIdFromObjNum(scc);
-          var sat = satSet.getSat(satId);
+          var sat = satSet.getSatExtraOnly(satId);
           if (satellite.altitudeCheck(object.TLE1, object.TLE2, timeManager.propOffset) > 1) {
             satCruncher.postMessage({
               typ: 'satEdit',
@@ -973,7 +972,7 @@ var lkpassed = false;
       $('#watchlist-save').click(function (e) {
         var saveWatchlist = [];
         for (var i = 0; i < watchlistList.length; i++) {
-          var sat = satSet.getSat(watchlistList[i]);
+          var sat = satSet.getSatExtraOnly(watchlistList[i]);
           saveWatchlist[i] = sat.SCC_NUM;
         }
         var variable = JSON.stringify(saveWatchlist);
@@ -999,7 +998,7 @@ var lkpassed = false;
           var newWatchlist = JSON.parse(evt.target.result);
           watchlistInViewList = [];
           for (var i = 0; i < newWatchlist.length; i++) {
-            var sat = satSet.getSat(satSet.getIdFromObjNum(newWatchlist[i]));
+            var sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
             if (sat !== null) {
               newWatchlist[i] = sat.id;
               watchlistInViewList.push(false);
@@ -1521,7 +1520,7 @@ var lkpassed = false;
               $('#loading-screen').fadeIn('slow', function () {
                   nextPassArray = [];
                   for (var x = 0; x < watchlistList.length; x++) {
-                    nextPassArray.push(satSet.getSat(watchlistList[x]));
+                    nextPassArray.push(satSet.getSatExtraOnly(watchlistList[x]));
                   }
                   nextPassArray = satellite.nextpassList(nextPassArray);
                   nextPassArray.sort(function(a, b) {
@@ -1562,55 +1561,27 @@ var lkpassed = false;
             break;
           }
           break;
-        case 'menu-in-coverage': // B
-          if (!satellite.sensorSelected()) { // No Sensor Selected
-            if (!$('#menu-in-coverage:animated').length) {
-              $('#menu-in-coverage').effect('shake', {distance: 10});
-            }
-            break;
-          }
-          if (settingsManager.isBottomMenuOpen) {
-            $('#bottom-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-            $('#menu-in-coverage').removeClass('bmenu-item-selected');
-            settingsManager.isBottomMenuOpen = false;
-            break;
-          } else {
-            $('#bottom-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            $('#menu-in-coverage').addClass('bmenu-item-selected');
-            settingsManager.isBottomMenuOpen = true;
-            break;
-          }
-          break;
         case 'menu-lookangles': // S
           if (isLookanglesMenuOpen) {
             isLookanglesMenuOpen = false;
             uiController.hideSideMenus();
             break;
           } else {
-            if (!satellite.sensorSelected() || selectedSat === -1) { // No Sensor or Satellite Selected
+            sat = satSet.getSatExtraOnly(selectedSat);
+            if (!satellite.sensorSelected() || sat.static || sat.missile || selectedSat === -1) { // No Sensor or Satellite Selected
               if (!$('#menu-lookangles:animated').length) {
                 $('#menu-lookangles').effect('shake', {distance: 10});
               }
               break;
             }
             uiController.hideSideMenus();
-            $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             isLookanglesMenuOpen = true;
-            $('#menu-lookangles').addClass('bmenu-item-selected');
-            if (selectedSat !== -1) {
-              sat = satSet.getSat(selectedSat);
-              if (sat.static || sat.missile) {
-                if (!$('#menu-lookangles:animated').length) {
-                  $('#menu-lookangles').effect('shake', {distance: 10});
-                }
-                break;
-              } else {
-                $('#loading-screen').fadeIn('slow', function () {
-                  satellite.getlookangles(sat, isLookanglesMenuOpen);
-                  $('#loading-screen').fadeOut();
-                });
-              }
-            }
+            $('#loading-screen').fadeIn('slow', function () {
+              satellite.getlookangles(sat, isLookanglesMenuOpen);
+              $('#menu-lookangles').addClass('bmenu-item-selected');
+              $('#loading-screen').fadeOut();
+              $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+            });
             break;
           }
           break;
@@ -1648,7 +1619,7 @@ var lkpassed = false;
             $('#menu-lookanglesmultisite').addClass('bmenu-item-selected');
             if (selectedSat !== -1) {
               $('#loading-screen').fadeIn('slow', function () {
-                sat = satSet.getSat(selectedSat);
+                sat = satSet.getSatExtraOnly(selectedSat);
                 satellite.getlookanglesMultiSite(sat, isLookanglesMultiSiteMenuOpen);
                 $('#loading-screen').fadeOut();
                 $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
@@ -1703,7 +1674,7 @@ var lkpassed = false;
             $('#map-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             settingsManager.isMapMenuOpen = true;
             uiController.updateMap();
-            var satData = satSet.getSat(selectedSat);
+            var satData = satSet.getSatExtraOnly(selectedSat);
             $('#map-sat').tooltip({delay: 50, tooltip: satData.SCC_NUM, position: 'left'});
             $('#menu-map').addClass('bmenu-item-selected');
             break;
@@ -1794,7 +1765,7 @@ var lkpassed = false;
               $('#menu-editSat').addClass('bmenu-item-selected');
               isEditSatMenuOpen = true;
 
-              sat = satSet.getSat(selectedSat);
+              sat = satSet.getSatExtraOnly(selectedSat);
               $('#es-scc').val(sat.SCC_NUM);
 
               var inc = (sat.inclination * RAD2DEG).toPrecision(7);
@@ -1846,7 +1817,7 @@ var lkpassed = false;
               $('#menu-newLaunch').addClass('bmenu-item-selected');
               isNewLaunchMenuOpen = true;
 
-              sat = satSet.getSat(selectedSat);
+              sat = satSet.getSatExtraOnly(selectedSat);
               $('#nl-scc').val(sat.SCC_NUM);
               $('#nl-inc').val((sat.inclination * RAD2DEG).toPrecision(2));
             } else {
@@ -1991,11 +1962,12 @@ var lkpassed = false;
 
     function _updateWatchlist () {
       if (!watchlistList) return;
+      settingsManager.isThemesNeeded = true;
       isWatchlistChanged = true;
       var watchlistString = '';
       var watchlistListHTML = '';
       for (var i = 0; i < watchlistList.length; i++) {
-        var sat = satSet.getSat(watchlistList[i]);
+        var sat = satSet.getSatExtraOnly(watchlistList[i]);
         if (sat == null) {
           watchlistList.splice(i, 1);
           continue;
@@ -2008,7 +1980,7 @@ var lkpassed = false;
       }
       $('#watchlist-list').html(watchlistListHTML);
       for (i = 0; i < watchlistList.length; i++) { // No duplicates
-        watchlistString += satSet.getSat(watchlistList[i]).SCC_NUM;
+        watchlistString += satSet.getSatExtraOnly(watchlistList[i]).SCC_NUM;
         if (i !== watchlistList.length - 1) watchlistString += ',';
       }
       $('#search').val(watchlistString);
@@ -2272,7 +2244,7 @@ var lkpassed = false;
       infoOverlayDOM = [];
       infoOverlayDOM.push('<div>');
       for (var s = 0; s < nextPassArray.length; s++) {
-        var satInView = satSet.getSat(satSet.getIdFromObjNum(nextPassArray[s].SCC_NUM)).inview;
+        var satInView = satSet.getSatInViewOnly(satSet.getIdFromObjNum(nextPassArray[s].SCC_NUM)).inview;
         // If old time and not in view, skip it
         if (nextPassArray[s].time - propTime < -1000 * 60 * 5 && !satInView) continue;
 
@@ -2757,7 +2729,6 @@ var lkpassed = false;
     });
     satellite.setobs(null, true);
     $('#menu-sensor-info').addClass('bmenu-item-disabled');
-    $('#menu-in-coverage').addClass('bmenu-item-disabled');
     $('#menu-lookangles').addClass('bmenu-item-disabled');
     $('#menu-planetarium').addClass('bmenu-item-disabled');
 

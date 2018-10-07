@@ -39,6 +39,7 @@ var isShowSatOverfly = false;
 var isResetSatOverfly = false;
 var isMultiSensor = false;
 var planetariumView = false;
+var isLowPerf = false;
 
 /** OBSERVER VARIABLES */
 var sensor = {};
@@ -78,6 +79,10 @@ onmessage = function (m) {
 
   if (m.data.isSlowCPUModeEnabled) {
     globalPropagationRateMultiplier = 2;
+  }
+
+  if (m.data.isLowPerf) {
+    isLowPerf = true;
   }
 
   // //////////////////////////////
@@ -287,7 +292,7 @@ function propagateCruncher () {
   var gmstNext = satellite.gstime(j2);
   var len = satCache.length - 1;
 
-  if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBubble) {
+  if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBubble || isLowPerf) {
     // console.warn('No Markers');
     len -= (fieldOfViewSetLength);
   }

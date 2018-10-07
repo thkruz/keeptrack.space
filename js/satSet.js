@@ -563,7 +563,8 @@ or mirrored at any other location without the express written permission of the 
       satCruncher.postMessage({
         typ: 'satdata',
         dat: satSet.satDataString,
-        fieldOfViewSetLength: tleManager.fieldOfViewSet.length
+        fieldOfViewSetLength: tleManager.fieldOfViewSet.length,
+        isLowPerf: settingsManager.lowPerf
       });
       // multThreadCruncher1.postMessage({type: 'init', data: satSet.satDataString});
       // multThreadCruncher2.postMessage({type: 'init', data: satSet.satDataString});
@@ -631,15 +632,18 @@ or mirrored at any other location without the express written permission of the 
     drawDivisor = Math.max(timeManager.propRate, 0.001);
     drawDt = Math.min((drawNow - lastDrawTime) / 1000.0, 1.0 / drawDivisor);
     drawDt *= timeManager.propRate; // Adjust drawDt correspond to the propagation rate
-    if (!settingsManager.isSatOverflyModeOn && !settingsManager.isFOVBubbleModeOn) {
-      for (drawI = 0; drawI < ((satData.length - MAX_FIELD_OF_VIEW_MARKERS) * 3); drawI++) {
-        satPos[drawI] += satVel[drawI] * drawDt;
+    if (!settingsManager.lowPerf) {
+      if (!settingsManager.isSatOverflyModeOn && !settingsManager.isFOVBubbleModeOn) {
+        for (drawI = 0; drawI < ((satData.length - MAX_FIELD_OF_VIEW_MARKERS) * 3); drawI++) {
+          satPos[drawI] += satVel[drawI] * drawDt;
+        }
+      } else {
+        for (drawI = 0; drawI < (satData.length * 3); drawI++) {
+          satPos[drawI] += satVel[drawI] * drawDt;
+        }
       }
-    } else {
-      for (drawI = 0; drawI < (satData.length * 3); drawI++) {
-        satPos[drawI] += satVel[drawI] * drawDt;
-      }
-    }
+  }
+
     // console.log('interp dt=' + dt + ' ' + drawNow);
 
     gl.useProgram(dotShader);

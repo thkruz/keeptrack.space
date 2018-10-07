@@ -14,11 +14,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=0.42.1b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=0.42.2b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=0.42.1b" rel="stylesheet">
+    <link href="css/fonts.css?v=0.42.2b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=0.42.1b">
+    <link rel="stylesheet" href="css/materialize.css?v=0.42.2b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -505,7 +505,7 @@
                   Enable Demo Mode
                 </label>
               </div>
-              <div class="switch row">
+              <div class="switch row" id="fovBubble-opt">
                 <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Sensor Field Of View Will Be Shown">
                   <input id="settings-fov-bubble" type="checkbox">
                   <span class="lever"></span>
@@ -519,20 +519,22 @@
                   Enable Satellite Label Mode
                 </label>
               </div>
-              <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-              <h5 class="center-align">Satellite Overfly Settings</h5>
-              <div class="switch row">
-                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Satellite Field Of View Will Be Shown">
-                  <input id="settings-sat-fov" type="checkbox">
-                  <span class="lever"></span>
-                  Show Satellite FOV
-                </label>
+              <div id="satOverfly-opt">
+                <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
+                <h5 class="center-align">Satellite Overfly Settings</h5>
+                <div class="switch row">
+                  <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Satellite Field Of View Will Be Shown">
+                    <input id="settings-sat-fov" type="checkbox">
+                    <span class="lever"></span>
+                    Show Satellite FOV
+                  </label>
+                </div>
+                <div class="input-field col s12">
+                  <input value="30" id="satFieldOfView" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="What is the satellite's field of view in degrees">
+                  <label for="satFieldOfView">Satellite Field of View</label>
+                </div>
+                <div class="row"></div>
               </div>
-              <div class="input-field col s12">
-                <input value="30" id="satFieldOfView" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="What is the satellite's field of view in degrees">
-                <label for="satFieldOfView">Satellite Field of View</label>
-              </div>
-              <div class="row"></div>
               <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
               <h5 class="center-align">Lookangles Settings</h5>
               <div class="switch row">
@@ -562,6 +564,12 @@
                   </label>
                 </div>
                 <div class="row"></div>
+              </div>
+              <br/>
+              <div id="settings-lowperf" class="row center">
+                <button class="red btn waves-effect waves-light" onclick="uiController.startLowPerf();">Low End PC Version &#9658;
+                </button>
+                <br/>
               </div>
               <div class="row center">
                 <button id="settings-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Settings &#9658;
@@ -1150,35 +1158,35 @@
   <script src="js/lib/materialize.min.js"></script>
   <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.js?v=0.42.1b"></script>
+  <script src="js/lib/satellite.js?v=0.42.2b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=0.42.1b"></script>
+  <script src="js/lib/shader-loader.min.js?v=0.42.2b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=0.42.1b"></script>
-  <script src="js/time-manager.js?v=0.42.1b"></script>
-  <script src="js/earth.js?v=0.42.1b"></script>
-  <script src="js/groups.js?v=0.42.1b"></script>
-  <script src="js/satSet.js?v=0.42.1b"></script>
-  <script src="js/sun.js?v=0.42.1b"></script>
+  <script src="js/settings-manager.js?v=0.42.2b"></script>
+  <script src="js/time-manager.js?v=0.42.2b"></script>
+  <script src="js/earth.js?v=0.42.2b"></script>
+  <script src="js/groups.js?v=0.42.2b"></script>
+  <script src="js/satSet.js?v=0.42.2b"></script>
+  <script src="js/sun.js?v=0.42.2b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js?v=0.42.1b"></script>
+  <script src="js/variables.js?v=0.42.2b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=0.42.1b"></script>
+  <script src="js/ballistic-missile.js?v=0.42.2b"></script>
   <!-- Load Extra Satellites -->
   <!-- <script src="offline/extra.js"></script>
   <script src="offline/satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=0.42.1b"></script>
-  <script src="js/mobile.js?v=0.42.1b"></script>
-  <script src="js/main.min.js?v=0.42.1b"></script>
-  <script src="js/ui.js?v=0.42.1b"></script>
-  <script src="js/lookangles.min.js?v=0.42.1b"></script>
-  <script src="js/orbit-display.js?v=0.42.1b"></script>
-  <script src="js/drawLoop-shapes.js?v=0.42.1b"></script>
-  <script src="js/search-box.js?v=0.42.1b"></script>
+  <script src="js/color-scheme.js?v=0.42.2b"></script>
+  <script src="js/mobile.js?v=0.42.2b"></script>
+  <script src="js/main.min.js?v=0.42.2b"></script>
+  <script src="js/ui.js?v=0.42.2b"></script>
+  <script src="js/lookangles.min.js?v=0.42.2b"></script>
+  <script src="js/orbit-display.js?v=0.42.2b"></script>
+  <script src="js/drawLoop-shapes.js?v=0.42.2b"></script>
+  <script src="js/search-box.js?v=0.42.2b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

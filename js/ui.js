@@ -379,7 +379,7 @@ var lkpassed = false;
       });
 
       $('#info-overlay-content').on('click', '.watchlist-object', function (evt) {
-        var objNum = $(this).context.textContent.split(':');
+        var objNum = evt.currentTarget.textContent.split(':');
         objNum = objNum[0];
         var satId = satSet.getIdFromObjNum(objNum);
         if (satId !== null) {
@@ -390,7 +390,7 @@ var lkpassed = false;
       $('#bottom-icons').on('click', '.bmenu-item', _bottomIconPress); // Bottom Button Pressed
 
       $('#bottom-menu').on('click', '.FOV-object', function (evt) {
-        var objNum = $(this).context.textContent;
+        var objNum = evt.currentTarget.textContent;
         objNum = objNum.slice(-5);
         var satId = satSet.getIdFromObjNum(objNum);
         if (satId !== null) {
@@ -891,7 +891,7 @@ var lkpassed = false;
 
       $('#map-menu').on('click', '.map-look', function (evt) {
         settingsManager.isMapUpdateOverride = true;
-        var time = $(this).context.attributes.time.value; // TODO: Find correct code for this.
+        var time = evt.currentTarget.attributes.time.value; // TODO: Find correct code for this.
         if (time !== null) {
           time = time.split(' ');
           time = new Date(time[0] + 'T' + time[1] + 'Z');
@@ -905,7 +905,7 @@ var lkpassed = false;
       });
 
       $('#socrates-menu').on('click', '.socrates-object', function (evt) {
-        var hiddenRow = $(this).context.attributes.hiddenrow.value; // TODO: Find correct code for this.
+        var hiddenRow = evt.currentTarget.attributes.hiddenrow.value; // TODO: Find correct code for this.
         if (hiddenRow !== null) {
           _socrates(hiddenRow);
         }
@@ -1480,8 +1480,9 @@ var lkpassed = false;
     function _bottomIconPress (evt) {
       var sat;
       if (settingsManager.isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
-      ga('send', 'event', 'Bottom Icon', $(this).context.id, 'Selected');
-      switch ($(this).context.id) {
+      console.log(evt);
+      ga('send', 'event', 'Bottom Icon', evt.currentTarget.id, 'Selected');
+      switch (evt.currentTarget.id) {
         case 'menu-sensor-list': // No Keyboard Commands
           if (isSensorListMenuOpen) {
             uiController.hideSideMenus();
@@ -2750,6 +2751,10 @@ var lkpassed = false;
       $('#nav-footer').addClass('footer-slide-up');
       $('#nav-footer-toggle').html('&#x25BC;');
     }
+  };
+
+  uiController.startLowPerf = function () {
+    window.location.replace("index.htm?lowperf");
   };
 
   uiController.updateMap = function () {

@@ -10,8 +10,52 @@ var MAX_FIELD_OF_VIEW_MARKERS = 200000;
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.42.1';
+  settingsManager.versionNumber = 'v0.42.2';
   settingsManager.versionDate = 'October 6, 2018';
+
+  settingsManager.lowPerf = false;
+
+  (function initParseFromGETVariables () {
+    // This is an initial parse of the GET variables
+    // A satSet focused one happens later.
+    var queryStr = window.location.search.substring(1);
+    var params = queryStr.split('&');
+    for (var i = 0; i < params.length; i++) {
+      var key = params[i].split('=')[0];
+      var val = params[i].split('=')[1];
+      switch (key) {
+        case 'lowperf':
+          settingsManager.lowPerf = true;
+          MAX_FIELD_OF_VIEW_MARKERS = 1;
+          $('#satOverfly-opt').hide();
+          $('#fovBubble-opt').hide();
+          $('#settings-lowperf').hide();
+          break;
+        case 'hires':
+          settingsManager.hiresImages = true;
+          break;
+        case 'vec':
+          settingsManager.vectorImages = true;
+          break;
+        case 'retro':
+          settingsManager.retro = true;
+          settingsManager.tleSource = 'tle/retro.json';
+          break;
+        case 'offline':
+          settingsManager.offline = true;
+          break;
+        case 'mw':
+          settingsManager.tleSource = 'tle/mw.json';
+          break;
+        case 'logo':
+          $('#demo-logo').removeClass('start-hidden');
+          break;
+        case 'noPropRate':
+          settingsManager.isAlwaysHidePropRate = true;
+          break;
+        }
+      }
+    })();
 
   // Offline management
   settingsManager.offlineLocation = '';

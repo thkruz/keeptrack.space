@@ -4,13 +4,13 @@
 
 var MAX_MISSILES = 500;
 var MAX_ANALSATS = 30;
-var MAX_FIELD_OF_VIEW_MARKERS = 500000;
+var MAX_FIELD_OF_VIEW_MARKERS = 200000;
 
 (function () {
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.41.10';
+  settingsManager.versionNumber = 'v0.41.11';
   settingsManager.versionDate = 'October 6, 2018';
 
   // Offline management

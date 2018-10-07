@@ -645,50 +645,48 @@ var drawLoopCallback;
 
   function _hoverBoxOnSat (satId, satX, satY) {
     if (cameraType.current === cameraType.PLANETARIUM && !settingsManager.isDemoModeOn) {
+      satHoverBoxDOM.css({display: 'none'});
       if (satId === -1) {
-        satHoverBoxDOM.html('(none)');
-        satHoverBoxDOM.css({display: 'none'});
         canvasDOM.css({cursor: 'default'});
       } else {
-        satHoverBoxDOM.html('(none)');
-        satHoverBoxDOM.css({display: 'none'});
         canvasDOM.css({cursor: 'pointer'});
       }
       return;
     }
     if (satId === -1) {
       if (!isHoverBoxVisible || settingsManager.isDisableSatHoverBox) return;
-      satHoverBoxDOM.html('(none)');
+      // satHoverBoxDOM.html('(none)');
       satHoverBoxDOM.css({display: 'none'});
       canvasDOM.css({cursor: 'default'});
       isHoverBoxVisible = false;
     } else if (!isDragging && !settingsManager.isDisableSatHoverBox) {
       try {
-        var sat = satSet.getSat(satId);
-        var selectedSatData = satSet.getSat(selectedSat);
+        var sat = satSet.getSatExtraOnly(satId);
+        var selectedSatData = satSet.getSatExtraOnly(selectedSat);
         isHoverBoxVisible = true;
         if (sat.static) {
           if (sat.type === 'Launch Facility') {
             var launchSite = tleManager.extractLaunchSite(sat.name);
-            satHoverBoxDOM.html(launchSite.site + ', ' + launchSite.sitec + '<br /><center>' + sat.type + satellite.distance(sat, selectedSatData) + '</center>');
+            satHoverBoxDOM.html(launchSite.site + ', ' + launchSite.sitec + '<br />' + sat.type + satellite.distance(sat, selectedSatData) + '');
           } else {
-            satHoverBoxDOM.html(sat.name + '<br /><center>' + sat.type + satellite.distance(sat, selectedSatData) + '</center>');
+            satHoverBoxDOM.html(sat.name + '<br />' + sat.type + satellite.distance(sat, selectedSatData) + '');
           }
         } else if (sat.missile) {
-          satHoverBoxDOM.html(sat.ON + '<br /><center>' + sat.desc + '</center>');
+          satHoverBoxDOM.html(sat.ON + '<br />' + sat.desc + '');
         } else {
           if (satellite.sensorSelected() && isShowNextPass && isShowDistance) {
-            satHoverBoxDOM.html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '</center>');
+            satHoverBoxDOM.html(sat.ON + '<br />' + sat.SCC_NUM + '<br />' + satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '');
           } else if (isShowDistance) {
-            satHoverBoxDOM.html(sat.ON + '<br /><center>' + sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '</center>');
+            satHoverBoxDOM.html(sat.ON + '<br />' + sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
           } else if (satellite.sensorSelected() && isShowNextPass) {
-            satHoverBoxDOM.html(sat.ON + '<br /><center>' + sat.SCC_NUM + '<br />' + satellite.nextpass(sat) + '</center>');
+            satHoverBoxDOM.html(sat.ON + '<br />' + sat.SCC_NUM + '<br />' + satellite.nextpass(sat) + '');
           } else {
-            satHoverBoxDOM.html(sat.ON + '<br /><center>' + sat.SCC_NUM + '</center>');
+            satHoverBoxDOM.html(sat.ON + '<br />' + sat.SCC_NUM + '');
           }
         }
         satHoverBoxDOM.css({
           display: 'block',
+          'text-align': 'center',
           position: 'absolute',
           left: satX + 20,
           top: satY - 10

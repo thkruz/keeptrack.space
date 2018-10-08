@@ -836,7 +836,6 @@ $.ajaxSetup({
     if (selectedSensor == null && staticNum == null) return;
     var sensor;
     if (selectedSensor === 'SSN') {
-      console.log('setSensor - SSN');
       var allSSNSensors = [];
       for (sensor in sensorList) {
         if ((sensorList[sensor].country === 'United States') ||
@@ -845,7 +844,6 @@ $.ajaxSetup({
           allSSNSensors.push(sensorList[sensor]);
         }
       }
-      console.log(allSSNSensors);
       satCruncher.postMessage({
         typ: 'offset',
         dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
@@ -853,31 +851,35 @@ $.ajaxSetup({
         sensor: allSSNSensors,
         multiSensor: true
       });
-      return;
-    }
-    for (sensor in sensorList) {
-      if (sensorList[sensor] === selectedSensor || sensorList[sensor].staticNum === staticNum) {
-        sensorManager.selectedSensor = sensorList[sensor];
-        ga('send', 'event', 'Sensor', sensorList[sensor].googleName, 'Selected');
-        // Do For All Sensors
-        sensorManager.whichRadar = sensorManager.selectedSensor.shortName;
-        satCruncher.postMessage({
-          typ: 'offset',
-          dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
-          setlatlong: true,
-          sensor: sensorManager.selectedSensor
-        });
-        satellite.setobs(sensorManager.selectedSensor);
+      satellite.setobs(sensorManager.sensorList.COD);
+      satellite.getsensorinfo();
+      selectSat(-1);
+      setTimeout(satSet.setColorScheme, 1500, ColorScheme.default, true);
+    } else {
+      for (sensor in sensorList) {
+        if (sensorList[sensor] === selectedSensor || sensorList[sensor].staticNum === staticNum) {
+          sensorManager.selectedSensor = sensorList[sensor];
+          ga('send', 'event', 'Sensor', sensorList[sensor].googleName, 'Selected');
+          // Do For All Sensors
+          sensorManager.whichRadar = sensorManager.selectedSensor.shortName;
+          satCruncher.postMessage({
+            typ: 'offset',
+            dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
+            setlatlong: true,
+            sensor: sensorManager.selectedSensor
+          });
+          satellite.setobs(sensorManager.selectedSensor);
 
-        $('#sensor-info-title').html("<a class='iframe' href='" + sensorManager.selectedSensor.url + "'>" + sensorManager.selectedSensor.name + '</a>');
-        $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
-        $('#sensor-type').html(sensorManager.selectedSensor.type);
-        $('#sensor-country').html(sensorManager.selectedSensor.country);
-        $('#sensor-sun').html(sensorManager.selectedSensor.sun);
-        selectSat(-1);
-        changeZoom(sensorManager.selectedSensor.zoom);
-        camSnap(latToPitch(sensorManager.selectedSensor.lat), longToYaw(sensorManager.selectedSensor.long));
-        satellite.getsensorinfo();
+          $('#sensor-info-title').html("<a class='iframe' href='" + sensorManager.selectedSensor.url + "'>" + sensorManager.selectedSensor.name + '</a>');
+          $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+          $('#sensor-type').html(sensorManager.selectedSensor.type);
+          $('#sensor-country').html(sensorManager.selectedSensor.country);
+          $('#sensor-sun').html(sensorManager.selectedSensor.sun);
+          selectSat(-1);
+          changeZoom(sensorManager.selectedSensor.zoom);
+          camSnap(latToPitch(sensorManager.selectedSensor.lat), longToYaw(sensorManager.selectedSensor.long));
+          satellite.getsensorinfo();
+        }
       }
     }
 
@@ -898,7 +900,8 @@ $.ajaxSetup({
 
   tleManager.init = function () {
     var i;
-    for (i = 0; i < MAX_MISSILES; i++) {
+    var maxMissiles = settingsManager.maxMissiles;
+    for (i = 0; i < maxMissiles; i++) {
       var missileInfo = {
         static: false,
         missile: true,
@@ -912,8 +915,8 @@ $.ajaxSetup({
       };
       tleManager.missileSet.push(missileInfo);
     }
-
-    for (i = 0; i < MAX_ANALSATS; i++) {
+    var maxAnalystSats = settingsManager.maxAnalystSats;
+    for (i = 0; i < maxAnalystSats; i++) {
       var analSatInfo = {
         static: false,
         missile: false,
@@ -958,7 +961,7 @@ $.ajaxSetup({
       tleManager.staticSet.push(launchSiteInfo);
     }
 
-    for (i = 0; i < MAX_FIELD_OF_VIEW_MARKERS; i++) {
+    for (i = 0; i < settingsManager.maxFieldOfViewMarkers; i++) {
       var fieldOfViewMarker = {
         static: true,
         marker: true,

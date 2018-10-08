@@ -112,6 +112,7 @@ onmessage = function (m) {
   if (m.data.multiSensor) {
     isMultiSensor = true;
     mSensor = m.data.sensor;
+    sensor = m.data.sensor;
     globalPropagationRate = 2000;
   } else if (m.data.sensor) {
     sensor = m.data.sensor;
@@ -258,21 +259,24 @@ function _lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_lon
   return {'x': x, 'y': y, 'z': z};
 }
 
+// //////////////////////////////////////////////////////////////////////////
+// NOTE: Benchmarking
 // var averageTimeForCrunchLoop = 0;
-var totalCrunchTime1 = 0;
+// var totalCrunchTime1 = 0;
 // var averageTimeForPropagate = 0;
 // var totalCrunchTime2 = 0;
-var numOfCrunches = 0;
+// var numOfCrunches = 0;
+// //////////////////////////////////////////////////////////////////////////
 function propagateCruncher () {
   // OPTIMIZE: 25.9ms
 
-  var startTime1 = performance.now();
-  numOfCrunches++;
+  // var startTime1 = performance.now();
+  // numOfCrunches++;
   propagationRunning = true;
 
   var now = propTime();
 
-  j = jday(now.getUTCFullYear(),
+  var j = jday(now.getUTCFullYear(),
                now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
                now.getUTCDate(),
                now.getUTCHours(),
@@ -287,13 +291,12 @@ function propagateCruncher () {
                now.getUTCDate(),
                now.getUTCHours(),
                now.getUTCMinutes(),
-               now.getUTCSeconds() + 1);
+               (now.getUTCSeconds() + 1));
   j2 += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
   var gmstNext = satellite.gstime(j2);
   var len = satCache.length - 1;
 
   if (!isResetSatOverfly && !isShowSatOverfly && !isResetFOVBubble && !isShowFOVBubble || isLowPerf) {
-    // console.warn('No Markers');
     len -= (fieldOfViewSetLength);
   }
 
@@ -305,7 +308,7 @@ function propagateCruncher () {
   var positionEcf, lookangles, azimuth, elevation, rangeSat;
   var x, y, z, vx, vy, vz;
   var cosLat, sinLat, cosLon, sinLon;
-  var curMissivarime;
+  var curMissivarTime;
   var s, m, pv, tLen, t;
   var sat;
   var isSensorChecked = false;
@@ -333,12 +336,13 @@ function propagateCruncher () {
         // Skip Calculating Lookangles if No Sensor is Selected
         if (!isSensorChecked) {
           if (sensor.observerGd !== defaultGd && !isMultiSensor) {
-            isSensorChecked = true;
             positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
             lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
             azimuth = lookangles.azimuth;
             elevation = lookangles.elevation;
             rangeSat = lookangles.rangeSat;
+          } else {
+            isSensorChecked = true;
           }
         }
       } else {
@@ -371,6 +375,7 @@ function propagateCruncher () {
               latitude: sensor.lat * DEG2RAD,
               height: sensor.obshei * 1 // Convert from string
             };
+            positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
             lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
             azimuth = lookangles.azimuth;
             elevation = lookangles.elevation;
@@ -432,27 +437,33 @@ function propagateCruncher () {
         tLen = satCache[i].altList.length;
         for (t = 0; t < tLen; t++) {
           if (satCache[i].startTime + t * 1000 > now) {
-            curMissivarime = t;
-            continue;
+            curMissivarTime = t;
+            break;
           }
         }
-        cosLat = Math.cos(satCache[i].latList[curMissivarime] * DEG2RAD);
-        sinLat = Math.sin(satCache[i].latList[curMissivarime] * DEG2RAD);
-        cosLon = Math.cos((satCache[i].lonList[curMissivarime] * DEG2RAD) + gmst);
-        sinLon = Math.sin((satCache[i].lonList[curMissivarime] * DEG2RAD) + gmst);
+        cosLat = Math.cos(satCache[i].latList[curMissivarTime] * DEG2RAD);
+        sinLat = Math.sin(satCache[i].latList[curMissivarTime] * DEG2RAD);
+        cosLon = Math.cos((satCache[i].lonList[curMissivarTime] * DEG2RAD) + gmst);
+        sinLon = Math.sin((satCache[i].lonList[curMissivarTime] * DEG2RAD) + gmst);
 
-        satPos[i * 3] = (6371 + satCache[i].altList[curMissivarime]) * cosLat * cosLon;
-        satPos[i * 3 + 1] = (6371 + satCache[i].altList[curMissivarime]) * cosLat * sinLon;
-        satPos[i * 3 + 2] = (6371 + satCache[i].altList[curMissivarime]) * sinLat;
+        satPos[i * 3] = (6371 + satCache[i].altList[curMissivarTime]) * cosLat * cosLon;
+        satPos[i * 3 + 1] = (6371 + satCache[i].altList[curMissivarTime]) * cosLat * sinLon;
+        satPos[i * 3 + 2] = (6371 + satCache[i].altList[curMissivarTime]) * sinLat;
 
-        cosLat = Math.cos(satCache[i].latList[curMissivarime + 1] * DEG2RAD);
-        sinLat = Math.sin(satCache[i].latList[curMissivarime + 1] * DEG2RAD);
-        cosLon = Math.cos((satCache[i].lonList[curMissivarime + 1] * DEG2RAD) + gmstNext);
-        sinLon = Math.sin((satCache[i].lonList[curMissivarime + 1] * DEG2RAD) + gmstNext);
+        curMissivarTime = Math.min(curMissivarTime, tLen);
 
-        satVel[i * 3] = ((6371 + satCache[i].altList[curMissivarime + 1]) * cosLat * cosLon) - satPos[i * 3];
-        satVel[i * 3 + 1] = ((6371 + satCache[i].altList[curMissivarime + 1]) * cosLat * sinLon) - satPos[i * 3 + 1];
-        satVel[i * 3 + 2] = ((6371 + satCache[i].altList[curMissivarime + 1]) * sinLat) - satPos[i * 3 + 2];
+        cosLat = Math.cos(satCache[i].latList[curMissivarTime + 1] * DEG2RAD);
+        sinLat = Math.sin(satCache[i].latList[curMissivarTime + 1] * DEG2RAD);
+        cosLon = Math.cos((satCache[i].lonList[curMissivarTime + 1] * DEG2RAD) + gmstNext);
+        sinLon = Math.sin((satCache[i].lonList[curMissivarTime + 1] * DEG2RAD) + gmstNext);
+
+        satVel[i * 3] = ((6371 + satCache[i].altList[curMissivarTime + 1]) * cosLat * cosLon) - satPos[i * 3];
+        satVel[i * 3 + 1] = ((6371 + satCache[i].altList[curMissivarTime + 1]) * cosLat * sinLon) - satPos[i * 3 + 1];
+        satVel[i * 3 + 2] = ((6371 + satCache[i].altList[curMissivarTime + 1]) * sinLat) - satPos[i * 3 + 2];
+
+        // satVel[i * 3] = 0;
+        // satVel[i * 3 + 1] = 0;
+        // satVel[i * 3 + 2] = 0;
 
         x = satPos[i * 3];
         y = satPos[i * 3 + 1];
@@ -787,13 +798,18 @@ function propagateCruncher () {
   // NOTE The longer the delay the more jitter at higher speeds of propagation
   setTimeout(propagateCruncher, 1 * globalPropagationRate * globalPropagationRateMultiplier / divisor);
 
-  var stopTime1 = performance.now();
-  if (numOfCrunches > 5) {
-    totalCrunchTime1 += (stopTime1 - startTime1);
-    averageTimeForCrunchLoop = totalCrunchTime1 / (numOfCrunches - 5);
+
+  // //////////////////////////////////////////////////////////////////////////
+  // NOTE: Benchmarking
+  //
+  // var stopTime1 = performance.now();
+  // if (numOfCrunches > 5) {
+    // totalCrunchTime1 += (stopTime1 - startTime1);
+    // averageTimeForCrunchLoop = totalCrunchTime1 / (numOfCrunches - 5);
 
     // averageTimeForPropagate = totalCrunchTime2 / (numOfCrunches - 5);
-  }
+  // }
+  // //////////////////////////////////////////////////////////////////////////
 }
 
 /** Returns Ordinal Day (Commonly Called J Day) */

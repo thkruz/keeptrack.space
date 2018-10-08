@@ -40,20 +40,20 @@ or mirrored at any other location without the express written permission of the 
     mapManager
     sensorManager
     tleManager
-    MassRaidPre
+    missileManager.MassRaidPre
     saveAs
     Blob
     FileReader
-    UsaICBM
-    RussianICBM
-    NorthKoreanBM
-    ChinaICBM
+    missileManager.UsaICBM
+    missileManager.RussianICBM
+    missileManager.NorthKoreanBM
+    missileManager.ChinaICBM
     Missile
-    missilesInUse
-    lastMissileError
+    missileManager.missilesInUse
+    missileManager.lastMissileError
     settingsManager
 */
-var canvasDOM = $('#canvas');
+var canvasDOM = $('#canvas-holder');
 var mapImageDOM = $('#map-image');
 var mapMenuDOM = $('#map-menu');
 var satHoverBoxDOM = $('#sat-hoverbox');
@@ -97,7 +97,7 @@ var lkpassed = false;
         _offlineMessage();
         throw new Error('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
       } else {
-        ga('send', 'event', 'Offline Software', settingsManager.offlineLocation, 'Licensed');
+        // ga('send', 'event', 'Offline Software', settingsManager.offlineLocation, 'Licensed');
       }
       uiController.resize2DMap();
     })();
@@ -398,17 +398,17 @@ var lkpassed = false;
         }
       });
 
-      $('#facebook-share').click(function () {
-        ga('send', 'social', 'Facebook', 'share', 'http://keeptrack.com');
-      });
-
-      $('#twitter-share').click(function () {
-        ga('send', 'social', 'Twitter', 'share', 'http://keeptrack.com');
-      });
-
-      $('#reddit-share').click(function () {
-        ga('send', 'social', 'Reddit', 'share', 'http://keeptrack.com');
-      });
+      // $('#facebook-share').click(function () {
+      //   ga('send', 'social', 'Facebook', 'share', 'http://keeptrack.com');
+      // });
+      //
+      // $('#twitter-share').click(function () {
+      //   ga('send', 'social', 'Twitter', 'share', 'http://keeptrack.com');
+      // });
+      //
+      // $('#reddit-share').click(function () {
+      //   ga('send', 'social', 'Reddit', 'share', 'http://keeptrack.com');
+      // });
 
       // NOTE: MOVE THIS
         $('#legend-hover-menu').click(function (e) {
@@ -543,6 +543,7 @@ var lkpassed = false;
       });
 
       // USAF Radars
+      $('#radar-cspocAll').click(function () { sensorManager.setSensor('SSN'); });
       $('#radar-beale').click(function () { sensorManager.setSensor(sensorManager.sensorList.BLE); });
       $('#radar-capecod').click(function () { sensorManager.setSensor(sensorManager.sensorList.COD); });
       $('#radar-clear').click(function () { sensorManager.setSensor(sensorManager.sensorList.CLR); });
@@ -1173,13 +1174,13 @@ var lkpassed = false;
         launchTime = new Date(launchTime[0] + 'T' + launchTime[1] + 'Z').getTime();
 
         if (type > 0) {
-          if (type === 1) MassRaidPre(launchTime, 'simulation/Russia2USA.json');
-          if (type === 2) MassRaidPre(launchTime, 'simulation/Russia2USAalt.json');
-          if (type === 3) MassRaidPre(launchTime, 'simulation/China2USA.json');
-          if (type === 4) MassRaidPre(launchTime, 'simulation/NorthKorea2USA.json');
-          if (type === 5) MassRaidPre(launchTime, 'simulation/USA2Russia.json');
-          if (type === 6) MassRaidPre(launchTime, 'simulation/USA2China.json');
-          if (type === 7) MassRaidPre(launchTime, 'simulation/USA2NorthKorea.json');
+          if (type === 1) missileManager.MassRaidPre(launchTime, 'simulation/Russia2USA.json');
+          if (type === 2) missileManager.MassRaidPre(launchTime, 'simulation/Russia2USAalt.json');
+          if (type === 3) missileManager.MassRaidPre(launchTime, 'simulation/China2USA.json');
+          if (type === 4) missileManager.MassRaidPre(launchTime, 'simulation/NorthKorea2USA.json');
+          if (type === 5) missileManager.MassRaidPre(launchTime, 'simulation/USA2Russia.json');
+          if (type === 6) missileManager.MassRaidPre(launchTime, 'simulation/USA2China.json');
+          if (type === 7) missileManager.MassRaidPre(launchTime, 'simulation/USA2NorthKorea.json');
           ga('send', 'event', 'Missile Sim', type, 'Sim Number');
           $('#ms-error').html('Large Scale Attack Loaded');
           $('#ms-error').show();
@@ -1198,37 +1199,37 @@ var lkpassed = false;
               return;
             }
           } else { // Premade Target
-            tgtLat = globalBMTargets[target * 3];
-            tgtLon = globalBMTargets[(target * 3) + 1];
+            tgtLat = missileManager.globalBMTargets[target * 3];
+            tgtLon = missileManager.globalBMTargets[(target * 3) + 1];
           }
 
           var a, b, attackerName;
 
           if (attacker < 200) { // USA
             a = attacker - 100;
-            b = 500 - missilesInUse;
-            attackerName = UsaICBM[a * 4 + 2];
-            Missile(UsaICBM[a * 4], UsaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, UsaICBM[a * 4 + 2], 30, 2.9, 0.07, UsaICBM[a * 4 + 3], 'United States');
+            b = 500 - missileManager.missilesInUse;
+            attackerName = missileManager.UsaICBM[a * 4 + 2];
+            missileManager.Missile(missileManager.UsaICBM[a * 4], missileManager.UsaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States');
           } else if (attacker < 300) { // Russian
             a = attacker - 200;
-            b = 500 - missilesInUse;
-            attackerName = RussianICBM[a * 4 + 2];
-            Missile(RussianICBM[a * 4], RussianICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, RussianICBM[a * 4 + 2], 30, 2.9, 0.07, RussianICBM[a * 4 + 3], 'Russia');
+            b = 500 - missileManager.missilesInUse;
+            attackerName = missileManager.RussianICBM[a * 4 + 2];
+            missileManager.Missile(missileManager.RussianICBM[a * 4], missileManager.RussianICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.RussianICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.RussianICBM[a * 4 + 3], 'Russia');
           } else if (attacker < 400) { // Chinese
             a = attacker - 300;
-            b = 500 - missilesInUse;
-            attackerName = ChinaICBM[a * 4 + 2];
-            Missile(ChinaICBM[a * 4], ChinaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, ChinaICBM[a * 4 + 2], 30, 2.9, 0.07, ChinaICBM[a * 4 + 3], 'China');
+            b = 500 - missileManager.missilesInUse;
+            attackerName = missileManager.ChinaICBM[a * 4 + 2];
+            missileManager.Missile(missileManager.ChinaICBM[a * 4], missileManager.ChinaICBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.ChinaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.ChinaICBM[a * 4 + 3], 'China');
           } else if (attacker < 500) { // North Korean
             a = attacker - 400;
-            b = 500 - missilesInUse;
-            attackerName = NorthKoreanBM[a * 4 + 2];
-            Missile(NorthKoreanBM[a * 4], NorthKoreanBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, NorthKoreanBM[a * 4 + 2], 30, 2.9, 0.07, NorthKoreanBM[a * 4 + 3], 'North Korea');
+            b = 500 - missileManager.missilesInUse;
+            attackerName = missileManager.NorthKoreanBM[a * 4 + 2];
+            missileManager.Missile(missileManager.NorthKoreanBM[a * 4], missileManager.NorthKoreanBM[a * 4 + 1], tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.NorthKoreanBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.NorthKoreanBM[a * 4 + 3], 'North Korea');
           }
           ga('send', 'event', 'New Missile', attackerName, 'Attacker');
           ga('send', 'event', 'New Missile', tgtLat + ', ' + tgtLon, 'Target');
 
-          $('#ms-error').html(lastMissileError);
+          $('#ms-error').html(missileManager.lastMissileError);
           $('#ms-error').show();
         }
         e.preventDefault();
@@ -1480,7 +1481,6 @@ var lkpassed = false;
     function _bottomIconPress (evt) {
       var sat;
       if (settingsManager.isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
-      console.log(evt);
       ga('send', 'event', 'Bottom Icon', evt.currentTarget.id, 'Selected');
       switch (evt.currentTarget.id) {
         case 'menu-sensor-list': // No Keyboard Commands
@@ -2310,7 +2310,7 @@ var lkpassed = false;
       if (!sat.missile) {
         satellite.getTEARR(sat);
       } else {
-        getMissileTEARR(sat);
+        missileManager.getMissileTEARR(sat);
       }
       if (satellite.degreesLong(satellite.currentTEARR.lon) >= 0) {
         $('#sat-longitude').html(satellite.degreesLong(satellite.currentTEARR.lon).toFixed(3) + '°E');
@@ -2425,7 +2425,7 @@ var lkpassed = false;
   });
 
   uiController.useCurrentGeolocationAsSensor = function () {
-    if (location.protocol === 'https:' && !settingsManager.geolocationUsed) {
+    if (location.protocol === 'https:' && !settingsManager.geolocationUsed && settingsManager.isMobileModeEnabled) {
       navigator.geolocation.getCurrentPosition(function (position) {
         settingsManager.geolocation.lat = position.coords.latitude;
         settingsManager.geolocation.long = position.coords.longitude;
@@ -2714,7 +2714,6 @@ var lkpassed = false;
 
   _resetSensorSelected = function () {
     // Return to default settings with nothing 'inview'
-    console.log(1);
     satCruncher.postMessage({
       typ: 'offset',
       dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
@@ -2732,7 +2731,7 @@ var lkpassed = false;
 
   _offlineMessage = function () {
     $('#loader-text').html('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
-    ga('send', 'event', 'Expired Offline Software', settingsManager.offlineLocation, 'Expired');
+    // ga('send', 'event', 'Expired Offline Software', settingsManager.offlineLocation, 'Expired');
   };
 
   var isFooterShown = true;

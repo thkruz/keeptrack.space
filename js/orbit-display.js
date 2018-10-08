@@ -223,14 +223,14 @@
     gl.uniformMatrix4fv(pathShader.uCamMatrix, false, camMatrix);
     gl.uniformMatrix4fv(pathShader.uPMatrix, false, pMatrix);
 
-    if (currentSelectId !== -1 && !satSet.getSat(currentSelectId).static) {
+    if (currentSelectId !== -1 && !satSet.getSatExtraOnly(currentSelectId).static) {
       gl.uniform4fv(pathShader.uColor, selectColor);
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
       gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
       gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
     }
 
-    if (currentHoverId !== -1 && currentHoverId !== currentSelectId && !satSet.getSat(currentHoverId).static) { // avoid z-fighting
+    if (currentHoverId !== -1 && currentHoverId !== currentSelectId && !satSet.getSatExtraOnly(currentHoverId).static) { // avoid z-fighting
       gl.uniform4fv(pathShader.uColor, hoverColor);
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
       gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);

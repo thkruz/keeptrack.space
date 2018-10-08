@@ -25,13 +25,13 @@ or mirrored at any other location without the express written permission of the 
 */
 
 // Constants
-var TAU = 2 * Math.PI;
-var DEG2RAD = TAU / 360;
-var RAD2DEG = 360 / TAU;
-var MINUTES_PER_DAY = 1440;
-var MILLISECONDS_PER_DAY = 1.15741e-8;
 
 (function () {
+  const tau = 2 * Math.PI;
+  const deg2rad = tau / 360;
+  const rad2deg = 360 / tau;
+  const minutesPerDay = 1440;
+  const millisecondsPerDay = 1.15741e-8;
   // Settings
   satellite.lookanglesInterval = 5;
   satellite.lookanglesLength = 2;
@@ -107,8 +107,8 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     }
     satellite.currentSensor = sensor;
     satellite.currentSensor.observerGd = {   // Array to calculate look angles in propagate()
-      latitude: sensor.lat * DEG2RAD,
-      longitude: sensor.long * DEG2RAD,
+      latitude: sensor.lat * deg2rad,
+      longitude: sensor.long * deg2rad,
       height: sensor.obshei * 1               // Converts from string to number TODO: Find correct way to convert string to integer
     };
   };
@@ -130,10 +130,10 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
                  propTime.getUTCHours(),
                  propTime.getUTCMinutes(),
                  propTime.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-    j += propTime.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+    j += propTime.getUTCMilliseconds() * millisecondsPerDay;
     var gmst = satellite.gstime(j);
 
-    var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+    var m = (j - satrec.jdsatepoch) * minutesPerDay;
     var positionEci = satellite.sgp4(satrec, m);
     var gpos;
 
@@ -177,10 +177,10 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
                  now.getUTCHours(),
                  now.getUTCMinutes(),
                  now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+    j += now.getUTCMilliseconds() * millisecondsPerDay;
     var gmst = satellite.gstime(j);
 
-    var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+    var m = (j - satrec.jdsatepoch) * minutesPerDay;
     var positionEci = satellite.sgp4(satrec, m);
     var positionEcf, lookAngles;
     var gpos;
@@ -192,8 +192,8 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       currentTEARR.lat = gpos.latitude;
       positionEcf = satellite.eciToEcf(positionEci.position, gmst);
       lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-      currentTEARR.azimuth = lookAngles.azimuth * RAD2DEG;
-      currentTEARR.elevation = lookAngles.elevation * RAD2DEG;
+      currentTEARR.azimuth = lookAngles.azimuth * rad2deg;
+      currentTEARR.elevation = lookAngles.elevation * rad2deg;
       currentTEARR.range = lookAngles.rangeSat;
     } catch (e) {
       currentTEARR.alt = 0;
@@ -373,17 +373,17 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       now.getUTCHours(),
       now.getUTCMinutes(),
       now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+      j += now.getUTCMilliseconds() * millisecondsPerDay;
       var gmst = satellite.gstime(j);
 
-      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+      var m = (j - satrec.jdsatepoch) * minutesPerDay;
       var positionEci = satellite.sgp4(satrec, m);
       var positionEcf, lookAngles, azimuth, elevation, range;
 
       positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
       lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-      azimuth = lookAngles.azimuth * RAD2DEG;
-      elevation = lookAngles.elevation * RAD2DEG;
+      azimuth = lookAngles.azimuth * rad2deg;
+      elevation = lookAngles.elevation * rad2deg;
       range = lookAngles.rangeSat;
 
       if (sensor.obsminaz > sensor.obsmaxaz) {
@@ -431,7 +431,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     var propOffset = timeManager.getPropOffset();
     var propTempOffset = 0;
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-    var orbitalPeriod = MINUTES_PER_DAY / (satrec.no * MINUTES_PER_DAY / TAU); // Seconds in a day divided by mean motion
+    var orbitalPeriod = minutesPerDay / (satrec.no * minutesPerDay / tau); // Seconds in a day divided by mean motion
     for (var i = 0; i < (searchLength * 24 * 60 * 60); i += interval) {         // 5second Looks
       // Only pass a maximum of 5 passes
       if (passTimesArray.length >= 5) { return passTimesArray; }
@@ -444,17 +444,17 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       now.getUTCHours(),
       now.getUTCMinutes(),
       now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+      j += now.getUTCMilliseconds() * millisecondsPerDay;
       var gmst = satellite.gstime(j);
 
-      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+      var m = (j - satrec.jdsatepoch) * minutesPerDay;
       var positionEci = satellite.sgp4(satrec, m);
       var positionEcf, lookAngles, azimuth, elevation, range;
 
       positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
       lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-      azimuth = lookAngles.azimuth * RAD2DEG;
-      elevation = lookAngles.elevation * RAD2DEG;
+      azimuth = lookAngles.azimuth * rad2deg;
+      elevation = lookAngles.elevation * rad2deg;
       range = lookAngles.rangeSat;
 
       if (sensor.obsminaz > sensor.obsmaxaz) {
@@ -491,7 +491,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     satellite.setobs(satellite.sensorListUS[0]);
 
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-    var orbitalPeriod = MINUTES_PER_DAY / (satrec.no * MINUTES_PER_DAY / TAU); // Seconds in a day divided by mean motion
+    var orbitalPeriod = minutesPerDay / (satrec.no * minutesPerDay / tau); // Seconds in a day divided by mean motion
     var tbl = document.getElementById('looksmultisite');           // Identify the table to update
     tbl.innerHTML = '';                                   // Clear the table from old object data
     var tblLength = 0;                                   // Iniially no rows to the table
@@ -608,7 +608,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       meana = parseFloat(meana).toPrecision(7);
       meana = pad(meana, 8);
 
-      var rasc = (sat.raan * RAD2DEG).toPrecision(7);
+      var rasc = (sat.raan * rad2deg).toPrecision(7);
       // if (rascOffset) {
       //   rasc = (rasc * 1) + 180; // Spin the orbit 180 degrees.
       //   if (rasc > 360) {
@@ -625,7 +625,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       var scc = sat.SCC_NUM;
 
       var intl = sat.TLE1.substr(9, 8);
-      var inc = (sat.inclination * RAD2DEG).toPrecision(7);
+      var inc = (sat.inclination * rad2deg).toPrecision(7);
       inc = inc.split('.');
       inc[0] = inc[0].substr(-3, 3);
       inc[1] = inc[1].substr(0, 4);
@@ -639,7 +639,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
 
       var ecen = sat.eccentricity.toPrecision(7).substr(2, 7);
 
-      var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
+      var argPe = (sat.argPe * rad2deg).toPrecision(7);
       argPe = argPe.split('.');
       argPe[0] = argPe[0].substr(-3, 3);
       argPe[1] = argPe[1].substr(0, 4);
@@ -681,7 +681,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       var scc = sat.SCC_NUM;
 
       var intl = sat.TLE1.substr(9, 8);
-      var inc = (sat.inclination * RAD2DEG).toPrecision(7);
+      var inc = (sat.inclination * rad2deg).toPrecision(7);
       inc = inc.split('.');
       inc[0] = inc[0].substr(-3, 3);
       inc[1] = inc[1].substr(0, 4);
@@ -695,7 +695,7 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
 
       var ecen = sat.eccentricity.toPrecision(7).substr(2, 7);
 
-      var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
+      var argPe = (sat.argPe * rad2deg).toPrecision(7);
       argPe = argPe.split('.');
       argPe[0] = argPe[0].substr(-3, 3);
       argPe[1] = argPe[1].substr(0, 4);
@@ -724,10 +724,10 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
                    now.getUTCHours(),
                    now.getUTCMinutes(),
                    now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+      j += now.getUTCMilliseconds() * millisecondsPerDay;
       var gmst = satellite.gstime(j);
 
-      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+      var m = (j - satrec.jdsatepoch) * minutesPerDay;
       var positionEci = satellite.sgp4(satrec, m);
 
       var gpos, lat, lon;
@@ -840,17 +840,17 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     now.getUTCHours(),
     now.getUTCMinutes(),
     now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+    j += now.getUTCMilliseconds() * millisecondsPerDay;
     var gmst = satellite.gstime(j);
 
-    var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+    var m = (j - satrec.jdsatepoch) * minutesPerDay;
     var positionEci = satellite.sgp4(satrec, m);
     var positionEcf, lookAngles, azimuth, elevation, range;
 
     positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
     lookAngles = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf);
-    azimuth = lookAngles.azimuth * RAD2DEG;
-    elevation = lookAngles.elevation * RAD2DEG;
+    azimuth = lookAngles.azimuth * rad2deg;
+    elevation = lookAngles.elevation * rad2deg;
     range = lookAngles.rangeSat;
 
     if (satellite.currentSensor.obsminaz < satellite.currentSensor.obsmaxaz) {
@@ -870,17 +870,17 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
         now1.getUTCHours(),
         now1.getUTCMinutes(),
         now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-        j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+        j1 += now1.getUTCMilliseconds() * millisecondsPerDay;
         var gmst1 = satellite.gstime(j1);
 
-        var m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
+        var m1 = (j1 - satrec.jdsatepoch) * minutesPerDay;
         var positionEci1 = satellite.sgp4(satrec, m1);
         var positionEcf1, lookAngles1, azimuth1, elevation1, range1;
 
         positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
         lookAngles1 = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf1);
-        azimuth1 = lookAngles1.azimuth * RAD2DEG;
-        elevation1 = lookAngles1.elevation * RAD2DEG;
+        azimuth1 = lookAngles1.azimuth * rad2deg;
+        elevation1 = lookAngles1.elevation * rad2deg;
         range1 = lookAngles1.rangeSat;
         if (!((azimuth >= satellite.currentSensor.obsminaz || azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
         ((azimuth >= satellite.currentSensor.obsminaz2 || azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
@@ -904,16 +904,16 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
           now1.getUTCHours(),
           now1.getUTCMinutes(),
           now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-          j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+          j1 += now1.getUTCMilliseconds() * millisecondsPerDay;
           gmst1 = satellite.gstime(j1);
 
-          m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
+          m1 = (j1 - satrec.jdsatepoch) * minutesPerDay;
           positionEci1 = satellite.sgp4(satrec, m1);
 
           positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
           lookAngles1 = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf1);
-          azimuth1 = lookAngles1.azimuth * RAD2DEG;
-          elevation1 = lookAngles1.elevation * RAD2DEG;
+          azimuth1 = lookAngles1.azimuth * rad2deg;
+          elevation1 = lookAngles1.elevation * rad2deg;
           range1 = lookAngles1.rangeSat;
           if (!((azimuth1 >= satellite.currentSensor.obsminaz || azimuth1 <= satellite.currentSensor.obsmaxaz) && (elevation1 >= satellite.currentSensor.obsminel && elevation1 <= satellite.currentSensor.obsmaxel) && (range1 <= satellite.currentSensor.obsmaxrange && range1 >= satellite.currentSensor.obsminrange)) ||
           ((azimuth1 >= satellite.currentSensor.obsminaz2 || azimuth1 <= satellite.currentSensor.obsmaxaz2) && (elevation1 >= satellite.currentSensor.obsminel2 && elevation1 <= satellite.currentSensor.obsmaxel2) && (range1 <= satellite.currentSensor.obsmaxrange2 && range1 >= satellite.currentSensor.obsminrange2))) {
@@ -958,17 +958,17 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
     now.getUTCHours(),
     now.getUTCMinutes(),
     now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+    j += now.getUTCMilliseconds() * millisecondsPerDay;
     var gmst = satellite.gstime(j);
 
-    var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+    var m = (j - satrec.jdsatepoch) * minutesPerDay;
     var positionEci = satellite.sgp4(satrec, m);
     var positionEcf, lookAngles, azimuth, elevation, range;
 
     positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
     lookAngles = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf);
-    azimuth = lookAngles.azimuth * RAD2DEG;
-    elevation = lookAngles.elevation * RAD2DEG;
+    azimuth = lookAngles.azimuth * rad2deg;
+    elevation = lookAngles.elevation * rad2deg;
     range = lookAngles.rangeSat;
 
     if (satellite.currentSensor.obsminaz < satellite.currentSensor.obsmaxaz) {
@@ -1040,10 +1040,10 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
                    now.getUTCHours(),
                    now.getUTCMinutes(),
                    now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+      j += now.getUTCMilliseconds() * millisecondsPerDay;
       var gmst = satellite.gstime(j);
 
-      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+      var m = (j - satrec.jdsatepoch) * minutesPerDay;
       var positionEci = satellite.sgp4(satrec, m);
 
       var gpos, lat, lon;
@@ -1057,8 +1057,8 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
       var positionEcf, lookAngles, azimuth, elevation, range;
       positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
       lookAngles = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf);
-      azimuth = lookAngles.azimuth * RAD2DEG;
-      elevation = lookAngles.elevation * RAD2DEG;
+      azimuth = lookAngles.azimuth * rad2deg;
+      elevation = lookAngles.elevation * rad2deg;
       range = lookAngles.rangeSat;
       var inview = 0;
 

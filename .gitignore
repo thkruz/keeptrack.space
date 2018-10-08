@@ -1,58 +1,7 @@
-# Windows image file caches
-Thumbs.db
-ehthumbs.db
-
-# Folder config file
-Desktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
-
-# =========================
-# Operating System Files
-# =========================
-
-# OSX
-# =========================
-
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Thumbnails
-._*
-
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
 # Remote-FTP config files
 .ftpconfig
 .ftpconfig_L
 ftpignore
-
-#.imdone Files
-.imdone
 
 # Admin Files for Updates
 admin/
@@ -67,9 +16,11 @@ offline/*
 # James Yoder Email
 license/jamesyoderemail.txt
 
+# High Res Images
 images/2_earth_16k-bak.jpg
 images/6_night_16k-bak.jpg
 
+# Min Versions of JS
 js/*.min.js
 
 dev.htm

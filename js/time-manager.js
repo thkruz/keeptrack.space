@@ -1,7 +1,6 @@
 /* global
   $
 */
-var MILLISECONDS_PER_DAY = 1.15741e-8;
 
 (function () {
   var timeManager = {};
@@ -13,6 +12,9 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
   // Variables pulled from timeManager.jday function to reduce garbage collection
   var jDayStart;
   var jDayDiff;
+
+  timeManager.dateObject = new Date();
+  timeManager.nowTemp = timeManager.dateObject;
 
   timeManager.now = propFrozen; // (initialized as Date.now)
   timeManager.propRealTime = propFrozen; // actual time we're running it (initialized as Date.now)
@@ -135,15 +137,13 @@ var MILLISECONDS_PER_DAY = 1.15741e-8;
 
   // Propagation Time Functions
   timeManager.propTime = function () {
-    timeManager.now = new Date();
-    realElapsedMsec = Number(timeManager.now) - Number(timeManager.propRealTime);
-    scaledMsec = realElapsedMsec * timeManager.propRate;
     if (timeManager.propRate === 0) {
-      timeManager.now.setTime(Number(propFrozen) + timeManager.propOffset);
+      timeManager.nowTemp.setTime(Number(propFrozen) + timeManager.propOffset);
     } else {
-      timeManager.now.setTime(Number(timeManager.propRealTime) + timeManager.propOffset + scaledMsec);
+      timeManager.nowTemp.setTime(Number(timeManager.propRealTime) + timeManager.propOffset +
+                                 ((Number(timeManager.now) - Number(timeManager.propRealTime)) * timeManager.propRate));
     }
-    return timeManager.now;
+    return timeManager.nowTemp;
   };
 
   timeManager.propTimeCheck = function (propTempOffset, propRealTime) {

@@ -632,13 +632,16 @@ or mirrored at any other location without the express written permission of the 
     drawDivisor = Math.max(timeManager.propRate, 0.001);
     drawDt = Math.min((drawNow - lastDrawTime) / 1000.0, 1.0 / drawDivisor);
     drawDt *= timeManager.propRate; // Adjust drawDt correspond to the propagation rate
+    satSet.satDataLenInDraw = satData.length;
     if (!settingsManager.lowPerf) {
       if (!settingsManager.isSatOverflyModeOn && !settingsManager.isFOVBubbleModeOn) {
-        for (drawI = 0; drawI < ((satData.length - MAX_FIELD_OF_VIEW_MARKERS) * 3); drawI++) {
+        satSet.satDataLenInDraw -= settingsManager.maxFieldOfViewMarkers;
+        for (drawI = 0; drawI < ((satSet.satDataLenInDraw) * 3); drawI++) {
           satPos[drawI] += satVel[drawI] * drawDt;
         }
       } else {
-        for (drawI = 0; drawI < (satData.length * 3); drawI++) {
+        satSet.satDataLenInDraw *= 3;
+        for (drawI = 0; drawI < (satSet.satDataLenInDraw); drawI++) {
           satPos[drawI] += satVel[drawI] * drawDt;
         }
       }
@@ -1053,10 +1056,7 @@ or mirrored at any other location without the express written permission of the 
   };
 
   satSet.selectSat = function (i) {
-    console.log(i);
-    console.log(selectedSat);
     if (i === selectedSat) return;
-    console.log(2);
     satCruncher.postMessage({
       satelliteSelected: [i]
     });
@@ -1086,4 +1086,5 @@ or mirrored at any other location without the express written permission of the 
 
   window.satSet = satSet;
   window.satCruncher = satCruncher;
+  window.satPos = satPos;
 })();

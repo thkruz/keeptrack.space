@@ -2,9 +2,7 @@
   $
 */
 
-var MAX_MISSILES = 500;
-var MAX_ANALSATS = 30;
-var MAX_FIELD_OF_VIEW_MARKERS = 200000;
+
 
 (function () {
   var settingsManager = {};
@@ -14,10 +12,14 @@ var MAX_FIELD_OF_VIEW_MARKERS = 200000;
   settingsManager.versionDate = 'October 6, 2018';
 
   settingsManager.lowPerf = false;
+  settingsManager.maxFieldOfViewMarkers = 200000;
+  settingsManager.maxMissiles = 500;
+  settingsManager.maxAnalystSats = 30;
 
   (function initParseFromGETVariables () {
     // This is an initial parse of the GET variables
     // A satSet focused one happens later.
+
     var queryStr = window.location.search.substring(1);
     var params = queryStr.split('&');
     for (var i = 0; i < params.length; i++) {
@@ -26,7 +28,7 @@ var MAX_FIELD_OF_VIEW_MARKERS = 200000;
       switch (key) {
         case 'lowperf':
           settingsManager.lowPerf = true;
-          MAX_FIELD_OF_VIEW_MARKERS = 1;
+          settingsManager.maxFieldOfViewMarkers = 1;
           $('#satOverfly-opt').hide();
           $('#fovBubble-opt').hide();
           $('#settings-lowperf').hide();
@@ -114,8 +116,6 @@ var MAX_FIELD_OF_VIEW_MARKERS = 200000;
     $('.btn').css('background-color', '#0091ea');
     settingsManager.themes.currentTheme = 'Blue';
   };
-
-  settingsManager.hiresImages = false; // USE OFFLINE ONLY
 
   settingsManager.shadersReady = false;
   settingsManager.cruncherReady = false;

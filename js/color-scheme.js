@@ -28,10 +28,9 @@
   ColorScheme.objectTypeFlags.white = true;
 
   // Removed from function to reduce memory leak
-  var numSats, colorData, pickableData, colors, i;
-  var lastCalculation = 0;
-  var satData;
   ColorScheme.prototype.calculateColorBuffers = function (isForceRecolor) {
+    var numSats, colorData, pickableData, colors, i;
+    var lastCalculation = 0;
     var now = Date.now();
     if (!pickableData || !colorData) {
       this.lastCalculation = now;
@@ -49,8 +48,8 @@
     lastCalculation = now;
 
     var isFirstMarkerChecked = false;
-    satData = satSet.getSatData();
-    satInView = satSet.getSatInView();
+    var satData = satSet.getSatData();
+    var satInView = satSet.getSatInView();
     if (this.isVelocityColorScheme) {
       satVel = satSet.getSatVel();
     }

@@ -26,14 +26,17 @@
 
   var vertPosBuf, vertNormBuf, texCoordBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
   var vertCount;
-  var earthJ;
   var earthNow;
-  var earthEra;
-  var timeTextStr;
-  var tDS; // time Date String
   var mvMatrix;
+  var mvMatrixEmpty = mat4.create();
   var nMatrix;
-  var lightDirection;
+  var nMatrixEmpty = mat3.create();
+  earth.earthJ = 0;
+  earth.earthEra = 0;
+  earth.timeTextStr = '';
+  earth.timeTextStrEmpty = '';
+  earth.lightDirection = [];
+  earth.propRateDOM = $('#propRate-status-box');
   var earthShader;
 
   earth.pos = [0, 0, 0];
@@ -227,17 +230,22 @@
 
     // wall time is not propagation time, so better print it
     // TODO substring causes 12kb memory leak every frame.
-    tDS = earthNow.toJSON();
-    timeTextStr = tDS.substring(0, 10) + ' ' + tDS.substring(11, 19);
+    earth.tDS = earthNow.toJSON();
+    earth.timeTextStr = earth.timeTextStrEmpty;
+    for (earth.iText = 0; earth.iText < 20; earth.iText++) {
+      if (earth.iText < 10) earth.timeTextStr += earth.tDS[earth.iText];
+      if (earth.iText === 10) earth.timeTextStr += ' ';
+      if (earth.iText > 11) earth.timeTextStr += earth.tDS[earth.iText-1];
+    }
     if (settingsManager.isPropRateChange && !settingsManager.isAlwaysHidePropRate) {
       if (timeManager.propRate > 1.01 || timeManager.propRate < 0.99) {
-        if (timeManager.propRate < 10) $('#propRate-status-box').html('Propagation Speed: ' + timeManager.propRate.toFixed(1) + 'x');
-        if (timeManager.propRate >= 10) $('#propRate-status-box').html('Propagation Speed: ' + timeManager.propRate.toFixed(2) + 'x');
-        $('#propRate-status-box').show();
+        if (timeManager.propRate < 10) earth.propRateDOM.html('Propagation Speed: ' + timeManager.propRate.toFixed(1) + 'x');
+        if (timeManager.propRate >= 10) earth.propRateDOM.html('Propagation Speed: ' + timeManager.propRate.toFixed(2) + 'x');
+        earth.propRateDOM.show();
         isPropRateVisible = true;
       } else {
         if (isPropRateVisible) {
-          $('#propRate-status-box').hide();
+          earth.propRateDOM.hide();
           isPropRateVisible = false;
         }
       }
@@ -245,31 +253,32 @@
     }
 
     // NOTE: jQuery call was causing additional Node every iteration.
-    document.getElementById('datetime-text').innerText = timeTextStr;
+    document.getElementById('datetime-text').innerText = earth.timeTextStr;
 
     // Don't update the time input unless it is currently being viewed.
     if (settingsManager.isEditTime || !settingsManager.cruncherReady) {
-      $('#datetime-input-tb').val(timeTextStr);
+      $('#datetime-input-tb').val(earth.timeTextStr);
     }
 
-    earthJ = timeManager.jday(earthNow.getUTCFullYear(),
+    earth.earthJ = timeManager.jday(earthNow.getUTCFullYear(),
                  earthNow.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  earthNow.getUTCDate(),
                  earthNow.getUTCHours(),
                  earthNow.getUTCMinutes(),
                  earthNow.getUTCSeconds());
-    earthJ += earthNow.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+    earth.earthJ += earthNow.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
 
-    earthEra = satellite.gstime(earthJ);
+    earth.earthEra = satellite.gstime(earth.earthJ);
 
-    lightDirection = sun.currentDirection();
-    vec3.normalize(lightDirection, lightDirection);
+    // Sets earth.lightDirection [x, y , z]
+    sun.currentDirection();
+    vec3.normalize(earth.lightDirection, earth.lightDirection);
 
-    mvMatrix = mat4.create();
+    mvMatrix = mvMatrixEmpty;
     mat4.identity(mvMatrix);
-    mat4.rotateZ(mvMatrix, mvMatrix, earthEra);
+    mat4.rotateZ(mvMatrix, mvMatrix, earth.earthEra);
     mat4.translate(mvMatrix, mvMatrix, earth.pos);
-    nMatrix = mat3.create();
+    nMatrix = nMatrixEmpty;
     mat3.normalFromMat4(nMatrix, mvMatrix);
 
     gl.useProgram(earthShader);
@@ -279,7 +288,7 @@
     gl.uniformMatrix4fv(earthShader.uMvMatrix, false, mvMatrix);
     gl.uniformMatrix4fv(earthShader.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(earthShader.uCamMatrix, false, camMatrix);
-    gl.uniform3fv(earthShader.uLightDirection, lightDirection);
+    gl.uniform3fv(earthShader.uLightDirection, earth.lightDirection);
     gl.uniform3fv(earthShader.uAmbientLightColor, [0.03, 0.03, 0.03]); // RGB ambient light
     gl.uniform3fv(earthShader.uDirectionalLightColor, [1, 1, 0.9]); // RGB directional light
 

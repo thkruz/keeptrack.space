@@ -177,7 +177,7 @@ onmessage = function (m) {
 
       satPos = new Float32Array(len * 3);
       satVel = new Float32Array(len * 3);
-      satInView = new Float32Array(len);
+      satInView = new Int8Array(len);
 
       postMessage({
         extraData: JSON.stringify(extraData)
@@ -312,6 +312,8 @@ function propagateCruncher () {
   var s, m, pv, tLen, t;
   var sat;
   var isSensorChecked = false;
+  var az, el, rng, pos;
+  var q;
   while (i < len) {
     i++; // At the beginning so i starts at 0
     // totalCrunchTime2 += (stopTime2 - startTime2);
@@ -524,8 +526,8 @@ function propagateCruncher () {
         if (!isShowFOVBubble) continue;
         if (sensor.observerGd === sensor.defaultGd) continue;
 
-        var az, el, rng, pos;
-        var q = 20;
+        az, el, rng, pos;
+        q = 20;
 
         // Only on non-360 FOV
         if (sensor.obsminaz !== 0 && sensor.obsmaxaz !== 360) {
@@ -779,7 +781,7 @@ function propagateCruncher () {
     }
   }
   if (isResetFOVBubble) {
-    console.log('Resetting FOV Bubble');
+    // console.log('Resetting FOV Bubble');
     isResetFOVBubble = false;
     len -= fieldOfViewSetLength;
   }

@@ -36,7 +36,7 @@
       this.lastCalculation = now;
       numSats = satSet.numSats;
       colorData = new Float32Array(numSats * 4);
-      pickableData = new Float32Array(numSats);
+      pickableData = new Float32Array(numSats); // Broke as an Int8
     }
 
     if (!isForceRecolor && now - lastCalculation < settingsManager.reColorMinimumTime && lastCalculation !== 0) {

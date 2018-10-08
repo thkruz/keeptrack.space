@@ -3647,7 +3647,7 @@ define('satellite',[
     './coordinate-transforms/geodetic-to-ecf',
     './coordinate-transforms/topocentric',
     './coordinate-transforms/topocentric-to-look-angles',
-    './doppler-factor',
+    // './doppler-factor',
     './gstime/days2mdhms',
     './gstime/gstime',
     './gstime/jday',
@@ -3665,7 +3665,7 @@ define('satellite',[
     geodeticToEcf,
     topocentric,
     topocentricToLookAngles,
-    dopplerFactor,
+    // dopplerFactor,
     days2mdhms,
     gstime,
     jday,
@@ -3688,12 +3688,12 @@ define('satellite',[
         ecfToLookAngles: ecfToLookAngles,
         geodeticToEcf: geodeticToEcf,
 
-        dopplerFactor: dopplerFactor,
+        // dopplerFactor: dopplerFactor,
         gstime: gstime,
-        gstimeFromDate: function() {
-            return gstime(jday.apply(null, arguments));
-        },
-        jday: jday,
+        // gstimeFromDate: function() {
+        //     return gstime(jday.apply(null, arguments));
+        // },
+        // jday: jday,
         propagate: propagate,
         twoline2satrec: twoline2satrec,
         sgp4: sgp4

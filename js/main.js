@@ -620,6 +620,9 @@ var drawLoopCallback;
       }
   }
 
+  // TODO: Hover Box should have two sub DOMs whose text is replaced so that <br> is not made and removed
+  // OPTIMIZE: Less DOM creation
+
   function _hoverBoxOnSat (satId, satX, satY) {
     if (cameraType.current === cameraType.PLANETARIUM && !settingsManager.isDemoModeOn) {
       satHoverBoxDOM.css({display: 'none'});

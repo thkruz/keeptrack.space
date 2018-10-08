@@ -8,7 +8,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.42.3';
+  settingsManager.versionNumber = 'v0.42.4';
   settingsManager.versionDate = 'October 8, 2018';
 
   settingsManager.lowPerf = false;

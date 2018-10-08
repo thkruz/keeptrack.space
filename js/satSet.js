@@ -73,6 +73,8 @@ or mirrored at any other location without the express written permission of the 
   var uFOVi;  // Update FOV function iteration i variable
   var uFOVs;  // Update FOV function iteration S variable
 
+  var emptyMat4 = mat4.create();
+
   var satPos;
   var satVel;
   var satInView;
@@ -169,7 +171,7 @@ or mirrored at any other location without the express written permission of the 
 
     satPos = new Float32Array(m.data.satPos);
     satVel = new Float32Array(m.data.satVel);
-    satInView = new Float32Array(m.data.satInView);
+    satInView = new Int8Array(m.data.satInView);
 
     if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
       SCnow = Date.now();
@@ -653,7 +655,7 @@ or mirrored at any other location without the express written permission of the 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     //  gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
 
-    gl.uniformMatrix4fv(dotShader.uMvMatrix, false, mat4.create());
+    gl.uniformMatrix4fv(dotShader.uMvMatrix, false, emptyMat4);
     gl.uniformMatrix4fv(dotShader.uCamMatrix, false, camMatrix);
     gl.uniformMatrix4fv(dotShader.uPMatrix, false, pMatrix);
 
@@ -679,7 +681,7 @@ or mirrored at any other location without the express written permission of the 
     gl.useProgram(gl.pickShaderProgram);
     gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
     //  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.uniformMatrix4fv(gl.pickShaderProgram.uMvMatrix, false, mat4.create());
+    gl.uniformMatrix4fv(gl.pickShaderProgram.uMvMatrix, false, emptyMat4);
     gl.uniformMatrix4fv(gl.pickShaderProgram.uCamMatrix, false, camMatrix);
     gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
 

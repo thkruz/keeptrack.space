@@ -147,6 +147,8 @@ var FPSSideSpeed = 0;
 var FPSRun = 1;
 var FPSLastTime = 1;
 
+var satScreenPositionArray = {};
+
 var isShowNextPass = false;
 var isShowDistance = true;
 var isHoverBoxVisible = false;
@@ -350,13 +352,13 @@ var drawLoopCallback;
     _updateHover();
     _onDrawLoopComplete(drawLoopCallback);
     if (settingsManager.isDemoModeOn) _demoMode();
+
+    // Hide satMiniBoxes When Not in Use
     if ((!settingsManager.isSatLabelModeOn || cameraType.current !== cameraType.PLANETARIUM)) {
       if (isSatMiniBoxInUse) {
         $('#sat-minibox').html('');
       }
       isSatMiniBoxInUse = false;
-    } else {
-      _satLabelMode(settingsManager.isSatLabelModeOn);
     }
 
     // drawLines();
@@ -478,7 +480,7 @@ var drawLoopCallback;
           break;
         case cameraType.PLANETARIUM: // pivot around the earth looking away from the earth
           {
-            let satPos = _calculateSensorPos(pos);
+            let satPos = _calculateSensorPos({});
 
             // Pitch is the opposite of the angle to the latitude
             // Yaw is 90 degrees to the left of the angle to the longitude
@@ -566,9 +568,9 @@ var drawLoopCallback;
   function _updateHover () {
     if (searchBox.isHovering()) {
       updateHoverSatId = searchBox.getHoverSat();
-      updateHoverSatPos = satSet.getScreenCoords(updateHoverSatId, pMatrix, camMatrix);
-      if (!_earthHitTest(updateHoverSatPos.x, updateHoverSatPos.y)) {
-        _hoverBoxOnSat(updateHoverSatId, updateHoverSatPos.x, updateHoverSatPos.y);
+      satSet.getScreenCoords(updateHoverSatId, pMatrix, camMatrix);
+      if (!_earthHitTest(satScreenPositionArray.x, satScreenPositionArray.y)) {
+        _hoverBoxOnSat(updateHoverSatId, satScreenPositionArray.x, satScreenPositionArray.y);
       } else {
         _hoverBoxOnSat(-1, 0, 0);
       }
@@ -595,30 +597,68 @@ var drawLoopCallback;
         pickColorBuf[2] === 0);
     }
   }
+
+
+  var satLabelModeLastTime = 0;
+  var isSatMiniBoxInUse = false;
+  var labelCount;
+  var hoverBoxOnSatMiniElements = [];
+  var satHoverMiniDOM;
   function _showOrbitsAbove () {
-    // Display Orbits of Satellites In View
-      orbitDisplay.clearInViewOrbit();
-      var orbitCount = 0;
-      var len = satSet.getSatData().length;
-      var maxOrbits = settingsManager.maxOrbits;
-      for (var i = 0; i < len; i++) {
-        if (orbitCount > maxOrbits) return;
-        var sat = satSet.getSatExtraOnly(i);
-        // if (sat.inview && ColorScheme.objectTypeFlags.orange === true) {
-          if (sat.static) continue;
-          if (sat.missile) continue;
-          if (sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) continue;
-          if (sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) continue;
-          if (sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) continue;
-          if (sat.inview && ColorScheme.objectTypeFlags.orange === false) continue;
-          var satPos = satSet.getScreenCoords(i, pMatrix, camMatrix);
-          if (typeof satPos.x == 'undefined' || typeof satPos.y == 'undefined') continue;
-          if (satPos.x > window.innerWidth || satPos.y > window.innerHeight) continue;
-          orbitDisplay.addInViewOrbit(i);
-          orbitCount++;
-        // }
+
+    if ((!settingsManager.isSatLabelModeOn || cameraType.current !== cameraType.PLANETARIUM)) {
+      if (isSatMiniBoxInUse) {
+        $('#sat-minibox').html('');
       }
+      isSatMiniBoxInUse = false;
+      return;
+    }
+
+    if (!satellite.sensorSelected()) return;
+    if (drawNow - satLabelModeLastTime < settingsManager.satLabelInterval) return;
+
+    orbitDisplay.clearInViewOrbit();
+
+    var sat;
+    labelCount = 0;
+    isHoverBoxVisible = true;
+
+    hoverBoxOnSatMiniElements = document.getElementById('sat-minibox');
+    hoverBoxOnSatMiniElements.innerHTML = '';
+    for (var i = 0; i < satSet.orbitalSats && labelCount < settingsManager.maxLabels; i++) {
+      sat = satSet.getSatPosOnly(i);
+
+      if (sat.static) continue;
+      if (sat.missile) continue;
+      if (sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) continue;
+      if (sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) continue;
+      if (sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) continue;
+      if (sat.inview && ColorScheme.objectTypeFlags.orange === false) continue;
+
+      satSet.getScreenCoords(i, pMatrix, camMatrix, sat.position);
+      if (satScreenPositionArray.error) continue;
+      if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
+      if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
+
+      // Draw Orbits
+      orbitDisplay.addInViewOrbit(i);
+
+      // Draw Sat Labels
+      if (settingsManager.isDisableSatHoverBox) continue;
+      satHoverMiniDOM = document.createElement("div");
+      satHoverMiniDOM.id = 'sat-minibox-' + i;
+      satHoverMiniDOM.textContent = sat.SCC_NUM;
+      satHoverMiniDOM.setAttribute(
+        'style',
+        "display: block; position: absolute; left: " + satScreenPositionArray.x + 10 + "px; top: " + satScreenPositionArray.y + "px;"
+      );
+      hoverBoxOnSatMiniElements.append(satHoverMiniDOM);
+      labelCount++;
+    }
+    isSatMiniBoxInUse = true;
+    satLabelModeLastTime = drawNow;
   }
+
 
   // TODO: Hover Box should have two sub DOMs whose text is replaced so that <br> is not made and removed
   // OPTIMIZE: Less DOM creation
@@ -647,21 +687,35 @@ var drawLoopCallback;
         if (sat.static) {
           if (sat.type === 'Launch Facility') {
             var launchSite = tleManager.extractLaunchSite(sat.name);
-            satHoverBoxDOM.html(launchSite.site + ', ' + launchSite.sitec + '<br />' + sat.type + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode1.textContent = (launchSite.site + ', ' + launchSite.sitec);
+            satHoverBoxNode2.textContent = (sat.type + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode3.textContent = ('');
           } else {
-            satHoverBoxDOM.html(sat.name + '<br />' + sat.type + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode1.textContent = (sat.name);
+            satHoverBoxNode2.textContent = (sat.type + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode3.textContent = ('');
           }
         } else if (sat.missile) {
-          satHoverBoxDOM.html(sat.ON + '<br />' + sat.desc + '');
+          satHoverBoxNode1.textContent = (sat.ON + '<br />' + sat.desc + '');
+          satHoverBoxNode2.textContent = '';
+          satHoverBoxNode3.textContent = '';
         } else {
           if (satellite.sensorSelected() && isShowNextPass && isShowDistance) {
-            satHoverBoxDOM.html(sat.ON + '<br />' + sat.SCC_NUM + '<br />' + satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode1.textContent = (sat.ON);
+            satHoverBoxNode2.textContent = (sat.SCC_NUM);
+            satHoverBoxNode3.textContent = (satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '');
           } else if (isShowDistance) {
-            satHoverBoxDOM.html(sat.ON + '<br />' + sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode1.textContent = (sat.ON);
+            satHoverBoxNode2.textContent = (sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode3.textContent = ('');
           } else if (satellite.sensorSelected() && isShowNextPass) {
-            satHoverBoxDOM.html(sat.ON + '<br />' + sat.SCC_NUM + '<br />' + satellite.nextpass(sat) + '');
+            satHoverBoxNode1.textContent = (sat.ON);
+            satHoverBoxNode2.textContent = (sat.SCC_NUM);
+            satHoverBoxNode3.textContent = (satellite.nextpass(sat));
           } else {
-            satHoverBoxDOM.html(sat.ON + '<br />' + sat.SCC_NUM + '');
+            satHoverBoxNode1.textContent = (sat.ON);
+            satHoverBoxNode2.textContent = (sat.SCC_NUM);
+            satHoverBoxNode3.textContent = ('');
           }
         }
         satHoverBoxDOM.css({
@@ -678,49 +732,6 @@ var drawLoopCallback;
   function _onDrawLoopComplete (cb) {
     if (typeof cb == 'undefined') return;
     cb();
-  }
-
-  var satLabelModeLastTime = 0;
-  var isSatMiniBoxInUse = false;
-  function _satLabelMode (isSatLabelModeOn) {
-    if (!satellite.sensorSelected()) return;
-    if (settingsManager.isDisableSatHoverBox) return;
-    if (drawNow - satLabelModeLastTime < settingsManager.satLabelInterval) return;
-
-    satLabelModeLastTime = drawNow;
-    // $('#sat-minibox').html('');
-
-    var labelCount = 0;
-    var hoverBoxOnSatMiniElements = [];
-    var len = satSet.getSatData().length;
-    var maxLabels = settingsManager.maxLabels;
-    isHoverBoxVisible = true;
-    for (var i = 0; i < len && labelCount < maxLabels; i++) {
-      var sat = satSet.getSatExtraOnly(i);
-
-      if (sat.static) continue;
-      if (sat.missile) continue;
-      if (sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) continue;
-      if (sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) continue;
-      if (sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) continue;
-      if (sat.inview && ColorScheme.objectTypeFlags.orange === false) continue;
-
-      updateHoverSatPos = satSet.getScreenCoords(i, pMatrix, camMatrix);
-      if (typeof updateHoverSatPos.x == 'undefined' || typeof updateHoverSatPos.y == 'undefined') continue;
-      if (updateHoverSatPos.x > window.innerWidth || updateHoverSatPos.y > window.innerHeight) continue;
-
-      var satHoverMiniDOM = $('<div>', { id: 'sat-minibox-' + i, text: sat.SCC_NUM });
-      satHoverMiniDOM.css({
-            display: 'block',
-            position: 'absolute',
-            left: updateHoverSatPos.x + 10,
-            top: updateHoverSatPos.y
-          });
-      hoverBoxOnSatMiniElements.push(satHoverMiniDOM);
-      labelCount++;
-    }
-    $('#sat-minibox').html(hoverBoxOnSatMiniElements);
-    isSatMiniBoxInUse = true;
   }
 
   var demoModeSatellite = 0;
@@ -741,10 +752,11 @@ var drawLoopCallback;
       if (sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) continue;
       if (sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) continue;
       if (sat.inview && ColorScheme.objectTypeFlags.orange === false) continue;
-      updateHoverSatPos = satSet.getScreenCoords(i, pMatrix, camMatrix);
-      if (typeof updateHoverSatPos.x == 'undefined' || typeof updateHoverSatPos.y == 'undefined') continue;
-      if (updateHoverSatPos.x > window.innerWidth || updateHoverSatPos.y > window.innerHeight) continue;
-      _hoverBoxOnSat(i, updateHoverSatPos.x, updateHoverSatPos.y);
+      satSet.getScreenCoords(i, pMatrix, camMatrix);
+      if (satScreenPositionArray.error) continue;
+      if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
+      if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
+      _hoverBoxOnSat(i, satScreenPositionArray.x, satScreenPositionArray.y);
       orbitDisplay.setSelectOrbit(i);
       demoModeSatellite = i + 1;
       return;
@@ -1043,13 +1055,17 @@ function selectSat (satId) {
       if ($(document).width() <= 1000) {
       } else {
         $('#search-results').attr('style', 'display:block; max-height:27%');
-        uiController.legendMenuChange('default');
+        if (cameraType.current !== cameraType.PLANETARIUM) {
+          uiController.legendMenuChange('default');
+        }
       }
     } else {
       if ($(document).width() <= 1000) {
       } else {
         $('#search-results').attr('style', 'max-height:27%');
-        uiController.legendMenuChange('default');
+        if (cameraType.current !== cameraType.PLANETARIUM) {
+          uiController.legendMenuChange('default');
+        }
       }
     }
 
@@ -1250,6 +1266,7 @@ function enableSlowCPUMode () {
   if (!settingsManager.cruncherReady) return;
   settingsManager.isSlowCPUModeEnabled = true;
   settingsManager.minimumSearchCharacters = 3;
+  settingsManager.satLabelInterval = 500;
 
   satCruncher.postMessage({
     isSlowCPUModeEnabled: true

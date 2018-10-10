@@ -8,8 +8,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.42.4';
-  settingsManager.versionDate = 'October 8, 2018';
+  settingsManager.versionNumber = 'v0.42.5';
+  settingsManager.versionDate = 'October 10, 2018';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 200000;
@@ -158,7 +158,7 @@
   settingsManager.isDemoModeOn = false;
   settingsManager.demoModeInterval = 3000; // in ms (3 second default)
   settingsManager.isSatLabelModeOn = true;
-  settingsManager.satLabelInterval = 250; //  in ms (0.5 second default)
+  settingsManager.satLabelInterval = 100; //  in ms (0.5 second default)
 
   settingsManager.isSatOverflyModeOn = false;
   settingsManager.isFOVBubbleModeOn = false;

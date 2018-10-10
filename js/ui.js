@@ -57,6 +57,9 @@ var canvasDOM = $('#canvas-holder');
 var mapImageDOM = $('#map-image');
 var mapMenuDOM = $('#map-menu');
 var satHoverBoxDOM = $('#sat-hoverbox');
+var satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
+var satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
+var satHoverBoxNode3 = document.getElementById('sat-hoverbox3');
 var lkpassed = false;
 
 (function () {
@@ -299,10 +302,10 @@ var lkpassed = false;
             isMilSatSelected = false;
             $('#menu-space-stations').removeClass('bmenu-item-selected');
 
-            if (satellite.sensorSelected()) {
+            if (satellite.sensorSelected() && cameraType.current !== cameraType.PLANETARIUM) {
               uiController.legendMenuChange('default');
             } else {
-              uiController.legendMenuChange('default');
+              // uiController.legendMenuChange('default');
             }
 
             // satSet.setColorScheme(ColorScheme.default);
@@ -1342,7 +1345,6 @@ var lkpassed = false;
         } else {
           changeZoom('leo');
         }
-        console.log('2: ' + Date.now());
         camSnap(latToPitch(lat), longToYaw(lon));
 
         uiController.legendMenuChange('default');

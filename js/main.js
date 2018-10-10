@@ -644,7 +644,7 @@ var drawLoopCallback;
       orbitDisplay.addInViewOrbit(i);
 
       // Draw Sat Labels
-      if (settingsManager.isDisableSatHoverBox) continue;
+      // if (settingsManager.isDisableSatHoverBox) continue;
       satHoverMiniDOM = document.createElement("div");
       satHoverMiniDOM.id = 'sat-minibox-' + i;
       satHoverMiniDOM.textContent = sat.SCC_NUM;

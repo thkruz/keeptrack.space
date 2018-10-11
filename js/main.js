@@ -652,7 +652,7 @@ var drawLoopCallback;
         'style',
         "display: block; position: absolute; left: " + satScreenPositionArray.x + 10 + "px; top: " + satScreenPositionArray.y + "px;"
       );
-      hoverBoxOnSatMiniElements.append(satHoverMiniDOM);
+      hoverBoxOnSatMiniElements.appendChild(satHoverMiniDOM);
       labelCount++;
     }
     isSatMiniBoxInUse = true;

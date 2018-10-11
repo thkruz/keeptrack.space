@@ -137,7 +137,7 @@ var lkpassed = false;
       jday = null; // Garbage collect
 
       // Load the Stylesheets
-      $('head').append('<link rel="stylesheet" type="text/css" href="css/style.css?v=' + settingsManager.versionNumber + '"">');
+      $('head').appendChild('<link rel="stylesheet" type="text/css" href="css/style.css?v=' + settingsManager.versionNumber + '"">');
 
       // Load ALl The Images Now
       $('img').each(function () {

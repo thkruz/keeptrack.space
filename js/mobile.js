@@ -75,6 +75,7 @@ var maxPinchSize = 1;
       settingsManager.isMobileModeEnabled = true;
       settingsManager.cameraMovementSpeed = 0.0001;
       settingsManager.cameraMovementSpeedMin = 0.0001;
+      settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
     } else {
       settingsManager.isMobileModeEnabled = false;
       settingsManager.cameraMovementSpeed = 0.003;

@@ -53,7 +53,8 @@ or mirrored at any other location without the express written permission of the 
     missileManager.lastMissileError
     settingsManager
 */
-var canvasDOM = $('#canvas-holder');
+var canvasDOM = $('#canvas');
+var bodyDOM = $('#bodyDOM');
 var mapImageDOM = $('#map-image');
 var mapMenuDOM = $('#map-menu');
 var satHoverBoxDOM = $('#sat-hoverbox');
@@ -335,9 +336,9 @@ var lkpassed = false;
         isDragging = false;
         rotateTheEarth = false;
       });
-      canvasDOM.on('keypress', _keyHandler); // On Key Press Event Run _keyHandler Function
-      canvasDOM.on('keydown', _keyDownHandler); // On Key Press Event Run _keyHandler Function
-      canvasDOM.on('keyup', _keyUpHandler); // On Key Press Event Run _keyHandler Function
+      bodyDOM.on('keypress', _keyHandler); // On Key Press Event Run _keyHandler Function
+      bodyDOM.on('keydown', _keyDownHandler); // On Key Press Event Run _keyHandler Function
+      bodyDOM.on('keyup', _keyUpHandler); // On Key Press Event Run _keyHandler Function
       canvasDOM.attr('tabIndex', 0);
       canvasDOM.focus();
     })();
@@ -2105,6 +2106,16 @@ var lkpassed = false;
         case 33: // !
           timeManager.propOffset = 0; // Reset to Current Time
           settingsManager.isPropRateChange = true;
+          break;
+        case 44: // ,
+          timeManager.propOffset -= 1000 * 60; // Move back a Minute
+          settingsManager.isPropRateChange = true;
+          $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
+          break;
+        case 46: // .
+          timeManager.propOffset += 1000 * 60; // Move a Minute
+          settingsManager.isPropRateChange = true;
+          $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
           break;
         case 60: // <
           timeManager.propOffset -= 1000 * 60 * 60 * 24 * 365.25; // Move back a year

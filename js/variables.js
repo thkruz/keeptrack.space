@@ -222,7 +222,8 @@ $.ajaxSetup({
     zoom: 'leo',
     url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.BLE = {
     name: 'Beale AFB, CA',
@@ -242,7 +243,8 @@ $.ajaxSetup({
     staticNum: 0,
     zoom: 'leo',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.CLR = {
     name: 'Clear AFS, AK',
@@ -262,7 +264,8 @@ $.ajaxSetup({
     staticNum: 2,
     zoom: 'leo',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.EGL = {
     name: 'Eglin AFB, FL',
@@ -283,7 +286,8 @@ $.ajaxSetup({
     zoom: 'geo',
     url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte002.en.html',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.FYL = {
     name: 'RAF Fylingdales, UK',
@@ -303,7 +307,8 @@ $.ajaxSetup({
     staticNum: 4,
     zoom: 'leo',
     country: 'United Kingdom',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.CAV = {
     name: 'Cavalier AFS, ND',
@@ -324,7 +329,8 @@ $.ajaxSetup({
     zoom: 'leo',
     url: 'https://mostlymissiledefense.com/2012/04/12/parcs-cavalier-radar-april-12-2012/',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: true
   };
   sensorList.THL = {
     name: 'Thule AFB, GL',
@@ -345,7 +351,8 @@ $.ajaxSetup({
     zoom: 'leo',
     url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.CDN = {
     name: 'Cobra Dane, AK',
@@ -372,7 +379,8 @@ $.ajaxSetup({
     zoom: 'leo',
     url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: true
   };
   sensorList.ALT = {
     name: 'ALTAIR, Kwaj',
@@ -393,7 +401,8 @@ $.ajaxSetup({
     zoom: 'geo',
     url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte005.en.html',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.MIL = {
     name: 'Millstone, MA',
@@ -414,7 +423,8 @@ $.ajaxSetup({
     zoom: 'geo',
     url: 'https://mostlymissiledefense.com/2012/05/05/space-surveillance-sensors-millstone-hill-radar/',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.DGC = {
     name: 'Diego Garcia',
@@ -435,7 +445,8 @@ $.ajaxSetup({
     zoom: 'geo',
     url: 'https://mostlymissiledefense.com/2012/08/20/space-surveillance-sensors-geodss-ground-based-electro-optical-deep-space-surveillance-system-august-20-2012/',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.MAU = {
     name: 'Maui, HI',
@@ -456,7 +467,8 @@ $.ajaxSetup({
     zoom: 'geo',
     url: 'https://mostlymissiledefense.com/2012/08/20/space-surveillance-sensors-geodss-ground-based-electro-optical-deep-space-surveillance-system-august-20-2012/',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.SOC = {
     name: 'Socorro, NM',
@@ -477,7 +489,8 @@ $.ajaxSetup({
     zoom: 'geo',
     url: 'https://mostlymissiledefense.com/2012/08/20/space-surveillance-sensors-geodss-ground-based-electro-optical-deep-space-surveillance-system-august-20-2012/',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.ASC = {
     name: 'Ascension',
@@ -498,7 +511,8 @@ $.ajaxSetup({
     zoom: 'geo',
     url: '',
     country: 'United States',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.GLB = {
     name: 'Globus II, NOR',
@@ -519,7 +533,8 @@ $.ajaxSetup({
     zoom: 'geo',
     url: '',
     country: 'Norway',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   // //////////////////////
   // ESOC RADARS
@@ -543,7 +558,8 @@ $.ajaxSetup({
     zoom: 'leo',
     url: '',
     country: 'France',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: true
   };
   sensorList.TIR = {
     name: 'Tracking and Imaging Radar, GER',
@@ -564,7 +580,8 @@ $.ajaxSetup({
     zoom: 'geo',
     url: '',
     country: 'Germany',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.NRC = {
     name: 'Croce del Nord, ITA',
@@ -591,7 +608,8 @@ $.ajaxSetup({
     zoom: 'leo',
     url: '',
     country: 'Italy',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.TRO = {
     name: 'RAF Troodos, UK',
@@ -612,7 +630,8 @@ $.ajaxSetup({
     zoom: 'geo',
     url: '',
     country: 'United Kingdom',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.SDT = {
     name: 'ESA Space Debris Telescope, ESP',
@@ -633,7 +652,8 @@ $.ajaxSetup({
     zoom: 'geo',
     url: '',
     country: 'Spain',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
 
   // //////////////////////
@@ -657,7 +677,8 @@ $.ajaxSetup({
     staticNum: 13,
     zoom: 'leo',
     country: 'Russia',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.BAL = {
     name: 'Balkhash, RUS',
@@ -677,7 +698,8 @@ $.ajaxSetup({
     staticNum: 14,
     zoom: 'leo',
     country: 'Russia',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.GAN = {
     name: 'Gantsevichi, RUS',
@@ -697,7 +719,8 @@ $.ajaxSetup({
     staticNum: 15,
     zoom: 'leo',
     country: 'Russia',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.LEK = {
     name: 'Lekhtusi, RUS',
@@ -717,7 +740,8 @@ $.ajaxSetup({
     staticNum: 16,
     zoom: 'leo',
     country: 'Russia',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.MIS = {
     name: 'Mishelevka-D',
@@ -737,7 +761,8 @@ $.ajaxSetup({
     staticNum: 17,
     zoom: 'leo',
     country: 'Russia',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.OLE = {
     name: 'Olenegorsk',
@@ -757,7 +782,8 @@ $.ajaxSetup({
     staticNum: 18,
     zoom: 'leo',
     country: 'Russia',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.PEC = {
     name: 'Pechora',
@@ -777,7 +803,8 @@ $.ajaxSetup({
     staticNum: 19,
     zoom: 'leo',
     country: 'Russia',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.PIO = {
     name: 'Pionersky',
@@ -797,7 +824,8 @@ $.ajaxSetup({
     staticNum: 20,
     zoom: 'leo',
     country: 'Russia',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
   sensorList.XUA = {
     name: 'Xuanhua, PRC',
@@ -817,7 +845,8 @@ $.ajaxSetup({
     staticNum: 21,
     zoom: 'leo',
     country: 'China',
-    sun: 'No Impact'
+    sun: 'No Impact',
+    volume: false
   };
 
   sensorManager.sensorListLength = function () {
@@ -852,6 +881,46 @@ $.ajaxSetup({
         multiSensor: true
       });
       satellite.setobs(sensorManager.sensorList.COD);
+      satellite.getsensorinfo();
+      selectSat(-1);
+      setTimeout(satSet.setColorScheme, 1500, ColorScheme.default, true);
+    } else if (selectedSensor === 'NATO-MW') {
+      var natoMWSensors = [];
+      natoMWSensors.push(sensorManager.sensorList.BLE);
+      natoMWSensors.push(sensorManager.sensorList.CAV);
+      natoMWSensors.push(sensorManager.sensorList.COD);
+      natoMWSensors.push(sensorManager.sensorList.CLR);
+      natoMWSensors.push(sensorManager.sensorList.FYL);
+      natoMWSensors.push(sensorManager.sensorList.THL);
+      satCruncher.postMessage({
+        typ: 'offset',
+        dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
+        setlatlong: true,
+        sensor: natoMWSensors,
+        multiSensor: true
+      });
+      satellite.setobs(sensorManager.sensorList.COD);
+      satellite.getsensorinfo();
+      selectSat(-1);
+      setTimeout(satSet.setColorScheme, 1500, ColorScheme.default, true);
+    } else if (selectedSensor === 'RUS-ALL') {
+      var rusSensors = [];
+      rusSensors.push(sensorManager.sensorList.ARM);
+      rusSensors.push(sensorManager.sensorList.BAL);
+      rusSensors.push(sensorManager.sensorList.GAN);
+      rusSensors.push(sensorManager.sensorList.LEK);
+      rusSensors.push(sensorManager.sensorList.MIS);
+      rusSensors.push(sensorManager.sensorList.OLE);
+      rusSensors.push(sensorManager.sensorList.PEC);
+      rusSensors.push(sensorManager.sensorList.PIO);
+      satCruncher.postMessage({
+        typ: 'offset',
+        dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
+        setlatlong: true,
+        sensor: rusSensors,
+        multiSensor: true
+      });
+      satellite.setobs(sensorManager.sensorList.ARM);
       satellite.getsensorinfo();
       selectSat(-1);
       setTimeout(satSet.setColorScheme, 1500, ColorScheme.default, true);
@@ -925,10 +994,10 @@ $.ajaxSetup({
         C: 'ANALSAT',
         LV: 'Analyst Satellite',
         LS: 'ANALSAT',
-        SCC_NUM: (60000 + i).toString(),
-        TLE1: '1 ' + (60000 + i).toString() + 'U 58002B   17115.48668720 +.00000144 +00000-0 +16234-3 0  9994',
-        TLE2: '2 ' + (60000 + i).toString() + ' 034.2502 167.2636 0042608 222.6554 121.5501 24.84703551080477',
-        intlDes: (60000 + i).toString(),
+        SCC_NUM: (80000 + i).toString(),
+        TLE1: '1 ' + (80000 + i).toString() + 'U 58002B   17115.48668720 +.00000144 +00000-0 +16234-3 0  9994',
+        TLE2: '2 ' + (80000 + i).toString() + ' 034.2502 167.2636 0042608 222.6554 121.5501 24.84703551080477',
+        intlDes: (80000 + i).toString(),
         type: 'sat',
         id: i
       };

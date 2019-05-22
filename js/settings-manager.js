@@ -8,13 +8,13 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.42.7';
-  settingsManager.versionDate = 'October 10, 2018';
+  settingsManager.versionNumber = 'v0.47.1';
+  settingsManager.versionDate = 'December 29, 2018';
 
   settingsManager.lowPerf = false;
-  settingsManager.maxFieldOfViewMarkers = 200000;
+  settingsManager.maxFieldOfViewMarkers = 105000;
   settingsManager.maxMissiles = 500;
-  settingsManager.maxAnalystSats = 30;
+  settingsManager.maxAnalystSats = 120;
 
   (function initParseFromGETVariables () {
     // This is an initial parse of the GET variables
@@ -29,8 +29,9 @@
         case 'lowperf':
           settingsManager.lowPerf = true;
           settingsManager.maxFieldOfViewMarkers = 1;
-          $('#satOverfly-opt').hide();
-          $('#fovBubble-opt').hide();
+          $('#menu-surveillance').hide();
+          $('#menu-sat-fov').hide();
+          $('#menu-fov-bubble').hide();
           $('#settings-lowperf').hide();
           break;
         case 'hires':
@@ -174,6 +175,14 @@
   settingsManager.cameraMovementSpeed = 0.003;
   settingsManager.cameraMovementSpeedMin = 0.005;
 
+
+  settingsManager.FPSForwardSpeed = 3;
+  settingsManager.FPSSideSpeed = 3;
+  settingsManager.FPSVertSpeed = 3;
+  settingsManager.FPSPitchRate = 0.02;
+  settingsManager.FPSYawRate = 0.02;
+  settingsManager.FPSRotateRate = 0.02;
+
   settingsManager.daysUntilObjectLost = 60;
 
   settingsManager.camDistBuffer = 2000;
@@ -201,7 +210,24 @@
 
   settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
   settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
-  settingsManager.colors.marker = [0.2, 1.0, 1.0, 1.0];
+  settingsManager.colors.marker = [[0.2, 1.0, 1.0, 1.0],
+                                   [1.0, 0.2, 1.0, 1.0],
+                                   [1.0, 1.0, 0.2, 1.0],
+                                   [0.2, 0.2, 1.0, 1.0],
+                                   [0.2, 1.0, 0.2, 1.0],
+                                   [1.0, 0.2, 0.2, 1.0],
+                                   [0.5, 0.6, 1.0, 1.0],
+                                   [0.6, 0.5, 1.0, 1.0],
+                                   [1.0, 0.6, 0.5, 1.0],
+                                   [1.0, 1.0, 1.0, 1.0],
+                                   [0.2, 1.0, 1.0, 1.0],
+                                   [1.0, 0.2, 1.0, 1.0],
+                                   [1.0, 1.0, 0.2, 1.0],
+                                   [0.2, 0.2, 1.0, 1.0],
+                                   [0.2, 1.0, 0.2, 1.0],
+                                   [1.0, 0.2, 0.2, 1.0],
+                                   [0.5, 0.6, 1.0, 1.0],
+                                   [0.6, 0.5, 1.0, 1.0],];
   settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
   settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
   settingsManager.colors.inviewAlt = [0.2, 0.5, 1.0, 0.85];
@@ -210,6 +236,7 @@
   settingsManager.colors.debris = [0.5, 0.5, 0.5, 0.85];
   settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
   settingsManager.colors.missile = [1.0, 1.0, 0.0, 1.0];
+  settingsManager.colors.analyst = [1.0, 1.0, 0.0, 1.0];
   settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];
   settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.1];
   settingsManager.colors.gradientAmt = 0;

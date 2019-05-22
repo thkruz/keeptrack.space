@@ -1,7 +1,7 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
 (c) 2016-2018, Theodore Kruczek
-(c) 2015-2017, James Yoder
+(c) 2015-2016, James Yoder
 
 satSet.js is the primary interface between sat-cruncher and the main application.
 It manages all interaction with the satellite catalogue.
@@ -52,6 +52,8 @@ or mirrored at any other location without the express written permission of the 
 // var multThreadCruncher6 = {};
 // var multThreadCruncher7 = {};
 // var multThreadCruncher8 = {};
+
+var satSensorMarkerArray = [];
 
 (function () {
   var TAU = 2 * Math.PI;
@@ -172,6 +174,7 @@ or mirrored at any other location without the express written permission of the 
     satPos = new Float32Array(m.data.satPos);
     satVel = new Float32Array(m.data.satVel);
     satInView = new Int8Array(m.data.satInView);
+    satSensorMarkerArray = m.data.sensorMarkerArray;
 
     if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
       SCnow = Date.now();
@@ -888,7 +891,7 @@ or mirrored at any other location without the express written permission of the 
     return res;
   };
 
-  satSet.searchAzElRange = function (azimuth, elevation, range, inclination, azMarg, elMarg, rangeMarg, incMarg, period, periodMarg) {
+  satSet.searchAzElRange = function (azimuth, elevation, range, inclination, azMarg, elMarg, rangeMarg, incMarg, period, periodMarg, objtype) {
     var isCheckAz = !isNaN(parseFloat(azimuth)) && isFinite(azimuth);
     var isCheckEl = !isNaN(parseFloat(elevation)) && isFinite(elevation);
     var isCheckRange = !isNaN(parseFloat(range)) && isFinite(range);
@@ -899,6 +902,8 @@ or mirrored at any other location without the express written permission of the 
     var isCheckRangeMarg = !isNaN(parseFloat(rangeMarg)) && isFinite(rangeMarg);
     var isCheckIncMarg = !isNaN(parseFloat(incMarg)) && isFinite(incMarg);
     var isCheckPeriodMarg = !isNaN(parseFloat(periodMarg)) && isFinite(periodMarg);
+    objtype *= 1; // String to Number
+
     if (!isCheckEl && !isCheckRange && !isCheckAz && !isCheckInclination && !isCheckPeriod) return; // Ensure there is a number typed.
 
     if (!isCheckAzMarg) { azMarg = 5; }
@@ -922,6 +927,10 @@ or mirrored at any other location without the express written permission of the 
 
     if (!isCheckInclination && !isCheckPeriod) {
       res = checkInview(res);
+    }
+
+    if (objtype !== 0) {
+      res = checkObjtype(res);
     }
 
     if (isCheckAz) {
@@ -972,6 +981,16 @@ or mirrored at any other location without the express written permission of the 
         }
       }
       return inviewRes;
+    }
+
+    function checkObjtype (possibles) {
+      var objtypeRes = [];
+      for (var i = 0; i < possibles.length; i++) {
+        if (possibles[i].OT === objtype) {
+          objtypeRes.push(possibles[i]);
+        }
+      }
+      return objtypeRes;
     }
 
     function checkAz (possibles, minaz, maxaz) {
@@ -1055,10 +1074,11 @@ or mirrored at any other location without the express written permission of the 
 
   satSet.selectSat = function (i) {
     if (i === selectedSat) return;
+    adviceList.satelliteSelected();
     satCruncher.postMessage({
       satelliteSelected: [i]
     });
-    if (settingsManager.isMobileModeEnabled) mobile.searchToggle(true);
+    if (settingsManager.isMobileModeEnabled) mobile.searchToggle(false);
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
     // If Old Select Sat Picked Color it Correct Color
     if (selectedSat !== -1) {
@@ -1066,6 +1086,7 @@ or mirrored at any other location without the express written permission of the 
     }
     // If New Select Sat Picked Color it
     if (i !== -1) {
+      isSatView = true;
       gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
     }
     selectedSat = i;
@@ -1073,9 +1094,12 @@ or mirrored at any other location without the express written permission of the 
       $('#menu-lookangles').removeClass('bmenu-item-disabled');
     }
     $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');
+    $('#menu-satview').removeClass('bmenu-item-disabled');
     $('#menu-map').removeClass('bmenu-item-disabled');
     $('#menu-editSat').removeClass('bmenu-item-disabled');
+    $('#menu-sat-fov').removeClass('bmenu-item-disabled');
     $('#menu-newLaunch').removeClass('bmenu-item-disabled');
+    $('#menu-breakup').removeClass('bmenu-item-disabled');
   };
 
   satSet.onCruncherReady = function (cruncherReadyCallback) {

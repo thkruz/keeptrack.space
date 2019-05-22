@@ -271,8 +271,10 @@
     earth.earthEra = satellite.gstime(earth.earthJ);
 
     // Sets earth.lightDirection [x, y , z]
-    sun.currentDirection();
-    vec3.normalize(earth.lightDirection, earth.lightDirection);
+    if (!isDayNightToggle) {
+      sun.currentDirection();
+      vec3.normalize(earth.lightDirection, earth.lightDirection);
+    }
 
     mvMatrix = mvMatrixEmpty;
     mat4.identity(mvMatrix);
@@ -288,7 +290,9 @@
     gl.uniformMatrix4fv(earthShader.uMvMatrix, false, mvMatrix);
     gl.uniformMatrix4fv(earthShader.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(earthShader.uCamMatrix, false, camMatrix);
-    gl.uniform3fv(earthShader.uLightDirection, earth.lightDirection);
+    if (!isDayNightToggle) {
+      gl.uniform3fv(earthShader.uLightDirection, earth.lightDirection);
+    }
     gl.uniform3fv(earthShader.uAmbientLightColor, [0.03, 0.03, 0.03]); // RGB ambient light
     gl.uniform3fv(earthShader.uDirectionalLightColor, [1, 1, 0.9]); // RGB directional light
 
@@ -297,9 +301,15 @@
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture); // bind texture to TEXTURE0
 
-    gl.uniform1i(earthShader.uNightSampler, 1);  // point sampler to TEXTURE1
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, nightTexture); // bind tex to TEXTURE1
+    if (!isDayNightToggle) {
+      gl.uniform1i(earthShader.uNightSampler, 1);  // point sampler to TEXTURE1
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, nightTexture); // bind tex to TEXTURE1
+    } else {
+      gl.uniform1i(earthShader.uNightSampler, 1);  // point sampler to TEXTURE1
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, texture); // bind tex to TEXTURE1
+    }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
     gl.enableVertexAttribArray(earthShader.aTexCoord);

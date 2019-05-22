@@ -14,11 +14,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=0.42.7b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=0.47.1b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=0.42.7b" rel="stylesheet">
+    <link href="css/fonts.css?v=0.47.1b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=0.42.7b">
+    <link rel="stylesheet" href="css/materialize.css?v=0.47.1b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -36,77 +36,70 @@
     <!-- FORCE HTTPS -->
   </head>
   <body id="bodyDOM" class="no-text-select">
-  <div id="loading-screen" class="valign-wrapper full-loader">
-    <div id="logo-inner-container" class="valign">
-      <span id="logo-text" class="logo-font">KEEP TRACK</span>
-      <div id= "spinner" class="preloader-wrapper active">
-        <div class="spinner-layer spinner-white-only">
-          <div class="circle-clipper left">
-            <div class="circle"></div>
-          </div><div class="gap-patch">
-            <div class="circle"></div>
-          </div><div class="circle-clipper right">
-            <div class="circle"></div>
+    <div id="loading-screen" class="valign-wrapper full-loader">
+      <div id="logo-inner-container" class="valign">
+        <span id="logo-text" class="logo-font">KEEP TRACK</span>
+        <div id= "spinner" class="preloader-wrapper active">
+          <div class="spinner-layer spinner-white-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div><div class="gap-patch">
+              <div class="circle"></div>
+            </div><div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
           </div>
         </div>
+        <span id="loader-text">Downloading Science...</span>
+        <button id="mobile-start-button" class="btn waves-effect waves-light" type="button" name="action" onclick="mobile.start();">Click to Begin &#9658;</button>
       </div>
-      <span id="loader-text">Downloading Science...</span>
-      <button id="mobile-start-button" class="btn waves-effect waves-light" type="button" name="action" onclick="mobile.start();">Click to Begin &#9658;</button>
     </div>
-  </div>
-  <!-- <div id="no-webgl">
-    Keeptrack.Space requires <a href="http://caniuse.com/#feat=webgl">WebGL</a> and <a href="http://caniuse.com/#feat=webworkers">Web Worker</a> support.
-  </div> -->
+    <div id="help-screen" class="valign-wrapper">
+      <div id="help-inner-container" class="valign">
+        <p>
+          <span id="help-header" class="logo-font">TITLE</span>
+          <span id="help-close">X</span>
+        </p>
+        <span id="help-text">ADVICE</span>
+      </div>
+    </div>
+    <!-- <div id="no-webgl">
+      Keeptrack.Space requires <a href="http://caniuse.com/#feat=webgl">WebGL</a> and <a href="http://caniuse.com/#feat=webworkers">Web Worker</a> support.
+    </div> -->
   <header>
     <nav>
       <div id="nav-wrapper" class="nav-wrapper light-blue darken-3">
         <a id="share-icon" class="top-menu-icons" onclick="mobile.socialToggle();"><img src="images/share-icon.png"></a>
         <ul id="nav-mobile" class="left hide-on-med-and-down">
           <li id="jday"></li>
-          <li><a id="countries-menu-button" class="dropdown-button" href="#!" data-beloworigin="true" data-activates="countries-menu">Satellites &#x25BC;</a></li>
         </ul>
         <ul id="nav-mobile" class="right">
           <li><a id="geolocation-btn" class="start-hidden" href="#!"><i class="material-icons">location_on</i></a></li>
-          <li>
-            <a id="legend-menu">
-              <span>Legend &#x25BC;</span>
-              <div class="top-menu-icons"><img src="images/layers-icon.png"></img></div>
+          <li><a id="legend-menu" class="top-menu-btns">
+              <!-- <span>Legend &#x25BC;</span> -->
+              <div id="legend-icon" class="top-menu-icons"><img src="images/layers-icon.png"></img></div>
             </a>
           </li>
+          <li><a id="tutorial-btn" class="top-menu-btns">
+              <div id="tutorial-icon" class="top-menu-icons"><img src="images/help.png"></img></div>
+            </a>
+          </li
           <li><a id="fullscreen-icon" class="top-menu-icons" onclick="mobile.fullscreenToggle();"><img src="images/fullscreen-icon.png"></img></a></li>
           <li><a id="search-icon" class="top-menu-icons" onclick="mobile.searchToggle();"><img src="images/search-icon.png"></img></a></li>
+          <div id="search-holder" class="menu-item">
+            <input id="search" type="search" required>
+            <span id="search-close" style="margin-left:5px">X</span>
+          </div>
         </ul>
       </div>
-    </nav>
-    <div id="social-alt" class="left">
+      <div id="social-alt" class="left">
         <div id="share-icon-container">
           <a id="facebook-share" class="share-up share-icons" href="https://www.facebook.com/sharer/sharer.php?u=http://keeptrack.space" target="_blank"><img src="https://static.addtoany.com/buttons/facebook.svg" width="32" height="32"></a>
           <a id="twitter-share" class="share-up share-icons" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank"><img src="https://static.addtoany.com/buttons/twitter.svg" width="32" height="32"></a>
           <a id="reddit-share" class="share-up share-icons" href="https://www.reddit.com/submit?url=http://keeptrack.space" target="_blank"><img src="https://static.addtoany.com/buttons/reddit.svg" width="32" height="32"></a>
         </div>
-    </div>
-    <div id="search-holder" class="menu-item">
-      <input id="search" type="search" required>
-      <span id="search-close" style="margin-left:5px">X</span>
-    </div>
-    <!-- Countries Menu -->
-    <ul id="countries-menu" class="dropdown-content">
-      <li data-group="Canada" class="country-option">Canadian</li>
-      <li data-group="China" class="country-option">Chinese</li>
-      <li data-group="France" class="country-option">French</li>
-      <li data-group="India" class="country-option">Indian</li>
-      <li data-group="Israel" class="country-option">Israeli</li>
-      <li data-group="Japan" class="country-option">Japanese</li>
-      <li data-group="Russia" class="country-option">Russian / USSR</li>
-      <li data-group="UnitedKingdom" class="country-option">British</li>
-      <li data-group="UnitedStates" class="country-option">American</li>
-      <li class="divider"></li>
-      <li data-group="SpaceStations" class="group-option">Space Stations</li>
-      <li data-group="GPSGroup" class="group-option">GPS Satellites</li>
-      <li data-group="GalileoGroup" class="group-option">Galileo Satellites</li>
-      <li data-group="GlonassGroup" class="group-option">Glonass Satellites</li>
-      <li data-group="AmatuerRadio" class="group-option">Amateur Radio</li>
-    </ul>
+      </div>
+    </nav>
   </header>
 
   <main>
@@ -123,13 +116,6 @@
           <span id="sat-hoverbox3"></span>
         </div>
         <div id="sat-minibox"></div>
-
-        <div id="camera-status-box" class="start-hidden status-box">
-          Earth Centered Camera Mode
-        </div>
-        <div id="propRate-status-box" class="start-hidden status-box">
-          Propagation Rate: 1.00x
-        </div>
 
         <div id="legend-hover-menu" class="start-hidden">
           <ul id="legend-list-default">
@@ -190,789 +176,6 @@
             <li><div class="Square-Box legend-orange-box"></div>Satellite In View</li>
           </ul>
         </div>
-
-        <div id="sensor-list-menu" class="side-menu-parent start-hidden text-select">
-          <div id="sensor-list-content" class="side-menu">
-            <div class="row">
-              <ul id="reset-sensor-text" class="sensor-reset-menu">
-                <h5 id="reset-sensor-button" class="center-align menu-selectable">Reset Sensor</h5>
-                <li class="divider"></li>
-              </ul>
-              <ul>
-                <h5 class="center-align">CSpOC Sensors</h5>
-                <li class="divider"></li>
-                <li class="menu-selectable" id="radar-cspocAll">All CSpOC Sensors<span class="badge dark-blue-badge" data-badge-caption="Coalition"></span></li>
-                <li class="menu-selectable" id="radar-ascension">Ascension<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                <li class="menu-selectable" id="radar-altair">ALTAIR<span class="badge dark-blue-badge" data-badge-caption="USA"></span></li>
-                <li class="menu-selectable" id="radar-beale">Beale<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                <li class="menu-selectable" id="radar-capecod">Cape Cod<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                <li class="menu-selectable" id="radar-parcs">Cavalier<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                <li class="menu-selectable" id="radar-clear">Clear<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                <li class="menu-selectable" id="radar-cobradane">Cobra Dane<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                <li class="menu-selectable" id="radar-eglin">Eglin<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                <li class="menu-selectable radar-fylingdales">Fylingdales<span class="badge dark-blue-badge" data-badge-caption="RAF"></span></li>
-                <li class="menu-selectable" id="radar-globus">Globus II<span class="badge dark-blue-badge" data-badge-caption="NOR"></span></li>
-                <li class="menu-selectable" id="radar-millstone">Millstone<span class="badge dark-blue-badge" data-badge-caption="MIT"></span></li>
-                <li class="menu-selectable" id="radar-thule">Thule<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                <li class="menu-selectable" id="optical-diego-garcia">Diego Garcia<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                <li class="menu-selectable" id="optical-maui">Maui<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                <li class="menu-selectable" id="optical-socorro">Socorro<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                <li class="divider"></li>
-                <h5 class="center-align">ESOC Sensors</h5>
-                <li class="divider"></li>
-                <li class="menu-selectable" id="esoc-graves">GRAVES<span class="badge dark-blue-badge" data-badge-caption="FRA"></span></li>
-                <li class="menu-selectable radar-fylingdales">Fylingdales<span class="badge dark-blue-badge" data-badge-caption="RAF"></span></li>
-                <li class="menu-selectable" id="esoc-tira">TIRA<span class="badge dark-blue-badge" data-badge-caption="GER"></span></li>
-                <li class="menu-selectable" id="esoc-northern-cross">Northern Cross<span class="badge dark-blue-badge" data-badge-caption="ITA"></span></li>
-                <li class="menu-selectable" id="esoc-troodos">Troodos<span class="badge dark-blue-badge" data-badge-caption="RAF"></span></li>
-                <li class="menu-selectable" id="esoc-space-debris-telescope">Space Debris Telescope<span class="badge dark-blue-badge" data-badge-caption="ESA"></span></li>
-                <li class="divider"></li>
-                <h5 class="center-align">Russian Sensors</h5>
-                <li class="divider"></li>
-                <li class="menu-selectable" id="russian-armavir">Armavir<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                <li class="menu-selectable" id="russian-balkhash">Balkhash<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                <li class="menu-selectable" id="russian-gantsevichi">Gantsevichi<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                <li class="menu-selectable" id="russian-lekhtusi">Lekhtusi<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                <li class="menu-selectable" id="russian-mishelevka-d">Mishelevka<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                <li class="menu-selectable" id="russian-olenegorsk">Olenegorsk<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                <li class="menu-selectable" id="russian-pechora">Pechora<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                <li class="menu-selectable" id="russian-pionersky">Pionersky<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                <li class="divider"></li>
-                <h5 class="center-align">Chinese Sensors</h5>
-                <li class="divider"></li>
-                <li class="menu-selectable" id="chinese-xuanhua">Xuanhua<span class="badge dark-blue-badge" data-badge-caption="PRC"></span></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div id="color-scheme-menu" class="side-menu-parent start-hidden text-select">
-          <div id="colors-menu" class="side-menu">
-            <ul>
-              <h5 class="center-align">Color Schemes</h5>
-              <li class="divider"></li>
-              <li class="menu-selectable" data-color="default">Object Type</li>
-              <li class="menu-selectable" data-color="velocity">Velocity</li>
-              <li class="menu-selectable" data-color="rcs">Radar Cross Section</li>
-              <li class="menu-selectable" data-color="smallsats">Small Satellites</li>
-              <li class="menu-selectable" data-color="countries">Countries</li>
-              <li class="menu-selectable" data-color="near-earth">Near Earth</li>
-              <li class="menu-selectable" data-color="deep-space">Deep Space</li>
-              <li class="menu-selectable" data-color="lost-objects">Lost Objects</li>
-            </ul>
-          </div>
-        </div>
-
-        <div id="sensor-info-menu" class="side-menu-parent start-hidden text-select">
-          <div id="sensor-content" class="side-menu">
-            <div class="row">
-              <h5 id="sensor-info-title" class="center-align">Sensor Name</h5>
-              <div class="sensor-info-row" style="margin-top: 0px;">
-                <div class="sensor-info-key">Country</div>
-                <div class="sensor-info-value" id="sensor-country">USA</div>
-              </div>
-              <div class="sensor-info-row">
-                <div class="sensor-info-key">Sensor Type</div>
-                <div class="sensor-info-value" id="sensor-type">Unknown</div>
-              </div>
-              <div class="sensor-info-row">
-                <div class="sensor-info-key">Latitude</div>
-                <div class="sensor-info-value" id="sensor-latitude">0</div>
-              </div>
-              <div class="sensor-info-row">
-                <div class="sensor-info-key">Longitude</div>
-                <div class="sensor-info-value" id="sensor-longitude">0</div>
-              </div>
-              <div class="sensor-info-row">
-                <div class="sensor-info-key">Sun Exclusion</div>
-                <div class="sensor-info-value" id="sensor-sun">Sun Stuff</div>
-              </div>
-              <div class="sensor-info-row">
-                <div class="sensor-info-key">Min Azimuth</div>
-                <div class="sensor-info-value" id="sensor-minazimuth">30 deg</div>
-              </div>
-              <div class="sensor-info-row">
-                <div class="sensor-info-key">Max Azimuth</div>
-                <div class="sensor-info-value" id="sensor-maxazimuth">30 deg</div>
-              </div>
-              <div class="sensor-info-row">
-                <div class="sensor-info-key">Min Elevation</div>
-                <div class="sensor-info-value" id="sensor-minelevation">60 deg</div>
-              </div>
-              <div class="sensor-info-row">
-                <div class="sensor-info-key">Max Elevation</div>
-                <div class="sensor-info-value" id="sensor-maxelevation">60 deg</div>
-              </div>
-              <div class="sensor-info-row">
-                <div class="sensor-info-key">Min Range</div>
-                <div class="sensor-info-value" id="sensor-minrange">1000 km</div>
-              </div>
-              <div class="sensor-info-row">
-                <div class="sensor-info-key">Max Range</div>
-                <div class="sensor-info-value" id="sensor-maxrange">1000 km</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="watchlist-menu" class="side-menu-parent start-hidden text-select">
-          <div id="watchlist-content" class="side-menu">
-            <div class="row">
-              <h5 class="center-align">Satellite Watchlist</h5>
-              <div id="watchlist-list">
-                <div class="row">
-                  <div class="col s3 m3 l3">25544</div>
-                  <div class="col s7 m7 l7">ISS (ZARYA)</div>
-                  <div class="col s2 m2 l2 center-align remove-icon"><img src="images/remove.png"></img></div>
-                </div>
-              </div>
-              <br />
-              <div class="row">
-                <div class="input-field col s10 m10 l10">
-                  <form id="watchlist-submit">
-                    <input placeholder="XXXXX" id="watchlist-new" type="text">
-                    <label for="watchlist-new">New Satellite</label>
-                  </form>
-                </div>
-                <div class="col s2 m2 l2 center-align add-icon"><img class="watchlist-add" src="images/add.png"></img></div>
-              </div>
-              <div class="center-align row">
-                <button id="watchlist-save" class="btn waves-effect waves-light" type="button" name="action">Save List &#9658;</button>
-              </div>
-              <div class="center-align row">
-                <button id="watchlist-open" class="btn waves-effect waves-light" type="button" name="action">Load List &#9658;</button>
-                <input id="watchlist-file" type="file" name="files[]" style="display: none;" />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="findByLooks-menu" class="side-menu-parent start-hidden text-select">
-          <div id="findByLooks-content" class="side-menu">
-            <div class="row">
-              <h5 class="center-align">Find By Looks</h5>
-              <form id="findByLooks">
-                <div class="row">
-                  <div class="input-field col s12 m6 l6">
-                    <input placeholder="XXX.X" id="fbl-azimuth" type="text">
-                    <label for="fbl-azimuth">Azimuth</label>
-                  </div>
-                  <div class="input-field col s12 m6 l6">
-                    <input placeholder="5" id="fbl-azimuth-margin" type="text">
-                    <label for="fbl-azimuth-margin">Margin</label>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="input-field col s12 m6 l6">
-                    <input placeholder="XX.X" id="fbl-elevation" type="text">
-                    <label for="fbl-elevation">Elevation</label>
-                  </div>
-                  <div class="input-field col s12 m6 l6">
-                    <input placeholder="5" id="fbl-elevation-margin" type="text">
-                    <label for="fbl-elevation-margin">Margin</label>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="input-field col s12 m6 l6">
-                    <input placeholder="XXXX.X" id="fbl-range" type="text">
-                    <label for="fbl-range">Range</label>
-                  </div>
-                  <div class="input-field col s12 m6 l6">
-                    <input placeholder="500" id="fbl-range-margin" type="text">
-                    <label for="fbl-range-margin">Margin</label>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="input-field col s12 m6 l6">
-                    <input placeholder="XX.X" id="fbl-inc" type="text">
-                    <label for="fbl-inc">Inclination</label>
-                  </div>
-                  <div class="input-field col s12 m6 l6">
-                    <input placeholder="0.5" id="fbl-inc-margin" type="text">
-                    <label for="fbl-inc-margin">Margin</label>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="input-field col s12 m6 l6">
-                    <input placeholder="XX.X" id="fbl-period" type="text">
-                    <label for="fbl-period">Period</label>
-                  </div>
-                  <div class="input-field col s12 m6 l6">
-                    <input placeholder="10" id="fbl-period-margin" type="text">
-                    <label for="fbl-period-margin">Margin</label>
-                  </div>
-                </div>
-                <div class="center-align">
-                  <button id="findByLooks-submit" class="btn waves-effect waves-light" type="submit" name="action">Find Satellite(s) &#9658;
-                  </button>
-                </div>
-              </form>
-              <div class="row center-align" style="margin-top=10px;">
-                <span id="findByLooks-results"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="lookangles-menu" class="side-menu-parent start-hidden text-select">
-          <div id="lookangles-content" class="side-menu">
-            <div class="row">
-              <h5 class="center-align">Sensor Look Angles</h5>
-              <table id="looks"  class="center-align striped-light centered"></table>
-            </div>
-          </div>
-        </div>
-        <div id="lookanglesmultisite-menu" class="side-menu-parent start-hidden text-select">
-          <div id="lookanglesmultisite-content" class="side-menu">
-            <div class="row">
-              <h5 class="center-align">Multi-Sensor Look Angles</h5>
-              <table id="looksmultisite" class="center-align striped-light centered"></table>
-            </div>
-          </div>
-        </div>
-        <div id="twitter-menu" class="side-menu-parent start-hidden side-menu text-select"></div>
-        <div id="map-menu" class="side-menu-parent start-hidden side-menu valign-wrapper">
-          <img id="map-image" src="images/braun-stereographic.jpg" width="800px" height="600px">
-          <img id="map-sat" class="map-item map-look" src="images/satellite-2.png" width="20px" height="20px">
-          <img id="map-sensor" class="map-item map-look start-hidden" src="images/radar-1.png" width="20px" height="20px">
-          <img id="map-look1" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look2" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look3" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look4" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look5" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look6" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look7" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look8" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look9" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look10" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look11" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look12" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look13" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look14" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look15" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look16" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look17" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look18" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look19" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look20" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look21" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look22" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look23" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look24" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look25" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look26" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look27" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look28" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look29" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look30" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look31" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look32" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look33" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look34" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look35" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look36" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look37" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look38" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look39" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look40" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look41" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look42" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look43" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look44" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look45" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look46" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look47" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look48" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look49" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <img id="map-look50" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-          <div id="braun-credit" style="position:absolute;right:10px;bottom:10px;z-index:5;color:#0a97d6;">
-            Braun Stereographic Projection (c) Tobias Jung
-          </div>
-        </div>
-        <div id="socrates-menu" class="side-menu-parent start-hidden text-select">
-          <div id="socrates-content" class="side-menu">
-            <div class="row">
-              <h5 class="center-align">Possible collisions</h5>
-              <table id="socrates-table" class="center-align"></table>
-            </div>
-          </div>
-        </div>
-        <div id="settings-menu" class="side-menu-parent start-hidden text-select">
-          <div id="settings-content" class="side-menu">
-            <div class="row">
-              <h5 class="center-align">General Settings</h5>
-              <form id="settings-form">
-                <div class="switch row">
-                  <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Non-selectable satellites will be hidden instead of grayed out.">
-                    <input id="settings-hos" type="checkbox">
-                    <span class="lever"></span>
-                    Hide Other Satellites
-                  </label>
-                </div>
-                <div class="switch row">
-                  <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Every 3 seconds a new satellite will be selected from FOV">
-                    <input id="settings-demo-mode" type="checkbox">
-                    <span class="lever"></span>
-                    Enable Demo Mode
-                  </label>
-                </div>
-                <div class="switch row" id="fovBubble-opt">
-                  <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Sensor Field Of View Will Be Shown">
-                    <input id="settings-fov-bubble" type="checkbox">
-                    <span class="lever"></span>
-                    Show Sensor FOV Bubble
-                  </label>
-                </div>
-                <div class="switch row">
-                  <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Small text labels will appear next to all satellites in FOV.">
-                    <input id="settings-sat-label-mode" type="checkbox" checked>
-                    <span class="lever"></span>
-                    Enable Satellite Label Mode
-                  </label>
-                </div>
-                <div id="satOverfly-opt">
-                  <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-                  <h5 class="center-align">Satellite Overfly Settings</h5>
-                  <div class="switch row">
-                    <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Satellite Field Of View Will Be Shown">
-                      <input id="settings-sat-fov" type="checkbox">
-                      <span class="lever"></span>
-                      Show Satellite FOV
-                    </label>
-                  </div>
-                  <div class="input-field col s12">
-                    <input value="30" id="satFieldOfView" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="What is the satellite's field of view in degrees">
-                    <label for="satFieldOfView">Satellite Field of View</label>
-                  </div>
-                  <div class="row"></div>
-                </div>
-                <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-                <h5 class="center-align">Lookangles Settings</h5>
-                <div class="switch row">
-                  <label>
-                    <input id="settings-riseset" type="checkbox">
-                    <span class="lever"></span>
-                    Show Only Rise and Set Times
-                  </label>
-                </div>
-                <div class="input-field col s6">
-                  <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated">
-                  <label for="lookanglesLength">Lookangles Length</label>
-                </div>
-                <div class="input-field col s6">
-                  <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
-                  <label for="lookanglesInterval">Lookangles Interval</label>
-                </div>
-                <div class="row"></div>
-                <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-                <div id="fastCompSettings">
-                  <h5 class="center-align">Fast CPU Required</h5>
-                  <div class="switch row">
-                    <label>
-                      <input id="settings-snp" type="checkbox">
-                      <span class="lever"></span>
-                      Show Next Pass on Hover
-                    </label>
-                  </div>
-                  <div class="row"></div>
-                </div>
-                <br/>
-                <div id="settings-lowperf" class="row center">
-                  <button class="red btn waves-effect waves-light" onclick="uiController.startLowPerf();">Low End PC Version &#9658;
-                  </button>
-                  <br/>
-                </div>
-                <div class="row center">
-                  <button id="settings-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Settings &#9658;
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-        <div id="about-menu" class="side-menu-parent start-hidden text-select">
-          <div id="about-content" class="side-menu">
-            <div class="row">
-              <div id="mobile-warning" class="center-align">
-                You are using the mobile version. Please try the desktop version for full functionality.
-              </div>
-              <div class="row">
-                <h5 class="center-align">Author</h5>
-                <div class="col s12">
-                  Created by <a style="color: #48f3e3 !important;" href="https://github.com/thkruz/">Theodore Kruczek</a>
-                   to help visualize orbital calculations for application to Ground Based Radars and Optical Telescopes.
-                   Based on the original work of <a style="color: #48f3e3 !important;" href="https://github.com/jeyoder/">James Yoder</a>
-                </div>
-              </div>
-              <div class="row">
-                <h5 class="center-align">Issues</h5>
-                <div class="col s12">
-                  Please contribute to development by posting your ideas/issues/bugs to the
-                  <a style="color: #48f3e3 !important;" href="https://github.com/thkruz/keeptrack.space">public github repository</a>.
-                </div>
-              </div>
-              <div class="row">
-                <h5 class="center-align">Sources</h5>
-                <div class="col s12">
-                  All information is open source publically available information. Orbits are derived from
-                  TLEs found on public websites. Payload information is compiled from various
-                  public sources. US Sensor data was derived from MDA reports on enviromental impacts and congressional
-                  budget reports.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="editSat-menu" class="side-menu-parent start-hidden text-select">
-          <div id="editSat-content" class="side-menu">
-            <div class="row">
-              <h5 class="center-align">Edit Satellite</h5>
-              <form id="editSat">
-                <div class="input-field col s12">
-                  <input disabled value="AAAAA" id="es-scc" type="text">
-                  <label for="disabled">Satellite SCC#</label>
-                </div>
-                <div class="input-field col s12">
-                  <input placeholder="AA" id="es-year" type="text">
-                  <label for="es-year">Epoch Year</label>
-                </div>
-                <div class="input-field col s12">
-                  <input placeholder="AAA.AAAAAAAA" id="es-day" type="text">
-                  <label for="es-day">Epoch Day</label>
-                </div>
-                <div class="input-field col s12">
-                  <input placeholder="AAA.AAAA" id="es-inc" type="text">
-                  <label for="es-inc">Inclination</label>
-                </div>
-                <div class="input-field col s12">
-                  <input placeholder="AAA.AAAA" id="es-rasc" type="text">
-                  <label for="es-rasc">Right Ascension</label>
-                </div>
-                <div class="input-field col s12">
-                  <input placeholder="AAA.AAAA" id="es-meanmo" type="text">
-                  <label for="es-meanmo">Mean Motion</label>
-                </div>
-                <div class="input-field col s12">
-                  <input placeholder="AA.AAAAAAAA" id="es-ecen" type="text">
-                  <label for="es-ecen">Eccentricity</label>
-                </div>
-                <div class="input-field col s12">
-                  <input placeholder="AA.AAAAAAAA" id="es-argPe" type="text">
-                  <label for="es-argPe">Argument of Perigee</label>
-                </div>
-                <div class="input-field col s12">
-                  <input placeholder="AAA.AAAA" id="es-meana" type="text">
-                  <label for="es-meana">Mean Anomaly</label>
-                </div>
-                <div class="center-align row">
-                  <button id="editSat-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Satellite &#9658;</button>
-                </div>
-                <div class="center-align row">
-                  <button id="editSat-save" class="btn waves-effect waves-light" type="button" name="action">Save TLE &#9658;</button>
-                </div>
-                <div class="center-align row">
-                  <button id="editSat-open" class="btn waves-effect waves-light" type="button" name="action">Load TLE &#9658;</button>
-                  <input id="editSat-file" class="start-hidden" type="file" name="files[]"/>
-                </div>
-              </form>
-            </div>
-            <div id="es-error" class="center-align start-hidden">
-              <h6 class="center-align">Error</h6>
-            </div>
-          </div>
-        </div>
-        <div id="newLaunch-menu" class="side-menu-parent start-hidden text-select">
-          <div id="newLaunch-content" class="side-menu">
-            <div class="row">
-              <h5 class="center-align">New Launch</h5>
-              <form id="newLaunch" class="col s12">
-                <div class="input-field col s12">
-                  <input disabled value="00005" id="nl-scc" type="text">
-                  <label for="disabled">Satellite SCC#</label>
-                </div>
-                <div class="input-field col s12">
-                  <input disabled value="50.00" id="nl-inc" type="text">
-                  <label for="disabled">Inclination</label>
-                </div>
-                <div class="input-field col s12">
-                  <select value="50.00" id="nl-updown" type="text">
-                    <option value="N">North</option>
-                    <option value="S">South</option>
-                  </select>
-                  <label for="disabled">Launching North or South</label>
-                </div>
-                <div class="input-field col s12" id="nl-launch-menu">
-                  <select id="nl-facility">
-                    <optgroup label="United States">
-                      <option value="CAS">Canary Island Air Space (Pegasus)</option>
-                      <option value="AFETR">Cape Canaveral AFS | Kennedy Space Center</option>
-                      <option value="ERAS">Eastern Range Air Space (Pegasus)</option>
-                      <option value="KODAK">Kodiak Launch Complex</option>
-                      <option value="KWAJ">Reagan Test Site</option>
-                      <option value="AFWTR">Vandenberg AFB</option>
-                      <option value="WLPIS">Wallops Flight Facility</option>
-                      <option value="WRAS">Western Range Air Space (Pegasus)</option>
-                    </optgroup>
-                    <optgroup label="Russia">
-                      <option value="KYMTR">Kasputin Yar MSC</option>
-                      <option value="PKMTR">Plesetsk MSC</option>
-                      <option value="SEAL">Sea Launch Platform</option>
-                      <option value="SADOL">Submarine Launch, Barents Sea</option>
-                      <option value="TTMTR">Tyuratam MSC | Baikonur Cosmodrome</option>
-                      <option value="VOSTO">Vostochny Cosmodrome</option>
-                      <option value="OREN">Yasny (Dombarovskiy) Cosmodrome</option>
-                    </optgroup>
-                    <optgroup label="China">
-                      <option value="JSC">Jiuquan SLC</option>
-                      <option value="TSC">Taiyuan SLC</option>
-                      <option value="WSC">Wenchang SLC</option>
-                      <option value="XSC">Xichang SLC</option>
-                    </optgroup>
-                    <optgroup label="Japan">
-                      <option value="TNSTA">Tanegashima Space Center</option>
-                      <option value="KSCUT">Uchinoura Space Center</option>
-                    </optgroup>
-                    <optgroup label="North Korea">
-                      <option value="YUN">Sohae Satellite Launch Station</option>
-                      <option value="TNGH">Tonghae Satellite Launching Ground</option>
-                    </optgroup>
-                    <optgroup label="Other">
-                      <option value="FRGUI">Guiana Space Centre (Kourou FG)</option>
-                      <option value="HGSTR">Hammaguira Space Track Range</option>
-                      <option value="NSC">Naro Space Center</option>
-                      <option value="YAVNE">Palmachim Air Force Base</option>
-                      <option value="RLLC">Rocket Labs Launch Complex</option>
-                      <option value="SNMLP">San Marco Launch Platform</option>
-                      <option value="SRI">Satish Dhawan Space Centre (Sriharikota IN)</option>
-                      <option value="SEM">Semnan Spaceport</option>
-                      <option value="WOMRA">Woomera Test Range</option>
-                    </optgroup>
-                  </select>
-                  <label>Launch Facility</label>
-                </div>
-                <div class="center-align">
-                  <button class="btn waves-effect waves-light" type="submit" name="action">Create Launch Nominal &#9658;
-                  </button>
-                </div>
-              </form>
-            </div>
-            <div id="nl-error" class="center-align start-hidden">
-              <h6 class="center-align">Error</h6>
-            </div>
-          </div>
-        </div>
-
-        <div id="breakup-menu" class="side-menu-parent start-hidden text-select">
-          <div id="breakup-content" class="side-menu">
-            <div class="row">
-              <h5 class="center-align">Breakup Simulator</h5>
-              <form id="breakup" class="col s12">
-                <div class="input-field col s12">
-                  <input disabled value="00005" id="hc-scc" type="text">
-                  <label for="disabled">Satellite SCC#</label>
-                </div>
-                <div class="center-align">
-                  <button class="btn waves-effect waves-light" type="submit" name="action">Create Breakup &#9658;
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <div id="missile-menu" class="side-menu-parent start-hidden text-select">
-          <div id="missile-content" class="side-menu">
-            <div class="row">
-              <h5 class="center-align">Create Missile Attack</h5>
-              <form id="missile" class="col s12">
-                <div class="input-field col s12">
-                  <select id="ms-type">
-                    <option value="0">Custom Missile</option>
-                    <option value="1">Russia to USA</option>
-                    <option value="2">Russia to USA w/ Subs</option>
-                    <option value="3">China to USA</option>
-                    <option value="4">North Korea to USA</option>
-                    <option value="5">USA to Russia</option>
-                    <option value="6">USA to China</option>
-                    <option value="7">USA to North Korea</option>
-                  </select>
-                  <label>Type of Attack</label>
-                </div>
-                <div id="ms-custom-opt">
-                  <div class="input-field col s12">
-                    <select id="ms-attacker">
-                      <optgroup label="United States">
-                        <option value="100">Minot</option>
-                        <option value="101">Malmstrom</option>
-                        <option value="102">F.E. Warren</option>
-                      </optgroup>
-                      <optgroup label="Russia">
-                        <option value="200">Aleysk</option>
-                        <option value="201">Dombarovskiy</option>
-                        <option value="202">Uzhur</option>
-                        <option value="203">Kartaly</option>
-                        <option value="204">Irkutsk</option>
-                        <option value="205">Kansk</option>
-                        <option value="206">Krasnoyarsk</option>
-                        <option value="207">Nizhniy Tagil</option>
-                        <option value="208">Novosibirsk</option>
-                        <option value="209">Tatischevo (SS-19)</option>
-                        <option value="210">Tatischevo (SS-27)</option>
-                        <option value="211">Teykovo</option>
-                        <option value="212">Yoshkar Ola</option>
-                      </optgroup>
-                      <optgroup label="China">
-                        <option value="300">Nanyang</option>
-                        <option value="301">Xining</option>
-                        <option value="302">Delingha</option>
-                        <option value="303">Haiyan</option>
-                        <option value="304">Datong</option>
-                        <option value="305">Tainshui</option>
-                        <option value="306">Xixia</option>
-                        <option value="307">Shaoyang</option>
-                        <option value="308">Yuxi</option>
-                        <option value="309">Luoyang</option>
-                        <option value="310">Wuzhai</option>
-                        <option value="311">Xuanhua</option>
-                        <option value="312">Tongdao</option>
-                        <option value="313">Lushi</option>
-                        <option value="314">Jingxian A</option>
-                        <option value="315">Jingxian B</option>
-                        <option value="316">Hunan</option>
-                        <option value="317">Daqing City</option>
-                        <option value="318">Xinyang City</option>
-                        <option value="319">Xinjiang Province</option>
-                        <option value="320">Tibet Province</option>
-                      </optgroup>
-                      <optgroup label="North Korea">
-                        <option value="400">Sinpo</option>
-                        <option value="401">P'yong'an</option>
-                        <option value="402">Pyongyang</option>
-                      </optgroup>
-                    </select>
-                    <label>Launch Location</label>
-                  </div>
-                  <div class="input-field col s12">
-                    <select id="ms-target">
-                      <option value="-1">Use Custom</option>
-                      <optgroup label="United States">
-                        <option value="0">Washington DC</option>
-                        <option value="1">New York City</option>
-                        <option value="2">Los Angeles</option>
-                        <option value="3">Chicago</option>
-                        <option value="4">Boston</option>
-                        <option value="5">Seattle</option>
-                        <option value="6">Miami</option>
-                        <option value="7">Dallas</option>
-                        <option value="8">Colorado Springs</option>
-                        <option value="9">Omaha</option>
-                        <option value="10">Hawaii</option>
-                        <option value="11">Guam</option>
-                      </optgroup>
-                      <optgroup label="NATO Countries">
-                        <option value="12">London</option>
-                        <option value="13">Paris</option>
-                        <option value="14">Madrid</option>
-                        <option value="15">Rome</option>
-                        <option value="16">Berlin</option>
-                        <option value="17">Toronto</option>
-                      </optgroup>
-                      <optgroup label="Non-NATO Countries">
-                        <option value="18">Moscow</option>
-                        <option value="19">St. Petersburg</option>
-                        <option value="20">Novosibirsk</option>
-                        <option value="21">Beijing</option>
-                        <option value="22">Pyongyang</option>
-                      </optgroup>
-                    </select>
-                    <label>Target Location</label>
-                  </div>
-                  <div class="input-field col s12">
-                    <input placeholder="00.000" id="ms-lat" type="text">
-                    <label for="ms-lat">Custom Target Latitude</label>
-                  </div>
-                  <div class="input-field col s12">
-                    <input placeholder="00.000" id="ms-lon" type="text">
-                    <label for="ms-lon">Custom Target Longitude</label>
-                  </div>
-                </div>
-                <div class="center-align">
-                  <button class="btn waves-effect waves-light" type="submit" name="action">Launch Missile Attack &#9658;
-                  </button>
-                </div>
-              </form>
-              <div class="row"></div>
-              <div class="center-align">
-                <button class="btn waves-effect waves-light" onclick="searchBox.doSearch('RV_');" name="search">Show All Missiles &#9658;
-                </button>
-              </div>
-            </div>
-            <div id="ms-error" class="center-align start-hidden">
-              <h6 class="center-align">Error</h6>
-            </div>
-          </div>
-        </div>
-
-        <div id="customSensor-menu" class="side-menu-parent start-hidden text-select">
-          <div id="customSensor-content" class="side-menu">
-            <div class="row">
-              <h5 class="center-align">Custom Sensor</h5>
-              <form id="customSensor">
-                <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Latitude in Decimal Form (ex: 43.283)">
-                  <input id="cs-lat" type="text">
-                  <label for="cs-lat">Latitude</label>
-                </div>
-                <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Longitude in Decimal Form (ex: -73.283)">
-                  <input id="cs-lon" type="text">
-                  <label for="cs-lon">Longitude</label>
-                </div>
-                <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in kilometers (ex: 0.645)">
-                  <input id="cs-hei" type="text">
-                  <label for="cs-hei">Elevation Above Sea Level</label>
-                </div>
-                <div class="switch row tooltipped" data-position="right" data-delay="50" data-tooltip="Is this Sensor a Telescope?">
-                  <label>
-                    <input id="cs-telescope" type="checkbox" checked="false">
-                    <span class="lever"></span>
-                    Telescope
-                  </label>
-                </div>
-                <div id="cs-minaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
-                  <input id="cs-minaz" type="text" disabled value="0">
-                  <label for="cs-minaz">Minimum Azimuth (Left Most Azimuth)</label>
-                </div>
-                <div id="cs-maxaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 120)">
-                  <input id="cs-maxaz" type="text" disabled value="360">
-                  <label for="cs-maxaz">Maximum Azimuth (Right Most Azimuth)</label>
-                </div>
-                <div id="cs-minel-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 10)">
-                  <input id="cs-minel" type="text" disabled value="10">
-                  <label for="cs-minel">Minimum Elevation</label>
-                </div>
-                <div id="cs-maxel-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 90)">
-                  <input id="cs-maxel" type="text" disabled value="90">
-                  <label for="cs-maxel">Maximum Elevation</label>
-                </div>
-                <div id="cs-minrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 500)">
-                  <input id="cs-minrange" type="text" disabled value="100">
-                  <label for="cs-minrange">Minimum Range</label>
-                </div>
-                <div id="cs-maxrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 20000)">
-                  <input id="cs-maxrange" type="text" disabled value="50000">
-                  <label for="cs-maxrange">Maximum Range</label>
-                </div>
-                <div class="center-align">
-                  <button id="cs-submit" class="btn waves-effect waves-light" type="submit" name="action">Create Custom Sensor &#9658;</button>
-                  <br><br>
-                  <button id="cs-geolocation" class="btn waves-effect waves-light" onclick="uiController.useCurrentGeolocationAsSensor();" name="search">Use Geolocation &#9658;</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <div id="info-overlay-menu" class="start-hidden text-select">
-          <div id="info-overlay-content">
-          </div>
-        </div>
-
         <div id="sat-infobox" class="text-select">
           <div id="sat-info-title" class="center-text">This is a title</div>
           <div id="all-objects-link" class="link sat-infobox-links sat-only-info">Find all objects from this launch...</div>
@@ -1103,20 +306,844 @@
               NO DATA
             </div>
           </div>
-          <!-- <div id="iss-stream-menu">
-            <div id="iss-stream"></div>
-          </div> -->
         </div>
-        <!-- <div id="bottom-menu">Current Objects</div> -->
+        <aside id="left-menus">
+          <div id="sensor-list-menu" class="side-menu-parent start-hidden text-select">
+            <div id="sensor-list-content" class="side-menu">
+              <div class="row">
+                <ul id="reset-sensor-text" class="sensor-reset-menu">
+                  <h5 id="reset-sensor-button" class="center-align menu-selectable">Reset Sensor</h5>
+                  <li class="divider"></li>
+                </ul>
+                <ul>
+                  <h5 class="center-align">CSpOC Sensors</h5>
+                  <li class="divider"></li>
+                  <li class="menu-selectable" id="radar-cspocAll">All CSpOC Sensors<span class="badge dark-blue-badge" data-badge-caption="Coalition"></span></li>
+                  <li class="menu-selectable" id="radar-mwAll">All MW Sensors<span class="badge dark-blue-badge" data-badge-caption="Coalition"></span></li>
+                  <li class="menu-selectable" id="radar-ascension">Ascension<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-altair">ALTAIR<span class="badge dark-blue-badge" data-badge-caption="USA"></span></li>
+                  <li class="menu-selectable" id="radar-beale">Beale<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-capecod">Cape Cod<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-parcs">Cavalier<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-clear">Clear<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-cobradane">Cobra Dane<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-eglin">Eglin<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable radar-fylingdales">Fylingdales<span class="badge dark-blue-badge" data-badge-caption="RAF"></span></li>
+                  <li class="menu-selectable" id="radar-globus">Globus II<span class="badge dark-blue-badge" data-badge-caption="NOR"></span></li>
+                  <li class="menu-selectable" id="radar-millstone">Millstone<span class="badge dark-blue-badge" data-badge-caption="MIT"></span></li>
+                  <li class="menu-selectable" id="radar-thule">Thule<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="optical-diego-garcia">Diego Garcia<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="optical-maui">Maui<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="optical-socorro">Socorro<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+                  <li class="divider"></li>
+                  <h5 class="center-align">ESOC Sensors</h5>
+                  <li class="divider"></li>
+                  <li class="menu-selectable" id="esoc-graves">GRAVES<span class="badge dark-blue-badge" data-badge-caption="FRA"></span></li>
+                  <li class="menu-selectable radar-fylingdales">Fylingdales<span class="badge dark-blue-badge" data-badge-caption="RAF"></span></li>
+                  <li class="menu-selectable" id="esoc-tira">TIRA<span class="badge dark-blue-badge" data-badge-caption="GER"></span></li>
+                  <li class="menu-selectable" id="esoc-northern-cross">Northern Cross<span class="badge dark-blue-badge" data-badge-caption="ITA"></span></li>
+                  <li class="menu-selectable" id="esoc-troodos">Troodos<span class="badge dark-blue-badge" data-badge-caption="RAF"></span></li>
+                  <li class="menu-selectable" id="esoc-space-debris-telescope">Space Debris Telescope<span class="badge dark-blue-badge" data-badge-caption="ESA"></span></li>
+                  <li class="divider"></li>
+                  <h5 class="center-align">Russian Sensors</h5>
+                  <li class="divider"></li>
+                  <li class="menu-selectable" id="radar-rus-all">All Russian Sensors<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-armavir">Armavir<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-balkhash">Balkhash<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-gantsevichi">Gantsevichi<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-lekhtusi">Lekhtusi<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-mishelevka-d">Mishelevka<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-olenegorsk">Olenegorsk<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-pechora">Pechora<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-pionersky">Pionersky<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+                  <li class="divider"></li>
+                  <h5 class="center-align">Chinese Sensors</h5>
+                  <li class="divider"></li>
+                  <li class="menu-selectable" id="chinese-xuanhua">Xuanhua<span class="badge dark-blue-badge" data-badge-caption="PRC"></span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div id="color-scheme-menu" class="side-menu-parent start-hidden text-select">
+            <div id="colors-menu" class="side-menu">
+              <ul>
+                <h5 class="center-align">Color Schemes</h5>
+                <li class="divider"></li>
+                <li class="menu-selectable" data-color="default">Object Type</li>
+                <li class="menu-selectable" data-color="velocity">Velocity</li>
+                <li class="menu-selectable" data-color="rcs">Radar Cross Section</li>
+                <li class="menu-selectable" data-color="smallsats">Small Satellites</li>
+                <li class="menu-selectable" data-color="countries">Countries</li>
+                <li class="menu-selectable" data-color="near-earth">Near Earth</li>
+                <li class="menu-selectable" data-color="deep-space">Deep Space</li>
+                <li class="menu-selectable" data-color="lost-objects">Lost Objects</li>
+              </ul>
+            </div>
+          </div>
+          <div id="countries-menu" class="side-menu-parent start-hidden text-select">
+            <div id="country-menu" class="side-menu">
+              <ul>
+                <h5 class="center-align">Countries</h5>
+                <li class="divider"></li>
+                <li class="menu-selectable country-option" data-group="Canada">Canadian</li>
+                <li class="menu-selectable country-option" data-group="China">Chinese</li>
+                <li class="menu-selectable country-option" data-group="France">French</li>
+                <li class="menu-selectable country-option" data-group="India">Indian</li>
+                <li class="menu-selectable country-option" data-group="Israel">Israeli</li>
+                <li class="menu-selectable country-option" data-group="Japan">Japanese</li>
+                <li class="menu-selectable country-option" data-group="Russia">Russian / USSR</li>
+                <li class="menu-selectable country-option" data-group="UnitedKingdom">British</li>
+                <li class="menu-selectable country-option" data-group="UnitedStates">American</li>
+              </ul>
+            </div>
+          </div>
+          <div id="constellations-menu" class="side-menu-parent start-hidden text-select">
+            <div id="constellation-menu" class="side-menu">
+              <ul>
+                <h5 class="center-align">Constellations</h5>
+                <li class="divider"></li>
+                <li class="menu-selectable country-option" data-group="SpaceStations">Space Stations</li>
+                <li class="menu-selectable country-option" data-group="GPSGroup">GPS Satellites</li>
+                <li class="menu-selectable country-option" data-group="GalileoGroup">Galileo Satellites</li>
+                <li class="menu-selectable country-option" data-group="GlonassGroup">Glonass Satellites</li>
+                <li class="menu-selectable country-option" data-group="AmatuerRadio">Amateur Radio</li>
+              </ul>
+            </div>
+          </div>
+          <div id="sensor-info-menu" class="side-menu-parent start-hidden text-select">
+            <div id="sensor-content" class="side-menu">
+              <div class="row">
+                <h5 id="sensor-info-title" class="center-align">Sensor Name</h5>
+                <div class="sensor-info-row" style="margin-top: 0px;">
+                  <div class="sensor-info-key">Country</div>
+                  <div class="sensor-info-value" id="sensor-country">USA</div>
+                </div>
+                <div class="sensor-info-row">
+                  <div class="sensor-info-key">Sensor Type</div>
+                  <div class="sensor-info-value" id="sensor-type">Unknown</div>
+                </div>
+                <div class="sensor-info-row">
+                  <div class="sensor-info-key">Latitude</div>
+                  <div class="sensor-info-value" id="sensor-latitude">0</div>
+                </div>
+                <div class="sensor-info-row">
+                  <div class="sensor-info-key">Longitude</div>
+                  <div class="sensor-info-value" id="sensor-longitude">0</div>
+                </div>
+                <div class="sensor-info-row">
+                  <div class="sensor-info-key">Sun Exclusion</div>
+                  <div class="sensor-info-value" id="sensor-sun">Sun Stuff</div>
+                </div>
+                <div class="sensor-info-row">
+                  <div class="sensor-info-key">Min Azimuth</div>
+                  <div class="sensor-info-value" id="sensor-minazimuth">30 deg</div>
+                </div>
+                <div class="sensor-info-row">
+                  <div class="sensor-info-key">Max Azimuth</div>
+                  <div class="sensor-info-value" id="sensor-maxazimuth">30 deg</div>
+                </div>
+                <div class="sensor-info-row">
+                  <div class="sensor-info-key">Min Elevation</div>
+                  <div class="sensor-info-value" id="sensor-minelevation">60 deg</div>
+                </div>
+                <div class="sensor-info-row">
+                  <div class="sensor-info-key">Max Elevation</div>
+                  <div class="sensor-info-value" id="sensor-maxelevation">60 deg</div>
+                </div>
+                <div class="sensor-info-row">
+                  <div class="sensor-info-key">Min Range</div>
+                  <div class="sensor-info-value" id="sensor-minrange">1000 km</div>
+                </div>
+                <div class="sensor-info-row">
+                  <div class="sensor-info-key">Max Range</div>
+                  <div class="sensor-info-value" id="sensor-maxrange">1000 km</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="watchlist-menu" class="side-menu-parent start-hidden text-select">
+            <div id="watchlist-content" class="side-menu">
+              <div class="row">
+                <h5 class="center-align">Satellite Watchlist</h5>
+                <div id="watchlist-list">
+                  <div class="row">
+                    <div class="col s3 m3 l3">25544</div>
+                    <div class="col s7 m7 l7">ISS (ZARYA)</div>
+                    <div class="col s2 m2 l2 center-align remove-icon"><img src="images/remove.png"></img></div>
+                  </div>
+                </div>
+                <br />
+                <div class="row">
+                  <div class="input-field col s10 m10 l10">
+                    <form id="watchlist-submit">
+                      <input placeholder="XXXXX" id="watchlist-new" type="text">
+                      <label for="watchlist-new">New Satellite</label>
+                    </form>
+                  </div>
+                  <div class="col s2 m2 l2 center-align add-icon"><img class="watchlist-add" src="images/add.png"></img></div>
+                </div>
+                <div class="center-align row">
+                  <button id="watchlist-save" class="btn waves-effect waves-light" type="button" name="action">Save List &#9658;</button>
+                </div>
+                <div class="center-align row">
+                  <button id="watchlist-open" class="btn waves-effect waves-light" type="button" name="action">Load List &#9658;</button>
+                  <input id="watchlist-file" type="file" name="files[]" style="display: none;" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="findByLooks-menu" class="side-menu-parent start-hidden text-select">
+            <div id="findByLooks-content" class="side-menu">
+              <div class="row">
+                <h5 class="center-align">Find By Looks</h5>
+                <form id="findByLooks">
+                  <div class="row">
+                    <div class="input-field col s12 m6 l6">
+                      <input placeholder="XXX.X" id="fbl-azimuth" type="text">
+                      <label for="fbl-azimuth">Azimuth</label>
+                    </div>
+                    <div class="input-field col s12 m6 l6">
+                      <input placeholder="5" id="fbl-azimuth-margin" type="text">
+                      <label for="fbl-azimuth-margin">Margin</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s12 m6 l6">
+                      <input placeholder="XX.X" id="fbl-elevation" type="text">
+                      <label for="fbl-elevation">Elevation</label>
+                    </div>
+                    <div class="input-field col s12 m6 l6">
+                      <input placeholder="5" id="fbl-elevation-margin" type="text">
+                      <label for="fbl-elevation-margin">Margin</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s12 m6 l6">
+                      <input placeholder="XXXX.X" id="fbl-range" type="text">
+                      <label for="fbl-range">Range</label>
+                    </div>
+                    <div class="input-field col s12 m6 l6">
+                      <input placeholder="500" id="fbl-range-margin" type="text">
+                      <label for="fbl-range-margin">Margin</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s12 m6 l6">
+                      <input placeholder="XX.X" id="fbl-inc" type="text">
+                      <label for="fbl-inc">Inclination</label>
+                    </div>
+                    <div class="input-field col s12 m6 l6">
+                      <input value="0.5" placeholder="0.5" id="fbl-inc-margin" type="text">
+                      <label for="fbl-inc-margin">Margin</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s12 m6 l6">
+                      <input placeholder="XX.X" id="fbl-period" type="text">
+                      <label for="fbl-period">Period</label>
+                    </div>
+                    <div class="input-field col s12 m6 l6">
+                      <input value="10" placeholder="10" id="fbl-period-margin" type="text">
+                      <label for="fbl-period-margin">Margin</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <select value=0 id="fbl-type" type="text">
+                        <option value=0>All</option>
+                        <option value=1>Payload</option>
+                        <option value=2>Rocket Body</option>
+                        <option value=3>Debris</option>
+                      </select>
+                      <label for="disabled">Object Type</label>
+                    </div>
+                  </div>
+                  <div class="center-align">
+                    <button id="findByLooks-submit" class="btn waves-effect waves-light" type="submit" name="action">Find Satellite(s) &#9658;
+                    </button>
+                  </div>
+                </form>
+                <div class="row center-align" style="margin-top:20px;">
+                  <span id="fbl-error" class="menu-selectable"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="lookangles-menu" class="side-menu-parent start-hidden text-select">
+            <div id="lookangles-content" class="side-menu">
+              <div class="row">
+                <h5 class="center-align">Sensor Look Angles</h5>
+                <table id="looks"  class="center-align striped-light centered"></table>
+              </div>
+            </div>
+          </div>
+          <div id="lookanglesmultisite-menu" class="side-menu-parent start-hidden text-select">
+            <div id="lookanglesmultisite-content" class="side-menu">
+              <div class="row">
+                <h5 class="center-align">Multi-Sensor Look Angles</h5>
+                <table id="looksmultisite" class="center-align striped-light centered"></table>
+              </div>
+            </div>
+          </div>
+          <div id="twitter-menu" class="side-menu-parent start-hidden side-menu text-select"></div>
+          <div id="map-menu" class="side-menu-parent start-hidden side-menu valign-wrapper">
+            <img id="map-image" src="images/braun-stereographic.jpg" width="800px" height="600px">
+            <img id="map-sat" class="map-item map-look" src="images/satellite-2.png" width="20px" height="20px">
+            <img id="map-sensor" class="map-item map-look start-hidden" src="images/radar-1.png" width="20px" height="20px">
+            <img id="map-look1" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look2" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look3" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look4" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look5" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look6" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look7" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look8" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look9" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look10" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look11" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look12" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look13" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look14" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look15" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look16" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look17" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look18" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look19" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look20" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look21" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look22" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look23" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look24" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look25" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look26" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look27" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look28" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look29" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look30" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look31" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look32" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look33" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look34" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look35" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look36" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look37" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look38" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look39" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look40" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look41" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look42" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look43" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look44" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look45" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look46" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look47" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look48" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look49" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <img id="map-look50" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
+            <div id="braun-credit" style="position:absolute;right:10px;bottom:10px;z-index:5;color:#0a97d6;">
+              Braun Stereographic Projection (c) Tobias Jung
+            </div>
+          </div>
+          <div id="socrates-menu" class="side-menu-parent start-hidden text-select">
+            <div id="socrates-content" class="side-menu">
+              <div class="row">
+                <h5 class="center-align">Possible collisions</h5>
+                <table id="socrates-table" class="center-align"></table>
+              </div>
+            </div>
+          </div>
+          <div id="settings-menu" class="side-menu-parent start-hidden text-select">
+            <div id="settings-content" class="side-menu">
+              <div class="row">
+                <h5 class="center-align">General Settings</h5>
+                <form id="settings-form">
+                  <div class="switch row">
+                    <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Non-selectable satellites will be hidden instead of grayed out.">
+                      <input id="settings-hos" type="checkbox">
+                      <span class="lever"></span>
+                      Hide Other Satellites
+                    </label>
+                  </div>
+                  <div class="switch row">
+                    <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Every 3 seconds a new satellite will be selected from FOV">
+                      <input id="settings-demo-mode" type="checkbox">
+                      <span class="lever"></span>
+                      Enable Demo Mode
+                    </label>
+                  </div>
+                  <div class="switch row">
+                    <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Small text labels will appear next to all satellites in FOV.">
+                      <input id="settings-sat-label-mode" type="checkbox" checked>
+                      <span class="lever"></span>
+                      Enable Satellite Label Mode
+                    </label>
+                  </div>
+                  <div id="satOverfly-opt">
+                    <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
+                    <h5 class="center-align">Satellite Overfly Settings</h5>
+                    <div class="input-field col s12">
+                      <input value="30" id="satFieldOfView" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="What is the satellite's field of view in degrees">
+                      <label for="satFieldOfView">Satellite Field of View</label>
+                    </div>
+                    <div class="row"></div>
+                  </div>
+                  <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
+                  <h5 class="center-align">Lookangles Settings</h5>
+                  <div class="switch row">
+                    <label>
+                      <input id="settings-riseset" type="checkbox">
+                      <span class="lever"></span>
+                      Show Only Rise and Set Times
+                    </label>
+                  </div>
+                  <div class="input-field col s6">
+                    <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated">
+                    <label for="lookanglesLength">Lookangles Length</label>
+                  </div>
+                  <div class="input-field col s6">
+                    <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
+                    <label for="lookanglesInterval">Lookangles Interval</label>
+                  </div>
+                  <div class="row"></div>
+                  <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
+                  <div id="fastCompSettings">
+                    <h5 class="center-align">Fast CPU Required</h5>
+                    <div class="switch row">
+                      <label>
+                        <input id="settings-snp" type="checkbox">
+                        <span class="lever"></span>
+                        Show Next Pass on Hover
+                      </label>
+                    </div>
+                    <div class="row"></div>
+                  </div>
+                  <br/>
+                  <div class="row center">
+                    <button id="settings-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Settings &#9658;
+                    </button>
+                  </div>
+                  <div id="settings-lowperf" class="row center">
+                    <button class="red btn waves-effect waves-light" style="margin-top:200px;" onclick="uiController.startLowPerf();">Low End PC Version &#9658;
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div id="about-menu" class="side-menu-parent start-hidden text-select">
+            <div id="about-content" class="side-menu">
+              <div class="row">
+                <div id="mobile-warning" class="center-align">
+                  You are using the mobile version. Please try the desktop version for full functionality.
+                </div>
+                <br>
+                <div class="row">
+                  <h5 class="center-align">Author</h5>
+                  <div class="col s12">
+                    Created by <a style="color: #48f3e3 !important;" href="https://github.com/thkruz/">Theodore Kruczek</a>
+                     to help visualize orbital calculations for application to Ground Based Radars and Optical Telescopes.
+                     Based on the original work of <a style="color: #48f3e3 !important;" href="https://github.com/jeyoder/">James Yoder</a>
+                  </div>
+                </div>
+                <br>
+                <div class="row">
+                  <h5 class="center-align">Issues</h5>
+                  <div class="col s12">
+                    Please contribute to development by posting your ideas/issues/bugs to the
+                    <a style="color: #48f3e3 !important;" href="https://github.com/thkruz/keeptrack.space">public github repository</a>.
+                  </div>
+                </div>
+                <br>
+                <div class="row">
+                  <h5 class="center-align">Sources</h5>
+                  <div class="col s12">
+                    All information is open source publically available information. Orbits are derived from
+                    TLEs found on public websites. Payload information is compiled from various
+                    public sources. US Sensor data was derived from MDA reports on enviromental impacts and congressional
+                    budget reports.
+                  </div>
+                </div>
+                <br>
+                <div class="row">
+                  <h5 class="center-align">Buy Offline License</h5>
+                  <div class="col s12">
+                    There are many benefits to purchasing an offline license! Use classified ELSETs,
+                    no data collected on user actions, and guarenteed availability -- to name a few! Click below to get a quote.
+                  </div>
+                </div>
+                <div id="get-quote" class="row center">
+                  <button class="red btn waves-effect waves-light" style="margin-top:25px;" onclick="requestQuote();">Buy Offline Version &#9658;
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="editSat-menu" class="side-menu-parent start-hidden text-select">
+            <div id="editSat-content" class="side-menu">
+              <div class="row">
+                <h5 class="center-align">Edit Satellite</h5>
+                <form id="editSat">
+                  <div class="input-field col s12">
+                    <input disabled value="AAAAA" id="es-scc" type="text" maxlength="5">
+                    <label for="disabled">Satellite SCC#</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <input placeholder="AA" id="es-year" type="text" maxlength="2">
+                    <label for="es-year">Epoch Year</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <input placeholder="AAA.AAAAAAAA" id="es-day" type="text" maxlength="12">
+                    <label for="es-day">Epoch Day</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <input placeholder="AAA.AAAA" id="es-inc" type="text" maxlength="8">
+                    <label for="es-inc">Inclination</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <input placeholder="AAA.AAAA" id="es-rasc" type="text" maxlength="8">
+                    <label for="es-rasc">Right Ascension</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <input placeholder="AAA.AAAA" id="es-meanmo" type="text" maxlength="11">
+                    <label for="es-meanmo">Mean Motion</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <input placeholder="AA.AAAAAAAA" id="es-ecen" type="text" maxlength="7">
+                    <label for="es-ecen">Eccentricity</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <input placeholder="AA.AAAAAAAA" id="es-argPe" type="text" maxlength="8">
+                    <label for="es-argPe">Argument of Perigee</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <input placeholder="AAA.AAAA" id="es-meana" type="text" maxlength="8">
+                    <label for="es-meana">Mean Anomaly</label>
+                  </div>
+                  <div class="center-align row">
+                    <button id="editSat-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Satellite &#9658;</button>
+                  </div>
+                  <div class="center-align row">
+                    <button id="editSat-save" class="btn waves-effect waves-light" type="button" name="action">Save TLE &#9658;</button>
+                  </div>
+                  <div class="center-align row">
+                    <button id="editSat-open" class="btn waves-effect waves-light" type="button" name="action">Load TLE &#9658;</button>
+                    <input id="editSat-file" class="start-hidden" type="file" name="files[]"/>
+                  </div>
+                </form>
+              </div>
+              <div id="es-error" class="center-align menu-selectable start-hidden">
+                <h6 class="center-align">Error</h6>
+              </div>
+            </div>
+          </div>
+          <div id="newLaunch-menu" class="side-menu-parent start-hidden text-select">
+            <div id="newLaunch-content" class="side-menu">
+              <div class="row">
+                <h5 class="center-align">New Launch</h5>
+                <form id="newLaunch" class="col s12">
+                  <div class="input-field col s12">
+                    <input disabled value="00005" id="nl-scc" type="text">
+                    <label for="disabled">Satellite SCC#</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <input disabled value="50.00" id="nl-inc" type="text">
+                    <label for="disabled">Inclination</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <select value="50.00" id="nl-updown" type="text">
+                      <option value="N">North</option>
+                      <option value="S">South</option>
+                    </select>
+                    <label for="disabled">Launching North or South</label>
+                  </div>
+                  <div class="input-field col s12" id="nl-launch-menu">
+                    <select id="nl-facility">
+                      <optgroup label="United States">
+                        <option value="CAS">Canary Island Air Space (Pegasus)</option>
+                        <option value="AFETR">Cape Canaveral AFS | Kennedy Space Center</option>
+                        <option value="ERAS">Eastern Range Air Space (Pegasus)</option>
+                        <option value="KODAK">Kodiak Launch Complex</option>
+                        <option value="KWAJ">Reagan Test Site</option>
+                        <option value="AFWTR">Vandenberg AFB</option>
+                        <option value="WLPIS">Wallops Flight Facility</option>
+                        <option value="WRAS">Western Range Air Space (Pegasus)</option>
+                      </optgroup>
+                      <optgroup label="Russia">
+                        <option value="KYMTR">Kasputin Yar MSC</option>
+                        <option value="PKMTR">Plesetsk MSC</option>
+                        <option value="SEAL">Sea Launch Platform</option>
+                        <option value="SADOL">Submarine Launch, Barents Sea</option>
+                        <option value="TTMTR">Tyuratam MSC | Baikonur Cosmodrome</option>
+                        <option value="VOSTO">Vostochny Cosmodrome</option>
+                        <option value="OREN">Yasny (Dombarovskiy) Cosmodrome</option>
+                      </optgroup>
+                      <optgroup label="China">
+                        <option value="JSC">Jiuquan SLC</option>
+                        <option value="TSC">Taiyuan SLC</option>
+                        <option value="WSC">Wenchang SLC</option>
+                        <option value="XSC">Xichang SLC</option>
+                      </optgroup>
+                      <optgroup label="Japan">
+                        <option value="TNSTA">Tanegashima Space Center</option>
+                        <option value="KSCUT">Uchinoura Space Center</option>
+                      </optgroup>
+                      <optgroup label="North Korea">
+                        <option value="YUN">Sohae Satellite Launch Station</option>
+                        <option value="TNGH">Tonghae Satellite Launching Ground</option>
+                      </optgroup>
+                      <optgroup label="Other">
+                        <option value="FRGUI">Guiana Space Centre (Kourou FG)</option>
+                        <option value="HGSTR">Hammaguira Space Track Range</option>
+                        <option value="NSC">Naro Space Center</option>
+                        <option value="YAVNE">Palmachim Air Force Base</option>
+                        <option value="RLLC">Rocket Labs Launch Complex</option>
+                        <option value="SNMLP">San Marco Launch Platform</option>
+                        <option value="SRI">Satish Dhawan Space Centre (Sriharikota IN)</option>
+                        <option value="SEM">Semnan Spaceport</option>
+                        <option value="WOMRA">Woomera Test Range</option>
+                      </optgroup>
+                    </select>
+                    <label>Launch Facility</label>
+                  </div>
+                  <div class="center-align">
+                    <button class="btn waves-effect waves-light" type="submit" name="action">Create Launch Nominal &#9658;
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <div id="nl-error" class="center-align menu-selectable start-hidden">
+                <h6 class="center-align">Error</h6>
+              </div>
+            </div>
+          </div>
+          <div id="breakup-menu" class="side-menu-parent start-hidden text-select">
+            <div id="breakup-content" class="side-menu">
+              <div class="row">
+                <h5 class="center-align">Breakup Simulator</h5>
+                <form id="breakup" class="col s12">
+                  <div class="input-field col s12">
+                    <input disabled value="00005" id="hc-scc" type="text">
+                    <label for="disabled">Satellite SCC#</label>
+                  </div>
+                  <div class="center-align">
+                    <button class="btn waves-effect waves-light" type="submit" name="action">Create Breakup &#9658;
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div id="missile-menu" class="side-menu-parent start-hidden text-select">
+            <div id="missile-content" class="side-menu">
+              <div class="row">
+                <h5 class="center-align">Create Missile Attack</h5>
+                <form id="missile" class="col s12">
+                  <div class="input-field col s12">
+                    <select id="ms-type">
+                      <option value="0">Custom Missile</option>
+                      <option value="1">Russia to USA</option>
+                      <option value="2">Russia to USA w/ Subs</option>
+                      <option value="3">China to USA</option>
+                      <option value="4">North Korea to USA</option>
+                      <option value="5">USA to Russia</option>
+                      <option value="6">USA to China</option>
+                      <option value="7">USA to North Korea</option>
+                    </select>
+                    <label>Type of Attack</label>
+                  </div>
+                  <div id="ms-custom-opt">
+                    <div class="input-field col s12">
+                      <select id="ms-attacker">
+                        <optgroup label="United States">
+                          <option value="100">Minot</option>
+                          <option value="101">Malmstrom</option>
+                          <option value="102">F.E. Warren</option>
+                        </optgroup>
+                        <optgroup label="Russia">
+                          <option value="200">Aleysk</option>
+                          <option value="201">Dombarovskiy</option>
+                          <option value="202">Uzhur</option>
+                          <option value="203">Kartaly</option>
+                          <option value="204">Irkutsk</option>
+                          <option value="205">Kansk</option>
+                          <option value="206">Krasnoyarsk</option>
+                          <option value="207">Nizhniy Tagil</option>
+                          <option value="208">Novosibirsk</option>
+                          <option value="209">Tatischevo (SS-19)</option>
+                          <option value="210">Tatischevo (SS-27)</option>
+                          <option value="211">Teykovo</option>
+                          <option value="212">Yoshkar Ola</option>
+                        </optgroup>
+                        <optgroup label="China">
+                          <option value="300">Nanyang</option>
+                          <option value="301">Xining</option>
+                          <option value="302">Delingha</option>
+                          <option value="303">Haiyan</option>
+                          <option value="304">Datong</option>
+                          <option value="305">Tainshui</option>
+                          <option value="306">Xixia</option>
+                          <option value="307">Shaoyang</option>
+                          <option value="308">Yuxi</option>
+                          <option value="309">Luoyang</option>
+                          <option value="310">Wuzhai</option>
+                          <option value="311">Xuanhua</option>
+                          <option value="312">Tongdao</option>
+                          <option value="313">Lushi</option>
+                          <option value="314">Jingxian A</option>
+                          <option value="315">Jingxian B</option>
+                          <option value="316">Hunan</option>
+                          <option value="317">Daqing City</option>
+                          <option value="318">Xinyang City</option>
+                          <option value="319">Xinjiang Province</option>
+                          <option value="320">Tibet Province</option>
+                        </optgroup>
+                        <optgroup label="North Korea">
+                          <option value="400">Sinpo</option>
+                          <option value="401">P'yong'an</option>
+                          <option value="402">Pyongyang</option>
+                        </optgroup>
+                      </select>
+                      <label>Launch Location</label>
+                    </div>
+                    <div class="input-field col s12">
+                      <select id="ms-target">
+                        <option value="-1">Use Custom</option>
+                        <optgroup label="United States">
+                          <option value="0">Washington DC</option>
+                          <option value="1">New York City</option>
+                          <option value="2">Los Angeles</option>
+                          <option value="3">Chicago</option>
+                          <option value="4">Boston</option>
+                          <option value="5">Seattle</option>
+                          <option value="6">Miami</option>
+                          <option value="7">Dallas</option>
+                          <option value="8">Colorado Springs</option>
+                          <option value="9">Omaha</option>
+                          <option value="10">Hawaii</option>
+                          <option value="11">Guam</option>
+                        </optgroup>
+                        <optgroup label="NATO Countries">
+                          <option value="12">London</option>
+                          <option value="13">Paris</option>
+                          <option value="14">Madrid</option>
+                          <option value="15">Rome</option>
+                          <option value="16">Berlin</option>
+                          <option value="17">Toronto</option>
+                        </optgroup>
+                        <optgroup label="Non-NATO Countries">
+                          <option value="18">Moscow</option>
+                          <option value="19">St. Petersburg</option>
+                          <option value="20">Novosibirsk</option>
+                          <option value="21">Beijing</option>
+                          <option value="22">Pyongyang</option>
+                        </optgroup>
+                      </select>
+                      <label>Target Location</label>
+                    </div>
+                    <div class="input-field col s12">
+                      <input placeholder="00.000" id="ms-lat" type="text" maxlength="8">
+                      <label for="ms-lat">Custom Target Latitude</label>
+                    </div>
+                    <div class="input-field col s12">
+                      <input placeholder="00.000" id="ms-lon" type="text" maxlength="8">
+                      <label for="ms-lon">Custom Target Longitude</label>
+                    </div>
+                  </div>
+                  <div class="center-align">
+                    <button class="btn waves-effect waves-light" type="submit" name="action">Launch Missile Attack &#9658;
+                    </button>
+                  </div>
+                </form>
+                <div class="row"></div>
+                <div class="center-align">
+                  <button class="btn waves-effect waves-light" onclick="searchBox.doSearch('RV_');" name="search">Show All Missiles &#9658;
+                  </button>
+                </div>
+              </div>
+              <div id="ms-error" class="center-align menu-selectable start-hidden">
+                <h6 class="center-align">Error</h6>
+              </div>
+            </div>
+          </div>
+          <div id="customSensor-menu" class="side-menu-parent start-hidden text-select">
+            <div id="customSensor-content" class="side-menu">
+              <div class="row">
+                <h5 class="center-align">Custom Sensor</h5>
+                <form id="customSensor">
+                  <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Latitude in Decimal Form (ex: 43.283)">
+                    <input id="cs-lat" type="text" value="0">
+                    <label for="cs-lat">Latitude</label>
+                  </div>
+                  <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Longitude in Decimal Form (ex: -73.283)">
+                    <input id="cs-lon" type="text" value="0">
+                    <label for="cs-lon">Longitude</label>
+                  </div>
+                  <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in kilometers (ex: 0.645)">
+                    <input id="cs-hei" type="text" value="0">
+                    <label for="cs-hei">Elevation Above Sea Level</label>
+                  </div>
+                  <div class="switch row tooltipped" data-position="right" data-delay="50" data-tooltip="Is this Sensor a Telescope?">
+                    <label>
+                      <input id="cs-telescope" type="checkbox" checked="false">
+                      <span class="lever"></span>
+                      Telescope
+                    </label>
+                  </div>
+                  <div id="cs-minaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
+                    <input id="cs-minaz" type="text" disabled value="0">
+                    <label for="cs-minaz">Minimum Azimuth (Left Most Azimuth)</label>
+                  </div>
+                  <div id="cs-maxaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 120)">
+                    <input id="cs-maxaz" type="text" disabled value="360">
+                    <label for="cs-maxaz">Maximum Azimuth (Right Most Azimuth)</label>
+                  </div>
+                  <div id="cs-minel-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 10)">
+                    <input id="cs-minel" type="text" disabled value="10">
+                    <label for="cs-minel">Minimum Elevation</label>
+                  </div>
+                  <div id="cs-maxel-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 90)">
+                    <input id="cs-maxel" type="text" disabled value="90">
+                    <label for="cs-maxel">Maximum Elevation</label>
+                  </div>
+                  <div id="cs-minrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 500)">
+                    <input id="cs-minrange" type="text" disabled value="100">
+                    <label for="cs-minrange">Minimum Range</label>
+                  </div>
+                  <div id="cs-maxrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 20000)">
+                    <input id="cs-maxrange" type="text" disabled value="50000">
+                    <label for="cs-maxrange">Maximum Range</label>
+                  </div>
+                  <div class="center-align">
+                    <button id="cs-submit" class="btn waves-effect waves-light" type="submit" name="action">Create Custom Sensor &#9658;</button>
+                    <br><br>
+                    <button id="cs-geolocation" class="btn waves-effect waves-light" onclick="uiController.useCurrentGeolocationAsSensor();" name="search">Use Geolocation &#9658;</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div id="info-overlay-menu" class="start-hidden text-select">
+          <div id="info-overlay-content">
+          </div>
+        </div>
+        </aside>
       </div>
     </div>
-    <div id="demo-logo" class="logo-font start-hidden">Keeptrack.space</div>
+    <figcaption id="info-overlays">
+      <div id="camera-status-box" class="start-hidden status-box">
+        Earth Centered Camera Mode
+      </div>
+      <div id="propRate-status-box" class="start-hidden status-box">
+        Propagation Rate: 1.00x
+      </div>
+      <div id="demo-logo" class="logo-font start-hidden">Keeptrack.space</div>
+    </figcaption>
   </main>
   <footer id="nav-footer" class="page-footer">
     <div id="footer-toggle-wrapper">
       <div id="nav-footer-toggle" onclick="uiController.footerToggle();">&#x25BC;</div>
     </div>
-    <div id="datetime" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Information Overlay">
+    <div id="datetime" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Time Menu">
         <div id="datetime-text"></div>
         <div id="datetime-input">
           <form id="datetime-input-form">
@@ -1127,25 +1154,34 @@
     <div id="bottom-icons-container" class="container center">
       <div id="bottom-icons">
         <img id="menu-sensor-list" src="" delayedsrc="images/space-station-2.png" class="bmenu-item tooltipped" alt="Sensor List" data-position="top" data-delay="50" data-tooltip="Sensor List">
-        <img id="menu-info-overlay" src="" delayedsrc="images/info.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Information Overlay" data-position="top" data-delay="50" data-tooltip="Information Overlay">
+        <!-- TODO: Do I Keep This? -->
+        <!-- <img id="menu-info-overlay" src="" delayedsrc="images/info.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Information Overlay" data-position="top" data-delay="50" data-tooltip="Information Overlay"> -->
         <img id="menu-sensor-info" src="" delayedsrc="images/radar.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Sensor Information" data-position="top" data-delay="50" data-tooltip="Sensor Information">
         <img id="menu-watchlist" src="" delayedsrc="images/star.png" class="bmenu-item tooltipped" alt="Satellite Watchlist" data-position="top" data-delay="50" data-tooltip="Satellite Watchlist">
         <img id="menu-lookangles" src="" delayedsrc="images/telescope.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Look Angles" data-position="top" data-delay="50" data-tooltip="Look Angles">
-        <img id="menu-lookanglesmultisite" src="" delayedsrc="images/orbit.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="SSN Lookangles" data-position="top" data-delay="50" data-tooltip="SSN Lookangles">
+        <img id="menu-lookanglesmultisite" src="" delayedsrc="images/worldwide.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="SSN Lookangles" data-position="top" data-delay="50" data-tooltip="SSN Lookangles">
         <img id="menu-find-sat" src="" delayedsrc="images/findOrbit.png" class="bmenu-item tooltipped" alt="Search Orbit" data-position="top" data-delay="50" data-tooltip="Search Orbit">
         <img id="menu-twitter" src="" delayedsrc="images/twitter.png" class="bmenu-item tooltipped" alt="Space News on Twitter" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
         <img id="menu-map" src="" delayedsrc="images/map.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Stereographic Map" data-position="top" data-delay="50" data-tooltip="Stereographic Map">
         <img id="menu-launches" src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item tooltipped" alt="Launch Schedule" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
-        <img id="menu-space-stations" src="" delayedsrc="images/space-station-1.png" class="bmenu-item tooltipped" alt="Union of Concerned Scientists Watchlist" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist">
+        <!-- <img id="menu-space-stations" src="" delayedsrc="images/space-station-1.png" class="bmenu-item tooltipped" alt="Union of Concerned Scientists Watchlist" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist"> -->
         <img id="menu-satellite-collision" src="" delayedsrc="images/satellite-collision.png" class="bmenu-item tooltipped" alt="SOCRATES Prediction of Near Conjunctions" data-position="top" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
         <img id="menu-editSat" src="" delayedsrc="images/editPencil.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Edit Satellites" data-position="top" data-delay="50" data-tooltip="Edit Satellites">
         <img id="menu-newLaunch" src="" delayedsrc="images/rocket-ship.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Create Launch Nominal" data-position="top" data-delay="50" data-tooltip="Create Launch Nominal">
+        <img id="menu-breakup" src="" delayedsrc="images/breakup.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Create Breakup" data-position="top" data-delay="50" data-tooltip="Create Breakup">
         <img id="menu-missile" src="" delayedsrc="images/rocket-ship-2.png" class="bmenu-item tooltipped" alt="Create Missile Attack" data-position="top" data-delay="50" data-tooltip="Create Missile Attack">
         <img id="menu-customSensor" src="" delayedsrc="images/observatory.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Custom Sensor">
         <img id="menu-settings" src="" delayedsrc="images/gear-icon.png" class="bmenu-item tooltipped" alt="Settings" data-position="top" data-delay="50" data-tooltip="Settings">
+        <img id="menu-fov-bubble" src="" delayedsrc="images/fieldofview.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Show/Hide Field of View Bubble" data-position="top" data-delay="50" data-tooltip="Show/Hide Field of View Bubble">
+        <img id="menu-surveillance" src="" delayedsrc="images/surveillance.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Show/Hide Surveillance Fence" data-position="top" data-delay="50" data-tooltip="Show/Hide Surveillance Fence">
+        <img id="menu-sat-fov" src="" delayedsrc="images/satellite-map.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Satellite Field of View" data-position="top" data-delay="50" data-tooltip="Satellite Field of View">
+        <img id="menu-day-night" src="" delayedsrc="images/orbit.png" class="bmenu-item tooltipped" alt="Day Night Toggle" data-position="top" data-delay="50" data-tooltip="Day Night Toggle">
         <img id="menu-color-scheme" src="" delayedsrc="images/brush.png" class="bmenu-item tooltipped" alt="Color Schemes" data-position="top" data-delay="50" data-tooltip="Color Schemes">
+        <img id="menu-constellations" src="" delayedsrc="images/orbit2.png" class="bmenu-item tooltipped" alt="Constellations" data-position="top" data-delay="50" data-tooltip="Constellations">
+        <img id="menu-countries" src="" delayedsrc="images/united-states.png" class="bmenu-item tooltipped" alt="Countries" data-position="top" data-delay="50" data-tooltip="Countries">
         <img id="menu-about" src="" delayedsrc="images/about.png" class="bmenu-item tooltipped" alt="Author Information" data-position="top" data-delay="50" data-tooltip="Author Information">
         <img id="menu-planetarium" src="" delayedsrc="images/astronaut.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Planetarium View" data-position="top" data-delay="50" data-tooltip="Planetarium View">
+        <img id="menu-satview" src="" delayedsrc="images/satellite.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Satellite View" data-position="top" data-delay="50" data-tooltip="Satellite View">
       </div>
     </div>
     <div id="social" class="right">
@@ -1167,35 +1203,35 @@
   <script src="js/lib/materialize.min.js"></script>
   <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.js?v=0.42.7b"></script>
+  <script src="js/lib/satellite.js?v=0.47.1b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=0.42.7b"></script>
+  <script src="js/lib/shader-loader.min.js?v=0.47.1b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=0.42.7b"></script>
-  <script src="js/time-manager.js?v=0.42.7b"></script>
-  <script src="js/sun.js?v=0.42.7b"></script>
-  <script src="js/earth.js?v=0.42.7b"></script>
-  <script src="js/groups.js?v=0.42.7b"></script>
-  <script src="js/satSet.js?v=0.42.7b"></script>
+  <script src="js/settings-manager.js?v=0.47.1b"></script>
+  <script src="js/time-manager.js?v=0.47.1b"></script>
+  <script src="js/sun.js?v=0.47.1b"></script>
+  <script src="js/earth.js?v=0.47.1b"></script>
+  <script src="js/groups.js?v=0.47.1b"></script>
+  <script src="js/satSet.js?v=0.47.1b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js?v=0.42.7b"></script>
+  <script src="js/variables.js?v=0.47.1b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=0.42.7b"></script>
+  <script src="js/ballistic-missile.js?v=0.47.1b"></script>
   <!-- Load Extra Satellites -->
   <!-- <script src="offline/extra.js"></script>
   <script src="offline/satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=0.42.7b"></script>
-  <script src="js/mobile.js?v=0.42.7b"></script>
-  <script src="js/main.min.js?v=0.42.7b"></script>
-  <script src="js/ui.js?v=0.42.7b"></script>
-  <script src="js/lookangles.min.js?v=0.42.7b"></script>
-  <script src="js/orbit-display.js?v=0.42.7b"></script>
-  <script src="js/drawLoop-shapes.js?v=0.42.7b"></script>
-  <script src="js/search-box.js?v=0.42.7b"></script>
+  <script src="js/color-scheme.js?v=0.47.1b"></script>
+  <script src="js/mobile.js?v=0.47.1b"></script>
+  <script src="js/main.min.js?v=0.47.1b"></script>
+  <script src="js/ui.js?v=0.47.1b"></script>
+  <script src="js/lookangles.min.js?v=0.47.1b"></script>
+  <script src="js/orbit-display.js?v=0.47.1b"></script>
+  <script src="js/drawLoop-shapes.js?v=0.47.1b"></script>
+  <script src="js/search-box.js?v=0.47.1b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>
@@ -1203,6 +1239,7 @@
   <script src="js/lib/perfect-scrollbar.min.js"></script>
   <!-- Load Extras Last to Speed Loading -->
   <script src="js/lib/jquery.colorbox.min.js"></script>
+  <script src="js/advice-module.min.js"></script>
   <!--Google Analytics -->
   <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -1213,5 +1250,15 @@
   ga('send', 'pageview');
   </script>
   <!--Google Analytics -->
+
+  <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script>
+
+  <script>
+  function requestQuote() {
+      require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us7.list-manage.com","uuid":"6b5e7c096c84bdffd952c902b","lid":"71dadbe4e3"}) })
+      document.cookie = 'MCPopupClosed=;path=/;expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+  };
+  </script>
+
   </body>
 </html>

@@ -10,6 +10,7 @@
 */
 (function () {
   var colorTheme = settingsManager.colors;
+  var iSensorMarkerArray = -1;
 
   var ColorScheme = function (colorizer) {
     this.colorizer = colorizer;
@@ -28,7 +29,7 @@
   ColorScheme.objectTypeFlags.white = true;
 
   // Removed from function to reduce memory leak
-  ColorScheme.prototype.calculateColorBuffers = function (isForceRecolor) {
+  ColorScheme.prototype.calculateColorBuffers = function (isForceRecolor, isCalculateMarkers) {
     var numSats, colorData, pickableData, colors, i;
     var lastCalculation = 0;
     var now = Date.now();
@@ -53,6 +54,11 @@
     if (this.isVelocityColorScheme) {
       satVel = satSet.getSatVel();
     }
+    iSensorMarkerArray = -1; // Start at -1 so the first use is 0
+
+    // Don't Calculate the Colors of things you can't see
+    if (!settingsManager.isFOVBubbleModeOn && !settingsManager.isShowSurvFence && !settingsManager.isSatOverflyModeOn) numSats -= settingsManager.maxFieldOfViewMarkers;
+
     for (i = 0; i < numSats; i++) {
       sat = satData[i];
       if (satInView) sat.inView = satInView[i];
@@ -109,11 +115,22 @@
       }
 
       if (sat.marker) {
-        return {
-          color: colorTheme.marker,
-          marker: true,
-          pickable: false
-        };
+        if (sat.id === satSensorMarkerArray[iSensorMarkerArray + 1]) {
+          iSensorMarkerArray++;
+        }
+        if (iSensorMarkerArray >= 0) {
+          return {
+            color: colorTheme.marker[iSensorMarkerArray],
+            marker: true,
+            pickable: false
+          };
+        } else {
+          return { // Failsafe
+            color: colorTheme.marker[0],
+            marker: true,
+            pickable: false
+          };
+        }
       }
 
       if (sat.static && ColorScheme.objectTypeFlags.red === false) {
@@ -174,6 +191,8 @@
 
       if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
         color = colorTheme.inview;
+      } else if (sat.C === 'ANALSAT') {
+        color = colorTheme.analyst;
       } else if (sat.OT === 1) { // Payload
         color = colorTheme.payload;
       } else if (sat.OT === 2) { // Rocket Body

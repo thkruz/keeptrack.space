@@ -29,9 +29,20 @@ var maxPinchSize = 1;
   };
 
   var isSearchOpen = false;
-  mobile.searchToggle = function (forceClose) {
-    forceClose = forceClose || false;
-    if (!isSearchOpen && !forceClose) {
+  var forceClose = false;
+  var forceOpen = false;
+  mobile.searchToggle = function (force) {
+    // Reset Force Options
+    forceClose = false;
+    forceOpen = false;
+
+    // Pass false to force close and true to force open
+    if (typeof force != 'undefined') {
+      if (!force) forceClose = true;
+      if (force) forceOpen = true;
+    }
+
+    if ((!isSearchOpen && !forceClose) || forceOpen) {
       isSearchOpen = true;
       $('#search-holder').removeClass('search-slide-up');
       $('#search-holder').addClass('search-slide-down');

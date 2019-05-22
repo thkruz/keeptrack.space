@@ -1,7 +1,7 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
 (c) 2016-2018, Theodore Kruczek
-(c) 2015-2017, James Yoder
+(c) 2015-2016, James Yoder
 
 main.js is the primary javascript file for keeptrack.space. It manages all user
 interaction with the application.
@@ -89,8 +89,10 @@ var isEditSatMenuOpen = false;
 var isLookanglesMenuOpen = false;
 var isLookanglesMultiSiteMenuOpen = false;
 var isNewLaunchMenuOpen = false;
+var isBreakupMenuOpen = false;
 var isMissileMenuOpen = false;
 var isPlanetariumView = false;
+var isSatView = false;
 var isCustomSensorMenuOpen = false;
 
 var pickFb, pickTex;
@@ -144,6 +146,10 @@ var FPSyPos = 25000;
 var FPSzPos = 0;
 var FPSForwardSpeed = 0;
 var FPSSideSpeed = 0;
+var FPSVertSpeed = 0;
+var isFPSForwardSpeedLock = false;
+var isFPSSideSpeedLock = false;
+var isFPSVertSpeedLock = false;
 var FPSRun = 1;
 var FPSLastTime = 1;
 
@@ -414,7 +420,9 @@ var drawLoopCallback;
         camZoomSnappedOnSat = false;
         camAngleSnappedOnSat = false;
       }
-      zoomTarget = Math.pow((camDistTarget - DIST_MIN) / (DIST_MAX - DIST_MIN), 1 / ZOOM_EXP);
+      if (Math.pow((camDistTarget - DIST_MIN) / (DIST_MAX - DIST_MIN), 1 / ZOOM_EXP) < zoomTarget) {
+        zoomTarget = Math.pow((camDistTarget - DIST_MIN) / (DIST_MAX - DIST_MIN), 1 / ZOOM_EXP);
+      }
     }
 
     if (cameraType.current=== cameraType.PLANETARIUM) {
@@ -505,7 +513,7 @@ var drawLoopCallback;
             mat4.rotate(camMatrix, camMatrix, FPSYaw * DEG2RAD, [0, 0, 1]);
             mat4.rotate(camMatrix, camMatrix, FPSRotate * DEG2RAD, [0, 1, 0]);
 
-            orbitDisplay.updateOrbitBuffer(lastSelectedSat.satId);
+            orbitDisplay.updateOrbitBuffer(lastSelectedSat);
             let satPos = sat.position;
             mat4.translate(camMatrix, camMatrix, [-satPos.x, -satPos.y, -satPos.z]);
             break;
@@ -547,20 +555,55 @@ var drawLoopCallback;
     FPStimeNow = Date.now();
     if (FPSLastTime !== 0) {
       FPSelapsed = FPStimeNow - FPSLastTime;
+
+      if (isFPSForwardSpeedLock && FPSForwardSpeed < 0) {
+        FPSForwardSpeed = Math.max(FPSForwardSpeed + Math.min(FPSForwardSpeed * -1.02 * FPSelapsed, -0.2), -settingsManager.FPSForwardSpeed);
+      } else if (isFPSForwardSpeedLock && FPSForwardSpeed > 0) {
+        FPSForwardSpeed = Math.min(FPSForwardSpeed + Math.max(FPSForwardSpeed * 1.02 * FPSelapsed, 0.2), settingsManager.FPSForwardSpeed);
+      }
+
+      if (isFPSSideSpeedLock && FPSSideSpeed < 0) {
+        FPSSideSpeed = Math.max(FPSSideSpeed + Math.min(FPSSideSpeed * -1.02 * FPSelapsed, -0.2), -settingsManager.FPSSideSpeed);
+      } else if (isFPSSideSpeedLock && FPSSideSpeed < 0) {
+        FPSSideSpeed = Math.min(FPSSideSpeed + Math.max(FPSSideSpeed * 1.02 * FPSelapsed, 0.2), settingsManager.FPSSideSpeed);
+      }
+
+      if (isFPSVertSpeedLock && FPSVertSpeed < 0) {
+        FPSVertSpeed = Math.max(FPSVertSpeed + Math.min(FPSVertSpeed * -1.02 * FPSelapsed, -0.2), -settingsManager.FPSVertSpeed);
+      } else if (isFPSVertSpeedLock && FPSVertSpeed < 0) {
+        FPSVertSpeed = Math.min(FPSVertSpeed + Math.max(FPSVertSpeed * 1.02 * FPSelapsed, 0.2), settingsManager.FPSVertSpeed);
+      }
+
+      // console.log('Front: ' + FPSForwardSpeed + ' - ' + 'Side: ' + FPSSideSpeed + ' - ' + 'Vert: ' + FPSVertSpeed);
+
       if (cameraType.FPS) {
         if (FPSForwardSpeed !== 0) {
           FPSxPos -= Math.sin(FPSYaw * DEG2RAD) * FPSForwardSpeed * FPSRun * FPSelapsed;
           FPSyPos -= Math.cos(FPSYaw * DEG2RAD) * FPSForwardSpeed * FPSRun * FPSelapsed;
           FPSzPos += Math.sin(FPSPitch * DEG2RAD) * FPSForwardSpeed * FPSRun * FPSelapsed;
         }
+        if (FPSVertSpeed !== 0) {
+          FPSzPos -= FPSVertSpeed * FPSRun * FPSelapsed;
+        }
         if (FPSSideSpeed !== 0) {
           FPSxPos -= Math.cos(-FPSYaw * DEG2RAD) * FPSSideSpeed * FPSRun * FPSelapsed;
           FPSyPos -= Math.sin(-FPSYaw * DEG2RAD) * FPSSideSpeed * FPSRun * FPSelapsed;
         }
       }
+
+      if (!isFPSForwardSpeedLock) FPSForwardSpeed *= Math.min(0.98 * FPSelapsed, 0.98);
+      if (!isFPSSideSpeedLock) FPSSideSpeed *= Math.min(0.98 * FPSelapsed, 0.98);
+      if (!isFPSVertSpeedLock) FPSVertSpeed *= Math.min(0.98 * FPSelapsed, 0.98);
+
+      if (FPSForwardSpeed < 0.01 && FPSForwardSpeed > -0.01) FPSForwardSpeed = 0;
+      if (FPSSideSpeed < 0.01 && FPSSideSpeed > -0.01) FPSSideSpeed = 0;
+      if (FPSVertSpeed < 0.01 && FPSVertSpeed > -0.01) FPSVertSpeed = 0;
+
       FPSPitch += FPSPitchRate * FPSelapsed;
       FPSRotate += FPSRotateRate * FPSelapsed;
       FPSYaw += FPSYawRate * FPSelapsed;
+
+      // console.log('Pitch: ' + FPSPitch + ' - ' + 'Rotate: ' + FPSRotate + ' - ' + 'Yaw: ' + FPSYaw);
     }
     FPSLastTime = FPStimeNow;
   }
@@ -688,25 +731,25 @@ var drawLoopCallback;
           if (sat.type === 'Launch Facility') {
             var launchSite = tleManager.extractLaunchSite(sat.name);
             satHoverBoxNode1.textContent = (launchSite.site + ', ' + launchSite.sitec);
-            satHoverBoxNode2.textContent = (sat.type + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode2.innerHTML = (sat.type + satellite.distance(sat, selectedSatData) + '');
             satHoverBoxNode3.textContent = ('');
           } else {
             satHoverBoxNode1.textContent = (sat.name);
-            satHoverBoxNode2.textContent = (sat.type + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode2.innerHTML = (sat.type + satellite.distance(sat, selectedSatData) + '');
             satHoverBoxNode3.textContent = ('');
           }
         } else if (sat.missile) {
-          satHoverBoxNode1.textContent = (sat.ON + '<br />' + sat.desc + '');
+          satHoverBoxNode1.textContent = (sat.ON + '<br \>' + sat.desc + '');
           satHoverBoxNode2.textContent = '';
           satHoverBoxNode3.textContent = '';
         } else {
           if (satellite.sensorSelected() && isShowNextPass && isShowDistance) {
             satHoverBoxNode1.textContent = (sat.ON);
             satHoverBoxNode2.textContent = (sat.SCC_NUM);
-            satHoverBoxNode3.textContent = (satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode3.innerHTML = (satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '');
           } else if (isShowDistance) {
             satHoverBoxNode1.textContent = (sat.ON);
-            satHoverBoxNode2.textContent = (sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode2.innerHTML = (sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
             satHoverBoxNode3.textContent = ('');
           } else if (satellite.sensorSelected() && isShowNextPass) {
             satHoverBoxNode1.textContent = (sat.ON);
@@ -997,20 +1040,26 @@ function selectSat (satId) {
     $('#menu-lookanglesmultisite').removeClass('bmenu-item-selected');
     $('#menu-lookangles').removeClass('bmenu-item-selected');
     $('#menu-editSat').removeClass('bmenu-item-selected');
+    $('#menu-sat-fov').removeClass('bmenu-item-selected');
     $('#menu-map').removeClass('bmenu-item-selected');
     $('#menu-newLaunch').removeClass('bmenu-item-selected');
+    $('#menu-breakup').removeClass('bmenu-item-selected');
     // Add Grey Out
     $('#menu-lookanglesmultisite').addClass('bmenu-item-disabled');
     $('#menu-lookangles').addClass('bmenu-item-disabled');
+    $('#menu-satview').addClass('bmenu-item-disabled');
     $('#menu-editSat').addClass('bmenu-item-disabled');
+    $('#menu-sat-fov').addClass('bmenu-item-disabled');
     $('#menu-map').addClass('bmenu-item-disabled');
     $('#menu-newLaunch').addClass('bmenu-item-disabled');
+    $('#menu-breakup').addClass('bmenu-item-disabled');
     // Remove Side Menus
     // $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     // $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#editSat-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#map-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+    $('#breakup-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     // Toggle the side menus as closed
     isEditSatMenuOpen = false;
@@ -1018,6 +1067,7 @@ function selectSat (satId) {
     settingsManager.isMapMenuOpen = false;
     isLookanglesMultiSiteMenuOpen = false;
     isNewLaunchMenuOpen = false;
+    isBreakupMenuOpen = false;
     isMissileMenuOpen = false;
     isCustomSensorMenuOpen = false;
   } else {
@@ -1026,11 +1076,14 @@ function selectSat (satId) {
     sat = satSet.getSatExtraOnly(satId);
     if (!sat) return;
     if (sat.static) {
+      adviceList.sensor();
       sat = satSet.getSat(satId);
       sensorManager.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
       sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
       selectedSat = -1;
       $('#menu-sensor-info').removeClass('bmenu-item-disabled');
+      $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
+      $('#menu-surveillance').removeClass('bmenu-item-disabled');
       $('#menu-planetarium').removeClass('bmenu-item-disabled');
       if (selectedSat !== -1) {
         $('#menu-lookangles').removeClass('bmenu-item-disabled');
@@ -1047,7 +1100,9 @@ function selectSat (satId) {
     }
 
     $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');
+    $('#menu-satview').removeClass('bmenu-item-disabled');
     $('#menu-editSat').removeClass('bmenu-item-disabled');
+    $('#menu-sat-fov').removeClass('bmenu-item-disabled');
     $('#menu-map').removeClass('bmenu-item-disabled');
     $('#menu-newLaunch').removeClass('bmenu-item-disabled');
 

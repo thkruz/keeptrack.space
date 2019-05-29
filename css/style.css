@@ -890,7 +890,6 @@ ul li{
       margin-top: 25px;
       padding: 0 10px 100px 10px;
       right: 0px;
-      width: 100%;
       border-top: 5px;
       border-top-color: #0277bd;
       border-top-style: solid;
@@ -915,15 +914,15 @@ ul li{
       cursor: default;
       position: absolute;
       top: 27%;
-      bottom: 50px;
+      bottom: 0px;
       margin-top: 25px;
-      padding: 0 10px 0 10px;
+      padding: 0 10px 100px 10px;
       right: 0px;
       width: 230px;
       border-width: 5px 0px 0px 5px;
       border-color: #0277bd;
       border-style: solid;
-      overflow: hidden;
+      overflow: auto;
   }
   .sat-infobox-fullsize {}
   .sat-info-value {

@@ -498,6 +498,17 @@
                 <h5 class="center-align">Find By Looks</h5>
                 <form id="findByLooks">
                   <div class="row">
+                    <div class="input-field col s12">
+                      <select value=0 id="fbl-type" type="text">
+                        <option value=0>All</option>
+                        <option value=1>Payload</option>
+                        <option value=2>Rocket Body</option>
+                        <option value=3>Debris</option>
+                      </select>
+                      <label for="disabled">Object Type</label>
+                    </div>
+                  </div>
+                  <div class="row">
                     <div class="input-field col s12 m6 l6">
                       <input placeholder="XXX.X" id="fbl-azimuth" type="text">
                       <label for="fbl-azimuth">Azimuth</label>
@@ -545,17 +556,6 @@
                     <div class="input-field col s12 m6 l6">
                       <input value="10" placeholder="10" id="fbl-period-margin" type="text">
                       <label for="fbl-period-margin">Margin</label>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="input-field col s12">
-                      <select value=0 id="fbl-type" type="text">
-                        <option value=0>All</option>
-                        <option value=1>Payload</option>
-                        <option value=2>Rocket Body</option>
-                        <option value=3>Debris</option>
-                      </select>
-                      <label for="disabled">Object Type</label>
                     </div>
                   </div>
                   <div class="center-align">
@@ -762,18 +762,6 @@
                     public sources. US Sensor data was derived from MDA reports on enviromental impacts and congressional
                     budget reports.
                   </div>
-                </div>
-                <br>
-                <div class="row">
-                  <h5 class="center-align">Buy Offline License</h5>
-                  <div class="col s12">
-                    There are many benefits to purchasing an offline license! Use classified ELSETs,
-                    no data collected on user actions, and guarenteed availability -- to name a few! Click below to get a quote.
-                  </div>
-                </div>
-                <div id="get-quote" class="row center">
-                  <button class="red btn waves-effect waves-light" style="margin-top:25px;" onclick="requestQuote();">Buy Offline Version &#9658;
-                  </button>
                 </div>
               </div>
             </div>

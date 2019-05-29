@@ -74,7 +74,7 @@
       // if (!isFirstMarkerChecked) { // Markers Color Can't Change so Don't Keep Checking
         colors = this.colorizer(sat); // Run the colorscheme below
       // }
-      isFirstMarkerChecked = colors.marker; // First Marker Checked Returns True
+      // isFirstMarkerChecked = colors.marker; // First Marker Checked Returns True
       if (typeof colors == 'undefined') continue;
       colorData[i * 4] = colors.color[0];  // R
       colorData[i * 4 + 1] = colors.color[1]; // G
@@ -528,7 +528,7 @@
 
       if (sat.marker) {
         return {
-          color: colorTheme.marker,
+          color: colorTheme.marker[0],
           marker: true,
           pickable: false
         };

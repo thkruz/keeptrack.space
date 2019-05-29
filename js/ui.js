@@ -1988,7 +1988,7 @@ var isDayNightToggle = false;
           }
           break;
         case 'menu-sat-fov': // No Keyboard Commands
-          if (selectedSat === -1) { // No Sat Selected
+          if (selectedSat === -1 && $('#search').val() === "") { // No Sat Selected and No Search Present
             adviceList.satFOVDisabled();
             if (!$('#menu-sat-fov:animated').length) {
               $('#menu-sat-fov').effect('shake', {distance: 10});
@@ -2009,6 +2009,12 @@ var isDayNightToggle = false;
             settingsManager.isFOVBubbleModeOn = false;
 
             settingsManager.isSatOverflyModeOn = true;
+
+            if ($('#search').val() !== '') { // If Group Selected
+              searchBox.doSearch($('#search').val());
+              console.log(1);
+            }
+
             var satFieldOfView = $('#satFieldOfView').val() * 1;
             $('#menu-sat-fov').addClass('bmenu-item-selected');
             satCruncher.postMessage({
@@ -3089,10 +3095,9 @@ var isDayNightToggle = false;
         break;
     }
     _groupSelected(groupName);
+    searchBox.doSearch($('#search').val());
   });
-
   _groupSelected = function (groupName) {
-    selectSat(-1); // Clear selected sat
     groups.selectGroup(groups[groupName]);
 
     $search.val('');
@@ -3109,6 +3114,8 @@ var isDayNightToggle = false;
     }
 
     searchBox.fillResultBox(groups[groupName].sats);
+
+    selectSat(-1); // Clear selected sat
 
     // Close Menus
     if (settingsManager.isMobileModeEnabled) mobile.searchToggle(true);

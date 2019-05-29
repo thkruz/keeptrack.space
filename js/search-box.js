@@ -51,10 +51,11 @@
   };
 
   searchBox.doSearch = function (searchString, isPreventDropDown) {
+    console.log(searchString);
     if (searchString.length === 0) {
-      selectSat(-1);
       $('#search').val('');
       searchBox.hideResults();
+      selectSat(-1);
       // satSet.setColorScheme(ColorScheme.default, true);
       return;
     }
@@ -62,6 +63,8 @@
     // Uppercase to make this search not case sensitive
     searchString = searchString.toUpperCase();
     var searchList = searchString.split(',');
+    console.log(searchString);
+    console.log(searchList);
 
     var results = [];
 

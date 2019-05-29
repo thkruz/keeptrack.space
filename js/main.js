@@ -1030,6 +1030,20 @@ function selectSat (satId) {
   satSet.selectSat(satId);
   var sat;
   camSnapMode = false;
+
+  if (satId === -1) {
+    if (settingsManager.currentColorScheme === ColorScheme.group || $('#search').val().length >= 3) { // If group selected
+      $('#menu-sat-fov').removeClass('bmenu-item-disabled');
+    } else {
+      $('#menu-sat-fov').removeClass('bmenu-item-selected');
+      $('#menu-sat-fov').addClass('bmenu-item-disabled');
+      settingsManager.isSatOverflyModeOn = false;
+      satCruncher.postMessage({
+        isShowSatOverfly: 'reset'
+      });
+    }
+  }
+
   if (satId === -1 && !isSelectedSatNegativeOne) {
     isSelectedSatNegativeOne = true;
     $('#sat-infobox').fadeOut();
@@ -1040,7 +1054,7 @@ function selectSat (satId) {
     $('#menu-lookanglesmultisite').removeClass('bmenu-item-selected');
     $('#menu-lookangles').removeClass('bmenu-item-selected');
     $('#menu-editSat').removeClass('bmenu-item-selected');
-    $('#menu-sat-fov').removeClass('bmenu-item-selected');
+
     $('#menu-map').removeClass('bmenu-item-selected');
     $('#menu-newLaunch').removeClass('bmenu-item-selected');
     $('#menu-breakup').removeClass('bmenu-item-selected');
@@ -1049,7 +1063,6 @@ function selectSat (satId) {
     $('#menu-lookangles').addClass('bmenu-item-disabled');
     $('#menu-satview').addClass('bmenu-item-disabled');
     $('#menu-editSat').addClass('bmenu-item-disabled');
-    $('#menu-sat-fov').addClass('bmenu-item-disabled');
     $('#menu-map').addClass('bmenu-item-disabled');
     $('#menu-newLaunch').addClass('bmenu-item-disabled');
     $('#menu-breakup').addClass('bmenu-item-disabled');

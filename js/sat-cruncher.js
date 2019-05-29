@@ -91,9 +91,8 @@ onmessage = function (m) {
   // //////////////////////////////
   // SAT OVERFLY AND FOV BUBBLE
   // /////////////////////////////
-  if (m.data.fieldOfViewSetLength) {
-    fieldOfViewSetLength = m.data.fieldOfViewSetLength;
-  }
+  if (m.data.fieldOfViewSetLength) { fieldOfViewSetLength = m.data.fieldOfViewSetLength; }
+
   if (m.data.isShowSatOverfly === 'enable') {
     isShowSatOverfly = true;
     selectedSatFOV = m.data.selectedSatFOV;
@@ -103,22 +102,14 @@ onmessage = function (m) {
     isShowSatOverfly = false;
   }
 
-  if (m.data.isShowFOVBubble === 'enable') {
-    isShowFOVBubble = true;
-  }
-
+  if (m.data.isShowFOVBubble === 'enable') { isShowFOVBubble = true; }
   if (m.data.isShowFOVBubble === 'reset') {
     isResetFOVBubble = true;
     isShowFOVBubble = false;
   }
 
-  if (m.data.isShowSurvFence === 'enable') {
-    isShowSurvFence = true;
-  }
-
-  if (m.data.isShowSurvFence === 'disable') {
-    isShowSurvFence = false;
-  }
+  if (m.data.isShowSurvFence === 'enable') { isShowSurvFence = true; }
+  if (m.data.isShowSurvFence === 'disable') { isShowSurvFence = false; }
   // ////////////////////////////////
 
   if (m.data.multiSensor) {

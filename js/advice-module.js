@@ -70,17 +70,22 @@ or mirrored at any other location without the express written permission of the 
     // localStorage.setItem("lastname", "Smith");
     // localStorage.getItem("lastname");
     // localStorage.removeItem(key);
-    adviceManager.on();
-    adviceList.welcome();
-    setTimeout(adviceList.useLegend, 5 * 1000 * 6);
-    setTimeout(adviceList.showSensors, 10 * 1000 * 6);
-    setTimeout(adviceList.findISS, 15 * 1000 * 6);
-    setTimeout(adviceList.missileMenu, 20 * 1000 * 6);
-    setTimeout(adviceList.toggleNight, 25 * 1000 * 6);
-    setTimeout(adviceList.socrates, 30 * 1000 * 6);
-    setTimeout(adviceList.colorScheme, 35 * 1000 * 6);
-    setTimeout(adviceList.customSensors, 40 * 1000 * 6);
-    setTimeout(adviceList.countries, 45 * 1000 * 6);
+    var wasAdviceEnabled = localStorage.getItem("isAdviceEnabled");
+    if (wasAdviceEnabled == "true" || wasAdviceEnabled == null) {
+      adviceManager.on();
+      adviceList.welcome();
+      setTimeout(adviceList.useLegend, 5 * 1000 * 6);
+      setTimeout(adviceList.showSensors, 10 * 1000 * 6);
+      setTimeout(adviceList.findISS, 15 * 1000 * 6);
+      setTimeout(adviceList.missileMenu, 20 * 1000 * 6);
+      setTimeout(adviceList.toggleNight, 25 * 1000 * 6);
+      setTimeout(adviceList.socrates, 30 * 1000 * 6);
+      setTimeout(adviceList.colorScheme, 35 * 1000 * 6);
+      setTimeout(adviceList.customSensors, 40 * 1000 * 6);
+      setTimeout(adviceList.countries, 45 * 1000 * 6);
+    } else {
+      adviceManager.off();
+    }
   });
 
   adviceCount.welcome = 0;
@@ -521,10 +526,12 @@ or mirrored at any other location without the express written permission of the 
     return isAdviceEnabled;
   };
   adviceManager.on = function () {
+    localStorage.setItem("isAdviceEnabled", true);
     isAdviceEnabled = true;
     tutIconDOM.addClass('bmenu-item-selected');
   };
   adviceManager.off = function () {
+    localStorage.setItem("isAdviceEnabled", false);
     isAdviceEnabled = false;
     helpDOM.hide();
     tutIconDOM.removeClass('bmenu-item-selected');

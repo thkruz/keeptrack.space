@@ -2,6 +2,10 @@
   background-color: #0277bd !important;
 }
 
+.spinner-layer {
+  border-color: #ffffff; 
+}
+
 label {
   color: #ffffff !important;
 }

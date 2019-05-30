@@ -320,8 +320,12 @@ var isDayNightToggle = false;
           }
           if (evt.button === 2) { // Right Mouse Button Clicked
             if (mouseSat !== -1) {
-              $('#edit-sat-rmb').show();
-              numMenuItems++;
+              if (!satSet.getSat(mouseSat).static) {
+                $('#edit-sat-rmb').show();
+                numMenuItems++;
+              } else {
+                $('#edit-sat-rmb').hide();  
+              }
             } else {
               $('#edit-sat-rmb').hide();
             }
@@ -374,7 +378,7 @@ var isDayNightToggle = false;
       rightBtnMenuDOM.click(function (e) {
         switch (e.target.innerText) {
           case 'View Info':
-            M.toast({html: 'Lat: ' + latLon.latitude + ' Lon: ' + latLon.longitude});
+            M.toast({html: 'Lat: ' + latLon.latitude.toFixed(3) + '<br/>Lon: ' + latLon.longitude.toFixed(3)});
           break;
           case 'Edit Satellite':
             selectSat(mouseSat);

@@ -1215,6 +1215,50 @@ or mirrored at any other location without the express written permission of the 
     return 0;
   }
 
+  satellite.pdopCalc = function (lat, lon) {
+    var sat;
+    var lookAngles, az, el;
+    var azList = [];
+    var elList = [];
+
+    if (typeof groups.GPSGroup == 'undefined') {
+      groups.GPSGroup = new groups.SatGroup('nameRegex', /NAVSTAR/);
+    }
+
+    for (var i = 0; i < groups.GPSGroup.sats.length; i++) {
+      sat = satSet.getSat(groups.GPSGroup.sats[i].satId);
+      lookAngles = satellite.ecfToLookAngles({longitude: lon, latitude: lat, height: 0}, sat.position);
+      az = lookAngles.azimuth * RAD2DEG;
+      el = lookAngles.elevation * RAD2DEG;
+      if (el > 0) {
+        azList.push(az);
+        elList.push(el);
+      }
+    }
+    var maxEl = Math.max.apply(null, elList);
+    var minEl = Math.min.apply(null, elList);
+
+    console.log('Az Factor: ' + _Nearest180(azList) / 180 * 10);
+    console.log('El Factor: ' + (maxEl - minEl) / 90 * 10);
+  };
+
+  function _Nearest180 (arr) {
+    var  maxDiff = null;
+    for(var x = 0; x < arr.length; x++){
+      for(var y = x+1; y < arr.length; y++){
+          if(arr[x] < arr[y] && maxDiff < (arr[y] - arr[x])){
+              if (arr[y] - arr[x] > 180) {
+                arr[y] = arr[y] - 180;
+              }
+              if (maxDiff < (arr[y] - arr[x])) {
+                maxDiff = arr[y] - arr[x];
+              }
+          }
+      }
+    }
+    return maxDiff === null ? -1 : maxDiff;
+  }
+
   satellite.xyz2latlon = function (x, y, z) {
     var propTime = timeManager.propTime();
     var j = timeManager.jday(propTime.getUTCFullYear(),

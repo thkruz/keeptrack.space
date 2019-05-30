@@ -126,7 +126,6 @@ onmessage = function (m) {
         mSensor = {};
       } else {
         globalPropagationRate = 2000;
-        console.log(m.data.sensor);
         sensor.observerGd = {
           longitude: m.data.sensor.long * DEG2RAD,
           latitude: m.data.sensor.lat * DEG2RAD,

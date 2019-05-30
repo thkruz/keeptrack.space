@@ -1,6 +1,6 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-(c) 2016-2018, Theodore Kruczek
+(c) 2016-2019, Theodore Kruczek
 (c) 2015-2016, James Yoder
 
 main.js is the primary javascript file for keeptrack.space. It manages all user
@@ -55,9 +55,13 @@ or mirrored at any other location without the express written permission of the 
 */
 var canvasDOM = $('#canvas');
 var bodyDOM = $('#bodyDOM');
+var dropdownInstance;
 var mapImageDOM = $('#map-image');
 var mapMenuDOM = $('#map-menu');
 var satHoverBoxDOM = $('#sat-hoverbox');
+var rightBtnMenuDOM = $('#right-btn-menu');
+var viewInfoRMB = $('#view-info-rmb');
+var clearScreenRMB = $('#clear-screen-rmb');
 var satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
 var satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
 var satHoverBoxNode3 = document.getElementById('sat-hoverbox3');
@@ -153,7 +157,8 @@ var isDayNightToggle = false;
       $('.tooltipped').tooltip({delay: 50});
 
       // Initialize Materialize Select Menus
-      $('select').material_select();
+      M.AutoInit();
+      dropdownInstance = M.Dropdown.getInstance($('.dropdown-trigger'));
 
       // Initialize Perfect Scrollbar
       $('#search-results').perfectScrollbar();
@@ -188,6 +193,7 @@ var isDayNightToggle = false;
       });
     })();
     (function _canvasController () {
+      var latLon;
       canvasDOM.on('touchmove', function (evt) {
         evt.preventDefault();
         if (isPinching) {
@@ -251,6 +257,7 @@ var isDayNightToggle = false;
         }
       });
       canvasDOM.click(function (evt) {
+        rightBtnMenuDOM.hide();
         if ($('#colorbox').css('display') === 'block') {
           $.colorbox.close(); // Close colorbox if it was open
         }
@@ -262,16 +269,15 @@ var isDayNightToggle = false;
         }
 
         dragPoint = getEarthScreenPoint(mouseX, mouseY);
+        latLon = satellite.xyz2latlon(dragPoint[0], dragPoint[1], dragPoint[2]);
         screenDragPoint = [mouseX, mouseY];
         dragStartPitch = camPitch;
         dragStartYaw = camYaw;
         // debugLine.set(dragPoint, getCamPos());
         isDragging = true;
-        // if ($(document).width() <= 1000) {
-        //   isDragging = false;
-        // }
         camSnapMode = false;
         rotateTheEarth = false;
+        rightBtnMenuDOM.hide();
       });
       canvasDOM.on('touchstart', function (evt) {
         settingsManager.cameraMovementSpeed = 0.0001;
@@ -302,26 +308,47 @@ var isDayNightToggle = false;
         }
       });
       canvasDOM.mouseup(function (evt) {
+        var numMenuItems = 1;
         if (!dragHasMoved) {
           var clickedSat = mouseSat;
-          if (clickedSat === -1 && evt.button === 2) { // Right Mouse Button Click
-            $('#search').val('');
-            searchBox.hideResults();
-            isMilSatSelected = false;
-            $('#menu-space-stations').removeClass('bmenu-item-selected');
-
-            if (satellite.sensorSelected() && cameraType.current !== cameraType.PLANETARIUM) {
-              uiController.legendMenuChange('default');
+          if (evt.button === 0) { // Left Mouse Button Clicked
+            if (cameraType.current === cameraType.SATELLITE) {
+              if (clickedSat !== -1 && !satSet.getSatExtraOnly(clickedSat).static) { selectSat(clickedSat); }
             } else {
-              // uiController.legendMenuChange('default');
+              selectSat(clickedSat);
+            }
+          }
+          if (evt.button === 2) { // Right Mouse Button Clicked
+            if (mouseSat !== -1) {
+              $('#edit-sat-rmb').show();
+              numMenuItems++;
+            } else {
+              $('#edit-sat-rmb').hide();
             }
 
-            // satSet.setColorScheme(ColorScheme.default);
-          }
-          if (cameraType.current === cameraType.SATELLITE) {
-            if (clickedSat !== -1 && !satSet.getSatExtraOnly(clickedSat).static) { selectSat(clickedSat); }
-          } else {
-            selectSat(clickedSat);
+            // Is this the Earth?
+            if (isNaN(latLon.latitude) || isNaN(latLon.longitude)) {
+              $('#view-info-rmb').hide();
+              $('#create-sensor-rmb').hide();
+            } else {
+              $('#view-info-rmb').show();
+              numMenuItems++;
+              $('#create-sensor-rmb').show();
+              numMenuItems++;
+            }
+
+
+            rightBtnMenuDOM.show();
+            // NOTE: Need to be adjusted if number of menus change
+            var offsetX = (mouseX < (canvasDOM.innerWidth() / 2)) ? 0 : -100;
+            var offsetY = (mouseY < (canvasDOM.innerHeight() / 2)) ? 0 : (numMenuItems * -50);
+            rightBtnMenuDOM.css({
+              display: 'block',
+              'text-align': 'center',
+              position: 'absolute',
+              left: mouseX + offsetX,
+              top: mouseY + offsetY
+            });
           }
         }
         // Repaint the theme to ensure it is the right color
@@ -343,6 +370,47 @@ var isDayNightToggle = false;
         isDragging = false;
         rotateTheEarth = false;
       });
+
+      rightBtnMenuDOM.click(function (e) {
+        switch (e.target.innerText) {
+          case 'View Info':
+            M.toast({html: 'Lat: ' + latLon.latitude + ' Lon: ' + latLon.longitude});
+          break;
+          case 'Edit Satellite':
+            selectSat(mouseSat);
+            if (!isEditSatMenuOpen) {
+              _bottomIconPress({currentTarget: {id: 'menu-editSat'}});
+            }
+          break;
+          case 'Create Sensor Here':
+            if (!isCustomSensorMenuOpen) {
+              _bottomIconPress({currentTarget: {id: 'menu-customSensor'}});
+            }
+            $('#cs-lat').val(latLon.latitude);
+            $('#cs-lon').val(latLon.longitude);
+            $('#customSensor').submit();
+          break;
+          case 'Clear Screen':
+            console.log('clear');
+            (function clearScreenRMB () {
+              $('#search').val('');
+              searchBox.hideResults();
+              isMilSatSelected = false;
+              $('#menu-space-stations').removeClass('bmenu-item-selected');
+
+              if (satellite.sensorSelected() && cameraType.current !== cameraType.PLANETARIUM) {
+                uiController.legendMenuChange('default');
+              }
+            })();
+            break;
+          }
+          rightBtnMenuDOM.hide();
+      });
+
+      clearScreenRMB.click(function (e) {
+
+      });
+
       bodyDOM.on('keypress', _keyHandler); // On Key Press Event Run _keyHandler Function
       bodyDOM.on('keydown', _keyDownHandler); // On Key Press Event Run _keyHandler Function
       bodyDOM.on('keyup', _keyUpHandler); // On Key Press Event Run _keyHandler Function
@@ -647,7 +715,9 @@ var isDayNightToggle = false;
         var fblType = $('#fbl-type').val();
         $('#search').val(''); // Reset the search first
         var res = satSet.searchAzElRange(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM, fblPeriod, fblPeriodM, fblType);
-        if (res.length === 0) {
+        if (typeof res === 'undefined') {
+          $('#fbl-error').html('No Search Criteria');
+        } else if (res.length === 0) {
           $('#fbl-error').html('No Satellites Found');
         }
         e.preventDefault();
@@ -910,7 +980,7 @@ var isDayNightToggle = false;
             watchlistInViewList.splice(i, 1);
           }
         }
-        _updateWatchlist();
+        uiController.updateWatchlist();
         if (watchlistList.length <= 0) {
           searchBox.doSearch('');
           satSet.setColorScheme(ColorScheme.default, true);
@@ -930,7 +1000,7 @@ var isDayNightToggle = false;
         if (!duplicate) {
           watchlistList.push(satId);
           watchlistInViewList.push(false);
-          _updateWatchlist();
+          uiController.updateWatchlist();
         }
         if (satellite.sensorSelected()) {
           $('#menu-info-overlay').removeClass('bmenu-item-disabled');
@@ -947,7 +1017,7 @@ var isDayNightToggle = false;
         if (!duplicate) {
           watchlistList.push(satId);
           watchlistInViewList.push(false);
-          _updateWatchlist();
+          uiController.updateWatchlist();
         }
         if (satellite.sensorSelected()) {
           $('#menu-info-overlay').removeClass('bmenu-item-disabled');
@@ -994,7 +1064,7 @@ var isDayNightToggle = false;
             }
           }
           watchlistList = newWatchlist;
-          _updateWatchlist();
+          uiController.updateWatchlist();
           if (satellite.sensorSelected()) {
             $('#menu-info-overlay').removeClass('bmenu-item-disabled');
           }
@@ -1636,7 +1706,7 @@ var isDayNightToggle = false;
             uiController.hideSideMenus();
             $('#watchlist-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             $('#search-holder').hide();
-            _updateWatchlist();
+            uiController.updateWatchlist();
             isWatchlistMenuOpen = true;
             $('#menu-watchlist').addClass('bmenu-item-selected');
             break;
@@ -1721,7 +1791,7 @@ var isDayNightToggle = false;
             settingsManager.isMapMenuOpen = true;
             uiController.updateMap();
             var satData = satSet.getSatExtraOnly(selectedSat);
-            $('#map-sat').tooltip({delay: 50, tooltip: satData.SCC_NUM, position: 'left'});
+            $('#map-sat').tooltip({delay: 50, html: satData.SCC_NUM, position: 'left'});
             $('#menu-map').addClass('bmenu-item-selected');
             break;
           }
@@ -1735,9 +1805,9 @@ var isDayNightToggle = false;
             if (settingsManager.isMobileModeEnabled) mobile.searchToggle(false);
             uiController.hideSideMenus();
             if (location.protocol === 'https:') {
-              $.colorbox({href: 'https://space.skyrocket.de/doc_chr/lau2018.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+              $.colorbox({href: 'https://space.skyrocket.de/doc_chr/lau2019.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
             } else {
-              $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2018.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+              $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2019.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
             }
             isLaunchMenuOpen = true;
             $('#menu-launches').addClass('bmenu-item-selected');
@@ -2012,7 +2082,6 @@ var isDayNightToggle = false;
 
             if ($('#search').val() !== '') { // If Group Selected
               searchBox.doSearch($('#search').val());
-              console.log(1);
             }
 
             var satFieldOfView = $('#satFieldOfView').val() * 1;
@@ -2201,14 +2270,22 @@ var isDayNightToggle = false;
       // isPlanetariumView = false;
     };
 
-    function _updateWatchlist () {
+    uiController.updateWatchlist = function (updateWatchlistList, updateWatchlistInViewList) {
+      if (typeof updateWatchlistList !== 'undefined') {
+        watchlistList = updateWatchlistList;
+      }
+      if (typeof updateWatchlistInViewList !== 'undefined') {
+        watchlistInViewList = updateWatchlistInViewList;
+      }
+
       if (!watchlistList) return;
       settingsManager.isThemesNeeded = true;
       isWatchlistChanged = true;
       var watchlistString = '';
       var watchlistListHTML = '';
+      var sat;
       for (var i = 0; i < watchlistList.length; i++) {
-        var sat = satSet.getSatExtraOnly(watchlistList[i]);
+        sat = satSet.getSatExtraOnly(watchlistList[i]);
         if (sat == null) {
           watchlistList.splice(i, 1);
           continue;
@@ -2226,6 +2303,14 @@ var isDayNightToggle = false;
       }
       $('#search').val(watchlistString);
       searchBox.doSearch(watchlistString, true);
+
+      var saveWatchlist = [];
+      for (i = 0; i < watchlistList.length; i++) {
+        sat = satSet.getSatExtraOnly(watchlistList[i]);
+        saveWatchlist[i] = sat.SCC_NUM;
+      }
+      var variable = JSON.stringify(saveWatchlist);
+      localStorage.setItem("watchlistList", variable);
     }
 
     var isCurrentlyTyping = false;
@@ -2614,6 +2699,7 @@ var isDayNightToggle = false;
     for (var i = 0; i < watchlistList.length; i++) {
       var sat = satSet.getSat(watchlistList[i]);
       if (sat.inview === 1 && watchlistInViewList[i] === false) { // Is inview and wasn't previously
+        console.log(1);
         watchlistInViewList[i] = true;
         orbitDisplay.addInViewOrbit(watchlistList[i]);
       }
@@ -3200,9 +3286,9 @@ var isDayNightToggle = false;
       map.x = map.x * settingsManager.mapWidth - 3.5;
       map.y = map.y / 0.6366197723675813 * settingsManager.mapHeight - 3.5;
       if (map.y > settingsManager.mapHeight / 2) {
-        $('#map-look' + i).tooltip({delay: 50, tooltip: satellite.map(sat, i).time, position: 'top'});
+        $('#map-look' + i).tooltip({delay: 50, html: satellite.map(sat, i).time, position: 'top'});
       } else {
-        $('#map-look' + i).tooltip({delay: 50, tooltip: satellite.map(sat, i).time, position: 'bottom'});
+        $('#map-look' + i).tooltip({delay: 50, html: satellite.map(sat, i).time, position: 'bottom'});
       }
       if (satellite.map(sat, i).inview === 1) {
         $('#map-look' + i).attr('src', 'images/yellow-square.png'); // If inview then make yellow

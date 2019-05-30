@@ -1,6 +1,6 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-(c) 2016-2018, Theodore Kruczek
+(c) 2016-2019, Theodore Kruczek
 
 lookangles.js is an expansion library for satellite.js providing tailored functions
 for calculating orbital data.
@@ -1214,6 +1214,25 @@ or mirrored at any other location without the express written permission of the 
     }
     return 0;
   }
+
+  satellite.xyz2latlon = function (x, y, z) {
+    var propTime = timeManager.propTime();
+    var j = timeManager.jday(propTime.getUTCFullYear(),
+                 propTime.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+                 propTime.getUTCDate(),
+                 propTime.getUTCHours(),
+                 propTime.getUTCMinutes(),
+                 propTime.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+    j += propTime.getUTCMilliseconds() * 1.15741e-8;
+    var gmst = satellite.gstime(j);
+    var latLon = satellite.eciToGeodetic({x: x, y: y, z: z}, gmst);
+    latLon.latitude = latLon.latitude * RAD2DEG;
+    latLon.longitude = latLon.longitude * RAD2DEG;
+
+    latLon.longitude = (latLon.longitude > 180) ? latLon.longitude - 360 : latLon.longitude;
+    latLon.longitude = (latLon.longitude < -180) ? latLon.longitude + 360 : latLon.longitude;
+    return latLon;
+  };
 
   // NOTE Specific to my project.
   satellite.map = function (sat, i) {

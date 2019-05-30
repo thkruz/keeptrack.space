@@ -1,6 +1,6 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-(c) 2016-2018, Theodore Kruczek
+(c) 2016-2019, Theodore Kruczek
 (c) 2015-2016, James Yoder
 
 main.js is the primary javascript file for keeptrack.space. It manages all user
@@ -750,7 +750,8 @@ var drawLoopCallback;
           } else if (isShowDistance) {
             satHoverBoxNode1.textContent = (sat.ON);
             satHoverBoxNode2.innerHTML = (sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
-            satHoverBoxNode3.textContent = ('');
+            satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
+                                            'X: ' + sat.velocityX.toFixed(2) + 'km/s Y: ' + sat.velocityY.toFixed(2) + 'km/s Z: ' + sat.velocityZ.toFixed(2)) + 'km/s';
           } else if (satellite.sensorSelected() && isShowNextPass) {
             satHoverBoxNode1.textContent = (sat.ON);
             satHoverBoxNode2.textContent = (sat.SCC_NUM);
@@ -758,7 +759,8 @@ var drawLoopCallback;
           } else {
             satHoverBoxNode1.textContent = (sat.ON);
             satHoverBoxNode2.textContent = (sat.SCC_NUM);
-            satHoverBoxNode3.textContent = ('');
+            satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
+                                            'X: ' + sat.velocityX.toFixed(2) + ' Y: ' + sat.velocityY.toFixed(2) + ' Z: ' + sat.velocityZ.toFixed(2));
           }
         }
         satHoverBoxDOM.css({
@@ -1222,7 +1224,7 @@ function selectSat (satId) {
       if (sat.R >= 0.1) { rcs = 'Medium'; }
       if (sat.R > 1) { rcs = 'Large'; }
       $('#sat-rcs').html(rcs);
-      $('#sat-rcs').tooltip({delay: 50, tooltip: sat.R, position: 'left'});
+      $('#sat-rcs').tooltip({delay: 50, html: sat.R, position: 'left'});
     }
 
     if (!sat.missile) {
@@ -1233,7 +1235,7 @@ function selectSat (satId) {
       $('#sat-eccentricity').html((sat.eccentricity).toFixed(3));
 
       $('#sat-period').html(sat.period.toFixed(2) + ' min');
-      $('#sat-period').tooltip({delay: 50, tooltip: 'Mean Motion: ' + MINUTES_PER_DAY / sat.period.toFixed(2), position: 'left'});
+      $('#sat-period').tooltip({delay: 50, html: 'Mean Motion: ' + MINUTES_PER_DAY / sat.period.toFixed(2), position: 'left'});
 
       var now = new Date();
       var jday = timeManager.getDayOfYear(now);
@@ -1246,7 +1248,7 @@ function selectSat (satId) {
         daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3) + (satSet.getSat(satId).TLE1.substr(17, 2) * 365);
       }
       $('#sat-elset-age').html(daysold + ' Days');
-      $('#sat-elset-age').tooltip({delay: 50, tooltip: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(), position: 'left'});
+      $('#sat-elset-age').tooltip({delay: 50, html: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(), position: 'left'});
 
       now = new Date(timeManager.propRealTime + timeManager.propOffset);
       var sunTime = SunCalc.getTimes(now, satellite.currentSensor.lat, satellite.currentSensor.long);

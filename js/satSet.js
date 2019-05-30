@@ -1,6 +1,6 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-(c) 2016-2018, Theodore Kruczek
+(c) 2016-2019, Theodore Kruczek
 (c) 2015-2016, James Yoder
 
 satSet.js is the primary interface between sat-cruncher and the main application.
@@ -207,7 +207,7 @@ var satSensorMarkerArray = [];
 
       // Version Info Updated
       $('#version-info').html(settingsManager.versionNumber);
-      $('#version-info').tooltip({delay: 50, tooltip: settingsManager.versionDate, position: 'top'});
+      $('#version-info').tooltip({delay: 50, html: settingsManager.versionDate, position: 'top'});
 
       /** Hide SOCRATES menu if not all the satellites are currently available to view */
       if (limitSats !== '') {
@@ -237,6 +237,25 @@ var satSensorMarkerArray = [];
       if (cruncherReadyCallback) {
         cruncherReadyCallback(satData);
       }
+
+      (function _watchlistInit () {
+        var watchlistJSON = localStorage.getItem("watchlistList");
+        if (watchlistJSON !== null) {
+          var newWatchlist = JSON.parse(watchlistJSON);
+          watchlistInViewList = [];
+          for (var i = 0; i < newWatchlist.length; i++) {
+            var sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
+            if (sat !== null) {
+              newWatchlist[i] = sat.id;
+              watchlistInViewList.push(false);
+            } else {
+              console.error('Watchlist File Format Incorret');
+              return;
+            }
+          }
+          uiController.updateWatchlist(newWatchlist, watchlistInViewList);
+        }
+      })();
 
       if ($(window).width() > $(window).height()) {
         settingsManager.mapHeight = $(window).width(); // Subtract 12 px for the scroll
@@ -773,6 +792,9 @@ var satSensorMarkerArray = [];
         satVel[i * 3 + 1] * satVel[i * 3 + 1] +
         satVel[i * 3 + 2] * satVel[i * 3 + 2]
       );
+      satData[i].velocityX = satVel[i * 3];
+      satData[i].velocityY = satVel[i * 3 + 1];
+      satData[i].velocityZ = satVel[i * 3 + 2];
       satData[i].position = {
         x: satPos[i * 3],
         y: satPos[i * 3 + 1],

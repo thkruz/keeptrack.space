@@ -47,7 +47,7 @@ body {
     background: rgba(2,119,189,1);
     cursor: pointer;
     text-align: center;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
 }
 
@@ -155,6 +155,32 @@ ul {
     bottom: 0;
     margin: auto;
     text-align: center;
+}
+
+#right-btn-menu {
+  display: none;
+  background: black;
+  color: white;
+  position: absolute;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#right-btn-menu ul {
+  width: 100%;
+}
+
+#right-btn-menu ul li {
+  padding: 15px;
+  cursor: pointer;
+}
+
+#right-btn-menu ul li:hover{
+  background-color: rgb(0, 114, 230);
+}
+
+#right-btn-menu ul li a:hover{
+  background-color: rgba(0, 0, 0, 0);
 }
 
 #sat-hoverbox {
@@ -410,7 +436,7 @@ ul {
     height: 470px;
 }
 #about-content {
-  font-size: small;
+  font-size: 12px;
 }
 .box-header {
     font-size: 20px;
@@ -536,7 +562,7 @@ ul {
       height: 18px;
   }
   .sensor-info-key {
-      font-size: 14px;
+      font-size: 12px;
       float: left;
   }
   .sensor-info-value {
@@ -690,11 +716,11 @@ ul {
     background: #0a97d6;
     color: white;
     width: 260px;
-    top: 100px;
-    bottom: 0px;
+    top: 50px;
+    bottom: 100px;
     overflow: auto;
     z-index: 10;
-    padding: 0px 5px 100px 0px;
+    padding: 0px 5px 0px 0px;
   }
   #lookanglesmultisite-content {
     width: 375px;
@@ -710,13 +736,17 @@ ul {
     color: white;
     width: 260px;
     top: 25px;
-    bottom: 0px;
+    bottom: 100px;
     overflow: auto;
     z-index: 10;
-    padding: 0px 5px 100px 0px;
+    padding: 0px 5px 0px 0px;
     border-width: 0px 5px 0px 0px;
     border-color: #0277bd;
     border-style: solid;
+  }
+  nav, nav .nav-wrapper i, nav a.sidenav-trigger, nav a.sidenav-trigger i {
+    height: 25px;
+    line-height: 25px;
   }
   #lookanglesmultisite-content {
     width: 375px;
@@ -833,7 +863,7 @@ a{
 
 ul li{
 	list-style: none;
-  padding: 10px;
+  padding: 5px;
 }
 
 #colorbox {
@@ -947,14 +977,14 @@ ul li{
     font-size: 18px;
 }
 .sat-info-row {
-    margin-bottom: 5px;
+    margin-bottom: 3px;
     height: 18px;
 }
 .sat-info-key, .sat-info-value {
     display: inline-block;
 }
 .sat-info-key {
-    font-size: 14px;
+    font-size: 12px;
     color: white;
     float: left;
 }
@@ -985,7 +1015,7 @@ ul li{
     top: 0px;
     width: 92px;
     height: 75px;
-    font-size: 14px;
+    font-size: 12px;
     text-align: center;
     background: transparent;
     overflow: hidden;
@@ -1017,7 +1047,7 @@ ul li{
   overflow: hidden;
   text-align: center;
   font-weight: bold;
-  font-size: 15px;
+  font-size: 12px;
 }
   #datetime-text {
       padding-top: 10px
@@ -1072,7 +1102,7 @@ ul li{
     overflow: hidden;
     text-align: center;
     font-weight: bold;
-    font-size: 15px;
+    font-size: 12px;
   }
     #datetime-text {
         padding: 10px

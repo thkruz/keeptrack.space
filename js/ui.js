@@ -60,8 +60,19 @@ var mapImageDOM = $('#map-image');
 var mapMenuDOM = $('#map-menu');
 var satHoverBoxDOM = $('#sat-hoverbox');
 var rightBtnMenuDOM = $('#right-btn-menu');
+var rightBtnViewDOM = $('#view-rmb');
+var rightBtnEditDOM = $('#edit-rmb');
+var rightBtnCreateDOM = $('#create-rmb');
+
+var rightBtnViewMenuDOM = $('#view-rmb-menu');
+var rightBtnEditMenuDOM = $('#edit-rmb-menu');
+var rightBtnCreateMenuDOM = $('#create-rmb-menu');
+
 var viewInfoRMB = $('#view-info-rmb');
+var editSatRMB = $('#edit-sat-rmb');
+var createSensorRMB = $('#create-sensor-rmb');
 var clearScreenRMB = $('#clear-screen-rmb');
+
 var satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
 var satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
 var satHoverBoxNode3 = document.getElementById('sat-hoverbox3');
@@ -258,6 +269,7 @@ var isDayNightToggle = false;
       });
       canvasDOM.click(function (evt) {
         rightBtnMenuDOM.hide();
+        _clearRMBSubMenu();
         if ($('#colorbox').css('display') === 'block') {
           $.colorbox.close(); // Close colorbox if it was open
         }
@@ -278,6 +290,7 @@ var isDayNightToggle = false;
         camSnapMode = false;
         rotateTheEarth = false;
         rightBtnMenuDOM.hide();
+        _clearRMBSubMenu();
       });
       canvasDOM.on('touchstart', function (evt) {
         settingsManager.cameraMovementSpeed = 0.0001;
@@ -321,28 +334,29 @@ var isDayNightToggle = false;
           if (evt.button === 2) { // Right Mouse Button Clicked
             if (mouseSat !== -1) {
               if (!satSet.getSat(mouseSat).static) {
-                $('#edit-sat-rmb').show();
+                rightBtnEditDOM.show();
                 numMenuItems++;
               } else {
-                $('#edit-sat-rmb').hide();
+                rightBtnEditDOM.hide();
               }
             } else {
-              $('#edit-sat-rmb').hide();
+              rightBtnEditDOM.hide();
             }
 
             // Is this the Earth?
             if (isNaN(latLon.latitude) || isNaN(latLon.longitude)) {
-              $('#view-info-rmb').hide();
-              $('#create-sensor-rmb').hide();
+              rightBtnViewDOM.hide();
+              rightBtnCreateDOM.hide();
             } else {
-              $('#view-info-rmb').show();
+              rightBtnViewDOM.show();
               numMenuItems++;
-              $('#create-sensor-rmb').show();
+              rightBtnCreateDOM.show();
               numMenuItems++;
             }
 
 
             rightBtnMenuDOM.show();
+            satHoverBoxDOM.hide();
             // NOTE: Need to be adjusted if number of menus change
             var offsetX = (mouseX < (canvasDOM.innerWidth() / 2)) ? 0 : -100;
             var offsetY = (mouseY < (canvasDOM.innerHeight() / 2)) ? 0 : (numMenuItems * -50);
@@ -376,9 +390,56 @@ var isDayNightToggle = false;
       });
 
       rightBtnMenuDOM.click(function (e) {
+        _rmbMenuActions(e);
+      });
+      rightBtnViewMenuDOM.click(function (e) {
+        _rmbMenuActions(e);
+      });
+      rightBtnEditMenuDOM.click(function (e) {
+        _rmbMenuActions(e);
+      });
+      rightBtnCreateMenuDOM.click(function (e) {
+        _rmbMenuActions(e);
+      });
+
+      function _rmbMenuActions (e) {
         switch (e.target.innerText) {
-          case 'View Info':
+          case 'Info':
             M.toast({html: 'Lat: ' + latLon.latitude.toFixed(3) + '<br/>Lon: ' + latLon.longitude.toFixed(3)});
+          break;
+          case 'Current GPS DOPs':
+            var gpsDOP = satellite.getDOPs(latLon.latitude, latLon.longitude, 0);
+            M.toast({html: 'HDOP: ' + gpsDOP.HDOP + '<br/>' +
+                           'VDOP: ' + gpsDOP.VDOP + '<br/>' +
+                           'PDOP: ' + gpsDOP.PDOP + '<br/>' +
+                           'GDOP: ' + gpsDOP.GDOP + '<br/>' +
+                           'TDOP: ' + gpsDOP.TDOP});
+          break;
+          case '24 Hour GPS DOPs':
+            if (!isDOPMenuOpen) {
+              $('#dops-lat').val(latLon.latitude.toFixed(3));
+              $('#dops-lon').val(latLon.longitude.toFixed(3));
+              $('#dops-alt').val(0);
+              $('#dops-el').val(settingsManager.gpsElevationMask);
+              _bottomIconPress({currentTarget: {id: 'menu-dops'}});
+            } else {
+              uiController.hideSideMenus();
+              isDOPMenuOpen = true;
+              $('#loading-screen').fadeIn('slow', function () {
+                $('#dops-lat').val(latLon.latitude.toFixed(3));
+                $('#dops-lon').val(latLon.longitude.toFixed(3));
+                $('#dops-alt').val(0);
+                $('#dops-el').val(settingsManager.gpsElevationMask);
+                var lat = $('#dops-lat').val() * 1;
+                var lon = $('#dops-lon').val() * 1;
+                var alt = $('#dops-alt').val() * 1;
+                var el = $('#dops-el').val() * 1;
+                satellite.getDOPsTable(lat, lon, alt);
+                $('#menu-dops').addClass('bmenu-item-selected');
+                $('#loading-screen').fadeOut();
+                $('#dops-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+              });
+            }
           break;
           case 'Edit Satellite':
             selectSat(mouseSat);
@@ -395,7 +456,6 @@ var isDayNightToggle = false;
             $('#customSensor').submit();
           break;
           case 'Clear Screen':
-            console.log('clear');
             (function clearScreenRMB () {
               $('#search').val('');
               searchBox.hideResults();
@@ -409,11 +469,8 @@ var isDayNightToggle = false;
             break;
           }
           rightBtnMenuDOM.hide();
-      });
-
-      clearScreenRMB.click(function (e) {
-
-      });
+          _clearRMBSubMenu();
+      }
 
       bodyDOM.on('keypress', _keyHandler); // On Key Press Event Run _keyHandler Function
       bodyDOM.on('keydown', _keyDownHandler); // On Key Press Event Run _keyHandler Function
@@ -421,13 +478,65 @@ var isDayNightToggle = false;
       canvasDOM.attr('tabIndex', 0);
       canvasDOM.focus();
 
-      $('#view-info-rmb').hover(function () {
-        $('#view-info-rmb-menu').show();
+      rightBtnViewDOM.hover(function () {
+        _clearRMBSubMenu();
+
+        var offsetX = (rightBtnViewDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+        rightBtnViewMenuDOM.css({
+          display: 'block',
+          'text-align': 'center',
+          position: 'absolute',
+          left: rightBtnViewDOM.offset().left + offsetX,
+          top: rightBtnViewDOM.offset().top
+        });
+        rightBtnViewMenuDOM.show();
       });
-      $('#view-info-rmb-menu').hover(null, function () { // Lost Focus
-        $('#view-info-rmb-menu').hide();
+      rightBtnViewMenuDOM.hover(null, function () { // Lost Focus
+        rightBtnViewMenuDOM.hide();
       });
+
+      rightBtnEditDOM.hover(function () {
+        _clearRMBSubMenu();
+
+        var offsetX = (rightBtnEditDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+        rightBtnEditMenuDOM.css({
+          display: 'block',
+          'text-align': 'center',
+          position: 'absolute',
+          left: rightBtnEditDOM.offset().left + offsetX,
+          top: rightBtnEditDOM.offset().top
+        });
+        rightBtnEditMenuDOM.show();
+      });
+      rightBtnEditMenuDOM.hover(null, function () { // Lost Focus
+        rightBtnEditMenuDOM.hide();
+      });
+
+      rightBtnCreateDOM.hover(function () {
+        _clearRMBSubMenu();
+
+        var offsetX = (rightBtnCreateDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+        rightBtnCreateMenuDOM.css({
+          display: 'block',
+          'text-align': 'center',
+          position: 'absolute',
+          left: rightBtnCreateDOM.offset().left + offsetX,
+          top: rightBtnCreateDOM.offset().top
+        });
+        rightBtnCreateMenuDOM.show();
+      });
+      rightBtnCreateMenuDOM.hover(null, function () { // Lost Focus
+        rightBtnCreateMenuDOM.hide();
+      });
+
     })();
+
+    function _clearRMBSubMenu () {
+      rightBtnViewMenuDOM.hide();
+      rightBtnEditMenuDOM.hide();
+      rightBtnCreateMenuDOM.hide();
+    }
+
     (function _menuController () {
 
       // Reset time if in retro mode
@@ -1470,6 +1579,22 @@ var isDayNightToggle = false;
         e.preventDefault();
       });
 
+      $('#dops-form').submit(function (e) {
+        uiController.hideSideMenus();
+        isDOPMenuOpen = true;
+        $('#loading-screen').fadeIn('slow', function () {
+          var lat = $('#dops-lat').val() * 1;
+          var lon = $('#dops-lon').val() * 1;
+          var alt = $('#dops-alt').val() * 1;
+          var el = $('#dops-el').val() * 1;
+          settingsManager.gpsElevationMask = el;
+          satellite.getDOPsTable(lat, lon, alt);
+          $('#menu-dops').addClass('bmenu-item-selected');
+          $('#loading-screen').fadeOut();
+          $('#dops-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+        });
+        e.preventDefault();
+      });
     })();
 
     var socratesObjOne = []; // Array for tr containing CATNR1
@@ -1703,6 +1828,31 @@ var isDayNightToggle = false;
               $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             });
             break;
+          }
+          break;
+        case 'menu-dops': // S
+          // if (!$('#menu-dops:animated').length) {
+          //     $('#menu-dops').effect('shake', {distance: 10});
+          // }
+          // break;
+          if (isDOPMenuOpen) {
+            isDOPMenuOpen = false;
+            uiController.hideSideMenus();
+            break;
+          } else {
+            uiController.hideSideMenus();
+            isDOPMenuOpen = true;
+            $('#loading-screen').fadeIn('slow', function () {
+              var lat = $('#dops-lat').val() * 1;
+              var lon = $('#dops-lon').val() * 1;
+              var alt = $('#dops-alt').val() * 1;
+              var el = $('#dops-el').val() * 1;
+              settingsManager.gpsElevationMask = el;
+              satellite.getDOPsTable(lat, lon, alt);
+              $('#menu-dops').addClass('bmenu-item-selected');
+              $('#loading-screen').fadeOut();
+              $('#dops-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+            });
           }
           break;
         case 'menu-watchlist': // S
@@ -2217,6 +2367,7 @@ var isDayNightToggle = false;
       $('#sensor-info-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#watchlist-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+      $('#dops-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#findByLooks-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#twitter-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
@@ -2239,6 +2390,7 @@ var isDayNightToggle = false;
       $('#menu-sensor-info').removeClass('bmenu-item-selected');
       $('#menu-watchlist').removeClass('bmenu-item-selected');
       $('#menu-lookangles').removeClass('bmenu-item-selected');
+      $('#menu-dops').removeClass('bmenu-item-selected');
       $('#menu-lookanglesmultisite').removeClass('bmenu-item-selected');
       $('#menu-launches').removeClass('bmenu-item-selected');
       $('#menu-find-sat').removeClass('bmenu-item-selected');
@@ -2266,6 +2418,7 @@ var isDayNightToggle = false;
       isFindByLooksMenuOpen = false;
       settingsManager.isMapMenuOpen = false;
       isLookanglesMenuOpen = false;
+      isDOPMenuOpen = false;
       isLookanglesMultiSiteMenuOpen = false;
       isSocratesMenuOpen = false;
       isSettingsMenuOpen = false;

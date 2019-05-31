@@ -1215,7 +1215,43 @@ or mirrored at any other location without the express written permission of the 
     return 0;
   }
 
-  satellite.pdopCalc = function (lat, lon, alt, isDrawLine) {
+  satellite.getDOPsTable = function (lat, lon, alt) {
+    var now;
+    var tbl = document.getElementById('dops');           // Identify the table to update
+    tbl.innerHTML = '';                                   // Clear the table from old object data
+    var tblLength = 0;
+    var propOffset = timeManager.getPropOffset();
+    var propTempOffset = 0;
+
+    var tr = tbl.insertRow();
+    var tdT = tr.insertCell();
+    tdT.appendChild(document.createTextNode('Time'));
+    var tdH = tr.insertCell();
+    tdH.appendChild(document.createTextNode('HDOP'));
+    var tdP = tr.insertCell();
+    tdP.appendChild(document.createTextNode('PDOP'));
+    var tdG = tr.insertCell();
+    tdG.appendChild(document.createTextNode('GDOP'));
+
+    for (var t = 0; t < 1440; t++) {
+      propTempOffset = t * 1000 * 60 + propOffset;                 // Offset in seconds (msec * 1000)
+      now = timeManager.propTimeCheck(propTempOffset, timeManager.propRealTime);
+
+      dops = satellite.getDOPs(lat, lon, alt, false, now);
+
+      tr = tbl.insertRow();
+      tdT = tr.insertCell();
+      tdT.appendChild(document.createTextNode(timeManager.dateFormat(now, 'isoDateTime', true)));
+      tdH = tr.insertCell();
+      tdH.appendChild(document.createTextNode(dops.HDOP));
+      tdP = tr.insertCell();
+      tdP.appendChild(document.createTextNode(dops.PDOP));
+      tdG = tr.insertCell();
+      tdG.appendChild(document.createTextNode(dops.GDOP));
+    }
+  };
+
+  satellite.getDOPs = function (lat, lon, alt, isDrawLine, propTime) {
     if (typeof lat == 'undefined') {
       console.error('Latitude Required');
       return;
@@ -1240,7 +1276,7 @@ or mirrored at any other location without the express written permission of the 
       groups.GPSGroup = new groups.SatGroup('nameRegex', /NAVSTAR/);
     }
 
-    var propTime = timeManager.propTime();
+    if (typeof propTime == 'undefined') propTime = timeManager.propTime();
     var j = timeManager.jday(propTime.getUTCFullYear(),
                  propTime.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  propTime.getUTCDate(),
@@ -1270,15 +1306,21 @@ or mirrored at any other location without the express written permission of the 
       }
     }
 
-    console.log(inViewList);
-    satellite.calculateDOPs(inViewList, referenceECF, isDrawLine);
+    return satellite.calculateDOPs(inViewList, referenceECF, isDrawLine);
   };
 
   satellite.calculateDOPs = function (satList, referenceECF, isDrawLine) {
+    var dops = {};
+
     nsat = satList.length;
     if (nsat < 4) {
-        console.error("Need More Satellites");
-        return;
+        dops.PDOP = 50;
+        dops.HDOP = 50;
+        dops.GDOP = 50;
+        dops.VDOP = 50;
+        dops.TDOP = 50;
+        // console.error("Need More Satellites");
+        return dops;
     }
 
     var A = numeric.rep([nsat, 4], 0);
@@ -1310,12 +1352,12 @@ or mirrored at any other location without the express written permission of the 
     var gdop = Math.sqrt(Qinv[0][0] + Qinv[1][1] + Qinv[2][2] + Qinv[3][3]);
     var vdop = Math.sqrt(Qinv[2][2]);
     var tdop = Math.sqrt(Qinv[3][3]);
-    console.log("PDOP: " + parseFloat(Math.round(pdop * 100) / 100).toFixed(2));
-    console.log("HDOP: " + parseFloat(Math.round(hdop * 100) / 100).toFixed(2));
-    console.log("GDOP: " + parseFloat(Math.round(gdop * 100) / 100).toFixed(2));
-    console.log("VDOP: " + parseFloat(Math.round(vdop * 100) / 100).toFixed(2));
-    console.log("TDOP: " + parseFloat(Math.round(tdop * 100) / 100).toFixed(2));
-    return;
+    dops.PDOP = parseFloat(Math.round(pdop * 100) / 100).toFixed(2);
+    dops.HDOP = parseFloat(Math.round(hdop * 100) / 100).toFixed(2);
+    dops.GDOP = parseFloat(Math.round(gdop * 100) / 100).toFixed(2);
+    dops.VDOP = parseFloat(Math.round(vdop * 100) / 100).toFixed(2);
+    dops.TDOP = parseFloat(Math.round(tdop * 100) / 100).toFixed(2);
+    return dops;
 };
 
   function _Nearest180 (arr) {

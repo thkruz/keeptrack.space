@@ -157,30 +157,37 @@ ul {
     text-align: center;
 }
 
-#right-btn-menu {
+.right-btn-menu {
   display: none;
   background: black;
   color: white;
   position: absolute;
+  width: 165px;
   border-radius: 5px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 1;
 }
 
-#right-btn-menu ul {
+.right-btn-menu ul {
   width: 100%;
 }
 
-#right-btn-menu ul li {
+.right-btn-menu ul li {
   padding: 15px;
   cursor: pointer;
+  border-radius: 5px;
 }
 
-#right-btn-menu ul li:hover{
+.right-btn-menu ul li:hover{
   background-color: rgb(0, 114, 230);
 }
 
-#right-btn-menu ul li a:hover{
+.right-btn-menu ul li a:hover{
   background-color: rgba(0, 0, 0, 0);
+}
+
+.rmb-menu-item:hover{
+    background-color: rgba(0,114,230,0.3) !important;
 }
 
 #sat-hoverbox {
@@ -725,6 +732,9 @@ ul {
   #lookanglesmultisite-content {
     width: 375px;
   }
+  #dops-content {
+    width: 375px;
+  }
   #menu-satellite-collision, #menu-find-sat {
     display: inline;
   }
@@ -751,6 +761,11 @@ ul {
   #lookanglesmultisite-content {
     width: 375px;
   }
+
+  #dops-content {
+    width: 375px;
+  }
+
   #menu-satellite-collision, #menu-find-sat {
     display: inline;
   }

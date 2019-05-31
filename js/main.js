@@ -86,6 +86,7 @@ var camRotateSpeed = 0;
 
 // Menu Variables
 var isEditSatMenuOpen = false;
+var isDOPMenuOpen = false;
 var isLookanglesMenuOpen = false;
 var isLookanglesMultiSiteMenuOpen = false;
 var isNewLaunchMenuOpen = false;

@@ -324,7 +324,7 @@ var isDayNightToggle = false;
                 $('#edit-sat-rmb').show();
                 numMenuItems++;
               } else {
-                $('#edit-sat-rmb').hide();  
+                $('#edit-sat-rmb').hide();
               }
             } else {
               $('#edit-sat-rmb').hide();
@@ -420,6 +420,13 @@ var isDayNightToggle = false;
       bodyDOM.on('keyup', _keyUpHandler); // On Key Press Event Run _keyHandler Function
       canvasDOM.attr('tabIndex', 0);
       canvasDOM.focus();
+
+      $('#view-info-rmb').hover(function () {
+        $('#view-info-rmb-menu').show();
+      });
+      $('#view-info-rmb-menu').hover(null, function () { // Lost Focus
+        $('#view-info-rmb-menu').hide();
+      });
     })();
     (function _menuController () {
 

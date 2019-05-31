@@ -14,12 +14,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=0.48.1b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=0.48.2b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=0.48.1b" rel="stylesheet">
+    <link href="css/fonts.css?v=0.48.2b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=0.48.1b">
-    <link rel="stylesheet" href="css/materialize-local.css?v=0.48.1b">
+    <link rel="stylesheet" href="css/materialize.css?v=0.48.2b">
+    <link rel="stylesheet" href="css/materialize-local.css?v=0.48.2b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -106,12 +106,21 @@
   <main>
     <div id="right-btn-menu">
       <ul class='dropdown-contents'>
-        <li id="view-info-rmb"><a href="#">View Info</a></li>
+        <li id="view-info-rmb">View MENU</li>
         <li id="edit-sat-rmb"><a href="#">Edit Satellite</a></li>
         <li id="create-sensor-rmb"><a href="#">Create Sensor Here</a></li>
         <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
       </ul>
     </div>
+    <div id="view-info-rmb-menu">
+      <ul class='dropdown-contents'>
+        <li id="iew-info-rmb"><a href="#">View Info</a></li>
+        <li id="dit-sat-rmb"><a href="#">Edit Satellite</a></li>
+        <li id="reate-sensor-rmb"><a href="#">Create Sensor Here</a></li>
+        <li id="lear-screen-rmb"><a href="#">Clear Screen</a></li>
+      </ul>
+    </div>
+
     <div id="canvas-holder">
       <canvas id="canvas"></canvas>
       <div id="ui-wrapper">
@@ -1200,35 +1209,35 @@
   <script src="js/lib/materialize.min.js"></script>
   <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.js?v=0.48.1b"></script>
+  <script src="js/lib/satellite.js?v=0.48.2b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=0.48.1b"></script>
+  <script src="js/lib/shader-loader.min.js?v=0.48.2b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=0.48.1b"></script>
-  <script src="js/time-manager.js?v=0.48.1b"></script>
-  <script src="js/sun.js?v=0.48.1b"></script>
-  <script src="js/earth.js?v=0.48.1b"></script>
-  <script src="js/groups.js?v=0.48.1b"></script>
-  <script src="js/satSet.js?v=0.48.1b"></script>
+  <script src="js/settings-manager.js?v=0.48.2b"></script>
+  <script src="js/time-manager.js?v=0.48.2b"></script>
+  <script src="js/sun.js?v=0.48.2b"></script>
+  <script src="js/earth.js?v=0.48.2b"></script>
+  <script src="js/groups.js?v=0.48.2b"></script>
+  <script src="js/satSet.js?v=0.48.2b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js?v=0.48.1b"></script>
+  <script src="js/variables.js?v=0.48.2b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=0.48.1b"></script>
+  <script src="js/ballistic-missile.js?v=0.48.2b"></script>
   <!-- Load Extra Satellites -->
   <!-- <script src="offline/extra.js"></script>
   <script src="offline/satInfo.js"></script> -->
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=0.48.1b"></script>
-  <script src="js/mobile.js?v=0.48.1b"></script>
-  <script src="js/main.min.js?v=0.48.1b"></script>
-  <script src="js/ui.js?v=0.48.1b"></script>
-  <script src="js/lookangles.min.js?v=0.48.1b"></script>
-  <script src="js/orbit-display.js?v=0.48.1b"></script>
-  <script src="js/drawLoop-shapes.js?v=0.48.1b"></script>
-  <script src="js/search-box.js?v=0.48.1b"></script>
+  <script src="js/color-scheme.js?v=0.48.2b"></script>
+  <script src="js/mobile.js?v=0.48.2b"></script>
+  <script src="js/main.min.js?v=0.48.2b"></script>
+  <script src="js/ui.js?v=0.48.2b"></script>
+  <script src="js/lookangles.min.js?v=0.48.2b"></script>
+  <script src="js/orbit-display.js?v=0.48.2b"></script>
+  <script src="js/drawLoop-shapes.js?v=0.48.2b"></script>
+  <script src="js/search-box.js?v=0.48.2b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>
@@ -1237,6 +1246,7 @@
   <!-- Load Extras Last to Speed Loading -->
   <script src="js/lib/jquery.colorbox.min.js"></script>
   <script src="js/advice-module.min.js"></script>
+  <script src="js/lib/numeric.js"></script>
   <!--Google Analytics -->
   <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

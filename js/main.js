@@ -107,6 +107,7 @@ var lastSelectedSat = -1;
 // var curRadarTrackNum = 0;
 // var lastRadarTrackTime = 0;
 // var debugLine;
+var drawLineList = [];
 
 var updateHoverDelay = 0;
 
@@ -367,7 +368,7 @@ var drawLoopCallback;
       isSatMiniBoxInUse = false;
     }
 
-    // drawLines();
+    drawLines();
     // var bubble = new FOVBubble();
     // bubble.set();
     // bubble.draw();
@@ -450,7 +451,7 @@ var drawLoopCallback;
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // if (debugLine) debugLine.draw();
+    // if (typeof debugLine != 'undefined') debugLine.draw();
     earth.draw(pMatrix, camMatrix);
     satSet.draw(pMatrix, camMatrix, drawNow);
     orbitDisplay.draw(pMatrix, camMatrix);
@@ -1341,6 +1342,15 @@ function enableSlowCPUMode () {
   satCruncher.postMessage({
     isSlowCPUModeEnabled: true
   });
+}
+
+function drawLines () {
+  if (drawLineList.length == 0) return;
+  for (var i = 0; i < drawLineList.length; i++) {
+    drawLineList[i].sat = satSet.getSat(drawLineList[i].sat.id);
+    drawLineList[i].line.set(drawLineList[i].ref, [drawLineList[i].sat.position.x,drawLineList[i].sat.position.y,drawLineList[i].sat.position.z]);
+    drawLineList[i].line.draw();
+  }
 }
 // var lastRadarTrackTime = 0;
 // var curRadarTrackNum = 0;

@@ -8,8 +8,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.48.1';
-  settingsManager.versionDate = 'May 29, 2019';
+  settingsManager.versionNumber = 'v0.48.2';
+  settingsManager.versionDate = 'May 31, 2019';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -175,6 +175,7 @@
   settingsManager.cameraMovementSpeed = 0.003;
   settingsManager.cameraMovementSpeedMin = 0.005;
 
+  settingsManager.gpsElevationMask = 15;
 
   settingsManager.FPSForwardSpeed = 3;
   settingsManager.FPSSideSpeed = 3;

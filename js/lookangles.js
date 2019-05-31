@@ -1215,32 +1215,108 @@ or mirrored at any other location without the express written permission of the 
     return 0;
   }
 
-  satellite.pdopCalc = function (lat, lon) {
+  satellite.pdopCalc = function (lat, lon, alt, isDrawLine) {
+    if (typeof lat == 'undefined') {
+      console.error('Latitude Required');
+      return;
+    }
+    if (typeof lon == 'undefined') {
+      console.error('Longitude Required');
+      return;
+    }
+    alt = (typeof alt != 'undefined') ? alt : 0;
+    isDrawLine = (typeof isDrawLine != 'undefined') ? isDrawLine : false;
+
+    lat = lat * DEG2RAD;
+    lon = lon * DEG2RAD;
+
     var sat;
     var lookAngles, az, el;
     var azList = [];
     var elList = [];
+    var inViewList = [];
 
     if (typeof groups.GPSGroup == 'undefined') {
       groups.GPSGroup = new groups.SatGroup('nameRegex', /NAVSTAR/);
     }
 
+    var propTime = timeManager.propTime();
+    var j = timeManager.jday(propTime.getUTCFullYear(),
+                 propTime.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+                 propTime.getUTCDate(),
+                 propTime.getUTCHours(),
+                 propTime.getUTCMinutes(),
+                 propTime.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+    j += propTime.getUTCMilliseconds() * 1.15741e-8;
+    var gmst = satellite.gstime(j);
+
+    var referenceECF = {};
+    var cosLat = Math.cos(lat);
+    var sinLat = Math.sin(lat);
+    var cosLon = Math.cos((lon) + gmst);
+    var sinLon = Math.sin((lon) + gmst);
+
+    referenceECF.x = (6371 + 0.25) * cosLat * cosLon; // 6371 is radius of earth
+    referenceECF.y = (6371 + 0.25) * cosLat * sinLon;
+    referenceECF.z = (6371 + 0.25) * sinLat;
+
     for (var i = 0; i < groups.GPSGroup.sats.length; i++) {
       sat = satSet.getSat(groups.GPSGroup.sats[i].satId);
-      lookAngles = satellite.ecfToLookAngles({longitude: lon, latitude: lat, height: 0}, sat.position);
-      az = lookAngles.azimuth * RAD2DEG;
-      el = lookAngles.elevation * RAD2DEG;
-      if (el > 0) {
-        azList.push(az);
-        elList.push(el);
+      lookAngles = satellite.ecfToLookAngles({longitude: lon, latitude: lat, height: alt}, satellite.eciToEcf(sat.position, gmst));
+      sat.az = lookAngles.azimuth * RAD2DEG;
+      sat.el = lookAngles.elevation * RAD2DEG;
+      if (sat.el > settingsManager.gpsElevationMask) {
+        inViewList.push(sat);
       }
     }
-    var maxEl = Math.max.apply(null, elList);
-    var minEl = Math.min.apply(null, elList);
 
-    console.log('Az Factor: ' + _Nearest180(azList) / 180 * 10);
-    console.log('El Factor: ' + (maxEl - minEl) / 90 * 10);
+    console.log(inViewList);
+    satellite.calculateDOPs(inViewList, referenceECF, isDrawLine);
   };
+
+  satellite.calculateDOPs = function (satList, referenceECF, isDrawLine) {
+    nsat = satList.length;
+    if (nsat < 4) {
+        console.error("Need More Satellites");
+        return;
+    }
+
+    var A = numeric.rep([nsat, 4], 0);
+    var azlist = [];
+    var elvlist = [];
+    if (isDrawLine) drawLineList = [];
+    for (var n = 1; n <= nsat; n++) {
+        var cursat = satList[n-1];
+
+        if (isDrawLine) {
+          drawLineList[n-1] = {};
+          drawLineList[n-1].line = new Line();
+          drawLineList[n-1].sat = cursat;
+          drawLineList[n-1].ref = [referenceECF.x, referenceECF.y, referenceECF.z];
+        }
+
+        var az = cursat.az;
+        var elv = cursat.el;
+
+        azlist.push(az);
+        elvlist.push(elv);
+        var B = [Math.cos(elv * Math.PI / 180.0) * Math.sin(az * Math.PI / 180.0), Math.cos(elv * Math.PI / 180.0) * Math.cos(az * Math.PI / 180.0), Math.sin(elv * Math.PI / 180.0), 1];
+        numeric.setBlock(A, [n - 1, 0], [n - 1, 3], [B]);
+    }
+    var Q = numeric.dot(numeric.transpose(A), A);
+    var Qinv = numeric.inv(Q);
+    var pdop = Math.sqrt(Qinv[0][0] + Qinv[1][1] + Qinv[2][2]);
+    var hdop = Math.sqrt(Qinv[0][0] + Qinv[1][1]);
+    var gdop = Math.sqrt(Qinv[0][0] + Qinv[1][1] + Qinv[2][2] + Qinv[3][3]);
+    var vdop = Math.sqrt(Qinv[2][2]);
+    var tdop = Math.sqrt(Qinv[3][3]);
+    console.log("PDOP: " + parseFloat(Math.round(pdop * 100) / 100).toFixed(2));
+    console.log("HDOP: " + parseFloat(Math.round(hdop * 100) / 100).toFixed(2));
+    console.log("GDOP: " + parseFloat(Math.round(gdop * 100) / 100).toFixed(2));
+    console.log("VDOP: " + parseFloat(Math.round(vdop * 100) / 100).toFixed(2));
+    console.log("TDOP: " + parseFloat(Math.round(tdop * 100) / 100).toFixed(2));
+    return;
+};
 
   function _Nearest180 (arr) {
     var  maxDiff = null;

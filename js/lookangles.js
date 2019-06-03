@@ -6,7 +6,7 @@ lookangles.js is an expansion library for satellite.js providing tailored functi
 for calculating orbital data.
 http://keeptrack.space
 
-Copyright © 2016-2018 by Theodore Kruczek. All rights reserved. No part of this
+Copyright © 2016-2019 by Theodore Kruczek. All rights reserved. No part of this
 web site may be reproduced, published, distributed, displayed, performed, copied
 or stored for public or private use, without written permission of the author.
 

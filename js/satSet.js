@@ -10,7 +10,7 @@ http://keeptrack.space
 Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
 under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
 
-All additions and modifications of original code is Copyright © 2016-2018 by
+All additions and modifications of original code is Copyright © 2016-2019 by
 Theodore Kruczek. All rights reserved. No part of this web site may be reproduced,
 published, distributed, displayed, performed, copied or stored for public or private
 use, without written permission of the author.
@@ -219,6 +219,7 @@ var satSensorMarkerArray = [];
       settingsManager.isBottomIconsEnabled = true; // NOTE: Probably depricated (8/29/2018)
 
       mobile.checkMobileMode();
+
       if (settingsManager.isMobileModeEnabled) { // Start Button Displayed
         $('#mobile-start-button').show();
         $('#spinner').hide();

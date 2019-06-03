@@ -1400,7 +1400,16 @@ ul li{
 
 #demo-logo {
   position: absolute;
-  bottom: 50px;
+  bottom: 125px;
+  left: 25px;
+  font-size: 35px;
+  height: auto !important;
+}
+
+#license-watermark {
+  position: absolute;
+  bottom: 125px;
+  left: 25px;
   font-size: 35px;
   height: auto !important;
 }

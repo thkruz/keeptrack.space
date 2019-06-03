@@ -10,7 +10,7 @@ http://keeptrack.space
 Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
 under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
 
-All additions and modifications of original code is Copyright © 2016-2018 by
+All additions and modifications of original code is Copyright © 2016-2019 by
 Theodore Kruczek. All rights reserved. No part of this web site may be reproduced,
 published, distributed, displayed, performed, copied or stored for public or private
 use, without written permission of the author.
@@ -118,7 +118,10 @@ var isDayNightToggle = false;
       if (typeof satel === 'undefined') satel = null;
       if (settingsManager.offline && !_clk(satel, olia)) {
         _offlineMessage();
-        throw new Error('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
+        $('#license-watermark').removeClass('start-hidden');
+        $('#license-watermark').show();
+        console.warn('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
+        // throw new Error('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
       } else {
         // ga('send', 'event', 'Offline Software', settingsManager.offlineLocation, 'Licensed');
       }
@@ -451,6 +454,7 @@ var isDayNightToggle = false;
             if (!isCustomSensorMenuOpen) {
               _bottomIconPress({currentTarget: {id: 'menu-customSensor'}});
             }
+            isCustomSensorMenuOpen = true;
             $('#cs-lat').val(latLon.latitude);
             $('#cs-lon').val(latLon.longitude);
             $('#customSensor').submit();
@@ -465,6 +469,9 @@ var isDayNightToggle = false;
               if (satellite.sensorSelected() && cameraType.current !== cameraType.PLANETARIUM) {
                 uiController.legendMenuChange('default');
               }
+
+              selectSat(-1);
+
             })();
             break;
           }

@@ -13,10 +13,6 @@ social/
 tle/*
 TLEAltNemo.json
 
-#Offline
-offline/*
-offline/
-
 # James Yoder Email
 license/jamesyoderemail.txt
 
@@ -28,8 +24,5 @@ images/6_night_16k.jpg
 images/dayearth-43200.jpg
 images/dayearth-10800.jpg
 images/dayearth-2048.jpg
-
-# Min Versions of JS
-js/*.min.js
 
 dev.htm

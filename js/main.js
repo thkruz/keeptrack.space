@@ -53,9 +53,6 @@ or mirrored at any other location without the express written permission of the 
     settingsManager
 */
 
-satel = new Date('January 1, 2020 00:00:01');
-olia = 1;
-
 // Constants
 const ZOOM_EXP = 3;
 const DIST_MIN = 6800;

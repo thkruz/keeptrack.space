@@ -344,12 +344,25 @@ var satSensorMarkerArray = [];
 
     if (!settingsManager.offline) {
       var tleSource = settingsManager.tleSource;
-      $.get('' + tleSource + '?v=' + settingsManager.versionNumber, function (resp) {
-        loadTLEs(resp);
-      });
+      $.get('' + tleSource + '?v=' + settingsManager.versionNumber)
+        .done(function (resp) {
+          // if the .json loads then use it
+          loadTLEs(resp);
+        })
+        .fail(function () {
+          // Sometimes network firewall's hate .json so use a .js
+          $.getScript('/offline/tle.js', function () {
+            loadTLEs(jsTLEfile);
+          });
+        });
       jsTLEfile = null;
     } else {
-      loadTLEs(jsTLEfile);
+      // Elimintates need to use different html files for offline versions
+      $.getScript('/offline/extra.js');
+      $.getScript('/offline/satInfo.js');
+      $.getScript('/offline/tle.js', function () {
+        loadTLEs(jsTLEfile);
+      });
       jsTLEfile = null;
     }
 

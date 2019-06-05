@@ -8,8 +8,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v0.49.0';
-  settingsManager.versionDate = 'May 31, 2019';
+  settingsManager.versionNumber = 'v1.0.0';
+  settingsManager.versionDate = 'June 4, 2019';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -59,9 +59,6 @@
         }
       }
     })();
-
-  // Offline management
-  settingsManager.offlineLocation = '';
 
   settingsManager.themes = {};
   settingsManager.isThemesNeeded = false;

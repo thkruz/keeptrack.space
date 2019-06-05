@@ -357,12 +357,7 @@ var satSensorMarkerArray = [];
         });
       jsTLEfile = null;
     } else {
-      // Elimintates need to use different html files for offline versions
-      $.getScript('/offline/extra.js');
-      $.getScript('/offline/satInfo.js');
-      $.getScript('/offline/tle.js', function () {
-        loadTLEs(jsTLEfile);
-      });
+      loadTLEs(jsTLEfile);
       jsTLEfile = null;
     }
 
@@ -484,6 +479,8 @@ var satSensorMarkerArray = [];
               if (satelliteList[s].TLE1 == undefined) continue; // Don't Process Bad Satellite Information
               if (satelliteList[s].TLE2 == undefined) continue; // Don't Process Bad Satellite Information
               if (tempSatData[i].SCC_NUM === satelliteList[s].SCC) {
+                tempSatData[i].ON = satelliteList[s].ON;
+                tempSatData[i].OT = (typeof satelliteList[s].OT != 'undefined') ? satelliteList[s].OT : null;
                 tempSatData[i].TLE1 = satelliteList[s].TLE1;
                 tempSatData[i].TLE2 = satelliteList[s].TLE2;
                 isMatchFound = true;
@@ -493,6 +490,8 @@ var satSensorMarkerArray = [];
             if (!isMatchFound) {
               if (satelliteList[s].TLE1 == undefined) continue; // Don't Process Bad Satellite Information
               if (satelliteList[s].TLE2 == undefined) continue; // Don't Process Bad Satellite Information
+              if (typeof satelliteList[s].ON == 'undefined') { satelliteList[s].ON = "Unknown"; }
+              if (typeof satelliteList[s].OT == 'undefined') { satelliteList[s].OT = null; }
               year = satelliteList[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
               prefix = (year > 50) ? '19' : '20';
               year = prefix + year;
@@ -501,7 +500,8 @@ var satSensorMarkerArray = [];
                 static: false,
                 missile: false,
                 active: false,
-                ON: 'Unknown',
+                ON: satelliteList[s].ON,
+                OT: satelliteList[s].OT,
                 C: 'Unknown',
                 LV: 'Unknown',
                 LS: 'Unknown',

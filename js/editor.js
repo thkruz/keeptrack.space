@@ -159,7 +159,41 @@ $(document).ready(function () {
         satellite.SCC = SCC;
         satelliteList[i] = satellite;
       }
-      var variable = 'var satelliteList = ' + JSON.stringify(satelliteList);
+      var variable = 'var satelliteList = ' + JSON.stringify(satelliteList) + ';';
+      var blob = new Blob([variable], {type: 'octet/stream'});
+      saveAs(blob, 'extra.js');
+    };
+    reader.readAsText(evt.target.files[0]);
+    evt.preventDefault();
+  });
+
+  $('#editor-open2').click(function (e) {
+    $('#editor-file2').trigger('click');
+  });
+  $('#editor-file2').change(function (evt) {
+    if (!window.FileReader) return; // Browser is not compatible
+    var reader = new FileReader();
+
+    reader.onload = function (evt) {
+      if (evt.target.readyState !== 2) return;
+      if (evt.target.error) {
+        console.log('error');
+        return;
+      }
+      var satelliteList = [];
+      var str = evt.target.result;
+      var array = str.split(/\r?\n/);
+      for (var i = 0; i < array.length / 3; i++) {
+        var satellite = {};
+        satellite.ON = array[i * 2];
+        satellite.OT = 4;
+        satellite.TLE1 = array[i * 2 + 1];
+        satellite.TLE2 = array[i * 2 + 2];
+        var SCC = _pad0(parseInt(satellite.TLE1.substr(2, 5).trim()).toString(), 5);
+        satellite.SCC = SCC;
+        satelliteList[i] = satellite;
+      }
+      var variable = 'var satelliteList = ' + JSON.stringify(satelliteList) + ';';
       var blob = new Blob([variable], {type: 'octet/stream'});
       saveAs(blob, 'extra.js');
     };

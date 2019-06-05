@@ -1170,6 +1170,7 @@ function selectSat (satId) {
     if (sat.OT === 1) { objtype = 'Payload'; }
     if (sat.OT === 2) { objtype = 'Rocket Body'; }
     if (sat.OT === 3) { objtype = 'Debris'; }
+    if (sat.OT === 4) { objtype = 'Amateur Report'; }
     if (sat.missile) { objtype = 'Ballistic Missile'; }
     $('#sat-type').html(objtype);
 

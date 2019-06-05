@@ -2771,17 +2771,15 @@ var isDayNightToggle = false;
       $('#no-webgl').css('display', 'block');
     }
     function _clk () {
-      $.getScript('/license/license.js', function() {
-        lk1 = new Date(lk1);
-        if (lk1 == 'undefined') return false;
-        if (settingsManager.lkVerify > lk1) return false;
-        var olcv = 0;
-        for (x = 0; x < settingsManager.offlineLocation.length; x++) {
-          olcv += (settingsManager.offlineLocation.charCodeAt(x) * 41690);
-        }
-        if (olcv === lk2) return true;
-        return false;
-      });
+      lk1 = new Date(lk1);
+      if (lk1 == 'undefined') return false;
+      if (settingsManager.lkVerify > lk1) return false;
+      var olcv = 0;
+      for (x = 0; x < settingsManager.offlineLocation.length; x++) {
+        olcv += (settingsManager.offlineLocation.charCodeAt(x) * 41690);
+      }
+      if (olcv === lk2) return true;
+      return false;    
     }
   });
 

@@ -26,3 +26,8 @@ images/dayearth-10800.jpg
 images/dayearth-2048.jpg
 
 dev.htm
+
+.gitignore
+.htaccess
+.jshintrc
+.gitattributes

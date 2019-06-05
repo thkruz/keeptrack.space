@@ -471,7 +471,7 @@ var satSensorMarkerArray = [];
           }
         }
         var isMatchFound = false;
-        if (typeof satelliteList !== 'undefined') { // If extra catalogue
+        if (typeof satelliteList !== 'undefined' && settingsManager.offline) { // If extra catalogue
           for (s = 0; s < satelliteList.length; s++) {
             isMatchFound = false;
             for (i = 0; i < tempSatData.length; i++) {
@@ -517,7 +517,7 @@ var satSensorMarkerArray = [];
           }
           satelliteList = null;
         }
-        if (typeof satInfoList !== 'undefined') { // If extra catalogue
+        if (typeof satInfoList !== 'undefined' && settingsManager.offline) { // If extra catalogue
           for (s = 0; s < satInfoList.length; s++) {
             isMatchFound = false;
             // NOTE i=s may need to be i=0, but this should be more effecient

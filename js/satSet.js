@@ -240,7 +240,7 @@ var satSensorMarkerArray = [];
       }
 
       (function _watchlistInit () {
-        var watchlistJSON = localStorage.getItem("watchlistList");
+        var watchlistJSON = (settingsManager.offline) ? localStorage.getItem("watchlistList") : null;
         if (watchlistJSON !== null) {
           var newWatchlist = JSON.parse(watchlistJSON);
           watchlistInViewList = [];

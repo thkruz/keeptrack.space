@@ -2483,8 +2483,8 @@ var isDayNightToggle = false;
         saveWatchlist[i] = sat.SCC_NUM;
       }
       var variable = JSON.stringify(saveWatchlist);
-      localStorage.setItem("watchlistList", variable);
-    }
+      if (settingsManager.offline) { localStorage.setItem("watchlistList", variable); }
+    };
 
     var isCurrentlyTyping = false;
     $('#search').focus(function(){

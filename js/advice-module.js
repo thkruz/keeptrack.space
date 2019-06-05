@@ -66,11 +66,7 @@ or mirrored at any other location without the express written permission of the 
   var tutIconDOM = $('#tutorial-icon');
   var curFocusDOM;
   $(document).ready(function () { // Code Once index.htm is loaded
-    // NOTE: These are just examples
-    // localStorage.setItem("lastname", "Smith");
-    // localStorage.getItem("lastname");
-    // localStorage.removeItem(key);
-    var wasAdviceEnabled = localStorage.getItem("isAdviceEnabled");
+    var wasAdviceEnabled = (settingsManager.settingsManager.offline) ? localStorage.getItem("isAdviceEnabled") : null;
     if (wasAdviceEnabled == "true" || wasAdviceEnabled == null) {
       adviceManager.on();
       adviceList.welcome();
@@ -526,12 +522,12 @@ or mirrored at any other location without the express written permission of the 
     return isAdviceEnabled;
   };
   adviceManager.on = function () {
-    localStorage.setItem("isAdviceEnabled", true);
+    if (settingsManager.offline) { localStorage.setItem("isAdviceEnabled", true); }
     isAdviceEnabled = true;
     tutIconDOM.addClass('bmenu-item-selected');
   };
   adviceManager.off = function () {
-    localStorage.setItem("isAdviceEnabled", false);
+    if (settingsManager.offline) { localStorage.setItem("isAdviceEnabled", false); }
     isAdviceEnabled = false;
     helpDOM.hide();
     tutIconDOM.removeClass('bmenu-item-selected');

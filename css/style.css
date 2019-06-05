@@ -904,7 +904,7 @@ ul li{
       top: 60%;
       bottom: 0px;
       margin-top: 25px;
-      padding: 0 10px 150px 10px;
+      padding: 0 10px 0px 10px;
       right: 0px;
       width: 100%;
       border-top: 5px;
@@ -912,6 +912,13 @@ ul li{
       border-top-style: solid;
       overflow: auto;
   }
+
+  #sat-infobox:after {
+    content: "";
+    height: 150px;
+    display: block;
+  }
+
   .sat-infobox-fullsize {
     padding: 0 10px 0px 10px !important;
   }
@@ -933,13 +940,20 @@ ul li{
       top: 60%;
       bottom: 0px;
       margin-top: 25px;
-      padding: 0 10px 100px 10px;
+      padding: 0 10px 0px 10px;
       right: 0px;
       border-top: 5px;
       border-top-color: #0277bd;
       border-top-style: solid;
       overflow: auto;
   }
+
+  #sat-infobox:after {
+    content: "";
+    height: 100px;
+    display: block;
+  }
+
   .sat-infobox-fullsize {
     padding: 0 10px 0px 10px !important;
   }
@@ -961,7 +975,7 @@ ul li{
       top: 27%;
       bottom: 0px;
       margin-top: 25px;
-      padding: 0 10px 100px 10px;
+      padding: 0 10px 0px 10px;
       right: 0px;
       width: 230px;
       border-width: 5px 0px 0px 5px;
@@ -969,6 +983,13 @@ ul li{
       border-style: solid;
       overflow: auto;
   }
+
+  #sat-infobox:after {
+    content: "";
+    height: 100px;
+    display: block;
+  }
+
   .sat-infobox-fullsize {}
   .sat-info-value {
       float: right;

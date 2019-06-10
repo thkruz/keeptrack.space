@@ -424,9 +424,12 @@ function propagateCruncher () {
         // INFO: 0 Latitude returns upside down results. Using 180 looks right, but more verification needed.
         var starPosition = StarCalc.getStarPosition(now, 180, 0, satCache[i]);
         starPosition = _lookAnglesToEcf(starPosition.azimuth * RAD2DEG, starPosition.altitude * RAD2DEG, 200000, 0, 0, 0);
-        satPos[i * 3] = starPosition.x;
-        satPos[i * 3 + 1] = starPosition.y;
-        satPos[i * 3 + 2] = starPosition.z;
+
+        // Reduce Random Jitter by Requiring New Positions to be Similar to Old
+        // THIS MIGHT BE A HORRIBLE IDEA
+        if (satPos[i * 3] == 0 || (satPos[i * 3] - starPosition.x < 0.1 && satPos[i * 3] - starPosition.x > -0.1 )) satPos[i * 3] = starPosition.x;
+        if (satPos[i * 3 + 1] == 0 || (satPos[i * 3 + 1] - starPosition.y < 0.1 && satPos[i * 3 + 1] - starPosition.y > -0.1 )) satPos[i * 3 + 1] = starPosition.y;
+        if (satPos[i * 3 + 2] == 0 || (satPos[i * 3 + 2] - starPosition.z < 0.1 && satPos[i * 3 + 2] - starPosition.z > -0.1 )) satPos[i * 3 + 2] = starPosition.z;
       } else {
         cosLat = Math.cos(satCache[i].lat * DEG2RAD);
         sinLat = Math.sin(satCache[i].lat * DEG2RAD);

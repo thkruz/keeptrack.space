@@ -884,10 +884,20 @@ var satSensorMarkerArray = [];
   };
 
   satSet.getIdFromStarName = function (starName) {
-    var starName2;
     for (var i = 0; i < satData.length; i++) {
       if (satData[i].type === 'Star') {
         if (satData[i].name === starName) {
+          return i;
+        }
+      }
+    }
+    return null;
+  };
+
+  satSet.getIdFromSensorName = function (sensorName) {
+    for (var i = 0; i < satData.length; i++) {
+      if (satData[i].static === true && satData[i].missile !== true && satData[i].type !== 'Star') {
+        if (satData[i].name === sensorName) {
           return i;
         }
       }

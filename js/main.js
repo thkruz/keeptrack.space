@@ -120,6 +120,7 @@ cameraType.OFFSET = 1;
 cameraType.FPS = 2;
 cameraType.PLANETARIUM = 3;
 cameraType.SATELLITE = 4;
+cameraType.ASTRONOMY = 5;
 
 var mouseX = 0;
 var mouseY = 0;
@@ -273,7 +274,7 @@ var drawLoopCallback;
       dragTarget = getEarthScreenPoint(mouseX, mouseY);
       if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
       isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
-      cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE ||
+      cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current=== cameraType.ASTRONOMY ||
       settingsManager.isMobileModeEnabled) { // random screen drag
         xDif = screenDragPoint[0] - mouseX;
         yDif = screenDragPoint[1] - mouseY;
@@ -310,10 +311,19 @@ var drawLoopCallback;
 
     camRotateSpeed -= (camRotateSpeed * dt * settingsManager.cameraMovementSpeed);
 
-    if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE) {
+    if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current=== cameraType.ASTRONOMY) {
+
       FPSPitch -= 20 * camPitchSpeed * dt;
       FPSYaw -= 20 * camYawSpeed * dt;
       FPSRotate -= 20 * camRotateSpeed * dt;
+
+      // Prevent Over Rotation
+      if (FPSPitch > 90) FPSPitch = 90;
+      if (FPSPitch < -90) FPSPitch = -90;
+      if (FPSRotate > 360) FPSRotate -= 360;
+      if (FPSRotate < 0) FPSRotate += 360;
+      if (FPSYaw > 360) FPSYaw -= 360;
+      if (FPSYaw < 0) FPSYaw += 360;
     } else {
       camPitch += camPitchSpeed * dt;
       camYaw += camYawSpeed * dt;
@@ -440,7 +450,7 @@ var drawLoopCallback;
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-    if (cameraType.current=== cameraType.FPS || cameraType.current=== cameraType.SATELLITE) {
+    if (cameraType.current=== cameraType.FPS || cameraType.current=== cameraType.SATELLITE || cameraType.current=== cameraType.ASTRONOMY) {
       _FPSMovement();
     }
     camMatrix = _drawCamera();
@@ -528,6 +538,28 @@ var drawLoopCallback;
             orbitDisplay.updateOrbitBuffer(lastSelectedSat);
             let satPos = sat.position;
             mat4.translate(camMatrix, camMatrix, [-satPos.x, -satPos.y, -satPos.z]);
+            break;
+          }
+        case cameraType.ASTRONOMY:
+          {
+            let satPos = _calculateSensorPos({});
+
+            // Pitch is the opposite of the angle to the latitude
+            // Yaw is 90 degrees to the left of the angle to the longitude
+            pitchRotate = ((-1 * satellite.currentSensor.lat) * DEG2RAD);
+            yawRotate = ((90 - satellite.currentSensor.long) * DEG2RAD) - satPos.gmst;
+
+            // yawRotate = ((-90 - satellite.currentSensor.long) * DEG2RAD);
+            if (typeof satellite.currentSensor.name == 'undefined') break; // Sensor Must be Selected
+            let sensor = satSet.getSat(satSet.getIdFromSensorName(satellite.currentSensor.name));
+            // mat4.rotate(camMatrix, camMatrix, sat.inclination * DEG2RAD, [0, 1, 0]);
+            mat4.rotate(camMatrix, camMatrix, (pitchRotate + (-FPSPitch * DEG2RAD)), [1, 0, 0]);
+            mat4.rotate(camMatrix, camMatrix, (yawRotate + (FPSYaw * DEG2RAD)), [0, 0, 1]);
+            mat4.rotate(camMatrix, camMatrix, FPSRotate * DEG2RAD, [0, 1, 0]);
+
+            // orbitDisplay.updateOrbitBuffer(lastSelectedSat);
+            let sensorPos = sensor.position;
+            mat4.translate(camMatrix, camMatrix, [-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01]); // Scale to get away from Earth
             break;
           }
       }
@@ -730,6 +762,7 @@ var drawLoopCallback;
     }
     if (satId === -1) {
       if (!isHoverBoxVisible || settingsManager.isDisableSatHoverBox) return;
+      if (starManager.isConstellationVisible === true) starManager.clearConstellations();
       // satHoverBoxDOM.html('(none)');
       satHoverBoxDOM.css({display: 'none'});
       canvasDOM.css({cursor: 'default'});
@@ -745,6 +778,15 @@ var drawLoopCallback;
             satHoverBoxNode1.textContent = (launchSite.site + ', ' + launchSite.sitec);
             satHoverBoxNode2.innerHTML = (sat.type + satellite.distance(sat, selectedSatData) + '');
             satHoverBoxNode3.textContent = ('');
+          } else if (sat.type === 'Star') {
+            if (starManager.findStarsConstellation(sat.name) !== null) {
+              satHoverBoxNode1.innerHTML = (sat.name + '</br>' + starManager.findStarsConstellation(sat.name));
+            } else {
+              satHoverBoxNode1.textContent = (sat.name);
+            }
+            satHoverBoxNode2.innerHTML = (sat.type);
+            satHoverBoxNode3.innerHTML = ('RA: ' + sat.ra.toFixed(3) + ' deg </br> DEC: ' + sat.dec.toFixed(3) + ' deg');
+            starManager.drawConstellations(starManager.findStarsConstellation(sat.name));
           } else {
             satHoverBoxNode1.textContent = (sat.name);
             satHoverBoxNode2.innerHTML = (sat.type + satellite.distance(sat, selectedSatData) + '');
@@ -1380,30 +1422,20 @@ function debugDrawLine (type, value) {
   }
 }
 
-function drawConstellations (C) {
-    for (var s = 0; s < C.stars.length; s++) {
-      var star1 = satSet.getSat(satSet.getIdFromStarName(C.stars[s][0]));
-      var star2 = satSet.getSat(satSet.getIdFromStarName(C.stars[s][1]));
-      if (star1 == null || star2 == null) { continue; }
-      drawLineList.push(
-        {
-          'line': new Line(),
-          'ref': [star1.position.x,star1.position.y,star1.position.z],
-          'ref2': [star2.position.x,star2.position.y,star2.position.z]
-        }
-      );
-    }
-}
-
 function drawLines () {
   if (drawLineList.length == 0) return;
   for (var i = 0; i < drawLineList.length; i++) {
     if (typeof drawLineList[i].sat != 'undefined') {
       drawLineList[i].sat = satSet.getSat(drawLineList[i].sat.id);
       drawLineList[i].line.set(drawLineList[i].ref, [drawLineList[i].sat.position.x,drawLineList[i].sat.position.y,drawLineList[i].sat.position.z]);
+    } else if ((typeof drawLineList[i].star1 != 'undefined') && (typeof drawLineList[i].star2 != 'undefined')) {
+      var star1 = satSet.getSat(satSet.getIdFromStarName(drawLineList[i].star1)).position;
+      var star2 = satSet.getSat(satSet.getIdFromStarName(drawLineList[i].star2)).position;
+      drawLineList[i].line.set([star1.x, star1.y, star1.z], [star2.x, star2.y,star2.z]);
     } else {
       drawLineList[i].line.set(drawLineList[i].ref, drawLineList[i].ref2);
     }
+
     drawLineList[i].line.draw();
   }
 }

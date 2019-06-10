@@ -882,7 +882,9 @@ $.ajaxSetup({
       dist: starManager.stars[star].dist,
       vmag: starManager.stars[star].vmag,
     };
-    sensorList['star' + star].name = (starManager.stars[star].pname != "") ? starManager.stars[star].pname : starManager.stars[star].name;
+    if (starManager.stars[star].pname != "") { sensorList['star' + star].name = starManager.stars[star].pname; continue; }
+    if (starManager.stars[star].bf != "") { sensorList['star' + star].name = starManager.stars[star].bf; continue; }
+    sensorList['star' + star].name = "HD " + starManager.stars[star].name;
   }
 
   sensorManager.sensorListLength = function () {
@@ -1051,6 +1053,7 @@ $.ajaxSetup({
         alt: sensorList[sensor].obshei,
         ra: sensorList[sensor].ra,
         dec: sensorList[sensor].dec,
+        vmag: sensorList[sensor].vmag,
         changeObjectInterval: sensorList[sensor].changeObjectInterval
       };
       tleManager.staticSet.push(sensorInfo);

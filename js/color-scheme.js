@@ -115,8 +115,20 @@
       }
 
       if (sat.static && sat.type === 'Star') {
+        if (sat.vmag >= 4.7) {
+          return {
+            color: colorTheme.star50,
+            pickable: true
+          };
+        }
+        if (sat.vmag >= 3.5) {
+          return {
+            color: colorTheme.star75,
+            pickable: true
+          };
+        }
         return {
-          color: colorTheme.star,
+          color: colorTheme.star100,
           pickable: true
         };
       }
@@ -189,32 +201,40 @@
         };
       }
 
-      if (sat.inView && ColorScheme.objectTypeFlags.orange === false && cameraType.current !== cameraType.PLANETARIUM) {
+      if (cameraType.current === cameraType.ASTRONOMY) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
-      }
-
-      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
-        color = colorTheme.inview;
-      } else if (sat.C === 'ANALSAT') {
-        color = colorTheme.analyst;
-      } else if (sat.OT === 1) { // Payload
-        color = colorTheme.payload;
-      } else if (sat.OT === 2) { // Rocket Body
-        color = colorTheme.rocket;
-      } else if (sat.OT === 3) { // Debris
-        color = colorTheme.debris;
       } else {
-        color = colorTheme.unknown;
-      }
 
-      if ((sat.perigee > satellite.obsmaxrange || sat.apogee < satellite.obsminrange)) {
-        return {
-          color: colorTheme.transparent,
-          pickable: false
-        };
+        if (sat.inView && ColorScheme.objectTypeFlags.orange === false && cameraType.current !== cameraType.PLANETARIUM) {
+          return {
+            color: colorTheme.deselected,
+            pickable: false
+          };
+        }
+
+        if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
+          color = colorTheme.inview;
+        } else if (sat.C === 'ANALSAT') {
+          color = colorTheme.analyst;
+        } else if (sat.OT === 1) { // Payload
+          color = colorTheme.payload;
+        } else if (sat.OT === 2) { // Rocket Body
+          color = colorTheme.rocket;
+        } else if (sat.OT === 3) { // Debris
+          color = colorTheme.debris;
+        } else {
+          color = colorTheme.unknown;
+        }
+
+        if ((sat.perigee > satellite.obsmaxrange || sat.apogee < satellite.obsminrange)) {
+          return {
+            color: colorTheme.transparent,
+            pickable: false
+          };
+        }
       }
 
       return {

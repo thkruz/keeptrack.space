@@ -472,6 +472,16 @@ var drawLoopCallback;
       * for traditional view, move the camera and then rotate it
       */
 
+     if (isNaN(camPitch) || isNaN(camYaw) || isNaN(camPitchTarget) || isNaN(camYawTarget) || isNaN(zoomLevel) || isNaN(zoomTarget)) {
+       camPitch = 0.5;
+       camYaw = 0.5;
+       zoomLevel  = 0.5;
+       camPitchTarget = 0;
+       camYawTarget = 0;
+       zoomTarget = 0.5;
+       console.error('Camera Math Error - Camera Reset');
+     }
+
       switch (cameraType.current) {
         case cameraType.DEFAULT: // pivot around the earth with earth in the center
           mat4.translate(camMatrix, camMatrix, [0, _getCamDist(), 0]);
@@ -670,7 +680,7 @@ var drawLoopCallback;
 
     hoverBoxOnSatMiniElements = document.getElementById('sat-minibox');
     hoverBoxOnSatMiniElements.innerHTML = '';
-    for (var i = 0; i < satSet.orbitalSats && labelCount < settingsManager.maxLabels; i++) {
+    for (var i = 0; i < (satSet.orbitalSats) && labelCount < settingsManager.maxLabels; i++) {
       sat = satSet.getSatPosOnly(i);
 
       if (sat.static) continue;
@@ -1031,6 +1041,7 @@ function updateUrl () { // URL Updater
 
 var isSelectedSatNegativeOne = false;
 function selectSat (satId) {
+  if (satId !== -1 && satSet.getSat(satId).type == 'Star') { return; } // TODO: Optimize
   satSet.selectSat(satId);
   var sat;
   camSnapMode = false;
@@ -1092,6 +1103,7 @@ function selectSat (satId) {
     selectedSat = satId;
     sat = satSet.getSatExtraOnly(satId);
     if (!sat) return;
+    if (sat.type == 'Star') { return; }
     if (sat.static) {
       adviceList.sensor();
       sat = satSet.getSat(satId);
@@ -1258,9 +1270,9 @@ function selectSat (satId) {
       if (!satellite.sensorSelected()) {
         $('#sat-sun').html('Unknown');
       } else if (satellite.currentSensor.type !== 'Optical') {
-        $('#sat-sun').html('Unaffected by Sun');
+        $('#sat-sun').html('Unaffected');
       } else if (sunTime.dawn.getTime() - now > 0 || sunTime.dusk.getTime() - now < 0) {
-        $('#sat-sun').html('No Impact from Sun');
+        $('#sat-sun').html('No Impact');
       } else {
         $('#sat-sun').html('Sun Exclusion');
       }
@@ -1346,11 +1358,52 @@ function enableSlowCPUMode () {
   });
 }
 
+function debugDrawLine (type, value) {
+  if (type == 'sat') {
+    var sat = satSet.getSat(value).position;
+    drawLineList.push(
+      {
+        'line': new Line(),
+        'ref': [0,0,0],
+        'ref2': [sat.x, sat.y, sat.z]
+      }
+    );
+  }
+  if (type == 'ref') {
+    drawLineList.push(
+      {
+        'line': new Line(),
+        'ref': [0,0,0],
+        'ref2': [value[0], value[1], value[2]]
+      }
+    );
+  }
+}
+
+function drawConstellations (C) {
+    for (var s = 0; s < C.stars.length; s++) {
+      var star1 = satSet.getSat(satSet.getIdFromStarName(C.stars[s][0]));
+      var star2 = satSet.getSat(satSet.getIdFromStarName(C.stars[s][1]));
+      if (star1 == null || star2 == null) { continue; }
+      drawLineList.push(
+        {
+          'line': new Line(),
+          'ref': [star1.position.x,star1.position.y,star1.position.z],
+          'ref2': [star2.position.x,star2.position.y,star2.position.z]
+        }
+      );
+    }
+}
+
 function drawLines () {
   if (drawLineList.length == 0) return;
   for (var i = 0; i < drawLineList.length; i++) {
-    drawLineList[i].sat = satSet.getSat(drawLineList[i].sat.id);
-    drawLineList[i].line.set(drawLineList[i].ref, [drawLineList[i].sat.position.x,drawLineList[i].sat.position.y,drawLineList[i].sat.position.z]);
+    if (typeof drawLineList[i].sat != 'undefined') {
+      drawLineList[i].sat = satSet.getSat(drawLineList[i].sat.id);
+      drawLineList[i].line.set(drawLineList[i].ref, [drawLineList[i].sat.position.x,drawLineList[i].sat.position.y,drawLineList[i].sat.position.z]);
+    } else {
+      drawLineList[i].line.set(drawLineList[i].ref, drawLineList[i].ref2);
+    }
     drawLineList[i].line.draw();
   }
 }

@@ -87,6 +87,9 @@ or mirrored at any other location without the express written permission of the 
     if (selectedSat == null || hoverSat == null) {
       return '';
     }
+    if (selectedSat.type === 'Star' || hoverSat.type === 'Star') {
+      return '';
+    }
     var distanceApartX = Math.pow(hoverSat.position.x - selectedSat.position.x, 2);
     var distanceApartY = Math.pow(hoverSat.position.y - selectedSat.position.y, 2);
     var distanceApartZ = Math.pow(hoverSat.position.z - selectedSat.position.z, 2);
@@ -1376,6 +1379,41 @@ or mirrored at any other location without the express written permission of the 
     }
     return maxDiff === null ? -1 : maxDiff;
   }
+
+  satellite.lookAnglesToEcf = function (azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long, obs_alt) {
+
+      // site ecef in meters
+      var geodeticCoords = {};
+      geodeticCoords.latitude = obs_lat;
+      geodeticCoords.longitude = obs_long;
+      geodeticCoords.height = obs_alt;
+
+      var siteXYZ = satellite.geodeticToEcf(geodeticCoords);
+      var sitex, sitey, sitez;
+      sitex = siteXYZ.x;
+      sitey = siteXYZ.y;
+      sitez = siteXYZ.z;
+
+      // some needed calculations
+      var slat = Math.sin(obs_lat);
+      var slon = Math.sin(obs_long);
+      var clat = Math.cos(obs_lat);
+      var clon = Math.cos(obs_long);
+
+      var azRad = DEG2RAD * azimuthDeg;
+      var elRad = DEG2RAD * elevationDeg;
+
+      // az,el,range to sez convertion
+      var south  = -slantRange * Math.cos(elRad) * Math.cos(azRad);
+      var east   =  slantRange * Math.cos(elRad) * Math.sin(azRad);
+      var zenith =  slantRange * Math.sin(elRad);
+
+      var x = ( slat * clon * south) + (-slon * east) + (clat * clon * zenith) + sitex;
+      var y = ( slat * slon * south) + ( clon * east) + (clat * slon * zenith) + sitey;
+      var z = (-clat *        south) + ( slat * zenith) + sitez;
+
+    return {'x': x, 'y': y, 'z': z};
+  };
 
   satellite.xyz2latlon = function (x, y, z) {
     var propTime = timeManager.propTime();

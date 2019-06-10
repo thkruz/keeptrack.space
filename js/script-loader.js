@@ -2417,7 +2417,6 @@ $('#radar-capecod').click(function() { //Select Cape Cod's Radar Coverage
   $("#sensor-info-title").html("<a class='iframe' href='http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html'>Cape Cod AFS</a>");
   $('a.iframe').colorbox({iframe: true, width:"80%", height:"80%", fastIframe: false, closeButton: false});
   $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
   whichRadar = 'COD';
   radarType = 'Phased Array';
   $('#menu-weather img').removeClass("bmenu-item-disabled");
@@ -2460,7 +2459,6 @@ $('#radar-clear').click(function() { //Select Clear's Radar Coverage
   whichRadar = 'CLR';
   $('#sensor-info-title').html("Clear AFS");
   $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').removeClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -2506,7 +2504,6 @@ $('#radar-eglin').click(function() { //Select Clear's Radar Coverage
   whichRadar = 'EGL';
   $('#sensor-info-title').html("Eglin AFB");
   $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').removeClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -2552,7 +2549,6 @@ $('#radar-beale').click(function() { //Select Beale's Radar Coverage
   whichRadar = 'BLE';
   $('#sensor-info-title').html("Beale AFB");
   $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').removeClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -2598,7 +2594,6 @@ $('#radar-fylingdales').click(function() { //Select Beale's Radar Coverage
   whichRadar = 'FYL';
   $('#sensor-info-title').html("RAF Fylingdales");
   $('#sensor-country').html("Great Britian");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').removeClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -2644,7 +2639,6 @@ $('#radar-parcs').click(function() { //Select Beale's Radar Coverage
   whichRadar = 'PAR';
   $('#sensor-info-title').html("Cavalier AFS");
   $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').removeClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -2690,7 +2684,6 @@ $('#radar-millstone').click(function() { //Select Millstone's Radar Coverage
   whichRadar = 'MIL';
   $('#sensor-info-title').html("Millstone Hill Steerable Antenna");
   $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Mechanical';
   $('#menu-weather img').removeClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -2736,7 +2729,6 @@ $('#radar-altair').click(function() { //Select Millstone's Radar Coverage
   whichRadar = '';
   $('#sensor-info-title').html("ARPA Long-Range Tracking and Instrumentation Radar");
   $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Mechanical';
   $('#menu-weather img').removeClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -2782,7 +2774,6 @@ $('#radar-thule').click(function() { //Select Thule's Radar Coverage
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("Thule Air Base");
   $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   //No Weather
   $('#menu-weather img').addClass("bmenu-item-disabled");
@@ -2827,7 +2818,6 @@ $('#optical-diego-garcia').click(function() { //Select Clear's Radar Coverage
   whichRadar = 'DGC';
   $('#sensor-info-title').html("Diego Garcia GEODSS");
   $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
 
   $('#menu-weather img').removeClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -2869,7 +2859,6 @@ $('#optical-maui').click(function() { //Select Clear's Radar Coverage
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("Maui GEODSS");
   $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Optical';
   //No Weather
   $('#menu-weather img').addClass("bmenu-item-disabled");
@@ -2912,7 +2901,6 @@ $('#optical-socorro').click(function() { //Select Clear's Radar Coverage
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("Socorro GEODSS");
   $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Optical';
   //No Weather
   $('#menu-weather img').addClass("bmenu-item-disabled");
@@ -2955,7 +2943,6 @@ $('#optical-spain').click(function() { //Select Clear's Radar Coverage
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("Moron Air Base");
   $('#sensor-country').html("United States");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Optical';
   //No Weather
   $('#menu-weather img').addClass("bmenu-item-disabled");
@@ -3000,7 +2987,6 @@ $('#russian-olenegorsk').click(function() {
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("Olenegorsk Radar Station");
   $('#sensor-country').html("Russia");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').addClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -3042,7 +3028,6 @@ $('#russian-pechora').click(function() {
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("Pechora Radar Station");
   $('#sensor-country').html("Russia");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').addClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -3084,7 +3069,6 @@ $('#russian-mishelevka-d').click(function() {
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("Mishelevka Radar Station");
   $('#sensor-country').html("Russia");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').addClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -3126,7 +3110,6 @@ $('#russian-lekhtusi').click(function() {
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("Lehktusi Radar Station");
   $('#sensor-country').html("Russia");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').addClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -3168,7 +3151,6 @@ $('#russian-armavir').click(function() {
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("Armavir Radar Station");
   $('#sensor-country').html("Russia");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').addClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -3210,7 +3192,6 @@ $('#russian-pionersky').click(function() {
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("Armavir Radar Station");
   $('#sensor-country').html("Russia");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').addClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -3251,7 +3232,6 @@ $('#russian-balkhash').click(function() {
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("Balkhash Radar Station");
   $('#sensor-country').html("Russia");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').addClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -3291,7 +3271,6 @@ $('#russian-gantsevichi').click(function() {
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("Gantsevichi Radar Station");
   $('#sensor-country').html("Russia");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').addClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");
@@ -3333,7 +3312,6 @@ $('#chinese-xuanhua').click(function() {
   whichRadar = ''; // Disables Weather Menu from Opening
   $('#sensor-info-title').html("7010 Large Phased Array Radar (LPAR)");
   $('#sensor-country').html("China");
-  $('#sensor-sun').html("No Impact");
   radarType = 'Phased Array';
   $('#menu-weather img').addClass("bmenu-item-disabled");
   $('#menu-sensor-info img').removeClass("bmenu-item-disabled");

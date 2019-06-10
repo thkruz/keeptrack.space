@@ -8,8 +8,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.1.1';
-  settingsManager.versionDate = 'June 5, 2019';
+  settingsManager.versionNumber = 'v1.2.0';
+  settingsManager.versionDate = 'June 9, 2019';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -207,6 +207,7 @@
   settingsManager.reColorMinimumTime = 1000;
 
   settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
+  settingsManager.colors.star = [1.0, 1.0, 1.0, 1.0];
   settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
   settingsManager.colors.marker = [[0.2, 1.0, 1.0, 1.0],
                                    [1.0, 0.2, 1.0, 1.0],

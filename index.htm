@@ -14,12 +14,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=1.0.0b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=1.2.0b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=1.0.0b" rel="stylesheet">
+    <link href="css/fonts.css?v=1.2.0b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=1.0.0b">
-    <link rel="stylesheet" href="css/materialize-local.css?v=1.0.0b">
+    <link rel="stylesheet" href="css/materialize.css?v=1.2.0b">
+    <link rel="stylesheet" href="css/materialize-local.css?v=1.2.0b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -456,10 +456,6 @@
                 <div class="sensor-info-row">
                   <div class="sensor-info-key">Longitude</div>
                   <div class="sensor-info-value" id="sensor-longitude">0</div>
-                </div>
-                <div class="sensor-info-row">
-                  <div class="sensor-info-key">Sun Exclusion</div>
-                  <div class="sensor-info-value" id="sensor-sun">Sun Stuff</div>
                 </div>
                 <div class="sensor-info-row">
                   <div class="sensor-info-key">Min Azimuth</div>
@@ -1252,38 +1248,41 @@
   <script src="js/lib/materialize.min.js"></script>
   <!-- <script src="js/spin.min.js"></script> -->
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.js?v=1.0.0b"></script>
+  <script src="js/lib/satellite.js?v=1.2.0b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=1.0.0b"></script>
+  <script src="js/lib/shader-loader.min.js?v=1.2.0b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/braun-projection.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=1.0.0b"></script>
-  <script src="license/license.js?v=1.0.0b"></script>
+  <script src="js/settings-manager.js?v=1.2.0b"></script>
+  <script src="license/license.js?v=1.2.0b"></script>
   <!-- Offline Only -->
-  <script src="offline/extra.js?v=1.0.0b"></script>
-  <script src="offline/satInfo.js?v=1.0.0b"></script>
-  <script src="offline/tle.js?v=1.0.0b"></script>
+  <!-- <script src="offline/extra.js?v=1.2.0b"></script> -->
+  <!-- <script src="offline/satInfo.js?v=1.2.0b"></script> -->
+  <!-- <script src="offline/tle.js?v=1.2.0b"></script> -->
+  <script src="offline/stars.js?v=1.2.0b"></script>
+  <script src="offline/constellations.js?v=1.2.0b"></script>
 
-  <script src="js/time-manager.min.js?v=1.0.0b"></script>
-  <script src="js/sun.js?v=1.0.0b"></script>
-  <script src="js/earth.min.js?v=1.0.0b"></script>
-  <script src="js/groups.js?v=1.0.0b"></script>
-  <script src="js/satSet.js?v=1.0.0b"></script>
+  <script src="js/time-manager.min.js?v=1.2.0b"></script>
+  <script src="js/sun.js?v=1.2.0b"></script>
+  <script src="js/starcalc.js?v=1.2.0b"></script>
+  <script src="js/earth.min.js?v=1.2.0b"></script>
+  <script src="js/groups.js?v=1.2.0b"></script>
+  <script src="js/satSet.js?v=1.2.0b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/variables.js?v=1.0.0b"></script>
+  <script src="js/variables.js?v=1.2.0b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=1.0.0b"></script>
+  <script src="js/ballistic-missile.js?v=1.2.0b"></script>
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=1.0.0b"></script>
-  <script src="js/mobile.js?v=1.0.0b"></script>
-  <script src="js/ui.min.js?v=1.0.0b"></script>
-  <script src="js/main.min.js?v=1.0.0b"></script>
-  <script src="js/lookangles.min.js?v=1.0.0b"></script>
-  <script src="js/orbit-display.js?v=1.0.0b"></script>
-  <script src="js/drawLoop-shapes.js?v=1.0.0b"></script>
-  <script src="js/search-box.min.js?v=1.0.0b"></script>
+  <script src="js/color-scheme.js?v=1.2.0b"></script>
+  <script src="js/mobile.js?v=1.2.0b"></script>
+  <script src="js/ui.min.js?v=1.2.0b"></script>
+  <script src="js/main.js?v=1.2.0b"></script>
+  <script src="js/lookangles.min.js?v=1.2.0b"></script>
+  <script src="js/orbit-display.js?v=1.2.0b"></script>
+  <script src="js/drawLoop-shapes.js?v=1.2.0b"></script>
+  <script src="js/search-box.min.js?v=1.2.0b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

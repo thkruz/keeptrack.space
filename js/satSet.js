@@ -883,6 +883,18 @@ var satSensorMarkerArray = [];
     return null;
   };
 
+  satSet.getIdFromStarName = function (starName) {
+    var starName2;
+    for (var i = 0; i < satData.length; i++) {
+      if (satData[i].type === 'Star') {
+        if (satData[i].name === starName) {
+          return i;
+        }
+      }
+    }
+    return null;
+  };
+
   var posVec4;
   satSet.getScreenCoords = function (i, pMatrix, camMatrix, pos) {
     satScreenPositionArray.error = false;

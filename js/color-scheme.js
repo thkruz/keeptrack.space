@@ -114,6 +114,13 @@
         };
       }
 
+      if (sat.static && sat.type === 'Star') {
+        return {
+          color: colorTheme.star,
+          pickable: true
+        };
+      }
+
       if (sat.marker) {
         if (sat.id === satSensorMarkerArray[iSensorMarkerArray + 1]) {
           iSensorMarkerArray++;

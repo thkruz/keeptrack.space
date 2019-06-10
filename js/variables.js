@@ -648,7 +648,7 @@ $.ajaxSetup({
     obsminrange: 25000,
     obsmaxrange: 200000,
     changeObjectInterval: 20000,
-    staticNum: 27,
+    staticNum: 28,
     zoom: 'geo',
     url: '',
     country: 'Spain',
@@ -849,6 +849,42 @@ $.ajaxSetup({
     volume: false
   };
 
+  // ISON Sensors
+  sensorList.MAY = {
+    name: 'Mayhill, NM',
+    googleName: 'Mayhill',
+    shortName: 'MAY',
+    type: 'Optical',
+    lat: 32.9039,
+    long: -105.5289,
+    obshei: 2.225,
+    obsminaz: 0,
+    obsmaxaz: 360,
+    obsminel: 10,
+    obsmaxel: 90,
+    obsminrange: 25000,
+    obsmaxrange: 200000,
+    changeObjectInterval: 20000,
+    staticNum: 29,
+    zoom: 'geo',
+    country: 'USA',
+    sun: 'No Impact',
+    volume: false
+  };
+
+  // Stars
+  for (var star = 0; star < (starManager.stars.length); star++) {
+    sensorList['star' + star] = {
+      shortName: 'STAR',
+      type: 'Star',
+      dec: starManager.stars[star].dec, //dec
+      ra: starManager.stars[star].ra, //ra
+      dist: starManager.stars[star].dist,
+      vmag: starManager.stars[star].vmag,
+    };
+    sensorList['star' + star].name = (starManager.stars[star].pname != "") ? starManager.stars[star].pname : starManager.stars[star].name;
+  }
+
   sensorManager.sensorListLength = function () {
     var sensorListCount = 0;
     for (var sensor in sensorList) {
@@ -926,7 +962,7 @@ $.ajaxSetup({
       setTimeout(satSet.setColorScheme, 1500, ColorScheme.default, true);
     } else {
       for (sensor in sensorList) {
-        if (sensorList[sensor] === selectedSensor || sensorList[sensor].staticNum === staticNum) {
+        if (sensorList[sensor] === selectedSensor || (sensorList[sensor].staticNum === staticNum && typeof staticNum != 'undefined')) {
           sensorManager.selectedSensor = sensorList[sensor];
           ga('send', 'event', 'Sensor', sensorList[sensor].googleName, 'Selected');
           // Do For All Sensors
@@ -943,7 +979,6 @@ $.ajaxSetup({
           $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
           $('#sensor-type').html(sensorManager.selectedSensor.type);
           $('#sensor-country').html(sensorManager.selectedSensor.country);
-          $('#sensor-sun').html(sensorManager.selectedSensor.sun);
           selectSat(-1);
           changeZoom(sensorManager.selectedSensor.zoom);
           camSnap(latToPitch(sensorManager.selectedSensor.lat), longToYaw(sensorManager.selectedSensor.long));
@@ -1013,6 +1048,9 @@ $.ajaxSetup({
         type: sensorList[sensor].type,
         lat: sensorList[sensor].lat,
         lon: sensorList[sensor].long,
+        alt: sensorList[sensor].obshei,
+        ra: sensorList[sensor].ra,
+        dec: sensorList[sensor].dec,
         changeObjectInterval: sensorList[sensor].changeObjectInterval
       };
       tleManager.staticSet.push(sensorInfo);

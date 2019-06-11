@@ -84,6 +84,7 @@ var maxPinchSize = 1;
   mobile.checkMobileMode = function () {
     if ($(document).width() <= settingsManager.desktopMinimumWidth) {
       settingsManager.isMobileModeEnabled = true;
+      settingsManager.fieldOfView = 1.2;
       settingsManager.cameraMovementSpeed = 0.0001;
       settingsManager.cameraMovementSpeedMin = 0.0001;
       settingsManager.fieldOfView = settingsManager.fieldOfViewMax;

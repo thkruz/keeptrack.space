@@ -117,6 +117,7 @@ or mirrored at any other location without the express written permission of the 
       $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
       $('#menu-surveillance').removeClass('bmenu-item-disabled');
       $('#menu-planetarium').removeClass('bmenu-item-disabled');
+      $('#menu-astronomy').removeClass('bmenu-item-disabled');
       $('.sensor-reset-menu').show(); // TODO: This belongs in UI.js somewhere
     }
     satellite.currentSensor = sensor;

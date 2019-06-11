@@ -895,14 +895,44 @@ var satSensorMarkerArray = [];
   };
 
   satSet.getIdFromSensorName = function (sensorName) {
-    for (var i = 0; i < satData.length; i++) {
-      if (satData[i].static === true && satData[i].missile !== true && satData[i].type !== 'Star') {
-        if (satData[i].name === sensorName) {
-          return i;
+    if (typeof sensorName != 'undefined') {
+      for (var i = 0; i < satData.length; i++) {
+        if (satData[i].static === true && satData[i].missile !== true && satData[i].type !== 'Star') {
+          if (satData[i].name === sensorName) {
+            return i;
+          }
         }
       }
     }
-    return null;
+    try {
+      var now = timeManager.propTime();
+
+      var j = timeManager.jday(now.getUTCFullYear(),
+                   now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+                   now.getUTCDate(),
+                   now.getUTCHours(),
+                   now.getUTCMinutes(),
+                   now.getUTCSeconds());
+      j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+
+      var gmst = satellite.gstime(j);
+      cosLat = Math.cos(satellite.currentSensor.lat * DEG2RAD);
+      sinLat = Math.sin(satellite.currentSensor.lat * DEG2RAD);
+      cosLon = Math.cos((satellite.currentSensor.long * DEG2RAD) + gmst);
+      sinLon = Math.sin((satellite.currentSensor.long * DEG2RAD) + gmst);
+      var sensor = {};
+      sensor.position = {};
+      sensor.name = 'Custom Sensor';
+      sensor.position.x = (6371 + 0.25 + satellite.currentSensor.obshei) * cosLat * cosLon; // 6371 is radius of earth
+      sensor.position.y = (6371 + 0.25 + satellite.currentSensor.obshei) * cosLat * sinLon;
+      sensor.position.z = (6371 + 0.25 + satellite.currentSensor.obshei) * sinLat;
+      // console.log('No Sensor Found. Using Current Sensor');
+      // console.log(sensor);
+      return sensor;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
   };
 
   var posVec4;

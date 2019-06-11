@@ -13202,7 +13202,7 @@ var starManager = {"stars": [
   {
     "name": 85558,
     "hr": 3909,
-    "bf": "8Gam Sex",
+    "bf": "γ-Sextans",
     "pname": "",
     "ra": 9.875121,
     "dec": -8.10503,
@@ -13322,7 +13322,7 @@ var starManager = {"stars": [
   {
     "name": 87696,
     "hr": 3974,
-    "bf": "21    LMi",
+    "bf": "21-LMi",
     "pname": "",
     "ra": 10.123821,
     "dec": 35.244693,
@@ -13352,7 +13352,7 @@ var starManager = {"stars": [
   {
     "name": 87887,
     "hr": 3981,
-    "bf": "15Alp Sex",
+    "bf": "α-Sextans",
     "pname": "",
     "ra": 10.1323,
     "dec": -0.371637,
@@ -13672,7 +13672,7 @@ var starManager = {"stars": [
   {
     "name": 90537,
     "hr": 4100,
-    "bf": "31Bet LMi",
+    "bf": "β-LMi",
     "pname": "",
     "ra": 10.464727,
     "dec": 36.707212,
@@ -13752,7 +13752,7 @@ var starManager = {"stars": [
   {
     "name": 90994,
     "hr": 4119,
-    "bf": "30Bet Sex",
+    "bf": "β-Sextans",
     "pname": "",
     "ra": 10.504855,
     "dec": -0.637026,
@@ -14142,7 +14142,7 @@ var starManager = {"stars": [
   {
     "name": 94264,
     "hr": 4247,
-    "bf": "46    LMi",
+    "bf": "46-LMi",
     "pname": "",
     "ra": 10.888526,
     "dec": 34.214871,
@@ -17572,7 +17572,7 @@ var starManager = {"stars": [
   {
     "name": 124294,
     "hr": 5315,
-    "bf": "98Kap Vir",
+    "bf": "κ-Vir",
     "pname": "",
     "ra": 14.214929,
     "dec": -10.273702,

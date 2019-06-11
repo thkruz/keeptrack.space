@@ -8,7 +8,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.2.1';
+  settingsManager.versionNumber = 'v1.2.2';
   settingsManager.versionDate = 'June 10, 2019';
 
   settingsManager.lowPerf = false;
@@ -126,8 +126,8 @@
   settingsManager.searchLimit = 400;
 
   settingsManager.fieldOfView = 0.6;
-  settingsManager.fieldOfViewMin = 0.5;
-  settingsManager.fieldOfViewMax = 1.0; // 2.12 shows GEO
+  settingsManager.fieldOfViewMin = 0.04; // 4 Degrees (I think)
+  settingsManager.fieldOfViewMax = 1.2; // 120 Degrees (I think)
 
   settingsManager.geolocation = {};
   settingsManager.geolocationUsed = false;

@@ -27,6 +27,9 @@
   ColorScheme.objectTypeFlags.red = true;
   ColorScheme.objectTypeFlags.purple = true;
   ColorScheme.objectTypeFlags.white = true;
+  ColorScheme.objectTypeFlags.star100 = true;
+  ColorScheme.objectTypeFlags.star75 = true;
+  ColorScheme.objectTypeFlags.star50 = true;
 
   // Removed from function to reduce memory leak
   ColorScheme.prototype.calculateColorBuffers = function (isForceRecolor, isCalculateMarkers) {
@@ -115,22 +118,28 @@
       }
 
       if (sat.static && sat.type === 'Star') {
-        if (sat.vmag >= 4.7) {
+        if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.star50) {
           return {
             color: colorTheme.star50,
             pickable: true
           };
-        }
-        if (sat.vmag >= 3.5) {
+        } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorScheme.objectTypeFlags.star75) {
           return {
             color: colorTheme.star75,
             pickable: true
           };
+        } else if (sat.vmag < 3.5 && ColorScheme.objectTypeFlags.star100) {
+          return {
+            color: colorTheme.star100,
+            pickable: true
+          };
+        } else {
+          // Deselected
+          return {
+            color: colorTheme.deselected,
+            pickable: false
+          };
         }
-        return {
-          color: colorTheme.star100,
-          pickable: true
-        };
       }
 
       if (sat.marker) {

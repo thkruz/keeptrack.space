@@ -267,7 +267,7 @@ var isDayNightToggle = false;
 
         if (cameraType.current === cameraType.PLANETARIUM || cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
           settingsManager.fieldOfView += delta * 0.0002;
-          $('#fov-text').html('FOV: ' + settingsManager.fieldOfView);
+          $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
           if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
           webGlInit();
@@ -469,7 +469,7 @@ var isDayNightToggle = false;
               isMilSatSelected = false;
               $('#menu-space-stations').removeClass('bmenu-item-selected');
 
-              if (satellite.sensorSelected() && cameraType.current !== cameraType.PLANETARIUM) {
+              if (satellite.sensorSelected() && cameraType.current !== cameraType.PLANETARIUM && cameraType.current !== cameraType.ASTRONOMY) {
                 uiController.legendMenuChange('default');
               }
 
@@ -661,6 +661,45 @@ var isDayNightToggle = false;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               }
               break;
+            case "legend-star100-box":
+              if (ColorScheme.objectTypeFlags.star100) {
+                ColorScheme.objectTypeFlags.star100 = false;
+                $('.legend-star100-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.star100 = true;
+                $('.legend-star100-box').css('background', 'rgb(200, 200, 200)');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
+            case "legend-star75-box":
+              if (ColorScheme.objectTypeFlags.star75) {
+                ColorScheme.objectTypeFlags.star75 = false;
+                $('.legend-star75-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.star75 = true;
+                $('.legend-star75-box').css('background', 'rgb(150, 150, 150)');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
+            case "legend-star50-box":
+              if (ColorScheme.objectTypeFlags.star50) {
+                ColorScheme.objectTypeFlags.star50 = false;
+                $('.legend-star50-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.star50 = true;
+                $('.legend-star50-box').css('background', 'rgb(100, 100, 100)');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
             case "legend-orange-box":
               if (ColorScheme.objectTypeFlags.orange) {
                 ColorScheme.objectTypeFlags.orange = false;
@@ -810,6 +849,7 @@ var isDayNightToggle = false;
         $('#menu-fov-bubble').addClass('bmenu-item-disabled');
         $('#menu-surveillance').addClass('bmenu-item-disabled');
         $('#menu-planetarium').addClass('bmenu-item-disabled');
+        $('#menu-astronomy').addClass('bmenu-item-disabled');
         _resetSensorSelected();
       });
 
@@ -1526,6 +1566,7 @@ var isDayNightToggle = false;
         $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
         $('#menu-surveillance').removeClass('bmenu-item-disabled');
         $('#menu-planetarium').removeClass('bmenu-item-disabled');
+        $('#menu-astronomy').removeClass('bmenu-item-disabled');
         sensorManager.whichRadar = 'CUSTOM';
         if ($('#cs-telescope').val()) {
           $('#sensor-type').html('Telescope');
@@ -2332,7 +2373,7 @@ var isDayNightToggle = false;
           } else {
             if (satellite.sensorSelected()) {
               cameraType.current = cameraType.PLANETARIUM; // Activate Planetarium Camera Mode
-              $('#fov-text').html('FOV: ' + settingsManager.fieldOfView);
+              $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
               uiController.legendMenuChange('planetarium');
               $('#menu-planetarium').addClass('bmenu-item-selected');
               isPlanetariumView = true;
@@ -2340,6 +2381,31 @@ var isDayNightToggle = false;
               adviceList.planetariumDisabled();
               if (!$('#menu-planetarium:animated').length) {
                 $('#menu-planetarium').effect('shake', {distance: 10});
+              }
+            }
+            break;
+          }
+          break;
+        case 'menu-astronomy':
+          if (isAstronomyView) {
+            isAstronomyView = false;
+            uiController.hideSideMenus();
+            orbitDisplay.clearInViewOrbit(); // Clear Orbits if Switching from Astronomy View
+            cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
+            $('#fov-text').html('');
+            $('#menu-astronomy').removeClass('bmenu-item-selected');
+            break;
+          } else {
+            if (satellite.sensorSelected()) {
+              if (settingsManager.isMobileModeEnabled) starManager.drawAllConstellations();
+              cameraType.current = cameraType.ASTRONOMY; // Activate Astronomy Camera Mode
+              $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+              uiController.legendMenuChange('astronomy');
+              $('#menu-astronomy').addClass('bmenu-item-selected');
+              isAstronomyView = true;
+            } else {
+              if (!$('#menu-astronomy:animated').length) {
+                $('#menu-astronomy').effect('shake', {distance: 10});
               }
             }
             break;
@@ -2521,14 +2587,26 @@ var isDayNightToggle = false;
       }
       if (evt.key.toUpperCase() === 'Q') {
         if (FPSVertSpeed === -settingsManager.FPSVertSpeed) isFPSVertSpeedLock = false;
-        FPSRotateRate = 0;
+        if (cameraType.current === cameraType.ASTRONOMY) {
+          FPSYawRate = 0;
+        } else {
+          FPSRotateRate = 0;
+        }
       }
       if (evt.key.toUpperCase() === 'E') {
         if (FPSVertSpeed === settingsManager.FPSVertSpeed) isFPSVertSpeedLock = false;
-        FPSRotateRate = 0;
+        if (cameraType.current === cameraType.ASTRONOMY) {
+          FPSYawRate = 0;
+        } else {
+          FPSRotateRate = 0;
+        }
       }
       if (evt.key.toUpperCase() === 'J' || evt.key.toUpperCase() === 'L') {
-        FPSYawRate = 0;
+        if (cameraType.current === cameraType.ASTRONOMY) {
+          FPSRotateRate = 0;
+        } else {
+          FPSYawRate = 0;
+        }
       }
       if (evt.key.toUpperCase() === 'I' || evt.key.toUpperCase() === 'K') {
         FPSPitchRate = 0;
@@ -2603,13 +2681,19 @@ var isDayNightToggle = false;
         }
       }
       if (evt.key.toUpperCase() === 'J') {
-        if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
+        if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE) {
           FPSYawRate = -settingsManager.FPSYawRate / speedModifier;
+        }
+        if (cameraType.current === cameraType.ASTRONOMY) {
+          FPSRotateRate = settingsManager.FPSRotateRate / speedModifier;
         }
       }
       if (evt.key.toUpperCase() === 'L') {
-        if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
+        if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE) {
           FPSYawRate = settingsManager.FPSYawRate / speedModifier;
+        }
+        if (cameraType.current === cameraType.ASTRONOMY) {
+          FPSRotateRate = -settingsManager.FPSRotateRate / speedModifier;
         }
       }
       if (evt.key.toUpperCase() === 'Q') {
@@ -2617,8 +2701,11 @@ var isDayNightToggle = false;
           FPSVertSpeed = -settingsManager.FPSVertSpeed;
           isFPSVertSpeedLock = true;
         }
-        if (cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
+        if (cameraType.current === cameraType.SATELLITE) {
           FPSRotateRate = settingsManager.FPSRotateRate / speedModifier;
+        }
+        if (cameraType.current === cameraType.ASTRONOMY) {
+          FPSYawRate = -settingsManager.FPSYawRate / speedModifier;
         }
       }
       if (evt.key.toUpperCase() === 'E') {
@@ -2626,8 +2713,11 @@ var isDayNightToggle = false;
           FPSVertSpeed = settingsManager.FPSVertSpeed;
           isFPSVertSpeedLock = true;
       }
-        if (cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
+        if (cameraType.current === cameraType.SATELLITE) {
           FPSRotateRate = -settingsManager.FPSRotateRate / speedModifier;
+        }
+        if (cameraType.current === cameraType.ASTRONOMY) {
+          FPSYawRate = settingsManager.FPSYawRate / speedModifier;
         }
       }
     }
@@ -2682,20 +2772,21 @@ var isDayNightToggle = false;
               break;
             case cameraType.FPS:
               $('#camera-status-box').html('Free Camera Mode');
-              $('#fov-text').html('FOV: ' + settingsManager.fieldOfView);
+              $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
               break;
             case cameraType.PLANETARIUM:
               $('#camera-status-box').html('Planetarium Camera Mode');
               uiController.legendMenuChange('planetarium');
-              $('#fov-text').html('FOV: ' + settingsManager.fieldOfView);
+              $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
               break;
             case cameraType.SATELLITE:
               $('#camera-status-box').html('Satellite Camera Mode');
-              $('#fov-text').html('FOV: ' + settingsManager.fieldOfView);
+              $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
               break;
             case cameraType.ASTRONOMY:
               $('#camera-status-box').html('Astronomy Camera Mode');
-              $('#fov-text').html('FOV: ' + settingsManager.fieldOfView);
+              uiController.legendMenuChange('astronomy');
+              $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
               break;
           }
           $('#camera-status-box').show();
@@ -3151,6 +3242,7 @@ var isDayNightToggle = false;
     $('#legend-list-velocity').hide();
     $('#legend-list-countries').hide();
     $('#legend-list-planetarium').hide();
+    $('#legend-list-astronomy').hide();
     switch (menu) {
       case 'default':
         if (satellite.sensorSelected()) {
@@ -3179,6 +3271,9 @@ var isDayNightToggle = false;
         break;
       case 'planetarium':
         $('#legend-list-planetarium').show();
+        break;
+      case 'astronomy':
+        $('#legend-list-astronomy').show();
         break;
       case 'clear':
         $('#legend-hover-menu').hide();
@@ -3425,11 +3520,13 @@ var isDayNightToggle = false;
     $('#menu-surveillance').removeClass('bmenu-item-selected');
     $('#menu-lookangles').removeClass('bmenu-item-selected');
     $('#menu-planetarium').removeClass('bmenu-item-selected');
+    $('#menu-astronomy').removeClass('bmenu-item-selected');
     $('#menu-sensor-info').addClass('bmenu-item-disabled');
     $('#menu-fov-bubble').addClass('bmenu-item-disabled');
     $('#menu-surveillance').addClass('bmenu-item-disabled');
     $('#menu-lookangles').addClass('bmenu-item-disabled');
     $('#menu-planetarium').addClass('bmenu-item-disabled');
+    $('#menu-astronomy').addClass('bmenu-item-disabled');
 
     setTimeout(function(){ satSet.setColorScheme(ColorScheme.default, true); }, 1500);
   };

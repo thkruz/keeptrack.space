@@ -539,6 +539,15 @@ ul {
 .legend-gray-box {
   background: rgb(157, 157, 157);
 }
+.legend-star100-box {
+  background: rgb(200, 200, 200);
+}
+.legend-star75-box {
+  background: rgb(150, 150, 150);
+}
+.legend-star50-box {
+  background: rgb(100, 100, 100);
+}
 .legend-red-box {
   background: rgb(166, 5, 5);
 }
@@ -713,7 +722,7 @@ ul {
     z-index: 10;
     padding: 0px 5px 150px 0px;
   }
-  #menu-satellite-collision, #menu-find-sat {
+  #menu-satellite-collision, #menu-find-sat, #menu-dops {
     display: none;
   }
 }

@@ -93,8 +93,15 @@ var isNewLaunchMenuOpen = false;
 var isBreakupMenuOpen = false;
 var isMissileMenuOpen = false;
 var isPlanetariumView = false;
+var isAstronomyView = false;
 var isSatView = false;
 var isCustomSensorMenuOpen = false;
+
+var pitchRotate;
+var yawRotate;
+
+var fpsEl;
+var fpsAz;
 
 var pickFb, pickTex;
 var pMatrix = mat4.create();
@@ -320,8 +327,14 @@ var drawLoopCallback;
       // Prevent Over Rotation
       if (FPSPitch > 90) FPSPitch = 90;
       if (FPSPitch < -90) FPSPitch = -90;
-      if (FPSRotate > 360) FPSRotate -= 360;
-      if (FPSRotate < 0) FPSRotate += 360;
+      // ASTRONOMY 180 FOV Bubble Looking out from Sensor
+      if (cameraType.current=== cameraType.ASTRONOMY) {
+        if (FPSRotate > 90) FPSRotate = 90;
+        if (FPSRotate < -90) FPSRotate = -90;
+      } else {
+        if (FPSRotate > 360) FPSRotate -= 360;
+        if (FPSRotate < 0) FPSRotate += 360;
+      }
       if (FPSYaw > 360) FPSYaw -= 360;
       if (FPSYaw < 0) FPSYaw += 360;
     } else {
@@ -442,8 +455,8 @@ var drawLoopCallback;
     }
   }
 
-  var pitchRotate;
-  var yawRotate;
+  // var pitchRotate;
+  // var yawRotate;
   function _drawScene () {
     gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -549,9 +562,17 @@ var drawLoopCallback;
             pitchRotate = ((-1 * satellite.currentSensor.lat) * DEG2RAD);
             yawRotate = ((90 - satellite.currentSensor.long) * DEG2RAD) - satPos.gmst;
 
+            fpsEl = ((FPSPitch + 90) > 90) ? (-(FPSPitch) + 90) : (FPSPitch + 90);
+            $('#el-text').html(' EL: ' + fpsEl.toFixed(2) + ' deg');
+
             // yawRotate = ((-90 - satellite.currentSensor.long) * DEG2RAD);
-            if (typeof satellite.currentSensor.name == 'undefined') break; // Sensor Must be Selected
-            let sensor = satSet.getSat(satSet.getIdFromSensorName(satellite.currentSensor.name));
+            let sensor = null;
+            if (typeof satellite.currentSensor.name == 'undefined') {
+              sensor = satSet.getIdFromSensorName(satellite.currentSensor.name);
+              if (sensor == null) return;
+            } else {
+              sensor = satSet.getSat(satSet.getIdFromSensorName(satellite.currentSensor.name));
+            }
             // mat4.rotate(camMatrix, camMatrix, sat.inclination * DEG2RAD, [0, 1, 0]);
             mat4.rotate(camMatrix, camMatrix, (pitchRotate + (-FPSPitch * DEG2RAD)), [1, 0, 0]);
             mat4.rotate(camMatrix, camMatrix, (yawRotate + (FPSYaw * DEG2RAD)), [0, 0, 1]);
@@ -559,6 +580,9 @@ var drawLoopCallback;
 
             // orbitDisplay.updateOrbitBuffer(lastSelectedSat);
             let sensorPos = sensor.position;
+            FPSxPos = sensorPos.x;
+            FPSyPos = sensorPos.y;
+            FPSzPos = sensorPos.z;
             mat4.translate(camMatrix, camMatrix, [-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01]); // Scale to get away from Earth
             break;
           }
@@ -1156,6 +1180,7 @@ function selectSat (satId) {
       $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
       $('#menu-surveillance').removeClass('bmenu-item-disabled');
       $('#menu-planetarium').removeClass('bmenu-item-disabled');
+      $('#menu-astronomy').removeClass('bmenu-item-disabled');
       if (selectedSat !== -1) {
         $('#menu-lookangles').removeClass('bmenu-item-disabled');
       }

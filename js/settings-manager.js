@@ -8,8 +8,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.2.2';
-  settingsManager.versionDate = 'June 10, 2019';
+  settingsManager.versionNumber = 'v1.2.3';
+  settingsManager.versionDate = 'June 11, 2019';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;

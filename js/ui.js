@@ -2392,7 +2392,9 @@ var isDayNightToggle = false;
             uiController.hideSideMenus();
             orbitDisplay.clearInViewOrbit(); // Clear Orbits if Switching from Astronomy View
             cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
+            uiController.legendMenuChange('default');
             $('#fov-text').html('');
+            $('#el-text').html('');
             $('#menu-astronomy').removeClass('bmenu-item-selected');
             break;
           } else {

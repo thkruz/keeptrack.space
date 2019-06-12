@@ -1447,21 +1447,25 @@ function debugDrawLine (type, value) {
   }
 }
 
+var drawLinesI = 0;
+var tempStar1, tempStar2;
 function drawLines () {
   if (drawLineList.length == 0) return;
-  for (var i = 0; i < drawLineList.length; i++) {
-    if (typeof drawLineList[i].sat != 'undefined') {
-      drawLineList[i].sat = satSet.getSat(drawLineList[i].sat.id);
-      drawLineList[i].line.set(drawLineList[i].ref, [drawLineList[i].sat.position.x,drawLineList[i].sat.position.y,drawLineList[i].sat.position.z]);
-    } else if ((typeof drawLineList[i].star1 != 'undefined') && (typeof drawLineList[i].star2 != 'undefined')) {
-      var star1 = satSet.getSat(satSet.getIdFromStarName(drawLineList[i].star1)).position;
-      var star2 = satSet.getSat(satSet.getIdFromStarName(drawLineList[i].star2)).position;
-      drawLineList[i].line.set([star1.x, star1.y, star1.z], [star2.x, star2.y,star2.z]);
+  for (drawLinesI = 0; drawLinesI < drawLineList.length; drawLinesI++) {
+    if (typeof drawLineList[drawLinesI].sat != 'undefined') {
+      drawLineList[drawLinesI].sat = satSet.getSat(drawLineList[drawLinesI].sat.id);
+      drawLineList[drawLinesI].line.set(drawLineList[drawLinesI].ref, [drawLineList[drawLinesI].sat.position.x,drawLineList[drawLinesI].sat.position.y,drawLineList[drawLinesI].sat.position.z]);
+    } else if ((typeof drawLineList[drawLinesI].star1 != 'undefined') && (typeof drawLineList[drawLinesI].star2 != 'undefined')) {
+      if (typeof drawLineList[drawLinesI].star1ID == 'undefined') { drawLineList[drawLinesI].star1ID = satSet.getIdFromStarName(drawLineList[drawLinesI].star1); }
+      if (typeof drawLineList[drawLinesI].star2ID == 'undefined') { drawLineList[drawLinesI].star2ID = satSet.getIdFromStarName(drawLineList[drawLinesI].star2); }
+      tempStar1 = satSet.getSat(drawLineList[drawLinesI].star1ID).position;
+      tempStar2 = satSet.getSat(drawLineList[drawLinesI].star2ID).position;
+      drawLineList[drawLinesI].line.set([tempStar1.x, tempStar1.y, tempStar1.z], [tempStar2.x, tempStar2.y,tempStar2.z]);
     } else {
-      drawLineList[i].line.set(drawLineList[i].ref, drawLineList[i].ref2);
+      drawLineList[drawLinesI].line.set(drawLineList[drawLinesI].ref, drawLineList[drawLinesI].ref2);
     }
 
-    drawLineList[i].line.draw();
+    drawLineList[drawLinesI].line.draw();
   }
 }
 // var lastRadarTrackTime = 0;

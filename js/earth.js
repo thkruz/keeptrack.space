@@ -21,6 +21,7 @@
   var earth = {};
   var NUM_LAT_SEGS = 64;
   var NUM_LON_SEGS = 64;
+  var createClockDOMOnce = false;
 
   var isPropRateVisible = false;
 
@@ -252,8 +253,12 @@
       settingsManager.isPropRateChange = false;
     }
 
-    // NOTE: jQuery call was causing additional Node every iteration.
-    document.getElementById('datetime-text').innerText = earth.timeTextStr;
+    if (!createClockDOMOnce) {
+      document.getElementById('datetime-text').innerText = earth.timeTextStr;
+      createClockDOMOnce = true;
+    } else {
+      document.getElementById('datetime-text').childNodes[0].nodeValue = earth.timeTextStr;
+    }
 
     // Don't update the time input unless it is currently being viewed.
     if (settingsManager.isEditTime || !settingsManager.cruncherReady) {

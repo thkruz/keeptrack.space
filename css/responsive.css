@@ -2,7 +2,7 @@
   .material-tooltip {
     display: none !important;
   }
-  
+
   #sat-infobox {
     display: none;
     background: #0a97d6;
@@ -201,9 +201,9 @@
   .ui-timepicker-div dl  {
     text-align: center !important;
   }
-  #sat-hoverbox {
+  /* #sat-hoverbox {
     display: none !important;
-  }
+  } */
   .top-menu-icons {
     display: inline-flex;
     width: 50px;

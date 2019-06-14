@@ -671,7 +671,7 @@ var satSensorMarkerArray = [];
     drawDt = Math.min((drawNow - lastDrawTime) / 1000.0, 1.0 / drawDivisor);
     drawDt *= timeManager.propRate; // Adjust drawDt correspond to the propagation rate
     satSet.satDataLenInDraw = satData.length;
-    if (!settingsManager.lowPerf) {
+    if (!settingsManager.lowPerf && drawDt > settingsManager.minimumDrawDt) {
       if (!settingsManager.isSatOverflyModeOn && !settingsManager.isFOVBubbleModeOn) {
         satSet.satDataLenInDraw -= settingsManager.maxFieldOfViewMarkers;
         for (drawI = 0; drawI < ((satSet.satDataLenInDraw) * 3); drawI++) {
@@ -683,7 +683,8 @@ var satSensorMarkerArray = [];
           satPos[drawI] += satVel[drawI] * drawDt;
         }
       }
-  }
+      lastDrawTime = drawNow;
+    } 
 
     // console.log('interp dt=' + dt + ' ' + drawNow);
 
@@ -735,8 +736,6 @@ var satSensorMarkerArray = [];
     gl.vertexAttribPointer(gl.pickShaderProgram.aPickable, 1, gl.FLOAT, false, 0, 0);
 
     gl.drawArrays(gl.POINTS, 0, satData.length); // draw pick
-
-    lastDrawTime = drawNow;
     // satSet.updateFOV(null, drawNow);
   };
 

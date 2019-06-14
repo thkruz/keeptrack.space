@@ -167,6 +167,36 @@
     lat: 39.66,
     lon: 124.7
   };
+
+  // Non-CSpOC
+
+  launchSiteList.AMH = {
+    name: 'AMH',
+    lat: 58.5107,
+    lon: -4.5121
+  };
+
+  launchSiteList.ALC = {
+    name: 'ALC',
+    lat: -2.373056,
+    lon: -44.396389
+  };
+
+  launchSiteManager.extractLaunchSite = function (LS) {
+    var site;
+    var sitec;
+    if (LS === 'AMH') {
+      site = "A' Mhòine";
+      sitec = 'Scotland';
+    }
+
+    if (LS === 'ALC') {
+      site = "Alcântara Launch Center";
+      sitec = 'Brazil';
+    }
+    return [site, sitec];
+  }
+
   launchSiteManager.launchSiteList = launchSiteList;
   window.launchSiteManager = launchSiteManager;
 })();

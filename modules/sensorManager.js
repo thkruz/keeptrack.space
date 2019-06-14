@@ -336,6 +336,28 @@
     sun: 'No Impact',
     volume: false
   };
+  sensorList.HOL = {
+    name: 'C-Band (Holt) Radar, AUS',
+    googleName: 'C-Band (Holt) Radar',
+    shortName: 'HOL',
+    type: 'Mechanical',
+    lat: -21.816195,
+    long: 114.165637,
+    obshei: 0.0,
+    obsminaz: 0,
+    obsmaxaz: 360,
+    obsminel: 1,
+    obsmaxel: 90,
+    obsminrange: 200,
+    obsmaxrange: 200000,
+    changeObjectInterval: 20000,
+    staticNum: 32,
+    zoom: 'geo',
+    url: '',
+    country: 'Australia',
+    sun: 'No Impact',
+    volume: false
+  };
   // //////////////////////
   // ESOC RADARS
   // //////////////////////
@@ -645,6 +667,95 @@
     staticNum: 21,
     zoom: 'leo',
     country: 'China',
+    sun: 'No Impact',
+    volume: false
+  };
+
+  // Telescopes
+  sensorList.MLS = {
+    name: 'Mount Lemmon Survey, AZ',
+    googleName: 'Mount Lemmon Survey',
+    shortName: 'MLS',
+    type: 'Optical',
+    lat: 32.442,
+    long: -110.789,
+    obshei: 2.791,
+    obsminaz: 0,
+    obsmaxaz: 360,
+    obsminel: 10,
+    obsmaxel: 90,
+    obsminrange: 25000,
+    obsmaxrange: 200000,
+    changeObjectInterval: 20000,
+    staticNum: 30,
+    zoom: 'geo',
+    country: 'United States',
+    sun: 'No Impact',
+    volume: false
+  };
+
+  sensorList.PMO = {
+    name: 'Purple Mountain Observatory, PRC',
+    googleName: 'Purple Mountain Observatory',
+    shortName: 'PMO',
+    type: 'Optical',
+    lat: 32.064946,
+    long: 118.829677,
+    obshei: 0.267,
+    obsminaz: 0,
+    obsmaxaz: 360,
+    obsminel: 10,
+    obsmaxel: 90,
+    obsminrange: 25000,
+    obsmaxrange: 200000,
+    changeObjectInterval: 20000,
+    staticNum: 33,
+    zoom: 'geo',
+    country: 'China',
+    sun: 'No Impact',
+    volume: false
+  };
+
+  sensorList.PO = {
+    name: 'Palomar Observatory, CA',
+    googleName: 'Palomar Observatory',
+    shortName: 'PO',
+    type: 'Optical',
+    lat: 33.3564,
+    long: -116.865,
+    obshei: 1.712,
+    obsminaz: 0,
+    obsmaxaz: 360,
+    obsminel: 10,
+    obsmaxel: 90,
+    obsminrange: 25000,
+    obsmaxrange: 200000,
+    changeObjectInterval: 20000,
+    staticNum: 34,
+    zoom: 'geo',
+    country: 'United States',
+    sun: 'No Impact',
+    volume: false
+  };
+
+  sensorList.LSO = {
+    name: 'La Sagra Observatory, ESP',
+    googleName: 'La Sagra Observatory',
+    shortName: 'LSO',
+    type: 'Optical',
+    lat: 37.9839,
+    long: -2.5644,
+    obshei: 0,
+    obsminaz: 0,
+    obsmaxaz: 360,
+    obsminel: 10,
+    obsmaxel: 90,
+    obsminrange: 25000,
+    obsmaxrange: 200000,
+    changeObjectInterval: 20000,
+    staticNum: 35,
+    zoom: 'geo',
+    country: 'Spain',
     sun: 'No Impact',
     volume: false
   };

@@ -100,7 +100,8 @@
           name: launchSiteList[launchSite].name,
           type: 'Launch Facility',
           lat: launchSiteList[launchSite].lat,
-          lon: launchSiteList[launchSite].lon
+          lon: launchSiteList[launchSite].lon,
+          alt: sensorList[sensor].obshei
         };
         objectManager.staticSet.push(launchSiteInfo);
       }
@@ -661,6 +662,16 @@
         site = 'Rocket Labs LC';
         sitec = 'New Zealand';
       }
+
+      // Use Extended Sites from Launch Site Manager
+      try {
+          site = launchSiteManager.extractLaunchSite(LS);
+          sitec = site[1];
+          site = site[0];
+      } catch (e) {
+          console.log('Launch Site Module not Loaded');
+      }
+
     }
     return {
       site: site,

@@ -622,18 +622,6 @@ $.ajaxSetup({
         }
       });
 
-      // $('#facebook-share').click(function () {
-      //   ga('send', 'social', 'Facebook', 'share', 'http://keeptrack.com');
-      // });
-      //
-      // $('#twitter-share').click(function () {
-      //   ga('send', 'social', 'Twitter', 'share', 'http://keeptrack.com');
-      // });
-      //
-      // $('#reddit-share').click(function () {
-      //   ga('send', 'social', 'Reddit', 'share', 'http://keeptrack.com');
-      // });
-
       // NOTE: MOVE THIS
         $('#legend-hover-menu').click(function (e) {
           switch (e.target.classList[1]) {

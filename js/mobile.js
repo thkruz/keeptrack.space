@@ -64,20 +64,16 @@ var maxPinchSize = 1;
     forceClose = forceClose || false;
     if (!isSocialOpen && !forceClose) {
       isSocialOpen = true;
-      $('#facebook-share').removeClass('share-up');
+      $('#github-share').removeClass('share-up');
       $('#twitter-share').removeClass('share-up');
-      $('#reddit-share').removeClass('share-up');
-      $('#facebook-share').addClass('facebook-share-down');
+      $('#github-share').addClass('github-share-down');
       $('#twitter-share').addClass('twitter-share-down');
-      $('#reddit-share').addClass('reddit-share-down');
     } else {
       isSocialOpen = false;
-      $('#facebook-share').addClass('share-up');
-      $('#reddit-share').addClass('share-up');
+      $('#github-share').addClass('share-up');
       $('#twitter-share').addClass('share-up');
-      $('#facebook-share').removeClass('facebook-share-down');
+      $('#github-share').removeClass('github-share-down');
       $('#twitter-share').removeClass('twitter-share-down');
-      $('#reddit-share').removeClass('reddit-share-down');
     }
   };
 

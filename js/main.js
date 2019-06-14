@@ -562,8 +562,9 @@ var drawLoopCallback;
             pitchRotate = ((-1 * satellite.currentSensor.lat) * DEG2RAD);
             yawRotate = ((90 - satellite.currentSensor.long) * DEG2RAD) - satPos.gmst;
 
-            fpsEl = ((FPSPitch + 90) > 90) ? (-(FPSPitch) + 90) : (FPSPitch + 90);
-            $('#el-text').html(' EL: ' + fpsEl.toFixed(2) + ' deg');
+            // TODO: Calculate Elevation
+            // fpsEl = ((FPSPitch + 90) > 90) ? (-(FPSPitch) + 90) : (FPSPitch + 90);
+            // $('#el-text').html(' EL: ' + fpsEl.toFixed(2) + ' deg');
 
             // yawRotate = ((-90 - satellite.currentSensor.long) * DEG2RAD);
             let sensor = null;
@@ -584,6 +585,8 @@ var drawLoopCallback;
             FPSyPos = sensorPos.y;
             FPSzPos = sensorPos.z;
             mat4.translate(camMatrix, camMatrix, [-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01]); // Scale to get away from Earth
+
+            _showOrbitsAbove(); // Clears Orbit
             break;
           }
       }
@@ -1203,7 +1206,7 @@ function selectSat (satId) {
     $('#menu-newLaunch').removeClass('bmenu-item-disabled');
 
     if ($('#search-results').css('display') === 'block') {
-      if ($(document).width() <= 1000) {
+      if (window.innerWidth <= 1000) {
       } else {
         $('#search-results').attr('style', 'display:block; max-height:27%');
         if (cameraType.current !== cameraType.PLANETARIUM) {
@@ -1211,7 +1214,7 @@ function selectSat (satId) {
         }
       }
     } else {
-      if ($(document).width() <= 1000) {
+      if (window.innerWidth <= 1000) {
       } else {
         $('#search-results').attr('style', 'max-height:27%');
         if (cameraType.current !== cameraType.PLANETARIUM) {

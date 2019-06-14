@@ -78,13 +78,15 @@ var maxPinchSize = 1;
   };
 
   mobile.checkMobileMode = function () {
-    if ($(document).width() <= settingsManager.desktopMinimumWidth) {
+    if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
       settingsManager.isMobileModeEnabled = true;
       settingsManager.fieldOfView = 1.2;
       settingsManager.cameraMovementSpeed = 0.0001;
       settingsManager.cameraMovementSpeedMin = 0.0001;
       settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+      settingsManager.maxLabels = settingsManager.mobileMaxLabels;
     } else {
+      settingsManager.maxLabels = settingsManager.desktopMaxLabels;
       settingsManager.isMobileModeEnabled = false;
       settingsManager.cameraMovementSpeed = 0.003;
       settingsManager.cameraMovementSpeedMin = 0.005;
@@ -93,7 +95,7 @@ var maxPinchSize = 1;
 
   mobile.start = function () {
     mobile.checkMobileMode();
-    maxPinchSize = Math.hypot($(document).width(),$(document).height());
+    maxPinchSize = Math.hypot(window.innerWidth,$(document).height());
     $('#loading-screen').removeClass('full-loader');
     $('#loading-screen').addClass('mini-loader-container');
     $('#logo-inner-container').addClass('mini-loader');

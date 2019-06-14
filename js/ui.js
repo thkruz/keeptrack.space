@@ -177,6 +177,7 @@ $.ajaxSetup({
 
       // Load the Stylesheets
       $('head').append('<link rel="stylesheet" type="text/css" href="css/style.css?v=' + settingsManager.versionNumber + '"">');
+      $('head').append('<link rel="stylesheet" type="text/css" href="css/responsive.css?v=' + settingsManager.versionNumber + '"">');
 
       // Load ALl The Images Now
       $('img').each(function () {
@@ -334,7 +335,7 @@ $.ajaxSetup({
           dragStartYaw = camYaw;
           // debugLine.set(dragPoint, getCamPos());
           isDragging = true;
-          // if ($(document).width() <= 1000) {
+          // if (window.innerWidth <= 1000) {
           //   isDragging = false;
           // }
           camSnapMode = false;
@@ -2378,8 +2379,11 @@ $.ajaxSetup({
               cameraType.current = cameraType.PLANETARIUM; // Activate Planetarium Camera Mode
               $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
               uiController.legendMenuChange('planetarium');
-              $('#menu-planetarium').addClass('bmenu-item-selected');
+              starManager.clearConstellations();
+              isAstronomyView = false;
+              $('#menu-astronomy').removeClass('bmenu-item-selected');
               isPlanetariumView = true;
+              $('#menu-planetarium').addClass('bmenu-item-selected');
             } else {
               adviceList.planetariumDisabled();
               if (!$('#menu-planetarium:animated').length) {
@@ -2393,21 +2397,24 @@ $.ajaxSetup({
           if (isAstronomyView) {
             isAstronomyView = false;
             uiController.hideSideMenus();
-            orbitDisplay.clearInViewOrbit(); // Clear Orbits if Switching from Astronomy View
             cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
             uiController.legendMenuChange('default');
+            starManager.clearConstellations();
             $('#fov-text').html('');
-            $('#el-text').html('');
+            // $('#el-text').html('');
             $('#menu-astronomy').removeClass('bmenu-item-selected');
             break;
           } else {
             if (satellite.sensorSelected()) {
-              if (settingsManager.isMobileModeEnabled) starManager.drawAllConstellations();
+              starManager.drawAllConstellations();
+              orbitDisplay.clearInViewOrbit();
               cameraType.current = cameraType.ASTRONOMY; // Activate Astronomy Camera Mode
               $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
               uiController.legendMenuChange('astronomy');
-              $('#menu-astronomy').addClass('bmenu-item-selected');
+              isPlanetariumView = false;
+              $('#menu-planetarium').removeClass('bmenu-item-selected');
               isAstronomyView = true;
+              $('#menu-astronomy').addClass('bmenu-item-selected');
             } else {
               if (!$('#menu-astronomy:animated').length) {
                 $('#menu-astronomy').effect('shake', {distance: 10});
@@ -2743,18 +2750,13 @@ $.ajaxSetup({
             cameraType.current += 1;
           }
 
-          console.log(cameraType.current);
-
           if (cameraType.current === cameraType.SATELLITE && selectedSat === -1) {
             cameraType.current += 1;
           }
-          console.log(cameraType.current);
 
           if (cameraType.current === cameraType.ASTRONOMY && !satellite.sensorSelected()) {
             cameraType.current += 1;
           }
-
-          console.log(cameraType.current);
 
           if (cameraType.current === 6) { // 6 is a placeholder to reset camera type
             cameraType.current = 0;
@@ -2991,7 +2993,6 @@ $.ajaxSetup({
     for (var i = 0; i < watchlistList.length; i++) {
       var sat = satSet.getSat(watchlistList[i]);
       if (sat.inview === 1 && watchlistInViewList[i] === false) { // Is inview and wasn't previously
-        console.log(1);
         watchlistInViewList[i] = true;
         orbitDisplay.addInViewOrbit(watchlistList[i]);
       }
@@ -3231,7 +3232,6 @@ $.ajaxSetup({
         } else {
           changeZoom('leo');
         }
-        console.log('2: ' + Date.now());
         camSnap(latToPitch(lat), longToYaw(lon));
       });
     }

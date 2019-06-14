@@ -8,7 +8,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.2.4';
+  settingsManager.versionNumber = '1.2.5';
   settingsManager.versionDate = 'June 14, 2019';
 
   settingsManager.lowPerf = false;
@@ -80,7 +80,7 @@
       $('#menu-info-overlay ').css('border-left-color', 'orangered');
       $('.side-menu').css('background', 'LightCoral');
       $('#sat-infobox').css('background', 'LightCoral');
-      $('#sat-infobox').css('border-top-color', 'DarkRed');
+      $('#sat-infobox').css('border-color', 'DarkRed');
       $('#search-results').css('background', 'LightCoral');
       $('#search-result:hover').css('background', 'DarkRed');
       $('.search-hilight').css('color', 'DarkRed');
@@ -107,7 +107,7 @@
     $('#menu-info-overlay ').css('border-left-color', 'steelblue');
     $('.side-menu').css('background', '#0a97d6');
     $('#sat-infobox').css('background', '#0a97d6');
-    $('#sat-infobox').css('border-top-color', '#0277bd');
+    $('#sat-infobox').css('border-color', '#0277bd');
     $('#search-results').css('background', '#0a97d6');
     $('#search-results:hover').css('background', '#0277bd');
     $('.search-hilight').css('color', '#01579b');
@@ -162,7 +162,10 @@
   settingsManager.isFOVBubbleModeOn = false;
 
   settingsManager.maxOrbits = 20000; // TODO: BROKEN
-  settingsManager.maxLabels = 20000;  // TODO: BROKEN
+
+  settingsManager.mobileMaxLabels = 100;
+  settingsManager.desktopMaxLabels = 20000;
+  settingsManager.maxLabels = 20000;
 
   settingsManager.isAlwaysHidePropRate = false;
 
@@ -188,9 +191,9 @@
   // /////////////////
   // Mobile Settings
   // /////////////////
-  settingsManager.desktopMinimumWidth = 1000;
+  settingsManager.desktopMinimumWidth = 1300;
   settingsManager.isMobileModeEnabled = false;
-  if ($(document).width() <= settingsManager.desktopMinimumWidth) {
+  if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
     settingsManager.isMobileModeEnabled = true;
     settingsManager.camDistBuffer = 3500;
     // settingsManager.cameraMovementSpeed = 0.0001;

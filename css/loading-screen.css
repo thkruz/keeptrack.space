@@ -8,6 +8,16 @@ body {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0277bd', endColorstr='#4096ee',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 
+.ui-icon-minus {
+  margin: auto !important;
+}
+.ui-icon-plus {
+  margin: auto !important;
+}
+.ui-datepicker td a {
+  text-align: center !important;
+}
+
 #canvas-holder {
     display: none;
 }

@@ -6,6 +6,9 @@ starManager.findStarsConstellation = function (starName) {
       if (starManager.constellations[i].stars[s][0] === starName) {
         return starManager.constellations[i].name;
       }
+      if (starManager.constellations[i].stars[s][1] === starName) {
+        return starManager.constellations[i].name;
+      }
     }
   }
   return null;
@@ -98,5 +101,23 @@ starManager.constellations = [
   "name": "Leo Minor",
   "stars": [["46-LMi", "β-LMi"],
             ["β-LMi", "21-LMi"]]
+},
+{
+  "name": "Aquila",
+  "stars": [["Altair", "Alshain"],
+            ["Alshain", "θ-Aql"],
+            ["θ-Aql", "η-Aql"],
+            ["η-Aql", "δ-Aql"],
+            ["δ-Aql", "ζ-Aql"],
+            ["ζ-Aql", "Tarazed"],
+            ["Tarazed", "Altair"],
+            ["ζ-Aql", "ε-Aql"],
+            ["δ-Aql", "λ-Aql"]]
+},
+{
+  "name": "Aries",
+  "stars": [["c-Ari", "Hamal"],
+            ["Hamal", "Sheratan"],
+            ["Sheratan", "Mesarthim"]]
 }
 ];

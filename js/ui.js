@@ -53,6 +53,9 @@ or mirrored at any other location without the express written permission of the 
     missileManager.lastMissileError
     settingsManager
 */
+
+// Public Variables
+
 var canvasDOM = $('#canvas');
 var bodyDOM = $('#bodyDOM');
 var dropdownInstance;
@@ -78,6 +81,18 @@ var satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
 var satHoverBoxNode3 = document.getElementById('sat-hoverbox3');
 var lkpassed = false;
 var isDayNightToggle = false;
+
+// Public Functions
+
+function saveVariable (variable) {
+  variable = JSON.stringify(variable);
+  var blob = new Blob([variable], {type: 'text/plain;charset=utf-8'});
+  saveAs(blob, 'variable.txt');
+}
+
+$.ajaxSetup({
+  cache: false
+});
 
 (function () {
   var lastBoxUpdateTime = 0;
@@ -3558,6 +3573,16 @@ var isDayNightToggle = false;
 
   uiController.startLowPerf = function () {
     window.location.replace("index.htm?lowperf");
+  };
+
+  // c is string name of star
+  // TODO: Yaw needs fixed
+  uiController.panToStar = function (c) {
+    var satId = satSet.getIdFromStarName(c);
+    var sat = satSet.getSat(satId);
+    console.log(sat);
+    debugDrawLine('sat',satId);
+    camSnap(latToPitch(sat.dec * -1), longToYaw(sat.ra));
   };
 
   uiController.updateMap = function () {

@@ -15,16 +15,6 @@
 
  */
 
-function saveVariable (variable) {
-  variable = JSON.stringify(variable);
-  var blob = new Blob([variable], {type: 'text/plain;charset=utf-8'});
-  saveAs(blob, 'variable.txt');
-}
-
-$.ajaxSetup({
-  cache: false
-});
-
 // Launch Site Manager (launchSiteManager)
 (function () {
   var launchSiteManager = {};
@@ -872,21 +862,6 @@ $.ajaxSetup({
     volume: false
   };
 
-  // Stars
-  for (var star = 0; star < (starManager.stars.length); star++) {
-    sensorList['star' + star] = {
-      shortName: 'STAR',
-      type: 'Star',
-      dec: starManager.stars[star].dec, //dec
-      ra: starManager.stars[star].ra, //ra
-      dist: starManager.stars[star].dist,
-      vmag: starManager.stars[star].vmag,
-    };
-    if (starManager.stars[star].pname != "") { sensorList['star' + star].name = starManager.stars[star].pname; continue; }
-    if (starManager.stars[star].bf != "") { sensorList['star' + star].name = starManager.stars[star].bf; continue; }
-    sensorList['star' + star].name = "HD " + starManager.stars[star].name;
-  }
-
   sensorManager.sensorListLength = function () {
     var sensorListCount = 0;
     for (var sensor in sensorList) {
@@ -1051,12 +1026,30 @@ $.ajaxSetup({
         lat: sensorList[sensor].lat,
         lon: sensorList[sensor].long,
         alt: sensorList[sensor].obshei,
-        ra: sensorList[sensor].ra,
-        dec: sensorList[sensor].dec,
-        vmag: sensorList[sensor].vmag,
         changeObjectInterval: sensorList[sensor].changeObjectInterval
       };
       tleManager.staticSet.push(sensorInfo);
+    }
+
+    for (var star = 0; star < (starManager.stars.length); star++) {
+      var starInfo = {
+        static: true,
+        shortName: 'STAR',
+        type: 'Star',
+        dec: starManager.stars[star].dec, //dec
+        ra: starManager.stars[star].ra, //ra
+        dist: starManager.stars[star].dist,
+        vmag: starManager.stars[star].vmag,
+      };
+      if (starManager.stars[star].pname != "") {
+        starInfo.name = starManager.stars[star].pname;
+      } else if (starManager.stars[star].bf != "") {
+        starInfo.name = starManager.stars[star].bf;
+      } else {
+        starInfo.name = "HD " + starManager.stars[star].name;
+      }
+
+      tleManager.staticSet.push(starInfo);
     }
 
     var launchSiteList = window.launchSiteManager.launchSiteList;

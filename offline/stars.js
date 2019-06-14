@@ -1,4 +1,5 @@
-var starManager = {"stars": [
+var starManager = {}
+starManager.stars = [
   {
     "name": 28,
     "hr": 3,
@@ -2243,7 +2244,7 @@ var starManager = {"stars": [
     "name": 11502,
     "hr": 546,
     "bf": "5Gam2Ari",
-    "pname": "",
+    "pname": "Mesarthim",
     "ra": 1.89217,
     "dec": 19.293852,
     "dist": 50.3018,
@@ -3693,7 +3694,7 @@ var starManager = {"stars": [
     "name": 17573,
     "hr": 838,
     "bf": "41    Ari",
-    "pname": "",
+    "pname": "c-Ari",
     "ra": 2.833063,
     "dec": 27.260507,
     "dist": 50.7872,
@@ -23563,7 +23564,7 @@ var starManager = {"stars": [
     "name": 176411,
     "hr": 7176,
     "bf": "13Eps Aql",
-    "pname": "",
+    "pname": "ε-Aql",
     "ra": 18.993711,
     "dec": 15.068298,
     "dist": 47.5059,
@@ -23613,7 +23614,7 @@ var starManager = {"stars": [
     "name": 176678,
     "hr": 7193,
     "bf": "12    Aql",
-    "pname": "",
+    "pname": "I-Aql",
     "ra": 19.028008,
     "dec": -5.739115,
     "dist": 44.1306,
@@ -23733,7 +23734,7 @@ var starManager = {"stars": [
     "name": 177724,
     "hr": 7235,
     "bf": "17Zet Aql",
-    "pname": "",
+    "pname": "ζ-Aql",
     "ra": 19.090169,
     "dec": 13.863478,
     "dist": 25.4582,
@@ -23743,7 +23744,7 @@ var starManager = {"stars": [
     "name": 177756,
     "hr": 7236,
     "bf": "16Lam Aql",
-    "pname": "",
+    "pname": "λ-Aql",
     "ra": 19.10415,
     "dec": -4.882554,
     "dist": 37.9219,
@@ -24253,7 +24254,7 @@ var starManager = {"stars": [
     "name": 182640,
     "hr": 7377,
     "bf": "30Del Aql",
-    "pname": "",
+    "pname": "δ-Aql",
     "ra": 19.424972,
     "dec": 3.114775,
     "dist": 15.5255,
@@ -24873,7 +24874,7 @@ var starManager = {"stars": [
     "name": 187929,
     "hr": 7570,
     "bf": "55Eta Aql",
-    "pname": "",
+    "pname": "η-Aql",
     "ra": 19.874547,
     "dec": 1.005661,
     "dist": 423.7288,
@@ -25413,7 +25414,7 @@ var starManager = {"stars": [
     "name": 191692,
     "hr": 7710,
     "bf": "65The Aql",
-    "pname": "",
+    "pname": "θ-Aql",
     "ra": 20.188413,
     "dec": -0.821461,
     "dist": 87.7963,
@@ -30979,4 +30980,4 @@ var starManager = {"stars": [
     "dist": 641.0256,
     "vmag": 4.99
   }
-]};
+];

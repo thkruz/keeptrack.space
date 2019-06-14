@@ -1,3 +1,5 @@
+// Used in UI.js
+
 (function () {
   /*
   map.js was created by Theodore Kruczek using the work of

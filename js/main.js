@@ -39,7 +39,7 @@ or mirrored at any other location without the express written permission of the 
     ga
     mapManager
     sensorManager
-    tleManager
+    objectManager
     missileManager.MassRaidPre
     saveAs
     Blob
@@ -798,7 +798,7 @@ var drawLoopCallback;
         isHoverBoxVisible = true;
         if (sat.static) {
           if (sat.type === 'Launch Facility') {
-            var launchSite = tleManager.extractLaunchSite(sat.name);
+            var launchSite = objectManager.extractLaunchSite(sat.name);
             satHoverBoxNode1.textContent = (launchSite.site + ', ' + launchSite.sitec);
             satHoverBoxNode2.innerHTML = (sat.type + satellite.distance(sat, selectedSatData) + '');
             satHoverBoxNode3.textContent = ('');
@@ -1257,7 +1257,7 @@ function selectSat (satId) {
     // Country Correlation Table
     // /////////////////////////////////////////////////////////////////////////
     var country;
-    country = tleManager.extractCountry(sat.C);
+    country = objectManager.extractCountry(sat.C);
     $('#sat-country').html(country);
 
     // /////////////////////////////////////////////////////////////////////////
@@ -1274,7 +1274,7 @@ function selectSat (satId) {
       site.site = missileOrigin;
       site.sitec = sat.C;
     } else {
-      site = tleManager.extractLaunchSite(sat.LS);
+      site = objectManager.extractLaunchSite(sat.LS);
     }
 
     $('#sat-site').html(site.site);
@@ -1292,7 +1292,7 @@ function selectSat (satId) {
     } else {
       $('#sat-vehicle').html(sat.LV); // Set to JSON record
       if (sat.LV === 'U') { $('#sat-vehicle').html('Unknown'); } // Replace with Unknown if necessary
-      tleManager.extractLiftVehicle(sat.LV); // Replace with link if available FIXME this should be a separate file
+      objectManager.extractLiftVehicle(sat.LV); // Replace with link if available FIXME this should be a separate file
     }
 
     // /////////////////////////////////////////////////////////////////////////

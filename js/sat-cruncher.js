@@ -567,7 +567,6 @@ function propagateCruncher () {
           // Don't show anything but the floor if in surveillance only mode
           // Unless it is a volume search radar
           if (!isShowSurvFence || sensor.volume) {
-            console.log(sensor);
             // Only on non-360 FOV
             if (sensor.obsminaz !== 0 && sensor.obsmaxaz !== 360) {
               // //////////////////////////////////

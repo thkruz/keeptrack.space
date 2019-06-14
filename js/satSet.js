@@ -36,7 +36,7 @@ or mirrored at any other location without the express written permission of the 
   selectSat
   updateMap
 
-  tleManager
+  objectManager
   timeManager
   settingsManager
   lookangles
@@ -539,22 +539,22 @@ var satSensorMarkerArray = [];
         satSet.orbitalSats = tempSatData.length;
 
         loggerStop = Date.now();
-        for (i = 0; i < tleManager.staticSet.length; i++) {
-          tempSatData.push(tleManager.staticSet[i]);
+        for (i = 0; i < objectManager.staticSet.length; i++) {
+          tempSatData.push(objectManager.staticSet[i]);
         }
-        for (i = 0; i < tleManager.analSatSet.length; i++) {
-          tleManager.analSatSet[i].id = tempSatData.length;
-          tempSatData.push(tleManager.analSatSet[i]);
+        for (i = 0; i < objectManager.analSatSet.length; i++) {
+          objectManager.analSatSet[i].id = tempSatData.length;
+          tempSatData.push(objectManager.analSatSet[i]);
         }
-        for (i = 0; i < tleManager.missileSet.length; i++) {
-          tempSatData.push(tleManager.missileSet[i]);
+        for (i = 0; i < objectManager.missileSet.length; i++) {
+          tempSatData.push(objectManager.missileSet[i]);
         }
 
         satSet.missileSats = tempSatData.length;
 
-        for (i = 0; i < tleManager.fieldOfViewSet.length; i++) {
-          tleManager.fieldOfViewSet[i].id = tempSatData.length;
-          tempSatData.push(tleManager.fieldOfViewSet[i]);
+        for (i = 0; i < objectManager.fieldOfViewSet.length; i++) {
+          objectManager.fieldOfViewSet[i].id = tempSatData.length;
+          tempSatData.push(objectManager.fieldOfViewSet[i]);
         }
         // console.log(tempSatData.length);
         return tempSatData;
@@ -601,7 +601,7 @@ var satSensorMarkerArray = [];
       satCruncher.postMessage({
         typ: 'satdata',
         dat: satSet.satDataString,
-        fieldOfViewSetLength: tleManager.fieldOfViewSet.length,
+        fieldOfViewSetLength: objectManager.fieldOfViewSet.length,
         isLowPerf: settingsManager.lowPerf
       });
       // multThreadCruncher1.postMessage({type: 'init', data: satSet.satDataString});

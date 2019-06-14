@@ -34,7 +34,7 @@ or mirrored at any other location without the express written permission of the 
     ga
     mapManager
     sensorManager
-    tleManager
+    objectManager
     missileManager.MassRaidPre
     saveAs
     Blob

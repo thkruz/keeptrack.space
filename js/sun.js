@@ -36,7 +36,7 @@
     earth.lightDirection[0] = Math.cos(sun.sunvar.ecLon * DEG2RAD);
     earth.lightDirection[1] = Math.cos(sun.sunvar.ob * DEG2RAD) * Math.sin(sun.sunvar.ecLon * DEG2RAD);
     earth.lightDirection[2] = Math.sin(sun.sunvar.ob * DEG2RAD) * Math.sin(sun.sunvar.ecLon * DEG2RAD);
-    
+
     // return [sun.sunvar.x, sun.sunvar.y, sun.sunvar.z];
   };
 

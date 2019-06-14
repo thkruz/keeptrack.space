@@ -78,7 +78,7 @@
 
     // Discard now that we are loaded
     satSet.satDataString = null;
-    tleManager.fieldOfViewSet = null;
+    objectManager.fieldOfViewSet = null;
 
     // var time = performance.now() - startTime;
     // console.log('orbitDisplay init: ' + time + ' ms');

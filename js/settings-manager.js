@@ -8,13 +8,15 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.2.6';
-  settingsManager.versionDate = 'June 14, 2019';
+  settingsManager.versionNumber = 'v1.3.0';
+  settingsManager.versionDate = 'September 5, 2019';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
   settingsManager.maxMissiles = 500;
   settingsManager.maxAnalystSats = 120;
+
+  settingsManager.minimumDrawDt = 0.1; // 20 FPS // 60 FPS = 0.01667;
 
   (function initParseFromGETVariables () {
     // This is an initial parse of the GET variables
@@ -36,6 +38,7 @@
           break;
         case 'hires':
           settingsManager.hiresImages = true;
+          settingsManager.minimumDrawDt = 0.01667;
           break;
         case 'vec':
           settingsManager.vectorImages = true;
@@ -134,8 +137,6 @@
 
   settingsManager.mapWidth = 800;
   settingsManager.mapHeight = 600;
-
-  settingsManager.minimumDrawDt = 0.35; // 20 FPS // 60 FPS = 0.01667;
 
   settingsManager.hoverColor = [0.1, 1.0, 0.0, 1.0]; // Green
   settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0]; // Red

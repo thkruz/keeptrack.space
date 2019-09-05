@@ -57,6 +57,7 @@ or mirrored at any other location without the express written permission of the 
 // Public Variables
 
 var canvasDOM = $('#canvas');
+var recorder = new CanvasRecorder(document.getElementById('canvas'));
 var bodyDOM = $('#bodyDOM');
 var dropdownInstance;
 var mapImageDOM = $('#map-image');
@@ -2441,6 +2442,20 @@ $.ajaxSetup({
                 $('#menu-satview').effect('shake', {distance: 10});
               }
             }
+            break;
+          }
+          break;
+        case 'menu-record': // No Keyboard Commands
+          if (isVideoRecording) {
+            isVideoRecording = false;
+            recorder.stop();
+            recorder.save('keeptrack.webm');
+            $('#menu-record').removeClass('bmenu-item-selected');
+            break;
+          } else {
+            isVideoRecording = true;
+            recorder.start();
+            $('#menu-record').addClass('bmenu-item-selected');
             break;
           }
           break;

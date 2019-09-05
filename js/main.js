@@ -95,6 +95,7 @@ var isMissileMenuOpen = false;
 var isPlanetariumView = false;
 var isAstronomyView = false;
 var isSatView = false;
+var isVideoRecording = false;
 var isCustomSensorMenuOpen = false;
 
 var pitchRotate;

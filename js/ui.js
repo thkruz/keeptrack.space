@@ -1,6 +1,6 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-(c) 2016-2019, Theodore Kruczek
+(c) 2016-2020, Theodore Kruczek
 (c) 2015-2016, James Yoder
 
 main.js is the primary javascript file for keeptrack.space. It manages all user
@@ -10,7 +10,7 @@ http://keeptrack.space
 Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
 under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
 
-All additions and modifications of original code is Copyright © 2016-2019 by
+All additions and modifications of original code is Copyright © 2016-2020 by
 Theodore Kruczek. All rights reserved. No part of this web site may be reproduced,
 published, distributed, displayed, performed, copied or stored for public or private
 use, without written permission of the author.
@@ -74,6 +74,7 @@ var rightBtnCreateMenuDOM = $('#create-rmb-menu');
 
 var viewInfoRMB = $('#view-info-rmb');
 var editSatRMB = $('#edit-sat-rmb');
+var createObserverRMB = $('#create-observer-rmb');
 var createSensorRMB = $('#create-sensor-rmb');
 var clearScreenRMB = $('#clear-screen-rmb');
 
@@ -470,13 +471,36 @@ $.ajaxSetup({
               _bottomIconPress({currentTarget: {id: 'menu-editSat'}});
             }
           break;
+          case 'Create Observer Here':
+            // if (!isCustomSensorMenuOpen) {
+              // _bottomIconPress({currentTarget: {id: 'menu-customSensor'}});
+              $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+              $('#menu-customSensor').addClass('bmenu-item-selected');
+            // }
+            isCustomSensorMenuOpen = true;
+            $('#cs-telescope').click();
+            $('#cs-lat').val(latLon.latitude);
+            $('#cs-lon').val(latLon.longitude);
+            $('#cs-hei').val(0);
+            // $('#cs-telescope').prop('checked', false);
+            $('#cs-minaz').val(0);
+            $('#cs-maxaz').val(360);
+            $('#cs-minel').val(10);
+            $('#cs-maxel').val(90);
+            $('#cs-minrange').val(0);
+            $('#cs-maxrange').val(1000000);
+            $('#customSensor').submit();
+          break;
           case 'Create Sensor Here':
-            if (!isCustomSensorMenuOpen) {
-              _bottomIconPress({currentTarget: {id: 'menu-customSensor'}});
-            }
+            // if (!isCustomSensorMenuOpen) {
+              // _bottomIconPress({currentTarget: {id: 'menu-customSensor'}});
+              $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+              $('#menu-customSensor').addClass('bmenu-item-selected');
+            // }
             isCustomSensorMenuOpen = true;
             $('#cs-lat').val(latLon.latitude);
             $('#cs-lon').val(latLon.longitude);
+            $('#cs-hei').val(0);
             $('#customSensor').submit();
           break;
           case 'Clear Screen':
@@ -701,6 +725,45 @@ $.ajaxSetup({
               } else {
                 ColorScheme.objectTypeFlags.star50 = true;
                 $('.legend-star50-box').css('background', 'rgb(100, 100, 100)');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
+            case "legend-sat100-box":
+              if (ColorScheme.objectTypeFlags.sat100) {
+                ColorScheme.objectTypeFlags.sat100 = false;
+                $('.legend-sat100-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.sat100 = true;
+                $('.legend-sat100-box').css('background', 'rgb(200, 200, 200)');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
+            case "legend-sat75-box":
+              if (ColorScheme.objectTypeFlags.sat75) {
+                ColorScheme.objectTypeFlags.sat75 = false;
+                $('.legend-sat75-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.sat75 = true;
+                $('.legend-sat75-box').css('background', 'rgb(150, 150, 150)');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
+            case "legend-sat50-box":
+              if (ColorScheme.objectTypeFlags.sat50) {
+                ColorScheme.objectTypeFlags.sat50 = false;
+                $('.legend-sat50-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.sat50 = true;
+                $('.legend-sat50-box').css('background', 'rgb(100, 100, 100)');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               }
@@ -1584,6 +1647,7 @@ $.ajaxSetup({
         var lon = $('#cs-lon').val();
         var lat = $('#cs-lat').val();
         var obshei = $('#cs-hei').val();
+        var sensorType = $('#cs-type').val();
         var minaz = $('#cs-minaz').val();
         var maxaz = $('#cs-maxaz').val();
         var minel = $('#cs-minel').val();
@@ -1604,7 +1668,8 @@ $.ajaxSetup({
             obsminel: minel * 1,
             obsmaxel: maxel * 1,
             obsminrange: minrange * 1,
-            obsmaxrange: maxrange * 1
+            obsmaxrange: maxrange * 1,
+            type: sensorType
           }
         });
 
@@ -1617,10 +1682,11 @@ $.ajaxSetup({
           obsminel: minel * 1,
           obsmaxel: maxel * 1,
           obsminrange: minrange * 1,
-          obsmaxrange: maxrange * 1
+          obsmaxrange: maxrange * 1,
+          type: sensorType
         });
 
-        selectSat(-1);
+        // selectSat(-1);
         lat = lat * 1;
         lon = lon * 1;
         if (maxrange > 6000) {
@@ -2447,15 +2513,15 @@ $.ajaxSetup({
           break;
         case 'menu-record': // No Keyboard Commands
           if (isVideoRecording) {
-            isVideoRecording = false;
             recorder.stop();
             recorder.save('keeptrack.webm');
-            $('#menu-record').removeClass('bmenu-item-selected');
+            // isVideoRecording = false;
+            // $('#menu-record').removeClass('bmenu-item-selected');
             break;
           } else {
-            isVideoRecording = true;
             recorder.start();
-            $('#menu-record').addClass('bmenu-item-selected');
+            // isVideoRecording = true;
+            // $('#menu-record').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -3078,6 +3144,11 @@ $.ajaxSetup({
       if (satellite.sensorSelected()) {
         if (selectedSat !== lastSelectedSat && !sat.missile) {
           $('#sat-nextpass').html(satellite.nextpass(sat));
+
+          // TODO: Code isInSun()
+          //sun.getXYZ();
+          //debugDrawLine('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
+
         }
         lastSelectedSat = selectedSat;
       } else {
@@ -3117,6 +3188,11 @@ $.ajaxSetup({
         satSet.setColorScheme(ColorScheme.velocity);
         ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
         break;
+      case 'sunlight':
+          uiController.legendMenuChange('sunlight');
+          satSet.setColorScheme(ColorScheme.sunlight);
+          ga('send', 'event', 'ColorScheme Menu', 'Sunlight', 'Selected');
+          break;
       case 'near-earth':
         uiController.legendMenuChange('near');
         satSet.setColorScheme(ColorScheme.leo);
@@ -3256,6 +3332,7 @@ $.ajaxSetup({
     $('#legend-list-default').hide();
     $('#legend-list-default-sensor').hide();
     $('#legend-list-rcs').hide();
+    $('#legend-list-sunlight').hide();
     $('#legend-list-small').hide();
     $('#legend-list-near').hide();
     $('#legend-list-deep').hide();
@@ -3285,6 +3362,9 @@ $.ajaxSetup({
         break;
       case 'velocity':
         $('#legend-list-velocity').show();
+        break;
+      case 'sunlight':
+        $('#legend-list-sunlight').show();
         break;
       case 'countries':
         $('#legend-list-countries').show();

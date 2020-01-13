@@ -1,6 +1,6 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-(c) 2016-2019, Theodore Kruczek
+(c) 2016-2020, Theodore Kruczek
 (c) 2015-2016, James Yoder
 
 satSet.js is the primary interface between sat-cruncher and the main application.
@@ -10,7 +10,7 @@ http://keeptrack.space
 Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
 under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
 
-All additions and modifications of original code is Copyright © 2016-2019 by
+All additions and modifications of original code is Copyright © 2016-2020 by
 Theodore Kruczek. All rights reserved. No part of this web site may be reproduced,
 published, distributed, displayed, performed, copied or stored for public or private
 use, without written permission of the author.
@@ -80,6 +80,7 @@ var satSensorMarkerArray = [];
   var satPos;
   var satVel;
   var satInView;
+  var satInSun;
   var satData;
   var satExtraData;
   var hoveringSat = -1;
@@ -174,6 +175,7 @@ var satSensorMarkerArray = [];
     satPos = new Float32Array(m.data.satPos);
     satVel = new Float32Array(m.data.satVel);
     satInView = new Int8Array(m.data.satInView);
+    satInSun = new Int8Array(m.data.satInSun);
     satSensorMarkerArray = m.data.sensorMarkerArray;
 
     if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
@@ -648,6 +650,11 @@ var satSensorMarkerArray = [];
     return satInView;
   };
 
+  satSet.getSatInSun = function () {
+    if (typeof satInSun == 'undefined') return false;
+    return satInSun;
+  };
+
   satSet.getSatVel = function () {
     if (typeof satVel == 'undefined') return false;
     return satVel;
@@ -684,7 +691,7 @@ var satSensorMarkerArray = [];
         }
       }
       lastDrawTime = drawNow;
-    } 
+    }
 
     // console.log('interp dt=' + dt + ' ' + drawNow);
 
@@ -800,6 +807,9 @@ var satSensorMarkerArray = [];
       satData[i].inViewChange = false;
       if (satData[i].inview !== satInView[i]) satData[i].inViewChange = true;
       satData[i].inview = satInView[i];
+      satData[i].inViewChange = false;
+      if (satData[i].inSun !== satInSun[i]) satData[i].inSunChange = true;
+      satData[i].inSun = satInSun[i];
       satData[i].velocity = Math.sqrt(
         satVel[i * 3] * satVel[i * 3] +
         satVel[i * 3 + 1] * satVel[i * 3 + 1] +

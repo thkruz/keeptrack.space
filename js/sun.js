@@ -40,6 +40,76 @@
     // return [sun.sunvar.x, sun.sunvar.y, sun.sunvar.z];
   };
 
+  sun.getXYZ = function () {
+    var now = timeManager.propTime();
+    j = timeManager.jday(now.getUTCFullYear(),
+                 now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+                 now.getUTCDate(),
+                 now.getUTCHours(),
+                 now.getUTCMinutes(),
+                 now.getUTCSeconds());
+    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+    var gmst = satellite.gstime(j);
+    var jdo = new A.JulianDay(j); // now
+
+    //var observerGd = satellite.currentSensor.observerGd;
+    //var coord = A.EclCoord.fromWgs84(observerGd.latitude * RAD2DEG, observerGd.longitude * RAD2DEG, observerGd.height);
+
+    var coord = A.EclCoord.fromWgs84(0,0,0);
+
+    // AZ / EL Calculation
+    var tp = A.Solar.topocentricPosition(jdo, coord, false);
+    azimuth = tp.hz.az * RAD2DEG + 180 % 360;
+    elevation = tp.hz.alt * RAD2DEG % 360;
+
+    // Range Calculation
+    var T = (new A.JulianDay(A.JulianDay.dateToJD(timeManager.propTime()))).jdJ2000Century();
+	  sun.sunvar.g = A.Solar.meanAnomaly(T)*180/Math.PI;
+    sun.sunvar.g = sun.sunvar.g % 360.0;
+    sun.sunvar.R = 1.00014 - (0.01671 * Math.cos(sun.sunvar.g)) - (0.00014 * Math.cos(2 * sun.sunvar.g));
+    range = sun.sunvar.R * 149597870700 / 1000; // au to km conversion
+
+    // RAE to ECI
+    sun.eci = satellite.ecfToEci(_lookAnglesToEcf(azimuth, elevation, range, 0,0,0), gmst);
+
+    return {'x': sun.eci.x, 'y': sun.eci.y, 'z': sun.eci.z};
+  };
+
+  function _lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long, obs_alt) {
+
+      // site ecef in meters
+      var geodeticCoords = {};
+      geodeticCoords.latitude = obs_lat;
+      geodeticCoords.longitude = obs_long;
+      geodeticCoords.height = obs_alt;
+
+      var siteXYZ = satellite.geodeticToEcf(geodeticCoords);
+      var sitex, sitey, sitez;
+      sitex = siteXYZ.x;
+      sitey = siteXYZ.y;
+      sitez = siteXYZ.z;
+
+      // some needed calculations
+      var slat = Math.sin(obs_lat);
+      var slon = Math.sin(obs_long);
+      var clat = Math.cos(obs_lat);
+      var clon = Math.cos(obs_long);
+
+      var azRad = DEG2RAD * azimuthDeg;
+      var elRad = DEG2RAD * elevationDeg;
+
+      // az,el,range to sez convertion
+      var south  = -slantRange * Math.cos(elRad) * Math.cos(azRad);
+      var east   =  slantRange * Math.cos(elRad) * Math.sin(azRad);
+      var zenith =  slantRange * Math.sin(elRad);
+
+      var x = ( slat * clon * south) + (-slon * east) + (clat * clon * zenith) + sitex;
+      var y = ( slat * slon * south) + ( clon * east) + (clat * slon * zenith) + sitey;
+      var z = (-clat *        south) + ( slat * zenith) + sitez;
+
+    return {'x': x, 'y': y, 'z': z};
+  }
+
   function _getObliquity (jd) {
     sun.sunvar.t = (jd - 2451545) / 3652500;
 

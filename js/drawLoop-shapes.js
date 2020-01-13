@@ -101,10 +101,16 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(buf), gl.STREAM_DRAW);
   };
-  Line.prototype.draw = function () {
+  Line.prototype.draw = function (color) {
     var shader = orbitDisplay.getPathShader();
     gl.useProgram(shader);
-    gl.uniform4fv(shader.uColor, [1.0, 0.0, 1.0, 1.0]);
+    if (typeof color == 'undefined') color = [1.0, 0.0, 1.0, 1.0];
+    try {      
+      gl.uniform4fv(shader.uColor, color);
+    }
+    catch {
+      gl.uniform4fv(shader.uColor, [1.0, 0.0, 1.0, 1.0]);
+    }
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
     gl.vertexAttribPointer(shader.aPos, 3, gl.FLOAT, false, 0, 0);
     gl.drawArrays(gl.LINES, 0, 2);

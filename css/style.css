@@ -363,6 +363,15 @@ ul {
 .legend-star50-box {
   background: rgb(100, 100, 100);
 }
+.legend-sat100-box {
+  background: rgb(200, 200, 200);
+}
+.legend-sat75-box {
+  background: rgb(150, 150, 150);
+}
+.legend-sat50-box {
+  background: rgb(100, 100, 100);
+}
 .legend-red-box {
   background: rgb(166, 5, 5);
 }

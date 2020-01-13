@@ -1,12 +1,12 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-(c) 2016-2019, Theodore Kruczek
+(c) 2016-2020, Theodore Kruczek
 
 lookangles.js is an expansion library for satellite.js providing tailored functions
 for calculating orbital data.
 http://keeptrack.space
 
-Copyright © 2016-2019 by Theodore Kruczek. All rights reserved. No part of this
+Copyright © 2016-2020 by Theodore Kruczek. All rights reserved. No part of this
 web site may be reproduced, published, distributed, displayed, performed, copied
 or stored for public or private use, without written permission of the author.
 
@@ -1381,6 +1381,97 @@ or mirrored at any other location without the express written permission of the 
     return maxDiff === null ? -1 : maxDiff;
   }
 
+  satellite.getSunTimes = function (sat, sensor, searchLength, interval) {
+    // If no sensor passed to function then try to use the 'currentSensor'
+    if (typeof sensor == 'undefined') {
+      if (typeof satellite.currentSensor == 'undefined') {
+        throw 'getTEARR requires a sensor or for a sensor to be currently selected.';
+      } else {
+        sensor = satellite.currentSensor;
+      }
+    }
+    // If sensor's observerGd is not set try to set it using it parameters
+    if (typeof sensor.observerGd == 'undefined') {
+      try {
+        sensor.observerGd = {
+          height: sensor.obshei,
+          latitude: sensor.lat,
+          longitude: sensor.long
+        };
+      } catch (e) {
+        throw 'observerGd is not set and could not be guessed.';
+      }
+    }
+    // If length and interval not set try to use defaults
+    if (typeof searchLength == 'undefined') searchLength = satellite.lookanglesLength;
+    if (typeof interval == 'undefined') interval = satellite.lookanglesInterval;
+
+    var propOffset = timeManager.getPropOffset();
+    var propTempOffset = 0;
+    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
+    var minDistanceApart = 100000000000;
+    var minDistTime;
+    for (var i = 0; i < (searchLength * 24 * 60 * 60); i += interval) {         // 5second Looks
+      propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
+      var now = timeManager.propTimeCheck(propTempOffset, timeManager.propRealTime);
+      var j = timeManager.jday(now.getUTCFullYear(),
+      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+      j += now.getUTCMilliseconds() * millisecondsPerDay;
+      var gmst = satellite.gstime(j);
+
+      var sunXYZ = sun.getDirection2(j);
+      // console.log(sunXYZ);
+      var sunX = sunXYZ[0] * 1000000;
+      var sunY = sunXYZ[1] * 1000000;
+      var sunZ = sunXYZ[2] * 1000000;
+
+      var m = (j - satrec.jdsatepoch) * minutesPerDay;
+      var positionEci = satellite.sgp4(satrec, m);
+      var positionEcf, lookAngles, azimuth, elevation, range;
+
+      var distanceApartX = Math.pow(sunX - positionEci.position.x, 2);
+      var distanceApartY = Math.pow(sunY - positionEci.position.y, 2);
+      var distanceApartZ = Math.pow(sunZ - positionEci.position.z, 2);
+      var distanceApart = Math.sqrt(distanceApartX + distanceApartY + distanceApartZ);
+
+      positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
+      lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+      gpos = satellite.eciToGeodetic(positionEci.position, gmst);
+      alt = gpos.height * 1000; // Km to m
+      lon = gpos.longitude;
+      lat = gpos.latitude;
+      azimuth = lookAngles.azimuth * rad2deg;
+      elevation = lookAngles.elevation * rad2deg;
+      range = lookAngles.rangeSat;
+
+      if (sensor.obsminaz > sensor.obsmaxaz) {
+        if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+           ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+             if (distanceApart < minDistanceApart) {
+               minDistanceApart = distanceApart;
+               minDistTime = now;
+             }
+        }
+      } else {
+        if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+           ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+             if (distanceApart < minDistanceApart) {
+               minDistanceApart = distanceApart;
+               minDistTime = now;
+             }
+        }
+      }
+    }
+    console.log('minDistanceApart: ' + minDistanceApart);
+    console.log('minDistTime: ' + minDistTime);
+
+    //return 'No Passes in ' + satellite.lookanglesLength + ' Days';
+  };
+
   satellite.lookAnglesToEcf = function (azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long, obs_alt) {
 
       // site ecef in meters
@@ -1433,6 +1524,56 @@ or mirrored at any other location without the express written permission of the 
     latLon.longitude = (latLon.longitude > 180) ? latLon.longitude - 360 : latLon.longitude;
     latLon.longitude = (latLon.longitude < -180) ? latLon.longitude + 360 : latLon.longitude;
     return latLon;
+  };
+
+  satellite.isInSun = function (sat) {
+    // Distances all in km
+    var sunECI = sun.getXYZ();
+    // NOTE: Position needs to be relative to satellite NOT ECI
+    // var distSatEarthX = Math.pow(-sat.position.x, 2);
+    // var distSatEarthY = Math.pow(-sat.position.y, 2);
+    // var distSatEarthZ = Math.pow(-sat.position.z, 2);
+    // var distSatEarth = Math.sqrt(distSatEarthX + distSatEarthY + distSatEarthZ);
+    // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
+    var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/Math.sqrt(Math.pow(-sat.position.x, 2) + Math.pow(-sat.position.y, 2) + Math.pow(-sat.position.z, 2))) * RAD2DEG;
+
+    // NOTE: Position needs to be relative to satellite NOT ECI
+    // var distSatSunX = Math.pow(-sat.position.x + sunECI.x, 2);
+    // var distSatSunY = Math.pow(-sat.position.y + sunECI.y, 2);
+    // var distSatSunZ = Math.pow(-sat.position.z + sunECI.z, 2);
+    // var distSatSun = Math.sqrt(distSatSunX + distSatSunY + distSatSunZ);
+    // var semiDiamSun = Math.asin(RADIUS_OF_SUN/distSatSun) * RAD2DEG;
+    var semiDiamSun = Math.asin(RADIUS_OF_SUN/Math.sqrt(Math.pow(-sat.position.x + sunECI.x, 2) + Math.pow(-sat.position.y + sunECI.y, 2) + Math.pow(-sat.position.z + sunECI.z, 2))) * RAD2DEG;
+
+    // Angle between earth and sun
+    var theta = Math.acos(numeric.dot([-sat.position.x,-sat.position.y,-sat.position.z],[-sat.position.x + sunECI.x,-sat.position.y + sunECI.y,-sat.position.z + sunECI.z])/(Math.sqrt(Math.pow(-sat.position.x, 2) + Math.pow(-sat.position.y, 2) + Math.pow(-sat.position.z, 2))*Math.sqrt(Math.pow(-sat.position.x + sunECI.x, 2) + Math.pow(-sat.position.y + sunECI.y, 2) + Math.pow(-sat.position.z + sunECI.z, 2)))) * RAD2DEG;
+
+    // var isSun = false;
+
+    // var isUmbral = false;
+    if ((semiDiamEarth > semiDiamSun) && (theta < semiDiamEarth - semiDiamSun)) {
+      // isUmbral = true;
+      return 0;
+    }
+
+    // var isPenumbral = false;
+    if ((Math.abs(semiDiamEarth - semiDiamSun) < theta) && (theta < semiDiamEarth + semiDiamSun)){
+      // isPenumbral = true;
+      return 1;
+    }
+
+    if (semiDiamSun > semiDiamEarth) {
+      // isPenumbral = true;
+      return 1;
+    }
+
+    if (theta < semiDiamSun - semiDiamEarth) {
+      // isPenumbral = true;
+      return 1;
+    }
+
+    // if (!isUmbral && !isPenumbral) isSun = true;
+    return 2;
   };
 
   // NOTE Specific to my project.

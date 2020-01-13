@@ -15,19 +15,19 @@
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=1.3.0b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=1.5.0b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=1.3.0b" rel="stylesheet">
+    <link href="css/fonts.css?v=1.5.0b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=1.3.0b">
-    <link rel="stylesheet" href="css/materialize-local.css?v=1.3.0b">
+    <link rel="stylesheet" href="css/materialize.css?v=1.5.0b">
+    <link rel="stylesheet" href="css/materialize-local.css?v=1.5.0b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
     <script language="JavaScript">
     function redirectHttpToHttps()
     {
-        if (window.location.protocol === 'http') {
+        if (window.location.protocol === 'http:' && window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'kronos') {
           var httpURL= window.location.hostname + window.location.pathname + window.location.search;
           var httpsURL= "https://" + httpURL;
           window.location = httpsURL;
@@ -129,6 +129,7 @@
     </div>
     <div id="create-rmb-menu" class="right-btn-menu">
       <ul class='dropdown-contents'>
+        <li id="create-observer-rmb"><a href="#">Create Observer Here</a></li>
         <li id="create-sensor-rmb"><a href="#">Create Sensor Here</a></li>
       </ul>
     </div>
@@ -164,6 +165,12 @@
             <li><div class="Square-Box legend-star100-box"></div>VisMag < 3.5</li>
             <li><div class="Square-Box legend-star75-box"></div>VisMag Between 3.5 and 4.7</li>
             <li><div class="Square-Box legend-star50-box"></div>VisMag > 4.7</li>
+          </ul>
+          <ul id="legend-list-sunlight" class="start-hidden">
+            <li><div class="Square-Box legend-sat50-box"></div>In Umbral</li>
+            <li><div class="Square-Box legend-sat75-box"></div>In Penumbral</li>
+            <li><div class="Square-Box legend-sat100-box"></div>In Sunlight</li>
+            <li><div class="Square-Box legend-orange-box"></div>Satellite In View</li>
           </ul>
           <ul id="legend-list-default-sensor" class="start-hidden">
             <li><div class="Square-Box legend-green-box"></div>Payload</li>
@@ -405,6 +412,7 @@
                 <h5 class="center-align">Color Schemes</h5>
                 <li class="divider"></li>
                 <li class="menu-selectable" data-color="default">Object Type</li>
+                <li class="menu-selectable" data-color="sunlight">Sunlight</li>
                 <li class="menu-selectable" data-color="velocity">Velocity</li>
                 <li class="menu-selectable" data-color="rcs">Radar Cross Section</li>
                 <li class="menu-selectable" data-color="smallsats">Small Satellites</li>
@@ -1133,6 +1141,14 @@
                     <input id="cs-hei" type="text" value="0">
                     <label for="cs-hei">Elevation Above Sea Level</label>
                   </div>
+                  <div class="input-field col s12">
+                    <select id="cs-type">
+                      <option value="Optical">Optical</option>
+                      <option value="Phased Array Radar">Phased Array Radar</option>
+                      <option value="Mechanical">Mechanical</option>
+                    </select>
+                    <label>Type of Sensor</label>
+                  </div>
                   <div class="switch row tooltipped" data-position="right" data-delay="50" data-tooltip="Is this Sensor a Telescope?">
                     <label>
                       <input id="cs-telescope" type="checkbox" checked="false">
@@ -1256,45 +1272,46 @@
   <script src="js/lib/jquery.min.js"></script>
   <script src="js/lib/materialize.min.js"></script>
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.js?v=1.3.0b"></script>
+  <script src="js/lib/satellite.js?v=1.5.0b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=1.3.0b"></script>
+  <script src="js/lib/shader-loader.min.js?v=1.5.0b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/mapManager.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=1.3.0b"></script>
-  <script src="license/license.js?v=1.3.0b"></script>
+  <script src="js/settings-manager.js?v=1.5.0b"></script>
+  <script src="license/license.js?v=1.5.0b"></script>
   <!-- Offline Only -->
-  <!-- <script src="offline/extra.js?v=1.3.0b"></script> -->
-  <!-- <script src="offline/satInfo.js?v=1.3.0b"></script> -->
-  <!-- <script src="offline/tle.js?v=1.3.0b"></script> -->
-  <script src="modules/sensorManager.js?v=1.3.0b"></script>
-  <script src="modules/launchSiteManager.js?v=1.3.0b"></script>
-  <script src="modules/starManager.js?v=1.3.0b"></script>
-  <script src="modules/starManager-constellations.js?v=1.3.0b"></script>
+  <!-- <script src="offline/extra.js?v=1.5.0b"></script> -->
+  <!-- <script src="offline/satInfo.js?v=1.5.0b"></script> -->
+  <!-- <script src="offline/tle.js?v=1.5.0b"></script> -->
+  <script src="modules/sensorManager.js?v=1.5.0b"></script>
+  <script src="modules/launchSiteManager.js?v=1.5.0b"></script>
+  <script src="modules/starManager.js?v=1.5.0b"></script>
+  <script src="modules/starManager-constellations.js?v=1.5.0b"></script>
 
-  <script src="js/time-manager.js?v=1.3.0b"></script>
-  <script src="js/sun.js?v=1.3.0b"></script>
-  <script src="js/lib/starcalc.js?v=1.3.0b"></script>
-  <script src="js/earth.js?v=1.3.0b"></script>
-  <script src="js/groups.js?v=1.3.0b"></script>
-  <script src="js/satSet.js?v=1.3.0b"></script>
+  <script src="js/time-manager.js?v=1.5.0b"></script>
+  <script src="js/sun.js?v=1.5.0b"></script>
+  <script src="js/lib/meuusjs.1.0.3.min.js?v=1.5.0b"></script>
+  <script src="js/lib/starcalc.js?v=1.5.0b"></script>
+  <script src="js/earth.js?v=1.5.0b"></script>
+  <script src="js/groups.js?v=1.5.0b"></script>
+  <script src="js/satSet.js?v=1.5.0b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/objectManager.js?v=1.3.0b"></script>
+  <script src="js/objectManager.js?v=1.5.0b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=1.3.0b"></script>
+  <script src="js/ballistic-missile.js?v=1.5.0b"></script>
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=1.3.0b"></script>
-  <script src="js/mobile.js?v=1.3.0b"></script>
+  <script src="js/color-scheme.js?v=1.5.0b"></script>
+  <script src="js/mobile.js?v=1.5.0b"></script>
   <script src="js/lib/CanvasRecorder.min.js"></script>
-  <script src="js/ui.js?v=1.3.0b"></script>
-  <script src="js/main.js?v=1.3.0b"></script>
-  <script src="js/lookangles.js?v=1.3.0b"></script>
-  <script src="js/orbit-display.js?v=1.3.0b"></script>
-  <script src="js/drawLoop-shapes.js?v=1.3.0b"></script>
-  <script src="js/search-box.js?v=1.3.0b"></script>
-  <script src="js/vector-to-kepler.js?v=1.3.0b"></script>
+  <script src="js/ui.js?v=1.5.0b"></script>
+  <script src="js/main.js?v=1.5.0b"></script>
+  <script src="js/lookangles.js?v=1.5.0b"></script>
+  <script src="js/orbit-display.js?v=1.5.0b"></script>
+  <script src="js/drawLoop-shapes.js?v=1.5.0b"></script>
+  <script src="js/search-box.js?v=1.5.0b"></script>
+  <script src="js/vector-to-kepler.js?v=1.5.0b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

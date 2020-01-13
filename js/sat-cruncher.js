@@ -12,16 +12,19 @@
 
 */
 importScripts('lib/satellite.js');
+importScripts('lib/numeric.js'); // Used for sunlight calculations
+importScripts('lib/meuusjs.1.0.3.min.js'); // Used for sunlight calculations
 
 // /////////////////////////////////////////////
 // TODO: Clean the top of this file up, it's a mess
 // /////////////////////////////////////////////
 
 /** CONSTANTS */
-var TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
-var DEG2RAD = TAU / 360;          // Used to convert degrees to radians
-var RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
-var RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
+const TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
+const DEG2RAD = TAU / 360;          // Used to convert degrees to radians
+const RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
+const RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
+const RADIUS_OF_SUN = 695700;     // Radius of the Sun in kilometers
 var globalPropagationRate = 1000;
 var globalPropagationRateMultiplier = 1;
 
@@ -30,6 +33,7 @@ var satCache = [];                // Cache of Satellite Data from TLE.json and S
 var sensorMarkerArray = [0];
 var satPos, satVel;               // Array of current Satellite and Static Positions and Velocities
 var satInView;                    // Array of booleans showing if current Satellite is in view of Sensor
+var satInSun;                    // Array of booleans showing if current Satellite is in sunlight
 
 var satelliteSelected = [-1];
 var selectedSatFOV = 90; // FOV in Degrees
@@ -42,6 +46,7 @@ var isResetSatOverfly = false;
 var isMultiSensor = false;
 var isIgnoreNonRadar = true;
 var planetariumView = false;
+var isSunlightView = true;
 var isLowPerf = false;
 
 /** OBSERVER VARIABLES */
@@ -182,6 +187,7 @@ onmessage = function (m) {
       satPos = new Float32Array(len * 3);
       satVel = new Float32Array(len * 3);
       satInView = new Int8Array(len);
+      satInSun = new Int8Array(len);
 
       postMessage({
         extraData: JSON.stringify(extraData)
@@ -289,6 +295,36 @@ function propagateCruncher () {
   j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
 
   var gmst = satellite.gstime(j);
+
+  var isSunExclusion = false;
+  if (isSunlightView) {
+    var jdo = new A.JulianDay(j); // now
+    var coord = A.EclCoord.fromWgs84(0, 0, 0);
+    var coord2 = A.EclCoord.fromWgs84(sensor.observerGd.latitude * RAD2DEG,sensor.observerGd.longitude * RAD2DEG,sensor.observerGd.height);
+
+    // AZ / EL Calculation
+    var tp = A.Solar.topocentricPosition(jdo, coord, false);
+    var tpRel = A.Solar.topocentricPosition(jdo, coord2, false);
+    sunAz = tp.hz.az * RAD2DEG + 180 % 360;
+    sunEl = tp.hz.alt * RAD2DEG % 360;
+    sunElRel = tpRel.hz.alt * RAD2DEG % 360;
+
+    // Range Calculation
+    var T = (new A.JulianDay(A.JulianDay.dateToJD(now))).jdJ2000Century();
+	  sunG = A.Solar.meanAnomaly(T)*180/Math.PI;
+    sunG = sunG % 360.0;
+    sunR = 1.00014 - (0.01671 * Math.cos(sunG)) - (0.00014 * Math.cos(2 * sunG));
+    sunRange = sunR * 149597870700 / 1000; // au to km conversion
+
+    // RAE to ECI
+    sunECI = satellite.ecfToEci(_lookAnglesToEcf(sunAz, sunEl, sunRange, 0, 0, 0), gmst);
+    if ((sensor.observerGd !== defaultGd) && (sensor.type === 'Optical') && (sunElRel > -6)) {
+      isSunExclusion = true;
+    } else {
+      isSunExclusion = false;
+    }
+  }
+
   var j2 = j;
   j2 = jday(now.getUTCFullYear(),
                now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
@@ -318,6 +354,7 @@ function propagateCruncher () {
   var isSensorChecked = false;
   var az, el, rng, pos;
   var q;
+  var semiDiamEarth, semiDiamSun, theta;
   while (i < len) {
     i++; // At the beginning so i starts at 0
     // totalCrunchTime2 += (stopTime2 - startTime2);
@@ -370,50 +407,79 @@ function propagateCruncher () {
       }
 
       satInView[i] = false; // Default in case no sensor selected
+      satInSun[i] = 2; // Default in case
 
-      if (sensor.observerGd !== defaultGd) {
+      if (isSunlightView) {
+        semiDiamEarth = Math.asin(RADIUS_OF_EARTH/Math.sqrt(Math.pow(-satPos[i * 3], 2) + Math.pow(-satPos[i * 3 + 1], 2) + Math.pow(-satPos[i * 3 + 2], 2))) * RAD2DEG;
+        semiDiamSun = Math.asin(RADIUS_OF_SUN/Math.sqrt(Math.pow(-satPos[i * 3] + sunECI.x, 2) + Math.pow(-satPos[i * 3 + 1] + sunECI.y, 2) + Math.pow(-satPos[i * 3 + 2] + sunECI.z, 2))) * RAD2DEG;
+
+        // Angle between earth and sun
+        theta = Math.acos(numeric.dot([-satPos[i * 3],-satPos[i * 3 + 1],-satPos[i * 3 + 2]],[-satPos[i * 3] + sunECI.x,-satPos[i * 3 + 1] + sunECI.y,-satPos[i * 3 + 2] + sunECI.z])/(Math.sqrt(Math.pow(-satPos[i * 3], 2) + Math.pow(-satPos[i * 3 + 1], 2) + Math.pow(-satPos[i * 3 + 2], 2))*Math.sqrt(Math.pow(-satPos[i * 3] + sunECI.x, 2) + Math.pow(-satPos[i * 3 + 1] + sunECI.y, 2) + Math.pow(-satPos[i * 3 + 2] + sunECI.z, 2)))) * RAD2DEG;
+        if ((semiDiamEarth > semiDiamSun) && (theta < semiDiamEarth - semiDiamSun)) {
+          satInSun[i] = 0; // Umbral
+        }
+
+        // var isPenumbral = false;
+        if ((Math.abs(semiDiamEarth - semiDiamSun) < theta) && (theta < semiDiamEarth + semiDiamSun)){
+          satInSun[i] = 1; // Penumbral
+        }
+
+        if (semiDiamSun > semiDiamEarth) {
+          satInSun[i] = 1; // Penumbral
+        }
+
+        if (theta < semiDiamSun - semiDiamEarth) {
+          satInSun[i] = 1; // Penumbral
+        }
+      }
+
+      if (sensor.observerGd !== defaultGd && !isSunExclusion) {
         if (isMultiSensor) {
           for (s = 0; s < mSensor.length; s++) {
-            if (satInView[i]) break;
-            sensor = mSensor[s];
-            sensor.observerGd = {
-              longitude: sensor.long * DEG2RAD,
-              latitude: sensor.lat * DEG2RAD,
-              height: sensor.obshei * 1 // Convert from string
-            };
-            positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
-            lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-            azimuth = lookangles.azimuth;
-            elevation = lookangles.elevation;
-            rangeSat = lookangles.rangeSat;
+            if (!(sensor.type == 'Optical' && satInSun[i] == 0)) {
+              if (satInView[i]) break;
+              sensor = mSensor[s];
+              sensor.observerGd = {
+                longitude: sensor.long * DEG2RAD,
+                latitude: sensor.lat * DEG2RAD,
+                height: sensor.obshei * 1 // Convert from string
+              };
+              positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
+              lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+              azimuth = lookangles.azimuth;
+              elevation = lookangles.elevation;
+              rangeSat = lookangles.rangeSat;
+              azimuth *= RAD2DEG;
+              elevation *= RAD2DEG;
+
+              if (sensor.obsminaz > sensor.obsmaxaz) {
+                if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+                ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+                  satInView[i] = true;
+                }
+              } else {
+                if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
+                ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+                  satInView[i] = true;
+                }
+              }
+            }
+          }
+        } else {
+          if (!(sensor.type == 'Optical' && satInSun[i] == 0)) {
             azimuth *= RAD2DEG;
             elevation *= RAD2DEG;
 
             if (sensor.obsminaz > sensor.obsmaxaz) {
               if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
-              ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+                 ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
                 satInView[i] = true;
               }
             } else {
               if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
-              ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
+                 ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
                 satInView[i] = true;
               }
-            }
-          }
-        } else {
-          azimuth *= RAD2DEG;
-          elevation *= RAD2DEG;
-
-          if (sensor.obsminaz > sensor.obsmaxaz) {
-            if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
-               ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
-              satInView[i] = true;
-            }
-          } else {
-            if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange)) ||
-               ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2))) {
-              satInView[i] = true;
             }
           }
         }
@@ -970,6 +1036,7 @@ function propagateCruncher () {
     satPos: satPos.buffer,
     satVel: satVel.buffer,
     satInView: satInView.buffer,
+    satInSun: satInSun.buffer,
     sensorMarkerArray: sensorMarkerArray}
   );
 

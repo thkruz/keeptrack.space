@@ -1,6 +1,6 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-(c) 2016-2019, Theodore Kruczek
+(c) 2016-2020, Theodore Kruczek
 (c) 2015-2016, James Yoder
 
 main.js is the primary javascript file for keeptrack.space. It manages all user
@@ -10,7 +10,7 @@ http://keeptrack.space
 Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
 under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
 
-All additions and modifications of original code is Copyright © 2016-2019 by
+All additions and modifications of original code is Copyright © 2016-2020 by
 Theodore Kruczek. All rights reserved. No part of this web site may be reproduced,
 published, distributed, displayed, performed, copied or stored for public or private
 use, without written permission of the author.
@@ -61,6 +61,7 @@ const TAU = 2 * Math.PI;
 const DEG2RAD = TAU / 360;
 const RAD2DEG = 360 / TAU;
 const RADIUS_OF_EARTH = 6371.0;
+const RADIUS_OF_SUN = 695700;
 const MINUTES_PER_DAY = 1440;
 const PLANETARIUM_DIST = 3;
 const MILLISECONDS_PER_DAY = 1.15741e-8;
@@ -1143,6 +1144,7 @@ function selectSat (satId) {
     $('#menu-map').removeClass('bmenu-item-selected');
     $('#menu-newLaunch').removeClass('bmenu-item-selected');
     $('#menu-breakup').removeClass('bmenu-item-selected');
+    $('#menu-customSensor').removeClass('bmenu-item-selected');
     // Add Grey Out
     $('#menu-lookanglesmultisite').addClass('bmenu-item-disabled');
     $('#menu-lookangles').addClass('bmenu-item-disabled');
@@ -1338,12 +1340,17 @@ function selectSat (satId) {
 
       now = new Date(timeManager.propRealTime + timeManager.propOffset);
       var sunTime = SunCalc.getTimes(now, satellite.currentSensor.lat, satellite.currentSensor.long);
+      var satInSun = satellite.isInSun(sat);
       if (!satellite.sensorSelected()) {
-        $('#sat-sun').html('Unknown');
+        if (satInSun == 0) $('#sat-sun').html('No Sunlight');
+        if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
+        if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
       } else if (satellite.currentSensor.type !== 'Optical') {
-        $('#sat-sun').html('Unaffected');
+        $('#sat-sun').html('No Effect');
       } else if (sunTime.dawn.getTime() - now > 0 || sunTime.dusk.getTime() - now < 0) {
-        $('#sat-sun').html('No Impact');
+        if (satInSun == 0) $('#sat-sun').html('No Sunlight');
+        if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
+        if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
       } else {
         $('#sat-sun').html('Sun Exclusion');
       }
@@ -1429,14 +1436,36 @@ function enableSlowCPUMode () {
   });
 }
 
-function debugDrawLine (type, value) {
+function debugDrawLine (type, value, color) {
+  if (typeof color == 'undefined') color = [1.0, 0, 1.0, 1.0];
+  switch (color) {
+    case 'r':
+      color = [1,0,0,1];
+      break;
+    case 'o':
+      color = [1,0.5,0,1];
+      break;
+    case 'y':
+      color = [1,1,0,1];
+      break;
+    case 'g':
+      color = [0,1,0,1];
+      break;
+    case 'b':
+      color = [0,0,1,1];
+      break;
+    case 'p':
+      color = [0,1,1,1];
+      break;
+  }
   if (type == 'sat') {
     var sat = satSet.getSat(value).position;
     drawLineList.push(
       {
         'line': new Line(),
         'ref': [0,0,0],
-        'ref2': [sat.x, sat.y, sat.z]
+        'ref2': [sat.x, sat.y, sat.z],
+        'color': color
       }
     );
   }
@@ -1445,7 +1474,18 @@ function debugDrawLine (type, value) {
       {
         'line': new Line(),
         'ref': [0,0,0],
-        'ref2': [value[0], value[1], value[2]]
+        'ref2': [value[0], value[1], value[2]],
+        'color': color
+      }
+    );
+  }
+  if (type == 'ref2') {
+    drawLineList.push(
+      {
+        'line': new Line(),
+        'ref': [value[0], value[1], value[2]],
+        'ref2': [value[3], value[4], value[5]],
+        'color': color
       }
     );
   }
@@ -1469,7 +1509,7 @@ function drawLines () {
       drawLineList[drawLinesI].line.set(drawLineList[drawLinesI].ref, drawLineList[drawLinesI].ref2);
     }
 
-    drawLineList[drawLinesI].line.draw();
+    drawLineList[drawLinesI].line.draw(drawLineList[drawLinesI].color);
   }
 }
 // var lastRadarTrackTime = 0;

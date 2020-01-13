@@ -8,8 +8,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.3.0';
-  settingsManager.versionDate = 'September 5, 2019';
+  settingsManager.versionNumber = 'v1.5.0';
+  settingsManager.versionDate = 'January 12, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -246,6 +246,14 @@
   settingsManager.colors.analyst = [1.0, 1.0, 0.0, 1.0];
   settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];
   settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.1];
+  settingsManager.colors.sunlight = [1.0, 1.0, 1.0, 1.0];
+  settingsManager.colors.penumbral = [1.0, 1.0, 1.0, 0.3];
+  settingsManager.colors.umbral = [1.0, 1.0, 1.0, 0.1];
+  // DEBUG Colors
+  // settingsManager.colors.sunlight = [0.2, 0.5, 1.0, 0.85];;
+  // settingsManager.colors.penumbral = [0.5, 0.5, 0.5, 0.85];
+  // settingsManager.colors.umbral = [0.2, 1.0, 0.0, 0.5];
+  //
   settingsManager.colors.gradientAmt = 0;
   // TODO: Gradients Must be Edited in color-scheme.js
   // settingsManager.colors.apogeeGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];

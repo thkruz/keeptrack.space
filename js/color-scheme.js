@@ -30,6 +30,9 @@
   ColorScheme.objectTypeFlags.star100 = true;
   ColorScheme.objectTypeFlags.star75 = true;
   ColorScheme.objectTypeFlags.star50 = true;
+  ColorScheme.objectTypeFlags.sat100 = true;
+  ColorScheme.objectTypeFlags.sat75 = true;
+  ColorScheme.objectTypeFlags.sat50 = true;
 
   // Removed from function to reduce memory leak
   ColorScheme.prototype.calculateColorBuffers = function (isForceRecolor, isCalculateMarkers) {
@@ -54,6 +57,7 @@
     var isFirstMarkerChecked = false;
     var satData = satSet.getSatData();
     var satInView = satSet.getSatInView();
+    var satInSun;
     if (this.isVelocityColorScheme) {
       satVel = satSet.getSatVel();
     }
@@ -62,9 +66,14 @@
     // Don't Calculate the Colors of things you can't see
     if (!settingsManager.isFOVBubbleModeOn && !settingsManager.isShowSurvFence && !settingsManager.isSatOverflyModeOn) numSats -= settingsManager.maxFieldOfViewMarkers;
 
+    if (this.isSunlightColorScheme) {
+      satInSun = satSet.getSatInSun();
+    }
+
     for (i = 0; i < numSats; i++) {
       sat = satData[i];
       if (satInView) sat.inView = satInView[i];
+      if (satInSun) sat.inSun = satInSun[i];
 
       if (this.isVelocityColorScheme) {
         sat.velocity = Math.sqrt(
@@ -264,6 +273,127 @@
         };
       }
     });
+    ColorScheme.sunlight = new ColorScheme(function (sat) {
+      if (sat.static && sat.type === 'Launch Facility' && ColorScheme.objectTypeFlags.purple === false) {
+        return {
+          color: colorTheme.deselected,
+          pickable: false
+        };
+      }
+
+      if (sat.static && sat.type === 'Launch Facility') {
+        return {
+          color: colorTheme.facility,
+          pickable: true
+        };
+      }
+
+      if (sat.static && sat.type === 'Star') {
+        if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.star50) {
+          return {
+            color: colorTheme.star50,
+            pickable: true
+          };
+        } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorScheme.objectTypeFlags.star75) {
+          return {
+            color: colorTheme.star75,
+            pickable: true
+          };
+        } else if (sat.vmag < 3.5 && ColorScheme.objectTypeFlags.star100) {
+          return {
+            color: colorTheme.star100,
+            pickable: true
+          };
+        } else {
+          // Deselected
+          return {
+            color: colorTheme.deselected,
+            pickable: false
+          };
+        }
+      }
+
+      if (sat.marker) {
+        if (sat.id === satSensorMarkerArray[iSensorMarkerArray + 1]) {
+          iSensorMarkerArray++;
+        }
+        if (iSensorMarkerArray >= 0) {
+          return {
+            color: colorTheme.marker[iSensorMarkerArray],
+            marker: true,
+            pickable: false
+          };
+        } else {
+          return { // Failsafe
+            color: colorTheme.marker[0],
+            marker: true,
+            pickable: false
+          };
+        }
+      }
+
+      if (sat.static && ColorScheme.objectTypeFlags.red === false) {
+        return {
+          color: colorTheme.deselected,
+          pickable: false
+        };
+      }
+      if (sat.static) {
+        return {
+          color: colorTheme.sensor,
+          pickable: true
+        };
+      }
+      if (sat.missile && !sat.inView) {
+        return {
+          color: colorTheme.missile,
+          pickable: true
+        };
+      }
+      if (sat.missile && sat.inView) {
+        return {
+          color: colorTheme.missileInview,
+          pickable: true
+        };
+      }
+
+      if ((sat.inView) && (ColorScheme.objectTypeFlags.orange === true)) {
+        return {
+          color: colorTheme.inview,
+          pickable: true
+        };
+      }
+
+      if (!sat.inView) {
+
+        if ((sat.inSun == 2) && (ColorScheme.objectTypeFlags.sat100 === true)) {
+          return {
+            color: colorTheme.sunlight,
+            pickable: true
+          };
+        }
+
+        if ((sat.inSun == 0)  && (ColorScheme.objectTypeFlags.sat50 === true)) {
+          return {
+            color: colorTheme.umbral,
+            pickable: true
+          };
+        }
+
+        if ((sat.inSun == 1) && (ColorScheme.objectTypeFlags.sat75 === true)) {
+          return {
+            color: colorTheme.penumbral,
+            pickable: true
+          };
+        }
+      }
+
+      return {
+        color: colorTheme.deselected,
+        pickable: false
+      };
+    });
+    ColorScheme.sunlight.isSunlightColorScheme = true;
     /// //////////////////////////////
     // NOTE: Doesn't appear to be used
     // ///////////////////////////////

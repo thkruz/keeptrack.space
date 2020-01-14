@@ -105,10 +105,10 @@
     var shader = orbitDisplay.getPathShader();
     gl.useProgram(shader);
     if (typeof color == 'undefined') color = [1.0, 0.0, 1.0, 1.0];
-    try {      
+    try {
       gl.uniform4fv(shader.uColor, color);
     }
-    catch {
+    catch (e) {      
       gl.uniform4fv(shader.uColor, [1.0, 0.0, 1.0, 1.0]);
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);

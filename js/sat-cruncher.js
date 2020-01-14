@@ -20,11 +20,11 @@ importScripts('lib/meuusjs.1.0.3.min.js'); // Used for sunlight calculations
 // /////////////////////////////////////////////
 
 /** CONSTANTS */
-const TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
-const DEG2RAD = TAU / 360;          // Used to convert degrees to radians
-const RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
-const RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
-const RADIUS_OF_SUN = 695700;     // Radius of the Sun in kilometers
+var TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
+var DEG2RAD = TAU / 360;          // Used to convert degrees to radians
+var RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
+var RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
+var RADIUS_OF_SUN = 695700;     // Radius of the Sun in kilometers
 var globalPropagationRate = 1000;
 var globalPropagationRateMultiplier = 1;
 

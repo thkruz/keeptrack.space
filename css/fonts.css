@@ -84,7 +84,9 @@
     font-family: 'nasalization';
     font-style: normal;
     font-weight: 400;
-    src: url('fonts/nasalization-rg.ttf') format('truetype');
+    src: url('fonts/nasalization-rg.woff2') format('woff2'),
+         url('fonts/nasalization-rg.woff') format('woff'),
+         url('fonts/nasalization-rg.ttf') format('truetype')
   }
 
   .ui-icon {

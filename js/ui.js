@@ -57,7 +57,11 @@ or mirrored at any other location without the express written permission of the 
 // Public Variables
 
 var canvasDOM = $('#canvas');
-var recorder = new CanvasRecorder(document.getElementById('canvas'));
+try {
+  var recorder = new CanvasRecorder(document.getElementById('canvas'));
+} catch (e){
+  console.log(e);
+}
 var bodyDOM = $('#bodyDOM');
 var dropdownInstance;
 var mapImageDOM = $('#map-image');
@@ -2519,7 +2523,17 @@ $.ajaxSetup({
             // $('#menu-record').removeClass('bmenu-item-selected');
             break;
           } else {
-            recorder.start();
+            try {
+              recorder.start();
+            } catch (e) {
+              console.error("Compatibility Issue");
+              isVideoRecording = false;
+              $('#menu-record').removeClass('bmenu-item-selected');
+              $('#menu-record').addClass('bmenu-item-disabled');
+              if (!$('#menu-record:animated').length) {
+                $('#menu-record').effect('shake', {distance: 10});
+              }
+            }
             // isVideoRecording = true;
             // $('#menu-record').addClass('bmenu-item-selected');
             break;

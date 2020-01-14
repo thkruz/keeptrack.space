@@ -54,17 +54,17 @@ or mirrored at any other location without the express written permission of the 
 */
 
 // Constants
-const ZOOM_EXP = 3;
-const DIST_MIN = 6800;
-const DIST_MAX = 200000;
-const TAU = 2 * Math.PI;
-const DEG2RAD = TAU / 360;
-const RAD2DEG = 360 / TAU;
-const RADIUS_OF_EARTH = 6371.0;
-const RADIUS_OF_SUN = 695700;
-const MINUTES_PER_DAY = 1440;
-const PLANETARIUM_DIST = 3;
-const MILLISECONDS_PER_DAY = 1.15741e-8;
+var ZOOM_EXP = 3;
+var DIST_MIN = 6800;
+var DIST_MAX = 200000;
+var TAU = 2 * Math.PI;
+var DEG2RAD = TAU / 360;
+var RAD2DEG = 360 / TAU;
+var RADIUS_OF_EARTH = 6371.0;
+var RADIUS_OF_SUN = 695700;
+var MINUTES_PER_DAY = 1440;
+var PLANETARIUM_DIST = 3;
+var MILLISECONDS_PER_DAY = 1.15741e-8;
 
 var timeManager = window.timeManager;
 var satCruncher = window.satCruncher;

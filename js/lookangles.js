@@ -27,11 +27,11 @@ or mirrored at any other location without the express written permission of the 
 // Constants
 
 (function () {
-  const tau = 2 * Math.PI;
-  const deg2rad = tau / 360;
-  const rad2deg = 360 / tau;
-  const minutesPerDay = 1440;
-  const millisecondsPerDay = 1.15741e-8;
+  var tau = 2 * Math.PI;
+  var deg2rad = tau / 360;
+  var rad2deg = 360 / tau;
+  var minutesPerDay = 1440;
+  var millisecondsPerDay = 1.15741e-8;
   // Settings
   satellite.lookanglesInterval = 5;
   satellite.lookanglesLength = 2;

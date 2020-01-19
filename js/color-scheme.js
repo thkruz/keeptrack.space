@@ -198,21 +198,24 @@
       // NOTE: ColorScheme.objectTypeFlags code
 
       if (!sat.inView && sat.OT === 1 && ColorScheme.objectTypeFlags.green === false ||
-          cameraType.current === cameraType.PLANETARIUM && sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) {
+          cameraType.current === cameraType.PLANETARIUM && sat.OT === 1 && ColorScheme.objectTypeFlags.green === false ||
+          (satellite.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 1 && ColorScheme.objectTypeFlags.green === false)) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
       if (!sat.inView && sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false ||
-          cameraType.current === cameraType.PLANETARIUM && sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) {
+          cameraType.current === cameraType.PLANETARIUM && sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false ||
+          (satellite.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false)) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
       if (!sat.inView && sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false ||
-          cameraType.current === cameraType.PLANETARIUM && sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) {
+          cameraType.current === cameraType.PLANETARIUM && sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false ||
+          (satellite.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false)) {
         return {
           color: colorTheme.deselected,
           pickable: false
@@ -234,8 +237,16 @@
         }
 
         if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
-          color = colorTheme.inview;
-        } else if (sat.C === 'ANALSAT') {
+          if (satellite.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined') {
+          } else {
+            return {
+              color: colorTheme.inview,
+              pickable: true
+            };
+          }
+        }
+
+        if (sat.C === 'ANALSAT') {
           color = colorTheme.analyst;
         } else if (sat.OT === 1) { // Payload
           color = colorTheme.payload;
@@ -357,26 +368,45 @@
         };
       }
 
-      if ((sat.inView) && (ColorScheme.objectTypeFlags.orange === true)) {
+      if ((sat.inView) && (ColorScheme.objectTypeFlags.red === true)) {
+        if (typeof sat.vmag == 'undefined') {
+          return {
+            color: colorTheme.umbral,
+            pickable: false
+          };
+        }
         return {
-          color: colorTheme.inview,
+          color: colorTheme.sunlightInview,
           pickable: true
         };
       }
 
-      if (!sat.inView) {
-
+      if (!sat.inView && typeof sat.vmag !== 'undefined') {
         if ((sat.inSun == 2) && (ColorScheme.objectTypeFlags.sat100 === true)) {
-          return {
-            color: colorTheme.sunlight,
-            pickable: true
-          };
+          if (sat.vmag < 3) {
+            return {
+              color: colorTheme.sunlight100,
+              pickable: true
+            };
+          }
+          if (sat.vmag <= 4.5) {
+            return {
+              color: colorTheme.sunlight80,
+              pickable: true
+            };
+          }
+          if (sat.vmag > 4.5) {
+            return {
+              color: colorTheme.sunlight60,
+              pickable: true
+            };
+          }
         }
 
         if ((sat.inSun == 0)  && (ColorScheme.objectTypeFlags.sat50 === true)) {
           return {
             color: colorTheme.umbral,
-            pickable: true
+            pickable: false
           };
         }
 
@@ -386,7 +416,13 @@
             pickable: true
           };
         }
+        // Not in the vmag database
+        return {
+          color: colorTheme.umbral,
+          pickable: false
+        };
       }
+
 
       return {
         color: colorTheme.deselected,
@@ -409,12 +445,12 @@
     // ///////////////////////////////
 
     ColorScheme.smallsats = new ColorScheme(function (sat) {
-      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
-        return {
-          color: colorTheme.inviewAlt,
-          pickable: true
-        };
-      }
+      // if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
+      //   return {
+      //     color: colorTheme.inviewAlt,
+      //     pickable: true
+      //   };
+      // }
       if (sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) {
         return {
           color: colorTheme.deselected,
@@ -435,12 +471,12 @@
     });
     ColorScheme.rcs = new ColorScheme(function (sat) {
       var rcs = sat.R;
-      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
-        return {
-          color: colorTheme.inview,
-          pickable: true
-        };
-      }
+      // if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
+      //   return {
+      //     color: colorTheme.inview,
+      //     pickable: true
+      //   };
+      // }
       if (rcs < 0.1 && ColorScheme.objectTypeFlags.red === false) {
         return {
           color: colorTheme.deselected,
@@ -491,27 +527,27 @@
     });
     ColorScheme.countries = new ColorScheme(function (sat) {
       var country = sat.C;
-      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
-        return {
-          color: colorTheme.inview,
-          pickable: true
-        };
-      }
-      if (!sat.inView && country === 'US' && ColorScheme.objectTypeFlags.blue === false ||
+      // if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
+      //   return {
+      //     color: colorTheme.inview,
+      //     pickable: true
+      //   };
+      // }
+      if (country === 'US' && ColorScheme.objectTypeFlags.blue === false ||
           cameraType.current === cameraType.PLANETARIUM && country === 'US' && ColorScheme.objectTypeFlags.blue === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if (!sat.inView && country === 'PRC' && ColorScheme.objectTypeFlags.red === false ||
+      if (country === 'PRC' && ColorScheme.objectTypeFlags.red === false ||
           cameraType.current === cameraType.PLANETARIUM && country === 'PRC' && ColorScheme.objectTypeFlags.red === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
-      if (!sat.inView && country === 'CIS' && ColorScheme.objectTypeFlags.white === false ||
+      if (country === 'CIS' && ColorScheme.objectTypeFlags.white === false ||
           cameraType.current === cameraType.PLANETARIUM && country === 'CIS' && ColorScheme.objectTypeFlags.white === false) {
         return {
           color: colorTheme.deselected,
@@ -537,7 +573,7 @@
         };
       }
       // Other Countries
-      if (!sat.inView && ColorScheme.objectTypeFlags.green === false ||
+      if (ColorScheme.objectTypeFlags.green === false ||
           cameraType.current === cameraType.PLANETARIUM && ColorScheme.objectTypeFlags.green === false) {
         return {
           color: colorTheme.deselected,
@@ -550,12 +586,12 @@
       };
     });
     ColorScheme.lostobjects = new ColorScheme(function (sat) {
-      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
-        return {
-          color: colorTheme.inview,
-          pickable: true
-        };
-      }
+      // if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
+      //   return {
+      //     color: colorTheme.inview,
+      //     pickable: true
+      //   };
+      // }
       if (sat.static && sat.type === 'Launch Facility') {
         return {
           color: colorTheme.facility,
@@ -568,18 +604,18 @@
           pickable: true
         };
       }
-      if (sat.missile && !sat.inView) {
-        return {
-          color: colorTheme.missile,
-          pickable: true
-        };
-      }
-      if (sat.missile && sat.inView) {
-        return {
-          color: colorTheme.missileInview,
-          pickable: true
-        };
-      }
+      // if (sat.missile && !sat.inView) {
+      //   return {
+      //     color: colorTheme.missile,
+      //     pickable: true
+      //   };
+      // }
+      // if (sat.missile && sat.inView) {
+      //   return {
+      //     color: colorTheme.missileInview,
+      //     pickable: true
+      //   };
+      // }
       var pe = sat.perigee;
       var now = new Date();
       var jday = timeManager.getDayOfYear(now);
@@ -607,14 +643,44 @@
           pickable: true
         };
       }
+      return {
+        color: colorTheme.transparent,
+        pickable: false
+      };
     });
     ColorScheme.leo = new ColorScheme(function (sat) {
-      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
-        return {
-          color: colorTheme.inview,
-          pickable: true
-        };
+      // if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
+      //   return {
+      //     color: colorTheme.inview,
+      //     pickable: true
+      //   };
+      // }
+
+      if (sat.static && sat.type === 'Star') {
+        if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.star50) {
+          return {
+            color: colorTheme.star50,
+            pickable: true
+          };
+        } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorScheme.objectTypeFlags.star75) {
+          return {
+            color: colorTheme.star75,
+            pickable: true
+          };
+        } else if (sat.vmag < 3.5 && ColorScheme.objectTypeFlags.star100) {
+          return {
+            color: colorTheme.star100,
+            pickable: true
+          };
+        } else {
+          // Deselected
+          return {
+            color: colorTheme.deselected,
+            pickable: false
+          };
+        }
       }
+
       var ap = sat.apogee;
       if (ap > 2000) {
         return {
@@ -629,12 +695,38 @@
       }
     });
     ColorScheme.geo = new ColorScheme(function (sat) {
-      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
-        return {
-          color: colorTheme.inview,
-          pickable: true
-        };
+      // if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
+      //   return {
+      //     color: colorTheme.inview,
+      //     pickable: true
+      //   };
+      // }
+
+      if (sat.static && sat.type === 'Star') {
+        if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.star50) {
+          return {
+            color: colorTheme.star50,
+            pickable: true
+          };
+        } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorScheme.objectTypeFlags.star75) {
+          return {
+            color: colorTheme.star75,
+            pickable: true
+          };
+        } else if (sat.vmag < 3.5 && ColorScheme.objectTypeFlags.star100) {
+          return {
+            color: colorTheme.star100,
+            pickable: true
+          };
+        } else {
+          // Deselected
+          return {
+            color: colorTheme.deselected,
+            pickable: false
+          };
+        }
       }
+
       var pe = sat.perigee;
       if (pe < 35000) {
         return {
@@ -649,12 +741,12 @@
       }
     });
     ColorScheme.velocity = new ColorScheme(function (sat) {
-      if (sat.inView && cameraType.current !== cameraType.PLANETARIUM && ColorScheme.objectTypeFlags.blue !== false) {
-        return {
-          color: colorTheme.inviewAlt,
-          pickable: true
-        };
-      }
+      // if (sat.inView && cameraType.current !== cameraType.PLANETARIUM && ColorScheme.objectTypeFlags.blue !== false) {
+      //   return {
+      //     color: colorTheme.inviewAlt,
+      //     pickable: true
+      //   };
+      // }
       var vel = sat.velocity;
       if (vel > 5.5 && ColorScheme.objectTypeFlags.yellow === false) {
         return {

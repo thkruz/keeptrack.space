@@ -66,6 +66,8 @@ var MINUTES_PER_DAY = 1440;
 var PLANETARIUM_DIST = 3;
 var MILLISECONDS_PER_DAY = 1.15741e-8;
 
+var debugTimeArray = [];
+
 var timeManager = window.timeManager;
 var satCruncher = window.satCruncher;
 var gl;
@@ -120,6 +122,7 @@ var lastSelectedSat = -1;
 var drawLineList = [];
 
 var updateHoverDelay = 0;
+var updateHoverDelayLimit = 1;
 
 var pickColorBuf;
 var cameraType = {};
@@ -275,6 +278,14 @@ var drawLoopCallback;
         if (dt > 500 && !settingsManager.isSlowCPUModeEnabled) enableSlowCPUMode();
       }
     }
+    if (dt > 20) {
+      updateHoverDelayLimit = 6;
+    } else if (dt > 50) {
+      updateHoverDelayLimit = 10;
+    } else {
+      updateHoverDelayLimit = 1;
+    }
+
     time = drawNow;
     timeManager.now = drawNow;
 
@@ -693,7 +704,7 @@ var drawLoopCallback;
     } else {
       if (!isMouseMoving || isDragging || settingsManager.isMobileModeEnabled) { return; }
       updateHoverDelay++;
-      if (updateHoverDelay === 8) updateHoverDelay = 0;
+      if (updateHoverDelay >= updateHoverDelayLimit) updateHoverDelay = 0;
       if (updateHoverDelay > 0) return;
       mouseSat = getSatIdFromCoord(mouseX, mouseY);
       if (mouseSat !== -1) {
@@ -791,70 +802,68 @@ var drawLoopCallback;
     }
     if (satId === -1) {
       if (!isHoverBoxVisible || settingsManager.isDisableSatHoverBox) return;
-      if (starManager.isConstellationVisible === true) starManager.clearConstellations();
+      if (starManager.isConstellationVisible === true && !starManager.isAllConstellationVisible) starManager.clearConstellations();
       // satHoverBoxDOM.html('(none)');
       satHoverBoxDOM.css({display: 'none'});
       canvasDOM.css({cursor: 'default'});
       isHoverBoxVisible = false;
     } else if (!isDragging && !settingsManager.isDisableSatHoverBox) {
-      try {
-        var sat = satSet.getSatExtraOnly(satId);
-        var selectedSatData = satSet.getSatExtraOnly(selectedSat);
-        isHoverBoxVisible = true;
-        if (sat.static) {
-          if (sat.type === 'Launch Facility') {
-            var launchSite = objectManager.extractLaunchSite(sat.name);
-            satHoverBoxNode1.textContent = (launchSite.site + ', ' + launchSite.sitec);
-            satHoverBoxNode2.innerHTML = (sat.type + satellite.distance(sat, selectedSatData) + '');
-            satHoverBoxNode3.textContent = ('');
-          } else if (sat.type === 'Star') {
-            if (starManager.findStarsConstellation(sat.name) !== null) {
-              satHoverBoxNode1.innerHTML = (sat.name + '</br>' + starManager.findStarsConstellation(sat.name));
-            } else {
-              satHoverBoxNode1.textContent = (sat.name);
-            }
-            satHoverBoxNode2.innerHTML = (sat.type);
-            satHoverBoxNode3.innerHTML = ('RA: ' + sat.ra.toFixed(3) + ' deg </br> DEC: ' + sat.dec.toFixed(3) + ' deg');
-            starManager.drawConstellations(starManager.findStarsConstellation(sat.name));
+      var sat = satSet.getSatExtraOnly(satId);
+      var selectedSatData = satSet.getSatExtraOnly(selectedSat);
+      isHoverBoxVisible = true;
+      if (sat.static) {
+        if (sat.type === 'Launch Facility') {
+          var launchSite = objectManager.extractLaunchSite(sat.name);
+          satHoverBoxNode1.textContent = (launchSite.site + ', ' + launchSite.sitec);
+          satHoverBoxNode2.innerHTML = (sat.type + satellite.distance(sat, selectedSatData) + '');
+          satHoverBoxNode3.textContent = ('');
+        } else if (sat.type === 'Star') {
+          if (starManager.findStarsConstellation(sat.name) !== null) {
+            satHoverBoxNode1.innerHTML = (sat.name + '</br>' + starManager.findStarsConstellation(sat.name));
           } else {
             satHoverBoxNode1.textContent = (sat.name);
-            satHoverBoxNode2.innerHTML = (sat.type + satellite.distance(sat, selectedSatData) + '');
-            satHoverBoxNode3.textContent = ('');
           }
-        } else if (sat.missile) {
-          satHoverBoxNode1.textContent = (sat.ON + '<br \>' + sat.desc + '');
-          satHoverBoxNode2.textContent = '';
-          satHoverBoxNode3.textContent = '';
+          satHoverBoxNode2.innerHTML = (sat.type);
+          satHoverBoxNode3.innerHTML = ('RA: ' + sat.ra.toFixed(3) + ' deg </br> DEC: ' + sat.dec.toFixed(3) + ' deg');
+          starManager.drawConstellations(starManager.findStarsConstellation(sat.name));
         } else {
-          if (satellite.sensorSelected() && isShowNextPass && isShowDistance) {
-            satHoverBoxNode1.textContent = (sat.ON);
-            satHoverBoxNode2.textContent = (sat.SCC_NUM);
-            satHoverBoxNode3.innerHTML = (satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '');
-          } else if (isShowDistance) {
-            satHoverBoxNode1.textContent = (sat.ON);
-            satHoverBoxNode2.innerHTML = (sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
-            satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
-                                            'X: ' + sat.velocityX.toFixed(2) + 'km/s Y: ' + sat.velocityY.toFixed(2) + 'km/s Z: ' + sat.velocityZ.toFixed(2)) + 'km/s';
-          } else if (satellite.sensorSelected() && isShowNextPass) {
-            satHoverBoxNode1.textContent = (sat.ON);
-            satHoverBoxNode2.textContent = (sat.SCC_NUM);
-            satHoverBoxNode3.textContent = (satellite.nextpass(sat));
-          } else {
-            satHoverBoxNode1.textContent = (sat.ON);
-            satHoverBoxNode2.textContent = (sat.SCC_NUM);
-            satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
-                                            'X: ' + sat.velocityX.toFixed(2) + ' Y: ' + sat.velocityY.toFixed(2) + ' Z: ' + sat.velocityZ.toFixed(2));
-          }
+          satHoverBoxNode1.textContent = (sat.name);
+          satHoverBoxNode2.innerHTML = (sat.type + satellite.distance(sat, selectedSatData) + '');
+          satHoverBoxNode3.textContent = ('');
         }
-        satHoverBoxDOM.css({
-          display: 'block',
-          'text-align': 'center',
-          position: 'absolute',
-          left: satX + 20,
-          top: satY - 10
-        });
-        canvasDOM.css({cursor: 'pointer'});
-      } catch (e) {}
+      } else if (sat.missile) {
+        satHoverBoxNode1.innerHTML = (sat.ON + '<br \>' + sat.desc + '');
+        satHoverBoxNode2.textContent = '';
+        satHoverBoxNode3.textContent = '';
+      } else {
+        if (satellite.sensorSelected() && isShowNextPass && isShowDistance) {
+          satHoverBoxNode1.textContent = (sat.ON);
+          satHoverBoxNode2.textContent = (sat.SCC_NUM);
+          satHoverBoxNode3.innerHTML = (satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '');
+        } else if (isShowDistance) {
+          satHoverBoxNode1.textContent = (sat.ON);
+          satHoverBoxNode2.innerHTML = (sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
+          satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
+                                          'X: ' + sat.velocityX.toFixed(2) + 'km/s Y: ' + sat.velocityY.toFixed(2) + 'km/s Z: ' + sat.velocityZ.toFixed(2)) + 'km/s';
+        } else if (satellite.sensorSelected() && isShowNextPass) {
+          satHoverBoxNode1.textContent = (sat.ON);
+          satHoverBoxNode2.textContent = (sat.SCC_NUM);
+          satHoverBoxNode3.textContent = (satellite.nextpass(sat));
+        } else {
+          satHoverBoxNode1.textContent = (sat.ON);
+          satHoverBoxNode2.textContent = (sat.SCC_NUM);
+          satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
+                                          'X: ' + sat.velocityX.toFixed(2) + ' Y: ' + sat.velocityY.toFixed(2) + ' Z: ' + sat.velocityZ.toFixed(2));
+        }
+      }
+      satHoverBoxDOM.css({
+        display: 'block',
+        'text-align': 'center',
+        position: 'absolute',
+        left: satX + 20,
+        top: satY - 10
+      });
+      canvasDOM.css({cursor: 'pointer'});
     }
   }
   function _onDrawLoopComplete (cb) {
@@ -1304,7 +1313,7 @@ function selectSat (satId) {
     // /////////////////////////////////////////////////////////////////////////
     // RCS Correlation Table
     // /////////////////////////////////////////////////////////////////////////
-    if (sat.R === null) {
+    if (sat.R === null || typeof sat.R == 'undefined') {
       $('#sat-rcs').html('Unknown');
     } else {
       var rcs;
@@ -1341,18 +1350,28 @@ function selectSat (satId) {
       now = new Date(timeManager.propRealTime + timeManager.propOffset);
       var sunTime = SunCalc.getTimes(now, satellite.currentSensor.lat, satellite.currentSensor.long);
       var satInSun = satellite.isInSun(sat);
+      // If No Sensor, then Ignore Sun Exclusion
       if (!satellite.sensorSelected()) {
         if (satInSun == 0) $('#sat-sun').html('No Sunlight');
         if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
         if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
-      } else if (satellite.currentSensor.type !== 'Optical') {
+      // If Radar Selected, then Say the Sun Doesn't Matter
+      } else if ((satellite.currentSensor.type !== 'Optical') && (satellite.currentSensor.type !== 'Observer')) {
         $('#sat-sun').html('No Effect');
+      // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
       } else if (sunTime.dawn.getTime() - now > 0 || sunTime.dusk.getTime() - now < 0) {
         if (satInSun == 0) $('#sat-sun').html('No Sunlight');
         if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
         if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
+      // If Optical Sesnor but Dawn Dusk Can't Be Calculated, then you are at a
+      // high latitude and we need to figure that out
+      } else if ((sunTime.night != 'Invalid Date') && (sunTime.dawn == 'Invalid Date' || sunTime.dusk == 'Invalid Date')) {
+          if (satInSun == 0) $('#sat-sun').html('No Sunlight');
+          if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
+          if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
       } else {
-        $('#sat-sun').html('Sun Exclusion');
+      // Unless you are in sun exclusion
+      $('#sat-sun').html('Sun Exclusion');
       }
     }
 
@@ -1454,17 +1473,47 @@ function debugDrawLine (type, value, color) {
     case 'b':
       color = [0,0,1,1];
       break;
-    case 'p':
+    case 'c':
       color = [0,1,1,1];
+      break;
+    case 'p':
+      color = [1,0,1,1];
       break;
   }
   if (type == 'sat') {
-    var sat = satSet.getSat(value).position;
+    var sat = satSet.getSat(value);
     drawLineList.push(
       {
         'line': new Line(),
+        'sat': sat,
         'ref': [0,0,0],
-        'ref2': [sat.x, sat.y, sat.z],
+        'ref2': [sat.position.x, sat.position.y, sat.position.z],
+        'color': color
+      }
+    );
+  }
+  if (type == 'sat2') {
+    var sat = satSet.getSat(value[0]);
+    drawLineList.push(
+      {
+        'line': new Line(),
+        'sat': sat,
+        'ref': [value[1], value[2], value[3]],
+        'ref2': [sat.position.x, sat.position.y, sat.position.z],
+        'color': color
+      }
+    );
+  }
+  if (type == 'sat3') {
+    var sat = satSet.getSat(value[0]);
+    var sat2 = satSet.getSat(value[1]);
+    drawLineList.push(
+      {
+        'line': new Line(),
+        'sat': sat,
+        'sat2': sat2,
+        'ref': [sat.position.x, sat.position.y, sat.position.z],
+        'ref2': [sat2.position.x, sat2.position.y, sat2.position.z],
         'color': color
       }
     );
@@ -1497,15 +1546,31 @@ function drawLines () {
   if (drawLineList.length == 0) return;
   for (drawLinesI = 0; drawLinesI < drawLineList.length; drawLinesI++) {
     if (typeof drawLineList[drawLinesI].sat != 'undefined') {
+      // At least One Satellite
       drawLineList[drawLinesI].sat = satSet.getSat(drawLineList[drawLinesI].sat.id);
-      drawLineList[drawLinesI].line.set(drawLineList[drawLinesI].ref, [drawLineList[drawLinesI].sat.position.x,drawLineList[drawLinesI].sat.position.y,drawLineList[drawLinesI].sat.position.z]);
+      if (typeof drawLineList[drawLinesI].sat2 != 'undefined') {
+        // Satellite and Static
+        if (typeof drawLineList[drawLinesI].sat2.name != 'undefined'){
+          drawLineList[drawLinesI].sat2 = satSet.getSat(satSet.getIdFromSensorName(drawLineList[drawLinesI].sat2.name));
+          drawLineList[drawLinesI].line.set([drawLineList[drawLinesI].sat.position.x,drawLineList[drawLinesI].sat.position.y,drawLineList[drawLinesI].sat.position.z], [drawLineList[drawLinesI].sat2.position.x,drawLineList[drawLinesI].sat2.position.y,drawLineList[drawLinesI].sat2.position.z]);
+        } else {
+          // Two Satellites
+          drawLineList[drawLinesI].sat2 = satSet.getSat(drawLineList[drawLinesI].sat2.id);
+          drawLineList[drawLinesI].line.set([drawLineList[drawLinesI].sat.position.x,drawLineList[drawLinesI].sat.position.y,drawLineList[drawLinesI].sat.position.z], [drawLineList[drawLinesI].sat2.position.x,drawLineList[drawLinesI].sat2.position.y,drawLineList[drawLinesI].sat2.position.z]);
+        }
+      } else {
+        // Just One Satellite
+        drawLineList[drawLinesI].line.set(drawLineList[drawLinesI].ref, [drawLineList[drawLinesI].sat.position.x,drawLineList[drawLinesI].sat.position.y,drawLineList[drawLinesI].sat.position.z]);
+      }
     } else if ((typeof drawLineList[drawLinesI].star1 != 'undefined') && (typeof drawLineList[drawLinesI].star2 != 'undefined')) {
+      // Constellation
       if (typeof drawLineList[drawLinesI].star1ID == 'undefined') { drawLineList[drawLinesI].star1ID = satSet.getIdFromStarName(drawLineList[drawLinesI].star1); }
       if (typeof drawLineList[drawLinesI].star2ID == 'undefined') { drawLineList[drawLinesI].star2ID = satSet.getIdFromStarName(drawLineList[drawLinesI].star2); }
       tempStar1 = satSet.getSat(drawLineList[drawLinesI].star1ID).position;
       tempStar2 = satSet.getSat(drawLineList[drawLinesI].star2ID).position;
       drawLineList[drawLinesI].line.set([tempStar1.x, tempStar1.y, tempStar1.z], [tempStar2.x, tempStar2.y,tempStar2.z]);
     } else {
+      // Arbitrary Lines
       drawLineList[drawLinesI].line.set(drawLineList[drawLinesI].ref, drawLineList[drawLinesI].ref2);
     }
 

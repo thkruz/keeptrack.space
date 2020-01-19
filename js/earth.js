@@ -339,6 +339,9 @@
     gl.disableVertexAttribArray(gl.pickShaderProgram.aColor);
     gl.enableVertexAttribArray(gl.pickShaderProgram.aPos);
     gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
+
+    // Done Drawing
+    return true;
   };
 
   window.earth = earth;

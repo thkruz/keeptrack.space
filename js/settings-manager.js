@@ -8,8 +8,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.5.1';
-  settingsManager.versionDate = 'January 13, 2020';
+  settingsManager.versionNumber = 'v1.5.2';
+  settingsManager.versionDate = 'January 18, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -246,7 +246,10 @@
   settingsManager.colors.analyst = [1.0, 1.0, 0.0, 1.0];
   settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];
   settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.1];
-  settingsManager.colors.sunlight = [1.0, 1.0, 1.0, 1.0];
+  settingsManager.colors.sunlight100 = [1.0, 1.0, 1.0, 1.0];
+  settingsManager.colors.sunlight80 = [1.0, 1.0, 1.0, 0.8];
+  settingsManager.colors.sunlight60 = [1.0, 1.0, 1.0, 0.6];
+  settingsManager.colors.sunlightInview = [0.85, 0.5, 0.0, 1.0];
   settingsManager.colors.penumbral = [1.0, 1.0, 1.0, 0.3];
   settingsManager.colors.umbral = [1.0, 1.0, 1.0, 0.1];
   // DEBUG Colors

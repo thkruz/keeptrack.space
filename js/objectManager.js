@@ -664,12 +664,14 @@
       }
 
       // Use Extended Sites from Launch Site Manager
-      try {
-          site = launchSiteManager.extractLaunchSite(LS);
-          sitec = site[1];
-          site = site[0];
-      } catch (e) {
-          console.log('Launch Site Module not Loaded');
+      if (typeof site == 'undefined') {
+        try {
+            site = launchSiteManager.extractLaunchSite(LS);
+            sitec = site[1];
+            site = site[0];
+        } catch (e) {
+            console.log('Launch Site Module not Loaded');
+        }
       }
 
     }

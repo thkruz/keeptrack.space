@@ -173,7 +173,7 @@ ul {
 }
 
 .right-btn-menu ul li {
-  padding: 15px;
+  padding: 5px;
   cursor: pointer;
   border-radius: 5px;
 }
@@ -668,6 +668,12 @@ ul li{
 .sat-info-row {
     margin-bottom: 3px;
     height: 18px;
+}
+#sat-site {
+  height: 40px;
+}
+#sat-site-row {
+  height: 40px;
 }
 .sat-info-key, .sat-info-value {
     display: inline-block;

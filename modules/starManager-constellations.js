@@ -1,6 +1,7 @@
 // Requires starManager Module
 
 starManager.isConstellationVisible = false;
+starManager.isAllConstellationVisible = false;
 starManager.findStarsConstellation = function (starName) {
   for (var i = 0; i < starManager.constellations.length; i++) {
     for (var s = 0; s < starManager.constellations[i].stars.length; s++) {
@@ -25,10 +26,12 @@ starManager.drawAllConstellations = function () {
         {
           'line': new Line(),
           'star1': starManager.constellations[i].stars[s][0],
-          'star2': starManager.constellations[i].stars[s][1]
+          'star2': starManager.constellations[i].stars[s][1],
+          'color': [1,1,1,1]
         }
       );
       starManager.isConstellationVisible = true;
+      starManager.isAllConstellationVisible = true;
     }
   }
 };

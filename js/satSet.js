@@ -637,6 +637,7 @@ var satSensorMarkerArray = [];
       settingsManager.shadersReady = true;
       if (satsReadyCallback) {
         satsReadyCallback(satData);
+        satVmagManager.init();
       }
     }
   };
@@ -682,12 +683,16 @@ var satSensorMarkerArray = [];
       if (!settingsManager.isSatOverflyModeOn && !settingsManager.isFOVBubbleModeOn) {
         satSet.satDataLenInDraw -= settingsManager.maxFieldOfViewMarkers;
         for (drawI = 0; drawI < ((satSet.satDataLenInDraw) * 3); drawI++) {
-          satPos[drawI] += satVel[drawI] * drawDt;
+          if (satVel[drawI] != 0) {
+            satPos[drawI] += satVel[drawI] * drawDt;
+          }
         }
       } else {
         satSet.satDataLenInDraw *= 3;
         for (drawI = 0; drawI < (satSet.satDataLenInDraw); drawI++) {
-          satPos[drawI] += satVel[drawI] * drawDt;
+          if (satVel[drawI] != 0) {
+            satPos[drawI] += satVel[drawI] * drawDt;
+          }
         }
       }
       lastDrawTime = drawNow;
@@ -744,6 +749,9 @@ var satSensorMarkerArray = [];
 
     gl.drawArrays(gl.POINTS, 0, satData.length); // draw pick
     // satSet.updateFOV(null, drawNow);
+
+    // Done Drawing
+    return true;
   };
 
   // var uFOVSearchItems;
@@ -791,7 +799,16 @@ var satSensorMarkerArray = [];
     satData[i].constellation = satObject.constellation;
     satData[i].associates = satObject.associates;
     satData[i].maneuver = satObject.maneuver;
+  };
 
+  satSet.vmagUpdate = function (vmagObject) {
+    if (!satData) return null;
+    var i = satSet.getIdFromObjNum(vmagObject.satid);
+    try {
+      satData[i].vmag = vmagObject.vmag;
+    } catch (e) {
+      // console.warn('Old Satellite in vmagManager: ' + vmagObject.satid);
+    }
   };
 
   satSet.setSat = function (i, satObject) {

@@ -46,7 +46,7 @@ var isResetSatOverfly = false;
 var isMultiSensor = false;
 var isIgnoreNonRadar = true;
 var planetariumView = false;
-var isSunlightView = true;
+var isSunlightView = false;
 var isLowPerf = false;
 
 /** OBSERVER VARIABLES */
@@ -76,6 +76,10 @@ onmessage = function (m) {
   }
   if (m.data.nonPlanetariumView){
     planetariumView = false;
+  }
+
+  if (m.data.isSunlightView) {
+    isSunlightView = m.data.isSunlightView;
   }
 
   if (m.data.satelliteSelected){
@@ -234,37 +238,44 @@ onmessage = function (m) {
   }
 };
 
+    var geodeticCoords;
+    var siteXYZ;
+    var sitex, sitey, sitez;
+    var slat, slon, clat, clon;
+    var azRad, elRad;
+    var south, east, zenith;
+    var x, y, z;
+
 function _lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long, obs_alt) {
 
     // site ecef in meters
-    var geodeticCoords = {};
+    geodeticCoords = {};
     geodeticCoords.latitude = obs_lat;
     geodeticCoords.longitude = obs_long;
     geodeticCoords.height = obs_alt;
 
-    var siteXYZ = satellite.geodeticToEcf(geodeticCoords);
-    var sitex, sitey, sitez;
+    siteXYZ = satellite.geodeticToEcf(geodeticCoords);
     sitex = siteXYZ.x;
     sitey = siteXYZ.y;
     sitez = siteXYZ.z;
 
     // some needed calculations
-    var slat = Math.sin(obs_lat);
-    var slon = Math.sin(obs_long);
-    var clat = Math.cos(obs_lat);
-    var clon = Math.cos(obs_long);
+    slat = Math.sin(obs_lat);
+    slon = Math.sin(obs_long);
+    clat = Math.cos(obs_lat);
+    clon = Math.cos(obs_long);
 
-    var azRad = DEG2RAD * azimuthDeg;
-    var elRad = DEG2RAD * elevationDeg;
+    azRad = DEG2RAD * azimuthDeg;
+    elRad = DEG2RAD * elevationDeg;
 
     // az,el,range to sez convertion
-    var south  = -slantRange * Math.cos(elRad) * Math.cos(azRad);
-    var east   =  slantRange * Math.cos(elRad) * Math.sin(azRad);
-    var zenith =  slantRange * Math.sin(elRad);
+    south  = -slantRange * Math.cos(elRad) * Math.cos(azRad);
+    east   =  slantRange * Math.cos(elRad) * Math.sin(azRad);
+    zenith =  slantRange * Math.sin(elRad);
 
-    var x = ( slat * clon * south) + (-slon * east) + (clat * clon * zenith) + sitex;
-    var y = ( slat * slon * south) + ( clon * east) + (clat * slon * zenith) + sitey;
-    var z = (-clat *        south) + ( slat * zenith) + sitez;
+    x = ( slat * clon * south) + (-slon * east) + (clat * clon * zenith) + sitex;
+    y = ( slat * slon * south) + ( clon * east) + (clat * slon * zenith) + sitey;
+    z = (-clat *        south) + ( slat * zenith) + sitez;
 
   return {'x': x, 'y': y, 'z': z};
 }
@@ -297,7 +308,7 @@ function propagateCruncher () {
   var gmst = satellite.gstime(j);
 
   var isSunExclusion = false;
-  if (isSunlightView) {
+  if (isSunlightView && !isMultiSensor) {
     var jdo = new A.JulianDay(j); // now
     var coord = A.EclCoord.fromWgs84(0, 0, 0);
     var coord2 = A.EclCoord.fromWgs84(sensor.observerGd.latitude * RAD2DEG,sensor.observerGd.longitude * RAD2DEG,sensor.observerGd.height);
@@ -318,7 +329,7 @@ function propagateCruncher () {
 
     // RAE to ECI
     sunECI = satellite.ecfToEci(_lookAnglesToEcf(sunAz, sunEl, sunRange, 0, 0, 0), gmst);
-    if ((sensor.observerGd !== defaultGd) && (sensor.type === 'Optical') && (sunElRel > -6)) {
+    if ((sensor.observerGd !== defaultGd) && ((sensor.type === 'Optical') || (sensor.type === 'Observer')) && (sunElRel > -6)) {
       isSunExclusion = true;
     } else {
       isSunExclusion = false;
@@ -355,6 +366,7 @@ function propagateCruncher () {
   var az, el, rng, pos;
   var q;
   var semiDiamEarth, semiDiamSun, theta;
+  var starPosition;
   while (i < len) {
     i++; // At the beginning so i starts at 0
     // totalCrunchTime2 += (stopTime2 - startTime2);
@@ -488,7 +500,7 @@ function propagateCruncher () {
     else if (satCache[i].static && !satCache[i].marker) {
       if (satCache[i].type == 'Star') {
         // INFO: 0 Latitude returns upside down results. Using 180 looks right, but more verification needed.
-        var starPosition = StarCalc.getStarPosition(now, 180, 0, satCache[i]);
+        starPosition = StarCalc.getStarPosition(now, 180, 0, satCache[i]);
         starPosition = _lookAnglesToEcf(starPosition.azimuth * RAD2DEG, starPosition.altitude * RAD2DEG, 200000, 0, 0, 0);
 
         // Reduce Random Jitter by Requiring New Positions to be Similar to Old
@@ -624,6 +636,7 @@ function propagateCruncher () {
           // Ignore Optical and Mechanical Sensors When showing Many
           if (isIgnoreNonRadar) {
             if (mSensor.length > 1 && sensor.type === 'Optical') continue;
+            if (mSensor.length > 1 && sensor.type === 'Observer') continue;
             if (mSensor.length > 1 && sensor.type === 'Mechanical') continue;
           }
 
@@ -1046,7 +1059,7 @@ function propagateCruncher () {
   // satInView = new Float32Array(satCache.length);
 
   // NOTE The longer the delay the more jitter at higher speeds of propagation
-  setTimeout(propagateCruncher, 1 * globalPropagationRate * globalPropagationRateMultiplier / divisor);
+  setTimeout(function () {propagateCruncher();}, 1 * globalPropagationRate * globalPropagationRateMultiplier / divisor);
 
 
   // //////////////////////////////////////////////////////////////////////////
@@ -1129,9 +1142,10 @@ function getSiderealTime(d, lw) {
   return rad * (280.16 + 360.9856235 * d) - lw;
 }
 
+var lw;
 StarCalc.getStarPosition = function (date, lat, lng, c) {
 
-  var lw  = rad * -lng,
+      lw  = rad * -lng,
       phi = rad * lat,
       d   = toDays(date),
 

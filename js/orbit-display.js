@@ -259,6 +259,9 @@
 
     //  gl.depthMask(true);
     gl.disable(gl.BLEND);
+
+    // Done drawing
+    return true;
   };
 
   function allocateBuffer () {

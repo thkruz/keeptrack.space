@@ -174,9 +174,16 @@ var satSensorMarkerArray = [];
 
     satPos = new Float32Array(m.data.satPos);
     satVel = new Float32Array(m.data.satVel);
-    satInView = new Int8Array(m.data.satInView);
-    satInSun = new Int8Array(m.data.satInSun);
-    satSensorMarkerArray = m.data.sensorMarkerArray;
+
+    if (typeof m.data.satInView != 'undefined') {
+      satInView = new Int8Array(m.data.satInView);
+    }
+    if (typeof m.data.satInSun != 'undefined') {
+      satInSun = new Int8Array(m.data.satInSun);
+    }
+    if (typeof m.data.sensorMarkerArray != 'undefined') {
+      satSensorMarkerArray = m.data.sensorMarkerArray;
+    }
 
     if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
       SCnow = Date.now();
@@ -200,7 +207,7 @@ var satSensorMarkerArray = [];
     if (satellite.sensorSelected() || settingsManager.isForceColorScheme) {
       // Don't change colors while dragging
       if (!isDragging) {
-        satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
+        satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
       }
     }
 
@@ -822,11 +829,21 @@ var satSensorMarkerArray = [];
     if (!satData[i]) return null;
     if (gotExtraData) {
       satData[i].inViewChange = false;
-      if (satData[i].inview !== satInView[i]) satData[i].inViewChange = true;
-      satData[i].inview = satInView[i];
-      satData[i].inViewChange = false;
-      if (satData[i].inSun !== satInSun[i]) satData[i].inSunChange = true;
-      satData[i].inSun = satInSun[i];
+      if (typeof  satInView != 'undefined' &&
+          typeof  satInView[i] != 'undefined') {
+        if (satData[i].inview !== satInView[i]) satData[i].inViewChange = true;
+        satData[i].inview = satInView[i];
+      } else {
+        satData[i].inview = false;
+        satData[i].inViewChange = false;
+      }
+
+      if (typeof  satInSun != 'undefined' &&
+          typeof  satInSun[i] != 'undefined') {
+        if(satData[i].inSun !== satInSun[i]) satData[i].inSunChange = true;
+        satData[i].inSun = satInSun[i];
+      }
+
       satData[i].velocity = Math.sqrt(
         satVel[i * 3] * satVel[i * 3] +
         satVel[i * 3 + 1] * satVel[i * 3 + 1] +

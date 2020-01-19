@@ -368,7 +368,7 @@
         };
       }
 
-      if ((sat.inView) && (ColorScheme.objectTypeFlags.red === true)) {
+      if ((sat.inView) && (sat.inSun > 0) && (ColorScheme.objectTypeFlags.orange === true)) {
         if (typeof sat.vmag == 'undefined') {
           return {
             color: colorTheme.umbral,

@@ -15,12 +15,12 @@
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=1.5.2b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=1.5.3b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=1.5.2b" rel="stylesheet">
+    <link href="css/fonts.css?v=1.5.3b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=1.5.2b">
-    <link rel="stylesheet" href="css/materialize-local.css?v=1.5.2b">
+    <link rel="stylesheet" href="css/materialize.css?v=1.5.3b">
+    <link rel="stylesheet" href="css/materialize-local.css?v=1.5.3b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -112,7 +112,10 @@
         <ul class='dropdown-contents'>
           <li class="rmb-menu-item" id="view-rmb">View &#x27A4;</li>
           <li class="rmb-menu-item" id="edit-rmb"><a href="#">Edit &#x27A4;</a></li>
+          <li class="rmb-menu-item" id="draw-rmb"><a href="#">Draw &#x27A4;</a></li>
           <li class="rmb-menu-item" id="create-rmb"><a href="#">Create &#x27A4;</a></li>
+          <li class="rmb-menu-item" id="earth-rmb"><a href="#">Earth &#x27A4;</a></li>
+          <li class="rmb-menu-item" id="colors-rmb"><a href="#">Colors &#x27A4;</a></li>
           <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
           <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
         </ul>
@@ -132,14 +135,34 @@
           <li id="edit-sat-rmb"><a href="#">Edit Satellite</a></li>
         </ul>
       </div>
+      <div id="draw-rmb-menu" class="right-btn-menu">
+        <ul class='dropdown-contents'>
+          <li id="line-eci-axis-rmb"><a href="#">Draw Earth Centered Inertial Axes</a></li>
+          <li id="line-earth-sat-rmb"><a href="#">Draw Line Earth to Satellite</a></li>
+          <li id="line-sensor-sat-rmb"><a href="#">Draw Line Sensor to Satellite</a></li>
+          <li id="line-sat-sun-rmb"><a href="#">Draw Line Satellite to Sun</a></li>
+        </ul>
+      </div>
       <div id="create-rmb-menu" class="right-btn-menu">
         <ul class='dropdown-contents'>
           <li id="create-observer-rmb"><a href="#">Create Observer Here</a></li>
           <li id="create-sensor-rmb"><a href="#">Create Sensor Here</a></li>
-          <li id="line-eci-axis-rmb"><a href="#">Show Earth Cetnered Inertial Axes</a></li>
-          <li id="line-earth-sat-rmb"><a href="#">Draw Line Earth to Satellite</a></li>
-          <li id="line-sensor-sat-rmb"><a href="#">Draw Line Sensor to Satellite</a></li>
-          <li id="line-sat-sun-rmb"><a href="#">Draw Line Satellite to Sun</a></li>
+        </ul>
+      </div>
+      <div id="colors-rmb-menu" class="right-btn-menu">
+        <ul class='dropdown-contents'>
+          <li id="colors-default-rmb"><a href="#">Object Types</a></li>
+          <li id="colors-sunlight-rmb"><a href="#">Sunlight Status</a></li>
+          <li id="colors-country-rmb"><a href="#">Country</a></li>
+        </ul>
+      </div>
+      <div id="earth-rmb-menu" class="right-btn-menu">
+        <ul class='dropdown-contents'>
+          <li id="earth-nasa-rmb"><a href="#">NASA Map</a></li>
+          <li id="earth-low-rmb"><a href="#">Low Resolution Map</a></li>
+          <li id="earth-high-no-clouds-rmb"><a href="#">High Resoultion Map</a></li>
+          <!-- <li id="earth-high-rmb"><a href="#">High Resolution Map Plus Clouds</a></li> -->
+          <li id="earth-vec-rmb"><a href="#">Vector Image Map</a></li>
         </ul>
       </div>
     </div>
@@ -779,11 +802,11 @@
                   </div>
                   <div class="input-field col s6">
                     <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated">
-                    <label for="lookanglesLength">Lookangles Length</label>
+                    <label for="lookanglesLength">Length (Days)</label>
                   </div>
                   <div class="input-field col s6">
                     <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
-                    <label for="lookanglesInterval">Lookangles Interval</label>
+                    <label for="lookanglesInterval">Interval</label>
                   </div>
                   <div class="row"></div>
                   <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
@@ -1283,47 +1306,47 @@
   <script src="js/lib/jquery.min.js"></script>
   <script src="js/lib/materialize.min.js"></script>
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.js?v=1.5.2b"></script>
+  <script src="js/lib/satellite.js?v=1.5.3b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=1.5.2b"></script>
+  <script src="js/lib/shader-loader.min.js?v=1.5.3b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/mapManager.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=1.5.2b"></script>
-  <script src="license/license.js?v=1.5.2b"></script>
+  <script src="js/settings-manager.js?v=1.5.3b"></script>
+  <script src="license/license.js?v=1.5.3b"></script>
   <!-- Offline Only -->
-  <!-- <script src="offline/extra.js?v=1.5.2b"></script> -->
-  <!-- <script src="offline/satInfo.js?v=1.5.2b"></script> -->
-  <!-- <script src="offline/tle.js?v=1.5.2b"></script> -->
-  <script src="modules/sensorManager.js?v=1.5.2b"></script>
-  <script src="modules/launchSiteManager.js?v=1.5.2b"></script>
-  <script src="modules/starManager.js?v=1.5.2b"></script>
-  <script src="modules/starManager-constellations.js?v=1.5.2b"></script>
+  <!-- <script src="offline/extra.js?v=1.5.3b"></script> -->
+  <!-- <script src="offline/satInfo.js?v=1.5.3b"></script> -->
+  <!-- <script src="offline/tle.js?v=1.5.3b"></script> -->
+  <script src="modules/sensorManager.js?v=1.5.3b"></script>
+  <script src="modules/launchSiteManager.js?v=1.5.3b"></script>
+  <script src="modules/starManager.js?v=1.5.3b"></script>
+  <script src="modules/starManager-constellations.js?v=1.5.3b"></script>
 
-  <script src="js/time-manager.js?v=1.5.2b"></script>
-  <script src="js/sun.js?v=1.5.2b"></script>
-  <script src="js/lib/meuusjs.1.0.3.min.js?v=1.5.2b"></script>
-  <script src="js/lib/starcalc.js?v=1.5.2b"></script>
-  <script src="js/earth.js?v=1.5.2b"></script>
-  <script src="js/groups.js?v=1.5.2b"></script>
-  <script src="js/satSet.js?v=1.5.2b"></script>
-  <script src="modules/satVmagManager.js?v=1.5.2b"></script>
+  <script src="js/time-manager.js?v=1.5.3b"></script>
+  <script src="js/sun.js?v=1.5.3b"></script>
+  <script src="js/lib/meuusjs.1.0.3.min.js?v=1.5.3b"></script>
+  <script src="js/lib/starcalc.js?v=1.5.3b"></script>
+  <script src="js/earth.js?v=1.5.3b"></script>
+  <script src="js/groups.js?v=1.5.3b"></script>
+  <script src="js/satSet.js?v=1.5.3b"></script>
+  <script src="modules/satVmagManager.js?v=1.5.3b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/objectManager.js?v=1.5.2b"></script>
+  <script src="js/objectManager.js?v=1.5.3b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=1.5.2b"></script>
+  <script src="js/ballistic-missile.js?v=1.5.3b"></script>
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=1.5.2b"></script>
-  <script src="js/mobile.js?v=1.5.2b"></script>
+  <script src="js/color-scheme.js?v=1.5.3b"></script>
+  <script src="js/mobile.js?v=1.5.3b"></script>
   <script src="js/lib/CanvasRecorder.min.js"></script>
-  <script src="js/ui.js?v=1.5.2b"></script>
-  <script src="js/main.js?v=1.5.2b"></script>
-  <script src="js/lookangles.js?v=1.5.2b"></script>
-  <script src="js/orbit-display.js?v=1.5.2b"></script>
-  <script src="js/drawLoop-shapes.js?v=1.5.2b"></script>
-  <script src="js/search-box.js?v=1.5.2b"></script>
-  <script src="js/vector-to-kepler.js?v=1.5.2b"></script>
+  <script src="js/ui.js?v=1.5.3b"></script>
+  <script src="js/main.js?v=1.5.3b"></script>
+  <script src="js/lookangles.js?v=1.5.3b"></script>
+  <script src="js/orbit-display.js?v=1.5.3b"></script>
+  <script src="js/drawLoop-shapes.js?v=1.5.3b"></script>
+  <script src="js/search-box.js?v=1.5.3b"></script>
+  <script src="js/vector-to-kepler.js?v=1.5.3b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

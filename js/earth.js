@@ -100,12 +100,12 @@
       texLoaded = true;
       onImageLoaded();
     };
-    if (!settingsManager.vectorImages) img.src = 'images/dayearth-4096.jpg';
+    if (settingsManager.nasaImages) img.src = 'images/dayearth-4096.jpg';
+    if (settingsManager.lowresImages) img.src = 'images/no_clouds_4096.jpg';
     if (settingsManager.vectorImages) img.src = 'images/dayearthvector-4096.jpg';
-    if (settingsManager.hiresImages) {
-      setTimeout(function () {
-        imgHiRes.src = 'images/2_earth_16k.jpg';
-      }, 20000);
+    if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) {
+      if (settingsManager.hiresImages) imgHiRes.src = 'images/2_earth_16k.jpg';
+      if (settingsManager.hiresNoCloudsImages) imgHiRes.src = 'images/no_clouds_8k.jpg';
       imgHiRes.onload = function () {
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgHiRes);
@@ -130,13 +130,12 @@
       nightLoaded = true;
       onImageLoaded();
     };
-    if (!settingsManager.vectorImages) nightImg.src = 'images/nightearth-4096.png';
+    if (settingsManager.nasaImages) nightImg.src = 'images/nightearth-4096.png';
+    if (settingsManager.lowresImages) nightImg.src = 'images/nightearth-4096.png';
     if (settingsManager.vectorImages) nightImg.src = 'images/dayearthvector-4096.jpg';
 
-    if (settingsManager.hiresImages) {
-      setTimeout(function () {
-        nightImgHiRes.src = 'images/6_night_16k.jpg';
-      }, 20000);
+    if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) {
+      nightImgHiRes.src = 'images/6_night_16k.jpg';
       nightImgHiRes.onload = function () {
         gl.bindTexture(gl.TEXTURE_2D, nightTexture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImgHiRes);
@@ -227,37 +226,40 @@
     if (!loaded) return;
 
     // var now = new Date();
+    earth.lastTime = earthNow;
     earthNow = timeManager.propTime();
 
     // wall time is not propagation time, so better print it
     // TODO substring causes 12kb memory leak every frame.
-    earth.tDS = earthNow.toJSON();
-    earth.timeTextStr = earth.timeTextStrEmpty;
-    for (earth.iText = 0; earth.iText < 20; earth.iText++) {
-      if (earth.iText < 10) earth.timeTextStr += earth.tDS[earth.iText];
-      if (earth.iText === 10) earth.timeTextStr += ' ';
-      if (earth.iText > 11) earth.timeTextStr += earth.tDS[earth.iText-1];
-    }
-    if (settingsManager.isPropRateChange && !settingsManager.isAlwaysHidePropRate) {
-      if (timeManager.propRate > 1.01 || timeManager.propRate < 0.99) {
-        if (timeManager.propRate < 10) earth.propRateDOM.html('Propagation Speed: ' + timeManager.propRate.toFixed(1) + 'x');
-        if (timeManager.propRate >= 10) earth.propRateDOM.html('Propagation Speed: ' + timeManager.propRate.toFixed(2) + 'x');
-        earth.propRateDOM.show();
-        isPropRateVisible = true;
-      } else {
-        if (isPropRateVisible) {
-          earth.propRateDOM.hide();
-          isPropRateVisible = false;
-        }
+    if (earth.lastTime - earthNow < 300) {
+      earth.tDS = earthNow.toJSON();
+      earth.timeTextStr = earth.timeTextStrEmpty;
+      for (earth.iText = 0; earth.iText < 20; earth.iText++) {
+        if (earth.iText < 10) earth.timeTextStr += earth.tDS[earth.iText];
+        if (earth.iText === 10) earth.timeTextStr += ' ';
+        if (earth.iText > 11) earth.timeTextStr += earth.tDS[earth.iText-1];
       }
-      settingsManager.isPropRateChange = false;
-    }
+      if (settingsManager.isPropRateChange && !settingsManager.isAlwaysHidePropRate) {
+        if (timeManager.propRate > 1.01 || timeManager.propRate < 0.99) {
+          if (timeManager.propRate < 10) earth.propRateDOM.html('Propagation Speed: ' + timeManager.propRate.toFixed(1) + 'x');
+          if (timeManager.propRate >= 10) earth.propRateDOM.html('Propagation Speed: ' + timeManager.propRate.toFixed(2) + 'x');
+          earth.propRateDOM.show();
+          isPropRateVisible = true;
+        } else {
+          if (isPropRateVisible) {
+            earth.propRateDOM.hide();
+            isPropRateVisible = false;
+          }
+        }
+        settingsManager.isPropRateChange = false;
+      }
 
-    if (!createClockDOMOnce) {
-      document.getElementById('datetime-text').innerText = earth.timeTextStr;
-      createClockDOMOnce = true;
-    } else {
-      document.getElementById('datetime-text').childNodes[0].nodeValue = earth.timeTextStr;
+      if (!createClockDOMOnce) {
+        document.getElementById('datetime-text').innerText = earth.timeTextStr;
+        createClockDOMOnce = true;
+      } else {
+        document.getElementById('datetime-text').childNodes[0].nodeValue = earth.timeTextStr;
+      }
     }
 
     // Don't update the time input unless it is currently being viewed.
@@ -299,7 +301,8 @@
       gl.uniform3fv(earthShader.uLightDirection, earth.lightDirection);
     }
     gl.uniform3fv(earthShader.uAmbientLightColor, [0.03, 0.03, 0.03]); // RGB ambient light
-    gl.uniform3fv(earthShader.uDirectionalLightColor, [1, 1, 0.9]); // RGB directional light
+    // No reason to reduce blue light since this is a real image of earth
+    gl.uniform3fv(earthShader.uDirectionalLightColor, [1, 1, 1]); // RGB directional light
 
 
     gl.uniform1i(earthShader.uSampler, 0); // point sampler to TEXTURE0

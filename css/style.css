@@ -670,10 +670,10 @@ ul li{
     height: 18px;
 }
 #sat-site {
-  height: 40px;
+  max-height: 40px;
 }
 #sat-site-row {
-  height: 40px;
+  max-height: 40px;
 }
 .sat-info-key, .sat-info-value {
     display: inline-block;

@@ -49,6 +49,10 @@ var planetariumView = false;
 var isSunlightView = false;
 var isLowPerf = false;
 
+var resetSunlight = false;
+var resetMarker = false;
+var resetInView = false;
+
 /** OBSERVER VARIABLES */
 var sensor = {};
 var mSensor = {};
@@ -80,12 +84,14 @@ onmessage = function (m) {
 
   if (m.data.isSunlightView) {
     isSunlightView = m.data.isSunlightView;
+    if (isSunlightView == false) resetSunlight = true;
   }
 
   if (m.data.satelliteSelected){
     satelliteSelected = m.data.satelliteSelected;
     if (satelliteSelected[0] === -1) {
       isResetSatOverfly = true;
+      if (resetMarker == false) resetMarker = true;
     }
   }
 
@@ -109,16 +115,25 @@ onmessage = function (m) {
   if (m.data.isShowSatOverfly === 'reset') {
     isResetSatOverfly = true;
     isShowSatOverfly = false;
+    if (resetMarker == false) resetMarker = true;
   }
 
   if (m.data.isShowFOVBubble === 'enable') { isShowFOVBubble = true; }
   if (m.data.isShowFOVBubble === 'reset') {
     isResetFOVBubble = true;
     isShowFOVBubble = false;
+    if (resetMarker == false) resetMarker = true;
   }
 
-  if (m.data.isShowSurvFence === 'enable') { isShowSurvFence = true; }
-  if (m.data.isShowSurvFence === 'disable') { isShowSurvFence = false; }
+  if (m.data.isShowSurvFence === 'enable') {
+    isShowSurvFence = true;
+    if (resetMarker == false) resetMarker = true;
+ }
+  if (m.data.isShowSurvFence === 'disable') {
+    isShowSurvFence = false;
+    if (resetMarker == false) resetMarker = true;
+  }
+
   // ////////////////////////////////
 
   if (m.data.multiSensor) {
@@ -126,6 +141,7 @@ onmessage = function (m) {
     mSensor = m.data.sensor;
     sensor = m.data.sensor;
     globalPropagationRate = 2000;
+    if (resetInView == false) resetInView = true;
   } else if (m.data.sensor) {
     sensor = m.data.sensor;
     if (m.data.setlatlong) {
@@ -133,6 +149,7 @@ onmessage = function (m) {
         globalPropagationRate = 1000;
         sensor.observerGd = defaultGd;
         mSensor = {};
+        if (resetInView == false) resetInView = true;
       } else {
         globalPropagationRate = 2000;
         sensor.observerGd = {
@@ -140,6 +157,7 @@ onmessage = function (m) {
           latitude: m.data.sensor.lat * DEG2RAD,
           height: m.data.sensor.obshei * 1 // Convert from string
         };
+        if (resetInView == false) resetInView = true;
       }
     }
     isMultiSensor = false;
@@ -1045,18 +1063,86 @@ function propagateCruncher () {
     len -= fieldOfViewSetLength;
   }
 
-  postMessage({
-    satPos: satPos.buffer,
-    satVel: satVel.buffer,
-    satInView: satInView.buffer,
-    satInSun: satInSun.buffer,
-    sensorMarkerArray: sensorMarkerArray}
-  );
 
-  // OPTIMIZE: 5.8ms
-  // satPos = new Float32Array(satCache.length * 3);
-  // satVel = new Float32Array(satCache.length * 3);
-  // satInView = new Float32Array(satCache.length);
+    postMessage({
+      satPos: satPos.buffer,
+      satVel: satVel.buffer,
+      satInView: satInView.buffer,
+      satInSun: satInSun.buffer,
+      sensorMarkerArray: sensorMarkerArray}
+    );
+
+  // Overhead Seems Very Minimal
+
+  // // If anything changed - send all info
+  // if (resetInView || resetMarker || resetSunlight) {
+  //   postMessage({
+  //     satPos: satPos.buffer,
+  //     satVel: satVel.buffer,
+  //     satInView: satInView.buffer,
+  //     satInSun: satInSun.buffer,
+  //     sensorMarkerArray: sensorMarkerArray}
+  //   );
+  // // If sunlight on, sensor selected and markers in use - send all info
+  // } else if (isSunlightView &&
+  //           (isShowFOVBubble || isShowSurvFence || isShowSatOverfly) &&
+  //           (sensor.observerGd !== defaultGd || isMultiSensor)) {
+  //   postMessage({
+  //     satPos: satPos.buffer,
+  //     satVel: satVel.buffer,
+  //     satInView: satInView.buffer,
+  //     satInSun: satInSun.buffer,
+  //     sensorMarkerArray: sensorMarkerArray}
+  //   );
+  // // If sunlight ON, makers OFF, sensor ON - don't send markers
+  // } else if (isSunlightView &&
+  //           !(isShowFOVBubble || isShowSurvFence || isShowSatOverfly) &&
+  //           (sensor.observerGd !== defaultGd || isMultiSensor)) {
+  //   postMessage({
+  //     satPos: satPos.buffer,
+  //     satVel: satVel.buffer,
+  //     satInView: satInView.buffer,
+  //     satInSun: satInSun.buffer}
+  //   );
+  // } else if (isSunlightView &&
+  //           !(isShowFOVBubble || isShowSurvFence || isShowSatOverfly) &&
+  //           !(sensor.observerGd !== defaultGd || isMultiSensor)) {
+  //   postMessage({
+  //     satPos: satPos.buffer,
+  //     satVel: satVel.buffer,
+  //     satInSun: satInSun.buffer}
+  //   );
+  // } else if (!isSunlightView &&
+  //           !(isShowFOVBubble || isShowSurvFence || isShowSatOverfly) &&
+  //           (sensor.observerGd !== defaultGd || isMultiSensor)) {
+  //   postMessage({
+  //     satPos: satPos.buffer,
+  //     satVel: satVel.buffer,
+  //     satInView: satInView.buffer}
+  //   );
+  // } else if (!isSunlightView &&
+  //           (isShowFOVBubble || isShowSurvFence || isShowSatOverfly) &&
+  //           (sensor.observerGd !== defaultGd || isMultiSensor)) {
+  //   postMessage({
+  //     satPos: satPos.buffer,
+  //     satVel: satVel.buffer,
+  //     satInView: satInView.buffer,
+  //     sensorMarkerArray: sensorMarkerArray}
+  //   );
+  // } else if (!isSunlightView &&
+  //           (isShowFOVBubble || isShowSurvFence || isShowSatOverfly) &&
+  //           !(sensor.observerGd !== defaultGd || isMultiSensor)) {
+  //   postMessage({
+  //     satPos: satPos.buffer,
+  //     satVel: satVel.buffer,
+  //     sensorMarkerArray: sensorMarkerArray}
+  //   );
+  // } else {
+  //    postMessage({
+  //      satPos: satPos.buffer,
+  //      satVel: satVel.buffer}
+  //    );
+  // }
 
   // NOTE The longer the delay the more jitter at higher speeds of propagation
   setTimeout(function () {propagateCruncher();}, 1 * globalPropagationRate * globalPropagationRateMultiplier / divisor);

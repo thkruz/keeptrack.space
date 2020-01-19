@@ -283,7 +283,8 @@ var drawLoopCallback;
     } else if (dt > 50) {
       updateHoverDelayLimit = 10;
     } else {
-      updateHoverDelayLimit = 1;
+      if (updateHoverDelayLimit > 1)
+        --updateHoverDelayLimit;
     }
 
     time = drawNow;
@@ -703,10 +704,17 @@ var drawLoopCallback;
       }
     } else {
       if (!isMouseMoving || isDragging || settingsManager.isMobileModeEnabled) { return; }
-      updateHoverDelay++;
-      if (updateHoverDelay >= updateHoverDelayLimit) updateHoverDelay = 0;
-      if (updateHoverDelay > 0) return;
-      mouseSat = getSatIdFromCoord(mouseX, mouseY);
+
+      // gl.readPixels in getSatIdFromCoord creates a lot of jank
+      // Earlier in the loop we decided how much to throttle updateHover
+      // if we skip it this loop, we want to still drawl the last thing
+      // it was looking at
+
+      if (++updateHoverDelay >= updateHoverDelayLimit) {
+        updateHoverDelay = 0;
+        mouseSat = getSatIdFromCoord(mouseX, mouseY);
+      }
+
       if (mouseSat !== -1) {
         orbitDisplay.setHoverOrbit(mouseSat);
       } else {

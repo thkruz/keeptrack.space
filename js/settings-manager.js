@@ -8,13 +8,19 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.5.2';
-  settingsManager.versionDate = 'January 18, 2020';
+  settingsManager.versionNumber = 'v1.5.3';
+  settingsManager.versionDate = 'January 19, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
   settingsManager.maxMissiles = 500;
   settingsManager.maxAnalystSats = 120;
+
+  settingsManager.nasaImages = false;
+  settingsManager.lowresImages = true;
+  settingsManager.hiresImages = false;
+  settingsManager.hiresNoCloudsImages = false;
+  settingsManager.vectorImages = false;
 
   settingsManager.minimumDrawDt = 0.1; // 20 FPS // 60 FPS = 0.01667;
 

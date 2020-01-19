@@ -700,6 +700,7 @@ $.ajaxSetup({
             settingsManager.hiresImages = false;
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
+            localStorage.setItem("lastMap", 'nasa');
             earth.init();
             break;
           case 'earth-low-rmb':
@@ -708,6 +709,7 @@ $.ajaxSetup({
             settingsManager.hiresImages = false;
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
+            localStorage.setItem("lastMap", 'low');
             earth.init();
             break;
           case 'earth-high-rmb':
@@ -717,6 +719,7 @@ $.ajaxSetup({
               settingsManager.hiresImages = true;
               settingsManager.hiresNoCloudsImages = false;
               settingsManager.vectorImages = false;
+              localStorage.setItem("lastMap", 'high');
               earth.init();
               $('#loading-screen').fadeOut();
             });
@@ -728,6 +731,7 @@ $.ajaxSetup({
               settingsManager.hiresImages = false;
               settingsManager.hiresNoCloudsImages = true;
               settingsManager.vectorImages = false;
+              localStorage.setItem("lastMap", 'high-nc');
               earth.init();
               $('#loading-screen').fadeOut();
             });
@@ -738,6 +742,7 @@ $.ajaxSetup({
             settingsManager.hiresImages = false;
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = true;
+            localStorage.setItem("lastMap", 'vec');
             earth.init();
             break;
           case 'clear-screen-rmb':

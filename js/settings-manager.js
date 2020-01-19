@@ -8,7 +8,7 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.5.3';
+  settingsManager.versionNumber = 'v1.5.4';
   settingsManager.versionDate = 'January 19, 2020';
 
   settingsManager.lowPerf = false;
@@ -17,10 +17,32 @@
   settingsManager.maxAnalystSats = 120;
 
   settingsManager.nasaImages = false;
-  settingsManager.lowresImages = true;
+  settingsManager.lowresImages = false;
   settingsManager.hiresImages = false;
   settingsManager.hiresNoCloudsImages = false;
   settingsManager.vectorImages = false;
+
+  var lastMap = localStorage.getItem("lastMap");
+  switch (lastMap) {
+    case 'nasa':
+      settingsManager.nasaImages = true;
+      break;
+    case 'low':
+      settingsManager.lowresImages = true;
+      break;
+    case 'high':
+      settingsManager.hiresImages = true;
+      break;
+    case 'high-nc':
+      settingsManager.hiresNoCloudsImages = true;
+      break;
+    case 'vec':
+      settingsManager.vectorImages = true;
+      break;
+    default:
+      settingsManager.lowresImages = true;
+      break;
+  }
 
   settingsManager.minimumDrawDt = 0.1; // 20 FPS // 60 FPS = 0.01667;
 

@@ -104,7 +104,7 @@ var maxPinchSize = 1;
     $('#loading-screen').fadeOut();
     $('#spinner').show();
     $('#mobile-start-button').hide();
-    mobile.fullscreenToggle();
+    mobile.fullscreenToggle();    
     settingsManager.isDisableSatHoverBox = true;
   };
 

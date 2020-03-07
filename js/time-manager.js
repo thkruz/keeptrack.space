@@ -167,6 +167,16 @@
     return timeManager.propOffset;
   };
 
+  timeManager.dateToISOLikeButLocal = function(date) {
+    var offsetMs = date.getTimezoneOffset() * 60 * 1000;
+    var msLocal =  date.getTime() - offsetMs;
+    var dateLocal = new Date(msLocal);
+    var iso = dateLocal.toISOString();
+    iso = iso.replace('T', ' ')
+    var isoLocal = iso.slice(0, 19) + " " + dateLocal.toString().slice(25,31);
+    return isoLocal;
+  }
+
   timeManager.localToZulu = function (date) {
     date = timeManager.dateFormat(date, 'isoDateTime', true);
     date = date.split(' ');

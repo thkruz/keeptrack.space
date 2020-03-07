@@ -101,6 +101,7 @@
       onImageLoaded();
     };
     if (settingsManager.nasaImages) img.src = 'images/dayearth-4096.jpg';
+    if (settingsManager.blueImages) img.src = 'images/world_blue-2048.png';
     if (settingsManager.lowresImages) img.src = 'images/no_clouds_4096.jpg';
     if (settingsManager.vectorImages) img.src = 'images/dayearthvector-4096.jpg';
     if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) {
@@ -132,6 +133,7 @@
     };
     if (settingsManager.nasaImages) nightImg.src = 'images/nightearth-4096.png';
     if (settingsManager.lowresImages) nightImg.src = 'images/nightearth-4096.png';
+    if (settingsManager.blueImages) nightImg.src = 'images/nightearth-4096.png';
     if (settingsManager.vectorImages) nightImg.src = 'images/dayearthvector-4096.jpg';
 
     if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) {
@@ -255,10 +257,12 @@
       }
 
       if (!createClockDOMOnce) {
-        document.getElementById('datetime-text').innerText = earth.timeTextStr;
+        document.getElementById('datetime-text').innerText = `${earth.timeTextStr} UTC`;
+        // document.getElementById('datetime-text-local').innerText = `${timeManager.dateToISOLikeButLocal(earthNow)}`;
         createClockDOMOnce = true;
       } else {
-        document.getElementById('datetime-text').childNodes[0].nodeValue = earth.timeTextStr;
+        document.getElementById('datetime-text').childNodes[0].nodeValue = `${earth.timeTextStr} UTC`;
+        // document.getElementById('datetime-text-local').childNodes[0].nodeValue = `${timeManager.dateToISOLikeButLocal(earthNow)}`;
       }
     }
 

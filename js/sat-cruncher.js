@@ -24,7 +24,8 @@ var TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the form
 var DEG2RAD = TAU / 360;          // Used to convert degrees to radians
 var RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
 var RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
-var RADIUS_OF_SUN = 695700;     // Radius of the Sun in kilometers
+var RADIUS_OF_SUN = 695700;       // Radius of the Sun in kilometers
+var STAR_DISTANCE = 200000;        // Artificial Star Distance - Lower numberrReduces webgl depth buffer
 var globalPropagationRate = 1000;
 var globalPropagationRateMultiplier = 1;
 
@@ -519,7 +520,7 @@ function propagateCruncher () {
       if (satCache[i].type == 'Star') {
         // INFO: 0 Latitude returns upside down results. Using 180 looks right, but more verification needed.
         starPosition = StarCalc.getStarPosition(now, 180, 0, satCache[i]);
-        starPosition = _lookAnglesToEcf(starPosition.azimuth * RAD2DEG, starPosition.altitude * RAD2DEG, 200000, 0, 0, 0);
+        starPosition = _lookAnglesToEcf(starPosition.azimuth * RAD2DEG, starPosition.altitude * RAD2DEG, STAR_DISTANCE, 0, 0, 0);
 
         // Reduce Random Jitter by Requiring New Positions to be Similar to Old
         // THIS MIGHT BE A HORRIBLE IDEA
@@ -673,15 +674,19 @@ function propagateCruncher () {
                 az = sensor.obsminaz;
                 for (el = sensor.obsminel; el < sensor.obsmaxel; el+=2) {
                   pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
-                  satCache[i].active = true;
-                  satPos[i * 3] = pos.x;
-                  satPos[i * 3 + 1] = pos.y;
-                  satPos[i * 3 + 2] = pos.z;
+                  try {
+                    satCache[i].active = true;
+                    satPos[i * 3] = pos.x;
+                    satPos[i * 3 + 1] = pos.y;
+                    satPos[i * 3 + 2] = pos.z;
 
-                  satVel[i * 3] = 0;
-                  satVel[i * 3 + 1] = 0;
-                  satVel[i * 3 + 2] = 0;
-                  i++;
+                    satVel[i * 3] = 0;
+                    satVel[i * 3 + 1] = 0;
+                    satVel[i * 3 + 2] = 0;
+                    i++;
+                  } catch (e) {
+                    console.log(e);
+                  }
                 }
               }
 

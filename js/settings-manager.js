@@ -8,8 +8,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.5.4';
-  settingsManager.versionDate = 'January 19, 2020';
+  settingsManager.versionNumber = 'v1.6.1';
+  settingsManager.versionDate = 'March 7, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -17,6 +17,7 @@
   settingsManager.maxAnalystSats = 120;
 
   settingsManager.nasaImages = false;
+  settingsManager.blueImages = false;
   settingsManager.lowresImages = false;
   settingsManager.hiresImages = false;
   settingsManager.hiresNoCloudsImages = false;
@@ -24,6 +25,9 @@
 
   var lastMap = localStorage.getItem("lastMap");
   switch (lastMap) {
+    case 'blue':
+      settingsManager.blueImages = true;
+      break;
     case 'nasa':
       settingsManager.nasaImages = true;
       break;
@@ -265,9 +269,9 @@
                                    [0.6, 0.5, 1.0, 1.0],];
   settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
   settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
-  settingsManager.colors.inviewAlt = [0.2, 0.5, 1.0, 0.85];
+  settingsManager.colors.inviewAlt = [0.2, 0.4, 1.0, 1];
   settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
-  settingsManager.colors.rocket = [0.2, 0.5, 1.0, 0.85];
+  settingsManager.colors.rocket = [0.2, 0.4, 1.0, 1];
   settingsManager.colors.debris = [0.5, 0.5, 0.5, 0.85];
   settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
   settingsManager.colors.missile = [1.0, 1.0, 0.0, 1.0];
@@ -281,7 +285,7 @@
   settingsManager.colors.penumbral = [1.0, 1.0, 1.0, 0.3];
   settingsManager.colors.umbral = [1.0, 1.0, 1.0, 0.1];
   // DEBUG Colors
-  // settingsManager.colors.sunlight = [0.2, 0.5, 1.0, 0.85];;
+  // settingsManager.colors.sunlight = [0.2, 0.4, 1.0, 1];;
   // settingsManager.colors.penumbral = [0.5, 0.5, 0.5, 0.85];
   // settingsManager.colors.umbral = [0.2, 1.0, 0.0, 0.5];
   //
@@ -291,7 +295,7 @@
   // settingsManager.colors.velGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
   settingsManager.colors.smallSats = [0.2, 1.0, 0.0, 0.65];
   settingsManager.colors.smallRCS = [1.0, 0, 0, 0.6];
-  settingsManager.colors.mediumRCS = [0.2, 0.5, 1.0, 0.85];
+  settingsManager.colors.mediumRCS = [0.2, 0.4, 1.0, 1];
   settingsManager.colors.largeRCS = [0, 1.0, 0, 0.6];
   settingsManager.colors.unknownRCS = [1.0, 1.0, 0, 0.6];
   settingsManager.colors.lostobjects = [0.2, 1.0, 0.0, 0.65];
@@ -299,7 +303,7 @@
   settingsManager.colors.geo = [0.2, 1.0, 0.0, 0.65];
   settingsManager.colors.inGroup = [0.2, 1.0, 0.0, 0.5];
   settingsManager.colors.china = [1.0, 0, 0, 0.6];
-  settingsManager.colors.usa = [0.2, 0.5, 1.0, 0.85];
+  settingsManager.colors.usa = [0.2, 0.4, 1.0, 1];
   settingsManager.colors.russia = [1.0, 1.0, 1.0, 1.0];
   settingsManager.colors.otherCountries = [0, 1.0, 0, 0.6];
 
@@ -307,10 +311,12 @@
   // Orbit Color Settings
   // /////////////////
   settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 1.0];
-  settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0];
+  settingsManager.orbitHoverColor = [1.0, 0.0, 0.0, 1.0];
+  // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0];
   settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.6]; // WHITE
   // settingsManager.orbitInViewColor = [1.0, 1.0, 0.0, 1.0]; // Applies to Planetarium View
-  settingsManager.orbitGroupColor = [0.3, 0.5, 1.0, 0.4];
+  //settingsManager.orbitGroupColor = [0.3, 0.5, 1.0, 0.4];
+  settingsManager.orbitGroupColor = [1.0, 1.0, 0, 0.4];
 
 
   window.settingsManager = settingsManager;

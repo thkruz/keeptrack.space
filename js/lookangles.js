@@ -75,12 +75,14 @@ or mirrored at any other location without the express written permission of the 
     epochYear = parseInt(epochYear.toString().substr(2, 2));
     var epochDay = pad(timeManager.getDayOfYear(currentDate), 3);
     var timeOfDay = ((currentDate.getUTCHours() * 60) + currentDate.getUTCMinutes()) / 1440;
+    epochDay = (epochDay + timeOfDay).toFixed(8);
+    epochDay = pad(epochDay,12);
 
     function pad (str, max) {
       return str.length < max ? pad('0' + str, max) : str;
     }
 
-    return [epochYear, (epochDay + timeOfDay).toFixed(8)];
+    return [epochYear, epochDay];
   };
 
   satellite.distance = function (hoverSat, selectedSat) {
@@ -165,12 +167,10 @@ or mirrored at any other location without the express written permission of the 
     var futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
     var futLat = satellite.getTEARR(sat, undefined, futureTime).lat;
 
-    console.log(sat);
-    console.log('Now: ' + timeManager.propTime() + ' --- Fut: ' + futureTime);
-    console.log('Now: ' + nowLat + ' --- Fut: ' + futLat);
     nowLat *= RAD2DEG;
     futLat *= RAD2DEG;
-    console.log('Now: ' + nowLat + ' --- Fut: ' + futLat);
+    // console.log('Now: ' + timeManager.propTime() + ' --- Fut: ' + futureTime);
+    // console.log('Now: ' + nowLat + ' --- Fut: ' + futLat);
 
     if (nowLat < futLat) return 'N';
     if (nowLat > futLat) return 'S';
@@ -205,6 +205,18 @@ or mirrored at any other location without the express written permission of the 
         };
       } catch (e) {
         throw 'observerGd is not set and could not be guessed.';
+      }
+      // If it didn't work, try again
+      if (typeof sensor.observerGd.longitude == 'undefined') {
+        try {
+          sensor.observerGd = {
+            height: sensor.alt,
+            latitude: sensor.lat * DEG2RAD,
+            longitude: sensor.lon * DEG2RAD
+          };
+        } catch (e) {
+          throw 'observerGd is not set and could not be guessed.';
+        }
       }
     }
 
@@ -633,7 +645,11 @@ or mirrored at any other location without the express written permission of the 
       if (meanACalcResults === 5) {
         i += (10 * 10); // Change meanA faster
       }
-      if (meanACalcResults === 2) { return ['Error', '']; }
+    }
+    console.log(`meanACalcResults: ${meanACalcResults} - ${meanAiValue}`);
+    if (meanACalcResults === 2) {
+      console.warn(`meanACalcResults failed after trying all combinations!`);
+      return ['Error', ''];
     }
 
     // Don't Bother Unless Specifically Requested
@@ -654,6 +670,8 @@ or mirrored at any other location without the express written permission of the 
           } else {
             // console.log('Found Wrong Lat');
           }
+        } else {
+          console.log('Failed Arg of Per Calc');
         }
         if (argPerCalcResults === 5) {
           i += (5 * 10); // Change ArgPer faster
@@ -911,12 +929,16 @@ or mirrored at any other location without the express written permission of the 
 
       var m = (j - satrec.jdsatepoch) * minutesPerDay;
       var positionEci = satellite.sgp4(satrec, m);
+      if (typeof positionEci == 'undefined') {
+        console.log(satrec);
+      }
 
       var gpos, lat, lon, alt;
 
       try {
         gpos = satellite.eciToGeodetic(positionEci.position, gmst);
       } catch (err) {
+        console.warn(err);
         return 2;
       }
 

@@ -4,7 +4,7 @@
   var sensorList = {};
 
   sensorList.COD = {
-    name: 'Cape Cod AFS, MA',
+    name: 'Cape Cod AFS, Massachusetts',
     googleName: 'Cape Cod',
     shortName: 'COD',
     type: 'Phased Array Radar',
@@ -19,6 +19,8 @@
     obsmaxrange: 5555,
     changeObjectInterval: 1000,
     staticNum: 1,
+    linkAEHF: true,
+    linkWGS: true,
     zoom: 'leo',
     url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
     country: 'United States',
@@ -26,7 +28,7 @@
     volume: false
   };
   sensorList.BLE = {
-    name: 'Beale AFB, CA',
+    name: 'Beale AFB, California',
     googleName: 'Beale',
     shortName: 'BLE',
     type: 'Phased Array Radar',
@@ -41,13 +43,15 @@
     obsmaxrange: 5555,
     changeObjectInterval: 1000,
     staticNum: 0,
+    linkAEHF: true,
+    linkWGS: true,
     zoom: 'leo',
     country: 'United States',
     sun: 'No Impact',
     volume: false
   };
   sensorList.CLR = {
-    name: 'Clear AFS, AK',
+    name: 'Clear AFS, Alaska',
     googleName: 'Clear',
     shortName: 'CLR',
     type: 'Phased Array Radar',
@@ -62,13 +66,15 @@
     obsmaxrange: 4910,
     changeObjectInterval: 1000,
     staticNum: 2,
+    linkAEHF: true,
+    linkWGS: true,
     zoom: 'leo',
     country: 'United States',
     sun: 'No Impact',
     volume: false
   };
   sensorList.EGL = {
-    name: 'Eglin AFB, FL',
+    name: 'Eglin AFB, Florida',
     googleName: 'Eglin',
     shortName: 'EGL',
     type: 'Phased Array Radar',
@@ -90,7 +96,7 @@
     volume: false
   };
   sensorList.FYL = {
-    name: 'RAF Fylingdales, UK',
+    name: 'RAF Fylingdales, United Kingdom',
     googleName: 'Fylingdales',
     shortName: 'FYL',
     type: 'Phased Array Radar',
@@ -105,13 +111,15 @@
     obsmaxrange: 4820,
     changeObjectInterval: 1000,
     staticNum: 4,
+    linkAEHF: true,
+    linkWGS: true,
     zoom: 'leo',
     country: 'United Kingdom',
     sun: 'No Impact',
     volume: false
   };
   sensorList.CAV = {
-    name: 'Cavalier AFS, ND',
+    name: 'Cavalier AFS, North Dakota',
     googleName: 'Cavalier',
     shortName: 'CAV',
     type: 'Phased Array Radar',
@@ -126,6 +134,7 @@
     obsmaxrange: 3300, // TODO: Double check this
     changeObjectInterval: 1000,
     staticNum: 5,
+    linkAEHF: true,
     zoom: 'leo',
     url: 'https://mostlymissiledefense.com/2012/04/12/parcs-cavalier-radar-april-12-2012/',
     country: 'United States',
@@ -133,7 +142,7 @@
     volume: true
   };
   sensorList.THL = {
-    name: 'Thule AFB, GL',
+    name: 'Thule AFB, Greenland',
     googleName: 'Thule',
     shortName: 'THL',
     type: 'Phased Array Radar',
@@ -148,6 +157,8 @@
     obsmaxrange: 5555,
     changeObjectInterval: 1000,
     staticNum: 6,
+    linkAEHF: true,
+    linkWGS: true,
     zoom: 'leo',
     url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
     country: 'United States',
@@ -155,7 +166,7 @@
     volume: false
   };
   sensorList.CDN = {
-    name: 'Cobra Dane, AK',
+    name: 'Cobra Dane, Alaska',
     googleName: 'Cobra Dane',
     shortName: 'CDN',
     type: 'Phased Array Radar',
@@ -176,6 +187,7 @@
     obsmaxrange2: 4200,
     changeObjectInterval: 1000,
     staticNum: 7,
+    linkWGS: true,
     zoom: 'leo',
     url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
     country: 'United States',
@@ -183,7 +195,7 @@
     volume: true
   };
   sensorList.ALT = {
-    name: 'ALTAIR, Kwaj',
+    name: 'ALTAIR, Kwajalein Atoll',
     googleName: 'ALTAIR',
     shortName: 'ALT',
     type: 'Mechanical',
@@ -198,6 +210,8 @@
     obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 8,
+    linkAEHF: true,
+    linkWGS: true,
     zoom: 'geo',
     url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte005.en.html',
     country: 'United States',
@@ -205,7 +219,7 @@
     volume: false
   };
   sensorList.MIL = {
-    name: 'Millstone, MA',
+    name: 'Millstone, Massachusetts',
     googleName: 'Millstone',
     shortName: 'MIL',
     type: 'Mechanical',
@@ -238,7 +252,7 @@
     obsmaxaz: 360,
     obsminel: 20,
     obsmaxel: 90,
-    obsminrange: 20000,
+    obsminrange: 0,
     obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 10,
@@ -249,7 +263,7 @@
     volume: false
   };
   sensorList.MAU = {
-    name: 'Maui, HI',
+    name: 'Maui, Hawaii',
     googleName: 'Maui',
     shortName: 'MAU',
     type: 'Optical',
@@ -260,7 +274,7 @@
     obsmaxaz: 360,
     obsminel: 20,
     obsmaxel: 90,
-    obsminrange: 20000,
+    obsminrange: 0,
     obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 11,
@@ -271,7 +285,7 @@
     volume: false
   };
   sensorList.SOC = {
-    name: 'Socorro, NM',
+    name: 'Socorro, New Mexico',
     googleName: 'Socorro',
     shortName: 'SOC',
     type: 'Optical',
@@ -282,7 +296,7 @@
     obsmaxaz: 360,
     obsminel: 20,
     obsmaxel: 90,
-    obsminrange: 20000,
+    obsminrange: 0,
     obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 12,
@@ -293,7 +307,7 @@
     volume: false
   };
   sensorList.ASC = {
-    name: 'Ascension',
+    name: 'Ascension Island, United Kingdom',
     googleName: 'Ascension',
     shortName: 'ASC',
     type: 'Mechanical',
@@ -337,7 +351,7 @@
     volume: false
   };
   sensorList.HOL = {
-    name: 'C-Band (Holt) Radar, AUS',
+    name: 'C-Band (Holt) Radar, Australia',
     googleName: 'C-Band (Holt) Radar',
     shortName: 'HOL',
     type: 'Mechanical',
@@ -358,11 +372,237 @@
     sun: 'No Impact',
     volume: false
   };
+
+  // //////////////
+  // TPY-2 RADARS
+  // //////////////
+
+  sensorList.HAR = {
+    name: 'Har Keren TPY-2, Israel',
+    googleName: 'Har Keren',
+    shortName: 'HAR',
+    type: 'Phased Array Radar',
+    lat: 30.995807,
+    long: 34.496062,
+    obshei: 0.173,
+    obsminaz: 5,
+    obsmaxaz: 125,
+    obsminel: 5,
+    obsmaxel: 95,
+    obsminrange: 0,
+    obsmaxrange: 2000,
+    changeObjectInterval: 1000,
+    staticNum: 51,
+    zoom: 'leo',
+    url: '',
+    country: 'Israel',
+    sun: 'No Impact',
+    volume: false
+  };
+  sensorList.QTR = {
+    name: 'Centcom TPY-2, Qatar',
+    googleName: 'Centcom',
+    shortName: 'QTR',
+    type: 'Phased Array Radar',
+    lat: 25.315980,
+    long: 51.146515,
+    obshei: 0.01,
+    obsminaz: 335,
+    obsmaxaz: 95,
+    obsminel: 0,
+    obsmaxel: 90,
+    obsminrange: 0,
+    obsmaxrange: 2000,
+    changeObjectInterval: 1000,
+    staticNum: 50,
+    zoom: 'leo',
+    url: '',
+    country: 'United States',
+    sun: 'No Impact',
+    volume: false
+  };
+  sensorList.KUR = {
+    name: 'Kürecik Radar Station, Turkey',
+    googleName: 'Kürecik Radar Station',
+    shortName: 'KUR',
+    type: 'Phased Array Radar',
+    lat: 38.349444,
+    long: 37.793611,
+    obshei: 1.969,
+    obsminaz: 40,
+    obsmaxaz: 160,
+    obsminel: 0,
+    obsmaxel: 90,
+    obsminrange: 0,
+    obsmaxrange: 2000,
+    changeObjectInterval: 1000,
+    staticNum: 52,
+    zoom: 'leo',
+    url: '',
+    country: 'United States',
+    sun: 'No Impact',
+    volume: false
+  };
+
+  sensorList.SHA = {
+    name: 'Shariki Communication Site, Japan',
+    googleName: 'Shariki Communication Site',
+    shortName: 'SHA',
+    type: 'Phased Array Radar',
+    lat: 40.888090,
+    long: 140.337698,
+    obshei: 0.010,
+    obsminaz: 230,
+    obsmaxaz: 350,
+    obsminel: 0,
+    obsmaxel: 90,
+    obsminrange: 0,
+    obsmaxrange: 2000,
+    changeObjectInterval: 1000,
+    staticNum: 53,
+    zoom: 'leo',
+    url: '',
+    country: 'United States',
+    sun: 'No Impact',
+    volume: false
+  };
+
+  sensorList.KCS = {
+    name: 'Kyogamisaki Communication Site, Japan',
+    googleName: 'Kyogamisaki Communication Site',
+    shortName: 'KCS',
+    type: 'Phased Array Radar',
+    lat: 35.766667,
+    long: 135.195278,
+    obshei: 0.010,
+    obsminaz: 210,
+    obsmaxaz: 330,
+    obsminel: 0,
+    obsmaxel: 90,
+    obsminrange: 0,
+    obsmaxrange: 2000,
+    changeObjectInterval: 1000,
+    staticNum: 54,
+    zoom: 'leo',
+    url: '',
+    country: 'United States',
+    sun: 'No Impact',
+    volume: false
+  };
+
+  sensorList.SBX = {
+    name: 'Sea-Based X-Band Radar, Pacific Ocean',
+    googleName: 'Sea-Based X-Band Radar',
+    shortName: 'SBX',
+    type: 'Phased Array Radar',
+    lat: 36.5012,
+    long: 169.6941,
+    obshei: 0.000,
+    obsminaz: 275,
+    obsmaxaz: 300,
+    obsminel: 0,
+    obsmaxel: 90,
+    obsminrange: 0,
+    obsmaxrange: 4025,
+    changeObjectInterval: 1000,
+    staticNum: 55,
+    zoom: 'leo',
+    url: '',
+    country: 'United States',
+    sun: 'No Impact',
+    volume: false
+  };
+
+  // //////////////////////
+  // LEO LABS
+  // //////////////////////
+
+  sensorList.MSR = {
+    name: 'Midland Space Radar, Texas',
+    googleName: 'Midland Space Radar',
+    shortName: 'MSR',
+    type: 'Phased Array Radar',
+    lat: 31.9643,
+    long: -103.233245,
+    obshei: 0.855,
+    obsminaz: 70,
+    obsmaxaz: 72,
+    obsminel: 30,
+    obsmaxel: 91, // 91 to ensure visual overlap
+    obsminrange: 100,
+    obsmaxrange: 1800,
+    obsminaz2: 250,
+    obsmaxaz2: 252,
+    obsminel2: 30,
+    obsmaxel2: 91, // 91 to ensure visual overlap
+    obsminrange2: 100,
+    obsmaxrange2: 1800,
+    changeObjectInterval: 1000,
+    staticNum: 38,
+    zoom: 'leo',
+    url: 'https://platform.leolabs.space/sites/msr',
+    country: 'United States',
+    sun: 'No Impact',
+    volume: false
+  };
+
+  sensorList.PFISR = {
+    name: 'Poker Flat Incoherent Scatter Radar, Alaska',
+    googleName: 'Poker Flat Incoherent Scatter Radar',
+    shortName: 'PFISR',
+    type: 'Phased Array Radar',
+    lat: 65.130029,
+    long: -147.470992,
+    obshei: 0.230,
+    obsminaz: 0,
+    obsmaxaz: 360,
+    obsminel: 45,
+    obsmaxel: 90, // 91 to ensure visual overlap
+    obsminrange: 100,
+    obsmaxrange: 1800,
+    changeObjectInterval: 1000,
+    staticNum: 39,
+    zoom: 'leo',
+    url: 'https://platform.leolabs.space/sites/pfisr',
+    country: 'United States',
+    sun: 'No Impact',
+    volume: false
+  };
+
+  sensorList.KSR = {
+    name: 'Kiwi Space Radar, New Zealand',
+    googleName: 'Kiwi Space Radar',
+    shortName: 'KSR',
+    type: 'Phased Array Radar',
+    lat: -45.038725,
+    long: 170.095673,
+    obshei: 0.0,
+    obsminaz: 269,
+    obsmaxaz: 271,
+    obsminel: 20,
+    obsmaxel: 91,
+    obsminrange: 100,
+    obsmaxrange: 1800,
+    obsminaz2: 89,
+    obsmaxaz2: 91,
+    obsminel2: 20,
+    obsmaxel2: 91,
+    obsminrange2: 100,
+    obsmaxrange2: 1800,
+    changeObjectInterval: 1000,
+    staticNum: 40,
+    zoom: 'leo',
+    url: 'https://platform.leolabs.space/sites/ksr',
+    country: 'United States',
+    sun: 'No Impact',
+    volume: false
+  };
+
   // //////////////////////
   // ESOC RADARS
   // //////////////////////
   sensorList.GRV = {
-    name: 'Grand Réseau Adapté à la Veille Spatiale, FRA',
+    name: 'Grand Réseau Adapté à la Veille Spatiale, France',
     googleName: 'GRAVES',
     shortName: 'GRV',
     type: 'Phased Array',
@@ -384,7 +624,7 @@
     volume: true
   };
   sensorList.TIR = {
-    name: 'Tracking and Imaging Radar, GER',
+    name: 'Tracking and Imaging Radar, Germany',
     googleName: 'TIRA',
     shortName: 'TIR',
     type: 'Mechanical',
@@ -406,7 +646,7 @@
     volume: false
   };
   sensorList.NRC = {
-    name: 'Croce del Nord, ITA',
+    name: 'Croce del Nord, Italy',
     googleName: 'Northern Cross',
     shortName: 'NRC',
     type: 'Bistatic Radio Telescope',
@@ -434,7 +674,7 @@
     volume: false
   };
   sensorList.TRO = {
-    name: 'RAF Troodos, UK',
+    name: 'RAF Troodos, United Kingdom',
     googleName: 'RAF Troodos',
     shortName: 'TRO',
     type: 'Optical',
@@ -445,7 +685,7 @@
     obsmaxaz: 360,
     obsminel: 10,
     obsmaxel: 90,
-    obsminrange: 25000,
+    obsminrange: 0,
     obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 27,
@@ -456,7 +696,7 @@
     volume: false
   };
   sensorList.SDT = {
-    name: 'ESA Space Debris Telescope, ESP',
+    name: 'ESA Space Debris Telescope, Spain',
     googleName: 'ESA Space Debris Telescope',
     shortName: 'SDT',
     type: 'Optical',
@@ -467,7 +707,7 @@
     obsmaxaz: 360,
     obsminel: 10,
     obsmaxel: 90,
-    obsminrange: 25000,
+    obsminrange: 0,
     obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 28,
@@ -482,7 +722,7 @@
   // RUSSIAN RADARS
   // //////////////////////
   sensorList.ARM = {
-    name: 'Armavir, RUS',
+    name: 'Armavir, Russia',
     googleName: 'Armavir',
     shortName: 'ARM',
     type: 'Phased Array Radar',
@@ -503,7 +743,7 @@
     volume: false
   };
   sensorList.BAL = {
-    name: 'Balkhash, RUS',
+    name: 'Balkhash, Russia',
     googleName: 'Balkhash',
     shortName: 'BAL',
     type: 'Phased Array Radar',
@@ -524,7 +764,7 @@
     volume: false
   };
   sensorList.GAN = {
-    name: 'Gantsevichi, RUS',
+    name: 'Gantsevichi, Russia',
     googleName: 'Gantsevichi',
     shortName: 'GAN',
     type: 'Phased Array Radar',
@@ -545,7 +785,7 @@
     volume: false
   };
   sensorList.LEK = {
-    name: 'Lekhtusi, RUS',
+    name: 'Lekhtusi, Russia',
     googleName: 'Lekhtusi',
     shortName: 'LEK',
     type: 'Phased Array Radar',
@@ -566,7 +806,7 @@
     volume: false
   };
   sensorList.MIS = {
-    name: 'Mishelevka-D',
+    name: 'Mishelevka-D, Russia',
     googleName: 'Mishelevka',
     shortName: 'MIS',
     type: 'Phased Array Radar',
@@ -587,7 +827,7 @@
     volume: false
   };
   sensorList.OLE = {
-    name: 'Olenegorsk',
+    name: 'Olenegorsk, Russia',
     googleName: 'Olenegorsk',
     shortName: 'OLE',
     type: 'Phased Array Radar',
@@ -608,7 +848,7 @@
     volume: false
   };
   sensorList.PEC = {
-    name: 'Pechora',
+    name: 'Pechora, Russia',
     googleName: 'Pechora',
     shortName: 'PEC',
     type: 'Phased Array Radar',
@@ -629,7 +869,7 @@
     volume: false
   };
   sensorList.PIO = {
-    name: 'Pionersky',
+    name: 'Pionersky, Russia',
     googleName: 'Pionersky',
     shortName: 'PIO',
     type: 'Phased Array Radar',
@@ -650,7 +890,7 @@
     volume: false
   };
   sensorList.XUA = {
-    name: 'Xuanhua, PRC',
+    name: 'Xuanhua, China',
     googleName: 'Xuanhua',
     shortName: 'XUA',
     type: 'Phased Array Radar',
@@ -673,7 +913,7 @@
 
   // Telescopes
   sensorList.MLS = {
-    name: 'Mount Lemmon Survey, AZ',
+    name: 'Mount Lemmon Survey, Arizona',
     googleName: 'Mount Lemmon Survey',
     shortName: 'MLS',
     type: 'Optical',
@@ -684,7 +924,7 @@
     obsmaxaz: 360,
     obsminel: 10,
     obsmaxel: 90,
-    obsminrange: 25000,
+    obsminrange: 0,
     obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 30,
@@ -695,7 +935,7 @@
   };
 
   sensorList.PMO = {
-    name: 'Purple Mountain Observatory, PRC',
+    name: 'Purple Mountain Observatory, China',
     googleName: 'Purple Mountain Observatory',
     shortName: 'PMO',
     type: 'Optical',
@@ -706,7 +946,7 @@
     obsmaxaz: 360,
     obsminel: 10,
     obsmaxel: 90,
-    obsminrange: 25000,
+    obsminrange: 0,
     obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 33,
@@ -717,7 +957,7 @@
   };
 
   sensorList.PO = {
-    name: 'Palomar Observatory, CA',
+    name: 'Palomar Observatory, California',
     googleName: 'Palomar Observatory',
     shortName: 'PO',
     type: 'Optical',
@@ -728,7 +968,7 @@
     obsmaxaz: 360,
     obsminel: 10,
     obsmaxel: 90,
-    obsminrange: 25000,
+    obsminrange: 0,
     obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 34,
@@ -739,7 +979,7 @@
   };
 
   sensorList.LSO = {
-    name: 'La Sagra Observatory, ESP',
+    name: 'La Sagra Observatory, Spain',
     googleName: 'La Sagra Observatory',
     shortName: 'LSO',
     type: 'Optical',
@@ -750,7 +990,7 @@
     obsmaxaz: 360,
     obsminel: 10,
     obsmaxel: 90,
-    obsminrange: 25000,
+    obsminrange: 0,
     obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 35,
@@ -762,7 +1002,7 @@
 
   // ISON Sensors
   sensorList.MAY = {
-    name: 'Mayhill, NM',
+    name: 'Mayhill, New Mexico',
     googleName: 'Mayhill',
     shortName: 'MAY',
     type: 'Optical',
@@ -773,7 +1013,7 @@
     obsmaxaz: 360,
     obsminel: 10,
     obsmaxel: 90,
-    obsminrange: 25000,
+    obsminrange: 0,
     obsmaxrange: 200000,
     changeObjectInterval: 20000,
     staticNum: 29,
@@ -817,7 +1057,7 @@
       satellite.setobs(sensorManager.sensorList.COD);
       satellite.getsensorinfo();
       selectSat(-1);
-      setTimeout(satSet.setColorScheme, 1500, ColorScheme.default, true);
+      setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else if (selectedSensor === 'NATO-MW') {
       var natoMWSensors = [];
       natoMWSensors.push(sensorManager.sensorList.BLE);
@@ -836,7 +1076,7 @@
       satellite.setobs(sensorManager.sensorList.COD);
       satellite.getsensorinfo();
       selectSat(-1);
-      setTimeout(satSet.setColorScheme, 1500, ColorScheme.default, true);
+      setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else if (selectedSensor === 'RUS-ALL') {
       var rusSensors = [];
       rusSensors.push(sensorManager.sensorList.ARM);
@@ -857,7 +1097,47 @@
       satellite.setobs(sensorManager.sensorList.ARM);
       satellite.getsensorinfo();
       selectSat(-1);
-      setTimeout(satSet.setColorScheme, 1500, ColorScheme.default, true);
+      setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+    } else if (selectedSensor === 'LEO-LABS') {
+      var leolabsSensors = [];
+      leolabsSensors.push(sensorManager.sensorList.MSR);
+      leolabsSensors.push(sensorManager.sensorList.PFISR);
+      leolabsSensors.push(sensorManager.sensorList.KSR);
+      satCruncher.postMessage({
+        typ: 'offset',
+        dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
+        setlatlong: true,
+        sensor: leolabsSensors,
+        multiSensor: true
+      });
+      satellite.setobs(sensorManager.sensorList.MSR);
+      satellite.getsensorinfo();
+      selectSat(-1);
+      setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+    } else if (selectedSensor === 'MD-ALL') {
+      var mdSensors = [];
+      mdSensors.push(sensorManager.sensorList.COD);
+      mdSensors.push(sensorManager.sensorList.BLE);
+      mdSensors.push(sensorManager.sensorList.CLR);
+      mdSensors.push(sensorManager.sensorList.FYL);
+      mdSensors.push(sensorManager.sensorList.THL);
+      mdSensors.push(sensorManager.sensorList.HAR);
+      mdSensors.push(sensorManager.sensorList.QTR);
+      mdSensors.push(sensorManager.sensorList.KUR);
+      mdSensors.push(sensorManager.sensorList.SHA);
+      mdSensors.push(sensorManager.sensorList.KCS);
+      mdSensors.push(sensorManager.sensorList.SBX);
+      satCruncher.postMessage({
+        typ: 'offset',
+        dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString(),
+        setlatlong: true,
+        sensor: mdSensors,
+        multiSensor: true
+      });
+      satellite.setobs(sensorManager.sensorList.MSR);
+      satellite.getsensorinfo();
+      selectSat(-1);
+      setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else {
       for (sensor in sensorList) {
         if (sensorList[sensor] === selectedSensor || (sensorList[sensor].staticNum === staticNum && typeof staticNum != 'undefined')) {

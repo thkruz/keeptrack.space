@@ -112,14 +112,14 @@
   var sat, color;
   ColorScheme.init = function () {
     ColorScheme.default = new ColorScheme(function (sat) {
-      if (sat.static && sat.type === 'Launch Facility' && ColorScheme.objectTypeFlags.purple === false) {
+      if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility') && ColorScheme.objectTypeFlags.purple === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
 
-      if (sat.static && sat.type === 'Launch Facility') {
+      if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
         return {
           color: colorTheme.facility,
           pickable: true
@@ -285,14 +285,14 @@
       }
     });
     ColorScheme.sunlight = new ColorScheme(function (sat) {
-      if (sat.static && sat.type === 'Launch Facility' && ColorScheme.objectTypeFlags.purple === false) {
+      if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility') && ColorScheme.objectTypeFlags.purple === false) {
         return {
           color: colorTheme.deselected,
           pickable: false
         };
       }
 
-      if (sat.static && sat.type === 'Launch Facility') {
+      if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
         return {
           color: colorTheme.facility,
           pickable: true
@@ -592,7 +592,7 @@
       //     pickable: true
       //   };
       // }
-      if (sat.static && sat.type === 'Launch Facility') {
+      if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
         return {
           color: colorTheme.facility,
           pickable: true

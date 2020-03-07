@@ -109,6 +109,31 @@
       console.log('You do not have the Launch Site Module');
     }
 
+    // Try Loading the Control Site Module
+    try {
+      var controlSiteList = window.controlSiteManager.controlSiteList;
+      for (var controlSite in controlSiteList) {
+        var controlSiteInfo = {
+          static: true,
+          name: controlSiteList[controlSite].name,
+          type: controlSiteList[controlSite].type,
+          typeExt: controlSiteList[controlSite].typeExt,
+          lat: controlSiteList[controlSite].lat,
+          lon: controlSiteList[controlSite].lon,
+          alt: controlSiteList[controlSite].alt,
+          linkAEHF: controlSiteList[controlSite].linkAEHF,
+          linkWGS: controlSiteList[controlSite].linkWGSF,
+          linkGPS: controlSiteList[controlSite].linkGPS,
+          linkGalileo: controlSiteList[controlSite].linkGalileo,
+          linkBeidou: controlSiteList[controlSite].linkBeidou,
+          linkGlonass: controlSiteList[controlSite].linkGlonass,
+        };
+        objectManager.staticSet.push(controlSiteInfo);
+      }
+    } catch (e) {
+      console.log('You do not have the Control Site Module');
+    }
+
     for (i = 0; i < settingsManager.maxFieldOfViewMarkers; i++) {
       var fieldOfViewMarker = {
         static: true,

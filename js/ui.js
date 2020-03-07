@@ -125,6 +125,8 @@ $.ajaxSetup({
   var isConstellationsMenuOpen = false;
   var isCountriesMenuOpen = false;
   var isMilSatSelected = false;
+  var isSatcomMenuOpen = false;
+  var isAnalysisMenuOpen = false;
   var isSocratesMenuOpen = false;
   var isSettingsMenuOpen = false;
 
@@ -359,6 +361,9 @@ $.ajaxSetup({
       canvasDOM.mouseup(function (evt) {
         var numMenuItems = 0;
         if (!dragHasMoved) {
+          if (settingsManager.isMobileModeEnabled) {
+            mouseSat = getSatIdFromCoord(mouseX, mouseY);
+          }
           clickedSat = mouseSat;
           if (evt.button === 0) { // Left Mouse Button Clicked
             if (cameraType.current === cameraType.SATELLITE) {
@@ -481,10 +486,12 @@ $.ajaxSetup({
               }
 
               $('#earth-nasa-rmb').show();
+              $('#earth-blue-rmb').show();
               $('#earth-low-rmb').show();
               $('#earth-high-no-clouds-rmb').show();
               $('#earth-vec-rmb').show();
               if (settingsManager.nasaImages == true) $('#earth-nasa-rmb').hide();
+              if (settingsManager.blueImages == true) $('#earth-blue-rmb').hide();
               if (settingsManager.lowresImages == true) $('#earth-low-rmb').hide();
               if (settingsManager.hiresNoCloudsImages == true) $('#earth-high-no-clouds-rmb').hide();
               if (settingsManager.vectorImages == true) $('#earth-vec-rmb').hide();
@@ -694,7 +701,18 @@ $.ajaxSetup({
             satSet.setColorScheme(ColorScheme.countries);
             ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
             break;
+          case 'earth-blue-rmb':
+            settingsManager.blueImages = true;
+            settingsManager.nasaImages = false;
+            settingsManager.lowresImages = false;
+            settingsManager.hiresImages = false;
+            settingsManager.hiresNoCloudsImages = false;
+            settingsManager.vectorImages = false;
+            localStorage.setItem("lastMap", 'nasa');
+            earth.init();
+            break;
           case 'earth-nasa-rmb':
+            settingsManager.blueImages = false;
             settingsManager.nasaImages = true;
             settingsManager.lowresImages = false;
             settingsManager.hiresImages = false;
@@ -704,6 +722,7 @@ $.ajaxSetup({
             earth.init();
             break;
           case 'earth-low-rmb':
+            settingsManager.blueImages = false;
             settingsManager.nasaImages = false;
             settingsManager.lowresImages = true;
             settingsManager.hiresImages = false;
@@ -714,6 +733,7 @@ $.ajaxSetup({
             break;
           case 'earth-high-rmb':
             $('#loading-screen').fadeIn('slow', function () {
+              settingsManager.blueImages = false;
               settingsManager.nasaImages = false;
               settingsManager.lowresImages = false;
               settingsManager.hiresImages = true;
@@ -726,6 +746,7 @@ $.ajaxSetup({
             break;
           case 'earth-high-no-clouds-rmb':
             $('#loading-screen').fadeIn('slow', function () {
+              settingsManager.blueImages = false;
               settingsManager.nasaImages = false;
               settingsManager.lowresImages = false;
               settingsManager.hiresImages = false;
@@ -737,6 +758,7 @@ $.ajaxSetup({
             });
             break;
           case 'earth-vec-rmb':
+            settingsManager.blueImages = false;
             settingsManager.nasaImages = false;
             settingsManager.lowresImages = false;
             settingsManager.hiresImages = false;
@@ -1205,6 +1227,21 @@ $.ajaxSetup({
       $('#optical-maui').click(function () { sensorManager.setSensor(sensorManager.sensorList.MAU); });
       $('#optical-socorro').click(function () { sensorManager.setSensor(sensorManager.sensorList.SOC); });
 
+      // Missile Defense Radars
+      $('#radar-md-all').click(function () { sensorManager.setSensor('MD-ALL'); });
+      $('#radar-md-har').click(function () { sensorManager.setSensor(sensorManager.sensorList.HAR); });
+      $('#radar-md-qtr').click(function () { sensorManager.setSensor(sensorManager.sensorList.QTR); });
+      $('#radar-md-kur').click(function () { sensorManager.setSensor(sensorManager.sensorList.KUR); });
+      $('#radar-md-sha').click(function () { sensorManager.setSensor(sensorManager.sensorList.SHA); });
+      $('#radar-md-kcs').click(function () { sensorManager.setSensor(sensorManager.sensorList.KCS); });
+      $('#radar-md-sbx').click(function () { sensorManager.setSensor(sensorManager.sensorList.SBX); });
+
+      // LeoLabs Commercial Radars
+      $('#radar-ll-all').click(function () { sensorManager.setSensor('LEO-LABS'); });
+      $('#radar-ll-msr').click(function () { sensorManager.setSensor(sensorManager.sensorList.MSR); });
+      $('#radar-ll-pfisr').click(function () { sensorManager.setSensor(sensorManager.sensorList.PFISR); });
+      $('#radar-ll-ksr').click(function () { sensorManager.setSensor(sensorManager.sensorList.KSR); });
+
       // ESOC Radars
       $('#esoc-graves').click(function () { sensorManager.setSensor(sensorManager.sensorList.GRV); });
       $('#esoc-tira').click(function () { sensorManager.setSensor(sensorManager.sensorList.TIR); });
@@ -1336,6 +1373,84 @@ $.ajaxSetup({
         settingsManager.isForceColorScheme = true;
         satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
         e.preventDefault();
+      });
+
+      $('#editSat-newTLE').click(function (e) {
+        $('#loading-screen').fadeIn('slow', function () {
+          //
+          // Update Satellite TLE so that Epoch is Now but ECI position is very very close
+          //
+          var satId = satSet.getIdFromObjNum($('#es-scc').val());
+          var mainsat = satSet.getSat(satId);
+          // NOTE: Launch Points are the Satellites Current Location
+
+          var TEARR = satellite.getTEARR(mainsat);
+          var launchLat, launchLon, alt;
+          launchLon = satellite.degreesLong(TEARR.lon);
+          launchLat = satellite.degreesLat(TEARR.lat);
+          alt = TEARR.alt;
+
+          var upOrDown = satellite.getDirection(mainsat);
+          // console.log(upOrDown);
+
+          var currentEpoch = satellite.currentEpoch(timeManager.propTime());
+          mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
+
+          camSnapMode = false;
+
+          var TLEs;
+          // Ignore argument of perigee for round orbits OPTIMIZE
+          if ((mainsat.apogee - mainsat.perigee) < 300) {
+            TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.propOffset);
+          } else {
+            TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.propOffset, alt);
+          }
+          var TLE1 = TLEs[0];
+          var TLE2 = TLEs[1];
+          satCruncher.postMessage({
+            typ: 'satEdit',
+            id: satId,
+            TLE1: TLE1,
+            TLE2: TLE2
+          });
+          orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
+          //
+          // Reload Menu with new TLE
+          //
+          sat = satSet.getSatExtraOnly(selectedSat);
+          $('#es-scc').val(sat.SCC_NUM);
+
+          var inc = (sat.inclination * RAD2DEG).toPrecision(7);
+          inc = inc.split('.');
+          inc[0] = inc[0].substr(-3, 3);
+          inc[1] = inc[1].substr(0, 4);
+          inc = (inc[0] + '.' + inc[1]).toString();
+
+          $('#es-inc').val(_pad0(inc, 8));
+          $('#es-year').val(sat.TLE1.substr(18, 2));
+          $('#es-day').val(sat.TLE1.substr(20, 12));
+          $('#es-meanmo').val(sat.TLE2.substr(52, 11));
+
+          var rasc = (sat.raan * RAD2DEG).toPrecision(7);
+          rasc = rasc.split('.');
+          rasc[0] = rasc[0].substr(-3, 3);
+          rasc[1] = rasc[1].substr(0, 4);
+          rasc = (rasc[0] + '.' + rasc[1]).toString();
+
+          $('#es-rasc').val(_pad0(rasc, 8));
+          $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
+
+          var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
+          argPe = argPe.split('.');
+          argPe[0] = argPe[0].substr(-3, 3);
+          argPe[1] = argPe[1].substr(0, 4);
+          argPe = (argPe[0] + '.' + argPe[1]).toString();
+
+          $('#es-argPe').val(_pad0(argPe, 8));
+          $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
+
+          $('#loading-screen').fadeOut();
+        });
       });
 
       $('#editSat').submit(function (e) {
@@ -1735,10 +1850,13 @@ $.ajaxSetup({
 
           var breakupSearchString = '';
 
-          var breakupCount = 100; // settingsManager.maxAnalystSats;
+          var meanmoVariation = $('#hc-per').val();
+          var incVariation = $('#hc-inc').val();
+
+          var breakupCount = 25; // settingsManager.maxAnalystSats;
           for (var i = 0; i < breakupCount; i++) {
-            for (var incIterat = 0; incIterat < 10; incIterat++) {
-              for (var meanmoIterat = 0; meanmoIterat < 10; meanmoIterat++) {
+            for (var incIterat = 0; incIterat <= 4; incIterat++) {
+              for (var meanmoIterat = 0; meanmoIterat <= 4; meanmoIterat++) {
                 if (i >= breakupCount) continue;
                 satId = satSet.getIdFromObjNum(80000 + i);
                 var sat = satSet.getSat(satId);
@@ -1757,7 +1875,7 @@ $.ajaxSetup({
 
                 // For the first 30
                 var inc = TLE2.substr(8, 8);
-                inc = parseFloat(inc - 0.3 + (0.6 / (10 / (incIterat + 1)))).toPrecision(7);
+                inc = parseFloat(inc - (incVariation/2) + (incVariation * (incIterat / 4))).toPrecision(7);
                 inc = inc.split('.');
                 inc[0] = inc[0].substr(-3, 3);
                 if (inc[1]) {
@@ -1770,7 +1888,8 @@ $.ajaxSetup({
 
                 // For the second 30
                 var meanmo = TLE2.substr(52, 10);
-                meanmo = parseFloat(meanmo - (0.005 / 10) + (0.01 * ((meanmoIterat + 1) / 10))).toPrecision(10);
+                meanmo = parseFloat(meanmo - (meanmo*meanmoVariation/2) + (meanmo*meanmoVariation * (meanmoIterat / 4))).toPrecision(10);
+                // meanmo = parseFloat(meanmo - (0.005 / 10) + (0.01 * ((meanmoIterat + 1) / 10))).toPrecision(10);
                 meanmo = meanmo.split('.');
                 meanmo[0] = meanmo[0].substr(-2, 2);
                 if (meanmo[1]) {
@@ -2006,8 +2125,6 @@ $.ajaxSetup({
           changeZoom('leo');
         }
         camSnap(latToPitch(lat), longToYaw(lon));
-
-        uiController.legendMenuChange('default');
 
         e.preventDefault();
       });
@@ -2303,6 +2420,36 @@ $.ajaxSetup({
             uiController.updateWatchlist();
             isWatchlistMenuOpen = true;
             $('#menu-watchlist').addClass('bmenu-item-selected');
+            break;
+          }
+          break;
+        case 'menu-analysis':
+          if (isAnalysisMenuOpen) {
+            isAnalysisMenuOpen = false;
+            $('#menu-analysis').removeClass('bmenu-item-selected');
+            uiController.hideSideMenus();
+            break;
+          } else {
+            uiController.hideSideMenus();
+            $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+            uiController.updateWatchlist();
+            isAnalysisMenuOpen = true;
+            $('#menu-analysis').addClass('bmenu-item-selected');
+            break;
+          }
+          break;
+        case 'menu-satcom':
+          if (isSatcomMenuOpen) {
+            isSatcomMenuOpen = false;
+            $('#menu-satcom').removeClass('bmenu-item-selected');
+            uiController.hideSideMenus();
+            break;
+          } else {
+            uiController.hideSideMenus();
+            $('#satcom-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+            uiController.updateWatchlist();
+            isSatcomMenuOpen = true;
+            $('#menu-satcom').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -2871,6 +3018,8 @@ $.ajaxSetup({
       $('#breakup-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#missile-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+      $('#satcom-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+      $('#analysis-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#color-scheme-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#countries-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#constellations-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
@@ -2894,6 +3043,8 @@ $.ajaxSetup({
       $('#menu-newLaunch').removeClass('bmenu-item-selected');
       $('#menu-breakup').removeClass('bmenu-item-selected');
       $('#menu-missile').removeClass('bmenu-item-selected');
+      $('#menu-satcom').removeClass('bmenu-item-selected');
+      $('#menu-analysis').removeClass('bmenu-item-selected');
       $('#menu-customSensor').removeClass('bmenu-item-selected');
       $('#menu-color-scheme').removeClass('bmenu-item-selected');
       $('#menu-countries').removeClass('bmenu-item-selected');
@@ -2920,6 +3071,8 @@ $.ajaxSetup({
       isMissileMenuOpen = false;
       isCustomSensorMenuOpen = false;
       isColorSchemeMenuOpen = false;
+      isAnalysisMenuOpen = false;
+      isSatcomMenuOpen = false;
       isConstellationsMenuOpen = false;
       isCountriesMenuOpen = false;
       isAboutSelected = false;
@@ -3491,6 +3644,31 @@ $.ajaxSetup({
     }
   }
 
+  $('#satcom-inner-menu>ul>li').click(function () {
+    selectSat(-1); // clear selected sat
+    var satcomName = $(this).data('satcom');
+    switch (satcomName) {
+      case 'aehf':
+        $('#loading-screen').fadeIn('slow', function () {
+          drawLineList = [];
+          satCommManager.showLinks('aehf');
+          ga('send', 'event', 'Satcom Menu', 'aehf', 'Selected');
+          $('#loading-screen').fadeOut();
+          $('#satcom-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+        });
+        break;
+      case 'wgs':
+        $('#loading-screen').fadeIn('slow', function () {
+          drawLineList = [];
+          satCommManager.showLinks('wgs');
+          ga('send', 'event', 'Satcom Menu', 'wgs', 'Selected');
+          $('#loading-screen').fadeOut();
+          $('#satcom-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+        });
+        break;
+    }
+  });
+
   $('#colors-menu>ul>li').click(function () {
     selectSat(-1); // clear selected sat
     var colorName = $(this).data('color');
@@ -3501,11 +3679,7 @@ $.ajaxSetup({
     }
     switch (colorName) {
       case 'default':
-        if (satellite.sensorSelected()) {
-          uiController.legendMenuChange('default');
-        } else {
-          uiController.legendMenuChange('default');
-        }
+        uiController.legendMenuChange('default');
         satSet.setColorScheme(ColorScheme.default, true);
         ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
         break;
@@ -3958,7 +4132,7 @@ $.ajaxSetup({
     $('#menu-planetarium').addClass('bmenu-item-disabled');
     $('#menu-astronomy').addClass('bmenu-item-disabled');
 
-    setTimeout(function(){ satSet.setColorScheme(settingsManager.currentColorScheme, true); }, 1500);
+    setTimeout(function(){ satSet.setColorScheme(settingsManager.currentColorScheme, true); }, 2000);
   };
 
   _offlineMessage = function () {

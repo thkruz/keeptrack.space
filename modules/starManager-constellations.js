@@ -120,5 +120,20 @@ starManager.constellations = [
   "stars": [["c-Ari", "Hamal"],
             ["Hamal", "Sheratan"],
             ["Sheratan", "Mesarthim"]]
+},
+{
+  "name": "Perseus",
+  "stars": [["Atik", "ζ-Per"],
+            ["ζ-Per", "Menkib"],
+            ["Menkib", "ε-Per"],
+            ["ε-Per", "δ-Per"],
+            ["δ-Per", "Mirphak"],
+            ["Mirphak", "κ-Per"],
+            ["κ-Per", "Algol"],
+            ["Algol", "ρ-Per"],
+            ["ρ-Per", "16-Per"],
+            ["Mirphak", "γ-Per"],
+            ["γ-Per", "η-Per"],
+            ["η-Per", "φ-Per"]]
 }
 ];

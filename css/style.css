@@ -394,7 +394,7 @@ ul {
 
   .sensor-info-row {
       text-align: center;
-      margin: 20px;
+      margin: 10px;
       height: 18px;
   }
   .sensor-info-key, .sensor-info-value {
@@ -407,6 +407,7 @@ ul {
   }
   .sensor-info-value {
       float: right;
+      font-size: 12px;
   }
 
 .timeline-Header {
@@ -742,6 +743,7 @@ ul li{
   #datetime-text {
       padding-top: 10px
   }
+  
   #datetime-text:hover {
       background: rgba(255, 255, 255, .2);
       border-radius: 5px;
@@ -864,6 +866,14 @@ ul li{
 }
 
 #colors-menu ul li {
+  text-align: center;
+  padding: 2px !important;
+}
+#satcom-menu ul li {
+  text-align: center;
+  padding: 2px !important;
+}
+#analysis-menu ul li {
   text-align: center;
   padding: 2px !important;
 }

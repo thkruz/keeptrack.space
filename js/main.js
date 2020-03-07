@@ -274,14 +274,21 @@ var drawLoopCallback;
         drawLoopCount = null;
         return;
       }
-      if (drawLoopCount > 10) {
-        if (dt > 500 && !settingsManager.isSlowCPUModeEnabled) enableSlowCPUMode();
+      if (drawLoopCount > 50) {
+        if (dt > 500 && !settingsManager.isSlowCPUModeEnabled) {
+          // TODO: Better method of determining if computer is slow
+          // selectSat(-1);
+          // M.toast({html: `Computer is slow!</br>Forcing Mobile Mode`});
+          // settingsManager.isMobileModeEnabled = true;
+          // settingsManager.isDisableSatHoverBox = true;
+          // enableSlowCPUMode();
+        }
       }
     }
     if (dt > 20) {
-      updateHoverDelayLimit = 6;
-    } else if (dt > 50) {
       updateHoverDelayLimit = 10;
+    } else if (dt > 50) {
+      updateHoverDelayLimit = 15;
     } else {
       if (updateHoverDelayLimit > 1)
         --updateHoverDelayLimit;
@@ -394,6 +401,7 @@ var drawLoopCallback;
     }
 
     _drawScene();
+    drawLines();
     _updateHover();
     _onDrawLoopComplete(drawLoopCallback);
     if (settingsManager.isDemoModeOn) _demoMode();
@@ -406,7 +414,6 @@ var drawLoopCallback;
       isSatMiniBoxInUse = false;
     }
 
-    drawLines();
     // var bubble = new FOVBubble();
     // bubble.set();
     // bubble.draw();
@@ -486,6 +493,7 @@ var drawLoopCallback;
     gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(gl.pickShaderProgram.camMatrix, false, camMatrix);
 
+    // NOTE: Why do we clear the color buffer twice?
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -720,6 +728,7 @@ var drawLoopCallback;
       } else {
         orbitDisplay.clearHoverOrbit();
       }
+
       satSet.setHover(mouseSat);
       _hoverBoxOnSat(mouseSat, mouseX, mouseY);
     }
@@ -825,6 +834,10 @@ var drawLoopCallback;
           satHoverBoxNode1.textContent = (launchSite.site + ', ' + launchSite.sitec);
           satHoverBoxNode2.innerHTML = (sat.type + satellite.distance(sat, selectedSatData) + '');
           satHoverBoxNode3.textContent = ('');
+        } else if (sat.type === 'Control Facility') {
+            satHoverBoxNode1.textContent = sat.name;
+            satHoverBoxNode2.innerHTML = (sat.typeExt + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode3.textContent = ('');
         } else if (sat.type === 'Star') {
           if (starManager.findStarsConstellation(sat.name) !== null) {
             satHoverBoxNode1.innerHTML = (sat.name + '</br>' + starManager.findStarsConstellation(sat.name));
@@ -1129,9 +1142,13 @@ function updateUrl () { // URL Updater
 
 var isSelectedSatNegativeOne = false;
 function selectSat (satId) {
-  if (satId !== -1 && satSet.getSat(satId).type == 'Star') { return; } // TODO: Optimize
-  satSet.selectSat(satId);
   var sat;
+  if (satId !== -1) {
+    sat = satSet.getSat(satId);
+    if (sat.type == 'Star') return;
+    if ((sat.active == false || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') return; // Non-Missile Non-Sensor Object
+  }
+  satSet.selectSat(satId);
   camSnapMode = false;
 
   if (satId === -1) {
@@ -1194,6 +1211,7 @@ function selectSat (satId) {
     if (!sat) return;
     if (sat.type == 'Star') { return; }
     if (sat.static) {
+      if (typeof sat.staticNum == 'undefined') return;
       adviceList.sensor();
       sat = satSet.getSat(satId);
       sensorManager.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
@@ -1550,20 +1568,24 @@ function debugDrawLine (type, value, color) {
 
 var drawLinesI = 0;
 var tempStar1, tempStar2;
+var satPos;
 function drawLines () {
   if (drawLineList.length == 0) return;
   for (drawLinesI = 0; drawLinesI < drawLineList.length; drawLinesI++) {
     if (typeof drawLineList[drawLinesI].sat != 'undefined') {
       // At least One Satellite
-      drawLineList[drawLinesI].sat = satSet.getSat(drawLineList[drawLinesI].sat.id);
+      drawLineList[drawLinesI].sat =  satSet.getSatPosOnly(drawLineList[drawLinesI].sat.id);
       if (typeof drawLineList[drawLinesI].sat2 != 'undefined') {
         // Satellite and Static
         if (typeof drawLineList[drawLinesI].sat2.name != 'undefined'){
-          drawLineList[drawLinesI].sat2 = satSet.getSat(satSet.getIdFromSensorName(drawLineList[drawLinesI].sat2.name));
+          if (typeof  drawLineList[drawLinesI].sat2.id == 'undefined') {
+            drawLineList[drawLinesI].sat2.id = satSet.getIdFromSensorName(drawLineList[drawLinesI].sat2.name);
+          }
+          drawLineList[drawLinesI].sat2 =  satSet.getSatPosOnly(drawLineList[drawLinesI].sat2.id);
           drawLineList[drawLinesI].line.set([drawLineList[drawLinesI].sat.position.x,drawLineList[drawLinesI].sat.position.y,drawLineList[drawLinesI].sat.position.z], [drawLineList[drawLinesI].sat2.position.x,drawLineList[drawLinesI].sat2.position.y,drawLineList[drawLinesI].sat2.position.z]);
         } else {
           // Two Satellites
-          drawLineList[drawLinesI].sat2 = satSet.getSat(drawLineList[drawLinesI].sat2.id);
+          drawLineList[drawLinesI].sat2 =  satSet.getSatPosOnly(drawLineList[drawLinesI].sat2.id);
           drawLineList[drawLinesI].line.set([drawLineList[drawLinesI].sat.position.x,drawLineList[drawLinesI].sat.position.y,drawLineList[drawLinesI].sat.position.z], [drawLineList[drawLinesI].sat2.position.x,drawLineList[drawLinesI].sat2.position.y,drawLineList[drawLinesI].sat2.position.z]);
         }
       } else {
@@ -1574,9 +1596,9 @@ function drawLines () {
       // Constellation
       if (typeof drawLineList[drawLinesI].star1ID == 'undefined') { drawLineList[drawLinesI].star1ID = satSet.getIdFromStarName(drawLineList[drawLinesI].star1); }
       if (typeof drawLineList[drawLinesI].star2ID == 'undefined') { drawLineList[drawLinesI].star2ID = satSet.getIdFromStarName(drawLineList[drawLinesI].star2); }
-      tempStar1 = satSet.getSat(drawLineList[drawLinesI].star1ID).position;
-      tempStar2 = satSet.getSat(drawLineList[drawLinesI].star2ID).position;
-      drawLineList[drawLinesI].line.set([tempStar1.x, tempStar1.y, tempStar1.z], [tempStar2.x, tempStar2.y,tempStar2.z]);
+      tempStar1 =  satSet.getSatPosOnly(drawLineList[drawLinesI].star1ID);
+      tempStar2 =  satSet.getSatPosOnly(drawLineList[drawLinesI].star2ID);
+      drawLineList[drawLinesI].line.set([tempStar1.position.x, tempStar1.position.y, tempStar1.position.z], [tempStar2.position.x, tempStar2.position.y,tempStar2.position.z]);
     } else {
       // Arbitrary Lines
       drawLineList[drawLinesI].line.set(drawLineList[drawLinesI].ref, drawLineList[drawLinesI].ref2);

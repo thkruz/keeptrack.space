@@ -201,7 +201,7 @@ or mirrored at any other location without the express written permission of the 
       "object with a similar orbit, use the launch nominal creator menu to position the " +
       "satellite over the launch site at a time of 0000z. Now you can see details using " +
       "relative time.",
-      $('#menu-satellite-collision'),
+      $('#menu-newLaunch'),
       "top-right");
     } else if (adviceCount.breakup < 1) {
       // Only Do this Twice

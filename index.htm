@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta name="description" content="A 3D visualtion tool to learn about satellites and tracking radars." />
-    <meta property="og:image" content="http://keeptrack.space/social/keeptrackPreview.jpg">
+    <meta property="og:image" content="http://keeptrack.space/social/keeptrackPreview-new.jpg">
     <meta property="og:image:type" content="image/jpg"/>
     <meta property="og:image:width" content="1024"/>
     <meta property="og:image:height" content="1024"/>
@@ -15,19 +15,19 @@
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
 
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=1.5.4b" type="text/css">
+    <link rel="stylesheet" href="css/loading-screen.css?v=1.6.1b" type="text/css">
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=1.5.4b" rel="stylesheet">
+    <link href="css/fonts.css?v=1.6.1b" rel="stylesheet">
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=1.5.4b">
-    <link rel="stylesheet" href="css/materialize-local.css?v=1.5.4b">
+    <link rel="stylesheet" href="css/materialize.css?v=1.6.1b">
+    <link rel="stylesheet" href="css/materialize-local.css?v=1.6.1b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
     <script language="JavaScript">
     function redirectHttpToHttps()
     {
-        if (window.location.protocol === 'http:' && window.location.hostname !== 'sats3d.com' && window.location.hostname !== 's4ts.com' && window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'kronos') {
+        if (window.location.protocol === 'http:' && window.location.hostname === 'keeptrack.space') {
           var httpURL= window.location.hostname + window.location.pathname + window.location.search;
           var httpsURL= "https://" + httpURL;
           window.location = httpsURL;
@@ -74,6 +74,7 @@
         <a id="share-icon" class="top-menu-icons" onclick="mobile.socialToggle();"><img src="images/share-icon.png"></a>
         <ul id="nav-mobile" class="left hide-on-med-and-down">
           <li id="jday"></li>
+          <!-- <li id="datetime-text-local"></li> -->
           <li id="fov-text"></li>
           <li id="az-text"></li>
           <li id="el-text"></li>
@@ -158,6 +159,7 @@
       </div>
       <div id="earth-rmb-menu" class="right-btn-menu">
         <ul class='dropdown-contents'>
+          <li id="earth-blue-rmb"><a href="#">Blue Map</a></li>
           <li id="earth-nasa-rmb"><a href="#">NASA Map</a></li>
           <li id="earth-low-rmb"><a href="#">Low Resolution Map</a></li>
           <li id="earth-high-no-clouds-rmb"><a href="#">High Resoultion Map</a></li>
@@ -411,6 +413,23 @@
                   <li class="menu-selectable" id="optical-maui">Maui<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
                   <li class="menu-selectable" id="optical-socorro">Socorro<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
                   <li class="divider"></li>
+                  <h5 class="center-align">MDA Sensors</h5>
+                  <li class="divider"></li>
+                  <li class="menu-selectable" id="radar-md-all">All Sensors<span class="badge dark-blue-badge" data-badge-caption="Coalition"></span></li>
+                  <li class="menu-selectable" id="radar-md-har">Har Keren<span class="badge dark-blue-badge" data-badge-caption="ISR"></span></li>
+                  <li class="menu-selectable" id="radar-md-qtr">CENTCOM<span class="badge dark-blue-badge" data-badge-caption="USA"></span></li>
+                  <li class="menu-selectable" id="radar-md-kur">Kürecik<span class="badge dark-blue-badge" data-badge-caption="USA"></span></li>
+                  <li class="menu-selectable" id="radar-md-sha">Shariki<span class="badge dark-blue-badge" data-badge-caption="USA"></span></li>
+                  <li class="menu-selectable" id="radar-md-kcs">Kyogamisaki<span class="badge dark-blue-badge" data-badge-caption="USA"></span></li>
+                  <li class="menu-selectable" id="radar-md-sbx">Sea-Based X-Band<span class="badge dark-blue-badge" data-badge-caption="USN"></span></li>
+                  <li class="divider"></li>
+                  <h5 class="center-align">LeoLabs Sensors</h5>
+                  <li class="divider"></li>
+                  <li class="menu-selectable" id="radar-ll-all">All Sensors<span class="badge dark-blue-badge" data-badge-caption="Commercial"></span></li>
+                  <li class="menu-selectable" id="radar-ll-msr">Midland Radar<span class="badge dark-blue-badge" data-badge-caption="Commercial"></span></li>
+                  <li class="menu-selectable" id="radar-ll-pfisr">PFIS Radar<span class="badge dark-blue-badge" data-badge-caption="Commercial"></span></li>
+                  <li class="menu-selectable" id="radar-ll-ksr">Kiwi Space Radar<span class="badge dark-blue-badge" data-badge-caption="Commercial"></span></li>
+                  <li class="divider"></li>
                   <h5 class="center-align">ESOC Sensors</h5>
                   <li class="divider"></li>
                   <li class="menu-selectable" id="esoc-graves">GRAVES<span class="badge dark-blue-badge" data-badge-caption="FRA"></span></li>
@@ -453,6 +472,25 @@
                 <li class="menu-selectable" data-color="near-earth">Near Earth</li>
                 <li class="menu-selectable" data-color="deep-space">Deep Space</li>
                 <li class="menu-selectable" data-color="lost-objects">Lost Objects</li>
+              </ul>
+            </div>
+          </div>
+          <div id="analysis-menu" class="side-menu-parent start-hidden text-select">
+            <div id="analysis-inner-menu" class="side-menu">
+              <ul>
+                <h5 class="center-align">Analysis Menu</h5>
+                <li class="divider"></li>
+                <li class="menu-selectable" data-analysis="Placeholder">Coming Soon</li>
+              </ul>
+            </div>
+          </div>
+          <div id="satcom-menu" class="side-menu-parent start-hidden text-select">
+            <div id="satcom-inner-menu" class="side-menu">
+              <ul>
+                <h5 class="center-align">Satellite Communication</h5>
+                <li class="divider"></li>
+                <li class="menu-selectable" data-satcom="aehf">Milstar and AEHF</li>
+                <li class="menu-selectable" data-satcom="wgs">DSCS and WGS</li>
               </ul>
             </div>
           </div>
@@ -915,6 +953,9 @@
                     <button id="editSat-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Satellite &#9658;</button>
                   </div>
                   <div class="center-align row">
+                    <button id="editSat-newTLE" class="btn waves-effect waves-light" type="button" name="action">Update Epoch to Now &#9658;</button>
+                  </div>
+                  <div class="center-align row">
                     <button id="editSat-save" class="btn waves-effect waves-light" type="button" name="action">Save TLE &#9658;</button>
                   </div>
                   <div class="center-align row">
@@ -1016,6 +1057,30 @@
                   <div class="input-field col s12">
                     <input disabled value="00005" id="hc-scc" type="text">
                     <label for="disabled">Satellite SCC#</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <select id="hc-inc">
+                      <option value="0.5">0.5 Degrees</option>
+                      <option value="0.75">0.75 Degrees</option>
+                      <option value="1">1 Degrees</option>
+                      <option value="1.25">1.25 Degrees</option>
+                      <option value="1.5">1.5 Degrees</option>
+                      <option value="1.75">1.75 Degrees</option>
+                      <option value="2">2 Degrees</option>
+                      <option value="2.25">2.25 Degrees</option>
+                      <option value="2.5">2.5 Degrees</option>
+                    </select>
+                    <label>Inclination Variation</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <select id="hc-per">
+                      <option value="0.01">1 Percent</option>
+                      <option value="0.02">2 Percent</option>
+                      <option value="0.03">3 Percent</option>
+                      <option value="0.04">4 Percent</option>
+                      <option value="0.05">5 Percent</option>
+                    </select>
+                    <label>Period Variation</label>
                   </div>
                   <div class="center-align">
                     <button class="btn waves-effect waves-light" type="submit" name="action">Create Breakup &#9658;
@@ -1263,30 +1328,32 @@
         <img id="menu-lookangles" src="" delayedsrc="images/telescope.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Look Angles" data-position="top" data-delay="50" data-tooltip="Look Angles">
         <img id="menu-lookanglesmultisite" src="" delayedsrc="images/worldwide.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="SSN Lookangles" data-position="top" data-delay="50" data-tooltip="SSN Lookangles">
         <img id="menu-find-sat" src="" delayedsrc="images/findOrbit.png" class="bmenu-item tooltipped" alt="Search Orbit" data-position="top" data-delay="50" data-tooltip="Search Orbit">
-        <img id="menu-twitter" src="" delayedsrc="images/twitter.png" class="bmenu-item tooltipped" alt="Space News on Twitter" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
-        <img id="menu-map" src="" delayedsrc="images/map.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Stereographic Map" data-position="top" data-delay="50" data-tooltip="Stereographic Map">
-        <img id="menu-launches" src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item tooltipped" alt="Launch Schedule" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
         <!-- <img id="menu-space-stations" src="" delayedsrc="images/space-station-1.png" class="bmenu-item tooltipped" alt="Union of Concerned Scientists Watchlist" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist"> -->
         <img id="menu-satellite-collision" src="" delayedsrc="images/satellite-collision.png" class="bmenu-item tooltipped" alt="SOCRATES Prediction of Near Conjunctions" data-position="top" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
         <img id="menu-editSat" src="" delayedsrc="images/editPencil.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Edit Satellites" data-position="top" data-delay="50" data-tooltip="Edit Satellites">
         <img id="menu-newLaunch" src="" delayedsrc="images/rocket-ship.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Create Launch Nominal" data-position="top" data-delay="50" data-tooltip="Create Launch Nominal">
         <img id="menu-breakup" src="" delayedsrc="images/breakup.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Create Breakup" data-position="top" data-delay="50" data-tooltip="Create Breakup">
         <img id="menu-missile" src="" delayedsrc="images/rocket-ship-2.png" class="bmenu-item tooltipped" alt="Create Missile Attack" data-position="top" data-delay="50" data-tooltip="Create Missile Attack">
+        <img id="menu-satcom" src="" delayedsrc="images/satcom.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Satellite Communication">
         <img id="menu-dops" src="" delayedsrc="images/antenna.png" class="bmenu-item tooltipped" alt="GPS DOP" data-position="top" data-delay="50" data-tooltip="GPS DOP Over Time">
         <img id="menu-customSensor" src="" delayedsrc="images/observatory.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Custom Sensor">
-        <img id="menu-settings" src="" delayedsrc="images/gear-icon.png" class="bmenu-item tooltipped" alt="Settings" data-position="top" data-delay="50" data-tooltip="Settings">
-        <img id="menu-fov-bubble" src="" delayedsrc="images/fieldofview.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Show/Hide Field of View Bubble" data-position="top" data-delay="50" data-tooltip="Show/Hide Field of View Bubble">
-        <img id="menu-surveillance" src="" delayedsrc="images/surveillance.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Show/Hide Surveillance Fence" data-position="top" data-delay="50" data-tooltip="Show/Hide Surveillance Fence">
         <img id="menu-sat-fov" src="" delayedsrc="images/satellite-map.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Satellite Field of View" data-position="top" data-delay="50" data-tooltip="Satellite Field of View">
         <img id="menu-day-night" src="" delayedsrc="images/orbit.png" class="bmenu-item tooltipped" alt="Day Night Toggle" data-position="top" data-delay="50" data-tooltip="Day Night Toggle">
         <img id="menu-color-scheme" src="" delayedsrc="images/brush.png" class="bmenu-item tooltipped" alt="Color Schemes" data-position="top" data-delay="50" data-tooltip="Color Schemes">
         <img id="menu-constellations" src="" delayedsrc="images/orbit2.png" class="bmenu-item tooltipped" alt="Constellations" data-position="top" data-delay="50" data-tooltip="Constellations">
         <img id="menu-countries" src="" delayedsrc="images/united-states.png" class="bmenu-item tooltipped" alt="Countries" data-position="top" data-delay="50" data-tooltip="Countries">
-        <img id="menu-about" src="" delayedsrc="images/about.png" class="bmenu-item tooltipped" alt="Author Information" data-position="top" data-delay="50" data-tooltip="Author Information">
         <img id="menu-planetarium" src="" delayedsrc="images/astronaut.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Planetarium View" data-position="top" data-delay="50" data-tooltip="Planetarium View">
         <img id="menu-astronomy" src="" delayedsrc="images/ursa-major.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Astronomy View" data-position="top" data-delay="50" data-tooltip="Astronomy View">
+        <img id="menu-map" src="" delayedsrc="images/map.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Stereographic Map" data-position="top" data-delay="50" data-tooltip="Stereographic Map">
         <img id="menu-satview" src="" delayedsrc="images/satellite.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Satellite View" data-position="top" data-delay="50" data-tooltip="Satellite View">
+        <img id="menu-fov-bubble" src="" delayedsrc="images/fieldofview.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Show/Hide Field of View Bubble" data-position="top" data-delay="50" data-tooltip="Show/Hide Field of View Bubble">
+        <img id="menu-surveillance" src="" delayedsrc="images/surveillance.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Show/Hide Surveillance Fence" data-position="top" data-delay="50" data-tooltip="Show/Hide Surveillance Fence">
         <img id="menu-record" src="" delayedsrc="images/screen-capture.jpg" class="bmenu-item tooltipped" alt="Screen Capture" data-position="top" data-delay="50" data-tooltip="Screen Capture">
+        <img id="menu-analysis" src="" delayedsrc="images/analysis.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Analysis">
+        <img id="menu-launches" src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item tooltipped" alt="Launch Schedule" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
+        <img id="menu-twitter" src="" delayedsrc="images/twitter.png" class="bmenu-item tooltipped" alt="Space News on Twitter" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
+        <img id="menu-settings" src="" delayedsrc="images/gear-icon.png" class="bmenu-item tooltipped" alt="Settings" data-position="top" data-delay="50" data-tooltip="Settings">
+        <img id="menu-about" src="" delayedsrc="images/about.png" class="bmenu-item tooltipped" alt="Author Information" data-position="top" data-delay="50" data-tooltip="Author Information">
       </div>
     </div>
     <div id="social" class="right">
@@ -1306,47 +1373,49 @@
   <script src="js/lib/jquery.min.js"></script>
   <script src="js/lib/materialize.min.js"></script>
   <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.js?v=1.5.4b"></script>
+  <script src="js/lib/satellite.js?v=1.6.1b"></script>
   <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=1.5.4b"></script>
+  <script src="js/lib/shader-loader.min.js?v=1.6.1b"></script>
   <!-- Load Map Projection Code -->
   <script src="js/mapManager.js"></script>
   <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=1.5.4b"></script>
-  <script src="license/license.js?v=1.5.4b"></script>
+  <script src="js/settings-manager.js?v=1.6.1b"></script>
+  <script src="license/license.js?v=1.6.1b"></script>
   <!-- Offline Only -->
-  <!-- <script src="offline/extra.js?v=1.5.4b"></script> -->
-  <!-- <script src="offline/satInfo.js?v=1.5.4b"></script> -->
-  <!-- <script src="offline/tle.js?v=1.5.4b"></script> -->
-  <script src="modules/sensorManager.js?v=1.5.4b"></script>
-  <script src="modules/launchSiteManager.js?v=1.5.4b"></script>
-  <script src="modules/starManager.js?v=1.5.4b"></script>
-  <script src="modules/starManager-constellations.js?v=1.5.4b"></script>
+  <!-- <script src="offline/extra.js?v=1.6.1b"></script> -->
+  <!-- <script src="offline/satInfo.js?v=1.6.1b"></script> -->
+  <!-- <script src="offline/tle.js?v=1.6.1b"></script> -->
+  <script src="modules/sensorManager.js?v=1.6.1b"></script>
+  <script src="modules/controlSiteManager.js?v=1.6.1b"></script>
+  <script src="modules/launchSiteManager.js?v=1.6.1b"></script>
+  <script src="modules/starManager.js?v=1.6.1b"></script>
+  <script src="modules/satCommManager.js?v=1.6.1b"></script>
+  <script src="modules/starManager-constellations.js?v=1.6.1b"></script>
 
-  <script src="js/time-manager.js?v=1.5.4b"></script>
-  <script src="js/sun.js?v=1.5.4b"></script>
-  <script src="js/lib/meuusjs.1.0.3.min.js?v=1.5.4b"></script>
-  <script src="js/lib/starcalc.js?v=1.5.4b"></script>
-  <script src="js/earth.js?v=1.5.4b"></script>
-  <script src="js/groups.js?v=1.5.4b"></script>
-  <script src="js/satSet.js?v=1.5.4b"></script>
-  <script src="modules/satVmagManager.js?v=1.5.4b"></script>
+  <script src="js/time-manager.js?v=1.6.1b"></script>
+  <script src="js/sun.js?v=1.6.1b"></script>
+  <script src="js/lib/meuusjs.1.0.3.min.js?v=1.6.1b"></script>
+  <script src="js/lib/starcalc.js?v=1.6.1b"></script>
+  <script src="js/earth.js?v=1.6.1b"></script>
+  <script src="js/groups.js?v=1.6.1b"></script>
+  <script src="js/satSet.js?v=1.6.1b"></script>
+  <script src="modules/satVmagManager.js?v=1.6.1b"></script>
   <!-- Load Extra Variables -->
-  <script src="js/objectManager.js?v=1.5.4b"></script>
+  <script src="js/objectManager.js?v=1.6.1b"></script>
   <script src="js/lib/file-saver.min.js"></script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=1.5.4b"></script>
+  <script src="js/ballistic-missile.js?v=1.6.1b"></script>
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=1.5.4b"></script>
-  <script src="js/mobile.js?v=1.5.4b"></script>
+  <script src="js/color-scheme.js?v=1.6.1b"></script>
+  <script src="js/mobile.js?v=1.6.1b"></script>
   <script src="js/lib/CanvasRecorder.min.js"></script>
-  <script src="js/ui.js?v=1.5.4b"></script>
-  <script src="js/main.js?v=1.5.4b"></script>
-  <script src="js/lookangles.js?v=1.5.4b"></script>
-  <script src="js/orbit-display.js?v=1.5.4b"></script>
-  <script src="js/drawLoop-shapes.js?v=1.5.4b"></script>
-  <script src="js/search-box.js?v=1.5.4b"></script>
-  <script src="js/vector-to-kepler.js?v=1.5.4b"></script>
+  <script src="js/ui.js?v=1.6.1b"></script>
+  <script src="js/main.js?v=1.6.1b"></script>
+  <script src="js/lookangles.js?v=1.6.1b"></script>
+  <script src="js/orbit-display.js?v=1.6.1b"></script>
+  <script src="js/drawLoop-shapes.js?v=1.6.1b"></script>
+  <script src="js/search-box.js?v=1.6.1b"></script>
+  <script src="js/vector-to-kepler.js?v=1.6.1b"></script>
   <!-- Load UI Dependencies -->
   <script src="js/lib/jquery-ui.min.js"></script>
   <script src="js/lib/jquery-ui-slideraccess.js"></script>

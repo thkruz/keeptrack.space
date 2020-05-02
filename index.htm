@@ -41,6 +41,8 @@
     <div id="loading-screen" class="valign-wrapper full-loader">
       <div id="logo-inner-container" class="valign">
         <span id="logo-text" class="logo-font">KEEP TRACK</span>
+        <span id="logo-trusat" style="display: none;"><img src="/images/trusat.png"></span>
+        </br>
         <div id= "spinner" class="preloader-wrapper active">
           <div class="spinner-layer spinner-white-only">
             <div class="circle-clipper left">
@@ -161,6 +163,7 @@
         <ul class='dropdown-contents'>
           <li id="earth-blue-rmb"><a href="#">Blue Map</a></li>
           <li id="earth-nasa-rmb"><a href="#">NASA Map</a></li>
+          <li id="earth-trusat-rmb"><a href="#">TruSat Map</a></li>
           <li id="earth-low-rmb"><a href="#">Low Resolution Map</a></li>
           <li id="earth-high-no-clouds-rmb"><a href="#">High Resoultion Map</a></li>
           <!-- <li id="earth-high-rmb"><a href="#">High Resolution Map Plus Clouds</a></li> -->
@@ -1060,9 +1063,10 @@
                   </div>
                   <div class="input-field col s12">
                     <select id="hc-inc">
+                      <option value="0">0 Degrees</option>
                       <option value="0.5">0.5 Degrees</option>
                       <option value="0.75">0.75 Degrees</option>
-                      <option value="1">1 Degrees</option>
+                      <option value="1" selected>1 Degrees</option>
                       <option value="1.25">1.25 Degrees</option>
                       <option value="1.5">1.5 Degrees</option>
                       <option value="1.75">1.75 Degrees</option>
@@ -1074,13 +1078,29 @@
                   </div>
                   <div class="input-field col s12">
                     <select id="hc-per">
+                      <option value="0">0 Percent</option>
                       <option value="0.01">1 Percent</option>
-                      <option value="0.02">2 Percent</option>
+                      <option value="0.02" selected>2 Percent</option>
                       <option value="0.03">3 Percent</option>
                       <option value="0.04">4 Percent</option>
                       <option value="0.05">5 Percent</option>
                     </select>
                     <label>Period Variation</label>
+                  </div>
+                  <div class="input-field col s12">
+                    <select id="hc-raan">
+                      <option value="0">0 Degrees</option>
+                      <option value="0.5">0.5 Degrees</option>
+                      <option value="0.75">0.75 Degrees</option>
+                      <option value="1" selected>1 Degrees</option>
+                      <option value="1.25">1.25 Degrees</option>
+                      <option value="1.5">1.5 Degrees</option>
+                      <option value="1.75">1.75 Degrees</option>
+                      <option value="2">2 Degrees</option>
+                      <option value="2.25">2.25 Degrees</option>
+                      <option value="2.5">2.5 Degrees</option>
+                    </select>
+                    <label>Right Ascension of the Ascending Node Variation</label>
                   </div>
                   <div class="center-align">
                     <button class="btn waves-effect waves-light" type="submit" name="action">Create Breakup &#9658;

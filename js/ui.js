@@ -491,6 +491,7 @@ $.ajaxSetup({
               $('#earth-high-no-clouds-rmb').show();
               $('#earth-vec-rmb').show();
               if (settingsManager.nasaImages == true) $('#earth-nasa-rmb').hide();
+              if (settingsManager.trusatImages == true) $('#earth-trusat-rmb').hide();
               if (settingsManager.blueImages == true) $('#earth-blue-rmb').hide();
               if (settingsManager.lowresImages == true) $('#earth-low-rmb').hide();
               if (settingsManager.hiresNoCloudsImages == true) $('#earth-high-no-clouds-rmb').hide();
@@ -704,6 +705,7 @@ $.ajaxSetup({
           case 'earth-blue-rmb':
             settingsManager.blueImages = true;
             settingsManager.nasaImages = false;
+            settingsManager.trusatImages = false;
             settingsManager.lowresImages = false;
             settingsManager.hiresImages = false;
             settingsManager.hiresNoCloudsImages = false;
@@ -714,6 +716,18 @@ $.ajaxSetup({
           case 'earth-nasa-rmb':
             settingsManager.blueImages = false;
             settingsManager.nasaImages = true;
+            settingsManager.trusatImages = false;
+            settingsManager.lowresImages = false;
+            settingsManager.hiresImages = false;
+            settingsManager.hiresNoCloudsImages = false;
+            settingsManager.vectorImages = false;
+            localStorage.setItem("lastMap", 'nasa');
+            earth.init();
+            break;
+          case 'earth-trusat-rmb':
+            settingsManager.blueImages = false;
+            settingsManager.nasaImages = false;
+            settingsManager.trusatImages = true;
             settingsManager.lowresImages = false;
             settingsManager.hiresImages = false;
             settingsManager.hiresNoCloudsImages = false;
@@ -724,6 +738,7 @@ $.ajaxSetup({
           case 'earth-low-rmb':
             settingsManager.blueImages = false;
             settingsManager.nasaImages = false;
+            settingsManager.trusatImages = false;
             settingsManager.lowresImages = true;
             settingsManager.hiresImages = false;
             settingsManager.hiresNoCloudsImages = false;
@@ -735,6 +750,7 @@ $.ajaxSetup({
             $('#loading-screen').fadeIn('slow', function () {
               settingsManager.blueImages = false;
               settingsManager.nasaImages = false;
+              settingsManager.trusatImages = false;
               settingsManager.lowresImages = false;
               settingsManager.hiresImages = true;
               settingsManager.hiresNoCloudsImages = false;
@@ -748,6 +764,7 @@ $.ajaxSetup({
             $('#loading-screen').fadeIn('slow', function () {
               settingsManager.blueImages = false;
               settingsManager.nasaImages = false;
+              settingsManager.trusatImages = false;
               settingsManager.lowresImages = false;
               settingsManager.hiresImages = false;
               settingsManager.hiresNoCloudsImages = true;
@@ -760,6 +777,7 @@ $.ajaxSetup({
           case 'earth-vec-rmb':
             settingsManager.blueImages = false;
             settingsManager.nasaImages = false;
+            settingsManager.trusatImages = false;
             settingsManager.lowresImages = false;
             settingsManager.hiresImages = false;
             settingsManager.hiresNoCloudsImages = false;
@@ -1815,6 +1833,7 @@ $.ajaxSetup({
         $('#loading-screen').fadeIn('slow', function () {
           var satId = satSet.getIdFromObjNum($('#hc-scc').val());
           var mainsat = satSet.getSat(satId);
+          var origsat = mainsat;
           // NOTE: Launch Points are the Satellites Current Location
 
           var TEARR = satellite.getTEARR(mainsat);
@@ -1852,70 +1871,75 @@ $.ajaxSetup({
 
           var meanmoVariation = $('#hc-per').val();
           var incVariation = $('#hc-inc').val();
+          var rascVariation = $('#hc-raan').val();
 
-          var breakupCount = 25; // settingsManager.maxAnalystSats;
+          var breakupCount = 100; // settingsManager.maxAnalystSats;
           for (var i = 0; i < breakupCount; i++) {
             for (var incIterat = 0; incIterat <= 4; incIterat++) {
               for (var meanmoIterat = 0; meanmoIterat <= 4; meanmoIterat++) {
-                if (i >= breakupCount) continue;
-                satId = satSet.getIdFromObjNum(80000 + i);
-                var sat = satSet.getSat(satId);
-                sat = mainsat;
-                var iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7);
+                for (var rascIterat = 0; rascIterat <= 4; rascIterat++) {
+                  if (i >= breakupCount) continue;
+                  satId = satSet.getIdFromObjNum(80000 + i);
+                  var sat = satSet.getSat(satId);
+                  sat = origsat;
+                  var iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7);
 
-                var iTLEs;
-                // Ignore argument of perigee for round orbits OPTIMIZE
-                if ((sat.apogee - sat.perigee) < 300) {
-                  iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, timeManager.propOffset);
-                } else {
-                  iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, timeManager.propOffset, alt);
-                }
-                iTLE1 = iTLEs[0];
-                iTLE2 = iTLEs[1];
+                  var rascOffset = (-rascVariation/2) + (rascVariation * (rascIterat / 4));
 
-                // For the first 30
-                var inc = TLE2.substr(8, 8);
-                inc = parseFloat(inc - (incVariation/2) + (incVariation * (incIterat / 4))).toPrecision(7);
-                inc = inc.split('.');
-                inc[0] = inc[0].substr(-3, 3);
-                if (inc[1]) {
-                  inc[1] = inc[1].substr(0, 4);
-                } else {
-                  inc[1] = '0000';
-                }
-                inc = (inc[0] + '.' + inc[1]).toString();
-                inc = _padEmpty(inc, 8);
+                  var iTLEs;
+                  // Ignore argument of perigee for round orbits OPTIMIZE
+                  if ((sat.apogee - sat.perigee) < 300) {
+                    iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, timeManager.propOffset, 0, rascOffset);
+                  } else {
+                    iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, timeManager.propOffset, alt, rascOffset);
+                  }
+                  iTLE1 = iTLEs[0];
+                  iTLE2 = iTLEs[1];
 
-                // For the second 30
-                var meanmo = TLE2.substr(52, 10);
-                meanmo = parseFloat(meanmo - (meanmo*meanmoVariation/2) + (meanmo*meanmoVariation * (meanmoIterat / 4))).toPrecision(10);
-                // meanmo = parseFloat(meanmo - (0.005 / 10) + (0.01 * ((meanmoIterat + 1) / 10))).toPrecision(10);
-                meanmo = meanmo.split('.');
-                meanmo[0] = meanmo[0].substr(-2, 2);
-                if (meanmo[1]) {
-                  meanmo[1] = meanmo[1].substr(0, 8);
-                } else {
-                  meanmo[1] = '00000000';
-                }
-                meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
+                  // For the first 30
+                  var inc = TLE2.substr(8, 8);
+                  inc = parseFloat(inc - (incVariation/2) + (incVariation * (incIterat / 4))).toPrecision(7);
+                  inc = inc.split('.');
+                  inc[0] = inc[0].substr(-3, 3);
+                  if (inc[1]) {
+                    inc[1] = inc[1].substr(0, 4);
+                  } else {
+                    inc[1] = '0000';
+                  }
+                  inc = (inc[0] + '.' + inc[1]).toString();
+                  inc = _padEmpty(inc, 8);
 
-                var iTLE2 = '2 ' + (80000 + i) + ' ' + inc + ' ' + TLE2.substr(17, 35) + meanmo + TLE2.substr(63);
-                sat = satSet.getSat(satId);
-                sat.TLE1 = iTLE1;
-                sat.TLE2 = iTLE2;
-                sat.active = true;
-                if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.propOffset) > 1) {
-                  satCruncher.postMessage({
-                    typ: 'satEdit',
-                    id: satId,
-                    TLE1: iTLE1,
-                    TLE2: iTLE2
-                  });
-                  orbitDisplay.updateOrbitBuffer(satId, true, iTLE1, iTLE2);
-                } else {
-                  console.error('Breakup Generator Failed');
+                  // For the second 30
+                  var meanmo = iTLE2.substr(52, 10);
+                  meanmo = parseFloat(meanmo - (meanmo*meanmoVariation/2) + (meanmo*meanmoVariation * (meanmoIterat / 4))).toPrecision(10);
+                  // meanmo = parseFloat(meanmo - (0.005 / 10) + (0.01 * ((meanmoIterat + 1) / 10))).toPrecision(10);
+                  meanmo = meanmo.split('.');
+                  meanmo[0] = meanmo[0].substr(-2, 2);
+                  if (meanmo[1]) {
+                    meanmo[1] = meanmo[1].substr(0, 8);
+                  } else {
+                    meanmo[1] = '00000000';
+                  }
+                  meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
+
+                  var iTLE2 = '2 ' + (80000 + i) + ' ' + inc + ' ' + iTLE2.substr(17, 35) + meanmo + iTLE2.substr(63);
+                  sat = satSet.getSat(satId);
+                  sat.TLE1 = iTLE1;
+                  sat.TLE2 = iTLE2;
+                  sat.active = true;
+                  if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.propOffset) > 1) {
+                    satCruncher.postMessage({
+                      typ: 'satEdit',
+                      id: satId,
+                      TLE1: iTLE1,
+                      TLE2: iTLE2
+                    });
+                    orbitDisplay.updateOrbitBuffer(satId, true, iTLE1, iTLE2);
+                  } else {
+                    console.error('Breakup Generator Failed');
+                  }
+                  i++;
                 }
-                i++;
               }
             }
           }

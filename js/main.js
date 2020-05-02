@@ -199,7 +199,9 @@ var drawLoopCallback;
   $(document).ready(function () { // Code Once index.htm is loaded
 
     // Set Default TLE
-    settingsManager.tleSource = 'TLE.json';
+    if (typeof settingsManager.tleSource == 'undefined') {
+      settingsManager.tleSource = 'TLE.json';
+    }
     webGlInit();
     earth.init();
     ColorScheme.init();

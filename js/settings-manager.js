@@ -14,7 +14,7 @@
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
   settingsManager.maxMissiles = 500;
-  settingsManager.maxAnalystSats = 120;
+  settingsManager.maxAnalystSats = 256;
 
   settingsManager.nasaImages = false;
   settingsManager.blueImages = false;
@@ -84,6 +84,11 @@
           break;
         case 'mw':
           settingsManager.tleSource = 'tle/mw.json';
+          break;
+        case 'trusat':
+          settingsManager.tleSource = 'tle/trusat.json';
+          settingsManager.trusatImages = true;
+          $('#logo-trusat').show();
           break;
         case 'logo':
           $('#demo-logo').removeClass('start-hidden');
@@ -270,7 +275,11 @@
   settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
   settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
   settingsManager.colors.inviewAlt = [0.2, 0.4, 1.0, 1];
-  settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
+  if (settingsManager.trusatImages) {
+    settingsManager.colors.payload = [1.0, 1.0, 1.0, 0.8];
+  } else {
+    settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
+  }
   settingsManager.colors.rocket = [0.2, 0.4, 1.0, 1];
   settingsManager.colors.debris = [0.5, 0.5, 0.5, 0.85];
   settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];

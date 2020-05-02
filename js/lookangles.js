@@ -601,7 +601,7 @@ or mirrored at any other location without the express written permission of the 
     }
     (resetWhenDone) ? satellite.currentSensor = satellite.defaultSensor : satellite.currentSensor = satellite.tempSensor;
   };
-  satellite.getOrbitByLatLon = function (sat, goalLat, goalLon, upOrDown, propOffset, goalAlt) {
+  satellite.getOrbitByLatLon = function (sat, goalLat, goalLon, upOrDown, propOffset, goalAlt, rascOffset) {
     /**
      * Function to brute force find an orbit over a sites lattiude and longitude
      * @param  object       sat             satellite object with satrec
@@ -626,16 +626,15 @@ or mirrored at any other location without the express written permission of the 
     var meanAiValue;
     var lastLat;
     var isUpOrDown;
-    var rascOffset = false;
-
     var i;
+
+    if (typeof rascOffset == 'undefined') rascOffset = 0;
 
     // ===== Mean Anomaly Loop =====
     for (i = 0; i < (520 * 10); i += 1) { /** Rotate Mean Anomaly 0.1 Degree at a Time for Up To 400 Degrees */
-      meanACalcResults = meanaCalc(i, rascOffset);
+      meanACalcResults = meanaCalc(i);
       if (meanACalcResults === 1) {
         if (isUpOrDown !== upOrDown) { // If Object is moving opposite of the goal direction (upOrDown)
-          // rascOffset = true;
           i = i + 20;                 // Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
         } else {
           meanAiValue = i;
@@ -646,7 +645,6 @@ or mirrored at any other location without the express written permission of the 
         i += (10 * 10); // Change meanA faster
       }
     }
-    console.log(`meanACalcResults: ${meanACalcResults} - ${meanAiValue}`);
     if (meanACalcResults === 2) {
       console.warn(`meanACalcResults failed after trying all combinations!`);
       return ['Error', ''];
@@ -655,7 +653,7 @@ or mirrored at any other location without the express written permission of the 
     // Don't Bother Unless Specifically Requested
     // NOTE: Applies to eccentric orbits
     // ===== Argument of Perigee Loop =====
-    if (typeof goalAlt != 'undefined') {
+    if (typeof goalAlt != 'undefined' && goalAlt !== 0) {
       meanACalcResults = 0; // Reset meanACalcResults
       for (i = 0; i < (360 * 10); i += 1) { /** Rotate ArgPer 0.1 Degree at a Time for Up To 400 Degrees */
         argPerCalcResults = argPerCalc(i);
@@ -680,10 +678,9 @@ or mirrored at any other location without the express written permission of the 
 
         // ===== Mean Anomaly Loop =====
         for (var j = 0; j < (520 * 10); j += 1) { /** Rotate Mean Anomaly 0.1 Degree at a Time for Up To 400 Degrees */
-          meanACalcResults = meanaCalc(j, rascOffset);
+          meanACalcResults = meanaCalc(j);
           if (meanACalcResults === 1) {
             if (isUpOrDown !== upOrDown) { // If Object is moving opposite of the goal direction (upOrDown)
-              // rascOffset = true;
               j = j + 20;                 // Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
             } else {
               break; // Stop changing the Mean Anomaly
@@ -699,10 +696,7 @@ or mirrored at any other location without the express written permission of the 
 
     // ===== Right Ascension Loop =====
     for (i = 0; i < (5200 * 100); i += 1) {         // 520 degress in 0.01 increments TODO More precise?
-      if (rascOffset && i === 0) {
-        i = (mainRasc - 10) * 100;
-      }
-      var rascCalcResults = rascCalc(i);
+      var rascCalcResults = rascCalc(i, rascOffset);
       if (rascCalcResults === 1) {
         break;
       }
@@ -784,7 +778,7 @@ or mirrored at any other location without the express written permission of the 
       return propNewArgPe;
     }
 
-    function meanaCalc (meana, rascOffset) {
+    function meanaCalc (meana) {
       var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
 
       meana = meana / 10;
@@ -792,12 +786,6 @@ or mirrored at any other location without the express written permission of the 
       meana = pad(meana, 8);
 
       var rasc = (sat.raan * rad2deg).toPrecision(7);
-      // if (rascOffset) {
-      //   rasc = (rasc * 1) + 180; // Spin the orbit 180 degrees.
-      //   if (rasc > 360) {
-      //     rasc = (rasc * 1) - 360; // angle can't be bigger than 360
-      //   }
-      // }
       mainRasc = rasc;
       rasc = rasc.toString().split('.');
       rasc[0] = rasc[0].substr(-3, 3);
@@ -851,11 +839,12 @@ or mirrored at any other location without the express written permission of the 
       return propagateResults;
     }
 
-    function rascCalc (rasc) {
+    function rascCalc (rasc, rascOffset) {
       var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
       var meana = mainMeana;
 
-      rasc = rasc / 100;
+      rascNum = rasc;
+      rasc = (rasc / 100);
       if (rasc > 360) {
         rasc = rasc - 360; // angle can't be bigger than 360
       }
@@ -907,6 +896,24 @@ or mirrored at any other location without the express written permission of the 
 
       if (propNewRasc === 1) {
         sat.TLE1 = mainTLE1;
+
+        rasc = (rascNum / 100) + rascOffset;
+        if (rasc > 360) {
+          rasc = rasc - 360; // angle can't be bigger than 360 with offset
+        }
+        if (rasc < 0) {
+          rasc = rasc + 360; // angle can't be less than 360 with offset
+        }
+        rasc = rasc.toPrecision(7);
+        rasc = rasc.split('.');
+        rasc[0] = rasc[0].substr(-3, 3);
+        rasc[1] = rasc[1].substr(0, 4);
+        rasc = (rasc[0] + '.' + rasc[1]).toString();
+        rasc = pad(rasc, 8);
+        mainRasc = rasc;
+
+        mainTLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
+
         sat.TLE2 = mainTLE2;
       }
 

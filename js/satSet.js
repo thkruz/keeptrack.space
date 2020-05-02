@@ -234,12 +234,23 @@ var satSensorMarkerArray = [];
         $('#spinner').hide();
         $('#loader-text').html('');
       } else { // Loading Screen Resized and Hidden
-        $('#loading-screen').removeClass('full-loader');
-        $('#loading-screen').addClass('mini-loader-container');
-        $('#logo-inner-container').addClass('mini-loader');
-        $('#logo-text').html('');
-        $('#loader-text').html('Attempting to Math...');
-        $('#loading-screen').fadeOut();
+        if (settingsManager.trusatImages) {
+            setTimeout(function () {
+              $('#loading-screen').removeClass('full-loader');
+              $('#loading-screen').addClass('mini-loader-container');
+              $('#logo-inner-container').addClass('mini-loader');
+              $('#logo-text').html('');
+              $('#loader-text').html('Attempting to Math...');
+              $('#loading-screen').fadeOut();
+            }, 5000);
+        } else {
+          $('#loading-screen').removeClass('full-loader');
+          $('#loading-screen').addClass('mini-loader-container');
+          $('#logo-inner-container').addClass('mini-loader');
+          $('#logo-text').html('');
+          $('#loader-text').html('Attempting to Math...');
+          $('#loading-screen').fadeOut();
+        }
       }
 
       satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc

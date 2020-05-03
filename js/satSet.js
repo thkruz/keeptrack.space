@@ -234,12 +234,13 @@ var satSensorMarkerArray = [];
         $('#spinner').hide();
         $('#loader-text').html('');
       } else { // Loading Screen Resized and Hidden
-        if (settingsManager.trusatImages) {
+        if (settingsManager.trusatMode) {
             setTimeout(function () {
               $('#loading-screen').removeClass('full-loader');
               $('#loading-screen').addClass('mini-loader-container');
               $('#logo-inner-container').addClass('mini-loader');
               $('#logo-text').html('');
+              $('#logo-trusat').hide();
               $('#loader-text').html('Attempting to Math...');
               $('#loading-screen').fadeOut();
             }, 5000);
@@ -248,6 +249,7 @@ var satSensorMarkerArray = [];
           $('#loading-screen').addClass('mini-loader-container');
           $('#logo-inner-container').addClass('mini-loader');
           $('#logo-text').html('');
+          $('#logo-trusat').hide();
           $('#loader-text').html('Attempting to Math...');
           $('#loading-screen').fadeOut();
         }
@@ -392,6 +394,16 @@ var satSensorMarkerArray = [];
       var obsminrange;
       var obsmaxrange;
       var limitSatsArray = [];
+
+      // Get TruSat TLEs if in TruSat Mode
+      if (typeof trusatList == 'undefined' && settingsManager.trusatMode && !settingsManager.trusatOnly) {
+        // console.log(`${Date.now()} - TruSat TLEs Loading...`);
+        $.getScript('/tle/trusat.js', function () {
+          // console.log(`${Date.now()} - TruSat TLEs Loaded!`);
+          loadTLEs(resp); // Try again when you have all TLEs
+        });
+        return; // Stop and Wait for the TruSat TLEs to Load
+      }
 
       /** Parses GET variables for SatCruncher initialization */
       (function parseFromGETVariables () {
@@ -555,6 +567,39 @@ var satSensorMarkerArray = [];
           }
           satInfoList = null;
         }
+        // console.log(`${Date.now()} - Merging TruSat TLEs`);
+        if (typeof trusatList !== 'undefined' && settingsManager.trusatMode) { // If extra catalogue
+          for (s = 0; s < trusatList.length; s++) {
+            if (trusatList[s].TLE1 == undefined) continue; // Don't Process Bad Satellite Information
+            if (trusatList[s].TLE2 == undefined) continue; // Don't Process Bad Satellite Information
+            if (typeof trusatList[s].ON == 'undefined') { trusatList[s].ON = "Unknown"; }
+            if (typeof trusatList[s].OT == 'undefined') { trusatList[s].OT = null; }
+            year = trusatList[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+            prefix = (year > 50) ? '19' : '20';
+            year = prefix + year;
+            rest = trusatList[s].TLE1.substr(9, 8).trim().substring(2);
+            scc = pad0(parseInt(trusatList[s].TLE1.substr(2, 5).trim()).toString(), 5);
+            extrasSatInfo = {
+              static: false,
+              missile: false,
+              active: true,
+              trusat: true,
+              ON: trusatList[s].ON,
+              OT: 4, // Amateur Report
+              C: 'Unknown',
+              LV: 'Unknown',
+              LS: 'Unknown',
+              SCC_NUM: `T${scc.toString()}`,
+              TLE1: trusatList[s].TLE1,
+              TLE2: trusatList[s].TLE2,
+              intlDes: year + '-' + rest,
+              type: 'sat',
+              id: tempSatData.length
+            };
+            tempSatData.push(extrasSatInfo);
+          }
+          trusatList = null;
+        }
 
         satSet.orbitalSats = tempSatData.length;
 
@@ -655,9 +700,11 @@ var satSensorMarkerArray = [];
       settingsManager.shadersReady = true;
       if (satsReadyCallback) {
         satsReadyCallback(satData);
-        // If No Visual Magnitudes, Add The VMag Database
-        if (typeof satSet.getSat(satSet.getIdFromObjNum(00694)).vmag == 'undefined') {
-          satVmagManager.init();
+        if (!settingsManager.trusatOnly) {
+          // If No Visual Magnitudes, Add The VMag Database
+          if (typeof satSet.getSat(satSet.getIdFromObjNum(694)).vmag == 'undefined') {
+            satVmagManager.init();
+          }
         }
       }
     }
@@ -839,7 +886,6 @@ var satSensorMarkerArray = [];
 
   satSet.getSat = function (i) {
     if (!satData) return null;
-
     if (!satData[i]) return null;
     if (gotExtraData) {
       satData[i].inViewChange = false;

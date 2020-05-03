@@ -8,8 +8,8 @@
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.6.1';
-  settingsManager.versionDate = 'March 7, 2020';
+  settingsManager.versionNumber = 'v1.7.0';
+  settingsManager.versionDate = 'May 3, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -86,8 +86,17 @@
           settingsManager.tleSource = 'tle/mw.json';
           break;
         case 'trusat':
-          settingsManager.tleSource = 'tle/trusat.json';
+          settingsManager.trusatMode = true;
           settingsManager.trusatImages = true;
+          $('.legend-pink-box').show();
+          $('#logo-trusat').show();
+          break;
+        case 'trusat-only':
+          settingsManager.trusatMode = true;
+          settingsManager.trusatOnly = true;
+          settingsManager.trusatImages = true;
+          settingsManager.tleSource = 'tle/trusat.json';
+          $('.legend-pink-box').show();
           $('#logo-trusat').show();
           break;
         case 'logo':
@@ -275,16 +284,17 @@
   settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
   settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
   settingsManager.colors.inviewAlt = [0.2, 0.4, 1.0, 1];
-  if (settingsManager.trusatImages) {
-    settingsManager.colors.payload = [1.0, 1.0, 1.0, 0.8];
-  } else {
-    settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
-  }
+  settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
   settingsManager.colors.rocket = [0.2, 0.4, 1.0, 1];
-  settingsManager.colors.debris = [0.5, 0.5, 0.5, 0.85];
+  if (settingsManager.trusatOnly) {
+    settingsManager.colors.debris = [0.9, 0.9, 0.9, 1];
+  } else {
+    settingsManager.colors.debris = [0.5, 0.5, 0.5, 0.85];
+  }
   settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
+  settingsManager.colors.trusat = [1.0, 0.0, 0.6, 1.0];
+  settingsManager.colors.analyst = [1.0, 1.0, 1.0, 0.8];
   settingsManager.colors.missile = [1.0, 1.0, 0.0, 1.0];
-  settingsManager.colors.analyst = [1.0, 1.0, 0.0, 1.0];
   settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];
   settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.1];
   settingsManager.colors.sunlight100 = [1.0, 1.0, 1.0, 1.0];

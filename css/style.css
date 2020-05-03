@@ -378,6 +378,10 @@ ul {
 .legend-purple-box {
   background: rgb(108, 30, 103);
 }
+.legend-pink-box {
+  background: rgb(108, 0, 50);
+  display: hidden;
+}
 .legend-orange-box {
   background: rgb(255, 92, 0);
 }
@@ -743,7 +747,7 @@ ul li{
   #datetime-text {
       padding-top: 10px
   }
-  
+
   #datetime-text:hover {
       background: rgba(255, 255, 255, .2);
       border-radius: 5px;

@@ -1189,6 +1189,19 @@ $.ajaxSetup({
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               }
               break;
+            case "legend-pink-box":
+              if (ColorScheme.objectTypeFlags.pink) {
+                ColorScheme.objectTypeFlags.pink = false;
+                $('.legend-pink-box').css('background', 'black');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              } else {
+                ColorScheme.objectTypeFlags.pink = true;
+                $('.legend-pink-box').css('background', 'pink');
+                settingsManager.isForceColorScheme = true;
+                satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              }
+              break;
           }
         });
 
@@ -3921,6 +3934,7 @@ $.ajaxSetup({
       $('.legend-white-box').css('background', 'white');
       $('.legend-red-box').css('background', 'red');
       $('.legend-purple-box').css('background', 'purple');
+      $('.legend-pink-box').css('background', 'pink');
       ColorScheme.objectTypeFlags.green = true;
       ColorScheme.objectTypeFlags.blue = true;
       ColorScheme.objectTypeFlags.gray = true;
@@ -3929,6 +3943,7 @@ $.ajaxSetup({
       ColorScheme.objectTypeFlags.white = true;
       ColorScheme.objectTypeFlags.red = true;
       ColorScheme.objectTypeFlags.purple = true;
+      ColorScheme.objectTypeFlags.pink = true;
     }
     settingsManager.currentLegend = menu;
   };

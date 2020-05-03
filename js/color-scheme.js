@@ -26,6 +26,7 @@
   ColorScheme.objectTypeFlags.yellow = true;
   ColorScheme.objectTypeFlags.red = true;
   ColorScheme.objectTypeFlags.purple = true;
+  ColorScheme.objectTypeFlags.pink = true;
   ColorScheme.objectTypeFlags.white = true;
   ColorScheme.objectTypeFlags.star100 = true;
   ColorScheme.objectTypeFlags.star75 = true;
@@ -221,6 +222,14 @@
           pickable: false
         };
       }
+      if (!sat.inView && sat.OT === 4 && ColorScheme.objectTypeFlags.pink === false ||
+          cameraType.current === cameraType.PLANETARIUM && sat.OT === 4 && ColorScheme.objectTypeFlags.pink === false ||
+          (satellite.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 4 && ColorScheme.objectTypeFlags.pink === false)) {
+        return {
+          color: colorTheme.deselected,
+          pickable: false
+        };
+      }
 
       if (cameraType.current === cameraType.ASTRONOMY) {
         return {
@@ -254,6 +263,8 @@
           color = colorTheme.rocket;
         } else if (sat.OT === 3) { // Debris
           color = colorTheme.debris;
+        } else if (sat.OT === 4) { // TruSat Object
+          color = colorTheme.trusat;
         } else {
           color = colorTheme.unknown;
         }

@@ -930,7 +930,8 @@ function webGlInit () {
   can.width = window.innerWidth;
   can.height = window.innerHeight;
 
-  var gl = can.getContext('webgl', {alpha: false}) || can.getContext('experimental-webgl', {alpha: false});
+  // Desynchronized Fixed Jitter on Old Computer
+  var gl = can.getContext('webgl', {alpha: false, desynchronized: true}) || can.getContext('experimental-webgl', {alpha: false, desynchronized: true});
   if (!gl) {
     browserUnsupported();
   }

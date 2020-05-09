@@ -11,7 +11,7 @@
     onmessage
 
 */
-importScripts('lib/satellite.min.js');
+importScripts('lib/satellite.js');
 
 var propRealTime;
 var propOffset;

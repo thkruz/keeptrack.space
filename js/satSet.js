@@ -702,8 +702,12 @@ var satSensorMarkerArray = [];
         satsReadyCallback(satData);
         if (!settingsManager.trusatOnly) {
           // If No Visual Magnitudes, Add The VMag Database
-          if (typeof satSet.getSat(satSet.getIdFromObjNum(694)).vmag == 'undefined') {
-            satVmagManager.init();
+          try {
+            if (typeof satSet.getSat(satSet.getIdFromObjNum(694)).vmag == 'undefined') {
+              satVmagManager.init();
+            }
+          } catch (e) {
+              console.debug('satVmagManager Not Loaded');
           }
         }
       }
@@ -1265,6 +1269,7 @@ var satSensorMarkerArray = [];
 
   satSet.selectSat = function (i) {
     if (i === selectedSat) return;
+    if(isAnalysisMenuOpen && i != -1) { $('#anal-sat').val(satSet.getSat(i).SCC_NUM); }
     adviceList.satelliteSelected();
     satCruncher.postMessage({
       satelliteSelected: [i]

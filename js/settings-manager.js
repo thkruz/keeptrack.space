@@ -2,14 +2,12 @@
   $
 */
 
-
-
 (function () {
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.7.0';
-  settingsManager.versionDate = 'May 3, 2020';
+  settingsManager.versionNumber = 'v1.7.2';
+  settingsManager.versionDate = 'May 9, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -86,12 +84,14 @@
           settingsManager.tleSource = 'tle/mw.json';
           break;
         case 'trusat':
+          console.debug('TruSat Overlay Mode Initializing');
           settingsManager.trusatMode = true;
           settingsManager.trusatImages = true;
           $('.legend-pink-box').show();
           $('#logo-trusat').show();
           break;
         case 'trusat-only':
+          console.debug('TruSat Only Mode Initializing');
           settingsManager.trusatMode = true;
           settingsManager.trusatOnly = true;
           settingsManager.trusatImages = true;

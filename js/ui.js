@@ -108,6 +108,8 @@ $.ajaxSetup({
   cache: false
 });
 
+var isAnalysisMenuOpen = false;
+
 (function () {
   var lastBoxUpdateTime = 0;
   var lastOverlayUpdateTime = 0;
@@ -126,7 +128,6 @@ $.ajaxSetup({
   var isCountriesMenuOpen = false;
   var isMilSatSelected = false;
   var isSatcomMenuOpen = false;
-  var isAnalysisMenuOpen = false;
   var isSocratesMenuOpen = false;
   var isSettingsMenuOpen = false;
 
@@ -1343,6 +1344,12 @@ $.ajaxSetup({
         }
         e.preventDefault();
       });
+      $('#analysis-form').submit(function (e) {
+        var chartType = $('#anal-type').val();
+        var sat = $('#anal-sat').val();
+        $.colorbox({href: `https://keeptrack.space/analysis/?sat=${sat}&type=${chartType}`, iframe: true, width: '60%', height: '60%', fastIframe: false, closeButton: false});
+        e.preventDefault();
+      });
       $('#settings-form').change(function (e) {
         var isDMChecked = document.getElementById('settings-demo-mode').checked;
         var isSLMChecked = document.getElementById('settings-sat-label-mode').checked;
@@ -2468,6 +2475,10 @@ $.ajaxSetup({
             break;
           } else {
             uiController.hideSideMenus();
+            if (selectedSat != -1) {
+              var sat = satSet.getSat(selectedSat);
+              $('#anal-sat').val(sat.SCC_NUM);
+            }
             $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             uiController.updateWatchlist();
             isAnalysisMenuOpen = true;

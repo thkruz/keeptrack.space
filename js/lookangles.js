@@ -1007,6 +1007,187 @@ or mirrored at any other location without the express written permission of the 
       return 0;
     }
   };
+  satellite.calculateLookAngles = function (sat, sensor, offset) {
+    var propOffset;
+    (function _inputValidation () {
+      // Check if there is a sensor
+      if (typeof sensor == 'undefined') {
+        // Try using the current sensor if there is one
+        if (satellite.sensorSelected()) {
+          sensor = satellite.currentSensor;
+        } else {
+          console.error('getlookangles2 requires a sensor!');
+          return;
+        }
+        // Simple Error Checking
+      } else {
+        if (typeof sensor.obsminaz == 'undefined') {
+          console.error('sensor format incorrect');
+          return;
+        }
+        sensor.observerGd = {   // Array to calculate look angles in propagate()
+          latitude: sensor.lat * deg2rad,
+          longitude: sensor.long * deg2rad,
+          height: sensor.obshei * 1               // Converts from string to number TODO: Find correct way to convert string to integer
+        };
+      }
+
+      if (typeof sat == 'undefined') {
+        console.error('sat parameter required!');
+      } else {
+        if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
+          console.error('sat parameter invalid format!');
+        }
+      }
+
+      if (typeof propOffset == 'undefined') {
+        propOffset = 0;
+      }
+
+      if (typeof satellite.isRiseSetLookangles == 'undefined') {
+        satellite.isRiseSetLookangles = false;
+      }
+    })();
+
+    // Set default timing settings. These will be changed to find look angles at different times in future.
+    var propTempOffset = 0;               // offset letting us propagate in the future (or past)
+
+    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
+    var lookanglesTable = [];                                   // Iniially no rows to the table
+
+    if (satellite.isRiseSetLookangles) {
+      var tempLookanglesInterval = satellite.lookanglesInterval;
+      satellite.lookanglesInterval = 1;
+    }
+
+    for (var i = 0; i < (satellite.lookanglesLength * 24 * 60 * 60); i += satellite.lookanglesInterval) {         // satellite.lookanglesInterval in seconds
+      propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
+      if (lookanglesTable.length <= 5000) {                           // Maximum of 1500 lines in the look angles table
+        lookanglesRow = propagate2(propTempOffset, satrec);
+        if (typeof lookanglesRow != 'undefined') {
+          lookanglesTable.push(lookanglesRow);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
+        }
+      }
+    }
+
+    if (satellite.isRiseSetLookangles) {
+      satellite.lookanglesInterval = tempLookanglesInterval;
+    }
+    function propagate2 (propTempOffset, satrec) {
+      var lookAngleRecord = {};
+      var now = new Date();                                     // Make a time variable
+      now.setTime(Number(Date.now()) + propTempOffset);           // Set the time variable to the time in the future
+      var j = _jday(now.getUTCFullYear(),
+      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+      j += now.getUTCMilliseconds() * millisecondsPerDay;
+      var gmst = satellite.gstime(j);
+
+      var m = (j - satrec.jdsatepoch) * minutesPerDay;
+      var positionEci = satellite.sgp4(satrec, m);
+      var positionEcf, lookAngles, azimuth, elevation, range;
+
+      positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
+      lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+      azimuth = lookAngles.azimuth * rad2deg;
+      elevation = lookAngles.elevation * rad2deg;
+      range = lookAngles.rangeSat;
+
+      if (sensor.obsminaz < sensor.obsmaxaz) {
+        if (!((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+        ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+          return;
+        }
+      }
+      if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+      ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+        if (satellite.isRiseSetLookangles) {
+          // Previous Pass to Calculate first line of coverage
+          var now1 = new Date();
+          now1.setTime(Number(Date.now()) + propTempOffset - (satellite.lookanglesInterval * 1000));
+          var j1 = timeManager.jday(now1.getUTCFullYear(),
+          now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+          now1.getUTCDate(),
+          now1.getUTCHours(),
+          now1.getUTCMinutes(),
+          now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+          j1 += now1.getUTCMilliseconds() * millisecondsPerDay;
+          var gmst1 = satellite.gstime(j1);
+
+          var m1 = (j1 - satrec.jdsatepoch) * minutesPerDay;
+          var positionEci1 = satellite.sgp4(satrec, m1);
+          var positionEcf1, lookAngles1, azimuth1, elevation1, range1;
+
+          positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
+          lookAngles1 = satellite.ecfToLookAngles(sensor.observerGd, positionEcf1);
+          azimuth1 = lookAngles1.azimuth * rad2deg;
+          elevation1 = lookAngles1.elevation * rad2deg;
+          range1 = lookAngles1.rangeSat;
+          if (!((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+          ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+            return {time: timeManager.dateFormat(now, 'isoDateTime', true),
+                    rng: range,
+                    az: azimuth,
+                    el: elevation};
+          } else {
+            // Next Pass to Calculate Last line of coverage
+            now1.setTime(Number(Date.now()) + propTempOffset - (satellite.lookanglesInterval * 1000));
+            j1 = _jday(now1.getUTCFullYear(),
+            now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+            now1.getUTCDate(),
+            now1.getUTCHours(),
+            now1.getUTCMinutes(),
+            now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+            j1 += now1.getUTCMilliseconds() * millisecondsPerDay;
+            gmst1 = satellite.gstime(j1);
+
+            m1 = (j1 - satrec.jdsatepoch) * minutesPerDay;
+            positionEci1 = satellite.sgp4(satrec, m1);
+
+            positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
+            lookAngles1 = satellite.ecfToLookAngles(sensor.observerGd, positionEcf1);
+            azimuth1 = lookAngles1.azimuth * rad2deg;
+            elevation1 = lookAngles1.elevation * rad2deg;
+            range1 = lookAngles1.rangeSat;
+            if (!((azimuth1 >= sensor.obsminaz || azimuth1 <= sensor.obsmaxaz) && (elevation1 >= sensor.obsminel && elevation1 <= sensor.obsmaxel) && (range1 <= sensor.obsmaxrange && range1 >= sensor.obsminrange)) ||
+            ((azimuth1 >= sensor.obsminaz2 || azimuth1 <= sensor.obsmaxaz2) && (elevation1 >= sensor.obsminel2 && elevation1 <= sensor.obsmaxel2) && (range1 <= sensor.obsmaxrange2 && range1 >= sensor.obsminrange2))) {
+              return {time: timeManager.dateFormat(now, 'isoDateTime', true),
+                      rng: range,
+                      az: azimuth,
+                      el: elevation};
+            }
+          }
+          return;
+        }
+        return {time: timeManager.dateFormat(now, 'isoDateTime', true),
+                rng: range,
+                az: azimuth,
+                el: elevation};
+      }
+      return;
+    }
+    function _jday(year, mon, day, hr, minute, sec) { // from satellite.js
+      if (!year) {
+        // console.error('timeManager.jday should always have a date passed to it!');
+        var now;
+        now = Date.now();
+        jDayStart = new Date(now.getFullYear(), 0, 0);
+        jDayDiff = now - jDayStart;
+        return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);
+      } else {
+        return (367.0 * year -
+          Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
+          Math.floor(275 * mon / 9.0) +
+          day + 1721013.5 +
+          ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
+        );
+      }
+    }
+    return lookanglesTable;
+  };
   satellite.getlookangles = function (sat, isLookanglesMenuOpen) {
     if (!isLookanglesMenuOpen) {
       return;

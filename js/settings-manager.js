@@ -254,77 +254,79 @@
   // Color Settings
   // /////////////////
   settingsManager.currentColorScheme = null;
-  settingsManager.colors = {};
 
   settingsManager.reColorMinimumTime = 1000;
-
-  settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
-  settingsManager.colors.star100 = [1.0, 1.0, 1.0, 1.0];
-  settingsManager.colors.star75 = [1.0, 1.0, 1.0, 0.16];
-  settingsManager.colors.star50 = [1.0, 1.0, 1.0, 0.08];
-  settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
-  settingsManager.colors.marker = [[0.2, 1.0, 1.0, 1.0],
-                                   [1.0, 0.2, 1.0, 1.0],
-                                   [1.0, 1.0, 0.2, 1.0],
-                                   [0.2, 0.2, 1.0, 1.0],
-                                   [0.2, 1.0, 0.2, 1.0],
-                                   [1.0, 0.2, 0.2, 1.0],
-                                   [0.5, 0.6, 1.0, 1.0],
-                                   [0.6, 0.5, 1.0, 1.0],
-                                   [1.0, 0.6, 0.5, 1.0],
-                                   [1.0, 1.0, 1.0, 1.0],
-                                   [0.2, 1.0, 1.0, 1.0],
-                                   [1.0, 0.2, 1.0, 1.0],
-                                   [1.0, 1.0, 0.2, 1.0],
-                                   [0.2, 0.2, 1.0, 1.0],
-                                   [0.2, 1.0, 0.2, 1.0],
-                                   [1.0, 0.2, 0.2, 1.0],
-                                   [0.5, 0.6, 1.0, 1.0],
-                                   [0.6, 0.5, 1.0, 1.0],];
-  settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
-  settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
-  settingsManager.colors.inviewAlt = [0.2, 0.4, 1.0, 1];
-  settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
-  settingsManager.colors.rocket = [0.2, 0.4, 1.0, 1];
-  if (settingsManager.trusatOnly) {
-    settingsManager.colors.debris = [0.9, 0.9, 0.9, 1];
-  } else {
-    settingsManager.colors.debris = [0.5, 0.5, 0.5, 0.85];
+  settingsManager.colors = {};
+  settingsManager.colors = JSON.parse(localStorage.getItem("settingsManager-colors"));
+  if (settingsManager.colors == null) {
+    settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
+    settingsManager.colors.star100 = [1.0, 1.0, 1.0, 1.0];
+    settingsManager.colors.star75 = [1.0, 1.0, 1.0, 0.16];
+    settingsManager.colors.star50 = [1.0, 1.0, 1.0, 0.08];
+    settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
+    settingsManager.colors.marker = [[0.2, 1.0, 1.0, 1.0],
+                                     [1.0, 0.2, 1.0, 1.0],
+                                     [1.0, 1.0, 0.2, 1.0],
+                                     [0.2, 0.2, 1.0, 1.0],
+                                     [0.2, 1.0, 0.2, 1.0],
+                                     [1.0, 0.2, 0.2, 1.0],
+                                     [0.5, 0.6, 1.0, 1.0],
+                                     [0.6, 0.5, 1.0, 1.0],
+                                     [1.0, 0.6, 0.5, 1.0],
+                                     [1.0, 1.0, 1.0, 1.0],
+                                     [0.2, 1.0, 1.0, 1.0],
+                                     [1.0, 0.2, 1.0, 1.0],
+                                     [1.0, 1.0, 0.2, 1.0],
+                                     [0.2, 0.2, 1.0, 1.0],
+                                     [0.2, 1.0, 0.2, 1.0],
+                                     [1.0, 0.2, 0.2, 1.0],
+                                     [0.5, 0.6, 1.0, 1.0],
+                                     [0.6, 0.5, 1.0, 1.0],];
+    settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
+    settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
+    settingsManager.colors.inviewAlt = [0.2, 0.4, 1.0, 1];
+    settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
+    settingsManager.colors.rocketBody = [0.2, 0.4, 1.0, 1];
+    if (settingsManager.trusatOnly) {
+      settingsManager.colors.debris = [0.9, 0.9, 0.9, 1];
+    } else {
+      settingsManager.colors.debris = [0.5, 0.5, 0.5, 1];
+    }
+    settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
+    settingsManager.colors.trusat = [1.0, 0.0, 0.6, 1.0];
+    settingsManager.colors.analyst = [1.0, 1.0, 1.0, 0.8];
+    settingsManager.colors.missile = [1.0, 1.0, 0.0, 1.0];
+    settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];
+    settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.1];
+    settingsManager.colors.starHi = [1.0, 1.0, 1.0, 1.0];
+    settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.8];
+    settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.6];
+    settingsManager.colors.sunlightInview = [0.85, 0.5, 0.0, 1.0];
+    settingsManager.colors.penumbral = [1.0, 1.0, 1.0, 0.3];
+    settingsManager.colors.umbral = [1.0, 1.0, 1.0, 0.1];
+    // DEBUG Colors
+    // settingsManager.colors.sunlight = [0.2, 0.4, 1.0, 1];;
+    // settingsManager.colors.penumbral = [0.5, 0.5, 0.5, 0.85];
+    // settingsManager.colors.umbral = [0.2, 1.0, 0.0, 0.5];
+    //
+    settingsManager.colors.gradientAmt = 0;
+    // TODO: Gradients Must be Edited in color-scheme.js
+    // settingsManager.colors.apogeeGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
+    // settingsManager.colors.velGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
+    settingsManager.colors.satSmall = [0.2, 1.0, 0.0, 0.65];
+    settingsManager.colors.rcsSmall = [1.0, 0, 0, 0.6];
+    settingsManager.colors.rcsMed = [0.2, 0.4, 1.0, 1];
+    settingsManager.colors.rcsLarge = [0, 1.0, 0, 0.6];
+    settingsManager.colors.rcsUnknown = [1.0, 1.0, 0, 0.6];
+    settingsManager.colors.lostobjects = [0.2, 1.0, 0.0, 0.65];
+    settingsManager.colors.satLEO = [0.2, 1.0, 0.0, 0.65];
+    settingsManager.colors.satGEO = [0.2, 1.0, 0.0, 0.65];
+    settingsManager.colors.inGroup = [0.2, 1.0, 0.0, 0.5];
+    settingsManager.colors.countryPRC = [1.0, 0, 0, 0.6];
+    settingsManager.colors.countryUS = [0.2, 0.4, 1.0, 1];
+    settingsManager.colors.countryCIS = [1.0, 1.0, 1.0, 1.0];
+    settingsManager.colors.countryOther = [0, 1.0, 0, 0.6];
   }
-  settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
-  settingsManager.colors.trusat = [1.0, 0.0, 0.6, 1.0];
-  settingsManager.colors.analyst = [1.0, 1.0, 1.0, 0.8];
-  settingsManager.colors.missile = [1.0, 1.0, 0.0, 1.0];
-  settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];
-  settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.1];
-  settingsManager.colors.sunlight100 = [1.0, 1.0, 1.0, 1.0];
-  settingsManager.colors.sunlight80 = [1.0, 1.0, 1.0, 0.8];
-  settingsManager.colors.sunlight60 = [1.0, 1.0, 1.0, 0.6];
-  settingsManager.colors.sunlightInview = [0.85, 0.5, 0.0, 1.0];
-  settingsManager.colors.penumbral = [1.0, 1.0, 1.0, 0.3];
-  settingsManager.colors.umbral = [1.0, 1.0, 1.0, 0.1];
-  // DEBUG Colors
-  // settingsManager.colors.sunlight = [0.2, 0.4, 1.0, 1];;
-  // settingsManager.colors.penumbral = [0.5, 0.5, 0.5, 0.85];
-  // settingsManager.colors.umbral = [0.2, 1.0, 0.0, 0.5];
-  //
-  settingsManager.colors.gradientAmt = 0;
-  // TODO: Gradients Must be Edited in color-scheme.js
-  // settingsManager.colors.apogeeGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
-  // settingsManager.colors.velGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
-  settingsManager.colors.smallSats = [0.2, 1.0, 0.0, 0.65];
-  settingsManager.colors.smallRCS = [1.0, 0, 0, 0.6];
-  settingsManager.colors.mediumRCS = [0.2, 0.4, 1.0, 1];
-  settingsManager.colors.largeRCS = [0, 1.0, 0, 0.6];
-  settingsManager.colors.unknownRCS = [1.0, 1.0, 0, 0.6];
-  settingsManager.colors.lostobjects = [0.2, 1.0, 0.0, 0.65];
-  settingsManager.colors.leo = [0.2, 1.0, 0.0, 0.65];
-  settingsManager.colors.geo = [0.2, 1.0, 0.0, 0.65];
-  settingsManager.colors.inGroup = [0.2, 1.0, 0.0, 0.5];
-  settingsManager.colors.china = [1.0, 0, 0, 0.6];
-  settingsManager.colors.usa = [0.2, 0.4, 1.0, 1];
-  settingsManager.colors.russia = [1.0, 1.0, 1.0, 1.0];
-  settingsManager.colors.otherCountries = [0, 1.0, 0, 0.6];
 
   // /////////////////
   // Orbit Color Settings

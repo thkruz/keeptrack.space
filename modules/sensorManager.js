@@ -1165,7 +1165,7 @@
       }
     }
 
-    uiController.legendMenuChange('default');
+    // uiController.legendMenuChange('default');
   };
 
   sensorManager.sensorList = sensorList;

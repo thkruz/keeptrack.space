@@ -776,10 +776,10 @@ var drawLoopCallback;
 
       if (sat.static) continue;
       if (sat.missile) continue;
-      if (sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) continue;
-      if (sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) continue;
-      if (sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) continue;
-      if (sat.inview && ColorScheme.objectTypeFlags.orange === false) continue;
+      if (sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) continue;
+      if (sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false) continue;
+      if (sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
+      if (sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
 
       satSet.getScreenCoords(i, pMatrix, camMatrix, sat.position);
       if (satScreenPositionArray.error) continue;
@@ -908,10 +908,10 @@ var drawLoopCallback;
       if (sat.static) continue;
       if (sat.missile) continue;
       // if (!sat.inview) continue;
-      if (sat.OT === 1 && ColorScheme.objectTypeFlags.green === false) continue;
-      if (sat.OT === 2 && ColorScheme.objectTypeFlags.blue === false) continue;
-      if (sat.OT === 3 && ColorScheme.objectTypeFlags.gray === false) continue;
-      if (sat.inview && ColorScheme.objectTypeFlags.orange === false) continue;
+      if (sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) continue;
+      if (sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false) continue;
+      if (sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
+      if (sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
       satSet.getScreenCoords(i, pMatrix, camMatrix);
       if (satScreenPositionArray.error) continue;
       if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
@@ -1251,7 +1251,8 @@ function selectSat (satId) {
       } else {
         $('#search-results').attr('style', 'display:block; max-height:27%');
         if (cameraType.current !== cameraType.PLANETARIUM) {
-          uiController.legendMenuChange('default');
+          // Unclear why this was needed...
+          // uiController.legendMenuChange('default');
         }
       }
     } else {
@@ -1259,7 +1260,8 @@ function selectSat (satId) {
       } else {
         $('#search-results').attr('style', 'max-height:27%');
         if (cameraType.current !== cameraType.PLANETARIUM) {
-          uiController.legendMenuChange('default');
+          // Unclear why this was needed...
+          // uiController.legendMenuChange('default');
         }
       }
     }

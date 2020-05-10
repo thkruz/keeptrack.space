@@ -21,6 +21,8 @@
     <!--Import Materialize CSS-->
     <link rel="stylesheet" href="css/materialize.css?v=1.7.2b">
     <link rel="stylesheet" href="css/materialize-local.css?v=1.7.2b">
+    <!--Import Bootstrap Color Picker-->
+    <link rel="stylesheet" href="js/lib/colorPick.css?v=1.7.2b">
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -188,75 +190,73 @@
 
         <div id="legend-hover-menu" class="start-hidden">
           <ul id="legend-list-default">
-            <li><div class="Square-Box legend-green-box"></div>Payload</li>
-            <li><div class="Square-Box legend-blue-box"></div>Rocket Body</li>
-            <li><div class="Square-Box legend-gray-box"></div>Debris</li>
-            <li><div class="Square-Box legend-pink-box"></div>TruSat</li>
-            <li><div class="Square-Box legend-red-box"></div>Sensor</li>
-            <li><div class="Square-Box legend-purple-box"></div>Launch Site</li>
+            <li><div class="Square-Box legend-payload-box"></div>Payload</li>
+            <li><div class="Square-Box legend-rocketBody-box"></div>Rocket Body</li>
+            <li><div class="Square-Box legend-debris-box"></div>Debris</li>
+            <li class="legend-trusat"><div class="Square-Box legend-trusat-box"></div>TruSat</li>
+            <li><div class="Square-Box legend-sensor-box"></div>Sensor</li>
+            <li><div class="Square-Box legend-facility-box"></div>Launch Site</li>
           </ul>
           <ul id="legend-list-planetarium" class="start-hidden">
-            <li><div class="Square-Box legend-green-box"></div>Payload</li>
-            <li><div class="Square-Box legend-blue-box"></div>Rocket Body</li>
-            <li><div class="Square-Box legend-gray-box"></div>Debris</li>
-            <li><div class="Square-Box legend-pink-box"></div>TruSat</li>
+            <li><div class="Square-Box legend-payload-box"></div>Payload</li>
+            <li><div class="Square-Box legend-rocketBody-box"></div>Rocket Body</li>
+            <li><div class="Square-Box legend-debris-box"></div>Debris</li>
+            <li><div class="Square-Box legend-trusat-box"></div>TruSat</li>
           </ul>
           <ul id="legend-list-astronomy" class="start-hidden">
-            <li><div class="Square-Box legend-star100-box"></div>VisMag Less Than 3.5</li>
-            <li><div class="Square-Box legend-star75-box"></div>VisMag Between 3.5 and 4.7</li>
-            <li><div class="Square-Box legend-star50-box"></div>VisMag Greater Than 4.7</li>
+            <li><div class="Square-Box legend-starHi-box"></div>VisMag Less Than 3.5</li>
+            <li><div class="Square-Box legend-starMed-box"></div>VisMag Between 3.5 and 4.7</li>
+            <li><div class="Square-Box legend-starLow-box"></div>VisMag Greater Than 4.7</li>
           </ul>
           <ul id="legend-list-sunlight" class="start-hidden">
-            <li><div class="Square-Box legend-sat50-box"></div>In Umbral</li>
-            <li><div class="Square-Box legend-sat75-box"></div>In Penumbral</li>
-            <li><div class="Square-Box legend-sat100-box"></div>In Sunlight</li>
-            <li><div class="Square-Box legend-orange-box"></div>Satellite In View</li>
+            <li><div class="Square-Box legend-satLow-box"></div>In Umbral</li>
+            <li><div class="Square-Box legend-satMed-box"></div>In Penumbral</li>
+            <li><div class="Square-Box legend-satHi-box"></div>In Sunlight</li>
+            <li><div class="Square-Box legend-inFOV-box"></div>Satellite In View</li>
           </ul>
           <ul id="legend-list-default-sensor" class="start-hidden">
-            <li><div class="Square-Box legend-green-box"></div>Payload</li>
-            <li><div class="Square-Box legend-blue-box"></div>Rocket Body</li>
-            <li><div class="Square-Box legend-gray-box"></div>Debris</li>
-            <li><div class="Square-Box legend-pink-box"></div>TruSat</li>
-            <li><div class="Square-Box legend-orange-box"></div>Satellite In View</li>
-            <li><div class="Square-Box legend-yellow-box"></div>Missile</li>
-            <li><div class="Square-Box legend-red-box"></div>Missile In View</li>
-            <li><div class="Square-Box legend-red-box"></div>Sensor</li>
-            <li><div class="Square-Box legend-purple-box"></div>Launch Site</li>
+            <li><div class="Square-Box legend-payload-box"></div>Payload</li>
+            <li><div class="Square-Box legend-rocketBody-box"></div>Rocket Body</li>
+            <li><div class="Square-Box legend-debris-box"></div>Debris</li>
+            <li><div class="Square-Box legend-trusat-box"></div>TruSat</li>
+            <li><div class="Square-Box legend-inFOV-box"></div>Satellite In View</li>
+            <li><div class="Square-Box legend-missile-box"></div>Missile</li>
+            <li><div class="Square-Box legend-missileInview-box"></div>Missile In View</li>
+            <li><div class="Square-Box legend-static-box"></div>Sensor</li>
+            <li><div class="Square-Box legend-facility-box"></div>Launch Site</li>
           </ul>
           <ul id="legend-list-rcs" class="start-hidden">
-            <li><div class="Square-Box legend-red-box"></div>Less Than 0.1 sq m</li>
-            <li><div class="Square-Box legend-blue-box"></div>Between 0.1 and 1 sq m</li>
-            <li><div class="Square-Box legend-green-box"></div>More Than 1 sq m</li>
-            <li><div class="Square-Box legend-yellow-box"></div>No Public Data</li>
-            <li><div class="Square-Box legend-orange-box"></div>Satellite In View</li>
+            <li><div class="Square-Box legend-rcsSmall-box"></div>Less Than 0.1 sq m</li>
+            <li><div class="Square-Box legend-rcsMed-box"></div>Between 0.1 and 1 sq m</li>
+            <li><div class="Square-Box legend-rcsLarge-box"></div>More Than 1 sq m</li>
+            <li><div class="Square-Box legend-rcsUnknown-box"></div>No Public Data</li>
           </ul>
           <ul id="legend-list-small" class="start-hidden">
-            <li><div class="Square-Box legend-green-box"></div>Small Satellite</li>
-            <li><div class="Square-Box legend-gray-box"></div>Other Satellite</li>
-            <li><div class="Square-Box legend-blue-box"></div>Satellite In View</li>
+            <li><div class="Square-Box legend-satSmall-box"></div>Small Satellite</li>
+            <!-- <li><div class="Square-Box legend-inFOV-box"></div>Satellite In View</li> -->
           </ul>
           <ul id="legend-list-near" class="start-hidden">
-            <li><div class="Square-Box legend-green-box"></div>Period Less Than 225 min</li>
-            <li><div class="Square-Box legend-gray-box"></div>Other Satellite</li>
-            <li><div class="Square-Box legend-orange-box"></div>Satellite In View</li>
+            <li><div class="Square-Box legend-satLEO-box"></div>Period Less Than 225 min</li>
+            <!-- <li><div class="Square-Box legend-satOther-box"></div>Other Satellite</li> -->
+            <li><div class="Square-Box legend-inFOV-box"></div>Satellite In View</li>
           </ul>
           <ul id="legend-list-deep" class="start-hidden">
-            <li><div class="Square-Box legend-green-box"></div>Period More Than 225 min</li>
-            <li><div class="Square-Box legend-gray-box"></div>Other Satellite</li>
-            <li><div class="Square-Box legend-orange-box"></div>Satellite In View</li>
+            <li><div class="Square-Box legend-satGEO-box"></div>Period More Than 225 min</li>
+            <!-- <li><div class="Square-Box legend-satOther-box"></div>Other Satellite</li> -->
+            <li><div class="Square-Box legend-inFOV-box"></div>Satellite In View</li>
           </ul>
           <ul id="legend-list-velocity" class="start-hidden">
-            <li><div class="Square-Box legend-yellow-box"></div>~7 km/s Velocity</li>
-            <li><div class="Square-Box legend-orange-box"></div>~4 km/s Velocity</li>
-            <li><div class="Square-Box legend-red-box"></div>~1 km/s Velocity</li>
-            <li><div class="Square-Box legend-blue-box"></div>Satellite In View</li>
+            <li><div class="Square-Box legend-velocityFast-box"></div>~7 km/s Velocity</li>
+            <li><div class="Square-Box legend-velocityMed-box"></div>~4 km/s Velocity</li>
+            <li><div class="Square-Box legend-velocitySlow-box"></div>~1 km/s Velocity</li>
+            <!-- Not sure we need to see what is in view in the mode -->
+            <!-- <li><div class="Square-Box legend-inviewAlt-box"></div>Satellite In View</li> -->
           </ul>
           <ul id="legend-list-countries" class="start-hidden">
-            <li><div class="Square-Box legend-blue-box"></div>United States</li>
-            <li><div class="Square-Box legend-white-box"></div>Russia</li>
-            <li><div class="Square-Box legend-red-box"></div>China</li>
-            <li><div class="Square-Box legend-green-box"></div>Other</li>
-            <li><div class="Square-Box legend-orange-box"></div>Satellite In View</li>
+            <li><div class="Square-Box legend-countryUS-box"></div>United States</li>
+            <li><div class="Square-Box legend-countryCIS-box"></div>Russia</li>
+            <li><div class="Square-Box legend-countryPRC-box"></div>China</li>
+            <li><div class="Square-Box legend-countryOther-box"></div>Other</li>
           </ul>
         </div>
         <div id="sat-infobox" class="text-select">
@@ -827,31 +827,100 @@
           <div id="settings-menu" class="side-menu-parent start-hidden text-select">
             <div id="settings-content" class="side-menu">
               <div class="row">
-                <h5 class="center-align">General Settings</h5>
                 <form id="settings-form">
-                  <div class="switch row">
-                    <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Non-selectable satellites will be hidden instead of grayed out.">
-                      <input id="settings-hos" type="checkbox">
-                      <span class="lever"></span>
-                      Hide Other Satellites
-                    </label>
+                  <div id="settings-general">
+                    <h5 class="center-align">General Settings</h5>
+                    <div class="switch row">
+                      <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Non-selectable satellites will be hidden instead of grayed out.">
+                        <input id="settings-hos" type="checkbox">
+                        <span class="lever"></span>
+                        Hide Other Satellites
+                      </label>
+                    </div>
+                    <div class="switch row">
+                      <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Every 3 seconds a new satellite will be selected from FOV">
+                        <input id="settings-demo-mode" type="checkbox">
+                        <span class="lever"></span>
+                        Enable Demo Mode
+                      </label>
+                    </div>
+                    <div class="switch row">
+                      <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Small text labels will appear next to all satellites in FOV.">
+                        <input id="settings-sat-label-mode" type="checkbox" checked>
+                        <span class="lever"></span>
+                        Enable Satellite Label Mode
+                      </label>
+                    </div>
                   </div>
-                  <div class="switch row">
-                    <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Every 3 seconds a new satellite will be selected from FOV">
-                      <input id="settings-demo-mode" type="checkbox">
-                      <span class="lever"></span>
-                      Enable Demo Mode
-                    </label>
+                  <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
+                  <div id="settings-colors">
+                    <h5 class="center-align">Color Settings</h5>
+                    <div class="input-field col s6">
+                      <center>
+                        <p>Payload</p>
+                        <button id="settings-color-payload" class="btn waves-effect waves-light"></button>
+                      </center>
+                    </div>
+                    <div class="input-field col s6">
+                      <center>
+                        <p>Rocket Body</p>
+                        <button id="settings-color-rocketBody" class="btn waves-effect waves-light"></button>
+                      </center>
+                    </div>
+                    <div class="input-field col s6">
+                      <center>
+                        <p>Debris</p>
+                        <button id="settings-color-debris" class="btn waves-effect waves-light"></button>
+                      </center>
+                    </div>
+                    <div class="input-field col s6">
+                      <center>
+                        <p>In View</p>
+                        <button id="settings-color-inview" class="btn waves-effect waves-light"></button>
+                      </center>
+                    </div>
+                    <div class="input-field col s6">
+                      <center>
+                        <p>Missile</p>
+                        <button id="settings-color-missile" class="btn waves-effect waves-light"></button>
+                      </center>
+                    </div>
+                    <div class="input-field col s6">
+                      <center>
+                        <p>Missile (FOV)</p>
+                        <button id="settings-color-missileInview" class="btn waves-effect waves-light"></button>
+                      </center>
+                    </div>
+                    <div class="input-field col s6">
+                      <center>
+                        <p>TruSat</p>
+                        <button id="settings-color-trusat" class="btn waves-effect waves-light"></button>
+                      </center>
+                    </div>
                   </div>
-                  <div class="switch row">
-                    <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Small text labels will appear next to all satellites in FOV.">
-                      <input id="settings-sat-label-mode" type="checkbox" checked>
-                      <span class="lever"></span>
-                      Enable Satellite Label Mode
-                    </label>
+                  <div class="row"></div>
+                  <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
+                  <div id="settings-lookangles">
+                    <h5 class="center-align">Lookangles Settings</h5>
+                    <div class="switch row">
+                      <label>
+                        <input id="settings-riseset" type="checkbox">
+                        <span class="lever"></span>
+                        Show Only Rise and Set Times
+                      </label>
+                    </div>
+                    <div class="input-field col s6">
+                      <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated">
+                      <label for="lookanglesLength">Length (Days)</label>
+                    </div>
+                    <div class="input-field col s6">
+                      <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
+                      <label for="lookanglesInterval">Interval</label>
+                    </div>
+                    <div class="row"></div>
                   </div>
+                  <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
                   <div id="satOverfly-opt">
-                    <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
                     <h5 class="center-align">Satellite Overfly Settings</h5>
                     <div class="input-field col s12">
                       <input value="30" id="satFieldOfView" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="What is the satellite's field of view in degrees">
@@ -859,24 +928,6 @@
                     </div>
                     <div class="row"></div>
                   </div>
-                  <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-                  <h5 class="center-align">Lookangles Settings</h5>
-                  <div class="switch row">
-                    <label>
-                      <input id="settings-riseset" type="checkbox">
-                      <span class="lever"></span>
-                      Show Only Rise and Set Times
-                    </label>
-                  </div>
-                  <div class="input-field col s6">
-                    <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated">
-                    <label for="lookanglesLength">Length (Days)</label>
-                  </div>
-                  <div class="input-field col s6">
-                    <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
-                    <label for="lookanglesInterval">Interval</label>
-                  </div>
-                  <div class="row"></div>
                   <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
                   <div id="fastCompSettings">
                     <h5 class="center-align">Fast CPU Required</h5>
@@ -888,14 +939,14 @@
                       </label>
                     </div>
                     <div class="row"></div>
-                  </div>
-                  <br/>
-                  <div class="row center">
-                    <button id="settings-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Settings &#9658;
-                    </button>
+                    <br/>
+                    <div class="row center">
+                      <button id="settings-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Settings &#9658;
+                      </button>
+                    </div>
                   </div>
                   <div id="settings-lowperf" class="row center">
-                    <button class="red btn waves-effect waves-light" style="margin-top:200px;" onclick="uiController.startLowPerf();">Low End PC Version &#9658;
+                    <button class="red btn waves-effect waves-light" onclick="uiController.startLowPerf();">Low End PC Version &#9658;
                     </button>
                   </div>
                 </form>
@@ -1418,6 +1469,7 @@
   <link rel="stylesheet" href="css/jquery-ui-timepicker-addon.css" type="text/css">
   <!-- Load Satellite Dependencies -->
   <script src="js/lib/jquery.min.js"></script>
+  <script src="js/lib/colorPick.js"></script>
   <script src="js/lib/materialize.min.js"></script>
   <script src="js/lib/gl-matrix-min.js"></script>
   <script src="js/lib/satellite.js?v=1.7.2b"></script>

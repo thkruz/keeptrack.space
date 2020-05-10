@@ -11,6 +11,7 @@ The code has been rewrote multiple times and now barely resembles the original, 
 - [Installation](#Installation)
 - [Usage](#Usage)
 - [How the Code Works](#How-the-Code-Works)
+- [Contributors](#Contributors)
 - [License File](#License-File)
 
 ## Installation
@@ -46,6 +47,9 @@ Any modifications to a satellite require that information to be passed to the sa
 * sensorManager.js - Database of sensor locations.
 * starManager.js - Database of stars.
 * starManager-constellations.js - Add-on database of star constellations.
+
+## Contributors
+[@cwang-pivotal](https://github.com/cwang-pivotal/)
 
 ## License File
 At this time the code is NOT in the public domain and I reserve all rights on my modifications.

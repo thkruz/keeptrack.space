@@ -9,8 +9,8 @@ Since then the code has been rewrote multiple times and now barely resembles the
 
 ## Table of Contents
 ----------------------
-- [Installation](##Installation)
-- [How the Code Works](##How-the-Code-Works)
+- [Installation](#Installation)
+- [How the Code Works](#How-the-Code-Works)
 
 ## Installation
 ----------------------

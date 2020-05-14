@@ -925,6 +925,7 @@ var drawLoopCallback;
 })();
 
 function webGlInit () {
+  db.log('webGlInit');
   var can = $('#canvas')[0];
 
   can.width = window.innerWidth;
@@ -1005,6 +1006,7 @@ function webGlInit () {
   window.gl = gl;
 }
 function _getCamDist () {
+  db.log('_getCamDist', true);
   return Math.pow(zoomLevel, ZOOM_EXP) * (DIST_MAX - DIST_MIN) + DIST_MIN;
 }
 function _unProject (mx, my) {
@@ -1116,6 +1118,7 @@ function changeZoom (zoom) {
   zoomTarget = zoom;
 }
 function updateUrl () { // URL Updater
+  db.log('updateUrl', true);
   var arr = window.location.href.split('?');
   var url = arr[0];
   var paramSlices = [];
@@ -1145,6 +1148,8 @@ function updateUrl () { // URL Updater
 
 var isSelectedSatNegativeOne = false;
 function selectSat (satId) {
+  db.log('selectSat');
+  db.log(`satId: ${satId}`, true);
   var sat;
   if (satId !== -1) {
     sat = satSet.getSat(satId);
@@ -1476,6 +1481,7 @@ function selectSat (satId) {
 }
 
 function enableSlowCPUMode () {
+  db.log('enableSlowCPUMode');
   if (!settingsManager.cruncherReady) return;
   settingsManager.isSlowCPUModeEnabled = true;
   settingsManager.minimumSearchCharacters = 3;

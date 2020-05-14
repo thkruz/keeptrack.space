@@ -2,6 +2,20 @@
   $
 */
 
+// Debug Mode
+var db = {} //Global Debug Manager
+db.enabled = true;
+db.verbose = false;
+db.log = function (message, isVerbose) {
+  // Don't Log Verbose Stuff Normally
+  if (isVerbose && !db.verbose) return;
+
+  // If Logging is Enabled - Log It
+  if(db.enabled) {
+    console.log(message);
+  }
+};
+
 (function () {
   var settingsManager = {};
 
@@ -261,9 +275,9 @@
   if (settingsManager.colors == null) {
     settingsManager.colors = {};
     settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
-    settingsManager.colors.star100 = [1.0, 1.0, 1.0, 1.0];
-    settingsManager.colors.star75 = [1.0, 1.0, 1.0, 0.16];
-    settingsManager.colors.star50 = [1.0, 1.0, 1.0, 0.08];
+    settingsManager.colors.starHi = [1.0, 1.0, 1.0, 1.0];
+    settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.16];
+    settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.08];
     settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
     settingsManager.colors.marker = [[0.2, 1.0, 1.0, 1.0],
                                      [1.0, 0.2, 1.0, 1.0],
@@ -299,9 +313,9 @@
     settingsManager.colors.missile = [1.0, 1.0, 0.0, 1.0];
     settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];
     settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.1];
-    settingsManager.colors.starHi = [1.0, 1.0, 1.0, 1.0];
-    settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.8];
-    settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.6];
+    settingsManager.colors.satHi = [1.0, 1.0, 1.0, 1.0];
+    settingsManager.colors.satMed = [1.0, 1.0, 1.0, 0.8];
+    settingsManager.colors.satLow = [1.0, 1.0, 1.0, 0.6];
     settingsManager.colors.sunlightInview = [0.85, 0.5, 0.0, 1.0];
     settingsManager.colors.penumbral = [1.0, 1.0, 1.0, 0.3];
     settingsManager.colors.umbral = [1.0, 1.0, 1.0, 0.1];

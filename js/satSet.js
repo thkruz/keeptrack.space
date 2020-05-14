@@ -332,6 +332,7 @@ var satSensorMarkerArray = [];
   var fragShader;
 
   satSet.init = function (satsReadyCallback) {
+    db.log('satSet.init');
     /** Parses GET variables for Possible sharperShaders */
     (function parseFromGETVariables () {
       var queryStr = window.location.search.substring(1);
@@ -715,25 +716,30 @@ var satSensorMarkerArray = [];
   };
 
   satSet.getSatData = function () {
+    db.log('satSet.getSatData');
     return satData;
   };
 
   satSet.getSatInView = function () {
+    db.log('satSet.getSatInView');
     if (typeof satInView == 'undefined') return false;
     return satInView;
   };
 
   satSet.getSatInSun = function () {
+    db.log('satSet.getSatInSun');
     if (typeof satInSun == 'undefined') return false;
     return satInSun;
   };
 
   satSet.getSatVel = function () {
+    db.log('satSet.getSatVel');
     if (typeof satVel == 'undefined') return false;
     return satVel;
   };
 
   satSet.setColorScheme = function (scheme, isForceRecolor) {
+    db.log('satSet.setColorScheme');
     settingsManager.currentColorScheme = scheme;
     buffers = scheme.calculateColorBuffers(isForceRecolor);
     satColorBuf = buffers.colorBuf;
@@ -797,29 +803,37 @@ var satSensorMarkerArray = [];
     gl.depthMask(true);
     gl.disable(gl.BLEND);
 
+    satSet.isErrorCorrecting = false;
     // now pickbuffer stuff......
+    try {
+      gl.useProgram(gl.pickShaderProgram);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
+      //  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.uniformMatrix4fv(gl.pickShaderProgram.uMvMatrix, false, emptyMat4);
+      gl.uniformMatrix4fv(gl.pickShaderProgram.uCamMatrix, false, camMatrix);
+      gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
 
-    gl.useProgram(gl.pickShaderProgram);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-    //  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.uniformMatrix4fv(gl.pickShaderProgram.uMvMatrix, false, emptyMat4);
-    gl.uniformMatrix4fv(gl.pickShaderProgram.uCamMatrix, false, camMatrix);
-    gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
+      if (satSet.isErrorCorrecting) {
+        // NOTE: Might not be needed 10-6-2018
+        gl.bindBuffer(gl.ARRAY_BUFFER, satPosBuf);
+        gl.enableVertexAttribArray(gl.pickShaderProgram.aPos);
+        gl.vertexAttribPointer(gl.pickShaderProgram.aPos, 3, gl.FLOAT, false, 0, 0);
+      }
 
-    // NOTE: Might not be needed 10-6-2018
-    // gl.bindBuffer(gl.ARRAY_BUFFER, satPosBuf);
-    // gl.enableVertexAttribArray(gl.pickShaderProgram.aPos);
-    // gl.vertexAttribPointer(gl.pickShaderProgram.aPos, 3, gl.FLOAT, false, 0, 0);
-    //
-    gl.enableVertexAttribArray(gl.pickShaderProgram.aColor);
-    gl.bindBuffer(gl.ARRAY_BUFFER, pickColorBuf);
-    gl.vertexAttribPointer(gl.pickShaderProgram.aColor, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(gl.pickShaderProgram.aColor);
+      gl.bindBuffer(gl.ARRAY_BUFFER, pickColorBuf);
+      gl.vertexAttribPointer(gl.pickShaderProgram.aColor, 3, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, pickableBuf);
-    gl.enableVertexAttribArray(gl.pickShaderProgram.aPickable);
-    gl.vertexAttribPointer(gl.pickShaderProgram.aPickable, 1, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ARRAY_BUFFER, pickableBuf);
+      gl.enableVertexAttribArray(gl.pickShaderProgram.aPickable);
+      gl.vertexAttribPointer(gl.pickShaderProgram.aPickable, 1, gl.FLOAT, false, 0, 0);
 
-    gl.drawArrays(gl.POINTS, 0, satData.length); // draw pick
+      gl.drawArrays(gl.POINTS, 0, satData.length); // draw pick
+    } catch (e) {
+      db.log(`satData.length: ${satData.length}`);
+      db.log(e);
+      satSet.isErrorCorrecting = true;
+    }
     // satSet.updateFOV(null, drawNow);
 
     // Done Drawing
@@ -889,6 +903,7 @@ var satSensorMarkerArray = [];
   };
 
   satSet.getSat = function (i) {
+    db.log('satSet.getSat',true);
     if (!satData) return null;
     if (!satData[i]) return null;
     if (gotExtraData) {
@@ -1300,7 +1315,9 @@ var satSensorMarkerArray = [];
   };
 
   satSet.onCruncherReady = function (cruncherReadyCallback) {
+    db.log('satSet.onCruncherReady not ready',true);
     if (settingsManager.cruncherReady) cruncherReadyCallback(); // Prevent cruncher callbacks until cruncher ready.
+    db.log('satSet.onCruncherReady ready');
   };
 
   window.satSet = satSet;

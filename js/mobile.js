@@ -7,6 +7,7 @@ var maxPinchSize = 1;
   });
 
   mobile.fullscreenToggle = function () {
+    db.log('mobile.fullscreenToggle');
     if ((document.fullScreenElement && document.fullScreenElement !== null) ||
      (!document.mozFullScreen && !document.webkitIsFullScreen)) {
       if (document.documentElement.requestFullScreen) {
@@ -32,6 +33,7 @@ var maxPinchSize = 1;
   var forceClose = false;
   var forceOpen = false;
   mobile.searchToggle = function (force) {
+    db.log('mobile.searchToggle');
     // Reset Force Options
     forceClose = false;
     forceOpen = false;
@@ -61,6 +63,7 @@ var maxPinchSize = 1;
 
   var isSocialOpen = false;
   mobile.socialToggle = function (forceClose) {
+    db.log('mobile.socialToggle');
     forceClose = forceClose || false;
     if (!isSocialOpen && !forceClose) {
       isSocialOpen = true;
@@ -78,6 +81,7 @@ var maxPinchSize = 1;
   };
 
   mobile.checkMobileMode = function () {
+    db.log('mobile.checkMobileMode');
     if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
       settingsManager.isMobileModeEnabled = true;
       settingsManager.fieldOfView = 1.2;
@@ -94,6 +98,7 @@ var maxPinchSize = 1;
   };
 
   mobile.start = function () {
+    db.log('mobile.checkMobileMode');
     mobile.checkMobileMode();
     maxPinchSize = Math.hypot(window.innerWidth,$(document).height());
     $('#loading-screen').removeClass('full-loader');
@@ -104,7 +109,7 @@ var maxPinchSize = 1;
     $('#loading-screen').fadeOut();
     $('#spinner').show();
     $('#mobile-start-button').hide();
-    mobile.fullscreenToggle();    
+    mobile.fullscreenToggle();
     settingsManager.isDisableSatHoverBox = true;
   };
 

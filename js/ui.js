@@ -99,6 +99,7 @@ var clickedSat = 0;
 // Public Functions
 
 function saveVariable (variable) {
+  db.log('saveVariable');
   variable = JSON.stringify(variable);
   var blob = new Blob([variable], {type: 'text/plain;charset=utf-8'});
   saveAs(blob, 'variable.txt');
@@ -147,6 +148,7 @@ var isAnalysisMenuOpen = false;
     mobile.checkMobileMode();
     if (settingsManager.offline) updateInterval = 250;
     (function _licenseCheck () {
+      db.log('_licenseCheck');
       if (typeof satel === 'undefined') satel = null;
       if (settingsManager.offline && !_clk()) {
         _offlineMessage();
@@ -162,12 +164,14 @@ var isAnalysisMenuOpen = false;
       uiController.resize2DMap();
     })();
     (function _httpsCheck () {
+      db.log('_httpsCheck');
         if (location.protocol !== 'https:') {
           $('#cs-geolocation').hide();
           $('#geolocation-btn').hide();
         }
     })();
     (function _resizeWindow () {
+      db.log('_resizeWindow');
       var resizing = false;
       $(window).resize(function () {
         uiController.resize2DMap();
@@ -184,9 +188,11 @@ var isAnalysisMenuOpen = false;
 
     (function _uiInit () {
       // Register all UI callback functions with drawLoop in main.js
+      // These run during the draw loop
       drawLoopCallback = function () { _showSatTest(); _updateNextPassOverlay(); _checkWatchlist(); _updateSelectBox(); _mobileScreenControls(); };
     })();
     (function _menuInit () {
+      db.log('_menuInit');
       // Load the current JDAY
       var jday = 'JDAY: ' + timeManager.getDayOfYear(timeManager.propTime());
       $('#jday').html(jday);
@@ -246,6 +252,7 @@ var isAnalysisMenuOpen = false;
       });
     })();
     (function _canvasController () {
+      db.log('_canvasController');
       var latLon;
       canvasDOM.on('touchmove', function (evt) {
         evt.preventDefault();
@@ -942,6 +949,7 @@ var isAnalysisMenuOpen = false;
 
     var isNotColorPickerInitialSetup = false;
     (function _setupColorPicker () {
+      db.log('_setupColorPicker');
       var colorPalette = [
         _rgbCSS([1.0, 0.0, 0.0, 1.0]), // Red
         _rgbCSS([1.0, 0.75, 0.0, 1.0]), // Orange
@@ -1056,6 +1064,7 @@ var isAnalysisMenuOpen = false;
 
 
     function _clearRMBSubMenu () {
+      db.log('_clearRMBSubMenu',true);
       rightBtnViewMenuDOM.hide();
       rightBtnEditMenuDOM.hide();
       rightBtnCreateMenuDOM.hide();
@@ -1065,6 +1074,7 @@ var isAnalysisMenuOpen = false;
     }
 
     (function _menuController () {
+      db.log('_menuController');
 
       // Reset time if in retro mode
       if (settingsManager.retro) {
@@ -2484,6 +2494,7 @@ var isAnalysisMenuOpen = false;
     var socratesObjOne = []; // Array for tr containing CATNR1
     var socratesObjTwo = []; // Array for tr containing CATNR2
     function _socrates (row) {
+      db.log('_socrates');
       // SOCRATES Variables
 
       /* SOCRATES.htm is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
@@ -2608,6 +2619,8 @@ var isAnalysisMenuOpen = false;
       } // Allows passing -1 argument to socrates function to skip these steps
     }
     function _bottomIconPress (evt) {
+      db.log('_bottomIconPress');
+      db.log(evt.currentTarget.id);
       var sat;
       if (settingsManager.isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
       ga('send', 'event', 'Bottom Icon', evt.currentTarget.id, 'Selected');
@@ -3335,6 +3348,7 @@ var isAnalysisMenuOpen = false;
     }
 
     uiController.hideSideMenus = function () {
+      db.log('uiController.hideSideMenus');
       // Close any open colorboxes
       $.colorbox.close();
 
@@ -3418,6 +3432,7 @@ var isAnalysisMenuOpen = false;
     };
 
     uiController.updateWatchlist = function (updateWatchlistList, updateWatchlistInViewList) {
+      db.log('uiController.updateWatchlist');
       if (typeof updateWatchlistList !== 'undefined') {
         watchlistList = updateWatchlistList;
       }
@@ -3462,20 +3477,25 @@ var isAnalysisMenuOpen = false;
 
     var isCurrentlyTyping = false;
     $('#search').focus(function(){
+      db.log("$('#search').focus");
       isCurrentlyTyping = true;
     });
     $('#ui-wrapper').focusin(function(){
+      db.log("$('#ui-wrapper').focusin");
       isCurrentlyTyping = true;
     });
 
     $('#search').blur(function(){
+      db.log("('#search').blur");
       isCurrentlyTyping = false;
     });
     $('#ui-wrapper').focusout(function(){
+      db.log("('#ui-wrapper').focusout");
       isCurrentlyTyping = false;
     });
 
     function _keyUpHandler (evt) {
+      db.log('_keyUpHandler');
       if (isCurrentlyTyping) return;
 
       if (evt.key.toUpperCase() === 'A' && FPSSideSpeed === -settingsManager.FPSSideSpeed) {
@@ -3536,6 +3556,7 @@ var isAnalysisMenuOpen = false;
     }
 
     function _keyDownHandler (evt) {
+      db.log('_keyDownHandler');
       if (isCurrentlyTyping) return;
       if (evt.key.toUpperCase() === 'SHIFT') {
         if (cameraType.current === cameraType.FPS) {
@@ -3628,6 +3649,7 @@ var isAnalysisMenuOpen = false;
     }
 
     function _keyHandler (evt) {
+      db.log('_keyHandler');
       if (isCurrentlyTyping) return;
       // console.log(Number(evt.charCode));
       switch (evt.key.toUpperCase()) {
@@ -3780,10 +3802,12 @@ var isAnalysisMenuOpen = false;
       }
     }
     function browserUnsupported () {
+      db.log('browserUnsupported');
       $('#canvas-holder').hide();
       $('#no-webgl').css('display', 'block');
     }
     function _clk () {
+      db.log('_clk');
       lk1 = new Date(lk1);
       if (lk1 == 'undefined') return false;
       if (settingsManager.lkVerify > lk1) return false;
@@ -3797,6 +3821,7 @@ var isAnalysisMenuOpen = false;
   });
 
   uiController.resize2DMap = function () {
+    db.log('uiController.resize2DMap');
     if ($(window).width() > $(window).height()) { // If widescreen
       settingsManager.mapWidth = $(window).width();
       mapImageDOM.width(settingsManager.mapWidth);
@@ -3824,6 +3849,8 @@ var isAnalysisMenuOpen = false;
   var infoOverlayDOM = [];
   var satNumberOverlay = [];
   function _showSatTest () {
+    return;
+    db.log('_showSatTest');
     // if (timeManager.now > (lastSatUpdateTime * 1 + 10000)) {
     //   for (var i = 0; i < satSet.getSatData().length; i++) {
     //     satNumberOverlay[i] = satSet.getScreenCoords(i, pMatrix, camMatrix);
@@ -3836,6 +3863,7 @@ var isAnalysisMenuOpen = false;
 
   function _updateNextPassOverlay (isForceUpdate) {
     if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
+    db.log('_updateNextPassOverlay');
 
     // FIXME This should auto update the overlay when the time changes outside the original search window
 
@@ -3883,6 +3911,7 @@ var isAnalysisMenuOpen = false;
   }
   function _checkWatchlist () {
     if (watchlistList.length <= 0) return;
+    db.log('_checkWatchlist');
     for (var i = 0; i < watchlistList.length; i++) {
       var sat = satSet.getSat(watchlistList[i]);
       if (sat.inview === 1 && watchlistInViewList[i] === false) { // Is inview and wasn't previously
@@ -3907,6 +3936,7 @@ var isAnalysisMenuOpen = false;
   function _updateSelectBox () {
     // Don't update if no object is selected
     if (selectedSat === -1) return;
+    db.log('_updateSelectBox',true);
 
     var sat = satSet.getSat(selectedSat);
 
@@ -3971,14 +4001,17 @@ var isAnalysisMenuOpen = false;
     }
   }
   function _mobileScreenControls () {
-    if (touchHoldButton === '') return;
-    if (touchHoldButton === 'zoom-in') {
-      zoomTarget -= 0.0025;
-      if (zoomTarget < 0) zoomTarget = 0;
-    }
-    if (touchHoldButton === 'zoom-out') {
-      zoomTarget += 0.0025;
-      if (zoomTarget > 1) zoomTarget = 1;
+    if (settingsManager.isMobileModeEnabled) {
+      db.log('_mobileScreenControls');
+      if (touchHoldButton === '') return;
+      if (touchHoldButton === 'zoom-in') {
+        zoomTarget -= 0.0025;
+        if (zoomTarget < 0) zoomTarget = 0;
+      }
+      if (touchHoldButton === 'zoom-out') {
+        zoomTarget += 0.0025;
+        if (zoomTarget > 1) zoomTarget = 1;
+      }
     }
   }
 
@@ -4077,6 +4110,7 @@ var isAnalysisMenuOpen = false;
   });
 
   uiController.useCurrentGeolocationAsSensor = function () {
+    db.log('uiController.legendColorsChange');
     if (location.protocol === 'https:' && !settingsManager.geolocationUsed && settingsManager.isMobileModeEnabled) {
       navigator.geolocation.getCurrentPosition(function (position) {
         settingsManager.geolocation.lat = position.coords.latitude;
@@ -4171,6 +4205,7 @@ var isAnalysisMenuOpen = false;
   };
 
   uiController.legendColorsChange = function () {
+    db.log('uiController.legendColorsChange');
     $('.legend-payload-box').css('background', _rgbCSS(settingsManager.colors.payload));
     $('.legend-rocketBody-box').css('background', _rgbCSS(settingsManager.colors.rocketBody));
     $('.legend-debris-box').css('background', _rgbCSS(settingsManager.colors.debris));
@@ -4200,7 +4235,8 @@ var isAnalysisMenuOpen = false;
   }
 
   uiController.legendMenuChange = function (menu) {
-    console.log(menu);
+    db.log('uiController.legendMenuChange');
+    db.log(menu);
     $('#legend-list-default').hide();
     $('#legend-list-default-sensor').hide();
     $('#legend-list-rcs').hide();
@@ -4557,6 +4593,7 @@ var isAnalysisMenuOpen = false;
   };
 
   function getRGBA(str){
+    db.log('getRGBA');
     var [r,g,b,a] = str.match(/[\d\.]+/g);
     r = parseInt(r)/255;
     g = parseInt(g)/255;
@@ -4566,28 +4603,30 @@ var isAnalysisMenuOpen = false;
   }
 
   function _hexToRgbA(hex){
-      var c;
-      if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
-          c= hex.substring(1).split('');
-          if(c.length== 3){
-              c= [c[0], c[0], c[1], c[1], c[2], c[2]];
-          }
-          c= '0x'+c.join('');
-          var r = ((c>>16)&255)/255;
-          var g = ((c>>8)&255)/255;
-          var b = (c&255)/255;
-          return [r, g, b, 1]
-      }
-      throw new Error('Bad Hex');
+    db.log('_hexToRgbA');
+    var c;
+    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+        c= hex.substring(1).split('');
+        if(c.length== 3){
+            c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+        }
+        c= '0x'+c.join('');
+        var r = ((c>>16)&255)/255;
+        var g = ((c>>8)&255)/255;
+        var b = (c&255)/255;
+        return [r, g, b, 1]
+    }
+    throw new Error('Bad Hex');
   }
 
   function _rgbCSS(values) {
-      return `rgba(${values[0]*255},${values[1]*255},${values[2]*255},${values[3]})`
-      // return 'rgb(' + values.join(', ') + ')';
+    db.log('_rgbCSS');
+    return `rgba(${values[0]*255},${values[1]*255},${values[2]*255},${values[3]})`
   }
 
   var isFooterShown = true;
   uiController.footerToggle = function () {
+    db.log('uiController.footerToggle');
     if (isFooterShown) {
       isFooterShown = false;
       // uiController.hideSideMenus();
@@ -4605,12 +4644,17 @@ var isAnalysisMenuOpen = false;
   };
 
   uiController.startLowPerf = function () {
+    db.log('uiController.startLowPerf');
+    // TODO: This will disable other menu options
+    // This should pass current options on and/or use
+    // localStorage instead of browser variables
     window.location.replace("index.htm?lowperf");
   };
 
   // c is string name of star
   // TODO: Yaw needs fixed
   uiController.panToStar = function (c) {
+    db.log('uiController.panToStar');
     var satId = satSet.getIdFromStarName(c);
     var sat = satSet.getSat(satId);
     console.log(sat);
@@ -4619,6 +4663,7 @@ var isAnalysisMenuOpen = false;
   };
 
   uiController.updateMap = function () {
+    db.log('uiController.updateMap');
     if (selectedSat === -1) return;
     if (!settingsManager.isMapMenuOpen) return;
     var sat = satSet.getSat(selectedSat);

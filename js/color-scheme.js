@@ -99,11 +99,16 @@
       // }
       // isFirstMarkerChecked = colors.marker; // First Marker Checked Returns True
       if (typeof colors == 'undefined') continue;
-      colorData[i * 4] = colors.color[0];  // R
-      colorData[i * 4 + 1] = colors.color[1]; // G
-      colorData[i * 4 + 2] = colors.color[2]; // B
-      colorData[i * 4 + 3] = colors.color[3]; // A
-      pickableData[i] = colors.pickable ? 1 : 0;
+      try {
+        colorData[i * 4] = colors.color[0];  // R
+        colorData[i * 4 + 1] = colors.color[1]; // G
+        colorData[i * 4 + 2] = colors.color[2]; // B
+        colorData[i * 4 + 3] = colors.color[3]; // A
+        pickableData[i] = colors.pickable ? 1 : 0;
+      } catch (e) {
+        if (db.enabled) db.log(satSet.getSat(i));
+        continue;
+      }
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuf);
@@ -412,13 +417,13 @@
           }
           if (sat.vmag <= 4.5) {
             return {
-              color: colorTheme.sunlight80,
+              color: colorTheme.starMed,
               pickable: true
             };
           }
           if (sat.vmag > 4.5) {
             return {
-              color: colorTheme.sunlight60,
+              color: colorTheme.starLow,
               pickable: true
             };
           }

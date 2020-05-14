@@ -172,6 +172,7 @@ var isAnalysisMenuOpen = false;
     })();
     (function _resizeWindow () {
       db.log('_resizeWindow');
+      mobile.checkMobileMode();
       var resizing = false;
       $(window).resize(function () {
         uiController.resize2DMap();
@@ -4002,7 +4003,7 @@ var isAnalysisMenuOpen = false;
   }
   function _mobileScreenControls () {
     if (settingsManager.isMobileModeEnabled) {
-      db.log('_mobileScreenControls');
+      db.log('_mobileScreenControls',true);
       if (touchHoldButton === '') return;
       if (touchHoldButton === 'zoom-in') {
         zoomTarget -= 0.0025;
@@ -4655,11 +4656,35 @@ var isAnalysisMenuOpen = false;
   // TODO: Yaw needs fixed
   uiController.panToStar = function (c) {
     db.log('uiController.panToStar');
-    var satId = satSet.getIdFromStarName(c);
+    db.log(`c: ${c}`,true);
+
+    // Try with the pname
+    var satId = satSet.getIdFromStarName(c.pname);
     var sat = satSet.getSat(satId);
+
+    // If null try again with the bf
+    if (sat == null) {
+      satId = satSet.getIdFromStarName(c.bf);
+      sat = satSet.getSat(satId);
+    }
+
+    // Star isn't working - give up
+    if (sat == null) {
+      console.warn(`sat is null!`);
+      return;
+    }
+
+    drawLineList = [];
+    starManager.isAllConstellationVisible = false;
+
+    debugDrawLine('ref',[sat.position.x,sat.position.y,sat.position.z], [1,0.4,0,1]);
+    cameraType.current = cameraType.OFFSET;
     console.log(sat);
-    debugDrawLine('sat',satId);
-    camSnap(latToPitch(sat.dec * -1), longToYaw(sat.ra));
+    // TODO: Need to calculate the time to get the right RA offset
+    camSnap(latToPitch(sat.dec) * -1, longToYaw(sat.ra * DEG2RAD));
+    setTimeout(function () {
+      console.log(`pitch ${camPitch * RAD2DEG} -- yaw ${camYaw * RAD2DEG}`);
+    }, 2000);
   };
 
   uiController.updateMap = function () {

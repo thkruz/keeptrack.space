@@ -83,17 +83,19 @@ var maxPinchSize = 1;
   mobile.checkMobileMode = function () {
     db.log('mobile.checkMobileMode');
     if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
+      settingsManager.isDisableSatHoverBox = true;
       settingsManager.isMobileModeEnabled = true;
-      settingsManager.fieldOfView = 1.2;
       settingsManager.cameraMovementSpeed = 0.0001;
       settingsManager.cameraMovementSpeedMin = 0.0001;
       settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
       settingsManager.maxLabels = settingsManager.mobileMaxLabels;
     } else {
-      settingsManager.maxLabels = settingsManager.desktopMaxLabels;
+      settingsManager.isDisableSatHoverBox = false;
       settingsManager.isMobileModeEnabled = false;
       settingsManager.cameraMovementSpeed = 0.003;
       settingsManager.cameraMovementSpeedMin = 0.005;
+      settingsManager.fieldOfView = 0.6;
+      settingsManager.maxLabels = settingsManager.desktopMaxLabels;
     }
   };
 

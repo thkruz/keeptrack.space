@@ -3,25 +3,44 @@
 */
 
 // Debug Mode
-var db = {} //Global Debug Manager
-db.enabled = true;
-db.verbose = false;
-db.log = function (message, isVerbose) {
-  // Don't Log Verbose Stuff Normally
-  if (isVerbose && !db.verbose) return;
+var db = {}; //Global Debug Manager
+try {
+  db = JSON.parse(localStorage.getItem("db"));
+  if (db.version !== '1.0.4') reloadDb();
+} catch (e) {
+  db.version = '1.0.4'
+  db.enabled = false;
+  db.verbose = false;
+  localStorage.setItem("db", JSON.stringify(db));
+}
+(db.init = function (){
+  db.log = function (message, isVerbose) {
+    // Don't Log Verbose Stuff Normally
+    if (isVerbose && !db.verbose) return;
 
-  // If Logging is Enabled - Log It
-  if(db.enabled) {
-    console.log(message);
+    // If Logging is Enabled - Log It
+    if(db.enabled) {
+      console.log(message);
+    }
+  };
+  db.on = function () {
+    db.enabled = true;
+    console.log('db is now on!');
+    localStorage.setItem("db", JSON.stringify(db));
   }
-};
+  db.off = function () {
+    db.enabled = false;
+    console.log('db is now off!');
+    localStorage.setItem("db", JSON.stringify(db));
+  }
+})();
 
 (function () {
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.8.0';
-  settingsManager.versionDate = 'May 10, 2020';
+  settingsManager.versionNumber = 'v1.8.1';
+  settingsManager.versionDate = 'May 14, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;

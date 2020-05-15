@@ -292,6 +292,7 @@
         }
       }
 
+      if (typeof color == 'undefined') console.warn(sat.id);
       return {
         color: color,
         pickable: true

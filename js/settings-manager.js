@@ -6,9 +6,10 @@
 var db = {}; //Global Debug Manager
 try {
   db = JSON.parse(localStorage.getItem("db"));
-  if (db.version !== '1.0.4') reloadDb();
+  if (db == null) reloadDb();
+  if (typeof db.enabled == 'undefined') reloadDb();
 } catch (e) {
-  db.version = '1.0.4'
+  db = {};
   db.enabled = false;
   db.verbose = false;
   localStorage.setItem("db", JSON.stringify(db));
@@ -39,8 +40,8 @@ try {
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = 'v1.8.1';
-  settingsManager.versionDate = 'May 14, 2020';
+  settingsManager.versionNumber = '1.8.2';
+  settingsManager.versionDate = 'May 15, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;

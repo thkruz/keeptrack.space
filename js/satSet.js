@@ -803,7 +803,6 @@ var satSensorMarkerArray = [];
     gl.depthMask(true);
     gl.disable(gl.BLEND);
 
-    satSet.isErrorCorrecting = false;
     // now pickbuffer stuff......
     try {
       gl.useProgram(gl.pickShaderProgram);
@@ -813,12 +812,10 @@ var satSensorMarkerArray = [];
       gl.uniformMatrix4fv(gl.pickShaderProgram.uCamMatrix, false, camMatrix);
       gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
 
-      if (satSet.isErrorCorrecting) {
-        // NOTE: Might not be needed 10-6-2018
-        gl.bindBuffer(gl.ARRAY_BUFFER, satPosBuf);
-        gl.enableVertexAttribArray(gl.pickShaderProgram.aPos);
-        gl.vertexAttribPointer(gl.pickShaderProgram.aPos, 3, gl.FLOAT, false, 0, 0);
-      }
+      // NOTE: Might not be needed 10-6-2018
+      // gl.bindBuffer(gl.ARRAY_BUFFER, satPosBuf);
+      // gl.enableVertexAttribArray(gl.pickShaderProgram.aPos);
+      // gl.vertexAttribPointer(gl.pickShaderProgram.aPos, 3, gl.FLOAT, false, 0, 0);
 
       gl.enableVertexAttribArray(gl.pickShaderProgram.aColor);
       gl.bindBuffer(gl.ARRAY_BUFFER, pickColorBuf);
@@ -832,7 +829,6 @@ var satSensorMarkerArray = [];
     } catch (e) {
       db.log(`satData.length: ${satData.length}`);
       db.log(e);
-      satSet.isErrorCorrecting = true;
     }
     // satSet.updateFOV(null, drawNow);
 

@@ -14,15 +14,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
 
+    <!-- Get Settings -->
+    <script>document.write('<script src="js/settings-manager.js?v=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
     <!-- Import CSS needed for loading screen -->
-    <link rel="stylesheet" href="css/loading-screen.css?v=1.8.1" type="text/css">
+    <script>document.write('<link rel="stylesheet" href="css/loading-screen.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
     <!--Import Fonts-->
-    <link href="css/fonts.css?v=1.8.1" rel="stylesheet">
+    <script>document.write('<link rel="stylesheet" href="css/fonts.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
     <!--Import Materialize CSS-->
-    <link rel="stylesheet" href="css/materialize.css?v=1.8.1">
-    <link rel="stylesheet" href="css/materialize-local.css?v=1.8.1">
+    <script>document.write('<link rel="stylesheet" href="css/materialize.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
+    <script>document.write('<link rel="stylesheet" href="css/materialize-local.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
     <!--Import Bootstrap Color Picker-->
-    <link rel="stylesheet" href="js/lib/colorPick.css?v=1.8.1">
+    <script>document.write('<link rel="stylesheet" href="js/lib/colorPick.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
 
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
@@ -110,7 +112,6 @@
       </div>
     </nav>
   </header>
-
   <main>
     <div id="rmb-wrapper">
       <div id="right-btn-menu" class="right-btn-menu">
@@ -1464,66 +1465,66 @@
   </footer>
 
   <!-- Load jquery CSS -->
-  <link rel="stylesheet" href="css/perfect-scrollbar.min.css" type="text/css">
-  <link rel="stylesheet" href="css/jquery-ui.min.css" type="text/css">
-  <link rel="stylesheet" href="css/jquery-ui-timepicker-addon.css" type="text/css">
+  <script>document.write('<link rel="stylesheet" href="css/perfect-scrollbar.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
+  <script>document.write('<link rel="stylesheet" href="css/jquery-ui.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
+  <script>document.write('<link rel="stylesheet" href="css/jquery-ui-timepicker-addon.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
   <!-- Load Satellite Dependencies -->
-  <script src="js/lib/jquery.min.js"></script>
-  <script src="js/lib/colorPick.js"></script>
-  <script src="js/lib/materialize.min.js"></script>
-  <script src="js/lib/gl-matrix-min.js"></script>
-  <script src="js/lib/satellite.js?v=1.8.1"></script>
-  <script src="js/lib/suncalc.js"></script>
-  <script src="js/lib/shader-loader.min.js?v=1.8.1"></script>
+  <script>document.write('<script src="js/lib/jquery.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/colorPick.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/materialize.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/gl-matrix-min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/satellite.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/suncalc.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/shader-loader.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <!-- Load Map Projection Code -->
-  <script src="js/mapManager.js"></script>
-  <!-- Load JS Scripts -->
-  <script src="js/settings-manager.js?v=1.8.1"></script>
-  <script src="license/license.js?v=1.8.1"></script>
+  <script>document.write('<script src="js/mapManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <!-- Load License Scripts -->
+  <script>document.write('<script src="license/license.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <!-- Offline Only -->
-  <!-- <script src="offline/extra.js?v=1.8.1"></script> -->
-  <!-- <script src="offline/satInfo.js?v=1.8.1"></script> -->
-  <!-- <script src="offline/tle.js?v=1.8.1"></script> -->
-  <script src="modules/sensorManager.js?v=1.8.1"></script>
-  <script src="modules/controlSiteManager.js?v=1.8.1"></script>
-  <script src="modules/launchSiteManager.js?v=1.8.1"></script>
-  <script src="modules/starManager.js?v=1.8.1"></script>
-  <script src="modules/satCommManager.js?v=1.8.1"></script>
-  <script src="modules/starManager-constellations.js?v=1.8.1"></script>
-
-  <script src="js/time-manager.js?v=1.8.1"></script>
-  <script src="js/sun.js?v=1.8.1"></script>
-  <script src="js/lib/meuusjs.1.0.3.min.js?v=1.8.1"></script>
-  <script src="js/lib/starcalc.js?v=1.8.1"></script>
-  <script src="js/earth.js?v=1.8.1"></script>
-  <script src="js/groups.js?v=1.8.1"></script>
-  <script src="js/satSet.js?v=1.8.1"></script>
-  <script src="modules/satVmagManager.js?v=1.8.1"></script>
+  <script>if(settingsManager.offline){document.write('<script src="offline/extra.js?v=' + settingsManager.versionNumber + '"\><\/script>');}</script>
+  <script>if(settingsManager.offline){document.write('<script src="offline/satInfo.js?v=' + settingsManager.versionNumber + '"\><\/script>');}</script>
+  <script>if(settingsManager.offline){document.write('<script src="offline/tle.js?v=' + settingsManager.versionNumber + '"\><\/script>');}</script>
+  <!-- Addon Modules -->
+  <script>document.write('<script src="modules/sensorManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="modules/controlSiteManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="modules/launchSiteManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="modules/starManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="modules/satCommManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="modules/starManager-constellations.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <!-- Other Required Files -->
+  <script>document.write('<script src="js/time-manager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/sun.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/meuusjs.1.0.3.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/starcalc.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/earth.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/groups.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/satSet.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="modules/satVmagManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <!-- Load Extra Variables -->
-  <script src="js/objectManager.js?v=1.8.1"></script>
-  <script src="js/lib/file-saver.min.js"></script>
+  <script>document.write('<script src="js/objectManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/file-saver.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <!-- Load Ballistic Missile Functions -->
-  <script src="js/ballistic-missile.js?v=1.8.1"></script>
+  <script>document.write('<script src="js/ballistic-missile.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <!-- Load Main JavaScript Code -->
-  <script src="js/color-scheme.js?v=1.8.1"></script>
-  <script src="js/mobile.js?v=1.8.1"></script>
-  <script src="js/lib/CanvasRecorder.min.js"></script>
-  <script src="js/ui.js?v=1.8.1"></script>
-  <script src="js/main.js?v=1.8.1"></script>
-  <script src="js/lookangles.js?v=1.8.1"></script>
-  <script src="js/orbit-display.js?v=1.8.1"></script>
-  <script src="js/drawLoop-shapes.js?v=1.8.1"></script>
-  <script src="js/search-box.js?v=1.8.1"></script>
-  <script src="js/vector-to-kepler.js?v=1.8.1"></script>
+  <script>document.write('<script src="js/color-scheme.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/mobile.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/CanvasRecorder.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/ui.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/main.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lookangles.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/orbit-display.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/drawLoop-shapes.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/search-box.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/vector-to-kepler.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <!-- Load UI Dependencies -->
-  <script src="js/lib/jquery-ui.min.js"></script>
-  <script src="js/lib/jquery-ui-slideraccess.js"></script>
-  <script src="js/lib/jquery-ui-timepicker.js"></script>
-  <script src="js/lib/perfect-scrollbar.min.js"></script>
+  <script>document.write('<script src="js/lib/jquery-ui.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/jquery-ui-slideraccess.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/jquery-ui-timepicker.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/perfect-scrollbar.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <!-- Load Extras Last to Speed Loading -->
-  <script src="js/lib/jquery.colorbox.min.js"></script>
-  <script src="js/advice-module.min.js"></script>
-  <script src="js/lib/numeric.js"></script>
+  <script>document.write('<script src="js/lib/jquery.colorbox.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/advice-module.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lib/numeric.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <!--Google Analytics -->
   <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

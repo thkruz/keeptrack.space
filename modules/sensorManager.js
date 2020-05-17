@@ -34,7 +34,7 @@
     type: 'Phased Array Radar',
     lat: 39.136064,
     long: -121.351237,
-    obshei: 0.060966, // TODO: Find correct height
+    obshei: 0.1120, // Open Street Maps
     obsminaz: 126,
     obsmaxaz: 6,
     obsminel: 3,
@@ -57,7 +57,7 @@
     type: 'Phased Array Radar',
     lat: 64.290556,
     long: -149.186944,
-    obshei: 0.060966,
+    obshei: 0.1750, // Open Street Maps
     obsminaz: 184,
     obsmaxaz: 64,
     obsminel: 3,
@@ -80,7 +80,7 @@
     type: 'Phased Array Radar',
     lat: 30.572411,
     long: -86.214836,
-    obshei: 0.060966, // TODO: Confirm Altitude
+    obshei: 0.0390, // Open Street Maps
     obsminaz: 120,
     obsmaxaz: 240,
     obsminel: 3,
@@ -102,7 +102,7 @@
     type: 'Phased Array Radar',
     lat: 54.361758,
     long: -0.670051,
-    obshei: 0.060966, // TODO: Find correct height
+    obshei: 0.2600, // Open Street Maps
     obsminaz: 0,
     obsmaxaz: 360,
     obsminel: 3,
@@ -125,7 +125,7 @@
     type: 'Phased Array Radar',
     lat: 48.724567,
     long: -97.899755,
-    obshei: 0.060966, // TODO: Find correct height
+    obshei: 0.3520, // Open Street Maps
     obsminaz: 298,
     obsmaxaz: 78,
     obsminel: 1.9,
@@ -148,7 +148,7 @@
     type: 'Phased Array Radar',
     lat: 76.570322,
     long: -68.299211,
-    obshei: 0.060966, // TODO: Find correct height
+    obshei: 0.3920, // Open Street Maps
     obsminaz: 297,
     obsmaxaz: 177,
     obsminel: 3,
@@ -172,7 +172,7 @@
     type: 'Phased Array Radar',
     lat: 52.737,
     long: 174.092,
-    obshei: 0.010966, // TODO: Find correct height
+    obshei: 0.0660, // Open Street Maps
     obsminaz: 259,
     obsmaxaz: 19,
     obsminel: 2,

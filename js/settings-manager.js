@@ -40,8 +40,8 @@ try {
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.8.2';
-  settingsManager.versionDate = 'May 15, 2020';
+  settingsManager.versionNumber = '1.8.3';
+  settingsManager.versionDate = 'May 17, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;

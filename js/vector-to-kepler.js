@@ -1,5 +1,6 @@
 (function() {
   var vec2kepler = {};
+  var RADIUS_OF_EARTH = 6371000;       // Radius of Earth in meters
 
   function arctan2(Ey, Ex) {
     var u;
@@ -27,7 +28,7 @@
     return 3.14159265358979*theta/180;
   }
 
-  vec2kepler.computeOrbitalElements = function (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU) {
+  vec2kepler.computeOrbitalElements = function (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2) {
     // TODO: Error Checking for invalid units
 
     var G = 6.6725985e-11;
@@ -242,8 +243,8 @@
     while (TL >=2*Pi) {TL = TL - 2*Pi;}
 
     var PlusMinus = a * E;
-    var Periapsis = a - PlusMinus;
-    var Apoapsis = a + PlusMinus;
+    var Periapsis = a - PlusMinus  - RADIUS_OF_EARTH;
+    var Apoapsis = a + PlusMinus  - RADIUS_OF_EARTH;
     var Period = 2 * Pi * Math.sqrt((a*a*a / (G*(massPrimary + massSecondary))));
 
     if (typeof outputU == 'undefined'){
@@ -251,7 +252,7 @@
     } else {
       if (outputU=='cm'){a=a*100;}
       if (outputU=='km'){a=a/1000;}
-      if (outputU=='outputU'){a=a/149597870691;}
+      if (outputU=='AU'){a=a/149597870691;}
       if (outputU=='LY'){a=a/9.4605e15;}
       if (outputU=='PC'){a=a/3.0857e16;}
       if (outputU=='mi'){a=a/1609.344;}

@@ -195,7 +195,7 @@
       sitec = 'Brazil';
     }
     return [site, sitec];
-  }
+  };
 
   launchSiteManager.launchSiteList = launchSiteList;
   window.launchSiteManager = launchSiteManager;

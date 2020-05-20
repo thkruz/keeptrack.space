@@ -14,7 +14,7 @@ try {
   db.verbose = false;
   localStorage.setItem("db", JSON.stringify(db));
 }
-(db.init = function (){
+db.init = (function (){
   db.log = function (message, isVerbose) {
     // Don't Log Verbose Stuff Normally
     if (isVerbose && !db.verbose) return;
@@ -28,20 +28,20 @@ try {
     db.enabled = true;
     console.log('db is now on!');
     localStorage.setItem("db", JSON.stringify(db));
-  }
+  };
   db.off = function () {
     db.enabled = false;
     console.log('db is now off!');
     localStorage.setItem("db", JSON.stringify(db));
-  }
+  };
 })();
 
 (function () {
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.8.3';
-  settingsManager.versionDate = 'May 17, 2020';
+  settingsManager.versionNumber = '1.8.4';
+  settingsManager.versionDate = 'May 20, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;

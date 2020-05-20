@@ -1233,16 +1233,16 @@ function getSiderealTime(d, lw) {
   return rad * (280.16 + 360.9856235 * d) - lw;
 }
 
-var lw;
+// Reduce variable assignment during the loop
+var lw, phi, d, H, h;
 StarCalc.getStarPosition = function (date, lat, lng, c) {
+  lw  = rad * -lng;
+  phi = rad * lat;
+  d   = toDays(date);
 
-      lw  = rad * -lng,
-      phi = rad * lat,
-      d   = toDays(date),
-
-      H = getSiderealTime(d, lw) - c.ra / 12 * Math.PI,
-      h = getAltitude(H, phi, c.dec / 180 * Math.PI);
-//console.log(getAzimuth(H, phi, c.dec / 180 * Math.PI));
+  H = (getSiderealTime(d, lw) - c.ra / 12 * Math.PI);
+  h = getAltitude(H, phi, c.dec / 180 * Math.PI);
+  //console.log(getAzimuth(H, phi, c.dec / 180 * Math.PI));
   // altitude correction for refraction
   h = h + rad * 0.017 / tan(h + rad * 10.26 / (h + rad * 5.10));
 

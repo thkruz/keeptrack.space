@@ -593,7 +593,6 @@
         color: colorTheme.countryOther,
         pickable: true
       };
-      console.log(sat);
     });
     ColorScheme.lostobjects = new ColorScheme(function (sat) {
       // Objects beyond sensor coverage are hidden

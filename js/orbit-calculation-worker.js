@@ -41,7 +41,7 @@ onmessage = function (m) {
   if (m.data.isInit) {
     var satData = JSON.parse(m.data.satData);
     var sLen = satData.length - 1;
-    var i = -1;
+    let i = -1;
     while (i < sLen) {
       i++;
       if (satData[i].static || satData[i].missile) {
@@ -76,9 +76,9 @@ onmessage = function (m) {
     var now = (nowJ - satCache[satId].jdsatepoch) * 1440.0; // in minutes
 
     var len = NUM_SEGS + 1;
-    i = 0;
+    let i = 0;
     if (satCache[satId].missile) {
-      var timeslice = satCache[satId].altList.length / NUM_SEGS;
+      let timeslice = satCache[satId].altList.length / NUM_SEGS;
       while (i < len) {
         var x = parseInt(satCache[satId].altList.length * (i / NUM_SEGS));
 
@@ -104,7 +104,7 @@ onmessage = function (m) {
       }
     } else {
       var period = (2 * Math.PI) / satCache[satId].no;  // convert rads/min to min
-      timeslice = period / NUM_SEGS;
+      let timeslice = period / NUM_SEGS;
 
       while (i < len) {
         var t = now + i * timeslice;

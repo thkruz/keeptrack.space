@@ -3,6 +3,7 @@
 
 (function () {
   var objectManager = {};
+  var sensorList;
   objectManager.missileSet = [];
   objectManager.analSatSet = [];
   objectManager.staticSet = [];
@@ -46,9 +47,10 @@
     }
 
     // Try Loading Sensor Module
+    var sensor;
     try {
-      var sensorList = window.sensorManager.sensorList;
-      for (var sensor in sensorList) {
+      sensorList = window.sensorManager.sensorList;
+      for (sensor in sensorList) {
         var sensorInfo = {
           static: true,
           staticNum: sensorList[sensor].staticNum,

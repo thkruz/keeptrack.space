@@ -589,7 +589,11 @@ or mirrored at any other location without the express written permission of the 
         }
       }
       if (sensor === satellite.sensorListUS.length - 1) {
-        (resetWhenDone) ? satellite.currentSensor = satellite.defaultSensor : satellite.currentSensor = satellite.tempSensor;
+        if (resetWhenDone) {
+          satellite.currentSensor = satellite.defaultSensor;
+        } else {
+          satellite.currentSensor = satellite.tempSensor;
+        }
         break;
       }
       if (sensor < satellite.sensorListUS.length - 1 && i >= (satellite.lookanglesLength * 24 * 60 * 60) - satellite.lookanglesInterval) { // Move to next sensor if this sensor doesn't have enough passes.
@@ -599,7 +603,11 @@ or mirrored at any other location without the express written permission of the 
         howManyPasses = 6;
       }
     }
-    (resetWhenDone) ? satellite.currentSensor = satellite.defaultSensor : satellite.currentSensor = satellite.tempSensor;
+    if (resetWhenDone) {
+      satellite.currentSensor = satellite.defaultSensor;
+    } else {
+      satellite.currentSensor = satellite.tempSensor;
+    }
   };
   satellite.getOrbitByLatLon = function (sat, goalLat, goalLon, upOrDown, propOffset, goalAlt, rascOffset) {
     /**
@@ -1054,9 +1062,10 @@ or mirrored at any other location without the express written permission of the 
 
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
     var lookanglesTable = [];                                   // Iniially no rows to the table
+    var tempLookanglesInterval;
 
     if (satellite.isRiseSetLookangles) {
-      var tempLookanglesInterval = satellite.lookanglesInterval;
+      tempLookanglesInterval = satellite.lookanglesInterval;
       satellite.lookanglesInterval = 1;
     }
 
@@ -1218,8 +1227,9 @@ or mirrored at any other location without the express written permission of the 
       tdR.appendChild(document.createTextNode('Rng'));
       tdR.setAttribute('style', 'text-decoration: underline');
 
+      var tempLookanglesInterval;
       if (satellite.isRiseSetLookangles) {
-        var tempLookanglesInterval = satellite.lookanglesInterval;
+        tempLookanglesInterval = satellite.lookanglesInterval;
         satellite.lookanglesInterval = 1;
       }
 
@@ -1251,6 +1261,7 @@ or mirrored at any other location without the express written permission of the 
     var m = (j - satrec.jdsatepoch) * minutesPerDay;
     var positionEci = satellite.sgp4(satrec, m);
     var positionEcf, lookAngles, azimuth, elevation, range;
+    var tr,tdT,tdE,tdA,tdR;
 
     positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
     lookAngles = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf);
@@ -1287,17 +1298,18 @@ or mirrored at any other location without the express written permission of the 
         azimuth1 = lookAngles1.azimuth * rad2deg;
         elevation1 = lookAngles1.elevation * rad2deg;
         range1 = lookAngles1.rangeSat;
+
         if (!((azimuth >= satellite.currentSensor.obsminaz || azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
         ((azimuth >= satellite.currentSensor.obsminaz2 || azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
-          var tr = tbl.insertRow();
-          var tdT = tr.insertCell();
+          tr = tbl.insertRow();
+          tdT = tr.insertCell();
           tdT.appendChild(document.createTextNode(timeManager.dateFormat(now, 'isoDateTime', true)));
           // tdT.style.border = '1px solid black';
-          var tdE = tr.insertCell();
+          tdE = tr.insertCell();
           tdE.appendChild(document.createTextNode(elevation.toFixed(1)));
-          var tdA = tr.insertCell();
+          tdA = tr.insertCell();
           tdA.appendChild(document.createTextNode(azimuth.toFixed(0)));
-          var tdR = tr.insertCell();
+          tdR = tr.insertCell();
           tdR.appendChild(document.createTextNode(range.toFixed(0)));
           return 1;
         } else {

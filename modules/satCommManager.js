@@ -1,9 +1,11 @@
-var satCommManager = {}
+/* jshint esversion: 8 */
+
+var satCommManager = {};
 satCommManager.AEHFUsers = [];
 satCommManager.WGSUsers = [];
 satCommManager.IridiumUsers = [];
 satCommManager.init = (function () {
-  for (controlSite in controlSiteManager.controlSiteList) {
+  for (let controlSite in controlSiteManager.controlSiteList) {
     if (controlSiteManager.controlSiteList[controlSite].linkAEHF) {
       satCommManager.AEHFUsers.push(controlSiteManager.controlSiteList[controlSite].name);
     }
@@ -15,7 +17,7 @@ satCommManager.init = (function () {
     }
   }
 
-  for (sensor in sensorManager.sensorList) {
+  for (let sensor in sensorManager.sensorList) {
     if (sensorManager.sensorList[sensor].linkAEHF) {
       satCommManager.AEHFUsers.push(sensorManager.sensorList[sensor].name);
     }
@@ -56,8 +58,8 @@ satCommManager.showLinks = async function (group) {
       break;
   }
 
-  for (var i = 0; i < satlist.length; i++) {
-    for (var j = 0; j < satlist.length; j++) {
+  for (let i = 0; i < satlist.length; i++) {
+    for (let j = 0; j < satlist.length; j++) {
       if (i !== j) {
         var sat1 = satSet.getSatFromObjNum(satlist[i]);
         var sat2 = satSet.getSatFromObjNum(satlist[j]);
@@ -82,11 +84,11 @@ satCommManager.showLinks = async function (group) {
     }
   }
 
-  for (var i = 0; i < userlist.length; i++) {
+  for (let i = 0; i < userlist.length; i++) {
     var user = satSet.getSat(satSet.getIdFromSensorName(userlist[i]));
     var bestSat;
     var bestRange = 1000000;
-    for (var j = 0; j < satlist.length; j++) {
+    for (let j = 0; j < satlist.length; j++) {
       var sat = satSet.getSatFromObjNum(satlist[j]);
       var tearr = satellite.getTEARR(sat,user);
       if (tearr.elevation > 10) {
@@ -111,4 +113,4 @@ satCommManager.Iridium = [24841, 24870, 41917, 41918,41919,41920,41921,41922,
                           43573,43754,43575,43576,24903,24907,24944,24948,25105,
                           25527,24946,24967,25042,25043,24796,25077,25078,25104,
                           24795,25262,25273,25286,25319,24793,25320,25344,25467,
-                          24836,24842,24871,24873,27376]
+                          24836,24842,24871,24873,27376];

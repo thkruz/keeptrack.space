@@ -1518,7 +1518,7 @@ function debugDrawLine (type, value, color) {
       break;
   }
   if (type == 'sat') {
-    var sat = satSet.getSat(value);
+    let sat = satSet.getSat(value);
     drawLineList.push(
       {
         'line': new Line(),
@@ -1530,7 +1530,7 @@ function debugDrawLine (type, value, color) {
     );
   }
   if (type == 'sat2') {
-    var sat = satSet.getSat(value[0]);
+    let sat = satSet.getSat(value[0]);
     drawLineList.push(
       {
         'line': new Line(),
@@ -1542,7 +1542,7 @@ function debugDrawLine (type, value, color) {
     );
   }
   if (type == 'sat3') {
-    var sat = satSet.getSat(value[0]);
+    let sat = satSet.getSat(value[0]);
     var sat2 = satSet.getSat(value[1]);
     drawLineList.push(
       {

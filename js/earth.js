@@ -155,13 +155,13 @@
     var vertPos = [];
     var vertNorm = [];
     var texCoord = [];
-    for (var lat = 0; lat <= NUM_LAT_SEGS; lat++) {
+    for (let lat = 0; lat <= NUM_LAT_SEGS; lat++) {
       var latAngle = (Math.PI / NUM_LAT_SEGS) * lat - (Math.PI / 2);
       var diskRadius = Math.cos(Math.abs(latAngle));
       var z = Math.sin(latAngle);
       // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
       // var i = 0;
-      for (var lon = 0; lon <= NUM_LON_SEGS; lon++) { // add an extra vertex for texture funness
+      for (let lon = 0; lon <= NUM_LON_SEGS; lon++) { // add an extra vertex for texture funness
         var lonAngle = (Math.PI * 2 / NUM_LON_SEGS) * lon;
         var x = Math.cos(lonAngle) * diskRadius;
         var y = Math.sin(lonAngle) * diskRadius;
@@ -188,8 +188,8 @@
 
     // ok let's calculate vertex draw orders.... indiv triangles
     var vertIndex = [];
-    for (lat = 0; lat < NUM_LAT_SEGS; lat++) { // this is for each QUAD, not each vertex, so <
-      for (lon = 0; lon < NUM_LON_SEGS; lon++) {
+    for (let lat = 0; lat < NUM_LAT_SEGS; lat++) { // this is for each QUAD, not each vertex, so <
+      for (let lon = 0; lon < NUM_LON_SEGS; lon++) {
         var blVert = lat * (NUM_LON_SEGS + 1) + lon; // there's NUM_LON_SEGS + 1 verts in each horizontal band
         var brVert = blVert + 1;
         var tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;

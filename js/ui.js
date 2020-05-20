@@ -966,7 +966,7 @@ var isAnalysisMenuOpen = false;
         _rgbCSS([0.5, 0.5, 0.5, 1]), // Gray
         _rgbCSS([1,1,1,1]), // White
       ];
-      $('#settings-color-payload').css({'backgroundColor': _rgbCSS(settingsManager.colors.payload)})
+      $('#settings-color-payload').css({'backgroundColor': _rgbCSS(settingsManager.colors.payload)});
       $('#settings-color-payload').colorPick({
         'initialColor':_rgbCSS(settingsManager.colors.payload),
         'palette': colorPalette,
@@ -980,7 +980,7 @@ var isAnalysisMenuOpen = false;
           }
         }
       });
-      $('#settings-color-rocketBody').css({'backgroundColor': _rgbCSS(settingsManager.colors.rocketBody)})
+      $('#settings-color-rocketBody').css({'backgroundColor': _rgbCSS(settingsManager.colors.rocketBody)});
       $('#settings-color-rocketBody').colorPick({
         'initialColor':_rgbCSS(settingsManager.colors.rocketBody),
         'palette': colorPalette,
@@ -994,7 +994,7 @@ var isAnalysisMenuOpen = false;
           }
         }
       });
-      $('#settings-color-debris').css({'backgroundColor': _rgbCSS(settingsManager.colors.debris)})
+      $('#settings-color-debris').css({'backgroundColor': _rgbCSS(settingsManager.colors.debris)});
       $('#settings-color-debris').colorPick({
         'initialColor':_rgbCSS(settingsManager.colors.debris),
         'palette': colorPalette,
@@ -2492,6 +2492,75 @@ var isAnalysisMenuOpen = false;
       });
     })();
 
+    var satChngTable = [];
+    uiController.satChng = function (row) {
+      db.log('_satChng');
+      // SOCRATES Variables
+
+      /* SOCRATES.htm is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
+      If it ever becomes unavailable a similar, but less accurate (maybe?) cron job could be
+      created using satCruncer.
+
+      The variable row determines which set of objects on SOCRATES.htm we are using. First
+      row is 0 and last one is 19. */
+      if (row === -1 && satChngTable.length === 0) { // Only generate the table if receiving the -1 argument for the first time
+        $.get('/analysis/satchng.json?v=' + settingsManager.versionNumber)
+        .done(function (resp) {
+          for (let i = 0; i < resp.length; i++) {
+            var prefix = (resp[i].year > 50) ? '19' : '20';
+            var year = parseInt(prefix + resp[i].year.toString());
+            var date = timeManager.dateFromDay(year, resp[i].day);
+            date = new Date(date.getTime() + (resp[i].day % 1) * 1440 * 60000);
+            resp[i].date = date;
+          }
+          satChngTable = resp;
+          // SatChng Menu
+          var tbl = document.getElementById('satchng-table'); // Identify the table to update
+          tbl.innerHTML = '';                                  // Clear the table from old object data
+          // var tblLength = 0;                                   // Iniially no rows to the table
+
+          var tr = tbl.insertRow();
+          var tdT = tr.insertCell();
+          tdT.appendChild(document.createTextNode('Time'));
+          tdT.setAttribute('style', 'text-decoration: underline');
+          var tdSat = tr.insertCell();
+          tdSat.appendChild(document.createTextNode('Sat'));
+          tdSat.setAttribute('style', 'text-decoration: underline');
+          var tdInc = tr.insertCell();
+          tdInc.appendChild(document.createTextNode('Inc'));
+          tdInc.setAttribute('style', 'text-decoration: underline');
+          var tdMeanMo = tr.insertCell();
+          tdMeanMo.appendChild(document.createTextNode('MeanMo'));
+          tdMeanMo.setAttribute('style', 'text-decoration: underline');
+
+          for (let i = 0; i < Math.min(satChngTable.length,20); i++) {                       // 20 rows
+            tr = tbl.insertRow();
+            tr.setAttribute('class', 'satchng-object link');
+            tr.setAttribute('hiddenrow', i);
+            tdT = tr.insertCell();
+            var dateStr = satChngTable[i].date.toJSON();
+            var timeTextStr = '';
+            for (var iText = 0; iText < 20; iText++) {
+              if (iText < 10) timeTextStr += dateStr[iText];
+              if (iText === 10) timeTextStr += ' ';
+              if (iText > 11) timeTextStr += dateStr[iText-1];
+            }
+            tdT.appendChild(document.createTextNode(timeTextStr));
+            tdSat = tr.insertCell();
+            tdSat.appendChild(document.createTextNode(satChngTable[i].SCC));
+            tdInc = tr.insertCell();
+            tdInc.appendChild(document.createTextNode(satChngTable[i].inc.toFixed(2)));
+            tdMeanMo = tr.insertCell();
+            tdMeanMo.appendChild(document.createTextNode(satChngTable[i].meanmo.toFixed(2)));
+          }
+        });
+      }
+      if (row !== -1) { // If an object was selected from the menu
+        $('#search').val(satChngTable[row].SCC); // Fill in the serach box with the two objects
+        searchBox.doSearch(satChngTable[row].SCC); // Actually perform the search of the two objects
+      } // If a row was selected
+    };
+
     var socratesObjOne = []; // Array for tr containing CATNR1
     var socratesObjTwo = []; // Array for tr containing CATNR2
     function _socrates (row) {
@@ -2622,7 +2691,6 @@ var isAnalysisMenuOpen = false;
     function _bottomIconPress (evt) {
       db.log('_bottomIconPress');
       db.log(evt.currentTarget.id);
-      var sat;
       if (settingsManager.isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
       ga('send', 'event', 'Bottom Icon', evt.currentTarget.id, 'Selected');
       switch (evt.currentTarget.id) {
@@ -2708,7 +2776,7 @@ var isAnalysisMenuOpen = false;
             uiController.hideSideMenus();
             break;
           } else {
-            sat = satSet.getSatExtraOnly(selectedSat);
+            let sat = satSet.getSatExtraOnly(selectedSat);
             if (!satellite.sensorSelected() || sat.static || sat.missile || selectedSat === -1) { // No Sensor or Satellite Selected
               adviceList.lookanglesDisabled();
               if (!$('#menu-lookangles:animated').length) {
@@ -2780,7 +2848,7 @@ var isAnalysisMenuOpen = false;
           } else {
             uiController.hideSideMenus();
             if (selectedSat != -1) {
-              var sat = satSet.getSat(selectedSat);
+              let sat = satSet.getSat(selectedSat);
               $('#anal-sat').val(sat.SCC_NUM);
             }
             $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
@@ -3851,7 +3919,7 @@ var isAnalysisMenuOpen = false;
   var satNumberOverlay = [];
   function _showSatTest () {
     return;
-    db.log('_showSatTest');
+    // db.log('_showSatTest');
     // if (timeManager.now > (lastSatUpdateTime * 1 + 10000)) {
     //   for (var i = 0; i < satSet.getSatData().length; i++) {
     //     satNumberOverlay[i] = satSet.getScreenCoords(i, pMatrix, camMatrix);
@@ -4233,7 +4301,7 @@ var isAnalysisMenuOpen = false;
     $('.legend-countryCIS-box').css('background', _rgbCSS(settingsManager.colors.countryCIS));
     $('.legend-countryPRC-box').css('background', _rgbCSS(settingsManager.colors.countryPRC));
     $('.legend-countryOther-box').css('background', _rgbCSS(settingsManager.colors.countryOther));
-  }
+  };
 
   uiController.legendMenuChange = function (menu) {
     db.log('uiController.legendMenuChange');
@@ -4615,14 +4683,14 @@ var isAnalysisMenuOpen = false;
         var r = ((c>>16)&255)/255;
         var g = ((c>>8)&255)/255;
         var b = (c&255)/255;
-        return [r, g, b, 1]
+        return [r, g, b, 1];
     }
     throw new Error('Bad Hex');
   }
 
   function _rgbCSS(values) {
     db.log('_rgbCSS');
-    return `rgba(${values[0]*255},${values[1]*255},${values[2]*255},${values[3]})`
+    return `rgba(${values[0]*255},${values[1]*255},${values[2]*255},${values[3]})`;
   }
 
   var isFooterShown = true;

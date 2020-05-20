@@ -1,4 +1,4 @@
-var satVmagManager = {}
+var satVmagManager = {};
 satVmagManager.init = function () {
   for (var i = 0; i < satVmagManager.starlink.length; i++) {
     satVmagManager.sats.push(satVmagManager.starlink[i]);
@@ -745,7 +745,7 @@ satVmagManager.starlink = [
     "satid": "44977",
     "vmag": -3
   }
-]
+];
 satVmagManager.sats = [
   {
     "satid": "42800",

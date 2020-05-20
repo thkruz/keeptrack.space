@@ -172,10 +172,10 @@
     var msLocal =  date.getTime() - offsetMs;
     var dateLocal = new Date(msLocal);
     var iso = dateLocal.toISOString();
-    iso = iso.replace('T', ' ')
+    iso = iso.replace('T', ' ');
     var isoLocal = iso.slice(0, 19) + " " + dateLocal.toString().slice(25,31);
     return isoLocal;
-  }
+  };
 
   timeManager.localToZulu = function (date) {
     date = timeManager.dateFormat(date, 'isoDateTime', true);
@@ -199,6 +199,11 @@
       if ((year & 3) !== 0) return false;
       return ((year % 100) !== 0 || (year % 400) === 0);
     }
+  };
+
+  timeManager.dateFromDay = function (year, day) {
+    var date = new Date(year, 0); // initialize a date in `year-01-01`
+    return new Date(date.setDate(day)); // add the number of days
   };
 
   timeManager.jday = function (year, mon, day, hr, minute, sec) { // from satellite.js

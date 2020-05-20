@@ -40,7 +40,7 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.8.4';
+  settingsManager.versionNumber = '1.9.0';
   settingsManager.versionDate = 'May 20, 2020';
 
   settingsManager.lowPerf = false;
@@ -55,7 +55,7 @@ db.init = (function (){
   settingsManager.hiresNoCloudsImages = false;
   settingsManager.vectorImages = false;
 
-  var lastMap = localStorage.getItem("lastMap");
+  let lastMap = localStorage.getItem("lastMap");
   switch (lastMap) {
     case 'blue':
       settingsManager.blueImages = true;
@@ -86,11 +86,11 @@ db.init = (function (){
     // This is an initial parse of the GET variables
     // A satSet focused one happens later.
 
-    var queryStr = window.location.search.substring(1);
-    var params = queryStr.split('&');
-    for (var i = 0; i < params.length; i++) {
-      var key = params[i].split('=')[0];
-      var val = params[i].split('=')[1];
+    let queryStr = window.location.search.substring(1);
+    let params = queryStr.split('&');
+    for (let i = 0; i < params.length; i++) {
+      let key = params[i].split('=')[0];
+      let val = params[i].split('=')[1];
       switch (key) {
         case 'lowperf':
           settingsManager.lowPerf = true;
@@ -118,14 +118,14 @@ db.init = (function (){
           settingsManager.tleSource = 'tle/mw.json';
           break;
         case 'trusat':
-          console.debug('TruSat Overlay Mode Initializing');
+          db.log('TruSat Overlay Mode Initializing');
           settingsManager.trusatMode = true;
           settingsManager.trusatImages = true;
           $('.legend-pink-box').show();
           $('#logo-trusat').show();
           break;
         case 'trusat-only':
-          console.debug('TruSat Only Mode Initializing');
+          db.log('TruSat Only Mode Initializing');
           settingsManager.trusatMode = true;
           settingsManager.trusatOnly = true;
           settingsManager.trusatImages = true;

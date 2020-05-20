@@ -487,6 +487,7 @@
               <ul>
                 <h5 class="center-align">Analysis Menu</h5>
                 <li class="divider"></li>
+                <div class="row"></div>
                 <form id="analysis-form">
                   <div class="row">
                     <div class="input-field col s12">
@@ -497,20 +498,40 @@
                   <div class="row">
                     <div class="input-field col s12">
                       <select value=0 id="anal-type" type="text">
-                        <option value='inc'>Inclination</option>
-                        <option value='ap'>Apogee</option>
-                        <option value='pe'>Perigee</option>
-                        <option value='per'>Period</option>
-                        <option value='e'>Eccentricity</option>
-                        <option value='ra'>RAAN</option>
-                        <option value='all'>All</option>
+                        <optgroup label="Orbital Parameters">
+                          <option value='inc'>Inclination</option>
+                          <option value='ap'>Apogee</option>
+                          <option value='pe'>Perigee</option>
+                          <option value='per'>Period</option>
+                          <option value='e'>Eccentricity</option>
+                          <option value='ra'>RAAN</option>
+                          <option value='all'>All</option>
+                        </optgroup>
+                        <optgroup id="anal-look-opt" label="Look Angles">
+                          <option value='az'>Azimuth</option>
+                          <option value='el'>Elevation</option>
+                          <option value='rng'>Range</option>
+                          <option value='rae'>All</option>
+                        </optgroup>
                       </select>
                       <label for="disabled">Chart Type</label>
                     </div>
                   </div>
-                  <center>
-                    <button id="analysis-submit" class="btn waves-effect waves-light" type="submit" name="action">View Trends &#9658;</button>
-                  </center>
+                  <div class="row">
+                    <center>
+                      <button id="analysis-submit" class="btn waves-effect waves-light" type="submit" name="action">View Trends &#9658;</button>
+                    </center>
+                  </div>
+                  <div class="row">
+                    <center>
+                      <button class="btn waves-effect waves-light" onclick="satellite.exportTle2Txt();">Export TLEs &#9658;</button>
+                    </center>
+                  </div>
+                  <div class="row">
+                    <center>
+                      <button class="btn waves-effect waves-light" onclick="satellite.exportTle2Csv();">Export Catalog CSV &#9658;</button>
+                    </center>
+                  </div>
                 </form>
               </ul>
             </div>
@@ -715,6 +736,10 @@
               <div class="row">
                 <h5 class="center-align">Sensor Look Angles</h5>
                 <table id="looks"  class="center-align striped-light centered"></table>
+                <br />
+                <center>
+                  <button class="btn waves-effect waves-light" onclick="saveCsv(satellite.lastlooksArray,'lookAngles');">Export &#9658;</button>
+                </center>
               </div>
             </div>
           </div>
@@ -755,6 +780,10 @@
               <div class="row">
                 <h5 class="center-align">Multi-Sensor Look Angles</h5>
                 <table id="looksmultisite" class="center-align striped-light centered"></table>
+                <br />
+                <center>
+                  <button class="btn waves-effect waves-light" onclick="saveCsv(satellite.lastMultiSiteArray,'multiSiteLooks');">Export &#9658;</button>
+                </center>
               </div>
             </div>
           </div>

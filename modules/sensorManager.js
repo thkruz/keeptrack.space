@@ -5,7 +5,6 @@
 
   sensorList.COD = {
     name: 'Cape Cod AFS, Massachusetts',
-    googleName: 'Cape Cod',
     shortName: 'COD',
     type: 'Phased Array Radar',
     lat: 41.754785,
@@ -29,7 +28,6 @@
   };
   sensorList.BLE = {
     name: 'Beale AFB, California',
-    googleName: 'Beale',
     shortName: 'BLE',
     type: 'Phased Array Radar',
     lat: 39.136064,
@@ -52,7 +50,6 @@
   };
   sensorList.CLR = {
     name: 'Clear AFS, Alaska',
-    googleName: 'Clear',
     shortName: 'CLR',
     type: 'Phased Array Radar',
     lat: 64.290556,
@@ -75,7 +72,6 @@
   };
   sensorList.EGL = {
     name: 'Eglin AFB, Florida',
-    googleName: 'Eglin',
     shortName: 'EGL',
     type: 'Phased Array Radar',
     lat: 30.572411,
@@ -97,7 +93,6 @@
   };
   sensorList.FYL = {
     name: 'RAF Fylingdales, United Kingdom',
-    googleName: 'Fylingdales',
     shortName: 'FYL',
     type: 'Phased Array Radar',
     lat: 54.361758,
@@ -120,7 +115,6 @@
   };
   sensorList.CAV = {
     name: 'Cavalier AFS, North Dakota',
-    googleName: 'Cavalier',
     shortName: 'CAV',
     type: 'Phased Array Radar',
     lat: 48.724567,
@@ -143,7 +137,6 @@
   };
   sensorList.THL = {
     name: 'Thule AFB, Greenland',
-    googleName: 'Thule',
     shortName: 'THL',
     type: 'Phased Array Radar',
     lat: 76.570322,
@@ -167,7 +160,6 @@
   };
   sensorList.CDN = {
     name: 'Cobra Dane, Alaska',
-    googleName: 'Cobra Dane',
     shortName: 'CDN',
     type: 'Phased Array Radar',
     lat: 52.737,
@@ -196,7 +188,6 @@
   };
   sensorList.ALT = {
     name: 'ALTAIR, Kwajalein Atoll',
-    googleName: 'ALTAIR',
     shortName: 'ALT',
     type: 'Mechanical',
     lat: 8.716667,
@@ -220,7 +211,6 @@
   };
   sensorList.MIL = {
     name: 'Millstone, Massachusetts',
-    googleName: 'Millstone',
     shortName: 'MIL',
     type: 'Mechanical',
     lat: 42.6233,
@@ -242,7 +232,6 @@
   };
   sensorList.DGC = {
     name: 'Diego Garcia',
-    googleName: 'Diego Garcia',
     shortName: 'DGC',
     type: 'Optical',
     lat: -7.296480,
@@ -264,7 +253,6 @@
   };
   sensorList.MAU = {
     name: 'Maui, Hawaii',
-    googleName: 'Maui',
     shortName: 'MAU',
     type: 'Optical',
     lat: 20.708350,
@@ -286,7 +274,6 @@
   };
   sensorList.SOC = {
     name: 'Socorro, New Mexico',
-    googleName: 'Socorro',
     shortName: 'SOC',
     type: 'Optical',
     lat: 33.817233,
@@ -308,7 +295,6 @@
   };
   sensorList.ASC = {
     name: 'Ascension Island, United Kingdom',
-    googleName: 'Ascension',
     shortName: 'ASC',
     type: 'Mechanical',
     lat: -7.969444,
@@ -330,7 +316,6 @@
   };
   sensorList.GLB = {
     name: 'Globus II, NOR',
-    googleName: 'Globus II',
     shortName: 'GLB',
     type: 'Mechanical',
     lat: 70.3671,
@@ -352,7 +337,6 @@
   };
   sensorList.HOL = {
     name: 'C-Band (Holt) Radar, Australia',
-    googleName: 'C-Band (Holt) Radar',
     shortName: 'HOL',
     type: 'Mechanical',
     lat: -21.816195,
@@ -379,7 +363,6 @@
 
   sensorList.HAR = {
     name: 'Har Keren TPY-2, Israel',
-    googleName: 'Har Keren',
     shortName: 'HAR',
     type: 'Phased Array Radar',
     lat: 30.995807,
@@ -401,7 +384,6 @@
   };
   sensorList.QTR = {
     name: 'Centcom TPY-2, Qatar',
-    googleName: 'Centcom',
     shortName: 'QTR',
     type: 'Phased Array Radar',
     lat: 25.315980,
@@ -423,7 +405,6 @@
   };
   sensorList.KUR = {
     name: 'Kürecik Radar Station, Turkey',
-    googleName: 'Kürecik Radar Station',
     shortName: 'KUR',
     type: 'Phased Array Radar',
     lat: 38.349444,
@@ -446,7 +427,6 @@
 
   sensorList.SHA = {
     name: 'Shariki Communication Site, Japan',
-    googleName: 'Shariki Communication Site',
     shortName: 'SHA',
     type: 'Phased Array Radar',
     lat: 40.888090,
@@ -469,7 +449,6 @@
 
   sensorList.KCS = {
     name: 'Kyogamisaki Communication Site, Japan',
-    googleName: 'Kyogamisaki Communication Site',
     shortName: 'KCS',
     type: 'Phased Array Radar',
     lat: 35.766667,
@@ -492,7 +471,6 @@
 
   sensorList.SBX = {
     name: 'Sea-Based X-Band Radar, Pacific Ocean',
-    googleName: 'Sea-Based X-Band Radar',
     shortName: 'SBX',
     type: 'Phased Array Radar',
     lat: 36.5012,
@@ -519,7 +497,6 @@
 
   sensorList.MSR = {
     name: 'Midland Space Radar, Texas',
-    googleName: 'Midland Space Radar',
     shortName: 'MSR',
     type: 'Phased Array Radar',
     lat: 31.9643,
@@ -548,7 +525,6 @@
 
   sensorList.PFISR = {
     name: 'Poker Flat Incoherent Scatter Radar, Alaska',
-    googleName: 'Poker Flat Incoherent Scatter Radar',
     shortName: 'PFISR',
     type: 'Phased Array Radar',
     lat: 65.130029,
@@ -571,7 +547,6 @@
 
   sensorList.KSR = {
     name: 'Kiwi Space Radar, New Zealand',
-    googleName: 'Kiwi Space Radar',
     shortName: 'KSR',
     type: 'Phased Array Radar',
     lat: -45.038725,
@@ -603,7 +578,6 @@
   // //////////////////////
   sensorList.GRV = {
     name: 'Grand Réseau Adapté à la Veille Spatiale, France',
-    googleName: 'GRAVES',
     shortName: 'GRV',
     type: 'Phased Array',
     lat: 47.347778,
@@ -625,7 +599,6 @@
   };
   sensorList.TIR = {
     name: 'Tracking and Imaging Radar, Germany',
-    googleName: 'TIRA',
     shortName: 'TIR',
     type: 'Mechanical',
     lat: 50.6166,
@@ -647,7 +620,6 @@
   };
   sensorList.NRC = {
     name: 'Croce del Nord, Italy',
-    googleName: 'Northern Cross',
     shortName: 'NRC',
     type: 'Bistatic Radio Telescope',
     lat: 44.5208,
@@ -675,7 +647,6 @@
   };
   sensorList.TRO = {
     name: 'RAF Troodos, United Kingdom',
-    googleName: 'RAF Troodos',
     shortName: 'TRO',
     type: 'Optical',
     lat: 34.912778,
@@ -697,7 +668,6 @@
   };
   sensorList.SDT = {
     name: 'ESA Space Debris Telescope, Spain',
-    googleName: 'ESA Space Debris Telescope',
     shortName: 'SDT',
     type: 'Optical',
     lat: 28.3,
@@ -723,7 +693,6 @@
   // //////////////////////
   sensorList.ARM = {
     name: 'Armavir, Russia',
-    googleName: 'Armavir',
     shortName: 'ARM',
     type: 'Phased Array Radar',
     lat: 44.925106,
@@ -744,7 +713,6 @@
   };
   sensorList.BAL = {
     name: 'Balkhash, Russia',
-    googleName: 'Balkhash',
     shortName: 'BAL',
     type: 'Phased Array Radar',
     lat: 46.603076,
@@ -765,7 +733,6 @@
   };
   sensorList.GAN = {
     name: 'Gantsevichi, Russia',
-    googleName: 'Gantsevichi',
     shortName: 'GAN',
     type: 'Phased Array Radar',
     lat: 52.850000,
@@ -786,7 +753,6 @@
   };
   sensorList.LEK = {
     name: 'Lekhtusi, Russia',
-    googleName: 'Lekhtusi',
     shortName: 'LEK',
     type: 'Phased Array Radar',
     lat: 60.275458,
@@ -807,7 +773,6 @@
   };
   sensorList.MIS = {
     name: 'Mishelevka-D, Russia',
-    googleName: 'Mishelevka',
     shortName: 'MIS',
     type: 'Phased Array Radar',
     lat: 52.855500,
@@ -828,7 +793,6 @@
   };
   sensorList.OLE = {
     name: 'Olenegorsk, Russia',
-    googleName: 'Olenegorsk',
     shortName: 'OLE',
     type: 'Phased Array Radar',
     lat: 68.114100,
@@ -849,7 +813,6 @@
   };
   sensorList.PEC = {
     name: 'Pechora, Russia',
-    googleName: 'Pechora',
     shortName: 'PEC',
     type: 'Phased Array Radar',
     lat: 65.210000,
@@ -870,7 +833,6 @@
   };
   sensorList.PIO = {
     name: 'Pionersky, Russia',
-    googleName: 'Pionersky',
     shortName: 'PIO',
     type: 'Phased Array Radar',
     lat: 54.857294,
@@ -891,7 +853,6 @@
   };
   sensorList.XUA = {
     name: 'Xuanhua, China',
-    googleName: 'Xuanhua',
     shortName: 'XUA',
     type: 'Phased Array Radar',
     lat: 40.446944,
@@ -914,7 +875,6 @@
   // Telescopes
   sensorList.MLS = {
     name: 'Mount Lemmon Survey, Arizona',
-    googleName: 'Mount Lemmon Survey',
     shortName: 'MLS',
     type: 'Optical',
     lat: 32.442,
@@ -936,7 +896,6 @@
 
   sensorList.PMO = {
     name: 'Purple Mountain Observatory, China',
-    googleName: 'Purple Mountain Observatory',
     shortName: 'PMO',
     type: 'Optical',
     lat: 32.064946,
@@ -958,7 +917,6 @@
 
   sensorList.PO = {
     name: 'Palomar Observatory, California',
-    googleName: 'Palomar Observatory',
     shortName: 'PO',
     type: 'Optical',
     lat: 33.3564,
@@ -980,7 +938,6 @@
 
   sensorList.LSO = {
     name: 'La Sagra Observatory, Spain',
-    googleName: 'La Sagra Observatory',
     shortName: 'LSO',
     type: 'Optical',
     lat: 37.9839,
@@ -1003,7 +960,6 @@
   // ISON Sensors
   sensorList.MAY = {
     name: 'Mayhill, New Mexico',
-    googleName: 'Mayhill',
     shortName: 'MAY',
     type: 'Optical',
     lat: 32.9039,
@@ -1142,7 +1098,7 @@
       for (sensor in sensorList) {
         if (sensorList[sensor] === selectedSensor || (sensorList[sensor].staticNum === staticNum && typeof staticNum != 'undefined')) {
           sensorManager.selectedSensor = sensorList[sensor];
-          ga('send', 'event', 'Sensor', sensorList[sensor].googleName, 'Selected');
+          ga('send', 'event', 'Sensor', sensorList[sensor].shortName, 'Selected');
           // Do For All Sensors
           sensorManager.whichRadar = sensorManager.selectedSensor.shortName;
           satCruncher.postMessage({

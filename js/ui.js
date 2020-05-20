@@ -105,6 +105,18 @@ function saveVariable (variable) {
   saveAs(blob, 'variable.txt');
 }
 
+function saveCsv (items,name) {
+  db.log('saveCsv');
+  const replacer = (key, value) => value === null ? '' : value; // specify how you want to handle null values here
+  const header = Object.keys(items[0]);
+  let csv = items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','));
+  csv.unshift(header.join(','));
+  csv = csv.join('\r\n');
+
+  var blob = new Blob([csv], {type: 'text/plain;charset=utf-8'});
+  saveAs(blob, `${name}.csv`);
+}
+
 $.ajaxSetup({
   cache: false
 });
@@ -448,7 +460,7 @@ var isAnalysisMenuOpen = false;
                 $('#view-sat-info-rmb').show();
                 $('#view-related-sats-rmb').show();
 
-                if (satellite.sensorSelected() && sensorManager.whichRadar !== 'CUSTOM') {
+                if (satellite.checkSensorSelected() && sensorManager.whichRadar !== 'CUSTOM') {
                   $('#line-sensor-sat-rmb').show();
                 }
                 $('#line-earth-sat-rmb').show();
@@ -693,7 +705,7 @@ var isAnalysisMenuOpen = false;
             });
           break;
           case 'colors-default-rmb':
-            if (satellite.sensorSelected()) {
+            if (satellite.checkSensorSelected()) {
               uiController.legendMenuChange('default');
             } else {
               uiController.legendMenuChange('default');
@@ -805,7 +817,7 @@ var isAnalysisMenuOpen = false;
               isMilSatSelected = false;
               $('#menu-space-stations').removeClass('bmenu-item-selected');
 
-              if (satellite.sensorSelected() && cameraType.current !== cameraType.PLANETARIUM && cameraType.current !== cameraType.ASTRONOMY) {
+              if (satellite.checkSensorSelected() && cameraType.current !== cameraType.PLANETARIUM && cameraType.current !== cameraType.ASTRONOMY) {
                 uiController.legendMenuChange('default');
               }
 
@@ -1646,9 +1658,14 @@ var isAnalysisMenuOpen = false;
         e.preventDefault();
       });
       $('#analysis-form').submit(function (e) {
-        var chartType = $('#anal-type').val();
-        var sat = $('#anal-sat').val();
-        $.colorbox({href: `https://keeptrack.space/analysis/?sat=${sat}&type=${chartType}`, iframe: true, width: '60%', height: '60%', fastIframe: false, closeButton: false});
+        let chartType = $('#anal-type').val();
+        let sat = $('#anal-sat').val();
+        let sensor = satellite.currentSensor.shortName;
+        if (typeof sensor == 'undefined') {
+          $.colorbox({href: `https://keeptrack.space/analysis/?sat=${sat}&type=${chartType}`, iframe: true, width: '60%', height: '60%', fastIframe: false, closeButton: false});
+        } else {
+          $.colorbox({href: `https://keeptrack.space/analysis/?sat=${sat}&type=${chartType}&sensor=${sensor}`, iframe: true, width: '60%', height: '60%', fastIframe: false, closeButton: false});
+        }
         e.preventDefault();
       });
       $('#settings-form').change(function (e) {
@@ -1993,7 +2010,7 @@ var isAnalysisMenuOpen = false;
           satSet.setColorScheme(ColorScheme.default, true);
           settingsManager.themes.blueTheme();
         }
-        if (!satellite.sensorSelected() || watchlistList.length <= 0) {
+        if (!satellite.checkSensorSelected() || watchlistList.length <= 0) {
           $('#menu-info-overlay').addClass('bmenu-item-disabled');
         }
       });
@@ -2009,7 +2026,7 @@ var isAnalysisMenuOpen = false;
           watchlistInViewList.push(false);
           uiController.updateWatchlist();
         }
-        if (satellite.sensorSelected()) {
+        if (satellite.checkSensorSelected()) {
           $('#menu-info-overlay').removeClass('bmenu-item-disabled');
         }
         $('#watchlist-new').val(''); // Clear the search box after enter pressed/selected
@@ -2026,7 +2043,7 @@ var isAnalysisMenuOpen = false;
           watchlistInViewList.push(false);
           uiController.updateWatchlist();
         }
-        if (satellite.sensorSelected()) {
+        if (satellite.checkSensorSelected()) {
           $('#menu-info-overlay').removeClass('bmenu-item-disabled');
         }
         $('#watchlist-new').val(''); // Clear the search box after enter pressed/selected
@@ -2072,7 +2089,7 @@ var isAnalysisMenuOpen = false;
           }
           watchlistList = newWatchlist;
           uiController.updateWatchlist();
-          if (satellite.sensorSelected()) {
+          if (satellite.checkSensorSelected()) {
             $('#menu-info-overlay').removeClass('bmenu-item-disabled');
           }
         };
@@ -2397,7 +2414,7 @@ var isAnalysisMenuOpen = false;
           $('#cs-maxel-div').show();
           $('#cs-minrange-div').show();
           $('#cs-maxrange-div').show();
-          if (satellite.sensorSelected()) {
+          if (satellite.checkSensorSelected()) {
             $('#cs-minaz').val(sensorManager.selectedSensor.obsminaz);
             $('#cs-maxaz').val(sensorManager.selectedSensor.obsmaxaz);
             $('#cs-minel').val(sensorManager.selectedSensor.obsminel);
@@ -2709,7 +2726,7 @@ var isAnalysisMenuOpen = false;
           }
           break;
         case 'menu-info-overlay':
-          if (!satellite.sensorSelected()) { // No Sensor Selected
+          if (!satellite.checkSensorSelected()) { // No Sensor Selected
             if (!$('#menu-info-overlay:animated').length) {
               $('#menu-info-overlay').effect('shake', {distance: 10});
             }
@@ -2749,7 +2766,7 @@ var isAnalysisMenuOpen = false;
           }
           break;
         case 'menu-sensor-info': // No Keyboard Commands
-          if (!satellite.sensorSelected()) { // No Sensor Selected
+          if (!satellite.checkSensorSelected()) { // No Sensor Selected
             adviceList.sensorInfoDisabled();
             if (!$('#menu-sensor-info:animated').length) {
               $('#menu-sensor-info').effect('shake', {distance: 10});
@@ -2777,7 +2794,7 @@ var isAnalysisMenuOpen = false;
             break;
           } else {
             let sat = satSet.getSatExtraOnly(selectedSat);
-            if (!satellite.sensorSelected() || sat.static || sat.missile || selectedSat === -1) { // No Sensor or Satellite Selected
+            if (!satellite.checkSensorSelected() || sat.static || sat.missile || selectedSat === -1) { // No Sensor or Satellite Selected
               adviceList.lookanglesDisabled();
               if (!$('#menu-lookangles:animated').length) {
                 $('#menu-lookangles').effect('shake', {distance: 10});
@@ -2788,7 +2805,7 @@ var isAnalysisMenuOpen = false;
             uiController.hideSideMenus();
             isLookanglesMenuOpen = true;
             $('#loading-screen').fadeIn('slow', function () {
-              satellite.getlookangles(sat, isLookanglesMenuOpen);
+              satellite.getlookangles(sat);
               $('#menu-lookangles').addClass('bmenu-item-selected');
               $('#loading-screen').fadeOut();
               $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
@@ -2851,6 +2868,38 @@ var isAnalysisMenuOpen = false;
               let sat = satSet.getSat(selectedSat);
               $('#anal-sat').val(sat.SCC_NUM);
             }
+            if (satellite.checkSensorSelected()) {
+              $('#anal-type').html(
+              `<optgroup label="Orbital Parameters">
+                  <option value='inc'>Inclination</option>
+                  <option value='ap'>Apogee</option>
+                  <option value='pe'>Perigee</option>
+                  <option value='per'>Period</option>
+                  <option value='e'>Eccentricity</option>
+                  <option value='ra'>RAAN</option>
+                  <option value='all'>All</option>
+                </optgroup>
+                <optgroup id="anal-look-opt" label="Look Angles">
+                  <option value='az'>Azimuth</option>
+                  <option value='el'>Elevation</option>
+                  <option value='rng'>Range</option>
+                  <option value='rae'>All</option>
+                </optgroup>`);
+            } else {
+              $('#anal-type').html(
+                `<optgroup label="Orbital Parameters">
+                  <option value='inc'>Inclination</option>
+                  <option value='ap'>Apogee</option>
+                  <option value='pe'>Perigee</option>
+                  <option value='per'>Period</option>
+                  <option value='e'>Eccentricity</option>
+                  <option value='ra'>RAAN</option>
+                  <option value='all'>All</option>
+                </optgroup>`);
+            }
+            // Reinitialize the Material CSS Code
+            $('#anal-type').formSelect();
+
             $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             uiController.updateWatchlist();
             isAnalysisMenuOpen = true;
@@ -2893,7 +2942,7 @@ var isAnalysisMenuOpen = false;
             if (selectedSat !== -1) {
               $('#loading-screen').fadeIn('slow', function () {
                 sat = satSet.getSatExtraOnly(selectedSat);
-                satellite.getlookanglesMultiSite(sat, isLookanglesMultiSiteMenuOpen);
+                satellite.getlookanglesMultiSite(sat);
                 $('#loading-screen').fadeOut();
                 $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
               });
@@ -3128,7 +3177,7 @@ var isAnalysisMenuOpen = false;
             if (settingsManager.isMobileModeEnabled) mobile.searchToggle(false);
             uiController.hideSideMenus();
 
-            if (satellite.sensorSelected()) {
+            if (satellite.checkSensorSelected()) {
               $('#cs-lat').val(sensorManager.selectedSensor.lat);
               $('#cs-lon').val(sensorManager.selectedSensor.long);
               $('#cs-hei').val(sensorManager.selectedSensor.obshei);
@@ -3154,7 +3203,7 @@ var isAnalysisMenuOpen = false;
           }
           break;
         case 'menu-fov-bubble': // No Keyboard Commands
-          if (!satellite.sensorSelected()) { // No Sensor Selected
+          if (!satellite.checkSensorSelected()) { // No Sensor Selected
             adviceList.bubbleDisabled();
             if (!$('#menu-fov-bubble:animated').length) {
               $('#menu-fov-bubble').effect('shake', {distance: 10});
@@ -3187,7 +3236,7 @@ var isAnalysisMenuOpen = false;
           }
           break;
         case 'menu-surveillance': // No Keyboard Commands
-          if (!satellite.sensorSelected()) { // No Sensor Selected
+          if (!satellite.checkSensorSelected()) { // No Sensor Selected
             adviceList.survFenceDisabled();
             if (!$('#menu-surveillance:animated').length) {
               $('#menu-surveillance').effect('shake', {distance: 10});
@@ -3320,7 +3369,7 @@ var isAnalysisMenuOpen = false;
             $('#menu-planetarium').removeClass('bmenu-item-selected');
             break;
           } else {
-            if (satellite.sensorSelected()) {
+            if (satellite.checkSensorSelected()) {
               cameraType.current = cameraType.PLANETARIUM; // Activate Planetarium Camera Mode
               $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
               uiController.legendMenuChange('planetarium');
@@ -3350,7 +3399,7 @@ var isAnalysisMenuOpen = false;
             $('#menu-astronomy').removeClass('bmenu-item-selected');
             break;
           } else {
-            if (satellite.sensorSelected()) {
+            if (satellite.checkSensorSelected()) {
               starManager.drawAllConstellations();
               orbitDisplay.clearInViewOrbit();
               cameraType.current = cameraType.ASTRONOMY; // Activate Astronomy Camera Mode
@@ -3730,7 +3779,7 @@ var isAnalysisMenuOpen = false;
           if (cameraType.current === cameraType.PLANETARIUM) orbitDisplay.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
 
           cameraType.current += 1;
-          if (cameraType.current === cameraType.PLANETARIUM && !satellite.sensorSelected()) {
+          if (cameraType.current === cameraType.PLANETARIUM && !satellite.checkSensorSelected()) {
             cameraType.current += 1;
           }
 
@@ -3738,7 +3787,7 @@ var isAnalysisMenuOpen = false;
             cameraType.current += 1;
           }
 
-          if (cameraType.current === cameraType.ASTRONOMY && !satellite.sensorSelected()) {
+          if (cameraType.current === cameraType.ASTRONOMY && !satellite.checkSensorSelected()) {
             cameraType.current += 1;
           }
 
@@ -4052,7 +4101,7 @@ var isAnalysisMenuOpen = false;
         $('#sat-range').prop('title', 'Range: ' + satellite.currentTEARR.range.toFixed(2) + ' km');
       }
 
-      if (satellite.sensorSelected()) {
+      if (satellite.checkSensorSelected()) {
         if (selectedSat !== lastSelectedSat && !sat.missile) {
           $('#sat-nextpass').html(satellite.nextpass(sat));
 
@@ -4323,7 +4372,7 @@ var isAnalysisMenuOpen = false;
 
     switch (menu) {
       case 'default':
-        if (satellite.sensorSelected()) {
+        if (satellite.checkSensorSelected()) {
           $('#legend-list-default-sensor').show();
         } else {
           $('#legend-list-default').show();
@@ -4358,7 +4407,7 @@ var isAnalysisMenuOpen = false;
         break;
       case 'clear':
         $('#legend-hover-menu').hide();
-        if (satellite.sensorSelected()) {
+        if (satellite.checkSensorSelected()) {
           $('#legend-list-default-sensor').show();
         } else {
           $('#legend-list-default').show();
@@ -4766,7 +4815,7 @@ var isAnalysisMenuOpen = false;
     map.x = map.x * settingsManager.mapWidth - 10;
     map.y = map.y / 0.6366197723675813 * settingsManager.mapHeight - 10;
     $('#map-sat').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
-    if (satellite.sensorSelected()) {
+    if (satellite.checkSensorSelected()) {
       map = mapManager.braun({lon: satellite.currentSensor.long, lat: satellite.currentSensor.lat}, {meridian: 0, latLimit: 90});
       map.x = map.x * settingsManager.mapWidth - 10;
       map.y = map.y / 0.6366197723675813 * settingsManager.mapHeight - 10;

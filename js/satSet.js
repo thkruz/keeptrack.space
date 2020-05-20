@@ -204,7 +204,7 @@ var satSensorMarkerArray = [];
     }
 
     // Don't force color recalc if default colors and no sensor for inview color
-    if (satellite.sensorSelected() || settingsManager.isForceColorScheme) {
+    if (satellite.checkSensorSelected() || settingsManager.isForceColorScheme) {
       // Don't change colors while dragging
       if (!isDragging) {
         satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
@@ -1298,7 +1298,7 @@ var satSensorMarkerArray = [];
     }
     selectedSat = i;
 
-    if (satellite.sensorSelected()) {
+    if (satellite.checkSensorSelected()) {
       $('#menu-lookangles').removeClass('bmenu-item-disabled');
     }
     $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');

@@ -209,8 +209,7 @@
   timeManager.jday = function (year, mon, day, hr, minute, sec) { // from satellite.js
     if (!year) {
       // console.error('timeManager.jday should always have a date passed to it!');
-      var now;
-      now = Date.now();
+      let now = new Date();
       jDayStart = new Date(now.getFullYear(), 0, 0);
       jDayDiff = now - jDayStart;
       return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);

@@ -760,7 +760,7 @@ var drawLoopCallback;
       return;
     }
 
-    if (!satellite.sensorSelected()) return;
+    if (!satellite.checkSensorSelected()) return;
     if (drawNow - satLabelModeLastTime < settingsManager.satLabelInterval) return;
 
     orbitDisplay.clearInViewOrbit();
@@ -859,7 +859,7 @@ var drawLoopCallback;
         satHoverBoxNode2.textContent = '';
         satHoverBoxNode3.textContent = '';
       } else {
-        if (satellite.sensorSelected() && isShowNextPass && isShowDistance) {
+        if (satellite.checkSensorSelected() && isShowNextPass && isShowDistance) {
           satHoverBoxNode1.textContent = (sat.ON);
           satHoverBoxNode2.textContent = (sat.SCC_NUM);
           satHoverBoxNode3.innerHTML = (satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '');
@@ -868,7 +868,7 @@ var drawLoopCallback;
           satHoverBoxNode2.innerHTML = (sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
           satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
                                           'X: ' + sat.velocityX.toFixed(2) + 'km/s Y: ' + sat.velocityY.toFixed(2) + 'km/s Z: ' + sat.velocityZ.toFixed(2)) + 'km/s';
-        } else if (satellite.sensorSelected() && isShowNextPass) {
+        } else if (satellite.checkSensorSelected() && isShowNextPass) {
           satHoverBoxNode1.textContent = (sat.ON);
           satHoverBoxNode2.textContent = (sat.SCC_NUM);
           satHoverBoxNode3.textContent = (satellite.nextpass(sat));
@@ -897,7 +897,7 @@ var drawLoopCallback;
   var demoModeSatellite = 0;
   var demoModeLastTime = 0;
   function _demoMode () {
-    if (!satellite.sensorSelected()) return;
+    if (!satellite.checkSensorSelected()) return;
     if (drawNow - demoModeLastTime < settingsManager.demoModeInterval) return;
 
     demoModeLastTime = drawNow;
@@ -1240,7 +1240,7 @@ function selectSat (satId) {
 
     orbitDisplay.setSelectOrbit(satId);
 
-    if (satellite.sensorSelected()) {
+    if (satellite.checkSensorSelected()) {
       $('#menu-lookangles').removeClass('bmenu-item-disabled');
     }
 
@@ -1387,7 +1387,7 @@ function selectSat (satId) {
       var sunTime = SunCalc.getTimes(now, satellite.currentSensor.lat, satellite.currentSensor.long);
       var satInSun = satellite.isInSun(sat);
       // If No Sensor, then Ignore Sun Exclusion
-      if (!satellite.sensorSelected()) {
+      if (!satellite.checkSensorSelected()) {
         if (satInSun == 0) $('#sat-sun').html('No Sunlight');
         if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
         if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
@@ -1411,8 +1411,8 @@ function selectSat (satId) {
       }
     }
 
-    if (satellite.sensorSelected()) {
-      satellite.getlookangles(sat, isLookanglesMenuOpen);
+    if (satellite.checkSensorSelected() && isLookanglesMenuOpen) {
+      satellite.getlookangles(sat);
     }
   }
 
@@ -1623,7 +1623,7 @@ function drawLines () {
 // function drawLines () {
 //   var satData = satSet.getSatData();
 //   var propTime = timeManager.propTime();
-//   if (satData && satellite.sensorSelected()) {
+//   if (satData && satellite.checkSensorSelected()) {
 //     if (propTime - lastRadarTrackTime > 54) {
 //       lastRadarTrackTime = 0;
 //       curRadarTrackNum++;

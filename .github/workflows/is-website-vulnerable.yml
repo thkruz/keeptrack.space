@@ -1,0 +1,11 @@
+name: Test site for publicly known js vulnerabilities
+
+on: push
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test for public javascript library vulnerabilities 
+        uses: lirantal/is-website-vulnerable@master
+        with:
+          scan-url: "https://keeptrack.space"

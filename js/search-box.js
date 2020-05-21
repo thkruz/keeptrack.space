@@ -85,6 +85,9 @@
         // Skip inactive missiles.
         if (sat.missile && !sat.active) { continue; }
 
+        // Skip Fake Analyst satellites
+        if (sat.C == 'ANALSAT') { continue; }
+
         // Everything has a name. If it doesn't then assume it isn't what we are
         // searching for.
         if (!sat.ON) { continue; }
@@ -112,9 +115,6 @@
         } else {
           continue; // Last check for missiles
         }
-
-        // Skip Inactive Analyst satellites
-        if (!sat.active) { continue; }
 
         if (sat.SCC_NUM.indexOf(searchString) !== -1) {
           results.push({

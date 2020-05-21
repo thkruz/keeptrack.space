@@ -422,6 +422,8 @@ function propagateCruncher () {
       } else {
         // This is probably a reentry and should be skipped from now on.
         satCache[i].skip = true;
+        console.log(`sat index ${i} skipped!`);
+        console.log(satCache[i]);
         satPos[i * 3] = 0;
         satPos[i * 3 + 1] = 0;
         satPos[i * 3 + 2] = 0;

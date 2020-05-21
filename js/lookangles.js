@@ -1,22 +1,20 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-Copyright © 2016-2020 by Theodore Kruczek. All rights reserved. No part of this
-web site may be reproduced, published, distributed, displayed, performed, copied
-or stored for public or private use, without written permission of the author.
-
-lookangles.js is an expansion library for satellite.js providing tailored functions
-for calculating orbital data.
+(c) 2016-2020, Theodore Kruczek
+lookangles.js is an expansion library for satellite.js providing tailored
+functions for calculating orbital data.
 http://keeptrack.space
 
+All code is Copyright © 2016-2020 by Theodore Kruczek. All rights reserved.
+No part of this web site may be reproduced, published, distributed, displayed,
+performed, copied or stored for public or private use, without written
+permission of the author.
+
+No part of this code may be modified or changed or exploited in any way used
+for derivative works, or offered for sale, or used to construct any kind of database
+or mirrored at any other location without the express written permission of the author.
+
 ///////////////////////////////////////////////////////////////////////////// */
-
-/* global
-
-  $
-  satellite
-  timeManager
-
-*/
 
 (function () {
   // Constants

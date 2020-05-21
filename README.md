@@ -1,4 +1,10 @@
 # keeptrack.space
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=for-the-badge)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/thkruz/keeptrack.space?style=for-the-badge)
+![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=for-the-badge)
+![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/thkruz/keeptrack.space/Test%20site%20for%20publicly%20known%20js%20vulnerabilities?label=vulnerabilities&style=for-the-badge)
+![License](https://img.shields.io/badge/license-rights%20reserved-red?style=for-the-badge)
 ## Description
 In 2015 [@jeyoder](https://github.com/jeyoder) released stuffin.space to visualize satellites around the earth.
 

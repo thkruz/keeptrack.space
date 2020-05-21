@@ -2509,7 +2509,7 @@ var isAnalysisMenuOpen = false;
       db.log('uiController.satChng');
 
       if (row === -1 && satChngTable.length === 0) { // Only generate the table if receiving the -1 argument for the first time
-        $.get('/analysis/satChng.json?v=' + settingsManager.versionNumber)
+        $.get('/analysis/satchng.json?v=' + settingsManager.versionNumber)
         .done(function (resp) {
           for (let i = 0; i < resp.length; i++) {
             var prefix = (resp[i].year > 50) ? '19' : '20';
@@ -2584,7 +2584,7 @@ var isAnalysisMenuOpen = false;
       The variable row determines which set of objects on SOCRATES.htm we are using. First
       row is 0 and last one is 19. */
       if (row === -1 && socratesObjOne.length === 0 && socratesObjTwo.length === 0) { // Only generate the table if receiving the -1 argument for the first time
-        $.get('/SOCRATES.htm', function (socratesHTM) { // Load SOCRATES.htm so we can use it instead of index.htm
+        $.get('/admin/SOCRATES.htm', function (socratesHTM) { // Load SOCRATES.htm so we can use it instead of index.htm
           var tableRowOne = $("[name='CATNR1']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR1
           var tableRowTwo = $("[name='CATNR2']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR2
           tableRowOne.each(function (rowIndex, r) {

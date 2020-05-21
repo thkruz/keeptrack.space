@@ -200,7 +200,7 @@ var drawLoopCallback;
 
     // Set Default TLE
     if (typeof settingsManager.tleSource == 'undefined') {
-      settingsManager.tleSource = 'TLE.json';
+      settingsManager.tleSource = 'tle/TLE.json';
     }
     webGlInit();
     earth.init();

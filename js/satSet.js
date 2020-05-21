@@ -21,29 +21,6 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-/* global
-
-  $
-  Worker
-  gl
-  vec4
-  mat4
-  shaderLoader
-  ColorScheme
-
-  browserUnsupported
-  selectedSat
-  selectSat
-  updateMap
-
-  objectManager
-  timeManager
-  settingsManager
-  lookangles
-  searchBox
-
-*/
-
 // var multThreadCruncher1 = {};
 // var multThreadCruncher2 = {};
 // var multThreadCruncher3 = {};

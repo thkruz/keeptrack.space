@@ -6,11 +6,9 @@
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/thkruz/keeptrack.space/Test%20site%20for%20publicly%20known%20js%20vulnerabilities?label=vulnerabilities&style=for-the-badge)
 ![License](https://img.shields.io/badge/license-rights%20reserved-red?style=for-the-badge)
 ## Description
-In 2015 [@jeyoder](https://github.com/jeyoder) released stuffin.space to visualize satellites around the earth.
+KeepTrack originally was meant to provide simple orbital analysis tools. Since then those simple tools have evolved into complex tools that bring functionality usually only found in expensive toolkits to the average user. The ultimate goal of the project is to make learning about orbital mechanics and satellite operations accessible to everyone without a paywall.
 
-In 2016 [@thkruz](https://github.com/thkruz) released keeptrack.space to provide simple orbital analysis tools. Since then those simple tools have evolved into complex tools that bring functionality usually only found in expensive toolkits to the average user. The ultimate goal of the project is to make learning about orbital mechanics and satellite operations accessible to everyone without a paywall.
-
-The code has been rewrote multiple times and now barely resembles the original, but none of this would have been possible without [@jeyoder](https://github.com/jeyoder).
+The code has been rewrote multiple times and now barely resembles the original, but none of this would have been possible without [@jeyoder](https://github.com/jeyoder)'s original stuffin.space.
 
 ## Table of Contents
 - [Description](#Description)

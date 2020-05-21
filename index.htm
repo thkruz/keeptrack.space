@@ -743,6 +743,21 @@
               </div>
             </div>
           </div>
+
+          <div id="nextLaunch-menu" class="side-menu-parent start-hidden text-select">
+            <div id="nextLaunch-content" class="side-menu">
+              <div class="row">
+                <h5 class="center-align">Next Launches</h5>
+                <table id="nextLaunch-table"  class="center-align striped-light centered"></table>
+              </div>
+              <div class="row">
+                <center>
+                  <button class="btn waves-effect waves-light" onclick="saveCsv(nextLaunchManager.launchList,'launchList');">Export Launch Info &#9658;</button>
+                </center>
+              </div>
+            </div>
+          </div>
+
           <div id="dops-menu" class="side-menu-parent start-hidden text-select">
             <div id="dops-content" class="side-menu">
               <form id="dops-form">
@@ -1486,6 +1501,7 @@
         <img id="menu-surveillance" src="" delayedsrc="images/surveillance.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Show/Hide Surveillance Fence" data-position="top" data-delay="50" data-tooltip="Show/Hide Surveillance Fence">
         <img id="menu-record" src="" delayedsrc="images/screen-capture.jpg" class="bmenu-item tooltipped" alt="Screen Capture" data-position="top" data-delay="50" data-tooltip="Screen Capture">
         <img id="menu-analysis" src="" delayedsrc="images/analysis.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Analysis">
+        <img id="menu-nextLaunch" src="" delayedsrc="images/calendar.png" class="bmenu-item tooltipped" alt="Next Launches" data-position="top" data-delay="50" data-tooltip="Next Launches">
         <img id="menu-launches" src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item tooltipped" alt="Launch Schedule" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
         <img id="menu-twitter" src="" delayedsrc="images/twitter.png" class="bmenu-item tooltipped" alt="Space News on Twitter" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
         <img id="menu-settings" src="" delayedsrc="images/gear-icon.png" class="bmenu-item tooltipped" alt="Settings" data-position="top" data-delay="50" data-tooltip="Settings">
@@ -1525,6 +1541,8 @@
   <script>document.write('<script src="modules/sensorManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="modules/controlSiteManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="modules/launchSiteManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<link rel="stylesheet" href="modules/nextLaunchManager.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
+  <script>document.write('<script src="modules/nextLaunchManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="modules/starManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="modules/satCommManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="modules/starManager-constellations.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>

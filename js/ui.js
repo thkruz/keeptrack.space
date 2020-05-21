@@ -142,6 +142,7 @@ var isAnalysisMenuOpen = false;
   var isMilSatSelected = false;
   var isSatcomMenuOpen = false;
   var isSocratesMenuOpen = false;
+  var isNextLaunchMenuOpen = false;
   var issatChngMenuOpen = false;
   var isSettingsMenuOpen = false;
 
@@ -482,7 +483,8 @@ var isAnalysisMenuOpen = false;
             // Is this the Earth?
             //
             // This not the Earth
-            if (isNaN(latLon.latitude) || isNaN(latLon.longitude)) {
+
+            if (typeof latLon == 'undefined' || isNaN(latLon.latitude) || isNaN(latLon.longitude)) {
             } else { // This is the Earth
               if (!isViewDOM) {
                 rightBtnViewDOM.show();
@@ -556,6 +558,20 @@ var isAnalysisMenuOpen = false;
         isDragging = false;
         rotateTheEarth = false;
       });
+
+      $('#nav-wrapper *').on("click", function (evt) { _hidePopUps(); });
+      $('#nav-wrapper').on("click", function (evt) { _hidePopUps(); });
+      $('#nav-footer *').on("click", function (evt) { _hidePopUps(); });
+      $('#nav-footer').on("click", function (evt) { _hidePopUps(); });
+      $('#ui-wrapper *').on("click", function (evt) { _hidePopUps(); });
+      function _hidePopUps () {
+        rightBtnMenuDOM.hide();
+        _clearRMBSubMenu();
+        if ($('#colorbox').css('display') === 'block') {
+          $.colorbox.close(); // Close colorbox if it was open
+        }
+      }
+
 
       rightBtnMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
@@ -836,7 +852,7 @@ var isAnalysisMenuOpen = false;
       canvasDOM.attr('tabIndex', 0);
       canvasDOM.trigger("focus");
 
-      rightBtnViewDOM.on("hover", function () {
+      rightBtnViewDOM.hover(function () {
         _clearRMBSubMenu();
         var offsetX = (rightBtnViewDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnViewMenuDOM.css({
@@ -852,11 +868,11 @@ var isAnalysisMenuOpen = false;
           rightBtnViewMenuDOM.hide();
         }
       });
-      rightBtnViewMenuDOM.on("hover", null, function () { // Lost Focus
+      rightBtnViewMenuDOM.hover(null, function () { // Lost Focus
         rightBtnViewMenuDOM.hide();
       });
 
-      rightBtnEditDOM.on("hover", function () {
+      rightBtnEditDOM.hover(function () {
         _clearRMBSubMenu();
 
         var offsetX = (rightBtnEditDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
@@ -873,11 +889,11 @@ var isAnalysisMenuOpen = false;
           rightBtnEditMenuDOM.hide();
         }
       });
-      rightBtnEditMenuDOM.on("hover", null, function () { // Lost Focus
+      rightBtnEditMenuDOM.hover(null, function () { // Lost Focus
         rightBtnEditMenuDOM.hide();
       });
 
-      rightBtnCreateDOM.on("hover", function () {
+      rightBtnCreateDOM.hover(function () {
         _clearRMBSubMenu();
 
         var offsetX = (rightBtnCreateDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
@@ -894,11 +910,11 @@ var isAnalysisMenuOpen = false;
           rightBtnCreateMenuDOM.hide();
         }
       });
-      rightBtnCreateMenuDOM.on("hover", null, function () { // Lost Focus
+      rightBtnCreateMenuDOM.hover(null, function () { // Lost Focus
         rightBtnCreateMenuDOM.hide();
       });
 
-      rightBtnDrawDOM.on("hover", function () {
+      rightBtnDrawDOM.hover(function () {
         _clearRMBSubMenu();
         var offsetX = (rightBtnDrawDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnDrawMenuDOM.css({
@@ -914,11 +930,11 @@ var isAnalysisMenuOpen = false;
           rightBtnDrawMenuDOM.hide();
         }
       });
-      rightBtnDrawMenuDOM.on("hover", null, function () { // Lost Focus
+      rightBtnDrawMenuDOM.hover(null, function () { // Lost Focus
         rightBtnDrawMenuDOM.hide();
       });
 
-      rightBtnColorsDOM.on("hover", function () {
+      rightBtnColorsDOM.hover(function () {
         _clearRMBSubMenu();
         var offsetX = (rightBtnColorsDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnColorsMenuDOM.css({
@@ -934,11 +950,11 @@ var isAnalysisMenuOpen = false;
           rightBtnColorsMenuDOM.hide();
         }
       });
-      rightBtnEarthMenuDOM.on("hover", null, function () { // Lost Focus
+      rightBtnEarthMenuDOM.hover(null, function () { // Lost Focus
         rightBtnEarthMenuDOM.hide();
       });
 
-      rightBtnEarthDOM.on("hover", function () {
+      rightBtnEarthDOM.hover(function () {
         _clearRMBSubMenu();
         var offsetX = (rightBtnEarthDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnEarthMenuDOM.css({
@@ -954,7 +970,7 @@ var isAnalysisMenuOpen = false;
           rightBtnEarthMenuDOM.hide();
         }
       });
-      rightBtnEarthMenuDOM.on("hover", null, function () { // Lost Focus
+      rightBtnEarthMenuDOM.hover(null, function () { // Lost Focus
         rightBtnEarthMenuDOM.hide();
       });
 
@@ -1993,6 +2009,12 @@ var isAnalysisMenuOpen = false;
           uiController.satChng(hiddenRow);
         }
       });
+      // $('#nextLaunch-menu').on('click', '.satChng-object', function (evt) {
+      //   var hiddenRow = evt.currentTarget.attributes.hiddenrow.value; // TODO: Find correct code for this.
+      //   if (hiddenRow !== null) {
+      //     uiController.satChng(hiddenRow);
+      //   }
+      // });
       $('#watchlist-list').on('click', '.watchlist-remove', function (evt) {
         var satId = $(this).data('sat-id');
         for (var i = 0; i < watchlistList.length; i++) {
@@ -3365,6 +3387,20 @@ var isAnalysisMenuOpen = false;
             break;
           }
           break;
+        case 'menu-nextLaunch': // No Keyboard Commands
+          if (isNextLaunchMenuOpen) {
+            uiController.hideSideMenus();
+            isNextLaunchMenuOpen = false;
+            break;
+          } else {
+            uiController.hideSideMenus();
+            nextLaunchManager.showTable();
+            $('#nextLaunch-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+            isNextLaunchMenuOpen = true;
+            $('#menu-nextLaunch').addClass('bmenu-item-selected');
+            break;
+          }
+          break;
         case 'menu-planetarium':
           if (isPlanetariumView) {
             isPlanetariumView = false;
@@ -3489,6 +3525,7 @@ var isAnalysisMenuOpen = false;
       $('#map-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#socrates-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#satChng-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+      $('#nextLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#settings-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#editSat-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
@@ -3519,6 +3556,7 @@ var isAnalysisMenuOpen = false;
       $('#menu-settings').removeClass('bmenu-item-selected');
       $('#menu-editSat').removeClass('bmenu-item-selected');
       $('#menu-newLaunch').removeClass('bmenu-item-selected');
+      $('#menu-nextLaunch').removeClass('bmenu-item-selected');
       $('#menu-breakup').removeClass('bmenu-item-selected');
       $('#menu-missile').removeClass('bmenu-item-selected');
       $('#menu-satcom').removeClass('bmenu-item-selected');
@@ -3542,6 +3580,7 @@ var isAnalysisMenuOpen = false;
       isDOPMenuOpen = false;
       isLookanglesMultiSiteMenuOpen = false;
       isSocratesMenuOpen = false;
+      isNextLaunchMenuOpen = false;
       issatChngMenuOpen = false;
       isSettingsMenuOpen = false;
       isEditSatMenuOpen = false;

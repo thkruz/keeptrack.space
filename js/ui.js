@@ -1984,7 +1984,8 @@ var isAnalysisMenuOpen = false;
 
       $('#map-menu').on('click', '.map-look', function (evt) {
         settingsManager.isMapUpdateOverride = true;
-        var time = evt.currentTarget.attributes.time.value; // TODO: Find correct code for this.
+        // Might be better code for this.
+        var time = evt.currentTarget.attributes.time.value;
         if (time !== null) {
           time = time.split(' ');
           time = new Date(time[0] + 'T' + time[1] + 'Z');
@@ -1998,19 +1999,22 @@ var isAnalysisMenuOpen = false;
       });
 
       $('#socrates-menu').on('click', '.socrates-object', function (evt) {
-        var hiddenRow = evt.currentTarget.attributes.hiddenrow.value; // TODO: Find correct code for this.
+        // Might be better code for this.
+        var hiddenRow = evt.currentTarget.attributes.hiddenrow.value;
         if (hiddenRow !== null) {
           _socrates(hiddenRow);
         }
       });
       $('#satChng-menu').on('click', '.satChng-object', function (evt) {
-        var hiddenRow = evt.currentTarget.attributes.hiddenrow.value; // TODO: Find correct code for this.
+        // Might be better code for this.
+        var hiddenRow = evt.currentTarget.attributes.hiddenrow.value;
         if (hiddenRow !== null) {
           uiController.satChng(hiddenRow);
         }
       });
       // $('#nextLaunch-menu').on('click', '.satChng-object', function (evt) {
-      //   var hiddenRow = evt.currentTarget.attributes.hiddenrow.value; // TODO: Find correct code for this.
+      //   Might be better code for this
+      //   var hiddenRow = evt.currentTarget.attributes.hiddenrow.value;
       //   if (hiddenRow !== null) {
       //     uiController.satChng(hiddenRow);
       //   }
@@ -2716,7 +2720,7 @@ var isAnalysisMenuOpen = false;
           typ: 'offset',
           dat: (timeManager.propOffset).toString() + ' ' + (1.0).toString()
         });
-        timeManager.propRealTime = Date.now(); // Reset realtime TODO: This might not be necessary...
+        timeManager.propRealTime = Date.now(); // Reset realtime...this might not be necessary...
         timeManager.propTime();
       } // Allows passing -1 argument to socrates function to skip these steps
     }
@@ -3713,6 +3717,7 @@ var isAnalysisMenuOpen = false;
         if (!isFPSVertSpeedLock) FPSVertSpeed = 0;
       }
       // TODO: evt.key === 'ShiftRight' Alternative for IE?
+      // Applies to _keyDownHandler as well
       if (evt.key === 'ShiftRight') {
         FPSRun = 1;
         settingsManager.cameraMovementSpeed = 0.003;
@@ -3732,7 +3737,6 @@ var isAnalysisMenuOpen = false;
         settingsManager.cameraMovementSpeed = 0.003 / 8;
         settingsManager.cameraMovementSpeedMin = 0.005 / 8;
       }
-      // TODO: evt.key === 'ShiftRight' Alternative for IE?
       if (evt.key === 'ShiftRight') {
         if (cameraType.current === cameraType.FPS) {
           FPSRun = 3;
@@ -4108,7 +4112,7 @@ var isAnalysisMenuOpen = false;
     // Don't bring up the update box for static dots
     if (sat.static) return;
 
-    // TODO: Include updates when satellite edited regardless of time.
+    // IDEA: Include updates when satellite edited regardless of time.
     if (timeManager.now > (lastBoxUpdateTime * 1 + updateInterval)) {
       if (!sat.missile) {
         satellite.getTEARR(sat);
@@ -4152,7 +4156,7 @@ var isAnalysisMenuOpen = false;
         if (selectedSat !== lastSelectedSat && !sat.missile) {
           $('#sat-nextpass').html(satellite.nextpass(sat));
 
-          // TODO: Code isInSun()
+          // IDEA: Code isInSun()
           //sun.getXYZ();
           //debugDrawLine('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
 
@@ -4810,14 +4814,14 @@ var isAnalysisMenuOpen = false;
 
   uiController.startLowPerf = function () {
     db.log('uiController.startLowPerf');
-    // TODO: This will disable other menu options
-    // This should pass current options on and/or use
-    // localStorage instead of browser variables
+    // IDEA: Replace browser variables with localStorage
+    // The settings passed as browser variables could be saved as localStorage items
     window.location.replace("index.htm?lowperf");
   };
 
   // c is string name of star
-  // TODO: Yaw needs fixed
+  // TODO: uiController.panToStar needs finished
+  // Yaw needs fixed. Needs to incorporate a time calculation
   uiController.panToStar = function (c) {
     db.log('uiController.panToStar');
     db.log(`c: ${c}`,true);
@@ -4844,7 +4848,9 @@ var isAnalysisMenuOpen = false;
     debugDrawLine('ref',[sat.position.x,sat.position.y,sat.position.z], [1,0.4,0,1]);
     cameraType.current = cameraType.OFFSET;
     console.log(sat);
-    // TODO: Need to calculate the time to get the right RA offset
+    // ======================================================
+    // Need to calculate the time to get the right RA offset
+    // ======================================================
     camSnap(latToPitch(sat.dec) * -1, longToYaw(sat.ra * DEG2RAD));
     setTimeout(function () {
       console.log(`pitch ${camPitch * RAD2DEG} -- yaw ${camYaw * RAD2DEG}`);

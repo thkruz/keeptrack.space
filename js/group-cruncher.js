@@ -61,7 +61,6 @@
       for (i = 0; i < data.length; i++) {
         var theSatId = getIdFromIntlDes(data[i]);
         if (theSatId === null) continue;
-        // TODO: Ugly Fix Later
         this.sats.push({
           satId: data[i],
           isIntlDes: true
@@ -74,7 +73,6 @@
     } else if (groupType === 'nameRegex') {
       data = searchNameRegex(data);
       for (i = 0; i < data.length; i++) {
-        // TODO: Ugly Fix Later
         this.sats.push({
           satId: data[i],
           isSCC_NUM: true //Forces Highlighting of Obj Num
@@ -87,7 +85,6 @@
     } else if (groupType === 'countryRegex') {
       data = searchCountryRegex(data);
       for (i = 0; i < data.length; i++) {
-        // TODO: Ugly Fix Later
         this.sats.push({
           satId: data[i],
           isSCC_NUM: true //Forces Highlighting of Obj Num
@@ -101,7 +98,6 @@
       for (i = 0; i < data.length; i++) {
         satId = getIdFromObjNum(data[i]);
         if (satId === null) continue;
-        // TODO: Ugly Fix Later
         this.sats.push({
           satId: satId,
           isSCC_NUM: true //Forces Highlighting of Obj Num
@@ -113,7 +109,6 @@
       }
     } else if (groupType === 'idList') {
       for (i = 0; i < data.length; i++) {
-        // TODO: Ugly Fix Later
         this.sats.push({
           satId: data[i],
           isSCC_NUM: true //Forces Highlighting of Obj Num

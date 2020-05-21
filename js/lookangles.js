@@ -103,11 +103,15 @@ or mirrored at any other location without the express written permission of the 
     $('#sensor-minrange').html(satellite.currentSensor.obsminrange);
     $('#sensor-maxrange').html(satellite.currentSensor.obsmaxrange);
   };
+
+  // TODO: UI element changes and references should be moved to ui.js
+  // There are a series of referecnes, especially in satellite.obs, to ui elements.
+  // These should be moved to ui.js and then called before/after calling satellite.setobs
   satellite.setobs = function (sensor, reset) {
     /** obslat is what is used to determine if a site is set or not. If this is null sensorSelected() will return false */
     if (reset) {
       satellite.currentSensor = satellite.defaultSensor;
-      $('.sensor-reset-menu').hide(); // TODO: This belongs in UI.js somewhere
+      $('.sensor-reset-menu').hide();
       return;
     } else {
       $('#menu-sensor-info').removeClass('bmenu-item-disabled');
@@ -115,7 +119,7 @@ or mirrored at any other location without the express written permission of the 
       $('#menu-surveillance').removeClass('bmenu-item-disabled');
       $('#menu-planetarium').removeClass('bmenu-item-disabled');
       $('#menu-astronomy').removeClass('bmenu-item-disabled');
-      $('.sensor-reset-menu').show(); // TODO: This belongs in UI.js somewhere
+      $('.sensor-reset-menu').show();
     }
     satellite.currentSensor = sensor;
     satellite.currentSensor.observerGd = {   // Array to calculate look angles in propagate()
@@ -900,10 +904,6 @@ or mirrored at any other location without the express written permission of the 
     }
 
     function _propagateMultiSite (offset, satrec, sensor) {
-      // Reassign currentSensor
-      // TODO: Make this work independent
-      // let sensor = satellite.currentSensor;
-
       // Setup Realtime and Offset Time
       var propRealTimeTemp = Date.now();
       var now = timeManager.propTimeCheck(offset * 1000, propRealTimeTemp);

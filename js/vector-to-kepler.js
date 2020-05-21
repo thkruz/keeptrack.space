@@ -29,7 +29,7 @@
   }
 
   vec2kepler.computeOrbitalElements = function (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2) {
-    // TODO: Error Checking for invalid units
+    // IDEA: Error Checking for invalid units would be helpful
 
     var G = 6.6725985e-11;
     var Pi = Math.PI;

@@ -587,6 +587,9 @@ var drawLoopCallback;
             yawRotate = ((90 - satellite.currentSensor.long) * DEG2RAD) - satPos.gmst;
 
             // TODO: Calculate Elevation for cameraType.ASTRONOMY
+            // Idealy the astronomy view would feel more natural and tell you what
+            // az/el you are currently looking at.
+
             // fpsEl = ((FPSPitch + 90) > 90) ? (-(FPSPitch) + 90) : (FPSPitch + 90);
             // $('#el-text').html(' EL: ' + fpsEl.toFixed(2) + ' deg');
 
@@ -1469,8 +1472,8 @@ function selectSat (satId) {
     // }
   }
 
-  // settingsManager.themes.retheme();
-  // TODO: Make this a setting that is disabled by default
+  // TODO: Make updateUrl a setting that is disabled by default
+  // This can be very annoying, especially when using modes like trusat
   updateUrl();
 }
 

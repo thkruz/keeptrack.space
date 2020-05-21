@@ -1219,7 +1219,7 @@ var satSensorMarkerArray = [];
       return periodRes;
     }
     // $('#findByLooks-results').text('');
-    // TODO: Intentionally doesn't clear previous searches. Could be an option later.
+    // IDEA: Intentionally doesn't clear previous searches. Could be an option later.
     var sccList = [];
     for (i = 0; i < res.length; i++) {
       // $('#findByLooks-results').append(res[i].SCC_NUM + '<br />');

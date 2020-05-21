@@ -17,7 +17,7 @@ importScripts('lib/meuusjs.1.0.3.min.js'); // Used for sunlight calculations
 
 // /////////////////////////////////////////////
 // TODO: Clean the top of sat-cruncher.js up, it's a mess
-// /////////////////////////////////////////////
+// the various variable delcarations need to be organized
 
 /** CONSTANTS */
 const TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
@@ -218,8 +218,6 @@ onmessage = function (m) {
       satData = null;
       break;
     case 'satEdit':
-      // TODO: This code is not optimized yet. Making arrays for one object is unnecessary
-      // and I am not sure if there is any reason to convert to JSON back and forth from the web workers.
       satCache[m.data.id] = satellite.twoline2satrec( // replace old TLEs
         m.data.TLE1, m.data.TLE2);
       satrec = satCache[m.data.id];
@@ -949,7 +947,6 @@ function propagateCruncher () {
             satSelPosEarth = {longitude: satSelGeodetic.longitude, latitude: satSelGeodetic.latitude, height: 1};
 
             deltaLatInt = 1;
-            // TODO: Change 7000 to a setting variable
             if (satHeight < 2500 && selectedSatFOV <= 60) deltaLatInt = 0.5;
             if (satHeight > 7000 || selectedSatFOV >= 90) deltaLatInt = 2;
             if (satelliteSelected.length > 1) deltaLatInt = 2;

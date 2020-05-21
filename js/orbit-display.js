@@ -94,7 +94,6 @@
           realTime: timeManager.propRealTime,
           offset: timeManager.propOffset,
           rate: timeManager.propRate,
-          // NOTE: STATIC TLE
           TLE1: TLE1,
           TLE2: TLE2
         });
@@ -189,10 +188,6 @@
   orbitDisplay.clearInViewOrbit = function (satId) {
     if (currentInView === []) return;
     currentInView = [];
-
-    // NOTE might need this
-    // gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
-    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 3), gl.DYNAMIC_DRAW);
   };
 
   orbitDisplay.setHoverOrbit = function (satId) {
@@ -237,7 +232,7 @@
       gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
     }
 
-    if (currentInView.length >= 1) { // NOTE There might be some z-fighting
+    if (currentInView.length >= 1) { // There might be some z-fighting
       gl.uniform4fv(pathShader.uColor, inViewColor);
       currentInView.forEach(function (id) {
         gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
@@ -249,11 +244,9 @@
     if (groups.selectedGroup !== null) {
       gl.uniform4fv(pathShader.uColor, groupColor);
       groups.selectedGroup.forEach(function (id) {
-        // if (groups.selectedGroup.sats.length <= maxOrbitsDisplayed) {
         gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
         gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
         gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-        // }
       });
     }
 

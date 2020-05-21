@@ -102,14 +102,14 @@ var satSensorMarkerArray = [];
   }
 
   /**
-   * NOTE: These variables are here rather inside the function because as they
+   * These variables are here rather inside the function because as they
    * loop each iteration it was causing the jsHeap to grow. This isn't noticeable
    * on faster computers because the garbage collector takes care of it, but on
    * slower computers it would noticeably lag when the garbage collector ran.
    *
    * The arbitrary convention used is to put the name of the loop/function the
    * variable is part of at the front of what the name used to be
-   * (ex: now --> drawNow) (ex: i --> SCi)
+   * (ex: now --> drawNow) (ex: i --> satCrunchIndex)
   */
 
   // draw Loop
@@ -119,8 +119,8 @@ var satSensorMarkerArray = [];
   var drawDt;
   var drawI;
 
-  var SCi; // Sat Cruncher i loop
-  var SCnow = 0;
+  var satCrunchIndex;
+  var satCrunchNow = 0;
 
   var lastFOVUpdateTime = 0;
   var cruncherReadyCallback;
@@ -132,18 +132,18 @@ var satSensorMarkerArray = [];
 
       satExtraData = JSON.parse(m.data.extraData);
 
-      for (SCi = 0; SCi < satSet.numSats; SCi++) {
-        satData[SCi].inclination = satExtraData[SCi].inclination;
-        satData[SCi].eccentricity = satExtraData[SCi].eccentricity;
-        satData[SCi].raan = satExtraData[SCi].raan;
-        satData[SCi].argPe = satExtraData[SCi].argPe;
-        satData[SCi].meanMotion = satExtraData[SCi].meanMotion;
+      for (satCrunchIndex = 0; satCrunchIndex < satSet.numSats; satCrunchIndex++) {
+        satData[satCrunchIndex].inclination = satExtraData[satCrunchIndex].inclination;
+        satData[satCrunchIndex].eccentricity = satExtraData[satCrunchIndex].eccentricity;
+        satData[satCrunchIndex].raan = satExtraData[satCrunchIndex].raan;
+        satData[satCrunchIndex].argPe = satExtraData[satCrunchIndex].argPe;
+        satData[satCrunchIndex].meanMotion = satExtraData[satCrunchIndex].meanMotion;
 
-        satData[SCi].semiMajorAxis = satExtraData[SCi].semiMajorAxis;
-        satData[SCi].semiMinorAxis = satExtraData[SCi].semiMinorAxis;
-        satData[SCi].apogee = satExtraData[SCi].apogee;
-        satData[SCi].perigee = satExtraData[SCi].perigee;
-        satData[SCi].period = satExtraData[SCi].period;
+        satData[satCrunchIndex].semiMajorAxis = satExtraData[satCrunchIndex].semiMajorAxis;
+        satData[satCrunchIndex].semiMinorAxis = satExtraData[satCrunchIndex].semiMinorAxis;
+        satData[satCrunchIndex].apogee = satExtraData[satCrunchIndex].apogee;
+        satData[satCrunchIndex].perigee = satExtraData[satCrunchIndex].perigee;
+        satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
       }
 
       gotExtraData = true;
@@ -153,21 +153,21 @@ var satSensorMarkerArray = [];
 
     if (m.data.extraUpdate) {
       satExtraData = JSON.parse(m.data.extraData);
-      SCi = m.data.satId;
+      satCrunchIndex = m.data.satId;
 
-      satData[SCi].inclination = satExtraData[0].inclination;
-      satData[SCi].eccentricity = satExtraData[0].eccentricity;
-      satData[SCi].raan = satExtraData[0].raan;
-      satData[SCi].argPe = satExtraData[0].argPe;
-      satData[SCi].meanMotion = satExtraData[0].meanMotion;
+      satData[satCrunchIndex].inclination = satExtraData[0].inclination;
+      satData[satCrunchIndex].eccentricity = satExtraData[0].eccentricity;
+      satData[satCrunchIndex].raan = satExtraData[0].raan;
+      satData[satCrunchIndex].argPe = satExtraData[0].argPe;
+      satData[satCrunchIndex].meanMotion = satExtraData[0].meanMotion;
 
-      satData[SCi].semiMajorAxis = satExtraData[0].semiMajorAxis;
-      satData[SCi].semiMinorAxis = satExtraData[0].semiMinorAxis;
-      satData[SCi].apogee = satExtraData[0].apogee;
-      satData[SCi].perigee = satExtraData[0].perigee;
-      satData[SCi].period = satExtraData[0].period;
-      satData[SCi].TLE1 = satExtraData[0].TLE1;
-      satData[SCi].TLE2 = satExtraData[0].TLE2;
+      satData[satCrunchIndex].semiMajorAxis = satExtraData[0].semiMajorAxis;
+      satData[satCrunchIndex].semiMinorAxis = satExtraData[0].semiMinorAxis;
+      satData[satCrunchIndex].apogee = satExtraData[0].apogee;
+      satData[satCrunchIndex].perigee = satExtraData[0].perigee;
+      satData[satCrunchIndex].period = satExtraData[0].period;
+      satData[satCrunchIndex].TLE1 = satExtraData[0].TLE1;
+      satData[satCrunchIndex].TLE2 = satExtraData[0].TLE2;
       satExtraData = null;
       return;
     }
@@ -186,14 +186,14 @@ var satSensorMarkerArray = [];
     }
 
     if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
-      SCnow = Date.now();
-      if (SCnow > settingsManager.lastMapUpdateTime + 30000) {
+      satCrunchNow = Date.now();
+      if (satCrunchNow > settingsManager.lastMapUpdateTime + 30000) {
         uiController.updateMap();
-        settingsManager.lastMapUpdateTime = SCnow;
+        settingsManager.lastMapUpdateTime = satCrunchNow;
         settingsManager.isMapUpdateOverride = false;
       } else if (settingsManager.isMapUpdateOverride) {
         uiController.updateMap();
-        settingsManager.lastMapUpdateTime = SCnow;
+        settingsManager.lastMapUpdateTime = satCrunchNow;
         settingsManager.isMapUpdateOverride = false;
       }
     }
@@ -225,7 +225,6 @@ var satSensorMarkerArray = [];
 
       $('body').attr('style', 'background:black');
       $('#canvas-holder').attr('style', 'display:block');
-      settingsManager.isBottomIconsEnabled = true; // NOTE: Probably depricated (8/29/2018)
 
       mobile.checkMobileMode();
 
@@ -422,35 +421,34 @@ var satSensorMarkerArray = [];
               limitSatsArray = val.split(',');
               break;
             case 'lat':
-              obslatitude = val;
+              if (val >= -90 && val <= 90) obslatitude = val;
               break;
             case 'long':
-              obslongitude = val;
+              if (val >= -180 && val <= 360) obslongitude = val;
               break;
             case 'hei':
-              obsheight = val;
+              if (val >= -20 && val <= 20) obsheight = val;
               break;
             case 'minaz':
-              obsminaz = val;
+              if (val >= 0 && val <= 360) obsminaz = val;
               break;
             case 'maxaz':
-              obsmaxaz = val;
+              if (val >= 0 && val <= 360)obsmaxaz = val;
               break;
             case 'minel':
-              obsminel = val;
+              if (val >= -10 && val <= 180) obsminel = val;
               break;
             case 'maxel':
-              obsmaxel = val;
+              if (val >= -10 && val <= 180) obsmaxel = val;
               break;
             case 'minrange':
-              obsminrange = val;
+              if (val >= 0) obsminrange = val;
               break;
             case 'maxrange':
-              obsmaxrange = val;
+              if (val <= 10000000) obsmaxrange = val;
               break;
           }
         }
-        // TODO: Create logical checks to prevent 'bad' sesnors from being generated
       })();
 
       /**
@@ -553,7 +551,8 @@ var satSensorMarkerArray = [];
         if (typeof satInfoList !== 'undefined' && settingsManager.offline) { // If extra catalogue
           for (s = 0; s < satInfoList.length; s++) {
             isMatchFound = false;
-            // NOTE i=s may need to be i=0, but this should be more effecient
+            // NOTE i=s may need to be i=0, but this should be more effecient.
+            // There should be some sorting done earlier
             for (i = s; i < tempSatData.length; i++) {
               if (satInfoList[s].SCC === tempSatData[i].SCC_NUM) {
                 tempSatData[i].ON = satInfoList[s].ON;
@@ -811,11 +810,6 @@ var satSensorMarkerArray = [];
       gl.uniformMatrix4fv(gl.pickShaderProgram.uMvMatrix, false, emptyMat4);
       gl.uniformMatrix4fv(gl.pickShaderProgram.uCamMatrix, false, camMatrix);
       gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
-
-      // NOTE: Might not be needed 10-6-2018
-      // gl.bindBuffer(gl.ARRAY_BUFFER, satPosBuf);
-      // gl.enableVertexAttribArray(gl.pickShaderProgram.aPos);
-      // gl.vertexAttribPointer(gl.pickShaderProgram.aPos, 3, gl.FLOAT, false, 0, 0);
 
       gl.enableVertexAttribArray(gl.pickShaderProgram.aColor);
       gl.bindBuffer(gl.ARRAY_BUFFER, pickColorBuf);
@@ -1227,29 +1221,29 @@ var satSensorMarkerArray = [];
       return rangeRes;
     }
     function checkInc (possibles, minInc, maxInc) {
-      var IncRes = [];
+      var incRes = [];
       for (var i = 0; i < possibles.length; i++) {
         if ((possibles[i].inclination * RAD2DEG).toFixed(2) < maxInc && (possibles[i].inclination * RAD2DEG).toFixed(2) > minInc) {
-          IncRes.push(possibles[i]);
+          incRes.push(possibles[i]);
         }
       }
-      return IncRes;
+      return incRes;
     }
     function checkPeriod (possibles, minPeriod, maxPeriod) {
-      var PeriodRes = [];
+      var periodRes = [];
       for (var i = 0; i < possibles.length; i++) {
-        if (possibles[i].period < maxPeriod && possibles[i].period > minPeriod && PeriodRes.length <= 200) { // Don't display more than 200 results - this is because LEO and GEO belt have a lot of satellites
-          PeriodRes.push(possibles[i]);
+        if (possibles[i].period < maxPeriod && possibles[i].period > minPeriod && periodRes.length <= 200) { // Don't display more than 200 results - this is because LEO and GEO belt have a lot of satellites
+          periodRes.push(possibles[i]);
         }
       }
-      if (PeriodRes.length >= 200) {
+      if (periodRes.length >= 200) {
         $('#findByLooks-results').text('Limited to 200 Results!');
       }
-      return PeriodRes;
+      return periodRes;
     }
     // $('#findByLooks-results').text('');
     // TODO: Intentionally doesn't clear previous searches. Could be an option later.
-    var SCCs = [];
+    var sccList = [];
     for (i = 0; i < res.length; i++) {
       // $('#findByLooks-results').append(res[i].SCC_NUM + '<br />');
       if (i < res.length - 1) {
@@ -1257,10 +1251,10 @@ var satSensorMarkerArray = [];
       } else {
         $('#search').val($('#search').val() + res[i].SCC_NUM);
       }
-      SCCs.push(res[i].SCC_NUM);
+      sccList.push(res[i].SCC_NUM);
     }
     searchBox.doSearch($('#search').val());
-    // console.log(SCCs);
+    // console.log(sccList);
     return res;
   };
 

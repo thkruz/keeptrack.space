@@ -598,9 +598,6 @@ define('coordinate-transforms/topocentric',[
         var longitude   = observerCoords.longitude;
         var latitude    = observerCoords.latitude;
 
-        // TODO: defined but never used
-        //var height      = observerCoords.height;
-
         var observerEcf = geodeticToEcf (observerCoords);
 
         var rx      = satelliteCoords.x - observerEcf.x;
@@ -1000,9 +997,6 @@ define('dpper',[
          *    vallado, crawford, hujsak, kelso  2006
          ----------------------------------------------------------------------------*/
 
-        // TODO: defined but never used
-        //var inclo   = dpperParameters.inclo;
-
         var init    = dpperParameters.init,
             ep      = dpperParameters.ep,
             inclp   = dpperParameters.inclp,
@@ -1022,9 +1016,6 @@ define('dpper',[
             pe, pgh, ph, pinc, pl,
             sel, ses, sghl, sghs, shs, sil, sinzf, sis,  sll, sls,
             xls, xnoh, zf, zm, shll;
-
-        // TODO: defined but never used
-        //var shl;
 
         var e3      = satrec.e3;
         var ee2     = satrec.ee2;
@@ -1642,9 +1633,6 @@ define('sgp4',[
             };
 
             var dspaceResult = dspace(dspaceParameters);
-
-            // TODO: defined but never used
-            //var atime = dspaceResult.atime;
 
             em = dspaceResult.em;
             argpm = dspaceResult.argpm;
@@ -2765,9 +2753,6 @@ define('initl',[
          *    vallado, crawford, hujsak, kelso  2006
          ----------------------------------------------------------------------------*/
 
-        // TODO: defined but never used
-        //var satn = initlParameters.satn;
-
         var ecco = initlParameters.ecco,
             epoch = initlParameters.epoch,
             inclo = initlParameters.inclo,
@@ -2776,9 +2761,6 @@ define('initl',[
             opsmode = initlParameters.opsmode;
 
         var ak, d1, adel, po, gsto;
-
-        // TODO: defined but never used
-        // var del;
 
         // sgp4fix use old way of finding gst
         //  ----------------------- earth constants ----------------------
@@ -3531,16 +3513,8 @@ define('propagate/twoline2satrec',[
         var year = 0;
 
         var satrec = {};
-        // satrec.error = 0;
-
-        // TODO: defined but never used
-        //var cardnumb        = parseInt(longstr1.substring(0, 1), 10);
 
         satrec.satnum       = longstr1.substring(2, 7);
-
-        // TODO: defined but never used
-        //var classification  = longstr1.substring(7, 8);
-        //var intldesg        = longstr1.substring(9, 11);
 
         satrec.epochyr      = parseInt(longstr1.substring(18, 20), 10);
         satrec.epochdays    = parseFloat(longstr1.substring(20, 32));
@@ -3555,12 +3529,8 @@ define('propagate/twoline2satrec',[
                                 'E' + longstr1.substring(59, 61)
                             );
 
-        // TODO: defined but never used
-        //var numb            = parseInt(longstr1.substring(62, 63), 10);
-
         elnum               = parseInt(longstr1.substring(64, 68), 10);
 
-        //satrec.satnum   = longstr2.substring(2, 7);
         satrec.inclo    = parseFloat(longstr2.substring(8, 16));
         satrec.nodeo    = parseFloat(longstr2.substring(17, 25));
         satrec.ecco     = parseFloat('.' + longstr2.substring(26, 33));

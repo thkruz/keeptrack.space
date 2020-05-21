@@ -40,7 +40,7 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.9.0';
+  settingsManager.versionNumber = '1.9.1';
   settingsManager.versionDate = 'May 20, 2020';
 
   settingsManager.lowPerf = false;
@@ -239,13 +239,14 @@ db.init = (function (){
 
   settingsManager.currentLegend = 'default';
 
+  settingsManager.nextNPassesCount = 5;
+
   settingsManager.socratesOnSatCruncher = null;
 
   settingsManager.vertShadersSize = 12;
   settingsManager.isEditTime = false;
   settingsManager.isPropRateChange = false;
   settingsManager.isOnlyFOVChecked = false;
-  settingsManager.isBottomIconsEnabled = false;
   settingsManager.isBottomMenuOpen = false;
   settingsManager.isMapMenuOpen = false;
   settingsManager.isForceColorScheme = false;
@@ -257,8 +258,6 @@ db.init = (function (){
 
   settingsManager.isSatOverflyModeOn = false;
   settingsManager.isFOVBubbleModeOn = false;
-
-  settingsManager.maxOrbits = 20000; // TODO: BROKEN
 
   settingsManager.mobileMaxLabels = 100;
   settingsManager.desktopMaxLabels = 20000;
@@ -359,7 +358,7 @@ db.init = (function (){
     // settingsManager.colors.umbral = [0.2, 1.0, 0.0, 0.5];
     //
     settingsManager.colors.gradientAmt = 0;
-    // TODO: Gradients Must be Edited in color-scheme.js
+    // Gradients Must be Edited in color-scheme.js
     // settingsManager.colors.apogeeGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
     // settingsManager.colors.velGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
     settingsManager.colors.satSmall = [0.2, 1.0, 0.0, 0.65];

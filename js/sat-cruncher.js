@@ -16,18 +16,18 @@ importScripts('lib/numeric.js'); // Used for sunlight calculations
 importScripts('lib/meuusjs.1.0.3.min.js'); // Used for sunlight calculations
 
 // /////////////////////////////////////////////
-// TODO: Clean the top of this file up, it's a mess
+// TODO: Clean the top of sat-cruncher.js up, it's a mess
 // /////////////////////////////////////////////
 
 /** CONSTANTS */
-var TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
-var DEG2RAD = TAU / 360;          // Used to convert degrees to radians
-var RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
-var RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
-var RADIUS_OF_SUN = 695700;       // Radius of the Sun in kilometers
-var STAR_DISTANCE = 200000;        // Artificial Star Distance - Lower numberrReduces webgl depth buffer
-var globalPropagationRate = 1000;
-var globalPropagationRateMultiplier = 1;
+const TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
+const DEG2RAD = TAU / 360;          // Used to convert degrees to radians
+const RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
+const RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
+const RADIUS_OF_SUN = 695700;       // Radius of the Sun in kilometers
+const STAR_DISTANCE = 200000;        // Artificial Star Distance - Lower numberrReduces webgl depth buffer
+let globalPropagationRate = 1000;
+let globalPropagationRateMultiplier = 1;
 
 /** ARRAYS */
 var satCache = [];                // Cache of Satellite Data from TLE.json and Static Data from variable.js
@@ -300,7 +300,7 @@ function _lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_lon
 }
 
 // //////////////////////////////////////////////////////////////////////////
-// NOTE: Benchmarking
+// Benchmarking
 // var averageTimeForCrunchLoop = 0;
 // var totalCrunchTime1 = 0;
 // var averageTimeForPropagate = 0;
@@ -523,7 +523,7 @@ function propagateCruncher () {
         starPosition = _lookAnglesToEcf(starPosition.azimuth * RAD2DEG, starPosition.altitude * RAD2DEG, STAR_DISTANCE, 0, 0, 0);
 
         // Reduce Random Jitter by Requiring New Positions to be Similar to Old
-        // THIS MIGHT BE A HORRIBLE IDEA
+        // THIS MIGHT BE A HORRIBLE
         if (satPos[i * 3] == 0 || (satPos[i * 3] - starPosition.x < 0.1 && satPos[i * 3] - starPosition.x > -0.1 )) satPos[i * 3] = starPosition.x;
         if (satPos[i * 3 + 1] == 0 || (satPos[i * 3 + 1] - starPosition.y < 0.1 && satPos[i * 3 + 1] - starPosition.y > -0.1 )) satPos[i * 3 + 1] = starPosition.y;
         if (satPos[i * 3 + 2] == 0 || (satPos[i * 3 + 2] - starPosition.z < 0.1 && satPos[i * 3 + 2] - starPosition.z > -0.1 )) satPos[i * 3 + 2] = starPosition.z;
@@ -540,11 +540,6 @@ function propagateCruncher () {
       satVel[i * 3] = 0;
       satVel[i * 3 + 1] = 0;
       satVel[i * 3 + 2] = 0;
-
-      cosLat = null;
-      cosLon = null;
-      sinLat = null;
-      sinLon = null;
     }
     else if (satCache[i].missile) {
         if (!satCache[i].active) { continue; } // Skip inactive missiles
@@ -575,18 +570,9 @@ function propagateCruncher () {
         satVel[i * 3 + 1] = ((6371 + satCache[i].altList[curMissivarTime + 1]) * cosLat * sinLon) - satPos[i * 3 + 1];
         satVel[i * 3 + 2] = ((6371 + satCache[i].altList[curMissivarTime + 1]) * sinLat) - satPos[i * 3 + 2];
 
-        // satVel[i * 3] = 0;
-        // satVel[i * 3 + 1] = 0;
-        // satVel[i * 3 + 2] = 0;
-
         x = satPos[i * 3];
         y = satPos[i * 3 + 1];
         z = satPos[i * 3 + 2];
-        // NOTE: Might not be needed
-        cosLat = null;
-        cosLon = null;
-        sinLat = null;
-        sinLon = null;
 
         positionEcf = satellite.eciToEcf({x: x, y: y, z: z}, gmst); // pv.position is called positionEci originally
         if (satellite.eciToGeodetic({x: x, y: y, z: z}, gmst).height <= 150 && satellite.missile === false) {
@@ -624,7 +610,6 @@ function propagateCruncher () {
       // FOV Bubble Drawing Code - START
       // //////////////////////////////////
       if (!isMultiSensor && sensor.observerGd !== defaultGd) {
-        // TODO: Make a less ugly way to do this (factor out function?)
         mSensor[0] = sensor;
         mSensor.length = 1;
       }
@@ -1149,12 +1134,12 @@ function propagateCruncher () {
   //    );
   // }
 
-  // NOTE The longer the delay the more jitter at higher speeds of propagation
+  // The longer the delay the more jitter at higher speeds of propagation
   setTimeout(function () {propagateCruncher();}, 1 * globalPropagationRate * globalPropagationRateMultiplier / divisor);
 
 
   // //////////////////////////////////////////////////////////////////////////
-  // NOTE: Benchmarking
+  // Benchmarking
   //
   // var stopTime1 = performance.now();
   // if (numOfCrunches > 5) {

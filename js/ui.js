@@ -142,6 +142,7 @@ var isAnalysisMenuOpen = false;
   var isMilSatSelected = false;
   var isSatcomMenuOpen = false;
   var isSocratesMenuOpen = false;
+  var issatChngMenuOpen = false;
   var isSettingsMenuOpen = false;
 
   var watchlistList = [];
@@ -241,9 +242,8 @@ var isAnalysisMenuOpen = false;
         // minDate: -14, // No more than 7 days in the past
         // maxDate: 14,
         sliderAccessArgs: { touchonly: false }}).on('change.dp', function (e) { // or 7 days in the future to make sure ELSETs are valid
-          // NOTE: This code gets called when the done button is pressed or the time sliders are closed
+          // This code gets called when the done button is pressed or the time sliders are closed
           $('#datetime-input').fadeOut();
-          // $('#datetime-text').fadeIn();
           _updateNextPassOverlay(true);
           settingsManager.isEditTime = false;
         });
@@ -371,7 +371,7 @@ var isAnalysisMenuOpen = false;
           settingsManager.cameraMovementSpeed = Math.max(0.005 * zoomLevel, settingsManager.cameraMovementSpeedMin);
           screenDragPoint = [mouseX, mouseY];
           // dragPoint = getEarthScreenPoint(x, y);
-          dragPoint = screenDragPoint; // NOTE: Ignore the earth on mobile
+          dragPoint = screenDragPoint; // Ignore the earth on mobile
           dragStartPitch = camPitch;
           dragStartYaw = camYaw;
           // debugLine.set(dragPoint, getCamPos());
@@ -525,7 +525,7 @@ var isAnalysisMenuOpen = false;
 
             rightBtnMenuDOM.show();
             satHoverBoxDOM.hide();
-            // NOTE: Need to be adjusted if number of menus change
+            // Might need to be adjusted if number of menus change
             var offsetX = (mouseX < (canvasDOM.innerWidth() / 2)) ? 0 : -100;
             var offsetY = (mouseY < (canvasDOM.innerHeight() / 2)) ? 0 : (numMenuItems * -50);
             rightBtnMenuDOM.css({
@@ -1147,376 +1147,375 @@ var isAnalysisMenuOpen = false;
         }
       });
 
-      // NOTE: MOVE THIS
-        $('#legend-hover-menu').click(function (e) {
-          switch (e.target.classList[1]) {
-            case "legend-payload-box":
-              if (ColorScheme.objectTypeFlags.payload) {
-                ColorScheme.objectTypeFlags.payload = false;
-                $('.legend-payload-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.payload = true;
-                $('.legend-payload-box').css('background', _rgbCSS(settingsManager.colors.payload));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-rocketBody-box":
-              if (ColorScheme.objectTypeFlags.rocketBody) {
-                ColorScheme.objectTypeFlags.rocketBody = false;
-                $('.legend-rocketBody-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.rocketBody = true;
-                $('.legend-rocketBody-box').css('background', _rgbCSS(settingsManager.colors.rocketBody));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-debris-box":
-              if (ColorScheme.objectTypeFlags.debris) {
-                ColorScheme.objectTypeFlags.debris = false;
-                $('.legend-debris-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.debris = true;
-                $('.legend-debris-box').css('background', _rgbCSS(settingsManager.colors.debris));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-starHi-box":
-              if (ColorScheme.objectTypeFlags.starHi) {
-                ColorScheme.objectTypeFlags.starHi = false;
-                $('.legend-starHi-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.starHi = true;
-                $('.legend-starHi-box').css('background', _rgbCSS(settingsManager.colors.star100));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-starMed-box":
-              if (ColorScheme.objectTypeFlags.starMed) {
-                ColorScheme.objectTypeFlags.starMed = false;
-                $('.legend-starMed-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.starMed = true;
-                $('.legend-starMed-box').css('background', _rgbCSS(settingsManager.colors.star75));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-starLow-box":
-              if (ColorScheme.objectTypeFlags.starLow) {
-                ColorScheme.objectTypeFlags.starLow = false;
-                $('.legend-starLow-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.starLow = true;
-                $('.legend-starLow-box').css('background', _rgbCSS(settingsManager.colors.star100));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-satHi-box":
-                if (ColorScheme.objectTypeFlags.satHi) {
-                  ColorScheme.objectTypeFlags.satHi = false;
-                  $('.legend-satHi-box').css('background', 'black');
-                  settingsManager.isForceColorScheme = true;
-                  satSet.setColorScheme(settingsManager.currentColorScheme, true);
-                } else {
-                  ColorScheme.objectTypeFlags.satHi = true;
-                  $('.legend-satHi-box').css('background', 'rgb(250, 250, 250)');
-                  settingsManager.isForceColorScheme = true;
-                  satSet.setColorScheme(settingsManager.currentColorScheme, true);
-                }
-                break;
-            case "legend-satMed-box":
-              if (ColorScheme.objectTypeFlags.satMed) {
-                ColorScheme.objectTypeFlags.satMed = false;
-                $('.legend-satMed-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.satMed = true;
-                $('.legend-satMed-box').css('background', 'rgb(150, 150, 150)');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-satLow-box":
-              if (ColorScheme.objectTypeFlags.satLow) {
-                ColorScheme.objectTypeFlags.satLow = false;
-                $('.legend-satLow-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.satLow = true;
-                $('.legend-satLow-box').css('background', 'rgb(200, 200, 200)');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-inFOV-box":
-              if (ColorScheme.objectTypeFlags.inFOV) {
-                ColorScheme.objectTypeFlags.inFOV = false;
-                $('.legend-inFOV-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.inFOV = true;
-                $('.legend-inFOV-box').css('background', _rgbCSS(settingsManager.colors.inview));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-velocityFast-box":
-              if (ColorScheme.objectTypeFlags.velocityFast) {
-                ColorScheme.objectTypeFlags.velocityFast = false;
-                $('.legend-velocityFast-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.velocityFast = true;
-                $('.legend-velocityFast-box').css('background', [0, 1, 0.0, 1.0]);
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
+      $('#legend-hover-menu').click(function (e) {
+        switch (e.target.classList[1]) {
+          case "legend-payload-box":
+            if (ColorScheme.objectTypeFlags.payload) {
+              ColorScheme.objectTypeFlags.payload = false;
+              $('.legend-payload-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.payload = true;
+              $('.legend-payload-box').css('background', _rgbCSS(settingsManager.colors.payload));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
             break;
-            case "legend-velocityMed-box":
-              if (ColorScheme.objectTypeFlags.velocityMed) {
-                ColorScheme.objectTypeFlags.velocityMed = false;
-                $('.legend-velocityMed-box').css('background', 'black');
+          case "legend-rocketBody-box":
+            if (ColorScheme.objectTypeFlags.rocketBody) {
+              ColorScheme.objectTypeFlags.rocketBody = false;
+              $('.legend-rocketBody-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.rocketBody = true;
+              $('.legend-rocketBody-box').css('background', _rgbCSS(settingsManager.colors.rocketBody));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-debris-box":
+            if (ColorScheme.objectTypeFlags.debris) {
+              ColorScheme.objectTypeFlags.debris = false;
+              $('.legend-debris-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.debris = true;
+              $('.legend-debris-box').css('background', _rgbCSS(settingsManager.colors.debris));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-starHi-box":
+            if (ColorScheme.objectTypeFlags.starHi) {
+              ColorScheme.objectTypeFlags.starHi = false;
+              $('.legend-starHi-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.starHi = true;
+              $('.legend-starHi-box').css('background', _rgbCSS(settingsManager.colors.star100));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-starMed-box":
+            if (ColorScheme.objectTypeFlags.starMed) {
+              ColorScheme.objectTypeFlags.starMed = false;
+              $('.legend-starMed-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.starMed = true;
+              $('.legend-starMed-box').css('background', _rgbCSS(settingsManager.colors.star75));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-starLow-box":
+            if (ColorScheme.objectTypeFlags.starLow) {
+              ColorScheme.objectTypeFlags.starLow = false;
+              $('.legend-starLow-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.starLow = true;
+              $('.legend-starLow-box').css('background', _rgbCSS(settingsManager.colors.star100));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-satHi-box":
+              if (ColorScheme.objectTypeFlags.satHi) {
+                ColorScheme.objectTypeFlags.satHi = false;
+                $('.legend-satHi-box').css('background', 'black');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               } else {
-                ColorScheme.objectTypeFlags.velocityMed = true;
-                $('.legend-velocityMed-box').css('background', [0.5, 0.5, 0.0, 1.0]);
+                ColorScheme.objectTypeFlags.satHi = true;
+                $('.legend-satHi-box').css('background', 'rgb(250, 250, 250)');
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme, true);
               }
               break;
-            case "legend-velocitySlow-box":
-              if (ColorScheme.objectTypeFlags.velocitySlow) {
-                ColorScheme.objectTypeFlags.velocitySlow = false;
-                $('.legend-velocitySlow-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.velocitySlow = true;
-                $('.legend-velocitySlow-box').css('background', [1.0, 0, 0.0, 1.0]);
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-inviewAlt-box":
-              if (ColorScheme.objectTypeFlags.inviewAlt) {
-                ColorScheme.objectTypeFlags.inviewAlt = false;
-                $('.legend-inviewAlt-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.inviewAlt = true;
-                $('.legend-inviewAlt-box').css('background', _rgbCSS(settingsManager.colors.inviewAlt));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-rcsSmall-box":
-              if (ColorScheme.objectTypeFlags.rcsSmall) {
-                ColorScheme.objectTypeFlags.rcsSmall = false;
-                $('.legend-rcsSmall-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.rcsSmall = true;
-                $('.legend-rcsSmall-box').css('background', _rgbCSS(settingsManager.colors.rcsSmall));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-rcsMed-box":
-              if (ColorScheme.objectTypeFlags.rcsMed) {
-                ColorScheme.objectTypeFlags.rcsMed = false;
-                $('.legend-rcsMed-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.rcsMed = true;
-                $('.legend-rcsMed-box').css('background', _rgbCSS(settingsManager.colors.rcsMed));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-rcsLarge-box":
-              if (ColorScheme.objectTypeFlags.rcsLarge) {
-                ColorScheme.objectTypeFlags.rcsLarge = false;
-                $('.legend-rcsLarge-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.rcsLarge = true;
-                $('.legend-rcsLarge-box').css('background', _rgbCSS(settingsManager.colors.rcsLarge));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-rcsUnknown-box":
-              if (ColorScheme.objectTypeFlags.rcsUnknown) {
-                ColorScheme.objectTypeFlags.rcsUnknown = false;
-                $('.legend-rcsUnknown-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.rcsUnknown = true;
-                $('.legend-rcsUnknown-box').css('background', _rgbCSS(settingsManager.colors.rcsUnknown));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-missile-box":
-              if (ColorScheme.objectTypeFlags.missile) {
-                ColorScheme.objectTypeFlags.missile = false;
-                $('.legend-missile-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.missile = true;
-                $('.legend-missile-box').css('background', _rgbCSS(settingsManager.colors.missile));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-sensor-box":
-              if (ColorScheme.objectTypeFlags.sensor) {
-                ColorScheme.objectTypeFlags.sensor = false;
-                $('.legend-sensor-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.sensor = true;
-                $('.legend-sensor-box').css('background', _rgbCSS(settingsManager.colors.sensor));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-facility-box":
-              if (ColorScheme.objectTypeFlags.facility) {
-                ColorScheme.objectTypeFlags.facility = false;
-                $('.legend-facility-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.facility = true;
-                $('.legend-facility-box').css('background', _rgbCSS(settingsManager.colors.facility));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-trusat-box":
-              if (ColorScheme.objectTypeFlags.trusat) {
-                ColorScheme.objectTypeFlags.trusat = false;
-                $('.legend-trusat-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.trusat = true;
-                $('.legend-trusat-box').css('background', _rgbCSS(settingsManager.colors.trusat));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            // No benefit to disabling the only color
-            // case "legend-satLEO-box":
-            //   if (ColorScheme.objectTypeFlags.satLEO) {
-            //     ColorScheme.objectTypeFlags.satLEO = false;
-            //     $('.legend-satLEO-box').css('background', 'black');
-            //     settingsManager.isForceColorScheme = true;
-            //     satSet.setColorScheme(settingsManager.currentColorScheme, true);
-            //   } else {
-            //     ColorScheme.objectTypeFlags.satLEO = true;
-            //     $('.legend-satLEO-box').css('background', _rgbCSS(settingsManager.colors.satLEO));
-            //     settingsManager.isForceColorScheme = true;
-            //     satSet.setColorScheme(settingsManager.currentColorScheme, true);
-            //   }
-            //   break;
-            // case "legend-satGEO-box":
-            //   if (ColorScheme.objectTypeFlags.satGEO) {
-            //     ColorScheme.objectTypeFlags.satGEO = false;
-            //     $('.legend-satGEO-box').css('background', 'black');
-            //     settingsManager.isForceColorScheme = true;
-            //     satSet.setColorScheme(settingsManager.currentColorScheme, true);
-            //   } else {
-            //     ColorScheme.objectTypeFlags.satGEO = true;
-            //     $('.legend-satGEO-box').css('background', _rgbCSS(settingsManager.colors.satGEO));
-            //     settingsManager.isForceColorScheme = true;
-            //     satSet.setColorScheme(settingsManager.currentColorScheme, true);
-            //   }
-            //   break;
-              case "legend-countryUS-box":
-              if (ColorScheme.objectTypeFlags.countryUS) {
-                ColorScheme.objectTypeFlags.countryUS = false;
-                $('.legend-countryUS-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.countryUS = true;
-                $('.legend-countryUS-box').css('background', _rgbCSS(settingsManager.colors.countryUS));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-countryCIS-box":
-              if (ColorScheme.objectTypeFlags.countryCIS) {
-                ColorScheme.objectTypeFlags.countryCIS = false;
-                $('.legend-countryCIS-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.countryCIS = true;
-                $('.legend-countryCIS-box').css('background', _rgbCSS(settingsManager.colors.countryCIS));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-countryPRC-box":
-              if (ColorScheme.objectTypeFlags.countryPRC) {
-                ColorScheme.objectTypeFlags.countryPRC = false;
-                $('.legend-countryPRC-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.countryPRC = true;
-                $('.legend-countryPRC-box').css('background', _rgbCSS(settingsManager.colors.countryPRC));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-            case "legend-countryOther-box":
-              if (ColorScheme.objectTypeFlags.countryOther) {
-                ColorScheme.objectTypeFlags.countryOther = false;
-                $('.legend-countryOther-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.countryOther = true;
-                $('.legend-countryOther-box').css('background', _rgbCSS(settingsManager.colors.countryOther));
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
-          }
-        });
+          case "legend-satMed-box":
+            if (ColorScheme.objectTypeFlags.satMed) {
+              ColorScheme.objectTypeFlags.satMed = false;
+              $('.legend-satMed-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.satMed = true;
+              $('.legend-satMed-box').css('background', 'rgb(150, 150, 150)');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-satLow-box":
+            if (ColorScheme.objectTypeFlags.satLow) {
+              ColorScheme.objectTypeFlags.satLow = false;
+              $('.legend-satLow-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.satLow = true;
+              $('.legend-satLow-box').css('background', 'rgb(200, 200, 200)');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-inFOV-box":
+            if (ColorScheme.objectTypeFlags.inFOV) {
+              ColorScheme.objectTypeFlags.inFOV = false;
+              $('.legend-inFOV-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.inFOV = true;
+              $('.legend-inFOV-box').css('background', _rgbCSS(settingsManager.colors.inview));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-velocityFast-box":
+            if (ColorScheme.objectTypeFlags.velocityFast) {
+              ColorScheme.objectTypeFlags.velocityFast = false;
+              $('.legend-velocityFast-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.velocityFast = true;
+              $('.legend-velocityFast-box').css('background', [0, 1, 0.0, 1.0]);
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+          break;
+          case "legend-velocityMed-box":
+            if (ColorScheme.objectTypeFlags.velocityMed) {
+              ColorScheme.objectTypeFlags.velocityMed = false;
+              $('.legend-velocityMed-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.velocityMed = true;
+              $('.legend-velocityMed-box').css('background', [0.5, 0.5, 0.0, 1.0]);
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-velocitySlow-box":
+            if (ColorScheme.objectTypeFlags.velocitySlow) {
+              ColorScheme.objectTypeFlags.velocitySlow = false;
+              $('.legend-velocitySlow-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.velocitySlow = true;
+              $('.legend-velocitySlow-box').css('background', [1.0, 0, 0.0, 1.0]);
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-inviewAlt-box":
+            if (ColorScheme.objectTypeFlags.inviewAlt) {
+              ColorScheme.objectTypeFlags.inviewAlt = false;
+              $('.legend-inviewAlt-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.inviewAlt = true;
+              $('.legend-inviewAlt-box').css('background', _rgbCSS(settingsManager.colors.inviewAlt));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-rcsSmall-box":
+            if (ColorScheme.objectTypeFlags.rcsSmall) {
+              ColorScheme.objectTypeFlags.rcsSmall = false;
+              $('.legend-rcsSmall-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.rcsSmall = true;
+              $('.legend-rcsSmall-box').css('background', _rgbCSS(settingsManager.colors.rcsSmall));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-rcsMed-box":
+            if (ColorScheme.objectTypeFlags.rcsMed) {
+              ColorScheme.objectTypeFlags.rcsMed = false;
+              $('.legend-rcsMed-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.rcsMed = true;
+              $('.legend-rcsMed-box').css('background', _rgbCSS(settingsManager.colors.rcsMed));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-rcsLarge-box":
+            if (ColorScheme.objectTypeFlags.rcsLarge) {
+              ColorScheme.objectTypeFlags.rcsLarge = false;
+              $('.legend-rcsLarge-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.rcsLarge = true;
+              $('.legend-rcsLarge-box').css('background', _rgbCSS(settingsManager.colors.rcsLarge));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-rcsUnknown-box":
+            if (ColorScheme.objectTypeFlags.rcsUnknown) {
+              ColorScheme.objectTypeFlags.rcsUnknown = false;
+              $('.legend-rcsUnknown-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.rcsUnknown = true;
+              $('.legend-rcsUnknown-box').css('background', _rgbCSS(settingsManager.colors.rcsUnknown));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-missile-box":
+            if (ColorScheme.objectTypeFlags.missile) {
+              ColorScheme.objectTypeFlags.missile = false;
+              $('.legend-missile-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.missile = true;
+              $('.legend-missile-box').css('background', _rgbCSS(settingsManager.colors.missile));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-sensor-box":
+            if (ColorScheme.objectTypeFlags.sensor) {
+              ColorScheme.objectTypeFlags.sensor = false;
+              $('.legend-sensor-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.sensor = true;
+              $('.legend-sensor-box').css('background', _rgbCSS(settingsManager.colors.sensor));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-facility-box":
+            if (ColorScheme.objectTypeFlags.facility) {
+              ColorScheme.objectTypeFlags.facility = false;
+              $('.legend-facility-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.facility = true;
+              $('.legend-facility-box').css('background', _rgbCSS(settingsManager.colors.facility));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-trusat-box":
+            if (ColorScheme.objectTypeFlags.trusat) {
+              ColorScheme.objectTypeFlags.trusat = false;
+              $('.legend-trusat-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.trusat = true;
+              $('.legend-trusat-box').css('background', _rgbCSS(settingsManager.colors.trusat));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          // No benefit to disabling the only color
+          // case "legend-satLEO-box":
+          //   if (ColorScheme.objectTypeFlags.satLEO) {
+          //     ColorScheme.objectTypeFlags.satLEO = false;
+          //     $('.legend-satLEO-box').css('background', 'black');
+          //     settingsManager.isForceColorScheme = true;
+          //     satSet.setColorScheme(settingsManager.currentColorScheme, true);
+          //   } else {
+          //     ColorScheme.objectTypeFlags.satLEO = true;
+          //     $('.legend-satLEO-box').css('background', _rgbCSS(settingsManager.colors.satLEO));
+          //     settingsManager.isForceColorScheme = true;
+          //     satSet.setColorScheme(settingsManager.currentColorScheme, true);
+          //   }
+          //   break;
+          // case "legend-satGEO-box":
+          //   if (ColorScheme.objectTypeFlags.satGEO) {
+          //     ColorScheme.objectTypeFlags.satGEO = false;
+          //     $('.legend-satGEO-box').css('background', 'black');
+          //     settingsManager.isForceColorScheme = true;
+          //     satSet.setColorScheme(settingsManager.currentColorScheme, true);
+          //   } else {
+          //     ColorScheme.objectTypeFlags.satGEO = true;
+          //     $('.legend-satGEO-box').css('background', _rgbCSS(settingsManager.colors.satGEO));
+          //     settingsManager.isForceColorScheme = true;
+          //     satSet.setColorScheme(settingsManager.currentColorScheme, true);
+          //   }
+          //   break;
+            case "legend-countryUS-box":
+            if (ColorScheme.objectTypeFlags.countryUS) {
+              ColorScheme.objectTypeFlags.countryUS = false;
+              $('.legend-countryUS-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.countryUS = true;
+              $('.legend-countryUS-box').css('background', _rgbCSS(settingsManager.colors.countryUS));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-countryCIS-box":
+            if (ColorScheme.objectTypeFlags.countryCIS) {
+              ColorScheme.objectTypeFlags.countryCIS = false;
+              $('.legend-countryCIS-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.countryCIS = true;
+              $('.legend-countryCIS-box').css('background', _rgbCSS(settingsManager.colors.countryCIS));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-countryPRC-box":
+            if (ColorScheme.objectTypeFlags.countryPRC) {
+              ColorScheme.objectTypeFlags.countryPRC = false;
+              $('.legend-countryPRC-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.countryPRC = true;
+              $('.legend-countryPRC-box').css('background', _rgbCSS(settingsManager.colors.countryPRC));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-countryOther-box":
+            if (ColorScheme.objectTypeFlags.countryOther) {
+              ColorScheme.objectTypeFlags.countryOther = false;
+              $('.legend-countryOther-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.countryOther = true;
+              $('.legend-countryOther-box').css('background', _rgbCSS(settingsManager.colors.countryOther));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+        }
+      });
 
       $('#legend-menu').click(function () {
         if ($('#legend-hover-menu').css('display') === 'block') {
@@ -1733,13 +1732,11 @@ var isAnalysisMenuOpen = false;
 
       $('#editSat-newTLE').click(function (e) {
         $('#loading-screen').fadeIn('slow', function () {
-          //
           // Update Satellite TLE so that Epoch is Now but ECI position is very very close
-          //
           var satId = satSet.getIdFromObjNum($('#es-scc').val());
           var mainsat = satSet.getSat(satId);
-          // NOTE: Launch Points are the Satellites Current Location
 
+          // Launch Points are the Satellites Current Location
           var TEARR = satellite.getTEARR(mainsat);
           var launchLat, launchLon, alt;
           launchLon = satellite.degreesLong(TEARR.lon);
@@ -1747,7 +1744,6 @@ var isAnalysisMenuOpen = false;
           alt = TEARR.alt;
 
           var upOrDown = satellite.getDirection(mainsat);
-          // console.log(upOrDown);
 
           var currentEpoch = satellite.currentEpoch(timeManager.propTime());
           mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
@@ -1821,8 +1817,6 @@ var isAnalysisMenuOpen = false;
         var sat = satSet.getSatExtraOnly(satId);
 
         var intl = sat.TLE1.substr(9, 8);
-
-        // TODO: Calculate current J-Day to change Epoch Date
 
         var inc = $('#es-inc').val();
 
@@ -1908,9 +1902,6 @@ var isAnalysisMenuOpen = false;
           });
           orbitDisplay.updateOrbitBuffer(satId, true, TLE1, TLE2);
           sat.active = true;
-
-          // FIXME: Why?
-          // sat = satSet.getSat(satId);
         } else {
           $('#es-error').html('Failed Altitude Check</br>Try Different Parameters');
           $('#es-error').show();
@@ -1994,6 +1985,12 @@ var isAnalysisMenuOpen = false;
         var hiddenRow = evt.currentTarget.attributes.hiddenrow.value; // TODO: Find correct code for this.
         if (hiddenRow !== null) {
           _socrates(hiddenRow);
+        }
+      });
+      $('#satChng-menu').on('click', '.satChng-object', function (evt) {
+        var hiddenRow = evt.currentTarget.attributes.hiddenrow.value; // TODO: Find correct code for this.
+        if (hiddenRow !== null) {
+          uiController.satChng(hiddenRow);
         }
       });
       $('#watchlist-list').on('click', '.watchlist-remove', function (evt) {
@@ -2107,8 +2104,6 @@ var isAnalysisMenuOpen = false;
 
           var upOrDown = $('#nl-updown').val();
 
-          // TODO: Calculate current J-Day to change Epoch Date
-
           var launchFac = $('#nl-facility').val();
           ga('send', 'event', 'New Launch', launchFac, 'Launch Site');
 
@@ -2172,8 +2167,8 @@ var isAnalysisMenuOpen = false;
           var satId = satSet.getIdFromObjNum($('#hc-scc').val());
           var mainsat = satSet.getSat(satId);
           var origsat = mainsat;
-          // NOTE: Launch Points are the Satellites Current Location
 
+          // Launch Points are the Satellites Current Location
           var TEARR = satellite.getTEARR(mainsat);
           var launchLat, launchLon, alt;
           launchLon = satellite.degreesLong(TEARR.lon);
@@ -2511,17 +2506,10 @@ var isAnalysisMenuOpen = false;
 
     var satChngTable = [];
     uiController.satChng = function (row) {
-      db.log('_satChng');
-      // SOCRATES Variables
+      db.log('uiController.satChng');
 
-      /* SOCRATES.htm is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
-      If it ever becomes unavailable a similar, but less accurate (maybe?) cron job could be
-      created using satCruncer.
-
-      The variable row determines which set of objects on SOCRATES.htm we are using. First
-      row is 0 and last one is 19. */
       if (row === -1 && satChngTable.length === 0) { // Only generate the table if receiving the -1 argument for the first time
-        $.get('/analysis/satchng.json?v=' + settingsManager.versionNumber)
+        $.get('/analysis/satChng.json?v=' + settingsManager.versionNumber)
         .done(function (resp) {
           for (let i = 0; i < resp.length; i++) {
             var prefix = (resp[i].year > 50) ? '19' : '20';
@@ -2531,8 +2519,8 @@ var isAnalysisMenuOpen = false;
             resp[i].date = date;
           }
           satChngTable = resp;
-          // SatChng Menu
-          var tbl = document.getElementById('satchng-table'); // Identify the table to update
+          // satChng Menu
+          var tbl = document.getElementById('satChng-table'); // Identify the table to update
           tbl.innerHTML = '';                                  // Clear the table from old object data
           // var tblLength = 0;                                   // Iniially no rows to the table
 
@@ -2546,13 +2534,13 @@ var isAnalysisMenuOpen = false;
           var tdInc = tr.insertCell();
           tdInc.appendChild(document.createTextNode('Inc'));
           tdInc.setAttribute('style', 'text-decoration: underline');
-          var tdMeanMo = tr.insertCell();
-          tdMeanMo.appendChild(document.createTextNode('MeanMo'));
-          tdMeanMo.setAttribute('style', 'text-decoration: underline');
+          var tdPer = tr.insertCell();
+          tdPer.appendChild(document.createTextNode('Per'));
+          tdPer.setAttribute('style', 'text-decoration: underline');
 
           for (let i = 0; i < Math.min(satChngTable.length,20); i++) {                       // 20 rows
             tr = tbl.insertRow();
-            tr.setAttribute('class', 'satchng-object link');
+            tr.setAttribute('class', 'satChng-object link');
             tr.setAttribute('hiddenrow', i);
             tdT = tr.insertCell();
             var dateStr = satChngTable[i].date.toJSON();
@@ -2567,14 +2555,19 @@ var isAnalysisMenuOpen = false;
             tdSat.appendChild(document.createTextNode(satChngTable[i].SCC));
             tdInc = tr.insertCell();
             tdInc.appendChild(document.createTextNode(satChngTable[i].inc.toFixed(2)));
-            tdMeanMo = tr.insertCell();
-            tdMeanMo.appendChild(document.createTextNode(satChngTable[i].meanmo.toFixed(2)));
+            tdPer = tr.insertCell();
+            let deltaMeanMo = satChngTable[i].meanmo;
+            let sat = satSet.getSat(satSet.getIdFromObjNum(satChngTable[i].SCC));
+            let origPer = (1440/(parseFloat(sat.meanMotion) + deltaMeanMo));
+            let perDelta = (1440/parseFloat(sat.meanMotion)) - (origPer);
+            tdPer.appendChild(document.createTextNode((perDelta).toFixed(2)));
           }
         });
       }
       if (row !== -1) { // If an object was selected from the menu
         $('#search').val(satChngTable[row].SCC); // Fill in the serach box with the two objects
         searchBox.doSearch(satChngTable[row].SCC); // Actually perform the search of the two objects
+        $('#anal-sat').val(satChngTable[row].SCC);
       } // If a row was selected
     };
 
@@ -2708,7 +2701,6 @@ var isAnalysisMenuOpen = false;
     function _bottomIconPress (evt) {
       db.log('_bottomIconPress');
       db.log(evt.currentTarget.id);
-      if (settingsManager.isBottomIconsEnabled === false) { return; } // Exit if menu is disabled
       ga('send', 'event', 'Bottom Icon', evt.currentTarget.id, 'Selected');
       switch (evt.currentTarget.id) {
         case 'menu-sensor-list': // No Keyboard Commands
@@ -2901,7 +2893,6 @@ var isAnalysisMenuOpen = false;
             $('#anal-type').formSelect();
 
             $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            uiController.updateWatchlist();
             isAnalysisMenuOpen = true;
             $('#menu-analysis').addClass('bmenu-item-selected');
             break;
@@ -3049,6 +3040,21 @@ var isAnalysisMenuOpen = false;
             isSocratesMenuOpen = true;
             _socrates(-1);
             $('#menu-satellite-collision').addClass('bmenu-item-selected');
+            break;
+          }
+          break;
+        case 'menu-satChng': // No Keyboard Shortcut
+          if (issatChngMenuOpen) {
+            issatChngMenuOpen = false;
+            uiController.hideSideMenus();
+            break;
+          } else {
+            if (settingsManager.isMobileModeEnabled) mobile.searchToggle(false);
+            uiController.hideSideMenus();
+            $('#satChng-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+            issatChngMenuOpen = true;
+            uiController.satChng(-1);
+            $('#menu-satChng').addClass('bmenu-item-selected');
             break;
           }
           break;
@@ -3482,6 +3488,7 @@ var isAnalysisMenuOpen = false;
       $('#twitter-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#map-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#socrates-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+      $('#satChng-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#settings-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#editSat-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
@@ -3508,6 +3515,7 @@ var isAnalysisMenuOpen = false;
       $('#menu-twitter').removeClass('bmenu-item-selected');
       $('#menu-map').removeClass('bmenu-item-selected');
       $('#menu-satellite-collision').removeClass('bmenu-item-selected');
+      $('#menu-satChng').removeClass('bmenu-item-selected');
       $('#menu-settings').removeClass('bmenu-item-selected');
       $('#menu-editSat').removeClass('bmenu-item-selected');
       $('#menu-newLaunch').removeClass('bmenu-item-selected');
@@ -3534,6 +3542,7 @@ var isAnalysisMenuOpen = false;
       isDOPMenuOpen = false;
       isLookanglesMultiSiteMenuOpen = false;
       isSocratesMenuOpen = false;
+      issatChngMenuOpen = false;
       isSettingsMenuOpen = false;
       isEditSatMenuOpen = false;
       isNewLaunchMenuOpen = false;
@@ -3664,7 +3673,7 @@ var isAnalysisMenuOpen = false;
         if (!isFPSSideSpeedLock) FPSSideSpeed = 0;
         if (!isFPSVertSpeedLock) FPSVertSpeed = 0;
       }
-      // TODO: Alternative for IE?
+      // TODO: evt.key === 'ShiftRight' Alternative for IE?
       if (evt.key === 'ShiftRight') {
         FPSRun = 1;
         settingsManager.cameraMovementSpeed = 0.003;
@@ -3684,7 +3693,7 @@ var isAnalysisMenuOpen = false;
         settingsManager.cameraMovementSpeed = 0.003 / 8;
         settingsManager.cameraMovementSpeedMin = 0.005 / 8;
       }
-      // TODO: Alternative for IE?
+      // TODO: evt.key === 'ShiftRight' Alternative for IE?
       if (evt.key === 'ShiftRight') {
         if (cameraType.current === cameraType.FPS) {
           FPSRun = 3;
@@ -3984,7 +3993,6 @@ var isAnalysisMenuOpen = false;
     db.log('_updateNextPassOverlay');
 
     // FIXME This should auto update the overlay when the time changes outside the original search window
-
     // Update once every 10 seconds
     if (((timeManager.now > (lastOverlayUpdateTime * 1 + 10000) &&
                            selectedSat === -1) &&

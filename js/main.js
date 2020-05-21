@@ -266,7 +266,7 @@ var drawLoopCallback;
   var drawLoopCount = 0;
 
   function drawLoop () {
-    // NOTE 7kb memory leak -- No Impact
+    // NOTE drawLoop has 7kb memory leak -- No Impact
     requestAnimationFrame(drawLoop);
     drawNow = Date.now();
     dt = drawNow - (time || drawNow);
@@ -278,7 +278,7 @@ var drawLoopCallback;
       }
       if (drawLoopCount > 50) {
         if (dt > 500 && !settingsManager.isSlowCPUModeEnabled) {
-          // TODO: Better method of determining if computer is slow
+          // Method of determining if computer is slow
           // selectSat(-1);
           // M.toast({html: `Computer is slow!</br>Forcing Mobile Mode`});
           // settingsManager.isMobileModeEnabled = true;
@@ -495,7 +495,7 @@ var drawLoopCallback;
     gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(gl.pickShaderProgram.camMatrix, false, camMatrix);
 
-    // NOTE: Why do we clear the color buffer twice?
+    // Why do we clear the color buffer twice?
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -586,7 +586,7 @@ var drawLoopCallback;
             pitchRotate = ((-1 * satellite.currentSensor.lat) * DEG2RAD);
             yawRotate = ((90 - satellite.currentSensor.long) * DEG2RAD) - satPos.gmst;
 
-            // TODO: Calculate Elevation
+            // TODO: Calculate Elevation for cameraType.ASTRONOMY
             // fpsEl = ((FPSPitch + 90) > 90) ? (-(FPSPitch) + 90) : (FPSPitch + 90);
             // $('#el-text').html(' EL: ' + fpsEl.toFixed(2) + ' deg');
 
@@ -804,10 +804,6 @@ var drawLoopCallback;
     isSatMiniBoxInUse = true;
     satLabelModeLastTime = drawNow;
   }
-
-
-  // TODO: Hover Box should have two sub DOMs whose text is replaced so that <br> is not made and removed
-  // OPTIMIZE: Less DOM creation
 
   function _hoverBoxOnSat (satId, satX, satY) {
     if (cameraType.current === cameraType.PLANETARIUM && !settingsManager.isDemoModeOn) {
@@ -1078,8 +1074,7 @@ function longToYaw (long) {
 
   selectedDate = selectedDate.split(' ');
   selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
-  // TODO: Find a formula using the date variable for this.
-  // TODO: This formula is still a pain
+  // NOTE: This formula sometimes is incorrect, but has been stable for over a year
   today.setUTCHours(selectedDate.getUTCHours() + ((selectedDate.getUTCMonth()) * 2) - 10);  // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
 
   today.setUTCMinutes(selectedDate.getUTCMinutes());
@@ -1343,7 +1338,7 @@ function selectSat (satId) {
     } else {
       $('#sat-vehicle').html(sat.LV); // Set to JSON record
       if (sat.LV === 'U') { $('#sat-vehicle').html('Unknown'); } // Replace with Unknown if necessary
-      objectManager.extractLiftVehicle(sat.LV); // Replace with link if available FIXME this should be a separate file
+      objectManager.extractLiftVehicle(sat.LV); // Replace with link if available
     }
 
     // /////////////////////////////////////////////////////////////////////////
@@ -1463,8 +1458,7 @@ function selectSat (satId) {
     }
     uiController.updateMap();
 
-    // NOTE: ISS Stream Slows Down a Lot Of Computers
-
+    // ISS Stream Slows Down a Lot Of Computers
     // if (sat.SCC_NUM === '25544') { // ISS is Selected
     //   $('#iss-stream-menu').show();
     //   $('#iss-stream').html('<iframe src="http://www.ustream.tv/embed/17074538?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://www.ustream.tv/embed/9408562?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><br />' +

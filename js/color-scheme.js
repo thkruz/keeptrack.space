@@ -211,8 +211,6 @@
         };
       }
 
-      // NOTE: ColorScheme.objectTypeFlags code
-
       if (!sat.inView && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false ||
           cameraType.current === cameraType.PLANETARIUM && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false ||
           (satellite.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false)) {
@@ -458,7 +456,7 @@
     });
     ColorScheme.sunlight.isSunlightColorScheme = true;
     /// //////////////////////////////
-    // NOTE: Doesn't appear to be used
+    // NOTE: ColorScheme.apogee doesn't appear to be used
     // ///////////////////////////////
     ColorScheme.apogee = new ColorScheme(function (sat) {
       var ap = sat.apogee;

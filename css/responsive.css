@@ -1,4 +1,4 @@
-@media (max-width: 640px) {
+@media (max-width: 694px) {
   .material-tooltip {
     display: none !important;
   }
@@ -79,7 +79,7 @@
   }
 }
 
-@media (min-width: 641px) and (max-width: 1300px) {
+@media (min-width: 695px) and (max-width: 1300px) {
   .side-menu {
     position: absolute;
     background: #0a97d6;
@@ -140,7 +140,7 @@
     width: 100%;
   }
   #bottom-icons-container {
-    width: 630px;
+    width: 685px;
     height: 100px;
 
   }
@@ -169,6 +169,7 @@
   }
   #menu-space-stations,
   #menu-launches,
+  #menu-record,
   #menu-color-scheme,
   #social,
   #version-info,
@@ -508,7 +509,7 @@
     overflow: hidden;
   }
   #bottom-icons-container {
-    width: 920px;
+    width: 800px;
     height: 100px;
     text-align: center;
 

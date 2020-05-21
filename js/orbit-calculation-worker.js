@@ -56,7 +56,7 @@ onmessage = function (m) {
     NUM_SEGS = m.data.numSegs;
   } else {
   //  var start = performance.now();
-    // TODO: figure out how to calculate the orbit points on constant
+    // IDEA: figure out how to calculate the orbit points on constant
     // position slices, not timeslices (ugly perigees on HEOs)
 
     var satId = m.data.satId;

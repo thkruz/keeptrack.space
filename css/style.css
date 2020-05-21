@@ -4,7 +4,7 @@
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.5); }
 
 /*Hide yellow coloring in Chrome*/
-/*TODO: The bug seems to be with chrome not the site*/
+/*The bug seems to be with chrome not the site*/
 input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px #0a97d6 inset;
   background-color: #0a97d6;
@@ -456,6 +456,10 @@ ul {
 .add-icon img {
   padding-top: 35px;
   width: 15px;
+}
+
+#satChng-content {
+  width: 330px;
 }
 
 #map-menu {

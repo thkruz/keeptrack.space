@@ -125,7 +125,7 @@
     obsminel: 1.9,
     obsmaxel: 95,
     obsminrange: 200,
-    obsmaxrange: 3300, // TODO: Double check this
+    obsmaxrange: 3300, // 1,780 Nm http://www.fortwiki.com/Cavalier_Air_Force_Station
     changeObjectInterval: 1000,
     staticNum: 5,
     linkAEHF: true,
@@ -862,7 +862,7 @@
     obsmaxaz: 60,     // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
     obsminel: 2,      // Information via globalsecurity.org
     obsmaxel: 80,     // Information via globalsecurity.org
-    obsminrange: 300, // TODO: Verify
+    obsminrange: 300, 
     obsmaxrange: 3000, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
     changeObjectInterval: 1000,
     staticNum: 21,

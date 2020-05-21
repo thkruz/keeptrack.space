@@ -123,7 +123,7 @@ http://keeptrack.space
     satellite.currentSensor.observerGd = {   // Array to calculate look angles in propagate()
       latitude: sensor.lat * DEG2RAD,
       longitude: sensor.long * DEG2RAD,
-      height: sensor.obshei * 1               // Converts from string to number TODO: Find correct way to convert string to integer
+      height: parseFloat(sensor.obshei)               // Converts from string to number
     };
   };
 
@@ -419,7 +419,7 @@ http://keeptrack.space
   satellite.nextpassList = function (satArray) {
     var nextPassArray = [];
     for (var s = 0; s < satArray.length; s++) {
-      var time = satellite.next5passes(satArray[s], undefined, (1000 * 60 * 60 * 24)); // Only do 1 day looks
+      var time = satellite.nextNpasses(satArray[s], undefined, (1000 * 60 * 60 * 24), satellite.lookanglesInterval, settingsManager.nextNPassesCount); // Only do 1 day looks
       for (var i = 0; i < time.length; i++) {
         nextPassArray.push({'SCC_NUM': satArray[s].SCC_NUM, 'time': time[i]});
       }
@@ -491,8 +491,7 @@ http://keeptrack.space
     return 'No Passes in ' + satellite.lookanglesLength + ' Days';
   };
 
-  // TODO: Convert this into nextNpasses
-  satellite.next5passes = function (sat, sensor, searchLength, interval) {
+  satellite.nextNpasses = function (sat, sensor, searchLength, interval, numPasses) {
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensor == 'undefined') {
       if (typeof satellite.currentSensor == 'undefined') {
@@ -517,35 +516,33 @@ http://keeptrack.space
     if (typeof searchLength == 'undefined') searchLength = satellite.lookanglesLength;
     if (typeof interval == 'undefined') interval = satellite.lookanglesInterval;
 
-    var passTimesArray = [];
-    var propOffset = timeManager.getPropOffset();
-    var propTempOffset = 0;
-    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-    var orbitalPeriod = MINUTES_PER_DAY / (satrec.no * MINUTES_PER_DAY / TAU); // Seconds in a day divided by mean motion
-    for (var i = 0; i < (searchLength * 24 * 60 * 60); i += interval) {         // 5second Looks
-      // Only pass a maximum of 5 passes
-      if (passTimesArray.length >= 5) { return passTimesArray; }
+    let passTimesArray = [];
+    let propOffset = timeManager.getPropOffset();
+    let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
+    const orbitalPeriod = MINUTES_PER_DAY / (satrec.no * MINUTES_PER_DAY / TAU); // Seconds in a day divided by mean motion
+    for (let i = 0; i < (searchLength * 24 * 60 * 60); i += interval) {         // 5second Looks
+      // Only pass a maximum of N passes
+      if (passTimesArray.length >= numPasses) { return passTimesArray; }
 
-      propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
-      var now = timeManager.propTimeCheck(propTempOffset, timeManager.propRealTime);
-      var j = timeManager.jday(now.getUTCFullYear(),
+      let propTempOffset = i + propOffset;                 // Offset in seconds (msec * 1000)
+      let now = timeManager.propTimeCheck(propTempOffset * 1000, timeManager.propRealTime);
+      let j = timeManager.jday(now.getUTCFullYear(),
       now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
       now.getUTCDate(),
       now.getUTCHours(),
       now.getUTCMinutes(),
       now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
       j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-      var gmst = satellite.gstime(j);
+      let gmst = satellite.gstime(j);
 
-      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-      var positionEci = satellite.sgp4(satrec, m);
-      var positionEcf, lookAngles, azimuth, elevation, range;
+      let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+      let positionEci = satellite.sgp4(satrec, m);
 
-      positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-      lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-      azimuth = lookAngles.azimuth * RAD2DEG;
-      elevation = lookAngles.elevation * RAD2DEG;
-      range = lookAngles.rangeSat;
+      let positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
+      let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+      let azimuth = lookAngles.azimuth * RAD2DEG;
+      let elevation = lookAngles.elevation * RAD2DEG;
+      let range = lookAngles.rangeSat;
 
       if (sensor.obsminaz > sensor.obsmaxaz) {
         if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
@@ -993,7 +990,7 @@ http://keeptrack.space
     }
 
     // Don't Bother Unless Specifically Requested
-    // NOTE: Applies to eccentric orbits
+    // Applies to eccentric orbits
     // ===== Argument of Perigee Loop =====
     if (typeof goalAlt != 'undefined' && goalAlt !== 0) {
       meanACalcResults = 0; // Reset meanACalcResults
@@ -1370,7 +1367,7 @@ http://keeptrack.space
         sensor.observerGd = {   // Array to calculate look angles in propagate()
           latitude: sensor.lat * DEG2RAD,
           longitude: sensor.long * DEG2RAD,
-          height: sensor.obshei * 1               // Converts from string to number TODO: Find correct way to convert string to integer
+          height: parseFloat(sensor.obshei)
         };
       }
 
@@ -1833,7 +1830,7 @@ http://keeptrack.space
   satellite.isInSun = function (sat) {
     // Distances all in km
     var sunECI = sun.getXYZ();
-    // NOTE: Position needs to be relative to satellite NOT ECI
+    // Position needs to be relative to satellite NOT ECI
     // var distSatEarthX = Math.pow(-sat.position.x, 2);
     // var distSatEarthY = Math.pow(-sat.position.y, 2);
     // var distSatEarthZ = Math.pow(-sat.position.z, 2);
@@ -1841,7 +1838,7 @@ http://keeptrack.space
     // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
     var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/Math.sqrt(Math.pow(-sat.position.x, 2) + Math.pow(-sat.position.y, 2) + Math.pow(-sat.position.z, 2))) * RAD2DEG;
 
-    // NOTE: Position needs to be relative to satellite NOT ECI
+    // Position needs to be relative to satellite NOT ECI
     // var distSatSunX = Math.pow(-sat.position.x + sunECI.x, 2);
     // var distSatSunY = Math.pow(-sat.position.y + sunECI.y, 2);
     // var distSatSunZ = Math.pow(-sat.position.z + sunECI.z, 2);
@@ -1880,7 +1877,7 @@ http://keeptrack.space
     return 2;
   };
 
-  // NOTE Specific to my project.
+  // Specific to KeepTrack.
   satellite.map = function (sat, i) {
     // Set default timing settings. These will be changed to find look angles at different times in future.
     var propOffset = timeManager.getPropOffset();

@@ -150,7 +150,7 @@
       }
     }
 
-    // NOTE Removing this can result in a heavy performance lag
+    // Removing this can result in a heavy performance lag
     if (results.length > settingsManager.searchLimit) {
       results.length = settingsManager.searchLimit;
     }

@@ -288,9 +288,12 @@ or mirrored at any other location without the express written permission of the 
 
   satellite.exportTle2Csv = function () {
     let catalogTLE2 = [];
-    for (let s = 0; s < satSet.getSatData().length; s++) {
-      sat = satSet.getSat(s);
+    let satCat = satSet.getSatData();
+    satCat.sort((a, b) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
+    for (let s = 0; s < satCat.length; s++) {
+      let sat = satCat[s];
       if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') { continue; }
+      if (sat.C == 'ANALSAT') continue;
       catalogTLE2.push({
         satId: sat.SCC_NUM,
         TLE1: sat.TLE1,
@@ -311,9 +314,12 @@ or mirrored at any other location without the express written permission of the 
 
   satellite.exportTle2Txt = function () {
     let catalogTLE2 = [];
-    for (let s = 0; s < satSet.getSatData().length; s++) {
-      sat = satSet.getSat(s);
+    let satCat = satSet.getSatData();
+    satCat.sort((a, b) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
+    for (let s = 0; s < satCat.length; s++) {
+      let sat = satCat[s];
       if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') { continue; }
+      if (sat.C == 'ANALSAT') continue;
       catalogTLE2.push(sat.TLE1);
       catalogTLE2.push(sat.TLE2);
     }

@@ -113,8 +113,8 @@
           continue; // Last check for missiles
         }
 
-        // Analyst satellites only have names and SCC_NUMs
-        if (+sat.SCC_NUM >= 60000) { continue; }
+        // Skip Inactive Analyst satellites
+        if (!sat.active) { continue; }
 
         if (sat.SCC_NUM.indexOf(searchString) !== -1) {
           results.push({

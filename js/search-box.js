@@ -249,7 +249,7 @@
       hovering = true;
       hoverSatId = satId;
     });
-    $('#search-results').mouseout(function () {
+    $('#search-results').on("mouseout", function () {
       orbitDisplay.clearHoverOrbit();
       satSet.setHover(-1);
       hovering = false;
@@ -260,7 +260,7 @@
       searchBox.doSearch(searchStr);
     });
 
-    $('#all-objects-link').click(function () {
+    $('#all-objects-link').on("click", function () {
       if (selectedSat === -1) {
         return;
       }
@@ -269,7 +269,7 @@
       searchBox.doSearch(searchStr);
       $('#search').val(searchStr);
     });
-    $('#near-objects-link').click(function () {
+    $('#near-objects-link').on("click", function () {
       if (selectedSat === -1) {
         return;
       }

@@ -187,7 +187,7 @@ var isAnalysisMenuOpen = false;
       db.log('_resizeWindow');
       mobile.checkMobileMode();
       var resizing = false;
-      $(window).resize(function () {
+      $(window).on("resize", function () {
         uiController.resize2DMap();
         mobile.checkMobileMode();
         if (!resizing) {
@@ -257,7 +257,7 @@ var isAnalysisMenuOpen = false;
         event.stopPropagation();
         return false;
       };
-      $(document).bind('cbox_closed', function () {
+      $(document).on('cbox_closed', function () {
         if (isLaunchMenuOpen) {
           isLaunchMenuOpen = false;
           $('#menu-launches').removeClass('bmenu-item-selected');
@@ -291,7 +291,7 @@ var isAnalysisMenuOpen = false;
           }, 250);
         }
       });
-      canvasDOM.mousemove(function (evt) {
+      canvasDOM.on("mousemove", function (evt) {
         mouseX = evt.clientX;
         mouseY = evt.clientY;
         if (isDragging && screenDragPoint[0] !== mouseX && screenDragPoint[1] !== mouseY) {
@@ -330,14 +330,14 @@ var isAnalysisMenuOpen = false;
           webGlInit();
         }
       });
-      canvasDOM.click(function (evt) {
+      canvasDOM.on("click", function (evt) {
         rightBtnMenuDOM.hide();
         _clearRMBSubMenu();
         if ($('#colorbox').css('display') === 'block') {
           $.colorbox.close(); // Close colorbox if it was open
         }
       });
-      canvasDOM.mousedown(function (evt) {
+      canvasDOM.on("mousedown", function (evt) {
         if (speedModifier === 1) {
           settingsManager.cameraMovementSpeed = 0.003;
           settingsManager.cameraMovementSpeedMin = 0.005;
@@ -383,7 +383,7 @@ var isAnalysisMenuOpen = false;
           rotateTheEarth = false;
         }
       });
-      canvasDOM.mouseup(function (evt) {
+      canvasDOM.on("mouseup", function (evt) {
         var numMenuItems = 0;
         if (!dragHasMoved) {
           if (settingsManager.isMobileModeEnabled) {
@@ -557,25 +557,25 @@ var isAnalysisMenuOpen = false;
         rotateTheEarth = false;
       });
 
-      rightBtnMenuDOM.click(function (e) {
+      rightBtnMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
       });
-      rightBtnViewMenuDOM.click(function (e) {
+      rightBtnViewMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
       });
-      rightBtnEditMenuDOM.click(function (e) {
+      rightBtnEditMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
       });
-      rightBtnCreateMenuDOM.click(function (e) {
+      rightBtnCreateMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
       });
-      rightBtnDrawMenuDOM.click(function (e) {
+      rightBtnDrawMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
       });
-      rightBtnColorsMenuDOM.click(function (e) {
+      rightBtnColorsMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
       });
-      rightBtnEarthMenuDOM.click(function (e) {
+      rightBtnEarthMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
       });
 
@@ -596,7 +596,7 @@ var isAnalysisMenuOpen = false;
             break;
           case 'view-sensor-info-rmb':
             selectSat(clickedSat);
-            $('#menu-sensor-info').click();
+            $('#menu-sensor-info').on("click", );
             break;
           case 'view-related-sats-rmb':
             var intldes = satSet.getSatExtraOnly(clickedSat).intlDes;
@@ -651,7 +651,7 @@ var isAnalysisMenuOpen = false;
               $('#menu-customSensor').addClass('bmenu-item-selected');
             // }
             isCustomSensorMenuOpen = true;
-            $('#cs-telescope').click();
+            $('#cs-telescope').on("click", );
             $('#cs-lat').val(latLon.latitude);
             $('#cs-lon').val(latLon.longitude);
             $('#cs-hei').val(0);
@@ -663,7 +663,7 @@ var isAnalysisMenuOpen = false;
             $('#cs-maxel').val(90);
             $('#cs-minrange').val(0);
             $('#cs-maxrange').val(1000000);
-            $('#customSensor').submit();
+            $('#customSensor').on("submit", );
           break;
           case 'clear-lines-rmb':
             drawLineList = [];
@@ -696,7 +696,7 @@ var isAnalysisMenuOpen = false;
             $('#cs-lon').val(latLon.longitude);
             $('#cs-hei').val(0);
             $('#cs-type').val('Observer');
-            $('#customSensor').submit();
+            $('#customSensor').on("submit", );
             uiController.legendMenuChange('sunlight');
             satSet.setColorScheme(ColorScheme.sunlight, true);
             settingsManager.isForceColorScheme = true;
@@ -834,9 +834,9 @@ var isAnalysisMenuOpen = false;
       bodyDOM.on('keydown', _keyDownHandler); // On Key Press Event Run _keyHandler Function
       bodyDOM.on('keyup', _keyUpHandler); // On Key Press Event Run _keyHandler Function
       canvasDOM.attr('tabIndex', 0);
-      canvasDOM.focus();
+      canvasDOM.trigger("focus");
 
-      rightBtnViewDOM.hover(function () {
+      rightBtnViewDOM.on("hover", function () {
         _clearRMBSubMenu();
         var offsetX = (rightBtnViewDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnViewMenuDOM.css({
@@ -852,11 +852,11 @@ var isAnalysisMenuOpen = false;
           rightBtnViewMenuDOM.hide();
         }
       });
-      rightBtnViewMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnViewMenuDOM.on("hover", null, function () { // Lost Focus
         rightBtnViewMenuDOM.hide();
       });
 
-      rightBtnEditDOM.hover(function () {
+      rightBtnEditDOM.on("hover", function () {
         _clearRMBSubMenu();
 
         var offsetX = (rightBtnEditDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
@@ -873,11 +873,11 @@ var isAnalysisMenuOpen = false;
           rightBtnEditMenuDOM.hide();
         }
       });
-      rightBtnEditMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnEditMenuDOM.on("hover", null, function () { // Lost Focus
         rightBtnEditMenuDOM.hide();
       });
 
-      rightBtnCreateDOM.hover(function () {
+      rightBtnCreateDOM.on("hover", function () {
         _clearRMBSubMenu();
 
         var offsetX = (rightBtnCreateDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
@@ -894,11 +894,11 @@ var isAnalysisMenuOpen = false;
           rightBtnCreateMenuDOM.hide();
         }
       });
-      rightBtnCreateMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnCreateMenuDOM.on("hover", null, function () { // Lost Focus
         rightBtnCreateMenuDOM.hide();
       });
 
-      rightBtnDrawDOM.hover(function () {
+      rightBtnDrawDOM.on("hover", function () {
         _clearRMBSubMenu();
         var offsetX = (rightBtnDrawDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnDrawMenuDOM.css({
@@ -914,11 +914,11 @@ var isAnalysisMenuOpen = false;
           rightBtnDrawMenuDOM.hide();
         }
       });
-      rightBtnDrawMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnDrawMenuDOM.on("hover", null, function () { // Lost Focus
         rightBtnDrawMenuDOM.hide();
       });
 
-      rightBtnColorsDOM.hover(function () {
+      rightBtnColorsDOM.on("hover", function () {
         _clearRMBSubMenu();
         var offsetX = (rightBtnColorsDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnColorsMenuDOM.css({
@@ -934,11 +934,11 @@ var isAnalysisMenuOpen = false;
           rightBtnColorsMenuDOM.hide();
         }
       });
-      rightBtnEarthMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnEarthMenuDOM.on("hover", null, function () { // Lost Focus
         rightBtnEarthMenuDOM.hide();
       });
 
-      rightBtnEarthDOM.hover(function () {
+      rightBtnEarthDOM.on("hover", function () {
         _clearRMBSubMenu();
         var offsetX = (rightBtnEarthDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnEarthMenuDOM.css({
@@ -954,7 +954,7 @@ var isAnalysisMenuOpen = false;
           rightBtnEarthMenuDOM.hide();
         }
       });
-      rightBtnEarthMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnEarthMenuDOM.on("hover", null, function () { // Lost Focus
         rightBtnEarthMenuDOM.hide();
       });
 
@@ -1099,28 +1099,28 @@ var isAnalysisMenuOpen = false;
         });
       }
 
-      $('#datetime-text').click(function () {
+      $('#datetime-text').on("click", function () {
         if (!settingsManager.isEditTime) {
           // $('#datetime-text').fadeOut();
           $('#datetime-input').fadeIn();
-          $('#datetime-input-tb').focus();
+          $('#datetime-input-tb').trigger("focus");
           settingsManager.isEditTime = true;
         }
       });
 
-      $('.menu-item').mouseover(function (evt) {
+      $('.menu-item').on("mouseover", function (evt) {
         $(this).children('.submenu').css({
           display: 'block'
         });
       });
 
-      $('.menu-item').mouseout(function (evt) {
+      $('.menu-item').on("mouseout", function (evt) {
         $(this).children('.submenu').css({
           display: 'none'
         });
       });
 
-      $('#search-close').click(function () {
+      $('#search-close').on("click", function () {
         searchBox.hideResults();
         $('#search').val('');
         isMilSatSelected = false;
@@ -1147,7 +1147,7 @@ var isAnalysisMenuOpen = false;
         }
       });
 
-      $('#legend-hover-menu').click(function (e) {
+      $('#legend-hover-menu').on("click", function (e) {
         switch (e.target.classList[1]) {
           case "legend-payload-box":
             if (ColorScheme.objectTypeFlags.payload) {
@@ -1517,7 +1517,7 @@ var isAnalysisMenuOpen = false;
         }
       });
 
-      $('#legend-menu').click(function () {
+      $('#legend-menu').on("click", function () {
         if ($('#legend-hover-menu').css('display') === 'block') {
           $('#legend-hover-menu').hide();
         } else {
@@ -1529,7 +1529,7 @@ var isAnalysisMenuOpen = false;
         }
       });
 
-      $('.menu-selectable').click(function () {
+      $('.menu-selectable').on("click", function () {
         // $('#menu-sensor-info').removeClass('bmenu-item-disabled');
         // $('#menu-planetarium').removeClass('bmenu-item-disabled');
         if (selectedSat !== -1) {
@@ -1542,72 +1542,72 @@ var isAnalysisMenuOpen = false;
       });
 
       // When any sensor is selected
-      $('#sensor-list-content > div > ul > .menu-selectable').click(function() {
+      $('#sensor-list-content > div > ul > .menu-selectable').on("click", function() {
          adviceList.sensor();
        });
 
       // USAF Radars
-      $('#radar-cspocAll').click(function () {
+      $('#radar-cspocAll').on("click", function () {
         adviceList.cspocSensors();
         sensorManager.setSensor('SSN');
       });
-      $('#radar-mwAll').click(function () {
+      $('#radar-mwAll').on("click", function () {
         adviceList.mwSensors();
         sensorManager.setSensor('NATO-MW');
       });
-      $('#radar-beale').click(function () { sensorManager.setSensor(sensorManager.sensorList.BLE); });
-      $('#radar-capecod').click(function () { sensorManager.setSensor(sensorManager.sensorList.COD); });
-      $('#radar-clear').click(function () { sensorManager.setSensor(sensorManager.sensorList.CLR); });
-      $('#radar-eglin').click(function () { sensorManager.setSensor(sensorManager.sensorList.EGL); });
-      $('.radar-fylingdales').click(function () { sensorManager.setSensor(sensorManager.sensorList.FYL); });
-      $('#radar-parcs').click(function () { sensorManager.setSensor(sensorManager.sensorList.CAV); });
-      $('#radar-thule').click(function () { sensorManager.setSensor(sensorManager.sensorList.THL); });
-      $('#radar-cobradane').click(function () { sensorManager.setSensor(sensorManager.sensorList.CDN); });
-      $('#radar-altair').click(function () { sensorManager.setSensor(sensorManager.sensorList.ALT); });
-      $('#radar-millstone').click(function () { sensorManager.setSensor(sensorManager.sensorList.MIL); });
-      $('#radar-ascension').click(function () { sensorManager.setSensor(sensorManager.sensorList.ASC); });
-      $('#radar-globus').click(function () { sensorManager.setSensor(sensorManager.sensorList.GLB); });
-      $('#optical-diego-garcia').click(function () { sensorManager.setSensor(sensorManager.sensorList.DGC); });
-      $('#optical-maui').click(function () { sensorManager.setSensor(sensorManager.sensorList.MAU); });
-      $('#optical-socorro').click(function () { sensorManager.setSensor(sensorManager.sensorList.SOC); });
+      $('#radar-beale').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.BLE); });
+      $('#radar-capecod').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.COD); });
+      $('#radar-clear').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.CLR); });
+      $('#radar-eglin').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.EGL); });
+      $('.radar-fylingdales').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.FYL); });
+      $('#radar-parcs').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.CAV); });
+      $('#radar-thule').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.THL); });
+      $('#radar-cobradane').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.CDN); });
+      $('#radar-altair').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.ALT); });
+      $('#radar-millstone').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.MIL); });
+      $('#radar-ascension').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.ASC); });
+      $('#radar-globus').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.GLB); });
+      $('#optical-diego-garcia').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.DGC); });
+      $('#optical-maui').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.MAU); });
+      $('#optical-socorro').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.SOC); });
 
       // Missile Defense Radars
-      $('#radar-md-all').click(function () { sensorManager.setSensor('MD-ALL'); });
-      $('#radar-md-har').click(function () { sensorManager.setSensor(sensorManager.sensorList.HAR); });
-      $('#radar-md-qtr').click(function () { sensorManager.setSensor(sensorManager.sensorList.QTR); });
-      $('#radar-md-kur').click(function () { sensorManager.setSensor(sensorManager.sensorList.KUR); });
-      $('#radar-md-sha').click(function () { sensorManager.setSensor(sensorManager.sensorList.SHA); });
-      $('#radar-md-kcs').click(function () { sensorManager.setSensor(sensorManager.sensorList.KCS); });
-      $('#radar-md-sbx').click(function () { sensorManager.setSensor(sensorManager.sensorList.SBX); });
+      $('#radar-md-all').on("click", function () { sensorManager.setSensor('MD-ALL'); });
+      $('#radar-md-har').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.HAR); });
+      $('#radar-md-qtr').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.QTR); });
+      $('#radar-md-kur').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.KUR); });
+      $('#radar-md-sha').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.SHA); });
+      $('#radar-md-kcs').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.KCS); });
+      $('#radar-md-sbx').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.SBX); });
 
       // LeoLabs Commercial Radars
-      $('#radar-ll-all').click(function () { sensorManager.setSensor('LEO-LABS'); });
-      $('#radar-ll-msr').click(function () { sensorManager.setSensor(sensorManager.sensorList.MSR); });
-      $('#radar-ll-pfisr').click(function () { sensorManager.setSensor(sensorManager.sensorList.PFISR); });
-      $('#radar-ll-ksr').click(function () { sensorManager.setSensor(sensorManager.sensorList.KSR); });
+      $('#radar-ll-all').on("click", function () { sensorManager.setSensor('LEO-LABS'); });
+      $('#radar-ll-msr').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.MSR); });
+      $('#radar-ll-pfisr').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.PFISR); });
+      $('#radar-ll-ksr').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.KSR); });
 
       // ESOC Radars
-      $('#esoc-graves').click(function () { sensorManager.setSensor(sensorManager.sensorList.GRV); });
-      $('#esoc-tira').click(function () { sensorManager.setSensor(sensorManager.sensorList.TIR); });
-      $('#esoc-northern-cross').click(function () { sensorManager.setSensor(sensorManager.sensorList.NRC); });
-      $('#esoc-troodos').click(function () { sensorManager.setSensor(sensorManager.sensorList.TRO); });
-      $('#esoc-space-debris-telescope').click(function () { sensorManager.setSensor(sensorManager.sensorList.SDT); });
+      $('#esoc-graves').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.GRV); });
+      $('#esoc-tira').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.TIR); });
+      $('#esoc-northern-cross').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.NRC); });
+      $('#esoc-troodos').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.TRO); });
+      $('#esoc-space-debris-telescope').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.SDT); });
 
       // Russian Radars
-      $('#radar-rus-all').click(function () { sensorManager.setSensor('RUS-ALL'); });
-      $('#russian-armavir').click(function () { sensorManager.setSensor(sensorManager.sensorList.ARM); });
-      $('#russian-balkhash').click(function () { sensorManager.setSensor(sensorManager.sensorList.BAL); });
-      $('#russian-gantsevichi').click(function () { sensorManager.setSensor(sensorManager.sensorList.GAN); });
-      $('#russian-lekhtusi').click(function () { sensorManager.setSensor(sensorManager.sensorList.LEK); });
-      $('#russian-mishelevka-d').click(function () { sensorManager.setSensor(sensorManager.sensorList.MIS); });
-      $('#russian-olenegorsk').click(function () { sensorManager.setSensor(sensorManager.sensorList.OLE); });
-      $('#russian-pechora').click(function () { sensorManager.setSensor(sensorManager.sensorList.PEC); });
-      $('#russian-pionersky').click(function () { sensorManager.setSensor(sensorManager.sensorList.PIO); });
+      $('#radar-rus-all').on("click", function () { sensorManager.setSensor('RUS-ALL'); });
+      $('#russian-armavir').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.ARM); });
+      $('#russian-balkhash').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.BAL); });
+      $('#russian-gantsevichi').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.GAN); });
+      $('#russian-lekhtusi').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.LEK); });
+      $('#russian-mishelevka-d').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.MIS); });
+      $('#russian-olenegorsk').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.OLE); });
+      $('#russian-pechora').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.PEC); });
+      $('#russian-pionersky').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.PIO); });
 
       // Chinese Radars
-      $('#chinese-xuanhua').click(function () { sensorManager.setSensor(sensorManager.sensorList.XUA); });
+      $('#chinese-xuanhua').on("click", function () { sensorManager.setSensor(sensorManager.sensorList.XUA); });
 
-      $('#reset-sensor-button').click(function () {
+      $('#reset-sensor-button').on("click", function () {
         settingsManager.isForceColorScheme = false;
         $('#menu-sensor-info').addClass('bmenu-item-disabled');
         $('#menu-fov-bubble').addClass('bmenu-item-disabled');
@@ -1617,7 +1617,7 @@ var isAnalysisMenuOpen = false;
         _resetSensorSelected();
       });
 
-      $('#datetime-input-form').change(function (e) {
+      $('#datetime-input-form').on("change", function (e) {
         var selectedDate = $('#datetime-input-tb').datepicker('getDate');
         var today = new Date();
         var jday = 'JDAY: ' + timeManager.getDayOfYear(timeManager.propTime());
@@ -1635,7 +1635,7 @@ var isAnalysisMenuOpen = false;
         _updateNextPassOverlay(true);
         e.preventDefault();
       });
-      $('#findByLooks').submit(function (e) {
+      $('#findByLooks').on("submit", function (e) {
         var fblAzimuth = $('#fbl-azimuth').val();
         var fblElevation = $('#fbl-elevation').val();
         var fblRange = $('#fbl-range').val();
@@ -1656,7 +1656,7 @@ var isAnalysisMenuOpen = false;
         }
         e.preventDefault();
       });
-      $('#analysis-form').submit(function (e) {
+      $('#analysis-form').on("submit", function (e) {
         let chartType = $('#anal-type').val();
         let sat = $('#anal-sat').val();
         let sensor = satellite.currentSensor.shortName;
@@ -1667,7 +1667,7 @@ var isAnalysisMenuOpen = false;
         }
         e.preventDefault();
       });
-      $('#settings-form').change(function (e) {
+      $('#settings-form').on("change", function (e) {
         var isDMChecked = document.getElementById('settings-demo-mode').checked;
         var isSLMChecked = document.getElementById('settings-sat-label-mode').checked;
 
@@ -1681,7 +1681,7 @@ var isAnalysisMenuOpen = false;
           $('#settings-sat-label-mode').removeClass('lever:after');
         }
       });
-      $('#settings-form').submit(function (e) {
+      $('#settings-form').on("submit", function (e) {
         var isHOSChecked = document.getElementById('settings-hos').checked;
         var isDMChecked = document.getElementById('settings-demo-mode').checked;
         var isSLMChecked = document.getElementById('settings-sat-label-mode').checked;
@@ -1730,7 +1730,7 @@ var isAnalysisMenuOpen = false;
         e.preventDefault();
       });
 
-      $('#editSat-newTLE').click(function (e) {
+      $('#editSat-newTLE').on("click", function (e) {
         $('#loading-screen').fadeIn('slow', function () {
           // Update Satellite TLE so that Epoch is Now but ECI position is very very close
           var satId = satSet.getIdFromObjNum($('#es-scc').val());
@@ -1805,7 +1805,7 @@ var isAnalysisMenuOpen = false;
         });
       });
 
-      $('#editSat').submit(function (e) {
+      $('#editSat').on("submit", function (e) {
         $('#es-error').hide();
         var scc = $('#es-scc').val();
         var satId = satSet.getIdFromObjNum(scc);
@@ -1909,7 +1909,7 @@ var isAnalysisMenuOpen = false;
         e.preventDefault();
       });
 
-      $('#editSat-save').click(function (e) {
+      $('#editSat-save').on("click", function (e) {
         var scc = $('#es-scc').val();
         var satId = satSet.getIdFromObjNum(scc);
         var sat = satSet.getSatExtraOnly(satId);
@@ -1923,11 +1923,11 @@ var isAnalysisMenuOpen = false;
         e.preventDefault();
       });
 
-      $('#editSat-open').click(function (e) {
+      $('#editSat-open').on("click", function (e) {
         $('#editSat-file').trigger('click');
       });
 
-      $('#editSat-file').change(function (evt) {
+      $('#editSat-file').on("change", function (evt) {
         if (!window.FileReader) return; // Browser is not compatible
 
         var reader = new FileReader();
@@ -1962,7 +1962,7 @@ var isAnalysisMenuOpen = false;
         evt.preventDefault();
       });
 
-      $('#es-error').click(function () {
+      $('#es-error').on("click", function () {
         $('#es-error').hide();
       });
 
@@ -2029,7 +2029,7 @@ var isAnalysisMenuOpen = false;
         $('#watchlist-new').val(''); // Clear the search box after enter pressed/selected
       });
       // Enter pressed/selected on watchlist menu
-      $('#watchlist-content').submit(function (e) {
+      $('#watchlist-content').on("submit", function (e) {
         var satId = satSet.getIdFromObjNum(_pad0($('#watchlist-new').val(), 5));
         var duplicate = false;
         for (var i = 0; i < watchlistList.length; i++) { // No duplicates
@@ -2046,7 +2046,7 @@ var isAnalysisMenuOpen = false;
         $('#watchlist-new').val(''); // Clear the search box after enter pressed/selected
         e.preventDefault();
       });
-      $('#watchlist-save').click(function (e) {
+      $('#watchlist-save').on("click", function (e) {
         var saveWatchlist = [];
         for (var i = 0; i < watchlistList.length; i++) {
           var sat = satSet.getSatExtraOnly(watchlistList[i]);
@@ -2057,10 +2057,10 @@ var isAnalysisMenuOpen = false;
         saveAs(blob, 'watchlist.json');
         e.preventDefault();
       });
-      $('#watchlist-open').click(function (e) {
+      $('#watchlist-open').on("click", function (e) {
         $('#watchlist-file').trigger('click');
       });
-      $('#watchlist-file').change(function (evt) {
+      $('#watchlist-file').on("change", function (evt) {
         if (!window.FileReader) return; // Browser is not compatible
 
         var reader = new FileReader();
@@ -2094,7 +2094,7 @@ var isAnalysisMenuOpen = false;
         evt.preventDefault();
       });
 
-      $('#newLaunch').submit(function (e) {
+      $('#newLaunch').on("submit", function (e) {
         $('#loading-screen').fadeIn('slow', function () {
           $('#nl-error').hide();
           var scc = $('#nl-scc').val();
@@ -2158,11 +2158,11 @@ var isAnalysisMenuOpen = false;
         e.preventDefault();
       });
 
-      $('#nl-error').click(function () {
+      $('#nl-error').on("click", function () {
         $('#nl-error').hide();
       });
 
-      $('#breakup').submit(function (e) {
+      $('#breakup').on("submit", function (e) {
         $('#loading-screen').fadeIn('slow', function () {
           var satId = satSet.getIdFromObjNum($('#hc-scc').val());
           var mainsat = satSet.getSat(satId);
@@ -2285,7 +2285,7 @@ var isAnalysisMenuOpen = false;
         e.preventDefault();
       });
 
-      $('#missile').submit(function (e) {
+      $('#missile').on("submit", function (e) {
         $('#ms-error').hide();
         var type = $('#ms-type').val() * 1;
         var attacker = $('#ms-attacker').val() * 1;
@@ -2360,15 +2360,15 @@ var isAnalysisMenuOpen = false;
         e.preventDefault();
       });
 
-      $('#ms-error').click(function () {
+      $('#ms-error').on("click", function () {
         $('#ms-error').hide();
       });
 
-      $('#fbl-error').click(function () {
+      $('#fbl-error').on("click", function () {
         $('#fbl-error').hide();
       });
 
-      $('#missile').change(function (e) {
+      $('#missile').on("change", function (e) {
         if ($('#ms-type').val() * 1 !== 0) {
           $('#ms-custom-opt').hide();
         } else {
@@ -2376,7 +2376,7 @@ var isAnalysisMenuOpen = false;
         }
       });
 
-      $('#cs-telescope').click(function (e) {
+      $('#cs-telescope').on("click", function (e) {
         if ($('#cs-telescope').is(':checked')) {
           $('#cs-minaz').attr('disabled', true);
           $('#cs-maxaz').attr('disabled', true);
@@ -2420,7 +2420,7 @@ var isAnalysisMenuOpen = false;
         }
       });
 
-      $('#customSensor').submit(function (e) {
+      $('#customSensor').on("submit", function (e) {
         $('#menu-sensor-info').removeClass('bmenu-item-disabled');
         $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
         $('#menu-surveillance').removeClass('bmenu-item-disabled');
@@ -2486,7 +2486,7 @@ var isAnalysisMenuOpen = false;
         e.preventDefault();
       });
 
-      $('#dops-form').submit(function (e) {
+      $('#dops-form').on("submit", function (e) {
         uiController.hideSideMenus();
         isDOPMenuOpen = true;
         $('#loading-screen').fadeIn('slow', function () {
@@ -3603,20 +3603,20 @@ var isAnalysisMenuOpen = false;
     };
 
     var isCurrentlyTyping = false;
-    $('#search').focus(function(){
+    $('#search').on("focus", function(){
       db.log("$('#search').focus");
       isCurrentlyTyping = true;
     });
-    $('#ui-wrapper').focusin(function(){
+    $('#ui-wrapper').on("focusin", function(){
       db.log("$('#ui-wrapper').focusin");
       isCurrentlyTyping = true;
     });
 
-    $('#search').blur(function(){
+    $('#search').on("blur", function(){
       db.log("('#search').blur");
       isCurrentlyTyping = false;
     });
-    $('#ui-wrapper').focusout(function(){
+    $('#ui-wrapper').on("focusout", function(){
       db.log("('#ui-wrapper').focusout");
       isCurrentlyTyping = false;
     });
@@ -4141,7 +4141,7 @@ var isAnalysisMenuOpen = false;
     }
   }
 
-  $('#satcom-inner-menu>ul>li').click(function () {
+  $('#satcom-inner-menu>ul>li').on("click", function () {
     selectSat(-1); // clear selected sat
     var satcomName = $(this).data('satcom');
     switch (satcomName) {
@@ -4166,7 +4166,7 @@ var isAnalysisMenuOpen = false;
     }
   });
 
-  $('#colors-menu>ul>li').click(function () {
+  $('#colors-menu>ul>li').on("click", function () {
     selectSat(-1); // clear selected sat
     var colorName = $(this).data('color');
     if (colorName !== 'sunlight') {
@@ -4487,48 +4487,48 @@ var isAnalysisMenuOpen = false;
     settingsManager.currentLegend = menu;
   };
 
-  $('#editSat>div>input').bind({
+  $('#editSat>div>input').on({
     keydown: function (e) {
       _validateNumOnly(e);
     }
   });
 
-  $('#es-ecen').bind({
+  $('#es-ecen').on({
     keydown: function (e) {
       if (e.keyCode === 190) e.preventDefault();
     }
   });
 
-  $('#es-day').keyup(function () {
+  $('#es-day').on("keyup", function () {
     if ($('#es-day').val() < 0) $('#es-day').val('000.00000000');
     if ($('#es-day').val() > 367) $('#es-day').val('365.00000000');
   });
-  $('#es-inc').keyup(function () {
+  $('#es-inc').on("keyup", function () {
     if ($('#es-inc').val() < 0) $('#es-inc').val('000.0000');
     if ($('#es-inc').val() > 180) $('#es-inc').val('180.0000');
   });
-  $('#es-rasc').keyup(function () {
+  $('#es-rasc').on("keyup", function () {
     if ($('#es-rasc').val() < 0) $('#es-rasc').val('000.0000');
     if ($('#es-rasc').val() > 360) $('#es-rasc').val('360.0000');
   });
-  $('#es-meanmo').keyup(function () {
+  $('#es-meanmo').on("keyup", function () {
     if ($('#es-meanmo').val() < 0) $('#es-meanmo').val('00.00000000');
     if ($('#es-meanmo').val() > 18) $('#es-meanmo').val('18.00000000');
   });
-  $('#es-argPe').keyup(function () {
+  $('#es-argPe').on("keyup", function () {
     if ($('#es-argPe').val() < 0) $('#es-argPe').val('000.0000');
     if ($('#es-argPe').val() > 360) $('#es-argPe').val('360.0000');
   });
-  $('#es-meana').keyup(function () {
+  $('#es-meana').on("keyup", function () {
     if ($('#es-meana').val() < 0) $('#es-meana').val('000.0000');
     if ($('#es-meana').val() > 360) $('#es-meana').val('360.0000');
   });
 
-  $('#ms-lat').keyup(function () {
+  $('#ms-lat').on("keyup", function () {
     if ($('#ms-lat').val() < -90) $('#ms-lat').val('-90.000');
     if ($('#ms-lat').val() > 90) $('#ms-lat').val('90.000');
   });
-  $('#ms-lon').keyup(function () {
+  $('#ms-lon').on("keyup", function () {
     if ($('#ms-lon').val() < -180) $('#ms-lon').val('-180.000');
     if ($('#ms-lon').val() > 180) $('#ms-lon').val('180.000');
   });
@@ -4552,7 +4552,7 @@ var isAnalysisMenuOpen = false;
   };
 
   var $search = $('#search');
-  $('#country-menu>ul>li').click(function () {
+  $('#country-menu>ul>li').on("click", function () {
     var groupName = $(this).data('group');
     switch (groupName) {
       case 'Canada':
@@ -4603,7 +4603,7 @@ var isAnalysisMenuOpen = false;
     }
     _groupSelected(groupName);
   });
-  $('#constellation-menu>ul>li').click(function () {
+  $('#constellation-menu>ul>li').on("click", function () {
     var groupName = $(this).data('group');
     switch (groupName) {
       case 'SpaceStations':

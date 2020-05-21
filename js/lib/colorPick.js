@@ -64,22 +64,22 @@
 
             $.proxy($.fn.colorPick.defaults.onColorSelected, this)();
 
-            this.element.click(function(event) {
+            this.element.on("click", function(event) {
                 event.preventDefault();
                 self.show(event.pageX, event.pageY);
 
                 $('.customColorHash').val(self.color);
 
-                $('.colorPickButton').click(function(event) {
+                $('.colorPickButton').on("click", function(event) {
 					self.color = $(event.target).attr('hexValue');
 					self.appendToStorage($(event.target).attr('hexValue'));
 					self.hide();
 					$.proxy(self.options.onColorSelected, self)();
 					return false;
             	});
-                $('.customColorHash').click(function(event) {
+                $('.customColorHash').on("click", function(event) {
                     return false;
-                }).keyup(function (event) {
+                }).on("keyup", function (event) {
                     var hash = $(this).val();
                     if (hash.indexOf('#') !== 0) {
                         hash = "#"+hash;
@@ -95,7 +95,7 @@
                 });
 
                 return false;
-            }).blur(function() {
+            }).on("blur", function() {
                 self.element.val(self.color);
                 $.proxy(self.options.onColorSelected, self)();
                 self.hide();

@@ -17,7 +17,7 @@ $(document).ready(function () {
     updateSelectedObjectInfo();
   }
 
-  $('#editor-scc').bind('input', function(){ updateSelectedObjectInfo(); });
+  $('#editor-scc').on('input', function(){ updateSelectedObjectInfo(); });
 
   function updateSelectedObjectInfo () {
     if (typeof satInfoList === 'undefined') { console.error('No satInfo.js File'); return; }
@@ -69,17 +69,17 @@ $(document).ready(function () {
     }
   }
 
-  $('#editor-ON').bind('input', function(){ satInfoChange(); });
-  $('#editor-C').bind('input', function(){ satInfoChange(); });
-  $('#editor-LV').bind('input', function(){ satInfoChange(); });
-  $('#editor-LS').bind('input', function(){ satInfoChange(); });
-  $('#editor-URL').bind('input', function(){ satInfoChange(); });
-  $('#editor-TTP').bind('input', function(){ satInfoChange(); });
-  $('#editor-fmissed').bind('input', function(){ satInfoChange(); });
-  $('#editor-oRPO').bind('input', function(){ satInfoChange(); });
-  $('#editor-constellation').bind('input', function(){ satInfoChange(); });
-  $('#editor-associates').bind('input', function(){ satInfoChange(); });
-  $('#editor-maneuver').bind('input', function(){ satInfoChange(); });
+  $('#editor-ON').on('input', function(){ satInfoChange(); });
+  $('#editor-C').on('input', function(){ satInfoChange(); });
+  $('#editor-LV').on('input', function(){ satInfoChange(); });
+  $('#editor-LS').on('input', function(){ satInfoChange(); });
+  $('#editor-URL').on('input', function(){ satInfoChange(); });
+  $('#editor-TTP').on('input', function(){ satInfoChange(); });
+  $('#editor-fmissed').on('input', function(){ satInfoChange(); });
+  $('#editor-oRPO').on('input', function(){ satInfoChange(); });
+  $('#editor-constellation').on('input', function(){ satInfoChange(); });
+  $('#editor-associates').on('input', function(){ satInfoChange(); });
+  $('#editor-maneuver').on('input', function(){ satInfoChange(); });
 
   function satInfoChange () {
     var isFoundMatch = false;
@@ -127,7 +127,7 @@ $(document).ready(function () {
     }
   }
 
-  $('#editor-save').click(function (e) {
+  $('#editor-save').on("click", function (e) {
     satInfoChange();
     var variable = 'var satInfoList = ' + JSON.stringify(satInfoList);
     var blob = new Blob([variable], {type: 'octet/stream'});
@@ -135,7 +135,7 @@ $(document).ready(function () {
     e.preventDefault();
   });
 
-  $('#editor-open').click(function (e) {
+  $('#editor-open').on("click", function (e) {
     $('#editor-file').trigger('click');
   });
   $('#editor-file').change(function (evt) {
@@ -167,7 +167,7 @@ $(document).ready(function () {
     evt.preventDefault();
   });
 
-  $('#editor-open2').click(function (e) {
+  $('#editor-open2').on("click", function (e) {
     $('#editor-file2').trigger('click');
   });
   $('#editor-file2').change(function (evt) {

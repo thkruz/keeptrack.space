@@ -16,7 +16,7 @@ importScripts('lib/numeric.js'); // Used for sunlight calculations
 importScripts('lib/meuusjs.1.0.3.min.js'); // Used for sunlight calculations
 
 // /////////////////////////////////////////////
-// TODO: Clean the top of sat-cruncher.js up, it's a mess
+// TODO: Clean top of sat-cruncher.js up, it's a mess
 // the various variable delcarations need to be organized
 
 /** CONSTANTS */

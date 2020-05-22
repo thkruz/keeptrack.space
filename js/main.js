@@ -586,7 +586,7 @@ var drawLoopCallback;
             pitchRotate = ((-1 * satellite.currentSensor.lat) * DEG2RAD);
             yawRotate = ((90 - satellite.currentSensor.long) * DEG2RAD) - satPos.gmst;
 
-            // TODO: Calculate Elevation for cameraType.ASTRONOMY
+            // TODO: Calculate elevation for cameraType.ASTRONOMY
             // Idealy the astronomy view would feel more natural and tell you what
             // az/el you are currently looking at.
 
@@ -1472,7 +1472,7 @@ function selectSat (satId) {
     // }
   }
 
-  // TODO: Make updateUrl a setting that is disabled by default
+  // TODO: Make updateUrl() a setting that is disabled by default
   // This can be very annoying, especially when using modes like trusat
   updateUrl();
 }

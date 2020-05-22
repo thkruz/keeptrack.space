@@ -3716,7 +3716,7 @@ var isAnalysisMenuOpen = false;
         if (!isFPSSideSpeedLock) FPSSideSpeed = 0;
         if (!isFPSVertSpeedLock) FPSVertSpeed = 0;
       }
-      // TODO: evt.key === 'ShiftRight' Alternative for IE?
+      // TODO: Find evt.key === 'ShiftRight' alternative for IE
       // Applies to _keyDownHandler as well
       if (evt.key === 'ShiftRight') {
         FPSRun = 1;
@@ -4820,7 +4820,7 @@ var isAnalysisMenuOpen = false;
   };
 
   // c is string name of star
-  // TODO: uiController.panToStar needs finished
+  // TODO: uiController.panToStar needs to be finished
   // Yaw needs fixed. Needs to incorporate a time calculation
   uiController.panToStar = function (c) {
     db.log('uiController.panToStar');

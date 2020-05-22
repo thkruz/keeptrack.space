@@ -104,7 +104,7 @@ or mirrored at any other location without the express written permission of the 
     $('#sensor-maxrange').html(satellite.currentSensor.obsmaxrange);
   };
 
-  // TODO: UI element changes and references should be moved to ui.js
+  // TODO: UI element changes/references should be moved to ui.js
   // There are a series of referecnes, especially in satellite.obs, to ui elements.
   // These should be moved to ui.js and then called before/after calling satellite.setobs
   satellite.setobs = function (sensor, reset) {

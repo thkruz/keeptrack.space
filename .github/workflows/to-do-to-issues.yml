@@ -1,9 +1,0 @@
-name: Sync TODO comments with Issues
-
-on: push
-jobs:
-  security:
-    runs-on: ubuntu-latest
-    steps:
-      - name: todo-actions
-        uses: dtinth/todo-actions@v0.2.0

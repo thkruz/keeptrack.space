@@ -3,8 +3,6 @@
 (c) 2016-2020, Theodore Kruczek
 (c) 2015-2016, James Yoder
 
-main.js is the primary javascript file for keeptrack.space. It manages all user
-interaction with the application.
 http://keeptrack.space
 
 Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/

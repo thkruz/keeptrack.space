@@ -1,23 +1,27 @@
-/* global
+/* /////////////////////////////////////////////////////////////////////////////
 
-    satellite
-    importScripts
-    postMessage
-    onmessage: true
+(c) 2016-2020, Theodore Kruczek
+(c) 2015-2016, James Yoder
 
-*/
-/* exported
+http://keeptrack.space
 
-    onmessage
+Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
+under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
 
-*/
+All additions and modifications of original code is Copyright © 2016-2020 by
+Theodore Kruczek. All rights reserved. No part of this web site may be reproduced,
+published, distributed, displayed, performed, copied or stored for public or private
+use, without written permission of the author.
+
+No part of this code may be modified or changed or exploited in any way used
+for derivative works, or offered for sale, or used to construct any kind of database
+or mirrored at any other location without the express written permission of the author.
+
+///////////////////////////////////////////////////////////////////////////// */
+
 importScripts('lib/satellite.js');
 importScripts('lib/numeric.js'); // Used for sunlight calculations
 importScripts('lib/meuusjs.1.0.3.min.js'); // Used for sunlight calculations
-
-// /////////////////////////////////////////////
-// TODO: Clean top of sat-cruncher.js up, it's a mess
-// the various variable delcarations need to be organized
 
 /** CONSTANTS */
 const TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
@@ -26,73 +30,72 @@ const RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
 const RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
 const RADIUS_OF_SUN = 695700;       // Radius of the Sun in kilometers
 const STAR_DISTANCE = 200000;        // Artificial Star Distance - Lower numberrReduces webgl depth buffer
-let globalPropagationRate = 1000;
-let globalPropagationRateMultiplier = 1;
 
 /** ARRAYS */
-var satCache = [];                // Cache of Satellite Data from TLE.json and Static Data from variable.js
-var sensorMarkerArray = [0];
-var satPos, satVel;               // Array of current Satellite and Static Positions and Velocities
-var satInView;                    // Array of booleans showing if current Satellite is in view of Sensor
-var satInSun;                    // Array of booleans showing if current Satellite is in sunlight
+var satCache = [];            // Cache of Satellite Data from TLE.json and Static Data from variable.js
+var sensorMarkerArray = [0];  // Array of Markers used to show sensor fence and FOV
+var satPos, satVel;           // Array of current Satellite and Static Positions and Velocities
+var satInView;                // Array of booleans showing if current Satellite is in view of Sensor
+var satInSun;                 // Array of booleans showing if current Satellite is in sunlight
+var satelliteSelected = [-1]; // Array used to determine which satellites are selected
 
-var satelliteSelected = [-1];
-var selectedSatFOV = 90; // FOV in Degrees
+/** TIME VARIABLES */
+let globalPropagationRate = 1000;        // Limits how often the propagation loop runs
+let globalPropagationRateMultiplier = 1; // Used to slow down propagation rate on slow computers
+var propagationRunning = false;          // Prevent Propagation From Running Twice
+var divisor = 1;                         // When running at high speeds, allow faster propagation
+var propOffset = 0;                      // offset varting us propagate in the future (or past)
+var propRate = 1;                        // vars us run time faster (or slower) than normal
+var propRealTime = Date.now();           // vars us run time faster (or slower) than normal
 
-var isShowFOVBubble = false;
-var isShowSurvFence = false;
+/** Settings */
+var selectedSatFOV = 90;      // FOV in Degrees
+var isShowFOVBubble = false;  // Flag for if FOV bubble is shown
+var isShowSurvFence = false;  // Flag for if fence markers are shown
 var isResetFOVBubble = false;
 var isShowSatOverfly = false;
 var isResetSatOverfly = false;
 var isMultiSensor = false;
 var isIgnoreNonRadar = true;
-var planetariumView = false;
 var isSunlightView = false;
 var isLowPerf = false;
-
-var resetSunlight = false;
-var resetMarker = false;
-var resetInView = false;
+var isResetMarker = false;
+var isResetInView = false;
+var isPlanetariumView = false; // Remove
+var isResetSunlight = false;  // Remove
 
 /** OBSERVER VARIABLES */
 var sensor = {};
 var mSensor = {};
-var defaultGd = {
+sensor.defaultGd = {
   lat: null,
   longitude: 0,
   latitude: 0,
   height: 0
 };
-sensor.defaultGd = defaultGd;
 sensor.observerGd = defaultGd;
-var propagationRunning = false;
-var divisor = 1;
 
-/** TIME VARIABLES */
-var propOffset = 0;                 // offset varting us propagate in the future (or past)
-var propRate = 1;                   // vars us run time faster (or slower) than normal
-var propRealTime = Date.now();      // vars us run time faster (or slower) than normal
-
+// Handles Incomming Messages to sat-cruncher from main thread
 onmessage = function (m) {
   propRealTime = Date.now();
 
-  if (m.data.planetariumView) {
-    planetariumView = true;
+  if (m.data.isPlanetariumView) {
+    isPlanetariumView = true;
   }
-  if (m.data.nonPlanetariumView){
-    planetariumView = false;
+  if (m.data.nonisPlanetariumView){
+    isPlanetariumView = false;
   }
 
   if (m.data.isSunlightView) {
     isSunlightView = m.data.isSunlightView;
-    if (isSunlightView == false) resetSunlight = true;
+    if (isSunlightView == false) isResetSunlight = true;
   }
 
   if (m.data.satelliteSelected){
     satelliteSelected = m.data.satelliteSelected;
     if (satelliteSelected[0] === -1) {
       isResetSatOverfly = true;
-      if (resetMarker == false) resetMarker = true;
+      if (isResetMarker == false) isResetMarker = true;
     }
   }
 
@@ -116,23 +119,23 @@ onmessage = function (m) {
   if (m.data.isShowSatOverfly === 'reset') {
     isResetSatOverfly = true;
     isShowSatOverfly = false;
-    if (resetMarker == false) resetMarker = true;
+    if (isResetMarker == false) isResetMarker = true;
   }
 
   if (m.data.isShowFOVBubble === 'enable') { isShowFOVBubble = true; }
   if (m.data.isShowFOVBubble === 'reset') {
     isResetFOVBubble = true;
     isShowFOVBubble = false;
-    if (resetMarker == false) resetMarker = true;
+    if (isResetMarker == false) isResetMarker = true;
   }
 
   if (m.data.isShowSurvFence === 'enable') {
     isShowSurvFence = true;
-    if (resetMarker == false) resetMarker = true;
+    if (isResetMarker == false) isResetMarker = true;
  }
   if (m.data.isShowSurvFence === 'disable') {
     isShowSurvFence = false;
-    if (resetMarker == false) resetMarker = true;
+    if (isResetMarker == false) isResetMarker = true;
   }
 
   // ////////////////////////////////
@@ -142,15 +145,15 @@ onmessage = function (m) {
     mSensor = m.data.sensor;
     sensor = m.data.sensor;
     globalPropagationRate = 2000;
-    if (resetInView == false) resetInView = true;
+    if (isResetInView == false) isResetInView = true;
   } else if (m.data.sensor) {
     sensor = m.data.sensor;
     if (m.data.setlatlong) {
       if (m.data.resetObserverGd) {
         globalPropagationRate = 1000;
-        sensor.observerGd = defaultGd;
+        sensor.observerGd = sensor.defaultGd;
         mSensor = {};
-        if (resetInView == false) resetInView = true;
+        if (isResetInView == false) isResetInView = true;
       } else {
         globalPropagationRate = 2000;
         sensor.observerGd = {
@@ -158,7 +161,7 @@ onmessage = function (m) {
           latitude: m.data.sensor.lat * DEG2RAD,
           height: m.data.sensor.obshei * 1 // Convert from string
         };
-        if (resetInView == false) resetInView = true;
+        if (isResetInView == false) isResetInView = true;
       }
     }
     isMultiSensor = false;
@@ -255,44 +258,43 @@ onmessage = function (m) {
   }
 };
 
-    var geodeticCoords;
-    var siteXYZ;
-    var sitex, sitey, sitez;
-    var slat, slon, clat, clon;
-    var azRad, elRad;
-    var south, east, zenith;
-    var x, y, z;
-
+// Prevent Memory Leak by declaring variables outside of function
+var geodeticCoords;
+var siteXYZ;
+var sitex, sitey, sitez;
+var slat, slon, clat, clon;
+var azRad, elRad;
+var south, east, zenith;
+var x, y, z;
 function _lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long, obs_alt) {
+  // site ecef in meters
+  geodeticCoords = {};
+  geodeticCoords.latitude = obs_lat;
+  geodeticCoords.longitude = obs_long;
+  geodeticCoords.height = obs_alt;
 
-    // site ecef in meters
-    geodeticCoords = {};
-    geodeticCoords.latitude = obs_lat;
-    geodeticCoords.longitude = obs_long;
-    geodeticCoords.height = obs_alt;
+  siteXYZ = satellite.geodeticToEcf(geodeticCoords);
+  sitex = siteXYZ.x;
+  sitey = siteXYZ.y;
+  sitez = siteXYZ.z;
 
-    siteXYZ = satellite.geodeticToEcf(geodeticCoords);
-    sitex = siteXYZ.x;
-    sitey = siteXYZ.y;
-    sitez = siteXYZ.z;
+  // some needed calculations
+  slat = Math.sin(obs_lat);
+  slon = Math.sin(obs_long);
+  clat = Math.cos(obs_lat);
+  clon = Math.cos(obs_long);
 
-    // some needed calculations
-    slat = Math.sin(obs_lat);
-    slon = Math.sin(obs_long);
-    clat = Math.cos(obs_lat);
-    clon = Math.cos(obs_long);
+  azRad = DEG2RAD * azimuthDeg;
+  elRad = DEG2RAD * elevationDeg;
 
-    azRad = DEG2RAD * azimuthDeg;
-    elRad = DEG2RAD * elevationDeg;
+  // az,el,range to sez convertion
+  south  = -slantRange * Math.cos(elRad) * Math.cos(azRad);
+  east   =  slantRange * Math.cos(elRad) * Math.sin(azRad);
+  zenith =  slantRange * Math.sin(elRad);
 
-    // az,el,range to sez convertion
-    south  = -slantRange * Math.cos(elRad) * Math.cos(azRad);
-    east   =  slantRange * Math.cos(elRad) * Math.sin(azRad);
-    zenith =  slantRange * Math.sin(elRad);
-
-    x = ( slat * clon * south) + (-slon * east) + (clat * clon * zenith) + sitex;
-    y = ( slat * slon * south) + ( clon * east) + (clat * slon * zenith) + sitey;
-    z = (-clat *        south) + ( slat * zenith) + sitez;
+  x = ( slat * clon * south) + (-slon * east) + (clat * clon * zenith) + sitex;
+  y = ( slat * slon * south) + ( clon * east) + (clat * slon * zenith) + sitey;
+  z = (-clat *        south) + ( slat * zenith) + sitez;
 
   return {'x': x, 'y': y, 'z': z};
 }
@@ -307,7 +309,6 @@ function _lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_lon
 // //////////////////////////////////////////////////////////////////////////
 function propagateCruncher () {
   // OPTIMIZE: 25.9ms
-
   // var startTime1 = performance.now();
   // numOfCrunches++;
   propagationRunning = true;
@@ -346,7 +347,7 @@ function propagateCruncher () {
 
     // RAE to ECI
     sunECI = satellite.ecfToEci(_lookAnglesToEcf(sunAz, sunEl, sunRange, 0, 0, 0), gmst);
-    if ((sensor.observerGd !== defaultGd) && ((sensor.type === 'Optical') || (sensor.type === 'Observer')) && (sunElRel > -6)) {
+    if ((sensor.observerGd !== sensor.defaultGd) && ((sensor.type === 'Optical') || (sensor.type === 'Observer')) && (sunElRel > -6)) {
       isSunExclusion = true;
     } else {
       isSunExclusion = false;
@@ -407,7 +408,7 @@ function propagateCruncher () {
 
         // Skip Calculating Lookangles if No Sensor is Selected
         if (!isSensorChecked) {
-          if (sensor.observerGd !== defaultGd && !isMultiSensor) {
+          if (sensor.observerGd !== sensor.defaultGd && !isMultiSensor) {
             positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
             lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
             azimuth = lookangles.azimuth;
@@ -464,7 +465,7 @@ function propagateCruncher () {
         }
       }
 
-      if (sensor.observerGd !== defaultGd && !isSunExclusion) {
+      if (sensor.observerGd !== sensor.defaultGd && !isSunExclusion) {
         if (isMultiSensor) {
           for (s = 0; s < mSensor.length; s++) {
             if (!(sensor.type == 'Optical' && satInSun[i] == 0)) {
@@ -609,7 +610,7 @@ function propagateCruncher () {
       // //////////////////////////////////
       // FOV Bubble Drawing Code - START
       // //////////////////////////////////
-      if (!isMultiSensor && sensor.observerGd !== defaultGd) {
+      if (!isMultiSensor && sensor.observerGd !== sensor.defaultGd) {
         mSensor[0] = sensor;
         mSensor.length = 1;
       }
@@ -1052,91 +1053,16 @@ function propagateCruncher () {
     len -= fieldOfViewSetLength;
   }
 
-
-    postMessage({
-      satPos: satPos.buffer,
-      satVel: satVel.buffer,
-      satInView: satInView.buffer,
-      satInSun: satInSun.buffer,
-      sensorMarkerArray: sensorMarkerArray}
-    );
-
-  // Overhead Seems Very Minimal
-
-  // // If anything changed - send all info
-  // if (resetInView || resetMarker || resetSunlight) {
-  //   postMessage({
-  //     satPos: satPos.buffer,
-  //     satVel: satVel.buffer,
-  //     satInView: satInView.buffer,
-  //     satInSun: satInSun.buffer,
-  //     sensorMarkerArray: sensorMarkerArray}
-  //   );
-  // // If sunlight on, sensor selected and markers in use - send all info
-  // } else if (isSunlightView &&
-  //           (isShowFOVBubble || isShowSurvFence || isShowSatOverfly) &&
-  //           (sensor.observerGd !== defaultGd || isMultiSensor)) {
-  //   postMessage({
-  //     satPos: satPos.buffer,
-  //     satVel: satVel.buffer,
-  //     satInView: satInView.buffer,
-  //     satInSun: satInSun.buffer,
-  //     sensorMarkerArray: sensorMarkerArray}
-  //   );
-  // // If sunlight ON, makers OFF, sensor ON - don't send markers
-  // } else if (isSunlightView &&
-  //           !(isShowFOVBubble || isShowSurvFence || isShowSatOverfly) &&
-  //           (sensor.observerGd !== defaultGd || isMultiSensor)) {
-  //   postMessage({
-  //     satPos: satPos.buffer,
-  //     satVel: satVel.buffer,
-  //     satInView: satInView.buffer,
-  //     satInSun: satInSun.buffer}
-  //   );
-  // } else if (isSunlightView &&
-  //           !(isShowFOVBubble || isShowSurvFence || isShowSatOverfly) &&
-  //           !(sensor.observerGd !== defaultGd || isMultiSensor)) {
-  //   postMessage({
-  //     satPos: satPos.buffer,
-  //     satVel: satVel.buffer,
-  //     satInSun: satInSun.buffer}
-  //   );
-  // } else if (!isSunlightView &&
-  //           !(isShowFOVBubble || isShowSurvFence || isShowSatOverfly) &&
-  //           (sensor.observerGd !== defaultGd || isMultiSensor)) {
-  //   postMessage({
-  //     satPos: satPos.buffer,
-  //     satVel: satVel.buffer,
-  //     satInView: satInView.buffer}
-  //   );
-  // } else if (!isSunlightView &&
-  //           (isShowFOVBubble || isShowSurvFence || isShowSatOverfly) &&
-  //           (sensor.observerGd !== defaultGd || isMultiSensor)) {
-  //   postMessage({
-  //     satPos: satPos.buffer,
-  //     satVel: satVel.buffer,
-  //     satInView: satInView.buffer,
-  //     sensorMarkerArray: sensorMarkerArray}
-  //   );
-  // } else if (!isSunlightView &&
-  //           (isShowFOVBubble || isShowSurvFence || isShowSatOverfly) &&
-  //           !(sensor.observerGd !== defaultGd || isMultiSensor)) {
-  //   postMessage({
-  //     satPos: satPos.buffer,
-  //     satVel: satVel.buffer,
-  //     sensorMarkerArray: sensorMarkerArray}
-  //   );
-  // } else {
-  //    postMessage({
-  //      satPos: satPos.buffer,
-  //      satVel: satVel.buffer}
-  //    );
-  // }
+  postMessage({
+    satPos: satPos.buffer,
+    satVel: satVel.buffer,
+    satInView: satInView.buffer,
+    satInSun: satInSun.buffer,
+    sensorMarkerArray: sensorMarkerArray}
+  );
 
   // The longer the delay the more jitter at higher speeds of propagation
   setTimeout(function () {propagateCruncher();}, 1 * globalPropagationRate * globalPropagationRateMultiplier / divisor);
-
-
   // //////////////////////////////////////////////////////////////////////////
   // Benchmarking
   //
@@ -1178,7 +1104,6 @@ function propTime () {
  Based on SunCalc, (c) 2011-2013, Vladimir Agafonkin
  https://github.com/mourner/suncalc
 */
-
 var StarCalc = {};
 
 var PI   = Math.PI,
@@ -1190,12 +1115,10 @@ var PI   = Math.PI,
   acos = Math.acos,
   rad  = PI / 180;
 
-
 // date/time constants and conversions
-
 var dayMs = 1000 * 60 * 60 * 24,
-  J1970 = 2440588,
-  J2000 = 2451545;
+J1970 = 2440588,
+J2000 = 2451545;
 
 function toJulian(date) {
   return date.valueOf() / dayMs - 0.5 + J1970;
@@ -1203,10 +1126,7 @@ function toJulian(date) {
 function toDays(date) {
   return toJulian(date) - J2000;
 }
-
-
 // general calculations for position
-
 function getAzimuth(H, phi, dec) {
   return atan(sin(H), cos(H) * sin(phi) - tan(dec) * cos(phi));
 }

@@ -54,7 +54,6 @@ nextLaunchManager.showTable = function () {
     tdC.appendChild(document.createTextNode('Country'));
     tdC.setAttribute('style', 'text-decoration: underline');
 
-    console.log(launchList);
     for (let i = 0; i < launchList.length; i++) {
       let tr = tbl.insertRow();
 
@@ -99,7 +98,6 @@ nextLaunchManager.showTable = function () {
       if (typeof launchList[i].locationURL == 'undefined' || launchList[i].locationURL == '') {
         locationHTML = `${_truncateString(launchList[i].location,25)}`;
       } else {
-        console.log(launchList[i].locationURL);
         locationHTML = `<a class='iframe' href="${launchList[i].locationURL}">${_truncateString(launchList[i].location,25)}</a>`;
       }
 

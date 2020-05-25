@@ -67,12 +67,13 @@ var isResetSunlight = false;  // Remove
 /** OBSERVER VARIABLES */
 var sensor = {};
 var mSensor = {};
-sensor.defaultGd = {
+var defaultGd = {
   lat: null,
   longitude: 0,
   latitude: 0,
   height: 0
 };
+sensor.defaultGd = defaultGd;
 sensor.observerGd = defaultGd;
 
 // Handles Incomming Messages to sat-cruncher from main thread
@@ -151,7 +152,7 @@ onmessage = function (m) {
     if (m.data.setlatlong) {
       if (m.data.resetObserverGd) {
         globalPropagationRate = 1000;
-        sensor.observerGd = sensor.defaultGd;
+        sensor.observerGd = defaultGd;
         mSensor = {};
         if (isResetInView == false) isResetInView = true;
       } else {
@@ -347,7 +348,7 @@ function propagateCruncher () {
 
     // RAE to ECI
     sunECI = satellite.ecfToEci(_lookAnglesToEcf(sunAz, sunEl, sunRange, 0, 0, 0), gmst);
-    if ((sensor.observerGd !== sensor.defaultGd) && ((sensor.type === 'Optical') || (sensor.type === 'Observer')) && (sunElRel > -6)) {
+    if ((sensor.observerGd !== defaultGd) && ((sensor.type === 'Optical') || (sensor.type === 'Observer')) && (sunElRel > -6)) {
       isSunExclusion = true;
     } else {
       isSunExclusion = false;
@@ -408,7 +409,7 @@ function propagateCruncher () {
 
         // Skip Calculating Lookangles if No Sensor is Selected
         if (!isSensorChecked) {
-          if (sensor.observerGd !== sensor.defaultGd && !isMultiSensor) {
+          if (sensor.observerGd !== defaultGd && !isMultiSensor) {
             positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
             lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
             azimuth = lookangles.azimuth;
@@ -465,7 +466,7 @@ function propagateCruncher () {
         }
       }
 
-      if (sensor.observerGd !== sensor.defaultGd && !isSunExclusion) {
+      if (sensor.observerGd !== defaultGd && !isSunExclusion) {
         if (isMultiSensor) {
           for (s = 0; s < mSensor.length; s++) {
             if (!(sensor.type == 'Optical' && satInSun[i] == 0)) {
@@ -610,7 +611,7 @@ function propagateCruncher () {
       // //////////////////////////////////
       // FOV Bubble Drawing Code - START
       // //////////////////////////////////
-      if (!isMultiSensor && sensor.observerGd !== sensor.defaultGd) {
+      if (!isMultiSensor && sensor.observerGd !== defaultGd) {
         mSensor[0] = sensor;
         mSensor.length = 1;
       }
@@ -636,7 +637,7 @@ function propagateCruncher () {
           }
 
           if (!isShowFOVBubble) continue;
-          if (sensor.observerGd === sensor.defaultGd) continue;
+          if (sensor.observerGd === defaultGd) continue;
 
           // Ignore Optical and Mechanical Sensors When showing Many
           if (isIgnoreNonRadar) {

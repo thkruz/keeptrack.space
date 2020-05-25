@@ -31,7 +31,7 @@ or mirrored at any other location without the express written permission of the 
     obsminel: 3,
     obsmaxel: 85,
     obsminrange: 200,
-    obsmaxrange: 5555,
+    obsmaxrange: 5556,
     changeObjectInterval: 1000,
     staticNum: 1,
     linkAEHF: true,
@@ -54,7 +54,7 @@ or mirrored at any other location without the express written permission of the 
     obsminel: 3,
     obsmaxel: 85,
     obsminrange: 200,
-    obsmaxrange: 5555,
+    obsmaxrange: 5556,
     changeObjectInterval: 1000,
     staticNum: 0,
     linkAEHF: true,
@@ -76,7 +76,7 @@ or mirrored at any other location without the express written permission of the 
     obsminel: 3,
     obsmaxel: 85,
     obsminrange: 200,
-    obsmaxrange: 4910,
+    obsmaxrange: 5556,
     changeObjectInterval: 1000,
     staticNum: 2,
     linkAEHF: true,
@@ -119,7 +119,7 @@ or mirrored at any other location without the express written permission of the 
     obsminel: 3,
     obsmaxel: 85,
     obsminrange: 200,
-    obsmaxrange: 4820,
+    obsmaxrange: 5556,
     changeObjectInterval: 1000,
     staticNum: 4,
     linkAEHF: true,
@@ -163,7 +163,7 @@ or mirrored at any other location without the express written permission of the 
     obsminel: 3,
     obsmaxel: 85,
     obsminrange: 200,
-    obsmaxrange: 5555,
+    obsmaxrange: 5556,
     changeObjectInterval: 1000,
     staticNum: 6,
     linkAEHF: true,
@@ -1008,6 +1008,7 @@ or mirrored at any other location without the express written permission of the 
   sensorManager.selectedSensor = {};
   sensorManager.whichRadar = '';
   sensorManager.setSensor = function (selectedSensor, staticNum) {
+    if (!settingsManager.offline) { localStorage.setItem("currentSensor", JSON.stringify([selectedSensor, staticNum])); }
     if (selectedSensor == null && staticNum == null) return;
     var sensor;
     if (selectedSensor === 'SSN') {
@@ -1112,7 +1113,8 @@ or mirrored at any other location without the express written permission of the 
       setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else {
       for (sensor in sensorList) {
-        if (sensorList[sensor] === selectedSensor || (sensorList[sensor].staticNum === staticNum && typeof staticNum != 'undefined')) {
+        // console.log(sensorList[sensor] == selectedSensor);
+        if (sensorList[sensor] == selectedSensor || (sensorList[sensor].staticNum === staticNum && typeof staticNum != 'undefined')) {
           sensorManager.selectedSensor = sensorList[sensor];
           ga('send', 'event', 'Sensor', sensorList[sensor].shortName, 'Selected');
           // Do For All Sensors
@@ -1130,6 +1132,7 @@ or mirrored at any other location without the express written permission of the 
           $('#sensor-type').html(sensorManager.selectedSensor.type);
           $('#sensor-country').html(sensorManager.selectedSensor.country);
           selectSat(-1);
+          setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
           changeZoom(sensorManager.selectedSensor.zoom);
           camSnap(latToPitch(sensorManager.selectedSensor.lat), longToYaw(sensorManager.selectedSensor.long));
           satellite.getsensorinfo();

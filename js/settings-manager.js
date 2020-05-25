@@ -40,8 +40,8 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.10.1';
-  settingsManager.versionDate = 'May 21, 2020';
+  settingsManager.versionNumber = '1.10.2';
+  settingsManager.versionDate = 'May 24 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -54,6 +54,8 @@ db.init = (function (){
   settingsManager.hiresImages = false;
   settingsManager.hiresNoCloudsImages = false;
   settingsManager.vectorImages = false;
+
+  settingsManager.offline = false;
 
   let lastMap = localStorage.getItem("lastMap");
   switch (lastMap) {
@@ -273,12 +275,12 @@ db.init = (function (){
 
   settingsManager.gpsElevationMask = 15;
 
-  settingsManager.FPSForwardSpeed = 3;
-  settingsManager.FPSSideSpeed = 3;
-  settingsManager.FPSVertSpeed = 3;
-  settingsManager.FPSPitchRate = 0.02;
-  settingsManager.FPSYawRate = 0.02;
-  settingsManager.FPSRotateRate = 0.02;
+  settingsManager.fpsForwardSpeed = 3;
+  settingsManager.fpsSideSpeed = 3;
+  settingsManager.fpsVertSpeed = 3;
+  settingsManager.fpsPitchRate = 0.02;
+  settingsManager.fpsYawRate = 0.02;
+  settingsManager.fpsRotateRate = 0.02;
 
   settingsManager.daysUntilObjectLost = 60;
 

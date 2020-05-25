@@ -233,9 +233,30 @@ var satSensorMarkerArray = [];
 
       satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
       settingsManager.cruncherReady = true;
-      if (cruncherReadyCallback) {
-        cruncherReadyCallback(satData);
-      }
+      satSet.onCruncherReady();
+
+      (function _reloadLastSensor () {
+        let currentSensor = (!settingsManager.offline) ? JSON.parse(localStorage.getItem("currentSensor")) : null;
+        if (currentSensor !== null) {
+          try {
+            // If there is a staticnum set use that
+            if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
+              sensorManager.setSensor(null, currentSensor[1]);
+            } else {
+              // If the sensor is a string, load that collection of sensors
+              if (typeof currentSensor[0].shortName == 'undefined') {
+                sensorManager.setSensor(currentSensor[0], currentSensor[1]);
+              } else {
+                // Seems to be a single sensor without a staticnum, load that
+                sensorManager.setSensor(sensorManager.sensorList[currentSensor[0].shortName], currentSensor[1]);
+              }
+            }
+          }
+          catch {
+            console.warn('Saved Sensor Information Invalid');
+          }
+        }
+      })();
 
       (function _watchlistInit () {
         var watchlistJSON = (!settingsManager.offline) ? localStorage.getItem("watchlistList") : null;
@@ -1281,10 +1302,51 @@ var satSensorMarkerArray = [];
     $('#menu-breakup').removeClass('bmenu-item-disabled');
   };
 
-  satSet.onCruncherReady = function (cruncherReadyCallback) {
-    db.log('satSet.onCruncherReady not ready',true);
-    if (settingsManager.cruncherReady) cruncherReadyCallback(); // Prevent cruncher callbacks until cruncher ready.
-    db.log('satSet.onCruncherReady ready');
+  satSet.onCruncherReady = function () {
+    db.log('satSet.onCruncherReady',true);
+    // do querystring stuff
+    var queryStr = window.location.search.substring(1);
+    var params = queryStr.split('&');
+    for (var i = 0; i < params.length; i++) {
+      var key = params[i].split('=')[0];
+      var val = params[i].split('=')[1];
+      switch (key) {
+        case 'intldes':
+          var urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
+          if (urlSatId !== null) {
+            selectSat(urlSatId);
+          }
+          break;
+        case 'search':
+          // console.log('preloading search to ' + val);
+          searchBox.doSearch(val);
+          $('#search').val(val);
+          break;
+        case 'rate':
+          val = Math.min(val, 1000);
+          // could run time backwards, but let's not!
+          val = Math.max(val, 0.0);
+          // console.log('propagating at rate ' + val + ' x real time ');
+          timeManager.propRate = Number(val);
+          satCruncher.postMessage({
+            typ: 'offset',
+            dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
+          });
+          break;
+        case 'hrs':
+          // console.log('propagating at offset ' + val + ' hrs');
+          // offset is in msec
+          timeManager.propOffset = Number(val) * 3600 * 1000;
+          satCruncher.postMessage({
+            typ: 'offset',
+            dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
+          });
+          break;
+      }
+    }
+
+    searchBox.init(satData);
+    satSet.satDataString = null; // Clears stringified json file and clears 7MB of memory.
   };
 
   window.satSet = satSet;

@@ -202,7 +202,13 @@ var isAnalysisMenuOpen = false;
     (function _uiInit () {
       // Register all UI callback functions with drawLoop in main.js
       // These run during the draw loop
-      drawLoopCallback = function () { _showSatTest(); _updateNextPassOverlay(); _checkWatchlist(); _updateSelectBox(); _mobileScreenControls(); };
+      drawLoopCallback = function () {
+        _showSatTest();
+        _updateNextPassOverlay();
+        _checkWatchlist();
+        _updateSelectBox();
+        _mobileScreenControls();
+      };
     })();
     (function _menuInit () {
       db.log('_menuInit');
@@ -2535,6 +2541,7 @@ var isAnalysisMenuOpen = false;
       if (row === -1 && satChngTable.length === 0) { // Only generate the table if receiving the -1 argument for the first time
         $.get('/analysis/satchng.json?v=' + settingsManager.versionNumber)
         .done(function (resp) {
+          resp = [...new Set(resp)]; 
           for (let i = 0; i < resp.length; i++) {
             var prefix = (resp[i].year > 50) ? '19' : '20';
             var year = parseInt(prefix + resp[i].year.toString());
@@ -3640,7 +3647,7 @@ var isAnalysisMenuOpen = false;
         saveWatchlist[i] = sat.SCC_NUM;
       }
       var variable = JSON.stringify(saveWatchlist);
-      if (settingsManager.offline) { localStorage.setItem("watchlistList", variable); }
+      if (!settingsManager.offline) { localStorage.setItem("watchlistList", variable); }
     };
 
     var isCurrentlyTyping = false;
@@ -3666,58 +3673,58 @@ var isAnalysisMenuOpen = false;
       db.log('_keyUpHandler');
       if (isCurrentlyTyping) return;
 
-      if (evt.key.toUpperCase() === 'A' && FPSSideSpeed === -settingsManager.FPSSideSpeed) {
+      if (evt.key.toUpperCase() === 'A' && fpsSideSpeed === -settingsManager.fpsSideSpeed) {
         isFPSSideSpeedLock = false;
       }
-      if (evt.key.toUpperCase() === 'D' && FPSSideSpeed === settingsManager.FPSSideSpeed) {
+      if (evt.key.toUpperCase() === 'D' && fpsSideSpeed === settingsManager.fpsSideSpeed) {
         isFPSSideSpeedLock = false;
       }
-      if (evt.key.toUpperCase() === 'S' && FPSForwardSpeed === -settingsManager.FPSForwardSpeed) {
+      if (evt.key.toUpperCase() === 'S' && fpsForwardSpeed === -settingsManager.fpsForwardSpeed) {
         isFPSForwardSpeedLock = false;
       }
-      if (evt.key.toUpperCase() === 'W' && FPSForwardSpeed === settingsManager.FPSForwardSpeed) {
+      if (evt.key.toUpperCase() === 'W' && fpsForwardSpeed === settingsManager.fpsForwardSpeed) {
         isFPSForwardSpeedLock = false;
       }
       if (evt.key.toUpperCase() === 'Q') {
-        if (FPSVertSpeed === -settingsManager.FPSVertSpeed) isFPSVertSpeedLock = false;
+        if (fpsVertSpeed === -settingsManager.fpsVertSpeed) isFPSVertSpeedLock = false;
         if (cameraType.current === cameraType.ASTRONOMY) {
-          FPSYawRate = 0;
+          fpsYawRate = 0;
         } else {
-          FPSRotateRate = 0;
+          fpsRotateRate = 0;
         }
       }
       if (evt.key.toUpperCase() === 'E') {
-        if (FPSVertSpeed === settingsManager.FPSVertSpeed) isFPSVertSpeedLock = false;
+        if (fpsVertSpeed === settingsManager.fpsVertSpeed) isFPSVertSpeedLock = false;
         if (cameraType.current === cameraType.ASTRONOMY) {
-          FPSYawRate = 0;
+          fpsYawRate = 0;
         } else {
-          FPSRotateRate = 0;
+          fpsRotateRate = 0;
         }
       }
       if (evt.key.toUpperCase() === 'J' || evt.key.toUpperCase() === 'L') {
         if (cameraType.current === cameraType.ASTRONOMY) {
-          FPSRotateRate = 0;
+          fpsRotateRate = 0;
         } else {
-          FPSYawRate = 0;
+          fpsYawRate = 0;
         }
       }
       if (evt.key.toUpperCase() === 'I' || evt.key.toUpperCase() === 'K') {
-        FPSPitchRate = 0;
+        fpsPitchRate = 0;
       }
 
       if (evt.key.toUpperCase() === 'SHIFT') {
-        FPSRun = 1;
+        fpsRun = 1;
         settingsManager.cameraMovementSpeed = 0.003;
         settingsManager.cameraMovementSpeedMin = 0.005;
         speedModifier = 1;
-        if (!isFPSForwardSpeedLock) FPSForwardSpeed = 0;
-        if (!isFPSSideSpeedLock) FPSSideSpeed = 0;
-        if (!isFPSVertSpeedLock) FPSVertSpeed = 0;
+        if (!isFPSForwardSpeedLock) fpsForwardSpeed = 0;
+        if (!isFPSSideSpeedLock) fpsSideSpeed = 0;
+        if (!isFPSVertSpeedLock) fpsVertSpeed = 0;
       }
       // TODO: Find evt.key === 'ShiftRight' alternative for IE
       // Applies to _keyDownHandler as well
       if (evt.key === 'ShiftRight') {
-        FPSRun = 1;
+        fpsRun = 1;
         settingsManager.cameraMovementSpeed = 0.003;
         settingsManager.cameraMovementSpeedMin = 0.005;
         speedModifier = 1;
@@ -3729,7 +3736,7 @@ var isAnalysisMenuOpen = false;
       if (isCurrentlyTyping) return;
       if (evt.key.toUpperCase() === 'SHIFT') {
         if (cameraType.current === cameraType.FPS) {
-          FPSRun = 0.05;
+          fpsRun = 0.05;
         }
         speedModifier = 8;
         settingsManager.cameraMovementSpeed = 0.003 / 8;
@@ -3737,81 +3744,81 @@ var isAnalysisMenuOpen = false;
       }
       if (evt.key === 'ShiftRight') {
         if (cameraType.current === cameraType.FPS) {
-          FPSRun = 3;
+          fpsRun = 3;
         }
       }
       if (evt.key.toUpperCase() === 'W') {
         if (cameraType.current === cameraType.FPS) {
-          FPSForwardSpeed = settingsManager.FPSForwardSpeed;
+          fpsForwardSpeed = settingsManager.fpsForwardSpeed;
           isFPSForwardSpeedLock = true;
         }
       }
       if (evt.key.toUpperCase() === 'A') {
         if (cameraType.current === cameraType.FPS) {
-          FPSSideSpeed = -settingsManager.FPSSideSpeed;
+          fpsSideSpeed = -settingsManager.fpsSideSpeed;
           isFPSSideSpeedLock = true;
         }
       }
       if (evt.key.toUpperCase() === 'S') {
         if (cameraType.current === cameraType.FPS) {
-          FPSForwardSpeed = -settingsManager.FPSForwardSpeed;
+          fpsForwardSpeed = -settingsManager.fpsForwardSpeed;
           isFPSForwardSpeedLock = true;
         }
       }
       if (evt.key.toUpperCase() === 'D') {
         if (cameraType.current === cameraType.FPS) {
-          FPSSideSpeed = settingsManager.FPSSideSpeed;
+          fpsSideSpeed = settingsManager.fpsSideSpeed;
           isFPSSideSpeedLock = true;
         }
       }
       if (evt.key.toUpperCase() === 'I') {
         if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
-          FPSPitchRate = settingsManager.FPSPitchRate / speedModifier;
+          fpsPitchRate = settingsManager.fpsPitchRate / speedModifier;
         }
       }
       if (evt.key.toUpperCase() === 'K') {
         if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
-          FPSPitchRate = -settingsManager.FPSPitchRate / speedModifier;
+          fpsPitchRate = -settingsManager.fpsPitchRate / speedModifier;
         }
       }
       if (evt.key.toUpperCase() === 'J') {
         if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE) {
-          FPSYawRate = -settingsManager.FPSYawRate / speedModifier;
+          fpsYawRate = -settingsManager.fpsYawRate / speedModifier;
         }
         if (cameraType.current === cameraType.ASTRONOMY) {
-          FPSRotateRate = settingsManager.FPSRotateRate / speedModifier;
+          fpsRotateRate = settingsManager.fpsRotateRate / speedModifier;
         }
       }
       if (evt.key.toUpperCase() === 'L') {
         if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE) {
-          FPSYawRate = settingsManager.FPSYawRate / speedModifier;
+          fpsYawRate = settingsManager.fpsYawRate / speedModifier;
         }
         if (cameraType.current === cameraType.ASTRONOMY) {
-          FPSRotateRate = -settingsManager.FPSRotateRate / speedModifier;
+          fpsRotateRate = -settingsManager.fpsRotateRate / speedModifier;
         }
       }
       if (evt.key.toUpperCase() === 'Q') {
         if (cameraType.current === cameraType.FPS) {
-          FPSVertSpeed = -settingsManager.FPSVertSpeed;
+          fpsVertSpeed = -settingsManager.fpsVertSpeed;
           isFPSVertSpeedLock = true;
         }
         if (cameraType.current === cameraType.SATELLITE) {
-          FPSRotateRate = settingsManager.FPSRotateRate / speedModifier;
+          fpsRotateRate = settingsManager.fpsRotateRate / speedModifier;
         }
         if (cameraType.current === cameraType.ASTRONOMY) {
-          FPSYawRate = -settingsManager.FPSYawRate / speedModifier;
+          fpsYawRate = -settingsManager.fpsYawRate / speedModifier;
         }
       }
       if (evt.key.toUpperCase() === 'E') {
         if (cameraType.current === cameraType.FPS) {
-          FPSVertSpeed = settingsManager.FPSVertSpeed;
+          fpsVertSpeed = settingsManager.fpsVertSpeed;
           isFPSVertSpeedLock = true;
       }
         if (cameraType.current === cameraType.SATELLITE) {
-          FPSRotateRate = -settingsManager.FPSRotateRate / speedModifier;
+          fpsRotateRate = -settingsManager.fpsRotateRate / speedModifier;
         }
         if (cameraType.current === cameraType.ASTRONOMY) {
-          FPSYawRate = settingsManager.FPSYawRate / speedModifier;
+          fpsYawRate = settingsManager.fpsYawRate / speedModifier;
         }
       }
     }
@@ -3843,11 +3850,11 @@ var isAnalysisMenuOpen = false;
 
           if (cameraType.current === 6) { // 6 is a placeholder to reset camera type
             cameraType.current = 0;
-            FPSPitch = 0;
-            FPSYaw = 0;
-            FPSxPos = 0;
-            FPSyPos = 25000;
-            FPSzPos = 0;
+            fpsPitch = 0;
+            fpsYaw = 0;
+            fpsXPos = 0;
+            fpsYPos = 25000;
+            fpsZPos = 0;
           }
 
           switch (cameraType.current) {

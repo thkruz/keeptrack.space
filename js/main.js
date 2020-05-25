@@ -11,6 +11,7 @@ Original source code released by James Yoder at https://github.com/jeyoder/Thing
 under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
 
 All additions and modifications of original code is Copyright © 2016-2020 by
+All additions and modifications of original code is Copyright © 2016-2020 by
 Theodore Kruczek. All rights reserved. No part of this web site may be reproduced,
 published, distributed, displayed, performed, copied or stored for public or private
 use, without written permission of the author.
@@ -20,52 +21,6 @@ for derivative works, or offered for sale, or used to construct any kind of data
 or mirrored at any other location without the express written permission of the author.
 
 ///////////////////////////////////////////////////////////////////////////// */
-
-/* global
-    satSet
-    searchBox
-    $
-    satellite
-    ColorScheme
-    orbitDisplay
-    shaderLoader
-    SunCalc
-    earth
-    groups
-    mat4
-    vec3
-    vec4
-    requestAnimationFrame
-    ga
-    mapManager
-    sensorManager
-    objectManager
-    missileManager.MassRaidPre
-    saveAs
-    Blob
-    FileReader
-    missileManager.UsaICBM
-    missileManager.RussianICBM
-    missileManager.NorthKoreanBM
-    Missile
-    missileManager.missilesInUse
-    missileManager.lastMissileError
-    settingsManager
-*/
-
-// Constants
-var ZOOM_EXP = 3;
-var DIST_MIN = 6800;
-var DIST_MAX = 200000;
-var TAU = 2 * Math.PI;
-var DEG2RAD = TAU / 360;
-var RAD2DEG = 360 / TAU;
-var RADIUS_OF_EARTH = 6371.0;
-var RADIUS_OF_SUN = 695700;
-var MINUTES_PER_DAY = 1440;
-var PLANETARIUM_DIST = 3;
-var MILLISECONDS_PER_DAY = 1.15741e-8;
-
 var debugTimeArray = [];
 
 var timeManager = window.timeManager;
@@ -104,9 +59,6 @@ var isCustomSensorMenuOpen = false;
 var pitchRotate;
 var yawRotate;
 
-var fpsEl;
-var fpsAz;
-
 var pickFb, pickTex;
 var pMatrix = mat4.create();
 var camMatrix = mat4.create();
@@ -114,11 +66,6 @@ var camMatrixEmpty = mat4.create();
 var selectedSat = -1;
 var lastSelectedSat = -1;
 
-// getEarthScreenPoint;
-// var rayOrigin;
-// var curRadarTrackNum = 0;
-// var lastRadarTrackTime = 0;
-// var debugLine;
 var drawLineList = [];
 
 var updateHoverDelay = 0;
@@ -150,32 +97,29 @@ var isPinching = false;
 var deltaPinchDistance = 0;
 var startPinchDistance = 0;
 
-var FPSPitch = 0;
-var FPSPitchRate = 0;
-var FPSRotate = 0;
-var FPSRotateRate = 0;
-var FPSYaw = 0;
-var FPSYawRate = 0;
-var FPSxPos = 0;
-var FPSyPos = 25000;
-var FPSzPos = 0;
-var FPSForwardSpeed = 0;
-var FPSSideSpeed = 0;
-var FPSVertSpeed = 0;
+var fpsEl;
+var fpsAz;
+var fpsPitch = 0;
+var fpsPitchRate = 0;
+var fpsRotate = 0;
+var fpsRotateRate = 0;
+var fpsYaw = 0;
+var fpsYawRate = 0;
+var fpsXPos = 0;
+var fpsYPos = 25000;
+var fpsZPos = 0;
+var fpsForwardSpeed = 0;
+var fpsSideSpeed = 0;
+var fpsVertSpeed = 0;
 var isFPSForwardSpeedLock = false;
 var isFPSSideSpeedLock = false;
 var isFPSVertSpeedLock = false;
-var FPSRun = 1;
-var FPSLastTime = 1;
+var fpsRun = 1;
+var fpsLastTime = 1;
 
 var satScreenPositionArray = {};
-
 var isShowNextPass = false;
-var isShowDistance = true;
-var isHoverBoxVisible = false;
-
 var rotateTheEarth = true; // Set to False to disable initial rotation
-var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotating around earth
 
 var drawLoopCallback;
 (function () {
@@ -186,18 +130,21 @@ var drawLoopCallback;
 
   // _unProject variables
   var glScreenX, glScreenY, screenVec, comboPMat, invMat, worldVec, gCPr, gCPz,
-      gCPrYaw, gCPx, gCPy, FPStimeNow, FPSelapsed, satData, dragTarget;
+      gCPrYaw, gCPx, gCPy, fpsTimeNow, fpsElapsed, satData, dragTarget;
 
   // drawLoop camera variables
   var xDif, yDif, yawTarget, pitchTarget, dragPointR, dragTargetR, dragPointLon,
       dragTargetLon, dragPointLat, dragTargetLat, pitchDif, yawDif;
+  var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotating around earth
+  var isHoverBoxVisible = false;
+  var isShowDistance = true;
 
   // getEarthScreenPoint
   var rayOrigin, ptThru, rayDir, toCenterVec, dParallel, longDir, dPerp, dSubSurf,
       dSurf, ptSurf;
 
-  $(document).ready(function () { // Code Once index.htm is loaded
-
+  // Code Once index.htm is loaded
+  $(document).ready(function () {
     // Set Default TLE
     if (typeof settingsManager.tleSource == 'undefined') {
       settingsManager.tleSource = 'tle/TLE.json';
@@ -210,56 +157,7 @@ var drawLoopCallback;
       orbitDisplay.init();
       groups.init();
       searchBox.init(satData);
-
-      // debugLine = new Line();
-      // debugLine2 = new Line();
-      // debugLine3 = new Line();
-    });
-    satSet.onCruncherReady(function (satData) {
-      // do querystring stuff
-      var queryStr = window.location.search.substring(1);
-      var params = queryStr.split('&');
-      for (var i = 0; i < params.length; i++) {
-        var key = params[i].split('=')[0];
-        var val = params[i].split('=')[1];
-        switch (key) {
-          case 'intldes':
-            var urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
-            if (urlSatId !== null) {
-              selectSat(urlSatId);
-            }
-            break;
-          case 'search':
-            // console.log('preloading search to ' + val);
-            searchBox.doSearch(val);
-            $('#search').val(val);
-            break;
-          case 'rate':
-            val = Math.min(val, 1000);
-            // could run time backwards, but let's not!
-            val = Math.max(val, 0.0);
-            // console.log('propagating at rate ' + val + ' x real time ');
-            timeManager.propRate = Number(val);
-            satCruncher.postMessage({
-              typ: 'offset',
-              dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
-            });
-            break;
-          case 'hrs':
-            // console.log('propagating at offset ' + val + ' hrs');
-            // offset is in msec
-            timeManager.propOffset = Number(val) * 3600 * 1000;
-            satCruncher.postMessage({
-              typ: 'offset',
-              dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
-            });
-            break;
-        }
-      }
-
-      searchBox.init(satData);
-      satSet.satDataString = null; // Clears stringified json file and clears 7MB of memory.
-    });
+    });    
     drawLoop(); // kick off the animationFrame()s
   });
 
@@ -343,27 +241,27 @@ var drawLoopCallback;
 
     if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current=== cameraType.ASTRONOMY) {
 
-      FPSPitch -= 20 * camPitchSpeed * dt;
-      FPSYaw -= 20 * camYawSpeed * dt;
-      FPSRotate -= 20 * camRotateSpeed * dt;
+      fpsPitch -= 20 * camPitchSpeed * dt;
+      fpsYaw -= 20 * camYawSpeed * dt;
+      fpsRotate -= 20 * camRotateSpeed * dt;
 
       // Prevent Over Rotation
-      if (FPSPitch > 90) FPSPitch = 90;
-      if (FPSPitch < -90) FPSPitch = -90;
+      if (fpsPitch > 90) fpsPitch = 90;
+      if (fpsPitch < -90) fpsPitch = -90;
       // ASTRONOMY 180 FOV Bubble Looking out from Sensor
       if (cameraType.current=== cameraType.ASTRONOMY) {
-        if (FPSRotate > 90) FPSRotate = 90;
-        if (FPSRotate < -90) FPSRotate = -90;
+        if (fpsRotate > 90) fpsRotate = 90;
+        if (fpsRotate < -90) fpsRotate = -90;
       } else {
-        if (FPSRotate > 360) FPSRotate -= 360;
-        if (FPSRotate < 0) FPSRotate += 360;
+        if (fpsRotate > 360) fpsRotate -= 360;
+        if (fpsRotate < 0) fpsRotate += 360;
       }
-      if (FPSYaw > 360) FPSYaw -= 360;
-      if (FPSYaw < 0) FPSYaw += 360;
+      if (fpsYaw > 360) fpsYaw -= 360;
+      if (fpsYaw < 0) fpsYaw += 360;
     } else {
       camPitch += camPitchSpeed * dt;
       camYaw += camYawSpeed * dt;
-      FPSRotate += camRotateSpeed * dt;
+      fpsRotate += camRotateSpeed * dt;
     }
 
     if (rotateTheEarth) { camYaw -= rotateTheEarthSpeed * dt; }
@@ -420,7 +318,6 @@ var drawLoopCallback;
     // bubble.set();
     // bubble.draw();
   }
-
   function _camSnapToSat (sat) {
     /* this function runs every frame that a satellite is selected.
     However, the user might have broken out of the zoom snap or angle snap.
@@ -477,9 +374,6 @@ var drawLoopCallback;
       zoomTarget = 0.01;
     }
   }
-
-  // var pitchRotate;
-  // var yawRotate;
   function _drawScene () {
     gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -487,7 +381,7 @@ var drawLoopCallback;
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
     if (cameraType.current=== cameraType.FPS || cameraType.current=== cameraType.SATELLITE || cameraType.current=== cameraType.ASTRONOMY) {
-      _FPSMovement();
+      _fpsMovement();
     }
     camMatrix = _drawCamera();
 
@@ -541,9 +435,9 @@ var drawLoopCallback;
           mat4.rotateZ(camMatrix, camMatrix, -camYaw);
           break;
         case cameraType.FPS: // FPS style movement
-          mat4.rotate(camMatrix, camMatrix, -FPSPitch * DEG2RAD, [1, 0, 0]);
-          mat4.rotate(camMatrix, camMatrix, FPSYaw * DEG2RAD, [0, 0, 1]);
-          mat4.translate(camMatrix, camMatrix, [FPSxPos, FPSyPos, -FPSzPos]);
+          mat4.rotate(camMatrix, camMatrix, -fpsPitch * DEG2RAD, [1, 0, 0]);
+          mat4.rotate(camMatrix, camMatrix, fpsYaw * DEG2RAD, [0, 0, 1]);
+          mat4.translate(camMatrix, camMatrix, [fpsXPos, fpsYPos, -fpsZPos]);
           break;
         case cameraType.PLANETARIUM: // pivot around the earth looking away from the earth
           {
@@ -568,9 +462,9 @@ var drawLoopCallback;
             if (selectedSat !== -1) lastSelectedSat = selectedSat;
             let sat = satSet.getSat(lastSelectedSat);
             // mat4.rotate(camMatrix, camMatrix, sat.inclination * DEG2RAD, [0, 1, 0]);
-            mat4.rotate(camMatrix, camMatrix, -FPSPitch * DEG2RAD, [1, 0, 0]);
-            mat4.rotate(camMatrix, camMatrix, FPSYaw * DEG2RAD, [0, 0, 1]);
-            mat4.rotate(camMatrix, camMatrix, FPSRotate * DEG2RAD, [0, 1, 0]);
+            mat4.rotate(camMatrix, camMatrix, -fpsPitch * DEG2RAD, [1, 0, 0]);
+            mat4.rotate(camMatrix, camMatrix, fpsYaw * DEG2RAD, [0, 0, 1]);
+            mat4.rotate(camMatrix, camMatrix, fpsRotate * DEG2RAD, [0, 1, 0]);
 
             orbitDisplay.updateOrbitBuffer(lastSelectedSat);
             let satPos = sat.position;
@@ -590,7 +484,7 @@ var drawLoopCallback;
             // Idealy the astronomy view would feel more natural and tell you what
             // az/el you are currently looking at.
 
-            // fpsEl = ((FPSPitch + 90) > 90) ? (-(FPSPitch) + 90) : (FPSPitch + 90);
+            // fpsEl = ((fpsPitch + 90) > 90) ? (-(fpsPitch) + 90) : (fpsPitch + 90);
             // $('#el-text').html(' EL: ' + fpsEl.toFixed(2) + ' deg');
 
             // yawRotate = ((-90 - satellite.currentSensor.long) * DEG2RAD);
@@ -602,15 +496,15 @@ var drawLoopCallback;
               sensor = satSet.getSat(satSet.getIdFromSensorName(satellite.currentSensor.name));
             }
             // mat4.rotate(camMatrix, camMatrix, sat.inclination * DEG2RAD, [0, 1, 0]);
-            mat4.rotate(camMatrix, camMatrix, (pitchRotate + (-FPSPitch * DEG2RAD)), [1, 0, 0]);
-            mat4.rotate(camMatrix, camMatrix, (yawRotate + (FPSYaw * DEG2RAD)), [0, 0, 1]);
-            mat4.rotate(camMatrix, camMatrix, FPSRotate * DEG2RAD, [0, 1, 0]);
+            mat4.rotate(camMatrix, camMatrix, (pitchRotate + (-fpsPitch * DEG2RAD)), [1, 0, 0]);
+            mat4.rotate(camMatrix, camMatrix, (yawRotate + (fpsYaw * DEG2RAD)), [0, 0, 1]);
+            mat4.rotate(camMatrix, camMatrix, fpsRotate * DEG2RAD, [0, 1, 0]);
 
             // orbitDisplay.updateOrbitBuffer(lastSelectedSat);
             let sensorPos = sensor.position;
-            FPSxPos = sensorPos.x;
-            FPSyPos = sensorPos.y;
-            FPSzPos = sensorPos.z;
+            fpsXPos = sensorPos.x;
+            fpsYPos = sensorPos.y;
+            fpsZPos = sensorPos.z;
             mat4.translate(camMatrix, camMatrix, [-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01]); // Scale to get away from Earth
 
             _showOrbitsAbove(); // Clears Orbit
@@ -649,63 +543,62 @@ var drawLoopCallback;
     pos.gmst = gmst;
     return pos;
   }
-  function _FPSMovement () {
-    FPStimeNow = Date.now();
-    if (FPSLastTime !== 0) {
-      FPSelapsed = FPStimeNow - FPSLastTime;
+  function _fpsMovement () {
+    fpsTimeNow = Date.now();
+    if (fpsLastTime !== 0) {
+      fpsElapsed = fpsTimeNow - fpsLastTime;
 
-      if (isFPSForwardSpeedLock && FPSForwardSpeed < 0) {
-        FPSForwardSpeed = Math.max(FPSForwardSpeed + Math.min(FPSForwardSpeed * -1.02 * FPSelapsed, -0.2), -settingsManager.FPSForwardSpeed);
-      } else if (isFPSForwardSpeedLock && FPSForwardSpeed > 0) {
-        FPSForwardSpeed = Math.min(FPSForwardSpeed + Math.max(FPSForwardSpeed * 1.02 * FPSelapsed, 0.2), settingsManager.FPSForwardSpeed);
+      if (isFPSForwardSpeedLock && fpsForwardSpeed < 0) {
+        fpsForwardSpeed = Math.max(fpsForwardSpeed + Math.min(fpsForwardSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsForwardSpeed);
+      } else if (isFPSForwardSpeedLock && fpsForwardSpeed > 0) {
+        fpsForwardSpeed = Math.min(fpsForwardSpeed + Math.max(fpsForwardSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsForwardSpeed);
       }
 
-      if (isFPSSideSpeedLock && FPSSideSpeed < 0) {
-        FPSSideSpeed = Math.max(FPSSideSpeed + Math.min(FPSSideSpeed * -1.02 * FPSelapsed, -0.2), -settingsManager.FPSSideSpeed);
-      } else if (isFPSSideSpeedLock && FPSSideSpeed < 0) {
-        FPSSideSpeed = Math.min(FPSSideSpeed + Math.max(FPSSideSpeed * 1.02 * FPSelapsed, 0.2), settingsManager.FPSSideSpeed);
+      if (isFPSSideSpeedLock && fpsSideSpeed < 0) {
+        fpsSideSpeed = Math.max(fpsSideSpeed + Math.min(fpsSideSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsSideSpeed);
+      } else if (isFPSSideSpeedLock && fpsSideSpeed < 0) {
+        fpsSideSpeed = Math.min(fpsSideSpeed + Math.max(fpsSideSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsSideSpeed);
       }
 
-      if (isFPSVertSpeedLock && FPSVertSpeed < 0) {
-        FPSVertSpeed = Math.max(FPSVertSpeed + Math.min(FPSVertSpeed * -1.02 * FPSelapsed, -0.2), -settingsManager.FPSVertSpeed);
-      } else if (isFPSVertSpeedLock && FPSVertSpeed < 0) {
-        FPSVertSpeed = Math.min(FPSVertSpeed + Math.max(FPSVertSpeed * 1.02 * FPSelapsed, 0.2), settingsManager.FPSVertSpeed);
+      if (isFPSVertSpeedLock && fpsVertSpeed < 0) {
+        fpsVertSpeed = Math.max(fpsVertSpeed + Math.min(fpsVertSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsVertSpeed);
+      } else if (isFPSVertSpeedLock && fpsVertSpeed < 0) {
+        fpsVertSpeed = Math.min(fpsVertSpeed + Math.max(fpsVertSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsVertSpeed);
       }
 
-      // console.log('Front: ' + FPSForwardSpeed + ' - ' + 'Side: ' + FPSSideSpeed + ' - ' + 'Vert: ' + FPSVertSpeed);
+      // console.log('Front: ' + fpsForwardSpeed + ' - ' + 'Side: ' + fpsSideSpeed + ' - ' + 'Vert: ' + fpsVertSpeed);
 
       if (cameraType.FPS) {
-        if (FPSForwardSpeed !== 0) {
-          FPSxPos -= Math.sin(FPSYaw * DEG2RAD) * FPSForwardSpeed * FPSRun * FPSelapsed;
-          FPSyPos -= Math.cos(FPSYaw * DEG2RAD) * FPSForwardSpeed * FPSRun * FPSelapsed;
-          FPSzPos += Math.sin(FPSPitch * DEG2RAD) * FPSForwardSpeed * FPSRun * FPSelapsed;
+        if (fpsForwardSpeed !== 0) {
+          fpsXPos -= Math.sin(fpsYaw * DEG2RAD) * fpsForwardSpeed * fpsRun * fpsElapsed;
+          fpsYPos -= Math.cos(fpsYaw * DEG2RAD) * fpsForwardSpeed * fpsRun * fpsElapsed;
+          fpsZPos += Math.sin(fpsPitch * DEG2RAD) * fpsForwardSpeed * fpsRun * fpsElapsed;
         }
-        if (FPSVertSpeed !== 0) {
-          FPSzPos -= FPSVertSpeed * FPSRun * FPSelapsed;
+        if (fpsVertSpeed !== 0) {
+          fpsZPos -= fpsVertSpeed * fpsRun * fpsElapsed;
         }
-        if (FPSSideSpeed !== 0) {
-          FPSxPos -= Math.cos(-FPSYaw * DEG2RAD) * FPSSideSpeed * FPSRun * FPSelapsed;
-          FPSyPos -= Math.sin(-FPSYaw * DEG2RAD) * FPSSideSpeed * FPSRun * FPSelapsed;
+        if (fpsSideSpeed !== 0) {
+          fpsXPos -= Math.cos(-fpsYaw * DEG2RAD) * fpsSideSpeed * fpsRun * fpsElapsed;
+          fpsYPos -= Math.sin(-fpsYaw * DEG2RAD) * fpsSideSpeed * fpsRun * fpsElapsed;
         }
       }
 
-      if (!isFPSForwardSpeedLock) FPSForwardSpeed *= Math.min(0.98 * FPSelapsed, 0.98);
-      if (!isFPSSideSpeedLock) FPSSideSpeed *= Math.min(0.98 * FPSelapsed, 0.98);
-      if (!isFPSVertSpeedLock) FPSVertSpeed *= Math.min(0.98 * FPSelapsed, 0.98);
+      if (!isFPSForwardSpeedLock) fpsForwardSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
+      if (!isFPSSideSpeedLock) fpsSideSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
+      if (!isFPSVertSpeedLock) fpsVertSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
 
-      if (FPSForwardSpeed < 0.01 && FPSForwardSpeed > -0.01) FPSForwardSpeed = 0;
-      if (FPSSideSpeed < 0.01 && FPSSideSpeed > -0.01) FPSSideSpeed = 0;
-      if (FPSVertSpeed < 0.01 && FPSVertSpeed > -0.01) FPSVertSpeed = 0;
+      if (fpsForwardSpeed < 0.01 && fpsForwardSpeed > -0.01) fpsForwardSpeed = 0;
+      if (fpsSideSpeed < 0.01 && fpsSideSpeed > -0.01) fpsSideSpeed = 0;
+      if (fpsVertSpeed < 0.01 && fpsVertSpeed > -0.01) fpsVertSpeed = 0;
 
-      FPSPitch += FPSPitchRate * FPSelapsed;
-      FPSRotate += FPSRotateRate * FPSelapsed;
-      FPSYaw += FPSYawRate * FPSelapsed;
+      fpsPitch += fpsPitchRate * fpsElapsed;
+      fpsRotate += fpsRotateRate * fpsElapsed;
+      fpsYaw += fpsYawRate * fpsElapsed;
 
-      // console.log('Pitch: ' + FPSPitch + ' - ' + 'Rotate: ' + FPSRotate + ' - ' + 'Yaw: ' + FPSYaw);
+      // console.log('Pitch: ' + fpsPitch + ' - ' + 'Rotate: ' + fpsRotate + ' - ' + 'Yaw: ' + fpsYaw);
     }
-    FPSLastTime = FPStimeNow;
+    fpsLastTime = fpsTimeNow;
   }
-
   function _updateHover () {
     if (searchBox.isHovering()) {
       updateHoverSatId = searchBox.getHoverSat();
@@ -746,8 +639,6 @@ var drawLoopCallback;
         pickColorBuf[2] === 0);
     }
   }
-
-
   var satLabelModeLastTime = 0;
   var isSatMiniBoxInUse = false;
   var labelCount;
@@ -807,7 +698,6 @@ var drawLoopCallback;
     isSatMiniBoxInUse = true;
     satLabelModeLastTime = drawNow;
   }
-
   function _hoverBoxOnSat (satId, satX, satY) {
     if (cameraType.current === cameraType.PLANETARIUM && !settingsManager.isDemoModeOn) {
       satHoverBoxDOM.css({display: 'none'});
@@ -892,7 +782,6 @@ var drawLoopCallback;
     if (typeof cb == 'undefined') return;
     cb();
   }
-
   var demoModeSatellite = 0;
   var demoModeLastTime = 0;
   function _demoMode () {
@@ -1028,14 +917,12 @@ function _normalizeAngle (angle) {
   if (angle < -Math.PI) angle += TAU;
   return angle;
 }
-
 function getSatIdFromCoord (x, y) {
   // OPTIMIZE: Find a way to do this without using gl.readPixels!
   gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
   gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
   return ((pickColorBuf[2] << 16) | (pickColorBuf[1] << 8) | (pickColorBuf[0])) - 1;
 }
-
 function getEarthScreenPoint (x, y) {
   rayOrigin = getCamPos();
   ptThru = _unProject(x, y);
@@ -1476,7 +1363,6 @@ function selectSat (satId) {
   // This can be very annoying, especially when using modes like trusat
   updateUrl();
 }
-
 function enableSlowCPUMode () {
   db.log('enableSlowCPUMode');
   if (!settingsManager.cruncherReady) return;
@@ -1488,7 +1374,6 @@ function enableSlowCPUMode () {
     isSlowCPUModeEnabled: true
   });
 }
-
 function debugDrawLine (type, value, color) {
   if (typeof color == 'undefined') color = [1.0, 0, 1.0, 1.0];
   switch (color) {
@@ -1615,27 +1500,3 @@ function drawLines () {
     drawLineList[drawLinesI].line.draw(drawLineList[drawLinesI].color);
   }
 }
-// var lastRadarTrackTime = 0;
-// var curRadarTrackNum = 0;
-// function drawLines () {
-//   var satData = satSet.getSatData();
-//   var propTime = timeManager.propTime();
-//   if (satData && satellite.checkSensorSelected()) {
-//     if (propTime - lastRadarTrackTime > 54) {
-//       lastRadarTrackTime = 0;
-//       curRadarTrackNum++;
-//     }
-//     if (curRadarTrackNum < satData.length) {
-//       if (satData[curRadarTrackNum]) {
-//         if (satData[curRadarTrackNum].inview) {
-//           var debugLine = new Line();
-//           var sat = satData[curRadarTrackNum];
-//           var satposition = [sat.position.x, sat.position.y, sat.position.z];
-//           debugLine.set(satposition, sensorManager.curSensorPositon);
-//           debugLine.draw();
-//           if (lastRadarTrackTime === 0) { lastRadarTrackTime = propTime; }
-//         } else { curRadarTrackNum++; }
-//       } else { curRadarTrackNum++; }
-//     } else { curRadarTrackNum = 0; }
-//   }
-// }

@@ -747,6 +747,16 @@ var isAnalysisMenuOpen = false;
             satSet.setColorScheme(ColorScheme.countries);
             ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
             break;
+          case 'colors-velocity-rmb':
+            uiController.legendMenuChange('velocity');
+            satSet.setColorScheme(ColorScheme.velocity);
+            ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
+            break;
+          case 'colors-ageOfElset-rmb':
+            uiController.legendMenuChange('ageOfElset');
+            satSet.setColorScheme(ColorScheme.ageOfElset);
+            ga('send', 'event', 'ColorScheme Menu', 'Age of Elset', 'Selected');
+            break;
           case 'earth-blue-rmb':
             settingsManager.blueImages = true;
             settingsManager.nasaImages = false;
@@ -1347,6 +1357,58 @@ var isAnalysisMenuOpen = false;
             } else {
               ColorScheme.objectTypeFlags.inviewAlt = true;
               $('.legend-inviewAlt-box').css('background', _rgbCSS(settingsManager.colors.inviewAlt));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-ageNew-box":
+            if (ColorScheme.objectTypeFlags.ageNew) {
+              ColorScheme.objectTypeFlags.ageNew = false;
+              $('.legend-ageNew-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.ageNew = true;
+              $('.legend-ageNew-box').css('background', _rgbCSS(settingsManager.colors.ageNew));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-ageMed-box":
+            if (ColorScheme.objectTypeFlags.ageMed) {
+              ColorScheme.objectTypeFlags.ageMed = false;
+              $('.legend-ageMed-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.ageMed = true;
+              $('.legend-ageMed-box').css('background', _rgbCSS(settingsManager.colors.ageMed));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-ageOld-box":
+            if (ColorScheme.objectTypeFlags.ageOld) {
+              ColorScheme.objectTypeFlags.ageOld = false;
+              $('.legend-ageOld-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.ageOld = true;
+              $('.legend-ageOld-box').css('background', _rgbCSS(settingsManager.colors.ageOld));
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
+          case "legend-ageLost-box":
+            if (ColorScheme.objectTypeFlags.ageLost) {
+              ColorScheme.objectTypeFlags.ageLost = false;
+              $('.legend-ageLost-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.ageLost = true;
+              $('.legend-ageLost-box').css('background', _rgbCSS(settingsManager.colors.ageLost));
               settingsManager.isForceColorScheme = true;
               satSet.setColorScheme(settingsManager.currentColorScheme, true);
             }
@@ -2541,7 +2603,7 @@ var isAnalysisMenuOpen = false;
       if (row === -1 && satChngTable.length === 0) { // Only generate the table if receiving the -1 argument for the first time
         $.get('/analysis/satchng.json?v=' + settingsManager.versionNumber)
         .done(function (resp) {
-          resp = [...new Set(resp)]; 
+          resp = [...new Set(resp)];
           for (let i = 0; i < resp.length; i++) {
             var prefix = (resp[i].year > 50) ? '19' : '20';
             var year = parseInt(prefix + resp[i].year.toString());
@@ -4252,6 +4314,14 @@ var isAnalysisMenuOpen = false;
         satSet.setColorScheme(ColorScheme.geo);
         ga('send', 'event', 'ColorScheme Menu', 'Deep-Space', 'Selected');
         break;
+      case 'elset-age':
+      $('#loading-screen').fadeIn('slow', function () {
+        uiController.legendMenuChange('ageOfElset');
+        satSet.setColorScheme(ColorScheme.ageOfElset);
+        ga('send', 'event', 'ColorScheme Menu', 'Age of Elset', 'Selected');
+        $('#loading-screen').fadeOut();
+      });
+      break;
       case 'lost-objects':
         $('#search').val('');
         $('#loading-screen').fadeIn('slow', function () {
@@ -4399,6 +4469,10 @@ var isAnalysisMenuOpen = false;
     $('.legend-rcsMed-box').css('background', _rgbCSS(settingsManager.colors.rcsMed));
     $('.legend-rcsLarge-box').css('background', _rgbCSS(settingsManager.colors.rcsLarge));
     $('.legend-rcsUnknown-box').css('background', _rgbCSS(settingsManager.colors.rcsUnknown));
+    $('.legend-ageNew-box').css('background', _rgbCSS(settingsManager.colors.ageNew));
+    $('.legend-ageMed-box').css('background', _rgbCSS(settingsManager.colors.ageMed));
+    $('.legend-ageOld-box').css('background', _rgbCSS(settingsManager.colors.ageOld));
+    $('.legend-ageLost-box').css('background', _rgbCSS(settingsManager.colors.ageLost));
     $('.legend-satLEO-box').css('background', _rgbCSS(settingsManager.colors.satLEO));
     $('.legend-satGEO-box').css('background', _rgbCSS(settingsManager.colors.satGEO));
     $('.legend-satSmall-box').css('background', _rgbCSS(settingsManager.colors.satSmall));
@@ -4422,6 +4496,7 @@ var isAnalysisMenuOpen = false;
     $('#legend-list-countries').hide();
     $('#legend-list-planetarium').hide();
     $('#legend-list-astronomy').hide();
+    $('#legend-list-ageOfElset').hide();
 
     // Update Legend Colors
     uiController.legendColorsChange();
@@ -4451,6 +4526,9 @@ var isAnalysisMenuOpen = false;
         break;
       case 'sunlight':
         $('#legend-list-sunlight').show();
+        break;
+      case 'ageOfElset':
+        $('#legend-list-ageOfElset').show();
         break;
       case 'countries':
         $('#legend-list-countries').show();
@@ -4531,6 +4609,14 @@ var isAnalysisMenuOpen = false;
       ColorScheme.objectTypeFlags.countryPRC = true;
       $('.legend-countryOther-box').css('background', settingsManager.colors.countryOther);
       ColorScheme.objectTypeFlags.countryOther = true;
+      $('.legend-ageNew-box').css('background', settingsManager.colors.ageNew);
+      ColorScheme.objectTypeFlags.ageNew = true;
+      $('.legend-ageMed-box').css('background', settingsManager.colors.ageMed);
+      ColorScheme.objectTypeFlags.ageMed = true;
+      $('.legend-ageOld-box').css('background', settingsManager.colors.ageOld);
+      ColorScheme.objectTypeFlags.ageOld = true;
+      $('.legend-ageLost-box').css('background', settingsManager.colors.ageLost);
+      ColorScheme.objectTypeFlags.ageLost = true;
     }
     settingsManager.currentLegend = menu;
   };

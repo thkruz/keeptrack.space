@@ -406,6 +406,18 @@ ul {
 .legend-rcsUnkown-box {
   background: rgb(200, 200, 200);
 }
+.legend-ageNew-box {
+  background: rgb(100, 100, 100);
+}
+.legend-ageMed-box {
+  background: rgb(150, 150, 150);
+}
+.legend-ageOld-box {
+  background: rgb(200, 200, 200);
+}
+.legend-ageLost-box {
+  background: rgb(200, 200, 200);
+}
 .legend-velocitySlow-box {
   background: rgb(100, 100, 100);
 }

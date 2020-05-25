@@ -40,8 +40,8 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.10.2';
-  settingsManager.versionDate = 'May 24 2020';
+  settingsManager.versionNumber = '1.10.3';
+  settingsManager.versionDate = 'May 25 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -307,8 +307,9 @@ db.init = (function (){
   settingsManager.reColorMinimumTime = 1000;
   settingsManager.colors = {};
   settingsManager.colors = JSON.parse(localStorage.getItem("settingsManager-colors"));
-  if (settingsManager.colors == null) {
+  if (settingsManager.colors == null || settingsManager.colors.version !== '1.0.0') {
     settingsManager.colors = {};
+    settingsManager.colors.version = '1.0.0';
     settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
     settingsManager.colors.starHi = [1.0, 1.0, 1.0, 1.0];
     settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.16];
@@ -368,6 +369,10 @@ db.init = (function (){
     settingsManager.colors.rcsMed = [0.2, 0.4, 1.0, 1];
     settingsManager.colors.rcsLarge = [0, 1.0, 0, 0.6];
     settingsManager.colors.rcsUnknown = [1.0, 1.0, 0, 0.6];
+    settingsManager.colors.ageNew = [0, 1.0, 0, 0.9];
+    settingsManager.colors.ageMed = [1.0, 1.0, 0.0, 0.9];
+    settingsManager.colors.ageOld = [1.0, 0.6, 0, 0.9];
+    settingsManager.colors.ageLost = [1.0, 0.0, 0, 0.9];
     settingsManager.colors.lostobjects = [0.2, 1.0, 0.0, 0.65];
     settingsManager.colors.satLEO = [0.2, 1.0, 0.0, 0.65];
     settingsManager.colors.satGEO = [0.2, 1.0, 0.0, 0.65];

@@ -44,6 +44,10 @@
   ColorScheme.objectTypeFlags.velocitySlow = true;
   ColorScheme.objectTypeFlags.velocityMed = true;
   ColorScheme.objectTypeFlags.velocityFast = true;
+  ColorScheme.objectTypeFlags.ageNew = true;
+  ColorScheme.objectTypeFlags.ageMed = true;
+  ColorScheme.objectTypeFlags.ageOld = true;
+  ColorScheme.objectTypeFlags.ageLost = true;
 
   // Removed from function to reduce memory leak
   ColorScheme.prototype.calculateColorBuffers = function (isForceRecolor, isCalculateMarkers) {
@@ -592,7 +596,98 @@
         pickable: true
       };
     });
+    ColorScheme.ageOfElset = new ColorScheme(function (sat) {
+      // Objects beyond sensor coverage are hidden
+      if (sat.static && sat.type === 'Star') {
+        if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
+          return {
+            color: colorTheme.starLow,
+            pickable: true
+          };
+        } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorScheme.objectTypeFlags.starMed) {
+          return {
+            color: colorTheme.starMed,
+            pickable: true
+          };
+        } else if (sat.vmag < 3.5 && ColorScheme.objectTypeFlags.starHi) {
+          return {
+            color: colorTheme.starHi,
+            pickable: true
+          };
+        } else {
+          // Deselected
+          return {
+            color: colorTheme.deselected,
+            pickable: false
+          };
+        }
+      }
+      if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
+        return {
+          color: colorTheme.facility,
+          pickable: true
+        };
+      }
+      if (sat.static) {
+        return {
+          color: colorTheme.sensor,
+          pickable: true
+        };
+      }
+      if (sat.missile) {
+        return {
+          color: colorTheme.transparent,
+          pickable: false
+        };
+      }
+
+      var now = new Date();
+      var jday = timeManager.getDayOfYear(now);
+      now = now.getFullYear();
+      now = now.toString().substr(2, 2);
+      var daysold;
+      if (sat.TLE1.substr(18, 2) === now) {
+        daysold = jday - sat.TLE1.substr(20, 3);
+      } else {
+        daysold = jday - sat.TLE1.substr(20, 3) + (sat.TLE1.substr(17, 2) * 365);
+      }
+
+      if (daysold < 3 && ColorScheme.objectTypeFlags.ageNew) {
+        return {
+          color: colorTheme.ageNew,
+          pickable: true
+        };
+      }
+      if (daysold >= 3 && daysold < 14 && ColorScheme.objectTypeFlags.ageMed) {
+        return {
+          color: colorTheme.ageMed,
+          pickable: true
+        };
+      }
+      if (daysold >= 14 && daysold < 60 && ColorScheme.objectTypeFlags.ageOld) {
+        return {
+          color: colorTheme.ageOld,
+          pickable: true
+        };
+      }
+      if (daysold >= 60 && ColorScheme.objectTypeFlags.ageLost) {
+        return {
+          color: colorTheme.ageLost,
+          pickable: true
+        };
+      }
+
+      // Deselected
+      return {
+        color: colorTheme.deselected,
+        pickable: false
+      };
+    });
     ColorScheme.lostobjects = new ColorScheme(function (sat) {
+      // TODO: Constantly adjusting the search bar makes this really slow
+      // The objects should be appended to an array and the DOM modified once at
+      // the end of the color initialization.
+      //
       // Objects beyond sensor coverage are hidden
       if (sat.static && sat.type === 'Star') {
         if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {

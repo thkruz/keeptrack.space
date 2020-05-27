@@ -1749,6 +1749,16 @@ var isAnalysisMenuOpen = false;
         }
         e.preventDefault();
       });
+      $('#analysis-bpt').on("submit", function (e) {
+        let sats = $('#analysis-bpt-sats').val();
+        if (!satellite.checkSensorSelected()) {
+          // Default to COD
+          satellite.findBestPasses(sats,sensorManager.sensorList.COD);
+        } else {
+          satellite.findBestPasses(sats,sensorManager.selectedSensor);
+        }
+        e.preventDefault();
+      });
       $('#settings-form').on("change", function (e) {
         var isDMChecked = document.getElementById('settings-demo-mode').checked;
         var isSLMChecked = document.getElementById('settings-sat-label-mode').checked;

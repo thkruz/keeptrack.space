@@ -543,6 +543,25 @@
                   <button class="btn waves-effect waves-light" onclick="satellite.exportTle2Csv();">Export Catalog CSV &#9658;</button>
                 </center>
               </div>
+              <div class="row"></div>
+              <h5 class="center-align">Best Pass Times</h5>
+              <li class="divider"></li>
+              <div class="row"></div>
+              <div class="row">
+                <form id="analysis-bpt">
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <input value="25544,00005" id="analysis-bpt-sats" type="text">
+                      <label for="analysis-bpt-sats">Satellite Numbers</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <center>
+                      <button id="analysis-bpt-submit" class="btn waves-effect waves-light" type="submit" name="action">Generate Best Pass Times &#9658;</button>
+                    </center>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
           <div id="satcom-menu" class="side-menu-parent start-hidden text-select">
@@ -1564,6 +1583,7 @@
   <script>document.write('<script src="js/lib/starcalc.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/earth.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/groups.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/lookangles.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/satSet.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="modules/satVmagManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <!-- Load Extra Variables -->
@@ -1575,7 +1595,6 @@
   <script>document.write('<script src="js/color-scheme.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/mobile.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/lib/CanvasRecorder.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lookangles.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/ui.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/main.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/orbit-display.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>

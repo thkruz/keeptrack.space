@@ -1513,25 +1513,252 @@ or mirrored at any other location without the express written permission of the 
       }
       return;
     }
-    function _jday(year, mon, day, hr, minute, sec) { // from satellite.js
-      if (!year) {
-        // console.error('timeManager.jday should always have a date passed to it!');
-        var now;
-        now = Date.now();
-        jDayStart = new Date(now.getFullYear(), 0, 0);
-        jDayDiff = now - jDayStart;
-        return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);
-      } else {
-        return (367.0 * year -
-          Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
-          Math.floor(275 * mon / 9.0) +
-          day + 1721013.5 +
-          ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
-        );
-      }
-    }
     return lookanglesTable;
   };
+  satellite.findBestPasses = function (sats,sensor) {
+    var satArray = sats.split(',');
+    var tableSatTimes = [];
+    for (var i = 0; i < satArray.length; i++) {
+      try {
+        var sat = satSet.getSat(satSet.getIdFromObjNum(satArray[i]));
+        var satPasses = satellite.findBestPass(sat,sensor);
+        for (var s = 0; s < satPasses.length; s++) {
+          tableSatTimes.push(satPasses[s]);
+        }
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+    saveCsv(tableSatTimes,'bestSatTimes');
+  }
+  satellite.findBestPass = function (sat, sensor) {
+    var propOffset = 0;
+    (function _inputValidation () {
+      // Check if there is a sensor
+      if (typeof sensor == 'undefined') {
+        // Try using the current sensor if there is one
+        if (satellite.checkSensorSelected()) {
+          sensor = satellite.currentSensor;
+        } else {
+          console.error('getlookangles2 requires a sensor!');
+          return;
+        }
+        // Simple Error Checking
+      } else {
+        if (typeof sensor.obsminaz == 'undefined') {
+          console.error('sensor format incorrect');
+          return;
+        }
+        sensor.observerGd = {   // Array to calculate look angles in propagate()
+          latitude: sensor.lat * DEG2RAD,
+          longitude: sensor.long * DEG2RAD,
+          height: parseFloat(sensor.obshei)
+        };
+      }
+
+      if (typeof sat == 'undefined') {
+        console.error('sat parameter required!');
+      } else {
+        if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
+          console.error('sat parameter invalid format!');
+        }
+      }
+    })();
+
+    // Set default timing settings. These will be changed to find look angles at different times in future.
+    var propTempOffset = 0;               // offset letting us propagate in the future (or past)
+
+    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
+    var lookanglesTable = [];                                   // Iniially no rows to the table
+    var tempLookanglesInterval;
+
+    tempLookanglesInterval = satellite.lookanglesInterval;
+    satellite.lookanglesInterval = 5;
+    satellite.lookanglesLength = 7;
+    satellite.isRiseSetLookangles = true;
+
+    // Setup flags for passes
+    var score = 0;
+    var sAz = null;
+    var sEl = null;
+    var sRange = null;
+    var sTime = null;
+    var sTime; // This is set in the propagate function on first valid look
+    var passMinRange = sensor.obsmaxrange; // This is set each look to find minimum range (start at max range)
+    var passMaxEl = 0;
+    var margFast = false;
+    var start3 = false;
+    var stop3 = false;
+
+    var orbitalPeriod = MINUTES_PER_DAY / (satrec.no * MINUTES_PER_DAY / TAU); // Seconds in a day divided by mean motion
+
+    for (var i = 0; i < (satellite.lookanglesLength * 24 * 60 * 60); i += satellite.lookanglesInterval) {         // satellite.lookanglesInterval in seconds
+      propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
+      if (lookanglesTable.length <= 5000) {                           // Maximum of 1500 lines in the look angles table
+        lookanglesRow = propagate(propTempOffset, satrec);
+        // If data came back...
+        if (typeof lookanglesRow != 'undefined') {
+          lookanglesTable.push(lookanglesRow);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
+          // Reset flags for next pass
+          sAz = null;
+          sEl = null;
+          sRange = null;
+          sTime = null;
+          score = 0;
+          passMinRange = sensor.obsmaxrange; // This is set each look to find minimum range
+          passMaxEl = 0;
+          margFast = false;
+          i = i + (orbitalPeriod * 60 * 0.75); // Jump 3/4th to the next orbit
+        }
+      }
+    }
+
+    satellite.lookanglesInterval = tempLookanglesInterval;
+
+    return lookanglesTable;
+
+    function propagate (propTempOffset, satrec) {
+      var lookAngleRecord = {};
+      var scc = satrec.satnum;
+      var now = new Date();                                     // Make a time variable
+      now.setTime(Number(Date.now()) + propTempOffset);           // Set the time variable to the time in the future
+      var j = _jday(now.getUTCFullYear(),
+      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+      var gmst = satellite.gstime(j);
+
+      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+      var positionEci = satellite.sgp4(satrec, m);
+      var positionEcf, lookAngles, azimuth, elevation, range;
+
+      positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
+      lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+      azimuth = lookAngles.azimuth * RAD2DEG;
+      elevation = lookAngles.elevation * RAD2DEG;
+      range = lookAngles.rangeSat;
+
+      if (sensor.obsminaz < sensor.obsmaxaz) {
+        if (!((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+        ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+          return;
+        }
+      }
+      if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+      ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+        if (satellite.isRiseSetLookangles) {
+          // Previous Pass to Calculate first line of coverage
+          var now1 = new Date();
+          now1.setTime(Number(Date.now()) + propTempOffset - (satellite.lookanglesInterval * 1000));
+          var j1 = timeManager.jday(now1.getUTCFullYear(),
+          now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+          now1.getUTCDate(),
+          now1.getUTCHours(),
+          now1.getUTCMinutes(),
+          now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+          j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+          var gmst1 = satellite.gstime(j1);
+
+          var m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
+          var positionEci1 = satellite.sgp4(satrec, m1);
+          var positionEcf1, lookAngles1, azimuth1, elevation1, range1;
+
+          positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
+          lookAngles1 = satellite.ecfToLookAngles(sensor.observerGd, positionEcf1);
+          azimuth1 = lookAngles1.azimuth * RAD2DEG;
+          elevation1 = lookAngles1.elevation * RAD2DEG;
+          range1 = lookAngles1.rangeSat;
+          if (!((azimuth1 >= sensor.obsminaz || azimuth1 <= sensor.obsmaxaz) && (elevation1 >= sensor.obsminel && elevation1 <= sensor.obsmaxel) && (range1 <= sensor.obsmaxrange && range1 >= sensor.obsminrange)) ||
+          ((azimuth1 >= sensor.obsminaz2 || azimuth1 <= sensor.obsmaxaz2) && (elevation1 >= sensor.obsminel2 && elevation1 <= sensor.obsmaxel2) && (range1 <= sensor.obsmaxrange2 && range1 >= sensor.obsminrange2))) {
+            // if it starts around 3
+            if (elevation <= 3.5) {
+              start3 = true;
+            }
+
+            // First Line of Coverage
+            sTime = now;
+            sAz = azimuth.toFixed(0);
+            sEl = elevation.toFixed(1);
+            sRange = range.toFixed(0);
+          } else {
+            // Next Pass to Calculate Last line of coverage
+            now1.setTime(Number(Date.now()) + propTempOffset + (satellite.lookanglesInterval * 1000));
+            j1 = _jday(now1.getUTCFullYear(),
+            now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+            now1.getUTCDate(),
+            now1.getUTCHours(),
+            now1.getUTCMinutes(),
+            now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+            j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+            gmst1 = satellite.gstime(j1);
+
+            m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
+            positionEci1 = satellite.sgp4(satrec, m1);
+
+            positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
+            lookAngles1 = satellite.ecfToLookAngles(sensor.observerGd, positionEcf1);
+            azimuth1 = lookAngles1.azimuth * RAD2DEG;
+            elevation1 = lookAngles1.elevation * RAD2DEG;
+            range1 = lookAngles1.rangeSat;
+            if (!((azimuth1 >= sensor.obsminaz || azimuth1 <= sensor.obsmaxaz) && (elevation1 >= sensor.obsminel && elevation1 <= sensor.obsmaxel) && (range1 <= sensor.obsmaxrange && range1 >= sensor.obsminrange)) ||
+            ((azimuth1 >= sensor.obsminaz2 || azimuth1 <= sensor.obsmaxaz2) && (elevation1 >= sensor.obsminel2 && elevation1 <= sensor.obsmaxel2) && (range1 <= sensor.obsmaxrange2 && range1 >= sensor.obsminrange2))) {
+              // if it stops around 3
+              if (elevation <= 3.5) {
+                stop3 = true;
+              }
+              // Check for possible marginal for timeout
+              // using 3 minutes because FOV is expanded
+              score += (Math.min((now - sTime) / 1000 / 60 * 2,10)); // 5 minute pass is max score
+              var elScore = (Math.min(passMaxEl/5,10)); // 40 el or above is max score
+              elScore *= (start3 && stop3) ? 2 : 1; // Double points for start and stop at 3
+              score += elScore;
+              score += (Math.min(10*750/passMinRange,10)); // 750 or less is max score
+              // if (margFast) score -= 5;
+
+              // Last Line of Coverage
+              return {
+                scc: scc,
+                score: score,
+                startTime: sTime.toISOString(),
+                startAz: sAz,
+                startEl: sEl,
+                startRange: sRange,
+                stopTime: now.toISOString(),
+                stopAz: azimuth.toFixed(0),
+                stopEl: elevation.toFixed(1),
+                stopRange: range.toFixed(0)};
+            }
+          }
+        }
+        // Do this for any pass in coverage
+        if (range <= 750) margFast = true;
+        if (passMaxEl < elevation) passMaxEl = elevation;
+        if (passMinRange > range) passMinRange = range;
+      }
+      return;
+    }
+  };
+
+  function _jday(year, mon, day, hr, minute, sec) { // from satellite.js
+    if (!year) {
+      // console.error('timeManager.jday should always have a date passed to it!');
+      var now;
+      now = Date.now();
+      jDayStart = new Date(now.getFullYear(), 0, 0);
+      jDayDiff = now - jDayStart;
+      return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);
+    } else {
+      return (367.0 * year -
+        Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
+        Math.floor(275 * mon / 9.0) +
+        day + 1721013.5 +
+        ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
+      );
+    }
+  }
 
   satellite.getDOPsTable = function (lat, lon, alt) {
     var now;

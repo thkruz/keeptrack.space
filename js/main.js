@@ -157,7 +157,7 @@ var drawLoopCallback;
       orbitDisplay.init();
       groups.init();
       searchBox.init(satData);
-    });    
+    });
     drawLoop(); // kick off the animationFrame()s
   });
 
@@ -351,8 +351,8 @@ var drawLoopCallback;
       var altitude;
       var camDistTarget;
       if (!sat.missile && !sat.static && sat.active) { // if this is a satellite not a missile
-        satellite.getTEARR(sat);       // do lookangles on the satellite
-        altitude = satellite.currentTEARR.alt; // and set the altitude
+        sat.getTEARR();       // do lookangles on the satellite
+        altitude = uiManager.currentTEARR.alt; // and set the altitude
       } if (sat.missile) {
         altitude = sat.maxAlt + 1000;             // if it is a missile use its altitude
         orbitDisplay.setSelectOrbit(sat.satId);
@@ -445,8 +445,8 @@ var drawLoopCallback;
 
             // Pitch is the opposite of the angle to the latitude
             // Yaw is 90 degrees to the left of the angle to the longitude
-            pitchRotate = ((-1 * satellite.currentSensor.lat) * DEG2RAD);
-            yawRotate = ((90 - satellite.currentSensor.long) * DEG2RAD) - satPos.gmst;
+            pitchRotate = ((-1 * sensorManager.currentSensor.lat) * DEG2RAD);
+            yawRotate = ((90 - sensorManager.currentSensor.long) * DEG2RAD) - satPos.gmst;
             mat4.rotate(camMatrix, camMatrix, pitchRotate, [1, 0, 0]);
             mat4.rotate(camMatrix, camMatrix, yawRotate, [0, 0, 1]);
 
@@ -458,7 +458,7 @@ var drawLoopCallback;
           }
         case cameraType.SATELLITE:
           {
-            // yawRotate = ((-90 - satellite.currentSensor.long) * DEG2RAD);
+            // yawRotate = ((-90 - sensorManager.currentSensor.long) * DEG2RAD);
             if (selectedSat !== -1) lastSelectedSat = selectedSat;
             let sat = satSet.getSat(lastSelectedSat);
             // mat4.rotate(camMatrix, camMatrix, sat.inclination * DEG2RAD, [0, 1, 0]);
@@ -477,8 +477,8 @@ var drawLoopCallback;
 
             // Pitch is the opposite of the angle to the latitude
             // Yaw is 90 degrees to the left of the angle to the longitude
-            pitchRotate = ((-1 * satellite.currentSensor.lat) * DEG2RAD);
-            yawRotate = ((90 - satellite.currentSensor.long) * DEG2RAD) - satPos.gmst;
+            pitchRotate = ((-1 * sensorManager.currentSensor.lat) * DEG2RAD);
+            yawRotate = ((90 - sensorManager.currentSensor.long) * DEG2RAD) - satPos.gmst;
 
             // TODO: Calculate elevation for cameraType.ASTRONOMY
             // Idealy the astronomy view would feel more natural and tell you what
@@ -487,13 +487,13 @@ var drawLoopCallback;
             // fpsEl = ((fpsPitch + 90) > 90) ? (-(fpsPitch) + 90) : (fpsPitch + 90);
             // $('#el-text').html(' EL: ' + fpsEl.toFixed(2) + ' deg');
 
-            // yawRotate = ((-90 - satellite.currentSensor.long) * DEG2RAD);
+            // yawRotate = ((-90 - sensorManager.currentSensor.long) * DEG2RAD);
             let sensor = null;
-            if (typeof satellite.currentSensor.name == 'undefined') {
-              sensor = satSet.getIdFromSensorName(satellite.currentSensor.name);
+            if (typeof sensorManager.currentSensor.name == 'undefined') {
+              sensor = satSet.getIdFromSensorName(sensorManager.currentSensor.name);
               if (sensor == null) return;
             } else {
-              sensor = satSet.getSat(satSet.getIdFromSensorName(satellite.currentSensor.name));
+              sensor = satSet.getSat(satSet.getIdFromSensorName(sensorManager.currentSensor.name));
             }
             // mat4.rotate(camMatrix, camMatrix, sat.inclination * DEG2RAD, [0, 1, 0]);
             mat4.rotate(camMatrix, camMatrix, (pitchRotate + (-fpsPitch * DEG2RAD)), [1, 0, 0]);
@@ -532,10 +532,10 @@ var drawLoopCallback;
     }
     var gmst = satellite.gstime(j);
 
-    var cosLat = Math.cos(satellite.currentSensor.lat * DEG2RAD);
-    var sinLat = Math.sin(satellite.currentSensor.lat * DEG2RAD);
-    var cosLon = Math.cos((satellite.currentSensor.long * DEG2RAD) + gmst);
-    var sinLon = Math.sin((satellite.currentSensor.long * DEG2RAD) + gmst);
+    var cosLat = Math.cos(sensorManager.currentSensor.lat * DEG2RAD);
+    var sinLat = Math.sin(sensorManager.currentSensor.lat * DEG2RAD);
+    var cosLon = Math.cos((sensorManager.currentSensor.long * DEG2RAD) + gmst);
+    var sinLon = Math.sin((sensorManager.currentSensor.long * DEG2RAD) + gmst);
 
     pos.x = (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * cosLon;
     pos.y = (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * sinLon;
@@ -654,7 +654,7 @@ var drawLoopCallback;
       return;
     }
 
-    if (!satellite.checkSensorSelected()) return;
+    if (!sensorManager.checkSensorSelected()) return;
     if (drawNow - satLabelModeLastTime < settingsManager.satLabelInterval) return;
 
     orbitDisplay.clearInViewOrbit();
@@ -748,7 +748,7 @@ var drawLoopCallback;
         satHoverBoxNode2.textContent = '';
         satHoverBoxNode3.textContent = '';
       } else {
-        if (satellite.checkSensorSelected() && isShowNextPass && isShowDistance) {
+        if (sensorManager.checkSensorSelected() && isShowNextPass && isShowDistance) {
           satHoverBoxNode1.textContent = (sat.ON);
           satHoverBoxNode2.textContent = (sat.SCC_NUM);
           satHoverBoxNode3.innerHTML = (satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '');
@@ -757,7 +757,7 @@ var drawLoopCallback;
           satHoverBoxNode2.innerHTML = (sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
           satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
                                           'X: ' + sat.velocityX.toFixed(2) + 'km/s Y: ' + sat.velocityY.toFixed(2) + 'km/s Z: ' + sat.velocityZ.toFixed(2)) + 'km/s';
-        } else if (satellite.checkSensorSelected() && isShowNextPass) {
+        } else if (sensorManager.checkSensorSelected() && isShowNextPass) {
           satHoverBoxNode1.textContent = (sat.ON);
           satHoverBoxNode2.textContent = (sat.SCC_NUM);
           satHoverBoxNode3.textContent = (satellite.nextpass(sat));
@@ -785,7 +785,7 @@ var drawLoopCallback;
   var demoModeSatellite = 0;
   var demoModeLastTime = 0;
   function _demoMode () {
-    if (!satellite.checkSensorSelected()) return;
+    if (!sensorManager.checkSensorSelected()) return;
     if (drawNow - demoModeLastTime < settingsManager.demoModeInterval) return;
 
     demoModeLastTime = drawNow;
@@ -1125,7 +1125,7 @@ function selectSat (satId) {
 
     orbitDisplay.setSelectOrbit(satId);
 
-    if (satellite.checkSensorSelected()) {
+    if (sensorManager.checkSensorSelected()) {
       $('#menu-lookangles').removeClass('bmenu-item-disabled');
     }
 
@@ -1142,7 +1142,7 @@ function selectSat (satId) {
         $('#search-results').attr('style', 'display:block; max-height:27%');
         if (cameraType.current !== cameraType.PLANETARIUM) {
           // Unclear why this was needed...
-          // uiController.legendMenuChange('default');
+          // uiManager.legendMenuChange('default');
         }
       }
     } else {
@@ -1151,7 +1151,7 @@ function selectSat (satId) {
         $('#search-results').attr('style', 'max-height:27%');
         if (cameraType.current !== cameraType.PLANETARIUM) {
           // Unclear why this was needed...
-          // uiController.legendMenuChange('default');
+          // uiManager.legendMenuChange('default');
         }
       }
     }
@@ -1269,15 +1269,15 @@ function selectSat (satId) {
       $('#sat-elset-age').tooltip({delay: 50, html: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(), position: 'left'});
 
       now = new Date(timeManager.propRealTime + timeManager.propOffset);
-      var sunTime = SunCalc.getTimes(now, satellite.currentSensor.lat, satellite.currentSensor.long);
-      var satInSun = satellite.isInSun(sat);
+      var sunTime = SunCalc.getTimes(now, sensorManager.currentSensor.lat, sensorManager.currentSensor.long);
+      var satInSun = sat.isInSun;
       // If No Sensor, then Ignore Sun Exclusion
-      if (!satellite.checkSensorSelected()) {
+      if (!sensorManager.checkSensorSelected()) {
         if (satInSun == 0) $('#sat-sun').html('No Sunlight');
         if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
         if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
       // If Radar Selected, then Say the Sun Doesn't Matter
-      } else if ((satellite.currentSensor.type !== 'Optical') && (satellite.currentSensor.type !== 'Observer')) {
+      } else if ((sensorManager.currentSensor.type !== 'Optical') && (sensorManager.currentSensor.type !== 'Observer')) {
         $('#sat-sun').html('No Effect');
       // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
       } else if (sunTime.dawn.getTime() - now > 0 || sunTime.dusk.getTime() - now < 0) {
@@ -1296,7 +1296,7 @@ function selectSat (satId) {
       }
     }
 
-    if (satellite.checkSensorSelected() && isLookanglesMenuOpen) {
+    if (sensorManager.checkSensorSelected() && isLookanglesMenuOpen) {
       satellite.getlookangles(sat);
     }
   }
@@ -1346,7 +1346,7 @@ function selectSat (satId) {
     } else {
       $('#sat-associates-wrapper').hide();
     }
-    uiController.updateMap();
+    uiManager.updateMap();
 
     // ISS Stream Slows Down a Lot Of Computers
     // if (sat.SCC_NUM === '25544') { // ISS is Selected

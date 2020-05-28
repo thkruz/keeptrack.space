@@ -17,6 +17,25 @@ or mirrored at any other location without the express written permission of the 
 // Sensor Manager (sensorManager)
 (function () {
   var sensorManager = {};
+  sensorManager.tempSensor = {};
+  sensorManager.checkSensorSelected = () => {
+    if (sensorManager.currentSensor.lat != null) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  sensorManager.defaultSensor = {};
+  sensorManager.currentSensor = {};
+  sensorManager.defaultSensor.observerGd = {
+    lat: null,
+    longitude: 0,
+    latitude: 0,
+    height: 0
+  };
+  sensorManager.currentSensor = sensorManager.defaultSensor;
+
   var sensorList = {};
 
   sensorList.COD = {
@@ -1028,7 +1047,7 @@ or mirrored at any other location without the express written permission of the 
         multiSensor: true
       });
       satellite.setobs(sensorManager.sensorList.COD);
-      satellite.getsensorinfo();
+      uiManager.getsensorinfo();
       selectSat(-1);
       setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else if (selectedSensor === 'NATO-MW') {
@@ -1047,7 +1066,7 @@ or mirrored at any other location without the express written permission of the 
         multiSensor: true
       });
       satellite.setobs(sensorManager.sensorList.COD);
-      satellite.getsensorinfo();
+      uiManager.getsensorinfo();
       selectSat(-1);
       setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else if (selectedSensor === 'RUS-ALL') {
@@ -1068,7 +1087,7 @@ or mirrored at any other location without the express written permission of the 
         multiSensor: true
       });
       satellite.setobs(sensorManager.sensorList.ARM);
-      satellite.getsensorinfo();
+      uiManager.getsensorinfo();
       selectSat(-1);
       setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else if (selectedSensor === 'LEO-LABS') {
@@ -1084,7 +1103,7 @@ or mirrored at any other location without the express written permission of the 
         multiSensor: true
       });
       satellite.setobs(sensorManager.sensorList.MSR);
-      satellite.getsensorinfo();
+      uiManager.getsensorinfo();
       selectSat(-1);
       setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else if (selectedSensor === 'MD-ALL') {
@@ -1108,7 +1127,7 @@ or mirrored at any other location without the express written permission of the 
         multiSensor: true
       });
       satellite.setobs(sensorManager.sensorList.MSR);
-      satellite.getsensorinfo();
+      uiManager.getsensorinfo();
       selectSat(-1);
       setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else {
@@ -1135,13 +1154,27 @@ or mirrored at any other location without the express written permission of the 
           setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
           changeZoom(sensorManager.selectedSensor.zoom);
           camSnap(latToPitch(sensorManager.selectedSensor.lat), longToYaw(sensorManager.selectedSensor.long));
-          satellite.getsensorinfo();
+          uiManager.getsensorinfo();
         }
       }
     }
 
-    // uiController.legendMenuChange('default');
+    // uiManager.legendMenuChange('default');
+    sensorManager.sensorListUS = [
+      sensorManager.sensorList.COD,
+      sensorManager.sensorList.BLE,
+      sensorManager.sensorList.CAV,
+      sensorManager.sensorList.CLR,
+      sensorManager.sensorList.EGL,
+      sensorManager.sensorList.FYL,
+      sensorManager.sensorList.THL,
+      sensorManager.sensorList.MIL,
+      sensorManager.sensorList.ALT,
+      sensorManager.sensorList.ASC,
+      sensorManager.sensorList.CDN
+    ];
   };
+
 
   sensorManager.sensorList = sensorList;
   window.sensorManager = sensorManager;

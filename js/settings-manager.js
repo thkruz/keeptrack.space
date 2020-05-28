@@ -40,7 +40,7 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.10.6';
+  settingsManager.versionNumber = '1.10.7';
   settingsManager.versionDate = 'May 28, 2020';
 
   settingsManager.lowPerf = false;

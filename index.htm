@@ -15,6 +15,7 @@
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
 
     <!-- Get Settings -->
+    <script>document.write('<script src="js/lib/jquery.min.js?v=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
     <script>document.write('<script src="js/settings-manager.js?v=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
     <!-- Import CSS needed for loading screen -->
     <script>document.write('<link rel="stylesheet" href="css/loading-screen.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
@@ -535,12 +536,12 @@
               </ul>
               <div class="row">
                 <center>
-                  <button class="btn waves-effect waves-light" onclick="satellite.exportTle2Txt();">Export TLEs &#9658;</button>
+                  <button class="btn waves-effect waves-light" onclick="satSet.exportTle2Txt();">Export TLEs &#9658;</button>
                 </center>
               </div>
               <div class="row">
                 <center>
-                  <button class="btn waves-effect waves-light" onclick="satellite.exportTle2Csv();">Export Catalog CSV &#9658;</button>
+                  <button class="btn waves-effect waves-light" onclick="satSet.exportTle2Csv();">Export Catalog CSV &#9658;</button>
                 </center>
               </div>
               <div class="row"></div>
@@ -1027,7 +1028,7 @@
                     </div>
                   </div>
                   <div id="settings-lowperf" class="row center">
-                    <button class="red btn waves-effect waves-light" onclick="uiController.startLowPerf();">Low End PC Version &#9658;
+                    <button class="red btn waves-effect waves-light" onclick="uiManager.startLowPerf();">Low End PC Version &#9658;
                     </button>
                   </div>
                 </form>
@@ -1461,7 +1462,7 @@
                   <div class="center-align">
                     <button id="cs-submit" class="btn waves-effect waves-light" type="submit" name="action">Create Custom Sensor &#9658;</button>
                     <br><br>
-                    <button id="cs-geolocation" class="btn waves-effect waves-light" onclick="uiController.useCurrentGeolocationAsSensor();" name="search">Use Geolocation &#9658;</button>
+                    <button id="cs-geolocation" class="btn waves-effect waves-light" onclick="uiManager.useCurrentGeolocationAsSensor();" name="search">Use Geolocation &#9658;</button>
                   </div>
                 </form>
               </div>
@@ -1487,7 +1488,7 @@
   </main>
   <footer id="nav-footer" class="page-footer">
     <div id="footer-toggle-wrapper">
-      <div id="nav-footer-toggle" onclick="uiController.footerToggle();">&#x25BC;</div>
+      <div id="nav-footer-toggle" onclick="uiManager.footerToggle();">&#x25BC;</div>
     </div>
     <div id="datetime" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Time Menu">
         <div id="datetime-text"></div>
@@ -1550,7 +1551,6 @@
   <script>document.write('<link rel="stylesheet" href="css/jquery-ui.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
   <script>document.write('<link rel="stylesheet" href="css/jquery-ui-timepicker-addon.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
   <!-- Load Satellite Dependencies -->
-  <script>document.write('<script src="js/lib/jquery.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/lib/colorPick.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/lib/materialize.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/lib/gl-matrix-min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>

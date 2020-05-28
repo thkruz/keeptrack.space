@@ -29,45 +29,6 @@ or mirrored at any other location without the express written permission of the 
   satellite.lookanglesLength = 2;
   satellite.isRiseSetLookangles = false;
 
-  // Init Objects
-  satellite.currentSensor = {};
-  satellite.tempSensor = {};
-  satellite.currentTEARR = {};
-
-  // TODO: sensor info should be contained in sensor manager
-  satellite.defaultSensor = {};
-  satellite.defaultSensor.observerGd = {
-    lat: null,
-    longitude: 0,
-    latitude: 0,
-    height: 0
-  };
-  // TODO: sensor info should be contained in sensor manager
-  satellite.currentSensor = satellite.defaultSensor;
-
-  // Init Us Sensor List for MultiSite Propagate Menu
-  // TODO: satellite.sensorListUS should be contained in sensor manager
-  satellite.sensorListUS = [
-    window.sensorManager.sensorList.COD,
-    window.sensorManager.sensorList.BLE,
-    window.sensorManager.sensorList.CAV,
-    window.sensorManager.sensorList.CLR,
-    window.sensorManager.sensorList.EGL,
-    window.sensorManager.sensorList.FYL,
-    window.sensorManager.sensorList.THL,
-    window.sensorManager.sensorList.MIL,
-    window.sensorManager.sensorList.ALT,
-    window.sensorManager.sensorList.ASC,
-    window.sensorManager.sensorList.CDN
-  ];
-
-  satellite.checkSensorSelected = () => {
-    if (satellite.currentSensor.lat != null) {
-      return true;
-    } else {
-      return false;
-    }
-  };
   satellite.currentEpoch = (currentDate) => {
     currentDate = new Date(currentDate);
     let epochYear = currentDate.getUTCFullYear();
@@ -98,27 +59,12 @@ or mirrored at any other location without the express written permission of the 
     return '<br />' + distanceApart + ' km';
   };
 
-  // TODO: This belongs in ui.js or part of a new sat class
-  satellite.getsensorinfo = () => {
-    $('#sensor-latitude').html(satellite.currentSensor.lat);
-    $('#sensor-longitude').html(satellite.currentSensor.long);
-    $('#sensor-minazimuth').html(satellite.currentSensor.obsminaz);
-    $('#sensor-maxazimuth').html(satellite.currentSensor.obsmaxaz);
-    $('#sensor-minelevation').html(satellite.currentSensor.obsminel);
-    $('#sensor-maxelevation').html(satellite.currentSensor.obsmaxel);
-    $('#sensor-minrange').html(satellite.currentSensor.obsminrange);
-    $('#sensor-maxrange').html(satellite.currentSensor.obsmaxrange);
-  };
-
   // TODO: UI element changes/references should be moved to ui.js
   // There are a series of referecnes, especially in satellite.obs, to ui elements.
   // These should be moved to ui.js and then called before/after calling satellite.setobs
-
-  // TODO: replace "reset" with use of null for sensor
-  satellite.setobs = (sensor, reset) => {
-    /** obslat is what is used to determine if a site is set or not. If this is null sensorSelected() will return false */
-    if (reset) {
-      satellite.currentSensor = satellite.defaultSensor;
+  satellite.setobs = (sensor) => {
+    if (typeof sensor == 'undefined') {
+      sensorManager.currentSensor = sensorManager.defaultSensor;
       $('.sensor-reset-menu').hide();
       return;
     } else {
@@ -129,24 +75,16 @@ or mirrored at any other location without the express written permission of the 
       $('#menu-astronomy').removeClass('bmenu-item-disabled');
       $('.sensor-reset-menu').show();
     }
-    satellite.currentSensor = sensor;
-    satellite.currentSensor.observerGd = {   // Array to calculate look angles in propagate()
+    sensorManager.currentSensor = sensor;
+    sensorManager.currentSensor.observerGd = {   // Array to calculate look angles in propagate()
       latitude: sensor.lat * DEG2RAD,
       longitude: sensor.long * DEG2RAD,
       height: parseFloat(sensor.obshei)               // Converts from string to number
     };
   };
 
-  // TODO: Standardize this function throughout the code vs this workaround
-  satellite.altitudeCheck = (TLE1, TLE2, propOffset) => {
-    // Allow alternate function        (sat, propOffset)
-    let satrec;
-    if (TLE1.TLE1 !== undefined) {
-      propOffset = TLE2;
-      satrec = satellite.twoline2satrec(TLE1.TLE1, TLE1.TLE2);// perform and store sat init calcs
-    } else {
-      satrec = satellite.twoline2satrec(TLE1, TLE2);// perform and store sat init calcs
-    }
+  satellite.altitudeCheck = (tle1, tle2, propOffset) => {
+    let satrec = satellite.twoline2satrec(tle1, tle2);// perform and store sat init calcs
 
     let propTime = timeManager.propTimeCheck(propOffset, timeManager.propRealTime);
     let j = timeManager.jday(propTime.getUTCFullYear(),
@@ -169,33 +107,13 @@ or mirrored at any other location without the express written permission of the 
     }
     return gpos.height;
   };
-
-  // TODO: satellite.getDirection should be part of a future sat class
-  satellite.getDirection = (sat) => {
-    let nowLat = satellite.getTEARR(sat).lat * RAD2DEG;
-    let futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
-    let futLat = satellite.getTEARR(sat, undefined, futureTime).lat * RAD2DEG;
-
-    if (nowLat < futLat) return 'N';
-    if (nowLat > futLat) return 'S';
-    if (nowLat === futLat) {
-      futureTime = timeManager.propTimeCheck(20000, timeManager.propTime());
-      futureTEARR = satellite.getTEARR(sat, undefined, futureTime);
-      if (nowLat < futLat) return 'N';
-      if (nowLat > futLat) return 'S';
-    }
-    console.warn('Sat Direction Calculation Error - By Pole?');
-    return 'Error';
-  };
-
-  // TODO: satellite.getTEARR should be part of a future sat class
   satellite.getTEARR = (sat, sensor, propTime) => {
     let currentTEARR = {}; // Most current TEARR data that is set in satellite object and returned.
 
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensor == 'undefined') {
-      if (typeof satellite.currentSensor != 'undefined') {
-        sensor = satellite.currentSensor;
+      if (typeof sensorManager.currentSensor != 'undefined') {
+        sensor = sensorManager.currentSensor;
       } else {
         throw 'getTEARR requires a sensor or for a sensor to be currently selected.';
       }
@@ -264,91 +182,9 @@ or mirrored at any other location without the express written permission of the 
       currentTEARR.range = 0;
     }
 
-    // TODO: Standardize this as the code for checking if a satellite is in FOV
-    // Check if satellite is in field of view of a sensor.
-    if (sensor.obsminaz > sensor.obsmaxaz) {
-      if (((currentTEARR.azimuth >= sensor.obsminaz || currentTEARR.azimuth <= sensor.obsmaxaz) &&
-           (currentTEARR.elevation >= sensor.obsminel && currentTEARR.elevation <= sensor.obsmaxel) &&
-           (currentTEARR.range <= sensor.obsmaxrange && currentTEARR.range >= sensor.obsminrange)) ||
-           ((currentTEARR.azimuth >= sensor.obsminaz2 || currentTEARR.azimuth <= sensor.obsmaxaz2) &&
-           (currentTEARR.elevation >= sensor.obsminel2 && currentTEARR.elevation <= sensor.obsmaxel2) &&
-           (currentTEARR.range <= sensor.obsmaxrange2 && currentTEARR.range >= sensor.obsminrange2))) {
-        currentTEARR.inview = true;
-      } else {
-        currentTEARR.inview = false;
-      }
-    } else {
-      if (((currentTEARR.azimuth >= sensor.obsminaz && currentTEARR.azimuth <= sensor.obsmaxaz) &&
-           (currentTEARR.elevation >= sensor.obsminel && currentTEARR.elevation <= sensor.obsmaxel) &&
-           (currentTEARR.range <= sensor.obsmaxrange && currentTEARR.range >= sensor.obsminrange)) ||
-           ((currentTEARR.azimuth >= sensor.obsminaz2 && currentTEARR.azimuth <= sensor.obsmaxaz2) &&
-           (currentTEARR.elevation >= sensor.obsminel2 && currentTEARR.elevation <= sensor.obsmaxel2) &&
-           (currentTEARR.range <= sensor.obsmaxrange2 && currentTEARR.range >= sensor.obsminrange2))) {
-        currentTEARR.inview = true;
-      } else {
-        currentTEARR.inview = false;
-      }
-    }
-    satellite.currentTEARR = currentTEARR;
+    currentTEARR.inview = satellite.checkIsInFOV(sensor,{az: currentTEARR.azimuth, el: currentTEARR.elevation, range: currentTEARR.range});
+    uiManager.currentTEARR = currentTEARR;
     return currentTEARR;
-  };
-
-  // TODO: satellite.exportTle2Csv belongs in satSet
-  satellite.exportTle2Csv = () => {
-    let catalogTLE2 = [];
-    let satCat = satSet.getSatData();
-    satCat.sort((a, b) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
-    for (let s = 0; s < satCat.length; s++) {
-      let sat = satCat[s];
-      if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') { continue; }
-      if (sat.C == 'ANALSAT') continue;
-      catalogTLE2.push({
-        satId: sat.SCC_NUM,
-        TLE1: sat.TLE1,
-        TLE2: sat.TLE2,
-        inclination: sat.inclination,
-        eccentricity: sat.eccentricity,
-        period: sat.period,
-        raan: sat.raan,
-        apogee: sat.apogee,
-        perigee: sat.perigee,
-        site: sat.LS,
-        country: sat.C,
-        name: sat.ON,
-        rocket: sat.LV,});
-    }
-    saveCsv(catalogTLE2,'catalogTLE2');
-  };
-
-  // TODO: satellite.exportTle2Txt belongs in satSet
-  satellite.exportTle2Txt = () => {
-    let catalogTLE2 = [];
-    let satCat = satSet.getSatData();
-    satCat.sort((a, b) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
-    for (let s = 0; s < satCat.length; s++) {
-      let sat = satCat[s];
-      if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') { continue; }
-      if (sat.C == 'ANALSAT') continue;
-      catalogTLE2.push(sat.TLE1);
-      catalogTLE2.push(sat.TLE2);
-    }
-    catalogTLE2 = catalogTLE2.join('\n');
-    var blob = new Blob([catalogTLE2], {type: 'text/plain;charset=utf-8'});
-    saveAs(blob, 'TLE.txt');
-  };
-
-  // TODO: satellite.calculateSatrec belongs in satSet
-  satellite.calculateSatrec = () => {
-    let satrecCache = [];
-    let satrec; // Called outside of the loop to save memory
-    for (let s = 0; s < satSet.getSatData().length; s++) {
-      sat = satSet.getSat(s);
-      if (sat.static || sat.missile || !sat.active) { continue; }
-      satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-      satrecCache.push({'SCC_NUM': sat.SCC_NUM, 'satrec': satrec});
-    }
-    // TODO: window.satrecCache probably isn't necessary
-    window.satrecCache = satrecCache;
   };
 
   satellite.nextpassList = (satArray) => {
@@ -364,10 +200,10 @@ or mirrored at any other location without the express written permission of the 
   satellite.nextpass = (sat, sensor, searchLength, interval) => {
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensor == 'undefined') {
-      if (typeof satellite.currentSensor == 'undefined') {
+      if (typeof sensorManager.currentSensor == 'undefined') {
         throw 'getTEARR requires a sensor or for a sensor to be currently selected.';
       } else {
-        sensor = satellite.currentSensor;
+        sensor = sensorManager.currentSensor;
       }
     }
     // If sensor's observerGd is not set try to set it using it parameters
@@ -401,14 +237,13 @@ or mirrored at any other location without the express written permission of the 
     }
     return 'No Passes in ' + satellite.lookanglesLength + ' Days';
   };
-
   satellite.nextNpasses = (sat, sensor, searchLength, interval, numPasses) => {
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensor == 'undefined') {
-      if (typeof satellite.currentSensor == 'undefined') {
+      if (typeof sensorManager.currentSensor == 'undefined') {
         throw 'getTEARR requires a sensor or for a sensor to be currently selected.';
       } else {
-        sensor = satellite.currentSensor;
+        sensor = sensorManager.currentSensor;
       }
     }
     // If sensor's observerGd is not set try to set it using it parameters
@@ -451,7 +286,7 @@ or mirrored at any other location without the express written permission of the 
   satellite.lastlooksArray = [];
   satellite.getlookangles = (sat) => {
     // Error Checking
-    if (!satellite.checkSensorSelected()) {
+    if (!sensorManager.checkSensorSelected()) {
       console.warn('satellite.getlookangles requires a sensor to be set!');
       return;
     }
@@ -543,7 +378,7 @@ or mirrored at any other location without the express written permission of the 
       }
     })();
     function _propagate (offset,  satrec) {
-      let sensor = satellite.currentSensor;
+      let sensor = sensorManager.currentSensor;
       // Setup Realtime and Offset Time
       var propRealTimeTemp = Date.now();
       var now = timeManager.propTimeCheck(offset * 1000, propRealTimeTemp);
@@ -592,10 +427,10 @@ or mirrored at any other location without the express written permission of the 
   satellite.lastMultiSiteArray = [];
   satellite.getlookanglesMultiSite = (sat) => {
     let isResetToDefault = false;
-    if (!satellite.checkSensorSelected()) { isResetToDefault = true; }
+    if (!sensorManager.checkSensorSelected()) { isResetToDefault = true; }
 
     // Save Current Sensor
-    satellite.tempSensor = satellite.currentSensor;
+    sensorManager.tempSensor = sensorManager.currentSensor;
 
     // Determine time offset from real time
     let propOffset = timeManager.getPropOffset();
@@ -606,11 +441,11 @@ or mirrored at any other location without the express written permission of the 
 
     // Calculate Look Angles
     let multiSiteArray = [];
-    for (let sensorIndex = 0; sensorIndex < satellite.sensorListUS.length; sensorIndex++) {
-      satellite.setobs(satellite.sensorListUS[sensorIndex]);
+    for (let sensorIndex = 0; sensorIndex < sensorManager.sensorListUS.length; sensorIndex++) {
+      satellite.setobs(sensorManager.sensorListUS[sensorIndex]);
       for (let i = 0; i < (satellite.lookanglesLength * 24 * 60 * 60); i += satellite.lookanglesInterval) {         // 5second Looks
         let propTempOffset = i + propOffset;                 // Offset in seconds
-        let multiSitePass = _propagateMultiSite(propTempOffset, satrec, satellite.sensorListUS[sensorIndex]);
+        let multiSitePass = _propagateMultiSite(propTempOffset, satrec, sensorManager.sensorListUS[sensorIndex]);
         if (typeof multiSitePass != 'undefined') {
           multiSiteArray.push(multiSitePass);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
           i = i + (orbitalPeriod * 60 * 0.75); // Jump 3/4th to the next orbit
@@ -689,9 +524,9 @@ or mirrored at any other location without the express written permission of the 
     })();
 
     if (isResetToDefault) {
-      satellite.currentSensor = satellite.defaultSensor;
+      sensorManager.currentSensor = sensorManager.defaultSensor;
     } else {
-      satellite.currentSensor = satellite.tempSensor;
+      sensorManager.currentSensor = sensorManager.tempSensor;
     }
 
     function _propagateMultiSite (offset, satrec, sensor) {
@@ -1126,8 +961,8 @@ or mirrored at any other location without the express written permission of the 
       // Check if there is a sensor
       if (typeof sensor == 'undefined') {
         // Try using the current sensor if there is one
-        if (satellite.checkSensorSelected()) {
-          sensor = satellite.currentSensor;
+        if (sensorManager.checkSensorSelected()) {
+          sensor = sensorManager.currentSensor;
         } else {
           console.error('getlookangles2 requires a sensor!');
           return;
@@ -1251,9 +1086,9 @@ or mirrored at any other location without the express written permission of the 
     let sortedTableSatTimes = tableSatTimes.sort((a, b) => b.sortTime - a.sortTime);
     sortedTableSatTimes.reverse();
 
-    sortedTableSatTimes.forEach(function(v){ delete v.sortTime });
+    sortedTableSatTimes.forEach(function(v){ delete v.sortTime; });
 
-    for (var i = 0; i < sortedTableSatTimes.length; i++) {
+    for (let i = 0; i < sortedTableSatTimes.length; i++) {
       sortedTableSatTimes[i].startDate = sortedTableSatTimes[i].startDate.toISOString().split('T')[0];
       sortedTableSatTimes[i].startTime = sortedTableSatTimes[i].startTime.toISOString().split('T')[1].split('.')[0];
       sortedTableSatTimes[i].stopDate = sortedTableSatTimes[i].stopDate.toISOString().split('T')[0];
@@ -1261,14 +1096,14 @@ or mirrored at any other location without the express written permission of the 
     }
 
     saveCsv(sortedTableSatTimes,'bestSatTimes');
-  }
+  };
   satellite.findBestPass = (sat, sensor, propOffset) => {
     (function _inputValidation () {
       // Check if there is a sensor
       if (typeof sensor == 'undefined') {
         // Try using the current sensor if there is one
-        if (satellite.checkSensorSelected()) {
-          sensor = satellite.currentSensor;
+        if (sensorManager.checkSensorSelected()) {
+          sensor = sensorManager.currentSensor;
         } else {
           console.error('getlookangles2 requires a sensor!');
           return;
@@ -1417,25 +1252,7 @@ or mirrored at any other location without the express written permission of the 
     }
   };
 
-  function _jday(year, mon, day, hr, minute, sec) { // from satellite.js
-    if (!year) {
-      // console.error('timeManager.jday should always have a date passed to it!');
-      var now;
-      now = Date.now();
-      jDayStart = new Date(now.getFullYear(), 0, 0);
-      jDayDiff = now - jDayStart;
-      return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);
-    } else {
-      return (367.0 * year -
-        Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
-        Math.floor(275 * mon / 9.0) +
-        day + 1721013.5 +
-        ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
-      );
-    }
-  }
-
-  // TODO: standardize use of azimuth, elevation, and rangeSat (whatever satellite.js uses)
+  // IDEA: standardize use of azimuth, elevation, and rangeSat (whatever satellite.js uses)
   satellite.getRae = (now, satrec, sensor) => {
     let j = _jday(now.getUTCFullYear(),
     now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -1463,18 +1280,29 @@ or mirrored at any other location without the express written permission of the 
     let elevation = rae.el;
     let range = rae.range;
 
-    if (sensor.obsminaz < sensor.obsmaxaz) {
-      if (!((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-      ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+    if (sensor.obsminaz > sensor.obsmaxaz) {
+      if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) &&
+           (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) &&
+           (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+           ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) &&
+           (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) &&
+           (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) &&
+           (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) &&
+           (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+           ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) &&
+           (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) &&
+           (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+        return true;
+      } else {
         return false;
       }
     }
-    if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-    ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
-      return true;
-    }
-
-    return false;
   };
 
   satellite.getDOPsTable = (lat, lon, alt) => {
@@ -1620,31 +1448,13 @@ or mirrored at any other location without the express written permission of the 
     return dops;
 };
 
-  // TODO: Add comments on what this is used for
-  function _Nearest180 (arr) {
-    let  maxDiff = null;
-    for(let x = 0; x < arr.length; x++){
-      for(let y = x+1; y < arr.length; y++){
-          if(arr[x] < arr[y] && maxDiff < (arr[y] - arr[x])){
-              if (arr[y] - arr[x] > 180) {
-                arr[y] = arr[y] - 180;
-              }
-              if (maxDiff < (arr[y] - arr[x])) {
-                maxDiff = arr[y] - arr[x];
-              }
-          }
-      }
-    }
-    return maxDiff === null ? -1 : maxDiff;
-  }
-
   satellite.getSunTimes = (sat, sensor, searchLength, interval) => {
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensor == 'undefined') {
-      if (typeof satellite.currentSensor == 'undefined') {
+      if (typeof sensorManager.currentSensor == 'undefined') {
         throw 'getTEARR requires a sensor or for a sensor to be currently selected.';
       } else {
-        sensor = satellite.currentSensor;
+        sensor = sensorManager.currentSensor;
       }
     }
     // If sensor's observerGd is not set try to set it using it parameters
@@ -1759,8 +1569,7 @@ or mirrored at any other location without the express written permission of the 
     return {'x': x, 'y': y, 'z': z};
   };
 
-  // TODO: Rename eci2lla and include altitude
-  satellite.xyz2latlon = (x, y, z) => {
+  satellite.eci2ll = (x, y, z) => {
     var propTime = timeManager.propTime();
     var j = timeManager.jday(propTime.getUTCFullYear(),
                  propTime.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -1777,60 +1586,6 @@ or mirrored at any other location without the express written permission of the 
     latLon.longitude = (latLon.longitude > 180) ? latLon.longitude - 360 : latLon.longitude;
     latLon.longitude = (latLon.longitude < -180) ? latLon.longitude + 360 : latLon.longitude;
     return latLon;
-  };
-
-  // TODO: satellite.isInSun should be moved to a sat class
-  satellite.isInSun = (sat) => {
-    // Distances all in km
-    var sunECI = sun.getXYZ();
-
-    // NOTE: Code is mashed to save memory when used on the whole catalog
-
-    // Position needs to be relative to satellite NOT ECI
-    // var distSatEarthX = Math.pow(-sat.position.x, 2);
-    // var distSatEarthY = Math.pow(-sat.position.y, 2);
-    // var distSatEarthZ = Math.pow(-sat.position.z, 2);
-    // var distSatEarth = Math.sqrt(distSatEarthX + distSatEarthY + distSatEarthZ);
-    // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
-    var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/Math.sqrt(Math.pow(-sat.position.x, 2) + Math.pow(-sat.position.y, 2) + Math.pow(-sat.position.z, 2))) * RAD2DEG;
-
-    // Position needs to be relative to satellite NOT ECI
-    // var distSatSunX = Math.pow(-sat.position.x + sunECI.x, 2);
-    // var distSatSunY = Math.pow(-sat.position.y + sunECI.y, 2);
-    // var distSatSunZ = Math.pow(-sat.position.z + sunECI.z, 2);
-    // var distSatSun = Math.sqrt(distSatSunX + distSatSunY + distSatSunZ);
-    // var semiDiamSun = Math.asin(RADIUS_OF_SUN/distSatSun) * RAD2DEG;
-    var semiDiamSun = Math.asin(RADIUS_OF_SUN/Math.sqrt(Math.pow(-sat.position.x + sunECI.x, 2) + Math.pow(-sat.position.y + sunECI.y, 2) + Math.pow(-sat.position.z + sunECI.z, 2))) * RAD2DEG;
-
-    // Angle between earth and sun
-    var theta = Math.acos(numeric.dot([-sat.position.x,-sat.position.y,-sat.position.z],[-sat.position.x + sunECI.x,-sat.position.y + sunECI.y,-sat.position.z + sunECI.z])/(Math.sqrt(Math.pow(-sat.position.x, 2) + Math.pow(-sat.position.y, 2) + Math.pow(-sat.position.z, 2))*Math.sqrt(Math.pow(-sat.position.x + sunECI.x, 2) + Math.pow(-sat.position.y + sunECI.y, 2) + Math.pow(-sat.position.z + sunECI.z, 2)))) * RAD2DEG;
-
-    // var isSun = false;
-
-    // var isUmbral = false;
-    if ((semiDiamEarth > semiDiamSun) && (theta < semiDiamEarth - semiDiamSun)) {
-      // isUmbral = true;
-      return 0;
-    }
-
-    // var isPenumbral = false;
-    if ((Math.abs(semiDiamEarth - semiDiamSun) < theta) && (theta < semiDiamEarth + semiDiamSun)){
-      // isPenumbral = true;
-      return 1;
-    }
-
-    if (semiDiamSun > semiDiamEarth) {
-      // isPenumbral = true;
-      return 1;
-    }
-
-    if (theta < semiDiamSun - semiDiamEarth) {
-      // isPenumbral = true;
-      return 1;
-    }
-
-    // if (!isUmbral && !isPenumbral) isSun = true;
-    return 2;
   };
 
   // Specific to KeepTrack.
@@ -1865,20 +1620,20 @@ or mirrored at any other location without the express written permission of the 
 
       var positionEcf, lookAngles, azimuth, elevation, range;
       positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-      lookAngles = satellite.ecfToLookAngles(satellite.currentSensor.observerGd, positionEcf);
+      lookAngles = satellite.ecfToLookAngles(sensorManager.currentSensor.observerGd, positionEcf);
       azimuth = lookAngles.azimuth * RAD2DEG;
       elevation = lookAngles.elevation * RAD2DEG;
       range = lookAngles.rangeSat;
       var inview = 0;
 
-      if (satellite.currentSensor.obsminaz < satellite.currentSensor.obsmaxaz) {
-        if (((azimuth >= satellite.currentSensor.obsminaz && azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
-           ((azimuth >= satellite.currentSensor.obsminaz2 && azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
+      if (sensorManager.currentSensor.obsminaz < sensorManager.currentSensor.obsmaxaz) {
+        if (((azimuth >= sensorManager.currentSensor.obsminaz && azimuth <= sensorManager.currentSensor.obsmaxaz) && (elevation >= sensorManager.currentSensor.obsminel && elevation <= sensorManager.currentSensor.obsmaxel) && (range <= sensorManager.currentSensor.obsmaxrange && range >= sensorManager.currentSensor.obsminrange)) ||
+           ((azimuth >= sensorManager.currentSensor.obsminaz2 && azimuth <= sensorManager.currentSensor.obsmaxaz2) && (elevation >= sensorManager.currentSensor.obsminel2 && elevation <= sensorManager.currentSensor.obsmaxel2) && (range <= sensorManager.currentSensor.obsmaxrange2 && range >= sensorManager.currentSensor.obsminrange2))) {
           inview = 1;
         }
       } else {
-        if (((azimuth >= satellite.currentSensor.obsminaz || azimuth <= satellite.currentSensor.obsmaxaz) && (elevation >= satellite.currentSensor.obsminel && elevation <= satellite.currentSensor.obsmaxel) && (range <= satellite.currentSensor.obsmaxrange && range >= satellite.currentSensor.obsminrange)) ||
-           ((azimuth >= satellite.currentSensor.obsminaz2 || azimuth <= satellite.currentSensor.obsmaxaz2) && (elevation >= satellite.currentSensor.obsminel2 && elevation <= satellite.currentSensor.obsmaxel2) && (range <= satellite.currentSensor.obsmaxrange2 && range >= satellite.currentSensor.obsminrange2))) {
+        if (((azimuth >= sensorManager.currentSensor.obsminaz || azimuth <= sensorManager.currentSensor.obsmaxaz) && (elevation >= sensorManager.currentSensor.obsminel && elevation <= sensorManager.currentSensor.obsmaxel) && (range <= sensorManager.currentSensor.obsmaxrange && range >= sensorManager.currentSensor.obsminrange)) ||
+           ((azimuth >= sensorManager.currentSensor.obsminaz2 || azimuth <= sensorManager.currentSensor.obsmaxaz2) && (elevation >= sensorManager.currentSensor.obsminel2 && elevation <= sensorManager.currentSensor.obsmaxel2) && (range <= sensorManager.currentSensor.obsmaxrange2 && range >= sensorManager.currentSensor.obsminrange2))) {
           inview = 1;
         }
       }
@@ -1886,6 +1641,41 @@ or mirrored at any other location without the express written permission of the 
       return {lat: lat, lon: lon, time: time, inview: inview};
     }
   };
+
+  // TODO: Add comments on what this is used for
+  function _Nearest180 (arr) {
+    let  maxDiff = null;
+    for(let x = 0; x < arr.length; x++){
+      for(let y = x+1; y < arr.length; y++){
+        if(arr[x] < arr[y] && maxDiff < (arr[y] - arr[x])){
+          if (arr[y] - arr[x] > 180) {
+            arr[y] = arr[y] - 180;
+          }
+          if (maxDiff < (arr[y] - arr[x])) {
+            maxDiff = arr[y] - arr[x];
+          }
+        }
+      }
+    }
+    return maxDiff === null ? -1 : maxDiff;
+  }
+  function _jday(year, mon, day, hr, minute, sec) { // from satellite.js
+    if (!year) {
+      // console.error('timeManager.jday should always have a date passed to it!');
+      var now;
+      now = Date.now();
+      jDayStart = new Date(now.getFullYear(), 0, 0);
+      jDayDiff = now - jDayStart;
+      return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);
+    } else {
+      return (367.0 * year -
+        Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
+        Math.floor(275 * mon / 9.0) +
+        day + 1721013.5 +
+        ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
+      );
+    }
+  }
 })();
 
 // NOTE: This was an early attempt at multithreading.
@@ -1904,23 +1694,23 @@ or mirrored at any other location without the express written permission of the 
 //   ready7 = false;
 //   ready8 = false;
 //
-//   // multThreadCruncher1.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 0, endNum: 0, sensor: satellite.currentSensor});
-//   // multThreadCruncher2.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 1, endNum: 1, sensor: satellite.currentSensor});
-//   // multThreadCruncher3.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 2, endNum: 2, sensor: satellite.currentSensor});
-//   // multThreadCruncher4.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 3, endNum: 3, sensor: satellite.currentSensor});
-//   // multThreadCruncher5.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 4, endNum: 4, sensor: satellite.currentSensor});
-//   // multThreadCruncher6.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 5, endNum: 5, sensor: satellite.currentSensor});
-//   // multThreadCruncher7.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 6, endNum: 6, sensor: satellite.currentSensor});
-//   // multThreadCruncher8.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 7, endNum: 1599, sensor: satellite.currentSensor});
+//   // multThreadCruncher1.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 0, endNum: 0, sensor: sensorManager.currentSensor});
+//   // multThreadCruncher2.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 1, endNum: 1, sensor: sensorManager.currentSensor});
+//   // multThreadCruncher3.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 2, endNum: 2, sensor: sensorManager.currentSensor});
+//   // multThreadCruncher4.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 3, endNum: 3, sensor: sensorManager.currentSensor});
+//   // multThreadCruncher5.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 4, endNum: 4, sensor: sensorManager.currentSensor});
+//   // multThreadCruncher6.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 5, endNum: 5, sensor: sensorManager.currentSensor});
+//   // multThreadCruncher7.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 6, endNum: 6, sensor: sensorManager.currentSensor});
+//   // multThreadCruncher8.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 7, endNum: 1599, sensor: sensorManager.currentSensor});
 //
-//   multThreadCruncher1.postMessage({thread: 1, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 0, endNum: debugCalculations/8*1, sensor: satellite.currentSensor});
-//   multThreadCruncher2.postMessage({thread: 2, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*1+1, endNum: debugCalculations/8*2, sensor: satellite.currentSensor});
-//   multThreadCruncher3.postMessage({thread: 3, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*2+1, endNum: debugCalculations/8*3, sensor: satellite.currentSensor});
-//   multThreadCruncher4.postMessage({thread: 4, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*3+1, endNum: debugCalculations/8*4, sensor: satellite.currentSensor});
-//   multThreadCruncher5.postMessage({thread: 5, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*4+1, endNum: debugCalculations/8*5, sensor: satellite.currentSensor});
-//   multThreadCruncher6.postMessage({thread: 6, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*5+1, endNum: debugCalculations/8*6, sensor: satellite.currentSensor});
-//   multThreadCruncher7.postMessage({thread: 7, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*6+1, endNum: debugCalculations/8*7, sensor: satellite.currentSensor});
-//   multThreadCruncher8.postMessage({thread: 8, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*7+1, endNum: debugCalculations/8*8, sensor: satellite.currentSensor});
+//   multThreadCruncher1.postMessage({thread: 1, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 0, endNum: debugCalculations/8*1, sensor: sensorManager.currentSensor});
+//   multThreadCruncher2.postMessage({thread: 2, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*1+1, endNum: debugCalculations/8*2, sensor: sensorManager.currentSensor});
+//   multThreadCruncher3.postMessage({thread: 3, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*2+1, endNum: debugCalculations/8*3, sensor: sensorManager.currentSensor});
+//   multThreadCruncher4.postMessage({thread: 4, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*3+1, endNum: debugCalculations/8*4, sensor: sensorManager.currentSensor});
+//   multThreadCruncher5.postMessage({thread: 5, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*4+1, endNum: debugCalculations/8*5, sensor: sensorManager.currentSensor});
+//   multThreadCruncher6.postMessage({thread: 6, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*5+1, endNum: debugCalculations/8*6, sensor: sensorManager.currentSensor});
+//   multThreadCruncher7.postMessage({thread: 7, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*6+1, endNum: debugCalculations/8*7, sensor: sensorManager.currentSensor});
+//   multThreadCruncher8.postMessage({thread: 8, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*7+1, endNum: debugCalculations/8*8, sensor: sensorManager.currentSensor});
 //
 //   multThreadCruncher1.onmessage = function (m) {
 //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }

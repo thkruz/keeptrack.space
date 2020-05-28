@@ -171,7 +171,7 @@
     groups.selectGroup(dispGroup);
 
     // Don't let the search overlap with the legend
-    uiController.legendMenuChange('clear');
+    uiManager.legendMenuChange('clear');
 
     if (!isPreventDropDown) {
       searchBox.fillResultBox(results);

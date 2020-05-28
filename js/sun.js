@@ -52,7 +52,7 @@
     var gmst = satellite.gstime(j);
     var jdo = new A.JulianDay(j); // now
 
-    //var observerGd = satellite.currentSensor.observerGd;
+    //var observerGd = sensorManager.currentSensor.observerGd;
     //var coord = A.EclCoord.fromWgs84(observerGd.latitude * RAD2DEG, observerGd.longitude * RAD2DEG, observerGd.height);
 
     var coord = A.EclCoord.fromWgs84(0,0,0);

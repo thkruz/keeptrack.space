@@ -217,7 +217,7 @@
 
       if (!sat.inView && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false ||
           cameraType.current === cameraType.PLANETARIUM && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false ||
-          (satellite.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false)) {
+          (sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false)) {
         return {
           color: colorTheme.deselected,
           pickable: false
@@ -225,7 +225,7 @@
       }
       if (!sat.inView && sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false ||
           cameraType.current === cameraType.PLANETARIUM && sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false ||
-          (satellite.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false)) {
+          (sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false)) {
         return {
           color: colorTheme.deselected,
           pickable: false
@@ -233,7 +233,7 @@
       }
       if (!sat.inView && sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false ||
           cameraType.current === cameraType.PLANETARIUM && sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false ||
-          (satellite.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false)) {
+          (sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false)) {
         return {
           color: colorTheme.deselected,
           pickable: false
@@ -241,7 +241,7 @@
       }
       if (!sat.inView && sat.OT === 4 && ColorScheme.objectTypeFlags.trusat === false ||
           cameraType.current === cameraType.PLANETARIUM && sat.OT === 4 && ColorScheme.objectTypeFlags.trusat === false ||
-          (satellite.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 4 && ColorScheme.objectTypeFlags.trusat === false)) {
+          (sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 4 && ColorScheme.objectTypeFlags.trusat === false)) {
         return {
           color: colorTheme.deselected,
           pickable: false
@@ -263,7 +263,7 @@
         }
 
         if (sat.inView && cameraType.current !== cameraType.PLANETARIUM) {
-          if (satellite.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined') {
+          if (sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined') {
           } else {
             return {
               color: colorTheme.inview,
@@ -400,7 +400,7 @@
       if ((sat.inView) && (sat.inSun > 0) && (ColorScheme.objectTypeFlags.inFOV === true)) {
         if (typeof sat.vmag == 'undefined') {
           return {
-            color: colorTheme.umbral,
+            color: colorTheme.deselected,
             pickable: false
           };
         }
@@ -412,22 +412,24 @@
 
       if (!sat.inView && typeof sat.vmag !== 'undefined') {
         if ((sat.inSun == 2) && (ColorScheme.objectTypeFlags.satHi === true)) {
+          // If vmag is undefined color it like a star
+          // TODO: Better way of doing this
           if (sat.vmag < 3) {
             return {
               color: colorTheme.starHi,
-              pickable: true
+              pickable: false
             };
           }
           if (sat.vmag <= 4.5) {
             return {
               color: colorTheme.starMed,
-              pickable: true
+              pickable: false
             };
           }
           if (sat.vmag > 4.5) {
             return {
               color: colorTheme.starLow,
-              pickable: true
+              pickable: false
             };
           }
         }

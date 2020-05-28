@@ -21,17 +21,7 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-// var multThreadCruncher1 = {};
-// var multThreadCruncher2 = {};
-// var multThreadCruncher3 = {};
-// var multThreadCruncher4 = {};
-// var multThreadCruncher5 = {};
-// var multThreadCruncher6 = {};
-// var multThreadCruncher7 = {};
-// var multThreadCruncher8 = {};
-
 var satSensorMarkerArray = [];
-
 (function () {
   var TAU = 2 * Math.PI;
   var RAD2DEG = 360 / TAU;
@@ -61,19 +51,10 @@ var satSensorMarkerArray = [];
   var satData;
   var satExtraData;
   var hoveringSat = -1;
-  // var selectedSat = -1;
 
   try {
     $('#loader-text').text('Locating ELSETs...');
     satCruncher = new Worker('js/sat-cruncher.js');
-    // multThreadCruncher1 = new Worker('js/mSat.js');
-    // multThreadCruncher2 = new Worker('js/mSat.js');
-    // multThreadCruncher3 = new Worker('js/mSat.js');
-    // multThreadCruncher4 = new Worker('js/mSat.js');
-    // multThreadCruncher5 = new Worker('js/mSat.js');
-    // multThreadCruncher6 = new Worker('js/mSat.js');
-    // multThreadCruncher7 = new Worker('js/mSat.js');
-    // multThreadCruncher8 = new Worker('js/mSat.js');
   } catch (E) {
     browserUnsupported();
   }
@@ -88,7 +69,6 @@ var satSensorMarkerArray = [];
    * variable is part of at the front of what the name used to be
    * (ex: now --> drawNow) (ex: i --> satCrunchIndex)
   */
-
   // draw Loop
   var drawNow = 0;
   var lastDrawTime = 0;
@@ -103,7 +83,7 @@ var satSensorMarkerArray = [];
   var cruncherReadyCallback;
   var gotExtraData = false;
 
-  satCruncher.onmessage = function (m) {
+  satCruncher.onmessage = (m) => {
     if (!gotExtraData) { // store extra data that comes from crunching
       // Only do this once
 
@@ -165,11 +145,11 @@ var satSensorMarkerArray = [];
     if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
       satCrunchNow = Date.now();
       if (satCrunchNow > settingsManager.lastMapUpdateTime + 30000) {
-        uiController.updateMap();
+        uiManager.updateMap();
         settingsManager.lastMapUpdateTime = satCrunchNow;
         settingsManager.isMapUpdateOverride = false;
       } else if (settingsManager.isMapUpdateOverride) {
-        uiController.updateMap();
+        uiManager.updateMap();
         settingsManager.lastMapUpdateTime = satCrunchNow;
         settingsManager.isMapUpdateOverride = false;
       }
@@ -181,7 +161,7 @@ var satSensorMarkerArray = [];
     }
 
     // Don't force color recalc if default colors and no sensor for inview color
-    if (satellite.checkSensorSelected() || settingsManager.isForceColorScheme) {
+    if (sensorManager.checkSensorSelected() || settingsManager.isForceColorScheme) {
       // Don't change colors while dragging
       if (!isDragging) {
         satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
@@ -252,7 +232,7 @@ var satSensorMarkerArray = [];
               }
             }
           }
-          catch {
+          catch (e){
             console.warn('Saved Sensor Information Invalid');
           }
         }
@@ -273,7 +253,7 @@ var satSensorMarkerArray = [];
               return;
             }
           }
-          uiController.updateWatchlist(newWatchlist, watchlistInViewList);
+          uiManager.updateWatchlist(newWatchlist, watchlistInViewList);
         }
       })();
 
@@ -293,7 +273,9 @@ var satSensorMarkerArray = [];
     }
   };
 
-  satSet.changeShaders = function (newShaders) {
+  var vertShader;
+  var fragShader;
+  satSet.changeShaders = (newShaders) => {
     gl.detachShader(dotShader, vertShader);
     gl.detachShader(dotShader, fragShader);
     switch (newShaders) {
@@ -325,10 +307,7 @@ var satSensorMarkerArray = [];
     dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
   };
 
-  var vertShader;
-  var fragShader;
-
-  satSet.init = function (satsReadyCallback) {
+  satSet.init = (satsReadyCallback) => {
     db.log('satSet.init');
     /** Parses GET variables for Possible sharperShaders */
     (function parseFromGETVariables () {
@@ -712,30 +691,28 @@ var satSensorMarkerArray = [];
     }
   };
 
-  satSet.getSatData = function () {
+  satSet.getSatData = () => {
     db.log('satSet.getSatData');
     return satData;
   };
 
-  satSet.getSatInView = function () {
+  satSet.getSatInView = () => {
     db.log('satSet.getSatInView');
     if (typeof satInView == 'undefined') return false;
     return satInView;
   };
-
-  satSet.getSatInSun = function () {
+  satSet.getSatInSun = () => {
     db.log('satSet.getSatInSun');
     if (typeof satInSun == 'undefined') return false;
     return satInSun;
   };
-
-  satSet.getSatVel = function () {
+  satSet.getSatVel = () => {
     db.log('satSet.getSatVel');
     if (typeof satVel == 'undefined') return false;
     return satVel;
   };
 
-  satSet.setColorScheme = function (scheme, isForceRecolor) {
+  satSet.setColorScheme = (scheme, isForceRecolor) => {
     db.log('satSet.setColorScheme');
     settingsManager.currentColorScheme = scheme;
     buffers = scheme.calculateColorBuffers(isForceRecolor);
@@ -744,8 +721,7 @@ var satSensorMarkerArray = [];
   };
 
   var screenLocation = [];
-
-  satSet.draw = function (pMatrix, camMatrix, drawNow) {
+  satSet.draw = (pMatrix, camMatrix, drawNow) => {
     // NOTE: 640 byte leak.
 
     if (!settingsManager.shadersReady || !settingsManager.cruncherReady) return;
@@ -828,36 +804,11 @@ var satSensorMarkerArray = [];
     return true;
   };
 
-  // var uFOVSearchItems;
-  // var inViewObs = [];
-  // satSet.updateFOV = function (curSCC, now) {
-  //   if (now - lastFOVUpdateTime > 1 * 1000 / timeManager.propRate && settingsManager.isBottomMenuOpen === true) { // If it has been 1 seconds since last update that the menu is open
-  //     inViewObs = [];
-  //     DOMcurObjsHTML.innerHTML = '';
-  //     for (uFOVi = 0; uFOVi < (satData.length); uFOVi++) {
-  //       if ($('#search').val() === '') {
-  //         if (satData[uFOVi].inview) {
-  //           inViewObs.push(satData[uFOVi].SCC_NUM);
-  //         }
-  //       } else {
-  //         uFOVSearchItems = $('#search').val().split(',');
-  //         for (uFOVs = 0; uFOVs < ($('#datetime-text').length); uFOVs++) {
-  //           if (satData[uFOVi].inview && satData[uFOVi].SCC_NUM === uFOVSearchItems[uFOVs]) {
-  //             inViewObs.push(satData[uFOVi].SCC_NUM);
-  //           }
-  //         }
-  //       }
-  //     }
-  //     curObjsHTMLText = '';
-  //     for (uFOVi = 0; uFOVi < inViewObs.length; uFOVi++) {
-  //       curObjsHTMLText += "<span class='FOV-object link'>" + inViewObs[uFOVi] + '</span>\n';
-  //     }
-  //     DOMcurObjsHTML.innerHTML = curObjsHTMLText;
-  //     lastFOVUpdateTime = now;
-  //   }
-  // };
-
-  satSet.mergeSat = function (satObject) {
+  satSet.setSat = (i, satObject) => {
+    if (!satData) return null;
+    satData[i] = satObject;
+  };
+  satSet.mergeSat = (satObject) => {
     if (!satData) return null;
     var i = satSet.getIdFromObjNum(satObject.SCC);
     satData[i].ON = satObject.ON;
@@ -874,8 +825,7 @@ var satSensorMarkerArray = [];
     satData[i].associates = satObject.associates;
     satData[i].maneuver = satObject.maneuver;
   };
-
-  satSet.vmagUpdate = function (vmagObject) {
+  satSet.vmagUpdate = (vmagObject) => {
     if (!satData) return null;
     var i = satSet.getIdFromObjNum(vmagObject.satid);
     try {
@@ -885,12 +835,7 @@ var satSensorMarkerArray = [];
     }
   };
 
-  satSet.setSat = function (i, satObject) {
-    if (!satData) return null;
-    satData[i] = satObject;
-  };
-
-  satSet.getSat = function (i) {
+  satSet.getSat = (i) => {
     db.log('satSet.getSat',true);
     if (!satData) return null;
     if (!satData[i]) return null;
@@ -926,18 +871,16 @@ var satSensorMarkerArray = [];
       };
     }
 
-    return satData[i];
+    return new Sat(satData[i]);
   };
-
-  satSet.getSatInViewOnly = function (i) {
+  satSet.getSatInViewOnly = (i) => {
     if (!satData) return null;
     if (!satData[i]) return null;
 
     satData[i].inview = satInView[i];
-    return satData[i];
+    return new Sat(satData[i]);
   };
-
-  satSet.getSatPosOnly = function (i) {
+  satSet.getSatPosOnly = (i) => {
     if (!satData) return null;
     if (!satData[i]) return null;
 
@@ -949,34 +892,218 @@ var satSensorMarkerArray = [];
       };
     }
 
-    return satData[i];
+    let sat = new Sat(satData[i]);
+    return sat;
   };
-
-  satSet.getSatExtraOnly = function (i) {
+  satSet.getSatExtraOnly = (i) => {
     if (!satData) return null;
     if (!satData[i]) return null;
-    return satData[i];
+    return new Sat(satData[i]);
+  };
+  satSet.getSatFromObjNum = (objNum) => {
+      let satIndex = satSet.getIdFromObjNum (objNum);
+      return satSet.getSat(satIndex);
   };
 
-  satSet.getIdFromIntlDes = function (intlDes) {
-    for (var i = 0; i < satData.length; i++) {
-      if (satData[i].intlDes === intlDes) {
-        return i;
-      }
+  class Sat {
+    constructor (satData) {
+      this.inSun = satData.inSun;
+      this.inSunChange = satData.inSunChange;
+      this.inview = satData.inview;
+      this.inView = satData.inView;
+      this.inViewChange = satData.inViewChange;
+      this.position = satData.position;
+      this.velocity = satData.velocity;
+      this.velocityX = satData.velocityX;
+      this.velocityY = satData.velocityY;
+      this.velocityZ = satData.velocityZ;
+      this.C = satData.C;
+      this.LS = satData.LS;
+      this.LV = satData.LV;
+      this.ON = satData.ON;
+      this.OT = satData.OT;
+      this.R = satData.R;
+      this.SCC_NUM = satData.SCC_NUM;
+      this.TLE1 = satData.TLE1;
+      this.TLE2 = satData.TLE2;
+      this.active = satData.active;
+      this.apogee = satData.apogee;
+      this.argPe = satData.argPe;
+      this.eccentricity = satData.eccentricity;
+      this.id = satData.id;
+      this.inclination = satData.inclination;
+      this.intlDes = satData.intlDes;
+      this.meanMotion = satData.meanMotion;
+      this.perigee = satData.perigee;
+      this.period = satData.period;
+      this.raan = satData.raan;
+      this.semiMajorAxis = satData.semiMajorAxis;
+      this.semiMinorAxis = satData.semiMinorAxis;
+      this.alt = satData.alt;
+      this.lat = satData.lat;
+      this.lon = satData.lon;
+      this.linkAEHF = satData.linkAEHF;
+      this.linkBeidou = satData.linkBeidou;
+      this.linkGPS = satData.linkGPS;
+      this.linkGalileo = satData.linkGalileo;
+      this.linkGlonass = satData.linkGlonass;
+      this.linkWGS = satData.linkWGS;
+      this.name = satData.name;
+      this.static = satData.static;
+      this.staticNum = satData.staticNum;
+      this.type = satData.type;
+      this.typeExt = satData.typeExt;
+      this.ra = satData.ra;
+      this.dec = satData.dec;
     }
-    return null;
-  };
+    get isInSun () {
+      // Distances all in km
+      let sunECI = sun.getXYZ();
 
-  function pad0 (str, max) {
-    return str.length < max ? pad0('0' + str, max) : str;
+      // NOTE: Code is mashed to save memory when used on the whole catalog
+
+      // Position needs to be relative to satellite NOT ECI
+      // var distSatEarthX = Math.pow(-this.position.x, 2);
+      // var distSatEarthY = Math.pow(-this.position.y, 2);
+      // var distSatEarthZ = Math.pow(-this.position.z, 2);
+      // var distSatEarth = Math.sqrt(distSatEarthX + distSatEarthY + distSatEarthZ);
+      // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
+      let semiDiamEarth = Math.asin(RADIUS_OF_EARTH/Math.sqrt(Math.pow(-this.position.x, 2) + Math.pow(-this.position.y, 2) + Math.pow(-this.position.z, 2))) * RAD2DEG;
+
+      // Position needs to be relative to satellite NOT ECI
+      // var distSatSunX = Math.pow(-this.position.x + sunECI.x, 2);
+      // var distSatSunY = Math.pow(-this.position.y + sunECI.y, 2);
+      // var distSatSunZ = Math.pow(-this.position.z + sunECI.z, 2);
+      // var distSatSun = Math.sqrt(distSatSunX + distSatSunY + distSatSunZ);
+      // var semiDiamSun = Math.asin(RADIUS_OF_SUN/distSatSun) * RAD2DEG;
+      let semiDiamSun = Math.asin(RADIUS_OF_SUN/Math.sqrt(Math.pow(-this.position.x + sunECI.x, 2) + Math.pow(-this.position.y + sunECI.y, 2) + Math.pow(-this.position.z + sunECI.z, 2))) * RAD2DEG;
+
+      // Angle between earth and sun
+      let theta = Math.acos(numeric.dot([-this.position.x,-this.position.y,-this.position.z],[-this.position.x + sunECI.x,-this.position.y + sunECI.y,-this.position.z + sunECI.z])/(Math.sqrt(Math.pow(-this.position.x, 2) + Math.pow(-this.position.y, 2) + Math.pow(-this.position.z, 2))*Math.sqrt(Math.pow(-this.position.x + sunECI.x, 2) + Math.pow(-this.position.y + sunECI.y, 2) + Math.pow(-this.position.z + sunECI.z, 2)))) * RAD2DEG;
+
+      // var isSun = false;
+
+      // var isUmbral = false;
+      if ((semiDiamEarth > semiDiamSun) && (theta < semiDiamEarth - semiDiamSun)) {
+        // isUmbral = true;
+        return 0;
+      }
+
+      // var isPenumbral = false;
+      if ((Math.abs(semiDiamEarth - semiDiamSun) < theta) && (theta < semiDiamEarth + semiDiamSun)){
+        // isPenumbral = true;
+        return 1;
+      }
+
+      if (semiDiamSun > semiDiamEarth) {
+        // isPenumbral = true;
+        return 1;
+      }
+
+      if (theta < semiDiamSun - semiDiamEarth) {
+        // isPenumbral = true;
+        return 1;
+      }
+
+      // if (!isUmbral && !isPenumbral) isSun = true;
+      return 2;
+    }
+
+    getTEARR (propTime, sensor) {
+      let currentTEARR = {}; // Most current TEARR data that is set in satellite object and returned.
+
+      if (typeof sensor == 'undefined') {
+        sensor = sensorManager.currentSensor;
+      }
+      // If sensor's observerGd is not set try to set it using it parameters
+      if (typeof sensor.observerGd == 'undefined') {
+        try {
+          sensor.observerGd = {
+            height: sensor.obshei,
+            latitude: sensor.lat,
+            longitude: sensor.long
+          };
+        } catch (e) {
+          throw 'observerGd is not set and could not be guessed.';
+        }
+        // If it didn't work, try again
+        if (typeof sensor.observerGd.longitude == 'undefined') {
+          try {
+            sensor.observerGd = {
+              height: sensor.alt,
+              latitude: sensor.lat * DEG2RAD,
+              longitude: sensor.lon * DEG2RAD
+            };
+          } catch (e) {
+            throw 'observerGd is not set and could not be guessed.';
+          }
+        }
+      }
+
+      // Set default timing settings. These will be changed to find look angles at different times in future.
+      let satrec = satellite.twoline2satrec(this.TLE1, this.TLE2); // perform and store sat init calcs
+      let now;
+      if (typeof propTime != 'undefined') {
+        now = propTime;
+      } else {
+        now = timeManager.propTime();
+      }
+      let j = timeManager.jday(now.getUTCFullYear(),
+                   now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+                   now.getUTCDate(),
+                   now.getUTCHours(),
+                   now.getUTCMinutes(),
+                   now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+      let gmst = satellite.gstime(j);
+
+      let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+      let positionEci = satellite.sgp4(satrec, m);
+
+      try {
+        let gpos = satellite.eciToGeodetic(positionEci.position, gmst);
+        currentTEARR.alt = gpos.height;
+        currentTEARR.lon = gpos.longitude;
+        currentTEARR.lat = gpos.latitude;
+        let positionEcf = satellite.eciToEcf(positionEci.position, gmst);
+        let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+        currentTEARR.azimuth = lookAngles.azimuth * RAD2DEG;
+        currentTEARR.elevation = lookAngles.elevation * RAD2DEG;
+        currentTEARR.range = lookAngles.rangeSat;
+      } catch (e) {
+        currentTEARR.alt = 0;
+        currentTEARR.lon = 0;
+        currentTEARR.lat = 0;
+        currentTEARR.azimuth = 0;
+        currentTEARR.elevation = 0;
+        currentTEARR.range = 0;
+      }
+
+      currentTEARR.inview = satellite.checkIsInFOV(sensor,{az: currentTEARR.azimuth, el: currentTEARR.elevation, range:currentTEARR.range});
+
+      uiManager.currentTEARR = currentTEARR;
+      return currentTEARR;
+    }
+
+    getDirection () {
+      let nowLat = this.getTEARR().lat * RAD2DEG;
+      let futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
+      let futLat = this.getTEARR(futureTime).lat * RAD2DEG;
+
+      if (nowLat < futLat) return 'N';
+      if (nowLat > futLat) return 'S';
+      if (nowLat === futLat) {
+        futureTime = timeManager.propTimeCheck(20000, timeManager.propTime());
+        futureTEARR = this.getTEARR(futureTime);
+        if (nowLat < futLat) return 'N';
+        if (nowLat > futLat) return 'S';
+      }
+      console.warn('Sat Direction Calculation Error - By Pole?');
+      return 'Error';
+    }
   }
 
-  satSet.getSatFromObjNum = function (objNum) {
-      var satID = satSet.getIdFromObjNum (objNum);
-      return satSet.getSat(satID);
-  };
-
-  satSet.getIdFromObjNum = function (objNum) {
+  satSet.getIdFromObjNum = (objNum) => {
     var scc;
     for (var i = 0; i < satData.length; i++) {
       if (satData[i].static || satData[i].missile) {
@@ -992,8 +1119,15 @@ var satSensorMarkerArray = [];
     }
     return null;
   };
-
-  satSet.getIdFromStarName = function (starName) {
+  satSet.getIdFromIntlDes = (intlDes) => {
+    for (var i = 0; i < satData.length; i++) {
+      if (satData[i].intlDes === intlDes) {
+        return i;
+      }
+    }
+    return null;
+  };
+  satSet.getIdFromStarName = (starName) => {
     for (var i = 0; i < satData.length; i++) {
       if (satData[i].type === 'Star') {
         if (satData[i].name === starName) {
@@ -1003,8 +1137,7 @@ var satSensorMarkerArray = [];
     }
     return null;
   };
-
-  satSet.getIdFromSensorName = function (sensorName) {
+  satSet.getIdFromSensorName = (sensorName) => {
     if (typeof sensorName != 'undefined') {
       for (var i = 0; i < satData.length; i++) {
         if (satData[i].static === true && satData[i].missile !== true && satData[i].type !== 'Star') {
@@ -1026,16 +1159,16 @@ var satSensorMarkerArray = [];
       j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
 
       var gmst = satellite.gstime(j);
-      cosLat = Math.cos(satellite.currentSensor.lat * DEG2RAD);
-      sinLat = Math.sin(satellite.currentSensor.lat * DEG2RAD);
-      cosLon = Math.cos((satellite.currentSensor.long * DEG2RAD) + gmst);
-      sinLon = Math.sin((satellite.currentSensor.long * DEG2RAD) + gmst);
+      cosLat = Math.cos(sensorManager.currentSensor.lat * DEG2RAD);
+      sinLat = Math.sin(sensorManager.currentSensor.lat * DEG2RAD);
+      cosLon = Math.cos((sensorManager.currentSensor.long * DEG2RAD) + gmst);
+      sinLon = Math.sin((sensorManager.currentSensor.long * DEG2RAD) + gmst);
       var sensor = {};
       sensor.position = {};
       sensor.name = 'Custom Sensor';
-      sensor.position.x = (6371 + 0.25 + satellite.currentSensor.obshei) * cosLat * cosLon; // 6371 is radius of earth
-      sensor.position.y = (6371 + 0.25 + satellite.currentSensor.obshei) * cosLat * sinLon;
-      sensor.position.z = (6371 + 0.25 + satellite.currentSensor.obshei) * sinLat;
+      sensor.position.x = (6371 + 0.25 + sensorManager.currentSensor.obshei) * cosLat * cosLon; // 6371 is radius of earth
+      sensor.position.y = (6371 + 0.25 + sensorManager.currentSensor.obshei) * cosLat * sinLon;
+      sensor.position.z = (6371 + 0.25 + sensorManager.currentSensor.obshei) * sinLat;
       // console.log('No Sensor Found. Using Current Sensor');
       // console.log(sensor);
       return sensor;
@@ -1046,7 +1179,7 @@ var satSensorMarkerArray = [];
   };
 
   var posVec4;
-  satSet.getScreenCoords = function (i, pMatrix, camMatrix, pos) {
+  satSet.getScreenCoords = (i, pMatrix, camMatrix, pos) => {
     satScreenPositionArray.error = false;
     if (!pos) pos = satSet.getSatPosOnly(i).position;
     posVec4 = vec4.fromValues(pos.x, pos.y, pos.z, 1);
@@ -1069,7 +1202,7 @@ var satSensorMarkerArray = [];
     }
   };
 
-  satSet.searchNameRegex = function (regex) {
+  satSet.searchNameRegex = (regex) => {
     var res = [];
     for (var i = 0; i < satData.length; i++) {
       if (regex.test(satData[i].ON)) {
@@ -1078,8 +1211,7 @@ var satSensorMarkerArray = [];
     }
     return res;
   };
-
-  satSet.searchCountryRegex = function (regex) {
+  satSet.searchCountryRegex = (regex) => {
     var res = [];
     for (var i = 0; i < satData.length; i++) {
       if (regex.test(satData[i].C)) {
@@ -1088,8 +1220,7 @@ var satSensorMarkerArray = [];
     }
     return res;
   };
-
-  satSet.searchAzElRange = function (azimuth, elevation, range, inclination, azMarg, elMarg, rangeMarg, incMarg, period, periodMarg, objtype) {
+  satSet.searchAzElRange = (azimuth, elevation, range, inclination, azMarg, elMarg, rangeMarg, incMarg, period, periodMarg, objtype) => {
     var isCheckAz = !isNaN(parseFloat(azimuth)) && isFinite(azimuth);
     var isCheckEl = !isNaN(parseFloat(elevation)) && isFinite(elevation);
     var isCheckRange = !isNaN(parseFloat(range)) && isFinite(range);
@@ -1116,10 +1247,10 @@ var satSensorMarkerArray = [];
       if (satData[i].static || satData[i].missile || !satData[i].active) { continue; }
       res.push(satData[i]);
       satellite.getTEARR(res[s]);
-      res[s].azimuth = satellite.currentTEARR.azimuth;
-      res[s].elevation = satellite.currentTEARR.elevation;
-      res[s].range = satellite.currentTEARR.range;
-      res[s].inview = satellite.currentTEARR.inview;
+      res[s].azimuth = uiManager.currentTEARR.azimuth;
+      res[s].elevation = uiManager.currentTEARR.elevation;
+      res[s].range = uiManager.currentTEARR.range;
+      res[s].inview = uiManager.currentTEARR.inview;
       s++;
     }
 
@@ -1256,7 +1387,48 @@ var satSensorMarkerArray = [];
     return res;
   };
 
-  satSet.setHover = function (i) {
+  satSet.exportTle2Csv = () => {
+    let catalogTLE2 = [];
+    let satCat = satSet.getSatData();
+    satCat.sort((a, b) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
+    for (let s = 0; s < satCat.length; s++) {
+      let sat = satCat[s];
+      if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') { continue; }
+      if (sat.C == 'ANALSAT') continue;
+      catalogTLE2.push({
+        satId: sat.SCC_NUM,
+        TLE1: sat.TLE1,
+        TLE2: sat.TLE2,
+        inclination: sat.inclination,
+        eccentricity: sat.eccentricity,
+        period: sat.period,
+        raan: sat.raan,
+        apogee: sat.apogee,
+        perigee: sat.perigee,
+        site: sat.LS,
+        country: sat.C,
+        name: sat.ON,
+        rocket: sat.LV,});
+    }
+    saveCsv(catalogTLE2,'catalogTLE2');
+  };
+  satSet.exportTle2Txt = () => {
+    let catalogTLE2 = [];
+    let satCat = satSet.getSatData();
+    satCat.sort((a, b) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
+    for (let s = 0; s < satCat.length; s++) {
+      let sat = satCat[s];
+      if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') { continue; }
+      if (sat.C == 'ANALSAT') continue;
+      catalogTLE2.push(sat.TLE1);
+      catalogTLE2.push(sat.TLE2);
+    }
+    catalogTLE2 = catalogTLE2.join('\n');
+    var blob = new Blob([catalogTLE2], {type: 'text/plain;charset=utf-8'});
+    saveAs(blob, 'TLE.txt');
+  };
+
+  satSet.setHover = (i) => {
     if (i === hoveringSat) return;
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
     // If Old Select Sat Picked Color it Correct Color
@@ -1270,7 +1442,7 @@ var satSensorMarkerArray = [];
       hoveringSat = i;
   };
 
-  satSet.selectSat = function (i) {
+  satSet.selectSat = (i) => {
     if (i === selectedSat) return;
     if(isAnalysisMenuOpen && i != -1) { $('#anal-sat').val(satSet.getSat(i).SCC_NUM); }
     adviceList.satelliteSelected();
@@ -1290,7 +1462,7 @@ var satSensorMarkerArray = [];
     }
     selectedSat = i;
 
-    if (satellite.checkSensorSelected()) {
+    if (sensorManager.checkSensorSelected()) {
       $('#menu-lookangles').removeClass('bmenu-item-disabled');
     }
     $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');
@@ -1302,7 +1474,7 @@ var satSensorMarkerArray = [];
     $('#menu-breakup').removeClass('bmenu-item-disabled');
   };
 
-  satSet.onCruncherReady = function () {
+  satSet.onCruncherReady = () => {
     db.log('satSet.onCruncherReady',true);
     // do querystring stuff
     var queryStr = window.location.search.substring(1);
@@ -1348,6 +1520,10 @@ var satSensorMarkerArray = [];
     searchBox.init(satData);
     satSet.satDataString = null; // Clears stringified json file and clears 7MB of memory.
   };
+
+  function pad0 (str, max) {
+    return str.length < max ? pad0('0' + str, max) : str;
+  }
 
   window.satSet = satSet;
   window.satCruncher = satCruncher;

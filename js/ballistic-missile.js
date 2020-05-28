@@ -936,10 +936,10 @@
 
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensor == 'undefined') {
-      if (typeof satellite.currentSensor == 'undefined') {
+      if (typeof sensorManager.currentSensor == 'undefined') {
         throw 'getTEARR requires a sensor or for a sensor to be currently selected.';
       } else {
-        sensor = satellite.currentSensor;
+        sensor = sensorManager.currentSensor;
       }
     }
     // If sensor's observerGd is not set try to set it using it parameters
@@ -1019,7 +1019,7 @@
         currentTEARR.inview = false;
       }
     }
-    satellite.currentTEARR = currentTEARR;
+    uiManager.currentTEARR = currentTEARR;
     return currentTEARR;
   };
 

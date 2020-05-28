@@ -85,12 +85,12 @@ satCommManager.showLinks = async function (group) {
   }
 
   for (let i = 0; i < userlist.length; i++) {
-    var user = satSet.getSat(satSet.getIdFromSensorName(userlist[i]));
+    let user = satSet.getSat(satSet.getIdFromSensorName(userlist[i]));
     var bestSat;
     var bestRange = 1000000;
     for (let j = 0; j < satlist.length; j++) {
       var sat = satSet.getSatFromObjNum(satlist[j]);
-      var tearr = satellite.getTEARR(sat,user);
+      var tearr = sat.getTEARR(void 0,user);
       if (tearr.elevation > 10) {
         if (tearr.range < bestRange) bestSat = sat;
       }

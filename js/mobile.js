@@ -26,7 +26,7 @@ var maxPinchSize = 1;
         document.webkitCancelFullScreen();
       }
     }
-    uiController.resize2DMap();
+    uiManager.resize2DMap();
   };
 
   var isSearchOpen = false;
@@ -52,7 +52,7 @@ var maxPinchSize = 1;
       isSearchOpen = false;
       $('#search-holder').removeClass('search-slide-down');
       $('#search-holder').addClass('search-slide-up');
-      uiController.hideSideMenus();
+      uiManager.hideSideMenus();
       $('#search').val('');
       searchBox.hideResults();
       isMilSatSelected = false;

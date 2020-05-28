@@ -33,6 +33,8 @@ or mirrored at any other location without the express written permission of the 
   satellite.currentSensor = {};
   satellite.tempSensor = {};
   satellite.currentTEARR = {};
+
+  // TODO: sensor info should be contained in sensor manager
   satellite.defaultSensor = {};
   satellite.defaultSensor.observerGd = {
     lat: null,
@@ -40,9 +42,11 @@ or mirrored at any other location without the express written permission of the 
     latitude: 0,
     height: 0
   };
+  // TODO: sensor info should be contained in sensor manager
   satellite.currentSensor = satellite.defaultSensor;
 
   // Init Us Sensor List for MultiSite Propagate Menu
+  // TODO: satellite.sensorListUS should be contained in sensor manager
   satellite.sensorListUS = [
     window.sensorManager.sensorList.COD,
     window.sensorManager.sensorList.BLE,
@@ -57,19 +61,19 @@ or mirrored at any other location without the express written permission of the 
     window.sensorManager.sensorList.CDN
   ];
 
-  satellite.checkSensorSelected = function () {
+  satellite.checkSensorSelected = () => {
     if (satellite.currentSensor.lat != null) {
       return true;
     } else {
       return false;
     }
   };
-  satellite.currentEpoch = function (currentDate) {
+  satellite.currentEpoch = (currentDate) => {
     currentDate = new Date(currentDate);
-    var epochYear = currentDate.getUTCFullYear();
+    let epochYear = currentDate.getUTCFullYear();
     epochYear = parseInt(epochYear.toString().substr(2, 2));
-    var epochDay = pad(timeManager.getDayOfYear(currentDate), 3);
-    var timeOfDay = ((currentDate.getUTCHours() * 60) + currentDate.getUTCMinutes()) / 1440;
+    let epochDay = pad(timeManager.getDayOfYear(currentDate), 3);
+    let timeOfDay = ((currentDate.getUTCHours() * 60) + currentDate.getUTCMinutes()) / 1440;
     epochDay = (epochDay + timeOfDay).toFixed(8);
     epochDay = pad(epochDay,12);
 
@@ -80,20 +84,22 @@ or mirrored at any other location without the express written permission of the 
     return [epochYear, epochDay];
   };
 
-  satellite.distance = function (hoverSat, selectedSat) {
+  satellite.distance = (hoverSat, selectedSat) => {
     if (selectedSat == null || hoverSat == null) {
       return '';
     }
     if (selectedSat.type === 'Star' || hoverSat.type === 'Star') {
       return '';
     }
-    var distanceApartX = Math.pow(hoverSat.position.x - selectedSat.position.x, 2);
-    var distanceApartY = Math.pow(hoverSat.position.y - selectedSat.position.y, 2);
-    var distanceApartZ = Math.pow(hoverSat.position.z - selectedSat.position.z, 2);
-    var distanceApart = Math.sqrt(distanceApartX + distanceApartY + distanceApartZ).toFixed(0);
+    let distanceApartX = Math.pow(hoverSat.position.x - selectedSat.position.x, 2);
+    let distanceApartY = Math.pow(hoverSat.position.y - selectedSat.position.y, 2);
+    let distanceApartZ = Math.pow(hoverSat.position.z - selectedSat.position.z, 2);
+    let distanceApart = Math.sqrt(distanceApartX + distanceApartY + distanceApartZ).toFixed(0);
     return '<br />' + distanceApart + ' km';
   };
-  satellite.getsensorinfo = function () {
+
+  // TODO: This belongs in ui.js or part of a new sat class
+  satellite.getsensorinfo = () => {
     $('#sensor-latitude').html(satellite.currentSensor.lat);
     $('#sensor-longitude').html(satellite.currentSensor.long);
     $('#sensor-minazimuth').html(satellite.currentSensor.obsminaz);
@@ -107,7 +113,9 @@ or mirrored at any other location without the express written permission of the 
   // TODO: UI element changes/references should be moved to ui.js
   // There are a series of referecnes, especially in satellite.obs, to ui elements.
   // These should be moved to ui.js and then called before/after calling satellite.setobs
-  satellite.setobs = function (sensor, reset) {
+
+  // TODO: replace "reset" with use of null for sensor
+  satellite.setobs = (sensor, reset) => {
     /** obslat is what is used to determine if a site is set or not. If this is null sensorSelected() will return false */
     if (reset) {
       satellite.currentSensor = satellite.defaultSensor;
@@ -129,9 +137,10 @@ or mirrored at any other location without the express written permission of the 
     };
   };
 
-  satellite.altitudeCheck = function (TLE1, TLE2, propOffset) {
+  // TODO: Standardize this function throughout the code vs this workaround
+  satellite.altitudeCheck = (TLE1, TLE2, propOffset) => {
     // Allow alternate function        (sat, propOffset)
-    var satrec;
+    let satrec;
     if (TLE1.TLE1 !== undefined) {
       propOffset = TLE2;
       satrec = satellite.twoline2satrec(TLE1.TLE1, TLE1.TLE2);// perform and store sat init calcs
@@ -139,19 +148,19 @@ or mirrored at any other location without the express written permission of the 
       satrec = satellite.twoline2satrec(TLE1, TLE2);// perform and store sat init calcs
     }
 
-    var propTime = timeManager.propTimeCheck(propOffset, timeManager.propRealTime);
-    var j = timeManager.jday(propTime.getUTCFullYear(),
+    let propTime = timeManager.propTimeCheck(propOffset, timeManager.propRealTime);
+    let j = timeManager.jday(propTime.getUTCFullYear(),
                  propTime.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  propTime.getUTCDate(),
                  propTime.getUTCHours(),
                  propTime.getUTCMinutes(),
                  propTime.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
     j += propTime.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-    var gmst = satellite.gstime(j);
+    let gmst = satellite.gstime(j);
 
-    var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-    var positionEci = satellite.sgp4(satrec, m);
-    var gpos;
+    let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+    let positionEci = satellite.sgp4(satrec, m);
+    let gpos;
 
     try {
       gpos = satellite.eciToGeodetic(positionEci.position, gmst);
@@ -161,15 +170,11 @@ or mirrored at any other location without the express written permission of the 
     return gpos.height;
   };
 
-  satellite.getDirection = function (sat) {
-    var nowLat = satellite.getTEARR(sat).lat;
-    var futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
-    var futLat = satellite.getTEARR(sat, undefined, futureTime).lat;
-
-    nowLat *= RAD2DEG;
-    futLat *= RAD2DEG;
-    // console.log('Now: ' + timeManager.propTime() + ' --- Fut: ' + futureTime);
-    // console.log('Now: ' + nowLat + ' --- Fut: ' + futLat);
+  // TODO: satellite.getDirection should be part of a future sat class
+  satellite.getDirection = (sat) => {
+    let nowLat = satellite.getTEARR(sat).lat * RAD2DEG;
+    let futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
+    let futLat = satellite.getTEARR(sat, undefined, futureTime).lat * RAD2DEG;
 
     if (nowLat < futLat) return 'N';
     if (nowLat > futLat) return 'S';
@@ -179,19 +184,20 @@ or mirrored at any other location without the express written permission of the 
       if (nowLat < futLat) return 'N';
       if (nowLat > futLat) return 'S';
     }
-    console.error('Sat Direction Calculation Error - By Pole?');
+    console.warn('Sat Direction Calculation Error - By Pole?');
     return 'Error';
   };
 
-  satellite.getTEARR = function (sat, sensor, propTime) {
-    var currentTEARR = {}; // Most current TEARR data that is set in satellite object and returned.
+  // TODO: satellite.getTEARR should be part of a future sat class
+  satellite.getTEARR = (sat, sensor, propTime) => {
+    let currentTEARR = {}; // Most current TEARR data that is set in satellite object and returned.
 
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensor == 'undefined') {
-      if (typeof satellite.currentSensor == 'undefined') {
-        throw 'getTEARR requires a sensor or for a sensor to be currently selected.';
-      } else {
+      if (typeof satellite.currentSensor != 'undefined') {
         sensor = satellite.currentSensor;
+      } else {
+        throw 'getTEARR requires a sensor or for a sensor to be currently selected.';
       }
     }
     // If sensor's observerGd is not set try to set it using it parameters
@@ -220,34 +226,32 @@ or mirrored at any other location without the express written permission of the 
     }
 
     // Set default timing settings. These will be changed to find look angles at different times in future.
-    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
-    var now;
-    if (typeof propTime == 'undefined') {
-      now = timeManager.propTime();
-    } else {
+    let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+    let now;
+    if (typeof propTime != 'undefined') {
       now = propTime;
+    } else {
+      now = timeManager.propTime();
     }
-    var j = timeManager.jday(now.getUTCFullYear(),
+    let j = timeManager.jday(now.getUTCFullYear(),
                  now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
                  now.getUTCDate(),
                  now.getUTCHours(),
                  now.getUTCMinutes(),
                  now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
     j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-    var gmst = satellite.gstime(j);
+    let gmst = satellite.gstime(j);
 
-    var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-    var positionEci = satellite.sgp4(satrec, m);
-    var positionEcf, lookAngles;
-    var gpos;
+    let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+    let positionEci = satellite.sgp4(satrec, m);
 
     try {
-      gpos = satellite.eciToGeodetic(positionEci.position, gmst);
+      let gpos = satellite.eciToGeodetic(positionEci.position, gmst);
       currentTEARR.alt = gpos.height;
       currentTEARR.lon = gpos.longitude;
       currentTEARR.lat = gpos.latitude;
-      positionEcf = satellite.eciToEcf(positionEci.position, gmst);
-      lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+      let positionEcf = satellite.eciToEcf(positionEci.position, gmst);
+      let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
       currentTEARR.azimuth = lookAngles.azimuth * RAD2DEG;
       currentTEARR.elevation = lookAngles.elevation * RAD2DEG;
       currentTEARR.range = lookAngles.rangeSat;
@@ -255,13 +259,12 @@ or mirrored at any other location without the express written permission of the 
       currentTEARR.alt = 0;
       currentTEARR.lon = 0;
       currentTEARR.lat = 0;
-      positionEcf = 0;
-      lookAngles = 0;
       currentTEARR.azimuth = 0;
       currentTEARR.elevation = 0;
       currentTEARR.range = 0;
     }
 
+    // TODO: Standardize this as the code for checking if a satellite is in FOV
     // Check if satellite is in field of view of a sensor.
     if (sensor.obsminaz > sensor.obsmaxaz) {
       if (((currentTEARR.azimuth >= sensor.obsminaz || currentTEARR.azimuth <= sensor.obsmaxaz) &&
@@ -290,7 +293,8 @@ or mirrored at any other location without the express written permission of the 
     return currentTEARR;
   };
 
-  satellite.exportTle2Csv = function () {
+  // TODO: satellite.exportTle2Csv belongs in satSet
+  satellite.exportTle2Csv = () => {
     let catalogTLE2 = [];
     let satCat = satSet.getSatData();
     satCat.sort((a, b) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
@@ -316,7 +320,8 @@ or mirrored at any other location without the express written permission of the 
     saveCsv(catalogTLE2,'catalogTLE2');
   };
 
-  satellite.exportTle2Txt = function () {
+  // TODO: satellite.exportTle2Txt belongs in satSet
+  satellite.exportTle2Txt = () => {
     let catalogTLE2 = [];
     let satCat = satSet.getSatData();
     satCat.sort((a, b) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
@@ -332,109 +337,31 @@ or mirrored at any other location without the express written permission of the 
     saveAs(blob, 'TLE.txt');
   };
 
-  satellite.calculateSatrec = function () {
-    console.time('satrecCache');
-    var satrecCache = [];
-    var satrec;
-    for (var s = 0; s < satSet.getSatData().length; s++) {
+  // TODO: satellite.calculateSatrec belongs in satSet
+  satellite.calculateSatrec = () => {
+    let satrecCache = [];
+    let satrec; // Called outside of the loop to save memory
+    for (let s = 0; s < satSet.getSatData().length; s++) {
       sat = satSet.getSat(s);
       if (sat.static || sat.missile || !sat.active) { continue; }
       satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
       satrecCache.push({'SCC_NUM': sat.SCC_NUM, 'satrec': satrec});
     }
+    // TODO: window.satrecCache probably isn't necessary
     window.satrecCache = satrecCache;
-    console.timeEnd('satrecCache');
   };
 
-  // satellite.calculateTimeInCoverage = function () {
-  //   console.time('TIC');
-  //   console.log(Date.now());
-  //   var calcTICArray = [];
-  //   var ready1, ready2, ready3, ready4, ready5, ready6, ready7, ready8;
-  //   var debugCalculations = 17868;
-  //   ready1 = false;
-  //   ready2 = false;
-  //   ready3 = false;
-  //   ready4 = false;
-  //   ready5 = false;
-  //   ready6 = false;
-  //   ready7 = false;
-  //   ready8 = false;
-  //
-  //   // multThreadCruncher1.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 0, endNum: 0, sensor: satellite.currentSensor});
-  //   // multThreadCruncher2.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 1, endNum: 1, sensor: satellite.currentSensor});
-  //   // multThreadCruncher3.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 2, endNum: 2, sensor: satellite.currentSensor});
-  //   // multThreadCruncher4.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 3, endNum: 3, sensor: satellite.currentSensor});
-  //   // multThreadCruncher5.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 4, endNum: 4, sensor: satellite.currentSensor});
-  //   // multThreadCruncher6.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 5, endNum: 5, sensor: satellite.currentSensor});
-  //   // multThreadCruncher7.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 6, endNum: 6, sensor: satellite.currentSensor});
-  //   // multThreadCruncher8.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 7, endNum: 1599, sensor: satellite.currentSensor});
-  //
-  //   multThreadCruncher1.postMessage({thread: 1, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 0, endNum: debugCalculations/8*1, sensor: satellite.currentSensor});
-  //   multThreadCruncher2.postMessage({thread: 2, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*1+1, endNum: debugCalculations/8*2, sensor: satellite.currentSensor});
-  //   multThreadCruncher3.postMessage({thread: 3, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*2+1, endNum: debugCalculations/8*3, sensor: satellite.currentSensor});
-  //   multThreadCruncher4.postMessage({thread: 4, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*3+1, endNum: debugCalculations/8*4, sensor: satellite.currentSensor});
-  //   multThreadCruncher5.postMessage({thread: 5, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*4+1, endNum: debugCalculations/8*5, sensor: satellite.currentSensor});
-  //   multThreadCruncher6.postMessage({thread: 6, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*5+1, endNum: debugCalculations/8*6, sensor: satellite.currentSensor});
-  //   multThreadCruncher7.postMessage({thread: 7, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*6+1, endNum: debugCalculations/8*7, sensor: satellite.currentSensor});
-  //   multThreadCruncher8.postMessage({thread: 8, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*7+1, endNum: debugCalculations/8*8, sensor: satellite.currentSensor});
-  //
-  //   multThreadCruncher1.onmessage = function (m) {
-  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-  //     ready1 = true;
-  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-  //   };
-  //   multThreadCruncher2.onmessage = function (m) {
-  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-  //     ready2 = true;
-  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-  //   };
-  //   multThreadCruncher3.onmessage = function (m) {
-  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-  //     ready3 = true;
-  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-  //   };
-  //   multThreadCruncher4.onmessage = function (m) {
-  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-  //     ready4 = true;
-  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-  //   };
-  //   multThreadCruncher5.onmessage = function (m) {
-  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-  //     ready5 = true;
-  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-  //   };
-  //   multThreadCruncher6.onmessage = function (m) {
-  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-  //     ready6 = true;
-  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-  //   };
-  //   multThreadCruncher7.onmessage = function (m) {
-  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-  //     ready7 = true;
-  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-  //   };
-  //   multThreadCruncher8.onmessage = function (m) {
-  //     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
-  //     ready8 = true;
-  //     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
-  //   };
-  //   function multThreadComplete () {
-  //     console.log(calcTICArray);
-  //     console.timeEnd('TIC');
-  //   }
-  // };
-  satellite.nextpassList = function (satArray) {
-    var nextPassArray = [];
-    for (var s = 0; s < satArray.length; s++) {
-      var time = satellite.nextNpasses(satArray[s], undefined, (1000 * 60 * 60 * 24), satellite.lookanglesInterval, settingsManager.nextNPassesCount); // Only do 1 day looks
-      for (var i = 0; i < time.length; i++) {
+  satellite.nextpassList = (satArray) => {
+    let nextPassArray = [];
+    for (let s = 0; s < satArray.length; s++) {
+      let time = satellite.nextNpasses(satArray[s], undefined, (1000 * 60 * 60 * 24), satellite.lookanglesInterval, settingsManager.nextNPassesCount); // Only do 1 day looks
+      for (let i = 0; i < time.length; i++) {
         nextPassArray.push({'SCC_NUM': satArray[s].SCC_NUM, 'time': time[i]});
       }
     }
     return nextPassArray;
   };
-  satellite.nextpass = function (sat, sensor, searchLength, interval) {
+  satellite.nextpass = (sat, sensor, searchLength, interval) => {
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensor == 'undefined') {
       if (typeof satellite.currentSensor == 'undefined') {
@@ -459,47 +386,23 @@ or mirrored at any other location without the express written permission of the 
     if (typeof searchLength == 'undefined') searchLength = satellite.lookanglesLength;
     if (typeof interval == 'undefined') interval = satellite.lookanglesInterval;
 
-    var propOffset = timeManager.getPropOffset();
-    var propTempOffset = 0;
-    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
-    for (var i = 0; i < (searchLength * 24 * 60 * 60); i += interval) {         // 5second Looks
+    let propOffset = timeManager.getPropOffset();
+    let propTempOffset = 0;
+    let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
+    for (let i = 0; i < (searchLength * 24 * 60 * 60); i += interval) {         // 5second Looks
       propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
-      var now = timeManager.propTimeCheck(propTempOffset, timeManager.propRealTime);
-      var j = timeManager.jday(now.getUTCFullYear(),
-      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-      var gmst = satellite.gstime(j);
+      let now = timeManager.propTimeCheck(propTempOffset, timeManager.propRealTime);
+      let aer = satellite.getRae(now, satrec, sensor);
 
-      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-      var positionEci = satellite.sgp4(satrec, m);
-      var positionEcf, lookAngles, azimuth, elevation, range;
-
-      positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-      lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-      azimuth = lookAngles.azimuth * RAD2DEG;
-      elevation = lookAngles.elevation * RAD2DEG;
-      range = lookAngles.rangeSat;
-
-      if (sensor.obsminaz > sensor.obsmaxaz) {
-        if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-           ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
-          return timeManager.dateFormat(now, 'isoDateTime', true);
-        }
-      } else {
-        if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-           ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
-          return timeManager.dateFormat(now, 'isoDateTime', true);
-        }
+      let isInFOV = satellite.checkIsInFOV(sensor,aer);
+      if (isInFOV) {
+        return timeManager.dateFormat(now, 'isoDateTime', true);
       }
     }
     return 'No Passes in ' + satellite.lookanglesLength + ' Days';
   };
 
-  satellite.nextNpasses = function (sat, sensor, searchLength, interval, numPasses) {
+  satellite.nextNpasses = (sat, sensor, searchLength, interval, numPasses) => {
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensor == 'undefined') {
       if (typeof satellite.currentSensor == 'undefined') {
@@ -534,43 +437,19 @@ or mirrored at any other location without the express written permission of the 
 
       let propTempOffset = i + propOffset;                 // Offset in seconds (msec * 1000)
       let now = timeManager.propTimeCheck(propTempOffset * 1000, timeManager.propRealTime);
-      let j = timeManager.jday(now.getUTCFullYear(),
-      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-      let gmst = satellite.gstime(j);
+      let aer = satellite.getRae(now, satrec, sensor);
 
-      let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-      let positionEci = satellite.sgp4(satrec, m);
-
-      let positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-      let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-      let azimuth = lookAngles.azimuth * RAD2DEG;
-      let elevation = lookAngles.elevation * RAD2DEG;
-      let range = lookAngles.rangeSat;
-
-      if (sensor.obsminaz > sensor.obsmaxaz) {
-        if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-           ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
-          passTimesArray.push(now);
-          i = i + (orbitalPeriod * 60 * 0.75); // Jump 3/4th to the next orbit
-        }
-      } else {
-        if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-           ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
-          passTimesArray.push(now);
-          i = i + (orbitalPeriod * 60 * 0.75); // Jump 3/4th to the next orbit
-        }
+      let isInFOV = satellite.checkIsInFOV(sensor,aer);
+      if (isInFOV) {
+        passTimesArray.push(now);
+        i = i + (orbitalPeriod * 60 * 0.75); // Jump 3/4th to the next orbit
       }
     }
     return passTimesArray;
   };
 
   satellite.lastlooksArray = [];
-  satellite.getlookangles = function (sat) {
+  satellite.getlookangles = (sat) => {
     // Error Checking
     if (!satellite.checkSensorSelected()) {
       console.warn('satellite.getlookangles requires a sensor to be set!');
@@ -668,91 +547,18 @@ or mirrored at any other location without the express written permission of the 
       // Setup Realtime and Offset Time
       var propRealTimeTemp = Date.now();
       var now = timeManager.propTimeCheck(offset * 1000, propRealTimeTemp);
-      var j = timeManager.jday(now.getUTCFullYear(),
-      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-      var gmst = satellite.gstime(j);
+      let aer = satellite.getRae(now, satrec, sensor);
 
-      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-      var positionEci = satellite.sgp4(satrec, m);
-
-      let positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-      let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-      let azimuth = lookAngles.azimuth * RAD2DEG;
-      let elevation = lookAngles.elevation * RAD2DEG;
-      let range = lookAngles.rangeSat;
-
-      function _checkInFOV (azimuth,elevation,range) {
-        if (sensor.obsminaz < sensor.obsmaxaz) {
-          // Exit if it is not in view...
-          // Azimuth has to be bigger than min AND less than max
-          if (((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-          ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
-            return true;
-          } else {
-            return false;
-          }
-        } else {
-          if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-          ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
-            return true;
-          } else {
-            return false;
-          }
-        }
-      }
-      function _checkInFOV1 (azimuth1,elevation1,range1) {
-        if (sensor.obsminaz < sensor.obsmaxaz) {
-          // Exit if it is not in view...
-          // Azimuth has to be bigger than min AND less than max
-          if (((azimuth1 >= sensor.obsminaz && azimuth1 <= sensor.obsmaxaz) && (elevation1 >= sensor.obsminel && elevation1 <= sensor.obsmaxel) && (range1 <= sensor.obsmaxrange && range1 >= sensor.obsminrange)) ||
-          ((azimuth1 >= sensor.obsminaz2 && azimuth1 <= sensor.obsmaxaz2) && (elevation1 >= sensor.obsminel2 && elevation1 <= sensor.obsmaxel2) && (range1 <= sensor.obsmaxrange2 && range1 >= sensor.obsminrange2))) {
-            return true;
-          } else {
-            return false;
-          }
-        } else {
-          if (((azimuth1 >= sensor.obsminaz || azimuth1 <= sensor.obsmaxaz) && (elevation1 >= sensor.obsminel && elevation1 <= sensor.obsmaxel) && (range1 <= sensor.obsmaxrange && range1 >= sensor.obsminrange)) ||
-          ((azimuth1 >= sensor.obsminaz2 || azimuth1 <= sensor.obsmaxaz2) && (elevation1 >= sensor.obsminel2 && elevation1 <= sensor.obsmaxel2) && (range1 <= sensor.obsmaxrange2 && range1 >= sensor.obsminrange2))) {
-            return true;
-          } else {
-            return false;
-          }
-        }
-      }
-      let isInView = _checkInFOV(azimuth,elevation,range);
-
-      // Recheck if it is in view...
-      // Azimuth has to be bigger than min OR less than max (sensors that straddle 0/360 mark)
-      // All other sensors will pass the check again
-      if (isInView) {
+      let isInFOV = satellite.checkIsInFOV(sensor,aer);
+      if (isInFOV) {
         if (satellite.isRiseSetLookangles) {
           // Previous Pass to Calculate first line of coverage
           let now1 = new Date();
           now1.setTime(Number(now) - (satellite.lookanglesInterval * 1000));
-          let j1 = timeManager.jday(now1.getUTCFullYear(),
-          now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-          now1.getUTCDate(),
-          now1.getUTCHours(),
-          now1.getUTCMinutes(),
-          now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-          j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-          var gmst1 = satellite.gstime(j1);
+          aer1 = satellite.getRae(now1, satrec, sensor);
 
-          let m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
-          let positionEci1 = satellite.sgp4(satrec, m1);
-
-          let positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
-          let lookAngles1 = satellite.ecfToLookAngles(sensor.observerGd, positionEcf1);
-          let azimuth1 = lookAngles1.azimuth * RAD2DEG;
-          let elevation1 = lookAngles1.elevation * RAD2DEG;
-          let range1 = lookAngles1.rangeSat;
-          let isInView1 = _checkInFOV1(azimuth1,elevation1,range1);
-          if (!isInView1) {
+          let isInFOV1 = satellite.checkIsInFOV(sensor,aer1);
+          if (!isInFOV1) {
             // First Pass
             return {time: timeManager.dateFormat(now, 'isoDateTime', true),
             rng: range,
@@ -761,25 +567,10 @@ or mirrored at any other location without the express written permission of the 
           } else {
             // Next Pass to Calculate Last line of coverage
             now1.setTime(Number(now) + (satellite.lookanglesInterval * 1000));
-            j1 = timeManager.jday(now1.getUTCFullYear(),
-            now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-            now1.getUTCDate(),
-            now1.getUTCHours(),
-            now1.getUTCMinutes(),
-            now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-            j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-            gmst1 = satellite.gstime(j1);
+            aer1 = satellite.getRae(now1, satrec, sensor);
 
-            m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
-            positionEci1 = satellite.sgp4(satrec, m1);
-
-            positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
-            lookAngles1 = satellite.ecfToLookAngles(sensor.observerGd, positionEcf1);
-            azimuth1 = lookAngles1.azimuth * RAD2DEG;
-            elevation1 = lookAngles1.elevation * RAD2DEG;
-            range1 = lookAngles1.rangeSat;
-            let isInView1 = _checkInFOV1(azimuth1,elevation1,range1);
-            if (!isInView1) {
+            let isInFOV1 = satellite.checkIsInFOV(sensor,aer1);
+            if (!isInFOV1) {
               // Last Pass
               return {time: timeManager.dateFormat(now, 'isoDateTime', true),
               rng: range,
@@ -799,7 +590,7 @@ or mirrored at any other location without the express written permission of the 
     }
   };
   satellite.lastMultiSiteArray = [];
-  satellite.getlookanglesMultiSite = function (sat) {
+  satellite.getlookanglesMultiSite = (sat) => {
     let isResetToDefault = false;
     if (!satellite.checkSensorSelected()) { isResetToDefault = true; }
 
@@ -907,32 +698,10 @@ or mirrored at any other location without the express written permission of the 
       // Setup Realtime and Offset Time
       var propRealTimeTemp = Date.now();
       var now = timeManager.propTimeCheck(offset * 1000, propRealTimeTemp);
-      var j = timeManager.jday(now.getUTCFullYear(),
-      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-      var gmst = satellite.gstime(j);
+      let aer = satellite.getRae(now, satrec, sensor);
 
-      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-      var positionEci = satellite.sgp4(satrec, m);
-
-      let positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-      let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-      let azimuth = lookAngles.azimuth * RAD2DEG;
-      let elevation = lookAngles.elevation * RAD2DEG;
-      let range = lookAngles.rangeSat;
-
-      if (sensor.obsminaz < sensor.obsmaxaz) {
-        if (!((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-        ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
-          return;
-        }
-      }
-      if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-      ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+      let isInFOV = satellite.checkIsInFOV(sensor,aer);
+      if (isInFOV) {
         return {
             time: now,
             el: elevation,
@@ -944,7 +713,9 @@ or mirrored at any other location without the express written permission of the 
       return;
     }
   };
-  satellite.getOrbitByLatLon = function (sat, goalLat, goalLon, upOrDown, propOffset, goalAlt, rascOffset) {
+
+  // TODO: satellite.getOrbitByLatLon needs cleaned up badly
+  satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalAlt, rascOffset) => {
     /**
      * Function to brute force find an orbit over a sites lattiude and longitude
      * @param  object       sat             satellite object with satrec
@@ -1350,8 +1121,7 @@ or mirrored at any other location without the express written permission of the 
       return 0;
     }
   };
-  satellite.calculateLookAngles = function (sat, sensor, offset) {
-    var propOffset;
+  satellite.calculateLookAngles = (sat, sensor, propOffset) => {
     (function _inputValidation () {
       // Check if there is a sensor
       if (typeof sensor == 'undefined') {
@@ -1393,6 +1163,7 @@ or mirrored at any other location without the express written permission of the 
     })();
 
     // Set default timing settings. These will be changed to find look angles at different times in future.
+    if (typeof propOffset == 'undefined') propOffset = 0; // Could be used for changing the time start
     var propTempOffset = 0;               // offset letting us propagate in the future (or past)
 
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
@@ -1407,7 +1178,7 @@ or mirrored at any other location without the express written permission of the 
     for (var i = 0; i < (satellite.lookanglesLength * 24 * 60 * 60); i += satellite.lookanglesInterval) {         // satellite.lookanglesInterval in seconds
       propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
       if (lookanglesTable.length <= 5000) {                           // Maximum of 1500 lines in the look angles table
-        lookanglesRow = propagate2(propTempOffset, satrec);
+        lookanglesRow = _propagate(propTempOffset, satrec);
         if (typeof lookanglesRow != 'undefined') {
           lookanglesTable.push(lookanglesRow);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
         }
@@ -1417,61 +1188,22 @@ or mirrored at any other location without the express written permission of the 
     if (satellite.isRiseSetLookangles) {
       satellite.lookanglesInterval = tempLookanglesInterval;
     }
-    function propagate2 (propTempOffset, satrec) {
+    function _propagate (propTempOffset, satrec) {
       var lookAngleRecord = {};
-      var now = new Date();                                     // Make a time variable
+      let now = new Date();                                     // Make a time variable
       now.setTime(Number(Date.now()) + propTempOffset);           // Set the time variable to the time in the future
-      var j = _jday(now.getUTCFullYear(),
-      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-      var gmst = satellite.gstime(j);
+      let aer = satellite.getRae(now, satrec, sensor);
+      let isInFOV = satellite.checkIsInFOV(sensor,aer);
 
-      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-      var positionEci = satellite.sgp4(satrec, m);
-      var positionEcf, lookAngles, azimuth, elevation, range;
-
-      positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-      lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-      azimuth = lookAngles.azimuth * RAD2DEG;
-      elevation = lookAngles.elevation * RAD2DEG;
-      range = lookAngles.rangeSat;
-
-      if (sensor.obsminaz < sensor.obsmaxaz) {
-        if (!((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-        ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
-          return;
-        }
-      }
-      if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-      ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+      if (isInFOV) {
         if (satellite.isRiseSetLookangles) {
           // Previous Pass to Calculate first line of coverage
           var now1 = new Date();
           now1.setTime(Number(Date.now()) + propTempOffset - (satellite.lookanglesInterval * 1000));
-          var j1 = timeManager.jday(now1.getUTCFullYear(),
-          now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-          now1.getUTCDate(),
-          now1.getUTCHours(),
-          now1.getUTCMinutes(),
-          now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-          j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-          var gmst1 = satellite.gstime(j1);
+          aer1 = satellite.getRae(now1, satrec, sensor);
+          isInFOV1 = satellite.checkIsInFOV(sensor,aer1);
 
-          var m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
-          var positionEci1 = satellite.sgp4(satrec, m1);
-          var positionEcf1, lookAngles1, azimuth1, elevation1, range1;
-
-          positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
-          lookAngles1 = satellite.ecfToLookAngles(sensor.observerGd, positionEcf1);
-          azimuth1 = lookAngles1.azimuth * RAD2DEG;
-          elevation1 = lookAngles1.elevation * RAD2DEG;
-          range1 = lookAngles1.rangeSat;
-          if (!((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-          ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+          if (!isInFOV1) {
             return {time: timeManager.dateFormat(now, 'isoDateTime', true),
                     rng: range,
                     az: azimuth,
@@ -1479,25 +1211,10 @@ or mirrored at any other location without the express written permission of the 
           } else {
             // Next Pass to Calculate Last line of coverage
             now1.setTime(Number(Date.now()) + propTempOffset - (satellite.lookanglesInterval * 1000));
-            j1 = _jday(now1.getUTCFullYear(),
-            now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-            now1.getUTCDate(),
-            now1.getUTCHours(),
-            now1.getUTCMinutes(),
-            now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-            j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-            gmst1 = satellite.gstime(j1);
+            aer1 = satellite.getRae(now1, satrec, sensor);
+            isInFOV1 = satellite.checkIsInFOV(sensor,aer1);
 
-            m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
-            positionEci1 = satellite.sgp4(satrec, m1);
-
-            positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
-            lookAngles1 = satellite.ecfToLookAngles(sensor.observerGd, positionEcf1);
-            azimuth1 = lookAngles1.azimuth * RAD2DEG;
-            elevation1 = lookAngles1.elevation * RAD2DEG;
-            range1 = lookAngles1.rangeSat;
-            if (!((azimuth1 >= sensor.obsminaz || azimuth1 <= sensor.obsmaxaz) && (elevation1 >= sensor.obsminel && elevation1 <= sensor.obsmaxel) && (range1 <= sensor.obsmaxrange && range1 >= sensor.obsminrange)) ||
-            ((azimuth1 >= sensor.obsminaz2 || azimuth1 <= sensor.obsmaxaz2) && (elevation1 >= sensor.obsminel2 && elevation1 <= sensor.obsmaxel2) && (range1 <= sensor.obsmaxrange2 && range1 >= sensor.obsminrange2))) {
+            if (!isInFOV1) {
               return {time: timeManager.dateFormat(now, 'isoDateTime', true),
                       rng: range,
                       az: azimuth,
@@ -1515,24 +1232,37 @@ or mirrored at any other location without the express written permission of the 
     }
     return lookanglesTable;
   };
-  satellite.findBestPasses = function (sats,sensor) {
+  satellite.findBestPasses = (sats,sensor) => {
     var satArray = sats.split(',');
     var tableSatTimes = [];
     for (var i = 0; i < satArray.length; i++) {
       try {
         var sat = satSet.getSat(satSet.getIdFromObjNum(satArray[i]));
-        var satPasses = satellite.findBestPass(sat,sensor);
+        var satPasses = satellite.findBestPass(sat, sensor, 0);
         for (var s = 0; s < satPasses.length; s++) {
-          tableSatTimes.push(satPasses[s]);
+          // if (satPasses[s].score > 30) {
+            tableSatTimes.push(satPasses[s]);
+          // }
         }
       } catch (e) {
         console.warn(e);
       }
     }
-    saveCsv(tableSatTimes,'bestSatTimes');
+    let sortedTableSatTimes = tableSatTimes.sort((a, b) => b.sortTime - a.sortTime);
+    sortedTableSatTimes.reverse();
+
+    sortedTableSatTimes.forEach(function(v){ delete v.sortTime });
+
+    for (var i = 0; i < sortedTableSatTimes.length; i++) {
+      sortedTableSatTimes[i].startDate = sortedTableSatTimes[i].startDate.toISOString().split('T')[0];
+      sortedTableSatTimes[i].startTime = sortedTableSatTimes[i].startTime.toISOString().split('T')[1].split('.')[0];
+      sortedTableSatTimes[i].stopDate = sortedTableSatTimes[i].stopDate.toISOString().split('T')[0];
+      sortedTableSatTimes[i].stopTime = sortedTableSatTimes[i].stopTime.toISOString().split('T')[1].split('.')[0];
+    }
+
+    saveCsv(sortedTableSatTimes,'bestSatTimes');
   }
-  satellite.findBestPass = function (sat, sensor) {
-    var propOffset = 0;
+  satellite.findBestPass = (sat, sensor, propOffset) => {
     (function _inputValidation () {
       // Check if there is a sensor
       if (typeof sensor == 'undefined') {
@@ -1566,16 +1296,14 @@ or mirrored at any other location without the express written permission of the 
     })();
 
     // Set default timing settings. These will be changed to find look angles at different times in future.
+    if (typeof propOffset == 'undefined') propOffset = 0; // Could be used for changing the time start
     var propTempOffset = 0;               // offset letting us propagate in the future (or past)
 
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
     var lookanglesTable = [];                                   // Iniially no rows to the table
-    var tempLookanglesInterval;
 
-    tempLookanglesInterval = satellite.lookanglesInterval;
-    satellite.lookanglesInterval = 5;
-    satellite.lookanglesLength = 7;
-    satellite.isRiseSetLookangles = true;
+    looksInterval = 5;
+    looksLength = 7;
 
     // Setup flags for passes
     var score = 0;
@@ -1583,158 +1311,105 @@ or mirrored at any other location without the express written permission of the 
     var sEl = null;
     var sRange = null;
     var sTime = null;
-    var sTime; // This is set in the propagate function on first valid look
     var passMinRange = sensor.obsmaxrange; // This is set each look to find minimum range (start at max range)
     var passMaxEl = 0;
-    var margFast = false;
     var start3 = false;
     var stop3 = false;
 
     var orbitalPeriod = MINUTES_PER_DAY / (satrec.no * MINUTES_PER_DAY / TAU); // Seconds in a day divided by mean motion
 
-    for (var i = 0; i < (satellite.lookanglesLength * 24 * 60 * 60); i += satellite.lookanglesInterval) {         // satellite.lookanglesInterval in seconds
+    for (var i = 0; i < (looksLength * 24 * 60 * 60); i += looksInterval) {         // satellite.lookanglesInterval in seconds
       propTempOffset = i * 1000 + propOffset;                 // Offset in seconds (msec * 1000)
       if (lookanglesTable.length <= 5000) {                           // Maximum of 1500 lines in the look angles table
-        lookanglesRow = propagate(propTempOffset, satrec);
+        lookanglesRow = _propagate(propTempOffset, satrec);
         // If data came back...
         if (typeof lookanglesRow != 'undefined') {
           lookanglesTable.push(lookanglesRow);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
           // Reset flags for next pass
+          score = 0;
           sAz = null;
           sEl = null;
           sRange = null;
           sTime = null;
-          score = 0;
           passMinRange = sensor.obsmaxrange; // This is set each look to find minimum range
           passMaxEl = 0;
-          margFast = false;
+          start3 = false;
+          stop3 = false;
           i = i + (orbitalPeriod * 60 * 0.75); // Jump 3/4th to the next orbit
         }
       }
     }
 
-    satellite.lookanglesInterval = tempLookanglesInterval;
-
     return lookanglesTable;
-
-    function propagate (propTempOffset, satrec) {
-      var lookAngleRecord = {};
-      var scc = satrec.satnum;
-      var now = new Date();                                     // Make a time variable
+    function _propagate (propTempOffset, satrec) {
+      let now = new Date();                                     // Make a time variable
       now.setTime(Number(Date.now()) + propTempOffset);           // Set the time variable to the time in the future
-      var j = _jday(now.getUTCFullYear(),
-      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-      var gmst = satellite.gstime(j);
+      let aer = satellite.getRae(now, satrec, sensor);
+      let isInFOV = satellite.checkIsInFOV(sensor,aer);
 
-      var m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-      var positionEci = satellite.sgp4(satrec, m);
-      var positionEcf, lookAngles, azimuth, elevation, range;
+      if (isInFOV) {
+        // Previous Pass to Calculate first line of coverage
+        let now1 = new Date();
+        now1.setTime(Number(Date.now()) + propTempOffset - (looksInterval * 1000));
+        aer1 = satellite.getRae(now1, satrec, sensor);
 
-      positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-      lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-      azimuth = lookAngles.azimuth * RAD2DEG;
-      elevation = lookAngles.elevation * RAD2DEG;
-      range = lookAngles.rangeSat;
+        let isInFOV1 = satellite.checkIsInFOV(sensor,aer1);
+        if (!isInFOV1) {
+          // if it starts around 3
+          if (elevation <= 3.5) { start3 = true; }
 
-      if (sensor.obsminaz < sensor.obsmaxaz) {
-        if (!((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-        ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
-          return;
-        }
-      }
-      if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
-      ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
-        if (satellite.isRiseSetLookangles) {
-          // Previous Pass to Calculate first line of coverage
-          var now1 = new Date();
-          now1.setTime(Number(Date.now()) + propTempOffset - (satellite.lookanglesInterval * 1000));
-          var j1 = timeManager.jday(now1.getUTCFullYear(),
-          now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-          now1.getUTCDate(),
-          now1.getUTCHours(),
-          now1.getUTCMinutes(),
-          now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-          j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-          var gmst1 = satellite.gstime(j1);
+          // First Line of Coverage
+          sTime = now;
+          sAz = azimuth.toFixed(0);
+          sEl = elevation.toFixed(1);
+          sRange = range.toFixed(0);
+        } else {
+          // Next Pass to Calculate Last line of coverage
+          now1.setTime(Number(Date.now()) + propTempOffset + (looksInterval * 1000));
+          aer1 = satellite.getRae(now1, satrec, sensor);
 
-          var m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
-          var positionEci1 = satellite.sgp4(satrec, m1);
-          var positionEcf1, lookAngles1, azimuth1, elevation1, range1;
+          isInFOV1 = satellite.checkIsInFOV(sensor,aer1);
+          if (!isInFOV1) {
+            // if it stops around 3
+            stop3 = (elevation <= 3.5) ? true : false;
 
-          positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
-          lookAngles1 = satellite.ecfToLookAngles(sensor.observerGd, positionEcf1);
-          azimuth1 = lookAngles1.azimuth * RAD2DEG;
-          elevation1 = lookAngles1.elevation * RAD2DEG;
-          range1 = lookAngles1.rangeSat;
-          if (!((azimuth1 >= sensor.obsminaz || azimuth1 <= sensor.obsmaxaz) && (elevation1 >= sensor.obsminel && elevation1 <= sensor.obsmaxel) && (range1 <= sensor.obsmaxrange && range1 >= sensor.obsminrange)) ||
-          ((azimuth1 >= sensor.obsminaz2 || azimuth1 <= sensor.obsmaxaz2) && (elevation1 >= sensor.obsminel2 && elevation1 <= sensor.obsmaxel2) && (range1 <= sensor.obsmaxrange2 && range1 >= sensor.obsminrange2))) {
-            // if it starts around 3
-            if (elevation <= 3.5) {
-              start3 = true;
+            score = (Math.min((now - sTime) / 1000 / 60 * 10 / 8,10)); // 8 minute pass is max score
+            let elScore = (Math.min(passMaxEl/40*10,10)); // 40 el or above is max score
+            elScore -= (Math.max((passMaxEl-50)/5,0)); // subtract points for being over 50 el
+            elScore *= (start3 && stop3) ? 2 : 1; // Double points for start and stop at 3
+            score += elScore;
+            score += (Math.min(10*900/passMinRange,10)); // 750 or less is max score
+            score -= (Math.max((900-passMinRange)/10,0)); // subtract points for being closer than 750
+
+            let tic = 0;
+            try {
+              tic = ((now - sTime)/1000);
+            } catch (e) {
+              tic = 0;
             }
 
-            // First Line of Coverage
-            sTime = now;
-            sAz = azimuth.toFixed(0);
-            sEl = elevation.toFixed(1);
-            sRange = range.toFixed(0);
-          } else {
-            // Next Pass to Calculate Last line of coverage
-            now1.setTime(Number(Date.now()) + propTempOffset + (satellite.lookanglesInterval * 1000));
-            j1 = _jday(now1.getUTCFullYear(),
-            now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-            now1.getUTCDate(),
-            now1.getUTCHours(),
-            now1.getUTCMinutes(),
-            now1.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-            j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-            gmst1 = satellite.gstime(j1);
-
-            m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY;
-            positionEci1 = satellite.sgp4(satrec, m1);
-
-            positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
-            lookAngles1 = satellite.ecfToLookAngles(sensor.observerGd, positionEcf1);
-            azimuth1 = lookAngles1.azimuth * RAD2DEG;
-            elevation1 = lookAngles1.elevation * RAD2DEG;
-            range1 = lookAngles1.rangeSat;
-            if (!((azimuth1 >= sensor.obsminaz || azimuth1 <= sensor.obsmaxaz) && (elevation1 >= sensor.obsminel && elevation1 <= sensor.obsmaxel) && (range1 <= sensor.obsmaxrange && range1 >= sensor.obsminrange)) ||
-            ((azimuth1 >= sensor.obsminaz2 || azimuth1 <= sensor.obsmaxaz2) && (elevation1 >= sensor.obsminel2 && elevation1 <= sensor.obsmaxel2) && (range1 <= sensor.obsmaxrange2 && range1 >= sensor.obsminrange2))) {
-              // if it stops around 3
-              if (elevation <= 3.5) {
-                stop3 = true;
-              }
-              // Check for possible marginal for timeout
-              // using 3 minutes because FOV is expanded
-              score += (Math.min((now - sTime) / 1000 / 60 * 2,10)); // 5 minute pass is max score
-              var elScore = (Math.min(passMaxEl/5,10)); // 40 el or above is max score
-              elScore *= (start3 && stop3) ? 2 : 1; // Double points for start and stop at 3
-              score += elScore;
-              score += (Math.min(10*750/passMinRange,10)); // 750 or less is max score
-              // if (margFast) score -= 5;
-
-              // Last Line of Coverage
-              return {
-                scc: scc,
-                score: score,
-                startTime: sTime.toISOString(),
-                startAz: sAz,
-                startEl: sEl,
-                startRange: sRange,
-                stopTime: now.toISOString(),
-                stopAz: azimuth.toFixed(0),
-                stopEl: elevation.toFixed(1),
-                stopRange: range.toFixed(0)};
-            }
+            // Last Line of Coverage
+            return {
+              sortTime: sTime,
+              scc: satrec.satnum,
+              score: score,
+              startDate: sTime,
+              startTime: sTime,
+              startAz: sAz,
+              startEl: sEl,
+              startRange: sRange,
+              stopDate: now,
+              stopTime: now,
+              stopAz: azimuth.toFixed(0),
+              stopEl: elevation.toFixed(1),
+              stopRange: range.toFixed(0),
+              tic: tic,
+              minRange: passMinRange.toFixed(0),
+              passMaxEl: passMaxEl.toFixed(1)
+            };
           }
         }
         // Do this for any pass in coverage
-        if (range <= 750) margFast = true;
         if (passMaxEl < elevation) passMaxEl = elevation;
         if (passMinRange > range) passMinRange = range;
       }
@@ -1760,25 +1435,67 @@ or mirrored at any other location without the express written permission of the 
     }
   }
 
-  satellite.getDOPsTable = function (lat, lon, alt) {
-    var now;
-    var tbl = document.getElementById('dops');           // Identify the table to update
-    tbl.innerHTML = '';                                   // Clear the table from old object data
-    var tblLength = 0;
-    var propOffset = timeManager.getPropOffset();
-    var propTempOffset = 0;
+  // TODO: standardize use of azimuth, elevation, and rangeSat (whatever satellite.js uses)
+  satellite.getRae = (now, satrec, sensor) => {
+    let j = _jday(now.getUTCFullYear(),
+    now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+    now.getUTCDate(),
+    now.getUTCHours(),
+    now.getUTCMinutes(),
+    now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+    let gmst = satellite.gstime(j);
 
-    var tr = tbl.insertRow();
-    var tdT = tr.insertCell();
+    let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+    let positionEci = satellite.sgp4(satrec, m);
+
+    let positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
+    let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+    azimuth = lookAngles.azimuth * RAD2DEG;
+    elevation = lookAngles.elevation * RAD2DEG;
+    range = lookAngles.rangeSat;
+      return {az: azimuth, el: elevation, range: range};
+  };
+
+  // NOTE: Better code is available for this
+  satellite.checkIsInFOV = (sensor,rae) => {
+    let azimuth = rae.az;
+    let elevation = rae.el;
+    let range = rae.range;
+
+    if (sensor.obsminaz < sensor.obsmaxaz) {
+      if (!((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+      ((azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+        return false;
+      }
+    }
+    if (((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && (elevation >= sensor.obsminel && elevation <= sensor.obsmaxel) && (range <= sensor.obsmaxrange && range >= sensor.obsminrange)) ||
+    ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && (elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2) && (range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2))) {
+      return true;
+    }
+
+    return false;
+  };
+
+  satellite.getDOPsTable = (lat, lon, alt) => {
+    let now;
+    let tbl = document.getElementById('dops');           // Identify the table to update
+    tbl.innerHTML = '';                                   // Clear the table from old object data
+    let tblLength = 0;
+    let propOffset = timeManager.getPropOffset();
+    let propTempOffset = 0;
+
+    let tr = tbl.insertRow();
+    let tdT = tr.insertCell();
     tdT.appendChild(document.createTextNode('Time'));
-    var tdH = tr.insertCell();
+    let tdH = tr.insertCell();
     tdH.appendChild(document.createTextNode('HDOP'));
-    var tdP = tr.insertCell();
+    let tdP = tr.insertCell();
     tdP.appendChild(document.createTextNode('PDOP'));
-    var tdG = tr.insertCell();
+    let tdG = tr.insertCell();
     tdG.appendChild(document.createTextNode('GDOP'));
 
-    for (var t = 0; t < 1440; t++) {
+    for (let t = 0; t < 1440; t++) {
       propTempOffset = t * 1000 * 60 + propOffset;                 // Offset in seconds (msec * 1000)
       now = timeManager.propTimeCheck(propTempOffset, timeManager.propRealTime);
 
@@ -1795,7 +1512,7 @@ or mirrored at any other location without the express written permission of the 
       tdG.appendChild(document.createTextNode(dops.GDOP));
     }
   };
-  satellite.getDOPs = function (lat, lon, alt, isDrawLine, propTime) {
+  satellite.getDOPs = (lat, lon, alt, isDrawLine, propTime) => {
     if (typeof lat == 'undefined') {
       console.error('Latitude Required');
       return;
@@ -1852,7 +1569,7 @@ or mirrored at any other location without the express written permission of the 
 
     return satellite.calculateDOPs(inViewList, referenceECF, isDrawLine);
   };
-  satellite.calculateDOPs = function (satList, referenceECF, isDrawLine) {
+  satellite.calculateDOPs = (satList, referenceECF, isDrawLine) => {
     var dops = {};
 
     nsat = satList.length;
@@ -1903,10 +1620,11 @@ or mirrored at any other location without the express written permission of the 
     return dops;
 };
 
+  // TODO: Add comments on what this is used for
   function _Nearest180 (arr) {
-    var  maxDiff = null;
-    for(var x = 0; x < arr.length; x++){
-      for(var y = x+1; y < arr.length; y++){
+    let  maxDiff = null;
+    for(let x = 0; x < arr.length; x++){
+      for(let y = x+1; y < arr.length; y++){
           if(arr[x] < arr[y] && maxDiff < (arr[y] - arr[x])){
               if (arr[y] - arr[x] > 180) {
                 arr[y] = arr[y] - 180;
@@ -1920,7 +1638,7 @@ or mirrored at any other location without the express written permission of the 
     return maxDiff === null ? -1 : maxDiff;
   }
 
-  satellite.getSunTimes = function (sat, sensor, searchLength, interval) {
+  satellite.getSunTimes = (sat, sensor, searchLength, interval) => {
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensor == 'undefined') {
       if (typeof satellite.currentSensor == 'undefined') {
@@ -2006,7 +1724,7 @@ or mirrored at any other location without the express written permission of the 
       }
     }
   };
-  satellite.lookAnglesToEcf = function (azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long, obs_alt) {
+  satellite.lookAnglesToEcf = (azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long, obs_alt) => {
 
       // site ecef in meters
       var geodeticCoords = {};
@@ -2040,7 +1758,9 @@ or mirrored at any other location without the express written permission of the 
 
     return {'x': x, 'y': y, 'z': z};
   };
-  satellite.xyz2latlon = function (x, y, z) {
+
+  // TODO: Rename eci2lla and include altitude
+  satellite.xyz2latlon = (x, y, z) => {
     var propTime = timeManager.propTime();
     var j = timeManager.jday(propTime.getUTCFullYear(),
                  propTime.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -2058,9 +1778,14 @@ or mirrored at any other location without the express written permission of the 
     latLon.longitude = (latLon.longitude < -180) ? latLon.longitude + 360 : latLon.longitude;
     return latLon;
   };
-  satellite.isInSun = function (sat) {
+
+  // TODO: satellite.isInSun should be moved to a sat class
+  satellite.isInSun = (sat) => {
     // Distances all in km
     var sunECI = sun.getXYZ();
+
+    // NOTE: Code is mashed to save memory when used on the whole catalog
+
     // Position needs to be relative to satellite NOT ECI
     // var distSatEarthX = Math.pow(-sat.position.x, 2);
     // var distSatEarthY = Math.pow(-sat.position.y, 2);
@@ -2109,7 +1834,7 @@ or mirrored at any other location without the express written permission of the 
   };
 
   // Specific to KeepTrack.
-  satellite.map = function (sat, i) {
+  satellite.map = (sat, i) => {
     // Set default timing settings. These will be changed to find look angles at different times in future.
     var propOffset = timeManager.getPropOffset();
     var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);// perform and store sat init calcs
@@ -2162,3 +1887,83 @@ or mirrored at any other location without the express written permission of the 
     }
   };
 })();
+
+// NOTE: This was an early attempt at multithreading.
+// satellite.calculateTimeInCoverage = function () {
+//   console.time('TIC');
+//   console.log(Date.now());
+//   var calcTICArray = [];
+//   var ready1, ready2, ready3, ready4, ready5, ready6, ready7, ready8;
+//   var debugCalculations = 17868;
+//   ready1 = false;
+//   ready2 = false;
+//   ready3 = false;
+//   ready4 = false;
+//   ready5 = false;
+//   ready6 = false;
+//   ready7 = false;
+//   ready8 = false;
+//
+//   // multThreadCruncher1.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 0, endNum: 0, sensor: satellite.currentSensor});
+//   // multThreadCruncher2.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 1, endNum: 1, sensor: satellite.currentSensor});
+//   // multThreadCruncher3.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 2, endNum: 2, sensor: satellite.currentSensor});
+//   // multThreadCruncher4.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 3, endNum: 3, sensor: satellite.currentSensor});
+//   // multThreadCruncher5.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 4, endNum: 4, sensor: satellite.currentSensor});
+//   // multThreadCruncher6.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 5, endNum: 5, sensor: satellite.currentSensor});
+//   // multThreadCruncher7.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 6, endNum: 6, sensor: satellite.currentSensor});
+//   // multThreadCruncher8.postMessage({type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 7, endNum: 1599, sensor: satellite.currentSensor});
+//
+//   multThreadCruncher1.postMessage({thread: 1, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: 0, endNum: debugCalculations/8*1, sensor: satellite.currentSensor});
+//   multThreadCruncher2.postMessage({thread: 2, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*1+1, endNum: debugCalculations/8*2, sensor: satellite.currentSensor});
+//   multThreadCruncher3.postMessage({thread: 3, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*2+1, endNum: debugCalculations/8*3, sensor: satellite.currentSensor});
+//   multThreadCruncher4.postMessage({thread: 4, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*3+1, endNum: debugCalculations/8*4, sensor: satellite.currentSensor});
+//   multThreadCruncher5.postMessage({thread: 5, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*4+1, endNum: debugCalculations/8*5, sensor: satellite.currentSensor});
+//   multThreadCruncher6.postMessage({thread: 6, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*5+1, endNum: debugCalculations/8*6, sensor: satellite.currentSensor});
+//   multThreadCruncher7.postMessage({thread: 7, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*6+1, endNum: debugCalculations/8*7, sensor: satellite.currentSensor});
+//   multThreadCruncher8.postMessage({thread: 8, type: 'calcTIC', propOffset: timeManager.getPropOffset(), startNum: debugCalculations/8*7+1, endNum: debugCalculations/8*8, sensor: satellite.currentSensor});
+//
+//   multThreadCruncher1.onmessage = function (m) {
+//     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+//     ready1 = true;
+//     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+//   };
+//   multThreadCruncher2.onmessage = function (m) {
+//     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+//     ready2 = true;
+//     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+//   };
+//   multThreadCruncher3.onmessage = function (m) {
+//     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+//     ready3 = true;
+//     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+//   };
+//   multThreadCruncher4.onmessage = function (m) {
+//     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+//     ready4 = true;
+//     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+//   };
+//   multThreadCruncher5.onmessage = function (m) {
+//     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+//     ready5 = true;
+//     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+//   };
+//   multThreadCruncher6.onmessage = function (m) {
+//     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+//     ready6 = true;
+//     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+//   };
+//   multThreadCruncher7.onmessage = function (m) {
+//     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+//     ready7 = true;
+//     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+//   };
+//   multThreadCruncher8.onmessage = function (m) {
+//     for (var i = 0; i < m.data.calcTICArray.length; i++) { calcTICArray.push(m.data.calcTICArray[i]); }
+//     ready8 = true;
+//     if (ready1 && ready2 && ready3 && ready4 && ready5 && ready6 && ready7 && ready8) multThreadComplete();
+//   };
+//   function multThreadComplete () {
+//     console.log(calcTICArray);
+//     console.timeEnd('TIC');
+//   }
+// };

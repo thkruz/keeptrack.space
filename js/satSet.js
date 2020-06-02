@@ -518,7 +518,8 @@ var satSensorMarkerArray = [];
                 TLE2: satelliteList[s].TLE2,
                 intlDes: year + '-' + rest,
                 type: 'sat',
-                id: tempSatData.length
+                id: tempSatData.length,
+                vmag: satelliteList[s].vmag
               };
               tempSatData.push(extrasSatInfo);
             }
@@ -680,7 +681,7 @@ var satSensorMarkerArray = [];
         if (!settingsManager.trusatOnly) {
           // If No Visual Magnitudes, Add The VMag Database
           try {
-            if (typeof satSet.getSat(satSet.getIdFromObjNum(694)).vmag == 'undefined') {
+            if (typeof satSet.getSat(satSet.getIdFromObjNum(44235)).vmag == 'undefined') {
               satVmagManager.init();
             }
           } catch (e) {
@@ -906,57 +907,74 @@ var satSensorMarkerArray = [];
   };
 
   class Sat {
-    constructor (satData) {
-      this.inSun = satData.inSun;
-      this.inSunChange = satData.inSunChange;
-      this.inview = satData.inview;
-      this.inView = satData.inView;
-      this.inViewChange = satData.inViewChange;
-      this.position = satData.position;
-      this.velocity = satData.velocity;
-      this.velocityX = satData.velocityX;
-      this.velocityY = satData.velocityY;
-      this.velocityZ = satData.velocityZ;
-      this.C = satData.C;
-      this.LS = satData.LS;
-      this.LV = satData.LV;
-      this.ON = satData.ON;
-      this.OT = satData.OT;
-      this.R = satData.R;
-      this.SCC_NUM = satData.SCC_NUM;
-      this.TLE1 = satData.TLE1;
-      this.TLE2 = satData.TLE2;
-      this.active = satData.active;
-      this.apogee = satData.apogee;
-      this.argPe = satData.argPe;
-      this.eccentricity = satData.eccentricity;
-      this.id = satData.id;
-      this.inclination = satData.inclination;
-      this.intlDes = satData.intlDes;
-      this.meanMotion = satData.meanMotion;
-      this.perigee = satData.perigee;
-      this.period = satData.period;
-      this.raan = satData.raan;
-      this.semiMajorAxis = satData.semiMajorAxis;
-      this.semiMinorAxis = satData.semiMinorAxis;
-      this.alt = satData.alt;
-      this.lat = satData.lat;
-      this.lon = satData.lon;
-      this.linkAEHF = satData.linkAEHF;
-      this.linkBeidou = satData.linkBeidou;
-      this.linkGPS = satData.linkGPS;
-      this.linkGalileo = satData.linkGalileo;
-      this.linkGlonass = satData.linkGlonass;
-      this.linkWGS = satData.linkWGS;
-      this.name = satData.name;
-      this.static = satData.static;
-      this.staticNum = satData.staticNum;
-      this.type = satData.type;
-      this.typeExt = satData.typeExt;
-      this.ra = satData.ra;
-      this.dec = satData.dec;
+    constructor (satInfo) {
+      this.inSun = satInfo.inSun;
+      this.inSunChange = satInfo.inSunChange;
+      this.inview = satInfo.inview;
+      this.inView = satInfo.inView;
+      this.inViewChange = satInfo.inViewChange;
+      this.position = satInfo.position;
+      this.velocity = satInfo.velocity;
+      this.velocityX = satInfo.velocityX;
+      this.velocityY = satInfo.velocityY;
+      this.velocityZ = satInfo.velocityZ;
+      this.C = satInfo.C;
+      this.Con = satInfo.Con;
+      this.DM = satInfo.DM;
+      this.LM = satInfo.LM;
+      this.LS = satInfo.LS;
+      this.LV = satInfo.LV;
+      this.Li = satInfo.Li;
+      this.M = satInfo.M;
+      this.O = satInfo.O;
+      this.ON = satInfo.ON;
+      this.OT = satInfo.OT;
+      this.Pw = satInfo.Pw;
+      this.R = satInfo.R;
+      this.S1 = satInfo.S1;
+      this.S2 = satInfo.S2;
+      this.S3 = satInfo.S3;
+      this.S4 = satInfo.S4;
+      this.S5 = satInfo.S5;
+      this.S6 = satInfo.S6;
+      this.S7 = satInfo.S7;
+      this.SCC_NUM = satInfo.SCC_NUM;
+      this.TLE1 = satInfo.TLE1;
+      this.TLE2 = satInfo.TLE2;
+      this.U = satInfo.U;
+      this.URL = satInfo.URL;
+      this.active = satInfo.active;
+      this.apogee = satInfo.apogee;
+      this.argPe = satInfo.argPe;
+      this.eccentricity = satInfo.eccentricity;
+      this.id = satInfo.id;
+      this.inclination = satInfo.inclination;
+      this.intlDes = satInfo.intlDes;
+      this.meanMotion = satInfo.meanMotion;
+      this.perigee = satInfo.perigee;
+      this.period = satInfo.period;
+      this.raan = satInfo.raan;
+      this.semiMajorAxis = satInfo.semiMajorAxis;
+      this.semiMinorAxis = satInfo.semiMinorAxis;
+      this.alt = satInfo.alt;
+      this.lat = satInfo.lat;
+      this.lon = satInfo.lon;
+      this.linkAEHF = satInfo.linkAEHF;
+      this.linkBeidou = satInfo.linkBeidou;
+      this.linkGPS = satInfo.linkGPS;
+      this.linkGalileo = satInfo.linkGalileo;
+      this.linkGlonass = satInfo.linkGlonass;
+      this.linkWGS = satInfo.linkWGS;
+      this.name = satInfo.name;
+      this.static = satInfo.static;
+      this.staticNum = satInfo.staticNum;
+      this.type = satInfo.type;
+      this.typeExt = satInfo.typeExt;
+      this.ra = satInfo.ra;
+      this.dec = satInfo.dec;
+      this.vmag = satInfo.vmag;
     }
-    get isInSun () {
+    get isInSun() {
       // Distances all in km
       let sunECI = sun.getXYZ();
 
@@ -1007,6 +1025,13 @@ var satSensorMarkerArray = [];
 
       // if (!isUmbral && !isPenumbral) isSun = true;
       return 2;
+    }
+
+    set isInGroup(_inGroup) {
+        satData[this.id].isInGroup = _inGroup;
+    }
+    get isInGroup () {
+        return satData[this.id].isInGroup;
     }
 
     getTEARR (propTime, sensor) {
@@ -1399,18 +1424,36 @@ var satSensorMarkerArray = [];
         satId: sat.SCC_NUM,
         TLE1: sat.TLE1,
         TLE2: sat.TLE2,
-        inclination: sat.inclination,
+        inclination: sat.inclination * RAD2DEG,
         eccentricity: sat.eccentricity,
         period: sat.period,
-        raan: sat.raan,
+        raan: sat.raan * RAD2DEG,
         apogee: sat.apogee,
         perigee: sat.perigee,
         site: sat.LS,
         country: sat.C,
         name: sat.ON,
-        rocket: sat.LV,});
+        mission: sat.M,
+        purpose: sat.P,
+        user: sat.U,
+        rocket: sat.LV,
+        contractor: sat.Con,
+        dryMass: sat.DM,
+        liftMass: sat.LM,
+        lifeExpected: sat.Li,
+        power: sat.Pw,
+        visualMagnitude: sat.vmag,
+        source1: sat.S1,
+        source2: sat.S2,
+        source3: sat.S3,
+        source4: sat.S4,
+        source5: sat.S5,
+        source6: sat.S6,
+        source7: sat.S7,
+        source8: sat.URL
+      });
     }
-    saveCsv(catalogTLE2,'catalogTLE2');
+    saveCsv(catalogTLE2,'catalogInfo');
   };
   satSet.exportTle2Txt = () => {
     let catalogTLE2 = [];
@@ -1517,7 +1560,7 @@ var satSensorMarkerArray = [];
       }
     }
 
-    searchBox.init(satData);
+    // searchBox.init(satData);
     satSet.satDataString = null; // Clears stringified json file and clears 7MB of memory.
   };
 

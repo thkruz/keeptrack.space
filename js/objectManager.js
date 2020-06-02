@@ -426,116 +426,14 @@
     return country;
   };
   objectManager.extractLiftVehicle = function (LV) {
-    switch (LV) {
-      // ///////////////////////////////////////////////////////////////////////
-      // UNITED STATES
-      // ///////////////////////////////////////////////////////////////////////
-      case 'Scout B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutb.html'>" + LV + '</a>');
-        break;
-      case 'Scout X-1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutx-1.html'>" + LV + '</a>');
-        break;
-      case 'Scout X-4':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutx-4.html'>" + LV + '</a>');
-        break;
-      case 'Scout A':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scouta.html'>" + LV + '</a>');
-        break;
-      case 'Scout G-1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scoutg-1.html'>" + LV + '</a>');
-        break;
-      case 'Scout S-1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/scout.html'>" + LV + '</a>');
-        break;
-      case 'Delta 0300':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/d/delta0300.html'>" + LV + '</a>');
-        break;
-      case 'Falcon 9':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/f/falcon9.html'>" + LV + '</a>');
-        break;
-      case 'Falcon 9 v1.1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/f/falcon9v11.html'>" + LV + '</a>');
-        break;
-      case 'Atlas Agena B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/a/atlasagenab.html'>" + LV + '</a>');
-        break;
-      case 'Thor Ablestar':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/t/thorablestar.html'>" + LV + '</a>');
-        break;
-
-      // ///////////////////////////////////////////////////////////////////////
-      // RUSSIA
-      // ///////////////////////////////////////////////////////////////////////
-      case 'Soyuz-ST-A':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-st-a.html'>" + LV + '</a>');
-        break;
-      case 'Soyuz-ST-B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-st-b.html'>" + LV + '</a>');
-        break;
-      case 'Soyuz 11A511L':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz11a511l.html'>" + LV + '</a>');
-        break;
-      case 'Soyuz-U':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-u.html'>" + LV + '</a>');
-        break;
-      case 'Soyuz-U-PVB':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-u-pvb.html'>" + LV + '</a>');
-        break;
-      case 'Soyuz-FG':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-fg.html'>" + LV + '</a>');
-        break;
-      case 'Soyuz-2-1A':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-2-1a.html'>" + LV + '</a>');
-        break;
-      case 'Soyuz-2-1B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/s/soyuz-2-1b.html'>" + LV + '</a>');
-        break;
-      case 'Kosmos 11K65M':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/k/kosmos11k65m.html'>Kosmos 3M</a>");
-        break;
-      case 'Kosmos 65S3':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/k/kosmos65s3.html'>" + LV + '</a>');
-        break;
-      case 'Tsiklon-2':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/t/tsiklon-2.html'>" + LV + '</a>');
-        break;
-      case 'Tsiklon-3':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/t/tsiklon-3.html'>" + LV + '</a>');
-        break;
-      case 'Vostok 8A92M':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/v/vostok8a92m.html'>" + LV + '</a>');
-        break;
-      case 'Vostok 8K72K':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/v/vostok8k72k.html'>" + LV + '</a>');
-        break;
-      // ///////////////////////////////////////////////////////////////////////
-      // CHINA
-      // ///////////////////////////////////////////////////////////////////////
-      case 'Chang Zheng 1':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng1.html'>" + LV + '</a>');
-        break;
-      case 'Chang Zheng 3':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng3.html'>" + LV + '</a>');
-        break;
-      case 'Chang Zheng 3A':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng3a.html'>" + LV + '</a>');
-        break;
-      case 'Chang Zheng 4':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng4.html'>" + LV + '</a>');
-        break;
-      case 'Chang Zheng 4B':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng4b.html'>" + LV + '</a>');
-        break;
-      case 'Chang Zheng 2C-III/SD':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng2c-iiisd.html'>" + LV + '</a>');
-        break;
-      case 'Chang Zheng 2C':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng2c.html'>" + LV + '</a>');
-        break;
-      case 'Chang Zheng 6':
-        $('#sat-vehicle').html("<a class='iframe' href='http://www.astronautix.com/c/changzheng6.html'>" + LV + '</a>');
-        break;
+    if (LV == 'U') {
+      $('#sat-vehicle').html("LV");
+    } else {
+      for (var i = 0; i < objectManager.rocketUrls.length; i++) {
+        if (objectManager.rocketUrls[i].rocket == LV) {
+          $('#sat-vehicle').html(`<a class="iframe" href="${objectManager.rocketUrls[i].url}">${LV}</a>`);
+        }
+      }
     }
   };
   objectManager.extractLaunchSite = function (LS) {
@@ -707,6 +605,904 @@
       sitec: sitec
     };
   };
+  objectManager.rocketUrls = [
+    {
+      "rocket": "Angara A5",
+      "url": "https://en.wikipedia.org/wiki/Angara_(rocket_family)"
+    },
+    {
+      "rocket": "Antares 230",
+      "url": "https://en.wikipedia.org/wiki/Antares_(rocket)"
+    },
+    {
+      "rocket": "Ariane 1",
+      "url": "https://en.wikipedia.org/wiki/Ariane_1"
+    },
+    {
+      "rocket": "Ariane 2",
+      "url": "https://en.wikipedia.org/wiki/Ariane_2"
+    },
+    {
+      "rocket": "Ariane 3",
+      "url": "https://en.wikipedia.org/wiki/Ariane_3"
+    },
+    {
+      "rocket": "Ariane 40",
+      "url": "https://en.wikipedia.org/wiki/Ariane_4"
+    },
+    {
+      "rocket": "Ariane 42L",
+      "url": "https://en.wikipedia.org/wiki/Ariane_4"
+    },
+    {
+      "rocket": "Ariane 42P",
+      "url": "https://en.wikipedia.org/wiki/Ariane_4"
+    },
+    {
+      "rocket": "Ariane 44L",
+      "url": "https://en.wikipedia.org/wiki/Ariane_4"
+    },
+    {
+      "rocket": "Ariane 44LP",
+      "url": "https://en.wikipedia.org/wiki/Ariane_4"
+    },
+    {
+      "rocket": "Ariane 44P",
+      "url": "https://en.wikipedia.org/wiki/Ariane_4"
+    },
+    {
+      "rocket": "Ariane 5ECA",
+      "url": "https://en.wikipedia.org/wiki/Ariane_5"
+    },
+    {
+      "rocket": "Ariane 5ES",
+      "url": "https://en.wikipedia.org/wiki/Ariane_5"
+    },
+    {
+      "rocket": "Ariane 5G",
+      "url": "https://en.wikipedia.org/wiki/Ariane_5"
+    },
+    {
+      "rocket": "Ariane 5G+",
+      "url": "https://en.wikipedia.org/wiki/Ariane_5"
+    },
+    {
+      "rocket": "Ariane 5GS",
+      "url": "https://en.wikipedia.org/wiki/Ariane_5"
+    },
+    {
+      "rocket": "ARPA Taurus",
+      "url": "https://en.wikipedia.org/wiki/Minotaur-C"
+    },
+    {
+      "rocket": "Athena-1",
+      "url": "https://en.wikipedia.org/wiki/Athena_(rocket_family)"
+    },
+    {
+      "rocket": "Athena-2",
+      "url": "https://en.wikipedia.org/wiki/Athena_(rocket_family)"
+    },
+    {
+      "rocket": "Atlas 3A",
+      "url": "https://en.wikipedia.org/wiki/Atlas_III"
+    },
+    {
+      "rocket": "Atlas 3B",
+      "url": "https://en.wikipedia.org/wiki/Atlas_III"
+    },
+    {
+      "rocket": "Atlas Agena B",
+      "url": "https://en.wikipedia.org/wiki/Atlas-Agena"
+    },
+    {
+      "rocket": "Atlas Agena D",
+      "url": "https://en.wikipedia.org/wiki/Atlas-Agena"
+    },
+    {
+      "rocket": "Atlas Burner 2",
+      "url": "https://en.wikipedia.org/wiki/Atlas_(rocket_family)"
+    },
+    {
+      "rocket": "Atlas Centaur",
+      "url": "https://en.wikipedia.org/wiki/Atlas-Centaur"
+    },
+    {
+      "rocket": "Atlas D",
+      "url": "https://en.wikipedia.org/wiki/SM-65D_Atlas"
+    },
+    {
+      "rocket": "Atlas E",
+      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+    },
+    {
+      "rocket": "Atlas E/OIS",
+      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+    },
+    {
+      "rocket": "Atlas E/SGS-2",
+      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+    },
+    {
+      "rocket": "Atlas F",
+      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+    },
+    {
+      "rocket": "Atlas F/Agena D",
+      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+    },
+    {
+      "rocket": "Atlas F/PTS",
+      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+    },
+    {
+      "rocket": "Atlas F/SVS",
+      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+    },
+    {
+      "rocket": "Atlas G Centaur",
+      "url": "https://en.wikipedia.org/wiki/Atlas_G"
+    },
+    {
+      "rocket": "Atlas I",
+      "url": "https://en.wikipedia.org/wiki/Atlas_I"
+    },
+    {
+      "rocket": "Atlas II",
+      "url": "https://en.wikipedia.org/wiki/Atlas_II"
+    },
+    {
+      "rocket": "Atlas IIA",
+      "url": "https://en.wikipedia.org/wiki/Atlas_II"
+    },
+    {
+      "rocket": "Atlas IIAS",
+      "url": "https://en.wikipedia.org/wiki/Atlas_II"
+    },
+    {
+      "rocket": "Atlas SLV-3 Agena D",
+      "url": "https://en.wikipedia.org/wiki/Atlas_SLV-3"
+    },
+    {
+      "rocket": "Atlas SLV-3A Agena D",
+      "url": "https://en.wikipedia.org/wiki/Atlas_SLV-3"
+    },
+    {
+      "rocket": "Atlas SLV-3C Centaur",
+      "url": "https://en.wikipedia.org/wiki/Atlas_SLV-3"
+    },
+    {
+      "rocket": "Atlas SLV-3D Centaur",
+      "url": "https://en.wikipedia.org/wiki/Atlas_SLV-3"
+    },
+    {
+      "rocket": "Atlas V 401",
+      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+    },
+    {
+      "rocket": "Atlas V 411",
+      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+    },
+    {
+      "rocket": "Atlas V 421",
+      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+    },
+    {
+      "rocket": "Atlas V 431",
+      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+    },
+    {
+      "rocket": "Atlas V 521",
+      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+    },
+    {
+      "rocket": "Atlas V 541",
+      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+    },
+    {
+      "rocket": "Atlas V 551",
+      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+    },
+    {
+      "rocket": "Black Arrow",
+      "url": "https://en.wikipedia.org/wiki/Black_Arrow"
+    },
+    {
+      "rocket": "Chang Zheng 1",
+      "url": "https://en.wikipedia.org/wiki/Long_March_1"
+    },
+    {
+      "rocket": "Chang Zheng 11",
+      "url": "https://en.wikipedia.org/wiki/Long_March_11"
+    },
+    {
+      "rocket": "Chang Zheng 2C",
+      "url": "https://en.wikipedia.org/wiki/Long_March_2C"
+    },
+    {
+      "rocket": "Chang Zheng 2C-III/SD",
+      "url": "https://en.wikipedia.org/wiki/Long_March_2C"
+    },
+    {
+      "rocket": "Chang Zheng 2D",
+      "url": "https://en.wikipedia.org/wiki/Long_March_2D"
+    },
+    {
+      "rocket": "Chang Zheng 2E",
+      "url": "https://en.wikipedia.org/wiki/Long_March_2E"
+    },
+    {
+      "rocket": "Chang Zheng 2F",
+      "url": "https://en.wikipedia.org/wiki/Long_March_2F"
+    },
+    {
+      "rocket": "Chang Zheng 3",
+      "url": "https://en.wikipedia.org/wiki/Long_March_3"
+    },
+    {
+      "rocket": "Chang Zheng 3A",
+      "url": "https://en.wikipedia.org/wiki/Long_March_3A"
+    },
+    {
+      "rocket": "Chang Zheng 3B",
+      "url": "https://en.wikipedia.org/wiki/Long_March_3B"
+    },
+    {
+      "rocket": "Chang Zheng 3B/YZ-1",
+      "url": "https://en.wikipedia.org/wiki/Long_March_3B"
+    },
+    {
+      "rocket": "Chang Zheng 3C",
+      "url": "https://en.wikipedia.org/wiki/Long_March_3C"
+    },
+    {
+      "rocket": "Chang Zheng 3C/YZ-1",
+      "url": "https://en.wikipedia.org/wiki/Long_March_3C"
+    },
+    {
+      "rocket": "Chang Zheng 4",
+      "url": "https://en.wikipedia.org/wiki/Long_March_4A"
+    },
+    {
+      "rocket": "Chang Zheng 4B",
+      "url": "https://en.wikipedia.org/wiki/Long_March_4B"
+    },
+    {
+      "rocket": "Chang Zheng 4C",
+      "url": "https://en.wikipedia.org/wiki/Long_March_4C"
+    },
+    {
+      "rocket": "Chang Zheng 5/YZ-2",
+      "url": "https://en.wikipedia.org/wiki/Long_March_5"
+    },
+    {
+      "rocket": "Chang Zheng 6",
+      "url": "https://en.wikipedia.org/wiki/Long_March_6"
+    },
+    {
+      "rocket": "Commercial Titan 3",
+      "url": "https://en.wikipedia.org/wiki/Commercial_Titan_III"
+    },
+    {
+      "rocket": "Delta 0300",
+      "url": "https://en.wikipedia.org/wiki/Delta_0100"
+    },
+    {
+      "rocket": "Delta 0900",
+      "url": "https://en.wikipedia.org/wiki/Delta_0100"
+    },
+    {
+      "rocket": "Delta 1410",
+      "url": "https://en.wikipedia.org/wiki/Delta_1000"
+    },
+    {
+      "rocket": "Delta 1914",
+      "url": "https://en.wikipedia.org/wiki/Delta_1000"
+    },
+    {
+      "rocket": "Delta 2310",
+      "url": "https://en.wikipedia.org/wiki/Delta_2000"
+    },
+    {
+      "rocket": "Delta 2313",
+      "url": "https://en.wikipedia.org/wiki/Delta_2000"
+    },
+    {
+      "rocket": "Delta 2910",
+      "url": "https://en.wikipedia.org/wiki/Delta_2000"
+    },
+    {
+      "rocket": "Delta 2913",
+      "url": "https://en.wikipedia.org/wiki/Delta_2000"
+    },
+    {
+      "rocket": "Delta 2914",
+      "url": "https://en.wikipedia.org/wiki/Delta_2000"
+    },
+    {
+      "rocket": "Delta 3910",
+      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+    },
+    {
+      "rocket": "Delta 3910/PAM",
+      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+    },
+    {
+      "rocket": "Delta 3913",
+      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+    },
+    {
+      "rocket": "Delta 3914",
+      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+    },
+    {
+      "rocket": "Delta 3920",
+      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+    },
+    {
+      "rocket": "Delta 3920/PAM",
+      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+    },
+    {
+      "rocket": "Delta 3924",
+      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+    },
+    {
+      "rocket": "Delta 4925-8",
+      "url": "https://en.wikipedia.org/wiki/Delta_(rocket_family)"
+    },
+    {
+      "rocket": "Delta 4M",
+      "url": "https://en.wikipedia.org/wiki/Delta_IV"
+    },
+    {
+      "rocket": "Delta 4M+(4,2)",
+      "url": "https://en.wikipedia.org/wiki/Delta_IV"
+    },
+    {
+      "rocket": "Delta 5920-8",
+      "url": "https://en.wikipedia.org/wiki/Delta_(rocket_family)"
+    },
+    {
+      "rocket": "Delta 6925",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 6925-8",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7290-10C",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7320-10",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7320-10C",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7326-9.5",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7420-10C",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7426-9.5",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7920-10",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7920-10C",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7920-10L",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7920H",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7925",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7925-10",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7925-10C",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7925-10L",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7925-8",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 7925-9.5",
+      "url": "https://en.wikipedia.org/wiki/Delta_II"
+    },
+    {
+      "rocket": "Delta 8930",
+      "url": "https://en.wikipedia.org/wiki/Delta_III"
+    },
+    {
+      "rocket": "Diamant A",
+      "url": "https://en.wikipedia.org/wiki/Diamant"
+    },
+    {
+      "rocket": "Diamant BP.4",
+      "url": "https://en.wikipedia.org/wiki/Diamant"
+    },
+    {
+      "rocket": "Dnepr",
+      "url": "https://en.wikipedia.org/wiki/Dnepr_(rocket)"
+    },
+    {
+      "rocket": "Electron",
+      "url": "https://en.wikipedia.org/wiki/Electron_(rocket)"
+    },
+    {
+      "rocket": "Epsilon",
+      "url": "https://en.wikipedia.org/wiki/Epsilon_(rocket)"
+    },
+    {
+      "rocket": "Falcon 1",
+      "url": "https://en.wikipedia.org/wiki/Falcon_1"
+    },
+    {
+      "rocket": "Falcon 9",
+      "url": "https://en.wikipedia.org/wiki/Falcon_9"
+    },
+    {
+      "rocket": "Falcon Heavy",
+      "url": "https://en.wikipedia.org/wiki/Falcon_Heavy"
+    },
+    {
+      "rocket": "GSLV Mk I",
+      "url": "https://en.wikipedia.org/wiki/Geosynchronous_Satellite_Launch_Vehicle#GSLV_Mk_I"
+    },
+    {
+      "rocket": "GSLV Mk II",
+      "url": "https://en.wikipedia.org/wiki/Geosynchronous_Satellite_Launch_Vehicle#GSLV_Mk_II"
+    },
+    {
+      "rocket": "GSLV Mk III",
+      "url": "https://en.wikipedia.org/wiki/GSLV_Mark_III"
+    },
+    {
+      "rocket": "H-1",
+      "url": "https://en.wikipedia.org/wiki/H-I"
+    },
+    {
+      "rocket": "H-II",
+      "url": "https://en.wikipedia.org/wiki/H-II"
+    },
+    {
+      "rocket": "H-IIA 202",
+      "url": "https://en.wikipedia.org/wiki/H-IIA"
+    },
+    {
+      "rocket": "H-IIA 2022",
+      "url": "https://en.wikipedia.org/wiki/H-IIA"
+    },
+    {
+      "rocket": "H-IIA 2024",
+      "url": "https://en.wikipedia.org/wiki/H-IIA"
+    },
+    {
+      "rocket": "H-IIA 204",
+      "url": "https://en.wikipedia.org/wiki/H-IIA"
+    },
+    {
+      "rocket": "Kosmos 11K65M",
+      "url": "https://en.wikipedia.org/wiki/Kosmos-3M"
+    },
+    {
+      "rocket": "Kosmos 65S3",
+      "url": "https://en.wikipedia.org/wiki/Kosmos-3"
+    },
+    {
+      "rocket": "KT-2",
+      "url": "https://en.wikipedia.org/wiki/Kaituozhe_(rocket_family)#Kaituozhe-2"
+    },
+    {
+      "rocket": "Kuaizhou-1A",
+      "url": "https://en.wikipedia.org/wiki/Kuaizhou"
+    },
+    {
+      "rocket": "Kwangmyongsong",
+      "url": "https://en.wikipedia.org/wiki/Kwangmy%C5%8Fngs%C5%8Fng_program"
+    },
+    {
+      "rocket": "Minotaur 1",
+      "url": "https://en.wikipedia.org/wiki/Minotaur_I"
+    },
+    {
+      "rocket": "Minotaur IV",
+      "url": "https://en.wikipedia.org/wiki/Minotaur_IV"
+    },
+    {
+      "rocket": "Minotaur IV+",
+      "url": "https://en.wikipedia.org/wiki/Minotaur_IV"
+    },
+    {
+      "rocket": "Minotaur-C 3210",
+      "url": "https://en.wikipedia.org/wiki/Minotaur-C"
+    },
+    {
+      "rocket": "Molniya 8K78M",
+      "url": "https://en.wikipedia.org/wiki/Molniya_(rocket)"
+    },
+    {
+      "rocket": "Molniya 8K78M-PVB",
+      "url": "https://en.wikipedia.org/wiki/Molniya_(rocket)"
+    },
+    {
+      "rocket": "Mu-3H",
+      "url": "https://en.wikipedia.org/wiki/Mu_(rocket_family)"
+    },
+    {
+      "rocket": "Mu-3S-II",
+      "url": "https://en.wikipedia.org/wiki/Mu_(rocket_family)"
+    },
+    {
+      "rocket": "Mu-4S",
+      "url": "https://en.wikipedia.org/wiki/Mu_(rocket_family)"
+    },
+    {
+      "rocket": "M-V",
+      "url": "https://en.wikipedia.org/wiki/M-V"
+    },
+    {
+      "rocket": "N-1",
+      "url": "https://en.wikipedia.org/wiki/N-I_(rocket)"
+    },
+    {
+      "rocket": "N-2",
+      "url": "https://en.wikipedia.org/wiki/N-II_(rocket)"
+    },
+    {
+      "rocket": "Naro-1",
+      "url": "https://en.wikipedia.org/wiki/Naro-1"
+    },
+    {
+      "rocket": "Pegasus",
+      "url": "https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus"
+    },
+    {
+      "rocket": "Pegasus H",
+      "url": "https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus"
+    },
+    {
+      "rocket": "Pegasus XL",
+      "url": "https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus"
+    },
+    {
+      "rocket": "Pegasus XL/HAPS",
+      "url": "https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus"
+    },
+    {
+      "rocket": "Pegasus/HAPS",
+      "url": "https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus"
+    },
+    {
+      "rocket": "Proton-K",
+      "url": "https://en.wikipedia.org/wiki/Proton-K"
+    },
+    {
+      "rocket": "Proton-K/17S40",
+      "url": "https://en.wikipedia.org/wiki/Proton-K"
+    },
+    {
+      "rocket": "Proton-K/Briz-M",
+      "url": "https://en.wikipedia.org/wiki/Proton-K"
+    },
+    {
+      "rocket": "Proton-K/D",
+      "url": "https://en.wikipedia.org/wiki/Proton-K"
+    },
+    {
+      "rocket": "Proton-K/D-1",
+      "url": "https://en.wikipedia.org/wiki/Proton-K"
+    },
+    {
+      "rocket": "Proton-K/DM",
+      "url": "https://en.wikipedia.org/wiki/Proton-K"
+    },
+    {
+      "rocket": "Proton-K/DM-2",
+      "url": "https://en.wikipedia.org/wiki/Proton-K"
+    },
+    {
+      "rocket": "Proton-K/DM-2M",
+      "url": "https://en.wikipedia.org/wiki/Proton-K"
+    },
+    {
+      "rocket": "Proton-M/Briz-M",
+      "url": "https://en.wikipedia.org/wiki/Proton-M"
+    },
+    {
+      "rocket": "Proton-M/DM-2",
+      "url": "https://en.wikipedia.org/wiki/Proton-M"
+    },
+    {
+      "rocket": "Proton-M/DM-3",
+      "url": "https://en.wikipedia.org/wiki/Proton-M"
+    },
+    {
+      "rocket": "PSLV",
+      "url": "https://en.wikipedia.org/wiki/Polar_Satellite_Launch_Vehicle"
+    },
+    {
+      "rocket": "PSLV-XL",
+      "url": "https://en.wikipedia.org/wiki/Polar_Satellite_Launch_Vehicle#Variants"
+    },
+    {
+      "rocket": "Rokot",
+      "url": "https://en.wikipedia.org/wiki/Rokot"
+    },
+    {
+      "rocket": "Scout A",
+      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+    },
+    {
+      "rocket": "Scout A-1",
+      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+    },
+    {
+      "rocket": "Scout B",
+      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+    },
+    {
+      "rocket": "Scout B-1",
+      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+    },
+    {
+      "rocket": "Scout D-1",
+      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+    },
+    {
+      "rocket": "Scout G-1",
+      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+    },
+    {
+      "rocket": "Scout X-4",
+      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+    },
+    {
+      "rocket": "Soyuz 11A511L",
+      "url": "https://en.wikipedia.org/wiki/Soyuz_(rocket_family)"
+    },
+    {
+      "rocket": "Soyuz-2-1A",
+      "url": "https://en.wikipedia.org/wiki/Soyuz-2"
+    },
+    {
+      "rocket": "Soyuz-2-1B",
+      "url": "https://en.wikipedia.org/wiki/Soyuz-2"
+    },
+    {
+      "rocket": "Soyuz-2-1V",
+      "url": "https://en.wikipedia.org/wiki/Soyuz-2"
+    },
+    {
+      "rocket": "Soyuz-FG",
+      "url": "https://en.wikipedia.org/wiki/Soyuz-FG"
+    },
+    {
+      "rocket": "Soyuz-ST-A",
+      "url": "https://en.wikipedia.org/wiki/Soyuz-2"
+    },
+    {
+      "rocket": "Soyuz-ST-B",
+      "url": "https://en.wikipedia.org/wiki/Soyuz-2"
+    },
+    {
+      "rocket": "Soyuz-U",
+      "url": "https://en.wikipedia.org/wiki/Soyuz-U"
+    },
+    {
+      "rocket": "Soyuz-U-PVB",
+      "url": "https://en.wikipedia.org/wiki/Soyuz-U"
+    },
+    {
+      "rocket": "Space Shuttle",
+      "url": "https://en.wikipedia.org/wiki/Space_Shuttle"
+    },
+    {
+      "rocket": "Start-1",
+      "url": "https://en.wikipedia.org/wiki/Start-1"
+    },
+    {
+      "rocket": "Strela",
+      "url": "https://en.wikipedia.org/wiki/Strela_(rocket)"
+    },
+    {
+      "rocket": "Taurus 1110",
+      "url": "https://en.wikipedia.org/wiki/Minotaur-C"
+    },
+    {
+      "rocket": "Taurus 2110",
+      "url": "https://en.wikipedia.org/wiki/Minotaur-C"
+    },
+    {
+      "rocket": "Taurus 2210",
+      "url": "https://en.wikipedia.org/wiki/Minotaur-C"
+    },
+    {
+      "rocket": "Taurus 3210",
+      "url": "https://en.wikipedia.org/wiki/Minotaur-C"
+    },
+    {
+      "rocket": "Thor Ablestar",
+      "url": "https://en.wikipedia.org/wiki/Thor-Ablestar"
+    },
+    {
+      "rocket": "Thor Burner 1",
+      "url": "https://en.wikipedia.org/wiki/Thor-Burner"
+    },
+    {
+      "rocket": "Thor Burner 2",
+      "url": "https://en.wikipedia.org/wiki/Thor-Burner"
+    },
+    {
+      "rocket": "Thor Burner 2A",
+      "url": "https://en.wikipedia.org/wiki/Thor-Burner"
+    },
+    {
+      "rocket": "Thor Delta B",
+      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+    },
+    {
+      "rocket": "Thor Delta C",
+      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+    },
+    {
+      "rocket": "Thor Delta D",
+      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+    },
+    {
+      "rocket": "Thor Delta E",
+      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+    },
+    {
+      "rocket": "Thor Delta E1",
+      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+    },
+    {
+      "rocket": "Thor Delta J",
+      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+    },
+    {
+      "rocket": "Thor Delta M",
+      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+    },
+    {
+      "rocket": "Thor Delta N",
+      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+    },
+    {
+      "rocket": "Thor Delta N6",
+      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+    },
+    {
+      "rocket": "Thor DSV-2U",
+      "url": "https://en.wikipedia.org/wiki/Thor_DSV-2U"
+    },
+    {
+      "rocket": "Thor SLV-2 Agena B",
+      "url": "https://en.wikipedia.org/wiki/Thor_(rocket_family)"
+    },
+    {
+      "rocket": "Thor SLV-2 Agena D",
+      "url": "https://en.wikipedia.org/wiki/Thor_(rocket_family)"
+    },
+    {
+      "rocket": "Thor SLV-2A Agena B",
+      "url": "https://en.wikipedia.org/wiki/Thor_(rocket_family)"
+    },
+    {
+      "rocket": "Thor SLV-2A Agena D",
+      "url": "https://en.wikipedia.org/wiki/Thor_(rocket_family)"
+    },
+    {
+      "rocket": "Thorad SLV-2G Agena D",
+      "url": "https://en.wikipedia.org/wiki/Thorad-Agena"
+    },
+    {
+      "rocket": "Titan 34D/IUS",
+      "url": "https://en.wikipedia.org/wiki/Titan_34D"
+    },
+    {
+      "rocket": "Titan 402A/IUS",
+      "url": "https://en.wikipedia.org/wiki/Titan_IV"
+    },
+    {
+      "rocket": "Titan 403B",
+      "url": "https://en.wikipedia.org/wiki/Titan_IV"
+    },
+    {
+      "rocket": "Titan II SLV",
+      "url": "https://en.wikipedia.org/wiki/LGM-25C_Titan_II"
+    },
+    {
+      "rocket": "Titan IIIA",
+      "url": "https://en.wikipedia.org/wiki/Titan_IIIA"
+    },
+    {
+      "rocket": "Titan IIIC",
+      "url": "https://en.wikipedia.org/wiki/Titan_IIIC"
+    },
+    {
+      "rocket": "Titan IIID",
+      "url": "https://en.wikipedia.org/wiki/Titan_IIID"
+    },
+    {
+      "rocket": "Tsiklon-2",
+      "url": "https://en.wikipedia.org/wiki/Tsyklon-2"
+    },
+    {
+      "rocket": "Tsiklon-2A",
+      "url": "https://en.wikipedia.org/wiki/Tsyklon-2"
+    },
+    {
+      "rocket": "Tsiklon-3",
+      "url": "https://en.wikipedia.org/wiki/Tsyklon-3"
+    },
+    {
+      "rocket": "U",
+      "url": ""
+    },
+    {
+      "rocket": "Unha-3",
+      "url": "https://en.wikipedia.org/wiki/Unha"
+    },
+    {
+      "rocket": "Vega",
+      "url": "https://en.wikipedia.org/wiki/Vega_(rocket)"
+    },
+    {
+      "rocket": "Vostok 8A92M",
+      "url": "https://en.wikipedia.org/wiki/Vostok_(rocket_family)"
+    },
+    {
+      "rocket": "Vostok 8K72K",
+      "url": "https://en.wikipedia.org/wiki/Vostok_(rocket_family)"
+    },
+    {
+      "rocket": "Zenit-2",
+      "url": "https://en.wikipedia.org/wiki/Zenit-2"
+    },
+    {
+      "rocket": "Zenit-2M",
+      "url": "https://en.wikipedia.org/wiki/Zenit-2"
+    },
+    {
+      "rocket": "Zenit-3SL",
+      "url": "https://en.wikipedia.org/wiki/Zenit_(rocket_family)"
+    },
+    {
+      "rocket": "Zenit-3SLB",
+      "url": "https://en.wikipedia.org/wiki/Zenit_(rocket_family)"
+    },
+    {
+      "rocket": "Zenit-3SLBF",
+      "url": "https://en.wikipedia.org/wiki/Zenit_(rocket_family)"
+    }
+  ];
 
   window.objectManager = objectManager;
 })();

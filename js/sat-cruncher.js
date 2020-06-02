@@ -422,8 +422,8 @@ function propagateCruncher () {
       } else {
         // This is probably a reentry and should be skipped from now on.
         satCache[i].skip = true;
-        console.log(`sat index ${i} skipped!`);
-        console.log(satCache[i]);
+        // console.log(`sat index ${i} skipped!`);
+        // console.log(satCache[i]);
         satPos[i * 3] = 0;
         satPos[i * 3 + 1] = 0;
         satPos[i * 3 + 2] = 0;
@@ -477,8 +477,12 @@ function propagateCruncher () {
                 latitude: sensor.lat * DEG2RAD,
                 height: sensor.obshei * 1 // Convert from string
               };
-              positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
-              lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+              try {
+                positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
+                lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+              } catch (e) {
+                continue;
+              }
               azimuth = lookangles.azimuth;
               elevation = lookangles.elevation;
               rangeSat = lookangles.rangeSat;

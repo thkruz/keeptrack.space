@@ -1255,6 +1255,106 @@ function selectSat (satId) {
       $('#sat-period').html(sat.period.toFixed(2) + ' min');
       $('#sat-period').tooltip({delay: 50, html: 'Mean Motion: ' + MINUTES_PER_DAY / sat.period.toFixed(2), position: 'left'});
 
+      if (typeof sat.U != 'undefined' && sat.U != '') {
+        $('#sat-user').html(sat.U);
+      } else {
+        $('#sat-user').html('Unknown');
+      }
+      if (typeof sat.P != 'undefined' && sat.P != '') {
+        $('#sat-purpose').html(sat.P);
+      } else {
+        $('#sat-purpose').html('Unknown');
+      }
+      if (typeof sat.Con != 'undefined' && sat.Con != '') {
+        $('#sat-contractor').html(sat.Con);
+      } else {
+        $('#sat-contractor').html('Unknown');
+      }
+      if (typeof sat.LM != 'undefined' && sat.LM != '') {
+        $('#sat-lmass').html(sat.LM + ' kg');
+      } else {
+        $('#sat-lmass').html('Unknown');
+      }
+      if (typeof sat.DM != 'undefined' && sat.DM != '') {
+        $('#sat-dmass').html(sat.DM + ' kg');
+      } else {
+        $('#sat-dmass').html('Unknown');
+      }
+      if (typeof sat.Li != 'undefined' && sat.Li != '') {
+        $('#sat-life').html(sat.Li + ' yrs');
+      } else {
+        $('#sat-life').html('Unknown');
+      }
+      if (typeof sat.Pw != 'undefined' && sat.Pw != '') {
+        $('#sat-power').html(sat.Pw + ' w');
+      } else {
+        $('#sat-power').html('Unknown');
+      }
+      if (typeof sat.vmag != 'undefined' && sat.vmag != '') {
+        $('#sat-vmag').html(sat.vmag);
+      } else {
+        $('#sat-vmag').html('Unknown');
+      }
+      if (typeof sat.S1 != 'undefined' && sat.S1 != '') {
+        $('#sat-source1').html(`<a class="iframe" href="${sat.S1}">${sat.S1.split('//').splice(1)}</a>`);
+        $('#sat-source1w').show();
+      } else {
+        $('#sat-source1').html('Unknown');
+        $('#sat-source1w').hide();
+      }
+      if (typeof sat.S2 != 'undefined' && sat.S2 != '') {
+        $('#sat-source2').html(`<a class="iframe" href="${sat.S2}">${sat.S2.split('//').splice(1)}</a>`);
+        $('#sat-source2w').show();
+      } else {
+        $('#sat-source2').html('Unknown');
+        $('#sat-source2w').hide();
+      }
+      if (typeof sat.S3 != 'undefined' && sat.S3 != '') {
+        $('#sat-source3').html(`<a class="iframe" href="${sat.S3}">${sat.S3.split('//').splice(1)}</a>`);
+        $('#sat-source3w').show();
+      } else {
+        $('#sat-source3').html('Unknown');
+        $('#sat-source3w').hide();
+      }
+      if (typeof sat.S4 != 'undefined' && sat.S4 != '') {
+        $('#sat-source4').html(`<a class="iframe" href="${sat.S4}">${sat.S4.split('//').splice(1)}</a>`);
+        $('#sat-source4w').show();
+      } else {
+        $('#sat-source4').html('Unknown');
+        $('#sat-source4w').hide();
+      }
+      if (typeof sat.S5 != 'undefined' && sat.S5 != '') {
+        $('#sat-source5').html(`<a class="iframe" href="${sat.S5}">${sat.S5.split('//').splice(1)}</a>`);
+        $('#sat-source5w').show();
+      } else {
+        $('#sat-source5').html('Unknown');
+        $('#sat-source5w').hide();
+      }
+      if (typeof sat.S6 != 'undefined' && sat.S6 != '') {
+        $('#sat-source6').html(`<a class="iframe" href="${sat.S6}">${sat.S6.split('//').splice(1)}</a>`);
+        $('#sat-source6w').show();
+      } else {
+        $('#sat-source6').html('Unknown');
+        $('#sat-source6w').hide();
+      }
+      if (typeof sat.S7 != 'undefined' && sat.S7 != '') {
+        $('#sat-source7').html(`<a class="iframe" href="${sat.S7}">${sat.S7.split('//').splice(1)}</a>`);
+        $('#sat-source7w').show();
+      } else {
+        $('#sat-source7').html('Unknown');
+        $('#sat-source7w').hide();
+      }
+      if (typeof sat.URL != 'undefined' && sat.URL != '') {
+        $('#sat-sourceURL').html(`<a class="iframe" href="${sat.URL}">${sat.URL.split('//').splice(1)}</a>`);
+        $('#sat-source8w').show();
+      } else {
+        $('#sat-source8').html('Unknown');
+        $('#sat-source8w').hide();
+      }
+      $('a.iframe').colorbox({iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+
+      // TODO: Error checking on Iframe
+
       var now = new Date();
       var jday = timeManager.getDayOfYear(now);
       now = now.getFullYear();

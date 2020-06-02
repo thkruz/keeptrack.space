@@ -19,41 +19,7 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-/* global
-    satSet
-    searchBox
-    $
-    satellite
-    ColorScheme
-    orbitDisplay
-    shaderLoader
-    SunCalc
-    earth
-    groups
-    mat4
-    vec3
-    vec4
-    requestAnimationFrame
-    ga
-    mapManager
-    sensorManager
-    objectManager
-    missileManager.MassRaidPre
-    saveAs
-    Blob
-    FileReader
-    missileManager.UsaICBM
-    missileManager.RussianICBM
-    missileManager.NorthKoreanBM
-    missileManager.ChinaICBM
-    Missile
-    missileManager.missilesInUse
-    missileManager.lastMissileError
-    settingsManager
-*/
-
 // Public Variables
-
 var canvasDOM = $('#canvas');
 try {
   var recorder = new CanvasRecorder(document.getElementById('canvas'));
@@ -4456,6 +4422,13 @@ var isAnalysisMenuOpen = false;
         camSnap(latToPitch(lat), longToYaw(lon));
       });
     }
+  };
+
+  uiManager.showCSObjects = () => {
+    $('#loading-screen').fadeIn('slow', function () {
+      satellite.findCloseObjects();
+      $('#loading-screen').fadeOut();
+    });
   };
 
   uiManager.legendColorsChange = function () {

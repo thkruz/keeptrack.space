@@ -40,8 +40,8 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.10.7';
-  settingsManager.versionDate = 'May 28, 2020';
+  settingsManager.versionNumber = '1.11.0';
+  settingsManager.versionDate = 'June 2, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -170,9 +170,9 @@ db.init = (function (){
       $('#legend-hover-menu').css('background', 'LightCoral');
       $('#legend-hover-menu').css('border-color', 'DarkRed');
       $('#colorbox').css('border', '10px solid DarkRed');
-      $('#search-results').css('cssText', 'background: LightCoral !important');
-      $('#search-results').css('border-color', 'DarkRed');
-      $('#search-result:hover').css('background', 'DarkRed');
+      // $('#search-results').css('cssText', 'background: LightCoral !important');
+      // $('#search-results').css('border-color', 'DarkRed');
+      // $('#search-result:hover').css('background', 'DarkRed');
       $('#nav-footer-toggle').css('background', 'DarkRed');
       $('.badge').css('cssText', 'color: DarkRed !important');
       $('.search-hilight').css('color', 'DarkRed');
@@ -200,9 +200,9 @@ db.init = (function (){
     $('#menu-info-overlay ').css('border-left-color', 'steelblue');
     $('.side-menu').css('background', '#0a97d6');
     $('.side-menu').css('border-color', '#0277bd');
-    $('#search-results').css('cssText', 'background: #0a97d6 !important');
-    $('#search-results:hover').css('background', '#0277bd');
-    $('#search-results').css('border-color', '#0277bd');
+    // $('#search-results').css('cssText', 'background: #0a97d6 !important');
+    // $('#search-results:hover').css('background', '#0277bd');
+    // $('#search-results').css('border-color', '#0277bd');
     $('#legend-hover-menu').css('background', '#0a97d6');
     $('#legend-hover-menu').css('border-color', '#0277bd');
     $('#colorbox').css('border', '10px solid #0277bd');

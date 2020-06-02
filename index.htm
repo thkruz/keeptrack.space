@@ -399,6 +399,134 @@
               NO DATA
             </div>
           </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Primary User of the Satellite">
+              User
+            </div>
+            <div class="sat-info-value" id="sat-user">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Main Function of the Satellite">
+              Purpose
+            </div>
+            <div class="sat-info-value" id="sat-purpose">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Contractor Who Built the Satellite">
+              Contractor
+            </div>
+            <div class="sat-info-value" id="sat-contractor">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Mass at Lift Off">
+              Lift Mass
+            </div>
+            <div class="sat-info-value" id="sat-lmass">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Unfueled Mass">
+              Dry Mass
+            </div>
+            <div class="sat-info-value" id="sat-dmass">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="How Long the Satellite was Expected to be Operational">
+              Life Expectancy
+            </div>
+            <div class="sat-info-value" id="sat-life">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Power of the Satellite">
+              Power
+            </div>
+            <div class="sat-info-value" id="sat-power">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Visual Magnitude - Smaller Numbers Are Brighter">
+              Visual Mag
+            </div>
+            <div class="sat-info-value" id="sat-vmag">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-source1w">
+            <div class="sat-info-key">
+              Source
+            </div>
+            <div class="sat-info-value" id="sat-source1">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-source2w">
+            <div class="sat-info-key">
+              Source
+            </div>
+            <div class="sat-info-value" id="sat-source2">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-source3w">
+            <div class="sat-info-key">
+              Source
+            </div>
+            <div class="sat-info-value" id="sat-source3">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-source4w">
+            <div class="sat-info-key">
+              Source
+            </div>
+            <div class="sat-info-value" id="sat-source4">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-source5w">
+            <div class="sat-info-key">
+              Source
+            </div>
+            <div class="sat-info-value" id="sat-source5">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-source6w">
+            <div class="sat-info-key">
+              Source
+            </div>
+            <div class="sat-info-value" id="sat-source6">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-source7w">
+            <div class="sat-info-key">
+              Source
+            </div>
+            <div class="sat-info-value" id="sat-source7">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-source8w">
+            <div class="sat-info-key">
+              Source
+            </div>
+            <div class="sat-info-value" id="sat-source8">
+              NO DATA
+            </div>
+          </div>
         </div>
         <aside id="left-menus">
           <div id="sensor-list-menu" class="side-menu-parent start-hidden text-select">
@@ -542,6 +670,11 @@
               <div class="row">
                 <center>
                   <button class="btn waves-effect waves-light" onclick="satSet.exportTle2Csv();">Export Catalog CSV &#9658;</button>
+                </center>
+              </div>
+              <div class="row">
+                <center>
+                  <button class="btn waves-effect waves-light" onclick="uiManager.showCSObjects();">Find Close Objects &#9658;</button>
                 </center>
               </div>
               <div class="row"></div>

@@ -549,6 +549,106 @@ or mirrored at any other location without the express written permission of the 
     }
   };
 
+  satellite.findCloseObjects = () => {
+    let csoList = [];
+    let satList = [];
+    for (let i = 0; i < satSet.numSats; i++) {
+      let sat = satSet.getSat(i);
+      if (typeof sat.TLE1 == 'undefined') continue;
+      if (sat.apogee > 5556) continue;
+      sat.satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);
+      let pos = _propagate(0, sat.satrec);
+      sat.position = pos.position;
+      if (typeof sat.position == 'undefined') continue;
+      satList.push(sat);
+    }
+
+    for (let i = 0; i < satList.length; i++) {
+      let sat1 = satList[i];
+      let pos1 = sat1.position;
+      let posXmin = pos1.x - 20;
+      let posXmax = pos1.x + 20;
+      let posYmin = pos1.y - 20;
+      let posYmax = pos1.y + 20;
+      let posZmin = pos1.z - 20;
+      let posZmax = pos1.z + 20;
+      for (let j = 0; j < satList.length; j++) {
+        let sat2 = satList[j];
+        if (sat1 == sat2) continue;
+        let pos2 = sat2.position;
+        if (pos2.x < posXmax && pos2.x > posXmin && pos2.y < posYmax && pos2.y > posYmin && pos2.z < posZmax && pos2.z > posZmin) {
+          csoList.push({sat1: sat1, sat2: sat2});
+        }
+      }
+    }
+
+    let csoListUnique = Array.from(new Set(csoList));
+    csoList = []; // Clear CSO List
+    satList = []; // Clear CSO List
+
+    for (let i = 0; i < csoListUnique.length; i++) {
+      let sat = csoListUnique[i].sat1;
+      let pos = _propagate(1000*60*30, sat.satrec);
+      csoListUnique[i].sat1.position = pos.position;
+
+      sat = csoListUnique[i].sat2;
+      pos = _propagate(1000*60*30, sat.satrec);
+      sat.position = pos.position;
+      csoListUnique[i].sat2.position = pos.position;
+    }
+
+    satList = Array.from(new Set(satList)); // Remove duplicates
+
+    for (let i = 0; i < csoListUnique.length; i++) {
+      let sat1 = csoListUnique[i].sat1;
+      let pos1 = sat1.position;
+      if (typeof pos1 == 'undefined') continue;
+      let posXmin = pos1.x - 20;
+      let posXmax = pos1.x + 20;
+      let posYmin = pos1.y - 20;
+      let posYmax = pos1.y + 20;
+      let posZmin = pos1.z - 20;
+      let posZmax = pos1.z + 20;
+      let sat2 = csoListUnique[i].sat2;
+      let pos2 = sat2.position;
+      if (typeof pos2 == 'undefined') continue;
+      if (pos2.x < posXmax && pos2.x > posXmin && pos2.y < posYmax && pos2.y > posYmin && pos2.z < posZmax && pos2.z > posZmin) {
+        csoList.push(sat1.SCC_NUM);
+        csoList.push(sat2.SCC_NUM);
+      }
+    }
+
+    csoListUnique = Array.from(new Set(csoList));
+    let searchStr = '';
+    for (let i = 0; i < csoListUnique.length; i++) {
+      if (i == csoListUnique.length - 1) {
+        searchStr += csoListUnique[i];
+      } else {
+        searchStr += csoListUnique[i] + ',';
+      }
+    }
+
+    $('#search').val(searchStr);
+    searchBox.doSearch(searchStr);
+    return; // csoListUnique;
+
+    function _propagate (propTempOffset, satrec) {
+      let now = new Date();                                     // Make a time variable
+      now.setTime(Number(Date.now()) + propTempOffset);           // Set the time variable to the time in the future
+      let j = _jday(now.getUTCFullYear(),
+      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+      let gmst = satellite.gstime(j);
+
+      let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+      return satellite.sgp4(satrec, m);
+    }
+  };
+
   // TODO: satellite.getOrbitByLatLon needs cleaned up badly
   satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalAlt, rascOffset) => {
     /**
@@ -1075,7 +1175,6 @@ or mirrored at any other location without the express written permission of the 
         var sat = satSet.getSat(satSet.getIdFromObjNum(satArray[i]));
         var satPasses = satellite.findBestPass(sat, sensor, 0);
         for (var s = 0; s < satPasses.length; s++) {
-          // if (satPasses[s].score > 30) {
             tableSatTimes.push(satPasses[s]);
           // }
         }

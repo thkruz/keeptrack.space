@@ -60,7 +60,7 @@
           </div>
         </div>
         <span id="loader-text">Downloading Science...</span>
-        <button id="mobile-start-button" class="btn waves-effect waves-light" type="button" name="action" onclick="mobile.start();">Click to Begin &#9658;</button>
+        <button id="mobile-start-button" class="btn btn-ui waves-effect waves-light" type="button" name="action" onclick="mobile.start();">Click to Begin &#9658;</button>
       </div>
     </div>
     <div id="help-screen" class="valign-wrapper">
@@ -657,24 +657,24 @@
                   </div>
                   <div class="row">
                     <center>
-                      <button id="analysis-submit" class="btn waves-effect waves-light" type="submit" name="action">View Trends &#9658;</button>
+                      <button id="analysis-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">View Trends &#9658;</button>
                     </center>
                   </div>
                 </form>
               </ul>
               <div class="row">
                 <center>
-                  <button class="btn waves-effect waves-light" onclick="satSet.exportTle2Txt();">Export TLEs &#9658;</button>
+                  <button class="btn btn-ui waves-effect waves-light" onclick="satSet.exportTle2Txt();">Export TLEs &#9658;</button>
                 </center>
               </div>
               <div class="row">
                 <center>
-                  <button class="btn waves-effect waves-light" onclick="satSet.exportTle2Csv();">Export Catalog CSV &#9658;</button>
+                  <button class="btn btn-ui waves-effect waves-light" onclick="satSet.exportTle2Csv();">Export Catalog CSV &#9658;</button>
                 </center>
               </div>
               <div class="row">
                 <center>
-                  <button class="btn waves-effect waves-light" onclick="uiManager.showCSObjects();">Find Close Objects &#9658;</button>
+                  <button class="btn btn-ui waves-effect waves-light" onclick="uiManager.showCSObjects();">Find Close Objects &#9658;</button>
                 </center>
               </div>
               <div class="row"></div>
@@ -691,7 +691,7 @@
                   </div>
                   <div class="row">
                     <center>
-                      <button id="analysis-bpt-submit" class="btn waves-effect waves-light" type="submit" name="action">Generate Best Pass Times &#9658;</button>
+                      <button id="analysis-bpt-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Generate Best Pass Times &#9658;</button>
                     </center>
                   </div>
                 </form>
@@ -807,10 +807,10 @@
                   <div class="col s2 m2 l2 center-align add-icon"><img class="watchlist-add" src="images/add.png"></div>
                 </div>
                 <div class="center-align row">
-                  <button id="watchlist-save" class="btn waves-effect waves-light" type="button" name="action">Save List &#9658;</button>
+                  <button id="watchlist-save" class="btn btn-ui waves-effect waves-light" type="button" name="action">Save List &#9658;</button>
                 </div>
                 <div class="center-align row">
-                  <button id="watchlist-open" class="btn waves-effect waves-light" type="button" name="action">Load List &#9658;</button>
+                  <button id="watchlist-open" class="btn btn-ui waves-effect waves-light" type="button" name="action">Load List &#9658;</button>
                   <input id="watchlist-file" type="file" name="files[]" style="display: none;" />
                 </div>
               </div>
@@ -883,7 +883,7 @@
                     </div>
                   </div>
                   <div class="center-align">
-                    <button id="findByLooks-submit" class="btn waves-effect waves-light" type="submit" name="action">Find Satellite(s) &#9658;
+                    <button id="findByLooks-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Find Satellite(s) &#9658;
                     </button>
                   </div>
                 </form>
@@ -900,7 +900,7 @@
                 <table id="looks"  class="center-align striped-light centered"></table>
                 <br />
                 <center>
-                  <button class="btn waves-effect waves-light" onclick="saveCsv(satellite.lastlooksArray,'lookAngles');">Export &#9658;</button>
+                  <button class="btn btn-ui waves-effect waves-light" onclick="saveCsv(satellite.lastlooksArray,'lookAngles');">Export &#9658;</button>
                 </center>
               </div>
             </div>
@@ -914,7 +914,7 @@
               </div>
               <div class="row">
                 <center>
-                  <button class="btn waves-effect waves-light" onclick="saveCsv(nextLaunchManager.launchList,'launchList');">Export Launch Info &#9658;</button>
+                  <button class="btn btn-ui waves-effect waves-light" onclick="saveCsv(nextLaunchManager.launchList,'launchList');">Export Launch Info &#9658;</button>
                 </center>
               </div>
             </div>
@@ -943,7 +943,7 @@
                     </div>
                 </div>
                 <div class="row center">
-                  <button id="dops-submit" class="btn waves-effect waves-light" type="submit" name="action">Update DOP Data &#9658;
+                  <button id="dops-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update DOP Data &#9658;
                   </button>
                 </div>
               </form>
@@ -959,7 +959,7 @@
                 <table id="looksmultisite" class="center-align striped-light centered"></table>
                 <br />
                 <center>
-                  <button class="btn waves-effect waves-light" onclick="saveCsv(satellite.lastMultiSiteArray,'multiSiteLooks');">Export &#9658;</button>
+                  <button class="btn btn-ui waves-effect waves-light" onclick="saveCsv(satellite.lastMultiSiteArray,'multiSiteLooks');">Export &#9658;</button>
                 </center>
               </div>
             </div>
@@ -1156,7 +1156,7 @@
                     <div class="row"></div>
                     <br/>
                     <div class="row center">
-                      <button id="settings-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Settings &#9658;
+                      <button id="settings-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update Settings &#9658;
                       </button>
                     </div>
                   </div>
@@ -1246,16 +1246,16 @@
                     <label for="es-meana">Mean Anomaly</label>
                   </div>
                   <div class="center-align row">
-                    <button id="editSat-submit" class="btn waves-effect waves-light" type="submit" name="action">Update Satellite &#9658;</button>
+                    <button id="editSat-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update Satellite &#9658;</button>
                   </div>
                   <div class="center-align row">
-                    <button id="editSat-newTLE" class="btn waves-effect waves-light" type="button" name="action">Update Epoch to Now &#9658;</button>
+                    <button id="editSat-newTLE" class="btn btn-ui waves-effect waves-light" type="button" name="action">Update Epoch to Now &#9658;</button>
                   </div>
                   <div class="center-align row">
-                    <button id="editSat-save" class="btn waves-effect waves-light" type="button" name="action">Save TLE &#9658;</button>
+                    <button id="editSat-save" class="btn btn-ui waves-effect waves-light" type="button" name="action">Save TLE &#9658;</button>
                   </div>
                   <div class="center-align row">
-                    <button id="editSat-open" class="btn waves-effect waves-light" type="button" name="action">Load TLE &#9658;</button>
+                    <button id="editSat-open" class="btn btn-ui waves-effect waves-light" type="button" name="action">Load TLE &#9658;</button>
                     <input id="editSat-file" class="start-hidden" type="file" name="files[]"/>
                   </div>
                 </form>
@@ -1335,7 +1335,7 @@
                     <label>Launch Facility</label>
                   </div>
                   <div class="center-align">
-                    <button class="btn waves-effect waves-light" type="submit" name="action">Create Launch Nominal &#9658;
+                    <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Launch Nominal &#9658;
                     </button>
                   </div>
                 </form>
@@ -1396,7 +1396,7 @@
                     <label>Right Ascension of the Ascending Node Variation</label>
                   </div>
                   <div class="center-align">
-                    <button class="btn waves-effect waves-light" type="submit" name="action">Create Breakup &#9658;
+                    <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Breakup &#9658;
                     </button>
                   </div>
                 </form>
@@ -1520,13 +1520,13 @@
                     </div>
                   </div>
                   <div class="center-align">
-                    <button class="btn waves-effect waves-light" type="submit" name="action">Launch Missile Attack &#9658;
+                    <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Launch Missile Attack &#9658;
                     </button>
                   </div>
                 </form>
                 <div class="row"></div>
                 <div class="center-align">
-                  <button class="btn waves-effect waves-light" onclick="searchBox.doSearch('RV_');" name="search">Show All Missiles &#9658;
+                  <button class="btn btn-ui waves-effect waves-light" onclick="searchBox.doSearch('RV_');" name="search">Show All Missiles &#9658;
                   </button>
                 </div>
               </div>
@@ -1593,9 +1593,9 @@
                     <label for="cs-maxrange">Maximum Range</label>
                   </div>
                   <div class="center-align">
-                    <button id="cs-submit" class="btn waves-effect waves-light" type="submit" name="action">Create Custom Sensor &#9658;</button>
+                    <button id="cs-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Custom Sensor &#9658;</button>
                     <br><br>
-                    <button id="cs-geolocation" class="btn waves-effect waves-light" onclick="uiManager.useCurrentGeolocationAsSensor();" name="search">Use Geolocation &#9658;</button>
+                    <button id="cs-geolocation" class="btn btn-ui waves-effect waves-light" onclick="uiManager.useCurrentGeolocationAsSensor();" name="search">Use Geolocation &#9658;</button>
                   </div>
                 </form>
               </div>

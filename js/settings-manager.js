@@ -40,8 +40,8 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.11.0';
-  settingsManager.versionDate = 'June 2, 2020';
+  settingsManager.versionNumber = '1.11.1';
+  settingsManager.versionDate = 'June 7, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -176,7 +176,7 @@ db.init = (function (){
       $('#nav-footer-toggle').css('background', 'DarkRed');
       $('.badge').css('cssText', 'color: DarkRed !important');
       $('.search-hilight').css('color', 'DarkRed');
-      $('.btn').css('background-color', 'red');
+      $('.btn-ui').css('background-color', 'red');
       settingsManager.themes.currentTheme = 'Red';
     };
   settingsManager.themes.redThemeSearch = function (isForce) {
@@ -210,7 +210,7 @@ db.init = (function (){
     $('#sat-infobox').css('border-color', '#0277bd');
     $('#nav-footer-toggle').css('background', '#0277bd');
     $('.search-hilight').css('color', '#01579b');
-    $('.btn').css('background-color', '#0091ea');
+    $('.btn-ui').css('background-color', '#0091ea');
     settingsManager.themes.currentTheme = 'Blue';
   };
 

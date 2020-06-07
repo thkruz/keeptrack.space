@@ -26,10 +26,10 @@ function CanvasRecorder(canvas, video_bits_per_sec) {
        if (window.location.protocol === 'https:') {
          if ("getDisplayMedia" in navigator) {
            return navigator.getDisplayMedia(displayMediaOptions)
-              .catch(err => { console.error("Error:" + err); return null; });
+              .catch(err => { console.warn("Error:" + err); return null; });
          } else  if ("getDisplayMedia" in navigator.mediaDevices) {
            return navigator.mediaDevices.getDisplayMedia(displayMediaOptions)
-              .catch(err => { console.error("Error:" + err); return null; });
+              .catch(err => { console.warn("Error:" + err); return null; });
          } else {
            console.error("No Recording Support");
            isVideoRecording = false;
@@ -92,8 +92,10 @@ function CanvasRecorder(canvas, video_bits_per_sec) {
           try {
               mediaRecorder = new MediaRecorder(stream, options);
           } catch (e) {
-              alert('MediaRecorder is not supported by this browser.');
-              console.error('Exception while creating MediaRecorder:', e);
+              // alert('MediaRecorder is not supported by this browser.');
+              isVideoRecording = false;
+              $('#menu-record').removeClass('bmenu-item-selected');
+              console.warn('Exception while creating MediaRecorder:', e);
               return;
           }
 

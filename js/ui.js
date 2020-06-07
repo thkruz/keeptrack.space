@@ -3531,8 +3531,8 @@ var isAnalysisMenuOpen = false;
           if (isVideoRecording) {
             recorder.stop();
             recorder.save('keeptrack.webm');
-            // isVideoRecording = false;
-            // $('#menu-record').removeClass('bmenu-item-selected');
+            isVideoRecording = false;
+            $('#menu-record').removeClass('bmenu-item-selected');
             break;
           } else {
             try {

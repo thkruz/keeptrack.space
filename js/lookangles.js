@@ -302,7 +302,7 @@ or mirrored at any other location without the express written permission of the 
 
     let looksArray = [];
     for (let i = 0; i < (satellite.lookanglesLength * 24 * 60 * 60); i += lookanglesInterval) {
-      let propTempOffset = i + propOffset;                 // Offset in seconds
+      let propTempOffset = i * 1000 + propOffset;                 // Offset in seconds
       let looksPass = _propagate(propTempOffset, satrec);
       if (typeof looksPass != 'undefined') {
         looksArray.push(looksPass);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
@@ -381,7 +381,7 @@ or mirrored at any other location without the express written permission of the 
       let sensor = sensorManager.currentSensor;
       // Setup Realtime and Offset Time
       var propRealTimeTemp = Date.now();
-      var now = timeManager.propTimeCheck(offset * 1000, propRealTimeTemp);
+      var now = timeManager.propTimeCheck(offset, propRealTimeTemp);
       let aer = satellite.getRae(now, satrec, sensor);
 
       let isInFOV = satellite.checkIsInFOV(sensor,aer);
@@ -389,36 +389,39 @@ or mirrored at any other location without the express written permission of the 
         if (satellite.isRiseSetLookangles) {
           // Previous Pass to Calculate first line of coverage
           let now1 = new Date();
-          now1.setTime(Number(now) - (satellite.lookanglesInterval * 1000));
+          now1.setTime(Number(now) - (lookanglesInterval * 1000));
           aer1 = satellite.getRae(now1, satrec, sensor);
 
           let isInFOV1 = satellite.checkIsInFOV(sensor,aer1);
           if (!isInFOV1) {
             // First Pass
-            return {time: timeManager.dateFormat(now, 'isoDateTime', true),
-            rng: range,
-            az: azimuth,
-            el: elevation};
+            return {
+              time: timeManager.dateFormat(now, 'isoDateTime', true),
+              rng: range,
+              az: azimuth,
+              el: elevation};
           } else {
             // Next Pass to Calculate Last line of coverage
-            now1.setTime(Number(now) + (satellite.lookanglesInterval * 1000));
+            now1.setTime(Number(now) + (lookanglesInterval * 1000));
             aer1 = satellite.getRae(now1, satrec, sensor);
 
             let isInFOV1 = satellite.checkIsInFOV(sensor,aer1);
             if (!isInFOV1) {
               // Last Pass
-              return {time: timeManager.dateFormat(now, 'isoDateTime', true),
-              rng: range,
-              az: azimuth,
-              el: elevation};
+              return {
+                time: timeManager.dateFormat(now, 'isoDateTime', true),
+                rng: range,
+                az: azimuth,
+                el: elevation};
             }
           }
           return;
         } else {
-          return {time: timeManager.dateFormat(now, 'isoDateTime', true),
-          rng: range,
-          az: azimuth,
-          el: elevation};
+          return {
+            time: timeManager.dateFormat(now, 'isoDateTime', true),
+            rng: range,
+            az: azimuth,
+            el: elevation};
         }
       }
       return;
@@ -444,7 +447,7 @@ or mirrored at any other location without the express written permission of the 
     for (let sensorIndex = 0; sensorIndex < sensorManager.sensorListUS.length; sensorIndex++) {
       satellite.setobs(sensorManager.sensorListUS[sensorIndex]);
       for (let i = 0; i < (satellite.lookanglesLength * 24 * 60 * 60); i += satellite.lookanglesInterval) {         // 5second Looks
-        let propTempOffset = i + propOffset;                 // Offset in seconds
+        let propTempOffset = i * 1000 + propOffset;                 // Offset in seconds
         let multiSitePass = _propagateMultiSite(propTempOffset, satrec, sensorManager.sensorListUS[sensorIndex]);
         if (typeof multiSitePass != 'undefined') {
           multiSiteArray.push(multiSitePass);   // Update the table with looks for this 5 second chunk and then increase table counter by 1
@@ -532,7 +535,7 @@ or mirrored at any other location without the express written permission of the 
     function _propagateMultiSite (offset, satrec, sensor) {
       // Setup Realtime and Offset Time
       var propRealTimeTemp = Date.now();
-      var now = timeManager.propTimeCheck(offset * 1000, propRealTimeTemp);
+      var now = timeManager.propTimeCheck(offset, propRealTimeTemp);
       let aer = satellite.getRae(now, satrec, sensor);
 
       let isInFOV = satellite.checkIsInFOV(sensor,aer);

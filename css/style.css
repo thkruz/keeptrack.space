@@ -1001,3 +1001,8 @@ ul li{
   display: block;
   line-height: 30px;
 }
+
+.top-menu-icons-search-on {
+  transition: 1s;
+  display: none;
+}

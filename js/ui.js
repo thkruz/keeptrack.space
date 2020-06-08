@@ -2903,14 +2903,14 @@ var isAnalysisMenuOpen = false;
           if (isWatchlistMenuOpen) {
             isWatchlistMenuOpen = false;
             $('#menu-watchlist').removeClass('bmenu-item-selected');
-            $('#search-holder').show();
+            // $('#search-holder').hide();
             uiManager.hideSideMenus();
             break;
           } else {
             if (settingsManager.isMobileModeEnabled) mobile.searchToggle(false);
             uiManager.hideSideMenus();
             $('#watchlist-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            $('#search-holder').hide();
+            mobile.searchToggle(true);
             uiManager.updateWatchlist();
             isWatchlistMenuOpen = true;
             $('#menu-watchlist').addClass('bmenu-item-selected');

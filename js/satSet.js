@@ -1031,7 +1031,11 @@ var satSensorMarkerArray = [];
         satData[this.id].isInGroup = _inGroup;
     }
     get isInGroup () {
+      try {
         return satData[this.id].isInGroup;
+      } catch (e) {
+        console.log(this);
+      }
     }
 
     getTEARR (propTime, sensor) {

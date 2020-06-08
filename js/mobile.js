@@ -48,10 +48,20 @@ var maxPinchSize = 1;
       isSearchOpen = true;
       $('#search-holder').removeClass('search-slide-up');
       $('#search-holder').addClass('search-slide-down');
+      $('#search-icon').addClass('search-icon-search-on');
+      $('#fullscreen-icon').addClass('top-menu-icons-search-on');
+      $('#tutorial-icon').addClass('top-menu-icons-search-on');
+      $('#legend-icon').addClass('top-menu-icons-search-on');
     } else {
       isSearchOpen = false;
       $('#search-holder').removeClass('search-slide-down');
       $('#search-holder').addClass('search-slide-up');
+      $('#search-icon').removeClass('search-icon-search-on');
+      setTimeout(function () {
+        $('#fullscreen-icon').removeClass('top-menu-icons-search-on');
+        $('#tutorial-icon').removeClass('top-menu-icons-search-on');
+        $('#legend-icon').removeClass('top-menu-icons-search-on');
+      }, 500);
       uiManager.hideSideMenus();
       $('#search').val('');
       searchBox.hideResults();

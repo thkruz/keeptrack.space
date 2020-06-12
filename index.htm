@@ -1467,6 +1467,10 @@
                           <option value="319">Xinjiang Province</option>
                           <option value="320">Tibet Province</option>
                         </optgroup>
+                        <optgroup label="France">
+                          <option value="500">Custom Launch</option>
+                          <option value="501">Bay of Biscay</option>
+                        </optgroup>
                         <optgroup label="North Korea">
                           <option value="400">Sinpo</option>
                           <option value="401">P'yong'an</option>
@@ -1476,8 +1480,16 @@
                       <label>Launch Location</label>
                     </div>
                     <div class="input-field col s12">
+                      <input placeholder="00.000" id="ms-lat-lau" type="text" maxlength="8">
+                      <label for="ms-lat-lau">Custom Launch Latitude</label>
+                    </div>
+                    <div class="input-field col s12">
+                      <input placeholder="00.000" id="ms-lon-lau" type="text" maxlength="8">
+                      <label for="ms-lon-lau">Custom Launch Longitude</label>
+                    </div>
+                    <div class="input-field col s12">
                       <select id="ms-target">
-                        <option value="-1">Use Custom</option>
+                        <option value="-1">Custom Impact</option>
                         <optgroup label="United States">
                           <option value="0">Washington DC</option>
                           <option value="1">New York City</option>
@@ -1495,17 +1507,18 @@
                         <optgroup label="NATO Countries">
                           <option value="12">London</option>
                           <option value="13">Paris</option>
-                          <option value="14">Madrid</option>
-                          <option value="15">Rome</option>
-                          <option value="16">Berlin</option>
-                          <option value="17">Toronto</option>
+                          <option value="14">French Caribean</option>
+                          <option value="15">Madrid</option>
+                          <option value="16">Rome</option>
+                          <option value="17">Berlin</option>
+                          <option value="18">Toronto</option>
                         </optgroup>
                         <optgroup label="Non-NATO Countries">
-                          <option value="18">Moscow</option>
-                          <option value="19">St. Petersburg</option>
-                          <option value="20">Novosibirsk</option>
-                          <option value="21">Beijing</option>
-                          <option value="22">Pyongyang</option>
+                          <option value="19">Moscow</option>
+                          <option value="20">St. Petersburg</option>
+                          <option value="21">Novosibirsk</option>
+                          <option value="22">Beijing</option>
+                          <option value="23">Pyongyang</option>
                         </optgroup>
                       </select>
                       <label>Target Location</label>

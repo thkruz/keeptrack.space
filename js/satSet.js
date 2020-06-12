@@ -872,14 +872,165 @@ var satSensorMarkerArray = [];
       };
     }
 
-    return new Sat(satData[i]);
+    // Add Functions One Time
+    if (typeof satData[i].isInSun == 'undefined') {
+      satData[i].isInSun = () => {
+        // Distances all in km
+        let sunECI = sun.getXYZ();
+
+        // NOTE: Code is mashed to save memory when used on the whole catalog
+
+        // Position needs to be relative to satellite NOT ECI
+        // var distSatEarthX = Math.pow(-satData[i].position.x, 2);
+        // var distSatEarthY = Math.pow(-satData[i].position.y, 2);
+        // var distSatEarthZ = Math.pow(-satData[i].position.z, 2);
+        // var distSatEarth = Math.sqrt(distSatEarthX + distSatEarthY + distSatEarthZ);
+        // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
+        let semiDiamEarth = Math.asin(RADIUS_OF_EARTH/Math.sqrt(Math.pow(-satData[i].position.x, 2) + Math.pow(-satData[i].position.y, 2) + Math.pow(-satData[i].position.z, 2))) * RAD2DEG;
+
+        // Position needs to be relative to satellite NOT ECI
+        // var distSatSunX = Math.pow(-satData[i].position.x + sunECI.x, 2);
+        // var distSatSunY = Math.pow(-satData[i].position.y + sunECI.y, 2);
+        // var distSatSunZ = Math.pow(-satData[i].position.z + sunECI.z, 2);
+        // var distSatSun = Math.sqrt(distSatSunX + distSatSunY + distSatSunZ);
+        // var semiDiamSun = Math.asin(RADIUS_OF_SUN/distSatSun) * RAD2DEG;
+        let semiDiamSun = Math.asin(RADIUS_OF_SUN/Math.sqrt(Math.pow(-satData[i].position.x + sunECI.x, 2) + Math.pow(-satData[i].position.y + sunECI.y, 2) + Math.pow(-satData[i].position.z + sunECI.z, 2))) * RAD2DEG;
+
+        // Angle between earth and sun
+        let theta = Math.acos(numeric.dot([-satData[i].position.x,-satData[i].position.y,-satData[i].position.z],[-satData[i].position.x + sunECI.x,-satData[i].position.y + sunECI.y,-satData[i].position.z + sunECI.z])/(Math.sqrt(Math.pow(-satData[i].position.x, 2) + Math.pow(-satData[i].position.y, 2) + Math.pow(-satData[i].position.z, 2))*Math.sqrt(Math.pow(-satData[i].position.x + sunECI.x, 2) + Math.pow(-satData[i].position.y + sunECI.y, 2) + Math.pow(-satData[i].position.z + sunECI.z, 2)))) * RAD2DEG;
+
+        // var isSun = false;
+
+        // var isUmbral = false;
+        if ((semiDiamEarth > semiDiamSun) && (theta < semiDiamEarth - semiDiamSun)) {
+          // isUmbral = true;
+          return 0;
+        }
+
+        // var isPenumbral = false;
+        if ((Math.abs(semiDiamEarth - semiDiamSun) < theta) && (theta < semiDiamEarth + semiDiamSun)){
+          // isPenumbral = true;
+          return 1;
+        }
+
+        if (semiDiamSun > semiDiamEarth) {
+          // isPenumbral = true;
+          return 1;
+        }
+
+        if (theta < semiDiamSun - semiDiamEarth) {
+          // isPenumbral = true;
+          return 1;
+        }
+
+        // if (!isUmbral && !isPenumbral) isSun = true;
+        return 2;
+      };
+    }
+    if (typeof satData[i].getTEARR == 'undefined') {
+      satData[i].getTEARR = (propTime, sensor) => {
+        let currentTEARR = {}; // Most current TEARR data that is set in satellite object and returned.
+
+        if (typeof sensor == 'undefined') {
+          sensor = sensorManager.currentSensor;
+        }
+        // If sensor's observerGd is not set try to set it using it parameters
+        if (typeof sensor.observerGd == 'undefined') {
+          try {
+            sensor.observerGd = {
+              height: sensor.obshei,
+              latitude: sensor.lat,
+              longitude: sensor.long
+            };
+          } catch (e) {
+            throw 'observerGd is not set and could not be guessed.';
+          }
+          // If it didn't work, try again
+          if (typeof sensor.observerGd.longitude == 'undefined') {
+            try {
+              sensor.observerGd = {
+                height: sensor.alt,
+                latitude: sensor.lat * DEG2RAD,
+                longitude: sensor.lon * DEG2RAD
+              };
+            } catch (e) {
+              throw 'observerGd is not set and could not be guessed.';
+            }
+          }
+        }
+
+        // Set default timing settings. These will be changed to find look angles at different times in future.
+        let satrec = satellite.twoline2satrec(satData[i].TLE1, satData[i].TLE2); // perform and store sat init calcs
+        let now;
+        if (typeof propTime != 'undefined') {
+          now = propTime;
+        } else {
+          now = timeManager.propTime();
+        }
+        let j = timeManager.jday(now.getUTCFullYear(),
+                     now.getUTCMonth() + 1, // NOTE:, satData[i] function requires months in range 1-12.
+                     now.getUTCDate(),
+                     now.getUTCHours(),
+                     now.getUTCMinutes(),
+                     now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+        j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+        let gmst = satellite.gstime(j);
+
+        let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+        let positionEci = satellite.sgp4(satrec, m);
+
+        try {
+          let gpos = satellite.eciToGeodetic(positionEci.position, gmst);
+          currentTEARR.alt = gpos.height;
+          currentTEARR.lon = gpos.longitude;
+          currentTEARR.lat = gpos.latitude;
+          let positionEcf = satellite.eciToEcf(positionEci.position, gmst);
+          let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+          currentTEARR.azimuth = lookAngles.azimuth * RAD2DEG;
+          currentTEARR.elevation = lookAngles.elevation * RAD2DEG;
+          currentTEARR.range = lookAngles.rangeSat;
+        } catch (e) {
+          currentTEARR.alt = 0;
+          currentTEARR.lon = 0;
+          currentTEARR.lat = 0;
+          currentTEARR.azimuth = 0;
+          currentTEARR.elevation = 0;
+          currentTEARR.range = 0;
+        }
+
+        currentTEARR.inview = satellite.checkIsInFOV(sensor,{az: currentTEARR.azimuth, el: currentTEARR.elevation, range:currentTEARR.range});
+
+        uiManager.currentTEARR = currentTEARR;
+        return currentTEARR;
+      };
+    }
+    if (typeof satData[i].getDirection == 'undefined') {
+      satData[i].getDirection = () => {
+        let nowLat = satData[i].getTEARR().lat * RAD2DEG;
+        let futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
+        let futLat = satData[i].getTEARR(futureTime).lat * RAD2DEG;
+
+        if (nowLat < futLat) return 'N';
+        if (nowLat > futLat) return 'S';
+        if (nowLat === futLat) {
+          futureTime = timeManager.propTimeCheck(20000, timeManager.propTime());
+          futureTEARR = satData[i].getTEARR(futureTime);
+          if (nowLat < futLat) return 'N';
+          if (nowLat > futLat) return 'S';
+        }
+        console.warn('Sat Direction Calculation Error - By Pole?');
+        return 'Error';
+      };
+    }
+
+    return satData[i];
   };
   satSet.getSatInViewOnly = (i) => {
     if (!satData) return null;
     if (!satData[i]) return null;
 
     satData[i].inview = satInView[i];
-    return new Sat(satData[i]);
+    return satData[i];
   };
   satSet.getSatPosOnly = (i) => {
     if (!satData) return null;
@@ -893,244 +1044,18 @@ var satSensorMarkerArray = [];
       };
     }
 
-    let sat = new Sat(satData[i]);
+    let sat = satData[i];
     return sat;
   };
   satSet.getSatExtraOnly = (i) => {
     if (!satData) return null;
     if (!satData[i]) return null;
-    return new Sat(satData[i]);
+    return satData[i];
   };
   satSet.getSatFromObjNum = (objNum) => {
       let satIndex = satSet.getIdFromObjNum (objNum);
       return satSet.getSat(satIndex);
   };
-
-  class Sat {
-    constructor (satInfo) {
-      this.inSun = satInfo.inSun;
-      this.inSunChange = satInfo.inSunChange;
-      this.inview = satInfo.inview;
-      this.inView = satInfo.inView;
-      this.inViewChange = satInfo.inViewChange;
-      this.position = satInfo.position;
-      this.velocity = satInfo.velocity;
-      this.velocityX = satInfo.velocityX;
-      this.velocityY = satInfo.velocityY;
-      this.velocityZ = satInfo.velocityZ;
-      this.C = satInfo.C;
-      this.Con = satInfo.Con;
-      this.DM = satInfo.DM;
-      this.LM = satInfo.LM;
-      this.LS = satInfo.LS;
-      this.LV = satInfo.LV;
-      this.Li = satInfo.Li;
-      this.M = satInfo.M;
-      this.O = satInfo.O;
-      this.ON = satInfo.ON;
-      this.OT = satInfo.OT;
-      this.Pw = satInfo.Pw;
-      this.R = satInfo.R;
-      this.S1 = satInfo.S1;
-      this.S2 = satInfo.S2;
-      this.S3 = satInfo.S3;
-      this.S4 = satInfo.S4;
-      this.S5 = satInfo.S5;
-      this.S6 = satInfo.S6;
-      this.S7 = satInfo.S7;
-      this.SCC_NUM = satInfo.SCC_NUM;
-      this.TLE1 = satInfo.TLE1;
-      this.TLE2 = satInfo.TLE2;
-      this.U = satInfo.U;
-      this.URL = satInfo.URL;
-      this.active = satInfo.active;
-      this.apogee = satInfo.apogee;
-      this.argPe = satInfo.argPe;
-      this.eccentricity = satInfo.eccentricity;
-      this.id = satInfo.id;
-      this.inclination = satInfo.inclination;
-      this.intlDes = satInfo.intlDes;
-      this.meanMotion = satInfo.meanMotion;
-      this.perigee = satInfo.perigee;
-      this.period = satInfo.period;
-      this.raan = satInfo.raan;
-      this.semiMajorAxis = satInfo.semiMajorAxis;
-      this.semiMinorAxis = satInfo.semiMinorAxis;
-      this.alt = satInfo.alt;
-      this.lat = satInfo.lat;
-      this.lon = satInfo.lon;
-      this.linkAEHF = satInfo.linkAEHF;
-      this.linkBeidou = satInfo.linkBeidou;
-      this.linkGPS = satInfo.linkGPS;
-      this.linkGalileo = satInfo.linkGalileo;
-      this.linkGlonass = satInfo.linkGlonass;
-      this.linkWGS = satInfo.linkWGS;
-      this.name = satInfo.name;
-      this.static = satInfo.static;
-      this.staticNum = satInfo.staticNum;
-      this.type = satInfo.type;
-      this.typeExt = satInfo.typeExt;
-      this.ra = satInfo.ra;
-      this.dec = satInfo.dec;
-      this.vmag = satInfo.vmag;
-    }
-    get isInSun() {
-      // Distances all in km
-      let sunECI = sun.getXYZ();
-
-      // NOTE: Code is mashed to save memory when used on the whole catalog
-
-      // Position needs to be relative to satellite NOT ECI
-      // var distSatEarthX = Math.pow(-this.position.x, 2);
-      // var distSatEarthY = Math.pow(-this.position.y, 2);
-      // var distSatEarthZ = Math.pow(-this.position.z, 2);
-      // var distSatEarth = Math.sqrt(distSatEarthX + distSatEarthY + distSatEarthZ);
-      // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
-      let semiDiamEarth = Math.asin(RADIUS_OF_EARTH/Math.sqrt(Math.pow(-this.position.x, 2) + Math.pow(-this.position.y, 2) + Math.pow(-this.position.z, 2))) * RAD2DEG;
-
-      // Position needs to be relative to satellite NOT ECI
-      // var distSatSunX = Math.pow(-this.position.x + sunECI.x, 2);
-      // var distSatSunY = Math.pow(-this.position.y + sunECI.y, 2);
-      // var distSatSunZ = Math.pow(-this.position.z + sunECI.z, 2);
-      // var distSatSun = Math.sqrt(distSatSunX + distSatSunY + distSatSunZ);
-      // var semiDiamSun = Math.asin(RADIUS_OF_SUN/distSatSun) * RAD2DEG;
-      let semiDiamSun = Math.asin(RADIUS_OF_SUN/Math.sqrt(Math.pow(-this.position.x + sunECI.x, 2) + Math.pow(-this.position.y + sunECI.y, 2) + Math.pow(-this.position.z + sunECI.z, 2))) * RAD2DEG;
-
-      // Angle between earth and sun
-      let theta = Math.acos(numeric.dot([-this.position.x,-this.position.y,-this.position.z],[-this.position.x + sunECI.x,-this.position.y + sunECI.y,-this.position.z + sunECI.z])/(Math.sqrt(Math.pow(-this.position.x, 2) + Math.pow(-this.position.y, 2) + Math.pow(-this.position.z, 2))*Math.sqrt(Math.pow(-this.position.x + sunECI.x, 2) + Math.pow(-this.position.y + sunECI.y, 2) + Math.pow(-this.position.z + sunECI.z, 2)))) * RAD2DEG;
-
-      // var isSun = false;
-
-      // var isUmbral = false;
-      if ((semiDiamEarth > semiDiamSun) && (theta < semiDiamEarth - semiDiamSun)) {
-        // isUmbral = true;
-        return 0;
-      }
-
-      // var isPenumbral = false;
-      if ((Math.abs(semiDiamEarth - semiDiamSun) < theta) && (theta < semiDiamEarth + semiDiamSun)){
-        // isPenumbral = true;
-        return 1;
-      }
-
-      if (semiDiamSun > semiDiamEarth) {
-        // isPenumbral = true;
-        return 1;
-      }
-
-      if (theta < semiDiamSun - semiDiamEarth) {
-        // isPenumbral = true;
-        return 1;
-      }
-
-      // if (!isUmbral && !isPenumbral) isSun = true;
-      return 2;
-    }
-
-    set isInGroup(_inGroup) {
-        satData[this.id].isInGroup = _inGroup;
-    }
-    get isInGroup () {
-      try {
-        return satData[this.id].isInGroup;
-      } catch (e) {
-        console.log(this);
-      }
-    }
-
-    getTEARR (propTime, sensor) {
-      let currentTEARR = {}; // Most current TEARR data that is set in satellite object and returned.
-
-      if (typeof sensor == 'undefined') {
-        sensor = sensorManager.currentSensor;
-      }
-      // If sensor's observerGd is not set try to set it using it parameters
-      if (typeof sensor.observerGd == 'undefined') {
-        try {
-          sensor.observerGd = {
-            height: sensor.obshei,
-            latitude: sensor.lat,
-            longitude: sensor.long
-          };
-        } catch (e) {
-          throw 'observerGd is not set and could not be guessed.';
-        }
-        // If it didn't work, try again
-        if (typeof sensor.observerGd.longitude == 'undefined') {
-          try {
-            sensor.observerGd = {
-              height: sensor.alt,
-              latitude: sensor.lat * DEG2RAD,
-              longitude: sensor.lon * DEG2RAD
-            };
-          } catch (e) {
-            throw 'observerGd is not set and could not be guessed.';
-          }
-        }
-      }
-
-      // Set default timing settings. These will be changed to find look angles at different times in future.
-      let satrec = satellite.twoline2satrec(this.TLE1, this.TLE2); // perform and store sat init calcs
-      let now;
-      if (typeof propTime != 'undefined') {
-        now = propTime;
-      } else {
-        now = timeManager.propTime();
-      }
-      let j = timeManager.jday(now.getUTCFullYear(),
-                   now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-                   now.getUTCDate(),
-                   now.getUTCHours(),
-                   now.getUTCMinutes(),
-                   now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-      let gmst = satellite.gstime(j);
-
-      let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-      let positionEci = satellite.sgp4(satrec, m);
-
-      try {
-        let gpos = satellite.eciToGeodetic(positionEci.position, gmst);
-        currentTEARR.alt = gpos.height;
-        currentTEARR.lon = gpos.longitude;
-        currentTEARR.lat = gpos.latitude;
-        let positionEcf = satellite.eciToEcf(positionEci.position, gmst);
-        let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-        currentTEARR.azimuth = lookAngles.azimuth * RAD2DEG;
-        currentTEARR.elevation = lookAngles.elevation * RAD2DEG;
-        currentTEARR.range = lookAngles.rangeSat;
-      } catch (e) {
-        currentTEARR.alt = 0;
-        currentTEARR.lon = 0;
-        currentTEARR.lat = 0;
-        currentTEARR.azimuth = 0;
-        currentTEARR.elevation = 0;
-        currentTEARR.range = 0;
-      }
-
-      currentTEARR.inview = satellite.checkIsInFOV(sensor,{az: currentTEARR.azimuth, el: currentTEARR.elevation, range:currentTEARR.range});
-
-      uiManager.currentTEARR = currentTEARR;
-      return currentTEARR;
-    }
-
-    getDirection () {
-      let nowLat = this.getTEARR().lat * RAD2DEG;
-      let futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
-      let futLat = this.getTEARR(futureTime).lat * RAD2DEG;
-
-      if (nowLat < futLat) return 'N';
-      if (nowLat > futLat) return 'S';
-      if (nowLat === futLat) {
-        futureTime = timeManager.propTimeCheck(20000, timeManager.propTime());
-        futureTEARR = this.getTEARR(futureTime);
-        if (nowLat < futLat) return 'N';
-        if (nowLat > futLat) return 'S';
-      }
-      console.warn('Sat Direction Calculation Error - By Pole?');
-      return 'Error';
-    }
-  }
 
   satSet.getIdFromObjNum = (objNum) => {
     var scc;

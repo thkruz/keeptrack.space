@@ -65,6 +65,10 @@
       47.505958, -111.181776, 'Malmstrom (Minuteman III)', 13000,
       41.149931, -104.860645, 'F.E. Warren (Minuteman III)', 13000
     ];
+    missileManager.FraSLBM = [
+      47.878, -4.263, 'Triomphant Class Submarine (M51)', 10000, // Custom Lat/Lon Replaced
+      47.878, -4.263, 'Triomphant Class Submarine (M51)', 10000
+    ];
     missileManager.globalBMTargets = [
       38.951, -77.013, 'Washington DC',
       40.679, -73.947, 'New York City',
@@ -80,6 +84,7 @@
       13.588, 144.922,  'Guam',
       51.506340, -0.097485, 'London',
       48.874195, 2.378987, 'Paris',
+      24.503 , -66.127, 'French Caribean',
       40.449889, -3.717309, 'Madrid',
       41.931955, 12.520198, 'Rome',
       52.501746, 13.416486, 'Berlin',
@@ -892,6 +897,7 @@
       if (MissileObject.semiMinorAxis) delete MissileObject.semiMinorAxis;
 
       if (MissileDesc) MissileObject.desc = MissileDesc;
+      console.log(MissileObject);
       missileArray.push(MissileObject);
       satCruncher.postMessage({
         id: MissileObject.id,

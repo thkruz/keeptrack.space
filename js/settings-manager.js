@@ -40,8 +40,8 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.11.2';
-  settingsManager.versionDate = 'June 7, 2020';
+  settingsManager.versionNumber = '1.11.3';
+  settingsManager.versionDate = 'June 12, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -67,6 +67,9 @@ db.init = (function (){
       break;
     case 'low':
       settingsManager.lowresImages = true;
+      break;
+    case 'trusat':
+      settingsManager.trusatImages = true;
       break;
     case 'high':
       settingsManager.hiresImages = true;

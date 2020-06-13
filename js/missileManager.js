@@ -31,6 +31,9 @@
       82.256810, -10.161045, 'Bryansk (SS-N-23A)', 8300,
       81.564646, 32.553796, 'Karelia (SS-N-23A)', 8300,
       74.673660, 6.538173, 'Novomoskovsk (SS-N-23A)', 8300,
+      71.920763, 41.039876, 'Borei Sub (Bulava)', 9300, // Sub
+      71.920763, 41.039876, 'Delta IV Sub (Sineva)', 8300, // Sub
+      71.920763, 41.039876, 'Delta IV Sub (Layner)', 12000 // Sub
     ];
     missileManager.ChinaICBM = [
       32.997534, 112.537904, 'Nanyang (DF-31)', 8000,
@@ -53,21 +56,28 @@
       46.585153, 125.104037, 'Daqing City (DF-41)', 13500,
       32.154153, 114.099875, 'Xinyang City (DF-41)', 13500,
       40.441700, 85.530745, 'Xinjiang Province (DF-41)', 13500,
-      31.271257, 88.699152, 'Tibet Province (DF-41)', 13500
+      31.271257, 88.699152, 'Tibet Province (DF-41)', 13500,
+      29.573548, 122.923151, 'Type 092 Sub (JL-2)', 8000
     ];
     missileManager.NorthKoreanBM = [
+      40.0, 128.3, 'Sinpo Sub (Pukkŭksŏng-1)', 2500,
       40.019, 128.193, 'Sinpo (KN-14)', 8000,
       39.365, 126.165, 'P`yong`an (KN-20)', 10000,
       39.046, 125.667, 'Pyongyang (KN-22)', 13000
     ];
     missileManager.UsaICBM = [
+      48.420079, -101.333560, 'Ohio Sub (Trident II)', 12000,
       48.420079, -101.333560, 'Minot (Minuteman III)', 13000,
       47.505958, -111.181776, 'Malmstrom (Minuteman III)', 13000,
       41.149931, -104.860645, 'F.E. Warren (Minuteman III)', 13000
     ];
     missileManager.FraSLBM = [
-      47.878, -4.263, 'Triomphant Class Submarine (M51)', 10000, // Custom Lat/Lon Replaced
-      47.878, -4.263, 'Triomphant Class Submarine (M51)', 10000
+      47.878, -4.263, 'Triomphant Class Sub (M51)', 10000, // Custom Lat/Lon Replaced
+      47.878, -4.263, 'Triomphant Class Sub (M51)', 10000
+    ];
+    missileManager.ukSLBM = [
+      56.066111, -4.8175, 'Vanguard Sub (Trident II)', 12000,
+      56.066111, -4.8175, 'HMNB Clyde (Trident II)', 12000,
     ];
     missileManager.globalBMTargets = [
       38.951, -77.013, 'Washington DC',

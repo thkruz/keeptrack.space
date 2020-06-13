@@ -40,8 +40,8 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.11.3';
-  settingsManager.versionDate = 'June 12, 2020';
+  settingsManager.versionNumber = '1.11.4';
+  settingsManager.versionDate = 'June 13, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;

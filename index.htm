@@ -16,7 +16,7 @@
 
     <!-- Get Settings -->
     <script>document.write('<script src="js/lib/jquery.min.js?v=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
-    <script>document.write('<script src="js/settings-manager.js?v=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
+    <script>document.write('<script src="js/settingsManager.js?v=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
     <!-- Import CSS needed for loading screen -->
     <script>document.write('<link rel="stylesheet" href="css/loading-screen.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
     <!--Import Fonts-->
@@ -1425,9 +1425,14 @@
                     <div class="input-field col s12">
                       <select id="ms-attacker">
                         <optgroup label="United States">
-                          <option value="100">Minot</option>
-                          <option value="101">Malmstrom</option>
-                          <option value="102">F.E. Warren</option>
+                          <option value="100">Ohio Sub (Trident II)</option>
+                          <option value="101">Minot</option>
+                          <option value="102">Malmstrom</option>
+                          <option value="103">F.E. Warren</option>
+                        </optgroup>
+                        <optgroup label="United Kingdom">
+                          <option value="600">Vanguard Sub (Trident II)</option>
+                          <option value="601">HMNB Clyde (Trident II)</option>
                         </optgroup>
                         <optgroup label="Russia">
                           <option value="200">Aleysk</option>
@@ -1443,8 +1448,12 @@
                           <option value="210">Tatischevo (SS-27)</option>
                           <option value="211">Teykovo</option>
                           <option value="212">Yoshkar Ola</option>
+                          <option value="213">Borei Sub (Bulava)</option>
+                          <option value="214">Delta IV Sub (Sineva)</option>
+                          <option value="215">Delta IV Sub (Layner)</option>
                         </optgroup>
                         <optgroup label="China">
+                          <option value="321">Type 092 Sub (JL-2)</option>
                           <option value="300">Nanyang</option>
                           <option value="301">Xining</option>
                           <option value="302">Delingha</option>
@@ -1468,22 +1477,23 @@
                           <option value="320">Tibet Province</option>
                         </optgroup>
                         <optgroup label="France">
-                          <option value="500">Custom Launch</option>
+                          <option value="500">Triomphant Sub (M51)</option>
                           <option value="501">Bay of Biscay</option>
                         </optgroup>
                         <optgroup label="North Korea">
-                          <option value="400">Sinpo</option>
-                          <option value="401">P'yong'an</option>
-                          <option value="402">Pyongyang</option>
+                          <option value="400">Sinpo Sub (Pukkŭksŏng-1)</option>
+                          <option value="401">Sinpo</option>
+                          <option value="402">P'yong'an</option>
+                          <option value="403">Pyongyang</option>
                         </optgroup>
                       </select>
                       <label>Launch Location</label>
                     </div>
-                    <div class="input-field col s12">
+                    <div id="ms-lau-holder-lat" class="input-field col s12">
                       <input placeholder="00.000" id="ms-lat-lau" type="text" maxlength="8">
                       <label for="ms-lat-lau">Custom Launch Latitude</label>
                     </div>
-                    <div class="input-field col s12">
+                    <div id="ms-lau-holder-lon" class="input-field col s12">
                       <input placeholder="00.000" id="ms-lon-lau" type="text" maxlength="8">
                       <label for="ms-lon-lau">Custom Launch Longitude</label>
                     </div>
@@ -1523,11 +1533,11 @@
                       </select>
                       <label>Target Location</label>
                     </div>
-                    <div class="input-field col s12">
+                    <div id="ms-tgt-holder-lat" class="input-field col s12">
                       <input placeholder="00.000" id="ms-lat" type="text" maxlength="8">
                       <label for="ms-lat">Custom Target Latitude</label>
                     </div>
-                    <div class="input-field col s12">
+                    <div id="ms-tgt-holder-lon" class="input-field col s12">
                       <input placeholder="00.000" id="ms-lon" type="text" maxlength="8">
                       <label for="ms-lon">Custom Target Longitude</label>
                     </div>
@@ -1736,7 +1746,7 @@
   <script>document.write('<script src="js/objectManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/lib/file-saver.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <!-- Load Ballistic Missile Functions -->
-  <script>document.write('<script src="js/ballistic-missile.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <script>document.write('<script src="js/missileManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <!-- Load Main JavaScript Code -->
   <script>document.write('<script src="js/color-scheme.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
   <script>document.write('<script src="js/mobile.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>

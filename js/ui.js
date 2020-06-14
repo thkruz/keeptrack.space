@@ -2461,7 +2461,7 @@ var isAnalysisMenuOpen = false;
               lauLat = missileManager.FraSLBM[a * 4];
               lauLon = missileManager.FraSLBM[a * 4 + 1];
             }
-            missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.FraSLBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.FraSLBM[a * 4 + 3], 'France');
+            missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.FraSLBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.FraSLBM[a * 4 + 3], 'France', 1000);
           } else if (attacker < 700) { // United Kingdom SLBM
             a = attacker - 600;
             b = 500 - missileManager.missilesInUse;

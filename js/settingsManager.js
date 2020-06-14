@@ -40,8 +40,8 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.11.4';
-  settingsManager.versionDate = 'June 13, 2020';
+  settingsManager.versionNumber = '1.11.5';
+  settingsManager.versionDate = 'June 14, 2020';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -310,9 +310,9 @@ db.init = (function (){
   settingsManager.reColorMinimumTime = 1000;
   settingsManager.colors = {};
   settingsManager.colors = JSON.parse(localStorage.getItem("settingsManager-colors"));
-  if (settingsManager.colors == null || settingsManager.colors.version !== '1.0.0') {
+  if (settingsManager.colors == null || settingsManager.colors.version !== '1.0.1') {
     settingsManager.colors = {};
-    settingsManager.colors.version = '1.0.0';
+    settingsManager.colors.version = '1.0.1';
     settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
     settingsManager.colors.starHi = [1.0, 1.0, 1.0, 1.0];
     settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.16];
@@ -379,7 +379,7 @@ db.init = (function (){
     settingsManager.colors.lostobjects = [0.2, 1.0, 0.0, 0.65];
     settingsManager.colors.satLEO = [0.2, 1.0, 0.0, 0.65];
     settingsManager.colors.satGEO = [0.2, 1.0, 0.0, 0.65];
-    settingsManager.colors.inGroup = [0.2, 1.0, 0.0, 0.5];
+    settingsManager.colors.inGroup = [1.0, 0.0, 0.0, 1.0];
     settingsManager.colors.countryPRC = [1.0, 0, 0, 0.6];
     settingsManager.colors.countryUS = [0.2, 0.4, 1.0, 1];
     settingsManager.colors.countryCIS = [1.0, 1.0, 1.0, 1.0];

@@ -300,6 +300,12 @@ var drawLoopCallback;
       // debugLine.set(satposition, [0, 0, 0]);
     }
 
+    if (missileManager.missileArray.length > 0) {
+      for (var i = 0; i < missileManager.missileArray.length; i++) {
+        orbitDisplay.updateOrbitBuffer(missileManager.missileArray[i].id);
+      }
+    }
+
     _drawScene();
     drawLines();
     _updateHover();
@@ -599,7 +605,9 @@ var drawLoopCallback;
     }
     fpsLastTime = fpsTimeNow;
   }
+  var currentSearchSats;
   function _updateHover () {
+    currentSearchSats = searchBox.getLastResultGroup();
     if (searchBox.isHovering()) {
       updateHoverSatId = searchBox.getHoverSat();
       satSet.getScreenCoords(updateHoverSatId, pMatrix, camMatrix);

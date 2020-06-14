@@ -71,7 +71,11 @@
   SatGroup.prototype.updateOrbits = function () {
     // What calls the orbit buffer when selected a group from the menu.
     for (var i = 0; i < this.sats.length; i++) {
-      orbitDisplay.updateOrbitBuffer(this.sats[i].satId);
+      if (this.sats[i].missile) {
+        orbitDisplay.updateOrbitBuffer(this.sats[i].id, null, null, null, true, this.sats[i].latList, this.sats[i].lonList, this.sats[i].altList, this.sats[i].startTime);
+      } else {
+        orbitDisplay.updateOrbitBuffer(this.sats[i].satId);
+      }
     }
   };
   SatGroup.prototype.forEach = function (callback) {

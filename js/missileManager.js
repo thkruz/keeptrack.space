@@ -192,6 +192,7 @@
   ];
   var EarthRadius, EarthMass, FuelDensity, BurnRate, WarheadMass, R, G, h;
   var missileArray = [];
+  missileManager.missileArray = missileArray;
   var MassRaidArray = [];
 
   // External Functions
@@ -225,6 +226,7 @@
           orbitDisplay.updateOrbitBuffer(MissileObject.id, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
         }
       }
+      missileManager.missileArray = missileArray;
     });
   };
   missileManager.MassRaid = function (time, BurnRate, RaidType) {
@@ -404,7 +406,7 @@
       missileManager.missilesInUse = 500 - b;
     }
   };
-  missileManager.Missile = function (CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude, NumberWarheads, MissileObjectNum, CurrentTime, MissileDesc, Length, Diameter, NewBurnRate, MaxMissileRange, country) {
+  missileManager.Missile = function (CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude, NumberWarheads, MissileObjectNum, CurrentTime, MissileDesc, Length, Diameter, NewBurnRate, MaxMissileRange, country, minAltitude) {
     // This is the main function for this program. It calculates and designs the flight path of an intercontinental
     // ballistic missile (ICBM). This function calls upon many sub-functions to help it iteratively calculate many of the
     // changing variables as the rocket makes its path around the world. Changing variables that had to be taken into
@@ -472,6 +474,8 @@
       console.error('Error: The number of warheads must be a whole number');
       return 0;
     }
+
+    if (typeof minAltitude == 'undefined') minAltitude = 0;
 
     EarthRadius = 6371000;       // (m)
     R = 287;                     // (J * K^-1 * kg^-1)
@@ -841,6 +845,13 @@
       return Math.max(a, b);
     });
 
+    if (MaxAltitude < minAltitude) {
+      // Try again with 25% increase to burn rate
+      let burnMultiplier = Math.min(2,minAltitude/MaxAltitude);
+      missileManager.Missile(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude, NumberWarheads, MissileObjectNum, CurrentTime, MissileDesc, Length, Diameter, NewBurnRate * burnMultiplier, MaxMissileRange, country, minAltitude);
+      return;
+    }
+
     // console.log('Max Altitude: ' + MaxAltitude);
 
     for (var i = 0; i < AltitudeList.length; i++) { if (AltitudeList[i] === MaxAltitude) var MaxAltitudePossition = i; }
@@ -925,6 +936,8 @@
         startTime: MissileObject.startTime
       });
       orbitDisplay.updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
+
+      missileManager.missileArray = missileArray;
 
       // if (MissileObject.latList) delete MissileObject.latList;
       // if (MissileObject.lonList) delete MissileObject.lonList;

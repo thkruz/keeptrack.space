@@ -514,6 +514,11 @@
       missileManager.lastMissileError = 'Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.';
       return 0;
     }
+
+    // Calculate Notional Altitude
+    var minAltitudeTrue = minAltitude * (Math.min(3, MaxMissileRange / (ArcLength / 1000)) / 2);
+    console.log(minAltitudeTrue);
+
     // Calculations for the warheads
     WarheadMass = 500 * NumberWarheads;                      // (Kg)
     var WarheadPayload = 475 * NumberWarheads;               // (KiloTons of TNT)
@@ -845,11 +850,20 @@
       return Math.max(a, b);
     });
 
-    if (MaxAltitude < minAltitude) {
+    console.log(MaxAltitude);
+
+    if (MaxAltitude < minAltitudeTrue) {
       // Try again with 25% increase to burn rate
-      let burnMultiplier = Math.min(2,minAltitude/MaxAltitude);
-      missileManager.Missile(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude, NumberWarheads, MissileObjectNum, CurrentTime, MissileDesc, Length, Diameter, NewBurnRate * burnMultiplier, MaxMissileRange, country, minAltitude);
-      return;
+      let burnMultiplier = Math.min(3,minAltitudeTrue/MaxAltitude);
+      setTimeout(function () {
+        missileManager.Missile(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude, NumberWarheads, MissileObjectNum, CurrentTime, MissileDesc, Length, Diameter, NewBurnRate * burnMultiplier, MaxMissileRange, country, minAltitude);
+      }, 10);
+      return 0;
+    }
+
+    if (minAltitudeTrue == minAltitude * 3 / 2) {
+      missileManager.lastMissileError = 'Error: This distance is too close for the selected missile.';
+      return 0;
     }
 
     // console.log('Max Altitude: ' + MaxAltitude);

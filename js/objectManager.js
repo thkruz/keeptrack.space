@@ -427,7 +427,7 @@
   };
   objectManager.extractLiftVehicle = function (LV) {
     if (LV == 'U') {
-      $('#sat-vehicle').html("LV");
+      $('#sat-vehicle').html("Unknown");
     } else {
       for (var i = 0; i < objectManager.rocketUrls.length; i++) {
         if (objectManager.rocketUrls[i].rocket == LV) {

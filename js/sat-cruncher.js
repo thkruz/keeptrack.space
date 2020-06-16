@@ -24,12 +24,14 @@ importScripts('lib/numeric.js'); // Used for sunlight calculations
 importScripts('lib/meuusjs.1.0.3.min.js'); // Used for sunlight calculations
 
 /** CONSTANTS */
-const TAU = 2 * Math.PI;            // PI * 2 -- This makes understanding the formulas easier
+const PI = Math.PI;
+const TAU = 2 * PI;            // PI * 2 -- This makes understanding the formulas easier
 const DEG2RAD = TAU / 360;          // Used to convert degrees to radians
 const RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
 const RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
 const RADIUS_OF_SUN = 695700;       // Radius of the Sun in kilometers
 const STAR_DISTANCE = 200000;        // Artificial Star Distance - Lower numberrReduces webgl depth buffer
+const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
 
 /** ARRAYS */
 var satCache = [];            // Cache of Satellite Data from TLE.json and Static Data from variable.js
@@ -61,7 +63,6 @@ var isSunlightView = false;
 var isLowPerf = false;
 var isResetMarker = false;
 var isResetInView = false;
-var isPlanetariumView = false; // Remove
 var isResetSunlight = false;  // Remove
 
 /** OBSERVER VARIABLES */
@@ -79,14 +80,6 @@ sensor.observerGd = defaultGd;
 // Handles Incomming Messages to sat-cruncher from main thread
 onmessage = function (m) {
   propRealTime = Date.now();
-
-  if (m.data.isPlanetariumView) {
-    isPlanetariumView = true;
-  }
-  if (m.data.nonisPlanetariumView){
-    isPlanetariumView = false;
-  }
-
   if (m.data.isSunlightView) {
     isSunlightView = m.data.isSunlightView;
     if (isSunlightView == false) isResetSunlight = true;
@@ -232,7 +225,7 @@ onmessage = function (m) {
       extra.eccentricity = satrec.ecco;
       extra.raan = satrec.nodeo;        // rads
       extra.argPe = satrec.argpo;       // rads
-      extra.meanMotion = satrec.no * 60 * 24 / (2 * Math.PI); // convert rads/minute to rev/day
+      extra.meanMotion = satrec.no * 60 * 24 / (2 * PI); // convert rads/minute to rev/day
 
       // fun other data
       extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, (2 / 3));
@@ -341,7 +334,7 @@ function propagateCruncher () {
 
     // Range Calculation
     var T = (new A.JulianDay(A.JulianDay.dateToJD(now))).jdJ2000Century();
-	  sunG = A.Solar.meanAnomaly(T)*180/Math.PI;
+	  sunG = A.Solar.meanAnomaly(T)*180/PI;
     sunG = sunG % 360.0;
     sunR = 1.00014 - (0.01671 * Math.cos(sunG)) - (0.00014 * Math.cos(2 * sunG));
     sunRange = sunR * 149597870700 / 1000; // au to km conversion
@@ -398,7 +391,7 @@ function propagateCruncher () {
       pv = satellite.sgp4(sat, m);
       // stopTime2 = performance.now();
 
-      if (pv[0] !== false) {
+      try {
         satPos[i * 3] = pv.position.x;
         satPos[i * 3 + 1] = pv.position.y;
         satPos[i * 3 + 2] = pv.position.z;
@@ -419,11 +412,9 @@ function propagateCruncher () {
             isSensorChecked = true;
           }
         }
-      } else {
+      } catch (e) {
         // This is probably a reentry and should be skipped from now on.
         satCache[i].skip = true;
-        // console.log(`sat index ${i} skipped!`);
-        // console.log(satCache[i]);
         satPos[i * 3] = 0;
         satPos[i * 3 + 1] = 0;
         satPos[i * 3 + 2] = 0;
@@ -525,7 +516,7 @@ function propagateCruncher () {
     else if (satCache[i].static && !satCache[i].marker) {
       if (satCache[i].type == 'Star') {
         // INFO: 0 Latitude returns upside down results. Using 180 looks right, but more verification needed.
-        starPosition = StarCalc.getStarPosition(now, 180, 0, satCache[i]);
+        starPosition = getStarPosition(now, 180, 0, satCache[i]);
         starPosition = _lookAnglesToEcf(starPosition.azimuth * RAD2DEG, starPosition.altitude * RAD2DEG, STAR_DISTANCE, 0, 0, 0);
 
         // Reduce Random Jitter by Requiring New Positions to be Similar to Old
@@ -1053,7 +1044,6 @@ function propagateCruncher () {
     }
   }
   if (isResetFOVBubble) {
-    // console.log('Resetting FOV Bubble');
     isResetFOVBubble = false;
     len -= fieldOfViewSetLength;
   }
@@ -1067,7 +1057,7 @@ function propagateCruncher () {
   );
 
   // The longer the delay the more jitter at higher speeds of propagation
-  setTimeout(function () {propagateCruncher();}, 1 * globalPropagationRate * globalPropagationRateMultiplier / divisor);
+  setTimeout(() => { propagateCruncher(); }, 1 * globalPropagationRate * globalPropagationRateMultiplier / divisor);
   // //////////////////////////////////////////////////////////////////////////
   // Benchmarking
   //
@@ -1109,24 +1099,20 @@ function propTime () {
  Based on SunCalc, (c) 2011-2013, Vladimir Agafonkin
  https://github.com/mourner/suncalc
 */
-var StarCalc = {};
-
-var PI   = Math.PI,
-  sin  = Math.sin,
-  cos  = Math.cos,
-  tan  = Math.tan,
-  asin = Math.asin,
-  atan = Math.atan2,
-  acos = Math.acos,
-  rad  = PI / 180;
+var sin  = Math.sin,
+    cos  = Math.cos,
+    tan  = Math.tan,
+    asin = Math.asin,
+    atan = Math.atan2,
+    acos = Math.acos,
+    rad  = PI / 180;
 
 // date/time constants and conversions
-var dayMs = 1000 * 60 * 60 * 24,
-J1970 = 2440588,
-J2000 = 2451545;
+const J1970 = 2440588;
+const J2000 = 2451545;
 
 function toJulian(date) {
-  return date.valueOf() / dayMs - 0.5 + J1970;
+  return date.valueOf() / MILLISECONDS_PER_DAY - 0.5 + J1970;
 }
 function toDays(date) {
   return toJulian(date) - J2000;
@@ -1144,23 +1130,23 @@ function getSiderealTime(d, lw) {
 
 // Reduce variable assignment during the loop
 var lw, phi, d, H, h;
-StarCalc.getStarPosition = function (date, lat, lng, c) {
+function getStarPosition (date, lat, lng, c) {
   lw  = rad * -lng;
   phi = rad * lat;
   d   = toDays(date);
 
-  H = (getSiderealTime(d, lw) - c.ra / 12 * Math.PI);
-  h = getAltitude(H, phi, c.dec / 180 * Math.PI);
-  //console.log(getAzimuth(H, phi, c.dec / 180 * Math.PI));
+  H = (getSiderealTime(d, lw) - c.ra / 12 * PI);
+  h = getAltitude(H, phi, c.dec / 180 * PI);
+
   // altitude correction for refraction
   h = h + rad * 0.017 / tan(h + rad * 10.26 / (h + rad * 5.10));
 
   return {
-      azimuth: getAzimuth(H, phi, c.dec / 180 * Math.PI),
+      azimuth: getAzimuth(H, phi, c.dec / 180 * PI),
       altitude: h,
       vmag: c.vmag,
       name: c.name,
       pname: c.pname,
       dist: c.dist
   };
-};
+}

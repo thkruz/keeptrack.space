@@ -213,8 +213,8 @@ var isAnalysisMenuOpen = false;
         gotoCurrent: true,
         addSliderAccess: true,
         // minDate: -14, // No more than 7 days in the past
-        // maxDate: 14,
-        sliderAccessArgs: { touchonly: false }}).on('change.dp', function (e) { // or 7 days in the future to make sure ELSETs are valid
+        // maxDate: 14, // or 7 days in the future to make sure ELSETs are valid
+        sliderAccessArgs: { touchonly: false }}).on('change.dp', function (e) {
           // This code gets called when the done button is pressed or the time sliders are closed
           $('#datetime-input').fadeOut();
           _updateNextPassOverlay(true);

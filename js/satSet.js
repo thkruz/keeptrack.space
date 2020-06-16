@@ -257,6 +257,54 @@ var satSensorMarkerArray = [];
         }
       })();
 
+      (function _parseGetParameters () {
+        // do querystring stuff
+        var params = satSet.queryStr.split('&');
+        for (var i = 0; i < params.length; i++) {
+          var key = params[i].split('=')[0];
+          var val = params[i].split('=')[1];
+          let urlSatId;
+          switch (key) {
+            case 'intldes':
+              urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
+              if (urlSatId !== null) {
+                selectSat(urlSatId);
+              }
+              break;
+            case 'sat':
+              urlSatId = satSet.getIdFromObjNum(val.toUpperCase());
+              if (urlSatId !== null) {
+                selectSat(urlSatId);
+              }
+              break;
+            case 'date':
+              timeManager.propOffset = Number(val) - Date.now();
+              $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
+              satCruncher.postMessage({
+                typ: 'offset',
+                dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
+              });
+              break;
+            case 'search':
+              // console.log('preloading search to ' + val);
+              searchBox.doSearch(val);
+              $('#search').val(val);
+              break;
+            case 'rate':
+              val = Math.min(val, 1000);
+              // could run time backwards, but let's not!
+              val = Math.max(val, 0.0);
+              // console.log('propagating at rate ' + val + ' x real time ');
+              timeManager.propRate = Number(val);
+              satCruncher.postMessage({
+                typ: 'offset',
+                dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
+              });
+              break;            
+          }
+        }
+      })();
+
       if ($(window).width() > $(window).height()) {
         settingsManager.mapHeight = $(window).width(); // Subtract 12 px for the scroll
         $('#map-image').width(settingsManager.mapHeight);
@@ -1454,47 +1502,7 @@ var satSensorMarkerArray = [];
 
   satSet.onCruncherReady = () => {
     db.log('satSet.onCruncherReady',true);
-    // do querystring stuff
-    var queryStr = window.location.search.substring(1);
-    var params = queryStr.split('&');
-    for (var i = 0; i < params.length; i++) {
-      var key = params[i].split('=')[0];
-      var val = params[i].split('=')[1];
-      switch (key) {
-        case 'intldes':
-          var urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
-          if (urlSatId !== null) {
-            selectSat(urlSatId);
-          }
-          break;
-        case 'search':
-          // console.log('preloading search to ' + val);
-          searchBox.doSearch(val);
-          $('#search').val(val);
-          break;
-        case 'rate':
-          val = Math.min(val, 1000);
-          // could run time backwards, but let's not!
-          val = Math.max(val, 0.0);
-          // console.log('propagating at rate ' + val + ' x real time ');
-          timeManager.propRate = Number(val);
-          satCruncher.postMessage({
-            typ: 'offset',
-            dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
-          });
-          break;
-        case 'hrs':
-          // console.log('propagating at offset ' + val + ' hrs');
-          // offset is in msec
-          timeManager.propOffset = Number(val) * 3600 * 1000;
-          satCruncher.postMessage({
-            typ: 'offset',
-            dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
-          });
-          break;
-      }
-    }
-
+    satSet.queryStr = window.location.search.substring(1);
     // searchBox.init(satData);
     satSet.satDataString = null; // Clears stringified json file and clears 7MB of memory.
   };

@@ -1016,10 +1016,9 @@ function updateUrl () { // URL Updater
   var url = arr[0];
   var paramSlices = [];
 
-  if (selectedSat !== -1 && satSet.getSatExtraOnly(selectedSat).intlDes !== 'none') {
-    paramSlices.push('intldes=' + satSet.getSatExtraOnly(selectedSat).intlDes);
+  if (selectedSat !== -1 && typeof satSet.getSatExtraOnly(selectedSat).SCC_NUM != 'undefined') {
+    paramSlices.push('sat=' + satSet.getSatExtraOnly(selectedSat).SCC_NUM);
   }
-
   var currentSearch = searchBox.getCurrentSearch();
   if (currentSearch != null) {
     paramSlices.push('search=' + currentSearch);
@@ -1029,7 +1028,7 @@ function updateUrl () { // URL Updater
   }
 
   if (timeManager.propOffset < -1000 || timeManager.propOffset > 1000) {
-    paramSlices.push('hrs=' + (timeManager.propOffset / 1000.0 / 3600.0).toString());
+    paramSlices.push('date=' + (timeManager.propRealTime + timeManager.propOffset).toString());
   }
 
   if (paramSlices.length > 0) {

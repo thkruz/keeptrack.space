@@ -2371,121 +2371,124 @@ var isAnalysisMenuOpen = false;
       });
 
       $('#missile').on("submit", function (e) {
-        $('#ms-error').hide();
-        var type = $('#ms-type').val() * 1;
-        var attacker = $('#ms-attacker').val() * 1;
-        let lauLat = $('#ms-lat-lau').val() * 1;
-        let lauLon = $('#ms-lon-lau').val() * 1;
-        var target = $('#ms-target').val() * 1;
-        var tgtLat = $('#ms-lat').val() * 1;
-        var tgtLon = $('#ms-lon').val() * 1;
-        // var result = false;
+        $('#loading-screen').fadeIn('slow', function () {
+          $('#ms-error').hide();
+          var type = $('#ms-type').val() * 1;
+          var attacker = $('#ms-attacker').val() * 1;
+          let lauLat = $('#ms-lat-lau').val() * 1;
+          let lauLon = $('#ms-lon-lau').val() * 1;
+          var target = $('#ms-target').val() * 1;
+          var tgtLat = $('#ms-lat').val() * 1;
+          var tgtLon = $('#ms-lon').val() * 1;
+          // var result = false;
 
-        var launchTime = $('#datetime-text').text().substr(0, 19);
-        launchTime = launchTime.split(' ');
-        launchTime = new Date(launchTime[0] + 'T' + launchTime[1] + 'Z').getTime();
+          var launchTime = $('#datetime-text').text().substr(0, 19);
+          launchTime = launchTime.split(' ');
+          launchTime = new Date(launchTime[0] + 'T' + launchTime[1] + 'Z').getTime();
 
-        if (type > 0) {
-          if (type === 1) missileManager.MassRaidPre(launchTime, 'simulation/Russia2USA.json');
-          if (type === 2) missileManager.MassRaidPre(launchTime, 'simulation/Russia2USAalt.json');
-          if (type === 3) missileManager.MassRaidPre(launchTime, 'simulation/China2USA.json');
-          if (type === 4) missileManager.MassRaidPre(launchTime, 'simulation/NorthKorea2USA.json');
-          if (type === 5) missileManager.MassRaidPre(launchTime, 'simulation/USA2Russia.json');
-          if (type === 6) missileManager.MassRaidPre(launchTime, 'simulation/USA2China.json');
-          if (type === 7) missileManager.MassRaidPre(launchTime, 'simulation/USA2NorthKorea.json');
-          ga('send', 'event', 'Missile Sim', type, 'Sim Number');
-          $('#ms-error').html('Large Scale Attack Loaded');
-          $('#ms-error').show();
-        } else {
-          if (target === -1) { // Custom Target
-            if (isNaN(tgtLat)) {
-              $('#ms-error').html('Please enter a number<br>for Target Latitude');
-              $('#ms-error').show();
-              e.preventDefault();
-              return;
+          if (type > 0) {
+            if (type === 1) missileManager.MassRaidPre(launchTime, 'simulation/Russia2USA.json');
+            if (type === 2) missileManager.MassRaidPre(launchTime, 'simulation/Russia2USAalt.json');
+            if (type === 3) missileManager.MassRaidPre(launchTime, 'simulation/China2USA.json');
+            if (type === 4) missileManager.MassRaidPre(launchTime, 'simulation/NorthKorea2USA.json');
+            if (type === 5) missileManager.MassRaidPre(launchTime, 'simulation/USA2Russia.json');
+            if (type === 6) missileManager.MassRaidPre(launchTime, 'simulation/USA2China.json');
+            if (type === 7) missileManager.MassRaidPre(launchTime, 'simulation/USA2NorthKorea.json');
+            ga('send', 'event', 'Missile Sim', type, 'Sim Number');
+            $('#ms-error').html('Large Scale Attack Loaded');
+            $('#ms-error').show();
+          } else {
+            if (target === -1) { // Custom Target
+              if (isNaN(tgtLat)) {
+                $('#ms-error').html('Please enter a number<br>for Target Latitude');
+                $('#ms-error').show();
+                e.preventDefault();
+                return;
+              }
+              if (isNaN(tgtLon)) {
+                $('#ms-error').html('Please enter a number<br>for Target Longitude');
+                $('#ms-error').show();
+                e.preventDefault();
+                return;
+              }
+            } else { // Premade Target
+              tgtLat = missileManager.globalBMTargets[target * 3];
+              tgtLon = missileManager.globalBMTargets[(target * 3) + 1];
             }
-            if (isNaN(tgtLon)) {
-              $('#ms-error').html('Please enter a number<br>for Target Longitude');
-              $('#ms-error').show();
-              e.preventDefault();
-              return;
+
+            var a, b, attackerName;
+
+            if (attacker < 200) { // USA
+              a = attacker - 100;
+              b = 500 - missileManager.missilesInUse;
+              let missileMinAlt = 1200;
+              if (attacker != 100) { // Use Custom Launch Site
+                lauLat = missileManager.UsaICBM[a * 4];
+                lauLon = missileManager.UsaICBM[a * 4 + 1];
+                missileMinAlt = 1100; //https://www.space.com/8689-air-force-launches-ballistic-missile-suborbital-test.html
+              }
+              attackerName = missileManager.UsaICBM[a * 4 + 2];
+              missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', missileMinAlt);
+            } else if (attacker < 300) { // Russian
+              a = attacker - 200;
+              b = 500 - missileManager.missilesInUse;
+              let missileMinAlt = 1120;
+              if (attacker != 213 && attacker != 214 && attacker != 215) { // Use Custom Launch Site
+                lauLat = missileManager.RussianICBM[a * 4];
+                lauLon = missileManager.RussianICBM[a * 4 + 1];
+              }
+              attackerName = missileManager.RussianICBM[a * 4 + 2];
+              missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.RussianICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.RussianICBM[a * 4 + 3], 'Russia', missileMinAlt);
+            } else if (attacker < 400) { // Chinese
+              a = attacker - 300;
+              b = 500 - missileManager.missilesInUse;
+              let missileMinAlt = 1120;
+              if (attacker != 321) { // Use Custom Launch Site
+                lauLat = missileManager.ChinaICBM[a * 4];
+                lauLon = missileManager.ChinaICBM[a * 4 + 1];
+              }
+              attackerName = missileManager.ChinaICBM[a * 4 + 2];
+              missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.ChinaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.ChinaICBM[a * 4 + 3], 'China', missileMinAlt);
+            } else if (attacker < 500) { // North Korean
+              a = attacker - 400;
+              b = 500 - missileManager.missilesInUse;
+              let missileMinAlt = 1120;
+              if (attacker != 400) { // Use Custom Launch Site
+                lauLat = missileManager.NorthKoreanBM[a * 4];
+                lauLon = missileManager.NorthKoreanBM[a * 4 + 1];
+              }
+              attackerName = missileManager.NorthKoreanBM[a * 4 + 2];
+              missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.NorthKoreanBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.NorthKoreanBM[a * 4 + 3], 'North Korea', missileMinAlt);
+            } else if (attacker < 600) { // French SLBM
+              a = attacker - 500;
+              b = 500 - missileManager.missilesInUse;
+              attackerName = missileManager.FraSLBM[a * 4 + 2];
+              let missileMinAlt = 1000;
+              if (attacker != 500) { // Use Custom Launch Site
+                lauLat = missileManager.FraSLBM[a * 4];
+                lauLon = missileManager.FraSLBM[a * 4 + 1];
+              }
+              // https://etikkradet.no/files/2017/02/EADS-Engelsk.pdf
+              missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.FraSLBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.FraSLBM[a * 4 + 3], 'France', missileMinAlt);
+            } else if (attacker < 700) { // United Kingdom SLBM
+              a = attacker - 600;
+              b = 500 - missileManager.missilesInUse;
+              attackerName = missileManager.ukSLBM[a * 4 + 2];
+              let missileMinAlt = 1200;
+              if (attacker != 600) { // Use Custom Launch Site
+                lauLat = missileManager.ukSLBM[a * 4];
+                lauLon = missileManager.ukSLBM[a * 4 + 1];
+              }
+              missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.ukSLBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.ukSLBM[a * 4 + 3], 'United Kigndom', missileMinAlt);
             }
-          } else { // Premade Target
-            tgtLat = missileManager.globalBMTargets[target * 3];
-            tgtLon = missileManager.globalBMTargets[(target * 3) + 1];
+            ga('send', 'event', 'New Missile', attackerName, 'Attacker');
+            ga('send', 'event', 'New Missile', tgtLat + ', ' + tgtLon, 'Target');
+
+            $('#ms-error').html(missileManager.lastMissileError);
+            $('#ms-error').show();
           }
-
-          var a, b, attackerName;
-
-          if (attacker < 200) { // USA
-            a = attacker - 100;
-            b = 500 - missileManager.missilesInUse;
-            let missileMinAlt = 1200;
-            if (attacker != 100) { // Use Custom Launch Site
-              lauLat = missileManager.UsaICBM[a * 4];
-              lauLon = missileManager.UsaICBM[a * 4 + 1];
-              missileMinAlt = 1100; //https://www.space.com/8689-air-force-launches-ballistic-missile-suborbital-test.html
-            }
-            attackerName = missileManager.UsaICBM[a * 4 + 2];
-            missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', missileMinAlt);
-          } else if (attacker < 300) { // Russian
-            a = attacker - 200;
-            b = 500 - missileManager.missilesInUse;
-            let missileMinAlt = 1120;
-            if (attacker != 213 && attacker != 214 && attacker != 215) { // Use Custom Launch Site
-              lauLat = missileManager.RussianICBM[a * 4];
-              lauLon = missileManager.RussianICBM[a * 4 + 1];
-            }
-            attackerName = missileManager.RussianICBM[a * 4 + 2];
-            missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.RussianICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.RussianICBM[a * 4 + 3], 'Russia', missileMinAlt);
-          } else if (attacker < 400) { // Chinese
-            a = attacker - 300;
-            b = 500 - missileManager.missilesInUse;
-            let missileMinAlt = 1120;
-            if (attacker != 321) { // Use Custom Launch Site
-              lauLat = missileManager.ChinaICBM[a * 4];
-              lauLon = missileManager.ChinaICBM[a * 4 + 1];
-            }
-            attackerName = missileManager.ChinaICBM[a * 4 + 2];
-            missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.ChinaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.ChinaICBM[a * 4 + 3], 'China', missileMinAlt);
-          } else if (attacker < 500) { // North Korean
-            a = attacker - 400;
-            b = 500 - missileManager.missilesInUse;
-            let missileMinAlt = 1120;
-            if (attacker != 400) { // Use Custom Launch Site
-              lauLat = missileManager.NorthKoreanBM[a * 4];
-              lauLon = missileManager.NorthKoreanBM[a * 4 + 1];
-            }
-            attackerName = missileManager.NorthKoreanBM[a * 4 + 2];
-            missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.NorthKoreanBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.NorthKoreanBM[a * 4 + 3], 'North Korea', missileMinAlt);
-          } else if (attacker < 600) { // French SLBM
-            a = attacker - 500;
-            b = 500 - missileManager.missilesInUse;
-            attackerName = missileManager.FraSLBM[a * 4 + 2];
-            let missileMinAlt = 1000;
-            if (attacker != 500) { // Use Custom Launch Site
-              lauLat = missileManager.FraSLBM[a * 4];
-              lauLon = missileManager.FraSLBM[a * 4 + 1];
-            }
-            // https://etikkradet.no/files/2017/02/EADS-Engelsk.pdf
-            missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.FraSLBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.FraSLBM[a * 4 + 3], 'France', missileMinAlt);
-          } else if (attacker < 700) { // United Kingdom SLBM
-            a = attacker - 600;
-            b = 500 - missileManager.missilesInUse;
-            attackerName = missileManager.ukSLBM[a * 4 + 2];
-            let missileMinAlt = 1200;
-            if (attacker != 600) { // Use Custom Launch Site
-              lauLat = missileManager.ukSLBM[a * 4];
-              lauLon = missileManager.ukSLBM[a * 4 + 1];
-            }
-            missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.ukSLBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.ukSLBM[a * 4 + 3], 'United Kigndom', missileMinAlt);
-          }
-          ga('send', 'event', 'New Missile', attackerName, 'Attacker');
-          ga('send', 'event', 'New Missile', tgtLat + ', ' + tgtLon, 'Target');
-
-          $('#ms-error').html(missileManager.lastMissileError);
-          $('#ms-error').show();
-        }
+          $('#loading-screen').hide();
+        });
         e.preventDefault();
       });
 

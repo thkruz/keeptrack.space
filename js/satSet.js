@@ -1405,7 +1405,13 @@ var satSensorMarkerArray = [];
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
     // If Old Select Sat Picked Color it Correct Color
     if (hoveringSat !== -1) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(hoveringSat)).color));
+      try {
+        gl.bufferSubData(gl.ARRAY_BUFFER, hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(hoveringSat)).color));
+      } catch (e) {
+        console.log(hoveringSat);
+        console.log(satSet.getSat(hoveringSat));
+        console.log(settingsManager.currentColorScheme.colorizer(satSet.getSat(hoveringSat)));
+      }
     }
     // If New Select Sat Picked Color it
     if (i !== -1) {

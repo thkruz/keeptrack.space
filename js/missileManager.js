@@ -517,7 +517,7 @@
 
     // Calculate Notional Altitude
     var minAltitudeTrue = minAltitude * (Math.min(3, MaxMissileRange / (ArcLength / 1000)) / 2);
-    console.log(minAltitudeTrue);
+    // console.log(minAltitudeTrue);
 
     // Calculations for the warheads
     WarheadMass = 500 * NumberWarheads;                      // (Kg)
@@ -850,7 +850,7 @@
       return Math.max(a, b);
     });
 
-    console.log(MaxAltitude);
+    // console.log(MaxAltitude);
 
     if (MaxAltitude < minAltitudeTrue) {
       // Try again with 25% increase to burn rate
@@ -932,7 +932,7 @@
       if (MissileObject.semiMinorAxis) delete MissileObject.semiMinorAxis;
 
       if (MissileDesc) MissileObject.desc = MissileDesc;
-      console.log(MissileObject);
+      // console.log(MissileObject);
       missileArray.push(MissileObject);
       satCruncher.postMessage({
         id: MissileObject.id,

@@ -367,7 +367,7 @@ or mirrored at any other location without the express written permission of the 
         }
 
         let tdT = tr.insertCell();
-        tdT.appendChild(document.createTextNode(timeManager.dateFormat(looksArray[i].time, 'isoDateTime', true)));
+        tdT.appendChild(document.createTextNode(timeManager.dateFormat(looksArray[i].time, 'isoDateTime', false)));
         // tdT.style.border = '1px solid black';
         let tdE = tr.insertCell();
         tdE.appendChild(document.createTextNode(looksArray[i].el.toFixed(1)));
@@ -462,7 +462,6 @@ or mirrored at any other location without the express written permission of the 
 
     // Populate the Side Menu
     (function _populateSideMenu () {
-      console.log(multiSiteArray);
       var tbl = document.getElementById('looksmultisite');           // Identify the table to update
       tbl.innerHTML = '';                                   // Clear the table from old object data
       var tr = tbl.insertRow();
@@ -513,7 +512,7 @@ or mirrored at any other location without the express written permission of the 
         }
 
         let tdT = tr.insertCell();
-        tdT.appendChild(document.createTextNode(timeManager.dateFormat(multiSiteArray[i].time, 'isoDateTime', true)));
+        tdT.appendChild(document.createTextNode(timeManager.dateFormat(multiSiteArray[i].time, 'isoDateTime', false)));
         // tdT.style.border = '1px solid black';
         let tdE = tr.insertCell();
         tdE.appendChild(document.createTextNode(multiSiteArray[i].el.toFixed(1)));

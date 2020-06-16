@@ -294,7 +294,14 @@
         }
       }
 
-      if (typeof color == 'undefined') console.warn(sat.id);
+      // Shouldn't be getting here
+      if (typeof color == 'undefined') {
+        console.warn(sat.id);
+        return {
+          color: colorTheme.transparent,
+          pickable: false
+        };
+      }
       return {
         color: color,
         pickable: true

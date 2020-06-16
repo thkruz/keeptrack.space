@@ -68,6 +68,7 @@ var maxPinchSize = 1;
       isMilSatSelected = false;
       $('#menu-space-stations').removeClass('bmenu-item-selected');
       satSet.setColorScheme(ColorScheme.default, true);
+      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
     }
   };
 

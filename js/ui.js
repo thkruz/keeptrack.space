@@ -599,7 +599,7 @@ var isAnalysisMenuOpen = false;
             break;
           case 'view-sensor-info-rmb':
             selectSat(clickedSat);
-            $('#menu-sensor-info').on("click", );
+            $('#menu-sensor-info').on("click", () => {});
             break;
           case 'view-related-sats-rmb':
             var intldes = satSet.getSatExtraOnly(clickedSat).intlDes;
@@ -648,13 +648,10 @@ var isAnalysisMenuOpen = false;
             }
           break;
           case 'create-sensor-rmb':
-            // if (!isCustomSensorMenuOpen) {
-              // _bottomIconPress({currentTarget: {id: 'menu-customSensor'}});
-              $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-              $('#menu-customSensor').addClass('bmenu-item-selected');
-            // }
+            $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+            $('#menu-customSensor').addClass('bmenu-item-selected');
             isCustomSensorMenuOpen = true;
-            $('#cs-telescope').on("click", );
+            $('#cs-telescope').on("click", () => {});
             $('#cs-lat').val(latLon.latitude);
             $('#cs-lon').val(latLon.longitude);
             $('#cs-hei').val(0);
@@ -666,7 +663,7 @@ var isAnalysisMenuOpen = false;
             $('#cs-maxel').val(90);
             $('#cs-minrange').val(0);
             $('#cs-maxrange').val(1000000);
-            $('#customSensor').on("submit", );
+            $('#customSensor').on("submit", () => {});
           break;
           case 'clear-lines-rmb':
             drawLineList = [];
@@ -689,19 +686,17 @@ var isAnalysisMenuOpen = false;
             debugDrawLine('sat2', [clickedSat, sunPos.x, sunPos.y, sunPos.z],'p');
             break;
           case 'create-observer-rmb':
-            // if (!isCustomSensorMenuOpen) {
-              // _bottomIconPress({currentTarget: {id: 'menu-customSensor'}});
-              $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-              $('#menu-customSensor').addClass('bmenu-item-selected');
-            // }
+            $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+            $('#menu-customSensor').addClass('bmenu-item-selected');
             isCustomSensorMenuOpen = true;
             $('#cs-lat').val(latLon.latitude);
             $('#cs-lon').val(latLon.longitude);
             $('#cs-hei').val(0);
             $('#cs-type').val('Observer');
-            $('#customSensor').on("submit", );
+            $('#customSensor').on("submit", () => {});
             uiManager.legendMenuChange('sunlight');
             satSet.setColorScheme(ColorScheme.sunlight, true);
+            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
             settingsManager.isForceColorScheme = true;
             satCruncher.postMessage({
               isSunlightView: true,
@@ -714,11 +709,13 @@ var isAnalysisMenuOpen = false;
               uiManager.legendMenuChange('default');
             }
             satSet.setColorScheme(ColorScheme.default, true);
+            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
             ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
             break;
           case 'colors-sunlight-rmb':
             uiManager.legendMenuChange('sunlight');
             satSet.setColorScheme(ColorScheme.sunlight, true);
+            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
             settingsManager.isForceColorScheme = true;
             satCruncher.postMessage({
               isSunlightView: true,
@@ -728,16 +725,19 @@ var isAnalysisMenuOpen = false;
           case 'colors-country-rmb':
             uiManager.legendMenuChange('countries');
             satSet.setColorScheme(ColorScheme.countries);
+            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
             ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
             break;
           case 'colors-velocity-rmb':
             uiManager.legendMenuChange('velocity');
             satSet.setColorScheme(ColorScheme.velocity);
+            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
             ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
             break;
           case 'colors-ageOfElset-rmb':
             uiManager.legendMenuChange('ageOfElset');
             satSet.setColorScheme(ColorScheme.ageOfElset);
+            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
             ga('send', 'event', 'ColorScheme Menu', 'Age of Elset', 'Selected');
             break;
           case 'earth-blue-rmb':
@@ -2090,6 +2090,7 @@ var isAnalysisMenuOpen = false;
         if (watchlistList.length <= 0) {
           searchBox.doSearch('');
           satSet.setColorScheme(ColorScheme.default, true);
+          uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
           settingsManager.themes.blueTheme();
         }
         if (!sensorManager.checkSensorSelected() || watchlistList.length <= 0) {
@@ -4364,16 +4365,19 @@ var isAnalysisMenuOpen = false;
       case 'default':
         uiManager.legendMenuChange('default');
         satSet.setColorScheme(ColorScheme.default, true);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
         ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
         break;
       case 'velocity':
         uiManager.legendMenuChange('velocity');
         satSet.setColorScheme(ColorScheme.velocity);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
         ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
         break;
       case 'sunlight':
           uiManager.legendMenuChange('sunlight');
           satSet.setColorScheme(ColorScheme.sunlight, true);
+          uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
           settingsManager.isForceColorScheme = true;
           satCruncher.postMessage({
             isSunlightView: true,
@@ -4383,17 +4387,20 @@ var isAnalysisMenuOpen = false;
       case 'near-earth':
         uiManager.legendMenuChange('near');
         satSet.setColorScheme(ColorScheme.leo);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
         ga('send', 'event', 'ColorScheme Menu', 'near-earth', 'Selected');
         break;
       case 'deep-space':
         uiManager.legendMenuChange('deep');
         satSet.setColorScheme(ColorScheme.geo);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
         ga('send', 'event', 'ColorScheme Menu', 'Deep-Space', 'Selected');
         break;
       case 'elset-age':
       $('#loading-screen').fadeIn('slow', function () {
         uiManager.legendMenuChange('ageOfElset');
         satSet.setColorScheme(ColorScheme.ageOfElset);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
         ga('send', 'event', 'ColorScheme Menu', 'Age of Elset', 'Selected');
         $('#loading-screen').fadeOut();
       });
@@ -4402,6 +4409,7 @@ var isAnalysisMenuOpen = false;
         $('#search').val('');
         $('#loading-screen').fadeIn('slow', function () {
           satSet.setColorScheme(ColorScheme.lostobjects);
+          uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
           ga('send', 'event', 'ColorScheme Menu', 'Lost Objects', 'Selected');
           searchBox.doSearch($('#search').val());
           $('#loading-screen').fadeOut();
@@ -4410,16 +4418,19 @@ var isAnalysisMenuOpen = false;
       case 'rcs':
         uiManager.legendMenuChange('rcs');
         satSet.setColorScheme(ColorScheme.rcs);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
         ga('send', 'event', 'ColorScheme Menu', 'RCS', 'Selected');
         break;
       case 'smallsats':
         uiManager.legendMenuChange('small');
         satSet.setColorScheme(ColorScheme.smallsats);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
         ga('send', 'event', 'ColorScheme Menu', 'Small Satellites', 'Selected');
         break;
       case 'countries':
         uiManager.legendMenuChange('countries');
         satSet.setColorScheme(ColorScheme.countries);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
         ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
         break;
     }
@@ -4702,6 +4713,14 @@ var isAnalysisMenuOpen = false;
       ColorScheme.objectTypeFlags.ageLost = true;
     }
     settingsManager.currentLegend = menu;
+  };
+
+  uiManager.colorSchemeChangeAlert = (scheme) => {
+    for (var i = 0; i < Object.keys(ColorScheme).length; i++) {
+      if (scheme == ColorScheme[Object.keys(ColorScheme)[i]]) {
+        M.toast({html: `Color Scheme changed to ${Object.keys(ColorScheme)[i]}`});
+      }
+    }
   };
 
   $('#editSat>div>input').on({

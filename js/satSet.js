@@ -300,7 +300,7 @@ var satSensorMarkerArray = [];
                 typ: 'offset',
                 dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
               });
-              break;            
+              break;
           }
         }
       })();

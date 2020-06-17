@@ -63,7 +63,6 @@ var maxPinchSize = 1;
         $('#legend-icon').removeClass('top-menu-icons-search-on');
       }, 500);
       uiManager.hideSideMenus();
-      $('#search').val('');
       searchBox.hideResults();
       isMilSatSelected = false;
       $('#menu-space-stations').removeClass('bmenu-item-selected');

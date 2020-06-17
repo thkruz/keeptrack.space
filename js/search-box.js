@@ -55,9 +55,10 @@
       $('#search').val('');
       searchBox.hideResults();
       selectSat(-1);
-      // satSet.setColorScheme(ColorScheme.default, true);
       return;
     }
+
+    $('#search').val(searchString);
 
     // Uppercase to make this search not case sensitive
     searchString = searchString.toUpperCase();
@@ -177,7 +178,7 @@
       searchBox.fillResultBox(results);
     }
 
-    updateUrl();
+    uiManager.updateURL();
     settingsManager.themes.retheme();
   };
 

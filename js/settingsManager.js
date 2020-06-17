@@ -40,7 +40,7 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.11.8';
+  settingsManager.versionNumber = '1.12.0';
   settingsManager.versionDate = 'June 16, 2020';
 
   settingsManager.lowPerf = false;
@@ -90,7 +90,6 @@ db.init = (function (){
   (function initParseFromGETVariables () {
     // This is an initial parse of the GET variables
     // A satSet focused one happens later.
-
     let queryStr = window.location.search.substring(1);
     let params = queryStr.split('&');
     for (let i = 0; i < params.length; i++) {
@@ -100,10 +99,6 @@ db.init = (function (){
         case 'lowperf':
           settingsManager.lowPerf = true;
           settingsManager.maxFieldOfViewMarkers = 1;
-          $('#menu-surveillance').hide();
-          $('#menu-sat-fov').hide();
-          $('#menu-fov-bubble').hide();
-          $('#settings-lowperf').hide();
           break;
         case 'hires':
           settingsManager.hiresImages = true;
@@ -126,8 +121,6 @@ db.init = (function (){
           db.log('TruSat Overlay Mode Initializing');
           settingsManager.trusatMode = true;
           settingsManager.trusatImages = true;
-          $('.legend-pink-box').show();
-          $('#logo-trusat').show();
           break;
         case 'trusat-only':
           db.log('TruSat Only Mode Initializing');
@@ -135,11 +128,9 @@ db.init = (function (){
           settingsManager.trusatOnly = true;
           settingsManager.trusatImages = true;
           settingsManager.tleSource = 'tle/trusat.json';
-          $('.legend-pink-box').show();
-          $('#logo-trusat').show();
           break;
         case 'logo':
-          $('#demo-logo').removeClass('start-hidden');
+          settingsManager.isShowLogo = true;
           break;
         case 'noPropRate':
           settingsManager.isAlwaysHidePropRate = true;

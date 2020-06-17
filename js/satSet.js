@@ -260,9 +260,24 @@ var satSensorMarkerArray = [];
       (function _parseGetParameters () {
         // do querystring stuff
         var params = satSet.queryStr.split('&');
-        for (var i = 0; i < params.length; i++) {
-          var key = params[i].split('=')[0];
-          var val = params[i].split('=')[1];
+
+        // Do Searches First
+        for (let i = 0; i < params.length; i++) {
+          let key = params[i].split('=')[0];
+          let val = params[i].split('=')[1];
+          if (key == 'search') {
+            // console.log('preloading search to ' + val);
+            // Sensor Selection takes 1.5 seconds to update color Scheme
+            // TODO: SensorManager might be the problem here, but this works
+            // _doDelayedSearch(val);
+            searchBox.doSearch(val);
+          }
+        }
+
+        // Then Do Other Stuff
+        for (let i = 0; i < params.length; i++) {
+          let key = params[i].split('=')[0];
+          let val = params[i].split('=')[1];
           let urlSatId;
           switch (key) {
             case 'intldes':
@@ -277,6 +292,17 @@ var satSensorMarkerArray = [];
                 selectSat(urlSatId);
               }
               break;
+            case 'misl':
+              var subVal = val.split(',');
+              $('#ms-type').val(subVal[0].toString());
+              $('#ms-attacker').val(subVal[1].toString());
+              // $('#ms-lat-lau').val() * 1;
+              // ('#ms-lon-lau').val() * 1;
+              $('#ms-target').val(subVal[2].toString());
+              // $('#ms-lat').val() * 1;
+              // $('#ms-lon').val() * 1;
+              $('#missile').trigger("submit");
+              break;
             case 'date':
               timeManager.propOffset = Number(val) - Date.now();
               $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
@@ -284,11 +310,6 @@ var satSensorMarkerArray = [];
                 typ: 'offset',
                 dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
               });
-              break;
-            case 'search':
-              // console.log('preloading search to ' + val);
-              searchBox.doSearch(val);
-              $('#search').val(val);
               break;
             case 'rate':
               val = Math.min(val, 1000);
@@ -320,6 +341,12 @@ var satSensorMarkerArray = [];
       }
     }
   };
+
+  function _doDelayedSearch(val) {
+    setTimeout(() => {
+      searchBox.doSearch(val);
+    }, 2000);
+  }
 
   var vertShader;
   var fragShader;

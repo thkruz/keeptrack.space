@@ -177,6 +177,20 @@ var isAnalysisMenuOpen = false;
         _updateSelectBox();
         _mobileScreenControls();
       };
+
+      if (settingsManager.trusatMode) {
+        $('.legend-pink-box').show();
+        $('#logo-trusat').show();
+      }
+      if (settingsManager.isShowLogo) {
+        $('#demo-logo').removeClass('start-hidden');
+      }
+      if (settingsManager.lowPerf) {
+        $('#menu-surveillance').hide();
+        $('#menu-sat-fov').hide();
+        $('#menu-fov-bubble').hide();
+        $('#settings-lowperf').hide();
+      }
     })();
     (function _menuInit () {
       db.log('_menuInit');
@@ -327,6 +341,9 @@ var isAnalysisMenuOpen = false;
         rotateTheEarth = false;
         rightBtnMenuDOM.hide();
         _clearRMBSubMenu();
+
+        // TODO: Make uiManager.updateURL() a setting that is disabled by default
+        uiManager.updateURL();
       });
       canvasDOM.on('touchstart', function (evt) {
         settingsManager.cameraMovementSpeed = 0.0001;
@@ -355,6 +372,9 @@ var isAnalysisMenuOpen = false;
           // }
           camSnapMode = false;
           rotateTheEarth = false;
+
+          // TODO: Make updateUrl() a setting that is disabled by default
+          uiManager.updateURL();
         }
       });
       canvasDOM.on("mouseup", function (evt) {
@@ -605,7 +625,6 @@ var isAnalysisMenuOpen = false;
             var intldes = satSet.getSatExtraOnly(clickedSat).intlDes;
             var searchStr = intldes.slice(0, 8);
             searchBox.doSearch(searchStr);
-            $('#search').val(searchStr);
             break;
           case 'view-curdops-rmb':
             var gpsDOP = satellite.getDOPs(latLon.latitude, latLon.longitude, 0);
@@ -825,7 +844,6 @@ var isAnalysisMenuOpen = false;
             break;
           case 'clear-screen-rmb':
             (function clearScreenRMB () {
-              $('#search').val('');
               searchBox.hideResults();
               isMilSatSelected = false;
               $('#menu-space-stations').removeClass('bmenu-item-selected');
@@ -1135,7 +1153,6 @@ var isAnalysisMenuOpen = false;
 
       $('#search-close').on("click", function () {
         searchBox.hideResults();
-        $('#search').val('');
         isMilSatSelected = false;
         $('#menu-space-stations').removeClass('bmenu-item-selected');
       });
@@ -1588,7 +1605,6 @@ var isAnalysisMenuOpen = false;
         } else {
           uiManager.legendColorsChange();
           $('#legend-hover-menu').show();
-          $('#search').val('');
           searchBox.hideResults();
           $('#search-results').hide();
         }
@@ -2363,7 +2379,6 @@ var isAnalysisMenuOpen = false;
             }
           }
           breakupSearchString += mainsat.SCC_NUM + ',Analyst Sat';
-          $('#search').val(breakupSearchString);
           searchBox.doSearch($('#search').val());
 
           $('#loading-screen').fadeOut();
@@ -2488,6 +2503,7 @@ var isAnalysisMenuOpen = false;
             $('#ms-error').html(missileManager.lastMissileError);
             $('#ms-error').show();
           }
+          searchBox.doSearch("RV_");
           $('#loading-screen').hide();
         });
         e.preventDefault();
@@ -2735,7 +2751,6 @@ var isAnalysisMenuOpen = false;
         });
       }
       if (row !== -1) { // If an object was selected from the menu
-        $('#search').val(satChngTable[row].SCC); // Fill in the serach box with the two objects
         searchBox.doSearch(satChngTable[row].SCC); // Actually perform the search of the two objects
         $('#anal-sat').val(satChngTable[row].SCC);
       } // If a row was selected
@@ -2807,7 +2822,6 @@ var isAnalysisMenuOpen = false;
       if (row !== -1) { // If an object was selected from the menu
         findFutureDate(socratesObjTwo); // Jump to the date/time of the collision
 
-        $('#search').val(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Fill in the serach box with the two objects
         searchBox.doSearch(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Actually perform the search of the two objects
         settingsManager.socratesOnSatCruncher = satSet.getIdFromObjNum(socratesObjOne[row][1]);
       } // If a row was selected
@@ -3777,7 +3791,6 @@ var isAnalysisMenuOpen = false;
         watchlistString += satSet.getSatExtraOnly(watchlistList[i]).SCC_NUM;
         if (i !== watchlistList.length - 1) watchlistString += ',';
       }
-      $('#search').val(watchlistString);
       searchBox.doSearch(watchlistString, true);
 
       var saveWatchlist = [];
@@ -4987,6 +5000,38 @@ var isAnalysisMenuOpen = false;
   }
 
   var isFooterShown = true;
+
+  uiManager.updateURL = () => {
+    db.log('uiManager.updateURL', true);
+    var arr = window.location.href.split('?');
+    var url = arr[0];
+    var paramSlices = [];
+
+    if (settingsManager.trusatMode) {
+      paramSlices.push('trusat');
+    }
+    if (selectedSat !== -1 && typeof satSet.getSatExtraOnly(selectedSat).SCC_NUM != 'undefined') {
+      paramSlices.push('sat=' + satSet.getSatExtraOnly(selectedSat).SCC_NUM);
+    }
+    var currentSearch = searchBox.getCurrentSearch();
+    if (currentSearch != null) {
+      paramSlices.push('search=' + currentSearch);
+    }
+    if (timeManager.propRate < 0.99 || timeManager.propRate > 1.01) {
+      paramSlices.push('rate=' + timeManager.propRate);
+    }
+
+    if (timeManager.propOffset < -1000 || timeManager.propOffset > 1000) {
+      paramSlices.push('date=' + (timeManager.propRealTime + timeManager.propOffset).toString());
+    }
+
+    if (paramSlices.length > 0) {
+      url += '?' + paramSlices.join('&');
+    }
+
+    window.history.replaceState(null, 'Keeptrack', url);
+  };
+
   uiManager.footerToggle = function () {
     db.log('uiManager.footerToggle');
     if (isFooterShown) {

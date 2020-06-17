@@ -81,6 +81,10 @@
     // Don't Calculate the Colors of things you can't see
     if (!settingsManager.isFOVBubbleModeOn && !settingsManager.isShowSurvFence && !settingsManager.isSatOverflyModeOn) numSats -= settingsManager.maxFieldOfViewMarkers;
 
+    if (this.default) {
+      // debugger;
+    }
+
     if (this.isSunlightColorScheme) {
       satInSun = satSet.getSatInSun();
     }
@@ -307,6 +311,7 @@
         pickable: true
       };
     });
+    ColorScheme.default.default = true;
     ColorScheme.onlyFOV = new ColorScheme(function (sat) {
       if (sat.inView) {
         return {

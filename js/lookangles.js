@@ -630,7 +630,6 @@ or mirrored at any other location without the express written permission of the 
       }
     }
 
-    $('#search').val(searchStr);
     searchBox.doSearch(searchStr);
     return; // csoListUnique;
 

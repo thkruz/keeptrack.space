@@ -1010,33 +1010,6 @@ function changeZoom (zoom) {
   }
   zoomTarget = zoom;
 }
-function updateUrl () { // URL Updater
-  db.log('updateUrl', true);
-  var arr = window.location.href.split('?');
-  var url = arr[0];
-  var paramSlices = [];
-
-  if (selectedSat !== -1 && typeof satSet.getSatExtraOnly(selectedSat).SCC_NUM != 'undefined') {
-    paramSlices.push('sat=' + satSet.getSatExtraOnly(selectedSat).SCC_NUM);
-  }
-  var currentSearch = searchBox.getCurrentSearch();
-  if (currentSearch != null) {
-    paramSlices.push('search=' + currentSearch);
-  }
-  if (timeManager.propRate < 0.99 || timeManager.propRate > 1.01) {
-    paramSlices.push('rate=' + timeManager.propRate);
-  }
-
-  if (timeManager.propOffset < -1000 || timeManager.propOffset > 1000) {
-    paramSlices.push('date=' + (timeManager.propRealTime + timeManager.propOffset).toString());
-  }
-
-  if (paramSlices.length > 0) {
-    url += '?' + paramSlices.join('&');
-  }
-
-  window.history.replaceState(null, 'Keeptrack', url);
-}
 
 var isSelectedSatNegativeOne = false;
 function selectSat (satId) {
@@ -1050,6 +1023,7 @@ function selectSat (satId) {
   }
   satSet.selectSat(satId);
   camSnapMode = false;
+  rotateTheEarth = false;
 
   if (satId === -1) {
     if (settingsManager.currentColorScheme === ColorScheme.group || $('#search').val().length >= 3) { // If group selected
@@ -1465,10 +1439,6 @@ function selectSat (satId) {
     //   $('#iss-stream-menu').hide();
     // }
   }
-
-  // TODO: Make updateUrl() a setting that is disabled by default
-  // This can be very annoying, especially when using modes like trusat
-  updateUrl();
 }
 function enableSlowCPUMode () {
   db.log('enableSlowCPUMode');

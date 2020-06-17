@@ -72,8 +72,8 @@
       41.149931, -104.860645, 'F.E. Warren (Minuteman III)', 13000
     ];
     missileManager.FraSLBM = [
-      47.878, -4.263, 'Triomphant Class Sub (M51)', 10000, // Custom Lat/Lon Replaced
-      47.878, -4.263, 'Triomphant Class Sub (M51)', 10000
+      47.878, -4.263, 'Triomphant Sub (M51)', 10000, // Custom Lat/Lon Replaced
+      47.878, -4.263, 'Triomphant Sub (M51)', 10000
     ];
     missileManager.ukSLBM = [
       56.066111, -4.8175, 'Vanguard Sub (Trident II)', 12000,
@@ -855,9 +855,9 @@
     if (MaxAltitude < minAltitudeTrue) {
       // Try again with 25% increase to burn rate
       let burnMultiplier = Math.min(3,minAltitudeTrue/MaxAltitude);
-      setTimeout(function () {
+      // setTimeout(function () {
         missileManager.Missile(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude, NumberWarheads, MissileObjectNum, CurrentTime, MissileDesc, Length, Diameter, NewBurnRate * burnMultiplier, MaxMissileRange, country, minAltitude);
-      }, 10);
+      // }, 10);
       return 0;
     }
 
@@ -1579,7 +1579,6 @@
     return Distance;
   }
   function _clearMissiles () {
-    $('#search').val('');
     missileManager.missilesInUse = 0;
     searchBox.hideResults();
     var satSetLen = satSet.getSatData().length;

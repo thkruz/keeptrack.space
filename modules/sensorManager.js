@@ -1049,7 +1049,8 @@ or mirrored at any other location without the express written permission of the 
       satellite.setobs(sensorManager.sensorList.COD);
       uiManager.getsensorinfo();
       selectSat(-1);
-      setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+      // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else if (selectedSensor === 'NATO-MW') {
       var natoMWSensors = [];
       natoMWSensors.push(sensorManager.sensorList.BLE);
@@ -1068,7 +1069,8 @@ or mirrored at any other location without the express written permission of the 
       satellite.setobs(sensorManager.sensorList.COD);
       uiManager.getsensorinfo();
       selectSat(-1);
-      setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+      // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else if (selectedSensor === 'RUS-ALL') {
       var rusSensors = [];
       rusSensors.push(sensorManager.sensorList.ARM);
@@ -1089,7 +1091,8 @@ or mirrored at any other location without the express written permission of the 
       satellite.setobs(sensorManager.sensorList.ARM);
       uiManager.getsensorinfo();
       selectSat(-1);
-      setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+      // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else if (selectedSensor === 'LEO-LABS') {
       var leolabsSensors = [];
       leolabsSensors.push(sensorManager.sensorList.MSR);
@@ -1105,7 +1108,8 @@ or mirrored at any other location without the express written permission of the 
       satellite.setobs(sensorManager.sensorList.MSR);
       uiManager.getsensorinfo();
       selectSat(-1);
-      setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+      // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else if (selectedSensor === 'MD-ALL') {
       var mdSensors = [];
       mdSensors.push(sensorManager.sensorList.COD);
@@ -1129,7 +1133,8 @@ or mirrored at any other location without the express written permission of the 
       satellite.setobs(sensorManager.sensorList.MSR);
       uiManager.getsensorinfo();
       selectSat(-1);
-      setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+      // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
     } else {
       for (sensor in sensorList) {
         // console.log(sensorList[sensor] == selectedSensor);
@@ -1151,7 +1156,8 @@ or mirrored at any other location without the express written permission of the 
           $('#sensor-type').html(sensorManager.selectedSensor.type);
           $('#sensor-country').html(sensorManager.selectedSensor.country);
           selectSat(-1);
-          setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+          satSet.setColorScheme(settingsManager.currentColorScheme, true);
+          // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
           changeZoom(sensorManager.selectedSensor.zoom);
           camSnap(latToPitch(sensorManager.selectedSensor.lat), longToYaw(sensorManager.selectedSensor.long));
           uiManager.getsensorinfo();

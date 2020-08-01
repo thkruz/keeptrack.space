@@ -52,7 +52,9 @@ db.init = (function (){
   settingsManager.hiresNoCloudsImages = false;
   settingsManager.vectorImages = false;
 
-  if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'localhost') {
+  if (window.location.hostname === 'keeptrack.space' ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === 'thkruz.github.io') {
     settingsManager.offline = false;
   } else {
     settingsManager.offline = true;

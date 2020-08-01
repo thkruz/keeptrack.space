@@ -55,7 +55,7 @@ document.write('<script defer src="js/lib/jquery-ui-timepicker.js?v=' + settings
 document.write('<script defer src="js/lib/perfect-scrollbar.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 // Load Extras Last to Speed Loading
 document.write('<script defer src="js/lib/jquery.colorbox.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="js/advice-module.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+document.write('<script src="js/advice-module.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 document.write('<script defer src="js/lib/numeric.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 
 // Load Bottom icons

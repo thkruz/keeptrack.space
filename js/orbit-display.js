@@ -241,7 +241,7 @@
       });
     }
 
-    if (groups.selectedGroup !== null) {
+    if (groups.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
       gl.uniform4fv(pathShader.uColor, groupColor);
       groups.selectedGroup.forEach(function (id) {
         gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);

@@ -108,6 +108,7 @@ or mirrored at any other location without the express written permission of the 
     return gpos.height;
   };
   satellite.getTEARR = (sat, sensor, propTime) => {
+    if (!objectManager.isSensorManagerLoaded) throw 'satellite.getTEARR requires sensorManager';
     let currentTEARR = {}; // Most current TEARR data that is set in satellite object and returned.
 
     // If no sensor passed to function then try to use the 'currentSensor'

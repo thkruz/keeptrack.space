@@ -161,7 +161,7 @@ var satSensorMarkerArray = [];
     }
 
     // Don't force color recalc if default colors and no sensor for inview color
-    if (sensorManager.checkSensorSelected() || settingsManager.isForceColorScheme) {
+    if ((objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) || settingsManager.isForceColorScheme) {
       // Don't change colors while dragging
       if (!isDragging) {
         satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
@@ -416,7 +416,7 @@ var satSensorMarkerArray = [];
     dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
     dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
 
-    if (!settingsManager.offline) {
+    try {
       var tleSource = settingsManager.tleSource;
       $.get('' + tleSource + '?v=' + settingsManager.versionNumber)
         .done(function (resp) {
@@ -430,7 +430,7 @@ var satSensorMarkerArray = [];
           });
         });
       jsTLEfile = null;
-    } else {
+    } catch {
       loadTLEs(jsTLEfile);
       jsTLEfile = null;
     }
@@ -1002,7 +1002,12 @@ var satSensorMarkerArray = [];
         return 2;
       };
     }
-    if (typeof satData[i].getTEARR == 'undefined') {
+    if (typeof satData[i].getAltitude == 'undefined') {
+      satData[i].getAltitude = () => {
+        return satellite.altitudeCheck(satData[i].TLE1, satData[i].TLE2, timeManager.getPropOffset());
+      };
+    }
+    if (objectManager.isSensorManagerLoaded && typeof satData[i].getTEARR == 'undefined') {
       satData[i].getTEARR = (propTime, sensor) => {
         let currentTEARR = {}; // Most current TEARR data that is set in satellite object and returned.
 
@@ -1084,6 +1089,12 @@ var satSensorMarkerArray = [];
         let nowLat = satData[i].getTEARR().lat * RAD2DEG;
         let futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
         let futLat = satData[i].getTEARR(futureTime).lat * RAD2DEG;
+
+        // TODO: Remove getTEARR References
+        // let nowLat = satellite.eci2ll(satData[i].position.x,satData[i].position.y,satData[i].position.z).latitude;
+        // let futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
+        // let futureEci = satellite.getEci(satData[i], futureTime);
+        // let futLat = satellite.eci2ll(futureEci.x,futureEci.y,futureEci.z).latitude;
 
         if (nowLat < futLat) return 'N';
         if (nowLat > futLat) return 'S';
@@ -1229,6 +1240,34 @@ var satSensorMarkerArray = [];
     } else {
       satScreenPositionArray.error = true;
     }
+  };
+
+  satSet.searchYear = (year) => {
+    var res = [];
+    for (var i = 0; i < satData.length; i++) {
+      if (typeof satData[i].TLE1 == 'undefined') continue;
+      if (satData[i].TLE1.substring(9,11) == year) {
+        res.push(i);
+      }
+    }
+    return res;
+  };
+
+  satSet.searchYearOrLess = (year) => {
+    var res = [];
+    for (var i = 0; i < satData.length; i++) {
+      if (typeof satData[i].TLE1 == 'undefined') continue;
+      if (year >= 59 && year < 100) {
+        if (satData[i].TLE1.substring(9,11) <= year && satData[i].TLE1.substring(9,11) >= 59) {
+          res.push(i);
+        }
+      } else {
+        if (satData[i].TLE1.substring(9,11) <= year || satData[i].TLE1.substring(9,11) >= 59) {
+          res.push(i);
+        }
+      }
+    }
+    return res;
   };
 
   satSet.searchNameRegex = (regex) => {
@@ -1515,7 +1554,7 @@ var satSensorMarkerArray = [];
     }
     selectedSat = i;
 
-    if (sensorManager.checkSensorSelected()) {
+    if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
       $('#menu-lookangles').removeClass('bmenu-item-disabled');
     }
     $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');

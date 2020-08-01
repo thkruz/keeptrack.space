@@ -20,7 +20,7 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 
 // Public Variables
-var canvasDOM = $('#canvas');
+var canvasDOM = $('#keeptrack-canvas');
 try {
   var recorder = new CanvasRecorder(document.getElementById('canvas'));
 } catch (e){
@@ -468,7 +468,7 @@ var isAnalysisMenuOpen = false;
             $('#view-sat-info-rmb').show();
             $('#view-related-sats-rmb').show();
 
-            if (sensorManager.checkSensorSelected() && sensorManager.whichRadar !== 'CUSTOM') {
+            if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected() && sensorManager.whichRadar !== 'CUSTOM') {
               $('#line-sensor-sat-rmb').show();
             }
             $('#line-earth-sat-rmb').show();
@@ -686,7 +686,9 @@ var isAnalysisMenuOpen = false;
           break;
           case 'clear-lines-rmb':
             drawLineList = [];
-            starManager.isAllConstellationVisible = false;
+            if (objectManager.isStarManagerLoaded) {
+              starManager.isAllConstellationVisible = false;
+            }
             break;
           case 'line-eci-axis-rmb':
             debugDrawLine('ref',[10000, 0, 0],'r');
@@ -722,7 +724,7 @@ var isAnalysisMenuOpen = false;
             });
           break;
           case 'colors-default-rmb':
-            if (sensorManager.checkSensorSelected()) {
+            if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
               uiManager.legendMenuChange('default');
             } else {
               uiManager.legendMenuChange('default');
@@ -848,7 +850,7 @@ var isAnalysisMenuOpen = false;
               isMilSatSelected = false;
               $('#menu-space-stations').removeClass('bmenu-item-selected');
 
-              if (sensorManager.checkSensorSelected() && cameraType.current !== cameraType.PLANETARIUM && cameraType.current !== cameraType.ASTRONOMY) {
+              if ((!objectManager.isSensorManagerLoaded || sensorManager.checkSensorSelected()) && cameraType.current !== cameraType.PLANETARIUM && cameraType.current !== cameraType.ASTRONOMY) {
                 uiManager.legendMenuChange('default');
               }
 
@@ -1599,6 +1601,16 @@ var isAnalysisMenuOpen = false;
         }
       });
 
+      $('#time-machine-icon').on("click", function () {
+        if ($('#time-machine-menu').css('display') === 'block') {
+          $('#time-machine-menu').hide();
+        } else {
+          $('#time-machine-menu').show();
+          searchBox.hideResults();
+          $('#search-results').hide();
+        }
+      });
+
       $('#legend-menu').on("click", function () {
         if ($('#legend-hover-menu').css('display') === 'block') {
           $('#legend-hover-menu').hide();
@@ -2211,10 +2223,12 @@ var isAnalysisMenuOpen = false;
 
           var launchLat, launchLon;
 
-          for (var launchSite in window.launchSiteManager.launchSiteList) {
-            if (window.launchSiteManager.launchSiteList[launchSite].name === launchFac) {
-              launchLat = window.launchSiteManager.launchSiteList[launchSite].lat;
-              launchLon = window.launchSiteManager.launchSiteList[launchSite].lon;
+          if (objectManager.isLaunchSiteManagerLoaded) {
+            for (var launchSite in window.launchSiteManager.launchSiteList) {
+              if (window.launchSiteManager.launchSiteList[launchSite].name === launchFac) {
+                launchLat = window.launchSiteManager.launchSiteList[launchSite].lat;
+                launchLon = window.launchSiteManager.launchSiteList[launchSite].lon;
+              }
             }
           }
           if (launchLon > 180) { // if West not East
@@ -2271,10 +2285,21 @@ var isAnalysisMenuOpen = false;
           var origsat = mainsat;
 
           // Launch Points are the Satellites Current Location
+          // TODO: Remove TEARR References
+          //
+          // var latlon = satellite.eci2ll(mainsat.position.x,mainsat.position.y,mainsat.position.z);
+          // var launchLat = satellite.degreesLat(latlon.latitude * DEG2RAD);
+          // var launchLon = satellite.degreesLong(latlon.longitude * DEG2RAD);
+          // var alt = satellite.altitudeCheck(mainsat.TLE1, mainsat.TLE2, timeManager.getPropOffset());
+          // console.log(launchLat);
+          // console.log(launchLon);
+          // console.log(alt);
+
+          // Launch Points are the Satellites Current Location
           var TEARR = mainsat.getTEARR();
           var launchLat, launchLon, alt;
-          launchLon = satellite.degreesLong(TEARR.lon);
           launchLat = satellite.degreesLat(TEARR.lat);
+          launchLon = satellite.degreesLong(TEARR.lon);
           alt = TEARR.alt;
 
           var upOrDown = mainsat.getDirection();
@@ -3507,6 +3532,10 @@ var isAnalysisMenuOpen = false;
             break;
           }
           break;
+        case 'menu-time-machine':
+          if (uiManager.isTimeMachineRunning == true) break;
+          uiManager.historyOfSatellitesPlay();
+        break;
         case 'menu-color-scheme': // No Keyboard Commands
           if (isColorSchemeMenuOpen) {
             uiManager.hideSideMenus();
@@ -3577,7 +3606,9 @@ var isAnalysisMenuOpen = false;
               cameraType.current = cameraType.PLANETARIUM; // Activate Planetarium Camera Mode
               $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
               uiManager.legendMenuChange('planetarium');
-              starManager.clearConstellations();
+              if (objectManager.isStarManagerLoaded) {
+                starManager.clearConstellations();
+              }
               isAstronomyView = false;
               $('#menu-astronomy').removeClass('bmenu-item-selected');
               isPlanetariumView = true;
@@ -3597,14 +3628,18 @@ var isAnalysisMenuOpen = false;
             uiManager.hideSideMenus();
             cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
             uiManager.legendMenuChange('default');
-            starManager.clearConstellations();
+            if (objectManager.isStarManagerLoaded) {
+              starManager.clearConstellations();
+            }
             $('#fov-text').html('');
             // $('#el-text').html('');
             $('#menu-astronomy').removeClass('bmenu-item-selected');
             break;
           } else {
             if (sensorManager.checkSensorSelected()) {
-              starManager.drawAllConstellations();
+              if (objectManager.isStarManagerLoaded) {
+                starManager.drawAllConstellations();
+              }
               orbitDisplay.clearInViewOrbit();
               cameraType.current = cameraType.ASTRONOMY; // Activate Astronomy Camera Mode
               $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
@@ -3988,7 +4023,7 @@ var isAnalysisMenuOpen = false;
           if (cameraType.current === cameraType.PLANETARIUM) orbitDisplay.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
 
           cameraType.current += 1;
-          if (cameraType.current === cameraType.PLANETARIUM && !sensorManager.checkSensorSelected()) {
+          if (cameraType.current === cameraType.PLANETARIUM && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
             cameraType.current += 1;
           }
 
@@ -3996,7 +4031,7 @@ var isAnalysisMenuOpen = false;
             cameraType.current += 1;
           }
 
-          if (cameraType.current === cameraType.ASTRONOMY && !sensorManager.checkSensorSelected()) {
+          if (cameraType.current === cameraType.ASTRONOMY && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
             cameraType.current += 1;
           }
 
@@ -4272,7 +4307,9 @@ var isAnalysisMenuOpen = false;
     // IDEA: Include updates when satellite edited regardless of time.
     if (timeManager.now > (lastBoxUpdateTime * 1 + updateInterval)) {
       if (!sat.missile) {
-        sat.getTEARR();
+        if (objectManager.isSensorManagerLoaded) {
+          sat.getTEARR();
+        }
       } else {
         missileManager.getMissileTEARR(sat);
       }
@@ -4294,33 +4331,43 @@ var isAnalysisMenuOpen = false;
         settingsManager.lastMapUpdateTime = timeManager.now;
       }
 
-      $('#sat-altitude').html(uiManager.currentTEARR.alt.toFixed(2) + ' km');
+      $('#sat-altitude').html(sat.getAltitude().toFixed(2) + ' km');
       $('#sat-velocity').html(sat.velocity.toFixed(2) + ' km/s');
-      if (uiManager.currentTEARR.inview) {
-        $('#sat-azimuth').html(uiManager.currentTEARR.azimuth.toFixed(0) + '°'); // Convert to Degrees
-        $('#sat-elevation').html(uiManager.currentTEARR.elevation.toFixed(1) + '°');
-        $('#sat-range').html(uiManager.currentTEARR.range.toFixed(2) + ' km');
+      if (objectManager.isSensorManagerLoaded) {
+        if (uiManager.currentTEARR.inview) {
+          $('#sat-azimuth').html(uiManager.currentTEARR.azimuth.toFixed(0) + '°'); // Convert to Degrees
+          $('#sat-elevation').html(uiManager.currentTEARR.elevation.toFixed(1) + '°');
+          $('#sat-range').html(uiManager.currentTEARR.range.toFixed(2) + ' km');
+        } else {
+          $('#sat-azimuth').html('Out of Bounds');
+          $('#sat-azimuth').prop('title', 'Azimuth: ' + uiManager.currentTEARR.azimuth.toFixed(0) + '°');
+          $('#sat-elevation').html('Out of Bounds');
+          $('#sat-elevation').prop('title', 'Elevation: ' + uiManager.currentTEARR.elevation.toFixed(1) + '°');
+          $('#sat-range').html('Out of Bounds');
+          $('#sat-range').prop('title', 'Range: ' + uiManager.currentTEARR.range.toFixed(2) + ' km');
+        }
       } else {
-        $('#sat-azimuth').html('Out of Bounds');
-        $('#sat-azimuth').prop('title', 'Azimuth: ' + uiManager.currentTEARR.azimuth.toFixed(0) + '°');
-        $('#sat-elevation').html('Out of Bounds');
-        $('#sat-elevation').prop('title', 'Elevation: ' + uiManager.currentTEARR.elevation.toFixed(1) + '°');
-        $('#sat-range').html('Out of Bounds');
-        $('#sat-range').prop('title', 'Range: ' + uiManager.currentTEARR.range.toFixed(2) + ' km');
+         $('#sat-azimuth').parent().hide();
+         $('#sat-elevation').parent().hide();
+         $('#sat-range').parent().hide();
       }
 
-      if (sensorManager.checkSensorSelected()) {
-        if (selectedSat !== lastSelectedSat && !sat.missile) {
-          $('#sat-nextpass').html(satellite.nextpass(sat));
+      if (objectManager.isSensorManagerLoaded) {
+        if (sensorManager.checkSensorSelected()) {
+          if (selectedSat !== lastSelectedSat && !sat.missile) {
+            $('#sat-nextpass').html(satellite.nextpass(sat));
 
-          // IDEA: Code isInSun()
-          //sun.getXYZ();
-          //debugDrawLine('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
+            // IDEA: Code isInSun()
+            //sun.getXYZ();
+            //debugDrawLine('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
 
+          }
+          lastSelectedSat = selectedSat;
+        } else {
+          $('#sat-nextpass').html('Unavailable');
         }
-        lastSelectedSat = selectedSat;
       } else {
-        $('#sat-nextpass').html('Unavailable');
+        $('#sat-nextpass').parent().hide();
       }
 
       lastBoxUpdateTime = timeManager.now;
@@ -4610,7 +4657,7 @@ var isAnalysisMenuOpen = false;
 
     switch (menu) {
       case 'default':
-        if (sensorManager.checkSensorSelected()) {
+        if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
           $('#legend-list-default-sensor').show();
         } else {
           $('#legend-list-default').show();
@@ -4648,7 +4695,7 @@ var isAnalysisMenuOpen = false;
         break;
       case 'clear':
         $('#legend-hover-menu').hide();
-        if (sensorManager.checkSensorSelected()) {
+        if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
           $('#legend-list-default-sensor').show();
         } else {
           $('#legend-list-default').show();
@@ -5068,6 +5115,36 @@ var isAnalysisMenuOpen = false;
     window.location.replace("index.htm?lowperf");
   };
 
+  uiManager.isTimeMachineRunning = false;
+  uiManager.historyOfSatellitesPlay = () => {
+    uiManager.isTimeMachineRunning = true;
+    let tempTransColor = settingsManager.colors.transparent;
+    settingsManager.colors.transparent = [0,0,0,0];
+    for (let yy = 0; yy <= 200; yy++) {
+      let year = 59 + yy;
+      if (year >= 100) year = year - 100;
+      setTimeout(function () {
+        yearGroup = new groups.SatGroup('yearOrLess', year);
+        groups.selectGroupNoOverlay(yearGroup);
+        yearGroup.updateOrbits();
+        satSet.setColorScheme(ColorScheme.group, true); // force color recalc
+        if (year >= 59 && year < 100) {
+          M.toast({html: `Time Machine In Year 19${year}!`});
+        } else {
+          yearStr = (year < 10) ? `0${year}` : `${year}`;
+          M.toast({html: `Time Machine In Year 20${yearStr}!`});
+        }
+        if (year == 20) {
+          settingsManager.colors.transparent = tempTransColor;
+          uiManager.isTimeMachineRunning = false;
+          groups.clearSelect();
+          satSet.setColorScheme(ColorScheme.default, true); // force color recalc
+        }
+      }, settingsManager.timeMachineDelay * yy);
+      if (year == 20) break;
+    }
+  }
+
   uiManager.currentTEARR = {};
 
   // c is string name of star
@@ -5094,7 +5171,9 @@ var isAnalysisMenuOpen = false;
     }
 
     drawLineList = [];
-    starManager.isAllConstellationVisible = false;
+    if (objectManager.isStarManagerLoaded) {
+      starManager.isAllConstellationVisible = false;
+    }
 
     debugDrawLine('ref',[sat.position.x,sat.position.y,sat.position.z], [1,0.4,0,1]);
     cameraType.current = cameraType.OFFSET;

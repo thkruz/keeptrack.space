@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
   <head>
+    <script src="js/keeptrack-head.js"></script>
     <meta name="description" content="A 3D visualtion tool to learn about satellites and tracking radars." />
     <meta property="og:image" content="http://keeptrack.space/social/keeptrackPreview-new.jpg">
     <meta property="og:image:type" content="image/jpg"/>
@@ -13,32 +14,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
-
-    <!-- Get Settings -->
-    <script>document.write('<script src="js/lib/jquery.min.js?v=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
-    <script>document.write('<script src="js/settingsManager.js?v=' + Math.floor(Math.random() * 100) + '"\><\/script>');</script>
-    <!-- Import CSS needed for loading screen -->
-    <script>document.write('<link rel="stylesheet" href="css/loading-screen.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
-    <!--Import Fonts-->
-    <script>document.write('<link rel="stylesheet" href="css/fonts.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
-    <!--Import Materialize CSS-->
-    <script>document.write('<link rel="stylesheet" href="css/materialize.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
-    <script>document.write('<link rel="stylesheet" href="css/materialize-local.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
-    <!--Import Bootstrap Color Picker-->
-    <script>document.write('<link rel="stylesheet" href="js/lib/colorPick.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
-
     <title>Keeptrack.space</title>
     <!-- FORCE HTTPS -->
-    <script language="JavaScript">
-    function redirectHttpToHttps()
-    {
-        if (window.location.protocol === 'http:' && window.location.hostname === 'keeptrack.space') {
-          var httpURL= window.location.hostname + window.location.pathname + window.location.search;
-          var httpsURL= "https://" + httpURL;
-          window.location = httpsURL;
-        }
-    }
-    redirectHttpToHttps();
+    <script>
+      (function redirectHttpToHttps() {
+          if (window.location.protocol === 'http:' && window.location.hostname === 'keeptrack.space') {
+            var httpURL= window.location.hostname + window.location.pathname + window.location.search;
+            var httpsURL= "https://" + httpURL;
+            window.location = httpsURL;
+          }
+      })();
     </script>
     <!-- FORCE HTTPS -->
   </head>
@@ -72,9 +57,6 @@
         <span id="help-text">ADVICE</span>
       </div>
     </div>
-    <!-- <div id="no-webgl">
-      Keeptrack.Space requires <a href="http://caniuse.com/#feat=webgl">WebGL</a> and <a href="http://caniuse.com/#feat=webworkers">Web Worker</a> support.
-    </div> -->
   <header>
     <nav>
       <div id="nav-wrapper" class="nav-wrapper light-blue darken-3">
@@ -88,6 +70,10 @@
         </ul>
         <ul id="nav-mobile" class="right">
           <li><a id="geolocation-btn" class="start-hidden" href="#!"><i class="material-icons">location_on</i></a></li>
+          <!-- <li><a id="time-machine-btn" class="top-menu-btns">
+              <div id="time-machine-icon" class="top-menu-icons"><img src="images/history.png"></div>
+            </a>
+          </li> -->
           <li><a id="legend-menu" class="top-menu-btns">
               <!-- <span>Legend &#x25BC;</span> -->
               <div id="legend-icon" class="top-menu-icons"><img src="images/layers-icon.png"></div>
@@ -179,7 +165,7 @@
     </div>
 
     <div id="canvas-holder">
-      <canvas id="canvas"></canvas>
+      <canvas id="keeptrack-canvas"></canvas>
       <div id="ui-wrapper">
         <div id="search-results"></div>
 
@@ -191,6 +177,17 @@
           <span id="sat-hoverbox3"></span>
         </div>
         <div id="sat-minibox"></div>
+
+        <div id="time-machine-menu" class="start-hidden">
+          <ul id="time-machine-default">
+            <li><div class="Square-Box legend-payload-box"></div>1960s</li>
+            <li><div class="Square-Box legend-rocketBody-box"></div>1970s</li>
+            <li><div class="Square-Box legend-debris-box"></div>1980s</li>
+            <li class="legend-trusat"><div class="Square-Box legend-trusat-box"></div>1990s</li>
+            <li><div class="Square-Box legend-sensor-box"></div>2000s</li>
+            <li><div class="Square-Box legend-facility-box"></div>2010s</li>
+          </ul>
+        </div>
 
         <div id="legend-hover-menu" class="start-hidden">
           <ul id="legend-list-default">
@@ -1656,41 +1653,7 @@
     </div>
     <div id="bottom-icons-container" class="container">
       <div id="bottom-icons">
-        <img id="menu-sensor-list" src="" delayedsrc="images/space-station-2.png" class="bmenu-item tooltipped" alt="Sensor List" data-position="top" data-delay="50" data-tooltip="Sensor List">
-        <img id="menu-info-overlay" src="" delayedsrc="images/info.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Information Overlay" data-position="top" data-delay="50" data-tooltip="Information Overlay">
-        <img id="menu-sensor-info" src="" delayedsrc="images/radar.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Sensor Information" data-position="top" data-delay="50" data-tooltip="Sensor Information">
-        <img id="menu-watchlist" src="" delayedsrc="images/star.png" class="bmenu-item tooltipped" alt="Satellite Watchlist" data-position="top" data-delay="50" data-tooltip="Satellite Watchlist">
-        <img id="menu-lookangles" src="" delayedsrc="images/telescope.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Look Angles" data-position="top" data-delay="50" data-tooltip="Look Angles">
-        <img id="menu-lookanglesmultisite" src="" delayedsrc="images/worldwide.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="SSN Lookangles" data-position="top" data-delay="50" data-tooltip="SSN Lookangles">
-        <img id="menu-find-sat" src="" delayedsrc="images/findOrbit.png" class="bmenu-item tooltipped" alt="Search Orbit" data-position="top" data-delay="50" data-tooltip="Search Orbit">
-        <!-- <img id="menu-space-stations" src="" delayedsrc="images/space-station-1.png" class="bmenu-item tooltipped" alt="Union of Concerned Scientists Watchlist" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist"> -->
-        <img id="menu-satellite-collision" src="" delayedsrc="images/satellite-collision.png" class="bmenu-item tooltipped" alt="SOCRATES Prediction of Near Conjunctions" data-position="top" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">
-        <img id="menu-editSat" src="" delayedsrc="images/editPencil.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Edit Satellites" data-position="top" data-delay="50" data-tooltip="Edit Satellites">
-        <img id="menu-newLaunch" src="" delayedsrc="images/rocket-ship.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Create Launch Nominal" data-position="top" data-delay="50" data-tooltip="Create Launch Nominal">
-        <img id="menu-breakup" src="" delayedsrc="images/breakup.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Create Breakup" data-position="top" data-delay="50" data-tooltip="Create Breakup">
-        <img id="menu-missile" src="" delayedsrc="images/rocket-ship-2.png" class="bmenu-item tooltipped" alt="Create Missile Attack" data-position="top" data-delay="50" data-tooltip="Create Missile Attack">
-        <img id="menu-satcom" src="" delayedsrc="images/satcom.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Satellite Communication">
-        <img id="menu-dops" src="" delayedsrc="images/antenna.png" class="bmenu-item tooltipped" alt="GPS DOP" data-position="top" data-delay="50" data-tooltip="GPS DOP Over Time">
-        <img id="menu-customSensor" src="" delayedsrc="images/observatory.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Custom Sensor">
-        <img id="menu-sat-fov" src="" delayedsrc="images/satellite-map.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Satellite Field of View" data-position="top" data-delay="50" data-tooltip="Satellite Field of View">
-        <img id="menu-day-night" src="" delayedsrc="images/orbit.png" class="bmenu-item tooltipped" alt="Day Night Toggle" data-position="top" data-delay="50" data-tooltip="Day Night Toggle">
-        <img id="menu-color-scheme" src="" delayedsrc="images/brush.png" class="bmenu-item tooltipped" alt="Color Schemes" data-position="top" data-delay="50" data-tooltip="Color Schemes">
-        <img id="menu-constellations" src="" delayedsrc="images/orbit2.png" class="bmenu-item tooltipped" alt="Constellations" data-position="top" data-delay="50" data-tooltip="Constellations">
-        <img id="menu-satChng" src="" delayedsrc="images/satChng.png" class="bmenu-item tooltipped" alt="Catalog Changes" data-position="top" data-delay="50" data-tooltip="Catalog Changes">
-        <img id="menu-countries" src="" delayedsrc="images/united-states.png" class="bmenu-item tooltipped" alt="Countries" data-position="top" data-delay="50" data-tooltip="Countries">
-        <img id="menu-planetarium" src="" delayedsrc="images/astronaut.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Planetarium View" data-position="top" data-delay="50" data-tooltip="Planetarium View">
-        <img id="menu-astronomy" src="" delayedsrc="images/ursa-major.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Astronomy View" data-position="top" data-delay="50" data-tooltip="Astronomy View">
-        <img id="menu-map" src="" delayedsrc="images/map.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Stereographic Map" data-position="top" data-delay="50" data-tooltip="Stereographic Map">
-        <img id="menu-satview" src="" delayedsrc="images/satellite.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Satellite View" data-position="top" data-delay="50" data-tooltip="Satellite View">
-        <img id="menu-fov-bubble" src="" delayedsrc="images/fieldofview.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Show/Hide Field of View Bubble" data-position="top" data-delay="50" data-tooltip="Show/Hide Field of View Bubble">
-        <img id="menu-surveillance" src="" delayedsrc="images/surveillance.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Show/Hide Surveillance Fence" data-position="top" data-delay="50" data-tooltip="Show/Hide Surveillance Fence">
-        <img id="menu-record" src="" delayedsrc="images/screen-capture.jpg" class="bmenu-item tooltipped" alt="Screen Capture" data-position="top" data-delay="50" data-tooltip="Screen Capture">
-        <img id="menu-analysis" src="" delayedsrc="images/analysis.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Analysis">
-        <img id="menu-nextLaunch" src="" delayedsrc="images/calendar.png" class="bmenu-item tooltipped" alt="Next Launches" data-position="top" data-delay="50" data-tooltip="Next Launches">
-        <img id="menu-launches" src="" delayedsrc="images/rocket-ship-1.png" class="bmenu-item tooltipped" alt="Launch Schedule" data-position="top" data-delay="50" data-tooltip="Launch Schedule">
-        <img id="menu-twitter" src="" delayedsrc="images/twitter.png" class="bmenu-item tooltipped" alt="Space News on Twitter" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">
-        <img id="menu-settings" src="" delayedsrc="images/gear-icon.png" class="bmenu-item tooltipped" alt="Settings" data-position="top" data-delay="50" data-tooltip="Settings">
-        <img id="menu-about" src="" delayedsrc="images/about.png" class="bmenu-item tooltipped" alt="Author Information" data-position="top" data-delay="50" data-tooltip="Author Information">
+        <!-- Dynamic Load Icons In keeptrack-foot.js -->
       </div>
     </div>
     <div id="social" class="right">
@@ -1702,78 +1665,17 @@
     </span>
   </footer>
 
-  <!-- Load jquery CSS -->
-  <script>document.write('<link rel="stylesheet" href="css/perfect-scrollbar.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
-  <script>document.write('<link rel="stylesheet" href="css/jquery-ui.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
-  <script>document.write('<link rel="stylesheet" href="css/jquery-ui-timepicker-addon.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
-  <!-- Load Satellite Dependencies -->
-  <script>document.write('<script src="js/lib/colorPick.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/materialize.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/gl-matrix-min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/satellite.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/suncalc.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/shader-loader.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <!-- Load Constants -->
-  <script>document.write('<script src="js/constants.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <!-- Load Map Projection Code -->
-  <script>document.write('<script src="js/mapManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <!-- Load License Scripts -->
-  <script>document.write('<script src="license/license.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <!-- Offline Only -->
-  <script>if(settingsManager.offline){document.write('<script src="offline/extra.js?v=' + settingsManager.versionNumber + '"\><\/script>');}</script>
-  <script>if(settingsManager.offline){document.write('<script src="offline/satInfo.js?v=' + settingsManager.versionNumber + '"\><\/script>');}</script>
-  <script>if(settingsManager.offline){document.write('<script src="offline/tle.js?v=' + settingsManager.versionNumber + '"\><\/script>');}</script>
-  <!-- Addon Modules -->
-  <script>document.write('<script src="modules/sensorManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="modules/controlSiteManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="modules/launchSiteManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<link rel="stylesheet" href="modules/nextLaunchManager.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');</script>
-  <script>document.write('<script src="modules/nextLaunchManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="modules/starManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="modules/satCommManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="modules/starManager-constellations.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <!-- Other Required Files -->
-  <script>document.write('<script src="js/time-manager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/sun.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/meuusjs.1.0.3.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/starcalc.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/earth.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/groups.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lookangles.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/satSet.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="modules/satVmagManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <!-- Load Extra Variables -->
-  <script>document.write('<script src="js/objectManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/file-saver.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <!-- Load Ballistic Missile Functions -->
-  <script>document.write('<script src="js/missileManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <!-- Load Main JavaScript Code -->
-  <script>document.write('<script src="js/color-scheme.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/mobile.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/CanvasRecorder.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/ui.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/main.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/orbit-display.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/drawLoop-shapes.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/search-box.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/vector-to-kepler.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <!-- Load UI Dependencies -->
-  <script>document.write('<script src="js/lib/jquery-ui.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/jquery-ui-slideraccess.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/jquery-ui-timepicker.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/perfect-scrollbar.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <!-- Load Extras Last to Speed Loading -->
-  <script>document.write('<script src="js/lib/jquery.colorbox.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/advice-module.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
-  <script>document.write('<script src="js/lib/numeric.js?v=' + settingsManager.versionNumber + '"\><\/script>');</script>
+  <!-- Keeptrack Code -->
+  <script src="js/lib/jquery.min.js"></script>
+  <script src="js/keeptrack-foot.js"></script>
   <!--Google Analytics -->
   <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-85015093-1', 'auto');
-  ga('send', 'pageview');
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-85015093-1', 'auto');
+    ga('send', 'pageview');
   </script>
   <!--Google Analytics -->
   </body>

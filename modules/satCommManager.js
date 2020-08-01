@@ -5,16 +5,20 @@ satCommManager.AEHFUsers = [];
 satCommManager.WGSUsers = [];
 satCommManager.IridiumUsers = [];
 satCommManager.init = (function () {
-  for (let controlSite in controlSiteManager.controlSiteList) {
-    if (controlSiteManager.controlSiteList[controlSite].linkAEHF) {
-      satCommManager.AEHFUsers.push(controlSiteManager.controlSiteList[controlSite].name);
+  try {
+    for (let controlSite in controlSiteManager.controlSiteList) {
+      if (controlSiteManager.controlSiteList[controlSite].linkAEHF) {
+        satCommManager.AEHFUsers.push(controlSiteManager.controlSiteList[controlSite].name);
+      }
+      if (controlSiteManager.controlSiteList[controlSite].linkWGS) {
+        satCommManager.WGSUsers.push(controlSiteManager.controlSiteList[controlSite].name);
+      }
+      if (controlSiteManager.controlSiteList[controlSite].linkIridium) {
+        satCommManager.WGSUsers.push(controlSiteManager.controlSiteList[controlSite].name);
+      }
     }
-    if (controlSiteManager.controlSiteList[controlSite].linkWGS) {
-      satCommManager.WGSUsers.push(controlSiteManager.controlSiteList[controlSite].name);
-    }
-    if (controlSiteManager.controlSiteList[controlSite].linkIridium) {
-      satCommManager.WGSUsers.push(controlSiteManager.controlSiteList[controlSite].name);
-    }
+  } catch {
+    console.log('ControlSiteMananger unable to load!');
   }
 
   for (let sensor in sensorManager.sensorList) {

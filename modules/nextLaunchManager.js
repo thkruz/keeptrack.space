@@ -98,7 +98,11 @@ nextLaunchManager.showTable = function () {
       if (typeof launchList[i].locationURL == 'undefined' || launchList[i].locationURL == '') {
         locationHTML = `${_truncateString(launchList[i].location,25)}`;
       } else {
-        locationHTML = `<a class='iframe' href="${launchList[i].locationURL}">${_truncateString(launchList[i].location,25)}</a>`;
+        if (window.location.protocol === 'http:') {
+          locationHTML = `<a class='iframe' href="http://${launchList[i].locationURL}">${_truncateString(launchList[i].location,25)}</a>`;
+        } else {
+          locationHTML = `<a class='iframe' href="https://${launchList[i].locationURL}">${_truncateString(launchList[i].location,25)}</a>`;
+        }
       }
 
       let tdL = tr.insertCell();
@@ -109,7 +113,11 @@ nextLaunchManager.showTable = function () {
       if (typeof launchList[i].agencyURL == 'undefined') {
         agencyHTML = `${_truncateString(launchList[i].agency,30)}`;
       } else {
-        agencyHTML = `<a class='iframe' href="${launchList[i].agencyURL}">${_truncateString(launchList[i].agency,30)}</a>`;
+        if (window.location.protocol === 'http:') {
+          agencyHTML = `<a class='iframe' href="http://${launchList[i].agencyURL}">${_truncateString(launchList[i].agency,30)}</a>`;
+        } else {
+          agencyHTML = `<a class='iframe' href="https://${launchList[i].agencyURL}">${_truncateString(launchList[i].agency,30)}</a>`;
+        }
       }
 
       let tdA = tr.insertCell();

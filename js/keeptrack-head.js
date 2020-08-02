@@ -37,9 +37,13 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.14.0';
+  settingsManager.versionNumber = '1.14.1';
   settingsManager.versionDate = 'August 2, 2020';
-  settingsManager.installDirectory = '/';
+  settingsManager.installDirectory = '';
+  let pathArray = window.location.pathname.split('/');
+  for (var i = 0; i < pathArray.length - 1; i++) {
+    settingsManager.installDirectory += pathArray[i] + '/';
+  }
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;

@@ -113,14 +113,14 @@ ATMOSPHERE_DIST_MIN = 200;
       texLoaded = true;
       onImageLoaded();
     };
-    if (settingsManager.nasaImages) img.src = 'images/dayearth-4096.jpg';
-    if (settingsManager.trusatImages) img.src = 'images/trusatvector-4096.jpg';
-    if (settingsManager.blueImages) img.src = 'images/world_blue-2048.png';
-    if (settingsManager.lowresImages) img.src = 'images/no_clouds_4096.jpg';
-    if (settingsManager.vectorImages) img.src = 'images/dayearthvector-4096.jpg';
+    if (settingsManager.nasaImages) img.src = settingsManager.installDirectory + 'images/dayearth-4096.jpg';
+    if (settingsManager.trusatImages) img.src = settingsManager.installDirectory + 'images/trusatvector-4096.jpg';
+    if (settingsManager.blueImages) img.src = settingsManager.installDirectory + 'images/world_blue-2048.png';
+    if (settingsManager.lowresImages) img.src = settingsManager.installDirectory + 'images/no_clouds_4096.jpg';
+    if (settingsManager.vectorImages) img.src = settingsManager.installDirectory + 'images/dayearthvector-4096.jpg';
     if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) {
-      if (settingsManager.hiresImages) imgHiRes.src = 'images/2_earth_16k.jpg';
-      if (settingsManager.hiresNoCloudsImages) imgHiRes.src = 'images/no_clouds_8k.jpg';
+      if (settingsManager.hiresImages) imgHiRes.src = settingsManager.installDirectory + 'images/2_earth_16k.jpg';
+      if (settingsManager.hiresNoCloudsImages) imgHiRes.src = settingsManager.installDirectory + 'images/no_clouds_8k.jpg';
       imgHiRes.onload = function () {
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgHiRes);
@@ -145,14 +145,14 @@ ATMOSPHERE_DIST_MIN = 200;
       nightLoaded = true;
       onImageLoaded();
     };
-    if (settingsManager.nasaImages) nightImg.src = 'images/nightearth-4096.png';
-    if (settingsManager.trusatImages) nightImg.src = 'images/nightearth-4096.png';
-    if (settingsManager.lowresImages) nightImg.src = 'images/nightearth-4096.png';
-    if (settingsManager.blueImages) nightImg.src = 'images/nightearth-4096.png';
-    if (settingsManager.vectorImages) nightImg.src = 'images/dayearthvector-4096.jpg';
+    if (settingsManager.nasaImages) nightImg.src = settingsManager.installDirectory + 'images/nightearth-4096.png';
+    if (settingsManager.trusatImages) nightImg.src = settingsManager.installDirectory + 'images/nightearth-4096.png';
+    if (settingsManager.lowresImages) nightImg.src = settingsManager.installDirectory + 'images/nightearth-4096.png';
+    if (settingsManager.blueImages) nightImg.src = settingsManager.installDirectory + 'images/nightearth-4096.png';
+    if (settingsManager.vectorImages) nightImg.src = settingsManager.installDirectory + 'images/dayearthvector-4096.jpg';
 
     if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) {
-      nightImgHiRes.src = 'images/6_night_16k.jpg';
+      nightImgHiRes.src = settingsManager.installDirectory + 'images/6_night_16k.jpg';
       nightImgHiRes.onload = function () {
         gl.bindTexture(gl.TEXTURE_2D, nightTexture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImgHiRes);
@@ -441,7 +441,7 @@ ATMOSPHERE_DIST_MIN = 200;
       texLoaded = true;
       onImageLoaded();
     };
-    img.src = 'images/atmosphere-day.png';
+    img.src = settingsManager.installDirectory + 'images/atmosphere-day.png';
 
     nightTexture = gl.createTexture();
     var nightImg = new Image();
@@ -456,7 +456,7 @@ ATMOSPHERE_DIST_MIN = 200;
       nightLoaded = true;
       onImageLoaded();
     };
-      nightImg.src = 'images/atmosphere-night.png';
+      nightImg.src = settingsManager.installDirectory + 'images/atmosphere-night.png';
 
     // generate a uvsphere bottom up, CCW order
     var vertPos = [];

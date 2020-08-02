@@ -54,7 +54,7 @@ var satSensorMarkerArray = [];
 
   try {
     $('#loader-text').text('Locating ELSETs...');
-    satCruncher = new Worker('js/sat-cruncher.js');
+    satCruncher = new Worker(settingsManager.installDirectory + 'js/sat-cruncher.js');
   } catch (E) {
     browserUnsupported();
   }

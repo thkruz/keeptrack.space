@@ -37,8 +37,9 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.13.1';
-  settingsManager.versionDate = 'August 1, 2020';
+  settingsManager.versionNumber = '1.14.0';
+  settingsManager.versionDate = 'August 2, 2020';
+  settingsManager.installDirectory = '/';
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;
@@ -406,18 +407,18 @@ if (typeof $ == 'undefined') {
 }
 
 // Import CSS needed for loading screen
-document.write('<link rel="stylesheet" href="css/loading-screen.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/loading-screen.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
 // Import Fonts
-document.write('<link rel="stylesheet" href="css/fonts.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/fonts.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
 // Import Materialize CSS
-document.write('<link rel="stylesheet" href="css/materialize.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-document.write('<link rel="stylesheet" href="css/materialize-local.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/materialize.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/materialize-local.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
 // Import Bootstrap Color Picker
-document.write('<link rel="stylesheet" href="js/lib/colorPick.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'js/lib/colorPick.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
 // Import Modules Style Sheets
-document.write('<link rel="stylesheet" href="modules/nextLaunchManager.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'modules/nextLaunchManager.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
 
 // Load jquery CSS
-document.write('<link rel="stylesheet" href="css/perfect-scrollbar.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-document.write('<link rel="stylesheet" href="css/jquery-ui.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-document.write('<link rel="stylesheet" href="css/jquery-ui-timepicker-addon.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/perfect-scrollbar.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/jquery-ui.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/jquery-ui-timepicker-addon.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');

@@ -644,8 +644,8 @@ ATMOSPHERE_DIST_MIN = 200;
     gl.disable(gl.DEPTH_TEST);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     // gl.cullFace(gl.BACK)
-    vec3.normalize(earth.lightDirection, atmosphere.lightDirection);
-    vec3.inverse(atmosphere.lightDirection, atmosphere.lightDirection);
+    // vec3.normalize(earth.lightDirection, atmosphere.lightDirection);
+    // vec3.inverse(atmosphere.lightDirection, atmosphere.lightDirection);
 
     mvMatrix = mvMatrixEmpty;
     mat4.identity(mvMatrix);

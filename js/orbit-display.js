@@ -32,7 +32,7 @@
 
   var orbitMvMat = mat4.create();
 
-  var orbitWorker = new Worker('js/orbit-calculation-worker.js');
+  var orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbit-calculation-worker.js');
 
   var initialized = false;
 

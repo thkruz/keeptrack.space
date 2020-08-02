@@ -151,6 +151,8 @@ var drawLoopCallback;
     }
     webGlInit();
     atmosphere.init();
+    sun.init();
+    moon.init();
     earth.init();
     ColorScheme.init();
     satSet.init(function satSetInitCallBack (satData) {
@@ -403,6 +405,8 @@ var drawLoopCallback;
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+    sun.draw(pMatrix, camMatrix);
+    moon.draw(pMatrix, camMatrix);
     // if (typeof debugLine != 'undefined') debugLine.draw();
     if (cameraType.current != cameraType.FPS) {
       atmosphere.draw(pMatrix, camMatrix);

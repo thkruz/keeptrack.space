@@ -30,7 +30,7 @@ const DEG2RAD = TAU / 360;          // Used to convert degrees to radians
 const RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
 const RADIUS_OF_EARTH = 6371;       // Radius of Earth in kilometers
 const RADIUS_OF_SUN = 695700;       // Radius of the Sun in kilometers
-const STAR_DISTANCE = 200000;        // Artificial Star Distance - Lower numberrReduces webgl depth buffer
+const STAR_DISTANCE = 350000;        // Artificial Star Distance - Lower numberrReduces webgl depth buffer
 const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
 
 /** ARRAYS */

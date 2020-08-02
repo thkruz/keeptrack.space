@@ -37,7 +37,7 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.14.2';
+  settingsManager.versionNumber = '1.14.3';
   settingsManager.versionDate = 'August 2, 2020';
   if (window.location.host == 'keeptrack.space') {
     settingsManager.installDirectory = '/';

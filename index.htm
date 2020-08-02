@@ -31,7 +31,12 @@
     <div id="loading-screen" class="valign-wrapper full-loader">
       <div id="logo-inner-container" class="valign">
         <span id="logo-text" class="logo-font">KEEP TRACK</span>
-        <span id="logo-trusat" style="display: none;"><img src="/images/trusat.png"></span>
+        <script>
+          if (settingsManager.trusatMode) {
+            document.write('<span id="logo-trusat"><img src="' + settingsManager.installDirectory + '/images/trusat.png"></span>');
+          }
+        </script>
+        }
         </br>
         <div id= "spinner" class="preloader-wrapper active">
           <div class="spinner-layer spinner-white-only">

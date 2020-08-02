@@ -37,13 +37,22 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.14.1';
+  settingsManager.versionNumber = '1.14.2';
   settingsManager.versionDate = 'August 2, 2020';
-  settingsManager.installDirectory = '';
-  let pathArray = window.location.pathname.split('/');
-  for (var i = 0; i < pathArray.length - 1; i++) {
-    settingsManager.installDirectory += pathArray[i] + '/';
+  if (window.location.host == 'keeptrack.space') {
+    settingsManager.installDirectory = '/';
   }
+  if (window.location.host == 'thkruz.github.io') {
+    settingsManager.installDirectory = '/keeptrack.space/';
+  }
+  // let pathArray = window.location.pathname.split('/');
+  // for (var i = 0; i < pathArray.length - 1; i++) {
+  //   if (pathArray[i] != '/') {
+  //     settingsManager.installDirectory += pathArray[i] + '\/';
+  //   } else {
+  //     settingsManager.installDirectory = '/';
+  //   }
+  // }
 
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 105000;

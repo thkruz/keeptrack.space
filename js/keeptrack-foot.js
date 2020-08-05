@@ -4,7 +4,7 @@ document.write('<script src="' + settingsManager.installDirectory + 'js/lib/mate
 document.write('<script src="' + settingsManager.installDirectory + 'js/lib/gl-matrix-min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 document.write('<script src="' + settingsManager.installDirectory + 'js/lib/satellite.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 document.write('<script src="' + settingsManager.installDirectory + 'js/lib/suncalc.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/lib/shader-loader.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+document.write('<script src="' + settingsManager.installDirectory + 'js/shaders.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 // Load Constants
 document.write('<script src="' + settingsManager.installDirectory + 'js/constants.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 // Load Map Projection Code

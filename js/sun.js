@@ -10,8 +10,8 @@
 var RADIUS_OF_DRAW_SUN = 2200;
 var SUN_SCALAR_DISTANCE = 250000;
 
-var RADIUS_OF_DRAW_MOON = 5500;
-var MOON_SCALAR_DISTANCE = 150000;
+var RADIUS_OF_DRAW_MOON = 4500;
+var MOON_SCALAR_DISTANCE = 75000;
 
 (function () {
   var sun = {};
@@ -163,7 +163,6 @@ var MOON_SCALAR_DISTANCE = 150000;
 
     texture = gl.createTexture();
     var img = new Image();
-    var imgHiRes = new Image();
     img.onload = function () {
       gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
@@ -365,16 +364,13 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
   moon = {};
   moon.pos = [0,0,0];
 
-  var texture, nightTexture;
+  var texture;
 
   var texLoaded = false;
-  var nightLoaded = false;
-  var loaded = false;
   moon.loaded = false;
 
   function onImageLoaded () {
     if (texLoaded) {
-      loaded = true;
       moon.loaded = true;
     }
   }
@@ -391,19 +387,19 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
     var gmst = satellite.gstime(j);
 
     let moonPos = SunCalc.getMoonPosition(timeManager.propTime(),0,0);
-    moon.pos = satellite.ecfToEci(lookAnglesToEcf(moonPos.azimuth * RAD2DEG, moonPos.altitude * RAD2DEG, moonPos.distance, 0,0,0), gmst);
+    moon.position = satellite.ecfToEci(lookAnglesToEcf(moonPos.azimuth * RAD2DEG, moonPos.altitude * RAD2DEG, moonPos.distance, 0,0,0), gmst);
 
-    return {'x': moon.pos.x, 'y': moon.pos.y, 'z': moon.pos.z};
+    return {'x': moon.position.x, 'y': moon.position.y, 'z': moon.position.z};
   };
 
   moon.init = function () {
     let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-    let fragCode = shaderLoader.getShaderCode('sun-fragment.glsl');
+    let fragCode = shaderLoader.getShaderCode('moon-fragment.glsl');
     gl.shaderSource(fragShader, fragCode);
     gl.compileShader(fragShader);
 
     let vertShader = gl.createShader(gl.VERTEX_SHADER);
-    let vertCode = shaderLoader.getShaderCode('sun-vertex.glsl');
+    let vertCode = shaderLoader.getShaderCode('moon-vertex.glsl');
     gl.shaderSource(vertShader, vertCode);
     gl.compileShader(vertShader);
 
@@ -520,7 +516,7 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
   };
 
   moon.draw = function (pMatrix, camMatrix) {
-    if (!loaded) return;
+    if (!moon.loaded) return;
 
     mvMatrix = mvMatrixEmpty;
     mat4.identity(mvMatrix);
@@ -540,11 +536,6 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
     gl.uniform1i(moonShader.uSampler, 0); // point sampler to TEXTURE0
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture); // bind texture to TEXTURE0
-
-    // Todo: Write new moon shader code
-    gl.uniform1i(moonShader.uNightSampler, 1);  // point sampler to TEXTURE1
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, texture); // bind tex to TEXTURE1
 
     gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
     gl.enableVertexAttribArray(moonShader.aTexCoord);

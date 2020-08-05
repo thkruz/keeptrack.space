@@ -80,6 +80,7 @@
 
     // Try Loading Star Module
     try {
+      objectManager.starIndex1 = objectManager.staticSet.length + 1;
       for (var star = 0; star < (starManager.stars.length); star++) {
         var starInfo = {
           static: true,
@@ -105,6 +106,7 @@
       objectManager.isStarManagerLoaded = false;
       console.log('You do not have the Star Module');
     }
+    objectManager.starIndex2 = objectManager.staticSet.length;
 
     // Try Loading the Launch Site Module
     try {

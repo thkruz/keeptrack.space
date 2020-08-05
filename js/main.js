@@ -155,11 +155,190 @@ var drawLoopCallback;
     moon.init();
     earth.init();
     ColorScheme.init();
+    $('#loader-text').text('Drawing Dots in Space...');
     satSet.init(function satSetInitCallBack (satData) {
-      $('#loader-text').text('Coloring Inside the Lines...');
       orbitDisplay.init();
       groups.init();
       searchBox.init(satData);
+      (function _checkIfEarthFinished () {
+        if (earth.loaded) return;
+        $('#loader-text').text('Coloring Inside the Lines...');
+        setTimeout(function () {
+          _checkIfEarthFinished();
+        }, 250);
+      })();
+      let isFinalLoadingComplete = false;
+      (function _finalLoadingSequence () {
+        if (!isFinalLoadingComplete && !earth.loaded) {
+          setTimeout(function () {
+            _finalLoadingSequence();
+          }, 250);
+          return;
+        }
+        if (isFinalLoadingComplete) return;
+        // NOTE:: This is called right after all the objects load on the screen.
+
+        // Version Info Updated
+        $('#version-info').html(settingsManager.versionNumber);
+        $('#version-info').tooltip({delay: 50, html: settingsManager.versionDate, position: 'top'});
+
+        $('body').attr('style', 'background:black');
+        $('#canvas-holder').attr('style', 'display:block');
+
+        mobile.checkMobileMode();
+
+        if (settingsManager.isMobileModeEnabled) { // Start Button Displayed
+          $('#mobile-start-button').show();
+          $('#spinner').hide();
+          $('#loader-text').html('');
+        } else { // Loading Screen Resized and Hidden
+          if (settingsManager.trusatMode) {
+              setTimeout(function () {
+                $('#loading-screen').removeClass('full-loader');
+                $('#loading-screen').addClass('mini-loader-container');
+                $('#logo-inner-container').addClass('mini-loader');
+                $('#logo-text').html('');
+                $('#logo-trusat').hide();
+                $('#loading-screen').hide();
+                $('#loader-text').html('Attempting to Math...');
+              }, 5000);
+          } else {
+            $('#loading-screen').removeClass('full-loader');
+            $('#loading-screen').addClass('mini-loader-container');
+            $('#logo-inner-container').addClass('mini-loader');
+            $('#logo-text').html('');
+            $('#logo-trusat').hide();
+            $('#loading-screen').hide();
+            $('#loader-text').html('Attempting to Math...');
+          }
+        }
+
+        satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
+        satSet.onCruncherReady();
+
+        (function _reloadLastSensor () {
+          let currentSensor = (!settingsManager.offline) ? JSON.parse(localStorage.getItem("currentSensor")) : null;
+          if (currentSensor !== null) {
+            try {
+              // If there is a staticnum set use that
+              if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
+                sensorManager.setSensor(null, currentSensor[1]);
+              } else {
+                // If the sensor is a string, load that collection of sensors
+                if (typeof currentSensor[0].shortName == 'undefined') {
+                  sensorManager.setSensor(currentSensor[0], currentSensor[1]);
+                } else {
+                  // Seems to be a single sensor without a staticnum, load that
+                  sensorManager.setSensor(sensorManager.sensorList[currentSensor[0].shortName], currentSensor[1]);
+                }
+              }
+            }
+            catch (e){
+              console.warn('Saved Sensor Information Invalid');
+            }
+          }
+        })();
+        (function _watchlistInit () {
+          var watchlistJSON = (!settingsManager.offline) ? localStorage.getItem("watchlistList") : null;
+          if (watchlistJSON !== null) {
+            var newWatchlist = JSON.parse(watchlistJSON);
+            watchlistInViewList = [];
+            for (var i = 0; i < newWatchlist.length; i++) {
+              var sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
+              if (sat !== null) {
+                newWatchlist[i] = sat.id;
+                watchlistInViewList.push(false);
+              } else {
+                console.error('Watchlist File Format Incorret');
+                return;
+              }
+            }
+            uiManager.updateWatchlist(newWatchlist, watchlistInViewList);
+          }
+        })();
+        (function _parseGetParameters () {
+          // do querystring stuff
+          var params = satSet.queryStr.split('&');
+
+          // Do Searches First
+          for (let i = 0; i < params.length; i++) {
+            let key = params[i].split('=')[0];
+            let val = params[i].split('=')[1];
+            if (key == 'search') {
+              // console.log('preloading search to ' + val);
+              // Sensor Selection takes 1.5 seconds to update color Scheme
+              // TODO: SensorManager might be the problem here, but this works
+              // _doDelayedSearch(val);
+              searchBox.doSearch(val);
+            }
+          }
+
+          // Then Do Other Stuff
+          for (let i = 0; i < params.length; i++) {
+            let key = params[i].split('=')[0];
+            let val = params[i].split('=')[1];
+            let urlSatId;
+            switch (key) {
+              case 'intldes':
+                urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
+                if (urlSatId !== null) {
+                  selectSat(urlSatId);
+                }
+                break;
+              case 'sat':
+                urlSatId = satSet.getIdFromObjNum(val.toUpperCase());
+                if (urlSatId !== null) {
+                  selectSat(urlSatId);
+                }
+                break;
+              case 'misl':
+                var subVal = val.split(',');
+                $('#ms-type').val(subVal[0].toString());
+                $('#ms-attacker').val(subVal[1].toString());
+                // $('#ms-lat-lau').val() * 1;
+                // ('#ms-lon-lau').val() * 1;
+                $('#ms-target').val(subVal[2].toString());
+                // $('#ms-lat').val() * 1;
+                // $('#ms-lon').val() * 1;
+                $('#missile').trigger("submit");
+                break;
+              case 'date':
+                timeManager.propOffset = Number(val) - Date.now();
+                $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
+                satCruncher.postMessage({
+                  typ: 'offset',
+                  dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
+                });
+                break;
+              case 'rate':
+                val = Math.min(val, 1000);
+                // could run time backwards, but let's not!
+                val = Math.max(val, 0.0);
+                // console.log('propagating at rate ' + val + ' x real time ');
+                timeManager.propRate = Number(val);
+                satCruncher.postMessage({
+                  typ: 'offset',
+                  dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
+                });
+                break;
+            }
+          }
+        })();
+
+        if ($(window).width() > $(window).height()) {
+          settingsManager.mapHeight = $(window).width(); // Subtract 12 px for the scroll
+          $('#map-image').width(settingsManager.mapHeight);
+          settingsManager.mapHeight = settingsManager.mapHeight * 3 / 4;
+          $('#map-image').height(settingsManager.mapHeight);
+          $('#map-menu').width($(window).width());
+        } else {
+          settingsManager.mapHeight = $(window).height() - 100; // Subtract 12 px for the scroll
+          $('#map-image').height(settingsManager.mapHeight);
+          settingsManager.mapHeight = settingsManager.mapHeight * 4 / 3;
+          $('#map-image').width(settingsManager.mapHeight);
+          $('#map-menu').width($(window).width());
+        }        
+      })();
     });
     drawLoop(); // kick off the animationFrame()s
   });
@@ -271,7 +450,17 @@ var drawLoopCallback;
 
     if (rotateTheEarth) { camYaw -= rotateTheEarthSpeed * dt; }
 
-    if (zoomLevel !== zoomTarget) atmosphere.resize();
+    // Zoom Changing
+    if (zoomLevel !== zoomTarget) {
+      if (zoomLevel > settingsManager.satShader.largeObjectMaxZoom) {
+        settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize * 2;
+      } else if (zoomLevel < settingsManager.satShader.largeObjectMinZoom) {
+        settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize / 2;
+      } else {
+        settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize;
+      }
+      atmosphere.resize();
+    }
 
     if (camSnapMode) {
       camPitch += (camPitchTarget - camPitch) * 0.003 * dt;
@@ -480,13 +669,25 @@ var drawLoopCallback;
       */
 
      if (isNaN(camPitch) || isNaN(camYaw) || isNaN(camPitchTarget) || isNaN(camYawTarget) || isNaN(zoomLevel) || isNaN(zoomTarget)) {
+       try {
+         console.group('Camera Math Error');
+         console.log(`camPitch: ${camPitch}`);
+         console.log(`camYaw: ${camYaw}`);
+         console.log(`camPitchTarget: ${camPitchTarget}`);
+         console.log(`camYawTarget: ${camYawTarget}`);
+         console.log(`zoomLevel: ${zoomLevel}`);
+         console.log(`zoomTarget: ${zoomTarget}`);
+         console.log(`settingsManager.cameraMovementSpeed: ${settingsManager.cameraMovementSpeed}`);
+         console.groupEnd();
+       } catch (e) {
+         console.warn('Camera Math Error');
+       }
        camPitch = 0.5;
        camYaw = 0.5;
        zoomLevel  = 0.5;
        camPitchTarget = 0;
        camYawTarget = 0;
        zoomTarget = 0.5;
-       console.error('Camera Math Error - Camera Reset');
      }
 
       switch (cameraType.current) {
@@ -882,9 +1083,32 @@ var drawLoopCallback;
   }
 })();
 
+function _fixDpi(canvas, dpi) {
+//create a style object that returns width and height
+  let style = {
+    height() {
+      return +getComputedStyle(canvas).getPropertyValue('height').slice(0,-2);
+    },
+    width() {
+      return +getComputedStyle(canvas).getPropertyValue('width').slice(0,-2);
+    }
+  };
+//set the correct attributes for a crystal clear image!
+  canvas.setAttribute('width', style.width() * dpi);
+  canvas.setAttribute('height', style.height() * dpi);
+}
+
 function webGlInit () {
   db.log('webGlInit');
-  var can = canvasDOM[0];
+  let can = canvasDOM[0];
+  let dpi;
+  if (typeof settingsManager.dpi != 'undefined') {
+    dpi = settingsManager.dpi;
+  } else {
+    dpi = window.devicePixelRatio;
+  }
+
+  _fixDpi(can,dpi);
 
   if (settingsManager.screenshotMode) {
     can.width = settingsManager.hiResWidth;

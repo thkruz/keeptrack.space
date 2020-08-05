@@ -33,6 +33,7 @@ var satSensorMarkerArray = [];
   var dotShader;
   var satPosBuf;
   var satColorBuf;
+  var starBuf;
 
   // Removed to reduce garbage collection
   var buffers;
@@ -169,176 +170,11 @@ var satSensorMarkerArray = [];
     }
 
     if (!settingsManager.cruncherReady) {
-      // NOTE:: This is called right after all the objects load on the screen.
-
-      // Version Info Updated
-      $('#version-info').html(settingsManager.versionNumber);
-      $('#version-info').tooltip({delay: 50, html: settingsManager.versionDate, position: 'top'});
-
       /** Hide SOCRATES menu if not all the satellites are currently available to view */
       if (limitSats !== '') {
         $('#menu-satellite-collision').hide();
       }
-
-      $('body').attr('style', 'background:black');
-      $('#canvas-holder').attr('style', 'display:block');
-
-      mobile.checkMobileMode();
-
-      if (settingsManager.isMobileModeEnabled) { // Start Button Displayed
-        $('#mobile-start-button').show();
-        $('#spinner').hide();
-        $('#loader-text').html('');
-      } else { // Loading Screen Resized and Hidden
-        if (settingsManager.trusatMode) {
-            setTimeout(function () {
-              $('#loading-screen').removeClass('full-loader');
-              $('#loading-screen').addClass('mini-loader-container');
-              $('#logo-inner-container').addClass('mini-loader');
-              $('#logo-text').html('');
-              $('#logo-trusat').hide();
-              $('#loader-text').html('Attempting to Math...');
-              $('#loading-screen').fadeOut();
-            }, 5000);
-        } else {
-          $('#loading-screen').removeClass('full-loader');
-          $('#loading-screen').addClass('mini-loader-container');
-          $('#logo-inner-container').addClass('mini-loader');
-          $('#logo-text').html('');
-          $('#logo-trusat').hide();
-          $('#loader-text').html('Attempting to Math...');
-          $('#loading-screen').fadeOut();
-        }
-      }
-
-      satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
       settingsManager.cruncherReady = true;
-      satSet.onCruncherReady();
-
-      (function _reloadLastSensor () {
-        let currentSensor = (!settingsManager.offline) ? JSON.parse(localStorage.getItem("currentSensor")) : null;
-        if (currentSensor !== null) {
-          try {
-            // If there is a staticnum set use that
-            if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
-              sensorManager.setSensor(null, currentSensor[1]);
-            } else {
-              // If the sensor is a string, load that collection of sensors
-              if (typeof currentSensor[0].shortName == 'undefined') {
-                sensorManager.setSensor(currentSensor[0], currentSensor[1]);
-              } else {
-                // Seems to be a single sensor without a staticnum, load that
-                sensorManager.setSensor(sensorManager.sensorList[currentSensor[0].shortName], currentSensor[1]);
-              }
-            }
-          }
-          catch (e){
-            console.warn('Saved Sensor Information Invalid');
-          }
-        }
-      })();
-
-      (function _watchlistInit () {
-        var watchlistJSON = (!settingsManager.offline) ? localStorage.getItem("watchlistList") : null;
-        if (watchlistJSON !== null) {
-          var newWatchlist = JSON.parse(watchlistJSON);
-          watchlistInViewList = [];
-          for (var i = 0; i < newWatchlist.length; i++) {
-            var sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
-            if (sat !== null) {
-              newWatchlist[i] = sat.id;
-              watchlistInViewList.push(false);
-            } else {
-              console.error('Watchlist File Format Incorret');
-              return;
-            }
-          }
-          uiManager.updateWatchlist(newWatchlist, watchlistInViewList);
-        }
-      })();
-
-      (function _parseGetParameters () {
-        // do querystring stuff
-        var params = satSet.queryStr.split('&');
-
-        // Do Searches First
-        for (let i = 0; i < params.length; i++) {
-          let key = params[i].split('=')[0];
-          let val = params[i].split('=')[1];
-          if (key == 'search') {
-            // console.log('preloading search to ' + val);
-            // Sensor Selection takes 1.5 seconds to update color Scheme
-            // TODO: SensorManager might be the problem here, but this works
-            // _doDelayedSearch(val);
-            searchBox.doSearch(val);
-          }
-        }
-
-        // Then Do Other Stuff
-        for (let i = 0; i < params.length; i++) {
-          let key = params[i].split('=')[0];
-          let val = params[i].split('=')[1];
-          let urlSatId;
-          switch (key) {
-            case 'intldes':
-              urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
-              if (urlSatId !== null) {
-                selectSat(urlSatId);
-              }
-              break;
-            case 'sat':
-              urlSatId = satSet.getIdFromObjNum(val.toUpperCase());
-              if (urlSatId !== null) {
-                selectSat(urlSatId);
-              }
-              break;
-            case 'misl':
-              var subVal = val.split(',');
-              $('#ms-type').val(subVal[0].toString());
-              $('#ms-attacker').val(subVal[1].toString());
-              // $('#ms-lat-lau').val() * 1;
-              // ('#ms-lon-lau').val() * 1;
-              $('#ms-target').val(subVal[2].toString());
-              // $('#ms-lat').val() * 1;
-              // $('#ms-lon').val() * 1;
-              $('#missile').trigger("submit");
-              break;
-            case 'date':
-              timeManager.propOffset = Number(val) - Date.now();
-              $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
-              satCruncher.postMessage({
-                typ: 'offset',
-                dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
-              });
-              break;
-            case 'rate':
-              val = Math.min(val, 1000);
-              // could run time backwards, but let's not!
-              val = Math.max(val, 0.0);
-              // console.log('propagating at rate ' + val + ' x real time ');
-              timeManager.propRate = Number(val);
-              satCruncher.postMessage({
-                typ: 'offset',
-                dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
-              });
-              break;
-          }
-        }
-      })();
-
-      if ($(window).width() > $(window).height()) {
-        settingsManager.mapHeight = $(window).width(); // Subtract 12 px for the scroll
-        $('#map-image').width(settingsManager.mapHeight);
-        settingsManager.mapHeight = settingsManager.mapHeight * 3 / 4;
-        $('#map-image').height(settingsManager.mapHeight);
-        $('#map-menu').width($(window).width());
-      } else {
-        settingsManager.mapHeight = $(window).height() - 100; // Subtract 12 px for the scroll
-        $('#map-image').height(settingsManager.mapHeight);
-        settingsManager.mapHeight = settingsManager.mapHeight * 4 / 3;
-        $('#map-image').width(settingsManager.mapHeight);
-        $('#map-menu').width($(window).width());
-      }
     }
   };
 
@@ -377,6 +213,9 @@ var satSensorMarkerArray = [];
     gl.linkProgram(dotShader);
     dotShader.aPos = gl.getAttribLocation(dotShader, 'aPos');
     dotShader.aColor = gl.getAttribLocation(dotShader, 'aColor');
+    dotShader.aStar = gl.getAttribLocation(dotShader, 'aStar');
+    dotShader.minSize = gl.getUniformLocation(dotShader, 'minSize');
+    dotShader.maxSize = gl.getUniformLocation(dotShader, 'maxSize');
     dotShader.uMvMatrix = gl.getUniformLocation(dotShader, 'uMvMatrix');
     dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
     dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
@@ -412,6 +251,9 @@ var satSensorMarkerArray = [];
 
     dotShader.aPos = gl.getAttribLocation(dotShader, 'aPos');
     dotShader.aColor = gl.getAttribLocation(dotShader, 'aColor');
+    dotShader.aStar = gl.getAttribLocation(dotShader, 'aStar');
+    dotShader.minSize = gl.getUniformLocation(dotShader, 'minSize');
+    dotShader.maxSize = gl.getUniformLocation(dotShader, 'maxSize');
     dotShader.uMvMatrix = gl.getUniformLocation(dotShader, 'uMvMatrix');
     dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
     dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
@@ -655,6 +497,8 @@ var satSensorMarkerArray = [];
         }
 
         satSet.orbitalSats = tempSatData.length;
+        objectManager.starIndex1 += satSet.orbitalSats;
+        objectManager.starIndex2 += satSet.orbitalSats;
 
         loggerStop = Date.now();
         for (i = 0; i < objectManager.staticSet.length; i++) {
@@ -748,6 +592,11 @@ var satSensorMarkerArray = [];
       gl.bindBuffer(gl.ARRAY_BUFFER, pickColorBuf);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pickColorData), gl.STATIC_DRAW);
 
+      starBuf = gl.createBuffer();
+      starBufData = satSet.setupStarData(satData);
+      gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(starBufData), gl.STATIC_DRAW);
+
       satSet.numSats = satData.length;
       satSet.setColorScheme(ColorScheme.default, true);
       settingsManager.shadersReady = true;
@@ -796,6 +645,18 @@ var satSensorMarkerArray = [];
     pickableBuf = buffers.pickableBuf;
   };
 
+  satSet.setupStarData = (satData) => {
+    let starArray = [];
+    for (var i = 0; i < satData.length; i++) {
+      if (i >= objectManager.starIndex1 && i <= objectManager.starIndex2) {
+        starArray.push(2.0);
+      }  else {
+        starArray.push(1.0);
+      }
+    }
+    return starArray;
+  };
+
   var screenLocation = [];
   satSet.draw = (pMatrix, camMatrix, drawNow) => {
     // NOTE: 640 byte leak.
@@ -834,6 +695,12 @@ var satSensorMarkerArray = [];
     gl.uniformMatrix4fv(dotShader.uMvMatrix, false, emptyMat4);
     gl.uniformMatrix4fv(dotShader.uCamMatrix, false, camMatrix);
     gl.uniformMatrix4fv(dotShader.uPMatrix, false, pMatrix);
+    gl.uniform1f(dotShader.minSize, settingsManager.satShader.minSize);
+    gl.uniform1f(dotShader.maxSize, settingsManager.satShader.maxSize);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, starBufData, gl.STREAM_DRAW);
+    gl.vertexAttribPointer(dotShader.aStar, 1, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, satPosBuf);
     gl.bufferData(gl.ARRAY_BUFFER, satPos, gl.STREAM_DRAW);

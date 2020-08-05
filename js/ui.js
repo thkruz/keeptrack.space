@@ -32,6 +32,7 @@ var mapImageDOM = $('#map-image');
 var mapMenuDOM = $('#map-menu');
 var satHoverBoxDOM = $('#sat-hoverbox');
 var rightBtnMenuDOM = $('#right-btn-menu');
+var rightBtnSaveDOM = $('#save-rmb');
 var rightBtnViewDOM = $('#view-rmb');
 var rightBtnEditDOM = $('#edit-rmb');
 var rightBtnCreateDOM = $('#create-rmb');
@@ -39,6 +40,7 @@ var rightBtnDrawDOM = $('#draw-rmb');
 var rightBtnColorsDOM = $('#colors-rmb');
 var rightBtnEarthDOM = $('#earth-rmb');
 
+var rightBtnSaveMenuDOM = $('#save-rmb-menu');
 var rightBtnViewMenuDOM = $('#view-rmb-menu');
 var rightBtnEditMenuDOM = $('#edit-rmb-menu');
 var rightBtnCreateMenuDOM = $('#create-rmb-menu');
@@ -157,6 +159,17 @@ var isAnalysisMenuOpen = false;
       $(window).on("resize", function () {
         uiManager.resize2DMap();
         mobile.checkMobileMode();
+        if (settingsManager.screenshotMode) {
+          bodyDOM.css('overflow','visible');
+          $('#canvas-holder').css('overflow','visible');
+          $('#canvas-holder').width = 3840;
+          $('#canvas-holder').height = 2160;
+          bodyDOM.width = 3840;
+          bodyDOM.height = 2160;
+        } else {
+          bodyDOM.css('overflow','hidden');
+          $('#canvas-holder').css('overflow','hidden');
+        }
         if (!resizing) {
           window.setTimeout(function () {
             resizing = false;
@@ -441,6 +454,7 @@ var isAnalysisMenuOpen = false;
         var isDrawDOM = false;
         var isEarthDOM = false;
 
+        rightBtnSaveDOM.show();
         rightBtnViewDOM.hide();
         rightBtnEditDOM.hide();
         rightBtnCreateDOM.hide();
@@ -583,6 +597,9 @@ var isAnalysisMenuOpen = false;
       rightBtnMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
       });
+      rightBtnSaveMenuDOM.on("click", function (e) {
+        _rmbMenuActions(e);
+      });
       rightBtnViewMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
       });
@@ -611,6 +628,15 @@ var isAnalysisMenuOpen = false;
           targetId = e.target.firstChild.id;
         }
         switch (targetId) {
+          case 'save-hd-rmb':
+            uiManager.saveHiResPhoto('hd');
+          break;
+          case 'save-4k-rmb':
+            uiManager.saveHiResPhoto('4k');
+          break;
+          case 'save-8k-rmb':
+            uiManager.saveHiResPhoto('8k');
+          break;
           case 'view-info-rmb':
             M.toast({html: 'Lat: ' + latLon.latitude.toFixed(3) + '<br/>Lon: ' + latLon.longitude.toFixed(3)});
           break;
@@ -869,6 +895,26 @@ var isAnalysisMenuOpen = false;
       canvasDOM.attr('tabIndex', 0);
       canvasDOM.trigger("focus");
 
+      rightBtnSaveDOM.hover(function () {
+        _clearRMBSubMenu();
+        var offsetX = (rightBtnSaveDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+        rightBtnSaveMenuDOM.css({
+          display: 'block',
+          'text-align': 'center',
+          position: 'absolute',
+          left: rightBtnSaveDOM.offset().left + offsetX,
+          top: rightBtnSaveDOM.offset().top
+        });
+        if (rightBtnSaveDOM.offset().top !== 0) {
+          rightBtnSaveMenuDOM.show();
+        } else {
+          rightBtnSaveMenuDOM.hide();
+        }
+      });
+      rightBtnSaveMenuDOM.hover(null, function () { // Lost Focus
+        rightBtnSaveMenuDOM.hide();
+      });
+
       rightBtnViewDOM.hover(function () {
         _clearRMBSubMenu();
         var offsetX = (rightBtnViewDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
@@ -1111,6 +1157,7 @@ var isAnalysisMenuOpen = false;
 
     function _clearRMBSubMenu () {
       db.log('_clearRMBSubMenu',true);
+      rightBtnSaveMenuDOM.hide();
       rightBtnViewMenuDOM.hide();
       rightBtnEditMenuDOM.hide();
       rightBtnCreateMenuDOM.hide();
@@ -5143,7 +5190,26 @@ var isAnalysisMenuOpen = false;
       }, settingsManager.timeMachineDelay * yy);
       if (year == 20) break;
     }
-  }
+  };
+
+  uiManager.saveHiResPhoto = (resolution) => {
+    switch (resolution) {
+      case 'hd':
+      settingsManager.hiResWidth = 1920;
+      settingsManager.hiResHeight = 1080;
+        break;
+      case '4k':
+      settingsManager.hiResWidth = 3840;
+      settingsManager.hiResHeight = 2160;
+        break;
+      case '8k':
+      settingsManager.hiResWidth = 7680;
+      settingsManager.hiResHeight = 4320;
+        break;
+    }
+
+    settingsManager.screenshotMode = true;
+  };
 
   uiManager.currentTEARR = {};
 

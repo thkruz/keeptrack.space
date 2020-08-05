@@ -36,7 +36,6 @@
             document.write('<span id="logo-trusat"><img src="' + settingsManager.installDirectory + '/images/trusat.png"></span>');
           }
         </script>
-        }
         </br>
         <div id= "spinner" class="preloader-wrapper active">
           <div class="spinner-layer spinner-white-only">
@@ -108,6 +107,7 @@
     <div id="rmb-wrapper">
       <div id="right-btn-menu" class="right-btn-menu">
         <ul class='dropdown-contents'>
+          <li class="rmb-menu-item" id="save-rmb">Save Image &#x27A4;</li>
           <li class="rmb-menu-item" id="view-rmb">View &#x27A4;</li>
           <li class="rmb-menu-item" id="edit-rmb"><a href="#">Edit &#x27A4;</a></li>
           <li class="rmb-menu-item" id="draw-rmb"><a href="#">Draw &#x27A4;</a></li>
@@ -116,6 +116,13 @@
           <li class="rmb-menu-item" id="colors-rmb"><a href="#">Colors &#x27A4;</a></li>
           <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
           <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
+        </ul>
+      </div>
+      <div id="save-rmb-menu" class="right-btn-menu">
+        <ul class='dropdown-contents'>
+          <li id="save-hd-rmb"><a href="#">HD (1920 x 1080)</a></li>
+          <li id="save-4k-rmb"><a href="#">4K (3840 x 2160)</a></li>
+          <li id="save-8k-rmb"><a href="#">8K (7680 x 4320)</a></li>
         </ul>
       </div>
       <div id="view-rmb-menu" class="right-btn-menu">

@@ -330,6 +330,55 @@ var drawLoopCallback;
     // var bubble = new FOVBubble();
     // bubble.set();
     // bubble.draw();
+
+    if (settingsManager.screenshotMode) {
+      webGlInit();
+      if (settingsManager.queuedScreenshot) return;
+
+      setTimeout(function () {
+        let link = document.createElement('a');
+        link.download = 'keeptrack.png';
+
+        let d = new Date();
+        let n = d.getFullYear();
+        let copyrightStr;
+        if (!settingsManager.copyrightOveride) {
+          copyrightStr = `©${n} KEEPTRACK.SPACE`;
+        } else {
+          copyrightStr = '';
+        }
+
+        link.href = _watermarkedDataURL(canvasDOM[0],copyrightStr);
+        settingsManager.screenshotMode = false;
+        settingsManager.queuedScreenshot = false;
+        setTimeout(function () {
+          link.click();
+        }, 10);
+        webGlInit();
+      }, 200);
+      settingsManager.queuedScreenshot = true;
+    }
+  }
+
+  function _watermarkedDataURL(canvas,text){
+    var tempCanvas=document.createElement('canvas');
+    var tempCtx=tempCanvas.getContext('2d');
+    var cw,ch;
+    cw=tempCanvas.width=canvas.width;
+    ch=tempCanvas.height=canvas.height;
+    tempCtx.drawImage(canvas,0,0);
+    tempCtx.font = "24px nasalization";
+    var textWidth = tempCtx.measureText(text).width;
+    tempCtx.globalAlpha = 1.0;
+    tempCtx.fillStyle ='white';
+    tempCtx.fillText(text,cw-textWidth-30,ch-30);
+    // tempCtx.fillStyle ='black';
+    // tempCtx.fillText(text,cw-textWidth-10+2,ch-20+2);
+    // just testing by adding tempCanvas to document
+    document.body.appendChild(tempCanvas);
+    let image = tempCanvas.toDataURL();
+    tempCanvas.parentNode.removeChild(tempCanvas);
+    return(image);
   }
   function _camSnapToSat (sat) {
     /* this function runs every frame that a satellite is selected.
@@ -837,8 +886,13 @@ function webGlInit () {
   db.log('webGlInit');
   var can = canvasDOM[0];
 
-  can.width = window.innerWidth;
-  can.height = window.innerHeight;
+  if (settingsManager.screenshotMode) {
+    can.width = settingsManager.hiResWidth;
+    can.height = settingsManager.hiResHeight;
+  } else {
+    can.width = window.innerWidth;
+    can.height = window.innerHeight;
+  }
 
   // Desynchronized Fixed Jitter on Old Computer
   var gl = can.getContext('webgl', {alpha: false, desynchronized: true}) || can.getContext('experimental-webgl', {alpha: false, desynchronized: true});

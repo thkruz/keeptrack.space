@@ -37,14 +37,20 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.14.3';
-  settingsManager.versionDate = 'August 2, 2020';
+  settingsManager.versionNumber = '1.15.0';
+  settingsManager.versionDate = 'August 5, 2020';
   if (window.location.host == 'keeptrack.space') {
     settingsManager.installDirectory = '/';
   }
-  if (window.location.host == 'thkruz.github.io') {
+  else if (window.location.host == 'thkruz.github.io') {
     settingsManager.installDirectory = '/keeptrack.space/';
   }
+  else {
+    settingsManager.installDirectory = './';
+  }
+
+  // settingsManager.screenshotMode = true;
+
   // let pathArray = window.location.pathname.split('/');
   // for (var i = 0; i < pathArray.length - 1; i++) {
   //   if (pathArray[i] != '/') {
@@ -277,6 +283,8 @@ db.init = (function (){
   settingsManager.mobileMaxLabels = 100;
   settingsManager.desktopMaxLabels = 20000;
   settingsManager.maxLabels = 20000;
+
+  settingsManager.queuedScreenshot = false;
 
   settingsManager.isAlwaysHidePropRate = false;
 

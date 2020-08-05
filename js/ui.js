@@ -3583,6 +3583,9 @@ var isAnalysisMenuOpen = false;
           if (uiManager.isTimeMachineRunning == true) break;
           uiManager.historyOfSatellitesPlay();
         break;
+        case 'menu-photo':
+          uiManager.saveHiResPhoto('4k');
+          break;
         case 'menu-color-scheme': // No Keyboard Commands
           if (isColorSchemeMenuOpen) {
             uiManager.hideSideMenus();
@@ -5172,7 +5175,8 @@ var isAnalysisMenuOpen = false;
       if (year >= 100) year = year - 100;
       setTimeout(function () {
         yearGroup = new groups.SatGroup('yearOrLess', year);
-        groups.selectGroupNoOverlay(yearGroup);
+        // groups.selectGroupNoOverlay(yearGroup);
+        groups.selectGroup(yearGroup);
         yearGroup.updateOrbits();
         satSet.setColorScheme(ColorScheme.group, true); // force color recalc
         if (year >= 59 && year < 100) {

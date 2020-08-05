@@ -130,6 +130,7 @@ $(document).ready(function() {
       bottomIconsDivDOM.append('<img id="menu-analysis" src="" delayedsrc="' + settingsManager.installDirectory + 'images/analysis.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Analysis">');
     }
     bottomIconsDivDOM.append('<img id="menu-time-machine" src="" delayedsrc="' + settingsManager.installDirectory + 'images/time.png" class="bmenu-item tooltipped" alt="Time Machine" data-position="top" data-delay="50" data-tooltip="Time Machine">');
+    bottomIconsDivDOM.append('<img id="menu-photo" src="" delayedsrc="' + settingsManager.installDirectory + 'images/camera.png" class="bmenu-item tooltipped" alt="Take HiRes Photo" data-position="top" data-delay="50" data-tooltip="Take HiRes Photo">');
     bottomIconsDivDOM.append('<img id="menu-record" src="" delayedsrc="' + settingsManager.installDirectory + 'images/screen-capture.jpg" class="bmenu-item tooltipped" alt="Screen Capture" data-position="top" data-delay="50" data-tooltip="Screen Capture">');
     if (objectManager.isLaunchSiteManagerLoaded) {
       numOfIcons++;

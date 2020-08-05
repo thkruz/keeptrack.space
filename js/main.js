@@ -29,14 +29,14 @@ var gl;
 
 // Camera Variables
 var camYaw = 0;
-var camPitch = 0.5;
+var camPitch = 0;
 var camYawTarget = 0;
 var camPitchTarget = 0;
 var camSnapMode = false;
 var camZoomSnappedOnSat = false;
 var camAngleSnappedOnSat = false;
-var zoomLevel = 0.5;
-var zoomTarget = 0.5;
+var zoomLevel = 0.6;
+var zoomTarget = 0.6;
 var isZoomIn = false;
 var camPitchSpeed = 0;
 var camYawSpeed = 0;
@@ -337,7 +337,7 @@ var drawLoopCallback;
           settingsManager.mapHeight = settingsManager.mapHeight * 4 / 3;
           $('#map-image').width(settingsManager.mapHeight);
           $('#map-menu').width($(window).width());
-        }        
+        }
       })();
     });
     drawLoop(); // kick off the animationFrame()s

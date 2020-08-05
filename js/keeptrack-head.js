@@ -37,7 +37,7 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.16.0';
+  settingsManager.versionNumber = '1.16.1';
   settingsManager.versionDate = 'August 5, 2020';
   if (window.location.host == 'keeptrack.space') {
     settingsManager.installDirectory = '/';
@@ -136,6 +136,9 @@ db.init = (function (){
           break;
         case 'offline':
           settingsManager.offline = true;
+          break;
+        case 'debris':
+          settingsManager.tleSource = 'tle/TLEdebris.json';
           break;
         case 'mw':
           settingsManager.tleSource = 'tle/mw.json';

@@ -61,11 +61,9 @@ ATMOSPHERE_DIST_MIN = 200;
   earth.loaded = false;
 
   function onImageLoaded () {
-    console.log(texLoaded);
-    console.log(nightLoaded);
     if (texLoaded && nightLoaded) {
       loaded = true;
-      earth.loaded = true;      
+      earth.loaded = true;
     }
   }
 

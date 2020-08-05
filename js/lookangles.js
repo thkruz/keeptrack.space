@@ -551,6 +551,126 @@ or mirrored at any other location without the express written permission of the 
     }
   };
 
+  satellite.satSensorFOV = (sat1, sat2) => {
+    // Set default timing settings. These will be changed to find look angles at different times in future.
+    let propOffset = timeManager.getPropOffset();
+    let propRealTimeTemp = Date.now();
+    let now = timeManager.propTimeCheck(propOffset, propRealTimeTemp);
+
+    let satrec1 = satellite.twoline2satrec(sat1.TLE1, sat1.TLE2);// perform and store sat init calcs
+    let sat1Ecf = _getEcf(now,satrec1);
+    let satrec2 = satellite.twoline2satrec(sat2.TLE1, sat2.TLE2);// perform and store sat init calcs
+    let sat2Ecf = _getEcf(now,satrec2);
+
+    console.log(sat1Ecf);
+    console.log(sat2Ecf);
+    return;
+
+    // Find the ECI position of the Selected Satellite
+    satSelPosX = satPos[satelliteSelected[snum] * 3];
+    satSelPosY = satPos[satelliteSelected[snum] * 3 + 1];
+    satSelPosZ = satPos[satelliteSelected[snum] * 3 + 2];
+    satSelPosEcf = {x: satSelPosX, y: satSelPosY, z: satSelPosZ};
+    satSelPos = satellite.ecfToEci(satSelPosEcf, gmst);
+
+    // Find the Lat/Long of the Selected Satellite
+    satSelGeodetic = satellite.eciToGeodetic(satSelPos, gmst); // pv.position is called positionEci originally
+    satHeight = satSelGeodetic.height;
+    satSelPosEarth = {longitude: satSelGeodetic.longitude, latitude: satSelGeodetic.latitude, height: 1};
+
+    deltaLatInt = 1;
+    if (satHeight < 2500 && selectedSatFOV <= 60) deltaLatInt = 0.5;
+    if (satHeight > 7000 || selectedSatFOV >= 90) deltaLatInt = 2;
+    if (satelliteSelected.length > 1) deltaLatInt = 2;
+    for ( deltaLat = -60; deltaLat < 60; deltaLat+=deltaLatInt) {
+      lat = Math.max(Math.min(Math.round((satSelGeodetic.latitude * RAD2DEG)) + deltaLat,90),-90) * DEG2RAD;
+      if (lat > 90) continue;
+      deltaLonInt = 1; // Math.max((Math.abs(lat)*RAD2DEG/15),1);
+      if (satHeight < 2500 && selectedSatFOV <= 60) deltaLonInt = 0.5;
+      if (satHeight > 7000 || selectedSatFOV >= 90) deltaLonInt = 2;
+      if (satelliteSelected.length > 1) deltaLonInt = 2;
+      for (deltaLon = 0; deltaLon < 181; deltaLon+=deltaLonInt) {
+        // //////////
+        // Add Long
+        // //////////
+        long = satSelGeodetic.longitude + (deltaLon * DEG2RAD);
+        satSelPosEarth = {longitude: long, latitude: lat, height: 15};
+        // Find the Az/El of the position on the earth
+        lookangles = satellite.ecfToLookAngles(satSelPosEarth, satSelPosEcf);
+        // azimuth = lookangles.azimuth;
+        elevation = lookangles.elevation;
+        // rangeSat = lookangles.rangeSat;
+
+        if ((elevation * RAD2DEG > 0) && (90 - (elevation * RAD2DEG)) < selectedSatFOV) {
+          satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
+
+          if (i === len) {
+            console.error('Ran out of Markers');
+            continue; // Only get so many markers.
+          }
+          satCache[i].active = true;
+
+          satPos[i * 3] = satSelPosEarth.x;
+          satPos[i * 3 + 1] = satSelPosEarth.y;
+          satPos[i * 3 + 2] = satSelPosEarth.z;
+
+          satVel[i * 3] = 0;
+          satVel[i * 3 + 1] = 0;
+          satVel[i * 3 + 2] = 0;
+          i++;
+        }
+        // //////////
+        // Minus Long
+        // //////////
+        if (deltaLon === 0 || deltaLon === 180) continue; // Don't Draw Two Dots On the Center Line
+        long = satSelGeodetic.longitude - (deltaLon * DEG2RAD);
+        satSelPosEarth = {longitude: long, latitude: lat, height: 15};
+        // Find the Az/El of the position on the earth
+        lookangles = satellite.ecfToLookAngles(satSelPosEarth, satSelPosEcf);
+        // azimuth = lookangles.azimuth;
+        elevation = lookangles.elevation;
+        // rangeSat = lookangles.rangeSat;
+
+        if ((elevation * RAD2DEG > 0) && (90 - (elevation * RAD2DEG)) < selectedSatFOV) {
+          satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
+
+          if (i === len) {
+            console.error('Ran out of Markers');
+            continue; // Only get so many markers.
+          }
+          satCache[i].active = true;
+
+          satPos[i * 3] = satSelPosEarth.x;
+          satPos[i * 3 + 1] = satSelPosEarth.y;
+          satPos[i * 3 + 2] = satSelPosEarth.z;
+
+          satVel[i * 3] = 0;
+          satVel[i * 3 + 1] = 0;
+          satVel[i * 3 + 2] = 0;
+          i++;
+        }
+
+        if (lat === 90 || lat === -90) break; // One Dot for the Poles
+      }
+    }
+
+    function _getEcf (now, satrec) {
+      let j = _jday(now.getUTCFullYear(),
+      now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+      let gmst = satellite.gstime(j);
+
+      let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+      let positionEci = satellite.sgp4(satrec, m);
+
+      return satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
+    }
+  };
+
   satellite.findCloseObjects = () => {
     let csoList = [];
     let satList = [];

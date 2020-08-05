@@ -9,22 +9,30 @@
   objectManager.staticSet = [];
   objectManager.fieldOfViewSet = [];
 
+  if (typeof satCommManager == 'undefined') {
+    objectManager.isSatCommManagerLoaded = false;
+  } else {
+    objectManager.isSatCommManagerLoaded = true;
+  }
+
   objectManager.init = function () {
     var i;
-    var maxMissiles = settingsManager.maxMissiles;
-    for (i = 0; i < maxMissiles; i++) {
-      var missileInfo = {
-        static: false,
-        missile: true,
-        active: false,
-        type: '',
-        name: i,
-        latList: [],
-        lonList: [],
-        altList: [],
-        timeList: []
-      };
-      objectManager.missileSet.push(missileInfo);
+    if (typeof missileManager != 'undefined') {
+      var maxMissiles = settingsManager.maxMissiles;
+      for (i = 0; i < maxMissiles; i++) {
+        var missileInfo = {
+          static: false,
+          missile: true,
+          active: false,
+          type: '',
+          name: i,
+          latList: [],
+          lonList: [],
+          altList: [],
+          timeList: []
+        };
+        objectManager.missileSet.push(missileInfo);
+      }
     }
     var maxAnalystSats = settingsManager.maxAnalystSats;
     for (i = 0; i < maxAnalystSats; i++) {
@@ -63,33 +71,38 @@
         };
         objectManager.staticSet.push(sensorInfo);
       }
+      objectManager.isSensorManagerLoaded = true;
     } catch (e) {
+      objectManager.isSensorManagerLoaded = false;
+      settingsManager.maxFieldOfViewMarkers = 1;
       console.log('You do not have the Sensor Module');
     }
 
     // Try Loading Star Module
     try {
       for (var star = 0; star < (starManager.stars.length); star++) {
-      var starInfo = {
-        static: true,
-        shortName: 'STAR',
-        type: 'Star',
-        dec: starManager.stars[star].dec, //dec
-        ra: starManager.stars[star].ra, //ra
-        dist: starManager.stars[star].dist,
-        vmag: starManager.stars[star].vmag,
-      };
-      if (starManager.stars[star].pname != "") {
-        starInfo.name = starManager.stars[star].pname;
-      } else if (starManager.stars[star].bf != "") {
-        starInfo.name = starManager.stars[star].bf;
-      } else {
-        starInfo.name = "HD " + starManager.stars[star].name;
-      }
+        var starInfo = {
+          static: true,
+          shortName: 'STAR',
+          type: 'Star',
+          dec: starManager.stars[star].dec, //dec
+          ra: starManager.stars[star].ra, //ra
+          dist: starManager.stars[star].dist,
+          vmag: starManager.stars[star].vmag,
+        };
+        if (starManager.stars[star].pname != "") {
+          starInfo.name = starManager.stars[star].pname;
+        } else if (starManager.stars[star].bf != "") {
+          starInfo.name = starManager.stars[star].bf;
+        } else {
+          starInfo.name = "HD " + starManager.stars[star].name;
+        }
 
-      objectManager.staticSet.push(starInfo);
-    }
+        objectManager.staticSet.push(starInfo);
+      }
+      objectManager.isStarManagerLoaded = true;
     } catch (e) {
+      objectManager.isStarManagerLoaded = false;
       console.log('You do not have the Star Module');
     }
 
@@ -107,7 +120,9 @@
         };
         objectManager.staticSet.push(launchSiteInfo);
       }
+      objectManager.isLaunchSiteManagerLoaded = true;
     } catch (e) {
+      objectManager.isLaunchSiteManagerLoaded = false;
       console.log('You do not have the Launch Site Module');
     }
 
@@ -132,7 +147,9 @@
         };
         objectManager.staticSet.push(controlSiteInfo);
       }
+      objectManager.isControlSiteManagerLoaded = true;
     } catch (e) {
+      objectManager.isControlSiteManagerLoaded = false;
       console.log('You do not have the Control Site Module');
     }
 

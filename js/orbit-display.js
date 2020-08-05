@@ -32,7 +32,7 @@
 
   var orbitMvMat = mat4.create();
 
-  var orbitWorker = new Worker('js/orbit-calculation-worker.js');
+  var orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbit-calculation-worker.js');
 
   var initialized = false;
 
@@ -241,7 +241,7 @@
       });
     }
 
-    if (groups.selectedGroup !== null) {
+    if (groups.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
       gl.uniform4fv(pathShader.uColor, groupColor);
       groups.selectedGroup.forEach(function (id) {
         gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);

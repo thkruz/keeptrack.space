@@ -1,4 +1,4 @@
-// Launch Site Manager (launchSiteManager)
+// Contorl Site Manager (controlSiteManager)
 (function () {
   var controlSiteManager = {};
   var controlSiteList = {};

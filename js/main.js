@@ -150,6 +150,9 @@ var drawLoopCallback;
       settingsManager.tleSource = 'tle/TLE.json';
     }
     webGlInit();
+    atmosphere.init();
+    sun.init();
+    moon.init();
     earth.init();
     ColorScheme.init();
     satSet.init(function satSetInitCallBack (satData) {
@@ -180,6 +183,8 @@ var drawLoopCallback;
           // selectSat(-1);
           // M.toast({html: `Computer is slow!</br>Forcing Mobile Mode`});
           // settingsManager.isMobileModeEnabled = true;
+          // settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+          // webGlInit();
           // settingsManager.isDisableSatHoverBox = true;
           // enableSlowCPUMode();
         }
@@ -266,6 +271,8 @@ var drawLoopCallback;
 
     if (rotateTheEarth) { camYaw -= rotateTheEarthSpeed * dt; }
 
+    if (zoomLevel !== zoomTarget) atmosphere.resize();
+
     if (camSnapMode) {
       camPitch += (camPitchTarget - camPitch) * 0.003 * dt;
 
@@ -300,7 +307,7 @@ var drawLoopCallback;
       // debugLine.set(satposition, [0, 0, 0]);
     }
 
-    if (missileManager.missileArray.length > 0) {
+    if (typeof missileManager != 'undefined' && missileManager.missileArray.length > 0) {
       for (var i = 0; i < missileManager.missileArray.length; i++) {
         orbitDisplay.updateOrbitBuffer(missileManager.missileArray[i].id);
       }
@@ -357,8 +364,7 @@ var drawLoopCallback;
       var altitude;
       var camDistTarget;
       if (!sat.missile && !sat.static && sat.active) { // if this is a satellite not a missile
-        sat.getTEARR();       // do lookangles on the satellite
-        altitude = uiManager.currentTEARR.alt; // and set the altitude
+        altitude = sat.getAltitude();
       } if (sat.missile) {
         altitude = sat.maxAlt + 1000;             // if it is a missile use its altitude
         orbitDisplay.setSelectOrbit(sat.satId);
@@ -399,7 +405,12 @@ var drawLoopCallback;
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+    sun.draw(pMatrix, camMatrix);
+    moon.draw(pMatrix, camMatrix);
     // if (typeof debugLine != 'undefined') debugLine.draw();
+    if (cameraType.current != cameraType.FPS) {
+      atmosphere.draw(pMatrix, camMatrix);
+    }
     earth.draw(pMatrix, camMatrix);
     satSet.draw(pMatrix, camMatrix, drawNow);
     orbitDisplay.draw(pMatrix, camMatrix);
@@ -718,7 +729,9 @@ var drawLoopCallback;
     }
     if (satId === -1) {
       if (!isHoverBoxVisible || settingsManager.isDisableSatHoverBox) return;
-      if (starManager.isConstellationVisible === true && !starManager.isAllConstellationVisible) starManager.clearConstellations();
+      if (objectManager.isStarManagerLoaded) {
+        if (starManager.isConstellationVisible === true && !starManager.isAllConstellationVisible) starManager.clearConstellations();
+      }
       // satHoverBoxDOM.html('(none)');
       satHoverBoxDOM.css({display: 'none'});
       canvasDOM.css({cursor: 'default'});
@@ -756,7 +769,7 @@ var drawLoopCallback;
         satHoverBoxNode2.textContent = '';
         satHoverBoxNode3.textContent = '';
       } else {
-        if (sensorManager.checkSensorSelected() && isShowNextPass && isShowDistance) {
+        if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected() && isShowNextPass && isShowDistance) {
           satHoverBoxNode1.textContent = (sat.ON);
           satHoverBoxNode2.textContent = (sat.SCC_NUM);
           satHoverBoxNode3.innerHTML = (satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '');
@@ -765,7 +778,7 @@ var drawLoopCallback;
           satHoverBoxNode2.innerHTML = (sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
           satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
                                           'X: ' + sat.velocityX.toFixed(2) + 'km/s Y: ' + sat.velocityY.toFixed(2) + 'km/s Z: ' + sat.velocityZ.toFixed(2)) + 'km/s';
-        } else if (sensorManager.checkSensorSelected() && isShowNextPass) {
+        } else if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected() && isShowNextPass) {
           satHoverBoxNode1.textContent = (sat.ON);
           satHoverBoxNode2.textContent = (sat.SCC_NUM);
           satHoverBoxNode3.textContent = (satellite.nextpass(sat));
@@ -793,7 +806,7 @@ var drawLoopCallback;
   var demoModeSatellite = 0;
   var demoModeLastTime = 0;
   function _demoMode () {
-    if (!sensorManager.checkSensorSelected()) return;
+    if (objectManager.isSensorManagerLoaded && !sensorManager.checkSensorSelected()) return;
     if (drawNow - demoModeLastTime < settingsManager.demoModeInterval) return;
 
     demoModeLastTime = drawNow;
@@ -822,7 +835,7 @@ var drawLoopCallback;
 
 function webGlInit () {
   db.log('webGlInit');
-  var can = $('#canvas')[0];
+  var can = canvasDOM[0];
 
   can.width = window.innerWidth;
   can.height = window.innerHeight;
@@ -1088,8 +1101,8 @@ function selectSat (satId) {
       if (typeof sat.staticNum == 'undefined') return;
       adviceList.sensor();
       sat = satSet.getSat(satId);
-      sensorManager.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
-      sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
+      if (objectManager.isSensorManagerLoaded) sensorManager.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
+      if (objectManager.isSensorManagerLoaded) sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
       selectedSat = -1;
       $('#menu-sensor-info').removeClass('bmenu-item-disabled');
       $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
@@ -1106,7 +1119,7 @@ function selectSat (satId) {
 
     orbitDisplay.setSelectOrbit(satId);
 
-    if (sensorManager.checkSensorSelected()) {
+    if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
       $('#menu-lookangles').removeClass('bmenu-item-disabled');
     }
 
@@ -1349,35 +1362,39 @@ function selectSat (satId) {
       $('#sat-elset-age').html(daysold + ' Days');
       $('#sat-elset-age').tooltip({delay: 50, html: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(), position: 'left'});
 
-      now = new Date(timeManager.propRealTime + timeManager.propOffset);
-      var sunTime = SunCalc.getTimes(now, sensorManager.currentSensor.lat, sensorManager.currentSensor.long);
-      var satInSun = sat.isInSun;
-      // If No Sensor, then Ignore Sun Exclusion
-      if (!sensorManager.checkSensorSelected()) {
-        if (satInSun == 0) $('#sat-sun').html('No Sunlight');
-        if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
-        if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
-      // If Radar Selected, then Say the Sun Doesn't Matter
-      } else if ((sensorManager.currentSensor.type !== 'Optical') && (sensorManager.currentSensor.type !== 'Observer')) {
-        $('#sat-sun').html('No Effect');
-      // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
-      } else if (sunTime.dawn.getTime() - now > 0 || sunTime.dusk.getTime() - now < 0) {
-        if (satInSun == 0) $('#sat-sun').html('No Sunlight');
-        if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
-        if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
-      // If Optical Sesnor but Dawn Dusk Can't Be Calculated, then you are at a
-      // high latitude and we need to figure that out
-      } else if ((sunTime.night != 'Invalid Date') && (sunTime.dawn == 'Invalid Date' || sunTime.dusk == 'Invalid Date')) {
+      if (!objectManager.isSensorManagerLoaded) {
+        $('#sat-sun').parent().hide();
+      } else {
+        now = new Date(timeManager.propRealTime + timeManager.propOffset);
+        var sunTime = SunCalc.getTimes(now, sensorManager.currentSensor.lat, sensorManager.currentSensor.long);
+        var satInSun = sat.isInSun;
+        // If No Sensor, then Ignore Sun Exclusion
+        if (!sensorManager.checkSensorSelected()) {
           if (satInSun == 0) $('#sat-sun').html('No Sunlight');
           if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
           if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
-      } else {
-      // Unless you are in sun exclusion
-      $('#sat-sun').html('Sun Exclusion');
+        // If Radar Selected, then Say the Sun Doesn't Matter
+        } else if ((sensorManager.currentSensor.type !== 'Optical') && (sensorManager.currentSensor.type !== 'Observer')) {
+          $('#sat-sun').html('No Effect');
+        // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
+        } else if (sunTime.dawn.getTime() - now > 0 || sunTime.dusk.getTime() - now < 0) {
+          if (satInSun == 0) $('#sat-sun').html('No Sunlight');
+          if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
+          if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
+        // If Optical Sesnor but Dawn Dusk Can't Be Calculated, then you are at a
+        // high latitude and we need to figure that out
+        } else if ((sunTime.night != 'Invalid Date') && (sunTime.dawn == 'Invalid Date' || sunTime.dusk == 'Invalid Date')) {
+            if (satInSun == 0) $('#sat-sun').html('No Sunlight');
+            if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
+            if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
+        } else {
+        // Unless you are in sun exclusion
+        $('#sat-sun').html('Sun Exclusion');
+        }
       }
     }
 
-    if (sensorManager.checkSensorSelected() && isLookanglesMenuOpen) {
+    if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected() && isLookanglesMenuOpen) {
       satellite.getlookangles(sat);
     }
   }

@@ -330,6 +330,10 @@ ul {
   bottom: 100px;
 }
 
+#time-machine-menu li {
+  display: flex;
+}
+
 #legend-hover-menu li {
   display: flex;
 }

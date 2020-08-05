@@ -300,6 +300,22 @@
     transition: 1s;
     top: 0px !important;
   }
+
+  #time-machine-menu {
+    padding-left: 35px;
+    color: white;
+    background: #0a97d6;
+    top: 50px;
+    right: 0px;
+    z-index: 100;
+    position: absolute;
+    overflow: auto;
+    width: 100%;
+    border-width: 0px 0px 5px 0px;
+    border-style: solid;
+    border-color: #0277bd;
+  }
+
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
@@ -438,6 +454,20 @@
     top: auto !important;
     bottom: 55px !important;
     left: 5px !important;
+  }
+  #time-machine-menu {
+    padding-left: 35px;
+    color: white;
+    background: #0a97d6;
+    width: 300px;
+    top: 25px;
+    right: 0px;
+    z-index: 100;
+    position: absolute;
+    overflow: auto;
+    border-width: 0px 0px 5px 5px;
+    border-style: solid;
+    border-color: #0277bd;
   }
   #legend-hover-menu {
     padding-left: 35px;

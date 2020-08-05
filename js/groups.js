@@ -20,7 +20,21 @@
     var satId;
     var i = 0;
     this.sats = [];
-    if (groupType === 'intlDes') {
+    if (groupType === 'year') {
+      data = satSet.searchYear(data);
+      for (i = 0; i < data.length; i++) {
+        this.sats.push({
+          satId: data[i]
+        });
+      }
+    } else if (groupType === 'yearOrLess') {
+      data = satSet.searchYearOrLess(data);
+      for (i = 0; i < data.length; i++) {
+        this.sats.push({
+          satId: data[i]
+        });
+      }
+    } else if (groupType === 'intlDes') {
       for (i = 0; i < data.length; i++) {
         var theSatId = satSet.getIdFromIntlDes(data[i]);
         if (theSatId === null) continue;
@@ -94,6 +108,15 @@
     group.updateOrbits();
     settingsManager.currentColorScheme = ColorScheme.group;
   };
+
+  groups.selectGroupNoOverlay = function (group) {
+    if (group === null || group === undefined) { return; }
+    groups.updateIsInGroup(groups.selectedGroup, group);
+    groups.selectedGroup = group;
+    settingsManager.isGroupOverlayDisabled = true;
+    settingsManager.currentColorScheme = ColorScheme.group;
+  };
+
   groups.updateIsInGroup = function (oldgroup, newgroup) {
     var sat;
     if (oldgroup !== null && oldgroup !== undefined) {
@@ -113,6 +136,7 @@
   groups.clearSelect = function () {
     groups.updateIsInGroup(groups.selectedGroup, null);
     groups.selectedGroup = null;
+    settingsManager.isGroupOverlayDisabled = false;
   };
   groups.init = function () {
     // Might not be needed anymore

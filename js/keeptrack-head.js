@@ -37,7 +37,7 @@ db.init = (function (){
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.15.0';
+  settingsManager.versionNumber = '1.16.0';
   settingsManager.versionDate = 'August 5, 2020';
   if (window.location.host == 'keeptrack.space') {
     settingsManager.installDirectory = '/';
@@ -151,6 +151,9 @@ db.init = (function (){
           settingsManager.trusatOnly = true;
           settingsManager.trusatImages = true;
           settingsManager.tleSource = 'tle/trusat.json';
+          break;
+        case 'cpo':
+          settingsManager.copyrightOveride = true;
           break;
         case 'logo':
           settingsManager.isShowLogo = true;
@@ -320,6 +323,13 @@ db.init = (function (){
   }
   settingsManager.isDisableSatHoverBox = false;
 
+settingsManager.satShader = {};
+settingsManager.satShader.largeObjectMinZoom = 0.37;
+settingsManager.satShader.largeObjectMaxZoom = 0.58;
+settingsManager.satShader.minSize = 10.0;
+settingsManager.satShader.maxSize = 50.0;
+settingsManager.satShader.maxAllowedSize = 100.0;
+
   // /////////////////
   // Color Settings
   // /////////////////
@@ -328,13 +338,13 @@ db.init = (function (){
   settingsManager.reColorMinimumTime = 1000;
   settingsManager.colors = {};
   settingsManager.colors = JSON.parse(localStorage.getItem("settingsManager-colors"));
-  if (settingsManager.colors == null || settingsManager.colors.version !== '1.0.1') {
+  if (settingsManager.colors == null || settingsManager.colors.version !== '1.0.2') {
     settingsManager.colors = {};
-    settingsManager.colors.version = '1.0.1';
+    settingsManager.colors.version = '1.0.2';
     settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
     settingsManager.colors.starHi = [1.0, 1.0, 1.0, 1.0];
-    settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.16];
-    settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.08];
+    settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.35];
+    settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.15];
     settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
     settingsManager.colors.marker = [[0.2, 1.0, 1.0, 1.0],
                                      [1.0, 0.2, 1.0, 1.0],

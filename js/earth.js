@@ -22,7 +22,7 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 
 ATMOSPHERE_MAX = 108;
-ATMOSPHERE_MOD = RADIUS_OF_EARTH + 300
+ATMOSPHERE_MOD = RADIUS_OF_EARTH + 300;
 ATMOSPHERE_DIST = 4000;
 ATMOSPHERE_DIST_MOD = 5000;
 ATMOSPHERE_DIST_MIN = 200;
@@ -61,10 +61,11 @@ ATMOSPHERE_DIST_MIN = 200;
   earth.loaded = false;
 
   function onImageLoaded () {
+    console.log(texLoaded);
+    console.log(nightLoaded);
     if (texLoaded && nightLoaded) {
       loaded = true;
-      earth.loaded = true;
-      $('#loader-text').text('Drawing Dots in Space...');
+      earth.loaded = true;      
     }
   }
 
@@ -127,6 +128,8 @@ ATMOSPHERE_DIST_MIN = 200;
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        texLoaded = true;
+        onImageLoaded();
       };
     } else {
       imgHiRes = null;
@@ -159,9 +162,11 @@ ATMOSPHERE_DIST_MIN = 200;
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        nightLoaded = true;
+        onImageLoaded();
       };
     } else {
-      imgHiRes = null;
+      nightImgHiRes = null;
     }
 
     // generate a uvsphere bottom up, CCW order

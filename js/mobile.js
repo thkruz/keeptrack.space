@@ -93,22 +93,24 @@ var maxPinchSize = 1;
   mobile.checkMobileMode = function () {
     db.log('mobile.checkMobileMode');
     if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
-      settingsManager.isDisableSatHoverBox = true;
+      settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
+      settingsManager.enableHoverOverlay = false;
       settingsManager.isMobileModeEnabled = true;
       settingsManager.cameraMovementSpeed = 0.0001;
       settingsManager.cameraMovementSpeedMin = 0.0001;
-      if (settingsManager.isSlowCPUModeEnabled) {
+      if (settingsManager.isUseHigherFOVonMobile) {
         settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
       } else {
         settingsManager.fieldOfView = 0.6;
       }
       settingsManager.maxLabels = settingsManager.mobileMaxLabels;
     } else {
-      settingsManager.isDisableSatHoverBox = false;
+      settingsManager.maxOribtsDisplayed = settingsManager.maxOribtsDisplayedDesktop;
+      settingsManager.enableHoverOverlay = true;
       settingsManager.isMobileModeEnabled = false;
       settingsManager.cameraMovementSpeed = 0.003;
       settingsManager.cameraMovementSpeedMin = 0.005;
-      if (settingsManager.isSlowCPUModeEnabled) {
+      if (settingsManager.isUseHigherFOVonMobile) {
         settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
       } else {
         settingsManager.fieldOfView = 0.6;
@@ -130,7 +132,7 @@ var maxPinchSize = 1;
     $('#spinner').show();
     $('#mobile-start-button').hide();
     mobile.fullscreenToggle();
-    settingsManager.isDisableSatHoverBox = true;
+    settingsManager.enableHoverOverlay = false;
   };
 
   window.mobile = mobile;

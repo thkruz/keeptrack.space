@@ -9,74 +9,119 @@ const MINUTES_PER_DAY = 1440;
 const PLANETARIUM_DIST = 3;
 const MILLISECONDS_PER_DAY = 1.15741e-8;
 
-// Debug Mode
-var db = {}; //Global Debug Manager
-{
-  try {
-    db = JSON.parse(localStorage.getItem("db"));
-    if (db == null) reloadDb();
-    if (typeof db.enabled == 'undefined') reloadDb();
-  } catch (e) {
-    db = {};
-    db.enabled = false;
-    db.verbose = false;
-    localStorage.setItem("db", JSON.stringify(db));
-  }
-  db.init = (function (){
-    db.log = function (message, isVerbose) {
-      // Don't Log Verbose Stuff Normally
-      if (isVerbose && !db.verbose) return;
-
-      // If Logging is Enabled - Log It
-      if(db.enabled) {
-        console.log(message);
-      }
-    };
-    db.on = function () {
-      db.enabled = true;
-      console.log('db is now on!');
-      localStorage.setItem("db", JSON.stringify(db));
-    };
-    db.off = function () {
-      db.enabled = false;
-      console.log('db is now off!');
-      localStorage.setItem("db", JSON.stringify(db));
-    };
-  })();
-}
-
 // Settings Manager Setup
-(function () {
-  var settingsManager = {};
+{
+  let settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.17.1';
+  settingsManager.versionNumber = '1.17.3';
   settingsManager.versionDate = 'August 14, 2020';
-  if (window.location.host == 'keeptrack.space') {
-    settingsManager.installDirectory = '/';
-  }
-  else if (window.location.host == 'thkruz.github.io') {
-    settingsManager.installDirectory = '/keeptrack.space/';
-  }
-  else {
-    settingsManager.installDirectory = './';
-  }
 
-  // settingsManager.screenshotMode = true;
-
-  // let pathArray = window.location.pathname.split('/');
-  // for (var i = 0; i < pathArray.length - 1; i++) {
-  //   if (pathArray[i] != '/') {
-  //     settingsManager.installDirectory += pathArray[i] + '\/';
-  //   } else {
-  //     settingsManager.installDirectory = '/';
-  //   }
-  // }
+  // Install Folder Settings
+  {
+    switch (window.location.host) {
+      case 'keeptrack.space':
+        settingsManager.installDirectory = '/';
+        break;
+      case 'localhost':
+        // Comment Out the Next Three Lines if you are testing on a local server
+        // and have the keeptrack files installed in a subdirectory
+        settingsManager.installDirectory = '/';
+        break;
+      case 'thkruz.github.io':
+        settingsManager.installDirectory = '/keeptrack.space/';
+        break;
+    }
+    if (typeof settingsManager.installDirectory == 'undefined') {
+      // Put Your Custom Install Directory Here
+      settingsManager.installDirectory = '/keeptrack/';
+    }
+  }
 
   settingsManager.lowPerf = false;
-  settingsManager.maxFieldOfViewMarkers = 105000;
-  settingsManager.maxMissiles = 500;
-  settingsManager.maxAnalystSats = 256;
+
+  if (window.location.hostname === 'keeptrack.space' ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === 'thkruz.github.io') {
+    settingsManager.unofficial = false;
+  } else {
+    settingsManager.unofficial = true;
+  }
+
+  // //////////////////////////////////////////////////////////////////////////
+  // Most Commonly Used Settings
+  // //////////////////////////////////////////////////////////////////////////
+
+  // Adjust to change camera speed of auto rotate around earth
+  settingsManager.autoRotateSpeed = 1.0 * 0.000075;
+
+  settingsManager.disableUI = false;
+  settingsManager.disableNormalEvents = false;
+  settingsManager.enableLimitedUI = false;
+  // Allows canvas will steal focus on load
+  settingsManager.startWithFocus = false;
+  // Shows an overlay with object information
+  settingsManager.enableHoverOverlay = true;
+  // Shows the oribt of the object when highlighted
+  settingsManager.enableHoverOrbits = true;
+  // Automatically display all of the orbits
+  settingsManager.startWithOrbitsDisplayed = false;
+  // Maximum orbits allowed on fullsize screens
+  settingsManager.maxOribtsDisplayedDesktop = 100000;
+  // Maximum orbits allowed on smaller screens
+  settingsManager.maxOrbitsDisplayedMobile = 1500;
+  // Canvas will autoresize on screen resize to width/height of window
+  settingsManager.isAutoResizeCanvas = true;
+
+  settingsManager.fieldOfViewMin = 0.04; // 4 Degrees (I think)
+  settingsManager.fieldOfViewMax = 1.2; // 120 Degrees (I think)
+
+  settingsManager.minZoomDistance = 6800;
+  settingsManager.maxZoomDistance = 120000;
+
+  settingsManager.hoverColor = [1.0, 1.0, 0.0, 1.0]; // Yellow
+  settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0]; // Red
+
+  settingsManager.timeMachineDelay = 3000;
+
+  // Use to Override TLE Settings
+  // settingsManager.tleSource = settingsManager.installDirectory + 'tle/TLEdebris.json';
+
+  // //////////////////////////////////////////////////////////////////////////
+  // Mobile Settings
+  // //////////////////////////////////////////////////////////////////////////
+  settingsManager.desktopMinimumWidth = 1300;
+  settingsManager.isMobileModeEnabled = false;
+  if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
+    settingsManager.isMobileModeEnabled = true;
+    settingsManager.camDistBuffer = 3500;
+  }
+
+  // //////////////////////////////////////////////////////////////////////////
+  // Shader Settings
+  // //////////////////////////////////////////////////////////////////////////
+  settingsManager.showOrbitThroughEarth = false;
+
+  settingsManager.atmosphereSize = RADIUS_OF_EARTH + 200;
+  settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)';
+
+  settingsManager.satShader = {};
+  settingsManager.satShader.largeObjectMinZoom = 0.37;
+  settingsManager.satShader.largeObjectMaxZoom = 0.58;
+  settingsManager.satShader.minSize = 6.0;
+  settingsManager.satShader.isUseDynamicSizing = true;
+  settingsManager.satShader.dynamicSizeScalar = 0.9;
+  settingsManager.satShader.maxSize = 50.0;
+  settingsManager.satShader.maxAllowedSize = 100.0;
+  // NOTE: Use floats not integers because some settings get sent to graphics card
+  // Must be a string for GPU to read.
+  settingsManager.satShader.distanceBeforeGrow = '15000.0'; // Km allowed before grow
+  settingsManager.satShader.blurFactor1 = '0.53';
+  settingsManager.satShader.blurFactor2 = '0.5';
+
+  // //////////////////////////////////////////////////////////////////////////
+  // Map settings
+  // //////////////////////////////////////////////////////////////////////////
 
   settingsManager.nasaImages = false;
   settingsManager.blueImages = false;
@@ -85,102 +130,166 @@ var db = {}; //Global Debug Manager
   settingsManager.hiresNoCloudsImages = false;
   settingsManager.vectorImages = false;
 
-  if (window.location.hostname === 'keeptrack.space' ||
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === 'thkruz.github.io') {
-    settingsManager.offline = false;
-  } else {
-    settingsManager.offline = true;
-  }
-
-  let lastMap = localStorage.getItem("lastMap");
-  switch (lastMap) {
-    case 'blue':
+  // Load the previously saved map
+  {
+    let lastMap = localStorage.getItem("lastMap");
+    switch (lastMap) {
+      case 'blue':
       settingsManager.blueImages = true;
       break;
-    case 'nasa':
+      case 'nasa':
       settingsManager.nasaImages = true;
       break;
-    case 'low':
+      case 'low':
       settingsManager.lowresImages = true;
       break;
-    case 'trusat':
+      case 'trusat':
       settingsManager.trusatImages = true;
       break;
-    case 'high':
+      case 'high':
       settingsManager.hiresImages = true;
       break;
-    case 'high-nc':
+      case 'high-nc':
       settingsManager.hiresNoCloudsImages = true;
       break;
-    case 'vec':
+      case 'vec':
       settingsManager.vectorImages = true;
       break;
-    default:
+      default:
       settingsManager.lowresImages = true;
       break;
+    }
   }
 
-  settingsManager.minimumDrawDt = 0.1; // 20 FPS // 60 FPS = 0.01667;
+  // //////////////////////////////////////////////////////////////////////////
+  // Color Settings
+  // //////////////////////////////////////////////////////////////////////////
+  settingsManager.currentColorScheme = null;
 
-  (function initParseFromGETVariables () {
-    // This is an initial parse of the GET variables
-    // A satSet focused one happens later.
-    let queryStr = window.location.search.substring(1);
-    let params = queryStr.split('&');
-    for (let i = 0; i < params.length; i++) {
-      let key = params[i].split('=')[0];
-      let val = params[i].split('=')[1];
-      switch (key) {
-        case 'lowperf':
-          settingsManager.lowPerf = true;
-          settingsManager.maxFieldOfViewMarkers = 1;
-          break;
-        case 'hires':
-          settingsManager.hiresImages = true;
-          settingsManager.minimumDrawDt = 0.01667;
-          break;
-        case 'vec':
-          settingsManager.vectorImages = true;
-          break;
-        case 'retro':
-          settingsManager.retro = true;
-          settingsManager.tleSource = 'tle/retro.json';
-          break;
-        case 'offline':
-          settingsManager.offline = true;
-          break;
-        case 'debris':
-          settingsManager.tleSource = 'tle/TLEdebris.json';
-          break;
-        case 'mw':
-          settingsManager.tleSource = 'tle/mw.json';
-          break;
-        case 'trusat':
-          db.log('TruSat Overlay Mode Initializing');
-          settingsManager.trusatMode = true;
-          settingsManager.trusatImages = true;
-          break;
-        case 'trusat-only':
-          db.log('TruSat Only Mode Initializing');
-          settingsManager.trusatMode = true;
-          settingsManager.trusatOnly = true;
-          settingsManager.trusatImages = true;
-          settingsManager.tleSource = 'tle/trusat.json';
-          break;
-        case 'cpo':
-          settingsManager.copyrightOveride = true;
-          break;
-        case 'logo':
-          settingsManager.isShowLogo = true;
-          break;
-        case 'noPropRate':
-          settingsManager.isAlwaysHidePropRate = true;
-          break;
-        }
-      }
-    })();
+  settingsManager.reColorMinimumTime = 1000;
+  settingsManager.colors = {};
+  settingsManager.colors = JSON.parse(localStorage.getItem("settingsManager-colors"));
+  if (settingsManager.colors == null || settingsManager.colors.version !== '1.0.2') {
+    settingsManager.colors = {};
+    settingsManager.colors.version = '1.0.2';
+    settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
+    settingsManager.colors.starHi = [1.0, 1.0, 1.0, 1.0];
+    settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.35];
+    settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.15];
+    settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
+    settingsManager.colors.marker = [[0.2, 1.0, 1.0, 1.0],
+                                     [1.0, 0.2, 1.0, 1.0],
+                                     [1.0, 1.0, 0.2, 1.0],
+                                     [0.2, 0.2, 1.0, 1.0],
+                                     [0.2, 1.0, 0.2, 1.0],
+                                     [1.0, 0.2, 0.2, 1.0],
+                                     [0.5, 0.6, 1.0, 1.0],
+                                     [0.6, 0.5, 1.0, 1.0],
+                                     [1.0, 0.6, 0.5, 1.0],
+                                     [1.0, 1.0, 1.0, 1.0],
+                                     [0.2, 1.0, 1.0, 1.0],
+                                     [1.0, 0.2, 1.0, 1.0],
+                                     [1.0, 1.0, 0.2, 1.0],
+                                     [0.2, 0.2, 1.0, 1.0],
+                                     [0.2, 1.0, 0.2, 1.0],
+                                     [1.0, 0.2, 0.2, 1.0],
+                                     [0.5, 0.6, 1.0, 1.0],
+                                     [0.6, 0.5, 1.0, 1.0],];
+    settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
+    settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
+    settingsManager.colors.inviewAlt = [0.2, 0.4, 1.0, 1];
+    settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
+    settingsManager.colors.rocketBody = [0.2, 0.4, 1.0, 1];
+    if (settingsManager.trusatOnly) {
+      settingsManager.colors.debris = [0.9, 0.9, 0.9, 1];
+    } else {
+      settingsManager.colors.debris = [0.5, 0.5, 0.5, 1];
+    }
+    settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
+    settingsManager.colors.trusat = [1.0, 0.0, 0.6, 1.0];
+    settingsManager.colors.analyst = [1.0, 1.0, 1.0, 0.8];
+    settingsManager.colors.missile = [1.0, 1.0, 0.0, 1.0];
+    settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];
+    settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.1];
+    settingsManager.colors.satHi = [1.0, 1.0, 1.0, 1.0];
+    settingsManager.colors.satMed = [1.0, 1.0, 1.0, 0.8];
+    settingsManager.colors.satLow = [1.0, 1.0, 1.0, 0.6];
+    settingsManager.colors.sunlightInview = [0.85, 0.5, 0.0, 1.0];
+    settingsManager.colors.penumbral = [1.0, 1.0, 1.0, 0.3];
+    settingsManager.colors.umbral = [1.0, 1.0, 1.0, 0.1];
+    // DEBUG Colors
+    // settingsManager.colors.sunlight = [0.2, 0.4, 1.0, 1];;
+    // settingsManager.colors.penumbral = [0.5, 0.5, 0.5, 0.85];
+    // settingsManager.colors.umbral = [0.2, 1.0, 0.0, 0.5];
 
+    settingsManager.colors.gradientAmt = 0;
+    // Gradients Must be Edited in color-scheme.js
+    // settingsManager.colors.apogeeGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
+    // settingsManager.colors.velGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
+    settingsManager.colors.satSmall = [0.2, 1.0, 0.0, 0.65];
+    settingsManager.colors.rcsSmall = [1.0, 0, 0, 0.6];
+    settingsManager.colors.rcsMed = [0.2, 0.4, 1.0, 1];
+    settingsManager.colors.rcsLarge = [0, 1.0, 0, 0.6];
+    settingsManager.colors.rcsUnknown = [1.0, 1.0, 0, 0.6];
+    settingsManager.colors.ageNew = [0, 1.0, 0, 0.9];
+    settingsManager.colors.ageMed = [1.0, 1.0, 0.0, 0.9];
+    settingsManager.colors.ageOld = [1.0, 0.6, 0, 0.9];
+    settingsManager.colors.ageLost = [1.0, 0.0, 0, 0.9];
+    settingsManager.colors.lostobjects = [0.2, 1.0, 0.0, 0.65];
+    settingsManager.colors.satLEO = [0.2, 1.0, 0.0, 0.65];
+    settingsManager.colors.satGEO = [0.2, 1.0, 0.0, 0.65];
+    settingsManager.colors.inGroup = [1.0, 0.0, 0.0, 1.0];
+    settingsManager.colors.countryPRC = [1.0, 0, 0, 0.6];
+    settingsManager.colors.countryUS = [0.2, 0.4, 1.0, 1];
+    settingsManager.colors.countryCIS = [1.0, 1.0, 1.0, 1.0];
+    settingsManager.colors.countryOther = [0, 1.0, 0, 0.6];
+    localStorage.setItem("settingsManager-colors", JSON.stringify(settingsManager.colors));
+  }
+
+  // //////////////////////////////////////////////////////////////////////////
+  // Orbit Color Settings
+  // //////////////////////////////////////////////////////////////////////////
+  settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 0.9];
+  settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];
+  // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0];
+  settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.6]; // WHITE
+  // settingsManager.orbitInViewColor = [1.0, 1.0, 0.0, 1.0]; // Applies to Planetarium View
+  //settingsManager.orbitGroupColor = [0.3, 0.5, 1.0, 0.4];
+  settingsManager.orbitGroupColor = [0.3, 1.0, 1.0, 0.4];
+
+  // //////////////////////////////////////////////////////////////////////////
+  // UI Settings
+  // //////////////////////////////////////////////////////////////////////////
+  settingsManager.nextNPassesCount = 5;
+
+  settingsManager.minimumSearchCharacters = 2; // Searches after 3 characters typed
+  settingsManager.searchLimit = 400;
+
+  settingsManager.cameraMovementSpeed = 0.003;
+  settingsManager.cameraMovementSpeedMin = 0.005;
+
+  settingsManager.fpsForwardSpeed = 3;
+  settingsManager.fpsSideSpeed = 3;
+  settingsManager.fpsVertSpeed = 3;
+  settingsManager.fpsPitchRate = 0.02;
+  settingsManager.fpsYawRate = 0.02;
+  settingsManager.fpsRotateRate = 0.02;
+
+  settingsManager.gpsElevationMask = 15;
+  settingsManager.daysUntilObjectLost = 60;
+
+  settingsManager.mobileMaxLabels = 100;
+  settingsManager.desktopMaxLabels = 20000;
+  settingsManager.maxLabels = 20000;
+
+  settingsManager.isAlwaysHidePropRate = false;
+
+  settingsManager.maxFieldOfViewMarkers = 105000;
+  settingsManager.maxMissiles = 500;
+  settingsManager.maxAnalystSats = 256;
+
+  // Information Overlay Color Settings
+  settingsManager.redTheme = false;
   settingsManager.themes = {};
   settingsManager.isThemesNeeded = false;
   settingsManager.themes.currentTheme = 'Blue';
@@ -250,28 +359,29 @@ var db = {}; //Global Debug Manager
     settingsManager.themes.currentTheme = 'Blue';
   };
 
+  // //////////////////////////////////////////////////////////////////////////
+  // Advanced Settings Below This Point
+  // Feel free to change these, but they could break something
+  // //////////////////////////////////////////////////////////////////////////
+
+  // Frames Per Second Limiter
+  settingsManager.minimumDrawDt = 0.0; // 20 FPS // 60 FPS = 0.01667;
+
+  settingsManager.camDistBuffer = 2000;
+  settingsManager.zNear = 20.0;
+  settingsManager.zFar = 500000.0;
+
+  // //////////////////////////////////////////////////////////////////////////
+  // Defaults that should never be changed
+  // //////////////////////////////////////////////////////////////////////////
+
+  settingsManager.fieldOfView = 0.6;
+
+  // Determines if the Loading is complete
   settingsManager.shadersReady = false;
   settingsManager.cruncherReady = false;
 
   settingsManager.lkVerify = Date.now();
-
-  settingsManager.redTheme = false;
-
-// Adjust to change camera speed of auto rotate around earth
-  settingsManager.autoRotateSpeed = 1.0 * 0.000075;
-
-  settingsManager.disableUI = false;
-  settingsManager.disableNormalEvents = false;
-  settingsManager.enableLimitedUI = false;
-  settingsManager.enableHoverOverlay = true;
-  settingsManager.enableHoverOrbits = true;
-  settingsManager.startWithOrbitsDisplayed = false;
-  settingsManager.startWithFocus = true;
-
-  // Use to Override TLE Settings
-  // settingsManager.tleSource = settingsManager.installDirectory + 'tle/TLEdebris.json';
-
-  settingsManager.isFullscreenApplication = true;
 
   // If No UI Reduce Overhead
   if (settingsManager.disableUI) {
@@ -280,32 +390,14 @@ var db = {}; //Global Debug Manager
     settingsManager.maxMissiles = 1;
     settingsManager.maxAnalystSats = 1;
   }
-
   settingsManager.limitSats = '';
-  settingsManager.searchLimit = 400;
-
-  settingsManager.fieldOfView = 0.6;
-  settingsManager.fieldOfViewMin = 0.04; // 4 Degrees (I think)
-  settingsManager.fieldOfViewMax = 1.2; // 120 Degrees (I think)
-
   settingsManager.geolocation = {};
   settingsManager.geolocationUsed = false;
-
   settingsManager.mapWidth = 800;
   settingsManager.mapHeight = 600;
-
-  settingsManager.hoverColor = [1.0, 1.0, 0.0, 1.0]; // Yellow
-  settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0]; // Red
-
-  settingsManager.minimumSearchCharacters = 2; // Searches after 3 characters typed
-
   settingsManager.currentLegend = 'default';
-
-  settingsManager.nextNPassesCount = 5;
-
-  settingsManager.timeMachineDelay = 3000;
-
   settingsManager.socratesOnSatCruncher = null;
+  settingsManager.queuedScreenshot = false;
 
   settingsManager.vertShadersSize = 12;
   settingsManager.isEditTime = false;
@@ -323,168 +415,107 @@ var db = {}; //Global Debug Manager
   settingsManager.isSatOverflyModeOn = false;
   settingsManager.isFOVBubbleModeOn = false;
 
-  settingsManager.mobileMaxLabels = 100;
-  settingsManager.desktopMaxLabels = 20000;
-  settingsManager.maxLabels = 20000;
-
-  settingsManager.queuedScreenshot = false;
-
-  settingsManager.isAlwaysHidePropRate = false;
-
   settingsManager.isMapUpdateOverride = false;
   settingsManager.lastMapUpdateTime = 0;
 
-  settingsManager.cameraMovementSpeed = 0.003;
-  settingsManager.cameraMovementSpeedMin = 0.005;
-
-  settingsManager.gpsElevationMask = 15;
-
-  settingsManager.minZoomDistance = 6800;
-  settingsManager.maxZoomDistance = 120000;
-
-  settingsManager.fpsForwardSpeed = 3;
-  settingsManager.fpsSideSpeed = 3;
-  settingsManager.fpsVertSpeed = 3;
-  settingsManager.fpsPitchRate = 0.02;
-  settingsManager.fpsYawRate = 0.02;
-  settingsManager.fpsRotateRate = 0.02;
-
-  settingsManager.daysUntilObjectLost = 60;
-
-  settingsManager.camDistBuffer = 2000;
-
-  settingsManager.zNear = 20.0;
-  settingsManager.zFar = 500000.0;
-
-  // /////////////////
-  // Mobile Settings
-  // /////////////////
-  settingsManager.desktopMinimumWidth = 1300;
-  settingsManager.isMobileModeEnabled = false;
-  if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
-    settingsManager.isMobileModeEnabled = true;
-    settingsManager.camDistBuffer = 3500;
-    // settingsManager.cameraMovementSpeed = 0.0001;
-    // settingsManager.cameraMovementSpeedMin = 0.0001;
-  }
-  settingsManager.isDisableSatHoverBox = false;
-
-settingsManager.showOrbitThroughEarth = false;
-
-settingsManager.atmosphereSize = RADIUS_OF_EARTH + 200;
-settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)';
-
-settingsManager.satShader = {};
-settingsManager.satShader.largeObjectMinZoom = 0.37;
-settingsManager.satShader.largeObjectMaxZoom = 0.58;
-settingsManager.satShader.minSize = 3.0;
-settingsManager.satShader.maxSize = 50.0;
-settingsManager.satShader.maxAllowedSize = 100.0;
-// NOTE: Use floats not integers because some settings get sent to graphics card
-// Must be a string for GPU to read.
-settingsManager.satShader.distanceBeforeGrow = '15000.0'; // Km allowed before grow
-settingsManager.satShader.blurFactor1 = '0.53';
-settingsManager.satShader.blurFactor2 = '0.5';
-
-  // /////////////////
-  // Color Settings
-  // /////////////////
-  settingsManager.currentColorScheme = null;
-
-  settingsManager.reColorMinimumTime = 1000;
-  settingsManager.colors = {};
-  settingsManager.colors = JSON.parse(localStorage.getItem("settingsManager-colors"));
-  if (settingsManager.colors == null || settingsManager.colors.version !== '1.0.2') {
-    settingsManager.colors = {};
-    settingsManager.colors.version = '1.0.2';
-    settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
-    settingsManager.colors.starHi = [1.0, 1.0, 1.0, 1.0];
-    settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.35];
-    settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.15];
-    settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
-    settingsManager.colors.marker = [[0.2, 1.0, 1.0, 1.0],
-                                     [1.0, 0.2, 1.0, 1.0],
-                                     [1.0, 1.0, 0.2, 1.0],
-                                     [0.2, 0.2, 1.0, 1.0],
-                                     [0.2, 1.0, 0.2, 1.0],
-                                     [1.0, 0.2, 0.2, 1.0],
-                                     [0.5, 0.6, 1.0, 1.0],
-                                     [0.6, 0.5, 1.0, 1.0],
-                                     [1.0, 0.6, 0.5, 1.0],
-                                     [1.0, 1.0, 1.0, 1.0],
-                                     [0.2, 1.0, 1.0, 1.0],
-                                     [1.0, 0.2, 1.0, 1.0],
-                                     [1.0, 1.0, 0.2, 1.0],
-                                     [0.2, 0.2, 1.0, 1.0],
-                                     [0.2, 1.0, 0.2, 1.0],
-                                     [1.0, 0.2, 0.2, 1.0],
-                                     [0.5, 0.6, 1.0, 1.0],
-                                     [0.6, 0.5, 1.0, 1.0],];
-    settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
-    settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
-    settingsManager.colors.inviewAlt = [0.2, 0.4, 1.0, 1];
-    settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
-    settingsManager.colors.rocketBody = [0.2, 0.4, 1.0, 1];
-    if (settingsManager.trusatOnly) {
-      settingsManager.colors.debris = [0.9, 0.9, 0.9, 1];
-    } else {
-      settingsManager.colors.debris = [0.5, 0.5, 0.5, 1];
-    }
-    settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
-    settingsManager.colors.trusat = [1.0, 0.0, 0.6, 1.0];
-    settingsManager.colors.analyst = [1.0, 1.0, 1.0, 0.8];
-    settingsManager.colors.missile = [1.0, 1.0, 0.0, 1.0];
-    settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];
-    settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.1];
-    settingsManager.colors.satHi = [1.0, 1.0, 1.0, 1.0];
-    settingsManager.colors.satMed = [1.0, 1.0, 1.0, 0.8];
-    settingsManager.colors.satLow = [1.0, 1.0, 1.0, 0.6];
-    settingsManager.colors.sunlightInview = [0.85, 0.5, 0.0, 1.0];
-    settingsManager.colors.penumbral = [1.0, 1.0, 1.0, 0.3];
-    settingsManager.colors.umbral = [1.0, 1.0, 1.0, 0.1];
-    // DEBUG Colors
-    // settingsManager.colors.sunlight = [0.2, 0.4, 1.0, 1];;
-    // settingsManager.colors.penumbral = [0.5, 0.5, 0.5, 0.85];
-    // settingsManager.colors.umbral = [0.2, 1.0, 0.0, 0.5];
-    //
-    settingsManager.colors.gradientAmt = 0;
-    // Gradients Must be Edited in color-scheme.js
-    // settingsManager.colors.apogeeGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
-    // settingsManager.colors.velGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
-    settingsManager.colors.satSmall = [0.2, 1.0, 0.0, 0.65];
-    settingsManager.colors.rcsSmall = [1.0, 0, 0, 0.6];
-    settingsManager.colors.rcsMed = [0.2, 0.4, 1.0, 1];
-    settingsManager.colors.rcsLarge = [0, 1.0, 0, 0.6];
-    settingsManager.colors.rcsUnknown = [1.0, 1.0, 0, 0.6];
-    settingsManager.colors.ageNew = [0, 1.0, 0, 0.9];
-    settingsManager.colors.ageMed = [1.0, 1.0, 0.0, 0.9];
-    settingsManager.colors.ageOld = [1.0, 0.6, 0, 0.9];
-    settingsManager.colors.ageLost = [1.0, 0.0, 0, 0.9];
-    settingsManager.colors.lostobjects = [0.2, 1.0, 0.0, 0.65];
-    settingsManager.colors.satLEO = [0.2, 1.0, 0.0, 0.65];
-    settingsManager.colors.satGEO = [0.2, 1.0, 0.0, 0.65];
-    settingsManager.colors.inGroup = [1.0, 0.0, 0.0, 1.0];
-    settingsManager.colors.countryPRC = [1.0, 0, 0, 0.6];
-    settingsManager.colors.countryUS = [0.2, 0.4, 1.0, 1];
-    settingsManager.colors.countryCIS = [1.0, 1.0, 1.0, 1.0];
-    settingsManager.colors.countryOther = [0, 1.0, 0, 0.6];
-    localStorage.setItem("settingsManager-colors", JSON.stringify(settingsManager.colors));
-  }
-
-  // /////////////////
-  // Orbit Color Settings
-  // /////////////////
-  settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 0.9];
-  settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];
-  // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0];
-  settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.6]; // WHITE
-  // settingsManager.orbitInViewColor = [1.0, 1.0, 0.0, 1.0]; // Applies to Planetarium View
-  //settingsManager.orbitGroupColor = [0.3, 0.5, 1.0, 0.4];
-  settingsManager.orbitGroupColor = [0.3, 1.0, 1.0, 0.4];
-
-
+  // Export settingsManager to everyone else
   window.settingsManager = settingsManager;
-})();
+}
+
+// This is an initial parse of the GET variables
+// to determine critical settings. Other variables are checked later during
+// satSet.init
+(function initParseFromGETVariables () {
+  let queryStr = window.location.search.substring(1);
+  let params = queryStr.split('&');
+  for (let i = 0; i < params.length; i++) {
+    let key = params[i].split('=')[0];
+    let val = params[i].split('=')[1];
+    switch (key) {
+      case 'lowperf':
+        settingsManager.lowPerf = true;
+        settingsManager.maxFieldOfViewMarkers = 1;
+        break;
+      case 'hires':
+        settingsManager.hiresImages = true;
+        settingsManager.minimumDrawDt = 0.01667;
+        break;
+      case 'vec':
+        settingsManager.vectorImages = true;
+        break;
+      case 'retro':
+        settingsManager.retro = true;
+        settingsManager.tleSource = 'tle/retro.json';
+        break;
+      case 'offline':
+        settingsManager.offline = true;
+        break;
+      case 'debris':
+        settingsManager.tleSource = 'tle/TLEdebris.json';
+        break;
+      case 'mw':
+        settingsManager.tleSource = 'tle/mw.json';
+        break;
+      case 'trusat':
+        db.log('TruSat Overlay Mode Initializing');
+        settingsManager.trusatMode = true;
+        settingsManager.trusatImages = true;
+        break;
+      case 'trusat-only':
+        db.log('TruSat Only Mode Initializing');
+        settingsManager.trusatMode = true;
+        settingsManager.trusatOnly = true;
+        settingsManager.trusatImages = true;
+        settingsManager.tleSource = 'tle/trusat.json';
+        break;
+      case 'cpo':
+        settingsManager.copyrightOveride = true;
+        break;
+      case 'logo':
+        settingsManager.isShowLogo = true;
+        break;
+      case 'noPropRate':
+        settingsManager.isAlwaysHidePropRate = true;
+        break;
+      }
+    }
+  })();
+
+//Global Debug Manager
+let db = {};
+{
+  try {
+    db = JSON.parse(localStorage.getItem("db"));
+    if (db == null) reloadDb();
+    if (typeof db.enabled == 'undefined') reloadDb();
+  } catch (e) {
+    db = {};
+    db.enabled = false;
+    db.verbose = false;
+    localStorage.setItem("db", JSON.stringify(db));
+  }
+  db.init = (function (){
+    db.log = function (message, isVerbose) {
+      // Don't Log Verbose Stuff Normally
+      if (isVerbose && !db.verbose) return;
+
+      // If Logging is Enabled - Log It
+      if(db.enabled) {
+        console.log(message);
+      }
+    };
+    db.on = function () {
+      db.enabled = true;
+      console.log('db is now on!');
+      localStorage.setItem("db", JSON.stringify(db));
+    };
+    db.off = function () {
+      db.enabled = false;
+      console.log('db is now off!');
+      localStorage.setItem("db", JSON.stringify(db));
+    };
+  })();
+}
 
 // Try to Make Older Versions of Jquery Work
 if (typeof $ == 'undefined') {
@@ -495,21 +526,17 @@ if (typeof $ == 'undefined') {
 
 // Import CSS needed for loading screen
 if (!settingsManager.disableUI) {
-  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/loading-screen.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-  // Import Fonts
-  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/fonts.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-  // Import Materialize CSS
-  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/materialize.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/materialize-local.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-  // Import Bootstrap Color Picker
-  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'js/lib/colorPick.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-  // Import Modules Style Sheets
-  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'modules/nextLaunchManager.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-
-  // Load jquery CSS
-  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/perfect-scrollbar.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/jquery-ui.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/jquery-ui-timepicker-addon.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+  document.write(`
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/loading-screen.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/fonts.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize-local.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}js/lib/colorPick.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}modules/nextLaunchManager.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/perfect-scrollbar.min.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/jquery-ui.min.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/jquery-ui-timepicker-addon.css?v=${settingsManager.versionNumber}" type="text/css"\>
+  `);
 } else if (settingsManager.enableLimitedUI) {
   document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/limitedUI.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
 }

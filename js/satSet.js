@@ -703,7 +703,7 @@ var satSensorMarkerArray = [];
     gl.uniform1f(dotShader.maxSize, settingsManager.satShader.maxSize);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, starBufData, gl.STREAM_DRAW);
+    gl.enableVertexAttribArray(dotShader.aStar);
     gl.vertexAttribPointer(dotShader.aStar, 1, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, satPosBuf);

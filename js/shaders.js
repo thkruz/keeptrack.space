@@ -190,14 +190,14 @@
 
         void main(void) {
           vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
-          if (aStar < 0.5) {
-            gl_PointSize = min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize), maxSize) * 1.0;
-          } else {
-            gl_PointSize = 15.0;
+          float drawSize = 15.0;
+          if (aStar <= 0.5) {
+            drawSize = min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize), maxSize) * 1.0;
           }
+          gl_PointSize = drawSize;
           gl_Position = position;
           vColor = aColor;
-          vStar = aStar;
+          vStar = 1.0;
         }
       `
     }, {

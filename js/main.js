@@ -104,6 +104,7 @@ var dragHasMoved = false;
 var isPinching = false;
 var deltaPinchDistance = 0;
 var startPinchDistance = 0;
+var touchStartTime;
 
 var fpsEl;
 var fpsAz;
@@ -157,6 +158,38 @@ var drawLoopCallback;
       settingsManager.tleSource = 'tle/TLE.json';
     }
     webGlInit();
+    mobile.checkMobileMode();
+    (function _resizeWindow () {
+      db.log('_resizeWindow');
+      mobile.checkMobileMode();
+      var resizing = false;
+      $(window).on("resize", function () {
+        if (!settingsManager.disableUI) {
+          uiManager.resize2DMap();
+        }
+        mobile.checkMobileMode();
+        if (!settingsManager.disableUI) {
+          if (settingsManager.screenshotMode) {
+            bodyDOM.css('overflow','visible');
+            $('#canvas-holder').css('overflow','visible');
+            $('#canvas-holder').width = 3840;
+            $('#canvas-holder').height = 2160;
+            bodyDOM.width = 3840;
+            bodyDOM.height = 2160;
+          } else {
+            bodyDOM.css('overflow','hidden');
+            $('#canvas-holder').css('overflow','hidden');
+          }
+        }
+        if (!resizing) {
+          window.setTimeout(function () {
+            resizing = false;
+            webGlInit();
+          }, 500);
+        }
+        resizing = true;
+      });
+    })();
     atmosphere.init();
     sun.init();
     moon.init();
@@ -339,6 +372,20 @@ var drawLoopCallback;
           })();
         }, 300);
 
+        if (settingsManager.startWithOrbitsDisplayed) {
+          setTimeout(function () {
+            // Time Machine
+            // orbitManager.historyOfSatellitesPlay();
+
+            // All Orbits
+            groups.debris = new groups.SatGroup('all', '');
+            groups.selectGroup(groups.debris);
+            satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+            groups.debris.updateOrbits();
+            isOrbitOverlay = true;
+          }, 5000);
+        }
+
         if ($(window).width() > $(window).height()) {
           settingsManager.mapHeight = $(window).width(); // Subtract 12 px for the scroll
           $('#map-image').width(settingsManager.mapHeight);
@@ -378,7 +425,7 @@ var drawLoopCallback;
           // settingsManager.isMobileModeEnabled = true;
           // settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
           // webGlInit();
-          // settingsManager.isDisableSatHoverBox = true;
+          // !settingsManager.enableHoverOverlay = true;
           // enableSlowCPUMode();
         }
       }
@@ -974,7 +1021,7 @@ var drawLoopCallback;
       orbitManager.addInViewOrbit(i);
 
       // Draw Sat Labels
-      // if (settingsManager.isDisableSatHoverBox) continue;
+      // if (!settingsManager.enableHoverOverlay) continue;
       satHoverMiniDOM = document.createElement("div");
       satHoverMiniDOM.id = 'sat-minibox-' + i;
       satHoverMiniDOM.textContent = sat.SCC_NUM;
@@ -999,7 +1046,7 @@ var drawLoopCallback;
       return;
     }
     if (satId === -1) {
-      if (!isHoverBoxVisible || settingsManager.isDisableSatHoverBox) return;
+      if (!isHoverBoxVisible || !settingsManager.enableHoverOverlay) return;
       if (objectManager.isStarManagerLoaded) {
         if (starManager.isConstellationVisible === true && !starManager.isAllConstellationVisible) starManager.clearConstellations();
       }
@@ -1007,7 +1054,7 @@ var drawLoopCallback;
       satHoverBoxDOM.css({display: 'none'});
       canvasDOM.css({cursor: 'default'});
       isHoverBoxVisible = false;
-    } else if (!isDragging && !settingsManager.isDisableSatHoverBox) {
+    } else if (!isDragging && !!settingsManager.enableHoverOverlay) {
       var sat = satSet.getSatExtraOnly(satId);
       var selectedSatData = satSet.getSatExtraOnly(selectedSat);
       isHoverBoxVisible = true;
@@ -1134,7 +1181,9 @@ function webGlInit () {
     dpi = settingsManager.dpi;
   } else {
     dpi = window.devicePixelRatio;
+    settingsManager.dpi = dpi;
   }
+  console.log(settingsManager.dpi);
 
   _fixDpi(can,dpi);
 
@@ -1142,14 +1191,20 @@ function webGlInit () {
     can.width = settingsManager.hiResWidth;
     can.height = settingsManager.hiResHeight;
   } else {
-    if (settingsManager.isFullscreenApplication) {
+    if (settingsManager.isAutoResizeCanvas) {
       can.width = document.body.clientWidth;
       can.height = window.innerHeight;
     }
   }
 
+  if (settingsManager.satShader.isUseDynamicSizing) {
+    console.log(can.width);
+    settingsManager.satShader.dynamicSize = 1920/can.width * settingsManager.satShader.dynamicSizeScalar * settingsManager.dpi;
+    settingsManager.satShader.minSize = Math.max(settingsManager.satShader.minSize,settingsManager.satShader.dynamicSize);
+  }
+
   // Desynchronized Fixed Jitter on Old Computer
-  var gl = can.getContext('webgl', {alpha: false, desynchronized: true}) || can.getContext('experimental-webgl', {alpha: false, desynchronized: true});
+  gl = can.getContext('webgl', {alpha: false, desynchronized: true}) || can.getContext('experimental-webgl', {alpha: false, desynchronized: true});
   if (!gl) {
     browserUnsupported();
   }
@@ -1978,7 +2033,7 @@ function drawLines () {
     canvasDOM.on("click", function (evt) {
       if (settingsManager.disableNormalEvents) { evt.preventDefault(); }
       rightBtnMenuDOM.hide();
-      _clearRMBSubMenu();
+      uiManager.clearRMBSubMenu();
       if ($('#colorbox').css('display') === 'block') {
         $.colorbox.close(); // Close colorbox if it was open
       }
@@ -2001,9 +2056,11 @@ function drawLines () {
       // debugLine.set(dragPoint, getCamPos());
       isDragging = true;
       camSnapMode = false;
-      rotateTheEarth = false;
+      if (!settingsManager.disableUI) {
+        rotateTheEarth = false;
+      }
       rightBtnMenuDOM.hide();
-      _clearRMBSubMenu();
+      uiManager.clearRMBSubMenu();
 
       // TODO: Make uiManager.updateURL() a setting that is disabled by default
       uiManager.updateURL();
@@ -2034,7 +2091,9 @@ function drawLines () {
         //   isDragging = false;
         // }
         camSnapMode = false;
-        rotateTheEarth = false;
+        if (!settingsManager.disableUI) {
+          rotateTheEarth = false;
+        }
 
         // TODO: Make updateUrl() a setting that is disabled by default
         uiManager.updateURL();
@@ -2064,7 +2123,9 @@ function drawLines () {
       settingsManager.themes.redThemeSearch();
       dragHasMoved = false;
       isDragging = false;
-      rotateTheEarth = false;
+      if (!settingsManager.disableUI) {
+        rotateTheEarth = false;
+      }
     });
   }
 
@@ -2229,7 +2290,9 @@ function drawLines () {
     mouseX = 0;
     dragHasMoved = false;
     isDragging = false;
-    rotateTheEarth = false;
+    if (!settingsManager.disableUI) {
+      rotateTheEarth = false;
+    }
   });
 
   $('#nav-wrapper *').on("click", function (evt) { _hidePopUps(); });
@@ -2239,7 +2302,7 @@ function drawLines () {
   $('#ui-wrapper *').on("click", function (evt) { _hidePopUps(); });
   function _hidePopUps () {
     rightBtnMenuDOM.hide();
-    _clearRMBSubMenu();
+    uiManager.clearRMBSubMenu();
     if ($('#colorbox').css('display') === 'block') {
       $.colorbox.close(); // Close colorbox if it was open
     }
@@ -2251,9 +2314,9 @@ function drawLines () {
   }
 
   if (!settingsManager.disableUI) {
-    bodyDOM.on('keypress', _keyHandler); // On Key Press Event Run _keyHandler Function
-    bodyDOM.on('keydown', _keyDownHandler); // On Key Press Event Run _keyHandler Function
-    bodyDOM.on('keyup', _keyUpHandler); // On Key Press Event Run _keyHandler Function
+    bodyDOM.on('keypress', uiManager.keyHandler); // On Key Press Event Run _keyHandler Function
+    bodyDOM.on('keydown', uiManager.keyDownHandler); // On Key Press Event Run _keyHandler Function
+    bodyDOM.on('keyup', uiManager.keyUpHandler); // On Key Press Event Run _keyHandler Function
 
     rightBtnMenuDOM.on("click", function (e) {
       _rmbMenuActions(e);
@@ -2281,7 +2344,7 @@ function drawLines () {
     });
 
     rightBtnSaveDOM.hover(function () {
-      _clearRMBSubMenu();
+      uiManager.clearRMBSubMenu();
       var offsetX = (rightBtnSaveDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
       rightBtnSaveMenuDOM.css({
         display: 'block',
@@ -2301,7 +2364,7 @@ function drawLines () {
     });
 
     rightBtnViewDOM.hover(function () {
-      _clearRMBSubMenu();
+      uiManager.clearRMBSubMenu();
       var offsetX = (rightBtnViewDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
       rightBtnViewMenuDOM.css({
         display: 'block',
@@ -2321,7 +2384,7 @@ function drawLines () {
     });
 
     rightBtnEditDOM.hover(function () {
-      _clearRMBSubMenu();
+      uiManager.clearRMBSubMenu();
 
       var offsetX = (rightBtnEditDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
       rightBtnEditMenuDOM.css({
@@ -2342,7 +2405,7 @@ function drawLines () {
     });
 
     rightBtnCreateDOM.hover(function () {
-      _clearRMBSubMenu();
+      uiManager.clearRMBSubMenu();
 
       var offsetX = (rightBtnCreateDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
       rightBtnCreateMenuDOM.css({
@@ -2363,7 +2426,7 @@ function drawLines () {
     });
 
     rightBtnDrawDOM.hover(function () {
-      _clearRMBSubMenu();
+      uiManager.clearRMBSubMenu();
       var offsetX = (rightBtnDrawDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
       rightBtnDrawMenuDOM.css({
         display: 'block',
@@ -2383,7 +2446,7 @@ function drawLines () {
     });
 
     rightBtnColorsDOM.hover(function () {
-      _clearRMBSubMenu();
+      uiManager.clearRMBSubMenu();
       var offsetX = (rightBtnColorsDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
       rightBtnColorsMenuDOM.css({
         display: 'block',
@@ -2403,7 +2466,7 @@ function drawLines () {
     });
 
     rightBtnEarthDOM.hover(function () {
-      _clearRMBSubMenu();
+      uiManager.clearRMBSubMenu();
       var offsetX = (rightBtnEarthDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
       rightBtnEarthMenuDOM.css({
         display: 'block',
@@ -2692,6 +2755,6 @@ function drawLines () {
         break;
       }
       rightBtnMenuDOM.hide();
-      _clearRMBSubMenu();
+      uiManager.clearRMBSubMenu();
   }
 })();

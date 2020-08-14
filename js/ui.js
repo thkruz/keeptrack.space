@@ -85,8 +85,6 @@ var isAnalysisMenuOpen = false;
 var updateInterval = 1000;
 var speedModifier = 1;
 
-var touchStartTime;
-
 (function () {
   var lastBoxUpdateTime = 0;
   var lastOverlayUpdateTime = 0;
@@ -120,7 +118,6 @@ var touchStartTime;
 
   var touchHoldButton = '';
   $(document).ready(function () { // Code Once index.htm is loaded
-    mobile.checkMobileMode();
     if (settingsManager.offline) updateInterval = 250;
     (function _licenseCheck () {
       db.log('_licenseCheck');
@@ -145,34 +142,6 @@ var touchStartTime;
           $('#geolocation-btn').hide();
         }
     })();
-    (function _resizeWindow () {
-      db.log('_resizeWindow');
-      mobile.checkMobileMode();
-      var resizing = false;
-      $(window).on("resize", function () {
-        uiManager.resize2DMap();
-        mobile.checkMobileMode();
-        if (settingsManager.screenshotMode) {
-          bodyDOM.css('overflow','visible');
-          $('#canvas-holder').css('overflow','visible');
-          $('#canvas-holder').width = 3840;
-          $('#canvas-holder').height = 2160;
-          bodyDOM.width = 3840;
-          bodyDOM.height = 2160;
-        } else {
-          bodyDOM.css('overflow','hidden');
-          $('#canvas-holder').css('overflow','hidden');
-        }
-        if (!resizing) {
-          window.setTimeout(function () {
-            resizing = false;
-            webGlInit();
-          }, 500);
-        }
-        resizing = true;
-      });
-    })();
-
     (function _uiInit () {
       // Register all UI callback functions with drawLoop in main.js
       // These run during the draw loop
@@ -374,8 +343,8 @@ var touchStartTime;
     })();
 
 
-    function _clearRMBSubMenu () {
-      db.log('_clearRMBSubMenu',true);
+    uiManager.clearRMBSubMenu = () => {
+      db.log('uiManager.clearRMBSubMenu',true);
       rightBtnSaveMenuDOM.hide();
       rightBtnViewMenuDOM.hide();
       rightBtnEditMenuDOM.hide();
@@ -3125,8 +3094,8 @@ var touchStartTime;
       isCurrentlyTyping = false;
     });
 
-    function _keyUpHandler (evt) {
-      db.log('_keyUpHandler');
+    uiManager.keyUpHandler = (evt) => {
+      db.log('uiManager.keyUpHandler');
       if (isCurrentlyTyping) return;
 
       if (evt.key.toUpperCase() === 'A' && fpsSideSpeed === -settingsManager.fpsSideSpeed) {
@@ -3185,10 +3154,10 @@ var touchStartTime;
         settingsManager.cameraMovementSpeedMin = 0.005;
         speedModifier = 1;
       }
-    }
+    };
 
-    function _keyDownHandler (evt) {
-      db.log('_keyDownHandler');
+    uiManager.keyDownHandler = (evt) => {
+      db.log('uiManager.keyDownHandler');
       if (isCurrentlyTyping) return;
       if (evt.key.toUpperCase() === 'SHIFT') {
         if (cameraType.current === cameraType.FPS) {
@@ -3279,8 +3248,8 @@ var touchStartTime;
       }
     }
 
-    function _keyHandler (evt) {
-      db.log('_keyHandler');
+    uiManager.keyHandler = (evt) => {
+      db.log('uiManager.keyHandler');
       if (isCurrentlyTyping) return;
       // console.log(Number(evt.charCode));
       switch (evt.key.toUpperCase()) {

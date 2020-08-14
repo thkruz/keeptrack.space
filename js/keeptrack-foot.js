@@ -1,3 +1,4 @@
+// Enable the Limited UI
 if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
   if (document.getElementById('keeptrack-canvas').tagName !== 'CANVAS') {
     console.warn('There is no canvas with id "keeptrack-canvas!!!"');
@@ -72,86 +73,84 @@ if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
         isTimeMachine = false;
       }
     });
-
-    if (settingsManager.startWithOrbitsDisplayed) {
-      setTimeout(function () {
-        // Time Machine
-        orbitManager.historyOfSatellitesPlay();
-
-        // All Orbits
-        // groups.debris = new groups.SatGroup('all', '');
-        // groups.selectGroup(groups.debris);
-        // satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-        // groups.debris.updateOrbits();
-        // isOrbitOverlay = true;
-      }, 5000);
-    }
   });
 }
 
 // Load Satellite Dependencies
-document.write('<script src="' + settingsManager.installDirectory + 'js/lib/colorPick.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/lib/materialize.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/lib/gl-matrix-min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/lib/satellite.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/lib/suncalc.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/shaders.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-// Load Map Projection Code
-document.write('<script src="' + settingsManager.installDirectory + 'js/mapManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-// Load License Scripts
-document.write('<script src="' + settingsManager.installDirectory + 'license/license.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+document.write(`
+  <script src="${settingsManager.installDirectory}js/lib/colorPick.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/materialize.min.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/gl-matrix-min.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/satellite.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/suncalc.js?v=${settingsManager.versionNumber}"\><\/script>
+
+  <script src="${settingsManager.installDirectory}js/shaders.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/mapManager.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}license/license.js?v=${settingsManager.versionNumber}"\><\/script>
+`);
+
+// Addon Modules
+if (!settingsManager.disableUI) {
+  document.write(`
+    <script src="${settingsManager.installDirectory}modules/sensorManager.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}modules/controlSiteManager.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}modules/launchSiteManager.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}modules/nextLaunchManager.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}modules/starManager.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}modules/starManager-constellations.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}modules/satCommManager.js?v=${settingsManager.versionNumber}"\><\/script>
+
+    <script src="${settingsManager.installDirectory}js/lib/CanvasRecorder.min.js?v=${settingsManager.versionNumber}"\><\/script>
+  `);
+}
+
 // Offline Only
 // if(settingsManager.offline){document.write('<script src="' + settingsManager.installDirectory + 'offline/extra.js?v=' + settingsManager.versionNumber + '"\><\/script>');}
 // if(settingsManager.offline){document.write('<script src="' + settingsManager.installDirectory + 'offline/satInfo.js?v=' + settingsManager.versionNumber + '"\><\/script>');}
 // if(settingsManager.offline){document.write('<script src="' + settingsManager.installDirectory + 'offline/tle.js?v=' + settingsManager.versionNumber + '"\><\/script>');}
 
-// Addon Modules
-if (!settingsManager.disableUI) {
-  document.write('<script src="' + settingsManager.installDirectory + 'modules/sensorManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script src="' + settingsManager.installDirectory + 'modules/controlSiteManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script src="' + settingsManager.installDirectory + 'modules/launchSiteManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script src="' + settingsManager.installDirectory + 'modules/nextLaunchManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script src="' + settingsManager.installDirectory + 'modules/starManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script src="' + settingsManager.installDirectory + 'modules/satCommManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script src="' + settingsManager.installDirectory + 'modules/starManager-constellations.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-}
 // Other Required Files
-document.write('<script src="' + settingsManager.installDirectory + 'js/time-manager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/sun.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/lib/meuusjs.1.0.3.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/lib/starcalc.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/earth.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/groups.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/lookangles.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/satSet.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'modules/satVmagManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-// Load Extra Variables
-document.write('<script src="' + settingsManager.installDirectory + 'js/objectManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/lib/file-saver.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-// Load Ballistic Missile Functions
-document.write('<script src="' + settingsManager.installDirectory + 'modules/missileManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-// Load Main JavaScript Code
-document.write('<script src="' + settingsManager.installDirectory + 'js/color-scheme.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/mobile.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/lib/CanvasRecorder.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+document.write(`
+  <script src="${settingsManager.installDirectory}js/time-manager.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/sun.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/meuusjs.1.0.3.min.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/starcalc.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/earth.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/groups.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lookangles.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/satSet.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}modules/satVmagManager.js?v=${settingsManager.versionNumber}"\><\/script>
+
+  <script src="${settingsManager.installDirectory}js/objectManager.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/file-saver.min.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}modules/missileManager.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/color-scheme.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/mobile.js?v=${settingsManager.versionNumber}"\><\/script>
+
+  <script src="${settingsManager.installDirectory}js/mobile.js?v=${settingsManager.versionNumber}"\><\/script>
+`);
 if (!settingsManager.disableUI) {
   document.write('<script src="' + settingsManager.installDirectory + 'js/ui.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 }
-document.write('<script src="' + settingsManager.installDirectory + 'js/main.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/orbitManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+
+document.write(`
+  <script src="${settingsManager.installDirectory}js/main.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/orbitManager.js?v=${settingsManager.versionNumber}"\><\/script>
+`);
+
 if (!settingsManager.disableUI) {
-  document.write('<script src="' + settingsManager.installDirectory + 'js/drawLoop-shapes.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script src="' + settingsManager.installDirectory + 'js/search-box.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script defer src="' + settingsManager.installDirectory + 'js/vector-to-kepler.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  // Load UI Dependencies
-  document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/jquery-ui.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/jquery-ui-slideraccess.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/jquery-ui-timepicker.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/perfect-scrollbar.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  // Load Extras Last to Speed Loading
-  document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/jquery.colorbox.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script src="' + settingsManager.installDirectory + 'js/advice-module.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-  document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/numeric.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write(`
+    <script src="${settingsManager.installDirectory}js/drawLoop-shapes.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/search-box.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/vector-to-kepler.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/lib/jquery-ui.min.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/lib/jquery-ui-slideraccess.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/lib/jquery-ui-timepicker.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/lib/perfect-scrollbar.min.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/lib/jquery.colorbox.min.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/advice-module.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/lib/numeric.js?v=${settingsManager.versionNumber}"\><\/script>
+  `);
 }
 
 // Load Bottom icons
@@ -239,6 +238,6 @@ if (!settingsManager.disableUI) {
     }
     bottomIconsDivDOM.append('<img id="menu-settings" src="" delayedsrc="' + settingsManager.installDirectory + 'images/gear-icon.png" class="bmenu-item tooltipped" alt="Settings" data-position="top" data-delay="50" data-tooltip="Settings">');
     bottomIconsDivDOM.append('<img id="menu-about" src="" delayedsrc="' + settingsManager.installDirectory + 'images/about.png" class="bmenu-item tooltipped" alt="Author Information" data-position="top" data-delay="50" data-tooltip="Author Information">');
-  })();
-})
+    })();
+  });
 }

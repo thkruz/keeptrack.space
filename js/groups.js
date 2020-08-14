@@ -23,6 +23,7 @@
     if (groupType === 'all') {
       data = satSet.getSatData();
       for (i = 0; i < data.length; i++) {
+        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
         if (typeof data[i].SCC_NUM == 'undefined') continue;
         this.sats.push({
           satId: data[i].id,
@@ -33,6 +34,7 @@
     if (groupType === 'year') {
       data = satSet.searchYear(data);
       for (i = 0; i < data.length; i++) {
+        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
         this.sats.push({
           satId: data[i]
         });
@@ -40,12 +42,14 @@
     } else if (groupType === 'yearOrLess') {
       data = satSet.searchYearOrLess(data);
       for (i = 0; i < data.length; i++) {
+        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
         this.sats.push({
           satId: data[i]
         });
       }
     } else if (groupType === 'intlDes') {
       for (i = 0; i < data.length; i++) {
+        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
         var theSatId = satSet.getIdFromIntlDes(data[i]);
         if (theSatId === null) continue;
         this.sats.push({
@@ -56,6 +60,7 @@
     } else if (groupType === 'nameRegex') {
       data = satSet.searchNameRegex(data);
       for (i = 0; i < data.length; i++) {
+        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
         this.sats.push({
           satId: data[i]
         });
@@ -63,6 +68,7 @@
     } else if (groupType === 'countryRegex') {
       data = satSet.searchCountryRegex(data);
       for (i = 0; i < data.length; i++) {
+        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
         this.sats.push({
           satId: data[i]
         });
@@ -70,6 +76,7 @@
     } else if (groupType === 'objNum') {
       for (i = 0; i < data.length; i++) {
         satId = satSet.getIdFromObjNum(data[i]);
+        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
         if (satId === null) continue;
         this.sats.push({
           satId: satId,
@@ -78,6 +85,7 @@
       }
     } else if (groupType === 'idList') {
       for (i = 0; i < data.length; i++) {
+        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
         this.sats.push({
           satId: data[i]
         });

@@ -50,7 +50,7 @@ var db = {}; //Global Debug Manager
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.17.0';
+  settingsManager.versionNumber = '1.17.1';
   settingsManager.versionDate = 'August 14, 2020';
   if (window.location.host == 'keeptrack.space') {
     settingsManager.installDirectory = '/';
@@ -260,18 +260,18 @@ var db = {}; //Global Debug Manager
 // Adjust to change camera speed of auto rotate around earth
   settingsManager.autoRotateSpeed = 1.0 * 0.000075;
 
-  settingsManager.disableUI = true;
+  settingsManager.disableUI = false;
   settingsManager.disableNormalEvents = false;
-  settingsManager.enableLimitedUI = true;
-  settingsManager.enableHoverOverlay = false;
-  settingsManager.enableHoverOrbits = false;
+  settingsManager.enableLimitedUI = false;
+  settingsManager.enableHoverOverlay = true;
+  settingsManager.enableHoverOrbits = true;
   settingsManager.startWithOrbitsDisplayed = false;
-  settingsManager.startWithFocus = false;
+  settingsManager.startWithFocus = true;
 
   // Use to Override TLE Settings
-  settingsManager.tleSource = settingsManager.installDirectory + 'tle/TLEdebris.json';
+  // settingsManager.tleSource = settingsManager.installDirectory + 'tle/TLEdebris.json';
 
-  settingsManager.isFullscreenApplication = false;
+  settingsManager.isFullscreenApplication = true;
 
   // If No UI Reduce Overhead
   if (settingsManager.disableUI) {

@@ -191,7 +191,6 @@ var drawLoopCallback;
         $('#version-info').html(settingsManager.versionNumber);
         $('#version-info').tooltip({delay: 50, html: settingsManager.versionDate, position: 'top'});
 
-        $('body').attr('style', 'background:black');
         $('#canvas-holder').attr('style', 'display:block');
 
         mobile.checkMobileMode();
@@ -1143,7 +1142,7 @@ function webGlInit () {
     can.width = settingsManager.hiResWidth;
     can.height = settingsManager.hiResHeight;
   } else {
-    if (!settingsManager.isFullscreenApplication) {
+    if (settingsManager.isFullscreenApplication) {
       can.width = document.body.clientWidth;
       can.height = window.innerHeight;
     }

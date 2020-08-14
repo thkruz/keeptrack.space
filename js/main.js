@@ -1904,7 +1904,7 @@ function drawLines () {
   db.log('_canvasController');
   var latLon;
   canvasDOM.on('touchmove', function (evt) {
-    evt.preventDefault();
+    if (settingsManager.disableNormalEvents) { evt.preventDefault(); }
     if (isPinching) {
       var currentPinchDistance = Math.hypot(
         evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX,

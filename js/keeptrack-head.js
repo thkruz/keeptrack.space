@@ -261,7 +261,7 @@ var db = {}; //Global Debug Manager
   settingsManager.autoRotateSpeed = 1.0 * 0.000075;
 
   settingsManager.disableUI = true;
-  settingsManager.disableNormalEvents = true;
+  settingsManager.disableNormalEvents = false;
   settingsManager.enableLimitedUI = true;
   settingsManager.enableHoverOverlay = false;
   settingsManager.enableHoverOrbits = false;
@@ -272,6 +272,14 @@ var db = {}; //Global Debug Manager
   settingsManager.tleSource = settingsManager.installDirectory + 'tle/TLEdebris.json';
 
   settingsManager.isFullscreenApplication = false;
+
+  // If No UI Reduce Overhead
+  if (settingsManager.disableUI) {
+    // LEAVE AT LEAST ONE TO PREVENT ERRORS
+    settingsManager.maxFieldOfViewMarkers = 1;
+    settingsManager.maxMissiles = 1;
+    settingsManager.maxAnalystSats = 1;
+  }
 
   settingsManager.limitSats = '';
   settingsManager.searchLimit = 400;
@@ -486,18 +494,22 @@ if (typeof $ == 'undefined') {
 }
 
 // Import CSS needed for loading screen
-document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/loading-screen.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-// Import Fonts
-document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/fonts.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-// Import Materialize CSS
-document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/materialize.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/materialize-local.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-// Import Bootstrap Color Picker
-document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'js/lib/colorPick.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-// Import Modules Style Sheets
-document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'modules/nextLaunchManager.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+if (!settingsManager.disableUI) {
+  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/loading-screen.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+  // Import Fonts
+  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/fonts.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+  // Import Materialize CSS
+  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/materialize.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/materialize-local.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+  // Import Bootstrap Color Picker
+  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'js/lib/colorPick.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+  // Import Modules Style Sheets
+  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'modules/nextLaunchManager.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
 
-// Load jquery CSS
-document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/perfect-scrollbar.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/jquery-ui.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
-document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/jquery-ui-timepicker-addon.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+  // Load jquery CSS
+  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/perfect-scrollbar.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/jquery-ui.min.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/jquery-ui-timepicker-addon.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+} else if (settingsManager.enableLimitedUI) {
+  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/limitedUI.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+}

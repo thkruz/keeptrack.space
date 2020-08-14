@@ -17,17 +17,9 @@ if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
   </div>
   <div id="orbit-btn">
   </div>
-  <div id="sat-hoverbox" style="
-    display: none;
-    background: black;
-    cursor: default;
-    color: white;
-    position: absolute;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    pointer-events: none;"
-  >
+  <div id="time-machine-btn">
+  </div>
+  <div id="sat-hoverbox">
     <span id="sat-hoverbox1"></span>
     <br/>
     <span id="sat-hoverbox2"></span>
@@ -47,22 +39,46 @@ if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
     var isOrbitOverlay = false;
     orbitBtnDOM.on('click', function(){
       if (!isOrbitOverlay) {
+        orbitManager.isTimeMachineVisible = false;
+        isTimeMachine = false;
         groups.debris = new groups.SatGroup('all', '');
         groups.selectGroup(groups.debris);
         satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
         groups.debris.updateOrbits();
         isOrbitOverlay = true;
       } else {
+        orbitManager.isTimeMachineVisible = false;
+        isTimeMachine = false;
         groups.clearSelect();
-        orbitDisplay.clearHoverOrbit();
+        orbitManager.clearHoverOrbit();
         satSet.setColorScheme(ColorScheme.default, true);
         isOrbitOverlay = false;
+      }
+    });
+    var timeMachineDOM = $('#time-machine-btn');
+    var isTimeMachine = false;
+    timeMachineDOM.on('click', function(){
+      if (!isTimeMachine) {
+        isTimeMachine = true;
+        orbitManager.isTimeMachineVisible = true;
+        if (!orbitManager.isTimeMachineRunning) {
+          orbitManager.historyOfSatellitesPlay();
+        }
+      } else {
+        groups.clearSelect();
+        orbitManager.clearHoverOrbit();
+        satSet.setColorScheme(ColorScheme.default, true);
+        orbitManager.isTimeMachineVisible = false;
+        isTimeMachine = false;
       }
     });
 
     if (settingsManager.startWithOrbitsDisplayed) {
       setTimeout(function () {
+        // Time Machine
         orbitManager.historyOfSatellitesPlay();
+
+        // All Orbits
         // groups.debris = new groups.SatGroup('all', '');
         // groups.selectGroup(groups.debris);
         // satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc

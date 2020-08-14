@@ -276,6 +276,7 @@
       let year = 59 + yy;
       if (year >= 100) year = year - 100;
       setTimeout(function () {
+        if (!orbitManager.isTimeMachineVisible) return;
         yearGroup = new groups.SatGroup('yearOrLess', year);
         // groups.selectGroupNoOverlay(yearGroup);
         groups.selectGroup(yearGroup);
@@ -291,6 +292,7 @@
         }
         if (year == 20) {
           setTimeout(function () {
+            if (!orbitManager.isTimeMachineVisible) return;
             settingsManager.colors.transparent = tempTransColor;
             orbitManager.isTimeMachineRunning = false;
             groups.clearSelect();

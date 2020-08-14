@@ -640,18 +640,22 @@ var satSensorMarkerArray = [];
   satSet.setColorScheme = (scheme, isForceRecolor) => {
     db.log('satSet.setColorScheme');
     settingsManager.currentColorScheme = scheme;
-    buffers = scheme.calculateColorBuffers(isForceRecolor);
-    satColorBuf = buffers.colorBuf;
-    pickableBuf = buffers.pickableBuf;
+    try {
+      buffers = scheme.calculateColorBuffers(isForceRecolor);
+      satColorBuf = buffers.colorBuf;
+      pickableBuf = buffers.pickableBuf;
+    } catch (e) {
+      console.log('satSet.setColorScheme not ready yet!');
+    }
   };
 
   satSet.setupStarData = (satData) => {
     let starArray = [];
     for (var i = 0; i < satData.length; i++) {
       if (i >= objectManager.starIndex1 && i <= objectManager.starIndex2) {
-        starArray.push(2.0);
-      }  else {
         starArray.push(1.0);
+      }  else {
+        starArray.push(0.0);
       }
     }
     return starArray;
@@ -1385,7 +1389,7 @@ var satSensorMarkerArray = [];
     if (i === hoveringSat) return;
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
     // If Old Select Sat Picked Color it Correct Color
-    if (hoveringSat !== -1) {
+    if (hoveringSat !== -1 && hoveringSat !== selectedSat) {
       try {
         gl.bufferSubData(gl.ARRAY_BUFFER, hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(hoveringSat)).color));
       } catch (e) {
@@ -1395,7 +1399,7 @@ var satSensorMarkerArray = [];
       }
     }
     // If New Select Sat Picked Color it
-    if (i !== -1) {
+    if (i !== -1 && i !== selectedSat) {
       gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.hoverColor));
     }
       hoveringSat = i;

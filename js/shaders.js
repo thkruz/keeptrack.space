@@ -119,21 +119,54 @@
         }`
     }, {
       'name': 'atmosphere-fragment.glsl',
-      'code': 'precision mediump float;\n\nuniform vec3 uAmbientLightColor;\nuniform vec3 uDirectionalLightColor;\nuniform vec3 uLightDirection;\n\nvarying vec2 texCoord;\nvarying vec3 normal;\n\nuniform sampler2D uSampler;\nuniform sampler2D uNightSampler;\n\n\n\nvoid main(void) {\n  float directionalLightAmount = max(dot(normal, uLightDirection), 0.5);\n  vec3 lightColor = uAmbientLightColor + (uDirectionalLightColor * directionalLightAmount);\n  \n  vec3 litTexColor = texture2D(uSampler, texCoord).rgb * lightColor * 2.0;\n  \n  vec3 nightLightColor = texture2D(uNightSampler, texCoord).rgb * pow(1.0 - directionalLightAmount, 2.0) ;\n\n  gl_FragColor = vec4( 1.0, 1.0 , 1.0, 1.0 ) * 0.7;\n}'
+      'code': `
+        precision mediump float;
+
+        uniform vec3 uLightDirection;
+        varying vec3  vNormal;
+
+        void main () {
+          float directionalLightAmount = max(dot(vNormal, uLightDirection), 0.0);
+          gl_FragColor    = vec4( ${settingsManager.atmosphereColor}, max(directionalLightAmount,0.025));
+        }
+      `
     }, {
       'name': 'atmosphere-vertex.glsl',
-      'code': 'attribute vec3 aVertexPosition;\n\nattribute vec2 aTexCoord;\nattribute vec3 aVertexNormal;\n\nuniform mat4 uPMatrix;\nuniform mat4 uCamMatrix;\nuniform mat4 uMvMatrix;\nuniform mat3 uNormalMatrix;\n\n\nvarying vec2 texCoord;\nvarying vec3 normal;\nvarying float directionalLightAmount;\n\nvoid main(void) {\n  gl_Position = uPMatrix * uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);\n  texCoord = aTexCoord;\n  \n  normal = uNormalMatrix * aVertexNormal;\n}\n'
+      'code': `
+        attribute vec3 aVertexPosition;
+        attribute vec3 aVertexNormal;
+
+        uniform mat4 uPMatrix;
+        uniform mat4 uCamMatrix;
+        uniform mat4 uMvMatrix;
+        uniform mat3 uNormalMatrix;
+
+        varying vec3 vNormal;
+
+        void main(void) {
+          gl_Position = uPMatrix * uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
+          vNormal = normalize( uNormalMatrix * aVertexNormal );
+        }
+      `
     }, {
       'name': 'dot-fragment.glsl',
       'code': `
       precision mediump float;
 
       varying vec4 vColor;
+      varying float vStar;
 
       void main(void) {
         vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
-        float r = 0.43 - min(abs(length(ptCoord)), 1.0);
-        float alpha = pow(2.0 * r + 0.1, 3.0);
+        float r = 0.0;
+        float alpha = 0.0;
+        if (vStar < 0.5) {
+          r = ${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0);
+          alpha = pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0);
+        } else {
+          r = 0.43 - min(abs(length(ptCoord)), 1.0);
+          alpha = pow(2.0 * r + 0.2, 3.0);
+        }
         alpha = min(alpha, 1.0);
         gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
       }
@@ -153,13 +186,18 @@
         uniform mat4 uPMatrix;
 
         varying vec4 vColor;
+        varying float vStar;
 
         void main(void) {
           vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
-
-          gl_PointSize = min(max(pow(40000.0 \/ position.z, 2.1), minSize * aStar), maxSize) * 1.0;
+          if (aStar < 0.5) {
+            gl_PointSize = min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize), maxSize) * 1.0;
+          } else {
+            gl_PointSize = 15.0;
+          }
           gl_Position = position;
           vColor = aColor;
+          vStar = aStar;
         }
       `
     }, {

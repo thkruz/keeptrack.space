@@ -6,7 +6,7 @@
   selectSat
 
   satSet
-  orbitDisplay
+  orbitManager
   settingsManager
   searchBox
   lookangles
@@ -20,6 +20,16 @@
     var satId;
     var i = 0;
     this.sats = [];
+    if (groupType === 'all') {
+      data = satSet.getSatData();
+      for (i = 0; i < data.length; i++) {
+        if (typeof data[i].SCC_NUM == 'undefined') continue;
+        this.sats.push({
+          satId: data[i].id,
+          isIntlDes: true
+        });
+      }
+    }
     if (groupType === 'year') {
       data = satSet.searchYear(data);
       for (i = 0; i < data.length; i++) {
@@ -86,9 +96,9 @@
     // What calls the orbit buffer when selected a group from the menu.
     for (var i = 0; i < this.sats.length; i++) {
       if (this.sats[i].missile) {
-        orbitDisplay.updateOrbitBuffer(this.sats[i].id, null, null, null, true, this.sats[i].latList, this.sats[i].lonList, this.sats[i].altList, this.sats[i].startTime);
+        orbitManager.updateOrbitBuffer(this.sats[i].id, null, null, null, true, this.sats[i].latList, this.sats[i].lonList, this.sats[i].altList, this.sats[i].startTime);
       } else {
-        orbitDisplay.updateOrbitBuffer(this.sats[i].satId);
+        orbitManager.updateOrbitBuffer(this.sats[i].satId);
       }
     }
   };

@@ -14,17 +14,15 @@
   var glBuffers = [];
   var inProgress = [];
 
-  var orbitDisplay = {};
+  var orbitManager = {};
 
   var pathShader;
 
   var selectOrbitBuf;
   var hoverOrbitBuf;
 
-  var selectColor = settingsManager.orbitSelectColor;
-  var hoverColor = settingsManager.orbitHoverColor;
-  var inViewColor = settingsManager.orbitInViewColor;
-  var groupColor = settingsManager.orbitGroupColor;
+  orbitManager.emptyOrbitBuffer = new Float32Array((NUM_SEGS + 1) * 3);
+
 
   var currentHoverId = -1;
   var currentSelectId = -1;
@@ -36,7 +34,7 @@
 
   var initialized = false;
 
-  orbitDisplay.init = function () {
+  orbitManager.init = function () {
     // var startTime = performance.now();
 
     var vs = gl.createShader(gl.VERTEX_SHADER);
@@ -60,11 +58,11 @@
 
     selectOrbitBuf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 3), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.STATIC_DRAW);
 
     hoverOrbitBuf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 3), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.STATIC_DRAW);
 
     for (var i = 0; i < satSet.missileSats; i++) {
       glBuffers.push(allocateBuffer());
@@ -81,10 +79,10 @@
     objectManager.fieldOfViewSet = null;
 
     // var time = performance.now() - startTime;
-    // console.log('orbitDisplay init: ' + time + ' ms');
+    // console.log('orbitManager init: ' + time + ' ms');
   };
 
-  orbitDisplay.updateOrbitBuffer = function (satId, force, TLE1, TLE2, missile, latList, lonList, altList) {
+  orbitManager.updateOrbitBuffer = function (satId, force, TLE1, TLE2, missile, latList, lonList, altList) {
     if (!inProgress[satId] && !satSet.getSat(satId).static) {
       if (force) {
         orbitWorker.postMessage({
@@ -129,7 +127,7 @@
     inProgress[satId] = false;
   };
 
-  /* orbitDisplay.setOrbit = function (satId) {
+  /* orbitManager.setOrbit = function (satId) {
     var sat = satSet.getSat(satId);
     mat4.identity(orbitMvMat);
     //apply steps in reverse order because matrix multiplication
@@ -148,32 +146,30 @@
 
   };
 
-  orbitDisplay.clearOrbit = function () {
+  orbitManager.clearOrbit = function () {
     mat4.identity(orbitMvMat);
   } */
 
-  orbitDisplay.setSelectOrbit = function (satId) {
-   // var start = performance.now();
+  orbitManager.setSelectOrbit = function (satId) {
     currentSelectId = satId;
-    orbitDisplay.updateOrbitBuffer(satId);
-   // console.log('setOrbit(): ' + (performance.now() - start) + ' ms');
+    orbitManager.updateOrbitBuffer(satId);
   };
 
-  orbitDisplay.clearSelectOrbit = function () {
+  orbitManager.clearSelectOrbit = function () {
     currentSelectId = -1;
     gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 3), gl.DYNAMIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.DYNAMIC_DRAW);
   };
 
-  orbitDisplay.addInViewOrbit = function (satId) {
+  orbitManager.addInViewOrbit = function (satId) {
     for (var i = 0; i < currentInView.length; i++) {
       if (satId === currentInView[i]) return;
     }
     currentInView.push(satId);
-    orbitDisplay.updateOrbitBuffer(satId);
+    orbitManager.updateOrbitBuffer(satId);
   };
 
-  orbitDisplay.removeInViewOrbit = function (satId) {
+  orbitManager.removeInViewOrbit = function (satId) {
     var r = null;
     for (var i = 0; i < currentInView.length; i++) {
       if (satId === currentInView[i]) {
@@ -182,29 +178,29 @@
     }
     if (r === null) return;
     currentInView.splice(r, 1);
-    orbitDisplay.updateOrbitBuffer(satId);
+    orbitManager.updateOrbitBuffer(satId);
   };
 
-  orbitDisplay.clearInViewOrbit = function (satId) {
+  orbitManager.clearInViewOrbit = function (satId) {
     if (currentInView === []) return;
     currentInView = [];
   };
 
-  orbitDisplay.setHoverOrbit = function (satId) {
+  orbitManager.setHoverOrbit = function (satId) {
     if (satId === currentHoverId) return;
     currentHoverId = satId;
-    orbitDisplay.updateOrbitBuffer(satId);
+    orbitManager.updateOrbitBuffer(satId);
   };
 
-  orbitDisplay.clearHoverOrbit = function (satId) {
+  orbitManager.clearHoverOrbit = function (satId) {
     if (currentHoverId === -1) return;
     currentHoverId = -1;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 3), gl.DYNAMIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.DYNAMIC_DRAW);
   };
 
-  orbitDisplay.draw = function (pMatrix, camMatrix) { // lol what do I do here
+  orbitManager.draw = function (pMatrix, camMatrix) { // lol what do I do here
     if (!initialized) return;
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -212,28 +208,30 @@
 
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
-   // gl.depthMask(false);
+    if (settingsManager.showOrbitThroughEarth) {
+      gl.disable(gl.DEPTH_TEST);
+    }
 
     gl.uniformMatrix4fv(pathShader.uMvMatrix, false, orbitMvMat);
     gl.uniformMatrix4fv(pathShader.uCamMatrix, false, camMatrix);
     gl.uniformMatrix4fv(pathShader.uPMatrix, false, pMatrix);
 
     if (currentSelectId !== -1 && !satSet.getSatExtraOnly(currentSelectId).static) {
-      gl.uniform4fv(pathShader.uColor, selectColor);
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor);
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
       gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
       gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
     }
 
     if (currentHoverId !== -1 && currentHoverId !== currentSelectId && !satSet.getSatExtraOnly(currentHoverId).static) { // avoid z-fighting
-      gl.uniform4fv(pathShader.uColor, hoverColor);
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitHoverColor);
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
       gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
       gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
     }
 
     if (currentInView.length >= 1) { // There might be some z-fighting
-      gl.uniform4fv(pathShader.uColor, inViewColor);
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
       currentInView.forEach(function (id) {
         gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
         gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
@@ -242,7 +240,7 @@
     }
 
     if (groups.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
-      gl.uniform4fv(pathShader.uColor, groupColor);
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
       groups.selectedGroup.forEach(function (id) {
         gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
         gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
@@ -250,8 +248,10 @@
       });
     }
 
-    //  gl.depthMask(true);
     gl.disable(gl.BLEND);
+    if (settingsManager.showOrbitThroughEarth) {
+      gl.enable(gl.DEPTH_TEST);
+    }
 
     // Done drawing
     return true;
@@ -260,13 +260,47 @@
   function allocateBuffer () {
     var buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 3), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.STATIC_DRAW);
     return buf;
   }
 
-  orbitDisplay.getPathShader = function () {
+  orbitManager.getPathShader = function () {
     return pathShader;
   };
 
-  window.orbitDisplay = orbitDisplay;
+  orbitManager.historyOfSatellitesPlay = () => {
+    orbitManager.isTimeMachineRunning = true;
+    let tempTransColor = settingsManager.colors.transparent;
+    settingsManager.colors.transparent = [0,0,0,0];
+    for (let yy = 0; yy <= 200; yy++) {
+      let year = 59 + yy;
+      if (year >= 100) year = year - 100;
+      setTimeout(function () {
+        yearGroup = new groups.SatGroup('yearOrLess', year);
+        // groups.selectGroupNoOverlay(yearGroup);
+        groups.selectGroup(yearGroup);
+        yearGroup.updateOrbits();
+        satSet.setColorScheme(ColorScheme.group, true); // force color recalc
+        if (!settingsManager.disableUI) {
+          if (year >= 59 && year < 100) {
+            M.toast({html: `Time Machine In Year 19${year}!`});
+          } else {
+            yearStr = (year < 10) ? `0${year}` : `${year}`;
+            M.toast({html: `Time Machine In Year 20${yearStr}!`});
+          }
+        }
+        if (year == 20) {
+          setTimeout(function () {
+            settingsManager.colors.transparent = tempTransColor;
+            orbitManager.isTimeMachineRunning = false;
+            groups.clearSelect();
+            satSet.setColorScheme(ColorScheme.default, true); // force color recalc
+          }, 10000); // Linger for 10 seconds
+        }
+      }, settingsManager.timeMachineDelay * yy);
+      if (year == 20) break;
+    }
+  };
+
+  window.orbitManager = orbitManager;
 })();

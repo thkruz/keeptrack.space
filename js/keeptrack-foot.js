@@ -1,3 +1,78 @@
+if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
+  if (document.getElementById('keeptrack-canvas').tagName !== 'CANVAS') {
+    console.warn('There is no canvas with id "keeptrack-canvas!!!"');
+    console.log('Here is a list of canvas found:');
+    console.log(document.getElementsByTagName('canvas'));
+    if (document.getElementById('keeptrack-canvas').tagName == 'DIV') {
+      console.warn('There IS a div with id "keeptrack-canvas"!!!');
+    }
+  } else {
+    console.log('Found the keeptrack canvas:');
+    console.log(document.getElementById('keeptrack-canvas'));
+  }
+
+  // Add Required DOMs
+  document.getElementById('keeptrack-canvas').parentElement.innerHTML +=`
+  <div id="countries-btn">
+  </div>
+  <div id="orbit-btn">
+  </div>
+  <div id="sat-hoverbox" style="
+    display: none;
+    background: black;
+    cursor: default;
+    color: white;
+    position: absolute;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    pointer-events: none;"
+  >
+    <span id="sat-hoverbox1"></span>
+    <br/>
+    <span id="sat-hoverbox2"></span>
+    <br/>
+    <span id="sat-hoverbox3"></span>
+  </div>`;
+  $(document).ready(function () {
+    var countriesBtnDOM = $('#countries-btn');
+    countriesBtnDOM.on('click', function(){
+      if (settingsManager.currentColorScheme == ColorScheme.countries) {
+        satSet.setColorScheme(ColorScheme.default);
+      } else {
+        satSet.setColorScheme(ColorScheme.countries);
+      }
+    });
+    var orbitBtnDOM = $('#orbit-btn');
+    var isOrbitOverlay = false;
+    orbitBtnDOM.on('click', function(){
+      if (!isOrbitOverlay) {
+        groups.debris = new groups.SatGroup('all', '');
+        groups.selectGroup(groups.debris);
+        satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+        groups.debris.updateOrbits();
+        isOrbitOverlay = true;
+      } else {
+        groups.clearSelect();
+        orbitDisplay.clearHoverOrbit();
+        satSet.setColorScheme(ColorScheme.default, true);
+        isOrbitOverlay = false;
+      }
+    });
+
+    if (settingsManager.startWithOrbitsDisplayed) {
+      setTimeout(function () {
+        orbitManager.historyOfSatellitesPlay();
+        // groups.debris = new groups.SatGroup('all', '');
+        // groups.selectGroup(groups.debris);
+        // satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+        // groups.debris.updateOrbits();
+        // isOrbitOverlay = true;
+      }, 5000);
+    }
+  });
+}
+
 // Load Satellite Dependencies
 document.write('<script src="' + settingsManager.installDirectory + 'js/lib/colorPick.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 document.write('<script src="' + settingsManager.installDirectory + 'js/lib/materialize.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
@@ -5,8 +80,6 @@ document.write('<script src="' + settingsManager.installDirectory + 'js/lib/gl-m
 document.write('<script src="' + settingsManager.installDirectory + 'js/lib/satellite.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 document.write('<script src="' + settingsManager.installDirectory + 'js/lib/suncalc.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 document.write('<script src="' + settingsManager.installDirectory + 'js/shaders.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-// Load Constants
-document.write('<script src="' + settingsManager.installDirectory + 'js/constants.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 // Load Map Projection Code
 document.write('<script src="' + settingsManager.installDirectory + 'js/mapManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 // Load License Scripts
@@ -15,14 +88,17 @@ document.write('<script src="' + settingsManager.installDirectory + 'license/lic
 // if(settingsManager.offline){document.write('<script src="' + settingsManager.installDirectory + 'offline/extra.js?v=' + settingsManager.versionNumber + '"\><\/script>');}
 // if(settingsManager.offline){document.write('<script src="' + settingsManager.installDirectory + 'offline/satInfo.js?v=' + settingsManager.versionNumber + '"\><\/script>');}
 // if(settingsManager.offline){document.write('<script src="' + settingsManager.installDirectory + 'offline/tle.js?v=' + settingsManager.versionNumber + '"\><\/script>');}
+
 // Addon Modules
-document.write('<script src="' + settingsManager.installDirectory + 'modules/sensorManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'modules/controlSiteManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'modules/launchSiteManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'modules/nextLaunchManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'modules/starManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'modules/satCommManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'modules/starManager-constellations.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+if (!settingsManager.disableUI) {
+  document.write('<script src="' + settingsManager.installDirectory + 'modules/sensorManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script src="' + settingsManager.installDirectory + 'modules/controlSiteManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script src="' + settingsManager.installDirectory + 'modules/launchSiteManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script src="' + settingsManager.installDirectory + 'modules/nextLaunchManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script src="' + settingsManager.installDirectory + 'modules/starManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script src="' + settingsManager.installDirectory + 'modules/satCommManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script src="' + settingsManager.installDirectory + 'modules/starManager-constellations.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+}
 // Other Required Files
 document.write('<script src="' + settingsManager.installDirectory + 'js/time-manager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 document.write('<script src="' + settingsManager.installDirectory + 'js/sun.js?v=' + settingsManager.versionNumber + '"\><\/script>');
@@ -42,24 +118,29 @@ document.write('<script src="' + settingsManager.installDirectory + 'modules/mis
 document.write('<script src="' + settingsManager.installDirectory + 'js/color-scheme.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 document.write('<script src="' + settingsManager.installDirectory + 'js/mobile.js?v=' + settingsManager.versionNumber + '"\><\/script>');
 document.write('<script src="' + settingsManager.installDirectory + 'js/lib/CanvasRecorder.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/ui.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+if (!settingsManager.disableUI) {
+  document.write('<script src="' + settingsManager.installDirectory + 'js/ui.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+}
 document.write('<script src="' + settingsManager.installDirectory + 'js/main.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/orbit-display.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/drawLoop-shapes.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/search-box.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script defer src="' + settingsManager.installDirectory + 'js/vector-to-kepler.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-// Load UI Dependencies
-document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/jquery-ui.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/jquery-ui-slideraccess.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/jquery-ui-timepicker.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/perfect-scrollbar.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-// Load Extras Last to Speed Loading
-document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/jquery.colorbox.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script src="' + settingsManager.installDirectory + 'js/advice-module.js?v=' + settingsManager.versionNumber + '"\><\/script>');
-document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/numeric.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+document.write('<script src="' + settingsManager.installDirectory + 'js/orbitManager.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+if (!settingsManager.disableUI) {
+  document.write('<script src="' + settingsManager.installDirectory + 'js/drawLoop-shapes.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script src="' + settingsManager.installDirectory + 'js/search-box.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script defer src="' + settingsManager.installDirectory + 'js/vector-to-kepler.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  // Load UI Dependencies
+  document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/jquery-ui.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/jquery-ui-slideraccess.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/jquery-ui-timepicker.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/perfect-scrollbar.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  // Load Extras Last to Speed Loading
+  document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/jquery.colorbox.min.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script src="' + settingsManager.installDirectory + 'js/advice-module.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+  document.write('<script defer src="' + settingsManager.installDirectory + 'js/lib/numeric.js?v=' + settingsManager.versionNumber + '"\><\/script>');
+}
 
 // Load Bottom icons
-$(document).ready(function() {
+if (!settingsManager.disableUI) {
+  $(document).ready(function() {
   (function loadBottomIcons () {
     let numOfIcons = 0;
     bottomIconsDivDOM = $('#bottom-icons');
@@ -144,3 +225,4 @@ $(document).ready(function() {
     bottomIconsDivDOM.append('<img id="menu-about" src="" delayedsrc="' + settingsManager.installDirectory + 'images/about.png" class="bmenu-item tooltipped" alt="Author Information" data-position="top" data-delay="50" data-tooltip="Author Information">');
   })();
 })
+}

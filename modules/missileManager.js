@@ -2,7 +2,7 @@
 
   satSet
   satCruncher
-  orbitDisplay
+  orbitManager
 
 */
 
@@ -223,7 +223,7 @@
             altList: MissileObject.altList,
             startTime: MissileObject.startTime
           });
-          orbitDisplay.updateOrbitBuffer(MissileObject.id, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
+          orbitManager.updateOrbitBuffer(MissileObject.id, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
         }
       }
       missileManager.missileArray = missileArray;
@@ -949,7 +949,7 @@
         altList: MissileObject.altList,
         startTime: MissileObject.startTime
       });
-      orbitDisplay.updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
+      orbitManager.updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
 
       missileManager.missileArray = missileArray;
 
@@ -1489,7 +1489,7 @@
         altList: MissileObject.altList,
         startTime: MissileObject.startTime
       });
-      orbitDisplay.updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
+      orbitManager.updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
 
       missileManager.missileArray = missileArray;
 
@@ -2038,7 +2038,7 @@
         altList: MissileObject.altList,
         startTime: MissileObject.startTime
       });
-      orbitDisplay.updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
+      orbitManager.updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
 
       missileManager.missileArray = missileArray;
 

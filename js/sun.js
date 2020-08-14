@@ -10,8 +10,8 @@
 var RADIUS_OF_DRAW_SUN = 2200;
 var SUN_SCALAR_DISTANCE = 250000;
 
-var RADIUS_OF_DRAW_MOON = 4500;
-var MOON_SCALAR_DISTANCE = 75000;
+var RADIUS_OF_DRAW_MOON = 4000;
+var MOON_SCALAR_DISTANCE = 250000;
 
 (function () {
   var sun = {};
@@ -254,7 +254,7 @@ var MOON_SCALAR_DISTANCE = 75000;
     if (!loaded) return;
 
     let sunXYZ = sun.getXYZ();
-    let sunMaxDist = Math.max(Math.max(sunXYZ.x,sunXYZ.y),sunXYZ.z);
+    let sunMaxDist = Math.max(Math.max(Math.abs(sunXYZ.x),Math.abs(sunXYZ.y)),Math.abs(sunXYZ.z));
     sun.pos[0] = sunXYZ.x / sunMaxDist * SUN_SCALAR_DISTANCE;
     sun.pos[1] = sunXYZ.y / sunMaxDist * SUN_SCALAR_DISTANCE;
     sun.pos[2] = sunXYZ.z / sunMaxDist * SUN_SCALAR_DISTANCE;
@@ -420,7 +420,6 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
 
     texture = gl.createTexture();
     var img = new Image();
-    var imgHiRes = new Image();
     img.onload = function () {
       gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
@@ -430,7 +429,7 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
       // console.log('moon.js loaded texture');
 
       let moonXYZ = moon.getXYZ();
-      let moonMaxDist = Math.max(Math.max(moonXYZ.x,moonXYZ.y),moonXYZ.z);
+      let moonMaxDist = Math.max(Math.max(Math.abs(moonXYZ.x),Math.abs(moonXYZ.y)),Math.abs(moonXYZ.z));
       moon.pos[0] = moonXYZ.x / moonMaxDist * MOON_SCALAR_DISTANCE;
       moon.pos[1] = moonXYZ.y / moonMaxDist * MOON_SCALAR_DISTANCE;
       moon.pos[2] = moonXYZ.z / moonMaxDist * MOON_SCALAR_DISTANCE;

@@ -22,7 +22,7 @@ or mirrored at any other location without the express written permission of the 
     $
     satellite
     ColorScheme
-    orbitDisplay
+    orbitManager
     shaderLoader
     SunCalc
     earth

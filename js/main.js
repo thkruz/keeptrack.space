@@ -22,6 +22,11 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 var debugTimeArray = [];
+var canvasDOM = $('#keeptrack-canvas');
+var satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
+var satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
+var satHoverBoxNode3 = document.getElementById('sat-hoverbox3');
+var satHoverBoxDOM = $('#sat-hoverbox');
 
 var timeManager = window.timeManager;
 var satCruncher = window.satCruncher;
@@ -35,12 +40,15 @@ var camPitchTarget = 0;
 var camSnapMode = false;
 var camZoomSnappedOnSat = false;
 var camAngleSnappedOnSat = false;
-var zoomLevel = 0.6;
-var zoomTarget = 0.6;
+var zoomLevel = 0.6925;
+var zoomTarget = 0.6925;
 var isZoomIn = false;
 var camPitchSpeed = 0;
 var camYawSpeed = 0;
 var camRotateSpeed = 0;
+
+let cameraManager = {};
+cameraManager.chaseSpeed = 0.001;
 
 // Menu Variables
 var isEditSatMenuOpen = false;
@@ -135,7 +143,6 @@ var drawLoopCallback;
   // drawLoop camera variables
   var xDif, yDif, yawTarget, pitchTarget, dragPointR, dragTargetR, dragPointLon,
       dragTargetLon, dragPointLat, dragTargetLat, pitchDif, yawDif;
-  var rotateTheEarthSpeed = 0.000075; // Adjust to change camera speed when rotating around earth
   var isHoverBoxVisible = false;
   var isShowDistance = true;
 
@@ -157,9 +164,11 @@ var drawLoopCallback;
     ColorScheme.init();
     $('#loader-text').text('Drawing Dots in Space...');
     satSet.init(function satSetInitCallBack (satData) {
-      orbitDisplay.init();
+      orbitManager.init();
       groups.init();
-      searchBox.init(satData);
+      if (!settingsManager.disableUI) {
+        searchBox.init(satData);
+      }
       (function _checkIfEarthFinished () {
         if (earth.loaded) return;
         $('#loader-text').text('Coloring Inside the Lines...');
@@ -216,82 +225,87 @@ var drawLoopCallback;
         satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
         satSet.onCruncherReady();
 
-        (function _reloadLastSensor () {
-          let currentSensor = (!settingsManager.offline) ? JSON.parse(localStorage.getItem("currentSensor")) : null;
-          if (currentSensor !== null) {
-            try {
-              // If there is a staticnum set use that
-              if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
-                sensorManager.setSensor(null, currentSensor[1]);
-              } else {
-                // If the sensor is a string, load that collection of sensors
-                if (typeof currentSensor[0].shortName == 'undefined') {
-                  sensorManager.setSensor(currentSensor[0], currentSensor[1]);
+        // Add Short Delay To Make Sure Everything Else is ready
+        // This shouldn't be necessary in the future
+        setTimeout(function () {
+          (function _reloadLastSensor () {
+            let currentSensor = (!settingsManager.offline) ? JSON.parse(localStorage.getItem("currentSensor")) : null;
+            if (currentSensor !== null) {
+              try {
+                // If there is a staticnum set use that
+                if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
+                  sensorManager.setSensor(null, currentSensor[1]);
                 } else {
-                  // Seems to be a single sensor without a staticnum, load that
-                  sensorManager.setSensor(sensorManager.sensorList[currentSensor[0].shortName], currentSensor[1]);
+                  // If the sensor is a string, load that collection of sensors
+                  if (typeof currentSensor[0].shortName == 'undefined') {
+                    sensorManager.setSensor(currentSensor[0], currentSensor[1]);
+                  } else {
+                    // Seems to be a single sensor without a staticnum, load that
+                    sensorManager.setSensor(sensorManager.sensorList[currentSensor[0].shortName], currentSensor[1]);
+                  }
+                }
+              }
+              catch (e){
+                console.warn('Saved Sensor Information Invalid');
+              }
+            }
+          })();
+          (function _watchlistInit () {
+            var watchlistJSON = (!settingsManager.offline) ? localStorage.getItem("watchlistList") : null;
+            if (watchlistJSON !== null) {
+              var newWatchlist = JSON.parse(watchlistJSON);
+              watchlistInViewList = [];
+              for (var i = 0; i < newWatchlist.length; i++) {
+                var sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
+                if (sat !== null) {
+                  newWatchlist[i] = sat.id;
+                  watchlistInViewList.push(false);
+                } else {
+                  console.error('Watchlist File Format Incorret');
+                  return;
+                }
+              }
+              uiManager.updateWatchlist(newWatchlist, watchlistInViewList);
+            }
+          })();
+          (function _parseGetParameters () {
+            // do querystring stuff
+            var params = satSet.queryStr.split('&');
+
+            // Do Searches First
+            for (let i = 0; i < params.length; i++) {
+              let key = params[i].split('=')[0];
+              let val = params[i].split('=')[1];
+              if (key == 'search') {
+                // console.log('preloading search to ' + val);
+                // Sensor Selection takes 1.5 seconds to update color Scheme
+                // TODO: SensorManager might be the problem here, but this works
+                // _doDelayedSearch(val);
+                if (!settingsManager.disableUI) {
+                  searchBox.doSearch(val);
                 }
               }
             }
-            catch (e){
-              console.warn('Saved Sensor Information Invalid');
-            }
-          }
-        })();
-        (function _watchlistInit () {
-          var watchlistJSON = (!settingsManager.offline) ? localStorage.getItem("watchlistList") : null;
-          if (watchlistJSON !== null) {
-            var newWatchlist = JSON.parse(watchlistJSON);
-            watchlistInViewList = [];
-            for (var i = 0; i < newWatchlist.length; i++) {
-              var sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
-              if (sat !== null) {
-                newWatchlist[i] = sat.id;
-                watchlistInViewList.push(false);
-              } else {
-                console.error('Watchlist File Format Incorret');
-                return;
-              }
-            }
-            uiManager.updateWatchlist(newWatchlist, watchlistInViewList);
-          }
-        })();
-        (function _parseGetParameters () {
-          // do querystring stuff
-          var params = satSet.queryStr.split('&');
 
-          // Do Searches First
-          for (let i = 0; i < params.length; i++) {
-            let key = params[i].split('=')[0];
-            let val = params[i].split('=')[1];
-            if (key == 'search') {
-              // console.log('preloading search to ' + val);
-              // Sensor Selection takes 1.5 seconds to update color Scheme
-              // TODO: SensorManager might be the problem here, but this works
-              // _doDelayedSearch(val);
-              searchBox.doSearch(val);
-            }
-          }
-
-          // Then Do Other Stuff
-          for (let i = 0; i < params.length; i++) {
-            let key = params[i].split('=')[0];
-            let val = params[i].split('=')[1];
-            let urlSatId;
-            switch (key) {
-              case 'intldes':
+            // Then Do Other Stuff
+            for (let i = 0; i < params.length; i++) {
+              let key = params[i].split('=')[0];
+              let val = params[i].split('=')[1];
+              let urlSatId;
+              switch (key) {
+                case 'intldes':
                 urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
                 if (urlSatId !== null) {
                   selectSat(urlSatId);
                 }
                 break;
-              case 'sat':
+                case 'sat':
                 urlSatId = satSet.getIdFromObjNum(val.toUpperCase());
                 if (urlSatId !== null) {
                   selectSat(urlSatId);
                 }
                 break;
-              case 'misl':
+                case 'misl':
                 var subVal = val.split(',');
                 $('#ms-type').val(subVal[0].toString());
                 $('#ms-attacker').val(subVal[1].toString());
@@ -302,7 +316,7 @@ var drawLoopCallback;
                 // $('#ms-lon').val() * 1;
                 $('#missile').trigger("submit");
                 break;
-              case 'date':
+                case 'date':
                 timeManager.propOffset = Number(val) - Date.now();
                 $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
                 satCruncher.postMessage({
@@ -310,7 +324,7 @@ var drawLoopCallback;
                   dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
                 });
                 break;
-              case 'rate':
+                case 'rate':
                 val = Math.min(val, 1000);
                 // could run time backwards, but let's not!
                 val = Math.max(val, 0.0);
@@ -321,9 +335,10 @@ var drawLoopCallback;
                   dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
                 });
                 break;
+              }
             }
-          }
-        })();
+          })();
+        }, 300);
 
         if ($(window).width() > $(window).height()) {
           settingsManager.mapHeight = $(window).width(); // Subtract 12 px for the scroll
@@ -383,9 +398,11 @@ var drawLoopCallback;
 
     if ((isDragging && !settingsManager.isMobileModeEnabled) ||
          isDragging && settingsManager.isMobileModeEnabled && (mouseX !== 0 || mouseY !== 0)) {
-      dragTarget = getEarthScreenPoint(mouseX, mouseY);
-      if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
-      isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
+      // Disable Raycasting for Performance
+      // dragTarget = getEarthScreenPoint(mouseX, mouseY);
+      // if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
+      // isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
+      if (true ||
       cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current=== cameraType.ASTRONOMY ||
       settingsManager.isMobileModeEnabled) { // random screen drag
         xDif = screenDragPoint[0] - mouseX;
@@ -448,7 +465,7 @@ var drawLoopCallback;
       fpsRotate += camRotateSpeed * dt;
     }
 
-    if (rotateTheEarth) { camYaw -= rotateTheEarthSpeed * dt; }
+    if (rotateTheEarth) { camYaw -= settingsManager.autoRotateSpeed * dt; }
 
     // Zoom Changing
     if (zoomLevel !== zoomTarget) {
@@ -459,14 +476,13 @@ var drawLoopCallback;
       } else {
         settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize;
       }
-      atmosphere.resize();
     }
 
     if (camSnapMode) {
-      camPitch += (camPitchTarget - camPitch) * 0.003 * dt;
+      camPitch += (camPitchTarget - camPitch) * cameraManager.chaseSpeed * dt;
 
       let yawErr = _normalizeAngle(camYawTarget - camYaw);
-      camYaw += yawErr * 0.003 * dt;
+      camYaw += yawErr * cameraManager.chaseSpeed * dt;
 
       zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dt * 0.0025;
     } else {
@@ -498,10 +514,13 @@ var drawLoopCallback;
 
     if (typeof missileManager != 'undefined' && missileManager.missileArray.length > 0) {
       for (var i = 0; i < missileManager.missileArray.length; i++) {
-        orbitDisplay.updateOrbitBuffer(missileManager.missileArray[i].id);
+        orbitManager.updateOrbitBuffer(missileManager.missileArray[i].id);
       }
     }
 
+    if (cameraType.current=== cameraType.FPS || cameraType.current=== cameraType.SATELLITE || cameraType.current=== cameraType.ASTRONOMY) {
+      _fpsMovement();
+    }
     _drawScene();
     drawLines();
     _updateHover();
@@ -605,7 +624,7 @@ var drawLoopCallback;
         altitude = sat.getAltitude();
       } if (sat.missile) {
         altitude = sat.maxAlt + 1000;             // if it is a missile use its altitude
-        orbitDisplay.setSelectOrbit(sat.satId);
+        orbitManager.setSelectOrbit(sat.satId);
       }
       if (altitude) {
         camDistTarget = altitude + RADIUS_OF_EARTH + settingsManager.camDistBuffer;
@@ -615,8 +634,8 @@ var drawLoopCallback;
         camZoomSnappedOnSat = false;
         camAngleSnappedOnSat = false;
       }
-      if (Math.pow((camDistTarget - DIST_MIN) / (DIST_MAX - DIST_MIN), 1 / ZOOM_EXP) < zoomTarget) {
-        zoomTarget = Math.pow((camDistTarget - DIST_MIN) / (DIST_MAX - DIST_MIN), 1 / ZOOM_EXP);
+      if (Math.pow((camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance), 1 / ZOOM_EXP) < zoomTarget) {
+        zoomTarget = Math.pow((camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance), 1 / ZOOM_EXP);
       }
     }
 
@@ -625,39 +644,34 @@ var drawLoopCallback;
     }
   }
   function _drawScene () {
+    // Drawing ColorIds for Picking Satellites
     gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-    if (cameraType.current=== cameraType.FPS || cameraType.current=== cameraType.SATELLITE || cameraType.current=== cameraType.ASTRONOMY) {
-      _fpsMovement();
-    }
     camMatrix = _drawCamera();
 
     gl.useProgram(gl.pickShaderProgram);
     gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(gl.pickShaderProgram.camMatrix, false, camMatrix);
 
-    // Why do we clear the color buffer twice?
+    // Draw Scene
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     sun.draw(pMatrix, camMatrix);
     moon.draw(pMatrix, camMatrix);
     // if (typeof debugLine != 'undefined') debugLine.draw();
-    if (cameraType.current != cameraType.FPS) {
-      atmosphere.draw(pMatrix, camMatrix);
-    }
+    atmosphere.draw(pMatrix, camMatrix);
     earth.draw(pMatrix, camMatrix);
     satSet.draw(pMatrix, camMatrix, drawNow);
-    orbitDisplay.draw(pMatrix, camMatrix);
+    orbitManager.draw(pMatrix, camMatrix);
 
     /* DEBUG - show the pickbuffer on a canvas */
     // debugImageData.data = pickColorMap;
     /* debugImageData.data.set(pickColorMap);
     debugContext.putImageData(debugImageData, 0, 0); */
-
   }
   function _drawCamera () {
       camMatrix = camMatrixEmpty;
@@ -733,7 +747,7 @@ var drawLoopCallback;
             mat4.rotate(camMatrix, camMatrix, fpsYaw * DEG2RAD, [0, 0, 1]);
             mat4.rotate(camMatrix, camMatrix, fpsRotate * DEG2RAD, [0, 1, 0]);
 
-            orbitDisplay.updateOrbitBuffer(lastSelectedSat);
+            orbitManager.updateOrbitBuffer(lastSelectedSat);
             let satPos = sat.position;
             mat4.translate(camMatrix, camMatrix, [-satPos.x, -satPos.y, -satPos.z]);
             break;
@@ -767,7 +781,7 @@ var drawLoopCallback;
             mat4.rotate(camMatrix, camMatrix, (yawRotate + (fpsYaw * DEG2RAD)), [0, 0, 1]);
             mat4.rotate(camMatrix, camMatrix, fpsRotate * DEG2RAD, [0, 1, 0]);
 
-            // orbitDisplay.updateOrbitBuffer(lastSelectedSat);
+            // orbitManager.updateOrbitBuffer(lastSelectedSat);
             let sensorPos = sensor.position;
             fpsXPos = sensorPos.x;
             fpsYPos = sensorPos.y;
@@ -868,15 +882,20 @@ var drawLoopCallback;
   }
   var currentSearchSats;
   function _updateHover () {
-    currentSearchSats = searchBox.getLastResultGroup();
-    if (searchBox.isHovering()) {
+    if (!settingsManager.disableUI) {
+      currentSearchSats = searchBox.getLastResultGroup();
+    }
+    if (!settingsManager.disableUI && searchBox.isHovering()) {
       updateHoverSatId = searchBox.getHoverSat();
       satSet.getScreenCoords(updateHoverSatId, pMatrix, camMatrix);
-      if (!_earthHitTest(satScreenPositionArray.x, satScreenPositionArray.y)) {
-        _hoverBoxOnSat(updateHoverSatId, satScreenPositionArray.x, satScreenPositionArray.y);
-      } else {
-        _hoverBoxOnSat(-1, 0, 0);
-      }
+      // if (!_earthHitTest(satScreenPositionArray.x, satScreenPositionArray.y)) {
+        try {
+          _hoverBoxOnSat(updateHoverSatId, satScreenPositionArray.x, satScreenPositionArray.y);
+        } catch (e) {
+        }
+      // } else {
+      //   _hoverBoxOnSat(-1, 0, 0);
+      // }
     } else {
       if (!isMouseMoving || isDragging || settingsManager.isMobileModeEnabled) { return; }
 
@@ -890,14 +909,17 @@ var drawLoopCallback;
         mouseSat = getSatIdFromCoord(mouseX, mouseY);
       }
 
-      if (mouseSat !== -1) {
-        orbitDisplay.setHoverOrbit(mouseSat);
-      } else {
-        orbitDisplay.clearHoverOrbit();
+      if (settingsManager.enableHoverOrbits) {
+        if (mouseSat !== -1) {
+          orbitManager.setHoverOrbit(mouseSat);
+        } else {
+          orbitManager.clearHoverOrbit();
+        }
+        satSet.setHover(mouseSat);
       }
-
-      satSet.setHover(mouseSat);
-      _hoverBoxOnSat(mouseSat, mouseX, mouseY);
+      if (settingsManager.enableHoverOverlay) {
+        _hoverBoxOnSat(mouseSat, mouseX, mouseY);
+      }
     }
     function _earthHitTest (x, y) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
@@ -926,7 +948,7 @@ var drawLoopCallback;
     if (!sensorManager.checkSensorSelected()) return;
     if (drawNow - satLabelModeLastTime < settingsManager.satLabelInterval) return;
 
-    orbitDisplay.clearInViewOrbit();
+    orbitManager.clearInViewOrbit();
 
     var sat;
     labelCount = 0;
@@ -950,7 +972,7 @@ var drawLoopCallback;
       if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
 
       // Draw Orbits
-      orbitDisplay.addInViewOrbit(i);
+      orbitManager.addInViewOrbit(i);
 
       // Draw Sat Labels
       // if (settingsManager.isDisableSatHoverBox) continue;
@@ -1019,30 +1041,37 @@ var drawLoopCallback;
         satHoverBoxNode2.textContent = '';
         satHoverBoxNode3.textContent = '';
       } else {
-        if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected() && isShowNextPass && isShowDistance) {
+        // Use this as a default if no UI
+        if (settingsManager.disableUI) {
           satHoverBoxNode1.textContent = (sat.ON);
           satHoverBoxNode2.textContent = (sat.SCC_NUM);
-          satHoverBoxNode3.innerHTML = (satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '');
-        } else if (isShowDistance) {
-          satHoverBoxNode1.textContent = (sat.ON);
-          satHoverBoxNode2.innerHTML = (sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
-          satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
-                                          'X: ' + sat.velocityX.toFixed(2) + 'km/s Y: ' + sat.velocityY.toFixed(2) + 'km/s Z: ' + sat.velocityZ.toFixed(2)) + 'km/s';
-        } else if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected() && isShowNextPass) {
-          satHoverBoxNode1.textContent = (sat.ON);
-          satHoverBoxNode2.textContent = (sat.SCC_NUM);
-          satHoverBoxNode3.textContent = (satellite.nextpass(sat));
+          satHoverBoxNode3.textContent = (objectManager.extractCountry(sat.C));
         } else {
-          satHoverBoxNode1.textContent = (sat.ON);
-          satHoverBoxNode2.textContent = (sat.SCC_NUM);
-          satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
-                                          'X: ' + sat.velocityX.toFixed(2) + ' Y: ' + sat.velocityY.toFixed(2) + ' Z: ' + sat.velocityZ.toFixed(2));
+          if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected() && isShowNextPass && isShowDistance) {
+            satHoverBoxNode1.textContent = (sat.ON);
+            satHoverBoxNode2.textContent = (sat.SCC_NUM);
+            satHoverBoxNode3.innerHTML = (satellite.nextpass(sat) + satellite.distance(sat, selectedSatData) + '');
+          } else if (isShowDistance) {
+            satHoverBoxNode1.textContent = (sat.ON);
+            satHoverBoxNode2.innerHTML = (sat.SCC_NUM + satellite.distance(sat, selectedSatData) + '');
+            satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
+                                            'X: ' + sat.velocityX.toFixed(2) + 'km/s Y: ' + sat.velocityY.toFixed(2) + 'km/s Z: ' + sat.velocityZ.toFixed(2)) + 'km/s';
+          } else if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected() && isShowNextPass) {
+            satHoverBoxNode1.textContent = (sat.ON);
+            satHoverBoxNode2.textContent = (sat.SCC_NUM);
+            satHoverBoxNode3.textContent = (satellite.nextpass(sat));
+          } else {
+            satHoverBoxNode1.textContent = (sat.ON);
+            satHoverBoxNode2.textContent = (sat.SCC_NUM);
+            satHoverBoxNode3.innerHTML = ('X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>' +
+                                            'X: ' + sat.velocityX.toFixed(2) + ' Y: ' + sat.velocityY.toFixed(2) + ' Z: ' + sat.velocityZ.toFixed(2));
+          }
         }
       }
       satHoverBoxDOM.css({
         display: 'block',
         'text-align': 'center',
-        position: 'absolute',
+        position: 'fixed',
         left: satX + 20,
         top: satY - 10
       });
@@ -1076,7 +1105,7 @@ var drawLoopCallback;
       if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
       if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
       _hoverBoxOnSat(i, satScreenPositionArray.x, satScreenPositionArray.y);
-      orbitDisplay.setSelectOrbit(i);
+      orbitManager.setSelectOrbit(i);
       demoModeSatellite = i + 1;
       return;
     }
@@ -1114,8 +1143,10 @@ function webGlInit () {
     can.width = settingsManager.hiResWidth;
     can.height = settingsManager.hiResHeight;
   } else {
-    can.width = window.innerWidth;
-    can.height = window.innerHeight;
+    if (!settingsManager.isFullscreenApplication) {
+      can.width = document.body.clientWidth;
+      can.height = window.innerHeight;
+    }
   }
 
   // Desynchronized Fixed Jitter on Old Computer
@@ -1127,12 +1158,6 @@ function webGlInit () {
   gl.viewport(0, 0, can.width, can.height);
 
   gl.enable(gl.DEPTH_TEST);
-
-  // gl.enable(0x8642);
-  /* enable point sprites(?!) This might get browsers with
-  underlying OpenGL to behave
-  although it's not technically a part of the WebGL standard
-  */
 
   var pFragShader = gl.createShader(gl.FRAGMENT_SHADER);
   var pFragCode = shaderLoader.getShaderCode('pick-fragment.glsl');
@@ -1181,7 +1206,7 @@ function webGlInit () {
   pickColorBuf = new Uint8Array(4);
 
   pMatrix = mat4.create();
-  mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, 20.0, 600000.0);
+  mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
   var eciToOpenGlMat = [
     1, 0, 0, 0,
     0, 0, -1, 0,
@@ -1194,7 +1219,7 @@ function webGlInit () {
 }
 function _getCamDist () {
   db.log('_getCamDist', true);
-  return Math.pow(zoomLevel, ZOOM_EXP) * (DIST_MAX - DIST_MIN) + DIST_MIN;
+  return Math.pow(zoomLevel, ZOOM_EXP) * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance;
 }
 function _unProject (mx, my) {
   glScreenX = (mx / gl.drawingBufferWidth * 2) - 1.0;
@@ -1308,6 +1333,7 @@ function selectSat (satId) {
   db.log(`satId: ${satId}`, true);
   var sat;
   if (satId !== -1) {
+    cameraManager.isChasing = false;
     sat = satSet.getSat(satId);
     if (sat.type == 'Star') return;
     if ((sat.active == false || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') return; // Non-Missile Non-Sensor Object
@@ -1334,7 +1360,7 @@ function selectSat (satId) {
     $('#sat-infobox').fadeOut();
     // $('#iss-stream').html('');
     // $('#iss-stream-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    orbitDisplay.clearSelectOrbit();
+    orbitManager.clearSelectOrbit();
     // Remove Red Box
     $('#menu-lookanglesmultisite').removeClass('bmenu-item-selected');
     $('#menu-lookangles').removeClass('bmenu-item-selected');
@@ -1370,6 +1396,7 @@ function selectSat (satId) {
     isMissileMenuOpen = false;
     isCustomSensorMenuOpen = false;
   } else {
+    cameraManager.isChasing = true;
     isSelectedSatNegativeOne = false;
     selectedSat = satId;
     sat = satSet.getSatExtraOnly(satId);
@@ -1395,7 +1422,7 @@ function selectSat (satId) {
     camZoomSnappedOnSat = true;
     camAngleSnappedOnSat = true;
 
-    orbitDisplay.setSelectOrbit(satId);
+    orbitManager.setSelectOrbit(satId);
 
     if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
       $('#menu-lookangles').removeClass('bmenu-item-disabled');
@@ -1872,3 +1899,800 @@ function drawLines () {
     drawLineList[drawLinesI].line.draw(drawLineList[drawLinesI].color);
   }
 }
+
+(function _canvasController () {
+  db.log('_canvasController');
+  var latLon;
+  canvasDOM.on('touchmove', function (evt) {
+    evt.preventDefault();
+    if (isPinching) {
+      var currentPinchDistance = Math.hypot(
+        evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX,
+        evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY);
+      deltaPinchDistance = ((startPinchDistance - currentPinchDistance) / maxPinchSize);
+      zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed + 0.006);
+      zoomTarget = Math.min(Math.max(zoomTarget, 0), 1); // Force between 0 and 1
+    } else { // Dont Move While Zooming
+      mouseX = evt.originalEvent.touches[0].clientX;
+      mouseY = evt.originalEvent.touches[0].clientY;
+      if (isDragging && screenDragPoint[0] !== mouseX && screenDragPoint[1] !== mouseY) {
+        dragHasMoved = true;
+        camAngleSnappedOnSat = false;
+        camZoomSnappedOnSat = false;
+      }
+      isMouseMoving = true;
+      clearTimeout(mouseTimeout);
+      mouseTimeout = setTimeout(function () {
+        isMouseMoving = false;
+      }, 250);
+    }
+  });
+  canvasDOM.on("mousemove", function (evt) {
+    mouseX = evt.clientX;
+    mouseY = evt.clientY;
+    if (isDragging && screenDragPoint[0] !== mouseX && screenDragPoint[1] !== mouseY) {
+      dragHasMoved = true;
+      camAngleSnappedOnSat = false;
+      camZoomSnappedOnSat = false;
+    }
+    isMouseMoving = true;
+    clearTimeout(mouseTimeout);
+    mouseTimeout = setTimeout(function () {
+      isMouseMoving = false;
+    }, 250);
+  });
+
+  if (settingsManager.disableUI) {
+    canvasDOM.on('wheel', function (evt) {
+      satHoverBoxDOM.css({
+        display: 'none'});
+    });
+  }
+  if (!settingsManager.disableUI) {
+    canvasDOM.on('wheel', function (evt) {
+      if (settingsManager.disableNormalEvents) { evt.preventDefault(); }
+
+      var delta = evt.originalEvent.deltaY;
+      if (evt.originalEvent.deltaMode === 1) {
+        delta *= 33.3333333;
+      }
+
+      if (delta < 0) {
+        isZoomIn = true;
+      } else {
+        isZoomIn = false;
+      }
+
+      zoomTarget += delta / 100 / 50 / speedModifier; // delta is +/- 100
+      zoomTarget = Math.min(Math.max(zoomTarget, 0), 1); // Force between 0 and 1
+      rotateTheEarth = false;
+      camZoomSnappedOnSat = false;
+
+      if (cameraType.current === cameraType.PLANETARIUM || cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
+        settingsManager.fieldOfView += delta * 0.0002;
+        $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+        if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+        if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
+        webGlInit();
+      }
+    });
+    canvasDOM.on("click", function (evt) {
+      if (settingsManager.disableNormalEvents) { evt.preventDefault(); }
+      rightBtnMenuDOM.hide();
+      _clearRMBSubMenu();
+      if ($('#colorbox').css('display') === 'block') {
+        $.colorbox.close(); // Close colorbox if it was open
+      }
+    });
+    canvasDOM.on("mousedown", function (evt) {
+      if (settingsManager.disableNormalEvents) { evt.preventDefault(); }
+
+      if (speedModifier === 1) {
+        settingsManager.cameraMovementSpeed = 0.003;
+        settingsManager.cameraMovementSpeedMin = 0.005;
+      }
+
+      if (evt.button === 2) {
+        dragPoint = getEarthScreenPoint(mouseX, mouseY);
+        latLon = satellite.eci2ll(dragPoint[0], dragPoint[1], dragPoint[2]);
+      }
+      screenDragPoint = [mouseX, mouseY];
+      dragStartPitch = camPitch;
+      dragStartYaw = camYaw;
+      // debugLine.set(dragPoint, getCamPos());
+      isDragging = true;
+      camSnapMode = false;
+      rotateTheEarth = false;
+      rightBtnMenuDOM.hide();
+      _clearRMBSubMenu();
+
+      // TODO: Make uiManager.updateURL() a setting that is disabled by default
+      uiManager.updateURL();
+    });
+    canvasDOM.on('touchstart', function (evt) {
+      settingsManager.cameraMovementSpeed = 0.0001;
+      settingsManager.cameraMovementSpeedMin = 0.0001;
+      if (evt.originalEvent.touches.length > 1) { // Two Finger Touch
+          isPinching = true;
+          startPinchDistance = Math.hypot(
+            evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX,
+            evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY);
+          // _pinchStart(evt);
+      } else { // Single Finger Touch
+        mouseX = evt.originalEvent.touches[0].clientX;
+        mouseY = evt.originalEvent.touches[0].clientY;
+        mouseSat = getSatIdFromCoord(mouseX, mouseY);
+        settingsManager.cameraMovementSpeed = Math.max(0.005 * zoomLevel, settingsManager.cameraMovementSpeedMin);
+        screenDragPoint = [mouseX, mouseY];
+        // dragPoint = getEarthScreenPoint(x, y);
+        dragPoint = screenDragPoint; // Ignore the earth on mobile
+        dragStartPitch = camPitch;
+        dragStartYaw = camYaw;
+        // debugLine.set(dragPoint, getCamPos());
+        isDragging = true;
+        touchStartTime = Date.now();
+        // if (window.innerWidth <= 1000) {
+        //   isDragging = false;
+        // }
+        camSnapMode = false;
+        rotateTheEarth = false;
+
+        // TODO: Make updateUrl() a setting that is disabled by default
+        uiManager.updateURL();
+      }
+    });
+    canvasDOM.on("mouseup", function (evt) {
+      if (settingsManager.disableNormalEvents) { evt.preventDefault(); }
+      if (!dragHasMoved) {
+        if (settingsManager.isMobileModeEnabled) {
+          mouseSat = getSatIdFromCoord(mouseX, mouseY);
+        }
+        clickedSat = mouseSat;
+        if (evt.button === 0) { // Left Mouse Button Clicked
+          if (cameraType.current === cameraType.SATELLITE) {
+            if (clickedSat !== -1 && !satSet.getSatExtraOnly(clickedSat).static) { selectSat(clickedSat); }
+          } else {
+            selectSat(clickedSat);
+          }
+        }
+        if (evt.button === 2) { // Right Mouse Button Clicked
+          _openRmbMenu();
+        }
+      }
+      // Repaint the theme to ensure it is the right color
+      settingsManager.themes.retheme();
+      // Force the serach bar to get repainted because it gets overwrote a lot
+      settingsManager.themes.redThemeSearch();
+      dragHasMoved = false;
+      isDragging = false;
+      rotateTheEarth = false;
+    });
+  }
+
+  function _openRmbMenu () {
+    let numMenuItems = 0;
+    $('#clear-lines-rmb').hide();
+
+    // View
+    $('#view-info-rmb').hide();
+    $('#view-sensor-info-rmb').hide();
+    $('#view-sat-info-rmb').hide();
+    $('#view-related-sats-rmb').hide();
+    $('#view-curdops-rmb').hide();
+    $('#view-24dops-rmb').hide();
+
+    // Edit
+    $('#edit-sat-rmb').hide();
+
+    // Create
+    $('#create-observer-rmb ').hide();
+    $('#create-sensor-rmb').hide();
+
+    // Draw
+    $('#line-eci-axis-rmb').hide();
+    $('#line-sensor-sat-rmb').hide();
+    $('#line-earth-sat-rmb').hide();
+    $('#line-sat-sun-rmb').hide();
+
+    // Earth
+    $('#earth-low-rmb').hide();
+    $('#earth-high-rmb').hide();
+    $('#earth-vec-rmb').hide();
+
+    // Colors Always Present
+
+    var isViewDOM = false;
+    var isEditDOM = false;
+    var isCreateDOM = false;
+    var isDrawDOM = false;
+    var isEarthDOM = false;
+
+    rightBtnSaveDOM.show();
+    rightBtnViewDOM.hide();
+    rightBtnEditDOM.hide();
+    rightBtnCreateDOM.hide();
+    rightBtnDrawDOM.hide();
+    rightBtnEarthDOM.hide();
+
+    if (drawLineList.length > 0) {
+      $('#clear-lines-rmb').show();
+    }
+
+
+    if (mouseSat !== -1) {
+      if (typeof clickedSat == 'undefined' || typeof satSet.getSat(clickedSat) == 'undefined') return;
+      if (typeof satSet.getSat(clickedSat).type == 'undefined' || satSet.getSat(clickedSat).type !== 'Star') {
+        rightBtnViewDOM.show();
+        isViewDOM = true;
+        numMenuItems++;
+      }
+      if (!satSet.getSat(clickedSat).static) {
+        $('#edit-sat-rmb').show();
+        rightBtnEditDOM.show();
+        isEditDOM = true;
+        numMenuItems++;
+
+        $('#view-sat-info-rmb').show();
+        $('#view-related-sats-rmb').show();
+
+        if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected() && sensorManager.whichRadar !== 'CUSTOM') {
+          $('#line-sensor-sat-rmb').show();
+        }
+        $('#line-earth-sat-rmb').show();
+        $('#line-sat-sun-rmb').show();
+        rightBtnDrawDOM.show();
+        isDrawDOM = true;
+        numMenuItems++;
+      } else {
+        if (satSet.getSat(clickedSat).type === 'Optical' ||
+            satSet.getSat(clickedSat).type === 'Mechanical' ||
+            satSet.getSat(clickedSat).type === 'Phased Array Radar') {
+
+          $('#view-sensor-info-rmb').show();
+        }
+      }
+    } else {
+    }
+
+    // Is this the Earth?
+    //
+    // This not the Earth
+
+    if (typeof latLon == 'undefined' || isNaN(latLon.latitude) || isNaN(latLon.longitude)) {
+    } else { // This is the Earth
+      if (!isViewDOM) {
+        rightBtnViewDOM.show();
+        ++numMenuItems;
+      }
+      $('#view-info-rmb').show();
+      $('#view-curdops-rmb').show();
+      $('#view-24dops-rmb').show();
+
+      if (!isCreateDOM) {
+        rightBtnCreateDOM.show();
+        ++numMenuItems;
+      }
+      $('#create-observer-rmb ').show();
+      $('#create-sensor-rmb').show();
+
+      if (!isDrawDOM) {
+        rightBtnDrawDOM.show();
+        ++numMenuItems;
+      }
+      $('#line-eci-axis-rmb').show();
+
+      if (!isEarthDOM) {
+        rightBtnEarthDOM.show();
+        ++numMenuItems;
+      }
+
+      $('#earth-nasa-rmb').show();
+      $('#earth-blue-rmb').show();
+      $('#earth-low-rmb').show();
+      $('#earth-high-no-clouds-rmb').show();
+      $('#earth-vec-rmb').show();
+      if (settingsManager.nasaImages == true) $('#earth-nasa-rmb').hide();
+      if (settingsManager.trusatImages == true) $('#earth-trusat-rmb').hide();
+      if (settingsManager.blueImages == true) $('#earth-blue-rmb').hide();
+      if (settingsManager.lowresImages == true) $('#earth-low-rmb').hide();
+      if (settingsManager.hiresNoCloudsImages == true) $('#earth-high-no-clouds-rmb').hide();
+      if (settingsManager.vectorImages == true) $('#earth-vec-rmb').hide();
+    }
+
+    rightBtnMenuDOM.show();
+    satHoverBoxDOM.hide();
+    // Might need to be adjusted if number of menus change
+    var offsetX = (mouseX < (canvasDOM.innerWidth() / 2)) ? 0 : -100;
+    var offsetY = (mouseY < (canvasDOM.innerHeight() / 2)) ? 0 : (numMenuItems * -50);
+    rightBtnMenuDOM.css({
+      display: 'block',
+      'text-align': 'center',
+      position: 'absolute',
+      left: mouseX + offsetX,
+      top: mouseY + offsetY
+    });
+  }
+
+  canvasDOM.on('touchend', function (evt) {
+    let touchTime = (Date.now() - touchStartTime);
+
+    if (touchTime > 250) {
+      // TODO: Implement touchscreen rmb
+      // _openRmbMenu();
+      mouseSat = -1;
+    }
+
+    if (isPinching) {
+        // pinchEnd(e);
+        isPinching = false;
+    }
+    mouseY = 0;
+    mouseX = 0;
+    dragHasMoved = false;
+    isDragging = false;
+    rotateTheEarth = false;
+  });
+
+  $('#nav-wrapper *').on("click", function (evt) { _hidePopUps(); });
+  $('#nav-wrapper').on("click", function (evt) { _hidePopUps(); });
+  $('#nav-footer *').on("click", function (evt) { _hidePopUps(); });
+  $('#nav-footer').on("click", function (evt) { _hidePopUps(); });
+  $('#ui-wrapper *').on("click", function (evt) { _hidePopUps(); });
+  function _hidePopUps () {
+    rightBtnMenuDOM.hide();
+    _clearRMBSubMenu();
+    if ($('#colorbox').css('display') === 'block') {
+      $.colorbox.close(); // Close colorbox if it was open
+    }
+  }
+
+  if (settingsManager.startWithFocus) {
+    canvasDOM.attr('tabIndex', 0);
+    canvasDOM.trigger("focus");
+  }
+
+  if (!settingsManager.disableUI) {
+    bodyDOM.on('keypress', _keyHandler); // On Key Press Event Run _keyHandler Function
+    bodyDOM.on('keydown', _keyDownHandler); // On Key Press Event Run _keyHandler Function
+    bodyDOM.on('keyup', _keyUpHandler); // On Key Press Event Run _keyHandler Function
+
+    rightBtnMenuDOM.on("click", function (e) {
+      _rmbMenuActions(e);
+    });
+    rightBtnSaveMenuDOM.on("click", function (e) {
+      _rmbMenuActions(e);
+    });
+    rightBtnViewMenuDOM.on("click", function (e) {
+      _rmbMenuActions(e);
+    });
+    rightBtnEditMenuDOM.on("click", function (e) {
+      _rmbMenuActions(e);
+    });
+    rightBtnCreateMenuDOM.on("click", function (e) {
+      _rmbMenuActions(e);
+    });
+    rightBtnDrawMenuDOM.on("click", function (e) {
+      _rmbMenuActions(e);
+    });
+    rightBtnColorsMenuDOM.on("click", function (e) {
+      _rmbMenuActions(e);
+    });
+    rightBtnEarthMenuDOM.on("click", function (e) {
+      _rmbMenuActions(e);
+    });
+
+    rightBtnSaveDOM.hover(function () {
+      _clearRMBSubMenu();
+      var offsetX = (rightBtnSaveDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+      rightBtnSaveMenuDOM.css({
+        display: 'block',
+        'text-align': 'center',
+        position: 'absolute',
+        left: rightBtnSaveDOM.offset().left + offsetX,
+        top: rightBtnSaveDOM.offset().top
+      });
+      if (rightBtnSaveDOM.offset().top !== 0) {
+        rightBtnSaveMenuDOM.show();
+      } else {
+        rightBtnSaveMenuDOM.hide();
+      }
+    });
+    rightBtnSaveMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnSaveMenuDOM.hide();
+    });
+
+    rightBtnViewDOM.hover(function () {
+      _clearRMBSubMenu();
+      var offsetX = (rightBtnViewDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+      rightBtnViewMenuDOM.css({
+        display: 'block',
+        'text-align': 'center',
+        position: 'absolute',
+        left: rightBtnViewDOM.offset().left + offsetX,
+        top: rightBtnViewDOM.offset().top
+      });
+      if (rightBtnViewDOM.offset().top !== 0) {
+        rightBtnViewMenuDOM.show();
+      } else {
+        rightBtnViewMenuDOM.hide();
+      }
+    });
+    rightBtnViewMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnViewMenuDOM.hide();
+    });
+
+    rightBtnEditDOM.hover(function () {
+      _clearRMBSubMenu();
+
+      var offsetX = (rightBtnEditDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+      rightBtnEditMenuDOM.css({
+        display: 'block',
+        'text-align': 'center',
+        position: 'absolute',
+        left: rightBtnEditDOM.offset().left + offsetX,
+        top: rightBtnEditDOM.offset().top
+      });
+      if (rightBtnEditMenuDOM.offset().top !== 0) {
+        rightBtnEditMenuDOM.show();
+      } else {
+        rightBtnEditMenuDOM.hide();
+      }
+    });
+    rightBtnEditMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnEditMenuDOM.hide();
+    });
+
+    rightBtnCreateDOM.hover(function () {
+      _clearRMBSubMenu();
+
+      var offsetX = (rightBtnCreateDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+      rightBtnCreateMenuDOM.css({
+        display: 'block',
+        'text-align': 'center',
+        position: 'absolute',
+        left: rightBtnCreateDOM.offset().left + offsetX,
+        top: rightBtnCreateDOM.offset().top
+      });
+      if (rightBtnCreateMenuDOM.offset().top !== 0) {
+        rightBtnCreateMenuDOM.show();
+      } else {
+        rightBtnCreateMenuDOM.hide();
+      }
+    });
+    rightBtnCreateMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnCreateMenuDOM.hide();
+    });
+
+    rightBtnDrawDOM.hover(function () {
+      _clearRMBSubMenu();
+      var offsetX = (rightBtnDrawDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+      rightBtnDrawMenuDOM.css({
+        display: 'block',
+        'text-align': 'center',
+        position: 'absolute',
+        left: rightBtnDrawDOM.offset().left + offsetX,
+        top: rightBtnDrawDOM.offset().top
+      });
+      if (rightBtnDrawDOM.offset().top !== 0) {
+        rightBtnDrawMenuDOM.show();
+      } else {
+        rightBtnDrawMenuDOM.hide();
+      }
+    });
+    rightBtnDrawMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnDrawMenuDOM.hide();
+    });
+
+    rightBtnColorsDOM.hover(function () {
+      _clearRMBSubMenu();
+      var offsetX = (rightBtnColorsDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+      rightBtnColorsMenuDOM.css({
+        display: 'block',
+        'text-align': 'center',
+        position: 'absolute',
+        left: rightBtnColorsDOM.offset().left + offsetX,
+        top: rightBtnColorsDOM.offset().top
+      });
+      if (rightBtnColorsDOM.offset().top !== 0) {
+        rightBtnColorsMenuDOM.show();
+      } else {
+        rightBtnColorsMenuDOM.hide();
+      }
+    });
+    rightBtnEarthMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnEarthMenuDOM.hide();
+    });
+
+    rightBtnEarthDOM.hover(function () {
+      _clearRMBSubMenu();
+      var offsetX = (rightBtnEarthDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+      rightBtnEarthMenuDOM.css({
+        display: 'block',
+        'text-align': 'center',
+        position: 'absolute',
+        left: rightBtnEarthDOM.offset().left + offsetX,
+        top: rightBtnEarthDOM.offset().top
+      });
+      if (rightBtnEarthDOM.offset().top !== 0) {
+        rightBtnEarthMenuDOM.show();
+      } else {
+        rightBtnEarthMenuDOM.hide();
+      }
+    });
+    rightBtnEarthMenuDOM.hover(null, function () { // Lost Focus
+      rightBtnEarthMenuDOM.hide();
+    });
+  }
+  function _rmbMenuActions (e) {
+    // No Right Click Without UI
+    if (settingsManager.disableUI) return;
+
+    var targetId = e.target.id;
+    if (e.target.tagName == 'A') {
+      targetId = e.target.parentNode.id;
+    }
+    if (e.target.tagName == 'UL'){
+      targetId = e.target.firstChild.id;
+    }
+    switch (targetId) {
+      case 'save-hd-rmb':
+        uiManager.saveHiResPhoto('hd');
+      break;
+      case 'save-4k-rmb':
+        uiManager.saveHiResPhoto('4k');
+      break;
+      case 'save-8k-rmb':
+        uiManager.saveHiResPhoto('8k');
+      break;
+      case 'view-info-rmb':
+        M.toast({html: 'Lat: ' + latLon.latitude.toFixed(3) + '<br/>Lon: ' + latLon.longitude.toFixed(3)});
+      break;
+      case 'view-sat-info-rmb':
+        selectSat(clickedSat);
+        break;
+      case 'view-sensor-info-rmb':
+        selectSat(clickedSat);
+        $('#menu-sensor-info').on("click", () => {});
+        break;
+      case 'view-related-sats-rmb':
+        var intldes = satSet.getSatExtraOnly(clickedSat).intlDes;
+        var searchStr = intldes.slice(0, 8);
+        searchBox.doSearch(searchStr);
+        break;
+      case 'view-curdops-rmb':
+        var gpsDOP = satellite.getDOPs(latLon.latitude, latLon.longitude, 0);
+        M.toast({html: 'HDOP: ' + gpsDOP.HDOP + '<br/>' +
+                       'VDOP: ' + gpsDOP.VDOP + '<br/>' +
+                       'PDOP: ' + gpsDOP.PDOP + '<br/>' +
+                       'GDOP: ' + gpsDOP.GDOP + '<br/>' +
+                       'TDOP: ' + gpsDOP.TDOP});
+      break;
+      case 'view-24dops-rmb':
+        if (!isDOPMenuOpen) {
+          $('#dops-lat').val(latLon.latitude.toFixed(3));
+          $('#dops-lon').val(latLon.longitude.toFixed(3));
+          $('#dops-alt').val(0);
+          $('#dops-el').val(settingsManager.gpsElevationMask);
+          _bottomIconPress({currentTarget: {id: 'menu-dops'}});
+        } else {
+          uiManager.hideSideMenus();
+          isDOPMenuOpen = true;
+          $('#loading-screen').fadeIn('slow', function () {
+            $('#dops-lat').val(latLon.latitude.toFixed(3));
+            $('#dops-lon').val(latLon.longitude.toFixed(3));
+            $('#dops-alt').val(0);
+            $('#dops-el').val(settingsManager.gpsElevationMask);
+            var lat = $('#dops-lat').val() * 1;
+            var lon = $('#dops-lon').val() * 1;
+            var alt = $('#dops-alt').val() * 1;
+            var el = $('#dops-el').val() * 1;
+            satellite.getDOPsTable(lat, lon, alt);
+            $('#menu-dops').addClass('bmenu-item-selected');
+            $('#loading-screen').fadeOut();
+            $('#dops-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+          });
+        }
+      break;
+      case 'edit-sat-rmb':
+        selectSat(clickedSat);
+        if (!isEditSatMenuOpen) {
+          _bottomIconPress({currentTarget: {id: 'menu-editSat'}});
+        }
+      break;
+      case 'create-sensor-rmb':
+        $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+        $('#menu-customSensor').addClass('bmenu-item-selected');
+        isCustomSensorMenuOpen = true;
+        $('#cs-telescope').on("click", () => {});
+        $('#cs-lat').val(latLon.latitude);
+        $('#cs-lon').val(latLon.longitude);
+        $('#cs-hei').val(0);
+        $('#cs-type').val('Optical');
+        // $('#cs-telescope').prop('checked', false);
+        $('#cs-minaz').val(0);
+        $('#cs-maxaz').val(360);
+        $('#cs-minel').val(10);
+        $('#cs-maxel').val(90);
+        $('#cs-minrange').val(0);
+        $('#cs-maxrange').val(1000000);
+        $('#customSensor').on("submit", () => {});
+      break;
+      case 'clear-lines-rmb':
+        drawLineList = [];
+        if (objectManager.isStarManagerLoaded) {
+          starManager.isAllConstellationVisible = false;
+        }
+        break;
+      case 'line-eci-axis-rmb':
+        debugDrawLine('ref',[10000, 0, 0],'r');
+        debugDrawLine('ref',[0, 10000, 0],'g');
+        debugDrawLine('ref',[0, 0, 10000],'b');
+        break;
+      case 'line-earth-sat-rmb':
+        debugDrawLine('sat', clickedSat,'p');
+        break;
+      case 'line-sensor-sat-rmb':
+        // Sensor always has to be #2
+        debugDrawLine('sat3', [clickedSat,satSet.getIdFromSensorName(sensorManager.currentSensor.name)],'p');
+        break;
+      case 'line-sat-sun-rmb':
+        var sunPos = sun.getXYZ();
+        debugDrawLine('sat2', [clickedSat, sunPos.x, sunPos.y, sunPos.z],'p');
+        break;
+      case 'create-observer-rmb':
+        $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+        $('#menu-customSensor').addClass('bmenu-item-selected');
+        isCustomSensorMenuOpen = true;
+        $('#cs-lat').val(latLon.latitude);
+        $('#cs-lon').val(latLon.longitude);
+        $('#cs-hei').val(0);
+        $('#cs-type').val('Observer');
+        $('#customSensor').on("submit", () => {});
+        uiManager.legendMenuChange('sunlight');
+        satSet.setColorScheme(ColorScheme.sunlight, true);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        settingsManager.isForceColorScheme = true;
+        satCruncher.postMessage({
+          isSunlightView: true,
+        });
+      break;
+      case 'colors-default-rmb':
+        if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
+          uiManager.legendMenuChange('default');
+        } else {
+          uiManager.legendMenuChange('default');
+        }
+        satSet.setColorScheme(ColorScheme.default, true);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
+        break;
+      case 'colors-sunlight-rmb':
+        uiManager.legendMenuChange('sunlight');
+        satSet.setColorScheme(ColorScheme.sunlight, true);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        settingsManager.isForceColorScheme = true;
+        satCruncher.postMessage({
+          isSunlightView: true,
+        });
+        ga('send', 'event', 'ColorScheme Menu', 'Sunlight', 'Selected');
+        break;
+      case 'colors-country-rmb':
+        uiManager.legendMenuChange('countries');
+        satSet.setColorScheme(ColorScheme.countries);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
+        break;
+      case 'colors-velocity-rmb':
+        uiManager.legendMenuChange('velocity');
+        satSet.setColorScheme(ColorScheme.velocity);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
+        break;
+      case 'colors-ageOfElset-rmb':
+        uiManager.legendMenuChange('ageOfElset');
+        satSet.setColorScheme(ColorScheme.ageOfElset);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        ga('send', 'event', 'ColorScheme Menu', 'Age of Elset', 'Selected');
+        break;
+      case 'earth-blue-rmb':
+        settingsManager.blueImages = true;
+        settingsManager.nasaImages = false;
+        settingsManager.trusatImages = false;
+        settingsManager.lowresImages = false;
+        settingsManager.hiresImages = false;
+        settingsManager.hiresNoCloudsImages = false;
+        settingsManager.vectorImages = false;
+        localStorage.setItem("lastMap", 'nasa');
+        earth.init();
+        break;
+      case 'earth-nasa-rmb':
+        settingsManager.blueImages = false;
+        settingsManager.nasaImages = true;
+        settingsManager.trusatImages = false;
+        settingsManager.lowresImages = false;
+        settingsManager.hiresImages = false;
+        settingsManager.hiresNoCloudsImages = false;
+        settingsManager.vectorImages = false;
+        localStorage.setItem("lastMap", 'nasa');
+        earth.init();
+        break;
+      case 'earth-trusat-rmb':
+        settingsManager.blueImages = false;
+        settingsManager.nasaImages = false;
+        settingsManager.trusatImages = true;
+        settingsManager.lowresImages = false;
+        settingsManager.hiresImages = false;
+        settingsManager.hiresNoCloudsImages = false;
+        settingsManager.vectorImages = false;
+        localStorage.setItem("lastMap", 'trusat');
+        earth.init();
+        break;
+      case 'earth-low-rmb':
+        settingsManager.blueImages = false;
+        settingsManager.nasaImages = false;
+        settingsManager.trusatImages = false;
+        settingsManager.lowresImages = true;
+        settingsManager.hiresImages = false;
+        settingsManager.hiresNoCloudsImages = false;
+        settingsManager.vectorImages = false;
+        localStorage.setItem("lastMap", 'low');
+        earth.init();
+        break;
+      case 'earth-high-rmb':
+        $('#loading-screen').fadeIn('slow', function () {
+          settingsManager.blueImages = false;
+          settingsManager.nasaImages = false;
+          settingsManager.trusatImages = false;
+          settingsManager.lowresImages = false;
+          settingsManager.hiresImages = true;
+          settingsManager.hiresNoCloudsImages = false;
+          settingsManager.vectorImages = false;
+          localStorage.setItem("lastMap", 'high');
+          earth.init();
+          $('#loading-screen').fadeOut();
+        });
+        break;
+      case 'earth-high-no-clouds-rmb':
+        $('#loading-screen').fadeIn('slow', function () {
+          settingsManager.blueImages = false;
+          settingsManager.nasaImages = false;
+          settingsManager.trusatImages = false;
+          settingsManager.lowresImages = false;
+          settingsManager.hiresImages = false;
+          settingsManager.hiresNoCloudsImages = true;
+          settingsManager.vectorImages = false;
+          localStorage.setItem("lastMap", 'high-nc');
+          earth.init();
+          $('#loading-screen').fadeOut();
+        });
+        break;
+      case 'earth-vec-rmb':
+        settingsManager.blueImages = false;
+        settingsManager.nasaImages = false;
+        settingsManager.trusatImages = false;
+        settingsManager.lowresImages = false;
+        settingsManager.hiresImages = false;
+        settingsManager.hiresNoCloudsImages = false;
+        settingsManager.vectorImages = true;
+        localStorage.setItem("lastMap", 'vec');
+        earth.init();
+        break;
+      case 'clear-screen-rmb':
+        (function clearScreenRMB () {
+          searchBox.hideResults();
+          isMilSatSelected = false;
+          $('#menu-space-stations').removeClass('bmenu-item-selected');
+
+          if ((!objectManager.isSensorManagerLoaded || sensorManager.checkSensorSelected()) && cameraType.current !== cameraType.PLANETARIUM && cameraType.current !== cameraType.ASTRONOMY) {
+            uiManager.legendMenuChange('default');
+          }
+
+          selectSat(-1);
+
+        })();
+        break;
+      }
+      rightBtnMenuDOM.hide();
+      _clearRMBSubMenu();
+  }
+})();

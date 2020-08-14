@@ -3,7 +3,7 @@
   gl
   shadersReady
   cruncherReady
-  orbitDisplay
+  orbitManager
 
  */
 
@@ -62,7 +62,7 @@
   };
   FOVBubble.prototype.draw = function () {
     if (!settingsManager.shadersReady || !settingsManager.cruncherReady) return;
-    var bubbleShader = orbitDisplay.getPathShader();
+    var bubbleShader = orbitManager.getPathShader();
 
     gl.useProgram(bubbleShader);
     // Disable depth test
@@ -102,7 +102,7 @@
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(buf), gl.STREAM_DRAW);
   };
   Line.prototype.draw = function (color) {
-    var shader = orbitDisplay.getPathShader();
+    var shader = orbitManager.getPathShader();
     gl.useProgram(shader);
     if (typeof color == 'undefined') color = [1.0, 0.0, 1.0, 1.0];
     try {

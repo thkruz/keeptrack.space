@@ -21,12 +21,6 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-ATMOSPHERE_MAX = 108;
-ATMOSPHERE_MOD = RADIUS_OF_EARTH + 300;
-ATMOSPHERE_DIST = 4000;
-ATMOSPHERE_DIST_MOD = 5000;
-ATMOSPHERE_DIST_MIN = 200;
-
 // Earth
 (function () {
   var earth = {};
@@ -66,6 +60,8 @@ ATMOSPHERE_DIST_MIN = 200;
       earth.loaded = true;
     }
   }
+
+  earth.isDayNightToggle = false;
 
   earth.init = function () {
     // var startTime = new Date().getTime();
@@ -274,13 +270,15 @@ ATMOSPHERE_DIST_MIN = 200;
         settingsManager.isPropRateChange = false;
       }
 
-      if (!createClockDOMOnce) {
-        document.getElementById('datetime-text').innerText = `${earth.timeTextStr} UTC`;
-        // document.getElementById('datetime-text-local').innerText = `${timeManager.dateToISOLikeButLocal(earthNow)}`;
-        createClockDOMOnce = true;
-      } else {
-        document.getElementById('datetime-text').childNodes[0].nodeValue = `${earth.timeTextStr} UTC`;
-        // document.getElementById('datetime-text-local').childNodes[0].nodeValue = `${timeManager.dateToISOLikeButLocal(earthNow)}`;
+      if (!settingsManager.disableUI) {
+        if (!createClockDOMOnce) {
+          document.getElementById('datetime-text').innerText = `${earth.timeTextStr} UTC`;
+          // document.getElementById('datetime-text-local').innerText = `${timeManager.dateToISOLikeButLocal(earthNow)}`;
+          createClockDOMOnce = true;
+        } else {
+          document.getElementById('datetime-text').childNodes[0].nodeValue = `${earth.timeTextStr} UTC`;
+          // document.getElementById('datetime-text-local').childNodes[0].nodeValue = `${timeManager.dateToISOLikeButLocal(earthNow)}`;
+        }
       }
     }
 
@@ -300,7 +298,7 @@ ATMOSPHERE_DIST_MIN = 200;
     earth.earthEra = satellite.gstime(earth.earthJ);
 
     // Sets earth.lightDirection [x, y , z]
-    if (!isDayNightToggle) {
+    if (!earth.isDayNightToggle) {
       sun.currentDirection();
       vec3.normalize(earth.lightDirection, earth.lightDirection);
     }
@@ -320,7 +318,7 @@ ATMOSPHERE_DIST_MIN = 200;
     gl.uniformMatrix4fv(earthShader.uMvMatrix, false, mvMatrix);
     gl.uniformMatrix4fv(earthShader.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(earthShader.uCamMatrix, false, camMatrix);
-    if (!isDayNightToggle) {
+    if (!earth.isDayNightToggle) {
       gl.uniform3fv(earthShader.uLightDirection, earth.lightDirection);
     }
     gl.uniform3fv(earthShader.uAmbientLightColor, [0.03, 0.03, 0.03]); // RGB ambient light
@@ -332,7 +330,7 @@ ATMOSPHERE_DIST_MIN = 200;
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture); // bind texture to TEXTURE0
 
-    if (!isDayNightToggle) {
+    if (!earth.isDayNightToggle) {
       gl.uniform1i(earthShader.uNightSampler, 1);  // point sampler to TEXTURE1
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, nightTexture); // bind tex to TEXTURE1
@@ -389,20 +387,7 @@ ATMOSPHERE_DIST_MIN = 200;
 
   atmosphere.lightDirection = [];
 
-  atmosphere.pos = [100, 0, 0];
-
-  var texture, nightTexture;
-
-  var texLoaded = false;
-  var nightLoaded = false;
-  var loaded = false;
-
-  function onImageLoaded () {
-    if (texLoaded && nightLoaded) {
-      loaded = true;
-      $('#loader-text').text('Drawing Dots in Space...');
-    }
-  }
+  atmosphere.pos = [0, 0, 0];
 
   atmosphere.init = function () {
     var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -421,78 +406,31 @@ ATMOSPHERE_DIST_MIN = 200;
     gl.linkProgram(atmosphereShader);
 
     atmosphereShader.aVertexPosition = gl.getAttribLocation(atmosphereShader, 'aVertexPosition');
-    atmosphereShader.aTexCoord = gl.getAttribLocation(atmosphereShader, 'aTexCoord');
     atmosphereShader.aVertexNormal = gl.getAttribLocation(atmosphereShader, 'aVertexNormal');
     atmosphereShader.uPMatrix = gl.getUniformLocation(atmosphereShader, 'uPMatrix');
     atmosphereShader.uCamMatrix = gl.getUniformLocation(atmosphereShader, 'uCamMatrix');
     atmosphereShader.uMvMatrix = gl.getUniformLocation(atmosphereShader, 'uMvMatrix');
     atmosphereShader.uNormalMatrix = gl.getUniformLocation(atmosphereShader, 'uNormalMatrix');
     atmosphereShader.uLightDirection = gl.getUniformLocation(atmosphereShader, 'uLightDirection');
-    atmosphereShader.uAmbientLightColor = gl.getUniformLocation(atmosphereShader, 'uAmbientLightColor');
-    atmosphereShader.uDirectionalLightColor = gl.getUniformLocation(atmosphereShader, 'uDirectionalLightColor');
-    atmosphereShader.uSampler = gl.getUniformLocation(atmosphereShader, 'uSampler');
-    atmosphereShader.uNightSampler = gl.getUniformLocation(atmosphereShader, 'uNightSampler');
-
-    texture = gl.createTexture();
-    var img = new Image();
-    img.onload = function () {
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-      texLoaded = true;
-      onImageLoaded();
-    };
-    img.src = settingsManager.installDirectory + 'images/atmosphere-day.png';
-
-    nightTexture = gl.createTexture();
-    var nightImg = new Image();
-    var nightImgHiRes = new Image();
-    nightImg.onload = function () {
-      gl.bindTexture(gl.TEXTURE_2D, nightTexture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImg);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-      // console.log('earth.js loaded nightearth');
-      nightLoaded = true;
-      onImageLoaded();
-    };
-      nightImg.src = settingsManager.installDirectory + 'images/atmosphere-night.png';
 
     // generate a uvsphere bottom up, CCW order
     var vertPos = [];
     var vertNorm = [];
-    var texCoord = [];
     for (let lat = 0; lat <= NUM_LAT_SEGS; lat++) {
       var latAngle = (Math.PI / NUM_LAT_SEGS) * lat - (Math.PI / 2);
       var diskRadius = Math.cos(Math.abs(latAngle));
       var z = Math.sin(latAngle);
-      // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
-      // var i = 0;
       for (let lon = 0; lon <= NUM_LON_SEGS; lon++) { // add an extra vertex for texture funness
         var lonAngle = (Math.PI * 2 / NUM_LON_SEGS) * lon;
         var x = Math.cos(lonAngle) * diskRadius;
         var y = Math.sin(lonAngle) * diskRadius;
-        // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
 
-        // mercator cylindrical projection (simple angle interpolation)
-        var v = 1 - (lat / NUM_LAT_SEGS);
-        var u = 0.5 + (lon / NUM_LON_SEGS); // may need to change to move map
-        // console.log('u: ' + u + ' v: ' + v);
-        // normals: should just be a vector from center to point (aka the point itself!
-
-        vertPos.push(x * (1));
-        vertPos.push(y * ATMOSPHERE_MOD);
-        vertPos.push(z * ATMOSPHERE_MOD);
-        texCoord.push(u);
-        texCoord.push(v);
+        vertPos.push(x * settingsManager.atmosphereSize);
+        vertPos.push(y * settingsManager.atmosphereSize);
+        vertPos.push(z * settingsManager.atmosphereSize);
         vertNorm.push(x);
         vertNorm.push(y);
         vertNorm.push(z);
-
-        // i++;
       }
     }
 
@@ -504,7 +442,6 @@ ATMOSPHERE_DIST_MIN = 200;
         var brVert = blVert + 1;
         var tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;
         var trVert = tlVert + 1;
-        // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
         vertIndex.push(blVert);
         vertIndex.push(brVert);
         vertIndex.push(tlVert);
@@ -523,118 +460,6 @@ ATMOSPHERE_DIST_MIN = 200;
     vertNormBuf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertNorm), gl.STATIC_DRAW);
-
-    texCoordBuf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoord), gl.STATIC_DRAW);
-
-    vertIndexBuf = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
-
-    // var end = new Date().getTime() - startTime;
-    // console.log('atmosphere init: ' + end + ' ms');
-  };
-
-  atmosphere.resize = function () {
-    atmosphere.pos[0] = Math.min(zoomTarget**3 * (ATMOSPHERE_DIST) + ATMOSPHERE_DIST_MOD,ATMOSPHERE_DIST_MIN);
-    ATMOSPHERE_MOD = RADIUS_OF_EARTH + (ATMOSPHERE_MAX / (zoomLevel**2))
-
-    var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-    var fragCode = shaderLoader.getShaderCode('atmosphere-fragment.glsl');
-    gl.shaderSource(fragShader, fragCode);
-    gl.compileShader(fragShader);
-
-    var vertShader = gl.createShader(gl.VERTEX_SHADER);
-    var vertCode = shaderLoader.getShaderCode('atmosphere-vertex.glsl');
-    gl.shaderSource(vertShader, vertCode);
-    gl.compileShader(vertShader);
-
-    atmosphereShader = gl.createProgram();
-    gl.attachShader(atmosphereShader, vertShader);
-    gl.attachShader(atmosphereShader, fragShader);
-    gl.linkProgram(atmosphereShader);
-
-    atmosphereShader.aVertexPosition = gl.getAttribLocation(atmosphereShader, 'aVertexPosition');
-    atmosphereShader.aTexCoord = gl.getAttribLocation(atmosphereShader, 'aTexCoord');
-    atmosphereShader.aVertexNormal = gl.getAttribLocation(atmosphereShader, 'aVertexNormal');
-    atmosphereShader.uPMatrix = gl.getUniformLocation(atmosphereShader, 'uPMatrix');
-    atmosphereShader.uCamMatrix = gl.getUniformLocation(atmosphereShader, 'uCamMatrix');
-    atmosphereShader.uMvMatrix = gl.getUniformLocation(atmosphereShader, 'uMvMatrix');
-    atmosphereShader.uNormalMatrix = gl.getUniformLocation(atmosphereShader, 'uNormalMatrix');
-    atmosphereShader.uLightDirection = gl.getUniformLocation(atmosphereShader, 'uLightDirection');
-    atmosphereShader.uAmbientLightColor = gl.getUniformLocation(atmosphereShader, 'uAmbientLightColor');
-    atmosphereShader.uDirectionalLightColor = gl.getUniformLocation(atmosphereShader, 'uDirectionalLightColor');
-    atmosphereShader.uSampler = gl.getUniformLocation(atmosphereShader, 'uSampler');
-    atmosphereShader.uNightSampler = gl.getUniformLocation(atmosphereShader, 'uNightSampler');
-
-    // generate a uvsphere bottom up, CCW order
-    var vertPos = [];
-    var vertNorm = [];
-    var texCoord = [];
-
-    for (let lat = 0; lat <= NUM_LAT_SEGS; lat++) {
-      var latAngle = (Math.PI / NUM_LAT_SEGS) * lat - (Math.PI / 2);
-      var diskRadius = Math.cos(Math.abs(latAngle));
-      var z = Math.sin(latAngle);
-      // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
-      // var i = 0;
-      for (let lon = 0; lon <= NUM_LON_SEGS; lon++) { // add an extra vertex for texture funness
-        var lonAngle = (Math.PI * 2 / NUM_LON_SEGS) * lon;
-        var x = Math.cos(lonAngle) * diskRadius;
-        var y = Math.sin(lonAngle) * diskRadius;
-        // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
-
-        // mercator cylindrical projection (simple angle interpolation)
-        var v = 1 - (lat / NUM_LAT_SEGS);
-        var u = 0.5 + (lon / NUM_LON_SEGS); // may need to change to move map
-        // console.log('u: ' + u + ' v: ' + v);
-        // normals: should just be a vector from center to point (aka the point itself!
-
-        vertPos.push(x * (1));
-        vertPos.push(y * ATMOSPHERE_MOD);
-        vertPos.push(z * ATMOSPHERE_MOD);
-        texCoord.push(u);
-        texCoord.push(v);
-        vertNorm.push(x);
-        vertNorm.push(y);
-        vertNorm.push(z);
-
-        // i++;
-      }
-    }
-
-    // ok let's calculate vertex draw orders.... indiv triangles
-    var vertIndex = [];
-    for (let lat = 0; lat < NUM_LAT_SEGS; lat++) { // this is for each QUAD, not each vertex, so <
-      for (let lon = 0; lon < NUM_LON_SEGS; lon++) {
-        var blVert = lat * (NUM_LON_SEGS + 1) + lon; // there's NUM_LON_SEGS + 1 verts in each horizontal band
-        var brVert = blVert + 1;
-        var tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;
-        var trVert = tlVert + 1;
-        // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
-        vertIndex.push(blVert);
-        vertIndex.push(brVert);
-        vertIndex.push(tlVert);
-
-        vertIndex.push(tlVert);
-        vertIndex.push(trVert);
-        vertIndex.push(brVert);
-      }
-    }
-    vertCount = vertIndex.length;
-
-    vertPosBuf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertPos), gl.STATIC_DRAW);
-
-    vertNormBuf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertNorm), gl.STATIC_DRAW);
-
-    texCoordBuf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoord), gl.STATIC_DRAW);
 
     vertIndexBuf = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
@@ -642,19 +467,16 @@ ATMOSPHERE_DIST_MIN = 200;
   };
 
   atmosphere.draw = function (pMatrix, camMatrix) {
-    if (!texLoaded || !earth.loaded) return;
     gl.enable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    // gl.cullFace(gl.BACK)
-    // vec3.normalize(earth.lightDirection, atmosphere.lightDirection);
-    // vec3.inverse(atmosphere.lightDirection, atmosphere.lightDirection);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // gl.blendEquation(gl.FUNC_ADD);
+
+    sun.currentDirection();
+    vec3.normalize(earth.lightDirection, earth.lightDirection);
 
     mvMatrix = mvMatrixEmpty;
     mat4.identity(mvMatrix);
-    // console.log(pMatrix);
-    mat4.rotateZ(mvMatrix, mvMatrix, (camYaw + (DEG2RAD * 90)));
-    mat4.rotateY(mvMatrix, mvMatrix, camPitch);
     mat4.translate(mvMatrix, mvMatrix, atmosphere.pos);
     nMatrix = nMatrixEmpty;
     mat3.normalFromMat4(nMatrix, mvMatrix);
@@ -666,23 +488,7 @@ ATMOSPHERE_DIST_MIN = 200;
     gl.uniformMatrix4fv(atmosphereShader.uMvMatrix, false, mvMatrix);
     gl.uniformMatrix4fv(atmosphereShader.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(atmosphereShader.uCamMatrix, false, camMatrix);
-    // gl.uniform3fv(atmosphereShader.uLightDirection, earth.lightDirection);
-    gl.uniform3fv(atmosphereShader.uAmbientLightColor, [0.5, 0.5, 0.5]); // RGB ambient light
-    // No reason to reduce blue light since this is a real image of atmosphere
-    // gl.uniform3fv(atmosphereShader.uDirectionalLightColor, [1, 1, 1]); // RGB directional light
-
-
-    gl.uniform1i(atmosphereShader.uSampler, 0); // point sampler to TEXTURE0
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture); // bind texture to TEXTURE0
-
-    gl.uniform1i(atmosphereShader.uNightSampler, 1);  // point sampler to TEXTURE1
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, nightTexture); // bind tex to TEXTURE1
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
-    gl.enableVertexAttribArray(atmosphereShader.aTexCoord);
-    gl.vertexAttribPointer(atmosphereShader.aTexCoord, 2, gl.FLOAT, false, 0, 0);
+    gl.uniform3fv(atmosphereShader.uLightDirection, earth.lightDirection);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
     gl.enableVertexAttribArray(atmosphereShader.aVertexPosition);
@@ -696,17 +502,8 @@ ATMOSPHERE_DIST_MIN = 200;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
     gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 
-    gl.useProgram(gl.pickShaderProgram);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-    // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.uniformMatrix4fv(gl.pickShaderProgram.uMvMatrix, false, mvMatrix); // set up picking
-    gl.disableVertexAttribArray(gl.pickShaderProgram.aColor);
-    gl.enableVertexAttribArray(gl.pickShaderProgram.aPos);
-    gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
-
     gl.disable(gl.BLEND);
     gl.enable(gl.DEPTH_TEST);
-    // Done Drawing
     return true;
   };
 

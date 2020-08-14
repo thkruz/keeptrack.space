@@ -5,16 +5,16 @@
   updateUrl
 
   satSet
-  orbitDisplay
+  orbitManager
   selectedSat
   settingsManager
 */
+var hoverSatId = -1;
 (function () {
   var searchBox = {};
   var satData;
 
   var hovering = false;
-  var hoverSatId = -1;
 
   var resultsOpen = false;
   var lastResultGroup;
@@ -244,14 +244,14 @@
 
     $('#search-results').on('mouseover', '.search-result', function (evt) {
       var satId = $(this).data('sat-id');
-      orbitDisplay.setHoverOrbit(satId);
+      orbitManager.setHoverOrbit(satId);
       satSet.setHover(satId);
 
       hovering = true;
       hoverSatId = satId;
     });
     $('#search-results').on("mouseout", function () {
-      orbitDisplay.clearHoverOrbit();
+      orbitManager.clearHoverOrbit();
       satSet.setHover(-1);
       hovering = false;
     });

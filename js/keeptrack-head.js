@@ -1,44 +1,57 @@
+// Global Constants
+const ZOOM_EXP = 3;
+const TAU = 2 * Math.PI;
+const DEG2RAD = TAU / 360;
+const RAD2DEG = 360 / TAU;
+const RADIUS_OF_EARTH = 6371.0;
+const RADIUS_OF_SUN = 695700;
+const MINUTES_PER_DAY = 1440;
+const PLANETARIUM_DIST = 3;
+const MILLISECONDS_PER_DAY = 1.15741e-8;
+
 // Debug Mode
 var db = {}; //Global Debug Manager
-try {
-  db = JSON.parse(localStorage.getItem("db"));
-  if (db == null) reloadDb();
-  if (typeof db.enabled == 'undefined') reloadDb();
-} catch (e) {
-  db = {};
-  db.enabled = false;
-  db.verbose = false;
-  localStorage.setItem("db", JSON.stringify(db));
-}
-db.init = (function (){
-  db.log = function (message, isVerbose) {
-    // Don't Log Verbose Stuff Normally
-    if (isVerbose && !db.verbose) return;
-
-    // If Logging is Enabled - Log It
-    if(db.enabled) {
-      console.log(message);
-    }
-  };
-  db.on = function () {
-    db.enabled = true;
-    console.log('db is now on!');
-    localStorage.setItem("db", JSON.stringify(db));
-  };
-  db.off = function () {
+{
+  try {
+    db = JSON.parse(localStorage.getItem("db"));
+    if (db == null) reloadDb();
+    if (typeof db.enabled == 'undefined') reloadDb();
+  } catch (e) {
+    db = {};
     db.enabled = false;
-    console.log('db is now off!');
+    db.verbose = false;
     localStorage.setItem("db", JSON.stringify(db));
-  };
-})();
+  }
+  db.init = (function (){
+    db.log = function (message, isVerbose) {
+      // Don't Log Verbose Stuff Normally
+      if (isVerbose && !db.verbose) return;
+
+      // If Logging is Enabled - Log It
+      if(db.enabled) {
+        console.log(message);
+      }
+    };
+    db.on = function () {
+      db.enabled = true;
+      console.log('db is now on!');
+      localStorage.setItem("db", JSON.stringify(db));
+    };
+    db.off = function () {
+      db.enabled = false;
+      console.log('db is now off!');
+      localStorage.setItem("db", JSON.stringify(db));
+    };
+  })();
+}
 
 // Settings Manager Setup
 (function () {
   var settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.16.2';
-  settingsManager.versionDate = 'August 5, 2020';
+  settingsManager.versionNumber = '1.17.0';
+  settingsManager.versionDate = 'August 14, 2020';
   if (window.location.host == 'keeptrack.space') {
     settingsManager.installDirectory = '/';
   }
@@ -244,6 +257,22 @@ db.init = (function (){
 
   settingsManager.redTheme = false;
 
+// Adjust to change camera speed of auto rotate around earth
+  settingsManager.autoRotateSpeed = 1.0 * 0.000075;
+
+  settingsManager.disableUI = true;
+  settingsManager.disableNormalEvents = true;
+  settingsManager.enableLimitedUI = true;
+  settingsManager.enableHoverOverlay = false;
+  settingsManager.enableHoverOrbits = false;
+  settingsManager.startWithOrbitsDisplayed = false;
+  settingsManager.startWithFocus = false;
+
+  // Use to Override TLE Settings
+  settingsManager.tleSource = settingsManager.installDirectory + 'tle/TLEdebris.json';
+
+  settingsManager.isFullscreenApplication = false;
+
   settingsManager.limitSats = '';
   settingsManager.searchLimit = 400;
 
@@ -257,7 +286,7 @@ db.init = (function (){
   settingsManager.mapWidth = 800;
   settingsManager.mapHeight = 600;
 
-  settingsManager.hoverColor = [0.1, 1.0, 0.0, 1.0]; // Green
+  settingsManager.hoverColor = [1.0, 1.0, 0.0, 1.0]; // Yellow
   settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0]; // Red
 
   settingsManager.minimumSearchCharacters = 2; // Searches after 3 characters typed
@@ -302,6 +331,9 @@ db.init = (function (){
 
   settingsManager.gpsElevationMask = 15;
 
+  settingsManager.minZoomDistance = 6800;
+  settingsManager.maxZoomDistance = 120000;
+
   settingsManager.fpsForwardSpeed = 3;
   settingsManager.fpsSideSpeed = 3;
   settingsManager.fpsVertSpeed = 3;
@@ -312,6 +344,9 @@ db.init = (function (){
   settingsManager.daysUntilObjectLost = 60;
 
   settingsManager.camDistBuffer = 2000;
+
+  settingsManager.zNear = 20.0;
+  settingsManager.zFar = 500000.0;
 
   // /////////////////
   // Mobile Settings
@@ -326,12 +361,22 @@ db.init = (function (){
   }
   settingsManager.isDisableSatHoverBox = false;
 
+settingsManager.showOrbitThroughEarth = false;
+
+settingsManager.atmosphereSize = RADIUS_OF_EARTH + 200;
+settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)';
+
 settingsManager.satShader = {};
 settingsManager.satShader.largeObjectMinZoom = 0.37;
 settingsManager.satShader.largeObjectMaxZoom = 0.58;
-settingsManager.satShader.minSize = 10.0;
+settingsManager.satShader.minSize = 3.0;
 settingsManager.satShader.maxSize = 50.0;
 settingsManager.satShader.maxAllowedSize = 100.0;
+// NOTE: Use floats not integers because some settings get sent to graphics card
+// Must be a string for GPU to read.
+settingsManager.satShader.distanceBeforeGrow = '15000.0'; // Km allowed before grow
+settingsManager.satShader.blurFactor1 = '0.53';
+settingsManager.satShader.blurFactor2 = '0.5';
 
   // /////////////////
   // Color Settings
@@ -421,13 +466,13 @@ settingsManager.satShader.maxAllowedSize = 100.0;
   // /////////////////
   // Orbit Color Settings
   // /////////////////
-  settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 1.0];
-  settingsManager.orbitHoverColor = [1.0, 0.0, 0.0, 1.0];
+  settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 0.9];
+  settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];
   // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0];
   settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.6]; // WHITE
   // settingsManager.orbitInViewColor = [1.0, 1.0, 0.0, 1.0]; // Applies to Planetarium View
   //settingsManager.orbitGroupColor = [0.3, 0.5, 1.0, 0.4];
-  settingsManager.orbitGroupColor = [1.0, 1.0, 0, 0.4];
+  settingsManager.orbitGroupColor = [0.3, 1.0, 1.0, 0.4];
 
 
   window.settingsManager = settingsManager;

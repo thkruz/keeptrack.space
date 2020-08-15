@@ -14,8 +14,8 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   let settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.17.4';
-  settingsManager.versionDate = 'August 14, 2020';
+  settingsManager.versionNumber = '1.18.0';
+  settingsManager.versionDate = 'August 15, 2020';
 
   // Install Folder Settings
   {
@@ -55,8 +55,14 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   // Adjust to change camera speed of auto rotate around earth
   settingsManager.autoRotateSpeed = 1.0 * 0.000075;
 
+  // Disable main user interface. Currently an all or nothing package.
   settingsManager.disableUI = false;
-  settingsManager.disableNormalEvents = false;
+  // Currently only disables panning. In the future it will disable all camera
+  // movement
+  settingsManager.disableCameraControls = false;
+  // Disable normal browser events from keyboard/mouse
+  settingsManager.disableNormalEvents = true;
+  // Enable limited UI features
   settingsManager.enableLimitedUI = false;
   // Allows canvas will steal focus on load
   settingsManager.startWithFocus = false;

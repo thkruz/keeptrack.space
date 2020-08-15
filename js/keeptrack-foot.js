@@ -1,3 +1,15 @@
+// Enable Satbox Overlay
+if (settingsManager.enableHoverOverlay) {
+  document.getElementById('keeptrack-canvas').parentElement.innerHTML +=`
+  <div id="sat-hoverbox">
+    <span id="sat-hoverbox1"></span>
+    <br/>
+    <span id="sat-hoverbox2"></span>
+    <br/>
+    <span id="sat-hoverbox3"></span>
+  </div>`;
+}
+
 // Enable the Limited UI
 if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
   if (document.getElementById('keeptrack-canvas').tagName !== 'CANVAS') {
@@ -19,13 +31,6 @@ if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
   <div id="orbit-btn">
   </div>
   <div id="time-machine-btn">
-  </div>
-  <div id="sat-hoverbox">
-    <span id="sat-hoverbox1"></span>
-    <br/>
-    <span id="sat-hoverbox2"></span>
-    <br/>
-    <span id="sat-hoverbox3"></span>
   </div>`;
   $(document).ready(function () {
     var countriesBtnDOM = $('#countries-btn');
@@ -76,11 +81,12 @@ if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
   });
 }
 
-// Load Satellite Dependencies
+// Load Dependencies
 document.write(`
   <script src="${settingsManager.installDirectory}js/lib/colorPick.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/materialize.min.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/gl-matrix-min.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/webgl-obj-loader.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/satellite.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/suncalc.js?v=${settingsManager.versionNumber}"\><\/script>
 
@@ -92,6 +98,7 @@ document.write(`
 // Addon Modules
 if (!settingsManager.disableUI) {
   document.write(`
+    <script src="${settingsManager.installDirectory}modules/meshManager.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}modules/sensorManager.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}modules/controlSiteManager.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}modules/launchSiteManager.js?v=${settingsManager.versionNumber}"\><\/script>

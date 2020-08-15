@@ -185,6 +185,7 @@ function initializeKeepTrack () {
   sun.init();
   moon.init();
   earth.init();
+  meshManager.init();
   ColorScheme.init();
   $('#loader-text').text('Drawing Dots in Space...');
   satSet.init(function satSetInitCallBack (satData) {
@@ -618,6 +619,7 @@ function drawLoop () {
     let sat = satSet.getSat(objectManager.selectedSat);
     if (!sat.static) {
       _camSnapToSat(sat);
+      meshManager.models.Satellite.position = sat.position;
     }
     if (sat.static && cameraType.current=== cameraType.PLANETARIUM) {
       // _camSnapToSat(objectManager.selectedSat);
@@ -790,6 +792,14 @@ function _drawScene () {
   earth.draw(pMatrix, camMatrix);
   satSet.draw(pMatrix, camMatrix, drawNow);
   orbitManager.draw(pMatrix, camMatrix);
+
+  // Draw Satellite if Selected
+  if (objectManager.selectedSat !== -1) {
+    let sat = satSet.getSat(objectManager.selectedSat);
+    if (!sat.static) {
+      meshManager.drawObject(meshManager.models.Satellite, pMatrix, camMatrix);
+    }
+  }
 
   /* DEBUG - show the pickbuffer on a canvas */
   // debugImageData.data = pickColorMap;
@@ -2083,27 +2093,28 @@ $(document).ready(function () {
     settingsManager.isResizing = true;
   });
   // Camera Manager Events
-  $(window).mousedown(function(evt){
-    if (evt.button === 2) {
-      cameraManager.isPanning = true;
-      cameraManager.panStartPosition = cameraManager.panCurrent;
-      if (cameraManager.isShiftPressed) {
+  if (!settingsManager.disableCameraControls) {
+    $(window).mousedown(function(evt){
+      if (evt.button === 2) {
+        cameraManager.isPanning = true;
+        cameraManager.panStartPosition = cameraManager.panCurrent;
+        if (cameraManager.isShiftPressed) {
+          cameraManager.isScreenPan = false;
+          cameraManager.isWorldPan = true;
+        } else {
+          cameraManager.isScreenPan = true;
+          cameraManager.isWorldPan = false;
+        }
+      }
+    });
+    $(window).mouseup(function(evt){
+      if (evt.button === 2) {
+        cameraManager.isPanning = false;
         cameraManager.isScreenPan = false;
-        cameraManager.isWorldPan = true;
-      } else {
-        cameraManager.isScreenPan = true;
         cameraManager.isWorldPan = false;
       }
-    }
-  });
-  $(window).mouseup(function(evt){
-    if (evt.button === 2) {
-      cameraManager.isPanning = false;
-      cameraManager.isScreenPan = false;
-      cameraManager.isWorldPan = false;
-    }
-  });
-
+    });
+  }
 
   (function _canvasController () {
     db.log('_canvasController');

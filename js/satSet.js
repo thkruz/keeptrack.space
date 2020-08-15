@@ -22,6 +22,7 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 
 var satSensorMarkerArray = [];
+var emptyMat4 = mat4.create();
 (function () {
   var TAU = 2 * Math.PI;
   var RAD2DEG = 360 / TAU;
@@ -43,7 +44,6 @@ var satSensorMarkerArray = [];
   var uFOVi;  // Update FOV function iteration i variable
   var uFOVs;  // Update FOV function iteration S variable
 
-  var emptyMat4 = mat4.create();
 
   var satPos;
   var satVel;

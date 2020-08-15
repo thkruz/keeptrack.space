@@ -145,19 +145,27 @@ let glScreenX, glScreenY, screenVec, comboPMat, invMat, worldVec, gCPr, gCPz,
 let xDif, yDif, yawTarget, pitchTarget, dragPointR, dragTargetR, dragPointLon,
     dragTargetLon, dragPointLat, dragTargetLat, pitchDif, yawDif;
 
+// Panning Settings/Flags
 cameraManager.isPanning = false;
 cameraManager.isWorldPan = false;
 cameraManager.isScreenPan = false;
 cameraManager.panReset = false;
 cameraManager.panSpeed = {x:0,y:0,z:0};
-cameraManager.maxPanChange = 1.2;
-cameraManager.panDifScale = 0.02;
-cameraManager.panDeadZone = 2.5;
 cameraManager.panMovementSpeed = 0.5;
 cameraManager.panTarget = {x:0,y:0,z:0};
 cameraManager.panCurrent = {x:0,y:0,z:0};
-cameraManager.panDif = {x: 0,y: 0,z: 0};
-cameraManager.panStartPosition = {x: 0,y: 0,z: 0};
+cameraManager.panDif = {x:0,y:0,z:0};
+cameraManager.panStartPosition = {x:0,y:0,z:0};
+
+// Local Rotate Settings/Flags
+cameraManager.isLocalRotate = false;
+cameraManager.localRotateReset = false;
+cameraManager.localRotateSpeed = {pitch:0,roll:0,yaw:0};
+cameraManager.localRotateMovementSpeed = 0.00005;
+cameraManager.localRotateTarget = {pitch:0,roll:0,yaw:0};
+cameraManager.localRotateCurrent = {pitch:0,roll:0,yaw:0};
+cameraManager.localRotateDif = {pitch:0,roll:0,yaw:0};
+cameraManager.localRotateStartPosition = {pitch:0,roll:0,yaw:0};
 
 let isHoverBoxVisible = false;
 let isShowDistance = true;
@@ -446,14 +454,11 @@ function drawLoop () {
   if (cameraManager.isPanning || cameraManager.panReset) {
     // If user is actively moving
     if (cameraManager.isPanning) {
-      xDif = screenDragPoint[0] - mouseX;
-      yDif = screenDragPoint[1] - mouseY;
-
       camPitchSpeed = 0;
       camYawSpeed = 0;
-      cameraManager.panDif.x = xDif;
-      cameraManager.panDif.y = yDif;
-      cameraManager.panDif.z = yDif;
+      cameraManager.panDif.x = screenDragPoint[0] - mouseX;
+      cameraManager.panDif.y = screenDragPoint[0] - mouseX;
+      cameraManager.panDif.z = screenDragPoint[1] - mouseY;
 
       cameraManager.panTarget.x = cameraManager.panStartPosition.x + cameraManager.panDif.x * cameraManager.panMovementSpeed * zoomLevel;
       if (cameraManager.isWorldPan)  {
@@ -499,14 +504,58 @@ function drawLoop () {
         cameraManager.panReset = false;
       }
     }
+  } else if (cameraManager.isLocalRotate || cameraManager.localRotateReset) {
+    // If user is actively moving
+    if (cameraManager.isLocalRotate) {
+      cameraManager.localRotateDif.pitch = screenDragPoint[1] - mouseY;
+      cameraManager.localRotateTarget.pitch = cameraManager.localRotateStartPosition.pitch  + cameraManager.localRotateDif.pitch * -settingsManager.cameraMovementSpeed;
+      cameraManager.localRotateSpeed.pitch = _normalizeAngle(cameraManager.localRotateCurrent.pitch - cameraManager.localRotateTarget.pitch) * -settingsManager.cameraMovementSpeed;
 
-    // TODO: Calculate Camera Position in xyz
-    // if (!settingsManager.isAllowInsideEarth) {
-    //   cameraManager.panCurrent.x = Math.min(Math.max(cameraManager.panCurrent.x,RADIUS_OF_EARTH + settingsManager.earthPanningBufferDistance),-RADIUS_OF_EARTH - settingsManager.earthPanningBufferDistance);
-    //   cameraManager.panCurrent.y = Math.min(Math.max(cameraManager.panCurrent.y,RADIUS_OF_EARTH + settingsManager.earthPanningBufferDistance),-RADIUS_OF_EARTH - settingsManager.earthPanningBufferDistance);
-    //   cameraManager.panCurrent.z = Math.min(Math.max(cameraManager.panCurrent.z,RADIUS_OF_EARTH + settingsManager.earthPanningBufferDistance),-RADIUS_OF_EARTH - settingsManager.earthPanningBufferDistance);
-    // }
+      if (cameraManager.isLocalRotateRoll) {
+        cameraManager.localRotateDif.roll = screenDragPoint[0] - mouseX;
+        cameraManager.localRotateTarget.roll = cameraManager.localRotateStartPosition.roll + cameraManager.localRotateDif.roll * settingsManager.cameraMovementSpeed;
+        cameraManager.localRotateSpeed.roll = _normalizeAngle(cameraManager.localRotateCurrent.roll - cameraManager.localRotateTarget.roll) * -settingsManager.cameraMovementSpeed;
+      }
+      if (cameraManager.isLocalRotateYaw) {
+        cameraManager.localRotateDif.yaw = screenDragPoint[0] - mouseX;
+        cameraManager.localRotateTarget.yaw = cameraManager.localRotateStartPosition.yaw + cameraManager.localRotateDif.yaw * settingsManager.cameraMovementSpeed;
+        cameraManager.localRotateSpeed.yaw = _normalizeAngle(cameraManager.localRotateCurrent.yaw - cameraManager.localRotateTarget.yaw) * -settingsManager.cameraMovementSpeed;
+      }
+    }
 
+    if (cameraManager.localRotateReset) {
+      cameraManager.localRotateTarget.pitch = 0;
+      cameraManager.localRotateTarget.roll = 0;
+      cameraManager.localRotateTarget.yaw = 0;
+      cameraManager.localRotateDif.pitch = -cameraManager.localRotateCurrent.pitch;
+      cameraManager.localRotateDif.roll = -cameraManager.localRotateCurrent.roll;
+      cameraManager.localRotateDif.yaw = cameraManager.localRotateCurrent.yaw;
+    }
+
+    cameraManager.localRotateSpeed.pitch -= (cameraManager.localRotateSpeed.pitch * dt * cameraManager.localRotateMovementSpeed);
+    if (cameraManager.localRotateReset) { cameraManager.localRotateSpeed.pitch /= 10; }
+    cameraManager.localRotateCurrent.pitch += cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.pitch;
+
+    if (cameraManager.isLocalRotateRoll) {
+      cameraManager.localRotateSpeed.roll -= (cameraManager.localRotateSpeed.roll * dt * cameraManager.localRotateMovementSpeed);
+      if (cameraManager.localRotateReset) { cameraManager.localRotateSpeed.roll /= 10; }
+      cameraManager.localRotateCurrent.roll += cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.roll;
+    }
+
+    if (cameraManager.isLocalRotateYaw) {
+      cameraManager.localRotateSpeed.yaw -= (cameraManager.localRotateSpeed.yaw * dt * cameraManager.localRotateMovementSpeed);
+      if (cameraManager.localRotateReset) { cameraManager.localRotateSpeed.yaw /= 10; }
+      cameraManager.localRotateCurrent.yaw += cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.yaw;
+    }
+
+    if (cameraManager.localRotateReset) {
+      if (cameraManager.localRotateCurrent.pitch > -0.001 && cameraManager.localRotateCurrent.pitch < 0.001) cameraManager.localRotateCurrent.pitch = 0;
+      if (cameraManager.localRotateCurrent.roll > -0.001 && cameraManager.localRotateCurrent.roll < 0.001) cameraManager.localRotateCurrent.roll = 0;
+      if (cameraManager.localRotateCurrent.yaw > -0.001 && cameraManager.localRotateCurrent.yaw < 0.001) cameraManager.localRotateCurrent.yaw = 0;
+      if (cameraManager.localRotateCurrent.pitch == 0 && cameraManager.localRotateCurrent.roll == 0 && cameraManager.localRotateCurrent.yaw == 0) {
+        cameraManager.localRotateReset = false;
+      }
+    }
   } else {
   // Dont Rotate if Panning
     if ((isDragging && !settingsManager.isMobileModeEnabled) ||
@@ -841,16 +890,23 @@ function _drawCamera () {
 
     switch (cameraType.current) {
       case cameraType.DEFAULT: // pivot around the earth with earth in the center
+        mat4.rotateX(camMatrix, camMatrix, -cameraManager.localRotateCurrent.pitch);
+        mat4.rotateY(camMatrix, camMatrix, -cameraManager.localRotateCurrent.roll);
+        mat4.rotateZ(camMatrix, camMatrix, -cameraManager.localRotateCurrent.yaw);
         mat4.translate(camMatrix, camMatrix, [0, _getCamDist(), 0]);
         mat4.rotateX(camMatrix, camMatrix, camPitch);
         mat4.rotateZ(camMatrix, camMatrix, -camYaw);
         break;
       case cameraType.OFFSET: // pivot around the earth with earth offset to the bottom right
+        mat4.rotateX(camMatrix, camMatrix, -cameraManager.localRotateCurrent.pitch);
+        mat4.rotateY(camMatrix, camMatrix, -cameraManager.localRotateCurrent.roll);
+        mat4.rotateZ(camMatrix, camMatrix, -cameraManager.localRotateCurrent.yaw);
+        // TODO: Make offset adjustable in settings
         mat4.translate(camMatrix, camMatrix, [15000, _getCamDist(), -6000]);
         mat4.rotateX(camMatrix, camMatrix, camPitch);
         mat4.rotateZ(camMatrix, camMatrix, -camYaw);
         break;
-      case cameraType.FPS: // FPS style movement
+      case cameraType.FPS: // FPS style movement        
         mat4.rotate(camMatrix, camMatrix, -fpsPitch * DEG2RAD, [1, 0, 0]);
         mat4.rotate(camMatrix, camMatrix, fpsYaw * DEG2RAD, [0, 0, 1]);
         mat4.translate(camMatrix, camMatrix, [fpsXPos, fpsYPos, -fpsZPos]);
@@ -2092,9 +2148,24 @@ $(document).ready(function () {
     }
     settingsManager.isResizing = true;
   });
+
   // Camera Manager Events
   if (!settingsManager.disableCameraControls) {
     $(window).mousedown(function(evt){
+      // Middle Mouse Button MMB
+      if (evt.button === 1) {
+        cameraManager.isLocalRotate = true;
+        cameraManager.localRotateStartPosition = cameraManager.localRotateCurrent;
+        if (cameraManager.isShiftPressed) {
+          cameraManager.isLocalRotateRoll = true;
+          cameraManager.isLocalRotateYaw = false;
+        } else {
+          cameraManager.isLocalRotateRoll = false;
+          cameraManager.isLocalRotateYaw = true;
+        }
+      }
+
+      // Right Mouse Button RMB
       if (evt.button === 2) {
         cameraManager.isPanning = true;
         cameraManager.panStartPosition = cameraManager.panCurrent;
@@ -2108,6 +2179,11 @@ $(document).ready(function () {
       }
     });
     $(window).mouseup(function(evt){
+      if (evt.button === 1) {
+        cameraManager.isLocalRotate = false;
+        cameraManager.isLocalRotateRoll = false;
+        cameraManager.isLocalRotateYaw = false;
+      }
       if (evt.button === 2) {
         cameraManager.isPanning = false;
         cameraManager.isScreenPan = false;

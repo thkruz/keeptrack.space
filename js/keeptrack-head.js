@@ -14,7 +14,7 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   let settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.18.1';
+  settingsManager.versionNumber = '1.18.2';
   settingsManager.versionDate = 'August 15, 2020';
 
   // Install Folder Settings

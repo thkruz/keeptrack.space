@@ -692,7 +692,7 @@ or mirrored at any other location without the express written permission of the 
     "name": "Vulpecula",
     "stars": [["1-Vul", "α-Vul"],
               ["α-Vul", "13-Vul"]]
-    },
+    }
     ];
   } catch {
     console.log('starManager.constellations Plugin failed to load!');

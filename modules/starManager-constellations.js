@@ -175,7 +175,7 @@ or mirrored at any other location without the express written permission of the 
     {
     "name": "Pyxis",
     "stars": [["γ-Pyx", "α-Pyx"],
-              ["α-Pyx", "β-Pyx"]}
+              ["α-Pyx", "β-Pyx"]]
     },
     {
     "name": "Corvus",
@@ -557,7 +557,7 @@ or mirrored at any other location without the express written permission of the 
     },
     {
     "name": "Leo",
-    "stars": [["ε-Leo", "Rasalas],
+    "stars": [["ε-Leo", "Rasalas"],
               ["Rasalas", "Adhafera"],
               ["Adhafera", "Algieba"],
               ["Algieba", "η-Leo"],

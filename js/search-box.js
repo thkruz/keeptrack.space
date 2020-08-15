@@ -6,7 +6,7 @@
 
   satSet
   orbitManager
-  selectedSat
+  objectManager.selectedSat
   settingsManager
 */
 var hoverSatId = -1;
@@ -262,19 +262,19 @@ var hoverSatId = -1;
     });
 
     $('#all-objects-link').on("click", function () {
-      if (selectedSat === -1) {
+      if (objectManager.selectedSat === -1) {
         return;
       }
-      var intldes = satSet.getSatExtraOnly(selectedSat).intlDes;
+      var intldes = satSet.getSatExtraOnly(objectManager.selectedSat).intlDes;
       var searchStr = intldes.slice(0, 8);
       searchBox.doSearch(searchStr);
       $('#search').val(searchStr);
     });
     $('#near-objects-link').on("click", function () {
-      if (selectedSat === -1) {
+      if (objectManager.selectedSat === -1) {
         return;
       }
-      var sat = selectedSat;
+      var sat = objectManager.selectedSat;
       var SCCs = [];
       var pos = satSet.getSatPosOnly(sat).position;
       var posXmin = pos.x - 100;

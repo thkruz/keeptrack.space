@@ -3,6 +3,8 @@
 
 (function () {
   var objectManager = {};
+  objectManager.selectedSat = -1;
+  objectManager.hoveringSat = -1;
   var sensorList;
   objectManager.missileSet = [];
   objectManager.analSatSet = [];
@@ -106,7 +108,7 @@
       objectManager.isStarManagerLoaded = false;
       console.log('You do not have the Star Module');
     }
-    objectManager.starIndex2 = objectManager.staticSet.length;
+    objectManager.starIndex2 = objectManager.staticSet.length - 1;
 
     // Try Loading the Launch Site Module
     try {

@@ -117,6 +117,26 @@
         if (db.enabled) db.log(satSet.getSat(i));
         continue;
       }
+
+      // debugger
+
+      if (i == objectManager.selectedSat) {
+        colorData[i * 4] = settingsManager.selectedColor[0];  // R
+        colorData[i * 4 + 1] = settingsManager.selectedColor[1]; // G
+        colorData[i * 4 + 2] = settingsManager.selectedColor[2]; // B
+        colorData[i * 4 + 3] = settingsManager.selectedColor[3]; // A
+      }
+
+      try {
+        if (i == objectManager.hoveringSat) {
+          colorData[i * 4] = settingsManager.hoverColor[0];  // R
+          colorData[i * 4 + 1] = settingsManager.hoverColor[1]; // G
+          colorData[i * 4 + 2] = settingsManager.hoverColor[2]; // B
+          colorData[i * 4 + 3] = settingsManager.hoverColor[3]; // A
+        }
+      } catch (e) {
+        debugger
+      }
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuf);

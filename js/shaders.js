@@ -164,8 +164,8 @@
           r = ${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0);
           alpha = pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0);
         } else {
-          r = 0.43 - min(abs(length(ptCoord)), 1.0);
-          alpha = pow(2.0 * r + 0.2, 3.0);
+          r = ${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0);
+          alpha = pow(2.0 * r + ${settingsManager.satShader.blurFactor4}, 3.0);
         }
         alpha = min(alpha, 1.0);
         gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
@@ -190,14 +190,14 @@
 
         void main(void) {
           vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
-          float drawSize = 15.0;
-          if (aStar <= 0.5) {
+          float drawSize = ${settingsManager.satShader.starSize};
+          if (aStar < 0.5) {
             drawSize = min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize), maxSize) * 1.0;
           }
           gl_PointSize = drawSize;
           gl_Position = position;
           vColor = aColor;
-          vStar = 1.0;
+          vStar = aStar * 1.0;
         }
       `
     }, {

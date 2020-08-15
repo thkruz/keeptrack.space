@@ -14,7 +14,7 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   let settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.17.3';
+  settingsManager.versionNumber = '1.17.4';
   settingsManager.versionDate = 'August 14, 2020';
 
   // Install Folder Settings
@@ -84,6 +84,8 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
 
   settingsManager.timeMachineDelay = 3000;
 
+  // settingsManager.earthPanningBufferDistance = 100; // Needs work in main.js
+
   // Use to Override TLE Settings
   // settingsManager.tleSource = settingsManager.installDirectory + 'tle/TLEdebris.json';
 
@@ -108,16 +110,21 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   settingsManager.satShader = {};
   settingsManager.satShader.largeObjectMinZoom = 0.37;
   settingsManager.satShader.largeObjectMaxZoom = 0.58;
-  settingsManager.satShader.minSize = 6.0;
-  settingsManager.satShader.isUseDynamicSizing = true;
-  settingsManager.satShader.dynamicSizeScalar = 0.9;
+  settingsManager.satShader.minSize = 4.0;
+  settingsManager.satShader.isUseDynamicSizing = false;
+  settingsManager.satShader.dynamicSizeScalar = 1.0;
   settingsManager.satShader.maxSize = 50.0;
   settingsManager.satShader.maxAllowedSize = 100.0;
+  settingsManager.satShader.starSize = '20.0'; // Has to be a string
   // NOTE: Use floats not integers because some settings get sent to graphics card
   // Must be a string for GPU to read.
-  settingsManager.satShader.distanceBeforeGrow = '15000.0'; // Km allowed before grow
+  settingsManager.satShader.distanceBeforeGrow = '22000.0'; // Km allowed before grow
+  // Used for Satellites
   settingsManager.satShader.blurFactor1 = '0.53';
   settingsManager.satShader.blurFactor2 = '0.5';
+  // Used for Stars
+  settingsManager.satShader.blurFactor3 = '0.43';
+  settingsManager.satShader.blurFactor4 = '0.2';
 
   // //////////////////////////////////////////////////////////////////////////
   // Map settings
@@ -398,6 +405,8 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   settingsManager.currentLegend = 'default';
   settingsManager.socratesOnSatCruncher = null;
   settingsManager.queuedScreenshot = false;
+
+  settingsManager.isResizing = false;
 
   settingsManager.vertShadersSize = 12;
   settingsManager.isEditTime = false;

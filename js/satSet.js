@@ -51,7 +51,6 @@ var satSensorMarkerArray = [];
   var satInSun;
   var satData;
   var satExtraData;
-  var hoveringSat = -1;
 
   try {
     $('#loader-text').text('Locating ELSETs...');
@@ -1386,27 +1385,27 @@ var satSensorMarkerArray = [];
   };
 
   satSet.setHover = (i) => {
-    if (i === hoveringSat) return;
+    if (i === objectManager.hoveringSat) return;
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
     // If Old Select Sat Picked Color it Correct Color
-    if (hoveringSat !== -1 && hoveringSat !== selectedSat) {
+    if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
       try {
-        gl.bufferSubData(gl.ARRAY_BUFFER, hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(hoveringSat)).color));
+        gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(objectManager.hoveringSat)).color));
       } catch (e) {
-        console.log(hoveringSat);
-        console.log(satSet.getSat(hoveringSat));
-        console.log(settingsManager.currentColorScheme.colorizer(satSet.getSat(hoveringSat)));
+        console.log(objectManager.hoveringSat);
+        console.log(satSet.getSat(objectManager.hoveringSat));
+        console.log(settingsManager.currentColorScheme.colorizer(satSet.getSat(objectManager.hoveringSat)));
       }
     }
     // If New Select Sat Picked Color it
-    if (i !== -1 && i !== selectedSat) {
+    if (i !== -1 && i !== objectManager.selectedSat) {
       gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.hoverColor));
     }
-      hoveringSat = i;
+      objectManager.hoveringSat = i;
   };
 
   satSet.selectSat = (i) => {
-    if (i === selectedSat) return;
+    if (i === objectManager.selectedSat) return;
     if(isAnalysisMenuOpen && i != -1) { $('#anal-sat').val(satSet.getSat(i).SCC_NUM); }
     adviceList.satelliteSelected();
     satCruncher.postMessage({
@@ -1415,15 +1414,15 @@ var satSensorMarkerArray = [];
     if (settingsManager.isMobileModeEnabled) mobile.searchToggle(false);
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
     // If Old Select Sat Picked Color it Correct Color
-    if (selectedSat !== -1) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(selectedSat)).color));
+    if (objectManager.selectedSat !== -1) {
+      gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(objectManager.selectedSat)).color));
     }
     // If New Select Sat Picked Color it
     if (i !== -1) {
       isSatView = true;
       gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
     }
-    selectedSat = i;
+    objectManager.selectedSat = i;
 
     if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
       $('#menu-lookangles').removeClass('bmenu-item-disabled');

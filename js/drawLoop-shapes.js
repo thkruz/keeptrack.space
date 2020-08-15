@@ -8,8 +8,51 @@
  */
 
 // FOVBubble
+
+var fovBubbleShader;
+
 (function () {
   function FOVBubble () {
+    let fragShaderCode = `
+    precision mediump float;
+
+    uniform vec3 uLightDirection;
+    varying vec3  vNormal;
+
+    void main () {
+      float directionalLightAmount = max(dot(vNormal, uLightDirection), 0.0);
+      gl_FragColor    = vec4( ${settingsManager.atmosphereColor}, max(directionalLightAmount,0.025));
+    }`;
+
+    let vertShaderCode = `
+      attribute vec3 aVertexPosition;
+      attribute vec3 aVertexNormal;
+
+      uniform mat4 uPMatrix;
+      uniform mat4 uCamMatrix;
+      uniform mat4 uMvMatrix;
+      uniform mat3 uNormalMatrix;
+
+      varying vec3 vNormal;
+
+      void main(void) {
+        gl_Position = uPMatrix * uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
+        vNormal = normalize( uNormalMatrix * aVertexNormal );
+      }`;
+
+    var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragShader, fragShaderCode);
+    gl.compileShader(fragShader);
+
+    var vertShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertShader, vertShaderCode);
+    gl.compileShader(vertShader);
+
+    fovBubbleShader = gl.createProgram();
+    gl.attachShader(fovBubbleShader, vertShader);
+    gl.attachShader(fovBubbleShader, fragShader);
+    gl.linkProgram(fovBubbleShader);
+
     this.vertBuf = gl.createBuffer();
     this.vertexCount = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
@@ -66,16 +109,14 @@
 
     gl.useProgram(bubbleShader);
     // Disable depth test
-    gl.enable(gl.DEPTH_TEST);
-    // Accept fragment if it closer to the camera than the former one
-    gl.depthFunc(gl.LESS);
+    gl.disable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    gl.uniform4fv(bubbleShader.uColor, [0.0, 1.0, 1.0, 0.2]);
+    gl.uniform4fv(bubbleShader.uColor, [0.0, 1.0, 1.0, 1.0]);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
     gl.vertexAttribPointer(bubbleShader.aPos, 3, gl.FLOAT, false, 0, 0);
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, this.vertexCount); // Mode, First Vertex, Number of Vertex
+    gl.drawElements(gl.TRIANGLES, this.vertexCount, gl.UNSIGNED_SHORT, 0);
 
     // RESET GL for EARTH
   };
@@ -108,7 +149,7 @@
     try {
       gl.uniform4fv(shader.uColor, color);
     }
-    catch (e) {      
+    catch (e) {
       gl.uniform4fv(shader.uColor, [1.0, 0.0, 1.0, 1.0]);
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);

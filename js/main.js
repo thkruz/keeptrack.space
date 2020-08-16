@@ -187,8 +187,8 @@ function initializeKeepTrack () {
   if (typeof settingsManager.tleSource == 'undefined') {
     settingsManager.tleSource = 'tle/TLE.json';
   }
-  webGlInit();
   mobile.checkMobileMode();
+  webGlInit();
   atmosphere.init();
   sun.init();
   moon.init();
@@ -264,7 +264,7 @@ function initializeKeepTrack () {
       // This shouldn't be necessary in the future
       setTimeout(function () {
         (function _reloadLastSensor () {
-          let currentSensor = (!settingsManager.offline) ? JSON.parse(localStorage.getItem("currentSensor")) : null;          
+          let currentSensor = (!settingsManager.offline) ? JSON.parse(localStorage.getItem("currentSensor")) : null;
           if (currentSensor !== null) {
             try {
               // If there is a staticnum set use that
@@ -567,6 +567,9 @@ function drawLoop () {
       // dragTarget = getEarthScreenPoint(mouseX, mouseY);
       // if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
       // isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
+      //
+      // TODO: Rotate Around Earth code needs cleaned up now that raycasting is turned off
+      //
       if (true ||
         cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current=== cameraType.ASTRONOMY ||
         settingsManager.isMobileModeEnabled) { // random screen drag
@@ -1338,16 +1341,19 @@ function webGlInit () {
     dpi = window.devicePixelRatio;
     settingsManager.dpi = dpi;
   }
-  console.log(settingsManager.dpi);
 
   if (settingsManager.screenshotMode) {
     can.width = settingsManager.hiResWidth;
     can.height = settingsManager.hiResHeight;
+    settingsManager.canvasResizeLock = false;
   } else {
-    if (settingsManager.isAutoResizeCanvas) {
-      // can.width = document.body.clientWidth;
-      can.width = window.innerWidth;
-      can.height = window.innerHeight;
+    if (!settingsManager.canvasResizeLock) {
+      if (settingsManager.isAutoResizeCanvas) {
+        // can.width = document.body.clientWidth;
+        can.width = window.innerWidth;
+        can.height = window.innerHeight;
+        if (settingsManager.isMobileModeEnabled) settingsManager.canvasResizeLock = true;
+      }
     }
   }
 

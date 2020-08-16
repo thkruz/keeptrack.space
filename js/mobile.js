@@ -92,7 +92,7 @@ var maxPinchSize = 1;
 
   mobile.checkMobileMode = function () {
     db.log('mobile.checkMobileMode');
-    if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
+    if (mobile.checkIfMobileDevice()) {
       settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
       settingsManager.enableHoverOverlay = false;
       settingsManager.isMobileModeEnabled = true;
@@ -117,6 +117,10 @@ var maxPinchSize = 1;
       }
       settingsManager.maxLabels = settingsManager.desktopMaxLabels;
     }
+  };
+
+  mobile.checkIfMobileDevice = () => {
+    return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
   };
 
   mobile.start = function () {

@@ -616,7 +616,7 @@ or mirrored at any other location without the express written permission of the 
               ["ε-Cen", "Hadar"],
               ["ε-Cen", "Rigil Kentaurus"],
               ["ε-Cen", "M-Cen"],
-              ["M-Cen" ,"ζ-Cen"]
+              ["M-Cen" ,"ζ-Cen"],
               ["ζ-Cen", "μ-Cen"],
               ["μ-Cen", "ν-Cen"],
               ["ν-Cen", "Menkent"],
@@ -649,7 +649,7 @@ or mirrored at any other location without the express written permission of the 
               ["Baten Kaitos", "70-Cet"],
               ["70-Cet", "δ-Cet"],
               ["δ-Cet", "γ-Cet"],
-              ["γ-Cet" ,"ν-Cet"]
+              ["γ-Cet" ,"ν-Cet"],
               ["ν-Cet", "ξ²-Cet"],
               ["ξ²-Cet", "μ-Cet"],
               ["μ-Cet", "λ-Cet"],
@@ -679,7 +679,7 @@ or mirrored at any other location without the express written permission of the 
               ["9-Cyg", "Albireo"],
               ["Sadr", "δ-Cyg"],
               ["δ-Cyg", "θ-Cyg"],
-              ["θ-Cyg" ,"ι-Cyg"]
+              ["θ-Cyg" ,"ι-Cyg"],
               ["ι-Cyg", "κ-Cyg"]]
     },
     {

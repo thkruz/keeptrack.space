@@ -26,15 +26,15 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
       case 'localhost':
         // Comment Out the Next Three Lines if you are testing on a local server
         // and have the keeptrack files installed in a subdirectory
-        settingsManager.installDirectory = '/';
-        break;
-      case 'thkruz.github.io':
+      //   settingsManager.installDirectory = '/';
+      //   break;
+      // case 'thkruz.github.io':
         settingsManager.installDirectory = '/keeptrack.space/';
         break;
     }
     if (typeof settingsManager.installDirectory == 'undefined') {
       // Put Your Custom Install Directory Here
-      settingsManager.installDirectory = '/keeptrack/';
+      settingsManager.installDirectory = '/';
     }
   }
 

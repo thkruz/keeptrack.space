@@ -757,7 +757,7 @@ ul li{
 #datetime {
     z-index: 11;
     position: fixed;
-    left: 50px;
+    left: 10vw;
     top: 0px;
     width: 92px;
     height: 75px;
@@ -765,7 +765,7 @@ ul li{
     text-align: center;
     background: transparent;
     overflow: hidden;
-    margin-top: -5px;
+    margin-top: -2px;
 }
 #datetime-input {
     position: absolute;

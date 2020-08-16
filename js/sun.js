@@ -7,12 +7,6 @@
 
 */
 
-var RADIUS_OF_DRAW_SUN = 2200;
-var SUN_SCALAR_DISTANCE = 250000;
-
-var RADIUS_OF_DRAW_MOON = 4000;
-var MOON_SCALAR_DISTANCE = 250000;
-
 (function () {
   var sun = {};
   sun.sunvar = {};
@@ -126,14 +120,6 @@ var MOON_SCALAR_DISTANCE = 250000;
   var texLoaded = false;
   var nightLoaded = false;
   var loaded = false;
-  sun.loaded = false;
-
-  function onImageLoaded () {
-    if (texLoaded) {
-      loaded = true;
-      sun.loaded = true;
-    }
-  }
 
   sun.init = function () {
     let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -158,22 +144,6 @@ var MOON_SCALAR_DISTANCE = 250000;
     sunShader.uCamMatrix = gl.getUniformLocation(sunShader, 'uCamMatrix');
     sunShader.uMvMatrix = gl.getUniformLocation(sunShader, 'uMvMatrix');
     sunShader.uNormalMatrix = gl.getUniformLocation(sunShader, 'uNormalMatrix');
-    sunShader.uAmbientLightColor = gl.getUniformLocation(sunShader, 'uAmbientLightColor');
-    sunShader.uSampler = gl.getUniformLocation(sunShader, 'uSampler');
-
-    texture = gl.createTexture();
-    var img = new Image();
-    img.onload = function () {
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-      // console.log('sun.js loaded texture');
-      texLoaded = true;
-      onImageLoaded();
-    };
-    img.src = settingsManager.installDirectory + 'images/sun-1024.jpg';
 
     // generate a uvsphere bottom up, CCW order
     var vertPos = [];
@@ -238,32 +208,30 @@ var MOON_SCALAR_DISTANCE = 250000;
     gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertNorm), gl.STATIC_DRAW);
 
-    texCoordBuf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoord), gl.STATIC_DRAW);
-
     vertIndexBuf = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
 
-    // var end = new Date().getTime() - startTime;
-    // console.log('sun init: ' + end + ' ms');
+    sun.loaded = true;
   };
 
   sun.draw = function (pMatrix, camMatrix) {
-    if (!loaded) return;
+    if (!sun.loaded) return;
 
-    let sunXYZ = sun.getXYZ();
-    let sunMaxDist = Math.max(Math.max(Math.abs(sunXYZ.x),Math.abs(sunXYZ.y)),Math.abs(sunXYZ.z));
-    sun.pos[0] = sunXYZ.x / sunMaxDist * SUN_SCALAR_DISTANCE;
-    sun.pos[1] = sunXYZ.y / sunMaxDist * SUN_SCALAR_DISTANCE;
-    sun.pos[2] = sunXYZ.z / sunMaxDist * SUN_SCALAR_DISTANCE;
+    sun.realXyz = sun.getXYZ();
+    let sunMaxDist = Math.max(Math.max(Math.abs(sun.realXyz.x),Math.abs(sun.realXyz.y)),Math.abs(sun.realXyz.z));
+    sun.pos[0] = sun.realXyz.x / sunMaxDist * SUN_SCALAR_DISTANCE;
+    sun.pos[1] = sun.realXyz.y / sunMaxDist * SUN_SCALAR_DISTANCE;
+    sun.pos[2] = sun.realXyz.z / sunMaxDist * SUN_SCALAR_DISTANCE;
 
     mvMatrix = mvMatrixEmpty;
     mat4.identity(mvMatrix);
     mat4.translate(mvMatrix, mvMatrix, sun.pos);
     nMatrix = nMatrixEmpty;
     mat3.normalFromMat4(nMatrix, mvMatrix);
+
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     gl.useProgram(sunShader);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -272,20 +240,6 @@ var MOON_SCALAR_DISTANCE = 250000;
     gl.uniformMatrix4fv(sunShader.uMvMatrix, false, mvMatrix);
     gl.uniformMatrix4fv(sunShader.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(sunShader.uCamMatrix, false, camMatrix);
-    gl.uniform3fv(sunShader.uAmbientLightColor, [1, 1, 1]); // RGB ambient light
-
-    gl.uniform1i(sunShader.uSampler, 0); // point sampler to TEXTURE0
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture); // bind texture to TEXTURE0
-
-    // Todo: Write new sun shader code
-    gl.uniform1i(sunShader.uNightSampler, 1);  // point sampler to TEXTURE1
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, texture); // bind tex to TEXTURE1
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
-    gl.enableVertexAttribArray(sunShader.aTexCoord);
-    gl.vertexAttribPointer(sunShader.aTexCoord, 2, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
     gl.enableVertexAttribArray(sunShader.aVertexPosition);
@@ -307,7 +261,7 @@ var MOON_SCALAR_DISTANCE = 250000;
     gl.enableVertexAttribArray(gl.pickShaderProgram.aPos);
     gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 
-    // Done Drawing
+    gl.disable(gl.BLEND);
     return true;
   };
 
@@ -334,6 +288,8 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
     var clat = Math.cos(obs_lat);
     var clon = Math.cos(obs_long);
 
+    azRad = azRad % 360;
+
     var azRad = DEG2RAD * azimuthDeg;
     var elRad = DEG2RAD * elevationDeg;
 
@@ -354,7 +310,7 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
   let NUM_LAT_SEGS = 64;
   let NUM_LON_SEGS = 64;
 
-  let vertPosBuf, vertNormBuf, texCoordBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
+  let vertPosBuf, vertNormBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
   let vertCount;
   let mvMatrix;
   let mvMatrixEmpty = mat4.create();
@@ -365,9 +321,7 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
   moon.pos = [0,0,0];
 
   var texture;
-
   var texLoaded = false;
-  moon.loaded = false;
 
   function onImageLoaded () {
     if (texLoaded) {
@@ -415,7 +369,7 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
     moonShader.uCamMatrix = gl.getUniformLocation(moonShader, 'uCamMatrix');
     moonShader.uMvMatrix = gl.getUniformLocation(moonShader, 'uMvMatrix');
     moonShader.uNormalMatrix = gl.getUniformLocation(moonShader, 'uNormalMatrix');
-    moonShader.uAmbientLightColor = gl.getUniformLocation(moonShader, 'uAmbientLightColor');
+    moonShader.uSunPos = gl.getUniformLocation(moonShader, 'uSunPos');
     moonShader.uSampler = gl.getUniformLocation(moonShader, 'uSampler');
 
     texture = gl.createTexture();
@@ -437,7 +391,7 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
       texLoaded = true;
       onImageLoaded();
     };
-    img.src = settingsManager.installDirectory + 'images/moon-1024.jpg';
+    img.src = settingsManager.installDirectory + 'textures/moon-1024.jpg';
 
     // generate a uvsphere bottom up, CCW order
     var vertPos = [];
@@ -517,6 +471,13 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
   moon.draw = function (pMatrix, camMatrix) {
     if (!moon.loaded) return;
 
+    // Needed because geocentric earth
+    let moonXYZ = moon.getXYZ();
+    let moonMaxDist = Math.max(Math.max(Math.abs(moonXYZ.x),Math.abs(moonXYZ.y)),Math.abs(moonXYZ.z));
+    moon.pos[0] = moonXYZ.x / moonMaxDist * MOON_SCALAR_DISTANCE;
+    moon.pos[1] = moonXYZ.y / moonMaxDist * MOON_SCALAR_DISTANCE;
+    moon.pos[2] = moonXYZ.z / moonMaxDist * MOON_SCALAR_DISTANCE;
+
     mvMatrix = mvMatrixEmpty;
     mat4.identity(mvMatrix);
     mat4.translate(mvMatrix, mvMatrix, moon.pos);
@@ -530,7 +491,7 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
     gl.uniformMatrix4fv(moonShader.uMvMatrix, false, mvMatrix);
     gl.uniformMatrix4fv(moonShader.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(moonShader.uCamMatrix, false, camMatrix);
-    gl.uniform3fv(moonShader.uAmbientLightColor, [1, 1, 1]); // RGB ambient light
+    gl.uniform3fv(moonShader.uSunPos, sun.pos);
 
     gl.uniform1i(moonShader.uSampler, 0); // point sampler to TEXTURE0
     gl.activeTexture(gl.TEXTURE0);

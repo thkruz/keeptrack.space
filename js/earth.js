@@ -55,7 +55,7 @@ or mirrored at any other location without the express written permission of the 
   earth.loaded = false;
 
   function onImageLoaded () {
-    if (texLoaded && nightLoaded) {
+    if (texLoaded && nightLoaded && earth.bumpMap.isReady && earth.specularMap.isReady) {
       loaded = true;
       earth.loaded = true;
     }
@@ -93,74 +93,115 @@ or mirrored at any other location without the express written permission of the 
     earthShader.uDirectionalLightColor = gl.getUniformLocation(earthShader, 'uDirectionalLightColor');
     earthShader.uSampler = gl.getUniformLocation(earthShader, 'uSampler');
     earthShader.uNightSampler = gl.getUniformLocation(earthShader, 'uNightSampler');
+    earthShader.uBumpMap = gl.getUniformLocation(earthShader, 'uBumpMap');
+    earthShader.uSpecMap = gl.getUniformLocation(earthShader, 'uSpecMap');
 
-    texture = gl.createTexture();
-    var img = new Image();
-    var imgHiRes = new Image();
-    img.onload = function () {
-      $('#loader-text').text('Painting the Earth...');
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-      // console.log('earth.js loaded texture');
-      texLoaded = true;
-      onImageLoaded();
-    };
-    if (settingsManager.nasaImages) img.src = settingsManager.installDirectory + 'images/dayearth-4096.jpg';
-    if (settingsManager.trusatImages) img.src = settingsManager.installDirectory + 'images/trusatvector-4096.jpg';
-    if (settingsManager.blueImages) img.src = settingsManager.installDirectory + 'images/world_blue-2048.png';
-    if (settingsManager.lowresImages) img.src = settingsManager.installDirectory + 'images/no_clouds_4096.jpg';
-    if (settingsManager.vectorImages) img.src = settingsManager.installDirectory + 'images/dayearthvector-4096.jpg';
-    if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) {
-      if (settingsManager.hiresImages) imgHiRes.src = settingsManager.installDirectory + 'images/2_earth_16k.jpg';
-      if (settingsManager.hiresNoCloudsImages) imgHiRes.src = settingsManager.installDirectory + 'images/no_clouds_8k.jpg';
-      imgHiRes.onload = function () {
+    // Day Color Texture
+    {
+      texture = gl.createTexture();
+      var img = new Image();
+      var imgHiRes = new Image();
+      img.onload = function () {
+        $('#loader-text').text('Painting the Earth...');
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgHiRes);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        // console.log('earth.js loaded texture');
         texLoaded = true;
         onImageLoaded();
       };
-    } else {
-      imgHiRes = null;
+      if (settingsManager.nasaImages) img.src = settingsManager.installDirectory + 'textures/mercator-tex.jpg';
+      if (settingsManager.trusatImages) img.src = settingsManager.installDirectory + 'textures/trusatvector-4096.jpg';
+      if (settingsManager.blueImages) img.src = settingsManager.installDirectory + 'textures/world_blue-2048.png';
+      if (settingsManager.lowresImages) img.src = settingsManager.installDirectory + 'textures/earthmap4k.jpg';
+      if (settingsManager.vectorImages) img.src = settingsManager.installDirectory + 'textures/dayearthvector-4096.jpg';
+      if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) {
+        if (settingsManager.hiresImages) imgHiRes.src = settingsManager.installDirectory + 'textures/earthmap8k.jpg';
+        if (settingsManager.hiresNoCloudsImages) imgHiRes.src = settingsManager.installDirectory + 'textures/earthmap8k.jpg';
+        imgHiRes.onload = function () {
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgHiRes);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+          texLoaded = true;
+          onImageLoaded();
+        };
+      } else {
+        imgHiRes = null;
+      }
     }
 
-    nightTexture = gl.createTexture();
-    var nightImg = new Image();
-    var nightImgHiRes = new Image();
-    nightImg.onload = function () {
-      gl.bindTexture(gl.TEXTURE_2D, nightTexture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImg);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-      // console.log('earth.js loaded nightearth');
-      nightLoaded = true;
-      onImageLoaded();
-    };
-    if (settingsManager.nasaImages) nightImg.src = settingsManager.installDirectory + 'images/nightearth-4096.png';
-    if (settingsManager.trusatImages) nightImg.src = settingsManager.installDirectory + 'images/nightearth-4096.png';
-    if (settingsManager.lowresImages) nightImg.src = settingsManager.installDirectory + 'images/nightearth-4096.png';
-    if (settingsManager.blueImages) nightImg.src = settingsManager.installDirectory + 'images/nightearth-4096.png';
-    if (settingsManager.vectorImages) nightImg.src = settingsManager.installDirectory + 'images/dayearthvector-4096.jpg';
-
-    if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) {
-      nightImgHiRes.src = settingsManager.installDirectory + 'images/6_night_16k.jpg';
-      nightImgHiRes.onload = function () {
+    // Night Color Texture
+    {
+      nightTexture = gl.createTexture();
+      var nightImg = new Image();
+      var nightImgHiRes = new Image();
+      nightImg.onload = function () {
         gl.bindTexture(gl.TEXTURE_2D, nightTexture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImgHiRes);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImg);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        // console.log('earth.js loaded nightearth');
         nightLoaded = true;
         onImageLoaded();
       };
-    } else {
-      nightImgHiRes = null;
+      nightImg.src = settingsManager.installDirectory + 'textures/earthlights4k.jpg';
+      if (settingsManager.vectorImages) nightImg.src = settingsManager.installDirectory + 'textures/dayearthvector-4096.jpg';
+
+      if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) {
+        nightImgHiRes.src = settingsManager.installDirectory + 'textures/earthlights10k.jpg';
+        nightImgHiRes.onload = function () {
+          gl.bindTexture(gl.TEXTURE_2D, nightTexture);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImgHiRes);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+          nightLoaded = true;
+          onImageLoaded();
+        };
+      } else {
+        nightImgHiRes = null;
+      }
+    }
+
+    // Bump Map
+    {
+      earth.bumpMap = {};
+      earth.bumpMap.isReady = false;
+      earth.bumpMap.texture = gl.createTexture();
+      earth.bumpMap.img = new Image();
+      earth.bumpMap.img.onload = function () {
+        gl.bindTexture(gl.TEXTURE_2D, earth.bumpMap.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.bumpMap.img);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        earth.bumpMap.isReady = true;
+        onImageLoaded();
+      };
+      earth.bumpMap.img.src = settingsManager.installDirectory + 'textures/earthbump8k.jpg';
+    }
+
+    // Specular Map
+    {
+      earth.specularMap = {};
+      earth.specularMap.isReady = false;
+      earth.specularMap.texture = gl.createTexture();
+      earth.specularMap.img = new Image();
+      earth.specularMap.img.onload = function () {
+        gl.bindTexture(gl.TEXTURE_2D, earth.specularMap.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.specularMap.img);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        earth.specularMap.isReady = true;
+        onImageLoaded();
+      };
+      earth.specularMap.img.src = settingsManager.installDirectory + 'textures/earthspec8k.jpg';
     }
 
     // generate a uvsphere bottom up, CCW order
@@ -318,12 +359,12 @@ or mirrored at any other location without the express written permission of the 
     gl.uniformMatrix4fv(earthShader.uMvMatrix, false, mvMatrix);
     gl.uniformMatrix4fv(earthShader.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(earthShader.uCamMatrix, false, camMatrix);
-    if (!earth.isDayNightToggle) {
+    // if (!earth.isDayNightToggle) {
       gl.uniform3fv(earthShader.uLightDirection, earth.lightDirection);
-    }
-    gl.uniform3fv(earthShader.uAmbientLightColor, [0.03, 0.03, 0.03]); // RGB ambient light
+    // }
+    gl.uniform3fv(earthShader.uAmbientLightColor, [0.1, 0.1, 0.1]); // RGB ambient light
     // No reason to reduce blue light since this is a real image of earth
-    gl.uniform3fv(earthShader.uDirectionalLightColor, [1, 1, 1]); // RGB directional light
+    gl.uniform3fv(earthShader.uDirectionalLightColor, [1.0, 1.0, 1.0]); // RGB directional light
 
 
     gl.uniform1i(earthShader.uSampler, 0); // point sampler to TEXTURE0
@@ -339,6 +380,18 @@ or mirrored at any other location without the express written permission of the 
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, texture); // bind tex to TEXTURE1
     }
+
+    // Bump Map
+
+    gl.uniform1i(earthShader.uBumpMap, 2);
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, earth.bumpMap.texture);
+
+    // Specular Map
+
+    gl.uniform1i(earthShader.uSpecMap, 3);
+    gl.activeTexture(gl.TEXTURE3);
+    gl.bindTexture(gl.TEXTURE_2D, earth.specularMap.texture);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
     gl.enableVertexAttribArray(earthShader.aTexCoord);
@@ -467,6 +520,7 @@ or mirrored at any other location without the express written permission of the 
   };
 
   atmosphere.draw = function (pMatrix, camMatrix) {
+
     gl.enable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -477,6 +531,7 @@ or mirrored at any other location without the express written permission of the 
 
     mvMatrix = mvMatrixEmpty;
     mat4.identity(mvMatrix);
+    mat4.rotateY(mvMatrix, mvMatrix, 90 * DEG2RAD - camPitch);
     mat4.translate(mvMatrix, mvMatrix, atmosphere.pos);
     nMatrix = nMatrixEmpty;
     mat3.normalFromMat4(nMatrix, mvMatrix);

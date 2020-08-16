@@ -9,6 +9,11 @@ const MINUTES_PER_DAY = 1440;
 const PLANETARIUM_DIST = 3;
 const MILLISECONDS_PER_DAY = 1.15741e-8;
 
+const RADIUS_OF_DRAW_SUN = 9000;
+const SUN_SCALAR_DISTANCE = 250000;
+const RADIUS_OF_DRAW_MOON = 4000;
+const MOON_SCALAR_DISTANCE = 250000;
+
 // Settings Manager Setup
 {
   let settingsManager = {};
@@ -110,17 +115,17 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   // //////////////////////////////////////////////////////////////////////////
   settingsManager.showOrbitThroughEarth = false;
 
-  settingsManager.atmosphereSize = RADIUS_OF_EARTH + 200;
+  settingsManager.atmosphereSize = RADIUS_OF_EARTH + 150;
   settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)';
 
   settingsManager.satShader = {};
   settingsManager.satShader.largeObjectMinZoom = 0.37;
   settingsManager.satShader.largeObjectMaxZoom = 0.58;
   settingsManager.satShader.minSize = 4.0;
+  // Max size dynamically changes based on zoom level
+  settingsManager.satShader.maxAllowedSize = 80.0;
   settingsManager.satShader.isUseDynamicSizing = false;
   settingsManager.satShader.dynamicSizeScalar = 1.0;
-  settingsManager.satShader.maxSize = 50.0;
-  settingsManager.satShader.maxAllowedSize = 100.0;
   settingsManager.satShader.starSize = '20.0'; // Has to be a string
   // NOTE: Use floats not integers because some settings get sent to graphics card
   // Must be a string for GPU to read.
@@ -387,6 +392,9 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   // //////////////////////////////////////////////////////////////////////////
   // Defaults that should never be changed
   // //////////////////////////////////////////////////////////////////////////
+
+  // Nominal max size - overwritten by settingsManager.satShader.maxAllowedSize
+  settingsManager.satShader.maxSize = 0.0;
 
   settingsManager.fieldOfView = 0.6;
 

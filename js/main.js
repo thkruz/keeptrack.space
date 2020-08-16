@@ -193,7 +193,10 @@ function initializeKeepTrack () {
   sun.init();
   moon.init();
   earth.init();
-  meshManager.init();
+  // Load Optional 3D models if available
+  if (typeof meshManager !== 'undefined') {
+    meshManager.init();
+  }
   ColorScheme.init();
   $('#loader-text').text('Drawing Dots in Space...');
   satSet.init(function satSetInitCallBack (satData) {
@@ -668,7 +671,10 @@ function drawLoop () {
     let sat = satSet.getSat(objectManager.selectedSat);
     if (!sat.static) {
       _camSnapToSat(sat);
-      meshManager.models.Satellite.position = sat.position;
+      // If 3D Models Available, then update their position on the screen
+      if (typeof meshManager !== 'undefined') {
+        meshManager.models.Satellite.position = sat.position;
+      }
     }
     if (sat.static && cameraType.current=== cameraType.PLANETARIUM) {
       // _camSnapToSat(objectManager.selectedSat);
@@ -838,15 +844,20 @@ function _drawScene () {
   moon.draw(pMatrix, camMatrix);
   // if (typeof debugLine != 'undefined') debugLine.draw();
   atmosphere.draw(pMatrix, camMatrix);
-  earth.draw(pMatrix, camMatrix);
+  if (earth.loaded) {
+    earth.draw(pMatrix, camMatrix);
+  }
   satSet.draw(pMatrix, camMatrix, drawNow);
   orbitManager.draw(pMatrix, camMatrix);
 
   // Draw Satellite if Selected
   if (objectManager.selectedSat !== -1) {
     let sat = satSet.getSat(objectManager.selectedSat);
-    if (!sat.static) {
-      meshManager.drawObject(meshManager.models.Satellite, pMatrix, camMatrix);
+    // If 3D Models Available, then draw them on the screen
+    if (typeof meshManager !== 'undefined') {
+        if (!sat.static) {
+          meshManager.drawObject(meshManager.models.Satellite, pMatrix, camMatrix);
+        }
     }
   }
 
@@ -906,7 +917,7 @@ function _drawCamera () {
         mat4.rotateX(camMatrix, camMatrix, camPitch);
         mat4.rotateZ(camMatrix, camMatrix, -camYaw);
         break;
-      case cameraType.FPS: // FPS style movement        
+      case cameraType.FPS: // FPS style movement
         mat4.rotate(camMatrix, camMatrix, -fpsPitch * DEG2RAD, [1, 0, 0]);
         mat4.rotate(camMatrix, camMatrix, fpsYaw * DEG2RAD, [0, 0, 1]);
         mat4.translate(camMatrix, camMatrix, [fpsXPos, fpsYPos, -fpsZPos]);

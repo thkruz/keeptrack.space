@@ -1,4 +1,5 @@
 (function() {
+  return;
   meshManager = {};
   let mvMatrix;
   let mvMatrixEmpty = mat4.create();
@@ -18,34 +19,66 @@
   meshManager.fragShaderCode = `
     precision mediump float;
 
-    varying vec3 normal;
+    varying vec3 vLightDirection;
+    varying vec3 vTransformedNormal;
+    varying vec2 vTextureCoord;
+    varying vec4 vPosition;
+    varying vec3 vDiffuse;
+    varying vec3 vSpecular;
+    varying float vSpecularExponent;
 
     void main(void) {
-      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+      vec3 V = -normalize(vPosition.xyz);
+      vec3 L = normalize(vLightDirection);
+      vec3 H = normalize(L + V);
+      vec3 N = normalize(vTransformedNormal);
+
+      vec3 color = vDiffuse * dot(N, L) +
+      vSpecular * pow(dot(H, N), vSpecularExponent);
+      gl_FragColor = vec4(color, 1.0);
     }
   `;
   meshManager.vertShaderCode = `
     attribute vec3 aVertexPosition;
     attribute vec3 aVertexNormal;
+    attribute vec3 aSpecular;
+    attribute float aSpecularExponent;
+    attribute vec3 aDiffuse;
+    attribute vec2 aTextureCoord;
 
     uniform mat4 uPMatrix;
     uniform mat4 uCamMatrix;
     uniform mat4 uMvMatrix;
     uniform mat3 uNormalMatrix;
+    uniform vec3 uLightDirection;
 
-    varying vec3 normal;
+    varying vec2 vTextureCoord;
+    varying vec3 vTransformedNormal;
+    varying vec4 vPosition;
+    varying vec3 vLightDirection;
+
+    varying vec3 vDiffuse;
+    varying vec3 vSpecular;
+    varying float vSpecularExponent;
 
     void main(void) {
-      gl_Position = uPMatrix * uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
-      normal = uNormalMatrix * aVertexNormal;
+      vLightDirection = uLightDirection;
+      vDiffuse = aDiffuse;
+      vSpecular = aSpecular;
+      vSpecularExponent = aSpecularExponent;
+
+      vPosition = uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
+      gl_Position = uPMatrix * vPosition;
+      vTextureCoord = aTextureCoord;
+      vTransformedNormal  = uNormalMatrix * aVertexNormal;
     }
   `;
   meshManager.isReady = false;
   meshManager.init = () => {
     let p = OBJ.downloadModels([
         {
-            obj: "/meshes/Satellite.obj",
-            mtl: "/meshes/Satellite.mtl"
+            obj: "./meshes/Satellite.obj",
+            mtl: "./meshes/Satellite.mtl"
         }
     ]);
 
@@ -82,6 +115,8 @@
       nMatrix = nMatrixEmpty;
       mat3.normalFromMat4(nMatrix, mvMatrix);
 
+      gl.enable(gl.BLEND);
+
       // Use the mesh shader program
       gl.useProgram(meshManager.shaderProgram);
 
@@ -89,6 +124,7 @@
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
       // Assign uniforms
+      gl.uniform3fv(meshManager.shaderProgram.uLightDirection, earth.lightDirection);
       gl.uniformMatrix3fv(meshManager.shaderProgram.uNormalMatrix, false, nMatrix);
       gl.uniformMatrix4fv(meshManager.shaderProgram.uMvMatrix, false, mvMatrix);
       gl.uniformMatrix4fv(meshManager.shaderProgram.uPMatrix, false, pMatrix);
@@ -101,6 +137,8 @@
 
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, model.mesh.indexBuffer);
       gl.drawElements(gl.TRIANGLES, model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+      gl.disable(gl.BLEND);
   };
 
   function initShaders() {
@@ -127,10 +165,10 @@
     const attrs = {
         aVertexPosition: OBJ.Layout.POSITION.key,
         aVertexNormal: OBJ.Layout.NORMAL.key,
-        // aTextureCoord: OBJ.Layout.UV.key,
-        // aDiffuse: OBJ.Layout.DIFFUSE.key,
-        // aSpecular: OBJ.Layout.SPECULAR.key,
-        // aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key
+        aTextureCoord: OBJ.Layout.UV.key,
+        aDiffuse: OBJ.Layout.DIFFUSE.key,
+        aSpecular: OBJ.Layout.SPECULAR.key,
+        aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key
     };
 
     meshManager.shaderProgram.attrIndices = {};
@@ -154,6 +192,7 @@
     meshManager.shaderProgram.uCamMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uCamMatrix');
     meshManager.shaderProgram.uMvMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uMvMatrix');
     meshManager.shaderProgram.uNormalMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uNormalMatrix');
+    meshManager.shaderProgram.uLightDirection = gl.getUniformLocation(meshManager.shaderProgram, 'uLightDirection');
 
     meshManager.shaderProgram.applyAttributePointers = function(model) {
         const layout = model.mesh.vertexBuffer.layout;
@@ -179,11 +218,11 @@
   function initBuffers() {
       var layout = new OBJ.Layout(
           OBJ.Layout.POSITION,
-          OBJ.Layout.NORMAL
-          // OBJ.Layout.DIFFUSE,
-          // OBJ.Layout.UV,
-          // OBJ.Layout.SPECULAR,
-          // OBJ.Layout.SPECULAR_EXPONENT
+          OBJ.Layout.NORMAL,
+          OBJ.Layout.DIFFUSE,
+          OBJ.Layout.UV,
+          OBJ.Layout.SPECULAR,
+          OBJ.Layout.SPECULAR_EXPONENT
       );
 
       // initialize the mesh's buffers

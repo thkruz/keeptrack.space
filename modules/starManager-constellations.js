@@ -36,9 +36,14 @@ or mirrored at any other location without the express written permission of the 
       for (var i = 0; i < starManager.constellations.length; i++) {
         for (var s = 0; s < starManager.constellations[i].stars.length; s++) {
           // Verify Stars Exist
-          var star1 = satSet.getSat(satSet.getIdFromStarName(starManager.constellations[i].stars[s][0]));
-          var star2 = satSet.getSat(satSet.getIdFromStarName(starManager.constellations[i].stars[s][1]));
-          if (star1 == null || star2 == null) { continue; }
+          try {
+            var star1 = satSet.getSat(satSet.getIdFromStarName(starManager.constellations[i].stars[s][0]));
+            var star2 = satSet.getSat(satSet.getIdFromStarName(starManager.constellations[i].stars[s][1]));
+            if (star1 == null || star2 == null) { continue; }
+          } catch (e) {
+            console.warn(`Star/Constellation error - i: ${i} - s: ${s}`);
+            continue;
+          }
           drawLineList.push(
             {
               'line': new Line(),

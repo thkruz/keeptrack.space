@@ -10,6 +10,9 @@ KeepTrack originally was meant to provide simple orbital analysis tools. Since t
 
 The code has been rewrote multiple times and now barely resembles the original, but none of this would have been possible without [@jeyoder](https://github.com/jeyoder)'s original stuffin.space.
 
+## Live Demo
+The most recent commit is available here: https://thkruz.github.io/keeptrack.space/
+
 ## Table of Contents
 - [Description](#Description)
 - [Installation](#Installation)
@@ -35,12 +38,12 @@ Any modifications to a satellite require that information to be passed to the sa
 * main.js - Primary JS files that controls the draw loop.
 * objectManager.js - Used for extracting details from TLE.json and loading additional objects from other files.
 * mapManager.js - My modified version of [@juliuste](https://github.com/juliuste/projections)'s library for stereographic map projection.
-* orbit-display.js - Draws the orbit lines. Called from the main draw loop.
+* orbitManager.js - Draws the orbit lines. Called from the main draw loop.
 * satSet.js - Most of the manipulation of the local satellite catalogue occurs here.
 * color-scheme.js - Handles the calculation of rgba colors for objects.
-* earth.js - Draws the earth.
+* earth.js - Draws the earth and the atmosphere. Currently (bad!) responsible for updating time string timeManager references. Called from main.js
 * lookangles.js - My personal modifications to [@shashwata](https://github.com/shashwatak/)'s amazing library [satellite.js](https://github.com/shashwatak/satellite-js).
-* time-manager.js - Tracks internal time and controls time manipulation.
+* timeManager.js - Tracks internal time and controls time manipulation.
 * search-box.js - Functions for searching the catalog and manipulating the search drop-down.
 * sun-calc.js - [@mourner](https://github.com/mourner/suncalc)'s library used for star position calculations.
 * satCruncher.js - Web Worker that provides x, y, z coordinates of the satellites and if it is in a sensor's FOV.
@@ -48,15 +51,18 @@ Any modifications to a satellite require that information to be passed to the sa
 * TLE.json - The main database on satellites.
 * controlSiteManager.js - Database of command and control locations.
 * launchSiteManager.js - Database of launch locations.
+* missileManager.js - ICBM/SLBM simulator.
 * sensorManager.js - Database of sensor locations.
 * starManager.js - Database of stars.
 * starManager-constellations.js - Add-on database of star constellations.
 
 ## Contributors
-[@cwang-pivotal](https://github.com/cwang-pivotal/)
+* [@cwang-pivotal](https://github.com/cwang-pivotal/)
+* [@hkruczek](https://github.com/hkruczek/)
+* [@Le-Roi777](https://github.com/Le-Roi777/)
 
 ## License File
 At this time the code is NOT in the public domain and I reserve all rights on my modifications.
 
 ### Why Post the Code Then
-I wouldn't have gotten this far if I hadn't been able to reference other projects and figure out how they work. I encourage you to use my ideas and methods, especially if you are currently forking from stuffin.space, but I am unwilling to give away use of the code to commercial projects at this time.
+I wouldn't have gotten this far if I hadn't been able to reference other projects and figure out how they work. I encourage you to use my ideas and methods, especially if you are currently forking from stuffin.space, but I am unwilling to give away use of the code to commercial projects at this time. If you would like to use this for academic/educational/scientific purposes please email me and we can arrange something - not looking for money, just credit.

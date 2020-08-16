@@ -131,7 +131,7 @@ var speedModifier = 1;
         setTimeout(function() { window.location.replace('http://s4ts.com'); }, 1000 * 60 * 2);
         // throw new Error('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
       } else {
-        // ga('send', 'event', 'Offline Software', settingsManager.offlineLocation, 'Licensed');
+        if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Offline Software', settingsManager.offlineLocation, 'Licensed');
       }
       uiManager.resize2DMap();
     })();
@@ -1040,7 +1040,7 @@ var speedModifier = 1;
 
         if (isHOSChecked) {
           settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0];
-          ga('send', 'event', 'Settings Menu', 'Hide Other Satellites', 'Option Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Settings Menu', 'Hide Other Satellites', 'Option Selected');
         } else {
           settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.1];
         }
@@ -1048,14 +1048,14 @@ var speedModifier = 1;
 
         if (isSNPChecked) {
           isShowNextPass = true;
-          ga('send', 'event', 'Settings Menu', 'Show Next Pass on Hover', 'Option Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Settings Menu', 'Show Next Pass on Hover', 'Option Selected');
         } else {
           isShowNextPass = false;
         }
 
         if (isRiseSetChecked) {
           satellite.isRiseSetLookangles = true;
-          ga('send', 'event', 'Settings Menu', 'Show Only Rise/Set Times', 'Option Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Settings Menu', 'Show Only Rise/Set Times', 'Option Selected');
         } else {
           satellite.isRiseSetLookangles = false;
         }
@@ -1454,7 +1454,7 @@ var speedModifier = 1;
           var upOrDown = $('#nl-updown').val();
 
           var launchFac = $('#nl-facility').val();
-          ga('send', 'event', 'New Launch', launchFac, 'Launch Site');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'New Launch', launchFac, 'Launch Site');
 
           var launchLat, launchLon;
 
@@ -1670,7 +1670,7 @@ var speedModifier = 1;
             if (type === 5) missileManager.MassRaidPre(launchTime, 'simulation/USA2Russia.json');
             if (type === 6) missileManager.MassRaidPre(launchTime, 'simulation/USA2China.json');
             if (type === 7) missileManager.MassRaidPre(launchTime, 'simulation/USA2NorthKorea.json');
-            ga('send', 'event', 'Missile Sim', type, 'Sim Number');
+            if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Missile Sim', type, 'Sim Number');
             $('#ms-error').html('Large Scale Attack Loaded');
             $('#ms-error').show();
           } else {
@@ -1757,8 +1757,8 @@ var speedModifier = 1;
               }
               missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.ukSLBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.ukSLBM[a * 4 + 3], 'United Kigndom', missileMinAlt);
             }
-            ga('send', 'event', 'New Missile', attackerName, 'Attacker');
-            ga('send', 'event', 'New Missile', tgtLat + ', ' + tgtLon, 'Target');
+            if (settingsManager.isOfficialWebsite) ga('send', 'event', 'New Missile', attackerName, 'Attacker');
+            if (settingsManager.isOfficialWebsite) ga('send', 'event', 'New Missile', tgtLat + ', ' + tgtLon, 'Target');
 
             $('#ms-error').html(missileManager.lastMissileError);
             $('#ms-error').show();
@@ -2145,8 +2145,7 @@ var speedModifier = 1;
     function _bottomIconPress (evt) {
       db.log('_bottomIconPress');
       db.log(evt.currentTarget.id);
-      // This line is undefined and causes error on opening menu items...Don't know if needed? (Le-Roi)
-      // ga('send', 'event', 'Bottom Icon', evt.currentTarget.id, 'Selected');
+      if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Bottom Icon', evt.currentTarget.id, 'Selected');
       switch (evt.currentTarget.id) {
         case 'menu-sensor-list': // No Keyboard Commands
           if (isSensorListMenuOpen) {
@@ -3639,7 +3638,7 @@ var speedModifier = 1;
         $('#loading-screen').fadeIn('slow', function () {
           drawLineList = [];
           satCommManager.showLinks('aehf');
-          ga('send', 'event', 'Satcom Menu', 'aehf', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Satcom Menu', 'aehf', 'Selected');
           $('#loading-screen').fadeOut();
           $('#satcom-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
         });
@@ -3648,7 +3647,7 @@ var speedModifier = 1;
         $('#loading-screen').fadeIn('slow', function () {
           drawLineList = [];
           satCommManager.showLinks('wgs');
-          ga('send', 'event', 'Satcom Menu', 'wgs', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Satcom Menu', 'wgs', 'Selected');
           $('#loading-screen').fadeOut();
           $('#satcom-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
         });
@@ -3669,13 +3668,13 @@ var speedModifier = 1;
         uiManager.legendMenuChange('default');
         satSet.setColorScheme(ColorScheme.default, true);
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
+        if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
         break;
       case 'velocity':
         uiManager.legendMenuChange('velocity');
         satSet.setColorScheme(ColorScheme.velocity);
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
+        if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
         break;
       case 'sunlight':
           uiManager.legendMenuChange('sunlight');
@@ -3685,26 +3684,26 @@ var speedModifier = 1;
           satCruncher.postMessage({
             isSunlightView: true,
           });
-          ga('send', 'event', 'ColorScheme Menu', 'Sunlight', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Sunlight', 'Selected');
           break;
       case 'near-earth':
         uiManager.legendMenuChange('near');
         satSet.setColorScheme(ColorScheme.leo);
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        ga('send', 'event', 'ColorScheme Menu', 'near-earth', 'Selected');
+        if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'near-earth', 'Selected');
         break;
       case 'deep-space':
         uiManager.legendMenuChange('deep');
         satSet.setColorScheme(ColorScheme.geo);
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        ga('send', 'event', 'ColorScheme Menu', 'Deep-Space', 'Selected');
+        if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Deep-Space', 'Selected');
         break;
       case 'elset-age':
       $('#loading-screen').fadeIn('slow', function () {
         uiManager.legendMenuChange('ageOfElset');
         satSet.setColorScheme(ColorScheme.ageOfElset);
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        ga('send', 'event', 'ColorScheme Menu', 'Age of Elset', 'Selected');
+        if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Age of Elset', 'Selected');
         $('#loading-screen').fadeOut();
       });
       break;
@@ -3713,7 +3712,7 @@ var speedModifier = 1;
         $('#loading-screen').fadeIn('slow', function () {
           satSet.setColorScheme(ColorScheme.lostobjects);
           uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-          ga('send', 'event', 'ColorScheme Menu', 'Lost Objects', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Lost Objects', 'Selected');
           searchBox.doSearch($('#search').val());
           $('#loading-screen').fadeOut();
         });
@@ -3722,19 +3721,19 @@ var speedModifier = 1;
         uiManager.legendMenuChange('rcs');
         satSet.setColorScheme(ColorScheme.rcs);
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        ga('send', 'event', 'ColorScheme Menu', 'RCS', 'Selected');
+        if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'RCS', 'Selected');
         break;
       case 'smallsats':
         uiManager.legendMenuChange('small');
         satSet.setColorScheme(ColorScheme.smallsats);
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        ga('send', 'event', 'ColorScheme Menu', 'Small Satellites', 'Selected');
+        if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Small Satellites', 'Selected');
         break;
       case 'countries':
         uiManager.legendMenuChange('countries');
         satSet.setColorScheme(ColorScheme.countries);
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
+        if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
         break;
     }
 

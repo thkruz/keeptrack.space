@@ -1140,7 +1140,7 @@ or mirrored at any other location without the express written permission of the 
         // console.log(sensorList[sensor] == selectedSensor);
         if (sensorList[sensor] == selectedSensor || (sensorList[sensor].staticNum === staticNum && typeof staticNum != 'undefined')) {
           sensorManager.selectedSensor = sensorList[sensor];
-          ga('send', 'event', 'Sensor', sensorList[sensor].shortName, 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Sensor', sensorList[sensor].shortName, 'Selected');
           // Do For All Sensors
           sensorManager.whichRadar = sensorManager.selectedSensor.shortName;
           satCruncher.postMessage({

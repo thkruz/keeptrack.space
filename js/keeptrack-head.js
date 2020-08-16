@@ -19,21 +19,22 @@ const MOON_SCALAR_DISTANCE = 250000;
   let settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.18.2';
-  settingsManager.versionDate = 'August 15, 2020';
+  settingsManager.versionNumber = '1.18.3';
+  settingsManager.versionDate = 'August 16, 2020';
 
   // Install Folder Settings
   {
     switch (window.location.host) {
       case 'keeptrack.space':
         settingsManager.installDirectory = '/';
+        settingsManager.isOfficialWebsite = true;
         break;
       case 'localhost':
-        // Comment Out the Next Three Lines if you are testing on a local server
+        // Comment Out the Next Two Lines if you are testing on a local server
         // and have the keeptrack files installed in a subdirectory
-      //   settingsManager.installDirectory = '/';
-      //   break;
-      // case 'thkruz.github.io':
+        settingsManager.installDirectory = '/';
+        break;
+      case 'thkruz.github.io':
         settingsManager.installDirectory = '/keeptrack.space/';
         break;
     }
@@ -421,6 +422,9 @@ const MOON_SCALAR_DISTANCE = 250000;
   settingsManager.queuedScreenshot = false;
 
   settingsManager.isResizing = false;
+  if (typeof settingsManager.isOfficialWebsite == 'undefined') {
+    settingsManager.isOfficialWebsite = false;
+  }
 
   settingsManager.vertShadersSize = 12;
   settingsManager.isEditTime = false;

@@ -1345,7 +1345,8 @@ function webGlInit () {
     can.height = settingsManager.hiResHeight;
   } else {
     if (settingsManager.isAutoResizeCanvas) {
-      can.width = document.body.clientWidth;
+      // can.width = document.body.clientWidth;
+      can.width = window.innerWidth;
       can.height = window.innerHeight;
     }
   }
@@ -1703,7 +1704,7 @@ function selectSat (satId) {
     } else {
       //      $('#sat-objnum').html(sat.TLE2.substr(2,7));
       $('#sat-objnum').html(sat.SCC_NUM);
-      ga('send', 'event', 'Satellite', 'SCC: ' + sat.SCC_NUM, 'SCC Number');
+      if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Satellite', 'SCC: ' + sat.SCC_NUM, 'SCC Number');
     }
 
     var objtype;
@@ -1742,8 +1743,8 @@ function selectSat (satId) {
     $('#sat-site').html(site.site);
     $('#sat-sitec').html(site.sitec);
 
-    ga('send', 'event', 'Satellite', 'Country: ' + country, 'Country');
-    ga('send', 'event', 'Satellite', 'Site: ' + site, 'Site');
+    if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Satellite', 'Country: ' + country, 'Country');
+    if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Satellite', 'Site: ' + site, 'Site');
 
     // /////////////////////////////////////////////////////////////////////////
     // Launch Vehicle Correlation Table
@@ -2875,7 +2876,7 @@ $(document).ready(function () {
           }
           satSet.setColorScheme(ColorScheme.default, true);
           uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-          ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
           break;
         case 'colors-sunlight-rmb':
           uiManager.legendMenuChange('sunlight');
@@ -2885,25 +2886,25 @@ $(document).ready(function () {
           satCruncher.postMessage({
             isSunlightView: true,
           });
-          ga('send', 'event', 'ColorScheme Menu', 'Sunlight', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Sunlight', 'Selected');
           break;
         case 'colors-country-rmb':
           uiManager.legendMenuChange('countries');
           satSet.setColorScheme(ColorScheme.countries);
           uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-          ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
           break;
         case 'colors-velocity-rmb':
           uiManager.legendMenuChange('velocity');
           satSet.setColorScheme(ColorScheme.velocity);
           uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-          ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
           break;
         case 'colors-ageOfElset-rmb':
           uiManager.legendMenuChange('ageOfElset');
           satSet.setColorScheme(ColorScheme.ageOfElset);
           uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-          ga('send', 'event', 'ColorScheme Menu', 'Age of Elset', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Age of Elset', 'Selected');
           break;
         case 'earth-blue-rmb':
           settingsManager.blueImages = true;

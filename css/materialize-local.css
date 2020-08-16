@@ -30,6 +30,7 @@ input[type=search]:not(.browser-default),
 textarea.materialize-textarea {
   border-bottom: 1px solid #ffffff !important;
   color: #ffffff;
+  -webkit-appearance: none;
 }
 
 .btn, .btn-large, .btn-small {

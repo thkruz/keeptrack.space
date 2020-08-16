@@ -825,6 +825,7 @@ ul li{
     margin-left: 0px;
 }
 .bmenu-item {
+  margin: 0 auto;
     height: 42px;
     padding: 5px;
 }

@@ -395,7 +395,7 @@ const MOON_SCALAR_DISTANCE = 250000;
   // //////////////////////////////////////////////////////////////////////////
 
   // Nominal max size - overwritten by settingsManager.satShader.maxAllowedSize
-  settingsManager.satShader.maxSize = 0.0;
+  settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize * 2;
 
   settingsManager.fieldOfView = 0.6;
 
@@ -541,6 +541,10 @@ let db = {};
       console.log('db is now off!');
       localStorage.setItem("db", JSON.stringify(db));
     };
+    if (db.enabled) {
+      // Fix for multiple sensors gettings saved locally by previous bug
+      if (currentSensor.length > 1) currentSensor = currentSensor[0];
+    }
   })();
 }
 

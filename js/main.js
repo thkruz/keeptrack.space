@@ -264,7 +264,7 @@ function initializeKeepTrack () {
       // This shouldn't be necessary in the future
       setTimeout(function () {
         (function _reloadLastSensor () {
-          let currentSensor = (!settingsManager.offline) ? JSON.parse(localStorage.getItem("currentSensor")) : null;
+          let currentSensor = (!settingsManager.offline) ? JSON.parse(localStorage.getItem("currentSensor")) : null;          
           if (currentSensor !== null) {
             try {
               // If there is a staticnum set use that

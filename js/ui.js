@@ -2145,7 +2145,8 @@ var speedModifier = 1;
     function _bottomIconPress (evt) {
       db.log('_bottomIconPress');
       db.log(evt.currentTarget.id);
-      ga('send', 'event', 'Bottom Icon', evt.currentTarget.id, 'Selected');
+      // This line is undefined and causes error on opening menu items...Don't know if needed? (Le-Roi)
+      // ga('send', 'event', 'Bottom Icon', evt.currentTarget.id, 'Selected');
       switch (evt.currentTarget.id) {
         case 'menu-sensor-list': // No Keyboard Commands
           if (isSensorListMenuOpen) {

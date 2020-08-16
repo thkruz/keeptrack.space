@@ -54,9 +54,9 @@ Any modifications to a satellite require that information to be passed to the sa
 * starManager-constellations.js - Add-on database of star constellations.
 
 ## Contributors
-[@cwang-pivotal](https://github.com/cwang-pivotal/)
-[@hkruczek](https://github.com/hkruczek/)
-[@Le-Roi777](https://github.com/Le-Roi777/)
+* [@cwang-pivotal](https://github.com/cwang-pivotal/)
+* [@hkruczek](https://github.com/hkruczek/)
+* [@Le-Roi777](https://github.com/Le-Roi777/)
 
 ## License File
 At this time the code is NOT in the public domain and I reserve all rights on my modifications.

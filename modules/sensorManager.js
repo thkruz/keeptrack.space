@@ -1027,7 +1027,11 @@ or mirrored at any other location without the express written permission of the 
   sensorManager.selectedSensor = {};
   sensorManager.whichRadar = '';
   sensorManager.setSensor = function (selectedSensor, staticNum) {
-    if (!settingsManager.offline) { localStorage.setItem("currentSensor", JSON.stringify([selectedSensor, staticNum])); }
+    try {
+      localStorage.setItem("currentSensor", JSON.stringify([selectedSensor, staticNum]));
+    } catch (e) {
+      console.log(`Couldn't clear the current sensor info!`);
+    }
     if (selectedSensor == null && staticNum == null) return;
     var sensor;
     if (selectedSensor === 'SSN') {

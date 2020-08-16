@@ -1,22 +1,23 @@
 <!doctype html>
-<html>
-  <head>
-    <script src="js/keeptrack-head.js"></script>
-    <meta name="description" content="A 3D visualtion tool to learn about satellites and tracking radars." />
-    <meta property="og:image" content="http://keeptrack.space/social/keeptrackPreview-new.jpg">
-    <meta property="og:image:type" content="image/jpg"/>
-    <meta property="og:image:width" content="1024"/>
-    <meta property="og:image:height" content="1024"/>
-    <meta property='og:title' content='Keeptrack'/>
-    <meta property='og:description' content='A 3D visualtion tool to learn about satellites and tracking radars.'/>
-    <meta property='og:url' content='http://keeptrack.space'>
+<html lang="en">
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
-    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
-    <title>Keeptrack.space</title>
-    <!-- FORCE HTTPS -->
-    <!-- <script>
+<head>
+  <script src="js/keeptrack-head.js"></script>
+  <meta name="description" content="A 3D visualtion tool to learn about satellites and tracking radars." />
+  <meta property="og:image" content="http://keeptrack.space/social/keeptrackPreview-new.jpg">
+  <meta property="og:image:type" content="image/jpg" />
+  <meta property="og:image:width" content="1024" />
+  <meta property="og:image:height" content="1024" />
+  <meta property='og:title' content='Keeptrack' />
+  <meta property='og:description' content='A 3D visualtion tool to learn about satellites and tracking radars.' />
+  <meta property='og:url' content='http://keeptrack.space'>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+  <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+  <title>Keeptrack.space</title>
+  <!-- FORCE HTTPS -->
+  <!-- <script>
       (function redirectHttpToHttps() {
           if (window.location.protocol === 'http:' && window.location.hostname === 'keeptrack.space') {
             var httpURL= window.location.hostname + window.location.pathname + window.location.search;
@@ -25,42 +26,46 @@
           }
       })();
     </script> -->
-    <!-- FORCE HTTPS -->
-  </head>
-  <body id="bodyDOM" class="no-text-select">
-    <div id="loading-screen" class="valign-wrapper full-loader">
-      <div id="logo-inner-container" class="valign">
-        <span id="logo-text" class="logo-font">KEEP TRACK</span>
-        <script>
-          if (settingsManager.trusatMode) {
-            document.write('<span id="logo-trusat"><img src="' + settingsManager.installDirectory + '/images/trusat.png"></span>');
-          }
-        </script>
-        </br>
-        <div id= "spinner" class="preloader-wrapper active">
-          <div class="spinner-layer spinner-white-only">
-            <div class="circle-clipper left">
-              <div class="circle"></div>
-            </div><div class="gap-patch">
-              <div class="circle"></div>
-            </div><div class="circle-clipper right">
-              <div class="circle"></div>
-            </div>
+  <!-- FORCE HTTPS -->
+</head>
+
+<body id="bodyDOM" class="no-text-select">
+  <div id="loading-screen" class="valign-wrapper full-loader">
+    <div id="logo-inner-container" class="valign">
+      <span id="logo-text" class="logo-font">KEEP TRACK</span>
+      <script>
+        if (settingsManager.trusatMode) {
+          document.write('<span id="logo-trusat"><img src="' + settingsManager.installDirectory + '/images/trusat.png"></span>');
+        }
+      </script>
+      </br>
+      <div id="spinner" class="preloader-wrapper active">
+        <div class="spinner-layer spinner-white-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div>
+          <div class="gap-patch">
+            <div class="circle"></div>
+          </div>
+          <div class="circle-clipper right">
+            <div class="circle"></div>
           </div>
         </div>
-        <span id="loader-text">Downloading Science...</span>
-        <button id="mobile-start-button" class="btn btn-ui waves-effect waves-light" type="button" name="action" onclick="mobile.start();">Click to Begin &#9658;</button>
       </div>
+      <span id="loader-text">Downloading Science...</span>
+      <button id="mobile-start-button" class="btn btn-ui waves-effect waves-light" type="button" name="action"
+        onclick="mobile.start();">Click to Begin &#9658;</button>
     </div>
-    <div id="help-screen" class="valign-wrapper">
-      <div id="help-inner-container" class="valign">
-        <p>
-          <span id="help-header" class="logo-font">TITLE</span>
-          <span id="help-close">X</span>
-        </p>
-        <span id="help-text">ADVICE</span>
-      </div>
+  </div>
+  <div id="help-screen" class="valign-wrapper">
+    <div id="help-inner-container" class="valign">
+      <p>
+        <span id="help-header" class="logo-font">TITLE</span>
+        <span id="help-close">X</span>
+      </p>
+      <span id="help-text">ADVICE</span>
     </div>
+  </div>
   <header>
     <nav>
       <div id="nav-wrapper" class="nav-wrapper light-blue darken-3">
@@ -87,8 +92,10 @@
               <div id="tutorial-icon" class="top-menu-icons"><img src="images/help.png"></div>
             </a>
           </li>
-          <li><a id="fullscreen-icon" class="top-menu-icons" onclick="mobile.fullscreenToggle();"><img src="images/fullscreen-icon.png"></a></li>
-          <li><a id="search-icon" class="top-menu-icons" onclick="mobile.searchToggle();"><img src="images/search-icon.png"></a></li>
+          <li><a id="fullscreen-icon" class="top-menu-icons" onclick="mobile.fullscreenToggle();"><img
+                src="images/fullscreen-icon.png"></a></li>
+          <li><a id="search-icon" class="top-menu-icons" onclick="mobile.searchToggle();"><img
+                src="images/search-icon.png"></a></li>
           <div id="search-holder" class="menu-item search-slide-up">
             <input id="search" type="search" required>
             <!-- <span id="search-close" style="margin-left:5px">X</span> -->
@@ -97,8 +104,11 @@
       </div>
       <div id="social-alt" class="left">
         <div id="share-icon-container">
-          <a id="github-share" class="share-up share-icons" href="https://github.com/thkruz/keeptrack.space/" target="_blank"><img src="images/github.png" width="32" height="32"></a>
-          <a id="twitter-share" class="share-up share-icons" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank"><img src="https://static.addtoany.com/buttons/twitter.svg" width="32" height="32"></a>
+          <a id="github-share" class="share-up share-icons" href="https://github.com/thkruz/keeptrack.space/"
+            target="_blank"><img src="images/github.png" width="32" height="32"></a>
+          <a id="twitter-share" class="share-up share-icons"
+            href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank"><img
+              src="https://static.addtoany.com/buttons/twitter.svg" width="32" height="32"></a>
         </div>
       </div>
     </nav>
@@ -183,104 +193,209 @@
 
         <div id="sat-hoverbox">
           <span id="sat-hoverbox1"></span>
-          <br/>
+          <br />
           <span id="sat-hoverbox2"></span>
-          <br/>
+          <br />
           <span id="sat-hoverbox3"></span>
         </div>
         <div id="sat-minibox"></div>
 
         <div id="time-machine-menu" class="start-hidden">
           <ul id="time-machine-default">
-            <li><div class="Square-Box legend-payload-box"></div>1960s</li>
-            <li><div class="Square-Box legend-rocketBody-box"></div>1970s</li>
-            <li><div class="Square-Box legend-debris-box"></div>1980s</li>
-            <li class="legend-trusat"><div class="Square-Box legend-trusat-box"></div>1990s</li>
-            <li><div class="Square-Box legend-sensor-box"></div>2000s</li>
-            <li><div class="Square-Box legend-facility-box"></div>2010s</li>
+            <li>
+              <div class="Square-Box legend-payload-box"></div>1960s
+            </li>
+            <li>
+              <div class="Square-Box legend-rocketBody-box"></div>1970s
+            </li>
+            <li>
+              <div class="Square-Box legend-debris-box"></div>1980s
+            </li>
+            <li class="legend-trusat">
+              <div class="Square-Box legend-trusat-box"></div>1990s
+            </li>
+            <li>
+              <div class="Square-Box legend-sensor-box"></div>2000s
+            </li>
+            <li>
+              <div class="Square-Box legend-facility-box"></div>2010s
+            </li>
           </ul>
         </div>
 
         <div id="legend-hover-menu" class="start-hidden">
           <ul id="legend-list-default">
-            <li><div class="Square-Box legend-payload-box"></div>Payload</li>
-            <li><div class="Square-Box legend-rocketBody-box"></div>Rocket Body</li>
-            <li><div class="Square-Box legend-debris-box"></div>Debris</li>
-            <li class="legend-trusat"><div class="Square-Box legend-trusat-box"></div>TruSat</li>
-            <li><div class="Square-Box legend-sensor-box"></div>Sensor</li>
-            <li><div class="Square-Box legend-facility-box"></div>Launch Site</li>
+            <li>
+              <div class="Square-Box legend-payload-box"></div>Payload
+            </li>
+            <li>
+              <div class="Square-Box legend-rocketBody-box"></div>Rocket Body
+            </li>
+            <li>
+              <div class="Square-Box legend-debris-box"></div>Debris
+            </li>
+            <li class="legend-trusat">
+              <div class="Square-Box legend-trusat-box"></div>TruSat
+            </li>
+            <li>
+              <div class="Square-Box legend-sensor-box"></div>Sensor
+            </li>
+            <li>
+              <div class="Square-Box legend-facility-box"></div>Launch Site
+            </li>
           </ul>
           <ul id="legend-list-planetarium" class="start-hidden">
-            <li><div class="Square-Box legend-payload-box"></div>Payload</li>
-            <li><div class="Square-Box legend-rocketBody-box"></div>Rocket Body</li>
-            <li><div class="Square-Box legend-debris-box"></div>Debris</li>
-            <li><div class="Square-Box legend-trusat-box"></div>TruSat</li>
+            <li>
+              <div class="Square-Box legend-payload-box"></div>Payload
+            </li>
+            <li>
+              <div class="Square-Box legend-rocketBody-box"></div>Rocket Body
+            </li>
+            <li>
+              <div class="Square-Box legend-debris-box"></div>Debris
+            </li>
+            <li>
+              <div class="Square-Box legend-trusat-box"></div>TruSat
+            </li>
           </ul>
           <ul id="legend-list-astronomy" class="start-hidden">
-            <li><div class="Square-Box legend-starHi-box"></div>VisMag Less Than 3.5</li>
-            <li><div class="Square-Box legend-starMed-box"></div>VisMag Between 3.5 and 4.7</li>
-            <li><div class="Square-Box legend-starLow-box"></div>VisMag Greater Than 4.7</li>
+            <li>
+              <div class="Square-Box legend-starHi-box"></div>VisMag Less Than 3.5
+            </li>
+            <li>
+              <div class="Square-Box legend-starMed-box"></div>VisMag Between 3.5 and 4.7
+            </li>
+            <li>
+              <div class="Square-Box legend-starLow-box"></div>VisMag Greater Than 4.7
+            </li>
           </ul>
           <ul id="legend-list-sunlight" class="start-hidden">
-            <li><div class="Square-Box legend-satLow-box"></div>In Umbral</li>
-            <li><div class="Square-Box legend-satMed-box"></div>In Penumbral</li>
-            <li><div class="Square-Box legend-satHi-box"></div>In Sunlight</li>
-            <li><div class="Square-Box legend-inFOV-box"></div>Satellite In View</li>
+            <li>
+              <div class="Square-Box legend-satLow-box"></div>In Umbral
+            </li>
+            <li>
+              <div class="Square-Box legend-satMed-box"></div>In Penumbral
+            </li>
+            <li>
+              <div class="Square-Box legend-satHi-box"></div>In Sunlight
+            </li>
+            <li>
+              <div class="Square-Box legend-inFOV-box"></div>Satellite In View
+            </li>
           </ul>
           <ul id="legend-list-default-sensor" class="start-hidden">
-            <li><div class="Square-Box legend-payload-box"></div>Payload</li>
-            <li><div class="Square-Box legend-rocketBody-box"></div>Rocket Body</li>
-            <li><div class="Square-Box legend-debris-box"></div>Debris</li>
-            <li><div class="Square-Box legend-trusat-box"></div>TruSat</li>
-            <li><div class="Square-Box legend-inFOV-box"></div>Satellite In View</li>
-            <li><div class="Square-Box legend-missile-box"></div>Missile</li>
-            <li><div class="Square-Box legend-missileInview-box"></div>Missile In View</li>
-            <li><div class="Square-Box legend-static-box"></div>Sensor</li>
-            <li><div class="Square-Box legend-facility-box"></div>Launch Site</li>
+            <li>
+              <div class="Square-Box legend-payload-box"></div>Payload
+            </li>
+            <li>
+              <div class="Square-Box legend-rocketBody-box"></div>Rocket Body
+            </li>
+            <li>
+              <div class="Square-Box legend-debris-box"></div>Debris
+            </li>
+            <li>
+              <div class="Square-Box legend-trusat-box"></div>TruSat
+            </li>
+            <li>
+              <div class="Square-Box legend-inFOV-box"></div>Satellite In View
+            </li>
+            <li>
+              <div class="Square-Box legend-missile-box"></div>Missile
+            </li>
+            <li>
+              <div class="Square-Box legend-missileInview-box"></div>Missile In View
+            </li>
+            <li>
+              <div class="Square-Box legend-static-box"></div>Sensor
+            </li>
+            <li>
+              <div class="Square-Box legend-facility-box"></div>Launch Site
+            </li>
           </ul>
           <ul id="legend-list-rcs" class="start-hidden">
-            <li><div class="Square-Box legend-rcsSmall-box"></div>Less Than 0.1 sq m</li>
-            <li><div class="Square-Box legend-rcsMed-box"></div>Between 0.1 and 1 sq m</li>
-            <li><div class="Square-Box legend-rcsLarge-box"></div>More Than 1 sq m</li>
-            <li><div class="Square-Box legend-rcsUnknown-box"></div>No Public Data</li>
+            <li>
+              <div class="Square-Box legend-rcsSmall-box"></div>Less Than 0.1 sq m
+            </li>
+            <li>
+              <div class="Square-Box legend-rcsMed-box"></div>Between 0.1 and 1 sq m
+            </li>
+            <li>
+              <div class="Square-Box legend-rcsLarge-box"></div>More Than 1 sq m
+            </li>
+            <li>
+              <div class="Square-Box legend-rcsUnknown-box"></div>No Public Data
+            </li>
           </ul>
           <ul id="legend-list-ageOfElset" class="start-hidden">
-            <li><div class="Square-Box legend-ageNew-box"></div>Less Than 3 Days</li>
-            <li><div class="Square-Box legend-ageMed-box"></div>Less Than 14 Days</li>
-            <li><div class="Square-Box legend-ageOld-box"></div>Less Than 60 Days</li>
-            <li><div class="Square-Box legend-ageLost-box"></div>More Than 60 Days</li>
+            <li>
+              <div class="Square-Box legend-ageNew-box"></div>Less Than 3 Days
+            </li>
+            <li>
+              <div class="Square-Box legend-ageMed-box"></div>Less Than 14 Days
+            </li>
+            <li>
+              <div class="Square-Box legend-ageOld-box"></div>Less Than 60 Days
+            </li>
+            <li>
+              <div class="Square-Box legend-ageLost-box"></div>More Than 60 Days
+            </li>
           </ul>
           <ul id="legend-list-small" class="start-hidden">
-            <li><div class="Square-Box legend-satSmall-box"></div>Small Satellite</li>
+            <li>
+              <div class="Square-Box legend-satSmall-box"></div>Small Satellite
+            </li>
             <!-- <li><div class="Square-Box legend-inFOV-box"></div>Satellite In View</li> -->
           </ul>
           <ul id="legend-list-near" class="start-hidden">
-            <li><div class="Square-Box legend-satLEO-box"></div>Period Less Than 225 min</li>
+            <li>
+              <div class="Square-Box legend-satLEO-box"></div>Period Less Than 225 min
+            </li>
             <!-- <li><div class="Square-Box legend-satOther-box"></div>Other Satellite</li> -->
-            <li><div class="Square-Box legend-inFOV-box"></div>Satellite In View</li>
+            <li>
+              <div class="Square-Box legend-inFOV-box"></div>Satellite In View
+            </li>
           </ul>
           <ul id="legend-list-deep" class="start-hidden">
-            <li><div class="Square-Box legend-satGEO-box"></div>Period More Than 225 min</li>
+            <li>
+              <div class="Square-Box legend-satGEO-box"></div>Period More Than 225 min
+            </li>
             <!-- <li><div class="Square-Box legend-satOther-box"></div>Other Satellite</li> -->
-            <li><div class="Square-Box legend-inFOV-box"></div>Satellite In View</li>
+            <li>
+              <div class="Square-Box legend-inFOV-box"></div>Satellite In View
+            </li>
           </ul>
           <ul id="legend-list-velocity" class="start-hidden">
-            <li><div class="Square-Box legend-velocityFast-box"></div>~7 km/s Velocity</li>
-            <li><div class="Square-Box legend-velocityMed-box"></div>~4 km/s Velocity</li>
-            <li><div class="Square-Box legend-velocitySlow-box"></div>~1 km/s Velocity</li>
+            <li>
+              <div class="Square-Box legend-velocityFast-box"></div>~7 km/s Velocity
+            </li>
+            <li>
+              <div class="Square-Box legend-velocityMed-box"></div>~4 km/s Velocity
+            </li>
+            <li>
+              <div class="Square-Box legend-velocitySlow-box"></div>~1 km/s Velocity
+            </li>
             <!-- Not sure we need to see what is in view in the mode -->
             <!-- <li><div class="Square-Box legend-inviewAlt-box"></div>Satellite In View</li> -->
           </ul>
           <ul id="legend-list-countries" class="start-hidden">
-            <li><div class="Square-Box legend-countryUS-box"></div>United States</li>
-            <li><div class="Square-Box legend-countryCIS-box"></div>Russia</li>
-            <li><div class="Square-Box legend-countryPRC-box"></div>China</li>
-            <li><div class="Square-Box legend-countryOther-box"></div>Other</li>
+            <li>
+              <div class="Square-Box legend-countryUS-box"></div>United States
+            </li>
+            <li>
+              <div class="Square-Box legend-countryCIS-box"></div>Russia
+            </li>
+            <li>
+              <div class="Square-Box legend-countryPRC-box"></div>China
+            </li>
+            <li>
+              <div class="Square-Box legend-countryOther-box"></div>Other
+            </li>
           </ul>
         </div>
         <div id="sat-infobox" class="text-select">
           <div id="sat-info-title" class="center-text">This is a title</div>
-          <div id="all-objects-link" class="link sat-infobox-links sat-only-info">Find all objects from this launch...</div>
+          <div id="all-objects-link" class="link sat-infobox-links sat-only-info">Find all objects from this launch...
+          </div>
           <div id="near-objects-link" class="link sat-infobox-links">Find all objects near this object...</div>
           <div class="sat-info-row sat-only-info">
             <div class="sat-info-key">COSPAR</div>
@@ -311,97 +426,113 @@
             <div class="sat-info-value" id="sat-vehicle">VEHICLE</div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="left" data-delay="50" data-tooltip="Highest Point in the Orbit">
+            <div class="sat-info-key tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Highest Point in the Orbit">
               Apogee
             </div>
             <div class="sat-info-value" id="sat-apogee">xxx km</div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="left" data-delay="50" data-tooltip="Lowest Point in the Orbit">
+            <div class="sat-info-key tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Lowest Point in the Orbit">
               Perigee
             </div>
             <div class="sat-info-value" id="sat-perigee">xxx km</div>
           </div>
-           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="left" data-delay="50" data-tooltip="Angle Measured from Equator on the Ascending Node">
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Angle Measured from Equator on the Ascending Node">
               Inclination
             </div>
             <div class="sat-info-value" id="sat-inclination">xxx.xx</div>
           </div>
-           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="How Circular the Orbit Is (0 is a Circle)">
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="How Circular the Orbit Is (0 is a Circle)">
               Eccentricity
             </div>
             <div class="sat-info-value" id="sat-eccentricity">x.xx</div>
           </div>
           <div class="sat-info-row">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Latitude Over Earth">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Current Latitude Over Earth">
               Latitude
             </div>
             <div class="sat-info-value" id="sat-latitude">x.xx</div>
           </div>
           <div class="sat-info-row">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Longitude Over Earth">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Current Longitude Over Earth">
               Longitude
             </div>
             <div class="sat-info-value" id="sat-longitude">x.xx</div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Is the Sun Affected the Sensor">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Is the Sun Affected the Sensor">
               Sun
             </div>
             <div class="sat-info-value" id="sat-sun">Sun Stuff</div>
           </div>
           <div class="sat-info-row">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Altitude Above Sea Level">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Current Altitude Above Sea Level">
               Altitude
             </div>
             <div class="sat-info-value" id="sat-altitude">xxx km</div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Current Velocity of the Satellite (Higher the Closer to Earth it Is)">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Current Velocity of the Satellite (Higher the Closer to Earth it Is)">
               Velocity
             </div>
             <div class="sat-info-value" id="sat-velocity">xxx km/s</div>
           </div>
           <div class="sat-info-row">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Angle (Left/Right) from the Sensor">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Angle (Left/Right) from the Sensor">
               Azimuth
             </div>
             <div class="sat-info-value" id="sat-azimuth">XX deg</div>
           </div>
           <div class="sat-info-row">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Angle (Up/Down) from the Sensor">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Angle (Up/Down) from the Sensor">
               Elevation
             </div>
             <div class="sat-info-value" id="sat-elevation">XX deg</div>
           </div>
           <div class="sat-info-row">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Distance from the Sensor">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Distance from the Sensor">
               Range
             </div>
             <div class="sat-info-value" id="sat-range">xxxx km</div>
           </div>
           <div id="sat-info-nextpass-row" class="sat-info-row sat-only-info">
-            <div id="sat-info-nextpass" class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Next Time in Coverage">
+            <div id="sat-info-nextpass" class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Next Time in Coverage">
               Next Pass
             </div>
             <div id="sat-nextpass" class="sat-info-value">00:00:00z</div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Time for One Complete Revolution Around Earth">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Time for One Complete Revolution Around Earth">
               Period
             </div>
             <div class="sat-info-value" id="sat-period">xxx min</div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Time Since Official Orbit Calculated (Older ELSETs are Less Accuarate Usually)">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Time Since Official Orbit Calculated (Older ELSETs are Less Accuarate Usually)">
               Age of ELSET
             </div>
             <div class="sat-info-value" id="sat-elset-age">xxx.xxxx</div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Large are > 1^2 meter, Small are < 0.1^2 meters">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Large are > 1^2 meter, Small are < 0.1^2 meters">
               RCS
             </div>
             <div class="sat-info-value" id="sat-rcs">
@@ -409,7 +540,8 @@
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Primary User of the Satellite">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Primary User of the Satellite">
               User
             </div>
             <div class="sat-info-value" id="sat-user">
@@ -417,7 +549,8 @@
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Main Function of the Satellite">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Main Function of the Satellite">
               Purpose
             </div>
             <div class="sat-info-value" id="sat-purpose">
@@ -425,7 +558,8 @@
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Contractor Who Built the Satellite">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Contractor Who Built the Satellite">
               Contractor
             </div>
             <div class="sat-info-value" id="sat-contractor">
@@ -449,7 +583,8 @@
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="How Long the Satellite was Expected to be Operational">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="How Long the Satellite was Expected to be Operational">
               Life Expectancy
             </div>
             <div class="sat-info-value" id="sat-life">
@@ -457,7 +592,8 @@
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Power of the Satellite">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Power of the Satellite">
               Power
             </div>
             <div class="sat-info-value" id="sat-power">
@@ -465,7 +601,8 @@
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50" data-tooltip="Visual Magnitude - Smaller Numbers Are Brighter">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Visual Magnitude - Smaller Numbers Are Brighter">
               Visual Mag
             </div>
             <div class="sat-info-value" id="sat-vmag">
@@ -548,65 +685,109 @@
                 <ul>
                   <h5 class="center-align">CSpOC Sensors</h5>
                   <li class="divider"></li>
-                  <li class="menu-selectable" id="radar-cspocAll">All CSpOC Sensors<span class="badge dark-blue-badge" data-badge-caption="Coalition"></span></li>
-                  <li class="menu-selectable" id="radar-mwAll">All MW Sensors<span class="badge dark-blue-badge" data-badge-caption="Coalition"></span></li>
-                  <li class="menu-selectable" id="radar-ascension">Ascension<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                  <li class="menu-selectable" id="radar-altair">ALTAIR<span class="badge dark-blue-badge" data-badge-caption="USA"></span></li>
-                  <li class="menu-selectable" id="radar-beale">Beale<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                  <li class="menu-selectable" id="radar-capecod">Cape Cod<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                  <li class="menu-selectable" id="radar-parcs">Cavalier<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                  <li class="menu-selectable" id="radar-clear">Clear<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                  <li class="menu-selectable" id="radar-cobradane">Cobra Dane<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                  <li class="menu-selectable" id="radar-eglin">Eglin<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                  <li class="menu-selectable radar-fylingdales">Fylingdales<span class="badge dark-blue-badge" data-badge-caption="RAF"></span></li>
-                  <li class="menu-selectable" id="radar-globus">Globus II<span class="badge dark-blue-badge" data-badge-caption="NOR"></span></li>
-                  <li class="menu-selectable" id="radar-millstone">Millstone<span class="badge dark-blue-badge" data-badge-caption="MIT"></span></li>
-                  <li class="menu-selectable" id="radar-thule">Thule<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                  <li class="menu-selectable" id="optical-diego-garcia">Diego Garcia<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                  <li class="menu-selectable" id="optical-maui">Maui<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
-                  <li class="menu-selectable" id="optical-socorro">Socorro<span class="badge dark-blue-badge" data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-cspocAll">All CSpOC Sensors<span class="badge dark-blue-badge"
+                      data-badge-caption="Coalition"></span></li>
+                  <li class="menu-selectable" id="radar-mwAll">All MW Sensors<span class="badge dark-blue-badge"
+                      data-badge-caption="Coalition"></span></li>
+                  <li class="menu-selectable" id="radar-ascension">Ascension<span class="badge dark-blue-badge"
+                      data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-altair">ALTAIR<span class="badge dark-blue-badge"
+                      data-badge-caption="USA"></span></li>
+                  <li class="menu-selectable" id="radar-beale">Beale<span class="badge dark-blue-badge"
+                      data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-capecod">Cape Cod<span class="badge dark-blue-badge"
+                      data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-parcs">Cavalier<span class="badge dark-blue-badge"
+                      data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-clear">Clear<span class="badge dark-blue-badge"
+                      data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-cobradane">Cobra Dane<span class="badge dark-blue-badge"
+                      data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="radar-eglin">Eglin<span class="badge dark-blue-badge"
+                      data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable radar-fylingdales">Fylingdales<span class="badge dark-blue-badge"
+                      data-badge-caption="RAF"></span></li>
+                  <li class="menu-selectable" id="radar-globus">Globus II<span class="badge dark-blue-badge"
+                      data-badge-caption="NOR"></span></li>
+                  <li class="menu-selectable" id="radar-millstone">Millstone<span class="badge dark-blue-badge"
+                      data-badge-caption="MIT"></span></li>
+                  <li class="menu-selectable" id="radar-thule">Thule<span class="badge dark-blue-badge"
+                      data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="optical-diego-garcia">Diego Garcia<span class="badge dark-blue-badge"
+                      data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="optical-maui">Maui<span class="badge dark-blue-badge"
+                      data-badge-caption="USAF"></span></li>
+                  <li class="menu-selectable" id="optical-socorro">Socorro<span class="badge dark-blue-badge"
+                      data-badge-caption="USAF"></span></li>
                   <li class="divider"></li>
                   <h5 class="center-align">MDA Sensors</h5>
                   <li class="divider"></li>
-                  <li class="menu-selectable" id="radar-md-all">All Sensors<span class="badge dark-blue-badge" data-badge-caption="Coalition"></span></li>
-                  <li class="menu-selectable" id="radar-md-har">Har Keren<span class="badge dark-blue-badge" data-badge-caption="ISR"></span></li>
-                  <li class="menu-selectable" id="radar-md-qtr">CENTCOM<span class="badge dark-blue-badge" data-badge-caption="USA"></span></li>
-                  <li class="menu-selectable" id="radar-md-kur">Kürecik<span class="badge dark-blue-badge" data-badge-caption="USA"></span></li>
-                  <li class="menu-selectable" id="radar-md-sha">Shariki<span class="badge dark-blue-badge" data-badge-caption="USA"></span></li>
-                  <li class="menu-selectable" id="radar-md-kcs">Kyogamisaki<span class="badge dark-blue-badge" data-badge-caption="USA"></span></li>
-                  <li class="menu-selectable" id="radar-md-sbx">Sea-Based X-Band<span class="badge dark-blue-badge" data-badge-caption="USN"></span></li>
+                  <li class="menu-selectable" id="radar-md-all">All Sensors<span class="badge dark-blue-badge"
+                      data-badge-caption="Coalition"></span></li>
+                  <li class="menu-selectable" id="radar-md-har">Har Keren<span class="badge dark-blue-badge"
+                      data-badge-caption="ISR"></span></li>
+                  <li class="menu-selectable" id="radar-md-qtr">CENTCOM<span class="badge dark-blue-badge"
+                      data-badge-caption="USA"></span></li>
+                  <li class="menu-selectable" id="radar-md-kur">Kürecik<span class="badge dark-blue-badge"
+                      data-badge-caption="USA"></span></li>
+                  <li class="menu-selectable" id="radar-md-sha">Shariki<span class="badge dark-blue-badge"
+                      data-badge-caption="USA"></span></li>
+                  <li class="menu-selectable" id="radar-md-kcs">Kyogamisaki<span class="badge dark-blue-badge"
+                      data-badge-caption="USA"></span></li>
+                  <li class="menu-selectable" id="radar-md-sbx">Sea-Based X-Band<span class="badge dark-blue-badge"
+                      data-badge-caption="USN"></span></li>
                   <li class="divider"></li>
                   <h5 class="center-align">LeoLabs Sensors</h5>
                   <li class="divider"></li>
-                  <li class="menu-selectable" id="radar-ll-all">All Sensors<span class="badge dark-blue-badge" data-badge-caption="Commercial"></span></li>
-                  <li class="menu-selectable" id="radar-ll-msr">Midland Radar<span class="badge dark-blue-badge" data-badge-caption="Commercial"></span></li>
-                  <li class="menu-selectable" id="radar-ll-pfisr">PFIS Radar<span class="badge dark-blue-badge" data-badge-caption="Commercial"></span></li>
-                  <li class="menu-selectable" id="radar-ll-ksr">Kiwi Space Radar<span class="badge dark-blue-badge" data-badge-caption="Commercial"></span></li>
+                  <li class="menu-selectable" id="radar-ll-all">All Sensors<span class="badge dark-blue-badge"
+                      data-badge-caption="Commercial"></span></li>
+                  <li class="menu-selectable" id="radar-ll-msr">Midland Radar<span class="badge dark-blue-badge"
+                      data-badge-caption="Commercial"></span></li>
+                  <li class="menu-selectable" id="radar-ll-pfisr">PFIS Radar<span class="badge dark-blue-badge"
+                      data-badge-caption="Commercial"></span></li>
+                  <li class="menu-selectable" id="radar-ll-ksr">Kiwi Space Radar<span class="badge dark-blue-badge"
+                      data-badge-caption="Commercial"></span></li>
                   <li class="divider"></li>
                   <h5 class="center-align">ESOC Sensors</h5>
                   <li class="divider"></li>
-                  <li class="menu-selectable" id="esoc-graves">GRAVES<span class="badge dark-blue-badge" data-badge-caption="FRA"></span></li>
-                  <li class="menu-selectable radar-fylingdales">Fylingdales<span class="badge dark-blue-badge" data-badge-caption="RAF"></span></li>
-                  <li class="menu-selectable" id="esoc-tira">TIRA<span class="badge dark-blue-badge" data-badge-caption="GER"></span></li>
-                  <li class="menu-selectable" id="esoc-northern-cross">Northern Cross<span class="badge dark-blue-badge" data-badge-caption="ITA"></span></li>
-                  <li class="menu-selectable" id="esoc-troodos">Troodos<span class="badge dark-blue-badge" data-badge-caption="RAF"></span></li>
-                  <li class="menu-selectable" id="esoc-space-debris-telescope">Space Debris Telescope<span class="badge dark-blue-badge" data-badge-caption="ESA"></span></li>
+                  <li class="menu-selectable" id="esoc-graves">GRAVES<span class="badge dark-blue-badge"
+                      data-badge-caption="FRA"></span></li>
+                  <li class="menu-selectable radar-fylingdales">Fylingdales<span class="badge dark-blue-badge"
+                      data-badge-caption="RAF"></span></li>
+                  <li class="menu-selectable" id="esoc-tira">TIRA<span class="badge dark-blue-badge"
+                      data-badge-caption="GER"></span></li>
+                  <li class="menu-selectable" id="esoc-northern-cross">Northern Cross<span class="badge dark-blue-badge"
+                      data-badge-caption="ITA"></span></li>
+                  <li class="menu-selectable" id="esoc-troodos">Troodos<span class="badge dark-blue-badge"
+                      data-badge-caption="RAF"></span></li>
+                  <li class="menu-selectable" id="esoc-space-debris-telescope">Space Debris Telescope<span
+                      class="badge dark-blue-badge" data-badge-caption="ESA"></span></li>
                   <li class="divider"></li>
                   <h5 class="center-align">Russian Sensors</h5>
                   <li class="divider"></li>
-                  <li class="menu-selectable" id="radar-rus-all">All Russian Sensors<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                  <li class="menu-selectable" id="russian-armavir">Armavir<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                  <li class="menu-selectable" id="russian-balkhash">Balkhash<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                  <li class="menu-selectable" id="russian-gantsevichi">Gantsevichi<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                  <li class="menu-selectable" id="russian-lekhtusi">Lekhtusi<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                  <li class="menu-selectable" id="russian-mishelevka-d">Mishelevka<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                  <li class="menu-selectable" id="russian-olenegorsk">Olenegorsk<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                  <li class="menu-selectable" id="russian-pechora">Pechora<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                  <li class="menu-selectable" id="russian-pionersky">Pionersky<span class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="radar-rus-all">All Russian Sensors<span class="badge dark-blue-badge"
+                      data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-armavir">Armavir<span class="badge dark-blue-badge"
+                      data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-balkhash">Balkhash<span class="badge dark-blue-badge"
+                      data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-gantsevichi">Gantsevichi<span class="badge dark-blue-badge"
+                      data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-lekhtusi">Lekhtusi<span class="badge dark-blue-badge"
+                      data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-mishelevka-d">Mishelevka<span class="badge dark-blue-badge"
+                      data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-olenegorsk">Olenegorsk<span class="badge dark-blue-badge"
+                      data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-pechora">Pechora<span class="badge dark-blue-badge"
+                      data-badge-caption="RUS"></span></li>
+                  <li class="menu-selectable" id="russian-pionersky">Pionersky<span class="badge dark-blue-badge"
+                      data-badge-caption="RUS"></span></li>
                   <li class="divider"></li>
                   <h5 class="center-align">Chinese Sensors</h5>
                   <li class="divider"></li>
-                  <li class="menu-selectable" id="chinese-xuanhua">Xuanhua<span class="badge dark-blue-badge" data-badge-caption="PRC"></span></li>
+                  <li class="menu-selectable" id="chinese-xuanhua">Xuanhua<span class="badge dark-blue-badge"
+                      data-badge-caption="PRC"></span></li>
                 </ul>
               </div>
             </div>
@@ -666,24 +847,28 @@
                   </div>
                   <div class="row">
                     <center>
-                      <button id="analysis-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">View Trends &#9658;</button>
+                      <button id="analysis-submit" class="btn btn-ui waves-effect waves-light" type="submit"
+                        name="action">View Trends &#9658;</button>
                     </center>
                   </div>
                 </form>
               </ul>
               <div class="row">
                 <center>
-                  <button class="btn btn-ui waves-effect waves-light" onclick="satSet.exportTle2Txt();">Export TLEs &#9658;</button>
+                  <button class="btn btn-ui waves-effect waves-light" onclick="satSet.exportTle2Txt();">Export TLEs
+                    &#9658;</button>
                 </center>
               </div>
               <div class="row">
                 <center>
-                  <button class="btn btn-ui waves-effect waves-light" onclick="satSet.exportTle2Csv();">Export Catalog CSV &#9658;</button>
+                  <button class="btn btn-ui waves-effect waves-light" onclick="satSet.exportTle2Csv();">Export Catalog
+                    CSV &#9658;</button>
                 </center>
               </div>
               <div class="row">
                 <center>
-                  <button class="btn btn-ui waves-effect waves-light" onclick="uiManager.showCSObjects();">Find Close Objects &#9658;</button>
+                  <button class="btn btn-ui waves-effect waves-light" onclick="uiManager.showCSObjects();">Find Close
+                    Objects &#9658;</button>
                 </center>
               </div>
               <div class="row"></div>
@@ -700,7 +885,8 @@
                   </div>
                   <div class="row">
                     <center>
-                      <button id="analysis-bpt-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Generate Best Pass Times &#9658;</button>
+                      <button id="analysis-bpt-submit" class="btn btn-ui waves-effect waves-light" type="submit"
+                        name="action">Generate Best Pass Times &#9658;</button>
                     </center>
                   </div>
                 </form>
@@ -816,10 +1002,12 @@
                   <div class="col s2 m2 l2 center-align add-icon"><img class="watchlist-add" src="images/add.png"></div>
                 </div>
                 <div class="center-align row">
-                  <button id="watchlist-save" class="btn btn-ui waves-effect waves-light" type="button" name="action">Save List &#9658;</button>
+                  <button id="watchlist-save" class="btn btn-ui waves-effect waves-light" type="button"
+                    name="action">Save List &#9658;</button>
                 </div>
                 <div class="center-align row">
-                  <button id="watchlist-open" class="btn btn-ui waves-effect waves-light" type="button" name="action">Load List &#9658;</button>
+                  <button id="watchlist-open" class="btn btn-ui waves-effect waves-light" type="button"
+                    name="action">Load List &#9658;</button>
                   <input id="watchlist-file" type="file" name="files[]" style="display: none;" />
                 </div>
               </div>
@@ -892,7 +1080,8 @@
                     </div>
                   </div>
                   <div class="center-align">
-                    <button id="findByLooks-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Find Satellite(s) &#9658;
+                    <button id="findByLooks-submit" class="btn btn-ui waves-effect waves-light" type="submit"
+                      name="action">Find Satellite(s) &#9658;
                     </button>
                   </div>
                 </form>
@@ -906,10 +1095,11 @@
             <div id="lookangles-content" class="side-menu">
               <div class="row">
                 <h5 class="center-align">Sensor Look Angles</h5>
-                <table id="looks"  class="center-align striped-light centered"></table>
+                <table id="looks" class="center-align striped-light centered"></table>
                 <br />
                 <center>
-                  <button class="btn btn-ui waves-effect waves-light" onclick="saveCsv(satellite.lastlooksArray,'lookAngles');">Export &#9658;</button>
+                  <button class="btn btn-ui waves-effect waves-light"
+                    onclick="saveCsv(satellite.lastlooksArray,'lookAngles');">Export &#9658;</button>
                 </center>
               </div>
             </div>
@@ -919,11 +1109,12 @@
             <div id="nextLaunch-content" class="side-menu">
               <div class="row">
                 <h5 class="center-align">Next Launches</h5>
-                <table id="nextLaunch-table"  class="center-align striped-light centered"></table>
+                <table id="nextLaunch-table" class="center-align striped-light centered"></table>
               </div>
               <div class="row">
                 <center>
-                  <button class="btn btn-ui waves-effect waves-light" onclick="saveCsv(nextLaunchManager.launchList,'launchList');">Export Launch Info &#9658;</button>
+                  <button class="btn btn-ui waves-effect waves-light"
+                    onclick="saveCsv(nextLaunchManager.launchList,'launchList');">Export Launch Info &#9658;</button>
                 </center>
               </div>
             </div>
@@ -934,30 +1125,35 @@
               <form id="dops-form">
                 <div class="switch row">
                   <h5 class="center-align">DOP Table</h5>
-                    <div class="input-field col s3">
-                      <input value="41" id="dops-lat" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Latitude in Degrees">
-                      <label for="dops-lat">Latitude</label>
-                    </div>
-                    <div class="input-field col s3">
-                      <input value="-71" id="dops-lon" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Longitude in Degrees">
-                      <label for="dops-lon">Longitude</label>
-                    </div>
-                    <div class="input-field col s3">
-                      <input value="-71" id="dops-alt" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Altitude in KM">
-                      <label for="dops-lon">Altitude</label>
-                    </div>
-                    <div class="input-field col s3">
-                      <input value="15" id="dops-el" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Minimum Elevation for GPS Lock">
-                      <label for="dops-el">Mask</label>
-                    </div>
+                  <div class="input-field col s3">
+                    <input value="41" id="dops-lat" type="text" class="tooltipped" data-position="right" data-delay="50"
+                      data-tooltip="Latitude in Degrees">
+                    <label for="dops-lat">Latitude</label>
+                  </div>
+                  <div class="input-field col s3">
+                    <input value="-71" id="dops-lon" type="text" class="tooltipped" data-position="right"
+                      data-delay="50" data-tooltip="Longitude in Degrees">
+                    <label for="dops-lon">Longitude</label>
+                  </div>
+                  <div class="input-field col s3">
+                    <input value="-71" id="dops-alt" type="text" class="tooltipped" data-position="right"
+                      data-delay="50" data-tooltip="Altitude in KM">
+                    <label for="dops-lon">Altitude</label>
+                  </div>
+                  <div class="input-field col s3">
+                    <input value="15" id="dops-el" type="text" class="tooltipped" data-position="right" data-delay="50"
+                      data-tooltip="Minimum Elevation for GPS Lock">
+                    <label for="dops-el">Mask</label>
+                  </div>
                 </div>
                 <div class="row center">
-                  <button id="dops-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update DOP Data &#9658;
+                  <button id="dops-submit" class="btn btn-ui waves-effect waves-light" type="submit"
+                    name="action">Update DOP Data &#9658;
                   </button>
                 </div>
               </form>
               <div class="row">
-                <table id="dops"  class="center-align striped-light centered"></table>
+                <table id="dops" class="center-align striped-light centered"></table>
               </div>
             </div>
           </div>
@@ -968,7 +1164,8 @@
                 <table id="looksmultisite" class="center-align striped-light centered"></table>
                 <br />
                 <center>
-                  <button class="btn btn-ui waves-effect waves-light" onclick="saveCsv(satellite.lastMultiSiteArray,'multiSiteLooks');">Export &#9658;</button>
+                  <button class="btn btn-ui waves-effect waves-light"
+                    onclick="saveCsv(satellite.lastMultiSiteArray,'multiSiteLooks');">Export &#9658;</button>
                 </center>
               </div>
             </div>
@@ -977,7 +1174,8 @@
           <div id="map-menu" class="side-menu-parent start-hidden side-menu valign-wrapper">
             <img id="map-image" src="images/braun-stereographic.jpg" width="800px" height="600px">
             <img id="map-sat" class="map-item map-look" src="images/satellite-2.png" width="20px" height="20px">
-            <img id="map-sensor" class="map-item map-look start-hidden" src="images/radar-1.png" width="20px" height="20px">
+            <img id="map-sensor" class="map-item map-look start-hidden" src="images/radar-1.png" width="20px"
+              height="20px">
             <img id="map-look1" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
             <img id="map-look2" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
             <img id="map-look3" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
@@ -1055,21 +1253,24 @@
                   <div id="settings-general">
                     <h5 class="center-align">General Settings</h5>
                     <div class="switch row">
-                      <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Non-selectable satellites will be hidden instead of grayed out.">
+                      <label class="tooltipped" data-position="right" data-delay="50"
+                        data-tooltip="Non-selectable satellites will be hidden instead of grayed out.">
                         <input id="settings-hos" type="checkbox">
                         <span class="lever"></span>
                         Hide Other Satellites
                       </label>
                     </div>
                     <div class="switch row">
-                      <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Every 3 seconds a new satellite will be selected from FOV">
+                      <label class="tooltipped" data-position="right" data-delay="50"
+                        data-tooltip="Every 3 seconds a new satellite will be selected from FOV">
                         <input id="settings-demo-mode" type="checkbox">
                         <span class="lever"></span>
                         Enable Demo Mode
                       </label>
                     </div>
                     <div class="switch row">
-                      <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Small text labels will appear next to all satellites in FOV.">
+                      <label class="tooltipped" data-position="right" data-delay="50"
+                        data-tooltip="Small text labels will appear next to all satellites in FOV.">
                         <input id="settings-sat-label-mode" type="checkbox" checked>
                         <span class="lever"></span>
                         Enable Satellite Label Mode
@@ -1134,11 +1335,13 @@
                       </label>
                     </div>
                     <div class="input-field col s6">
-                      <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated">
+                      <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right"
+                        data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated">
                       <label for="lookanglesLength">Length (Days)</label>
                     </div>
                     <div class="input-field col s6">
-                      <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
+                      <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right"
+                        data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
                       <label for="lookanglesInterval">Interval</label>
                     </div>
                     <div class="row"></div>
@@ -1147,7 +1350,8 @@
                   <div id="satOverfly-opt">
                     <h5 class="center-align">Satellite Overfly Settings</h5>
                     <div class="input-field col s12">
-                      <input value="30" id="satFieldOfView" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="What is the satellite's field of view in degrees">
+                      <input value="30" id="satFieldOfView" type="text" class="tooltipped" data-position="right"
+                        data-delay="50" data-tooltip="What is the satellite's field of view in degrees">
                       <label for="satFieldOfView">Satellite Field of View</label>
                     </div>
                     <div class="row"></div>
@@ -1163,14 +1367,16 @@
                       </label>
                     </div>
                     <div class="row"></div>
-                    <br/>
+                    <br />
                     <div class="row center">
-                      <button id="settings-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update Settings &#9658;
+                      <button id="settings-submit" class="btn btn-ui waves-effect waves-light" type="submit"
+                        name="action">Update Settings &#9658;
                       </button>
                     </div>
                   </div>
                   <div id="settings-lowperf" class="row center">
-                    <button class="red btn waves-effect waves-light" onclick="uiManager.startLowPerf();">Low End PC Version &#9658;
+                    <button class="red btn waves-effect waves-light" onclick="uiManager.startLowPerf();">Low End PC
+                      Version &#9658;
                     </button>
                   </div>
                 </form>
@@ -1187,9 +1393,12 @@
                 <div class="row">
                   <h5 class="center-align">Author</h5>
                   <div class="col s12">
-                    Created by <a style="color: #48f3e3 !important;" href="https://github.com/thkruz/">Theodore Kruczek</a>
-                     to help visualize orbital calculations for application to Ground Based Radars and Optical Telescopes.
-                     Based on the original work of <a style="color: #48f3e3 !important;" href="https://github.com/jeyoder/">James Yoder</a>
+                    Created by <a style="color: #48f3e3 !important;" href="https://github.com/thkruz/">Theodore
+                      Kruczek</a>
+                    to help visualize orbital calculations for application to Ground Based Radars and Optical
+                    Telescopes.
+                    Based on the original work of <a style="color: #48f3e3 !important;"
+                      href="https://github.com/jeyoder/">James Yoder</a>
                   </div>
                 </div>
                 <br>
@@ -1197,7 +1406,8 @@
                   <h5 class="center-align">Issues</h5>
                   <div class="col s12">
                     Please contribute to development by posting your ideas/issues/bugs to the
-                    <a style="color: #48f3e3 !important;" href="https://github.com/thkruz/keeptrack.space">public github repository</a>.
+                    <a style="color: #48f3e3 !important;" href="https://github.com/thkruz/keeptrack.space">public github
+                      repository</a>.
                   </div>
                 </div>
                 <br>
@@ -1206,7 +1416,8 @@
                   <div class="col s12">
                     All information is open source publically available information. Orbits are derived from
                     TLEs found on public websites. Payload information is compiled from various
-                    public sources. US Sensor data was derived from MDA reports on enviromental impacts and congressional
+                    public sources. US Sensor data was derived from MDA reports on enviromental impacts and
+                    congressional
                     budget reports.
                   </div>
                 </div>
@@ -1255,17 +1466,21 @@
                     <label for="es-meana">Mean Anomaly</label>
                   </div>
                   <div class="center-align row">
-                    <button id="editSat-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update Satellite &#9658;</button>
+                    <button id="editSat-submit" class="btn btn-ui waves-effect waves-light" type="submit"
+                      name="action">Update Satellite &#9658;</button>
                   </div>
                   <div class="center-align row">
-                    <button id="editSat-newTLE" class="btn btn-ui waves-effect waves-light" type="button" name="action">Update Epoch to Now &#9658;</button>
+                    <button id="editSat-newTLE" class="btn btn-ui waves-effect waves-light" type="button"
+                      name="action">Update Epoch to Now &#9658;</button>
                   </div>
                   <div class="center-align row">
-                    <button id="editSat-save" class="btn btn-ui waves-effect waves-light" type="button" name="action">Save TLE &#9658;</button>
+                    <button id="editSat-save" class="btn btn-ui waves-effect waves-light" type="button"
+                      name="action">Save TLE &#9658;</button>
                   </div>
                   <div class="center-align row">
-                    <button id="editSat-open" class="btn btn-ui waves-effect waves-light" type="button" name="action">Load TLE &#9658;</button>
-                    <input id="editSat-file" class="start-hidden" type="file" name="files[]"/>
+                    <button id="editSat-open" class="btn btn-ui waves-effect waves-light" type="button"
+                      name="action">Load TLE &#9658;</button>
+                    <input id="editSat-file" class="start-hidden" type="file" name="files[]" />
                   </div>
                 </form>
               </div>
@@ -1344,7 +1559,8 @@
                     <label>Launch Facility</label>
                   </div>
                   <div class="center-align">
-                    <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Launch Nominal &#9658;
+                    <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Launch
+                      Nominal &#9658;
                     </button>
                   </div>
                 </form>
@@ -1405,7 +1621,8 @@
                     <label>Right Ascension of the Ascending Node Variation</label>
                   </div>
                   <div class="center-align">
-                    <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Breakup &#9658;
+                    <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Breakup
+                      &#9658;
                     </button>
                   </div>
                 </form>
@@ -1552,13 +1769,15 @@
                     </div>
                   </div>
                   <div class="center-align">
-                    <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Launch Missile Attack &#9658;
+                    <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Launch Missile
+                      Attack &#9658;
                     </button>
                   </div>
                 </form>
                 <div class="row"></div>
                 <div class="center-align">
-                  <button class="btn btn-ui waves-effect waves-light" onclick="searchBox.doSearch('RV_');" name="search">Show All Missiles &#9658;
+                  <button class="btn btn-ui waves-effect waves-light" onclick="searchBox.doSearch('RV_');"
+                    name="search">Show All Missiles &#9658;
                   </button>
                 </div>
               </div>
@@ -1572,15 +1791,18 @@
               <div class="row">
                 <h5 class="center-align">Custom Sensor</h5>
                 <form id="customSensor">
-                  <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Latitude in Decimal Form (ex: 43.283)">
+                  <div class="input-field col s12 tooltipped" data-position="right" data-delay="50"
+                    data-tooltip="Latitude in Decimal Form (ex: 43.283)">
                     <input id="cs-lat" type="text" value="0">
                     <label for="cs-lat">Latitude</label>
                   </div>
-                  <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Longitude in Decimal Form (ex: -73.283)">
+                  <div class="input-field col s12 tooltipped" data-position="right" data-delay="50"
+                    data-tooltip="Longitude in Decimal Form (ex: -73.283)">
                     <input id="cs-lon" type="text" value="0">
                     <label for="cs-lon">Longitude</label>
                   </div>
-                  <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in kilometers (ex: 0.645)">
+                  <div class="input-field col s12 tooltipped" data-position="right" data-delay="50"
+                    data-tooltip="Elevation in kilometers (ex: 0.645)">
                     <input id="cs-hei" type="text" value="0">
                     <label for="cs-hei">Elevation Above Sea Level</label>
                   </div>
@@ -1593,50 +1815,60 @@
                     </select>
                     <label>Type of Sensor</label>
                   </div>
-                  <div class="switch row tooltipped" data-position="right" data-delay="50" data-tooltip="Is this Sensor a Telescope?">
+                  <div class="switch row tooltipped" data-position="right" data-delay="50"
+                    data-tooltip="Is this Sensor a Telescope?">
                     <label>
                       <input id="cs-telescope" type="checkbox" checked="false">
                       <span class="lever"></span>
                       Telescope
                     </label>
                   </div>
-                  <div id="cs-minaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
+                  <div id="cs-minaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right"
+                    data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
                     <input id="cs-minaz" type="text" disabled value="0">
                     <label for="cs-minaz">Minimum Azimuth</label>
                   </div>
-                  <div id="cs-maxaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 120)">
+                  <div id="cs-maxaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right"
+                    data-delay="50" data-tooltip="Azimuth in degrees (ex: 120)">
                     <input id="cs-maxaz" type="text" disabled value="360">
                     <label for="cs-maxaz">Maximum Azimuth</label>
                   </div>
-                  <div id="cs-minel-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 10)">
+                  <div id="cs-minel-div" class="start-hidden input-field col s12 tooltipped" data-position="right"
+                    data-delay="50" data-tooltip="Elevation in degrees (ex: 10)">
                     <input id="cs-minel" type="text" disabled value="10">
                     <label for="cs-minel">Minimum Elevation</label>
                   </div>
-                  <div id="cs-maxel-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 90)">
+                  <div id="cs-maxel-div" class="start-hidden input-field col s12 tooltipped" data-position="right"
+                    data-delay="50" data-tooltip="Elevation in degrees (ex: 90)">
                     <input id="cs-maxel" type="text" disabled value="90">
                     <label for="cs-maxel">Maximum Elevation</label>
                   </div>
-                  <div id="cs-minrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 500)">
+                  <div id="cs-minrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right"
+                    data-delay="50" data-tooltip="Range in kilometers (ex: 500)">
                     <input id="cs-minrange" type="text" disabled value="100">
                     <label for="cs-minrange">Minimum Range</label>
                   </div>
-                  <div id="cs-maxrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 20000)">
+                  <div id="cs-maxrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right"
+                    data-delay="50" data-tooltip="Range in kilometers (ex: 20000)">
                     <input id="cs-maxrange" type="text" disabled value="50000">
                     <label for="cs-maxrange">Maximum Range</label>
                   </div>
                   <div class="center-align">
-                    <button id="cs-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Custom Sensor &#9658;</button>
+                    <button id="cs-submit" class="btn btn-ui waves-effect waves-light" type="submit"
+                      name="action">Create Custom Sensor &#9658;</button>
                     <br><br>
-                    <button id="cs-geolocation" class="btn btn-ui waves-effect waves-light" onclick="uiManager.useCurrentGeolocationAsSensor();" name="search">Use Geolocation &#9658;</button>
+                    <button id="cs-geolocation" class="btn btn-ui waves-effect waves-light"
+                      onclick="uiManager.useCurrentGeolocationAsSensor();" name="search">Use Geolocation
+                      &#9658;</button>
                   </div>
                 </form>
               </div>
             </div>
           </div>
           <div id="info-overlay-menu" class="start-hidden text-select">
-          <div id="info-overlay-content">
+            <div id="info-overlay-content">
+            </div>
           </div>
-        </div>
         </aside>
       </div>
     </div>
@@ -1648,7 +1880,8 @@
         Propagation Rate: 1.00x
       </div>
       <div id="demo-logo" class="logo-font start-hidden">Keeptrack.space</div>
-      <div id="license-watermark" class="logo-font start-hidden">Unlicensed Software - Contact theodore.kruczek@gmail.com to Renew!</div>
+      <div id="license-watermark" class="logo-font start-hidden">Unlicensed Software - Contact
+        theodore.kruczek@gmail.com to Renew!</div>
     </figcaption>
   </main>
   <footer id="nav-footer" class="page-footer">
@@ -1656,12 +1889,12 @@
       <div id="nav-footer-toggle" onclick="uiManager.footerToggle();">&#x25BC;</div>
     </div>
     <div id="datetime" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Time Menu">
-        <div id="datetime-text"></div>
-        <div id="datetime-input">
-          <form id="datetime-input-form">
-            <input type="text" id="datetime-input-tb" readonly="true">
-          </form>
-        </div>
+      <div id="datetime-text"></div>
+      <div id="datetime-input">
+        <form id="datetime-input-form">
+          <input type="text" id="datetime-input-tb" readonly="true">
+        </form>
+      </div>
     </div>
     <div id="bottom-icons-container" class="container">
       <div id="bottom-icons">
@@ -1669,8 +1902,12 @@
       </div>
     </div>
     <div id="social" class="right">
-      <a id="github-share" href="https://github.com/thkruz/keeptrack.space/" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Github Page"><img src="images/github.png" width="32" height="32"></a>
-      <a id="twitter-share" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Twitter"><img src="https://static.addtoany.com/buttons/twitter.svg" width="32" height="32"></a>
+      <a id="github-share" href="https://github.com/thkruz/keeptrack.space/" target="_blank" class="tooltipped"
+        data-position="top" data-delay="50" data-tooltip="Github Page"><img src="images/github.png" width="32"
+          height="32"></a>
+      <a id="twitter-share" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank"
+        class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Twitter"><img
+          src="https://static.addtoany.com/buttons/twitter.svg" width="32" height="32"></a>
     </div>
     <span id="version-info" class="right">
       vX.XX.XX
@@ -1690,5 +1927,6 @@
     ga('send', 'pageview');
   </script> -->
   <!--Google Analytics -->
-  </body>
+</body>
+
 </html>

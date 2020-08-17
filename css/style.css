@@ -1,22 +1,35 @@
 /*Min Scrollbar for Webkit Browsers */
-::-webkit-scrollbar { width: 12px; height: 12px; }
-::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.5); }
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.5);
+}
 
 /*Hide yellow coloring in Chrome*/
+
 /*The bug seems to be with chrome not the site*/
+
 input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0px 1000px #0a97d6 inset;
+  box-shadow: 0 0 0px 1000px #0a97d6 inset;
   background-color: #0a97d6;
   -webkit-text-fill-color: white !important;
   color: white !important;
 }
 
 a, .link {
-    cursor: pointer;
+  cursor: pointer;
 }
+
 a:hover, .link:hover {
-    background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 body {
@@ -37,24 +50,25 @@ body {
 }
 
 #nav-footer-toggle {
-    display: block;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    height: 20px;
-    width: 40px;
-    margin: 0px auto;
-    margin-top: -20px;
-    background: rgba(2,119,189,1);
-    cursor: pointer;
-    text-align: center;
-    font-size: 12px;
-    font-weight: bold;
+  display: block;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  height: 20px;
+  width: 40px;
+  margin: 0px auto;
+  margin-top: -20px;
+  background: rgba(2, 119, 189, 1);
+  cursor: pointer;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 .footer-slide-down {
   transition: 1s;
   bottom: -50px !important;
 }
+
 .footer-slide-up {
   transition: 1s;
   bottom: 0px !important;
@@ -69,22 +83,25 @@ footer {
 }
 
 ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
 }
 
-.huerotate {-webkit-filter: hue-rotate(180deg); filter: hue-rotate(180deg);}
+.huerotate {
+  -webkit-filter: hue-rotate(180deg);
+  filter: hue-rotate(180deg);
+}
 
 .center-text {
-    text-align: center;
+  text-align: center;
 }
 
 .vertcenter {
-    line-height: 36px
+  line-height: 36px
 }
 
-.text-select{
+.text-select {
   -webkit-touch-callout: text;
   -webkit-user-select: text;
   -khtml-user-select: text;
@@ -103,58 +120,61 @@ ul {
 }
 
 #no-webgl {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    text-align: center;
-    margin-top: 20px;
-    display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  text-align: center;
+  margin-top: 20px;
+  display: none;
 }
+
 #canvas {
-    position: absolute;
-    z-index: 0;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
+
 #canvas-holder {
-    z-index: -1;
-    padding: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
+  z-index: -1;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
 }
 
 #load-cover {
-    background: rgba(0, 0, 0, 0.8);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0
+  background: rgba(0, 0, 0, 0.8);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0
 }
+
 #loader {
-    background: black;
-    cursor: default;
-    color: white;
-    position: absolute;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    width: 250px;
-    height: 50px;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: auto;
-    text-align: center;
+  background: black;
+  cursor: default;
+  color: white;
+  position: absolute;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 250px;
+  height: 50px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  text-align: center;
 }
 
 .right-btn-menu {
@@ -178,48 +198,50 @@ ul {
   border-radius: 5px;
 }
 
-.right-btn-menu ul li:hover{
+.right-btn-menu ul li:hover {
   background-color: rgb(0, 114, 230);
 }
 
-.right-btn-menu ul li a:hover{
+.right-btn-menu ul li a:hover {
   background-color: rgba(0, 0, 0, 0);
 }
 
-.rmb-menu-item:hover{
-    background-color: rgba(0,114,230,0.3) !important;
+.rmb-menu-item:hover {
+  background-color: rgba(0, 114, 230, 0.3) !important;
 }
 
 #sat-hoverbox {
-    display: none;
-    background: black;
-    cursor: default;
-    color: white;
-    position: absolute;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    pointer-events: none;
+  display: none;
+  background: black;
+  cursor: default;
+  color: white;
+  position: absolute;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
 }
-
 
 .search-hilight {
-    font-weight: bold;
-    color: #01579b;
+  font-weight: bold;
+  color: #01579b;
 }
+
 .search-result {
-    padding: 5px;
-    height: 28px;
-    line-height: 16px;
+  padding: 5px;
+  height: 28px;
+  line-height: 16px;
 }
+
 .search-result:hover {
-    background: rgba(0, 0, 0, 0.2);
-    cursor: pointer;
+  background: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
+
 .search-result-scc {
-    float: right;
-    margin-right: 5px;
-    margin-top: -15px;
+  float: right;
+  margin-right: 5px;
+  margin-top: -15px;
 }
 
 .truncate-search {
@@ -230,86 +252,93 @@ ul {
 }
 
 .menubar {
-    height: 30px;
-    position: absolute;
-    top: 5px;
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    align-content: stretch;
+  height: 30px;
+  position: absolute;
+  top: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  align-content: stretch;
 }
 
 #menu-left {
-    left: 130px;
-    justify-content: flex-start;
+  left: 130px;
+  justify-content: flex-start;
 }
+
 #menu-right {
-    right: 0px;
-    justify-content: flex-end;
+  right: 0px;
+  justify-content: flex-end;
 }
+
 .left-menu-offset {
-    left: 250px;
+  left: 250px;
 }
 
 .menubox {
-    cursor: default;
-    padding: 10px;
+  cursor: default;
+  padding: 10px;
 }
 
 .menu-item {
-    cursor: pointer;
-    margin: 0px 10px;
-    z-index: 11;
+  cursor: pointer;
+  z-index: 11;
 }
+
 .menu-item:first-child {
-    margin-left: 2px;
+  margin-left: 2px;
 }
+
 .menu-item:hover .menu-title {
-    color: #0277bd;
+  color: #0277bd;
 }
 
 .menu-title {
-    height: 30px;
+  height: 30px;
 }
+
 .menu-radar {
-    right: 50px;
+  right: 50px;
 }
 
 .submenu {
-    display: none;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-    margin: 0;
-    overflow: hidden;
-    position: absolute;
+  display: none;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
 }
 
 #about-box {
-    background: black;
-    right: 10px;
-    width: 500px;
-    height: 470px;
+  background: black;
+  right: 10px;
+  width: 500px;
+  height: 470px;
 }
+
 #about-content {
   font-size: 12px;
 }
+
 .box-header {
-    font-size: 20px;
-    margin-top: 5px;
-    margin-bottom: 5px;
+  font-size: 20px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
+
 #version-box {
-    background: transparent;
-    right: 10px;
-    width: 125px;
+  background: transparent;
+  right: 10px;
+  width: 125px;
 }
 
 .title-text {
-    text-align: center;
-    margin-bottom: 5px;
-    font-size: 18px;
-    vertical-align: middle;
+  text-align: center;
+  margin-bottom: 5px;
+  font-size: 18px;
+  vertical-align: middle;
 }
 
 .status-box {
@@ -352,114 +381,144 @@ ul {
 .legend-payload-box {
   background: rgb(68, 193, 47);
 }
+
 .legend-rocketBody-box {
   background: rgb(0, 48, 255);
 }
+
 .legend-debris-box {
   background: rgb(157, 157, 157);
 }
+
 .legend-sensor-box {
   background: rgb(166, 5, 5);
 }
+
 .legend-facility-box {
   background: rgb(108, 30, 103);
 }
+
 .legend-missile-box {
   background: rgb(200, 198, 9);
 }
+
 .legend-missileInview-box {
   background: rgb(200, 198, 9);
 }
+
 .legend-trusat-box {
   background: rgb(108, 0, 50);
   display: hidden;
 }
+
 .legend-inFOV-box {
   background: rgb(255, 92, 0);
 }
+
 .legend-inviewAlt-box {
   background: rgb(255, 92, 0);
 }
+
 .legend-starLow-box {
   background: rgb(100, 100, 100);
 }
+
 .legend-starMed-box {
   background: rgb(150, 150, 150);
 }
+
 .legend-starHi-box {
   background: rgb(200, 200, 200);
 }
+
 .legend-satLow-box {
   background: rgb(100, 100, 100);
 }
+
 .legend-satMed-box {
   background: rgb(150, 150, 150);
 }
+
 .legend-satHi-box {
   background: rgb(200, 200, 200);
 }
+
 .legend-rcsSmall-box {
   background: rgb(100, 100, 100);
 }
+
 .legend-rcsMed-box {
   background: rgb(150, 150, 150);
 }
+
 .legend-rcsLarge-box {
   background: rgb(200, 200, 200);
 }
+
 .legend-rcsUnkown-box {
   background: rgb(200, 200, 200);
 }
+
 .legend-ageNew-box {
   background: rgb(100, 100, 100);
 }
+
 .legend-ageMed-box {
   background: rgb(150, 150, 150);
 }
+
 .legend-ageOld-box {
   background: rgb(200, 200, 200);
 }
+
 .legend-ageLost-box {
   background: rgb(200, 200, 200);
 }
+
 .legend-velocitySlow-box {
   background: rgb(100, 100, 100);
 }
+
 .legend-velocityMed-box {
   background: rgb(150, 150, 150);
 }
+
 .legend-velocityFast-box {
   background: rgb(200, 200, 200);
 }
+
 .legend-satLEO-box {
   background: rgb(200, 200, 200);
 }
+
 .legend-satGEO-box {
   background: rgb(200, 200, 200);
 }
-
 
 #sensor-info-menu a {
   color: white !important;
 }
 
-  .sensor-info-row {
-      text-align: center;
-      margin: 10px;
-      height: 18px;
-  }
-  .sensor-info-key, .sensor-info-value {
-      display: inline-block;
-      height: 18px;
-  }
-  .sensor-info-key {
-      font-size: 12px;
-      float: left;
-  }
-  .sensor-info-value {
-      float: right;
-      font-size: 12px;
-  }
+.sensor-info-row {
+  text-align: center;
+  margin: 10px;
+  height: 18px;
+}
+
+.sensor-info-key, .sensor-info-value {
+  display: inline-block;
+  height: 18px;
+}
+
+.sensor-info-key {
+  font-size: 12px;
+  float: left;
+}
+
+.sensor-info-value {
+  float: right;
+  font-size: 12px;
+}
 
 .timeline-Header {
   display: none;
@@ -479,12 +538,12 @@ ul {
 }
 
 #map-menu {
-    display: none;
-    position: absolute;
-    width: 800px;
-    z-index: 10;
-    left: 0;
-    color: white;
+  display: none;
+  position: absolute;
+  width: 800px;
+  z-index: 10;
+  left: 0;
+  color: white;
 }
 
 #map-sensor {
@@ -501,8 +560,8 @@ ul {
 }
 
 .map-item {
-    position: absolute;
-    z-index: 11;
+  position: absolute;
+  z-index: 11;
 }
 
 #iss-stream-menu {
@@ -538,6 +597,7 @@ ul {
 #looks {
   margin: 0 auto;
 }
+
 #socrates-table {
   line-height: 0.05;
   font-size: 13px;
@@ -547,7 +607,7 @@ ul {
   text-align: center;
 }
 
-#lookangles-content td{
+#lookangles-content td {
   padding: 5px;
   font-size: 13px;
 }
@@ -571,7 +631,7 @@ ul {
 
 #info-overlay-content {
   position: absolute;
-  background: rgba(0,0,0,0);
+  background: rgba(0, 0, 0, 0);
   color: white;
   width: 260px;
   top: 25px;
@@ -583,7 +643,6 @@ ul {
 .side-menu-parent {
   height: 100% !important;
 }
-
 
 input[type=checkbox].css-checkbox {
   position: absolute;
@@ -597,6 +656,7 @@ input[type=checkbox].css-checkbox {
   padding: 0;
   border: 0;
 }
+
 input[type=checkbox].css-checkbox+label.css-label {
   padding-left: 25px;
   height: 20px;
@@ -608,9 +668,11 @@ input[type=checkbox].css-checkbox+label.css-label {
   vertical-align: middle;
   cursor: pointer;
 }
+
 input[type=checkbox].css-checkbox:checked+label.css-label {
   background-position: 0px -20px;
 }
+
 label.css-label {
   background-image: url(/images/csscheckbox-sm.png);
   -webkit-touch-callout: none;
@@ -620,23 +682,25 @@ label.css-label {
   -ms-user-select: none;
   user-select: none;
 }
+
 fieldset {
-    display: block;
-    -webkit-margin-start: 0px;
-    -webkit-margin-end: 0px;
-    -webkit-padding-before: 0em;
-    -webkit-padding-start: 0em;
-    -webkit-padding-end: 0em;
-    -webkit-padding-after: 0em;
-    border: 0px;
-    border-image-source: initial;
-    border-image-slice: initial;
-    border-image-width: initial;
-    border-image-outset: initial;
-    border-image-repeat: initial;
-    min-width: -webkit-min-content;
-    padding: 25px 30px;
+  display: block;
+  -webkit-margin-start: 0px;
+  -webkit-margin-end: 0px;
+  -webkit-padding-before: 0em;
+  -webkit-padding-start: 0em;
+  -webkit-padding-end: 0em;
+  -webkit-padding-after: 0em;
+  border: 0px;
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  min-width: -webkit-min-content;
+  padding: 25px 30px;
 }
+
 .ghost-input {
   text-align: right;
   font-weight: 300;
@@ -659,14 +723,16 @@ fieldset {
   -o-transition: all 0.1s ease-in-out;
   transition: all 0.1s ease-in-out;
 }
+
 .ghost-input:focus {
   border-bottom: 1px solid #ddd;
 }
+
 .ghost-input:hover {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 5px;
-  /*border: 1px solid rgba(255, 255, 255, 0.2);*/
 }
+
 .ghost-button {
   display: block;
   border: 2px white;
@@ -680,30 +746,33 @@ fieldset {
   -o-transition: all 0.1s ease-in-out;
   transition: all 0.1s ease-in-out;
 }
+
 .ghost-button:hover {
   background: #c33;
   color: #fff;
 }
 
-a{
-	text-decoration: none;
-	color: inherit;
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
-ul li{
-	list-style: none;
+ul li {
+  list-style: none;
   padding: 5px;
 }
 
 #colorbox {
-    border: 10px solid rgb(2,119,189);
-    z-index: 10;
-    box-sizing: content-box;
+  border: 10px solid rgb(2, 119, 189);
+  z-index: 10;
+  box-sizing: content-box;
 }
+
 #cboxLoadedContent {
   overflow: hidden !important;
   background: #fff;
 }
+
 .cboxIframe {
   width: 100%;
   height: 100%;
@@ -714,30 +783,36 @@ ul li{
 }
 
 .sat-infobox-links {
-    font-size: 12px;
-    margin: 5px 0;
+  font-size: 12px;
+  margin: 5px 0;
 }
+
 #sat-info-title {
-    margin-bottom: 5px;
-    font-size: 18px;
+  margin-bottom: 5px;
+  font-size: 18px;
 }
+
 .sat-info-row {
-    margin-bottom: 3px;
-    height: 18px;
+  margin-bottom: 3px;
+  height: 18px;
 }
+
 #sat-site {
   max-height: 40px;
 }
+
 #sat-site-row {
   max-height: 40px;
 }
+
 .sat-info-key, .sat-info-value {
-    display: inline-block;
+  display: inline-block;
 }
+
 .sat-info-key {
-    font-size: 12px;
-    color: white;
-    float: left;
+  font-size: 12px;
+  color: white;
+  float: left;
 }
 
 #sat-info-nextpass-row {
@@ -755,34 +830,38 @@ ul li{
 }
 
 #datetime {
-    z-index: 11;
-    position: fixed;
-    left: 10vw;
-    top: 0px;
-    width: 92px;
-    height: 75px;
-    font-size: 12px;
-    text-align: center;
-    background: transparent;
-    overflow: hidden;
-    margin-top: -2px;
+  z-index: 11;
+  position: fixed;
+  left: 10vw;
+  top: 0px;
+  width: 92px;
+  height: 75px;
+  font-size: 12px;
+  text-align: center;
+  background: transparent;
+  overflow: hidden;
+  margin-top: -2px;
 }
+
 #datetime-input {
-    position: absolute;
-    left: 0px;
-    bottom: 10px;
-    display: none;
+  position: absolute;
+  left: 0px;
+  bottom: 10px;
+  display: none;
 }
-  #datetime-input-tb {
-      color: white;
-      font-family: 'Droid Sans', sans-serif;
-      /* Hides it above the top of the screen */
-      height: 0px !important;
-      margin: 0 0 55px 0 !important;
-  }
-    #datetime-input-tb:focus, input:focus {
-        outline: none;
-    }
+
+#datetime-input-tb {
+  color: white;
+  font-family: 'Droid Sans', sans-serif;
+  /* Hides it above the top of the screen */
+  height: 0px !important;
+  margin: 0 0 55px 0 !important;
+}
+
+#datetime-input-tb:focus, input:focus {
+  outline: none;
+}
+
 #datetime-title {
   position: absolute;
   left: 20px;
@@ -795,14 +874,14 @@ ul li{
   font-weight: bold;
   font-size: 12px;
 }
-  #datetime-text {
-      padding-top: 10px
-  }
 
-  #datetime-text:hover {
-      background: rgba(255, 255, 255, .2);
-      border-radius: 5px;
-  }
+#datetime-text {
+  padding-top: 10px
+}
+
+#datetime-text:hover {
+  background: rgba(255, 255, 255, .2);
+  border-radius: 5px;
 }
 
 .ui-datepicker-calendar tbody tr td a {
@@ -810,36 +889,37 @@ ul li{
 }
 
 #bottom-icons-container {
-    text-align: center;
-    margin-top: -20px;
+  text-align: center;
+  margin-top: -20px;
 }
 
 #bottom-icons {
-    /* box-sizing: content-box; */
-    /* display: inline-flex; */
-    cursor: pointer;
-    z-index: 11;
+  cursor: pointer;
+  z-index: 11;
 }
 
 #bottom-icons div:first-of-type {
-    margin-left: 0px;
+  margin-left: 0px;
 }
+
 .bmenu-item {
   margin: 0 auto;
-    height: 42px;
-    padding: 5px;
+  height: 42px;
+  padding: 5px;
 }
+
 .bmenu-item img {
-    background: transparent;
-    height: 25px;
-    padding: 10px;
-    position: relative;
-    border-right: 2px;
-    border-right-style: solid;
-    border-right-color: steelblue;
-    bottom: 2.5px;
-    width: 25px;
+  background: transparent;
+  height: 25px;
+  padding: 10px;
+  position: relative;
+  border-right: 2px;
+  border-right-style: solid;
+  border-right-color: steelblue;
+  bottom: 2.5px;
+  width: 25px;
 }
+
 .bmenu-item:hover {
   background: rgba(255, 255, 255, 0.4);
 }
@@ -851,16 +931,16 @@ ul li{
 } */
 
 .bmenu-item-selected {
-    background: #c33 !important;
+  background: #c33 !important;
 }
 
 .bmenu-item-help {
-    background: #dfea8b !important;
+  background: #dfea8b !important;
 }
 
 .bmenu-item-disabled {
-    background: lightslategrey !important;
-    filter: grayscale();
+  background: lightslategrey !important;
+  filter: grayscale();
 }
 
 #down {
@@ -925,24 +1005,28 @@ ul li{
   text-align: center;
   padding: 2px !important;
 }
+
 #satcom-menu ul li {
   text-align: center;
   padding: 2px !important;
 }
+
 #analysis-menu ul li {
   text-align: center;
   padding: 2px !important;
 }
+
 #country-menu ul li {
   text-align: center;
   padding: 2px !important;
 }
+
 #constellation-menu ul li {
   text-align: center;
   padding: 2px !important;
 }
 
-.menu-selectable:hover{
+.menu-selectable:hover {
   background-color: gray;
   cursor: pointer;
 }
@@ -970,11 +1054,16 @@ ul li{
   text-align: center;
   padding: 10px;
   overflow: hidden;
-  background: rgb(2,119,189); /* Old browsers */
-  background: -moz-linear-gradient(45deg, rgba(2,119,189,1) 0%, rgba(64,150,238,1) 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(45deg, rgba(2,119,189,1) 0%,rgba(64,150,238,1) 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(45deg, rgba(2,119,189,1) 0%,rgba(64,150,238,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0277bd', endColorstr='#4096ee',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+  background: rgb(2, 119, 189);
+  /* Old browsers */
+  background: -moz-linear-gradient(45deg, rgba(2, 119, 189, 1) 0%, rgba(64, 150, 238, 1) 100%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(45deg, rgba(2, 119, 189, 1) 0%, rgba(64, 150, 238, 1) 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(45deg, rgba(2, 119, 189, 1) 0%, rgba(64, 150, 238, 1) 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0277bd', endColorstr='#4096ee', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
 }
 
 #help-inner-container {

@@ -1,13 +1,28 @@
 (function() {
-  return;
   meshManager = {};
   let mvMatrix;
   let mvMatrixEmpty = mat4.create();
   let nMatrix;
   let nMatrixEmpty = mat3.create();
 
+  meshManager.fileList = [
+      {
+          obj: `${settingsManager.installDirectory}meshes/Satellite.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/Satellite.mtl`
+      },
+      {
+          obj: `${settingsManager.installDirectory}meshes/Satellite2.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/Satellite2.mtl`
+      }
+  ];
+
   meshManager.sizeInfo = {
     Satellite: {
+      x: 100.0,
+      y: 100.0,
+      z: 100.0
+    },
+    Satellite2: {
       x: 100.0,
       y: 100.0,
       z: 100.0
@@ -15,7 +30,6 @@
   };
 
   // main shader program
-  meshManager.shaderProgram = null;
   meshManager.fragShaderCode = `
     precision mediump float;
 
@@ -28,13 +42,16 @@
     varying float vSpecularExponent;
 
     void main(void) {
-      vec3 V = -normalize(vPosition.xyz);
-      vec3 L = normalize(vLightDirection);
-      vec3 H = normalize(L + V);
-      vec3 N = normalize(vTransformedNormal);
+      float diffuse = max(dot(vTransformedNormal, vLightDirection), 0.0);
 
-      vec3 color = vDiffuse * dot(N, L) +
-      vSpecular * pow(dot(H, N), vSpecularExponent);
+      vec3 baseColor = vec3(1.0,1.0,1.0);
+      vec3 ambientColor = vec3(1.0,1.0,1.0) * diffuse * 5.0;
+      vec3 dirColor = vec3(1.0,1.0,1.0) * diffuse * 10.0;
+      vec3 specColor = vSpecular * diffuse * 3.0;
+      vec3 bumpColor = vDiffuse * diffuse * 1.0;
+
+      vec3 color = baseColor * (ambientColor + dirColor + specColor + bumpColor);
+
       gl_FragColor = vec4(color, 1.0);
     }
   `;
@@ -75,12 +92,7 @@
   `;
   meshManager.isReady = false;
   meshManager.init = () => {
-    let p = OBJ.downloadModels([
-        {
-            obj: "./meshes/Satellite.obj",
-            mtl: "./meshes/Satellite.mtl"
-        }
-    ]);
+    let p = OBJ.downloadModels(meshManager.fileList);
 
     p.then(models => {
         for ([name, mesh] of Object.entries(models)) {
@@ -99,8 +111,12 @@
   meshManager.mvMatrixStack = [];
   meshManager.pMatrix = mat4.create();
   meshManager.drawObject = (model, pMatrix, camMatrix) => {
-    // Model probably isn't ready yet
       if (typeof model == 'undefined') return;
+
+      // Meshes aren't finished loading
+      if (!meshManager.loaded) return;
+
+      // gl.bindVertexArray(meshManager.vao);
 
       // Assigned an origin at 0,0,0
       mvMatrix = mvMatrixEmpty;
@@ -130,18 +146,28 @@
       gl.uniformMatrix4fv(meshManager.shaderProgram.uPMatrix, false, pMatrix);
       gl.uniformMatrix4fv(meshManager.shaderProgram.uCamMatrix, false, camMatrix);
 
-      // Assign vertex buffer to
+      // Assign vertex buffer
       gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.vertexBuffer);
+
       // Update Buffers
       meshManager.shaderProgram.applyAttributePointers(model);
 
+      // Enable attributes
+      meshManager.shaderProgram.enableVertexAttribArrays(model);
+
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, model.mesh.indexBuffer);
       gl.drawElements(gl.TRIANGLES, model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+      // Enable attributes
+      meshManager.shaderProgram.disableVertexAttribArrays(model);
 
       gl.disable(gl.BLEND);
   };
 
   function initShaders() {
+    // meshManager.vao = gl.createVertexArray();
+    // gl.bindVertexArray(meshManager.vao);
+
     let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
     let fragCode = meshManager.fragShaderCode;
     gl.shaderSource(fragShader, fragCode);
@@ -172,21 +198,6 @@
     };
 
     meshManager.shaderProgram.attrIndices = {};
-    for (const attrName in attrs) {
-        if (!attrs.hasOwnProperty(attrName)) {
-            continue;
-        }
-        meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
-        if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
-            gl.enableVertexAttribArray(meshManager.shaderProgram.attrIndices[attrName]);
-        } else {
-            console.warn(
-                'Shader attribute "' +
-                    attrName +
-                    '" not found in shader. Is it undeclared or unused in the shader code?'
-            );
-        }
-    }
 
     meshManager.shaderProgram.uPMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uPMatrix');
     meshManager.shaderProgram.uCamMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uCamMatrix');
@@ -195,24 +206,58 @@
     meshManager.shaderProgram.uLightDirection = gl.getUniformLocation(meshManager.shaderProgram, 'uLightDirection');
 
     meshManager.shaderProgram.applyAttributePointers = function(model) {
-        const layout = model.mesh.vertexBuffer.layout;
-        for (const attrName in attrs) {
-            if (!attrs.hasOwnProperty(attrName) || meshManager.shaderProgram.attrIndices[attrName] == -1) {
-                continue;
-            }
-            const layoutKey = attrs[attrName];
-            if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
-                const attr = layout.attributeMap[layoutKey];
-                gl.vertexAttribPointer(
-                    meshManager.shaderProgram.attrIndices[attrName],
-                    attr.size,
-                    gl[attr.type],
-                    attr.normalized,
-                    attr.stride,
-                    attr.offset
-                );
-            }
+      const layout = model.mesh.vertexBuffer.layout;
+      for (const attrName in attrs) {
+        if (!attrs.hasOwnProperty(attrName) || meshManager.shaderProgram.attrIndices[attrName] == -1) {
+            continue;
         }
+        const layoutKey = attrs[attrName];
+        if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
+          const attr = layout.attributeMap[layoutKey];
+          gl.vertexAttribPointer(
+              meshManager.shaderProgram.attrIndices[attrName],
+              attr.size,
+              gl[attr.type],
+              attr.normalized,
+              attr.stride,
+              attr.offset
+          );
+        }
+      }
+    };
+    meshManager.shaderProgram.enableVertexAttribArrays = function(model) {
+      for (const attrName in attrs) {
+          if (!attrs.hasOwnProperty(attrName)) {
+              continue;
+          }
+          meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
+          if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
+              gl.enableVertexAttribArray(meshManager.shaderProgram.attrIndices[attrName]);
+          } else {
+              console.warn(
+                  'Shader attribute "' +
+                      attrName +
+                      '" not found in shader. Is it undeclared or unused in the shader code?'
+              );
+          }
+      }
+    };
+    meshManager.shaderProgram.disableVertexAttribArrays = function(model) {
+      for (const attrName in attrs) {
+          if (!attrs.hasOwnProperty(attrName)) {
+              continue;
+          }
+          meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
+          if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
+              gl.disableVertexAttribArray(meshManager.shaderProgram.attrIndices[attrName]);
+          } else {
+              console.warn(
+                  'Shader attribute "' +
+                      attrName +
+                      '" not found in shader. Is it undeclared or unused in the shader code?'
+              );
+          }
+      }
     };
   }
   function initBuffers() {
@@ -250,6 +295,7 @@
           meshManager.models[mesh].mesh = meshManager.meshes[mesh];
           meshManager.models[mesh].size = meshManager.sizeInfo[mesh];
       }
+      meshManager.loaded = true;
   }
   function getShader(gl, id) {
       var shaderScript = document.getElementById(id);

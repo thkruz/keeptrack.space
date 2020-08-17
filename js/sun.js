@@ -122,6 +122,10 @@
   var loaded = false;
 
   sun.init = function () {
+    // Make New Vertex Array Objects
+    // sun.vao = gl.createVertexArray();
+    // gl.bindVertexArray(sun.vao);
+
     let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
     let fragCode = shaderLoader.getShaderCode('sun-fragment.glsl');
     gl.shaderSource(fragShader, fragCode);
@@ -217,6 +221,9 @@
 
   sun.draw = function (pMatrix, camMatrix) {
     if (!sun.loaded) return;
+
+    // Switch Vertex Array Objects
+    // gl.bindVertexArray(sun.vao);
 
     sun.realXyz = sun.getXYZ();
     let sunMaxDist = Math.max(Math.max(Math.abs(sun.realXyz.x),Math.abs(sun.realXyz.y)),Math.abs(sun.realXyz.z));
@@ -347,6 +354,10 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
   };
 
   moon.init = function () {
+    // Make New Vertex Array Objects
+    // moon.vao = gl.createVertexArray();
+    // gl.bindVertexArray(moon.vao);
+
     let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
     let fragCode = shaderLoader.getShaderCode('moon-fragment.glsl');
     gl.shaderSource(fragShader, fragCode);
@@ -470,6 +481,8 @@ function lookAnglesToEcf(azimuthDeg, elevationDeg, slantRange, obs_lat, obs_long
 
   moon.draw = function (pMatrix, camMatrix) {
     if (!moon.loaded) return;
+    // Switch Vertex Array Objects
+    // gl.bindVertexArray(moon.vao);
 
     // Needed because geocentric earth
     let moonXYZ = moon.getXYZ();

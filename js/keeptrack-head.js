@@ -19,7 +19,7 @@ const MOON_SCALAR_DISTANCE = 250000;
   let settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.18.5';
+  settingsManager.versionNumber = '1.19.0';
   settingsManager.versionDate = 'August 16, 2020';
 
   // Install Folder Settings
@@ -90,9 +90,6 @@ const MOON_SCALAR_DISTANCE = 250000;
 
   settingsManager.minZoomDistance = 6800;
   settingsManager.maxZoomDistance = 120000;
-
-  settingsManager.hoverColor = [1.0, 1.0, 0.0, 1.0]; // Yellow
-  settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0]; // Red
 
   settingsManager.timeMachineDelay = 3000;
 
@@ -184,6 +181,9 @@ const MOON_SCALAR_DISTANCE = 250000;
   // Color Settings
   // //////////////////////////////////////////////////////////////////////////
   settingsManager.currentColorScheme = null;
+
+  settingsManager.hoverColor = [1.0, 1.0, 0.0, 1.0]; // Yellow
+  settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0]; // Red
 
   settingsManager.reColorMinimumTime = 1000;
   settingsManager.colors = {};

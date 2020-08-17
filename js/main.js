@@ -195,7 +195,9 @@ function initializeKeepTrack () {
   earth.init();
   // Load Optional 3D models if available
   if (typeof meshManager !== 'undefined') {
-    meshManager.init();
+    setTimeout(function () {
+      meshManager.init();
+    }, 2000);
   }
   ColorScheme.init();
   $('#loader-text').text('Drawing Dots in Space...');
@@ -676,7 +678,7 @@ function drawLoop () {
       _camSnapToSat(sat);
       // If 3D Models Available, then update their position on the screen
       if (typeof meshManager !== 'undefined') {
-        meshManager.models.Satellite.position = sat.position;
+        meshManager.models.Satellite2.position = sat.position;
       }
     }
     if (sat.static && cameraType.current=== cameraType.PLANETARIUM) {
@@ -845,11 +847,8 @@ function _drawScene () {
 
   sun.draw(pMatrix, camMatrix);
   moon.draw(pMatrix, camMatrix);
-  // if (typeof debugLine != 'undefined') debugLine.draw();
   atmosphere.draw(pMatrix, camMatrix);
-  if (earth.loaded) {
-    earth.draw(pMatrix, camMatrix);
-  }
+  earth.draw(pMatrix, camMatrix);
   satSet.draw(pMatrix, camMatrix, drawNow);
   orbitManager.draw(pMatrix, camMatrix);
 
@@ -859,7 +858,7 @@ function _drawScene () {
     // If 3D Models Available, then draw them on the screen
     if (typeof meshManager !== 'undefined') {
         if (!sat.static) {
-          meshManager.drawObject(meshManager.models.Satellite, pMatrix, camMatrix);
+          meshManager.drawObject(meshManager.models.Satellite2, pMatrix, camMatrix);
         }
     }
   }

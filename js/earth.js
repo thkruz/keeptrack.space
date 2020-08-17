@@ -64,7 +64,9 @@ or mirrored at any other location without the express written permission of the 
   earth.isDayNightToggle = false;
 
   earth.init = function () {
-    // var startTime = new Date().getTime();
+    // Make New Vertex Array Objects
+    // earth.vao = gl.createVertexArray();
+    // gl.bindVertexArray(earth.vao);
 
     var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
     var fragCode = shaderLoader.getShaderCode('earth-fragment.glsl');
@@ -282,6 +284,8 @@ or mirrored at any other location without the express written permission of the 
   earth.draw = function (pMatrix, camMatrix) {
     if (!loaded) return;
 
+    // gl.bindVertexArray(earth.vao);
+
     // var now = new Date();
     earth.lastTime = earthNow;
     earthNow = timeManager.propTime();
@@ -443,6 +447,10 @@ or mirrored at any other location without the express written permission of the 
   atmosphere.pos = [0, 0, 0];
 
   atmosphere.init = function () {
+    // Make New Vertex Array Objects
+    // atmosphere.vao = gl.createVertexArray();
+    // gl.bindVertexArray(atmosphere.vao);
+
     var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
     var fragCode = shaderLoader.getShaderCode('atmosphere-fragment.glsl');
     gl.shaderSource(fragShader, fragCode);
@@ -517,9 +525,13 @@ or mirrored at any other location without the express written permission of the 
     vertIndexBuf = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
+
+    atmosphere.loaded = true;
   };
 
   atmosphere.draw = function (pMatrix, camMatrix) {
+    if (!atmosphere.loaded) return;
+    // gl.bindVertexArray(atmosphere.vao);
 
     gl.enable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);

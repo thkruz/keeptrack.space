@@ -9,11 +9,11 @@
       {
           obj: `${settingsManager.installDirectory}meshes/Satellite.obj`,
           mtl: `${settingsManager.installDirectory}meshes/Satellite.mtl`
-      },
-      {
-          obj: `${settingsManager.installDirectory}meshes/Satellite2.obj`,
-          mtl: `${settingsManager.installDirectory}meshes/Satellite2.mtl`
       }
+      // {
+      //     obj: `${settingsManager.installDirectory}meshes/Satellite2.obj`,
+      //     mtl: `${settingsManager.installDirectory}meshes/Satellite2.mtl`
+      // }
   ];
 
   meshManager.sizeInfo = {
@@ -21,12 +21,12 @@
       x: 100.0,
       y: 100.0,
       z: 100.0
-    },
-    Satellite2: {
-      x: 100.0,
-      y: 100.0,
-      z: 100.0
     }
+    // Satellite2: {
+    //   x: 100.0,
+    //   y: 100.0,
+    //   z: 100.0
+    // }
   };
 
   // main shader program

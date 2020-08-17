@@ -678,7 +678,7 @@ function drawLoop () {
       _camSnapToSat(sat);
       // If 3D Models Available, then update their position on the screen
       if (typeof meshManager !== 'undefined') {
-        meshManager.models.Satellite2.position = sat.position;
+        meshManager.models.Satellite.position = sat.position;
       }
     }
     if (sat.static && cameraType.current=== cameraType.PLANETARIUM) {
@@ -858,7 +858,7 @@ function _drawScene () {
     // If 3D Models Available, then draw them on the screen
     if (typeof meshManager !== 'undefined') {
         if (!sat.static) {
-          meshManager.drawObject(meshManager.models.Satellite2, pMatrix, camMatrix);
+          meshManager.drawObject(meshManager.models.Satellite, pMatrix, camMatrix);
         }
     }
   }

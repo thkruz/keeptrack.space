@@ -195,9 +195,7 @@ function initializeKeepTrack () {
   earth.init();
   // Load Optional 3D models if available
   if (typeof meshManager !== 'undefined') {
-    setTimeout(function () {
-      meshManager.init();
-    }, 2000);
+    meshManager.init();
   }
   ColorScheme.init();
   $('#loader-text').text('Drawing Dots in Space...');
@@ -1355,9 +1353,6 @@ function webGlInit () {
   var vw = Math.min.apply(null, [cw,iw].filter(Boolean));
   var vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 
-  console.log(vw);
-  console.log(vh);
-
   // If taking a screenshot then resize no matter what to get high resolution
   if (settingsManager.screenshotMode) {
     can.width = settingsManager.hiResWidth;
@@ -1365,11 +1360,9 @@ function webGlInit () {
   } else {
     // If not autoresizing then don't do anything to the canvas
     if (settingsManager.isAutoResizeCanvas) {
-      console.log('Do Resize?');
       // If this is a cellphone avoid the keyboard forcing resizes but
       // always resize on rotation
       if (settingsManager.isMobileModeEnabled) {
-        console.log('YES!');
         // Changes more than 35% of height but not due to rotation are likely
         // the keyboard! Ignore them
         if ((((vw - can.width)/can.width * 100 < 1) &&
@@ -1380,7 +1373,6 @@ function webGlInit () {
              mobile.forceResize = false;
              mobile.isRotationEvent = false;
            } else {
-             console.log('Psych!');
            }
       } else {
         can.width = vw;
@@ -1598,6 +1590,7 @@ function selectSat (satId) {
   db.log(`satId: ${satId}`, true);
   var sat;
   if (satId !== -1) {
+    rotateTheEarth = false;
     cameraManager.isChasing = false;
     sat = satSet.getSat(satId);
     if (sat.type == 'Star') return;
@@ -1605,7 +1598,6 @@ function selectSat (satId) {
   }
   satSet.selectSat(satId);
   camSnapMode = false;
-  rotateTheEarth = false;
 
   if (satId === -1) {
     if (settingsManager.currentColorScheme === ColorScheme.group || $('#search').val().length >= 3) { // If group selected

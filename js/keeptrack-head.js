@@ -19,7 +19,7 @@ const MOON_SCALAR_DISTANCE = 250000;
   let settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.19.0';
+  settingsManager.versionNumber = '1.19.1';
   settingsManager.versionDate = 'August 16, 2020';
 
   // Install Folder Settings
@@ -60,7 +60,6 @@ const MOON_SCALAR_DISTANCE = 250000;
 
   // Adjust to change camera speed of auto rotate around earth
   settingsManager.autoRotateSpeed = 1.0 * 0.000075;
-
   // Disable main user interface. Currently an all or nothing package.
   settingsManager.disableUI = false;
   // Currently only disables panning. In the future it will disable all camera
@@ -91,7 +90,7 @@ const MOON_SCALAR_DISTANCE = 250000;
   settingsManager.minZoomDistance = 6800;
   settingsManager.maxZoomDistance = 120000;
 
-  settingsManager.timeMachineDelay = 3000;
+  settingsManager.timeMachineDelay = 5000;
 
   // settingsManager.earthPanningBufferDistance = 100; // Needs work in main.js
 
@@ -569,5 +568,8 @@ if (!settingsManager.disableUI) {
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/jquery-ui-timepicker-addon.css?v=${settingsManager.versionNumber}" type="text/css"\>
   `);
 } else if (settingsManager.enableLimitedUI) {
-  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/limitedUI.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+  document.write(`
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/limitedUI.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize.css?v=${settingsManager.versionNumber}" type="text/css"\>
+  `);
 }

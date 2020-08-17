@@ -268,38 +268,44 @@
     return pathShader;
   };
 
+  // Used to kill old async calls
+  orbitManager.historyOfSatellitesRunCount = 0;
   orbitManager.historyOfSatellitesPlay = () => {
+    orbitManager.historyOfSatellitesRunCount++;
     orbitManager.isTimeMachineRunning = true;
-    let tempTransColor = settingsManager.colors.transparent;
+    orbitManager.tempTransColor = settingsManager.colors.transparent;
     settingsManager.colors.transparent = [0,0,0,0];
     for (let yy = 0; yy <= 200; yy++) {
       let year = 59 + yy;
       if (year >= 100) year = year - 100;
-      setTimeout(function () {
+      setTimeout(function (runCount) {
         if (!orbitManager.isTimeMachineVisible) return;
+        // Kill all old async calls if run count updates
+        if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
         yearGroup = new groups.SatGroup('yearOrLess', year);
         // groups.selectGroupNoOverlay(yearGroup);
         groups.selectGroup(yearGroup);
         yearGroup.updateOrbits();
         satSet.setColorScheme(ColorScheme.group, true); // force color recalc
-        if (!settingsManager.disableUI) {
-          if (year >= 59 && year < 100) {
-            M.toast({html: `Time Machine In Year 19${year}!`});
-          } else {
-            yearStr = (year < 10) ? `0${year}` : `${year}`;
-            M.toast({html: `Time Machine In Year 20${yearStr}!`});
-          }
+        if (year >= 59 && year < 100) {
+          M.toast({html: `Time Machine In Year 19${year}!`});
+        } else {
+          yearStr = (year < 10) ? `0${year}` : `${year}`;
+          M.toast({html: `Time Machine In Year 20${yearStr}!`});
         }
+        // TODO: Have timemachine autocalculate current year
+        // Last one 2020
         if (year == 20) {
           setTimeout(function () {
+            if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
             if (!orbitManager.isTimeMachineVisible) return;
-            settingsManager.colors.transparent = tempTransColor;
+            settingsManager.colors.transparent = orbitManager.tempTransColor;
             orbitManager.isTimeMachineRunning = false;
             groups.clearSelect();
             satSet.setColorScheme(ColorScheme.default, true); // force color recalc
           }, 10000); // Linger for 10 seconds
         }
-      }, settingsManager.timeMachineDelay * yy);
+      }, settingsManager.timeMachineDelay * yy, orbitManager.historyOfSatellitesRunCount);
       if (year == 20) break;
     }
   };

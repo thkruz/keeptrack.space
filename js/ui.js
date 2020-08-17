@@ -2768,9 +2768,26 @@ var speedModifier = 1;
           }
           break;
         case 'menu-time-machine':
-          if (orbitManager.isTimeMachineRunning == true) break;
-          orbitManager.historyOfSatellitesPlay();
-        break;
+          if (orbitManager.isTimeMachineRunning) {
+            // Merge to one variable?
+            orbitManager.isTimeMachineRunning = false;
+            orbitManager.isTimeMachineVisible = false;
+
+            settingsManager.colors.transparent = orbitManager.tempTransColor;
+            groups.clearSelect();
+            satSet.setColorScheme(ColorScheme.default, true); // force color recalc
+
+            $('#menu-time-machine').removeClass('bmenu-item-selected');
+            break;
+          } else {
+            // Merge to one variable?
+            orbitManager.isTimeMachineRunning = true;
+            orbitManager.isTimeMachineVisible = true;
+            $('#menu-time-machine').addClass('bmenu-item-selected');
+            orbitManager.historyOfSatellitesPlay();
+            break;
+          }
+          break;
         case 'menu-photo':
           uiManager.saveHiResPhoto('4k');
           break;

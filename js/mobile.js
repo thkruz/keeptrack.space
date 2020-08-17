@@ -93,6 +93,7 @@ var maxPinchSize = 1;
   mobile.checkMobileMode = function () {
     db.log('mobile.checkMobileMode');
     if (mobile.checkIfMobileDevice()) {
+      mobile.forceResize = true;
       settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
       settingsManager.enableHoverOverlay = false;
       settingsManager.isMobileModeEnabled = true;
@@ -126,6 +127,7 @@ var maxPinchSize = 1;
   mobile.start = function () {
     db.log('mobile.checkMobileMode');
     mobile.checkMobileMode();
+    mobile.fullscreenToggle();
     maxPinchSize = Math.hypot(window.innerWidth,$(document).height());
     $('#loading-screen').removeClass('full-loader');
     $('#loading-screen').addClass('mini-loader-container');
@@ -135,7 +137,6 @@ var maxPinchSize = 1;
     $('#loading-screen').fadeOut();
     $('#spinner').show();
     $('#mobile-start-button').hide();
-    mobile.fullscreenToggle();
     settingsManager.enableHoverOverlay = false;
   };
 

@@ -1330,6 +1330,13 @@ function _fixDpi(canvas, dpi) {
   canvas.setAttribute('width', style.width() * dpi);
   canvas.setAttribute('height', style.height() * dpi);
 }
+
+// Reinitialize the canvas on mobile rotation
+$(window).bind( 'orientationchange', function(e){
+  console.log('rotate');
+  mobile.isRotationEvent = true;
+});
+
 function webGlInit () {
   db.log('webGlInit');
   let can = canvasDOM[0];
@@ -1341,23 +1348,48 @@ function webGlInit () {
     settingsManager.dpi = dpi;
   }
 
+  // Using minimum allows the canvas to be full screen without fighting with
+  // scrollbars
+  let cw = document.documentElement.clientWidth || 0;
+  let iw = window.innerWidth || 0;
+  var vw = Math.min.apply(null, [cw,iw].filter(Boolean));
+  var vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+
+  console.log(vw);
+  console.log(vh);
+
+  // If taking a screenshot then resize no matter what to get high resolution
   if (settingsManager.screenshotMode) {
     can.width = settingsManager.hiResWidth;
     can.height = settingsManager.hiResHeight;
-    settingsManager.canvasResizeLock = false;
   } else {
-    if (!settingsManager.canvasResizeLock) {
-      if (settingsManager.isAutoResizeCanvas) {
-        // can.width = document.body.clientWidth;
-        can.width = window.innerWidth;
-        can.height = window.innerHeight;
-        if (settingsManager.isMobileModeEnabled) settingsManager.canvasResizeLock = true;
+    // If not autoresizing then don't do anything to the canvas
+    if (settingsManager.isAutoResizeCanvas) {
+      console.log('Do Resize?');
+      // If this is a cellphone avoid the keyboard forcing resizes but
+      // always resize on rotation
+      if (settingsManager.isMobileModeEnabled) {
+        console.log('YES!');
+        // Changes more than 35% of height but not due to rotation are likely
+        // the keyboard! Ignore them
+        if ((((vw - can.width)/can.width * 100 < 1) &&
+           ((vh - can.height)/can.height * 100 < 1))  ||
+           mobile.isRotationEvent || mobile.forceResize) {
+             can.width = vw;
+             can.height = vh;
+             mobile.forceResize = false;
+             mobile.isRotationEvent = false;
+           } else {
+             console.log('Psych!');
+           }
+      } else {
+        can.width = vw;
+        can.height = vh;
       }
     }
   }
 
   if (settingsManager.satShader.isUseDynamicSizing) {
-    console.log(can.width);
     settingsManager.satShader.dynamicSize = 1920/can.width * settingsManager.satShader.dynamicSizeScalar * settingsManager.dpi;
     settingsManager.satShader.minSize = Math.max(settingsManager.satShader.minSize,settingsManager.satShader.dynamicSize);
   }

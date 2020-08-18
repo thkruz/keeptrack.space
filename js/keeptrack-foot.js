@@ -1,3 +1,17 @@
+// Load Dependencies
+document.write(`
+  <script src="${settingsManager.installDirectory}js/lib/colorPick.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/materialize.min.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/gl-matrix-min.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/webgl-obj-loader.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/satellite.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/lib/suncalc.js?v=${settingsManager.versionNumber}"\><\/script>
+
+  <script src="${settingsManager.installDirectory}js/shaders.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/mapManager.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}license/license.js?v=${settingsManager.versionNumber}"\><\/script>
+  `);
+
 // Enable Satbox Overlay
 if (settingsManager.enableHoverOverlay) {
   document.getElementById('keeptrack-canvas').parentElement.innerHTML +=`
@@ -33,6 +47,7 @@ if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
   <div id="time-machine-btn">
   </div>`;
   $(document).ready(function () {
+    M.AutoInit();
     var countriesBtnDOM = $('#countries-btn');
     countriesBtnDOM.on('click', function(){
       if (settingsManager.currentColorScheme == ColorScheme.countries) {
@@ -49,8 +64,8 @@ if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
         isTimeMachine = false;
         groups.debris = new groups.SatGroup('all', '');
         groups.selectGroup(groups.debris);
-        satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-        groups.debris.updateOrbits();
+        // satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+        // groups.debris.updateOrbits();
         isOrbitOverlay = true;
       } else {
         orbitManager.isTimeMachineVisible = false;
@@ -64,36 +79,28 @@ if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
     var timeMachineDOM = $('#time-machine-btn');
     var isTimeMachine = false;
     timeMachineDOM.on('click', function(){
-      if (!isTimeMachine) {
-        isTimeMachine = true;
-        orbitManager.isTimeMachineVisible = true;
-        if (!orbitManager.isTimeMachineRunning) {
-          orbitManager.historyOfSatellitesPlay();
-        }
-      } else {
-        groups.clearSelect();
-        orbitManager.clearHoverOrbit();
-        satSet.setColorScheme(ColorScheme.default, true);
-        orbitManager.isTimeMachineVisible = false;
+      if (isTimeMachine) {
         isTimeMachine = false;
+        // Merge to one variable?
+        orbitManager.isTimeMachineRunning = false;
+        orbitManager.isTimeMachineVisible = false;
+
+        settingsManager.colors.transparent = orbitManager.tempTransColor;
+        groups.clearSelect();
+        satSet.setColorScheme(ColorScheme.default, true); // force color recalc
+
+        $('#menu-time-machine').removeClass('bmenu-item-selected');
+      } else {
+        // Merge to one variable?
+        orbitManager.isTimeMachineRunning = true;
+        orbitManager.isTimeMachineVisible = true;
+        $('#menu-time-machine').addClass('bmenu-item-selected');
+        orbitManager.historyOfSatellitesPlay();
+        isTimeMachine = true;
       }
     });
   });
 }
-
-// Load Dependencies
-document.write(`
-  <script src="${settingsManager.installDirectory}js/lib/colorPick.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/lib/materialize.min.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/lib/gl-matrix-min.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/lib/webgl-obj-loader.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/lib/satellite.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/lib/suncalc.js?v=${settingsManager.versionNumber}"\><\/script>
-
-  <script src="${settingsManager.installDirectory}js/shaders.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/mapManager.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}license/license.js?v=${settingsManager.versionNumber}"\><\/script>
-`);
 
 // Addon Modules
 if (!settingsManager.disableUI) {
@@ -118,11 +125,10 @@ if (!settingsManager.disableUI) {
 
 // Other Required Files
 document.write(`
-  <script src="${settingsManager.installDirectory}js/time-manager.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/sun.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/sceneManager.js?v=${settingsManager.versionNumber}"\><\/script>
+  <script src="${settingsManager.installDirectory}js/timeManager.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/meuusjs.1.0.3.min.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/starcalc.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/earth.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/groups.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lookangles.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/satSet.js?v=${settingsManager.versionNumber}"\><\/script>

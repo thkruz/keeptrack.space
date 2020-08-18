@@ -26,9 +26,9 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
       case 'localhost':
         // Comment Out the Next Three Lines if you are testing on a local server
         // and have the keeptrack files installed in a subdirectory
-      //   settingsManager.installDirectory = '/';
-      //   break;
-      // case 'thkruz.github.io':
+        settingsManager.installDirectory = '/';
+        break;
+      case 'thkruz.github.io':
         settingsManager.installDirectory = '/keeptrack.space/';
         break;
     }
@@ -41,8 +41,8 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   settingsManager.lowPerf = false;
 
   if (window.location.hostname === 'keeptrack.space' ||
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === 'thkruz.github.io') {
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === 'thkruz.github.io') {
     settingsManager.unofficial = false;
   } else {
     settingsManager.unofficial = true;
@@ -148,29 +148,29 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
     let lastMap = localStorage.getItem("lastMap");
     switch (lastMap) {
       case 'blue':
-      settingsManager.blueImages = true;
-      break;
+        settingsManager.blueImages = true;
+        break;
       case 'nasa':
-      settingsManager.nasaImages = true;
-      break;
+        settingsManager.nasaImages = true;
+        break;
       case 'low':
-      settingsManager.lowresImages = true;
-      break;
+        settingsManager.lowresImages = true;
+        break;
       case 'trusat':
-      settingsManager.trusatImages = true;
-      break;
+        settingsManager.trusatImages = true;
+        break;
       case 'high':
-      settingsManager.hiresImages = true;
-      break;
+        settingsManager.hiresImages = true;
+        break;
       case 'high-nc':
-      settingsManager.hiresNoCloudsImages = true;
-      break;
+        settingsManager.hiresNoCloudsImages = true;
+        break;
       case 'vec':
-      settingsManager.vectorImages = true;
-      break;
+        settingsManager.vectorImages = true;
+        break;
       default:
-      settingsManager.lowresImages = true;
-      break;
+        settingsManager.lowresImages = true;
+        break;
     }
   }
 
@@ -191,23 +191,23 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
     settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.15];
     settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
     settingsManager.colors.marker = [[0.2, 1.0, 1.0, 1.0],
-                                     [1.0, 0.2, 1.0, 1.0],
-                                     [1.0, 1.0, 0.2, 1.0],
-                                     [0.2, 0.2, 1.0, 1.0],
-                                     [0.2, 1.0, 0.2, 1.0],
-                                     [1.0, 0.2, 0.2, 1.0],
-                                     [0.5, 0.6, 1.0, 1.0],
-                                     [0.6, 0.5, 1.0, 1.0],
-                                     [1.0, 0.6, 0.5, 1.0],
-                                     [1.0, 1.0, 1.0, 1.0],
-                                     [0.2, 1.0, 1.0, 1.0],
-                                     [1.0, 0.2, 1.0, 1.0],
-                                     [1.0, 1.0, 0.2, 1.0],
-                                     [0.2, 0.2, 1.0, 1.0],
-                                     [0.2, 1.0, 0.2, 1.0],
-                                     [1.0, 0.2, 0.2, 1.0],
-                                     [0.5, 0.6, 1.0, 1.0],
-                                     [0.6, 0.5, 1.0, 1.0],];
+    [1.0, 0.2, 1.0, 1.0],
+    [1.0, 1.0, 0.2, 1.0],
+    [0.2, 0.2, 1.0, 1.0],
+    [0.2, 1.0, 0.2, 1.0],
+    [1.0, 0.2, 0.2, 1.0],
+    [0.5, 0.6, 1.0, 1.0],
+    [0.6, 0.5, 1.0, 1.0],
+    [1.0, 0.6, 0.5, 1.0],
+    [1.0, 1.0, 1.0, 1.0],
+    [0.2, 1.0, 1.0, 1.0],
+    [1.0, 0.2, 1.0, 1.0],
+    [1.0, 1.0, 0.2, 1.0],
+    [0.2, 0.2, 1.0, 1.0],
+    [0.2, 1.0, 0.2, 1.0],
+    [1.0, 0.2, 0.2, 1.0],
+    [0.5, 0.6, 1.0, 1.0],
+    [0.6, 0.5, 1.0, 1.0],];
     settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
     settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
     settingsManager.colors.inviewAlt = [0.2, 0.4, 1.0, 1];
@@ -314,29 +314,29 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   settingsManager.themes.redTheme = function (isForce) {
     if (settingsManager.retro) return;
     if (settingsManager.themes.currentTheme === 'Red' && !isForce) return;
-      document.getElementById('nav-wrapper').classList.remove('light-blue');
-      document.getElementById('nav-wrapper').classList.add('red');
-      document.getElementById('nav-footer').classList.add('red');
-      document.getElementById('nav-footer').classList.add('darken-3');
-      $('#bottom-menu').css('background', 'rgb(165, 0, 0)');
-      $('.bmenu-item').css('border-right-color', 'orangered');
-      $('#menu-info-overlay ').css('border-left-color', 'orangered');
-      $('.side-menu').css('background', 'LightCoral');
-      $('.side-menu').css('border-color', 'DarkRed');
-      $('#sat-infobox').css('background', 'LightCoral');
-      $('#sat-infobox').css('border-color', 'DarkRed');
-      $('#legend-hover-menu').css('background', 'LightCoral');
-      $('#legend-hover-menu').css('border-color', 'DarkRed');
-      $('#colorbox').css('border', '10px solid DarkRed');
-      // $('#search-results').css('cssText', 'background: LightCoral !important');
-      // $('#search-results').css('border-color', 'DarkRed');
-      // $('#search-result:hover').css('background', 'DarkRed');
-      $('#nav-footer-toggle').css('background', 'DarkRed');
-      $('.badge').css('cssText', 'color: DarkRed !important');
-      $('.search-hilight').css('color', 'DarkRed');
-      $('.btn-ui').css('background-color', 'red');
-      settingsManager.themes.currentTheme = 'Red';
-    };
+    document.getElementById('nav-wrapper').classList.remove('light-blue');
+    document.getElementById('nav-wrapper').classList.add('red');
+    document.getElementById('nav-footer').classList.add('red');
+    document.getElementById('nav-footer').classList.add('darken-3');
+    $('#bottom-menu').css('background', 'rgb(165, 0, 0)');
+    $('.bmenu-item').css('border-right-color', 'orangered');
+    $('#menu-info-overlay ').css('border-left-color', 'orangered');
+    $('.side-menu').css('background', 'LightCoral');
+    $('.side-menu').css('border-color', 'DarkRed');
+    $('#sat-infobox').css('background', 'LightCoral');
+    $('#sat-infobox').css('border-color', 'DarkRed');
+    $('#legend-hover-menu').css('background', 'LightCoral');
+    $('#legend-hover-menu').css('border-color', 'DarkRed');
+    $('#colorbox').css('border', '10px solid DarkRed');
+    // $('#search-results').css('cssText', 'background: LightCoral !important');
+    // $('#search-results').css('border-color', 'DarkRed');
+    // $('#search-result:hover').css('background', 'DarkRed');
+    $('#nav-footer-toggle').css('background', 'DarkRed');
+    $('.badge').css('cssText', 'color: DarkRed !important');
+    $('.search-hilight').css('color', 'DarkRed');
+    $('.btn-ui').css('background-color', 'red');
+    settingsManager.themes.currentTheme = 'Red';
+  };
   settingsManager.themes.redThemeSearch = function (isForce) {
     if (settingsManager.retro) return;
     if (settingsManager.themes.currentTheme !== 'Red' && !isForce) return;
@@ -440,7 +440,7 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
 // This is an initial parse of the GET variables
 // to determine critical settings. Other variables are checked later during
 // satSet.init
-(function initParseFromGETVariables () {
+(function initParseFromGETVariables() {
   let queryStr = window.location.search.substring(1);
   let params = queryStr.split('&');
   for (let i = 0; i < params.length; i++) {
@@ -492,9 +492,9 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
       case 'noPropRate':
         settingsManager.isAlwaysHidePropRate = true;
         break;
-      }
     }
-  })();
+  }
+})();
 
 //Global Debug Manager
 let db = {};
@@ -509,13 +509,13 @@ let db = {};
     db.verbose = false;
     localStorage.setItem("db", JSON.stringify(db));
   }
-  db.init = (function (){
+  db.init = (function () {
     db.log = function (message, isVerbose) {
       // Don't Log Verbose Stuff Normally
       if (isVerbose && !db.verbose) return;
 
       // If Logging is Enabled - Log It
-      if(db.enabled) {
+      if (db.enabled) {
         console.log(message);
       }
     };

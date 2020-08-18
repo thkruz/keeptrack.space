@@ -32,9 +32,9 @@ const MOON_SCALAR_DISTANCE = 250000;
       case 'localhost':
         // Comment Out the Next Two Lines if you are testing on a local server
         // and have the keeptrack files installed in a subdirectory
-        settingsManager.installDirectory = '/';
-        break;
-      case 'thkruz.github.io':
+      //   settingsManager.installDirectory = '/';
+      //   break;
+      // case 'thkruz.github.io':
         settingsManager.installDirectory = '/keeptrack.space/';
         break;
     }

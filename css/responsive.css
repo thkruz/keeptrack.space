@@ -1,11 +1,9 @@
 /* MEDIA @ 1301px */
+
 @media (min-width: 1301px) {
   #fullscreen-icon {
     display: none;
   }
-  /* #search-icon {
-    display: none;
-  } */
   #datetime {
     position: absolute;
     left: 20px;
@@ -69,7 +67,6 @@
     height: 25px;
     margin: 0px;
   }
-
   #share-icon {
     display: none;
   }
@@ -152,11 +149,9 @@
   #lookanglesmultisite-content {
     width: 375px;
   }
-
   #dops-content {
     width: 375px;
   }
-
   #menu-satellite-collision, #menu-find-sat {
     display: inline;
   }
@@ -176,14 +171,12 @@
     border-style: solid;
     overflow: auto;
   }
-
   #sat-infobox:after {
     content: "";
     height: 100px;
     display: block;
   }
-
-  .sat-infobox-fullsize {}
+  /* .sat-infobox-fullsize {} */
   .sat-info-value {
     float: right;
     width: 100px;
@@ -195,7 +188,6 @@
     width: 800px;
     height: 100px;
     text-align: center;
-
   }
   #footer-toggle-wrapper {
     width: 100%;
@@ -211,7 +203,6 @@
     transition: 1s;
     bottom: 0px !important;
   }
-
   footer {
     margin-top: -100px;
     position: absolute;
@@ -226,18 +217,16 @@
   }
   #social {
     display: block;
-    margin-top:-75px;
-    margin-right:90px;
+    margin-top: -75px;
+    margin-right: 90px;
   }
-  #menu-space-stations,
-  #menu-launches {
+  #menu-space-stations, #menu-launches {
     display: inline;
   }
   #fastCompSettings {
     display: block;
   }
-  #social-alt,
-  #mobile-warning {
+  #social-alt, #mobile-warning {
     display: none;
   }
   #version-info {
@@ -259,7 +248,10 @@
 }
 /* MEDIA @ 1301px */
 
+/* MEDIA @ 1301px */
+
 /* MEDIA @ 695px & 1300px */
+
 @media (min-width: 695px) and (max-width: 1300px) {
   .side-menu {
     position: absolute;
@@ -296,13 +288,11 @@
     border-top-style: solid;
     overflow: auto;
   }
-
   #sat-infobox:after {
     content: "";
     height: 100px;
     display: block;
   }
-
   .sat-infobox-fullsize {
     padding: 0 10px 0px 10px !important;
   }
@@ -341,7 +331,10 @@
 }
 /* MEDIA @ 695px & 1300px */
 
+/* MEDIA @ 695px & 1300px */
+
 /* MEDIA @ 1300px */
+
 @media (max-width: 1300px) {
   #social-alt {
     display: block;
@@ -349,20 +342,13 @@
     top: 0px;
     height: 50px;
   }
-  #menu-space-stations,
-  #menu-launches,
-  #menu-record,
-  #menu-twitter,
-  #menu-color-scheme,
-  #social,
-  #version-info,
-  #fastCompSettings {
+  #menu-space-stations, #menu-launches, #menu-record, #menu-twitter, #menu-color-scheme, #social, #version-info, #fastCompSettings {
     display: none;
   }
   #mobile-warning {
     display: block;
-    margin-top:10px;
-    color:#48f3e3 !important
+    margin-top: 10px;
+    color: #48f3e3 !important
   }
   #jday {
     display: none;
@@ -382,7 +368,7 @@
     border: 0px solid #ffffff !important;
     background: #ffffff !important;
   }
-  .ui-timepicker-div dl  {
+  .ui-timepicker-div dl {
     text-align: center !important;
   }
   /* #sat-hoverbox {
@@ -405,7 +391,6 @@
     height: 35px;
     margin: 8px -15px;
   }
-
   #search-results {
     display: none;
     position: absolute;
@@ -421,41 +406,30 @@
     border-color: #0277bd;
   }
   #search-holder {
-    display: inline-flex;
+    display: flex;
     top: 0px;
-    /* background: #03a9f4 !important; */
-    width: 175px;
     height: 50px;
-    /* left: 100%; */
   }
   #search {
-    font-size: 24px;
     padding-bottom: 5px;
     height: 16px;
     margin: 0;
-    /* margin-left: 20px; */
     margin-top: 15px;
-    padding-top: 5px;
-    width: 90%;
   }
-
   #search-holder input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0px 1000px #0277bd inset;
+    box-shadow: 0 0 0px 1000px #0277bd inset;
     background-color: #0277bd !important;
     -webkit-text-fill-color: white !important;
     color: white !important;
   }
-
   #search-close {
     padding: 0px 6.25%;
     font-size: 24px;
   }
-
   .top-menu-btns {
     padding: 0px 5px !important;
     height: 50px !important;
   }
-
   .github-share-down {
     transition: 1s;
     top: 50px !important;
@@ -482,7 +456,6 @@
     transition: 1s;
     top: 0px !important;
   }
-
   #time-machine-menu {
     padding-left: 35px;
     color: white;
@@ -497,7 +470,6 @@
     border-style: solid;
     border-color: #0277bd;
   }
-
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
@@ -512,34 +484,32 @@
     border-style: solid;
     border-color: #0277bd;
   }
-
   nav, nav .nav-wrapper i, nav a.sidenav-trigger, nav a.sidenav-trigger i {
     height: 50px;
     line-height: 50px;
   }
-
   ::-webkit-scrollbar {
     display: none;
   }
-
-  .search-slide-down {
+  .search-slide-down input[type=search] {
     transition: 1s;
-    margin-right: 0px;
+    width: 180px;
   }
-  .search-slide-up {
+  .search-slide-up input[type=search] {
     transition: 1s;
-    margin-right: -300px;
-    padding-left: 25px;
+    width: 0px;
   }
 }
 /* MEDIA @ 695px & 1300px */
 
+/* MEDIA @ 695px & 1300px */
+
 /* MEDIA @ 694px */
+
 @media (max-width: 694px) {
   .material-tooltip {
     display: none !important;
   }
-
   #sat-infobox {
     display: none;
     background: #0a97d6;
@@ -556,13 +526,11 @@
     border-top-style: solid;
     overflow: auto;
   }
-
   #sat-infobox:after {
     content: "";
     height: 150px;
     display: block;
   }
-
   .sat-infobox-fullsize {
     padding: 0 10px 0px 10px !important;
   }
@@ -574,10 +542,10 @@
     overflow: hidden;
   }
   #bottom-icons-container {
-      width: 100%;
-      height: 100%;
-      padding: 10px;
-      overflow: scroll;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    overflow: scroll;
   }
   #bottom-icons {
     display: grid;
@@ -599,7 +567,6 @@
     transition: 1s;
     bottom: 0px !important;
   }
-
   footer {
     margin-top: -100px;
     position: absolute;
@@ -622,13 +589,26 @@
     display: none;
   }
 }
+
 /* MEDIA @ 694px */
 
 /* MEDIA @ 320px */
+
 @media (max-width: 320px) {
-  #search-holder {
-    width: 45vw;
+  #search {
+    padding-bottom: 5px;
+    height: 16px;
+    margin: 0;
+    margin-top: 15px;
+  }
+  .search-slide-down input[type=search] {
+    transition: 1s;
+    width: 140px;
+  }
+  .search-slide-up input[type=search] {
+    transition: 1s;
+    width: 0px;
   }
 }
-/* MEDIA @ 320px */
 
+/* MEDIA @ 320px */

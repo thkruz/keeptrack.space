@@ -22,7 +22,7 @@ or mirrored at any other location without the express written permission of the 
 // Public Variables
 try {
   var recorder = new CanvasRecorder(document.getElementById('canvas'));
-} catch (e){
+} catch (e) {
   console.log(e);
 }
 var bodyDOM = $('#bodyDOM');
@@ -58,14 +58,14 @@ var clickedSat = 0;
 
 // Public Functions
 
-function saveVariable (variable) {
+function saveVariable(variable) {
   db.log('saveVariable');
   variable = JSON.stringify(variable);
-  var blob = new Blob([variable], {type: 'text/plain;charset=utf-8'});
+  var blob = new Blob([variable], { type: 'text/plain;charset=utf-8' });
   saveAs(blob, 'variable.txt');
 }
 
-function saveCsv (items,name) {
+function saveCsv(items, name) {
   db.log('saveCsv');
   const replacer = (key, value) => value === null ? '' : value; // specify how you want to handle null values here
   const header = Object.keys(items[0]);
@@ -73,7 +73,7 @@ function saveCsv (items,name) {
   csv.unshift(header.join(','));
   csv = csv.join('\r\n');
 
-  var blob = new Blob([csv], {type: 'text/plain;charset=utf-8'});
+  var blob = new Blob([csv], { type: 'text/plain;charset=utf-8' });
   saveAs(blob, `${name}.csv`);
 }
 
@@ -119,7 +119,7 @@ var speedModifier = 1;
   var touchHoldButton = '';
   $(document).ready(function () { // Code Once index.htm is loaded
     if (settingsManager.offline) updateInterval = 250;
-    (function _licenseCheck () {
+    (function _licenseCheck() {
       db.log('_licenseCheck');
       if (typeof satel === 'undefined') satel = null;
       if (settingsManager.offline && !_clk()) {
@@ -128,21 +128,21 @@ var speedModifier = 1;
         $('#license-watermark').show();
         console.warn('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
         console.warn('You will be redirected to the online version of keeptrack in 2 minutes.');
-        setTimeout(function() { window.location.replace('http://s4ts.com'); }, 1000 * 60 * 2);
+        setTimeout(function () { window.location.replace('http://s4ts.com'); }, 1000 * 60 * 2);
         // throw new Error('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
       } else {
         if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Offline Software', settingsManager.offlineLocation, 'Licensed');
       }
       uiManager.resize2DMap();
     })();
-    (function _httpsCheck () {
+    (function _httpsCheck() {
       db.log('_httpsCheck');
-        if (location.protocol !== 'https:') {
-          $('#cs-geolocation').hide();
-          $('#geolocation-btn').hide();
-        }
+      if (location.protocol !== 'https:') {
+        $('#cs-geolocation').hide();
+        $('#geolocation-btn').hide();
+      }
     })();
-    (function _uiInit () {
+    (function _uiInit() {
       // Register all UI callback functions with drawLoop in main.js
       // These run during the draw loop
       drawLoopCallback = function () {
@@ -167,7 +167,7 @@ var speedModifier = 1;
         $('#settings-lowperf').hide();
       }
     })();
-    (function _menuInit () {
+    (function _menuInit() {
       db.log('_menuInit');
       // Load the current JDAY
       var jday = 'JDAY: ' + timeManager.getDayOfYear(timeManager.propTime());
@@ -185,7 +185,7 @@ var speedModifier = 1;
 
       // Initialize Navigation Menu
       $('.dropdown-button').dropdown();
-      $('.tooltipped').tooltip({delay: 50});
+      $('.tooltipped').tooltip({ delay: 50 });
 
       // Initialize Materialize Select Menus
       M.AutoInit();
@@ -203,12 +203,13 @@ var speedModifier = 1;
         addSliderAccess: true,
         // minDate: -14, // No more than 7 days in the past
         // maxDate: 14, // or 7 days in the future to make sure ELSETs are valid
-        sliderAccessArgs: { touchonly: false }}).on('change.dp', function (e) {
-          // This code gets called when the done button is pressed or the time sliders are closed
-          $('#datetime-input').fadeOut();
-          _updateNextPassOverlay(true);
-          settingsManager.isEditTime = false;
-        });
+        sliderAccessArgs: { touchonly: false }
+      }).on('change.dp', function (e) {
+        // This code gets called when the done button is pressed or the time sliders are closed
+        $('#datetime-input').fadeOut();
+        _updateNextPassOverlay(true);
+        settingsManager.isEditTime = false;
+      });
 
       // Setup Legend Colors
       uiManager.legendColorsChange();
@@ -228,29 +229,29 @@ var speedModifier = 1;
     })();
 
     var isNotColorPickerInitialSetup = false;
-    (function _setupColorPicker () {
+    (function _setupColorPicker() {
       db.log('_setupColorPicker');
       var colorPalette = [
         _rgbCSS([1.0, 0.0, 0.0, 1.0]), // Red
         _rgbCSS([1.0, 0.75, 0.0, 1.0]), // Orange
         _rgbCSS([0.85, 0.5, 0.0, 1.0]), // Dark Orange
         _rgbCSS([1.0, 1.0, 0.0, 1.0]), // Yellow
-        _rgbCSS([0,1,0,1]), // Green
+        _rgbCSS([0, 1, 0, 1]), // Green
         _rgbCSS([0.2, 1.0, 0.0, 0.5]), // Mint
         _rgbCSS([0.2, 1.0, 1.0, 1.0]), // Bright Green
-        _rgbCSS([0,0,1,1]), // Royal Blue
+        _rgbCSS([0, 0, 1, 1]), // Royal Blue
         _rgbCSS([0.2, 0.4, 1.0, 1]), // Dark Blue
         _rgbCSS([0.64, 0.0, 0.64, 1.0]), // Purple
         _rgbCSS([1.0, 0.0, 0.6, 1.0]), // Pink
         _rgbCSS([0.5, 0.5, 0.5, 1]), // Gray
-        _rgbCSS([1,1,1,1]), // White
+        _rgbCSS([1, 1, 1, 1]), // White
       ];
-      $('#settings-color-payload').css({'backgroundColor': _rgbCSS(settingsManager.colors.payload)});
+      $('#settings-color-payload').css({ 'backgroundColor': _rgbCSS(settingsManager.colors.payload) });
       $('#settings-color-payload').colorPick({
-        'initialColor':_rgbCSS(settingsManager.colors.payload),
+        'initialColor': _rgbCSS(settingsManager.colors.payload),
         'palette': colorPalette,
-        'onColorSelected':function() {
-          this.element.css({'backgroundColor':this.color,'color':this.color});
+        'onColorSelected': function () {
+          this.element.css({ 'backgroundColor': this.color, 'color': this.color });
           if (isNotColorPickerInitialSetup) {
             settingsManager.colors.payload = getRGBA(this.color);
             uiManager.legendColorsChange();
@@ -259,12 +260,12 @@ var speedModifier = 1;
           }
         }
       });
-      $('#settings-color-rocketBody').css({'backgroundColor': _rgbCSS(settingsManager.colors.rocketBody)});
+      $('#settings-color-rocketBody').css({ 'backgroundColor': _rgbCSS(settingsManager.colors.rocketBody) });
       $('#settings-color-rocketBody').colorPick({
-        'initialColor':_rgbCSS(settingsManager.colors.rocketBody),
+        'initialColor': _rgbCSS(settingsManager.colors.rocketBody),
         'palette': colorPalette,
-        'onColorSelected':function() {
-          this.element.css({'backgroundColor':this.color,'color':this.color});
+        'onColorSelected': function () {
+          this.element.css({ 'backgroundColor': this.color, 'color': this.color });
           if (isNotColorPickerInitialSetup) {
             settingsManager.colors.rocketBody = getRGBA(this.color);
             uiManager.legendColorsChange();
@@ -273,12 +274,12 @@ var speedModifier = 1;
           }
         }
       });
-      $('#settings-color-debris').css({'backgroundColor': _rgbCSS(settingsManager.colors.debris)});
+      $('#settings-color-debris').css({ 'backgroundColor': _rgbCSS(settingsManager.colors.debris) });
       $('#settings-color-debris').colorPick({
-        'initialColor':_rgbCSS(settingsManager.colors.debris),
+        'initialColor': _rgbCSS(settingsManager.colors.debris),
         'palette': colorPalette,
-        'onColorSelected':function() {
-          this.element.css({'backgroundColor':this.color,'color':this.color});
+        'onColorSelected': function () {
+          this.element.css({ 'backgroundColor': this.color, 'color': this.color });
           if (isNotColorPickerInitialSetup) {
             settingsManager.colors.debris = getRGBA(this.color);
             uiManager.legendColorsChange();
@@ -288,10 +289,10 @@ var speedModifier = 1;
         }
       });
       $('#settings-color-inview').colorPick({
-        'initialColor':_rgbCSS(settingsManager.colors.inview),
+        'initialColor': _rgbCSS(settingsManager.colors.inview),
         'palette': colorPalette,
-        'onColorSelected':function() {
-          this.element.css({'backgroundColor':this.color,'color':this.color});
+        'onColorSelected': function () {
+          this.element.css({ 'backgroundColor': this.color, 'color': this.color });
           if (isNotColorPickerInitialSetup) {
             settingsManager.colors.inview = getRGBA(this.color);
             uiManager.legendColorsChange();
@@ -301,10 +302,10 @@ var speedModifier = 1;
         }
       });
       $('#settings-color-missile').colorPick({
-        'initialColor':_rgbCSS(settingsManager.colors.missile),
+        'initialColor': _rgbCSS(settingsManager.colors.missile),
         'palette': colorPalette,
-        'onColorSelected':function() {
-          this.element.css({'backgroundColor':this.color,'color':this.color});
+        'onColorSelected': function () {
+          this.element.css({ 'backgroundColor': this.color, 'color': this.color });
           if (isNotColorPickerInitialSetup) {
             settingsManager.colors.missile = getRGBA(this.color);
             uiManager.legendColorsChange();
@@ -314,10 +315,10 @@ var speedModifier = 1;
         }
       });
       $('#settings-color-missileInview').colorPick({
-        'initialColor':_rgbCSS(settingsManager.colors.missileInview),
+        'initialColor': _rgbCSS(settingsManager.colors.missileInview),
         'palette': colorPalette,
-        'onColorSelected':function() {
-          this.element.css({'backgroundColor':this.color,'color':this.color});
+        'onColorSelected': function () {
+          this.element.css({ 'backgroundColor': this.color, 'color': this.color });
           if (isNotColorPickerInitialSetup) {
             settingsManager.colors.missileInview = getRGBA(this.color);
             uiManager.legendColorsChange();
@@ -327,10 +328,10 @@ var speedModifier = 1;
         }
       });
       $('#settings-color-trusat').colorPick({
-        'initialColor':_rgbCSS(settingsManager.colors.trusat),
+        'initialColor': _rgbCSS(settingsManager.colors.trusat),
         'palette': colorPalette,
-        'onColorSelected':function() {
-          this.element.css({'backgroundColor':this.color,'color':this.color});
+        'onColorSelected': function () {
+          this.element.css({ 'backgroundColor': this.color, 'color': this.color });
           if (isNotColorPickerInitialSetup) {
             settingsManager.colors.trusat = getRGBA(this.color);
             uiManager.legendColorsChange();
@@ -344,7 +345,7 @@ var speedModifier = 1;
 
 
     uiManager.clearRMBSubMenu = () => {
-      db.log('uiManager.clearRMBSubMenu',true);
+      db.log('uiManager.clearRMBSubMenu', true);
       rightBtnSaveMenuDOM.hide();
       rightBtnViewMenuDOM.hide();
       rightBtnEditMenuDOM.hide();
@@ -354,7 +355,7 @@ var speedModifier = 1;
       rightBtnEarthMenuDOM.hide();
     }
 
-    (function _menuController () {
+    (function _menuController() {
       db.log('_menuController');
 
       // Reset time if in retro mode
@@ -495,18 +496,18 @@ var speedModifier = 1;
             }
             break;
           case "legend-satHi-box":
-              if (ColorScheme.objectTypeFlags.satHi) {
-                ColorScheme.objectTypeFlags.satHi = false;
-                $('.legend-satHi-box').css('background', 'black');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              } else {
-                ColorScheme.objectTypeFlags.satHi = true;
-                $('.legend-satHi-box').css('background', 'rgb(250, 250, 250)');
-                settingsManager.isForceColorScheme = true;
-                satSet.setColorScheme(settingsManager.currentColorScheme, true);
-              }
-              break;
+            if (ColorScheme.objectTypeFlags.satHi) {
+              ColorScheme.objectTypeFlags.satHi = false;
+              $('.legend-satHi-box').css('background', 'black');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            } else {
+              ColorScheme.objectTypeFlags.satHi = true;
+              $('.legend-satHi-box').css('background', 'rgb(250, 250, 250)');
+              settingsManager.isForceColorScheme = true;
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+            }
+            break;
           case "legend-satMed-box":
             if (ColorScheme.objectTypeFlags.satMed) {
               ColorScheme.objectTypeFlags.satMed = false;
@@ -558,7 +559,7 @@ var speedModifier = 1;
               settingsManager.isForceColorScheme = true;
               satSet.setColorScheme(settingsManager.currentColorScheme, true);
             }
-          break;
+            break;
           case "legend-velocityMed-box":
             if (ColorScheme.objectTypeFlags.velocityMed) {
               ColorScheme.objectTypeFlags.velocityMed = false;
@@ -781,7 +782,7 @@ var speedModifier = 1;
           //     satSet.setColorScheme(settingsManager.currentColorScheme, true);
           //   }
           //   break;
-            case "legend-countryUS-box":
+          case "legend-countryUS-box":
             if (ColorScheme.objectTypeFlags.countryUS) {
               ColorScheme.objectTypeFlags.countryUS = false;
               $('.legend-countryUS-box').css('background', 'black');
@@ -870,9 +871,9 @@ var speedModifier = 1;
       });
 
       // When any sensor is selected
-      $('#sensor-list-content > div > ul > .menu-selectable').on("click", function() {
-         adviceList.sensor();
-       });
+      $('#sensor-list-content > div > ul > .menu-selectable').on("click", function () {
+        adviceList.sensor();
+      });
 
       // USAF Radars
       $('#radar-cspocAll').on("click", function () {
@@ -989,9 +990,9 @@ var speedModifier = 1;
         let sat = $('#anal-sat').val();
         let sensor = sensorManager.currentSensor.shortName;
         if (typeof sensor == 'undefined') {
-          $.colorbox({href: `https://keeptrack.space/analysis/?sat=${sat}&type=${chartType}`, iframe: true, width: '60%', height: '60%', fastIframe: false, closeButton: false});
+          $.colorbox({ href: `https://keeptrack.space/analysis/?sat=${sat}&type=${chartType}`, iframe: true, width: '60%', height: '60%', fastIframe: false, closeButton: false });
         } else {
-          $.colorbox({href: `https://keeptrack.space/analysis/?sat=${sat}&type=${chartType}&sensor=${sensor}`, iframe: true, width: '60%', height: '60%', fastIframe: false, closeButton: false});
+          $.colorbox({ href: `https://keeptrack.space/analysis/?sat=${sat}&type=${chartType}&sensor=${sensor}`, iframe: true, width: '60%', height: '60%', fastIframe: false, closeButton: false });
         }
         e.preventDefault();
       });
@@ -999,9 +1000,9 @@ var speedModifier = 1;
         let sats = $('#analysis-bpt-sats').val();
         if (!sensorManager.checkSensorSelected()) {
           // Default to COD
-          satellite.findBestPasses(sats,sensorManager.sensorList.COD);
+          satellite.findBestPasses(sats, sensorManager.sensorList.COD);
         } else {
-          satellite.findBestPasses(sats,sensorManager.selectedSensor);
+          satellite.findBestPasses(sats, sensorManager.selectedSensor);
         }
         e.preventDefault();
       });
@@ -1256,7 +1257,7 @@ var speedModifier = 1;
           TLE2: sat.TLE2
         };
         var variable = JSON.stringify(sat2);
-        var blob = new Blob([variable], {type: 'text/plain;charset=utf-8'});
+        var blob = new Blob([variable], { type: 'text/plain;charset=utf-8' });
         saveAs(blob, scc + '.tle');
         e.preventDefault();
       });
@@ -1402,7 +1403,7 @@ var speedModifier = 1;
           saveWatchlist[i] = sat.SCC_NUM;
         }
         var variable = JSON.stringify(saveWatchlist);
-        var blob = new Blob([variable], {type: 'text/plain;charset=utf-8'});
+        var blob = new Blob([variable], { type: 'text/plain;charset=utf-8' });
         saveAs(blob, 'watchlist.json');
         e.preventDefault();
       });
@@ -1579,7 +1580,7 @@ var speedModifier = 1;
                   sat = origsat;
                   var iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7);
 
-                  var rascOffset = (-rascVariation/2) + (rascVariation * (rascIterat / 4));
+                  var rascOffset = (-rascVariation / 2) + (rascVariation * (rascIterat / 4));
 
                   var iTLEs;
                   // Ignore argument of perigee for round orbits OPTIMIZE
@@ -1593,7 +1594,7 @@ var speedModifier = 1;
 
                   // For the first 30
                   var inc = TLE2.substr(8, 8);
-                  inc = parseFloat(inc - (incVariation/2) + (incVariation * (incIterat / 4))).toPrecision(7);
+                  inc = parseFloat(inc - (incVariation / 2) + (incVariation * (incIterat / 4))).toPrecision(7);
                   inc = inc.split('.');
                   inc[0] = inc[0].substr(-3, 3);
                   if (inc[1]) {
@@ -1606,7 +1607,7 @@ var speedModifier = 1;
 
                   // For the second 30
                   var meanmo = iTLE2.substr(52, 10);
-                  meanmo = parseFloat(meanmo - (meanmo*meanmoVariation/2) + (meanmo*meanmoVariation * (meanmoIterat / 4))).toPrecision(10);
+                  meanmo = parseFloat(meanmo - (meanmo * meanmoVariation / 2) + (meanmo * meanmoVariation * (meanmoIterat / 4))).toPrecision(10);
                   // meanmo = parseFloat(meanmo - (0.005 / 10) + (0.01 * ((meanmoIterat + 1) / 10))).toPrecision(10);
                   meanmo = meanmo.split('.');
                   meanmo[0] = meanmo[0].substr(-2, 2);
@@ -1955,60 +1956,60 @@ var speedModifier = 1;
 
       if (row === -1 && satChngTable.length === 0) { // Only generate the table if receiving the -1 argument for the first time
         $.get('/analysis/satchng.json?v=' + settingsManager.versionNumber)
-        .done(function (resp) {
-          resp = [...new Set(resp)];
-          for (let i = 0; i < resp.length; i++) {
-            var prefix = (resp[i].year > 50) ? '19' : '20';
-            var year = parseInt(prefix + resp[i].year.toString());
-            var date = timeManager.dateFromDay(year, resp[i].day);
-            date = new Date(date.getTime() + (resp[i].day % 1) * 1440 * 60000);
-            resp[i].date = date;
-          }
-          satChngTable = resp;
-          // satChng Menu
-          var tbl = document.getElementById('satChng-table'); // Identify the table to update
-          tbl.innerHTML = '';                                  // Clear the table from old object data
-          // var tblLength = 0;                                   // Iniially no rows to the table
-
-          var tr = tbl.insertRow();
-          var tdT = tr.insertCell();
-          tdT.appendChild(document.createTextNode('Time'));
-          tdT.setAttribute('style', 'text-decoration: underline');
-          var tdSat = tr.insertCell();
-          tdSat.appendChild(document.createTextNode('Sat'));
-          tdSat.setAttribute('style', 'text-decoration: underline');
-          var tdInc = tr.insertCell();
-          tdInc.appendChild(document.createTextNode('Inc'));
-          tdInc.setAttribute('style', 'text-decoration: underline');
-          var tdPer = tr.insertCell();
-          tdPer.appendChild(document.createTextNode('Per'));
-          tdPer.setAttribute('style', 'text-decoration: underline');
-
-          for (let i = 0; i < Math.min(satChngTable.length,20); i++) {                       // 20 rows
-            tr = tbl.insertRow();
-            tr.setAttribute('class', 'satChng-object link');
-            tr.setAttribute('hiddenrow', i);
-            tdT = tr.insertCell();
-            var dateStr = satChngTable[i].date.toJSON();
-            var timeTextStr = '';
-            for (var iText = 0; iText < 20; iText++) {
-              if (iText < 10) timeTextStr += dateStr[iText];
-              if (iText === 10) timeTextStr += ' ';
-              if (iText > 11) timeTextStr += dateStr[iText-1];
+          .done(function (resp) {
+            resp = [...new Set(resp)];
+            for (let i = 0; i < resp.length; i++) {
+              var prefix = (resp[i].year > 50) ? '19' : '20';
+              var year = parseInt(prefix + resp[i].year.toString());
+              var date = timeManager.dateFromDay(year, resp[i].day);
+              date = new Date(date.getTime() + (resp[i].day % 1) * 1440 * 60000);
+              resp[i].date = date;
             }
-            tdT.appendChild(document.createTextNode(timeTextStr));
-            tdSat = tr.insertCell();
-            tdSat.appendChild(document.createTextNode(satChngTable[i].SCC));
-            tdInc = tr.insertCell();
-            tdInc.appendChild(document.createTextNode(satChngTable[i].inc.toFixed(2)));
-            tdPer = tr.insertCell();
-            let deltaMeanMo = satChngTable[i].meanmo;
-            let sat = satSet.getSat(satSet.getIdFromObjNum(satChngTable[i].SCC));
-            let origPer = (1440/(parseFloat(sat.meanMotion) + deltaMeanMo));
-            let perDelta = (1440/parseFloat(sat.meanMotion)) - (origPer);
-            tdPer.appendChild(document.createTextNode((perDelta).toFixed(2)));
-          }
-        });
+            satChngTable = resp;
+            // satChng Menu
+            var tbl = document.getElementById('satChng-table'); // Identify the table to update
+            tbl.innerHTML = '';                                  // Clear the table from old object data
+            // var tblLength = 0;                                   // Iniially no rows to the table
+
+            var tr = tbl.insertRow();
+            var tdT = tr.insertCell();
+            tdT.appendChild(document.createTextNode('Time'));
+            tdT.setAttribute('style', 'text-decoration: underline');
+            var tdSat = tr.insertCell();
+            tdSat.appendChild(document.createTextNode('Sat'));
+            tdSat.setAttribute('style', 'text-decoration: underline');
+            var tdInc = tr.insertCell();
+            tdInc.appendChild(document.createTextNode('Inc'));
+            tdInc.setAttribute('style', 'text-decoration: underline');
+            var tdPer = tr.insertCell();
+            tdPer.appendChild(document.createTextNode('Per'));
+            tdPer.setAttribute('style', 'text-decoration: underline');
+
+            for (let i = 0; i < Math.min(satChngTable.length, 20); i++) {                       // 20 rows
+              tr = tbl.insertRow();
+              tr.setAttribute('class', 'satChng-object link');
+              tr.setAttribute('hiddenrow', i);
+              tdT = tr.insertCell();
+              var dateStr = satChngTable[i].date.toJSON();
+              var timeTextStr = '';
+              for (var iText = 0; iText < 20; iText++) {
+                if (iText < 10) timeTextStr += dateStr[iText];
+                if (iText === 10) timeTextStr += ' ';
+                if (iText > 11) timeTextStr += dateStr[iText - 1];
+              }
+              tdT.appendChild(document.createTextNode(timeTextStr));
+              tdSat = tr.insertCell();
+              tdSat.appendChild(document.createTextNode(satChngTable[i].SCC));
+              tdInc = tr.insertCell();
+              tdInc.appendChild(document.createTextNode(satChngTable[i].inc.toFixed(2)));
+              tdPer = tr.insertCell();
+              let deltaMeanMo = satChngTable[i].meanmo;
+              let sat = satSet.getSat(satSet.getIdFromObjNum(satChngTable[i].SCC));
+              let origPer = (1440 / (parseFloat(sat.meanMotion) + deltaMeanMo));
+              let perDelta = (1440 / parseFloat(sat.meanMotion)) - (origPer);
+              tdPer.appendChild(document.createTextNode((perDelta).toFixed(2)));
+            }
+          });
       }
       if (row !== -1) { // If an object was selected from the menu
         searchBox.doSearch(satChngTable[row].SCC); // Actually perform the search of the two objects
@@ -2018,7 +2019,7 @@ var speedModifier = 1;
 
     var socratesObjOne = []; // Array for tr containing CATNR1
     var socratesObjTwo = []; // Array for tr containing CATNR2
-    function _socrates (row) {
+    function _socrates(row) {
       db.log('_socrates');
       // SOCRATES Variables
 
@@ -2071,7 +2072,7 @@ var speedModifier = 1;
             var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
             var socratesTimeS = socratesTime[2].split('.'); // Split time from date for easier management
             tdT.appendChild(document.createTextNode(socratesDate[2] + ' ' + socratesDate[1] + ' ' + socratesDate[0] + ' - ' + _pad0(socratesTime[0], 2) + ':' +
-            _pad0(socratesTime[1], 2) + ':' + _pad0(socratesTimeS[0], 2) + 'Z'));
+              _pad0(socratesTime[1], 2) + ':' + _pad0(socratesTimeS[0], 2) + 'Z'));
             tdS1 = tr.insertCell();
             tdS1.appendChild(document.createTextNode(socratesObjOne[i][1]));
             tdS2 = tr.insertCell();
@@ -2086,7 +2087,7 @@ var speedModifier = 1;
         settingsManager.socratesOnSatCruncher = satSet.getIdFromObjNum(socratesObjOne[row][1]);
       } // If a row was selected
 
-      function findFutureDate (socratesObjTwo) {
+      function findFutureDate(socratesObjTwo) {
         var socratesDate = socratesObjTwo[row][4].split(' '); // Date/time is on the second line 5th column
         var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
 
@@ -2097,7 +2098,7 @@ var speedModifier = 1;
         var sMin = parseInt(socratesTime[1]); // UTC Min
         var sSec = parseInt(socratesTime[2]); // UTC Sec - This is a decimal, but when we convert to int we drop those
 
-        function MMMtoInt (month) {
+        function MMMtoInt(month) {
           switch (month) {
             case 'Jan':
               return 0;
@@ -2142,7 +2143,7 @@ var speedModifier = 1;
         timeManager.propTime();
       } // Allows passing -1 argument to socrates function to skip these steps
     }
-    function _bottomIconPress (evt) {
+    function _bottomIconPress(evt) {
       db.log('_bottomIconPress');
       db.log(evt.currentTarget.id);
       if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Bottom Icon', evt.currentTarget.id, 'Selected');
@@ -2164,7 +2165,7 @@ var speedModifier = 1;
         case 'menu-info-overlay':
           if (!sensorManager.checkSensorSelected()) { // No Sensor Selected
             if (!$('#menu-info-overlay:animated').length) {
-              $('#menu-info-overlay').effect('shake', {distance: 10});
+              $('#menu-info-overlay').effect('shake', { distance: 10 });
             }
             break;
           }
@@ -2175,19 +2176,19 @@ var speedModifier = 1;
           } else {
             uiManager.hideSideMenus();
             if ((nextPassArray.length === 0 || nextPassEarliestTime > timeManager.now ||
-                new Date(nextPassEarliestTime * 1 + (1000 * 60 * 60 * 24)) < timeManager.now) ||
-                isWatchlistChanged) {
+              new Date(nextPassEarliestTime * 1 + (1000 * 60 * 60 * 24)) < timeManager.now) ||
+              isWatchlistChanged) {
               $('#loading-screen').fadeIn('slow', function () {
-                  nextPassArray = [];
-                  for (var x = 0; x < watchlistList.length; x++) {
-                    nextPassArray.push(satSet.getSatExtraOnly(watchlistList[x]));
-                  }
-                  nextPassArray = satellite.nextpassList(nextPassArray);
-                  nextPassArray.sort(function(a, b) {
-                      return new Date(a.time) - new Date(b.time);
-                  });
-                  nextPassEarliestTime = timeManager.now;
-                  lastOverlayUpdateTime = 0;
+                nextPassArray = [];
+                for (var x = 0; x < watchlistList.length; x++) {
+                  nextPassArray.push(satSet.getSatExtraOnly(watchlistList[x]));
+                }
+                nextPassArray = satellite.nextpassList(nextPassArray);
+                nextPassArray.sort(function (a, b) {
+                  return new Date(a.time) - new Date(b.time);
+                });
+                nextPassEarliestTime = timeManager.now;
+                lastOverlayUpdateTime = 0;
                 _updateNextPassOverlay(true);
                 $('#loading-screen').fadeOut();
                 isWatchlistChanged = false;
@@ -2205,7 +2206,7 @@ var speedModifier = 1;
           if (!sensorManager.checkSensorSelected()) { // No Sensor Selected
             adviceList.sensorInfoDisabled();
             if (!$('#menu-sensor-info:animated').length) {
-              $('#menu-sensor-info').effect('shake', {distance: 10});
+              $('#menu-sensor-info').effect('shake', { distance: 10 });
             }
             break;
           }
@@ -2233,7 +2234,7 @@ var speedModifier = 1;
             if (!sensorManager.checkSensorSelected() || sat.static || sat.missile || objectManager.selectedSat === -1) { // No Sensor or Satellite Selected
               adviceList.lookanglesDisabled();
               if (!$('#menu-lookangles:animated').length) {
-                $('#menu-lookangles').effect('shake', {distance: 10});
+                $('#menu-lookangles').effect('shake', { distance: 10 });
               }
               break;
             }
@@ -2306,7 +2307,7 @@ var speedModifier = 1;
             }
             if (sensorManager.checkSensorSelected()) {
               $('#anal-type').html(
-              `<optgroup label="Orbital Parameters">
+                `<optgroup label="Orbital Parameters">
                   <option value='inc'>Inclination</option>
                   <option value='ap'>Apogee</option>
                   <option value='pe'>Perigee</option>
@@ -2366,7 +2367,7 @@ var speedModifier = 1;
             if (objectManager.selectedSat === -1) { // No Satellite Selected
               adviceList.ssnLookanglesDisabled();
               if (!$('#menu-lookanglesmultisite:animated').length) {
-                $('#menu-lookanglesmultisite').effect('shake', {distance: 10});
+                $('#menu-lookanglesmultisite').effect('shake', { distance: 10 });
               }
               break;
             }
@@ -2426,7 +2427,7 @@ var speedModifier = 1;
             if (objectManager.selectedSat === -1) { // No Satellite Selected
               adviceList.mapDisabled();
               if (!$('#menu-map:animated').length) {
-                $('#menu-map').effect('shake', {distance: 10});
+                $('#menu-map').effect('shake', { distance: 10 });
               }
               break;
             }
@@ -2436,7 +2437,7 @@ var speedModifier = 1;
             settingsManager.isMapMenuOpen = true;
             uiManager.updateMap();
             var satData = satSet.getSatExtraOnly(objectManager.selectedSat);
-            $('#map-sat').tooltip({delay: 50, html: satData.SCC_NUM, position: 'left'});
+            $('#map-sat').tooltip({ delay: 50, html: satData.SCC_NUM, position: 'left' });
             $('#menu-map').addClass('bmenu-item-selected');
             break;
           }
@@ -2450,9 +2451,9 @@ var speedModifier = 1;
             if (settingsManager.isMobileModeEnabled) mobile.searchToggle(false);
             uiManager.hideSideMenus();
             if (location.protocol === 'https:') {
-              $.colorbox({href: 'https://space.skyrocket.de/doc_chr/lau2020.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+              $.colorbox({ href: 'https://space.skyrocket.de/doc_chr/lau2020.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false });
             } else {
-              $.colorbox({href: 'http://space.skyrocket.de/doc_chr/lau2020.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false});
+              $.colorbox({ href: 'http://space.skyrocket.de/doc_chr/lau2020.htm', iframe: true, width: '80%', height: '80%', fastIframe: false, closeButton: false });
             }
             isLaunchMenuOpen = true;
             $('#menu-launches').addClass('bmenu-item-selected');
@@ -2564,7 +2565,7 @@ var speedModifier = 1;
             } else {
               adviceList.editSatDisabled();
               if (!$('#menu-editSat:animated').length) {
-                $('#menu-editSat').effect('shake', {distance: 10});
+                $('#menu-editSat').effect('shake', { distance: 10 });
               }
             }
           }
@@ -2588,7 +2589,7 @@ var speedModifier = 1;
             } else {
               adviceList.newLaunchDisabled();
               if (!$('#menu-newLaunch:animated').length) {
-                $('#menu-newLaunch').effect('shake', {distance: 10});
+                $('#menu-newLaunch').effect('shake', { distance: 10 });
               }
             }
             break;
@@ -2612,7 +2613,7 @@ var speedModifier = 1;
             } else {
               adviceList.breakupDisabled();
               if (!$('#menu-breakup:animated').length) {
-                $('#menu-breakup').effect('shake', {distance: 10});
+                $('#menu-breakup').effect('shake', { distance: 10 });
               }
             }
             break;
@@ -2644,7 +2645,7 @@ var speedModifier = 1;
             uiManager.hideSideMenus();
             break;
           } else {
-             if (settingsManager.isMobileModeEnabled) mobile.searchToggle(false);
+            if (settingsManager.isMobileModeEnabled) mobile.searchToggle(false);
             uiManager.hideSideMenus();
             $('#missile-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             $('#menu-missile').addClass('bmenu-item-selected');
@@ -2656,7 +2657,7 @@ var speedModifier = 1;
           if (!sensorManager.checkSensorSelected()) { // No Sensor Selected
             adviceList.bubbleDisabled();
             if (!$('#menu-fov-bubble:animated').length) {
-              $('#menu-fov-bubble').effect('shake', {distance: 10});
+              $('#menu-fov-bubble').effect('shake', { distance: 10 });
             }
             break;
           }
@@ -2689,7 +2690,7 @@ var speedModifier = 1;
           if (!sensorManager.checkSensorSelected()) { // No Sensor Selected
             adviceList.survFenceDisabled();
             if (!$('#menu-surveillance:animated').length) {
-              $('#menu-surveillance').effect('shake', {distance: 10});
+              $('#menu-surveillance').effect('shake', { distance: 10 });
             }
             break;
           }
@@ -2721,7 +2722,7 @@ var speedModifier = 1;
           if (objectManager.selectedSat === -1 && $('#search').val() === "") { // No Sat Selected and No Search Present
             adviceList.satFOVDisabled();
             if (!$('#menu-sat-fov:animated').length) {
-              $('#menu-sat-fov').effect('shake', {distance: 10});
+              $('#menu-sat-fov').effect('shake', { distance: 10 });
             }
             break;
           }
@@ -2871,7 +2872,7 @@ var speedModifier = 1;
             } else {
               adviceList.planetariumDisabled();
               if (!$('#menu-planetarium:animated').length) {
-                $('#menu-planetarium').effect('shake', {distance: 10});
+                $('#menu-planetarium').effect('shake', { distance: 10 });
               }
             }
             break;
@@ -2905,7 +2906,7 @@ var speedModifier = 1;
               $('#menu-astronomy').addClass('bmenu-item-selected');
             } else {
               if (!$('#menu-astronomy:animated').length) {
-                $('#menu-astronomy').effect('shake', {distance: 10});
+                $('#menu-astronomy').effect('shake', { distance: 10 });
               }
             }
             break;
@@ -2926,7 +2927,7 @@ var speedModifier = 1;
             } else {
               adviceList.satViewDisabled();
               if (!$('#menu-satview:animated').length) {
-                $('#menu-satview').effect('shake', {distance: 10});
+                $('#menu-satview').effect('shake', { distance: 10 });
               }
             }
             break;
@@ -2948,7 +2949,7 @@ var speedModifier = 1;
               $('#menu-record').removeClass('bmenu-item-selected');
               $('#menu-record').addClass('bmenu-item-disabled');
               if (!$('#menu-record:animated').length) {
-                $('#menu-record').effect('shake', {distance: 10});
+                $('#menu-record').effect('shake', { distance: 10 });
               }
             }
             // isVideoRecording = true;
@@ -3074,7 +3075,7 @@ var speedModifier = 1;
           '<div class="col s3 m3 l3">' + sat.SCC_NUM + '</div>' +
           '<div class="col s7 m7 l7">' + sat.ON + '</div>' +
           '<div class="col s2 m2 l2 center-align remove-icon"><img class="watchlist-remove" data-sat-id="' + sat.id + '" src="images/remove.png"></img></div>' +
-        '</div>';
+          '</div>';
       }
       $('#watchlist-list').html(watchlistListHTML);
       for (i = 0; i < watchlistList.length; i++) { // No duplicates
@@ -3093,20 +3094,20 @@ var speedModifier = 1;
     };
 
     var isCurrentlyTyping = false;
-    $('#search').on("focus", function(){
+    $('#search').on("focus", function () {
       db.log("$('#search').focus");
       isCurrentlyTyping = true;
     });
-    $('#ui-wrapper').on("focusin", function(){
+    $('#ui-wrapper').on("focusin", function () {
       db.log("$('#ui-wrapper').focusin");
       isCurrentlyTyping = true;
     });
 
-    $('#search').on("blur", function(){
+    $('#search').on("blur", function () {
       db.log("('#search').blur");
       isCurrentlyTyping = false;
     });
-    $('#ui-wrapper').on("focusout", function(){
+    $('#ui-wrapper').on("focusout", function () {
       db.log("('#ui-wrapper').focusout");
       isCurrentlyTyping = false;
     });
@@ -3259,7 +3260,7 @@ var speedModifier = 1;
         if (cameraType.current === cameraType.FPS) {
           fpsVertSpeed = settingsManager.fpsVertSpeed;
           isFPSVertSpeedLock = true;
-      }
+        }
         if (cameraType.current === cameraType.SATELLITE) {
           fpsRotateRate = -settingsManager.fpsRotateRate / speedModifier;
         }
@@ -3337,9 +3338,9 @@ var speedModifier = 1;
             $('#camera-status-box').hide();
           }, 3000);
           break;
-        }
+      }
 
-        switch (evt.key) {
+      switch (evt.key) {
         case '!':
           timeManager.propOffset = 0; // Reset to Current Time
           settingsManager.isPropRateChange = true;
@@ -3422,12 +3423,12 @@ var speedModifier = 1;
         timeManager.propTime();
       }
     }
-    function browserUnsupported () {
+    function browserUnsupported() {
       db.log('browserUnsupported');
       $('#canvas-holder').hide();
       $('#no-webgl').css('display', 'block');
     }
-    function _clk () {
+    function _clk() {
       db.log('_clk');
       lk1 = new Date(lk1);
       if (lk1 == 'undefined') return false;
@@ -3458,18 +3459,18 @@ var speedModifier = 1;
     }
   };
 
-  function _padEmpty (num, size) {
+  function _padEmpty(num, size) {
     var s = '   ' + num;
     return s.substr(s.length - size);
   }
-  function _pad0 (str, max) {
+  function _pad0(str, max) {
     return str.length < max ? _pad0('0' + str, max) : str;
   }
 
   // Callbacks from DrawLoop
   var infoOverlayDOM = [];
   var satNumberOverlay = [];
-  function _showSatTest () {
+  function _showSatTest() {
     return;
     // db.log('_showSatTest');
     // if (timeManager.now > (lastSatUpdateTime * 1 + 10000)) {
@@ -3482,15 +3483,15 @@ var speedModifier = 1;
 
   }
 
-  function _updateNextPassOverlay (isForceUpdate) {
+  function _updateNextPassOverlay(isForceUpdate) {
     if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
     db.log('_updateNextPassOverlay');
 
     // FIXME This should auto update the overlay when the time changes outside the original search window
     // Update once every 10 seconds
     if (((timeManager.now > (lastOverlayUpdateTime * 1 + 10000) &&
-                           objectManager.selectedSat === -1) &&
-                           !isDragging && zoomLevel === zoomTarget) || isForceUpdate) {
+      objectManager.selectedSat === -1) &&
+      !isDragging && zoomLevel === zoomTarget) || isForceUpdate) {
       var propTime = timeManager.propTime();
       infoOverlayDOM = [];
       infoOverlayDOM.push('<div>');
@@ -3505,23 +3506,23 @@ var speedModifier = 1;
         // Yellow - In View and Time to Next Pass is +/- 30 minutes
         if ((satInView && (nextPassArray[s].time - propTime < 1000 * 60 * 30) && (propTime - nextPassArray[s].time < 1000 * 60 * 30))) {
           infoOverlayDOM.push('<div class="row">' +
-                        '<h5 class="center-align watchlist-object link" style="color: yellow">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
-                        '</div>');
+            '<h5 class="center-align watchlist-object link" style="color: yellow">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
+            '</div>');
           continue;
         }
         // Blue - Time to Next Pass is between 10 minutes before and 20 minutes after the current time
         // This makes recent objects stay at the top of the list in blue
         if ((nextPassArray[s].time - propTime < 1000 * 60 * 10) && (propTime - nextPassArray[s].time < 1000 * 60 * 20)) {
           infoOverlayDOM.push('<div class="row">' +
-                        '<h5 class="center-align watchlist-object link" style="color: blue">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
-                        '</div>');
+            '<h5 class="center-align watchlist-object link" style="color: blue">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
+            '</div>');
           continue;
         }
         // White - Any future pass not fitting the above requirements
         if (nextPassArray[s].time - propTime > 0) {
           infoOverlayDOM.push('<div class="row">' +
-                      '<h5 class="center-align watchlist-object link" style="color: white">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
-                      '</div>');
+            '<h5 class="center-align watchlist-object link" style="color: white">' + nextPassArray[s].SCC_NUM + ': ' + time + '</h5>' +
+            '</div>');
         }
       }
       infoOverlayDOM.push('</div>');
@@ -3529,7 +3530,7 @@ var speedModifier = 1;
       lastOverlayUpdateTime = timeManager.now;
     }
   }
-  function _checkWatchlist () {
+  function _checkWatchlist() {
     if (watchlistList.length <= 0) return;
     db.log('_checkWatchlist');
     for (var i = 0; i < watchlistList.length; i++) {
@@ -3553,10 +3554,10 @@ var speedModifier = 1;
     // None of the sats on the watchlist are in view
     settingsManager.themes.blueTheme();
   }
-  function _updateSelectBox () {
+  function _updateSelectBox() {
     // Don't update if no object is selected
     if (objectManager.selectedSat === -1) return;
-    db.log('_updateSelectBox',true);
+    db.log('_updateSelectBox', true);
 
     var sat = satSet.getSat(objectManager.selectedSat);
 
@@ -3606,9 +3607,9 @@ var speedModifier = 1;
           $('#sat-range').prop('title', 'Range: ' + uiManager.currentTEARR.range.toFixed(2) + ' km');
         }
       } else {
-         $('#sat-azimuth').parent().hide();
-         $('#sat-elevation').parent().hide();
-         $('#sat-range').parent().hide();
+        $('#sat-azimuth').parent().hide();
+        $('#sat-elevation').parent().hide();
+        $('#sat-range').parent().hide();
       }
 
       if (objectManager.isSensorManagerLoaded) {
@@ -3632,9 +3633,9 @@ var speedModifier = 1;
       lastBoxUpdateTime = timeManager.now;
     }
   }
-  function _mobileScreenControls () {
+  function _mobileScreenControls() {
     if (settingsManager.isMobileModeEnabled) {
-      db.log('_mobileScreenControls',true);
+      db.log('_mobileScreenControls', true);
       if (touchHoldButton === '') return;
       if (touchHoldButton === 'zoom-in') {
         zoomTarget -= 0.0025;
@@ -3694,15 +3695,15 @@ var speedModifier = 1;
         if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
         break;
       case 'sunlight':
-          uiManager.legendMenuChange('sunlight');
-          satSet.setColorScheme(ColorScheme.sunlight, true);
-          uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-          settingsManager.isForceColorScheme = true;
-          satCruncher.postMessage({
-            isSunlightView: true,
-          });
-          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Sunlight', 'Selected');
-          break;
+        uiManager.legendMenuChange('sunlight');
+        satSet.setColorScheme(ColorScheme.sunlight, true);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        settingsManager.isForceColorScheme = true;
+        satCruncher.postMessage({
+          isSunlightView: true,
+        });
+        if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Sunlight', 'Selected');
+        break;
       case 'near-earth':
         uiManager.legendMenuChange('near');
         satSet.setColorScheme(ColorScheme.leo);
@@ -3778,7 +3779,7 @@ var speedModifier = 1;
         $('#cs-lon').val(settingsManager.geolocation.long).trigger("change");
         $('#cs-hei').val(settingsManager.geolocation.obshei).trigger("change");
 
-        $('#cs-telescope').attr('checked','checked');
+        $('#cs-telescope').attr('checked', 'checked');
         $('#cs-minaz').attr('disabled', true);
         $('#cs-maxaz').attr('disabled', true);
         $('#cs-minel').attr('disabled', true);
@@ -3874,9 +3875,9 @@ var speedModifier = 1;
     } else {
       $('.legend-trusat').hide();
     }
-    $('.legend-velocityFast-box').css('background', _rgbCSS([0.75,0.75,0,1]));
-    $('.legend-velocityMed-box').css('background', _rgbCSS([0.75,0.25,0,1]));
-    $('.legend-velocitySlow-box').css('background', _rgbCSS([1,0,0,1]));
+    $('.legend-velocityFast-box').css('background', _rgbCSS([0.75, 0.75, 0, 1]));
+    $('.legend-velocityMed-box').css('background', _rgbCSS([0.75, 0.25, 0, 1]));
+    $('.legend-velocitySlow-box').css('background', _rgbCSS([1, 0, 0, 1]));
     $('.legend-inviewAlt-box').css('background', _rgbCSS(settingsManager.colors.inviewAlt));
     $('.legend-rcsSmall-box').css('background', _rgbCSS(settingsManager.colors.rcsSmall));
     $('.legend-rcsMed-box').css('background', _rgbCSS(settingsManager.colors.rcsMed));
@@ -4037,7 +4038,7 @@ var speedModifier = 1;
   uiManager.colorSchemeChangeAlert = (scheme) => {
     for (var i = 0; i < Object.keys(ColorScheme).length; i++) {
       if (scheme == ColorScheme[Object.keys(ColorScheme)[i]]) {
-        M.toast({html: `Color Scheme changed to ${Object.keys(ColorScheme)[i]}`});
+        M.toast({ html: `Color Scheme changed to ${Object.keys(ColorScheme)[i]}` });
       }
     }
   };
@@ -4090,20 +4091,20 @@ var speedModifier = 1;
 
   _validateNumOnly = function (e) {
     // Allow: backspace, delete, tab, escape, enter and .
-      if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
-           // Allow: Ctrl+A, Command+A
-          (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
-           // Allow: home, end, left, right, down, up
-          (e.keyCode >= 35 && e.keyCode <= 40) ||
-          // Allow: period
-          (e.keyCode === 190)) {
-               // let it happen, don't do anything
-               return;
-      }
-      // Ensure that it is a number and stop the keypress
-      if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
-          e.preventDefault();
-      }
+    if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+      // Allow: Ctrl+A, Command+A
+      (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+      // Allow: home, end, left, right, down, up
+      (e.keyCode >= 35 && e.keyCode <= 40) ||
+      // Allow: period
+      (e.keyCode === 190)) {
+      // let it happen, don't do anything
+      return;
+    }
+    // Ensure that it is a number and stop the keypress
+    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+      e.preventDefault();
+    }
   };
 
   var $search = $('#search');
@@ -4265,7 +4266,7 @@ var speedModifier = 1;
     $('#menu-planetarium').addClass('bmenu-item-disabled');
     $('#menu-astronomy').addClass('bmenu-item-disabled');
 
-    setTimeout(function(){ satSet.setColorScheme(settingsManager.currentColorScheme, true); }, 2000);
+    setTimeout(function () { satSet.setColorScheme(settingsManager.currentColorScheme, true); }, 2000);
   };
 
   _offlineMessage = function () {
@@ -4273,36 +4274,36 @@ var speedModifier = 1;
     // ga('send', 'event', 'Expired Offline Software', settingsManager.offlineLocation, 'Expired');
   };
 
-  function getRGBA(str){
+  function getRGBA(str) {
     db.log('getRGBA');
-    var [r,g,b,a] = str.match(/[\d\.]+/g);
-    r = parseInt(r)/255;
-    g = parseInt(g)/255;
-    b = parseInt(b)/255;
+    var [r, g, b, a] = str.match(/[\d\.]+/g);
+    r = parseInt(r) / 255;
+    g = parseInt(g) / 255;
+    b = parseInt(b) / 255;
     a = parseFloat(a);
-    return [r,g,b,a];
+    return [r, g, b, a];
   }
 
-  function _hexToRgbA(hex){
+  function _hexToRgbA(hex) {
     db.log('_hexToRgbA');
     var c;
-    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
-        c= hex.substring(1).split('');
-        if(c.length== 3){
-            c= [c[0], c[0], c[1], c[1], c[2], c[2]];
-        }
-        c= '0x'+c.join('');
-        var r = ((c>>16)&255)/255;
-        var g = ((c>>8)&255)/255;
-        var b = (c&255)/255;
-        return [r, g, b, 1];
+    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+      c = hex.substring(1).split('');
+      if (c.length == 3) {
+        c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+      }
+      c = '0x' + c.join('');
+      var r = ((c >> 16) & 255) / 255;
+      var g = ((c >> 8) & 255) / 255;
+      var b = (c & 255) / 255;
+      return [r, g, b, 1];
     }
     throw new Error('Bad Hex');
   }
 
   function _rgbCSS(values) {
     db.log('_rgbCSS');
-    return `rgba(${values[0]*255},${values[1]*255},${values[2]*255},${values[3]})`;
+    return `rgba(${values[0] * 255},${values[1] * 255},${values[2] * 255},${values[3]})`;
   }
 
   var isFooterShown = true;
@@ -4379,16 +4380,16 @@ var speedModifier = 1;
   uiManager.saveHiResPhoto = (resolution) => {
     switch (resolution) {
       case 'hd':
-      settingsManager.hiResWidth = 1920;
-      settingsManager.hiResHeight = 1080;
+        settingsManager.hiResWidth = 1920;
+        settingsManager.hiResHeight = 1080;
         break;
       case '4k':
-      settingsManager.hiResWidth = 3840;
-      settingsManager.hiResHeight = 2160;
+        settingsManager.hiResWidth = 3840;
+        settingsManager.hiResHeight = 2160;
         break;
       case '8k':
-      settingsManager.hiResWidth = 7680;
-      settingsManager.hiResHeight = 4320;
+        settingsManager.hiResWidth = 7680;
+        settingsManager.hiResHeight = 4320;
         break;
     }
 
@@ -4402,7 +4403,7 @@ var speedModifier = 1;
   // Yaw needs fixed. Needs to incorporate a time calculation
   uiManager.panToStar = function (c) {
     db.log('uiManager.panToStar');
-    db.log(`c: ${c}`,true);
+    db.log(`c: ${c}`, true);
 
     // Try with the pname
     var satId = satSet.getIdFromStarName(c.pname);
@@ -4425,7 +4426,7 @@ var speedModifier = 1;
       starManager.isAllConstellationVisible = false;
     }
 
-    debugDrawLine('ref',[sat.position.x,sat.position.y,sat.position.z], [1,0.4,0,1]);
+    debugDrawLine('ref', [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
     cameraType.current = cameraType.OFFSET;
     console.log(sat);
     // ======================================================
@@ -4444,24 +4445,24 @@ var speedModifier = 1;
     var sat = satSet.getSat(objectManager.selectedSat);
     var map;
     sat.getTEARR();
-    map = mapManager.braun({lon: satellite.degreesLong(uiManager.currentTEARR.lon), lat: satellite.degreesLat(uiManager.currentTEARR.lat)}, {meridian: 0, latLimit: 90});
+    map = mapManager.braun({ lon: satellite.degreesLong(uiManager.currentTEARR.lon), lat: satellite.degreesLat(uiManager.currentTEARR.lat) }, { meridian: 0, latLimit: 90 });
     map.x = map.x * settingsManager.mapWidth - 10;
     map.y = map.y / 0.6366197723675813 * settingsManager.mapHeight - 10;
     $('#map-sat').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
     if (sensorManager.checkSensorSelected()) {
-      map = mapManager.braun({lon: sensorManager.currentSensor.long, lat: sensorManager.currentSensor.lat}, {meridian: 0, latLimit: 90});
+      map = mapManager.braun({ lon: sensorManager.currentSensor.long, lat: sensorManager.currentSensor.lat }, { meridian: 0, latLimit: 90 });
       map.x = map.x * settingsManager.mapWidth - 10;
       map.y = map.y / 0.6366197723675813 * settingsManager.mapHeight - 10;
       $('#map-sensor').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;z-index:11;'); // Set to size of the map image (800x600)
     }
     for (var i = 1; i <= 50; i++) {
-      map = mapManager.braun({lon: satellite.map(sat, i).lon, lat: satellite.map(sat, i).lat}, {meridian: 0, latLimit: 90});
+      map = mapManager.braun({ lon: satellite.map(sat, i).lon, lat: satellite.map(sat, i).lat }, { meridian: 0, latLimit: 90 });
       map.x = map.x * settingsManager.mapWidth - 3.5;
       map.y = map.y / 0.6366197723675813 * settingsManager.mapHeight - 3.5;
       if (map.y > settingsManager.mapHeight / 2) {
-        $('#map-look' + i).tooltip({delay: 50, html: satellite.map(sat, i).time, position: 'top'});
+        $('#map-look' + i).tooltip({ delay: 50, html: satellite.map(sat, i).time, position: 'top' });
       } else {
-        $('#map-look' + i).tooltip({delay: 50, html: satellite.map(sat, i).time, position: 'bottom'});
+        $('#map-look' + i).tooltip({ delay: 50, html: satellite.map(sat, i).time, position: 'bottom' });
       }
       if (satellite.map(sat, i).inview === 1) {
         $('#map-look' + i).attr('src', 'images/yellow-square.png'); // If inview then make yellow

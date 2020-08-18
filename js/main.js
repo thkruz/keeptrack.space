@@ -921,8 +921,8 @@ function _drawCamera() {
       mat4.rotateX(camMatrix, camMatrix, -cameraManager.localRotateCurrent.pitch);
       mat4.rotateY(camMatrix, camMatrix, -cameraManager.localRotateCurrent.roll);
       mat4.rotateZ(camMatrix, camMatrix, -cameraManager.localRotateCurrent.yaw);
-      // TODO: Make offset adjustable in settings
-      mat4.translate(camMatrix, camMatrix, [15000, _getCamDist(), -6000]);
+            
+      mat4.translate(camMatrix, camMatrix, [settingsManager.offsetCameraModeX, _getCamDist(), settingsManager.offsetCameraModeZ]);
       mat4.rotateX(camMatrix, camMatrix, camPitch);
       mat4.rotateZ(camMatrix, camMatrix, -camYaw);
       break;

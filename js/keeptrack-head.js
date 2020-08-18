@@ -19,8 +19,8 @@ const MOON_SCALAR_DISTANCE = 250000;
   let settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.19.3';
-  settingsManager.versionDate = 'August 17, 2020';
+  settingsManager.versionNumber = '1.19.4';
+  settingsManager.versionDate = 'August 18, 2020';
 
   // Install Folder Settings
   {
@@ -285,6 +285,9 @@ const MOON_SCALAR_DISTANCE = 250000;
 
   settingsManager.cameraMovementSpeed = 0.003;
   settingsManager.cameraMovementSpeedMin = 0.005;
+
+  settingsManager.offsetCameraModeX = 15000;
+  settingsManager.offsetCameraModeZ = -6000;
 
   settingsManager.fpsForwardSpeed = 3;
   settingsManager.fpsSideSpeed = 3;

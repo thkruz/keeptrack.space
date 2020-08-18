@@ -37,16 +37,16 @@ body {
   overflow: hidden;
 }
 
+#nav-wrapper {
+  z-index: 3;
+}
+
 #footer-toggle-wrapper {
   width: 100%;
   bottom: 50px;
   height: 0px;
   z-index: 1;
   position: absolute;
-}
-
-#nav-wrapper {
-  z-index: 3;
 }
 
 #nav-footer-toggle {

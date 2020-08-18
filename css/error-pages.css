@@ -23,3 +23,8 @@ img {
     padding: 50px 50px;
     width: 250px;
 }
+
+button {
+    display: block;
+    margin: 0 auto;
+}

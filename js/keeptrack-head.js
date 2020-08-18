@@ -578,3 +578,7 @@ if (!settingsManager.disableUI) {
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize.css?v=${settingsManager.versionNumber}" type="text/css"\>
   `);
 }
+
+else {
+  console.log("ERROR");
+}

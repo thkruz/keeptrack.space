@@ -189,10 +189,12 @@ function initializeKeepTrack() {
   }
   mobile.checkMobileMode();
   webGlInit();
-  atmosphere.init();
   sun.init();
-  moon.init();
   earth.init();
+  if (!settingsManager.enableLimitedUI) {
+    atmosphere.init();
+    moon.init();
+  }
   // Load Optional 3D models if available
   if (typeof meshManager !== 'undefined') {
     meshManager.init();
@@ -845,10 +847,14 @@ function _drawScene() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   sun.draw(pMatrix, camMatrix);
-  moon.draw(pMatrix, camMatrix);
+  if (!settingsManager.enableLimitedUI) {
+    moon.draw(pMatrix, camMatrix);
+  }
   earth.update();
-  atmosphere.update();
-  atmosphere.draw(pMatrix, camMatrix);
+  if (!settingsManager.enableLimitedUI) {
+    atmosphere.update();
+    atmosphere.draw(pMatrix, camMatrix);
+  }
   earth.draw(pMatrix, camMatrix);
   satSet.draw(pMatrix, camMatrix, drawNow);
   orbitManager.draw(pMatrix, camMatrix);
@@ -920,7 +926,7 @@ function _drawCamera() {
       mat4.rotateX(camMatrix, camMatrix, camPitch);
       mat4.rotateZ(camMatrix, camMatrix, -camYaw);
       break;
-    case cameraType.FPS: // FPS style movement        
+    case cameraType.FPS: // FPS style movement
       mat4.rotate(camMatrix, camMatrix, -fpsPitch * DEG2RAD, [1, 0, 0]);
       mat4.rotate(camMatrix, camMatrix, fpsYaw * DEG2RAD, [0, 0, 1]);
       mat4.translate(camMatrix, camMatrix, [fpsXPos, fpsYPos, -fpsZPos]);

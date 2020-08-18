@@ -411,6 +411,11 @@ const MOON_SCALAR_DISTANCE = 250000;
     settingsManager.maxMissiles = 1;
     settingsManager.maxAnalystSats = 1;
   }
+
+  if (settingsManager.enableLimitedUI) {
+    settingsManager.zFar = 150000;
+  }
+
   settingsManager.limitSats = '';
   settingsManager.geolocation = {};
   settingsManager.geolocationUsed = false;

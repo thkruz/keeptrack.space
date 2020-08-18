@@ -210,6 +210,8 @@
     gl.enable(gl.BLEND);
     if (settingsManager.showOrbitThroughEarth) {
       gl.disable(gl.DEPTH_TEST);
+    } else {
+      gl.enable(gl.DEPTH_TEST);
     }
 
     gl.uniformMatrix4fv(pathShader.uMvMatrix, false, orbitMvMat);
@@ -220,6 +222,7 @@
       gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor);
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
       gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(pathShader.aPos);
       gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
     }
 
@@ -227,6 +230,7 @@
       gl.uniform4fv(pathShader.uColor, settingsManager.orbitHoverColor);
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
       gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(pathShader.aPos);
       gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
     }
 
@@ -235,6 +239,7 @@
       currentInView.forEach(function (id) {
         gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
         gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(pathShader.aPos);
         gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
       });
     }
@@ -244,14 +249,16 @@
       groups.selectedGroup.forEach(function (id) {
         gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
         gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(pathShader.aPos);
         gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
       });
     }
 
+    gl.disableVertexAttribArray(pathShader.aPos);
+    gl.disableVertexAttribArray(pathShader.aColor);
+
     gl.disable(gl.BLEND);
-    if (settingsManager.showOrbitThroughEarth) {
-      gl.enable(gl.DEPTH_TEST);
-    }
+    gl.enable(gl.DEPTH_TEST);
 
     // Done drawing
     return true;

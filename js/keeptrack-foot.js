@@ -125,11 +125,10 @@ if (!settingsManager.disableUI) {
 
 // Other Required Files
 document.write(`
+  <script src="${settingsManager.installDirectory}js/sceneManager.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/timeManager.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/sun.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/meuusjs.1.0.3.min.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/starcalc.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/earth.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/groups.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lookangles.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/satSet.js?v=${settingsManager.versionNumber}"\><\/script>

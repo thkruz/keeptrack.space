@@ -845,6 +845,8 @@ function _drawScene () {
 
   sun.draw(pMatrix, camMatrix);
   moon.draw(pMatrix, camMatrix);
+  earth.update();
+  atmosphere.update();
   atmosphere.draw(pMatrix, camMatrix);
   earth.draw(pMatrix, camMatrix);
   satSet.draw(pMatrix, camMatrix, drawNow);

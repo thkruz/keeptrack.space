@@ -36,14 +36,9 @@ or mirrored at any other location without the express written permission of the 
       for (var i = 0; i < starManager.constellations.length; i++) {
         for (var s = 0; s < starManager.constellations[i].stars.length; s++) {
           // Verify Stars Exist
-          try {
-            var star1 = satSet.getSat(satSet.getIdFromStarName(starManager.constellations[i].stars[s][0]));
-            var star2 = satSet.getSat(satSet.getIdFromStarName(starManager.constellations[i].stars[s][1]));
-            if (star1 == null || star2 == null) { continue; }
-          } catch (e) {
-            console.warn(`Star/Constellation error - i: ${i} - s: ${s}`);
-            continue;
-          }
+          var star1 = satSet.getSat(satSet.getIdFromStarName(starManager.constellations[i].stars[s][0]));
+          var star2 = satSet.getSat(satSet.getIdFromStarName(starManager.constellations[i].stars[s][1]));
+          if (star1 == null || star2 == null) { continue; }
           drawLineList.push(
             {
               'line': new Line(),
@@ -616,7 +611,7 @@ or mirrored at any other location without the express written permission of the 
               ["ε-Cen", "Hadar"],
               ["ε-Cen", "Rigil Kentaurus"],
               ["ε-Cen", "M-Cen"],
-              ["M-Cen" ,"ζ-Cen"],
+              ["M-Cen" ,"ζ-Cen"]
               ["ζ-Cen", "μ-Cen"],
               ["μ-Cen", "ν-Cen"],
               ["ν-Cen", "Menkent"],
@@ -649,7 +644,7 @@ or mirrored at any other location without the express written permission of the 
               ["Baten Kaitos", "70-Cet"],
               ["70-Cet", "δ-Cet"],
               ["δ-Cet", "γ-Cet"],
-              ["γ-Cet" ,"ν-Cet"],
+              ["γ-Cet" ,"ν-Cet"]
               ["ν-Cet", "ξ²-Cet"],
               ["ξ²-Cet", "μ-Cet"],
               ["μ-Cet", "λ-Cet"],
@@ -679,7 +674,7 @@ or mirrored at any other location without the express written permission of the 
               ["9-Cyg", "Albireo"],
               ["Sadr", "δ-Cyg"],
               ["δ-Cyg", "θ-Cyg"],
-              ["θ-Cyg" ,"ι-Cyg"],
+              ["θ-Cyg" ,"ι-Cyg"]
               ["ι-Cyg", "κ-Cyg"]]
     },
     {

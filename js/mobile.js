@@ -92,8 +92,7 @@ var maxPinchSize = 1;
 
   mobile.checkMobileMode = function () {
     db.log('mobile.checkMobileMode');
-    if (mobile.checkIfMobileDevice()) {
-      mobile.forceResize = true;
+    if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
       settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
       settingsManager.enableHoverOverlay = false;
       settingsManager.isMobileModeEnabled = true;
@@ -120,14 +119,9 @@ var maxPinchSize = 1;
     }
   };
 
-  mobile.checkIfMobileDevice = () => {
-    return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
-  };
-
   mobile.start = function () {
     db.log('mobile.checkMobileMode');
     mobile.checkMobileMode();
-    mobile.fullscreenToggle();
     maxPinchSize = Math.hypot(window.innerWidth,$(document).height());
     $('#loading-screen').removeClass('full-loader');
     $('#loading-screen').addClass('mini-loader-container');
@@ -137,6 +131,7 @@ var maxPinchSize = 1;
     $('#loading-screen').fadeOut();
     $('#spinner').show();
     $('#mobile-start-button').hide();
+    mobile.fullscreenToggle();
     settingsManager.enableHoverOverlay = false;
   };
 

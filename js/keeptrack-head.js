@@ -9,22 +9,28 @@ const MINUTES_PER_DAY = 1440;
 const PLANETARIUM_DIST = 3;
 const MILLISECONDS_PER_DAY = 1.15741e-8;
 
+const RADIUS_OF_DRAW_SUN = 9000;
+const SUN_SCALAR_DISTANCE = 250000;
+const RADIUS_OF_DRAW_MOON = 4000;
+const MOON_SCALAR_DISTANCE = 250000;
+
 // Settings Manager Setup
 {
   let settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.18.2';
-  settingsManager.versionDate = 'August 15, 2020';
+  settingsManager.versionNumber = '1.19.3';
+  settingsManager.versionDate = 'August 17, 2020';
 
   // Install Folder Settings
   {
     switch (window.location.host) {
       case 'keeptrack.space':
         settingsManager.installDirectory = '/';
+        settingsManager.isOfficialWebsite = true;
         break;
       case 'localhost':
-        // Comment Out the Next Three Lines if you are testing on a local server
+        // Comment Out the Next Two Lines if you are testing on a local server
         // and have the keeptrack files installed in a subdirectory
       //   settingsManager.installDirectory = '/';
       //   break;
@@ -54,7 +60,6 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
 
   // Adjust to change camera speed of auto rotate around earth
   settingsManager.autoRotateSpeed = 1.0 * 0.000075;
-
   // Disable main user interface. Currently an all or nothing package.
   settingsManager.disableUI = false;
   // Currently only disables panning. In the future it will disable all camera
@@ -85,10 +90,7 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   settingsManager.minZoomDistance = 6800;
   settingsManager.maxZoomDistance = 120000;
 
-  settingsManager.hoverColor = [1.0, 1.0, 0.0, 1.0]; // Yellow
-  settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0]; // Red
-
-  settingsManager.timeMachineDelay = 3000;
+  settingsManager.timeMachineDelay = 5000;
 
   // settingsManager.earthPanningBufferDistance = 100; // Needs work in main.js
 
@@ -110,17 +112,17 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   // //////////////////////////////////////////////////////////////////////////
   settingsManager.showOrbitThroughEarth = false;
 
-  settingsManager.atmosphereSize = RADIUS_OF_EARTH + 200;
+  settingsManager.atmosphereSize = RADIUS_OF_EARTH + 150;
   settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)';
 
   settingsManager.satShader = {};
   settingsManager.satShader.largeObjectMinZoom = 0.37;
   settingsManager.satShader.largeObjectMaxZoom = 0.58;
   settingsManager.satShader.minSize = 4.0;
+  // Max size dynamically changes based on zoom level
+  settingsManager.satShader.maxAllowedSize = 80.0;
   settingsManager.satShader.isUseDynamicSizing = false;
   settingsManager.satShader.dynamicSizeScalar = 1.0;
-  settingsManager.satShader.maxSize = 50.0;
-  settingsManager.satShader.maxAllowedSize = 100.0;
   settingsManager.satShader.starSize = '20.0'; // Has to be a string
   // NOTE: Use floats not integers because some settings get sent to graphics card
   // Must be a string for GPU to read.
@@ -178,6 +180,9 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   // Color Settings
   // //////////////////////////////////////////////////////////////////////////
   settingsManager.currentColorScheme = null;
+
+  settingsManager.hoverColor = [1.0, 1.0, 0.0, 1.0]; // Yellow
+  settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0]; // Red
 
   settingsManager.reColorMinimumTime = 1000;
   settingsManager.colors = {};
@@ -388,6 +393,9 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   // Defaults that should never be changed
   // //////////////////////////////////////////////////////////////////////////
 
+  // Nominal max size - overwritten by settingsManager.satShader.maxAllowedSize
+  settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize * 2;
+
   settingsManager.fieldOfView = 0.6;
 
   // Determines if the Loading is complete
@@ -413,6 +421,9 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
   settingsManager.queuedScreenshot = false;
 
   settingsManager.isResizing = false;
+  if (typeof settingsManager.isOfficialWebsite == 'undefined') {
+    settingsManager.isOfficialWebsite = false;
+  }
 
   settingsManager.vertShadersSize = 12;
   settingsManager.isEditTime = false;
@@ -529,6 +540,10 @@ let db = {};
       console.log('db is now off!');
       localStorage.setItem("db", JSON.stringify(db));
     };
+    if (db.enabled) {
+      // Fix for multiple sensors gettings saved locally by previous bug
+      if (currentSensor.length > 1) currentSensor = currentSensor[0];
+    }
   })();
 }
 
@@ -553,5 +568,8 @@ if (!settingsManager.disableUI) {
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/jquery-ui-timepicker-addon.css?v=${settingsManager.versionNumber}" type="text/css"\>
   `);
 } else if (settingsManager.enableLimitedUI) {
-  document.write('<link rel="stylesheet" href="' + settingsManager.installDirectory + 'css/limitedUI.css?v=' + settingsManager.versionNumber + '" type="text/css"\>');
+  document.write(`
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/limitedUI.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize.css?v=${settingsManager.versionNumber}" type="text/css"\>
+  `);
 }

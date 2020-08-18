@@ -210,6 +210,8 @@
     gl.enable(gl.BLEND);
     if (settingsManager.showOrbitThroughEarth) {
       gl.disable(gl.DEPTH_TEST);
+    } else {
+      gl.enable(gl.DEPTH_TEST);
     }
 
     gl.uniformMatrix4fv(pathShader.uMvMatrix, false, orbitMvMat);
@@ -220,6 +222,7 @@
       gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor);
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
       gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(pathShader.aPos);
       gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
     }
 
@@ -227,6 +230,7 @@
       gl.uniform4fv(pathShader.uColor, settingsManager.orbitHoverColor);
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
       gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(pathShader.aPos);
       gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
     }
 
@@ -235,6 +239,7 @@
       currentInView.forEach(function (id) {
         gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
         gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(pathShader.aPos);
         gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
       });
     }
@@ -244,14 +249,16 @@
       groups.selectedGroup.forEach(function (id) {
         gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
         gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(pathShader.aPos);
         gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
       });
     }
 
+    gl.disableVertexAttribArray(pathShader.aPos);
+    gl.disableVertexAttribArray(pathShader.aColor);
+
     gl.disable(gl.BLEND);
-    if (settingsManager.showOrbitThroughEarth) {
-      gl.enable(gl.DEPTH_TEST);
-    }
+    gl.enable(gl.DEPTH_TEST);
 
     // Done drawing
     return true;
@@ -268,38 +275,44 @@
     return pathShader;
   };
 
+  // Used to kill old async calls
+  orbitManager.historyOfSatellitesRunCount = 0;
   orbitManager.historyOfSatellitesPlay = () => {
+    orbitManager.historyOfSatellitesRunCount++;
     orbitManager.isTimeMachineRunning = true;
-    let tempTransColor = settingsManager.colors.transparent;
+    orbitManager.tempTransColor = settingsManager.colors.transparent;
     settingsManager.colors.transparent = [0,0,0,0];
     for (let yy = 0; yy <= 200; yy++) {
       let year = 59 + yy;
       if (year >= 100) year = year - 100;
-      setTimeout(function () {
+      setTimeout(function (runCount) {
         if (!orbitManager.isTimeMachineVisible) return;
+        // Kill all old async calls if run count updates
+        if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
         yearGroup = new groups.SatGroup('yearOrLess', year);
         // groups.selectGroupNoOverlay(yearGroup);
         groups.selectGroup(yearGroup);
         yearGroup.updateOrbits();
         satSet.setColorScheme(ColorScheme.group, true); // force color recalc
-        if (!settingsManager.disableUI) {
-          if (year >= 59 && year < 100) {
-            M.toast({html: `Time Machine In Year 19${year}!`});
-          } else {
-            yearStr = (year < 10) ? `0${year}` : `${year}`;
-            M.toast({html: `Time Machine In Year 20${yearStr}!`});
-          }
+        if (year >= 59 && year < 100) {
+          M.toast({html: `Time Machine In Year 19${year}!`});
+        } else {
+          yearStr = (year < 10) ? `0${year}` : `${year}`;
+          M.toast({html: `Time Machine In Year 20${yearStr}!`});
         }
+        // TODO: Have timemachine autocalculate current year
+        // Last one 2020
         if (year == 20) {
           setTimeout(function () {
+            if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
             if (!orbitManager.isTimeMachineVisible) return;
-            settingsManager.colors.transparent = tempTransColor;
+            settingsManager.colors.transparent = orbitManager.tempTransColor;
             orbitManager.isTimeMachineRunning = false;
             groups.clearSelect();
             satSet.setColorScheme(ColorScheme.default, true); // force color recalc
           }, 10000); // Linger for 10 seconds
         }
-      }, settingsManager.timeMachineDelay * yy);
+      }, settingsManager.timeMachineDelay * yy, orbitManager.historyOfSatellitesRunCount);
       if (year == 20) break;
     }
   };

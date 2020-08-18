@@ -234,6 +234,11 @@ var emptyMat4 = mat4.create();
         }
       }
     })();
+
+    // Make New Vertex Array Objects
+    // satSet.vao = gl.createVertexArray();
+    // gl.bindVertexArray(satSet.vao);
+
     dotShader = gl.createProgram();
 
     vertShader = gl.createShader(gl.VERTEX_SHADER);
@@ -663,8 +668,9 @@ var emptyMat4 = mat4.create();
   var screenLocation = [];
   satSet.draw = (pMatrix, camMatrix, drawNow) => {
     // NOTE: 640 byte leak.
-
     if (!settingsManager.shadersReady || !settingsManager.cruncherReady) return;
+
+    // gl.bindVertexArray(satSet.vao);
 
     drawDivisor = Math.max(timeManager.propRate, 0.001);
     drawDt = Math.min((drawNow - lastDrawTime) / 1000.0, 1.0 / drawDivisor);

@@ -1027,7 +1027,11 @@ or mirrored at any other location without the express written permission of the 
   sensorManager.selectedSensor = {};
   sensorManager.whichRadar = '';
   sensorManager.setSensor = function (selectedSensor, staticNum) {
-    if (!settingsManager.offline) { localStorage.setItem("currentSensor", JSON.stringify([selectedSensor, staticNum])); }
+    try {
+      localStorage.setItem("currentSensor", JSON.stringify([selectedSensor, staticNum]));
+    } catch (e) {
+      console.log(`Couldn't clear the current sensor info!`);
+    }
     if (selectedSensor == null && staticNum == null) return;
     var sensor;
     if (selectedSensor === 'SSN') {
@@ -1140,7 +1144,7 @@ or mirrored at any other location without the express written permission of the 
         // console.log(sensorList[sensor] == selectedSensor);
         if (sensorList[sensor] == selectedSensor || (sensorList[sensor].staticNum === staticNum && typeof staticNum != 'undefined')) {
           sensorManager.selectedSensor = sensorList[sensor];
-          ga('send', 'event', 'Sensor', sensorList[sensor].shortName, 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Sensor', sensorList[sensor].shortName, 'Selected');
           // Do For All Sensors
           sensorManager.whichRadar = sensorManager.selectedSensor.shortName;
           satCruncher.postMessage({

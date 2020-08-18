@@ -187,13 +187,18 @@ function initializeKeepTrack() {
   if (typeof settingsManager.tleSource == 'undefined') {
     settingsManager.tleSource = 'tle/TLE.json';
   }
-  webGlInit();
   mobile.checkMobileMode();
-  atmosphere.init();
+  webGlInit();
   sun.init();
-  moon.init();
   earth.init();
-  meshManager.init();
+  if (!settingsManager.enableLimitedUI) {
+    atmosphere.init();
+    moon.init();
+  }
+  // Load Optional 3D models if available
+  if (typeof meshManager !== 'undefined') {
+    meshManager.init();
+  }
   ColorScheme.init();
   $('#loader-text').text('Drawing Dots in Space...');
   satSet.init(function satSetInitCallBack(satData) {
@@ -565,6 +570,9 @@ function drawLoop() {
       // dragTarget = getEarthScreenPoint(mouseX, mouseY);
       // if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
       // isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
+      //
+      // TODO: Rotate Around Earth code needs cleaned up now that raycasting is turned off
+      //
       if (true ||
         cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY ||
         settingsManager.isMobileModeEnabled) { // random screen drag
@@ -669,7 +677,10 @@ function drawLoop() {
     let sat = satSet.getSat(objectManager.selectedSat);
     if (!sat.static) {
       _camSnapToSat(sat);
-      meshManager.models.Satellite.position = sat.position;
+      // If 3D Models Available, then update their position on the screen
+      if (typeof meshManager !== 'undefined') {
+        meshManager.models.Satellite.position = sat.position;
+      }
     }
     if (sat.static && cameraType.current === cameraType.PLANETARIUM) {
       // _camSnapToSat(objectManager.selectedSat);
@@ -836,9 +847,14 @@ function _drawScene() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   sun.draw(pMatrix, camMatrix);
-  moon.draw(pMatrix, camMatrix);
-  // if (typeof debugLine != 'undefined') debugLine.draw();
-  atmosphere.draw(pMatrix, camMatrix);
+  if (!settingsManager.enableLimitedUI) {
+    moon.draw(pMatrix, camMatrix);
+  }
+  earth.update();
+  if (!settingsManager.enableLimitedUI) {
+    atmosphere.update();
+    atmosphere.draw(pMatrix, camMatrix);
+  }
   earth.draw(pMatrix, camMatrix);
   satSet.draw(pMatrix, camMatrix, drawNow);
   orbitManager.draw(pMatrix, camMatrix);
@@ -846,8 +862,11 @@ function _drawScene() {
   // Draw Satellite if Selected
   if (objectManager.selectedSat !== -1) {
     let sat = satSet.getSat(objectManager.selectedSat);
-    if (!sat.static) {
-      meshManager.drawObject(meshManager.models.Satellite, pMatrix, camMatrix);
+    // If 3D Models Available, then draw them on the screen
+    if (typeof meshManager !== 'undefined') {
+        if (!sat.static) {
+          meshManager.drawObject(meshManager.models.Satellite, pMatrix, camMatrix);
+        }
     }
   }
 
@@ -907,7 +926,7 @@ function _drawCamera() {
       mat4.rotateX(camMatrix, camMatrix, camPitch);
       mat4.rotateZ(camMatrix, camMatrix, -camYaw);
       break;
-    case cameraType.FPS: // FPS style movement        
+    case cameraType.FPS: // FPS style movement
       mat4.rotate(camMatrix, camMatrix, -fpsPitch * DEG2RAD, [1, 0, 0]);
       mat4.rotate(camMatrix, camMatrix, fpsYaw * DEG2RAD, [0, 0, 1]);
       mat4.translate(camMatrix, camMatrix, [fpsXPos, fpsYPos, -fpsZPos]);
@@ -1318,7 +1337,14 @@ function _fixDpi(canvas, dpi) {
   canvas.setAttribute('width', style.width() * dpi);
   canvas.setAttribute('height', style.height() * dpi);
 }
-function webGlInit() {
+
+// Reinitialize the canvas on mobile rotation
+$(window).bind( 'orientationchange', function(e){
+  console.log('rotate');
+  mobile.isRotationEvent = true;
+});
+
+function webGlInit () {
   db.log('webGlInit');
   let can = canvasDOM[0];
   let dpi;
@@ -1328,22 +1354,45 @@ function webGlInit() {
     dpi = window.devicePixelRatio;
     settingsManager.dpi = dpi;
   }
-  console.log(settingsManager.dpi);
 
+  // Using minimum allows the canvas to be full screen without fighting with
+  // scrollbars
+  let cw = document.documentElement.clientWidth || 0;
+  let iw = window.innerWidth || 0;
+  var vw = Math.min.apply(null, [cw,iw].filter(Boolean));
+  var vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+
+  // If taking a screenshot then resize no matter what to get high resolution
   if (settingsManager.screenshotMode) {
     can.width = settingsManager.hiResWidth;
     can.height = settingsManager.hiResHeight;
   } else {
+    // If not autoresizing then don't do anything to the canvas
     if (settingsManager.isAutoResizeCanvas) {
-      can.width = document.body.clientWidth;
-      can.height = window.innerHeight;
+      // If this is a cellphone avoid the keyboard forcing resizes but
+      // always resize on rotation
+      if (settingsManager.isMobileModeEnabled) {
+        // Changes more than 35% of height but not due to rotation are likely
+        // the keyboard! Ignore them
+        if ((((vw - can.width)/can.width * 100 < 1) &&
+           ((vh - can.height)/can.height * 100 < 1))  ||
+           mobile.isRotationEvent || mobile.forceResize) {
+             can.width = vw;
+             can.height = vh;
+             mobile.forceResize = false;
+             mobile.isRotationEvent = false;
+           } else {
+           }
+      } else {
+        can.width = vw;
+        can.height = vh;
+      }
     }
   }
 
   if (settingsManager.satShader.isUseDynamicSizing) {
-    console.log(can.width);
-    settingsManager.satShader.dynamicSize = 1920 / can.width * settingsManager.satShader.dynamicSizeScalar * settingsManager.dpi;
-    settingsManager.satShader.minSize = Math.max(settingsManager.satShader.minSize, settingsManager.satShader.dynamicSize);
+    settingsManager.satShader.dynamicSize = 1920/can.width * settingsManager.satShader.dynamicSizeScalar * settingsManager.dpi;
+    settingsManager.satShader.minSize = Math.max(settingsManager.satShader.minSize,settingsManager.satShader.dynamicSize);
   }
 
   // Desynchronized Fixed Jitter on Old Computer
@@ -1550,6 +1599,7 @@ function selectSat(satId) {
   db.log(`satId: ${satId}`, true);
   var sat;
   if (satId !== -1) {
+    rotateTheEarth = false;
     cameraManager.isChasing = false;
     sat = satSet.getSat(satId);
     if (sat.type == 'Star') return;
@@ -1557,7 +1607,6 @@ function selectSat(satId) {
   }
   satSet.selectSat(satId);
   camSnapMode = false;
-  rotateTheEarth = false;
 
   if (satId === -1) {
     if (settingsManager.currentColorScheme === ColorScheme.group || $('#search').val().length >= 3) { // If group selected
@@ -1693,7 +1742,7 @@ function selectSat(satId) {
     } else {
       //      $('#sat-objnum').html(sat.TLE2.substr(2,7));
       $('#sat-objnum').html(sat.SCC_NUM);
-      ga('send', 'event', 'Satellite', 'SCC: ' + sat.SCC_NUM, 'SCC Number');
+      if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Satellite', 'SCC: ' + sat.SCC_NUM, 'SCC Number');
     }
 
     var objtype;
@@ -1732,8 +1781,8 @@ function selectSat(satId) {
     $('#sat-site').html(site.site);
     $('#sat-sitec').html(site.sitec);
 
-    ga('send', 'event', 'Satellite', 'Country: ' + country, 'Country');
-    ga('send', 'event', 'Satellite', 'Site: ' + site, 'Site');
+    if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Satellite', 'Country: ' + country, 'Country');
+    if (settingsManager.isOfficialWebsite) ga('send', 'event', 'Satellite', 'Site: ' + site, 'Site');
 
     // /////////////////////////////////////////////////////////////////////////
     // Launch Vehicle Correlation Table
@@ -2868,7 +2917,7 @@ $(document).ready(function () {
           }
           satSet.setColorScheme(ColorScheme.default, true);
           uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-          ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Default Color', 'Selected');
           break;
         case 'colors-sunlight-rmb':
           uiManager.legendMenuChange('sunlight');
@@ -2878,25 +2927,25 @@ $(document).ready(function () {
           satCruncher.postMessage({
             isSunlightView: true,
           });
-          ga('send', 'event', 'ColorScheme Menu', 'Sunlight', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Sunlight', 'Selected');
           break;
         case 'colors-country-rmb':
           uiManager.legendMenuChange('countries');
           satSet.setColorScheme(ColorScheme.countries);
           uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-          ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Countries', 'Selected');
           break;
         case 'colors-velocity-rmb':
           uiManager.legendMenuChange('velocity');
           satSet.setColorScheme(ColorScheme.velocity);
           uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-          ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Velocity', 'Selected');
           break;
         case 'colors-ageOfElset-rmb':
           uiManager.legendMenuChange('ageOfElset');
           satSet.setColorScheme(ColorScheme.ageOfElset);
           uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-          ga('send', 'event', 'ColorScheme Menu', 'Age of Elset', 'Selected');
+          if (settingsManager.isOfficialWebsite) ga('send', 'event', 'ColorScheme Menu', 'Age of Elset', 'Selected');
           break;
         case 'earth-blue-rmb':
           settingsManager.blueImages = true;

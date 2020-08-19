@@ -2620,9 +2620,6 @@ $(document).ready(function () {
       bodyDOM.on('keydown', (e) => { uiManager.keyDownHandler(e); }); // On Key Press Event Run _keyHandler Function
       bodyDOM.on('keyup', (e) => { uiManager.keyUpHandler(e); }); // On Key Press Event Run _keyHandler Function
 
-      rightBtnMenuDOM.on("click", function (e) {
-        _rmbMenuActions(e);
-      });
       rightBtnSaveMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
       });
@@ -2645,7 +2642,10 @@ $(document).ready(function () {
         _rmbMenuActions(e);
       });
 
-      rightBtnSaveDOM.hover(function () {
+      rightBtnSaveDOM.hover(()=>{rightBtnSaveDOMDropdown();});
+      rightBtnSaveDOM.click(()=>{rightBtnSaveDOMDropdown();});
+      function rightBtnSaveDOMDropdown () {
+        console.log('test');
         uiManager.clearRMBSubMenu();
         var offsetX = (rightBtnSaveDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnSaveMenuDOM.css({
@@ -2660,12 +2660,14 @@ $(document).ready(function () {
         } else {
           rightBtnSaveMenuDOM.hide();
         }
-      });
+      }
       rightBtnSaveMenuDOM.hover(null, function () { // Lost Focus
         rightBtnSaveMenuDOM.hide();
       });
 
-      rightBtnViewDOM.hover(function () {
+      rightBtnViewDOM.hover(()=>{rightBtnViewDOMDropdown();});
+      rightBtnViewDOM.click(()=>{rightBtnViewDOMDropdown();});
+      function rightBtnViewDOMDropdown () {
         uiManager.clearRMBSubMenu();
         var offsetX = (rightBtnViewDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnViewMenuDOM.css({
@@ -2680,54 +2682,60 @@ $(document).ready(function () {
         } else {
           rightBtnViewMenuDOM.hide();
         }
-      });
+      }
       rightBtnViewMenuDOM.hover(null, function () { // Lost Focus
         rightBtnViewMenuDOM.hide();
       });
 
-      rightBtnEditDOM.hover(function () {
-        uiManager.clearRMBSubMenu();
+      rightBtnEditDOM.hover(()=>{rightBtnEditDOMDropdown();});
+      rightBtnEditDOM.click(()=>{rightBtnEditDOMDropdown();});
+      function rightBtnEditDOMDropdown () {
+          uiManager.clearRMBSubMenu();
 
-        var offsetX = (rightBtnEditDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
-        rightBtnEditMenuDOM.css({
-          display: 'block',
-          'text-align': 'center',
-          position: 'absolute',
-          left: rightBtnEditDOM.offset().left + offsetX,
-          top: rightBtnEditDOM.offset().top
-        });
-        if (rightBtnEditMenuDOM.offset().top !== 0) {
-          rightBtnEditMenuDOM.show();
-        } else {
-          rightBtnEditMenuDOM.hide();
+          var offsetX = (rightBtnEditDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+          rightBtnEditMenuDOM.css({
+            display: 'block',
+            'text-align': 'center',
+            position: 'absolute',
+            left: rightBtnEditDOM.offset().left + offsetX,
+            top: rightBtnEditDOM.offset().top
+          });
+          if (rightBtnEditMenuDOM.offset().top !== 0) {
+            rightBtnEditMenuDOM.show();
+          } else {
+            rightBtnEditMenuDOM.hide();
+          }
         }
-      });
       rightBtnEditMenuDOM.hover(null, function () { // Lost Focus
         rightBtnEditMenuDOM.hide();
       });
 
-      rightBtnCreateDOM.hover(function () {
-        uiManager.clearRMBSubMenu();
+      rightBtnCreateDOM.hover(()=>{rightBtnCreateDOMDropdown();});
+      rightBtnCreateDOM.click(()=>{rightBtnCreateDOMDropdown();});
+      function rightBtnCreateDOMDropdown () {
+          uiManager.clearRMBSubMenu();
 
-        var offsetX = (rightBtnCreateDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
-        rightBtnCreateMenuDOM.css({
-          display: 'block',
-          'text-align': 'center',
-          position: 'absolute',
-          left: rightBtnCreateDOM.offset().left + offsetX,
-          top: rightBtnCreateDOM.offset().top
-        });
-        if (rightBtnCreateMenuDOM.offset().top !== 0) {
-          rightBtnCreateMenuDOM.show();
-        } else {
-          rightBtnCreateMenuDOM.hide();
+          var offsetX = (rightBtnCreateDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+          rightBtnCreateMenuDOM.css({
+            display: 'block',
+            'text-align': 'center',
+            position: 'absolute',
+            left: rightBtnCreateDOM.offset().left + offsetX,
+            top: rightBtnCreateDOM.offset().top
+          });
+          if (rightBtnCreateMenuDOM.offset().top !== 0) {
+            rightBtnCreateMenuDOM.show();
+          } else {
+            rightBtnCreateMenuDOM.hide();
+          }
         }
-      });
       rightBtnCreateMenuDOM.hover(null, function () { // Lost Focus
         rightBtnCreateMenuDOM.hide();
       });
 
-      rightBtnDrawDOM.hover(function () {
+      rightBtnDrawDOM.hover(()=>{rightBtnDrawDOMDropdown();});
+      rightBtnDrawDOM.click(()=>{rightBtnDrawDOMDropdown();});
+      function rightBtnDrawDOMDropdown () {
         uiManager.clearRMBSubMenu();
         var offsetX = (rightBtnDrawDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnDrawMenuDOM.css({
@@ -2742,12 +2750,14 @@ $(document).ready(function () {
         } else {
           rightBtnDrawMenuDOM.hide();
         }
-      });
+      }
       rightBtnDrawMenuDOM.hover(null, function () { // Lost Focus
         rightBtnDrawMenuDOM.hide();
       });
 
-      rightBtnColorsDOM.hover(function () {
+      rightBtnColorsDOM.hover(()=>{rightBtnColorsDOMDropdown();});
+      rightBtnColorsDOM.click(()=>{rightBtnColorsDOMDropdown();});
+      function rightBtnColorsDOMDropdown () {
         uiManager.clearRMBSubMenu();
         var offsetX = (rightBtnColorsDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnColorsMenuDOM.css({
@@ -2762,27 +2772,29 @@ $(document).ready(function () {
         } else {
           rightBtnColorsMenuDOM.hide();
         }
-      });
+      }
       rightBtnEarthMenuDOM.hover(null, function () { // Lost Focus
         rightBtnEarthMenuDOM.hide();
       });
 
-      rightBtnEarthDOM.hover(function () {
-        uiManager.clearRMBSubMenu();
-        var offsetX = (rightBtnEarthDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
-        rightBtnEarthMenuDOM.css({
-          display: 'block',
-          'text-align': 'center',
-          position: 'absolute',
-          left: rightBtnEarthDOM.offset().left + offsetX,
-          top: rightBtnEarthDOM.offset().top
-        });
-        if (rightBtnEarthDOM.offset().top !== 0) {
-          rightBtnEarthMenuDOM.show();
-        } else {
-          rightBtnEarthMenuDOM.hide();
+      rightBtnEarthDOM.hover(()=>{rightBtnEarthDOMDropdown();});
+      rightBtnEarthDOM.click(()=>{rightBtnEarthDOMDropdown();});
+      function rightBtnEarthDOMDropdown () {
+          uiManager.clearRMBSubMenu();
+          var offsetX = (rightBtnEarthDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+          rightBtnEarthMenuDOM.css({
+            display: 'block',
+            'text-align': 'center',
+            position: 'absolute',
+            left: rightBtnEarthDOM.offset().left + offsetX,
+            top: rightBtnEarthDOM.offset().top
+          });
+          if (rightBtnEarthDOM.offset().top !== 0) {
+            rightBtnEarthMenuDOM.show();
+          } else {
+            rightBtnEarthMenuDOM.hide();
+          }
         }
-      });
       rightBtnEarthMenuDOM.hover(null, function () { // Lost Focus
         rightBtnEarthMenuDOM.hide();
       });

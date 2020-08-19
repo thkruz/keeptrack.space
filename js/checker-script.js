@@ -11,7 +11,7 @@ function detectIe() {
     let browsers = /Chrome|Safari|Firefox|Edg/i.test(BrowserA);
 
     if (browsers === false) {
-        window.location.assign = ("/IE.html");
+        window.location.assign = ("/res/IE.html");
     }
     else {
         return true;
@@ -20,6 +20,20 @@ function detectIe() {
 // DETECT IE
 
 // CHECK READY STATE
+let checkRequest = new Request("/");
+
+fetch(checkRequest).then(function (response) {
+
+    console.log(response.status + "OK");
+
+    if (response.status === 404) {
+        window.location.assign("/res/404.html");
+    }
+    else {
+        readyForInteraction();
+    }
+});
+
 function readyForInteraction() {
 
     document.addEventListener("readystatechange", function () {
@@ -44,15 +58,5 @@ function readyForInteraction() {
             }
         }
     });
-
-    fetch("/").then(function (response) {
-
-        console.log(response.status);
-
-        if (response.status === 404) {
-            window.location.assign("/404.html");
-        }
-    });
-
-} readyForInteraction();
+}
 // CHECK READY STATE

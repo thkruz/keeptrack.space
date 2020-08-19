@@ -185,7 +185,7 @@ ul {
   width: 165px;
   border-radius: 5px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  z-index: 1;
+  z-index: 10; // Prevent fighting with the slide down button on mobile
 }
 
 .right-btn-menu ul {

@@ -921,7 +921,7 @@ function _drawCamera() {
       mat4.rotateX(camMatrix, camMatrix, -cameraManager.localRotateCurrent.pitch);
       mat4.rotateY(camMatrix, camMatrix, -cameraManager.localRotateCurrent.roll);
       mat4.rotateZ(camMatrix, camMatrix, -cameraManager.localRotateCurrent.yaw);
-            
+
       mat4.translate(camMatrix, camMatrix, [settingsManager.offsetCameraModeX, _getCamDist(), settingsManager.offsetCameraModeZ]);
       mat4.rotateX(camMatrix, camMatrix, camPitch);
       mat4.rotateZ(camMatrix, camMatrix, -camYaw);
@@ -2199,48 +2199,59 @@ $(document).ready(function () {
     settingsManager.isResizing = true;
   });
 
-  // Camera Manager Events
-  if (!settingsManager.disableCameraControls) {
-    $(window).mousedown(function (evt) {
-      // Middle Mouse Button MMB
-      if (evt.button === 1) {
-        cameraManager.isLocalRotate = true;
-        cameraManager.localRotateStartPosition = cameraManager.localRotateCurrent;
-        if (cameraManager.isShiftPressed) {
-          cameraManager.isLocalRotateRoll = true;
-          cameraManager.isLocalRotateYaw = false;
-        } else {
-          cameraManager.isLocalRotateRoll = false;
-          cameraManager.isLocalRotateYaw = true;
+  // TODO: Migrate All Mouse/Touch events under this single document ready
+  // listener so that they are scoped to the window and easier to manage
+  // and isolate from other files.
+  $(window).mousedown(function (evt) {
+    // Camera Manager Events
+    {
+      if (!settingsManager.disableCameraControls) {
+        // Middle Mouse Button MMB
+        if (evt.button === 1) {
+          cameraManager.isLocalRotate = true;
+          cameraManager.localRotateStartPosition = cameraManager.localRotateCurrent;
+          if (cameraManager.isShiftPressed) {
+            cameraManager.isLocalRotateRoll = true;
+            cameraManager.isLocalRotateYaw = false;
+          } else {
+            cameraManager.isLocalRotateRoll = false;
+            cameraManager.isLocalRotateYaw = true;
+          }
+        }
+
+        // Right Mouse Button RMB
+        if (evt.button === 2) {
+          cameraManager.isPanning = true;
+          cameraManager.panStartPosition = cameraManager.panCurrent;
+          if (cameraManager.isShiftPressed) {
+            cameraManager.isScreenPan = false;
+            cameraManager.isWorldPan = true;
+          } else {
+            cameraManager.isScreenPan = true;
+            cameraManager.isWorldPan = false;
+          }
         }
       }
+    }
+  });
 
-      // Right Mouse Button RMB
-      if (evt.button === 2) {
-        cameraManager.isPanning = true;
-        cameraManager.panStartPosition = cameraManager.panCurrent;
-        if (cameraManager.isShiftPressed) {
+  $(window).mouseup(function (evt) {
+    // Camera Manager Events
+    {
+      if (!settingsManager.disableCameraControls) {
+        if (evt.button === 1) {
+          cameraManager.isLocalRotate = false;
+          cameraManager.isLocalRotateRoll = false;
+          cameraManager.isLocalRotateYaw = false;
+        }
+        if (evt.button === 2) {
+          cameraManager.isPanning = false;
           cameraManager.isScreenPan = false;
-          cameraManager.isWorldPan = true;
-        } else {
-          cameraManager.isScreenPan = true;
           cameraManager.isWorldPan = false;
         }
       }
-    });
-    $(window).mouseup(function (evt) {
-      if (evt.button === 1) {
-        cameraManager.isLocalRotate = false;
-        cameraManager.isLocalRotateRoll = false;
-        cameraManager.isLocalRotateYaw = false;
-      }
-      if (evt.button === 2) {
-        cameraManager.isPanning = false;
-        cameraManager.isScreenPan = false;
-        cameraManager.isWorldPan = false;
-      }
-    });
-  }
+    }
+  });
 
   (function _canvasController() {
     db.log('_canvasController');
@@ -2364,6 +2375,8 @@ $(document).ready(function () {
             evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY);
           // _pinchStart(evt);
         } else { // Single Finger Touch
+          mobile.startMouseX = evt.originalEvent.touches[0].clientX;
+          mobile.startMouseY = evt.originalEvent.touches[0].clientY;
           mouseX = evt.originalEvent.touches[0].clientX;
           mouseY = evt.originalEvent.touches[0].clientY;
           mouseSat = getSatIdFromCoord(mouseX, mouseY);
@@ -2376,9 +2389,8 @@ $(document).ready(function () {
           // debugLine.set(dragPoint, getCamPos());
           isDragging = true;
           touchStartTime = Date.now();
-          // if (window.innerWidth <= 1000) {
-          //   isDragging = false;
-          // }
+          // If you hit the canvas hide any popups
+          _hidePopUps();
           camSnapMode = false;
           if (!settingsManager.disableUI) {
             rotateTheEarth = false;
@@ -2565,9 +2577,10 @@ $(document).ready(function () {
     canvasDOM.on('touchend', function (evt) {
       let touchTime = (Date.now() - touchStartTime);
 
-      if (touchTime > 250) {
-        // TODO: Implement touchscreen rmb
-        // _openRmbMenu();
+      if (touchTime > 150 && !isPinching &&
+          Math.abs(mobile.startMouseX - mouseX) < 50 &&
+          Math.abs(mobile.startMouseY - mouseY) < 50) {
+        _openRmbMenu();
         mouseSat = -1;
       }
 

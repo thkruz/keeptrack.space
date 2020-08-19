@@ -37,25 +37,22 @@ function readyForInteraction() {
             }
 
             else if (document.readyState === "complete") {
+
                 window.clearInterval(intervalID);
                 displayElement("main-container", true);
+
             }
         }
     });
 
-    function filesLoaded() {
+    fetch("/").then(function (response) {
 
-        if (settingsManager.installDirectory !== "/") {
-            window.location.assign("/500.html");
-            // ADD CONTACT EMAIL ON ERROR PAGE BUTTON??
-            // STYLE THE BUTTON
-            // LOG ERRORS TO JSON FILE??
-            return false;
+        console.log(response.status);
+
+        if (response.status === 404) {
+            window.location.assign("/404.html");
         }
-        else {
-            return true;
-        }
-    } filesLoaded();
+    });
 
 } readyForInteraction();
 // CHECK READY STATE

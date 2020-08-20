@@ -230,7 +230,7 @@ function initializeKeepTrack() {
       $('#version-info').tooltip({ delay: 50, html: settingsManager.versionDate, position: 'top' });
 
       // Display content when loading is complete.
-      $('#main-container').attr('style', 'display:block');
+      $('#canvas-holder').attr('style', 'display:block');
 
       mobile.checkMobileMode();
 

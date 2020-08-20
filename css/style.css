@@ -18,8 +18,8 @@
 /*The bug seems to be with chrome not the site*/
 
 input:-webkit-autofill {
-  box-shadow: 0 0 0px 1000px #0a97d6 inset;
-  background-color: #0a97d6;
+  box-shadow: 0 0 0px 1000px #1f3347 inset;
+  background-color: #1f3347;
   -webkit-text-fill-color: white !important;
   color: white !important;
 }
@@ -57,7 +57,7 @@ body {
   width: 40px;
   margin: 0px auto;
   margin-top: -20px;
-  background: rgba(2, 119, 189, 1);
+  background: rgb(23, 38, 53);
   cursor: pointer;
   text-align: center;
   font-size: 12px;
@@ -224,7 +224,7 @@ ul {
 
 .search-hilight {
   font-weight: bold;
-  color: #01579b;
+  color: #4dacff;
 }
 
 .search-result {
@@ -290,7 +290,7 @@ ul {
 }
 
 .menu-item:hover .menu-title {
-  color: #0277bd;
+  color: #172635;
 }
 
 .menu-title {
@@ -344,7 +344,7 @@ ul {
 .status-box {
   background: rgba(0, 0, 0, 0.0);
   color: white;
-  font-family: "Segoe UI", Times, serif;
+  font-family: "Open Sans", Times, serif;
   font-size: 28px;
   position: absolute;
   height: 100px !important;
@@ -618,7 +618,7 @@ ul {
 }
 
 #editor-menu {
-  background: #0a97d6;
+  background: #1f3347;
   color: white;
   overflow: auto;
 }
@@ -763,7 +763,7 @@ ul li {
 }
 
 #colorbox {
-  border: 10px solid rgb(2, 119, 189);
+  border: 10px solid #172635	;
   z-index: 10;
   box-sizing: content-box;
 }
@@ -845,14 +845,13 @@ ul li {
 
 #datetime-input {
   position: absolute;
-  left: 0px;
   bottom: 10px;
   display: none;
 }
 
 #datetime-input-tb {
   color: white;
-  font-family: 'Droid Sans', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   /* Hides it above the top of the screen */
   height: 0px !important;
   margin: 0 0 55px 0 !important;
@@ -876,7 +875,8 @@ ul li {
 }
 
 #datetime-text {
-  padding-top: 10px
+  padding-top: 10px;
+  font-family: 'Roboto Mono', monospace;
 }
 
 #datetime-text:hover {
@@ -1032,7 +1032,7 @@ ul li {
 }
 
 .dark-blue-badge {
-  color: #00568a !important;
+  color: #4dacff !important;
   font-weight: bold;
 }
 
@@ -1047,22 +1047,22 @@ ul li {
   left: 10%;
   border-radius: 5px;
   z-index: 99;
-  border: 1px solid #0277bd;
+  border: 1px solid #172635;
   min-width: 200px;
   max-width: 350px;
   margin: 50px 10px;
   text-align: center;
   padding: 10px;
   overflow: hidden;
-  background: rgb(2, 119, 189);
+  background: #172635	;
   /* Old browsers */
-  background: -moz-linear-gradient(45deg, rgba(2, 119, 189, 1) 0%, rgba(64, 150, 238, 1) 100%);
+  background: -moz-linear-gradient(45deg, #080c11, #274059);
   /* FF3.6-15 */
-  background: -webkit-linear-gradient(45deg, rgba(2, 119, 189, 1) 0%, rgba(64, 150, 238, 1) 100%);
+  background: -webkit-linear-gradient(45deg, #080c11, #274059);
   /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(45deg, rgba(2, 119, 189, 1) 0%, rgba(64, 150, 238, 1) 100%);
+  background: linear-gradient(45deg, #080c11, #274059);
   /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0277bd', endColorstr='#4096ee', GradientType=1);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
 }
 
@@ -1076,7 +1076,7 @@ ul li {
 
 .help-header-sel:hover {
   cursor: pointer;
-  color: #00568a;
+  color: #4dacff;
 }
 
 #help-close {
@@ -1088,7 +1088,7 @@ ul li {
 
 #help-close:hover {
   cursor: pointer;
-  color: #00568a;
+  color: #4dacff;
 }
 
 #help-text {

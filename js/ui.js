@@ -2286,7 +2286,7 @@ var speedModifier = 1;
             if (settingsManager.isMobileModeEnabled) mobile.searchToggle(false);
             uiManager.hideSideMenus();
             $('#watchlist-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            mobile.searchToggle(true);
+            // mobile.searchToggle(true);
             uiManager.updateWatchlist();
             isWatchlistMenuOpen = true;
             $('#menu-watchlist').addClass('bmenu-item-selected');
@@ -4036,6 +4036,16 @@ var speedModifier = 1;
   };
 
   uiManager.colorSchemeChangeAlert = (scheme) => {
+    // Don't Make an alert the first time!
+    if (typeof uiManager.lastColorScheme == 'undefined' &&
+        scheme.default) {
+          uiManager.lastColorScheme = scheme;
+          return;
+        }
+
+    // Don't make an alert unless something has really changed
+    if (uiManager.lastColorScheme == scheme) return;
+    uiManager.lastColorScheme = scheme;
     for (var i = 0; i < Object.keys(ColorScheme).length; i++) {
       if (scheme == ColorScheme[Object.keys(ColorScheme)[i]]) {
         M.toast({ html: `Color Scheme changed to ${Object.keys(ColorScheme)[i]}` });

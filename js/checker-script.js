@@ -35,13 +35,18 @@ function readyForInteraction() {
         }
 
         function isReady() {
+
             if (document.readyState === "interactive") {
                 displayElement("main-container", false);
             }
             else if (document.readyState === "complete") {
                 window.clearInterval(intervalID);
                 displayElement("main-container", true);
+                displayElement("canvas-holder", false);
                 checkScripts();
+            }
+            else {
+                displayElement("canvas-holder", true);
             }
         }
     });
@@ -70,6 +75,10 @@ function readyForInteraction() {
             });
         }
     }
+    // Combine this with the scriptFileSrc causing the error.
+    // window.onerror = function (message, url) {
+    //     console.log(message + " " + url);
+    // }
 
 } window.onload = readyForInteraction();
 // CHECK READY STATE

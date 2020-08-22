@@ -463,7 +463,7 @@ function drawLoop() {
       camPitchSpeed = 0;
       camYawSpeed = 0;
       cameraManager.panDif.x = screenDragPoint[0] - mouseX;
-      cameraManager.panDif.y = screenDragPoint[0] - mouseX;
+      cameraManager.panDif.y = screenDragPoint[1] - mouseY;
       cameraManager.panDif.z = screenDragPoint[1] - mouseY;
 
       cameraManager.panTarget.x = cameraManager.panStartPosition.x + cameraManager.panDif.x * cameraManager.panMovementSpeed * zoomLevel;
@@ -471,7 +471,7 @@ function drawLoop() {
         cameraManager.panTarget.y = cameraManager.panStartPosition.y + cameraManager.panDif.y * cameraManager.panMovementSpeed * zoomLevel;
       }
       if (cameraManager.isScreenPan) {
-        cameraManager.panTarget.z = cameraManager.panStartPosition.z + cameraManager.panDif.y * cameraManager.panMovementSpeed;
+        cameraManager.panTarget.z = cameraManager.panStartPosition.z + cameraManager.panDif.z * cameraManager.panMovementSpeed;
       }
     }
 
@@ -484,33 +484,44 @@ function drawLoop() {
       cameraManager.panDif.z = cameraManager.panCurrent.z;
     }
 
+    cameraManager.panResetModifier = (cameraManager.panReset) ? 0.5 : 1;
+
+    // X is X no matter what
     cameraManager.panSpeed.x = (cameraManager.panCurrent.x - cameraManager.panTarget.x) * cameraManager.panMovementSpeed * zoomLevel;
     cameraManager.panSpeed.x -= (cameraManager.panSpeed.x * dt * cameraManager.panMovementSpeed * zoomLevel);
-    if (cameraManager.panReset) { cameraManager.panSpeed.x /= 10; }
-    cameraManager.panCurrent.x += cameraManager.panMovementSpeed * cameraManager.panDif.x;
-
-    if (cameraManager.isWorldPan || cameraManager.panReset) {
-      cameraManager.panSpeed.y = (cameraManager.panCurrent.y - cameraManager.panTarget.y) * cameraManager.panMovementSpeed * zoomLevel;
-      cameraManager.panSpeed.y -= (cameraManager.panSpeed.y * dt * cameraManager.panMovementSpeed * zoomLevel);
-      if (cameraManager.panReset) { cameraManager.panSpeed.y /= 10; }
-      cameraManager.panCurrent.y -= cameraManager.panMovementSpeed * cameraManager.panDif.y;
+    cameraManager.panCurrent.x += cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.x;
+    // If we are moving like an FPS then Y and Z are based on the angle of the camera
+    if (cameraManager.isWorldPan) {
+      fpsYPos -= Math.cos(cameraManager.localRotateCurrent.yaw) * cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.y;
+      fpsZPos += Math.sin(cameraManager.localRotateCurrent.pitch) * cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.y;
+      fpsYPos -= Math.sin(-cameraManager.localRotateCurrent.yaw) * cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.x;
     }
+    // If we are moving the screen then Z is always up and Y is not relevant
     if (cameraManager.isScreenPan || cameraManager.panReset) {
       cameraManager.panSpeed.z = (cameraManager.panCurrent.z - cameraManager.panTarget.z) * cameraManager.panMovementSpeed * zoomLevel;
       cameraManager.panSpeed.z -= (cameraManager.panSpeed.z * dt * cameraManager.panMovementSpeed * zoomLevel);
-      if (cameraManager.panReset) { cameraManager.panSpeed.z /= 10; }
-      cameraManager.panCurrent.z -= cameraManager.panMovementSpeed * cameraManager.panDif.z;
+      cameraManager.panCurrent.z -= cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.z;
     }
 
     if (cameraManager.panReset) {
-      if (cameraManager.panCurrent.x > -0.001 && cameraManager.panCurrent.x < 0.001) cameraManager.panCurrent.x = 0;
-      if (cameraManager.panCurrent.y > -0.001 && cameraManager.panCurrent.y < 0.001) cameraManager.panCurrent.y = 0;
-      if (cameraManager.panCurrent.z > -0.001 && cameraManager.panCurrent.z < 0.001) cameraManager.panCurrent.z = 0;
-      if (cameraManager.panCurrent.x == 0 && cameraManager.panCurrent.y == 0 && cameraManager.panCurrent.z == 0) {
+      fpsXPos = fpsXPos - (fpsXPos/25);
+      fpsYPos = fpsYPos - (fpsYPos/25);
+      fpsZPos = fpsZPos - (fpsZPos/25);
+
+      if (cameraManager.panCurrent.x > -0.5 && cameraManager.panCurrent.x < 0.5) cameraManager.panCurrent.x = 0;
+      if (cameraManager.panCurrent.y > -0.5 && cameraManager.panCurrent.y < 0.5) cameraManager.panCurrent.y = 0;
+      if (cameraManager.panCurrent.z > -0.5 && cameraManager.panCurrent.z < 0.5) cameraManager.panCurrent.z = 0;
+      if (fpsXPos > -0.5 && fpsXPos < 0.5) fpsXPos = 0;
+      if (fpsYPos > -0.5 && fpsYPos < 0.5) fpsYPos = 0;
+      if (fpsZPos > -0.5 && fpsZPos < 0.5) fpsZPos = 0;
+
+      if (cameraManager.panCurrent.x == 0 && cameraManager.panCurrent.y == 0 && cameraManager.panCurrent.z == 0 &&
+          fpsXPos == 0 && fpsYPos == 0 && fpsZPos == 0) {
         cameraManager.panReset = false;
       }
     }
-  } else if (cameraManager.isLocalRotate || cameraManager.localRotateReset) {
+  }
+  if (cameraManager.isLocalRotate || cameraManager.localRotateReset) {
     // If user is actively moving
     if (cameraManager.isLocalRotate) {
       cameraManager.localRotateDif.pitch = screenDragPoint[1] - mouseY;
@@ -535,23 +546,22 @@ function drawLoop() {
       cameraManager.localRotateTarget.yaw = 0;
       cameraManager.localRotateDif.pitch = -cameraManager.localRotateCurrent.pitch;
       cameraManager.localRotateDif.roll = -cameraManager.localRotateCurrent.roll;
-      cameraManager.localRotateDif.yaw = cameraManager.localRotateCurrent.yaw;
+      cameraManager.localRotateDif.yaw = -cameraManager.localRotateCurrent.yaw;
     }
+
+    cameraManager.resetModifier = (cameraManager.localRotateReset) ? 500 : 1;
 
     cameraManager.localRotateSpeed.pitch -= (cameraManager.localRotateSpeed.pitch * dt * cameraManager.localRotateMovementSpeed);
-    if (cameraManager.localRotateReset) { cameraManager.localRotateSpeed.pitch /= 10; }
-    cameraManager.localRotateCurrent.pitch += cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.pitch;
+    cameraManager.localRotateCurrent.pitch += cameraManager.resetModifier * cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.pitch;
 
-    if (cameraManager.isLocalRotateRoll) {
+    if (cameraManager.isLocalRotateRoll || cameraManager.localRotateReset) {
       cameraManager.localRotateSpeed.roll -= (cameraManager.localRotateSpeed.roll * dt * cameraManager.localRotateMovementSpeed);
-      if (cameraManager.localRotateReset) { cameraManager.localRotateSpeed.roll /= 10; }
-      cameraManager.localRotateCurrent.roll += cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.roll;
+      cameraManager.localRotateCurrent.roll += cameraManager.resetModifier * cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.roll;
     }
 
-    if (cameraManager.isLocalRotateYaw) {
+    if (cameraManager.isLocalRotateYaw || cameraManager.localRotateReset) {
       cameraManager.localRotateSpeed.yaw -= (cameraManager.localRotateSpeed.yaw * dt * cameraManager.localRotateMovementSpeed);
-      if (cameraManager.localRotateReset) { cameraManager.localRotateSpeed.yaw /= 10; }
-      cameraManager.localRotateCurrent.yaw += cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.yaw;
+      cameraManager.localRotateCurrent.yaw += cameraManager.resetModifier * cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.yaw;
     }
 
     if (cameraManager.localRotateReset) {
@@ -562,81 +572,79 @@ function drawLoop() {
         cameraManager.localRotateReset = false;
       }
     }
-  } else {
-    // Dont Rotate if Panning
-    if ((isDragging && !settingsManager.isMobileModeEnabled) ||
-      isDragging && settingsManager.isMobileModeEnabled && (mouseX !== 0 || mouseY !== 0)) {
-      // Disable Raycasting for Performance
-      // dragTarget = getEarthScreenPoint(mouseX, mouseY);
-      // if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
-      // isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
-      //
-      // TODO: Rotate Around Earth code needs cleaned up now that raycasting is turned off
-      //
-      if (true ||
-        cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY ||
-        settingsManager.isMobileModeEnabled) { // random screen drag
-        xDif = screenDragPoint[0] - mouseX;
-        yDif = screenDragPoint[1] - mouseY;
-        yawTarget = dragStartYaw + xDif * settingsManager.cameraMovementSpeed;
-        pitchTarget = dragStartPitch + yDif * -settingsManager.cameraMovementSpeed;
-        camPitchSpeed = _normalizeAngle(camPitch - pitchTarget) * -settingsManager.cameraMovementSpeed;
-        camYawSpeed = _normalizeAngle(camYaw - yawTarget) * -settingsManager.cameraMovementSpeed;
-      } else {  // earth surface point drag
-        dragPointR = Math.sqrt(dragPoint[0] * dragPoint[0] + dragPoint[1] * dragPoint[1]);
-        dragTargetR = Math.sqrt(dragTarget[0] * dragTarget[0] + dragTarget[1] * dragTarget[1]);
+  }
 
-        dragPointLon = Math.atan2(dragPoint[1], dragPoint[0]);
-        dragTargetLon = Math.atan2(dragTarget[1], dragTarget[0]);
+  if ((isDragging && !settingsManager.isMobileModeEnabled) ||
+    isDragging && settingsManager.isMobileModeEnabled && (mouseX !== 0 || mouseY !== 0)) {
+    // Disable Raycasting for Performance
+    // dragTarget = getEarthScreenPoint(mouseX, mouseY);
+    // if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
+    // isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
+    //
+    // TODO: Rotate Around Earth code needs cleaned up now that raycasting is turned off
+    //
+    if (true ||
+      cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY ||
+      settingsManager.isMobileModeEnabled) { // random screen drag
+      xDif = screenDragPoint[0] - mouseX;
+      yDif = screenDragPoint[1] - mouseY;
+      yawTarget = dragStartYaw + xDif * settingsManager.cameraMovementSpeed;
+      pitchTarget = dragStartPitch + yDif * -settingsManager.cameraMovementSpeed;
+      camPitchSpeed = _normalizeAngle(camPitch - pitchTarget) * -settingsManager.cameraMovementSpeed;
+      camYawSpeed = _normalizeAngle(camYaw - yawTarget) * -settingsManager.cameraMovementSpeed;
+    } else {  // earth surface point drag
+      dragPointR = Math.sqrt(dragPoint[0] * dragPoint[0] + dragPoint[1] * dragPoint[1]);
+      dragTargetR = Math.sqrt(dragTarget[0] * dragTarget[0] + dragTarget[1] * dragTarget[1]);
 
-        dragPointLat = Math.atan2(dragPoint[2], dragPointR);
-        dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
+      dragPointLon = Math.atan2(dragPoint[1], dragPoint[0]);
+      dragTargetLon = Math.atan2(dragTarget[1], dragTarget[0]);
 
-        pitchDif = dragPointLat - dragTargetLat;
-        yawDif = _normalizeAngle(dragPointLon - dragTargetLon);
-        camPitchSpeed = pitchDif * settingsManager.cameraMovementSpeed;
-        camYawSpeed = yawDif * settingsManager.cameraMovementSpeed;
-      }
-      camSnapMode = false;
-    } else {
-      // DESKTOP ONLY
-      if (!settingsManager.isMobileModeEnabled) {
-        camPitchSpeed -= (camPitchSpeed * dt * settingsManager.cameraMovementSpeed); // decay speeds when globe is "thrown"
-        camYawSpeed -= (camYawSpeed * dt * settingsManager.cameraMovementSpeed);
-      } else if (settingsManager.isMobileModeEnabled) { // MOBILE
-        camPitchSpeed -= (camPitchSpeed * dt * settingsManager.cameraMovementSpeed * 5); // decay speeds when globe is "thrown"
-        camYawSpeed -= (camYawSpeed * dt * settingsManager.cameraMovementSpeed * 5);
-      }
+      dragPointLat = Math.atan2(dragPoint[2], dragPointR);
+      dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
+
+      pitchDif = dragPointLat - dragTargetLat;
+      yawDif = _normalizeAngle(dragPointLon - dragTargetLon);
+      camPitchSpeed = pitchDif * settingsManager.cameraMovementSpeed;
+      camYawSpeed = yawDif * settingsManager.cameraMovementSpeed;
     }
-
-    camRotateSpeed -= (camRotateSpeed * dt * settingsManager.cameraMovementSpeed);
-
-    if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
-
-      fpsPitch -= 20 * camPitchSpeed * dt;
-      fpsYaw -= 20 * camYawSpeed * dt;
-      fpsRotate -= 20 * camRotateSpeed * dt;
-
-      // Prevent Over Rotation
-      if (fpsPitch > 90) fpsPitch = 90;
-      if (fpsPitch < -90) fpsPitch = -90;
-      // ASTRONOMY 180 FOV Bubble Looking out from Sensor
-      if (cameraType.current === cameraType.ASTRONOMY) {
-        if (fpsRotate > 90) fpsRotate = 90;
-        if (fpsRotate < -90) fpsRotate = -90;
-      } else {
-        if (fpsRotate > 360) fpsRotate -= 360;
-        if (fpsRotate < 0) fpsRotate += 360;
-      }
-      if (fpsYaw > 360) fpsYaw -= 360;
-      if (fpsYaw < 0) fpsYaw += 360;
-    } else {
-      camPitch += camPitchSpeed * dt;
-      camYaw += camYawSpeed * dt;
-      fpsRotate += camRotateSpeed * dt;
+    camSnapMode = false;
+  } else {
+    // DESKTOP ONLY
+    if (!settingsManager.isMobileModeEnabled) {
+      camPitchSpeed -= (camPitchSpeed * dt * settingsManager.cameraMovementSpeed); // decay speeds when globe is "thrown"
+      camYawSpeed -= (camYawSpeed * dt * settingsManager.cameraMovementSpeed);
+    } else if (settingsManager.isMobileModeEnabled) { // MOBILE
+      camPitchSpeed -= (camPitchSpeed * dt * settingsManager.cameraMovementSpeed * 5); // decay speeds when globe is "thrown"
+      camYawSpeed -= (camYawSpeed * dt * settingsManager.cameraMovementSpeed * 5);
     }
   }
 
+  camRotateSpeed -= (camRotateSpeed * dt * settingsManager.cameraMovementSpeed);
+
+  if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
+
+    fpsPitch -= 20 * camPitchSpeed * dt;
+    fpsYaw -= 20 * camYawSpeed * dt;
+    fpsRotate -= 20 * camRotateSpeed * dt;
+
+    // Prevent Over Rotation
+    if (fpsPitch > 90) fpsPitch = 90;
+    if (fpsPitch < -90) fpsPitch = -90;
+    // ASTRONOMY 180 FOV Bubble Looking out from Sensor
+    if (cameraType.current === cameraType.ASTRONOMY) {
+      if (fpsRotate > 90) fpsRotate = 90;
+      if (fpsRotate < -90) fpsRotate = -90;
+    } else {
+      if (fpsRotate > 360) fpsRotate -= 360;
+      if (fpsRotate < 0) fpsRotate += 360;
+    }
+    if (fpsYaw > 360) fpsYaw -= 360;
+    if (fpsYaw < 0) fpsYaw += 360;
+  } else {
+    camPitch += camPitchSpeed * dt;
+    camYaw += camYawSpeed * dt;
+    fpsRotate += camRotateSpeed * dt;
+  }
 
   if (rotateTheEarth) { camYaw -= settingsManager.autoRotateSpeed * dt; }
 
@@ -906,13 +914,13 @@ function _drawCamera() {
     zoomTarget = 0.5;
   }
 
-  mat4.translate(camMatrix, camMatrix, [cameraManager.panCurrent.x, cameraManager.panCurrent.y, cameraManager.panCurrent.z]);
-
   switch (cameraType.current) {
     case cameraType.DEFAULT: // pivot around the earth with earth in the center
+      mat4.translate(camMatrix, camMatrix, [cameraManager.panCurrent.x, cameraManager.panCurrent.y, cameraManager.panCurrent.z]);
       mat4.rotateX(camMatrix, camMatrix, -cameraManager.localRotateCurrent.pitch);
       mat4.rotateY(camMatrix, camMatrix, -cameraManager.localRotateCurrent.roll);
       mat4.rotateZ(camMatrix, camMatrix, -cameraManager.localRotateCurrent.yaw);
+      mat4.translate(camMatrix, camMatrix, [fpsXPos, fpsYPos, -fpsZPos]);
       mat4.translate(camMatrix, camMatrix, [0, _getCamDist(), 0]);
       mat4.rotateX(camMatrix, camMatrix, camPitch);
       mat4.rotateZ(camMatrix, camMatrix, -camYaw);
@@ -953,7 +961,7 @@ function _drawCamera() {
         // yawRotate = ((-90 - sensorManager.currentSensor.long) * DEG2RAD);
         if (objectManager.selectedSat !== -1) lastselectedSat = objectManager.selectedSat;
         let sat = satSet.getSat(lastselectedSat);
-        // mat4.rotate(camMatrix, camMatrix, sat.inclination * DEG2RAD, [0, 1, 0]);
+        // mat4.rotate(camMatrix, camMatrix, sat.lat * DEG2RAD, [0, 1, 0]);
         mat4.rotate(camMatrix, camMatrix, -fpsPitch * DEG2RAD, [1, 0, 0]);
         mat4.rotate(camMatrix, camMatrix, fpsYaw * DEG2RAD, [0, 0, 1]);
         mat4.rotate(camMatrix, camMatrix, fpsRotate * DEG2RAD, [0, 1, 0]);
@@ -2292,7 +2300,7 @@ $(document).ready(function () {
       clearTimeout(mouseTimeout);
       mouseTimeout = setTimeout(function () {
         isMouseMoving = false;
-      }, 250);
+      }, 150);
     });
 
     if (settingsManager.disableUI) {
@@ -2353,8 +2361,10 @@ $(document).ready(function () {
         screenDragPoint = [mouseX, mouseY];
         dragStartPitch = camPitch;
         dragStartYaw = camYaw;
+        if (evt.button === 0) {
+          isDragging = true;
+        }
         // debugLine.set(dragPoint, getCamPos());
-        isDragging = true;
         camSnapMode = false;
         if (!settingsManager.disableUI) {
           rotateTheEarth = false;
@@ -2415,7 +2425,9 @@ $(document).ready(function () {
             }
           }
           if (evt.button === 2) { // Right Mouse Button Clicked
-            _openRmbMenu();
+            if (!isMouseMoving) {
+              _openRmbMenu();
+            }
           }
         }
         // Repaint the theme to ensure it is the right color
@@ -2639,6 +2651,15 @@ $(document).ready(function () {
         _rmbMenuActions(e);
       });
       rightBtnEarthMenuDOM.on("click", function (e) {
+        _rmbMenuActions(e);
+      });
+      $('#reset-camera-rmb').on("click", function (e) {
+        _rmbMenuActions(e);
+      });
+      $('#clear-screen-rmb').on("click", function (e) {
+        _rmbMenuActions(e);
+      });
+      $('#clear-lines-rmb').on("click", function (e) {
         _rmbMenuActions(e);
       });
 
@@ -2894,6 +2915,10 @@ $(document).ready(function () {
           $('#cs-minrange').val(0);
           $('#cs-maxrange').val(1000000);
           $('#customSensor').on("submit", () => { });
+          break;
+        case 'reset-camera-rmb':
+          cameraManager.panReset = true;
+          cameraManager.localRotateReset = true;
           break;
         case 'clear-lines-rmb':
           drawLineList = [];

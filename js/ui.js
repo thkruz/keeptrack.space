@@ -3583,7 +3583,7 @@ var speedModifier = 1;
       } else {
         $('#sat-latitude').html((satellite.degreesLat(uiManager.currentTEARR.lat) * -1).toFixed(3) + '°S');
       }
-      var jday = 'JDAY: ' + timeManager.getDayOfYear(timeManager.propTime());
+      var jday = timeManager.getDayOfYear(timeManager.propTime());
       $('#jday').html(jday);
 
       if (settingsManager.isMapMenuOpen && timeManager.now > settingsManager.lastMapUpdateTime + 30000) {

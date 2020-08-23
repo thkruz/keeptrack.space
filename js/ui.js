@@ -170,7 +170,7 @@ var speedModifier = 1;
     (function _menuInit() {
       db.log('_menuInit');
       // Load the current JDAY
-      var jday = 'JDAY: ' + timeManager.getDayOfYear(timeManager.propTime());
+      var jday = timeManager.getDayOfYear(timeManager.propTime());
       $('#jday').html(jday);
       jday = null; // Garbage collect
 
@@ -949,7 +949,7 @@ var speedModifier = 1;
       $('#datetime-input-form').on("change", function (e) {
         var selectedDate = $('#datetime-input-tb').datepicker('getDate');
         var today = new Date();
-        var jday = 'JDAY: ' + timeManager.getDayOfYear(timeManager.propTime());
+        var jday = timeManager.getDayOfYear(timeManager.propTime());
         $('#jday').html(jday);
         timeManager.propOffset = selectedDate - today;
         satCruncher.postMessage({

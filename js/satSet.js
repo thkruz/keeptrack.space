@@ -173,6 +173,134 @@ var emptyMat4 = mat4.create();
       if (limitSats !== '') {
         $('#menu-satellite-collision').hide();
       }
+
+      satSet.onCruncherReady();
+
+      (function _reloadLastSensor() {
+        let currentSensor = (!settingsManager.offline) ? JSON.parse(localStorage.getItem("currentSensor")) : null;
+        if (currentSensor !== null) {
+          try {
+            // If there is a staticnum set use that
+            if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
+              sensorManager.setSensor(null, currentSensor[1]);
+            } else {
+              // If the sensor is a string, load that collection of sensors
+              if (typeof currentSensor[0].shortName == 'undefined') {
+                sensorManager.setSensor(currentSensor[0], currentSensor[1]);
+              } else {
+                // Seems to be a single sensor without a staticnum, load that
+                sensorManager.setSensor(sensorManager.sensorList[currentSensor[0].shortName], currentSensor[1]);
+              }
+            }
+          }
+          catch (e) {
+            console.warn('Saved Sensor Information Invalid');
+          }
+        }
+      })();
+      (function _watchlistInit() {
+        var watchlistJSON = (!settingsManager.offline) ? localStorage.getItem("watchlistList") : null;
+        if (watchlistJSON !== null) {
+          var newWatchlist = JSON.parse(watchlistJSON);
+          watchlistInViewList = [];
+          for (var i = 0; i < newWatchlist.length; i++) {
+            var sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
+            if (sat !== null) {
+              newWatchlist[i] = sat.id;
+              watchlistInViewList.push(false);
+            } else {
+              console.error('Watchlist File Format Incorret');
+              return;
+            }
+          }
+          uiManager.updateWatchlist(newWatchlist, watchlistInViewList);
+        }
+      })();
+      (function _parseGetParameters() {
+        // do querystring stuff
+        var params = satSet.queryStr.split('&');
+
+        // Do Searches First
+        for (let i = 0; i < params.length; i++) {
+          let key = params[i].split('=')[0];
+          let val = params[i].split('=')[1];
+          if (key == 'search') {
+            // console.log('preloading search to ' + val);
+            // Sensor Selection takes 1.5 seconds to update color Scheme
+            // TODO: SensorManager might be the problem here, but this works
+            // _doDelayedSearch(val);
+            if (!settingsManager.disableUI) {
+              searchBox.doSearch(val);
+            }
+          }
+        }
+
+        // Then Do Other Stuff
+        for (let i = 0; i < params.length; i++) {
+          let key = params[i].split('=')[0];
+          let val = params[i].split('=')[1];
+          let urlSatId;
+          switch (key) {
+            case 'intldes':
+              urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
+              if (urlSatId !== null) {
+                selectSat(urlSatId);
+              }
+              break;
+            case 'sat':
+              urlSatId = satSet.getIdFromObjNum(val.toUpperCase());
+              if (urlSatId !== null) {
+                selectSat(urlSatId);
+              }
+              break;
+            case 'misl':
+              var subVal = val.split(',');
+              $('#ms-type').val(subVal[0].toString());
+              $('#ms-attacker').val(subVal[1].toString());
+              // $('#ms-lat-lau').val() * 1;
+              // ('#ms-lon-lau').val() * 1;
+              $('#ms-target').val(subVal[2].toString());
+              // $('#ms-lat').val() * 1;
+              // $('#ms-lon').val() * 1;
+              $('#missile').trigger("submit");
+              break;
+            case 'date':
+              timeManager.propOffset = Number(val) - Date.now();
+              $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
+              satCruncher.postMessage({
+                typ: 'offset',
+                dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
+              });
+              break;
+            case 'rate':
+              val = Math.min(val, 1000);
+              // could run time backwards, but let's not!
+              val = Math.max(val, 0.0);
+              // console.log('propagating at rate ' + val + ' x real time ');
+              timeManager.propRate = Number(val);
+              satCruncher.postMessage({
+                typ: 'offset',
+                dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
+              });
+              break;
+          }
+        }
+      })();
+
+      if (settingsManager.startWithOrbitsDisplayed) {
+      setTimeout(function () {
+        // Time Machine
+        // orbitManager.historyOfSatellitesPlay();
+
+        // All Orbits
+        groups.debris = new groups.SatGroup('all', '');
+        groups.selectGroup(groups.debris);
+        satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+        groups.debris.updateOrbits();
+        isOrbitOverlay = true;
+      }, 5000);
+    }
+
       settingsManager.cruncherReady = true;
     }
   };

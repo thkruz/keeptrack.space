@@ -175,82 +175,329 @@ if (!settingsManager.disableUI) {
 
     if (objectManager.isSensorManagerLoaded) {
       numOfIcons++;
-      bottomIconsDivDOM.append('<img id="menu-sensor-list" src="" delayedsrc="' + settingsManager.installDirectory + 'images/space-station-2.png" class="bmenu-item tooltipped" alt="Sensor List" data-position="top" data-delay="50" data-tooltip="Sensor List">');
+      bottomIconsDivDOM.append(`
+        <div id="menu-sensor-list" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/radar.png">
+          <span class="bmenu-title">Sensors</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
       numOfIcons++;
-      bottomIconsDivDOM.append('<img id="menu-info-overlay" src="" delayedsrc="' + settingsManager.installDirectory + 'images/info.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Information Overlay" data-position="top" data-delay="50" data-tooltip="Information Overlay">');
+      bottomIconsDivDOM.append(`
+        <div id="menu-info-overlay" class="bmenu-item bmenu-item-disabled">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/info.png">
+          <span class="bmenu-title">Overlay</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
       numOfIcons++;
-      bottomIconsDivDOM.append('<img id="menu-sensor-info" src="" delayedsrc="' + settingsManager.installDirectory + 'images/radar.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Sensor Information" data-position="top" data-delay="50" data-tooltip="Sensor Information">');
+      bottomIconsDivDOM.append(`
+        <div id="menu-sensor-info" class="bmenu-item bmenu-item-disabled">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/radio-tower.png">
+          <span class="bmenu-title">Sensor Info</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
       numOfIcons++;
-      bottomIconsDivDOM.append('<img id="menu-watchlist" src="" delayedsrc="' + settingsManager.installDirectory + 'images/star.png" class="bmenu-item tooltipped" alt="Satellite Watchlist" data-position="top" data-delay="50" data-tooltip="Satellite Watchlist">');
+      bottomIconsDivDOM.append(`
+        <div id="menu-watchlist" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/watchlist.png">
+          <span class="bmenu-title">Watchlist</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
     }
     if (objectManager.isSensorManagerLoaded) {
-      bottomIconsDivDOM.append('<img id="menu-lookangles" src="" delayedsrc="' + settingsManager.installDirectory + 'images/telescope.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Look Angles" data-position="top" data-delay="50" data-tooltip="Look Angles">');
-      bottomIconsDivDOM.append('<img id="menu-lookanglesmultisite" src="" delayedsrc="' + settingsManager.installDirectory + 'images/worldwide.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="SSN Lookangles" data-position="top" data-delay="50" data-tooltip="SSN Lookangles">');
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-lookangles" class="bmenu-item bmenu-item-disabled">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/lookangles.png">
+          <span class="bmenu-title">Look Angles</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-lookanglesmultisite" class="bmenu-item bmenu-item-disabled">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/multi-site.png">
+          <span class="bmenu-title">Multi-Site Looks</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
     }
-    bottomIconsDivDOM.append('<img id="menu-find-sat" src="" delayedsrc="' + settingsManager.installDirectory + 'images/findOrbit.png" class="bmenu-item tooltipped" alt="Search Orbit" data-position="top" data-delay="50" data-tooltip="Search Orbit">');
-    bottomIconsDivDOM.append('<!-- <img id="menu-space-stations" src="" delayedsrc="' + settingsManager.installDirectory + 'images/space-station-1.png" class="bmenu-item tooltipped" alt="Union of Concerned Scientists Watchlist" data-position="top" data-delay="50" data-tooltip="Union of Concerned Scientists Watchlist"> -->');
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-find-sat" class="bmenu-item">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/find2.png">
+        <span class="bmenu-title">Find Satellite</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
+    // numOfIcons++;
+    // bottomIconsDivDOM.append(`
+    //   <div id="menu-space-stations" class="bmenu-item">
+    //     <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/blue-sat.png">
+    //     <span class="bmenu-title">a</span>
+    //   </div>
+    // `);
     if (!settingsManager.offline) {
-      bottomIconsDivDOM.append('<img id="menu-satellite-collision" src="" delayedsrc="' + settingsManager.installDirectory + 'images/satellite-collision.png" class="bmenu-item tooltipped" alt="SOCRATES Prediction of Near Conjunctions" data-position="top" data-delay="50" data-tooltip="SOCRATES Prediction of Near Conjunctions">');
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-satellite-collision" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/socrates.png">
+          <span class="bmenu-title">Collisions</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
     }
-    bottomIconsDivDOM.append('<img id="menu-editSat" src="" delayedsrc="' + settingsManager.installDirectory + 'images/editPencil.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Edit Satellites" data-position="top" data-delay="50" data-tooltip="Edit Satellites">');
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-satellite-editSat" class="bmenu-item bmenu-item-disabled">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/edit.png">
+        <span class="bmenu-title">Edit Satellite</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
     if (objectManager.isLaunchSiteManagerLoaded) {
       numOfIcons++;
-      bottomIconsDivDOM.append('<img id="menu-newLaunch" src="" delayedsrc="' + settingsManager.installDirectory + 'images/rocket-ship.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Create Launch Nominal" data-position="top" data-delay="50" data-tooltip="Create Launch Nominal">');
+      bottomIconsDivDOM.append(`
+        <div id="menu-newLaunch" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/rocket.png">
+          <span class="bmenu-title">New Launch</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
     }
     if (objectManager.isSensorManagerLoaded) {
-      bottomIconsDivDOM.append('<img id="menu-breakup" src="" delayedsrc="' + settingsManager.installDirectory + 'images/breakup.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Create Breakup" data-position="top" data-delay="50" data-tooltip="Create Breakup">');
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-breakup" class="bmenu-item bmenu-item-disabled">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/breakup.png">
+          <span class="bmenu-title">Breakup</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
     }
     if (objectManager.isMissileManagerLoaded) {
       numOfIcons++;
-      bottomIconsDivDOM.append('<img id="menu-missile" src="" delayedsrc="' + settingsManager.installDirectory + 'images/rocket-ship-2.png" class="bmenu-item tooltipped" alt="Create Missile Attack" data-position="top" data-delay="50" data-tooltip="Create Missile Attack">');
+      bottomIconsDivDOM.append(`
+        <div id="menu-missile" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/missile.png">
+          <span class="bmenu-title">Missile</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
     }
     if (objectManager.isSatCommManagerLoaded) {
       numOfIcons++;
-      bottomIconsDivDOM.append('<img id="menu-satcom" src="" delayedsrc="' + settingsManager.installDirectory + 'images/satcom.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Satellite Communication">');
-    }
-    if (!settingsManager.offline) {
-      bottomIconsDivDOM.append('<img id="menu-dops" src="" delayedsrc="' + settingsManager.installDirectory + 'images/antenna.png" class="bmenu-item tooltipped" alt="GPS DOP" data-position="top" data-delay="50" data-tooltip="GPS DOP Over Time">');
-    }
-    if (objectManager.isSensorManagerLoaded) {
-      bottomIconsDivDOM.append('<img id="menu-customSensor" src="" delayedsrc="' + settingsManager.installDirectory + 'images/observatory.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Custom Sensor">');
-    }
-    bottomIconsDivDOM.append('<img id="menu-sat-fov" src="" delayedsrc="' + settingsManager.installDirectory + 'images/satellite-map.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Satellite Field of View" data-position="top" data-delay="50" data-tooltip="Satellite Field of View">');
-    bottomIconsDivDOM.append('<img id="menu-day-night" src="" delayedsrc="' + settingsManager.installDirectory + 'images/orbit.png" class="bmenu-item tooltipped" alt="Day Night Toggle" data-position="top" data-delay="50" data-tooltip="Day Night Toggle">');
-    bottomIconsDivDOM.append('<img id="menu-color-scheme" src="" delayedsrc="' + settingsManager.installDirectory + 'images/brush.png" class="bmenu-item tooltipped" alt="Color Schemes" data-position="top" data-delay="50" data-tooltip="Color Schemes">');
-    bottomIconsDivDOM.append('<img id="menu-constellations" src="" delayedsrc="' + settingsManager.installDirectory + 'images/orbit2.png" class="bmenu-item tooltipped" alt="Constellations" data-position="top" data-delay="50" data-tooltip="Constellations">');
-    if (!settingsManager.offline) {
-      bottomIconsDivDOM.append('<img id="menu-satChng" src="" delayedsrc="' + settingsManager.installDirectory + 'images/satChng.png" class="bmenu-item tooltipped" alt="Catalog Changes" data-position="top" data-delay="50" data-tooltip="Catalog Changes">');
-    }
-    bottomIconsDivDOM.append('<img id="menu-countries" src="" delayedsrc="' + settingsManager.installDirectory + 'images/united-states.png" class="bmenu-item tooltipped" alt="Countries" data-position="top" data-delay="50" data-tooltip="Countries">');
-    if (objectManager.isSensorManagerLoaded) {
-      bottomIconsDivDOM.append('<img id="menu-planetarium" src="" delayedsrc="' + settingsManager.installDirectory + 'images/astronaut.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Planetarium View" data-position="top" data-delay="50" data-tooltip="Planetarium View">');
-      bottomIconsDivDOM.append('<img id="menu-astronomy" src="" delayedsrc="' + settingsManager.installDirectory + 'images/ursa-major.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Astronomy View" data-position="top" data-delay="50" data-tooltip="Astronomy View">');
-    }
-    bottomIconsDivDOM.append('<img id="menu-map" src="" delayedsrc="' + settingsManager.installDirectory + 'images/map.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Stereographic Map" data-position="top" data-delay="50" data-tooltip="Stereographic Map">');
-    bottomIconsDivDOM.append('<img id="menu-satview" src="" delayedsrc="' + settingsManager.installDirectory + 'images/satellite.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Satellite View" data-position="top" data-delay="50" data-tooltip="Satellite View">');
-    if (objectManager.isSensorManagerLoaded) {
-      numOfIcons++;
-      bottomIconsDivDOM.append('<img id="menu-fov-bubble" src="" delayedsrc="' + settingsManager.installDirectory + 'images/fieldofview.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Show/Hide Field of View Bubble" data-position="top" data-delay="50" data-tooltip="Show/Hide Field of View Bubble">');
-      numOfIcons++;
-      bottomIconsDivDOM.append('<img id="menu-surveillance" src="" delayedsrc="' + settingsManager.installDirectory + 'images/surveillance.png" class="bmenu-item-disabled bmenu-item tooltipped" alt="Show/Hide Surveillance Fence" data-position="top" data-delay="50" data-tooltip="Show/Hide Surveillance Fence">');
+      bottomIconsDivDOM.append(`
+        <div id="menu-satcom" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/satcom.png">
+          <span class="bmenu-title">SATCOM</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
     }
     if (!settingsManager.offline) {
       numOfIcons++;
-      bottomIconsDivDOM.append('<img id="menu-analysis" src="" delayedsrc="' + settingsManager.installDirectory + 'images/analysis.png" class="bmenu-item tooltipped" alt="Custom Sensor" data-position="top" data-delay="50" data-tooltip="Analysis">');
+      bottomIconsDivDOM.append(`
+        <div id="menu-dops" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/gps.png">
+          <span class="bmenu-title">DOPs</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
     }
-    bottomIconsDivDOM.append('<img id="menu-time-machine" src="" delayedsrc="' + settingsManager.installDirectory + 'images/time.png" class="bmenu-item tooltipped" alt="Time Machine" data-position="top" data-delay="50" data-tooltip="Time Machine">');
-    bottomIconsDivDOM.append('<img id="menu-photo" src="" delayedsrc="' + settingsManager.installDirectory + 'images/camera.png" class="bmenu-item tooltipped" alt="Take HiRes Photo" data-position="top" data-delay="50" data-tooltip="Take HiRes Photo">');
-    bottomIconsDivDOM.append('<img id="menu-record" src="" delayedsrc="' + settingsManager.installDirectory + 'images/screen-capture.jpg" class="bmenu-item tooltipped" alt="Screen Capture" data-position="top" data-delay="50" data-tooltip="Screen Capture">');
+    if (objectManager.isSensorManagerLoaded) {
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-customSensor" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/custom.png">
+          <span class="bmenu-title">Custom Sensor</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
+    }
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-sat-fov" class="bmenu-item bmenu-item-disabled">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/sat2.png">
+        <span class="bmenu-title">Satellite FOV</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-day-night" class="bmenu-item">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/day-night.png">
+        <span class="bmenu-title">Night Toggle</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-color-scheme" class="bmenu-item">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/colors.png">
+        <span class="bmenu-title">Color Schemes</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-constellations" class="bmenu-item">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/constellation.png">
+        <span class="bmenu-title">Constellations</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
+    if (!settingsManager.offline) {
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-satChng" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/satchng.png">
+          <span class="bmenu-title">Satellite Changes</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
+    }
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-countries" class="bmenu-item">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/flag.png">
+        <span class="bmenu-title">Countries</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
+    if (objectManager.isSensorManagerLoaded) {
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-planetarium" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/planetarium.png">
+          <span class="bmenu-title">Planetarium View</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-astronomy" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/telescope.png">
+          <span class="bmenu-title">Astronomy View</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
+    }
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-map" class="bmenu-item bmenu-item-disabled">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/map.png">
+        <span class="bmenu-title">Stereographic Map</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-satview" class="bmenu-item bmenu-item-disabled">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/sat3.png">
+        <span class="bmenu-title">Satellite View</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
+    if (objectManager.isSensorManagerLoaded) {
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-fov-bubble" class="bmenu-item bmenu-item-disabled">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/fov.png">
+          <span class="bmenu-title">Sensor FOV</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-surveillance" class="bmenu-item bmenu-item-disabled">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/fence.png">
+          <span class="bmenu-title">Sesnor Fence</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
+    }
+    if (!settingsManager.offline) {
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-analysis" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/analysis.png">
+          <span class="bmenu-title">Analysis</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
+    }
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-time-machine" class="bmenu-item">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/time-machine.png">
+        <span class="bmenu-title">Time Machine</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-photo" class="bmenu-item">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/camera.png">
+        <span class="bmenu-title">Take Photo</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-record" class="bmenu-item">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/video.png">
+        <span class="bmenu-title">Record Video</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
     if (objectManager.isLaunchSiteManagerLoaded) {
       numOfIcons++;
-      bottomIconsDivDOM.append('<img id="menu-nextLaunch" src="" delayedsrc="' + settingsManager.installDirectory + 'images/calendar.png" class="bmenu-item tooltipped" alt="Next Launches" data-position="top" data-delay="50" data-tooltip="Next Launches">');
+      bottomIconsDivDOM.append(`
+        <div id="menu-nextLaunch" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/calendar.png">
+          <span class="bmenu-title">Next Launches</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
     }
     if (!settingsManager.offline) {
-      bottomIconsDivDOM.append('<img id="menu-launches" src="" delayedsrc="' + settingsManager.installDirectory + 'images/rocket-ship-1.png" class="bmenu-item tooltipped" alt="Launch Schedule" data-position="top" data-delay="50" data-tooltip="Launch Schedule">');
-      bottomIconsDivDOM.append('<img id="menu-twitter" src="" delayedsrc="' + settingsManager.installDirectory + 'images/twitter.png" class="bmenu-item tooltipped" alt="Space News on Twitter" data-position="top" data-delay="50" data-tooltip="Space News on Twitter">');
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-launches" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/calendar2.png">
+          <span class="bmenu-title">Launch Calendar</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
+      numOfIcons++;
+      bottomIconsDivDOM.append(`
+        <div id="menu-twitter" class="bmenu-item">
+          <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/twitter.png">
+          <span class="bmenu-title">Twitter</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
     }
-    bottomIconsDivDOM.append('<img id="menu-settings" src="" delayedsrc="' + settingsManager.installDirectory + 'images/gear-icon.png" class="bmenu-item tooltipped" alt="Settings" data-position="top" data-delay="50" data-tooltip="Settings">');
-    bottomIconsDivDOM.append('<img id="menu-about" src="" delayedsrc="' + settingsManager.installDirectory + 'images/about.png" class="bmenu-item tooltipped" alt="Author Information" data-position="top" data-delay="50" data-tooltip="Author Information">');
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-settings" class="bmenu-item">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/settings.png">
+        <span class="bmenu-title">Settings</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
+    numOfIcons++;
+    bottomIconsDivDOM.append(`
+      <div id="menu-about" class="bmenu-item">
+        <img src="" delayedsrc="${settingsManager.installDirectory}images/icons/about.png">
+        <span class="bmenu-title">About</span>
+        <div class="status-icon"></div>
+      </div>
+    `);
     })();
   });
 }

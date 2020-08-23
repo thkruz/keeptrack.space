@@ -114,7 +114,7 @@ var fpsRotateRate = 0;
 var fpsYaw = 0;
 var fpsYawRate = 0;
 var fpsXPos = 0;
-var fpsYPos = 25000;
+var fpsYPos = 0;
 var fpsZPos = 0;
 var fpsForwardSpeed = 0;
 var fpsSideSpeed = 0;
@@ -557,7 +557,7 @@ function drawLoop() {
       _camSnapToSat(sat);
       // If 3D Models Available, then update their position on the screen
       if (typeof meshManager !== 'undefined') {
-        meshManager.models.Satellite.position = sat.position;
+        meshManager.selectedSatPosition = sat.position;
       }
     }
     if (sat.static && cameraType.current === cameraType.PLANETARIUM) {
@@ -743,7 +743,24 @@ function _drawScene() {
     // If 3D Models Available, then draw them on the screen
     if (typeof meshManager !== 'undefined') {
         if (!sat.static) {
-          meshManager.drawObject(meshManager.models.Satellite, pMatrix, camMatrix);
+          if (sat.SCC_NUM == 25544) {
+            meshManager.models.iss.position = meshManager.selectedSatPosition;
+            meshManager.drawObject(meshManager.models.iss, pMatrix, camMatrix);
+          } else if (sat.OT == 1) { // Default Satellite
+            if (sat.SCC_NUM < 20000) {
+              meshManager.models.sat.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.sat, pMatrix, camMatrix);
+            } else {
+              meshManager.models.satellite.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.satellite, pMatrix, camMatrix);
+            }
+          } else if (sat.OT == 2) { // Rocket Body
+            meshManager.models.rocketbody.position = meshManager.selectedSatPosition;
+            meshManager.drawObject(meshManager.models.rocketbody, pMatrix, camMatrix);
+          } else if (sat.OT == 3) { // Debris
+            meshManager.models.rocketdebris.position = meshManager.selectedSatPosition;
+            meshManager.drawObject(meshManager.models.rocketdebris, pMatrix, camMatrix);
+          }
         }
     }
   }
@@ -1454,7 +1471,7 @@ function latToPitch(lat) {
   return pitch;
 }
 function camSnap(pitch, yaw) {
-  cameraManager.panReset = true;
+  // cameraManager.panReset = true;
   camPitchTarget = pitch;
   camYawTarget = _normalizeAngle(yaw);
   camSnapMode = true;
@@ -2298,7 +2315,9 @@ $(document).ready(function () {
             }
           }
           if (evt.button === 2) { // Right Mouse Button Clicked
-            if (!isMouseMoving) {
+            if (!isMouseMoving &&
+                (Math.abs(cameraManager.panTarget.x - cameraManager.panCurrent.x) < 3) &&
+                (Math.abs(cameraManager.panTarget.z - cameraManager.panCurrent.z) < 3)) {
               _openRmbMenu();
             }
           }
@@ -2539,7 +2558,6 @@ $(document).ready(function () {
       rightBtnSaveDOM.hover(()=>{rightBtnSaveDOMDropdown();});
       rightBtnSaveDOM.click(()=>{rightBtnSaveDOMDropdown();});
       function rightBtnSaveDOMDropdown () {
-        console.log('test');
         uiManager.clearRMBSubMenu();
         var offsetX = (rightBtnSaveDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnSaveMenuDOM.css({

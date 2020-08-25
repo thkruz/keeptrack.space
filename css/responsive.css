@@ -341,13 +341,9 @@
     position: fixed;
     z-index: 11;
     left: 120px;
-    width: 240px;
+    width: 110px;
     background: transparent;
     overflow: hidden;
-  }
-
-  #datetime-text {
-    top: -32px;
   }
 
   #nav-mobile {

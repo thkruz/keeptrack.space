@@ -842,7 +842,7 @@ ul li {
   position: fixed;
   left: 10vw;
   top: 0px;
-  width: 92px;
+  width: 100px;
   height: 75px;
   font-size: 12px;
   text-align: center;
@@ -887,9 +887,9 @@ ul li {
   font-size: 20px;
   padding: 0px 0px 0px 5px;
   font-size: 20px;
-  width: 145px;
+  width: 100px;
   overflow: hidden;
-  top: -31px;
+  top: 0px;
   border-width: 0px 0px 0px 1px;
   border-style: solid;
   border-color: #4dacff;

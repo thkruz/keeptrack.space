@@ -1442,7 +1442,7 @@ function getCamPos() {
   return [gCPx, gCPy, gCPz];
 }
 function longToYaw(long) {
-  var selectedDate = $('#datetime-text').text().substr(0, 19);
+  var selectedDate = timeManager.selectedDate;
   var today = new Date();
   var angle = 0;
 

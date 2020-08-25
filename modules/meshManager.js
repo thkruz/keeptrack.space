@@ -7,8 +7,8 @@
 
   meshManager.fileList = [
       {
-          obj: `${settingsManager.installDirectory}meshes/satellite.obj`,
-          mtl: `${settingsManager.installDirectory}meshes/satellite.mtl`
+          obj: `${settingsManager.installDirectory}meshes/Satellite.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/Satellite.mtl`
       },
       {
           obj: `${settingsManager.installDirectory}meshes/sat.obj`,
@@ -29,7 +29,7 @@
   ];
 
   meshManager.sizeInfo = {
-    satellite: {
+    Satellite: {
       x: 80.0,
       y: 80.0,
       z: 80.0

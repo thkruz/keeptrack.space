@@ -162,7 +162,7 @@
     if (!timeManager.selectedDate) return;
     // selectedDate = selectedDate.split(' ');
     // selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
-    // var today = new Date();
+    var today = new Date();
     // Not using local scope caused time to drift backwards!
     let propOffset = timeManager.selectedDate - today;
     return timeManager.propOffset;

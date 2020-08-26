@@ -9,24 +9,51 @@
       {
           obj: `${settingsManager.installDirectory}meshes/Satellite.obj`,
           mtl: `${settingsManager.installDirectory}meshes/Satellite.mtl`
+      },
+      {
+          obj: `${settingsManager.installDirectory}meshes/sat.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/sat.mtl`
+      },
+      {
+          obj: `${settingsManager.installDirectory}meshes/iss.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/iss.mtl`
+      },
+      {
+          obj: `${settingsManager.installDirectory}meshes/rocketdebris.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/rocketdebris.mtl`
+      },
+      {
+          obj: `${settingsManager.installDirectory}meshes/rocketbody.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/rocketbody.mtl`
       }
-      // {
-      //     obj: `${settingsManager.installDirectory}meshes/Satellite2.obj`,
-      //     mtl: `${settingsManager.installDirectory}meshes/Satellite2.mtl`
-      // }
   ];
 
   meshManager.sizeInfo = {
     Satellite: {
-      x: 100.0,
-      y: 100.0,
-      z: 100.0
+      x: 80.0,
+      y: 80.0,
+      z: 80.0
+    },
+    sat: {
+      x: 5.0,
+      y: 5.0,
+      z: 5.0
+    },
+    iss: {
+      x: 150.0,
+      y: 150.0,
+      z: 150.0
+    },
+    rocketdebris: {
+      x: 0.1,
+      y: 0.1,
+      z: 0.1
+    },
+    rocketbody: {
+      x: 0.2,
+      y: 0.2,
+      z: 2.5
     }
-    // Satellite2: {
-    //   x: 100.0,
-    //   y: 100.0,
-    //   z: 100.0
-    // }
   };
 
   // main shader program

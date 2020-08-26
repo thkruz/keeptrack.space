@@ -114,7 +114,7 @@ var fpsRotateRate = 0;
 var fpsYaw = 0;
 var fpsYawRate = 0;
 var fpsXPos = 0;
-var fpsYPos = 25000;
+var fpsYPos = 0;
 var fpsZPos = 0;
 var fpsForwardSpeed = 0;
 var fpsSideSpeed = 0;
@@ -261,136 +261,6 @@ function initializeKeepTrack() {
       }
 
       satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
-      satSet.onCruncherReady();
-
-      // Add Short Delay To Make Sure Everything Else is ready
-      // This shouldn't be necessary in the future
-      setTimeout(function () {
-        (function _reloadLastSensor() {
-          let currentSensor = (!settingsManager.offline) ? JSON.parse(localStorage.getItem("currentSensor")) : null;
-          if (currentSensor !== null) {
-            try {
-              // If there is a staticnum set use that
-              if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
-                sensorManager.setSensor(null, currentSensor[1]);
-              } else {
-                // If the sensor is a string, load that collection of sensors
-                if (typeof currentSensor[0].shortName == 'undefined') {
-                  sensorManager.setSensor(currentSensor[0], currentSensor[1]);
-                } else {
-                  // Seems to be a single sensor without a staticnum, load that
-                  sensorManager.setSensor(sensorManager.sensorList[currentSensor[0].shortName], currentSensor[1]);
-                }
-              }
-            }
-            catch (e) {
-              console.warn('Saved Sensor Information Invalid');
-            }
-          }
-        })();
-        (function _watchlistInit() {
-          var watchlistJSON = (!settingsManager.offline) ? localStorage.getItem("watchlistList") : null;
-          if (watchlistJSON !== null) {
-            var newWatchlist = JSON.parse(watchlistJSON);
-            watchlistInViewList = [];
-            for (var i = 0; i < newWatchlist.length; i++) {
-              var sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
-              if (sat !== null) {
-                newWatchlist[i] = sat.id;
-                watchlistInViewList.push(false);
-              } else {
-                console.error('Watchlist File Format Incorret');
-                return;
-              }
-            }
-            uiManager.updateWatchlist(newWatchlist, watchlistInViewList);
-          }
-        })();
-        (function _parseGetParameters() {
-          // do querystring stuff
-          var params = satSet.queryStr.split('&');
-
-          // Do Searches First
-          for (let i = 0; i < params.length; i++) {
-            let key = params[i].split('=')[0];
-            let val = params[i].split('=')[1];
-            if (key == 'search') {
-              // console.log('preloading search to ' + val);
-              // Sensor Selection takes 1.5 seconds to update color Scheme
-              // TODO: SensorManager might be the problem here, but this works
-              // _doDelayedSearch(val);
-              if (!settingsManager.disableUI) {
-                searchBox.doSearch(val);
-              }
-            }
-          }
-
-          // Then Do Other Stuff
-          for (let i = 0; i < params.length; i++) {
-            let key = params[i].split('=')[0];
-            let val = params[i].split('=')[1];
-            let urlSatId;
-            switch (key) {
-              case 'intldes':
-                urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
-                if (urlSatId !== null) {
-                  selectSat(urlSatId);
-                }
-                break;
-              case 'sat':
-                urlSatId = satSet.getIdFromObjNum(val.toUpperCase());
-                if (urlSatId !== null) {
-                  selectSat(urlSatId);
-                }
-                break;
-              case 'misl':
-                var subVal = val.split(',');
-                $('#ms-type').val(subVal[0].toString());
-                $('#ms-attacker').val(subVal[1].toString());
-                // $('#ms-lat-lau').val() * 1;
-                // ('#ms-lon-lau').val() * 1;
-                $('#ms-target').val(subVal[2].toString());
-                // $('#ms-lat').val() * 1;
-                // $('#ms-lon').val() * 1;
-                $('#missile').trigger("submit");
-                break;
-              case 'date':
-                timeManager.propOffset = Number(val) - Date.now();
-                $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
-                satCruncher.postMessage({
-                  typ: 'offset',
-                  dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
-                });
-                break;
-              case 'rate':
-                val = Math.min(val, 1000);
-                // could run time backwards, but let's not!
-                val = Math.max(val, 0.0);
-                // console.log('propagating at rate ' + val + ' x real time ');
-                timeManager.propRate = Number(val);
-                satCruncher.postMessage({
-                  typ: 'offset',
-                  dat: (timeManager.propOffset).toString() + ' ' + (timeManager.propRate).toString()
-                });
-                break;
-            }
-          }
-        })();
-      }, 300);
-
-      if (settingsManager.startWithOrbitsDisplayed) {
-        setTimeout(function () {
-          // Time Machine
-          // orbitManager.historyOfSatellitesPlay();
-
-          // All Orbits
-          groups.debris = new groups.SatGroup('all', '');
-          groups.selectGroup(groups.debris);
-          satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-          groups.debris.updateOrbits();
-          isOrbitOverlay = true;
-        }, 5000);
-      }
 
       if ($(window).width() > $(window).height()) {
         settingsManager.mapHeight = $(window).width(); // Subtract 12 px for the scroll
@@ -463,7 +333,7 @@ function drawLoop() {
       camPitchSpeed = 0;
       camYawSpeed = 0;
       cameraManager.panDif.x = screenDragPoint[0] - mouseX;
-      cameraManager.panDif.y = screenDragPoint[0] - mouseX;
+      cameraManager.panDif.y = screenDragPoint[1] - mouseY;
       cameraManager.panDif.z = screenDragPoint[1] - mouseY;
 
       cameraManager.panTarget.x = cameraManager.panStartPosition.x + cameraManager.panDif.x * cameraManager.panMovementSpeed * zoomLevel;
@@ -471,7 +341,7 @@ function drawLoop() {
         cameraManager.panTarget.y = cameraManager.panStartPosition.y + cameraManager.panDif.y * cameraManager.panMovementSpeed * zoomLevel;
       }
       if (cameraManager.isScreenPan) {
-        cameraManager.panTarget.z = cameraManager.panStartPosition.z + cameraManager.panDif.y * cameraManager.panMovementSpeed;
+        cameraManager.panTarget.z = cameraManager.panStartPosition.z + cameraManager.panDif.z * cameraManager.panMovementSpeed;
       }
     }
 
@@ -484,33 +354,44 @@ function drawLoop() {
       cameraManager.panDif.z = cameraManager.panCurrent.z;
     }
 
+    cameraManager.panResetModifier = (cameraManager.panReset) ? 0.5 : 1;
+
+    // X is X no matter what
     cameraManager.panSpeed.x = (cameraManager.panCurrent.x - cameraManager.panTarget.x) * cameraManager.panMovementSpeed * zoomLevel;
     cameraManager.panSpeed.x -= (cameraManager.panSpeed.x * dt * cameraManager.panMovementSpeed * zoomLevel);
-    if (cameraManager.panReset) { cameraManager.panSpeed.x /= 10; }
-    cameraManager.panCurrent.x += cameraManager.panMovementSpeed * cameraManager.panDif.x;
-
-    if (cameraManager.isWorldPan || cameraManager.panReset) {
-      cameraManager.panSpeed.y = (cameraManager.panCurrent.y - cameraManager.panTarget.y) * cameraManager.panMovementSpeed * zoomLevel;
-      cameraManager.panSpeed.y -= (cameraManager.panSpeed.y * dt * cameraManager.panMovementSpeed * zoomLevel);
-      if (cameraManager.panReset) { cameraManager.panSpeed.y /= 10; }
-      cameraManager.panCurrent.y -= cameraManager.panMovementSpeed * cameraManager.panDif.y;
+    cameraManager.panCurrent.x += cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.x;
+    // If we are moving like an FPS then Y and Z are based on the angle of the camera
+    if (cameraManager.isWorldPan) {
+      fpsYPos -= Math.cos(cameraManager.localRotateCurrent.yaw) * cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.y;
+      fpsZPos += Math.sin(cameraManager.localRotateCurrent.pitch) * cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.y;
+      fpsYPos -= Math.sin(-cameraManager.localRotateCurrent.yaw) * cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.x;
     }
+    // If we are moving the screen then Z is always up and Y is not relevant
     if (cameraManager.isScreenPan || cameraManager.panReset) {
       cameraManager.panSpeed.z = (cameraManager.panCurrent.z - cameraManager.panTarget.z) * cameraManager.panMovementSpeed * zoomLevel;
       cameraManager.panSpeed.z -= (cameraManager.panSpeed.z * dt * cameraManager.panMovementSpeed * zoomLevel);
-      if (cameraManager.panReset) { cameraManager.panSpeed.z /= 10; }
-      cameraManager.panCurrent.z -= cameraManager.panMovementSpeed * cameraManager.panDif.z;
+      cameraManager.panCurrent.z -= cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.z;
     }
 
     if (cameraManager.panReset) {
-      if (cameraManager.panCurrent.x > -0.001 && cameraManager.panCurrent.x < 0.001) cameraManager.panCurrent.x = 0;
-      if (cameraManager.panCurrent.y > -0.001 && cameraManager.panCurrent.y < 0.001) cameraManager.panCurrent.y = 0;
-      if (cameraManager.panCurrent.z > -0.001 && cameraManager.panCurrent.z < 0.001) cameraManager.panCurrent.z = 0;
-      if (cameraManager.panCurrent.x == 0 && cameraManager.panCurrent.y == 0 && cameraManager.panCurrent.z == 0) {
+      fpsXPos = fpsXPos - (fpsXPos/25);
+      fpsYPos = fpsYPos - (fpsYPos/25);
+      fpsZPos = fpsZPos - (fpsZPos/25);
+
+      if (cameraManager.panCurrent.x > -0.5 && cameraManager.panCurrent.x < 0.5) cameraManager.panCurrent.x = 0;
+      if (cameraManager.panCurrent.y > -0.5 && cameraManager.panCurrent.y < 0.5) cameraManager.panCurrent.y = 0;
+      if (cameraManager.panCurrent.z > -0.5 && cameraManager.panCurrent.z < 0.5) cameraManager.panCurrent.z = 0;
+      if (fpsXPos > -0.5 && fpsXPos < 0.5) fpsXPos = 0;
+      if (fpsYPos > -0.5 && fpsYPos < 0.5) fpsYPos = 0;
+      if (fpsZPos > -0.5 && fpsZPos < 0.5) fpsZPos = 0;
+
+      if (cameraManager.panCurrent.x == 0 && cameraManager.panCurrent.y == 0 && cameraManager.panCurrent.z == 0 &&
+          fpsXPos == 0 && fpsYPos == 0 && fpsZPos == 0) {
         cameraManager.panReset = false;
       }
     }
-  } else if (cameraManager.isLocalRotate || cameraManager.localRotateReset) {
+  }
+  if (cameraManager.isLocalRotate || cameraManager.localRotateReset) {
     // If user is actively moving
     if (cameraManager.isLocalRotate) {
       cameraManager.localRotateDif.pitch = screenDragPoint[1] - mouseY;
@@ -535,23 +416,22 @@ function drawLoop() {
       cameraManager.localRotateTarget.yaw = 0;
       cameraManager.localRotateDif.pitch = -cameraManager.localRotateCurrent.pitch;
       cameraManager.localRotateDif.roll = -cameraManager.localRotateCurrent.roll;
-      cameraManager.localRotateDif.yaw = cameraManager.localRotateCurrent.yaw;
+      cameraManager.localRotateDif.yaw = -cameraManager.localRotateCurrent.yaw;
     }
+
+    cameraManager.resetModifier = (cameraManager.localRotateReset) ? 500 : 1;
 
     cameraManager.localRotateSpeed.pitch -= (cameraManager.localRotateSpeed.pitch * dt * cameraManager.localRotateMovementSpeed);
-    if (cameraManager.localRotateReset) { cameraManager.localRotateSpeed.pitch /= 10; }
-    cameraManager.localRotateCurrent.pitch += cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.pitch;
+    cameraManager.localRotateCurrent.pitch += cameraManager.resetModifier * cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.pitch;
 
-    if (cameraManager.isLocalRotateRoll) {
+    if (cameraManager.isLocalRotateRoll || cameraManager.localRotateReset) {
       cameraManager.localRotateSpeed.roll -= (cameraManager.localRotateSpeed.roll * dt * cameraManager.localRotateMovementSpeed);
-      if (cameraManager.localRotateReset) { cameraManager.localRotateSpeed.roll /= 10; }
-      cameraManager.localRotateCurrent.roll += cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.roll;
+      cameraManager.localRotateCurrent.roll += cameraManager.resetModifier * cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.roll;
     }
 
-    if (cameraManager.isLocalRotateYaw) {
+    if (cameraManager.isLocalRotateYaw || cameraManager.localRotateReset) {
       cameraManager.localRotateSpeed.yaw -= (cameraManager.localRotateSpeed.yaw * dt * cameraManager.localRotateMovementSpeed);
-      if (cameraManager.localRotateReset) { cameraManager.localRotateSpeed.yaw /= 10; }
-      cameraManager.localRotateCurrent.yaw += cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.yaw;
+      cameraManager.localRotateCurrent.yaw += cameraManager.resetModifier * cameraManager.localRotateMovementSpeed * cameraManager.localRotateDif.yaw;
     }
 
     if (cameraManager.localRotateReset) {
@@ -562,81 +442,79 @@ function drawLoop() {
         cameraManager.localRotateReset = false;
       }
     }
-  } else {
-    // Dont Rotate if Panning
-    if ((isDragging && !settingsManager.isMobileModeEnabled) ||
-      isDragging && settingsManager.isMobileModeEnabled && (mouseX !== 0 || mouseY !== 0)) {
-      // Disable Raycasting for Performance
-      // dragTarget = getEarthScreenPoint(mouseX, mouseY);
-      // if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
-      // isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
-      //
-      // TODO: Rotate Around Earth code needs cleaned up now that raycasting is turned off
-      //
-      if (true ||
-        cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY ||
-        settingsManager.isMobileModeEnabled) { // random screen drag
-        xDif = screenDragPoint[0] - mouseX;
-        yDif = screenDragPoint[1] - mouseY;
-        yawTarget = dragStartYaw + xDif * settingsManager.cameraMovementSpeed;
-        pitchTarget = dragStartPitch + yDif * -settingsManager.cameraMovementSpeed;
-        camPitchSpeed = _normalizeAngle(camPitch - pitchTarget) * -settingsManager.cameraMovementSpeed;
-        camYawSpeed = _normalizeAngle(camYaw - yawTarget) * -settingsManager.cameraMovementSpeed;
-      } else {  // earth surface point drag
-        dragPointR = Math.sqrt(dragPoint[0] * dragPoint[0] + dragPoint[1] * dragPoint[1]);
-        dragTargetR = Math.sqrt(dragTarget[0] * dragTarget[0] + dragTarget[1] * dragTarget[1]);
+  }
 
-        dragPointLon = Math.atan2(dragPoint[1], dragPoint[0]);
-        dragTargetLon = Math.atan2(dragTarget[1], dragTarget[0]);
+  if ((isDragging && !settingsManager.isMobileModeEnabled) ||
+    isDragging && settingsManager.isMobileModeEnabled && (mouseX !== 0 || mouseY !== 0)) {
+    // Disable Raycasting for Performance
+    // dragTarget = getEarthScreenPoint(mouseX, mouseY);
+    // if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
+    // isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
+    //
+    // TODO: Rotate Around Earth code needs cleaned up now that raycasting is turned off
+    //
+    if (true ||
+      cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY ||
+      settingsManager.isMobileModeEnabled) { // random screen drag
+      xDif = screenDragPoint[0] - mouseX;
+      yDif = screenDragPoint[1] - mouseY;
+      yawTarget = dragStartYaw + xDif * settingsManager.cameraMovementSpeed;
+      pitchTarget = dragStartPitch + yDif * -settingsManager.cameraMovementSpeed;
+      camPitchSpeed = _normalizeAngle(camPitch - pitchTarget) * -settingsManager.cameraMovementSpeed;
+      camYawSpeed = _normalizeAngle(camYaw - yawTarget) * -settingsManager.cameraMovementSpeed;
+    } else {  // earth surface point drag
+      dragPointR = Math.sqrt(dragPoint[0] * dragPoint[0] + dragPoint[1] * dragPoint[1]);
+      dragTargetR = Math.sqrt(dragTarget[0] * dragTarget[0] + dragTarget[1] * dragTarget[1]);
 
-        dragPointLat = Math.atan2(dragPoint[2], dragPointR);
-        dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
+      dragPointLon = Math.atan2(dragPoint[1], dragPoint[0]);
+      dragTargetLon = Math.atan2(dragTarget[1], dragTarget[0]);
 
-        pitchDif = dragPointLat - dragTargetLat;
-        yawDif = _normalizeAngle(dragPointLon - dragTargetLon);
-        camPitchSpeed = pitchDif * settingsManager.cameraMovementSpeed;
-        camYawSpeed = yawDif * settingsManager.cameraMovementSpeed;
-      }
-      camSnapMode = false;
-    } else {
-      // DESKTOP ONLY
-      if (!settingsManager.isMobileModeEnabled) {
-        camPitchSpeed -= (camPitchSpeed * dt * settingsManager.cameraMovementSpeed); // decay speeds when globe is "thrown"
-        camYawSpeed -= (camYawSpeed * dt * settingsManager.cameraMovementSpeed);
-      } else if (settingsManager.isMobileModeEnabled) { // MOBILE
-        camPitchSpeed -= (camPitchSpeed * dt * settingsManager.cameraMovementSpeed * 5); // decay speeds when globe is "thrown"
-        camYawSpeed -= (camYawSpeed * dt * settingsManager.cameraMovementSpeed * 5);
-      }
+      dragPointLat = Math.atan2(dragPoint[2], dragPointR);
+      dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
+
+      pitchDif = dragPointLat - dragTargetLat;
+      yawDif = _normalizeAngle(dragPointLon - dragTargetLon);
+      camPitchSpeed = pitchDif * settingsManager.cameraMovementSpeed;
+      camYawSpeed = yawDif * settingsManager.cameraMovementSpeed;
     }
-
-    camRotateSpeed -= (camRotateSpeed * dt * settingsManager.cameraMovementSpeed);
-
-    if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
-
-      fpsPitch -= 20 * camPitchSpeed * dt;
-      fpsYaw -= 20 * camYawSpeed * dt;
-      fpsRotate -= 20 * camRotateSpeed * dt;
-
-      // Prevent Over Rotation
-      if (fpsPitch > 90) fpsPitch = 90;
-      if (fpsPitch < -90) fpsPitch = -90;
-      // ASTRONOMY 180 FOV Bubble Looking out from Sensor
-      if (cameraType.current === cameraType.ASTRONOMY) {
-        if (fpsRotate > 90) fpsRotate = 90;
-        if (fpsRotate < -90) fpsRotate = -90;
-      } else {
-        if (fpsRotate > 360) fpsRotate -= 360;
-        if (fpsRotate < 0) fpsRotate += 360;
-      }
-      if (fpsYaw > 360) fpsYaw -= 360;
-      if (fpsYaw < 0) fpsYaw += 360;
-    } else {
-      camPitch += camPitchSpeed * dt;
-      camYaw += camYawSpeed * dt;
-      fpsRotate += camRotateSpeed * dt;
+    camSnapMode = false;
+  } else {
+    // DESKTOP ONLY
+    if (!settingsManager.isMobileModeEnabled) {
+      camPitchSpeed -= (camPitchSpeed * dt * settingsManager.cameraMovementSpeed); // decay speeds when globe is "thrown"
+      camYawSpeed -= (camYawSpeed * dt * settingsManager.cameraMovementSpeed);
+    } else if (settingsManager.isMobileModeEnabled) { // MOBILE
+      camPitchSpeed -= (camPitchSpeed * dt * settingsManager.cameraMovementSpeed * 5); // decay speeds when globe is "thrown"
+      camYawSpeed -= (camYawSpeed * dt * settingsManager.cameraMovementSpeed * 5);
     }
   }
 
+  camRotateSpeed -= (camRotateSpeed * dt * settingsManager.cameraMovementSpeed);
+
+  if (cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
+
+    fpsPitch -= 20 * camPitchSpeed * dt;
+    fpsYaw -= 20 * camYawSpeed * dt;
+    fpsRotate -= 20 * camRotateSpeed * dt;
+
+    // Prevent Over Rotation
+    if (fpsPitch > 90) fpsPitch = 90;
+    if (fpsPitch < -90) fpsPitch = -90;
+    // ASTRONOMY 180 FOV Bubble Looking out from Sensor
+    if (cameraType.current === cameraType.ASTRONOMY) {
+      if (fpsRotate > 90) fpsRotate = 90;
+      if (fpsRotate < -90) fpsRotate = -90;
+    } else {
+      if (fpsRotate > 360) fpsRotate -= 360;
+      if (fpsRotate < 0) fpsRotate += 360;
+    }
+    if (fpsYaw > 360) fpsYaw -= 360;
+    if (fpsYaw < 0) fpsYaw += 360;
+  } else {
+    camPitch += camPitchSpeed * dt;
+    camYaw += camYawSpeed * dt;
+    fpsRotate += camRotateSpeed * dt;
+  }
 
   if (rotateTheEarth) { camYaw -= settingsManager.autoRotateSpeed * dt; }
 
@@ -679,7 +557,7 @@ function drawLoop() {
       _camSnapToSat(sat);
       // If 3D Models Available, then update their position on the screen
       if (typeof meshManager !== 'undefined') {
-        meshManager.models.Satellite.position = sat.position;
+        meshManager.selectedSatPosition = sat.position;
       }
     }
     if (sat.static && cameraType.current === cameraType.PLANETARIUM) {
@@ -865,7 +743,24 @@ function _drawScene() {
     // If 3D Models Available, then draw them on the screen
     if (typeof meshManager !== 'undefined') {
         if (!sat.static) {
-          meshManager.drawObject(meshManager.models.Satellite, pMatrix, camMatrix);
+          if (sat.SCC_NUM == 25544) {
+            meshManager.models.iss.position = meshManager.selectedSatPosition;
+            meshManager.drawObject(meshManager.models.iss, pMatrix, camMatrix);
+          } else if (sat.OT == 1) { // Default Satellite
+            if (sat.SCC_NUM < 20000) {
+              meshManager.models.sat.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.sat, pMatrix, camMatrix);
+            } else {
+              meshManager.models.Satellite.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.Satellite, pMatrix, camMatrix);
+            }
+          } else if (sat.OT == 2) { // Rocket Body
+            meshManager.models.rocketbody.position = meshManager.selectedSatPosition;
+            meshManager.drawObject(meshManager.models.rocketbody, pMatrix, camMatrix);
+          } else if (sat.OT == 3) { // Debris
+            meshManager.models.rocketdebris.position = meshManager.selectedSatPosition;
+            meshManager.drawObject(meshManager.models.rocketdebris, pMatrix, camMatrix);
+          }
         }
     }
   }
@@ -906,13 +801,13 @@ function _drawCamera() {
     zoomTarget = 0.5;
   }
 
-  mat4.translate(camMatrix, camMatrix, [cameraManager.panCurrent.x, cameraManager.panCurrent.y, cameraManager.panCurrent.z]);
-
   switch (cameraType.current) {
     case cameraType.DEFAULT: // pivot around the earth with earth in the center
+      mat4.translate(camMatrix, camMatrix, [cameraManager.panCurrent.x, cameraManager.panCurrent.y, cameraManager.panCurrent.z]);
       mat4.rotateX(camMatrix, camMatrix, -cameraManager.localRotateCurrent.pitch);
       mat4.rotateY(camMatrix, camMatrix, -cameraManager.localRotateCurrent.roll);
       mat4.rotateZ(camMatrix, camMatrix, -cameraManager.localRotateCurrent.yaw);
+      mat4.translate(camMatrix, camMatrix, [fpsXPos, fpsYPos, -fpsZPos]);
       mat4.translate(camMatrix, camMatrix, [0, _getCamDist(), 0]);
       mat4.rotateX(camMatrix, camMatrix, camPitch);
       mat4.rotateZ(camMatrix, camMatrix, -camYaw);
@@ -921,8 +816,8 @@ function _drawCamera() {
       mat4.rotateX(camMatrix, camMatrix, -cameraManager.localRotateCurrent.pitch);
       mat4.rotateY(camMatrix, camMatrix, -cameraManager.localRotateCurrent.roll);
       mat4.rotateZ(camMatrix, camMatrix, -cameraManager.localRotateCurrent.yaw);
-      // TODO: Make offset adjustable in settings
-      mat4.translate(camMatrix, camMatrix, [15000, _getCamDist(), -6000]);
+
+      mat4.translate(camMatrix, camMatrix, [settingsManager.offsetCameraModeX, _getCamDist(), settingsManager.offsetCameraModeZ]);
       mat4.rotateX(camMatrix, camMatrix, camPitch);
       mat4.rotateZ(camMatrix, camMatrix, -camYaw);
       break;
@@ -953,7 +848,7 @@ function _drawCamera() {
         // yawRotate = ((-90 - sensorManager.currentSensor.long) * DEG2RAD);
         if (objectManager.selectedSat !== -1) lastselectedSat = objectManager.selectedSat;
         let sat = satSet.getSat(lastselectedSat);
-        // mat4.rotate(camMatrix, camMatrix, sat.inclination * DEG2RAD, [0, 1, 0]);
+        // mat4.rotate(camMatrix, camMatrix, sat.lat * DEG2RAD, [0, 1, 0]);
         mat4.rotate(camMatrix, camMatrix, -fpsPitch * DEG2RAD, [1, 0, 0]);
         mat4.rotate(camMatrix, camMatrix, fpsYaw * DEG2RAD, [0, 0, 1]);
         mat4.rotate(camMatrix, camMatrix, fpsRotate * DEG2RAD, [0, 1, 0]);
@@ -1547,7 +1442,7 @@ function getCamPos() {
   return [gCPx, gCPy, gCPz];
 }
 function longToYaw(long) {
-  var selectedDate = $('#datetime-text').text().substr(0, 19);
+  var selectedDate = timeManager.selectedDate;
   var today = new Date();
   var angle = 0;
 
@@ -1576,7 +1471,7 @@ function latToPitch(lat) {
   return pitch;
 }
 function camSnap(pitch, yaw) {
-  cameraManager.panReset = true;
+  // cameraManager.panReset = true;
   camPitchTarget = pitch;
   camYawTarget = _normalizeAngle(yaw);
   camSnapMode = true;
@@ -1652,6 +1547,9 @@ function selectSat(satId) {
     $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#breakup-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+
+    $('#search-results').attr('style', 'max-height:auto');
+
     // Toggle the side menus as closed
     isEditSatMenuOpen = false;
     isLookanglesMenuOpen = false;
@@ -1704,7 +1602,7 @@ function selectSat(satId) {
     if ($('#search-results').css('display') === 'block') {
       if (window.innerWidth <= 1000) {
       } else {
-        $('#search-results').attr('style', 'display:block; max-height:27%');
+        $('#search-results').attr('style', 'display:block; max-height:28%');
         if (cameraType.current !== cameraType.PLANETARIUM) {
           // Unclear why this was needed...
           // uiManager.legendMenuChange('default');
@@ -1713,7 +1611,7 @@ function selectSat(satId) {
     } else {
       if (window.innerWidth <= 1000) {
       } else {
-        $('#search-results').attr('style', 'max-height:27%');
+        $('#search-results').attr('style', 'max-height:auto');
         if (cameraType.current !== cameraType.PLANETARIUM) {
           // Unclear why this was needed...
           // uiManager.legendMenuChange('default');
@@ -2199,48 +2097,59 @@ $(document).ready(function () {
     settingsManager.isResizing = true;
   });
 
-  // Camera Manager Events
-  if (!settingsManager.disableCameraControls) {
-    $(window).mousedown(function (evt) {
-      // Middle Mouse Button MMB
-      if (evt.button === 1) {
-        cameraManager.isLocalRotate = true;
-        cameraManager.localRotateStartPosition = cameraManager.localRotateCurrent;
-        if (cameraManager.isShiftPressed) {
-          cameraManager.isLocalRotateRoll = true;
-          cameraManager.isLocalRotateYaw = false;
-        } else {
-          cameraManager.isLocalRotateRoll = false;
-          cameraManager.isLocalRotateYaw = true;
+  // TODO: Migrate All Mouse/Touch events under this single document ready
+  // listener so that they are scoped to the window and easier to manage
+  // and isolate from other files.
+  $(window).mousedown(function (evt) {
+    // Camera Manager Events
+    {
+      if (!settingsManager.disableCameraControls) {
+        // Middle Mouse Button MMB
+        if (evt.button === 1) {
+          cameraManager.isLocalRotate = true;
+          cameraManager.localRotateStartPosition = cameraManager.localRotateCurrent;
+          if (cameraManager.isShiftPressed) {
+            cameraManager.isLocalRotateRoll = true;
+            cameraManager.isLocalRotateYaw = false;
+          } else {
+            cameraManager.isLocalRotateRoll = false;
+            cameraManager.isLocalRotateYaw = true;
+          }
+        }
+
+        // Right Mouse Button RMB
+        if (evt.button === 2) {
+          cameraManager.isPanning = true;
+          cameraManager.panStartPosition = cameraManager.panCurrent;
+          if (cameraManager.isShiftPressed) {
+            cameraManager.isScreenPan = false;
+            cameraManager.isWorldPan = true;
+          } else {
+            cameraManager.isScreenPan = true;
+            cameraManager.isWorldPan = false;
+          }
         }
       }
+    }
+  });
 
-      // Right Mouse Button RMB
-      if (evt.button === 2) {
-        cameraManager.isPanning = true;
-        cameraManager.panStartPosition = cameraManager.panCurrent;
-        if (cameraManager.isShiftPressed) {
+  $(window).mouseup(function (evt) {
+    // Camera Manager Events
+    {
+      if (!settingsManager.disableCameraControls) {
+        if (evt.button === 1) {
+          cameraManager.isLocalRotate = false;
+          cameraManager.isLocalRotateRoll = false;
+          cameraManager.isLocalRotateYaw = false;
+        }
+        if (evt.button === 2) {
+          cameraManager.isPanning = false;
           cameraManager.isScreenPan = false;
-          cameraManager.isWorldPan = true;
-        } else {
-          cameraManager.isScreenPan = true;
           cameraManager.isWorldPan = false;
         }
       }
-    });
-    $(window).mouseup(function (evt) {
-      if (evt.button === 1) {
-        cameraManager.isLocalRotate = false;
-        cameraManager.isLocalRotateRoll = false;
-        cameraManager.isLocalRotateYaw = false;
-      }
-      if (evt.button === 2) {
-        cameraManager.isPanning = false;
-        cameraManager.isScreenPan = false;
-        cameraManager.isWorldPan = false;
-      }
-    });
-  }
+    }
+  });
 
   (function _canvasController() {
     db.log('_canvasController');
@@ -2281,7 +2190,7 @@ $(document).ready(function () {
       clearTimeout(mouseTimeout);
       mouseTimeout = setTimeout(function () {
         isMouseMoving = false;
-      }, 250);
+      }, 150);
     });
 
     if (settingsManager.disableUI) {
@@ -2342,8 +2251,10 @@ $(document).ready(function () {
         screenDragPoint = [mouseX, mouseY];
         dragStartPitch = camPitch;
         dragStartYaw = camYaw;
+        if (evt.button === 0) {
+          isDragging = true;
+        }
         // debugLine.set(dragPoint, getCamPos());
-        isDragging = true;
         camSnapMode = false;
         if (!settingsManager.disableUI) {
           rotateTheEarth = false;
@@ -2364,6 +2275,8 @@ $(document).ready(function () {
             evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY);
           // _pinchStart(evt);
         } else { // Single Finger Touch
+          mobile.startMouseX = evt.originalEvent.touches[0].clientX;
+          mobile.startMouseY = evt.originalEvent.touches[0].clientY;
           mouseX = evt.originalEvent.touches[0].clientX;
           mouseY = evt.originalEvent.touches[0].clientY;
           mouseSat = getSatIdFromCoord(mouseX, mouseY);
@@ -2376,9 +2289,8 @@ $(document).ready(function () {
           // debugLine.set(dragPoint, getCamPos());
           isDragging = true;
           touchStartTime = Date.now();
-          // if (window.innerWidth <= 1000) {
-          //   isDragging = false;
-          // }
+          // If you hit the canvas hide any popups
+          _hidePopUps();
           camSnapMode = false;
           if (!settingsManager.disableUI) {
             rotateTheEarth = false;
@@ -2403,7 +2315,11 @@ $(document).ready(function () {
             }
           }
           if (evt.button === 2) { // Right Mouse Button Clicked
-            _openRmbMenu();
+            if (!isMouseMoving &&
+                (Math.abs(cameraManager.panTarget.x - cameraManager.panCurrent.x) < 3) &&
+                (Math.abs(cameraManager.panTarget.z - cameraManager.panCurrent.z) < 3)) {
+              _openRmbMenu();
+            }
           }
         }
         // Repaint the theme to ensure it is the right color
@@ -2565,9 +2481,10 @@ $(document).ready(function () {
     canvasDOM.on('touchend', function (evt) {
       let touchTime = (Date.now() - touchStartTime);
 
-      if (touchTime > 250) {
-        // TODO: Implement touchscreen rmb
-        // _openRmbMenu();
+      if (touchTime > 150 && !isPinching &&
+          Math.abs(mobile.startMouseX - mouseX) < 50 &&
+          Math.abs(mobile.startMouseY - mouseY) < 50) {
+        _openRmbMenu();
         mouseSat = -1;
       }
 
@@ -2607,9 +2524,6 @@ $(document).ready(function () {
       bodyDOM.on('keydown', (e) => { uiManager.keyDownHandler(e); }); // On Key Press Event Run _keyHandler Function
       bodyDOM.on('keyup', (e) => { uiManager.keyUpHandler(e); }); // On Key Press Event Run _keyHandler Function
 
-      rightBtnMenuDOM.on("click", function (e) {
-        _rmbMenuActions(e);
-      });
       rightBtnSaveMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
       });
@@ -2631,8 +2545,19 @@ $(document).ready(function () {
       rightBtnEarthMenuDOM.on("click", function (e) {
         _rmbMenuActions(e);
       });
+      $('#reset-camera-rmb').on("click", function (e) {
+        _rmbMenuActions(e);
+      });
+      $('#clear-screen-rmb').on("click", function (e) {
+        _rmbMenuActions(e);
+      });
+      $('#clear-lines-rmb').on("click", function (e) {
+        _rmbMenuActions(e);
+      });
 
-      rightBtnSaveDOM.hover(function () {
+      rightBtnSaveDOM.hover(()=>{rightBtnSaveDOMDropdown();});
+      rightBtnSaveDOM.click(()=>{rightBtnSaveDOMDropdown();});
+      function rightBtnSaveDOMDropdown () {
         uiManager.clearRMBSubMenu();
         var offsetX = (rightBtnSaveDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnSaveMenuDOM.css({
@@ -2647,12 +2572,14 @@ $(document).ready(function () {
         } else {
           rightBtnSaveMenuDOM.hide();
         }
-      });
+      }
       rightBtnSaveMenuDOM.hover(null, function () { // Lost Focus
         rightBtnSaveMenuDOM.hide();
       });
 
-      rightBtnViewDOM.hover(function () {
+      rightBtnViewDOM.hover(()=>{rightBtnViewDOMDropdown();});
+      rightBtnViewDOM.click(()=>{rightBtnViewDOMDropdown();});
+      function rightBtnViewDOMDropdown () {
         uiManager.clearRMBSubMenu();
         var offsetX = (rightBtnViewDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnViewMenuDOM.css({
@@ -2667,54 +2594,60 @@ $(document).ready(function () {
         } else {
           rightBtnViewMenuDOM.hide();
         }
-      });
+      }
       rightBtnViewMenuDOM.hover(null, function () { // Lost Focus
         rightBtnViewMenuDOM.hide();
       });
 
-      rightBtnEditDOM.hover(function () {
-        uiManager.clearRMBSubMenu();
+      rightBtnEditDOM.hover(()=>{rightBtnEditDOMDropdown();});
+      rightBtnEditDOM.click(()=>{rightBtnEditDOMDropdown();});
+      function rightBtnEditDOMDropdown () {
+          uiManager.clearRMBSubMenu();
 
-        var offsetX = (rightBtnEditDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
-        rightBtnEditMenuDOM.css({
-          display: 'block',
-          'text-align': 'center',
-          position: 'absolute',
-          left: rightBtnEditDOM.offset().left + offsetX,
-          top: rightBtnEditDOM.offset().top
-        });
-        if (rightBtnEditMenuDOM.offset().top !== 0) {
-          rightBtnEditMenuDOM.show();
-        } else {
-          rightBtnEditMenuDOM.hide();
+          var offsetX = (rightBtnEditDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+          rightBtnEditMenuDOM.css({
+            display: 'block',
+            'text-align': 'center',
+            position: 'absolute',
+            left: rightBtnEditDOM.offset().left + offsetX,
+            top: rightBtnEditDOM.offset().top
+          });
+          if (rightBtnEditMenuDOM.offset().top !== 0) {
+            rightBtnEditMenuDOM.show();
+          } else {
+            rightBtnEditMenuDOM.hide();
+          }
         }
-      });
       rightBtnEditMenuDOM.hover(null, function () { // Lost Focus
         rightBtnEditMenuDOM.hide();
       });
 
-      rightBtnCreateDOM.hover(function () {
-        uiManager.clearRMBSubMenu();
+      rightBtnCreateDOM.hover(()=>{rightBtnCreateDOMDropdown();});
+      rightBtnCreateDOM.click(()=>{rightBtnCreateDOMDropdown();});
+      function rightBtnCreateDOMDropdown () {
+          uiManager.clearRMBSubMenu();
 
-        var offsetX = (rightBtnCreateDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
-        rightBtnCreateMenuDOM.css({
-          display: 'block',
-          'text-align': 'center',
-          position: 'absolute',
-          left: rightBtnCreateDOM.offset().left + offsetX,
-          top: rightBtnCreateDOM.offset().top
-        });
-        if (rightBtnCreateMenuDOM.offset().top !== 0) {
-          rightBtnCreateMenuDOM.show();
-        } else {
-          rightBtnCreateMenuDOM.hide();
+          var offsetX = (rightBtnCreateDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+          rightBtnCreateMenuDOM.css({
+            display: 'block',
+            'text-align': 'center',
+            position: 'absolute',
+            left: rightBtnCreateDOM.offset().left + offsetX,
+            top: rightBtnCreateDOM.offset().top
+          });
+          if (rightBtnCreateMenuDOM.offset().top !== 0) {
+            rightBtnCreateMenuDOM.show();
+          } else {
+            rightBtnCreateMenuDOM.hide();
+          }
         }
-      });
       rightBtnCreateMenuDOM.hover(null, function () { // Lost Focus
         rightBtnCreateMenuDOM.hide();
       });
 
-      rightBtnDrawDOM.hover(function () {
+      rightBtnDrawDOM.hover(()=>{rightBtnDrawDOMDropdown();});
+      rightBtnDrawDOM.click(()=>{rightBtnDrawDOMDropdown();});
+      function rightBtnDrawDOMDropdown () {
         uiManager.clearRMBSubMenu();
         var offsetX = (rightBtnDrawDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnDrawMenuDOM.css({
@@ -2729,12 +2662,14 @@ $(document).ready(function () {
         } else {
           rightBtnDrawMenuDOM.hide();
         }
-      });
+      }
       rightBtnDrawMenuDOM.hover(null, function () { // Lost Focus
         rightBtnDrawMenuDOM.hide();
       });
 
-      rightBtnColorsDOM.hover(function () {
+      rightBtnColorsDOM.hover(()=>{rightBtnColorsDOMDropdown();});
+      rightBtnColorsDOM.click(()=>{rightBtnColorsDOMDropdown();});
+      function rightBtnColorsDOMDropdown () {
         uiManager.clearRMBSubMenu();
         var offsetX = (rightBtnColorsDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
         rightBtnColorsMenuDOM.css({
@@ -2749,27 +2684,29 @@ $(document).ready(function () {
         } else {
           rightBtnColorsMenuDOM.hide();
         }
-      });
+      }
       rightBtnEarthMenuDOM.hover(null, function () { // Lost Focus
         rightBtnEarthMenuDOM.hide();
       });
 
-      rightBtnEarthDOM.hover(function () {
-        uiManager.clearRMBSubMenu();
-        var offsetX = (rightBtnEarthDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
-        rightBtnEarthMenuDOM.css({
-          display: 'block',
-          'text-align': 'center',
-          position: 'absolute',
-          left: rightBtnEarthDOM.offset().left + offsetX,
-          top: rightBtnEarthDOM.offset().top
-        });
-        if (rightBtnEarthDOM.offset().top !== 0) {
-          rightBtnEarthMenuDOM.show();
-        } else {
-          rightBtnEarthMenuDOM.hide();
+      rightBtnEarthDOM.hover(()=>{rightBtnEarthDOMDropdown();});
+      rightBtnEarthDOM.click(()=>{rightBtnEarthDOMDropdown();});
+      function rightBtnEarthDOMDropdown () {
+          uiManager.clearRMBSubMenu();
+          var offsetX = (rightBtnEarthDOM.offset().left < (canvasDOM.innerWidth() / 2)) ? 165 : -165;
+          rightBtnEarthMenuDOM.css({
+            display: 'block',
+            'text-align': 'center',
+            position: 'absolute',
+            left: rightBtnEarthDOM.offset().left + offsetX,
+            top: rightBtnEarthDOM.offset().top
+          });
+          if (rightBtnEarthDOM.offset().top !== 0) {
+            rightBtnEarthMenuDOM.show();
+          } else {
+            rightBtnEarthMenuDOM.hide();
+          }
         }
-      });
       rightBtnEarthMenuDOM.hover(null, function () { // Lost Focus
         rightBtnEarthMenuDOM.hide();
       });
@@ -2869,6 +2806,10 @@ $(document).ready(function () {
           $('#cs-minrange').val(0);
           $('#cs-maxrange').val(1000000);
           $('#customSensor').on("submit", () => { });
+          break;
+        case 'reset-camera-rmb':
+          cameraManager.panReset = true;
+          cameraManager.localRotateReset = true;
           break;
         case 'clear-lines-rmb':
           drawLineList = [];

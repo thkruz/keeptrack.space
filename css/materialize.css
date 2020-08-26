@@ -821,19 +821,19 @@
 }
 
 .light-blue.darken-3 {
-  background-color: #0277bd !important;
+  background-color: #172635 !important;
 }
 
 .light-blue-text.text-darken-3 {
-  color: #0277bd !important;
+  color: #172635 !important;
 }
 
 .light-blue.darken-4 {
-  background-color: #01579b !important;
+  background-color: #4dacff !important;
 }
 
 .light-blue-text.text-darken-4 {
-  color: #01579b !important;
+  color: #4dacff !important;
 }
 
 .light-blue.accent-1 {
@@ -861,11 +861,11 @@
 }
 
 .light-blue.accent-4 {
-  background-color: #0091ea !important;
+  background-color: #005a8f !important;
 }
 
 .light-blue-text.text-accent-4 {
-  color: #0091ea !important;
+  color: #005a8f !important;
 }
 
 .cyan {
@@ -2609,7 +2609,7 @@ html {
 }
 
 button, input, optgroup, select, textarea {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Open Sans", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 ul:not(.browser-default) {
@@ -4504,7 +4504,7 @@ a {
 
 html {
   line-height: 1.5;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Open Sans", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   font-weight: normal;
   color: rgba(0, 0, 0, 0.87);
 }
@@ -4966,7 +4966,7 @@ small {
 @media only screen and (max-width: 600px) {
   #toast-container {
     min-width: 100%;
-    bottom: 0%;
+    top: 50px;
   }
 }
 
@@ -4996,11 +4996,12 @@ small {
   height: auto;
   min-height: 48px;
   line-height: 1.5em;
-  background-color: #323232;
+  /* background-color: #323232; */
+  background-color: rgb(160, 232, 255);
   padding: 10px 25px;
   font-size: 1.1rem;
   font-weight: 300;
-  color: #fff;
+  color: #000000;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -6109,7 +6110,7 @@ input:not([type]), input[type=text]:not(.browser-default), input[type=password]:
 }
 
 input:not([type]):disabled, input:not([type])[readonly="readonly"], input[type=text]:not(.browser-default):disabled, input[type=text]:not(.browser-default)[readonly="readonly"], input[type=password]:not(.browser-default):disabled, input[type=password]:not(.browser-default)[readonly="readonly"], input[type=email]:not(.browser-default):disabled, input[type=email]:not(.browser-default)[readonly="readonly"], input[type=url]:not(.browser-default):disabled, input[type=url]:not(.browser-default)[readonly="readonly"], input[type=time]:not(.browser-default):disabled, input[type=time]:not(.browser-default)[readonly="readonly"], input[type=date]:not(.browser-default):disabled, input[type=date]:not(.browser-default)[readonly="readonly"], input[type=datetime]:not(.browser-default):disabled, input[type=datetime]:not(.browser-default)[readonly="readonly"], input[type=datetime-local]:not(.browser-default):disabled, input[type=datetime-local]:not(.browser-default)[readonly="readonly"], input[type=tel]:not(.browser-default):disabled, input[type=tel]:not(.browser-default)[readonly="readonly"], input[type=number]:not(.browser-default):disabled, input[type=number]:not(.browser-default)[readonly="readonly"], input[type=search]:not(.browser-default):disabled, input[type=search]:not(.browser-default)[readonly="readonly"], textarea.materialize-textarea:disabled, textarea.materialize-textarea[readonly="readonly"] {
-  color: rgba(0, 0, 0, 0.42);
+  color: rgba(255, 255, 255, 0.42);
   border-bottom: 1px dotted rgba(0, 0, 0, 0.42);
 }
 
@@ -6729,7 +6730,7 @@ textarea.materialize-textarea {
 }
 
 .switch label input[type=checkbox]:checked+.lever {
-  background-color: #84c7c1;
+  background-color: rgb(100, 217, 255);
 }
 
 .switch label input[type=checkbox]:checked+.lever:before, .switch label input[type=checkbox]:checked+.lever:after {

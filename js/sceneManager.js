@@ -270,15 +270,16 @@
     earth.update = () => {
       earth.lastTime = earthNow;
       earthNow = timeManager.propTime();
+      timeManager.selectedDate = earthNow;
 
       // wall time is not propagation time, so better print it
       // TODO substring causes 12kb memory leak every frame.
       if (earth.lastTime - earthNow < 300) {
         earth.tDS = earthNow.toJSON();
         earth.timeTextStr = earth.timeTextStrEmpty;
-        for (earth.iText = 0; earth.iText < 20; earth.iText++) {
-          if (earth.iText < 10) earth.timeTextStr += earth.tDS[earth.iText];
-          if (earth.iText === 10) earth.timeTextStr += ' ';
+        for (earth.iText = 11; earth.iText < 20; earth.iText++) {
+          // if (earth.iText < 10) earth.timeTextStr += earth.tDS[earth.iText];
+          // if (earth.iText === 10) earth.timeTextStr += ' ';
           if (earth.iText > 11) earth.timeTextStr += earth.tDS[earth.iText-1];
         }
         if (settingsManager.isPropRateChange && !settingsManager.isAlwaysHidePropRate) {
@@ -298,10 +299,10 @@
 
         if (!settingsManager.disableUI) {
           if (!createClockDOMOnce) {
-            document.getElementById('datetime-text').innerText = `${earth.timeTextStr} UTC`;
+            document.getElementById('datetime-text').innerText = `${earth.timeTextStr}`;
             createClockDOMOnce = true;
           } else {
-            document.getElementById('datetime-text').childNodes[0].nodeValue = `${earth.timeTextStr} UTC`;
+            document.getElementById('datetime-text').childNodes[0].nodeValue = `${earth.timeTextStr}`;
           }
         }
       }
@@ -1053,7 +1054,6 @@
       gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
       gl.enableVertexAttribArray(moonShader.aVertexPosition);
       gl.vertexAttribPointer(moonShader.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
-      gl.vertexAttribPointer(gl.pickShaderProgram.aPos, 3, gl.FLOAT, false, 0, 0);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
       gl.enableVertexAttribArray(moonShader.aVertexNormal);
@@ -1062,13 +1062,9 @@
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
       gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 
-      gl.useProgram(gl.pickShaderProgram);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-
-      gl.uniformMatrix4fv(gl.pickShaderProgram.uMvMatrix, false, mvMatrix); // set up picking
-      gl.disableVertexAttribArray(gl.pickShaderProgram.aColor);
-      gl.enableVertexAttribArray(gl.pickShaderProgram.aPos);
-      gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
+      gl.disableVertexAttribArray(moonShader.aTexCoord);
+      gl.disableVertexAttribArray(moonShader.aVertexPosition);
+      gl.disableVertexAttribArray(moonShader.aVertexNormal);
 
       // Done Drawing
       return true;

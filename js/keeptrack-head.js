@@ -19,8 +19,8 @@ const MOON_SCALAR_DISTANCE = 250000;
   let settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.19.3';
-  settingsManager.versionDate = 'August 17, 2020';
+  settingsManager.versionNumber = '1.19.9';
+  settingsManager.versionDate = 'August 24, 2020';
 
   // Install Folder Settings
   {
@@ -286,6 +286,9 @@ const MOON_SCALAR_DISTANCE = 250000;
   settingsManager.cameraMovementSpeed = 0.003;
   settingsManager.cameraMovementSpeedMin = 0.005;
 
+  settingsManager.offsetCameraModeX = 15000;
+  settingsManager.offsetCameraModeZ = -6000;
+
   settingsManager.fpsForwardSpeed = 3;
   settingsManager.fpsSideSpeed = 3;
   settingsManager.fpsVertSpeed = 3;
@@ -356,24 +359,24 @@ const MOON_SCALAR_DISTANCE = 250000;
     document.getElementById('nav-footer').classList.remove('red');
     document.getElementById('nav-footer').classList.remove('darken-3');
     document.getElementById('nav-wrapper').classList.add('light-blue');
-    $('#nav-footer').css('background-color', '#0277bd');
+    $('#nav-footer').css('background-color', '#172635');
     $('#bottom-menu').css('background', 'rgb(0,105,165)');
     $('.bmenu-item').css('border-right-color', 'steelblue');
-    $('.badge').css('color', '#00568a !important');
+    $('.badge').css('color', '#4dacff !important');
     $('#menu-info-overlay ').css('border-left-color', 'steelblue');
-    $('.side-menu').css('background', '#0a97d6');
-    $('.side-menu').css('border-color', '#0277bd');
-    // $('#search-results').css('cssText', 'background: #0a97d6 !important');
-    // $('#search-results:hover').css('background', '#0277bd');
-    // $('#search-results').css('border-color', '#0277bd');
-    $('#legend-hover-menu').css('background', '#0a97d6');
-    $('#legend-hover-menu').css('border-color', '#0277bd');
-    $('#colorbox').css('border', '10px solid #0277bd');
-    $('#sat-infobox').css('background', '#0a97d6');
-    $('#sat-infobox').css('border-color', '#0277bd');
-    $('#nav-footer-toggle').css('background', '#0277bd');
-    $('.search-hilight').css('color', '#01579b');
-    $('.btn-ui').css('background-color', '#0091ea');
+    $('.side-menu').css('background', '#1f3347');
+    $('.side-menu').css('border-color', '#172635');
+    // $('#search-results').css('cssText', 'background: #1f3347 !important');
+    // $('#search-results:hover').css('background', '#172635');
+    // $('#search-results').css('border-color', '#172635');
+    $('#legend-hover-menu').css('background', '#1f3347');
+    $('#legend-hover-menu').css('border-color', '#172635');
+    $('#colorbox').css('border', '10px solid #172635');
+    $('#sat-infobox').css('background', '#1f3347');
+    $('#sat-infobox').css('border-color', '#172635');
+    $('#nav-footer-toggle').css('background', '#172635');
+    $('.search-hilight').css('color', '#4dacff');
+    $('.btn-ui').css('background-color', '#005a8f');
     settingsManager.themes.currentTheme = 'Blue';
   };
 

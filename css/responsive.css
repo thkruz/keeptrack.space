@@ -5,25 +5,23 @@
     display: none;
   }
   #datetime {
-    position: absolute;
-    left: 20px;
-    bottom: -5px;
-    top: 30px;
+    position: fixed;
+    top: 1px;
     z-index: 11;
-    width: 160px;
-    height: 75px;
+    left: 55px;
+    width: 240px;
+    height: 25px;
     background: transparent;
     overflow: hidden;
   }
   #datetime-input {
     position: absolute;
-    left: 0px;
     bottom: 10px;
     display: none;
   }
   #datetime-input-tb {
     color: white;
-    font-family: 'Droid Sans', sans-serif;
+    font-family: 'Open Sans', sans-serif;
     padding: 10px 10px 11px 10px;
     /* Moves it below screen */
     height: 0px !important;
@@ -43,9 +41,6 @@
     text-align: center;
     font-weight: bold;
     font-size: 12px;
-  }
-  #datetime-text {
-    padding: 10px
   }
   #datetime-text:hover {
     background: rgba(255, 255, 255, .2);
@@ -75,7 +70,7 @@
     position: absolute;
     right: 0px;
     width: 230px;
-    background: #0a97d6 !important;
+    background: #1f3347 !important;
     z-index: 1;
     top: 0px;
     margin-top: 25px;
@@ -83,7 +78,7 @@
     max-height: 100%;
     border-width: 0px 0px 5px 5px;
     border-style: solid;
-    border-color: #0277bd;
+    border-color: #172635;
   }
   #search-holder {
     right: 0px;
@@ -96,14 +91,13 @@
     padding-top: 5px;
   }
   #ui-datepicker-div {
-    top: auto !important;
-    bottom: 55px !important;
-    left: 5px !important;
+    top: 25px !important;
+    border-radius: 0px;
   }
   #time-machine-menu {
     padding-left: 35px;
     color: white;
-    background: #0a97d6;
+    background: #1f3347;
     width: 300px;
     top: 25px;
     right: 0px;
@@ -112,12 +106,12 @@
     overflow: auto;
     border-width: 0px 0px 5px 5px;
     border-style: solid;
-    border-color: #0277bd;
+    border-color: #172635;
   }
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
-    background: #0a97d6;
+    background: #1f3347;
     width: 300px;
     top: 25px;
     right: 0px;
@@ -126,11 +120,11 @@
     overflow: auto;
     border-width: 0px 0px 5px 5px;
     border-style: solid;
-    border-color: #0277bd;
+    border-color: #172635;
   }
   .side-menu {
     position: absolute;
-    background: #0a97d6;
+    background: #1f3347;
     color: white;
     width: 260px;
     top: 25px;
@@ -139,7 +133,7 @@
     z-index: 10;
     padding: 0px 5px 0px 0px;
     border-width: 0px 5px 0px 0px;
-    border-color: #0277bd;
+    border-color: #172635;
     border-style: solid;
   }
   nav, nav .nav-wrapper i, nav a.sidenav-trigger, nav a.sidenav-trigger i {
@@ -157,7 +151,7 @@
   }
   #sat-infobox {
     display: none;
-    background: #0a97d6;
+    background: #1f3347;
     cursor: default;
     position: absolute;
     top: 27%;
@@ -167,7 +161,7 @@
     right: 0px;
     width: 230px;
     border-width: 5px 0px 0px 5px;
-    border-color: #0277bd;
+    border-color: #172635;
     border-style: solid;
     overflow: auto;
   }
@@ -183,11 +177,6 @@
     height: 20px;
     text-overflow: ellipsis;
     overflow: hidden;
-  }
-  #bottom-icons-container {
-    width: 800px;
-    height: 100px;
-    text-align: center;
   }
   #footer-toggle-wrapper {
     width: 100%;
@@ -212,8 +201,7 @@
   }
   #jday {
     display: block;
-    padding-right: 25px;
-    padding-left: 25px;
+    padding-left: 10px;
   }
   #social {
     display: block;
@@ -255,7 +243,7 @@
 @media (min-width: 695px) and (max-width: 1300px) {
   .side-menu {
     position: absolute;
-    background: #0a97d6;
+    background: #1f3347;
     color: white;
     width: 260px;
     top: 50px;
@@ -275,7 +263,7 @@
   }
   #sat-infobox {
     display: none;
-    background: #0a97d6;
+    background: #1f3347;
     cursor: default;
     position: absolute;
     top: 60%;
@@ -284,7 +272,7 @@
     padding: 0 10px 0px 10px;
     right: 0px;
     border-top: 5px;
-    border-top-color: #0277bd;
+    border-top-color: #172635;
     border-top-style: solid;
     overflow: auto;
   }
@@ -311,7 +299,7 @@
     width: 100%;
   }
   #bottom-icons-container {
-    width: 685px;
+    width: 100%;
     height: 100px;
   }
   #footer-toggle-wrapper {
@@ -328,6 +316,10 @@
     transition: 1s;
     bottom: 0px !important;
   }
+  .ui-timepicker-div dl dd div {
+    width: 60px !important;
+    margin-left: -35px !important;
+  }
 }
 /* MEDIA @ 695px & 1300px */
 
@@ -342,6 +334,30 @@
     top: 0px;
     height: 50px;
   }
+
+  #datetime {
+    top: 15px;
+    height: 26px;
+    position: fixed;
+    z-index: 11;
+    left: 120px;
+    width: 110px;
+    background: transparent;
+    overflow: hidden;
+  }
+
+  #nav-mobile {
+    display: inline-block;
+  }
+
+  #github-share1 {
+    display: none;
+  }
+
+  #twitter-share1 {
+    display: none;
+  }
+
   #menu-space-stations, #menu-launches, #menu-record, #menu-twitter, #menu-color-scheme, #social, #version-info, #fastCompSettings {
     display: none;
   }
@@ -350,23 +366,9 @@
     margin-top: 10px;
     color: #48f3e3 !important
   }
-  #jday {
-    display: none;
-  }
   #ui-datepicker-div {
-    top: auto !important;
-    width: 100% !important;
-    bottom: 0px !important;
-    left: 0px !important;
-    border-radius: 0px !important;
-  }
-  .ui-timepicker-div dl dd div {
-    width: 0px !important;
-    margin-left: -10px !important;
-  }
-  .ui-timepicker-div dl dd div span {
-    border: 0px solid #ffffff !important;
-    background: #ffffff !important;
+    top: 50px !important;
+    border-radius: 0px;
   }
   .ui-timepicker-div dl {
     text-align: center !important;
@@ -396,14 +398,14 @@
     position: absolute;
     right: 0px;
     width: 100%;
-    background: #0a97d6 !important;
+    background: #1f3347 !important;
     z-index: 1;
     top: 50px;
     bottom: 250px;
     max-height: 20%;
     border-width: 0px 0px 5px 0px;
     border-style: solid;
-    border-color: #0277bd;
+    border-color: #172635;
   }
   #search-holder {
     display: flex;
@@ -417,8 +419,8 @@
     margin-top: 15px;
   }
   #search-holder input:-webkit-autofill {
-    box-shadow: 0 0 0px 1000px #0277bd inset;
-    background-color: #0277bd !important;
+    box-shadow: 0 0 0px 1000px #172635 inset;
+    background-color: #172635 !important;
     -webkit-text-fill-color: white !important;
     color: white !important;
   }
@@ -450,7 +452,7 @@
     width: 50px;
     height: 50px;
     padding: 9px;
-    background: #039be5 !important;
+    background: #1f3347 !important;
   }
   .share-up {
     transition: 1s;
@@ -459,7 +461,7 @@
   #time-machine-menu {
     padding-left: 35px;
     color: white;
-    background: #0a97d6;
+    background: #1f3347;
     top: 50px;
     right: 0px;
     z-index: 100;
@@ -468,12 +470,12 @@
     width: 100%;
     border-width: 0px 0px 5px 0px;
     border-style: solid;
-    border-color: #0277bd;
+    border-color: #172635;
   }
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
-    background: #0a97d6;
+    background: #1f3347;
     top: 50px;
     right: 0px;
     z-index: 100;
@@ -482,7 +484,7 @@
     width: 100%;
     border-width: 0px 0px 5px 0px;
     border-style: solid;
-    border-color: #0277bd;
+    border-color: #172635;
   }
   nav, nav .nav-wrapper i, nav a.sidenav-trigger, nav a.sidenav-trigger i {
     height: 50px;
@@ -510,9 +512,24 @@
   .material-tooltip {
     display: none !important;
   }
+
+  #datetime {
+    left: 40px;
+  }
+
+  #datetime-text {
+    width: 111px;
+    padding: 0px;
+    border-width: 0px;
+  }
+
+  #jday {
+    display: none;
+  }
+
   #sat-infobox {
     display: none;
-    background: #0a97d6;
+    background: #1f3347;
     cursor: default;
     position: absolute;
     top: 60%;
@@ -522,7 +539,7 @@
     right: 0px;
     width: 100%;
     border-top: 5px;
-    border-top-color: #0277bd;
+    border-top-color: #172635;
     border-top-style: solid;
     overflow: auto;
   }
@@ -544,14 +561,7 @@
   #bottom-icons-container {
     width: 100%;
     height: 100%;
-    padding: 10px;
     overflow: scroll;
-  }
-  #bottom-icons {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    justify-content: center;
-    row-gap: 10px;
   }
   #footer-toggle-wrapper {
     width: 100%;
@@ -576,7 +586,7 @@
   }
   .side-menu {
     position: absolute;
-    background: #0a97d6;
+    background: #1f3347;
     color: white;
     width: 100%;
     top: 50px;
@@ -585,8 +595,17 @@
     z-index: 10;
     padding: 0px 5px 150px 0px;
   }
-  #menu-satellite-collision, #menu-find-sat, #menu-dops {
-    display: none;
+
+  .ui-slider {
+    width: 160px !important;
+  }
+
+  #ui-datepicker-div {
+    top: auto !important;
+    width: 100% !important;
+    bottom: 0px !important;
+    left: 0px !important;
+    border-radius: 0px !important;
   }
 }
 

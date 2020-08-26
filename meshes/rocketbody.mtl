@@ -1,0 +1,30 @@
+newmtl INSIDE
+Kd 0.784314 0.784314 0.784314
+Ke 0 0 0
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+Ns 500
+d 1
+Ni 1
+Tf 1 1 1
+
+newmtl MAIN
+Kd 0.784314 0.784314 0.784314
+Ke 0 0 0
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+Ns 500
+d 1
+Ni 1
+Tf 1 1 1
+
+newmtl METAL_FRAME
+Kd 0.784314 0.784314 0.784314
+Ke 0 0 0
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+Ns 500
+d 1
+Ni 1
+Tf 1 1 1
+

@@ -170,7 +170,7 @@ var speedModifier = 1;
     (function _menuInit() {
       db.log('_menuInit');
       // Load the current JDAY
-      var jday = 'JDAY: ' + timeManager.getDayOfYear(timeManager.propTime());
+      var jday = timeManager.getDayOfYear(timeManager.propTime());
       $('#jday').html(jday);
       jday = null; // Garbage collect
 
@@ -949,7 +949,7 @@ var speedModifier = 1;
       $('#datetime-input-form').on("change", function (e) {
         var selectedDate = $('#datetime-input-tb').datepicker('getDate');
         var today = new Date();
-        var jday = 'JDAY: ' + timeManager.getDayOfYear(timeManager.propTime());
+        var jday = timeManager.getDayOfYear(timeManager.propTime());
         $('#jday').html(jday);
         timeManager.propOffset = selectedDate - today;
         satCruncher.postMessage({
@@ -1659,7 +1659,7 @@ var speedModifier = 1;
           var tgtLon = $('#ms-lon').val() * 1;
           // var result = false;
 
-          var launchTime = $('#datetime-text').text().substr(0, 19);
+          var launchTime = timeManager.selectedDate;
           launchTime = launchTime.split(' ');
           launchTime = new Date(launchTime[0] + 'T' + launchTime[1] + 'Z').getTime();
 
@@ -2286,7 +2286,7 @@ var speedModifier = 1;
             if (settingsManager.isMobileModeEnabled) mobile.searchToggle(false);
             uiManager.hideSideMenus();
             $('#watchlist-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            mobile.searchToggle(true);
+            // mobile.searchToggle(true);
             uiManager.updateWatchlist();
             isWatchlistMenuOpen = true;
             $('#menu-watchlist').addClass('bmenu-item-selected');
@@ -3583,7 +3583,7 @@ var speedModifier = 1;
       } else {
         $('#sat-latitude').html((satellite.degreesLat(uiManager.currentTEARR.lat) * -1).toFixed(3) + '°S');
       }
-      var jday = 'JDAY: ' + timeManager.getDayOfYear(timeManager.propTime());
+      var jday = timeManager.getDayOfYear(timeManager.propTime());
       $('#jday').html(jday);
 
       if (settingsManager.isMapMenuOpen && timeManager.now > settingsManager.lastMapUpdateTime + 30000) {
@@ -4036,6 +4036,16 @@ var speedModifier = 1;
   };
 
   uiManager.colorSchemeChangeAlert = (scheme) => {
+    // Don't Make an alert the first time!
+    if (typeof uiManager.lastColorScheme == 'undefined' &&
+        scheme.default) {
+          uiManager.lastColorScheme = scheme;
+          return;
+        }
+
+    // Don't make an alert unless something has really changed
+    if (uiManager.lastColorScheme == scheme) return;
+    uiManager.lastColorScheme = scheme;
     for (var i = 0; i < Object.keys(ColorScheme).length; i++) {
       if (scheme == ColorScheme[Object.keys(ColorScheme)[i]]) {
         M.toast({ html: `Color Scheme changed to ${Object.keys(ColorScheme)[i]}` });

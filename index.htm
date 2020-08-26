@@ -4,7 +4,7 @@
 <head>
   <script src="js/keeptrack-head.js"></script>
   <meta name="description" content="A 3D visualtion tool to learn about satellites and tracking radars." />
-  <meta property="og:image" content="http://keeptrack.space/social/official-preview-1-19-2.png">
+  <meta property="og:image" content="http://keeptrack.space/social/official-preview-1-19-9.jpg">
   <meta property="og:image:type" content="image/jpg" />
   <meta property="og:image:width" content="1920" />
   <meta property="og:image:height" content="1080" />
@@ -86,12 +86,12 @@
         <div id="nav-wrapper" class="nav-wrapper light-blue darken-3">
           <a id="share-icon" class="top-menu-icons" onclick="mobile.socialToggle();"><img
               src="images/share-icon.png"></a>
-          <ul id="nav-mobile" class="left hide-on-med-and-down">
+          <ul id="nav-mobile">
             <li id="jday"></li>
             <!-- <li id="datetime-text-local"></li> -->
-            <li id="fov-text"></li>
-            <li id="az-text"></li>
-            <li id="el-text"></li>
+            <!-- <li id="fov-text"></li> -->
+            <!-- <li id="az-text"></li> -->
+            <!-- <li id="el-text"></li> -->
           </ul>
           <ul id="nav-mobile" class="right">
             <li><a id="geolocation-btn" class="start-hidden" href="#!"><i class="material-icons">location_on</i></a>
@@ -100,6 +100,16 @@
               <div id="time-machine-icon" class="top-menu-icons"><img src="images/history.png"></div>
             </a>
           </li> -->
+            <li>
+              <a id="github-share1" class="top-menu-btns" href="https://github.com/thkruz/keeptrack.space/" target="_blank">
+                <img src="images/github.png" width="22" height="22" style="margin-top: 1px;">
+              </a>
+            </li>
+            <li>
+              <a id="twitter-share1" class="top-menu-btns" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank">
+                <img src="https://static.addtoany.com/buttons/twitter.svg" width="25" height="25">
+              </a>
+            </li>
             <li><a id="legend-menu" class="top-menu-btns">
                 <!-- <span>Legend &#x25BC;</span> -->
                 <div id="legend-icon" class="top-menu-icons"><img src="images/layers-icon.png"></div>
@@ -144,6 +154,7 @@
             <li class="rmb-menu-item" id="create-rmb"><a href="#">Create &#x27A4;</a></li>
             <li class="rmb-menu-item" id="earth-rmb"><a href="#">Earth &#x27A4;</a></li>
             <li class="rmb-menu-item" id="colors-rmb"><a href="#">Colors &#x27A4;</a></li>
+            <li id="reset-camera-rmb"><a href="#">Reset Camera</a></li>
             <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
             <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
           </ul>
@@ -1249,7 +1260,7 @@
               <img id="map-look48" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
               <img id="map-look49" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
               <img id="map-look50" class="map-item map-look" src="images/red-square.png" width="7px" height="7px">
-              <div id="braun-credit" style="position:absolute;right:10px;bottom:10px;z-index:5;color:#0a97d6;">
+              <div id="braun-credit" style="position:absolute;right:10px;bottom:10px;z-index:5;color:#1f3347;">
                 Braun Stereographic Projection (c) Tobias Jung
               </div>
             </div>
@@ -1923,18 +1934,10 @@
           </form>
         </div>
       </div>
-      <div id="bottom-icons-container" class="container">
+      <div id="bottom-icons-container">
         <div id="bottom-icons">
           <!-- Dynamic Load Icons In keeptrack-foot.js -->
         </div>
-      </div>
-      <div id="social" class="right">
-        <a id="github-share" href="https://github.com/thkruz/keeptrack.space/" target="_blank" class="tooltipped"
-          data-position="top" data-delay="50" data-tooltip="Github Page"><img src="images/github.png" width="32"
-            height="32"></a>
-        <a id="twitter-share" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank"
-          class="tooltipped" data-position="top" data-delay="50" data-tooltip="Share to Twitter"><img
-            src="https://static.addtoany.com/buttons/twitter.svg" width="32" height="32"></a>
       </div>
       <span id="version-info" class="right">
         vX.XX.XX

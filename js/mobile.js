@@ -66,8 +66,10 @@ var maxPinchSize = 1;
       searchBox.hideResults();
       isMilSatSelected = false;
       $('#menu-space-stations').removeClass('bmenu-item-selected');
-      satSet.setColorScheme(ColorScheme.default, true);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+
+      // This is getting called too much. Not sure what it was meant to prevent?
+      // satSet.setColorScheme(ColorScheme.default, true);
+      // uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
     }
   };
 

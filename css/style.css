@@ -922,6 +922,7 @@ ul li {
   padding-top: 10px;
   cursor: pointer;
   z-index: 11;
+  /* backdrop-filter: blur(3px); */
 }
 
 .bmenu-item {

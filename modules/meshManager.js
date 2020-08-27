@@ -7,8 +7,8 @@
 
   meshManager.fileList = [
       {
-          obj: `${settingsManager.installDirectory}meshes/satellite.obj`,
-          mtl: `${settingsManager.installDirectory}meshes/satellite.mtl`
+          obj: `${settingsManager.installDirectory}meshes/sat2.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/sat2.mtl`
       },
       {
           obj: `${settingsManager.installDirectory}meshes/sat.obj`,
@@ -29,7 +29,7 @@
   ];
 
   meshManager.sizeInfo = {
-    satellite: {
+    sat2: {
       x: 80.0,
       y: 80.0,
       z: 80.0
@@ -50,9 +50,9 @@
       z: 0.1
     },
     rocketbody: {
-      x: 0.2,
-      y: 0.2,
-      z: 2.5
+      x: 20.0,
+      y: 20.0,
+      z: 20.0
     }
   };
 
@@ -63,7 +63,9 @@
     varying vec3 vLightDirection;
     varying vec3 vTransformedNormal;
     varying vec2 vTextureCoord;
+    varying vec3 vColor;
     varying vec4 vPosition;
+    varying vec3 vAmbient;
     varying vec3 vDiffuse;
     varying vec3 vSpecular;
     varying float vSpecularExponent;
@@ -71,13 +73,12 @@
     void main(void) {
       float diffuse = max(dot(vTransformedNormal, vLightDirection), 0.0);
 
-      vec3 baseColor = vec3(1.0,1.0,1.0);
-      vec3 ambientColor = vec3(1.0,1.0,1.0) * diffuse * 5.0;
+      vec3 ambientColor = vColor * vAmbient * diffuse * 40.0;
       vec3 dirColor = vec3(1.0,1.0,1.0) * diffuse * 10.0;
       vec3 specColor = vSpecular * diffuse * 3.0;
       vec3 bumpColor = vDiffuse * diffuse * 1.0;
 
-      vec3 color = baseColor * (ambientColor + dirColor + specColor + bumpColor);
+      vec3 color = ambientColor + dirColor + specColor + bumpColor;
 
       gl_FragColor = vec4(color, 1.0);
     }
@@ -87,6 +88,8 @@
     attribute vec3 aVertexNormal;
     attribute vec3 aSpecular;
     attribute float aSpecularExponent;
+    attribute vec3 aColor;
+    attribute vec3 aAmbient;
     attribute vec3 aDiffuse;
     attribute vec2 aTextureCoord;
 
@@ -101,12 +104,16 @@
     varying vec4 vPosition;
     varying vec3 vLightDirection;
 
+    varying vec3 vColor;
+    varying vec3 vAmbient;
     varying vec3 vDiffuse;
     varying vec3 vSpecular;
     varying float vSpecularExponent;
 
     void main(void) {
       vLightDirection = uLightDirection;
+      vColor = aColor;
+      vAmbient = aAmbient;
       vDiffuse = aDiffuse;
       vSpecular = aSpecular;
       vSpecularExponent = aSpecularExponent;
@@ -216,9 +223,11 @@
     gl.useProgram(meshManager.shaderProgram);
 
     const attrs = {
+        aColor: OBJ.Layout.COLOR.key,
         aVertexPosition: OBJ.Layout.POSITION.key,
         aVertexNormal: OBJ.Layout.NORMAL.key,
         aTextureCoord: OBJ.Layout.UV.key,
+        aAmbient: OBJ.Layout.AMBIENT.key,
         aDiffuse: OBJ.Layout.DIFFUSE.key,
         aSpecular: OBJ.Layout.SPECULAR.key,
         aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key
@@ -289,8 +298,10 @@
   }
   function initBuffers() {
       var layout = new OBJ.Layout(
+          OBJ.Layout.COLOR,
           OBJ.Layout.POSITION,
           OBJ.Layout.NORMAL,
+          OBJ.Layout.AMBIENT,
           OBJ.Layout.DIFFUSE,
           OBJ.Layout.UV,
           OBJ.Layout.SPECULAR,

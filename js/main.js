@@ -198,6 +198,7 @@ function initializeKeepTrack() {
   // Load Optional 3D models if available
   if (typeof meshManager !== 'undefined') {
     meshManager.init();
+    settingsManager.selectedColor = [0.0,0.0,0.0,0.0];
   }
   ColorScheme.init();
   $('#loader-text').text('Drawing Dots in Space...');
@@ -748,11 +749,11 @@ function _drawScene() {
             meshManager.drawObject(meshManager.models.iss, pMatrix, camMatrix);
           } else if (sat.OT == 1) { // Default Satellite
             if (sat.SCC_NUM < 20000) {
-              meshManager.models.sat.position = meshManager.selectedSatPosition;
-              meshManager.drawObject(meshManager.models.sat, pMatrix, camMatrix);
+              meshManager.models.sat2.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.sat2, pMatrix, camMatrix);
             } else {
-              meshManager.models.satellite.position = meshManager.selectedSatPosition;
-              meshManager.drawObject(meshManager.models.satellite, pMatrix, camMatrix);
+              meshManager.models.sat2.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.sat2, pMatrix, camMatrix);
             }
           } else if (sat.OT == 2) { // Rocket Body
             meshManager.models.rocketbody.position = meshManager.selectedSatPosition;

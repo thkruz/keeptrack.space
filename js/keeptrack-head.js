@@ -63,7 +63,7 @@ const MOON_SCALAR_DISTANCE = 250000
   // Adjust to change camera speed of auto rotate around earth
   settingsManager.autoRotateSpeed = 1.0 * 0.000075
   // Disable main user interface. Currently an all or nothing package.
-  settingsManager.disableUI = false
+  settingsManager.disableUI = true
   // Currently only disables panning. In the future it will disable all camera
   // movement
   settingsManager.disableCameraControls = false
@@ -114,8 +114,8 @@ const MOON_SCALAR_DISTANCE = 250000
   // //////////////////////////////////////////////////////////////////////////
   settingsManager.showOrbitThroughEarth = false
 
-  settingsManager.atmosphereSize = RADIUS_OF_EARTH + 150
-  settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)'
+  settingsManager.atmosphereSize = RADIUS_OF_EARTH + 180
+  settingsManager.atmosphereColor = 'vec3(0.0, 0.0, 1.0)'
 
   settingsManager.satShader = {}
   settingsManager.satShader.largeObjectMinZoom = 0.37
@@ -245,7 +245,7 @@ const MOON_SCALAR_DISTANCE = 250000
     settingsManager.colors.penumbral = [1.0, 1.0, 1.0, 0.3]
     settingsManager.colors.umbral = [1.0, 1.0, 1.0, 0.1]
     // DEBUG Colors
-    // settingsManager.colors.sunlight = [0.2, 0.4, 1.0, 1];;
+    // settingsManager.colors.sunlight = [0.2, 0.4, 1.0, 1];
     // settingsManager.colors.penumbral = [0.5, 0.5, 0.5, 0.85];
     // settingsManager.colors.umbral = [0.2, 1.0, 0.0, 0.5];
 

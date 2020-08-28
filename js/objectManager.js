@@ -1,26 +1,26 @@
 // Object Manager (objectManager)
 // This loads all of the various modules that provide objects for the screen
 
-(function () {
-  var objectManager = {};
-  objectManager.selectedSat = -1;
-  objectManager.hoveringSat = -1;
-  var sensorList;
-  objectManager.missileSet = [];
-  objectManager.analSatSet = [];
-  objectManager.staticSet = [];
-  objectManager.fieldOfViewSet = [];
+;(function () {
+  var objectManager = {}
+  objectManager.selectedSat = -1
+  objectManager.hoveringSat = -1
+  var sensorList
+  objectManager.missileSet = []
+  objectManager.analSatSet = []
+  objectManager.staticSet = []
+  objectManager.fieldOfViewSet = []
 
   if (typeof satCommManager == 'undefined') {
-    objectManager.isSatCommManagerLoaded = false;
+    objectManager.isSatCommManagerLoaded = false
   } else {
-    objectManager.isSatCommManagerLoaded = true;
+    objectManager.isSatCommManagerLoaded = true
   }
 
   objectManager.init = function () {
-    var i;
+    var i
     if (typeof missileManager != 'undefined') {
-      var maxMissiles = settingsManager.maxMissiles;
+      var maxMissiles = settingsManager.maxMissiles
       for (i = 0; i < maxMissiles; i++) {
         var missileInfo = {
           static: false,
@@ -31,12 +31,12 @@
           latList: [],
           lonList: [],
           altList: [],
-          timeList: []
-        };
-        objectManager.missileSet.push(missileInfo);
+          timeList: [],
+        }
+        objectManager.missileSet.push(missileInfo)
       }
     }
-    var maxAnalystSats = settingsManager.maxAnalystSats;
+    var maxAnalystSats = settingsManager.maxAnalystSats
     for (i = 0; i < maxAnalystSats; i++) {
       var analSatInfo = {
         static: false,
@@ -47,19 +47,25 @@
         LV: 'Analyst Satellite',
         LS: 'ANALSAT',
         SCC_NUM: (80000 + i).toString(),
-        TLE1: '1 ' + (80000 + i).toString() + 'U 58002B   17115.48668720 +.00000144 +00000-0 +16234-3 0  9994',
-        TLE2: '2 ' + (80000 + i).toString() + ' 034.2502 167.2636 0042608 222.6554 121.5501 24.84703551080477',
+        TLE1:
+          '1 ' +
+          (80000 + i).toString() +
+          'U 58002B   17115.48668720 +.00000144 +00000-0 +16234-3 0  9994',
+        TLE2:
+          '2 ' +
+          (80000 + i).toString() +
+          ' 034.2502 167.2636 0042608 222.6554 121.5501 24.84703551080477',
         intlDes: (80000 + i).toString(),
         type: 'sat',
-        id: i
-      };
-      objectManager.analSatSet.push(analSatInfo);
+        id: i,
+      }
+      objectManager.analSatSet.push(analSatInfo)
     }
 
     // Try Loading Sensor Module
-    var sensor;
+    var sensor
     try {
-      sensorList = window.sensorManager.sensorList;
+      sensorList = window.sensorManager.sensorList
       for (sensor in sensorList) {
         var sensorInfo = {
           static: true,
@@ -69,21 +75,21 @@
           lat: sensorList[sensor].lat,
           lon: sensorList[sensor].long,
           alt: sensorList[sensor].obshei,
-          changeObjectInterval: sensorList[sensor].changeObjectInterval
-        };
-        objectManager.staticSet.push(sensorInfo);
+          changeObjectInterval: sensorList[sensor].changeObjectInterval,
+        }
+        objectManager.staticSet.push(sensorInfo)
       }
-      objectManager.isSensorManagerLoaded = true;
+      objectManager.isSensorManagerLoaded = true
     } catch (e) {
-      objectManager.isSensorManagerLoaded = false;
-      settingsManager.maxFieldOfViewMarkers = 1;
-      console.log('You do not have the Sensor Module');
+      objectManager.isSensorManagerLoaded = false
+      settingsManager.maxFieldOfViewMarkers = 1
+      console.log('You do not have the Sensor Module')
     }
 
     // Try Loading Star Module
     try {
-      objectManager.starIndex1 = objectManager.staticSet.length + 1;
-      for (var star = 0; star < (starManager.stars.length); star++) {
+      objectManager.starIndex1 = objectManager.staticSet.length + 1
+      for (var star = 0; star < starManager.stars.length; star++) {
         var starInfo = {
           static: true,
           shortName: 'STAR',
@@ -92,27 +98,27 @@
           ra: starManager.stars[star].ra, //ra
           dist: starManager.stars[star].dist,
           vmag: starManager.stars[star].vmag,
-        };
-        if (starManager.stars[star].pname != "") {
-          starInfo.name = starManager.stars[star].pname;
-        } else if (starManager.stars[star].bf != "") {
-          starInfo.name = starManager.stars[star].bf;
+        }
+        if (starManager.stars[star].pname != '') {
+          starInfo.name = starManager.stars[star].pname
+        } else if (starManager.stars[star].bf != '') {
+          starInfo.name = starManager.stars[star].bf
         } else {
-          starInfo.name = "HD " + starManager.stars[star].name;
+          starInfo.name = 'HD ' + starManager.stars[star].name
         }
 
-        objectManager.staticSet.push(starInfo);
+        objectManager.staticSet.push(starInfo)
       }
-      objectManager.isStarManagerLoaded = true;
+      objectManager.isStarManagerLoaded = true
     } catch (e) {
-      objectManager.isStarManagerLoaded = false;
-      console.log('You do not have the Star Module');
+      objectManager.isStarManagerLoaded = false
+      console.log('You do not have the Star Module')
     }
-    objectManager.starIndex2 = objectManager.staticSet.length - 1;
+    objectManager.starIndex2 = objectManager.staticSet.length - 1
 
     // Try Loading the Launch Site Module
     try {
-      var launchSiteList = window.launchSiteManager.launchSiteList;
+      var launchSiteList = window.launchSiteManager.launchSiteList
       for (var launchSite in launchSiteList) {
         var launchSiteInfo = {
           static: true,
@@ -120,19 +126,19 @@
           type: 'Launch Facility',
           lat: launchSiteList[launchSite].lat,
           lon: launchSiteList[launchSite].lon,
-          alt: sensorList[sensor].obshei
-        };
-        objectManager.staticSet.push(launchSiteInfo);
+          alt: sensorList[sensor].obshei,
+        }
+        objectManager.staticSet.push(launchSiteInfo)
       }
-      objectManager.isLaunchSiteManagerLoaded = true;
+      objectManager.isLaunchSiteManagerLoaded = true
     } catch (e) {
-      objectManager.isLaunchSiteManagerLoaded = false;
-      console.log('You do not have the Launch Site Module');
+      objectManager.isLaunchSiteManagerLoaded = false
+      console.log('You do not have the Launch Site Module')
     }
 
     // Try Loading the Control Site Module
     try {
-      var controlSiteList = window.controlSiteManager.controlSiteList;
+      var controlSiteList = window.controlSiteManager.controlSiteList
       for (var controlSite in controlSiteList) {
         var controlSiteInfo = {
           static: true,
@@ -148,1382 +154,1396 @@
           linkGalileo: controlSiteList[controlSite].linkGalileo,
           linkBeidou: controlSiteList[controlSite].linkBeidou,
           linkGlonass: controlSiteList[controlSite].linkGlonass,
-        };
-        objectManager.staticSet.push(controlSiteInfo);
+        }
+        objectManager.staticSet.push(controlSiteInfo)
       }
-      objectManager.isControlSiteManagerLoaded = true;
+      objectManager.isControlSiteManagerLoaded = true
     } catch (e) {
-      objectManager.isControlSiteManagerLoaded = false;
-      console.log('You do not have the Control Site Module');
+      objectManager.isControlSiteManagerLoaded = false
+      console.log('You do not have the Control Site Module')
     }
 
     for (i = 0; i < settingsManager.maxFieldOfViewMarkers; i++) {
       var fieldOfViewMarker = {
         static: true,
         marker: true,
-        id: i
-      };
-      objectManager.fieldOfViewSet.push(fieldOfViewMarker);
+        id: i,
+      }
+      objectManager.fieldOfViewSet.push(fieldOfViewMarker)
     }
-  };
-  objectManager.init();
+  }
+  objectManager.init()
   objectManager.extractCountry = function (C) {
-    var country;
-    country = C; // Assume it is right and overwrite if it is a code below.
+    var country
+    country = C // Assume it is right and overwrite if it is a code below.
     if (C === 'U') {
-      country = 'Unknown';
-    // Table Nested in ELSE to Make Hiding it Easier
+      country = 'Unknown'
+      // Table Nested in ELSE to Make Hiding it Easier
     } else if (C === 'ANALSAT') {
-      country = 'Analyst Satellite';
+      country = 'Analyst Satellite'
     } else {
-      if (C === 'AB') { // Headquartered in Riyadh, Saudi Arabia
-        country = 'Saudi Arabia';
+      if (C === 'AB') {
+        // Headquartered in Riyadh, Saudi Arabia
+        country = 'Saudi Arabia'
       }
       if (C === 'AC') {
-        country = 'AsiaSat Corp';
+        country = 'AsiaSat Corp'
       }
       if (C === 'ALG') {
-        country = 'Algeria';
+        country = 'Algeria'
       }
       if (C === 'ALL') {
-        country = 'All';
+        country = 'All'
       }
       if (C === 'ARGN') {
-        country = 'Argentina';
+        country = 'Argentina'
       }
       if (C === 'ASRA') {
-        country = 'Austria';
+        country = 'Austria'
       }
       if (C === 'AUS') {
-        country = 'Australia';
+        country = 'Australia'
       }
       if (C === 'AZER') {
-        country = 'Azerbaijan';
+        country = 'Azerbaijan'
       }
       if (C === 'BEL') {
-        country = 'Belgium';
+        country = 'Belgium'
       }
       if (C === 'BELA') {
-        country = 'Belarus';
+        country = 'Belarus'
       }
       if (C === 'BERM') {
-        country = 'Bermuda';
+        country = 'Bermuda'
       }
       if (C === 'BOL') {
-        country = 'Bolivia';
+        country = 'Bolivia'
       }
       if (C === 'BRAZ') {
-        country = 'Brazil';
+        country = 'Brazil'
       }
       if (C === 'CA') {
-        country = 'Canada';
+        country = 'Canada'
       }
       if (C === 'CHBZ') {
-        country = 'China/Brazil';
+        country = 'China/Brazil'
       }
       if (C === 'CHLE') {
-        country = 'Chile';
+        country = 'Chile'
       }
       if (C === 'CIS') {
-        country = 'Commonwealth of Ind States';
+        country = 'Commonwealth of Ind States'
       }
       if (C === 'COL') {
-        country = 'Colombia';
+        country = 'Colombia'
       }
       if (C === 'CZCH') {
-        country = 'Czechoslovakia';
+        country = 'Czechoslovakia'
       }
       if (C === 'DEN') {
-        country = 'Denmark';
+        country = 'Denmark'
       }
       if (C === 'ECU') {
-        country = 'Ecuador';
+        country = 'Ecuador'
       }
       if (C === 'EGYP') {
-        country = 'Egypt';
+        country = 'Egypt'
       }
       if (C === 'ESA') {
-        country = 'European Space Agency';
+        country = 'European Space Agency'
       }
       // if (C === 'ESA') {
       //   country = 'European Space Research Org';
       // }
       if (C === 'EST') {
-        country = 'Estonia';
+        country = 'Estonia'
       }
       if (C === 'EUME') {
-        country = 'EUMETSAT';
+        country = 'EUMETSAT'
       }
       if (C === 'EUTE') {
-        country = 'EUTELSAT';
+        country = 'EUTELSAT'
       }
       if (C === 'FGER') {
-        country = 'France/Germany';
+        country = 'France/Germany'
       }
       if (C === 'FR') {
-        country = 'France';
+        country = 'France'
       }
       if (C === 'FRIT') {
-        country = 'France/Italy';
+        country = 'France/Italy'
       }
       if (C === 'GER') {
-        country = 'Germany';
+        country = 'Germany'
       }
-      if (C === 'GLOB') { // Headquartered in Louisiana, USA
-        country = 'United States';
+      if (C === 'GLOB') {
+        // Headquartered in Louisiana, USA
+        country = 'United States'
       }
       if (C === 'GREC') {
-        country = 'Greece';
+        country = 'Greece'
       }
       if (C === 'HUN') {
-        country = 'Hungary';
+        country = 'Hungary'
       }
-      if (C === 'IM') { // Headquartered in London, UK
-        country = 'United Kingdom';
+      if (C === 'IM') {
+        // Headquartered in London, UK
+        country = 'United Kingdom'
       }
       if (C === 'IND') {
-        country = 'India';
+        country = 'India'
       }
       if (C === 'INDO') {
-        country = 'Indonesia';
+        country = 'Indonesia'
       }
       if (C === 'IRAN') {
-        country = 'Iran';
+        country = 'Iran'
       }
       if (C === 'IRAQ') {
-        country = 'Iraq';
+        country = 'Iraq'
       }
       if (C === 'ISRA') {
-        country = 'Israel';
+        country = 'Israel'
       }
       if (C === 'ISS') {
-        country = 'International';
+        country = 'International'
       }
       if (C === 'IT') {
-        country = 'Italy';
+        country = 'Italy'
       }
-      if (C === 'ITSO') { // Headquartered in Luxembourg District, Luxembourg
-        country = 'Luxembourg';
+      if (C === 'ITSO') {
+        // Headquartered in Luxembourg District, Luxembourg
+        country = 'Luxembourg'
       }
       if (C === 'JPN') {
-        country = 'Japan';
+        country = 'Japan'
       }
       if (C === 'KAZ') {
-        country = 'Kazakhstan';
+        country = 'Kazakhstan'
       }
       if (C === 'LAOS') {
-        country = 'Laos';
+        country = 'Laos'
       }
       if (C === 'LTU') {
-        country = 'Lithuania';
+        country = 'Lithuania'
       }
       if (C === 'LUXE') {
-        country = 'Luxembourg';
+        country = 'Luxembourg'
       }
       if (C === 'MALA') {
-        country = 'Malaysia';
+        country = 'Malaysia'
       }
       if (C === 'MEX') {
-        country = 'Mexico';
+        country = 'Mexico'
       }
       if (C === 'NATO') {
-        country = 'North Atlantic Treaty Org';
+        country = 'North Atlantic Treaty Org'
       }
       if (C === 'NETH') {
-        country = 'Netherlands';
+        country = 'Netherlands'
       }
-      if (C === 'NICO') { // Headquartered in Washington, USA
-        country = 'United States';
+      if (C === 'NICO') {
+        // Headquartered in Washington, USA
+        country = 'United States'
       }
       if (C === 'NIG') {
-        country = 'Nigeria';
+        country = 'Nigeria'
       }
       if (C === 'NKOR') {
-        country = 'North Korea';
+        country = 'North Korea'
       }
       if (C === 'NOR') {
-        country = 'Norway';
+        country = 'Norway'
       }
-      if (C === 'O3B') { // Majority Shareholder Based in Luxembourg
-        country = 'Luxembourg';
+      if (C === 'O3B') {
+        // Majority Shareholder Based in Luxembourg
+        country = 'Luxembourg'
       }
-      if (C === 'ORB') { // Headquartered in Louisiana, USA
-        country = 'United States';
+      if (C === 'ORB') {
+        // Headquartered in Louisiana, USA
+        country = 'United States'
       }
       if (C === 'PAKI') {
-        country = 'Pakistan';
+        country = 'Pakistan'
       }
       if (C === 'PERU') {
-        country = 'Peru';
+        country = 'Peru'
       }
       if (C === 'POL') {
-        country = 'Poland';
+        country = 'Poland'
       }
       if (C === 'POR') {
-        country = 'Portugal';
+        country = 'Portugal'
       }
       if (C === 'PRC') {
-        country = 'China';
+        country = 'China'
       }
-      if (C === 'RASC') { // Headquartered in Mauritius
-        country = 'Mauritius';
+      if (C === 'RASC') {
+        // Headquartered in Mauritius
+        country = 'Mauritius'
       }
       if (C === 'ROC') {
-        country = 'Taiwan';
+        country = 'Taiwan'
       }
       if (C === 'ROM') {
-        country = 'Romania';
+        country = 'Romania'
       }
       if (C === 'RP') {
-        country = 'Philippines';
+        country = 'Philippines'
       }
       if (C === 'SAFR') {
-        country = 'South Africa';
+        country = 'South Africa'
       }
       if (C === 'SAUD') {
-        country = 'Saudi Arabia';
+        country = 'Saudi Arabia'
       }
-      if (C === 'SEAL') { // Primary Shareholder Russian
-        country = 'Russia';
+      if (C === 'SEAL') {
+        // Primary Shareholder Russian
+        country = 'Russia'
       }
       if (C === 'RP') {
-        country = 'Philippines';
+        country = 'Philippines'
       }
       if (C === 'SES') {
-        country = 'Luxembourg';
+        country = 'Luxembourg'
       }
       if (C === 'SING') {
-        country = 'Singapore';
+        country = 'Singapore'
       }
       if (C === 'SKOR') {
-        country = 'South Korea';
+        country = 'South Korea'
       }
       if (C === 'SPN') {
-        country = 'Spain';
+        country = 'Spain'
       }
       if (C === 'STCT') {
-        country = 'Singapore/Taiwan';
+        country = 'Singapore/Taiwan'
       }
       if (C === 'SWED') {
-        country = 'Sweden';
+        country = 'Sweden'
       }
       if (C === 'SWTZ') {
-        country = 'Switzerland';
+        country = 'Switzerland'
       }
       if (C === 'THAI') {
-        country = 'Thailand';
+        country = 'Thailand'
       }
       if (C === 'TMMC') {
-        country = 'Turkmenistan/Monaco';
+        country = 'Turkmenistan/Monaco'
       }
       if (C === 'TURK') {
-        country = 'Turkey';
+        country = 'Turkey'
       }
       if (C === 'UAE') {
-        country = 'United Arab Emirates';
+        country = 'United Arab Emirates'
       }
       if (C === 'UK') {
-        country = 'United Kingdom';
+        country = 'United Kingdom'
       }
       if (C === 'UKR') {
-        country = 'Ukraine';
+        country = 'Ukraine'
       }
       if (C === 'URY') {
-        country = 'Uruguay';
+        country = 'Uruguay'
       }
       if (C === 'US') {
-        country = 'United States';
+        country = 'United States'
       }
       if (C === 'USBZ') {
-        country = 'United States/Brazil';
+        country = 'United States/Brazil'
       }
       if (C === 'VENZ') {
-        country = 'Venezuela';
+        country = 'Venezuela'
       }
       if (C === 'VTNM') {
-        country = 'Vietnam';
+        country = 'Vietnam'
       }
     }
-    return country;
-  };
+    return country
+  }
   objectManager.extractLiftVehicle = function (LV) {
     if (LV == 'U') {
-      $('#sat-vehicle').html("Unknown");
+      $('#sat-vehicle').html('Unknown')
     } else {
       for (var i = 0; i < objectManager.rocketUrls.length; i++) {
         if (objectManager.rocketUrls[i].rocket == LV) {
-          $('#sat-vehicle').html(`<a class="iframe" href="${objectManager.rocketUrls[i].url}">${LV}</a>`);
+          $('#sat-vehicle').html(
+            `<a class="iframe" href="${objectManager.rocketUrls[i].url}">${LV}</a>`,
+          )
         }
       }
     }
-  };
+  }
   objectManager.extractLaunchSite = function (LS) {
-    var site;
-    var sitec;
+    var site
+    var sitec
     if (LS === 'U' || LS === 'Unknown') {
-      site = 'Unknown';
-      sitec = 'Unknown';
-    // Table Nested in ELSE to Make Hiding it Easier
+      site = 'Unknown'
+      sitec = 'Unknown'
+      // Table Nested in ELSE to Make Hiding it Easier
     } else if (LS === 'ANALSAT') {
-      site = 'Analyst Satellite';
-      sitec = 'Analyst Satellite';
+      site = 'Analyst Satellite'
+      sitec = 'Analyst Satellite'
     } else {
       if (LS === 'AFETR') {
-        site = 'Cape Canaveral AFS';
-        sitec = 'United States';
+        site = 'Cape Canaveral AFS'
+        sitec = 'United States'
       }
       if (LS === 'AFWTR') {
-        site = 'Vandenberg AFB';
-        sitec = 'United States';
+        site = 'Vandenberg AFB'
+        sitec = 'United States'
       }
       if (LS === 'CAS') {
-        site = 'Canary Islands';
-        sitec = 'United States';
+        site = 'Canary Islands'
+        sitec = 'United States'
       }
       if (LS === 'FRGUI') {
-        site = 'French Guiana';
-        sitec = 'United States';
+        site = 'French Guiana'
+        sitec = 'United States'
       }
       if (LS === 'HGSTR') {
-        site = 'Hammaguira STR';
-        sitec = 'Algeria';
+        site = 'Hammaguira STR'
+        sitec = 'Algeria'
       }
       if (LS === 'KSCUT') {
-        site = 'Uchinoura Space Center';
-        sitec = 'Japan';
+        site = 'Uchinoura Space Center'
+        sitec = 'Japan'
       }
       if (LS === 'KYMTR') {
-        site = 'Kapustin Yar MSC';
-        sitec = 'Russia';
+        site = 'Kapustin Yar MSC'
+        sitec = 'Russia'
       }
       if (LS === 'PKMTR') {
-        site = 'Plesetsk MSC';
-        sitec = 'Russia';
+        site = 'Plesetsk MSC'
+        sitec = 'Russia'
       }
       if (LS === 'WSC') {
-        site = 'Wenchang SLC';
-        sitec = 'China';
+        site = 'Wenchang SLC'
+        sitec = 'China'
       }
       if (LS === 'SNMLP') {
-        site = 'San Marco LP';
-        sitec = 'Kenya';
+        site = 'San Marco LP'
+        sitec = 'Kenya'
       }
       if (LS === 'SRI') {
-        site = 'Satish Dhawan SC';
-        sitec = 'India';
+        site = 'Satish Dhawan SC'
+        sitec = 'India'
       }
       if (LS === 'TNSTA') {
-        site = 'Tanegashima SC';
-        sitec = 'Japan';
+        site = 'Tanegashima SC'
+        sitec = 'Japan'
       }
       if (LS === 'TTMTR') {
-        site = 'Baikonur Cosmodrome';
-        sitec = 'Kazakhstan';
+        site = 'Baikonur Cosmodrome'
+        sitec = 'Kazakhstan'
       }
       if (LS === 'WLPIS') {
-        site = 'Wallops Island';
-        sitec = 'United States';
+        site = 'Wallops Island'
+        sitec = 'United States'
       }
       if (LS === 'WOMRA') {
-        site = 'Woomera';
-        sitec = 'Australia';
+        site = 'Woomera'
+        sitec = 'Australia'
       }
       if (LS === 'VOSTO') {
-        site = 'Vostochny Cosmodrome';
-        sitec = 'Russia';
+        site = 'Vostochny Cosmodrome'
+        sitec = 'Russia'
       }
       if (LS === 'PMRF') {
-        site = 'PMRF Barking Sands';
-        sitec = 'United States';
+        site = 'PMRF Barking Sands'
+        sitec = 'United States'
       }
       if (LS === 'SEAL') {
-        site = 'Sea Launch Odyssey';
-        sitec = 'Russia';
+        site = 'Sea Launch Odyssey'
+        sitec = 'Russia'
       }
       if (LS === 'KWAJ') {
-        site = 'Kwajalein';
-        sitec = 'United States';
+        site = 'Kwajalein'
+        sitec = 'United States'
       }
       if (LS === 'ERAS') {
-        site = 'Pegasus East';
-        sitec = 'United States';
+        site = 'Pegasus East'
+        sitec = 'United States'
       }
       if (LS === 'JSC') {
-        site = 'Jiuquan SLC';
-        sitec = 'China';
+        site = 'Jiuquan SLC'
+        sitec = 'China'
       }
       if (LS === 'SVOB') {
-        site = 'Svobodny';
-        sitec = 'Russia';
+        site = 'Svobodny'
+        sitec = 'Russia'
       }
       if (LS === 'UNKN') {
-        site = 'Unknown';
-        sitec = 'Unknown';
+        site = 'Unknown'
+        sitec = 'Unknown'
       }
       if (LS === 'TSC') {
-        site = 'Taiyaun SC';
-        sitec = 'China';
+        site = 'Taiyaun SC'
+        sitec = 'China'
       }
       if (LS === 'WRAS') {
-        site = 'Pegasus West';
-        sitec = 'United States';
+        site = 'Pegasus West'
+        sitec = 'United States'
       }
       if (LS === 'XSC') {
-        site = 'Xichang SC';
-        sitec = 'China';
+        site = 'Xichang SC'
+        sitec = 'China'
       }
       if (LS === 'YAVNE') {
-        site = 'Yavne';
-        sitec = 'Israel';
+        site = 'Yavne'
+        sitec = 'Israel'
       }
       if (LS === 'OREN') {
-        site = 'Orenburg';
-        sitec = 'Russia';
+        site = 'Orenburg'
+        sitec = 'Russia'
       }
       if (LS === 'SADOL') {
-        site = 'Submarine Launch';
-        sitec = 'Russia';
+        site = 'Submarine Launch'
+        sitec = 'Russia'
       }
       if (LS === 'KODAK') {
-        site = 'Kodiak Island';
-        sitec = 'United States';
+        site = 'Kodiak Island'
+        sitec = 'United States'
       }
       if (LS === 'SEM') {
-        site = 'Semnan';
-        sitec = 'Iran';
+        site = 'Semnan'
+        sitec = 'Iran'
       }
       if (LS === 'YUN') {
-        site = 'Sohae SLS';
-        sitec = 'North Korea';
+        site = 'Sohae SLS'
+        sitec = 'North Korea'
       }
       if (LS === 'TNGH') {
-        site = 'Tonghae SLG';
-        sitec = 'North Korea';
+        site = 'Tonghae SLG'
+        sitec = 'North Korea'
       }
       if (LS === 'NSC') {
-        site = 'Naro Space Center';
-        sitec = 'South Korea';
+        site = 'Naro Space Center'
+        sitec = 'South Korea'
       }
       if (LS === 'RLLC') {
-        site = 'Rocket Labs LC';
-        sitec = 'New Zealand';
+        site = 'Rocket Labs LC'
+        sitec = 'New Zealand'
       }
 
       // Use Extended Sites from Launch Site Manager
       if (typeof site == 'undefined') {
         try {
-            site = launchSiteManager.extractLaunchSite(LS);
-            sitec = site[1];
-            site = site[0];
+          site = launchSiteManager.extractLaunchSite(LS)
+          sitec = site[1]
+          site = site[0]
         } catch (e) {
-            console.log('Launch Site Module not Loaded');
+          console.log('Launch Site Module not Loaded')
         }
       }
-
     }
     return {
       site: site,
-      sitec: sitec
-    };
-  };
+      sitec: sitec,
+    }
+  }
   objectManager.rocketUrls = [
     {
-      "rocket": "Angara A5",
-      "url": "https://en.wikipedia.org/wiki/Angara_(rocket_family)"
+      rocket: 'Angara A5',
+      url: 'https://en.wikipedia.org/wiki/Angara_(rocket_family)',
     },
     {
-      "rocket": "Antares 230",
-      "url": "https://en.wikipedia.org/wiki/Antares_(rocket)"
+      rocket: 'Antares 230',
+      url: 'https://en.wikipedia.org/wiki/Antares_(rocket)',
     },
     {
-      "rocket": "Ariane 1",
-      "url": "https://en.wikipedia.org/wiki/Ariane_1"
+      rocket: 'Ariane 1',
+      url: 'https://en.wikipedia.org/wiki/Ariane_1',
     },
     {
-      "rocket": "Ariane 2",
-      "url": "https://en.wikipedia.org/wiki/Ariane_2"
+      rocket: 'Ariane 2',
+      url: 'https://en.wikipedia.org/wiki/Ariane_2',
     },
     {
-      "rocket": "Ariane 3",
-      "url": "https://en.wikipedia.org/wiki/Ariane_3"
+      rocket: 'Ariane 3',
+      url: 'https://en.wikipedia.org/wiki/Ariane_3',
     },
     {
-      "rocket": "Ariane 40",
-      "url": "https://en.wikipedia.org/wiki/Ariane_4"
+      rocket: 'Ariane 40',
+      url: 'https://en.wikipedia.org/wiki/Ariane_4',
     },
     {
-      "rocket": "Ariane 42L",
-      "url": "https://en.wikipedia.org/wiki/Ariane_4"
+      rocket: 'Ariane 42L',
+      url: 'https://en.wikipedia.org/wiki/Ariane_4',
     },
     {
-      "rocket": "Ariane 42P",
-      "url": "https://en.wikipedia.org/wiki/Ariane_4"
+      rocket: 'Ariane 42P',
+      url: 'https://en.wikipedia.org/wiki/Ariane_4',
     },
     {
-      "rocket": "Ariane 44L",
-      "url": "https://en.wikipedia.org/wiki/Ariane_4"
+      rocket: 'Ariane 44L',
+      url: 'https://en.wikipedia.org/wiki/Ariane_4',
     },
     {
-      "rocket": "Ariane 44LP",
-      "url": "https://en.wikipedia.org/wiki/Ariane_4"
+      rocket: 'Ariane 44LP',
+      url: 'https://en.wikipedia.org/wiki/Ariane_4',
     },
     {
-      "rocket": "Ariane 44P",
-      "url": "https://en.wikipedia.org/wiki/Ariane_4"
+      rocket: 'Ariane 44P',
+      url: 'https://en.wikipedia.org/wiki/Ariane_4',
     },
     {
-      "rocket": "Ariane 5ECA",
-      "url": "https://en.wikipedia.org/wiki/Ariane_5"
+      rocket: 'Ariane 5ECA',
+      url: 'https://en.wikipedia.org/wiki/Ariane_5',
     },
     {
-      "rocket": "Ariane 5ES",
-      "url": "https://en.wikipedia.org/wiki/Ariane_5"
+      rocket: 'Ariane 5ES',
+      url: 'https://en.wikipedia.org/wiki/Ariane_5',
     },
     {
-      "rocket": "Ariane 5G",
-      "url": "https://en.wikipedia.org/wiki/Ariane_5"
+      rocket: 'Ariane 5G',
+      url: 'https://en.wikipedia.org/wiki/Ariane_5',
     },
     {
-      "rocket": "Ariane 5G+",
-      "url": "https://en.wikipedia.org/wiki/Ariane_5"
+      rocket: 'Ariane 5G+',
+      url: 'https://en.wikipedia.org/wiki/Ariane_5',
     },
     {
-      "rocket": "Ariane 5GS",
-      "url": "https://en.wikipedia.org/wiki/Ariane_5"
+      rocket: 'Ariane 5GS',
+      url: 'https://en.wikipedia.org/wiki/Ariane_5',
     },
     {
-      "rocket": "ARPA Taurus",
-      "url": "https://en.wikipedia.org/wiki/Minotaur-C"
+      rocket: 'ARPA Taurus',
+      url: 'https://en.wikipedia.org/wiki/Minotaur-C',
     },
     {
-      "rocket": "Athena-1",
-      "url": "https://en.wikipedia.org/wiki/Athena_(rocket_family)"
+      rocket: 'Athena-1',
+      url: 'https://en.wikipedia.org/wiki/Athena_(rocket_family)',
     },
     {
-      "rocket": "Athena-2",
-      "url": "https://en.wikipedia.org/wiki/Athena_(rocket_family)"
+      rocket: 'Athena-2',
+      url: 'https://en.wikipedia.org/wiki/Athena_(rocket_family)',
     },
     {
-      "rocket": "Atlas 3A",
-      "url": "https://en.wikipedia.org/wiki/Atlas_III"
+      rocket: 'Atlas 3A',
+      url: 'https://en.wikipedia.org/wiki/Atlas_III',
     },
     {
-      "rocket": "Atlas 3B",
-      "url": "https://en.wikipedia.org/wiki/Atlas_III"
+      rocket: 'Atlas 3B',
+      url: 'https://en.wikipedia.org/wiki/Atlas_III',
     },
     {
-      "rocket": "Atlas Agena B",
-      "url": "https://en.wikipedia.org/wiki/Atlas-Agena"
+      rocket: 'Atlas Agena B',
+      url: 'https://en.wikipedia.org/wiki/Atlas-Agena',
     },
     {
-      "rocket": "Atlas Agena D",
-      "url": "https://en.wikipedia.org/wiki/Atlas-Agena"
+      rocket: 'Atlas Agena D',
+      url: 'https://en.wikipedia.org/wiki/Atlas-Agena',
     },
     {
-      "rocket": "Atlas Burner 2",
-      "url": "https://en.wikipedia.org/wiki/Atlas_(rocket_family)"
+      rocket: 'Atlas Burner 2',
+      url: 'https://en.wikipedia.org/wiki/Atlas_(rocket_family)',
     },
     {
-      "rocket": "Atlas Centaur",
-      "url": "https://en.wikipedia.org/wiki/Atlas-Centaur"
+      rocket: 'Atlas Centaur',
+      url: 'https://en.wikipedia.org/wiki/Atlas-Centaur',
     },
     {
-      "rocket": "Atlas D",
-      "url": "https://en.wikipedia.org/wiki/SM-65D_Atlas"
+      rocket: 'Atlas D',
+      url: 'https://en.wikipedia.org/wiki/SM-65D_Atlas',
     },
     {
-      "rocket": "Atlas E",
-      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+      rocket: 'Atlas E',
+      url: 'https://en.wikipedia.org/wiki/Atlas_E/F',
     },
     {
-      "rocket": "Atlas E/OIS",
-      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+      rocket: 'Atlas E/OIS',
+      url: 'https://en.wikipedia.org/wiki/Atlas_E/F',
     },
     {
-      "rocket": "Atlas E/SGS-2",
-      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+      rocket: 'Atlas E/SGS-2',
+      url: 'https://en.wikipedia.org/wiki/Atlas_E/F',
     },
     {
-      "rocket": "Atlas F",
-      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+      rocket: 'Atlas F',
+      url: 'https://en.wikipedia.org/wiki/Atlas_E/F',
     },
     {
-      "rocket": "Atlas F/Agena D",
-      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+      rocket: 'Atlas F/Agena D',
+      url: 'https://en.wikipedia.org/wiki/Atlas_E/F',
     },
     {
-      "rocket": "Atlas F/PTS",
-      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+      rocket: 'Atlas F/PTS',
+      url: 'https://en.wikipedia.org/wiki/Atlas_E/F',
     },
     {
-      "rocket": "Atlas F/SVS",
-      "url": "https://en.wikipedia.org/wiki/Atlas_E/F"
+      rocket: 'Atlas F/SVS',
+      url: 'https://en.wikipedia.org/wiki/Atlas_E/F',
     },
     {
-      "rocket": "Atlas G Centaur",
-      "url": "https://en.wikipedia.org/wiki/Atlas_G"
+      rocket: 'Atlas G Centaur',
+      url: 'https://en.wikipedia.org/wiki/Atlas_G',
     },
     {
-      "rocket": "Atlas I",
-      "url": "https://en.wikipedia.org/wiki/Atlas_I"
+      rocket: 'Atlas I',
+      url: 'https://en.wikipedia.org/wiki/Atlas_I',
     },
     {
-      "rocket": "Atlas II",
-      "url": "https://en.wikipedia.org/wiki/Atlas_II"
+      rocket: 'Atlas II',
+      url: 'https://en.wikipedia.org/wiki/Atlas_II',
     },
     {
-      "rocket": "Atlas IIA",
-      "url": "https://en.wikipedia.org/wiki/Atlas_II"
+      rocket: 'Atlas IIA',
+      url: 'https://en.wikipedia.org/wiki/Atlas_II',
     },
     {
-      "rocket": "Atlas IIAS",
-      "url": "https://en.wikipedia.org/wiki/Atlas_II"
+      rocket: 'Atlas IIAS',
+      url: 'https://en.wikipedia.org/wiki/Atlas_II',
     },
     {
-      "rocket": "Atlas SLV-3 Agena D",
-      "url": "https://en.wikipedia.org/wiki/Atlas_SLV-3"
+      rocket: 'Atlas SLV-3 Agena D',
+      url: 'https://en.wikipedia.org/wiki/Atlas_SLV-3',
     },
     {
-      "rocket": "Atlas SLV-3A Agena D",
-      "url": "https://en.wikipedia.org/wiki/Atlas_SLV-3"
+      rocket: 'Atlas SLV-3A Agena D',
+      url: 'https://en.wikipedia.org/wiki/Atlas_SLV-3',
     },
     {
-      "rocket": "Atlas SLV-3C Centaur",
-      "url": "https://en.wikipedia.org/wiki/Atlas_SLV-3"
+      rocket: 'Atlas SLV-3C Centaur',
+      url: 'https://en.wikipedia.org/wiki/Atlas_SLV-3',
     },
     {
-      "rocket": "Atlas SLV-3D Centaur",
-      "url": "https://en.wikipedia.org/wiki/Atlas_SLV-3"
+      rocket: 'Atlas SLV-3D Centaur',
+      url: 'https://en.wikipedia.org/wiki/Atlas_SLV-3',
     },
     {
-      "rocket": "Atlas V 401",
-      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+      rocket: 'Atlas V 401',
+      url: 'https://en.wikipedia.org/wiki/Atlas_V',
     },
     {
-      "rocket": "Atlas V 411",
-      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+      rocket: 'Atlas V 411',
+      url: 'https://en.wikipedia.org/wiki/Atlas_V',
     },
     {
-      "rocket": "Atlas V 421",
-      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+      rocket: 'Atlas V 421',
+      url: 'https://en.wikipedia.org/wiki/Atlas_V',
     },
     {
-      "rocket": "Atlas V 431",
-      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+      rocket: 'Atlas V 431',
+      url: 'https://en.wikipedia.org/wiki/Atlas_V',
     },
     {
-      "rocket": "Atlas V 521",
-      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+      rocket: 'Atlas V 521',
+      url: 'https://en.wikipedia.org/wiki/Atlas_V',
     },
     {
-      "rocket": "Atlas V 541",
-      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+      rocket: 'Atlas V 541',
+      url: 'https://en.wikipedia.org/wiki/Atlas_V',
     },
     {
-      "rocket": "Atlas V 551",
-      "url": "https://en.wikipedia.org/wiki/Atlas_V"
+      rocket: 'Atlas V 551',
+      url: 'https://en.wikipedia.org/wiki/Atlas_V',
     },
     {
-      "rocket": "Black Arrow",
-      "url": "https://en.wikipedia.org/wiki/Black_Arrow"
+      rocket: 'Black Arrow',
+      url: 'https://en.wikipedia.org/wiki/Black_Arrow',
     },
     {
-      "rocket": "Chang Zheng 1",
-      "url": "https://en.wikipedia.org/wiki/Long_March_1"
+      rocket: 'Chang Zheng 1',
+      url: 'https://en.wikipedia.org/wiki/Long_March_1',
     },
     {
-      "rocket": "Chang Zheng 11",
-      "url": "https://en.wikipedia.org/wiki/Long_March_11"
+      rocket: 'Chang Zheng 11',
+      url: 'https://en.wikipedia.org/wiki/Long_March_11',
     },
     {
-      "rocket": "Chang Zheng 2C",
-      "url": "https://en.wikipedia.org/wiki/Long_March_2C"
+      rocket: 'Chang Zheng 2C',
+      url: 'https://en.wikipedia.org/wiki/Long_March_2C',
     },
     {
-      "rocket": "Chang Zheng 2C-III/SD",
-      "url": "https://en.wikipedia.org/wiki/Long_March_2C"
+      rocket: 'Chang Zheng 2C-III/SD',
+      url: 'https://en.wikipedia.org/wiki/Long_March_2C',
     },
     {
-      "rocket": "Chang Zheng 2D",
-      "url": "https://en.wikipedia.org/wiki/Long_March_2D"
+      rocket: 'Chang Zheng 2D',
+      url: 'https://en.wikipedia.org/wiki/Long_March_2D',
     },
     {
-      "rocket": "Chang Zheng 2E",
-      "url": "https://en.wikipedia.org/wiki/Long_March_2E"
+      rocket: 'Chang Zheng 2E',
+      url: 'https://en.wikipedia.org/wiki/Long_March_2E',
     },
     {
-      "rocket": "Chang Zheng 2F",
-      "url": "https://en.wikipedia.org/wiki/Long_March_2F"
+      rocket: 'Chang Zheng 2F',
+      url: 'https://en.wikipedia.org/wiki/Long_March_2F',
     },
     {
-      "rocket": "Chang Zheng 3",
-      "url": "https://en.wikipedia.org/wiki/Long_March_3"
+      rocket: 'Chang Zheng 3',
+      url: 'https://en.wikipedia.org/wiki/Long_March_3',
     },
     {
-      "rocket": "Chang Zheng 3A",
-      "url": "https://en.wikipedia.org/wiki/Long_March_3A"
+      rocket: 'Chang Zheng 3A',
+      url: 'https://en.wikipedia.org/wiki/Long_March_3A',
     },
     {
-      "rocket": "Chang Zheng 3B",
-      "url": "https://en.wikipedia.org/wiki/Long_March_3B"
+      rocket: 'Chang Zheng 3B',
+      url: 'https://en.wikipedia.org/wiki/Long_March_3B',
     },
     {
-      "rocket": "Chang Zheng 3B/YZ-1",
-      "url": "https://en.wikipedia.org/wiki/Long_March_3B"
+      rocket: 'Chang Zheng 3B/YZ-1',
+      url: 'https://en.wikipedia.org/wiki/Long_March_3B',
     },
     {
-      "rocket": "Chang Zheng 3C",
-      "url": "https://en.wikipedia.org/wiki/Long_March_3C"
+      rocket: 'Chang Zheng 3C',
+      url: 'https://en.wikipedia.org/wiki/Long_March_3C',
     },
     {
-      "rocket": "Chang Zheng 3C/YZ-1",
-      "url": "https://en.wikipedia.org/wiki/Long_March_3C"
+      rocket: 'Chang Zheng 3C/YZ-1',
+      url: 'https://en.wikipedia.org/wiki/Long_March_3C',
     },
     {
-      "rocket": "Chang Zheng 4",
-      "url": "https://en.wikipedia.org/wiki/Long_March_4A"
+      rocket: 'Chang Zheng 4',
+      url: 'https://en.wikipedia.org/wiki/Long_March_4A',
     },
     {
-      "rocket": "Chang Zheng 4B",
-      "url": "https://en.wikipedia.org/wiki/Long_March_4B"
+      rocket: 'Chang Zheng 4B',
+      url: 'https://en.wikipedia.org/wiki/Long_March_4B',
     },
     {
-      "rocket": "Chang Zheng 4C",
-      "url": "https://en.wikipedia.org/wiki/Long_March_4C"
+      rocket: 'Chang Zheng 4C',
+      url: 'https://en.wikipedia.org/wiki/Long_March_4C',
     },
     {
-      "rocket": "Chang Zheng 5/YZ-2",
-      "url": "https://en.wikipedia.org/wiki/Long_March_5"
+      rocket: 'Chang Zheng 5/YZ-2',
+      url: 'https://en.wikipedia.org/wiki/Long_March_5',
     },
     {
-      "rocket": "Chang Zheng 6",
-      "url": "https://en.wikipedia.org/wiki/Long_March_6"
+      rocket: 'Chang Zheng 6',
+      url: 'https://en.wikipedia.org/wiki/Long_March_6',
     },
     {
-      "rocket": "Commercial Titan 3",
-      "url": "https://en.wikipedia.org/wiki/Commercial_Titan_III"
+      rocket: 'Commercial Titan 3',
+      url: 'https://en.wikipedia.org/wiki/Commercial_Titan_III',
     },
     {
-      "rocket": "Delta 0300",
-      "url": "https://en.wikipedia.org/wiki/Delta_0100"
+      rocket: 'Delta 0300',
+      url: 'https://en.wikipedia.org/wiki/Delta_0100',
     },
     {
-      "rocket": "Delta 0900",
-      "url": "https://en.wikipedia.org/wiki/Delta_0100"
+      rocket: 'Delta 0900',
+      url: 'https://en.wikipedia.org/wiki/Delta_0100',
     },
     {
-      "rocket": "Delta 1410",
-      "url": "https://en.wikipedia.org/wiki/Delta_1000"
+      rocket: 'Delta 1410',
+      url: 'https://en.wikipedia.org/wiki/Delta_1000',
     },
     {
-      "rocket": "Delta 1914",
-      "url": "https://en.wikipedia.org/wiki/Delta_1000"
+      rocket: 'Delta 1914',
+      url: 'https://en.wikipedia.org/wiki/Delta_1000',
     },
     {
-      "rocket": "Delta 2310",
-      "url": "https://en.wikipedia.org/wiki/Delta_2000"
+      rocket: 'Delta 2310',
+      url: 'https://en.wikipedia.org/wiki/Delta_2000',
     },
     {
-      "rocket": "Delta 2313",
-      "url": "https://en.wikipedia.org/wiki/Delta_2000"
+      rocket: 'Delta 2313',
+      url: 'https://en.wikipedia.org/wiki/Delta_2000',
     },
     {
-      "rocket": "Delta 2910",
-      "url": "https://en.wikipedia.org/wiki/Delta_2000"
+      rocket: 'Delta 2910',
+      url: 'https://en.wikipedia.org/wiki/Delta_2000',
     },
     {
-      "rocket": "Delta 2913",
-      "url": "https://en.wikipedia.org/wiki/Delta_2000"
+      rocket: 'Delta 2913',
+      url: 'https://en.wikipedia.org/wiki/Delta_2000',
     },
     {
-      "rocket": "Delta 2914",
-      "url": "https://en.wikipedia.org/wiki/Delta_2000"
+      rocket: 'Delta 2914',
+      url: 'https://en.wikipedia.org/wiki/Delta_2000',
     },
     {
-      "rocket": "Delta 3910",
-      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+      rocket: 'Delta 3910',
+      url: 'https://en.wikipedia.org/wiki/Delta_3000',
     },
     {
-      "rocket": "Delta 3910/PAM",
-      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+      rocket: 'Delta 3910/PAM',
+      url: 'https://en.wikipedia.org/wiki/Delta_3000',
     },
     {
-      "rocket": "Delta 3913",
-      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+      rocket: 'Delta 3913',
+      url: 'https://en.wikipedia.org/wiki/Delta_3000',
     },
     {
-      "rocket": "Delta 3914",
-      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+      rocket: 'Delta 3914',
+      url: 'https://en.wikipedia.org/wiki/Delta_3000',
     },
     {
-      "rocket": "Delta 3920",
-      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+      rocket: 'Delta 3920',
+      url: 'https://en.wikipedia.org/wiki/Delta_3000',
     },
     {
-      "rocket": "Delta 3920/PAM",
-      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+      rocket: 'Delta 3920/PAM',
+      url: 'https://en.wikipedia.org/wiki/Delta_3000',
     },
     {
-      "rocket": "Delta 3924",
-      "url": "https://en.wikipedia.org/wiki/Delta_3000"
+      rocket: 'Delta 3924',
+      url: 'https://en.wikipedia.org/wiki/Delta_3000',
     },
     {
-      "rocket": "Delta 4925-8",
-      "url": "https://en.wikipedia.org/wiki/Delta_(rocket_family)"
+      rocket: 'Delta 4925-8',
+      url: 'https://en.wikipedia.org/wiki/Delta_(rocket_family)',
     },
     {
-      "rocket": "Delta 4M",
-      "url": "https://en.wikipedia.org/wiki/Delta_IV"
+      rocket: 'Delta 4M',
+      url: 'https://en.wikipedia.org/wiki/Delta_IV',
     },
     {
-      "rocket": "Delta 4M+(4,2)",
-      "url": "https://en.wikipedia.org/wiki/Delta_IV"
+      rocket: 'Delta 4M+(4,2)',
+      url: 'https://en.wikipedia.org/wiki/Delta_IV',
     },
     {
-      "rocket": "Delta 5920-8",
-      "url": "https://en.wikipedia.org/wiki/Delta_(rocket_family)"
+      rocket: 'Delta 5920-8',
+      url: 'https://en.wikipedia.org/wiki/Delta_(rocket_family)',
     },
     {
-      "rocket": "Delta 6925",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 6925',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 6925-8",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 6925-8',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7290-10C",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7290-10C',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7320-10",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7320-10',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7320-10C",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7320-10C',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7326-9.5",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7326-9.5',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7420-10C",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7420-10C',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7426-9.5",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7426-9.5',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7920-10",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7920-10',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7920-10C",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7920-10C',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7920-10L",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7920-10L',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7920H",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7920H',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7925",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7925',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7925-10",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7925-10',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7925-10C",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7925-10C',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7925-10L",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7925-10L',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7925-8",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7925-8',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 7925-9.5",
-      "url": "https://en.wikipedia.org/wiki/Delta_II"
+      rocket: 'Delta 7925-9.5',
+      url: 'https://en.wikipedia.org/wiki/Delta_II',
     },
     {
-      "rocket": "Delta 8930",
-      "url": "https://en.wikipedia.org/wiki/Delta_III"
+      rocket: 'Delta 8930',
+      url: 'https://en.wikipedia.org/wiki/Delta_III',
     },
     {
-      "rocket": "Diamant A",
-      "url": "https://en.wikipedia.org/wiki/Diamant"
+      rocket: 'Diamant A',
+      url: 'https://en.wikipedia.org/wiki/Diamant',
     },
     {
-      "rocket": "Diamant BP.4",
-      "url": "https://en.wikipedia.org/wiki/Diamant"
+      rocket: 'Diamant BP.4',
+      url: 'https://en.wikipedia.org/wiki/Diamant',
     },
     {
-      "rocket": "Dnepr",
-      "url": "https://en.wikipedia.org/wiki/Dnepr_(rocket)"
+      rocket: 'Dnepr',
+      url: 'https://en.wikipedia.org/wiki/Dnepr_(rocket)',
     },
     {
-      "rocket": "Electron",
-      "url": "https://en.wikipedia.org/wiki/Electron_(rocket)"
+      rocket: 'Electron',
+      url: 'https://en.wikipedia.org/wiki/Electron_(rocket)',
     },
     {
-      "rocket": "Epsilon",
-      "url": "https://en.wikipedia.org/wiki/Epsilon_(rocket)"
+      rocket: 'Epsilon',
+      url: 'https://en.wikipedia.org/wiki/Epsilon_(rocket)',
     },
     {
-      "rocket": "Falcon 1",
-      "url": "https://en.wikipedia.org/wiki/Falcon_1"
+      rocket: 'Falcon 1',
+      url: 'https://en.wikipedia.org/wiki/Falcon_1',
     },
     {
-      "rocket": "Falcon 9",
-      "url": "https://en.wikipedia.org/wiki/Falcon_9"
+      rocket: 'Falcon 9',
+      url: 'https://en.wikipedia.org/wiki/Falcon_9',
     },
     {
-      "rocket": "Falcon Heavy",
-      "url": "https://en.wikipedia.org/wiki/Falcon_Heavy"
+      rocket: 'Falcon Heavy',
+      url: 'https://en.wikipedia.org/wiki/Falcon_Heavy',
     },
     {
-      "rocket": "GSLV Mk I",
-      "url": "https://en.wikipedia.org/wiki/Geosynchronous_Satellite_Launch_Vehicle#GSLV_Mk_I"
+      rocket: 'GSLV Mk I',
+      url:
+        'https://en.wikipedia.org/wiki/Geosynchronous_Satellite_Launch_Vehicle#GSLV_Mk_I',
     },
     {
-      "rocket": "GSLV Mk II",
-      "url": "https://en.wikipedia.org/wiki/Geosynchronous_Satellite_Launch_Vehicle#GSLV_Mk_II"
+      rocket: 'GSLV Mk II',
+      url:
+        'https://en.wikipedia.org/wiki/Geosynchronous_Satellite_Launch_Vehicle#GSLV_Mk_II',
     },
     {
-      "rocket": "GSLV Mk III",
-      "url": "https://en.wikipedia.org/wiki/GSLV_Mark_III"
+      rocket: 'GSLV Mk III',
+      url: 'https://en.wikipedia.org/wiki/GSLV_Mark_III',
     },
     {
-      "rocket": "H-1",
-      "url": "https://en.wikipedia.org/wiki/H-I"
+      rocket: 'H-1',
+      url: 'https://en.wikipedia.org/wiki/H-I',
     },
     {
-      "rocket": "H-II",
-      "url": "https://en.wikipedia.org/wiki/H-II"
+      rocket: 'H-II',
+      url: 'https://en.wikipedia.org/wiki/H-II',
     },
     {
-      "rocket": "H-IIA 202",
-      "url": "https://en.wikipedia.org/wiki/H-IIA"
+      rocket: 'H-IIA 202',
+      url: 'https://en.wikipedia.org/wiki/H-IIA',
     },
     {
-      "rocket": "H-IIA 2022",
-      "url": "https://en.wikipedia.org/wiki/H-IIA"
+      rocket: 'H-IIA 2022',
+      url: 'https://en.wikipedia.org/wiki/H-IIA',
     },
     {
-      "rocket": "H-IIA 2024",
-      "url": "https://en.wikipedia.org/wiki/H-IIA"
+      rocket: 'H-IIA 2024',
+      url: 'https://en.wikipedia.org/wiki/H-IIA',
     },
     {
-      "rocket": "H-IIA 204",
-      "url": "https://en.wikipedia.org/wiki/H-IIA"
+      rocket: 'H-IIA 204',
+      url: 'https://en.wikipedia.org/wiki/H-IIA',
     },
     {
-      "rocket": "Kosmos 11K65M",
-      "url": "https://en.wikipedia.org/wiki/Kosmos-3M"
+      rocket: 'Kosmos 11K65M',
+      url: 'https://en.wikipedia.org/wiki/Kosmos-3M',
     },
     {
-      "rocket": "Kosmos 65S3",
-      "url": "https://en.wikipedia.org/wiki/Kosmos-3"
+      rocket: 'Kosmos 65S3',
+      url: 'https://en.wikipedia.org/wiki/Kosmos-3',
     },
     {
-      "rocket": "KT-2",
-      "url": "https://en.wikipedia.org/wiki/Kaituozhe_(rocket_family)#Kaituozhe-2"
+      rocket: 'KT-2',
+      url:
+        'https://en.wikipedia.org/wiki/Kaituozhe_(rocket_family)#Kaituozhe-2',
     },
     {
-      "rocket": "Kuaizhou-1A",
-      "url": "https://en.wikipedia.org/wiki/Kuaizhou"
+      rocket: 'Kuaizhou-1A',
+      url: 'https://en.wikipedia.org/wiki/Kuaizhou',
     },
     {
-      "rocket": "Kwangmyongsong",
-      "url": "https://en.wikipedia.org/wiki/Kwangmy%C5%8Fngs%C5%8Fng_program"
+      rocket: 'Kwangmyongsong',
+      url: 'https://en.wikipedia.org/wiki/Kwangmy%C5%8Fngs%C5%8Fng_program',
     },
     {
-      "rocket": "Minotaur 1",
-      "url": "https://en.wikipedia.org/wiki/Minotaur_I"
+      rocket: 'Minotaur 1',
+      url: 'https://en.wikipedia.org/wiki/Minotaur_I',
     },
     {
-      "rocket": "Minotaur IV",
-      "url": "https://en.wikipedia.org/wiki/Minotaur_IV"
+      rocket: 'Minotaur IV',
+      url: 'https://en.wikipedia.org/wiki/Minotaur_IV',
     },
     {
-      "rocket": "Minotaur IV+",
-      "url": "https://en.wikipedia.org/wiki/Minotaur_IV"
+      rocket: 'Minotaur IV+',
+      url: 'https://en.wikipedia.org/wiki/Minotaur_IV',
     },
     {
-      "rocket": "Minotaur-C 3210",
-      "url": "https://en.wikipedia.org/wiki/Minotaur-C"
+      rocket: 'Minotaur-C 3210',
+      url: 'https://en.wikipedia.org/wiki/Minotaur-C',
     },
     {
-      "rocket": "Molniya 8K78M",
-      "url": "https://en.wikipedia.org/wiki/Molniya_(rocket)"
+      rocket: 'Molniya 8K78M',
+      url: 'https://en.wikipedia.org/wiki/Molniya_(rocket)',
     },
     {
-      "rocket": "Molniya 8K78M-PVB",
-      "url": "https://en.wikipedia.org/wiki/Molniya_(rocket)"
+      rocket: 'Molniya 8K78M-PVB',
+      url: 'https://en.wikipedia.org/wiki/Molniya_(rocket)',
     },
     {
-      "rocket": "Mu-3H",
-      "url": "https://en.wikipedia.org/wiki/Mu_(rocket_family)"
+      rocket: 'Mu-3H',
+      url: 'https://en.wikipedia.org/wiki/Mu_(rocket_family)',
     },
     {
-      "rocket": "Mu-3S-II",
-      "url": "https://en.wikipedia.org/wiki/Mu_(rocket_family)"
+      rocket: 'Mu-3S-II',
+      url: 'https://en.wikipedia.org/wiki/Mu_(rocket_family)',
     },
     {
-      "rocket": "Mu-4S",
-      "url": "https://en.wikipedia.org/wiki/Mu_(rocket_family)"
+      rocket: 'Mu-4S',
+      url: 'https://en.wikipedia.org/wiki/Mu_(rocket_family)',
     },
     {
-      "rocket": "M-V",
-      "url": "https://en.wikipedia.org/wiki/M-V"
+      rocket: 'M-V',
+      url: 'https://en.wikipedia.org/wiki/M-V',
     },
     {
-      "rocket": "N-1",
-      "url": "https://en.wikipedia.org/wiki/N-I_(rocket)"
+      rocket: 'N-1',
+      url: 'https://en.wikipedia.org/wiki/N-I_(rocket)',
     },
     {
-      "rocket": "N-2",
-      "url": "https://en.wikipedia.org/wiki/N-II_(rocket)"
+      rocket: 'N-2',
+      url: 'https://en.wikipedia.org/wiki/N-II_(rocket)',
     },
     {
-      "rocket": "Naro-1",
-      "url": "https://en.wikipedia.org/wiki/Naro-1"
+      rocket: 'Naro-1',
+      url: 'https://en.wikipedia.org/wiki/Naro-1',
     },
     {
-      "rocket": "Pegasus",
-      "url": "https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus"
+      rocket: 'Pegasus',
+      url: 'https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus',
     },
     {
-      "rocket": "Pegasus H",
-      "url": "https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus"
+      rocket: 'Pegasus H',
+      url: 'https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus',
     },
     {
-      "rocket": "Pegasus XL",
-      "url": "https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus"
+      rocket: 'Pegasus XL',
+      url: 'https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus',
     },
     {
-      "rocket": "Pegasus XL/HAPS",
-      "url": "https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus"
+      rocket: 'Pegasus XL/HAPS',
+      url: 'https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus',
     },
     {
-      "rocket": "Pegasus/HAPS",
-      "url": "https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus"
+      rocket: 'Pegasus/HAPS',
+      url: 'https://en.wikipedia.org/wiki/Northrop_Grumman_Pegasus',
     },
     {
-      "rocket": "Proton-K",
-      "url": "https://en.wikipedia.org/wiki/Proton-K"
+      rocket: 'Proton-K',
+      url: 'https://en.wikipedia.org/wiki/Proton-K',
     },
     {
-      "rocket": "Proton-K/17S40",
-      "url": "https://en.wikipedia.org/wiki/Proton-K"
+      rocket: 'Proton-K/17S40',
+      url: 'https://en.wikipedia.org/wiki/Proton-K',
     },
     {
-      "rocket": "Proton-K/Briz-M",
-      "url": "https://en.wikipedia.org/wiki/Proton-K"
+      rocket: 'Proton-K/Briz-M',
+      url: 'https://en.wikipedia.org/wiki/Proton-K',
     },
     {
-      "rocket": "Proton-K/D",
-      "url": "https://en.wikipedia.org/wiki/Proton-K"
+      rocket: 'Proton-K/D',
+      url: 'https://en.wikipedia.org/wiki/Proton-K',
     },
     {
-      "rocket": "Proton-K/D-1",
-      "url": "https://en.wikipedia.org/wiki/Proton-K"
+      rocket: 'Proton-K/D-1',
+      url: 'https://en.wikipedia.org/wiki/Proton-K',
     },
     {
-      "rocket": "Proton-K/DM",
-      "url": "https://en.wikipedia.org/wiki/Proton-K"
+      rocket: 'Proton-K/DM',
+      url: 'https://en.wikipedia.org/wiki/Proton-K',
     },
     {
-      "rocket": "Proton-K/DM-2",
-      "url": "https://en.wikipedia.org/wiki/Proton-K"
+      rocket: 'Proton-K/DM-2',
+      url: 'https://en.wikipedia.org/wiki/Proton-K',
     },
     {
-      "rocket": "Proton-K/DM-2M",
-      "url": "https://en.wikipedia.org/wiki/Proton-K"
+      rocket: 'Proton-K/DM-2M',
+      url: 'https://en.wikipedia.org/wiki/Proton-K',
     },
     {
-      "rocket": "Proton-M/Briz-M",
-      "url": "https://en.wikipedia.org/wiki/Proton-M"
+      rocket: 'Proton-M/Briz-M',
+      url: 'https://en.wikipedia.org/wiki/Proton-M',
     },
     {
-      "rocket": "Proton-M/DM-2",
-      "url": "https://en.wikipedia.org/wiki/Proton-M"
+      rocket: 'Proton-M/DM-2',
+      url: 'https://en.wikipedia.org/wiki/Proton-M',
     },
     {
-      "rocket": "Proton-M/DM-3",
-      "url": "https://en.wikipedia.org/wiki/Proton-M"
+      rocket: 'Proton-M/DM-3',
+      url: 'https://en.wikipedia.org/wiki/Proton-M',
     },
     {
-      "rocket": "PSLV",
-      "url": "https://en.wikipedia.org/wiki/Polar_Satellite_Launch_Vehicle"
+      rocket: 'PSLV',
+      url: 'https://en.wikipedia.org/wiki/Polar_Satellite_Launch_Vehicle',
     },
     {
-      "rocket": "PSLV-XL",
-      "url": "https://en.wikipedia.org/wiki/Polar_Satellite_Launch_Vehicle#Variants"
+      rocket: 'PSLV-XL',
+      url:
+        'https://en.wikipedia.org/wiki/Polar_Satellite_Launch_Vehicle#Variants',
     },
     {
-      "rocket": "Rokot",
-      "url": "https://en.wikipedia.org/wiki/Rokot"
+      rocket: 'Rokot',
+      url: 'https://en.wikipedia.org/wiki/Rokot',
     },
     {
-      "rocket": "Scout A",
-      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+      rocket: 'Scout A',
+      url: 'https://en.wikipedia.org/wiki/Scout_(rocket_family)',
     },
     {
-      "rocket": "Scout A-1",
-      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+      rocket: 'Scout A-1',
+      url: 'https://en.wikipedia.org/wiki/Scout_(rocket_family)',
     },
     {
-      "rocket": "Scout B",
-      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+      rocket: 'Scout B',
+      url: 'https://en.wikipedia.org/wiki/Scout_(rocket_family)',
     },
     {
-      "rocket": "Scout B-1",
-      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+      rocket: 'Scout B-1',
+      url: 'https://en.wikipedia.org/wiki/Scout_(rocket_family)',
     },
     {
-      "rocket": "Scout D-1",
-      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+      rocket: 'Scout D-1',
+      url: 'https://en.wikipedia.org/wiki/Scout_(rocket_family)',
     },
     {
-      "rocket": "Scout G-1",
-      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+      rocket: 'Scout G-1',
+      url: 'https://en.wikipedia.org/wiki/Scout_(rocket_family)',
     },
     {
-      "rocket": "Scout X-4",
-      "url": "https://en.wikipedia.org/wiki/Scout_(rocket_family)"
+      rocket: 'Scout X-4',
+      url: 'https://en.wikipedia.org/wiki/Scout_(rocket_family)',
     },
     {
-      "rocket": "Soyuz 11A511L",
-      "url": "https://en.wikipedia.org/wiki/Soyuz_(rocket_family)"
+      rocket: 'Soyuz 11A511L',
+      url: 'https://en.wikipedia.org/wiki/Soyuz_(rocket_family)',
     },
     {
-      "rocket": "Soyuz-2-1A",
-      "url": "https://en.wikipedia.org/wiki/Soyuz-2"
+      rocket: 'Soyuz-2-1A',
+      url: 'https://en.wikipedia.org/wiki/Soyuz-2',
     },
     {
-      "rocket": "Soyuz-2-1B",
-      "url": "https://en.wikipedia.org/wiki/Soyuz-2"
+      rocket: 'Soyuz-2-1B',
+      url: 'https://en.wikipedia.org/wiki/Soyuz-2',
     },
     {
-      "rocket": "Soyuz-2-1V",
-      "url": "https://en.wikipedia.org/wiki/Soyuz-2"
+      rocket: 'Soyuz-2-1V',
+      url: 'https://en.wikipedia.org/wiki/Soyuz-2',
     },
     {
-      "rocket": "Soyuz-FG",
-      "url": "https://en.wikipedia.org/wiki/Soyuz-FG"
+      rocket: 'Soyuz-FG',
+      url: 'https://en.wikipedia.org/wiki/Soyuz-FG',
     },
     {
-      "rocket": "Soyuz-ST-A",
-      "url": "https://en.wikipedia.org/wiki/Soyuz-2"
+      rocket: 'Soyuz-ST-A',
+      url: 'https://en.wikipedia.org/wiki/Soyuz-2',
     },
     {
-      "rocket": "Soyuz-ST-B",
-      "url": "https://en.wikipedia.org/wiki/Soyuz-2"
+      rocket: 'Soyuz-ST-B',
+      url: 'https://en.wikipedia.org/wiki/Soyuz-2',
     },
     {
-      "rocket": "Soyuz-U",
-      "url": "https://en.wikipedia.org/wiki/Soyuz-U"
+      rocket: 'Soyuz-U',
+      url: 'https://en.wikipedia.org/wiki/Soyuz-U',
     },
     {
-      "rocket": "Soyuz-U-PVB",
-      "url": "https://en.wikipedia.org/wiki/Soyuz-U"
+      rocket: 'Soyuz-U-PVB',
+      url: 'https://en.wikipedia.org/wiki/Soyuz-U',
     },
     {
-      "rocket": "Space Shuttle",
-      "url": "https://en.wikipedia.org/wiki/Space_Shuttle"
+      rocket: 'Space Shuttle',
+      url: 'https://en.wikipedia.org/wiki/Space_Shuttle',
     },
     {
-      "rocket": "Start-1",
-      "url": "https://en.wikipedia.org/wiki/Start-1"
+      rocket: 'Start-1',
+      url: 'https://en.wikipedia.org/wiki/Start-1',
     },
     {
-      "rocket": "Strela",
-      "url": "https://en.wikipedia.org/wiki/Strela_(rocket)"
+      rocket: 'Strela',
+      url: 'https://en.wikipedia.org/wiki/Strela_(rocket)',
     },
     {
-      "rocket": "Taurus 1110",
-      "url": "https://en.wikipedia.org/wiki/Minotaur-C"
+      rocket: 'Taurus 1110',
+      url: 'https://en.wikipedia.org/wiki/Minotaur-C',
     },
     {
-      "rocket": "Taurus 2110",
-      "url": "https://en.wikipedia.org/wiki/Minotaur-C"
+      rocket: 'Taurus 2110',
+      url: 'https://en.wikipedia.org/wiki/Minotaur-C',
     },
     {
-      "rocket": "Taurus 2210",
-      "url": "https://en.wikipedia.org/wiki/Minotaur-C"
+      rocket: 'Taurus 2210',
+      url: 'https://en.wikipedia.org/wiki/Minotaur-C',
     },
     {
-      "rocket": "Taurus 3210",
-      "url": "https://en.wikipedia.org/wiki/Minotaur-C"
+      rocket: 'Taurus 3210',
+      url: 'https://en.wikipedia.org/wiki/Minotaur-C',
     },
     {
-      "rocket": "Thor Ablestar",
-      "url": "https://en.wikipedia.org/wiki/Thor-Ablestar"
+      rocket: 'Thor Ablestar',
+      url: 'https://en.wikipedia.org/wiki/Thor-Ablestar',
     },
     {
-      "rocket": "Thor Burner 1",
-      "url": "https://en.wikipedia.org/wiki/Thor-Burner"
+      rocket: 'Thor Burner 1',
+      url: 'https://en.wikipedia.org/wiki/Thor-Burner',
     },
     {
-      "rocket": "Thor Burner 2",
-      "url": "https://en.wikipedia.org/wiki/Thor-Burner"
+      rocket: 'Thor Burner 2',
+      url: 'https://en.wikipedia.org/wiki/Thor-Burner',
     },
     {
-      "rocket": "Thor Burner 2A",
-      "url": "https://en.wikipedia.org/wiki/Thor-Burner"
+      rocket: 'Thor Burner 2A',
+      url: 'https://en.wikipedia.org/wiki/Thor-Burner',
     },
     {
-      "rocket": "Thor Delta B",
-      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+      rocket: 'Thor Delta B',
+      url: 'https://en.wikipedia.org/wiki/Thor-Delta',
     },
     {
-      "rocket": "Thor Delta C",
-      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+      rocket: 'Thor Delta C',
+      url: 'https://en.wikipedia.org/wiki/Thor-Delta',
     },
     {
-      "rocket": "Thor Delta D",
-      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+      rocket: 'Thor Delta D',
+      url: 'https://en.wikipedia.org/wiki/Thor-Delta',
     },
     {
-      "rocket": "Thor Delta E",
-      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+      rocket: 'Thor Delta E',
+      url: 'https://en.wikipedia.org/wiki/Thor-Delta',
     },
     {
-      "rocket": "Thor Delta E1",
-      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+      rocket: 'Thor Delta E1',
+      url: 'https://en.wikipedia.org/wiki/Thor-Delta',
     },
     {
-      "rocket": "Thor Delta J",
-      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+      rocket: 'Thor Delta J',
+      url: 'https://en.wikipedia.org/wiki/Thor-Delta',
     },
     {
-      "rocket": "Thor Delta M",
-      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+      rocket: 'Thor Delta M',
+      url: 'https://en.wikipedia.org/wiki/Thor-Delta',
     },
     {
-      "rocket": "Thor Delta N",
-      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+      rocket: 'Thor Delta N',
+      url: 'https://en.wikipedia.org/wiki/Thor-Delta',
     },
     {
-      "rocket": "Thor Delta N6",
-      "url": "https://en.wikipedia.org/wiki/Thor-Delta"
+      rocket: 'Thor Delta N6',
+      url: 'https://en.wikipedia.org/wiki/Thor-Delta',
     },
     {
-      "rocket": "Thor DSV-2U",
-      "url": "https://en.wikipedia.org/wiki/Thor_DSV-2U"
+      rocket: 'Thor DSV-2U',
+      url: 'https://en.wikipedia.org/wiki/Thor_DSV-2U',
     },
     {
-      "rocket": "Thor SLV-2 Agena B",
-      "url": "https://en.wikipedia.org/wiki/Thor_(rocket_family)"
+      rocket: 'Thor SLV-2 Agena B',
+      url: 'https://en.wikipedia.org/wiki/Thor_(rocket_family)',
     },
     {
-      "rocket": "Thor SLV-2 Agena D",
-      "url": "https://en.wikipedia.org/wiki/Thor_(rocket_family)"
+      rocket: 'Thor SLV-2 Agena D',
+      url: 'https://en.wikipedia.org/wiki/Thor_(rocket_family)',
     },
     {
-      "rocket": "Thor SLV-2A Agena B",
-      "url": "https://en.wikipedia.org/wiki/Thor_(rocket_family)"
+      rocket: 'Thor SLV-2A Agena B',
+      url: 'https://en.wikipedia.org/wiki/Thor_(rocket_family)',
     },
     {
-      "rocket": "Thor SLV-2A Agena D",
-      "url": "https://en.wikipedia.org/wiki/Thor_(rocket_family)"
+      rocket: 'Thor SLV-2A Agena D',
+      url: 'https://en.wikipedia.org/wiki/Thor_(rocket_family)',
     },
     {
-      "rocket": "Thorad SLV-2G Agena D",
-      "url": "https://en.wikipedia.org/wiki/Thorad-Agena"
+      rocket: 'Thorad SLV-2G Agena D',
+      url: 'https://en.wikipedia.org/wiki/Thorad-Agena',
     },
     {
-      "rocket": "Titan 34D/IUS",
-      "url": "https://en.wikipedia.org/wiki/Titan_34D"
+      rocket: 'Titan 34D/IUS',
+      url: 'https://en.wikipedia.org/wiki/Titan_34D',
     },
     {
-      "rocket": "Titan 402A/IUS",
-      "url": "https://en.wikipedia.org/wiki/Titan_IV"
+      rocket: 'Titan 402A/IUS',
+      url: 'https://en.wikipedia.org/wiki/Titan_IV',
     },
     {
-      "rocket": "Titan 403B",
-      "url": "https://en.wikipedia.org/wiki/Titan_IV"
+      rocket: 'Titan 403B',
+      url: 'https://en.wikipedia.org/wiki/Titan_IV',
     },
     {
-      "rocket": "Titan II SLV",
-      "url": "https://en.wikipedia.org/wiki/LGM-25C_Titan_II"
+      rocket: 'Titan II SLV',
+      url: 'https://en.wikipedia.org/wiki/LGM-25C_Titan_II',
     },
     {
-      "rocket": "Titan IIIA",
-      "url": "https://en.wikipedia.org/wiki/Titan_IIIA"
+      rocket: 'Titan IIIA',
+      url: 'https://en.wikipedia.org/wiki/Titan_IIIA',
     },
     {
-      "rocket": "Titan IIIC",
-      "url": "https://en.wikipedia.org/wiki/Titan_IIIC"
+      rocket: 'Titan IIIC',
+      url: 'https://en.wikipedia.org/wiki/Titan_IIIC',
     },
     {
-      "rocket": "Titan IIID",
-      "url": "https://en.wikipedia.org/wiki/Titan_IIID"
+      rocket: 'Titan IIID',
+      url: 'https://en.wikipedia.org/wiki/Titan_IIID',
     },
     {
-      "rocket": "Tsiklon-2",
-      "url": "https://en.wikipedia.org/wiki/Tsyklon-2"
+      rocket: 'Tsiklon-2',
+      url: 'https://en.wikipedia.org/wiki/Tsyklon-2',
     },
     {
-      "rocket": "Tsiklon-2A",
-      "url": "https://en.wikipedia.org/wiki/Tsyklon-2"
+      rocket: 'Tsiklon-2A',
+      url: 'https://en.wikipedia.org/wiki/Tsyklon-2',
     },
     {
-      "rocket": "Tsiklon-3",
-      "url": "https://en.wikipedia.org/wiki/Tsyklon-3"
+      rocket: 'Tsiklon-3',
+      url: 'https://en.wikipedia.org/wiki/Tsyklon-3',
     },
     {
-      "rocket": "U",
-      "url": ""
+      rocket: 'U',
+      url: '',
     },
     {
-      "rocket": "Unha-3",
-      "url": "https://en.wikipedia.org/wiki/Unha"
+      rocket: 'Unha-3',
+      url: 'https://en.wikipedia.org/wiki/Unha',
     },
     {
-      "rocket": "Vega",
-      "url": "https://en.wikipedia.org/wiki/Vega_(rocket)"
+      rocket: 'Vega',
+      url: 'https://en.wikipedia.org/wiki/Vega_(rocket)',
     },
     {
-      "rocket": "Vostok 8A92M",
-      "url": "https://en.wikipedia.org/wiki/Vostok_(rocket_family)"
+      rocket: 'Vostok 8A92M',
+      url: 'https://en.wikipedia.org/wiki/Vostok_(rocket_family)',
     },
     {
-      "rocket": "Vostok 8K72K",
-      "url": "https://en.wikipedia.org/wiki/Vostok_(rocket_family)"
+      rocket: 'Vostok 8K72K',
+      url: 'https://en.wikipedia.org/wiki/Vostok_(rocket_family)',
     },
     {
-      "rocket": "Zenit-2",
-      "url": "https://en.wikipedia.org/wiki/Zenit-2"
+      rocket: 'Zenit-2',
+      url: 'https://en.wikipedia.org/wiki/Zenit-2',
     },
     {
-      "rocket": "Zenit-2M",
-      "url": "https://en.wikipedia.org/wiki/Zenit-2"
+      rocket: 'Zenit-2M',
+      url: 'https://en.wikipedia.org/wiki/Zenit-2',
     },
     {
-      "rocket": "Zenit-3SL",
-      "url": "https://en.wikipedia.org/wiki/Zenit_(rocket_family)"
+      rocket: 'Zenit-3SL',
+      url: 'https://en.wikipedia.org/wiki/Zenit_(rocket_family)',
     },
     {
-      "rocket": "Zenit-3SLB",
-      "url": "https://en.wikipedia.org/wiki/Zenit_(rocket_family)"
+      rocket: 'Zenit-3SLB',
+      url: 'https://en.wikipedia.org/wiki/Zenit_(rocket_family)',
     },
     {
-      "rocket": "Zenit-3SLBF",
-      "url": "https://en.wikipedia.org/wiki/Zenit_(rocket_family)"
-    }
-  ];
+      rocket: 'Zenit-3SLBF',
+      url: 'https://en.wikipedia.org/wiki/Zenit_(rocket_family)',
+    },
+  ]
 
-  window.objectManager = objectManager;
-})();
+  window.objectManager = objectManager
+})()

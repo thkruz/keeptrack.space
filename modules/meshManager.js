@@ -1,60 +1,60 @@
-(function() {
-  meshManager = {};
-  let mvMatrix;
-  let mvMatrixEmpty = mat4.create();
-  let nMatrix;
-  let nMatrixEmpty = mat3.create();
+;(function () {
+  meshManager = {}
+  let mvMatrix
+  let mvMatrixEmpty = mat4.create()
+  let nMatrix
+  let nMatrixEmpty = mat3.create()
 
   meshManager.fileList = [
-      {
-          obj: `${settingsManager.installDirectory}meshes/Satellite.obj`,
-          mtl: `${settingsManager.installDirectory}meshes/Satellite.mtl`
-      },
-      {
-          obj: `${settingsManager.installDirectory}meshes/sat.obj`,
-          mtl: `${settingsManager.installDirectory}meshes/sat.mtl`
-      },
-      {
-          obj: `${settingsManager.installDirectory}meshes/iss.obj`,
-          mtl: `${settingsManager.installDirectory}meshes/iss.mtl`
-      },
-      {
-          obj: `${settingsManager.installDirectory}meshes/rocketdebris.obj`,
-          mtl: `${settingsManager.installDirectory}meshes/rocketdebris.mtl`
-      },
-      {
-          obj: `${settingsManager.installDirectory}meshes/rocketbody.obj`,
-          mtl: `${settingsManager.installDirectory}meshes/rocketbody.mtl`
-      }
-  ];
+    {
+      obj: `${settingsManager.installDirectory}meshes/Satellite.obj`,
+      mtl: `${settingsManager.installDirectory}meshes/Satellite.mtl`,
+    },
+    {
+      obj: `${settingsManager.installDirectory}meshes/sat.obj`,
+      mtl: `${settingsManager.installDirectory}meshes/sat.mtl`,
+    },
+    {
+      obj: `${settingsManager.installDirectory}meshes/iss.obj`,
+      mtl: `${settingsManager.installDirectory}meshes/iss.mtl`,
+    },
+    {
+      obj: `${settingsManager.installDirectory}meshes/rocketdebris.obj`,
+      mtl: `${settingsManager.installDirectory}meshes/rocketdebris.mtl`,
+    },
+    {
+      obj: `${settingsManager.installDirectory}meshes/rocketbody.obj`,
+      mtl: `${settingsManager.installDirectory}meshes/rocketbody.mtl`,
+    },
+  ]
 
   meshManager.sizeInfo = {
     Satellite: {
       x: 80.0,
       y: 80.0,
-      z: 80.0
+      z: 80.0,
     },
     sat: {
       x: 5.0,
       y: 5.0,
-      z: 5.0
+      z: 5.0,
     },
     iss: {
       x: 150.0,
       y: 150.0,
-      z: 150.0
+      z: 150.0,
     },
     rocketdebris: {
       x: 0.1,
       y: 0.1,
-      z: 0.1
+      z: 0.1,
     },
     rocketbody: {
       x: 0.2,
       y: 0.2,
-      z: 2.5
-    }
-  };
+      z: 2.5,
+    },
+  }
 
   // main shader program
   meshManager.fragShaderCode = `
@@ -81,7 +81,7 @@
 
       gl_FragColor = vec4(color, 1.0);
     }
-  `;
+  `
   meshManager.vertShaderCode = `
     attribute vec3 aVertexPosition;
     attribute vec3 aVertexNormal;
@@ -116,248 +116,294 @@
       vTextureCoord = aTextureCoord;
       vTransformedNormal  = uNormalMatrix * aVertexNormal;
     }
-  `;
-  meshManager.isReady = false;
+  `
+  meshManager.isReady = false
   meshManager.init = () => {
-    let p = OBJ.downloadModels(meshManager.fileList);
+    let p = OBJ.downloadModels(meshManager.fileList)
 
-    p.then(models => {
-        for ([name, mesh] of Object.entries(models)) {
-            // console.log("Name:", name);
-            // console.log("Mesh:", mesh);
-        }
-        meshManager.meshes = models;
-        initShaders();
-        initBuffers();
-    });
-  };
+    p.then((models) => {
+      for ([name, mesh] of Object.entries(models)) {
+        // console.log("Name:", name);
+        // console.log("Mesh:", mesh);
+      }
+      meshManager.meshes = models
+      initShaders()
+      initBuffers()
+    })
+  }
   // main app object
-  meshManager.meshes = {};
-  meshManager.models = {};
-  meshManager.mvMatrix = mat4.create();
-  meshManager.mvMatrixStack = [];
-  meshManager.pMatrix = mat4.create();
+  meshManager.meshes = {}
+  meshManager.models = {}
+  meshManager.mvMatrix = mat4.create()
+  meshManager.mvMatrixStack = []
+  meshManager.pMatrix = mat4.create()
   meshManager.drawObject = (model, pMatrix, camMatrix) => {
-      if (typeof model == 'undefined') return;
+    if (typeof model == 'undefined') return
 
-      // Meshes aren't finished loading
-      if (!meshManager.loaded) return;
+    // Meshes aren't finished loading
+    if (!meshManager.loaded) return
 
-      // gl.bindVertexArray(meshManager.vao);
+    // gl.bindVertexArray(meshManager.vao);
 
-      // Assigned an origin at 0,0,0
-      mvMatrix = mvMatrixEmpty;
-      mat4.identity(mvMatrix);
+    // Assigned an origin at 0,0,0
+    mvMatrix = mvMatrixEmpty
+    mat4.identity(mvMatrix)
 
-      // Move the mesh to its location in world space
-      mat4.translate(mvMatrix, mvMatrix, vec3.fromValues(model.position.x,model.position.y,model.position.z));
+    // Move the mesh to its location in world space
+    mat4.translate(
+      mvMatrix,
+      mvMatrix,
+      vec3.fromValues(model.position.x, model.position.y, model.position.z),
+    )
 
-      mat4.scale(mvMatrix, mvMatrix, vec3.fromValues(model.size.x,model.size.y,model.size.z));
+    mat4.scale(
+      mvMatrix,
+      mvMatrix,
+      vec3.fromValues(model.size.x, model.size.y, model.size.z),
+    )
 
-      // Assign the normal matrix the opposite of the mvMatrix
-      nMatrix = nMatrixEmpty;
-      mat3.normalFromMat4(nMatrix, mvMatrix);
+    // Assign the normal matrix the opposite of the mvMatrix
+    nMatrix = nMatrixEmpty
+    mat3.normalFromMat4(nMatrix, mvMatrix)
 
-      gl.enable(gl.BLEND);
+    gl.enable(gl.BLEND)
 
-      // Use the mesh shader program
-      gl.useProgram(meshManager.shaderProgram);
+    // Use the mesh shader program
+    gl.useProgram(meshManager.shaderProgram)
 
-       // Not sure what this does?!
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    // Not sure what this does?!
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 
-      // Assign uniforms
-      gl.uniform3fv(meshManager.shaderProgram.uLightDirection, earth.lightDirection);
-      gl.uniformMatrix3fv(meshManager.shaderProgram.uNormalMatrix, false, nMatrix);
-      gl.uniformMatrix4fv(meshManager.shaderProgram.uMvMatrix, false, mvMatrix);
-      gl.uniformMatrix4fv(meshManager.shaderProgram.uPMatrix, false, pMatrix);
-      gl.uniformMatrix4fv(meshManager.shaderProgram.uCamMatrix, false, camMatrix);
+    // Assign uniforms
+    gl.uniform3fv(
+      meshManager.shaderProgram.uLightDirection,
+      earth.lightDirection,
+    )
+    gl.uniformMatrix3fv(meshManager.shaderProgram.uNormalMatrix, false, nMatrix)
+    gl.uniformMatrix4fv(meshManager.shaderProgram.uMvMatrix, false, mvMatrix)
+    gl.uniformMatrix4fv(meshManager.shaderProgram.uPMatrix, false, pMatrix)
+    gl.uniformMatrix4fv(meshManager.shaderProgram.uCamMatrix, false, camMatrix)
 
-      // Assign vertex buffer
-      gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.vertexBuffer);
+    // Assign vertex buffer
+    gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.vertexBuffer)
 
-      // Update Buffers
-      meshManager.shaderProgram.applyAttributePointers(model);
+    // Update Buffers
+    meshManager.shaderProgram.applyAttributePointers(model)
 
-      // Enable attributes
-      meshManager.shaderProgram.enableVertexAttribArrays(model);
+    // Enable attributes
+    meshManager.shaderProgram.enableVertexAttribArrays(model)
 
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, model.mesh.indexBuffer);
-      gl.drawElements(gl.TRIANGLES, model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, model.mesh.indexBuffer)
+    gl.drawElements(
+      gl.TRIANGLES,
+      model.mesh.indexBuffer.numItems,
+      gl.UNSIGNED_SHORT,
+      0,
+    )
 
-      // Enable attributes
-      meshManager.shaderProgram.disableVertexAttribArrays(model);
+    // Enable attributes
+    meshManager.shaderProgram.disableVertexAttribArrays(model)
 
-      gl.disable(gl.BLEND);
-  };
+    gl.disable(gl.BLEND)
+  }
 
   function initShaders() {
     // meshManager.vao = gl.createVertexArray();
     // gl.bindVertexArray(meshManager.vao);
 
-    let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-    let fragCode = meshManager.fragShaderCode;
-    gl.shaderSource(fragShader, fragCode);
-    gl.compileShader(fragShader);
+    let fragShader = gl.createShader(gl.FRAGMENT_SHADER)
+    let fragCode = meshManager.fragShaderCode
+    gl.shaderSource(fragShader, fragCode)
+    gl.compileShader(fragShader)
 
-    let vertShader = gl.createShader(gl.VERTEX_SHADER);
-    let vertCode = meshManager.vertShaderCode;
-    gl.shaderSource(vertShader, vertCode);
-    gl.compileShader(vertShader);
+    let vertShader = gl.createShader(gl.VERTEX_SHADER)
+    let vertCode = meshManager.vertShaderCode
+    gl.shaderSource(vertShader, vertCode)
+    gl.compileShader(vertShader)
 
-    meshManager.shaderProgram = gl.createProgram();
-    gl.attachShader(meshManager.shaderProgram, vertShader);
-    gl.attachShader(meshManager.shaderProgram, fragShader);
-    gl.linkProgram(meshManager.shaderProgram);
+    meshManager.shaderProgram = gl.createProgram()
+    gl.attachShader(meshManager.shaderProgram, vertShader)
+    gl.attachShader(meshManager.shaderProgram, fragShader)
+    gl.linkProgram(meshManager.shaderProgram)
 
     if (!gl.getProgramParameter(meshManager.shaderProgram, gl.LINK_STATUS)) {
-        console.log("Could not initialise shaders");
+      console.log('Could not initialise shaders')
     }
-    gl.useProgram(meshManager.shaderProgram);
+    gl.useProgram(meshManager.shaderProgram)
 
     const attrs = {
-        aVertexPosition: OBJ.Layout.POSITION.key,
-        aVertexNormal: OBJ.Layout.NORMAL.key,
-        aTextureCoord: OBJ.Layout.UV.key,
-        aDiffuse: OBJ.Layout.DIFFUSE.key,
-        aSpecular: OBJ.Layout.SPECULAR.key,
-        aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key
-    };
+      aVertexPosition: OBJ.Layout.POSITION.key,
+      aVertexNormal: OBJ.Layout.NORMAL.key,
+      aTextureCoord: OBJ.Layout.UV.key,
+      aDiffuse: OBJ.Layout.DIFFUSE.key,
+      aSpecular: OBJ.Layout.SPECULAR.key,
+      aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key,
+    }
 
-    meshManager.shaderProgram.attrIndices = {};
+    meshManager.shaderProgram.attrIndices = {}
 
-    meshManager.shaderProgram.uPMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uPMatrix');
-    meshManager.shaderProgram.uCamMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uCamMatrix');
-    meshManager.shaderProgram.uMvMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uMvMatrix');
-    meshManager.shaderProgram.uNormalMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uNormalMatrix');
-    meshManager.shaderProgram.uLightDirection = gl.getUniformLocation(meshManager.shaderProgram, 'uLightDirection');
+    meshManager.shaderProgram.uPMatrix = gl.getUniformLocation(
+      meshManager.shaderProgram,
+      'uPMatrix',
+    )
+    meshManager.shaderProgram.uCamMatrix = gl.getUniformLocation(
+      meshManager.shaderProgram,
+      'uCamMatrix',
+    )
+    meshManager.shaderProgram.uMvMatrix = gl.getUniformLocation(
+      meshManager.shaderProgram,
+      'uMvMatrix',
+    )
+    meshManager.shaderProgram.uNormalMatrix = gl.getUniformLocation(
+      meshManager.shaderProgram,
+      'uNormalMatrix',
+    )
+    meshManager.shaderProgram.uLightDirection = gl.getUniformLocation(
+      meshManager.shaderProgram,
+      'uLightDirection',
+    )
 
-    meshManager.shaderProgram.applyAttributePointers = function(model) {
-      const layout = model.mesh.vertexBuffer.layout;
+    meshManager.shaderProgram.applyAttributePointers = function (model) {
+      const layout = model.mesh.vertexBuffer.layout
       for (const attrName in attrs) {
-        if (!attrs.hasOwnProperty(attrName) || meshManager.shaderProgram.attrIndices[attrName] == -1) {
-            continue;
+        if (
+          !attrs.hasOwnProperty(attrName) ||
+          meshManager.shaderProgram.attrIndices[attrName] == -1
+        ) {
+          continue
         }
-        const layoutKey = attrs[attrName];
+        const layoutKey = attrs[attrName]
         if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
-          const attr = layout.attributeMap[layoutKey];
+          const attr = layout.attributeMap[layoutKey]
           gl.vertexAttribPointer(
-              meshManager.shaderProgram.attrIndices[attrName],
-              attr.size,
-              gl[attr.type],
-              attr.normalized,
-              attr.stride,
-              attr.offset
-          );
+            meshManager.shaderProgram.attrIndices[attrName],
+            attr.size,
+            gl[attr.type],
+            attr.normalized,
+            attr.stride,
+            attr.offset,
+          )
         }
       }
-    };
-    meshManager.shaderProgram.enableVertexAttribArrays = function(model) {
+    }
+    meshManager.shaderProgram.enableVertexAttribArrays = function (model) {
       for (const attrName in attrs) {
-          if (!attrs.hasOwnProperty(attrName)) {
-              continue;
-          }
-          meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
-          if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
-              gl.enableVertexAttribArray(meshManager.shaderProgram.attrIndices[attrName]);
-          } else {
-              console.warn(
-                  'Shader attribute "' +
-                      attrName +
-                      '" not found in shader. Is it undeclared or unused in the shader code?'
-              );
-          }
+        if (!attrs.hasOwnProperty(attrName)) {
+          continue
+        }
+        meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(
+          meshManager.shaderProgram,
+          attrName,
+        )
+        if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
+          gl.enableVertexAttribArray(
+            meshManager.shaderProgram.attrIndices[attrName],
+          )
+        } else {
+          console.warn(
+            'Shader attribute "' +
+              attrName +
+              '" not found in shader. Is it undeclared or unused in the shader code?',
+          )
+        }
       }
-    };
-    meshManager.shaderProgram.disableVertexAttribArrays = function(model) {
+    }
+    meshManager.shaderProgram.disableVertexAttribArrays = function (model) {
       for (const attrName in attrs) {
-          if (!attrs.hasOwnProperty(attrName)) {
-              continue;
-          }
-          meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
-          if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
-              gl.disableVertexAttribArray(meshManager.shaderProgram.attrIndices[attrName]);
-          } else {
-              console.warn(
-                  'Shader attribute "' +
-                      attrName +
-                      '" not found in shader. Is it undeclared or unused in the shader code?'
-              );
-          }
+        if (!attrs.hasOwnProperty(attrName)) {
+          continue
+        }
+        meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(
+          meshManager.shaderProgram,
+          attrName,
+        )
+        if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
+          gl.disableVertexAttribArray(
+            meshManager.shaderProgram.attrIndices[attrName],
+          )
+        } else {
+          console.warn(
+            'Shader attribute "' +
+              attrName +
+              '" not found in shader. Is it undeclared or unused in the shader code?',
+          )
+        }
       }
-    };
+    }
   }
   function initBuffers() {
-      var layout = new OBJ.Layout(
-          OBJ.Layout.POSITION,
-          OBJ.Layout.NORMAL,
-          OBJ.Layout.DIFFUSE,
-          OBJ.Layout.UV,
-          OBJ.Layout.SPECULAR,
-          OBJ.Layout.SPECULAR_EXPONENT
-      );
+    var layout = new OBJ.Layout(
+      OBJ.Layout.POSITION,
+      OBJ.Layout.NORMAL,
+      OBJ.Layout.DIFFUSE,
+      OBJ.Layout.UV,
+      OBJ.Layout.SPECULAR,
+      OBJ.Layout.SPECULAR_EXPONENT,
+    )
 
-      // initialize the mesh's buffers
-      for (var mesh in meshManager.meshes) {
-          // Create the vertex buffer for this mesh
-          var vertexBuffer = gl.createBuffer();
-          gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-          var vertexData = meshManager.meshes[mesh].makeBufferData(layout);
-          gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
-          vertexBuffer.numItems = vertexData.numItems;
-          vertexBuffer.layout = layout;
-          meshManager.meshes[mesh].vertexBuffer = vertexBuffer;
+    // initialize the mesh's buffers
+    for (var mesh in meshManager.meshes) {
+      // Create the vertex buffer for this mesh
+      var vertexBuffer = gl.createBuffer()
+      gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)
+      var vertexData = meshManager.meshes[mesh].makeBufferData(layout)
+      gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW)
+      vertexBuffer.numItems = vertexData.numItems
+      vertexBuffer.layout = layout
+      meshManager.meshes[mesh].vertexBuffer = vertexBuffer
 
-          // Create the index buffer for this mesh
-          var indexBuffer = gl.createBuffer();
-          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-          var indexData = meshManager.meshes[mesh].makeIndexBufferDataForMaterials(...Object.values(meshManager.meshes[mesh].materialIndices));
-          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
-          indexBuffer.numItems = indexData.numItems;
-          meshManager.meshes[mesh].indexBuffer = indexBuffer;
+      // Create the index buffer for this mesh
+      var indexBuffer = gl.createBuffer()
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer)
+      var indexData = meshManager.meshes[mesh].makeIndexBufferDataForMaterials(
+        ...Object.values(meshManager.meshes[mesh].materialIndices),
+      )
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW)
+      indexBuffer.numItems = indexData.numItems
+      meshManager.meshes[mesh].indexBuffer = indexBuffer
 
-          // this loops through the mesh names and creates new
-          // model objects and setting their mesh to the current mesh
-          meshManager.models[mesh] = {};
-          meshManager.models[mesh].mesh = meshManager.meshes[mesh];
-          meshManager.models[mesh].size = meshManager.sizeInfo[mesh];
-      }
-      meshManager.loaded = true;
+      // this loops through the mesh names and creates new
+      // model objects and setting their mesh to the current mesh
+      meshManager.models[mesh] = {}
+      meshManager.models[mesh].mesh = meshManager.meshes[mesh]
+      meshManager.models[mesh].size = meshManager.sizeInfo[mesh]
+    }
+    meshManager.loaded = true
   }
   function getShader(gl, id) {
-      var shaderScript = document.getElementById(id);
-      if (!shaderScript) {
-          return null;
+    var shaderScript = document.getElementById(id)
+    if (!shaderScript) {
+      return null
+    }
+
+    var str = ''
+    var k = shaderScript.firstChild
+    while (k) {
+      if (k.nodeType == 3) {
+        str += k.textContent
       }
+      k = k.nextSibling
+    }
 
-      var str = "";
-      var k = shaderScript.firstChild;
-      while (k) {
-          if (k.nodeType == 3) {
-              str += k.textContent;
-          }
-          k = k.nextSibling;
-      }
+    var shader
+    if (shaderScript.type == 'x-shader/x-fragment') {
+      shader = gl.createShader(gl.FRAGMENT_SHADER)
+    } else if (shaderScript.type == 'x-shader/x-vertex') {
+      shader = gl.createShader(gl.VERTEX_SHADER)
+    } else {
+      return null
+    }
 
-      var shader;
-      if (shaderScript.type == "x-shader/x-fragment") {
-          shader = gl.createShader(gl.FRAGMENT_SHADER);
-      } else if (shaderScript.type == "x-shader/x-vertex") {
-          shader = gl.createShader(gl.VERTEX_SHADER);
-      } else {
-          return null;
-      }
+    gl.shaderSource(shader, str)
+    gl.compileShader(shader)
 
-      gl.shaderSource(shader, str);
-      gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      alert(gl.getShaderInfoLog(shader))
+      return null
+    }
 
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-          alert(gl.getShaderInfoLog(shader));
-          return null;
-      }
-
-      return shader;
+    return shader
   }
 
-  window.meshManager = meshManager;
-})();
+  window.meshManager = meshManager
+})()

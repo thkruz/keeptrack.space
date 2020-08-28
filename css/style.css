@@ -24,11 +24,13 @@ input:-webkit-autofill {
   color: white !important;
 }
 
-a, .link {
+a,
+.link {
   cursor: pointer;
 }
 
-a:hover, .link:hover {
+a:hover,
+.link:hover {
   background: rgba(0, 0, 0, 0.2);
 }
 
@@ -99,7 +101,7 @@ ul {
 }
 
 .vertcenter {
-  line-height: 36px
+  line-height: 36px;
 }
 
 .text-select {
@@ -157,7 +159,7 @@ ul {
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0
+  bottom: 0;
 }
 
 #loader {
@@ -343,9 +345,9 @@ ul {
 }
 
 .status-box {
-  background: rgba(0, 0, 0, 0.0);
+  background: rgba(0, 0, 0, 0);
   color: white;
-  font-family: "Open Sans", Times, serif;
+  font-family: 'Open Sans', Times, serif;
   font-size: 28px;
   position: absolute;
   height: 100px !important;
@@ -506,7 +508,8 @@ ul {
   height: 18px;
 }
 
-.sensor-info-key, .sensor-info-value {
+.sensor-info-key,
+.sensor-info-value {
   display: inline-block;
   height: 18px;
 }
@@ -624,7 +627,9 @@ ul {
   overflow: auto;
 }
 
-#es-error, #nl-error, #ms-error {
+#es-error,
+#nl-error,
+#ms-error {
   margin-top: 10px;
   padding-bottom: 10px;
   cursor: 'pointer';
@@ -645,7 +650,7 @@ ul {
   height: 100% !important;
 }
 
-input[type=checkbox].css-checkbox {
+input[type='checkbox'].css-checkbox {
   position: absolute;
   z-index: -1000;
   left: -1000px;
@@ -658,7 +663,7 @@ input[type=checkbox].css-checkbox {
   border: 0;
 }
 
-input[type=checkbox].css-checkbox+label.css-label {
+input[type='checkbox'].css-checkbox + label.css-label {
   padding-left: 25px;
   height: 20px;
   display: inline-block;
@@ -670,7 +675,7 @@ input[type=checkbox].css-checkbox+label.css-label {
   cursor: pointer;
 }
 
-input[type=checkbox].css-checkbox:checked+label.css-label {
+input[type='checkbox'].css-checkbox:checked + label.css-label {
   background-position: 0px -20px;
 }
 
@@ -707,7 +712,6 @@ fieldset {
   font-weight: 300;
   width: 120px;
   position: absolute;
-  ;
   left: 140px;
   padding: 10px;
   border: 0px;
@@ -764,7 +768,7 @@ ul li {
 }
 
 #colorbox {
-  border: 10px solid #172635	;
+  border: 10px solid #172635;
   z-index: 10;
   box-sizing: content-box;
 }
@@ -806,7 +810,8 @@ ul li {
   max-height: 40px;
 }
 
-.sat-info-key, .sat-info-value {
+.sat-info-key,
+.sat-info-value {
   display: inline-block;
 }
 
@@ -865,7 +870,8 @@ ul li {
   margin: 0 0 55px 0 !important;
 }
 
-#datetime-input-tb:focus, input:focus {
+#datetime-input-tb:focus,
+input:focus {
   outline: none;
 }
 
@@ -897,7 +903,7 @@ ul li {
 }
 
 #datetime-text:hover {
-  background: rgba(255, 255, 255, .2);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 5px;
 }
 
@@ -914,8 +920,9 @@ ul li {
 
 #bottom-icons {
   display: grid;
-  grid-template-columns: minmax(120px, max-content)
-                         repeat(auto-fill, 120px);
+  grid-template-columns:
+    minmax(120px, max-content)
+    repeat(auto-fill, 120px);
   justify-content: center;
   row-gap: 10px;
   background: #1f3347;
@@ -1108,7 +1115,7 @@ ul li {
   text-align: center;
   padding: 10px;
   overflow: hidden;
-  background: #172635	;
+  background: #172635;
   /* Old browsers */
   background: -moz-linear-gradient(45deg, #080c11, #274059);
   /* FF3.6-15 */
@@ -1198,17 +1205,17 @@ ul li {
 }
 
 .ui-button span {
-  filter: brightness(5.0);
+  filter: brightness(5);
 }
 
 .ui-icon-circle-triangle-e {
-    background-position: -33px -17px !important;
-    filter: brightness(5.0) !important;
+  background-position: -33px -17px !important;
+  filter: brightness(5) !important;
 }
 
 .ui-icon-circle-triangle-w {
-    background-position: -97px -17px !important;
-    filter: brightness(5.0) !important;
+  background-position: -97px -17px !important;
+  filter: brightness(5) !important;
 }
 
 .ui-slider-handle {

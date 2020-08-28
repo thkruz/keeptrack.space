@@ -1,51 +1,51 @@
 #sat-hoverbox {
-    display: none;
-    background: black;
-    cursor: default;
-    color: white;
-    position: absolute;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    pointer-events: none;
+  display: none;
+  background: black;
+  cursor: default;
+  color: white;
+  position: absolute;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
 }
 #orbit-btn {
-    display: block;
-    background: red;
-    position: relative;
-    z-index: 99999;
-    width: 5px;
-    left: 0px;
-    top: 500px;
-    bottom: 0px;
-    padding: 20px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+  display: block;
+  background: red;
+  position: relative;
+  z-index: 99999;
+  width: 5px;
+  left: 0px;
+  top: 500px;
+  bottom: 0px;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 #countries-btn {
-    display: block;
-    background: green;
-    position: relative;
-    z-index: 99999;
-    width: 5px;
-    left: 0px;
-    top: 500px;
-    bottom: 0px;
-    padding: 20px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+  display: block;
+  background: green;
+  position: relative;
+  z-index: 99999;
+  width: 5px;
+  left: 0px;
+  top: 500px;
+  bottom: 0px;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 #time-machine-btn {
-    display: block;
-    background: yellow;
-    position: relative;
-    z-index: 99999;
-    width: 5px;
-    left: 0px;
-    top: 500px;
-    bottom: 0px;
-    padding: 20px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+  display: block;
+  background: yellow;
+  position: relative;
+  z-index: 99999;
+  width: 5px;
+  left: 0px;
+  top: 500px;
+  bottom: 0px;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }

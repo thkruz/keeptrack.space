@@ -27,7 +27,8 @@
     height: 0px !important;
     margin: 0 0 55px 0 !important;
   }
-  #datetime-input-tb:focus, input:focus {
+  #datetime-input-tb:focus,
+  input:focus {
     outline: none;
   }
   #datetime-title {
@@ -43,7 +44,7 @@
     font-size: 12px;
   }
   #datetime-text:hover {
-    background: rgba(255, 255, 255, .2);
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 5px;
   }
   .top-menu-icons {
@@ -136,7 +137,10 @@
     border-color: #172635;
     border-style: solid;
   }
-  nav, nav .nav-wrapper i, nav a.sidenav-trigger, nav a.sidenav-trigger i {
+  nav,
+  nav .nav-wrapper i,
+  nav a.sidenav-trigger,
+  nav a.sidenav-trigger i {
     height: 25px;
     line-height: 25px;
   }
@@ -146,7 +150,8 @@
   #dops-content {
     width: 375px;
   }
-  #menu-satellite-collision, #menu-find-sat {
+  #menu-satellite-collision,
+  #menu-find-sat {
     display: inline;
   }
   #sat-infobox {
@@ -166,7 +171,7 @@
     overflow: auto;
   }
   #sat-infobox:after {
-    content: "";
+    content: '';
     height: 100px;
     display: block;
   }
@@ -208,13 +213,15 @@
     margin-top: -75px;
     margin-right: 90px;
   }
-  #menu-space-stations, #menu-launches {
+  #menu-space-stations,
+  #menu-launches {
     display: inline;
   }
   #fastCompSettings {
     display: block;
   }
-  #social-alt, #mobile-warning {
+  #social-alt,
+  #mobile-warning {
     display: none;
   }
   #version-info {
@@ -258,7 +265,8 @@
   #dops-content {
     width: 375px;
   }
-  #menu-satellite-collision, #menu-find-sat {
+  #menu-satellite-collision,
+  #menu-find-sat {
     display: inline;
   }
   #sat-infobox {
@@ -277,7 +285,7 @@
     overflow: auto;
   }
   #sat-infobox:after {
-    content: "";
+    content: '';
     height: 100px;
     display: block;
   }
@@ -358,13 +366,20 @@
     display: none;
   }
 
-  #menu-space-stations, #menu-launches, #menu-record, #menu-twitter, #menu-color-scheme, #social, #version-info, #fastCompSettings {
+  #menu-space-stations,
+  #menu-launches,
+  #menu-record,
+  #menu-twitter,
+  #menu-color-scheme,
+  #social,
+  #version-info,
+  #fastCompSettings {
     display: none;
   }
   #mobile-warning {
     display: block;
     margin-top: 10px;
-    color: #48f3e3 !important
+    color: #48f3e3 !important;
   }
   #ui-datepicker-div {
     top: 50px !important;
@@ -486,18 +501,21 @@
     border-style: solid;
     border-color: #172635;
   }
-  nav, nav .nav-wrapper i, nav a.sidenav-trigger, nav a.sidenav-trigger i {
+  nav,
+  nav .nav-wrapper i,
+  nav a.sidenav-trigger,
+  nav a.sidenav-trigger i {
     height: 50px;
     line-height: 50px;
   }
   ::-webkit-scrollbar {
     display: none;
   }
-  .search-slide-down input[type=search] {
+  .search-slide-down input[type='search'] {
     transition: 1s;
     width: 180px;
   }
-  .search-slide-up input[type=search] {
+  .search-slide-up input[type='search'] {
     transition: 1s;
     width: 0px;
   }
@@ -544,7 +562,7 @@
     overflow: auto;
   }
   #sat-infobox:after {
-    content: "";
+    content: '';
     height: 150px;
     display: block;
   }
@@ -620,11 +638,11 @@
     margin: 0;
     margin-top: 15px;
   }
-  .search-slide-down input[type=search] {
+  .search-slide-down input[type='search'] {
     transition: 1s;
     width: 140px;
   }
-  .search-slide-up input[type=search] {
+  .search-slide-up input[type='search'] {
     transition: 1s;
     width: 0px;
   }

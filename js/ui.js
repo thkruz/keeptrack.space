@@ -1659,7 +1659,7 @@ var speedModifier = 1;
           var tgtLon = $('#ms-lon').val() * 1;
           // var result = false;
 
-          var launchTime = $('#datetime-text').text().substr(0, 19);
+          var launchTime = timeManager.selectedDate;
           launchTime = launchTime.split(' ');
           launchTime = new Date(launchTime[0] + 'T' + launchTime[1] + 'Z').getTime();
 

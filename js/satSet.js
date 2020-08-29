@@ -194,6 +194,8 @@ var emptyMat4 = mat4.create();
             }
           }
           catch (e) {
+            // Clear old settings because they seem corrupted
+            localStorage.setItem("currentSensor", null);
             console.warn('Saved Sensor Information Invalid');
           }
         }

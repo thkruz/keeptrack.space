@@ -7,13 +7,8 @@
 
   meshManager.fileList = [
       {
-<<<<<<< HEAD
           obj: `${settingsManager.installDirectory}meshes/sat2.obj`,
           mtl: `${settingsManager.installDirectory}meshes/sat2.mtl`
-=======
-          obj: `${settingsManager.installDirectory}meshes/Satellite.obj`,
-          mtl: `${settingsManager.installDirectory}meshes/Satellite.mtl`
->>>>>>> 53a6dc52aaa514da3692586cc3a469a3efed2a3b
       },
       {
           obj: `${settingsManager.installDirectory}meshes/sat.obj`,
@@ -34,11 +29,7 @@
   ];
 
   meshManager.sizeInfo = {
-<<<<<<< HEAD
     sat2: {
-=======
-    Satellite: {
->>>>>>> 53a6dc52aaa514da3692586cc3a469a3efed2a3b
       x: 80.0,
       y: 80.0,
       z: 80.0

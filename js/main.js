@@ -752,13 +752,8 @@ function _drawScene() {
               meshManager.models.sat2.position = meshManager.selectedSatPosition;
               meshManager.drawObject(meshManager.models.sat2, pMatrix, camMatrix);
             } else {
-<<<<<<< HEAD
               meshManager.models.sat2.position = meshManager.selectedSatPosition;
               meshManager.drawObject(meshManager.models.sat2, pMatrix, camMatrix);
-=======
-              meshManager.models.Satellite.position = meshManager.selectedSatPosition;
-              meshManager.drawObject(meshManager.models.Satellite, pMatrix, camMatrix);
->>>>>>> 53a6dc52aaa514da3692586cc3a469a3efed2a3b
             }
           } else if (sat.OT == 2) { // Rocket Body
             meshManager.models.rocketbody.position = meshManager.selectedSatPosition;

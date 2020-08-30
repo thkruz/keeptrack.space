@@ -970,14 +970,16 @@ var speedModifier = 1;
         var fblRange = $('#fbl-range').val();
         var fblInc = $('#fbl-inc').val();
         var fblPeriod = $('#fbl-period').val();
+        var fblRcs = $('#fbl-rcs').val();
         var fblAzimuthM = $('#fbl-azimuth-margin').val();
         var fblElevationM = $('#fbl-elevation-margin').val();
         var fblRangeM = $('#fbl-range-margin').val();
         var fblIncM = $('#fbl-inc-margin').val();
         var fblPeriodM = $('#fbl-period-margin').val();
+        var fblRcsM = $('#fbl-rcs-margin').val();
         var fblType = $('#fbl-type').val();
         $('#search').val(''); // Reset the search first
-        var res = satSet.searchAzElRange(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM, fblPeriod, fblPeriodM, fblType);
+        var res = satSet.searchAzElRange(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM, fblPeriod, fblPeriodM, fblRcs, fblRcsM, fblType);
         if (typeof res === 'undefined') {
           $('#fbl-error').html('No Search Criteria');
         } else if (res.length === 0) {

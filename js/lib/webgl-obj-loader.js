@@ -399,7 +399,6 @@ Layout.UV = new Attribute("uv", 2, TYPES.FLOAT);
  */
 Layout.MATERIAL_INDEX = new Attribute("materialIndex", 1, TYPES.SHORT);
 Layout.MATERIAL_ENABLED = new Attribute("materialEnabled", 1, TYPES.UNSIGNED_SHORT);
-Layout.COLOR = new Attribute("color", 3, TYPES.FLOAT);
 Layout.AMBIENT = new Attribute("ambient", 3, TYPES.FLOAT);
 Layout.DIFFUSE = new Attribute("diffuse", 3, TYPES.FLOAT);
 Layout.SPECULAR = new Attribute("specular", 3, TYPES.FLOAT);
@@ -1560,58 +1559,6 @@ class Mesh {
             for (const attribute of layout.attributes) {
                 const offset = vertexOffset + layout.attributeMap[attribute.key].offset;
                 switch (attribute.key) {
-                    case _layout__WEBPACK_IMPORTED_MODULE_0__["Layout"].COLOR.key:
-                        const materialIndex = this.vertexMaterialIndices[i];
-                        const material = this.materialsByIndex[materialIndex];
-                        if (!material) {
-                            console.warn('Material "' +
-                                this.materialNames[materialIndex] +
-                                '" not found in mesh. Did you forget to call addMaterialLibrary(...)?"');
-                            break;
-                        }
-
-                        let r,g,b;
-                        switch (this.materialNames[materialIndex]) {
-                          case 'DarkGrayMetal':
-                              r = 0.084;
-                              g = 0.084;
-                              b = 0.084;
-                            break;
-                          case 'GrayMetal':
-                              r = 0.274;
-                              g = 0.274;
-                              b = 0.274;
-                            break;
-                          case 'LightGrayMetal':
-                              r = 0.592;
-                              g = 0.592;
-                              b = 0.592;
-                            break;
-                          case 'WhiteMetal':
-                              r = 0.875;
-                              g = 0.875;
-                              b = 0.875;
-                            break;
-                          case 'BrownMetal':
-                              r = 0.373;
-                              g = 0.294;
-                              b = 0.157;
-                            break;
-                          case 'SolarPanels':
-                              r = 0.019;
-                              g = 0.072;
-                              b = 0.656;
-                            break;
-                          default:
-                            r = 0.8;
-                            g = 0.8;
-                            b = 0.8;
-                        }
-
-                        dataView.setFloat32(offset, r, true);
-                        dataView.setFloat32(offset + 4, g, true);
-                        dataView.setFloat32(offset + 8, b, true);
-                        break;
                     case _layout__WEBPACK_IMPORTED_MODULE_0__["Layout"].POSITION.key:
                         dataView.setFloat32(offset, this.vertices[i * 3], true);
                         dataView.setFloat32(offset + 4, this.vertices[i * 3 + 1], true);

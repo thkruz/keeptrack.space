@@ -1,5 +1,6 @@
 (function() {
   meshManager = {};
+  meshManager.selectedSatPosition = {x: 0, y: 0, z: 0};
   let mvMatrix;
   let mvMatrixEmpty = mat4.create();
   let nMatrix;
@@ -15,8 +16,32 @@
           mtl: `${settingsManager.installDirectory}meshes/sat.mtl`
       },
       {
+          obj: `${settingsManager.installDirectory}meshes/s1u.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/s1u.mtl`
+      },
+      {
+          obj: `${settingsManager.installDirectory}meshes/s2u.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/s2u.mtl`
+      },
+      {
+          obj: `${settingsManager.installDirectory}meshes/s3u.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/s3u.mtl`
+      },
+      {
+          obj: `${settingsManager.installDirectory}meshes/starlink.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/starlink.mtl`
+      },
+      {
           obj: `${settingsManager.installDirectory}meshes/iss.obj`,
           mtl: `${settingsManager.installDirectory}meshes/iss.mtl`
+      },
+      {
+          obj: `${settingsManager.installDirectory}meshes/dsp.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/dsp.mtl`
+      },
+      {
+          obj: `${settingsManager.installDirectory}meshes/iridium.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/iridium.mtl`
       },
       {
           obj: `${settingsManager.installDirectory}meshes/rocketdebris.obj`,
@@ -40,9 +65,39 @@
       z: 5.0
     },
     iss: {
-      x: 150.0,
-      y: 150.0,
-      z: 150.0
+      x: 1.0,
+      y: 1.0,
+      z: 1.0
+    },
+    s1u: { // Model 10:1 Scale
+      x: 1.0,
+      y: 1.0,
+      z: 1.0
+    },
+    s2u: { // Model 10:1 Scale
+      x: 1.0,
+      y: 1.0,
+      z: 1.0
+    },
+    s3u: { // Model 10:1 Scale
+      x: 1.0,
+      y: 1.0,
+      z: 1.0
+    },
+    starlink: { // Model 10:1 Scale
+      x: 1.0,
+      y: 1.0,
+      z: 1.0
+    },
+    dsp: {
+      x: 1.0,
+      y: 1.0,
+      z: 1.0
+    },
+    iridium: { // Model 10:1 Scale
+      x: 1.0,
+      y: 1.0,
+      z: 1.0
     },
     rocketdebris: {
       x: 0.1,
@@ -50,9 +105,9 @@
       z: 0.1
     },
     rocketbody: {
-      x: 20.0,
-      y: 20.0,
-      z: 20.0
+      x: 1.0,
+      y: 1.0,
+      z: 1.0
     }
   };
 
@@ -61,9 +116,9 @@
     precision mediump float;
 
     varying vec3 vLightDirection;
+    varying float vInSun;
     varying vec3 vTransformedNormal;
     varying vec2 vTextureCoord;
-    varying vec3 vColor;
     varying vec4 vPosition;
     varying vec3 vAmbient;
     varying vec3 vDiffuse;
@@ -71,14 +126,13 @@
     varying float vSpecularExponent;
 
     void main(void) {
-      float diffuse = max(dot(vTransformedNormal, vLightDirection), 0.0);
+      float lightAmt = max(dot(vTransformedNormal, vLightDirection), 0.0);
 
-      vec3 ambientColor = vColor * vAmbient * diffuse * 40.0;
-      vec3 dirColor = vec3(1.0,1.0,1.0) * diffuse * 10.0;
-      vec3 specColor = vSpecular * diffuse * 3.0;
-      vec3 bumpColor = vDiffuse * diffuse * 1.0;
+      vec3 ambientColor = vDiffuse * 0.1;
+      vec3 dirColor = vDiffuse * vAmbient * lightAmt * min(vInSun,1.0);
+      vec3 specColor = vSpecular * lightAmt * min(vInSun,1.0);
 
-      vec3 color = ambientColor + dirColor + specColor + bumpColor;
+      vec3 color = ambientColor + dirColor + specColor;
 
       gl_FragColor = vec4(color, 1.0);
     }
@@ -88,7 +142,6 @@
     attribute vec3 aVertexNormal;
     attribute vec3 aSpecular;
     attribute float aSpecularExponent;
-    attribute vec3 aColor;
     attribute vec3 aAmbient;
     attribute vec3 aDiffuse;
     attribute vec2 aTextureCoord;
@@ -98,13 +151,14 @@
     uniform mat4 uMvMatrix;
     uniform mat3 uNormalMatrix;
     uniform vec3 uLightDirection;
+    uniform float uInSun;
 
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
     varying vec4 vPosition;
     varying vec3 vLightDirection;
+    varying float vInSun;
 
-    varying vec3 vColor;
     varying vec3 vAmbient;
     varying vec3 vDiffuse;
     varying vec3 vSpecular;
@@ -112,11 +166,11 @@
 
     void main(void) {
       vLightDirection = uLightDirection;
-      vColor = aColor;
       vAmbient = aAmbient;
       vDiffuse = aDiffuse;
       vSpecular = aSpecular;
       vSpecularExponent = aSpecularExponent;
+      vInSun = uInSun;
 
       vPosition = uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
       gl_Position = uPMatrix * vPosition;
@@ -144,11 +198,13 @@
   meshManager.mvMatrix = mat4.create();
   meshManager.mvMatrixStack = [];
   meshManager.pMatrix = mat4.create();
-  meshManager.drawObject = (model, pMatrix, camMatrix) => {
+  meshManager.drawObject = (model, pMatrix, camMatrix, inSun) => {
       if (typeof model == 'undefined') return;
 
       // Meshes aren't finished loading
       if (!meshManager.loaded) return;
+
+      console.log();
 
       // gl.bindVertexArray(meshManager.vao);
 
@@ -179,6 +235,7 @@
       gl.uniformMatrix4fv(meshManager.shaderProgram.uMvMatrix, false, mvMatrix);
       gl.uniformMatrix4fv(meshManager.shaderProgram.uPMatrix, false, pMatrix);
       gl.uniformMatrix4fv(meshManager.shaderProgram.uCamMatrix, false, camMatrix);
+      gl.uniform1f(meshManager.shaderProgram.uInSun, inSun);
 
       // Assign vertex buffer
       gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.vertexBuffer);
@@ -223,7 +280,6 @@
     gl.useProgram(meshManager.shaderProgram);
 
     const attrs = {
-        aColor: OBJ.Layout.COLOR.key,
         aVertexPosition: OBJ.Layout.POSITION.key,
         aVertexNormal: OBJ.Layout.NORMAL.key,
         aTextureCoord: OBJ.Layout.UV.key,
@@ -240,6 +296,7 @@
     meshManager.shaderProgram.uMvMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uMvMatrix');
     meshManager.shaderProgram.uNormalMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uNormalMatrix');
     meshManager.shaderProgram.uLightDirection = gl.getUniformLocation(meshManager.shaderProgram, 'uLightDirection');
+    meshManager.shaderProgram.uInSun = gl.getUniformLocation(meshManager.shaderProgram, 'uInSun');
 
     meshManager.shaderProgram.applyAttributePointers = function(model) {
       const layout = model.mesh.vertexBuffer.layout;
@@ -298,7 +355,6 @@
   }
   function initBuffers() {
       var layout = new OBJ.Layout(
-          OBJ.Layout.COLOR,
           OBJ.Layout.POSITION,
           OBJ.Layout.NORMAL,
           OBJ.Layout.AMBIENT,

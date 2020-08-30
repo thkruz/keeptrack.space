@@ -1,15 +1,5 @@
-# Blender MTL File: 'iss.blend'
-# Material Count: 6
-
-newmtl BrownMetal
-Ns 96.078443
-Ka 1.000000 1.000000 1.000000
-Kd 0.372549 0.294118 0.156863
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
-illum 2
+# Blender MTL File: 'soyuz.blend'
+# Material Count: 4
 
 newmtl DarkGrayMetal
 Ns 96.078443
@@ -22,16 +12,6 @@ d 1.000000
 illum 2
 
 newmtl LightGrayMetal
-Ns 96.078443
-Ka 1.000000 1.000000 1.000000
-Kd 0.592157 0.592157 0.592157
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 1.000000
-illum 2
-
-newmtl LightGrayMetal.001
 Ns 96.078443
 Ka 1.000000 1.000000 1.000000
 Kd 0.592157 0.592157 0.592157

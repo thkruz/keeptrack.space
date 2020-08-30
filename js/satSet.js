@@ -1294,26 +1294,29 @@ var emptyMat4 = mat4.create();
     }
     return res;
   };
-  satSet.searchAzElRange = (azimuth, elevation, range, inclination, azMarg, elMarg, rangeMarg, incMarg, period, periodMarg, objtype) => {
+  satSet.searchAzElRange = (azimuth, elevation, range, inclination, azMarg, elMarg, rangeMarg, incMarg, period, periodMarg, rcs, rcsMarg, objtype) => {
     var isCheckAz = !isNaN(parseFloat(azimuth)) && isFinite(azimuth);
     var isCheckEl = !isNaN(parseFloat(elevation)) && isFinite(elevation);
     var isCheckRange = !isNaN(parseFloat(range)) && isFinite(range);
     var isCheckInclination = !isNaN(parseFloat(inclination)) && isFinite(inclination);
     var isCheckPeriod = !isNaN(parseFloat(period)) && isFinite(period);
+    var isCheckRcs = !isNaN(parseFloat(rcs)) && isFinite(rcs);
     var isCheckAzMarg = !isNaN(parseFloat(azMarg)) && isFinite(azMarg);
     var isCheckElMarg = !isNaN(parseFloat(elMarg)) && isFinite(elMarg);
     var isCheckRangeMarg = !isNaN(parseFloat(rangeMarg)) && isFinite(rangeMarg);
     var isCheckIncMarg = !isNaN(parseFloat(incMarg)) && isFinite(incMarg);
     var isCheckPeriodMarg = !isNaN(parseFloat(periodMarg)) && isFinite(periodMarg);
+    var isCheckRcsMarg = !isNaN(parseFloat(rcsMarg)) && isFinite(rcsMarg);
     objtype *= 1; // String to Number
 
-    if (!isCheckEl && !isCheckRange && !isCheckAz && !isCheckInclination && !isCheckPeriod) return; // Ensure there is a number typed.
+    if (!isCheckEl && !isCheckRange && !isCheckAz && !isCheckInclination && !isCheckPeriod && !isCheckRcs) return; // Ensure there is a number typed.
 
     if (!isCheckAzMarg) { azMarg = 5; }
     if (!isCheckElMarg) { elMarg = 5; }
     if (!isCheckRangeMarg) { rangeMarg = 200; }
     if (!isCheckIncMarg) { incMarg = 1; }
     if (!isCheckPeriodMarg) { periodMarg = 0.5; }
+    if (!isCheckRcsMarg) { rcsMarg = rcs/10; }
     var res = [];
 
     var s = 0;
@@ -1374,6 +1377,14 @@ var emptyMat4 = mat4.create();
       var minPeriod = period - periodMarg;
       var maxPeriod = period + periodMarg;
       res = checkPeriod(res, minPeriod, maxPeriod);
+    }
+
+    if (isCheckRcs) {
+      rcs = rcs * 1; // Convert period to int
+      rcsMarg = rcsMarg * 1;
+      var minRcs = rcs - rcsMarg;
+      var maxRcs = rcs + rcsMarg;
+      res = checkRcs(res, minRcs, maxRcs);
     }
 
     function checkInview (possibles) {
@@ -1443,6 +1454,21 @@ var emptyMat4 = mat4.create();
         $('#findByLooks-results').text('Limited to 200 Results!');
       }
       return periodRes;
+    }
+    function checkRcs (possibles, minRcs, maxRcs) {
+      console.log(minRcs);
+      console.log(maxRcs);
+      var rcsRes = [];
+      for (var i = 0; i < possibles.length; i++) {
+        if (parseFloat(possibles[i].R) < maxRcs && parseFloat(possibles[i].R) > minRcs && rcsRes.length <= 200) { // Don't display more than 200 results - this is because LEO and GEO belt have a lot of satellites
+          console.log(possibles[i]);
+          rcsRes.push(possibles[i]);
+        }
+      }
+      if (rcsRes.length >= 200) {
+        $('#findByLooks-results').text('Limited to 200 Results!');
+      }
+      return rcsRes;
     }
     // $('#findByLooks-results').text('');
     // IDEA: Intentionally doesn't clear previous searches. Could be an option later.

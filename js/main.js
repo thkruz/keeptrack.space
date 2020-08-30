@@ -48,7 +48,7 @@ var camYawSpeed = 0;
 var camRotateSpeed = 0;
 
 let cameraManager = {};
-cameraManager.chaseSpeed = 0.001;
+cameraManager.chaseSpeed = 0.0035;
 
 // Menu Variables
 var isEditSatMenuOpen = false;
@@ -337,6 +337,13 @@ function drawLoop() {
       cameraManager.panDif.y = screenDragPoint[1] - mouseY;
       cameraManager.panDif.z = screenDragPoint[1] - mouseY;
 
+      // Slow down the panning if a satellite is selected
+      if (objectManager.selectedSat !== -1) {
+        cameraManager.panDif.x /= 30;
+        cameraManager.panDif.y /= 30;
+        cameraManager.panDif.z /= 30;
+      }
+
       cameraManager.panTarget.x = cameraManager.panStartPosition.x + cameraManager.panDif.x * cameraManager.panMovementSpeed * zoomLevel;
       if (cameraManager.isWorldPan) {
         cameraManager.panTarget.y = cameraManager.panStartPosition.y + cameraManager.panDif.y * cameraManager.panMovementSpeed * zoomLevel;
@@ -558,7 +565,16 @@ function drawLoop() {
       _camSnapToSat(sat);
       // If 3D Models Available, then update their position on the screen
       if (typeof meshManager !== 'undefined') {
-        meshManager.selectedSatPosition = sat.position;
+        // Try to reduce some jitter
+        if ((meshManager.selectedSatPosition.x > sat.position.x - 1 && meshManager.selectedSatPosition.x < sat.position.x + 1) &&
+            (meshManager.selectedSatPosition.y > sat.position.y - 1 && meshManager.selectedSatPosition.y < sat.position.y + 1) &&
+            (meshManager.selectedSatPosition.z > sat.position.z - 1 && meshManager.selectedSatPosition.z < sat.position.z + 1)) {
+          meshManager.selectedSatPosition.x = (meshManager.selectedSatPosition.x + sat.position.x) / 2;
+          meshManager.selectedSatPosition.y = (meshManager.selectedSatPosition.y + sat.position.y) / 2;
+          meshManager.selectedSatPosition.z = (meshManager.selectedSatPosition.z + sat.position.z) / 2;
+        } else {
+          meshManager.selectedSatPosition = sat.position;
+        }
       }
     }
     if (sat.static && cameraType.current === cameraType.PLANETARIUM) {
@@ -699,9 +715,7 @@ function _camSnapToSat(sat) {
       camZoomSnappedOnSat = false;
       camAngleSnappedOnSat = false;
     }
-    if (Math.pow((camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance), 1 / ZOOM_EXP) < zoomTarget) {
-      zoomTarget = Math.pow((camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance), 1 / ZOOM_EXP);
-    }
+    zoomTarget = Math.pow((camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance), 1 / ZOOM_EXP);
   }
 
   if (cameraType.current === cameraType.PLANETARIUM) {
@@ -739,32 +753,91 @@ function _drawScene() {
   orbitManager.draw(pMatrix, camMatrix);
 
   // Draw Satellite if Selected
-  if (objectManager.selectedSat !== -1) {
-    let sat = satSet.getSat(objectManager.selectedSat);
-    // If 3D Models Available, then draw them on the screen
-    if (typeof meshManager !== 'undefined') {
+  (function drawSatellite() {
+    if (objectManager.selectedSat !== -1) {
+      let sat = satSet.getSat(objectManager.selectedSat);
+      // If 3D Models Available, then draw them on the screen
+      if (typeof meshManager !== 'undefined') {
         if (!sat.static) {
           if (sat.SCC_NUM == 25544) {
             meshManager.models.iss.position = meshManager.selectedSatPosition;
-            meshManager.drawObject(meshManager.models.iss, pMatrix, camMatrix);
-          } else if (sat.OT == 1) { // Default Satellite
+            meshManager.drawObject(meshManager.models.iss, pMatrix, camMatrix, sat.isInSun());
+            return;
+          }
+
+          if (sat.OT == 1) { // Default Satellite
+            if (sat.ON.slice(0,5) == "FLOCK" || sat.ON.slice(0,5) == "LEMUR") {
+              meshManager.models.s3u.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.s3u, pMatrix, camMatrix, sat.isInSun());
+              return;
+            }
+            if (sat.ON.slice(0,8) == "STARLINK") {
+              meshManager.models.starlink.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.starlink, pMatrix, camMatrix, sat.isInSun());
+              return;
+            }
+
+            if (sat.ON.slice(0,7) == "IRIDIUM") {
+              meshManager.models.iridium.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.iridium, pMatrix, camMatrix, sat.isInSun());
+              return;
+            }
+
+            // Is this a DSP Satellite?
+            if (sat.SCC_NUM == "04630" || sat.SCC_NUM == "05204" || sat.SCC_NUM == "05851" ||
+                sat.SCC_NUM == "06691" || sat.SCC_NUM == "08482" || sat.SCC_NUM == "08916" ||
+                sat.SCC_NUM == "09803" || sat.SCC_NUM == "11397" || sat.SCC_NUM == "12339" ||
+                sat.SCC_NUM == "13086" || sat.SCC_NUM == "14930" || sat.SCC_NUM == "15453" ||
+                sat.SCC_NUM == "18583" || sat.SCC_NUM == "20066" || sat.SCC_NUM == "20929" ||
+                sat.SCC_NUM == "21805" || sat.SCC_NUM == "23435" || sat.SCC_NUM == "24737" ||
+                sat.SCC_NUM == "26356" || sat.SCC_NUM == "26880" || sat.SCC_NUM == "28158") {
+              meshManager.models.dsp.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.dsp, pMatrix, camMatrix, sat.isInSun());
+              return;
+            }
+
+            // Is this a 1U Cubesat?
+            if (parseFloat(sat.R) < 0.1 && parseFloat(sat.R) > 0.04) {
+              meshManager.models.s1u.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.s1u, pMatrix, camMatrix, sat.isInSun());
+              return;
+            }
+            if (parseFloat(sat.R) < 0.22 && parseFloat(sat.R) >= 0.1) {
+              meshManager.models.s2u.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.s2u, pMatrix, camMatrix, sat.isInSun());
+              return;
+            }
+            if (parseFloat(sat.R) < 0.33 && parseFloat(sat.R) >= 0.22) {
+              meshManager.models.s3u.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.s3u, pMatrix, camMatrix, sat.isInSun());
+              return;
+            }
             if (sat.SCC_NUM < 20000) {
               meshManager.models.sat2.position = meshManager.selectedSatPosition;
-              meshManager.drawObject(meshManager.models.sat2, pMatrix, camMatrix);
+              meshManager.drawObject(meshManager.models.sat2, pMatrix, camMatrix, sat.isInSun());
+              return;
             } else {
               meshManager.models.sat2.position = meshManager.selectedSatPosition;
-              meshManager.drawObject(meshManager.models.sat2, pMatrix, camMatrix);
+              meshManager.drawObject(meshManager.models.sat2, pMatrix, camMatrix, sat.isInSun());
+              return;
             }
-          } else if (sat.OT == 2) { // Rocket Body
+          }
+
+          if (sat.OT == 2) { // Rocket Body
             meshManager.models.rocketbody.position = meshManager.selectedSatPosition;
-            meshManager.drawObject(meshManager.models.rocketbody, pMatrix, camMatrix);
-          } else if (sat.OT == 3) { // Debris
+            meshManager.drawObject(meshManager.models.rocketbody, pMatrix, camMatrix, sat.isInSun());
+            return;
+          }
+
+          if (sat.OT == 3) { // Debris
             meshManager.models.rocketdebris.position = meshManager.selectedSatPosition;
-            meshManager.drawObject(meshManager.models.rocketdebris, pMatrix, camMatrix);
+            meshManager.drawObject(meshManager.models.rocketdebris, pMatrix, camMatrix, sat.isInSun());
+            return;
           }
         }
+      }
     }
-  }
+  })();
 
   /* DEBUG - show the pickbuffer on a canvas */
   // debugImageData.data = pickColorMap;
@@ -1447,9 +1520,8 @@ function longToYaw(long) {
   var today = new Date();
   var angle = 0;
 
-  selectedDate = selectedDate.split(' ');
-  selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
   // NOTE: This formula sometimes is incorrect, but has been stable for over a year
+  // NOTE: Looks wrong again as of 8/29/2020 - time of year issue?
   today.setUTCHours(selectedDate.getUTCHours() + ((selectedDate.getUTCMonth()) * 2) - 10);  // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
 
   today.setUTCMinutes(selectedDate.getUTCMinutes());
@@ -2070,6 +2142,19 @@ $(document).ready(function () {
   // textures needs to start loading as fast as possible.
   initializeKeepTrack();
 
+  // 2020 Key listener
+  // TODO: Migrate most things from UI to Here
+  $(window).on({
+    keydown: function (e) {
+      if (e.ctrlKey === true || e.metaKey === true) cameraManager.isCtrlPressed = true;
+    }
+  });
+  $(window).on({
+    keyup: function (e) {
+      if (e.ctrlKey === false && e.metaKey === false) cameraManager.isCtrlPressed = false;
+    }
+  });
+
   // Resizing Listener
   $(window).on("resize", function () {
     if (!settingsManager.disableUI) {
@@ -2119,7 +2204,7 @@ $(document).ready(function () {
         }
 
         // Right Mouse Button RMB
-        if (evt.button === 2) {
+        if (evt.button === 2 && (cameraManager.isShiftPressed || cameraManager.isCtrlPressed)) {
           cameraManager.isPanning = true;
           cameraManager.panStartPosition = cameraManager.panCurrent;
           if (cameraManager.isShiftPressed) {
@@ -2216,10 +2301,17 @@ $(document).ready(function () {
           isZoomIn = false;
         }
 
-        zoomTarget += delta / 100 / 50 / speedModifier; // delta is +/- 100
-        zoomTarget = Math.min(Math.max(zoomTarget, 0), 1); // Force between 0 and 1
         rotateTheEarth = false;
-        camZoomSnappedOnSat = false;
+
+        if (settingsManager.isZoomStopsSnappedOnSat || objectManager.selectedSat == -1) {
+          zoomTarget += delta / 100 / 50 / speedModifier; // delta is +/- 100
+          zoomTarget = Math.min(Math.max(zoomTarget, 0), 1); // Force between 0 and 1
+          camZoomSnappedOnSat = false;
+        } else {
+          settingsManager.camDistBuffer += delta / 100; // delta is +/- 100
+          settingsManager.camDistBuffer = Math.min(Math.max(settingsManager.camDistBuffer, 30), 300);
+        }
+
 
         if (cameraType.current === cameraType.PLANETARIUM || cameraType.current === cameraType.FPS || cameraType.current === cameraType.SATELLITE || cameraType.current === cameraType.ASTRONOMY) {
           settingsManager.fieldOfView += delta * 0.0002;
@@ -2316,9 +2408,7 @@ $(document).ready(function () {
             }
           }
           if (evt.button === 2) { // Right Mouse Button Clicked
-            if (!isMouseMoving &&
-                (Math.abs(cameraManager.panTarget.x - cameraManager.panCurrent.x) < 3) &&
-                (Math.abs(cameraManager.panTarget.z - cameraManager.panCurrent.z) < 3)) {
+            if (!cameraManager.isCtrlPressed && !cameraManager.isShiftPressed) {
               _openRmbMenu();
             }
           }

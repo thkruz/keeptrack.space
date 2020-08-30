@@ -19,8 +19,8 @@ const MOON_SCALAR_DISTANCE = 250000;
   let settingsManager = {};
 
   //  Version Control
-  settingsManager.versionNumber = '1.19.9';
-  settingsManager.versionDate = 'August 24, 2020';
+  settingsManager.versionNumber = '1.19.10';
+  settingsManager.versionDate = 'August 30, 2020';
 
   // Install Folder Settings
   {
@@ -83,6 +83,9 @@ const MOON_SCALAR_DISTANCE = 250000;
   settingsManager.maxOrbitsDisplayedMobile = 1500;
   // Canvas will autoresize on screen resize to width/height of window
   settingsManager.isAutoResizeCanvas = true;
+  // Changing the zoom with the mouse wheel will stop the camera from following
+  // the satellite.
+  settingsManager.isZoomStopsSnappedOnSat = false;
 
   settingsManager.fieldOfViewMin = 0.04; // 4 Degrees (I think)
   settingsManager.fieldOfViewMax = 1.2; // 120 Degrees (I think)
@@ -104,7 +107,7 @@ const MOON_SCALAR_DISTANCE = 250000;
   settingsManager.isMobileModeEnabled = false;
   if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
     settingsManager.isMobileModeEnabled = true;
-    settingsManager.camDistBuffer = 3500;
+    settingsManager.camDistBuffer = 100;
   }
 
   // //////////////////////////////////////////////////////////////////////////
@@ -388,8 +391,8 @@ const MOON_SCALAR_DISTANCE = 250000;
   // Frames Per Second Limiter
   settingsManager.minimumDrawDt = 0.0; // 20 FPS // 60 FPS = 0.01667;
 
-  settingsManager.camDistBuffer = 2000;
-  settingsManager.zNear = 20.0;
+  settingsManager.camDistBuffer = 75;
+  settingsManager.zNear = 1.0;
   settingsManager.zFar = 500000.0;
 
   // //////////////////////////////////////////////////////////////////////////

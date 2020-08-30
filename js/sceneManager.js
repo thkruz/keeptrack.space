@@ -309,7 +309,11 @@
 
       // Don't update the time input unless it is currently being viewed.
       if (settingsManager.isEditTime || !settingsManager.cruncherReady) {
-        $('#datetime-input-tb').val(earth.timeTextStr);
+        let timeInput = timeManager.selectedDate.toISOString();
+        let dateInput = timeInput.split("T",1);
+        timeInput = timeInput.split(".",1);
+        timeInput = timeInput[0].split("T",2);
+        $('#datetime-input-tb').val(`${dateInput[0]} ${timeInput[1]}`);
       }
 
       earth.earthJ = timeManager.jday(earthNow.getUTCFullYear(),

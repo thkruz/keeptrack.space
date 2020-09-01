@@ -190,7 +190,6 @@ var emptyMat4 = mat4.create()
       }
 
       satSet.onCruncherReady()
-
       ;(function _reloadLastSensor() {
         let currentSensor = !settingsManager.offline
           ? JSON.parse(localStorage.getItem('currentSensor'))

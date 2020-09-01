@@ -63,7 +63,7 @@ const MOON_SCALAR_DISTANCE = 250000
   // Adjust to change camera speed of auto rotate around earth
   settingsManager.autoRotateSpeed = 1.0 * 0.000075
   // Disable main user interface. Currently an all or nothing package.
-  settingsManager.disableUI = true
+  settingsManager.disableUI = false
   // Currently only disables panning. In the future it will disable all camera
   // movement
   settingsManager.disableCameraControls = false
@@ -590,7 +590,7 @@ if (!settingsManager.disableUI) {
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/jquery-ui.min.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/jquery-ui-timepicker-addon.css?v=${settingsManager.versionNumber}" type="text/css"\>
   `)
-} else if (settingsManager.enableLimitedUI) {
+} else if (settingsManager.enableLimitedUI || settingsManager.disableUI) {
   document.write(`
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/limitedUI.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize.css?v=${settingsManager.versionNumber}" type="text/css"\>

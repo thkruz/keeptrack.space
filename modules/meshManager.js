@@ -36,6 +36,10 @@
           mtl: `${settingsManager.installDirectory}meshes/iss.mtl`
       },
       {
+          obj: `${settingsManager.installDirectory}meshes/gps.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/gps.mtl`
+      },
+      {
           obj: `${settingsManager.installDirectory}meshes/dsp.obj`,
           mtl: `${settingsManager.installDirectory}meshes/dsp.mtl`
       },
@@ -90,6 +94,11 @@
       z: 1.0
     },
     dsp: {
+      x: 1.0,
+      y: 1.0,
+      z: 1.0
+    },
+    gps: {
       x: 1.0,
       y: 1.0,
       z: 1.0

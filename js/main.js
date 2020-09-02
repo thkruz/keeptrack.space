@@ -783,6 +783,12 @@ function _drawScene() {
               return;
             }
 
+            if ((sat.ON.slice(0,7) == "NAVSTAR") || (sat.ON.slice(10,17) == "NAVSTAR")) {
+              meshManager.models.gps.position = meshManager.selectedSatPosition;
+              meshManager.drawObject(meshManager.models.gps, pMatrix, camMatrix, sat.isInSun());
+              return;
+            }
+
             // Is this a DSP Satellite?
             if (sat.SCC_NUM == "04630" || sat.SCC_NUM == "05204" || sat.SCC_NUM == "05851" ||
                 sat.SCC_NUM == "06691" || sat.SCC_NUM == "08482" || sat.SCC_NUM == "08916" ||

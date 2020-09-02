@@ -191,8 +191,8 @@ var emptyMat4 = mat4.create()
 
       satSet.onCruncherReady()
       ;(function _reloadLastSensor() {
-        let currentSensor = !settingsManager.offline
-          ? JSON.parse(localStorage.getItem('currentSensor'))
+        let currentSensor = !settingsManager.offline ?
+          JSON.parse(localStorage.getItem('currentSensor'))
           : null;
         if (currentSensor !== null) {
           try {
@@ -222,8 +222,8 @@ var emptyMat4 = mat4.create()
         }
       })()
       ;(function _watchlistInit() {
-        let watchlistJSON = !settingsManager.offline
-          ? localStorage.getItem('watchlistList')
+        let watchlistJSON = !settingsManager.offline ?
+          localStorage.getItem('watchlistList')
           : null
         if (watchlistJSON !== null) {
           let newWatchlist = JSON.parse(watchlistJSON)
@@ -455,7 +455,7 @@ var emptyMat4 = mat4.create()
           })
         })
       jsTLEfile = null
-    } catch {
+    } catch (e) {
       loadTLEs(jsTLEfile)
       jsTLEfile = null
     }
@@ -597,8 +597,8 @@ var emptyMat4 = mat4.create()
               if (tempSatData[i].SCC_NUM === satelliteList[s].SCC) {
                 tempSatData[i].ON = satelliteList[s].ON
                 tempSatData[i].OT =
-                  typeof satelliteList[s].OT != 'undefined'
-                    ? satelliteList[s].OT
+                  typeof satelliteList[s].OT != 'undefined' ?
+                    satelliteList[s].OT
                     : null
                 tempSatData[i].TLE1 = satelliteList[s].TLE1
                 tempSatData[i].TLE2 = satelliteList[s].TLE2

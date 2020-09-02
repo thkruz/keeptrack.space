@@ -840,7 +840,7 @@ or mirrored at any other location without the express written permission of the 
         ],
       },
     ]
-  } catch {
+  } catch (e) {
     console.log('starManager.constellations Plugin failed to load!')
   }
 })()

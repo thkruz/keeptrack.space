@@ -192,7 +192,7 @@
     let p = OBJ.downloadModels(meshManager.fileList);
 
     p.then(models => {
-        for ([name, mesh] of Object.entries(models)) {
+        for (var [name, mesh] of Object.entries(models)) {
             // console.log("Name:", name);
             // console.log("Mesh:", mesh);
         }

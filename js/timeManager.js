@@ -98,8 +98,8 @@
         tt: H < 12 ? 'am' : 'pm',
         T: H < 12 ? 'A' : 'P',
         TT: H < 12 ? 'AM' : 'PM',
-        Z: utc
-          ? 'UTC'
+        Z: utc ?
+          'UTC'
           : (String(date).match(timezone) || [''])
               .pop()
               .replace(timezoneClip, ''),

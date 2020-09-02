@@ -23,7 +23,7 @@ satCommManager.init = (function () {
         )
       }
     }
-  } catch {
+  } catch (e) {
     console.log('ControlSiteMananger unable to load!')
   }
 

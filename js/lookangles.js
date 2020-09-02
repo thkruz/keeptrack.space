@@ -344,8 +344,8 @@ or mirrored at any other location without the express written permission of the 
       MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU) // Seconds in a day divided by mean motion
 
     // Use custom interval unless doing rise/set lookangles - then use 1 second
-    let lookanglesInterval = satellite.isRiseSetLookangles
-      ? 1
+    let lookanglesInterval = satellite.isRiseSetLookangles ?
+      1
       : satellite.lookanglesInterval
 
     let looksArray = []

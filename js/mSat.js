@@ -64,7 +64,7 @@ onmessage = function (msg) {
       var orbitalPeriod = satrec.period
 
       var propTempOffset = 0
-      for (var i = 0; i < searchLength * 24 * 60 * 60; i += interval) {
+      for (let i = 0; i < searchLength * 24 * 60 * 60; i += interval) {
         // 5second Looks
         propTempOffset = i * 1000 + propOffset // Offset in seconds (msec * 1000)
         var now = propTimeCheck(propTempOffset, Date.now())
@@ -247,11 +247,11 @@ onmessage = function (msg) {
               range >= sensor.obsminrange2)
           ) {
             // Previous Pass to Calculate first line of coverage
-            var now1 = propTimeCheck(
+            let now1 = propTimeCheck(
               propTempOffset - interval * 1000,
               Date.now(),
             )
-            var j1 = jday(
+            let j1 = jday(
               now1.getUTCFullYear(),
               now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
               now1.getUTCDate(),
@@ -260,11 +260,11 @@ onmessage = function (msg) {
               now1.getUTCSeconds(),
             ) // Converts time to jday (TLEs use epoch year/day)
             j1 += now1.getUTCMilliseconds() * MILLISECONDS_PER_DAY
-            var gmst1 = satellite.gstime(j1)
+            let gmst1 = satellite.gstime(j1)
 
-            var m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY
-            var positionEci1 = satellite.sgp4(satrec, m1)
-            var positionEcf1, lookAngles1, azimuth1, elevation1, range1
+            let m1 = (j1 - satrec.jdsatepoch) * MINUTES_PER_DAY
+            let positionEci1 = satellite.sgp4(satrec, m1)
+            let positionEcf1, lookAngles1, azimuth1, elevation1, range1
 
             try {
               positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1) // positionEci.position is called positionEci originally
@@ -479,8 +479,8 @@ function pad0(str, max) {
       tt: H < 12 ? 'am' : 'pm',
       T: H < 12 ? 'A' : 'P',
       TT: H < 12 ? 'AM' : 'PM',
-      Z: utc
-        ? 'UTC'
+      Z: utc ?
+        'UTC'
         : (String(date).match(timezone) || [''])
             .pop()
             .replace(timezoneClip, ''),

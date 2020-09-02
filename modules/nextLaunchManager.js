@@ -77,8 +77,8 @@
 
         // Mission Name Text
         let nameText =
-          typeof launchList[i].missionName != 'undefined'
-            ? launchList[i].missionName
+          typeof launchList[i].missionName != 'undefined' ?
+            launchList[i].missionName
             : 'Unknown'
         // Mission Name HTML Setup
         let locationHTMLnameHTML

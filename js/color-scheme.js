@@ -147,7 +147,7 @@
           colorData[i * 4 + 3] = settingsManager.hoverColor[3] // A
         }
       } catch (e) {
-        debugger
+        // Don't let one bad color setting break everything
       }
     }
 

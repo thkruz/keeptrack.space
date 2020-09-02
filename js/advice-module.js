@@ -67,8 +67,8 @@ or mirrored at any other location without the express written permission of the 
   var curFocusDOM
   $(document).ready(function () {
     // Code Once index.htm is loaded
-    var wasAdviceEnabled = !settingsManager.offline
-      ? localStorage.getItem('isAdviceEnabled')
+    var wasAdviceEnabled = !settingsManager.offline ?
+      localStorage.getItem('isAdviceEnabled')
       : null
     if (wasAdviceEnabled == 'true' || wasAdviceEnabled == null) {
       adviceManager.on()

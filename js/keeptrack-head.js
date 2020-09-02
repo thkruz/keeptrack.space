@@ -465,7 +465,7 @@ const MOON_SCALAR_DISTANCE = 250000
 (function initParseFromGETVariables () {
   let queryStr = window.location.search.substring(1)
   let params = queryStr.split('&')
-  for (let i = 0 i < params.length i++) {
+  for (let i = 0; i < params.length; i++) {
     let key = params[i].split('=')[0]
     let val = params[i].split('=')[1]
     switch (key) {

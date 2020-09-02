@@ -1,10 +1,10 @@
-(function () {
-  var shaderLoader = {};
+;(function () {
+  var shaderLoader = {}
 
   shaderLoader.shaderData = [
     {
-      'name': 'dot-fragment.glsl',
-      'code': `
+      name: 'dot-fragment.glsl',
+      code: `
       precision mediump float;
 
       varying vec4 vColor;
@@ -24,10 +24,11 @@
         alpha = min(alpha, 1.0);
         gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
       }
-    `
-    }, {
-      'name': 'dot-vertex-var.glsl',
-      'code': `
+    `,
+    },
+    {
+      name: 'dot-vertex-var.glsl',
+      code: `
         attribute vec3 aPos;
         attribute vec4 aColor;
         attribute float aStar;
@@ -53,33 +54,41 @@
           vColor = aColor;
           vStar = aStar * 1.0;
         }
-      `
-    }, {
-      'name': 'pick-fragment.glsl',
-      'code': 'precision mediump float;\n\nvarying vec3 vColor;\n\nvoid main(void) {\n  gl_FragColor = vec4(vColor, 1.0);\n}'
-    }, {
-      'name': 'pick-vertex.glsl',
-      'code': 'attribute vec3 aPos;\nattribute vec3 aColor;\nattribute float aPickable;\n\nuniform mat4 uCamMatrix;\nuniform mat4 uMvMatrix;\nuniform mat4 uPMatrix;\n\nvarying vec3 vColor;\n\nvoid main(void) {\n  float dotSize = 16.0;\n  vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);\n  gl_Position = position;\n  gl_PointSize = dotSize * aPickable;\n  vColor = aColor * aPickable;\n}'
-    }, {
-      'name': 'path-fragment.glsl',
-      'code': 'precision mediump float;\n\nvarying vec4 vColor;\n\nvoid main(void) {\n  gl_FragColor = vColor;\n}'
-    }, {
-      'name': 'path-vertex.glsl',
-      'code': 'attribute vec3 aPos;\n\nuniform mat4 uCamMatrix;\nuniform mat4 uMvMatrix;\nuniform mat4 uPMatrix;\nuniform vec4 uColor;\n\nvarying vec4 vColor;\n\nvoid main(void) {\n  vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);\n  gl_Position = position;\n  vColor = uColor;\n}\n'
-    }];
+      `,
+    },
+    {
+      name: 'pick-fragment.glsl',
+      code:
+        'precision mediump float;\n\nvarying vec3 vColor;\n\nvoid main(void) {\n  gl_FragColor = vec4(vColor, 1.0);\n}',
+    },
+    {
+      name: 'pick-vertex.glsl',
+      code:
+        'attribute vec3 aPos;\nattribute vec3 aColor;\nattribute float aPickable;\n\nuniform mat4 uCamMatrix;\nuniform mat4 uMvMatrix;\nuniform mat4 uPMatrix;\n\nvarying vec3 vColor;\n\nvoid main(void) {\n  float dotSize = 16.0;\n  vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);\n  gl_Position = position;\n  gl_PointSize = dotSize * aPickable;\n  vColor = aColor * aPickable;\n}',
+    },
+    {
+      name: 'path-fragment.glsl',
+      code:
+        'precision mediump float;\n\nvarying vec4 vColor;\n\nvoid main(void) {\n  gl_FragColor = vColor;\n}',
+    },
+    {
+      name: 'path-vertex.glsl',
+      code:
+        'attribute vec3 aPos;\n\nuniform mat4 uCamMatrix;\nuniform mat4 uMvMatrix;\nuniform mat4 uPMatrix;\nuniform vec4 uColor;\n\nvarying vec4 vColor;\n\nvoid main(void) {\n  vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);\n  gl_Position = position;\n  vColor = uColor;\n}\n',
+    },
+  ]
 
-  shaderLoader.shaderDataLen = shaderLoader.shaderData.length;
+  shaderLoader.shaderDataLen = shaderLoader.shaderData.length
 
-
-  var i = 0;
+  var i = 0
   shaderLoader.getShaderCode = function (name) {
     for (i = 0; i < shaderLoader.shaderDataLen; i++) {
       if (shaderLoader.shaderData[i].name === name) {
-        return shaderLoader.shaderData[i].code;
+        return shaderLoader.shaderData[i].code
       }
     }
-    return null;
-  };
+    return null
+  }
 
-  window.shaderLoader = shaderLoader;
-})();
+  window.shaderLoader = shaderLoader
+})()

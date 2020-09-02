@@ -1,7 +1,7 @@
 // Contorl Site Manager (controlSiteManager)
-(function () {
-  var controlSiteManager = {};
-  var controlSiteList = {};
+;(function () {
+  var controlSiteManager = {}
+  var controlSiteList = {}
   controlSiteList.shriever = {
     name: 'Schriever AFB, Colorado',
     type: 'Control Facility',
@@ -14,8 +14,8 @@
     linkGPS: true,
     linkGalileo: false,
     linkBeidou: false,
-    linkGlonass: false
-  };
+    linkGlonass: false,
+  }
 
   controlSiteList.buckley = {
     name: 'Buckley AFB, Colorado',
@@ -29,8 +29,8 @@
     linkGPS: true,
     linkGalileo: false,
     linkBeidou: false,
-    linkGlonass: false
-  };
+    linkGlonass: false,
+  }
 
   controlSiteList.pentagon = {
     name: 'The Pentagon, Washington D.C.',
@@ -44,8 +44,8 @@
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
-    linkGlonass: false
-  };
+    linkGlonass: false,
+  }
 
   controlSiteList.ramstein = {
     name: 'Ramstein Air Base, Germany',
@@ -59,8 +59,8 @@
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
-    linkGlonass: false
-  };
+    linkGlonass: false,
+  }
 
   controlSiteList.osan = {
     name: 'Osan Air Base, South Korea',
@@ -74,8 +74,8 @@
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
-    linkGlonass: false
-  };
+    linkGlonass: false,
+  }
 
   controlSiteList.aludeid = {
     name: 'Al Udeid Air Base, Qatar',
@@ -89,9 +89,9 @@
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
-    linkGlonass: false
-  };
+    linkGlonass: false,
+  }
 
-  controlSiteManager.controlSiteList = controlSiteList;
-  window.controlSiteManager = controlSiteManager;
-})();
+  controlSiteManager.controlSiteList = controlSiteList
+  window.controlSiteManager = controlSiteManager
+})()

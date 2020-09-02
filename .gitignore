@@ -1,3 +1,4 @@
+node_modules/
 node_modules
 /license/license*
 .gitattributes
@@ -5,6 +6,7 @@ node_modules
 .notes.js
 classfd.tle
 .jshintrc
+.prettierignore
 
 social
 social/*

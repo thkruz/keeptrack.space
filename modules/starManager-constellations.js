@@ -14,79 +14,103 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-(function () {
+;(function () {
   // Requires starManager Module
   try {
-    starManager.isConstellationVisible = false;
-    starManager.isAllConstellationVisible = false;
+    starManager.isConstellationVisible = false
+    starManager.isAllConstellationVisible = false
     starManager.findStarsConstellation = function (starName) {
       for (var i = 0; i < starManager.constellations.length; i++) {
         for (var s = 0; s < starManager.constellations[i].stars.length; s++) {
           if (starManager.constellations[i].stars[s][0] === starName) {
-            return starManager.constellations[i].name;
+            return starManager.constellations[i].name
           }
           if (starManager.constellations[i].stars[s][1] === starName) {
-            return starManager.constellations[i].name;
+            return starManager.constellations[i].name
           }
         }
       }
-      return null;
-    };
+      return null
+    }
     starManager.drawAllConstellations = function () {
       for (var i = 0; i < starManager.constellations.length; i++) {
         for (var s = 0; s < starManager.constellations[i].stars.length; s++) {
           // Verify Stars Exist
-          var star1 = satSet.getSat(satSet.getIdFromStarName(starManager.constellations[i].stars[s][0]));
-          var star2 = satSet.getSat(satSet.getIdFromStarName(starManager.constellations[i].stars[s][1]));
-          if (star1 == null || star2 == null) { continue; }
-          drawLineList.push(
-            {
-              'line': new Line(),
-              'star1': starManager.constellations[i].stars[s][0],
-              'star2': starManager.constellations[i].stars[s][1],
-              'color': [1,1,1,1]
+          try {
+            var star1 = satSet.getSat(
+              satSet.getIdFromStarName(
+                starManager.constellations[i].stars[s][0],
+              ),
+            )
+            var star2 = satSet.getSat(
+              satSet.getIdFromStarName(
+                starManager.constellations[i].stars[s][1],
+              ),
+            )
+            if (star1 == null || star2 == null) {
+              continue
             }
-          );
-          starManager.isConstellationVisible = true;
-          starManager.isAllConstellationVisible = true;
+          } catch (e) {
+            console.warn(`Star/Constellation error - i: ${i} - s: ${s}`)
+            continue
+          }
+          drawLineList.push({
+            line: new Line(),
+            star1: starManager.constellations[i].stars[s][0],
+            star2: starManager.constellations[i].stars[s][1],
+            color: [1, 1, 1, 1],
+          })
+          starManager.isConstellationVisible = true
+          starManager.isAllConstellationVisible = true
         }
       }
-    };
+    }
     starManager.drawConstellations = function (C) {
       for (var i = 0; i < starManager.constellations.length; i++) {
         if (starManager.constellations[i].name === C) {
           for (var s = 0; s < starManager.constellations[i].stars.length; s++) {
             // Verify Stars Exist
-            var star1 = satSet.getSat(satSet.getIdFromStarName(starManager.constellations[i].stars[s][0]));
-            var star2 = satSet.getSat(satSet.getIdFromStarName(starManager.constellations[i].stars[s][1]));
-            if (star1 == null || star2 == null) { continue; }
-            drawLineList.push(
-              {
-                'line': new Line(),
-                'star1': starManager.constellations[i].stars[s][0],
-                'star2': starManager.constellations[i].stars[s][1]
-              }
-            );
-            starManager.isConstellationVisible = true;
+            var star1 = satSet.getSat(
+              satSet.getIdFromStarName(
+                starManager.constellations[i].stars[s][0],
+              ),
+            )
+            var star2 = satSet.getSat(
+              satSet.getIdFromStarName(
+                starManager.constellations[i].stars[s][1],
+              ),
+            )
+            if (star1 == null || star2 == null) {
+              continue
+            }
+            drawLineList.push({
+              line: new Line(),
+              star1: starManager.constellations[i].stars[s][0],
+              star2: starManager.constellations[i].stars[s][1],
+            })
+            starManager.isConstellationVisible = true
           }
         }
       }
-    };
+    }
     starManager.clearConstellations = function () {
-      starManager.isConstellationVisible = false;
-      var isFoundStar = true;
-      var attempts = 0;
+      starManager.isConstellationVisible = false
+      var isFoundStar = true
+      var attempts = 0
       while (isFoundStar && attempts < 30) {
-        isFoundStar = false;
+        isFoundStar = false
         for (var i = 0; i < drawLineList.length; i++) {
-          if ((typeof drawLineList[i].star1 !=='undefined') || (typeof drawLineList[i].star2 !=='undefined')) {
-            drawLineList.splice(i, 1);
-            isFoundStar = true;
+          if (
+            typeof drawLineList[i].star1 !== 'undefined' ||
+            typeof drawLineList[i].star2 !== 'undefined'
+          ) {
+            drawLineList.splice(i, 1)
+            isFoundStar = true
           }
         }
-        attempts++;
+        attempts++
       }
-    };
+    }
 
     starManager.constellations = [
     {
@@ -1101,4 +1125,4 @@ or mirrored at any other location without the express written permission of the 
   } catch {
     console.log('starManager.constellations Plugin failed to load!');
   }
-})();
+})()

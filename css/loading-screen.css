@@ -1,49 +1,67 @@
 body {
-    font-family: 'Droid Sans', sans-serif;
-    color: white;
-    background: rgb(2,119,189); /* Old browsers */
-    background: -moz-linear-gradient(45deg, rgba(2,119,189,1) 0%, rgba(64,150,238,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(45deg, rgba(2,119,189,1) 0%,rgba(64,150,238,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(45deg, rgba(2,119,189,1) 0%,rgba(64,150,238,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0277bd', endColorstr='#4096ee',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+  font-family: 'Open Sans', sans-serif;
+  color: white;
+  background: #172635;
+  /* Old browsers */
+  background: -moz-linear-gradient(45deg, #172635, #172635);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(45deg, #172635, #172635);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(45deg, #172635, #172635);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
 }
 
 .ui-icon-minus {
   margin: auto !important;
 }
+
 .ui-icon-plus {
   margin: auto !important;
 }
+
 .ui-datepicker td a {
   text-align: center !important;
 }
 
-#canvas-holder {
-    display: none;
+/* Display none till loading is complete main.js -227 */
+
+#canvas-holder,
+#main-container {
+  display: none;
 }
+
+/* Display none till loading is complete main.js -227 */
 
 #loading-screen {
   padding: 0;
-  z-index: 100;
+  z-index: 101;
   text-align: center;
-  background: rgb(2,119,189); /* Old browsers */
-  background: -moz-linear-gradient(45deg, rgba(2,119,189,1) 0%, rgba(64,150,238,1) 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(45deg, rgba(2,119,189,1) 0%,rgba(64,150,238,1) 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(45deg, rgba(2,119,189,1) 0%,rgba(64,150,238,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0277bd', endColorstr='#4096ee',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+  background: #172635;
+  /* Old browsers */
+  background: -moz-linear-gradient(45deg, #080c11, #274059);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(45deg, #080c11, #274059);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(45deg, #080c11, #274059);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
 }
 
 .full-loader {
   width: 100%;
+  height: 100%;
   position: absolute;
-  min-height: 100%;
   overflow: hidden;
   top: 0;
   bottom: 0;
 }
 
 .mini-loader-container {
-  background: rgba(0,0,0,0) !important; /* Old browsers */
+  background: rgba(0, 0, 0, 0) !important;
+  /* Old browsers */
   position: absolute;
   width: 100%;
   height: 100%;
@@ -56,11 +74,28 @@ body {
   width: 200px;
   padding-top: 15px;
   overflow: hidden;
-  background: rgb(2,119,189); /* Old browsers */
-  background: -moz-linear-gradient(45deg, rgba(2,119,189,1) 0%, rgba(64,150,238,1) 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(45deg, rgba(2,119,189,1) 0%,rgba(64,150,238,1) 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(45deg, rgba(2,119,189,1) 0%,rgba(64,150,238,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0277bd', endColorstr='#4096ee',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+  background: #172635;
+  /* Old browsers */
+  background: -moz-linear-gradient(
+    45deg,
+    rgb(23, 38, 53) 0%,
+    rgba(64, 150, 238, 1) 100%
+  );
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(
+    45deg,
+    rgb(23, 38, 53) 0%,
+    rgba(64, 150, 238, 1) 100%
+  );
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(
+    45deg,
+    rgb(23, 38, 53) 0%,
+    rgba(64, 150, 238, 1) 100%
+  );
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
 }
 
 #logo-inner-container {
@@ -83,14 +118,15 @@ body {
 }
 
 #loader-text {
-    display: block;
-    line-height: 50px;
+  display: block;
+  line-height: 50px;
 }
+
 #spinner {
-    display: inline-block;
-    height: 50px;
-    width: 50px;
-    position: relative;
+  display: inline-block;
+  height: 50px;
+  width: 50px;
+  position: relative;
 }
 
 #mobile-start-button {

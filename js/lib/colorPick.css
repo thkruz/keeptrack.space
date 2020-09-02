@@ -9,20 +9,20 @@
 */
 
 @font-face {
-  font-family: "Open Sans";
+  font-family: 'Open Sans';
   font-style: normal;
   font-weight: 400;
-  src: local("Open Sans"), local("OpenSans"),
+  src: local('Open Sans'), local('OpenSans'),
     url(https://fonts.gstatic.com/s/opensans/v13/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff)
-      format("woff");
+      format('woff');
 }
 @font-face {
-  font-family: "Open Sans";
+  font-family: 'Open Sans';
   font-style: normal;
   font-weight: 700;
-  src: local("Open Sans Bold"), local("OpenSans-Bold"),
+  src: local('Open Sans Bold'), local('OpenSans-Bold'),
     url(https://fonts.gstatic.com/s/opensans/v13/k3k702ZOKiLJc3WVjuplzKRDOzjiPcYnFooOUGCOsRk.woff)
-      format("woff");
+      format('woff');
 }
 
 #colorPick * {
@@ -40,7 +40,7 @@
   border-radius: 5px;
   box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
   padding: 15px;
-  font-family: "Open Sans", sans-serif;
+  font-family: 'Open Sans', sans-serif;
   width: 140px;
 }
 

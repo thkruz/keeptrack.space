@@ -115,7 +115,7 @@ const MOON_SCALAR_DISTANCE = 250000
   // //////////////////////////////////////////////////////////////////////////
   settingsManager.showOrbitThroughEarth = false
 
-  settingsManager.atmosphereSize = RADIUS_OF_EARTH + 150
+  settingsManager.atmosphereSize = RADIUS_OF_EARTH + 250
   settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)'
 
   settingsManager.satShader = {}

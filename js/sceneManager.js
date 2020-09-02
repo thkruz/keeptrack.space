@@ -1529,13 +1529,14 @@
         void main () {
           float sunAmount = max(dot(vNormal, uLightDirection), 0.1);
           float darkAmount = max(dot(vNormal, -uLightDirection), 0.0);
+          float a4 = pow(1.1 - vDist \/ 2.0, 1.1) * 2.0;
           float r = 1.0 - sunAmount;
           float g = max(1.0 - sunAmount, 0.8) - darkAmount;
           float b = max(sunAmount, 0.8) - darkAmount;
           float a1 = min(sunAmount, 0.8) * 2.0;
           float a2 = min(pow(darkAmount \/ 1.15, 2.0),0.2);
           float a3 = pow(vDist,2.0) * -1.0 + 1.0;
-          float a = min(a1 - a2, a3);
+          float a = min(a1 - a2, a3) * a4;
           gl_FragColor    = vec4(vec3(r,g,b), a);
         }
       `,

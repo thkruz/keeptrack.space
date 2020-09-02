@@ -477,6 +477,9 @@ const MOON_SCALAR_DISTANCE = 250000
         settingsManager.hiresImages = true
         settingsManager.minimumDrawDt = 0.01667
         break
+      case 'draw-less':
+        settingsManager.isDrawLess = true
+        break
       case 'vec':
         settingsManager.vectorImages = true
         break

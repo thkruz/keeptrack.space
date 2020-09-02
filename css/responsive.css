@@ -366,7 +366,6 @@
     display: none;
   }
 
-<<<<<<< HEAD
   #menu-space-stations,
   #menu-launches,
   #menu-record,
@@ -375,19 +374,12 @@
   #social,
   #version-info,
   #fastCompSettings {
-=======
-  #menu-space-stations, #menu-launches, #menu-record, #menu-twitter, #menu-color-scheme, #social, #version-info, #fastCompSettings {
->>>>>>> master
     display: none;
   }
   #mobile-warning {
     display: block;
     margin-top: 10px;
-<<<<<<< HEAD
     color: #48f3e3 !important;
-=======
-    color: #48f3e3 !important
->>>>>>> master
   }
   #ui-datepicker-div {
     top: 50px !important;

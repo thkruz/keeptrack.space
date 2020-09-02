@@ -739,12 +739,12 @@ function _drawScene() {
   gl.clearColor(0.0, 0.0, 0.0, 1.0)
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-  sun.draw(pMatrix, camMatrix)
-  if (!settingsManager.enableLimitedUI) {
+  if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
+    sun.draw(pMatrix, camMatrix)
     moon.draw(pMatrix, camMatrix)
   }
   earth.update()
-  if (!settingsManager.enableLimitedUI) {
+  if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
     atmosphere.update()
     atmosphere.draw(pMatrix, camMatrix)
   }

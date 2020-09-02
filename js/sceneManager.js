@@ -369,19 +369,19 @@
     }
 
     earth.update = () => {
-      earth.lastTime = earthNow
-      earthNow = timeManager.propTime()
-      timeManager.selectedDate = earthNow
+      earth.lastTime = earthNow;
+      earthNow = timeManager.propTime();
+      timeManager.selectedDate = earthNow;
 
       // wall time is not propagation time, so better print it
       // TODO substring causes 12kb memory leak every frame.
       if (earth.lastTime - earthNow < 300) {
-        earth.tDS = earthNow.toJSON()
-        earth.timeTextStr = earth.timeTextStrEmpty
+        earth.tDS = earthNow.toJSON();
+        earth.timeTextStr = earth.timeTextStrEmpty;
         for (earth.iText = 11; earth.iText < 20; earth.iText++) {
           // if (earth.iText < 10) earth.timeTextStr += earth.tDS[earth.iText];
           // if (earth.iText === 10) earth.timeTextStr += ' ';
-          if (earth.iText > 11) earth.timeTextStr += earth.tDS[earth.iText - 1]
+          if (earth.iText > 11) earth.timeTextStr += earth.tDS[earth.iText-1];
         }
         if (
           settingsManager.isPropRateChange &&
@@ -411,19 +411,23 @@
           if (!createClockDOMOnce) {
             document.getElementById(
               'datetime-text',
-            ).innerText = `${earth.timeTextStr}`
-            createClockDOMOnce = true
+            ).innerText = `${earth.timeTextStr}`;
+            createClockDOMOnce = true;
           } else {
             document.getElementById(
               'datetime-text',
-            ).childNodes[0].nodeValue = `${earth.timeTextStr}`
+            ).childNodes[0].nodeValue = `${earth.timeTextStr}`;
           }
         }
       }
 
       // Don't update the time input unless it is currently being viewed.
       if (settingsManager.isEditTime || !settingsManager.cruncherReady) {
-        $('#datetime-input-tb').val(earth.timeTextStr)
+        let timeInput = timeManager.selectedDate.toISOString();
+        let dateInput = timeInput.split("T",1);
+        timeInput = timeInput.split(".",1);
+        timeInput = timeInput[0].split("T",2);
+        $('#datetime-input-tb').val(`${dateInput[0]} ${timeInput[1]}`);
       }
 
       earth.earthJ = timeManager.jday(
@@ -1289,59 +1293,49 @@
       // gl.bindVertexArray(moon.vao);
 
       // Needed because geocentric earth
-      let moonXYZ = moon.getXYZ()
-      let moonMaxDist = Math.max(
-        Math.max(Math.abs(moonXYZ.x), Math.abs(moonXYZ.y)),
-        Math.abs(moonXYZ.z),
-      )
-      moon.pos[0] = (moonXYZ.x / moonMaxDist) * MOON_SCALAR_DISTANCE
-      moon.pos[1] = (moonXYZ.y / moonMaxDist) * MOON_SCALAR_DISTANCE
-      moon.pos[2] = (moonXYZ.z / moonMaxDist) * MOON_SCALAR_DISTANCE
+      let moonXYZ = moon.getXYZ();
+      let moonMaxDist = Math.max(Math.max(Math.abs(moonXYZ.x),Math.abs(moonXYZ.y)),Math.abs(moonXYZ.z));
+      moon.pos[0] = moonXYZ.x / moonMaxDist * MOON_SCALAR_DISTANCE;
+      moon.pos[1] = moonXYZ.y / moonMaxDist * MOON_SCALAR_DISTANCE;
+      moon.pos[2] = moonXYZ.z / moonMaxDist * MOON_SCALAR_DISTANCE;
 
-      mvMatrix = mvMatrixEmpty
-      mat4.identity(mvMatrix)
-      mat4.translate(mvMatrix, mvMatrix, moon.pos)
-      nMatrix = nMatrixEmpty
-      mat3.normalFromMat4(nMatrix, mvMatrix)
+      mvMatrix = mvMatrixEmpty;
+      mat4.identity(mvMatrix);
+      mat4.translate(mvMatrix, mvMatrix, moon.pos);
+      nMatrix = nMatrixEmpty;
+      mat3.normalFromMat4(nMatrix, mvMatrix);
 
-      gl.useProgram(moonShader)
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+      gl.useProgram(moonShader);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-      gl.uniformMatrix3fv(moonShader.uNormalMatrix, false, nMatrix)
-      gl.uniformMatrix4fv(moonShader.uMvMatrix, false, mvMatrix)
-      gl.uniformMatrix4fv(moonShader.uPMatrix, false, pMatrix)
-      gl.uniformMatrix4fv(moonShader.uCamMatrix, false, camMatrix)
-      gl.uniform3fv(moonShader.uSunPos, sun.pos)
+      gl.uniformMatrix3fv(moonShader.uNormalMatrix, false, nMatrix);
+      gl.uniformMatrix4fv(moonShader.uMvMatrix, false, mvMatrix);
+      gl.uniformMatrix4fv(moonShader.uPMatrix, false, pMatrix);
+      gl.uniformMatrix4fv(moonShader.uCamMatrix, false, camMatrix);
+      gl.uniform3fv(moonShader.uSunPos, sun.pos);
 
-      gl.uniform1i(moonShader.uSampler, 0) // point sampler to TEXTURE0
-      gl.activeTexture(gl.TEXTURE0)
-      gl.bindTexture(gl.TEXTURE_2D, texture) // bind texture to TEXTURE0
+      gl.uniform1i(moonShader.uSampler, 0); // point sampler to TEXTURE0
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture); // bind texture to TEXTURE0
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf)
-      gl.enableVertexAttribArray(moonShader.aTexCoord)
-      gl.vertexAttribPointer(moonShader.aTexCoord, 2, gl.FLOAT, false, 0, 0)
+      gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
+      gl.enableVertexAttribArray(moonShader.aTexCoord);
+      gl.vertexAttribPointer(moonShader.aTexCoord, 2, gl.FLOAT, false, 0, 0);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf)
-      gl.enableVertexAttribArray(moonShader.aVertexPosition)
-      gl.vertexAttribPointer(
-        moonShader.aVertexPosition,
-        3,
-        gl.FLOAT,
-        false,
-        0,
-        0,
-      )
+      gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
+      gl.enableVertexAttribArray(moonShader.aVertexPosition);
+      gl.vertexAttribPointer(moonShader.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf)
-      gl.enableVertexAttribArray(moonShader.aVertexNormal)
-      gl.vertexAttribPointer(moonShader.aVertexNormal, 3, gl.FLOAT, false, 0, 0)
+      gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
+      gl.enableVertexAttribArray(moonShader.aVertexNormal);
+      gl.vertexAttribPointer(moonShader.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
 
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf)
-      gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0)
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
+      gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 
-      gl.disableVertexAttribArray(moonShader.aTexCoord)
-      gl.disableVertexAttribArray(moonShader.aVertexPosition)
-      gl.disableVertexAttribArray(moonShader.aVertexNormal)
+      gl.disableVertexAttribArray(moonShader.aTexCoord);
+      gl.disableVertexAttribArray(moonShader.aVertexPosition);
+      gl.disableVertexAttribArray(moonShader.aVertexNormal);
 
       // Done Drawing
       return true

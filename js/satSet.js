@@ -193,7 +193,7 @@ var emptyMat4 = mat4.create()
       ;(function _reloadLastSensor() {
         let currentSensor = !settingsManager.offline
           ? JSON.parse(localStorage.getItem('currentSensor'))
-          : null
+          : null;
         if (currentSensor !== null) {
           try {
             // If there is a staticnum set use that
@@ -201,51 +201,51 @@ var emptyMat4 = mat4.create()
               typeof currentSensor[0] == 'undefined' ||
               currentSensor[0] == null
             ) {
-              sensorManager.setSensor(null, currentSensor[1])
+              sensorManager.setSensor(null, currentSensor[1]);
             } else {
               // If the sensor is a string, load that collection of sensors
               if (typeof currentSensor[0].shortName == 'undefined') {
-                sensorManager.setSensor(currentSensor[0], currentSensor[1])
+                sensorManager.setSensor(currentSensor[0], currentSensor[1]);
               } else {
                 // Seems to be a single sensor without a staticnum, load that
                 sensorManager.setSensor(
                   sensorManager.sensorList[currentSensor[0].shortName],
-                  currentSensor[1],
-                )
+                  currentSensor[1]
+                );
               }
             }
           } catch (e) {
             // Clear old settings because they seem corrupted
-            localStorage.setItem('currentSensor', null)
-            console.warn('Saved Sensor Information Invalid')
+            localStorage.setItem('currentSensor', null);
+            console.warn('Saved Sensor Information Invalid');
           }
         }
       })()
       ;(function _watchlistInit() {
-        var watchlistJSON = !settingsManager.offline
+        let watchlistJSON = !settingsManager.offline
           ? localStorage.getItem('watchlistList')
           : null
         if (watchlistJSON !== null) {
-          var newWatchlist = JSON.parse(watchlistJSON)
+          let newWatchlist = JSON.parse(watchlistJSON)
           watchlistInViewList = []
-          for (var i = 0; i < newWatchlist.length; i++) {
-            var sat = satSet.getSatExtraOnly(
-              satSet.getIdFromObjNum(newWatchlist[i]),
-            )
+          for (let i = 0; i < newWatchlist.length; i++) {
+            let sat = satSet.getSatExtraOnly(
+              satSet.getIdFromObjNum(newWatchlist[i])
+            );
             if (sat !== null) {
-              newWatchlist[i] = sat.id
-              watchlistInViewList.push(false)
+              newWatchlist[i] = sat.id;
+              watchlistInViewList.push(false);
             } else {
-              console.error('Watchlist File Format Incorret')
-              return
+              console.error('Watchlist File Format Incorret');
+              return;
             }
           }
-          uiManager.updateWatchlist(newWatchlist, watchlistInViewList)
+          uiManager.updateWatchlist(newWatchlist, watchlistInViewList);
         }
-      })()
-      ;(function _parseGetParameters() {
+      })();
+      (function _parseGetParameters() {
         // do querystring stuff
-        var params = satSet.queryStr.split('&')
+        let params = satSet.queryStr.split('&');
 
         // Do Searches First
         for (let i = 0; i < params.length; i++) {
@@ -257,68 +257,68 @@ var emptyMat4 = mat4.create()
             // TODO: SensorManager might be the problem here, but this works
             // _doDelayedSearch(val);
             if (!settingsManager.disableUI) {
-              searchBox.doSearch(val)
+              searchBox.doSearch(val);
             }
           }
         }
 
         // Then Do Other Stuff
         for (let i = 0; i < params.length; i++) {
-          let key = params[i].split('=')[0]
-          let val = params[i].split('=')[1]
-          let urlSatId
+          let key = params[i].split('=')[0];
+          let val = params[i].split('=')[1];
+          let urlSatId;
           switch (key) {
             case 'intldes':
-              urlSatId = satSet.getIdFromIntlDes(val.toUpperCase())
+              urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
               if (urlSatId !== null) {
-                selectSat(urlSatId)
+                selectSat(urlSatId);
               }
               break
             case 'sat':
-              urlSatId = satSet.getIdFromObjNum(val.toUpperCase())
+              urlSatId = satSet.getIdFromObjNum(val.toUpperCase());
               if (urlSatId !== null) {
-                selectSat(urlSatId)
+                selectSat(urlSatId);
               }
               break
             case 'misl':
-              var subVal = val.split(',')
-              $('#ms-type').val(subVal[0].toString())
-              $('#ms-attacker').val(subVal[1].toString())
+              var subVal = val.split(',');
+              $('#ms-type').val(subVal[0].toString());
+              $('#ms-attacker').val(subVal[1].toString());
               // $('#ms-lat-lau').val() * 1;
               // ('#ms-lon-lau').val() * 1;
-              $('#ms-target').val(subVal[2].toString())
+              $('#ms-target').val(subVal[2].toString());
               // $('#ms-lat').val() * 1;
               // $('#ms-lon').val() * 1;
-              $('#missile').trigger('submit')
-              break
+              $('#missile').trigger('submit');
+              break;
             case 'date':
-              timeManager.propOffset = Number(val) - Date.now()
+              timeManager.propOffset = Number(val) - Date.now();
               $('#datetime-input-tb').datepicker(
                 'setDate',
                 new Date(timeManager.propRealTime + timeManager.propOffset),
-              )
+              );
               satCruncher.postMessage({
                 typ: 'offset',
                 dat:
                   timeManager.propOffset.toString() +
                   ' ' +
-                  timeManager.propRate.toString(),
-              })
-              break
+                  timeManager.propRate.toString()
+              });
+              break;
             case 'rate':
-              val = Math.min(val, 1000)
+              val = Math.min(val, 1000);
               // could run time backwards, but let's not!
-              val = Math.max(val, 0.0)
+              val = Math.max(val, 0.0);
               // console.log('propagating at rate ' + val + ' x real time ');
-              timeManager.propRate = Number(val)
+              timeManager.propRate = Number(val);
               satCruncher.postMessage({
                 typ: 'offset',
                 dat:
                   timeManager.propOffset.toString() +
                   ' ' +
-                  timeManager.propRate.toString(),
-              })
-              break
+                  timeManager.propRate.toString()
+              });
+              break;
           }
         }
       })()
@@ -329,15 +329,15 @@ var emptyMat4 = mat4.create()
           // orbitManager.historyOfSatellitesPlay();
 
           // All Orbits
-          groups.debris = new groups.SatGroup('all', '')
-          groups.selectGroup(groups.debris)
-          satSet.setColorScheme(settingsManager.currentColorScheme, true) // force color recalc
-          groups.debris.updateOrbits()
-          isOrbitOverlay = true
-        }, 5000)
+          groups.debris = new groups.SatGroup('all', '');
+          groups.selectGroup(groups.debris);
+          satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+          groups.debris.updateOrbits();
+          isOrbitOverlay = true;
+        }, 5000);
       }
 
-      settingsManager.cruncherReady = true
+      settingsManager.cruncherReady = true;
     }
   }
 
@@ -1490,62 +1490,34 @@ var emptyMat4 = mat4.create()
         res.push(i)
       }
     }
-    return res
-  }
-  satSet.searchAzElRange = (
-    azimuth,
-    elevation,
-    range,
-    inclination,
-    azMarg,
-    elMarg,
-    rangeMarg,
-    incMarg,
-    period,
-    periodMarg,
-    objtype,
-  ) => {
-    var isCheckAz = !isNaN(parseFloat(azimuth)) && isFinite(azimuth)
-    var isCheckEl = !isNaN(parseFloat(elevation)) && isFinite(elevation)
-    var isCheckRange = !isNaN(parseFloat(range)) && isFinite(range)
-    var isCheckInclination =
-      !isNaN(parseFloat(inclination)) && isFinite(inclination)
-    var isCheckPeriod = !isNaN(parseFloat(period)) && isFinite(period)
-    var isCheckAzMarg = !isNaN(parseFloat(azMarg)) && isFinite(azMarg)
-    var isCheckElMarg = !isNaN(parseFloat(elMarg)) && isFinite(elMarg)
-    var isCheckRangeMarg = !isNaN(parseFloat(rangeMarg)) && isFinite(rangeMarg)
-    var isCheckIncMarg = !isNaN(parseFloat(incMarg)) && isFinite(incMarg)
-    var isCheckPeriodMarg =
-      !isNaN(parseFloat(periodMarg)) && isFinite(periodMarg)
-    objtype *= 1 // String to Number
+    return res;
+  };
+  satSet.searchAzElRange = (azimuth, elevation, range, inclination, azMarg, elMarg, rangeMarg, incMarg, period, periodMarg, rcs, rcsMarg, objtype) => {
+    var isCheckAz = !isNaN(parseFloat(azimuth)) && isFinite(azimuth);
+    var isCheckEl = !isNaN(parseFloat(elevation)) && isFinite(elevation);
+    var isCheckRange = !isNaN(parseFloat(range)) && isFinite(range);
+    var isCheckInclination = !isNaN(parseFloat(inclination)) && isFinite(inclination);
+    var isCheckPeriod = !isNaN(parseFloat(period)) && isFinite(period);
+    var isCheckRcs = !isNaN(parseFloat(rcs)) && isFinite(rcs);
+    var isCheckAzMarg = !isNaN(parseFloat(azMarg)) && isFinite(azMarg);
+    var isCheckElMarg = !isNaN(parseFloat(elMarg)) && isFinite(elMarg);
+    var isCheckRangeMarg = !isNaN(parseFloat(rangeMarg)) && isFinite(rangeMarg);
+    var isCheckIncMarg = !isNaN(parseFloat(incMarg)) && isFinite(incMarg);
+    var isCheckPeriodMarg = !isNaN(parseFloat(periodMarg)) && isFinite(periodMarg);
+    var isCheckRcsMarg = !isNaN(parseFloat(rcsMarg)) && isFinite(rcsMarg);
+    objtype *= 1; // String to Number
 
-    if (
-      !isCheckEl &&
-      !isCheckRange &&
-      !isCheckAz &&
-      !isCheckInclination &&
-      !isCheckPeriod
-    )
-      return // Ensure there is a number typed.
+    if (!isCheckEl && !isCheckRange && !isCheckAz && !isCheckInclination && !isCheckPeriod && !isCheckRcs) return; // Ensure there is a number typed.
 
-    if (!isCheckAzMarg) {
-      azMarg = 5
-    }
-    if (!isCheckElMarg) {
-      elMarg = 5
-    }
-    if (!isCheckRangeMarg) {
-      rangeMarg = 200
-    }
-    if (!isCheckIncMarg) {
-      incMarg = 1
-    }
-    if (!isCheckPeriodMarg) {
-      periodMarg = 0.5
-    }
-    var res = []
+    if (!isCheckAzMarg) { azMarg = 5; }
+    if (!isCheckElMarg) { elMarg = 5; }
+    if (!isCheckRangeMarg) { rangeMarg = 200; }
+    if (!isCheckIncMarg) { incMarg = 1; }
+    if (!isCheckPeriodMarg) { periodMarg = 0.5; }
+    if (!isCheckRcsMarg) { rcsMarg = rcs/10; }
+    var res = [];
 
-    var s = 0
+    var s = 0;
     for (var i = 0; i < satData.length; i++) {
       if (satData[i].static || satData[i].missile || !satData[i].active) {
         continue
@@ -1607,8 +1579,16 @@ var emptyMat4 = mat4.create()
       res = checkPeriod(res, minPeriod, maxPeriod)
     }
 
-    function checkInview(possibles) {
-      var inviewRes = []
+    if (isCheckRcs) {
+      rcs = rcs * 1; // Convert period to int
+      rcsMarg = rcsMarg * 1;
+      var minRcs = rcs - rcsMarg;
+      var maxRcs = rcs + rcsMarg;
+      res = checkRcs(res, minRcs, maxRcs);
+    }
+
+    function checkInview (possibles) {
+      var inviewRes = [];
       for (var i = 0; i < possibles.length; i++) {
         if (possibles[i].inview) {
           inviewRes.push(possibles[i])
@@ -1682,6 +1662,21 @@ var emptyMat4 = mat4.create()
         $('#findByLooks-results').text('Limited to 200 Results!')
       }
       return periodRes
+    }
+    function checkRcs (possibles, minRcs, maxRcs) {
+      console.log(minRcs);
+      console.log(maxRcs);
+      var rcsRes = [];
+      for (var i = 0; i < possibles.length; i++) {
+        if (parseFloat(possibles[i].R) < maxRcs && parseFloat(possibles[i].R) > minRcs && rcsRes.length <= 200) { // Don't display more than 200 results - this is because LEO and GEO belt have a lot of satellites
+          console.log(possibles[i]);
+          rcsRes.push(possibles[i]);
+        }
+      }
+      if (rcsRes.length >= 200) {
+        $('#findByLooks-results').text('Limited to 200 Results!');
+      }
+      return rcsRes;
     }
     // $('#findByLooks-results').text('');
     // IDEA: Intentionally doesn't clear previous searches. Could be an option later.

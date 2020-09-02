@@ -19,8 +19,8 @@ const MOON_SCALAR_DISTANCE = 250000
   let settingsManager = {}
 
   //  Version Control
-  settingsManager.versionNumber = '1.19.9'
-  settingsManager.versionDate = 'August 24, 2020'
+  settingsManager.versionNumber = '1.19.12';
+  settingsManager.versionDate = 'September 2, 2020';
 
   // Install Folder Settings
   {
@@ -84,7 +84,10 @@ const MOON_SCALAR_DISTANCE = 250000
   // Maximum orbits allowed on smaller screens
   settingsManager.maxOrbitsDisplayedMobile = 1500
   // Canvas will autoresize on screen resize to width/height of window
-  settingsManager.isAutoResizeCanvas = true
+  settingsManager.isAutoResizeCanvas = true;
+  // Changing the zoom with the mouse wheel will stop the camera from following
+  // the satellite.
+  settingsManager.isZoomStopsSnappedOnSat = false;
 
   settingsManager.fieldOfViewMin = 0.04 // 4 Degrees (I think)
   settingsManager.fieldOfViewMax = 1.2 // 120 Degrees (I think)
@@ -105,8 +108,8 @@ const MOON_SCALAR_DISTANCE = 250000
   settingsManager.desktopMinimumWidth = 1300
   settingsManager.isMobileModeEnabled = false
   if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
-    settingsManager.isMobileModeEnabled = true
-    settingsManager.camDistBuffer = 3500
+    settingsManager.isMobileModeEnabled = true;
+    settingsManager.camDistBuffer = 100;
   }
 
   // //////////////////////////////////////////////////////////////////////////
@@ -367,32 +370,32 @@ const MOON_SCALAR_DISTANCE = 250000
     $('.search-hilight').css('color', 'DarkRed')
   }
   settingsManager.themes.blueTheme = function (isForce) {
-    if (settingsManager.retro) return
-    if (settingsManager.themes.currentTheme === 'Blue' && !isForce) return
-    document.getElementById('nav-wrapper').classList.remove('red')
-    document.getElementById('nav-footer').classList.remove('red')
-    document.getElementById('nav-footer').classList.remove('darken-3')
-    document.getElementById('nav-wrapper').classList.add('light-blue')
-    $('#nav-footer').css('background-color', '#172635')
-    $('#bottom-menu').css('background', 'rgb(0,105,165)')
-    $('.bmenu-item').css('border-right-color', 'steelblue')
-    $('.badge').css('color', '#4dacff !important')
-    $('#menu-info-overlay ').css('border-left-color', 'steelblue')
-    $('.side-menu').css('background', '#1f3347')
-    $('.side-menu').css('border-color', '#172635')
+    if (settingsManager.retro) return;
+    if (settingsManager.themes.currentTheme === 'Blue' && !isForce) return;
+    document.getElementById('nav-wrapper').classList.remove('red');
+    document.getElementById('nav-footer').classList.remove('red');
+    document.getElementById('nav-footer').classList.remove('darken-3');
+    document.getElementById('nav-wrapper').classList.add('light-blue');
+    $('#nav-footer').css('background-color', '#172635');
+    $('#bottom-menu').css('background', 'rgb(0,105,165)');
+    $('.bmenu-item').css('border-right-color', 'steelblue');
+    $('.badge').css('color', '#4dacff !important');
+    $('#menu-info-overlay ').css('border-left-color', 'steelblue');
+    $('.side-menu').css('background', '#1f3347');
+    $('.side-menu').css('border-color', '#172635');
     // $('#search-results').css('cssText', 'background: #1f3347 !important');
     // $('#search-results:hover').css('background', '#172635');
     // $('#search-results').css('border-color', '#172635');
-    $('#legend-hover-menu').css('background', '#1f3347')
-    $('#legend-hover-menu').css('border-color', '#172635')
-    $('#colorbox').css('border', '10px solid #172635')
-    $('#sat-infobox').css('background', '#1f3347')
-    $('#sat-infobox').css('border-color', '#172635')
-    $('#nav-footer-toggle').css('background', '#172635')
-    $('.search-hilight').css('color', '#4dacff')
-    $('.btn-ui').css('background-color', '#005a8f')
-    settingsManager.themes.currentTheme = 'Blue'
-  }
+    $('#legend-hover-menu').css('background', '#1f3347');
+    $('#legend-hover-menu').css('border-color', '#172635');
+    $('#colorbox').css('border', '10px solid #172635');
+    $('#sat-infobox').css('background', '#1f3347');
+    $('#sat-infobox').css('border-color', '#172635');
+    $('#nav-footer-toggle').css('background', '#172635');
+    $('.search-hilight').css('color', '#4dacff');
+    $('.btn-ui').css('background-color', '#005a8f');
+    settingsManager.themes.currentTheme = 'Blue';
+  };
 
   // //////////////////////////////////////////////////////////////////////////
   // Advanced Settings Below This Point
@@ -402,9 +405,9 @@ const MOON_SCALAR_DISTANCE = 250000
   // Frames Per Second Limiter
   settingsManager.minimumDrawDt = 0.0 // 20 FPS // 60 FPS = 0.01667;
 
-  settingsManager.camDistBuffer = 2000
-  settingsManager.zNear = 20.0
-  settingsManager.zFar = 500000.0
+  settingsManager.camDistBuffer = 75;
+  settingsManager.zNear = 1.0;
+  settingsManager.zFar = 500000.0;
 
   // //////////////////////////////////////////////////////////////////////////
   // Defaults that should never be changed

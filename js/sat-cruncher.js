@@ -109,8 +109,8 @@ onmessage = function (m) {
   }
 
   if (m.data.isShowSatOverfly === 'enable') {
-    isShowSatOverfly = true
-    selectedSatFOV = m.data.selectedSatFOV
+    isShowSatOverfly = true;
+    selectedSatFOV = m.data.selectedSatFOV;
   }
   if (m.data.isShowSatOverfly === 'reset') {
     isResetSatOverfly = true
@@ -1251,33 +1251,22 @@ function propagateCruncher() {
             satSelPos = satellite.ecfToEci(satSelPosEcf, gmst)
 
             // Find the Lat/Long of the Selected Satellite
-            satSelGeodetic = satellite.eciToGeodetic(satSelPos, gmst) // pv.position is called positionEci originally
-            satHeight = satSelGeodetic.height
-            satSelPosEarth = {
-              longitude: satSelGeodetic.longitude,
-              latitude: satSelGeodetic.latitude,
-              height: 1,
-            }
+            satSelGeodetic = satellite.eciToGeodetic(satSelPos, gmst); // pv.position is called positionEci originally
+            satHeight = satSelGeodetic.height;
+            satSelPosEarth = {longitude: satSelGeodetic.longitude, latitude: satSelGeodetic.latitude, height: 1};
 
-            deltaLatInt = 1
-            if (satHeight < 2500 && selectedSatFOV <= 60) deltaLatInt = 0.5
-            if (satHeight > 7000 || selectedSatFOV >= 90) deltaLatInt = 2
-            if (satelliteSelected.length > 1) deltaLatInt = 2
-            for (deltaLat = -60; deltaLat < 60; deltaLat += deltaLatInt) {
-              lat =
-                Math.max(
-                  Math.min(
-                    Math.round(satSelGeodetic.latitude * RAD2DEG) + deltaLat,
-                    90,
-                  ),
-                  -90,
-                ) * DEG2RAD
-              if (lat > 90) continue
-              deltaLonInt = 1 // Math.max((Math.abs(lat)*RAD2DEG/15),1);
-              if (satHeight < 2500 && selectedSatFOV <= 60) deltaLonInt = 0.5
-              if (satHeight > 7000 || selectedSatFOV >= 90) deltaLonInt = 2
-              if (satelliteSelected.length > 1) deltaLonInt = 2
-              for (deltaLon = 0; deltaLon < 181; deltaLon += deltaLonInt) {
+            deltaLatInt = 1;
+            if (satHeight < 2500 && selectedSatFOV <= 60) deltaLatInt = 0.5;
+            if (satHeight > 7000 || selectedSatFOV >= 90) deltaLatInt = 2;
+            if (satelliteSelected.length > 1) deltaLatInt = 2;
+            for ( deltaLat = -60; deltaLat < 60; deltaLat+=deltaLatInt) {
+              lat = Math.max(Math.min(Math.round((satSelGeodetic.latitude * RAD2DEG)) + deltaLat,90),-90) * DEG2RAD;
+              if (lat > 90) continue;
+              deltaLonInt = 1; // Math.max((Math.abs(lat)*RAD2DEG/15),1);
+              if (satHeight < 2500 && selectedSatFOV <= 60) deltaLonInt = 0.5;
+              if (satHeight > 7000 || selectedSatFOV >= 90) deltaLonInt = 2;
+              if (satelliteSelected.length > 1) deltaLonInt = 2;
+              for (deltaLon = 0; deltaLon < 181; deltaLon+=deltaLonInt) {
                 // //////////
                 // Add Long
                 // //////////
@@ -1292,11 +1281,8 @@ function propagateCruncher() {
                 elevation = lookangles.elevation
                 // rangeSat = lookangles.rangeSat;
 
-                if (
-                  elevation * RAD2DEG > 0 &&
-                  90 - elevation * RAD2DEG < selectedSatFOV
-                ) {
-                  satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth)
+                if (elevation * RAD2DEG > 0 && 90 - elevation * RAD2DEG < selectedSatFOV ) {
+                  satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
 
                   if (i === len) {
                     console.error('Ran out of Markers')
@@ -1328,11 +1314,8 @@ function propagateCruncher() {
                 elevation = lookangles.elevation
                 // rangeSat = lookangles.rangeSat;
 
-                if (
-                  elevation * RAD2DEG > 0 &&
-                  90 - elevation * RAD2DEG < selectedSatFOV
-                ) {
-                  satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth)
+                if ((elevation * RAD2DEG > 0) && (90 - (elevation * RAD2DEG)) < selectedSatFOV) {
+                  satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
 
                   if (i === len) {
                     console.error('Ran out of Markers')

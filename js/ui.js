@@ -188,9 +188,9 @@ var speedModifier = 1
     ;(function _menuInit() {
       db.log('_menuInit')
       // Load the current JDAY
-      var jday = timeManager.getDayOfYear(timeManager.propTime())
-      $('#jday').html(jday)
-      jday = null // Garbage collect
+      var jday = timeManager.getDayOfYear(timeManager.propTime());
+      $('#jday').html(jday);
+      jday = null; // Garbage collect
 
       // Load the Stylesheets
       $('head').append(
@@ -1160,26 +1160,26 @@ var speedModifier = 1
       })
 
       // Chinese Radars
-      $('#chinese-xuanhua').on('click', function () {
-        sensorManager.setSensor(sensorManager.sensorList.XUA)
-      })
+      $('#chinese-xuanhua').on("click", function () {
+        sensorManager.setSensor(sensorManager.sensorList.XUA);
+      });
 
-      $('#reset-sensor-button').on('click', function () {
-        settingsManager.isForceColorScheme = false
-        $('#menu-sensor-info').addClass('bmenu-item-disabled')
-        $('#menu-fov-bubble').addClass('bmenu-item-disabled')
-        $('#menu-surveillance').addClass('bmenu-item-disabled')
-        $('#menu-planetarium').addClass('bmenu-item-disabled')
-        $('#menu-astronomy').addClass('bmenu-item-disabled')
-        _resetSensorSelected()
-      })
+      $('#reset-sensor-button').on("click", function () {
+        settingsManager.isForceColorScheme = false;
+        $('#menu-sensor-info').addClass('bmenu-item-disabled');
+        $('#menu-fov-bubble').addClass('bmenu-item-disabled');
+        $('#menu-surveillance').addClass('bmenu-item-disabled');
+        $('#menu-planetarium').addClass('bmenu-item-disabled');
+        $('#menu-astronomy').addClass('bmenu-item-disabled');
+        _resetSensorSelected();
+      });
 
-      $('#datetime-input-form').on('change', function (e) {
-        var selectedDate = $('#datetime-input-tb').datepicker('getDate')
-        var today = new Date()
-        var jday = timeManager.getDayOfYear(timeManager.propTime())
-        $('#jday').html(jday)
-        timeManager.propOffset = selectedDate - today
+      $('#datetime-input-form').on("change", function (e) {
+        var selectedDate = $('#datetime-input-tb').datepicker('getDate');
+        var today = new Date();
+        var jday = timeManager.getDayOfYear(timeManager.propTime());
+        $('#jday').html(jday);
+        timeManager.propOffset = selectedDate - today;
         satCruncher.postMessage({
           typ: 'offset',
           dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
@@ -1187,24 +1187,26 @@ var speedModifier = 1
         timeManager.propRealTime = Date.now()
         timeManager.propTime()
         // Reset last update times when going backwards in time
-        lastOverlayUpdateTime = timeManager.now * 1 - 7000
-        lastBoxUpdateTime = timeManager.now
-        _updateNextPassOverlay(true)
-        e.preventDefault()
-      })
-      $('#findByLooks').on('submit', function (e) {
-        var fblAzimuth = $('#fbl-azimuth').val()
-        var fblElevation = $('#fbl-elevation').val()
-        var fblRange = $('#fbl-range').val()
-        var fblInc = $('#fbl-inc').val()
-        var fblPeriod = $('#fbl-period').val()
-        var fblAzimuthM = $('#fbl-azimuth-margin').val()
-        var fblElevationM = $('#fbl-elevation-margin').val()
-        var fblRangeM = $('#fbl-range-margin').val()
-        var fblIncM = $('#fbl-inc-margin').val()
-        var fblPeriodM = $('#fbl-period-margin').val()
-        var fblType = $('#fbl-type').val()
-        $('#search').val('') // Reset the search first
+        lastOverlayUpdateTime = timeManager.now * 1 - 7000;
+        lastBoxUpdateTime = timeManager.now;
+        _updateNextPassOverlay(true);
+        e.preventDefault();
+      });
+      $('#findByLooks').on("submit", function (e) {
+        var fblAzimuth = $('#fbl-azimuth').val();
+        var fblElevation = $('#fbl-elevation').val();
+        var fblRange = $('#fbl-range').val();
+        var fblInc = $('#fbl-inc').val();
+        var fblPeriod = $('#fbl-period').val();
+        var fblRcs = $('#fbl-rcs').val();
+        var fblAzimuthM = $('#fbl-azimuth-margin').val();
+        var fblElevationM = $('#fbl-elevation-margin').val();
+        var fblRangeM = $('#fbl-range-margin').val();
+        var fblIncM = $('#fbl-inc-margin').val();
+        var fblPeriodM = $('#fbl-period-margin').val();
+        var fblRcsM = $('#fbl-rcs-margin').val();
+        var fblType = $('#fbl-type').val();
+        $('#search').val(''); // Reset the search first
         var res = satSet.searchAzElRange(
           fblAzimuth,
           fblElevation,
@@ -1216,8 +1218,10 @@ var speedModifier = 1
           fblIncM,
           fblPeriod,
           fblPeriodM,
-          fblType,
-        )
+          fblRcs,
+          fblRcsM,
+          fblType
+        );
         if (typeof res === 'undefined') {
           $('#fbl-error').html('No Search Criteria')
         } else if (res.length === 0) {
@@ -2067,11 +2071,11 @@ var speedModifier = 1
           var tgtLon = $('#ms-lon').val() * 1
           // var result = false;
 
-          var launchTime = timeManager.selectedDate
-          launchTime = launchTime.split(' ')
+          var launchTime = timeManager.selectedDate;
+          launchTime = launchTime.split(' ');
           launchTime = new Date(
-            launchTime[0] + 'T' + launchTime[1] + 'Z',
-          ).getTime()
+            launchTime[0] + 'T' + launchTime[1] + 'Z'
+          ).getTime();
 
           if (type > 0) {
             if (type === 1)
@@ -5182,13 +5186,13 @@ var speedModifier = 1
   uiManager.colorSchemeChangeAlert = (scheme) => {
     // Don't Make an alert the first time!
     if (typeof uiManager.lastColorScheme == 'undefined' && scheme.default) {
-      uiManager.lastColorScheme = scheme
+      uiManager.lastColorScheme = scheme;
       return
     }
 
     // Don't make an alert unless something has really changed
     if (uiManager.lastColorScheme == scheme) return
-    uiManager.lastColorScheme = scheme
+    uiManager.lastColorScheme = scheme;
     for (var i = 0; i < Object.keys(ColorScheme).length; i++) {
       if (scheme == ColorScheme[Object.keys(ColorScheme)[i]]) {
         M.toast({

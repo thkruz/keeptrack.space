@@ -63,14 +63,14 @@ var maxPinchSize = 1
       $('#search-holder').addClass('search-slide-up')
       $('#search-icon').removeClass('search-icon-search-on')
       setTimeout(function () {
-        $('#fullscreen-icon').removeClass('top-menu-icons-search-on')
-        $('#tutorial-icon').removeClass('top-menu-icons-search-on')
-        $('#legend-icon').removeClass('top-menu-icons-search-on')
-      }, 500)
-      uiManager.hideSideMenus()
-      searchBox.hideResults()
-      isMilSatSelected = false
-      $('#menu-space-stations').removeClass('bmenu-item-selected')
+        $('#fullscreen-icon').removeClass('top-menu-icons-search-on');
+        $('#tutorial-icon').removeClass('top-menu-icons-search-on');
+        $('#legend-icon').removeClass('top-menu-icons-search-on');
+      }, 500);
+      uiManager.hideSideMenus();
+      searchBox.hideResults();
+      isMilSatSelected = false;
+      $('#menu-space-stations').removeClass('bmenu-item-selected');
 
       // This is getting called too much. Not sure what it was meant to prevent?
       // satSet.setColorScheme(ColorScheme.default, true);

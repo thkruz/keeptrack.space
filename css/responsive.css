@@ -1,245 +1,245 @@
 /* MEDIA @ 1301px */
 
 @media (min-width: 1301px) {
-  #fullscreen-icon {
-    display: none;
-  }
-  #datetime {
-    position: fixed;
-    top: 1px;
-    z-index: 11;
-    left: 55px;
-    width: 240px;
-    height: 25px;
-    background: transparent;
-    overflow: hidden;
-  }
-  #datetime-input {
-    position: absolute;
-    bottom: 10px;
-    display: none;
-  }
-  #datetime-input-tb {
-    color: white;
-    font-family: 'Open Sans', sans-serif;
-    padding: 10px 10px 11px 10px;
-    /* Moves it below screen */
-    height: 0px !important;
-    margin: 0 0 55px 0 !important;
-  }
-  #datetime-input-tb:focus,
-  input:focus {
-    outline: none;
-  }
-  #datetime-title {
-    position: absolute;
-    left: 20px;
-    bottom: 20px;
-    width: 220px;
-    height: 30px;
-    background: transparent;
-    overflow: hidden;
-    text-align: center;
-    font-weight: bold;
-    font-size: 12px;
-  }
-  #datetime-text:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
-  }
-  .top-menu-icons {
-    display: inline-flex;
-    transition: 1s;
-    width: 25px;
-    height: 25px;
-    padding: 0px;
-  }
-  .top-menu-btns {
-    padding: 0px 5px !important;
-    height: 25px !important;
-  }
-  .top-menu-icons img {
-    width: 25px;
-    height: 25px;
-    margin: 0px;
-  }
-  #share-icon {
-    display: none;
-  }
-  #search-results {
-    display: none;
-    position: absolute;
-    right: 0px;
-    width: 230px;
-    background: #1f3347 !important;
-    z-index: 1;
-    top: 0px;
-    margin-top: 25px;
-    margin-bottom: -50px;
-    max-height: 100%;
-    border-width: 0px 0px 5px 5px;
-    border-style: solid;
-    border-color: #172635;
-  }
-  #search-holder {
-    right: 0px;
-    top: 0px;
-    display: inline-flex;
-  }
-  #search {
-    height: 16px;
-    margin: 0;
-    padding-top: 5px;
-  }
-  #ui-datepicker-div {
-    top: 25px !important;
-    border-radius: 0px;
-  }
-  #time-machine-menu {
-    padding-left: 35px;
-    color: white;
-    background: #1f3347;
-    width: 300px;
-    top: 25px;
-    right: 0px;
-    z-index: 100;
-    position: absolute;
-    overflow: auto;
-    border-width: 0px 0px 5px 5px;
-    border-style: solid;
-    border-color: #172635;
-  }
-  #legend-hover-menu {
-    padding-left: 35px;
-    color: white;
-    background: #1f3347;
-    width: 300px;
-    top: 25px;
-    right: 0px;
-    z-index: 100;
-    position: absolute;
-    overflow: auto;
-    border-width: 0px 0px 5px 5px;
-    border-style: solid;
-    border-color: #172635;
-  }
-  .side-menu {
-    position: absolute;
-    background: #1f3347;
-    color: white;
-    width: 260px;
-    top: 25px;
-    bottom: 100px;
-    overflow: auto;
-    z-index: 10;
-    padding: 0px 5px 0px 0px;
-    border-width: 0px 5px 0px 0px;
-    border-color: #172635;
-    border-style: solid;
-  }
-  nav,
-  nav .nav-wrapper i,
-  nav a.sidenav-trigger,
-  nav a.sidenav-trigger i {
-    height: 25px;
-    line-height: 25px;
-  }
-  #lookanglesmultisite-content {
-    width: 375px;
-  }
-  #dops-content {
-    width: 375px;
-  }
-  #menu-satellite-collision,
-  #menu-find-sat {
-    display: inline;
-  }
-  #sat-infobox {
-    display: none;
-    background: #1f3347;
-    cursor: default;
-    position: absolute;
-    top: 27%;
-    bottom: 0px;
-    margin-top: 25px;
-    padding: 0 10px 0px 10px;
-    right: 0px;
-    width: 230px;
-    border-width: 5px 0px 0px 5px;
-    border-color: #172635;
-    border-style: solid;
-    overflow: auto;
-  }
-  #sat-infobox:after {
-    content: '';
-    height: 100px;
-    display: block;
-  }
-  /* .sat-infobox-fullsize {} */
-  .sat-info-value {
-    float: right;
-    width: 100px;
-    height: 20px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-  #footer-toggle-wrapper {
-    width: 100%;
-    bottom: 100px;
-    z-index: 1;
-    position: absolute;
-  }
-  .footer-slide-down {
-    transition: 1s;
-    bottom: -100px !important;
-  }
-  .footer-slide-up {
-    transition: 1s;
-    bottom: 0px !important;
-  }
-  footer {
-    margin-top: -100px;
-    position: absolute;
-    bottom: 0px;
-    height: 100px;
-    width: 100%;
-  }
-  #jday {
-    display: block;
-    padding-left: 10px;
-  }
-  #social {
-    display: block;
-    margin-top: -75px;
-    margin-right: 90px;
-  }
-  #menu-space-stations,
-  #menu-launches {
-    display: inline;
-  }
-  #fastCompSettings {
-    display: block;
-  }
-  #social-alt,
-  #mobile-warning {
-    display: none;
-  }
-  #version-info {
-    display: block;
-    margin-top: -70px !important;
-    margin-right: 25px !important;
-  }
-  .search-slide-down {
-    transition: 1s;
-    margin-right: 0px;
-    padding-right: 25px;
-  }
-  .search-slide-up {
-    transition: 1s;
-    margin-right: -300px;
-    margin-left: 110px;
-    padding-left: 25px;
-  }
+    #fullscreen-icon {
+        display: none;
+    }
+    #datetime {
+        position: fixed;
+        top: 1px;
+        z-index: 11;
+        left: 55px;
+        width: 240px;
+        height: 25px;
+        background: transparent;
+        overflow: hidden;
+    }
+    #datetime-input {
+        position: absolute;
+        bottom: 10px;
+        display: none;
+    }
+    #datetime-input-tb {
+        color: white;
+        font-family: 'Open Sans', sans-serif;
+        padding: 10px 10px 11px 10px;
+        /* Moves it below screen */
+        height: 0px !important;
+        margin: 0 0 55px 0 !important;
+    }
+    #datetime-input-tb:focus,
+    input:focus {
+        outline: none;
+    }
+    #datetime-title {
+        position: absolute;
+        left: 20px;
+        bottom: 20px;
+        width: 220px;
+        height: 30px;
+        background: transparent;
+        overflow: hidden;
+        text-align: center;
+        font-weight: bold;
+        font-size: 12px;
+    }
+    #datetime-text:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+    }
+    .top-menu-icons {
+        display: inline-flex;
+        transition: 1s;
+        width: 25px;
+        height: 25px;
+        padding: 0px;
+    }
+    .top-menu-btns {
+        padding: 0px 5px !important;
+        height: 25px !important;
+    }
+    .top-menu-icons img {
+        width: 25px;
+        height: 25px;
+        margin: 0px;
+    }
+    #share-icon {
+        display: none;
+    }
+    #search-results {
+        display: none;
+        position: absolute;
+        right: 0px;
+        width: 230px;
+        background: #1f3347 !important;
+        z-index: 1;
+        top: 0px;
+        margin-top: 25px;
+        margin-bottom: -50px;
+        max-height: 100%;
+        border-width: 0px 0px 5px 5px;
+        border-style: solid;
+        border-color: #172635;
+    }
+    #search-holder {
+        right: 0px;
+        top: 0px;
+        display: inline-flex;
+    }
+    #search {
+        height: 16px;
+        margin: 0;
+        padding-top: 5px;
+    }
+    #ui-datepicker-div {
+        top: 25px !important;
+        border-radius: 0px;
+    }
+    #time-machine-menu {
+        padding-left: 35px;
+        color: white;
+        background: #1f3347;
+        width: 300px;
+        top: 25px;
+        right: 0px;
+        z-index: 100;
+        position: absolute;
+        overflow: auto;
+        border-width: 0px 0px 5px 5px;
+        border-style: solid;
+        border-color: #172635;
+    }
+    #legend-hover-menu {
+        padding-left: 35px;
+        color: white;
+        background: #1f3347;
+        width: 300px;
+        top: 25px;
+        right: 0px;
+        z-index: 100;
+        position: absolute;
+        overflow: auto;
+        border-width: 0px 0px 5px 5px;
+        border-style: solid;
+        border-color: #172635;
+    }
+    .side-menu {
+        position: absolute;
+        background: #1f3347;
+        color: white;
+        width: 260px;
+        top: 25px;
+        bottom: 100px;
+        overflow: auto;
+        z-index: 10;
+        padding: 0px 5px 0px 0px;
+        border-width: 0px 5px 0px 0px;
+        border-color: #172635;
+        border-style: solid;
+    }
+    nav,
+    nav .nav-wrapper i,
+    nav a.sidenav-trigger,
+    nav a.sidenav-trigger i {
+        height: 25px;
+        line-height: 25px;
+    }
+    #lookanglesmultisite-content {
+        width: 375px;
+    }
+    #dops-content {
+        width: 375px;
+    }
+    #menu-satellite-collision,
+    #menu-find-sat {
+        display: inline;
+    }
+    #sat-infobox {
+        display: none;
+        background: #1f3347;
+        cursor: default;
+        position: absolute;
+        top: 27%;
+        bottom: 0px;
+        margin-top: 25px;
+        padding: 0 10px 0px 10px;
+        right: 0px;
+        width: 230px;
+        border-width: 5px 0px 0px 5px;
+        border-color: #172635;
+        border-style: solid;
+        overflow: auto;
+    }
+    #sat-infobox:after {
+        content: '';
+        height: 100px;
+        display: block;
+    }
+    /* .sat-infobox-fullsize {} */
+    .sat-info-value {
+        float: right;
+        width: 100px;
+        height: 20px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    #footer-toggle-wrapper {
+        width: 100%;
+        bottom: 100px;
+        z-index: 1;
+        position: absolute;
+    }
+    .footer-slide-down {
+        transition: 1s;
+        bottom: -100px !important;
+    }
+    .footer-slide-up {
+        transition: 1s;
+        bottom: 0px !important;
+    }
+    footer {
+        margin-top: -100px;
+        position: absolute;
+        bottom: 0px;
+        height: 100px;
+        width: 100%;
+    }
+    #jday {
+        display: block;
+        padding-left: 10px;
+    }
+    #social {
+        display: block;
+        margin-top: -75px;
+        margin-right: 90px;
+    }
+    #menu-space-stations,
+    #menu-launches {
+        display: inline;
+    }
+    #fastCompSettings {
+        display: block;
+    }
+    #social-alt,
+    #mobile-warning {
+        display: none;
+    }
+    #version-info {
+        display: block;
+        margin-top: -70px !important;
+        margin-right: 25px !important;
+    }
+    .search-slide-down {
+        transition: 1s;
+        margin-right: 0px;
+        padding-right: 25px;
+    }
+    .search-slide-up {
+        transition: 1s;
+        margin-right: -300px;
+        margin-left: 110px;
+        padding-left: 25px;
+    }
 }
 /* MEDIA @ 1301px */
 
@@ -248,86 +248,86 @@
 /* MEDIA @ 695px & 1300px */
 
 @media (min-width: 695px) and (max-width: 1300px) {
-  .side-menu {
-    position: absolute;
-    background: #1f3347;
-    color: white;
-    width: 260px;
-    top: 50px;
-    bottom: 100px;
-    overflow: auto;
-    z-index: 10;
-    padding: 0px 5px 0px 0px;
-  }
-  #lookanglesmultisite-content {
-    width: 375px;
-  }
-  #dops-content {
-    width: 375px;
-  }
-  #menu-satellite-collision,
-  #menu-find-sat {
-    display: inline;
-  }
-  #sat-infobox {
-    display: none;
-    background: #1f3347;
-    cursor: default;
-    position: absolute;
-    top: 60%;
-    bottom: 0px;
-    margin-top: 25px;
-    padding: 0 10px 0px 10px;
-    right: 0px;
-    border-top: 5px;
-    border-top-color: #172635;
-    border-top-style: solid;
-    overflow: auto;
-  }
-  #sat-infobox:after {
-    content: '';
-    height: 100px;
-    display: block;
-  }
-  .sat-infobox-fullsize {
-    padding: 0 10px 0px 10px !important;
-  }
-  .sat-info-value {
-    float: right;
-    width: 45%;
-    height: 20px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-  footer {
-    margin-top: -100px;
-    position: absolute;
-    bottom: 0px;
-    height: 100px;
-    width: 100%;
-  }
-  #bottom-icons-container {
-    width: 100%;
-    height: 100px;
-  }
-  #footer-toggle-wrapper {
-    width: 100%;
-    bottom: 100px;
-    z-index: 1;
-    position: absolute;
-  }
-  .footer-slide-down {
-    transition: 1s;
-    bottom: -100px !important;
-  }
-  .footer-slide-up {
-    transition: 1s;
-    bottom: 0px !important;
-  }
-  .ui-timepicker-div dl dd div {
-    width: 60px !important;
-    margin-left: -35px !important;
-  }
+    .side-menu {
+        position: absolute;
+        background: #1f3347;
+        color: white;
+        width: 260px;
+        top: 50px;
+        bottom: 100px;
+        overflow: auto;
+        z-index: 10;
+        padding: 0px 5px 0px 0px;
+    }
+    #lookanglesmultisite-content {
+        width: 375px;
+    }
+    #dops-content {
+        width: 375px;
+    }
+    #menu-satellite-collision,
+    #menu-find-sat {
+        display: inline;
+    }
+    #sat-infobox {
+        display: none;
+        background: #1f3347;
+        cursor: default;
+        position: absolute;
+        top: 60%;
+        bottom: 0px;
+        margin-top: 25px;
+        padding: 0 10px 0px 10px;
+        right: 0px;
+        border-top: 5px;
+        border-top-color: #172635;
+        border-top-style: solid;
+        overflow: auto;
+    }
+    #sat-infobox:after {
+        content: '';
+        height: 100px;
+        display: block;
+    }
+    .sat-infobox-fullsize {
+        padding: 0 10px 0px 10px !important;
+    }
+    .sat-info-value {
+        float: right;
+        width: 45%;
+        height: 20px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    footer {
+        margin-top: -100px;
+        position: absolute;
+        bottom: 0px;
+        height: 100px;
+        width: 100%;
+    }
+    #bottom-icons-container {
+        width: 100%;
+        height: 100px;
+    }
+    #footer-toggle-wrapper {
+        width: 100%;
+        bottom: 100px;
+        z-index: 1;
+        position: absolute;
+    }
+    .footer-slide-down {
+        transition: 1s;
+        bottom: -100px !important;
+    }
+    .footer-slide-up {
+        transition: 1s;
+        bottom: 0px !important;
+    }
+    .ui-timepicker-div dl dd div {
+        width: 60px !important;
+        margin-left: -35px !important;
+    }
 }
 /* MEDIA @ 695px & 1300px */
 
@@ -336,189 +336,189 @@
 /* MEDIA @ 1300px */
 
 @media (max-width: 1300px) {
-  #social-alt {
-    display: block;
-    position: absolute;
-    top: 0px;
-    height: 50px;
-  }
+    #social-alt {
+        display: block;
+        position: absolute;
+        top: 0px;
+        height: 50px;
+    }
 
-  #datetime {
-    top: 15px;
-    height: 26px;
-    position: fixed;
-    z-index: 11;
-    left: 120px;
-    width: 110px;
-    background: transparent;
-    overflow: hidden;
-  }
+    #datetime {
+        top: 15px;
+        height: 26px;
+        position: fixed;
+        z-index: 11;
+        left: 120px;
+        width: 110px;
+        background: transparent;
+        overflow: hidden;
+    }
 
-  #nav-mobile {
-    display: inline-block;
-  }
+    #nav-mobile {
+        display: inline-block;
+    }
 
-  #github-share1 {
-    display: none;
-  }
+    #github-share1 {
+        display: none;
+    }
 
-  #twitter-share1 {
-    display: none;
-  }
+    #twitter-share1 {
+        display: none;
+    }
 
-  #menu-space-stations,
-  #menu-launches,
-  #menu-record,
-  #menu-twitter,
-  #menu-color-scheme,
-  #social,
-  #version-info,
-  #fastCompSettings {
-    display: none;
-  }
-  #mobile-warning {
-    display: block;
-    margin-top: 10px;
-    color: #48f3e3 !important;
-  }
-  #ui-datepicker-div {
-    top: 50px !important;
-    border-radius: 0px;
-  }
-  .ui-timepicker-div dl {
-    text-align: center !important;
-  }
-  /* #sat-hoverbox {
+    #menu-space-stations,
+    #menu-launches,
+    #menu-record,
+    #menu-twitter,
+    #menu-color-scheme,
+    #social,
+    #version-info,
+    #fastCompSettings {
+        display: none;
+    }
+    #mobile-warning {
+        display: block;
+        margin-top: 10px;
+        color: #48f3e3 !important;
+    }
+    #ui-datepicker-div {
+        top: 50px !important;
+        border-radius: 0px;
+    }
+    .ui-timepicker-div dl {
+        text-align: center !important;
+    }
+    /* #sat-hoverbox {
     display: none !important;
   } */
-  .top-menu-icons {
-    /* display: inline-flex; */
-    transition: 1s;
-    /* width: 50px; */
-    height: 50px;
-    padding: 0px 20px;
-  }
-  .search-icon-search-on {
-    transition: 1s;
-    /* margin-right: 175px; */
-    /* position: absolute; */
-  }
-  .top-menu-icons img {
-    width: 35px;
-    height: 35px;
-    margin: 8px -15px;
-  }
-  #search-results {
-    display: none;
-    position: absolute;
-    right: 0px;
-    width: 100%;
-    background: #1f3347 !important;
-    z-index: 1;
-    top: 50px;
-    bottom: 250px;
-    max-height: 20%;
-    border-width: 0px 0px 5px 0px;
-    border-style: solid;
-    border-color: #172635;
-  }
-  #search-holder {
-    display: flex;
-    top: 0px;
-    height: 50px;
-  }
-  #search {
-    padding-bottom: 5px;
-    height: 16px;
-    margin: 0;
-    margin-top: 15px;
-  }
-  #search-holder input:-webkit-autofill {
-    box-shadow: 0 0 0px 1000px #172635 inset;
-    background-color: #172635 !important;
-    -webkit-text-fill-color: white !important;
-    color: white !important;
-  }
-  #search-close {
-    padding: 0px 6.25%;
-    font-size: 24px;
-  }
-  .top-menu-btns {
-    padding: 0px 5px !important;
-    height: 50px !important;
-  }
-  .github-share-down {
-    transition: 1s;
-    top: 50px !important;
-  }
-  .twitter-share-down {
-    transition: 1s;
-    top: 100px !important;
-  }
-  .reddit-share-down {
-    transition: 1s;
-    border-bottom-right-radius: 10px;
-    top: 150px !important;
-  }
-  .share-icons {
-    position: absolute;
-    left: 0px;
-    z-index: 1;
-    width: 50px;
-    height: 50px;
-    padding: 9px;
-    background: #1f3347 !important;
-  }
-  .share-up {
-    transition: 1s;
-    top: 0px !important;
-  }
-  #time-machine-menu {
-    padding-left: 35px;
-    color: white;
-    background: #1f3347;
-    top: 50px;
-    right: 0px;
-    z-index: 100;
-    position: absolute;
-    overflow: auto;
-    width: 100%;
-    border-width: 0px 0px 5px 0px;
-    border-style: solid;
-    border-color: #172635;
-  }
-  #legend-hover-menu {
-    padding-left: 35px;
-    color: white;
-    background: #1f3347;
-    top: 50px;
-    right: 0px;
-    z-index: 100;
-    position: absolute;
-    overflow: auto;
-    width: 100%;
-    border-width: 0px 0px 5px 0px;
-    border-style: solid;
-    border-color: #172635;
-  }
-  nav,
-  nav .nav-wrapper i,
-  nav a.sidenav-trigger,
-  nav a.sidenav-trigger i {
-    height: 50px;
-    line-height: 50px;
-  }
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  .search-slide-down input[type='search'] {
-    transition: 1s;
-    width: 180px;
-  }
-  .search-slide-up input[type='search'] {
-    transition: 1s;
-    width: 0px;
-  }
+    .top-menu-icons {
+        /* display: inline-flex; */
+        transition: 1s;
+        /* width: 50px; */
+        height: 50px;
+        padding: 0px 20px;
+    }
+    .search-icon-search-on {
+        transition: 1s;
+        /* margin-right: 175px; */
+        /* position: absolute; */
+    }
+    .top-menu-icons img {
+        width: 35px;
+        height: 35px;
+        margin: 8px -15px;
+    }
+    #search-results {
+        display: none;
+        position: absolute;
+        right: 0px;
+        width: 100%;
+        background: #1f3347 !important;
+        z-index: 1;
+        top: 50px;
+        bottom: 250px;
+        max-height: 20%;
+        border-width: 0px 0px 5px 0px;
+        border-style: solid;
+        border-color: #172635;
+    }
+    #search-holder {
+        display: flex;
+        top: 0px;
+        height: 50px;
+    }
+    #search {
+        padding-bottom: 5px;
+        height: 16px;
+        margin: 0;
+        margin-top: 15px;
+    }
+    #search-holder input:-webkit-autofill {
+        box-shadow: 0 0 0px 1000px #172635 inset;
+        background-color: #172635 !important;
+        -webkit-text-fill-color: white !important;
+        color: white !important;
+    }
+    #search-close {
+        padding: 0px 6.25%;
+        font-size: 24px;
+    }
+    .top-menu-btns {
+        padding: 0px 5px !important;
+        height: 50px !important;
+    }
+    .github-share-down {
+        transition: 1s;
+        top: 50px !important;
+    }
+    .twitter-share-down {
+        transition: 1s;
+        top: 100px !important;
+    }
+    .reddit-share-down {
+        transition: 1s;
+        border-bottom-right-radius: 10px;
+        top: 150px !important;
+    }
+    .share-icons {
+        position: absolute;
+        left: 0px;
+        z-index: 1;
+        width: 50px;
+        height: 50px;
+        padding: 9px;
+        background: #1f3347 !important;
+    }
+    .share-up {
+        transition: 1s;
+        top: 0px !important;
+    }
+    #time-machine-menu {
+        padding-left: 35px;
+        color: white;
+        background: #1f3347;
+        top: 50px;
+        right: 0px;
+        z-index: 100;
+        position: absolute;
+        overflow: auto;
+        width: 100%;
+        border-width: 0px 0px 5px 0px;
+        border-style: solid;
+        border-color: #172635;
+    }
+    #legend-hover-menu {
+        padding-left: 35px;
+        color: white;
+        background: #1f3347;
+        top: 50px;
+        right: 0px;
+        z-index: 100;
+        position: absolute;
+        overflow: auto;
+        width: 100%;
+        border-width: 0px 0px 5px 0px;
+        border-style: solid;
+        border-color: #172635;
+    }
+    nav,
+    nav .nav-wrapper i,
+    nav a.sidenav-trigger,
+    nav a.sidenav-trigger i {
+        height: 50px;
+        line-height: 50px;
+    }
+    ::-webkit-scrollbar {
+        display: none;
+    }
+    .search-slide-down input[type='search'] {
+        transition: 1s;
+        width: 180px;
+    }
+    .search-slide-up input[type='search'] {
+        transition: 1s;
+        width: 0px;
+    }
 }
 /* MEDIA @ 695px & 1300px */
 
@@ -527,104 +527,104 @@
 /* MEDIA @ 694px */
 
 @media (max-width: 694px) {
-  .material-tooltip {
-    display: none !important;
-  }
+    .material-tooltip {
+        display: none !important;
+    }
 
-  #datetime {
-    left: 40px;
-  }
+    #datetime {
+        left: 40px;
+    }
 
-  #datetime-text {
-    width: 111px;
-    padding: 0px;
-    border-width: 0px;
-  }
+    #datetime-text {
+        width: 111px;
+        padding: 0px;
+        border-width: 0px;
+    }
 
-  #jday {
-    display: none;
-  }
+    #jday {
+        display: none;
+    }
 
-  #sat-infobox {
-    display: none;
-    background: #1f3347;
-    cursor: default;
-    position: absolute;
-    top: 60%;
-    bottom: 0px;
-    margin-top: 25px;
-    padding: 0 10px 0px 10px;
-    right: 0px;
-    width: 100%;
-    border-top: 5px;
-    border-top-color: #172635;
-    border-top-style: solid;
-    overflow: auto;
-  }
-  #sat-infobox:after {
-    content: '';
-    height: 150px;
-    display: block;
-  }
-  .sat-infobox-fullsize {
-    padding: 0 10px 0px 10px !important;
-  }
-  .sat-info-value {
-    float: right;
-    width: 45%;
-    height: 20px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-  #bottom-icons-container {
-    width: 100%;
-    height: 100%;
-    overflow: scroll;
-  }
-  #footer-toggle-wrapper {
-    width: 100%;
-    bottom: 150px;
-    z-index: 1;
-    position: absolute;
-  }
-  .footer-slide-down {
-    transition: 1s;
-    bottom: -150px !important;
-  }
-  .footer-slide-up {
-    transition: 1s;
-    bottom: 0px !important;
-  }
-  footer {
-    margin-top: -100px;
-    position: absolute;
-    bottom: 0px;
-    height: 150px;
-    width: 100%;
-  }
-  .side-menu {
-    position: absolute;
-    background: #1f3347;
-    color: white;
-    width: 100%;
-    top: 50px;
-    bottom: 0px;
-    overflow: auto;
-    z-index: 10;
-    padding: 0px 5px 150px 0px;
-  }
+    #sat-infobox {
+        display: none;
+        background: #1f3347;
+        cursor: default;
+        position: absolute;
+        top: 60%;
+        bottom: 0px;
+        margin-top: 25px;
+        padding: 0 10px 0px 10px;
+        right: 0px;
+        width: 100%;
+        border-top: 5px;
+        border-top-color: #172635;
+        border-top-style: solid;
+        overflow: auto;
+    }
+    #sat-infobox:after {
+        content: '';
+        height: 150px;
+        display: block;
+    }
+    .sat-infobox-fullsize {
+        padding: 0 10px 0px 10px !important;
+    }
+    .sat-info-value {
+        float: right;
+        width: 45%;
+        height: 20px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    #bottom-icons-container {
+        width: 100%;
+        height: 100%;
+        overflow: scroll;
+    }
+    #footer-toggle-wrapper {
+        width: 100%;
+        bottom: 150px;
+        z-index: 1;
+        position: absolute;
+    }
+    .footer-slide-down {
+        transition: 1s;
+        bottom: -150px !important;
+    }
+    .footer-slide-up {
+        transition: 1s;
+        bottom: 0px !important;
+    }
+    footer {
+        margin-top: -100px;
+        position: absolute;
+        bottom: 0px;
+        height: 150px;
+        width: 100%;
+    }
+    .side-menu {
+        position: absolute;
+        background: #1f3347;
+        color: white;
+        width: 100%;
+        top: 50px;
+        bottom: 0px;
+        overflow: auto;
+        z-index: 10;
+        padding: 0px 5px 150px 0px;
+    }
 
-  .ui-slider {
-    width: 160px !important;
-  }
+    .ui-slider {
+        width: 160px !important;
+    }
 
-  #ui-datepicker-div {
-    top: auto !important;
-    width: 100% !important;
-    bottom: 0px !important;
-    left: 0px !important;
-    border-radius: 0px !important;
-  }
+    #ui-datepicker-div {
+        top: auto !important;
+        width: 100% !important;
+        bottom: 0px !important;
+        left: 0px !important;
+        border-radius: 0px !important;
+    }
 }
 
 /* MEDIA @ 694px */
@@ -632,20 +632,20 @@
 /* MEDIA @ 320px */
 
 @media (max-width: 320px) {
-  #search {
-    padding-bottom: 5px;
-    height: 16px;
-    margin: 0;
-    margin-top: 15px;
-  }
-  .search-slide-down input[type='search'] {
-    transition: 1s;
-    width: 140px;
-  }
-  .search-slide-up input[type='search'] {
-    transition: 1s;
-    width: 0px;
-  }
+    #search {
+        padding-bottom: 5px;
+        height: 16px;
+        margin: 0;
+        margin-top: 15px;
+    }
+    .search-slide-down input[type='search'] {
+        transition: 1s;
+        width: 140px;
+    }
+    .search-slide-up input[type='search'] {
+        transition: 1s;
+        width: 0px;
+    }
 }
 
 /* MEDIA @ 320px */

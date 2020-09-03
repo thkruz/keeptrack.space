@@ -1,7 +1,7 @@
 // Used in UI.js
 
-;(function () {
-  /*
+(function () {
+    /*
   map.js was created by Theodore Kruczek using the work of
   Julius Tens' "projections" library (https://github.com/juliuste/projections).
   This file is exclusively released under the same license as the original author.
@@ -28,76 +28,78 @@
 
   */
 
-  'use strict'
-  var mapManager = {}
-  var rad = function (deg) {
-    return (deg * Math.PI) / 180
-  }
-  var tan = function (deg) {
-    return Math.tan(rad(deg))
-  }
-  var deg = function (rad) {
-    return (rad * 180) / Math.PI
-  }
+    'use strict';
+    var mapManager = {};
+    var rad = function (deg) {
+        return (deg * Math.PI) / 180;
+    };
+    var tan = function (deg) {
+        return Math.tan(rad(deg));
+    };
+    var deg = function (rad) {
+        return (rad * 180) / Math.PI;
+    };
 
-  var defaults = {
-    meridian: 0,
-    standardParallel: 0,
-    latLimit: 90,
-  }
+    var defaults = {
+        meridian: 0,
+        standardParallel: 0,
+        latLimit: 90,
+    };
 
-  mapManager.options = function (opt) {
-    return Object.assign({}, defaults, opt || {})
-  }
-  mapManager.braun = function (point, opt) {
-    point = _check(point)
-    // opt = options(opt);
-    if (point.wgs) {
-      point = _addMeridian(point, opt.meridian)
-      return {
-        x: rad(point.lon) / (2 * Math.PI) + 0.5,
-        y: (tan(opt.latLimit / 2) - tan(point.lat / 2)) / Math.PI,
-      }
-    } else {
-      var result = {
-        lon: deg((2 * point.x - 1) * Math.PI),
-        lat: deg(2 * Math.atan(tan(opt.latLimit / 2) - point.y * Math.PI)),
-      }
-      return _addMeridian(result, opt.meridian * -1)
-    }
-  }
+    mapManager.options = function (opt) {
+        return Object.assign({}, defaults, opt || {});
+    };
+    mapManager.braun = function (point, opt) {
+        point = _check(point);
+        // opt = options(opt);
+        if (point.wgs) {
+            point = _addMeridian(point, opt.meridian);
+            return {
+                x: rad(point.lon) / (2 * Math.PI) + 0.5,
+                y: (tan(opt.latLimit / 2) - tan(point.lat / 2)) / Math.PI,
+            };
+        } else {
+            var result = {
+                lon: deg((2 * point.x - 1) * Math.PI),
+                lat: deg(
+                    2 * Math.atan(tan(opt.latLimit / 2) - point.y * Math.PI)
+                ),
+            };
+            return _addMeridian(result, opt.meridian * -1);
+        }
+    };
 
-  function _check(point) {
-    if (
-      point.x !== undefined &&
-      point.x >= 0 &&
-      point.x <= 1 &&
-      point.y !== undefined &&
-      point.lon === undefined &&
-      point.lat === undefined
-    ) {
-      return { x: +point.x, y: +point.y, wgs: false }
+    function _check(point) {
+        if (
+            point.x !== undefined &&
+            point.x >= 0 &&
+            point.x <= 1 &&
+            point.y !== undefined &&
+            point.lon === undefined &&
+            point.lat === undefined
+        ) {
+            return { x: +point.x, y: +point.y, wgs: false };
+        }
+        if (
+            point.lon !== undefined &&
+            point.lat !== undefined &&
+            point.x === undefined &&
+            point.y === undefined
+        ) {
+            return { lon: +point.lon, lat: +point.lat, wgs: true };
+        }
+        throw new Error('Invalid input point.');
     }
-    if (
-      point.lon !== undefined &&
-      point.lat !== undefined &&
-      point.x === undefined &&
-      point.y === undefined
-    ) {
-      return { lon: +point.lon, lat: +point.lat, wgs: true }
+    function _addMeridian(point, meridian) {
+        point = _check(point);
+        if (meridian !== 0) {
+            return _check({
+                lon: ((point.lon + 180 + 360 - meridian) % 360) - 180,
+                lat: point.lat,
+            });
+        }
+        return point;
     }
-    throw new Error('Invalid input point.')
-  }
-  function _addMeridian(point, meridian) {
-    point = _check(point)
-    if (meridian !== 0) {
-      return _check({
-        lon: ((point.lon + 180 + 360 - meridian) % 360) - 180,
-        lat: point.lat,
-      })
-    }
-    return point
-  }
 
-  window.mapManager = mapManager
-})()
+    window.mapManager = mapManager;
+})();

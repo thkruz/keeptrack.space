@@ -1706,7 +1706,6 @@ function _demoMode() {
     }
 }
 
-
 function _fixDpi(canvas, dpi) {
     //create a style object that returns width and height
     let style = {

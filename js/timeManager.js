@@ -211,30 +211,31 @@
         return now;
     };
 
-  timeManager.setPropRateZero = function () {
-    timeManager.propRate = 0
-    propFrozen = Date.now()
-  }
-  timeManager.getPropOffset = function () {
-    // timeManager.selectedDate = $('#datetime-text').text().substr(0, 19);
-    if (!timeManager.selectedDate) return;
-    // selectedDate = selectedDate.split(' ');
-    // selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
-    var today = new Date();
-    // Not using local scope caused time to drift backwards!
-    let propOffset = timeManager.selectedDate - today;
-    return timeManager.propOffset;
-  };
+    timeManager.setPropRateZero = function () {
+        timeManager.propRate = 0;
+        propFrozen = Date.now();
+    };
+    timeManager.getPropOffset = function () {
+        // timeManager.selectedDate = $('#datetime-text').text().substr(0, 19);
+        if (!timeManager.selectedDate) return;
+        // selectedDate = selectedDate.split(' ');
+        // selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
+        var today = new Date();
+        // Not using local scope caused time to drift backwards!
+        let propOffset = timeManager.selectedDate - today;
+        return timeManager.propOffset;
+    };
 
-  timeManager.dateToISOLikeButLocal = function(date) {
-    var offsetMs = date.getTimezoneOffset() * 60 * 1000;
-    var msLocal =  date.getTime() - offsetMs;
-    var dateLocal = new Date(msLocal);
-    var iso = dateLocal.toISOString();
-    iso = iso.replace('T', ' ');
-    var isoLocal = iso.slice(0, 19) + ' ' + dateLocal.toString().slice(25,31);
-    return isoLocal;
-  };
+    timeManager.dateToISOLikeButLocal = function (date) {
+        var offsetMs = date.getTimezoneOffset() * 60 * 1000;
+        var msLocal = date.getTime() - offsetMs;
+        var dateLocal = new Date(msLocal);
+        var iso = dateLocal.toISOString();
+        iso = iso.replace('T', ' ');
+        var isoLocal =
+            iso.slice(0, 19) + ' ' + dateLocal.toString().slice(25, 31);
+        return isoLocal;
+    };
 
     timeManager.localToZulu = function (date) {
         date = timeManager.dateFormat(date, 'isoDateTime', true);

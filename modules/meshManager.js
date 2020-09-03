@@ -61,23 +61,23 @@
     precision mediump float;
 
     varying vec3 vLightDirection;
+    varying float vInSun;
     varying vec3 vTransformedNormal;
     varying vec2 vTextureCoord;
     varying vec4 vPosition;
+    varying vec3 vAmbient;
     varying vec3 vDiffuse;
     varying vec3 vSpecular;
     varying float vSpecularExponent;
 
     void main(void) {
-      float diffuse = max(dot(vTransformedNormal, vLightDirection), 0.0);
+      float lightAmt = max(dot(vTransformedNormal, vLightDirection), 0.0);
 
-      vec3 baseColor = vec3(1.0,1.0,1.0);
-      vec3 ambientColor = vec3(1.0,1.0,1.0) * diffuse * 5.0;
-      vec3 dirColor = vec3(1.0,1.0,1.0) * diffuse * 10.0;
-      vec3 specColor = vSpecular * diffuse * 3.0;
-      vec3 bumpColor = vDiffuse * diffuse * 1.0;
+      vec3 ambientColor = vDiffuse * 0.1;
+      vec3 dirColor = vDiffuse * vAmbient * lightAmt * min(vInSun,1.0);
+      vec3 specColor = vSpecular * lightAmt * min(vInSun,1.0);
 
-      vec3 color = baseColor * (ambientColor + dirColor + specColor + bumpColor);
+      vec3 color = ambientColor + dirColor + specColor;
 
       gl_FragColor = vec4(color, 1.0);
     }
@@ -87,6 +87,7 @@
     attribute vec3 aVertexNormal;
     attribute vec3 aSpecular;
     attribute float aSpecularExponent;
+    attribute vec3 aAmbient;
     attribute vec3 aDiffuse;
     attribute vec2 aTextureCoord;
 
@@ -95,21 +96,26 @@
     uniform mat4 uMvMatrix;
     uniform mat3 uNormalMatrix;
     uniform vec3 uLightDirection;
+    uniform float uInSun;
 
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
     varying vec4 vPosition;
     varying vec3 vLightDirection;
+    varying float vInSun;
 
+    varying vec3 vAmbient;
     varying vec3 vDiffuse;
     varying vec3 vSpecular;
     varying float vSpecularExponent;
 
     void main(void) {
       vLightDirection = uLightDirection;
+      vAmbient = aAmbient;
       vDiffuse = aDiffuse;
       vSpecular = aSpecular;
       vSpecularExponent = aSpecularExponent;
+      vInSun = uInSun;
 
       vPosition = uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
       gl_Position = uPMatrix * vPosition;

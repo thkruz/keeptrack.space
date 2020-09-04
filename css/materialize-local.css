@@ -1,17 +1,17 @@
 .page-footer {
-  background-color: #172635 !important;
+    background-color: #172635 !important;
 }
 
 .spinner-layer {
-  border-color: #ffffff;
+    border-color: #ffffff;
 }
 
 label {
-  color: #ffffff !important;
+    color: #ffffff !important;
 }
 
 .switch label input[type='checkbox']:checked + .lever:after {
-  background-color: rgb(255, 255, 255);
+    background-color: rgb(255, 255, 255);
 }
 
 /* Text inputs */
@@ -28,40 +28,40 @@ input[type='tel']:not(.browser-default),
 input[type='number']:not(.browser-default),
 input[type='search']:not(.browser-default),
 textarea.materialize-textarea {
-  border-bottom: 1px solid #ffffff !important;
-  color: #ffffff;
-  -webkit-appearance: none;
+    border-bottom: 1px solid #ffffff !important;
+    color: #ffffff;
+    -webkit-appearance: none;
 }
 
 .btn,
 .btn-large,
 .btn-small {
-  background-color: #005a8f;
+    background-color: #005a8f;
 }
 
 .btn:hover,
 .btn-large:hover,
 .btn-small:hover {
-  background-color: rgb(0, 165, 244);
+    background-color: rgb(0, 165, 244);
 }
 
 .btn:focus,
 .btn-large:focus,
 .btn-small:focus,
 .btn-floating:focus {
-  background-color: rgb(0, 115, 214);
+    background-color: rgb(0, 115, 214);
 }
 
 .dropdown-content li > a,
 .dropdown-content li > span {
-  color: #005a8f;
-  font-size: 14px;
+    color: #005a8f;
+    font-size: 14px;
 }
 
 @media only screen and (min-width: 601px) nav,
-  nav .nav-wrapper i,
-  nav a.sidenav-trigger,
-  nav a.sidenav-trigger i {
-  height: 64px;
-  line-height: 64px;
+    nav .nav-wrapper i,
+    nav a.sidenav-trigger,
+    nav a.sidenav-trigger i {
+    height: 64px;
+    line-height: 64px;
 }

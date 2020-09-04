@@ -1,135 +1,135 @@
 body {
-  font-family: 'Open Sans', sans-serif;
-  color: white;
-  background: #172635;
-  /* Old browsers */
-  background: -moz-linear-gradient(45deg, #172635, #172635);
-  /* FF3.6-15 */
-  background: -webkit-linear-gradient(45deg, #172635, #172635);
-  /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(45deg, #172635, #172635);
-  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
-  /* IE6-9 fallback on horizontal gradient */
+    font-family: 'Open Sans', sans-serif;
+    color: white;
+    background: #172635;
+    /* Old browsers */
+    background: -moz-linear-gradient(45deg, #172635, #172635);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(45deg, #172635, #172635);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(45deg, #172635, #172635);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
+    /* IE6-9 fallback on horizontal gradient */
 }
 
 .ui-icon-minus {
-  margin: auto !important;
+    margin: auto !important;
 }
 
 .ui-icon-plus {
-  margin: auto !important;
+    margin: auto !important;
 }
 
 .ui-datepicker td a {
-  text-align: center !important;
+    text-align: center !important;
 }
 
 /* Display none till loading is complete main.js -227 */
 
 #canvas-holder,
 #main-container {
-  display: none;
+    display: none;
 }
 
 /* Display none till loading is complete main.js -227 */
 
 #loading-screen {
-  padding: 0;
-  z-index: 101;
-  text-align: center;
-  background: #172635;
-  /* Old browsers */
-  background: -moz-linear-gradient(45deg, #080c11, #274059);
-  /* FF3.6-15 */
-  background: -webkit-linear-gradient(45deg, #080c11, #274059);
-  /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(45deg, #080c11, #274059);
-  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
-  /* IE6-9 fallback on horizontal gradient */
+    padding: 0;
+    z-index: 101;
+    text-align: center;
+    background: #172635;
+    /* Old browsers */
+    background: -moz-linear-gradient(45deg, #080c11, #274059);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(45deg, #080c11, #274059);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(45deg, #080c11, #274059);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
+    /* IE6-9 fallback on horizontal gradient */
 }
 
 .full-loader {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  overflow: hidden;
-  top: 0;
-  bottom: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    bottom: 0;
 }
 
 .mini-loader-container {
-  background: rgba(0, 0, 0, 0) !important;
-  /* Old browsers */
-  position: absolute;
-  width: 100%;
-  height: 100%;
+    background: rgba(0, 0, 0, 0) !important;
+    /* Old browsers */
+    position: absolute;
+    width: 100%;
+    height: 100%;
 }
 
 .mini-loader {
-  border-radius: 5px;
-  z-index: 101;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  width: 200px;
-  padding-top: 15px;
-  overflow: hidden;
-  background: #172635;
-  /* Old browsers */
-  background: -moz-linear-gradient(
-    45deg,
-    rgb(23, 38, 53) 0%,
-    rgba(64, 150, 238, 1) 100%
-  );
-  /* FF3.6-15 */
-  background: -webkit-linear-gradient(
-    45deg,
-    rgb(23, 38, 53) 0%,
-    rgba(64, 150, 238, 1) 100%
-  );
-  /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(
-    45deg,
-    rgb(23, 38, 53) 0%,
-    rgba(64, 150, 238, 1) 100%
-  );
-  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
-  /* IE6-9 fallback on horizontal gradient */
+    border-radius: 5px;
+    z-index: 101;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 200px;
+    padding-top: 15px;
+    overflow: hidden;
+    background: #172635;
+    /* Old browsers */
+    background: -moz-linear-gradient(
+        45deg,
+        rgb(23, 38, 53) 0%,
+        rgba(64, 150, 238, 1) 100%
+    );
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(
+        45deg,
+        rgb(23, 38, 53) 0%,
+        rgba(64, 150, 238, 1) 100%
+    );
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(
+        45deg,
+        rgb(23, 38, 53) 0%,
+        rgba(64, 150, 238, 1) 100%
+    );
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
+    /* IE6-9 fallback on horizontal gradient */
 }
 
 #logo-inner-container {
-  margin: auto;
+    margin: auto;
 }
 
 #logo-text {
-  display: block;
+    display: block;
 }
 
 .logo-font {
-  font-family: 'nasalization', sans-serif;
-  font-size: 8em;
+    font-family: 'nasalization', sans-serif;
+    font-size: 8em;
 }
 
 @media (max-width: 800px) {
-  #logo-text {
-    font-size: 4em;
-  }
+    #logo-text {
+        font-size: 4em;
+    }
 }
 
 #loader-text {
-  display: block;
-  line-height: 50px;
+    display: block;
+    line-height: 50px;
 }
 
 #spinner {
-  display: inline-block;
-  height: 50px;
-  width: 50px;
-  position: relative;
+    display: inline-block;
+    height: 50px;
+    width: 50px;
+    position: relative;
 }
 
 #mobile-start-button {
-  display: none;
-  margin-top: 10px;
+    display: none;
+    margin-top: 10px;
 }

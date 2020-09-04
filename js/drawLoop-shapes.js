@@ -192,16 +192,24 @@ var fovBubbleShader
   }
   Line.prototype.draw = function (color) {
     var shader = orbitManager.getPathShader()
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null)
     gl.useProgram(shader)
     if (typeof color == 'undefined') color = [1.0, 0.0, 1.0, 1.0]
     try {
-      gl.uniform4fv(shader.uColor, color)
-    } catch (e) {
       gl.uniform4fv(shader.uColor, [1.0, 0.0, 1.0, 1.0])
+    } catch (e) {
+      gl.uniform4fv(shader.uColor, color)
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf)
     gl.vertexAttribPointer(shader.aPos, 3, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(shader.aPos)
     gl.drawArrays(gl.LINES, 0, 2)
+
+    gl.disableVertexAttribArray(shader.aColor)
+
+    gl.disable(gl.BLEND)
+    gl.enable(gl.DEPTH_TEST)
   }
 
   window.Line = Line

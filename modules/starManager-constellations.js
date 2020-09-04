@@ -51,14 +51,14 @@ or mirrored at any other location without the express written permission of the 
               continue
             }
           } catch (e) {
-            console.warn(`Star/Constellation error - i: ${i} - s: ${s}`)
+            console.warn(`Constellation/Star error - i: ${i} - s: ${s}`)
             continue
           }
           drawLineList.push({
             line: new Line(),
             star1: starManager.constellations[i].stars[s][0],
             star2: starManager.constellations[i].stars[s][1],
-            color: [1, 1, 1, 1],
+            color: [1.0, 1.0, 1.0, 1.0],
           })
           starManager.isConstellationVisible = true
           starManager.isAllConstellationVisible = true
@@ -668,7 +668,7 @@ or mirrored at any other location without the express written permission of the 
               ["Baten Kaitos", "70-Cet"],
               ["70-Cet", "δ-Cet"],
               ["δ-Cet", "γ-Cet"],
-              ["γ-Cet" ,"ν-Cet"]
+              ["γ-Cet" ,"ν-Cet"],
               ["ν-Cet", "ξ²-Cet"],
               ["ξ²-Cet", "μ-Cet"],
               ["μ-Cet", "λ-Cet"],
@@ -1122,7 +1122,7 @@ or mirrored at any other location without the express written permission of the 
               ["δ-Vir", "Vindemiatrix"]]
     },
     ];
-  } catch {
+  } catch (e) {
     console.log('starManager.constellations Plugin failed to load!');
   }
 })()

@@ -497,12 +497,10 @@ const MOON_SCALAR_DISTANCE = 250000
         settingsManager.tleSource = 'tle/mw.json'
         break
       case 'trusat':
-        db.log('TruSat Overlay Mode Initializing')
         settingsManager.trusatMode = true
         settingsManager.trusatImages = true
         break
       case 'trusat-only':
-        db.log('TruSat Only Mode Initializing')
         settingsManager.trusatMode = true
         settingsManager.trusatOnly = true
         settingsManager.trusatImages = true

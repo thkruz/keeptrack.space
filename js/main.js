@@ -217,7 +217,7 @@ function initializeKeepTrack() {
     })()
     let isFinalLoadingComplete = false
     ;(function _finalLoadingSequence() {
-      if (!isFinalLoadingComplete && !earth.loaded) {
+      if (!isFinalLoadingComplete && !earth.loaded && settingsManager.cruncherReady) {
         setTimeout(function () {
           _finalLoadingSequence()
         }, 250)
@@ -251,13 +251,15 @@ function initializeKeepTrack() {
             $('#loader-text').html('Attempting to Math...')
           }, 5000)
         } else {
-          $('#loading-screen').removeClass('full-loader')
-          $('#loading-screen').addClass('mini-loader-container')
-          $('#logo-inner-container').addClass('mini-loader')
-          $('#logo-text').html('')
-          $('#logo-trusat').hide()
-          $('#loading-screen').hide()
-          $('#loader-text').html('Attempting to Math...')
+          setTimeout(function () {
+            $('#loading-screen').removeClass('full-loader')
+            $('#loading-screen').addClass('mini-loader-container')
+            $('#logo-inner-container').addClass('mini-loader')
+            $('#logo-text').html('')
+            $('#logo-trusat').hide()
+            $('#loading-screen').hide()
+            $('#loader-text').html('Attempting to Math...')
+          }, 2000)
         }
       }
 
@@ -1528,7 +1530,7 @@ function longToYaw(long) {
 
   // NOTE: This formula sometimes is incorrect, but has been stable for over a year
   // NOTE: Looks wrong again as of 8/29/2020 - time of year issue?
-  today.setUTCHours(selectedDate.getUTCHours() + ((selectedDate.getUTCMonth()) * 2) - 10)  // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
+  today.setUTCHours(selectedDate.getUTCHours() + ((selectedDate.getUTCMonth()) * 2) - 11)  // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
 
   today.setUTCMinutes(selectedDate.getUTCMinutes())
   today.setUTCSeconds(selectedDate.getUTCSeconds())
@@ -2020,25 +2022,25 @@ function debugDrawLine(type, value, color) {
   if (typeof color == 'undefined') color = [1.0, 0, 1.0, 1.0]
   switch (color) {
     case 'r':
-      color = [1, 0, 0, 1]
+      color = [1.0, 0.0, 0.0, 1.0]
       break
     case 'o':
-      color = [1, 0.5, 0, 1]
+      color = [1.0, 0.5, 0.0, 1.0]
       break
     case 'y':
-      color = [1, 1, 0, 1]
+      color = [1.0, 1.0, 0.0, 1.0]
       break
     case 'g':
-      color = [0, 1, 0, 1]
+      color = [0.0, 1.0, 0.0, 1.0]
       break
     case 'b':
-      color = [0, 0, 1, 1]
+      color = [0.0, 0.0, 1.0, 1.0]
       break
     case 'c':
-      color = [0, 1, 1, 1]
+      color = [0.0, 1.0, 1.0, 1.0]
       break
     case 'p':
-      color = [1, 0, 1, 1]
+      color = [1.0, 0.0, 1.0, 1.0]
       break
   }
   if (type == 'sat') {

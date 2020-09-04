@@ -1057,6 +1057,15 @@ var speedModifier = 1
       $('#radar-altair').on('click', function () {
         sensorManager.setSensor(sensorManager.sensorList.ALT)
       })
+      $('#radar-mmw').on('click', function () {
+        sensorManager.setSensor(sensorManager.sensorList.MMW)
+      })
+      $('#radar-alcor').on('click', function () {
+        sensorManager.setSensor(sensorManager.sensorList.ALC)
+      })
+      $('#radar-tradex').on('click', function () {
+        sensorManager.setSensor(sensorManager.sensorList.TDX)
+      })
       $('#radar-millstone').on('click', function () {
         sensorManager.setSensor(sensorManager.sensorList.MIL)
       })

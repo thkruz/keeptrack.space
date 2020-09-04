@@ -389,29 +389,6 @@
         text-align: center !important;
     }
     /* #sat-hoverbox {
-  #menu-space-stations,
-  #menu-launches,
-  #menu-record,
-  #menu-twitter,
-  #menu-color-scheme,
-  #social,
-  #version-info,
-  #fastCompSettings {
-    display: none;
-  }
-  #mobile-warning {
-    display: block;
-    margin-top: 10px;
-    color: #48f3e3 !important;
-  }
-  #ui-datepicker-div {
-    top: 50px !important;
-    border-radius: 0px;
-  }
-  .ui-timepicker-div dl {
-    text-align: center !important;
-  }
-  /* #sat-hoverbox {
     display: none !important;
   } */
     .top-menu-icons {

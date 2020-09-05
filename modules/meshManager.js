@@ -40,6 +40,10 @@
             mtl: `${settingsManager.installDirectory}meshes/gps.mtl`,
         },
         {
+            obj: `${settingsManager.installDirectory}meshes/aehf.obj`,
+            mtl: `${settingsManager.installDirectory}meshes/aehf.mtl`,
+        },
+        {
             obj: `${settingsManager.installDirectory}meshes/dsp.obj`,
             mtl: `${settingsManager.installDirectory}meshes/dsp.mtl`,
         },
@@ -103,6 +107,11 @@
             z: 1.0,
         },
         gps: {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        },
+        aehf: {
             x: 1.0,
             y: 1.0,
             z: 1.0,
@@ -212,13 +221,11 @@
     meshManager.mvMatrix = mat4.create();
     meshManager.mvMatrixStack = [];
     meshManager.pMatrix = mat4.create();
-    meshManager.drawObject = (model, pMatrix, camMatrix, inSun) => {
+    meshManager.drawObject = (model, pMatrix, camMatrix, inSun, isFacingNadir) => {
         if (typeof model == 'undefined') return;
 
         // Meshes aren't finished loading
         if (!meshManager.loaded) return;
-
-        console.log();
 
         // gl.bindVertexArray(meshManager.vao);
 
@@ -236,6 +243,12 @@
                 model.position.z
             )
         );
+
+        // Rotate the Satellite to Face Nadir
+        if (isFacingNadir) {
+          mat4.rotateX(mvMatrix, mvMatrix, -camPitch);
+          mat4.rotateZ(mvMatrix, mvMatrix, camYaw + 180 * DEG2RAD);
+        }
 
         mat4.scale(
             mvMatrix,

@@ -996,7 +996,8 @@ function _drawScene() {
                             meshManager.models.iss,
                             pMatrix,
                             camMatrix,
-                            sat.isInSun()
+                            sat.isInSun(),
+                            true
                         );
                         return;
                     }
@@ -1013,7 +1014,8 @@ function _drawScene() {
                                 meshManager.models.s3u,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun()
+                                sat.isInSun(),
+                                true
                             );
                             return;
                         }
@@ -1024,7 +1026,8 @@ function _drawScene() {
                                 meshManager.models.starlink,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun()
+                                sat.isInSun(),
+                                true
                             );
                             return;
                         }
@@ -1036,7 +1039,8 @@ function _drawScene() {
                                 meshManager.models.iridium,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun()
+                                sat.isInSun(),
+                                true
                             );
                             return;
                         }
@@ -1051,7 +1055,8 @@ function _drawScene() {
                                 meshManager.models.gps,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun()
+                                sat.isInSun(),
+                                true
                             );
                             return;
                         }
@@ -1086,7 +1091,29 @@ function _drawScene() {
                                 meshManager.models.dsp,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun()
+                                sat.isInSun(),
+                                true
+                            );
+                            return;
+                        }
+
+                        // Is this an AEHF Satellite?
+                        if (
+                            sat.SCC_NUM == '36868' ||
+                            sat.SCC_NUM == '38254' ||
+                            sat.SCC_NUM == '39256' ||
+                            sat.SCC_NUM == '43651' ||
+                            sat.SCC_NUM == '44481' ||
+                            sat.SCC_NUM == '45465'
+                        ) {
+                            meshManager.models.aehf.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.aehf,
+                                pMatrix,
+                                camMatrix,
+                                sat.isInSun(),
+                                true
                             );
                             return;
                         }
@@ -1102,7 +1129,8 @@ function _drawScene() {
                                 meshManager.models.s1u,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun()
+                                sat.isInSun(),
+                                true
                             );
                             return;
                         }
@@ -1116,7 +1144,8 @@ function _drawScene() {
                                 meshManager.models.s2u,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun()
+                                sat.isInSun(),
+                                true
                             );
                             return;
                         }
@@ -1130,7 +1159,8 @@ function _drawScene() {
                                 meshManager.models.s3u,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun()
+                                sat.isInSun(),
+                                true
                             );
                             return;
                         }
@@ -1141,7 +1171,8 @@ function _drawScene() {
                                 meshManager.models.sat2,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun()
+                                sat.isInSun(),
+                                true
                             );
                             return;
                         } else {
@@ -1151,7 +1182,8 @@ function _drawScene() {
                                 meshManager.models.sat2,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun()
+                                sat.isInSun(),
+                                true
                             );
                             return;
                         }
@@ -1165,7 +1197,8 @@ function _drawScene() {
                             meshManager.models.rocketbody,
                             pMatrix,
                             camMatrix,
-                            sat.isInSun()
+                            sat.isInSun(),
+                            false
                         );
                         return;
                     }
@@ -1178,7 +1211,8 @@ function _drawScene() {
                             meshManager.models.rocketdebris,
                             pMatrix,
                             camMatrix,
-                            sat.isInSun()
+                            sat.isInSun(),
+                            false
                         );
                         return;
                     }
@@ -3148,7 +3182,7 @@ $(document).ready(function () {
                 zoomTarget +=
                     deltaPinchDistance *
                     (settingsManager.cameraMovementSpeed + 0.006);
-                zoomTarget = Math.min(Math.max(zoomTarget, 0), 1); // Force between 0 and 1
+                zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
             } else {
                 // Dont Move While Zooming
                 mouseX = evt.originalEvent.touches[0].clientX;
@@ -3219,7 +3253,7 @@ $(document).ready(function () {
                     objectManager.selectedSat == -1
                 ) {
                     zoomTarget += delta / 100 / 50 / speedModifier; // delta is +/- 100
-                    zoomTarget = Math.min(Math.max(zoomTarget, 0), 1); // Force between 0 and 1
+                    zoomTarget = Math.min(Math.max(zoomTarget, 0.001), 1); // Force between 0 and 1
                     camZoomSnappedOnSat = false;
                 } else {
                     settingsManager.camDistBuffer += delta / 100; // delta is +/- 100

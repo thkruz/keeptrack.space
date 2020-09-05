@@ -10,6 +10,8 @@ if (!settingsManager.disableUI) {
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/perfect-scrollbar.min.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/jquery-ui.min.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/jquery-ui-timepicker-addon.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/style.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/responsive.css?v=${settingsManager.versionNumber}" type="text/css"\>
   `);
 } else if (settingsManager.enableLimitedUI) {
     document.write(`

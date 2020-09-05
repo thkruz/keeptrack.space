@@ -190,18 +190,6 @@ var speedModifier = 1;
             $('#jday').html(jday);
             jday = null; // Garbage collect
 
-            // Load the Stylesheets
-            $('head').append(
-                '<link rel="stylesheet" type="text/css" href="css/style.css?v=' +
-                    settingsManager.versionNumber +
-                    '"">'
-            );
-            $('head').append(
-                '<link rel="stylesheet" type="text/css" href="css/responsive.css?v=' +
-                    settingsManager.versionNumber +
-                    '"">'
-            );
-
             // Load ALl The Images Now
             $('img').each(function () {
                 $(this).attr('src', $(this).attr('delayedsrc'));

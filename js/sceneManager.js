@@ -547,7 +547,11 @@
 
             // Don't update the time input unless it is currently being viewed.
             if (settingsManager.isEditTime || !settingsManager.cruncherReady) {
-                $('#datetime-input-tb').val(earth.timeTextStr);
+                $('#datetime-input-tb').val(
+                  timeManager.selectedDate.toISOString().slice(0,10) +
+                  ' ' +
+                  timeManager.selectedDate.toISOString().slice(11,19)
+              );
             }
 
             earth.earthJ = timeManager.jday(

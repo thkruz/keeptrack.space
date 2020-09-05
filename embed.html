@@ -10,20 +10,21 @@
 
     <body>
         <div style="width: 400px; height: 600px;"></div>
+        <script type="text/javascript" src="js/keeptrack-head.js"></script>
         <div>
             <canvas
                 id="keeptrack-canvas"
                 width="800"
                 height="600"
-                style="position: absolute; cursor: default;"
+                style="position: absolute; left: 100px; cursor: default;"
                 tabindex="0"
             ></canvas>
         </div>
-        <script type="text/javascript" src="js/keeptrack-head.js"></script>
         <script>
             settingsManager.disableUI = true;
-            settingsManager.enableLimitedUI = true;
-            settingsManager.isAutoResizeCanvas = true;
+            settingsManager.enableLimitedUI = false;
+            settingsManager.isAutoResizeCanvas = false;
+            settingsManager.enableHoverOverlay = false;
         </script>
         <script type="text/javascript" src="js/keeptrack-foot.js"></script>
         <script>

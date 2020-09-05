@@ -141,8 +141,8 @@
   nav .nav-wrapper i,
   nav a.sidenav-trigger,
   nav a.sidenav-trigger i {
-    height: 25px;
-    line-height: 25px;
+    height: 25px !important;
+    line-height: 25px !important;
   }
   #lookanglesmultisite-content {
     width: 375px;
@@ -511,11 +511,11 @@
   ::-webkit-scrollbar {
     display: none;
   }
-  .search-slide-down input[type='search'] {
+  .search-slide-down {
     transition: 1s;
     width: 180px;
   }
-  .search-slide-up input[type='search'] {
+  .search-slide-up {
     transition: 1s;
     width: 0px;
   }

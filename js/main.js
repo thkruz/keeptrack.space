@@ -1755,6 +1755,7 @@ function _hoverBoxOnSat(satId, satX, satY) {
             satHoverBoxNode2.textContent = '';
             satHoverBoxNode3.textContent = '';
         } else {
+            if (!settingsManager.enableHoverOverlay) return;
             // Use this as a default if no UI
             if (settingsManager.disableUI) {
                 satHoverBoxNode1.textContent = sat.ON;
@@ -3169,8 +3170,8 @@ $(document).ready(function () {
             }
         });
         canvasDOM.on('mousemove', function (evt) {
-            mouseX = evt.clientX;
-            mouseY = evt.clientY;
+            mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
+            mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
             if (
                 isDragging &&
                 screenDragPoint[0] !== mouseX &&

@@ -996,7 +996,7 @@ function _drawScene() {
                             meshManager.models.iss,
                             pMatrix,
                             camMatrix,
-                            sat.isInSun(),
+                            sat,
                             true
                         );
                         return;
@@ -1014,7 +1014,7 @@ function _drawScene() {
                                 meshManager.models.s3u,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun(),
+                                sat,
                                 true
                             );
                             return;
@@ -1026,7 +1026,20 @@ function _drawScene() {
                                 meshManager.models.starlink,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun(),
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+
+                        if (sat.ON.slice(0, 10) == 'GLOBALSTAR') {
+                            meshManager.models.globalstar.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.globalstar,
+                                pMatrix,
+                                camMatrix,
+                                sat,
                                 true
                             );
                             return;
@@ -1039,7 +1052,20 @@ function _drawScene() {
                                 meshManager.models.iridium,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun(),
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+
+                        if (sat.ON.slice(0, 7) == 'ORBCOMM') {
+                            meshManager.models.orbcomm.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.orbcomm,
+                                pMatrix,
+                                camMatrix,
+                                sat,
                                 true
                             );
                             return;
@@ -1055,7 +1081,7 @@ function _drawScene() {
                                 meshManager.models.gps,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun(),
+                                sat,
                                 true
                             );
                             return;
@@ -1091,7 +1117,7 @@ function _drawScene() {
                                 meshManager.models.dsp,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun(),
+                                sat,
                                 true
                             );
                             return;
@@ -1112,7 +1138,7 @@ function _drawScene() {
                                 meshManager.models.aehf,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun(),
+                                sat,
                                 true
                             );
                             return;
@@ -1129,7 +1155,7 @@ function _drawScene() {
                                 meshManager.models.s1u,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun(),
+                                sat,
                                 true
                             );
                             return;
@@ -1144,7 +1170,7 @@ function _drawScene() {
                                 meshManager.models.s2u,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun(),
+                                sat,
                                 true
                             );
                             return;
@@ -1159,7 +1185,7 @@ function _drawScene() {
                                 meshManager.models.s3u,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun(),
+                                sat,
                                 true
                             );
                             return;
@@ -1171,7 +1197,7 @@ function _drawScene() {
                                 meshManager.models.sat2,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun(),
+                                sat,
                                 true
                             );
                             return;
@@ -1182,7 +1208,7 @@ function _drawScene() {
                                 meshManager.models.sat2,
                                 pMatrix,
                                 camMatrix,
-                                sat.isInSun(),
+                                sat,
                                 true
                             );
                             return;
@@ -1197,7 +1223,7 @@ function _drawScene() {
                             meshManager.models.rocketbody,
                             pMatrix,
                             camMatrix,
-                            sat.isInSun(),
+                            sat,
                             false
                         );
                         return;
@@ -1211,7 +1237,7 @@ function _drawScene() {
                             meshManager.models.rocketdebris,
                             pMatrix,
                             camMatrix,
-                            sat.isInSun(),
+                            sat,
                             false
                         );
                         return;

@@ -6,60 +6,31 @@
     let nMatrix;
     let nMatrixEmpty = mat3.create();
 
-    meshManager.fileList = [
-        {
-            obj: `${settingsManager.installDirectory}meshes/sat2.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/sat2.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/sat.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/sat.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/s1u.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/s1u.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/s2u.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/s2u.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/s3u.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/s3u.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/starlink.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/starlink.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/iss.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/iss.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/gps.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/gps.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/aehf.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/aehf.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/dsp.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/dsp.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/iridium.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/iridium.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/rocketdebris.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/rocketdebris.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/rocketbody.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/rocketbody.mtl`,
-        },
+    meshManager.fileList = [];
+    let meshList = [
+      'sat2',
+      'sat',
+      's1u',
+      's2u',
+      's3u',
+      'starlink',
+      'iss',
+      'gps',
+      'aehf',
+      'dsp',
+      'orbcomm',
+      'iridium',
+      'globalstar',
+      'rocketdebris',
+      'rocketbody'
     ];
+    for (var i = 0; i < meshList.length; i++) {
+      let meshFiles = {
+          obj: `${settingsManager.installDirectory}meshes/${meshList[i]}.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/${meshList[i]}.mtl`,
+      };
+      meshManager.fileList.push(meshFiles);
+    }
 
     meshManager.sizeInfo = {
         sat2: {
@@ -106,7 +77,17 @@
             y: 1.0,
             z: 1.0,
         },
+        globalstar: {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        },
         gps: {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        },
+        orbcomm: {
             x: 1.0,
             y: 1.0,
             z: 1.0,
@@ -221,13 +202,15 @@
     meshManager.mvMatrix = mat4.create();
     meshManager.mvMatrixStack = [];
     meshManager.pMatrix = mat4.create();
-    meshManager.drawObject = (model, pMatrix, camMatrix, inSun, isFacingNadir) => {
+    meshManager.drawObject = (model, pMatrix, camMatrix, sat, isFacingNadir) => {
         if (typeof model == 'undefined') return;
 
         // Meshes aren't finished loading
         if (!meshManager.loaded) return;
 
         // gl.bindVertexArray(meshManager.vao);
+
+        let inSun = sat.isInSun();
 
         // Assigned an origin at 0,0,0
         mvMatrix = mvMatrixEmpty;
@@ -246,7 +229,6 @@
 
         // Rotate the Satellite to Face Nadir
         if (isFacingNadir) {
-          mat4.rotateX(mvMatrix, mvMatrix, -camPitch);
           mat4.rotateZ(mvMatrix, mvMatrix, camYaw + 180 * DEG2RAD);
         }
 

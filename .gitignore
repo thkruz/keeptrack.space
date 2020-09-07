@@ -1,12 +1,9 @@
 node_modules/
-node_modules
-/license/license*
 .gitattributes
 .htaccess
 .notes.js
 classfd.tle
 .jshintrc
-.prettierignore
 
 social
 social/*

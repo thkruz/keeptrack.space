@@ -18,10 +18,13 @@
       'gps',
       'aehf',
       'dsp',
+      'o3b',
       'orbcomm',
       'iridium',
       'globalstar',
-      'rocketdebris',
+      'debris0',
+      'debris1',
+      'debris2',
       'rocketbody'
     ];
     for (var i = 0; i < meshList.length; i++) {
@@ -77,6 +80,11 @@
             y: 1.0,
             z: 1.0,
         },
+        o3b: {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        },
         globalstar: {
             x: 1.0,
             y: 1.0,
@@ -103,10 +111,20 @@
             y: 1.0,
             z: 1.0,
         },
-        rocketdebris: {
-            x: 0.1,
-            y: 0.1,
-            z: 0.1,
+        debris0: {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        },
+        debris1: {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+        },
+        debris2: {
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
         },
         rocketbody: {
             x: 1.0,

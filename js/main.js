@@ -1071,6 +1071,19 @@ function _drawScene() {
                             return;
                         }
 
+                        if (sat.ON.slice(0, 3) == 'O3B') {
+                            meshManager.models.o3b.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.o3b,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+
                         if (
                             sat.ON.slice(0, 7) == 'NAVSTAR' ||
                             sat.ON.slice(10, 17) == 'NAVSTAR'
@@ -1230,17 +1243,44 @@ function _drawScene() {
                     }
 
                     if (sat.OT == 3) {
-                        // Debris
-                        meshManager.models.rocketdebris.position =
-                            meshManager.selectedSatPosition;
-                        meshManager.drawObject(
-                            meshManager.models.rocketdebris,
+                        let randomDebrisNum = Math.random();
+                        if (randomDebrisNum <= 0.33) {
+                          // Debris
+                          meshManager.models.debris0.position =
+                          meshManager.selectedSatPosition;
+                          meshManager.drawObject(
+                            meshManager.models.debris0,
                             pMatrix,
                             camMatrix,
                             sat,
                             false
-                        );
-                        return;
+                          );
+                          return;
+                        } else if (randomDebrisNum <= 0.66) {
+                          // Debris
+                          meshManager.models.debris1.position =
+                          meshManager.selectedSatPosition;
+                          meshManager.drawObject(
+                            meshManager.models.debris1,
+                            pMatrix,
+                            camMatrix,
+                            sat,
+                            false
+                          );
+                          return;
+                        } else if (randomDebrisNum > 0.66) {
+                          // Debris
+                          meshManager.models.debris2.position =
+                          meshManager.selectedSatPosition;
+                          meshManager.drawObject(
+                            meshManager.models.debris2,
+                            pMatrix,
+                            camMatrix,
+                            sat,
+                            false
+                          );
+                          return;
+                        }
                     }
                 }
             }

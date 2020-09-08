@@ -2077,6 +2077,7 @@ function webGlInit() {
     gl =
         can.getContext('webgl', {
             alpha: true,
+            premultipliedAlpha: false,
             desynchronized: true,
             antialias: true,
             powerPreference: 'high-performance',
@@ -2085,6 +2086,7 @@ function webGlInit() {
         }) || // Or...
         can.getContext('experimental-webgl', {
             alpha: true,
+            premultipliedAlpha: false,
             desynchronized: true,
             antialias: true,
             powerPreference: 'high-performance',

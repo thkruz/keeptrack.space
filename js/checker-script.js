@@ -38,27 +38,31 @@ fetch(checkRequest).then(function (response) {
 });
 
 function readyForInteraction() {
-    // This looks to see if the main page is loaded.
-    // It does NOT know if all of the async loading is complete. The satellite
-    // database (.json file) is the largest async file and it has to  be processed
-    // by the sat-cruncher web worker before webgl can draw the satellites
+  // This looks to see if the main page is loaded.
+  // It does NOT know if all of the async loading is complete. The satellite
+  // database (.json file) is the largest async file and it has to  be processed
+  // by the sat-cruncher web worker before webgl can draw the satellites
+  if (document.readyState !== 'complete') {
     document.addEventListener('readystatechange', function () {
-        let intervalID = window.setInterval(isReady, 1000);
+      let intervalID = window.setInterval(isReady, 1000);
 
-        function displayElement(id, value) {
-            document.getElementById(id).style.display = value
-                ? 'block'
-                : 'none';
+      function isReady() {
+        if (document.readyState === 'interactive') {
+          displayElement('main-container', false);
+        } else if (document.readyState === 'complete') {
+          window.clearInterval(intervalID);
+          displayElement('main-container', true);
         }
-
-        function isReady() {
-            if (document.readyState === 'interactive') {
-                displayElement('main-container', false);
-            } else if (document.readyState === 'complete') {
-                window.clearInterval(intervalID);
-                displayElement('main-container', true);
-            }
-        }
+      }
     });
+  } else {
+    // Sometimes it loads really fast
+    displayElement('main-container', true);
+  }
+}
+function displayElement(id, value) {
+  document.getElementById(id).style.display = value
+  ? 'block'
+  : 'none';
 }
 // CHECK READY STATE

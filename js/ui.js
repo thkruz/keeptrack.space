@@ -190,11 +190,6 @@ var speedModifier = 1;
             $('#jday').html(jday);
             jday = null; // Garbage collect
 
-            // Load ALl The Images Now
-            $('img').each(function () {
-                $(this).attr('src', $(this).attr('delayedsrc'));
-            });
-
             // Initialize Navigation Menu
             $('.dropdown-button').dropdown();
             $('.tooltipped').tooltip({ delay: 50 });
@@ -240,7 +235,7 @@ var speedModifier = 1;
                 }
             });
         })();
-
+    
         var isNotColorPickerInitialSetup = false;
         (function _setupColorPicker() {
             db.log('_setupColorPicker');

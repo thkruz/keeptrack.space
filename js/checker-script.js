@@ -19,11 +19,11 @@ detectIe();
 // DETECT IE
 
 // CHECK READY STATE
-// Looking for an essential file such as main.js ensures that the install
+// Looking for an essential file such as shaders.js ensures that the install
 // directory is currectly set. If we look for the index.htm file then it will
 // always be found (otherwise how did we load this script). If we look for
 // optional modules like sensorManager.js then it could fail to load unnecessarily
-let checkRequest = new Request(`${settingsManager.installDirectory}js/main.js`);
+let checkRequest = new Request(`${settingsManager.installDirectory}js/shaders.js`);
 
 fetch(checkRequest).then(function (response) {
     // console.log(response.status + "OK");

@@ -201,16 +201,6 @@ var emptyMat4 = mat4.create();
 
             satSet.onCruncherReady();
             if (!settingsManager.disableUI) {
-              // Load Optional 3D models if available
-              setTimeout(function () {
-                if (typeof meshManager !== 'undefined') {
-                  setTimeout(function () {
-                    meshManager.init();
-                  }, 0);
-                  settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
-                }
-              }, 0);
-
               (function _reloadLastSensor() {
                   let currentSensor = !settingsManager.offline
                       ? JSON.parse(localStorage.getItem('currentSensor'))
@@ -370,6 +360,16 @@ var emptyMat4 = mat4.create();
                 }
             })();
 
+            if (!settingsManager.disableUI && !settingsManager.isDrawLess) {
+              // Load Optional 3D models if available
+              if (typeof meshManager !== 'undefined') {
+                setTimeout(function () {
+                  meshManager.init();
+                }, 0);
+                settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
+              }
+            }
+
             if (settingsManager.startWithOrbitsDisplayed) {
                 setTimeout(function () {
                     // Time Machine
@@ -386,6 +386,13 @@ var emptyMat4 = mat4.create();
                     settingsManager.isOrbitOverlayVisible = true;
                 }, 0);
             }
+
+            // Load ALl The Images Now
+            setTimeout(function () {
+              $('img').each(function () {
+                  $(this).attr('src', $(this).attr('delayedsrc'));
+              });
+            }, 0);
 
             settingsManager.cruncherReady = true;
         }

@@ -146,7 +146,7 @@ document.write(`
 if (!settingsManager.disableUI) {
     document.write(`
       <script src="${settingsManager.installDirectory}modules/missileManager.js?v=${settingsManager.versionNumber}"\><\/script>
-      <script src="${settingsManager.installDirectory}modules/ui.js?v=${settingsManager.versionNumber}"\><\/script>
+      <script src="${settingsManager.installDirectory}js/ui.js?v=${settingsManager.versionNumber}"\><\/script>
     `);
 }
 

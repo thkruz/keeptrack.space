@@ -185,84 +185,6 @@ const MOON_SCALAR_DISTANCE = 250000;
       settingsManager.isLoadLastMap = false;
     }
 
-    // Load the previously saved map
-    if (settingsManager.isLoadLastMap) {
-        let lastMap = localStorage.getItem('lastMap');
-        switch (lastMap) {
-            case 'blue':
-                settingsManager.blueImages = true;
-                document.write(`
-                  <link rel="preload" href="textures/world_blue-2048.png" as="image">
-                  <link rel="preload" href="textures/earthlights4k.jpg" as="image">
-                  <link rel="preload" href="textures/earthbump8k.jpg" as="image">
-                  <link rel="preload" href="textures/earthspec8k.jpg" as="image">
-                  `);
-                break;
-            case 'nasa':
-                settingsManager.nasaImages = true;
-                document.write(`
-                  <link rel="preload" href="textures/mercator-tex.jpg" as="image">
-                  <link rel="preload" href="textures/earthlights4k.jpg" as="image">
-                  <link rel="preload" href="textures/earthbump8k.jpg" as="image">
-                  <link rel="preload" href="textures/earthspec8k.jpg" as="image">
-                  `);
-                break;
-            case 'low':
-                settingsManager.lowresImages = true;
-                document.write(`
-                  <link rel="preload" href="textures/earthmap4k.jpg" as="image">
-                  <link rel="preload" href="textures/earthlights4k.jpg" as="image">
-                  <link rel="preload" href="textures/earthbump8k.jpg" as="image">
-                  <link rel="preload" href="textures/earthspec8k.jpg" as="image">
-                  `);
-                break;
-            case 'trusat':
-                settingsManager.trusatImages = true;
-                document.write(`
-                  <link rel="preload" href="textures/trusatvector-4096.jpg" as="image">
-                  <link rel="preload" href="textures/earthbump8k.jpg" as="image">
-                  <link rel="preload" href="textures/earthspec8k.jpg" as="image">
-                  `);
-                break;
-            case 'high':
-                settingsManager.hiresImages = true;
-                document.write(`
-                  <link rel="preload" href="textures/earthmap8k.jpg" as="image">
-                  <link rel="preload" href="textures/earthlights10k.jpg" as="image">
-                  <link rel="preload" href="textures/earthbump8k.jpg" as="image">
-                  <link rel="preload" href="textures/earthspec8k.jpg" as="image">
-                  `);
-                break;
-            case 'high-nc':
-                settingsManager.hiresNoCloudsImages = true;
-                document.write(`
-                  <link rel="preload" href="textures/earthmap8k.jpg" as="image">
-                  <link rel="preload" href="textures/earthlights10k.jpg" as="image">
-                  <link rel="preload" href="textures/earthbump8k.jpg" as="image">
-                  <link rel="preload" href="textures/earthspec8k.jpg" as="image">
-                  `);
-                break;
-            case 'vec':
-                settingsManager.vectorImages = true;
-                document.write(`
-                  <link rel="preload" href="textures/dayearthvector-4096.jpg" as="image">
-                  <link rel="preload" href="textures/earthlights4k.jpg" as="image">
-                  <link rel="preload" href="textures/earthbump8k.jpg" as="image">
-                  <link rel="preload" href="textures/earthspec8k.jpg" as="image">
-                  `);
-                break;
-            default:
-                settingsManager.lowresImages = true;
-                document.write(`
-                  <link rel="preload" href="textures/earthmap4k.jpg" as="image">
-                  <link rel="preload" href="textures/earthlights4k.jpg" as="image">
-                  <link rel="preload" href="textures/earthbump8k.jpg" as="image">
-                  <link rel="preload" href="textures/earthspec8k.jpg" as="image">
-                  `);
-                break;
-        }
-    }
-
     // //////////////////////////////////////////////////////////////////////////
     // Color Settings
     // //////////////////////////////////////////////////////////////////////////
@@ -583,6 +505,7 @@ if (!settingsManager.disableUI) {
                 break;
             case 'draw-less':
                 settingsManager.isDrawLess = true;
+                settingsManager.smallImages = true;
                 break;
             case 'vec':
                 settingsManager.vectorImages = true;
@@ -628,6 +551,84 @@ if (!settingsManager.disableUI) {
         }
     }
 })();
+}
+
+// Load the previously saved map
+if (settingsManager.isLoadLastMap && !settingsManager.isDrawLess) {
+    let lastMap = localStorage.getItem('lastMap');
+    switch (lastMap) {
+        case 'blue':
+            settingsManager.blueImages = true;
+            document.write(`
+              <link rel="preload" href="textures/world_blue-2048.png" as="image">
+              <link rel="preload" href="textures/earthlights4k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        case 'nasa':
+            settingsManager.nasaImages = true;
+            document.write(`
+              <link rel="preload" href="textures/mercator-tex.jpg" as="image">
+              <link rel="preload" href="textures/earthlights4k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        case 'low':
+            settingsManager.lowresImages = true;
+            document.write(`
+              <link rel="preload" href="textures/earthmap4k.jpg" as="image">
+              <link rel="preload" href="textures/earthlights4k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        case 'trusat':
+            settingsManager.trusatImages = true;
+            document.write(`
+              <link rel="preload" href="textures/trusatvector-4096.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        case 'high':
+            settingsManager.hiresImages = true;
+            document.write(`
+              <link rel="preload" href="textures/earthmap8k.jpg" as="image">
+              <link rel="preload" href="textures/earthlights10k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        case 'high-nc':
+            settingsManager.hiresNoCloudsImages = true;
+            document.write(`
+              <link rel="preload" href="textures/earthmap8k.jpg" as="image">
+              <link rel="preload" href="textures/earthlights10k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        case 'vec':
+            settingsManager.vectorImages = true;
+            document.write(`
+              <link rel="preload" href="textures/dayearthvector-4096.jpg" as="image">
+              <link rel="preload" href="textures/earthlights4k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        default:
+            settingsManager.lowresImages = true;
+            document.write(`
+              <link rel="preload" href="textures/earthmap4k.jpg" as="image">
+              <link rel="preload" href="textures/earthlights4k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+    }
 }
 
 //Global Debug Manager

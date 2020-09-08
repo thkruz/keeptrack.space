@@ -975,7 +975,7 @@ function _drawScene() {
 
     // Draw Satellite if Selected
     (function drawSatellite() {
-        if (objectManager.selectedSat !== -1) {
+        if (objectManager.selectedSat !== -1 && meshManager.isReady) {
             let sat = satSet.getSat(objectManager.selectedSat);
             // If 3D Models Available, then draw them on the screen
             if (typeof meshManager !== 'undefined') {

@@ -19,8 +19,8 @@ const MOON_SCALAR_DISTANCE = 250000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '1.19.11';
-    settingsManager.versionDate = 'August 31, 2020';
+    settingsManager.versionNumber = '1.20.0';
+    settingsManager.versionDate = 'September 8, 2020';
 
     // Install Folder Settings
     {
@@ -89,6 +89,14 @@ const MOON_SCALAR_DISTANCE = 250000;
     // the satellite.
     settingsManager.isZoomStopsSnappedOnSat = false;
 
+    // How many draw calls to wait before updating orbit overlay if last draw
+    // time was greater than 20ms
+    settingsManager.updateHoverDelayLimitSmall = 10;
+
+    // How many draw calls to wait before updating orbit overlay if last draw
+    // time was greater than 50ms
+    settingsManager.updateHoverDelayLimitBig = 15;
+
     settingsManager.fieldOfViewMin = 0.04; // 4 Degrees (I think)
     settingsManager.fieldOfViewMax = 1.2; // 120 Degrees (I think)
 
@@ -149,12 +157,16 @@ const MOON_SCALAR_DISTANCE = 250000;
     if (pageName[0] == 'embed.html') {
       settingsManager.disableUI = true;
       settingsManager.enableLimitedUI = true;
+      settingsManager.startWithOrbitsDisplayed = true;
       settingsManager.isAutoResizeCanvas = true;
-      settingsManager.enableHoverOverlay = false;
+      settingsManager.enableHoverOverlay = true;
+      settingsManager.enableHoverOrbits = true;
       settingsManager.isDrawLess = true;
       settingsManager.smallImages = true;
       settingsManager.hiresNoCloudsImages = false;
       settingsManager.tleSource = 'tle/TLEdebris.json';
+      settingsManager.updateHoverDelayLimitSmall = 25;
+      settingsManager.updateHoverDelayLimitBig = 45;
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -355,10 +367,10 @@ const MOON_SCALAR_DISTANCE = 250000;
     settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 0.9];
     settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];
     // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0]
-    settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.6]; // WHITE
+    settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.7]; // WHITE
     // settingsManager.orbitInViewColor = [1.0, 1.0, 0.0, 1.0] // Applies to Planetarium View
     //settingsManager.orbitGroupColor = [0.3, 0.5, 1.0, 0.4]
-    settingsManager.orbitGroupColor = [0.3, 1.0, 1.0, 0.4];
+    settingsManager.orbitGroupColor = [0.3, 1.0, 1.0, 0.7];
 
     // //////////////////////////////////////////////////////////////////////////
     // UI Settings
@@ -653,7 +665,10 @@ let db = {};
         };
         if (db.enabled) {
             // Fix for multiple sensors gettings saved locally by previous bug
-            if (currentSensor.length > 1) currentSensor = currentSensor[0];
+            try {
+              if (currentSensor.length > 1) currentSensor = currentSensor[0];
+            } catch (e) {
+            }
         }
     })();
 }
@@ -668,8 +683,8 @@ if (typeof $ == 'undefined') {
 // Import CSS needed for loading screen
 if (!settingsManager.disableUI) {
     document.write(`
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/loading-screen.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/fonts.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/loading-screen.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize-local.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}js/lib/colorPick.css?v=${settingsManager.versionNumber}" type="text/css"\>

@@ -216,10 +216,6 @@ let rayOrigin,
 // //////////////////////////////////////////////////////////////////////////
 
 function initializeKeepTrack() {
-    // Set Default TLE
-    if (typeof settingsManager.tleSource == 'undefined') {
-        settingsManager.tleSource = 'tle/TLE.json';
-    }
     mobile.checkMobileMode();
     webGlInit();
     sun.init();
@@ -227,13 +223,6 @@ function initializeKeepTrack() {
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
         atmosphere.init();
         moon.init();
-    }
-    // Load Optional 3D models if available
-    if (typeof meshManager !== 'undefined') {
-        setTimeout(function () {
-          meshManager.init();
-        }, 0);
-        settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
     }
     ColorScheme.init();
     $('#loader-text').text('Drawing Dots in Space...');
@@ -363,9 +352,9 @@ function drawLoop() {
         }
     }
     if (dt > 20) {
-        updateHoverDelayLimit = 10;
+        updateHoverDelayLimit = settingsManager.updateHoverDelayLimitSmall;
     } else if (dt > 50) {
-        updateHoverDelayLimit = 15;
+        updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;
     } else {
         if (updateHoverDelayLimit > 1) --updateHoverDelayLimit;
     }
@@ -1205,29 +1194,17 @@ function _drawScene() {
                             );
                             return;
                         }
-                        if (sat.SCC_NUM < 20000) {
-                            meshManager.models.sat2.position =
-                                meshManager.selectedSatPosition;
-                            meshManager.drawObject(
-                                meshManager.models.sat2,
-                                pMatrix,
-                                camMatrix,
-                                sat,
-                                true
-                            );
-                            return;
-                        } else {
-                            meshManager.models.sat2.position =
-                                meshManager.selectedSatPosition;
-                            meshManager.drawObject(
-                                meshManager.models.sat2,
-                                pMatrix,
-                                camMatrix,
-                                sat,
-                                true
-                            );
-                            return;
-                        }
+                        // Generic Model
+                        meshManager.models.sat2.position =
+                            meshManager.selectedSatPosition;
+                        meshManager.drawObject(
+                            meshManager.models.sat2,
+                            pMatrix,
+                            camMatrix,
+                            sat,
+                            true
+                        );
+                        return;
                     }
 
                     if (sat.OT == 2) {
@@ -1245,8 +1222,7 @@ function _drawScene() {
                     }
 
                     if (sat.OT == 3) {
-                        let randomDebrisNum = Math.random();
-                        if (randomDebrisNum <= 0.33) {
+                        if (sat.SCC_NUM <= 20000) {
                           // Debris
                           meshManager.models.debris0.position =
                           meshManager.selectedSatPosition;
@@ -1258,7 +1234,7 @@ function _drawScene() {
                             false
                           );
                           return;
-                        } else if (randomDebrisNum <= 0.66) {
+                        } else if (sat.SCC_NUM <= 35000) {
                           // Debris
                           meshManager.models.debris1.position =
                           meshManager.selectedSatPosition;
@@ -1270,7 +1246,7 @@ function _drawScene() {
                             false
                           );
                           return;
-                        } else if (randomDebrisNum > 0.66) {
+                        } else if (sat.SCC_NUM > 35000) {
                           // Debris
                           meshManager.models.debris2.position =
                           meshManager.selectedSatPosition;

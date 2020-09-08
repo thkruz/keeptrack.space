@@ -6406,6 +6406,7 @@ var speedModifier = 1;
     _resetSensorSelected = function () {
         // Return to default settings with nothing 'inview'
         satellite.setobs(void 0);
+        sensorManager.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
         satCruncher.postMessage({
             typ: 'offset',
             dat:

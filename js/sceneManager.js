@@ -170,7 +170,8 @@
                 if (settingsManager.smallImages)
                     img.src =
                         settingsManager.installDirectory +
-                        'textures/earthmap1k.jpg';
+                        'textures/earthmap512.jpg';
+                        // 'textures/earthmap1k.jpg';
                 if (settingsManager.nasaImages)
                     img.src =
                         settingsManager.installDirectory +
@@ -276,7 +277,8 @@
                 if (settingsManager.smallImages)
                   nightImg.src =
                       settingsManager.installDirectory +
-                      'textures/earthlights1k.jpg';
+                      'textures/earthlights512.jpg';
+                      // 'textures/earthlights1k.jpg';
                 if (settingsManager.vectorImages)
                     nightImg.src =
                         settingsManager.installDirectory +
@@ -362,7 +364,8 @@
                 if (settingsManager.smallImages)
                   earth.bumpMap.img.src =
                       settingsManager.installDirectory +
-                      'textures/earthbump1k.jpg';
+                      'textures/earthbump256.jpg';
+                      // 'textures/earthbump1k.jpg';
             }
 
             // Specular Map
@@ -405,7 +408,8 @@
                 if (settingsManager.smallImages)
                   earth.specularMap.img.src =
                       settingsManager.installDirectory +
-                      'textures/earthspec1k.jpg';
+                      'textures/earthspec256.jpg';
+                      // 'textures/earthspec1k.jpg';
             }
 
             // generate a uvsphere bottom up, CCW order

@@ -9,7 +9,6 @@
     meshManager.fileList = [];
     let meshList = [
       'sat2',
-      'sat',
       's1u',
       's2u',
       's3u',
@@ -34,104 +33,6 @@
       };
       meshManager.fileList.push(meshFiles);
     }
-
-    meshManager.sizeInfo = {
-        sat2: {
-            x: 80.0,
-            y: 80.0,
-            z: 80.0,
-        },
-        sat: {
-            x: 5.0,
-            y: 5.0,
-            z: 5.0,
-        },
-        iss: {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        s1u: {
-            // Model 10:1 Scale
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        s2u: {
-            // Model 10:1 Scale
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        s3u: {
-            // Model 10:1 Scale
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        starlink: {
-            // Model 10:1 Scale
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        dsp: {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        o3b: {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        globalstar: {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        gps: {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        orbcomm: {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        aehf: {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        iridium: {
-            // Model 10:1 Scale
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        debris0: {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        debris1: {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        debris2: {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-        rocketbody: {
-            x: 1.0,
-            y: 1.0,
-            z: 1.0,
-        },
-    };
 
     // main shader program
     meshManager.fragShaderCode = `
@@ -250,11 +151,11 @@
           mat4.rotateZ(mvMatrix, mvMatrix, camYaw + 180 * DEG2RAD);
         }
 
-        mat4.scale(
-            mvMatrix,
-            mvMatrix,
-            vec3.fromValues(model.size.x, model.size.y, model.size.z)
-        );
+        // mat4.scale(
+        //     mvMatrix,
+        //     mvMatrix,
+        //     vec3.fromValues(model.size.x, model.size.y, model.size.z)
+        // );
 
         // Assign the normal matrix the opposite of the mvMatrix
         nMatrix = nMatrixEmpty;
@@ -481,7 +382,7 @@
             // model objects and setting their mesh to the current mesh
             meshManager.models[mesh] = {};
             meshManager.models[mesh].mesh = meshManager.meshes[mesh];
-            meshManager.models[mesh].size = meshManager.sizeInfo[mesh];
+            // meshManager.models[mesh].size = meshManager.sizeInfo[mesh];
         }
         meshManager.loaded = true;
     }

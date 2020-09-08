@@ -201,71 +201,88 @@ var emptyMat4 = mat4.create();
 
             satSet.onCruncherReady();
             if (!settingsManager.disableUI) {
-                (function _reloadLastSensor() {
-                    let currentSensor = !settingsManager.offline
-                        ? JSON.parse(localStorage.getItem('currentSensor'))
-                        : null;
-                    if (currentSensor !== null) {
-                        try {
-                            // If there is a staticnum set use that
-                            if (
-                                typeof currentSensor[0] == 'undefined' ||
-                                currentSensor[0] == null
-                            ) {
-                                sensorManager.setSensor(null, currentSensor[1]);
-                            } else {
-                                // If the sensor is a string, load that collection of sensors
-                                if (
-                                    typeof currentSensor[0].shortName ==
-                                    'undefined'
-                                ) {
-                                    sensorManager.setSensor(
-                                        currentSensor[0],
-                                        currentSensor[1]
-                                    );
-                                } else {
-                                    // Seems to be a single sensor without a staticnum, load that
-                                    sensorManager.setSensor(
-                                        sensorManager.sensorList[
-                                            currentSensor[0].shortName
-                                        ],
-                                        currentSensor[1]
-                                    );
-                                }
-                            }
-                        } catch (e) {
-                            // Clear old settings because they seem corrupted
-                            localStorage.setItem('currentSensor', null);
-                            console.warn('Saved Sensor Information Invalid');
-                        }
-                    }
-                })();
-                (function _watchlistInit() {
-                    let watchlistJSON = !settingsManager.offline
-                        ? localStorage.getItem('watchlistList')
-                        : null;
-                    if (watchlistJSON !== null) {
-                        let newWatchlist = JSON.parse(watchlistJSON);
-                        watchlistInViewList = [];
-                        for (let i = 0; i < newWatchlist.length; i++) {
-                            let sat = satSet.getSatExtraOnly(
-                                satSet.getIdFromObjNum(newWatchlist[i])
-                            );
-                            if (sat !== null) {
-                                newWatchlist[i] = sat.id;
-                                watchlistInViewList.push(false);
-                            } else {
-                                console.error('Watchlist File Format Incorret');
-                                return;
-                            }
-                        }
-                        uiManager.updateWatchlist(
-                            newWatchlist,
-                            watchlistInViewList
-                        );
-                    }
-                })();
+              // Load Optional 3D models if available
+              setTimeout(function () {
+                if (typeof meshManager !== 'undefined') {
+                  setTimeout(function () {
+                    meshManager.init();
+                  }, 0);
+                  settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
+                }
+              }, 0);
+
+              (function _reloadLastSensor() {
+                  let currentSensor = !settingsManager.offline
+                      ? JSON.parse(localStorage.getItem('currentSensor'))
+                      : null;
+                  if (currentSensor !== null) {
+                      try {
+                          // If there is a staticnum set use that
+                          if (
+                              typeof currentSensor[0] == 'undefined' ||
+                              currentSensor[0] == null
+                          ) {
+                              sensorManager.setSensor(null, currentSensor[1]);
+                          } else {
+                              // If the sensor is a string, load that collection of sensors
+                              if (
+                                  typeof currentSensor[0].shortName ==
+                                  'undefined'
+                              ) {
+                                  sensorManager.setSensor(
+                                      currentSensor[0],
+                                      currentSensor[1]
+                                  );
+                              } else {
+                                  // Seems to be a single sensor without a staticnum, load that
+                                  sensorManager.setSensor(
+                                      sensorManager.sensorList[
+                                          currentSensor[0].shortName
+                                      ],
+                                      currentSensor[1]
+                                  );
+                              }
+                          }
+                      } catch (e) {
+                          // Clear old settings because they seem corrupted
+                          localStorage.setItem('currentSensor', null);
+                          console.warn('Saved Sensor Information Invalid');
+                      }
+                  }
+              })();
+              (function _watchlistInit() {
+                  let watchlistJSON = !settingsManager.offline
+                      ? localStorage.getItem('watchlistList')
+                      : null;
+                  if (watchlistJSON !== null) {
+                      let newWatchlist = JSON.parse(watchlistJSON);
+                      watchlistInViewList = [];
+                      for (let i = 0; i < newWatchlist.length; i++) {
+                          let sat = satSet.getSatExtraOnly(
+                              satSet.getIdFromObjNum(newWatchlist[i])
+                          );
+                          if (sat !== null) {
+                              newWatchlist[i] = sat.id;
+                              watchlistInViewList.push(false);
+                          } else {
+                              console.error('Watchlist File Format Incorret');
+                              return;
+                          }
+                      }
+                      uiManager.updateWatchlist(
+                          newWatchlist,
+                          watchlistInViewList
+                      );
+                  }
+              })();
             }
+
+            try {
+              nextLaunchManager.init();
+            } catch (e) {
+              // Might not have this module
+            }
+
             (function _parseGetParameters() {
                 // do querystring stuff
                 let params = satSet.queryStr.split('&');
@@ -366,8 +383,8 @@ var emptyMat4 = mat4.create();
                         true
                     ); // force color recalc
                     groups.debris.updateOrbits();
-                    isOrbitOverlay = true;
-                }, 5000);
+                    settingsManager.isOrbitOverlayVisible = true;
+                }, 0);
             }
 
             settingsManager.cruncherReady = true;
@@ -478,29 +495,9 @@ var emptyMat4 = mat4.create();
         dotShader.maxSize = gl.getUniformLocation(dotShader, 'maxSize');
         dotShader.uMvMatrix = gl.getUniformLocation(dotShader, 'uMvMatrix');
         dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
-        dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
+        dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');        
 
-        try {
-            var tleSource = settingsManager.tleSource;
-            // $.get('' + tleSource + '?v=' + settingsManager.versionNumber)
-            $.get('' + tleSource)
-                .done(function (resp) {
-                    // if the .json loads then use it
-                    loadTLEs(resp);
-                })
-                .fail(function () {
-                    // Sometimes network firewall's hate .json so use a .js
-                    $.getScript('/offline/tle.js', function () {
-                        loadTLEs(jsTLEfile);
-                    });
-                });
-            jsTLEfile = null;
-        } catch (e) {
-            loadTLEs(jsTLEfile);
-            jsTLEfile = null;
-        }
-
-        function loadTLEs(resp) {
+        satSet.loadTLEs = (resp) => {
             var obslatitude;
             var obslongitude;
             var obsheight;
@@ -521,7 +518,7 @@ var emptyMat4 = mat4.create();
                 // console.log(`${Date.now()} - TruSat TLEs Loading...`);
                 $.getScript('/tle/trusat.js', function () {
                     // console.log(`${Date.now()} - TruSat TLEs Loaded!`);
-                    loadTLEs(resp); // Try again when you have all TLEs
+                    satSet.loadTLEs(resp); // Try again when you have all TLEs
                 });
                 return; // Stop and Wait for the TruSat TLEs to Load
             }

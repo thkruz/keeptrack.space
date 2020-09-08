@@ -1,32 +1,34 @@
 (function nextLaunchInit() {
     let nextLaunchManager = {};
     nextLaunchManager.launchList = [];
-    $.get('https://launchlibrary.net/1.4/launch/next/20').done(function (resp) {
+    nextLaunchManager.init = () => {
+      $.get('https://launchlibrary.net/1.4/launch/next/20').done(function (resp) {
         for (let i = 0; i < resp.launches.length; i++) {
-            let launchInfo = {};
-            launchInfo.name = resp.launches[i].name;
-            launchInfo.updated = new Date(resp.launches[i].changed);
-            launchInfo.windowStart = new Date(resp.launches[i].wsstamp * 1000); // sec to ms
-            launchInfo.windowEnd = new Date(resp.launches[i].westamp * 1000); //sec to ms
-            launchInfo.location = resp.launches[i].location.name.split(',', 1);
-            launchInfo.location = launchInfo.location[0];
-            launchInfo.locationURL = resp.launches[i].location.pads[0].wikiURL;
-            launchInfo.agency = resp.launches[i].lsp.name;
-            launchInfo.country = resp.launches[i].lsp.countryCode;
-            launchInfo.agencyURL = resp.launches[i].lsp.wikiURL;
-            if (typeof resp.launches[i].missions[0] != 'undefined') {
-                launchInfo.mission = resp.launches[i].missions[0].description;
-                launchInfo.missionName = resp.launches[i].missions[0].name;
-                launchInfo.missionType = resp.launches[i].missions[0].typeName;
-                launchInfo.missionURL = resp.launches[i].missions[0].wikiURL;
-            }
-            launchInfo.rocket = resp.launches[i].rocket.name;
-            launchInfo.rocketConfig = resp.launches[i].rocket.configuration;
-            launchInfo.rocketFamily = resp.launches[i].rocket.familyname;
-            launchInfo.rocketURL = resp.launches[i].rocket.wikiURL;
-            nextLaunchManager.launchList[i] = launchInfo;
+          let launchInfo = {};
+          launchInfo.name = resp.launches[i].name;
+          launchInfo.updated = new Date(resp.launches[i].changed);
+          launchInfo.windowStart = new Date(resp.launches[i].wsstamp * 1000); // sec to ms
+          launchInfo.windowEnd = new Date(resp.launches[i].westamp * 1000); //sec to ms
+          launchInfo.location = resp.launches[i].location.name.split(',', 1);
+          launchInfo.location = launchInfo.location[0];
+          launchInfo.locationURL = resp.launches[i].location.pads[0].wikiURL;
+          launchInfo.agency = resp.launches[i].lsp.name;
+          launchInfo.country = resp.launches[i].lsp.countryCode;
+          launchInfo.agencyURL = resp.launches[i].lsp.wikiURL;
+          if (typeof resp.launches[i].missions[0] != 'undefined') {
+            launchInfo.mission = resp.launches[i].missions[0].description;
+            launchInfo.missionName = resp.launches[i].missions[0].name;
+            launchInfo.missionType = resp.launches[i].missions[0].typeName;
+            launchInfo.missionURL = resp.launches[i].missions[0].wikiURL;
+          }
+          launchInfo.rocket = resp.launches[i].rocket.name;
+          launchInfo.rocketConfig = resp.launches[i].rocket.configuration;
+          launchInfo.rocketFamily = resp.launches[i].rocket.familyname;
+          launchInfo.rocketURL = resp.launches[i].rocket.wikiURL;
+          nextLaunchManager.launchList[i] = launchInfo;
         }
-    });
+      });
+    };
     nextLaunchManager.showTable = function () {
         let tbl = document.getElementById('nextLaunch-table'); // Identify the table to update
 

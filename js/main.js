@@ -224,13 +224,15 @@ function initializeKeepTrack() {
     webGlInit();
     sun.init();
     earth.init();
-    if (!settingsManager.enableLimitedUI) {
+    if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
         atmosphere.init();
         moon.init();
     }
     // Load Optional 3D models if available
     if (typeof meshManager !== 'undefined') {
-        meshManager.init();
+        setTimeout(function () {
+          meshManager.init();
+        }, 0);
         settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
     }
     ColorScheme.init();

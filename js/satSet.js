@@ -482,7 +482,8 @@ var emptyMat4 = mat4.create();
 
         try {
             var tleSource = settingsManager.tleSource;
-            $.get('' + tleSource + '?v=' + settingsManager.versionNumber)
+            // $.get('' + tleSource + '?v=' + settingsManager.versionNumber)
+            $.get('' + tleSource)
                 .done(function (resp) {
                     // if the .json loads then use it
                     loadTLEs(resp);

@@ -1,39 +1,18 @@
-// Import CSS needed for loading screen
-if (!settingsManager.disableUI) {
-    document.write(`
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/loading-screen.css?v=${settingsManager.versionNumber}" type="text/css"\>
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/fonts.css?v=${settingsManager.versionNumber}" type="text/css"\>
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize.css?v=${settingsManager.versionNumber}" type="text/css"\>
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize-local.css?v=${settingsManager.versionNumber}" type="text/css"\>
-    <link rel="stylesheet" href="${settingsManager.installDirectory}js/lib/colorPick.css?v=${settingsManager.versionNumber}" type="text/css"\>
-    <link rel="stylesheet" href="${settingsManager.installDirectory}modules/nextLaunchManager.css?v=${settingsManager.versionNumber}" type="text/css"\>
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/perfect-scrollbar.min.css?v=${settingsManager.versionNumber}" type="text/css"\>
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/jquery-ui.min.css?v=${settingsManager.versionNumber}" type="text/css"\>
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/jquery-ui-timepicker-addon.css?v=${settingsManager.versionNumber}" type="text/css"\>
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/style.css?v=${settingsManager.versionNumber}" type="text/css"\>
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/responsive.css?v=${settingsManager.versionNumber}" type="text/css"\>
-  `);
-} else if (settingsManager.enableLimitedUI) {
-    document.write(`
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/limitedUI.css?v=${settingsManager.versionNumber}" type="text/css"\>
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize.css?v=${settingsManager.versionNumber}" type="text/css"\>
-  `);
-} else {
-    console.log('ERROR');
-}
-
 // Load Dependencies
+if (!settingsManager.disableUI) {
+  document.write(`
+    <script src="${settingsManager.installDirectory}js/lib/colorPick.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/lib/webgl-obj-loader.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/mapManager.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}license/license.js?v=${settingsManager.versionNumber}"\><\/script>
+    `);
+}
 document.write(`
-  <script src="${settingsManager.installDirectory}js/lib/colorPick.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/materialize.min.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/gl-matrix-min.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/lib/webgl-obj-loader.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/satellite.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/suncalc.js?v=${settingsManager.versionNumber}"\><\/script>
-
   <script src="${settingsManager.installDirectory}js/shaders.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/mapManager.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}license/license.js?v=${settingsManager.versionNumber}"\><\/script>
   `);
 
 // Enable Satbox Overlay
@@ -140,6 +119,7 @@ if (!settingsManager.disableUI) {
     <script src="${settingsManager.installDirectory}modules/satCommManager.js?v=${settingsManager.versionNumber}"\><\/script>
 
     <script src="${settingsManager.installDirectory}js/lib/CanvasRecorder.min.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}modules/satVmagManager.js?v=${settingsManager.versionNumber}"\><\/script>
   `);
 }
 
@@ -157,24 +137,17 @@ document.write(`
   <script src="${settingsManager.installDirectory}js/groups.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lookangles.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/satSet.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}modules/satVmagManager.js?v=${settingsManager.versionNumber}"\><\/script>
 
   <script src="${settingsManager.installDirectory}js/objectManager.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/lib/file-saver.min.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}modules/missileManager.js?v=${settingsManager.versionNumber}"\><\/script>
   <script src="${settingsManager.installDirectory}js/color-scheme.js?v=${settingsManager.versionNumber}"\><\/script>
-  <script src="${settingsManager.installDirectory}js/mobile.js?v=${settingsManager.versionNumber}"\><\/script>
-
   <script src="${settingsManager.installDirectory}js/mobile.js?v=${settingsManager.versionNumber}"\><\/script>
 `);
 if (!settingsManager.disableUI) {
-    document.write(
-        '<script src="' +
-            settingsManager.installDirectory +
-            'js/ui.js?v=' +
-            settingsManager.versionNumber +
-            '"></script>'
-    );
+    document.write(`
+      <script src="${settingsManager.installDirectory}modules/missileManager.js?v=${settingsManager.versionNumber}"\><\/script>
+      <script src="${settingsManager.installDirectory}modules/ui.js?v=${settingsManager.versionNumber}"\><\/script>
+    `);
 }
 
 document.write(`

@@ -129,7 +129,7 @@ if (db.enabled) {
     <script src="${settingsManager.installDirectory}js/lib/starcalc.min.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/groups.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/lookangles.min.js?v=${settingsManager.versionNumber}"\><\/script>
-    <script src="${settingsManager.installDirectory}js/satSet.min.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/satSet.js?v=${settingsManager.versionNumber}"\><\/script>
 
     <script src="${settingsManager.installDirectory}js/objectManager.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/lib/file-saver.min.js?v=${settingsManager.versionNumber}"\><\/script>

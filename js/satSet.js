@@ -934,7 +934,7 @@ var emptyMat4 = mat4.create();
                     }
                 }
             }
-        }
+        };
     };
 
     satSet.getSatData = () => {

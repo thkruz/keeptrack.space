@@ -23,7 +23,7 @@ detectIe();
 // directory is currectly set. If we look for the index.htm file then it will
 // always be found (otherwise how did we load this script). If we look for
 // optional modules like sensorManager.js then it could fail to load unnecessarily
-let checkRequest = new Request(`${settingsManager.installDirectory}js/shaders.js`);
+let checkRequest = new Request(`${settingsManager.installDirectory}js/objectManager.js`);
 
 fetch(checkRequest).then(function (response) {
     // console.log(response.status + "OK");

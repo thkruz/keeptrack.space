@@ -7,6 +7,7 @@
 */
 
 (function () {
+    objectManager.isMissileManagerLoaded = true;
     var missileManager = {};
     missileManager.missilesInUse = 0;
     missileManager.lastMissileError = '';

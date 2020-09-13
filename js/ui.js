@@ -54,8 +54,6 @@ var rightBtnEarthMenuDOM = $('#earth-rmb-menu');
 
 var lkpassed = false;
 
-var clickedSat = 0;
-
 // Public Functions
 
 function saveVariable(variable) {
@@ -192,23 +190,6 @@ var speedModifier = 1;
             $('#jday').html(jday);
             jday = null; // Garbage collect
 
-            // Load the Stylesheets
-            $('head').append(
-                '<link rel="stylesheet" type="text/css" href="css/style.css?v=' +
-                    settingsManager.versionNumber +
-                    '"">'
-            );
-            $('head').append(
-                '<link rel="stylesheet" type="text/css" href="css/responsive.css?v=' +
-                    settingsManager.versionNumber +
-                    '"">'
-            );
-
-            // Load ALl The Images Now
-            $('img').each(function () {
-                $(this).attr('src', $(this).attr('delayedsrc'));
-            });
-
             // Initialize Navigation Menu
             $('.dropdown-button').dropdown();
             $('.tooltipped').tooltip({ delay: 50 });
@@ -254,7 +235,7 @@ var speedModifier = 1;
                 }
             });
         })();
-
+    
         var isNotColorPickerInitialSetup = false;
         (function _setupColorPicker() {
             db.log('_setupColorPicker');
@@ -1335,6 +1316,15 @@ var speedModifier = 1;
             $('#radar-altair').on('click', function () {
                 sensorManager.setSensor(sensorManager.sensorList.ALT);
             });
+            $('#radar-mmw').on('click', function () {
+                sensorManager.setSensor(sensorManager.sensorList.MMW);
+            });
+            $('#radar-alcor').on('click', function () {
+                sensorManager.setSensor(sensorManager.sensorList.ALC);
+            });
+            $('#radar-tradex').on('click', function () {
+                sensorManager.setSensor(sensorManager.sensorList.TDX);
+            });
             $('#radar-millstone').on('click', function () {
                 sensorManager.setSensor(sensorManager.sensorList.MIL);
             });
@@ -1481,11 +1471,13 @@ var speedModifier = 1;
                 var fblRange = $('#fbl-range').val();
                 var fblInc = $('#fbl-inc').val();
                 var fblPeriod = $('#fbl-period').val();
+                var fblRcs = $('#fbl-rcs').val();
                 var fblAzimuthM = $('#fbl-azimuth-margin').val();
                 var fblElevationM = $('#fbl-elevation-margin').val();
                 var fblRangeM = $('#fbl-range-margin').val();
                 var fblIncM = $('#fbl-inc-margin').val();
                 var fblPeriodM = $('#fbl-period-margin').val();
+                var fblRcsM = $('#fbl-rcs-margin').val();
                 var fblType = $('#fbl-type').val();
                 $('#search').val(''); // Reset the search first
                 var res = satSet.searchAzElRange(
@@ -1499,6 +1491,8 @@ var speedModifier = 1;
                     fblIncM,
                     fblPeriod,
                     fblPeriodM,
+                    fblRcs,
+                    fblRcsM,
                     fblType
                 );
                 if (typeof res === 'undefined') {
@@ -6407,6 +6401,7 @@ var speedModifier = 1;
     _resetSensorSelected = function () {
         // Return to default settings with nothing 'inview'
         satellite.setobs(void 0);
+        sensorManager.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
         satCruncher.postMessage({
             typ: 'offset',
             dat:

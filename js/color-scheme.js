@@ -147,7 +147,7 @@
                     colorData[i * 4 + 3] = settingsManager.hoverColor[3]; // A
                 }
             } catch (e) {
-                debugger;
+                // Don't let one bad color setting break everything
             }
         }
 
@@ -155,6 +155,7 @@
         gl.bufferData(gl.ARRAY_BUFFER, colorData, gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.pickableBuf);
         gl.bufferData(gl.ARRAY_BUFFER, pickableData, gl.STATIC_DRAW);
+
         return {
             colorBuf: this.colorBuf,
             pickableBuf: this.pickableBuf,

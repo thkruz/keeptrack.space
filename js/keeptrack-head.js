@@ -19,8 +19,8 @@ const MOON_SCALAR_DISTANCE = 250000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '1.19.9';
-    settingsManager.versionDate = 'August 24, 2020';
+    settingsManager.versionNumber = '1.20.0';
+    settingsManager.versionDate = 'September 8, 2020';
 
     // Install Folder Settings
     {
@@ -63,7 +63,7 @@ const MOON_SCALAR_DISTANCE = 250000;
     // Adjust to change camera speed of auto rotate around earth
     settingsManager.autoRotateSpeed = 1.0 * 0.000075;
     // Disable main user interface. Currently an all or nothing package.
-    settingsManager.disableUI = true;
+    settingsManager.disableUI = false;
     // Currently only disables panning. In the future it will disable all camera
     // movement
     settingsManager.disableCameraControls = false;
@@ -85,6 +85,17 @@ const MOON_SCALAR_DISTANCE = 250000;
     settingsManager.maxOrbitsDisplayedMobile = 1500;
     // Canvas will autoresize on screen resize to width/height of window
     settingsManager.isAutoResizeCanvas = true;
+    // Changing the zoom with the mouse wheel will stop the camera from following
+    // the satellite.
+    settingsManager.isZoomStopsSnappedOnSat = false;
+
+    // How many draw calls to wait before updating orbit overlay if last draw
+    // time was greater than 20ms
+    settingsManager.updateHoverDelayLimitSmall = 10;
+
+    // How many draw calls to wait before updating orbit overlay if last draw
+    // time was greater than 50ms
+    settingsManager.updateHoverDelayLimitBig = 15;
 
     settingsManager.fieldOfViewMin = 0.04; // 4 Degrees (I think)
     settingsManager.fieldOfViewMax = 1.2; // 120 Degrees (I think)
@@ -94,10 +105,10 @@ const MOON_SCALAR_DISTANCE = 250000;
 
     settingsManager.timeMachineDelay = 5000;
 
-    // settingsManager.earthPanningBufferDistance = 100; // Needs work in main.js
+    // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 
     // Use to Override TLE Settings
-    // settingsManager.tleSource = settingsManager.installDirectory + 'tle/TLEdebris.json';
+    // settingsManager.tleSource = settingsManager.installDirectory + 'tle/TLEdebris.json'
 
     // //////////////////////////////////////////////////////////////////////////
     // Mobile Settings
@@ -106,7 +117,7 @@ const MOON_SCALAR_DISTANCE = 250000;
     settingsManager.isMobileModeEnabled = false;
     if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
         settingsManager.isMobileModeEnabled = true;
-        settingsManager.camDistBuffer = 3500;
+        settingsManager.camDistBuffer = 100;
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -114,8 +125,8 @@ const MOON_SCALAR_DISTANCE = 250000;
     // //////////////////////////////////////////////////////////////////////////
     settingsManager.showOrbitThroughEarth = false;
 
-    settingsManager.atmosphereSize = RADIUS_OF_EARTH + 180;
-    settingsManager.atmosphereColor = 'vec3(0.0, 0.0, 1.0)';
+    settingsManager.atmosphereSize = RADIUS_OF_EARTH + 250;
+    settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)';
 
     settingsManager.satShader = {};
     settingsManager.satShader.largeObjectMinZoom = 0.37;
@@ -137,45 +148,41 @@ const MOON_SCALAR_DISTANCE = 250000;
     settingsManager.satShader.blurFactor4 = '0.2';
 
     // //////////////////////////////////////////////////////////////////////////
+    // Embed Overrides - FOR TESTING ONLY
+    // //////////////////////////////////////////////////////////////////////////
+
+    let pageName = location.href.split("/").slice(-1);
+    pageName = pageName[0].split("?").slice(0);
+
+    if (pageName[0] == 'embed.html') {
+      settingsManager.disableUI = true;
+      settingsManager.enableLimitedUI = true;
+      settingsManager.startWithOrbitsDisplayed = true;
+      settingsManager.isAutoResizeCanvas = true;
+      settingsManager.enableHoverOverlay = true;
+      settingsManager.enableHoverOrbits = true;
+      settingsManager.isDrawLess = true;
+      settingsManager.smallImages = true;
+      settingsManager.hiresNoCloudsImages = false;
+      settingsManager.tleSource = 'tle/TLEdebris.json';
+      settingsManager.updateHoverDelayLimitSmall = 25;
+      settingsManager.updateHoverDelayLimitBig = 45;
+    }
+
+    // //////////////////////////////////////////////////////////////////////////
     // Map settings
     // //////////////////////////////////////////////////////////////////////////
 
+    // settingsManager.smallImages = false;
     settingsManager.nasaImages = false;
     settingsManager.blueImages = false;
     settingsManager.lowresImages = false;
     settingsManager.hiresImages = false;
     settingsManager.hiresNoCloudsImages = false;
     settingsManager.vectorImages = false;
-
-    // Load the previously saved map
-    {
-        let lastMap = localStorage.getItem('lastMap');
-        switch (lastMap) {
-            case 'blue':
-                settingsManager.blueImages = true;
-                break;
-            case 'nasa':
-                settingsManager.nasaImages = true;
-                break;
-            case 'low':
-                settingsManager.lowresImages = true;
-                break;
-            case 'trusat':
-                settingsManager.trusatImages = true;
-                break;
-            case 'high':
-                settingsManager.hiresImages = true;
-                break;
-            case 'high-nc':
-                settingsManager.hiresNoCloudsImages = true;
-                break;
-            case 'vec':
-                settingsManager.vectorImages = true;
-                break;
-            default:
-                settingsManager.lowresImages = true;
-                break;
-        }
+    settingsManager.isLoadLastMap = true;
+    if (settingsManager.disableUI) {
+      settingsManager.isLoadLastMap = false;
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -245,14 +252,14 @@ const MOON_SCALAR_DISTANCE = 250000;
         settingsManager.colors.penumbral = [1.0, 1.0, 1.0, 0.3];
         settingsManager.colors.umbral = [1.0, 1.0, 1.0, 0.1];
         // DEBUG Colors
-        // settingsManager.colors.sunlight = [0.2, 0.4, 1.0, 1];
-        // settingsManager.colors.penumbral = [0.5, 0.5, 0.5, 0.85];
-        // settingsManager.colors.umbral = [0.2, 1.0, 0.0, 0.5];
+        // settingsManager.colors.sunlight = [0.2, 0.4, 1.0, 1]
+        // settingsManager.colors.penumbral = [0.5, 0.5, 0.5, 0.85]
+        // settingsManager.colors.umbral = [0.2, 1.0, 0.0, 0.5]
 
         settingsManager.colors.gradientAmt = 0;
         // Gradients Must be Edited in color-scheme.js
-        // settingsManager.colors.apogeeGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
-        // settingsManager.colors.velGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0];
+        // settingsManager.colors.apogeeGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0]
+        // settingsManager.colors.velGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0]
         settingsManager.colors.satSmall = [0.2, 1.0, 0.0, 0.65];
         settingsManager.colors.rcsSmall = [1.0, 0, 0, 0.6];
         settingsManager.colors.rcsMed = [0.2, 0.4, 1.0, 1];
@@ -281,11 +288,11 @@ const MOON_SCALAR_DISTANCE = 250000;
     // //////////////////////////////////////////////////////////////////////////
     settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 0.9];
     settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];
-    // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0];
-    settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.6]; // WHITE
-    // settingsManager.orbitInViewColor = [1.0, 1.0, 0.0, 1.0]; // Applies to Planetarium View
-    //settingsManager.orbitGroupColor = [0.3, 0.5, 1.0, 0.4];
-    settingsManager.orbitGroupColor = [0.3, 1.0, 1.0, 0.4];
+    // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0]
+    settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.7]; // WHITE
+    // settingsManager.orbitInViewColor = [1.0, 1.0, 0.0, 1.0] // Applies to Planetarium View
+    //settingsManager.orbitGroupColor = [0.3, 0.5, 1.0, 0.4]
+    settingsManager.orbitGroupColor = [0.3, 1.0, 1.0, 0.7];
 
     // //////////////////////////////////////////////////////////////////////////
     // UI Settings
@@ -350,9 +357,9 @@ const MOON_SCALAR_DISTANCE = 250000;
         $('#legend-hover-menu').css('background', 'LightCoral');
         $('#legend-hover-menu').css('border-color', 'DarkRed');
         $('#colorbox').css('border', '10px solid DarkRed');
-        // $('#search-results').css('cssText', 'background: LightCoral !important');
-        // $('#search-results').css('border-color', 'DarkRed');
-        // $('#search-result:hover').css('background', 'DarkRed');
+        // $('#search-results').css('cssText', 'background: LightCoral !important')
+        // $('#search-results').css('border-color', 'DarkRed')
+        // $('#search-result:hover').css('background', 'DarkRed')
         $('#nav-footer-toggle').css('background', 'DarkRed');
         $('.badge').css('cssText', 'color: DarkRed !important');
         $('.search-hilight').css('color', 'DarkRed');
@@ -380,9 +387,9 @@ const MOON_SCALAR_DISTANCE = 250000;
         $('#menu-info-overlay ').css('border-left-color', 'steelblue');
         $('.side-menu').css('background', '#1f3347');
         $('.side-menu').css('border-color', '#172635');
-        // $('#search-results').css('cssText', 'background: #1f3347 !important');
-        // $('#search-results:hover').css('background', '#172635');
-        // $('#search-results').css('border-color', '#172635');
+        // $('#search-results').css('cssText', 'background: #1f3347 !important')
+        // $('#search-results:hover').css('background', '#172635')
+        // $('#search-results').css('border-color', '#172635')
         $('#legend-hover-menu').css('background', '#1f3347');
         $('#legend-hover-menu').css('border-color', '#172635');
         $('#colorbox').css('border', '10px solid #172635');
@@ -400,10 +407,10 @@ const MOON_SCALAR_DISTANCE = 250000;
     // //////////////////////////////////////////////////////////////////////////
 
     // Frames Per Second Limiter
-    settingsManager.minimumDrawDt = 0.0; // 20 FPS // 60 FPS = 0.01667;
+    settingsManager.minimumDrawDt = 0.0; // 20 FPS // 60 FPS = 0.01667
 
-    settingsManager.camDistBuffer = 2000;
-    settingsManager.zNear = 20.0;
+    settingsManager.camDistBuffer = 75;
+    settingsManager.zNear = 1.0;
     settingsManager.zFar = 500000.0;
 
     // //////////////////////////////////////////////////////////////////////////
@@ -474,7 +481,8 @@ const MOON_SCALAR_DISTANCE = 250000;
 // This is an initial parse of the GET variables
 // to determine critical settings. Other variables are checked later during
 // satSet.init
-(function initParseFromGETVariables() {
+if (!settingsManager.disableUI) {
+  (function initParseFromGETVariables() {
     let queryStr = window.location.search.substring(1);
     let params = queryStr.split('&');
     for (let i = 0; i < params.length; i++) {
@@ -488,9 +496,25 @@ const MOON_SCALAR_DISTANCE = 250000;
             case 'hires':
                 settingsManager.hiresImages = true;
                 settingsManager.minimumDrawDt = 0.01667;
+                document.write(`
+                  <link rel="preload" href="textures/earthmap8k.jpg" as="image">
+                  <link rel="preload" href="textures/earthlights10k.jpg" as="image">
+                  <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+                  <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+                  `);
+                break;
+            case 'draw-less':
+                settingsManager.isDrawLess = true;
+                settingsManager.smallImages = true;
                 break;
             case 'vec':
                 settingsManager.vectorImages = true;
+                document.write(`
+                  <link rel="preload" href="textures/dayearthvector-4096.jpg" as="image">
+                  <link rel="preload" href="textures/earthlights4k.jpg" as="image">
+                  <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+                  <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+                  `);
                 break;
             case 'retro':
                 settingsManager.retro = true;
@@ -506,12 +530,10 @@ const MOON_SCALAR_DISTANCE = 250000;
                 settingsManager.tleSource = 'tle/mw.json';
                 break;
             case 'trusat':
-                db.log('TruSat Overlay Mode Initializing');
                 settingsManager.trusatMode = true;
                 settingsManager.trusatImages = true;
                 break;
             case 'trusat-only':
-                db.log('TruSat Only Mode Initializing');
                 settingsManager.trusatMode = true;
                 settingsManager.trusatOnly = true;
                 settingsManager.trusatImages = true;
@@ -529,6 +551,85 @@ const MOON_SCALAR_DISTANCE = 250000;
         }
     }
 })();
+}
+
+// Load the previously saved map
+if (settingsManager.isLoadLastMap && !settingsManager.isDrawLess) {
+    let lastMap = localStorage.getItem('lastMap');
+    switch (lastMap) {
+        case 'blue':
+            settingsManager.blueImages = true;
+            document.write(`
+              <link rel="preload" href="textures/world_blue-2048.png" as="image">
+              <link rel="preload" href="textures/earthlights4k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        case 'nasa':
+            settingsManager.nasaImages = true;
+            document.write(`
+              <link rel="preload" href="textures/mercator-tex.jpg" as="image">
+              <link rel="preload" href="textures/earthlights4k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        case 'low':
+            settingsManager.lowresImages = true;
+            document.write(`
+              <link rel="preload" href="textures/earthmap4k.jpg" as="image">
+              <link rel="preload" href="textures/earthlights4k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        case 'trusat':
+            settingsManager.trusatImages = true;
+            document.write(`
+              <link rel="preload" href="textures/trusatvector-4096.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        case 'high':
+            settingsManager.hiresImages = true;
+            document.write(`
+              <link rel="preload" href="textures/earthmap8k.jpg" as="image">
+              <link rel="preload" href="textures/earthlights10k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        case 'high-nc':
+            settingsManager.hiresNoCloudsImages = true;
+            document.write(`
+              <link rel="preload" href="textures/earthmap8k.jpg" as="image">
+              <link rel="preload" href="textures/earthlights10k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        case 'vec':
+            settingsManager.vectorImages = true;
+            document.write(`
+              <link rel="preload" href="textures/dayearthvector-4096.jpg" as="image">
+              <link rel="preload" href="textures/earthlights4k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+        default:
+            settingsManager.lowresImages = true;
+            document.write(`
+              <link rel="preload" href="textures/earthmap4k.jpg" as="image">
+              <link rel="preload" href="textures/earthlights4k.jpg" as="image">
+              <link rel="preload" href="textures/earthbump8k.jpg" as="image">
+              <link rel="preload" href="textures/earthspec8k.jpg" as="image">
+              `);
+            break;
+    }
+}
 
 //Global Debug Manager
 let db = {};
@@ -565,7 +666,10 @@ let db = {};
         };
         if (db.enabled) {
             // Fix for multiple sensors gettings saved locally by previous bug
-            if (currentSensor.length > 1) currentSensor = currentSensor[0];
+            try {
+              if (currentSensor.length > 1) currentSensor = currentSensor[0];
+            } catch (e) {
+            }
         }
     })();
 }
@@ -580,8 +684,8 @@ if (typeof $ == 'undefined') {
 // Import CSS needed for loading screen
 if (!settingsManager.disableUI) {
     document.write(`
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/loading-screen.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/fonts.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/loading-screen.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize-local.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}js/lib/colorPick.css?v=${settingsManager.versionNumber}" type="text/css"\>
@@ -589,8 +693,10 @@ if (!settingsManager.disableUI) {
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/perfect-scrollbar.min.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/jquery-ui.min.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/jquery-ui-timepicker-addon.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/style.css?v=${settingsManager.versionNumber}" type="text/css"\>
+    <link rel="stylesheet" href="${settingsManager.installDirectory}css/responsive.css?v=${settingsManager.versionNumber}" type="text/css"\>
   `);
-} else if (settingsManager.enableLimitedUI || settingsManager.disableUI) {
+} else if (settingsManager.enableLimitedUI) {
     document.write(`
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/limitedUI.css?v=${settingsManager.versionNumber}" type="text/css"\>
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize.css?v=${settingsManager.versionNumber}" type="text/css"\>

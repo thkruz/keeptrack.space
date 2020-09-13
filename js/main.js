@@ -47,8 +47,10 @@ var camPitchSpeed = 0;
 var camYawSpeed = 0;
 var camRotateSpeed = 0;
 
+var clickedSat = 0;
+
 let cameraManager = {};
-cameraManager.chaseSpeed = 0.001;
+cameraManager.chaseSpeed = 0.0035;
 
 // Menu Variables
 var isEditSatMenuOpen = false;
@@ -214,21 +216,13 @@ let rayOrigin,
 // //////////////////////////////////////////////////////////////////////////
 
 function initializeKeepTrack() {
-    // Set Default TLE
-    if (typeof settingsManager.tleSource == 'undefined') {
-        settingsManager.tleSource = 'tle/TLE.json';
-    }
     mobile.checkMobileMode();
     webGlInit();
     sun.init();
     earth.init();
-    if (!settingsManager.enableLimitedUI) {
+    if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
         atmosphere.init();
         moon.init();
-    }
-    // Load Optional 3D models if available
-    if (typeof meshManager !== 'undefined') {
-        meshManager.init();
     }
     ColorScheme.init();
     $('#loader-text').text('Drawing Dots in Space...');
@@ -247,7 +241,11 @@ function initializeKeepTrack() {
         })();
         let isFinalLoadingComplete = false;
         (function _finalLoadingSequence() {
-            if (!isFinalLoadingComplete && !earth.loaded) {
+            if (
+                !isFinalLoadingComplete &&
+                !earth.loaded &&
+                settingsManager.cruncherReady
+            ) {
                 setTimeout(function () {
                     _finalLoadingSequence();
                 }, 250);
@@ -287,13 +285,15 @@ function initializeKeepTrack() {
                         $('#loader-text').html('Attempting to Math...');
                     }, 5000);
                 } else {
-                    $('#loading-screen').removeClass('full-loader');
-                    $('#loading-screen').addClass('mini-loader-container');
-                    $('#logo-inner-container').addClass('mini-loader');
-                    $('#logo-text').html('');
-                    $('#logo-trusat').hide();
-                    $('#loading-screen').hide();
-                    $('#loader-text').html('Attempting to Math...');
+                    setTimeout(function () {
+                        $('#loading-screen').removeClass('full-loader');
+                        $('#loading-screen').addClass('mini-loader-container');
+                        $('#logo-inner-container').addClass('mini-loader');
+                        $('#logo-text').html('');
+                        $('#logo-trusat').hide();
+                        $('#loading-screen').hide();
+                        $('#loader-text').html('Attempting to Math...');
+                    }, 2000);
                 }
             }
 
@@ -341,20 +341,20 @@ function drawLoop() {
         if (drawLoopCount > 50) {
             if (dt > 500 && !settingsManager.isSlowCPUModeEnabled) {
                 // Method of determining if computer is slow
-                // selectSat(-1);
-                // M.toast({html: `Computer is slow!</br>Forcing Mobile Mode`});
-                // settingsManager.isMobileModeEnabled = true;
-                // settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
-                // webGlInit();
-                // !settingsManager.enableHoverOverlay = true;
-                // enableSlowCPUMode();
+                // selectSat(-1)
+                // M.toast({html: `Computer is slow!</br>Forcing Mobile Mode`})
+                // settingsManager.isMobileModeEnabled = true
+                // settingsManager.fieldOfView = settingsManager.fieldOfViewMax
+                // webGlInit()
+                // !settingsManager.enableHoverOverlay = true
+                // enableSlowCPUMode()
             }
         }
     }
     if (dt > 20) {
-        updateHoverDelayLimit = 10;
+        updateHoverDelayLimit = settingsManager.updateHoverDelayLimitSmall;
     } else if (dt > 50) {
-        updateHoverDelayLimit = 15;
+        updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;
     } else {
         if (updateHoverDelayLimit > 1) --updateHoverDelayLimit;
     }
@@ -371,6 +371,13 @@ function drawLoop() {
             cameraManager.panDif.x = screenDragPoint[0] - mouseX;
             cameraManager.panDif.y = screenDragPoint[1] - mouseY;
             cameraManager.panDif.z = screenDragPoint[1] - mouseY;
+
+            // Slow down the panning if a satellite is selected
+            if (objectManager.selectedSat !== -1) {
+                cameraManager.panDif.x /= 30;
+                cameraManager.panDif.y /= 30;
+                cameraManager.panDif.z /= 30;
+            }
 
             cameraManager.panTarget.x =
                 cameraManager.panStartPosition.x +
@@ -605,7 +612,7 @@ function drawLoop() {
             (mouseX !== 0 || mouseY !== 0))
     ) {
         // Disable Raycasting for Performance
-        // dragTarget = getEarthScreenPoint(mouseX, mouseY);
+        // dragTarget = getEarthScreenPoint(mouseX, mouseY)
         // if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
         // isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
         //
@@ -748,14 +755,34 @@ function drawLoop() {
             _camSnapToSat(sat);
             // If 3D Models Available, then update their position on the screen
             if (typeof meshManager !== 'undefined') {
-                meshManager.selectedSatPosition = sat.position;
+                // Try to reduce some jitter
+                if (
+                    meshManager.selectedSatPosition.x > sat.position.x - 1 &&
+                    meshManager.selectedSatPosition.x < sat.position.x + 1 &&
+                    meshManager.selectedSatPosition.y > sat.position.y - 1 &&
+                    meshManager.selectedSatPosition.y < sat.position.y + 1 &&
+                    meshManager.selectedSatPosition.z > sat.position.z - 1 &&
+                    meshManager.selectedSatPosition.z < sat.position.z + 1
+                ) {
+                    meshManager.selectedSatPosition.x =
+                        (meshManager.selectedSatPosition.x + sat.position.x) /
+                        2;
+                    meshManager.selectedSatPosition.y =
+                        (meshManager.selectedSatPosition.y + sat.position.y) /
+                        2;
+                    meshManager.selectedSatPosition.z =
+                        (meshManager.selectedSatPosition.z + sat.position.z) /
+                        2;
+                } else {
+                    meshManager.selectedSatPosition = sat.position;
+                }
             }
         }
         if (sat.static && cameraType.current === cameraType.PLANETARIUM) {
-            // _camSnapToSat(objectManager.selectedSat);
+            // _camSnapToSat(objectManager.selectedSat)
         }
-        // var satposition = [sat.position.x, sat.position.y, sat.position.z];
-        // debugLine.set(satposition, [0, 0, 0]);
+        // var satposition = [sat.position.x, sat.position.y, sat.position.z]
+        // debugLine.set(satposition, [0, 0, 0])
     }
 
     if (
@@ -792,9 +819,9 @@ function drawLoop() {
         isSatMiniBoxInUse = false;
     }
 
-    // var bubble = new FOVBubble();
-    // bubble.set();
-    // bubble.draw();
+    // var bubble = new FOVBubble()
+    // bubble.set()
+    // bubble.draw()
 
     if (settingsManager.screenshotMode) {
         webGlInit();
@@ -845,8 +872,8 @@ function _watermarkedDataURL(canvas, text) {
     tempCtx.globalAlpha = 1.0;
     tempCtx.fillStyle = 'white';
     tempCtx.fillText(text, cw - textWidth - 30, ch - 30);
-    // tempCtx.fillStyle ='black';
-    // tempCtx.fillText(text,cw-textWidth-10+2,ch-20+2);
+    // tempCtx.fillStyle ='black'
+    // tempCtx.fillText(text,cw-textWidth-10+2,ch-20+2)
     // just testing by adding tempCanvas to document
     document.body.appendChild(tempCanvas);
     let image = tempCanvas.toDataURL();
@@ -876,7 +903,7 @@ function _camSnapToSat(sat) {
             camAngleSnappedOnSat = false;
         }
         if (cameraType.current === cameraType.PLANETARIUM) {
-            // camSnap(-pitch, -yaw);
+            // camSnap(-pitch, -yaw)
         } else {
             camSnap(pitch, yaw);
         }
@@ -904,21 +931,12 @@ function _camSnapToSat(sat) {
             camZoomSnappedOnSat = false;
             camAngleSnappedOnSat = false;
         }
-        if (
-            Math.pow(
-                (camDistTarget - settingsManager.minZoomDistance) /
-                    (settingsManager.maxZoomDistance -
-                        settingsManager.minZoomDistance),
-                1 / ZOOM_EXP
-            ) < zoomTarget
-        ) {
-            zoomTarget = Math.pow(
-                (camDistTarget - settingsManager.minZoomDistance) /
-                    (settingsManager.maxZoomDistance -
-                        settingsManager.minZoomDistance),
-                1 / ZOOM_EXP
-            );
-        }
+        zoomTarget = Math.pow(
+            (camDistTarget - settingsManager.minZoomDistance) /
+                (settingsManager.maxZoomDistance -
+                    settingsManager.minZoomDistance),
+            1 / ZOOM_EXP
+        );
     }
 
     if (cameraType.current === cameraType.PLANETARIUM) {
@@ -939,15 +957,15 @@ function _drawScene() {
     gl.uniformMatrix4fv(gl.pickShaderProgram.camMatrix, false, camMatrix);
 
     // Draw Scene
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    // gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    sun.draw(pMatrix, camMatrix);
-    if (!settingsManager.enableLimitedUI) {
+    if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
+        sun.draw(pMatrix, camMatrix);
         moon.draw(pMatrix, camMatrix);
     }
     earth.update();
-    if (!settingsManager.enableLimitedUI) {
+    if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
         atmosphere.update();
         atmosphere.draw(pMatrix, camMatrix);
     }
@@ -956,65 +974,301 @@ function _drawScene() {
     orbitManager.draw(pMatrix, camMatrix);
 
     // Draw Satellite if Selected
-    if (objectManager.selectedSat !== -1) {
-        let sat = satSet.getSat(objectManager.selectedSat);
-        // If 3D Models Available, then draw them on the screen
-        if (typeof meshManager !== 'undefined') {
-            if (!sat.static) {
-                if (sat.SCC_NUM == 25544) {
-                    meshManager.models.iss.position =
-                        meshManager.selectedSatPosition;
-                    meshManager.drawObject(
-                        meshManager.models.iss,
-                        pMatrix,
-                        camMatrix
-                    );
-                } else if (sat.OT == 1) {
-                    // Default Satellite
-                    if (sat.SCC_NUM < 20000) {
-                        meshManager.models.sat.position =
+    (function drawSatellite() {
+        if (objectManager.selectedSat !== -1 && meshManager.isReady) {
+            let sat = satSet.getSat(objectManager.selectedSat);
+            // If 3D Models Available, then draw them on the screen
+            if (typeof meshManager !== 'undefined') {
+                if (!sat.static) {
+                    if (sat.SCC_NUM == 25544) {
+                        meshManager.models.iss.position =
                             meshManager.selectedSatPosition;
                         meshManager.drawObject(
-                            meshManager.models.sat,
+                            meshManager.models.iss,
                             pMatrix,
-                            camMatrix
+                            camMatrix,
+                            sat,
+                            true
                         );
-                    } else {
-                        meshManager.models.Satellite.position =
-                            meshManager.selectedSatPosition;
-                        meshManager.drawObject(
-                            meshManager.models.Satellite,
-                            pMatrix,
-                            camMatrix
-                        );
+                        return;
                     }
-                } else if (sat.OT == 2) {
-                    // Rocket Body
-                    meshManager.models.rocketbody.position =
-                        meshManager.selectedSatPosition;
-                    meshManager.drawObject(
-                        meshManager.models.rocketbody,
-                        pMatrix,
-                        camMatrix
-                    );
-                } else if (sat.OT == 3) {
-                    // Debris
-                    meshManager.models.rocketdebris.position =
-                        meshManager.selectedSatPosition;
-                    meshManager.drawObject(
-                        meshManager.models.rocketdebris,
-                        pMatrix,
-                        camMatrix
-                    );
+
+                    if (sat.OT == 1) {
+                        // Default Satellite
+                        if (
+                            sat.ON.slice(0, 5) == 'FLOCK' ||
+                            sat.ON.slice(0, 5) == 'LEMUR'
+                        ) {
+                            meshManager.models.s3u.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.s3u,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+                        if (sat.ON.slice(0, 8) == 'STARLINK') {
+                            meshManager.models.starlink.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.starlink,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+
+                        if (sat.ON.slice(0, 10) == 'GLOBALSTAR') {
+                            meshManager.models.globalstar.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.globalstar,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+
+                        if (sat.ON.slice(0, 7) == 'IRIDIUM') {
+                            meshManager.models.iridium.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.iridium,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+
+                        if (sat.ON.slice(0, 7) == 'ORBCOMM') {
+                            meshManager.models.orbcomm.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.orbcomm,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+
+                        if (sat.ON.slice(0, 3) == 'O3B') {
+                            meshManager.models.o3b.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.o3b,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+
+                        if (
+                            sat.ON.slice(0, 7) == 'NAVSTAR' ||
+                            sat.ON.slice(10, 17) == 'NAVSTAR'
+                        ) {
+                            meshManager.models.gps.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.gps,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+
+                        // Is this a DSP Satellite?
+                        if (
+                            sat.SCC_NUM == '04630' ||
+                            sat.SCC_NUM == '05204' ||
+                            sat.SCC_NUM == '05851' ||
+                            sat.SCC_NUM == '06691' ||
+                            sat.SCC_NUM == '08482' ||
+                            sat.SCC_NUM == '08916' ||
+                            sat.SCC_NUM == '09803' ||
+                            sat.SCC_NUM == '11397' ||
+                            sat.SCC_NUM == '12339' ||
+                            sat.SCC_NUM == '13086' ||
+                            sat.SCC_NUM == '14930' ||
+                            sat.SCC_NUM == '15453' ||
+                            sat.SCC_NUM == '18583' ||
+                            sat.SCC_NUM == '20066' ||
+                            sat.SCC_NUM == '20929' ||
+                            sat.SCC_NUM == '21805' ||
+                            sat.SCC_NUM == '23435' ||
+                            sat.SCC_NUM == '24737' ||
+                            sat.SCC_NUM == '26356' ||
+                            sat.SCC_NUM == '26880' ||
+                            sat.SCC_NUM == '28158'
+                        ) {
+                            meshManager.models.dsp.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.dsp,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+
+                        // Is this an AEHF Satellite?
+                        if (
+                            sat.SCC_NUM == '36868' ||
+                            sat.SCC_NUM == '38254' ||
+                            sat.SCC_NUM == '39256' ||
+                            sat.SCC_NUM == '43651' ||
+                            sat.SCC_NUM == '44481' ||
+                            sat.SCC_NUM == '45465'
+                        ) {
+                            meshManager.models.aehf.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.aehf,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+
+                        // Is this a 1U Cubesat?
+                        if (
+                            parseFloat(sat.R) < 0.1 &&
+                            parseFloat(sat.R) > 0.04
+                        ) {
+                            meshManager.models.s1u.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.s1u,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+                        if (
+                            parseFloat(sat.R) < 0.22 &&
+                            parseFloat(sat.R) >= 0.1
+                        ) {
+                            meshManager.models.s2u.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.s2u,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+                        if (
+                            parseFloat(sat.R) < 0.33 &&
+                            parseFloat(sat.R) >= 0.22
+                        ) {
+                            meshManager.models.s3u.position =
+                                meshManager.selectedSatPosition;
+                            meshManager.drawObject(
+                                meshManager.models.s3u,
+                                pMatrix,
+                                camMatrix,
+                                sat,
+                                true
+                            );
+                            return;
+                        }
+                        // Generic Model
+                        meshManager.models.sat2.position =
+                            meshManager.selectedSatPosition;
+                        meshManager.drawObject(
+                            meshManager.models.sat2,
+                            pMatrix,
+                            camMatrix,
+                            sat,
+                            true
+                        );
+                        return;
+                    }
+
+                    if (sat.OT == 2) {
+                        // Rocket Body
+                        meshManager.models.rocketbody.position =
+                            meshManager.selectedSatPosition;
+                        meshManager.drawObject(
+                            meshManager.models.rocketbody,
+                            pMatrix,
+                            camMatrix,
+                            sat,
+                            false
+                        );
+                        return;
+                    }
+
+                    if (sat.OT == 3) {
+                        if (sat.SCC_NUM <= 20000) {
+                          // Debris
+                          meshManager.models.debris0.position =
+                          meshManager.selectedSatPosition;
+                          meshManager.drawObject(
+                            meshManager.models.debris0,
+                            pMatrix,
+                            camMatrix,
+                            sat,
+                            false
+                          );
+                          return;
+                        } else if (sat.SCC_NUM <= 35000) {
+                          // Debris
+                          meshManager.models.debris1.position =
+                          meshManager.selectedSatPosition;
+                          meshManager.drawObject(
+                            meshManager.models.debris1,
+                            pMatrix,
+                            camMatrix,
+                            sat,
+                            false
+                          );
+                          return;
+                        } else if (sat.SCC_NUM > 35000) {
+                          // Debris
+                          meshManager.models.debris2.position =
+                          meshManager.selectedSatPosition;
+                          meshManager.drawObject(
+                            meshManager.models.debris2,
+                            pMatrix,
+                            camMatrix,
+                            sat,
+                            false
+                          );
+                          return;
+                        }
+                    }
                 }
             }
         }
-    }
+    })();
 
     /* DEBUG - show the pickbuffer on a canvas */
-    // debugImageData.data = pickColorMap;
-    /* debugImageData.data.set(pickColorMap);
-  debugContext.putImageData(debugImageData, 0, 0); */
+    // debugImageData.data = pickColorMap
+    /* debugImageData.data.set(pickColorMap)
+    debugContext.putImageData(debugImageData, 0, 0) */
 }
 function _drawCamera() {
     camMatrix = camMatrixEmpty;
@@ -1136,11 +1390,11 @@ function _drawCamera() {
             break;
         }
         case cameraType.SATELLITE: {
-            // yawRotate = ((-90 - sensorManager.currentSensor.long) * DEG2RAD);
+            // yawRotate = ((-90 - sensorManager.currentSensor.long) * DEG2RAD)
             if (objectManager.selectedSat !== -1)
                 lastselectedSat = objectManager.selectedSat;
             let sat = satSet.getSat(lastselectedSat);
-            // mat4.rotate(camMatrix, camMatrix, sat.lat * DEG2RAD, [0, 1, 0]);
+            // mat4.rotate(camMatrix, camMatrix, sat.lat * DEG2RAD, [0, 1, 0])
             mat4.rotate(camMatrix, camMatrix, -fpsPitch * DEG2RAD, [1, 0, 0]);
             mat4.rotate(camMatrix, camMatrix, fpsYaw * DEG2RAD, [0, 0, 1]);
             mat4.rotate(camMatrix, camMatrix, fpsRotate * DEG2RAD, [0, 1, 0]);
@@ -1167,10 +1421,10 @@ function _drawCamera() {
             // Idealy the astronomy view would feel more natural and tell you what
             // az/el you are currently looking at.
 
-            // fpsEl = ((fpsPitch + 90) > 90) ? (-(fpsPitch) + 90) : (fpsPitch + 90);
-            // $('#el-text').html(' EL: ' + fpsEl.toFixed(2) + ' deg');
+            // fpsEl = ((fpsPitch + 90) > 90) ? (-(fpsPitch) + 90) : (fpsPitch + 90)
+            // $('#el-text').html(' EL: ' + fpsEl.toFixed(2) + ' deg')
 
-            // yawRotate = ((-90 - sensorManager.currentSensor.long) * DEG2RAD);
+            // yawRotate = ((-90 - sensorManager.currentSensor.long) * DEG2RAD)
             let sensor = null;
             if (typeof sensorManager.currentSensor.name == 'undefined') {
                 sensor = satSet.getIdFromSensorName(
@@ -1182,7 +1436,7 @@ function _drawCamera() {
                     satSet.getIdFromSensorName(sensorManager.currentSensor.name)
                 );
             }
-            // mat4.rotate(camMatrix, camMatrix, sat.inclination * DEG2RAD, [0, 1, 0]);
+            // mat4.rotate(camMatrix, camMatrix, sat.inclination * DEG2RAD, [0, 1, 0])
             mat4.rotate(
                 camMatrix,
                 camMatrix,
@@ -1196,7 +1450,7 @@ function _drawCamera() {
             ]);
             mat4.rotate(camMatrix, camMatrix, fpsRotate * DEG2RAD, [0, 1, 0]);
 
-            // orbitManager.updateOrbitBuffer(lastselectedSat);
+            // orbitManager.updateOrbitBuffer(lastselectedSat)
             let sensorPos = sensor.position;
             fpsXPos = sensorPos.x;
             fpsYPos = sensorPos.y;
@@ -1292,7 +1546,7 @@ function _fpsMovement() {
             );
         }
 
-        // console.log('Front: ' + fpsForwardSpeed + ' - ' + 'Side: ' + fpsSideSpeed + ' - ' + 'Vert: ' + fpsVertSpeed);
+        // console.log('Front: ' + fpsForwardSpeed + ' - ' + 'Side: ' + fpsSideSpeed + ' - ' + 'Vert: ' + fpsVertSpeed)
 
         if (cameraType.FPS) {
             if (fpsForwardSpeed !== 0) {
@@ -1345,7 +1599,7 @@ function _fpsMovement() {
         fpsRotate += fpsRotateRate * fpsElapsed;
         fpsYaw += fpsYawRate * fpsElapsed;
 
-        // console.log('Pitch: ' + fpsPitch + ' - ' + 'Rotate: ' + fpsRotate + ' - ' + 'Yaw: ' + fpsYaw);
+        // console.log('Pitch: ' + fpsPitch + ' - ' + 'Rotate: ' + fpsRotate + ' - ' + 'Yaw: ' + fpsYaw)
     }
     fpsLastTime = fpsTimeNow;
 }
@@ -1366,7 +1620,7 @@ function _updateHover() {
             );
         } catch (e) {}
         // } else {
-        //   _hoverBoxOnSat(-1, 0, 0);
+        //   _hoverBoxOnSat(-1, 0, 0)
         // }
     } else {
         if (
@@ -1481,18 +1735,18 @@ function _showOrbitsAbove() {
         orbitManager.addInViewOrbit(i);
 
         // Draw Sat Labels
-        // if (!settingsManager.enableHoverOverlay) continue;
+        // if (!settingsManager.enableHoverOverlay) continue
         satHoverMiniDOM = document.createElement('div');
         satHoverMiniDOM.id = 'sat-minibox-' + i;
         satHoverMiniDOM.textContent = sat.SCC_NUM;
         satHoverMiniDOM.setAttribute(
             'style',
-            'display: block; position: absolute; left: ' +
+            'display: block position: absolute left: ' +
                 satScreenPositionArray.x +
                 10 +
-                'px; top: ' +
+                'px top: ' +
                 satScreenPositionArray.y +
-                'px;'
+                'px'
         );
         hoverBoxOnSatMiniElements.appendChild(satHoverMiniDOM);
         labelCount++;
@@ -1522,7 +1776,7 @@ function _hoverBoxOnSat(satId, satX, satY) {
             )
                 starManager.clearConstellations();
         }
-        // satHoverBoxDOM.html('(none)');
+        // satHoverBoxDOM.html('(none)')
         satHoverBoxDOM.css({ display: 'none' });
         canvasDOM.css({ cursor: 'default' });
         isHoverBoxVisible = false;
@@ -1579,6 +1833,7 @@ function _hoverBoxOnSat(satId, satX, satY) {
             satHoverBoxNode2.textContent = '';
             satHoverBoxNode3.textContent = '';
         } else {
+            if (!settingsManager.enableHoverOverlay) return;
             // Use this as a default if no UI
             if (settingsManager.disableUI) {
                 satHoverBoxNode1.textContent = sat.ON;
@@ -1679,7 +1934,7 @@ function _demoMode() {
         var sat = satSet.getSat(i);
         if (sat.static) continue;
         if (sat.missile) continue;
-        // if (!sat.inview) continue;
+        // if (!sat.inview) continue
         if (sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false)
             continue;
         if (sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false)
@@ -1747,7 +2002,7 @@ function webGlInit() {
     let cw = document.documentElement.clientWidth || 0;
     let iw = window.innerWidth || 0;
     var vw = Math.min.apply(null, [cw, iw].filter(Boolean));
-    var vh = Math.max(
+    var vh = Math.min(
         document.documentElement.clientHeight || 0,
         window.innerHeight || 0
     );
@@ -1798,6 +2053,7 @@ function webGlInit() {
     gl =
         can.getContext('webgl', {
             alpha: true,
+            premultipliedAlpha: false,
             desynchronized: true,
             antialias: true,
             powerPreference: 'high-performance',
@@ -1806,6 +2062,7 @@ function webGlInit() {
         }) || // Or...
         can.getContext('experimental-webgl', {
             alpha: true,
+            premultipliedAlpha: false,
             desynchronized: true,
             antialias: true,
             powerPreference: 'high-performance',
@@ -2012,11 +2269,10 @@ function longToYaw(long) {
     var today = new Date();
     var angle = 0;
 
-    selectedDate = selectedDate.split(' ');
-    selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
     // NOTE: This formula sometimes is incorrect, but has been stable for over a year
+    // NOTE: Looks wrong again as of 8/29/2020 - time of year issue?
     today.setUTCHours(
-        selectedDate.getUTCHours() + selectedDate.getUTCMonth() * 2 - 10
+        selectedDate.getUTCHours() + selectedDate.getUTCMonth() * 2 - 11
     ); // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
 
     today.setUTCMinutes(selectedDate.getUTCMinutes());
@@ -2039,7 +2295,7 @@ function latToPitch(lat) {
     return pitch;
 }
 function camSnap(pitch, yaw) {
-    // cameraManager.panReset = true;
+    // cameraManager.panReset = true
     camPitchTarget = pitch;
     camYawTarget = _normalizeAngle(yaw);
     camSnapMode = true;
@@ -2095,8 +2351,8 @@ function selectSat(satId) {
     if (satId === -1 && !isselectedSatNegativeOne) {
         isselectedSatNegativeOne = true;
         $('#sat-infobox').fadeOut();
-        // $('#iss-stream').html('');
-        // $('#iss-stream-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+        // $('#iss-stream').html('')
+        // $('#iss-stream-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000)
         orbitManager.clearSelectOrbit();
         // Remove Red Box
         $('#menu-lookanglesmultisite').removeClass('bmenu-item-selected');
@@ -2116,8 +2372,8 @@ function selectSat(satId) {
         $('#menu-newLaunch').addClass('bmenu-item-disabled');
         $('#menu-breakup').addClass('bmenu-item-disabled');
         // Remove Side Menus
-        // $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-        // $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+        // $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000)
+        // $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000)
         $('#editSat-menu').effect(
             'slide',
             { direction: 'left', mode: 'hide' },
@@ -2211,11 +2467,11 @@ function selectSat(satId) {
             } else {
                 $('#search-results').attr(
                     'style',
-                    'display:block; max-height:28%'
+                    'display:block max-height:28%'
                 );
                 if (cameraType.current !== cameraType.PLANETARIUM) {
                     // Unclear why this was needed...
-                    // uiManager.legendMenuChange('default');
+                    // uiManager.legendMenuChange('default')
                 }
             }
         } else {
@@ -2224,7 +2480,7 @@ function selectSat(satId) {
                 $('#search-results').attr('style', 'max-height:auto');
                 if (cameraType.current !== cameraType.PLANETARIUM) {
                     // Unclear why this was needed...
-                    // uiManager.legendMenuChange('default');
+                    // uiManager.legendMenuChange('default')
                 }
             }
         }
@@ -2255,7 +2511,7 @@ function selectSat(satId) {
         if (sat.OT === 'unknown') {
             $('#sat-objnum').html(1 + sat.TLE2.substr(2, 7).toString());
         } else {
-            //      $('#sat-objnum').html(sat.TLE2.substr(2,7));
+            //      $('#sat-objnum').html(sat.TLE2.substr(2,7))
             $('#sat-objnum').html(sat.SCC_NUM);
             if (settingsManager.isOfficialWebsite)
                 ga(
@@ -2644,12 +2900,12 @@ function selectSat(satId) {
 
         // ISS Stream Slows Down a Lot Of Computers
         // if (sat.SCC_NUM === '25544') { // ISS is Selected
-        //   $('#iss-stream-menu').show();
-        //   $('#iss-stream').html('<iframe src="http://www.ustream.tv/embed/17074538?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://www.ustream.tv/embed/9408562?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><br />' +
-        //                         '<iframe src="http://www.ustream.tv/embed/6540154?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe><iframe src="http://cdn.livestream.com/embed/spaceflightnow?layout=4&amp;height=340&amp;width=560&amp;autoplay=false" style="border:0;outline:0" frameborder="0" scrolling="no"></iframe>');
+        //   $('#iss-stream-menu').show()
+        //   $('#iss-stream').html('<iframe src="http://www.ustream.tv/embed/17074538?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent"></iframe><iframe src="http://www.ustream.tv/embed/9408562?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent"></iframe><br />' +
+        //                         '<iframe src="http://www.ustream.tv/embed/6540154?html5ui=1" allowfullscreen="true" webkitallowfullscreen="true" scrolling="no" frameborder="0" style="border: 0px none transparent"></iframe><iframe src="http://cdn.livestream.com/embed/spaceflightnow?layout=4&ampheight=340&ampwidth=560&ampautoplay=false" style="border:0outline:0" frameborder="0" scrolling="no"></iframe>')
         // } else {
-        //   $('#iss-stream').html('');
-        //   $('#iss-stream-menu').hide();
+        //   $('#iss-stream').html('')
+        //   $('#iss-stream-menu').hide()
         // }
     }
 }
@@ -2668,25 +2924,25 @@ function debugDrawLine(type, value, color) {
     if (typeof color == 'undefined') color = [1.0, 0, 1.0, 1.0];
     switch (color) {
         case 'r':
-            color = [1, 0, 0, 1];
+            color = [1.0, 0.0, 0.0, 1.0];
             break;
         case 'o':
-            color = [1, 0.5, 0, 1];
+            color = [1.0, 0.5, 0.0, 1.0];
             break;
         case 'y':
-            color = [1, 1, 0, 1];
+            color = [1.0, 1.0, 0.0, 1.0];
             break;
         case 'g':
-            color = [0, 1, 0, 1];
+            color = [0.0, 1.0, 0.0, 1.0];
             break;
         case 'b':
-            color = [0, 0, 1, 1];
+            color = [0.0, 0.0, 1.0, 1.0];
             break;
         case 'c':
-            color = [0, 1, 1, 1];
+            color = [0.0, 1.0, 1.0, 1.0];
             break;
         case 'p':
-            color = [1, 0, 1, 1];
+            color = [1.0, 0.0, 1.0, 1.0];
             break;
     }
     if (type == 'sat') {
@@ -2852,6 +3108,21 @@ $(document).ready(function () {
     // textures needs to start loading as fast as possible.
     initializeKeepTrack();
 
+    // 2020 Key listener
+    // TODO: Migrate most things from UI to Here
+    $(window).on({
+        keydown: function (e) {
+            if (e.ctrlKey === true || e.metaKey === true)
+                cameraManager.isCtrlPressed = true;
+        },
+    });
+    $(window).on({
+        keyup: function (e) {
+            if (e.ctrlKey === false && e.metaKey === false)
+                cameraManager.isCtrlPressed = false;
+        },
+    });
+
     // Resizing Listener
     $(window).on('resize', function () {
         if (!settingsManager.disableUI) {
@@ -2902,7 +3173,11 @@ $(document).ready(function () {
                 }
 
                 // Right Mouse Button RMB
-                if (evt.button === 2) {
+                if (
+                    evt.button === 2 &&
+                    (cameraManager.isShiftPressed ||
+                        cameraManager.isCtrlPressed)
+                ) {
                     cameraManager.isPanning = true;
                     cameraManager.panStartPosition = cameraManager.panCurrent;
                     if (cameraManager.isShiftPressed) {
@@ -2953,7 +3228,7 @@ $(document).ready(function () {
                 zoomTarget +=
                     deltaPinchDistance *
                     (settingsManager.cameraMovementSpeed + 0.006);
-                zoomTarget = Math.min(Math.max(zoomTarget, 0), 1); // Force between 0 and 1
+                zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
             } else {
                 // Dont Move While Zooming
                 mouseX = evt.originalEvent.touches[0].clientX;
@@ -2975,8 +3250,8 @@ $(document).ready(function () {
             }
         });
         canvasDOM.on('mousemove', function (evt) {
-            mouseX = evt.clientX;
-            mouseY = evt.clientY;
+            mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
+            mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
             if (
                 isDragging &&
                 screenDragPoint[0] !== mouseX &&
@@ -3017,10 +3292,22 @@ $(document).ready(function () {
                     isZoomIn = false;
                 }
 
-                zoomTarget += delta / 100 / 50 / speedModifier; // delta is +/- 100
-                zoomTarget = Math.min(Math.max(zoomTarget, 0), 1); // Force between 0 and 1
                 rotateTheEarth = false;
-                camZoomSnappedOnSat = false;
+
+                if (
+                    settingsManager.isZoomStopsSnappedOnSat ||
+                    objectManager.selectedSat == -1
+                ) {
+                    zoomTarget += delta / 100 / 50 / speedModifier; // delta is +/- 100
+                    zoomTarget = Math.min(Math.max(zoomTarget, 0.001), 1); // Force between 0 and 1
+                    camZoomSnappedOnSat = false;
+                } else {
+                    settingsManager.camDistBuffer += delta / 100; // delta is +/- 100
+                    settingsManager.camDistBuffer = Math.min(
+                        Math.max(settingsManager.camDistBuffer, 30),
+                        300
+                    );
+                }
 
                 if (
                     cameraType.current === cameraType.PLANETARIUM ||
@@ -3083,7 +3370,7 @@ $(document).ready(function () {
                 if (evt.button === 0) {
                     isDragging = true;
                 }
-                // debugLine.set(dragPoint, getCamPos());
+                // debugLine.set(dragPoint, getCamPos())
                 camSnapMode = false;
                 if (!settingsManager.disableUI) {
                     rotateTheEarth = false;
@@ -3106,7 +3393,7 @@ $(document).ready(function () {
                         evt.originalEvent.touches[0].pageY -
                             evt.originalEvent.touches[1].pageY
                     );
-                    // _pinchStart(evt);
+                    // _pinchStart(evt)
                 } else {
                     // Single Finger Touch
                     mobile.startMouseX = evt.originalEvent.touches[0].clientX;
@@ -3119,11 +3406,11 @@ $(document).ready(function () {
                         settingsManager.cameraMovementSpeedMin
                     );
                     screenDragPoint = [mouseX, mouseY];
-                    // dragPoint = getEarthScreenPoint(x, y);
+                    // dragPoint = getEarthScreenPoint(x, y)
                     dragPoint = screenDragPoint; // Ignore the earth on mobile
                     dragStartPitch = camPitch;
                     dragStartYaw = camYaw;
-                    // debugLine.set(dragPoint, getCamPos());
+                    // debugLine.set(dragPoint, getCamPos())
                     isDragging = true;
                     touchStartTime = Date.now();
                     // If you hit the canvas hide any popups
@@ -3162,15 +3449,8 @@ $(document).ready(function () {
                     if (evt.button === 2) {
                         // Right Mouse Button Clicked
                         if (
-                            !isMouseMoving &&
-                            Math.abs(
-                                cameraManager.panTarget.x -
-                                    cameraManager.panCurrent.x
-                            ) < 3 &&
-                            Math.abs(
-                                cameraManager.panTarget.z -
-                                    cameraManager.panCurrent.z
-                            ) < 3
+                            !cameraManager.isCtrlPressed &&
+                            !cameraManager.isShiftPressed
                         ) {
                             _openRmbMenu();
                         }
@@ -3369,7 +3649,7 @@ $(document).ready(function () {
             }
 
             if (isPinching) {
-                // pinchEnd(e);
+                // pinchEnd(e)
                 isPinching = false;
             }
             mouseY = 0;
@@ -3457,25 +3737,6 @@ $(document).ready(function () {
             rightBtnSaveDOM.click(() => {
                 rightBtnSaveDOMDropdown();
             });
-            function rightBtnSaveDOMDropdown() {
-                uiManager.clearRMBSubMenu();
-                var offsetX =
-                    rightBtnSaveDOM.offset().left < canvasDOM.innerWidth() / 2
-                        ? 165
-                        : -165;
-                rightBtnSaveMenuDOM.css({
-                    display: 'block',
-                    'text-align': 'center',
-                    position: 'absolute',
-                    left: rightBtnSaveDOM.offset().left + offsetX,
-                    top: rightBtnSaveDOM.offset().top,
-                });
-                if (rightBtnSaveDOM.offset().top !== 0) {
-                    rightBtnSaveMenuDOM.show();
-                } else {
-                    rightBtnSaveMenuDOM.hide();
-                }
-            }
             rightBtnSaveMenuDOM.hover(null, function () {
                 // Lost Focus
                 rightBtnSaveMenuDOM.hide();
@@ -3487,25 +3748,6 @@ $(document).ready(function () {
             rightBtnViewDOM.click(() => {
                 rightBtnViewDOMDropdown();
             });
-            function rightBtnViewDOMDropdown() {
-                uiManager.clearRMBSubMenu();
-                var offsetX =
-                    rightBtnViewDOM.offset().left < canvasDOM.innerWidth() / 2
-                        ? 165
-                        : -165;
-                rightBtnViewMenuDOM.css({
-                    display: 'block',
-                    'text-align': 'center',
-                    position: 'absolute',
-                    left: rightBtnViewDOM.offset().left + offsetX,
-                    top: rightBtnViewDOM.offset().top,
-                });
-                if (rightBtnViewDOM.offset().top !== 0) {
-                    rightBtnViewMenuDOM.show();
-                } else {
-                    rightBtnViewMenuDOM.hide();
-                }
-            }
             rightBtnViewMenuDOM.hover(null, function () {
                 // Lost Focus
                 rightBtnViewMenuDOM.hide();
@@ -3517,26 +3759,6 @@ $(document).ready(function () {
             rightBtnEditDOM.click(() => {
                 rightBtnEditDOMDropdown();
             });
-            function rightBtnEditDOMDropdown() {
-                uiManager.clearRMBSubMenu();
-
-                var offsetX =
-                    rightBtnEditDOM.offset().left < canvasDOM.innerWidth() / 2
-                        ? 165
-                        : -165;
-                rightBtnEditMenuDOM.css({
-                    display: 'block',
-                    'text-align': 'center',
-                    position: 'absolute',
-                    left: rightBtnEditDOM.offset().left + offsetX,
-                    top: rightBtnEditDOM.offset().top,
-                });
-                if (rightBtnEditMenuDOM.offset().top !== 0) {
-                    rightBtnEditMenuDOM.show();
-                } else {
-                    rightBtnEditMenuDOM.hide();
-                }
-            }
             rightBtnEditMenuDOM.hover(null, function () {
                 // Lost Focus
                 rightBtnEditMenuDOM.hide();
@@ -3548,26 +3770,6 @@ $(document).ready(function () {
             rightBtnCreateDOM.click(() => {
                 rightBtnCreateDOMDropdown();
             });
-            function rightBtnCreateDOMDropdown() {
-                uiManager.clearRMBSubMenu();
-
-                var offsetX =
-                    rightBtnCreateDOM.offset().left < canvasDOM.innerWidth() / 2
-                        ? 165
-                        : -165;
-                rightBtnCreateMenuDOM.css({
-                    display: 'block',
-                    'text-align': 'center',
-                    position: 'absolute',
-                    left: rightBtnCreateDOM.offset().left + offsetX,
-                    top: rightBtnCreateDOM.offset().top,
-                });
-                if (rightBtnCreateMenuDOM.offset().top !== 0) {
-                    rightBtnCreateMenuDOM.show();
-                } else {
-                    rightBtnCreateMenuDOM.hide();
-                }
-            }
             rightBtnCreateMenuDOM.hover(null, function () {
                 // Lost Focus
                 rightBtnCreateMenuDOM.hide();
@@ -3579,25 +3781,6 @@ $(document).ready(function () {
             rightBtnDrawDOM.click(() => {
                 rightBtnDrawDOMDropdown();
             });
-            function rightBtnDrawDOMDropdown() {
-                uiManager.clearRMBSubMenu();
-                var offsetX =
-                    rightBtnDrawDOM.offset().left < canvasDOM.innerWidth() / 2
-                        ? 165
-                        : -165;
-                rightBtnDrawMenuDOM.css({
-                    display: 'block',
-                    'text-align': 'center',
-                    position: 'absolute',
-                    left: rightBtnDrawDOM.offset().left + offsetX,
-                    top: rightBtnDrawDOM.offset().top,
-                });
-                if (rightBtnDrawDOM.offset().top !== 0) {
-                    rightBtnDrawMenuDOM.show();
-                } else {
-                    rightBtnDrawMenuDOM.hide();
-                }
-            }
             rightBtnDrawMenuDOM.hover(null, function () {
                 // Lost Focus
                 rightBtnDrawMenuDOM.hide();
@@ -3609,25 +3792,6 @@ $(document).ready(function () {
             rightBtnColorsDOM.click(() => {
                 rightBtnColorsDOMDropdown();
             });
-            function rightBtnColorsDOMDropdown() {
-                uiManager.clearRMBSubMenu();
-                var offsetX =
-                    rightBtnColorsDOM.offset().left < canvasDOM.innerWidth() / 2
-                        ? 165
-                        : -165;
-                rightBtnColorsMenuDOM.css({
-                    display: 'block',
-                    'text-align': 'center',
-                    position: 'absolute',
-                    left: rightBtnColorsDOM.offset().left + offsetX,
-                    top: rightBtnColorsDOM.offset().top,
-                });
-                if (rightBtnColorsDOM.offset().top !== 0) {
-                    rightBtnColorsMenuDOM.show();
-                } else {
-                    rightBtnColorsMenuDOM.hide();
-                }
-            }
             rightBtnEarthMenuDOM.hover(null, function () {
                 // Lost Focus
                 rightBtnEarthMenuDOM.hide();
@@ -3639,29 +3803,145 @@ $(document).ready(function () {
             rightBtnEarthDOM.click(() => {
                 rightBtnEarthDOMDropdown();
             });
-            function rightBtnEarthDOMDropdown() {
-                uiManager.clearRMBSubMenu();
-                var offsetX =
-                    rightBtnEarthDOM.offset().left < canvasDOM.innerWidth() / 2
-                        ? 165
-                        : -165;
-                rightBtnEarthMenuDOM.css({
-                    display: 'block',
-                    'text-align': 'center',
-                    position: 'absolute',
-                    left: rightBtnEarthDOM.offset().left + offsetX,
-                    top: rightBtnEarthDOM.offset().top,
-                });
-                if (rightBtnEarthDOM.offset().top !== 0) {
-                    rightBtnEarthMenuDOM.show();
-                } else {
-                    rightBtnEarthMenuDOM.hide();
-                }
-            }
             rightBtnEarthMenuDOM.hover(null, function () {
                 // Lost Focus
                 rightBtnEarthMenuDOM.hide();
             });
+        }
+        function rightBtnSaveDOMDropdown() {
+            uiManager.clearRMBSubMenu();
+            var offsetX =
+                rightBtnSaveDOM.offset().left < canvasDOM.innerWidth() / 2
+                    ? 165
+                    : -165;
+            rightBtnSaveMenuDOM.css({
+                display: 'block',
+                'text-align': 'center',
+                position: 'absolute',
+                left: rightBtnSaveDOM.offset().left + offsetX,
+                top: rightBtnSaveDOM.offset().top,
+            });
+            if (rightBtnSaveDOM.offset().top !== 0) {
+                rightBtnSaveMenuDOM.show();
+            } else {
+                rightBtnSaveMenuDOM.hide();
+            }
+        }
+        function rightBtnViewDOMDropdown() {
+            uiManager.clearRMBSubMenu();
+            var offsetX =
+                rightBtnViewDOM.offset().left < canvasDOM.innerWidth() / 2
+                    ? 165
+                    : -165;
+            rightBtnViewMenuDOM.css({
+                display: 'block',
+                'text-align': 'center',
+                position: 'absolute',
+                left: rightBtnViewDOM.offset().left + offsetX,
+                top: rightBtnViewDOM.offset().top,
+            });
+            if (rightBtnViewDOM.offset().top !== 0) {
+                rightBtnViewMenuDOM.show();
+            } else {
+                rightBtnViewMenuDOM.hide();
+            }
+        }
+        function rightBtnEditDOMDropdown() {
+            uiManager.clearRMBSubMenu();
+
+            var offsetX =
+                rightBtnEditDOM.offset().left < canvasDOM.innerWidth() / 2
+                    ? 165
+                    : -165;
+            rightBtnEditMenuDOM.css({
+                display: 'block',
+                'text-align': 'center',
+                position: 'absolute',
+                left: rightBtnEditDOM.offset().left + offsetX,
+                top: rightBtnEditDOM.offset().top,
+            });
+            if (rightBtnEditMenuDOM.offset().top !== 0) {
+                rightBtnEditMenuDOM.show();
+            } else {
+                rightBtnEditMenuDOM.hide();
+            }
+        }
+        function rightBtnCreateDOMDropdown() {
+            uiManager.clearRMBSubMenu();
+
+            var offsetX =
+                rightBtnCreateDOM.offset().left < canvasDOM.innerWidth() / 2
+                    ? 165
+                    : -165;
+            rightBtnCreateMenuDOM.css({
+                display: 'block',
+                'text-align': 'center',
+                position: 'absolute',
+                left: rightBtnCreateDOM.offset().left + offsetX,
+                top: rightBtnCreateDOM.offset().top,
+            });
+            if (rightBtnCreateMenuDOM.offset().top !== 0) {
+                rightBtnCreateMenuDOM.show();
+            } else {
+                rightBtnCreateMenuDOM.hide();
+            }
+        }
+        function rightBtnDrawDOMDropdown() {
+            uiManager.clearRMBSubMenu();
+            var offsetX =
+                rightBtnDrawDOM.offset().left < canvasDOM.innerWidth() / 2
+                    ? 165
+                    : -165;
+            rightBtnDrawMenuDOM.css({
+                display: 'block',
+                'text-align': 'center',
+                position: 'absolute',
+                left: rightBtnDrawDOM.offset().left + offsetX,
+                top: rightBtnDrawDOM.offset().top,
+            });
+            if (rightBtnDrawDOM.offset().top !== 0) {
+                rightBtnDrawMenuDOM.show();
+            } else {
+                rightBtnDrawMenuDOM.hide();
+            }
+        }
+        function rightBtnColorsDOMDropdown() {
+            uiManager.clearRMBSubMenu();
+            var offsetX =
+                rightBtnColorsDOM.offset().left < canvasDOM.innerWidth() / 2
+                    ? 165
+                    : -165;
+            rightBtnColorsMenuDOM.css({
+                display: 'block',
+                'text-align': 'center',
+                position: 'absolute',
+                left: rightBtnColorsDOM.offset().left + offsetX,
+                top: rightBtnColorsDOM.offset().top,
+            });
+            if (rightBtnColorsDOM.offset().top !== 0) {
+                rightBtnColorsMenuDOM.show();
+            } else {
+                rightBtnColorsMenuDOM.hide();
+            }
+        }
+        function rightBtnEarthDOMDropdown() {
+            uiManager.clearRMBSubMenu();
+            var offsetX =
+                rightBtnEarthDOM.offset().left < canvasDOM.innerWidth() / 2
+                    ? 165
+                    : -165;
+            rightBtnEarthMenuDOM.css({
+                display: 'block',
+                'text-align': 'center',
+                position: 'absolute',
+                left: rightBtnEarthDOM.offset().left + offsetX,
+                top: rightBtnEarthDOM.offset().top,
+            });
+            if (rightBtnEarthDOM.offset().top !== 0) {
+                rightBtnEarthMenuDOM.show();
+            } else {
+                rightBtnEarthMenuDOM.hide();
+            }
         }
         function _rmbMenuActions(e) {
             // No Right Click Without UI
@@ -3782,7 +4062,7 @@ $(document).ready(function () {
                     $('#cs-lon').val(latLon.longitude);
                     $('#cs-hei').val(0);
                     $('#cs-type').val('Optical');
-                    // $('#cs-telescope').prop('checked', false);
+                    // $('#cs-telescope').prop('checked', false)
                     $('#cs-minaz').val(0);
                     $('#cs-maxaz').val(360);
                     $('#cs-minel').val(10);

@@ -117,7 +117,9 @@ var maxPinchSize = 1;
         } else {
             settingsManager.maxOribtsDisplayed =
                 settingsManager.maxOribtsDisplayedDesktop;
-            settingsManager.enableHoverOverlay = true;
+            if (typeof settingsManager.enableHoverOverlay == 'undefined') {
+                settingsManager.enableHoverOverlay = true;
+            }
             settingsManager.isMobileModeEnabled = false;
             settingsManager.cameraMovementSpeed = 0.003;
             settingsManager.cameraMovementSpeedMin = 0.005;

@@ -1,60 +1,38 @@
 (function () {
     meshManager = {};
+    meshManager.selectedSatPosition = { x: 0, y: 0, z: 0 };
     let mvMatrix;
     let mvMatrixEmpty = mat4.create();
     let nMatrix;
     let nMatrixEmpty = mat3.create();
 
-    meshManager.fileList = [
-        {
-            obj: `${settingsManager.installDirectory}meshes/Satellite.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/Satellite.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/sat.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/sat.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/iss.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/iss.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/rocketdebris.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/rocketdebris.mtl`,
-        },
-        {
-            obj: `${settingsManager.installDirectory}meshes/rocketbody.obj`,
-            mtl: `${settingsManager.installDirectory}meshes/rocketbody.mtl`,
-        },
+    meshManager.fileList = [];
+    let meshList = [
+      'sat2',
+      's1u',
+      's2u',
+      's3u',
+      'starlink',
+      'iss',
+      'gps',
+      'aehf',
+      'dsp',
+      'o3b',
+      'orbcomm',
+      'iridium',
+      'globalstar',
+      'debris0',
+      'debris1',
+      'debris2',
+      'rocketbody'
     ];
-
-    meshManager.sizeInfo = {
-        Satellite: {
-            x: 80.0,
-            y: 80.0,
-            z: 80.0,
-        },
-        sat: {
-            x: 5.0,
-            y: 5.0,
-            z: 5.0,
-        },
-        iss: {
-            x: 150.0,
-            y: 150.0,
-            z: 150.0,
-        },
-        rocketdebris: {
-            x: 0.1,
-            y: 0.1,
-            z: 0.1,
-        },
-        rocketbody: {
-            x: 0.2,
-            y: 0.2,
-            z: 2.5,
-        },
-    };
+    for (var i = 0; i < meshList.length; i++) {
+      let meshFiles = {
+          obj: `${settingsManager.installDirectory}meshes/${meshList[i]}.obj`,
+          mtl: `${settingsManager.installDirectory}meshes/${meshList[i]}.mtl`,
+      };
+      meshManager.fileList.push(meshFiles);
+    }
 
     // main shader program
     meshManager.fragShaderCode = `
@@ -128,7 +106,7 @@
         let p = OBJ.downloadModels(meshManager.fileList);
 
         p.then((models) => {
-            for ([name, mesh] of Object.entries(models)) {
+            for (var [name, mesh] of Object.entries(models)) {
                 // console.log("Name:", name);
                 // console.log("Mesh:", mesh);
             }
@@ -143,13 +121,15 @@
     meshManager.mvMatrix = mat4.create();
     meshManager.mvMatrixStack = [];
     meshManager.pMatrix = mat4.create();
-    meshManager.drawObject = (model, pMatrix, camMatrix) => {
+    meshManager.drawObject = (model, pMatrix, camMatrix, sat, isFacingNadir) => {
         if (typeof model == 'undefined') return;
 
         // Meshes aren't finished loading
         if (!meshManager.loaded) return;
 
         // gl.bindVertexArray(meshManager.vao);
+
+        let inSun = sat.isInSun();
 
         // Assigned an origin at 0,0,0
         mvMatrix = mvMatrixEmpty;
@@ -166,11 +146,16 @@
             )
         );
 
-        mat4.scale(
-            mvMatrix,
-            mvMatrix,
-            vec3.fromValues(model.size.x, model.size.y, model.size.z)
-        );
+        // Rotate the Satellite to Face Nadir
+        if (isFacingNadir) {
+          mat4.rotateZ(mvMatrix, mvMatrix, camYaw + 180 * DEG2RAD);
+        }
+
+        // mat4.scale(
+        //     mvMatrix,
+        //     mvMatrix,
+        //     vec3.fromValues(model.size.x, model.size.y, model.size.z)
+        // );
 
         // Assign the normal matrix the opposite of the mvMatrix
         nMatrix = nMatrixEmpty;
@@ -205,6 +190,7 @@
             false,
             camMatrix
         );
+        gl.uniform1f(meshManager.shaderProgram.uInSun, inSun);
 
         // Assign vertex buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.vertexBuffer);
@@ -259,6 +245,7 @@
             aVertexPosition: OBJ.Layout.POSITION.key,
             aVertexNormal: OBJ.Layout.NORMAL.key,
             aTextureCoord: OBJ.Layout.UV.key,
+            aAmbient: OBJ.Layout.AMBIENT.key,
             aDiffuse: OBJ.Layout.DIFFUSE.key,
             aSpecular: OBJ.Layout.SPECULAR.key,
             aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key,
@@ -285,6 +272,10 @@
         meshManager.shaderProgram.uLightDirection = gl.getUniformLocation(
             meshManager.shaderProgram,
             'uLightDirection'
+        );
+        meshManager.shaderProgram.uInSun = gl.getUniformLocation(
+            meshManager.shaderProgram,
+            'uInSun'
         );
 
         meshManager.shaderProgram.applyAttributePointers = function (model) {
@@ -357,6 +348,7 @@
         var layout = new OBJ.Layout(
             OBJ.Layout.POSITION,
             OBJ.Layout.NORMAL,
+            OBJ.Layout.AMBIENT,
             OBJ.Layout.DIFFUSE,
             OBJ.Layout.UV,
             OBJ.Layout.SPECULAR,
@@ -390,7 +382,7 @@
             // model objects and setting their mesh to the current mesh
             meshManager.models[mesh] = {};
             meshManager.models[mesh].mesh = meshManager.meshes[mesh];
-            meshManager.models[mesh].size = meshManager.sizeInfo[mesh];
+            // meshManager.models[mesh].size = meshManager.sizeInfo[mesh];
         }
         meshManager.loaded = true;
     }

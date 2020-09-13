@@ -1397,6 +1397,9 @@ var speedModifier = 1;
             $('#esoc-space-debris-telescope').on('click', function () {
                 sensorManager.setSensor(sensorManager.sensorList.SDT);
             });
+            $('#esoc-galileo-station').on('click', function () {
+                sensorManager.setSensor(sensorManager.sensorList.GGS);
+            });
 
             // Russian Radars
             $('#radar-rus-all').on('click', function () {

@@ -801,7 +801,7 @@ or mirrored at any other location without the express written permission of the 
     sensorList.GGS = {
         name: 'Galileo Ground Station, Fucino Italy', // https://www.esa.int/Applications/Navigation/Galileo/Galileo_IOV_ground_stations_Fucino
         shortName: 'GGS',
-        type: 'Optical',
+        type: 'Ground Sensor Station',
         lat: 41.978,
         long: 13.604,
         obshei: 0,

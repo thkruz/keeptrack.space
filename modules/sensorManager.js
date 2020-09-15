@@ -1250,20 +1250,20 @@ or mirrored at any other location without the express written permission of the 
         }
 
         // uiManager.legendMenuChange('default');
-        sensorManager.sensorListUS = [
-            sensorManager.sensorList.COD,
-            sensorManager.sensorList.BLE,
-            sensorManager.sensorList.CAV,
-            sensorManager.sensorList.CLR,
-            sensorManager.sensorList.EGL,
-            sensorManager.sensorList.FYL,
-            sensorManager.sensorList.THL,
-            sensorManager.sensorList.MIL,
-            sensorManager.sensorList.ALT,
-            sensorManager.sensorList.ASC,
-            sensorManager.sensorList.CDN,
-        ];
     };
+    sensorManager.sensorListUS = [
+        sensorList.COD,
+        sensorList.BLE,
+        sensorList.CAV,
+        sensorList.CLR,
+        sensorList.EGL,
+        sensorList.FYL,
+        sensorList.THL,
+        sensorList.MIL,
+        sensorList.ALT,
+        sensorList.ASC,
+        sensorList.CDN,
+    ];
 
     for (var i = 0; i < Object.keys(sensorList).length; i++) {
         sensorList[Object.keys(sensorList)[i]].staticNum = i;

@@ -9,11 +9,7 @@
     },
     "repository": {
         "type": "git",
-<<<<<<< HEAD
         "url": "git+https://github.com/thkruz/keeptrack.space"
-=======
-        "url": "git+https://github.com/Le-Roi777/keeptrack.space"
->>>>>>> master
     },
     "devDependencies": {
         "prettier": "^2.1.1"

@@ -1075,10 +1075,7 @@ function _drawScene() {
                             return;
                         }
 
-<<<<<<< HEAD
-=======
                         // Is this a GPS Satellite (Called NAVSTAR)
->>>>>>> master
                         if (
                             sat.ON.slice(0, 7) == 'NAVSTAR' ||
                             sat.ON.slice(10, 17) == 'NAVSTAR'
@@ -1095,8 +1092,6 @@ function _drawScene() {
                             return;
                         }
 
-<<<<<<< HEAD
-=======
                         // Is this a Galileo Satellite
                         if (sat.ON.slice(0, 7) == 'GALILEO') {
                             meshManager.models.galileo.position =
@@ -1111,7 +1106,6 @@ function _drawScene() {
                             return;
                         }
 
->>>>>>> master
                         // Is this a DSP Satellite?
                         if (
                             sat.SCC_NUM == '04630' ||
@@ -1244,43 +1238,6 @@ function _drawScene() {
 
                     if (sat.OT == 3) {
                         if (sat.SCC_NUM <= 20000) {
-<<<<<<< HEAD
-                          // Debris
-                          meshManager.models.debris0.position =
-                          meshManager.selectedSatPosition;
-                          meshManager.drawObject(
-                            meshManager.models.debris0,
-                            pMatrix,
-                            camMatrix,
-                            sat,
-                            false
-                          );
-                          return;
-                        } else if (sat.SCC_NUM <= 35000) {
-                          // Debris
-                          meshManager.models.debris1.position =
-                          meshManager.selectedSatPosition;
-                          meshManager.drawObject(
-                            meshManager.models.debris1,
-                            pMatrix,
-                            camMatrix,
-                            sat,
-                            false
-                          );
-                          return;
-                        } else if (sat.SCC_NUM > 35000) {
-                          // Debris
-                          meshManager.models.debris2.position =
-                          meshManager.selectedSatPosition;
-                          meshManager.drawObject(
-                            meshManager.models.debris2,
-                            pMatrix,
-                            camMatrix,
-                            sat,
-                            false
-                          );
-                          return;
-=======
                             // Debris
                             meshManager.models.debris0.position =
                                 meshManager.selectedSatPosition;
@@ -1316,7 +1273,6 @@ function _drawScene() {
                                 false
                             );
                             return;
->>>>>>> master
                         }
                     }
                 }

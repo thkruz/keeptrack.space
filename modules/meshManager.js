@@ -8,32 +8,6 @@
 
     meshManager.fileList = [];
     let meshList = [
-<<<<<<< HEAD
-      'sat2',
-      's1u',
-      's2u',
-      's3u',
-      'starlink',
-      'iss',
-      'gps',
-      'aehf',
-      'dsp',
-      'o3b',
-      'orbcomm',
-      'iridium',
-      'globalstar',
-      'debris0',
-      'debris1',
-      'debris2',
-      'rocketbody'
-    ];
-    for (var i = 0; i < meshList.length; i++) {
-      let meshFiles = {
-          obj: `${settingsManager.installDirectory}meshes/${meshList[i]}.obj`,
-          mtl: `${settingsManager.installDirectory}meshes/${meshList[i]}.mtl`,
-      };
-      meshManager.fileList.push(meshFiles);
-=======
         'sat2',
         's1u',
         's2u',
@@ -59,7 +33,6 @@
             mtl: `${settingsManager.installDirectory}meshes/${meshList[i]}.mtl`,
         };
         meshManager.fileList.push(meshFiles);
->>>>>>> master
     }
 
     // main shader program
@@ -150,9 +123,6 @@
     meshManager.mvMatrix = mat4.create();
     meshManager.mvMatrixStack = [];
     meshManager.pMatrix = mat4.create();
-<<<<<<< HEAD
-    meshManager.drawObject = (model, pMatrix, camMatrix, sat, isFacingNadir) => {
-=======
     meshManager.drawObject = (
         model,
         pMatrix,
@@ -160,7 +130,6 @@
         sat,
         isFacingNadir
     ) => {
->>>>>>> master
         if (typeof model == 'undefined') return;
 
         // Meshes aren't finished loading
@@ -187,11 +156,7 @@
 
         // Rotate the Satellite to Face Nadir
         if (isFacingNadir) {
-<<<<<<< HEAD
-          mat4.rotateZ(mvMatrix, mvMatrix, camYaw + 180 * DEG2RAD);
-=======
             mat4.rotateZ(mvMatrix, mvMatrix, camYaw + 180 * DEG2RAD);
->>>>>>> master
         }
 
         // mat4.scale(

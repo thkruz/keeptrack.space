@@ -117,6 +117,8 @@ const MOON_SCALAR_DISTANCE = 250000;
     settingsManager.isMobileModeEnabled = false;
     if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
         settingsManager.isMobileModeEnabled = true;
+        settingsManager.smallImages = true;
+        settingsManager.isDrawLess = true;
         settingsManager.camDistBuffer = 100;
     }
 
@@ -506,6 +508,10 @@ if (!settingsManager.disableUI) {
                 case 'draw-less':
                     settingsManager.isDrawLess = true;
                     settingsManager.smallImages = true;
+                    break;
+                case 'draw-more':
+                    settingsManager.isDrawLess = false;
+                    settingsManager.smallImages = false;
                     break;
                 case 'vec':
                     settingsManager.vectorImages = true;

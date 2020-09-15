@@ -60,6 +60,32 @@ var emptyMat4 = mat4.create();
         browserUnsupported();
     }
 
+    settingsManager.isCatalogPreloaded = true;
+    if (typeof settingsManager.tleSource == 'undefined') {
+      settingsManager.tleSource = 'tle/TLE.json';
+    }
+    try {
+      var tleSource = settingsManager.tleSource;
+      // $.get('' + tleSource + '?v=' + settingsManager.versionNumber)
+      $.get({
+        url: '' + tleSource,
+        cache: false
+      }).done(function (resp) {
+        // if the .json loads then use it
+        satSet.loadTLEs(resp);
+      })
+      .fail(function () {
+        // Sometimes network firewall's hate .json so use a .js
+        $.getScript('/offline/tle.js', function () {
+          satSet.loadTLEs(jsTLEfile);
+        });
+      });
+      jsTLEfile = null;
+    } catch (e) {
+      satSet.loadTLEs(jsTLEfile);
+      jsTLEfile = null;
+    }
+
     /**
      * These variables are here rather inside the function because as they
      * loop each iteration it was causing the jsHeap to grow. This isn't noticeable
@@ -504,32 +530,7 @@ var emptyMat4 = mat4.create();
         dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
         dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
 
-        // Start Catalog Loading
-        // Set Default TLE
-        if (typeof settingsManager.tleSource == 'undefined') {
-            settingsManager.tleSource = 'tle/TLE.json';
-        }
-        try {
-            var tleSource = settingsManager.tleSource;
-            // $.get('' + tleSource + '?v=' + settingsManager.versionNumber)
-            $.get({
-                  url: '' + tleSource,
-                  cache: false
-                }).done(function (resp) {
-                    // if the .json loads then use it
-                    satSet.loadTLEs(resp);
-                })
-                .fail(function () {
-                    // Sometimes network firewall's hate .json so use a .js
-                    $.getScript('/offline/tle.js', function () {
-                        satSet.loadTLEs(jsTLEfile);
-                    });
-                });
-            jsTLEfile = null;
-        } catch (e) {
-            satSet.loadTLEs(jsTLEfile);
-            jsTLEfile = null;
-        }
+        // Load the Catalog
 
         satSet.loadTLEs = (resp) => {
             var obslatitude;

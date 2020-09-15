@@ -235,7 +235,7 @@ var speedModifier = 1;
                 }
             });
         })();
-    
+
         var isNotColorPickerInitialSetup = false;
         (function _setupColorPicker() {
             db.log('_setupColorPicker');
@@ -1343,6 +1343,9 @@ var speedModifier = 1;
             $('#optical-socorro').on('click', function () {
                 sensorManager.setSensor(sensorManager.sensorList.SOC);
             });
+            $('#radar-taiwan').on('click', function () {
+                sensorManager.setSensor(sensorManager.sensorList.TAI);
+            });
 
             // Missile Defense Radars
             $('#radar-md-all').on('click', function () {
@@ -1433,6 +1436,9 @@ var speedModifier = 1;
             // Chinese Radars
             $('#chinese-xuanhua').on('click', function () {
                 sensorManager.setSensor(sensorManager.sensorList.XUA);
+            });
+            $('#chinese-purple').on('click', function () {
+                sensorManager.setSensor(sensorManager.sensorList.PMO);
             });
 
             $('#reset-sensor-button').on('click', function () {

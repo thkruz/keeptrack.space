@@ -171,7 +171,7 @@
                     img.src =
                         settingsManager.installDirectory +
                         'textures/earthmap512.jpg';
-                        // 'textures/earthmap1k.jpg';
+                // 'textures/earthmap1k.jpg';
                 if (settingsManager.nasaImages)
                     img.src =
                         settingsManager.installDirectory +
@@ -275,10 +275,10 @@
                     settingsManager.installDirectory +
                     'textures/earthlights4k.jpg';
                 if (settingsManager.smallImages)
-                  nightImg.src =
-                      settingsManager.installDirectory +
-                      'textures/earthlights512.jpg';
-                      // 'textures/earthlights1k.jpg';
+                    nightImg.src =
+                        settingsManager.installDirectory +
+                        'textures/earthlights512.jpg';
+                // 'textures/earthlights1k.jpg';
                 if (settingsManager.vectorImages)
                     nightImg.src =
                         settingsManager.installDirectory +
@@ -362,10 +362,10 @@
                     settingsManager.installDirectory +
                     'textures/earthbump8k.jpg';
                 if (settingsManager.smallImages)
-                  earth.bumpMap.img.src =
-                      settingsManager.installDirectory +
-                      'textures/earthbump256.jpg';
-                      // 'textures/earthbump1k.jpg';
+                    earth.bumpMap.img.src =
+                        settingsManager.installDirectory +
+                        'textures/earthbump256.jpg';
+                // 'textures/earthbump1k.jpg';
             }
 
             // Specular Map
@@ -406,10 +406,10 @@
                     settingsManager.installDirectory +
                     'textures/earthspec8k.jpg';
                 if (settingsManager.smallImages)
-                  earth.specularMap.img.src =
-                      settingsManager.installDirectory +
-                      'textures/earthspec256.jpg';
-                      // 'textures/earthspec1k.jpg';
+                    earth.specularMap.img.src =
+                        settingsManager.installDirectory +
+                        'textures/earthspec256.jpg';
+                // 'textures/earthspec1k.jpg';
             }
 
             // generate a uvsphere bottom up, CCW order
@@ -568,10 +568,10 @@
             // Don't update the time input unless it is currently being viewed.
             if (settingsManager.isEditTime || !settingsManager.cruncherReady) {
                 $('#datetime-input-tb').val(
-                  timeManager.selectedDate.toISOString().slice(0,10) +
-                  ' ' +
-                  timeManager.selectedDate.toISOString().slice(11,19)
-              );
+                    timeManager.selectedDate.toISOString().slice(0, 10) +
+                        ' ' +
+                        timeManager.selectedDate.toISOString().slice(11, 19)
+                );
             }
 
             earth.earthJ = timeManager.jday(
@@ -1250,7 +1250,13 @@
 
             mvMatrix = mvMatrixEmpty;
             mat4.identity(mvMatrix);
+
             mat4.translate(mvMatrix, mvMatrix, sun.pos);
+            // Keep the back of the sun sphere directly behind the front of the
+            // sun sphere so there is only one sun
+            mat4.rotateX(mvMatrix, mvMatrix, -camPitch);
+            mat4.rotateZ(mvMatrix, mvMatrix, -camYaw);
+
             nMatrix = nMatrixEmpty;
             mat3.normalFromMat4(nMatrix, mvMatrix);
 
@@ -1290,7 +1296,7 @@
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
             gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 
-            gl.disable(gl.BLEND);
+            // gl.disable(gl.BLEND);
             return true;
         };
 
@@ -1300,8 +1306,8 @@
     // Moon
     (function () {
         // Draw Moon
-        let NUM_LAT_SEGS = 64;
-        let NUM_LON_SEGS = 64;
+        let NUM_LAT_SEGS = 32;
+        let NUM_LON_SEGS = 32;
 
         let vertPosBuf, vertNormBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
         let vertCount;
@@ -1433,7 +1439,7 @@
                 onImageLoaded();
             };
             img.src =
-                settingsManager.installDirectory + 'textures/moon-1024.jpg';
+                settingsManager.installDirectory + 'textures/moonmap256.jpg';
 
             // generate a uvsphere bottom up, CCW order
             var vertPos = [];

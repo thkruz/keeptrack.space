@@ -19,8 +19,8 @@ const MOON_SCALAR_DISTANCE = 250000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '1.20.0';
-    settingsManager.versionDate = 'September 8, 2020';
+    settingsManager.versionNumber = '1.20.1';
+    settingsManager.versionDate = 'September 15, 2020';
 
     // Install Folder Settings
     {
@@ -151,22 +151,22 @@ const MOON_SCALAR_DISTANCE = 250000;
     // Embed Overrides - FOR TESTING ONLY
     // //////////////////////////////////////////////////////////////////////////
 
-    let pageName = location.href.split("/").slice(-1);
-    pageName = pageName[0].split("?").slice(0);
+    let pageName = location.href.split('/').slice(-1);
+    pageName = pageName[0].split('?').slice(0);
 
     if (pageName[0] == 'embed.html') {
-      settingsManager.disableUI = true;
-      settingsManager.enableLimitedUI = true;
-      settingsManager.startWithOrbitsDisplayed = true;
-      settingsManager.isAutoResizeCanvas = true;
-      settingsManager.enableHoverOverlay = true;
-      settingsManager.enableHoverOrbits = true;
-      settingsManager.isDrawLess = true;
-      settingsManager.smallImages = true;
-      settingsManager.hiresNoCloudsImages = false;
-      settingsManager.tleSource = 'tle/TLEdebris.json';
-      settingsManager.updateHoverDelayLimitSmall = 25;
-      settingsManager.updateHoverDelayLimitBig = 45;
+        settingsManager.disableUI = true;
+        settingsManager.enableLimitedUI = true;
+        settingsManager.startWithOrbitsDisplayed = true;
+        settingsManager.isAutoResizeCanvas = true;
+        settingsManager.enableHoverOverlay = true;
+        settingsManager.enableHoverOrbits = true;
+        settingsManager.isDrawLess = true;
+        settingsManager.smallImages = true;
+        settingsManager.hiresNoCloudsImages = false;
+        settingsManager.tleSource = 'tle/TLEdebris.json';
+        settingsManager.updateHoverDelayLimitSmall = 25;
+        settingsManager.updateHoverDelayLimitBig = 45;
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -182,7 +182,7 @@ const MOON_SCALAR_DISTANCE = 250000;
     settingsManager.vectorImages = false;
     settingsManager.isLoadLastMap = true;
     if (settingsManager.disableUI) {
-      settingsManager.isLoadLastMap = false;
+        settingsManager.isLoadLastMap = false;
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -411,7 +411,7 @@ const MOON_SCALAR_DISTANCE = 250000;
 
     settingsManager.camDistBuffer = 75;
     settingsManager.zNear = 1.0;
-    settingsManager.zFar = 500000.0;
+    settingsManager.zFar = 450000.0;
 
     // //////////////////////////////////////////////////////////////////////////
     // Defaults that should never be changed
@@ -482,75 +482,75 @@ const MOON_SCALAR_DISTANCE = 250000;
 // to determine critical settings. Other variables are checked later during
 // satSet.init
 if (!settingsManager.disableUI) {
-  (function initParseFromGETVariables() {
-    let queryStr = window.location.search.substring(1);
-    let params = queryStr.split('&');
-    for (let i = 0; i < params.length; i++) {
-        let key = params[i].split('=')[0];
-        let val = params[i].split('=')[1];
-        switch (key) {
-            case 'lowperf':
-                settingsManager.lowPerf = true;
-                settingsManager.maxFieldOfViewMarkers = 1;
-                break;
-            case 'hires':
-                settingsManager.hiresImages = true;
-                settingsManager.minimumDrawDt = 0.01667;
-                document.write(`
+    (function initParseFromGETVariables() {
+        let queryStr = window.location.search.substring(1);
+        let params = queryStr.split('&');
+        for (let i = 0; i < params.length; i++) {
+            let key = params[i].split('=')[0];
+            let val = params[i].split('=')[1];
+            switch (key) {
+                case 'lowperf':
+                    settingsManager.lowPerf = true;
+                    settingsManager.maxFieldOfViewMarkers = 1;
+                    break;
+                case 'hires':
+                    settingsManager.hiresImages = true;
+                    settingsManager.minimumDrawDt = 0.01667;
+                    document.write(`
                   <link rel="preload" href="textures/earthmap8k.jpg" as="image">
                   <link rel="preload" href="textures/earthlights10k.jpg" as="image">
                   <link rel="preload" href="textures/earthbump8k.jpg" as="image">
                   <link rel="preload" href="textures/earthspec8k.jpg" as="image">
                   `);
-                break;
-            case 'draw-less':
-                settingsManager.isDrawLess = true;
-                settingsManager.smallImages = true;
-                break;
-            case 'vec':
-                settingsManager.vectorImages = true;
-                document.write(`
+                    break;
+                case 'draw-less':
+                    settingsManager.isDrawLess = true;
+                    settingsManager.smallImages = true;
+                    break;
+                case 'vec':
+                    settingsManager.vectorImages = true;
+                    document.write(`
                   <link rel="preload" href="textures/dayearthvector-4096.jpg" as="image">
                   <link rel="preload" href="textures/earthlights4k.jpg" as="image">
                   <link rel="preload" href="textures/earthbump8k.jpg" as="image">
                   <link rel="preload" href="textures/earthspec8k.jpg" as="image">
                   `);
-                break;
-            case 'retro':
-                settingsManager.retro = true;
-                settingsManager.tleSource = 'tle/retro.json';
-                break;
-            case 'offline':
-                settingsManager.offline = true;
-                break;
-            case 'debris':
-                settingsManager.tleSource = 'tle/TLEdebris.json';
-                break;
-            case 'mw':
-                settingsManager.tleSource = 'tle/mw.json';
-                break;
-            case 'trusat':
-                settingsManager.trusatMode = true;
-                settingsManager.trusatImages = true;
-                break;
-            case 'trusat-only':
-                settingsManager.trusatMode = true;
-                settingsManager.trusatOnly = true;
-                settingsManager.trusatImages = true;
-                settingsManager.tleSource = 'tle/trusat.json';
-                break;
-            case 'cpo':
-                settingsManager.copyrightOveride = true;
-                break;
-            case 'logo':
-                settingsManager.isShowLogo = true;
-                break;
-            case 'noPropRate':
-                settingsManager.isAlwaysHidePropRate = true;
-                break;
+                    break;
+                case 'retro':
+                    settingsManager.retro = true;
+                    settingsManager.tleSource = 'tle/retro.json';
+                    break;
+                case 'offline':
+                    settingsManager.offline = true;
+                    break;
+                case 'debris':
+                    settingsManager.tleSource = 'tle/TLEdebris.json';
+                    break;
+                case 'mw':
+                    settingsManager.tleSource = 'tle/mw.json';
+                    break;
+                case 'trusat':
+                    settingsManager.trusatMode = true;
+                    settingsManager.trusatImages = true;
+                    break;
+                case 'trusat-only':
+                    settingsManager.trusatMode = true;
+                    settingsManager.trusatOnly = true;
+                    settingsManager.trusatImages = true;
+                    settingsManager.tleSource = 'tle/trusat.json';
+                    break;
+                case 'cpo':
+                    settingsManager.copyrightOveride = true;
+                    break;
+                case 'logo':
+                    settingsManager.isShowLogo = true;
+                    break;
+                case 'noPropRate':
+                    settingsManager.isAlwaysHidePropRate = true;
+                    break;
+            }
         }
-    }
-})();
+    })();
 }
 
 // Load the previously saved map
@@ -667,9 +667,8 @@ let db = {};
         if (db.enabled) {
             // Fix for multiple sensors gettings saved locally by previous bug
             try {
-              if (currentSensor.length > 1) currentSensor = currentSensor[0];
-            } catch (e) {
-            }
+                if (currentSensor.length > 1) currentSensor = currentSensor[0];
+            } catch (e) {}
         }
     })();
 }

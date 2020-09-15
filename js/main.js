@@ -222,7 +222,8 @@ function initializeKeepTrack() {
     earth.init();
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
         atmosphere.init();
-        moon.init();
+        // Disabling Moon Until it is Fixed
+        // moon.init();
     }
     ColorScheme.init();
     $('#loader-text').text('Drawing Dots in Space...');
@@ -962,7 +963,8 @@ function _drawScene() {
 
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
         sun.draw(pMatrix, camMatrix);
-        moon.draw(pMatrix, camMatrix);
+        // Disabling Moon Until it is Fixed
+        // moon.draw(pMatrix, camMatrix);
     }
     earth.update();
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
@@ -3166,9 +3168,6 @@ $(document).ready(function () {
         settingsManager.isResizing = true;
     });
 
-    // TODO: Migrate All Mouse/Touch events under this single document ready
-    // listener so that they are scoped to the window and easier to manage
-    // and isolate from other files.
     $(window).mousedown(function (evt) {
         // Camera Manager Events
         {
@@ -3571,6 +3570,8 @@ $(document).ready(function () {
                     if (
                         satSet.getSat(clickedSat).type === 'Optical' ||
                         satSet.getSat(clickedSat).type === 'Mechanical' ||
+                        satSet.getSat(clickedSat).type ===
+                            'Ground Sensor Station' ||
                         satSet.getSat(clickedSat).type === 'Phased Array Radar'
                     ) {
                         $('#view-sensor-info-rmb').show();

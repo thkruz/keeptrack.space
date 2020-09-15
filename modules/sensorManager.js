@@ -741,9 +741,9 @@ or mirrored at any other location without the express written permission of the 
         long: 13.604,
         obshei: 0,
         obsminaz: 0,
-        obsmaxaz: 0,
+        obsmaxaz: 360, // Full 360deg FOV
         obsminel: 0,
-        obsmaxel: 0,
+        obsmaxel: 90, // From Horizon to Straight Up
         obsminrange: 0,
         obsmaxrange: 35000, // Galileo Apogee plus the Diameter of Earth Roughly
         changeObjectInterval: 20000, // This will be used to show sensors tracking various targets eventually
@@ -1013,6 +1013,28 @@ or mirrored at any other location without the express written permission of the 
         obsmaxrange: 200000,
         changeObjectInterval: 20000,
         country: 'USA',
+        sun: 'No Impact',
+        volume: false,
+    };
+    sensorList.TAI = {
+        name: 'Surveillance Radar Program, Taiwan',
+        shortName: 'TAI',
+        type: 'Phased Array Radar',
+        lat: 24.499,
+        long: 121.072,
+        obshei: 0.060966, // Find accurate altitude
+        obsminaz: 180,
+        obsmaxaz: 60,
+        obsminel: 3,
+        obsmaxel: 85,
+        obsminrange: 200,
+        obsmaxrange: 5556,
+        changeObjectInterval: 1000,
+        linkAEHF: false,
+        linkWGS: false,
+        zoom: 'leo',
+        url: 'https://fas.org/man/eprint/leshan.pdf',
+        country: 'Taiwan',
         sun: 'No Impact',
         volume: false,
     };

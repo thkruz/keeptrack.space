@@ -4321,6 +4321,7 @@ $(document).ready(function () {
                 case 'clear-screen-rmb':
                     (function clearScreenRMB() {
                         searchBox.hideResults();
+                        uiManager.hideSideMenus();
                         isMilSatSelected = false;
                         $('#menu-space-stations').removeClass(
                             'bmenu-item-selected'

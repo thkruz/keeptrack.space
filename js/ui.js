@@ -5301,7 +5301,7 @@ var speedModifier = 1;
             case 'aehf':
                 $('#loading-screen').fadeIn('slow', function () {
                     drawLineList = [];
-                    satCommManager.showLinks('aehf');
+                    satLinkManager.showLinks('aehf');
                     if (settingsManager.isOfficialWebsite)
                         ga('send', 'event', 'Satcom Menu', 'aehf', 'Selected');
                     $('#loading-screen').fadeOut();
@@ -5315,7 +5315,7 @@ var speedModifier = 1;
             case 'wgs':
                 $('#loading-screen').fadeIn('slow', function () {
                     drawLineList = [];
-                    satCommManager.showLinks('wgs');
+                    satLinkManager.showLinks('wgs');
                     if (settingsManager.isOfficialWebsite)
                         ga('send', 'event', 'Satcom Menu', 'wgs', 'Selected');
                     $('#loading-screen').fadeOut();

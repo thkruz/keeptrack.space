@@ -11,10 +11,10 @@
     objectManager.staticSet = [];
     objectManager.fieldOfViewSet = [];
 
-    if (typeof satCommManager == 'undefined') {
-        objectManager.isSatCommManagerLoaded = false;
+    if (typeof satLinkManager == 'undefined') {
+        objectManager.issatLinkManagerLoaded = false;
     } else {
-        objectManager.isSatCommManagerLoaded = true;
+        objectManager.issatLinkManagerLoaded = true;
     }
 
     objectManager.init = function () {

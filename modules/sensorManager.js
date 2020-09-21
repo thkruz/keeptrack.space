@@ -731,28 +731,6 @@ or mirrored at any other location without the express written permission of the 
         sun: 'No Impact',
         volume: false,
     };
-    // Galileo Ground Station.
-    // https://gssc.esa.int/navipedia/images/5/5d/Galileo_s_Global_Ground_Segment.jpg
-    sensorList.GGS = {
-        name: 'Galileo Ground Station, Fucino Italy', // https://www.esa.int/Applications/Navigation/Galileo/Galileo_IOV_ground_stations_Fucino
-        shortName: 'GGS',
-        type: 'Ground Sensor Station',
-        lat: 41.978,
-        long: 13.604,
-        obshei: 0,
-        obsminaz: 0,
-        obsmaxaz: 360, // Full 360deg FOV
-        obsminel: 0,
-        obsmaxel: 90, // From Horizon to Straight Up
-        obsminrange: 0,
-        obsmaxrange: 35000, // Galileo Apogee plus the Diameter of Earth Roughly
-        changeObjectInterval: 20000, // This will be used to show sensors tracking various targets eventually
-        url:
-            'https://www.esa.int/Applications/Navigation/Galileo/Galileo_IOV_ground_stations_Fucino',
-        country: 'Italy',
-        sun: 'No Impact', // Not an optical sensor
-        volume: false,
-    };
 
     // //////////////////////
     // RUSSIAN RADARS

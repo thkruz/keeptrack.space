@@ -22,7 +22,7 @@ if (db.enabled) {
       <script src="${settingsManager.installDirectory}modules/launchSiteManager.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}modules/nextLaunchManager.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}modules/starManager.js?v=${settingsManager.versionNumber}"\><\/script>
-      <script src="${settingsManager.installDirectory}modules/satCommManager.js?v=${settingsManager.versionNumber}"\><\/script>
+      <script src="${settingsManager.installDirectory}modules/satLinkManager.js?v=${settingsManager.versionNumber}"\><\/script>
 
       <script src="${settingsManager.installDirectory}js/lib/CanvasRecorder.min.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}modules/satVmagManager.js?v=${settingsManager.versionNumber}"\><\/script>
@@ -91,7 +91,7 @@ if (db.enabled) {
       <script src="${settingsManager.installDirectory}modules/launchSiteManager.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}modules/nextLaunchManager.min.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}modules/starManager.min.js?v=${settingsManager.versionNumber}"\><\/script>
-      <script src="${settingsManager.installDirectory}modules/satCommManager.min.js?v=${settingsManager.versionNumber}"\><\/script>
+      <script src="${settingsManager.installDirectory}modules/satLinkManager.min.js?v=${settingsManager.versionNumber}"\><\/script>
 
       <script src="${settingsManager.installDirectory}js/lib/CanvasRecorder.min.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}modules/satVmagManager.js?v=${settingsManager.versionNumber}"\><\/script>
@@ -117,7 +117,7 @@ if (db.enabled) {
   `);
     if (!settingsManager.disableUI) {
         document.write(`
-        <script src="${settingsManager.installDirectory}modules/missileManager.min.js?v=${settingsManager.versionNumber}"\><\/script>
+        <script src="${settingsManager.installDirectory}modules/missileManager.js?v=${settingsManager.versionNumber}"\><\/script>
         <script src="${settingsManager.installDirectory}js/ui.min.js?v=${settingsManager.versionNumber}"\><\/script>
       `);
     }
@@ -351,7 +351,7 @@ if (!settingsManager.disableUI) {
         </div>
       `);
             }
-            if (objectManager.isSatCommManagerLoaded) {
+            if (objectManager.issatLinkManagerLoaded) {
                 numOfIcons++;
                 bottomIconsDivDOM.append(`
         <div id="menu-satcom" class="bmenu-item">

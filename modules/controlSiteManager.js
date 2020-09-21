@@ -92,6 +92,23 @@
         linkGlonass: false,
     };
 
+    // Galileo Ground Station.
+    // https://gssc.esa.int/navipedia/images/5/5d/Galileo_s_Global_Ground_Segment.jpg
+    controlSiteList.GGS = {
+        name: 'Galileo Ground Station, Fucino Italy', // https://www.esa.int/Applications/Navigation/Galileo/Galileo_IOV_ground_stations_Fucino
+        shortName: 'GGS',
+        type: 'Control Facility',
+        lat: 41.978,
+        lon: 13.604,
+        alt: 0,
+        linkAEHF: false,
+        linkWGS: false,
+        linkGPS: false,
+        linkGalileo: true,
+        linkBeidou: false,
+        linkGlonass: false,
+    };
+
     controlSiteManager.controlSiteList = controlSiteList;
     window.controlSiteManager = controlSiteManager;
 })();

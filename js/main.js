@@ -2066,26 +2066,37 @@ function webGlInit() {
         );
     }
 
-    // Desynchronized Fixed Jitter on Old Computer
-    gl =
-        can.getContext('webgl', {
-            alpha: true,
-            premultipliedAlpha: false,
-            desynchronized: true,
-            antialias: true,
-            powerPreference: 'high-performance',
-            preserveDrawingBuffer: true,
-            stencil: false,
-        }) || // Or...
-        can.getContext('experimental-webgl', {
-            alpha: true,
-            premultipliedAlpha: false,
-            desynchronized: true,
-            antialias: true,
-            powerPreference: 'high-performance',
-            preserveDrawingBuffer: true,
-            stencil: false,
-        });
+    if (!settingsManager.disableUI) {
+      gl =
+      can.getContext('webgl', {
+        alpha: true,
+        premultipliedAlpha: false,
+        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
+        antialias: true,
+        powerPreference: 'high-performance',
+        preserveDrawingBuffer: true,
+        stencil: false,
+      }) || // Or...
+      can.getContext('experimental-webgl', {
+        alpha: true,
+        premultipliedAlpha: false,
+        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
+        antialias: true,
+        powerPreference: 'high-performance',
+        preserveDrawingBuffer: true,
+        stencil: false,
+      });
+    } else {
+      gl =
+      can.getContext('webgl', {
+        alpha: false,
+        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
+      }) || // Or...
+      can.getContext('experimental-webgl', {
+        alpha: false,
+        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
+      });
+    }
     if (!gl) {
         browserUnsupported();
     }

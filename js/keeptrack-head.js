@@ -19,8 +19,8 @@ const MOON_SCALAR_DISTANCE = 250000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '1.20.1';
-    settingsManager.versionDate = 'September 15, 2020';
+    settingsManager.versionNumber = '1.20.2';
+    settingsManager.versionDate = 'September 23, 2020';
 
     // Install Folder Settings
     {
@@ -109,6 +109,12 @@ const MOON_SCALAR_DISTANCE = 250000;
 
     // Use to Override TLE Settings
     // settingsManager.tleSource = settingsManager.installDirectory + 'tle/TLEdebris.json'
+
+    // Use these to default smallest resolution maps and limited "extras" like
+    // the atmosphere and sun. Really useful on small screens and for faster
+    // loading times
+    // settingsManager.isDrawLess = true;
+    // settingsManager.smallImages = true;
 
     // //////////////////////////////////////////////////////////////////////////
     // Mobile Settings
@@ -635,6 +641,18 @@ if (settingsManager.isLoadLastMap && !settingsManager.isDrawLess) {
               `);
             break;
     }
+}
+
+// Make sure there is some map loaded!
+if (!settingsManager.smallImages &&
+    !settingsManager.nasaImages &&
+    !settingsManager.blueImages &&
+    !settingsManager.lowresImages &&
+    !settingsManager.hiresImages &&
+    !settingsManager.hiresNoCloudsImages &&
+    !settingsManager.vectorImages)
+{
+  settingsManager.lowresImages = true;
 }
 
 //Global Debug Manager

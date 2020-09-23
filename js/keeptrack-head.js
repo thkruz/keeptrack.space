@@ -722,7 +722,6 @@ if (!settingsManager.disableUI) {
 } else if (settingsManager.enableLimitedUI) {
     document.write(`
     <link rel="stylesheet" href="${settingsManager.installDirectory}css/limitedUI.css?v=${settingsManager.versionNumber}" type="text/css"\>
-    <link rel="stylesheet" href="${settingsManager.installDirectory}css/materialize.css?v=${settingsManager.versionNumber}" type="text/css"\>
   `);
 } else {
     console.log('ERROR');

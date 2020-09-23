@@ -3332,11 +3332,24 @@ $(document).ready(function () {
                     zoomTarget = Math.min(Math.max(zoomTarget, 0.001), 1); // Force between 0 and 1
                     camZoomSnappedOnSat = false;
                 } else {
-                    settingsManager.camDistBuffer += delta / 100; // delta is +/- 100
+                  if (settingsManager.camDistBuffer < 300 || settingsManager.nearZoomLevel == -1) {
+                    settingsManager.camDistBuffer += delta / 7.5; // delta is +/- 100
                     settingsManager.camDistBuffer = Math.min(
                         Math.max(settingsManager.camDistBuffer, 30),
                         300
                     );
+                    settingsManager.nearZoomLevel = zoomLevel;
+                  }
+                  if (settingsManager.camDistBuffer >= 300) {
+                    zoomTarget += delta / 100 / 50 / speedModifier; // delta is +/- 100
+                    zoomTarget = Math.min(Math.max(zoomTarget, 0.001), 1); // Force between 0 and 1
+                    camZoomSnappedOnSat = false;
+                    if (zoomTarget < settingsManager.nearZoomLevel) {
+                      camZoomSnappedOnSat = true;
+                      camAngleSnappedOnSat = true;
+                      settingsManager.camDistBuffer = 200;
+                    }
+                  }
                 }
 
                 if (

@@ -2069,7 +2069,7 @@ function webGlInit() {
     if (!settingsManager.disableUI) {
       gl =
       can.getContext('webgl', {
-        alpha: true,
+        alpha: false,
         premultipliedAlpha: false,
         desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
         antialias: true,
@@ -2078,7 +2078,7 @@ function webGlInit() {
         stencil: false,
       }) || // Or...
       can.getContext('experimental-webgl', {
-        alpha: true,
+        alpha: false,
         premultipliedAlpha: false,
         desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
         antialias: true,

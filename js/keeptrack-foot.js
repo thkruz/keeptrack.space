@@ -1,5 +1,5 @@
 // Load Full Version For Debugging
-if (db.enabled) {
+if (db.enabled || window.location.host == 'localhost') {
     // Load Dependencies
     if (!settingsManager.disableUI) {
         document.write(`

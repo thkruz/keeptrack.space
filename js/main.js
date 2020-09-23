@@ -932,6 +932,11 @@ function _camSnapToSat(sat) {
             camZoomSnappedOnSat = false;
             camAngleSnappedOnSat = false;
         }
+
+        camDistTarget = (camDistTarget < settingsManager.minZoomDistance)
+          ? settingsManager.minZoomDistance + 10
+          : camDistTarget;
+
         zoomTarget = Math.pow(
             (camDistTarget - settingsManager.minZoomDistance) /
                 (settingsManager.maxZoomDistance -

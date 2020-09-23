@@ -966,12 +966,12 @@ function _drawScene() {
     // gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+    earth.update();
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
         sun.draw(pMatrix, camMatrix);
         // Disabling Moon Until it is Fixed
         // moon.draw(pMatrix, camMatrix);
     }
-    earth.update();
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
         atmosphere.update();
         atmosphere.draw(pMatrix, camMatrix);

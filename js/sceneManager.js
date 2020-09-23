@@ -1148,6 +1148,10 @@
                 sunShader,
                 'uNormalMatrix'
             );
+            sunShader.uLightDirection = gl.getUniformLocation(
+                sunShader,
+                'uLightDirection'
+            );
 
             // generate a uvsphere bottom up, CCW order
             var vertPos = [];
@@ -1270,6 +1274,7 @@
             gl.uniformMatrix4fv(sunShader.uMvMatrix, false, mvMatrix);
             gl.uniformMatrix4fv(sunShader.uPMatrix, false, pMatrix);
             gl.uniformMatrix4fv(sunShader.uCamMatrix, false, camMatrix);
+            gl.uniform3fv(sunShader.uLightDirection, earth.lightDirection);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
             gl.enableVertexAttribArray(sunShader.aVertexPosition);
@@ -1711,12 +1716,17 @@
         sun: {
             frag: `
         precision mediump float;
+        uniform vec3 uLightDirection;
 
         varying vec3 vNormal;
         varying float vDist;
 
         void main(void) {
-          float a = pow(vDist \/ 2.0 * -1.0 + 1.1, 10.0);
+          // Hide the Back Side of the Sphere to prevent duplicate suns
+          float darkAmount = max(dot(vNormal, -uLightDirection), 0.1);
+          // Create blur effect
+          float a = pow(vDist \/ 2.0 * -1.0 + 1.1, 10.0) * darkAmount;
+          // Set colors
           float r = 1.0 * a;
           float g = 1.0 * a;
           float b = 0.4 * a;

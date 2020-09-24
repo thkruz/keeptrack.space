@@ -13,7 +13,7 @@
     font-style: normal;
     font-weight: 400;
     src: local('Open Sans'), local('OpenSans'),
-        url(/css/fonts/opensans.woff)
+        url(./css/fonts/opensans.woff)
             format('woff');
 }
 @font-face {
@@ -21,7 +21,7 @@
     font-style: normal;
     font-weight: 700;
     src: local('Open Sans Bold'), local('OpenSans-Bold'),
-        url(/css/fonts/opensans.woff)
+        url(./css/fonts/opensans.woff)
             format('woff');
 }
 

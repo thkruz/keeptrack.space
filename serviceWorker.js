@@ -28,7 +28,6 @@ var contentToCache = [
     './js/lib/colorPick.js?v=1.20.4',
     './js/lib/webgl-obj-loader.min.js?v=1.20.4',
     './js/mapManager.min.js?v=1.20.4',
-    './license/license.min.js?v=1.20.4',
     './js/lib/combinedDependencies.js?v=1.20.4',
     './modules/meshManager.min.js?v=1.20.4',
     './modules/sensorManager.min.js?v=1.20.4',

@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!--Service Worker Code -->
+    <script>
+      if('serviceWorker' in navigator) {
+        navigator.serviceWorker
+                 .register('./serviceWorker.js')
+                 .then(function() { console.log("Service Worker Registered"); });
+      }
+    </script>
+    <!--Service Worker Code -->
     <link rel="preload" href="css/fonts/nasalization-rg.woff2" as="font" crossorigin="anonymous">
     <script src="js/keeptrack-head.js"></script>
     <meta
@@ -2089,14 +2098,5 @@
       }
     </script>
     <!--Google Analytics -->
-    <!--Service Worker Code -->
-    <script>
-      if('serviceWorker' in navigator) {
-        navigator.serviceWorker
-                 .register('./serviceWorker.js')
-                 .then(function() { console.log("Service Worker Registered"); });
-      }
-    </script>
-    <!--Service Worker Code -->
   </body>
 </html>

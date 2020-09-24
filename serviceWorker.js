@@ -99,13 +99,6 @@ var contentToCache = [
     './meshes/rocketbody.mtl',
 ];
 
-// // run this in global scope of window or worker. since window.self = window, we're ok
-// if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
-//     // huzzah! a worker!
-// } else {
-//     // I'm a window... sad trombone.
-// }
-
 self.addEventListener('install', (e) => {
     // console.log('[Service Worker] Install');
     e.waitUntil(
@@ -116,6 +109,7 @@ self.addEventListener('install', (e) => {
             return cache.addAll(contentToCache);
         })
     );
+    return self.skipWaiting();
 });
 
 self.addEventListener('fetch', (e) => {

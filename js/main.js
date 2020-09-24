@@ -316,6 +316,15 @@ function initializeKeepTrack() {
         })();
     });
     drawLoop(); // kick off the animationFrame()s
+    if (!settingsManager.disableUI && !settingsManager.isDrawLess) {
+      // Load Optional 3D models if available
+      if (typeof meshManager !== 'undefined') {
+        setTimeout(function () {
+          meshManager.init();
+        }, 0);
+        settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
+      }
+    }
 }
 
 // //////////////////////////////////////////////////////////////////////////

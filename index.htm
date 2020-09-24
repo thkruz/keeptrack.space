@@ -2,15 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <!--Service Worker Code -->
-    <script>
-      if('serviceWorker' in navigator) {
-        navigator.serviceWorker
-                 .register('./serviceWorker.js')
-                 .then(function() { console.log("Service Worker Registered"); });
-      }
-    </script>
-    <!--Service Worker Code -->
+    <link rel="canonical" href="https://www.keeptrack.space"/>
     <link rel="preload" href="css/fonts/nasalization-rg.woff2" as="font" crossorigin="anonymous">
     <script src="js/keeptrack-head.js"></script>
     <meta
@@ -47,8 +39,8 @@
             // but it only runs on the main website
             if (
                 window.location.protocol === 'http:' &&
-                window.location.hostname === 'keeptrack.space' ||
-                window.location.hostname === 'www.keeptrack.space'
+                (window.location.hostname === 'keeptrack.space' ||
+                window.location.hostname === 'www.keeptrack.space')
             ) {
                 var httpURL =
                     window.location.hostname +
@@ -2101,5 +2093,18 @@
       }
     </script>
     <!--Google Analytics -->
+    <!--Service Worker Code -->
+    <script>
+      if('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          setTimeout(function () {
+            navigator.serviceWorker
+            .register('./serviceWorker.js')
+            .then(function() { console.log("Service Worker Registered"); });
+          }, 10000);
+        });
+      }
+    </script>
+    <!--Service Worker Code -->
   </body>
 </html>

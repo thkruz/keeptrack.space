@@ -397,17 +397,6 @@ var emptyMat4 = mat4.create();
                     }
                 }
             })();
-
-            if (!settingsManager.disableUI && !settingsManager.isDrawLess) {
-              // Load Optional 3D models if available
-              if (typeof meshManager !== 'undefined') {
-                setTimeout(function () {
-                  meshManager.init();
-                }, 0);
-                settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
-              }
-            }
-
             if (settingsManager.startWithOrbitsDisplayed) {
                 setTimeout(function () {
                     // Time Machine

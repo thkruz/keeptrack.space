@@ -1,9 +1,9 @@
 var cacheName = 'js13kPWA-v1';
 var contentToCache = [
-  '/',
-  '/index.htm',
-  '/tle/TLE.json',
-  '/offline/tle.js'
+  './',
+  './index.htm',
+  './tle/TLE.json',
+  './offline/tle.js'
 ];
 
 // // run this in global scope of window or worker. since window.self = window, we're ok

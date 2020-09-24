@@ -108,13 +108,12 @@ var contentToCache = [
 // }
 
 self.addEventListener('install', (e) => {
-    console.log('[Service Worker] Install');
+    // console.log('[Service Worker] Install');
     e.waitUntil(
         caches.open(cacheName).then((cache) => {
-            if (db.enabled)
-                console.log(
-                    '[Service Worker] Caching all: app shell and content'
-                );
+            // console.log(
+            //     '[Service Worker] Caching all: app shell and content'
+            // );
             return cache.addAll(contentToCache);
         })
     );
@@ -125,20 +124,18 @@ self.addEventListener('fetch', (e) => {
         caches.match(e.request).then((r) => {
             let url = e.request.url.split('?');
             e.request.url = url[0];
-            if (db.enabled)
-                console.log(
-                    '[Service Worker] Fetching resource: ' + e.request.url
-                );
+            // console.log(
+            //     '[Service Worker] Fetching resource: ' + e.request.url
+            // );
             return (
                 r ||
                 fetch(e.request).then((response) => {
                     if (!response.ok) console.log('NOT FOUND!');
                     return caches.open(cacheName).then((cache) => {
-                        if (db.enabled)
-                            console.log(
-                                '[Service Worker] Caching new resource: ' +
-                                    e.request.url
-                            );
+                        // console.log(
+                        //     '[Service Worker] Caching new resource: ' +
+                        //         e.request.url
+                        // );
                         cache.put(e.request, response.clone());
                         return response;
                     });

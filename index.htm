@@ -47,7 +47,8 @@
             // but it only runs on the main website
             if (
                 window.location.protocol === 'http:' &&
-                window.location.hostname === 'keeptrack.space'
+                window.location.hostname === 'keeptrack.space' ||
+                window.location.hostname === 'www.keeptrack.space'
             ) {
                 var httpURL =
                     window.location.hostname +

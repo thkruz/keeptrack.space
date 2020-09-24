@@ -2088,5 +2088,14 @@
       }
     </script>
     <!--Google Analytics -->
+    <!--Service Worker Code -->
+    <script>
+      if('serviceWorker' in navigator) {
+        navigator.serviceWorker
+                 .register('/serviceWorker.js')
+                 .then(function() { console.log("Service Worker Registered"); });
+      }
+    </script>
+    <!--Service Worker Code -->
   </body>
 </html>

@@ -75,13 +75,25 @@ var emptyMat4 = mat4.create();
         satSet.loadTLEs(resp);
       })
       .fail(function () {
-        // Sometimes network firewall's hate .json so use a .js
-        $.getScript('/offline/tle.js', function () {
-          satSet.loadTLEs(jsTLEfile);
+        // Disable Caching
+        // Try using a cached version - mainly for serviceWorker
+        $.get({
+          url: '' + tleSource,
+          cache: true
+        }).done(function (resp) {
+          // if the .json loads then use it
+          satSet.loadTLEs(resp);
+        })
+        .fail(function () {
+          // Try the js file without caching
+          $.getScript('/offline/tle.js', function () {
+            satSet.loadTLEs(jsTLEfile);
+          }, true);
         });
       });
       jsTLEfile = null;
     } catch (e) {
+      console.warn(5);
       satSet.loadTLEs(jsTLEfile);
       jsTLEfile = null;
     }

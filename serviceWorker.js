@@ -57,7 +57,6 @@ var contentToCache = [
     './js/advice-module.min.js?v=1.20.4',
     './css/fonts/droid/droid-sans-v6-latin-regular.woff2',
     './js/objectManager.js',
-    './license/license.min.js?v=1.20.4',
     './js/sat-cruncher.js',
     './tle/TLE.json',
     './js/orbit-calculation-worker.js',

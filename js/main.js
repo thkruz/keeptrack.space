@@ -230,6 +230,15 @@ function initializeKeepTrack() {
     satSet.init(function satSetInitCallBack(satData) {
         orbitManager.init();
         groups.init();
+        setTimeout(function () {
+          earth.loadHiRes();
+          earth.loadHiResNight();
+          if('serviceWorker' in navigator) {
+            navigator.serviceWorker
+            .register('./serviceWorker.js')
+            .then(function() { console.log("Service Worker Registered"); });
+          }
+        }, 0);
         if (!settingsManager.disableUI) {
             searchBox.init(satData);
         }
@@ -244,8 +253,8 @@ function initializeKeepTrack() {
         (function _finalLoadingSequence() {
             if (
                 !isFinalLoadingComplete &&
-                !earth.loaded &&
-                settingsManager.cruncherReady
+                !earth.loaded
+                // && settingsManager.cruncherReady
             ) {
                 setTimeout(function () {
                     _finalLoadingSequence();
@@ -284,7 +293,7 @@ function initializeKeepTrack() {
                         $('#logo-trusat').hide();
                         $('#loading-screen').hide();
                         $('#loader-text').html('Attempting to Math...');
-                    }, 5000);
+                    }, 3000);
                 } else {
                     setTimeout(function () {
                         $('#loading-screen').removeClass('full-loader');
@@ -294,7 +303,7 @@ function initializeKeepTrack() {
                         $('#logo-trusat').hide();
                         $('#loading-screen').hide();
                         $('#loader-text').html('Attempting to Math...');
-                    }, 2000);
+                    }, 1500);
                 }
             }
 

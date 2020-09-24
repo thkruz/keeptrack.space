@@ -1,5 +1,7 @@
 var cacheName = 'KeepTrack-v1';
 var contentToCache = [
+    './',
+    './index.htm',
     './css/fonts/nasalization-rg.woff2',
     './js/keeptrack-head.js',
     './js/checker-script.js',

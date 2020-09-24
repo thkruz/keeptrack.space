@@ -136,7 +136,6 @@
             {
                 texture = gl.createTexture();
                 var img = new Image();
-                var imgHiRes = new Image();
                 img.onload = function () {
                     $('#loader-text').text('Painting the Earth...');
                     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -167,81 +166,73 @@
                     texLoaded = true;
                     onImageLoaded();
                 };
-                if (settingsManager.smallImages)
-                    img.src =
-                        settingsManager.installDirectory +
-                        'textures/earthmap512.jpg';
-                // 'textures/earthmap1k.jpg';
-                if (settingsManager.nasaImages)
-                    img.src =
-                        settingsManager.installDirectory +
-                        'textures/mercator-tex.jpg';
-                if (settingsManager.trusatImages)
-                    img.src =
-                        settingsManager.installDirectory +
-                        'textures/trusatvector-4096.jpg';
-                if (settingsManager.blueImages)
-                    img.src =
-                        settingsManager.installDirectory +
-                        'textures/world_blue-2048.png';
-                if (settingsManager.lowresImages)
-                    img.src =
-                        settingsManager.installDirectory +
-                        'textures/earthmap4k.jpg';
-                if (settingsManager.vectorImages)
-                    img.src =
-                        settingsManager.installDirectory +
-                        'textures/dayearthvector-4096.jpg';
-                if (
-                    settingsManager.hiresImages ||
-                    settingsManager.hiresNoCloudsImages
-                ) {
-                    if (settingsManager.hiresImages)
-                        imgHiRes.src =
-                            settingsManager.installDirectory +
-                            'textures/earthmap8k.jpg';
-                    if (settingsManager.hiresNoCloudsImages)
-                        imgHiRes.src =
-                            settingsManager.installDirectory +
-                            'textures/earthmap8k.jpg';
-                    imgHiRes.onload = function () {
-                        gl.bindTexture(gl.TEXTURE_2D, texture);
-                        gl.texImage2D(
-                            gl.TEXTURE_2D,
-                            0,
-                            gl.RGBA,
-                            gl.RGBA,
-                            gl.UNSIGNED_BYTE,
-                            imgHiRes
-                        );
-                        gl.texParameteri(
-                            gl.TEXTURE_2D,
-                            gl.TEXTURE_MAG_FILTER,
-                            gl.LINEAR
-                        );
-                        gl.texParameteri(
-                            gl.TEXTURE_2D,
-                            gl.TEXTURE_MIN_FILTER,
-                            gl.LINEAR
-                        );
-                        gl.texParameteri(
-                            gl.TEXTURE_2D,
-                            gl.TEXTURE_WRAP_S,
-                            gl.REPEAT
-                        );
-                        texLoaded = true;
-                        onImageLoaded();
-                    };
-                } else {
-                    imgHiRes = null;
-                }
+                img.src =
+                    settingsManager.installDirectory +
+                    'textures/earthmap512.jpg';
+                earth.loadHiRes = () => {
+                  var imgHiRes = new Image();
+                  imgHiRes.src =
+                  settingsManager.installDirectory +
+                  'textures/earthmap4k.jpg';
+                  if (settingsManager.nasaImages)
+                  imgHiRes.src =
+                  settingsManager.installDirectory +
+                  'textures/mercator-tex.jpg';
+                  if (settingsManager.trusatImages)
+                  img.src =
+                  settingsManager.installDirectory +
+                  'textures/trusatvector-4096.jpg';
+                  if (settingsManager.blueImages)
+                  imgHiRes.src =
+                  settingsManager.installDirectory +
+                  'textures/world_blue-2048.png';
+                  if (settingsManager.vectorImages)
+                  imgHiRes.src =
+                  settingsManager.installDirectory +
+                  'textures/dayearthvector-4096.jpg';
+                  if (settingsManager.hiresImages)
+                  imgHiRes.src =
+                  settingsManager.installDirectory +
+                  'textures/earthmap8k.jpg';
+                  if (settingsManager.hiresNoCloudsImages)
+                  imgHiRes.src =
+                  settingsManager.installDirectory +
+                  'textures/earthmap8k.jpg';
+                  imgHiRes.onload = function () {
+                    gl.bindTexture(gl.TEXTURE_2D, texture);
+                    gl.texImage2D(
+                      gl.TEXTURE_2D,
+                      0,
+                      gl.RGBA,
+                      gl.RGBA,
+                      gl.UNSIGNED_BYTE,
+                      imgHiRes
+                    );
+                    gl.texParameteri(
+                      gl.TEXTURE_2D,
+                      gl.TEXTURE_MAG_FILTER,
+                      gl.LINEAR
+                    );
+                    gl.texParameteri(
+                      gl.TEXTURE_2D,
+                      gl.TEXTURE_MIN_FILTER,
+                      gl.LINEAR
+                    );
+                    gl.texParameteri(
+                      gl.TEXTURE_2D,
+                      gl.TEXTURE_WRAP_S,
+                      gl.REPEAT
+                    );
+                    texLoaded = true;
+                    onImageLoaded();
+                  };
+                };
             }
 
             // Night Color Texture
             {
                 nightTexture = gl.createTexture();
                 var nightImg = new Image();
-                var nightImgHiRes = new Image();
                 nightImg.onload = function () {
                     gl.bindTexture(gl.TEXTURE_2D, nightTexture);
                     gl.texImage2D(
@@ -273,55 +264,51 @@
                 };
                 nightImg.src =
                     settingsManager.installDirectory +
-                    'textures/earthlights4k.jpg';
-                if (settingsManager.smallImages)
-                    nightImg.src =
-                        settingsManager.installDirectory +
-                        'textures/earthlights512.jpg';
-                // 'textures/earthlights1k.jpg';
-                if (settingsManager.vectorImages)
-                    nightImg.src =
-                        settingsManager.installDirectory +
-                        'textures/dayearthvector-4096.jpg';
+                    'textures/earthlights512.jpg';
 
-                if (
-                    settingsManager.hiresImages ||
-                    settingsManager.hiresNoCloudsImages
-                ) {
-                    nightImgHiRes.src =
-                        settingsManager.installDirectory +
-                        'textures/earthlights10k.jpg';
-                    nightImgHiRes.onload = function () {
-                        gl.bindTexture(gl.TEXTURE_2D, nightTexture);
-                        gl.texImage2D(
-                            gl.TEXTURE_2D,
-                            0,
-                            gl.RGBA,
-                            gl.RGBA,
-                            gl.UNSIGNED_BYTE,
-                            nightImgHiRes
-                        );
-                        gl.texParameteri(
-                            gl.TEXTURE_2D,
-                            gl.TEXTURE_MAG_FILTER,
-                            gl.LINEAR
-                        );
-                        gl.texParameteri(
-                            gl.TEXTURE_2D,
-                            gl.TEXTURE_MIN_FILTER,
-                            gl.LINEAR
-                        );
-                        gl.texParameteri(
-                            gl.TEXTURE_2D,
-                            gl.TEXTURE_WRAP_S,
-                            gl.REPEAT
-                        );
-                        nightLoaded = true;
-                        onImageLoaded();
-                    };
-                } else {
-                    nightImgHiRes = null;
-                }
+                earth.loadHiResNight = () => {
+                  var nightImgHiRes = new Image();
+                  if (!settingsManager.smallImages)
+                  nightImgHiRes.src =
+                      settingsManager.installDirectory +
+                      'textures/earthlights4k.jpg';
+                  if (settingsManager.vectorImages)
+                      nightImgHiRes.src =
+                          settingsManager.installDirectory +
+                          'textures/dayearthvector-4096.jpg';
+                  if (settingsManager.hiresImages)
+                      nightImgHiRes.src =
+                          settingsManager.installDirectory +
+                          'textures/earthlights10k.jpg';
+                  nightImgHiRes.onload = function () {
+                      gl.bindTexture(gl.TEXTURE_2D, nightTexture);
+                      gl.texImage2D(
+                          gl.TEXTURE_2D,
+                          0,
+                          gl.RGBA,
+                          gl.RGBA,
+                          gl.UNSIGNED_BYTE,
+                          nightImgHiRes
+                      );
+                      gl.texParameteri(
+                          gl.TEXTURE_2D,
+                          gl.TEXTURE_MAG_FILTER,
+                          gl.LINEAR
+                      );
+                      gl.texParameteri(
+                          gl.TEXTURE_2D,
+                          gl.TEXTURE_MIN_FILTER,
+                          gl.LINEAR
+                      );
+                      gl.texParameteri(
+                          gl.TEXTURE_2D,
+                          gl.TEXTURE_WRAP_S,
+                          gl.REPEAT
+                      );
+                      nightLoaded = true;
+                      onImageLoaded();
+                  };
+                };
             }
 
             // Bump Map

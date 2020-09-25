@@ -19,7 +19,7 @@ const MOON_SCALAR_DISTANCE = 250000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '1.20.5.6';
+    settingsManager.versionNumber = '1.20.5.7';
     settingsManager.versionDate = 'September 24, 2020';
 
     // Install Folder Settings
@@ -123,7 +123,7 @@ const MOON_SCALAR_DISTANCE = 250000;
     settingsManager.isMobileModeEnabled = false;
     if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
         settingsManager.isMobileModeEnabled = true;
-        settingsManager.smallImages = true;
+        // settingsManager.smallImages = true;
         settingsManager.isDrawLess = true;
         settingsManager.camDistBuffer = 100;
     }

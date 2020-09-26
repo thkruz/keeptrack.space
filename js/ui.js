@@ -2460,11 +2460,7 @@ var speedModifier = 1;
                     var tgtLon = $('#ms-lon').val() * 1;
                     // var result = false;
 
-                    var launchTime = timeManager.selectedDate;
-                    launchTime = launchTime.split(' ');
-                    launchTime = new Date(
-                        launchTime[0] + 'T' + launchTime[1] + 'Z'
-                    ).getTime();
+                    let launchTime = timeManager.selectedDate;
 
                     if (type > 0) {
                         if (type === 1)

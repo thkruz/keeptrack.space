@@ -642,7 +642,7 @@ or mirrored at any other location without the express written permission of the 
                         timeManager.dateFormat(
                             multiSiteArray[i].time,
                             'isoDateTime',
-                            false
+                            true
                         )
                     )
                 );
@@ -681,7 +681,7 @@ or mirrored at any other location without the express written permission of the 
             let isInFOV = satellite.checkIsInFOV(sensor, aer);
             if (isInFOV) {
                 return {
-                    time: now,
+                    time: now.toISOString(),
                     el: elevation,
                     az: azimuth,
                     rng: range,

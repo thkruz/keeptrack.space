@@ -482,6 +482,8 @@ const MOON_SCALAR_DISTANCE = 250000;
     settingsManager.isMapUpdateOverride = false;
     settingsManager.lastMapUpdateTime = 0;
 
+    settingsManager.lastSearchResults = [];
+
     // Export settingsManager to everyone else
     window.settingsManager = settingsManager;
 }

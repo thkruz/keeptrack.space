@@ -1845,12 +1845,13 @@
 
       varying vec4 vColor;
       varying float vStar;
+      varying float vDist;
 
       void main(void) {
         vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
         float r = 0.0;
         float alpha = 0.0;
-        if (vStar < 0.5) {
+        if (vDist < 200000.0) {
           r = ${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0);
           alpha = pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0);
         } else {
@@ -1878,17 +1879,22 @@
 
         varying vec4 vColor;
         varying float vStar;
+        varying float vDist;
 
         void main(void) {
           vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
           float drawSize = ${settingsManager.satShader.starSize};
+          float dist = distance(vec3(0.0, 0.0, 0.0),aPos.xyz);
           if (aStar < 0.5) {
             drawSize = min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize), maxSize) * 1.0;
+          } else {
+            drawSize = min(max(${settingsManager.satShader.starSize} * 100000.0 \/ dist, ${settingsManager.satShader.starSize}),${settingsManager.satShader.starSize} * 1.1);
           }
           gl_PointSize = drawSize;
           gl_Position = position;
           vColor = aColor;
           vStar = aStar * 1.0;
+          vDist = dist;
         }
       `,
         },

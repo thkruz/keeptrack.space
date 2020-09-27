@@ -916,13 +916,7 @@ var emptyMat4 = mat4.create();
             );
 
             starBuf = gl.createBuffer();
-            starBufData = satSet.setupStarData(satData);
-            gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);
-            gl.bufferData(
-                gl.ARRAY_BUFFER,
-                new Float32Array(starBufData),
-                gl.STATIC_DRAW
-            );
+            satSet.setupStarBuffer();
 
             satSet.numSats = satData.length;
             satSet.setColorScheme(ColorScheme.default, true);
@@ -979,6 +973,16 @@ var emptyMat4 = mat4.create();
         }
     };
 
+    satSet.setupStarBuffer = () => {
+      let starBufData = satSet.setupStarData(satData);
+      gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);
+      gl.bufferData(
+          gl.ARRAY_BUFFER,
+          new Float32Array(starBufData),
+          gl.STATIC_DRAW
+      );
+    };
+
     satSet.setupStarData = (satData) => {
         let starArray = [];
         for (var i = 0; i < satData.length; i++) {
@@ -990,6 +994,9 @@ var emptyMat4 = mat4.create();
             } else {
                 starArray.push(0.0);
             }
+        }
+        for (let i = 0; i < settingsManager.lastSearchResults.length; i++) {
+          starArray[settingsManager.lastSearchResults[i]] = 1.0;
         }
         return starArray;
     };

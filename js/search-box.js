@@ -43,6 +43,10 @@ var hoverSatId = -1;
         groups.clearSelect();
         resultsOpen = false;
 
+        settingsManager.lastSearch = '';
+        settingsManager.lastSearchResults = [];
+        satSet.setupStarBuffer();
+
         if (settingsManager.currentColorScheme === ColorScheme.group) {
             satSet.setColorScheme(ColorScheme.default, true);
         } else {
@@ -52,6 +56,9 @@ var hoverSatId = -1;
 
     searchBox.doSearch = function (searchString, isPreventDropDown) {
         if (searchString.length === 0) {
+            settingsManager.lastSearch = '';
+            settingsManager.lastSearchResults = [];
+            satSet.setupStarBuffer();
             $('#search').val('');
             searchBox.hideResults();
             selectSat(-1);
@@ -63,6 +70,7 @@ var hoverSatId = -1;
         // Uppercase to make this search not case sensitive
         searchString = searchString.toUpperCase();
         var searchList = searchString.split(',');
+        settingsManager.lastSearch = searchList;
 
         var results = [];
 
@@ -183,6 +191,11 @@ var hoverSatId = -1;
         for (i = 0; i < results.length; i++) {
             idList.push(results[i].satId);
         }
+
+        settingsManager.lastSearchResults = idList;
+
+        satSet.setupStarBuffer();
+
         var dispGroup = new groups.SatGroup('idList', idList);
         lastResultGroup = dispGroup;
         selectSat(-1);

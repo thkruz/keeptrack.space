@@ -1040,7 +1040,7 @@ or mirrored at any other location without the express written permission of the 
                         // console.log('Found Wrong Lat');
                     }
                 } else {
-                    console.log('Failed Arg of Per Calc');
+                    // console.log('Failed Arg of Per Calc');
                 }
                 if (argPerCalcResults === 5) {
                     i += 5 * 10; // Change ArgPer faster

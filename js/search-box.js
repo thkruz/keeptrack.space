@@ -102,7 +102,7 @@ var hoverSatId = -1;
                 }
 
                 // Skip Fake Analyst satellites
-                if (sat.C == 'ANALSAT') {
+                if (sat.C == 'ANALSAT' && !sat.active) {
                     continue;
                 }
 

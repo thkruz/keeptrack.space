@@ -2441,7 +2441,7 @@ var speedModifier = 1;
                         }
                     }
                     breakupSearchString += mainsat.SCC_NUM + ',Analyst Sat';
-                    searchBox.doSearch($('#search').val());
+                    searchBox.doSearch(breakupSearchString);
 
                     $('#loading-screen').fadeOut();
                 });

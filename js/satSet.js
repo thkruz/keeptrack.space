@@ -995,6 +995,11 @@ var emptyMat4 = mat4.create();
                 starArray.push(0.0);
             }
         }
+        // Pretend Satellites that are currently being searched are stars
+        // The shaders will display these "stars" like close satellites
+        // because the distance from the center of the earth is too close to
+        // be a star. This method is so there are less buffers needed but as
+        // computers get faster it should be replaced
         for (let i = 0; i < settingsManager.lastSearchResults.length; i++) {
           starArray[settingsManager.lastSearchResults[i]] = 1.0;
         }

@@ -4367,6 +4367,13 @@ $(document).ready(function () {
                     break;
                 case 'clear-screen-rmb':
                     (function clearScreenRMB() {
+                        // Clear Lines first
+                        drawLineList = [];
+                        if (objectManager.isStarManagerLoaded) {
+                            starManager.isAllConstellationVisible = false;
+                        }
+
+                        // Now clear everything else
                         searchBox.hideResults();
                         uiManager.hideSideMenus();
                         isMilSatSelected = false;

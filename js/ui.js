@@ -5290,41 +5290,6 @@ var speedModifier = 1;
         }
     }
 
-    $('#satcom-inner-menu>ul>li').on('click', function () {
-        selectSat(-1); // clear selected sat
-        var satcomName = $(this).data('satcom');
-        switch (satcomName) {
-            case 'aehf':
-                $('#loading-screen').fadeIn('slow', function () {
-                    drawLineList = [];
-                    satLinkManager.showLinks('aehf');
-                    if (settingsManager.isOfficialWebsite)
-                        ga('send', 'event', 'Satcom Menu', 'aehf', 'Selected');
-                    $('#loading-screen').fadeOut();
-                    $('#satcom-menu').effect(
-                        'slide',
-                        { direction: 'left', mode: 'show' },
-                        1000
-                    );
-                });
-                break;
-            case 'wgs':
-                $('#loading-screen').fadeIn('slow', function () {
-                    drawLineList = [];
-                    satLinkManager.showLinks('wgs');
-                    if (settingsManager.isOfficialWebsite)
-                        ga('send', 'event', 'Satcom Menu', 'wgs', 'Selected');
-                    $('#loading-screen').fadeOut();
-                    $('#satcom-menu').effect(
-                        'slide',
-                        { direction: 'left', mode: 'show' },
-                        1000
-                    );
-                });
-                break;
-        }
-    });
-
     $('#colors-menu>ul>li').on('click', function () {
         selectSat(-1); // clear selected sat
         var colorName = $(this).data('color');
@@ -6237,142 +6202,100 @@ var speedModifier = 1;
                     ]);
                 }
                 break;
-            case 'MilitarySatellites':
-                if (typeof groups.MilitarySatellites == 'undefined') {
-                    // SCC#s based on Uninon of Concerned Scientists
-                    groups.MilitarySatellites = new groups.SatGroup('objNum', [
-                        40420,
-                        41394,
-                        32783,
-                        35943,
-                        36582,
-                        40353,
-                        40555,
-                        41032,
-                        38010,
-                        38008,
-                        38007,
-                        38009,
-                        37806,
-                        41121,
-                        41579,
-                        39030,
-                        39234,
-                        28492,
-                        36124,
-                        39194,
-                        36095,
-                        40358,
-                        40258,
-                        37212,
-                        37398,
-                        38995,
-                        40296,
-                        40900,
-                        39650,
-                        27434,
-                        31601,
-                        36608,
-                        28380,
-                        28521,
-                        36519,
-                        39177,
-                        40699,
-                        34264,
-                        36358,
-                        39375,
-                        38248,
-                        34807,
-                        28908,
-                        32954,
-                        32955,
-                        32956,
-                        35498,
-                        35500,
-                        37152,
-                        37154,
-                        38733,
-                        39057,
-                        39058,
-                        39059,
-                        39483,
-                        39484,
-                        39485,
-                        39761,
-                        39762,
-                        39763,
-                        40920,
-                        40921,
-                        40922,
-                        39765,
-                        29658,
-                        31797,
-                        32283,
-                        32750,
-                        33244,
-                        39208,
-                        26694,
-                        40614,
-                        20776,
-                        25639,
-                        26695,
-                        30794,
-                        32294,
-                        33055,
-                        39034,
-                        28946,
-                        33751,
-                        33752,
-                        27056,
-                        27057,
-                        27464,
-                        27465,
-                        27868,
-                        27869,
-                        28419,
-                        28420,
-                        28885,
-                        29273,
-                        32476,
-                        31792,
-                        36834,
-                        37165,
-                        37875,
-                        37941,
-                        38257,
-                        38354,
-                        39011,
-                        39012,
-                        39013,
-                        39239,
-                        39240,
-                        39241,
-                        39363,
-                        39410,
-                        40109,
-                        40111,
-                        40143,
-                        40275,
-                        40305,
-                        40310,
-                        40338,
-                        40339,
-                        40340,
-                        40362,
-                        40878,
-                        41026,
-                        41038,
-                        41473,
-                        28470,
-                        37804,
-                        37234,
-                        29398,
-                        40110,
-                        39209,
-                        39210,
-                        36596,
-                    ]);
+            case 'aehf':
+                if (typeof groups.aehf == 'undefined') {
+                  groups.aehf = new groups.SatGroup(
+                    'objNum',
+                    satSet.convertIdArrayToSatnumArray(satLinkManager.aehf)
+                  );
                 }
+                $('#loading-screen').fadeIn('slow', function () {
+                    drawLineList = [];
+                    satLinkManager.showLinks('aehf');
+                    if (settingsManager.isOfficialWebsite)
+                        ga('send', 'event', 'Satcom Menu', 'aehf', 'Selected');
+                    $('#loading-screen').fadeOut();
+                    $('#satcom-menu').effect(
+                        'slide',
+                        { direction: 'left', mode: 'show' },
+                        1000
+                    );
+                });
+                break;
+            case 'wgs':
+                // WGS also selects DSCS
+                if (typeof groups.wgs == 'undefined') {
+                  groups.wgs = new groups.SatGroup(
+                    'objNum',
+                    satSet.convertIdArrayToSatnumArray(satLinkManager.wgs.concat(satLinkManager.dscs))
+                  );
+                }
+                $('#loading-screen').fadeIn('slow', function () {
+                    drawLineList = [];
+                    try {
+                      satLinkManager.showLinks('wgs');
+                    } catch (e) {
+                      // Maybe the satLinkManager isn't installed?
+                    }
+                    if (settingsManager.isOfficialWebsite)
+                        ga('send', 'event', 'Satcom Menu', 'wgs', 'Selected');
+                    $('#loading-screen').fadeOut();
+                    $('#satcom-menu').effect(
+                        'slide',
+                        { direction: 'left', mode: 'show' },
+                        1000
+                    );
+                });
+                break;
+            case 'starlink':
+                // WGS also selects DSCS
+                if (typeof groups.starlink == 'undefined') {
+                  groups.starlink = new groups.SatGroup(
+                    'objNum',
+                    satSet.convertIdArrayToSatnumArray(satLinkManager.starlink)
+                  );
+                }
+                $('#loading-screen').fadeIn('slow', function () {
+                    drawLineList = [];
+                    try {
+                      satLinkManager.showLinks('starlink');
+                    } catch (e) {
+                      // Maybe the satLinkManager isn't installed?
+                    }
+                    if (settingsManager.isOfficialWebsite)
+                        ga('send', 'event', 'SatLink Menu', 'starlink', 'Selected');
+                    $('#loading-screen').fadeOut();
+                    $('#satcom-menu').effect(
+                        'slide',
+                        { direction: 'left', mode: 'show' },
+                        1000
+                    );
+                });
+                break;
+            case 'sbirs':
+                // SBIRS and DSP
+                if (typeof groups.sbirs == 'undefined') {
+                  groups.sbirs = new groups.SatGroup(
+                    'objNum',
+                    satSet.convertIdArrayToSatnumArray(satLinkManager.sbirs)
+                  );
+                }
+                $('#loading-screen').fadeIn('slow', function () {
+                    drawLineList = [];
+                    try {
+                      satLinkManager.showLinks('sbirs');
+                    } catch (e) {
+                      // Maybe the satLinkManager isn't installed?
+                    }
+                    if (settingsManager.isOfficialWebsite)
+                        ga('send', 'event', 'SatLink Menu', 'sbirs', 'Selected');
+                    $('#loading-screen').fadeOut();
+                    $('#satcom-menu').effect(
+                        'slide',
+                        { direction: 'left', mode: 'show' },
+                        1000
+                    );
+                });
                 break;
         }
         _groupSelected(groupName);
@@ -6380,6 +6303,8 @@ var speedModifier = 1;
     });
     _groupSelected = function (groupName) {
         groups.selectGroup(groups[groupName]);
+
+        console.log(groups[groupName]);
 
         $search.val('');
 

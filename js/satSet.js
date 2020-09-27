@@ -973,6 +973,22 @@ var emptyMat4 = mat4.create();
         }
     };
 
+    satSet.convertIdArrayToSatnumArray = (satIdArray) => {
+      let satnumArray = [];
+      for (let i = 0; i < satIdArray.length; i++) {
+        satnumArray.push(parseInt(satSet.getSat(satIdArray[i]).SCC_NUM));
+      }
+      return satnumArray;
+    };
+
+    satSet.convertSatnumArrayToIdArray = (satnumArray) => {
+      let satIdArray = [];
+      for (let i = 0; i < satnumArray.length; i++) {
+        satIdArray.push(satSet.getSatFromObjNum(satnumArray[i]).id);
+      }
+      return satIdArray;
+    };
+
     satSet.setupStarBuffer = () => {
       let starBufData = satSet.setupStarData(satData);
       gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);

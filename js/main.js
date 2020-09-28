@@ -1894,13 +1894,13 @@ function _hoverBoxOnSat(satId, satX, satY) {
                     satHoverBoxNode2.textContent = sat.SCC_NUM;
                     satHoverBoxNode3.innerHTML =
                         satellite.nextpass(sat) +
-                        satellite.distance(sat, objectManager.selectedSatData) +
+                        satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) +
                         '';
                 } else if (isShowDistance) {
                     satHoverBoxNode1.textContent = sat.ON;
                     satHoverBoxNode2.innerHTML =
                         sat.SCC_NUM +
-                        satellite.distance(sat, objectManager.selectedSatData) +
+                        satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) +
                         '';
                     satHoverBoxNode3.innerHTML =
                         'X: ' +
@@ -2453,7 +2453,9 @@ function selectSat(satId) {
             1000
         );
 
-        $('#search-results').attr('style', 'display: block; max-height:auto');
+        if ($('#search').val().length > 0) {
+          $('#search-results').attr('style', 'display: block; max-height:auto');
+        }
 
         // Toggle the side menus as closed
         isEditSatMenuOpen = false;
@@ -2464,7 +2466,7 @@ function selectSat(satId) {
         isBreakupMenuOpen = false;
         isMissileMenuOpen = false;
         isCustomSensorMenuOpen = false;
-    } else {
+    } else if (satId !== -1) {
         cameraManager.isChasing = true;
         isselectedSatNegativeOne = false;
         objectManager.selectedSat = satId;
@@ -2518,10 +2520,12 @@ function selectSat(satId) {
         if ($('#search-results').css('display') === 'block') {
             if (window.innerWidth <= 1000) {
             } else {
-                $('#search-results').attr(
-                    'style',
-                    'display:block; max-height:28%'
-                );
+                if ($('#search').val().length > 0) {
+                  $('#search-results').attr(
+                      'style',
+                      'display:block; max-height:28%'
+                  );
+                }
                 if (cameraType.current !== cameraType.PLANETARIUM) {
                     // Unclear why this was needed...
                     // uiManager.legendMenuChange('default')
@@ -2530,10 +2534,12 @@ function selectSat(satId) {
         } else {
             if (window.innerWidth <= 1000) {
             } else {
-                $('#search-results').attr(
-                  'style',
-                  'display:block; max-height:auto'
-                );
+                if ($('#search').val().length > 0) {
+                  $('#search-results').attr(
+                    'style',
+                    'display:block; max-height:auto'
+                  );
+                }
                 if (cameraType.current !== cameraType.PLANETARIUM) {
                     // Unclear why this was needed...
                     // uiManager.legendMenuChange('default')
@@ -4379,7 +4385,8 @@ $(document).ready(function () {
                         }
 
                         // Now clear everything else
-                        searchBox.hideResults();
+                        searchBox.doSearch('');
+                        mobile.searchToggle(false);
                         uiManager.hideSideMenus();
                         isMilSatSelected = false;
                         $('#menu-space-stations').removeClass(

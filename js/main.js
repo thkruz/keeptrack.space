@@ -2381,7 +2381,7 @@ function selectSat(satId) {
         )
             return; // Non-Missile Non-Sensor Object
     }
-    satSet.selectSat(satId);
+    // satSet.selectSat(satId);
     camSnapMode = false;
 
     if (satId === -1) {
@@ -2453,7 +2453,7 @@ function selectSat(satId) {
             1000
         );
 
-        $('#search-results').attr('style', 'max-height:auto');
+        $('#search-results').attr('style', 'display: block; max-height:auto');
 
         // Toggle the side menus as closed
         isEditSatMenuOpen = false;
@@ -2520,7 +2520,7 @@ function selectSat(satId) {
             } else {
                 $('#search-results').attr(
                     'style',
-                    'display:block max-height:28%'
+                    'display:block; max-height:28%'
                 );
                 if (cameraType.current !== cameraType.PLANETARIUM) {
                     // Unclear why this was needed...
@@ -2530,7 +2530,10 @@ function selectSat(satId) {
         } else {
             if (window.innerWidth <= 1000) {
             } else {
-                $('#search-results').attr('style', 'max-height:auto');
+                $('#search-results').attr(
+                  'style',
+                  'display:block; max-height:auto'
+                );
                 if (cameraType.current !== cameraType.PLANETARIUM) {
                     // Unclear why this was needed...
                     // uiManager.legendMenuChange('default')

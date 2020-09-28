@@ -322,6 +322,8 @@ function initializeKeepTrack() {
                 $('#map-image').width(settingsManager.mapHeight);
                 $('#map-menu').width($(window).width());
             }
+
+            satLinkManager.idToSatnum();
         })();
     });
     drawLoop(); // kick off the animationFrame()s

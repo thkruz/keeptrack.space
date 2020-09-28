@@ -104,7 +104,7 @@ var speedModifier = 1;
     var isConstellationsMenuOpen = false;
     var isCountriesMenuOpen = false;
     var isMilSatSelected = false;
-    var isSatcomMenuOpen = false;
+    var isExternalMenuOpen = false;
     var isSocratesMenuOpen = false;
     var isNextLaunchMenuOpen = false;
     var issatChngMenuOpen = false;
@@ -1648,6 +1648,24 @@ var speedModifier = 1;
 
                 settingsManager.isForceColorScheme = true;
                 satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
+                e.preventDefault();
+            });
+
+            $('#n2yo-form').on('submit', function (e) {
+                $('#loading-screen').fadeIn('slow', function () {
+                  let satnum = $('#ext-n2yo').val() * 1;
+                  satSet.searchN2yo(satnum);
+                  $('#loading-screen').fadeOut();
+                });
+                e.preventDefault();
+            });
+
+            $('#celestrak-form').on('submit', function (e) {
+                $('#loading-screen').fadeIn('slow', function () {
+                  let satnum = $('#ext-celestrak').val() * 1;
+                  satSet.searchCelestrak(satnum);
+                  $('#loading-screen').fadeOut();
+                });
                 e.preventDefault();
             });
 
@@ -3457,22 +3475,22 @@ var speedModifier = 1;
                         break;
                     }
                     break;
-                case 'menu-satcom':
-                    if (isSatcomMenuOpen) {
-                        isSatcomMenuOpen = false;
-                        $('#menu-satcom').removeClass('bmenu-item-selected');
+                case 'menu-external':
+                    if (isExternalMenuOpen) {
+                        isExternalMenuOpen = false;
+                        $('#menu-external').removeClass('bmenu-item-selected');
                         uiManager.hideSideMenus();
                         break;
                     } else {
                         uiManager.hideSideMenus();
-                        $('#satcom-menu').effect(
+                        $('#external-menu').effect(
                             'slide',
                             { direction: 'left', mode: 'show' },
                             1000
                         );
                         uiManager.updateWatchlist();
-                        isSatcomMenuOpen = true;
-                        $('#menu-satcom').addClass('bmenu-item-selected');
+                        isExternalMenuOpen = true;
+                        $('#menu-external').addClass('bmenu-item-selected');
                         break;
                     }
                     break;
@@ -4391,7 +4409,7 @@ var speedModifier = 1;
                 { direction: 'left', mode: 'hide' },
                 1000
             );
-            $('#satcom-menu').effect(
+            $('#external-menu').effect(
                 'slide',
                 { direction: 'left', mode: 'hide' },
                 1000
@@ -4442,7 +4460,7 @@ var speedModifier = 1;
             $('#menu-nextLaunch').removeClass('bmenu-item-selected');
             $('#menu-breakup').removeClass('bmenu-item-selected');
             $('#menu-missile').removeClass('bmenu-item-selected');
-            $('#menu-satcom').removeClass('bmenu-item-selected');
+            $('#menu-external').removeClass('bmenu-item-selected');
             $('#menu-analysis').removeClass('bmenu-item-selected');
             $('#menu-customSensor').removeClass('bmenu-item-selected');
             $('#menu-color-scheme').removeClass('bmenu-item-selected');
@@ -4473,7 +4491,7 @@ var speedModifier = 1;
             isCustomSensorMenuOpen = false;
             isColorSchemeMenuOpen = false;
             isAnalysisMenuOpen = false;
-            isSatcomMenuOpen = false;
+            isExternalMenuOpen = false;
             isConstellationsMenuOpen = false;
             isCountriesMenuOpen = false;
             isAboutSelected = false;
@@ -6213,13 +6231,8 @@ var speedModifier = 1;
                     drawLineList = [];
                     satLinkManager.showLinks('aehf');
                     if (settingsManager.isOfficialWebsite)
-                        ga('send', 'event', 'Satcom Menu', 'aehf', 'Selected');
+                        ga('send', 'event', 'SatLink Menu', 'aehf', 'Selected');
                     $('#loading-screen').fadeOut();
-                    $('#satcom-menu').effect(
-                        'slide',
-                        { direction: 'left', mode: 'show' },
-                        1000
-                    );
                 });
                 break;
             case 'wgs':
@@ -6238,13 +6251,8 @@ var speedModifier = 1;
                       // Maybe the satLinkManager isn't installed?
                     }
                     if (settingsManager.isOfficialWebsite)
-                        ga('send', 'event', 'Satcom Menu', 'wgs', 'Selected');
+                        ga('send', 'event', 'SatLink Menu', 'wgs', 'Selected');
                     $('#loading-screen').fadeOut();
-                    $('#satcom-menu').effect(
-                        'slide',
-                        { direction: 'left', mode: 'show' },
-                        1000
-                    );
                 });
                 break;
             case 'starlink':
@@ -6265,11 +6273,6 @@ var speedModifier = 1;
                     if (settingsManager.isOfficialWebsite)
                         ga('send', 'event', 'SatLink Menu', 'starlink', 'Selected');
                     $('#loading-screen').fadeOut();
-                    $('#satcom-menu').effect(
-                        'slide',
-                        { direction: 'left', mode: 'show' },
-                        1000
-                    );
                 });
                 break;
             case 'sbirs':
@@ -6290,11 +6293,6 @@ var speedModifier = 1;
                     if (settingsManager.isOfficialWebsite)
                         ga('send', 'event', 'SatLink Menu', 'sbirs', 'Selected');
                     $('#loading-screen').fadeOut();
-                    $('#satcom-menu').effect(
-                        'slide',
-                        { direction: 'left', mode: 'show' },
-                        1000
-                    );
                 });
                 break;
         }

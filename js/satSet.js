@@ -989,6 +989,83 @@ var emptyMat4 = mat4.create();
       return satIdArray;
     };
 
+    satSet.searchCelestrak = (satnum, analsat) => {
+      // If no Analyst Satellite specified find the first unused one
+      if (typeof analsat == 'undefined') {
+          for (var i = 15000; i < satData.length; i++) {
+            if (satData[i].SCC_NUM >= 80000 && !satData[i].active) {
+                analsat = i;
+                break;
+            }
+          }
+      } else {
+        // Satnum to Id
+        analsat = satSet.getIdFromObjNum(analsat);
+      }
+
+      $.ajax({
+          crossOrigin: true,
+          url: `https://celestrak.com/satcat/tle.php?CATNR=${satnum}`,
+          success: function(data) {
+              let tles = data.split('\n');
+              let TLE1 = tles[1];
+              let TLE2 = tles[2];
+              satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
+          }
+      });
+    };
+
+    satSet.searchN2yo = (satNum, analsat) => {
+      // If no Analyst Satellite specified find the first unused one
+      if (typeof analsat == 'undefined') {
+          for (var i = 15000; i < satData.length; i++) {
+            if (satData[i].SCC_NUM >= 80000 && !satData[i].active) {
+                analsat = i;
+                break;
+            }
+          }
+      } else {
+        // Satnum to Id
+        analsat = satSet.getIdFromObjNum(analsat);
+      }
+
+      $.ajax({
+          crossOrigin: true,
+          url: `https://www.n2yo.com/satellite/?s=${satNum}`,
+          success: function(data) {
+              let tles = data.split('<div id="tle">')[1].split('\n');
+              let TLE1 = tles[2];
+              let TLE2 = tles[3];
+              satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
+          }
+      });
+    };
+
+    satSet.insertNewAnalystSatellite = (TLE1, TLE2, analsat) => {
+      if (
+          satellite.altitudeCheck(
+              TLE1,
+              TLE2,
+              timeManager.propOffset
+          ) > 1
+      ) {
+          satCruncher.postMessage({
+              typ: 'satEdit',
+              id: analsat,
+              active: true,
+              TLE1: TLE1,
+              TLE2: TLE2,
+          });
+          orbitManager.updateOrbitBuffer(analsat, true, TLE1, TLE2);
+          let sat = satSet.getSat(analsat);
+          sat.active = true;
+          sat.OT = 1; // Default to Satellite
+          searchBox.doSearch(sat.SCC_NUM.toString());
+      } else {
+          alert('Failed Altitude Check');
+      }
+    };
+
     satSet.setupStarBuffer = () => {
       let starBufData = satSet.setupStarData(satData);
       gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);

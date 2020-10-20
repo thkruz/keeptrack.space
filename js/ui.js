@@ -122,6 +122,7 @@ var speedModifier = 1;
     $(document).ready(function () {
         // Code Once index.htm is loaded
         if (settingsManager.offline) updateInterval = 250;
+        $('#versionNumber-text').innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
         (function _licenseCheck() {
             db.log('_licenseCheck');
             if (typeof satel === 'undefined') satel = null;
@@ -2478,7 +2479,7 @@ var speedModifier = 1;
                     var tgtLon = $('#ms-lon').val() * 1;
                     // var result = false;
 
-                    let launchTime = timeManager.selectedDate;
+                    let launchTime = timeManager.selectedDate * 1;
 
                     if (type > 0) {
                         if (type === 1)
@@ -3627,10 +3628,14 @@ var speedModifier = 1;
                         if (settingsManager.isMobileModeEnabled)
                             mobile.searchToggle(false);
                         uiManager.hideSideMenus();
+                        settingsManager.isPreventColorboxClose = true;
+                        setTimeout(function () {
+                          settingsManager.isPreventColorboxClose = false;
+                        }, 2000);
                         if (location.protocol === 'https:') {
                             $.colorbox({
                                 href:
-                                    'https://space.skyrocket.de/doc_chr/lau2020.htm',
+                                  'https://space.skyrocket.de/doc_chr/lau2020.htm',
                                 iframe: true,
                                 width: '80%',
                                 height: '80%',
@@ -3640,7 +3645,7 @@ var speedModifier = 1;
                         } else {
                             $.colorbox({
                                 href:
-                                    'http://space.skyrocket.de/doc_chr/lau2020.htm',
+                                  'http://space.skyrocket.de/doc_chr/lau2020.htm',
                                 iframe: true,
                                 width: '80%',
                                 height: '80%',
@@ -4987,15 +4992,15 @@ var speedModifier = 1;
             }
 
             if (settingsManager.isPropRateChange) {
-                satCruncher.postMessage({
-                    typ: 'offset',
-                    dat:
-                        timeManager.propOffset.toString() +
-                        ' ' +
-                        timeManager.propRate.toString(),
-                });
-                timeManager.propRealTime = Date.now();
-                timeManager.propTime();
+              timeManager.propRealTime = Date.now();
+              timeManager.propTime();
+              satCruncher.postMessage({
+                  typ: 'offset',
+                  dat:
+                      timeManager.propOffset.toString() +
+                      ' ' +
+                      timeManager.propRate.toString(),
+              });
             }
         };
         function browserUnsupported() {
@@ -5183,13 +5188,13 @@ var speedModifier = 1;
         if (sat.static) return;
 
         // IDEA: Include updates when satellite edited regardless of time.
-        if (timeManager.now > lastBoxUpdateTime * 1 + updateInterval) {
+        if (timeManager.now * 1> lastBoxUpdateTime * 1 + updateInterval) {
             if (!sat.missile) {
                 if (objectManager.isSensorManagerLoaded) {
                     sat.getTEARR();
                 }
             } else {
-                missileManager.getMissileTEARR(sat);
+                uiManager.currentTEARR = missileManager.getMissileTEARR(sat);
             }
             if (satellite.degreesLong(uiManager.currentTEARR.lon) >= 0) {
                 $('#sat-longitude').html(
@@ -5228,7 +5233,12 @@ var speedModifier = 1;
                 settingsManager.lastMapUpdateTime = timeManager.now;
             }
 
-            $('#sat-altitude').html(sat.getAltitude().toFixed(2) + ' km');
+            if (!sat.missile) {
+                $('#sat-altitude').html(sat.getAltitude().toFixed(2) + ' km');
+            } else {
+                $('#sat-altitude').html(uiManager.currentTEARR.alt.toFixed(2) + ' km');
+            }
+
             $('#sat-velocity').html(sat.velocity.toFixed(2) + ' km/s');
             if (objectManager.isSensorManagerLoaded) {
                 if (uiManager.currentTEARR.inview) {
@@ -5242,21 +5252,21 @@ var speedModifier = 1;
                         uiManager.currentTEARR.range.toFixed(2) + ' km'
                     );
                 } else {
-                    $('#sat-azimuth').html('Out of Bounds');
+                    $('#sat-azimuth').html('Out of FOV');
                     $('#sat-azimuth').prop(
                         'title',
                         'Azimuth: ' +
                             uiManager.currentTEARR.azimuth.toFixed(0) +
                             '°'
                     );
-                    $('#sat-elevation').html('Out of Bounds');
+                    $('#sat-elevation').html('Out of FOV');
                     $('#sat-elevation').prop(
                         'title',
                         'Elevation: ' +
                             uiManager.currentTEARR.elevation.toFixed(1) +
                             '°'
                     );
-                    $('#sat-range').html('Out of Bounds');
+                    $('#sat-range').html('Out of FOV');
                     $('#sat-range').prop(
                         'title',
                         'Range: ' +

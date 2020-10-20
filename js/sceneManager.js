@@ -1847,17 +1847,30 @@
       varying float vStar;
       varying float vDist;
 
+      float when_lt(float x, float y) {
+        return max(sign(y - x), 0.0);
+      }
+      float when_ge(float x, float y) {
+        return 1.0 - when_lt(x, y);
+      }
+
       void main(void) {
+
         vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
         float r = 0.0;
         float alpha = 0.0;
-        if (vDist < 200000.0) {
-          r = ${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0);
-          alpha = pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0);
-        } else {
-          r = ${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0);
-          alpha = pow(2.0 * r + ${settingsManager.satShader.blurFactor4}, 3.0);
-        }
+        // If not a star and not on the ground
+        r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
+        alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
+
+        // If on the ground
+        r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 6421.0);
+        alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0)) * when_lt(vDist, 6471.0);
+
+        // If a star
+        r += (${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0)) * when_ge(vDist, 200000.0);
+        alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor4}, 3.0)) * when_ge(vDist, 200000.0);
+
         alpha = min(alpha, 1.0);
         gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
       }
@@ -1881,15 +1894,33 @@
         varying float vStar;
         varying float vDist;
 
+        float when_lt(float x, float y) {
+          return max(sign(y - x), 0.0);
+        }
+        float when_ge(float x, float y) {
+          return 1.0 - when_lt(x, y);
+        }
+
         void main(void) {
           vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
-          float drawSize = ${settingsManager.satShader.starSize};
+          float drawSize = 0.0;
           float dist = distance(vec3(0.0, 0.0, 0.0),aPos.xyz);
-          if (aStar < 0.5) {
-            drawSize = min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize), maxSize) * 1.0;
-          } else {
-            drawSize = min(max(${settingsManager.satShader.starSize} * 100000.0 \/ dist, ${settingsManager.satShader.starSize}),${settingsManager.satShader.starSize} * 1.1);
-          }
+
+          // Satellite
+          drawSize +=
+            when_lt(aStar, 0.5) *
+            (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize * 0.9), maxSize) * 1.0);
+
+          // Something on the ground
+          drawSize +=
+            when_ge(aStar, 0.5) * when_lt(dist, 6421.0) *
+            (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize * 0.75), maxSize) * 1.0);
+
+          // Star or Searched Object
+          drawSize +=
+            when_ge(aStar, 0.5) * when_ge(dist, 6421.0) *
+            (min(max(${settingsManager.satShader.starSize} * 100000.0 \/ dist, ${settingsManager.satShader.starSize}),${settingsManager.satShader.starSize} * 1.0));
+
           gl_PointSize = drawSize;
           gl_Position = position;
           vColor = aColor;

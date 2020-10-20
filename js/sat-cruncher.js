@@ -29,6 +29,7 @@ const TAU = 2 * PI; // PI * 2 -- This makes understanding the formulas easier
 const DEG2RAD = TAU / 360; // Used to convert degrees to radians
 const RAD2DEG = 360 / TAU; // Used to convert radians to degrees
 const RADIUS_OF_EARTH = 6371; // Radius of Earth in kilometers
+const GROUND_BUFFER_DISTANCE = 45; // Distance objects are placed above earth to avoid z-buffer fighting
 const RADIUS_OF_SUN = 695700; // Radius of the Sun in kilometers
 const STAR_DISTANCE = 250000; // Artificial Star Distance - Lower numberrReduces webgl depth buffer
 const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -717,10 +718,10 @@ function propagateCruncher() {
                 cosLon = Math.cos(satCache[i].lon * DEG2RAD + gmst);
                 sinLon = Math.sin(satCache[i].lon * DEG2RAD + gmst);
                 satPos[i * 3] =
-                    (6371 + 0.25 + satCache[i].alt) * cosLat * cosLon; // 6371 is radius of earth
+                    (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + satCache[i].alt) * cosLat * cosLon; // 6371 is radius of earth
                 satPos[i * 3 + 1] =
-                    (6371 + 0.25 + satCache[i].alt) * cosLat * sinLon;
-                satPos[i * 3 + 2] = (6371 + 0.25 + satCache[i].alt) * sinLat;
+                    (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + satCache[i].alt) * cosLat * sinLon;
+                satPos[i * 3 + 2] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + satCache[i].alt) * sinLat;
             }
 
             satVel[i * 3] = 0;
@@ -732,7 +733,7 @@ function propagateCruncher() {
             } // Skip inactive missiles
             tLen = satCache[i].altList.length;
             for (t = 0; t < tLen; t++) {
-                if (satCache[i].startTime + t * 1000 > now) {
+                if ((satCache[i].startTime * 1) + t * 1000 > now * 1) {
                     curMissivarTime = t;
                     break;
                 }

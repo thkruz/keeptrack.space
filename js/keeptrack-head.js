@@ -19,8 +19,8 @@ const MOON_SCALAR_DISTANCE = 250000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '1.20.6';
-    settingsManager.versionDate = 'September 27, 2020';
+    settingsManager.versionNumber = '1.20.7';
+    settingsManager.versionDate = 'October 20, 2020';
 
     // Install Folder Settings
     {
@@ -68,7 +68,7 @@ const MOON_SCALAR_DISTANCE = 250000;
     // movement
     settingsManager.disableCameraControls = false;
     // Disable normal browser events from keyboard/mouse
-    settingsManager.disableNormalEvents = true;
+    settingsManager.disableNormalEvents = false;
     // Enable limited UI features
     settingsManager.enableLimitedUI = false;
     // Allows canvas will steal focus on load

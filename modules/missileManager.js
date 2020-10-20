@@ -504,13 +504,13 @@
                     satCruncher.postMessage({
                         id: MissileObject.id,
                         typ: 'newMissile',
-                        ON: 'M00' + MissileObject.name,
+                        ON: 'M00' + MissileObject.id,
                         satId: MissileObject.id,
                         static: MissileObject.static,
                         missile: MissileObject.missile,
                         active: MissileObject.active,
                         type: MissileObject.type,
-                        name: MissileObject.name,
+                        name: MissileObject.id,
                         latList: MissileObject.latList,
                         lonList: MissileObject.lonList,
                         altList: MissileObject.altList,
@@ -825,6 +825,40 @@
             }
             missileManager.missilesInUse = 500 - b;
         }
+    };
+    missileManager.minMaxSimulation = function (launchTime, lat, lon, missileDesc, maxRange, minAlt, minLat, maxLat, minLon, maxLon, degInt) {
+      _clearMissiles();
+      console.info('Min Max Test Started: ' + Date.now());
+      isResetMissilesLaunched = false;
+      missilesLaunched = 0;
+      for (let i = minLat; maxLat <= 85; i+=degInt) {
+        for (let j = minLon; j < maxLon; j+=degInt) {
+          success = missileManager.Missile(
+              i,
+              j,
+              lat,
+              lon,
+              3, // Does this matter?
+              satSet.missileSats - (500 - missilesLaunched),
+              launchTime,
+              missileDesc,
+              30,
+              2.9,
+              0.07,
+              maxRange,
+              'Analyst',
+              minAlt
+          );
+          if (success == 1) {
+            console.log(`Missile ${missilesLaunched} Launched`);
+          } else {
+            console.log('Missile Out of Range');
+          }
+          missilesLaunched += success; // Add 1 if missile passed range checks
+          if (missilesLaunched >= 500) break;
+        }
+        if (missilesLaunched >= 500) break;
+      }
     };
     missileManager.Missile = function (
         CurrentLatitude,
@@ -1521,9 +1555,9 @@
             MissileObject.active = true;
             MissileObject.missile = true;
             MissileObject.type = '';
-            MissileObject.ON = 'RV_' + MissileObject.name;
-            MissileObject.satId = MissileObjectNum;
             MissileObject.id = MissileObjectNum;
+            MissileObject.ON = 'RV_' + MissileObject.id;
+            MissileObject.satId = MissileObjectNum;
             MissileObject.maxAlt = MaxAltitude;
             MissileObject.startTime = CurrentTime;
             if (country) MissileObject.C = country;
@@ -1547,13 +1581,13 @@
             satCruncher.postMessage({
                 id: MissileObject.id,
                 typ: 'newMissile',
-                ON: 'RV_' + MissileObject.name, // Don't think satCruncher needs this
+                ON: 'RV_' + MissileObject.id, // Don't think satCruncher needs this
                 satId: MissileObject.id,
                 static: MissileObject.static,
                 missile: MissileObject.missile,
                 active: MissileObject.active,
                 type: MissileObject.type,
-                name: MissileObject.name,
+                name: MissileObject.id,
                 latList: MissileObject.latList,
                 lonList: MissileObject.lonList,
                 altList: MissileObject.altList,
@@ -1580,7 +1614,7 @@
         }
         missileManager.missilesInUse++;
         missileManager.lastMissileError =
-            'Missile Named RV_' + MissileObject.name + '<br>has been created.';
+            'Missile Named RV_' + MissileObject.id + '<br>has been created.';
         return 1; // Successful Launch
     };
     missileManager.asat = (
@@ -2318,9 +2352,9 @@
             MissileObject.active = true;
             MissileObject.missile = true;
             MissileObject.type = '';
-            MissileObject.ON = 'RV_' + MissileObject.name;
-            MissileObject.satId = MissileObjectNum;
             MissileObject.id = MissileObjectNum;
+            MissileObject.ON = 'RV_' + MissileObject.id;
+            MissileObject.satId = MissileObjectNum;
             MissileObject.maxAlt = MaxAltitude;
             MissileObject.startTime = CurrentTime;
             if (country) MissileObject.C = country;
@@ -2344,13 +2378,13 @@
             satCruncher.postMessage({
                 id: MissileObject.id,
                 typ: 'newMissile',
-                ON: 'RV_' + MissileObject.name, // Don't think satCruncher needs this
+                ON: 'RV_' + MissileObject.id, // Don't think satCruncher needs this
                 satId: MissileObject.id,
                 static: MissileObject.static,
                 missile: MissileObject.missile,
                 active: MissileObject.active,
                 type: MissileObject.type,
-                name: MissileObject.name,
+                name: MissileObject.id,
                 latList: MissileObject.latList,
                 lonList: MissileObject.lonList,
                 altList: MissileObject.altList,
@@ -2377,7 +2411,7 @@
         }
         missileManager.missilesInUse++;
         missileManager.lastMissileError =
-            'Missile Named RV_' + MissileObject.name + '<br>has been created.';
+            'Missile Named RV_' + MissileObject.id + '<br>has been created.';
         return 1; // Successful Launch
     };
     missileManager.asatFlight = function (
@@ -3048,9 +3082,9 @@
             MissileObject.active = true;
             MissileObject.missile = true;
             MissileObject.type = '';
-            MissileObject.ON = 'RV_' + MissileObject.name;
-            MissileObject.satId = MissileObjectNum;
             MissileObject.id = MissileObjectNum;
+            MissileObject.ON = 'RV_' + MissileObject.id;
+            MissileObject.satId = MissileObjectNum;
             MissileObject.maxAlt = MaxAltitude;
             MissileObject.startTime = CurrentTime;
             if (country) MissileObject.C = country;
@@ -3074,13 +3108,13 @@
             satCruncher.postMessage({
                 id: MissileObject.id,
                 typ: 'newMissile',
-                ON: 'RV_' + MissileObject.name, // Don't think satCruncher needs this
+                ON: 'RV_' + MissileObject.id, // Don't think satCruncher needs this
                 satId: MissileObject.id,
                 static: MissileObject.static,
                 missile: MissileObject.missile,
                 active: MissileObject.active,
                 type: MissileObject.type,
-                name: MissileObject.name,
+                name: MissileObject.id,
                 latList: MissileObject.latList,
                 lonList: MissileObject.lonList,
                 altList: MissileObject.altList,
@@ -3107,7 +3141,7 @@
         }
         missileManager.missilesInUse++;
         missileManager.lastMissileError =
-            'Missile Named RV_' + MissileObject.name + '<br>has been created.';
+            'Missile Named RV_' + MissileObject.id + '<br>has been created.';
         return [
             timeInFlight,
             LatList[timeInFlight - 1],
@@ -3160,7 +3194,7 @@
         propOffset = timeManager.getPropOffset(); // offset letting us propagate in the future (or past)
         var tLen = missile.altList.length;
         for (var t = 0; t < tLen; t++) {
-            if (missile.startTime + t * 1000 > now) {
+            if ((missile.startTime * 1) + t * 1000 > now * 1) {
                 curMissileTime = t;
                 break;
             }
@@ -4058,13 +4092,13 @@
             satCruncher.postMessage({
                 id: MissileObject.id,
                 typ: 'newMissile',
-                ON: 'RV_' + MissileObject.name,
+                ON: 'RV_' + MissileObject.id,
                 satId: MissileObject.id,
                 static: MissileObject.static,
                 missile: MissileObject.missile,
                 active: MissileObject.active,
                 type: MissileObject.type,
-                name: MissileObject.name,
+                name: MissileObject.id,
                 latList: MissileObject.latList,
                 lonList: MissileObject.lonList,
                 altList: MissileObject.altList,

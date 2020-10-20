@@ -774,8 +774,15 @@ function drawLoop() {
         let sat = satSet.getSat(objectManager.selectedSat);
         if (!sat.static) {
             _camSnapToSat(sat);
+
+            if (sat.missile || typeof meshManager == 'undefined') {
+              settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0];
+            } else {
+              settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
+            }
+
             // If 3D Models Available, then update their position on the screen
-            if (typeof meshManager !== 'undefined') {
+            if (typeof meshManager !== 'undefined' && !sat.missile) {
                 // Try to reduce some jitter
                 if (
                     meshManager.selectedSatPosition.x > sat.position.x - 1 &&
@@ -2381,7 +2388,7 @@ function selectSat(satId) {
         )
             return; // Non-Missile Non-Sensor Object
     }
-    // satSet.selectSat(satId);
+    satSet.selectSat(satId);
     camSnapMode = false;
 
     if (satId === -1) {
@@ -3751,6 +3758,7 @@ $(document).ready(function () {
             _hidePopUps();
         });
         function _hidePopUps() {
+            if (settingsManager.isPreventColorboxClose == true) return;
             rightBtnMenuDOM.hide();
             uiManager.clearRMBSubMenu();
             if ($('#colorbox').css('display') === 'block') {

@@ -13,31 +13,30 @@ var fovBubbleShader;
 (function () {
     function FOVBubble() {
         let fragShaderCode = `
-    precision mediump float;
+          precision mediump float;
 
-    uniform vec3 uLightDirection;
-    varying vec3  vNormal;
+          uniform vec3 uLightDirection;
+          varying vec3  vNormal;
 
-    void main () {
-      float directionalLightAmount = max(dot(vNormal, uLightDirection), 0.0);
-      gl_FragColor    = vec4( ${settingsManager.atmosphereColor}, max(directionalLightAmount,0.025));
-    }`;
+          void main () {
+            gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+          }`;
 
         let vertShaderCode = `
-      attribute vec3 aVertexPosition;
-      attribute vec3 aVertexNormal;
+          attribute vec3 aPos;
+          attribute vec3 aVertexNormal;
 
-      uniform mat4 uPMatrix;
-      uniform mat4 uCamMatrix;
-      uniform mat4 uMvMatrix;
-      uniform mat3 uNormalMatrix;
+          uniform mat4 uPMatrix;
+          uniform mat4 uCamMatrix;
+          uniform mat4 uMvMatrix;
+          uniform mat3 uNormalMatrix;
 
-      varying vec3 vNormal;
+          varying vec3 vNormal;
 
-      void main(void) {
-        gl_Position = uPMatrix * uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
-        vNormal = normalize( uNormalMatrix * aVertexNormal );
-      }`;
+          void main(void) {
+            gl_Position = uPMatrix * uCamMatrix * uMvMatrix * vec4(aPos, 1.0);
+            vNormal = normalize( uNormalMatrix * aVertexNormal );
+          }`;
 
         var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(fragShader, fragShaderCode);
@@ -58,92 +57,92 @@ var fovBubbleShader;
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(72), gl.STREAM_DRAW);
     }
     FOVBubble.prototype.set = function () {
-        var camPos = getCamPos();
+        // var camPos = getCamPos();
 
         var buf = [
             // Front face
-            -100.0,
-            -100.0,
-            100.0,
-            100.0,
-            -100.0,
-            100.0,
-            100.0,
-            100.0,
-            100.0,
-            -100.0,
-            100.0,
-            100.0,
+            -1000.0,
+            -1000.0,
+            1000.0,
+            1000.0,
+            -1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            -1000.0,
+            1000.0,
+            1000.0,
 
             // Back face
-            -100.0,
-            -100.0,
-            -100.0,
-            -100.0,
-            100.0,
-            -100.0,
-            100.0,
-            100.0,
-            -100.0,
-            100.0,
-            100.0,
-            -100.0,
+            -1000.0,
+            -1000.0,
+            -1000.0,
+            -1000.0,
+            1000.0,
+            -1000.0,
+            1000.0,
+            1000.0,
+            -1000.0,
+            1000.0,
+            1000.0,
+            -1000.0,
 
             // Top face
-            -100.0,
-            100.0,
-            -100.0,
-            -100.0,
-            100.0,
-            100.0,
-            100.0,
-            100.0,
-            100.0,
-            100.0,
-            100.0,
-            -100.0,
+            -1000.0,
+            1000.0,
+            -1000.0,
+            -1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            -1000.0,
 
             // Bottom face
-            -100.0,
-            -100.0,
-            -100.0,
-            100.0,
-            -100.0,
-            -100.0,
-            100.0,
-            -100.0,
-            100.0,
-            -100.0,
-            -100.0,
-            100.0,
+            -1000.0,
+            -1000.0,
+            -1000.0,
+            1000.0,
+            -1000.0,
+            -1000.0,
+            1000.0,
+            -1000.0,
+            1000.0,
+            -1000.0,
+            -1000.0,
+            1000.0,
 
             // Right face
-            100.0,
-            -100.0,
-            -100.0,
-            100.0,
-            100.0,
-            -100.0,
-            100.0,
-            100.0,
-            100.0,
-            100.0,
-            -100.0,
-            100.0,
+            1000.0,
+            -1000.0,
+            -1000.0,
+            1000.0,
+            1000.0,
+            -1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            1000.0,
+            -1000.0,
+            1000.0,
 
             // Left face
-            -100.0,
-            -100.0,
-            -100.0,
-            -100.0,
-            -100.0,
-            100.0,
-            -100.0,
-            100.0,
-            100.0,
-            -100.0,
-            100.0,
-            -100.0,
+            -1000.0,
+            -1000.0,
+            -1000.0,
+            -1000.0,
+            -1000.0,
+            1000.0,
+            -1000.0,
+            1000.0,
+            1000.0,
+            -1000.0,
+            1000.0,
+            -1000.0,
         ];
 
         this.vertexCount = buf.length / 3;
@@ -153,18 +152,20 @@ var fovBubbleShader;
     FOVBubble.prototype.draw = function () {
         if (!settingsManager.shadersReady || !settingsManager.cruncherReady)
             return;
-        var bubbleShader = orbitManager.getPathShader();
 
-        gl.useProgram(bubbleShader);
+        gl.useProgram(fovBubbleShader);
         // Disable depth test
         gl.disable(gl.DEPTH_TEST);
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-        gl.uniform4fv(bubbleShader.uColor, [0.0, 1.0, 1.0, 1.0]);
+        gl.uniform4fv(fovBubbleShader.uColor, [0.0, 1.0, 1.0, 1.0]);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf);
-        gl.vertexAttribPointer(bubbleShader.aPos, 3, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(fovBubbleShader.aPos, 3, gl.FLOAT, false, 0, 0);
         gl.drawElements(gl.TRIANGLES, this.vertexCount, gl.UNSIGNED_SHORT, 0);
+
+        gl.enable(gl.DEPTH_TEST);
+        gl.disable(gl.BLEND);
 
         // RESET GL for EARTH
     };

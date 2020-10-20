@@ -223,7 +223,7 @@
         var today = new Date();
         // Not using local scope caused time to drift backwards!
         let propOffset = timeManager.selectedDate - today;
-        return timeManager.propOffset;
+        return propOffset;
     };
 
     timeManager.dateToISOLikeButLocal = function (date) {

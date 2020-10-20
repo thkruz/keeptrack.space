@@ -3,16 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <link rel="canonical" href="https://www.keeptrack.space"/>
-    <!-- <link rel="preload" href="css/fonts/nasalization-rg.woff2" as="font" crossorigin="anonymous"> -->
-    <!-- The most recent version of the settings needs to be section
-         for each update -->
-    <!-- <link rel="preload" href="/js/orbitManager.min.js?v=1.20.6" as="script">
-    <link rel="preload" href="/js/ui.min.js?v=1.20.6" as="script">
-    <link rel="preload" href="/js/advice-module.min.js?v=1.20.6" as="script">
-    <link rel="preload" href="/js/color-scheme.min.js?v=1.20.6" as="script">
-    <link rel="preload" href="/modules/missileManager.js?v=1.20.6" as="script">
-    <link rel="preload" href="/js/drawLoop-shapes.min.js?v=1.20.6" as="script"> -->
     <script src="js/keeptrack-head.js?v=1.20.6"></script>
+    <script>
+      var refreshing;
+      navigator.serviceWorker.addEventListener('controllerchange',
+      function() {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      }
+      );
+    </script>
     <meta
         name="description"
         content="A 3D visualtion tool to learn about satellites and tracking radars."
@@ -1617,6 +1618,12 @@
                         public sources. US Sensor data was derived from MDA reports on enviromental impacts and
                         congressional
                         budget reports.
+                      </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                      <h5 class="center-align">Version</h5>
+                      <div id="versionNumber-text" class="col s12">
                       </div>
                     </div>
                   </div>

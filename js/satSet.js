@@ -1081,7 +1081,8 @@ var emptyMat4 = mat4.create();
         for (var i = 0; i < satData.length; i++) {
             if (
                 i >= objectManager.starIndex1 &&
-                i <= objectManager.starIndex2
+                true
+                // i <= objectManager.starIndex2
             ) {
                 starArray.push(1.0);
             } else {
@@ -2130,28 +2131,32 @@ var emptyMat4 = mat4.create();
             satelliteSelected: [i],
         });
         if (settingsManager.isMobileModeEnabled) mobile.searchToggle(false);
-        gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
-        // If Old Select Sat Picked Color it Correct Color
-        if (objectManager.selectedSat !== -1) {
-            gl.bufferSubData(
-                gl.ARRAY_BUFFER,
-                objectManager.selectedSat * 4 * 4,
-                new Float32Array(
-                    settingsManager.currentColorScheme.colorizer(
-                        satSet.getSat(objectManager.selectedSat)
-                    ).color
-                )
-            );
+
+        if (typeof meshManager !== 'undefined') {
+          gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
+          // If Old Select Sat Picked Color it Correct Color
+          if (objectManager.selectedSat !== -1) {
+              gl.bufferSubData(
+                  gl.ARRAY_BUFFER,
+                  objectManager.selectedSat * 4 * 4,
+                  new Float32Array(
+                      settingsManager.currentColorScheme.colorizer(
+                          satSet.getSat(objectManager.selectedSat)
+                      ).color
+                  )
+              );
+          }
+          // If New Select Sat Picked Color it
+          if (i !== -1) {
+              isSatView = true;
+              gl.bufferSubData(
+                  gl.ARRAY_BUFFER,
+                  i * 4 * 4,
+                  new Float32Array(settingsManager.selectedColor)
+              );
+          }
         }
-        // If New Select Sat Picked Color it
-        if (i !== -1) {
-            isSatView = true;
-            gl.bufferSubData(
-                gl.ARRAY_BUFFER,
-                i * 4 * 4,
-                new Float32Array(settingsManager.selectedColor)
-            );
-        }
+
         objectManager.selectedSat = i;
 
         if (

@@ -1,4 +1,4 @@
-var cacheName = 'KeepTrack-v1';
+var cacheName = 'KeepTrack-v1.20.6.2';
 var contentToCache = [
     './',
     './index.htm',
@@ -102,23 +102,23 @@ var contentToCache = [
 ];
 
 self.addEventListener('install', (e) => {
-    // console.log('[Service Worker] Install');
+    console.log('[Service Worker] Install');
     e.waitUntil(
         caches.open(cacheName).then((cache) => {
             // console.log(
             //     '[Service Worker] Caching all: app shell and content'
             // );
             return cache.addAll(contentToCache);
-        })
+        }).then(function(e){
+        return self.skipWaiting();
+      })
     );
-    return self.skipWaiting();
+    // return self.skipWaiting();
 });
 
 self.addEventListener('fetch', (e) => {
     e.respondWith(
         caches.match(e.request).then((r) => {
-            let url = e.request.url.split('?');
-            e.request.url = url[0];
             // console.log(
             //     '[Service Worker] Fetching resource: ' + e.request.url
             // );
@@ -138,4 +138,18 @@ self.addEventListener('fetch', (e) => {
             );
         })
     );
+});
+
+self.addEventListener("activate", function(event) {
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (CACHE_NAME !== cacheName &&  cacheName.startsWith("KeepTrack-")) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
 });

@@ -19,23 +19,22 @@
 
     objectManager.init = function () {
         var i;
-        if (typeof missileManager != 'undefined') {
-            var maxMissiles = settingsManager.maxMissiles;
-            for (i = 0; i < maxMissiles; i++) {
-                var missileInfo = {
-                    static: false,
-                    missile: true,
-                    active: false,
-                    type: '',
-                    name: i,
-                    latList: [],
-                    lonList: [],
-                    altList: [],
-                    timeList: [],
-                };
-                objectManager.missileSet.push(missileInfo);
-            }
+        var maxMissiles = settingsManager.maxMissiles;
+        for (i = 0; i < maxMissiles; i++) {
+            var missileInfo = {
+                static: false,
+                missile: true,
+                active: false,
+                type: '',
+                name: i,
+                latList: [],
+                lonList: [],
+                altList: [],
+                timeList: [],
+            };
+            objectManager.missileSet.push(missileInfo);
         }
+
         var maxAnalystSats = settingsManager.maxAnalystSats;
         for (i = 0; i < maxAnalystSats; i++) {
             var analSatInfo = {
@@ -60,31 +59,6 @@
                 id: i,
             };
             objectManager.analSatSet.push(analSatInfo);
-        }
-
-        // Try Loading Sensor Module
-        var sensor;
-        try {
-            sensorList = window.sensorManager.sensorList;
-            for (sensor in sensorList) {
-                var sensorInfo = {
-                    static: true,
-                    staticNum: sensorList[sensor].staticNum,
-                    name: sensorList[sensor].name,
-                    type: sensorList[sensor].type,
-                    lat: sensorList[sensor].lat,
-                    lon: sensorList[sensor].long,
-                    alt: sensorList[sensor].obshei,
-                    changeObjectInterval:
-                        sensorList[sensor].changeObjectInterval,
-                };
-                objectManager.staticSet.push(sensorInfo);
-            }
-            objectManager.isSensorManagerLoaded = true;
-        } catch (e) {
-            objectManager.isSensorManagerLoaded = false;
-            settingsManager.maxFieldOfViewMarkers = 1;
-            console.log('You do not have the Sensor Module');
         }
 
         // Try Loading Star Module
@@ -116,6 +90,31 @@
             console.log('You do not have the Star Module');
         }
         objectManager.starIndex2 = objectManager.staticSet.length - 1;
+
+        // Try Loading Sensor Module
+        var sensor;
+        try {
+            sensorList = window.sensorManager.sensorList;
+            for (sensor in sensorList) {
+                var sensorInfo = {
+                    static: true,
+                    staticNum: sensorList[sensor].staticNum,
+                    name: sensorList[sensor].name,
+                    type: sensorList[sensor].type,
+                    lat: sensorList[sensor].lat,
+                    lon: sensorList[sensor].long,
+                    alt: sensorList[sensor].obshei,
+                    changeObjectInterval:
+                        sensorList[sensor].changeObjectInterval,
+                };
+                objectManager.staticSet.push(sensorInfo);
+            }
+            objectManager.isSensorManagerLoaded = true;
+        } catch (e) {
+            objectManager.isSensorManagerLoaded = false;
+            settingsManager.maxFieldOfViewMarkers = 1;
+            console.log('You do not have the Sensor Module');
+        }
 
         // Try Loading the Launch Site Module
         try {

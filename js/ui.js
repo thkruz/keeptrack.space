@@ -3208,6 +3208,9 @@ var speedModifier = 1;
                 timeManager.propTime();
             } // Allows passing -1 argument to socrates function to skip these steps
         }
+        uiManager.bottomIconPress = (evt) => {
+          _bottomIconPress(evt)
+        };
         function _bottomIconPress(evt) {
             db.log('_bottomIconPress');
             db.log(evt.currentTarget.id);

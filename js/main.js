@@ -4156,7 +4156,7 @@ $(document).ready(function () {
                         $('#dops-lon').val(latLon.longitude.toFixed(3));
                         $('#dops-alt').val(0);
                         $('#dops-el').val(settingsManager.gpsElevationMask);
-                        _bottomIconPress({
+                        uiManager.bottomIconPress({
                             currentTarget: { id: 'menu-dops' },
                         });
                     } else {
@@ -4185,7 +4185,7 @@ $(document).ready(function () {
                 case 'edit-sat-rmb':
                     selectSat(clickedSat);
                     if (!isEditSatMenuOpen) {
-                        _bottomIconPress({
+                        uiManager.bottomIconPress({
                             currentTarget: { id: 'menu-editSat' },
                         });
                     }

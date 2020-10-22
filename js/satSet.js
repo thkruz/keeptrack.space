@@ -1015,12 +1015,12 @@ var emptyMat4 = mat4.create();
           satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
         } else {
           // We reached our target server, but it returned an error
-          console.warn('N2YO request returned an error!');
+          console.warn('Celestrack request returned an error!');
         }
       };
 
       request.onerror = function() {
-        console.warn('N2YO request failed!');
+        console.warn('Celestrack request failed!');
       };
 
       request.send();

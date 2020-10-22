@@ -214,6 +214,10 @@ ul {
     background-color: rgba(0, 114, 230, 0.3) !important;
 }
 
+.rmb-menu-item a {
+    color: white !important;
+}
+
 #sat-hoverbox {
     display: none;
     background: black;

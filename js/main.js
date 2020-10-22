@@ -2408,6 +2408,14 @@ function selectSat(satId) {
         }
     }
 
+    if (satId !== -1 || (satId == -1 && !isselectedSatNegativeOne)) {
+      for (var i = 0; i < drawLineList.length; i++) {
+        if (drawLineList[i].isDrawWhenSelected) {
+          drawLineList.splice(i,1);
+        }
+      }
+    }
+
     if (satId === -1 && !isselectedSatNegativeOne) {
         isselectedSatNegativeOne = true;
         $('#sat-infobox').fadeOut();
@@ -2462,12 +2470,6 @@ function selectSat(satId) {
 
         if ($('#search').val().length > 0) {
           $('#search-results').attr('style', 'display: block; max-height:auto');
-        }
-
-        for (var i = 0; i < drawLineList.length; i++) {
-          if (drawLineList[i].isDrawWhenSelected) {
-            drawLineList.splice(i,1);
-          }
         }
 
         // Toggle the side menus as closed

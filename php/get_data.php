@@ -1,6 +1,6 @@
 <?php
   if ($_GET['type'] == "c") {
-    echo file_get_contents("https://celestrak.com/satcat/tle.php?CATNR=" . $_GET['sat']);
+    echo json_encode(file_get_contents("https://celestrak.com/satcat/tle.php?CATNR=" . $_GET['sat']));
   }
 
   if ($_GET['type'] == "n") {

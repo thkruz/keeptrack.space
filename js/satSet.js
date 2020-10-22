@@ -1003,18 +1003,40 @@ var emptyMat4 = mat4.create();
         analsat = satSet.getIdFromObjNum(analsat);
       }
 
-      $.ajax({
-          async:true,
-          // dataType : 'jsonp',   //you may use jsonp for cross origin request
-          crossDomain:true,
-          url: `php/get_data.php?type=c&sat=${satNum}`,
-          success: function(data) {
-              let tles = data.split('\n');
-              let TLE1 = tles[1];
-              let TLE2 = tles[2];
-              satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-          }
-      });
+      let request = new XMLHttpRequest();
+      request.open('GET', `php/get_data.php?type=c&sat=${satNum}`, true);
+
+      request.onload = function() {
+        if (this.status >= 200 && this.status < 400) {
+          // Success!
+          let tles = JSON.parse(this.response).split('\n');
+          let TLE1 = tles[1];
+          let TLE2 = tles[2];
+          satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
+        } else {
+          // We reached our target server, but it returned an error
+          console.warn('N2YO request returned an error!');
+        }
+      };
+
+      request.onerror = function() {
+        console.warn('N2YO request failed!');
+      };
+
+      request.send();
+
+      // $.ajax({
+      //     async:true,
+      //     // dataType : 'jsonp',   //you may use jsonp for cross origin request
+      //     crossDomain:true,
+      //     url: `php/get_data.php?type=c&sat=${satNum}`,
+      //     success: function(data) {
+      //         let tles = data.split('\n');
+      //         let TLE1 = tles[1];
+      //         let TLE2 = tles[2];
+      //         satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
+      //     }
+      // });
     };
 
     satSet.searchN2yo = (satNum, analsat) => {
@@ -1031,18 +1053,40 @@ var emptyMat4 = mat4.create();
         analsat = satSet.getIdFromObjNum(analsat);
       }
 
-      $.ajax({
-          async:true,
-          // dataType : 'jsonp',   //you may use jsonp for cross origin request
-          crossDomain:true,
-          url: `php/get_data.php?type=n&sat=${satNum}`,
-          success: function(data) {
-              let tles = data.split('<div id="tle">')[1].split('\n');
-              let TLE1 = tles[2];
-              let TLE2 = tles[3];
-              satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-          }
-      });
+      let request = new XMLHttpRequest();
+      request.open('GET', `php/get_data.php?type=n&sat=${satNum}`, true);
+
+      request.onload = function() {
+        if (this.status >= 200 && this.status < 400) {
+          // Success!
+          let tles = this.response.split('<div id="tle">')[1].split('\n');
+          let TLE1 = tles[2];
+          let TLE2 = tles[3];
+          satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
+        } else {
+          // We reached our target server, but it returned an error
+          console.warn('N2YO request returned an error!');
+        }
+      };
+
+      request.onerror = function() {
+        console.warn('N2YO request failed!');
+      };
+
+      request.send();
+
+      // $.ajax({
+      //     async:true,
+      //     // dataType : 'jsonp',   //you may use jsonp for cross origin request
+      //     crossDomain:true,
+      //     url: `php/get_data.php?type=n&sat=${satNum}`,
+      //     success: function(data) {
+      //         let tles = data.split('<div id="tle">')[1].split('\n');
+      //         let TLE1 = tles[2];
+      //         let TLE2 = tles[3];
+      //         satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
+      //     }
+      // });
     };
 
     satSet.insertNewAnalystSatellite = (TLE1, TLE2, analsat) => {

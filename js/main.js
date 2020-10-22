@@ -2464,6 +2464,12 @@ function selectSat(satId) {
           $('#search-results').attr('style', 'display: block; max-height:auto');
         }
 
+        for (var i = 0; i < drawLineList.length; i++) {
+          if (drawLineList[i].isDrawWhenSelected) {
+            drawLineList.splice(i,1);
+          }
+        }
+
         // Toggle the side menus as closed
         isEditSatMenuOpen = false;
         isLookanglesMenuOpen = false;
@@ -2913,10 +2919,29 @@ function selectSat(satId) {
 
         if (
             objectManager.isSensorManagerLoaded &&
-            sensorManager.checkSensorSelected() &&
-            isLookanglesMenuOpen
+            sensorManager.checkSensorSelected()
         ) {
+          if (isLookanglesMenuOpen) {
             satellite.getlookangles(sat);
+          }
+          let isLineDrawnToSat = false;
+          for (var i = 0; i < drawLineList.length; i++) {
+            if (drawLineList[i].sat.id == satId) {
+              isLineDrawnToSat = true;
+            }
+          }
+          if (!isLineDrawnToSat) {
+            debugDrawLine(
+              'sat4',
+              [
+                satId,
+                satSet.getIdFromSensorName(
+                  sensorManager.currentSensor.name
+                ),
+              ],
+              'g'
+            );
+          }
         }
     }
 
@@ -3044,6 +3069,36 @@ function debugDrawLine(type, value, color) {
             ref: [sat.position.x, sat.position.y, sat.position.z],
             ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
             color: color,
+            isOnlyInFOV: true,
+            isDrawWhenSelected: false,
+        });
+    }
+    if (type == 'sat4') {
+        let sat = satSet.getSat(value[0]);
+        var sat2 = satSet.getSat(value[1]);
+        drawLineList.push({
+            line: new Line(),
+            sat: sat,
+            sat2: sat2,
+            ref: [sat.position.x, sat.position.y, sat.position.z],
+            ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
+            color: color,
+            isOnlyInFOV: true,
+            isDrawWhenSelected: true,
+        });
+    }
+    if (type == 'sat5') {
+        let sat = satSet.getSat(value[0]);
+        var sat2 = satSet.getSat(value[1]);
+        drawLineList.push({
+            line: new Line(),
+            sat: sat,
+            sat2: sat2,
+            ref: [sat.position.x, sat.position.y, sat.position.z],
+            ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
+            color: color,
+            isOnlyInFOV: false,
+            isDrawWhenSelected: false,
         });
     }
     if (type == 'ref') {
@@ -3087,9 +3142,13 @@ function drawLines() {
                             drawLineList[drawLinesI].sat2.name
                         );
                     }
-                    drawLineList[drawLinesI].sat2 = satSet.getSatPosOnly(
+                    drawLineList[drawLinesI].sat2 = satSet.getSat(
                         drawLineList[drawLinesI].sat2.id
                     );
+                    if (drawLineList[drawLinesI].isOnlyInFOV && !drawLineList[drawLinesI].sat.getTEARR().inview) {
+                      drawLineList.splice(drawLinesI,1);
+                      continue;
+                    }
                     drawLineList[drawLinesI].line.set(
                         [
                             drawLineList[drawLinesI].sat.position.x,
@@ -4174,7 +4233,7 @@ $(document).ready(function () {
                 case 'line-sensor-sat-rmb':
                     // Sensor always has to be #2
                     debugDrawLine(
-                        'sat3',
+                        'sat5',
                         [
                             clickedSat,
                             satSet.getIdFromSensorName(

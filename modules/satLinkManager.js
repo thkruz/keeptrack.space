@@ -193,7 +193,7 @@ satLinkManager.showLinks = async function (group) {
                     if (theta < minTheta) {
                     } else {
                         debugDrawLine(
-                            'sat3',
+                            'sat5',
                             [sat1.id, sat2.id],
                             [0, 0.6, 1, 1]
                         );
@@ -214,7 +214,7 @@ satLinkManager.showLinks = async function (group) {
             }
             if (typeof bestSat.id !== 'undefined') {
                 debugDrawLine(
-                    'sat3',
+                    'sat5',
                     [bestSat.id, satSet.getIdFromSensorName(user.name)],
                     [0, 1.0, 0.6, 1.0]
                 );
@@ -245,7 +245,7 @@ satLinkManager.showLinks = async function (group) {
                 if (tearr.elevation > elevationMask) {
                     // Draw a line from the user to the satellite
                     debugDrawLine(
-                        'sat3',
+                        'sat5',
                         [sat.id, satSet.getIdFromSensorName(user.name)],
                         [0, 1.0, 0.6, 1.0]
                     );

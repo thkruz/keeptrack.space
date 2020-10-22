@@ -989,7 +989,7 @@ var emptyMat4 = mat4.create();
       return satIdArray;
     };
 
-    satSet.searchCelestrak = (satnum, analsat) => {
+    satSet.searchCelestrak = (satNum, analsat) => {
       // If no Analyst Satellite specified find the first unused one
       if (typeof analsat == 'undefined') {
           for (var i = 15000; i < satData.length; i++) {
@@ -1004,8 +1004,10 @@ var emptyMat4 = mat4.create();
       }
 
       $.ajax({
-          crossOrigin: true,
-          url: `https://celestrak.com/satcat/tle.php?CATNR=${satnum}`,
+          async:true,
+          // dataType : 'jsonp',   //you may use jsonp for cross origin request
+          crossDomain:true,
+          url: `php/get_data.php?type=c&sat=${satNum}`,
           success: function(data) {
               let tles = data.split('\n');
               let TLE1 = tles[1];
@@ -1030,8 +1032,10 @@ var emptyMat4 = mat4.create();
       }
 
       $.ajax({
-          crossOrigin: true,
-          url: `https://www.n2yo.com/satellite/?s=${satNum}`,
+          async:true,
+          // dataType : 'jsonp',   //you may use jsonp for cross origin request
+          crossDomain:true,
+          url: `php/get_data.php?type=n&sat=${satNum}`,
           success: function(data) {
               let tles = data.split('<div id="tle">')[1].split('\n');
               let TLE1 = tles[2];

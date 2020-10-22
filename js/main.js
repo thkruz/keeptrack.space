@@ -1905,25 +1905,43 @@ function _hoverBoxOnSat(satId, satX, satY) {
                         '';
                 } else if (isShowDistance) {
                     satHoverBoxNode1.textContent = sat.ON;
+                    sat2 = satSet.getSat(objectManager.selectedSat);
                     satHoverBoxNode2.innerHTML =
                         sat.SCC_NUM +
-                        satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) +
+                        satellite.distance(sat, sat2) +
                         '';
-                    satHoverBoxNode3.innerHTML =
-                        'X: ' +
-                        sat.position.x.toFixed(2) +
-                        ' Y: ' +
-                        sat.position.y.toFixed(2) +
-                        ' Z: ' +
-                        sat.position.z.toFixed(2) +
-                        '</br>' +
-                        'X: ' +
-                        sat.velocityX.toFixed(2) +
-                        'km/s Y: ' +
-                        sat.velocityY.toFixed(2) +
-                        'km/s Z: ' +
-                        sat.velocityZ.toFixed(2) +
-                        'km/s';
+                    if (sat !== sat2) {
+                      satHoverBoxNode3.innerHTML =
+                          'X: ' +
+                          sat.position.x.toFixed(2) +
+                          ' Y: ' +
+                          sat.position.y.toFixed(2) +
+                          ' Z: ' +
+                          sat.position.z.toFixed(2) +
+                          '</br>' +
+                          'ΔX: ' +
+                          (sat.velocityX - sat2.velocityX).toFixed(2) +
+                          'km/s ΔY: ' +
+                          (sat.velocityY - sat2.velocityY).toFixed(2) +
+                          'km/s ΔZ: ' +
+                          (sat.velocityZ - sat2.velocityZ).toFixed(2) +
+                          'km/s';
+                    } else {
+                      satHoverBoxNode3.innerHTML =
+                          'X: ' +
+                          sat.position.x.toFixed(2) +
+                          ' Y: ' +
+                          sat.position.y.toFixed(2) +
+                          ' Z: ' +
+                          sat.position.z.toFixed(2) +
+                          '</br>' +
+                          'X: ' +
+                          sat.velocityX.toFixed(2) +
+                          ' Y: ' +
+                          sat.velocityY.toFixed(2) +
+                          ' Z: ' +
+                          sat.velocityZ.toFixed(2);
+                    }
                 } else if (
                     objectManager.isSensorManagerLoaded &&
                     sensorManager.checkSensorSelected() &&

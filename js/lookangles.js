@@ -69,7 +69,7 @@ or mirrored at any other location without the express written permission of the 
         let distanceApart = Math.sqrt(
             distanceApartX + distanceApartY + distanceApartZ
         ).toFixed(0);
-        return '<br />' + distanceApart + ' km';
+        return '<br />Range: ' + distanceApart + ' km';
     };
 
     // TODO: UI element changes/references should be moved to ui.js

@@ -37,6 +37,9 @@ const MOON_SCALAR_DISTANCE = 250000;
             case 'thkruz.github.io':
                 settingsManager.installDirectory = '/keeptrack.space/';
                 break;
+            case '':
+              settingsManager.offline = true;
+              settingsManager.installDirectory = './';
         }
         if (typeof settingsManager.installDirectory == 'undefined') {
             // Put Your Custom Install Directory Here

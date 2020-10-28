@@ -1,4 +1,5 @@
 (function () {
+    if (settingsManager.offline) return;
     meshManager = {};
     meshManager.selectedSatPosition = { x: 0, y: 0, z: 0 };
     let mvMatrix;

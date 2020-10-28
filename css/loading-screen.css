@@ -27,8 +27,7 @@ body {
 
 /* Display none till loading is complete main.js -227 */
 
-#canvas-holder,
-#main-container {
+#canvas-holder {
     display: none;
 }
 

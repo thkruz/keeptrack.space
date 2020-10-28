@@ -57,6 +57,7 @@ var emptyMat4 = mat4.create();
             settingsManager.installDirectory + 'js/sat-cruncher.js'
         );
     } catch (E) {
+        console.log(E);
         browserUnsupported();
     }
 
@@ -86,7 +87,7 @@ var emptyMat4 = mat4.create();
         })
         .fail(function () {
           // Try the js file without caching
-          $.getScript('/offline/tle.js', function () {
+          $.getScript('offline/tle.js', function () {
             satSet.loadTLEs(jsTLEfile);
           }, true);
         });
@@ -620,6 +621,10 @@ var emptyMat4 = mat4.create();
                 var year;
                 var prefix;
                 var rest;
+
+                if (settingsManager.offline) {
+                  resp = JSON.parse(resp);
+                }
 
                 for (var i = 0; i < resp.length; i++) {
                     resp[i].SCC_NUM = pad0(resp[i].TLE1.substr(2, 5).trim(), 5);

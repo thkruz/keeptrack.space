@@ -1,5 +1,5 @@
 // Load Full Version For Debugging
-if (db.enabled || window.location.host == 'localhost') {
+if (db.enabled || window.location.host == 'localhost' || settingsManager.offline) {
     // Load Dependencies
     if (!settingsManager.disableUI) {
         document.write(`
@@ -75,7 +75,7 @@ if (db.enabled || window.location.host == 'localhost') {
       <script src="${settingsManager.installDirectory}js/lib/colorPick.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}js/lib/webgl-obj-loader.min.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}js/mapManager.min.js?v=${settingsManager.versionNumber}"\><\/script>
-      <script src="${settingsManager.installDirectory}license/license.min.js?v=${settingsManager.versionNumber}"\><\/script>
+      <script src="${settingsManager.installDirectory}license/license.js?v=${settingsManager.versionNumber}"\><\/script>
       `);
     }
     document.write(`

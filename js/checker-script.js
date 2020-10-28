@@ -4,7 +4,29 @@ This script is intended to check that the application is ready for interaction.
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-// DETECT IE
+detectIe();
+
+// Looking for an essential file such as shaders.js ensures that the install
+// directory is currectly set. If we look for the index.htm file then it will
+// always be found (otherwise how did we load this script). If we look for
+// optional modules like sensorManager.js then it could fail to load unnecessarily
+(function checkReadyState () {
+  if (settingsManager.offline) return;
+  let checkRequest = new Request(`${settingsManager.installDirectory}js/objectManager.js`);
+
+  fetch(checkRequest).then(function (response) {
+    // console.log(response.status + "OK");
+
+    if (response.status === 404) {
+      // This same file can be used by .htaccess to redirect bad links
+      // across the whole server (ex. keeptrack.space/fakepage.html)
+      window.location.assign('/res/404.html');
+    } else {
+      readyForInteraction();
+    }
+  });
+})();
+
 function detectIe() {
     let BrowserA = navigator.userAgent;
     let browsers = /Chrome|Safari|Firefox|Edg/i.test(BrowserA);
@@ -15,28 +37,6 @@ function detectIe() {
         return true;
     }
 }
-detectIe();
-// DETECT IE
-
-// CHECK READY STATE
-// Looking for an essential file such as shaders.js ensures that the install
-// directory is currectly set. If we look for the index.htm file then it will
-// always be found (otherwise how did we load this script). If we look for
-// optional modules like sensorManager.js then it could fail to load unnecessarily
-let checkRequest = new Request(`${settingsManager.installDirectory}js/objectManager.js`);
-
-fetch(checkRequest).then(function (response) {
-    // console.log(response.status + "OK");
-
-    if (response.status === 404) {
-        // This same file can be used by .htaccess to redirect bad links
-        // across the whole server (ex. keeptrack.space/fakepage.html)
-        window.location.assign('/res/404.html');
-    } else {
-        readyForInteraction();
-    }
-});
-
 function readyForInteraction() {
   // This looks to see if the main page is loaded.
   // It does NOT know if all of the async loading is complete. The satellite
@@ -65,4 +65,3 @@ function displayElement(id, value) {
   ? 'block'
   : 'none';
 }
-// CHECK READY STATE

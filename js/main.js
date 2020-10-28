@@ -233,7 +233,7 @@ function initializeKeepTrack() {
         setTimeout(function () {
           earth.loadHiRes();
           earth.loadHiResNight();
-          if('serviceWorker' in navigator) {
+          if(!settingsManager.offline && 'serviceWorker' in navigator) {
             navigator.serviceWorker
             .register('./serviceWorker.js')
             .then(function() { console.log("Service Worker Registered"); });
@@ -1009,7 +1009,7 @@ function _drawScene() {
 
     // Draw Satellite if Selected
     (function drawSatellite() {
-        if (objectManager.selectedSat !== -1 && meshManager.isReady) {
+        if (objectManager.selectedSat !== -1 && typeof meshManager != 'undefined' && meshManager.isReady) {
             let sat = satSet.getSat(objectManager.selectedSat);
             // If 3D Models Available, then draw them on the screen
             if (typeof meshManager !== 'undefined') {
@@ -1910,7 +1910,7 @@ function _hoverBoxOnSat(satId, satX, satY) {
                         sat.SCC_NUM +
                         satellite.distance(sat, sat2) +
                         '';
-                    if (sat !== sat2) {
+                    if (sat2 !== null && sat !== sat2) {
                       satHoverBoxNode3.innerHTML =
                           'X: ' +
                           sat.position.x.toFixed(2) +

@@ -19,13 +19,14 @@ const MOON_SCALAR_DISTANCE = 250000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '1.20.12';
-    settingsManager.versionDate = 'October 22, 2020';
+    settingsManager.versionNumber = '2.0.0';
+    settingsManager.versionDate = 'November 1, 2020';
 
     // Install Folder Settings
     {
         switch (window.location.host) {
             case 'keeptrack.space':
+            case 'www.keeptrack.space':
                 settingsManager.installDirectory = '/';
                 settingsManager.isOfficialWebsite = true;
                 break;
@@ -35,6 +36,7 @@ const MOON_SCALAR_DISTANCE = 250000;
                 settingsManager.installDirectory = '/';
                 break;
             case 'thkruz.github.io':
+            case 'www.thkruz.github.io':
                 settingsManager.installDirectory = '/keeptrack.space/';
                 break;
             case '':
@@ -179,6 +181,25 @@ const MOON_SCALAR_DISTANCE = 250000;
         settingsManager.updateHoverDelayLimitSmall = 25;
         settingsManager.updateHoverDelayLimitBig = 45;
     }
+
+    // //////////////////////////////////////////////////////////////////////////
+    // Membership settings
+    // //////////////////////////////////////////////////////////////////////////
+
+    // Always Show "Members Only" Menus
+    settingsManager.isMembersOnly = true;
+
+    // pageName = pageName[0].split('.html').slice(0);
+    //
+    // if (pageName[0] == 'basic') {
+    //   console.log('Premium Membership');
+    //   settingsManager.isMembersOnly = true;
+    // }
+    //
+    // if (pageName[0] == 'index') {
+    //   console.log('Free Membership');
+    //   settingsManager.isMembersOnly = false;
+    // }
 
     // //////////////////////////////////////////////////////////////////////////
     // Map settings

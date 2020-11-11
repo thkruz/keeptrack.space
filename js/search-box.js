@@ -54,6 +54,18 @@ var hoverSatId = -1;
         }
     };
 
+    searchBox.doArraySearch = (array) => {
+      let searchStr = '';
+      for (var i = 0; i < array.length; i++) {
+        if (i == array.length - 1) {
+          searchStr += `${satSet.getSat(array[i]).SCC_NUM}`;
+        } else {
+          searchStr += `${satSet.getSat(array[i]).SCC_NUM},`;
+        }
+      }
+      searchBox.doSearch(searchStr);
+    };
+
     searchBox.doSearch = function (searchString, isPreventDropDown) {
         if (searchString.length === 0) {
             settingsManager.lastSearch = '';
@@ -324,6 +336,13 @@ var hoverSatId = -1;
             var searchStr = intldes.slice(0, 8);
             searchBox.doSearch(searchStr);
             $('#search').val(searchStr);
+        });
+        $('#near-orbits-link').on('click', () => {
+          searchBox.doArraySearch(
+            satellite.findNearbyObjectsByOrbit(
+              satSet.getSat(objectManager.selectedSat)
+            )
+          );
         });
         $('#near-objects-link').on('click', function () {
             if (objectManager.selectedSat === -1) {

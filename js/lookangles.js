@@ -1865,6 +1865,282 @@ or mirrored at any other location without the express written permission of the 
         return { az: azimuth, el: elevation, range: range };
     };
 
+    satellite.getEci = (sat, propTime) => {
+        let j = _jday(
+            propTime.getUTCFullYear(),
+            propTime.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+            propTime.getUTCDate(),
+            propTime.getUTCHours(),
+            propTime.getUTCMinutes(),
+            propTime.getUTCSeconds()
+        ); // Converts time to jday (TLEs use epoch year/day)
+        j += propTime.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+        // let gmst = satellite.gstime(j);
+
+        let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+
+        let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+        return satellite.sgp4(satrec, m);
+    };
+
+    satellite.findNearbyObjectsByOrbit = (sat) => {
+      let catalog = satSet.getSatData();
+      let possibleMatches = [];
+      let maxPeriod = sat.period * 1.05;
+      let minPeriod = sat.period * 0.95;
+      let maxInclination = sat.inclination * 1.025;
+      let minInclination = sat.inclination * 0.975;
+      let maxRaan = sat.raan * 1.025;
+      let minRaan = sat.raan * 0.975;
+      for (ss = 0; ss < catalog.length; ss++) {
+        let sat2 = catalog[ss];
+        if (sat2.static) break;
+        if (sat2.period > maxPeriod || sat2.period < minPeriod) continue;
+        if (sat2.inclination > maxInclination || sat2.inclination < minInclination) continue;
+        if (sat2.raan > maxRaan || sat2.raan < minRaan) continue;
+        possibleMatches.push(sat2.id);
+      }
+
+      return possibleMatches;
+    };
+
+    satellite.findClosestApproachTime = (sat1, sat2, propOffset, propLength) => {
+      distArray = {};
+      if (typeof propLength == 'undefined') propLength = 1440 * 60; // 1 Day
+      let minDistance = 1000000;
+      for (let t = 0; t < propLength; t++) {
+        let propTempOffset = propOffset + (t * 1000);
+        let now = timeManager.propTimeCheck(
+          propTempOffset,
+          timeManager.propRealTime
+        );
+        let sat1Pos = satellite.getEci(sat1, now);
+        let sat2Pos = satellite.getEci(sat2, now);
+        let distance = Math.sqrt(
+          (sat1Pos.position.x - sat2Pos.position.x)**2 +
+          (sat1Pos.position.y - sat2Pos.position.y)**2 +
+          (sat1Pos.position.z - sat2Pos.position.z)**2);
+        if (distance < minDistance) {
+          minDistance = distance;
+          distArray = {
+            time: now,
+            propOffset: propOffset + (t * 1000),
+            dist: distance,
+            velX: (sat1Pos.velocity.x - sat2Pos.velocity.x),
+            velY: (sat1Pos.velocity.y - sat2Pos.velocity.y),
+            velZ: (sat1Pos.velocity.z - sat2Pos.velocity.z),
+          };
+        }
+      }
+
+      // Go to closest approach time
+      // timeManager.propOffset = distArray.propOffset;
+      // satCruncher.postMessage({
+      //     // Tell satCruncher we have changed times for orbit calculations
+      //     typ: 'offset',
+      //     dat:
+      //         timeManager.propOffset.toString() +
+      //         ' ' +
+      //         (1.0).toString(),
+      // });
+      // timeManager.propRealTime = Date.now(); // Reset realtime...this might not be necessary...
+      // timeManager.propTime();
+
+      return distArray;
+    };
+
+    satellite.createManeuverAnalyst = (satId, incVariation, meanmoVariation, rascVariation) => {
+
+      // TODO This needs rewrote from scratch to bypass the satcruncher
+
+      var mainsat = satSet.getSat(satId);
+      var origsat = mainsat;
+
+      // Launch Points are the Satellites Current Location
+      var TEARR = mainsat.getTEARR();
+      var launchLat, launchLon, alt;
+      launchLat = satellite.degreesLat(TEARR.lat);
+      launchLon = satellite.degreesLong(TEARR.lon);
+      alt = TEARR.alt;
+
+      var upOrDown = mainsat.getDirection();
+
+      var currentEpoch = satellite.currentEpoch(
+          timeManager.propTime()
+      );
+      mainsat.TLE1 =
+          mainsat.TLE1.substr(0, 18) +
+          currentEpoch[0] +
+          currentEpoch[1] +
+          mainsat.TLE1.substr(32);
+
+      camSnapMode = false;
+
+      var TLEs;
+      // Ignore argument of perigee for round orbits OPTIMIZE
+      if (mainsat.apogee - mainsat.perigee < 300) {
+          TLEs = satellite.getOrbitByLatLon(
+              mainsat,
+              launchLat,
+              launchLon,
+              upOrDown,
+              timeManager.propOffset
+          );
+      } else {
+          TLEs = satellite.getOrbitByLatLon(
+              mainsat,
+              launchLat,
+              launchLon,
+              upOrDown,
+              timeManager.propOffset,
+              alt
+          );
+      }
+      var TLE1 = TLEs[0];
+      var TLE2 = TLEs[1];
+
+      var breakupSearchString = '';
+
+      satId = satSet.getIdFromObjNum(80000);
+      var sat = satSet.getSat(satId);
+      sat = origsat;
+      var iTLE1 =
+          '1 ' + (80000) + TLE1.substr(7);
+
+      var iTLEs;
+      // Ignore argument of perigee for round orbits OPTIMIZE
+      if (sat.apogee - sat.perigee < 300) {
+          iTLEs = satellite.getOrbitByLatLon(
+              sat,
+              launchLat,
+              launchLon,
+              upOrDown,
+              timeManager.propOffset,
+              0,
+              rascVariation
+          );
+      } else {
+          iTLEs = satellite.getOrbitByLatLon(
+              sat,
+              launchLat,
+              launchLon,
+              upOrDown,
+              timeManager.propOffset,
+              alt,
+              rascVariation
+          );
+      }
+      iTLE1 = iTLEs[0];
+      iTLE2 = iTLEs[1];
+
+      // For the first 30
+      var inc = TLE2.substr(8, 8);
+      inc = (parseFloat(inc) + incVariation).toPrecision(7);
+      inc = inc.split('.');
+      inc[0] = inc[0].substr(-3, 3);
+      if (inc[1]) {
+          inc[1] = inc[1].substr(0, 4);
+      } else {
+          inc[1] = '0000';
+      }
+      inc = (inc[0] + '.' + inc[1]).toString();
+      inc = _padEmpty(inc, 8);
+
+      // For the second 30
+      var meanmo = iTLE2.substr(52, 10);
+      meanmo = parseFloat(meanmo * meanmoVariation).toPrecision(10);
+      // meanmo = parseFloat(meanmo - (0.005 / 10) + (0.01 * ((meanmoIterat + 1) / 10))).toPrecision(10);
+      meanmo = meanmo.split('.');
+      meanmo[0] = meanmo[0].substr(-2, 2);
+      if (meanmo[1]) {
+          meanmo[1] = meanmo[1].substr(0, 8);
+      } else {
+          meanmo[1] = '00000000';
+      }
+      meanmo = (
+          meanmo[0] +
+          '.' +
+          meanmo[1]
+      ).toString();
+
+      var iTLE2 =
+          '2 ' +
+          (80000) +
+          ' ' +
+          inc +
+          ' ' +
+          iTLE2.substr(17, 35) +
+          meanmo +
+          iTLE2.substr(63);
+      sat = satSet.getSat(satId);
+      sat.TLE1 = iTLE1;
+      sat.TLE2 = iTLE2;
+      sat.active = true;
+      if (
+          satellite.altitudeCheck(
+              iTLE1,
+              iTLE2,
+              timeManager.propOffset
+          ) > 1
+      ) {
+          satCruncher.postMessage({
+              typ: 'satEdit',
+              id: satId,
+              TLE1: iTLE1,
+              TLE2: iTLE2,
+          });
+          orbitManager.updateOrbitBuffer(
+              satId,
+              true,
+              iTLE1,
+              iTLE2
+          );
+      } else {
+          console.warn(
+              'Breakup Generator Failed'
+          );
+          return false;
+      }
+
+      // breakupSearchString += mainsat.SCC_NUM + ',Analyst Sat';
+      // searchBox.doSearch(breakupSearchString);
+      return true;
+    }
+
+    satellite.findChangeOrbitToDock = (sat, sat2, propOffset, propLength) => {
+      let closestInc = 0;
+      let closestRaan = 0;
+      let closestMeanMo = 1;
+
+      let minDistArray = {
+        dist: 1000000
+      };
+
+      for (let incTemp = -1; incTemp <= 1; incTemp++) {
+        for (let raanTemp = -1; raanTemp <= 1; raanTemp++) {
+          for (let meanMoTemp = 0.95; meanMoTemp <= 1.05; meanMoTemp += 0.05) {
+            if (satellite.createManeuverAnalyst(sat.id, incTemp, meanMoTemp, raanTemp)) {
+              let minDistArrayTemp = satellite.findClosestApproachTime(satSet.getSatFromObjNum(80000), sat2, propOffset, propLength);
+              if (minDistArrayTemp.dist < minDistArray.dist) {
+                minDistArray = minDistArrayTemp;
+                let closestInc = incTemp;
+                let closestRaan = raanTemp;
+                let closestMeanMo = meanMoTemp;
+                console.log(`Distance: ${minDistArray.dist}`);
+                console.log(`Time: ${minDistArray.time}`);
+                console.log(satSet.getSatFromObjNum(80000));
+              }
+            }
+          }
+        }
+      }
+
+      console.log(`${sat.inclination + closestInc}`);
+      console.log(`${sat.raan + closestRaan}`);
+      console.log(`${sat.meanMotion * closestMeanMo}`);
+      satellite.createManeuverAnalyst(sat.id, closestInc, closestMeanMo, closestRaan);
+    };
+
     // NOTE: Better code is available for this
     satellite.checkIsInFOV = (sensor, rae) => {
         let azimuth = rae.az;
@@ -2355,6 +2631,13 @@ or mirrored at any other location without the express written permission of the 
     };
 
     // TODO: Add comments on what this is used for
+    function _padEmpty(num, size) {
+        var s = '   ' + num;
+        return s.substr(s.length - size);
+    }
+    function _pad0(str, max) {
+        return str.length < max ? _pad0('0' + str, max) : str;
+    }
     function _Nearest180(arr) {
         let maxDiff = null;
         for (let x = 0; x < arr.length; x++) {

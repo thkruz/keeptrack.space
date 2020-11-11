@@ -114,7 +114,7 @@ var speedModifier = 1;
     var watchlistInViewList = [];
     var nextPassArray = [];
     var nextPassEarliestTime;
-    var isWatchlistChanged = false;
+    var isWatchlistChanged = null;
 
     var uiManager = {};
 
@@ -122,7 +122,7 @@ var speedModifier = 1;
     $(document).ready(function () {
         // Code Once index.htm is loaded
         if (settingsManager.offline) updateInterval = 250;
-        $('#versionNumber-text').innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
+        $('#versionNumber-text')[0].innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
         (function _licenseCheck() {
             db.log('_licenseCheck');
             if (typeof satel === 'undefined') satel = null;
@@ -2039,6 +2039,7 @@ var speedModifier = 1;
                     !sensorManager.checkSensorSelected() ||
                     watchlistList.length <= 0
                 ) {
+                    isWatchlistChanged = false;
                     $('#menu-info-overlay').addClass('bmenu-item-disabled');
                 }
             });
@@ -3208,6 +3209,26 @@ var speedModifier = 1;
                 timeManager.propTime();
             } // Allows passing -1 argument to socrates function to skip these steps
         }
+
+        uiManager.loginPopup = () => {
+          if (uiManager.isMembershipMenuOpen) {
+              uiManager.hideSideMenus();
+              uiManager.isMembershipMenuOpen = false;
+              return;
+          } else {
+              uiManager.toast(`Membership Required for this Feature!`,'critical');
+              uiManager.hideSideMenus();
+              $('#membership-menu').effect(
+                  'slide',
+                  { direction: 'left', mode: 'show' },
+                  1000
+              );
+              uiManager.isMembershipMenuOpen = true;
+              // $('#menu-sensor-info').addClass('bmenu-item-selected');
+              return;
+          }
+        };
+
         uiManager.bottomIconPress = (evt) => {
           _bottomIconPress(evt)
         };
@@ -3223,6 +3244,9 @@ var speedModifier = 1;
                     'Selected'
                 );
             switch (evt.currentTarget.id) {
+              case 'menu-membership': // No Keyboard Commands
+                  uiManager.loginPopup();
+                  break;
                 case 'menu-sensor-list': // No Keyboard Commands
                     if (isSensorListMenuOpen) {
                         uiManager.hideSideMenus();
@@ -3245,6 +3269,7 @@ var speedModifier = 1;
                 case 'menu-info-overlay':
                     if (!sensorManager.checkSensorSelected()) {
                         // No Sensor Selected
+                        uiManager.toast(`Select a Sensor First!`,'caution', true);
                         if (!$('#menu-info-overlay:animated').length) {
                             $('#menu-info-overlay').effect('shake', {
                                 distance: 10,
@@ -3257,6 +3282,11 @@ var speedModifier = 1;
                         uiManager.hideSideMenus();
                         break;
                     } else {
+                        if (watchlistList.length === 0 && !isWatchlistChanged) {
+                          uiManager.toast(`Add Satellites to Watchlist!`,'caution');
+                          nextPassArray = [];
+                          break;
+                        }
                         uiManager.hideSideMenus();
                         if (
                             nextPassArray.length === 0 ||
@@ -3302,6 +3332,7 @@ var speedModifier = 1;
                     if (!sensorManager.checkSensorSelected()) {
                         // No Sensor Selected
                         adviceList.sensorInfoDisabled();
+                        uiManager.toast(`Select a Sensor First!`,'caution');
                         if (!$('#menu-sensor-info:animated').length) {
                             $('#menu-sensor-info').effect('shake', {
                                 distance: 10,
@@ -3329,6 +3360,10 @@ var speedModifier = 1;
                     }
                     break;
                 case 'menu-lookangles': // S
+                    if (!settingsManager.isMembersOnly) {
+                      uiManager.loginPopup();
+                      break;
+                    }
                     if (isLookanglesMenuOpen) {
                         isLookanglesMenuOpen = false;
                         uiManager.hideSideMenus();
@@ -3372,6 +3407,10 @@ var speedModifier = 1;
                     }
                     break;
                 case 'menu-dops': // S
+                    if (!settingsManager.isMembersOnly) {
+                      uiManager.loginPopup();
+                      break;
+                    }
                     // if (!$('#menu-dops:animated').length) {
                     //     $('#menu-dops').effect('shake', {distance: 10});
                     // }
@@ -3424,6 +3463,10 @@ var speedModifier = 1;
                     }
                     break;
                 case 'menu-analysis':
+                    if (!settingsManager.isMembersOnly) {
+                      uiManager.loginPopup();
+                      break;
+                    }
                     if (isAnalysisMenuOpen) {
                         isAnalysisMenuOpen = false;
                         $('#menu-analysis').removeClass('bmenu-item-selected');
@@ -3499,6 +3542,10 @@ var speedModifier = 1;
                     }
                     break;
                 case 'menu-lookanglesmultisite':
+                    if (!settingsManager.isMembersOnly) {
+                      uiManager.loginPopup();
+                      break;
+                    }
                     if (isLookanglesMultiSiteMenuOpen) {
                         isLookanglesMultiSiteMenuOpen = false;
                         uiManager.hideSideMenus();
@@ -3593,6 +3640,7 @@ var speedModifier = 1;
                         if (objectManager.selectedSat === -1) {
                             // No Satellite Selected
                             adviceList.mapDisabled();
+                            uiManager.toast(`Select a Satellite First!`,'caution');
                             if (!$('#menu-map:animated').length) {
                                 $('#menu-map').effect('shake', {
                                     distance: 10,
@@ -3740,6 +3788,10 @@ var speedModifier = 1;
                     }
                     break;
                 case 'menu-editSat':
+                    if (!settingsManager.isMembersOnly) {
+                      uiManager.loginPopup();
+                      break;
+                    }
                     if (isEditSatMenuOpen) {
                         isEditSatMenuOpen = false;
                         uiManager.hideSideMenus();
@@ -3806,6 +3858,10 @@ var speedModifier = 1;
                     }
                     break;
                 case 'menu-newLaunch':
+                    if (!settingsManager.isMembersOnly) {
+                      uiManager.loginPopup();
+                      break;
+                    }
                     if (isNewLaunchMenuOpen) {
                         isNewLaunchMenuOpen = false;
                         uiManager.hideSideMenus();
@@ -3867,6 +3923,7 @@ var speedModifier = 1;
                             $('#hc-scc').val(sat.SCC_NUM);
                         } else {
                             adviceList.breakupDisabled();
+                            uiManager.toast(`Select a Satellite First!`,'caution');
                             if (!$('#menu-breakup:animated').length) {
                                 $('#menu-breakup').effect('shake', {
                                     distance: 10,
@@ -3877,6 +3934,10 @@ var speedModifier = 1;
                     }
                     break;
                 case 'menu-customSensor': // T
+                    if (!settingsManager.isMembersOnly) {
+                      uiManager.loginPopup();
+                      break;
+                    }
                     if (isCustomSensorMenuOpen) {
                         isCustomSensorMenuOpen = false;
                         uiManager.hideSideMenus();
@@ -3926,6 +3987,7 @@ var speedModifier = 1;
                     if (!sensorManager.checkSensorSelected()) {
                         // No Sensor Selected
                         adviceList.bubbleDisabled();
+                        uiManager.toast(`Select a Sensor First!`,'caution');
                         if (!$('#menu-fov-bubble:animated').length) {
                             $('#menu-fov-bubble').effect('shake', {
                                 distance: 10,
@@ -3969,6 +4031,7 @@ var speedModifier = 1;
                     if (!sensorManager.checkSensorSelected()) {
                         // No Sensor Selected
                         adviceList.survFenceDisabled();
+                        uiManager.toast(`Select a Sensor First!`,'caution');
                         if (!$('#menu-surveillance:animated').length) {
                             $('#menu-surveillance').effect('shake', {
                                 distance: 10,
@@ -4011,6 +4074,7 @@ var speedModifier = 1;
                     ) {
                         // No Sat Selected and No Search Present
                         adviceList.satFOVDisabled();
+                        uiManager.toast(`Select a Satellite First!`,'caution');
                         if (!$('#menu-sat-fov:animated').length) {
                             $('#menu-sat-fov').effect('shake', {
                                 distance: 10,
@@ -4207,6 +4271,7 @@ var speedModifier = 1;
                             );
                         } else {
                             adviceList.planetariumDisabled();
+                            uiManager.toast(`Select a Sensor First!`,'caution');
                             if (!$('#menu-planetarium:animated').length) {
                                 $('#menu-planetarium').effect('shake', {
                                     distance: 10,
@@ -4253,6 +4318,7 @@ var speedModifier = 1;
                                 'bmenu-item-selected'
                             );
                         } else {
+                            uiManager.toast(`Select a Sensor First!`,'caution');
                             if (!$('#menu-astronomy:animated').length) {
                                 $('#menu-astronomy').effect('shake', {
                                     distance: 10,
@@ -4275,6 +4341,7 @@ var speedModifier = 1;
                             $('#menu-satview').addClass('bmenu-item-selected');
                             isSatView = true;
                         } else {
+                          uiManager.toast(`Select a Satellite First!`,'caution');
                             adviceList.satViewDisabled();
                             if (!$('#menu-satview:animated').length) {
                                 $('#menu-satview').effect('shake', {
@@ -4296,7 +4363,9 @@ var speedModifier = 1;
                         try {
                             recorder.start();
                         } catch (e) {
-                            console.error('Compatibility Issue');
+                            M.toast({
+                                html: `Compatibility Error with Recording`,
+                            });
                             isVideoRecording = false;
                             $('#menu-record').removeClass(
                                 'bmenu-item-selected'
@@ -4322,6 +4391,11 @@ var speedModifier = 1;
             $.colorbox.close();
 
             // Hide all side menus
+            $('#membership-menu').effect(
+                'slide',
+                { direction: 'left', mode: 'hide' },
+                1000
+            );
             $('#sensor-list-menu').effect(
                 'slide',
                 { direction: 'left', mode: 'hide' },
@@ -4477,6 +4551,7 @@ var speedModifier = 1;
             $('#menu-about').removeClass('bmenu-item-selected');
 
             // Unflag all open menu variables
+            uiManager.isMembershipMenuOpen = false;
             isSensorListMenuOpen = false;
             isInfoOverlayMenuOpen = false;
             isSensorInfoMenuOpen = false;
@@ -4520,7 +4595,11 @@ var speedModifier = 1;
 
             if (!watchlistList) return;
             settingsManager.isThemesNeeded = true;
-            isWatchlistChanged = true;
+            if (isWatchlistChanged == null) {
+              isWatchlistChanged = false;
+            } else {
+              isWatchlistChanged = true;
+            }
             var watchlistString = '';
             var watchlistListHTML = '';
             var sat;
@@ -5640,7 +5719,10 @@ var speedModifier = 1;
                 _rgbCSS(settingsManager.colors.trusat)
             );
         } else {
-            $('.legend-trusat').hide();
+            $('.legend-trusat-box')[0].parentElement.style.display = "none";
+            $('.legend-trusat-box')[1].parentElement.style.display = "none";
+            $('.legend-trusat-box')[2].parentElement.style.display = "none";
+            $('.legend-trusat-box')[3].parentElement.style.display = "none";
         }
         $('.legend-velocityFast-box').css(
             'background',
@@ -6500,6 +6582,30 @@ var speedModifier = 1;
     };
 
     uiManager.isTimeMachineRunning = false;
+
+    uiManager.toast = (toastText, type, isLong) => {
+      let toastMsg = M.toast({
+          html: toastText,
+      });
+      if (isLong) toastMsg.timeRemaining = 100000;
+      switch (type) {
+        case 'standby':
+          toastMsg.$el[0].style.background = '#2dccff';
+          break;
+        case 'normal':
+          toastMsg.$el[0].style.background = '#56f000';
+          break;
+        case 'caution':
+          toastMsg.$el[0].style.background = '#fce83a';
+          break;
+        case 'serious':
+          toastMsg.$el[0].style.background = '#ffb302';
+          break;
+        case 'critical':
+          toastMsg.$el[0].style.background = '#ff3838';
+          break;
+      }
+    };
 
     uiManager.saveHiResPhoto = (resolution) => {
         switch (resolution) {

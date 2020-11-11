@@ -43,6 +43,9 @@ function CanvasRecorder(canvas, video_bits_per_sec) {
                 isVideoRecording = false;
                 $('#menu-record').removeClass('bmenu-item-selected');
                 $('#menu-record').addClass('bmenu-item-disabled');
+                M.toast({
+                    html: `Compatibility Error with Recording`,
+                });
                 if (!$('#menu-record:animated').length) {
                     $('#menu-record').effect('shake', { distance: 10 });
                 }
@@ -53,6 +56,9 @@ function CanvasRecorder(canvas, video_bits_per_sec) {
             isVideoRecording = false;
             $('#menu-record').removeClass('bmenu-item-selected');
             $('#menu-record').addClass('bmenu-item-disabled');
+            M.toast({
+                html: `Recording Only Available with HTTPS`,
+            });
             if (!$('#menu-record:animated').length) {
                 $('#menu-record').effect('shake', { distance: 10 });
             }

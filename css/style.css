@@ -133,6 +133,54 @@ ul {
     display: none;
 }
 
+.SFusrbtndiv {
+  text-align: center !important;
+}
+
+#SFusrdlg_gry {
+  display: none;
+}
+
+#SFusrpne0 {
+  margin: 25px !important;
+}
+
+#SFctr button {
+  background: #005a8f !important;
+
+  border: none !important;
+  border-radius: 2px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  padding: 0 16px !important;
+  text-transform: uppercase !important;
+
+  font-size: 14px !important;
+  outline: 0 !important;
+
+  webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
+
+  position: relative !important;
+  cursor: pointer !important;
+  display: inline-block !important;
+  overflow: hidden !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  vertical-align: middle !important;
+  z-index: 1 !important;
+  -webkit-transition: 0.3s ease-out !important;
+  transition: 0.3s ease-out !important;
+}
+
+#membership-pitch {
+  text-align: left;
+  margin: 25px;
+}
+
 #canvas {
     position: absolute;
     background: black; /* Inconsistent brightness without this */
@@ -1005,6 +1053,13 @@ input:focus {
 
 .bmenu-item-disabled .status-icon {
     background-position-x: -75px;
+}
+
+.bmenu-item-membersonly img {
+    filter: invert(52%) sepia(130%) saturate(7323%) hue-rotate(353deg) brightness(100%) contrast(86%);
+}
+.bmenu-item-membersonly .status-icon {
+    background-position-x: -90px;
 }
 
 #down {

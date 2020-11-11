@@ -1038,7 +1038,12 @@ or mirrored at any other location without the express written permission of the 
         } catch (e) {
             console.log(`Couldn't clear the current sensor info!`);
         }
-        if (selectedSensor == null && staticNum == null) return;
+        if (selectedSensor == null && staticNum == null) {
+          if (settingsManager.currentColorScheme == ColorScheme.default) {
+            uiManager.legendMenuChange('default');
+          }
+          return;
+        }
         var sensor;
         if (selectedSensor === 'SSN') {
             var allSSNSensors = [];
@@ -1066,6 +1071,58 @@ or mirrored at any other location without the express written permission of the 
             selectSat(-1);
             satSet.setColorScheme(settingsManager.currentColorScheme, true);
             // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+      } else if (selectedSensor === 'CapeCodMulti') {
+          let multiSensor = [];
+          multiSensor.push({
+              lat: 41.754785,
+              long: -70.539151,
+              obshei: 0.060966,
+              obsminaz: 347,
+              obsmaxaz: 227,
+              obsminel: 6,
+              obsmaxel: 85,
+              obsminrange: 150,
+              obsmaxrange: 725,
+              volume: false,
+          });
+          multiSensor.push({
+              lat: 41.754785,
+              long: -70.539151,
+              obshei: 0.060966,
+              obsminaz: 347,
+              obsmaxaz: 227,
+              obsminel: 3,
+              obsmaxel: 85,
+              obsminrange: 700,
+              obsmaxrange: 2450,
+              volume: false,
+          });
+          multiSensor.push({
+              lat: 41.754785,
+              long: -70.539151,
+              obshei: 0.060966,
+              obsminaz: 347,
+              obsmaxaz: 227,
+              obsminel: 3,
+              obsmaxel: 85,
+              obsminrange: 2200,
+              obsmaxrange: 5556,
+              volume: false,
+          });
+          satCruncher.postMessage({
+              typ: 'offset',
+              dat:
+                  timeManager.propOffset.toString() +
+                  ' ' +
+                  timeManager.propRate.toString(),
+              setlatlong: true,
+              sensor: multiSensor,
+              multiSensor: true,
+          });
+          satellite.setobs(sensorManager.sensorList.COD);
+          uiManager.getsensorinfo();
+          selectSat(-1);
+          satSet.setColorScheme(settingsManager.currentColorScheme, true);
         } else if (selectedSensor === 'NATO-MW') {
             var natoMWSensors = [];
             natoMWSensors.push(sensorManager.sensorList.BLE);
@@ -1227,7 +1284,9 @@ or mirrored at any other location without the express written permission of the 
             }
         }
 
-        // uiManager.legendMenuChange('default');
+        if (settingsManager.currentColorScheme == ColorScheme.default) {
+          uiManager.legendMenuChange('default');
+        }
     };
     sensorManager.sensorListUS = [
         sensorList.COD,

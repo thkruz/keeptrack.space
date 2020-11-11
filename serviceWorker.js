@@ -1,4 +1,4 @@
-var cacheName = 'KeepTrack-v1.20.12';
+var cacheName = 'KeepTrack-v2.0.0';
 var contentToCache = [
     './',
     './index.htm',
@@ -15,52 +15,52 @@ var contentToCache = [
     './textures/earthlights4k.jpg',
     './textures/earthbump8k.jpg',
     './textures/earthspec8k.jpg',
-    './css/fonts.css?v=1.20.12',
-    './css/loading-screen.css?v=1.20.12',
-    './css/materialize.css?v=1.20.12',
-    './css/materialize-local.css?v=1.20.12',
-    './js/lib/colorPick.css?v=1.20.12',
-    './modules/nextLaunchManager.css?v=1.20.12',
-    './css/perfect-scrollbar.min.css?v=1.20.12',
-    './css/jquery-ui.min.css?v=1.20.12',
-    './css/jquery-ui-timepicker-addon.css?v=1.20.12',
-    './css/style.css?v=1.20.12',
-    './css/responsive.css?v=1.20.12',
+    './css/fonts.css?v=2.0.0',
+    './css/loading-screen.css?v=2.0.0',
+    './css/materialize.css?v=2.0.0',
+    './css/materialize-local.css?v=2.0.0',
+    './js/lib/colorPick.css?v=2.0.0',
+    './modules/nextLaunchManager.css?v=2.0.0',
+    './css/perfect-scrollbar.min.css?v=2.0.0',
+    './css/jquery-ui.min.css?v=2.0.0',
+    './css/jquery-ui-timepicker-addon.css?v=2.0.0',
+    './css/style.css?v=2.0.0',
+    './css/responsive.css?v=2.0.0',
     './css/fonts/opensans.woff',
-    './js/lib/colorPick.js?v=1.20.12',
-    './js/lib/webgl-obj-loader.min.js?v=1.20.12',
-    './js/mapManager.min.js?v=1.20.12',
-    './js/lib/combinedDependencies.js?v=1.20.12',
-    './modules/meshManager.min.js?v=1.20.12',
-    './modules/sensorManager.min.js?v=1.20.12',
-    './modules/controlSiteManager.js?v=1.20.12',
-    './modules/launchSiteManager.js?v=1.20.12',
-    './modules/nextLaunchManager.min.js?v=1.20.12',
-    './modules/starManager.min.js?v=1.20.12',
-    './modules/satLinkManager.min.js?v=1.20.12',
-    './js/lib/CanvasRecorder.min.js?v=1.20.12',
-    './modules/satVmagManager.js?v=1.20.12',
-    './js/sceneManager.js?v=1.20.12',
-    './js/timeManager.min.js?v=1.20.12',
-    './js/groups.js?v=1.20.12',
-    './js/lookangles.min.js?v=1.20.12',
-    './js/satSet.js?v=1.20.12',
-    './js/objectManager.js?v=1.20.12',
-    './js/color-scheme.min.js?v=1.20.12',
-    './js/mobile.min.js?v=1.20.12',
-    './modules/missileManager.js?v=1.20.12',
-    './js/ui.min.js?v=1.20.12',
-    './js/main.min.js?v=1.20.12',
-    './js/orbitManager.min.js?v=1.20.12',
-    './js/drawLoop-shapes.min.js?v=1.20.12',
-    './js/search-box.min.js?v=1.20.12',
-    './js/vector-to-kepler.min.js?v=1.20.12',
-    './js/lib/uiCombinedDependencies.js?v=1.20.12',
-    './js/advice-module.min.js?v=1.20.12',
+    './js/lib/colorPick.js?v=2.0.0',
+    './js/lib/webgl-obj-loader.min.js?v=2.0.0',
+    './js/mapManager.min.js?v=2.0.0',
+    './js/lib/combinedDependencies.js?v=2.0.0',
+    './modules/meshManager.min.js?v=2.0.0',
+    './modules/sensorManager.min.js?v=2.0.0',
+    './modules/controlSiteManager.js?v=2.0.0',
+    './modules/launchSiteManager.js?v=2.0.0',
+    './modules/nextLaunchManager.min.js?v=2.0.0',
+    './modules/starManager.min.js?v=2.0.0',
+    './modules/satLinkManager.min.js?v=2.0.0',
+    './js/lib/CanvasRecorder.min.js?v=2.0.0',
+    './modules/satVmagManager.js?v=2.0.0',
+    './js/sceneManager.js?v=2.0.0',
+    './js/timeManager.min.js?v=2.0.0',
+    './js/groups.js?v=2.0.0',
+    './js/lookangles.min.js?v=2.0.0',
+    './js/satSet.js?v=2.0.0',
+    './js/objectManager.js?v=2.0.0',
+    './js/color-scheme.min.js?v=2.0.0',
+    './js/mobile.min.js?v=2.0.0',
+    './modules/missileManager.js?v=2.0.0',
+    './js/ui.min.js?v=2.0.0',
+    './js/main.min.js?v=2.0.0',
+    './js/orbitManager.min.js?v=2.0.0',
+    './js/drawLoop-shapes.min.js?v=2.0.0',
+    './js/search-box.min.js?v=2.0.0',
+    './js/vector-to-kepler.min.js?v=2.0.0',
+    './js/lib/uiCombinedDependencies.js?v=2.0.0',
+    './js/advice-module.min.js?v=2.0.0',
     './css/fonts/droid/droid-sans-v6-latin-regular.woff2',
     './js/objectManager.js',
-    './license/license.min.js?v=1.20.12',
-    './js/sat-cruncher.js',
+    './license/license.min.js?v=2.0.0',
+    './js/satCruncher.js',
     './tle/TLE.json',
     './js/orbit-calculation-worker.js',
     './meshes/sat2.obj',
@@ -101,20 +101,23 @@ var contentToCache = [
     './meshes/rocketbody.mtl',
 ];
 
-self.addEventListener('install', (e) => {
-    console.log('[Service Worker] Install');
-    e.waitUntil(
-        caches.open(cacheName).then((cache) => {
-            // console.log(
-            //     '[Service Worker] Caching all: app shell and content'
-            // );
-            return cache.addAll(contentToCache);
-        }).then(function(e){
-        return self.skipWaiting();
-      })
-    );
-    // return self.skipWaiting();
-});
+// ////////////////////////////////////////////////////////////////////////////
+// Auto-install
+// ////////////////////////////////////////////////////////////////////////////
+// self.addEventListener('install', (e) => {
+//     console.log('[Service Worker] Install');
+//     e.waitUntil(
+//         caches.open(cacheName).then((cache) => {
+//             // console.log(
+//             //     '[Service Worker] Caching all: app shell and content'
+//             // );
+//             return cache.addAll(contentToCache);
+//         }).then(function(e){
+//         return self.skipWaiting();
+//       })
+//     );
+//     // return self.skipWaiting();
+// });
 
 self.addEventListener('fetch', (e) => {
     e.respondWith(

@@ -89,7 +89,7 @@
             objectManager.isStarManagerLoaded = false;
             console.log('You do not have the Star Module');
         }
-        objectManager.starIndex2 = objectManager.staticSet.length - 1;
+        // objectManager.starIndex2 = objectManager.staticSet.length - 1;
 
         // Try Loading Sensor Module
         var sensor;
@@ -162,6 +162,8 @@
             objectManager.isControlSiteManagerLoaded = false;
             console.log('You do not have the Control Site Module');
         }
+
+        objectManager.starIndex2 = objectManager.staticSet.length - 1;
 
         for (i = 0; i < settingsManager.maxFieldOfViewMarkers; i++) {
             var fieldOfViewMarker = {

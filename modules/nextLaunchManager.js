@@ -5,16 +5,22 @@
       $.get('https://launchlibrary.net/1.4/launch/next/20').done(function (resp) {
         for (let i = 0; i < resp.launches.length; i++) {
           let launchInfo = {};
-          launchInfo.name = resp.launches[i].name;
+          launchInfo.name = (typeof resp.launches[i].name != 'undefined') ? resp.launches[i].name : 'Unknown';
           launchInfo.updated = new Date(resp.launches[i].changed);
           launchInfo.windowStart = new Date(resp.launches[i].wsstamp * 1000); // sec to ms
           launchInfo.windowEnd = new Date(resp.launches[i].westamp * 1000); //sec to ms
           launchInfo.location = resp.launches[i].location.name.split(',', 1);
           launchInfo.location = launchInfo.location[0];
           launchInfo.locationURL = resp.launches[i].location.pads[0].wikiURL;
-          launchInfo.agency = resp.launches[i].lsp.name;
-          launchInfo.country = resp.launches[i].lsp.countryCode;
-          launchInfo.agencyURL = resp.launches[i].lsp.wikiURL;
+          if (typeof resp.launches[i].lsp != 'undefined') {
+            launchInfo.agency = (typeof resp.launches[i].lsp.name != 'undefined') ? resp.launches[i].lsp.name : 'Unknown';
+            launchInfo.country = (typeof resp.launches[i].lsp.countryCode != 'undefined') ? resp.launches[i].lsp.countryCode : 'Unknown';
+            launchInfo.agencyURL = (typeof resp.launches[i].lsp.wikiURL != 'undefined') ? resp.launches[i].lsp.wikiURL : 'Unknown';
+          } else {
+            launchInfo.agency = 'Unknown';
+            launchInfo.country = 'UNK';
+            launchInfo.agencyURL = '';
+          }
           if (typeof resp.launches[i].missions[0] != 'undefined') {
             launchInfo.mission = resp.launches[i].missions[0].description;
             launchInfo.missionName = resp.launches[i].missions[0].name;
@@ -172,6 +178,8 @@
             });
         }
         function _truncateString(str, num) {
+            if (typeof str == 'undefined') return 'Unknown';
+
             // If the length of str is less than or equal to num
             // just return str--don't truncate it.
             if (str.length <= num) {

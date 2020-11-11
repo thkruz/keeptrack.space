@@ -302,7 +302,7 @@ function initializeKeepTrack() {
                         $('#logo-text').html('');
                         $('#logo-trusat').hide();
                         $('#loading-screen').hide();
-                        $('#loader-text').html('Attempting to Math...');
+                        $('#loader-text').html('Attempting to Math...');                        
                     }, 1500);
                 }
             }

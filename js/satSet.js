@@ -28,6 +28,7 @@ var emptyMat4 = mat4.create();
     var RAD2DEG = 360 / TAU;
 
     var satCruncher = {};
+    var markerCruncher = {};
     var limitSats = settingsManager.limitSats;
 
     var satSet = {};
@@ -51,10 +52,16 @@ var emptyMat4 = mat4.create();
     var satData;
     var satExtraData;
 
+    var markerPos;
+    var markerVel;
+
     try {
         $('#loader-text').text('Locating ELSETs...');
         satCruncher = new Worker(
-            settingsManager.installDirectory + 'js/sat-cruncher.js'
+            settingsManager.installDirectory + 'js/satCruncher.js'
+        );
+        markerCruncher = new Worker(
+            settingsManager.installDirectory + 'js/markerCruncher.js'
         );
     } catch (E) {
         console.log(E);
@@ -195,9 +202,6 @@ var emptyMat4 = mat4.create();
         if (typeof m.data.satInSun != 'undefined') {
             satInSun = new Int8Array(m.data.satInSun);
         }
-        if (typeof m.data.sensorMarkerArray != 'undefined') {
-            satSensorMarkerArray = m.data.sensorMarkerArray;
-        }
 
         if (
             settingsManager.isMapMenuOpen ||
@@ -252,6 +256,7 @@ var emptyMat4 = mat4.create();
                               currentSensor[0] == null
                           ) {
                               sensorManager.setSensor(null, currentSensor[1]);
+                              uiManager.legendMenuChange('default');
                           } else {
                               // If the sensor is a string, load that collection of sensors
                               if (
@@ -262,6 +267,7 @@ var emptyMat4 = mat4.create();
                                       currentSensor[0],
                                       currentSensor[1]
                                   );
+                                  uiManager.legendMenuChange('default');
                               } else {
                                   // Seems to be a single sensor without a staticnum, load that
                                   sensorManager.setSensor(
@@ -270,6 +276,7 @@ var emptyMat4 = mat4.create();
                                       ],
                                       currentSensor[1]
                                   );
+                                  uiManager.legendMenuChange('default');
                               }
                           }
                       } catch (e) {
@@ -423,6 +430,15 @@ var emptyMat4 = mat4.create();
             }, 0);
 
             settingsManager.cruncherReady = true;
+        }
+    };
+
+    markerCruncher.onmessage = (m) => {
+        markerPos = new Float32Array(m.data.satPos);
+        markerVel = new Float32Array(m.data.satVel);
+
+        if (typeof m.data.sensorMarkerArray != 'undefined') {
+            satSensorMarkerArray = m.data.sensorMarkerArray;
         }
     };
 
@@ -1134,8 +1150,8 @@ var emptyMat4 = mat4.create();
         for (var i = 0; i < satData.length; i++) {
             if (
                 i >= objectManager.starIndex1 &&
-                true
-                // i <= objectManager.starIndex2
+                // true
+                i <= objectManager.starIndex2
             ) {
                 starArray.push(1.0);
             } else {

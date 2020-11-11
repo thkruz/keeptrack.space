@@ -1,19 +1,19 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ENHWK6L0X7"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-ENHWK6L0X7');
+    </script>
+
     <meta charset="utf-8" />
     <link rel="canonical" href="https://www.keeptrack.space"/>
-    <script src="js/keeptrack-head.js?v=1.20.6"></script>
-    <script>
-      var refreshing;
-      navigator.serviceWorker.addEventListener('controllerchange',
-      function() {
-        if (refreshing) return;
-        refreshing = true;
-        window.location.reload();
-      }
-      );
-    </script>
+    <script src="js/keeptrack-head.js?v=2.0.0"></script>
     <meta
         name="description"
         content="A 3D visualtion tool to learn about satellites and tracking radars."
@@ -75,7 +75,7 @@
                   document.write(
                       '<span id="logo-trusat"><img src="' +
                           settingsManager.installDirectory +
-                          '/images/trusat.png"></span>'
+                          'images/trusat.png"></span>'
                   );
               }
           </script>
@@ -441,7 +441,7 @@
                   <div class="Square-Box legend-missileInview-box"></div>Missile In View
                 </li>
                 <li>
-                  <div class="Square-Box legend-static-box"></div>Sensor
+                  <div class="Square-Box legend-sensor-box"></div>Sensor
                 </li>
                 <li>
                   <div class="Square-Box legend-facility-box"></div>Launch Site
@@ -529,8 +529,8 @@
             </div>
             <div id="sat-infobox" class="text-select">
               <div id="sat-info-title" class="center-text">This is a title</div>
-              <div id="all-objects-link" class="link sat-infobox-links sat-only-info">Find all objects from this launch...
-              </div>
+              <div id="all-objects-link" class="link sat-infobox-links sat-only-info">Find all objects from this launch...</div>
+              <div id="near-orbits-link" class="link sat-infobox-links sat-only-info">Find all objects near this orbit...</div>
               <div id="near-objects-link" class="link sat-infobox-links">Find all objects near this object...</div>
               <div class="sat-info-row sat-only-info">
                 <div class="sat-info-key">COSPAR</div>
@@ -2130,7 +2130,7 @@
     <!--Google Analytics -->
     <script>
       // Only turn on analytics if on keeptrack.space ()
-      if (window.location.hostname === 'keeptrack.space') {
+      if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
         (function (i, s, o, g, r, a, m) {
           i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
             (i[r].q = i[r].q || []).push(arguments)

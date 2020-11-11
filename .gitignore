@@ -10,6 +10,12 @@ classfd.tle
 social
 social/*
 
+.index.html
+basic.html
+
+membership
+membership/*
+
 admin/*
 analysis/*
 tle/2006*

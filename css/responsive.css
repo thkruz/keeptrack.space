@@ -137,6 +137,9 @@
     border-color: #172635;
     border-style: solid;
   }
+  #membership-content {
+    width: 450px !important;
+  }
   nav,
   nav .nav-wrapper i,
   nav a.sidenav-trigger,
@@ -258,6 +261,9 @@
     overflow: auto;
     z-index: 10;
     padding: 0px 5px 0px 0px;
+  }
+  #membership-content {
+    width: 450px !important;
   }
   #lookanglesmultisite-content {
     width: 375px;

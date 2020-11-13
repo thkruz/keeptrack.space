@@ -1,4 +1,5 @@
 (function nextLaunchInit() {
+    if(settingsManager.offline) return;
     let nextLaunchManager = {};
     nextLaunchManager.launchList = [];
     nextLaunchManager.init = () => {

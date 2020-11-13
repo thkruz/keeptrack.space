@@ -126,7 +126,7 @@ var speedModifier = 1;
         (function _licenseCheck() {
             db.log('_licenseCheck');
             if (typeof satel === 'undefined') satel = null;
-            if (settingsManager.offline && !_clk()) {
+            if (!settingsManager.breakTheLaw && settingsManager.offline && !_clk()) {
                 _offlineMessage();
                 $('#license-watermark').removeClass('start-hidden');
                 $('#license-watermark').show();

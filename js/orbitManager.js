@@ -85,7 +85,7 @@
 
         // Discard now that we are loaded
         satSet.satDataString = null;
-        objectManager.fieldOfViewSet = null;
+        // objectManager.fieldOfViewSet = null;
 
         // var time = performance.now() - startTime;
         // console.log('orbitManager init: ' + time + ' ms');

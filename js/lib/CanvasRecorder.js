@@ -23,7 +23,7 @@ function CanvasRecorder(canvas, video_bits_per_sec) {
     function startCapture(displayMediaOptions) {
         let captureStream = null;
 
-        if (window.location.protocol === 'https:') {
+        if (window.location.protocol === 'https:' || settingsManager.offline) {
             if ('getDisplayMedia' in navigator) {
                 return navigator
                     .getDisplayMedia(displayMediaOptions)

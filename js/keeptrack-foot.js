@@ -30,9 +30,9 @@ if (db.enabled || window.location.host == 'localhost' || settingsManager.offline
     }
 
     // Offline Only
-    // if(settingsManager.offline){document.write('<script src="' + settingsManager.installDirectory + 'offline/extra.js?v=' + settingsManager.versionNumber + '"\><\/script>');}
+    if (settingsManager.offline) {document.write('<script src="' + settingsManager.installDirectory + 'offline/extra.js?v=' + settingsManager.versionNumber + '"\><\/script>'); }
     // if(settingsManager.offline){document.write('<script src="' + settingsManager.installDirectory + 'offline/satInfo.js?v=' + settingsManager.versionNumber + '"\><\/script>');}
-    // if(settingsManager.offline){document.write('<script src="' + settingsManager.installDirectory + 'offline/tle.js?v=' + settingsManager.versionNumber + '"\><\/script>');}
+    if (settingsManager.offline) {document.write('<script src="' + settingsManager.installDirectory + 'offline/tle.js?v=' + settingsManager.versionNumber + '"\><\/script>'); }
 
     // Other Required Files
     document.write(`
@@ -40,9 +40,9 @@ if (db.enabled || window.location.host == 'localhost' || settingsManager.offline
     <script src="${settingsManager.installDirectory}js/timeManager.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/groups.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/lookangles.js?v=${settingsManager.versionNumber}"\><\/script>
-    <script src="${settingsManager.installDirectory}js/satSet.js?v=${settingsManager.versionNumber}"\><\/script>
-
     <script src="${settingsManager.installDirectory}js/objectManager.js?v=${settingsManager.versionNumber}"\><\/script>
+
+    <script src="${settingsManager.installDirectory}js/satSet.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/color-scheme.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/mobile.js?v=${settingsManager.versionNumber}"\><\/script>
   `);
@@ -99,9 +99,9 @@ if (db.enabled || window.location.host == 'localhost' || settingsManager.offline
     }
 
     // Offline Only
-    // if(settingsManager.offline){document.write('<script src="' + settingsManager.installDirectory + 'offline/extra.js?v=' + settingsManager.versionNumber + '"\><\/script>');}
+    if (settingsManager.offline) {document.write('<script src="' + settingsManager.installDirectory + 'offline/extra.js?v=' + settingsManager.versionNumber + '"\><\/script>'); }
     // if(settingsManager.offline){document.write('<script src="' + settingsManager.installDirectory + 'offline/satInfo.js?v=' + settingsManager.versionNumber + '"\><\/script>');}
-    // if(settingsManager.offline){document.write('<script src="' + settingsManager.installDirectory + 'offline/tle.js?v=' + settingsManager.versionNumber + '"\><\/script>');}
+    if (settingsManager.offline) {document.write('<script src="' + settingsManager.installDirectory + 'offline/tle.js?v=' + settingsManager.versionNumber + '"\><\/script>'); }
 
     // Other Required Files
     document.write(`
@@ -109,9 +109,9 @@ if (db.enabled || window.location.host == 'localhost' || settingsManager.offline
     <script src="${settingsManager.installDirectory}js/timeManager.min.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/groups.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/lookangles.min.js?v=${settingsManager.versionNumber}"\><\/script>
-    <script src="${settingsManager.installDirectory}js/satSet.js?v=${settingsManager.versionNumber}"\><\/script>
-
     <script src="${settingsManager.installDirectory}js/objectManager.js?v=${settingsManager.versionNumber}"\><\/script>
+
+    <script src="${settingsManager.installDirectory}js/satSet.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/color-scheme.min.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/mobile.min.js?v=${settingsManager.versionNumber}"\><\/script>
   `);
@@ -534,7 +534,7 @@ if (!settingsManager.disableUI) {
         <div class="status-icon"></div>
       </div>
     `);
-            if (objectManager.isLaunchSiteManagerLoaded) {
+            if (!settingsManager.offline) {
                 numOfIcons++;
                 bottomIconsDivDOM.append(`
         <div id="menu-nextLaunch" class="bmenu-item">

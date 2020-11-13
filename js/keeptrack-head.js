@@ -19,8 +19,8 @@ const MOON_SCALAR_DISTANCE = 250000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.0.0';
-    settingsManager.versionDate = 'November 1, 2020';
+    settingsManager.versionNumber = '2.1.0';
+    settingsManager.versionDate = 'November 12, 2020';
 
     // Install Folder Settings
     {
@@ -41,6 +41,7 @@ const MOON_SCALAR_DISTANCE = 250000;
                 break;
             case '':
               settingsManager.offline = true;
+              settingsManager.breakTheLaw = true;
               settingsManager.installDirectory = './';
         }
         if (typeof settingsManager.installDirectory == 'undefined') {
@@ -387,6 +388,7 @@ const MOON_SCALAR_DISTANCE = 250000;
         $('#sat-infobox').css('background', 'LightCoral');
         $('#sat-infobox').css('border-color', 'DarkRed');
         $('#legend-hover-menu').css('background', 'LightCoral');
+        $('#bottom-icons').css('background', 'DarkRed');
         $('#legend-hover-menu').css('border-color', 'DarkRed');
         $('#colorbox').css('border', '10px solid DarkRed');
         // $('#search-results').css('cssText', 'background: LightCoral !important')
@@ -423,6 +425,7 @@ const MOON_SCALAR_DISTANCE = 250000;
         // $('#search-results:hover').css('background', '#172635')
         // $('#search-results').css('border-color', '#172635')
         $('#legend-hover-menu').css('background', '#1f3347');
+        $('#bottom-icons').css('background', '#1f3347');
         $('#legend-hover-menu').css('border-color', '#172635');
         $('#colorbox').css('border', '10px solid #172635');
         $('#sat-infobox').css('background', '#1f3347');
@@ -533,10 +536,12 @@ if (!settingsManager.disableUI) {
                     break;
                 case 'draw-less':
                     settingsManager.isDrawLess = true;
+                    settingsManager.noMeshManager = true;
                     settingsManager.smallImages = true;
                     break;
                 case 'draw-more':
                     settingsManager.isDrawLess = false;
+                    settingsManager.noMeshManager = false;
                     settingsManager.smallImages = false;
                     break;
                 case 'vec':

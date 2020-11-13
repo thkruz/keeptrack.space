@@ -302,7 +302,7 @@ function initializeKeepTrack() {
                         $('#logo-text').html('');
                         $('#logo-trusat').hide();
                         $('#loading-screen').hide();
-                        $('#loader-text').html('Attempting to Math...');                        
+                        $('#loader-text').html('Attempting to Math...');
                     }, 1500);
                 }
             }
@@ -326,6 +326,7 @@ function initializeKeepTrack() {
             satLinkManager.idToSatnum();
         })();
     });
+    rmManager.init();
     drawLoop(); // kick off the animationFrame()s
     if (!settingsManager.disableUI && !settingsManager.isDrawLess) {
       // Load Optional 3D models if available
@@ -1005,6 +1006,7 @@ function _drawScene() {
     }
     earth.draw(pMatrix, camMatrix);
     satSet.draw(pMatrix, camMatrix, drawNow);
+    rmManager.draw(pMatrix, camMatrix);
     orbitManager.draw(pMatrix, camMatrix);
 
     // Draw Satellite if Selected
@@ -2632,7 +2634,16 @@ function selectSat(satId) {
             objtype = 'Debris';
         }
         if (sat.OT === 4) {
-            objtype = 'Amateur Report';
+            objtype = 'Amateur Sat';
+        }
+        if (sat.OT === 5) {
+            objtype = 'Measurement';
+        }
+        if (sat.OT === 6) {
+            objtype = 'Radar Track';
+        }
+        if (sat.OT === 7) {
+            objtype = 'Radar Object';
         }
         if (sat.missile) {
             objtype = 'Ballistic Missile';
@@ -4388,8 +4399,10 @@ $(document).ready(function () {
                     settingsManager.hiresImages = false;
                     settingsManager.hiresNoCloudsImages = false;
                     settingsManager.vectorImages = false;
-                    localStorage.setItem('lastMap', 'nasa');
+                    localStorage.setItem('lastMap', 'blue');
                     earth.init();
+                    earth.loadHiRes();
+                    earth.loadHiResNight();
                     break;
                 case 'earth-nasa-rmb':
                     settingsManager.blueImages = false;
@@ -4401,6 +4414,8 @@ $(document).ready(function () {
                     settingsManager.vectorImages = false;
                     localStorage.setItem('lastMap', 'nasa');
                     earth.init();
+                    earth.loadHiRes();
+                    earth.loadHiResNight();
                     break;
                 case 'earth-trusat-rmb':
                     settingsManager.blueImages = false;
@@ -4412,6 +4427,8 @@ $(document).ready(function () {
                     settingsManager.vectorImages = false;
                     localStorage.setItem('lastMap', 'trusat');
                     earth.init();
+                    earth.loadHiRes();
+                    earth.loadHiResNight();
                     break;
                 case 'earth-low-rmb':
                     settingsManager.blueImages = false;
@@ -4423,6 +4440,8 @@ $(document).ready(function () {
                     settingsManager.vectorImages = false;
                     localStorage.setItem('lastMap', 'low');
                     earth.init();
+                    earth.loadHiRes();
+                    earth.loadHiResNight();
                     break;
                 case 'earth-high-rmb':
                     $('#loading-screen').fadeIn('slow', function () {
@@ -4435,6 +4454,8 @@ $(document).ready(function () {
                         settingsManager.vectorImages = false;
                         localStorage.setItem('lastMap', 'high');
                         earth.init();
+                        earth.loadHiRes();
+                        earth.loadHiResNight();
                         $('#loading-screen').fadeOut();
                     });
                     break;
@@ -4449,6 +4470,8 @@ $(document).ready(function () {
                         settingsManager.vectorImages = false;
                         localStorage.setItem('lastMap', 'high-nc');
                         earth.init();
+                        earth.loadHiRes();
+                        earth.loadHiResNight();
                         $('#loading-screen').fadeOut();
                     });
                     break;
@@ -4462,6 +4485,8 @@ $(document).ready(function () {
                     settingsManager.vectorImages = true;
                     localStorage.setItem('lastMap', 'vec');
                     earth.init();
+                    earth.loadHiRes();
+                    earth.loadHiResNight();
                     break;
                 case 'clear-screen-rmb':
                     (function clearScreenRMB() {

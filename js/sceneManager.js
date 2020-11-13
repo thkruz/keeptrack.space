@@ -169,6 +169,7 @@
                 img.src =
                     settingsManager.installDirectory +
                     'textures/earthmap512.jpg';
+
                 earth.loadHiRes = () => {
                   var imgHiRes = new Image();
                   imgHiRes.src =
@@ -1930,6 +1931,44 @@
       `,
         },
         {
+          name: 'dot-fragment-rm.glsl',
+          code: `
+          precision mediump float;
+
+          void main(void) {
+
+            vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
+
+            float r = (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0));
+            float alpha = (pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0));
+
+            alpha = min(alpha, 1.0);
+            gl_FragColor = vec4(1.0, 0.0, 1.0, alpha);
+          }
+        `,
+            },
+            {
+                name: 'dot-vertex-rm.glsl',
+                code: `
+            attribute vec3 aPos;
+
+            uniform mat4 uCamMatrix;
+            uniform mat4 uMvMatrix;
+            uniform mat4 uPMatrix;
+
+            void main(void) {
+              vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
+              float drawSize = 0.0;
+              float dist = distance(vec3(0.0, 0.0, 0.0),aPos.xyz);
+
+              drawSize = (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), 4.0 * 0.75), 80.0) * 1.0);
+
+              gl_PointSize = drawSize;
+              gl_Position = position;
+            }
+          `,
+        },
+        {
             name: 'pick-fragment.glsl',
             code:
                 'precision mediump float;\n\nvarying vec3 vColor;\n\nvoid main(void) {\n  gl_FragColor = vec4(vColor, 1.0);\n}',
@@ -1964,4 +2003,143 @@
     };
 
     window.shaderLoader = shaderLoader;
+})();
+
+(function () {
+  rmManager = {};
+  var dotShaderRm;
+  var vertShader;
+  var fragShader;
+
+  var rmData = [];
+
+  rmManager.draw = (pMatrix, camMatrix) => {
+      // NOTE: 640 byte leak.
+      if (!settingsManager.rmShadersReady)
+          return;
+
+      var i2 = rmManager.drawT1 * 3;
+      let now = timeManager.propTime() * 1;
+
+      var i;
+      for (i = rmManager.drawT1; i < rmData.length; i++) {
+        if (rmData[i].t < (now - 2000)) {
+          rmPos[i2] = 0;
+          rmPos[i2 + 1] = 0;
+          rmPos[i2 + 2] = 0;
+          i2 += 3;
+          rmManager.drawT1 = i;
+          // Between -2 seconds and + 2 seconds
+        } else if (rmData[i].t >= (now - 2000) && rmData[i].t <= (now + 2000)) {
+          rmPos[i2] = rmData[i].x;
+          rmPos[i2 + 1] = rmData[i].y;
+          rmPos[i2 + 2] = rmData[i].z;
+          i2 += 3;
+        } else if (rmData[i].t > (now + 2000)) {
+          break;
+        }
+      }
+
+      // gl.bindVertexArray(satSet.vao);
+
+      gl.useProgram(dotShaderRm);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+      gl.uniformMatrix4fv(dotShaderRm.uMvMatrix, false, emptyMat4);
+      gl.uniformMatrix4fv(dotShaderRm.uCamMatrix, false, camMatrix);
+      gl.uniformMatrix4fv(dotShaderRm.uPMatrix, false, pMatrix);
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, rmPosBuf);
+      gl.bufferData(gl.ARRAY_BUFFER, rmPos, gl.STREAM_DRAW);
+      gl.vertexAttribPointer(dotShaderRm.aPos, 3, gl.FLOAT, false, 0, 0);
+
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      gl.enable(gl.BLEND);
+      gl.depthMask(false);
+
+      gl.drawArrays(gl.POINTS, 0, rmData.length);
+
+      gl.depthMask(true);
+      gl.disable(gl.BLEND);
+
+      // Done Drawing
+      return true;
+  };
+
+  rmManager.init = () => {
+    $.getScript('rmData/rmData.txt', function (resp) {
+        rmManager.setup(resp);
+    });
+  };
+
+  rmManager.findFirstRmTime = (rmData) => {
+    let now = Date.now();
+    for (var i = 0; i < rmData.length; i++) {
+      if (rmData[i].t > now) {
+        return i;
+      }
+    }
+    console.log('Fail');
+  };
+
+  rmManager.setup = (resp) => {
+      db.log('rmManager.init');
+
+      rmData = JSON.parse(resp);
+
+      // Make New Vertex Array Objects
+      // satSet.vao = gl.createVertexArray();
+      // gl.bindVertexArray(satSet.vao);
+
+      dotShaderRm = gl.createProgram();
+
+      vertShader = gl.createShader(gl.VERTEX_SHADER);
+      gl.shaderSource(
+          vertShader,
+          shaderLoader.getShaderCode('dot-vertex-rm.glsl')
+      );
+      gl.compileShader(vertShader);
+
+      fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+      gl.shaderSource(
+          fragShader,
+          shaderLoader.getShaderCode('dot-fragment-rm.glsl')
+      );
+      gl.compileShader(fragShader);
+
+      gl.attachShader(dotShaderRm, vertShader);
+      gl.attachShader(dotShaderRm, fragShader);
+      gl.linkProgram(dotShaderRm);
+
+      dotShaderRm.aPos = gl.getAttribLocation(dotShaderRm, 'aPos');
+      dotShaderRm.uMvMatrix = gl.getUniformLocation(dotShaderRm, 'uMvMatrix');
+      dotShaderRm.uCamMatrix = gl.getUniformLocation(dotShaderRm, 'uCamMatrix');
+      dotShaderRm.uPMatrix = gl.getUniformLocation(dotShaderRm, 'uPMatrix');
+
+      // populate GPU mem buffers, now that we know how many sats there are
+      rmPosBuf = gl.createBuffer();
+      rmPos = new Float32Array(rmData.length * 3);
+
+      rmManager.drawT1 = rmManager.findFirstRmTime(rmData);
+
+      settingsManager.rmShadersReady = true;
+  };
+
+  rmManager.createFakeData = () => {
+    let fakeData = [];
+    let now = Date.now();
+    for (var i = 0; i < (1440 * 60); i++) {
+      fakeData.push(
+        {
+          t: now + i * 1000,
+          x: 6700 + (Math.random() * 2000),
+          y: 6700 + (Math.random() * 2000),
+          z: 6700 + (Math.random() * 2000),
+        }
+      )
+    }
+    return fakeData;
+  }
+
+  window.rmManager = rmManager;
 })();

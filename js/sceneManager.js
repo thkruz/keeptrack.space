@@ -1225,6 +1225,7 @@
             sun.loaded = true;
         };
 
+        let sunMaxDist;
         sun.draw = function (pMatrix, camMatrix) {
             if (!sun.loaded) return;
 
@@ -1232,7 +1233,7 @@
             // gl.bindVertexArray(sun.vao);
 
             sun.realXyz = sun.getXYZ();
-            let sunMaxDist = Math.max(
+            sunMaxDist = Math.max(
                 Math.max(Math.abs(sun.realXyz.x), Math.abs(sun.realXyz.y)),
                 Math.abs(sun.realXyz.z)
             );
@@ -2006,140 +2007,62 @@
 })();
 
 (function () {
-  rmManager = {};
+  radarDataManager = {};
   var dotShaderRm;
   var vertShader;
   var fragShader;
 
-  var rmData = [];
+  radarDataManager.radarData = [];
+  radarDataManager.drawT1 = 0;
 
-  rmManager.draw = (pMatrix, camMatrix) => {
-      // NOTE: 640 byte leak.
-      if (!settingsManager.rmShadersReady)
-          return;
-
-      var i2 = rmManager.drawT1 * 3;
-      let now = timeManager.propTime() * 1;
-
-      var i;
-      for (i = rmManager.drawT1; i < rmData.length; i++) {
-        if (rmData[i].t < (now - 2000)) {
-          rmPos[i2] = 0;
-          rmPos[i2 + 1] = 0;
-          rmPos[i2 + 2] = 0;
-          i2 += 3;
-          rmManager.drawT1 = i;
-          // Between -2 seconds and + 2 seconds
-        } else if (rmData[i].t >= (now - 2000) && rmData[i].t <= (now + 2000)) {
-          rmPos[i2] = rmData[i].x;
-          rmPos[i2 + 1] = rmData[i].y;
-          rmPos[i2 + 2] = rmData[i].z;
-          i2 += 3;
-        } else if (rmData[i].t > (now + 2000)) {
-          break;
-        }
-      }
-
-      // gl.bindVertexArray(satSet.vao);
-
-      gl.useProgram(dotShaderRm);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-      gl.uniformMatrix4fv(dotShaderRm.uMvMatrix, false, emptyMat4);
-      gl.uniformMatrix4fv(dotShaderRm.uCamMatrix, false, camMatrix);
-      gl.uniformMatrix4fv(dotShaderRm.uPMatrix, false, pMatrix);
-
-      gl.bindBuffer(gl.ARRAY_BUFFER, rmPosBuf);
-      gl.bufferData(gl.ARRAY_BUFFER, rmPos, gl.STREAM_DRAW);
-      gl.vertexAttribPointer(dotShaderRm.aPos, 3, gl.FLOAT, false, 0, 0);
-
-      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-      gl.enable(gl.BLEND);
-      gl.depthMask(false);
-
-      gl.drawArrays(gl.POINTS, 0, rmData.length);
-
-      gl.depthMask(true);
-      gl.disable(gl.BLEND);
-
-      // Done Drawing
-      return true;
-  };
-
-  rmManager.init = () => {
-    $.getScript('rmData/rmData.txt', function (resp) {
-        rmManager.setup(resp);
+  radarDataManager.init = () => {
+    $.getScript('radarData/radarData.json', function (resp) {
+        radarDataManager.setup(resp);
     });
   };
 
-  rmManager.findFirstRmTime = (rmData) => {
+  radarDataManager.findFirstDataTime = () => {
     let now = Date.now();
-    for (var i = 0; i < rmData.length; i++) {
-      if (rmData[i].t > now) {
+    for (let i = 0; i < radarDataManager.radarData.length; i++) {
+      if (radarDataManager.radarData[i].t > now - 3000) {
         return i;
       }
     }
-    console.log('Fail');
   };
 
-  rmManager.setup = (resp) => {
-      db.log('rmManager.init');
-
-      rmData = JSON.parse(resp);
-
-      // Make New Vertex Array Objects
-      // satSet.vao = gl.createVertexArray();
-      // gl.bindVertexArray(satSet.vao);
-
-      dotShaderRm = gl.createProgram();
-
-      vertShader = gl.createShader(gl.VERTEX_SHADER);
-      gl.shaderSource(
-          vertShader,
-          shaderLoader.getShaderCode('dot-vertex-rm.glsl')
-      );
-      gl.compileShader(vertShader);
-
-      fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-      gl.shaderSource(
-          fragShader,
-          shaderLoader.getShaderCode('dot-fragment-rm.glsl')
-      );
-      gl.compileShader(fragShader);
-
-      gl.attachShader(dotShaderRm, vertShader);
-      gl.attachShader(dotShaderRm, fragShader);
-      gl.linkProgram(dotShaderRm);
-
-      dotShaderRm.aPos = gl.getAttribLocation(dotShaderRm, 'aPos');
-      dotShaderRm.uMvMatrix = gl.getUniformLocation(dotShaderRm, 'uMvMatrix');
-      dotShaderRm.uCamMatrix = gl.getUniformLocation(dotShaderRm, 'uCamMatrix');
-      dotShaderRm.uPMatrix = gl.getUniformLocation(dotShaderRm, 'uPMatrix');
-
-      // populate GPU mem buffers, now that we know how many sats there are
-      rmPosBuf = gl.createBuffer();
-      rmPos = new Float32Array(rmData.length * 3);
-
-      rmManager.drawT1 = rmManager.findFirstRmTime(rmData);
-
-      settingsManager.rmShadersReady = true;
+  radarDataManager.setup = (resp) => {
+      db.log('radarDataManager.init');
+      radarDataManager.radarData = JSON.parse(resp);
+      satSet.updateRadarData();
+      settingsManager.radarDataReady = true;
   };
 
-  rmManager.createFakeData = () => {
+  radarDataManager.createFakeData = () => {
     let fakeData = [];
     let now = Date.now();
-    for (var i = 0; i < (1440 * 60); i++) {
-      fakeData.push(
-        {
-          t: now + i * 1000,
-          x: 6700 + (Math.random() * 2000),
-          y: 6700 + (Math.random() * 2000),
-          z: 6700 + (Math.random() * 2000),
-        }
-      )
+    // Generates 1 Hour of 10x ~56ms data
+    let k = 0;
+    for (var i = 0; i < (60 * 60 * 1000); i+=56) {
+      for (let j = 0; j < 1; j++) {
+        // Most in surveillance
+        let el = 2 + (Math.random() * 2);
+        if (k < 2) el = 2 + (Math.random() * 83);
+        k++;
+        if (k == 10) k = 0;
+        fakeData.push(
+          {
+            t: now + i,
+            name: `Radar Measurement ${(Math.round(Math.random() * 100000))}`,
+            dataType: 1,
+            r: 150 + (Math.random() * 5556),
+            a: -18 + (Math.random() * 240),
+            e: el,
+          }
+        )
+      }
     }
     return fakeData;
   }
 
-  window.rmManager = rmManager;
+  window.radarDataManager = radarDataManager;
 })();

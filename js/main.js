@@ -6,7 +6,7 @@
 main.js is the primary javascript file for keeptrack.space. It manages all user
 interaction with the application.
 http://keeptrack.space
-
+.
 Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
 under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
 
@@ -326,7 +326,7 @@ function initializeKeepTrack() {
             satLinkManager.idToSatnum();
         })();
     });
-    rmManager.init();
+    radarDataManager.init();
     drawLoop(); // kick off the animationFrame()s
     if (!settingsManager.disableUI && !settingsManager.isDrawLess) {
       // Load Optional 3D models if available
@@ -1006,7 +1006,6 @@ function _drawScene() {
     }
     earth.draw(pMatrix, camMatrix);
     satSet.draw(pMatrix, camMatrix, drawNow);
-    rmManager.draw(pMatrix, camMatrix);
     orbitManager.draw(pMatrix, camMatrix);
 
     // Draw Satellite if Selected
@@ -1845,6 +1844,32 @@ function _hoverBoxOnSat(satId, satX, satY) {
                     satellite.distance(sat, objectManager.selectedSatData) +
                     '';
                 satHoverBoxNode3.textContent = '';
+            } else if (sat.isRadarData) {
+                satHoverBoxNode1.textContent = sat.name;
+                if (typeof sat.rae == 'undefined' && sensorManager.currentSensor !== sensorManager.defaultSensor) {
+                  sat.rae = satellite.eci2Rae(sat.t,sat,sensorManager.currentSensor);
+                  sat.setRAE(sat.rae);
+                }
+                if (sensorManager.currentSensor !== sensorManager.defaultSensor) {
+                  satHoverBoxNode2.innerHTML =
+                    new Date(sat.t).toISOString() +
+                    '</br>' +
+                      'R: ' +
+                      sat.rae.range.toFixed(2) +
+                      ' A: ' +
+                      sat.rae.az.toFixed(2) +
+                      ' E: ' +
+                      sat.rae.el.toFixed(2);
+                } else {
+                  satHoverBoxNode2.innerHTML = new Date(sat.t).toISOString();
+                }
+                satHoverBoxNode3.innerHTML =
+                    'X: ' +
+                    sat.position.x.toFixed(2) +
+                    ' Y: ' +
+                    sat.position.y.toFixed(2) +
+                    ' Z: ' +
+                    sat.position.z.toFixed(2);
             } else if (sat.type === 'Control Facility') {
                 satHoverBoxNode1.textContent = sat.name;
                 satHoverBoxNode2.innerHTML =

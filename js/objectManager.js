@@ -7,6 +7,7 @@
     objectManager.hoveringSat = -1;
     var sensorList;
     objectManager.missileSet = [];
+    objectManager.radarDataSet = [];
     objectManager.analSatSet = [];
     objectManager.staticSet = [];
     objectManager.fieldOfViewSet = [];
@@ -18,9 +19,7 @@
     }
 
     objectManager.init = function () {
-        var i;
-        var maxMissiles = settingsManager.maxMissiles;
-        for (i = 0; i < maxMissiles; i++) {
+        for (let i = 0; i < settingsManager.maxMissiles; i++) {
             var missileInfo = {
                 static: false,
                 missile: true,
@@ -33,6 +32,18 @@
                 timeList: [],
             };
             objectManager.missileSet.push(missileInfo);
+        }
+
+        for (let i = 0; i < settingsManager.maxRadarData; i++) {
+            var radarDataInfo = {
+                static: true,
+                missile: false,
+                active: false,
+                isRadarData: true,
+                type: '',
+                name: `Radar Data ${i}`,
+            };
+            objectManager.radarDataSet.push(radarDataInfo);
         }
 
         var maxAnalystSats = settingsManager.maxAnalystSats;

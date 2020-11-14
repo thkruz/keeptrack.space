@@ -19,8 +19,8 @@ const MOON_SCALAR_DISTANCE = 250000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.1.0';
-    settingsManager.versionDate = 'November 12, 2020';
+    settingsManager.versionNumber = '2.2.0';
+    settingsManager.versionDate = 'November 14, 2020';
 
     // Install Folder Settings
     {
@@ -34,6 +34,8 @@ const MOON_SCALAR_DISTANCE = 250000;
                 // Comment Out the Next Two Lines if you are testing on a local server
                 // and have the keeptrack files installed in a subdirectory
                 settingsManager.installDirectory = '/';
+                settingsManager.offline = true;
+                settingsManager.breakTheLaw = true;
                 break;
             case 'thkruz.github.io':
             case 'www.thkruz.github.io':
@@ -233,10 +235,10 @@ const MOON_SCALAR_DISTANCE = 250000;
     );
     if (
         settingsManager.colors == null ||
-        settingsManager.colors.version !== '1.0.2'
+        settingsManager.colors.version !== '1.0.3'
     ) {
         settingsManager.colors = {};
-        settingsManager.colors.version = '1.0.2';
+        settingsManager.colors.version = '1.0.3';
         settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
         settingsManager.colors.starHi = [1.0, 1.0, 1.0, 1.0];
         settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.35];
@@ -265,6 +267,7 @@ const MOON_SCALAR_DISTANCE = 250000;
         settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
         settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
         settingsManager.colors.inviewAlt = [0.2, 0.4, 1.0, 1];
+        settingsManager.colors.radarData = [0.2, 1.0, 0.8, 1.0];
         settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
         settingsManager.colors.rocketBody = [0.2, 0.4, 1.0, 1];
         if (settingsManager.trusatOnly) {
@@ -358,6 +361,7 @@ const MOON_SCALAR_DISTANCE = 250000;
     settingsManager.isAlwaysHidePropRate = false;
 
     settingsManager.maxFieldOfViewMarkers = 105000;
+    settingsManager.maxRadarData = 70000;
     settingsManager.maxMissiles = 500;
     settingsManager.maxAnalystSats = 256;
 
@@ -475,6 +479,8 @@ const MOON_SCALAR_DISTANCE = 250000;
     if (settingsManager.enableLimitedUI) {
         settingsManager.zFar = 150000;
     }
+
+    settingsManager.legendMenuOpen = false;
 
     settingsManager.limitSats = '';
     settingsManager.geolocation = {};

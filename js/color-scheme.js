@@ -19,35 +19,39 @@
     };
 
     ColorScheme.objectTypeFlags = {};
-    ColorScheme.objectTypeFlags.payload = true;
-    ColorScheme.objectTypeFlags.rocketBody = true;
-    ColorScheme.objectTypeFlags.debris = true;
-    ColorScheme.objectTypeFlags.facility = true;
-    ColorScheme.objectTypeFlags.sensor = true;
-    ColorScheme.objectTypeFlags.missile = true;
-    ColorScheme.objectTypeFlags.trusat = true;
-    ColorScheme.objectTypeFlags.inFOV = true;
-    ColorScheme.objectTypeFlags.inviewAlt = true;
-    ColorScheme.objectTypeFlags.starLow = true;
-    ColorScheme.objectTypeFlags.starMed = true;
-    ColorScheme.objectTypeFlags.starHi = true;
-    ColorScheme.objectTypeFlags.satLEO = true;
-    ColorScheme.objectTypeFlags.satGEO = true;
-    ColorScheme.objectTypeFlags.satLow = true;
-    ColorScheme.objectTypeFlags.satMed = true;
-    ColorScheme.objectTypeFlags.satHi = true;
-    ColorScheme.objectTypeFlags.satSmall = true;
-    ColorScheme.objectTypeFlags.rcsSmall = true;
-    ColorScheme.objectTypeFlags.rcsMed = true;
-    ColorScheme.objectTypeFlags.rcsLarge = true;
-    ColorScheme.objectTypeFlags.rcsUnknown = true;
-    ColorScheme.objectTypeFlags.velocitySlow = true;
-    ColorScheme.objectTypeFlags.velocityMed = true;
-    ColorScheme.objectTypeFlags.velocityFast = true;
-    ColorScheme.objectTypeFlags.ageNew = true;
-    ColorScheme.objectTypeFlags.ageMed = true;
-    ColorScheme.objectTypeFlags.ageOld = true;
-    ColorScheme.objectTypeFlags.ageLost = true;
+    ColorScheme.resetObjectTypeFlags = () => {
+      ColorScheme.objectTypeFlags.payload = true;
+      ColorScheme.objectTypeFlags.radarData = true;
+      ColorScheme.objectTypeFlags.rocketBody = true;
+      ColorScheme.objectTypeFlags.debris = true;
+      ColorScheme.objectTypeFlags.facility = true;
+      ColorScheme.objectTypeFlags.sensor = true;
+      ColorScheme.objectTypeFlags.missile = true;
+      ColorScheme.objectTypeFlags.trusat = true;
+      ColorScheme.objectTypeFlags.inFOV = true;
+      ColorScheme.objectTypeFlags.inviewAlt = true;
+      ColorScheme.objectTypeFlags.starLow = true;
+      ColorScheme.objectTypeFlags.starMed = true;
+      ColorScheme.objectTypeFlags.starHi = true;
+      ColorScheme.objectTypeFlags.satLEO = true;
+      ColorScheme.objectTypeFlags.satGEO = true;
+      ColorScheme.objectTypeFlags.satLow = true;
+      ColorScheme.objectTypeFlags.satMed = true;
+      ColorScheme.objectTypeFlags.satHi = true;
+      ColorScheme.objectTypeFlags.satSmall = true;
+      ColorScheme.objectTypeFlags.rcsSmall = true;
+      ColorScheme.objectTypeFlags.rcsMed = true;
+      ColorScheme.objectTypeFlags.rcsLarge = true;
+      ColorScheme.objectTypeFlags.rcsUnknown = true;
+      ColorScheme.objectTypeFlags.velocitySlow = true;
+      ColorScheme.objectTypeFlags.velocityMed = true;
+      ColorScheme.objectTypeFlags.velocityFast = true;
+      ColorScheme.objectTypeFlags.ageNew = true;
+      ColorScheme.objectTypeFlags.ageMed = true;
+      ColorScheme.objectTypeFlags.ageOld = true;
+      ColorScheme.objectTypeFlags.ageLost = true;
+    }
+    ColorScheme.resetObjectTypeFlags();
 
     // Removed from function to reduce memory leak
     ColorScheme.prototype.calculateColorBuffers = function (
@@ -242,6 +246,19 @@
                         pickable: false,
                     };
                 }
+            }
+
+            if (sat.isRadarData && !ColorScheme.objectTypeFlags.radarData) {
+                return {
+                    color: colorTheme.deselected,
+                    pickable: false,
+                };
+            }
+            if (sat.isRadarData) {
+                return {
+                    color: colorTheme.radarData,
+                    pickable: true,
+                };
             }
 
             if (sat.static && ColorScheme.objectTypeFlags.sensor === false) {

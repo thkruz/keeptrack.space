@@ -1865,6 +1865,30 @@ or mirrored at any other location without the express written permission of the 
         return { az: azimuth, el: elevation, range: range };
     };
 
+    satellite.eci2Rae = (now, eci, sensor) => {
+        now = new Date(now);
+        let j = _jday(
+            now.getUTCFullYear(),
+            now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+            now.getUTCDate(),
+            now.getUTCHours(),
+            now.getUTCMinutes(),
+            now.getUTCSeconds()
+        ); // Converts time to jday (TLEs use epoch year/day)
+        j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+        let gmst = satellite.gstime(j);
+
+        let positionEcf = satellite.eciToEcf(eci.position, gmst); // positionEci.position is called positionEci originally
+        let lookAngles = satellite.ecfToLookAngles(
+            sensor.observerGd,
+            positionEcf
+        );
+        azimuth = lookAngles.azimuth * RAD2DEG;
+        elevation = lookAngles.elevation * RAD2DEG;
+        range = lookAngles.rangeSat;
+        return { az: azimuth, el: elevation, range: range };
+    };
+
     satellite.getEci = (sat, propTime) => {
         let j = _jday(
             propTime.getUTCFullYear(),

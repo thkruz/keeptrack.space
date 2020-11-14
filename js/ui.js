@@ -1251,13 +1251,15 @@ var speedModifier = 1;
             });
 
             $('#legend-menu').on('click', function () {
-                if ($('#legend-hover-menu').css('display') === 'block') {
+                if (settingsManager.legendMenuOpen) {
                     $('#legend-hover-menu').hide();
+                    settingsManager.legendMenuOpen = false;
                 } else {
-                    uiManager.legendColorsChange();
+                    // uiManager.legendColorsChange(); // Disabled colors show up again.
                     $('#legend-hover-menu').show();
                     searchBox.hideResults();
                     $('#search-results').hide();
+                    settingsManager.legendMenuOpen = true;
                 }
             });
 
@@ -5689,6 +5691,9 @@ var speedModifier = 1;
 
     uiManager.legendColorsChange = function () {
         db.log('uiManager.legendColorsChange');
+
+        ColorScheme.resetObjectTypeFlags();
+
         $('.legend-payload-box').css(
             'background',
             _rgbCSS(settingsManager.colors.payload)

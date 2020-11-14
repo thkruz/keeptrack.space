@@ -831,6 +831,13 @@ var emptyMat4 = mat4.create();
           objectManager.analSatSet[i].id = tempSatData.length;
           tempSatData.push(objectManager.analSatSet[i]);
         }
+
+        radarDataManager.satDataStartIndex = tempSatData.length + 1;
+
+        for (let i = 0; i < objectManager.radarDataSet.length; i++) {
+          tempSatData.push(objectManager.radarDataSet[i]);
+        }
+
         for (i = 0; i < objectManager.missileSet.length; i++) {
           tempSatData.push(objectManager.missileSet[i]);
         }
@@ -1168,11 +1175,59 @@ var emptyMat4 = mat4.create();
         return starArray;
     };
 
+    satSet.updateRadarData = () => {
+      for (let i = 0; i < radarDataManager.radarData.length; i++) {
+        try {
+          satData[radarDataManager.satDataStartIndex + i].name = radarDataManager.radarData[i].name;
+          satData[radarDataManager.satDataStartIndex + i].t = radarDataManager.radarData[i].t;
+          satData[radarDataManager.satDataStartIndex + i].dataType = radarDataManager.radarData[i].dataType;
+        } catch (e) {
+          // console.log(radarDataManager.radarData[i]);
+        }
+      }
+    };
+
     var screenLocation = [];
+    let drawPropTime,isDidOnce;
     satSet.draw = (pMatrix, camMatrix, drawNow) => {
         // NOTE: 640 byte leak.
         if (!settingsManager.shadersReady || !settingsManager.cruncherReady)
             return;
+
+        drawPropTime = timeManager.propTime() * 1;
+        if (radarDataManager.radarData.length > 0) {
+          if (radarDataManager.drawT1 == 0) radarDataManager.findFirstDataTime();
+
+          isDidOnce = false;
+          for (drawI = radarDataManager.drawT1; drawI < radarDataManager.radarData.length; drawI++) {
+            // Don't Exceed Max Radar Data Allocation
+            // if (drawI > settingsManager.maxRadarData) break;
+
+            if (radarDataManager.radarData[drawI].t >= (drawPropTime - 3000) && radarDataManager.radarData[drawI].t <= (drawPropTime + 3000)) {
+              if (!isDidOnce) {
+                radarDataManager.drawT1 = drawI;
+                isDidOnce = true;
+              }
+              // Skip if Already done
+              if (satPos[(radarDataManager.satDataStartIndex + drawI) * 3] !== 0) continue;
+
+              // Update Radar Marker Position
+              satPos[(radarDataManager.satDataStartIndex + drawI) * 3] = radarDataManager.radarData[drawI].x;
+              satPos[(radarDataManager.satDataStartIndex + drawI) * 3 + 1] = radarDataManager.radarData[drawI].y;
+              satPos[(radarDataManager.satDataStartIndex + drawI) * 3 + 2] = radarDataManager.radarData[drawI].z;
+              // NOTE: satVel could be added later
+            } else {
+              // Reset all positions outside time window
+              satPos[(radarDataManager.satDataStartIndex + drawI) * 3] = 0;
+              satPos[(radarDataManager.satDataStartIndex + drawI) * 3 + 1] = 0;
+              satPos[(radarDataManager.satDataStartIndex + drawI) * 3 + 2] = 0;
+            }
+
+            if (radarDataManager.radarData[drawI].t > (drawPropTime + 3000)) {
+              break;
+            }
+          }
+        }
 
         // gl.bindVertexArray(satSet.vao);
 
@@ -1189,18 +1244,15 @@ var emptyMat4 = mat4.create();
                 !settingsManager.isFOVBubbleModeOn
             ) {
                 satSet.satDataLenInDraw -=
-                    settingsManager.maxFieldOfViewMarkers;
-                for (drawI = 0; drawI < satSet.satDataLenInDraw * 3; drawI++) {
-                    if (satVel[drawI] != 0) {
-                        satPos[drawI] += satVel[drawI] * drawDt;
-                    }
+                    (settingsManager.maxFieldOfViewMarkers + settingsManager.maxRadarData);
+                satSet.satDataLenInDraw3 = satSet.satDataLenInDraw * 3;
+                for (drawI = 0; drawI < satSet.satDataLenInDraw3; drawI++) {
+                    satPos[drawI] += satVel[drawI] * drawDt;
                 }
             } else {
-                satSet.satDataLenInDraw *= 3;
-                for (drawI = 0; drawI < satSet.satDataLenInDraw; drawI++) {
-                    if (satVel[drawI] != 0) {
-                        satPos[drawI] += satVel[drawI] * drawDt;
-                    }
+                satSet.satDataLenInDraw3 = satSet.satDataLenInDraw * 3;
+                for (drawI = 0; drawI < satSet.satDataLenInDraw3; drawI++) {
+                    satPos[drawI] += satVel[drawI] * drawDt;
                 }
             }
             lastDrawTime = drawNow;
@@ -1476,6 +1528,11 @@ var emptyMat4 = mat4.create();
 
                 // if (!isUmbral && !isPenumbral) isSun = true;
                 return 2;
+            };
+        }
+        if (typeof satData[i].setRAE == 'undefined') {
+            satData[i].setRAE = (rae) => {
+                satData[i].rae = rae;
             };
         }
         if (typeof satData[i].getAltitude == 'undefined') {

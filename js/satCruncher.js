@@ -183,7 +183,7 @@ onmessage = function (m) {
             while (i < len) {
                 extra = {};
                 satrec = null;
-                if (satData[i].static || satData[i].missile) {
+                if (satData[i].static || satData[i].missile || satData[i].isRadarData) {
                     satrec = satData[i];
                     extraData.push(extra);
                     satCache.push(satrec);
@@ -679,6 +679,16 @@ function propagateCruncher() {
                     }
                 }
             }
+        } else if (satCache[i].isRadarData) {
+          if (satCache[i].skip) continue;
+          satCache[i].skip = true;
+          satPos[i * 3] = 0;
+          satPos[i * 3 + 1] = 0;
+          satPos[i * 3 + 2] = 0;
+
+          satVel[i * 3] = 0;
+          satVel[i * 3 + 1] = 0;
+          satVel[i * 3 + 2] = 0;
         } else if (satCache[i].static && !satCache[i].marker) {
             if (satCache[i].type == 'Star') {
                 // INFO: 0 Latitude returns upside down results. Using 180 looks right, but more verification needed.

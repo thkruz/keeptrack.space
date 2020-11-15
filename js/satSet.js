@@ -203,9 +203,12 @@ var emptyMat4 = mat4.create();
             satSet.onCruncherReady();
             if (!settingsManager.disableUI) {
               (function _reloadLastSensor() {
-                  let currentSensor = !settingsManager.offline
-                      ? JSON.parse(localStorage.getItem('currentSensor'))
-                      : null;
+                  let currentSensor;
+                  try {
+                    currentSensor = JSON.parse(localStorage.getItem('currentSensor'));
+                  } catch (e) {
+                    currentSensor = null;
+                  }
                   if (currentSensor !== null) {
                       try {
                           // If there is a staticnum set use that
@@ -245,9 +248,12 @@ var emptyMat4 = mat4.create();
                   }
               })();
               (function _watchlistInit() {
-                  let watchlistJSON = !settingsManager.offline
-                      ? localStorage.getItem('watchlistList')
-                      : null;
+                  let watchlistJSON
+                  try {
+                    watchlistJSON = localStorage.getItem('watchlistList');
+                  } catch (e) {
+                    watchlistJSON = null;
+                  }
                   if (watchlistJSON !== null) {
                       let newWatchlist = JSON.parse(watchlistJSON);
                       watchlistInViewList = [];
@@ -709,6 +715,8 @@ var emptyMat4 = mat4.create();
             if (!isMatchFound) {
               if (satelliteList[s].TLE1 == undefined) continue; // Don't Process Bad Satellite Information
               if (satelliteList[s].TLE2 == undefined) continue; // Don't Process Bad Satellite Information
+              settingsManager.isExtraSatellitesAdded = true;
+
               if (typeof satelliteList[s].ON == 'undefined') {
                 satelliteList[s].ON = 'Unknown';
               }
@@ -751,6 +759,7 @@ var emptyMat4 = mat4.create();
         ) {
           // If extra catalogue
           for (s = 0; s < satInfoList.length; s++) {
+            settingsManager.isExtraSatellitesAdded = true;
             isMatchFound = false;
             // NOTE i=s may need to be i=0, but this should be more effecient.
             // There should be some sorting done earlier
@@ -817,6 +826,16 @@ var emptyMat4 = mat4.create();
             tempSatData.push(extrasSatInfo);
           }
           trusatList = null;
+        }
+
+        if (settingsManager.isExtraSatellitesAdded) {
+          $('.legend-pink-box').show();
+          $('.legend-trusat-box')[1].parentElement.style.display = "";
+          $('.legend-trusat-box')[2].parentElement.style.display = "";
+          $('.legend-trusat-box')[3].parentElement.style.display = "";
+          $('.legend-trusat-box')[1].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
+          $('.legend-trusat-box')[2].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
+          $('.legend-trusat-box')[3].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
         }
 
         satSet.orbitalSats = tempSatData.length;
@@ -1180,6 +1199,9 @@ var emptyMat4 = mat4.create();
         try {
           satData[radarDataManager.satDataStartIndex + i].name = radarDataManager.radarData[i].name;
           satData[radarDataManager.satDataStartIndex + i].t = radarDataManager.radarData[i].t;
+          satData[radarDataManager.satDataStartIndex + i].rcs = radarDataManager.radarData[i].rc;
+          satData[radarDataManager.satDataStartIndex + i].azError = radarDataManager.radarData[i].ae;
+          satData[radarDataManager.satDataStartIndex + i].elError = radarDataManager.radarData[i].ee;
           satData[radarDataManager.satDataStartIndex + i].dataType = radarDataManager.radarData[i].dataType;
         } catch (e) {
           // console.log(radarDataManager.radarData[i]);

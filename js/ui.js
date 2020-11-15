@@ -4632,6 +4632,7 @@ var speedModifier = 1;
                 if (i !== watchlistList.length - 1) watchlistString += ',';
             }
             searchBox.doSearch(watchlistString, true);
+            satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 
             var saveWatchlist = [];
             for (i = 0; i < watchlistList.length; i++) {
@@ -4639,9 +4640,7 @@ var speedModifier = 1;
                 saveWatchlist[i] = sat.SCC_NUM;
             }
             var variable = JSON.stringify(saveWatchlist);
-            if (!settingsManager.offline) {
-                localStorage.setItem('watchlistList', variable);
-            }
+            localStorage.setItem('watchlistList', variable);
         };
 
         var isCurrentlyTyping = false;
@@ -5718,13 +5717,12 @@ var speedModifier = 1;
             'background',
             _rgbCSS(settingsManager.colors.sensor)
         );
-        if (settingsManager.trusatMode) {
+        if (settingsManager.trusatMode || settingsManager.isExtraSatellitesAdded) {
             $('.legend-trusat-box').css(
                 'background',
                 _rgbCSS(settingsManager.colors.trusat)
             );
         } else {
-            $('.legend-trusat-box')[0].parentElement.style.display = "none";
             $('.legend-trusat-box')[1].parentElement.style.display = "none";
             $('.legend-trusat-box')[2].parentElement.style.display = "none";
             $('.legend-trusat-box')[3].parentElement.style.display = "none";

@@ -2045,6 +2045,7 @@
     for (var i = 0; i < (60 * 60 * 1000); i+=56) {
       for (let j = 0; j < 1; j++) {
         // Most in surveillance
+        let az = -18 + (Math.random() * 240);
         let el = 2 + (Math.random() * 2);
         if (k < 2) el = 2 + (Math.random() * 83);
         k++;
@@ -2055,8 +2056,11 @@
             name: `Radar Measurement ${(Math.round(Math.random() * 100000))}`,
             dataType: 1,
             r: 150 + (Math.random() * 5556),
-            a: -18 + (Math.random() * 240),
+            a: az,
             e: el,
+            ae: Math.random() * 3,
+            ee: Math.random() * 3,
+            rc: (Math.random() * 40) / 10,
           }
         )
       }

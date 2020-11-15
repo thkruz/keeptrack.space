@@ -67,9 +67,7 @@ or mirrored at any other location without the express written permission of the 
     var curFocusDOM;
     $(document).ready(function () {
         // Code Once index.htm is loaded
-        var wasAdviceEnabled = !settingsManager.offline
-            ? localStorage.getItem('isAdviceEnabled')
-            : null;
+        var wasAdviceEnabled = localStorage.getItem('isAdviceEnabled');
         if (wasAdviceEnabled == 'true' || wasAdviceEnabled == null) {
             adviceManager.on();
             adviceList.welcome();
@@ -599,16 +597,12 @@ or mirrored at any other location without the express written permission of the 
         return isAdviceEnabled;
     };
     adviceManager.on = function () {
-        if (!settingsManager.offline) {
-            localStorage.setItem('isAdviceEnabled', true);
-        }
+        localStorage.setItem('isAdviceEnabled', true);
         isAdviceEnabled = true;
         tutIconDOM.addClass('bmenu-item-selected');
     };
     adviceManager.off = function () {
-        if (!settingsManager.offline) {
-            localStorage.setItem('isAdviceEnabled', false);
-        }
+        localStorage.setItem('isAdviceEnabled', false);
         isAdviceEnabled = false;
         helpDOM.hide();
         tutIconDOM.removeClass('bmenu-item-selected');

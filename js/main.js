@@ -1861,15 +1861,17 @@ function _hoverBoxOnSat(satId, satX, satY) {
                       ' E: ' +
                       sat.rae.el.toFixed(2);
                 } else {
-                  satHoverBoxNode2.innerHTML = new Date(sat.t).toISOString();
+                  satHoverBoxNode2.innerHTML = new Date(sat.t).toTimeString();
                 }
                 satHoverBoxNode3.innerHTML =
-                    'X: ' +
-                    sat.position.x.toFixed(2) +
-                    ' Y: ' +
-                    sat.position.y.toFixed(2) +
-                    ' Z: ' +
-                    sat.position.z.toFixed(2);
+                    'RCS: ' +
+                    sat.rcs.toFixed(2) + ' m^2 (' +
+                    (10 ** (sat.rcs/10)).toFixed(2) + ' dBsm)' +
+                    '</br>' +
+                    'Az Error: ' +
+                    sat.azError.toFixed(2) + '°' +
+                    ' El Error: ' +
+                    sat.elError.toFixed(2) + '°';
             } else if (sat.type === 'Control Facility') {
                 satHoverBoxNode1.textContent = sat.name;
                 satHoverBoxNode2.innerHTML =
@@ -2659,7 +2661,11 @@ function selectSat(satId) {
             objtype = 'Debris';
         }
         if (sat.OT === 4) {
-            objtype = 'Amateur Sat';
+            if (settingsManager.offline) {
+              objtype = 'Special';
+            } else {
+              objtype = 'Amateur Sat';
+            }
         }
         if (sat.OT === 5) {
             objtype = 'Measurement';

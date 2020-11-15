@@ -338,6 +338,8 @@ const MOON_SCALAR_DISTANCE = 250000;
     settingsManager.minimumSearchCharacters = 2; // Searches after 3 characters typed
     settingsManager.searchLimit = 400;
 
+    settingsManager.nameOfSpecialSats = 'Special Sats';
+
     settingsManager.cameraMovementSpeed = 0.003;
     settingsManager.cameraMovementSpeedMin = 0.005;
 

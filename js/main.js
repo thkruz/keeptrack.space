@@ -223,7 +223,7 @@ function initializeKeepTrack() {
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
         atmosphere.init();
         // Disabling Moon Until it is Fixed
-        // moon.init();
+        moon.init();
     }
     ColorScheme.init();
     $('#loader-text').text('Drawing Dots in Space...');
@@ -998,7 +998,7 @@ function _drawScene() {
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
         sun.draw(pMatrix, camMatrix);
         // Disabling Moon Until it is Fixed
-        // moon.draw(pMatrix, camMatrix);
+        moon.draw(pMatrix, camMatrix);
     }
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
         atmosphere.update();
@@ -2180,6 +2180,8 @@ function webGlInit() {
         browserUnsupported();
     }
 
+    gl.getExtension("EXT_frag_depth");
+
     gl.viewport(0, 0, can.width, can.height);
 
     gl.enable(gl.DEPTH_TEST);
@@ -2887,7 +2889,7 @@ function selectSat(satId) {
                 $('#sat-source7w').hide();
             }
             if (typeof sat.URL != 'undefined' && sat.URL != '') {
-                $('#sat-sourceURL').html(
+                $('#sat-source8').html(
                     `<a class="iframe" href="${sat.URL}">${sat.URL.split(
                         '//'
                     ).splice(1)}</a>`
@@ -4224,7 +4226,7 @@ $(document).ready(function () {
                     } else {
                         uiManager.hideSideMenus();
                         isDOPMenuOpen = true;
-                        $('#loading-screen').fadeIn('slow', function () {
+                        $('#loading-screen').fadeIn(1000, function () {
                             $('#dops-lat').val(latLon.latitude.toFixed(3));
                             $('#dops-lon').val(latLon.longitude.toFixed(3));
                             $('#dops-alt').val(0);
@@ -4235,7 +4237,7 @@ $(document).ready(function () {
                             var el = $('#dops-el').val() * 1;
                             satellite.getDOPsTable(lat, lon, alt);
                             $('#menu-dops').addClass('bmenu-item-selected');
-                            $('#loading-screen').fadeOut();
+                            $('#loading-screen').fadeOut('slow');
                             $('#dops-menu').effect(
                                 'slide',
                                 { direction: 'left', mode: 'show' },
@@ -4475,7 +4477,7 @@ $(document).ready(function () {
                     earth.loadHiResNight();
                     break;
                 case 'earth-high-rmb':
-                    $('#loading-screen').fadeIn('slow', function () {
+                    $('#loading-screen').fadeIn(1000, function () {
                         settingsManager.blueImages = false;
                         settingsManager.nasaImages = false;
                         settingsManager.trusatImages = false;
@@ -4487,11 +4489,11 @@ $(document).ready(function () {
                         earth.init();
                         earth.loadHiRes();
                         earth.loadHiResNight();
-                        $('#loading-screen').fadeOut();
+                        $('#loading-screen').fadeOut('slow');
                     });
                     break;
                 case 'earth-high-no-clouds-rmb':
-                    $('#loading-screen').fadeIn('slow', function () {
+                    $('#loading-screen').fadeIn(1000, function () {
                         settingsManager.blueImages = false;
                         settingsManager.nasaImages = false;
                         settingsManager.trusatImages = false;
@@ -4503,7 +4505,7 @@ $(document).ready(function () {
                         earth.init();
                         earth.loadHiRes();
                         earth.loadHiResNight();
-                        $('#loading-screen').fadeOut();
+                        $('#loading-screen').fadeOut('slow');
                     });
                     break;
                 case 'earth-vec-rmb':

@@ -1655,25 +1655,25 @@ var speedModifier = 1;
             });
 
             $('#n2yo-form').on('submit', function (e) {
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                   let satnum = $('#ext-n2yo').val() * 1;
                   satSet.searchN2yo(satnum);
-                  $('#loading-screen').fadeOut();
+                  $('#loading-screen').fadeOut('slow');
                 });
                 e.preventDefault();
             });
 
             $('#celestrak-form').on('submit', function (e) {
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                   let satnum = $('#ext-celestrak').val() * 1;
                   satSet.searchCelestrak(satnum);
-                  $('#loading-screen').fadeOut();
+                  $('#loading-screen').fadeOut('slow');
                 });
                 e.preventDefault();
             });
 
             $('#editSat-newTLE').on('click', function (e) {
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                     // Update Satellite TLE so that Epoch is Now but ECI position is very very close
                     var satId = satSet.getIdFromObjNum($('#es-scc').val());
                     var mainsat = satSet.getSat(satId);
@@ -1764,7 +1764,7 @@ var speedModifier = 1;
                     $('#es-argPe').val(_pad0(argPe, 8));
                     $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
 
-                    $('#loading-screen').fadeOut();
+                    $('#loading-screen').fadeOut('slow');
                 });
             });
 
@@ -2143,7 +2143,7 @@ var speedModifier = 1;
             });
 
             $('#newLaunch').on('submit', function (e) {
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                     $('#nl-error').hide();
                     var scc = $('#nl-scc').val();
                     var satId = satSet.getIdFromObjNum(scc);
@@ -2247,7 +2247,7 @@ var speedModifier = 1;
                         );
                         $('#nl-error').show();
                     }
-                    $('#loading-screen').fadeOut();
+                    $('#loading-screen').fadeOut('slow');
                 });
                 e.preventDefault();
             });
@@ -2257,7 +2257,7 @@ var speedModifier = 1;
             });
 
             $('#breakup').on('submit', function (e) {
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                     var satId = satSet.getIdFromObjNum($('#hc-scc').val());
                     var mainsat = satSet.getSat(satId);
                     var origsat = mainsat;
@@ -2465,13 +2465,13 @@ var speedModifier = 1;
                     breakupSearchString += mainsat.SCC_NUM + ',Analyst Sat';
                     searchBox.doSearch(breakupSearchString);
 
-                    $('#loading-screen').fadeOut();
+                    $('#loading-screen').fadeOut('slow');
                 });
                 e.preventDefault();
             });
 
             $('#missile').on('submit', function (e) {
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                     $('#ms-error').hide();
                     var type = $('#ms-type').val() * 1;
                     var attacker = $('#ms-attacker').val() * 1;
@@ -2928,7 +2928,7 @@ var speedModifier = 1;
             $('#dops-form').on('submit', function (e) {
                 uiManager.hideSideMenus();
                 isDOPMenuOpen = true;
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                     var lat = $('#dops-lat').val() * 1;
                     var lon = $('#dops-lon').val() * 1;
                     var alt = $('#dops-alt').val() * 1;
@@ -2936,7 +2936,7 @@ var speedModifier = 1;
                     settingsManager.gpsElevationMask = el;
                     satellite.getDOPsTable(lat, lon, alt);
                     $('#menu-dops').addClass('bmenu-item-selected');
-                    $('#loading-screen').fadeOut();
+                    $('#loading-screen').fadeOut('slow');
                     $('#dops-menu').effect(
                         'slide',
                         { direction: 'left', mode: 'show' },
@@ -3298,7 +3298,7 @@ var speedModifier = 1;
                             ) < timeManager.now ||
                             isWatchlistChanged
                         ) {
-                            $('#loading-screen').fadeIn('slow', function () {
+                            $('#loading-screen').fadeIn(1000, function () {
                                 nextPassArray = [];
                                 for (var x = 0; x < watchlistList.length; x++) {
                                     nextPassArray.push(
@@ -3314,7 +3314,7 @@ var speedModifier = 1;
                                 nextPassEarliestTime = timeManager.now;
                                 lastOverlayUpdateTime = 0;
                                 _updateNextPassOverlay(true);
-                                $('#loading-screen').fadeOut();
+                                $('#loading-screen').fadeOut('slow');
                                 isWatchlistChanged = false;
                             });
                         } else {
@@ -3393,12 +3393,12 @@ var speedModifier = 1;
                             mobile.searchToggle(false);
                         uiManager.hideSideMenus();
                         isLookanglesMenuOpen = true;
-                        $('#loading-screen').fadeIn('slow', function () {
+                        $('#loading-screen').fadeIn(1000, function () {
                             satellite.getlookangles(sat);
                             $('#menu-lookangles').addClass(
                                 'bmenu-item-selected'
                             );
-                            $('#loading-screen').fadeOut();
+                            $('#loading-screen').fadeOut('slow');
                             $('#lookangles-menu').effect(
                                 'slide',
                                 { direction: 'left', mode: 'show' },
@@ -3424,7 +3424,7 @@ var speedModifier = 1;
                     } else {
                         uiManager.hideSideMenus();
                         isDOPMenuOpen = true;
-                        $('#loading-screen').fadeIn('slow', function () {
+                        $('#loading-screen').fadeIn(1000, function () {
                             var lat = $('#dops-lat').val() * 1;
                             var lon = $('#dops-lon').val() * 1;
                             var alt = $('#dops-alt').val() * 1;
@@ -3432,7 +3432,7 @@ var speedModifier = 1;
                             settingsManager.gpsElevationMask = el;
                             satellite.getDOPsTable(lat, lon, alt);
                             $('#menu-dops').addClass('bmenu-item-selected');
-                            $('#loading-screen').fadeOut();
+                            $('#loading-screen').fadeOut('slow');
                             $('#dops-menu').effect(
                                 'slide',
                                 { direction: 'left', mode: 'show' },
@@ -3573,12 +3573,12 @@ var speedModifier = 1;
                             'bmenu-item-selected'
                         );
                         if (objectManager.selectedSat !== -1) {
-                            $('#loading-screen').fadeIn('slow', function () {
+                            $('#loading-screen').fadeIn(1000, function () {
                                 sat = satSet.getSatExtraOnly(
                                     objectManager.selectedSat
                                 );
                                 satellite.getlookanglesMultiSite(sat);
-                                $('#loading-screen').fadeOut();
+                                $('#loading-screen').fadeOut('slow');
                                 $('#lookanglesmultisite-menu').effect(
                                     'slide',
                                     { direction: 'left', mode: 'show' },
@@ -5490,7 +5490,7 @@ var speedModifier = 1;
                     );
                 break;
             case 'elset-age':
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                     uiManager.legendMenuChange('ageOfElset');
                     satSet.setColorScheme(ColorScheme.ageOfElset);
                     uiManager.colorSchemeChangeAlert(
@@ -5504,12 +5504,12 @@ var speedModifier = 1;
                             'Age of Elset',
                             'Selected'
                         );
-                    $('#loading-screen').fadeOut();
+                    $('#loading-screen').fadeOut('slow');
                 });
                 break;
             case 'lost-objects':
                 $('#search').val('');
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                     satSet.setColorScheme(ColorScheme.lostobjects);
                     uiManager.colorSchemeChangeAlert(
                         settingsManager.currentColorScheme
@@ -5523,7 +5523,7 @@ var speedModifier = 1;
                             'Selected'
                         );
                     searchBox.doSearch($('#search').val());
-                    $('#loading-screen').fadeOut();
+                    $('#loading-screen').fadeOut('slow');
                 });
                 break;
             case 'rcs':
@@ -5682,9 +5682,9 @@ var speedModifier = 1;
     };
 
     uiManager.showCSObjects = () => {
-        $('#loading-screen').fadeIn('slow', function () {
+        $('#loading-screen').fadeIn(1000, function () {
             satellite.findCloseObjects();
-            $('#loading-screen').fadeOut();
+            $('#loading-screen').fadeOut('slow');
         });
     };
 
@@ -6325,12 +6325,12 @@ var speedModifier = 1;
                     satSet.convertIdArrayToSatnumArray(satLinkManager.aehf)
                   );
                 }
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                     drawLineList = [];
                     satLinkManager.showLinks('aehf');
                     if (settingsManager.isOfficialWebsite)
                         ga('send', 'event', 'SatLink Menu', 'aehf', 'Selected');
-                    $('#loading-screen').fadeOut();
+                    $('#loading-screen').fadeOut('slow');
                 });
                 break;
             case 'wgs':
@@ -6341,7 +6341,7 @@ var speedModifier = 1;
                     satSet.convertIdArrayToSatnumArray(satLinkManager.wgs.concat(satLinkManager.dscs))
                   );
                 }
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                     drawLineList = [];
                     try {
                       satLinkManager.showLinks('wgs');
@@ -6350,7 +6350,7 @@ var speedModifier = 1;
                     }
                     if (settingsManager.isOfficialWebsite)
                         ga('send', 'event', 'SatLink Menu', 'wgs', 'Selected');
-                    $('#loading-screen').fadeOut();
+                    $('#loading-screen').fadeOut('slow');
                 });
                 break;
             case 'starlink':
@@ -6361,7 +6361,7 @@ var speedModifier = 1;
                     satSet.convertIdArrayToSatnumArray(satLinkManager.starlink)
                   );
                 }
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                     drawLineList = [];
                     try {
                       satLinkManager.showLinks('starlink');
@@ -6370,7 +6370,7 @@ var speedModifier = 1;
                     }
                     if (settingsManager.isOfficialWebsite)
                         ga('send', 'event', 'SatLink Menu', 'starlink', 'Selected');
-                    $('#loading-screen').fadeOut();
+                    $('#loading-screen').fadeOut('slow');
                 });
                 break;
             case 'sbirs':
@@ -6381,7 +6381,7 @@ var speedModifier = 1;
                     satSet.convertIdArrayToSatnumArray(satLinkManager.sbirs)
                   );
                 }
-                $('#loading-screen').fadeIn('slow', function () {
+                $('#loading-screen').fadeIn(1000, function () {
                     drawLineList = [];
                     try {
                       satLinkManager.showLinks('sbirs');
@@ -6390,7 +6390,7 @@ var speedModifier = 1;
                     }
                     if (settingsManager.isOfficialWebsite)
                         ga('send', 'event', 'SatLink Menu', 'sbirs', 'Selected');
-                    $('#loading-screen').fadeOut();
+                    $('#loading-screen').fadeOut('slow');
                 });
                 break;
         }

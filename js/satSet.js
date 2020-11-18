@@ -842,6 +842,8 @@ var emptyMat4 = mat4.create();
         objectManager.starIndex1 += satSet.orbitalSats;
         objectManager.starIndex2 += satSet.orbitalSats;
 
+        satSet.initGsData();
+
         loggerStop = Date.now();
         for (i = 0; i < objectManager.staticSet.length; i++) {
           tempSatData.push(objectManager.staticSet[i]);
@@ -1033,6 +1035,55 @@ var emptyMat4 = mat4.create();
         }
       }
       return satIdArray;
+    };
+
+    satSet.initGsData = () => {
+      $.getScript('satData/gs.json', function (resp) {
+        $('#loader-text').html('Integrating Satellite Intel...');
+        $('#loading-screen').fadeIn(1000, function () {
+          satSet.gsInfo = JSON.parse(resp);
+          for (let gsI = 0; gsI < satSet.gsInfo.length; gsI++) {
+            let gsSatType = satSet.gsInfo[gsI];
+            let satSetFirstI = 0
+            for (let gsI2 = 0; gsI2 < gsSatType[1].length; gsI2++) {
+              let gsSat = gsSatType[1][gsI2];
+              satSetFirstI = Math.max(satSetFirstI - 200, 0);
+              for (let satSetI = satSetFirstI; satSetI < satData.length; satSetI++) {
+                if (satData[satSetI].intlDes == gsSat.cospar) {
+                  if (satSetFirstI == 0) satSetFirstI = satSetI;
+                  if (typeof gsSat.name != 'undefined') {
+                    if (typeof satData[satSetI].ON == 'undefined' || satData[satSetI].ON == 'TBA' || satData[satSetI].ON == 'Unknown' || satData[satSetI].ON.slice(0, 7) == 'PAYLOAD') {
+                      satData[satSetI].ON = gsSat.name;
+                    }
+                  }
+                  if (typeof gsSat.lv != 'undefined') {
+                    if (typeof satData[satSetI].LV == 'undefined' || satData[satSetI].LV == 'U') {
+                      satData[satSetI].LV = gsSat.lv;
+                    }
+                  }
+                  if (typeof gsSat.ls != 'undefined') {
+                    if (typeof satData[satSetI].LS == 'undefined' || satData[satSetI].LS == 'U') {
+                      satData[satSetI].LS = gsSat.ls;
+                    }
+                  }
+                  if (typeof gsSatType[0].gsurl != 'undefined') satData[satSetI].URL = gsSatType[0].gsurl;
+                  if (typeof gsSatType[0].sdpow != 'undefined') satData[satSetI].Pw = gsSatType[0].sdpow;
+                  if (typeof gsSatType[0].sdtyp != 'undefined') satData[satSetI].P = gsSatType[0].sdtyp;
+                  if (typeof gsSatType[0].sdcon != 'undefined') satData[satSetI].Con = gsSatType[0].sdcon;
+                  if (typeof gsSatType[0].sdmas != 'undefined') satData[satSetI].DM = gsSatType[0].sdmas;
+                  if (typeof gsSatType[0].sdope != 'undefined') satData[satSetI].U = gsSatType[0].sdope;
+                  if (typeof gsSatType[0].sdlif != 'undefined') satData[satSetI].Li = gsSatType[0].sdlif;
+                  break;
+                }
+              }
+            }
+          }
+          $('#loading-screen').fadeOut('slow');
+          setTimeout(function () {
+            $('#loader-text').html('Attempting to Math...');
+          }, 800);
+        });
+      });
     };
 
     satSet.searchCelestrak = (satNum, analsat) => {

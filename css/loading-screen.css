@@ -67,34 +67,27 @@ body {
 }
 
 .mini-loader {
-    border-radius: 5px;
+    border-radius: 35px;
     z-index: 101;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    width: 200px;
-    padding-top: 15px;
+    border: 5px solid rgba(0, 0, 0, 0.3);
+    width: 300px;
+    padding-top: 25px;
+    padding-bottom: 5px;
     overflow: hidden;
     background: #172635;
     /* Old browsers */
-    background: -moz-linear-gradient(
-        45deg,
-        rgb(23, 38, 53) 0%,
-        rgba(64, 150, 238, 1) 100%
-    );
+    background: -moz-linear-gradient(45deg, #080c11, #274059);
     /* FF3.6-15 */
-    background: -webkit-linear-gradient(
-        45deg,
-        rgb(23, 38, 53) 0%,
-        rgba(64, 150, 238, 1) 100%
-    );
+    background: -webkit-linear-gradient(45deg, #080c11, #274059);
     /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(
-        45deg,
-        rgb(23, 38, 53) 0%,
-        rgba(64, 150, 238, 1) 100%
-    );
+    background: linear-gradient(45deg, #080c11, #274059);
     /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
     /* IE6-9 fallback on horizontal gradient */
+
+    -moz-background-clip: padding;     /* Firefox 3.6 */
+    -webkit-background-clip: padding;  /* Safari 4? Chrome 6? */
+    background-clip: padding-box;      /* Firefox 4, Safari 5, Opera 10, IE 9 */
 }
 
 #logo-inner-container {

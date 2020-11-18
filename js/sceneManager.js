@@ -1092,6 +1092,7 @@
         let sunShader;
 
         sun.pos = [0, 0, 0];
+        sun.pos2 = [0, 0, 0];
 
         var texture, nightTexture;
 
@@ -1240,6 +1241,9 @@
             sun.pos[0] = (sun.realXyz.x / sunMaxDist) * SUN_SCALAR_DISTANCE;
             sun.pos[1] = (sun.realXyz.y / sunMaxDist) * SUN_SCALAR_DISTANCE;
             sun.pos[2] = (sun.realXyz.z / sunMaxDist) * SUN_SCALAR_DISTANCE;
+            sun.pos2[0] = sun.pos[0] * 100;
+            sun.pos2[1] = sun.pos[1] * 100;
+            sun.pos2[2] = sun.pos[2] * 100;
 
             mvMatrix = mvMatrixEmpty;
             mat4.identity(mvMatrix);
@@ -1333,12 +1337,12 @@
             j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
             var gmst = satellite.gstime(j);
 
-            let moonPos = SunCalc.getMoonPosition(timeManager.propTime(), 0, 0);
+            moon.moonPos = SunCalc.getMoonPosition(timeManager.propTime(), 0, 0);
             moon.position = satellite.ecfToEci(
                 lookAnglesToEcf(
-                    moonPos.azimuth * RAD2DEG,
-                    moonPos.altitude * RAD2DEG,
-                    moonPos.distance,
+                    180 + moon.moonPos.azimuth * RAD2DEG,
+                    moon.moonPos.altitude * RAD2DEG,
+                    moon.moonPos.distance,
                     0,
                     0,
                     0
@@ -1393,6 +1397,7 @@
                 'uNormalMatrix'
             );
             moonShader.uSunPos = gl.getUniformLocation(moonShader, 'uSunPos');
+            moonShader.uMoonDis = gl.getUniformLocation(moonShader, 'uMoonDis');
             moonShader.uSampler = gl.getUniformLocation(moonShader, 'uSampler');
 
             texture = gl.createTexture();
@@ -1433,7 +1438,7 @@
                 onImageLoaded();
             };
             img.src =
-                settingsManager.installDirectory + 'textures/moonmap256.jpg';
+                settingsManager.installDirectory + 'textures/moon-1024.jpg';
 
             // generate a uvsphere bottom up, CCW order
             var vertPos = [];
@@ -1543,8 +1548,14 @@
             mvMatrix = mvMatrixEmpty;
             mat4.identity(mvMatrix);
             mat4.translate(mvMatrix, mvMatrix, moon.pos);
+
             nMatrix = nMatrixEmpty;
             mat3.normalFromMat4(nMatrix, mvMatrix);
+
+            // gl.enable(gl.CULL_FACE);
+
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
             gl.useProgram(moonShader);
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -1553,7 +1564,8 @@
             gl.uniformMatrix4fv(moonShader.uMvMatrix, false, mvMatrix);
             gl.uniformMatrix4fv(moonShader.uPMatrix, false, pMatrix);
             gl.uniformMatrix4fv(moonShader.uCamMatrix, false, camMatrix);
-            gl.uniform3fv(moonShader.uSunPos, sun.pos);
+            gl.uniform3fv(moonShader.uSunPos, sun.pos2);
+            gl.uniform1f(moonShader.uMoonDis, Math.sqrt(moon.pos[0]**2 + moon.pos[1]**2 + moon.pos[2]**2));
 
             gl.uniform1i(moonShader.uSampler, 0); // point sampler to TEXTURE0
             gl.activeTexture(gl.TEXTURE0);
@@ -1599,6 +1611,8 @@
             gl.disableVertexAttribArray(moonShader.aVertexPosition);
             gl.disableVertexAttribArray(moonShader.aVertexNormal);
 
+            // gl.disable(gl.CULL_FACE);
+
             // Done Drawing
             return true;
         };
@@ -1631,7 +1645,7 @@
         var clat = Math.cos(obs_lat);
         var clon = Math.cos(obs_long);
 
-        azRad = azRad % 360;
+        // azRad = azRad % 360;
 
         var azRad = DEG2RAD * azimuthDeg;
         var elRad = DEG2RAD * elevationDeg;
@@ -1744,6 +1758,7 @@
         },
         moon: {
             frag: `
+        #extension GL_EXT_frag_depth : enable
         precision mediump float;
 
         uniform vec3 uLightDirection;
@@ -1753,6 +1768,8 @@
         uniform sampler2D uSampler;
         uniform vec3 uSunPos;
 
+        varying float vDist;
+
         void main(void) {
           // Moon Position - Sun Position
           vec3 LightDirection = uSunPos - vec3(0.0,0.0,0.0);
@@ -1761,9 +1778,18 @@
           float diffuse = max(dot(vNormal, LightDirection), 0.0);
           vec3 ambientLight = vec3(0.05,0.05,0.05);
 
-          // float diffuseLight = 0.7;
           vec3 litTexColor = texture2D(uSampler, vUv).rgb * (ambientLight + diffuse * 1.5);
+
+          if (vDist > 1.0) {
+            discard;
+            // litTexColor = vec3(1.0,0.0,0.0);
+          }
+
+          // gl_FragColor = vec4(vec3(vDist - 1.0,0.0,0.0), 1.0);
           gl_FragColor = vec4(litTexColor, 1.0);
+
+          // gl_FragDepthEXT = gl_FragCoord.z - 0.000001;
+          // gl_FragDepthEXT = 0.999999 + (0.0000001 * gl_FragCoord.z); //min(gl_FragCoord.z, 0.999999);
         }
       `,
             vert: `
@@ -1776,11 +1802,16 @@
         uniform mat4 uCamMatrix;
         uniform mat4 uMvMatrix;
         uniform mat3 uNormalMatrix;
+        uniform float uMoonDis;
 
         varying vec2 vUv;
         varying vec3 vNormal;
+        varying float vDist;
+
         void main(void) {
-          gl_Position = uPMatrix * uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
+          vec4 position = uMvMatrix * vec4(aVertexPosition, 1.0);
+          gl_Position = uPMatrix * uCamMatrix * position;
+          vDist = distance(position.xyz,vec3(0.0,0.0,0.0)) \/ uMoonDis;
           vUv = aTexCoord;
 
           vNormal = uNormalMatrix * aVertexNormal;
@@ -1874,6 +1905,7 @@
         alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor4}, 3.0)) * when_ge(vDist, 200000.0);
 
         alpha = min(alpha, 1.0);
+        if (alpha == 0.0) discard;
         gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
       }
     `,
@@ -1881,6 +1913,7 @@
         {
             name: 'dot-vertex-var.glsl',
             code: `
+        #extension GL_EXT_frag_depth : enable
         attribute vec3 aPos;
         attribute vec4 aColor;
         attribute float aStar;
@@ -1971,23 +2004,71 @@
         },
         {
             name: 'pick-fragment.glsl',
-            code:
-                'precision mediump float;\n\nvarying vec3 vColor;\n\nvoid main(void) {\n  gl_FragColor = vec4(vColor, 1.0);\n}',
+            code: `
+            #extension GL_EXT_frag_depth : enable
+            precision mediump float;
+
+            varying vec3 vColor;
+
+            void main(void) {
+              gl_FragColor = vec4(vColor, 1.0);
+            }
+          `,
         },
         {
             name: 'pick-vertex.glsl',
-            code:
-                'attribute vec3 aPos;\nattribute vec3 aColor;\nattribute float aPickable;\n\nuniform mat4 uCamMatrix;\nuniform mat4 uMvMatrix;\nuniform mat4 uPMatrix;\n\nvarying vec3 vColor;\n\nvoid main(void) {\n  float dotSize = 16.0;\n  vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);\n  gl_Position = position;\n  gl_PointSize = dotSize * aPickable;\n  vColor = aColor * aPickable;\n}',
+            code: `
+              attribute vec3 aPos;
+              attribute vec3 aColor;
+              attribute float aPickable;
+
+              uniform mat4 uCamMatrix;
+              uniform mat4 uMvMatrix;
+              uniform mat4 uPMatrix;
+
+              varying vec3 vColor;
+
+              void main(void) {
+                float dotSize = 16.0;
+                vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
+                gl_Position = position;
+                gl_PointSize = dotSize * aPickable;
+                vColor = aColor * aPickable;
+              }
+            `,
         },
         {
             name: 'path-fragment.glsl',
-            code:
-                'precision mediump float;\n\nvarying vec4 vColor;\n\nvoid main(void) {\n  gl_FragColor = vColor;\n}',
+            code: `
+              #extension GL_EXT_frag_depth : enable
+              precision mediump float;
+
+              varying vec4 vColor;
+
+              void main(void) {
+                gl_FragColor = vColor;
+              }
+            `,
         },
         {
             name: 'path-vertex.glsl',
-            code:
-                'attribute vec3 aPos;\n\nuniform mat4 uCamMatrix;\nuniform mat4 uMvMatrix;\nuniform mat4 uPMatrix;\nuniform vec4 uColor;\n\nvarying vec4 vColor;\n\nvoid main(void) {\n  vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);\n  gl_Position = position;\n  vColor = uColor;\n}\n',
+            code: `
+            #extension GL_EXT_frag_depth : enable
+            attribute vec3 aPos;
+
+            uniform mat4 uCamMatrix;
+            uniform mat4 uMvMatrix;
+            uniform mat4 uPMatrix;
+            uniform vec4 uColor;
+
+            varying vec4 vColor;
+
+            void main(void) {
+              vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
+              gl_Position = position;
+              vColor = uColor;
+            }
+          `,
         },
     ];
 

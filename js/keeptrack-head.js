@@ -12,15 +12,15 @@ const MILLISECONDS_PER_DAY = 1.15741e-8;
 const RADIUS_OF_DRAW_SUN = 9000;
 const SUN_SCALAR_DISTANCE = 250000;
 const RADIUS_OF_DRAW_MOON = 4000;
-const MOON_SCALAR_DISTANCE = 250000;
+const MOON_SCALAR_DISTANCE = 200000;
 
 // Settings Manager Setup
 {
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.2.0';
-    settingsManager.versionDate = 'November 14, 2020';
+    settingsManager.versionNumber = '2.3.0';
+    settingsManager.versionDate = 'November 18, 2020';
 
     // Install Folder Settings
     {

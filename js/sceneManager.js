@@ -2098,15 +2098,38 @@
 
   radarDataManager.init = () => {
     $.getScript('radarData/radarData.json', function (resp) {
+      $('#loader-text').html('Importing Radar Data...');
+      $('#loading-screen').fadeIn(1000, function () {
         radarDataManager.setup(resp);
+        $('#loading-screen').fadeOut('slow');
+        setTimeout(function () {
+          $('#loader-text').html('Attempting to Math...');
+        }, 800);
+      });
     });
   };
 
+  radarDataManager.changeTimeToFirstDataTime = () => {
+    timeManager.propOffset = new Date(radarDataManager.radarData[0].t) - Date.now();
+    $('#datetime-input-tb').datepicker(
+      'setDate',
+      new Date(timeManager.propRealTime + timeManager.propOffset)
+    );
+    satCruncher.postMessage({
+      typ: 'offset',
+      dat:
+      timeManager.propOffset.toString() +
+      ' ' +
+      timeManager.propRate.toString(),
+    });
+  }
+
   radarDataManager.findFirstDataTime = () => {
-    let now = Date.now();
+    let now = timeManager.propTime() * 1;
     for (let i = 0; i < radarDataManager.radarData.length; i++) {
       if (radarDataManager.radarData[i].t > now - 3000) {
-        return i;
+        radarDataManager.drawT1 = i;
+        return;
       }
     }
   };
@@ -2115,6 +2138,7 @@
       db.log('radarDataManager.init');
       radarDataManager.radarData = JSON.parse(resp);
       satSet.updateRadarData();
+      radarDataManager.changeTimeToFirstDataTime();
       settingsManager.radarDataReady = true;
   };
 
@@ -2133,9 +2157,14 @@
         if (k == 10) k = 0;
         fakeData.push(
           {
-            t: now + i,
-            name: `Radar Measurement ${(Math.round(Math.random() * 100000))}`,
+            t: now - (1000 * 60 * 60 * 24 * 3) + i,
             dataType: 1,
+            m: `${(Math.round(Math.random() * 100000))}`,
+            ti: `${(Math.round(Math.random() * 100000))}`,
+            oi: `${(Math.round(Math.random() * 100000))}`,
+            si: `${(Math.round(Math.random() * 45000-30000))}`,
+            mc: `${(Math.round(Math.random() * 5 - 3))}`,
+            mo: `${(Math.round(Math.random() * 20))}`,
             r: 150 + (Math.random() * 5556),
             a: az,
             e: el,

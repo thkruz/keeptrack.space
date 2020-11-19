@@ -24,7 +24,7 @@
             data = satSet.getSatData();
             for (i = 0; i < data.length; i++) {
                 if (this.sats.length > settingsManager.maxOribtsDisplayed)
-                    continue;
+                    break;
                 if (typeof data[i].SCC_NUM == 'undefined') continue;
                 this.sats.push({
                     satId: data[i].id,

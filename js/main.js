@@ -326,7 +326,7 @@ function initializeKeepTrack() {
             satLinkManager.idToSatnum();
         })();
     });
-    radarDataManager.init();
+    if (settingsManager.isEnableRadarData) radarDataManager.init();
     drawLoop(); // kick off the animationFrame()s
     if (!settingsManager.disableUI && !settingsManager.isDrawLess) {
       // Load Optional 3D models if available
@@ -1845,7 +1845,15 @@ function _hoverBoxOnSat(satId, satX, satY) {
                     '';
                 satHoverBoxNode3.textContent = '';
             } else if (sat.isRadarData) {
-                satHoverBoxNode1.textContent = sat.name;
+                satHoverBoxNode1.innerHTML =
+                  'Measurement: ' + sat.mId + '</br>' +
+                  'Track: ' + sat.trackId + '</br>' +
+                  'Object: ' + sat.objectId;
+                if (sat.missileComplex !== -1) {
+                  satHoverBoxNode1.innerHTML += '</br>Missile Complex: ' + sat.missileComplex;
+                  satHoverBoxNode1.innerHTML += '</br>Missile Object: ' + sat.missileObject;
+                }
+                if (sat.si !== -1) satHoverBoxNode1.innerHTML += '</br>Satellite: ' + sat.satId;
                 if (typeof sat.rae == 'undefined' && sensorManager.currentSensor !== sensorManager.defaultSensor) {
                   sat.rae = satellite.eci2Rae(sat.t,sat,sensorManager.currentSensor);
                   sat.setRAE(sat.rae);
@@ -1861,7 +1869,8 @@ function _hoverBoxOnSat(satId, satX, satY) {
                       ' E: ' +
                       sat.rae.el.toFixed(2);
                 } else {
-                  satHoverBoxNode2.innerHTML = new Date(sat.t).toTimeString();
+                  let measurementDate = new Date(sat.t);
+                  satHoverBoxNode2.innerHTML = `JDAY: ${timeManager.getDayOfYear(measurementDate)} - ${measurementDate.toLocaleString('en-GB', { timeZone: 'UTC' }).slice(-8)}`;
                 }
                 satHoverBoxNode3.innerHTML =
                     'RCS: ' +
@@ -2587,7 +2596,7 @@ function selectSat(satId) {
                 if ($('#search').val().length > 0) {
                   $('#search-results').attr(
                       'style',
-                      'display:block; max-height:28%'
+                      'display:block; max-height:27%'
                   );
                 }
                 if (cameraType.current !== cameraType.PLANETARIUM) {

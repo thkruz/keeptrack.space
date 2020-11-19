@@ -110,10 +110,15 @@
               radarDataECI = satellite.ecfToEci(radarDataECF, gmst);
               radarDataECI.t = radarData[i].t;
               radarDataECI.rc = radarData[i].rc;
+              radarDataECI.m = radarData[i].m;
+              radarDataECI.ti = radarData[i].ti;
+              radarDataECI.oi = radarData[i].oi;
+              radarDataECI.si = radarData[i].si;
+              radarDataECI.mc = radarData[i].mc;
+              radarDataECI.mo = radarData[i].mo;
               radarDataECI.ae = radarData[i].ae;
               radarDataECI.ee = radarData[i].ee;
               radarDataECI.dataType = radarData[i].dataType;
-              radarDataECI.name = radarData[i].name;
               radarDataECIArray.push(radarDataECI);
             }
 

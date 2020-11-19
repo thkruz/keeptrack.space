@@ -255,10 +255,22 @@
                 };
             }
             if (sat.isRadarData) {
+              if (sat.missileComplex >= 0) { // || sat.missileObject >= 0
                 return {
-                    color: colorTheme.radarData,
-                    pickable: true,
+                  color: colorTheme.radarDataMissile,
+                  pickable: true,
                 };
+              }
+              if (sat.satId >= 0) {
+                return {
+                  color: colorTheme.radarDataSatellite,
+                  pickable: true,
+                };
+              }
+              return {
+                color: colorTheme.radarData,
+                pickable: true,
+              };
             }
 
             if (sat.static && ColorScheme.objectTypeFlags.sensor === false) {

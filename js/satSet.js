@@ -630,6 +630,8 @@ var emptyMat4 = mat4.create();
       */
       function filterTLEDatabase(limitSatsArray) {
         var tempSatData = [];
+        satSet.sccIndex = {};
+        satSet.cosparIndex = {};
         if (limitSatsArray[0] == null) {
           // If there are no limits then just process like normal
           limitSats = '';
@@ -659,6 +661,8 @@ var emptyMat4 = mat4.create();
               resp[i].intlDes = year + '-' + rest;
             }
             resp[i].id = i;
+            satSet.sccIndex[`${resp[i].SCC_NUM}`] = resp[i].id;
+            satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
             resp[i].active = true;
             tempSatData.push(resp[i]);
             continue;
@@ -680,6 +684,8 @@ var emptyMat4 = mat4.create();
                   resp[i].intlDes = year + '-' + rest;
                 }
                 resp[i].id = i;
+                satSet.sccIndex[`${resp[i].SCC_NUM}`] = resp[i].id;
+                satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
                 resp[i].active = true;
                 tempSatData.push(resp[i]);
               }
@@ -694,23 +700,20 @@ var emptyMat4 = mat4.create();
           // If extra catalogue
           for (s = 0; s < satelliteList.length; s++) {
             isMatchFound = false;
-            for (i = 0; i < tempSatData.length; i++) {
-              if (satelliteList[s].SCC == undefined) continue;
-              if (satelliteList[s].TLE1 == undefined) continue; // Don't Process Bad Satellite Information
-              if (satelliteList[s].TLE2 == undefined) continue; // Don't Process Bad Satellite Information
-              if (
-                tempSatData[i].SCC_NUM === satelliteList[s].SCC
-              ) {
-                tempSatData[i].ON = satelliteList[s].ON;
-                tempSatData[i].OT =
-                typeof satelliteList[s].OT != 'undefined'
-                ? satelliteList[s].OT
-                : null;
-                tempSatData[i].TLE1 = satelliteList[s].TLE1;
-                tempSatData[i].TLE2 = satelliteList[s].TLE2;
-                isMatchFound = true;
-                break;
-              }
+            if (satelliteList[s].SCC == undefined) continue;
+            if (satelliteList[s].TLE1 == undefined) continue; // Don't Process Bad Satellite Information
+            if (satelliteList[s].TLE2 == undefined) continue; // Don't Process Bad Satellite Information
+            if (typeof satSet.sccIndex[`${satelliteList[s].SCC}`] !== 'undefined') {
+              i = satSet.sccIndex[`${satelliteList[s].SCC}`];
+              tempSatData[i].ON = satelliteList[s].ON;
+              tempSatData[i].OT =
+              typeof satelliteList[s].OT != 'undefined'
+              ? satelliteList[s].OT
+              : null;
+              tempSatData[i].TLE1 = satelliteList[s].TLE1;
+              tempSatData[i].TLE2 = satelliteList[s].TLE2;
+              isMatchFound = true;
+              break;
             }
             if (!isMatchFound) {
               if (satelliteList[s].TLE1 == undefined) continue; // Don't Process Bad Satellite Information
@@ -748,6 +751,8 @@ var emptyMat4 = mat4.create();
                 id: tempSatData.length,
                 vmag: satelliteList[s].vmag,
               };
+              satSet.sccIndex[`${satelliteList[s].SCC.toString()}`] = tempSatData.length;
+              satSet.cosparIndex[`${year}-${rest}`] = tempSatData.length;
               tempSatData.push(extrasSatInfo);
             }
           }
@@ -842,7 +847,7 @@ var emptyMat4 = mat4.create();
         objectManager.starIndex1 += satSet.orbitalSats;
         objectManager.starIndex2 += satSet.orbitalSats;
 
-        satSet.initGsData();
+        if (settingsManager.isEnableGsCatalog) satSet.initGsData();
 
         loggerStop = Date.now();
         for (i = 0; i < objectManager.staticSet.length; i++) {
@@ -1040,7 +1045,7 @@ var emptyMat4 = mat4.create();
     satSet.initGsData = () => {
       $.getScript('satData/gs.json', function (resp) {
         $('#loader-text').html('Integrating Satellite Intel...');
-        $('#loading-screen').fadeIn(1000, function () {
+        $('#loading-screen').fadeIn(1000, function loadGsInfo () {
           satSet.gsInfo = JSON.parse(resp);
           for (let gsI = 0; gsI < satSet.gsInfo.length; gsI++) {
             let gsSatType = satSet.gsInfo[gsI];
@@ -1048,33 +1053,30 @@ var emptyMat4 = mat4.create();
             for (let gsI2 = 0; gsI2 < gsSatType[1].length; gsI2++) {
               let gsSat = gsSatType[1][gsI2];
               satSetFirstI = Math.max(satSetFirstI - 200, 0);
-              for (let satSetI = satSetFirstI; satSetI < satData.length; satSetI++) {
-                if (satData[satSetI].intlDes == gsSat.cospar) {
-                  if (satSetFirstI == 0) satSetFirstI = satSetI;
-                  if (typeof gsSat.name != 'undefined') {
-                    if (typeof satData[satSetI].ON == 'undefined' || satData[satSetI].ON == 'TBA' || satData[satSetI].ON == 'Unknown' || satData[satSetI].ON.slice(0, 7) == 'PAYLOAD') {
-                      satData[satSetI].ON = gsSat.name;
-                    }
+              if (typeof satSet.cosparIndex[`${gsSat.cospar}`] !== 'undefined') {
+                satSetI = satSet.cosparIndex[`${gsSat.cospar}`];
+                if (typeof gsSat.name != 'undefined') {
+                  if (typeof satData[satSetI].ON == 'undefined' || satData[satSetI].ON == 'TBA' || satData[satSetI].ON == 'Unknown' || satData[satSetI].ON.slice(0, 7) == 'PAYLOAD' || satData[satSetI].ON.slice(0, 6) == 'OBJECT') {
+                    satData[satSetI].ON = gsSat.name;
                   }
-                  if (typeof gsSat.lv != 'undefined') {
-                    if (typeof satData[satSetI].LV == 'undefined' || satData[satSetI].LV == 'U') {
-                      satData[satSetI].LV = gsSat.lv;
-                    }
-                  }
-                  if (typeof gsSat.ls != 'undefined') {
-                    if (typeof satData[satSetI].LS == 'undefined' || satData[satSetI].LS == 'U') {
-                      satData[satSetI].LS = gsSat.ls;
-                    }
-                  }
-                  if (typeof gsSatType[0].gsurl != 'undefined') satData[satSetI].URL = gsSatType[0].gsurl;
-                  if (typeof gsSatType[0].sdpow != 'undefined') satData[satSetI].Pw = gsSatType[0].sdpow;
-                  if (typeof gsSatType[0].sdtyp != 'undefined') satData[satSetI].P = gsSatType[0].sdtyp;
-                  if (typeof gsSatType[0].sdcon != 'undefined') satData[satSetI].Con = gsSatType[0].sdcon;
-                  if (typeof gsSatType[0].sdmas != 'undefined') satData[satSetI].DM = gsSatType[0].sdmas;
-                  if (typeof gsSatType[0].sdope != 'undefined') satData[satSetI].U = gsSatType[0].sdope;
-                  if (typeof gsSatType[0].sdlif != 'undefined') satData[satSetI].Li = gsSatType[0].sdlif;
-                  break;
                 }
+                if (typeof gsSat.lv != 'undefined') {
+                  if (typeof satData[satSetI].LV == 'undefined' || satData[satSetI].LV == 'U') {
+                    satData[satSetI].LV = gsSat.lv;
+                  }
+                }
+                if (typeof gsSat.ls != 'undefined') {
+                  if (typeof satData[satSetI].LS == 'undefined' || satData[satSetI].LS == 'U') {
+                    satData[satSetI].LS = gsSat.ls;
+                  }
+                }
+                if (typeof gsSatType[0].gsurl != 'undefined') satData[satSetI].URL = gsSatType[0].gsurl;
+                if (typeof gsSatType[0].sdpow != 'undefined') satData[satSetI].Pw = gsSatType[0].sdpow;
+                if (typeof gsSatType[0].sdtyp != 'undefined') satData[satSetI].P = gsSatType[0].sdtyp;
+                if (typeof gsSatType[0].sdcon != 'undefined') satData[satSetI].Con = gsSatType[0].sdcon;
+                if (typeof gsSatType[0].sdmas != 'undefined') satData[satSetI].DM = gsSatType[0].sdmas;
+                if (typeof gsSatType[0].sdope != 'undefined') satData[satSetI].U = gsSatType[0].sdope;
+                if (typeof gsSatType[0].sdlif != 'undefined') satData[satSetI].Li = gsSatType[0].sdlif;
               }
             }
           }
@@ -1248,9 +1250,14 @@ var emptyMat4 = mat4.create();
     satSet.updateRadarData = () => {
       for (let i = 0; i < radarDataManager.radarData.length; i++) {
         try {
-          satData[radarDataManager.satDataStartIndex + i].name = radarDataManager.radarData[i].name;
+          satData[radarDataManager.satDataStartIndex + i].mId = radarDataManager.radarData[i].m;
           satData[radarDataManager.satDataStartIndex + i].t = radarDataManager.radarData[i].t;
           satData[radarDataManager.satDataStartIndex + i].rcs = radarDataManager.radarData[i].rc;
+          satData[radarDataManager.satDataStartIndex + i].trackId = radarDataManager.radarData[i].ti;
+          satData[radarDataManager.satDataStartIndex + i].objectId = radarDataManager.radarData[i].oi;
+          satData[radarDataManager.satDataStartIndex + i].satId = radarDataManager.radarData[i].si;
+          satData[radarDataManager.satDataStartIndex + i].missileComplex = radarDataManager.radarData[i].mc;
+          satData[radarDataManager.satDataStartIndex + i].missileObject = radarDataManager.radarData[i].mo;
           satData[radarDataManager.satDataStartIndex + i].azError = radarDataManager.radarData[i].ae;
           satData[radarDataManager.satDataStartIndex + i].elError = radarDataManager.radarData[i].ee;
           satData[radarDataManager.satDataStartIndex + i].dataType = radarDataManager.radarData[i].dataType;
@@ -1781,28 +1788,18 @@ var emptyMat4 = mat4.create();
     };
 
     satSet.getIdFromObjNum = (objNum) => {
-        var scc;
-        for (var i = 0; i < satData.length; i++) {
-            if (satData[i].static || satData[i].missile) {
-                continue;
-            } else {
-                scc = parseInt(satData[i].SCC_NUM);
-                // scc = pad0(satData[i].TLE1.substr(2, 5).trim(), 5);
-            }
-
-            if (parseInt(objNum) === scc) {
-                return i;
-            }
+        if (typeof satSet.sccIndex[`${objNum}`] !== undefined) {
+          return satSet.sccIndex[`${objNum}`];
+        } else {
+          return null;
         }
-        return null;
     };
     satSet.getIdFromIntlDes = (intlDes) => {
-        for (var i = 0; i < satData.length; i++) {
-            if (satData[i].intlDes === intlDes) {
-                return i;
-            }
+        if (typeof satSet.cosparIndex[`${intlDes}`] !== undefined) {
+          return satSet.cosparIndex[`${intlDes}`];
+        } else {
+          return null;
         }
-        return null;
     };
     satSet.getIdFromStarName = (starName) => {
         for (var i = 0; i < satData.length; i++) {

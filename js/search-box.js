@@ -56,11 +56,12 @@ var hoverSatId = -1;
 
     searchBox.doArraySearch = (array) => {
       let searchStr = '';
+      let satData = satSet.getSatData();
       for (var i = 0; i < array.length; i++) {
         if (i == array.length - 1) {
-          searchStr += `${satSet.getSat(array[i]).SCC_NUM}`;
+          searchStr += `${satData[array[i]].SCC_NUM}`;
         } else {
-          searchStr += `${satSet.getSat(array[i]).SCC_NUM},`;
+          searchStr += `${satData[array[i]].SCC_NUM},`;
         }
       }
       searchBox.doSearch(searchStr);

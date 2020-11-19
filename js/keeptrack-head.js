@@ -19,7 +19,7 @@ const MOON_SCALAR_DISTANCE = 200000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.3.0';
+    settingsManager.versionNumber = '2.4.0';
     settingsManager.versionDate = 'November 18, 2020';
 
     // Install Folder Settings
@@ -67,7 +67,10 @@ const MOON_SCALAR_DISTANCE = 200000;
     // //////////////////////////////////////////////////////////////////////////
     // Most Commonly Used Settings
     // //////////////////////////////////////////////////////////////////////////
-
+    // Enable/Disable gs.json catalog Information
+    settingsManager.isEnableGsCatalog = true;
+    // Enable/Disable radarData Information
+    settingsManager.isEnableRadarData = true;
     // Adjust to change camera speed of auto rotate around earth
     settingsManager.autoRotateSpeed = 1.0 * 0.000075;
     // Disable main user interface. Currently an all or nothing package.
@@ -149,7 +152,7 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.satShader.largeObjectMaxZoom = 0.58;
     settingsManager.satShader.minSize = 4.0;
     // Max size dynamically changes based on zoom level
-    settingsManager.satShader.maxAllowedSize = 80.0;
+    settingsManager.satShader.maxAllowedSize = 50.0;
     settingsManager.satShader.isUseDynamicSizing = false;
     settingsManager.satShader.dynamicSizeScalar = 1.0;
     settingsManager.satShader.starSize = '20.0'; // Has to be a string
@@ -267,7 +270,9 @@ const MOON_SCALAR_DISTANCE = 200000;
         settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
         settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
         settingsManager.colors.inviewAlt = [0.2, 0.4, 1.0, 1];
-        settingsManager.colors.radarData = [0.2, 1.0, 0.8, 1.0];
+        settingsManager.colors.radarData = [0.0, 1.0, 1.0, 1.0];
+        settingsManager.colors.radarDataMissile = [1.0, 0.0, 0.0, 1.0];
+        settingsManager.colors.radarDataSatellite = [0.0, 1.0, 0.0, 1.0];
         settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
         settingsManager.colors.rocketBody = [0.2, 0.4, 1.0, 1];
         if (settingsManager.trusatOnly) {

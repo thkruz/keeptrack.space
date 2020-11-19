@@ -1475,6 +1475,9 @@ var speedModifier = 1;
                 lastOverlayUpdateTime = timeManager.now * 1 - 7000;
                 lastBoxUpdateTime = timeManager.now;
                 _updateNextPassOverlay(true);
+
+                radarDataManager.findFirstDataTime();
+
                 e.preventDefault();
             });
             $('#findByLooks').on('submit', function (e) {

@@ -63,6 +63,7 @@ Any modifications to a satellite require that information to be passed to the sa
 
 ## License
 Copyright (C) 2016-2020 Theodore Kruczek
+
 Copyright (C) 2020 Heather Kruczek
 
 This program is free software: you can redistribute it and/or modify

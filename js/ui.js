@@ -7,7 +7,7 @@ Copyright (C) 2020 Heather Kruczek
 Copyright (C) 2015-2016, James Yoder
 
 Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
-under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
+under the MIT License. Please reference http://keeptrack.space/licenses/thingsinspace.txt
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

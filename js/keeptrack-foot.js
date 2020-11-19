@@ -23,7 +23,7 @@ if (db.enabled || window.location.host == 'localhost' || settingsManager.offline
       <script src="${settingsManager.installDirectory}js/lib/colorPick.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}js/lib/webgl-obj-loader.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}js/mapManager.js?v=${settingsManager.versionNumber}"\><\/script>
-      <script src="${settingsManager.installDirectory}license/license.js?v=${settingsManager.versionNumber}"\><\/script>
+      <script src="${settingsManager.installDirectory}licenses/license.js?v=${settingsManager.versionNumber}"\><\/script>
       `);
     }
     document.write(`

@@ -61,8 +61,16 @@ Any modifications to a satellite require that information to be passed to the sa
 * [@hkruczek](https://github.com/hkruczek/)
 * [@Le-Roi777](https://github.com/Le-Roi777/)
 
-## License File
-At this time the code is NOT in the public domain and I reserve all rights on my modifications.
+## License
+Copyright (C) 2016-2020 Theodore Kruczek
+Copyright (C) 2020 Heather Kruczek
 
-### Why Post the Code Then
-I wouldn't have gotten this far if I hadn't been able to reference other projects and figure out how they work. I encourage you to use my ideas and methods, especially if you are currently forking from stuffin.space, but I am unwilling to give away use of the code to commercial projects at this time. If you would like to use this for academic/educational/scientific purposes please email me and we can arrange something - not looking for money, just credit.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.

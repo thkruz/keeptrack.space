@@ -4,7 +4,7 @@
 ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=for-the-badge)
 ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/thkruz/keeptrack.space/Test%20site%20for%20publicly%20known%20js%20vulnerabilities?label=vulnerabilities&style=for-the-badge)
-![License](https://img.shields.io/badge/license-rights%20reserved-red?style=for-the-badge)
+![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=for-the-badge)
 ## Description
 KeepTrack originally was meant to provide simple orbital analysis tools. Since then those simple tools have evolved into complex tools that bring functionality usually only found in expensive toolkits to the average user. The ultimate goal of the project is to make learning about orbital mechanics and satellite operations accessible to everyone without a paywall.
 
@@ -61,8 +61,17 @@ Any modifications to a satellite require that information to be passed to the sa
 * [@hkruczek](https://github.com/hkruczek/)
 * [@Le-Roi777](https://github.com/Le-Roi777/)
 
-## License File
-At this time the code is NOT in the public domain and I reserve all rights on my modifications.
+## License
+Copyright (C) 2016-2020 Theodore Kruczek
 
-### Why Post the Code Then
-I wouldn't have gotten this far if I hadn't been able to reference other projects and figure out how they work. I encourage you to use my ideas and methods, especially if you are currently forking from stuffin.space, but I am unwilling to give away use of the code to commercial projects at this time. If you would like to use this for academic/educational/scientific purposes please email me and we can arrange something - not looking for money, just credit.
+Copyright (C) 2020 Heather Kruczek
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.

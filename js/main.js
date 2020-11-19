@@ -1,24 +1,23 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-(c) 2016-2020, Theodore Kruczek
-(c) 2015-2016, James Yoder
-
 main.js is the primary javascript file for keeptrack.space. It manages all user
 interaction with the application.
 http://keeptrack.space
-.
+
+Copyright (C) 2016-2020 Theodore Kruczek
+Copyright (C) 2020 Heather Kruczek
+Copyright (C) 2015-2016, James Yoder
+
 Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
 under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
 
-All additions and modifications of original code is Copyright © 2016-2020 by
-All additions and modifications of original code is Copyright © 2016-2020 by
-Theodore Kruczek. All rights reserved. No part of this web site may be reproduced,
-published, distributed, displayed, performed, copied or stored for public or private
-use, without written permission of the author.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
 
-No part of this code may be modified or changed or exploited in any way used
-for derivative works, or offered for sale, or used to construct any kind of database
-or mirrored at any other location without the express written permission of the author.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ///////////////////////////////////////////////////////////////////////////// */
 var debugTimeArray = [];

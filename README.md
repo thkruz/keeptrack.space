@@ -4,7 +4,7 @@
 ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=for-the-badge)
 ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/thkruz/keeptrack.space/Test%20site%20for%20publicly%20known%20js%20vulnerabilities?label=vulnerabilities&style=for-the-badge)
-![License](https://img.shields.io/badge/license-rights%20reserved-red?style=for-the-badge)
+![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=for-the-badge)
 ## Description
 KeepTrack originally was meant to provide simple orbital analysis tools. Since then those simple tools have evolved into complex tools that bring functionality usually only found in expensive toolkits to the average user. The ultimate goal of the project is to make learning about orbital mechanics and satellite operations accessible to everyone without a paywall.
 

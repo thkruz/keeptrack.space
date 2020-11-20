@@ -561,6 +561,10 @@ if (!settingsManager.disableUI) {
                 case 'console':
                   settingsManager.isEnableConsole = true;
                   break;
+                case 'radarData':
+                  settingsManager.isEnableRadarData = true;
+                  settingsManager.maxRadarData = 70000;
+                  break;
                 case 'lowperf':
                     settingsManager.lowPerf = true;
                     settingsManager.maxFieldOfViewMarkers = 1;

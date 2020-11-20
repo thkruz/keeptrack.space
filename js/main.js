@@ -1858,15 +1858,15 @@ function _hoverBoxOnSat(satId, satX, satY) {
                   sat.setRAE(sat.rae);
                 }
                 if (sensorManager.currentSensor !== sensorManager.defaultSensor) {
-                  satHoverBoxNode2.innerHTML =
-                    new Date(sat.t).toISOString() +
-                    '</br>' +
-                      'R: ' +
-                      sat.rae.range.toFixed(2) +
-                      ' A: ' +
-                      sat.rae.az.toFixed(2) +
-                      ' E: ' +
-                      sat.rae.el.toFixed(2);
+                  let measurementDate = new Date(sat.t);
+                  satHoverBoxNode2.innerHTML = `JDAY: ${timeManager.getDayOfYear(measurementDate)} - ${measurementDate.toLocaleString('en-GB', { timeZone: 'UTC' }).slice(-8)}` +
+                  '</br>' +
+                  'R: ' +
+                  sat.rae.range.toFixed(2) +
+                  ' A: ' +
+                  sat.rae.az.toFixed(2) +
+                  ' E: ' +
+                  sat.rae.el.toFixed(2);
                 } else {
                   let measurementDate = new Date(sat.t);
                   satHoverBoxNode2.innerHTML = `JDAY: ${timeManager.getDayOfYear(measurementDate)} - ${measurementDate.toLocaleString('en-GB', { timeZone: 'UTC' }).slice(-8)}`;

@@ -1,4 +1,4 @@
-var cacheName = 'KeepTrack-v2.4.0';
+var cacheName = 'KeepTrack-v2.4.0.1';
 var contentToCache = [
     './',
     './index.htm',
@@ -59,7 +59,6 @@ var contentToCache = [
     './js/advice-module.min.js?v=2.4.0',
     './css/fonts/droid/droid-sans-v6-latin-regular.woff2',
     './js/objectManager.js',
-    './license/license.min.js?v=2.4.0',
     './js/satCruncher.js',
     './tle/TLE.json',
     './js/orbit-calculation-worker.js',

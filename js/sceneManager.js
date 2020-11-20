@@ -2022,7 +2022,6 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         {
             name: 'pick-fragment.glsl',
             code: `
-            #extension GL_EXT_frag_depth : enable
             precision mediump float;
 
             varying vec3 vColor;

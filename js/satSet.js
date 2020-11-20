@@ -1080,10 +1080,14 @@ var emptyMat4 = mat4.create();
               }
             }
           }
-          $('#loading-screen').fadeOut('slow');
-          setTimeout(function () {
-            $('#loader-text').html('Attempting to Math...');
-          }, 800);
+          if (!settingsManager.isMobileModeEnabled) {
+            $('#loading-screen').fadeOut('slow');
+            setTimeout(function () {
+              $('#loader-text').html('Attempting to Math...');
+            }, 800);
+          } else {
+            $('#loader-text').html('Loading Complete!');
+          }
         });
       });
     };

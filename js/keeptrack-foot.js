@@ -23,10 +23,10 @@ if (db.enabled || window.location.host == 'localhost' || settingsManager.offline
       <script src="${settingsManager.installDirectory}js/lib/colorPick.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}js/lib/webgl-obj-loader.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}js/mapManager.js?v=${settingsManager.versionNumber}"\><\/script>
-      <script src="${settingsManager.installDirectory}licenses/license.js?v=${settingsManager.versionNumber}"\><\/script>
       `);
     }
     document.write(`
+    <script src="${settingsManager.installDirectory}js/lib/mobileConsole.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/lib/combinedDependencies.js?v=${settingsManager.versionNumber}"\><\/script>
     `);
 
@@ -92,7 +92,6 @@ if (db.enabled || window.location.host == 'localhost' || settingsManager.offline
       <script src="${settingsManager.installDirectory}js/lib/colorPick.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}js/lib/webgl-obj-loader.min.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}js/mapManager.min.js?v=${settingsManager.versionNumber}"\><\/script>
-      <script src="${settingsManager.installDirectory}license/license.js?v=${settingsManager.versionNumber}"\><\/script>
       `);
     }
     document.write(`

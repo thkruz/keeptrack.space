@@ -126,21 +126,7 @@ var speedModifier = 1;
         (function _licenseCheck() {
             db.log('_licenseCheck');
             if (typeof satel === 'undefined') satel = null;
-            if (!settingsManager.breakTheLaw && settingsManager.offline && !_clk()) {
-                _offlineMessage();
-                $('#license-watermark').removeClass('start-hidden');
-                $('#license-watermark').show();
-                console.warn(
-                    'Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com'
-                );
-                console.warn(
-                    'You will be redirected to the online version of keeptrack in 2 minutes.'
-                );
-                setTimeout(function () {
-                    window.location.replace('http://s4ts.com');
-                }, 1000 * 60 * 2);
-                // throw new Error('Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com');
-            } else {
+            if (settingsManager.breakTheLaw || settingsManager.offline) {
                 if (settingsManager.isOfficialWebsite)
                     ga(
                         'send',
@@ -5093,18 +5079,6 @@ var speedModifier = 1;
             db.log('browserUnsupported');
             $('#canvas-holder').hide();
             $('#no-webgl').css('display', 'block');
-        }
-        function _clk() {
-            db.log('_clk');
-            lk1 = new Date(lk1);
-            if (lk1 == 'undefined') return false;
-            if (settingsManager.lkVerify > lk1) return false;
-            var olcv = 0;
-            for (x = 0; x < settingsManager.offlineLocation.length; x++) {
-                olcv += settingsManager.offlineLocation.charCodeAt(x) * 41690;
-            }
-            if (olcv === lk2) return true;
-            return false;
         }
     });
 

@@ -84,10 +84,16 @@ const MOON_SCALAR_DISTANCE = 200000;
     // //////////////////////////////////////////////////////////////////////////
     // Most Commonly Used Settings
     // //////////////////////////////////////////////////////////////////////////
+
+    settingsManager.maxFieldOfViewMarkers = 105000;
+    settingsManager.maxMissiles = 500;
+    settingsManager.maxAnalystSats = 256;
+
     // Enable/Disable gs.json catalog Information
     settingsManager.isEnableGsCatalog = true;
     // Enable/Disable radarData Information
-    settingsManager.isEnableRadarData = true;
+    settingsManager.isEnableRadarData = false;
+    settingsManager.maxRadarData = 1; // 70000;
     // Adjust to change camera speed of auto rotate around earth
     settingsManager.autoRotateSpeed = 1.0 * 0.000075;
     // Disable main user interface. Currently an all or nothing package.
@@ -151,6 +157,7 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.isMobileModeEnabled = false;
     if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
         settingsManager.isMobileModeEnabled = true;
+        settingsManager.maxFieldOfViewMarkers = 20000;
         // settingsManager.smallImages = true;
         settingsManager.isDrawLess = true;
         settingsManager.camDistBuffer = 100;
@@ -383,11 +390,6 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.maxLabels = 20000;
 
     settingsManager.isAlwaysHidePropRate = false;
-
-    settingsManager.maxFieldOfViewMarkers = 105000;
-    settingsManager.maxRadarData = 70000;
-    settingsManager.maxMissiles = 500;
-    settingsManager.maxAnalystSats = 256;
 
     // Information Overlay Color Settings
     settingsManager.redTheme = false;

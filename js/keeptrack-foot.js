@@ -15,6 +15,12 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 // /////////////////////////////////////////////////////////////////////////////
 */
 
+if (settingsManager.isEnableConsole) {
+  document.write(`
+  <script src="${settingsManager.installDirectory}js/lib/mobileConsole.js?v=${settingsManager.versionNumber}"\><\/script>
+  `);
+}
+
 // Load Full Version For Debugging
 if (db.enabled || window.location.host == 'localhost' || settingsManager.offline) {
     // Load Dependencies
@@ -26,7 +32,6 @@ if (db.enabled || window.location.host == 'localhost' || settingsManager.offline
       `);
     }
     document.write(`
-    <script src="${settingsManager.installDirectory}js/lib/mobileConsole.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/lib/combinedDependencies.js?v=${settingsManager.versionNumber}"\><\/script>
     `);
 

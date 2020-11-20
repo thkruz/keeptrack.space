@@ -558,6 +558,9 @@ if (!settingsManager.disableUI) {
             let key = params[i].split('=')[0];
             let val = params[i].split('=')[1];
             switch (key) {
+                case 'console':
+                  settingsManager.isEnableConsole = true;
+                  break;
                 case 'lowperf':
                     settingsManager.lowPerf = true;
                     settingsManager.maxFieldOfViewMarkers = 1;

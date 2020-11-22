@@ -1949,7 +1949,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         if (alpha == 0.0) discard;
         gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
         // Reduce Flickering from Depth Fighting
-        gl_FragDepthEXT = gl_FragCoord.z * 0.99999975;
+        ${settingsManager.desktopOnlySatShaderFix};
       }
     `,
         },

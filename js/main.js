@@ -1837,7 +1837,7 @@ function _hoverBoxOnSat(satId, satX, satY) {
         var sat = satSet.getSatExtraOnly(satId);
         let selectedSatData = satSet.getSatExtraOnly(objectManager.selectedSat);
         isHoverBoxVisible = true;
-        if (sat.static) {
+        if (sat.static || sat.isRadarData) {
             if (sat.type === 'Launch Facility') {
                 var launchSite = objectManager.extractLaunchSite(sat.name);
                 satHoverBoxNode1.textContent =
@@ -1856,7 +1856,7 @@ function _hoverBoxOnSat(satId, satX, satY) {
                   satHoverBoxNode1.innerHTML += '</br>Missile Complex: ' + sat.missileComplex;
                   satHoverBoxNode1.innerHTML += '</br>Missile Object: ' + sat.missileObject;
                 }
-                if (sat.si !== -1) satHoverBoxNode1.innerHTML += '</br>Satellite: ' + sat.satId;
+                if (sat.satId !== -1) satHoverBoxNode1.innerHTML += '</br>Satellite: ' + sat.satId;
                 if (typeof sat.rae == 'undefined' && sensorManager.currentSensor !== sensorManager.defaultSensor) {
                   sat.rae = satellite.eci2Rae(sat.t,sat,sensorManager.currentSensor);
                   sat.setRAE(sat.rae);

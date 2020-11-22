@@ -563,7 +563,7 @@ if (!settingsManager.disableUI) {
                   break;
                 case 'radarData':
                   settingsManager.isEnableRadarData = true;
-                  settingsManager.maxRadarData = 70000;
+                  settingsManager.maxRadarData = 150000;
                   break;
                 case 'lowperf':
                     settingsManager.lowPerf = true;

@@ -2136,7 +2136,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
   radarDataManager.drawT1 = 0;
 
   radarDataManager.init = () => {
-    $.getScript('radarData/radarData.json', function (resp) {
+    $.getScript(`${settingsManager.installDirectory}radarData/radarData.txt`, function (resp) {
       $('#loader-text').html('Importing Radar Data...');
       $('#loading-screen').fadeIn(1000, function () {
         radarDataManager.setup(resp);
@@ -2176,6 +2176,39 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
   radarDataManager.setup = (resp) => {
       db.log('radarDataManager.init');
       radarDataManager.radarData = JSON.parse(resp);
+
+      let j, gmst, nowDate, radarDataECF, radarDataECI;
+      for (let i = 0; i < radarDataManager.radarData.length; i++) {
+        nowDate = new Date(radarDataManager.radarData[i].t);
+
+        j = timeManager.jday(
+          nowDate.getUTCFullYear(),
+          nowDate.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+          nowDate.getUTCDate(),
+          nowDate.getUTCHours(),
+          nowDate.getUTCMinutes(),
+          nowDate.getUTCSeconds()
+        );
+        j += nowDate.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+
+        gmst = satellite.gstime(j);
+
+        // Update Radar Marker Position
+        radarDataECF = satellite.lookAnglesToEcf(
+            radarDataManager.radarData[i].a,
+            radarDataManager.radarData[i].e,
+            radarDataManager.radarData[i].r,
+            sensorManager.sensorList.COD.lat * DEG2RAD,
+            sensorManager.sensorList.COD.long * DEG2RAD,
+            sensorManager.sensorList.COD.obshei
+        );
+        radarDataECI = satellite.ecfToEci(radarDataECF, gmst);
+        radarDataManager.radarData[i].x = radarDataECI.x;
+        radarDataManager.radarData[i].y = radarDataECI.y;
+        radarDataManager.radarData[i].z = radarDataECI.z;
+      }
+
+
       satSet.updateRadarData();
       radarDataManager.changeTimeToFirstDataTime();
       settingsManager.radarDataReady = true;
@@ -2186,8 +2219,8 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
     let now = Date.now();
     // Generates 1 Hour of 10x ~56ms data
     let k = 0;
-    for (var i = 0; i < (60 * 60 * 1000); i+=56) {
-      for (let j = 0; j < 1; j++) {
+    for (var i = 0; i < (60 * 60 * 1000); i+=1000) {
+      for (let j = 0; j < 20; j++) {
         // Most in surveillance
         let az = -18 + (Math.random() * 240);
         let el = 2 + (Math.random() * 2);

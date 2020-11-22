@@ -1258,14 +1258,15 @@ var emptyMat4 = mat4.create();
     satSet.updateRadarData = () => {
       for (let i = 0; i < radarDataManager.radarData.length; i++) {
         try {
-          satData[radarDataManager.satDataStartIndex + i].mId = radarDataManager.radarData[i].m;
+          satData[radarDataManager.satDataStartIndex + i].isRadarData = true;
+          satData[radarDataManager.satDataStartIndex + i].mId = parseInt(radarDataManager.radarData[i].m);
           satData[radarDataManager.satDataStartIndex + i].t = radarDataManager.radarData[i].t;
-          satData[radarDataManager.satDataStartIndex + i].rcs = radarDataManager.radarData[i].rc;
-          satData[radarDataManager.satDataStartIndex + i].trackId = radarDataManager.radarData[i].ti;
-          satData[radarDataManager.satDataStartIndex + i].objectId = radarDataManager.radarData[i].oi;
-          satData[radarDataManager.satDataStartIndex + i].satId = radarDataManager.radarData[i].si;
-          satData[radarDataManager.satDataStartIndex + i].missileComplex = radarDataManager.radarData[i].mc;
-          satData[radarDataManager.satDataStartIndex + i].missileObject = radarDataManager.radarData[i].mo;
+          satData[radarDataManager.satDataStartIndex + i].rcs = parseInt(radarDataManager.radarData[i].rc);
+          satData[radarDataManager.satDataStartIndex + i].trackId = parseInt(radarDataManager.radarData[i].ti);
+          satData[radarDataManager.satDataStartIndex + i].objectId = parseInt(radarDataManager.radarData[i].oi);
+          satData[radarDataManager.satDataStartIndex + i].satId = parseInt(radarDataManager.radarData[i].si);
+          satData[radarDataManager.satDataStartIndex + i].missileComplex = parseInt(radarDataManager.radarData[i].mc);
+          satData[radarDataManager.satDataStartIndex + i].missileObject = parseInt(radarDataManager.radarData[i].mo);
           satData[radarDataManager.satDataStartIndex + i].azError = radarDataManager.radarData[i].ae;
           satData[radarDataManager.satDataStartIndex + i].elError = radarDataManager.radarData[i].ee;
           satData[radarDataManager.satDataStartIndex + i].dataType = radarDataManager.radarData[i].dataType;
@@ -1273,6 +1274,7 @@ var emptyMat4 = mat4.create();
           // console.log(radarDataManager.radarData[i]);
         }
       }
+      satSet.setColorScheme(settingsManager.currentColorScheme, true);
     };
 
     var screenLocation = [];
@@ -1286,11 +1288,11 @@ var emptyMat4 = mat4.create();
         if (radarDataLen > 0) {
           // Get Time
           if (timeManager.propRate === 0) {
-            timeManager.nowTemp.setTime(
+            timeManager.propTimeVar.setTime(
               Number(timeManager.propRealTime) + timeManager.propOffset
             );
           } else {
-            timeManager.nowTemp.setTime(
+            timeManager.propTimeVar.setTime(
               Number(timeManager.propRealTime) +
               timeManager.propOffset +
               (Number(timeManager.now) -
@@ -1298,12 +1300,12 @@ var emptyMat4 = mat4.create();
               timeManager.propRate
             );
           }
-          drawPropTime = timeManager.nowTemp * 1;
+          drawPropTime = timeManager.propTimeVar * 1;
 
           // Find the First Radar Return Time
           if (radarDataManager.drawT1 == 0) {
             for (rrI = 0; rrI < radarDataLen; rrI++) {
-              if (radarDataManager.radarData[rrI].t > now - 3000) {
+              if (radarDataManager.radarData[rrI].t > timeManager.now - 3000) {
                 radarDataManager.drawT1 = rrI;
                 break;
               }

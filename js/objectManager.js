@@ -2,6 +2,7 @@
 // This loads all of the various modules that provide objects for the screen
 
 (function () {
+  'use strict';
     var objectManager = {};
     objectManager.selectedSat = -1;
     objectManager.hoveringSat = -1;
@@ -47,7 +48,7 @@
         }
 
         var maxAnalystSats = settingsManager.maxAnalystSats;
-        for (i = 0; i < maxAnalystSats; i++) {
+        for (let i = 0; i < maxAnalystSats; i++) {
             var analSatInfo = {
                 static: false,
                 missile: false,
@@ -74,6 +75,8 @@
 
         // Try Loading Star Module
         try {
+            if (settingsManager.lowPerf) throw 'Low Performance Override';
+            if (settingsManager.noStars) throw 'No Stars Override';
             objectManager.starIndex1 = objectManager.staticSet.length + 1;
             for (var star = 0; star < starManager.stars.length; star++) {
                 var starInfo = {
@@ -96,6 +99,7 @@
                 objectManager.staticSet.push(starInfo);
             }
             objectManager.isStarManagerLoaded = true;
+            delete starManager.stars;
         } catch (e) {
             objectManager.isStarManagerLoaded = false;
             console.log('You do not have the Star Module');
@@ -176,7 +180,7 @@
 
         objectManager.starIndex2 = objectManager.staticSet.length - 1;
 
-        for (i = 0; i < settingsManager.maxFieldOfViewMarkers; i++) {
+        for (let i = 0; i < settingsManager.maxFieldOfViewMarkers; i++) {
             var fieldOfViewMarker = {
                 static: true,
                 marker: true,

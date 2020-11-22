@@ -10,6 +10,7 @@
 // FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 (function () {
+  'use strict';
     var groups = {};
     groups.selectedGroup = null;
     groups.SatGroup = SatGroup;
@@ -157,6 +158,7 @@
 
     groups.updateIsInGroup = function (oldgroup, newgroup) {
         var sat;
+        let i;
         if (oldgroup !== null && oldgroup !== undefined) {
             for (i = 0; i < oldgroup.sats.length; i++) {
                 sat = satSet.getSatExtraOnly(oldgroup.sats[i].satId);

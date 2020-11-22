@@ -18,6 +18,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 ///////////////////////////////////////////////////////////////////////////// */
 
 (function () {
+  'use strict';
     // Constants
     const TAU = 2 * Math.PI;
     const DEG2RAD = TAU / 360;
@@ -2329,7 +2330,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             return dops;
         }
 
-        var A = numeric.rep([nsat, 4], 0);
+        var A = window.numeric.rep([nsat, 4], 0);
         var azlist = [];
         var elvlist = [];
         if (isDrawLine) drawLineList = [];
@@ -2360,10 +2361,10 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                 Math.sin((elv * Math.PI) / 180.0),
                 1,
             ];
-            numeric.setBlock(A, [n - 1, 0], [n - 1, 3], [B]);
+            window.numeric.setBlock(A, [n - 1, 0], [n - 1, 3], [B]);
         }
-        var Q = numeric.dot(numeric.transpose(A), A);
-        var Qinv = numeric.inv(Q);
+        var Q = window.numeric.dot(window.numeric.transpose(A), A);
+        var Qinv = window.numeric.inv(Q);
         var pdop = Math.sqrt(Qinv[0][0] + Qinv[1][1] + Qinv[2][2]);
         var hdop = Math.sqrt(Qinv[0][0] + Qinv[1][1]);
         var gdop = Math.sqrt(Qinv[0][0] + Qinv[1][1] + Qinv[2][2] + Qinv[3][3]);

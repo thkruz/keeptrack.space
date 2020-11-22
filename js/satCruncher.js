@@ -19,6 +19,8 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
+'use strict';
+
 importScripts('lib/satellite.js');
 importScripts('lib/numeric.js'); // Used for sunlight calculations
 importScripts('lib/meuusjs.1.0.3.min.js'); // Used for sunlight calculations
@@ -65,6 +67,10 @@ var isLowPerf = false;
 var isResetMarker = false;
 var isResetInView = false;
 var isResetSunlight = false; // Remove
+let fieldOfViewSetLength;
+let len;
+
+let postMessageArray = {};
 
 /** OBSERVER VARIABLES */
 var sensor = {};
@@ -185,6 +191,7 @@ onmessage = function (m) {
                 satrec = null;
                 if (satData[i].static || satData[i].missile || satData[i].isRadarData) {
                     satrec = satData[i];
+                    delete satrec['id'];
                     extraData.push(extra);
                     satCache.push(satrec);
                     i++;
@@ -216,6 +223,7 @@ onmessage = function (m) {
                     extra.period = 1440.0 / extra.meanMotion;
 
                     extraData.push(extra);
+                    delete satrec['id'];
                     satCache.push(satrec);
                     i++;
                 }
@@ -409,7 +417,7 @@ function propagateCruncher() {
     );
     j2 += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
     var gmstNext = satellite.gstime(j2);
-    var len = satCache.length - 1;
+    len = satCache.length - 1;
 
     if (
         (!isResetSatOverfly &&
@@ -1541,13 +1549,24 @@ function propagateCruncher() {
         len -= fieldOfViewSetLength;
     }
 
-    postMessage({
-        satPos: satPos.buffer,
-        satVel: satVel.buffer,
-        satInView: satInView.buffer,
-        satInSun: satInSun.buffer,
-        sensorMarkerArray: sensorMarkerArray,
-    });
+    postMessageArray = {
+      satPos: satPos.buffer,
+      satVel: satVel.buffer,
+    };
+    // Add In View Data if Sensor Selected
+    if (sensor.observerGd !== defaultGd) {
+      postMessageArray.satInView = satInView.buffer;
+    }
+    // Add Sun View Data if Enabled
+    if (isSunlightView) {
+      postMessageArray.satInSun = satInSun.buffer;
+    }
+    if (sensorMarkerArray.length > 1) {
+      postMessageArray.sensorMarkerArray = sensorMarkerArray;
+    }
+
+    postMessage(postMessageArray);
+
 
     // The longer the delay the more jitter at higher speeds of propagation
     setTimeout(() => {

@@ -3,6 +3,7 @@
 */
 
 (function () {
+  'use strict';
     var timeManager = {};
 
     var propFrozen = Date.now(); // for when propRate 0
@@ -14,7 +15,7 @@
     var jDayDiff;
 
     timeManager.dateObject = new Date();
-    timeManager.nowTemp = timeManager.dateObject;
+    timeManager.propTimeVar = timeManager.dateObject;
 
     timeManager.now = propFrozen; // (initialized as Date.now)
     timeManager.propRealTime = propFrozen; // actual time we're running it (initialized as Date.now)
@@ -186,14 +187,30 @@
         };
     })();
 
+    timeManager.updatePropTime = () => {
+      if (timeManager.propRate === 0) {
+          timeManager.propTimeVar.setTime(
+              Number(timeManager.propRealTime) + timeManager.propOffset
+          );
+      } else {
+          timeManager.propTimeVar.setTime(
+              Number(timeManager.propRealTime) +
+                  timeManager.propOffset +
+                  (Number(timeManager.now) -
+                      Number(timeManager.propRealTime)) *
+                      timeManager.propRate
+          );
+      }
+    };
+
     // Propagation Time Functions
     timeManager.propTime = function () {
         if (timeManager.propRate === 0) {
-            timeManager.nowTemp.setTime(
-                Number(propFrozen) + timeManager.propOffset
+            timeManager.propTimeVar.setTime(
+                Number(timeManager.propRealTime) + timeManager.propOffset
             );
         } else {
-            timeManager.nowTemp.setTime(
+            timeManager.propTimeVar.setTime(
                 Number(timeManager.propRealTime) +
                     timeManager.propOffset +
                     (Number(timeManager.now) -
@@ -201,7 +218,7 @@
                         timeManager.propRate
             );
         }
-        return timeManager.nowTemp;
+        return timeManager.propTimeVar;
     };
 
     timeManager.propTimeCheck = function (propTempOffset, propRealTime) {

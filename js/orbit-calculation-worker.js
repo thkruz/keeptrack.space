@@ -12,6 +12,7 @@
 
 */
 importScripts('lib/satellite.js');
+'use strict';
 
 var propRealTime;
 var propOffset;
@@ -28,15 +29,18 @@ var satCache = [];
 
 onmessage = function (m) {
     if (m.data.isUpdate) {
-        if (!m.data.missile) {
+        // Add Satellites
+        if (m.data.satId < 99999) {
             satCache[m.data.satId] = satellite.twoline2satrec(
                 m.data.TLE1,
                 m.data.TLE2
             );
         }
+        // Add Missiles
         if (m.data.missile) {
             satCache[m.data.satId] = m.data;
         }
+        // Don't Add Anything Else
     }
 
     if (m.data.isInit) {
@@ -45,6 +49,7 @@ onmessage = function (m) {
         let i = -1;
         while (i < sLen) {
             i++;
+            delete satData[i]['id'];
             if (satData[i].static || satData[i].missile) {
                 satCache[i] = satData[i];
             } else {

@@ -36,8 +36,8 @@ const MOON_SCALAR_DISTANCE = 200000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.4.0';
-    settingsManager.versionDate = 'November 18, 2020';
+    settingsManager.versionNumber = '2.5.0';
+    settingsManager.versionDate = 'November 22, 2020';
 
     // Install Folder Settings
     {
@@ -174,15 +174,15 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.satShader = {};
     settingsManager.satShader.largeObjectMinZoom = 0.37;
     settingsManager.satShader.largeObjectMaxZoom = 0.58;
-    settingsManager.satShader.minSize = 4.0;
+    settingsManager.satShader.minSize = 5.5;
     // Max size dynamically changes based on zoom level
-    settingsManager.satShader.maxAllowedSize = 50.0;
+    settingsManager.satShader.maxAllowedSize = 35.0;
     settingsManager.satShader.isUseDynamicSizing = false;
     settingsManager.satShader.dynamicSizeScalar = 1.0;
     settingsManager.satShader.starSize = '20.0'; // Has to be a string
     // NOTE: Use floats not integers because some settings get sent to graphics card
     // Must be a string for GPU to read.
-    settingsManager.satShader.distanceBeforeGrow = '22000.0'; // Km allowed before grow
+    settingsManager.satShader.distanceBeforeGrow = '14000.0'; // Km allowed before grow
     // Used for Satellites
     settingsManager.satShader.blurFactor1 = '0.53';
     settingsManager.satShader.blurFactor2 = '0.5';
@@ -567,16 +567,23 @@ if (!settingsManager.disableUI) {
                   break;
                 case 'lowperf':
                     settingsManager.lowPerf = true;
+                    settingsManager.isDrawLess = true;
+                    settingsManager.zFar = 250000.0;
+                    settingsManager.noMeshManager = true;
                     settingsManager.maxFieldOfViewMarkers = 1;
+                    settingsManager.smallImages = true;
                     break;
                 case 'hires':
                     settingsManager.hiresImages = true;
                     settingsManager.minimumDrawDt = 0.01667;
                     break;
+                case 'nostars':
+                    settingsManager.noStars = true;
+                    break;
                 case 'draw-less':
                     settingsManager.isDrawLess = true;
+                    settingsManager.zFar = 250000.0;
                     settingsManager.noMeshManager = true;
-                    settingsManager.smallImages = true;
                     break;
                 case 'draw-more':
                     settingsManager.isDrawLess = false;

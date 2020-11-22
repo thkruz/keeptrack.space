@@ -21,6 +21,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ///////////////////////////////////////////////////////////////////////////// */
 
+// 'use strict';
 var satSensorMarkerArray = [];
 var emptyMat4 = mat4.create();
 (function () {
@@ -72,8 +73,6 @@ var emptyMat4 = mat4.create();
      * (ex: now --> drawNow) (ex: i --> satCrunchIndex)
      */
     // draw Loop
-    var drawNow = 0;
-    var lastDrawTime = 0;
     var drawDivisor;
     var drawDt;
     var drawI;
@@ -185,7 +184,7 @@ var emptyMat4 = mat4.create();
         // Don't force color recalc if default colors and no sensor for inview color
         if (
             (objectManager.isSensorManagerLoaded &&
-                sensorManager.checkSensorSelected()) ||
+                sensorManager.currentSensor.lat != null) ||
             settingsManager.isForceColorScheme
         ) {
             // Don't change colors while dragging
@@ -256,7 +255,7 @@ var emptyMat4 = mat4.create();
                   }
                   if (watchlistJSON !== null) {
                       let newWatchlist = JSON.parse(watchlistJSON);
-                      watchlistInViewList = [];
+                      let watchlistInViewList = [];
                       for (let i = 0; i < newWatchlist.length; i++) {
                           let sat = satSet.getSatExtraOnly(
                               satSet.getIdFromObjNum(newWatchlist[i])
@@ -508,7 +507,7 @@ var emptyMat4 = mat4.create();
         satSet.startCatalogLoad = () => {
           settingsManager.isCatalogPreloaded = true;
           if (typeof settingsManager.tleSource == 'undefined') {
-            settingsManager.tleSource = 'tle/TLE.json';
+            settingsManager.tleSource = `${settingsManager.installDirectory}tle/TLE.json`;
           }
           if (settingsManager.offline) {
             satSet.loadTLEs(jsTLEfile);
@@ -536,13 +535,14 @@ var emptyMat4 = mat4.create();
                 })
                 .fail(function () {
                   // Try the js file without caching
-                  $.getScript('offline/tle.js', function () {
+                  $.getScript(`${settingsManager.installDirectory}offline/tle.js`, function () {
                     satSet.loadTLEs(jsTLEfile);
                   }, true);
                 });
               });
               jsTLEfile = null;
             } catch (e) {
+              console.log(e);
               satSet.loadTLEs(jsTLEfile);
               jsTLEfile = null;
             }
@@ -645,7 +645,7 @@ var emptyMat4 = mat4.create();
         //   resp = JSON.parse(resp);
         // }
 
-        for (var i = 0; i < resp.length; i++) {
+        for (let i = 0; i < resp.length; i++) {
           resp[i].SCC_NUM = pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
           if (limitSats === '') {
             // If there are no limits then just process like normal
@@ -692,13 +692,14 @@ var emptyMat4 = mat4.create();
             }
           }
         }
-        var isMatchFound = false;
+        let isMatchFound = false;
+        let extrasSatInfo;
         if (
           typeof satelliteList !== 'undefined' &&
           settingsManager.offline
         ) {
           // If extra catalogue
-          for (s = 0; s < satelliteList.length; s++) {
+          for (let s = 0; s < satelliteList.length; s++) {
             isMatchFound = false;
             if (satelliteList[s].SCC == undefined) continue;
             if (satelliteList[s].TLE1 == undefined) continue; // Don't Process Bad Satellite Information
@@ -849,7 +850,6 @@ var emptyMat4 = mat4.create();
 
         if (settingsManager.isEnableGsCatalog) satSet.initGsData();
 
-        loggerStop = Date.now();
         for (i = 0; i < objectManager.staticSet.length; i++) {
           tempSatData.push(objectManager.staticSet[i]);
         }
@@ -934,6 +934,9 @@ var emptyMat4 = mat4.create();
         fieldOfViewSetLength: objectManager.fieldOfViewSet.length,
         isLowPerf: settingsManager.lowPerf,
       });
+
+      delete objectManager.fieldOfViewSet;
+
       // multThreadCruncher1.postMessage({type: 'init', data: satSet.satDataString});
       // multThreadCruncher2.postMessage({type: 'init', data: satSet.satDataString});
       // multThreadCruncher3.postMessage({type: 'init', data: satSet.satDataString});
@@ -1050,6 +1053,7 @@ var emptyMat4 = mat4.create();
           for (let gsI = 0; gsI < satSet.gsInfo.length; gsI++) {
             let gsSatType = satSet.gsInfo[gsI];
             let satSetFirstI = 0
+            let satSetI = 0;
             for (let gsI2 = 0; gsI2 < gsSatType[1].length; gsI2++) {
               let gsSat = gsSatType[1][gsI2];
               satSetFirstI = Math.max(satSetFirstI - 200, 0);
@@ -1272,18 +1276,42 @@ var emptyMat4 = mat4.create();
     };
 
     var screenLocation = [];
-    let drawPropTime,isDidOnce;
-    satSet.draw = (pMatrix, camMatrix, drawNow) => {
+    let drawPropTime,isDidOnce,rrI,radarDataLen;
+    satSet.draw = (pMatrix, camMatrix) => {
         // NOTE: 640 byte leak.
         if (!settingsManager.shadersReady || !settingsManager.cruncherReady)
             return;
 
-        drawPropTime = timeManager.propTime() * 1;
-        if (radarDataManager.radarData.length > 0) {
-          if (radarDataManager.drawT1 == 0) radarDataManager.findFirstDataTime();
+        radarDataLen = radarDataManager.radarData.length;
+        if (radarDataLen > 0) {
+          // Get Time
+          if (timeManager.propRate === 0) {
+            timeManager.nowTemp.setTime(
+              Number(timeManager.propRealTime) + timeManager.propOffset
+            );
+          } else {
+            timeManager.nowTemp.setTime(
+              Number(timeManager.propRealTime) +
+              timeManager.propOffset +
+              (Number(timeManager.now) -
+              Number(timeManager.propRealTime)) *
+              timeManager.propRate
+            );
+          }
+          drawPropTime = timeManager.nowTemp * 1;
+
+          // Find the First Radar Return Time
+          if (radarDataManager.drawT1 == 0) {
+            for (rrI = 0; rrI < radarDataLen; rrI++) {
+              if (radarDataManager.radarData[rrI].t > now - 3000) {
+                radarDataManager.drawT1 = rrI;
+                break;
+              }
+            }
+          }
 
           isDidOnce = false;
-          for (drawI = radarDataManager.drawT1; drawI < radarDataManager.radarData.length; drawI++) {
+          for (drawI = radarDataManager.drawT1; drawI < radarDataLen; drawI++) {
             // Don't Exceed Max Radar Data Allocation
             // if (drawI > settingsManager.maxRadarData) break;
 
@@ -1316,33 +1344,24 @@ var emptyMat4 = mat4.create();
         // gl.bindVertexArray(satSet.vao);
 
         drawDivisor = Math.max(timeManager.propRate, 0.001);
-        drawDt = Math.min((drawNow - lastDrawTime) / 1000.0, 1.0 / drawDivisor);
-        drawDt *= timeManager.propRate; // Adjust drawDt correspond to the propagation rate
+        dlManager.drawDt = Math.min((dlManager.drawNow - dlManager.lastDrawTime) / 1000.0, 1.0 / drawDivisor);
+        dlManager.drawDt *= timeManager.propRate; // Adjust drawDt correspond to the propagation rate
         satSet.satDataLenInDraw = satData.length;
-        if (
-            !settingsManager.lowPerf &&
-            drawDt > settingsManager.minimumDrawDt
-        ) {
-            if (
-                !settingsManager.isSatOverflyModeOn &&
-                !settingsManager.isFOVBubbleModeOn
-            ) {
-                satSet.satDataLenInDraw -=
-                    (settingsManager.maxFieldOfViewMarkers + settingsManager.maxRadarData);
+        if (!settingsManager.lowPerf && dlManager.drawDt > settingsManager.minimumDrawDt) {
+            if (!settingsManager.isSatOverflyModeOn && !settingsManager.isFOVBubbleModeOn) {
+                satSet.satDataLenInDraw -= (settingsManager.maxFieldOfViewMarkers + settingsManager.maxRadarData);
                 satSet.satDataLenInDraw3 = satSet.satDataLenInDraw * 3;
                 for (drawI = 0; drawI < satSet.satDataLenInDraw3; drawI++) {
-                    satPos[drawI] += satVel[drawI] * drawDt;
+                    satPos[drawI] += satVel[drawI] * dlManager.drawDt;
                 }
             } else {
                 satSet.satDataLenInDraw3 = satSet.satDataLenInDraw * 3;
                 for (drawI = 0; drawI < satSet.satDataLenInDraw3; drawI++) {
-                    satPos[drawI] += satVel[drawI] * drawDt;
+                    satPos[drawI] += satVel[drawI] * dlManager.drawDt;
                 }
             }
-            lastDrawTime = drawNow;
+            dlManager.lastDrawTime = dlManager.drawNow;
         }
-
-        // console.log('interp dt=' + dt + ' ' + drawNow);
 
         gl.useProgram(dotShader);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -1422,7 +1441,7 @@ var emptyMat4 = mat4.create();
         // satSet.updateFOV(null, drawNow);
 
         // Done Drawing
-        return true;
+        // return true;
     };
 
     satSet.setSat = (i, satObject) => {
@@ -1502,7 +1521,7 @@ var emptyMat4 = mat4.create();
         if (typeof satData[i].isInSun == 'undefined') {
             satData[i].isInSun = () => {
                 // Distances all in km
-                let sunECI = sun.getXYZ();
+                let sunECI = sun.realXyz;
 
                 // NOTE: Code is mashed to save memory when used on the whole catalog
 
@@ -1547,7 +1566,7 @@ var emptyMat4 = mat4.create();
                 // Angle between earth and sun
                 let theta =
                     Math.acos(
-                        numeric.dot(
+                        window.numeric.dot(
                             [
                                 -satData[i].position.x,
                                 -satData[i].position.y,
@@ -2360,7 +2379,7 @@ var emptyMat4 = mat4.create();
 
         if (
             objectManager.isSensorManagerLoaded &&
-            sensorManager.checkSensorSelected()
+            sensorManager.currentSensor.lat != null
         ) {
             $('#menu-lookangles').removeClass('bmenu-item-disabled');
         }

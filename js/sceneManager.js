@@ -22,6 +22,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 //       then have a single call to update time at the beginning of the draw
 //       function
 (function () {
+  'use strict';
     let mvMatrixEmpty = mat4.create();
     let nMatrixEmpty = mat3.create();
 
@@ -511,7 +512,8 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
         earth.update = () => {
             earth.lastTime = earthNow;
-            earthNow = timeManager.propTime();
+            timeManager.updatePropTime();
+            earthNow = timeManager.propTimeVar;
             timeManager.selectedDate = earthNow;
 
             // wall time is not propagation time, so better print it
@@ -560,12 +562,12 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                     if (!createClockDOMOnce) {
                         document.getElementById(
                             'datetime-text'
-                        ).innerText = `${earth.timeTextStr}`;
+                        ).innerText = earth.timeTextStr;
                         createClockDOMOnce = true;
                     } else {
                         document.getElementById(
                             'datetime-text'
-                        ).childNodes[0].nodeValue = `${earth.timeTextStr}`;
+                        ).childNodes[0].nodeValue = earth.timeTextStr;
                     }
                 }
             }
@@ -981,7 +983,8 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         sun.sunvar = {};
 
         sun.currentDirection = function () {
-            sun.sunvar.now = timeManager.propTime();
+            timeManager.updatePropTime();
+            sun.sunvar.now = timeManager.propTimeVar;
             sun.sunvar.j = timeManager.jday(
                 sun.sunvar.now.getUTCFullYear(),
                 sun.sunvar.now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -1017,51 +1020,6 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                 Math.sin(sun.sunvar.ecLon * DEG2RAD);
 
             // return [sun.sunvar.x, sun.sunvar.y, sun.sunvar.z];
-        };
-
-        sun.getXYZ = function () {
-            var now = timeManager.propTime();
-            j = timeManager.jday(
-                now.getUTCFullYear(),
-                now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-                now.getUTCDate(),
-                now.getUTCHours(),
-                now.getUTCMinutes(),
-                now.getUTCSeconds()
-            );
-            j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-            var gmst = satellite.gstime(j);
-            var jdo = new A.JulianDay(j); // now
-
-            //var observerGd = sensorManager.currentSensor.observerGd;
-            //var coord = A.EclCoord.fromWgs84(observerGd.latitude * RAD2DEG, observerGd.longitude * RAD2DEG, observerGd.height);
-
-            var coord = A.EclCoord.fromWgs84(0, 0, 0);
-
-            // AZ / EL Calculation
-            var tp = A.Solar.topocentricPosition(jdo, coord, false);
-            azimuth = tp.hz.az * RAD2DEG + (180 % 360);
-            elevation = (tp.hz.alt * RAD2DEG) % 360;
-
-            // Range Calculation
-            var T = new A.JulianDay(
-                A.JulianDay.dateToJD(timeManager.propTime())
-            ).jdJ2000Century();
-            sun.sunvar.g = (A.Solar.meanAnomaly(T) * 180) / Math.PI;
-            sun.sunvar.g = sun.sunvar.g % 360.0;
-            sun.sunvar.R =
-                1.00014 -
-                0.01671 * Math.cos(sun.sunvar.g) -
-                0.00014 * Math.cos(2 * sun.sunvar.g);
-            range = (sun.sunvar.R * 149597870700) / 1000; // au to km conversion
-
-            // RAE to ECI
-            sun.eci = satellite.ecfToEci(
-                lookAnglesToEcf(azimuth, elevation, range, 0, 0, 0),
-                gmst
-            );
-
-            return { x: sun.eci.x, y: sun.eci.y, z: sun.eci.z };
         };
 
         function _getObliquity(jd) {
@@ -1135,29 +1093,15 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             gl.attachShader(sunShader, fragShader);
             gl.linkProgram(sunShader);
 
-            sunShader.aVertexPosition = gl.getAttribLocation(
-                sunShader,
-                'aVertexPosition'
-            );
+            sunShader.aVertexPosition = gl.getAttribLocation(sunShader,'aVertexPosition');
             sunShader.aTexCoord = gl.getAttribLocation(sunShader, 'aTexCoord');
-            sunShader.aVertexNormal = gl.getAttribLocation(
-                sunShader,
-                'aVertexNormal'
-            );
+            sunShader.aVertexNormal = gl.getAttribLocation(sunShader,'aVertexNormal');
             sunShader.uPMatrix = gl.getUniformLocation(sunShader, 'uPMatrix');
-            sunShader.uCamMatrix = gl.getUniformLocation(
-                sunShader,
-                'uCamMatrix'
-            );
+            sunShader.uCamMatrix = gl.getUniformLocation(sunShader,'uCamMatrix');
             sunShader.uMvMatrix = gl.getUniformLocation(sunShader, 'uMvMatrix');
-            sunShader.uNormalMatrix = gl.getUniformLocation(
-                sunShader,
-                'uNormalMatrix'
-            );
-            sunShader.uLightDirection = gl.getUniformLocation(
-                sunShader,
-                'uLightDirection'
-            );
+            sunShader.uNormalMatrix = gl.getUniformLocation(sunShader,'uNormalMatrix');
+            sunShader.uLightDirection = gl.getUniformLocation(sunShader,'uLightDirection');
+            sunShader.uSunDis = gl.getUniformLocation(sunShader,'uSunDis');
 
             // generate a uvsphere bottom up, CCW order
             var vertPos = [];
@@ -1250,7 +1194,66 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             // Switch Vertex Array Objects
             // gl.bindVertexArray(sun.vao);
 
-            sun.realXyz = sun.getXYZ();
+            // #### sun.getXYZ ###
+            // Get Time
+            if (timeManager.propRate === 0) {
+              timeManager.propTimeVar.setTime(
+                Number(timeManager.propRealTime) + timeManager.propOffset
+              );
+            } else {
+              timeManager.propTimeVar.setTime(
+                Number(timeManager.propRealTime) +
+                timeManager.propOffset +
+                (Number(timeManager.now) -
+                Number(timeManager.propRealTime)) *
+                timeManager.propRate
+              );
+            }
+            sun.now = timeManager.propTimeVar;
+
+            sun.sunvar.j = timeManager.jday(
+                sun.now.getUTCFullYear(),
+                sun.now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+                sun.now.getUTCDate(),
+                sun.now.getUTCHours(),
+                sun.now.getUTCMinutes(),
+                sun.now.getUTCSeconds()
+            );
+            sun.sunvar.j += sun.now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+            sun.sunvar.gmst = satellite.gstime(sun.sunvar.j);
+            sun.sunvar.jdo = new A.JulianDay(sun.sunvar.j); // now
+
+            //var observerGd = sensorManager.currentSensor.observerGd;
+            //var coord = A.EclCoord.fromWgs84(observerGd.latitude * RAD2DEG, observerGd.longitude * RAD2DEG, observerGd.height);
+
+            sun.sunvar.coord = A.EclCoord.fromWgs84(0, 0, 0);
+
+            // AZ / EL Calculation
+            sun.sunvar.tp = A.Solar.topocentricPosition(sun.sunvar.jdo, sun.sunvar.coord, false);
+            sun.sunvar.azimuth = sun.sunvar.tp.hz.az * RAD2DEG + (180 % 360);
+            sun.sunvar.elevation = (sun.sunvar.tp.hz.alt * RAD2DEG) % 360;
+
+            // Range Calculation
+            var T = new A.JulianDay(
+                A.JulianDay.dateToJD(sun.now)
+            ).jdJ2000Century();
+            sun.sunvar.g = (A.Solar.meanAnomaly(T) * 180) / Math.PI;
+            sun.sunvar.g = sun.sunvar.g % 360.0;
+            sun.sunvar.R =
+                1.00014 -
+                0.01671 * Math.cos(sun.sunvar.g) -
+                0.00014 * Math.cos(2 * sun.sunvar.g);
+            sun.sunvar.range = (sun.sunvar.R * 149597870700) / 1000; // au to km conversion
+
+            // RAE to ECI
+            sun.eci = satellite.ecfToEci(
+                lookAnglesToEcf(sun.sunvar.azimuth, sun.sunvar.elevation, sun.sunvar.range, 0, 0, 0),
+                sun.sunvar.gmst
+            );
+
+            sun.realXyz = { x: sun.eci.x, y: sun.eci.y, z: sun.eci.z };
+            // #### sun.getXYZ ###
+
             sunMaxDist = Math.max(
                 Math.max(Math.abs(sun.realXyz.x), Math.abs(sun.realXyz.y)),
                 Math.abs(sun.realXyz.z)
@@ -1268,8 +1271,9 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             mat4.translate(mvMatrix, mvMatrix, sun.pos);
             // Keep the back of the sun sphere directly behind the front of the
             // sun sphere so there is only one sun
-            mat4.rotateX(mvMatrix, mvMatrix, -camPitch);
-            mat4.rotateZ(mvMatrix, mvMatrix, -camYaw);
+            // Depricated with use of fragment discard
+            // mat4.rotateX(mvMatrix, mvMatrix, -camPitch);
+            // mat4.rotateZ(mvMatrix, mvMatrix, -camYaw);
 
             nMatrix = nMatrixEmpty;
             mat3.normalFromMat4(nMatrix, mvMatrix);
@@ -1285,6 +1289,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             gl.uniformMatrix4fv(sunShader.uPMatrix, false, pMatrix);
             gl.uniformMatrix4fv(sunShader.uCamMatrix, false, camMatrix);
             gl.uniform3fv(sunShader.uLightDirection, earth.lightDirection);
+            gl.uniform1f(sunShader.uSunDis, Math.sqrt(sun.pos[0]**2 + sun.pos[1]**2 + sun.pos[2]**2));
 
             gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
             gl.enableVertexAttribArray(sunShader.aVertexPosition);
@@ -1324,12 +1329,12 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         let NUM_LAT_SEGS = 32;
         let NUM_LON_SEGS = 32;
 
-        let vertPosBuf, vertNormBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
+        let vertPosBuf, vertNormBuf, texCoordBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
         let vertCount;
         let mvMatrix;
         let nMatrix;
         let moonShader;
-        moon = {};
+        let moon = {};
         moon.pos = [0, 0, 0];
 
         var texture;
@@ -1342,19 +1347,10 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         }
 
         moon.getXYZ = () => {
-            var now = timeManager.propTime();
-            j = timeManager.jday(
-                now.getUTCFullYear(),
-                now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-                now.getUTCDate(),
-                now.getUTCHours(),
-                now.getUTCMinutes(),
-                now.getUTCSeconds()
-            );
-            j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-            var gmst = satellite.gstime(j);
+            // sun.sunvar.gmst and sun.now get calculated before the moon on each draw loop
+            // reusing them speeds up the draw loop
 
-            moon.moonPos = SunCalc.getMoonPosition(timeManager.propTime(), 0, 0);
+            moon.moonPos = SunCalc.getMoonPosition(sun.now, 0, 0);
             moon.position = satellite.ecfToEci(
                 lookAnglesToEcf(
                     180 + moon.moonPos.azimuth * RAD2DEG,
@@ -1364,7 +1360,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                     0,
                     0
                 ),
-                gmst
+                sun.sunvar.gmst
             );
 
             return {
@@ -1553,14 +1549,32 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             // gl.bindVertexArray(moon.vao);
 
             // Needed because geocentric earth
-            let moonXYZ = moon.getXYZ();
-            let moonMaxDist = Math.max(
-                Math.max(Math.abs(moonXYZ.x), Math.abs(moonXYZ.y)),
-                Math.abs(moonXYZ.z)
+            moon.moonPos = SunCalc.getMoonPosition(sun.now, 0, 0);
+            moon.position = satellite.ecfToEci(
+                lookAnglesToEcf(
+                    180 + moon.moonPos.azimuth * RAD2DEG,
+                    moon.moonPos.altitude * RAD2DEG,
+                    moon.moonPos.distance,
+                    0,
+                    0,
+                    0
+                ),
+                sun.sunvar.gmst
             );
-            moon.pos[0] = (moonXYZ.x / moonMaxDist) * MOON_SCALAR_DISTANCE;
-            moon.pos[1] = (moonXYZ.y / moonMaxDist) * MOON_SCALAR_DISTANCE;
-            moon.pos[2] = (moonXYZ.z / moonMaxDist) * MOON_SCALAR_DISTANCE;
+
+            moon.moonXYZ = {
+                x: moon.position.x,
+                y: moon.position.y,
+                z: moon.position.z,
+            };
+
+            moon.moonMaxDist = Math.max(
+                Math.max(Math.abs(moon.moonXYZ.x), Math.abs(moon.moonXYZ.y)),
+                Math.abs(moon.moonXYZ.z)
+            );
+            moon.pos[0] = (moon.moonXYZ.x / moon.moonMaxDist) * MOON_SCALAR_DISTANCE;
+            moon.pos[1] = (moon.moonXYZ.y / moon.moonMaxDist) * MOON_SCALAR_DISTANCE;
+            moon.pos[2] = (moon.moonXYZ.z / moon.moonMaxDist) * MOON_SCALAR_DISTANCE;
 
             mvMatrix = mvMatrixEmpty;
             mat4.identity(mvMatrix);
@@ -1740,6 +1754,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
         varying vec3 vNormal;
         varying float vDist;
+        varying float vDist2;
 
         void main(void) {
           // Hide the Back Side of the Sphere to prevent duplicate suns
@@ -1750,6 +1765,15 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
           float r = 1.0 * a;
           float g = 1.0 * a;
           float b = 0.4 * a;
+
+          if (vDist2 > 1.0) {
+            discard;
+            // r = 0.0;
+            // g = 1.0;
+            // b = 0.0;
+            // a = 1.0;
+          }
+
           gl_FragColor = vec4(vec3(r,g,b), a);
         }
       `,
@@ -1761,21 +1785,24 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         uniform mat4 uCamMatrix;
         uniform mat4 uMvMatrix;
         uniform mat3 uNormalMatrix;
+        uniform float uSunDis;
 
         varying vec3 vNormal;
         varying float vDist;
+        varying float vDist2;
 
         void main(void) {
-          vec4 position1 = uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
+          vec4 position = uMvMatrix * vec4(aVertexPosition, 1.0);
           vec4 position0 = uCamMatrix * uMvMatrix * vec4(vec3(0.0,0.0,0.0), 1.0);
+          vec4 position1 = uCamMatrix * position;
           gl_Position = uPMatrix * position1;
           vDist = distance(position0.xz,position1.xz) \/ ${RADIUS_OF_DRAW_SUN}.0;
+          vDist2 = distance(position.xyz,vec3(0.0,0.0,0.0)) \/ uSunDis;
           vNormal = uNormalMatrix * aVertexNormal;
         }`,
         },
         moon: {
             frag: `
-        #extension GL_EXT_frag_depth : enable
         precision mediump float;
 
         uniform vec3 uLightDirection;
@@ -1802,11 +1829,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             // litTexColor = vec3(1.0,0.0,0.0);
           }
 
-          // gl_FragColor = vec4(vec3(vDist - 1.0,0.0,0.0), 1.0);
           gl_FragColor = vec4(litTexColor, 1.0);
-
-          // gl_FragDepthEXT = gl_FragCoord.z - 0.000001;
-          // gl_FragDepthEXT = 0.999999 + (0.0000001 * gl_FragCoord.z); //min(gl_FragCoord.z, 0.999999);
         }
       `,
             vert: `
@@ -1891,6 +1914,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         {
             name: 'dot-fragment.glsl',
             code: `
+      #extension GL_EXT_frag_depth : enable
       precision mediump float;
 
       varying vec4 vColor;
@@ -1924,13 +1948,14 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         alpha = min(alpha, 1.0);
         if (alpha == 0.0) discard;
         gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
+        // Reduce Flickering from Depth Fighting
+        gl_FragDepthEXT = gl_FragCoord.z * 0.99999975;
       }
     `,
         },
         {
             name: 'dot-vertex-var.glsl',
             code: `
-        #extension GL_EXT_frag_depth : enable
         attribute vec3 aPos;
         attribute vec4 aColor;
         attribute float aStar;
@@ -2056,7 +2081,6 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         {
             name: 'path-fragment.glsl',
             code: `
-              #extension GL_EXT_frag_depth : enable
               precision mediump float;
 
               varying vec4 vColor;
@@ -2069,7 +2093,6 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         {
             name: 'path-vertex.glsl',
             code: `
-            #extension GL_EXT_frag_depth : enable
             attribute vec3 aPos;
 
             uniform mat4 uCamMatrix;

@@ -25,42 +25,43 @@ try {
 } catch (e) {
     console.log(e);
 }
-var bodyDOM = $('#bodyDOM');
+const bodyDOM = $('#bodyDOM');
 var dropdownInstance;
-var mapImageDOM = $('#map-image');
-var mapMenuDOM = $('#map-menu');
-var rightBtnMenuDOM = $('#right-btn-menu');
-var rightBtnSaveDOM = $('#save-rmb');
-var rightBtnViewDOM = $('#view-rmb');
-var rightBtnEditDOM = $('#edit-rmb');
-var rightBtnCreateDOM = $('#create-rmb');
-var rightBtnDrawDOM = $('#draw-rmb');
-var rightBtnColorsDOM = $('#colors-rmb');
-var rightBtnEarthDOM = $('#earth-rmb');
+const mapImageDOM = $('#map-image');
+const mapMenuDOM = $('#map-menu');
+const rightBtnMenuDOM = $('#right-btn-menu');
+const rightBtnSaveDOM = $('#save-rmb');
+const rightBtnViewDOM = $('#view-rmb');
+const rightBtnEditDOM = $('#edit-rmb');
+const rightBtnCreateDOM = $('#create-rmb');
+const rightBtnDrawDOM = $('#draw-rmb');
+const rightBtnColorsDOM = $('#colors-rmb');
+const rightBtnEarthDOM = $('#earth-rmb');
 
-var rightBtnSaveMenuDOM = $('#save-rmb-menu');
-var rightBtnViewMenuDOM = $('#view-rmb-menu');
-var rightBtnEditMenuDOM = $('#edit-rmb-menu');
-var rightBtnCreateMenuDOM = $('#create-rmb-menu');
-var rightBtnDrawMenuDOM = $('#draw-rmb-menu');
-var rightBtnColorsMenuDOM = $('#colors-rmb-menu');
-var rightBtnEarthMenuDOM = $('#earth-rmb-menu');
+const rightBtnSaveMenuDOM = $('#save-rmb-menu');
+const rightBtnViewMenuDOM = $('#view-rmb-menu');
+const rightBtnEditMenuDOM = $('#edit-rmb-menu');
+const rightBtnCreateMenuDOM = $('#create-rmb-menu');
+const rightBtnDrawMenuDOM = $('#draw-rmb-menu');
+const rightBtnColorsMenuDOM = $('#colors-rmb-menu');
+const rightBtnEarthMenuDOM = $('#earth-rmb-menu');
 
-// var viewInfoRMB = $('#view-info-rmb');
-// var editSatRMB = $('#edit-sat-rmb');
-// var createObserverRMB = $('#create-observer-rmb');
-// var createSensorRMB = $('#create-sensor-rmb');
-// var clearScreenRMB = $('#clear-screen-rmb');
+// const viewInfoRMB = $('#view-info-rmb');
+// const editSatRMB = $('#edit-sat-rmb');
+// const createObserverRMB = $('#create-observer-rmb');
+// const createSensorRMB = $('#create-sensor-rmb');
+// const clearScreenRMB = $('#clear-screen-rmb');
 
 var lkpassed = false;
 
 // Public Functions
 
-function saveVariable(variable) {
+function saveVariable(variable, filename) {
     db.log('saveVariable');
+    filename = (typeof filename == 'undefined') ? 'variable.txt' : filename;
     variable = JSON.stringify(variable);
     var blob = new Blob([variable], { type: 'text/plain;charset=utf-8' });
-    saveAs(blob, 'variable.txt');
+    saveAs(blob, filename);
 }
 
 function saveCsv(items, name) {
@@ -109,6 +110,7 @@ var speedModifier = 1;
     var isNextLaunchMenuOpen = false;
     var issatChngMenuOpen = false;
     var isSettingsMenuOpen = false;
+    var isObfitMenuOpen = false;
 
     var watchlistList = [];
     var watchlistInViewList = [];
@@ -1643,6 +1645,261 @@ var speedModifier = 1;
                 e.preventDefault();
             });
 
+            $('#obfit-form').on('submit', function (e) {
+                let t1v,x1v,y1v,z1v,xd1v,yd1v,zd1v;
+                let t2v,x2v,y2v,z2v,xd2v,yd2v,zd2v;
+                let t3v,x3v,y3v,z3v,xd3v,yd3v,zd3v;
+                let isOb1 = true;
+                let isOb2 = true;
+                let isOb3 = true;
+                const t1 = document.getElementById('obfit-t1').value;
+                if (t1.length > 0) {
+                  t1v = parseFloat(t1);
+                } else {
+                  t1v = NaN;
+                }
+                const x1 = document.getElementById('obfit-x1').value;
+                if (x1.length > 0) {
+                  x1v = parseFloat(x1);
+                } else {
+                  x1v = NaN;
+                }
+                const y1 = document.getElementById('obfit-y1').value;
+                if (y1.length > 0) {
+                  y1v = parseFloat(y1);
+                } else {
+                  y1v = NaN;
+                }
+                const z1 = document.getElementById('obfit-z1').value;
+                if (z1.length > 0) {
+                  z1v = parseFloat(z1);
+                } else {
+                  z1v = NaN;
+                }
+                const xd1 = document.getElementById('obfit-xd1').value;
+                if (xd1.length > 0) {
+                  xd1v = parseFloat(xd1);
+                } else {
+                  xd1v = NaN;
+                }
+                const yd1 = document.getElementById('obfit-yd1').value;
+                if (yd1.length > 0) {
+                  yd1v = parseFloat(yd1);
+                } else {
+                  yd1v = NaN;
+                }
+                const zd1 = document.getElementById('obfit-zd1').value;
+                if (zd1.length > 0) {
+                  zd1v = parseFloat(zd1);
+                } else {
+                  zd1v = NaN;
+                }
+                const t2 = document.getElementById('obfit-t2').value;
+                if (t2.length > 0) {
+                  t2v = parseFloat(t2);
+                } else {
+                  isOb2 = false;
+                }
+                const x2 = document.getElementById('obfit-x2').value;
+                if (x2.length > 0) {
+                  x2v = parseFloat(x2);
+                } else {
+                  isOb2 = false;
+                }
+                const y2 = document.getElementById('obfit-y2').value;
+                if (y2.length > 0) {
+                  y2v = parseFloat(y2);
+                } else {
+                  isOb2 = false;
+                }
+                const z2 = document.getElementById('obfit-z2').value;
+                if (z2.length > 0) {
+                  z2v = parseFloat(z2);
+                } else {
+                  isOb2 = false;
+                }
+                const xd2 = document.getElementById('obfit-xd2').value;
+                if (xd2.length > 0) {
+                  xd2v = parseFloat(xd2);
+                } else {
+                  isOb2 = false;
+                }
+                const yd2 = document.getElementById('obfit-yd2').value;
+                if (yd2.length > 0) {
+                  yd2v = parseFloat(yd2);
+                } else {
+                  isOb2 = false;
+                }
+                const zd2 = document.getElementById('obfit-zd2').value;
+                if (zd2.length > 0) {
+                  zd2v = parseFloat(zd2);
+                } else {
+                  isOb2 = false;
+                }
+                const t3 = document.getElementById('obfit-t3').value;
+                if (t3.length > 0) {
+                  t3v = parseFloat(t3);
+                } else {
+                  isOb3 = false;
+                }
+                const x3 = document.getElementById('obfit-x3').value;
+                if (x3.length > 0) {
+                  x3v = parseFloat(x3);
+                } else {
+                  isOb3 = false;
+                }
+                const y3 = document.getElementById('obfit-y3').value;
+                if (y3.length > 0) {
+                  y3v = parseFloat(y3);
+                } else {
+                  isOb3 = false;
+                }
+                const z3 = document.getElementById('obfit-z3').value;
+                if (z3.length > 0) {
+                  z3v = parseFloat(z3);
+                } else {
+                  isOb3 = false;
+                }
+                const xd3 = document.getElementById('obfit-xd3').value;
+                if (xd3.length > 0) {
+                  xd3v = parseFloat(xd3);
+                } else {
+                  isOb3 = false;
+                }
+                const yd3 = document.getElementById('obfit-yd3').value;
+                if (yd3.length > 0) {
+                  yd3v = parseFloat(yd3);
+                } else {
+                  isOb3 = false;
+                }
+                const zd3 = document.getElementById('obfit-zd3').value;
+                if (zd3.length > 0) {
+                  zd3v = parseFloat(zd3);
+                } else {
+                  isOb3 = false;
+                }
+
+                let svs = [];
+                let sv1 = [];
+                {
+                  if (isOb1 && isNaN(t1)) {
+                    isOb1 = false;
+                    uiManager.toast(`Time 1 is Invalid!`,'critical');
+                    return false;
+                  }
+                  if (isOb1 && isNaN(x1)) {
+                    isOb1 = false;
+                    uiManager.toast(`X 1 is Invalid!`,'critical');
+                    return false;
+                  }
+                  if (isOb1 && isNaN(y1)) {
+                    isOb1 = false;
+                    uiManager.toast(`Y 1 is Invalid!`,'critical');
+                    return false;
+                  }
+                  if (isOb1 && isNaN(z1)) {
+                    isOb1 = false;
+                    uiManager.toast(`Z 1 is Invalid!`,'critical');
+                    return false;
+                  }
+                  if (isOb1 && isNaN(xd1)) {
+                    isOb1 = false;
+                    uiManager.toast(`X Dot 1 is Invalid!`,'critical');
+                    return false;
+                  }
+                  if (isOb1 && isNaN(yd1)) {
+                    isOb1 = false;
+                    uiManager.toast(`Y Dot 1 is Invalid!`,'critical');
+                    return false;
+                  }
+                  if (isOb1 && isNaN(zd1)) {
+                    isOb1 = false;
+                    uiManager.toast(`Z Dot 1 is Invalid!`,'critical');
+                    return false;
+                  }
+                  if (isOb1) {
+                    sv1 = [t1v,x1v,y1v,z1v,xd1v,yd1v,zd1v];
+                    svs.push(sv1);
+                  }
+                }
+
+                let sv2 = [];
+                {
+                  if (isOb2 && isNaN(t2)) {
+                    isOb2 = false;
+                    uiManager.toast(`Time 2 is Invalid!`,'caution');
+                  }
+                  if (isOb2 && isNaN(x2)) {
+                    isOb2 = false;
+                    uiManager.toast(`X 2 is Invalid!`,'caution');
+                  }
+                  if (isOb2 && isNaN(y2)) {
+                    isOb2 = false;
+                    uiManager.toast(`Y 2 is Invalid!`,'caution');
+                  }
+                  if (isOb2 && isNaN(z2)) {
+                    isOb2 = false;
+                    uiManager.toast(`Z 2 is Invalid!`,'caution');
+                  }
+                  if (isOb2 && isNaN(xd2)) {
+                    isOb2 = false;
+                    uiManager.toast(`X Dot 2 is Invalid!`,'caution');
+                  }
+                  if (isOb2 && isNaN(yd2)) {
+                    isOb2 = false;
+                    uiManager.toast(`Y Dot 2 is Invalid!`,'caution');
+                  }
+                  if (isOb2 && isNaN(zd2)) {
+                    isOb2 = false;
+                    uiManager.toast(`Z Dot 2 is Invalid!`,'caution');
+                  }
+                  if (isOb2) {
+                    sv2 = [t2v,x2v,y2v,z2v,xd2v,yd2v,zd2v];
+                    svs.push(sv2);
+                  }
+                }
+
+                isOb3 = (!isOb2) ? false : isOb3;
+                let sv3 = [];
+                {
+                  if (isOb3 && isNaN(t3)) {
+                    isOb3 = false;
+                    uiManager.toast(`Time 3 is Invalid!`,'caution');
+                  }
+                  if (isOb3 && isNaN(x3)) {
+                    isOb3 = false;
+                    uiManager.toast(`X 3 is Invalid!`,'caution');
+                  }
+                  if (isOb3 && isNaN(y3)) {
+                    isOb3 = false;
+                    uiManager.toast(`Y 3 is Invalid!`,'caution');
+                  }
+                  if (isOb3 && isNaN(z3)) {
+                    isOb3 = false;
+                    uiManager.toast(`Z 3 is Invalid!`,'caution');
+                  }
+                  if (isOb3 && isNaN(xd3)) {
+                    isOb3 = false;
+                    uiManager.toast(`X Dot 3 is Invalid!`,'caution');
+                  }
+                  if (isOb3 && isNaN(yd3)) {
+                    isOb3 = false;
+                    uiManager.toast(`Y Dot 3 is Invalid!`,'caution');
+                  }
+                  if (isOb3 && isNaN(zd3)) {
+                    isOb3 = false;
+                    uiManager.toast(`Z Dot 3 is Invalid!`,'caution');
+                  }
+                  if (isOb3) {
+                    sv3 = [t3v,x3v,y3v,z3v,xd3v,yd3v,zd3v];
+                    svs.push(sv3);
+                  }
+                }
+                console.log(svs);
+                omManager.svs2analyst(svs);
+                e.preventDefault();
+            });
+
             $('#n2yo-form').on('submit', function (e) {
                 $('#loading-screen').fadeIn(1000, function () {
                   let satnum = $('#ext-n2yo').val() * 1;
@@ -1764,7 +2021,7 @@ var speedModifier = 1;
                 if (satId === null) {
                     console.log('Not a Real Satellite');
                     e.preventDefault();
-                    return;
+                    return false;
                 }
                 var sat = satSet.getSatExtraOnly(satId);
 
@@ -3759,6 +4016,25 @@ var speedModifier = 1;
                         break;
                     }
                     break;
+                case 'menu-obfit': // T
+                    if (isObfitMenuOpen) {
+                        isObfitMenuOpen = false;
+                        uiManager.hideSideMenus();
+                        break;
+                    } else {
+                        if (settingsManager.isMobileModeEnabled)
+                            mobile.searchToggle(false);
+                        uiManager.hideSideMenus();
+                        $('#obfit-menu').effect(
+                            'slide',
+                            { direction: 'left', mode: 'show' },
+                            1000
+                        );
+                        isObfitMenuOpen = true;
+                        $('#menu-obfit').addClass('bmenu-item-selected');
+                        break;
+                    }
+                    break;
                 case 'menu-settings': // T
                     if (isSettingsMenuOpen) {
                         isSettingsMenuOpen = false;
@@ -4452,6 +4728,11 @@ var speedModifier = 1;
                 { direction: 'left', mode: 'hide' },
                 1000
             );
+            $('#obfit-menu').effect(
+                'slide',
+                { direction: 'left', mode: 'hide' },
+                1000
+            );
             $('#settings-menu').effect(
                 'slide',
                 { direction: 'left', mode: 'hide' },
@@ -4539,6 +4820,7 @@ var speedModifier = 1;
             $('#menu-color-scheme').removeClass('bmenu-item-selected');
             $('#menu-countries').removeClass('bmenu-item-selected');
             $('#menu-constellations').removeClass('bmenu-item-selected');
+            $('#menu-obfit').removeClass('bmenu-item-selected');
             $('#menu-about').removeClass('bmenu-item-selected');
 
             // Unflag all open menu variables
@@ -4558,6 +4840,7 @@ var speedModifier = 1;
             isNextLaunchMenuOpen = false;
             issatChngMenuOpen = false;
             isSettingsMenuOpen = false;
+            isObfitMenuOpen = false;
             isEditSatMenuOpen = false;
             isNewLaunchMenuOpen = false;
             isBreakupMenuOpen = false;
@@ -5299,7 +5582,7 @@ var speedModifier = 1;
                 $('#sat-altitude').html(uiManager.currentTEARR.alt.toFixed(2) + ' km');
             }
 
-            $('#sat-velocity').html(sat.velocity.toFixed(2) + ' km/s');
+            $('#sat-velocity').html(sat.velocity.total.toFixed(2) + ' km/s');
             if (objectManager.isSensorManagerLoaded) {
                 if (uiManager.currentTEARR.inview) {
                     $('#sat-azimuth').html(

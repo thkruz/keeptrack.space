@@ -36,8 +36,8 @@ const MOON_SCALAR_DISTANCE = 200000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.5.1';
-    settingsManager.versionDate = 'November 22, 2020';
+    settingsManager.versionNumber = '2.6.0';
+    settingsManager.versionDate = 'November 26, 2020';
 
     // Install Folder Settings
     {
@@ -382,6 +382,8 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.fpsYawRate = 0.02;
     settingsManager.fpsRotateRate = 0.02;
 
+    settingsManager.fitTleSteps = 3; // Increasing this will kill performance
+
     settingsManager.gpsElevationMask = 15;
     settingsManager.daysUntilObjectLost = 60;
 
@@ -479,11 +481,7 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.zFar = 450000.0;
 
     // If Frag Depth Web GL Extension available then use it for satellite shader
-    if (gl.getExtension("EXT_frag_depth") !== null) {
-      settingsManager.desktopOnlySatShaderFix = 'gl_FragDepthEXT = gl_FragCoord.z * 0.99999975';
-    } else {
-      settingsManager.desktopOnlySatShaderFix = '';
-    }
+    settingsManager.desktopOnlySatShaderFix = 'gl_FragDepthEXT = gl_FragCoord.z * 0.99999975';
 
     // //////////////////////////////////////////////////////////////////////////
     // Defaults that should never be changed

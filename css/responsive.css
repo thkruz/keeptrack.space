@@ -109,6 +109,9 @@
     border-style: solid;
     border-color: #172635;
   }
+  #obfit-content {
+    width: 500px;
+  }
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
@@ -493,6 +496,11 @@
     border-style: solid;
     border-color: #172635;
   }
+
+  #obfit-content {
+    width: 500px;
+  }
+
   #legend-hover-menu {
     padding-left: 35px;
     color: white;

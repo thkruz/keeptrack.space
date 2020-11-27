@@ -1961,11 +1961,11 @@ function _hoverBoxOnSat(satId, satX, satY) {
                           sat.position.z.toFixed(2) +
                           '</br>' +
                           'ΔX: ' +
-                          (sat.velocityX - sat2.velocityX).toFixed(2) +
+                          (sat.velocity.x - sat2.velocity.x).toFixed(2) +
                           'km/s ΔY: ' +
-                          (sat.velocityY - sat2.velocityY).toFixed(2) +
+                          (sat.velocity.y - sat2.velocity.y).toFixed(2) +
                           'km/s ΔZ: ' +
-                          (sat.velocityZ - sat2.velocityZ).toFixed(2) +
+                          (sat.velocity.z - sat2.velocity.z).toFixed(2) +
                           'km/s';
                     } else {
                       satHoverBoxNode3.innerHTML =
@@ -1977,11 +1977,11 @@ function _hoverBoxOnSat(satId, satX, satY) {
                           sat.position.z.toFixed(2) +
                           '</br>' +
                           'X: ' +
-                          sat.velocityX.toFixed(2) +
+                          sat.velocity.x.toFixed(2) +
                           ' Y: ' +
-                          sat.velocityY.toFixed(2) +
+                          sat.velocity.y.toFixed(2) +
                           ' Z: ' +
-                          sat.velocityZ.toFixed(2);
+                          sat.velocity.z.toFixed(2);
                     }
                 } else if (
                     objectManager.isSensorManagerLoaded &&
@@ -2003,11 +2003,11 @@ function _hoverBoxOnSat(satId, satX, satY) {
                         sat.position.z.toFixed(2) +
                         '</br>' +
                         'X: ' +
-                        sat.velocityX.toFixed(2) +
+                        sat.velocity.x.toFixed(2) +
                         ' Y: ' +
-                        sat.velocityY.toFixed(2) +
+                        sat.velocity.y.toFixed(2) +
                         ' Z: ' +
-                        sat.velocityZ.toFixed(2);
+                        sat.velocity.z.toFixed(2);
                 }
             }
         }
@@ -2193,6 +2193,7 @@ function webGlInit() {
     }
 
     gl.getExtension("EXT_frag_depth");
+    if (gl.getExtension("EXT_frag_depth") == null)  settingsManager.desktopOnlySatShaderFix = '';
 
     gl.viewport(0, 0, can.width, can.height);
 

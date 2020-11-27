@@ -1217,7 +1217,9 @@ var emptyMat4 = mat4.create();
           sat.OT = 1; // Default to Satellite
           searchBox.doSearch(sat.SCC_NUM.toString());
       } else {
-          alert('Failed Altitude Check');
+          console.debug(TLE1);
+          console.debug(TLE2);
+          uiManager.toast(`New Analyst Satellite is Invalid!`,'critical');
       }
     };
 
@@ -1504,14 +1506,15 @@ var emptyMat4 = mat4.create();
                 satData[i].inSun = satInSun[i];
             }
 
-            satData[i].velocity = Math.sqrt(
+            satData[i].velocity = (typeof satData[i].velocity == 'undefined') ? {} : satData[i].velocity;
+            satData[i].velocity.total = Math.sqrt(
                 satVel[i * 3] * satVel[i * 3] +
                     satVel[i * 3 + 1] * satVel[i * 3 + 1] +
                     satVel[i * 3 + 2] * satVel[i * 3 + 2]
             );
-            satData[i].velocityX = satVel[i * 3];
-            satData[i].velocityY = satVel[i * 3 + 1];
-            satData[i].velocityZ = satVel[i * 3 + 2];
+            satData[i].velocity.x = satVel[i * 3];
+            satData[i].velocity.y = satVel[i * 3 + 1];
+            satData[i].velocity.z = satVel[i * 3 + 2];
             satData[i].position = {
                 x: satPos[i * 3],
                 y: satPos[i * 3 + 1],
@@ -1813,14 +1816,17 @@ var emptyMat4 = mat4.create();
     };
 
     satSet.getIdFromObjNum = (objNum) => {
-        if (typeof satSet.sccIndex[`${objNum}`] !== undefined) {
+        if (typeof satSet.sccIndex[`${objNum}`] !== 'undefined') {
           return satSet.sccIndex[`${objNum}`];
         } else {
+          for (let i = 0; i < satData.length; i++) {
+            if (parseInt(satData[i].SCC_NUM) == objNum) return i;
+          }
           return null;
         }
     };
     satSet.getIdFromIntlDes = (intlDes) => {
-        if (typeof satSet.cosparIndex[`${intlDes}`] !== undefined) {
+        if (typeof satSet.cosparIndex[`${intlDes}`] !== 'undefined') {
           return satSet.cosparIndex[`${intlDes}`];
         } else {
           return null;

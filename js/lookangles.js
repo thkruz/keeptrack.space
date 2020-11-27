@@ -1273,7 +1273,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
             var meana = mainMeana;
 
-            rascNum = rasc;
+            let rascNum = rasc;
             rasc = rasc / 100;
             if (rasc > 360) {
                 rasc = rasc - 360; // angle can't be bigger than 360
@@ -1865,6 +1865,135 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         elevation = lookAngles.elevation * RAD2DEG;
         range = lookAngles.rangeSat;
         return { az: azimuth, el: elevation, range: range };
+    };
+
+    satellite.genMlData = {};
+    satellite.genMlData.eci2inc = (start,stop) => {
+      let startTime = timeManager.propTime();
+      let trainData = [];
+      let trainTarget = [];
+      let testData = [];
+      let testTarget = [];
+      let satEciData = [];
+      let propLength = 1000 * 60 * 1440; //ms
+      let satData = satSet.getSatData();
+      let tt = 0;
+      let badSat = false;
+      for (let s = start; s < stop; s++) {
+        if (satData[s].static) break;
+        satEciData = [];
+        // console.log(satData[s].SCC_NUM);
+        for (let i = 0; i < 3; i++) {
+          satEciData[i] = [];
+          let now = new Date((startTime * 1) + 1000 * 60 * 2 * r * i);
+          let j = _jday(
+            now.getUTCFullYear(),
+            now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+            now.getUTCDate(),
+            now.getUTCHours(),
+            now.getUTCMinutes(),
+            now.getUTCSeconds()
+          ); // Converts time to jday (TLEs use epoch year/day)
+          j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+          let gmst = satellite.gstime(j);
+
+          let satrec = satellite.twoline2satrec(satData[s].TLE1, satData[s].TLE2); // perform and store sat init calcs
+          let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+          let positionEci = satellite.sgp4(satrec, m);
+          try {
+            satEciData[i].push(
+              now * 1,
+              positionEci.position.x,
+              positionEci.position.y,
+              positionEci.position.z,
+              positionEci.velocity.x,
+              positionEci.velocity.y,
+              positionEci.velocity.z,
+            );
+          } catch (e) {
+              badSat = true;
+              break;
+          }
+        }
+
+        if (badSat) {
+          badSat = false;
+          continue;
+        }
+
+        if (tt == 5) {
+          tt = 0;
+          testData.push(satEciData);
+          testTarget.push([satData[s].inclination * RAD2DEG,satData[s].raan * RAD2DEG,satData[s].eccentricity,satData[s].argPe * RAD2DEG,satData[s].meanMotion]);
+        } else {
+          trainData.push(satEciData);
+          trainTarget.push([satData[s].inclination * RAD2DEG,satData[s].raan * RAD2DEG,satData[s].eccentricity,satData[s].argPe * RAD2DEG,satData[s].meanMotion]);
+        }
+        tt++;
+      }
+      console.log(trainData.length);
+      console.log(trainTarget.length);
+      console.log(testData.length);
+      console.log(testTarget.length);
+      saveVariable(trainData,'train-data.json');
+      saveVariable(trainTarget,'train-target.json');
+      saveVariable(testData,'test-data.json');
+      saveVariable(testTarget,'test-target.json');
+    };
+    satellite.genMlData.tlePredict = (start,stop) => {
+      let startTime = timeManager.propTime();
+      let satEciDataArray = [];
+      let satEciData = [];
+      let propLength = 1000 * 60 * 1440; //ms
+      let satData = satSet.getSatData();
+      let tt = 0;
+      let badSat = false;
+      for (let s = start; s < stop; s++) {
+        if (satData[s].static) break;
+        satEciData = [];
+        // console.log(satData[s].SCC_NUM);
+        for (let i = 0; i < 3; i++) {
+          satEciData[i] = [];
+          let now = new Date((startTime * 1) + 1000 * 10 * i);
+          let j = _jday(
+            now.getUTCFullYear(),
+            now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+            now.getUTCDate(),
+            now.getUTCHours(),
+            now.getUTCMinutes(),
+            now.getUTCSeconds()
+          ); // Converts time to jday (TLEs use epoch year/day)
+          j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+          let gmst = satellite.gstime(j);
+
+          let satrec = satellite.twoline2satrec(satData[s].TLE1, satData[s].TLE2); // perform and store sat init calcs
+          let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+          let positionEci = satellite.sgp4(satrec, m);
+          try {
+            satEciData[i].push(
+              now * 1,
+              positionEci.position.x,
+              positionEci.position.y,
+              positionEci.position.z,
+              positionEci.velocity.x,
+              positionEci.velocity.y,
+              positionEci.velocity.z,
+            );
+          } catch (e) {
+              badSat = true;
+              break;
+          }
+        }
+
+        if (badSat) {
+          badSat = false;
+          continue;
+        }
+
+        satEciDataArray.push(satEciData);
+      }
+      console.log(satEciDataArray.length);
+      saveVariable(satEciDataArray,'metObs.json');
     };
 
     satellite.eci2Rae = (now, eci, sensor) => {

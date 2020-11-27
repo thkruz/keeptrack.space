@@ -1091,6 +1091,7 @@ var emptyMat4 = mat4.create();
             }, 800);
           } else {
             $('#loader-text').html('Loading Complete!');
+            $('#loading-screen').hide();
           }
         });
       });

@@ -481,7 +481,13 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.zFar = 450000.0;
 
     // If Frag Depth Web GL Extension available then use it for satellite shader
-    settingsManager.desktopOnlySatShaderFix = 'gl_FragDepthEXT = gl_FragCoord.z * 0.99999975';
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      settingsManager.desktopOnlySatShaderFix1 = '';
+      settingsManager.desktopOnlySatShaderFix2 = '';
+    } else {
+      settingsManager.desktopOnlySatShaderFix1 = '#extension GL_EXT_frag_depth : enable';
+      settingsManager.desktopOnlySatShaderFix2 = 'gl_FragDepthEXT = gl_FragCoord.z * 0.99999975;';
+    }
 
     // //////////////////////////////////////////////////////////////////////////
     // Defaults that should never be changed

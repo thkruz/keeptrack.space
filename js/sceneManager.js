@@ -371,6 +371,10 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                     earth.bumpMap.img.src =
                         settingsManager.installDirectory +
                         'textures/earthbump256.jpg';
+                if (settingsManager.isMobileModeEnabled)
+                    earth.bumpMap.img.src =
+                        settingsManager.installDirectory +
+                        'textures/earthbump4k.jpg';
                 // 'textures/earthbump1k.jpg';
             }
 
@@ -415,6 +419,10 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                     earth.specularMap.img.src =
                         settingsManager.installDirectory +
                         'textures/earthspec256.jpg';
+                if (settingsManager.isMobileModeEnabled)
+                    earth.specularMap.img.src =
+                        settingsManager.installDirectory +
+                        'textures/earthspec4k.jpg';
                 // 'textures/earthspec1k.jpg';
             }
 
@@ -1914,7 +1922,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         {
             name: 'dot-fragment.glsl',
             code: `
-      #extension GL_EXT_frag_depth : enable
+      ${settingsManager.desktopOnlySatShaderFix1}
       precision mediump float;
 
       varying vec4 vColor;
@@ -1949,7 +1957,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         if (alpha == 0.0) discard;
         gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
         // Reduce Flickering from Depth Fighting
-        ${settingsManager.desktopOnlySatShaderFix};
+        ${settingsManager.desktopOnlySatShaderFix2}
       }
     `,
         },

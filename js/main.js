@@ -2192,8 +2192,7 @@ function webGlInit() {
         browserUnsupported();
     }
 
-    gl.getExtension("EXT_frag_depth");
-    if (gl.getExtension("EXT_frag_depth") == null)  settingsManager.desktopOnlySatShaderFix = '';
+    gl.getExtension("EXT_frag_depth");    
 
     gl.viewport(0, 0, can.width, can.height);
 

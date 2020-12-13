@@ -29,6 +29,7 @@ if (db.enabled || window.location.host == 'localhost' || settingsManager.offline
       <script src="${settingsManager.installDirectory}js/lib/colorPick.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}js/lib/webgl-obj-loader.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}js/mapManager.js?v=${settingsManager.versionNumber}"\><\/script>
+      <script src="${settingsManager.installDirectory}js/lib/gpu-browser.min.js?v=${settingsManager.versionNumber}"\><\/script>
       `);
     }
     document.write(`
@@ -97,6 +98,7 @@ if (db.enabled || window.location.host == 'localhost' || settingsManager.offline
       <script src="${settingsManager.installDirectory}js/lib/colorPick.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}js/lib/webgl-obj-loader.min.js?v=${settingsManager.versionNumber}"\><\/script>
       <script src="${settingsManager.installDirectory}js/mapManager.min.js?v=${settingsManager.versionNumber}"\><\/script>
+      <script src="${settingsManager.installDirectory}js/lib/gpu-browser.min.js?v=${settingsManager.versionNumber}"\><\/script>
       `);
     }
     document.write(`
@@ -144,7 +146,7 @@ if (db.enabled || window.location.host == 'localhost' || settingsManager.offline
     }
 
     document.write(`
-    <script src="${settingsManager.installDirectory}js/main.min.js?v=${settingsManager.versionNumber}"\><\/script>
+    <script src="${settingsManager.installDirectory}js/main.js?v=${settingsManager.versionNumber}"\><\/script>
     <script src="${settingsManager.installDirectory}js/orbitManager.min.js?v=${settingsManager.versionNumber}"\><\/script>
   `);
 
@@ -253,6 +255,16 @@ if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
 // Load Bottom icons
 if (!settingsManager.disableUI) {
 	$(document).ready(function() {
+    $.event.special.touchstart = {
+      setup: function( _, ns, handle ){
+        if ( ns.includes("noPreventDefault") ) {
+          this.addEventListener("touchstart", handle, { passive: false });
+        } else {
+          this.addEventListener("touchstart", handle, { passive: true });
+        }
+      }
+    };
+
 		(function loadBottomIcons() {
 			let numOfIcons = 0;
 			bottomIconsDivDOM = $('#bottom-icons');

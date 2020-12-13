@@ -19,7 +19,7 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-'use strict';
+// 'use strict';
 
 importScripts('lib/satellite.js');
 importScripts('lib/numeric.js'); // Used for sunlight calculations

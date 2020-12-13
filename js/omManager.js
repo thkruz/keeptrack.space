@@ -186,6 +186,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
     return om.fitTles(epoch,svs,kps);
   };
   om.fitTles = async (epoch,svs,kps) => {
+    om.debug.closestApproach = 0;
     const STEPS = settingsManager.fitTleSteps;
     const incI = (kps.max.inclination - kps.min.inclination) / STEPS;
     const raanI = (kps.max.raan - kps.min.raan) / STEPS;
@@ -195,7 +196,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
     const periodI = (kps.max.period - kps.min.period) / STEPS;
     let bestIndicies = [10000000]; // Starts Really Large To Ensure First One is Better
 
-    for (let r = -STEPS; r < STEPS; r++) {
+    for (let r = -STEPS/2; r < STEPS/2; r++) {
       for (let a = -STEPS; a < STEPS; a++) {
         for (let m = -STEPS*2; m < STEPS*2; m++) {
           let kp = {};
@@ -233,6 +234,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
     // debug
     console.log(`Closest Approach: ${bestIndicies[0]}`);
     om.debug.closestApproach += bestIndicies[0];
+    debugger
 
     // Calculate Best TLE
     let kp = {};

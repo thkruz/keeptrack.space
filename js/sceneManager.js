@@ -22,7 +22,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 //       then have a single call to update time at the beginning of the draw
 //       function
 (function () {
-  'use strict';
+  // 'use strict';
     let mvMatrixEmpty = mat4.create();
     let nMatrixEmpty = mat3.create();
 

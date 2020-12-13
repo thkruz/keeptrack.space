@@ -931,12 +931,14 @@
         }
         if (TargetLatitude > 90 || TargetLatitude < -90) {
             // console.error('Error: Target Latitude must be between 90 and -90 degrees');
+            missileManager.lastMissileErrorType = 'critical';
             missileManager.lastMissileError =
                 'Error: Target Latitude must be<br>between 90 and -90 degrees';
             return 0;
         }
         if (TargetLongitude > 180 || TargetLongitude < -180) {
             // console.error('Error: Target Longitude must be between 180 and -180 degrees');
+            missileManager.lastMissileErrorType = 'critical';
             missileManager.lastMissileError =
                 'Error: Target Longitude must be<br>between 90 and -90 degrees';
             return 0;
@@ -986,6 +988,7 @@
         if (ArcLength < 320000) {
             // console.error('Error: This missile has a minimum distance of 320 km.');
             // console.error('Please choose different target coordinates.');
+            missileManager.lastMissileErrorType = 'critical';
             missileManager.lastMissileError =
                 'Error: This missile has a minimum distance of 320 km.';
             return 0;
@@ -994,6 +997,7 @@
         if (ArcLength > MaxMissileRange * 1000) {
             // console.error('Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.');
             // console.error('Please choose different target coordinates.');
+            missileManager.lastMissileErrorType = 'critical';
             missileManager.lastMissileError =
                 'Error: This missile has a maximum distance of ' +
                 MaxMissileRange +
@@ -1493,6 +1497,7 @@
         }
 
         if (minAltitudeTrue == (minAltitude * 3) / 2) {
+          missileManager.lastMissileErrorType = 'critical';
             missileManager.lastMissileError =
                 'Error: This distance is too close for the selected missile.';
             return 0;
@@ -1613,6 +1618,7 @@
             // if (MissileObject.startTime) delete MissileObject.startTime;
         }
         missileManager.missilesInUse++;
+        missileManager.lastMissileErrorType = 'normal';
         missileManager.lastMissileError =
             'Missile Named RV_' + MissileObject.id + '<br>has been created.';
         return 1; // Successful Launch
@@ -1842,6 +1848,7 @@
         if (ArcLength > MaxMissileRange * 1000) {
             // console.error('Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.');
             // console.error('Please choose different target coordinates.');
+            missileManager.lastMissileErrorType = 'critical';
             missileManager.lastMissileError =
                 'Error: This missile has a maximum distance of ' +
                 MaxMissileRange +
@@ -2312,6 +2319,7 @@
         console.log(AltitudeList);
         console.log(`Required Altitude ${minAltitude}`);
         if (MaxAltitude < minAltitude) {
+          missileManager.lastMissileErrorType = 'critical';
             missileManager.lastMissileError = `Failed Min Altitude Check! Max Altitude ${MaxAltitude} km.`;
             return -1;
         }
@@ -2410,6 +2418,7 @@
             // if (MissileObject.startTime) delete MissileObject.startTime;
         }
         missileManager.missilesInUse++;
+        missileManager.lastMissileErrorType = 'normal';
         missileManager.lastMissileError =
             'Missile Named RV_' + MissileObject.id + '<br>has been created.';
         return 1; // Successful Launch
@@ -2487,6 +2496,7 @@
         }
         if (TargetLatitude > 90 || TargetLatitude < -90) {
             // console.error('Error: Target Latitude must be between 90 and -90 degrees');
+            missileManager.lastMissileErrorType = 'critical';
             missileManager.lastMissileError =
                 'Error: Target Latitude must be<br>between 90 and -90 degrees';
             return 0;
@@ -2494,6 +2504,7 @@
         if (TargetLongitude > 180 || TargetLongitude < -180) {
             // console.error('Error: Target Longitude must be between 180 and -180 degrees');
             console.log(TargetLongitude);
+            missileManager.lastMissileErrorType = 'critical';
             missileManager.lastMissileError =
                 'Error: Target Longitude must be<br>between 180 and -180 degrees';
             return 0;
@@ -2550,6 +2561,7 @@
         if (ArcLength > MaxMissileRange * 1000) {
             // console.error('Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.');
             // console.error('Please choose different target coordinates.');
+            missileManager.lastMissileErrorType = 'critical';
             missileManager.lastMissileError =
                 'Error: This missile has a maximum distance of ' +
                 MaxMissileRange +
@@ -3140,6 +3152,7 @@
             // if (MissileObject.startTime) delete MissileObject.startTime;
         }
         missileManager.missilesInUse++;
+        missileManager.lastMissileErrorType = 'normal';
         missileManager.lastMissileError =
             'Missile Named RV_' + MissileObject.id + '<br>has been created.';
         return [

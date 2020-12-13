@@ -36,8 +36,8 @@ const MOON_SCALAR_DISTANCE = 200000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.6.0';
-    settingsManager.versionDate = 'November 26, 2020';
+    settingsManager.versionNumber = '2.6.1';
+    settingsManager.versionDate = 'December 12, 2020';
 
     // Install Folder Settings
     {
@@ -103,6 +103,12 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.disableCameraControls = false;
     // Disable normal browser events from keyboard/mouse
     settingsManager.disableNormalEvents = false;
+    // Disable Scrolling the Window Object
+    settingsManager.disableWindowScroll = true;
+    // Disable Zoom Keyboard Keys
+    settingsManager.disableZoomControls = true;
+    // Disable Touch Move Causing Drag Errors
+    settingsManager.disableWindowTouchMove = true;
     // Enable limited UI features
     settingsManager.enableLimitedUI = false;
     // Allows canvas will steal focus on load
@@ -213,23 +219,11 @@ const MOON_SCALAR_DISTANCE = 200000;
     }
 
     // //////////////////////////////////////////////////////////////////////////
-    // Membership settings
+    // GPU Powered Math from gpu.js
     // //////////////////////////////////////////////////////////////////////////
-
-    // Always Show "Members Only" Menus
-    settingsManager.isMembersOnly = true;
-
-    // pageName = pageName[0].split('.html').slice(0);
-    //
-    // if (pageName[0] == 'basic') {
-    //   console.log('Premium Membership');
-    //   settingsManager.isMembersOnly = true;
-    // }
-    //
-    // if (pageName[0] == 'index') {
-    //   console.log('Free Membership');
-    //   settingsManager.isMembersOnly = false;
-    // }
+    settingsManager.gpujsMode = 'webgl';
+    // settingsManager.gpujsMode = 'dev';
+    // settingsManager.gpujsMode = 'cpu';
 
     // //////////////////////////////////////////////////////////////////////////
     // Map settings
@@ -467,6 +461,25 @@ const MOON_SCALAR_DISTANCE = 200000;
         $('.btn-ui').css('background-color', '#005a8f');
         settingsManager.themes.currentTheme = 'Blue';
     };
+
+    // //////////////////////////////////////////////////////////////////////////
+    // Membership settings
+    // //////////////////////////////////////////////////////////////////////////
+
+    // Always Show "Members Only" Menus
+    settingsManager.isMembersOnly = true;
+
+    // pageName = pageName[0].split('.html').slice(0);
+    //
+    // if (pageName[0] == 'basic') {
+    //   console.log('Premium Membership');
+    //   settingsManager.isMembersOnly = true;
+    // }
+    //
+    // if (pageName[0] == 'index') {
+    //   console.log('Free Membership');
+    //   settingsManager.isMembersOnly = false;
+    // }
 
     // //////////////////////////////////////////////////////////////////////////
     // Advanced Settings Below This Point

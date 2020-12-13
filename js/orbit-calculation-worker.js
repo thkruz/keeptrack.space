@@ -12,7 +12,7 @@
 
 */
 importScripts('lib/satellite.js');
-'use strict';
+// 'use strict';
 
 var propRealTime;
 var propOffset;
@@ -30,7 +30,7 @@ var satCache = [];
 onmessage = function (m) {
     if (m.data.isUpdate) {
         // Add Satellites
-        if (m.data.satId < 99999) {
+        if (m.data.missile == false && m.data.satId < 99999) {
             satCache[m.data.satId] = satellite.twoline2satrec(
                 m.data.TLE1,
                 m.data.TLE2

@@ -2780,19 +2780,15 @@ var speedModifier = 1;
                         if (target === -1) {
                             // Custom Target
                             if (isNaN(tgtLat)) {
-                                $('#ms-error').html(
-                                    'Please enter a number<br>for Target Latitude'
-                                );
-                                $('#ms-error').show();
+                                uiManager.toast(`Invalid Target Latitude!`,'critical');
                                 e.preventDefault();
+                                $('#loading-screen').hide();
                                 return;
                             }
                             if (isNaN(tgtLon)) {
-                                $('#ms-error').html(
-                                    'Please enter a number<br>for Target Longitude'
-                                );
-                                $('#ms-error').show();
+                                uiManager.toast(`Invalid Target Longitude!`,'critical');
                                 e.preventDefault();
+                                $('#loading-screen').hide();
                                 return;
                             }
                         } else {
@@ -2800,6 +2796,19 @@ var speedModifier = 1;
                             tgtLat = missileManager.globalBMTargets[target * 3];
                             tgtLon =
                                 missileManager.globalBMTargets[target * 3 + 1];
+                        }
+
+                        if (isNaN(lauLat)) {
+                            uiManager.toast(`Invalid Launch Latitude!`,'critical');
+                            e.preventDefault();
+                            $('#loading-screen').hide();
+                            return;
+                        }
+                        if (isNaN(lauLon)) {
+                            uiManager.toast(`Invalid Launch Longitude!`,'critical');
+                            e.preventDefault();
+                            $('#loading-screen').hide();
+                            return;
                         }
 
                         var a, b, attackerName;
@@ -2992,9 +3001,7 @@ var speedModifier = 1;
                                 tgtLat + ', ' + tgtLon,
                                 'Target'
                             );
-
-                        $('#ms-error').html(missileManager.lastMissileError);
-                        $('#ms-error').show();
+                        uiManager.toast(missileManager.lastMissileError,missileManager.lastMissileErrorType);
                     }
                     searchBox.doSearch('RV_');
                     $('#loading-screen').hide();
@@ -3620,6 +3627,8 @@ var speedModifier = 1;
                         let sat = satSet.getSatExtraOnly(
                             objectManager.selectedSat
                         );
+                        if (sat == null) return;
+
                         if (
                             !sensorManager.checkSensorSelected() ||
                             sat.static ||
@@ -4936,6 +4945,10 @@ var speedModifier = 1;
 
         uiManager.keyUpHandler = (evt) => {
             db.log('uiManager.keyUpHandler');
+            // Error Handling
+            if (typeof evt.key == 'undefined') return;
+
+
             if (isCurrentlyTyping) return;
 
             if (
@@ -5020,6 +5033,9 @@ var speedModifier = 1;
 
         uiManager.keyDownHandler = (evt) => {
             db.log('uiManager.keyDownHandler');
+            // Error Handling
+            if (typeof evt.key == 'undefined') return;
+
             if (isCurrentlyTyping) return;
             if (evt.key.toUpperCase() === 'SHIFT') {
                 cameraManager.isShiftPressed = true;
@@ -5133,6 +5149,9 @@ var speedModifier = 1;
 
         uiManager.keyHandler = (evt) => {
             db.log('uiManager.keyHandler');
+            // Error Handling
+            if (typeof evt.key == 'undefined') return;
+
             if (isCurrentlyTyping) return;
             // console.log(Number(evt.charCode));
             switch (evt.key.toUpperCase()) {
@@ -6658,10 +6677,9 @@ var speedModifier = 1;
         searchBox.doSearch($('#search').val());
     });
     _groupSelected = function (groupName) {
+        if (typeof groupName == 'undefined') return;
+        if (typeof groups[groupName] == 'undefined') return;
         groups.selectGroup(groups[groupName]);
-
-        console.log(groups[groupName]);
-
         $search.val('');
 
         var results = groups[groupName].sats;
@@ -6718,6 +6736,7 @@ var speedModifier = 1;
         $('#menu-astronomy').addClass('bmenu-item-disabled');
 
         setTimeout(function () {
+            satSet.resetSatInView();
             satSet.setColorScheme(settingsManager.currentColorScheme, true);
         }, 2000);
     };

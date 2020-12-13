@@ -3,7 +3,7 @@
 */
 
 (function () {
-  'use strict';
+  // 'use strict';
     var timeManager = {};
 
     var propFrozen = Date.now(); // for when propRate 0

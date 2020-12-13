@@ -1013,6 +1013,16 @@ var emptyMat4 = mat4.create();
         return satVel;
     };
 
+    satSet.resetSatInView = () => {
+          satInView = new Int8Array(satInView.length);
+          satInView.fill(0);
+    }
+
+    satSet.resetSatInSun = () => {
+          satInSun = new Int8Array(satInSun.length);
+          satInSun.fill(0);
+    }
+
     satSet.setColorScheme = (scheme, isForceRecolor) => {
         db.log('satSet.setColorScheme');
         settingsManager.currentColorScheme = scheme;

@@ -232,7 +232,7 @@ if (typeof 'docReady' !== 'function') {
 var console = window.console;
 
 var mobileConsole = (function () {
-    'use strict';
+    // 'use strict';
 
     //options and other variable containers
     var options = {

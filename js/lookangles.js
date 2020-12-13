@@ -18,7 +18,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 ///////////////////////////////////////////////////////////////////////////// */
 
 (function () {
-  'use strict';
+  // 'use strict';
     // Constants
     const TAU = 2 * Math.PI;
     const DEG2RAD = TAU / 360;
@@ -494,9 +494,9 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                                 'isoDateTime',
                                 true
                             ),
-                            rng: range,
-                            az: azimuth,
-                            el: elevation,
+                            rng: aer.range,
+                            az: aer.az,
+                            el: aer.el,
                         };
                     } else {
                         // Next Pass to Calculate Last line of coverage
@@ -512,9 +512,9 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                                     'isoDateTime',
                                     true
                                 ),
-                                rng: range,
-                                az: azimuth,
-                                el: elevation,
+                                rng: aer.range,
+                                az: aer.az,
+                                el: aer.el,
                             };
                         }
                     }
@@ -522,9 +522,9 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                 } else {
                     return {
                         time: timeManager.dateFormat(now, 'isoDateTime', true),
-                        rng: range,
-                        az: azimuth,
-                        el: elevation,
+                        rng: aer.range,
+                        az: aer.az,
+                        el: aer.el,
                     };
                 }
             }
@@ -684,9 +684,9 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             if (isInFOV) {
                 return {
                     time: now.toISOString(),
-                    el: elevation,
-                    az: azimuth,
-                    rng: range,
+                    el: aer.el,
+                    az: aer.az,
+                    rng: aer.range,
                     name: sensor.shortName,
                 };
             }
@@ -1855,15 +1855,16 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
         let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
         let positionEci = satellite.sgp4(satrec, m);
+        if (typeof positionEci == 'undefined' || positionEci == null) {
+          console.debug('positionEci failed in satellite.getRae()');
+          return { az: 0, el: 0, range: 0 };
+        }
 
         let positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-        let lookAngles = satellite.ecfToLookAngles(
-            sensor.observerGd,
-            positionEcf
-        );
-        azimuth = lookAngles.azimuth * RAD2DEG;
-        elevation = lookAngles.elevation * RAD2DEG;
-        range = lookAngles.rangeSat;
+        let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+        let azimuth = lookAngles.azimuth * RAD2DEG;
+        let elevation = lookAngles.elevation * RAD2DEG;
+        let range = lookAngles.rangeSat;
         return { az: azimuth, el: elevation, range: range };
     };
 
@@ -2039,6 +2040,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
     };
 
     satellite.findNearbyObjectsByOrbit = (sat) => {
+      if (typeof sat == 'undefined' || sat == null) return;
       let catalog = satSet.getSatData();
       let possibleMatches = [];
       let maxPeriod = sat.period * 1.05;
@@ -2505,6 +2507,36 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         dops.VDOP = parseFloat(Math.round(vdop * 100) / 100).toFixed(2);
         dops.TDOP = parseFloat(Math.round(tdop * 100) / 100).toFixed(2);
         return dops;
+    };
+
+    satellite.radarMaxRange = (pW,aG,rcs,minSdB,fMhz) => {
+      // let powerInWatts = 325 * 1792;
+      // let antennaGain = 2613000000;
+      // let minimumDetectableSignaldB;
+      let minSW = Math.pow(10, ((minSdB - 30) / 10));
+      // let frequencyMhz = 435;
+      let fHz = fMhz *= Math.pow(10, 6);
+
+    	let numer = pW * Math.pow(aG, 2) * rcs * Math.pow(3 * Math.pow(10, 8), 2);
+    	let denom = minSW * Math.pow((4 * Math.PI), 3) * Math.pow(fHz, 2);
+
+      let range = Math.sqrt(Math.sqrt(numer / denom));
+      return range;
+    };
+
+    satellite.radarMinSignal = (pW,aG,rcs,range,fMhz) => {
+      // let powerInWatts = 325 * 1792;
+      // let antennaGain = 2613000000;
+      // let minimumDetectableSignaldB;
+      // let frequencyMhz = 435;
+      let fHz = fMhz *= Math.pow(10, 6);
+
+    	let numer = pW * Math.pow(aG, 2) * rcs * Math.pow(3 * Math.pow(10, 8), 2);
+    	let denom = range**4 * Math.pow((4 * Math.PI), 3) * Math.pow(fHz, 2);
+
+      let minSW = numer / denom;
+      let minSdB = Math.log10(minSW);
+      return minSdB;
     };
 
     satellite.getSunTimes = (sat, sensor, searchLength, interval) => {

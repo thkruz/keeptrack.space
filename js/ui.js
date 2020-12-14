@@ -4521,7 +4521,7 @@ var speedModifier = 1;
                         webGlInit();
                         uiManager.hideSideMenus();
                         orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
-                        cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
+                        cameraType.current = cameraType.default; // Back to normal Camera Mode
                         $('#fov-text').html('');
                         $('#menu-planetarium').removeClass(
                             'bmenu-item-selected'
@@ -4529,7 +4529,7 @@ var speedModifier = 1;
                         break;
                     } else {
                         if (sensorManager.checkSensorSelected()) {
-                            cameraType.current = cameraType.PLANETARIUM; // Activate Planetarium Camera Mode
+                            cameraType.current = cameraType.planetarium; // Activate Planetarium Camera Mode
                             $('#fov-text').html(
                                 'FOV: ' +
                                     (settingsManager.fieldOfView * 100).toFixed(
@@ -4569,7 +4569,7 @@ var speedModifier = 1;
                         settingsManager.fieldOfView = 0.6;
                         webGlInit();
                         uiManager.hideSideMenus();
-                        cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
+                        cameraType.current = cameraType.default; // Back to normal Camera Mode
                         uiManager.legendMenuChange('default');
                         if (objectManager.isStarManagerLoaded) {
                             starManager.clearConstellations();
@@ -4584,7 +4584,7 @@ var speedModifier = 1;
                                 starManager.drawAllConstellations();
                             }
                             orbitManager.clearInViewOrbit();
-                            cameraType.current = cameraType.ASTRONOMY; // Activate Astronomy Camera Mode
+                            cameraType.current = cameraType.astronomy; // Activate Astronomy Camera Mode
                             $('#fov-text').html(
                                 'FOV: ' +
                                     (settingsManager.fieldOfView * 100).toFixed(
@@ -4613,15 +4613,15 @@ var speedModifier = 1;
                     }
                     break;
                 case 'menu-satview':
-                    if (cameraType.current === cameraType.SATELLITE) {
+                    if (cameraType.current === cameraType.satellite) {
                         isSatView = false;
                         uiManager.hideSideMenus();
-                        cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
+                        cameraType.current = cameraType.default; // Back to normal Camera Mode
                         $('#menu-satview').removeClass('bmenu-item-selected');
                         break;
                     } else {
                         if (objectManager.selectedSat !== -1) {
-                            cameraType.current = cameraType.SATELLITE; // Activate Satellite Camera Mode
+                            cameraType.current = cameraType.satellite; // Activate Satellite Camera Mode
                             $('#menu-satview').addClass('bmenu-item-selected');
                             isSatView = true;
                         } else {
@@ -4997,7 +4997,7 @@ var speedModifier = 1;
                 evt.key.toUpperCase() === 'J' ||
                 evt.key.toUpperCase() === 'L'
             ) {
-                if (cameraType.current === cameraType.ASTRONOMY) {
+                if (cameraType.current === cameraType.astronomy) {
                     fpsRotateRate = 0;
                 } else {
                     fpsYawRate = 0;
@@ -5039,7 +5039,7 @@ var speedModifier = 1;
             if (isCurrentlyTyping) return;
             if (evt.key.toUpperCase() === 'SHIFT') {
                 cameraManager.isShiftPressed = true;
-                if (cameraType.current === cameraType.FPS) {
+                if (cameraType.current === cameraType.fps) {
                     fpsRun = 0.05;
                 }
                 speedModifier = 8;
@@ -5048,48 +5048,48 @@ var speedModifier = 1;
             }
             if (evt.key === 'ShiftRight') {
                 cameraManager.isShiftPressed = true;
-                if (cameraType.current === cameraType.FPS) {
+                if (cameraType.current === cameraType.fps) {
                     fpsRun = 3;
                 }
             }
             if (evt.key.toUpperCase() === 'W') {
-                if (cameraType.current === cameraType.FPS) {
+                if (cameraType.current === cameraType.fps) {
                     fpsForwardSpeed = settingsManager.fpsForwardSpeed;
                     isFPSForwardSpeedLock = true;
                 }
             }
             if (evt.key.toUpperCase() === 'A') {
-                if (cameraType.current === cameraType.FPS) {
+                if (cameraType.current === cameraType.fps) {
                     fpsSideSpeed = -settingsManager.fpsSideSpeed;
                     isFPSSideSpeedLock = true;
                 }
             }
             if (evt.key.toUpperCase() === 'S') {
-                if (cameraType.current === cameraType.FPS) {
+                if (cameraType.current === cameraType.fps) {
                     fpsForwardSpeed = -settingsManager.fpsForwardSpeed;
                     isFPSForwardSpeedLock = true;
                 }
             }
             if (evt.key.toUpperCase() === 'D') {
-                if (cameraType.current === cameraType.FPS) {
+                if (cameraType.current === cameraType.fps) {
                     fpsSideSpeed = settingsManager.fpsSideSpeed;
                     isFPSSideSpeedLock = true;
                 }
             }
             if (evt.key.toUpperCase() === 'I') {
                 if (
-                    cameraType.current === cameraType.FPS ||
-                    cameraType.current === cameraType.SATELLITE ||
-                    cameraType.current === cameraType.ASTRONOMY
+                    cameraType.current === cameraType.fps ||
+                    cameraType.current === cameraType.satellite ||
+                    cameraType.current === cameraType.astronomy
                 ) {
                     fpsPitchRate = settingsManager.fpsPitchRate / speedModifier;
                 }
             }
             if (evt.key.toUpperCase() === 'K') {
                 if (
-                    cameraType.current === cameraType.FPS ||
-                    cameraType.current === cameraType.SATELLITE ||
-                    cameraType.current === cameraType.ASTRONOMY
+                    cameraType.current === cameraType.fps ||
+                    cameraType.current === cameraType.satellite ||
+                    cameraType.current === cameraType.astronomy
                 ) {
                     fpsPitchRate =
                         -settingsManager.fpsPitchRate / speedModifier;
@@ -5097,46 +5097,46 @@ var speedModifier = 1;
             }
             if (evt.key.toUpperCase() === 'J') {
                 if (
-                    cameraType.current === cameraType.FPS ||
-                    cameraType.current === cameraType.SATELLITE
+                    cameraType.current === cameraType.fps ||
+                    cameraType.current === cameraType.satellite
                 ) {
                     fpsYawRate = -settingsManager.fpsYawRate / speedModifier;
                 }
-                if (cameraType.current === cameraType.ASTRONOMY) {
+                if (cameraType.current === cameraType.astronomy) {
                     fpsRotateRate =
                         settingsManager.fpsRotateRate / speedModifier;
                 }
             }
             if (evt.key.toUpperCase() === 'L') {
                 if (
-                    cameraType.current === cameraType.FPS ||
-                    cameraType.current === cameraType.SATELLITE
+                    cameraType.current === cameraType.fps ||
+                    cameraType.current === cameraType.satellite
                 ) {
                     fpsYawRate = settingsManager.fpsYawRate / speedModifier;
                 }
-                if (cameraType.current === cameraType.ASTRONOMY) {
+                if (cameraType.current === cameraType.astronomy) {
                     fpsRotateRate =
                         -settingsManager.fpsRotateRate / speedModifier;
                 }
             }
             if (evt.key.toUpperCase() === 'Q') {
-                if (cameraType.current === cameraType.FPS) {
+                if (cameraType.current === cameraType.fps) {
                     fpsVertSpeed = -settingsManager.fpsVertSpeed;
                     isFPSVertSpeedLock = true;
                 }
-                if (cameraType.current === cameraType.SATELLITE ||
-                    cameraType.current === cameraType.ASTRONOMY) {
+                if (cameraType.current === cameraType.satellite ||
+                    cameraType.current === cameraType.astronomy) {
                     fpsRotateRate =
                         settingsManager.fpsRotateRate / speedModifier;
                 }
             }
             if (evt.key.toUpperCase() === 'E') {
-                if (cameraType.current === cameraType.FPS) {
+                if (cameraType.current === cameraType.fps) {
                     fpsVertSpeed = settingsManager.fpsVertSpeed;
                     isFPSVertSpeedLock = true;
                 }
-                if (cameraType.current === cameraType.SATELLITE ||
-                    cameraType.current === cameraType.ASTRONOMY) {
+                if (cameraType.current === cameraType.satellite ||
+                    cameraType.current === cameraType.astronomy) {
                     fpsRotateRate =
                         -settingsManager.fpsRotateRate / speedModifier;
                 }
@@ -5156,40 +5156,40 @@ var speedModifier = 1;
                     // console.log('toggled rotation');
                     break;
                 case 'C':
-                    if (cameraType.current === cameraType.PLANETARIUM)
-                        orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
+                    if (cameraType.current === cameraType.planetarium) {
+                      orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
+                    }
 
                     cameraType.current += 1;
-                    if (
-                        cameraType.current === cameraType.PLANETARIUM &&
-                        (!objectManager.isSensorManagerLoaded ||
-                            !sensorManager.checkSensorSelected())
-                    ) {
-                        cameraType.current += 1;
+
+                    if (cameraType.current == cameraType.fixedToSat && objectManager.selectedSat == -1) {
+                      cameraType.current += 1;
                     }
 
-                    if (
-                        cameraType.current === cameraType.SATELLITE &&
-                        objectManager.selectedSat === -1
-                    ) {
-                        cameraType.current += 1;
+                    if (cameraType.current === cameraType.planetarium && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
+                      cameraType.current += 1;
                     }
 
-                    if (
-                        cameraType.current === cameraType.ASTRONOMY &&
-                        (!objectManager.isSensorManagerLoaded ||
-                            !sensorManager.checkSensorSelected())
-                    ) {
-                        cameraType.current += 1;
+                    if (cameraType.current === cameraType.satellite && objectManager.selectedSat === -1) {
+                      cameraType.current += 1;
                     }
 
-                    if (cameraType.current === 6) {
+                    if (cameraType.current === cameraType.astronomy && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
+                      cameraType.current += 1;
+                    }
+
+                    if (cameraType.current === 7) {
                         // 6 is a placeholder to reset camera type
                         cameraManager.panReset = true;
                         cameraManager.localRotateReset = true;
                         settingsManager.fieldOfView = 0.6;
                         webGlInit();
-                        cameraType.current = 0;
+                        if (objectManager.selectedSat !== -1) {
+                          camZoomSnappedOnSat = true;
+                          cameraType.current = cameraType.fixedToSat;
+                        } else {
+                          cameraType.current = cameraType.default;
+                        }
                         fpsPitch = 0;
                         fpsYaw = 0;
                         fpsXPos = 0;
@@ -5198,18 +5198,18 @@ var speedModifier = 1;
                     }
 
                     switch (cameraType.current) {
-                        case cameraType.DEFAULT:
+                        case cameraType.default:
                             $('#camera-status-box').html(
                                 'Earth Centered Camera Mode'
                             );
                             $('#fov-text').html('');
                             zoomLevel = 0.5;
                             break;
-                        case cameraType.OFFSET:
+                        case cameraType.offset:
                             $('#camera-status-box').html('Offset Camera Mode');
                             $('#fov-text').html('');
                             break;
-                        case cameraType.FPS:
+                        case cameraType.fps:
                             $('#camera-status-box').html('Free Camera Mode');
                             $('#fov-text').html(
                                 'FOV: ' +
@@ -5219,7 +5219,7 @@ var speedModifier = 1;
                                     ' deg'
                             );
                             break;
-                        case cameraType.PLANETARIUM:
+                        case cameraType.planetarium:
                             $('#camera-status-box').html(
                                 'Planetarium Camera Mode'
                             );
@@ -5232,7 +5232,7 @@ var speedModifier = 1;
                                     ' deg'
                             );
                             break;
-                        case cameraType.SATELLITE:
+                        case cameraType.satellite:
                             $('#camera-status-box').html(
                                 'Satellite Camera Mode'
                             );
@@ -5244,7 +5244,7 @@ var speedModifier = 1;
                                     ' deg'
                             );
                             break;
-                        case cameraType.ASTRONOMY:
+                        case cameraType.astronomy:
                             $('#camera-status-box').html(
                                 'Astronomy Camera Mode'
                             );
@@ -6943,7 +6943,7 @@ var speedModifier = 1;
             [sat.position.x, sat.position.y, sat.position.z],
             [1, 0.4, 0, 1]
         );
-        cameraType.current = cameraType.OFFSET;
+        cameraType.current = cameraType.offset;
         console.log(sat);
         // ======================================================
         // Need to calculate the time to get the right RA offset

@@ -26,8 +26,6 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
     // Earth
     (function () {
         var earth = {};
-        var NUM_LAT_SEGS = 64;
-        var NUM_LON_SEGS = 64;
         var createClockDOMOnce = false;
 
         var isPropRateVisible = false;
@@ -186,32 +184,32 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                 earth.loadHiRes = () => {
                   var imgHiRes = new Image();
                   imgHiRes.src =
-                  settingsManager.installDirectory +
-                  'textures/earthmap4k.jpg';
+                    settingsManager.installDirectory +
+                    'textures/earthmap4k.jpg';
                   if (settingsManager.nasaImages)
-                  imgHiRes.src =
-                  settingsManager.installDirectory +
-                  'textures/mercator-tex.jpg';
+                    imgHiRes.src =
+                    settingsManager.installDirectory +
+                    'textures/mercator-tex.jpg';
                   if (settingsManager.trusatImages)
-                  img.src =
-                  settingsManager.installDirectory +
-                  'textures/trusatvector-4096.jpg';
+                    img.src =
+                    settingsManager.installDirectory +
+                    'textures/trusatvector-4096.jpg';
                   if (settingsManager.blueImages)
-                  imgHiRes.src =
-                  settingsManager.installDirectory +
-                  'textures/world_blue-2048.png';
+                    imgHiRes.src =
+                    settingsManager.installDirectory +
+                    'textures/world_blue-2048.png';
                   if (settingsManager.vectorImages)
-                  imgHiRes.src =
-                  settingsManager.installDirectory +
-                  'textures/dayearthvector-4096.jpg';
+                    imgHiRes.src =
+                    settingsManager.installDirectory +
+                    'textures/dayearthvector-4096.jpg';
                   if (settingsManager.hiresImages)
-                  imgHiRes.src =
-                  settingsManager.installDirectory +
-                  'textures/earthmap8k.jpg';
+                    imgHiRes.src =
+                    settingsManager.installDirectory +
+                    'textures/earthmap16k.jpg';
                   if (settingsManager.hiresNoCloudsImages)
-                  imgHiRes.src =
-                  settingsManager.installDirectory +
-                  'textures/earthmap8k.jpg';
+                    imgHiRes.src =
+                    settingsManager.installDirectory +
+                    'textures/earthmap16k.jpg';
                   imgHiRes.onload = function () {
                     gl.bindTexture(gl.TEXTURE_2D, texture);
                     gl.texImage2D(
@@ -290,10 +288,10 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                       nightImgHiRes.src =
                           settingsManager.installDirectory +
                           'textures/dayearthvector-4096.jpg';
-                  if (settingsManager.hiresImages)
+                  if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages)
                       nightImgHiRes.src =
                           settingsManager.installDirectory +
-                          'textures/earthlights10k.jpg';
+                          'textures/earthlights16k.jpg';
                   nightImgHiRes.onload = function () {
                       gl.bindTexture(gl.TEXTURE_2D, nightTexture);
                       gl.texImage2D(
@@ -425,22 +423,22 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             var vertPos = [];
             var vertNorm = [];
             var texCoord = [];
-            for (let lat = 0; lat <= NUM_LAT_SEGS; lat++) {
-                var latAngle = (Math.PI / NUM_LAT_SEGS) * lat - Math.PI / 2;
+            for (let lat = 0; lat <= settingsManager.earthNumLatSegs; lat++) {
+                var latAngle = (Math.PI / settingsManager.earthNumLatSegs) * lat - Math.PI / 2;
                 var diskRadius = Math.cos(Math.abs(latAngle));
                 var z = Math.sin(latAngle);
                 // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
                 // var i = 0;
-                for (let lon = 0; lon <= NUM_LON_SEGS; lon++) {
+                for (let lon = 0; lon <= settingsManager.earthNumLonSegs; lon++) {
                     // add an extra vertex for texture funness
-                    var lonAngle = ((Math.PI * 2) / NUM_LON_SEGS) * lon;
+                    var lonAngle = ((Math.PI * 2) / settingsManager.earthNumLonSegs) * lon;
                     var x = Math.cos(lonAngle) * diskRadius;
                     var y = Math.sin(lonAngle) * diskRadius;
                     // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
 
                     // mercator cylindrical projection (simple angle interpolation)
-                    var v = 1 - lat / NUM_LAT_SEGS;
-                    var u = 0.5 + lon / NUM_LON_SEGS; // may need to change to move map
+                    var v = 1 - lat / settingsManager.earthNumLatSegs;
+                    var u = 0.5 + lon / settingsManager.earthNumLonSegs; // may need to change to move map
                     // console.log('u: ' + u + ' v: ' + v);
                     // normals: should just be a vector from center to point (aka the point itself!
 
@@ -459,12 +457,12 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
             // ok let's calculate vertex draw orders.... indiv triangles
             var vertIndex = [];
-            for (let lat = 0; lat < NUM_LAT_SEGS; lat++) {
+            for (let lat = 0; lat < settingsManager.earthNumLatSegs; lat++) {
                 // this is for each QUAD, not each vertex, so <
-                for (let lon = 0; lon < NUM_LON_SEGS; lon++) {
-                    var blVert = lat * (NUM_LON_SEGS + 1) + lon; // there's NUM_LON_SEGS + 1 verts in each horizontal band
+                for (let lon = 0; lon < settingsManager.earthNumLonSegs; lon++) {
+                    var blVert = lat * (settingsManager.earthNumLonSegs + 1) + lon; // there's settingsManager.earthNumLonSegs + 1 verts in each horizontal band
                     var brVert = blVert + 1;
-                    var tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;
+                    var tlVert = (lat + 1) * (settingsManager.earthNumLonSegs + 1) + lon;
                     var trVert = tlVert + 1;
                     // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
                     vertIndex.push(blVert);
@@ -743,8 +741,6 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
     // Atmosphere
     (function () {
         var atmosphere = {};
-        atmosphere.latSegs = 64;
-        atmosphere.lonSegs = 64;
         atmosphere.lightDirection = [];
 
         let vertPosBuf, vertNormBuf, texCoordBuf, vertIndexBuf;
@@ -802,14 +798,14 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             // Generate a UV Sphere Bottom Up, CCW order
             let vertPos = [];
             let vertNorm = [];
-            for (let lat = 0; lat <= atmosphere.latSegs; lat++) {
+            for (let lat = 0; lat <= settingsManager.atmospherelatSegs; lat++) {
                 let latAngle =
-                    (Math.PI / atmosphere.latSegs) * lat - Math.PI / 2;
+                    (Math.PI / settingsManager.atmospherelatSegs) * lat - Math.PI / 2;
                 let diskRadius = Math.cos(Math.abs(latAngle));
                 let z = Math.sin(latAngle);
-                for (let lon = 0; lon <= atmosphere.lonSegs; lon++) {
+                for (let lon = 0; lon <= settingsManager.atmospherelonSegs; lon++) {
                     // add an extra vertex for texture funness
-                    let lonAngle = ((Math.PI * 2) / atmosphere.lonSegs) * lon;
+                    let lonAngle = ((Math.PI * 2) / settingsManager.atmospherelonSegs) * lon;
                     let x = Math.cos(lonAngle) * diskRadius;
                     let y = Math.sin(lonAngle) * diskRadius;
 
@@ -824,12 +820,12 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
             // Calculate Vertex Draw Orders
             let vertIndex = [];
-            for (let lat = 0; lat < atmosphere.latSegs; lat++) {
+            for (let lat = 0; lat < settingsManager.atmospherelatSegs; lat++) {
                 // this is for each QUAD, not each vertex, so <
-                for (let lon = 0; lon < atmosphere.lonSegs; lon++) {
-                    var blVert = lat * (atmosphere.lonSegs + 1) + lon; // there's atmosphere.lonSegs + 1 verts in each horizontal band
+                for (let lon = 0; lon < settingsManager.atmospherelonSegs; lon++) {
+                    var blVert = lat * (settingsManager.atmospherelonSegs + 1) + lon; // there's settingsManager.atmospherelonSegs + 1 verts in each horizontal band
                     var brVert = blVert + 1;
-                    var tlVert = (lat + 1) * (atmosphere.lonSegs + 1) + lon;
+                    var tlVert = (lat + 1) * (settingsManager.atmospherelonSegs + 1) + lon;
                     var trVert = tlVert + 1;
                     vertIndex.push(blVert);
                     vertIndex.push(brVert);

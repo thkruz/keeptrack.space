@@ -264,7 +264,7 @@
 
         if (currentInView.length >= 1) {
           // There might be some z-fighting
-          if (cameraType.current == cameraType.PLANETARIUM) {
+          if (cameraType.current == cameraType.planetarium) {
             gl.uniform4fv(pathShader.uColor, settingsManager.orbitPlanetariumColor);
           } else {
             gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);

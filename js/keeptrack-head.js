@@ -36,7 +36,7 @@ const MOON_SCALAR_DISTANCE = 200000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.6.2';
+    settingsManager.versionNumber = '2.7.0';
     settingsManager.versionDate = 'December 14, 2020';
 
     // Install Folder Settings
@@ -173,6 +173,11 @@ const MOON_SCALAR_DISTANCE = 200000;
     // Shader Settings
     // //////////////////////////////////////////////////////////////////////////
     settingsManager.showOrbitThroughEarth = false;
+
+    settingsManager.earthNumLatSegs = 64;
+    settingsManager.earthNumLonSegs = 64;
+    settingsManager.atmospherelatSegs = 64;
+    settingsManager.atmospherelonSegs = 64;
 
     settingsManager.atmosphereSize = RADIUS_OF_EARTH + 250;
     settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)';
@@ -489,6 +494,8 @@ const MOON_SCALAR_DISTANCE = 200000;
     // Feel free to change these, but they could break something
     // //////////////////////////////////////////////////////////////////////////
 
+    settingsManager.modelsOnSatelliteViewOverride = false;
+
     // Frames Per Second Limiter
     settingsManager.minimumDrawDt = 0.0; // 20 FPS // 60 FPS = 0.01667
 
@@ -602,6 +609,10 @@ if (!settingsManager.disableUI) {
                     break;
                 case 'hires':
                     settingsManager.hiresImages = true;
+                    settingsManager.earthNumLatSegs = 256;
+                    settingsManager.earthNumLonSegs = 256;
+                    settingsManager.atmospherelatSegs = 128;
+                    settingsManager.atmospherelonSegs = 128;
                     settingsManager.minimumDrawDt = 0.01667;
                     break;
                 case 'nostars':

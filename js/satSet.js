@@ -1385,7 +1385,7 @@ var emptyMat4 = mat4.create();
         gl.uniformMatrix4fv(dotShader.uMvMatrix, false, emptyMat4);
         gl.uniformMatrix4fv(dotShader.uCamMatrix, false, camMatrix);
         gl.uniformMatrix4fv(dotShader.uPMatrix, false, pMatrix);
-        if (cameraType.current == cameraType.PLANETARIUM) {
+        if (cameraType.current == cameraType.planetarium) {
           gl.uniform1f(dotShader.minSize, settingsManager.satShader.minSizePlanetarium);
           gl.uniform1f(dotShader.maxSize, settingsManager.satShader.maxSizePlanetarium);
         } else {
@@ -1664,7 +1664,7 @@ var emptyMat4 = mat4.create();
                 return satellite.altitudeCheck(
                     satData[i].TLE1,
                     satData[i].TLE2,
-                    timeManager.getPropOffset()
+                    timeManager.propOffset
                 );
             };
         }

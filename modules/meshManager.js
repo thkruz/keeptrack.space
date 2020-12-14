@@ -157,7 +157,7 @@
 
         // Rotate the Satellite to Face Nadir
         if (isFacingNadir) {
-            mat4.rotateZ(mvMatrix, mvMatrix, camYaw + 180 * DEG2RAD);
+            mat4.rotateZ(mvMatrix, mvMatrix, longToYaw(sat.getTEARR().lon * RAD2DEG) + 180 * DEG2RAD);
         }
 
         // mat4.scale(

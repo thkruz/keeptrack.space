@@ -12,7 +12,7 @@
 
 */
 importScripts('lib/satellite.js');
-// 'use strict';
+'use strict';
 
 var propRealTime;
 var propOffset;

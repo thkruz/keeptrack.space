@@ -178,7 +178,7 @@
   }
   #sat-infobox:after {
     content: '';
-    height: 100px;
+    height: 120px;
     display: block;
   }
   /* .sat-infobox-fullsize {} */
@@ -191,13 +191,13 @@
   }
   #footer-toggle-wrapper {
     width: 100%;
-    bottom: 100px;
+    bottom: 120px;
     z-index: 1;
     position: absolute;
   }
   .footer-slide-down {
     transition: 1s;
-    bottom: -100px !important;
+    bottom: -120px !important;
   }
   .footer-slide-up {
     transition: 1s;
@@ -207,7 +207,7 @@
     margin-top: -100px;
     position: absolute;
     bottom: 0px;
-    height: 100px;
+    height: 120px;
     width: 100%;
   }
   #jday {
@@ -295,7 +295,7 @@
   }
   #sat-infobox:after {
     content: '';
-    height: 100px;
+    height: 120px;
     display: block;
   }
   .sat-infobox-fullsize {
@@ -303,7 +303,7 @@
   }
   .sat-info-value {
     float: right;
-    width: 45%;
+    width: 65%;
     height: 20px;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -312,22 +312,22 @@
     margin-top: -100px;
     position: absolute;
     bottom: 0px;
-    height: 100px;
+    height: 120px;
     width: 100%;
   }
   #bottom-icons-container {
     width: 100%;
-    height: 100px;
+    height: 120px;
   }
   #footer-toggle-wrapper {
     width: 100%;
-    bottom: 100px;
+    bottom: 120px;
     z-index: 1;
     position: absolute;
   }
   .footer-slide-down {
     transition: 1s;
-    bottom: -100px !important;
+    bottom: -120px !important;
   }
   .footer-slide-up {
     transition: 1s;

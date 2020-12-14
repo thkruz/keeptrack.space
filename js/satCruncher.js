@@ -19,7 +19,7 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-// 'use strict';
+'use strict';
 
 importScripts('lib/satellite.js');
 importScripts('lib/numeric.js'); // Used for sunlight calculations
@@ -434,17 +434,20 @@ function propagateCruncher() {
     // var startTime2 = 0;
     // var stopTime2 = 0;
 
-    var positionEcf, lookangles, azimuth, elevation, rangeSat;
-    var x, y, z, vx, vy, vz;
-    var cosLat, sinLat, cosLon, sinLon;
-    var curMissivarTime;
-    var s, m, pv, tLen, t;
-    var sat;
-    var isSensorChecked = false;
-    var az, el, rng, pos;
-    var q;
-    var semiDiamEarth, semiDiamSun, theta;
-    var starPosition;
+    let positionEcf, lookangles, azimuth, elevation, rangeSat;
+    let x, y, z, vx, vy, vz;
+    let cosLat, sinLat, cosLon, sinLon;
+    let curMissivarTime;
+    let s, m, pv, tLen, t;
+    let sat;
+    let isSensorChecked = false;
+    let az, el, rng, pos;
+    let q;
+    let semiDiamEarth, semiDiamSun, theta;
+    let starPosition;
+    let snum;
+    let lat, long;
+    let satSelPosX,satSelPosY,satSelPosZ, satSelPosEcf, satSelPos, satSelGeodetic, satHeight, satSelPosEarth, deltaLat, deltaLatInt, deltaLon, deltaLonInt;
     while (i < len) {
         i++; // At the beginning so i starts at 0
         // totalCrunchTime2 += (stopTime2 - startTime2);

@@ -21,7 +21,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-// 'use strict';
+'use strict';
 var satSensorMarkerArray = [];
 var emptyMat4 = mat4.create();
 (function () {
@@ -1385,8 +1385,13 @@ var emptyMat4 = mat4.create();
         gl.uniformMatrix4fv(dotShader.uMvMatrix, false, emptyMat4);
         gl.uniformMatrix4fv(dotShader.uCamMatrix, false, camMatrix);
         gl.uniformMatrix4fv(dotShader.uPMatrix, false, pMatrix);
-        gl.uniform1f(dotShader.minSize, settingsManager.satShader.minSize);
-        gl.uniform1f(dotShader.maxSize, settingsManager.satShader.maxSize);
+        if (cameraType.current == cameraType.PLANETARIUM) {
+          gl.uniform1f(dotShader.minSize, settingsManager.satShader.minSizePlanetarium);
+          gl.uniform1f(dotShader.maxSize, settingsManager.satShader.maxSizePlanetarium);
+        } else {
+          gl.uniform1f(dotShader.minSize, settingsManager.satShader.minSize);
+          gl.uniform1f(dotShader.maxSize, settingsManager.satShader.maxSize);
+        }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);
         gl.enableVertexAttribArray(dotShader.aStar);
@@ -1881,15 +1886,15 @@ var emptyMat4 = mat4.create();
             j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
 
             var gmst = satellite.gstime(j);
-            cosLat = Math.cos(sensorManager.currentSensor.lat * DEG2RAD);
-            sinLat = Math.sin(sensorManager.currentSensor.lat * DEG2RAD);
-            cosLon = Math.cos(
+            let cosLat = Math.cos(sensorManager.currentSensor.lat * DEG2RAD);
+            let sinLat = Math.sin(sensorManager.currentSensor.lat * DEG2RAD);
+            let cosLon = Math.cos(
                 sensorManager.currentSensor.long * DEG2RAD + gmst
             );
-            sinLon = Math.sin(
+            let sinLon = Math.sin(
                 sensorManager.currentSensor.long * DEG2RAD + gmst
             );
-            var sensor = {};
+            let sensor = {};
             sensor.position = {};
             sensor.name = 'Custom Sensor';
             sensor.position.x =

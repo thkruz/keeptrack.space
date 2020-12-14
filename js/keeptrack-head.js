@@ -36,8 +36,8 @@ const MOON_SCALAR_DISTANCE = 200000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.6.1';
-    settingsManager.versionDate = 'December 12, 2020';
+    settingsManager.versionNumber = '2.6.2';
+    settingsManager.versionDate = 'December 14, 2020';
 
     // Install Folder Settings
     {
@@ -181,6 +181,8 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.satShader.largeObjectMinZoom = 0.37;
     settingsManager.satShader.largeObjectMaxZoom = 0.58;
     settingsManager.satShader.minSize = 5.5;
+    settingsManager.satShader.minSizePlanetarium = 20.0;
+    settingsManager.satShader.maxSizePlanetarium = 20.0;
     // Max size dynamically changes based on zoom level
     settingsManager.satShader.maxAllowedSize = 35.0;
     settingsManager.satShader.isUseDynamicSizing = false;
@@ -349,6 +351,7 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];
     // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0]
     settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.7]; // WHITE
+    settingsManager.orbitPlanetariumColor = [1.0, 1.0, 1.0, 0.2]; // Transparent White
     // settingsManager.orbitInViewColor = [1.0, 1.0, 0.0, 1.0] // Applies to Planetarium View
     //settingsManager.orbitGroupColor = [0.3, 0.5, 1.0, 0.4]
     settingsManager.orbitGroupColor = [0.3, 1.0, 1.0, 0.7];
@@ -737,6 +740,85 @@ let db = {};
             } catch (e) {}
         }
     })();
+    db.gremlinsSettings = {};
+    db.gremlinsSettings.nb = 100000;
+    db.gremlinsSettings.delay = 5;
+    db.gremlins = () => {
+      $('#nav-footer').height(200);
+      $('#nav-footer-toggle').hide();
+      $('#bottom-icons-container').height(200);
+      $('#bottom-icons').height(200);
+      function callback() {
+        const bottomMenuGremlinClicker = gremlins.species.clicker({
+          // Click only if parent is has class test-class
+          canClick: (element) => {
+            if (typeof element.parentElement == 'undefined' ||
+                element.parentElement == null) return null;
+            return element.parentElement.className === 'bmenu-item'
+          },
+          defaultPositionSelector: () => {
+            [
+              randomizer.natural({
+                  max: Math.max(0, document.documentElement.clientWidth - 1),
+              }),
+              randomizer.natural({
+                  min: Math.max(0, document.documentElement.clientHeight - 100),
+                  max: Math.max(0, document.documentElement.clientHeight - 1),
+              }),
+            ]
+          },
+        });
+        const bottomMenuGremlinScroller = gremlins.species.toucher({
+          touchTypes: ['gesture'],
+          defaultPositionSelector: () => {
+            [
+              randomizer.natural({
+                  max: Math.max(0, document.documentElement.clientWidth - 1),
+              }),
+              randomizer.natural({
+                  min: Math.max(0, document.documentElement.clientHeight - 100),
+                  max: Math.max(0, document.documentElement.clientHeight - 1),
+              }),
+            ]
+          },
+        });
+        const distributionStrategy = gremlins.strategies.distribution({
+          distribution: [0.3, 0.3, 0.1, 0.1, 0.1, 0.1], // the first three gremlins have more chances to be executed than the last
+          delay: 5, // wait 5 ms between each action
+        });
+        gremlins.createHorde({
+            species: [
+              bottomMenuGremlinClicker,
+              bottomMenuGremlinScroller,
+              // gremlins.species.scroller(),
+              gremlins.species.clicker(),
+              gremlins.species.toucher(),
+              gremlins.species.formFiller(),
+              gremlins.species.typer()
+            ],
+            mogwais: [
+              gremlins.mogwais.alert(),
+              gremlins.mogwais.fps(),
+              gremlins.mogwais.gizmo({maxErrors: 1000})
+            ],
+            strategies: [
+              distributionStrategy
+            ]
+        }).unleash();
+      }
+      if (typeof gremlins == 'undefined') {
+        var s = document.createElement("script");
+        s.src = "https://unpkg.com/gremlins.js";
+        if (s.addEventListener) {
+          s.addEventListener("load", callback, false);
+        } else if (s.readyState) {
+          s.onreadystatechange = callback;
+        }
+        document.body.appendChild(s);
+      } else {
+        callback();
+      }
+    };
 }
 
 // Try to Make Older Versions of Jquery Work

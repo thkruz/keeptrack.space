@@ -16,13 +16,8 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 */
 
 // This file should contain all of the webgl code for generating non .obj meshes
-// TODO: Separate the matrix updates from the draw functions into update and draw
-// TODO: Sync main.js draw loop with the functions in this file
-// TODO: Move all elements of time writing out of earth and into timeManager and
-//       then have a single call to update time at the beginning of the draw
-//       function
 (function () {
-  // 'use strict';
+  'use strict';
     let mvMatrixEmpty = mat4.create();
     let nMatrixEmpty = mat3.create();
 
@@ -524,8 +519,6 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             earthNow = timeManager.propTimeVar;
             timeManager.selectedDate = earthNow;
 
-            // wall time is not propagation time, so better print it
-            // TODO substring causes 12kb memory leak every frame.
             if (earth.lastTime - earthNow < 300) {
                 earth.tDS = earthNow.toJSON();
                 earth.timeTextStr = earth.timeTextStrEmpty;
@@ -1877,13 +1870,13 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
         void main () {
           float sunAmount = max(dot(vNormal, uLightDirection), 0.1);
           float darkAmount = max(dot(vNormal, -uLightDirection), 0.0);
-          float a4 = pow(1.1 - vDist \/ 2.0, 1.1) * 2.0;
+          float a4 = pow(1.3 - vDist / 2.0, 1.1) * 2.0;
           float r = 1.0 - sunAmount;
-          float g = max(1.0 - sunAmount, 0.8) - darkAmount;
+          float g = max(1.0 - sunAmount, 0.75) - darkAmount;
           float b = max(sunAmount, 0.8) - darkAmount;
           float a1 = min(sunAmount, 0.8) * 2.0;
-          float a2 = min(pow(darkAmount \/ 1.15, 2.0),0.2);
-          float a3 = pow(vDist,2.0) * -1.0 + 1.0;
+          float a2 = min(pow(darkAmount / 1.15, 2.0),0.2);
+          float a3 = pow(vDist,2.0) * -1.0 + 1.2;
           float a = min(a1 - a2, a3) * a4;
           gl_FragColor    = vec4(vec3(r,g,b), a);
         }

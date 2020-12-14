@@ -10,7 +10,7 @@
 // FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 (function () {
-  // 'use strict';
+  'use strict';
     var groups = {};
     groups.selectedGroup = null;
     groups.SatGroup = SatGroup;

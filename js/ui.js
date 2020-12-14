@@ -4515,6 +4515,10 @@ var speedModifier = 1;
                 case 'menu-planetarium':
                     if (isPlanetariumView) {
                         isPlanetariumView = false;
+                        cameraManager.panReset = true;
+                        cameraManager.localRotateReset = true;
+                        settingsManager.fieldOfView = 0.6;
+                        webGlInit();
                         uiManager.hideSideMenus();
                         orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
                         cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
@@ -4560,6 +4564,10 @@ var speedModifier = 1;
                 case 'menu-astronomy':
                     if (isAstronomyView) {
                         isAstronomyView = false;
+                        cameraManager.panReset = true;
+                        cameraManager.localRotateReset = true;
+                        settingsManager.fieldOfView = 0.6;
+                        webGlInit();
                         uiManager.hideSideMenus();
                         cameraType.current = cameraType.DEFAULT; // Back to normal Camera Mode
                         uiManager.legendMenuChange('default');
@@ -4978,20 +4986,12 @@ var speedModifier = 1;
             if (evt.key.toUpperCase() === 'Q') {
                 if (fpsVertSpeed === -settingsManager.fpsVertSpeed)
                     isFPSVertSpeedLock = false;
-                if (cameraType.current === cameraType.ASTRONOMY) {
-                    fpsYawRate = 0;
-                } else {
-                    fpsRotateRate = 0;
-                }
+                fpsRotateRate = 0;
             }
             if (evt.key.toUpperCase() === 'E') {
                 if (fpsVertSpeed === settingsManager.fpsVertSpeed)
                     isFPSVertSpeedLock = false;
-                if (cameraType.current === cameraType.ASTRONOMY) {
-                    fpsYawRate = 0;
-                } else {
-                    fpsRotateRate = 0;
-                }
+                fpsRotateRate = 0;
             }
             if (
                 evt.key.toUpperCase() === 'J' ||
@@ -5124,12 +5124,10 @@ var speedModifier = 1;
                     fpsVertSpeed = -settingsManager.fpsVertSpeed;
                     isFPSVertSpeedLock = true;
                 }
-                if (cameraType.current === cameraType.SATELLITE) {
+                if (cameraType.current === cameraType.SATELLITE ||
+                    cameraType.current === cameraType.ASTRONOMY) {
                     fpsRotateRate =
                         settingsManager.fpsRotateRate / speedModifier;
-                }
-                if (cameraType.current === cameraType.ASTRONOMY) {
-                    fpsYawRate = -settingsManager.fpsYawRate / speedModifier;
                 }
             }
             if (evt.key.toUpperCase() === 'E') {
@@ -5137,12 +5135,10 @@ var speedModifier = 1;
                     fpsVertSpeed = settingsManager.fpsVertSpeed;
                     isFPSVertSpeedLock = true;
                 }
-                if (cameraType.current === cameraType.SATELLITE) {
+                if (cameraType.current === cameraType.SATELLITE ||
+                    cameraType.current === cameraType.ASTRONOMY) {
                     fpsRotateRate =
                         -settingsManager.fpsRotateRate / speedModifier;
-                }
-                if (cameraType.current === cameraType.ASTRONOMY) {
-                    fpsYawRate = settingsManager.fpsYawRate / speedModifier;
                 }
             }
         };
@@ -5189,6 +5185,10 @@ var speedModifier = 1;
 
                     if (cameraType.current === 6) {
                         // 6 is a placeholder to reset camera type
+                        cameraManager.panReset = true;
+                        cameraManager.localRotateReset = true;
+                        settingsManager.fieldOfView = 0.6;
+                        webGlInit();
                         cameraType.current = 0;
                         fpsPitch = 0;
                         fpsYaw = 0;

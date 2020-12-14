@@ -21,7 +21,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-// 'use strict';
+'use strict';
 var debugTimeArray = [];
 var canvasDOM = $('#keeptrack-canvas');
 var satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
@@ -714,14 +714,8 @@ function drawLoop() {
         // Prevent Over Rotation
         if (fpsPitch > 90) fpsPitch = 90;
         if (fpsPitch < -90) fpsPitch = -90;
-        // ASTRONOMY 180 FOV Bubble Looking out from Sensor
-        if (cameraType.current === cameraType.ASTRONOMY) {
-            if (fpsRotate > 90) fpsRotate = 90;
-            if (fpsRotate < -90) fpsRotate = -90;
-        } else {
-            if (fpsRotate > 360) fpsRotate -= 360;
-            if (fpsRotate < 0) fpsRotate += 360;
-        }
+        if (fpsRotate > 360) fpsRotate -= 360;
+        if (fpsRotate < 0) fpsRotate += 360;
         if (fpsYaw > 360) fpsYaw -= 360;
         if (fpsYaw < 0) fpsYaw += 360;
     } else {
@@ -1038,11 +1032,11 @@ function initializeGpuManager () {
       }
       gM.kern.sgp4.setOutput([satrecList.length,propLength,4]);
       // [j][t,x,y,z,xdot,ydot,zdot][id]
-      try {
+      // try {
         [t, x, y, z] = gM.kern.sgp4(satrecList,tsinceList);
-      } catch {
-        debugger
-      }
+      // } catch {
+        // debugger
+      // }
       tArray = tArray.concat(t);
       xArray = xArray.concat(x);
       yArray = yArray.concat(y);
@@ -1942,19 +1936,27 @@ function _drawScene() {
               // yawRotate = ((-90 - sensorManager.currentSensor.long) * DEG2RAD)
               if (objectManager.selectedSat !== -1)
                   lastselectedSat = objectManager.selectedSat;
-              sat = satSet.getSat(lastselectedSat);
+              let sat = satSet.getSat(lastselectedSat);
+
+              satPos = [-sat.position.x, -sat.position.y, -sat.position.z];
+              mat4.translate(camMatrix, camMatrix, satPos);
+              vec3.normalize(normUp, satPos);
+              vec3.normalize(normForward, [sat.velocity.x,sat.velocity.y,sat.velocity.z]);
+              vec3.transformQuat(normLeft, normUp, quat.fromValues(normForward[0], normForward[1], normForward[2], 90 * DEG2RAD));
+              satNextPos = [sat.position.x + sat.velocity.x, sat.position.y + sat.velocity.y, sat.position.z + sat.velocity.z];
+              mat4.lookAt(camMatrix, satNextPos, satPos, normUp);
+
+              mat4.translate(camMatrix, camMatrix, [sat.position.x, sat.position.y, sat.position.z]);
+
+              mat4.rotate(camMatrix, camMatrix, -fpsPitch * DEG2RAD, normLeft);
+              mat4.rotate(camMatrix, camMatrix, -fpsYaw * DEG2RAD, normUp);
+
               // mat4.rotate(camMatrix, camMatrix, sat.lat * DEG2RAD, [0, 1, 0])
-              mat4.rotate(camMatrix, camMatrix, -fpsPitch * DEG2RAD, [1, 0, 0]);
-              mat4.rotate(camMatrix, camMatrix, fpsYaw * DEG2RAD, [0, 0, 1]);
-              mat4.rotate(camMatrix, camMatrix, fpsRotate * DEG2RAD, [0, 1, 0]);
+              // mat4.rotate(camMatrix, camMatrix, -fpsRotate * DEG2RAD, [0, normUp[1], normForward[0]]);
+
+              mat4.translate(camMatrix, camMatrix, satPos);
 
               orbitManager.updateOrbitBuffer(lastselectedSat);
-              satPos = sat.position;
-              mat4.translate(camMatrix, camMatrix, [
-                  -satPos.x,
-                  -satPos.y,
-                  -satPos.z,
-              ]);
               break;
           }
           case cameraType.ASTRONOMY: {
@@ -1963,8 +1965,6 @@ function _drawScene() {
               // Pitch is the opposite of the angle to the latitude
               // Yaw is 90 degrees to the left of the angle to the longitude
               pitchRotate = -1 * sensorManager.currentSensor.lat * DEG2RAD;
-              yawRotate =
-                  (90 - sensorManager.currentSensor.long) * DEG2RAD - satPos.gmst;
 
               // TODO: Calculate elevation for cameraType.ASTRONOMY
               // Idealy the astronomy view would feel more natural and tell you what
@@ -1973,8 +1973,7 @@ function _drawScene() {
               // fpsEl = ((fpsPitch + 90) > 90) ? (-(fpsPitch) + 90) : (fpsPitch + 90)
               // $('#el-text').html(' EL: ' + fpsEl.toFixed(2) + ' deg')
 
-              // yawRotate = ((-90 - sensorManager.currentSensor.long) * DEG2RAD)
-              sensor = null;
+              let sensor = null;
               if (typeof sensorManager.currentSensor.name == 'undefined') {
                   sensor = satSet.getIdFromSensorName(
                       sensorManager.currentSensor.name
@@ -1985,30 +1984,36 @@ function _drawScene() {
                       satSet.getIdFromSensorName(sensorManager.currentSensor.name)
                   );
               }
-              // mat4.rotate(camMatrix, camMatrix, sat.inclination * DEG2RAD, [0, 1, 0])
-              mat4.rotate(
-                  camMatrix,
-                  camMatrix,
-                  pitchRotate + -fpsPitch * DEG2RAD,
-                  [1, 0, 0]
-              );
-              mat4.rotate(camMatrix, camMatrix, yawRotate + fpsYaw * DEG2RAD, [
-                  0,
-                  0,
-                  1,
-              ]);
-              mat4.rotate(camMatrix, camMatrix, fpsRotate * DEG2RAD, [0, 1, 0]);
+              let sensorPos = [-sensor.position.x * 1.01, -sensor.position.y * 1.01, -sensor.position.z * 1.01];
+              fpsXPos = sensor.position.x;
+              fpsYPos = sensor.position.y;
+              fpsZPos = sensor.position.z;
 
-              // orbitManager.updateOrbitBuffer(lastselectedSat)
-              sensorPos = sensor.position;
-              fpsXPos = sensorPos.x;
-              fpsYPos = sensorPos.y;
-              fpsZPos = sensorPos.z;
+              // mat4.translate(camMatrix, camMatrix, [
+              //   -sensor.position.x * 1.01,
+              //   -sensor.position.y * 1.01,
+              //   -sensor.position.z * 1.01,
+              // ]);
+              //
+              // vec3.cross(crossNormUp, [1,0,0], normUp)
+              // mat4.lookAt(camMatrix, crossNormUp, sensorPos, normUp);
+              //
+              // mat4.translate(camMatrix, camMatrix, [
+              //   sensor.position.x * 1.01,
+              //   sensor.position.y * 1.01,
+              //   sensor.position.z * 1.01,
+              // ]);
+
+              mat4.rotate(camMatrix, camMatrix, pitchRotate + -fpsPitch * DEG2RAD, [1, 0, 0]);
+              mat4.rotate(camMatrix, camMatrix, -fpsRotate * DEG2RAD, [0, 1, 0]);
+              vec3.normalize(normUp, sensorPos);
+              mat4.rotate(camMatrix, camMatrix, -fpsYaw * DEG2RAD, normUp);
+
               mat4.translate(camMatrix, camMatrix, [
-                  -sensorPos.x * 1.01,
-                  -sensorPos.y * 1.01,
-                  -sensorPos.z * 1.01,
-              ]); // Scale to get away from Earth
+                -sensor.position.x * 1.01,
+                -sensor.position.y * 1.01,
+                -sensor.position.z * 1.01,
+              ]);
 
               _showOrbitsAbove(); // Clears Orbit
               break;
@@ -2030,7 +2035,8 @@ function _drawScene() {
         // Disabling Moon Until it is Fixed
         moon.draw(pMatrix, camMatrix);
     }
-    if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
+    if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess &&
+        cameraType.current !== cameraType.PLANETARIUM && cameraType.current !== cameraType.ASTRONOMY) {
         atmosphere.update();
         atmosphere.draw(pMatrix, camMatrix);
     }
@@ -2042,7 +2048,7 @@ function _drawScene() {
     if (objectManager.selectedSat !== -1 && typeof meshManager != 'undefined' && meshManager.isReady) {
         let sat = satSet.getSat(objectManager.selectedSat);
         // If 3D Models Available, then draw them on the screen
-        if (typeof meshManager !== 'undefined') {
+        if (typeof meshManager !== 'undefined' && cameraType.current !== cameraType.SATELLITE) {
             if (!sat.static) {
                 if (sat.SCC_NUM == 25544) {
                     meshManager.models.iss.position =
@@ -2614,7 +2620,9 @@ function _showOrbitsAbove() {
             continue;
 
         // Draw Orbits
-        orbitManager.addInViewOrbit(i);
+        if (!settingsManager.isShowSatNameNotOrbit) {
+          orbitManager.addInViewOrbit(i);
+        }
 
         // Draw Sat Labels
         // if (!settingsManager.enableHoverOverlay) continue
@@ -2623,10 +2631,10 @@ function _showOrbitsAbove() {
         satHoverMiniDOM.textContent = sat.SCC_NUM;
         satHoverMiniDOM.setAttribute(
             'style',
-            'display: block position: absolute left: ' +
+            'display: block; position: absolute; left: ' +
                 satScreenPositionArray.x +
                 10 +
-                'px top: ' +
+                'px; top: ' +
                 satScreenPositionArray.y +
                 'px'
         );
@@ -4029,7 +4037,11 @@ function debugDrawLine(type, value, color) {
 
 var drawLinesI = 0;
 var tempStar1, tempStar2;
-var satPos;
+var satPos, satNextPos;
+var normUp = [0,0,0];
+var crossNormUp = [0,0,0];
+var normLeft = [0,0,0];
+var normForward = [0,0,0];
 function drawLines() {
     if (drawLineList.length == 0) return;
     for (drawLinesI = 0; drawLinesI < drawLineList.length; drawLinesI++) {

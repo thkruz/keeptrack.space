@@ -10,7 +10,7 @@
 // FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 (function () {
-  // 'use strict';
+  'use strict';
     var colorTheme = settingsManager.colors;
     var iSensorMarkerArray = -1;
 
@@ -175,29 +175,6 @@
     var sat, color;
     ColorScheme.init = function () {
         ColorScheme.default = new ColorScheme(function (sat) {
-            if (
-                sat.static &&
-                (sat.type === 'Launch Facility' ||
-                    sat.type === 'Control Facility') &&
-                ColorScheme.objectTypeFlags.facility === false
-            ) {
-                return {
-                    color: colorTheme.deselected,
-                    pickable: false,
-                };
-            }
-
-            if (
-                sat.static &&
-                (sat.type === 'Launch Facility' ||
-                    sat.type === 'Control Facility')
-            ) {
-                return {
-                    color: colorTheme.facility,
-                    pickable: true,
-                };
-            }
-
             if (sat.static && sat.type === 'Star') {
                 if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
                     return {
@@ -228,6 +205,37 @@
                         pickable: false,
                     };
                 }
+            }
+
+            if (cameraType.current === cameraType.ASTRONOMY) {
+              return {
+                color: colorTheme.deselected,
+                pickable: false,
+              };
+            }
+
+            if (
+                sat.static &&
+                (sat.type === 'Launch Facility' ||
+                    sat.type === 'Control Facility') &&
+                (ColorScheme.objectTypeFlags.facility === false ||
+                 cameraType.current === cameraType.PLANETARIUM)
+            ) {
+                return {
+                    color: colorTheme.deselected,
+                    pickable: false,
+                };
+            }
+
+            if (
+                sat.static &&
+                (sat.type === 'Launch Facility' ||
+                    sat.type === 'Control Facility')
+            ) {
+                return {
+                    color: colorTheme.facility,
+                    pickable: true,
+                };
             }
 
             if (sat.marker) {
@@ -275,7 +283,8 @@
               };
             }
 
-            if (sat.static && ColorScheme.objectTypeFlags.sensor === false) {
+            if (sat.static &&
+               (ColorScheme.objectTypeFlags.sensor === false || cameraType.current === cameraType.PLANETARIUM)) {
                 return {
                     color: colorTheme.deselected,
                     pickable: false,
@@ -373,67 +382,60 @@
                 };
             }
 
-            if (cameraType.current === cameraType.ASTRONOMY) {
+            if (
+                sat.inView &&
+                ColorScheme.objectTypeFlags.inFOV === false &&
+                cameraType.current !== cameraType.PLANETARIUM
+            ) {
                 return {
                     color: colorTheme.deselected,
                     pickable: false,
                 };
-            } else {
-                if (
-                    sat.inView &&
-                    ColorScheme.objectTypeFlags.inFOV === false &&
-                    cameraType.current !== cameraType.PLANETARIUM
-                ) {
-                    return {
-                        color: colorTheme.deselected,
-                        pickable: false,
-                    };
-                }
+            }
 
+            if (
+                sat.inView &&
+                cameraType.current !== cameraType.PLANETARIUM
+            ) {
                 if (
-                    sat.inView &&
-                    cameraType.current !== cameraType.PLANETARIUM
+                    objectManager.isSensorManagerLoaded &&
+                    sensorManager.currentSensor.type == 'Observer' &&
+                    typeof sat.vmag == 'undefined'
                 ) {
-                    if (
-                        objectManager.isSensorManagerLoaded &&
-                        sensorManager.currentSensor.type == 'Observer' &&
-                        typeof sat.vmag == 'undefined'
-                    ) {
-                    } else {
-                        return {
-                            color: colorTheme.inview,
-                            pickable: true,
-                        };
-                    }
-                }
-
-                if (sat.C === 'ANALSAT') {
-                    color = colorTheme.analyst;
-                } else if (sat.OT === 1) {
-                    // Payload
-                    color = colorTheme.payload;
-                } else if (sat.OT === 2) {
-                    // Rocket Body
-                    color = colorTheme.rocketBody;
-                } else if (sat.OT === 3) {
-                    // Debris
-                    color = colorTheme.debris;
-                } else if (sat.OT === 4) {
-                    // TruSat Object
-                    color = colorTheme.trusat;
                 } else {
-                    color = colorTheme.unknown;
-                }
-
-                if (
-                    sat.perigee > satellite.obsmaxrange ||
-                    sat.apogee < satellite.obsminrange
-                ) {
                     return {
-                        color: colorTheme.transparent,
-                        pickable: false,
+                        color: colorTheme.inview,
+                        pickable: true,
                     };
                 }
+            }
+
+            if (sat.C === 'ANALSAT') {
+                color = colorTheme.analyst;
+            } else if (sat.OT === 1) {
+                // Payload
+                color = colorTheme.payload;
+            } else if (sat.OT === 2) {
+                // Rocket Body
+                color = colorTheme.rocketBody;
+            } else if (sat.OT === 3) {
+                // Debris
+                color = colorTheme.debris;
+            } else if (sat.OT === 4) {
+                // TruSat Object
+                color = colorTheme.trusat;
+            } else {
+                color = colorTheme.unknown;
+            }
+
+            if (
+                sat.perigee > satellite.obsmaxrange ||
+                sat.apogee < satellite.obsminrange
+            ) {
+                return {
+                    color: colorTheme.transparent,
+                    pickable: false,
+                };
             }
 
             // Shouldn't be getting here

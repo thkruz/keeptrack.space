@@ -18,7 +18,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 ///////////////////////////////////////////////////////////////////////////// */
 
 (function () {
-  // 'use strict';
+  'use strict';
     // Constants
     const TAU = 2 * Math.PI;
     const DEG2RAD = TAU / 360;
@@ -2049,7 +2049,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
       let minInclination = sat.inclination * 0.975;
       let maxRaan = sat.raan * 1.025;
       let minRaan = sat.raan * 0.975;
-      for (ss = 0; ss < catalog.length; ss++) {
+      for (let ss = 0; ss < catalog.length; ss++) {
         let sat2 = catalog[ss];
         if (sat2.static) break;
         if (sat2.period > maxPeriod || sat2.period < minPeriod) continue;

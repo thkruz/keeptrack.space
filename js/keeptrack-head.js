@@ -36,7 +36,7 @@ const MOON_SCALAR_DISTANCE = 200000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.7.1';
+    settingsManager.versionNumber = '2.7.2';
     settingsManager.versionDate = 'December 15, 2020';
 
     // Install Folder Settings

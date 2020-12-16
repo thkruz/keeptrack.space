@@ -21,7 +21,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-'use strict';
+// 'use strict';
 var satSensorMarkerArray = [];
 var emptyMat4 = mat4.create();
 (function () {
@@ -540,7 +540,6 @@ var emptyMat4 = mat4.create();
                   }, true);
                 });
               });
-              jsTLEfile = null;
             } catch (e) {
               console.log(e);
               satSet.loadTLEs(jsTLEfile);
@@ -2361,6 +2360,8 @@ var emptyMat4 = mat4.create();
             );
         }
         objectManager.hoveringSat = i;
+
+        satSet.setColorScheme(settingsManager.currentColorScheme, true);
     };
 
     satSet.selectSat = (i) => {

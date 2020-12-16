@@ -5179,7 +5179,7 @@ var speedModifier = 1;
                     }
 
                     if (cameraType.current === 7) {
-                        // 6 is a placeholder to reset camera type
+                        // 7 is a placeholder to reset camera type
                         cameraManager.panReset = true;
                         cameraManager.localRotateReset = true;
                         settingsManager.fieldOfView = 0.6;
@@ -5333,6 +5333,7 @@ var speedModifier = 1;
                     } else {
                         timeManager.propRate *= 1.5;
                     }
+                    timeManager.updatePropTime()
                     timeManager.propOffset = timeManager.getPropOffset();
                     settingsManager.isPropRateChange = true;
                     break;
@@ -5355,6 +5356,7 @@ var speedModifier = 1;
                         timeManager.propRate *= 1.5;
                     }
 
+                    timeManager.updatePropTime()
                     timeManager.propOffset = timeManager.getPropOffset();
                     settingsManager.isPropRateChange = true;
                     break;
@@ -5584,7 +5586,7 @@ var speedModifier = 1;
                     ).toFixed(3) + '°S'
                 );
             }
-            var jday = timeManager.getDayOfYear(timeManager.propTime());
+            var jday = timeManager.getDayOfYear(timeManager.propTimeVar);
             $('#jday').html(jday);
 
             if (

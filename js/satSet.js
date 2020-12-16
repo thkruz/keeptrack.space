@@ -2401,6 +2401,8 @@ var emptyMat4 = mat4.create();
 
         objectManager.selectedSat = i;
 
+        satSet.setColorScheme(settingsManager.currentColorScheme, true);
+
         if (
             objectManager.isSensorManagerLoaded &&
             sensorManager.currentSensor.lat != null

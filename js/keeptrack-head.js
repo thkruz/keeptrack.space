@@ -36,8 +36,8 @@ const MOON_SCALAR_DISTANCE = 200000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.7.0';
-    settingsManager.versionDate = 'December 14, 2020';
+    settingsManager.versionNumber = '2.7.1';
+    settingsManager.versionDate = 'December 15, 2020';
 
     // Install Folder Settings
     {
@@ -48,6 +48,7 @@ const MOON_SCALAR_DISTANCE = 200000;
                 settingsManager.isOfficialWebsite = true;
                 break;
             case 'localhost':
+            case '10.0.0.34':
                 // Comment Out the Next Two Lines if you are testing on a local server
                 // and have the keeptrack files installed in a subdirectory
                 settingsManager.installDirectory = '/';
@@ -166,6 +167,7 @@ const MOON_SCALAR_DISTANCE = 200000;
         settingsManager.maxFieldOfViewMarkers = 20000;
         // settingsManager.smallImages = true;
         settingsManager.isDrawLess = true;
+        settingsManager.noMeshManager = true;
         settingsManager.camDistBuffer = 100;
     }
 

@@ -1803,6 +1803,9 @@ function _camSnapToSat(sat) {
                     settingsManager.minZoomDistance),
             1 / ZOOM_EXP
         );
+
+        // Only Zoom in Once on Mobile
+        if (settingsManager.isMobileModeEnabled) camZoomSnappedOnSat = false;
     }
 
     if (cameraType.current === cameraType.planetarium) {
@@ -4314,7 +4317,7 @@ $(document).ready(function () {
                     (startPinchDistance - currentPinchDistance) / maxPinchSize;
                 zoomTarget +=
                     deltaPinchDistance *
-                    (settingsManager.cameraMovementSpeed / 2);
+                    (settingsManager.cameraMovementSpeed / 10);
                 zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
             } else {
                 // Dont Move While Zooming

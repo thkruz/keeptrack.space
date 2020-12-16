@@ -1,6 +1,6 @@
 (function () {
     if (settingsManager.noMeshManager) return;
-    meshManager = {};
+    let meshManager = {};
     meshManager.selectedSatPosition = { x: 0, y: 0, z: 0 };
     let mvMatrix;
     let mvMatrixEmpty = mat4.create();
@@ -179,26 +179,11 @@
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         // Assign uniforms
-        gl.uniform3fv(
-            meshManager.shaderProgram.uLightDirection,
-            earth.lightDirection
-        );
-        gl.uniformMatrix3fv(
-            meshManager.shaderProgram.uNormalMatrix,
-            false,
-            nMatrix
-        );
-        gl.uniformMatrix4fv(
-            meshManager.shaderProgram.uMvMatrix,
-            false,
-            mvMatrix
-        );
+        gl.uniform3fv(meshManager.shaderProgram.uLightDirection,earth.lightDirection);
+        gl.uniformMatrix3fv(meshManager.shaderProgram.uNormalMatrix,false,nMatrix);
+        gl.uniformMatrix4fv(meshManager.shaderProgram.uMvMatrix,false,mvMatrix);
         gl.uniformMatrix4fv(meshManager.shaderProgram.uPMatrix, false, pMatrix);
-        gl.uniformMatrix4fv(
-            meshManager.shaderProgram.uCamMatrix,
-            false,
-            camMatrix
-        );
+        gl.uniformMatrix4fv(meshManager.shaderProgram.uCamMatrix,false,camMatrix);
         gl.uniform1f(meshManager.shaderProgram.uInSun, inSun);
 
         // Assign vertex buffer
@@ -211,12 +196,7 @@
         meshManager.shaderProgram.enableVertexAttribArrays(model);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, model.mesh.indexBuffer);
-        gl.drawElements(
-            gl.TRIANGLES,
-            model.mesh.indexBuffer.numItems,
-            gl.UNSIGNED_SHORT,
-            0
-        );
+        gl.drawElements(gl.TRIANGLES,model.mesh.indexBuffer.numItems,gl.UNSIGNED_SHORT,0);
 
         // Enable attributes
         meshManager.shaderProgram.disableVertexAttribArrays(model);
@@ -311,25 +291,21 @@
             }
         };
         meshManager.shaderProgram.enableVertexAttribArrays = function (model) {
-            for (const attrName in attrs) {
-                if (!attrs.hasOwnProperty(attrName)) {
-                    continue;
-                }
-                meshManager.shaderProgram.attrIndices[
-                    attrName
-                ] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
-                if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
-                    gl.enableVertexAttribArray(
-                        meshManager.shaderProgram.attrIndices[attrName]
-                    );
-                } else {
-                    console.warn(
-                        'Shader attribute "' +
-                            attrName +
-                            '" not found in shader. Is it undeclared or unused in the shader code?'
-                    );
-                }
+          for (const attrName in attrs) {
+            if (!attrs.hasOwnProperty(attrName)) {
+                continue;
             }
+            meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
+            if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
+                gl.enableVertexAttribArray(meshManager.shaderProgram.attrIndices[attrName]);
+            } else {
+              console.warn(
+                'Shader attribute "' +
+                attrName +
+                '" not found in shader. Is it undeclared or unused in the shader code?'
+              );
+            }
+          }
         };
         meshManager.shaderProgram.disableVertexAttribArrays = function (model) {
             for (const attrName in attrs) {

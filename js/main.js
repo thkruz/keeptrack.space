@@ -329,7 +329,7 @@ function initializeKeepTrack() {
         })();
     });
     if (settingsManager.isEnableRadarData) radarDataManager.init();
-    drawLoop(); // kick off the animationFrame()s
+    dlManager.drawLoop(); // kick off the animationFrame()s
     if (!settingsManager.disableUI && !settingsManager.isDrawLess) {
       // Load Optional 3D models if available
       if (typeof meshManager !== 'undefined') {
@@ -362,9 +362,9 @@ dlManager.demoModeLastTime = 0;
 dlManager.time = null;
 dlManager.dt = null;
 
-function drawLoop() {
+dlManager.drawLoop = () => {
     // NOTE drawLoop has 7kb memory leak -- No Impact
-    requestAnimationFrame(drawLoop);
+    requestAnimationFrame(dlManager.drawLoop);
     dlManager.drawNow = Date.now();
     dlManager.dt = dlManager.drawNow - (dlManager.time || dlManager.drawNow);
     if (typeof dlManager.drawLoopCount != 'undefined') {
@@ -537,7 +537,7 @@ function drawLoop() {
                 cameraManager.localRotateDif.pitch *
                     -settingsManager.cameraMovementSpeed;
             cameraManager.localRotateSpeed.pitch =
-                _normalizeAngle(
+                dlManager.normalizeAngle(
                     cameraManager.localRotateCurrent.pitch -
                         cameraManager.localRotateTarget.pitch
                 ) * -settingsManager.cameraMovementSpeed;
@@ -549,7 +549,7 @@ function drawLoop() {
                     cameraManager.localRotateDif.roll *
                         settingsManager.cameraMovementSpeed;
                 cameraManager.localRotateSpeed.roll =
-                    _normalizeAngle(
+                    dlManager.normalizeAngle(
                         cameraManager.localRotateCurrent.roll -
                             cameraManager.localRotateTarget.roll
                     ) * -settingsManager.cameraMovementSpeed;
@@ -561,7 +561,7 @@ function drawLoop() {
                     cameraManager.localRotateDif.yaw *
                         settingsManager.cameraMovementSpeed;
                 cameraManager.localRotateSpeed.yaw =
-                    _normalizeAngle(
+                    dlManager.normalizeAngle(
                         cameraManager.localRotateCurrent.yaw -
                             cameraManager.localRotateTarget.yaw
                     ) * -settingsManager.cameraMovementSpeed;
@@ -663,10 +663,10 @@ function drawLoop() {
             pitchTarget =
                 dragStartPitch + yDif * -settingsManager.cameraMovementSpeed;
             cameraManager.camPitchSpeed =
-                _normalizeAngle(camPitch - pitchTarget) *
+                dlManager.normalizeAngle(camPitch - pitchTarget) *
                 -settingsManager.cameraMovementSpeed;
             cameraManager.camYawSpeed =
-                _normalizeAngle(camYaw - yawTarget) *
+                dlManager.normalizeAngle(camYaw - yawTarget) *
                 -settingsManager.cameraMovementSpeed;
         } else {
             // earth surface point drag
@@ -684,7 +684,7 @@ function drawLoop() {
             dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
 
             pitchDif = dragPointLat - dragTargetLat;
-            yawDif = _normalizeAngle(dragPointLon - dragTargetLon);
+            yawDif = dlManager.normalizeAngle(dragPointLon - dragTargetLon);
             cameraManager.camPitchSpeed = pitchDif * settingsManager.cameraMovementSpeed;
             cameraManager.camYawSpeed = yawDif * settingsManager.cameraMovementSpeed;
         }
@@ -746,7 +746,7 @@ function drawLoop() {
     if (camSnapMode) {
         camPitch += (camPitchTarget - camPitch) * cameraManager.chaseSpeed * dlManager.dt;
 
-        let yawErr = _normalizeAngle(camYawTarget - camYaw);
+        let yawErr = dlManager.normalizeAngle(camYawTarget - camYaw);
         camYaw += yawErr * cameraManager.chaseSpeed * dlManager.dt;
 
         zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dlManager.dt * 0.0025;
@@ -773,7 +773,7 @@ function drawLoop() {
       if (camPitch > TAU / 4) camPitch = TAU / 4;
       if (camPitch < -TAU / 4) camPitch = -TAU / 4;
     }
-    camYaw = _normalizeAngle(camYaw);
+    camYaw = dlManager.normalizeAngle(camYaw);
     if (objectManager.selectedSat !== -1) {
         let sat = satSet.getSat(objectManager.selectedSat);
         if (!sat.static) {
@@ -834,10 +834,10 @@ function drawLoop() {
         _fpsMovement();
     }
 
-    _drawScene();
-    drawLines();
-    _updateHover();
-    _onDrawLoopComplete(drawLoopCallback);
+    dlManager.drawScene();
+    dlManager.drawLines();
+    dlManager.updateHover();
+    dlManager.onDrawLoopComplete(drawLoopCallback);
     if (settingsManager.isDemoModeOn) _demoMode();
 
     // Hide satMiniBoxes When Not in Use
@@ -1812,7 +1812,7 @@ function _camSnapToSat(sat) {
         zoomTarget = 0.01;
     }
 }
-function _drawScene() {
+dlManager.drawScene = () => {
     // Drawing ColorIds for Picking Satellites
     gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -2452,7 +2452,7 @@ function _fpsMovement() {
     fpsLastTime = fpsTimeNow;
 }
 var currentSearchSats;
-function _updateHover() {
+dlManager.updateHover = () => {
     if (!settingsManager.disableUI) {
         currentSearchSats = searchBox.getLastResultGroup();
     }
@@ -2819,7 +2819,7 @@ function _hoverBoxOnSat(satId, satX, satY) {
         canvasDOM.css({ cursor: 'pointer' });
     }
 }
-function _onDrawLoopComplete(cb) {
+dlManager.onDrawLoopComplete = (cb) => {
     if (typeof cb == 'undefined') return;
     cb();
 }
@@ -3127,7 +3127,7 @@ function _unProject(mx, my) {
         worldVec[2] / worldVec[3],
     ];
 }
-function _normalizeAngle(angle) {
+dlManager.normalizeAngle = (angle) => {
     angle %= TAU;
     if (angle > Math.PI) angle -= TAU;
     if (angle < -Math.PI) angle += TAU;
@@ -3204,7 +3204,7 @@ function longToYaw(long) {
     longOffset = longOffset * 15; // 15 Degress Per Hour longitude Offset
 
     angle = (long + longOffset) * DEG2RAD;
-    angle = _normalizeAngle(angle);
+    angle = dlManager.normalizeAngle(angle);
     return angle;
 }
 function latToPitch(lat) {
@@ -3216,7 +3216,7 @@ function latToPitch(lat) {
 function camSnap(pitch, yaw) {
     // cameraManager.panReset = true
     camPitchTarget = pitch;
-    camYawTarget = _normalizeAngle(yaw);
+    camYawTarget = dlManager.normalizeAngle(yaw);
     camSnapMode = true;
 }
 function changeZoom(zoom) {
@@ -4004,7 +4004,7 @@ var normUp = [0,0,0];
 var crossNormUp = [0,0,0];
 var normLeft = [0,0,0];
 var normForward = [0,0,0];
-function drawLines() {
+dlManager.drawLines = () => {
     if (drawLineList.length == 0) return;
     for (drawLinesI = 0; drawLinesI < drawLineList.length; drawLinesI++) {
         if (typeof drawLineList[drawLinesI].sat != 'undefined') {

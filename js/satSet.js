@@ -147,15 +147,34 @@ var emptyMat4 = mat4.create();
             return;
         }
 
-        satPos = new Float32Array(m.data.satPos);
-        satVel = new Float32Array(m.data.satVel);
+        if (typeof satPos == 'undefined') {
+          satPos = new Float32Array(m.data.satPos);
+        } else {
+          satPos.set(m.data.satPos,0);
+        }
+
+        if (typeof satVel == 'undefined') {
+          satVel = new Float32Array(m.data.satVel);
+        } else {
+          satVel.set(m.data.satVel,0);
+        }
 
         if (typeof m.data.satInView != 'undefined') {
+          if (typeof satInView == 'undefined') {
             satInView = new Int8Array(m.data.satInView);
+          } else {
+            satInView.set(m.data.satInView,0);
+          }
         }
+
         if (typeof m.data.satInSun != 'undefined') {
+          if (typeof satInSun == 'undefined') {
             satInSun = new Int8Array(m.data.satInSun);
+          } else {
+            satInSun.set(m.data.satInSun,0);
+          }
         }
+
         if (typeof m.data.sensorMarkerArray != 'undefined') {
             satSensorMarkerArray = m.data.sensorMarkerArray;
         }

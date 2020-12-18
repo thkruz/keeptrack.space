@@ -1553,16 +1553,16 @@ function propagateCruncher() {
     }
 
     postMessageArray = {
-      satPos: satPos.buffer,
-      satVel: satVel.buffer,
+      satPos: satPos,
+      satVel: satVel,
     };
     // Add In View Data if Sensor Selected
     if (sensor.observerGd !== defaultGd) {
-      postMessageArray.satInView = satInView.buffer;
+      postMessageArray.satInView = satInView;
     }
     // Add Sun View Data if Enabled
     if (isSunlightView) {
-      postMessageArray.satInSun = satInSun.buffer;
+      postMessageArray.satInSun = satInSun;
     }
     if (sensorMarkerArray.length > 1) {
       postMessageArray.sensorMarkerArray = sensorMarkerArray;

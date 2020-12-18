@@ -26,6 +26,7 @@ var RADIUS_OF_EARTH = 6371; // Radius of Earth in kilometers
 
 var NUM_SEGS;
 var satCache = [];
+let orbitFadeFactor = 1.0;
 
 onmessage = function (m) {
     if (m.data.isUpdate) {
@@ -45,6 +46,7 @@ onmessage = function (m) {
 
     if (m.data.isInit) {
         var satData = JSON.parse(m.data.satData);
+        orbitFadeFactor = JSON.parse(m.data.orbitFadeFactor);
         var sLen = satData.length - 1;
         let i = -1;
         while (i < sLen) {
@@ -70,7 +72,7 @@ onmessage = function (m) {
         propRealTime = m.data.realTime;
         propOffset = m.data.offset;
         propRate = m.data.rate;
-        var pointsOut = new Float32Array((NUM_SEGS + 1) * 3);
+        var pointsOut = new Float32Array((NUM_SEGS + 1) * 4);
 
         var nowDate = propTime();
         var nowJ = jday(
@@ -114,16 +116,10 @@ onmessage = function (m) {
                     satCache[satId].lonList[x] * DEG2RAD + gmst
                 );
 
-                pointsOut[i * 3] =
-                    (RADIUS_OF_EARTH + satCache[satId].altList[x]) *
-                    cosLat *
-                    cosLon;
-                pointsOut[i * 3 + 1] =
-                    (RADIUS_OF_EARTH + satCache[satId].altList[x]) *
-                    cosLat *
-                    sinLon;
-                pointsOut[i * 3 + 2] =
-                    (RADIUS_OF_EARTH + satCache[satId].altList[x]) * sinLat;
+                pointsOut[i * 4] = (RADIUS_OF_EARTH + satCache[satId].altList[x]) * cosLat * cosLon;
+                pointsOut[i * 4 + 1] = (RADIUS_OF_EARTH + satCache[satId].altList[x]) * cosLat * sinLon;
+                pointsOut[i * 4 + 2] = (RADIUS_OF_EARTH + satCache[satId].altList[x]) * sinLat;
+                pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len/(i + 1)),1.0);
                 i++;
             }
         } else {
@@ -134,13 +130,15 @@ onmessage = function (m) {
                 var t = now + i * timeslice;
                 var p = satellite.sgp4(satCache[satId], t).position;
                 try {
-                    pointsOut[i * 3] = p.x;
-                    pointsOut[i * 3 + 1] = p.y;
-                    pointsOut[i * 3 + 2] = p.z;
+                    pointsOut[i * 4] = p.x;
+                    pointsOut[i * 4 + 1] = p.y;
+                    pointsOut[i * 4 + 2] = p.z;
+                    pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len/(i + 1)),1.0);
                 } catch (ex) {
-                    pointsOut[i * 3] = 0;
-                    pointsOut[i * 3 + 1] = 0;
-                    pointsOut[i * 3 + 2] = 0;
+                    pointsOut[i * 4] = 0;
+                    pointsOut[i * 4 + 1] = 0;
+                    pointsOut[i * 4 + 2] = 0;
+                    pointsOut[i * 4 + 3] = 0;
                 }
                 i++;
             }

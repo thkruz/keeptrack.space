@@ -728,9 +728,9 @@ dlManager.drawLoop = () => {
     // This code might be better if applied directly to the shader versus a multiplier effect
     if (zoomLevel !== zoomTarget) {
         if (zoomLevel > settingsManager.satShader.largeObjectMaxZoom) {
-            settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize * 2;
+            settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize * 1.5;
         } else if (zoomLevel < settingsManager.satShader.largeObjectMinZoom) {
-            settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize / 2;
+            settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize / 3;
         } else {
             settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize;
         }
@@ -785,17 +785,16 @@ dlManager.drawLoop = () => {
             // If 3D Models Available, then update their position on the screen
             if (typeof meshManager !== 'undefined' && !dlManager.sat.missile) {
                 // Try to reduce some jitter
-                if (
-                    meshManager.selectedSatPosition.x > dlManager.sat.position.x - 1 &&
-                    meshManager.selectedSatPosition.x < dlManager.sat.position.x + 1 &&
-                    meshManager.selectedSatPosition.y > dlManager.sat.position.y - 1 &&
-                    meshManager.selectedSatPosition.y < dlManager.sat.position.y + 1 &&
-                    meshManager.selectedSatPosition.z > dlManager.sat.position.z - 1 &&
-                    meshManager.selectedSatPosition.z < dlManager.sat.position.z + 1
-                ) {
-                    meshManager.selectedSatPosition.x = (meshManager.selectedSatPosition.x + dlManager.sat.position.x) / 2;
-                    meshManager.selectedSatPosition.y = (meshManager.selectedSatPosition.y + dlManager.sat.position.y) / 2;
-                    meshManager.selectedSatPosition.z = (meshManager.selectedSatPosition.z + dlManager.sat.position.z) / 2;
+                if (meshManager.selectedSatPosition.x > dlManager.sat.position.x - 1.0 &&
+                    meshManager.selectedSatPosition.x < dlManager.sat.position.x + 1.0 &&
+                    meshManager.selectedSatPosition.y > dlManager.sat.position.y - 1.0 &&
+                    meshManager.selectedSatPosition.y < dlManager.sat.position.y + 1.0 &&
+                    meshManager.selectedSatPosition.z > dlManager.sat.position.z - 1.0 &&
+                    meshManager.selectedSatPosition.z < dlManager.sat.position.z + 1.0) {
+                    // Lerp to smooth difference between SGP4 and position+velocity
+                    meshManager.selectedSatPosition.x = dlManager.sat.position.x + (meshManager.selectedSatPosition.x - dlManager.sat.position.x) * dlManager.drawDt;
+                    meshManager.selectedSatPosition.y = dlManager.sat.position.y + (meshManager.selectedSatPosition.y - dlManager.sat.position.y) * dlManager.drawDt;
+                    meshManager.selectedSatPosition.z = dlManager.sat.position.z + (meshManager.selectedSatPosition.z - dlManager.sat.position.z) * dlManager.drawDt;
                 } else {
                     meshManager.selectedSatPosition = dlManager.sat.position;
                 }
@@ -1972,6 +1971,10 @@ dlManager.drawScene = () => {
     orbitManager.draw(pMatrix, camMatrix);
 
     // Draw Satellite if Selected
+    if (objectManager.selectedSat !== -1 && settingsManager.enableConstantSelectedSatRedraw) {
+      orbitManager.clearSelectOrbit();
+      orbitManager.setSelectOrbit(objectManager.selectedSat);
+    }
     if (objectManager.selectedSat !== -1 && typeof meshManager != 'undefined' && meshManager.isReady) {
         let sat = satSet.getSat(objectManager.selectedSat);
         // If 3D Models Available, then draw them on the screen

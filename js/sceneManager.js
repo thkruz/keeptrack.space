@@ -2081,16 +2081,17 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
               precision mediump float;
 
               varying vec4 vColor;
+              varying float vAlpha;
 
               void main(void) {
-                gl_FragColor = vColor;
+                gl_FragColor = vec4(vColor[0],vColor[1],vColor[2], vColor[3] * vAlpha);
               }
             `,
         },
         {
             name: 'path-vertex.glsl',
             code: `
-            attribute vec3 aPos;
+            attribute vec4 aPos;
 
             uniform mat4 uCamMatrix;
             uniform mat4 uMvMatrix;
@@ -2098,11 +2099,13 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             uniform vec4 uColor;
 
             varying vec4 vColor;
+            varying float vAlpha;
 
             void main(void) {
-              vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
+              vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos[0],aPos[1],aPos[2], 1.0);
               gl_Position = position;
               vColor = uColor;
+              vAlpha = aPos[3];
             }
           `,
         },

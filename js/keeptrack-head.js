@@ -36,7 +36,7 @@ const MOON_SCALAR_DISTANCE = 200000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.7.4';
+    settingsManager.versionNumber = '2.7.5';
     settingsManager.versionDate = 'December 18, 2020';
 
     // Install Folder Settings
@@ -108,7 +108,7 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.disableWindowScroll = true;
     // Disable Zoom Keyboard Keys
     settingsManager.disableZoomControls = true;
-    // Disable Touch Move Causing Drag Errors
+    // Disable Touch Move Causing Drag Errors on Desktop
     settingsManager.disableWindowTouchMove = true;
     // Enable limited UI features
     settingsManager.enableLimitedUI = false;
@@ -118,6 +118,11 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.enableHoverOverlay = true;
     // Shows the oribt of the object when highlighted
     settingsManager.enableHoverOrbits = true;
+    // Updates Orbit of selected satellite on every draw.
+    // Performance hit, but makes it clear what direction the satellite is going
+    settingsManager.enableConstantSelectedSatRedraw = true;
+    // How much an orbit fades over time
+    settingsManager.orbitFadeFactor = 0.6; // 1.0 == No Fade
     // Automatically display all of the orbits
     settingsManager.startWithOrbitsDisplayed = false;
     // Maximum orbits allowed on fullsize screens
@@ -163,12 +168,13 @@ const MOON_SCALAR_DISTANCE = 200000;
     settingsManager.desktopMinimumWidth = 1300;
     settingsManager.isMobileModeEnabled = false;
     if (window.innerWidth <= settingsManager.desktopMinimumWidth) {
-        settingsManager.isMobileModeEnabled = true;
-        settingsManager.maxFieldOfViewMarkers = 20000;
-        // settingsManager.smallImages = true;
-        settingsManager.isDrawLess = true;
-        settingsManager.noMeshManager = true;
-        settingsManager.camDistBuffer = 100;
+      settingsManager.disableWindowTouchMove = false;
+      settingsManager.isMobileModeEnabled = true;
+      settingsManager.maxFieldOfViewMarkers = 20000;
+      // settingsManager.smallImages = true;
+      settingsManager.isDrawLess = true;
+      settingsManager.noMeshManager = true;
+      settingsManager.camDistBuffer = 100;
     }
 
     // //////////////////////////////////////////////////////////////////////////

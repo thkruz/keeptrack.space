@@ -21,7 +21,7 @@
     var selectOrbitBuf;
     var hoverOrbitBuf;
 
-    orbitManager.emptyOrbitBuffer = new Float32Array((NUM_SEGS + 1) * 3);
+    orbitManager.emptyOrbitBuffer = new Float32Array((NUM_SEGS + 1) * 4);
 
     var currentHoverId = -1;
     var currentSelectId = -1;
@@ -59,25 +59,18 @@
 
         selectOrbitBuf = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
-        gl.bufferData(
-            gl.ARRAY_BUFFER,
-            orbitManager.emptyOrbitBuffer,
-            gl.STATIC_DRAW
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.STATIC_DRAW);
 
         hoverOrbitBuf = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
-        gl.bufferData(
-            gl.ARRAY_BUFFER,
-            orbitManager.emptyOrbitBuffer,
-            gl.STATIC_DRAW
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.STATIC_DRAW);
 
         for (var i = 0; i < satSet.missileSats; i++) {
             glBuffers.push(allocateBuffer());
         }
         orbitWorker.postMessage({
             isInit: true,
+            orbitFadeFactor: settingsManager.orbitFadeFactor,
             satData: satSet.satDataString,
             numSegs: NUM_SEGS,
         });
@@ -248,7 +241,7 @@
         if (currentSelectId !== -1 && !satSet.getSatExtraOnly(currentSelectId).static) {
             gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor);
             gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
-            gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(pathShader.aPos);
             gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
         }
@@ -257,7 +250,7 @@
             // avoid z-fighting
             gl.uniform4fv(pathShader.uColor, settingsManager.orbitHoverColor);
             gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
-            gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(pathShader.aPos);
             gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
         }
@@ -271,7 +264,7 @@
           }
           currentInView.forEach(function (id) {
             gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
-            gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(pathShader.aPos);
             gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
           });
@@ -281,7 +274,7 @@
           gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
           groups.selectedGroup.forEach(function (id) {
             gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
-            gl.vertexAttribPointer(pathShader.aPos, 3, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(pathShader.aPos);
             gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
           });
@@ -300,11 +293,7 @@
     function allocateBuffer() {
         var buf = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-        gl.bufferData(
-            gl.ARRAY_BUFFER,
-            orbitManager.emptyOrbitBuffer,
-            gl.STATIC_DRAW
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.STATIC_DRAW);
         return buf;
     }
 

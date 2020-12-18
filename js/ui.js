@@ -4616,7 +4616,7 @@ var speedModifier = 1;
                     if (cameraType.current === cameraType.satellite) {
                         isSatView = false;
                         uiManager.hideSideMenus();
-                        cameraType.current = cameraType.default; // Back to normal Camera Mode
+                        cameraType.current = cameraType.fixedToSat; // Back to normal Camera Mode
                         $('#menu-satview').removeClass('bmenu-item-selected');
                         break;
                     } else {
@@ -5361,8 +5361,9 @@ var speedModifier = 1;
                     settingsManager.isPropRateChange = true;
                     break;
                 case '1':
-                    timeManager.propRate = 1.0;
+                    timeManager.updatePropTime()
                     timeManager.propOffset = timeManager.getPropOffset();
+                    timeManager.propRate = 1.0;
                     settingsManager.isPropRateChange = true;
                     break;
             }

@@ -36,6 +36,7 @@ var gl;
 // Camera Variables
 var camYaw = 0;
 var camPitch = 0;
+var yawErr = 0;
 var camYawTarget = 0;
 var camPitchTarget = 0;
 var camSnapMode = false;
@@ -190,6 +191,15 @@ cameraManager.localRotateTarget = { pitch: 0, roll: 0, yaw: 0 };
 cameraManager.localRotateCurrent = { pitch: 0, roll: 0, yaw: 0 };
 cameraManager.localRotateDif = { pitch: 0, roll: 0, yaw: 0 };
 cameraManager.localRotateStartPosition = { pitch: 0, roll: 0, yaw: 0 };
+
+// Fixed to Sat and Earth Centered Pitch/Yaw Settings
+// This allows switching between cameras smoothly
+cameraManager.ecPitch = 0;
+cameraManager.ecYaw = 0;
+cameraManager.ftsPitch = 0;
+cameraManager.ftsYaw = 0;
+
+cameraManager.ecLastZoom = 0.45;
 
 let isHoverBoxVisible = false;
 let isShowDistance = true;
@@ -648,34 +658,22 @@ dlManager.drawLoop = () => {
         //
         // TODO: Rotate Around Earth code needs cleaned up now that raycasting is turned off
         //
-        if (
-            true ||
+        if (true ||
             cameraType.current === cameraType.fps ||
             cameraType.current === cameraType.satellite ||
             cameraType.current === cameraType.astronomy ||
-            settingsManager.isMobileModeEnabled
-        ) {
+            settingsManager.isMobileModeEnabled) {
             // random screen drag
             xDif = screenDragPoint[0] - mouseX;
             yDif = screenDragPoint[1] - mouseY;
-            yawTarget =
-                dragStartYaw + xDif * settingsManager.cameraMovementSpeed;
-            pitchTarget =
-                dragStartPitch + yDif * -settingsManager.cameraMovementSpeed;
-            cameraManager.camPitchSpeed =
-                dlManager.normalizeAngle(camPitch - pitchTarget) *
-                -settingsManager.cameraMovementSpeed;
-            cameraManager.camYawSpeed =
-                dlManager.normalizeAngle(camYaw - yawTarget) *
-                -settingsManager.cameraMovementSpeed;
+            yawTarget = dragStartYaw + xDif * settingsManager.cameraMovementSpeed;
+            pitchTarget = dragStartPitch + yDif * -settingsManager.cameraMovementSpeed;
+            cameraManager.camPitchSpeed = dlManager.normalizeAngle(camPitch - pitchTarget) * -settingsManager.cameraMovementSpeed;
+            cameraManager.camYawSpeed = dlManager.normalizeAngle(camYaw - yawTarget) * -settingsManager.cameraMovementSpeed;
         } else {
             // earth surface point drag
-            dragPointR = Math.sqrt(
-                dragPoint[0] * dragPoint[0] + dragPoint[1] * dragPoint[1]
-            );
-            dragTargetR = Math.sqrt(
-                dragTarget[0] * dragTarget[0] + dragTarget[1] * dragTarget[1]
-            );
+            dragPointR = Math.sqrt(dragPoint[0] * dragPoint[0] + dragPoint[1] * dragPoint[1]);
+            dragTargetR = Math.sqrt(dragTarget[0] * dragTarget[0] + dragTarget[1] * dragTarget[1]);
 
             dragPointLon = Math.atan2(dragPoint[1], dragPoint[0]);
             dragTargetLon = Math.atan2(dragTarget[1], dragTarget[0]);
@@ -690,18 +688,15 @@ dlManager.drawLoop = () => {
         }
         camSnapMode = false;
     } else {
-        // DESKTOP ONLY
-        if (!settingsManager.isMobileModeEnabled) {
-            cameraManager.camPitchSpeed -=
-                cameraManager.camPitchSpeed * dlManager.dt * settingsManager.cameraMovementSpeed; // decay speeds when globe is "thrown"
-            cameraManager.camYawSpeed -=
-                cameraManager.camYawSpeed * dlManager.dt * settingsManager.cameraMovementSpeed;
-        } else if (settingsManager.isMobileModeEnabled) {
-            // MOBILE
-            cameraManager.camPitchSpeed -=
-                cameraManager.camPitchSpeed * dlManager.dt * settingsManager.cameraMovementSpeed * 5; // decay speeds when globe is "thrown"
-            cameraManager.camYawSpeed -=
-                cameraManager.camYawSpeed * dlManager.dt * settingsManager.cameraMovementSpeed * 5;
+        // This block of code is what causes the moment effect when moving the camera
+        // Most applications like Goolge Earth or STK do not have this effect as pronounced
+        // It makes KeepTrack feel more like a game and less like a toolkit
+        if (!settingsManager.isMobileModeEnabled) { // DESKTOP ONLY
+            cameraManager.camPitchSpeed -= cameraManager.camPitchSpeed * dlManager.dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor; // decay speeds when globe is "thrown"
+            cameraManager.camYawSpeed -= cameraManager.camYawSpeed * dlManager.dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor;
+        } else if (settingsManager.isMobileModeEnabled) { // MOBILE
+            cameraManager.camPitchSpeed -= cameraManager.camPitchSpeed * dlManager.dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor; // decay speeds when globe is "thrown"
+            cameraManager.camYawSpeed -= cameraManager.camYawSpeed * dlManager.dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor;
         }
     }
 
@@ -730,107 +725,96 @@ dlManager.drawLoop = () => {
     }
 
     // Zoom Changing
+    // This code might be better if applied directly to the shader versus a multiplier effect
     if (zoomLevel !== zoomTarget) {
         if (zoomLevel > settingsManager.satShader.largeObjectMaxZoom) {
-            settingsManager.satShader.maxSize =
-                settingsManager.satShader.maxAllowedSize * 2;
+            settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize * 2;
         } else if (zoomLevel < settingsManager.satShader.largeObjectMinZoom) {
-            settingsManager.satShader.maxSize =
-                settingsManager.satShader.maxAllowedSize / 2;
+            settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize / 2;
         } else {
-            settingsManager.satShader.maxSize =
-                settingsManager.satShader.maxAllowedSize;
+            settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize;
         }
     }
 
     if (camSnapMode) {
         camPitch += (camPitchTarget - camPitch) * cameraManager.chaseSpeed * dlManager.dt;
 
-        let yawErr = dlManager.normalizeAngle(camYawTarget - camYaw);
+        yawErr = dlManager.normalizeAngle(camYawTarget - camYaw);
         camYaw += yawErr * cameraManager.chaseSpeed * dlManager.dt;
 
         zoomLevel = zoomLevel + (zoomTarget - zoomLevel) * dlManager.dt * 0.0025;
     } else {
         if (isZoomIn) {
-            zoomLevel -=
-                ((zoomLevel * dlManager.dt) / 100) * Math.abs(zoomTarget - zoomLevel);
+            zoomLevel -= ((zoomLevel * dlManager.dt) / 100) * Math.abs(zoomTarget - zoomLevel);
         } else {
-            zoomLevel +=
-                ((zoomLevel * dlManager.dt) / 100) * Math.abs(zoomTarget - zoomLevel);
+            zoomLevel += ((zoomLevel * dlManager.dt) / 100) * Math.abs(zoomTarget - zoomLevel);
         }
-        if (
-            (zoomLevel >= zoomTarget && !isZoomIn) ||
-            (zoomLevel <= zoomTarget && isZoomIn)
-        ) {
+
+        if ((zoomLevel >= zoomTarget && !isZoomIn) || (zoomLevel <= zoomTarget && isZoomIn)) {
             zoomLevel = zoomTarget;
         }
     }
 
     if (cameraType.current == cameraType.fixedToSat) {
-      if (camPitch > TAU / 2) camPitch = TAU / 2;
-      if (camPitch < -TAU / 2) camPitch = -TAU / 2;
+      camPitch = dlManager.normalizeAngle(camPitch);
     } else {
       if (camPitch > TAU / 4) camPitch = TAU / 4;
       if (camPitch < -TAU / 4) camPitch = -TAU / 4;
     }
     camYaw = dlManager.normalizeAngle(camYaw);
-    if (objectManager.selectedSat !== -1) {
-        let sat = satSet.getSat(objectManager.selectedSat);
-        if (!sat.static) {
-            _camSnapToSat(sat);
 
-            if (sat.missile || typeof meshManager == 'undefined') {
+    if (cameraType.current == cameraType.default || cameraType.current == cameraType.offset) {
+      cameraManager.ecPitch = camPitch;
+      cameraManager.ecYaw = camYaw;
+    } else if (cameraType.current == cameraType.fixedToSat) {
+      cameraManager.ftsPitch = camPitch;
+      cameraManager.ftsYaw = camYaw;
+    }
+
+    if (objectManager.selectedSat !== -1) {
+        dlManager.sat = satSet.getSat(objectManager.selectedSat);
+        if (!dlManager.sat.static) {
+            _camSnapToSat(dlManager.sat);
+
+            if (dlManager.sat.missile || typeof meshManager == 'undefined') {
               settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0];
             } else {
               settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
             }
 
             // If 3D Models Available, then update their position on the screen
-            if (typeof meshManager !== 'undefined' && !sat.missile) {
+            if (typeof meshManager !== 'undefined' && !dlManager.sat.missile) {
                 // Try to reduce some jitter
                 if (
-                    meshManager.selectedSatPosition.x > sat.position.x - 1 &&
-                    meshManager.selectedSatPosition.x < sat.position.x + 1 &&
-                    meshManager.selectedSatPosition.y > sat.position.y - 1 &&
-                    meshManager.selectedSatPosition.y < sat.position.y + 1 &&
-                    meshManager.selectedSatPosition.z > sat.position.z - 1 &&
-                    meshManager.selectedSatPosition.z < sat.position.z + 1
+                    meshManager.selectedSatPosition.x > dlManager.sat.position.x - 1 &&
+                    meshManager.selectedSatPosition.x < dlManager.sat.position.x + 1 &&
+                    meshManager.selectedSatPosition.y > dlManager.sat.position.y - 1 &&
+                    meshManager.selectedSatPosition.y < dlManager.sat.position.y + 1 &&
+                    meshManager.selectedSatPosition.z > dlManager.sat.position.z - 1 &&
+                    meshManager.selectedSatPosition.z < dlManager.sat.position.z + 1
                 ) {
-                    meshManager.selectedSatPosition.x =
-                        (meshManager.selectedSatPosition.x + sat.position.x) /
-                        2;
-                    meshManager.selectedSatPosition.y =
-                        (meshManager.selectedSatPosition.y + sat.position.y) /
-                        2;
-                    meshManager.selectedSatPosition.z =
-                        (meshManager.selectedSatPosition.z + sat.position.z) /
-                        2;
+                    meshManager.selectedSatPosition.x = (meshManager.selectedSatPosition.x + dlManager.sat.position.x) / 2;
+                    meshManager.selectedSatPosition.y = (meshManager.selectedSatPosition.y + dlManager.sat.position.y) / 2;
+                    meshManager.selectedSatPosition.z = (meshManager.selectedSatPosition.z + dlManager.sat.position.z) / 2;
                 } else {
-                    meshManager.selectedSatPosition = sat.position;
+                    meshManager.selectedSatPosition = dlManager.sat.position;
                 }
             }
         }
-        if (sat.static && cameraType.current === cameraType.planetarium) {
+        if (dlManager.sat.static && cameraType.current === cameraType.planetarium) {
             // _camSnapToSat(objectManager.selectedSat)
         }
         // var satposition = [sat.position.x, sat.position.y, sat.position.z]
         // debugLine.set(satposition, [0, 0, 0])
     }
 
-    if (
-        typeof missileManager != 'undefined' &&
-        missileManager.missileArray.length > 0
-    ) {
+    if (typeof missileManager != 'undefined' && missileManager.missileArray.length > 0) {
         for (dlManager.i = 0; dlManager.i < missileManager.missileArray.length; dlManager.i++) {
             orbitManager.updateOrbitBuffer(missileManager.missileArray[dlManager.i].id);
         }
     }
 
-    if (
-        cameraType.current === cameraType.fps ||
-        cameraType.current === cameraType.satellite ||
-        cameraType.current === cameraType.astronomy
-    ) {
+    if (cameraType.current === cameraType.fps || cameraType.current === cameraType.satellite || cameraType.current === cameraType.astronomy) {
         _fpsMovement();
     }
 
@@ -841,10 +825,7 @@ dlManager.drawLoop = () => {
     if (settingsManager.isDemoModeOn) _demoMode();
 
     // Hide satMiniBoxes When Not in Use
-    if (
-        !settingsManager.isSatLabelModeOn ||
-        cameraType.current !== cameraType.planetarium
-    ) {
+    if (!settingsManager.isSatLabelModeOn || cameraType.current !== cameraType.planetarium) {
         if (isSatMiniBoxInUse) {
             $('#sat-minibox').html('');
         }
@@ -1741,68 +1722,61 @@ function _watermarkedDataURL(canvas, text) {
     tempCanvas.parentNode.removeChild(tempCanvas);
     return image;
 }
+
+let cSTS = {};
 function _camSnapToSat(sat) {
     /* this function runs every frame that a satellite is selected.
   However, the user might have broken out of the zoom snap or angle snap.
   If so, don't change those targets. */
 
     if (camAngleSnappedOnSat) {
-        var pos = sat.position;
-        var r = Math.sqrt(pos.x * pos.x + pos.y * pos.y);
-        var yaw = Math.atan2(pos.y, pos.x) + TAU / 4;
-        var pitch = Math.atan2(pos.z, r);
-        if (!pitch) {
+        cSTS.pos = sat.position;
+        cSTS.r = Math.sqrt(cSTS.pos.x**2 + cSTS.pos.y**2);
+        cSTS.yaw = Math.atan2(cSTS.pos.y, cSTS.pos.x) + TAU / 4;
+        cSTS.pitch = Math.atan2(cSTS.pos.z, cSTS.r);
+        if (!cSTS.pitch) {
             console.warn('Pitch Calculation Error');
-            pitch = 0;
+            cSTS.pitch = 0;
             camZoomSnappedOnSat = false;
             camAngleSnappedOnSat = false;
         }
-        if (!yaw) {
+        if (!cSTS.yaw) {
             console.warn('Yaw Calculation Error');
-            yaw = 0;
+            cSTS.yaw = 0;
             camZoomSnappedOnSat = false;
             camAngleSnappedOnSat = false;
         }
         if (cameraType.current === cameraType.planetarium) {
             // camSnap(-pitch, -yaw)
         } else {
-            camSnap(pitch, yaw);
+            camSnap(cSTS.pitch, cSTS.yaw);
         }
     }
 
     if (camZoomSnappedOnSat) {
-        var altitude;
-        var camDistTarget;
+        cSTS.altitude;
+        cSTS.camDistTarget;
         if (!sat.missile && !sat.static && sat.active) {
             // if this is a satellite not a missile
-            altitude = sat.getAltitude();
+            cSTS.altitude = sat.getAltitude();
         }
         if (sat.missile) {
-            altitude = sat.maxAlt + 1000; // if it is a missile use its altitude
+            cSTS.altitude = sat.maxAlt + 1000; // if it is a missile use its altitude
             orbitManager.setSelectOrbit(sat.satId);
         }
-        if (altitude) {
-            camDistTarget =
-                altitude + RADIUS_OF_EARTH + settingsManager.camDistBuffer;
+        if (cSTS.altitude) {
+            cSTS.camDistTarget = cSTS.altitude + RADIUS_OF_EARTH + settingsManager.camDistBuffer;
         } else {
-            camDistTarget = RADIUS_OF_EARTH + settingsManager.camDistBuffer; // Stay out of the center of the earth. You will get stuck there.
-            console.warn(
-                'Zoom Calculation Error: ' + altitude + ' -- ' + camDistTarget
-            );
+            cSTS.camDistTarget = RADIUS_OF_EARTH + settingsManager.camDistBuffer; // Stay out of the center of the earth. You will get stuck there.
+            console.warn(`Zoom Calculation Error: ${cSTS.altitude} -- ${cSTS.camDistTarget}`);
             camZoomSnappedOnSat = false;
             camAngleSnappedOnSat = false;
         }
 
-        camDistTarget = (camDistTarget < settingsManager.minZoomDistance)
-          ? settingsManager.minZoomDistance + 10
-          : camDistTarget;
+        cSTS.camDistTarget = (cSTS.camDistTarget < settingsManager.minZoomDistance) ? settingsManager.minZoomDistance + 10 : cSTS.camDistTarget;
 
-        zoomTarget = Math.pow(
-            (camDistTarget - settingsManager.minZoomDistance) /
-                (settingsManager.maxZoomDistance -
-                    settingsManager.minZoomDistance),
-            1 / ZOOM_EXP
-        );
+        zoomTarget = Math.pow((cSTS.camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance),1 / ZOOM_EXP);
+        cameraManager.ecLastZoom = zoomTarget + 0.1;
 
         // Only Zoom in Once on Mobile
         if (settingsManager.isMobileModeEnabled) camZoomSnappedOnSat = false;
@@ -1831,36 +1805,29 @@ dlManager.drawScene = () => {
        * for traditional view, move the camera and then rotate it
        */
 
-      if (
-          isNaN(camPitch) ||
-          isNaN(camYaw) ||
-          isNaN(camPitchTarget) ||
-          isNaN(camYawTarget) ||
-          isNaN(zoomLevel) ||
-          isNaN(zoomTarget)
-      ) {
-          try {
-              console.group('Camera Math Error');
-              console.log(`camPitch: ${camPitch}`);
-              console.log(`camYaw: ${camYaw}`);
-              console.log(`camPitchTarget: ${camPitchTarget}`);
-              console.log(`camYawTarget: ${camYawTarget}`);
-                console.log(`zoomLevel: ${zoomLevel}`);
-                console.log(`zoomTarget: ${zoomTarget}`);
-                console.log(
-                    `settingsManager.cameraMovementSpeed: ${settingsManager.cameraMovementSpeed}`
-                );
-                console.groupEnd();
-            } catch (e) {
-                console.warn('Camera Math Error');
-            }
-            camPitch = 0.5;
-            camYaw = 0.5;
-            zoomLevel = 0.5;
-            camPitchTarget = 0;
-            camYawTarget = 0;
-            zoomTarget = 0.5;
-        }
+      if (isNaN(camPitch) || isNaN(camYaw) || isNaN(camPitchTarget) || isNaN(camYawTarget) || isNaN(zoomLevel) || isNaN(zoomTarget)) {
+        try {
+            console.group('Camera Math Error');
+            console.log(`camPitch: ${camPitch}`);
+            console.log(`camYaw: ${camYaw}`);
+            console.log(`camPitchTarget: ${camPitchTarget}`);
+            console.log(`camYawTarget: ${camYawTarget}`);
+              console.log(`zoomLevel: ${zoomLevel}`);
+              console.log(`zoomTarget: ${zoomTarget}`);
+              console.log(
+                  `settingsManager.cameraMovementSpeed: ${settingsManager.cameraMovementSpeed}`
+              );
+              console.groupEnd();
+          } catch (e) {
+              console.warn('Camera Math Error');
+          }
+          camPitch = 0.5;
+          camYaw = 0.5;
+          zoomLevel = 0.5;
+          camPitchTarget = 0;
+          camYawTarget = 0;
+          zoomTarget = 0.5;
+      }
 
       switch (cameraType.current) {
         case cameraType.default: // pivot around the earth with earth in the center
@@ -1870,8 +1837,8 @@ dlManager.drawScene = () => {
           mat4.rotateZ(camMatrix,camMatrix,-cameraManager.localRotateCurrent.yaw);
           mat4.translate(camMatrix, camMatrix, [fpsXPos, fpsYPos, -fpsZPos]);
           mat4.translate(camMatrix, camMatrix, [0, _getCamDist(), 0]);
-          mat4.rotateX(camMatrix, camMatrix, camPitch);
-          mat4.rotateZ(camMatrix, camMatrix, -camYaw);
+          mat4.rotateX(camMatrix, camMatrix, cameraManager.ecPitch);
+          mat4.rotateZ(camMatrix, camMatrix, -cameraManager.ecYaw);
           break;
         case cameraType.offset: // pivot around the earth with earth offset to the bottom right
           mat4.rotateX(camMatrix,camMatrix,-cameraManager.localRotateCurrent.pitch);
@@ -1879,8 +1846,8 @@ dlManager.drawScene = () => {
           mat4.rotateZ(camMatrix,camMatrix,-cameraManager.localRotateCurrent.yaw);
 
           mat4.translate(camMatrix, camMatrix, [settingsManager.offsetCameraModeX,_getCamDist(),settingsManager.offsetCameraModeZ,]);
-          mat4.rotateX(camMatrix, camMatrix, camPitch);
-          mat4.rotateZ(camMatrix, camMatrix, -camYaw);
+          mat4.rotateX(camMatrix, camMatrix, cameraManager.ecPitch);
+          mat4.rotateZ(camMatrix, camMatrix, -cameraManager.ecYaw);
           break;
         case cameraType.fixedToSat: // Pivot around the satellite
           mat4.rotateX(camMatrix,camMatrix,-cameraManager.localRotateCurrent.pitch);
@@ -1891,8 +1858,8 @@ dlManager.drawScene = () => {
 
           mat4.translate(camMatrix, camMatrix, [0,_getCamDist() - RADIUS_OF_EARTH - sat.getAltitude(),0,]);
 
-          mat4.rotateX(camMatrix, camMatrix, camPitch);
-          mat4.rotateZ(camMatrix, camMatrix, -camYaw);
+          mat4.rotateX(camMatrix, camMatrix, cameraManager.ftsPitch);
+          mat4.rotateZ(camMatrix, camMatrix, -cameraManager.ftsYaw);
 
           satPos = [-sat.position.x, -sat.position.y, -sat.position.z];
           mat4.translate(camMatrix, camMatrix, satPos);
@@ -3217,6 +3184,8 @@ function camSnap(pitch, yaw) {
     // cameraManager.panReset = true
     camPitchTarget = pitch;
     camYawTarget = dlManager.normalizeAngle(yaw);
+    cameraManager.ecPitch = pitch;
+    cameraManager.ecYaw = yaw;
     camSnapMode = true;
 }
 function changeZoom(zoom) {
@@ -3277,6 +3246,11 @@ function selectSat(satId) {
 
     if (satId === -1 && !isselectedSatNegativeOne) {
         cameraType.current = (cameraType.current == cameraType.fixedToSat) ? cameraType.default : cameraType.current;
+        if (cameraType.current == cameraType.default || cameraType.current == cameraType.offset) {
+          camPitch = cameraManager.ecPitch;
+          camYaw = cameraManager.ecYaw;
+          zoomTarget = cameraManager.ecLastZoom; // Reset Zoom
+        }
         isselectedSatNegativeOne = true;
         $('#sat-infobox').fadeOut();
         // $('#iss-stream').html('')
@@ -3342,7 +3316,10 @@ function selectSat(satId) {
         isMissileMenuOpen = false;
         isCustomSensorMenuOpen = false;
     } else if (satId !== -1) {
-        cameraType.current = (cameraType.current == cameraType.default) ? cameraType.fixedToSat : cameraType.current;
+        if (cameraType.current == cameraType.default) {
+          cameraManager.ecLastZoom = zoomLevel;
+          cameraType.current = cameraType.fixedToSat;
+        }
         cameraManager.isChasing = true;
         isselectedSatNegativeOne = false;
         objectManager.selectedSat = satId;
@@ -4367,77 +4344,56 @@ $(document).ready(function () {
         }
         if (!settingsManager.disableUI) {
             canvasDOM.on('wheel', function (evt) {
-                if (settingsManager.disableNormalEvents) {
-                    evt.preventDefault();
+              if (settingsManager.disableNormalEvents) {
+                evt.preventDefault();
+              }
+
+              var delta = evt.originalEvent.deltaY;
+              if (evt.originalEvent.deltaMode === 1) {
+                delta *= 33.3333333;
+              }
+
+              if (delta < 0) {
+                  isZoomIn = true;
+              } else {
+                  isZoomIn = false;
+              }
+
+              rotateTheEarth = false;
+
+              if (settingsManager.isZoomStopsSnappedOnSat || objectManager.selectedSat == -1) {
+                zoomTarget += delta / 100 / 50 / speedModifier; // delta is +/- 100
+                zoomTarget = Math.min(Math.max(zoomTarget, 0.001), 1); // Force between 0 and 1
+                cameraManager.ecLastZoom = zoomTarget;
+                camZoomSnappedOnSat = false;
+              } else {
+                if (settingsManager.camDistBuffer < 300 || settingsManager.nearZoomLevel == -1) {
+                  settingsManager.camDistBuffer += delta / 7.5; // delta is +/- 100
+                  settingsManager.camDistBuffer = Math.min(Math.max(settingsManager.camDistBuffer, 30),300);
+                  settingsManager.nearZoomLevel = zoomLevel;
                 }
-
-                var delta = evt.originalEvent.deltaY;
-                if (evt.originalEvent.deltaMode === 1) {
-                    delta *= 33.3333333;
-                }
-
-                if (delta < 0) {
-                    isZoomIn = true;
-                } else {
-                    isZoomIn = false;
-                }
-
-                rotateTheEarth = false;
-
-                if (
-                    settingsManager.isZoomStopsSnappedOnSat ||
-                    objectManager.selectedSat == -1
-                ) {
-                    zoomTarget += delta / 100 / 50 / speedModifier; // delta is +/- 100
-                    zoomTarget = Math.min(Math.max(zoomTarget, 0.001), 1); // Force between 0 and 1
-                    camZoomSnappedOnSat = false;
-                } else {
-                  if (settingsManager.camDistBuffer < 300 || settingsManager.nearZoomLevel == -1) {
-                    settingsManager.camDistBuffer += delta / 7.5; // delta is +/- 100
-                    settingsManager.camDistBuffer = Math.min(
-                        Math.max(settingsManager.camDistBuffer, 30),
-                        300
-                    );
-                    settingsManager.nearZoomLevel = zoomLevel;
-                  }
-                  if (settingsManager.camDistBuffer >= 300) {
-                    zoomTarget += delta / 100 / 50 / speedModifier; // delta is +/- 100
-                    zoomTarget = Math.min(Math.max(zoomTarget, 0.001), 1); // Force between 0 and 1
-                    camZoomSnappedOnSat = false;
-                    if (zoomTarget < settingsManager.nearZoomLevel) {
-                      camZoomSnappedOnSat = true;
-                      camAngleSnappedOnSat = true;
-                      settingsManager.camDistBuffer = 200;
-                    }
+                if (settingsManager.camDistBuffer >= 300) {
+                  zoomTarget += delta / 100 / 50 / speedModifier; // delta is +/- 100
+                  zoomTarget = Math.min(Math.max(zoomTarget, 0.001), 1); // Force between 0 and 1
+                  cameraManager.ecLastZoom = zoomTarget;
+                  camZoomSnappedOnSat = false;
+                  if (zoomTarget < settingsManager.nearZoomLevel) {
+                    camZoomSnappedOnSat = true;
+                    // camAngleSnappedOnSat = true;
+                    settingsManager.camDistBuffer = 200;
                   }
                 }
+              }
 
-                if (
-                    cameraType.current === cameraType.planetarium ||
-                    cameraType.current === cameraType.fps ||
-                    cameraType.current === cameraType.satellite ||
-                    cameraType.current === cameraType.astronomy
-                ) {
-                    settingsManager.fieldOfView += delta * 0.0002;
-                    $('#fov-text').html(
-                        'FOV: ' +
-                            (settingsManager.fieldOfView * 100).toFixed(2) +
-                            ' deg'
-                    );
-                    if (
-                        settingsManager.fieldOfView >
-                        settingsManager.fieldOfViewMax
-                    )
-                        settingsManager.fieldOfView =
-                            settingsManager.fieldOfViewMax;
-                    if (
-                        settingsManager.fieldOfView <
-                        settingsManager.fieldOfViewMin
-                    )
-                        settingsManager.fieldOfView =
-                            settingsManager.fieldOfViewMin;
-                    webGlInit();
-                }
+              if (cameraType.current === cameraType.planetarium || cameraType.current === cameraType.fps || cameraType.current === cameraType.satellite || cameraType.current === cameraType.astronomy) {
+                settingsManager.fieldOfView += delta * 0.0002;
+                $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+                if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax)
+                    settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+                if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin)
+                    settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
+                webGlInit();
+              }
             });
             canvasDOM.on('click', function (evt) {
                 if (settingsManager.disableNormalEvents) {

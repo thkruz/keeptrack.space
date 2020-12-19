@@ -187,7 +187,11 @@
         };
     })();
 
-    timeManager.updatePropTime = () => {
+    timeManager.updatePropTime = (propTimeVar) => {
+      if (typeof propTimeVar !== 'undefined' && propTimeVar !== null) {
+        timeManager.propTimeVar.setTime(propTimeVar);
+        return;
+      }
       if (timeManager.propRate === 0) {
           timeManager.propTimeVar.setTime(
               Number(timeManager.propRealTime) + timeManager.propOffset
@@ -210,13 +214,7 @@
                 Number(timeManager.propRealTime) + timeManager.propOffset
             );
         } else {
-            timeManager.propTimeVar.setTime(
-                Number(timeManager.propRealTime) +
-                    timeManager.propOffset +
-                    (Number(timeManager.now) -
-                        Number(timeManager.propRealTime)) *
-                        timeManager.propRate
-            );
+            timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset + (Number(timeManager.now) - Number(timeManager.propRealTime)) * timeManager.propRate);
         }
         return timeManager.propTimeVar;
     };

@@ -438,6 +438,7 @@ function propagateCruncher() {
     let x, y, z, vx, vy, vz;
     let cosLat, sinLat, cosLon, sinLon;
     let curMissivarTime;
+    let timeExcess;
     let s, m, pv, tLen, t;
     let sat;
     let isSensorChecked = false;
@@ -754,116 +755,75 @@ function propagateCruncher() {
             } // Skip inactive missiles
             tLen = satCache[i].altList.length;
             for (t = 0; t < tLen; t++) {
-                if ((satCache[i].startTime * 1) + t * 1000 > now * 1) {
+                if ((satCache[i].startTime * 1) + t * 1000 >= now * 1) {
                     curMissivarTime = t;
                     break;
                 }
             }
+
+            satCache[i].lastTime = (satCache[i].lastTime >= 0) ? satCache[i].lastTime : 0;
+
+            cosLat = Math.cos(satCache[i].latList[satCache[i].lastTime + 1] * DEG2RAD);
+            sinLat = Math.sin(satCache[i].latList[satCache[i].lastTime + 1] * DEG2RAD);
+            cosLon = Math.cos(satCache[i].lonList[satCache[i].lastTime + 1] * DEG2RAD + gmstNext);
+            sinLon = Math.sin(satCache[i].lonList[satCache[i].lastTime + 1] * DEG2RAD + gmstNext);
+
+            if (satCache[i].lastTime == 0) {
+              satVel[i * 3] = 0;
+              satVel[i * 3 + 1] = 0;
+              satVel[i * 3 + 2] = 0;
+            } else if (satVel[i * 3] == 0 && satVel[i * 3 + 1] == 0 && satVel[i * 3 + 2] == 0) {
+              satVel[i * 3] = (6371 + satCache[i].altList[satCache[i].lastTime + 1]) * cosLat * cosLon - satPos[i * 3];
+              satVel[i * 3 + 1] = (6371 + satCache[i].altList[satCache[i].lastTime + 1]) * cosLat * sinLon - satPos[i * 3 + 1];
+              satVel[i * 3 + 2] = (6371 + satCache[i].altList[satCache[i].lastTime + 1]) * sinLat - satPos[i * 3 + 2];
+            } else {
+              satVel[i * 3] += (6371 + satCache[i].altList[satCache[i].lastTime + 1]) * cosLat * cosLon - satPos[i * 3];
+              satVel[i * 3 + 1] += (6371 + satCache[i].altList[satCache[i].lastTime + 1]) * cosLat * sinLon - satPos[i * 3 + 1];
+              satVel[i * 3 + 2] += (6371 + satCache[i].altList[satCache[i].lastTime + 1]) * sinLat - satPos[i * 3 + 2];
+              satVel[i * 3] *= 0.5;
+              satVel[i * 3 + 1] *= 0.5;
+              satVel[i * 3 + 2] *= 0.5;
+            }
+
             cosLat = Math.cos(satCache[i].latList[curMissivarTime] * DEG2RAD);
             sinLat = Math.sin(satCache[i].latList[curMissivarTime] * DEG2RAD);
-            cosLon = Math.cos(
-                satCache[i].lonList[curMissivarTime] * DEG2RAD + gmst
-            );
-            sinLon = Math.sin(
-                satCache[i].lonList[curMissivarTime] * DEG2RAD + gmst
-            );
+            cosLon = Math.cos(satCache[i].lonList[curMissivarTime] * DEG2RAD + gmst);
+            sinLon = Math.sin(satCache[i].lonList[curMissivarTime] * DEG2RAD + gmst);
 
-            satPos[i * 3] =
-                (6371 + satCache[i].altList[curMissivarTime]) * cosLat * cosLon;
-            satPos[i * 3 + 1] =
-                (6371 + satCache[i].altList[curMissivarTime]) * cosLat * sinLon;
-            satPos[i * 3 + 2] =
-                (6371 + satCache[i].altList[curMissivarTime]) * sinLat;
+            satPos[i * 3] = (6371 + satCache[i].altList[curMissivarTime]) * cosLat * cosLon;
+            satPos[i * 3 + 1] = (6371 + satCache[i].altList[curMissivarTime]) * cosLat * sinLon;
+            satPos[i * 3 + 2] = (6371 + satCache[i].altList[curMissivarTime]) * sinLat;
 
-            curMissivarTime = Math.min(curMissivarTime, tLen);
-
-            cosLat = Math.cos(
-                satCache[i].latList[curMissivarTime + 1] * DEG2RAD
-            );
-            sinLat = Math.sin(
-                satCache[i].latList[curMissivarTime + 1] * DEG2RAD
-            );
-            cosLon = Math.cos(
-                satCache[i].lonList[curMissivarTime + 1] * DEG2RAD + gmstNext
-            );
-            sinLon = Math.sin(
-                satCache[i].lonList[curMissivarTime + 1] * DEG2RAD + gmstNext
-            );
-
-            satVel[i * 3] =
-                (6371 + satCache[i].altList[curMissivarTime + 1]) *
-                    cosLat *
-                    cosLon -
-                satPos[i * 3];
-            satVel[i * 3 + 1] =
-                (6371 + satCache[i].altList[curMissivarTime + 1]) *
-                    cosLat *
-                    sinLon -
-                satPos[i * 3 + 1];
-            satVel[i * 3 + 2] =
-                (6371 + satCache[i].altList[curMissivarTime + 1]) * sinLat -
-                satPos[i * 3 + 2];
+            satCache[i].lastTime = curMissivarTime;
 
             x = satPos[i * 3];
             y = satPos[i * 3 + 1];
             z = satPos[i * 3 + 2];
 
-            positionEcf = satellite.eciToEcf({ x: x, y: y, z: z }, gmst); // pv.position is called positionEci originally
-            if (
-                satellite.eciToGeodetic({ x: x, y: y, z: z }, gmst).height <=
-                    150 &&
-                satellite.missile === false
-            ) {
+            positionEcf = satellite.eciToEcf({ x: x, y: y, z: z }, gmst);
+            if (satellite.eciToGeodetic({ x: x, y: y, z: z }, gmst).height <= 150 && satellite.missile === false) {
                 console.error(satellite.SCC_NUM);
                 satCache[i].skip = true;
             }
-            lookangles = satellite.ecfToLookAngles(
-                sensor.observerGd,
-                positionEcf
-            );
+            lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
 
-            azimuth = lookangles.azimuth;
-            elevation = lookangles.elevation;
+            azimuth = lookangles.azimuth * RAD2DEG;
+            elevation = lookangles.elevation * RAD2DEG;
             rangeSat = lookangles.rangeSat;
 
-            azimuth *= RAD2DEG;
-            elevation *= RAD2DEG;
             satInView[i] = false; // Default in case no sensor selected
 
             if (sensor.obsminaz > sensor.obsmaxaz) {
                 if (
-                    ((azimuth >= sensor.obsminaz ||
-                        azimuth <= sensor.obsmaxaz) &&
-                        elevation >= sensor.obsminel &&
-                        elevation <= sensor.obsmaxel &&
-                        rangeSat <= sensor.obsmaxrange &&
-                        rangeSat >= sensor.obsminrange) ||
-                    ((azimuth >= sensor.obsminaz2 ||
-                        azimuth <= sensor.obsmaxaz2) &&
-                        elevation >= sensor.obsminel2 &&
-                        elevation <= sensor.obsmaxel2 &&
-                        rangeSat <= sensor.obsmaxrange2 &&
-                        rangeSat >= sensor.obsminrange2)
-                ) {
+                    ((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && elevation >= sensor.obsminel && elevation <= sensor.obsmaxel && rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange) ||
+                    ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2 && rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2)) {
                     satInView[i] = true;
                 } else {
                     satInView[i] = false;
                 }
             } else {
-                if (
-                    (azimuth >= sensor.obsminaz &&
-                        azimuth <= sensor.obsmaxaz &&
-                        elevation >= sensor.obsminel &&
-                        elevation <= sensor.obsmaxel &&
-                        rangeSat <= sensor.obsmaxrange &&
-                        rangeSat >= sensor.obsminrange) ||
-                    (azimuth >= sensor.obsminaz2 &&
-                        azimuth <= sensor.obsmaxaz2 &&
-                        elevation >= sensor.obsminel2 &&
-                        elevation <= sensor.obsmaxel2 &&
-                        rangeSat <= sensor.obsmaxrange2 &&
-                        rangeSat >= sensor.obsminrange2)
-                ) {
+                if ((azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz && elevation >= sensor.obsminel && elevation <= sensor.obsmaxel && rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange) ||
+                    (azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2 && elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2 && rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2)) {
                     satInView[i] = true;
                 } else {
                     satInView[i] = false;

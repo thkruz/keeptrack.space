@@ -14,14 +14,16 @@
 }
 
 /*Hide yellow coloring in Chrome*/
-
-/*The bug seems to be with chrome not the site*/
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active  {
+    -webkit-box-shadow: 0 0 0 30px #1f3347 inset !important;
+}
 
 input:-webkit-autofill {
-    box-shadow: 0 0 0px 1000px #1f3347 inset;
-    background-color: #1f3347;
     -webkit-text-fill-color: white !important;
-    color: white !important;
+    font-size: 16px;
 }
 
 a,
@@ -238,12 +240,12 @@ ul {
 
 .right-btn-menu {
     display: none;
-    background: black;
+    background: #1f3347;
     color: white;
     position: absolute;
     width: 165px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0px;
+    border: 5px solid #172635;
     z-index: 10; /*Prevent fighting with the slide down button on mobile */
 }
 
@@ -254,11 +256,10 @@ ul {
 .right-btn-menu ul li {
     padding: 5px;
     cursor: pointer;
-    border-radius: 5px;
 }
 
 .right-btn-menu ul li:hover {
-    background-color: rgb(0, 114, 230);
+    background-color: #3a87cf;
 }
 
 .right-btn-menu ul li a:hover {
@@ -266,7 +267,7 @@ ul {
 }
 
 .rmb-menu-item:hover {
-    background-color: rgba(0, 114, 230, 0.3) !important;
+    background-color: #1d4367 !important;
 }
 
 .rmb-menu-item a {
@@ -275,14 +276,15 @@ ul {
 
 #sat-hoverbox {
     display: none;
-    background: black;
+    background: #1f3347 !important;
     cursor: default;
     color: white;
     position: absolute;
     padding: 10px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0px;
+    border: 5px solid #172635;
     pointer-events: none;
+    z-index: 100000000;
 }
 
 .search-hilight {
@@ -466,7 +468,7 @@ ul {
 }
 
 .legend-missileInview-box {
-    background: rgb(200, 198, 9);
+    background: rgb(255, 0, 0);
 }
 
 .legend-trusat-box {

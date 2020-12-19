@@ -29,6 +29,7 @@
       ColorScheme.objectTypeFlags.facility = true;
       ColorScheme.objectTypeFlags.sensor = true;
       ColorScheme.objectTypeFlags.missile = true;
+      ColorScheme.objectTypeFlags.missileInview = true
       ColorScheme.objectTypeFlags.trusat = true;
       ColorScheme.objectTypeFlags.inFOV = true;
       ColorScheme.objectTypeFlags.inviewAlt = true;
@@ -297,16 +298,30 @@
                 };
             }
             if (sat.missile && !sat.inView) {
+              if (sat.missile && ColorScheme.objectTypeFlags.missile === false) {
+                return {
+                    color: colorTheme.deselected,
+                    pickable: false,
+                };
+              } else {
                 return {
                     color: colorTheme.missile,
                     pickable: true,
                 };
+              }
             }
             if (sat.missile && sat.inView) {
+              if (sat.missile && ColorScheme.objectTypeFlags.missileInview === false) {
+                return {
+                    color: colorTheme.deselected,
+                    pickable: false,
+                };
+              } else {
                 return {
                     color: colorTheme.missileInview,
                     pickable: true,
                 };
+              }
             }
 
             if (

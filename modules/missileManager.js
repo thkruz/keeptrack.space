@@ -530,6 +530,9 @@
                 }
             }
             missileManager.missileArray = missileArray;
+        })
+        .done(()=>{
+          searchBox.doSearch('RV_');
         });
     };
     missileManager.MassRaid = function (time, BurnRate, RaidType) {
@@ -3163,8 +3166,6 @@
     };
     missileManager.getMissileTEARR = function (missile, sensor) {
         var currentTEARR = {}; // Most current TEARR data that is set in satellite object and returned.
-        // Set default timing settings. These will be changed to find look angles at different times in future.
-        timeManager.propRealTime = Date.now();
         var propOffset = timeManager.getPropOffset(); // offset letting us propagate in the future (or past)
         var now = timeManager.propTimeCheck(
             propOffset,
@@ -3202,8 +3203,6 @@
             }
         }
 
-        // Set default timing settings. These will be changed to find look angles at different times in future.
-        timeManager.propRealTime = Date.now();
         propOffset = timeManager.getPropOffset(); // offset letting us propagate in the future (or past)
         var tLen = missile.altList.length;
         for (var t = 0; t < tLen; t++) {

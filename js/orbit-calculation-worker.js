@@ -31,7 +31,7 @@ let orbitFadeFactor = 1.0;
 onmessage = function (m) {
     if (m.data.isUpdate) {
         // Add Satellites
-        if (m.data.missile == false && m.data.satId < 99999) {
+        if (m.data.missile != true && m.data.satId < 99999) {
             satCache[m.data.satId] = satellite.twoline2satrec(
                 m.data.TLE1,
                 m.data.TLE2
@@ -48,6 +48,7 @@ onmessage = function (m) {
         var satData = JSON.parse(m.data.satData);
         orbitFadeFactor = JSON.parse(m.data.orbitFadeFactor);
         var sLen = satData.length - 1;
+        console.log(sLen);
         let i = -1;
         while (i < sLen) {
             i++;

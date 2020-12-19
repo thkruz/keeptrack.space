@@ -50,6 +50,9 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
     };
 
     satellite.distance = (hoverSat, selectedSat) => {
+        if (hoverSat == null || selectedSat == null) return '';
+        hoverSat = satSet.getSat(hoverSat.id);
+        selectedSat = satSet.getSat(selectedSat.id);
         if (selectedSat == null || hoverSat == null) {
             return '';
         }

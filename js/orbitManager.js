@@ -84,16 +84,7 @@
         // console.log('orbitManager init: ' + time + ' ms');
     };
 
-    orbitManager.updateOrbitBuffer = function (
-        satId,
-        force,
-        TLE1,
-        TLE2,
-        missile,
-        latList,
-        lonList,
-        altList
-    ) {
+    orbitManager.updateOrbitBuffer = function (satId, force, TLE1, TLE2, missile, latList, lonList, altList) {
         if (!inProgress[satId] && !satSet.getSat(satId).static) {
             if (force) {
                 orbitWorker.postMessage({

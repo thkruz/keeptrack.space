@@ -150,6 +150,9 @@
     height: 25px !important;
     line-height: 25px !important;
   }
+  #about-content {
+    width: 375px;
+  }
   #lookanglesmultisite-content {
     width: 375px;
   }

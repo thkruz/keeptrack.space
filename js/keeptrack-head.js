@@ -36,8 +36,8 @@ const MOON_SCALAR_DISTANCE = 200000;
     let settingsManager = {};
 
     //  Version Control
-    settingsManager.versionNumber = '2.7.5';
-    settingsManager.versionDate = 'December 18, 2020';
+    settingsManager.versionNumber = '2.8.0';
+    settingsManager.versionDate = 'December 19, 2020';
 
     // Install Folder Settings
     {
@@ -534,6 +534,60 @@ const MOON_SCALAR_DISTANCE = 200000;
     // Determines if the Loading is complete
     settingsManager.shadersReady = false;
     settingsManager.cruncherReady = false;
+
+    settingsManager.altLoadMsgs = true;
+    settingsManager.loadStr = (str) => {
+      if (str == '') {
+        $('#loader-text').html('');
+        return;
+      }
+      if (str == 'math') {
+        $('#loader-text').html('Attempting to Math...');
+      }
+
+      if (settingsManager.altLoadMsgs) {
+        settingsManager.altMsgNum = (typeof settingsManager.altMsgNum !== 'undefined') ? settingsManager.altMsgNum : Math.random();
+        let msg = '';
+
+        if (settingsManager.altMsgNum > 0) {
+          msg = `Fun Fact: KeepTrack is on the front page of <a style="color: #48f3e3 !important;" href="https://clearspace.today" target="_blank">ClearSpace-1's Website</a>!`
+        }
+        if (settingsManager.altMsgNum > 0.33) {
+          msg = `Fun Fact: KeepTrack provided visuals for Studio Roosegaarde's <a style="color: #48f3e3 !important;" href="https://www.studioroosegaarde.net/project/space-waste-lab" target="_blank">Space Waste Lab</a>!`
+        }
+        if (settingsManager.altMsgNum > 0.66) {
+          msg = `Fun Fact: KeepTrack was used by the <a style="color: #48f3e3 !important;" href="https://www.youtube.com/embed/OfvkKBNup5A?autoplay=0&start=521&modestbranding=1" target="_blank">Joint Space Operations Center</a>!`
+        }
+        $('#loader-text').html(msg);
+        return;
+      }
+
+      switch (str) {
+        case 'science':
+          $('#loader-text').html('Locating Science...');
+          break;
+        case 'dots':
+          $('#loader-text').html('Drawing Dots in Space...');
+          break;
+        case 'satIntel':
+          $('#loader-text').html('Integrating Satellite Intel...');
+          break;
+        case 'radarData':
+          $('#loader-text').html('Importing Radar Data...');
+          break;
+        case 'painting':
+          $('#loader-text').html('Painting the Earth...');
+          break;
+        case 'coloring':
+          $('#loader-text').html('Coloring Inside the Lines...');
+          break
+        case 'elsets':
+          $('#loader-text').html('Locating ELSETs...');
+          break;
+        case 'easterEgg':
+          $('#loader-text').html('Llama Llama Llama Duck!');
+      }
+    };
 
     settingsManager.lkVerify = Date.now();
 

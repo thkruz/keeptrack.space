@@ -236,7 +236,7 @@ function initializeKeepTrack() {
         moon.init();
     }
     ColorScheme.init();
-    $('#loader-text').text('Drawing Dots in Space...');
+    settingsManager.loadStr('dots');
     satSet.init(function satSetInitCallBack(satData) {
         orbitManager.init();
         groups.init();
@@ -256,7 +256,7 @@ function initializeKeepTrack() {
         }
         (function _checkIfEarthFinished() {
             if (earth.loaded) return;
-            $('#loader-text').text('Coloring Inside the Lines...');
+            settingsManager.loadStr('coloring');            
             setTimeout(function () {
                 _checkIfEarthFinished();
             }, 250);
@@ -293,7 +293,7 @@ function initializeKeepTrack() {
                 // Start Button Displayed
                 $('#mobile-start-button').show();
                 $('#spinner').hide();
-                $('#loader-text').html('');
+                settingsManager.loadStr('');
             } else {
                 // Loading Screen Resized and Hidden
                 if (settingsManager.trusatMode) {
@@ -304,7 +304,7 @@ function initializeKeepTrack() {
                         $('#logo-text').html('');
                         $('#logo-trusat').hide();
                         $('#loading-screen').hide();
-                        $('#loader-text').html('Attempting to Math...');
+                        settingsManager.loadStr('math');
                     }, 3000);
                 } else {
                     setTimeout(function () {
@@ -314,7 +314,7 @@ function initializeKeepTrack() {
                         $('#logo-text').html('');
                         $('#logo-trusat').hide();
                         $('#loading-screen').hide();
-                        $('#loader-text').html('Attempting to Math...');
+                        settingsManager.loadStr('math');
                     }, 1500);
                 }
             }
@@ -365,18 +365,23 @@ var dlManager = {};
 dlManager.i = 0;
 dlManager.drawLoopCount = 0;
 dlManager.drawNow;
-dlManager.lastDrawTime = 0;
 dlManager.sat;
 dlManager.demoModeSatellite = 0;
 dlManager.demoModeLastTime = 0;
 dlManager.time = null;
 dlManager.dt = null;
+dlManager.t0 = 0;
+dlManager.isShowFPS = false;
+dlManager.fps = 0;
 
-dlManager.drawLoop = () => {
+dlManager.drawLoop = (preciseDt) => {
     // NOTE drawLoop has 7kb memory leak -- No Impact
     requestAnimationFrame(dlManager.drawLoop);
     dlManager.drawNow = Date.now();
-    dlManager.dt = dlManager.drawNow - (dlManager.time || dlManager.drawNow);
+    dlManager.dt = (preciseDt - dlManager.t0) || 0;
+    dlManager.fps = 1000/dlManager.dt;
+    if (dlManager.isShowFPS) console.log(dlManager.fps);
+    dlManager.t0 = preciseDt;
     if (typeof dlManager.drawLoopCount != 'undefined') {
         dlManager.drawLoopCount++;
         if (dlManager.drawLoopCount > 100) {
@@ -395,10 +400,10 @@ dlManager.drawLoop = () => {
             }
         }
     }
-    if (dlManager.dt > 20) {
-        updateHoverDelayLimit = settingsManager.updateHoverDelayLimitSmall;
-    } else if (dlManager.dt > 50) {
-        updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;
+    if (dlManager.fps < 30) {
+      updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;
+    } else if (dlManager.fps < 50) {
+      updateHoverDelayLimit = settingsManager.updateHoverDelayLimitSmall;
     } else {
         if (updateHoverDelayLimit > 1) --updateHoverDelayLimit;
     }
@@ -454,36 +459,14 @@ dlManager.drawLoop = () => {
         cameraManager.panResetModifier = cameraManager.panReset ? 0.5 : 1;
 
         // X is X no matter what
-        cameraManager.panSpeed.x =
-            (cameraManager.panCurrent.x - cameraManager.panTarget.x) *
-            cameraManager.panMovementSpeed *
-            zoomLevel;
-        cameraManager.panSpeed.x -=
-            cameraManager.panSpeed.x *
-            dlManager.dt *
-            cameraManager.panMovementSpeed *
-            zoomLevel;
-        cameraManager.panCurrent.x +=
-            cameraManager.panResetModifier *
-            cameraManager.panMovementSpeed *
-            cameraManager.panDif.x;
+        cameraManager.panSpeed.x = (cameraManager.panCurrent.x - cameraManager.panTarget.x) * cameraManager.panMovementSpeed * zoomLevel;
+        cameraManager.panSpeed.x -= cameraManager.panSpeed.x * dlManager.dt * cameraManager.panMovementSpeed * zoomLevel;
+        cameraManager.panCurrent.x += cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.x;
         // If we are moving like an FPS then Y and Z are based on the angle of the camera
         if (cameraManager.isWorldPan) {
-            fpsYPos -=
-                Math.cos(cameraManager.localRotateCurrent.yaw) *
-                cameraManager.panResetModifier *
-                cameraManager.panMovementSpeed *
-                cameraManager.panDif.y;
-            fpsZPos +=
-                Math.sin(cameraManager.localRotateCurrent.pitch) *
-                cameraManager.panResetModifier *
-                cameraManager.panMovementSpeed *
-                cameraManager.panDif.y;
-            fpsYPos -=
-                Math.sin(-cameraManager.localRotateCurrent.yaw) *
-                cameraManager.panResetModifier *
-                cameraManager.panMovementSpeed *
-                cameraManager.panDif.x;
+            fpsYPos -= Math.cos(cameraManager.localRotateCurrent.yaw) * cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.y;
+            fpsZPos += Math.sin(cameraManager.localRotateCurrent.pitch) * cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.y;
+            fpsYPos -= Math.sin(-cameraManager.localRotateCurrent.yaw) * cameraManager.panResetModifier * cameraManager.panMovementSpeed * cameraManager.panDif.x;
         }
         // If we are moving the screen then Z is always up and Y is not relevant
         if (cameraManager.isScreenPan || cameraManager.panReset) {
@@ -539,6 +522,13 @@ dlManager.drawLoop = () => {
         }
     }
     if (cameraManager.isLocalRotate || cameraManager.localRotateReset) {
+        cameraManager.localRotateTarget.pitch = dlManager.normalizeAngle(cameraManager.localRotateTarget.pitch);
+        cameraManager.localRotateTarget.yaw = dlManager.normalizeAngle(cameraManager.localRotateTarget.yaw);
+        cameraManager.localRotateTarget.roll = dlManager.normalizeAngle(cameraManager.localRotateTarget.roll);
+        cameraManager.localRotateCurrent.pitch = dlManager.normalizeAngle(cameraManager.localRotateCurrent.pitch);
+        cameraManager.localRotateCurrent.yaw = dlManager.normalizeAngle(cameraManager.localRotateCurrent.yaw);
+        cameraManager.localRotateCurrent.roll = dlManager.normalizeAngle(cameraManager.localRotateCurrent.roll);
+
         // If user is actively moving
         if (cameraManager.isLocalRotate) {
             cameraManager.localRotateDif.pitch = screenDragPoint[1] - mouseY;
@@ -590,7 +580,7 @@ dlManager.drawLoop = () => {
                 .yaw;
         }
 
-        cameraManager.resetModifier = cameraManager.localRotateReset ? 500 : 1;
+        cameraManager.resetModifier = cameraManager.localRotateReset ? 750 : 1;
 
         cameraManager.localRotateSpeed.pitch -=
             cameraManager.localRotateSpeed.pitch *
@@ -700,6 +690,42 @@ dlManager.drawLoop = () => {
         }
     }
 
+    if (cameraManager.ftsRotateReset) {
+      if (cameraType.current !== cameraType.fixedToSat) {
+        cameraManager.ftsRotateReset = false;
+        cameraManager.ftsPitch = 0;
+        cameraManager.camPitchSpeed = 0;
+      }
+
+      cameraManager.camPitchSpeed = settingsManager.cameraMovementSpeed * 0.2;
+      cameraManager.camYawSpeed = settingsManager.cameraMovementSpeed * 0.2;
+
+      if (camPitch >= cameraManager.ecPitch - 0.05 && camPitch <= cameraManager.ecPitch + 0.05) {
+        camPitch = cameraManager.ecPitch;
+        cameraManager.camPitchSpeed = 0;
+      }
+      if (camYaw >= cameraManager.ecYaw - 0.05 && camYaw <= cameraManager.ecYaw + 0.01) {
+        camYaw = cameraManager.ecYaw;
+        cameraManager.camYawSpeed = 0;
+      }
+
+      if (camYaw == cameraManager.ecYaw && camPitch == cameraManager.ecPitch) {
+        cameraManager.ftsRotateReset = false;
+      }
+
+      if (camPitch > cameraManager.ecPitch) {
+        camPitch -= cameraManager.camPitchSpeed * dlManager.dt * settingsManager.cameraDecayFactor;
+      } else if (camPitch < cameraManager.ecPitch) {
+        camPitch += cameraManager.camPitchSpeed * dlManager.dt * settingsManager.cameraDecayFactor;
+      }
+
+      if (camYaw > cameraManager.ecYaw) {
+        camYaw -= cameraManager.camYawSpeed * dlManager.dt * settingsManager.cameraDecayFactor;
+      } else if (camYaw < cameraManager.ecYaw) {
+        camYaw += cameraManager.camYawSpeed * dlManager.dt * settingsManager.cameraDecayFactor;
+      }
+    }
+
     camRotateSpeed -= camRotateSpeed * dlManager.dt * settingsManager.cameraMovementSpeed;
 
     if (cameraType.current === cameraType.fps || cameraType.current === cameraType.satellite || cameraType.current === cameraType.astronomy) {
@@ -761,7 +787,8 @@ dlManager.drawLoop = () => {
       if (camPitch > TAU / 4) camPitch = TAU / 4;
       if (camPitch < -TAU / 4) camPitch = -TAU / 4;
     }
-    camYaw = dlManager.normalizeAngle(camYaw);
+    if (camYaw > TAU) camYaw -= TAU;
+    if (camYaw < 0) camYaw += TAU;
 
     if (cameraType.current == cameraType.default || cameraType.current == cameraType.offset) {
       cameraManager.ecPitch = camPitch;
@@ -2423,8 +2450,14 @@ function _fpsMovement() {
 }
 var currentSearchSats;
 dlManager.updateHover = () => {
-    if (!settingsManager.disableUI) {
+    if (!settingsManager.disableUI && !settingsManager.lowPerf) {
         currentSearchSats = searchBox.getLastResultGroup();
+        if (typeof currentSearchSats !== 'undefined') {
+          currentSearchSats = currentSearchSats["sats"]
+          for (dlManager.i = 0; dlManager.i < currentSearchSats.length; dlManager.i++) {
+            orbitManager.updateOrbitBuffer(currentSearchSats[dlManager.i].satId);
+          }
+        }
     }
     if (!settingsManager.disableUI && searchBox.isHovering()) {
         updateHoverSatId = searchBox.getHoverSat();
@@ -2441,17 +2474,13 @@ dlManager.updateHover = () => {
         //   _hoverBoxOnSat(-1, 0, 0)
         // }
     } else {
-        if (
-            !isMouseMoving ||
-            isDragging ||
-            settingsManager.isMobileModeEnabled
-        ) {
+        if (!isMouseMoving || isDragging || settingsManager.isMobileModeEnabled) {
             return;
         }
 
         // gl.readPixels in getSatIdFromCoord creates a lot of jank
         // Earlier in the loop we decided how much to throttle updateHover
-        // if we skip it this loop, we want to still drawl the last thing
+        // if we skip it this loop, we want to still draw the last thing
         // it was looking at
 
         if (++updateHoverDelay >= updateHoverDelayLimit) {
@@ -2737,19 +2766,13 @@ function _hoverBoxOnSat(satId, satX, satY) {
                           'km/s';
                     } else {
                       satHoverBoxNode3.innerHTML =
-                          'X: ' +
-                          sat.position.x.toFixed(2) +
-                          ' Y: ' +
-                          sat.position.y.toFixed(2) +
-                          ' Z: ' +
-                          sat.position.z.toFixed(2) +
+                          'X: ' + sat.position.x.toFixed(2)  + ' km' +
+                          ' Y: ' + sat.position.y.toFixed(2)  + ' km' +
+                          ' Z: ' + sat.position.z.toFixed(2)  + ' km' +
                           '</br>' +
-                          'X: ' +
-                          sat.velocity.x.toFixed(2) +
-                          ' Y: ' +
-                          sat.velocity.y.toFixed(2) +
-                          ' Z: ' +
-                          sat.velocity.z.toFixed(2);
+                          'XDot: ' + sat.velocity.x.toFixed(2)  + ' km/s' +
+                          ' YDot: ' + sat.velocity.y.toFixed(2) + ' km/s' +
+                          ' ZDot: ' + sat.velocity.z.toFixed(2) + ' km/s';
                     }
                 } else if (
                     objectManager.isSensorManagerLoaded &&
@@ -4236,6 +4259,7 @@ $(document).ready(function () {
                         cameraManager.isLocalRotateRoll = false;
                         cameraManager.isLocalRotateYaw = true;
                     }
+                    evt.preventDefault();
                 }
 
                 // Right Mouse Button RMB
@@ -4553,12 +4577,15 @@ $(document).ready(function () {
             $('#line-eci-axis-rmb').hide();
             $('#line-sensor-sat-rmb').hide();
             $('#line-earth-sat-rmb').hide();
-            $('#line-sat-sun-rmb').hide();
+            $('#line-sat-sat-rmb').hide();
 
             // Earth
             $('#earth-low-rmb').hide();
             $('#earth-high-rmb').hide();
             $('#earth-vec-rmb').hide();
+
+            // Reset Camera
+            // $('#reset-camera-rmb').hide();
 
             // Colors Always Present
 
@@ -4605,7 +4632,7 @@ $(document).ready(function () {
                         $('#line-sensor-sat-rmb').show();
                     }
                     $('#line-earth-sat-rmb').show();
-                    $('#line-sat-sun-rmb').show();
+                    $('#line-sat-sat-rmb').show();
                     rightBtnDrawDOM.show();
                     isDrawDOM = true;
                     numMenuItems++;
@@ -5139,6 +5166,7 @@ $(document).ready(function () {
                     // }
                     cameraManager.panReset = true;
                     cameraManager.localRotateReset = true;
+                    cameraManager.ftsRotateReset = true;
                     break;
                 case 'clear-lines-rmb':
                     drawLineList = [];
@@ -5167,11 +5195,10 @@ $(document).ready(function () {
                         'p'
                     );
                     break;
-                case 'line-sat-sun-rmb':
-                    var sunPos = sun.realXyz;
+                case 'line-sat-sat-rmb':
                     debugDrawLine(
-                        'sat2',
-                        [clickedSat, sunPos.x, sunPos.y, sunPos.z],
+                        'sat3',
+                        [clickedSat, objectManager.selectedSat],
                         'p'
                     );
                     break;

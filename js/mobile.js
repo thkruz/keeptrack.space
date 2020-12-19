@@ -148,7 +148,7 @@ var maxPinchSize = 1;
         $('#logo-inner-container').addClass('mini-loader');
         $('#logo-text').html('');
         $('#loading-screen').hide();
-        $('#loader-text').html('Attempting to Math...');
+        settingsManager.loadStr('math');
         $('#spinner').show();
         $('#mobile-start-button').hide();
         settingsManager.enableHoverOverlay = false;

@@ -148,7 +148,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                 texture = gl.createTexture();
                 var img = new Image();
                 img.onload = function () {
-                    $('#loader-text').text('Painting the Earth...');
+                    settingsManager.loadStr('painting');
                     gl.bindTexture(gl.TEXTURE_2D, texture);
                     gl.texImage2D(
                         gl.TEXTURE_2D,
@@ -210,6 +210,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                     imgHiRes.src =
                     settingsManager.installDirectory +
                     'textures/earthmap16k.jpg';
+                  earth.isUseHiRes = true;
                   imgHiRes.onload = function () {
                     gl.bindTexture(gl.TEXTURE_2D, texture);
                     gl.texImage2D(
@@ -236,6 +237,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                       gl.REPEAT
                     );
                     texLoaded = true;
+                    earth.isHiResReady = true;
                     onImageLoaded();
                   };
                 };
@@ -528,32 +530,20 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
                 }
                 if (
                     settingsManager.isPropRateChange &&
-                    !settingsManager.isAlwaysHidePropRate
+                    !settingsManager.isAlwaysHidePropRate &&
+                    timeManager.propRate0 !== timeManager.propRate
                 ) {
-                    if (
-                        timeManager.propRate > 1.01 ||
-                        timeManager.propRate < 0.99
-                    ) {
-                        if (timeManager.propRate < 10)
-                            earth.propRateDOM.html(
-                                'Propagation Speed: ' +
-                                    timeManager.propRate.toFixed(1) +
-                                    'x'
-                            );
-                        if (timeManager.propRate >= 10)
-                            earth.propRateDOM.html(
-                                'Propagation Speed: ' +
-                                    timeManager.propRate.toFixed(2) +
-                                    'x'
-                            );
-                        earth.propRateDOM.show();
-                        isPropRateVisible = true;
+                    if (timeManager.propRate > 1.01 || timeManager.propRate < 0.99) {
+                      if (timeManager.propRate < 10)
+                        uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`,'standby');
+                      if (timeManager.propRate >= 10 && timeManager.propRate < 100)
+                        uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`,'caution');
+                      if (timeManager.propRate >= 100)
+                        uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`,'serious');
                     } else {
-                        if (isPropRateVisible) {
-                            earth.propRateDOM.hide();
-                            isPropRateVisible = false;
-                        }
+                      uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`,'normal');
                     }
+                    timeManager.propRate0 = timeManager.propRate;
                     settingsManager.isPropRateChange = false;
                 }
 
@@ -2137,12 +2127,12 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
   radarDataManager.init = () => {
     $.getScript(`${settingsManager.installDirectory}radarData/radarData.txt`, function (resp) {
-      $('#loader-text').html('Importing Radar Data...');
+      settingsManager.loadStr('radarData');
       $('#loading-screen').fadeIn(1000, function () {
         radarDataManager.setup(resp);
         $('#loading-screen').fadeOut('slow');
         setTimeout(function () {
-          $('#loader-text').html('Attempting to Math...');
+          settingsManager.loadStr('math');
         }, 800);
       });
     });

@@ -1029,6 +1029,28 @@ var speedModifier = 1;
                             );
                         }
                         break;
+                    case 'legend-missileInview-box':
+                        if (ColorScheme.objectTypeFlags.missileInview) {
+                            ColorScheme.objectTypeFlags.missileInview = false;
+                            $('.legend-missileInview-box').css('background', 'black');
+                            settingsManager.isForceColorScheme = true;
+                            satSet.setColorScheme(
+                                settingsManager.currentColorScheme,
+                                true
+                            );
+                        } else {
+                            ColorScheme.objectTypeFlags.missileInview = true;
+                            $('.legend-missileInview-box').css(
+                                'background',
+                                _rgbCSS(settingsManager.colors.missileInview)
+                            );
+                            settingsManager.isForceColorScheme = true;
+                            satSet.setColorScheme(
+                                settingsManager.currentColorScheme,
+                                true
+                            );
+                        }
+                        break;
                     case 'legend-sensor-box':
                         if (ColorScheme.objectTypeFlags.sensor) {
                             ColorScheme.objectTypeFlags.sensor = false;
@@ -2731,41 +2753,35 @@ var speedModifier = 1;
                     let launchTime = timeManager.selectedDate * 1;
 
                     if (type > 0) {
-                        if (type === 1)
-                            missileManager.MassRaidPre(
-                                launchTime,
-                                'simulation/Russia2USA.json'
-                            );
-                        if (type === 2)
-                            missileManager.MassRaidPre(
-                                launchTime,
-                                'simulation/Russia2USAalt.json'
-                            );
-                        if (type === 3)
-                            missileManager.MassRaidPre(
-                                launchTime,
-                                'simulation/China2USA.json'
-                            );
-                        if (type === 4)
-                            missileManager.MassRaidPre(
-                                launchTime,
-                                'simulation/NorthKorea2USA.json'
-                            );
-                        if (type === 5)
-                            missileManager.MassRaidPre(
-                                launchTime,
-                                'simulation/USA2Russia.json'
-                            );
-                        if (type === 6)
-                            missileManager.MassRaidPre(
-                                launchTime,
-                                'simulation/USA2China.json'
-                            );
-                        if (type === 7)
-                            missileManager.MassRaidPre(
-                                launchTime,
-                                'simulation/USA2NorthKorea.json'
-                            );
+                        let sim = '';
+                        if (type === 1) {
+                          sim = 'simulation/Russia2USA.json';
+                          missileManager.MassRaidPre(launchTime,sim);
+                        }
+                        if (type === 2) {
+                          sim = 'simulation/Russia2USAalt.json';
+                          missileManager.MassRaidPre(launchTime,sim);
+                        }
+                        if (type === 3) {
+                          sim = 'simulation/China2USA.json';
+                          missileManager.MassRaidPre(launchTime,sim);
+                        }
+                        if (type === 4) {
+                          sim = 'simulation/NorthKorea2USA.json';
+                          missileManager.MassRaidPre(launchTime,sim);
+                        }
+                        if (type === 5) {
+                          sim = 'simulation/USA2Russia.json';
+                          missileManager.MassRaidPre(launchTime,sim);
+                        }
+                        if (type === 6) {
+                          sim = 'simulation/USA2China.json';
+                          missileManager.MassRaidPre(launchTime,sim);
+                        }
+                        if (type === 7) {
+                          sim = 'simulation/USA2NorthKorea.json';
+                          missileManager.MassRaidPre(launchTime,sim);
+                        }
                         if (settingsManager.isOfficialWebsite)
                             ga(
                                 'send',
@@ -2774,8 +2790,7 @@ var speedModifier = 1;
                                 type,
                                 'Sim Number'
                             );
-                        $('#ms-error').html('Large Scale Attack Loaded');
-                        $('#ms-error').show();
+                        uiManager.toast(`${sim} Loaded`,'standby',true);
                     } else {
                         if (target === -1) {
                             // Custom Target
@@ -3002,8 +3017,8 @@ var speedModifier = 1;
                                 'Target'
                             );
                         uiManager.toast(missileManager.lastMissileError,missileManager.lastMissileErrorType);
+                        searchBox.doSearch('RV_');
                     }
-                    searchBox.doSearch('RV_');
                     $('#loading-screen').hide();
                 });
                 e.preventDefault();
@@ -5199,69 +5214,31 @@ var speedModifier = 1;
 
                     switch (cameraType.current) {
                         case cameraType.default:
-                            $('#camera-status-box').html(
-                                'Earth Centered Camera Mode'
-                            );
-                            $('#fov-text').html('');
+                            uiManager.toast('Earth Centered Camera Mode','standby');
                             zoomLevel = 0.5;
                             break;
                         case cameraType.offset:
-                            $('#camera-status-box').html('Offset Camera Mode');
-                            $('#fov-text').html('');
+                            uiManager.toast('Offset Camera Mode','standby');
                             break;
                         case cameraType.fps:
-                            $('#camera-status-box').html('Free Camera Mode');
-                            $('#fov-text').html(
-                                'FOV: ' +
-                                    (settingsManager.fieldOfView * 100).toFixed(
-                                        2
-                                    ) +
-                                    ' deg'
-                            );
+                            uiManager.toast('Free Camera Mode','standby');
+                            $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
                             break;
                         case cameraType.planetarium:
-                            $('#camera-status-box').html(
-                                'Planetarium Camera Mode'
-                            );
+                            uiManager.toast('Planetarium Camera Mode','standby');
                             uiManager.legendMenuChange('planetarium');
-                            $('#fov-text').html(
-                                'FOV: ' +
-                                    (settingsManager.fieldOfView * 100).toFixed(
-                                        2
-                                    ) +
-                                    ' deg'
-                            );
+                            $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
                             break;
                         case cameraType.satellite:
-                            $('#camera-status-box').html(
-                                'Satellite Camera Mode'
-                            );
-                            $('#fov-text').html(
-                                'FOV: ' +
-                                    (settingsManager.fieldOfView * 100).toFixed(
-                                        2
-                                    ) +
-                                    ' deg'
-                            );
+                            uiManager.toast('Satellite Camera Mode','standby');
+                            $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
                             break;
                         case cameraType.astronomy:
-                            $('#camera-status-box').html(
-                                'Astronomy Camera Mode'
-                            );
+                            uiManager.toast('Astronomy Camera Mode','standby');
                             uiManager.legendMenuChange('astronomy');
-                            $('#fov-text').html(
-                                'FOV: ' +
-                                    (settingsManager.fieldOfView * 100).toFixed(
-                                        2
-                                    ) +
-                                    ' deg'
-                            );
+                            $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
                             break;
                     }
-                    $('#camera-status-box').show();
-                    setTimeout(function () {
-                        $('#camera-status-box').hide();
-                    }, 3000);
                     break;
             }
 
@@ -5317,51 +5294,45 @@ var speedModifier = 1;
                     break;
                 case '+':
                 case '=':
-                    if (
-                        timeManager.propRate < 0.001 &&
-                        timeManager.propRate > -0.001
-                    ) {
-                        timeManager.propRate = 0.001;
-                    }
+                  timeManager.updatePropTime();
+                  timeManager.propOffset = timeManager.getPropOffset();
+                  if (timeManager.propRate < 0.001 && timeManager.propRate > -0.001) {
+                      timeManager.propRate = 0.001;
+                  }
 
-                    if (timeManager.propRate > 1000) {
-                        timeManager.propRate = 1000;
-                    }
+                  if (timeManager.propRate > 1000) {
+                      timeManager.propRate = 1000;
+                  }
 
-                    if (timeManager.propRate < 0) {
-                        timeManager.propRate *= 0.666666;
-                    } else {
-                        timeManager.propRate *= 1.5;
-                    }
-                    timeManager.updatePropTime()
-                    timeManager.propOffset = timeManager.getPropOffset();
-                    settingsManager.isPropRateChange = true;
-                    break;
+                  if (timeManager.propRate < 0) {
+                      timeManager.propRate *= 0.666666;
+                  } else {
+                      timeManager.propRate *= 1.5;
+                  }
+                  settingsManager.isPropRateChange = true;
+                  break;
                 case '-':
                 case '_':
-                    if (
-                        timeManager.propRate < 0.001 &&
-                        timeManager.propRate > -0.001
-                    ) {
-                        timeManager.propRate = -0.001;
+                    timeManager.updatePropTime();
+                    timeManager.propOffset = timeManager.getPropOffset();
+
+                    if (timeManager.propRate < 0.001 && timeManager.propRate > -0.001) {
+                      timeManager.propRate = -0.001;
                     }
 
                     if (timeManager.propRate < -1000) {
-                        timeManager.propRate = -1000;
+                      timeManager.propRate = -1000;
                     }
 
                     if (timeManager.propRate > 0) {
-                        timeManager.propRate *= 0.666666;
+                      timeManager.propRate *= 0.666666;
                     } else {
-                        timeManager.propRate *= 1.5;
+                      timeManager.propRate *= 1.5;
                     }
-
-                    timeManager.updatePropTime()
-                    timeManager.propOffset = timeManager.getPropOffset();
                     settingsManager.isPropRateChange = true;
                     break;
                 case '1':
-                    timeManager.updatePropTime()
+                    timeManager.updatePropTime();
                     timeManager.propOffset = timeManager.getPropOffset();
                     timeManager.propRate = 1.0;
                     settingsManager.isPropRateChange = true;
@@ -5386,6 +5357,22 @@ var speedModifier = 1;
             $('#no-webgl').css('display', 'block');
         }
     });
+
+    uiManager.hideLoadingScreen = () => {
+      if (earth.isUseHiRes && earth.isHiResReady !== true) {
+        setTimeout(function () {
+          uiManager.hideLoadingScreen()
+        }, 100);
+        return;
+      }
+      if (!settingsManager.isMobileModeEnabled) {
+        settingsManager.loadStr('painting');
+        $('#loading-screen').hide();
+      } else {
+        settingsManager.loadStr('painting');
+        $('#loading-screen').hide();
+      }
+    }
 
     uiManager.resize2DMap = function () {
         db.log('uiManager.resize2DMap');
@@ -5600,11 +5587,11 @@ var speedModifier = 1;
 
             if (!sat.missile) {
                 $('#sat-altitude').html(sat.getAltitude().toFixed(2) + ' km');
+                $('#sat-velocity').html(sat.velocity.total.toFixed(2) + ' km/s');
             } else {
                 $('#sat-altitude').html(uiManager.currentTEARR.alt.toFixed(2) + ' km');
             }
 
-            $('#sat-velocity').html(sat.velocity.total.toFixed(2) + ' km/s');
             if (objectManager.isSensorManagerLoaded) {
                 if (uiManager.currentTEARR.inview) {
                     $('#sat-azimuth').html(
@@ -6745,9 +6732,7 @@ var speedModifier = 1;
     };
 
     _offlineMessage = function () {
-        $('#loader-text').html(
-            'Please Contact Theodore Kruczek To Renew Your License <br> theodore.kruczek@gmail.com'
-        );
+        settingsManager.loadStr('easterEgg');
         // ga('send', 'event', 'Expired Offline Software', settingsManager.offlineLocation, 'Expired');
     };
 

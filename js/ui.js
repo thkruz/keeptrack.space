@@ -5289,6 +5289,7 @@ var speedModifier = 1;
                     break;
                 case '0':
                     timeManager.setPropRateZero();
+                    timeManager.updatePropTime();
                     timeManager.propOffset = timeManager.getPropOffset();
                     settingsManager.isPropRateChange = true;
                     break;

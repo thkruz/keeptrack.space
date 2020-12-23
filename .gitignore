@@ -22,4 +22,6 @@ src/tle/retr*
 src/tle/trus*
 src/tle/TLEAltNemo*
 
+"src/images/old icons"
+
 .vscode

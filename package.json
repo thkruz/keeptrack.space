@@ -2,23 +2,16 @@
     "name": "keeptrack.space",
     "version": "1.10.1",
     "description": "![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=for-the-badge)\r ![GitHub release (latest by date)](https://img.shields.io/github/v/release/thkruz/keeptrack.space?style=for-the-badge)\r ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=for-the-badge)\r ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=for-the-badge)\r ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/thkruz/keeptrack.space/Test%20site%20for%20publicly%20known%20js%20vulnerabilities?label=vulnerabilities&style=for-the-badge)\r ![License](https://img.shields.io/badge/license-rights%20reserved-red?style=for-the-badge)\r ## Description\r KeepTrack originally was meant to provide simple orbital analysis tools. Since then those simple tools have evolved into complex tools that bring functionality usually only found in expensive toolkits to the average user. The ultimate goal of the project is to make learning about orbital mechanics and satellite operations accessible to everyone without a paywall.",
+    "author": "Theodore Kruczek",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "prettier": "./node_modules/.bin/prettier --write \"**/*.{js,html,css}\"",
-        "format:diff": "prettier --list-different \"**/*.{js,html,css}\""
+        "test": "jest"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/thkruz/keeptrack.space"
     },
     "devDependencies": {
-        "prettier": "^2.1.1"
-    },
-    "prettier": {
-        "printWidth": 80,
-        "semi": true,
-        "tabWidth": 4,
-        "singleQuote": true,
-        "trailingComma": "es5"
+        "eslint": "^7.16.0",
+        "jest": "^26.6.3"
     }
 }

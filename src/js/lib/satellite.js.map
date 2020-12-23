@@ -1,0 +1,8 @@
+{
+    version : 1,
+    file: "satellite.js",
+    sourceRoot : "",
+    sources: ["satellite.js"],
+    names: [""],
+    mappings: ""
+}

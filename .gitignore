@@ -1,29 +1,25 @@
 node_modules/
 node_modules
 .gitattributes
-.htaccess
+src/.htaccess
 .notes.js
 classfd.tle
 .jshintrc
 .prettierignore
 
-social
-social/*
+src/social
+src/social/*
 
-.index.html
-basic.html
+src/ml
+src/ml/*
 
-membership
-membership/*
+src/admin/*
+src/analysis/*
+src/tle/2006*
+src/tle/TLE.json.bak
+src/tle/mw*
+src/tle/retr*
+src/tle/trus*
+src/tle/TLEAltNemo*
 
-ml
-ml/*
-
-admin/*
-analysis/*
-tle/2006*
-tle/TLE.json.bak
-tle/mw*
-tle/retr*
-tle/trus*
-tle/TLEAltNemo*
+.vscode

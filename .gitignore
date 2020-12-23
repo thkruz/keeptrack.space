@@ -6,6 +6,7 @@ src/.htaccess
 classfd.tle
 .jshintrc
 .prettierignore
+package-lock.json
 
 src/social
 src/social/*

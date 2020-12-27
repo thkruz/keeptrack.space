@@ -1,7 +1,7 @@
 {
     "name": "keeptrack.space",
-    "version": "3.0.0",
-    "description": "![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=for-the-badge)\r ![GitHub release (latest by date)](https://img.shields.io/github/v/release/thkruz/keeptrack.space?style=for-the-badge)\r ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=for-the-badge)\r ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=for-the-badge)\r ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/thkruz/keeptrack.space/Test%20site%20for%20publicly%20known%20js%20vulnerabilities?label=vulnerabilities&style=for-the-badge)\r ![License](https://img.shields.io/badge/license-rights%20reserved-red?style=for-the-badge)\r ## Description\r KeepTrack originally was meant to provide simple orbital analysis tools. Since then those simple tools have evolved into complex tools that bring functionality usually only found in expensive toolkits to the average user. The ultimate goal of the project is to make learning about orbital mechanics and satellite operations accessible to everyone without a paywall.",
+    "version": "3.0.1",
+    "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
     "author": "Theodore Kruczek",
     "contributors": [
         {"name": "Le-Roi Claassen",
@@ -21,8 +21,10 @@
         "test": "jest",
         "updateTle": "node ./scripts/updateTle.mjs",
         "updateTextures": "node ./scripts/updateTextures.mjs",
+        "updateRadarData": "node ./scripts/updateRadarData.mjs",
         "updateSocrates": "node ./scripts/updateSocrates.mjs",
-        "stage": "node ./scripts/prebuild.mjs",
+        "getExtras": "npm run updateTle && npm run updateTextures && npm run updateRadarData && npm run updateSocrates",
+        "stage": "node ./scripts/prebuild.mjs",        
         "build": "node --no-deprecation node_modules/webpack/bin/webpack.jscl --config ./scripts/webpack.prod.js",
         "build-dev": "node --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.dev.js"
     },

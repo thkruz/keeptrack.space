@@ -655,8 +655,8 @@ dlManager.updateHover = () => {
   }
   if (!settingsManager.disableUI && searchBox.isHovering()) {
     updateHoverSatId = searchBox.getHoverSat();
-    satSet.getScreenCoords(updateHoverSatId, pMatrix, cameraManager.camMatrix);
-    // if (!_earthHitTest(satScreenPositionArray.x, satScreenPositionArray.y)) {
+    satSet.getScreenCoords(updateHoverSatId, pMatrix, cameraManager.camMatrix);  
+    // if (!cameraManager.earthHitTest(gl, pickColorBuf, satScreenPositionArray.x, satScreenPositionArray.y)) {
     try {
       _hoverBoxOnSat(updateHoverSatId, satScreenPositionArray.x, satScreenPositionArray.y);
     } catch (e) {
@@ -700,14 +700,6 @@ dlManager.updateHover = () => {
       _hoverBoxOnSat(mouseSat, mouseX, mouseY);
     }
   }
-  // Related to the currently disabled raycast
-  // eslint-disable-next-line no-unused-vars
-  var _earthHitTest = (x, y) => {
-    gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-    gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
-
-    return pickColorBuf[0] === 0 && pickColorBuf[1] === 0 && pickColorBuf[2] === 0;
-  };
 };
 let sat2;
 var _hoverBoxOnSat = (satId, satX, satY) => {

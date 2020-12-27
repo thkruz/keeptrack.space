@@ -22,6 +22,7 @@ var normForward = [0, 0, 0];
 
 var isZoomIn = false;
 cameraManager.setZoomIn = (val) => {
+  if (typeof val !== 'boolean') throw new TypeError();
   isZoomIn = val;
 };
 
@@ -30,6 +31,7 @@ cameraManager.rotateEarth = (val) => {
   if (typeof val == 'undefined') {
     rotateEarth = !rotateEarth;
   } else {
+    if (typeof val !== 'boolean') throw new TypeError();
     rotateEarth = val;
   }
 };
@@ -37,14 +39,17 @@ cameraManager.rotateEarth = (val) => {
 var mouseX = 0;
 var mouseY = 0;
 cameraManager.setMouseX = (val) => {
+  if (typeof val !== 'number') throw new TypeError();
   mouseX = val;
 };
 cameraManager.setMouseY = (val) => {
+  if (typeof val !== 'number') throw new TypeError();
   mouseY = val;
 };
 
 var screenDragPoint = [0, 0];
 cameraManager.screenDragPoint = (val) => {
+  if (typeof val !== 'object' || val.length !== 2) throw new TypeError();
   screenDragPoint = val;
 };
 
@@ -53,6 +58,8 @@ var camPitch = 0;
 var zoomLevel = 0.6925;
 cameraManager.zoomLevel = zoomLevel;
 cameraManager.setZoomLevel = (val) => {
+  if (typeof val !== 'number') throw new TypeError();
+  if (val > 1.0 || val < 0.0) throw new RangeError();
   zoomLevel = val;
 };
 var zoomTarget = 0.6925;
@@ -60,10 +67,12 @@ cameraManager.zoomTarget = zoomTarget;
 
 cameraManager.isCtrlPressed = false;
 cameraManager.setCtrlPressed = (val) => {
+  if (typeof val !== 'boolean') throw new TypeError();
   cameraManager.isCtrlPressed = val;
 };
 cameraManager.isShiftPressed = false;
 cameraManager.setShiftPressed = (val) => {
+  if (typeof val !== 'boolean') throw new TypeError();
   cameraManager.isShiftPressed = val;
 };
 
@@ -100,14 +109,17 @@ cameraManager.cameraType = {
   planetarium: 4,
   satellite: 5,
   astronomy: 6,
-  set: (type) => {
+  set: (val) => {
+    if (typeof val !== 'number') throw new TypeError();
+    if (val > 6 || val < 0) throw new RangeError();
+
     // Move out from the center of the Earth in FPS Mode
-    if (type == 3) {
+    if (val == 3) {
       fpsYPos = 25000;
     } else {
       fpsYPos = 0;
     }
-    cameraManager.cameraType.current = type;
+    cameraManager.cameraType.current = val;
   },
 };
 
@@ -149,6 +161,14 @@ cameraManager.cameraType = {
   cameraManager.camSnapMode = false;
   cameraManager.setCamSnapMode = (val) => {
     cameraManager.camSnapMode = val;
+  };
+
+  cameraManager.isRayCastingEarth = false;
+  // Related to the currently disabled raycast
+  cameraManager.earthHitTest = (gl, pickColorBuf, x, y) => {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
+    gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
+    cameraManager.isRayCastingEarth = pickColorBuf[0] === 0 && pickColorBuf[1] === 0 && pickColorBuf[2] === 0;
   };
 
   // Local Rotate Settings/Flags
@@ -325,11 +345,8 @@ cameraManager.calculate = (id, dt) => {
     // dragTarget = getEarthScreenPoint(mouseX, mouseY)
     // if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
     // isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
-    //
-    // TODO: Rotate Around Earth code needs cleaned up now that raycasting is turned off
     if (
-      // eslint-disable-next-line no-constant-condition
-      true ||
+      !cameraManager.isRayCastingEarth ||
       cameraManager.cameraType.current === cameraManager.cameraType.fps ||
       cameraManager.cameraType.current === cameraManager.cameraType.satellite ||
       cameraManager.cameraType.current === cameraManager.cameraType.astronomy ||
@@ -343,17 +360,21 @@ cameraManager.calculate = (id, dt) => {
       cameraManager.camPitchSpeed = cameraManager.normalizeAngle(camPitch - pitchTarget) * -settingsManager.cameraMovementSpeed;
       cameraManager.camYawSpeed = cameraManager.normalizeAngle(camYaw - yawTarget) * -settingsManager.cameraMovementSpeed;
     } else {
-      // earth surface point drag
-      // dragPointR = Math.sqrt(dragPoint[0] * dragPoint[0] + dragPoint[1] * dragPoint[1]);
-      // dragTargetR = Math.sqrt(dragTarget[0] * dragTarget[0] + dragTarget[1] * dragTarget[1]);
-      // dragPointLon = Math.atan2(dragPoint[1], dragPoint[0]);
-      // dragTargetLon = Math.atan2(dragTarget[1], dragTarget[0]);
-      // dragPointLat = Math.atan2(dragPoint[2], dragPointR);
-      // dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
-      // pitchDif = dragPointLat - dragTargetLat;
-      // yawDif = cameraManager.normalizeAngle(dragPointLon - dragTargetLon);
-      // cameraManager.camPitchSpeed = pitchDif * settingsManager.cameraMovementSpeed;
-      // cameraManager.camYawSpeed = yawDif * settingsManager.cameraMovementSpeed;
+      // This is how we handle a raycast that hit the earth to make it feel like you are grabbing onto the surface
+      // of the earth instead of the screen
+      /*
+        // earth surface point drag
+        // dragPointR = Math.sqrt(dragPoint[0] * dragPoint[0] + dragPoint[1] * dragPoint[1]);
+        // dragTargetR = Math.sqrt(dragTarget[0] * dragTarget[0] + dragTarget[1] * dragTarget[1]);
+        // dragPointLon = Math.atan2(dragPoint[1], dragPoint[0]);
+        // dragTargetLon = Math.atan2(dragTarget[1], dragTarget[0]);
+        // dragPointLat = Math.atan2(dragPoint[2], dragPointR);
+        // dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
+        // pitchDif = dragPointLat - dragTargetLat;
+        // yawDif = cameraManager.normalizeAngle(dragPointLon - dragTargetLon);
+        // cameraManager.camPitchSpeed = pitchDif * settingsManager.cameraMovementSpeed;
+        // cameraManager.camYawSpeed = yawDif * settingsManager.cameraMovementSpeed;
+      */
     }
     cameraManager.camSnapMode = false;
   } else {
@@ -868,7 +889,6 @@ cameraManager.keyUpHandler = (evt) => {
     if (!isFPSSideSpeedLock) fpsSideSpeed = 0;
     if (!isFPSVertSpeedLock) fpsVertSpeed = 0;
   }
-  // TODO: Find evt.key === 'ShiftRight' alternative for IE
   // Applies to _keyDownHandler as well
   if (evt.key === 'ShiftRight') {
     cameraManager.setShiftPressed(false);

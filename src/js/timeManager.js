@@ -77,7 +77,8 @@ timeManager.setSelectedDate = (selectedDate) => {
     timeManager.propRate0 = timeManager.propRate;
     settingsManager.isPropRateChange = false;
   }
-  document.getElementById('datetime-text').innerText = timeManager.timeTextStr;
+  // textContent doesn't remove the Node! No unecessary DOM changes everytime time updates.
+  document.getElementById('datetime-text').textContent = timeManager.timeTextStr;
 };
 
 timeManager.getPropOffset = function () {

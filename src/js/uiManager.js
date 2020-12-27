@@ -4070,13 +4070,48 @@ uiManager.hideLoadingScreen = () => {
     }, 100);
     return;
   }
-  if (!settingsManager.isMobileModeEnabled) {
-    settingsManager.loadStr('painting');
-    $('#loading-screen').hide();
+
+  // Display content when loading is complete.
+  $('#canvas-holder').attr('style', 'display:block');
+
+  mobile.checkMobileMode();
+
+  if (settingsManager.isMobileModeEnabled) {
+    $('#spinner').hide();
+    settingsManager.loadStr('math');
+    // settingsManager.loadStr('');
   } else {
-    settingsManager.loadStr('painting');
-    $('#loading-screen').hide();
+    // Loading Screen Resized and Hidden
+    if (settingsManager.trusatMode) {
+      setTimeout(function () {
+        $('#loading-screen').removeClass('full-loader');
+        $('#loading-screen').addClass('mini-loader-container');
+        $('#logo-inner-container').addClass('mini-loader');
+        $('#logo-text').html('');
+        $('#logo-trusat').hide();
+        $('#loading-screen').hide();
+        settingsManager.loadStr('math');
+      }, 3000);
+    } else {
+      setTimeout(function () {
+        $('#loading-screen').removeClass('full-loader');
+        $('#loading-screen').addClass('mini-loader-container');
+        $('#logo-inner-container').addClass('mini-loader');
+        $('#logo-text').html('');
+        $('#logo-trusat').hide();
+        $('#loading-screen').hide();
+        settingsManager.loadStr('math');
+      }, 1500);
+    }
   }
+
+  // if (!settingsManager.isMobileModeEnabled) {
+  //   // settingsManager.loadStr('painting');
+  //   $('#loading-screen').hide();
+  // } else {
+  //   // settingsManager.loadStr('painting');
+  //   $('#loading-screen').hide();
+  // }
 };
 
 uiManager.resize2DMap = function () {

@@ -70,7 +70,6 @@ mobile.checkIfMobileDevice = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IE
 //   $('#logo-inner-container').addClass('mini-loader');
 //   $('#logo-text').html('');
 //   $('#loading-screen').hide();
-//   settingsManager.loadStr('math');
 //   $('#spinner').show();
 //   $('#mobile-start-button').hide();
 //   settingsManager.enableHoverOverlay = false;

@@ -1,86 +1,94 @@
 {
-    "name": "keeptrack.space",
-    "version": "3.0.1",
-    "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
-    "author": "Theodore Kruczek",
-    "contributors": [
-        {"name": "Le-Roi Claassen",
-        "url": "https://www.linkedin.com/in/leroiclaassen-webdev/"},
-        {"name": "Heather Kruczek"}
-    ],
-    "license": "GPL-3.0",
-    "homepage": "https://keeptrack.space",
-    "bugs": { 
-        "url" : "https://github.com/thkruz/keeptrack.space/issues",
-        "email" : "theodore.kruczek@gmail.com"
-        },
-    "publishConfig": {
-        "access": "public"
+  "name": "keeptrack.space",
+  "version": "3.0.1",
+  "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
+  "author": "Theodore Kruczek",
+  "contributors": [
+    {
+      "name": "Le-Roi Claassen",
+      "url": "https://www.linkedin.com/in/leroiclaassen-webdev/"
     },
-    "scripts": {
-        "test": "jest",
-        "updateTle": "node ./scripts/updateTle.mjs",
-        "updateTextures": "node ./scripts/updateTextures.mjs",
-        "updateRadarData": "node ./scripts/updateRadarData.mjs",
-        "updateSocrates": "node ./scripts/updateSocrates.mjs",
-        "getExtras": "npm run updateTle && npm run updateTextures && npm run updateRadarData && npm run updateSocrates",
-        "stage": "node ./scripts/prebuild.mjs",        
-        "build": "node --no-deprecation node_modules/webpack/bin/webpack.jscl --config ./scripts/webpack.prod.js",
-        "build-dev": "node --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.dev.js"
-    },
-    "jest": {
-        "transform": {
-            "^.+\\.[t|j]sx?$": "babel-jest"
-        },        
-        "moduleNameMapper": {
-            "\\.(css|less|sass|scss)$": "<rootDir>/scripts/styleMock.js",
-            "\\.(gif|ttf|eot|svg)$": "<rootDir>/scripts/fileMock.js",
-            "@app(.*)$": "<rootDir>/src/$1"
-        }
-    },
-    "prettier": {
-        "printWidth": 250,
-        "tabWidth": 2,
-        "useTabs": false,
-        "semi": true,
-        "singleQuote": true,
-        "quoteProps": "consistent",
-        "trailingComma": "es5",
-        "bracketSpacing": true,
-        "arrowParens": "always",
-        "requirePragma": true,
-        "insertPragma": true,
-        "proseWrap": "never",
-        "htmlWhitespaceSensitivity": "ignore",
-        "endOfLine": "lf",
-        "embeddedLanguageFormatting": "off"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/thkruz/keeptrack.space"
-    },
-    "devDependencies": {
-        "@babel/plugin-transform-modules-commonjs": "^7.12.1",
-        "@babel/preset-env": "^7.12.11",
-        "copy-dir": "^1.3.0",
-        "css-loader": "^5.0.1",
-        "download-file": "^0.1.5",
-        "eslint": "^7.16.0",
-        "imports-loader": "^1.2.0",
-        "jest": "^26.6.3",
-        "mkdirp": "^1.0.4",
-        "prettier": "^2.2.1",
-        "style-loader": "^2.0.0",
-        "webpack": "^5.11.0",
-        "webpack-cli": "^4.2.0",
-        "worker-loader": "^3.0.7"
-    },
-    "dependencies": {
-        "gl-matrix": "^3.3.0",
-        "jquery": "^3.5.1",
-        "jquery-ui-bundle": "^1.12.1-migrate",
-        "materialize-css": "github:Dogfalo/materialize",
-        "meeusjs": "^1.0.4",
-        "satellite.js": "^4.1.3"
+    {
+      "name": "Heather Kruczek"
     }
+  ],
+  "license": "GPL-3.0",
+  "homepage": "https://keeptrack.space",
+  "bugs": {
+    "url": "https://github.com/thkruz/keeptrack.space/issues",
+    "email": "theodore.kruczek@gmail.com"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "jest",
+    "updateTle": "node ./scripts/updateTle.mjs",
+    "updateTextures": "node ./scripts/updateTextures.mjs",
+    "updateRadarData": "node ./scripts/updateRadarData.mjs",
+    "updateSocrates": "node ./scripts/updateSocrates.mjs",
+    "getExtras": "npm run updateTle && npm run updateTextures && npm run updateRadarData && npm run updateSocrates",
+    "stage": "node ./scripts/prebuild.mjs",
+    "build": "node --no-deprecation node_modules/webpack/bin/webpack.jscl --config ./scripts/webpack.prod.js",
+    "build-dev": "node --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.dev.js"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "coverageReporters": [
+      "html"
+    ],
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    },
+    "moduleNameMapper": {
+      "\\.(css|less|sass|scss)$": "<rootDir>/scripts/styleMock.js",
+      "\\.(gif|ttf|eot|svg)$": "<rootDir>/scripts/fileMock.js",
+      "@app(.*)$": "<rootDir>/src/$1"
+    }
+  },
+  "prettier": {
+    "printWidth": 250,
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true,
+    "quoteProps": "consistent",
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "arrowParens": "always",
+    "requirePragma": true,
+    "insertPragma": true,
+    "proseWrap": "never",
+    "htmlWhitespaceSensitivity": "ignore",
+    "endOfLine": "lf",
+    "embeddedLanguageFormatting": "off"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thkruz/keeptrack.space"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.12.1",
+    "@babel/preset-env": "^7.12.11",
+    "copy-dir": "^1.3.0",
+    "css-loader": "^5.0.1",
+    "download-file": "^0.1.5",
+    "eslint": "^7.16.0",
+    "imports-loader": "^1.2.0",
+    "jest": "^26.6.3",
+    "mkdirp": "^1.0.4",
+    "prettier": "^2.2.1",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.11.0",
+    "webpack-cli": "^4.2.0",
+    "worker-loader": "^3.0.7"
+  },
+  "dependencies": {
+    "gl-matrix": "^3.3.0",
+    "jquery": "^3.5.1",
+    "jquery-ui-bundle": "^1.12.1-migrate",
+    "materialize-css": "github:Dogfalo/materialize",
+    "meeusjs": "^1.0.4",
+    "satellite.js": "^4.1.3"
+  }
 }

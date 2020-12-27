@@ -530,7 +530,8 @@ let settingsManager = {};
     }
 
     if (settingsManager.altLoadMsgs) {
-      settingsManager.altMsgNum = typeof settingsManager.altMsgNum !== 'undefined' ? settingsManager.altMsgNum : Math.random();
+      if (typeof settingsManager.altMsgNum !== 'undefined') return;
+      settingsManager.altMsgNum = Math.random();
       let msg = '';
 
       if (settingsManager.altMsgNum > 0) {

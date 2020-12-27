@@ -2,7 +2,7 @@
 var webpack = require("webpack");
 
 let config = {  
-  module: {
+  module: {    
     rules: [
       {
         test: /\.css$/i,
@@ -41,6 +41,7 @@ let config = {
 
 var jsConfig = Object.assign({}, config,{
   name: "jsConfig",
+  mode: 'production',
   entry: {
     'main': [
       './src/js/main.js',

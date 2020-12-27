@@ -191,42 +191,7 @@ var initializeKeepTrack = () => {
         delay: 50,
         html: settingsManager.versionDate,
         position: 'top',
-      });
-
-      // Display content when loading is complete.
-      $('#canvas-holder').attr('style', 'display:block');
-
-      mobile.checkMobileMode();
-
-      if (settingsManager.isMobileModeEnabled) {
-        // Start Button Displayed
-        $('#mobile-start-button').show();
-        $('#spinner').hide();
-        settingsManager.loadStr('');
-      } else {
-        // Loading Screen Resized and Hidden
-        if (settingsManager.trusatMode) {
-          setTimeout(function () {
-            $('#loading-screen').removeClass('full-loader');
-            $('#loading-screen').addClass('mini-loader-container');
-            $('#logo-inner-container').addClass('mini-loader');
-            $('#logo-text').html('');
-            $('#logo-trusat').hide();
-            $('#loading-screen').hide();
-            settingsManager.loadStr('math');
-          }, 3000);
-        } else {
-          setTimeout(function () {
-            $('#loading-screen').removeClass('full-loader');
-            $('#loading-screen').addClass('mini-loader-container');
-            $('#logo-inner-container').addClass('mini-loader');
-            $('#logo-text').html('');
-            $('#logo-trusat').hide();
-            $('#loading-screen').hide();
-            settingsManager.loadStr('math');
-          }, 1500);
-        }
-      }
+      });      
 
       satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
 

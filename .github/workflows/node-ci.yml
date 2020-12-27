@@ -1,8 +1,7 @@
 name: Node.js CI
 
 on: 
-  workflow_run:
-    workflows: ["Run Tests"]
+  workflow_dispatch:
   pull_request:
   push:
 

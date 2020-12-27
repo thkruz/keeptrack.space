@@ -1,3 +1,5 @@
+name: NPM Update
+
 on: push
 
 jobs:

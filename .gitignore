@@ -18,6 +18,8 @@ src/textures/*32k*.jpg
 
 src/radarData/radar*
 
+coverage/
+
 src/admin
 src/analysis
 src/tle/2006*

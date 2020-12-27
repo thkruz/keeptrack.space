@@ -14,5 +14,4 @@ jobs:
         with:
           repo-token: ${{secrets.ESLINT_TOKEN}}
           eslint-rc: .eslintrc
-          execute-on-files:
-            - ./src
+          execute-on-files: './src'

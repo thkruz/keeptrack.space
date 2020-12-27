@@ -35,6 +35,7 @@ import '@app/js/lib/colorPick.js';
 import 'materialize-css';
 import '@app/js/keeptrack-foot.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
+import { dlManager, webGlInit } from '@app/js/main.js';
 import { earth, lineManager } from '@app/js/sceneManager/sceneManager.js';
 import { helpers, mathValue, saveAs, saveCsv } from '@app/js/helpers.js';
 import { satCruncher, satSet } from '@app/js/satSet.js';
@@ -43,7 +44,6 @@ import { ColorScheme } from '@app/js/color-scheme.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { cameraManager } from '@app/js/cameraManager.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
-import { dlManager } from '@app/js/main.js';
 import { groups } from '@app/js/groups.js';
 import { mapManager } from '@app/js/mapManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
@@ -96,10 +96,6 @@ var createClockDOMOnce = false;
 
 var uiManager = {};
 uiManager.isAnalysisMenuOpen = false;
-uiManager.isCustomSensorMenuOpen = false;
-uiManager.setCustomSensorMenuOpen = (val) => {
-  uiManager.isCustomSensorMenuOpen = val;
-};
 
 uiManager.isCurrentlyTyping = false;
 
@@ -153,7 +149,7 @@ $(document).ready(function () {
     // Register all UI callback functions with drawLoop in main.js
     // These run during the draw loop
     dlManager.setDrawLoopCallback(function () {
-      _showSatTest();
+      // _showSatTest();
       _updateNextPassOverlay();
       _checkWatchlist();
       _updateSelectBox();
@@ -3210,8 +3206,8 @@ $(document).ready(function () {
           break;
         }
       case 'menu-customSensor': // T
-        if (uiManager.isCustomSensorMenuOpen) {
-          uiManager.isCustomSensorMenuOpen = false;
+        if (sMM.isCustomSensorMenuOpen) {
+          sMM.isCustomSensorMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
@@ -3224,7 +3220,7 @@ $(document).ready(function () {
             $('#cs-hei').val(sensorManager.selectedSensor.obshei);
           }
           $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          uiManager.isCustomSensorMenuOpen = true;
+          sMM.isCustomSensorMenuOpen = true;
           $('#menu-customSensor').addClass('bmenu-item-selected');
           break;
         }
@@ -3446,7 +3442,7 @@ $(document).ready(function () {
           cameraManager.setPanReset(true);
           cameraManager.setLocalRotateReset(true);
           settingsManager.fieldOfView = 0.6;
-          cameraManager.webGlInit();
+          webGlInit();
           uiManager.hideSideMenus();
           orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
           cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
@@ -3482,7 +3478,7 @@ $(document).ready(function () {
           cameraManager.setPanReset(true);
           cameraManager.setLocalRotateReset(true);
           settingsManager.fieldOfView = 0.6;
-          cameraManager.webGlInit();
+          webGlInit();
           uiManager.hideSideMenus();
           cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
           uiManager.legendMenuChange('default');
@@ -3744,7 +3740,7 @@ $(document).ready(function () {
     sMM.isNewLaunchMenuOpen(false);
     sMM.isBreakupMenuOpen(false);
     sMM.isMissileMenuOpen(false);
-    uiManager.isCustomSensorMenuOpen = false;
+    sMM.isCustomSensorMenuOpen = false;
     isColorSchemeMenuOpen = false;
     sMM.isAnalysisMenuOpen(false);
     isExternalMenuOpen = false;
@@ -3917,7 +3913,7 @@ uiManager.keyHandler = (evt) => {
         // cameraManager.setPanReset(true);
         cameraManager.setLocalRotateReset(true);
         settingsManager.fieldOfView = 0.6;
-        cameraManager.webGlInit();
+        webGlInit();
         if (objectManager.selectedSat !== -1) {
           cameraManager.camZoomSnappedOnSat(true);
           cameraManager.cameraType.set(cameraManager.cameraType.fixedToSat);
@@ -4070,13 +4066,48 @@ uiManager.hideLoadingScreen = () => {
     }, 100);
     return;
   }
-  if (!settingsManager.isMobileModeEnabled) {
-    settingsManager.loadStr('painting');
-    $('#loading-screen').hide();
+
+  // Display content when loading is complete.
+  $('#canvas-holder').attr('style', 'display:block');
+
+  mobile.checkMobileMode();
+
+  if (settingsManager.isMobileModeEnabled) {
+    $('#spinner').hide();
+    settingsManager.loadStr('math');
+    // settingsManager.loadStr('');
   } else {
-    settingsManager.loadStr('painting');
-    $('#loading-screen').hide();
+    // Loading Screen Resized and Hidden
+    if (settingsManager.trusatMode) {
+      setTimeout(function () {
+        $('#loading-screen').removeClass('full-loader');
+        $('#loading-screen').addClass('mini-loader-container');
+        $('#logo-inner-container').addClass('mini-loader');
+        $('#logo-text').html('');
+        $('#logo-trusat').hide();
+        $('#loading-screen').hide();
+        settingsManager.loadStr('math');
+      }, 3000);
+    } else {
+      setTimeout(function () {
+        $('#loading-screen').removeClass('full-loader');
+        $('#loading-screen').addClass('mini-loader-container');
+        $('#logo-inner-container').addClass('mini-loader');
+        $('#logo-text').html('');
+        $('#logo-trusat').hide();
+        $('#loading-screen').hide();
+        settingsManager.loadStr('math');
+      }, 1500);
+    }
   }
+
+  // if (!settingsManager.isMobileModeEnabled) {
+  //   // settingsManager.loadStr('painting');
+  //   $('#loading-screen').hide();
+  // } else {
+  //   // settingsManager.loadStr('painting');
+  //   $('#loading-screen').hide();
+  // }
 };
 
 uiManager.resize2DMap = function () {
@@ -4101,17 +4132,17 @@ uiManager.resize2DMap = function () {
 var infoOverlayDOM = [];
 // var satNumberOverlay = [];
 // eslint-disable-next-line arrow-body-style
-var _showSatTest = () => {
-  return;
-  // db.log('_showSatTest');
-  // if (timeManager.now > (lastSatUpdateTime * 1 + 10000)) {
-  //   for (var i = 0; i < satSet.getSatData().length; i++) {
-  //     satNumberOverlay[i] = satSet.getScreenCoords(i, pMatrix, camMatrix);
-  //     if (satNumberOverlay[i] !== 1) console.log(satNumberOverlay[i]);
-  //     lastSatUpdateTime = timeManager.now;
-  //   }
-  // }
-};
+// var _showSatTest = () => {
+// return;
+// db.log('_showSatTest');
+// if (timeManager.now > (lastSatUpdateTime * 1 + 10000)) {
+//   for (var i = 0; i < satSet.getSatData().length; i++) {
+//     satNumberOverlay[i] = satSet.getScreenCoords(i, pMatrix, camMatrix);
+//     if (satNumberOverlay[i] !== 1) console.log(satNumberOverlay[i]);
+//     lastSatUpdateTime = timeManager.now;
+//   }
+// }
+// };
 
 var _updateNextPassOverlay = (isForceUpdate) => {
   if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;

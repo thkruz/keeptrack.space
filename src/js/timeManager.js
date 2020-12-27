@@ -53,8 +53,24 @@ timeManager.propTimeCheck = function (propTempOffset, propRealTime) {
   return now;
 };
 
-timeManager.setNow = (now) => {
+timeManager.dt = 0;
+timeManager.setNow = (now, dt, datetimeInput) => {
   timeManager.now = now;
+  timeManager.dt = dt;
+
+  timeManager.setLastTime(timeManager.propTimeVar);
+  timeManager.updatePropTime();
+  timeManager.setSelectedDate(timeManager.propTimeVar);
+
+  // Passing datetimeInput eliminates needing jQuery in this module
+  if (timeManager.lastTime - timeManager.propTimeVar < 300 && (settingsManager.isEditTime || !settingsManager.cruncherReady)) {
+    datetimeInput.val(timeManager.selectedDate.toISOString().slice(0, 10) + ' ' + timeManager.selectedDate.toISOString().slice(11, 19));
+  }
+};
+
+timeManager.drawDt = 0;
+timeManager.setDrawDt = (drawDt) => {
+  timeManager.drawDt = drawDt;
 };
 
 timeManager.setPropRateZero = function () {
@@ -77,7 +93,8 @@ timeManager.setSelectedDate = (selectedDate) => {
     timeManager.propRate0 = timeManager.propRate;
     settingsManager.isPropRateChange = false;
   }
-  document.getElementById('datetime-text').innerText = timeManager.timeTextStr;
+  // textContent doesn't remove the Node! No unecessary DOM changes everytime time updates.
+  document.getElementById('datetime-text').textContent = timeManager.timeTextStr;
 };
 
 timeManager.getPropOffset = function () {

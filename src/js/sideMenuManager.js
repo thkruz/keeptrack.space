@@ -28,6 +28,11 @@ sMM.isEditSatMenuOpen = (val) => {
   if (typeof val == 'undefined') return isEditSatMenuOpen;
   isEditSatMenuOpen = val;
 };
+// TODO: Standardize this later
+sMM.isCustomSensorMenuOpen = false;
+sMM.setCustomSensorMenuOpen = (val) => {
+  sMM.isCustomSensorMenuOpen = val;
+};
 let isNewLaunchMenuOpen = false;
 sMM.isNewLaunchMenuOpen = (val) => {
   if (typeof val == 'undefined') return isNewLaunchMenuOpen;

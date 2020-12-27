@@ -27,8 +27,8 @@ import { mathValue } from '@app/js/helpers.js';
 let settingsManager = {};
 {
   //  Version Control
-  settingsManager.versionNumber = '2.8.1';
-  settingsManager.versionDate = 'December 19, 2020';
+  settingsManager.versionNumber = '3.0.2';
+  settingsManager.versionDate = 'December 27, 2020';
 
   // Install Folder Settings
   {
@@ -530,7 +530,8 @@ let settingsManager = {};
     }
 
     if (settingsManager.altLoadMsgs) {
-      settingsManager.altMsgNum = typeof settingsManager.altMsgNum !== 'undefined' ? settingsManager.altMsgNum : Math.random();
+      if (typeof settingsManager.altMsgNum !== 'undefined') return;
+      settingsManager.altMsgNum = Math.random();
       let msg = '';
 
       if (settingsManager.altMsgNum > 0) {

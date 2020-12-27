@@ -59,6 +59,12 @@ mobile.checkMobileMode = function () {
   }
 };
 
+// Reinitialize the canvas on mobile rotation
+window.addEventListener('orientationchange', function () {
+  // console.log('rotate');
+  mobile.isRotationEvent = true;
+});
+
 mobile.checkIfMobileDevice = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu.test(navigator.userAgent);
 
 // mobile.start = function () {
@@ -70,7 +76,6 @@ mobile.checkIfMobileDevice = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IE
 //   $('#logo-inner-container').addClass('mini-loader');
 //   $('#logo-text').html('');
 //   $('#loading-screen').hide();
-//   settingsManager.loadStr('math');
 //   $('#spinner').show();
 //   $('#mobile-start-button').hide();
 //   settingsManager.enableHoverOverlay = false;

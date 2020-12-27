@@ -52,4 +52,40 @@ var saveCsv = (items, name) => {
   saveAs(blob, `${name}.csv`);
 };
 
-export { mathValue, helpers, saveVariable, saveCsv, saveAs };
+var watermarkedDataURL = (canvas, text) => {
+  var tempCanvas = document.createElement('canvas');
+  var tempCtx = tempCanvas.getContext('2d');
+  var cw, ch;
+  cw = tempCanvas.width = canvas.width;
+  ch = tempCanvas.height = canvas.height;
+  tempCtx.drawImage(canvas, 0, 0);
+  tempCtx.font = '24px nasalization';
+  var textWidth = tempCtx.measureText(text).width;
+  tempCtx.globalAlpha = 1.0;
+  tempCtx.fillStyle = 'white';
+  tempCtx.fillText(text, cw - textWidth - 30, ch - 30);
+  // tempCtx.fillStyle ='black'
+  // tempCtx.fillText(text,cw-textWidth-10+2,ch-20+2)
+  // just testing by adding tempCanvas to document
+  document.body.appendChild(tempCanvas);
+  let image = tempCanvas.toDataURL();
+  tempCanvas.parentNode.removeChild(tempCanvas);
+  return image;
+};
+
+var fixDpi = (canvas, dpi) => {
+  //create a style object that returns width and height
+  let style = {
+    height() {
+      return +getComputedStyle(canvas).getPropertyValue('height').slice(0, -2);
+    },
+    width() {
+      return +getComputedStyle(canvas).getPropertyValue('width').slice(0, -2);
+    },
+  };
+  //set the correct attributes for a crystal clear image!
+  canvas.setAttribute('width', style.width() * dpi);
+  canvas.setAttribute('height', style.height() * dpi);
+};
+
+export { mathValue, helpers, fixDpi, saveVariable, saveCsv, saveAs, watermarkedDataURL };

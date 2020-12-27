@@ -58,6 +58,15 @@ cameraManager.setZoomLevel = (val) => {
 var zoomTarget = 0.6925;
 cameraManager.zoomTarget = zoomTarget;
 
+cameraManager.isCtrlPressed = false;
+cameraManager.setCtrlPressed = (val) => {
+  cameraManager.isCtrlPressed = val;
+};
+cameraManager.isShiftPressed = false;
+cameraManager.setShiftPressed = (val) => {
+  cameraManager.isShiftPressed = val;
+};
+
 var yawErr = 0;
 var camYawTarget = 0;
 var camPitchTarget = 0;

@@ -11,6 +11,8 @@ package-lock.json
 src/social
 src/social/*
 
+src/textures/*10k*.jpg
+
 src/admin
 src/analysis
 src/tle/2006*

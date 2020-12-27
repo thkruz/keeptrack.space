@@ -5,7 +5,12 @@ name: Node.js Package
 
 on:
   release:
-    types: [published, created, edited]
+    types: 
+      published:
+      created:
+      edited:
+      workflow_dispatch:
+      
 
 jobs:
   build:

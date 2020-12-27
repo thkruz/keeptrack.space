@@ -4,12 +4,12 @@
 name: Node.js Package
 
 on:
+  workflow_dispatch:
   release:
     types: 
       published:
       created:
-      edited:
-      workflow_dispatch:
+      edited:      
       
 
 jobs:

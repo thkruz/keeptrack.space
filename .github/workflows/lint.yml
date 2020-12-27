@@ -12,7 +12,7 @@ jobs:
         # https://help.github.com/en/actions/reference/events-that-trigger-workflows#pull-request-event-pull_request
         if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }} 
         with:
-          repo-token: ${{secrets.GITHUB_TOKEN}}
+          repo-token: ${{secrets.ESLINT_TOKEN}}
           eslint-rc: .eslintrc
           execute-on-files:
             - ./src

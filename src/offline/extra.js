@@ -2484,3 +2484,5 @@ var satelliteList = [
         SCC: '39062',
     },
 ];
+
+export { satelliteList };

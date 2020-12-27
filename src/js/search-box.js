@@ -1,389 +1,281 @@
-/* global
-  $
-  groups
-  selectSat
-  updateUrl
+/**
+ * @format
+ */
 
-  satSet
-  orbitManager
-  objectManager.selectedSat
-  settingsManager
-*/
+import * as $ from 'jquery';
+import { ColorScheme } from '@app/js/color-scheme.js';
+import { groups } from '@app/js/groups.js';
+import { satSet } from '@app/js/satSet.js';
+import { settingsManager } from '@app/js/keeptrack-head.js';
+
 var hoverSatId = -1;
-(function () {
-    var searchBox = {};
-    var satData;
+var searchBox = {};
+var satData;
 
-    var hovering = false;
+var hovering = false;
 
-    var resultsOpen = false;
-    var lastResultGroup;
+var resultsOpen = false;
+var lastResultGroup;
 
-    searchBox.isResultBoxOpen = function () {
-        return resultsOpen;
-    };
-    searchBox.getLastResultGroup = function () {
-        return lastResultGroup;
-    };
-    searchBox.getCurrentSearch = function () {
-        if (resultsOpen) {
-            return $('#search').val();
-        } else {
-            return null;
-        }
-    };
-    searchBox.isHovering = function () {
-        return hovering;
-    };
-    searchBox.getHoverSat = function () {
-        return hoverSatId;
-    };
-    searchBox.hideResults = function () {
-        $('#search-results').slideUp();
-        groups.clearSelect();
-        resultsOpen = false;
+searchBox.isResultBoxOpen = function () {
+  return resultsOpen;
+};
+searchBox.getLastResultGroup = function () {
+  return lastResultGroup;
+};
+searchBox.getCurrentSearch = function () {
+  if (resultsOpen) {
+    return $('#search').val();
+  } else {
+    return null;
+  }
+};
+searchBox.isHovering = function (val) {
+  if (typeof val == 'undefined') return hovering;
+  hovering = val;
+};
+searchBox.setHoverSat = function (satId) {
+  hoverSatId = satId;
+};
+searchBox.getHoverSat = function () {
+  return hoverSatId;
+};
+searchBox.hideResults = function () {
+  $('#search-results').slideUp();
+  groups.clearSelect();
+  resultsOpen = false;
 
-        settingsManager.lastSearch = '';
-        settingsManager.lastSearchResults = [];
-        satSet.setupStarBuffer();
+  settingsManager.lastSearch = '';
+  settingsManager.lastSearchResults = [];
+  satSet.setupStarBuffer();
 
-        if (settingsManager.currentColorScheme === ColorScheme.group) {
-            satSet.setColorScheme(ColorScheme.default, true);
-        } else {
-            satSet.setColorScheme(settingsManager.currentColorScheme, true);
-        }
-    };
+  if (settingsManager.currentColorScheme === ColorScheme.group) {
+    satSet.setColorScheme(ColorScheme.default, true);
+  } else {
+    satSet.setColorScheme(settingsManager.currentColorScheme, true);
+  }
+};
 
-    searchBox.doArraySearch = (array) => {
-      let searchStr = '';
-      let satData = satSet.getSatData();
-      for (var i = 0; i < array.length; i++) {
-        if (i == array.length - 1) {
-          searchStr += `${satData[array[i]].SCC_NUM}`;
-        } else {
-          searchStr += `${satData[array[i]].SCC_NUM},`;
-        }
+searchBox.doArraySearch = (array) => {
+  let searchStr = '';
+  let satData = satSet.getSatData();
+  for (var i = 0; i < array.length; i++) {
+    if (i == array.length - 1) {
+      searchStr += `${satData[array[i]].SCC_NUM}`;
+    } else {
+      searchStr += `${satData[array[i]].SCC_NUM},`;
+    }
+  }
+  searchBox.doSearch(searchStr);
+};
+
+searchBox.doSearch = function (searchString, isPreventDropDown) {
+  if (searchString.length === 0) {
+    settingsManager.lastSearch = '';
+    settingsManager.lastSearchResults = [];
+    satSet.setupStarBuffer();
+    $('#search').val('');
+    searchBox.hideResults();
+    return;
+  }
+
+  $('#search').val(searchString);
+
+  // Uppercase to make this search not case sensitive
+  searchString = searchString.toUpperCase();
+  var searchList = searchString.split(',');
+  settingsManager.lastSearch = searchList;
+
+  var results = [];
+
+  for (var i = 0; i < satSet.missileSats; i++) {
+    // Stop once you get to the markers to save time
+    var sat = satData[i];
+    for (var j = 0; j < searchList.length; j++) {
+      // Move one search string at a time (separated by ',')
+      searchString = searchList[j];
+
+      // Don't search for things until at least the minimum characters
+      // are typed otherwise there are just too many search results.
+      if (searchString.length <= settingsManager.minimumSearchCharacters && searchString !== 'RV_') {
+        return;
       }
-      searchBox.doSearch(searchStr);
-    };
+      var len = searchList[j].length; // How many characters is in this search string
 
-    searchBox.doSearch = function (searchString, isPreventDropDown) {
-        if (searchString.length === 0) {
-            settingsManager.lastSearch = '';
-            settingsManager.lastSearchResults = [];
-            satSet.setupStarBuffer();
-            $('#search').val('');
-            searchBox.hideResults();
-            selectSat(-1);
-            return;
-        }
+      // Skip static dots (Maybe these should be searchable?)
+      if (sat.static) {
+        continue;
+      }
+      // Stop searching once you reach the markers
+      if (sat.marker) {
+        break;
+      }
+      // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
+      if (settingsManager.isSatOverflyModeOn && sat.OT > 1) {
+        continue;
+      }
+      // Skip inactive missiles.
+      if (sat.missile && !sat.active) {
+        continue;
+      }
 
-        $('#search').val(searchString);
+      // Skip Fake Analyst satellites
+      if (sat.C == 'ANALSAT' && !sat.active) {
+        continue;
+      }
 
-        // Uppercase to make this search not case sensitive
-        searchString = searchString.toUpperCase();
-        var searchList = searchString.split(',');
-        settingsManager.lastSearch = searchList;
+      // Everything has a name. If it doesn't then assume it isn't what we are
+      // searching for.
+      if (!sat.ON) {
+        continue;
+      }
 
-        var results = [];
-
-        for (var i = 0; i < satSet.missileSats; i++) {
-            // Stop once you get to the markers to save time
-            var sat = satData[i];
-            for (var j = 0; j < searchList.length; j++) {
-                // Move one search string at a time (separated by ',')
-                searchString = searchList[j];
-
-                // Don't search for things until at least the minimum characters
-                // are typed otherwise there are just too many search results.
-                if (
-                    searchString.length <=
-                        settingsManager.minimumSearchCharacters &&
-                    searchString !== 'RV_'
-                ) {
-                    return;
-                }
-                var len = searchList[j].length; // How many characters is in this search string
-
-                // Skip static dots (Maybe these should be searchable?)
-                if (sat.static) {
-                    continue;
-                }
-                // Stop searching once you reach the markers
-                if (sat.marker) {
-                    break;
-                }
-                // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
-                if (settingsManager.isSatOverflyModeOn && sat.OT > 1) {
-                    continue;
-                }
-                // Skip inactive missiles.
-                if (sat.missile && !sat.active) {
-                    continue;
-                }
-
-                // Skip Fake Analyst satellites
-                if (sat.C == 'ANALSAT' && !sat.active) {
-                    continue;
-                }
-
-                // Everything has a name. If it doesn't then assume it isn't what we are
-                // searching for.
-                if (!sat.ON) {
-                    continue;
-                }
-
-                //
-                if (sat.ON.toUpperCase().indexOf(searchString) !== -1) {
-                    results.push({
-                        strIndex: sat.ON.indexOf(searchString),
-                        isON: true,
-                        patlen: len,
-                        satId: i,
-                    });
-                    continue; // Prevent's duplicate results
-                }
-
-                if (!sat.desc) {
-                    // Do nothing there is no description property
-                } else if (
-                    sat.desc.toUpperCase().indexOf(searchString) !== -1
-                ) {
-                    results.push({
-                        strIndex: sat.desc.indexOf(searchString),
-                        isMissile: true,
-                        patlen: len,
-                        satId: i,
-                    });
-                    continue; // Prevent's duplicate results
-                } else {
-                    continue; // Last check for missiles
-                }
-
-                if (sat.SCC_NUM.indexOf(searchString) !== -1) {
-                    results.push({
-                        strIndex: sat.SCC_NUM.indexOf(searchString),
-                        isSCC_NUM: true,
-                        patlen: len,
-                        satId: i,
-                    });
-                    continue; // Prevent's duplicate results
-                }
-
-                if (sat.intlDes.indexOf(searchString) !== -1) {
-                    results.push({
-                        strIndex: sat.intlDes.indexOf(searchString),
-                        isIntlDes: true,
-                        patlen: len,
-                        satId: i,
-                    });
-                    continue; // Prevent's duplicate results
-                }
-
-                if (sat.LV.toUpperCase().indexOf(searchString) !== -1) {
-                    results.push({
-                        strIndex: sat.LV.indexOf(searchString),
-                        isLV: true,
-                        patlen: len,
-                        satId: i,
-                    });
-                    continue; // Prevent's duplicate results
-                }
-
-                // At this point the item didn't match our search
-            }
-        }
-
-        // Removing this can result in a heavy performance lag
-        if (results.length > settingsManager.searchLimit) {
-            results.length = settingsManager.searchLimit;
-        }
-
-        // Make a group to hilight results
-        var idList = [];
-        for (i = 0; i < results.length; i++) {
-            idList.push(results[i].satId);
-        }
-
-        settingsManager.lastSearchResults = idList;
-
-        satSet.setupStarBuffer();
-
-        var dispGroup = new groups.SatGroup('idList', idList);
-        lastResultGroup = dispGroup;
-        selectSat(-1);
-        if (settingsManager.isSatOverflyModeOn) {
-            satCruncher.postMessage({
-                satelliteSelected: idList,
-            });
-        }
-        groups.selectGroup(dispGroup);
-
-        // Don't let the search overlap with the legend
-        uiManager.legendMenuChange('clear');
-
-        if (!isPreventDropDown) {
-            searchBox.fillResultBox(results);
-        }
-
-        uiManager.updateURL();
-        settingsManager.themes.retheme();
-    };
-
-    searchBox.fillResultBox = function (results) {
-        var resultBox = $('#search-results');
-        var html = '';
-        for (var i = 0; i < results.length; i++) {
-            var sat = satData[results[i].satId];
-            html += '<div class="search-result" data-sat-id="' + sat.id + '">';
-            html += '<div class="truncate-search">';
-            if (sat.missile) {
-                html += sat.ON;
-            } else if (results[i].isON) {
-                // If the name matched - highlight it
-                html += sat.ON.substring(0, results[i].strIndex);
-                html += '<span class="search-hilight">';
-                html += sat.ON.substring(
-                    results[i].strIndex,
-                    results[i].strIndex + results[i].patlen
-                );
-                html += '</span>';
-                html += sat.ON.substring(
-                    results[i].strIndex + results[i].patlen
-                );
-            } else {
-                // If not, just write the name
-                html += sat.ON;
-            }
-            html += '</div>';
-            html += '<div class="search-result-scc">';
-            if (sat.missile) {
-                html += sat.desc;
-            } else if (results[i].isSCC_NUM) {
-                // If the object number matched
-                results[i].strIndex = results[i].strIndex || 0;
-                results[i].patlen = results[i].patlen || 5;
-
-                html += sat.SCC_NUM.substring(0, results[i].strIndex);
-                html += '<span class="search-hilight">';
-                html += sat.SCC_NUM.substring(
-                    results[i].strIndex,
-                    results[i].strIndex + results[i].patlen
-                );
-                html += '</span>';
-                html += sat.SCC_NUM.substring(
-                    results[i].strIndex + results[i].patlen
-                );
-            } else if (results[i].isIntlDes) {
-                // If the international designator matched
-                results[i].strIndex = results[i].strIndex || 0;
-                results[i].patlen = results[i].patlen || 5;
-
-                html += sat.intlDes.substring(0, results[i].strIndex);
-                html += '<span class="search-hilight">';
-                html += sat.intlDes.substring(
-                    results[i].strIndex,
-                    results[i].strIndex + results[i].patlen
-                );
-                html += '</span>';
-                html += sat.intlDes.substring(
-                    results[i].strIndex + results[i].patlen
-                );
-            } else {
-                // Don't Write the lift vehicle - maybe it should?
-                html += sat.SCC_NUM;
-            }
-            html += '</div></div>';
-        }
-        resultBox[0].innerHTML = html;
-        resultBox.slideDown();
-        settingsManager.themes.retheme();
-        resultsOpen = true;
-        satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-    };
-
-    searchBox.init = function (_satData) {
-        satData = _satData; // Copies satData to searchBox. Might be a more efficient way to access satData
-        $('#search-results').on('click', '.search-result', function (evt) {
-            var satId = $(this).data('sat-id');
-            selectSat(satId);
+      //
+      if (sat.ON.toUpperCase().indexOf(searchString) !== -1) {
+        results.push({
+          strIndex: sat.ON.indexOf(searchString),
+          isON: true,
+          patlen: len,
+          satId: i,
         });
+        continue; // Prevent's duplicate results
+      }
 
-        $('#search-results').on('mouseover', '.search-result', function (evt) {
-            var satId = $(this).data('sat-id');
-            orbitManager.setHoverOrbit(satId);
-            satSet.setHover(satId);
-
-            hovering = true;
-            hoverSatId = satId;
+      if (!sat.desc) {
+        // Do nothing there is no description property
+      } else if (sat.desc.toUpperCase().indexOf(searchString) !== -1) {
+        results.push({
+          strIndex: sat.desc.indexOf(searchString),
+          isMissile: true,
+          patlen: len,
+          satId: i,
         });
-        $('#search-results').on('mouseout', function () {
-            orbitManager.clearHoverOrbit();
-            satSet.setHover(-1);
-            hovering = false;
-        });
+        continue; // Prevent's duplicate results
+      } else {
+        continue; // Last check for missiles
+      }
 
-        $('#search').on('input', function () {
-            var searchStr = $('#search').val();
-            searchBox.doSearch(searchStr);
+      if (sat.SCC_NUM.indexOf(searchString) !== -1) {
+        results.push({
+          strIndex: sat.SCC_NUM.indexOf(searchString),
+          // eslint-disable-next-line camelcase
+          isSCC_NUM: true,
+          patlen: len,
+          satId: i,
         });
+        continue; // Prevent's duplicate results
+      }
 
-        $('#all-objects-link').on('click', function () {
-            if (objectManager.selectedSat === -1) {
-                return;
-            }
-            var intldes = satSet.getSatExtraOnly(objectManager.selectedSat)
-                .intlDes;
-            var searchStr = intldes.slice(0, 8);
-            searchBox.doSearch(searchStr);
-            $('#search').val(searchStr);
+      if (sat.intlDes.indexOf(searchString) !== -1) {
+        results.push({
+          strIndex: sat.intlDes.indexOf(searchString),
+          isIntlDes: true,
+          patlen: len,
+          satId: i,
         });
-        $('#near-orbits-link').on('click', () => {
-          searchBox.doArraySearch(
-            satellite.findNearbyObjectsByOrbit(
-              satSet.getSat(objectManager.selectedSat)
-            )
-          );
+        continue; // Prevent's duplicate results
+      }
+
+      if (sat.LV.toUpperCase().indexOf(searchString) !== -1) {
+        results.push({
+          strIndex: sat.LV.indexOf(searchString),
+          isLV: true,
+          patlen: len,
+          satId: i,
         });
-        $('#near-objects-link').on('click', function () {
-            if (objectManager.selectedSat === -1) {
-                return;
-            }
-            var sat = objectManager.selectedSat;
-            var SCCs = [];
-            var pos = satSet.getSatPosOnly(sat).position;
-            var posXmin = pos.x - 100;
-            var posXmax = pos.x + 100;
-            var posYmin = pos.y - 100;
-            var posYmax = pos.y + 100;
-            var posZmin = pos.z - 100;
-            var posZmax = pos.z + 100;
-            $('#search').val('');
-            for (var i = 0; i < satSet.numSats; i++) {
-                pos = satSet.getSatPosOnly(i).position;
-                if (
-                    pos.x < posXmax &&
-                    pos.x > posXmin &&
-                    pos.y < posYmax &&
-                    pos.y > posYmin &&
-                    pos.z < posZmax &&
-                    pos.z > posZmin
-                ) {
-                    SCCs.push(satSet.getSatExtraOnly(i).SCC_NUM);
-                }
-            }
+        continue; // Prevent's duplicate results
+      }
 
-            for (i = 0; i < SCCs.length; i++) {
-                if (i < SCCs.length - 1) {
-                    $('#search').val($('#search').val() + SCCs[i] + ',');
-                } else {
-                    $('#search').val($('#search').val() + SCCs[i]);
-                }
-            }
+      // At this point the item didn't match our search
+    }
+  }
 
-            searchBox.doSearch($('#search').val());
-        });
-    };
+  // Removing this can result in a heavy performance lag
+  if (results.length > settingsManager.searchLimit) {
+    results.length = settingsManager.searchLimit;
+  }
 
-    window.searchBox = searchBox;
-})();
+  // Make a group to hilight results
+  var idList = [];
+  for (i = 0; i < results.length; i++) {
+    idList.push(results[i].satId);
+  }
+
+  settingsManager.lastSearchResults = idList;
+
+  satSet.setupStarBuffer();
+
+  var dispGroup = new groups.SatGroup('idList', idList);
+  lastResultGroup = dispGroup;
+  groups.selectGroup(dispGroup);
+
+  if (!isPreventDropDown) {
+    searchBox.fillResultBox(results);
+  }
+
+  settingsManager.themes.retheme();
+  return idList;
+};
+
+searchBox.fillResultBox = function (results) {
+  var resultBox = $('#search-results');
+  var html = '';
+  for (var i = 0; i < results.length; i++) {
+    var sat = satData[results[i].satId];
+    html += '<div class="search-result" data-sat-id="' + sat.id + '">';
+    html += '<div class="truncate-search">';
+    if (sat.missile) {
+      html += sat.ON;
+    } else if (results[i].isON) {
+      // If the name matched - highlight it
+      html += sat.ON.substring(0, results[i].strIndex);
+      html += '<span class="search-hilight">';
+      html += sat.ON.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
+      html += '</span>';
+      html += sat.ON.substring(results[i].strIndex + results[i].patlen);
+    } else {
+      // If not, just write the name
+      html += sat.ON;
+    }
+    html += '</div>';
+    html += '<div class="search-result-scc">';
+    if (sat.missile) {
+      html += sat.desc;
+    } else if (results[i].isSCC_NUM) {
+      // If the object number matched
+      results[i].strIndex = results[i].strIndex || 0;
+      results[i].patlen = results[i].patlen || 5;
+
+      html += sat.SCC_NUM.substring(0, results[i].strIndex);
+      html += '<span class="search-hilight">';
+      html += sat.SCC_NUM.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
+      html += '</span>';
+      html += sat.SCC_NUM.substring(results[i].strIndex + results[i].patlen);
+    } else if (results[i].isIntlDes) {
+      // If the international designator matched
+      results[i].strIndex = results[i].strIndex || 0;
+      results[i].patlen = results[i].patlen || 5;
+
+      html += sat.intlDes.substring(0, results[i].strIndex);
+      html += '<span class="search-hilight">';
+      html += sat.intlDes.substring(results[i].strIndex, results[i].strIndex + results[i].patlen);
+      html += '</span>';
+      html += sat.intlDes.substring(results[i].strIndex + results[i].patlen);
+    } else {
+      // Don't Write the lift vehicle - maybe it should?
+      html += sat.SCC_NUM;
+    }
+    html += '</div></div>';
+  }
+  resultBox[0].innerHTML = html;
+  resultBox.slideDown();
+  settingsManager.themes.retheme();
+  resultsOpen = true;
+  satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+};
+
+searchBox.init = function (_satData) {
+  satData = _satData; // Copies satData to searchBox. Might be a more efficient way to access satData
+};
+
+export { searchBox };

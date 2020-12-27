@@ -3,7 +3,7 @@
  * Copyright (c) 2016 Trent Richardson; Licensed MIT */
 !(function (a) {
     'function' == typeof define && define.amd
-        ? define(['jquery', 'jquery-ui'], a)
+        ? define(['jquery', 'jquery-ui-bundle'], a)
         : a(jQuery);
 })(function ($) {
     if ((($.ui.timepicker = $.ui.timepicker || {}), !$.ui.timepicker.version)) {

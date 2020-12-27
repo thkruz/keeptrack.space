@@ -11,18 +11,14 @@ package-lock.json
 src/social
 src/social/*
 
-src/ml
-src/ml/*
-
-src/admin/*
-src/analysis/*
+src/admin
+src/analysis
 src/tle/2006*
 src/tle/TLE.json.bak
 src/tle/mw*
 src/tle/retr*
 src/tle/trus*
 src/tle/TLEAltNemo*
-
-"src/images/old icons"
+dist
 
 .vscode

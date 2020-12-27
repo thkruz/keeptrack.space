@@ -2,7 +2,8 @@
 // To record canvas effitiently using MediaRecorder
 // https://webrtc.github.io/samples/src/content/capture/canvas-record/
 
-function CanvasRecorder(canvas, video_bits_per_sec) {
+export class CanvasRecorder { 
+    constructor (canvas, videoBitsPerSec) {
     this.start = startRecording;
     this.stop = stopRecording;
     this.save = download;
@@ -20,7 +21,7 @@ function CanvasRecorder(canvas, video_bits_per_sec) {
     const video = document.createElement('video');
     video.style.display = 'none';
 
-    function startCapture(displayMediaOptions) {
+    var startCapture = (displayMediaOptions) => {
         let captureStream = null;
 
         if (window.location.protocol === 'https:' || settingsManager.offline) {
@@ -66,7 +67,7 @@ function CanvasRecorder(canvas, video_bits_per_sec) {
         }
     }
 
-    function startRecording() {
+    var startRecording = () => {
         let selectCapture = new Promise(function (resolve, reject) {
             resolve(startCapture());
         });
@@ -97,9 +98,9 @@ function CanvasRecorder(canvas, video_bits_per_sec) {
             }
             let options = {
                 mimeType: supportedType,
-                videoBitsPerSecond: video_bits_per_sec || 10000000, // 10.0Mbps
-                // videoBitsPerSecond: video_bits_per_sec || 5000000 // 5.0Mbps
-                // videoBitsPerSecond: video_bits_per_sec || 2500000 // 2.5Mbps
+                videoBitsPerSecond: videoBitsPerSec || 10000000, // 10.0Mbps
+                // videoBitsPerSecond: videoBitsPerSec || 5000000 // 5.0Mbps
+                // videoBitsPerSecond: videoBitsPerSec || 2500000 // 2.5Mbps
             };
 
             recordedBlobs = [];
@@ -126,37 +127,38 @@ function CanvasRecorder(canvas, video_bits_per_sec) {
         });
     }
 
-    function handleDataAvailable(event) {
+    var handleDataAvailable = (event) => {
         if (event.data && event.data.size > 0) {
             recordedBlobs.push(event.data);
         }
     }
 
-    function handleStop(event) {
+    var handleStop = (event) => {
         console.log('Recorder stopped: ', event);
         const superBuffer = new Blob(recordedBlobs, { type: supportedType });
         video.src = window.URL.createObjectURL(superBuffer);
     }
 
-    function stopRecording() {
+    var stopRecording = () => {
         mediaRecorder.stop();
         console.log('Recorded Blobs: ', recordedBlobs);
         video.controls = true;
     }
 
-    function download(file_name) {
-        const name = file_name || 'recording.webm';
+    var download = (fileName) => {
+        const name = fileName || 'recording.webm';
         const blob = new Blob(recordedBlobs, { type: supportedType });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = name;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }, 100);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = name;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 100);
+        }
     }
 }

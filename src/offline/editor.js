@@ -210,7 +210,7 @@ $(document).ready(function () {
                 satelliteList[i] = satellite;
             }
             var variable =
-                'var satelliteList = ' + JSON.stringify(satelliteList) + ';';
+                'var satelliteList = ' + JSON.stringify(satelliteList) + '; export { satelliteList };';
             var blob = new Blob([variable], { type: 'octet/stream' });
             saveAs(blob, 'extra.js');
         };
@@ -248,7 +248,7 @@ $(document).ready(function () {
                 satelliteList[i] = satellite;
             }
             var variable =
-                'var satelliteList = ' + JSON.stringify(satelliteList) + ';';
+                'var satelliteList = ' + JSON.stringify(satelliteList) + '; export { satelliteList };';
             var blob = new Blob([variable], { type: 'octet/stream' });
             saveAs(blob, 'extra.js');
         };

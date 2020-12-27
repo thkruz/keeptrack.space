@@ -20,7 +20,7 @@
     font-family: 'Open Sans';
     font-style: normal;
     font-weight: 400;
-    src: url('fonts/droid-sans-v6-latin-regular.eot'); /* IE9 Compat Modes */
+    src: url('fonts/droid/droid-sans-v6-latin-regular.eot'); /* IE9 Compat Modes */
     src: local('Open Sans'), local('DroidSans'),
         url('fonts/droid/droid-sans-v6-latin-regular.eot?#iefix')
             format('embedded-opentype'),

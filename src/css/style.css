@@ -51,14 +51,6 @@ html body {
     z-index: 3;
 }
 
-#footer-toggle-wrapper {
-    width: 100%;
-    bottom: 50px;
-    height: 0px;
-    z-index: 1;
-    position: absolute;
-}
-
 #nav-footer-toggle {
     display: block;
     border-top-left-radius: 12px;
@@ -74,23 +66,8 @@ html body {
     font-weight: bold;
 }
 
-.footer-slide-down {
-    transition: 1s;
-    bottom: -50px !important;
-}
-
-.footer-slide-up {
-    transition: 1s;
-    bottom: 0px !important;
-}
-
 footer {
-    margin-top: -100px;
-    position: absolute;
     padding-top: 5px !important;
-    bottom: 0px;
-    height: 50px;
-    width: 100%;
 }
 
 ul {
@@ -742,7 +719,7 @@ input[type='checkbox'].css-checkbox:checked + label.css-label {
 }
 
 label.css-label {
-    background-image: url(/images/csscheckbox-sm.png);
+    /* background-image: url(/images/csscheckbox-sm.png); */
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -945,7 +922,6 @@ input:focus {
     font-family: 'Roboto Mono', monospace;
     font-size: 20px;
     padding: 0px 0px 0px 5px;
-    font-size: 20px;
     width: 100px;
     overflow: hidden;
     top: 0px;

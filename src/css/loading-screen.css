@@ -1,4 +1,5 @@
 body {
+    overflow: hidden;
     font-family: 'Open Sans', sans-serif;
     color: white;
     background: #172635;

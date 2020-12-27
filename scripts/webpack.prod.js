@@ -1,5 +1,4 @@
 /* eslint-disable */
-
 var webpack = require("webpack");
 
 let config = {  
@@ -26,7 +25,8 @@ let config = {
   plugins: [
     new webpack.ProvidePlugin({
       $: "jquery",
-      jQuery: "jquery"
+      jQuery: "jquery",
+      'windows.jQuery': 'jquery'
     })
   ],
   optimization: {
@@ -54,6 +54,11 @@ var jsConfig = Object.assign({}, config,{
     'checker-script': [
       './src/js/checker-script.js',
     ],
+  },
+  resolve: {
+    alias: {
+      '@app': __dirname + '/../src'
+    }
   },
   output: {
     filename: '[name].js',

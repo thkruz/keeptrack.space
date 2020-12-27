@@ -9,7 +9,7 @@ var options = {
     directory: "./dist/radarData/",
 }
  
-urls.forEach(url => {
+urls.forEach((url) => {
     download(url, options, function(err) {
         if (err) {
             console.error(err);            

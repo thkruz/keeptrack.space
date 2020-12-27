@@ -31,10 +31,11 @@
     "jest": {
         "transform": {
             "^.+\\.[t|j]sx?$": "babel-jest"
-        },
+        },        
         "moduleNameMapper": {
             "\\.(css|less|sass|scss)$": "<rootDir>/scripts/styleMock.js",
-            "\\.(gif|ttf|eot|svg)$": "<rootDir>/scripts/fileMock.js"
+            "\\.(gif|ttf|eot|svg)$": "<rootDir>/scripts/fileMock.js",
+            "@app(.*)$": "<rootDir>/src/$1"
         }
     },
     "prettier": {

@@ -1,4 +1,4 @@
-name: Test site for publicly known js vulnerabilities
+name: JS Vulnerabilities Test
 
 on: push
 jobs:

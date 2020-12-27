@@ -30,11 +30,11 @@
 import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
-import { dlManager, gl } from '@app/js/main.js';
 import { helpers, mathValue, saveCsv } from '@app/js/helpers.js';
 import { ColorScheme } from '@app/js/color-scheme.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { cameraManager } from '@app/js/cameraManager.js';
+import { gl } from '@app/js/main.js';
 import { groups } from '@app/js/groups.js';
 import { jsTLEfile } from '@app/offline/tle.js';
 import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
@@ -1425,20 +1425,21 @@ satSet.draw = (pMatrix, camMatrix) => {
   // gl.bindVertexArray(satSet.vao);
 
   drawDivisor = Math.max(timeManager.propRate, 0.001);
-  dlManager.setDrawDt(Math.min(dlManager.dt / 1000.0, 1.0 / drawDivisor));
+  timeManager.setDrawDt(Math.min(timeManager.dt / 1000.0, 1.0 / drawDivisor));
   // Skip Velocity Math if FPS is hurting
-  if (dlManager.fps > settingsManager.fpsThrottle2) {
-    dlManager.setDrawDt(dlManager.drawDt * timeManager.propRate); // Adjust drawDt correspond to the propagation rate
+  // 1000 / dt = fps
+  if (1000 / timeManager.dt > settingsManager.fpsThrottle2) {
+    timeManager.setDrawDt(timeManager.drawDt * timeManager.propRate); // Adjust drawDt correspond to the propagation rate
     satSet.satDataLenInDraw = satData.length;
-    if (!settingsManager.lowPerf && dlManager.drawDt > settingsManager.minimumDrawDt) {
+    if (!settingsManager.lowPerf && timeManager.drawDt > settingsManager.minimumDrawDt) {
       satSet.satDataLenInDraw -= settingsManager.maxFieldOfViewMarkers + settingsManager.maxRadarData;
       satSet.satDataLenInDraw3 = satSet.satDataLenInDraw * 3;
       satSet.orbitalSats3 = satSet.orbitalSats * 3;
       for (drawI = 0; drawI < satSet.satDataLenInDraw3; drawI++) {
         if (drawI > satSet.orbitalSats3) {
-          satPos[drawI] += satVel[drawI] * dlManager.drawDt;
+          satPos[drawI] += satVel[drawI] * timeManager.drawDt;
         } else {
-          satPos[drawI] += satVel[drawI] * dlManager.drawDt;
+          satPos[drawI] += satVel[drawI] * timeManager.drawDt;
         }
       }
     }

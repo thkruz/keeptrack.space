@@ -59,6 +59,12 @@ mobile.checkMobileMode = function () {
   }
 };
 
+// Reinitialize the canvas on mobile rotation
+window.addEventListener('orientationchange', function () {
+  // console.log('rotate');
+  mobile.isRotationEvent = true;
+});
+
 mobile.checkIfMobileDevice = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu.test(navigator.userAgent);
 
 // mobile.start = function () {

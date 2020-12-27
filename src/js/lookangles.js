@@ -2321,6 +2321,37 @@ satellite.map = (sat, i) => {
   return propagate(propTempOffset, satrec); // Update the table with looks for this 5 second chunk and then increase table counter by 1
 };
 
+satellite.calculateSensorPos = (sensor) => {
+  sensor = sensor || sensorManager.currentSensor;
+  if (typeof sensor == 'undefined') return;
+  var now = timeManager.propTime();
+  var jday = (year, mon, day, hr, minute, sec) => 367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor((275 * mon) / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0; //  ut in days
+  var j = jday(
+    now.getUTCFullYear(),
+    now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+    now.getUTCDate(),
+    now.getUTCHours(),
+    now.getUTCMinutes(),
+    now.getUTCSeconds()
+  );
+  j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+  var gmst = satellite.gstime(j);
+
+  var cosLat = Math.cos(sensor.lat * mathValue.DEG2RAD);
+  var sinLat = Math.sin(sensor.lat * mathValue.DEG2RAD);
+  var cosLon = Math.cos(sensor.long * mathValue.DEG2RAD + gmst);
+  var sinLon = Math.sin(sensor.long * mathValue.DEG2RAD + gmst);
+
+  let pos = {};
+  pos.x = (mathValue.RADIUS_OF_EARTH + mathValue.PLANETARIUM_DIST) * cosLat * cosLon;
+  pos.y = (mathValue.RADIUS_OF_EARTH + mathValue.PLANETARIUM_DIST) * cosLat * sinLon;
+  pos.z = (mathValue.RADIUS_OF_EARTH + mathValue.PLANETARIUM_DIST) * sinLat;
+  pos.gmst = gmst;
+  pos.lat = sensor.lat;
+  pos.long = sensor.long;
+  return pos;
+};
+
 // function _Nearest180(arr) {
 //     let maxDiff = null;
 //     for (let x = 0; x < arr.length; x++) {

@@ -16,6 +16,8 @@ src/textures/*10k*.jpg
 src/textures/*16k*.jpg
 src/textures/*32k*.jpg
 
+src/radarData/radar*
+
 src/admin
 src/analysis
 src/tle/2006*

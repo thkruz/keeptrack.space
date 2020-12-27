@@ -1,16 +1,26 @@
 import download from 'download-file';
  
-var url = "https://www.keeptrack.space/TLE.json"
+var urls = [
+    "https://www.keeptrack.space/textures/earthbump8k.jpg",
+    "https://www.keeptrack.space/textures/earthbump10k.jpg",
+    "https://www.keeptrack.space/textures/earthlights8k.jpg",
+    "https://www.keeptrack.space/textures/earthlights10k.jpg",
+    "https://www.keeptrack.space/textures/earthmap8k.jpg",
+    "https://www.keeptrack.space/textures/earthmap10k.jpg",
+    "https://www.keeptrack.space/textures/earthspec8k.jpg",
+    "https://www.keeptrack.space/textures/earthspec10k.jpg"
+];
  
 var options = {
-    directory: "./src/",
-    filename: "TLE.json"
+    directory: "./dist/textures/",
 }
  
-download(url, options, function(err) {
-    if (err) {
-        console.error(err);
-        return;
-    }
-    console.log("TLE.json Updated from KeepTrack.space")
+urls.forEach(url => {
+    download(url, options, function(err) {
+        if (err) {
+            console.error(err);            
+        } else {
+            console.log(`${url} downloaded from KeepTrack.space`);
+        }
+    });
 });

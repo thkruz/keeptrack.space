@@ -20,6 +20,7 @@
     "scripts": {
         "test": "jest",
         "updateTle": "node ./scripts/updateTle.mjs",
+        "updateTextures": "node ./scripts/updateTextures.mjs",
         "updateSocrates": "node ./scripts/updateSocrates.mjs",
         "stage": "node ./scripts/prebuild.mjs",
         "build": "node --no-deprecation node_modules/webpack/bin/webpack.jscl --config ./scripts/webpack.prod.js",

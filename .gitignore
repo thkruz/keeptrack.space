@@ -13,6 +13,8 @@ src/social/*
 
 src/textures/*8k*.jpg
 src/textures/*10k*.jpg
+src/textures/*16k*.jpg
+src/textures/*32k*.jpg
 
 src/admin
 src/analysis

@@ -4,6 +4,7 @@
 
 import { controlSiteManager } from '@app/modules/controlSiteManager.js';
 import { lineManager } from '@app/js/sceneManager/line.js';
+import { mathValue } from '@app/js/helpers.js';
 import { satSet } from '@app/js/satSet.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
 
@@ -150,7 +151,7 @@ satLinkManager.showLinks = async function (group) {
               window.numeric.dot([-sat1.position.x, -sat1.position.y, -sat1.position.z], [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z]) /
                 (Math.sqrt(Math.pow(-sat1.position.x, 2) + Math.pow(-sat1.position.y, 2) + Math.pow(-sat1.position.z, 2)) *
                   Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2)))
-            ) * RAD2DEG;
+            ) * mathValue.RAD2DEG;
           if (theta < minTheta) {
             // Intentional
           } else {
@@ -165,7 +166,7 @@ satLinkManager.showLinks = async function (group) {
       var bestRange = 1000000;
       for (let j = 0; j < satlist.length; j++) {
         var sat = satSet.getSat(satlist[j]);
-        var tearr = sat.getTEARR(void 0, user);
+        var tearr = sat.getTEARR(null, user);
         if (tearr.elevation > elevationMask) {
           if (tearr.range < bestRange) bestSat = sat;
         }
@@ -189,7 +190,7 @@ satLinkManager.showLinks = async function (group) {
         // Calculate Time, Elevation, Azimuth, Range, and Range Rate data
         // of the current satellite relevant to the current user. This allows
         // us to figure out if the user can see the satellite
-        let tearr = sat.getTEARR(void 0, user);
+        let tearr = sat.getTEARR(null, user);
 
         // Only draw the line between the user and the satellite if the
         // elevation angle is greater than the elevation mask. This simulates

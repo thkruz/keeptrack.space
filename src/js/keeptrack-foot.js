@@ -39,7 +39,7 @@ if (settingsManager.enableHoverOverlay) {
 if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
   async () => {
     const { default: satSet } = await import('@app/js/satSet.js');
-    const { default: ColorScheme } = await import('@app/js/ColorScheme.js');
+    const { default: ColorScheme } = await import('@app/js/color-scheme.js');
     const { default: orbitManager } = await import('@app/js/orbitManager.js');
 
     if (document.getElementById('keeptrack-canvas').tagName !== 'CANVAS') {

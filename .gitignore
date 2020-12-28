@@ -1,25 +1,73 @@
-node_modules/
-node_modules
+### Git ###
+# Created by git for backups. To disable backups in Git:
+# $ git config --global mergetool.keepBackup false
 .gitattributes
-src/.htaccess
-.notes.js
-classfd.tle
-.jshintrc
-.prettierignore
+*.orig
+
+# Created by git when using merge tools for conflicts
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+*_BACKUP_*.txt
+*_BASE_*.txt
+*_LOCAL_*.txt
+*_REMOTE_*.txt
+
+### Node ###
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Package Lock
 package-lock.json
 
+# Optional eslint cache
+.eslintcache
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+### vscode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Prettier
+.prettierignore
+
+
+# Large Production Files
 src/social
 src/social/*
-
 src/textures/*8k*.jpg
 src/textures/*10k*.jpg
 src/textures/*16k*.jpg
 src/textures/*32k*.jpg
-
 src/radarData/radar*
-
-coverage/
-
 src/admin
 src/analysis
 src/tle/2006*
@@ -28,6 +76,12 @@ src/tle/mw*
 src/tle/retr*
 src/tle/trus*
 src/tle/TLEAltNemo*
-dist
+src/.htaccess
+.notes.js
+classfd.tle
 
-.vscode
+# Jest Coverage
+coverage/
+
+# Build Folder
+dist

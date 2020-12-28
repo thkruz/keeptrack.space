@@ -5,7 +5,6 @@ import * as $ from 'jquery';
 import { satCruncher, satSet } from '@app/js/satSet.js';
 import { SunCalc } from '@app/js/lib/suncalc.js';
 import { adviceList } from '@app/js/advice-module.js';
-import { cameraManager } from '@app/js/cameraManager.js';
 import { mathValue } from '@app/js/helpers.js';
 import { objectManager } from '@app/js/objectManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
@@ -23,7 +22,7 @@ selectSatManager.init = (groupColorScheme) => {
   selectSatManager.groupColorScheme = groupColorScheme;
 };
 
-selectSatManager.selectSat = (satId) => {
+selectSatManager.selectSat = (satId, cameraManager) => {
   var sat;
   if (satId !== -1) {
     cameraManager.rotateEarth(false);
@@ -32,7 +31,7 @@ selectSatManager.selectSat = (satId) => {
     if ((sat.active == false || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') return; // Non-Missile Non-Sensor Object
   }
   satSet.selectSat(satId);
-  cameraManager.setCamSnapMode(false);
+  cameraManager.camSnapMode = false;
 
   if (satId === -1) {
     if (settingsManager.currentColorScheme === selectSatManager.groupColorScheme || $('#search').val().length >= 3) {
@@ -122,8 +121,8 @@ selectSatManager.selectSat = (satId) => {
       }
       return;
     }
-    cameraManager.camZoomSnappedOnSat(true);
-    cameraManager.camAngleSnappedOnSat(true);
+    cameraManager.camZoomSnappedOnSat = true;
+    cameraManager.camAngleSnappedOnSat = true;
 
     if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
       $('#menu-lookangles').removeClass('bmenu-item-disabled');

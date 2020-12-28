@@ -2,7 +2,6 @@
 /* eslint-disable no-useless-escape */
 
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { camPitch } from '@app/js/cameraManager.js';
 import { earth } from '@app/js/sceneManager/earth.js';
 import { gl } from '@app/js/main.js';
 import { mathValue } from '@app/js/helpers.js';
@@ -151,7 +150,7 @@ atmosphere.init = function () {
   atmosphere.loaded = true;
 };
 
-atmosphere.update = () => {
+atmosphere.update = (camPitch) => {
   // This should be called in sun before everyone else gets updated
   // sun.currentDirection();
 

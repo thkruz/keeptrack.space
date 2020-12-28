@@ -22,17 +22,18 @@
     "access": "public"
   },
   "scripts": {
-    "test-nocov": "jest",
+    "build": "node --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.prod.js",
+    "build-dev": "node --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.dev.js",
+    "getExtras": "npm run updateTle && npm run updateTextures && npm run updateRadarData && npm run updateSocrates",
+    "gpr": "node ./scripts/gpr.js",
+    "stage": "node ./scripts/prebuild.mjs",
     "test": "jest --coverage --coverageReporters text",
     "test-html": "jest --coverage --coverageReporters html",
+    "test-nocov": "jest",
     "updateTle": "node ./scripts/updateTle.mjs",
-    "updateTextures": "node ./scripts/updateTextures.mjs",
     "updateRadarData": "node ./scripts/updateRadarData.mjs",
     "updateSocrates": "node ./scripts/updateSocrates.mjs",
-    "getExtras": "npm run updateTle && npm run updateTextures && npm run updateRadarData && npm run updateSocrates",
-    "stage": "node ./scripts/prebuild.mjs",
-    "build": "node --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.prod.js",
-    "build-dev": "node --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.dev.js"
+    "updateTextures": "node ./scripts/updateTextures.mjs"
   },
   "jest": {
     "transform": {

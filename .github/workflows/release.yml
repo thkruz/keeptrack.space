@@ -20,8 +20,7 @@ jobs:
 
   publish-npm:
     name: Publish on NPM
-    runs-on: ubuntu-latest
-    needs: docs
+    runs-on: ubuntu-latest    
 
     steps:
       - uses: actions/checkout@v2
@@ -38,8 +37,7 @@ jobs:
 
   publish-gpr:
     name: Publish on GPR
-    runs-on: ubuntu-latest
-    needs: docs
+    runs-on: ubuntu-latest    
 
     steps:
       - uses: actions/checkout@v2

@@ -1,0 +1,12 @@
+version = 1
+
+test_patterns = ["*.test.js"]
+
+exclude_patterns = ["*/js/lib/*"]
+
+[[analyzers]]
+name = "javascript"
+enabled = true
+
+  [analyzers.meta]
+  environment = ["jquery"]

@@ -719,7 +719,7 @@ input[type='checkbox'].css-checkbox:checked + label.css-label {
 }
 
 label.css-label {
-    /* background-image: url(/images/csscheckbox-sm.png); */
+    /* background-image: url(/img/csscheckbox-sm.png); */
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;

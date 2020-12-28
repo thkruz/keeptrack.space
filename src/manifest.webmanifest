@@ -4,18 +4,18 @@
   "description": "3D Satellite Toolkit",
   "icons": [
     {
-      "src": "./images/logo512.png",
+      "src": "./img/logo512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
     },
     {
-      "src": "./images/logo192.png",
+      "src": "./img/logo192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "./images/logo128.png",
+      "src": "./img/logo128.png",
       "type": "image/png",
       "sizes": "128x128"
     }

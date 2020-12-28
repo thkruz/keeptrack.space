@@ -1,30 +1,79 @@
-# keeptrack.space
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=for-the-badge)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/thkruz/keeptrack.space?style=for-the-badge)
-![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=for-the-badge)
-![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=for-the-badge)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/thkruz/keeptrack.space/Test%20site%20for%20publicly%20known%20js%20vulnerabilities?label=vulnerabilities&style=for-the-badge)
-![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=for-the-badge)
-## Description
-KeepTrack originally was meant to provide simple orbital analysis tools. Since then those simple tools have evolved into complex tools that bring functionality usually only found in expensive toolkits to the average user. The ultimate goal of the project is to make learning about orbital mechanics and satellite operations accessible to everyone without a paywall.
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=flat-square) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/thkruz/keeptrack.space?style=flat-square) ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=flat-square) ![Languages](https://img.shields.io/github/languages/count/thkruz/keeptrack.space?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=flat-square) ![Vulnerabilities](https://img.shields.io/github/workflow/status/thkruz/keeptrack.space/Test%20site%20for%20publicly%20known%20js%20vulnerabilities?label=vulnerabilities&style=flat-square) ![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=flat-square)
 
-The code has been rewrote multiple times and now barely resembles the original, but none of this would have been possible without [@jeyoder](https://github.com/jeyoder)'s original stuffin.space.
+<img src="./src/img/logo192.png" width=128 height=128 alt="KeepTrack.Space" align="right">
 
-## Live Demo
-The most recent commit is available here: https://thkruz.github.io/keeptrack.space/
+# KeepTrack.Space
+> Astrodyanmics Software for Non-Engineers
+
+KeepTrack aims to provide orbital analysis tools to the average user. By providing features that are usually only found in expensive toolkits, we make learning about orbital mechanics and satellite operations accessible to everyone.
+
+The code has been rewrote multiple times and now barely resembles the original, but none of this would have been possible without @jeyoder's original stuffin.space.
 
 ## Table of Contents
 - [Description](#Description)
 - [Installation](#Installation)
+- [Built With](#Built-With)
+- [Prerequisites](#Prerequisites)
+- [Setting up Dev](#Setting-up-Dev)
 - [Usage](#Usage)
+- [Versioning](#Versioning)
 - [How the Code Works](#How-the-Code-Works)
+- [Tests](#Tests)
 - [Contributors](#Contributors)
-- [License File](#License-File)
+- [Style Guide](#Style-Guide)
+- [License](#License)
 
 ## Installation
-The project is meant to be run from a webserver and is tested on an apache2 server. There are php scripts for generating TLE.json that are not included, but http://keeptrack.space/TLE.json can be referenced for an up-to-date catalog.
 
-To run this, simply drop the files into a webserver and then load index.htm in a browser. Development is done on the most up-to-date version of Chrome on Windows. Compatibility for Edge is periodically checked. Please report your browser/OS if you have problems to ensure it isn't a compatibility problem.
+A stable copy of the website is always availble at https://keeptrack.space.
+
+TODO: Get a github page setup with the most-current development version here: https://thkruz.github.io/keeptrack.space/
+
+### Built With
+* [Webpack](https://webpack.js.org/)
+* [eslint](https://eslint.org/)
+* [jest](https://jestjs.io/)
+
+### Prerequisites
+As of version 3.0, KeepTrack.Space is built using ES6+ modules and assembled with Webpack. If you would like to install it you need to install [git](https://git-scm.com/) and [npm](https://www.npmjs.com/).
+
+### Setting up Dev
+
+Clone the github files. 
+
+```bash
+git clone https://github.com/thkruz/keeptrack.space
+```
+
+Switch into the directory.
+
+```bash
+cd ./keeptrack.space/
+```
+
+Have npm install all the dependencies (including the development ones). 
+
+```bash
+npm install
+```
+
+Copy all the static files into the ./dist directory. 
+
+```bash
+npm run stage
+```
+
+(Optional) Download optional high-res images and up-to-date catalog files from https://keeptrack.space. 
+
+```bash
+npm run getExtras
+```
+
+Have webpack package the source, but not compress it for easier reading.
+
+```bash
+npm run build-dev
+```
 
 ## Usage
 The main index.htm page loads a canvas element set to the size of the window that displays the earth, satellites, and stars. The UI is loaded in DOM elements on top of the canvas element. Two webworkers are loaded (satCruncher.js and orbit-calculation-worker.js) to handle constant calculation of satellite locations and updating orbit lines when an object is highlighted.
@@ -33,7 +82,18 @@ The main draw loop (main.js) has been optimized to reduce memory leaks and to ke
 
 Any modifications to a satellite require that information to be passed to the satCruncher webworker to ensure the UI calculations match the dot on the screen. Most calculations utilize a brute-force method of guess and check (lookangle times, missile trajectories, etc). Optimizing the loop for those calculations is criitcal to keeping the project responsive.
 
+The project is meant to be run from a webserver and is tested on an apache2 server. There are php scripts for generating TLE.json that are not included, but http://keeptrack.space/TLE.json can be referenced for an up-to-date catalog using:
+
+```bash
+npm run updateTle
+```
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning.
+
 ### How the Code Works
+*(As of 11/2020)*
 * index.htm - Controls the structure of the front-end and loads all the CSS and JS files.
 * main.js - Primary JS files that controls the draw loop.
 * objectManager.js - Used for extracting details from TLE.json and loading additional objects from other files.
@@ -56,12 +116,27 @@ Any modifications to a satellite require that information to be passed to the sa
 * starManager.js - Database of stars.
 * starManager-constellations.js - Add-on database of star constellations.
 
+## Tests
+
+Currently building tests in Jest that should cover 100% of the non-jquery functions. They can be run using:
+
+```bash
+npm run test
+```
+
+For testing the user interface we use [gremlins.js](https://github.com/marmelab/gremlins.js/). You can unleash the gremlins using db.gremlins() in your web browser's console. By default it runs for 1000 interactions or 10 errors.
+
+## Style Guide
+
+We use Prettier and ESLint to enforce consistent readable code. Please refer to our [CONTRIBUTING.md](https://github.com/thkruz/keeptrack.space/blob/master/CONTRIBUTING.md#code-style) for more info on styling.
+
 ## Contributors
 * [@cwang-pivotal](https://github.com/cwang-pivotal/)
 * [@hkruczek](https://github.com/hkruczek/)
 * [@Le-Roi777](https://github.com/Le-Roi777/)
 
 ## License
+
 Copyright (C) 2016-2020 Theodore Kruczek
 
 Copyright (C) 2020 Heather Kruczek
@@ -75,3 +150,5 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
+
+[Full License](https://github.com/thkruz/keeptrack.space/blob/master/LICENSE)

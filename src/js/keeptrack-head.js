@@ -1,8 +1,4 @@
 /**
- * @prettier
- */
-
-/*
 // /////////////////////////////////////////////////////////////////////////////
 
 Copyright (C) 2016-2020 Theodore Kruczek
@@ -17,6 +13,8 @@ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 // /////////////////////////////////////////////////////////////////////////////
+
+@format
 */
 
 /*global gremlins, randomizer*/
@@ -27,7 +25,7 @@ import { mathValue } from '@app/js/helpers.js';
 let settingsManager = {};
 {
   //  Version Control
-  settingsManager.versionNumber = '3.0.2';
+  settingsManager.versionNumber = '3.0.3';
   settingsManager.versionDate = 'December 27, 2020';
 
   // Install Folder Settings

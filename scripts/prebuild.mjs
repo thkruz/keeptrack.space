@@ -14,7 +14,7 @@ const dirs = [
   'admin',
   'css/fonts',
   'analysis',
-  'images',
+  'img',
   'licenses',
   'meshes',
   'offline',

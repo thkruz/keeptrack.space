@@ -41,8 +41,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
-      - run: npm config set //npm.pkg.github.com/:_authToken $TOKEN
+          registry-url: 'https://npm.pkg.github.com'
       - run: npm install
       - run: npm publish
         env:
-          TOKEN: ${{secrets.GITHUB_TOKEN}}
+          TOKEN: ${{secrets.GH_NPM_TOKEN}}

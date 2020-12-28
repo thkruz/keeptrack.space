@@ -20,4 +20,4 @@ jobs:
     - run: npm run stage
     - run: npm run build-dev
     - run: npm test
-    - run: node .\node_modules\codecov\bin\codecov
+    - run: node ./node_modules/.bin/codecov

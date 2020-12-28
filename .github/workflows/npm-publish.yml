@@ -17,8 +17,8 @@ jobs:
         with:
           node-version: 12
       - run: npm install
-      - run: npm test
-      - run: node .\node_modules\codecov\bin\codecov
+      - run: npm coverage
+      - run: node ./node_modules/.bin/codecov
 
   publish-npm:
     needs: build

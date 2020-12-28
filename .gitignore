@@ -62,10 +62,7 @@ package-lock.json
 # Large Production Files
 src/social
 src/social/*
-src/textures/*8k*.jpg
-src/textures/*10k*.jpg
-src/textures/*16k*.jpg
-src/textures/*32k*.jpg
+src/textures-extra
 src/radarData/radar*
 src/admin
 src/analysis

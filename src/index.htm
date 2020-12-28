@@ -4,14 +4,18 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ENHWK6L0X7"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-ENHWK6L0X7');
+      // No Gtag unless on the official page
+      if (location.hostname == 'www.keeptrack.space') {
+        import('https://www.googletagmanager.com/gtag/js?id=G-ENHWK6L0X7')
+        .then(() => {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+    
+          gtag('config', 'G-ENHWK6L0X7');
+        });
+      }
     </script>
 
     <meta charset="utf-8" />
@@ -80,7 +84,7 @@
                   document.write(
                       '<span id="logo-trusat"><img src="' +
                         window.settingsManager.installDirectory +
-                          'images/trusat.png"></span>'
+                          'img/trusat.png"></span>'
                   );
               }
           </script> -->
@@ -120,7 +124,7 @@
                   <a
                       id="share-icon"
                       class="top-menu-icons"                      
-                      ><img src="images/share-icon.png" alt=""
+                      ><img src="img/share-icon.png" alt=""
                   /></a>
 
                   <ul id="nav-mobile">
@@ -137,7 +141,7 @@
                           >
                       </li>
                       <!-- <li><a id="time-machine-btn" class="top-menu-btns">
-                        <div id="time-machine-icon" class="top-menu-icons"><img src="images/history.png"></div>
+                        <div id="time-machine-icon" class="top-menu-icons"><img src="img/history.png"></div>
                         </a>
                       </li> -->
                       <li>
@@ -175,14 +179,14 @@
                           <a id="legend-menu" class="top-menu-btns">
                               <!-- <span>Legend &#x25BC;</span> -->
                               <div id="legend-icon" class="top-menu-icons">
-                                  <img src="images/layers-icon.png" alt="" />
+                                  <img src="img/layers-icon.png" alt="" />
                               </div>
                           </a>
                       </li>
                       <li>
                           <a id="tutorial-btn" class="top-menu-btns">
                               <div id="tutorial-icon" class="top-menu-icons">
-                                  <img src="images/help.png" alt="" />
+                                  <img src="img/help.png" alt="" />
                               </div>
                           </a>
                       </li>
@@ -190,7 +194,7 @@
                           <a
                               id="fullscreen-icon"
                               class="top-menu-icons"
-                              ><img src="images/fullscreen-icon.png" alt=""
+                              ><img src="img/fullscreen-icon.png" alt=""
                           /></a>
                       </li>
                       <li>
@@ -1501,60 +1505,60 @@
               </div>
               <div id="twitter-menu" class="side-menu-parent start-hidden side-menu text-select"></div>
               <div id="map-menu" class="side-menu-parent start-hidden side-menu valign-wrapper">
-                <img id="map-image" data-src="images/braun-stereographic.jpg" class="lazyload" width="800px" height="600px">
-                <img id="map-sat" class="lazyload map-item map-look" data-src="images/satellite-2.png" width="20px" height="20px">
-                <img id="map-sensor" class="lazyload map-item map-look start-hidden" data-src="images/radar-1.png" width="20px"
+                <img id="map-image" data-src="img/braun-stereographic.jpg" class="lazyload" width="800px" height="600px">
+                <img id="map-sat" class="lazyload map-item map-look" data-src="img/satellite-2.png" width="20px" height="20px">
+                <img id="map-sensor" class="lazyload map-item map-look start-hidden" data-src="img/radar-1.png" width="20px"
                   height="20px">
-                <img id="map-look1" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look2" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look3" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look4" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look5" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look6" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look7" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look8" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look9" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look10" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look11" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look12" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look13" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look14" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look15" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look16" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look17" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look18" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look19" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look20" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look21" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look22" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look23" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look24" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look25" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look26" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look27" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look28" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look29" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look30" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look31" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look32" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look33" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look34" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look35" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look36" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look37" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look38" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look39" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look40" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look41" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look42" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look43" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look44" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look45" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look46" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look47" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look48" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look49" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
-                <img id="map-look50" class="lazyload map-item map-look" data-src="images/red-square.png" width="7px" height="7px">
+                <img id="map-look1" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look2" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look3" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look4" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look5" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look6" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look7" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look8" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look9" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look10" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look11" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look12" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look13" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look14" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look15" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look16" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look17" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look18" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look19" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look20" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look21" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look22" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look23" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look24" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look25" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look26" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look27" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look28" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look29" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look30" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look31" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look32" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look33" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look34" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look35" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look36" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look37" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look38" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look39" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look40" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look41" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look42" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look43" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look44" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look45" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look46" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look47" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look48" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look49" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
+                <img id="map-look50" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
                 <div id="braun-credit" style="position:fixed;right:10px;bottom:10px;z-index:5;color:#1f3347;">
                   Braun Stereographic Projection (c) Tobias Jung
                 </div>

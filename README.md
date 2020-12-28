@@ -41,27 +41,27 @@ As of version 3.0, KeepTrack.Space is built using ES6+ modules and assembled wit
 
 Clone the github files. 
 
-`git clone https://github.com/thkruz/keeptrack.space`
+```git clone https://github.com/thkruz/keeptrack.space```
 
 Switch into the directory.
 
-`cd ./keeptrack.space/`
+```cd ./keeptrack.space/```
 
 Have npm install all the dependencies (including the development ones). 
 
-`npm install`
+```npm install```
 
 Copy all the static files into the ./dist directory. 
 
-`npm run stage`
+```npm run stage```
 
-Download optional high-res images and up-to-date catalog files from https://keeptrack.space. 
+(Optional) Download optional high-res images and up-to-date catalog files from https://keeptrack.space. 
 
-`npm run getExtras (Optional)`
+```npm run getExtras```
 
 Have webpack package the source, but not compress it for easier reading.
 
-`npm run build-dev`
+```npm run build-dev```
 
 ## Usage
 The main index.htm page loads a canvas element set to the size of the window that displays the earth, satellites, and stars. The UI is loaded in DOM elements on top of the canvas element. Two webworkers are loaded (satCruncher.js and orbit-calculation-worker.js) to handle constant calculation of satellite locations and updating orbit lines when an object is highlighted.
@@ -72,7 +72,7 @@ Any modifications to a satellite require that information to be passed to the sa
 
 The project is meant to be run from a webserver and is tested on an apache2 server. There are php scripts for generating TLE.json that are not included, but http://keeptrack.space/TLE.json can be referenced for an up-to-date catalog using:
 
-`npm run updateTle`
+```npm run updateTle```
 
 ## Versioning
 
@@ -106,7 +106,7 @@ We use [SemVer](http://semver.org/) for versioning.
 
 Currently building tests in Jest that should cover 100% of the non-jquery functions. They can be run using:
 
-`npm run test`
+```npm run test```
 
 For testing the user interface we use [gremlins.js](https://github.com/marmelab/gremlins.js/). You can unleash the gremlins using db.gremlins() in your web browser's console. By default it runs for 1000 interactions or 10 errors.
 

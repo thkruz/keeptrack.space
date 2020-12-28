@@ -27,6 +27,7 @@
     "getExtras": "npm run updateTle && npm run updateTextures && npm run updateRadarData && npm run updateSocrates",
     "gpr": "node ./scripts/gpr.js",
     "stage": "node ./scripts/prebuild.mjs",
+    "coverage": "jest --coverage --coverageReporters lcov",
     "test": "jest --coverage --coverageReporters text",
     "test-html": "jest --coverage --coverageReporters html",
     "test-nocov": "jest",
@@ -69,6 +70,7 @@
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.12.1",
     "@babel/preset-env": "^7.12.11",
+    "codecov": "^3.8.1",
     "copy-dir": "^1.3.0",
     "css-loader": "^5.0.1",
     "download-file": "^0.1.5",

@@ -1767,9 +1767,6 @@ satellite.createManeuverAnalyst = (satId, incVariation, meanmoVariation, rascVar
   var currentEpoch = satellite.currentEpoch(timeManager.propTime());
   mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
 
-  // Todo: This should be part of a call from main
-  // cameraManager.setCamSnapMode(false);
-
   var TLEs;
   // Ignore argument of perigee for round orbits OPTIMIZE
   if (mainsat.apogee - mainsat.perigee < 300) {

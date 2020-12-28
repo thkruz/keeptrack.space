@@ -1,9 +1,9 @@
 <img src="./src/img/logo192.png" alt="KeepTrack.Space" align="right">
 
 # KeepTrack.Space
+> Astrodyanmics Software for Non-Engineers
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=flat-square)![GitHub release (latest by date)](https://img.shields.io/github/v/release/thkruz/keeptrack.space?style=flat-square)![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=flat-square)![Languages](https://img.shields.io/github/languages/count/thkruz/keeptrack.space?style=flat-square)![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=flat-square)![Vulnerabilities](https://img.shields.io/github/workflow/status/thkruz/keeptrack.space/Test%20site%20for%20publicly%20known%20js%20vulnerabilities?label=vulnerabilities&style=flat-square)
 ![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=flat-square)
-> Astrodyanmics Software for Non-Engineers
 
 KeepTrack aims to provide orbital analysis tools to the average user. By providing features that are usually only found in expensive toolkits, we make learning about orbital mechanics and satellite operations accessible to everyone.
 

@@ -32,7 +32,6 @@ import { helpers, mathValue, saveCsv } from '@app/js/helpers.js';
 import { ColorScheme } from '@app/js/color-scheme.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { gl } from '@app/js/main.js';
-import { groups } from '@app/js/groups.js';
 import { jsTLEfile } from '@app/offline/tle.js';
 import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
 import { objectManager } from '@app/js/objectManager.js';
@@ -392,19 +391,6 @@ satCruncher.onmessage = (m) => {
         }
       }
     })();
-    if (settingsManager.startWithOrbitsDisplayed) {
-      setTimeout(function () {
-        // Time Machine
-        // orbitManager.historyOfSatellitesPlay();
-
-        // All Orbits
-        groups.debris = new groups.SatGroup('all', '');
-        groups.selectGroup(groups.debris);
-        satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-        groups.debris.updateOrbits();
-        settingsManager.isOrbitOverlayVisible = true;
-      }, 0);
-    }
 
     // Load ALl The Images Now
     setTimeout(function () {
@@ -1041,7 +1027,6 @@ satSet.loadTLEs = (resp) => {
   settingsManager.shadersReady = true;
 
   if (satSet.satsReadyCallback) {
-    satellite.initLookangles(satSet, satCruncher, sensorManager, groups);
     satSet.satsReadyCallback(satData);
     if (!settingsManager.trusatOnly) {
       // If No Visual Magnitudes, Add The VMag Database
@@ -1095,7 +1080,11 @@ satSet.setColorScheme = (scheme, isForceRecolor) => {
     satColorBuf = buffers.colorBuf;
     pickableBuf = buffers.pickableBuf;
   } catch (e) {
-    console.log('satSet.setColorScheme not ready yet!');
+    /**
+     * @todo Don't call setColorScheme after colorscheme is loaded
+     * @body It calls a few times while they are both loading
+     */
+    // console.log('satSet.setColorScheme not ready yet!');
   }
 };
 

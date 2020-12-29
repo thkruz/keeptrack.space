@@ -1,10 +1,9 @@
 /* */
 
 import { controlSiteManager } from '@app/modules/controlSiteManager.js';
-import { lineManager } from '@app/js/sceneManager/line.js';
 import { mathValue } from '@app/js/helpers.js';
-import { satSet } from '@app/js/satSet.js';
-import { sensorManager } from '@app/modules/sensorManager.js';
+
+var lineManager, satSet, sensorManager;
 
 var satLinkManager = {};
 satLinkManager.aehfUsers = [];
@@ -12,7 +11,10 @@ satLinkManager.wgsUsers = [];
 satLinkManager.iridiumUsers = [];
 satLinkManager.starlinkUsers = [];
 satLinkManager.galileoUsers = [];
-satLinkManager.init = (function () {
+satLinkManager.init = (lineManagerRef, satSetRef, sensorManagerRef) => {
+  lineManager = lineManagerRef;
+  satSet = satSetRef;
+  sensorManager = sensorManagerRef;
   try {
     for (let controlSite in controlSiteManager.controlSiteList) {
       if (controlSiteManager.controlSiteList[controlSite].linkAehf) {
@@ -52,7 +54,7 @@ satLinkManager.init = (function () {
       satLinkManager.starlinkUsers.push(sensorManager.sensorList[sensor].name);
     }
   }
-})();
+};
 satLinkManager.idToSatnum = () => {
   satLinkManager.aehf = satSet.convertSatnumArrayToIdArray(satLinkManager.aehf);
   satLinkManager.dscs = satSet.convertSatnumArrayToIdArray(satLinkManager.dscs);

@@ -29,14 +29,14 @@ import 'jquery-ui-bundle';
 import '@app/js/keeptrack-foot.js';
 import 'materialize-css';
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { atmosphere, earth, lineManager, moon, sun } from '@app/js/sceneManager/sceneManager.js';
+import { LineFactory, atmosphere, earth, moon, sun } from '@app/js/sceneManager/sceneManager.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
+import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satCruncher, satScreenPositionArray, satSet } from '@app/js/satSet.js';
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/selectSat.js';
 import { mathValue, watermarkedDataURL } from '@app/js/helpers.js';
-import { satCruncher, satScreenPositionArray, satSet } from '@app/js/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorScheme } from '@app/js/color-scheme.js';
-import { groups } from '@app/js/groups.js';
+import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
 import { meshManager } from '@app/modules/meshManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
 import { mobile } from '@app/js/mobile.js';
@@ -48,7 +48,7 @@ import { satLinkManager } from '@app/modules/satLinkManager.js';
 import { satellite } from '@app/js/lookangles.js';
 import { searchBox } from '@app/js/search-box.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
-import { starManager } from '@app/modules/starManager.js';
+import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { uiManager } from '@app/js/uiManager.js';
 let M = window.M;
@@ -78,6 +78,8 @@ const rightBtnEarthMenuDOM = $('#earth-rmb-menu');
 const satMiniBox = document.querySelector('#sat-minibox');
 
 var gl;
+var lineManager;
+var groupsManager;
 
 var clickedSat = 0;
 
@@ -133,7 +135,7 @@ var initializeKeepTrack = () => {
   mobile.checkMobileMode();
   webGlInit();
   cameraManager = new Camera();
-  uiManager.init(cameraManager);
+  ColorScheme.init(cameraManager);
   earth.init(gl);
   sun.init(gl, earth);
   if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
@@ -141,10 +143,9 @@ var initializeKeepTrack = () => {
     // Disabling Moon Until it is Fixed
     moon.init(gl, sun);
   }
-  ColorScheme.init(cameraManager);
   settingsManager.loadStr('dots');
+  objectManager.init();
   satSet.init(satSetInitCallBack, cameraManager);
-  selectSatManager.init(ColorScheme.group);
   if (settingsManager.isEnableRadarData) radarDataManager.init();
   dlManager.drawLoop(); // kick off the animationFrame()s
   if (!settingsManager.disableUI && !settingsManager.isDrawLess) {
@@ -221,9 +222,14 @@ dlManager.drawLoop = (preciseDt) => {
 };
 
 var satSetInitCallBack = (satData) => {
-  orbitManager.init(cameraManager);
-  lineManager.init(gl, orbitManager.shader);
-  groups.init(satSet, orbitManager, ColorScheme);
+  groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
+  selectSatManager.init(ColorScheme.group);
+  orbitManager.init(cameraManager, groupsManager);
+  lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
+  starManager.init(lineManager, getIdFromStarName);
+  satellite.initLookangles(satSet, satCruncher, sensorManager, groupsManager);
+  uiManager.init(cameraManager, lineManager, starManager, groupsManager);
+  satLinkManager.init(lineManager, satSet, sensorManager);
   setTimeout(function () {
     earth.loadHiRes();
     earth.loadHiResNight();
@@ -235,7 +241,7 @@ var satSetInitCallBack = (satData) => {
     // }
   }, 0);
   if (!settingsManager.disableUI) {
-    searchBox.init(satData);
+    searchBox.init(satData, groupsManager, orbitManager);
   }
   (function _checkIfEarthFinished() {
     if (earth.loaded) return;
@@ -285,6 +291,20 @@ var satSetInitCallBack = (satData) => {
 
     satLinkManager.idToSatnum();
   })();
+
+  if (settingsManager.startWithOrbitsDisplayed) {
+    setTimeout(function () {
+      // Time Machine
+      // orbitManager.historyOfSatellitesPlay();
+
+      // All Orbits
+      groupsManager.debris = groupsManager.createGroup('all', '');
+      groupsManager.selectGroup(groupsManager.debris, orbitManager);
+      satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+      groupsManager.debris.updateOrbits(orbitManager);
+      settingsManager.isOrbitOverlayVisible = true;
+    }, 0);
+  }
 };
 
 dlManager.satCalculate = () => {
@@ -2306,5 +2326,89 @@ $(document).ready(function () {
     };
   })();
 });
+
+// Enable the Limited UI
+if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
+  async () => {
+    const { default: satSet } = await import('@app/js/satSet.js');
+    const { default: ColorScheme } = await import('@app/js/color-scheme.js');
+    const { default: orbitManager } = await import('@app/js/orbitManager.js');
+
+    if (document.getElementById('keeptrack-canvas').tagName !== 'CANVAS') {
+      console.warn('There is no canvas with id "keeptrack-canvas!!!"');
+      console.log('Here is a list of canvas found:');
+      console.log(document.getElementsByTagName('canvas'));
+      if (document.getElementById('keeptrack-canvas').tagName == 'DIV') {
+        console.warn('There IS a div with id "keeptrack-canvas"!!!');
+      }
+    } else {
+      console.log('Found the keeptrack canvas:');
+      console.log(document.getElementById('keeptrack-canvas'));
+    }
+
+    // Add Required DOMs
+    document.getElementById('keeptrack-canvas').parentElement.innerHTML += `
+    <div id="countries-btn">
+    </div>
+    <div id="orbit-btn">
+    </div>
+    <div id="time-machine-btn">
+    </div>`;
+    $(document).ready(function () {
+      M.AutoInit();
+      var countriesBtnDOM = $('#countries-btn');
+      countriesBtnDOM.on('click', function () {
+        if (settingsManager.currentColorScheme == ColorScheme.countries) {
+          satSet.setColorScheme(ColorScheme.default);
+        } else {
+          satSet.setColorScheme(ColorScheme.countries);
+        }
+      });
+      var orbitBtnDOM = $('#orbit-btn');
+      settingsManager.isOrbitOverlayVisible = false;
+      orbitBtnDOM.on('click', function () {
+        if (!settingsManager.isOrbitOverlayVisible) {
+          orbitManager.isTimeMachineVisible = false;
+          isTimeMachine = false;
+          groupsManager.debris = groupsManager.createGroup('all', '');
+          groupsManager.selectGroup(groupsManager.debris, orbitManager);
+          // satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+          // groupsManager.debris.updateOrbits(orbitManager);
+          settingsManager.isOrbitOverlayVisible = true;
+        } else {
+          orbitManager.isTimeMachineVisible = false;
+          isTimeMachine = false;
+          groupsManager.clearSelect();
+          orbitManager.clearHoverOrbit();
+          satSet.setColorScheme(ColorScheme.default, true);
+          settingsManager.isOrbitOverlayVisible = false;
+        }
+      });
+      var timeMachineDOM = $('#time-machine-btn');
+      var isTimeMachine = false;
+      timeMachineDOM.on('click', function () {
+        if (isTimeMachine) {
+          isTimeMachine = false;
+          // Merge to one variable?
+          orbitManager.isTimeMachineRunning = false;
+          orbitManager.isTimeMachineVisible = false;
+
+          settingsManager.colors.transparent = orbitManager.tempTransColor;
+          groupsManager.clearSelect();
+          satSet.setColorScheme(ColorScheme.default, true); // force color recalc
+
+          $('#menu-time-machine').removeClass('bmenu-item-selected');
+        } else {
+          // Merge to one variable?
+          orbitManager.isTimeMachineRunning = true;
+          orbitManager.isTimeMachineVisible = true;
+          $('#menu-time-machine').addClass('bmenu-item-selected');
+          orbitManager.historyOfSatellitesPlay();
+          isTimeMachine = true;
+        }
+      });
+    });
+  };
+}
 
 export { dlManager, gl, webGlInit };

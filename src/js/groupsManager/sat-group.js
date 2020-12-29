@@ -1,30 +1,5 @@
-/**
- * @prettier
- */
-
-/*! /////////////////////////////////////////////////////////////////////////////
-
-Copyright (C) 2016-2020 Theodore Kruczek
-Copyright (C) 2020 Heather Kruczek
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-///////////////////////////////////////////////////////////////////////////// */
-
-import { settingsManager } from '@app/js/keeptrack-head.js';
-
-('use strict');
-var groups = {};
-groups.selectedGroup = null;
-
 class SatGroup {
-  constructor(groupType, data) {
+  constructor(groupType, data, satSet) {
     var satId;
     var i = 0;
     this.sats = [];
@@ -107,7 +82,7 @@ class SatGroup {
       }
       return false;
     };
-    this.updateOrbits = () => {
+    this.updateOrbits = (orbitManager) => {
       // What calls the orbit buffer when selected a group from the menu.
       for (var i = 0; i < this.sats.length; i++) {
         if (this.sats[i].missile) {
@@ -125,59 +100,4 @@ class SatGroup {
   }
 }
 
-// Make this available to other functions without renamming it
-groups.SatGroup = SatGroup;
-
-groups.selectGroup = function (group) {
-  if (group === null || typeof group === 'undefined') {
-    return;
-  }
-  groups.updateIsInGroup(groups.selectedGroup, group);
-  groups.selectedGroup = group;
-  group.updateOrbits();
-  settingsManager.setCurrentColorScheme(ColorScheme.group);
-};
-
-groups.selectGroupNoOverlay = function (group) {
-  if (group === null || typeof group === 'undefined') {
-    return;
-  }
-  groups.updateIsInGroup(groups.selectedGroup, group);
-  groups.selectedGroup = group;
-  settingsManager.isGroupOverlayDisabled = true;
-  settingsManager.setCurrentColorScheme(ColorScheme.group);
-};
-
-groups.updateIsInGroup = function (oldgroup, newgroup) {
-  var sat;
-  let i;
-  if (oldgroup !== null && typeof oldgroup !== 'undefined') {
-    for (i = 0; i < oldgroup.sats.length; i++) {
-      sat = satSet.getSatExtraOnly(oldgroup.sats[i].satId);
-      sat.isInGroup = false;
-    }
-  }
-
-  if (newgroup === null || typeof newgroup === 'undefined') {
-    return;
-  }
-
-  for (i = 0; i < newgroup.sats.length; i++) {
-    sat = satSet.getSatExtraOnly(newgroup.sats[i].satId);
-    sat.isInGroup = true;
-  }
-};
-groups.clearSelect = function () {
-  groups.updateIsInGroup(groups.selectedGroup, null);
-  groups.selectedGroup = null;
-  settingsManager.isGroupOverlayDisabled = false;
-};
-
-var satSet, orbitManager, ColorScheme;
-groups.init = function (satSetRef, orbitManagerRef, ColorSchemeRef) {
-  satSet = satSetRef;
-  orbitManager = orbitManagerRef;
-  ColorScheme = ColorSchemeRef;
-};
-
-export { groups };
+export { SatGroup };

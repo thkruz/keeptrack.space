@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import { satCruncher, satSet } from '@app/js/satSet.js';
-import { SunCalc } from '@app/js/lib/suncalc.js';
+import { SunCalc } from '@app/js/suncalc.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { mathValue } from '@app/js/helpers.js';
 import { objectManager } from '@app/js/objectManager.js';

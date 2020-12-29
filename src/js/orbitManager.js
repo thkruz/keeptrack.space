@@ -3,7 +3,6 @@
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { ColorScheme } from '@app/js/color-scheme.js';
 import { gl } from '@app/js/main.js';
-import { groups } from '@app/js/groups.js';
 import { satSet } from '@app/js/satSet.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';
 import { timeManager } from '@app/js/timeManager.js';
@@ -64,10 +63,10 @@ orbitManager.shader = {
     `,
 };
 
-var cameraManager;
-
-orbitManager.init = function (cameraManagerRef) {
+var cameraManager, groupsManager;
+orbitManager.init = function (cameraManagerRef, groupsManagerRef) {
   cameraManager = cameraManagerRef;
+  groupsManager = groupsManagerRef;
 
   var vs = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vs, orbitManager.shader.vert);
@@ -285,9 +284,9 @@ orbitManager.draw = function (pMatrix, camMatrix) {
     });
   }
 
-  if (groups.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
+  if (groupsManager.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
     gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
-    groups.selectedGroup.forEach(function (id) {
+    groupsManager.selectedGroup.forEach(function (id) {
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
       gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
       gl.enableVertexAttribArray(pathShader.aPos);
@@ -328,10 +327,10 @@ orbitManager.historyOfSatellitesPlay = () => {
         if (!orbitManager.isTimeMachineVisible) return;
         // Kill all old async calls if run count updates
         if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
-        let yearGroup = new groups.SatGroup('yearOrLess', year);
-        // groups.selectGroupNoOverlay(yearGroup);
-        groups.selectGroup(yearGroup);
-        yearGroup.updateOrbits();
+        let yearGroup = groupsManager.createGroup('yearOrLess', year);
+        // groupsManager.selectGroupNoOverlay(yearGroup);
+        groupsManager.selectGroup(yearGroup, orbitManager);
+        yearGroup.updateOrbits(orbitManager, orbitManager);
         satSet.setColorScheme(ColorScheme.group, true); // force color recalc
         if (year >= 59 && year < 100) {
           M.toast({ html: `Time Machine In Year 19${year}!` });
@@ -346,7 +345,7 @@ orbitManager.historyOfSatellitesPlay = () => {
             if (!orbitManager.isTimeMachineVisible) return;
             settingsManager.colors.transparent = orbitManager.tempTransColor;
             orbitManager.isTimeMachineRunning = false;
-            groups.clearSelect();
+            groupsManager.clearSelect();
             satSet.setColorScheme(ColorScheme.default, true); // force color recalc
           }, 10000); // Linger for 10 seconds
         }

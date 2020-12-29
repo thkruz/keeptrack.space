@@ -17,9 +17,7 @@
  */
 
 import * as $ from 'jquery';
-import { groups } from '@app/js/groups.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';
-var M = window.M;
 
 // Enable Satbox Overlay
 if (settingsManager.enableHoverOverlay) {
@@ -31,90 +29,6 @@ if (settingsManager.enableHoverOverlay) {
     <br/>
     <span id="sat-hoverbox3"></span>
   </div>`;
-}
-
-// Enable the Limited UI
-if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
-  async () => {
-    const { default: satSet } = await import('@app/js/satSet.js');
-    const { default: ColorScheme } = await import('@app/js/color-scheme.js');
-    const { default: orbitManager } = await import('@app/js/orbitManager.js');
-
-    if (document.getElementById('keeptrack-canvas').tagName !== 'CANVAS') {
-      console.warn('There is no canvas with id "keeptrack-canvas!!!"');
-      console.log('Here is a list of canvas found:');
-      console.log(document.getElementsByTagName('canvas'));
-      if (document.getElementById('keeptrack-canvas').tagName == 'DIV') {
-        console.warn('There IS a div with id "keeptrack-canvas"!!!');
-      }
-    } else {
-      console.log('Found the keeptrack canvas:');
-      console.log(document.getElementById('keeptrack-canvas'));
-    }
-
-    // Add Required DOMs
-    document.getElementById('keeptrack-canvas').parentElement.innerHTML += `
-    <div id="countries-btn">
-    </div>
-    <div id="orbit-btn">
-    </div>
-    <div id="time-machine-btn">
-    </div>`;
-    $(document).ready(function () {
-      M.AutoInit();
-      var countriesBtnDOM = $('#countries-btn');
-      countriesBtnDOM.on('click', function () {
-        if (settingsManager.currentColorScheme == ColorScheme.countries) {
-          satSet.setColorScheme(ColorScheme.default);
-        } else {
-          satSet.setColorScheme(ColorScheme.countries);
-        }
-      });
-      var orbitBtnDOM = $('#orbit-btn');
-      settingsManager.isOrbitOverlayVisible = false;
-      orbitBtnDOM.on('click', function () {
-        if (!settingsManager.isOrbitOverlayVisible) {
-          orbitManager.isTimeMachineVisible = false;
-          isTimeMachine = false;
-          groups.debris = new groups.SatGroup('all', '');
-          groups.selectGroup(groups.debris);
-          // satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-          // groups.debris.updateOrbits();
-          settingsManager.isOrbitOverlayVisible = true;
-        } else {
-          orbitManager.isTimeMachineVisible = false;
-          isTimeMachine = false;
-          groups.clearSelect();
-          orbitManager.clearHoverOrbit();
-          satSet.setColorScheme(ColorScheme.default, true);
-          settingsManager.isOrbitOverlayVisible = false;
-        }
-      });
-      var timeMachineDOM = $('#time-machine-btn');
-      var isTimeMachine = false;
-      timeMachineDOM.on('click', function () {
-        if (isTimeMachine) {
-          isTimeMachine = false;
-          // Merge to one variable?
-          orbitManager.isTimeMachineRunning = false;
-          orbitManager.isTimeMachineVisible = false;
-
-          settingsManager.colors.transparent = orbitManager.tempTransColor;
-          groups.clearSelect();
-          satSet.setColorScheme(ColorScheme.default, true); // force color recalc
-
-          $('#menu-time-machine').removeClass('bmenu-item-selected');
-        } else {
-          // Merge to one variable?
-          orbitManager.isTimeMachineRunning = true;
-          orbitManager.isTimeMachineVisible = true;
-          $('#menu-time-machine').addClass('bmenu-item-selected');
-          orbitManager.historyOfSatellitesPlay();
-          isTimeMachine = true;
-        }
-      });
-    });
-  };
 }
 
 // Load Bottom icons

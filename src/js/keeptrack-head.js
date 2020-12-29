@@ -25,7 +25,7 @@ import { mathValue } from '@app/js/helpers.js';
 let settingsManager = {};
 {
   //  Version Control
-  settingsManager.versionNumber = '3.0.4';
+  settingsManager.versionNumber = '3.0.5';
   settingsManager.versionDate = 'December 28, 2020';
 
   // Install Folder Settings

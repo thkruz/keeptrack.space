@@ -1,15 +1,13 @@
-/** @format */
 /* eslint-disable no-useless-escape */
 
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { SunCalc } from '@app/js/lib/suncalc.js';
-import { gl } from '@app/js/main.js';
 import { mathValue } from '@app/js/helpers.js';
 import { satellite } from '@app/js/lookangles.js';
-import { sun } from '@app/js/sceneManager/sun.js';
 
 let mvMatrixEmpty = glm.mat4.create();
 let nMatrixEmpty = glm.mat3.create();
+var gl, sun;
 
 let moon = {};
 let NUM_LAT_SEGS = 32;
@@ -102,7 +100,9 @@ moon.getXYZ = () => {
   };
 };
 
-moon.init = function () {
+moon.init = function (glRef, sunRef) {
+  gl = glRef;
+  sun = sunRef;
   let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
   gl.shaderSource(fragShader, moon.shader.frag);
   gl.compileShader(fragShader);

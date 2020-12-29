@@ -1,7 +1,3 @@
-/**
- * @prettier
- */
-
 /* /////////////////////////////////////////////////////////////////////////////
 
 http://keeptrack.space
@@ -3826,7 +3822,7 @@ uiManager.updateWatchlist = function (updateWatchlistList, updateWatchlistInView
       '</div>' +
       '<div class="col s2 m2 l2 center-align remove-icon"><img class="watchlist-remove" data-sat-id="' +
       sat.id +
-      '" src="images/remove.png"></img></div>' +
+      '" src="img/remove.png"></img></div>' +
       '</div>';
   }
   $('#watchlist-list').html(watchlistListHTML);
@@ -5452,9 +5448,9 @@ uiManager.updateMap = function () {
       });
     }
     if (satellite.map(sat, i).inview === 1) {
-      $('#map-look' + i).attr('src', 'images/yellow-square.png'); // If inview then make yellow
+      $('#map-look' + i).attr('src', 'img/yellow-square.png'); // If inview then make yellow
     } else {
-      $('#map-look' + i).attr('src', 'images/red-square.png'); // If not inview then make red
+      $('#map-look' + i).attr('src', 'img/red-square.png'); // If not inview then make red
     }
     $('#map-look' + i).attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
     $('#map-look' + i).attr('time', satellite.map(sat, i).time);

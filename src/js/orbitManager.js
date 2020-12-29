@@ -1,6 +1,4 @@
-/**
- * @format
- */
+/* */
 
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { ColorScheme } from '@app/js/color-scheme.js';

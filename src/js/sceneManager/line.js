@@ -1,6 +1,4 @@
-/**
- * @format
- */
+/* */
 
 import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly } from '@app/js/satSet.js';
 

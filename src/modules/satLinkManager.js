@@ -1,6 +1,4 @@
-/**
- * @format
- */
+/* */
 
 import { controlSiteManager } from '@app/modules/controlSiteManager.js';
 import { lineManager } from '@app/js/sceneManager/line.js';

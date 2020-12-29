@@ -1,7 +1,3 @@
-/**
- * @format
- */
-
 import { saveAs } from '@app/js/lib/file-saver.min.js';
 var mathValue = {};
 

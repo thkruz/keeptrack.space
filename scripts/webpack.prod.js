@@ -1,8 +1,8 @@
 /* eslint-disable */
-var webpack = require("webpack");
+var webpack = require('webpack');
 
-let config = {  
-  module: {    
+let config = {
+  module: {
     rules: [
       {
         test: /\.css$/i,
@@ -20,54 +20,48 @@ let config = {
         test: /\.worker\.js$/i,
         use: { loader: 'worker-loader' },
       },
+      {
+        test: /\.m?js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+        },
+      },
     ],
   },
   plugins: [
     new webpack.ProvidePlugin({
-      $: "jquery",
-      jQuery: "jquery",
-      'windows.jQuery': 'jquery'
-    })
+      '$': 'jquery',
+      'jQuery': 'jquery',
+      'windows.jQuery': 'jquery',
+    }),
   ],
   optimization: {
     minimize: true,
   },
-  ignoreWarnings: [
-    /asset size limit/,
-    /combined asset size exceeds the recommended limit/,
-  ],
+  ignoreWarnings: [/asset size limit/, /combined asset size exceeds the recommended limit/],
   stats: 'minimal',
 };
 
-var jsConfig = Object.assign({}, config,{
-  name: "jsConfig",
+var jsConfig = Object.assign({}, config, {
+  name: 'jsConfig',
   mode: 'production',
   entry: {
-    'main': [
-      './src/js/main.js',
-    ],
-    'positionCruncher': [
-      './src/js/positionCruncher.js',
-    ],
-    'orbitCruncher': [
-      './src/js/orbitCruncher.js',
-    ],
-    'checker-script': [
-      './src/js/checker-script.js',
-    ],
+    'main': ['./src/js/main.js'],
+    'positionCruncher': ['./src/js/positionCruncher.js'],
+    'orbitCruncher': ['./src/js/orbitCruncher.js'],
+    'checker-script': ['./src/js/checker-script.js'],
   },
   resolve: {
     alias: {
-      '@app': __dirname + '/../src'
-    }
+      '@app': __dirname + '/../src',
+    },
   },
   output: {
     filename: '[name].js',
-    path: __dirname + '/../dist/js'
-  ,}
+    path: __dirname + '/../dist/js',
+  },
 });
 
 // Return Array of Configurations
-module.exports = [
-  jsConfig,       
-];
+module.exports = [jsConfig];

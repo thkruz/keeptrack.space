@@ -1,7 +1,3 @@
-/**
- * @prettier
- */
-
 /* /////////////////////////////////////////////////////////////////////////////
 
 http://keeptrack.space
@@ -39,10 +35,10 @@ import { dlManager, webGlInit } from '@app/js/main.js';
 import { earth, lineManager } from '@app/js/sceneManager/sceneManager.js';
 import { helpers, mathValue, saveAs, saveCsv } from '@app/js/helpers.js';
 import { satCruncher, satSet } from '@app/js/satSet.js';
+import { Camera } from '@app/js/cameraManager/camera.js';
 import { CanvasRecorder } from '@app/js/lib/CanvasRecorder.js';
 import { ColorScheme } from '@app/js/color-scheme.js';
 import { adviceList } from '@app/js/advice-module.js';
-import { cameraManager } from '@app/js/cameraManager.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
 import { groups } from '@app/js/groups.js';
 import { mapManager } from '@app/js/mapManager.js';
@@ -130,6 +126,15 @@ var watchlistInViewList = [];
 var nextPassArray = [];
 var nextPassEarliestTime;
 var isWatchlistChanged = null;
+
+/**
+ * @todo Merge _uiInit and uiManager.init
+ * @body Managers will become Classes and won't autoInit
+ */
+var cameraManager;
+uiManager.init = (cameraManagerRef) => {
+  cameraManager = cameraManagerRef;
+};
 
 var touchHoldButton = '';
 $(document).ready(function () {
@@ -911,9 +916,16 @@ $(document).ready(function () {
       }
     });
 
+    /**
+     * @todo Combine Sensor selection listeners
+     * @body Refactor this into a single call using above and a case switch and remove the timeout for lookAtSensor.
+     */
+
     // When any sensor is selected
     $('#sensor-list-content > div > ul > .menu-selectable').on('click', function () {
       adviceList.sensor();
+      // Delay to ensure the below code is run first. This should be removed.
+      setTimeout(() => uiManager.lookAtSensor(), 1000);
     });
 
     // USAF Radars
@@ -1517,7 +1529,7 @@ $(document).ready(function () {
         var currentEpoch = satellite.currentEpoch(timeManager.propTime());
         mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
 
-        cameraManager.setCamSnapMode(false);
+        cameraManager.camSnapMode = false;
 
         var TLEs;
         // Ignore argument of perigee for round orbits OPTIMIZE
@@ -1918,7 +1930,7 @@ $(document).ready(function () {
         quadZTime.setUTCHours(0); // Move to UTC Hour
 
         timeManager.propOffset = quadZTime - today; // Find the offset from today
-        cameraManager.setCamSnapMode(false);
+        cameraManager.camSnapMode = false;
         satCruncher.postMessage({
           // Tell satCruncher we have changed times for orbit calculations
           typ: 'offset',
@@ -1984,7 +1996,7 @@ $(document).ready(function () {
         var currentEpoch = satellite.currentEpoch(timeManager.propTime());
         mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
 
-        cameraManager.setCamSnapMode(false);
+        cameraManager.camSnapMode = false;
 
         var TLEs;
         // Ignore argument of perigee for round orbits OPTIMIZE
@@ -2417,7 +2429,7 @@ $(document).ready(function () {
       } else {
         cameraManager.changeZoom('leo');
       }
-      cameraManager.camSnap(cameraManager.latToPitch(lat), cameraManager.longToYaw(lon, timeManager.selectedDate));
+      cameraManager.camSnap(Camera.latToPitch(lat), Camera.longToYaw(lon, timeManager.selectedDate));
 
       e.preventDefault();
     });
@@ -2558,7 +2570,7 @@ $(document).ready(function () {
 
     var today = new Date(); // Need to know today for offset calculation
     timeManager.propOffset = selectedDate - today; // Find the offset from today
-    cameraManager.setCamSnapMode(false);
+    cameraManager.camSnapMode = false;
     satCruncher.postMessage({
       // Tell satCruncher we have changed times for orbit calculations
       typ: 'offset',
@@ -3439,8 +3451,8 @@ $(document).ready(function () {
       case 'menu-planetarium':
         if (isPlanetariumView) {
           isPlanetariumView = false;
-          cameraManager.setPanReset(true);
-          cameraManager.setLocalRotateReset(true);
+          cameraManager.panReset = true;
+          cameraManager.localRotateReset = true;
           settingsManager.fieldOfView = 0.6;
           webGlInit();
           uiManager.hideSideMenus();
@@ -3475,8 +3487,8 @@ $(document).ready(function () {
       case 'menu-astronomy':
         if (isAstronomyView) {
           isAstronomyView = false;
-          cameraManager.setPanReset(true);
-          cameraManager.setLocalRotateReset(true);
+          cameraManager.panReset = true;
+          cameraManager.localRotateReset = true;
           settingsManager.fieldOfView = 0.6;
           webGlInit();
           uiManager.hideSideMenus();
@@ -3810,7 +3822,7 @@ uiManager.updateWatchlist = function (updateWatchlistList, updateWatchlistInView
       '</div>' +
       '<div class="col s2 m2 l2 center-align remove-icon"><img class="watchlist-remove" data-sat-id="' +
       sat.id +
-      '" src="images/remove.png"></img></div>' +
+      '" src="img/remove.png"></img></div>' +
       '</div>';
   }
   $('#watchlist-list').html(watchlistListHTML);
@@ -3886,47 +3898,51 @@ uiManager.keyHandler = (evt) => {
       cameraManager.rotateEarth();
       break;
     case 'C':
-      if (cameraManager.cameraType.current === cameraManager.cameraType.planetarium) {
+      // Create a local reference to the current cameraType
+      // This will get passed to the cameraManager after uiManager figures out
+      // what the new cameraType is
+      var curCam = cameraManager.cameraType.current;
+      if (curCam === cameraManager.cameraType.planetarium) {
         orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
       }
 
-      cameraManager.cameraType.set(cameraManager.cameraType.current + 1);
+      curCam++;
 
-      if (cameraManager.cameraType.current == cameraManager.cameraType.fixedToSat && objectManager.selectedSat == -1) {
-        cameraManager.cameraType.set(cameraManager.cameraType.current + 1);
+      if (curCam == cameraManager.cameraType.fixedToSat && objectManager.selectedSat == -1) {
+        curCam++;
       }
 
-      if (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
-        cameraManager.cameraType.set(cameraManager.cameraType.current + 1);
+      if (curCam === cameraManager.cameraType.planetarium && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
+        curCam++;
       }
 
-      if (cameraManager.cameraType.current === cameraManager.cameraType.satellite && objectManager.selectedSat === -1) {
-        cameraManager.cameraType.set(cameraManager.cameraType.current + 1);
+      if (curCam === cameraManager.cameraType.satellite && objectManager.selectedSat === -1) {
+        curCam++;
       }
 
-      if (cameraManager.cameraType.current === cameraManager.cameraType.astronomy && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
-        cameraManager.cameraType.set(cameraManager.cameraType.current + 1);
+      if (curCam === cameraManager.cameraType.astronomy && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
+        curCam++;
       }
 
-      if (cameraManager.cameraType.current === 7) {
+      if (curCam === 7) {
         // 7 is a placeholder to reset camera type
-        // cameraManager.setPanReset(true);
-        cameraManager.setLocalRotateReset(true);
+        cameraManager.localRotateReset = true;
         settingsManager.fieldOfView = 0.6;
         webGlInit();
         if (objectManager.selectedSat !== -1) {
           cameraManager.camZoomSnappedOnSat(true);
-          cameraManager.cameraType.set(cameraManager.cameraType.fixedToSat);
+          curCam = cameraManager.cameraType.fixedToSat;
         } else {
-          cameraManager.cameraType.set(cameraManager.cameraType.default);
+          curCam = cameraManager.cameraType.default;
         }
       }
 
-      switch (cameraManager.cameraType.current) {
+      cameraManager.cameraType.set(curCam);
+
+      switch (curCam) {
         case cameraManager.cameraType.default:
-          cameraManager.resetFpsPos();
           uiManager.toast('Earth Centered Camera Mode', 'standby');
-          cameraManager.setZoomLevel(0.5);
+          cameraManager.zoomLevel = 0.5;
           break;
         case cameraManager.cameraType.offset:
           uiManager.toast('Offset Camera Mode', 'standby');
@@ -4297,11 +4313,11 @@ var _mobileScreenControls = () => {
     db.log('_mobileScreenControls', true);
     if (touchHoldButton === '') return;
     if (touchHoldButton === 'zoom-in') {
-      cameraManager.setZoomTarget(cameraManager.zoomTarget - 0.0025);
+      cameraManager.zoomTarget = cameraManager.zoomTarget - 0.0025;
       if (cameraManager.zoomTarget < 0) cameraManager.zoomTarget = 0;
     }
     if (touchHoldButton === 'zoom-out') {
-      cameraManager.setZoomTarget(cameraManager.zoomTarget + 0.0025);
+      cameraManager.zoomTarget = cameraManager.zoomTarget + 0.0025;
       if (cameraManager.zoomTarget > 1) cameraManager.zoomTarget = 1;
     }
   }
@@ -4549,7 +4565,7 @@ uiManager.useCurrentGeolocationAsSensor = function () {
       } else {
         cameraManager.changeZoom('leo');
       }
-      cameraManager.camSnap(cameraManager.latToPitch(lat), cameraManager.longToYaw(lon, timeManager.selectedDate));
+      cameraManager.camSnap(Camera.latToPitch(lat), Camera.longToYaw(lon, timeManager.selectedDate));
     });
   }
 };
@@ -5200,6 +5216,44 @@ uiManager.updateURL = () => {
   window.history.replaceState(null, 'Keeptrack', url);
 };
 
+uiManager.lookAtSensor = () => {
+  cameraManager.lookAtSensor(sensorManager.selectedSensor.zoom, sensorManager.selectedSensor.lat, sensorManager.selectedSensor.long, timeManager.selectedDate);
+};
+
+uiManager.reloadLastSensor = () => {
+  let currentSensor;
+  try {
+    currentSensor = JSON.parse(localStorage.getItem('currentSensor'));
+  } catch (e) {
+    currentSensor = null;
+  }
+  if (currentSensor !== null) {
+    try {
+      // If there is a staticnum set use that
+      if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
+        sensorManager.setSensor(null, currentSensor[1]);
+        uiManager.legendMenuChange('default');
+      } else {
+        // If the sensor is a string, load that collection of sensors
+        if (typeof currentSensor[0].shortName == 'undefined') {
+          sensorManager.setSensor(currentSensor[0], currentSensor[1]);
+          uiManager.legendMenuChange('default');
+          uiManager.lookAtSensor();
+        } else {
+          // Seems to be a single sensor without a staticnum, load that
+          sensorManager.setSensor(sensorManager.sensorList[currentSensor[0].shortName], currentSensor[1]);
+          uiManager.legendMenuChange('default');
+          uiManager.lookAtSensor();
+        }
+      }
+    } catch (e) {
+      // Clear old settings because they seem corrupted
+      localStorage.setItem('currentSensor', null);
+      console.warn('Saved Sensor Information Invalid');
+    }
+  }
+};
+
 uiManager.footerToggle = function () {
   db.log('uiManager.footerToggle');
   if (isFooterShown) {
@@ -5335,7 +5389,7 @@ uiManager.panToStar = function (c) {
   // ======================================================
   // Need to calculate the time to get the right RA offset
   // ======================================================
-  cameraManager.camSnap(cameraManager.latToPitch(sat.dec) * -1, cameraManager.longToYaw(sat.ra * mathValue.DEG2RAD, timeManager.selectedDate));
+  cameraManager.camSnap(Camera.latToPitch(sat.dec) * -1, Camera.longToYaw(sat.ra * mathValue.DEG2RAD, timeManager.selectedDate));
   setTimeout(function () {
     // console.log(`pitch ${camPitch * mathValue.RAD2DEG} -- yaw ${camYaw * mathValue.RAD2DEG}`);
   }, 2000);
@@ -5394,9 +5448,9 @@ uiManager.updateMap = function () {
       });
     }
     if (satellite.map(sat, i).inview === 1) {
-      $('#map-look' + i).attr('src', 'images/yellow-square.png'); // If inview then make yellow
+      $('#map-look' + i).attr('src', 'img/yellow-square.png'); // If inview then make yellow
     } else {
-      $('#map-look' + i).attr('src', 'images/red-square.png'); // If not inview then make red
+      $('#map-look' + i).attr('src', 'img/red-square.png'); // If not inview then make red
     }
     $('#map-look' + i).attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
     $('#map-look' + i).attr('time', satellite.map(sat, i).time);

@@ -1,6 +1,4 @@
-/**
- * @format
- */
+/* */
 /*! /////////////////////////////////////////////////////////////////////////////
 
 (c) 2016-2020, Theodore Kruczek
@@ -20,7 +18,6 @@ or mirrored at any other location without the express written permission of the 
 import * as $ from 'jquery';
 import { satCruncher, satSet } from '@app/js/satSet.js';
 import { ColorScheme } from '@app/js/color-scheme.js';
-import { cameraManager } from '@app/js/cameraManager.js';
 import { objectManager } from '@app/js/objectManager.js';
 import { satellite } from '@app/js/lookangles.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';
@@ -1231,8 +1228,6 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
         objectManager.setSelectedSat(-1);
         satSet.setColorScheme(settingsManager.currentColorScheme, true);
         // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
-        cameraManager.changeZoom(sensorManager.selectedSensor.zoom);
-        cameraManager.camSnap(cameraManager.latToPitch(sensorManager.selectedSensor.lat), cameraManager.longToYaw(sensorManager.selectedSensor.long, timeManager.selectedDate));
         uiManager.getsensorinfo();
       }
     }

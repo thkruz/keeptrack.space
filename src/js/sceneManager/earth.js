@@ -1,13 +1,11 @@
-/** @format */
-
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { gl } from '@app/js/main.js';
 import { mathValue } from '@app/js/helpers.js';
 import { satellite } from '@app/js/lookangles.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';
 import { timeManager } from '@app/js/timeManager.js';
 
 var earth = {};
+var gl;
 
 var vertPosBuf, vertNormBuf, texCoordBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
 var vertCount;
@@ -97,7 +95,8 @@ earth.isDayNightToggle = (val) => {
   isDayNightToggle = val;
 };
 
-earth.init = function () {
+earth.init = function (glRef) {
+  gl = glRef;
   // Make Fragment Shader
   let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
   gl.shaderSource(fragShader, earth.shader.frag);

@@ -1,6 +1,4 @@
-/**
- * @format
- */
+/* */
 /**
  * /* /////////////////////////////////////////////////////////////////////////////
  *
@@ -33,7 +31,6 @@ import { db, settingsManager } from '@app/js/keeptrack-head.js';
 import { helpers, mathValue, saveCsv } from '@app/js/helpers.js';
 import { ColorScheme } from '@app/js/color-scheme.js';
 import { adviceList } from '@app/js/advice-module.js';
-import { cameraManager } from '@app/js/cameraManager.js';
 import { gl } from '@app/js/main.js';
 import { groups } from '@app/js/groups.js';
 import { jsTLEfile } from '@app/offline/tle.js';
@@ -278,37 +275,7 @@ satCruncher.onmessage = (m) => {
 
     satSet.onCruncherReady();
     if (!settingsManager.disableUI) {
-      (function _reloadLastSensor() {
-        let currentSensor;
-        try {
-          currentSensor = JSON.parse(localStorage.getItem('currentSensor'));
-        } catch (e) {
-          currentSensor = null;
-        }
-        if (currentSensor !== null) {
-          try {
-            // If there is a staticnum set use that
-            if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
-              sensorManager.setSensor(null, currentSensor[1]);
-              uiManager.legendMenuChange('default');
-            } else {
-              // If the sensor is a string, load that collection of sensors
-              if (typeof currentSensor[0].shortName == 'undefined') {
-                sensorManager.setSensor(currentSensor[0], currentSensor[1]);
-                uiManager.legendMenuChange('default');
-              } else {
-                // Seems to be a single sensor without a staticnum, load that
-                sensorManager.setSensor(sensorManager.sensorList[currentSensor[0].shortName], currentSensor[1]);
-                uiManager.legendMenuChange('default');
-              }
-            }
-          } catch (e) {
-            // Clear old settings because they seem corrupted
-            localStorage.setItem('currentSensor', null);
-            console.warn('Saved Sensor Information Invalid');
-          }
-        }
-      })();
+      uiManager.reloadLastSensor();
       (function _watchlistInit() {
         let watchlistJSON;
         try {
@@ -490,8 +457,9 @@ satSet.changeShaders = (newShaders) => {
   dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
 };
 */
-
-satSet.init = (satsReadyCallback) => {
+var cameraManager;
+satSet.init = (satsReadyCallback, cameraManagerRef) => {
+  cameraManager = cameraManagerRef;
   satSet.satsReadyCallback = satsReadyCallback;
   db.log('satSet.init');
   /** Parses GET variables for Possible sharperShaders */
@@ -676,6 +644,8 @@ satSet.init = (satsReadyCallback) => {
     }
   };
   satSet.startCatalogLoad();
+
+  satSet.isInitDone = true;
 };
 // Load the Catalog
 satSet.loadTLEs = (resp) => {
@@ -1071,6 +1041,7 @@ satSet.loadTLEs = (resp) => {
   settingsManager.shadersReady = true;
 
   if (satSet.satsReadyCallback) {
+    satellite.initLookangles(satSet, satCruncher, sensorManager, groups);
     satSet.satsReadyCallback(satData);
     if (!settingsManager.trusatOnly) {
       // If No Visual Magnitudes, Add The VMag Database
@@ -1369,7 +1340,7 @@ satSet.updateRadarData = () => {
 let drawPropTime, isDidOnce, rrI, radarDataLen;
 satSet.draw = (pMatrix, camMatrix) => {
   // NOTE: 640 byte leak.
-  if (!settingsManager.shadersReady || !settingsManager.cruncherReady) return;
+  if (!settingsManager.shadersReady || !settingsManager.cruncherReady || !satSet.isInitDone) return;
 
   radarDataLen = radarDataManager.radarData.length;
   if (radarDataLen > 0) {

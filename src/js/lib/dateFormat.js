@@ -1,6 +1,4 @@
-/**
- * @format
- */
+/* */
 
 /*! Date Format 1.2.4
  * (c) 2007-2009 Steven Levithan <stevenlevithan.com>

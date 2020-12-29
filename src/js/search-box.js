@@ -1,6 +1,4 @@
-/**
- * @format
- */
+/* */
 
 import * as $ from 'jquery';
 import { ColorScheme } from '@app/js/color-scheme.js';

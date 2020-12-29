@@ -1,10 +1,7 @@
-/**
- * @format
- */
+/* */
 
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { ColorScheme } from '@app/js/color-scheme.js';
-import { cameraManager } from '@app/js/cameraManager.js';
 import { gl } from '@app/js/main.js';
 import { groups } from '@app/js/groups.js';
 import { satSet } from '@app/js/satSet.js';
@@ -67,8 +64,10 @@ orbitManager.shader = {
     `,
 };
 
-orbitManager.init = function () {
-  // var startTime = performance.now();
+var cameraManager;
+
+orbitManager.init = function (cameraManagerRef) {
+  cameraManager = cameraManagerRef;
 
   var vs = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vs, orbitManager.shader.vert);

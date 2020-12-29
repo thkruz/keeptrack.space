@@ -1,7 +1,8 @@
-/**
-  @format
-*/
 /* eslint-disable */
+/**
+ * @todo Convert gpr.js to import format
+ * @body Remove require statements and turn eslint on
+ */
 
 const fs = require('fs');
 const { join } = require('path');

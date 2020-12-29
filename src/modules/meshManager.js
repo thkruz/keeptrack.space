@@ -1,6 +1,4 @@
-/**
- * @format
- */
+/* */
 
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { OBJ } from '@app/js/lib/webgl-obj-loader.js';

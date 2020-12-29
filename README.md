@@ -25,9 +25,9 @@ The code has been rewrote multiple times and now barely resembles the original, 
 
 ## Installation
 
-A stable copy of the website is always availble at https://keeptrack.space.
+The last release of Version 2 is availble at https://keeptrack.space. If you just want to use the site, recommend using Version 2 since no new features are being added to Version 3 yet.
 
-TODO: Get a github page setup with the most-current development version here: https://thkruz.github.io/keeptrack.space/
+Starting with Version 3, a github page is automatically deployed with the most-current version of the main branch to https://thkruz.github.io/keeptrack.space/.
 
 ### Built With
 * [Webpack](https://webpack.js.org/)
@@ -61,12 +61,6 @@ Copy all the static files into the ./dist directory.
 
 ```bash
 npm run stage
-```
-
-(Optional) Download optional high-res images and up-to-date catalog files from https://keeptrack.space. 
-
-```bash
-npm run getExtras
 ```
 
 Have webpack package the source, but not compress it for easier reading.
@@ -118,7 +112,7 @@ We use [SemVer](http://semver.org/) for versioning.
 
 ## Tests
 
-Currently building tests in Jest that should cover 100% of the non-jquery functions. They can be run using:
+Currently we are still building tests in Jest that should cover 100% of the non-jquery functions. All of the current test can be run using:
 
 ```bash
 npm run test
@@ -128,7 +122,7 @@ For testing the user interface we use [gremlins.js](https://github.com/marmelab/
 
 ## Style Guide
 
-We use Prettier and ESLint to enforce consistent readable code. Please refer to our [CONTRIBUTING.md](https://github.com/thkruz/keeptrack.space/blob/master/CONTRIBUTING.md#code-style) for more info on styling.
+We use Prettier and ESLint to enforce consistent readable code. Please refer to our [contributing guide](https://github.com/thkruz/keeptrack.space/blob/master/CONTRIBUTING.md#code-style) for more info on styling.
 
 ## Contributors
 * [@cwang-pivotal](https://github.com/cwang-pivotal/)

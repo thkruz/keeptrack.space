@@ -1,6 +1,4 @@
-/**
- * @format
- */
+/* */
 import * as $ from 'jquery';
 import { getMissileSatsLen, getSat, getSatData, satCruncher, setSat } from '@app/js/satSet.js';
 import { doSearch } from '@app/js/uiManager.js';

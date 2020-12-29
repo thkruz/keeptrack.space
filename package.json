@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
   "contributors": [
@@ -40,6 +40,9 @@
     "transform": {
       "^.+\\.[t|j]sx?$": "babel-jest"
     },
+    "setupFiles": [
+      "<rootDir>/test/test-env.js"
+    ],
     "moduleNameMapper": {
       "\\.(css|less|sass|scss)$": "<rootDir>/scripts/styleMock.js",
       "\\.(gif|ttf|eot|svg)$": "<rootDir>/scripts/fileMock.js",
@@ -56,8 +59,8 @@
     "trailingComma": "es5",
     "bracketSpacing": true,
     "arrowParens": "always",
-    "requirePragma": true,
-    "insertPragma": true,
+    "requirePragma": false,
+    "insertPragma": false,
     "proseWrap": "never",
     "htmlWhitespaceSensitivity": "ignore",
     "endOfLine": "lf",
@@ -68,8 +71,12 @@
     "url": "git+https://github.com/thkruz/keeptrack.space"
   },
   "devDependencies": {
+    "@babel/core": "^7.7.2",
+    "@babel/plugin-proposal-private-methods": "^7.12.1",
     "@babel/plugin-transform-modules-commonjs": "^7.12.1",
     "@babel/preset-env": "^7.12.11",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.2.2",
     "codecov": "^3.8.1",
     "copy-dir": "^1.3.0",
     "css-loader": "^5.0.1",

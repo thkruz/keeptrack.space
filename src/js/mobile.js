@@ -1,6 +1,4 @@
-/**
- * @format
- */
+/* */
 
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
 

@@ -3,7 +3,7 @@ import download from 'download-file';
 var url = "https://www.keeptrack.space/TLE.json"
  
 var options = {
-    directory: "./src/",
+    directory: "./src/tle/",
     filename: "TLE.json"
 }
  

@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-escape */
 
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { SunCalc } from '@app/js/lib/suncalc.js';
+import { SunCalc } from '@app/js/suncalc.js';
 import { mathValue } from '@app/js/helpers.js';
 import { satellite } from '@app/js/lookangles.js';
 

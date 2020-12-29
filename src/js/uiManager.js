@@ -40,7 +40,6 @@ import { ColorScheme } from '@app/js/color-scheme.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
 import { earth } from '@app/js/sceneManager/sceneManager.js';
-import { groups } from '@app/js/groups.js';
 import { mapManager } from '@app/js/mapManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
 import { mobile } from '@app/js/mobile.js';
@@ -130,11 +129,12 @@ var isWatchlistChanged = null;
  * @todo Merge _uiInit and uiManager.init
  * @body Managers will become Classes and won't autoInit
  */
-var cameraManager, lineManager, starManager;
-uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef) => {
+var cameraManager, lineManager, starManager, groups;
+uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef, groupsRef) => {
   cameraManager = cameraManagerRef;
   lineManager = lineManagerRef;
   starManager = starManagerRef;
+  groups = groupsRef;
 };
 
 var touchHoldButton = '';
@@ -4863,47 +4863,47 @@ $('#country-menu>ul>li').on('click', function () {
   switch (groupName) {
     case 'Canada':
       if (typeof groups.Canada == 'undefined') {
-        groups.Canada = new groups.SatGroup('countryRegex', /CA/u);
+        groups.Canada = groups.createGroup('countryRegex', /CA/u);
       }
       break;
     case 'China':
       if (typeof groups.China == 'undefined') {
-        groups.China = new groups.SatGroup('countryRegex', /PRC/u);
+        groups.China = groups.createGroup('countryRegex', /PRC/u);
       }
       break;
     case 'France':
       if (typeof groups.France == 'undefined') {
-        groups.France = new groups.SatGroup('countryRegex', /FR/u);
+        groups.France = groups.createGroup('countryRegex', /FR/u);
       }
       break;
     case 'India':
       if (typeof groups.India == 'undefined') {
-        groups.India = new groups.SatGroup('countryRegex', /IND/u);
+        groups.India = groups.createGroup('countryRegex', /IND/u);
       }
       break;
     case 'Israel':
       if (typeof groups.Israel == 'undefined') {
-        groups.Israel = new groups.SatGroup('countryRegex', /ISRA/u);
+        groups.Israel = groups.createGroup('countryRegex', /ISRA/u);
       }
       break;
     case 'Japan':
       if (typeof groups.Japan == 'undefined') {
-        groups.Japan = new groups.SatGroup('countryRegex', /JPN/u);
+        groups.Japan = groups.createGroup('countryRegex', /JPN/u);
       }
       break;
     case 'Russia':
       if (typeof groups.Russia == 'undefined') {
-        groups.Russia = new groups.SatGroup('countryRegex', /CIS/u);
+        groups.Russia = groups.createGroup('countryRegex', /CIS/u);
       }
       break;
     case 'UnitedKingdom':
       if (typeof groups.UnitedKingdom == 'undefined') {
-        groups.UnitedKingdom = new groups.SatGroup('countryRegex', /UK/u);
+        groups.UnitedKingdom = groups.createGroup('countryRegex', /UK/u);
       }
       break;
     case 'UnitedStates':
       if (typeof groups.UnitedStates == 'undefined') {
-        groups.UnitedStates = new groups.SatGroup('countryRegex', /US/u);
+        groups.UnitedStates = groups.createGroup('countryRegex', /US/u);
       }
       break;
   }
@@ -4914,27 +4914,27 @@ $('#constellation-menu>ul>li').on('click', function () {
   switch (groupName) {
     case 'SpaceStations':
       if (typeof groups.SpaceStations == 'undefined') {
-        groups.SpaceStations = new groups.SatGroup('objNum', [25544, 41765]);
+        groups.SpaceStations = groups.createGroup('objNum', [25544, 41765]);
       }
       break;
     case 'GlonassGroup':
       if (typeof groups.GlonassGroup == 'undefined') {
-        groups.GlonassGroup = new groups.SatGroup('nameRegex', /GLONASS/u);
+        groups.GlonassGroup = groups.createGroup('nameRegex', /GLONASS/u);
       }
       break;
     case 'GalileoGroup':
       if (typeof groups.GalileoGroup == 'undefined') {
-        groups.GalileoGroup = new groups.SatGroup('nameRegex', /GALILEO/u);
+        groups.GalileoGroup = groups.createGroup('nameRegex', /GALILEO/u);
       }
       break;
     case 'GPSGroup':
       if (typeof groups.GPSGroup == 'undefined') {
-        groups.GPSGroup = new groups.SatGroup('nameRegex', /NAVSTAR/u);
+        groups.GPSGroup = groups.createGroup('nameRegex', /NAVSTAR/u);
       }
       break;
     case 'AmatuerRadio':
       if (typeof groups.AmatuerRadio == 'undefined') {
-        groups.AmatuerRadio = new groups.SatGroup('objNum', [
+        groups.AmatuerRadio = groups.createGroup('objNum', [
           7530,
           14781,
           20442,
@@ -5024,7 +5024,7 @@ $('#constellation-menu>ul>li').on('click', function () {
       break;
     case 'aehf':
       if (typeof groups.aehf == 'undefined') {
-        groups.aehf = new groups.SatGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.aehf));
+        groups.aehf = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.aehf));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
@@ -5035,7 +5035,7 @@ $('#constellation-menu>ul>li').on('click', function () {
     case 'wgs':
       // WGS also selects DSCS
       if (typeof groups.wgs == 'undefined') {
-        groups.wgs = new groups.SatGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.wgs.concat(satLinkManager.dscs)));
+        groups.wgs = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.wgs.concat(satLinkManager.dscs)));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
@@ -5050,7 +5050,7 @@ $('#constellation-menu>ul>li').on('click', function () {
     case 'starlink':
       // WGS also selects DSCS
       if (typeof groups.starlink == 'undefined') {
-        groups.starlink = new groups.SatGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.starlink));
+        groups.starlink = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.starlink));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
@@ -5065,7 +5065,7 @@ $('#constellation-menu>ul>li').on('click', function () {
     case 'sbirs':
       // SBIRS and DSP
       if (typeof groups.sbirs == 'undefined') {
-        groups.sbirs = new groups.SatGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.sbirs));
+        groups.sbirs = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.sbirs));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
@@ -5084,7 +5084,7 @@ $('#constellation-menu>ul>li').on('click', function () {
 var _groupSelected = function (groupName) {
   if (typeof groupName == 'undefined') return;
   if (typeof groups[groupName] == 'undefined') return;
-  groups.selectGroup(groups[groupName]);
+  groups.selectGroup(groups[groupName], orbitManager);
   $search.val('');
 
   var results = groups[groupName].sats;

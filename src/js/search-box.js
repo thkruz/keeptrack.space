@@ -2,18 +2,18 @@
 
 import * as $ from 'jquery';
 import { ColorScheme } from '@app/js/color-scheme.js';
-import { groups } from '@app/js/groups.js';
 import { satSet } from '@app/js/satSet.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';
 
 var hoverSatId = -1;
 var searchBox = {};
-var satData;
 
 var hovering = false;
 
 var resultsOpen = false;
 var lastResultGroup;
+
+var i;
 
 searchBox.isResultBoxOpen = function () {
   return resultsOpen;
@@ -40,7 +40,7 @@ searchBox.getHoverSat = function () {
 };
 searchBox.hideResults = function () {
   $('#search-results').slideUp();
-  groups.clearSelect();
+  groupsManager.clearSelect();
   resultsOpen = false;
 
   settingsManager.lastSearch = '';
@@ -195,7 +195,7 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
 
   // Make a group to hilight results
   var idList = [];
-  for (i = 0; i < results.length; i++) {
+  for (let i = 0; i < results.length; i++) {
     idList.push(results[i].satId);
   }
 
@@ -203,9 +203,9 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
 
   satSet.setupStarBuffer();
 
-  var dispGroup = new groups.SatGroup('idList', idList);
+  var dispGroup = groupsManager.createGroup('idList', idList);
   lastResultGroup = dispGroup;
-  groups.selectGroup(dispGroup);
+  groupsManager.selectGroup(dispGroup, orbitManager);
 
   if (!isPreventDropDown) {
     searchBox.fillResultBox(results);
@@ -218,7 +218,7 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
 searchBox.fillResultBox = function (results) {
   var resultBox = $('#search-results');
   var html = '';
-  for (var i = 0; i < results.length; i++) {
+  for (i = 0; i < results.length; i++) {
     var sat = satData[results[i].satId];
     html += '<div class="search-result" data-sat-id="' + sat.id + '">';
     html += '<div class="truncate-search">';
@@ -272,8 +272,11 @@ searchBox.fillResultBox = function (results) {
   satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 };
 
-searchBox.init = function (_satData) {
-  satData = _satData; // Copies satData to searchBox. Might be a more efficient way to access satData
+var satData, groupsManager, orbitManager;
+searchBox.init = function (satDataRef, groupsManagerRef, orbitManagerRef) {
+  satData = satDataRef;
+  groupsManager = groupsManagerRef;
+  orbitManager = orbitManagerRef;
 };
 
 export { searchBox };

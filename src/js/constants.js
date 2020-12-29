@@ -1,7 +1,3 @@
-/**
- * @format
- */
-
 let ZOOM_EXP = 3;
 let TAU = 2 * Math.PI;
 let DEG2RAD = TAU / 360;

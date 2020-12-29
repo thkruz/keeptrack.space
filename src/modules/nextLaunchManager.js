@@ -1,6 +1,4 @@
-/**
- * @format
- */
+/* */
 
 import * as $ from 'jquery';
 import { dateFormat } from '@app/js/lib/dateFormat.js';

@@ -1,5 +1,3 @@
-/** @format */
-
 // Side Menu Manager
 var sMM = {};
 

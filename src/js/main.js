@@ -31,7 +31,7 @@ import 'materialize-css';
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { atmosphere, earth, lineManager, moon, sun } from '@app/js/sceneManager/sceneManager.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
-import { isselectedSatNegativeOne, selectSatManager } from '@app/js/selectSat.js'
+import { isselectedSatNegativeOne, selectSatManager } from '@app/js/selectSat.js';
 import { mathValue, watermarkedDataURL } from '@app/js/helpers.js';
 import { satCruncher, satScreenPositionArray, satSet } from '@app/js/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
@@ -130,16 +130,16 @@ let rayOrigin, ptThru, rayDir, toCenterVec, dParallel, longDir, dPerp, dSubSurf,
 var cameraManager;
 
 var initializeKeepTrack = () => {
-  mobile.checkMobileMode();  
+  mobile.checkMobileMode();
   webGlInit();
   cameraManager = new Camera();
   uiManager.init(cameraManager);
-  sun.init();
-  earth.init();
+  earth.init(gl);
+  sun.init(gl, earth);
   if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
-    atmosphere.init();
+    atmosphere.init(gl, earth);
     // Disabling Moon Until it is Fixed
-    moon.init();
+    moon.init(gl, sun);
   }
   ColorScheme.init(cameraManager);
   settingsManager.loadStr('dots');
@@ -165,13 +165,13 @@ var dlManager = {};
   dlManager.setDrawLoopCallback = (cb) => {
     dlManager.drawLoopCallback = cb;
   };
-  dlManager.i = 0;  
+  dlManager.i = 0;
   dlManager.sat;
   dlManager.demoModeSatellite = 0;
   dlManager.demoModeLastTime = 0;
   dlManager.dt = null;
   dlManager.t0 = 0;
-  dlManager.isShowFPS = false;  
+  dlManager.isShowFPS = false;
 }
 
 dlManager.drawLoop = (preciseDt) => {
@@ -181,19 +181,19 @@ dlManager.drawLoop = (preciseDt) => {
   // Record milliseconds since last drawLoop - default is 0
   dlManager.dt = preciseDt - dlManager.t0 || 0;
   // Record last Draw Time for Calculating Difference
-  dlManager.t0 = preciseDt;  
+  dlManager.t0 = preciseDt;
 
   // Display it if that settings is enabled
   if (dlManager.isShowFPS) console.log(1000 / timeManager.dt);
 
   // Update official time for everyone else
   timeManager.setNow(Date.now(), dlManager.dt, $('#datetime-input-tb'));
-  
+
   // Calculate changes related to satellites objects
-  dlManager.satCalculate();  
-  
+  dlManager.satCalculate();
+
   // Calculate camera changes needed since last draw
-  cameraManager.calculate(objectManager.selectedSat, dlManager.dt);      
+  cameraManager.calculate(objectManager.selectedSat, dlManager.dt);
 
   // Missile oribts have to be updated every draw or they quickly become innacurate
   dlManager.updateMissileOrbits();
@@ -212,9 +212,9 @@ dlManager.drawLoop = (preciseDt) => {
 
   // callbacks at the end of the draw loop (this should be used more!)
   dlManager.onDrawLoopComplete(dlManager.drawLoopCallback);
-  
+
   // If Demo Mode do stuff
-  if (settingsManager.isDemoModeOn) _demoMode();  
+  if (settingsManager.isDemoModeOn) _demoMode();
 
   // If in the process of taking a screenshot complete work for that
   if (settingsManager.screenshotMode) dlManager.screenShot();
@@ -223,7 +223,7 @@ dlManager.drawLoop = (preciseDt) => {
 var satSetInitCallBack = (satData) => {
   orbitManager.init(cameraManager);
   lineManager.init(gl, orbitManager.shader);
-  groups.init();
+  groups.init(satSet, orbitManager, ColorScheme);
   setTimeout(function () {
     earth.loadHiRes();
     earth.loadHiResNight();
@@ -265,7 +265,7 @@ var satSetInitCallBack = (satData) => {
       delay: 50,
       html: settingsManager.versionDate,
       position: 'top',
-    });      
+    });
 
     satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
 
@@ -285,10 +285,10 @@ var satSetInitCallBack = (satData) => {
 
     satLinkManager.idToSatnum();
   })();
-}
+};
 
 dlManager.satCalculate = () => {
-  if (objectManager.selectedSat !== -1) {  
+  if (objectManager.selectedSat !== -1) {
     dlManager.sat = satSet.getSat(objectManager.selectedSat);
     objectManager.lastSelectedSat(objectManager.selectedSat);
     if (!dlManager.sat.static) {
@@ -313,7 +313,7 @@ dlManager.satCalculate = () => {
           meshManager.selectedSatPosition.z < dlManager.sat.position.z + 1.0
         ) {
           // Lerp to smooth difference between SGP4 and position+velocity
-          meshManager.lerpPosition(dlManager.sat.position, timeManager.drawDt);          
+          meshManager.lerpPosition(dlManager.sat.position, timeManager.drawDt);
         } else {
           meshManager.updatePosition(dlManager.sat.position);
         }
@@ -335,7 +335,7 @@ dlManager.satCalculate = () => {
     }
     if (objectManager.selectedSat !== -1 || (objectManager.selectedSat == -1 && !isselectedSatNegativeOne)) {
       lineManager.drawWhenSelected();
-    }    
+    }
     dlManager.lastSelectedSat = objectManager.selectedSat;
   }
 };
@@ -350,42 +350,42 @@ dlManager.updateMissileOrbits = () => {
 
 dlManager.screenShot = () => {
   webGlInit();
-    if (settingsManager.queuedScreenshot) return;
+  if (settingsManager.queuedScreenshot) return;
 
+  setTimeout(function () {
+    let link = document.createElement('a');
+    link.download = 'keeptrack.png';
+
+    let d = new Date();
+    let n = d.getFullYear();
+    let copyrightStr;
+    if (!settingsManager.copyrightOveride) {
+      copyrightStr = `©${n} KEEPTRACK.SPACE`;
+    } else {
+      copyrightStr = '';
+    }
+
+    link.href = watermarkedDataURL(canvasDOM[0], copyrightStr);
+    settingsManager.screenshotMode = false;
+    settingsManager.queuedScreenshot = false;
     setTimeout(function () {
-      let link = document.createElement('a');
-      link.download = 'keeptrack.png';
-
-      let d = new Date();
-      let n = d.getFullYear();
-      let copyrightStr;
-      if (!settingsManager.copyrightOveride) {
-        copyrightStr = `©${n} KEEPTRACK.SPACE`;
-      } else {
-        copyrightStr = '';
-      }
-
-      link.href = watermarkedDataURL(canvasDOM[0], copyrightStr);
-      settingsManager.screenshotMode = false;
-      settingsManager.queuedScreenshot = false;
-      setTimeout(function () {
-        link.click();
-      }, 10);
-      webGlInit();
-    }, 200);
-    settingsManager.queuedScreenshot = true;
-}
+      link.click();
+    }, 10);
+    webGlInit();
+  }, 200);
+  settingsManager.queuedScreenshot = true;
+};
 
 var drawScene = () => {
   // Drawing ColorIds for Picking Satellites
   gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);  
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-  dlManager.orbitsAbove();    
+  dlManager.orbitsAbove();
 
-  cameraManager.update(dlManager.sat, dlManager.sensorPos);  
+  cameraManager.update(dlManager.sat, dlManager.sensorPos);
 
   gl.useProgram(gl.pickShaderProgram);
   gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
@@ -393,13 +393,13 @@ var drawScene = () => {
 
   // gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    
+
   if (1000 / timeManager.dt > settingsManager.fpsThrottle1) {
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
       sun.draw(pMatrix, cameraManager.camMatrix);
       moon.draw(pMatrix, cameraManager.camMatrix);
     }
-  } 
+  }
   if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
     atmosphere.update(cameraManager.camPitch);
     atmosphere.draw(pMatrix, cameraManager.camMatrix);
@@ -409,18 +409,18 @@ var drawScene = () => {
   orbitManager.draw(pMatrix, cameraManager.camMatrix);
 
   lineManager.draw();
-  
+
   if (objectManager.selectedSat !== -1 && settingsManager.enableConstantSelectedSatRedraw) {
     orbitManager.clearSelectOrbit();
-    orbitManager.setSelectOrbit(objectManager.selectedSat);    
-  }  
+    orbitManager.setSelectOrbit(objectManager.selectedSat);
+  }
 
   // Draw Satellite Model if a satellite is selected and meshManager is loaded
   if (objectManager.selectedSat !== -1 && typeof meshManager != 'undefined' && meshManager.isReady) {
     let sat = dlManager.sat;
     // If 3D Models Available, then draw them on the screen
     if (typeof meshManager !== 'undefined' && (settingsManager.modelsOnSatelliteViewOverride || cameraManager.cameraType.current !== cameraManager.cameraType.satellite)) {
-      if (!sat.static) {        
+      if (!sat.static) {
         if (sat.SCC_NUM == 25544) {
           meshManager.models.iss.position = meshManager.selectedSatPosition;
           dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
@@ -599,16 +599,16 @@ dlManager.orbitsAbove = () => {
       isSatMiniBoxInUse = false;
       return;
     }
-  
+
     if (sensorManager.currentSensor.lat == null) return;
     if (timeManager.now - satLabelModeLastTime < settingsManager.satLabelInterval) return;
-  
+
     orbitManager.clearInViewOrbit();
-  
+
     var sat;
     labelCount = 0;
     isHoverBoxVisible = true;
-  
+
     hoverBoxOnSatMiniElements = document.getElementById('sat-minibox');
 
     /**
@@ -618,35 +618,37 @@ dlManager.orbitsAbove = () => {
     hoverBoxOnSatMiniElements.innerHTML = '';
     for (var i = 0; i < satSet.orbitalSats && labelCount < settingsManager.maxLabels; i++) {
       sat = satSet.getSatPosOnly(i);
-  
+
       if (sat.static) continue;
       if (sat.missile) continue;
       if (sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) continue;
       if (sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false) continue;
       if (sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
       if (sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
-  
+
       satSet.getScreenCoords(i, pMatrix, cameraManager.camMatrix, sat.position);
       if (satScreenPositionArray.error) continue;
       if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
       if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
-  
+
       // Draw Orbits
       if (!settingsManager.isShowSatNameNotOrbit) {
         orbitManager.addInViewOrbit(i);
       }
-  
+
       // Draw Sat Labels
       // if (!settingsManager.enableHoverOverlay) continue
       satHoverMiniDOM = document.createElement('div');
       satHoverMiniDOM.id = 'sat-minibox-' + i;
       satHoverMiniDOM.textContent = sat.SCC_NUM;
-      satHoverMiniDOM.setAttribute('style', 
-      `display: block;
+      satHoverMiniDOM.setAttribute(
+        'style',
+        `display: block;
        position: absolute;
        left: ${satScreenPositionArray.x + 10}px;
        top: ${satScreenPositionArray.y}px
-       `);
+       `
+      );
       hoverBoxOnSatMiniElements.appendChild(satHoverMiniDOM);
       labelCount++;
     }
@@ -664,7 +666,7 @@ dlManager.orbitsAbove = () => {
     }
     isSatMiniBoxInUse = false;
   }
-}
+};
 
 var currentSearchSats;
 dlManager.updateHover = () => {
@@ -679,7 +681,7 @@ dlManager.updateHover = () => {
   }
   if (!settingsManager.disableUI && searchBox.isHovering()) {
     updateHoverSatId = searchBox.getHoverSat();
-    satSet.getScreenCoords(updateHoverSatId, pMatrix, cameraManager.camMatrix);  
+    satSet.getScreenCoords(updateHoverSatId, pMatrix, cameraManager.camMatrix);
     // if (!cameraManager.earthHitTest(gl, pickColorBuf, satScreenPositionArray.x, satScreenPositionArray.y)) {
     try {
       _hoverBoxOnSat(updateHoverSatId, satScreenPositionArray.x, satScreenPositionArray.y);
@@ -795,7 +797,7 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
         satHoverBoxNode3.innerHTML = 'RA: ' + sat.ra.toFixed(3) + ' deg </br> DEC: ' + sat.dec.toFixed(3) + ' deg';
         if (objectManager.lasthoveringSat !== satId) {
           starManager.drawConstellations(starManager.findStarsConstellation(sat.name));
-        }        
+        }
       } else {
         satHoverBoxNode1.textContent = sat.name;
         satHoverBoxNode2.innerHTML = sat.type + satellite.distance(sat, objectManager.selectedSatData) + '';
@@ -872,7 +874,7 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
       }
     }
 
-    objectManager.setLasthoveringSat = (objectManager.hoveringSat);
+    objectManager.setLasthoveringSat = objectManager.hoveringSat;
 
     satHoverBoxDOM.css({
       'display': 'block',
@@ -1298,10 +1300,10 @@ $(document).ready(function () {
           cameraManager.localRotateStartPosition = cameraManager.localRotateCurrent;
           if (cameraManager.isShiftPressed) {
             cameraManager.isLocalRotateRoll = true;
-          cameraManager.isLocalRotateYaw = false;
+            cameraManager.isLocalRotateYaw = false;
           } else {
             cameraManager.isLocalRotateRoll = false;
-          cameraManager.isLocalRotateYaw = true;
+            cameraManager.isLocalRotateYaw = true;
           }
           evt.preventDefault();
         }
@@ -1358,7 +1360,7 @@ $(document).ready(function () {
       } else {
         // Dont Move While Zooming
         cameraManager.mouseX = evt.originalEvent.touches[0].clientX;
-        cameraManager.mouseY = evt.originalEvent.touches[0].clientY;        
+        cameraManager.mouseY = evt.originalEvent.touches[0].clientY;
         if (cameraManager.isDragging && cameraManager.screenDragPoint[0] !== cameraManager.mouseX && cameraManager.screenDragPoint[1] !== cameraManager.mouseY) {
           dragHasMoved = true;
           cameraManager.camAngleSnappedOnSat = false;
@@ -1373,7 +1375,7 @@ $(document).ready(function () {
     });
     canvasDOM.on('mousemove', function (evt) {
       cameraManager.mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
-      cameraManager.mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);      
+      cameraManager.mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
       if (cameraManager.isDragging && cameraManager.screenDragPoint[0] !== cameraManager.mouseX && cameraManager.screenDragPoint[1] !== cameraManager.mouseY) {
         dragHasMoved = true;
         cameraManager.camAngleSnappedOnSat = false;
@@ -1405,9 +1407,9 @@ $(document).ready(function () {
         }
 
         if (delta < 0) {
-          cameraManager.zoomIn = true;
+          cameraManager.isZoomIn = true;
         } else {
-          cameraManager.zoomIn = false;
+          cameraManager.isZoomIn = false;
         }
 
         cameraManager.rotateEarth(false);
@@ -1439,7 +1441,12 @@ $(document).ready(function () {
           }
         }
 
-        if (cameraManager.cameraType.current === cameraManager.cameraType.planetarium || cameraManager.cameraType.current === cameraManager.cameraType.fps || cameraManager.cameraType.current === cameraManager.cameraType.satellite || cameraManager.cameraType.current === cameraManager.cameraType.astronomy) {
+        if (
+          cameraManager.cameraType.current === cameraManager.cameraType.planetarium ||
+          cameraManager.cameraType.current === cameraManager.cameraType.fps ||
+          cameraManager.cameraType.current === cameraManager.cameraType.satellite ||
+          cameraManager.cameraType.current === cameraManager.cameraType.astronomy
+        ) {
           settingsManager.fieldOfView += delta * 0.0002;
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
@@ -1473,7 +1480,7 @@ $(document).ready(function () {
         }
         cameraManager.screenDragPoint = [cameraManager.mouseX, cameraManager.mouseY];
         cameraManager.dragStartPitch = cameraManager.camPitch;
-        cameraManager.dragStartYaw = cameraManager.camYaw;        
+        cameraManager.dragStartYaw = cameraManager.camYaw;
         if (evt.button === 0) {
           cameraManager.isDragging = true;
         }
@@ -2180,7 +2187,7 @@ $(document).ready(function () {
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = false;
           localStorage.setItem('lastMap', 'blue');
-          earth.init();
+          earth.init(gl);
           earth.loadHiRes();
           earth.loadHiResNight();
           break;
@@ -2193,7 +2200,7 @@ $(document).ready(function () {
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = false;
           localStorage.setItem('lastMap', 'nasa');
-          earth.init();
+          earth.init(gl);
           earth.loadHiRes();
           earth.loadHiResNight();
           break;
@@ -2206,7 +2213,7 @@ $(document).ready(function () {
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = false;
           localStorage.setItem('lastMap', 'trusat');
-          earth.init();
+          earth.init(gl);
           earth.loadHiRes();
           earth.loadHiResNight();
           break;
@@ -2219,7 +2226,7 @@ $(document).ready(function () {
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = false;
           localStorage.setItem('lastMap', 'low');
-          earth.init();
+          earth.init(gl);
           earth.loadHiRes();
           earth.loadHiResNight();
           break;
@@ -2233,7 +2240,7 @@ $(document).ready(function () {
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
             localStorage.setItem('lastMap', 'high');
-            earth.init();
+            earth.init(gl);
             earth.loadHiRes();
             earth.loadHiResNight();
             $('#loading-screen').fadeOut('slow');
@@ -2249,7 +2256,7 @@ $(document).ready(function () {
             settingsManager.hiresNoCloudsImages = true;
             settingsManager.vectorImages = false;
             localStorage.setItem('lastMap', 'high-nc');
-            earth.init();
+            earth.init(gl);
             earth.loadHiRes();
             earth.loadHiResNight();
             $('#loading-screen').fadeOut('slow');
@@ -2264,7 +2271,7 @@ $(document).ready(function () {
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = true;
           localStorage.setItem('lastMap', 'vec');
-          earth.init();
+          earth.init(gl);
           earth.loadHiRes();
           earth.loadHiResNight();
           break;
@@ -2282,7 +2289,11 @@ $(document).ready(function () {
             uiManager.hideSideMenus();
             $('#menu-space-stations').removeClass('bmenu-item-selected');
 
-            if ((!objectManager.isSensorManagerLoaded || sensorManager.currentSensor.lat != null) && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
+            if (
+              (!objectManager.isSensorManagerLoaded || sensorManager.currentSensor.lat != null) &&
+              cameraManager.cameraType.current !== cameraManager.cameraType.planetarium &&
+              cameraManager.cameraType.current !== cameraManager.cameraType.astronomy
+            ) {
               uiManager.legendMenuChange('default');
             }
 
@@ -2296,4 +2307,4 @@ $(document).ready(function () {
   })();
 });
 
-export { dlManager,  gl, webGlInit };
+export { dlManager, gl, webGlInit };

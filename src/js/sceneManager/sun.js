@@ -1,12 +1,8 @@
-/** @format */
-
 // Shaders should NOT be modified
 /* eslint-disable no-useless-escape */
 
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { A } from '@app/js/lib/meuusjs.js';
-import { earth } from '@app/js/sceneManager/earth.js';
-import { gl } from '@app/js/main.js';
 import { mathValue } from '@app/js/helpers.js';
 import { satellite } from '@app/js/lookangles.js';
 import { timeManager } from '@app/js/timeManager.js';
@@ -15,6 +11,7 @@ let mvMatrixEmpty = glm.mat4.create();
 let nMatrixEmpty = glm.mat3.create();
 let NUM_LAT_SEGS = 64;
 let NUM_LON_SEGS = 64;
+var gl, earth;
 
 let vertPosBuf, vertNormBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
 let vertCount;
@@ -82,7 +79,9 @@ sun.shader = {
     }`,
 };
 
-sun.init = function () {
+sun.init = function (glRef, earthRef) {
+  gl = glRef;
+  earth = earthRef;
   // Make New Vertex Array Objects
   // sun.vao = gl.createVertexArray();
   // gl.bindVertexArray(sun.vao);

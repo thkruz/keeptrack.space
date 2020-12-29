@@ -1,14 +1,12 @@
-/** @format */
 /* eslint-disable no-useless-escape */
 
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { earth } from '@app/js/sceneManager/earth.js';
-import { gl } from '@app/js/main.js';
 import { mathValue } from '@app/js/helpers.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';
 
 let mvMatrixEmpty = glm.mat4.create();
 let nMatrixEmpty = glm.mat3.create();
+var earth, gl;
 
 var atmosphere = {};
 atmosphere.lightDirection = [];
@@ -61,7 +59,9 @@ let vertPosBuf, vertNormBuf, vertIndexBuf;
 // Shader Program
 let atmosphereShader;
 
-atmosphere.init = function () {
+atmosphere.init = function (glRef, earthRef) {
+  gl = glRef;
+  earth = earthRef;
   // Make Fragment Shader
   let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
   gl.shaderSource(fragShader, atmosphere.shader.frag);

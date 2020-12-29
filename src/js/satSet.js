@@ -1,6 +1,4 @@
-/**
- * @format
- */
+/* */
 /**
  * /* /////////////////////////////////////////////////////////////////////////////
  *
@@ -1043,6 +1041,7 @@ satSet.loadTLEs = (resp) => {
   settingsManager.shadersReady = true;
 
   if (satSet.satsReadyCallback) {
+    satellite.initLookangles(satSet, satCruncher, sensorManager, groups);
     satSet.satsReadyCallback(satData);
     if (!settingsManager.trusatOnly) {
       // If No Visual Magnitudes, Add The VMag Database

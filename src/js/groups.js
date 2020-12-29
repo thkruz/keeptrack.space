@@ -17,9 +17,6 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-import { ColorScheme } from '@app/js/color-scheme.js';
-import { orbitManager } from '@app/js/orbitManager.js';
-import { satSet } from '@app/js/satSet.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';
 
 ('use strict');
@@ -175,8 +172,12 @@ groups.clearSelect = function () {
   groups.selectedGroup = null;
   settingsManager.isGroupOverlayDisabled = false;
 };
-groups.init = function () {
-  // Might not be needed anymore
+
+var satSet, orbitManager, ColorScheme;
+groups.init = function (satSetRef, orbitManagerRef, ColorSchemeRef) {
+  satSet = satSetRef;
+  orbitManager = orbitManagerRef;
+  ColorScheme = ColorSchemeRef;
 };
 
 export { groups };

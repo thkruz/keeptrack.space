@@ -1,6 +1,3 @@
-/**
- * @format */
-
 import * as $ from 'jquery';
 import { satCruncher, satSet } from '@app/js/satSet.js';
 import { SunCalc } from '@app/js/lib/suncalc.js';

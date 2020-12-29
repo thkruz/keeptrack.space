@@ -17,19 +17,13 @@
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
  * /////////////////////////////////////////////////////////////////////////////
- *
- * @format
  */
 
 'use strict';
 import * as $ from 'jquery';
 import * as satelliteBase from '@app/js/lib/satellite.js';
 import { helpers, mathValue, saveCsv, saveVariable } from '@app/js/helpers.js';
-import { satCruncher, satSet } from '@app/js/satSet.js';
-// import { cameraManager } from '@app/js/main.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
-import { groups } from '@app/js/groups.js';
-import { sensorManager } from '@app/modules/sensorManager.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';
 import { timeManager } from '@app/js/timeManager.js';
 let satellite = satelliteBase;
@@ -40,6 +34,14 @@ const DEG2RAD = TAU / 360;
 const RAD2DEG = 360 / TAU;
 const MINUTES_PER_DAY = 1440;
 const MILLISECONDS_PER_DAY = 1.15741e-8;
+
+var satSet, satCruncher, sensorManager, groups;
+satellite.initLookangles = (satSetRef, satCruncherRef, sensorManagerRef, groupsRef) => {
+  satSet = satSetRef;
+  satCruncher = satCruncherRef;
+  sensorManager = sensorManagerRef;
+  groups = groupsRef;
+};
 
 var _propagate = (propTempOffset, satrec, sensor, lookanglesInterval) => {
   let now = new Date(); // Make a time variable

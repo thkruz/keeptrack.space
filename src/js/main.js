@@ -29,11 +29,11 @@ import 'jquery-ui-bundle';
 import '@app/js/keeptrack-foot.js';
 import 'materialize-css';
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { atmosphere, earth, lineManager, moon, sun } from '@app/js/sceneManager/sceneManager.js';
+import { atmosphere, earth, LineFactory, moon, sun } from '@app/js/sceneManager/sceneManager.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/selectSat.js';
 import { mathValue, watermarkedDataURL } from '@app/js/helpers.js';
-import { satCruncher, satScreenPositionArray, satSet } from '@app/js/satSet.js';
+import { satCruncher, satScreenPositionArray, satSet, getIdFromSensorName, getIdFromStarName, getSat, getStar, getSatPosOnly } from '@app/js/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorScheme } from '@app/js/color-scheme.js';
 import { groups } from '@app/js/groups.js';
@@ -48,7 +48,7 @@ import { satLinkManager } from '@app/modules/satLinkManager.js';
 import { satellite } from '@app/js/lookangles.js';
 import { searchBox } from '@app/js/search-box.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
-import { starManager } from '@app/modules/starManager.js';
+import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { uiManager } from '@app/js/uiManager.js';
 let M = window.M;
@@ -78,6 +78,7 @@ const rightBtnEarthMenuDOM = $('#earth-rmb-menu');
 const satMiniBox = document.querySelector('#sat-minibox');
 
 var gl;
+var lineManager;
 
 var clickedSat = 0;
 
@@ -133,7 +134,6 @@ var initializeKeepTrack = () => {
   mobile.checkMobileMode();
   webGlInit();
   cameraManager = new Camera();
-  uiManager.init(cameraManager);
   earth.init(gl);
   sun.init(gl, earth);
   if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
@@ -143,6 +143,7 @@ var initializeKeepTrack = () => {
   }
   ColorScheme.init(cameraManager);
   settingsManager.loadStr('dots');
+  objectManager.init();
   satSet.init(satSetInitCallBack, cameraManager);
   selectSatManager.init(ColorScheme.group);
   if (settingsManager.isEnableRadarData) radarDataManager.init();
@@ -222,7 +223,10 @@ dlManager.drawLoop = (preciseDt) => {
 
 var satSetInitCallBack = (satData) => {
   orbitManager.init(cameraManager);
-  lineManager.init(gl, orbitManager.shader);
+  lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
+  starManager.init(lineManager, getIdFromStarName);
+  uiManager.init(cameraManager, lineManager, starManager);
+  satLinkManager.init(lineManager, satSet, sensorManager);
   groups.init(satSet, orbitManager, ColorScheme);
   setTimeout(function () {
     earth.loadHiRes();

@@ -32,7 +32,6 @@ import 'materialize-css';
 import '@app/js/keeptrack-foot.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
 import { dlManager, webGlInit } from '@app/js/main.js';
-import { earth, lineManager } from '@app/js/sceneManager/sceneManager.js';
 import { helpers, mathValue, saveAs, saveCsv } from '@app/js/helpers.js';
 import { satCruncher, satSet } from '@app/js/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
@@ -40,6 +39,7 @@ import { CanvasRecorder } from '@app/js/lib/CanvasRecorder.js';
 import { ColorScheme } from '@app/js/color-scheme.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
+import { earth } from '@app/js/sceneManager/sceneManager.js';
 import { groups } from '@app/js/groups.js';
 import { mapManager } from '@app/js/mapManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
@@ -54,7 +54,6 @@ import { satLinkManager } from '@app/modules/satLinkManager.js';
 import { satellite } from '@app/js/lookangles.js';
 import { searchBox } from '@app/js/search-box.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
-import { starManager } from '@app/modules/starManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 let M = window.M;
 
@@ -131,9 +130,11 @@ var isWatchlistChanged = null;
  * @todo Merge _uiInit and uiManager.init
  * @body Managers will become Classes and won't autoInit
  */
-var cameraManager;
-uiManager.init = (cameraManagerRef) => {
+var cameraManager, lineManager, starManager;
+uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef) => {
   cameraManager = cameraManagerRef;
+  lineManager = lineManagerRef;
+  starManager = starManagerRef;
 };
 
 var touchHoldButton = '';

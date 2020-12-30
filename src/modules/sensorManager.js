@@ -22,7 +22,7 @@ import { objectManager } from '@app/js/objectManager.js';
 import { satellite } from '@app/js/lookangles.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';
 import { timeManager } from '@app/js/timeManager.js';
-import { uiManager } from '@app/js/uiManager.js';
+import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 var sensorManager = {};
 sensorManager.tempSensor = {};

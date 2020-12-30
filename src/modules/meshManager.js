@@ -2,11 +2,146 @@
 
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { OBJ } from '@app/js/lib/webgl-obj-loader.js';
-import { earth } from '@app/js/sceneManager/sceneManager.js';
-import { gl } from '@app/js/main.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
-
 let meshManager = {};
+var gl, earth;
+
+meshManager.isReady = false;
+meshManager.init = async (glRef, earthRef) => {
+  if (settingsManager.disableUI || settingsManager.isDrawLess) return;
+  gl = glRef;
+  earth = earthRef;
+
+  settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
+  let p = OBJ.downloadModels(meshManager.fileList);
+
+  p.then((models) => {
+    // eslint-disable-next-line no-unused-vars
+    for (var [name, mesh] of Object.entries(models)) {
+      // console.log("Name:", name);
+      // console.log("Mesh:", mesh);
+    }
+    meshManager.meshes = models;
+    initShaders();
+    initBuffers();
+    meshManager.isReady = true;
+  });
+};
+
+var initShaders = () => {
+  // meshManager.vao = gl.createVertexArray();
+  // gl.bindVertexArray(meshManager.vao);
+
+  let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+  let fragCode = meshManager.fragShaderCode;
+  gl.shaderSource(fragShader, fragCode);
+  gl.compileShader(fragShader);
+
+  let vertShader = gl.createShader(gl.VERTEX_SHADER);
+  let vertCode = meshManager.vertShaderCode;
+  gl.shaderSource(vertShader, vertCode);
+  gl.compileShader(vertShader);
+
+  meshManager.shaderProgram = gl.createProgram();
+  gl.attachShader(meshManager.shaderProgram, vertShader);
+  gl.attachShader(meshManager.shaderProgram, fragShader);
+  gl.linkProgram(meshManager.shaderProgram);
+
+  if (!gl.getProgramParameter(meshManager.shaderProgram, gl.LINK_STATUS)) {
+    console.log('Could not initialise shaders');
+  }
+  gl.useProgram(meshManager.shaderProgram);
+
+  const attrs = {
+    aVertexPosition: OBJ.Layout.POSITION.key,
+    aVertexNormal: OBJ.Layout.NORMAL.key,
+    aTextureCoord: OBJ.Layout.UV.key,
+    aAmbient: OBJ.Layout.AMBIENT.key,
+    aDiffuse: OBJ.Layout.DIFFUSE.key,
+    aSpecular: OBJ.Layout.SPECULAR.key,
+    aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key,
+  };
+
+  meshManager.shaderProgram.attrIndices = {};
+
+  meshManager.shaderProgram.uPMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uPMatrix');
+  meshManager.shaderProgram.uCamMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uCamMatrix');
+  meshManager.shaderProgram.uMvMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uMvMatrix');
+  meshManager.shaderProgram.uNormalMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uNormalMatrix');
+  meshManager.shaderProgram.uLightDirection = gl.getUniformLocation(meshManager.shaderProgram, 'uLightDirection');
+  meshManager.shaderProgram.uInSun = gl.getUniformLocation(meshManager.shaderProgram, 'uInSun');
+
+  meshManager.shaderProgram.applyAttributePointers = function (model) {
+    const layout = model.mesh.vertexBuffer.layout;
+    for (const attrName in attrs) {
+      if (!Object.prototype.hasOwnProperty.call(attrs, attrName) || meshManager.shaderProgram.attrIndices[attrName] == -1) {
+        continue;
+      }
+      const layoutKey = attrs[attrName];
+      if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
+        const attr = layout.attributeMap[layoutKey];
+        gl.vertexAttribPointer(meshManager.shaderProgram.attrIndices[attrName], attr.size, gl[attr.type], attr.normalized, attr.stride, attr.offset);
+      }
+    }
+  };
+  // eslint-disable-next-line no-unused-vars
+  meshManager.shaderProgram.enableVertexAttribArrays = function (model) {
+    for (const attrName in attrs) {
+      if (!Object.prototype.hasOwnProperty.call(attrs, attrName)) {
+        continue;
+      }
+      meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
+      if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
+        gl.enableVertexAttribArray(meshManager.shaderProgram.attrIndices[attrName]);
+      } else {
+        console.warn('Shader attribute "' + attrName + '" not found in shader. Is it undeclared or unused in the shader code?');
+      }
+    }
+  };
+  // eslint-disable-next-line no-unused-vars
+  meshManager.shaderProgram.disableVertexAttribArrays = function (model) {
+    for (const attrName in attrs) {
+      if (!Object.prototype.hasOwnProperty.call(attrs, attrName)) {
+        continue;
+      }
+      meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
+      if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
+        gl.disableVertexAttribArray(meshManager.shaderProgram.attrIndices[attrName]);
+      } else {
+        console.warn('Shader attribute "' + attrName + '" not found in shader. Is it undeclared or unused in the shader code?');
+      }
+    }
+  };
+};
+var initBuffers = () => {
+  var layout = new OBJ.Layout(OBJ.Layout.POSITION, OBJ.Layout.NORMAL, OBJ.Layout.AMBIENT, OBJ.Layout.DIFFUSE, OBJ.Layout.UV, OBJ.Layout.SPECULAR, OBJ.Layout.SPECULAR_EXPONENT);
+
+  // initialize the mesh's buffers
+  for (var mesh in meshManager.meshes) {
+    // Create the vertex buffer for this mesh
+    var vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    var vertexData = meshManager.meshes[mesh].makeBufferData(layout);
+    gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
+    vertexBuffer.numItems = vertexData.numItems;
+    vertexBuffer.layout = layout;
+    meshManager.meshes[mesh].vertexBuffer = vertexBuffer;
+
+    // Create the index buffer for this mesh
+    var indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    var indexData = meshManager.meshes[mesh].makeIndexBufferDataForMaterials(...Object.values(meshManager.meshes[mesh].materialIndices));
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
+    indexBuffer.numItems = indexData.numItems;
+    meshManager.meshes[mesh].indexBuffer = indexBuffer;
+
+    // this loops through the mesh names and creates new
+    // model objects and setting their mesh to the current mesh
+    meshManager.models[mesh] = {};
+    meshManager.models[mesh].mesh = meshManager.meshes[mesh];
+    // meshManager.models[mesh].size = meshManager.sizeInfo[mesh];
+  }
+  meshManager.loaded = true;
+};
 
 meshManager.lerpPosition = (pos, dt) => {
   meshManager.selectedSatPosition.x = pos.x + (meshManager.selectedSatPosition.x - pos.x) * dt;
@@ -20,6 +155,8 @@ meshManager.updatePosition = (pos) => {
 
 (function () {
   if (settingsManager.noMeshManager) return;
+  if (settingsManager.disableUI || settingsManager.isDrawLess) return;
+
   meshManager.selectedSatPosition = { x: 0, y: 0, z: 0 };
   let mvMatrix;
   let mvMatrixEmpty = glm.mat4.create();
@@ -103,22 +240,6 @@ meshManager.updatePosition = (pos) => {
       vTransformedNormal  = uNormalMatrix * aVertexNormal;
     }
   `;
-  meshManager.isReady = false;
-  meshManager.init = () => {
-    let p = OBJ.downloadModels(meshManager.fileList);
-
-    p.then((models) => {
-      // eslint-disable-next-line no-unused-vars
-      for (var [name, mesh] of Object.entries(models)) {
-        // console.log("Name:", name);
-        // console.log("Mesh:", mesh);
-      }
-      meshManager.meshes = models;
-      initShaders();
-      initBuffers();
-      meshManager.isReady = true;
-    });
-  };
   // main app object
   meshManager.meshes = {};
   meshManager.models = {};
@@ -187,122 +308,6 @@ meshManager.updatePosition = (pos) => {
     meshManager.shaderProgram.disableVertexAttribArrays(model);
 
     gl.disable(gl.BLEND);
-  };
-
-  var initShaders = () => {
-    // meshManager.vao = gl.createVertexArray();
-    // gl.bindVertexArray(meshManager.vao);
-
-    let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-    let fragCode = meshManager.fragShaderCode;
-    gl.shaderSource(fragShader, fragCode);
-    gl.compileShader(fragShader);
-
-    let vertShader = gl.createShader(gl.VERTEX_SHADER);
-    let vertCode = meshManager.vertShaderCode;
-    gl.shaderSource(vertShader, vertCode);
-    gl.compileShader(vertShader);
-
-    meshManager.shaderProgram = gl.createProgram();
-    gl.attachShader(meshManager.shaderProgram, vertShader);
-    gl.attachShader(meshManager.shaderProgram, fragShader);
-    gl.linkProgram(meshManager.shaderProgram);
-
-    if (!gl.getProgramParameter(meshManager.shaderProgram, gl.LINK_STATUS)) {
-      console.log('Could not initialise shaders');
-    }
-    gl.useProgram(meshManager.shaderProgram);
-
-    const attrs = {
-      aVertexPosition: OBJ.Layout.POSITION.key,
-      aVertexNormal: OBJ.Layout.NORMAL.key,
-      aTextureCoord: OBJ.Layout.UV.key,
-      aAmbient: OBJ.Layout.AMBIENT.key,
-      aDiffuse: OBJ.Layout.DIFFUSE.key,
-      aSpecular: OBJ.Layout.SPECULAR.key,
-      aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key,
-    };
-
-    meshManager.shaderProgram.attrIndices = {};
-
-    meshManager.shaderProgram.uPMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uPMatrix');
-    meshManager.shaderProgram.uCamMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uCamMatrix');
-    meshManager.shaderProgram.uMvMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uMvMatrix');
-    meshManager.shaderProgram.uNormalMatrix = gl.getUniformLocation(meshManager.shaderProgram, 'uNormalMatrix');
-    meshManager.shaderProgram.uLightDirection = gl.getUniformLocation(meshManager.shaderProgram, 'uLightDirection');
-    meshManager.shaderProgram.uInSun = gl.getUniformLocation(meshManager.shaderProgram, 'uInSun');
-
-    meshManager.shaderProgram.applyAttributePointers = function (model) {
-      const layout = model.mesh.vertexBuffer.layout;
-      for (const attrName in attrs) {
-        if (!Object.prototype.hasOwnProperty.call(attrs, attrName) || meshManager.shaderProgram.attrIndices[attrName] == -1) {
-          continue;
-        }
-        const layoutKey = attrs[attrName];
-        if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
-          const attr = layout.attributeMap[layoutKey];
-          gl.vertexAttribPointer(meshManager.shaderProgram.attrIndices[attrName], attr.size, gl[attr.type], attr.normalized, attr.stride, attr.offset);
-        }
-      }
-    };
-    // eslint-disable-next-line no-unused-vars
-    meshManager.shaderProgram.enableVertexAttribArrays = function (model) {
-      for (const attrName in attrs) {
-        if (!Object.prototype.hasOwnProperty.call(attrs, attrName)) {
-          continue;
-        }
-        meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
-        if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
-          gl.enableVertexAttribArray(meshManager.shaderProgram.attrIndices[attrName]);
-        } else {
-          console.warn('Shader attribute "' + attrName + '" not found in shader. Is it undeclared or unused in the shader code?');
-        }
-      }
-    };
-    // eslint-disable-next-line no-unused-vars
-    meshManager.shaderProgram.disableVertexAttribArrays = function (model) {
-      for (const attrName in attrs) {
-        if (!Object.prototype.hasOwnProperty.call(attrs, attrName)) {
-          continue;
-        }
-        meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
-        if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
-          gl.disableVertexAttribArray(meshManager.shaderProgram.attrIndices[attrName]);
-        } else {
-          console.warn('Shader attribute "' + attrName + '" not found in shader. Is it undeclared or unused in the shader code?');
-        }
-      }
-    };
-  };
-  var initBuffers = () => {
-    var layout = new OBJ.Layout(OBJ.Layout.POSITION, OBJ.Layout.NORMAL, OBJ.Layout.AMBIENT, OBJ.Layout.DIFFUSE, OBJ.Layout.UV, OBJ.Layout.SPECULAR, OBJ.Layout.SPECULAR_EXPONENT);
-
-    // initialize the mesh's buffers
-    for (var mesh in meshManager.meshes) {
-      // Create the vertex buffer for this mesh
-      var vertexBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-      var vertexData = meshManager.meshes[mesh].makeBufferData(layout);
-      gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
-      vertexBuffer.numItems = vertexData.numItems;
-      vertexBuffer.layout = layout;
-      meshManager.meshes[mesh].vertexBuffer = vertexBuffer;
-
-      // Create the index buffer for this mesh
-      var indexBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-      var indexData = meshManager.meshes[mesh].makeIndexBufferDataForMaterials(...Object.values(meshManager.meshes[mesh].materialIndices));
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
-      indexBuffer.numItems = indexData.numItems;
-      meshManager.meshes[mesh].indexBuffer = indexBuffer;
-
-      // this loops through the mesh names and creates new
-      // model objects and setting their mesh to the current mesh
-      meshManager.models[mesh] = {};
-      meshManager.models[mesh].mesh = meshManager.meshes[mesh];
-      // meshManager.models[mesh].size = meshManager.sizeInfo[mesh];
-    }
-    meshManager.loaded = true;
   };
 
   {

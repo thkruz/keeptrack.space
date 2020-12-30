@@ -30,8 +30,6 @@ sun calculations are based on http://aa.quae.nl/en/reken/zonpositie.html formula
 */
 
 class SunCalc {
-  constructor() {}
-
   static MILLISECONDS_IN_A_DAY = 1000 * 60 * 60 * 24;
   static TAU = Math.PI * 2; // https://tauday.com/tau-manifesto
   static J1970 = 2440588;
@@ -114,15 +112,15 @@ class SunCalc {
   }
 
   static julianCycle(d, lw) {
-    return Math.round(d - J0 - lw / ((2 * SunCalc.TAU) / 2));
+    return Math.round(d - SunCalc.J0 - lw / ((2 * SunCalc.TAU) / 2));
   }
 
   static approxTransit(Ht, lw, n) {
-    return J0 + (Ht + lw) / ((2 * SunCalc.TAU) / 2) + n;
+    return SunCalc.J0 + (Ht + lw) / ((2 * SunCalc.TAU) / 2) + n;
   }
 
   static solarTransitJ(ds, M, L) {
-    return J2000 + ds + 0.0053 * Math.sin(M) - 0.0069 * Math.sin(2 * L);
+    return SunCalc.J2000 + ds + 0.0053 * Math.sin(M) - 0.0069 * Math.sin(2 * L);
   }
 
   static hourAngle(h, phi, d) {
@@ -173,7 +171,7 @@ class SunCalc {
 
   // adds a custom time to the times config
   static addTime(angle, riseName, setName) {
-    times.push([angle, riseName, setName]);
+    SunCalc.times.push([angle, riseName, setName]);
   }
 
   // calculates sun times for a given date and latitude/longitude
@@ -198,8 +196,8 @@ class SunCalc {
       nadir: SunCalc.fromJulian(Jnoon - 0.5),
     };
 
-    for (i = 0, len = times.length; i < len; i += 1) {
-      time = times[i];
+    for (i = 0, len = SunCalc.times.length; i < len; i += 1) {
+      time = SunCalc.times[i];
 
       Jset = SunCalc.getSetJ((time[0] * SunCalc.TAU) / 360, lw, phi, dec, n, M, L);
       Jrise = Jnoon - (Jset - Jnoon);

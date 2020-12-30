@@ -15,8 +15,8 @@
   //   "sourceType": "module"
   // },
   "plugins": [
-    // "classPrivateMethods",
-    // "babel"
+    "classPrivateMethods",
+    "babel"
   ],
   "rules": {
     "accessor-pairs": "error",

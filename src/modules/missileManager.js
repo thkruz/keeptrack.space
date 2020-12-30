@@ -1,7 +1,7 @@
 /* */
 import * as $ from 'jquery';
 import { getMissileSatsLen, getSat, getSatData, satCruncher, setSat } from '@app/js/satSet.js';
-import { doSearch } from '@app/js/uiManager.js';
+import { doSearch } from '@app/js/uiManager/uiManager.js';
 import { mathValue } from '@app/js/helpers.js';
 import { satellite } from '@app/js/lookangles.js';
 import { sensorManager } from '@app/modules/sensorManager.js';

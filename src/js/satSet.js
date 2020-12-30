@@ -44,7 +44,7 @@ import { searchBox } from '@app/js/search-box.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
 import { sun } from '@app/js/sceneManager/sceneManager.js';
 import { timeManager } from '@app/js/timeManager.js';
-import { uiManager } from '@app/js/uiManager.js';
+import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 // 'use strict';
 var satSet = {};

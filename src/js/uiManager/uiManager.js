@@ -31,7 +31,6 @@ import '@app/js/lib/colorPick.js';
 import 'materialize-css';
 import '@app/js/keeptrack-foot.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
-import { dlManager, webGlInit } from '@app/js/main.js';
 import { helpers, mathValue, saveAs, saveCsv } from '@app/js/helpers.js';
 import { satCruncher, satSet } from '@app/js/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
@@ -39,6 +38,7 @@ import { CanvasRecorder } from '@app/js/lib/CanvasRecorder.js';
 import { ColorScheme } from '@app/js/color-scheme.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
+import { dlManager } from '@app/js/dlManager/dlManager.js';
 import { earth } from '@app/js/sceneManager/sceneManager.js';
 import { mapManager } from '@app/js/mapManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
@@ -54,6 +54,9 @@ import { satellite } from '@app/js/lookangles.js';
 import { searchBox } from '@app/js/search-box.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
 import { timeManager } from '@app/js/timeManager.js';
+import { uiInput } from './ui-input.js';
+import { uiLimited } from './ui-limited.js';
+import { webGlInit } from '@app/js/main.js';
 let M = window.M;
 
 // Public Variables
@@ -130,7 +133,11 @@ var isWatchlistChanged = null;
  * @body Managers will become Classes and won't autoInit
  */
 var cameraManager, lineManager, starManager, groups;
-uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef, groupsRef) => {
+uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef, groupsRef, satSet, orbitManager, groupsManager, ColorScheme) => {
+  if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
+    // Pass the references through to the limited UI
+    uiLimited.init(satSet, orbitManager, groupsManager, ColorScheme);
+  }
   cameraManager = cameraManagerRef;
   lineManager = lineManagerRef;
   starManager = starManagerRef;
@@ -138,7 +145,7 @@ uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef, groupsRef) =
 };
 
 var touchHoldButton = '';
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
   // Code Once index.htm is loaded
   if (settingsManager.offline) updateInterval = 250;
   $('#versionNumber-text')[0].innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
@@ -5480,4 +5487,4 @@ uiManager.updateMap = function () {
   }
 };
 
-export { doSearch, uiManager };
+export { doSearch, uiManager, uiLimited, uiInput };

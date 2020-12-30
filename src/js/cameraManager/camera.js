@@ -77,15 +77,15 @@ class Camera {
     };
   }
 
-  /** Static Methods */
-  static normalizeAngle(angle) {
+  /** Private Methods */
+  #normalizeAngle(angle) {
     angle %= TAU;
     if (angle > TAU / 2) angle -= TAU;
     if (angle < -TAU / 2) angle += TAU;
     return angle;
   }
 
-  static longToYaw(long, selectedDate) {
+  #longToYaw(long, selectedDate) {
     let today = new Date();
     let angle = 0;
 
@@ -103,11 +103,11 @@ class Camera {
     longOffset = longOffset * 15; // 15 Degress Per Hour longitude Offset
 
     angle = (long + longOffset) * DEG2RAD;
-    angle = Camera.normalizeAngle(angle);
+    angle = this.#normalizeAngle(angle);
     return angle;
   }
 
-  static latToPitch(lat) {
+  #latToPitch(lat) {
     let pitch = lat * DEG2RAD;
     if (pitch > TAU / 4) pitch = TAU / 4; // Max 90 Degrees
     if (pitch < -TAU / 4) pitch = -TAU / 4; // Min -90 Degrees
@@ -489,13 +489,13 @@ class Camera {
 
   lookAtSensor(zoom, lat, long, date) {
     this.changeZoom(zoom);
-    this.camSnap(Camera.latToPitch(lat), Camera.longToYaw(long, date));
+    this.camSnap(this.#latToPitch(lat), this.#longToYaw(long, date));
   }
 
   camSnap(pitch, yaw) {
     // this.panReset = true
     this.#camPitchTarget = pitch;
-    this.#camYawTarget = Camera.normalizeAngle(yaw);
+    this.#camYawTarget = this.#normalizeAngle(yaw);
     this.#ecPitch = pitch;
     this.#ecYaw = yaw;
     this.camSnapMode = true;
@@ -788,28 +788,28 @@ class Camera {
       }
     }
     if (this.isLocalRotate || this.localRotateReset) {
-      this.#localRotateTarget.pitch = Camera.normalizeAngle(this.#localRotateTarget.pitch);
-      this.#localRotateTarget.yaw = Camera.normalizeAngle(this.#localRotateTarget.yaw);
-      this.#localRotateTarget.roll = Camera.normalizeAngle(this.#localRotateTarget.roll);
-      this.localRotateCurrent.pitch = Camera.normalizeAngle(this.localRotateCurrent.pitch);
-      this.localRotateCurrent.yaw = Camera.normalizeAngle(this.localRotateCurrent.yaw);
-      this.localRotateCurrent.roll = Camera.normalizeAngle(this.localRotateCurrent.roll);
+      this.#localRotateTarget.pitch = this.#normalizeAngle(this.#localRotateTarget.pitch);
+      this.#localRotateTarget.yaw = this.#normalizeAngle(this.#localRotateTarget.yaw);
+      this.#localRotateTarget.roll = this.#normalizeAngle(this.#localRotateTarget.roll);
+      this.localRotateCurrent.pitch = this.#normalizeAngle(this.localRotateCurrent.pitch);
+      this.localRotateCurrent.yaw = this.#normalizeAngle(this.localRotateCurrent.yaw);
+      this.localRotateCurrent.roll = this.#normalizeAngle(this.localRotateCurrent.roll);
 
       // If user is actively moving
       if (this.isLocalRotate) {
         this.#localRotateDif.pitch = this.screenDragPoint[1] - this.mouseY;
         this.#localRotateTarget.pitch = this.localRotateStartPosition.pitch + this.#localRotateDif.pitch * -settingsManager.cameraMovementSpeed;
-        this.#localRotateSpeed.pitch = Camera.normalizeAngle(this.localRotateCurrent.pitch - this.#localRotateTarget.pitch) * -settingsManager.cameraMovementSpeed;
+        this.#localRotateSpeed.pitch = this.#normalizeAngle(this.localRotateCurrent.pitch - this.#localRotateTarget.pitch) * -settingsManager.cameraMovementSpeed;
 
         if (this.isLocalRotateRoll) {
           this.#localRotateDif.roll = this.screenDragPoint[0] - this.mouseX;
           this.#localRotateTarget.roll = this.localRotateStartPosition.roll + this.#localRotateDif.roll * settingsManager.cameraMovementSpeed;
-          this.#localRotateSpeed.roll = Camera.normalizeAngle(this.localRotateCurrent.roll - this.#localRotateTarget.roll) * -settingsManager.cameraMovementSpeed;
+          this.#localRotateSpeed.roll = this.#normalizeAngle(this.localRotateCurrent.roll - this.#localRotateTarget.roll) * -settingsManager.cameraMovementSpeed;
         }
         if (this.isLocalRotateYaw) {
           this.#localRotateDif.yaw = this.screenDragPoint[0] - this.mouseX;
           this.#localRotateTarget.yaw = this.localRotateStartPosition.yaw + this.#localRotateDif.yaw * settingsManager.cameraMovementSpeed;
-          this.#localRotateSpeed.yaw = Camera.normalizeAngle(this.localRotateCurrent.yaw - this.#localRotateTarget.yaw) * -settingsManager.cameraMovementSpeed;
+          this.#localRotateSpeed.yaw = this.#normalizeAngle(this.localRotateCurrent.yaw - this.#localRotateTarget.yaw) * -settingsManager.cameraMovementSpeed;
         }
       }
 
@@ -857,8 +857,8 @@ class Camera {
         this.yDif = this.screenDragPoint[1] - this.mouseY;
         this.yawTarget = this.dragStartYaw + this.xDif * settingsManager.cameraMovementSpeed;
         this.pitchTarget = this.dragStartPitch + this.yDif * -settingsManager.cameraMovementSpeed;
-        this.#camPitchSpeed = Camera.normalizeAngle(this.camPitch - this.pitchTarget) * -settingsManager.cameraMovementSpeed;
-        this.#camYawSpeed = Camera.normalizeAngle(this.camYaw - this.yawTarget) * -settingsManager.cameraMovementSpeed;
+        this.#camPitchSpeed = this.#normalizeAngle(this.camPitch - this.pitchTarget) * -settingsManager.cameraMovementSpeed;
+        this.#camYawSpeed = this.#normalizeAngle(this.camYaw - this.yawTarget) * -settingsManager.cameraMovementSpeed;
       } else {
         // This is how we handle a raycast that hit the earth to make it feel like you are grabbing onto the surface
         // of the earth instead of the screen
@@ -871,7 +871,7 @@ class Camera {
           // dragPointLat = Math.atan2(dragPoint[2], dragPointR);
           // dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
           // pitchDif = dragPointLat - dragTargetLat;
-          // yawDif = Camera.normalizeAngle(dragPointLon - dragTargetLon);
+          // yawDif = this.#normalizeAngle(dragPointLon - dragTargetLon);
           // this.#camPitchSpeed = pitchDif * settingsManager.cameraMovementSpeed;
           // this.#camYawSpeed = yawDif * settingsManager.cameraMovementSpeed;
         */
@@ -966,7 +966,7 @@ class Camera {
     if (this.camSnapMode) {
       this.camPitch += (this.#camPitchTarget - this.camPitch) * this.#chaseSpeed * dt;
 
-      this.#yawErr = Camera.normalizeAngle(this.#camYawTarget - this.camYaw);
+      this.#yawErr = this.#normalizeAngle(this.#camYawTarget - this.camYaw);
       this.camYaw += this.#yawErr * this.#chaseSpeed * dt;
 
       this.zoomLevel = this.zoomLevel + (this.zoomTarget - this.zoomLevel) * dt * 0.0025;
@@ -983,7 +983,7 @@ class Camera {
     }
 
     if (this.cameraType.current == this.cameraType.fixedToSat) {
-      this.camPitch = Camera.normalizeAngle(this.camPitch);
+      this.camPitch = this.#normalizeAngle(this.camPitch);
     } else {
       if (this.camPitch > TAU / 4) this.camPitch = TAU / 4;
       if (this.camPitch < -TAU / 4) this.camPitch = -TAU / 4;

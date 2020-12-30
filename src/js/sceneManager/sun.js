@@ -79,7 +79,7 @@ sun.shader = {
     }`,
 };
 
-sun.init = function (glRef, earthRef) {
+sun.init = async (glRef, earthRef) => {
   gl = glRef;
   earth = earthRef;
   // Make New Vertex Array Objects

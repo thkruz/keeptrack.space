@@ -12,7 +12,6 @@
 import * as $ from 'jquery';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
 import { satSensorMarkerArray, satSet } from '@app/js/satSet.js';
-import { gl } from '@app/js/main.js';
 import { objectManager } from '@app/js/objectManager.js';
 import { satellite } from '@app/js/lookangles.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
@@ -164,9 +163,11 @@ ColorScheme.reloadColors = function () {
   colorTheme = settingsManager.colors;
 };
 
-var sat, color, cameraManager;
-ColorScheme.init = function (cameraManagerRef) {
+var sat, color, cameraManager, gl;
+ColorScheme.init = function (glRef, cameraManagerRef) {
   cameraManager = cameraManagerRef;
+  gl = glRef;
+
   ColorScheme.default = new ColorScheme(function (sat) {
     if (sat.static && sat.type === 'Star') {
       if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {

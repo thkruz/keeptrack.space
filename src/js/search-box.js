@@ -274,6 +274,7 @@ searchBox.fillResultBox = function (results) {
 
 var satData, groupsManager, orbitManager;
 searchBox.init = function (satDataRef, groupsManagerRef, orbitManagerRef) {
+  if (settingsManager.disableUI) return;
   satData = satDataRef;
   groupsManager = groupsManagerRef;
   orbitManager = orbitManagerRef;

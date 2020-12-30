@@ -25,7 +25,7 @@ mobile.fullscreenToggle = function () {
   }
 };
 
-mobile.checkMobileMode = function () {
+mobile.checkMobileMode = async () => {
   db.log('mobile.checkMobileMode');
   if (mobile.checkIfMobileDevice()) {
     mobile.forceResize = true;

@@ -100,7 +100,8 @@ moon.getXYZ = () => {
   };
 };
 
-moon.init = function (glRef, sunRef) {
+moon.init = async (glRef, sunRef) => {
+  if (settingsManager.enableLimitedUI || settingsManager.isDrawLess) return;
   gl = glRef;
   sun = sunRef;
   let fragShader = gl.createShader(gl.FRAGMENT_SHADER);

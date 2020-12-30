@@ -95,7 +95,7 @@ earth.isDayNightToggle = (val) => {
   isDayNightToggle = val;
 };
 
-earth.init = function (glRef) {
+earth.init = async (glRef) => {
   gl = glRef;
   // Make Fragment Shader
   let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -146,7 +146,7 @@ earth.init = function (glRef) {
     };
     img.src = 'textures/earthmap512.jpg';
 
-    earth.loadHiRes = () => {
+    earth.loadHiRes = async () => {
       var imgHiRes = new Image();
       imgHiRes.src = 'textures/earthmap4k.jpg';
       if (settingsManager.nasaImages) imgHiRes.src = 'textures/mercator-tex.jpg';
@@ -185,7 +185,7 @@ earth.init = function (glRef) {
     };
     nightImg.src = 'textures/earthlights512.jpg';
 
-    earth.loadHiResNight = () => {
+    earth.loadHiResNight = async () => {
       var nightImgHiRes = new Image();
       if (!settingsManager.smallImages) nightImgHiRes.src = 'textures/earthlights4k.jpg';
       if (settingsManager.vectorImages) nightImgHiRes.src = 'textures/dayearthvector-4096.jpg';

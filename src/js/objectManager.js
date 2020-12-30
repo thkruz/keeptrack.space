@@ -7,7 +7,6 @@ import { controlSiteManager } from '@app/modules/controlSiteManager.js';
 import { launchSiteManager } from '@app/modules/launchSiteManager.js';
 import { satLinkManager } from '@app/modules/satLinkManager.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
 import { stars } from '@app/js/starManager/stars.js';
 
 var objectManager = {};
@@ -37,7 +36,7 @@ if (typeof satLinkManager == 'undefined') {
   objectManager.issatLinkManagerLoaded = true;
 }
 
-objectManager.init = function () {
+objectManager.init = async () => {
   for (let i = 0; i < settingsManager.maxMissiles; i++) {
     var missileInfo = {
       static: false,

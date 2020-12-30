@@ -444,9 +444,8 @@ satSet.changeShaders = (newShaders) => {
 };
 */
 var cameraManager;
-satSet.init = (satsReadyCallback, cameraManagerRef) => {
+satSet.init = async (cameraManagerRef) => {
   cameraManager = cameraManagerRef;
-  satSet.satsReadyCallback = satsReadyCallback;
   db.log('satSet.init');
   /** Parses GET variables for Possible sharperShaders */
   (function parseFromGETVariables() {
@@ -580,59 +579,59 @@ satSet.init = (satsReadyCallback, cameraManagerRef) => {
   dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
   dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
 
-  // Setup Catalog Now that SatSet is setup
-  satSet.startCatalogLoad = () => {
-    settingsManager.isCatalogPreloaded = true;
-    if (typeof settingsManager.tleSource == 'undefined') {
-      settingsManager.tleSource = `${settingsManager.installDirectory}tle/TLE.json`;
-    }
-    if (settingsManager.offline) {
-      satSet.loadTLEs(jsTLEfile);
-      // jsTLEfile = null;
-    } else {
-      try {
-        var tleSource = settingsManager.tleSource;
-        // $.get('' + tleSource + '?v=' + settingsManager.versionNumber)
-        $.get({
-          url: '' + tleSource,
-          cache: false,
-        })
-          .done(function (resp) {
-            // if the .json loads then use it
-            satSet.loadTLEs(resp);
-          })
-          .fail(function () {
-            // Disable Caching
-            // Try using a cached version - mainly for serviceWorker
-            $.get({
-              url: '' + tleSource,
-              cache: true,
-            })
-              .done(function (resp) {
-                // if the .json loads then use it
-                satSet.loadTLEs(resp);
-              })
-              .fail(function () {
-                // Try the js file without caching
-                $.getScript(
-                  `${settingsManager.installDirectory}offline/tle.js`,
-                  function () {
-                    satSet.loadTLEs(jsTLEfile);
-                  },
-                  true
-                );
-              });
-          });
-      } catch (e) {
-        console.log(e);
-        satSet.loadTLEs(jsTLEfile);
-      }
-    }
-  };
-  satSet.startCatalogLoad();
-
-  satSet.isInitDone = true;
+  let satSetRef = await satSet.startCatalogLoad();
+  return satSetRef;
 };
+// Setup Catalog Now that SatSet is setup
+satSet.startCatalogLoad = async () => {
+  settingsManager.isCatalogPreloaded = true;
+  if (typeof settingsManager.tleSource == 'undefined') {
+    settingsManager.tleSource = `${settingsManager.installDirectory}tle/TLE.json`;
+  }
+  if (settingsManager.offline) {
+    satSet.loadTLEs(jsTLEfile);
+    // jsTLEfile = null;
+  } else {
+    try {
+      var tleSource = settingsManager.tleSource;
+      // $.get('' + tleSource + '?v=' + settingsManager.versionNumber)
+      await $.get({
+        url: '' + tleSource,
+        cache: false,
+      })
+        .done(function (resp) {
+          // if the .json loads then use it
+          return satSet.loadTLEs(resp);
+        })
+        .fail(function () {
+          // Disable Caching
+          // Try using a cached version - mainly for serviceWorker
+          $.get({
+            url: '' + tleSource,
+            cache: true,
+          })
+            .done(function (resp) {
+              // if the .json loads then use it
+              return satSet.loadTLEs(resp);
+            })
+            .fail(function () {
+              // Try the js file without caching
+              $.getScript(
+                `${settingsManager.installDirectory}offline/tle.js`,
+                function () {
+                  return satSet.loadTLEs(jsTLEfile);
+                },
+                true
+              );
+            });
+        });
+    } catch (e) {
+      console.log(e);
+      return satSet.loadTLEs(jsTLEfile);
+    }
+  }
+};
+
 // Load the Catalog
 satSet.loadTLEs = (resp) => {
   var obslatitude;
@@ -1026,19 +1025,19 @@ satSet.loadTLEs = (resp) => {
   satSet.setColorScheme(ColorScheme.default, true);
   settingsManager.shadersReady = true;
 
-  if (satSet.satsReadyCallback) {
-    satSet.satsReadyCallback(satData);
-    if (!settingsManager.trusatOnly) {
-      // If No Visual Magnitudes, Add The VMag Database
-      try {
-        if (typeof satSet.getSat(satSet.getIdFromObjNum(44235)).vmag == 'undefined') {
-          satVmagManager.init();
-        }
-      } catch (e) {
-        console.debug('satVmagManager Not Loaded');
+  if (!settingsManager.trusatOnly) {
+    // If No Visual Magnitudes, Add The VMag Database
+    try {
+      if (typeof satSet.getSat(satSet.getIdFromObjNum(44235)).vmag == 'undefined') {
+        satVmagManager.init();
       }
+    } catch (e) {
+      console.debug('satVmagManager Not Loaded');
     }
   }
+
+  satSet.isInitDone = true;
+  return satData;
 };
 
 satSet.getSatData = () => {

@@ -129,34 +129,50 @@ let isShowDistance = true;
 // getEarthScreenPoint
 let rayOrigin, ptThru, rayDir, toCenterVec, dParallel, longDir, dPerp, dSubSurf, dSurf, ptSurf;
 
-var cameraManager;
+var cameraManager, satData;
 
-var initializeKeepTrack = () => {
-  mobile.checkMobileMode();
-  webGlInit();
+var initializeKeepTrack = async () => {
+  await mobile.checkMobileMode();
+  await webGlInit();
   cameraManager = new Camera();
-  ColorScheme.init(cameraManager);
-  earth.init(gl);
-  sun.init(gl, earth);
-  if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
-    atmosphere.init(gl, earth);
-    // Disabling Moon Until it is Fixed
-    moon.init(gl, sun);
-  }
-  settingsManager.loadStr('dots');
+  await ColorScheme.init(gl, cameraManager);
+  selectSatManager.init(ColorScheme.group);
   objectManager.init();
-  satSet.init(satSetInitCallBack, cameraManager);
-  if (settingsManager.isEnableRadarData) radarDataManager.init();
-  dlManager.drawLoop(); // kick off the animationFrame()s
-  if (!settingsManager.disableUI && !settingsManager.isDrawLess) {
-    // Load Optional 3D models if available
-    if (typeof meshManager !== 'undefined') {
-      setTimeout(function () {
-        meshManager.init();
-      }, 0);
-      settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
-    }
-  }
+  await earth.init(gl);
+  earth.loadHiRes();
+  earth.loadHiResNight();
+  meshManager.init(gl, earth);
+  atmosphere.init(gl, earth);
+  await sun.init(gl, earth);
+  moon.init(gl, sun);
+  settingsManager.loadStr('dots');
+
+  // Returns a Reference to satData
+  satData = await satSet.init(cameraManager);
+
+  groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
+  await orbitManager.init(cameraManager, groupsManager);
+  searchBox.init(satData, groupsManager, orbitManager);
+  lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
+  satLinkManager.init(lineManager, satSet, sensorManager);
+  starManager.init(lineManager, getIdFromStarName);
+  uiManager.init(cameraManager, lineManager, starManager, groupsManager);
+  await satellite.initLookangles(satSet, satCruncher, sensorManager, groupsManager);
+  await radarDataManager.init(sensorManager, timeManager, satSet, satCruncher, satellite);
+  satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
+  satLinkManager.idToSatnum();
+  if (settingsManager.startWithOrbitsDisplayed) startWithOrbits();
+
+  dlManager.drawLoop();
+};
+
+var startWithOrbits = async () => {
+  // All Orbits
+  groupsManager.debris = groupsManager.createGroup('all', '');
+  groupsManager.selectGroup(groupsManager.debris, orbitManager);
+  satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+  groupsManager.debris.updateOrbits(orbitManager);
+  settingsManager.isOrbitOverlayVisible = true;
 };
 
 var dlManager = {};
@@ -219,92 +235,6 @@ dlManager.drawLoop = (preciseDt) => {
 
   // If in the process of taking a screenshot complete work for that
   if (settingsManager.screenshotMode) dlManager.screenShot();
-};
-
-var satSetInitCallBack = (satData) => {
-  groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
-  selectSatManager.init(ColorScheme.group);
-  orbitManager.init(cameraManager, groupsManager);
-  lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
-  starManager.init(lineManager, getIdFromStarName);
-  satellite.initLookangles(satSet, satCruncher, sensorManager, groupsManager);
-  uiManager.init(cameraManager, lineManager, starManager, groupsManager);
-  satLinkManager.init(lineManager, satSet, sensorManager);
-  setTimeout(function () {
-    earth.loadHiRes();
-    earth.loadHiResNight();
-    // TOOD: Fix service worker with webpack
-    // if (!settingsManager.offline && 'serviceWorker' in navigator) {
-    //   navigator.serviceWorker.register('./serviceWorker.js').then(function () {
-    //     console.debug(`[Service Worker] Installed!`);
-    //   });
-    // }
-  }, 0);
-  if (!settingsManager.disableUI) {
-    searchBox.init(satData, groupsManager, orbitManager);
-  }
-  (function _checkIfEarthFinished() {
-    if (earth.loaded) return;
-    settingsManager.loadStr('coloring');
-    setTimeout(function () {
-      _checkIfEarthFinished();
-    }, 250);
-  })();
-  let isFinalLoadingComplete = false;
-  (function _finalLoadingSequence() {
-    if (
-      !isFinalLoadingComplete &&
-      !earth.loaded
-      // && settingsManager.cruncherReady
-    ) {
-      setTimeout(function () {
-        _finalLoadingSequence();
-      }, 250);
-      return;
-    }
-    if (isFinalLoadingComplete) return;
-    // NOTE:: This is called right after all the objects load on the screen.
-
-    // Version Info Updated
-    $('#version-info').html(settingsManager.versionNumber);
-    $('#version-info').tooltip({
-      delay: 50,
-      html: settingsManager.versionDate,
-      position: 'top',
-    });
-
-    satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
-
-    if ($(window).width() > $(window).height()) {
-      settingsManager.mapHeight = $(window).width(); // Subtract 12 px for the scroll
-      $('#map-image').width(settingsManager.mapHeight);
-      settingsManager.mapHeight = (settingsManager.mapHeight * 3) / 4;
-      $('#map-image').height(settingsManager.mapHeight);
-      $('#map-menu').width($(window).width());
-    } else {
-      settingsManager.mapHeight = $(window).height() - 100; // Subtract 12 px for the scroll
-      $('#map-image').height(settingsManager.mapHeight);
-      settingsManager.mapHeight = (settingsManager.mapHeight * 4) / 3;
-      $('#map-image').width(settingsManager.mapHeight);
-      $('#map-menu').width($(window).width());
-    }
-
-    satLinkManager.idToSatnum();
-  })();
-
-  if (settingsManager.startWithOrbitsDisplayed) {
-    setTimeout(function () {
-      // Time Machine
-      // orbitManager.historyOfSatellitesPlay();
-
-      // All Orbits
-      groupsManager.debris = groupsManager.createGroup('all', '');
-      groupsManager.selectGroup(groupsManager.debris, orbitManager);
-      satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-      groupsManager.debris.updateOrbits(orbitManager);
-      settingsManager.isOrbitOverlayVisible = true;
-    }, 0);
-  }
 };
 
 dlManager.satCalculate = () => {
@@ -940,7 +870,7 @@ var _demoMode = () => {
   }
 };
 
-var webGlInit = () => {
+var webGlInit = async () => {
   db.log('webGlInit');
   let can = canvasDOM[0];
   let dpi;

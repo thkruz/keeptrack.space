@@ -59,7 +59,8 @@ let vertPosBuf, vertNormBuf, vertIndexBuf;
 // Shader Program
 let atmosphereShader;
 
-atmosphere.init = function (glRef, earthRef) {
+atmosphere.init = async function (glRef, earthRef) {
+  if (settingsManager.enableLimitedUI || settingsManager.isDrawLess) return;
   gl = glRef;
   earth = earthRef;
   // Make Fragment Shader

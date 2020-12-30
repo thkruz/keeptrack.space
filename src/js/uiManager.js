@@ -151,6 +151,14 @@ $(document).ready(function () {
     }
   })();
 
+  // Version Info Updated
+  $('#version-info').html(settingsManager.versionNumber);
+  $('#version-info').tooltip({
+    delay: 50,
+    html: settingsManager.versionDate,
+    position: 'top',
+  });
+
   (function _uiInit() {
     // Register all UI callback functions with drawLoop in main.js
     // These run during the draw loop
@@ -3766,6 +3774,20 @@ $(document).ready(function () {
     mobile.fullscreenToggle();
     uiManager.resize2DMap();
   });
+
+  if ($(window).width() > $(window).height()) {
+    settingsManager.mapHeight = $(window).width(); // Subtract 12 px for the scroll
+    $('#map-image').width(settingsManager.mapHeight);
+    settingsManager.mapHeight = (settingsManager.mapHeight * 3) / 4;
+    $('#map-image').height(settingsManager.mapHeight);
+    $('#map-menu').width($(window).width());
+  } else {
+    settingsManager.mapHeight = $(window).height() - 100; // Subtract 12 px for the scroll
+    $('#map-image').height(settingsManager.mapHeight);
+    settingsManager.mapHeight = (settingsManager.mapHeight * 4) / 3;
+    $('#map-image').width(settingsManager.mapHeight);
+    $('#map-menu').width($(window).width());
+  }
 
   $('#nav-footer-toggle').on('click', function () {
     uiManager.footerToggle();

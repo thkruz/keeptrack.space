@@ -5,7 +5,7 @@
 // ===============================================================================
 //                                          OFFLINE
 // ===============================================================================
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
   var scc = getParameterByName('scc');
   var isPopup = getParameterByName('popup');
   if (scc != null) {

@@ -145,7 +145,7 @@ uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef, groupsRef, s
 };
 
 var touchHoldButton = '';
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
   // Code Once index.htm is loaded
   if (settingsManager.offline) updateInterval = 250;
   $('#versionNumber-text')[0].innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
@@ -200,7 +200,7 @@ $(document).ready(function () {
     jday = null; // Garbage collect
 
     // Initialize Navigation Menu
-    $(document).ready(function () {
+    document.addEventListener('DOMContentLoaded', function () {
       var elems = document.querySelectorAll('.dropdown-button');
       M.Dropdown.init(elems);
     });
@@ -2907,7 +2907,7 @@ $(document).ready(function () {
             );
           }
           // Reinitialize the Material CSS Code
-          $(document).ready(function () {
+          document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('anal-type');
             M.FormSelect.init(elems);
           });

@@ -36,7 +36,7 @@ var helpTextDOM = $('#help-text');
 // var helpTextDOM2 = $('#help-text2');
 var tutIconDOM = $('#tutorial-icon');
 var curFocusDOM;
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
   // Code Once index.htm is loaded
   var wasAdviceEnabled = localStorage.getItem('isAdviceEnabled');
   if (wasAdviceEnabled == 'true' || wasAdviceEnabled == null) {

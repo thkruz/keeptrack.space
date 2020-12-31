@@ -29,7 +29,7 @@ uiLimited.init = async (satSetRef, orbitManagerRef, groupsManagerRef, ColorSchem
   </div>
   <div id="time-machine-btn">
   </div>`;
-  document.addEventListener('DOMContentLoaded', function () {
+  $(document).ready(function () {
     M.AutoInit();
     var countriesBtnDOM = $('#countries-btn');
     countriesBtnDOM.on('click', function () {

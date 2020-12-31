@@ -61,7 +61,7 @@ var pMatrix = glm.mat4.create();
 
 var cameraManager, satData;
 // EVERYTHING SHOULD START HERE
-document.addEventListener('DOMContentLoaded', async function initalizeKeepTrack() {
+$(document).ready(async function initalizeKeepTrack() {
   await mobile.checkMobileMode();
   await webGlInit();
   cameraManager = new Camera();

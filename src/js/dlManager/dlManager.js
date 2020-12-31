@@ -731,7 +731,7 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
   }
 };
 dlManager.onDrawLoopComplete = (cb) => {
-  if (typeof cb == 'undefined') return;
+  if (typeof cb == 'undefined' || cb == null) return;
   cb();
 };
 

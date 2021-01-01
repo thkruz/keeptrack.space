@@ -2,7 +2,6 @@
 
 import * as $ from 'jquery';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
-import { satSet } from '@app/js/satSet.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';
 
 var hoverSatId = -1;
@@ -85,6 +84,8 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
   settingsManager.lastSearch = searchList;
 
   var results = [];
+
+  let satData = satSet.getSatData();
 
   for (var i = 0; i < satSet.missileSats; i++) {
     // Stop once you get to the markers to save time
@@ -216,6 +217,7 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
 };
 
 searchBox.fillResultBox = function (results) {
+  let satData = satSet.getSatData();
   var resultBox = $('#search-results');
   var html = '';
   for (i = 0; i < results.length; i++) {
@@ -272,10 +274,10 @@ searchBox.fillResultBox = function (results) {
   satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 };
 
-var satData, groupsManager, orbitManager;
-searchBox.init = function (satDataRef, groupsManagerRef, orbitManagerRef) {
+var satSet, groupsManager, orbitManager;
+searchBox.init = function (satSetRef, groupsManagerRef, orbitManagerRef) {
   if (settingsManager.disableUI) return;
-  satData = satDataRef;
+  satSet = satSetRef;
   groupsManager = groupsManagerRef;
   orbitManager = orbitManagerRef;
 };

@@ -59,7 +59,7 @@ import { timeManager } from '@app/js/timeManager.js';
 var gl, lineManager, groupsManager, pickFb, pickTex, pickColorBuf;
 var pMatrix = glm.mat4.create();
 
-var cameraManager, satData;
+var cameraManager;
 // EVERYTHING SHOULD START HERE
 $(document).ready(async function initalizeKeepTrack() {
   await mobile.checkMobileMode();
@@ -78,11 +78,11 @@ $(document).ready(async function initalizeKeepTrack() {
   settingsManager.loadStr('dots');
 
   // Returns a Reference to satData
-  satData = await satSet.init(cameraManager);
+  await satSet.init(cameraManager);
 
   groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
   await orbitManager.init(cameraManager, groupsManager);
-  searchBox.init(satData, groupsManager, orbitManager);
+  searchBox.init(satSet, groupsManager, orbitManager);
   lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
   satLinkManager.init(lineManager, satSet, sensorManager);
   starManager.init(lineManager, getIdFromStarName);

@@ -155,8 +155,20 @@ class SunCalc {
     return new Date(date.valueOf() + (h * SunCalc.MILLISECONDS_IN_A_DAY) / 24);
   }
 
+  static getStarPosition(date, lat, lng, c) {
+    var lw = (SunCalc.TAU / 360) * -lng,
+      phi = (SunCalc.TAU / 360) * lat,
+      d = SunCalc.toDays(date),
+      H = SunCalc.siderealTime(d, lw) - c.ra;
+
+    return {
+      azimuth: SunCalc.azimuth(H, phi, c.dec),
+      altitude: SunCalc.altitude(H, phi, c.dec),
+    };
+  }
+
   // calculates sun position for a given date and latitude/longitude
-  static getStarPosition(date, lat, lng) {
+  static getSunPosition(date, lat, lng) {
     var lw = (SunCalc.TAU / 360) * -lng,
       phi = (SunCalc.TAU / 360) * lat,
       d = SunCalc.toDays(date),

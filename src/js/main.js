@@ -65,7 +65,7 @@ $(document).ready(async function initalizeKeepTrack() {
   await mobile.checkMobileMode();
   await webGlInit();
   cameraManager = new Camera();
-  await ColorScheme.init(gl, cameraManager);
+  await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
   selectSatManager.init(ColorScheme.group);
   objectManager.init();
   await earth.init(gl);

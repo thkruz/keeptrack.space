@@ -48,7 +48,6 @@ import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 // 'use strict';
 var satSet = {};
-var satSensorMarkerArray = [];
 var emptyMat4 = glm.mat4.create();
 var TAU = 2 * Math.PI;
 var RAD2DEG = 360 / TAU;
@@ -237,7 +236,7 @@ satCruncher.onmessage = (m) => {
   }
 
   if (typeof m.data.sensorMarkerArray != 'undefined') {
-    satSensorMarkerArray = m.data.sensorMarkerArray;
+    satSet.satSensorMarkerArray = m.data.sensorMarkerArray;
   }
 
   if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
@@ -2210,4 +2209,4 @@ let getMissileSatsLen = () => satSet.missileSats;
 let setSat = (i, satObject) => satSet.setSat(i, satObject);
 let getSatPosOnly = (id) => satSet.getSatPosOnly(id);
 
-export { getIdFromSensorName, getIdFromStarName, getMissileSatsLen, getSat, getSatPosOnly, getSatData, getStar, satSet, satCruncher, satScreenPositionArray, satPos, satSensorMarkerArray, setSat };
+export { getIdFromSensorName, getIdFromStarName, getMissileSatsLen, getSat, getSatPosOnly, getSatData, getStar, satSet, satCruncher, satScreenPositionArray, satPos, setSat };

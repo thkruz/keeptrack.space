@@ -10,17 +10,9 @@
 // FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 import * as $ from 'jquery';
-import { db, settingsManager } from '@app/js/keeptrack-head.js';
-import { satSensorMarkerArray, satSet } from '@app/js/satSet.js';
-import { objectManager } from '@app/js/objectManager.js';
-import { satellite } from '@app/js/lookangles.js';
-import { sensorManager } from '@app/modules/sensorManager.js';
-import { timeManager } from '@app/js/timeManager.js';
 
 ('use strict');
-var colorTheme = settingsManager.colors;
-var iSensorMarkerArray = -1;
-
+var sat, color, cameraManager, gl, objectManager, timeManager, sensorManager, satSet, satellite, settingsManager, iSensorMarkerArray;
 var ColorScheme = function (colorizer) {
   this.colorizer = colorizer;
   this.colorBuf = gl.createBuffer();
@@ -123,7 +115,6 @@ ColorScheme.prototype.calculateColorBuffers = function (isForceRecolor) {
       colorData[i * 4 + 3] = colors.color[3]; // A
       pickableData[i] = colors.pickable ? 1 : 0;
     } catch (e) {
-      if (db.enabled) db.log(satSet.getSat(i));
       continue;
     }
 
@@ -160,35 +151,42 @@ ColorScheme.prototype.calculateColorBuffers = function (isForceRecolor) {
 };
 
 ColorScheme.reloadColors = function () {
-  colorTheme = settingsManager.colors;
+  ColorScheme.colorTheme = settingsManager.colors;
 };
 
-var sat, color, cameraManager, gl;
-ColorScheme.init = function (glRef, cameraManagerRef) {
+ColorScheme.init = function (glRef, cameraManagerRef, timeManagerRef, sensorManagerRef, objectManagerRef, satSetRef, satelliteRef, settingsManagerRef) {
   cameraManager = cameraManagerRef;
   gl = glRef;
+  timeManager = timeManagerRef;
+  sensorManager = sensorManagerRef;
+  objectManager = objectManagerRef;
+  satSet = satSetRef;
+  satellite = satelliteRef;
+  settingsManager = settingsManagerRef;
+  ColorScheme.colorTheme = settingsManager.colors;
+  iSensorMarkerArray = -1;
 
   ColorScheme.default = new ColorScheme(function (sat) {
     if (sat.static && sat.type === 'Star') {
       if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
         return {
-          color: colorTheme.starLow,
+          color: ColorScheme.colorTheme.starLow,
           pickable: true,
         };
       } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorScheme.objectTypeFlags.starMed) {
         return {
-          color: colorTheme.starMed,
+          color: ColorScheme.colorTheme.starMed,
           pickable: true,
         };
       } else if (sat.vmag < 3.5 && ColorScheme.objectTypeFlags.starHi) {
         return {
-          color: colorTheme.starHi,
+          color: ColorScheme.colorTheme.starHi,
           pickable: true,
         };
       } else {
         // Deselected
         return {
-          color: colorTheme.deselected,
+          color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       }
@@ -196,39 +194,39 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
 
     if (cameraManager.cameraType.current === cameraManager.cameraType.astronomy) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
 
     if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility') && (ColorScheme.objectTypeFlags.facility === false || cameraManager.cameraType.current === cameraManager.cameraType.planetarium)) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
 
     if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
       return {
-        color: colorTheme.facility,
+        color: ColorScheme.colorTheme.facility,
         pickable: true,
       };
     }
 
     if (sat.marker) {
-      if (sat.id === satSensorMarkerArray[iSensorMarkerArray + 1]) {
+      if (sat.id === satSet.satSensorMarkerArray[iSensorMarkerArray + 1]) {
         iSensorMarkerArray++;
       }
       if (iSensorMarkerArray >= 0) {
         return {
-          color: colorTheme.marker[iSensorMarkerArray],
+          color: ColorScheme.colorTheme.marker[iSensorMarkerArray],
           marker: true,
           pickable: false,
         };
       } else {
         return {
           // Failsafe
-          color: colorTheme.marker[0],
+          color: ColorScheme.colorTheme.marker[0],
           marker: true,
           pickable: false,
         };
@@ -237,7 +235,7 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
 
     if (sat.isRadarData && !ColorScheme.objectTypeFlags.radarData) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
@@ -245,43 +243,43 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
       if (sat.missileComplex >= 0) {
         // || sat.missileObject >= 0
         return {
-          color: colorTheme.radarDataMissile,
+          color: ColorScheme.colorTheme.radarDataMissile,
           pickable: true,
         };
       }
       if (sat.satId >= 0) {
         return {
-          color: colorTheme.radarDataSatellite,
+          color: ColorScheme.colorTheme.radarDataSatellite,
           pickable: true,
         };
       }
       return {
-        color: colorTheme.radarData,
+        color: ColorScheme.colorTheme.radarData,
         pickable: true,
       };
     }
 
     if (sat.static && (ColorScheme.objectTypeFlags.sensor === false || cameraManager.cameraType.current === cameraManager.cameraType.planetarium)) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     if (sat.static) {
       return {
-        color: colorTheme.sensor,
+        color: ColorScheme.colorTheme.sensor,
         pickable: true,
       };
     }
     if (sat.missile && !sat.inView) {
       if (sat.missile && ColorScheme.objectTypeFlags.missile === false) {
         return {
-          color: colorTheme.deselected,
+          color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       } else {
         return {
-          color: colorTheme.missile,
+          color: ColorScheme.colorTheme.missile,
           pickable: true,
         };
       }
@@ -289,12 +287,12 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     if (sat.missile && sat.inView) {
       if (sat.missile && ColorScheme.objectTypeFlags.missileInview === false) {
         return {
-          color: colorTheme.deselected,
+          color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       } else {
         return {
-          color: colorTheme.missileInview,
+          color: ColorScheme.colorTheme.missileInview,
           pickable: true,
         };
       }
@@ -306,7 +304,7 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
       (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false)
     ) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
@@ -316,7 +314,7 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
       (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false)
     ) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
@@ -326,7 +324,7 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
       (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false)
     ) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
@@ -336,14 +334,14 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
       (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 4 && ColorScheme.objectTypeFlags.trusat === false)
     ) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
 
     if (sat.inView && ColorScheme.objectTypeFlags.inFOV === false && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
@@ -353,33 +351,33 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
         // Intentional
       } else {
         return {
-          color: colorTheme.inview,
+          color: ColorScheme.colorTheme.inview,
           pickable: true,
         };
       }
     }
 
     if (sat.C === 'ANALSAT') {
-      color = colorTheme.analyst;
+      color = ColorScheme.colorTheme.analyst;
     } else if (sat.OT === 1) {
       // Payload
-      color = colorTheme.payload;
+      color = ColorScheme.colorTheme.payload;
     } else if (sat.OT === 2) {
       // Rocket Body
-      color = colorTheme.rocketBody;
+      color = ColorScheme.colorTheme.rocketBody;
     } else if (sat.OT === 3) {
       // Debris
-      color = colorTheme.debris;
+      color = ColorScheme.colorTheme.debris;
     } else if (sat.OT === 4) {
       // TruSat Object
-      color = colorTheme.trusat;
+      color = ColorScheme.colorTheme.trusat;
     } else {
-      color = colorTheme.unknown;
+      color = ColorScheme.colorTheme.unknown;
     }
 
     if (sat.perigee > satellite.obsmaxrange || sat.apogee < satellite.obsminrange) {
       return {
-        color: colorTheme.transparent,
+        color: ColorScheme.colorTheme.transparent,
         pickable: false,
       };
     }
@@ -388,7 +386,7 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     if (typeof color == 'undefined') {
       console.warn(sat.id);
       return {
-        color: colorTheme.transparent,
+        color: ColorScheme.colorTheme.transparent,
         pickable: false,
       };
     }
@@ -401,12 +399,12 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
   ColorScheme.onlyFOV = new ColorScheme(function (sat) {
     if (sat.inView) {
       return {
-        color: colorTheme.inview,
+        color: ColorScheme.colorTheme.inview,
         pickable: true,
       };
     } else {
       return {
-        color: colorTheme.transparent,
+        color: ColorScheme.colorTheme.transparent,
         pickable: false,
       };
     }
@@ -414,14 +412,14 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
   ColorScheme.sunlight = new ColorScheme(function (sat) {
     if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility') && ColorScheme.objectTypeFlags.facility === false) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
 
     if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
       return {
-        color: colorTheme.facility,
+        color: ColorScheme.colorTheme.facility,
         pickable: true,
       };
     }
@@ -429,42 +427,42 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     if (sat.static && sat.type === 'Star') {
       if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
         return {
-          color: colorTheme.starLow,
+          color: ColorScheme.colorTheme.starLow,
           pickable: true,
         };
       } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorScheme.objectTypeFlags.starMed) {
         return {
-          color: colorTheme.starMed,
+          color: ColorScheme.colorTheme.starMed,
           pickable: true,
         };
       } else if (sat.vmag < 3.5 && ColorScheme.objectTypeFlags.starHi) {
         return {
-          color: colorTheme.starHi,
+          color: ColorScheme.colorTheme.starHi,
           pickable: true,
         };
       } else {
         // Deselected
         return {
-          color: colorTheme.deselected,
+          color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       }
     }
 
     if (sat.marker) {
-      if (sat.id === satSensorMarkerArray[iSensorMarkerArray + 1]) {
+      if (sat.id === satSet.satSensorMarkerArray[iSensorMarkerArray + 1]) {
         iSensorMarkerArray++;
       }
       if (iSensorMarkerArray >= 0) {
         return {
-          color: colorTheme.marker[iSensorMarkerArray],
+          color: ColorScheme.colorTheme.marker[iSensorMarkerArray],
           marker: true,
           pickable: false,
         };
       } else {
         return {
           // Failsafe
-          color: colorTheme.marker[0],
+          color: ColorScheme.colorTheme.marker[0],
           marker: true,
           pickable: false,
         };
@@ -473,25 +471,25 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
 
     if (sat.static && ColorScheme.objectTypeFlags.sensor === false) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     if (sat.static) {
       return {
-        color: colorTheme.sensor,
+        color: ColorScheme.colorTheme.sensor,
         pickable: true,
       };
     }
     if (sat.missile && !sat.inView) {
       return {
-        color: colorTheme.missile,
+        color: ColorScheme.colorTheme.missile,
         pickable: true,
       };
     }
     if (sat.missile && sat.inView) {
       return {
-        color: colorTheme.missileInview,
+        color: ColorScheme.colorTheme.missileInview,
         pickable: true,
       };
     }
@@ -499,12 +497,12 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     if (sat.inView && sat.inSun > 0 && ColorScheme.objectTypeFlags.inFOV === true) {
       if (typeof sat.vmag == 'undefined') {
         return {
-          color: colorTheme.deselected,
+          color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       }
       return {
-        color: colorTheme.sunlightInview,
+        color: ColorScheme.colorTheme.sunlightInview,
         pickable: true,
       };
     }
@@ -515,19 +513,19 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
         // TODO: Better way of doing this
         if (sat.vmag < 3) {
           return {
-            color: colorTheme.starHi,
+            color: ColorScheme.colorTheme.starHi,
             pickable: false,
           };
         }
         if (sat.vmag <= 4.5) {
           return {
-            color: colorTheme.starMed,
+            color: ColorScheme.colorTheme.starMed,
             pickable: false,
           };
         }
         if (sat.vmag > 4.5) {
           return {
-            color: colorTheme.starLow,
+            color: ColorScheme.colorTheme.starLow,
             pickable: false,
           };
         }
@@ -535,26 +533,26 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
 
       if (sat.inSun == 0 && ColorScheme.objectTypeFlags.satLow === true) {
         return {
-          color: colorTheme.umbral,
+          color: ColorScheme.colorTheme.umbral,
           pickable: false,
         };
       }
 
       if (sat.inSun == 1 && ColorScheme.objectTypeFlags.satMed === true) {
         return {
-          color: colorTheme.penumbral,
+          color: ColorScheme.colorTheme.penumbral,
           pickable: true,
         };
       }
       // Not in the vmag database
       return {
-        color: colorTheme.umbral,
+        color: ColorScheme.colorTheme.umbral,
         pickable: false,
       };
     }
 
     return {
-      color: colorTheme.deselected,
+      color: ColorScheme.colorTheme.deselected,
       pickable: false,
     };
   });
@@ -564,10 +562,10 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
   // ///////////////////////////////
   ColorScheme.apogee = new ColorScheme(function (sat) {
     var ap = sat.apogee;
-    colorTheme.gradientAmt = Math.min(ap / 45000, 1.0);
-    colorTheme.apogeeGradient = [1.0 - colorTheme.gradientAmt, colorTheme.gradientAmt, 0.0, 1.0];
+    ColorScheme.colorTheme.gradientAmt = Math.min(ap / 45000, 1.0);
+    ColorScheme.colorTheme.apogeeGradient = [1.0 - ColorScheme.colorTheme.gradientAmt, ColorScheme.colorTheme.gradientAmt, 0.0, 1.0];
     return {
-      color: colorTheme.apogeeGradient,
+      color: ColorScheme.colorTheme.apogeeGradient,
       pickable: true,
     };
   });
@@ -576,18 +574,18 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
   ColorScheme.smallsats = new ColorScheme(function (sat) {
     if (sat.OT === 1 && ColorScheme.objectTypeFlags.satSmall === false) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     if (sat.R < 0.1 && sat.OT === 1) {
       return {
-        color: colorTheme.satSmall,
+        color: ColorScheme.colorTheme.satSmall,
         pickable: true,
       };
     } else {
       return {
-        color: colorTheme.transparent,
+        color: ColorScheme.colorTheme.transparent,
         pickable: false,
       };
     }
@@ -596,49 +594,49 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     var rcs = sat.R;
     if (rcs < 0.1 && ColorScheme.objectTypeFlags.rcsSmall === false) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     if (rcs >= 0.1 && rcs <= 1 && ColorScheme.objectTypeFlags.rcsMed === false) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     if (rcs > 1 && ColorScheme.objectTypeFlags.rcsLarge === false) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     if ((typeof rcs == 'undefined' || rcs == null || rcs == 'N/A') && ColorScheme.objectTypeFlags.rcsUnknown === false) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     if (rcs < 0.1) {
       return {
-        color: colorTheme.rcsSmall,
+        color: ColorScheme.colorTheme.rcsSmall,
         pickable: true,
       };
     }
     if (rcs >= 0.1 && rcs <= 1) {
       return {
-        color: colorTheme.rcsMed,
+        color: ColorScheme.colorTheme.rcsMed,
         pickable: true,
       };
     }
     if (rcs > 1) {
       return {
-        color: colorTheme.rcsLarge,
+        color: ColorScheme.colorTheme.rcsLarge,
         pickable: true,
       };
     }
     // Unknowns
     return {
-      color: colorTheme.rcsUnknown,
+      color: ColorScheme.colorTheme.rcsUnknown,
       pickable: true,
     };
   });
@@ -646,49 +644,49 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     var country = sat.C;
     if ((country === 'US' && ColorScheme.objectTypeFlags.countryUS === false) || (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && country === 'US' && ColorScheme.objectTypeFlags.countryUS === false)) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     if ((country === 'PRC' && ColorScheme.objectTypeFlags.countryPRC === false) || (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && country === 'PRC' && ColorScheme.objectTypeFlags.countryPRC === false)) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     if ((country === 'CIS' && ColorScheme.objectTypeFlags.countryCIS === false) || (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && country === 'CIS' && ColorScheme.objectTypeFlags.countryCIS === false)) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     if (country === 'US') {
       return {
-        color: colorTheme.countryUS,
+        color: ColorScheme.colorTheme.countryUS,
         pickable: true,
       };
     }
     if (country === 'PRC') {
       return {
-        color: colorTheme.countryPRC,
+        color: ColorScheme.colorTheme.countryPRC,
         pickable: true,
       };
     }
     if (country === 'CIS') {
       return {
-        color: colorTheme.countryCIS,
+        color: ColorScheme.colorTheme.countryCIS,
         pickable: true,
       };
     }
     // Other Countries
     if (ColorScheme.objectTypeFlags.countryOther === false || (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && ColorScheme.objectTypeFlags.countryOther === false)) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     return {
-      color: colorTheme.countryOther,
+      color: ColorScheme.colorTheme.countryOther,
       pickable: true,
     };
   });
@@ -697,42 +695,42 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     if (sat.static && sat.type === 'Star') {
       if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
         return {
-          color: colorTheme.starLow,
+          color: ColorScheme.colorTheme.starLow,
           pickable: true,
         };
       } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorScheme.objectTypeFlags.starMed) {
         return {
-          color: colorTheme.starMed,
+          color: ColorScheme.colorTheme.starMed,
           pickable: true,
         };
       } else if (sat.vmag < 3.5 && ColorScheme.objectTypeFlags.starHi) {
         return {
-          color: colorTheme.starHi,
+          color: ColorScheme.colorTheme.starHi,
           pickable: true,
         };
       } else {
         // Deselected
         return {
-          color: colorTheme.deselected,
+          color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       }
     }
     if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
       return {
-        color: colorTheme.facility,
+        color: ColorScheme.colorTheme.facility,
         pickable: true,
       };
     }
     if (sat.static) {
       return {
-        color: colorTheme.sensor,
+        color: ColorScheme.colorTheme.sensor,
         pickable: true,
       };
     }
     if (sat.missile) {
       return {
-        color: colorTheme.transparent,
+        color: ColorScheme.colorTheme.transparent,
         pickable: false,
       };
     }
@@ -750,32 +748,32 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
 
     if (daysold < 3 && ColorScheme.objectTypeFlags.ageNew) {
       return {
-        color: colorTheme.ageNew,
+        color: ColorScheme.colorTheme.ageNew,
         pickable: true,
       };
     }
     if (daysold >= 3 && daysold < 14 && ColorScheme.objectTypeFlags.ageMed) {
       return {
-        color: colorTheme.ageMed,
+        color: ColorScheme.colorTheme.ageMed,
         pickable: true,
       };
     }
     if (daysold >= 14 && daysold < 60 && ColorScheme.objectTypeFlags.ageOld) {
       return {
-        color: colorTheme.ageOld,
+        color: ColorScheme.colorTheme.ageOld,
         pickable: true,
       };
     }
     if (daysold >= 60 && ColorScheme.objectTypeFlags.ageLost) {
       return {
-        color: colorTheme.ageLost,
+        color: ColorScheme.colorTheme.ageLost,
         pickable: true,
       };
     }
 
     // Deselected
     return {
-      color: colorTheme.deselected,
+      color: ColorScheme.colorTheme.deselected,
       pickable: false,
     };
   });
@@ -788,42 +786,42 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     if (sat.static && sat.type === 'Star') {
       if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
         return {
-          color: colorTheme.starLow,
+          color: ColorScheme.colorTheme.starLow,
           pickable: true,
         };
       } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorScheme.objectTypeFlags.starMed) {
         return {
-          color: colorTheme.starMed,
+          color: ColorScheme.colorTheme.starMed,
           pickable: true,
         };
       } else if (sat.vmag < 3.5 && ColorScheme.objectTypeFlags.starHi) {
         return {
-          color: colorTheme.starHi,
+          color: ColorScheme.colorTheme.starHi,
           pickable: true,
         };
       } else {
         // Deselected
         return {
-          color: colorTheme.deselected,
+          color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       }
     }
     if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
       return {
-        color: colorTheme.facility,
+        color: ColorScheme.colorTheme.facility,
         pickable: true,
       };
     }
     if (sat.static) {
       return {
-        color: colorTheme.sensor,
+        color: ColorScheme.colorTheme.sensor,
         pickable: true,
       };
     }
     if (sat.missile) {
       return {
-        color: colorTheme.transparent,
+        color: ColorScheme.colorTheme.transparent,
         pickable: false,
       };
     }
@@ -841,7 +839,7 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     }
     if (pe > satellite.obsmaxrange || daysold < settingsManager.daysUntilObjectLost) {
       return {
-        color: colorTheme.transparent,
+        color: ColorScheme.colorTheme.transparent,
         pickable: false,
       };
     } else {
@@ -851,7 +849,7 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
         $('#search').val($('#search').val() + ',' + sat.SCC_NUM);
       }
       return {
-        color: colorTheme.lostobjects,
+        color: ColorScheme.colorTheme.lostobjects,
         pickable: true,
       };
     }
@@ -860,36 +858,36 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     if (sat.static && sat.type === 'Star') {
       if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
         return {
-          color: colorTheme.starLow,
+          color: ColorScheme.colorTheme.starLow,
           pickable: true,
         };
       } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorScheme.objectTypeFlags.starMed) {
         return {
-          color: colorTheme.starMed,
+          color: ColorScheme.colorTheme.starMed,
           pickable: true,
         };
       } else if (sat.vmag < 3.5 && ColorScheme.objectTypeFlags.starHi) {
         return {
-          color: colorTheme.starHi,
+          color: ColorScheme.colorTheme.starHi,
           pickable: true,
         };
       } else {
         // Deselected
         return {
-          color: colorTheme.deselected,
+          color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       }
     }
     if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
       return {
-        color: colorTheme.facility,
+        color: ColorScheme.colorTheme.facility,
         pickable: true,
       };
     }
     if (sat.static) {
       return {
-        color: colorTheme.sensor,
+        color: ColorScheme.colorTheme.sensor,
         pickable: true,
       };
     }
@@ -897,18 +895,18 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     var ap = sat.apogee;
     if (ap > 2000) {
       return {
-        color: colorTheme.transparent,
+        color: ColorScheme.colorTheme.transparent,
         pickable: false,
       };
     } else {
       if (sat.inView && ColorScheme.objectTypeFlags.inFOV === true) {
         return {
-          color: colorTheme.inview,
+          color: ColorScheme.colorTheme.inview,
           pickable: true,
         };
       } else {
         return {
-          color: colorTheme.satLEO,
+          color: ColorScheme.colorTheme.satLEO,
           pickable: true,
         };
       }
@@ -918,36 +916,36 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     if (sat.static && sat.type === 'Star') {
       if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
         return {
-          color: colorTheme.starLow,
+          color: ColorScheme.colorTheme.starLow,
           pickable: true,
         };
       } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorScheme.objectTypeFlags.starMed) {
         return {
-          color: colorTheme.starMed,
+          color: ColorScheme.colorTheme.starMed,
           pickable: true,
         };
       } else if (sat.vmag < 3.5 && ColorScheme.objectTypeFlags.starHi) {
         return {
-          color: colorTheme.starHi,
+          color: ColorScheme.colorTheme.starHi,
           pickable: true,
         };
       } else {
         // Deselected
         return {
-          color: colorTheme.deselected,
+          color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       }
     }
     if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
       return {
-        color: colorTheme.facility,
+        color: ColorScheme.colorTheme.facility,
         pickable: true,
       };
     }
     if (sat.static) {
       return {
-        color: colorTheme.sensor,
+        color: ColorScheme.colorTheme.sensor,
         pickable: true,
       };
     }
@@ -955,18 +953,18 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     var pe = sat.perigee;
     if (pe < 35000) {
       return {
-        color: colorTheme.transparent,
+        color: ColorScheme.colorTheme.transparent,
         pickable: false,
       };
     } else {
       if (sat.inView && ColorScheme.objectTypeFlags.inFOV === true) {
         return {
-          color: colorTheme.inview,
+          color: ColorScheme.colorTheme.inview,
           pickable: true,
         };
       } else {
         return {
-          color: colorTheme.satGEO,
+          color: ColorScheme.colorTheme.satGEO,
           pickable: true,
         };
       }
@@ -977,23 +975,23 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     if (sat.static && sat.type === 'Star') {
       if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
         return {
-          color: colorTheme.starLow,
+          color: ColorScheme.colorTheme.starLow,
           pickable: true,
         };
       } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorScheme.objectTypeFlags.starMed) {
         return {
-          color: colorTheme.starMed,
+          color: ColorScheme.colorTheme.starMed,
           pickable: true,
         };
       } else if (sat.vmag < 3.5 && ColorScheme.objectTypeFlags.starHi) {
         return {
-          color: colorTheme.starHi,
+          color: ColorScheme.colorTheme.starHi,
           pickable: true,
         };
       } else {
         // Deselected
         return {
-          color: colorTheme.deselected,
+          color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       }
@@ -1001,14 +999,14 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     // Facilities
     if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
       return {
-        color: colorTheme.facility,
+        color: ColorScheme.colorTheme.facility,
         pickable: true,
       };
     }
     // Sensors
     if (sat.static) {
       return {
-        color: colorTheme.sensor,
+        color: ColorScheme.colorTheme.sensor,
         pickable: true,
       };
     }
@@ -1016,39 +1014,39 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     if (sat.inView) {
       if (ColorScheme.objectTypeFlags.inviewAlt === false) {
         return {
-          color: colorTheme.deselected,
+          color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       } else {
         return {
-          color: colorTheme.inviewAlt,
+          color: ColorScheme.colorTheme.inviewAlt,
           pickable: true,
         };
       }
     }
     if (vel > 5.5 && ColorScheme.objectTypeFlags.velocityFast === false) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     if (vel >= 2.5 && vel <= 5.5 && ColorScheme.objectTypeFlags.velocityMed === false) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
     if (vel < 2.5 && ColorScheme.objectTypeFlags.velocitySlow === false) {
       return {
-        color: colorTheme.deselected,
+        color: ColorScheme.colorTheme.deselected,
         pickable: false,
       };
     }
-    colorTheme.gradientAmt = Math.min(vel / 15, 1.0);
-    colorTheme.velGradient = [1.0 - colorTheme.gradientAmt, colorTheme.gradientAmt, 0.0, 1.0];
+    ColorScheme.colorTheme.gradientAmt = Math.min(vel / 15, 1.0);
+    ColorScheme.colorTheme.velGradient = [1.0 - ColorScheme.colorTheme.gradientAmt, ColorScheme.colorTheme.gradientAmt, 0.0, 1.0];
 
     return {
-      color: colorTheme.velGradient,
+      color: ColorScheme.colorTheme.velGradient,
       pickable: true,
     };
   });
@@ -1060,21 +1058,21 @@ ColorScheme.init = function (glRef, cameraManagerRef) {
     // Show Things in the Group
     if (sat.isInGroup) {
       return {
-        color: colorTheme.inGroup,
+        color: ColorScheme.colorTheme.inGroup,
         pickable: true,
       };
     }
     // Show Markers But Don't Allow Them To Be Selected
     if (sat.marker) {
       return {
-        color: colorTheme.marker[0],
+        color: ColorScheme.colorTheme.marker[0],
         marker: true,
         pickable: false,
       };
     }
     // Hide Everything Else
     return {
-      color: colorTheme.transparent,
+      color: ColorScheme.colorTheme.transparent,
       pickable: false,
     };
   });

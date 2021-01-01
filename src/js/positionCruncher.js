@@ -20,10 +20,10 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 
 'use strict';
+import '@app/js/lib/numeric.js';
 import * as satellite from '@app/js/lib/satellite.js';
 import { A } from '@app/js/lib/meuusjs.js';
 import { SunCalc } from '@app/js/suncalc.js';
-import { numeric } from '@app/js/lib/numeric.js';
 
 /** CONSTANTS */
 const PI = Math.PI;
@@ -466,7 +466,7 @@ var propagateCruncher = () => {
         // Angle between earth and sun
         theta =
           Math.acos(
-            numeric.dot([-satPos[i * 3], -satPos[i * 3 + 1], -satPos[i * 3 + 2]], [-satPos[i * 3] + sunECI.x, -satPos[i * 3 + 1] + sunECI.y, -satPos[i * 3 + 2] + sunECI.z]) /
+            self.numeric.dot([-satPos[i * 3], -satPos[i * 3 + 1], -satPos[i * 3 + 2]], [-satPos[i * 3] + sunECI.x, -satPos[i * 3 + 1] + sunECI.y, -satPos[i * 3 + 2] + sunECI.z]) /
               (Math.sqrt(Math.pow(-satPos[i * 3], 2) + Math.pow(-satPos[i * 3 + 1], 2) + Math.pow(-satPos[i * 3 + 2], 2)) *
                 Math.sqrt(Math.pow(-satPos[i * 3] + sunECI.x, 2) + Math.pow(-satPos[i * 3 + 1] + sunECI.y, 2) + Math.pow(-satPos[i * 3 + 2] + sunECI.z, 2)))
           ) * RAD2DEG;
@@ -1149,7 +1149,8 @@ var propagateCruncher = () => {
   if (isSunlightView) {
     postMessageArray.satInSun = satInSun;
   }
-  if (sensorMarkerArray.length > 1) {
+  // If there is at least one sensor showing markers
+  if (sensorMarkerArray.length >= 1) {
     postMessageArray.sensorMarkerArray = sensorMarkerArray;
   }
 

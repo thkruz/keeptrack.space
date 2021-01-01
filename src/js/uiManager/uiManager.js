@@ -35,7 +35,7 @@ import { helpers, mathValue, saveAs, saveCsv } from '@app/js/helpers.js';
 import { satCruncher, satSet } from '@app/js/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { CanvasRecorder } from '@app/js/lib/CanvasRecorder.js';
-import { ColorScheme } from '@app/js/color-scheme.js';
+import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
 import { dlManager } from '@app/js/dlManager/dlManager.js';

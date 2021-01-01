@@ -25,11 +25,12 @@
  */
 /* eslint-disable no-useless-escape */
 
+import '@app/js/lib/numeric.js';
 import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
 import { helpers, mathValue, saveCsv } from '@app/js/helpers.js';
-import { ColorScheme } from '@app/js/color-scheme.js';
+import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { gl } from '@app/js/main.js';
 import { jsTLEfile } from '@app/offline/tle.js';
@@ -48,7 +49,6 @@ import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 // 'use strict';
 var satSet = {};
-var satSensorMarkerArray = [];
 var emptyMat4 = glm.mat4.create();
 var TAU = 2 * Math.PI;
 var RAD2DEG = 360 / TAU;
@@ -180,6 +180,7 @@ satCruncher.onmessage = (m) => {
       satData[satCrunchIndex].apogee = satExtraData[satCrunchIndex].apogee;
       satData[satCrunchIndex].perigee = satExtraData[satCrunchIndex].perigee;
       satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
+      satData[satCrunchIndex].velocity = {};
     }
 
     gotExtraData = true;
@@ -237,7 +238,7 @@ satCruncher.onmessage = (m) => {
   }
 
   if (typeof m.data.sensorMarkerArray != 'undefined') {
-    satSensorMarkerArray = m.data.sensorMarkerArray;
+    satSet.satSensorMarkerArray = m.data.sensorMarkerArray;
   }
 
   if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
@@ -1029,7 +1030,7 @@ satSet.loadTLEs = (resp) => {
     // If No Visual Magnitudes, Add The VMag Database
     try {
       if (typeof satSet.getSat(satSet.getIdFromObjNum(44235)).vmag == 'undefined') {
-        satVmagManager.init();
+        satVmagManager.init(satSet);
       }
     } catch (e) {
       console.debug('satVmagManager Not Loaded');
@@ -1075,9 +1076,9 @@ satSet.setColorScheme = (scheme, isForceRecolor) => {
   db.log('satSet.setColorScheme');
   settingsManager.setCurrentColorScheme(scheme);
   try {
-    buffers = scheme.calculateColorBuffers(isForceRecolor);
-    satColorBuf = buffers.colorBuf;
-    pickableBuf = buffers.pickableBuf;
+    scheme.calculateColorBuffers(isForceRecolor);
+    satColorBuf = scheme.colorBuf;
+    pickableBuf = scheme.pickableBuf;
   } catch (e) {
     /**
      * @todo Don't call setColorScheme after colorscheme is loaded
@@ -2138,11 +2139,11 @@ satSet.setHover = (i) => {
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
     try {
-      gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(objectManager.hoveringSat)).color));
+      gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.hoveringSat)).color));
     } catch (e) {
       console.log(objectManager.hoveringSat);
       console.log(satSet.getSat(objectManager.hoveringSat));
-      console.log(settingsManager.currentColorScheme.colorizer(satSet.getSat(objectManager.hoveringSat)));
+      console.log(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.hoveringSat)));
     }
   }
   // If New Select Sat Picked Color it
@@ -2169,7 +2170,7 @@ satSet.selectSat = (i) => {
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
     // If Old Select Sat Picked Color it Correct Color
     if (objectManager.selectedSat !== -1) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(objectManager.selectedSat)).color));
+      gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.selectedSat)).color));
     }
     // If New Select Sat Picked Color it
     if (i !== -1) {
@@ -2210,4 +2211,4 @@ let getMissileSatsLen = () => satSet.missileSats;
 let setSat = (i, satObject) => satSet.setSat(i, satObject);
 let getSatPosOnly = (id) => satSet.getSatPosOnly(id);
 
-export { getIdFromSensorName, getIdFromStarName, getMissileSatsLen, getSat, getSatPosOnly, getSatData, getStar, satSet, satCruncher, satScreenPositionArray, satPos, satSensorMarkerArray, setSat };
+export { getIdFromSensorName, getIdFromStarName, getMissileSatsLen, getSat, getSatPosOnly, getSatData, getStar, satSet, satCruncher, satScreenPositionArray, satPos, setSat };

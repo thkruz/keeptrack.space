@@ -17,7 +17,7 @@ or mirrored at any other location without the express written permission of the 
 
 import * as $ from 'jquery';
 import { satCruncher, satSet } from '@app/js/satSet.js';
-import { ColorScheme } from '@app/js/color-scheme.js';
+import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { objectManager } from '@app/js/objectManager.js';
 import { satellite } from '@app/js/lookangles.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';

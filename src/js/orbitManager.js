@@ -1,7 +1,7 @@
 /* */
 
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { ColorScheme } from '@app/js/color-scheme.js';
+import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { gl } from '@app/js/main.js';
 import { satSet } from '@app/js/satSet.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';

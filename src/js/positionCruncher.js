@@ -1149,7 +1149,8 @@ var propagateCruncher = () => {
   if (isSunlightView) {
     postMessageArray.satInSun = satInSun;
   }
-  if (sensorMarkerArray.length > 1) {
+  // If there is at least one sensor showing markers
+  if (sensorMarkerArray.length >= 1) {
     postMessageArray.sensorMarkerArray = sensorMarkerArray;
   }
 

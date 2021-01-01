@@ -38,7 +38,7 @@ import { LineFactory, atmosphere, earth, moon, sun } from '@app/js/sceneManager/
 import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satCruncher, satSet } from '@app/js/satSet.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
-import { ColorScheme } from '@app/js/color-scheme.js';
+import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
 import { dlManager } from '@app/js/dlManager/dlManager.js';
 import { meshManager } from '@app/modules/meshManager.js';

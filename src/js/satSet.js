@@ -30,7 +30,7 @@ import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
 import { helpers, mathValue, saveCsv } from '@app/js/helpers.js';
-import { ColorScheme } from '@app/js/color-scheme.js';
+import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { gl } from '@app/js/main.js';
 import { jsTLEfile } from '@app/offline/tle.js';
@@ -1076,9 +1076,9 @@ satSet.setColorScheme = (scheme, isForceRecolor) => {
   db.log('satSet.setColorScheme');
   settingsManager.setCurrentColorScheme(scheme);
   try {
-    buffers = scheme.calculateColorBuffers(isForceRecolor);
-    satColorBuf = buffers.colorBuf;
-    pickableBuf = buffers.pickableBuf;
+    scheme.calculateColorBuffers(isForceRecolor);
+    satColorBuf = scheme.colorBuf;
+    pickableBuf = scheme.pickableBuf;
   } catch (e) {
     /**
      * @todo Don't call setColorScheme after colorscheme is loaded
@@ -1522,6 +1522,7 @@ satSet.getSat = (i) => {
 
     // if (satData[i].velocity == 0) debugger;
 
+    satData[i].velocity = typeof satData[i].velocity == 'undefined' ? {} : satData[i].velocity;
     satData[i].velocity.total = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
     satData[i].velocity.x = satVel[i * 3];
     satData[i].velocity.y = satVel[i * 3 + 1];
@@ -2138,11 +2139,11 @@ satSet.setHover = (i) => {
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
     try {
-      gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(objectManager.hoveringSat)).color));
+      gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.hoveringSat)).color));
     } catch (e) {
       console.log(objectManager.hoveringSat);
       console.log(satSet.getSat(objectManager.hoveringSat));
-      console.log(settingsManager.currentColorScheme.colorizer(satSet.getSat(objectManager.hoveringSat)));
+      console.log(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.hoveringSat)));
     }
   }
   // If New Select Sat Picked Color it
@@ -2169,7 +2170,7 @@ satSet.selectSat = (i) => {
     gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
     // If Old Select Sat Picked Color it Correct Color
     if (objectManager.selectedSat !== -1) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorizer(satSet.getSat(objectManager.selectedSat)).color));
+      gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.selectedSat)).color));
     }
     // If New Select Sat Picked Color it
     if (i !== -1) {

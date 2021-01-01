@@ -25,6 +25,7 @@
  */
 /* eslint-disable no-useless-escape */
 
+import '@app/js/lib/numeric.js';
 import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
@@ -179,6 +180,7 @@ satCruncher.onmessage = (m) => {
       satData[satCrunchIndex].apogee = satExtraData[satCrunchIndex].apogee;
       satData[satCrunchIndex].perigee = satExtraData[satCrunchIndex].perigee;
       satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
+      satData[satCrunchIndex].velocity = {};
     }
 
     gotExtraData = true;
@@ -1028,7 +1030,7 @@ satSet.loadTLEs = (resp) => {
     // If No Visual Magnitudes, Add The VMag Database
     try {
       if (typeof satSet.getSat(satSet.getIdFromObjNum(44235)).vmag == 'undefined') {
-        satVmagManager.init();
+        satVmagManager.init(satSet);
       }
     } catch (e) {
       console.debug('satVmagManager Not Loaded');
@@ -1520,7 +1522,6 @@ satSet.getSat = (i) => {
 
     // if (satData[i].velocity == 0) debugger;
 
-    satData[i].velocity = typeof satData[i].velocity == 'undefined' ? {} : satData[i].velocity;
     satData[i].velocity.total = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
     satData[i].velocity.x = satVel[i * 3];
     satData[i].velocity.y = satVel[i * 3 + 1];

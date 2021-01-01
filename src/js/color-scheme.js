@@ -9,163 +9,27 @@
 // ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 // FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
+// eslint-disable-next-line max-classes-per-file
 import * as $ from 'jquery';
+import { Schematic } from './colorManager/schematic.js';
 
-('use strict');
-var sat, color, cameraManager, gl, objectManager, timeManager, sensorManager, satSet, satellite, settingsManager, iSensorMarkerArray;
 class ColorScheme {
-  constructor(colorizer) {
-    this.colorizer = colorizer;
-    this.colorBuf = gl.createBuffer();
-    this.pickableBuf = gl.createBuffer();
-  }
+  static objectTypeFlags = {};
 
-  // Removed from function to reduce memory leak
-  calculateColorBuffers(isForceRecolor) {
-    var numSats, colorData, pickableData, colors, i;
-    var lastCalculation = 0;
-    var now = Date.now();
-    if (!pickableData || !colorData) {
-      this.lastCalculation = now;
-      numSats = satSet.numSats;
-      colorData = new Float32Array(numSats * 4);
-      pickableData = new Float32Array(numSats); // Broke as an Int8
-    }
-
-    if (!isForceRecolor && now - lastCalculation < settingsManager.reColorMinimumTime && lastCalculation !== 0) {
-      return {
-        colorBuf: this.colorBuf,
-        pickableBuf: this.pickableBuf,
-      };
-    }
-    lastCalculation = now;
-
-    var satData = satSet.getSatData();
-    var satInView = satSet.getSatInView();
-    var satInSun, satVel;
-    if (this.isVelocityColorScheme) {
-      satVel = satSet.getSatVel();
-    }
-    iSensorMarkerArray = -1; // Start at -1 so the first use is 0
-
-    // Don't Calculate the Colors of things you can't see
-    if (!settingsManager.isFOVBubbleModeOn && !settingsManager.isShowSurvFence && !settingsManager.isSatOverflyModeOn) numSats -= settingsManager.maxFieldOfViewMarkers;
-
-    if (this.default) {
-      // debugger;
-    }
-
-    if (this.isSunlightColorScheme) {
-      satInSun = satSet.getSatInSun();
-    }
-
-    for (i = 0; i < numSats; i++) {
-      sat = satData[i];
-      if (satInView) sat.inView = satInView[i];
-      if (satInSun) sat.inSun = satInSun[i];
-
-      if (this.isVelocityColorScheme) {
-        sat.velocity = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
-      }
-
-      // if (!isFirstMarkerChecked) { // Markers Color Can't Change so Don't Keep Checking
-      colors = this.colorizer(sat); // Run the colorscheme below
-
-      // }
-      // isFirstMarkerChecked = colors.marker; // First Marker Checked Returns True
-      if (typeof colors == 'undefined') continue;
-      try {
-        colorData[i * 4] = colors.color[0]; // R
-        colorData[i * 4 + 1] = colors.color[1]; // G
-        colorData[i * 4 + 2] = colors.color[2]; // B
-        colorData[i * 4 + 3] = colors.color[3]; // A
-        pickableData[i] = colors.pickable ? 1 : 0;
-      } catch (e) {
-        continue;
-      }
-
-      // debugger
-      if (i == objectManager.selectedSat) {
-        colorData[i * 4] = settingsManager.selectedColor[0]; // R
-        colorData[i * 4 + 1] = settingsManager.selectedColor[1]; // G
-        colorData[i * 4 + 2] = settingsManager.selectedColor[2]; // B
-        colorData[i * 4 + 3] = settingsManager.selectedColor[3]; // A
-      }
-
-      try {
-        if (i == objectManager.hoveringSat) {
-          colorData[i * 4] = settingsManager.hoverColor[0]; // R
-          colorData[i * 4 + 1] = settingsManager.hoverColor[1]; // G
-          colorData[i * 4 + 2] = settingsManager.hoverColor[2]; // B
-          colorData[i * 4 + 3] = settingsManager.hoverColor[3]; // A
-        }
-      } catch (e) {
-        // Don't let one bad color setting break everything
-      }
-    }
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, colorData, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.pickableBuf);
-    gl.bufferData(gl.ARRAY_BUFFER, pickableData, gl.STATIC_DRAW);
-
-    return {
-      colorBuf: this.colorBuf,
-      pickableBuf: this.pickableBuf,
-    };
-  }
-
-  static resetObjectTypeFlags() {
-    ColorScheme.objectTypeFlags.payload = true;
-    ColorScheme.objectTypeFlags.radarData = true;
-    ColorScheme.objectTypeFlags.rocketBody = true;
-    ColorScheme.objectTypeFlags.debris = true;
-    ColorScheme.objectTypeFlags.facility = true;
-    ColorScheme.objectTypeFlags.sensor = true;
-    ColorScheme.objectTypeFlags.missile = true;
-    ColorScheme.objectTypeFlags.missileInview = true;
-    ColorScheme.objectTypeFlags.trusat = true;
-    ColorScheme.objectTypeFlags.inFOV = true;
-    ColorScheme.objectTypeFlags.inviewAlt = true;
-    ColorScheme.objectTypeFlags.starLow = true;
-    ColorScheme.objectTypeFlags.starMed = true;
-    ColorScheme.objectTypeFlags.starHi = true;
-    ColorScheme.objectTypeFlags.satLEO = true;
-    ColorScheme.objectTypeFlags.satGEO = true;
-    ColorScheme.objectTypeFlags.satLow = true;
-    ColorScheme.objectTypeFlags.satMed = true;
-    ColorScheme.objectTypeFlags.satHi = true;
-    ColorScheme.objectTypeFlags.satSmall = true;
-    ColorScheme.objectTypeFlags.rcsSmall = true;
-    ColorScheme.objectTypeFlags.rcsMed = true;
-    ColorScheme.objectTypeFlags.rcsLarge = true;
-    ColorScheme.objectTypeFlags.rcsUnknown = true;
-    ColorScheme.objectTypeFlags.velocitySlow = true;
-    ColorScheme.objectTypeFlags.velocityMed = true;
-    ColorScheme.objectTypeFlags.velocityFast = true;
-    ColorScheme.objectTypeFlags.ageNew = true;
-    ColorScheme.objectTypeFlags.ageMed = true;
-    ColorScheme.objectTypeFlags.ageOld = true;
-    ColorScheme.objectTypeFlags.ageLost = true;
-  }
-
-  static reloadColors() {
+  static init(gl, cameraManagerRef, timeManagerRef, sensorManagerRef, objectManagerRef, satSetRef, satelliteRef, settingsManagerRef) {
+    let cameraManager = cameraManagerRef;
+    let timeManager = timeManagerRef;
+    let sensorManager = sensorManagerRef;
+    let objectManager = objectManagerRef;
+    let satSet = satSetRef;
+    let satellite = satelliteRef;
+    let settingsManager = settingsManagerRef;
+    let color;
     ColorScheme.colorTheme = settingsManager.colors;
-  }
+    let iSensor = -1;
+    ColorScheme.resetObjectTypeFlags();
 
-  static init(glRef, cameraManagerRef, timeManagerRef, sensorManagerRef, objectManagerRef, satSetRef, satelliteRef, settingsManagerRef) {
-    cameraManager = cameraManagerRef;
-    gl = glRef;
-    timeManager = timeManagerRef;
-    sensorManager = sensorManagerRef;
-    objectManager = objectManagerRef;
-    satSet = satSetRef;
-    satellite = satelliteRef;
-    settingsManager = settingsManagerRef;
-    ColorScheme.colorTheme = settingsManager.colors;
-    iSensorMarkerArray = -1;
-
-    ColorScheme.default = new ColorScheme(function (sat) {
+    ColorScheme.default = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       if (sat.static && sat.type === 'Star') {
         if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
           return {
@@ -213,12 +77,12 @@ class ColorScheme {
       }
 
       if (sat.marker) {
-        if (sat.id === satSet.satSensorMarkerArray[iSensorMarkerArray + 1]) {
-          iSensorMarkerArray++;
+        if (sat.id === satSet.satSensorMarkerArray[iSensor + 1]) {
+          iSensor++;
         }
-        if (iSensorMarkerArray >= 0) {
+        if (iSensor >= 0) {
           return {
-            color: ColorScheme.colorTheme.marker[iSensorMarkerArray],
+            color: ColorScheme.colorTheme.marker[iSensor],
             marker: true,
             pickable: false,
           };
@@ -395,7 +259,7 @@ class ColorScheme {
       };
     });
     ColorScheme.default.default = true;
-    ColorScheme.onlyFOV = new ColorScheme(function (sat) {
+    ColorScheme.onlyFOV = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       if (sat.inView) {
         return {
           color: ColorScheme.colorTheme.inview,
@@ -408,7 +272,7 @@ class ColorScheme {
         };
       }
     });
-    ColorScheme.sunlight = new ColorScheme(function (sat) {
+    ColorScheme.sunlight = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility') && ColorScheme.objectTypeFlags.facility === false) {
         return {
           color: ColorScheme.colorTheme.deselected,
@@ -449,12 +313,12 @@ class ColorScheme {
       }
 
       if (sat.marker) {
-        if (sat.id === satSet.satSensorMarkerArray[iSensorMarkerArray + 1]) {
-          iSensorMarkerArray++;
+        if (sat.id === satSet.satSensorMarkerArray[iSensor + 1]) {
+          iSensor++;
         }
-        if (iSensorMarkerArray >= 0) {
+        if (iSensor >= 0) {
           return {
-            color: ColorScheme.colorTheme.marker[iSensorMarkerArray],
+            color: ColorScheme.colorTheme.marker[iSensor],
             marker: true,
             pickable: false,
           };
@@ -513,28 +377,21 @@ class ColorScheme {
           if (sat.vmag < 3) {
             return {
               color: ColorScheme.colorTheme.starHi,
-              pickable: false,
+              pickable: true,
             };
           }
           if (sat.vmag <= 4.5) {
             return {
               color: ColorScheme.colorTheme.starMed,
-              pickable: false,
+              pickable: true,
             };
           }
           if (sat.vmag > 4.5) {
             return {
               color: ColorScheme.colorTheme.starLow,
-              pickable: false,
+              pickable: true,
             };
           }
-        }
-
-        if (sat.inSun == 0 && ColorScheme.objectTypeFlags.satLow === true) {
-          return {
-            color: ColorScheme.colorTheme.umbral,
-            pickable: false,
-          };
         }
 
         if (sat.inSun == 1 && ColorScheme.objectTypeFlags.satMed === true) {
@@ -543,10 +400,17 @@ class ColorScheme {
             pickable: true,
           };
         }
+
+        if (sat.inSun == 0 && ColorScheme.objectTypeFlags.satLow === true) {
+          return {
+            color: ColorScheme.colorTheme.umbral,
+            pickable: true,
+          };
+        }
         // Not in the vmag database
         return {
           color: ColorScheme.colorTheme.umbral,
-          pickable: false,
+          pickable: true,
         };
       }
 
@@ -559,7 +423,7 @@ class ColorScheme {
     /// //////////////////////////////
     // NOTE: ColorScheme.apogee doesn't appear to be used
     // ///////////////////////////////
-    ColorScheme.apogee = new ColorScheme(function (sat) {
+    ColorScheme.apogee = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       var ap = sat.apogee;
       ColorScheme.colorTheme.gradientAmt = Math.min(ap / 45000, 1.0);
       ColorScheme.colorTheme.apogeeGradient = [1.0 - ColorScheme.colorTheme.gradientAmt, ColorScheme.colorTheme.gradientAmt, 0.0, 1.0];
@@ -569,7 +433,7 @@ class ColorScheme {
       };
     });
     // ///////////////////////////////
-    ColorScheme.smallsats = new ColorScheme(function (sat) {
+    ColorScheme.smallsats = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       if (sat.OT === 1 && ColorScheme.objectTypeFlags.satSmall === false) {
         return {
           color: ColorScheme.colorTheme.deselected,
@@ -588,7 +452,7 @@ class ColorScheme {
         };
       }
     });
-    ColorScheme.rcs = new ColorScheme(function (sat) {
+    ColorScheme.rcs = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       var rcs = sat.R;
       if (rcs < 0.1 && ColorScheme.objectTypeFlags.rcsSmall === false) {
         return {
@@ -638,7 +502,7 @@ class ColorScheme {
         pickable: true,
       };
     });
-    ColorScheme.countries = new ColorScheme(function (sat) {
+    ColorScheme.countries = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       var country = sat.C;
       if ((country === 'US' && ColorScheme.objectTypeFlags.countryUS === false) || (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && country === 'US' && ColorScheme.objectTypeFlags.countryUS === false)) {
         return {
@@ -688,7 +552,7 @@ class ColorScheme {
         pickable: true,
       };
     });
-    ColorScheme.ageOfElset = new ColorScheme(function (sat) {
+    ColorScheme.ageOfElset = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       // Objects beyond sensor coverage are hidden
       if (sat.static && sat.type === 'Star') {
         if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
@@ -775,7 +639,7 @@ class ColorScheme {
         pickable: false,
       };
     });
-    ColorScheme.lostobjects = new ColorScheme(function (sat) {
+    ColorScheme.lostobjects = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       // TODO: Constantly adjusting the search bar makes this really slow
       // The objects should be appended to an array and the DOM modified once at
       // the end of the color initialization.
@@ -852,7 +716,7 @@ class ColorScheme {
         };
       }
     });
-    ColorScheme.leo = new ColorScheme(function (sat) {
+    ColorScheme.leo = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       if (sat.static && sat.type === 'Star') {
         if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
           return {
@@ -910,7 +774,7 @@ class ColorScheme {
         }
       }
     });
-    ColorScheme.geo = new ColorScheme(function (sat) {
+    ColorScheme.geo = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       if (sat.static && sat.type === 'Star') {
         if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
           return {
@@ -968,7 +832,7 @@ class ColorScheme {
         }
       }
     });
-    ColorScheme.velocity = new ColorScheme(function (sat) {
+    ColorScheme.velocity = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       // Stars
       if (sat.static && sat.type === 'Star') {
         if (sat.vmag >= 4.7 && ColorScheme.objectTypeFlags.starLow) {
@@ -1008,7 +872,6 @@ class ColorScheme {
           pickable: true,
         };
       }
-      var vel = sat.velocity;
       if (sat.inView) {
         if (ColorScheme.objectTypeFlags.inviewAlt === false) {
           return {
@@ -1022,25 +885,25 @@ class ColorScheme {
           };
         }
       }
-      if (vel > 5.5 && ColorScheme.objectTypeFlags.velocityFast === false) {
+      if (sat.velocity.total > 5.5 && ColorScheme.objectTypeFlags.velocityFast === false) {
         return {
           color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       }
-      if (vel >= 2.5 && vel <= 5.5 && ColorScheme.objectTypeFlags.velocityMed === false) {
+      if (sat.velocity.total >= 2.5 && sat.velocity.total <= 5.5 && ColorScheme.objectTypeFlags.velocityMed === false) {
         return {
           color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       }
-      if (vel < 2.5 && ColorScheme.objectTypeFlags.velocitySlow === false) {
+      if (sat.velocity.total < 2.5 && ColorScheme.objectTypeFlags.velocitySlow === false) {
         return {
           color: ColorScheme.colorTheme.deselected,
           pickable: false,
         };
       }
-      ColorScheme.colorTheme.gradientAmt = Math.min(vel / 15, 1.0);
+      ColorScheme.colorTheme.gradientAmt = Math.min(sat.velocity.total / 15, 1.0);
       ColorScheme.colorTheme.velGradient = [1.0 - ColorScheme.colorTheme.gradientAmt, ColorScheme.colorTheme.gradientAmt, 0.0, 1.0];
 
       return {
@@ -1050,7 +913,7 @@ class ColorScheme {
     });
     ColorScheme.velocity.isVelocityColorScheme = true;
     // Used When Displaying a Group/Search of Objects
-    ColorScheme.group = new ColorScheme(function (sat) {
+    ColorScheme.group = new Schematic(gl, satSet, iSensor, objectManager, function (sat) {
       // Glitch in the Matrix
       // if (groupsManager.selectedGroup === null) return;
       // Show Things in the Group
@@ -1075,9 +938,44 @@ class ColorScheme {
       };
     });
   }
-}
 
-ColorScheme.objectTypeFlags = {};
-ColorScheme.resetObjectTypeFlags();
+  static resetObjectTypeFlags() {
+    ColorScheme.objectTypeFlags.payload = true;
+    ColorScheme.objectTypeFlags.radarData = true;
+    ColorScheme.objectTypeFlags.rocketBody = true;
+    ColorScheme.objectTypeFlags.debris = true;
+    ColorScheme.objectTypeFlags.facility = true;
+    ColorScheme.objectTypeFlags.sensor = true;
+    ColorScheme.objectTypeFlags.missile = true;
+    ColorScheme.objectTypeFlags.missileInview = true;
+    ColorScheme.objectTypeFlags.trusat = true;
+    ColorScheme.objectTypeFlags.inFOV = true;
+    ColorScheme.objectTypeFlags.inviewAlt = true;
+    ColorScheme.objectTypeFlags.starLow = true;
+    ColorScheme.objectTypeFlags.starMed = true;
+    ColorScheme.objectTypeFlags.starHi = true;
+    ColorScheme.objectTypeFlags.satLEO = true;
+    ColorScheme.objectTypeFlags.satGEO = true;
+    ColorScheme.objectTypeFlags.satLow = true;
+    ColorScheme.objectTypeFlags.satMed = true;
+    ColorScheme.objectTypeFlags.satHi = true;
+    ColorScheme.objectTypeFlags.satSmall = true;
+    ColorScheme.objectTypeFlags.rcsSmall = true;
+    ColorScheme.objectTypeFlags.rcsMed = true;
+    ColorScheme.objectTypeFlags.rcsLarge = true;
+    ColorScheme.objectTypeFlags.rcsUnknown = true;
+    ColorScheme.objectTypeFlags.velocitySlow = true;
+    ColorScheme.objectTypeFlags.velocityMed = true;
+    ColorScheme.objectTypeFlags.velocityFast = true;
+    ColorScheme.objectTypeFlags.ageNew = true;
+    ColorScheme.objectTypeFlags.ageMed = true;
+    ColorScheme.objectTypeFlags.ageOld = true;
+    ColorScheme.objectTypeFlags.ageLost = true;
+  }
+
+  static reloadColors() {
+    ColorScheme.colorTheme = settingsManager.colors;
+  }
+}
 
 export { ColorScheme };

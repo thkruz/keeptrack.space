@@ -60,7 +60,7 @@ class SunCalc {
 
   static e = (SunCalc.TAU / 360) * 23.4397; // obliquity of the Earth
   static rightAscension(l, b) {
-    return Math.atan(Math.sin(l) * Math.cos(SunCalc.e) - Math.tan(b) * Math.sin(SunCalc.e), Math.cos(l));
+    return Math.atan2(Math.sin(l) * Math.cos(SunCalc.e) - Math.tan(b) * Math.sin(SunCalc.e), Math.cos(l));
   }
 
   static declination(l, b) {
@@ -68,7 +68,7 @@ class SunCalc {
   }
 
   static azimuth(H, phi, dec) {
-    return Math.atan(Math.sin(H), Math.cos(H) * Math.sin(phi) - Math.tan(dec) * Math.cos(phi));
+    return Math.atan2(Math.sin(H), Math.cos(H) * Math.sin(phi) - Math.tan(dec) * Math.cos(phi));
   }
 
   static altitude(H, phi, dec) {
@@ -155,15 +155,29 @@ class SunCalc {
     return new Date(date.valueOf() + (h * SunCalc.MILLISECONDS_IN_A_DAY) / 24);
   }
 
+  // Make some variables we can reusue a bunch
+  static lw;
+  static phi;
+  static d;
+  static H;
+  static h;
+  static DEG2RAD = SunCalc.TAU / 360;
   static getStarPosition(date, lat, lng, c) {
-    var lw = (SunCalc.TAU / 360) * -lng,
-      phi = (SunCalc.TAU / 360) * lat,
-      d = SunCalc.toDays(date),
-      H = SunCalc.siderealTime(d, lw) - c.ra;
+    SunCalc.lw = SunCalc.DEG2RAD * -lng;
+    SunCalc.phi = SunCalc.DEG2RAD * lat;
+    SunCalc.d = SunCalc.toDays(date);
+    SunCalc.H = SunCalc.siderealTime(SunCalc.d, SunCalc.lw) - (c.ra / 12) * Math.PI;
+    SunCalc.h = SunCalc.altitude(SunCalc.H, SunCalc.phi, (c.dec / 180) * Math.PI);
+
+    SunCalc.h += SunCalc.astroRefraction(SunCalc.h); // altitude correction for refraction
 
     return {
-      azimuth: SunCalc.azimuth(H, phi, c.dec),
-      altitude: SunCalc.altitude(H, phi, c.dec),
+      azimuth: SunCalc.azimuth(SunCalc.H, SunCalc.phi, (c.dec / 180) * Math.PI),
+      altitude: SunCalc.h,
+      vmag: c.vmag,
+      name: c.name,
+      pname: c.pname,
+      dist: c.dist,
     };
   }
 
@@ -230,7 +244,7 @@ class SunCalc {
       H = SunCalc.siderealTime(d, lw) - c.ra,
       h = SunCalc.altitude(H, phi, c.dec),
       // formula 14.1 of "Astronomical Algorithms" 2nd edition by Jean Meeus (Willmann-Bell, Richmond) 1998.
-      pa = Math.atan(Math.sin(H), Math.tan(phi) * Math.cos(c.dec) - Math.sin(c.dec) * Math.cos(H));
+      pa = Math.atan2(Math.sin(H), Math.tan(phi) * Math.cos(c.dec) - Math.sin(c.dec) * Math.cos(H));
 
     h = h + SunCalc.astroRefraction(h); // altitude correction for refraction
 
@@ -251,8 +265,8 @@ class SunCalc {
       m = SunCalc.moonCoords(d),
       sdist = 149598000, // distance from Earth to Sun in km
       phi = Math.acos(Math.sin(s.dec) * Math.sin(m.dec) + Math.cos(s.dec) * Math.cos(m.dec) * Math.cos(s.ra - m.ra)),
-      inc = Math.atan(sdist * Math.sin(phi), m.dist - sdist * Math.cos(phi)),
-      angle = Math.atan(Math.cos(s.dec) * Math.sin(s.ra - m.ra), Math.sin(s.dec) * Math.cos(m.dec) - Math.cos(s.dec) * Math.sin(m.dec) * Math.cos(s.ra - m.ra));
+      inc = Math.atan2(sdist * Math.sin(phi), m.dist - sdist * Math.cos(phi)),
+      angle = Math.atan2(Math.cos(s.dec) * Math.sin(s.ra - m.ra), Math.sin(s.dec) * Math.cos(m.dec) - Math.cos(s.dec) * Math.sin(m.dec) * Math.cos(s.ra - m.ra));
 
     return {
       fraction: (1 + Math.cos(inc)) / 2,

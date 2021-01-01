@@ -564,6 +564,7 @@ var propagateCruncher = () => {
     } else if (satCache[i].static && !satCache[i].marker) {
       if (satCache[i].type == 'Star') {
         // INFO: 0 Latitude returns upside down results. Using 180 looks right, but more verification needed.
+        // WARNING: 180 and 0 really matter...unclear why
         starPosition = SunCalc.getStarPosition(now, 180, 0, satCache[i]);
         starPosition = _lookAnglesToEcf(starPosition.azimuth * RAD2DEG, starPosition.altitude * RAD2DEG, STAR_DISTANCE, 0, 0, 0);
 

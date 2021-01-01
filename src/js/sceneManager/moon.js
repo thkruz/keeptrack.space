@@ -14,6 +14,8 @@ class Moon {
   static DRAW_RADIUS = 4000;
   static SCALAR_DISTANCE = 200000;
   static textureSrc = 'textures/moon-1024.jpg';
+  // static ambientLight = [0.05, 0.05, 0.05];
+  static ambientLight = [0.0025, 0.0025, 0.0025];
 
   constructor(gl, sun) {
     // Move to the code the creates the moon?
@@ -65,7 +67,8 @@ class Moon {
       u_pMatrix: pMatrix,
       u_camMatrix: camMatrix,
       u_sunPos: this.sun.pos2,
-      u_moonDis: Math.sqrt(this.drawPosition[0] ** 2 + this.drawPosition[1] ** 2 + this.drawPosition[2] ** 2),
+      u_drawPosition: Math.sqrt(this.drawPosition[0] ** 2 + this.drawPosition[1] ** 2 + this.drawPosition[2] ** 2),
+      u_ambientLight: Moon.ambientLight,
     };
   }
 
@@ -110,28 +113,30 @@ class Moon {
     frag: `
       precision mediump float;
   
-      uniform vec3 u_lightDirection;
-      varying vec2 v_texcoord;
-      varying vec3 v_normal;
-  
+      uniform vec3 u_ambientLight;
       uniform sampler2D u_sampler;
       uniform vec3 u_sunPos;
-  
+
+      varying vec2 v_texcoord;
+      varying vec3 v_normal;
       varying float v_dist;
   
       void main(void) {
-          // Moon Position - Sun Position
-          vec3 LightDirection = u_sunPos - vec3(0.0,0.0,0.0);
-          LightDirection = normalize(LightDirection);
+          // Sun is shining opposite of its direction from the center of the earth
+          vec3 lightDirection = u_sunPos - vec3(0.0,0.0,0.0);
+
+          // Normalize this to a max of 1.0
+          lightDirection = normalize(lightDirection);
   
-          float diffuse = max(dot(v_normal, LightDirection), 0.0);
-          vec3 ambientLight = vec3(0.05,0.05,0.05);
+          // Smooth the light across the sphere
+          float lightFromSun = max(dot(v_normal, lightDirection), 0.0)  * 1.0;
+          
+          // Calculate the color by merging the texture with the light
+          vec3 litTexColor = texture2D(u_sampler, v_texcoord).rgb * (u_ambientLight + lightFromSun);
   
-          vec3 litTexColor = texture2D(u_sampler, v_texcoord).rgb * (ambientLight + diffuse * 1.5);
-  
+          // Don't draw the back of the sphere
           if (v_dist > 1.0) {
-          discard;
-          // litTexColor = vec3(1.0,0.0,0.0);
+            discard;
           }
   
           gl_FragColor = vec4(litTexColor, 1.0);
@@ -146,7 +151,7 @@ class Moon {
       uniform mat4 u_camMatrix;
       uniform mat4 u_mvMatrix;
       uniform mat3 u_normalMatrix;
-      uniform float u_moonDis;
+      uniform float u_drawPosition;
   
       varying vec2 v_texcoord;
       varying vec3 v_normal;
@@ -155,9 +160,12 @@ class Moon {
       void main(void) {
           vec4 position = u_mvMatrix * vec4(a_position, 1.0);
           gl_Position = u_pMatrix * u_camMatrix * position;
-          v_dist = distance(position.xyz,vec3(0.0,0.0,0.0)) \/ u_moonDis;
+
+          // Ratio of the vertex distance compared to the center of the sphere
+          // This lets us figure out which verticies are on the back half
+          v_dist = distance(position.xyz,vec3(0.0,0.0,0.0)) \/ u_drawPosition;
+          
           v_texcoord = a_texcoord;
-  
           v_normal = u_normalMatrix * a_normal;
       }
       `,

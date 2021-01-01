@@ -19,10 +19,10 @@
 ('use strict');
 
 // This file should contain all of the webgl code for generating non .obj meshes
+import { LineFactory } from './line-factory.js';
+import { Moon } from './moon.js';
 import { atmosphere } from './atmosphere.js';
 import { earth } from './earth.js';
-import { LineFactory } from './line-factory.js';
-import { moon } from './moon.js';
 import { sun } from './sun.js';
 
-export { LineFactory, sun, earth, atmosphere, moon };
+export { LineFactory, sun, earth, atmosphere, Moon };

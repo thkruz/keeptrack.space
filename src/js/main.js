@@ -34,7 +34,7 @@ import 'jquery-ui-bundle';
 import '@app/js/keeptrack-foot.js';
 import 'materialize-css';
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { LineFactory, atmosphere, earth, moon, sun } from '@app/js/sceneManager/sceneManager.js';
+import { LineFactory, Moon, atmosphere, earth, sun } from '@app/js/sceneManager/sceneManager.js';
 import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satCruncher, satSet } from '@app/js/satSet.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
@@ -74,7 +74,7 @@ $(document).ready(async function initalizeKeepTrack() {
   meshManager.init(gl, earth);
   atmosphere.init(gl, earth);
   await sun.init(gl, earth);
-  moon.init(gl, sun);
+  let moon = new Moon(gl, sun);
   settingsManager.loadStr('dots');
 
   // Returns a Reference to satData
@@ -282,7 +282,9 @@ pick.init = () => {
 
   pMatrix = glm.mat4.create();
   glm.mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
-  var eciToOpenGlMat = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
+
+  // This converts everything from 3D space to ECI (z and y planes are swapped)
+  const eciToOpenGlMat = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
   glm.mat4.mul(pMatrix, pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
 };
 

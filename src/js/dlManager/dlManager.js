@@ -248,7 +248,16 @@ var drawScene = () => {
     atmosphere.draw(pMatrix, cameraManager);
   }
   earth.draw(pMatrix, cameraManager.camMatrix);
+
+  // Update Draw Positions
+  satSet.updateDrawPositions();
+
+  // Draw Dots
   satSet.draw(pMatrix, cameraManager.camMatrix);
+
+  // Draw GPU Picking Overlay -- This is what lets us pick a satellite
+  satSet.drawPicking(pMatrix, cameraManager.camMatrix);
+
   orbitManager.draw(pMatrix, cameraManager.camMatrix);
 
   lineManager.draw();

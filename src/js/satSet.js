@@ -55,7 +55,7 @@ var RAD2DEG = 360 / TAU;
 var satCruncher = {};
 var limitSats = settingsManager.limitSats;
 
-var dotShader;
+var dotShaderProgram;
 var satPosBuf;
 var satColorBuf;
 var starBuf;
@@ -511,7 +511,7 @@ satSet.init = async (cameraManagerRef) => {
   /** Parses GET variables for Possible sharperShaders */
   parseFromGETVariables();
 
-  dotShader = gl.createProgram();
+  dotShaderProgram = gl.createProgram();
 
   vertShader = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vertShader, satSet.shader.vert);
@@ -521,18 +521,18 @@ satSet.init = async (cameraManagerRef) => {
   gl.shaderSource(fragShader, satSet.shader.frag);
   gl.compileShader(fragShader);
 
-  gl.attachShader(dotShader, vertShader);
-  gl.attachShader(dotShader, fragShader);
-  gl.linkProgram(dotShader);
+  gl.attachShader(dotShaderProgram, vertShader);
+  gl.attachShader(dotShaderProgram, fragShader);
+  gl.linkProgram(dotShaderProgram);
 
-  dotShader.aPos = gl.getAttribLocation(dotShader, 'aPos');
-  dotShader.aColor = gl.getAttribLocation(dotShader, 'aColor');
-  dotShader.aStar = gl.getAttribLocation(dotShader, 'aStar');
-  dotShader.minSize = gl.getUniformLocation(dotShader, 'minSize');
-  dotShader.maxSize = gl.getUniformLocation(dotShader, 'maxSize');
-  dotShader.uMvMatrix = gl.getUniformLocation(dotShader, 'uMvMatrix');
-  dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
-  dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
+  dotShaderProgram.aPos = gl.getAttribLocation(dotShaderProgram, 'aPos');
+  dotShaderProgram.aColor = gl.getAttribLocation(dotShaderProgram, 'aColor');
+  dotShaderProgram.aStar = gl.getAttribLocation(dotShaderProgram, 'aStar');
+  dotShaderProgram.minSize = gl.getUniformLocation(dotShaderProgram, 'minSize');
+  dotShaderProgram.maxSize = gl.getUniformLocation(dotShaderProgram, 'maxSize');
+  dotShaderProgram.uMvMatrix = gl.getUniformLocation(dotShaderProgram, 'uMvMatrix');
+  dotShaderProgram.uCamMatrix = gl.getUniformLocation(dotShaderProgram, 'uCamMatrix');
+  dotShaderProgram.uPMatrix = gl.getUniformLocation(dotShaderProgram, 'uPMatrix');
 };
 
 // This is a wrapper that tries various combinations to figure out which file to use for the satellites
@@ -971,7 +971,7 @@ satSet.setupGpuBuffers = () => {
   // Make a buffer for satellite data
   satPosBuf = gl.createBuffer();
   // Create an empty set of data -- why isn't this being assigned to the buffer?
-  satPos = new Float32Array(satData.length * 3);
+  // satPos = new Float32Array(satData.length * 3);
 
   // Make a buffer for star/selected satellite data
   starBuf = gl.createBuffer();
@@ -1288,14 +1288,12 @@ satSet.updateRadarData = () => {
   satSet.setColorScheme(settingsManager.currentColorScheme, true);
 };
 
-// var screenLocation = [];
-let drawPropTime, isDidOnce, rrI, radarDataLen;
-satSet.draw = (pMatrix, camMatrix) => {
-  // NOTE: 640 byte leak.
-  if (!settingsManager.shadersReady || !settingsManager.cruncherReady || !satSet.isInitDone) return;
+satSet.updateDrawPositions = () => {
+  // Don't update positions until positionCruncher finishes its first loop and creates data in satPos
+  if (!satPos) return;
 
-  radarDataLen = radarDataManager.radarData.length;
-  if (radarDataLen > 0) {
+  // If we have radar data -- let's update that first
+  if (radarDataManager.radarData.length > 0) {
     // Get Time
     if (timeManager.propRate === 0) {
       timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset);
@@ -1345,8 +1343,6 @@ satSet.draw = (pMatrix, camMatrix) => {
     }
   }
 
-  // gl.bindVertexArray(satSet.vao);
-
   drawDivisor = Math.max(timeManager.propRate, 0.001);
   timeManager.setDrawDt(Math.min(timeManager.dt / 1000.0, 1.0 / drawDivisor));
   // Skip Velocity Math if FPS is hurting
@@ -1367,33 +1363,40 @@ satSet.draw = (pMatrix, camMatrix) => {
       }
     }
   }
+};
 
-  gl.useProgram(dotShader);
+let drawPropTime, isDidOnce, rrI, radarDataLen;
+satSet.draw = (pMatrix, camMatrix) => {
+  if (!settingsManager.shadersReady || !settingsManager.cruncherReady || !satSet.isInitDone) return;
+
+  // gl.bindVertexArray(satSet.vao);
+
+  gl.useProgram(dotShaderProgram);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   //  gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
 
-  gl.uniformMatrix4fv(dotShader.uMvMatrix, false, emptyMat4);
-  gl.uniformMatrix4fv(dotShader.uCamMatrix, false, camMatrix);
-  gl.uniformMatrix4fv(dotShader.uPMatrix, false, pMatrix);
+  gl.uniformMatrix4fv(dotShaderProgram.uMvMatrix, false, emptyMat4);
+  gl.uniformMatrix4fv(dotShaderProgram.uCamMatrix, false, camMatrix);
+  gl.uniformMatrix4fv(dotShaderProgram.uPMatrix, false, pMatrix);
   if (cameraManager.cameraType.current == cameraManager.cameraType.planetarium) {
-    gl.uniform1f(dotShader.minSize, settingsManager.satShader.minSizePlanetarium);
-    gl.uniform1f(dotShader.maxSize, settingsManager.satShader.maxSizePlanetarium);
+    gl.uniform1f(dotShaderProgram.minSize, settingsManager.satShader.minSizePlanetarium);
+    gl.uniform1f(dotShaderProgram.maxSize, settingsManager.satShader.maxSizePlanetarium);
   } else {
-    gl.uniform1f(dotShader.minSize, settingsManager.satShader.minSize);
-    gl.uniform1f(dotShader.maxSize, settingsManager.satShader.maxSize);
+    gl.uniform1f(dotShaderProgram.minSize, settingsManager.satShader.minSize);
+    gl.uniform1f(dotShaderProgram.maxSize, settingsManager.satShader.maxSize);
   }
 
   gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);
-  gl.enableVertexAttribArray(dotShader.aStar);
-  gl.vertexAttribPointer(dotShader.aStar, 1, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(dotShaderProgram.aStar);
+  gl.vertexAttribPointer(dotShaderProgram.aStar, 1, gl.FLOAT, false, 0, 0);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, satPosBuf);
   gl.bufferData(gl.ARRAY_BUFFER, satPos, gl.STREAM_DRAW);
-  gl.vertexAttribPointer(dotShader.aPos, 3, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(dotShaderProgram.aPos, 3, gl.FLOAT, false, 0, 0);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
-  gl.enableVertexAttribArray(dotShader.aColor);
-  gl.vertexAttribPointer(dotShader.aColor, 4, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(dotShaderProgram.aColor);
+  gl.vertexAttribPointer(dotShaderProgram.aColor, 4, gl.FLOAT, false, 0, 0);
 
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.enable(gl.BLEND);
@@ -1403,8 +1406,9 @@ satSet.draw = (pMatrix, camMatrix) => {
 
   gl.depthMask(true);
   gl.disable(gl.BLEND);
+};
 
-  // now pickbuffer stuff......
+satSet.drawPicking = (pMatrix, camMatrix) => {
   try {
     gl.useProgram(gl.pickShaderProgram);
     gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
@@ -1426,10 +1430,6 @@ satSet.draw = (pMatrix, camMatrix) => {
     db.log(`satData.length: ${satData.length}`);
     db.log(e);
   }
-  // satSet.updateFOV(null, drawNow);
-
-  // Done Drawing
-  // return true;
 };
 
 satSet.setSat = (i, satObject) => {

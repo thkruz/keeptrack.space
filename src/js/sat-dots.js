@@ -208,8 +208,8 @@ class SatDots {
 /*
   // Note: This won't work as is but is kept as a reference
   satSet.changeShaders = (newShaders) => {
-    gl.detachShader(dotShader, vertShader);
-    gl.detachShader(dotShader, fragShader);
+    gl.detachShader(dotShaderProgram, vertShader);
+    gl.detachShader(dotShaderProgram, fragShader);
     switch (newShaders) {
       case 'var':
         gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-var.glsl'));
@@ -229,17 +229,17 @@ class SatDots {
     gl.shaderSource(fragShader, shaderLoader.getShaderCode('dot-fragment.glsl'));
     gl.compileShader(fragShader);
 
-    gl.attachShader(dotShader, vertShader);
-    gl.attachShader(dotShader, fragShader);
-    gl.linkProgram(dotShader);
-    dotShader.aPos = gl.getAttribLocation(dotShader, 'aPos');
-    dotShader.aColor = gl.getAttribLocation(dotShader, 'aColor');
-    dotShader.aStar = gl.getAttribLocation(dotShader, 'aStar');
-    dotShader.minSize = gl.getUniformLocation(dotShader, 'minSize');
-    dotShader.maxSize = gl.getUniformLocation(dotShader, 'maxSize');
-    dotShader.uMvMatrix = gl.getUniformLocation(dotShader, 'uMvMatrix');
-    dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
-    dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
+    gl.attachShader(dotShaderProgram, vertShader);
+    gl.attachShader(dotShaderProgram, fragShader);
+    gl.linkProgram(dotShaderProgram);
+    dotShaderProgram.aPos = gl.getAttribLocation(dotShaderProgram, 'aPos');
+    dotShaderProgram.aColor = gl.getAttribLocation(dotShaderProgram, 'aColor');
+    dotShaderProgram.aStar = gl.getAttribLocation(dotShaderProgram, 'aStar');
+    dotShaderProgram.minSize = gl.getUniformLocation(dotShaderProgram, 'minSize');
+    dotShaderProgram.maxSize = gl.getUniformLocation(dotShaderProgram, 'maxSize');
+    dotShaderProgram.uMvMatrix = gl.getUniformLocation(dotShaderProgram, 'uMvMatrix');
+    dotShaderProgram.uCamMatrix = gl.getUniformLocation(dotShaderProgram, 'uCamMatrix');
+    dotShaderProgram.uPMatrix = gl.getUniformLocation(dotShaderProgram, 'uPMatrix');
   };
 */
 

@@ -4,6 +4,8 @@ import * as glm from '@app/js/lib/gl-matrix.js';
 
 class Dots {
   constructor(gl, pMatrix, cameraManager, timeManager) {
+    this.pickingDotSize = '16.0'; // glsl code - keep as a string
+
     this.gl = gl;
     this.cameraManager = cameraManager;
     this.timeManager = timeManager;
@@ -47,7 +49,7 @@ class Dots {
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, this.positionData, gl.STREAM_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, this.positionData, gl.DYNAMIC_DRAW);
     gl.vertexAttribPointer(this.drawProgram.aPos, 3, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorScheme.colorBuffer);
@@ -198,10 +200,9 @@ class Dots {
               varying vec3 vColor;
       
               void main(void) {
-              float dotSize = 16.0;
               vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
               gl_Position = position;
-              gl_PointSize = dotSize * aPickable;
+              gl_PointSize = ${this.pickingDotSize} * aPickable;
               vColor = aColor * aPickable;
               }
           `,
@@ -364,7 +365,7 @@ class Dots {
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.positionData), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.positionData), gl.DYNAMIC_DRAW);
   }
 
   updateSizeBuffer(satData) {
@@ -388,7 +389,7 @@ class Dots {
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.sizeBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.sizeData), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.sizeData), gl.DYNAMIC_DRAW);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -417,7 +418,7 @@ class Dots {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.pickingColorBuffer);
 
     // Update the data
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.pickingColorData), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.pickingColorData), gl.DYNAMIC_DRAW);
   }
 }
 

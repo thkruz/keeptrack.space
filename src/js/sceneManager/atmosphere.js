@@ -1,222 +1,143 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 
+// eslint-disable-next-line max-classes-per-file
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { mathValue } from '@app/js/helpers.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import * as twgl from 'twgl.js';
+import { DEG2RAD } from '@app/js/constants.js';
 
-let mvMatrixEmpty = glm.mat4.create();
-let nMatrixEmpty = glm.mat3.create();
-var earth, gl;
+class Atmosphere {
+  static NUM_LAT_SEGS = 64;
+  static NUM_LON_SEGS = 64;
 
-var atmosphere = {};
-atmosphere.lightDirection = [];
-// Shader Code
-atmosphere.shader = {
-  frag: `
-  precision mediump float;
+  constructor(gl, earth) {
+    // Move to the code the creates the moon?
+    if (settingsManager.enableLimitedUI || settingsManager.isDrawLess) return;
 
-  uniform vec3 uLightDirection;
-  varying vec3 vNormal;
-  varying float vDist;
+    // Setup References to World
+    this.gl = gl;
+    this.earth = earth;
 
-  void main () {
-      float sunAmount = max(dot(vNormal, uLightDirection), 0.1);
-      float darkAmount = max(dot(vNormal, -uLightDirection), 0.0);
-      float a4 = pow(1.3 - vDist / 2.0, 1.1) * 2.0;
-      float r = 1.0 - sunAmount;
-      float g = max(1.0 - sunAmount, 0.75) - darkAmount;
-      float b = max(sunAmount, 0.8) - darkAmount;
-      float a1 = min(sunAmount, 0.8) * 2.0;
-      float a2 = min(pow(darkAmount / 1.15, 2.0),0.2);
-      float a3 = pow(vDist,2.0) * -1.0 + 1.2;
-      float a = min(a1 - a2, a3) * a4;
-      gl_FragColor    = vec4(vec3(r,g,b), a);
-  }
-  `,
-  vert: `
-  attribute vec3 aVertexPosition;
-  attribute vec3 aVertexNormal;
+    // We draw the moon way closer than it actually is because of depthBuffer issues
+    // Each draw loop we will scale the real position so it is consistent
+    this.drawPosition = [0, 0, 0];
 
-  uniform mat4 uPMatrix;
-  uniform mat4 uCamMatrix;
-  uniform mat4 uMvMatrix;
-  uniform mat3 uNormalMatrix;
+    // Create these once and reuse them a lot
+    this.mvMatrixEmpty = glm.mat4.create();
+    this.nMatrixEmpty = glm.mat3.create();
 
-  varying vec3 vNormal;
-  varying float vDist;
+    // Create a gl program from the vert/frag shaders
+    this.programInfo = twgl.createProgramInfo(gl, [Atmosphere.shaders.vert, Atmosphere.shaders.frag]);
 
-  void main(void) {
-      vec4 position1 = uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
-      vec4 position0 = uCamMatrix * uMvMatrix * vec4(vec3(0.0,0.0,0.0), 1.0);
-      gl_Position = uPMatrix * position1;
-      vDist = distance(position0.xz,position1.xz) \/ ${settingsManager.atmosphereSize}.0;
-      vNormal = normalize( uNormalMatrix * aVertexNormal );
-  }
-  `,
-};
+    // Create buffers from the geomerty
+    this.bufferInfo = twgl.primitives.createSphereBufferInfo(gl, settingsManager.atmosphereSize, Atmosphere.NUM_LON_SEGS, Atmosphere.NUM_LAT_SEGS);
 
-let vertPosBuf, vertNormBuf, vertIndexBuf;
-// Shader Program
-let atmosphereShader;
-
-atmosphere.init = async function (glRef, earthRef) {
-  if (settingsManager.enableLimitedUI || settingsManager.isDrawLess) return;
-  gl = glRef;
-  earth = earthRef;
-  // Make Fragment Shader
-  let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-  gl.shaderSource(fragShader, atmosphere.shader.frag);
-  gl.compileShader(fragShader);
-
-  // Make Vertex Shader
-  let vertShader = gl.createShader(gl.VERTEX_SHADER);
-  gl.shaderSource(vertShader, atmosphere.shader.vert);
-  gl.compileShader(vertShader);
-
-  // Create Program with Two Shaders
-  atmosphereShader = gl.createProgram();
-  gl.attachShader(atmosphereShader, vertShader);
-  gl.attachShader(atmosphereShader, fragShader);
-  gl.linkProgram(atmosphereShader);
-
-  // Assign Attributes
-  atmosphereShader.aVertexPosition = gl.getAttribLocation(atmosphereShader, 'aVertexPosition');
-  atmosphereShader.aVertexNormal = gl.getAttribLocation(atmosphereShader, 'aVertexNormal');
-
-  // Assign Uniforms
-  atmosphereShader.uPMatrix = gl.getUniformLocation(atmosphereShader, 'uPMatrix');
-  atmosphereShader.uCamMatrix = gl.getUniformLocation(atmosphereShader, 'uCamMatrix');
-  atmosphereShader.uMvMatrix = gl.getUniformLocation(atmosphereShader, 'uMvMatrix');
-  atmosphereShader.uNormalMatrix = gl.getUniformLocation(atmosphereShader, 'uNormalMatrix');
-  atmosphereShader.uLightDirection = gl.getUniformLocation(atmosphereShader, 'uLightDirection');
-
-  // Generate a UV Sphere Bottom Up, CCW order
-  let vertPos = [];
-  let vertNorm = [];
-  for (let lat = 0; lat <= settingsManager.atmospherelatSegs; lat++) {
-    let latAngle = (Math.PI / settingsManager.atmospherelatSegs) * lat - Math.PI / 2;
-    let diskRadius = Math.cos(Math.abs(latAngle));
-    let z = Math.sin(latAngle);
-    for (let lon = 0; lon <= settingsManager.atmospherelonSegs; lon++) {
-      // add an extra vertex for texture funness
-      let lonAngle = ((Math.PI * 2) / settingsManager.atmospherelonSegs) * lon;
-      let x = Math.cos(lonAngle) * diskRadius;
-      let y = Math.sin(lonAngle) * diskRadius;
-
-      vertPos.push(x * settingsManager.atmosphereSize);
-      vertPos.push(y * settingsManager.atmosphereSize);
-      vertPos.push(z * settingsManager.atmosphereSize);
-      vertNorm.push(x);
-      vertNorm.push(y);
-      vertNorm.push(z);
-    }
+    this.loaded = true;
   }
 
-  // Calculate Vertex Draw Orders
-  let vertIndex = [];
-  for (let lat = 0; lat < settingsManager.atmospherelatSegs; lat++) {
-    // this is for each QUAD, not each vertex, so <
-    for (let lon = 0; lon < settingsManager.atmospherelonSegs; lon++) {
-      var blVert = lat * (settingsManager.atmospherelonSegs + 1) + lon; // there's settingsManager.atmospherelonSegs + 1 verts in each horizontal band
-      var brVert = blVert + 1;
-      var tlVert = (lat + 1) * (settingsManager.atmospherelonSegs + 1) + lon;
-      var trVert = tlVert + 1;
-      vertIndex.push(blVert);
-      vertIndex.push(brVert);
-      vertIndex.push(tlVert);
+  updateUniforms(pMatrix, camMatrix) {
+    this.mvMatrix = glm.mat4.create();
+    this.nMatrix = glm.mat3.create();
+    glm.mat4.identity(this.mvMatrix);
+    glm.mat4.translate(this.mvMatrix, this.mvMatrix, this.drawPosition);
+    glm.mat3.normalFromMat4(this.nMatrix, this.mvMatrix);
 
-      vertIndex.push(tlVert);
-      vertIndex.push(trVert);
-      vertIndex.push(brVert);
-    }
+    this.uniforms = {
+      u_nMatrix: this.nMatrix,
+      u_mvMatrix: this.mvMatrix,
+      u_pMatrix: pMatrix,
+      u_camMatrix: camMatrix,
+      u_lightDirection: this.earth.lightDirection,
+    };
   }
-  atmosphere.vertCount = vertIndex.length;
 
-  // Create Buffer for Vertex Positions
-  vertPosBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertPos), gl.STATIC_DRAW);
+  draw(pMatrix, cameraManager) {
+    // Move this to the draw loop?
+    if (!this.loaded) return;
+    const gl = this.gl;
 
-  // Create Buffer for Vertex Normals
-  vertNormBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertNorm), gl.STATIC_DRAW);
+    this.update(cameraManager.camPitch);
+    this.updateUniforms(pMatrix, cameraManager.camMatrix);
 
-  // Create Buffer for Vertex Indicies
-  vertIndexBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
+    // Enable blending and ignore depth test (especially on self)
+    gl.enable(gl.BLEND);
+    gl.disable(gl.DEPTH_TEST);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-  // Let Everyone Know This is Initialized
-  atmosphere.loaded = true;
-};
+    gl.useProgram(this.programInfo.program);
+    twgl.setBuffersAndAttributes(gl, this.programInfo, this.bufferInfo);
+    twgl.setUniforms(this.programInfo, this.uniforms);
+    twgl.drawBufferInfo(gl, this.bufferInfo);
 
-atmosphere.update = (camPitch) => {
-  // This should be called in sun before everyone else gets updated
-  // sun.currentDirection();
+    // Disable blending and reeneable depth test
+    gl.disable(gl.BLEND);
+    gl.enable(gl.DEPTH_TEST);
 
-  // Normalize light direction (should be done in earth)
-  // glm.vec3.normalize(earth.lightDirection, earth.lightDirection);
+    // Done Drawing
+    return true;
+  }
 
-  // Start with an empyy model view matrix
-  atmosphere.mvMatrix = mvMatrixEmpty;
-  glm.mat4.identity(atmosphere.mvMatrix);
-  // Rotate model view matrix to prevent lines showing as camera rotates
-  glm.mat4.rotateY(atmosphere.mvMatrix, atmosphere.mvMatrix, 90 * mathValue.DEG2RAD - camPitch);
-  // Scale the atmosphere to 0,0,0 - needed?
-  glm.mat4.translate(atmosphere.mvMatrix, atmosphere.mvMatrix, [0, 0, 0]);
-  // Calculate normals
-  atmosphere.nMatrix = nMatrixEmpty;
-  glm.mat3.normalFromMat4(atmosphere.nMatrix, atmosphere.mvMatrix);
-};
+  update(camPitch) {
+    // Start with an empyy model view matrix
+    this.mvMatrix = glm.mat4.create();
 
-atmosphere.draw = function (pMatrix, camMatrix) {
-  if (!atmosphere.loaded) return;
+    glm.mat4.identity(this.mvMatrix);
+    // Rotate model view matrix to prevent lines showing as camera rotates
+    glm.mat4.rotateY(this.mvMatrix, this.mvMatrix, 90 * DEG2RAD - camPitch);
+    // Scale the atmosphere to 0,0,0 - needed?
+    glm.mat4.translate(this.mvMatrix, this.mvMatrix, [0, 0, 0]);
+    // Calculate normals
+    this.nMatrix = glm.mat3.create();
+    glm.mat3.normalFromMat4(this.nMatrix, this.mvMatrix);
+  }
 
-  // Enable blending and ignore depth test (especially on self)
-  gl.enable(gl.BLEND);
-  gl.disable(gl.DEPTH_TEST);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  static shaders = {
+    frag: `
+      #ifdef GL_FRAGMENT_PRECISION_HIGH
+        precision highp float;
+      #else
+        precision mediump float;
+      #endif
 
-  // Change to the atmosphere shader
-  gl.useProgram(atmosphereShader);
-  // Change to the main drawing buffer
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      uniform vec3 u_lightDirection;
+      varying vec3 v_normal;
+      varying float v_dist;
 
-  // Set the uniforms
-  gl.uniformMatrix3fv(atmosphereShader.uNormalMatrix, false, atmosphere.nMatrix);
-  gl.uniformMatrix4fv(atmosphereShader.uMvMatrix, false, atmosphere.mvMatrix);
-  gl.uniformMatrix4fv(atmosphereShader.uPMatrix, false, pMatrix);
-  gl.uniformMatrix4fv(atmosphereShader.uCamMatrix, false, camMatrix);
-  gl.uniform3fv(atmosphereShader.uLightDirection, earth.lightDirection);
+      void main () {
+          float sunAmount = max(dot(v_normal, u_lightDirection), 0.1);
+          float darkAmount = max(dot(v_normal, -u_lightDirection), 0.0);
+          float a4 = pow(1.3 - v_dist / 2.0, 1.1) * 2.0;
+          float r = 1.0 - sunAmount;
+          float g = max(1.0 - sunAmount, 0.75) - darkAmount;
+          float b = max(sunAmount, 0.8) - darkAmount;
+          float a1 = min(sunAmount, 0.8) * 2.0;
+          float a2 = min(pow(darkAmount / 1.15, 2.0),0.2);
+          float a3 = pow(v_dist,2.0) * -1.0 + 1.2;
+          float a = min(a1 - a2, a3) * a4;
+          gl_FragColor    = vec4(vec3(r,g,b), a);
+      }
+      `,
+    vert: `
+      attribute vec3 position;
+      attribute vec3 normal;
 
-  // Select the vertex position buffer
-  // Enable the attribute
-  // Set the attribute
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
-  gl.enableVertexAttribArray(atmosphereShader.aVertexPosition);
-  gl.vertexAttribPointer(atmosphereShader.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+      uniform mat4 u_pMatrix;
+      uniform mat4 u_camMatrix;
+      uniform mat4 u_mvMatrix;
+      uniform mat3 u_nMatrix;
 
-  // Select the vertex normals buffer
-  // Enable the attribute
-  // Set the attribute
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
-  gl.enableVertexAttribArray(atmosphereShader.aVertexNormal);
-  gl.vertexAttribPointer(atmosphereShader.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
+      varying vec3 v_normal;
+      varying float v_dist;
 
-  // Select the vertex indicies buffer
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
-  // Draw everythign to screen
-  gl.drawElements(gl.TRIANGLES, atmosphere.vertCount, gl.UNSIGNED_SHORT, 0);
+      void main(void) {
+          vec4 position1 = u_camMatrix * u_mvMatrix * vec4(position, 1.0);
+          vec4 position0 = u_camMatrix * u_mvMatrix * vec4(vec3(0.0,0.0,0.0), 1.0);
+          gl_Position = u_pMatrix * position1;
+          v_dist = distance(position0.xz,position1.xz) \/ ${settingsManager.atmosphereSize}.0;
+          v_normal = normalize( u_nMatrix * normal );
+      }
+      `,
+  };
+}
 
-  // Disable attributes to avoid conflict with other shaders
-  gl.disableVertexAttribArray(atmosphereShader.aVertexPosition);
-  gl.disableVertexAttribArray(atmosphereShader.aVertexNormal);
-
-  // Disable blending and reeneable depth test
-  gl.disable(gl.BLEND);
-  gl.enable(gl.DEPTH_TEST);
-  return true;
-};
-
-export { atmosphere };
+export { Atmosphere };

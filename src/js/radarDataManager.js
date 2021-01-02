@@ -27,6 +27,7 @@ radarDataManager.init = async (sensorManagerRef, timeManagerRef, satSetRef, satC
 };
 
 radarDataManager.changeTimeToFirstDataTime = () => {
+  if (!settingsManager.isEnableRadarData) return;
   timeManager.propOffset = new Date(radarDataManager.radarData[0].t) - Date.now();
   $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
   satCruncher.postMessage({
@@ -36,6 +37,7 @@ radarDataManager.changeTimeToFirstDataTime = () => {
 };
 
 radarDataManager.findFirstDataTime = () => {
+  if (!settingsManager.isEnableRadarData) return;
   let now = timeManager.propTime() * 1;
   for (let i = 0; i < radarDataManager.radarData.length; i++) {
     if (radarDataManager.radarData[i].t > now - 3000) {
@@ -46,6 +48,7 @@ radarDataManager.findFirstDataTime = () => {
 };
 
 radarDataManager.setup = (resp) => {
+  if (!settingsManager.isEnableRadarData) return;
   db.log('radarDataManager.init');
   radarDataManager.radarData = JSON.parse(resp);
 

@@ -245,8 +245,7 @@ var drawScene = () => {
     }
   }
   if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
-    atmosphere.update(cameraManager.camPitch);
-    atmosphere.draw(pMatrix, cameraManager.camMatrix);
+    atmosphere.draw(pMatrix, cameraManager);
   }
   earth.draw(pMatrix, cameraManager.camMatrix);
   satSet.draw(pMatrix, cameraManager.camMatrix);

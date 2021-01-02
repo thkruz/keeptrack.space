@@ -4,8 +4,8 @@
 // eslint-disable-next-line max-classes-per-file
 import * as glm from '@app/js/lib/gl-matrix.js';
 import * as twgl from 'twgl.js';
+import { RAD2DEG } from '@app/js/constants.js';
 import { SunCalc } from '@app/js/suncalc.js';
-import { mathValue } from '@app/js/helpers.js';
 import { satellite } from '@app/js/lookangles.js';
 
 class Moon {
@@ -51,12 +51,12 @@ class Moon {
     );
 
     // Create buffers from the geomerty
-    this.bufferInfo = twgl.primitives.createSphereBufferInfo(gl, Moon.DRAW_RADIUS, Moon.NUM_ON_SEGS, Moon.NUM_LAT_SEGS);
+    this.bufferInfo = twgl.primitives.createSphereBufferInfo(gl, Moon.DRAW_RADIUS, Moon.NUM_LON_SEGS, Moon.NUM_LAT_SEGS);
   }
 
   updateUniforms(pMatrix, camMatrix) {
-    this.mvMatrix = this.mvMatrixEmpty;
-    this.nMatrix = this.nMatrixEmpty;
+    this.mvMatrix = glm.mat4.create();
+    this.nMatrix = glm.mat3.create();
     glm.mat4.identity(this.mvMatrix);
     glm.mat4.translate(this.mvMatrix, this.mvMatrix, this.drawPosition);
     glm.mat3.normalFromMat4(this.nMatrix, this.mvMatrix);
@@ -69,6 +69,7 @@ class Moon {
       u_sunPos: this.sun.pos2,
       u_drawPosition: Math.sqrt(this.drawPosition[0] ** 2 + this.drawPosition[1] ** 2 + this.drawPosition[2] ** 2),
       u_ambientLight: Moon.ambientLight,
+      u_sampler: this.texture,
     };
   }
 
@@ -88,9 +89,9 @@ class Moon {
     twgl.setUniforms(this.programInfo, this.uniforms);
     twgl.drawBufferInfo(gl, this.bufferInfo);
 
-    gl.disableVertexAttribArray(this.programInfo.program.aTexCoord);
-    gl.disableVertexAttribArray(this.programInfo.program.aVertexPosition);
-    gl.disableVertexAttribArray(this.programInfo.program.aVertexNormal);
+    // gl.disableVertexAttribArray(this.programInfo.program.aTexCoord);
+    // gl.disableVertexAttribArray(this.programInfo.program.aVertexPosition);
+    // gl.disableVertexAttribArray(this.programInfo.program.aVertexNormal);
 
     // Done Drawing
     return true;
@@ -101,7 +102,7 @@ class Moon {
     this.rae = SunCalc.getMoonPosition(sun.now, 0, 0);
 
     // RAE2ECF and then ECF2ECI
-    this.position = satellite.ecfToEci(satellite.lookAnglesToEcf(180 + this.rae.azimuth * mathValue.RAD2DEG, this.rae.altitude * mathValue.RAD2DEG, this.rae.distance, 0, 0, 0), sun.sunvar.gmst);
+    this.position = satellite.ecfToEci(satellite.lookAnglesToEcf(180 + this.rae.azimuth * RAD2DEG, this.rae.altitude * RAD2DEG, this.rae.distance, 0, 0, 0), sun.sunvar.gmst);
 
     const scaleFactor = Moon.SCALAR_DISTANCE / Math.max(Math.max(Math.abs(this.position.x), Math.abs(this.position.y)), Math.abs(this.position.z));
     this.drawPosition[0] = this.position.x * scaleFactor;
@@ -111,7 +112,11 @@ class Moon {
 
   static shaders = {
     frag: `
-      precision mediump float;
+      #ifdef GL_FRAGMENT_PRECISION_HIGH
+        precision highp float;
+      #else
+        precision mediump float;
+      #endif
   
       uniform vec3 u_ambientLight;
       uniform sampler2D u_sampler;
@@ -143,30 +148,30 @@ class Moon {
       }
       `,
     vert: `
-      attribute vec3 a_position;
-      attribute vec2 a_texcoord;
-      attribute vec3 a_normal;
-  
       uniform mat4 u_pMatrix;
       uniform mat4 u_camMatrix;
       uniform mat4 u_mvMatrix;
-      uniform mat3 u_normalMatrix;
+      uniform mat3 u_nMatrix;
       uniform float u_drawPosition;
-  
+      
+      attribute vec3 position;
+      attribute vec2 texcoord;
+      attribute vec3 normal;
+    
       varying vec2 v_texcoord;
       varying vec3 v_normal;
       varying float v_dist;
   
       void main(void) {
-          vec4 position = u_mvMatrix * vec4(a_position, 1.0);
+          vec4 position = u_mvMatrix * vec4(position, 1.0);
           gl_Position = u_pMatrix * u_camMatrix * position;
 
           // Ratio of the vertex distance compared to the center of the sphere
           // This lets us figure out which verticies are on the back half
           v_dist = distance(position.xyz,vec3(0.0,0.0,0.0)) \/ u_drawPosition;
           
-          v_texcoord = a_texcoord;
-          v_normal = u_normalMatrix * a_normal;
+          v_texcoord = texcoord;
+          v_normal = u_nMatrix * normal;
       }
       `,
   };

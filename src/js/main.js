@@ -34,7 +34,7 @@ import 'jquery-ui-bundle';
 import '@app/js/keeptrack-foot.js';
 import 'materialize-css';
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { LineFactory, Moon, atmosphere, earth, sun } from '@app/js/sceneManager/sceneManager.js';
+import { Atmosphere, LineFactory, Moon, earth, sun } from '@app/js/sceneManager/sceneManager.js';
 import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satCruncher, satSet } from '@app/js/satSet.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
@@ -72,7 +72,7 @@ $(document).ready(async function initalizeKeepTrack() {
   earth.loadHiRes();
   earth.loadHiResNight();
   meshManager.init(gl, earth);
-  atmosphere.init(gl, earth);
+  let atmosphere = new Atmosphere(gl, earth);
   await sun.init(gl, earth);
   let moon = new Moon(gl, sun);
   settingsManager.loadStr('dots');

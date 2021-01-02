@@ -40,7 +40,7 @@ var dlManager = {};
   dlManager.isShowFPS = false;
 }
 
-var uiInput, moon, pMatrix, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, webGlInit, timeManager;
+var uiInput, moon, pMatrix, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, webGlInit, timeManager, dotsManager;
 dlManager.init = (
   uiInputRef,
   moonRef,
@@ -61,7 +61,8 @@ dlManager.init = (
   lineManagerRef,
   glRef,
   webGlInitRef,
-  timeManagerRef
+  timeManagerRef,
+  dotsManagerRef
 ) => {
   uiInput = uiInputRef;
   moon = moonRef;
@@ -83,6 +84,7 @@ dlManager.init = (
   gl = glRef;
   webGlInit = webGlInitRef;
   timeManager = timeManagerRef;
+  dotsManager = dotsManagerRef;
 };
 
 dlManager.drawLoop = (preciseDt) => {
@@ -222,7 +224,7 @@ dlManager.screenShot = () => {
 
 var drawScene = () => {
   // Drawing ColorIds for Picking Satellites
-  gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -231,9 +233,10 @@ var drawScene = () => {
 
   cameraManager.update(dlManager.sat, dlManager.sensorPos);
 
-  gl.useProgram(gl.pickShaderProgram);
-  gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
-  gl.uniformMatrix4fv(gl.pickShaderProgram.camMatrix, false, cameraManager.camMatrix);
+  // This should be moved TODO
+  gl.useProgram(dotsManager.pickingProgram);
+  gl.uniformMatrix4fv(dotsManager.pickingProgram.uPMatrix, false, pMatrix);
+  gl.uniformMatrix4fv(dotsManager.pickingProgram.camMatrix, false, cameraManager.camMatrix);
 
   // gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -247,16 +250,16 @@ var drawScene = () => {
   if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
     atmosphere.draw(pMatrix, cameraManager);
   }
-  earth.draw(pMatrix, cameraManager.camMatrix);
+  earth.draw(pMatrix, cameraManager.camMatrix, dotsManager);
 
   // Update Draw Positions
-  satSet.updateDrawPositions();
+  dotsManager.updatePositionBuffer(satSet, timeManager);
 
   // Draw Dots
-  satSet.draw(pMatrix, cameraManager.camMatrix);
+  dotsManager.draw(pMatrix, cameraManager, settingsManager.currentColorScheme);
 
   // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-  satSet.drawPicking(pMatrix, cameraManager.camMatrix);
+  dotsManager.drawPicking(pMatrix, cameraManager);
 
   orbitManager.draw(pMatrix, cameraManager.camMatrix);
 

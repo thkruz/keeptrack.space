@@ -38,11 +38,11 @@ var uiInput = {};
 uiInput.isMouseMoving = false;
 uiInput.mouseSat = -1;
 
-var cameraManager, webGlInit, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, pMatrix, pickColorBuf;
-uiInput.init = (cameraManagerRef, webGlInitRef, mobileRef, objectManagerRef, satelliteRef, satSetRef, lineManagerRef, sensorManagerRef, starManagerRef, ColorSchemeRef, satCruncherRef, earthRef, glRef, uiManagerRef, pMatrixRef, pickColorBufRef) => {
+var cameraManager, webGlInit, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, pMatrix, dotsManager;
+uiInput.init = (cameraManagerRef, webGlInitRef, mobileRef, objectManagerRef, satelliteRef, satSetRef, lineManagerRef, sensorManagerRef, starManagerRef, ColorSchemeRef, satCruncherRef, earthRef, glRef, uiManagerRef, pMatrixRef, dotsManagerRef) => {
   cameraManager = cameraManagerRef;
   webGlInit = webGlInitRef;
-  pickColorBuf = pickColorBufRef;
+  dotsManager = dotsManagerRef;
   mobile = mobileRef;
   objectManager = objectManagerRef;
   satellite = satelliteRef;
@@ -1209,9 +1209,10 @@ uiInput.init = (cameraManagerRef, webGlInitRef, mobileRef, objectManagerRef, sat
 
 uiInput.getSatIdFromCoord = (x, y) => {
   // NOTE: gl.readPixels is a huge bottleneck
-  gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-  gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
-  return ((pickColorBuf[2] << 16) | (pickColorBuf[1] << 8) | pickColorBuf[0]) - 1;
+  gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
+  gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManager.pickReadPixelBuffer);
+  // const id = ((dotsManager.pickReadPixelBuffer[2] << 16) | (dotsManager.pickReadPixelBuffer[1] << 8) | dotsManager.pickReadPixelBuffer[0]) - 1;
+  return ((dotsManager.pickReadPixelBuffer[2] << 16) | (dotsManager.pickReadPixelBuffer[1] << 8) | dotsManager.pickReadPixelBuffer[0]) - 1;
 };
 
 // Raycasting in getEarthScreenPoint would provide a lot of powerful (but slow) options later

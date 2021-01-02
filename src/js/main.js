@@ -39,6 +39,7 @@ import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satCrunc
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
+import { Dots } from './dots';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
 import { dlManager } from '@app/js/dlManager/dlManager.js';
 import { meshManager } from '@app/modules/meshManager.js';
@@ -56,10 +57,10 @@ import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 
 // Common Variables
-var gl, lineManager, groupsManager, pickFb, pickTex, pickColorBuf;
+var gl, lineManager, groupsManager;
 var pMatrix = glm.mat4.create();
 
-var cameraManager;
+var cameraManager, dotsManager;
 // EVERYTHING SHOULD START HERE
 $(document).ready(async function initalizeKeepTrack() {
   timeManager.propRealTime = Date.now(); // assumed same as value in Worker, not passing
@@ -68,12 +69,14 @@ $(document).ready(async function initalizeKeepTrack() {
   await webGlInit();
   cameraManager = new Camera();
   await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
-  satSet.init(cameraManager);
+  settingsManager.loadStr('dots');
+  dotsManager = new Dots(gl, pMatrix, cameraManager, timeManager, ColorScheme);
+  satSet.init(cameraManager, dotsManager);
   selectSatManager.init(ColorScheme.group);
   objectManager.init();
   await satSet.loadCatalog(); // Needs Object Manager and gl first
-  satSet.setupGpuBuffers();
-  satSet.setupGpuBuffersPicking();
+
+  dotsManager.setupPickingBuffer(satSet.satData);
   satSet.setColorScheme(ColorScheme.default, true);
   await earth.init(gl);
   earth.loadHiRes();
@@ -82,11 +85,10 @@ $(document).ready(async function initalizeKeepTrack() {
   let atmosphere = new Atmosphere(gl, earth);
   await sun.init(gl, earth);
   let moon = new Moon(gl, sun);
-  settingsManager.loadStr('dots');
 
   groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
   await orbitManager.init(cameraManager, groupsManager);
-  searchBox.init(satSet, groupsManager, orbitManager);
+  searchBox.init(satSet, groupsManager, orbitManager, dotsManager);
   lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
   satLinkManager.init(lineManager, satSet, sensorManager);
   starManager.init(lineManager, getIdFromStarName);
@@ -97,9 +99,31 @@ $(document).ready(async function initalizeKeepTrack() {
   satLinkManager.idToSatnum();
   startWithOrbits();
 
-  uiInput.init(cameraManager, webGlInit, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, pMatrix, pickColorBuf);
+  uiInput.init(cameraManager, webGlInit, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, pMatrix, dotsManager);
 
-  await dlManager.init(uiInput, moon, pMatrix, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, webGlInit, timeManager);
+  await dlManager.init(
+    uiInput,
+    moon,
+    pMatrix,
+    sun,
+    searchBox,
+    atmosphere,
+    starManager,
+    satellite,
+    ColorScheme,
+    cameraManager,
+    objectManager,
+    orbitManager,
+    meshManager,
+    earth,
+    sensorManager,
+    uiManager,
+    lineManager,
+    gl,
+    webGlInit,
+    timeManager,
+    dotsManager
+  );
   dlManager.drawLoop();
 });
 
@@ -199,97 +223,14 @@ var webGlInit = async () => {
 
   gl.enable(gl.DEPTH_TEST);
 
-  // Reinitialize GPU Picking Buffers
-  pick.init();
-
-  window.gl = gl;
-};
-
-var pick = {};
-pick.shader = {
-  vert: `
-        attribute vec3 aPos;
-        attribute vec3 aColor;
-        attribute float aPickable;
-
-        uniform mat4 uCamMatrix;
-        uniform mat4 uMvMatrix;
-        uniform mat4 uPMatrix;
-
-        varying vec3 vColor;
-
-        void main(void) {
-        float dotSize = 16.0;
-        vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
-        gl_Position = position;
-        gl_PointSize = dotSize * aPickable;
-        vColor = aColor * aPickable;
-        }
-    `,
-  frag: `
-        precision mediump float;
-
-        varying vec3 vColor;
-
-        void main(void) {
-            gl_FragColor = vec4(vColor, 1.0);
-        }
-    `,
-};
-
-pick.init = () => {
-  var pFragShader = gl.createShader(gl.FRAGMENT_SHADER);
-  var pFragCode = pick.shader.frag;
-  gl.shaderSource(pFragShader, pFragCode);
-  gl.compileShader(pFragShader);
-
-  var pVertShader = gl.createShader(gl.VERTEX_SHADER);
-  var pVertCode = pick.shader.vert;
-  gl.shaderSource(pVertShader, pVertCode);
-  gl.compileShader(pVertShader);
-
-  var pickShaderProgram = gl.createProgram();
-  gl.attachShader(pickShaderProgram, pVertShader);
-  gl.attachShader(pickShaderProgram, pFragShader);
-  gl.linkProgram(pickShaderProgram);
-
-  pickShaderProgram.aPos = gl.getAttribLocation(pickShaderProgram, 'aPos');
-  pickShaderProgram.aColor = gl.getAttribLocation(pickShaderProgram, 'aColor');
-  pickShaderProgram.aPickable = gl.getAttribLocation(pickShaderProgram, 'aPickable');
-  pickShaderProgram.uCamMatrix = gl.getUniformLocation(pickShaderProgram, 'uCamMatrix');
-  pickShaderProgram.uMvMatrix = gl.getUniformLocation(pickShaderProgram, 'uMvMatrix');
-  pickShaderProgram.uPMatrix = gl.getUniformLocation(pickShaderProgram, 'uPMatrix');
-
-  gl.pickShaderProgram = pickShaderProgram;
-
-  pickFb = gl.createFramebuffer();
-  gl.bindFramebuffer(gl.FRAMEBUFFER, pickFb);
-
-  pickTex = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, pickTex);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); // makes clearing work
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.drawingBufferWidth, gl.drawingBufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-
-  var rb = gl.createRenderbuffer(); // create RB to store the depth buffer
-  gl.bindRenderbuffer(gl.RENDERBUFFER, rb);
-  gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickTex, 0);
-  gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, rb);
-
-  gl.pickFb = pickFb;
-
-  pickColorBuf = new Uint8Array(4);
-
   pMatrix = glm.mat4.create();
   glm.mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
 
   // This converts everything from 3D space to ECI (z and y planes are swapped)
   const eciToOpenGlMat = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
   glm.mat4.mul(pMatrix, pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
+
+  window.gl = gl;
 };
 
 export { gl, webGlInit };

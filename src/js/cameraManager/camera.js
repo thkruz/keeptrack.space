@@ -16,7 +16,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 */
 
-/**
+/*
  * @todo cameraManager.js Testing Full Coverage
  * @body Complete 100% testing coverage and input validation for @app/test/cameraManager.test.js. Use cameraManager.setZoomLevel() as an example of a correct test/validation.
  */
@@ -24,9 +24,9 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/constants.js';
 
-/** Used for managing the movement of the camera during the draw loop */
+/* Used for managing the movement of the camera during the draw loop */
 class Camera {
-  /** Setup */
+  /* Setup */
   constructor() {
     this.camMatrix = glm.mat4.create();
     this.isZoomIn = false;
@@ -72,12 +72,12 @@ class Camera {
         if (val > 6 || val < 0) throw new RangeError();
 
         this.cameraType.current = val;
-        this.#resetFpsPos();
+        this.resetFpsPos();
       },
     };
   }
 
-  /** Static Methods */
+  /* Static Methods */
   static normalizeAngle(angle) {
     angle %= TAU;
     if (angle > TAU / 2) angle -= TAU;
@@ -114,7 +114,7 @@ class Camera {
     return pitch;
   }
 
-  /** Private Fields */
+  /* Private Fields */
   #camMatrixEmpty = glm.mat4.create();
   #normUp = [0, 0, 0];
   #normForward = [0, 0, 0];
@@ -159,8 +159,8 @@ class Camera {
   #ftsYaw = 0;
   #camRotateSpeed = 0;
 
-  /** Private Methods */
-  #resetFpsPos() {
+  /* Private Methods */
+  resetFpsPos() {
     this.#fpsPitch = 0;
     this.#fpsYaw = 0;
     this.#fpsXPos = 0;
@@ -174,7 +174,7 @@ class Camera {
     this.#fpsZPos = 0;
   }
 
-  #fpsMovement() {
+  fpsMovement() {
     this.fpsTimeNow = Date.now();
     if (this.#fpsLastTime !== 0) {
       this.fpsElapsed = this.fpsTimeNow - this.#fpsLastTime;
@@ -231,11 +231,11 @@ class Camera {
     this.#fpsLastTime = this.fpsTimeNow;
   }
 
-  #getCamDist() {
+  getCamDist() {
     return Math.pow(this.zoomLevel, ZOOM_EXP) * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance;
   }
 
-  /** Getters and Setters */
+  /* Getters and Setters */
   set camPitch(val) {
     this._camPitch = val;
   }
@@ -464,7 +464,7 @@ class Camera {
     return this._ftsRotateReset;
   }
 
-  /** Public Methods */
+  /* Public Methods */
   rotateEarth(val) {
     if (typeof val == 'undefined') {
       this.#isRotateEarth = !this.#isRotateEarth;
@@ -1000,7 +1000,7 @@ class Camera {
     }
 
     if (this.cameraType.current === this.cameraType.fps || this.cameraType.current === this.cameraType.satellite || this.cameraType.current === this.cameraType.astronomy) {
-      this.#fpsMovement();
+      this.fpsMovement();
     }
   }
 
@@ -1009,7 +1009,7 @@ class Camera {
     {
       glm.mat4.identity(this.camMatrix);
 
-      /**
+      /*
        * For FPS style movement rotate the camera and then translate it
        * for traditional view, move the camera and then rotate it
        */
@@ -1043,7 +1043,7 @@ class Camera {
           glm.mat4.rotateY(this.camMatrix, this.camMatrix, -this.localRotateCurrent.roll);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.localRotateCurrent.yaw);
           glm.mat4.translate(this.camMatrix, this.camMatrix, [this.#fpsXPos, this.#fpsYPos, -this.#fpsZPos]);
-          glm.mat4.translate(this.camMatrix, this.camMatrix, [0, this.#getCamDist(), 0]);
+          glm.mat4.translate(this.camMatrix, this.camMatrix, [0, this.getCamDist(), 0]);
           glm.mat4.rotateX(this.camMatrix, this.camMatrix, this.#ecPitch);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.#ecYaw);
           break;
@@ -1052,7 +1052,7 @@ class Camera {
           glm.mat4.rotateY(this.camMatrix, this.camMatrix, -this.localRotateCurrent.roll);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.localRotateCurrent.yaw);
 
-          glm.mat4.translate(this.camMatrix, this.camMatrix, [settingsManager.offsetCameraModeX, this.#getCamDist(), settingsManager.offsetCameraModeZ]);
+          glm.mat4.translate(this.camMatrix, this.camMatrix, [settingsManager.offsetCameraModeX, this.getCamDist(), settingsManager.offsetCameraModeZ]);
           glm.mat4.rotateX(this.camMatrix, this.camMatrix, this.#ecPitch);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.#ecYaw);
           break;
@@ -1061,13 +1061,13 @@ class Camera {
           glm.mat4.rotateY(this.camMatrix, this.camMatrix, -this.localRotateCurrent.roll);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.localRotateCurrent.yaw);
 
-          glm.mat4.translate(this.camMatrix, this.camMatrix, [0, this.#getCamDist() - RADIUS_OF_EARTH - sat.getAltitude(), 0]);
+          glm.mat4.translate(this.camMatrix, this.camMatrix, [0, this.getCamDist() - RADIUS_OF_EARTH - sat.getAltitude(), 0]);
 
           glm.mat4.rotateX(this.camMatrix, this.camMatrix, this.#ftsPitch);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.#ftsYaw);
 
-          this.satPos = [-sat.position.x, -sat.position.y, -sat.position.z];
-          glm.mat4.translate(this.camMatrix, this.camMatrix, this.satPos);
+          this.satPosition = [-sat.position.x, -sat.position.y, -sat.position.z];
+          glm.mat4.translate(this.camMatrix, this.camMatrix, this.satPosition);
           break;
         case this.cameraType.fps: // FPS style movement
           glm.mat4.rotate(this.camMatrix, this.camMatrix, -this.#fpsPitch * DEG2RAD, [1, 0, 0]);
@@ -1086,20 +1086,20 @@ class Camera {
           break;
         }
         case this.cameraType.satellite: {
-          this.satPos = [-sat.position.x, -sat.position.y, -sat.position.z];
-          glm.mat4.translate(this.camMatrix, this.camMatrix, this.satPos);
-          glm.vec3.normalize(this.#normUp, this.satPos);
+          this.satPosition = [-sat.position.x, -sat.position.y, -sat.position.z];
+          glm.mat4.translate(this.camMatrix, this.camMatrix, this.satPosition);
+          glm.vec3.normalize(this.#normUp, this.satPosition);
           glm.vec3.normalize(this.#normForward, [sat.velocity.x, sat.velocity.y, sat.velocity.z]);
           glm.vec3.transformQuat(this.#normLeft, this.#normUp, glm.quat.fromValues(this.#normForward[0], this.#normForward[1], this.#normForward[2], 90 * DEG2RAD));
           this.satNextPos = [sat.position.x + sat.velocity.x, sat.position.y + sat.velocity.y, sat.position.z + sat.velocity.z];
-          glm.mat4.lookAt(this.camMatrix, this.satNextPos, this.satPos, this.#normUp);
+          glm.mat4.lookAt(this.camMatrix, this.satNextPos, this.satPosition, this.#normUp);
 
           glm.mat4.translate(this.camMatrix, this.camMatrix, [sat.position.x, sat.position.y, sat.position.z]);
 
           glm.mat4.rotate(this.camMatrix, this.camMatrix, this.#fpsPitch * DEG2RAD, this.#normLeft);
           glm.mat4.rotate(this.camMatrix, this.camMatrix, -this.#fpsYaw * DEG2RAD, this.#normUp);
 
-          glm.mat4.translate(this.camMatrix, this.camMatrix, this.satPos);
+          glm.mat4.translate(this.camMatrix, this.camMatrix, this.satPosition);
           break;
         }
         case this.cameraType.astronomy: {
@@ -1124,9 +1124,9 @@ class Camera {
     }
   }
 
-  /** For RayCasting -- Not Used Yet */
+  /* For RayCasting -- Not Used Yet */
   getCamPos() {
-    let gCPr = this.#getCamDist();
+    let gCPr = this.getCamDist();
     let gCPz = gCPr * Math.sin(this.camPitch);
     let gCPrYaw = gCPr * Math.cos(this.camPitch);
     let gCPx = gCPrYaw * Math.sin(this.camYaw);
@@ -1134,10 +1134,10 @@ class Camera {
     return [gCPx, gCPy, gCPz];
   }
 
-  earthHitTest(gl, pickColorBuf, x, y) {
-    gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-    gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
-    this.#isRayCastingEarth = pickColorBuf[0] === 0 && pickColorBuf[1] === 0 && pickColorBuf[2] === 0;
+  earthHitTest(gl, dotsManager, x, y) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
+    gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManager.pickReadPixelBuffer);
+    this.#isRayCastingEarth = dotsManager.pickReadPixelBuffer[0] === 0 && dotsManager.pickReadPixelBuffer[1] === 0 && dotsManager.pickReadPixelBuffer[2] === 0;
   }
 }
 

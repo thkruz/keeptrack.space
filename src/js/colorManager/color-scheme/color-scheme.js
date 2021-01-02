@@ -11,7 +11,7 @@ class ColorScheme {
     this.selectSat = objectManager.selectedSat;
 
     // Generate some public buffers
-    this.colorBuf = gl.createBuffer();
+    this.colorBuffer = gl.createBuffer();
     this.pickableBuf = gl.createBuffer();
   }
 
@@ -109,7 +109,7 @@ class ColorScheme {
     }
 
     // Now that we have all the information, load the color buffer
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuf);
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
     // And update it
     this.gl.bufferData(this.gl.ARRAY_BUFFER, this.colorData, this.gl.STATIC_DRAW);
 

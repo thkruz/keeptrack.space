@@ -48,24 +48,14 @@ import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 // 'use strict';
 var satSet = {};
-var emptyMat4 = glm.mat4.create();
 var TAU = 2 * Math.PI;
 var RAD2DEG = 360 / TAU;
 
 var satCruncher = {};
 var limitSats = settingsManager.limitSats;
 
-var dotShaderProgram;
-var satPosBuf;
 var satColorBuf;
-var starBuf;
 
-// Removed to reduce garbage collection
-var pickColorBuf;
-var pickableBuf;
-
-var satPos;
-var satVel;
 var satInView;
 var satInSun;
 var satData;
@@ -144,11 +134,6 @@ try {
  * variable is part of at the front of what the name used to be
  * (ex: now --> drawNow) (ex: i --> satCrunchIndex)
  */
-// draw Loop
-var drawDivisor;
-// var drawDt;
-var drawI;
-
 var satCrunchIndex;
 var satCrunchNow = 0;
 
@@ -156,6 +141,7 @@ var satCrunchNow = 0;
 // var cruncherReadyCallback;
 var gotExtraData = false;
 
+var dotManager;
 satCruncher.onmessage = (m) => {
   if (!gotExtraData) {
     // store extra data that comes from crunching
@@ -204,31 +190,31 @@ satCruncher.onmessage = (m) => {
     return;
   }
 
-  if (typeof satPos == 'undefined') {
-    satPos = new Float32Array(m.data.satPos);
+  if (typeof dotManager.positionData == 'undefined') {
+    dotManager.positionData = new Float32Array(m.data.satPos);
   } else {
-    satPos.set(m.data.satPos, 0);
+    dotManager.positionData.set(m.data.satPos, 0);
   }
 
-  if (typeof satVel == 'undefined') {
-    satVel = new Float32Array(m.data.satVel);
+  if (typeof dotManager.velocityData == 'undefined') {
+    dotManager.velocityData = new Float32Array(m.data.satVel);
   } else {
-    satVel.set(m.data.satVel, 0);
+    dotManager.velocityData.set(m.data.satVel, 0);
   }
 
   if (typeof m.data.satInView != 'undefined') {
     if (typeof satInView == 'undefined') {
-      satInView = new Int8Array(m.data.satInView);
+      dotManager.inViewData = new Int8Array(m.data.satInView);
     } else {
-      satInView.set(m.data.satInView, 0);
+      dotManager.inViewData.set(m.data.satInView, 0);
     }
   }
 
   if (typeof m.data.satInSun != 'undefined') {
     if (typeof satInSun == 'undefined') {
-      satInSun = new Int8Array(m.data.satInSun);
+      dotManager.inSunData = new Int8Array(m.data.satInSun);
     } else {
-      satInSun.set(m.data.satInSun, 0);
+      dotManager.inSunData.set(m.data.satInSun, 0);
     }
   }
 
@@ -503,36 +489,12 @@ satSet.shader = {
   `,
 };
 
-var vertShader;
-var fragShader;
 var cameraManager;
-satSet.init = async (cameraManagerRef) => {
+satSet.init = async (cameraManagerRef, dotManagerRef) => {
   cameraManager = cameraManagerRef;
+  dotManager = dotManagerRef;
   /** Parses GET variables for Possible sharperShaders */
   parseFromGETVariables();
-
-  dotShaderProgram = gl.createProgram();
-
-  vertShader = gl.createShader(gl.VERTEX_SHADER);
-  gl.shaderSource(vertShader, satSet.shader.vert);
-  gl.compileShader(vertShader);
-
-  fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-  gl.shaderSource(fragShader, satSet.shader.frag);
-  gl.compileShader(fragShader);
-
-  gl.attachShader(dotShaderProgram, vertShader);
-  gl.attachShader(dotShaderProgram, fragShader);
-  gl.linkProgram(dotShaderProgram);
-
-  dotShaderProgram.aPos = gl.getAttribLocation(dotShaderProgram, 'aPos');
-  dotShaderProgram.aColor = gl.getAttribLocation(dotShaderProgram, 'aColor');
-  dotShaderProgram.aStar = gl.getAttribLocation(dotShaderProgram, 'aStar');
-  dotShaderProgram.minSize = gl.getUniformLocation(dotShaderProgram, 'minSize');
-  dotShaderProgram.maxSize = gl.getUniformLocation(dotShaderProgram, 'maxSize');
-  dotShaderProgram.uMvMatrix = gl.getUniformLocation(dotShaderProgram, 'uMvMatrix');
-  dotShaderProgram.uCamMatrix = gl.getUniformLocation(dotShaderProgram, 'uCamMatrix');
-  dotShaderProgram.uPMatrix = gl.getUniformLocation(dotShaderProgram, 'uPMatrix');
 };
 
 // This is a wrapper that tries various combinations to figure out which file to use for the satellites
@@ -600,6 +562,7 @@ satSet.parseCatalog = (resp) => {
   let limitSatsArray = satSet.setupGetVariables();
 
   satData = satSet.filterTLEDatabase(resp, limitSatsArray);
+  satSet.satData = satData; // Expose this to everyone
   resp = null; // is this needed?
 
   // WebWorkers need this in a string format for initialization
@@ -965,64 +928,21 @@ satSet.filterTLEDatabase = (resp, limitSatsArray) => {
   return tempSatData;
 };
 
-satSet.setupGpuBuffers = () => {
-  // populate GPU mem buffers, now that we know how many sats there are
-
-  // Make a buffer for satellite data
-  satPosBuf = gl.createBuffer();
-  // Create an empty set of data -- why isn't this being assigned to the buffer?
-  // satPos = new Float32Array(satData.length * 3);
-
-  // Make a buffer for star/selected satellite data
-  starBuf = gl.createBuffer();
-  satSet.setupStarBuffer();
-
-  // This name is misleading
-  settingsManager.shadersReady = true;
-};
-
-satSet.setupGpuBuffersPicking = () => {
-  // Array for which colors go to which ids
-  let pickColorData = [];
-  // Make a buffer
-  pickColorBuf = gl.createBuffer();
-
-  // loop assinging random colors to ids
-  let byteR, byteG, byteB; // reuse color variables
-  for (let i = 0; i < satData.length; i++) {
-    byteR = (i + 1) & 0xff;
-    byteG = ((i + 1) & 0xff00) >> 8;
-    byteB = ((i + 1) & 0xff0000) >> 16;
-
-    // Normalize colors to 1 and flatten them
-    pickColorData.push(byteR / 255.0);
-    pickColorData.push(byteG / 255.0);
-    pickColorData.push(byteB / 255.0);
-  }
-
-  // Switch to the pick buffer
-  gl.bindBuffer(gl.ARRAY_BUFFER, pickColorBuf);
-
-  // Update the data
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pickColorData), gl.STATIC_DRAW);
-};
+satSet.setupGpuBuffersPicking = () => {};
 
 satSet.getSatData = () => satData;
 
 satSet.getSatInView = () => {
-  db.log('satSet.getSatInView');
-  if (typeof satInView == 'undefined') return false;
-  return satInView;
+  if (typeof dotManager.inViewData == 'undefined') return false;
+  return dotManager.inViewData;
 };
 satSet.getSatInSun = () => {
-  db.log('satSet.getSatInSun');
-  if (typeof satInSun == 'undefined') return false;
-  return satInSun;
+  if (typeof dotManager.inSunData == 'undefined') return false;
+  return dotManager.inSunData;
 };
 satSet.getSatVel = () => {
-  db.log('satSet.getSatVel');
-  if (typeof satVel == 'undefined') return false;
-  return satVel;
+  if (typeof dotManager.velocityData == 'undefined') return false;
+  return dotManager.velocityData;
 };
 
 satSet.resetSatInView = () => {
@@ -1036,19 +956,12 @@ satSet.resetSatInSun = () => {
 };
 
 satSet.setColorScheme = (scheme, isForceRecolor) => {
-  db.log('satSet.setColorScheme');
   settingsManager.setCurrentColorScheme(scheme);
-  try {
-    scheme.calculateColorBuffers(isForceRecolor);
-    satColorBuf = scheme.colorBuf;
-    pickableBuf = scheme.pickableBuf;
-  } catch (e) {
-    /**
-     * @todo Don't call setColorScheme after colorscheme is loaded
-     * @body It calls a few times while they are both loading
-     */
-    // console.log('satSet.setColorScheme not ready yet!');
-  }
+
+  scheme.calculateColorBuffers(isForceRecolor);
+  satColorBuf = scheme.colorBuf;
+  dotManager.colorBuffer = satColorBuf;
+  dotManager.pickingBuffer = scheme.pickableBuf;
 };
 
 satSet.convertIdArrayToSatnumArray = (satIdArray) => {
@@ -1236,36 +1149,6 @@ satSet.insertNewAnalystSatellite = (TLE1, TLE2, analsat) => {
   }
 };
 
-satSet.setupStarBuffer = () => {
-  let starBufData = satSet.setupStarData(satData);
-  gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(starBufData), gl.STATIC_DRAW);
-};
-
-satSet.setupStarData = (satData) => {
-  let starArray = [];
-  for (var i = 0; i < satData.length; i++) {
-    if (
-      i >= objectManager.starIndex1 &&
-      // true
-      i <= objectManager.starIndex2
-    ) {
-      starArray.push(1.0);
-    } else {
-      starArray.push(0.0);
-    }
-  }
-  // Pretend Satellites that are currently being searched are stars
-  // The shaders will display these "stars" like close satellites
-  // because the distance from the center of the earth is too close to
-  // be a star. This method is so there are less buffers needed but as
-  // computers get faster it should be replaced
-  for (let i = 0; i < settingsManager.lastSearchResults.length; i++) {
-    starArray[settingsManager.lastSearchResults[i]] = 1.0;
-  }
-  return starArray;
-};
-
 satSet.updateRadarData = () => {
   for (let i = 0; i < radarDataManager.radarData.length; i++) {
     try {
@@ -1286,150 +1169,6 @@ satSet.updateRadarData = () => {
     }
   }
   satSet.setColorScheme(settingsManager.currentColorScheme, true);
-};
-
-satSet.updateDrawPositions = () => {
-  // Don't update positions until positionCruncher finishes its first loop and creates data in satPos
-  if (!satPos) return;
-
-  // If we have radar data -- let's update that first
-  if (radarDataManager.radarData.length > 0) {
-    // Get Time
-    if (timeManager.propRate === 0) {
-      timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset);
-    } else {
-      timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset + (Number(timeManager.now) - Number(timeManager.propRealTime)) * timeManager.propRate);
-    }
-    drawPropTime = timeManager.propTimeVar * 1;
-
-    // Find the First Radar Return Time
-    if (radarDataManager.drawT1 == 0) {
-      for (rrI = 0; rrI < radarDataLen; rrI++) {
-        if (radarDataManager.radarData[rrI].t > timeManager.now - 3000) {
-          radarDataManager.drawT1 = rrI;
-          break;
-        }
-      }
-    }
-
-    isDidOnce = false;
-    for (drawI = radarDataManager.drawT1; drawI < radarDataLen; drawI++) {
-      // Don't Exceed Max Radar Data Allocation
-      // if (drawI > settingsManager.maxRadarData) break;
-
-      if (radarDataManager.radarData[drawI].t >= drawPropTime - 3000 && radarDataManager.radarData[drawI].t <= drawPropTime + 3000) {
-        if (!isDidOnce) {
-          radarDataManager.drawT1 = drawI;
-          isDidOnce = true;
-        }
-        // Skip if Already done
-        if (satPos[(radarDataManager.satDataStartIndex + drawI) * 3] !== 0) continue;
-
-        // Update Radar Marker Position
-        satPos[(radarDataManager.satDataStartIndex + drawI) * 3] = radarDataManager.radarData[drawI].x;
-        satPos[(radarDataManager.satDataStartIndex + drawI) * 3 + 1] = radarDataManager.radarData[drawI].y;
-        satPos[(radarDataManager.satDataStartIndex + drawI) * 3 + 2] = radarDataManager.radarData[drawI].z;
-        // NOTE: satVel could be added later
-      } else {
-        // Reset all positions outside time window
-        satPos[(radarDataManager.satDataStartIndex + drawI) * 3] = 0;
-        satPos[(radarDataManager.satDataStartIndex + drawI) * 3 + 1] = 0;
-        satPos[(radarDataManager.satDataStartIndex + drawI) * 3 + 2] = 0;
-      }
-
-      if (radarDataManager.radarData[drawI].t > drawPropTime + 3000) {
-        break;
-      }
-    }
-  }
-
-  drawDivisor = Math.max(timeManager.propRate, 0.001);
-  timeManager.setDrawDt(Math.min(timeManager.dt / 1000.0, 1.0 / drawDivisor));
-  // Skip Velocity Math if FPS is hurting
-  // 1000 / dt = fps
-  if (1000 / timeManager.dt > settingsManager.fpsThrottle2) {
-    timeManager.setDrawDt(timeManager.drawDt * timeManager.propRate); // Adjust drawDt correspond to the propagation rate
-    satSet.satDataLenInDraw = satData.length;
-    if (!settingsManager.lowPerf && timeManager.drawDt > settingsManager.minimumDrawDt) {
-      satSet.satDataLenInDraw -= settingsManager.maxFieldOfViewMarkers + settingsManager.maxRadarData;
-      satSet.satDataLenInDraw3 = satSet.satDataLenInDraw * 3;
-      satSet.orbitalSats3 = satSet.orbitalSats * 3;
-      for (drawI = 0; drawI < satSet.satDataLenInDraw3; drawI++) {
-        if (drawI > satSet.orbitalSats3) {
-          satPos[drawI] += satVel[drawI] * timeManager.drawDt;
-        } else {
-          satPos[drawI] += satVel[drawI] * timeManager.drawDt;
-        }
-      }
-    }
-  }
-};
-
-let drawPropTime, isDidOnce, rrI, radarDataLen;
-satSet.draw = (pMatrix, camMatrix) => {
-  if (!settingsManager.shadersReady || !settingsManager.cruncherReady || !satSet.isInitDone) return;
-
-  // gl.bindVertexArray(satSet.vao);
-
-  gl.useProgram(dotShaderProgram);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  //  gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-
-  gl.uniformMatrix4fv(dotShaderProgram.uMvMatrix, false, emptyMat4);
-  gl.uniformMatrix4fv(dotShaderProgram.uCamMatrix, false, camMatrix);
-  gl.uniformMatrix4fv(dotShaderProgram.uPMatrix, false, pMatrix);
-  if (cameraManager.cameraType.current == cameraManager.cameraType.planetarium) {
-    gl.uniform1f(dotShaderProgram.minSize, settingsManager.satShader.minSizePlanetarium);
-    gl.uniform1f(dotShaderProgram.maxSize, settingsManager.satShader.maxSizePlanetarium);
-  } else {
-    gl.uniform1f(dotShaderProgram.minSize, settingsManager.satShader.minSize);
-    gl.uniform1f(dotShaderProgram.maxSize, settingsManager.satShader.maxSize);
-  }
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, starBuf);
-  gl.enableVertexAttribArray(dotShaderProgram.aStar);
-  gl.vertexAttribPointer(dotShaderProgram.aStar, 1, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, satPosBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, satPos, gl.STREAM_DRAW);
-  gl.vertexAttribPointer(dotShaderProgram.aPos, 3, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
-  gl.enableVertexAttribArray(dotShaderProgram.aColor);
-  gl.vertexAttribPointer(dotShaderProgram.aColor, 4, gl.FLOAT, false, 0, 0);
-
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-  gl.enable(gl.BLEND);
-  gl.depthMask(false);
-
-  gl.drawArrays(gl.POINTS, 0, satData.length);
-
-  gl.depthMask(true);
-  gl.disable(gl.BLEND);
-};
-
-satSet.drawPicking = (pMatrix, camMatrix) => {
-  try {
-    gl.useProgram(gl.pickShaderProgram);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-    //  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.uniformMatrix4fv(gl.pickShaderProgram.uMvMatrix, false, emptyMat4);
-    gl.uniformMatrix4fv(gl.pickShaderProgram.uCamMatrix, false, camMatrix);
-    gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
-
-    gl.enableVertexAttribArray(gl.pickShaderProgram.aColor);
-    gl.bindBuffer(gl.ARRAY_BUFFER, pickColorBuf);
-    gl.vertexAttribPointer(gl.pickShaderProgram.aColor, 3, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, pickableBuf);
-    gl.enableVertexAttribArray(gl.pickShaderProgram.aPickable);
-    gl.vertexAttribPointer(gl.pickShaderProgram.aPickable, 1, gl.FLOAT, false, 0, 0);
-
-    gl.drawArrays(gl.POINTS, 0, satData.length); // draw pick
-  } catch (e) {
-    db.log(`satData.length: ${satData.length}`);
-    db.log(e);
-  }
 };
 
 satSet.setSat = (i, satObject) => {
@@ -1486,14 +1225,16 @@ satSet.getSat = (i) => {
     // if (satData[i].velocity == 0) debugger;
 
     satData[i].velocity = typeof satData[i].velocity == 'undefined' ? {} : satData[i].velocity;
-    satData[i].velocity.total = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
-    satData[i].velocity.x = satVel[i * 3];
-    satData[i].velocity.y = satVel[i * 3 + 1];
-    satData[i].velocity.z = satVel[i * 3 + 2];
+    satData[i].velocity.total = Math.sqrt(
+      dotManager.velocityData[i * 3] * dotManager.velocityData[i * 3] + dotManager.velocityData[i * 3 + 1] * dotManager.velocityData[i * 3 + 1] + dotManager.velocityData[i * 3 + 2] * dotManager.velocityData[i * 3 + 2]
+    );
+    satData[i].velocity.x = dotManager.velocityData[i * 3];
+    satData[i].velocity.y = dotManager.velocityData[i * 3 + 1];
+    satData[i].velocity.z = dotManager.velocityData[i * 3 + 2];
     satData[i].position = {
-      x: satPos[i * 3],
-      y: satPos[i * 3 + 1],
-      z: satPos[i * 3 + 2],
+      x: dotManager.positionData[i * 3],
+      y: dotManager.positionData[i * 3 + 1],
+      z: dotManager.positionData[i * 3 + 2],
     };
   }
 
@@ -1700,9 +1441,9 @@ satSet.getSatPosOnly = (i) => {
 
   if (gotExtraData) {
     satData[i].position = {
-      x: satPos[i * 3],
-      y: satPos[i * 3 + 1],
-      z: satPos[i * 3 + 2],
+      x: dotManager.positionData[i * 3],
+      y: dotManager.positionData[i * 3 + 1],
+      z: dotManager.positionData[i * 3 + 2],
     };
   }
 
@@ -2098,7 +1839,7 @@ satSet.exportTle2Txt = () => {
 
 satSet.setHover = (i) => {
   if (i === objectManager.hoveringSat) return;
-  gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
+  gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
     try {
@@ -2130,7 +1871,7 @@ satSet.selectSat = (i) => {
   if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
 
   if (typeof meshManager !== 'undefined') {
-    gl.bindBuffer(gl.ARRAY_BUFFER, satColorBuf);
+    gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
     // If Old Select Sat Picked Color it Correct Color
     if (objectManager.selectedSat !== -1) {
       gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.selectedSat)).color));
@@ -2174,4 +1915,4 @@ let getMissileSatsLen = () => satSet.missileSats;
 let setSat = (i, satObject) => satSet.setSat(i, satObject);
 let getSatPosOnly = (id) => satSet.getSatPosOnly(id);
 
-export { getIdFromSensorName, getIdFromStarName, getMissileSatsLen, getSat, getSatPosOnly, getSatData, getStar, satSet, satCruncher, satScreenPositionArray, satPos, setSat };
+export { getIdFromSensorName, getIdFromStarName, getMissileSatsLen, getSat, getSatPosOnly, getSatData, getStar, satSet, satCruncher, satScreenPositionArray, setSat };

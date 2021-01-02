@@ -62,6 +62,7 @@ var pMatrix = glm.mat4.create();
 var cameraManager;
 // EVERYTHING SHOULD START HERE
 $(document).ready(async function initalizeKeepTrack() {
+  timeManager.propRealTime = Date.now(); // assumed same as value in Worker, not passing
   // A lot of things rely on a satellite catalog
   await mobile.checkMobileMode();
   await webGlInit();

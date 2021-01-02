@@ -593,17 +593,6 @@ satSet.loadCatalog = async () => {
 
 // Load the Catalog
 satSet.parseCatalog = (resp) => {
-  var obslatitude;
-  var obslongitude;
-  var obsheight;
-  var obsminaz;
-  var obsmaxaz;
-  var obsminel;
-  var obsmaxel;
-  var obsminrange;
-  var obsmaxrange;
-  var limitSatsArray = [];
-
   // Get TruSat TLEs if in TruSat Mode
   if (typeof trusatList == 'undefined' && settingsManager.trusatMode && !settingsManager.trusatOnly) {
     // console.log(`${Date.now()} - TruSat TLEs Loading...`);
@@ -614,293 +603,94 @@ satSet.parseCatalog = (resp) => {
     return; // Stop and Wait for the TruSat TLEs to Load
   }
 
-  /** Parses GET variables for SatCruncher initialization */
-  // This should be somewhere else!!
-  (function parseFromGETVariables() {
-    var queryStr = window.location.search.substring(1);
-    var params = queryStr.split('&');
-    for (var i = 0; i < params.length; i++) {
-      var key = params[i].split('=')[0];
-      var val = params[i].split('=')[1];
-      switch (key) {
-        case 'limitSats':
-          limitSats = val;
-          $('#limitSats').val(val);
-          // document.getElementById('settings-limitSats-enabled').checked = true;
-          $('#limitSats-Label').addClass('active');
-          limitSatsArray = val.split(',');
-          break;
-        case 'lat':
-          if (val >= -90 && val <= 90) obslatitude = val;
-          break;
-        case 'long':
-          if (val >= -180 && val <= 360) obslongitude = val;
-          break;
-        case 'hei':
-          if (val >= -20 && val <= 20) obsheight = val;
-          break;
-        case 'minaz':
-          if (val >= 0 && val <= 360) obsminaz = val;
-          break;
-        case 'maxaz':
-          if (val >= 0 && val <= 360) obsmaxaz = val;
-          break;
-        case 'minel':
-          if (val >= -10 && val <= 180) obsminel = val;
-          break;
-        case 'maxel':
-          if (val >= -10 && val <= 180) obsmaxel = val;
-          break;
-        case 'minrange':
-          if (val >= 0) obsminrange = val;
-          break;
-        case 'maxrange':
-          if (val <= 10000000) obsmaxrange = val;
-          break;
-      }
-    }
-  })();
+  let limitSatsArray = satSet.setupGetVariables();
 
-  var filterTLEDatabase = (limitSatsArray) => {
-    var tempSatData = [];
-    satSet.sccIndex = {};
-    satSet.cosparIndex = {};
-    if (limitSatsArray[0] == null) {
-      // If there are no limits then just process like normal
-      limitSats = '';
-    }
+  satData = satSet.filterTLEDatabase(resp, limitSatsArray);
+  resp = null; // is this needed?
 
-    var year;
-    var prefix;
-    var rest;
-
-    // if (settingsManager.offline) {
-    //   resp = JSON.parse(resp);
-    // }
-
-    let i = 0;
-    for (i = 0; i < resp.length; i++) {
-      resp[i].SCC_NUM = helpers.pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
-      if (limitSats === '') {
-        // If there are no limits then just process like normal
-        year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
-        if (year === '') {
-          resp[i].intlDes = 'none';
-        } else {
-          prefix = year > 50 ? '19' : '20';
-          year = prefix + year;
-          rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
-          resp[i].intlDes = year + '-' + rest;
-        }
-        resp[i].id = i;
-        satSet.sccIndex[`${resp[i].SCC_NUM}`] = resp[i].id;
-        satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
-        resp[i].active = true;
-        tempSatData.push(resp[i]);
-        continue;
-      } else {
-        // If there are limited satellites
-        for (var x = 0; x < limitSatsArray.length; x++) {
-          if (resp[i].SCC_NUM === limitSatsArray[x]) {
-            year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
-            if (year === '') {
-              resp[i].intlDes = 'none';
-            } else {
-              prefix = year > 50 ? '19' : '20';
-              year = prefix + year;
-              rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
-              resp[i].intlDes = year + '-' + rest;
-            }
-            resp[i].id = i;
-            satSet.sccIndex[`${resp[i].SCC_NUM}`] = resp[i].id;
-            satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
-            resp[i].active = true;
-            tempSatData.push(resp[i]);
-          }
-        }
-      }
-    }
-    let isMatchFound = false;
-    let extrasSatInfo;
-    if (typeof satelliteList !== 'undefined' && settingsManager.offline) {
-      // If extra catalogue
-      for (let s = 0; s < satelliteList.length; s++) {
-        isMatchFound = false;
-        if (typeof satelliteList[s].SCC == 'undefined') continue;
-        if (typeof satelliteList[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
-        if (typeof satelliteList[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
-        if (typeof satSet.sccIndex[`${satelliteList[s].SCC}`] !== 'undefined') {
-          i = satSet.sccIndex[`${satelliteList[s].SCC}`];
-          tempSatData[i].ON = satelliteList[s].ON;
-          tempSatData[i].OT = typeof satelliteList[s].OT != 'undefined' ? satelliteList[s].OT : null;
-          tempSatData[i].TLE1 = satelliteList[s].TLE1;
-          tempSatData[i].TLE2 = satelliteList[s].TLE2;
-          isMatchFound = true;
-          break;
-        }
-        if (!isMatchFound) {
-          if (typeof satelliteList[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
-          if (typeof satelliteList[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
-          settingsManager.isExtraSatellitesAdded = true;
-
-          if (typeof satelliteList[s].ON == 'undefined') {
-            satelliteList[s].ON = 'Unknown';
-          }
-          if (typeof satelliteList[s].OT == 'undefined') {
-            satelliteList[s].OT = null;
-          }
-          year = satelliteList[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
-          prefix = year > 50 ? '19' : '20';
-          year = prefix + year;
-          rest = satelliteList[s].TLE1.substr(9, 8).trim().substring(2);
-          extrasSatInfo = {
-            static: false,
-            missile: false,
-            active: true,
-            ON: satelliteList[s].ON,
-            OT: satelliteList[s].OT,
-            C: 'Unknown',
-            LV: 'Unknown',
-            LS: 'Unknown',
-            SCC_NUM: satelliteList[s].SCC.toString(),
-            TLE1: satelliteList[s].TLE1,
-            TLE2: satelliteList[s].TLE2,
-            intlDes: year + '-' + rest,
-            type: 'sat',
-            id: tempSatData.length,
-            vmag: satelliteList[s].vmag,
-          };
-          satSet.sccIndex[`${satelliteList[s].SCC.toString()}`] = tempSatData.length;
-          satSet.cosparIndex[`${year}-${rest}`] = tempSatData.length;
-          tempSatData.push(extrasSatInfo);
-        }
-      }
-      satelliteList = null;
-    }
-    // if (
-    //   typeof satInfoList !== 'undefined' &&
-    //   settingsManager.offline
-    // ) {
-    //   // If extra catalogue
-    //   for (let s = 0; s < satInfoList.length; s++) {
-    //     settingsManager.isExtraSatellitesAdded = true;
-    //     isMatchFound = false;
-    //     // NOTE i=s may need to be i=0, but this should be more effecient.
-    //     // There should be some sorting done earlier
-    //     for (i = s; i < tempSatData.length; i++) {
-    //       if (satInfoList[s].SCC === tempSatData[i].SCC_NUM) {
-    //         tempSatData[i].ON = satInfoList[s].ON;
-    //         tempSatData[i].C = satInfoList[s].C;
-    //         tempSatData[i].LV = satInfoList[s].LV;
-    //         tempSatData[i].LS = satInfoList[s].LS;
-    //         tempSatData[i].URL = satInfoList[s].URL;
-    //         isMatchFound = true;
-    //         break;
-    //       }
-    //     }
-    //   }
-    //   satInfoList = null;
-    // }
-    // console.log(`${Date.now()} - Merging TruSat TLEs`);
-    // if (
-    //   typeof trusatList !== 'undefined' &&
-    //   settingsManager.trusatMode
-    // ) {
-    //   // If extra catalogue
-    //   for (let s = 0; s < trusatList.length; s++) {
-    //     if (typeof trusatList[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
-    //     if (typeof trusatList[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
-    //     if (typeof trusatList[s].ON == 'undefined') {
-    //       trusatList[s].ON = 'Unknown';
-    //     }
-    //     if (typeof trusatList[s].OT == 'undefined') {
-    //       trusatList[s].OT = null;
-    //     }
-    //     year = trusatList[s].TLE1.substr(9, 8)
-    //     .trim()
-    //     .substring(0, 2); // clean up intl des for display
-    //     prefix = year > 50 ? '19' : '20';
-    //     year = prefix + year;
-    //     rest = trusatList[s].TLE1.substr(9, 8)
-    //     .trim()
-    //     .substring(2);
-    //     scc = pad0(
-    //       parseInt(
-    //         trusatList[s].TLE1.substr(2, 5).trim()
-    //       ).toString(),
-    //       5
-    //     );
-    //     extrasSatInfo = {
-    //       static: false,
-    //       missile: false,
-    //       active: true,
-    //       trusat: true,
-    //       ON: trusatList[s].ON,
-    //       OT: 4, // Amateur Report
-    //       C: 'Unknown',
-    //       LV: 'Unknown',
-    //       LS: 'Unknown',
-    //       SCC_NUM: `T${scc.toString()}`,
-    //       TLE1: trusatList[s].TLE1,
-    //       TLE2: trusatList[s].TLE2,
-    //       intlDes: year + '-' + rest,
-    //       type: 'sat',
-    //       id: tempSatData.length,
-    //     };
-    //     tempSatData.push(extrasSatInfo);
-    //   }
-    //   trusatList = null;
-    // }
-
-    if (settingsManager.isExtraSatellitesAdded) {
-      $('.legend-pink-box').show();
-      $('.legend-trusat-box')[1].parentElement.style.display = '';
-      $('.legend-trusat-box')[2].parentElement.style.display = '';
-      $('.legend-trusat-box')[3].parentElement.style.display = '';
-      $('.legend-trusat-box')[1].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
-      $('.legend-trusat-box')[2].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
-      $('.legend-trusat-box')[3].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
-    }
-
-    satSet.orbitalSats = tempSatData.length;
-    objectManager.starIndex1 += satSet.orbitalSats;
-    objectManager.starIndex2 += satSet.orbitalSats;
-
-    if (settingsManager.isEnableGsCatalog) satSet.initGsData();
-
-    for (i = 0; i < objectManager.staticSet.length; i++) {
-      tempSatData.push(objectManager.staticSet[i]);
-    }
-    for (i = 0; i < objectManager.analSatSet.length; i++) {
-      objectManager.analSatSet[i].id = tempSatData.length;
-      tempSatData.push(objectManager.analSatSet[i]);
-    }
-
-    radarDataManager.satDataStartIndex = tempSatData.length + 1;
-
-    for (let i = 0; i < objectManager.radarDataSet.length; i++) {
-      tempSatData.push(objectManager.radarDataSet[i]);
-    }
-
-    for (i = 0; i < objectManager.missileSet.length; i++) {
-      tempSatData.push(objectManager.missileSet[i]);
-    }
-
-    satSet.missileSats = tempSatData.length;
-
-    for (i = 0; i < objectManager.fieldOfViewSet.length; i++) {
-      objectManager.fieldOfViewSet[i].id = tempSatData.length;
-      tempSatData.push(objectManager.fieldOfViewSet[i]);
-    }
-    // console.log(tempSatData.length);
-    return tempSatData;
-  };
-
-  satData = filterTLEDatabase(limitSatsArray);
-  resp = null;
+  // WebWorkers need this in a string format for initialization
   satSet.satDataString = JSON.stringify(satData);
 
-  timeManager.propRealTime = Date.now(); // assumed same as value in Worker, not passing
+  /** Send satDataString to satCruncher to begin propagation loop */
+  satCruncher.postMessage({
+    typ: 'satdata',
+    dat: satSet.satDataString,
+    fieldOfViewSetLength: objectManager.fieldOfViewSet.length,
+    isLowPerf: settingsManager.lowPerf,
+  });
+
+  delete objectManager.fieldOfViewSet;
+
+  if (!settingsManager.trusatOnly) {
+    // If No Visual Magnitudes, Add The VMag Database
+    try {
+      if (typeof satSet.getSat(satSet.getIdFromObjNum(44235)).vmag == 'undefined') {
+        satVmagManager.init(satSet);
+      }
+    } catch (e) {
+      console.debug('satVmagManager Not Loaded');
+    }
+  }
+
+  satSet.isInitDone = true;
+  return satData;
+};
+
+satSet.setupGetVariables = () => {
+  var obslatitude;
+  var obslongitude;
+  var obsheight;
+  var obsminaz;
+  var obsmaxaz;
+  var obsminel;
+  var obsmaxel;
+  var obsminrange;
+  var obsmaxrange;
+  var limitSatsArray = [];
+  /** Parses GET variables for SatCruncher initialization */
+  // This should be somewhere else!!
+  var queryStr = window.location.search.substring(1);
+  var params = queryStr.split('&');
+  for (var i = 0; i < params.length; i++) {
+    var key = params[i].split('=')[0];
+    var val = params[i].split('=')[1];
+    switch (key) {
+      case 'limitSats':
+        limitSats = val;
+        $('#limitSats').val(val);
+        // document.getElementById('settings-limitSats-enabled').checked = true;
+        $('#limitSats-Label').addClass('active');
+        limitSatsArray = val.split(',');
+        break;
+      case 'lat':
+        if (val >= -90 && val <= 90) obslatitude = val;
+        break;
+      case 'long':
+        if (val >= -180 && val <= 360) obslongitude = val;
+        break;
+      case 'hei':
+        if (val >= -20 && val <= 20) obsheight = val;
+        break;
+      case 'minaz':
+        if (val >= 0 && val <= 360) obsminaz = val;
+        break;
+      case 'maxaz':
+        if (val >= 0 && val <= 360) obsmaxaz = val;
+        break;
+      case 'minel':
+        if (val >= -10 && val <= 180) obsminel = val;
+        break;
+      case 'maxel':
+        if (val >= -10 && val <= 180) obsmaxel = val;
+        break;
+      case 'minrange':
+        if (val >= 0) obsminrange = val;
+        break;
+      case 'maxrange':
+        if (val <= 10000000) obsmaxrange = val;
+        break;
+    }
+  }
 
   /** If custom sensor set then send parameters to lookangles and satCruncher */
   if (
@@ -942,29 +732,242 @@ satSet.parseCatalog = (resp) => {
     });
   }
 
-  /** Send satDataString to satCruncher to begin propagation loop */
-  satCruncher.postMessage({
-    typ: 'satdata',
-    dat: satSet.satDataString,
-    fieldOfViewSetLength: objectManager.fieldOfViewSet.length,
-    isLowPerf: settingsManager.lowPerf,
-  });
+  return limitSatsArray;
+};
 
-  delete objectManager.fieldOfViewSet;
-
-  if (!settingsManager.trusatOnly) {
-    // If No Visual Magnitudes, Add The VMag Database
-    try {
-      if (typeof satSet.getSat(satSet.getIdFromObjNum(44235)).vmag == 'undefined') {
-        satVmagManager.init(satSet);
-      }
-    } catch (e) {
-      console.debug('satVmagManager Not Loaded');
-    }
+satSet.filterTLEDatabase = (resp, limitSatsArray) => {
+  var tempSatData = [];
+  satSet.sccIndex = {};
+  satSet.cosparIndex = {};
+  if (limitSatsArray[0] == null) {
+    // If there are no limits then just process like normal
+    limitSats = '';
   }
 
-  satSet.isInitDone = true;
-  return satData;
+  var year;
+  var prefix;
+  var rest;
+
+  // if (settingsManager.offline) {
+  //   resp = JSON.parse(resp);
+  // }
+
+  let i = 0;
+  for (i = 0; i < resp.length; i++) {
+    resp[i].SCC_NUM = helpers.pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
+    if (limitSats === '') {
+      // If there are no limits then just process like normal
+      year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+      if (year === '') {
+        resp[i].intlDes = 'none';
+      } else {
+        prefix = year > 50 ? '19' : '20';
+        year = prefix + year;
+        rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
+        resp[i].intlDes = year + '-' + rest;
+      }
+      resp[i].id = i;
+      satSet.sccIndex[`${resp[i].SCC_NUM}`] = resp[i].id;
+      satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
+      resp[i].active = true;
+      tempSatData.push(resp[i]);
+      continue;
+    } else {
+      // If there are limited satellites
+      for (var x = 0; x < limitSatsArray.length; x++) {
+        if (resp[i].SCC_NUM === limitSatsArray[x]) {
+          year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+          if (year === '') {
+            resp[i].intlDes = 'none';
+          } else {
+            prefix = year > 50 ? '19' : '20';
+            year = prefix + year;
+            rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
+            resp[i].intlDes = year + '-' + rest;
+          }
+          resp[i].id = i;
+          satSet.sccIndex[`${resp[i].SCC_NUM}`] = resp[i].id;
+          satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
+          resp[i].active = true;
+          tempSatData.push(resp[i]);
+        }
+      }
+    }
+  }
+  let isMatchFound = false;
+  let extrasSatInfo;
+  if (typeof satelliteList !== 'undefined' && settingsManager.offline) {
+    // If extra catalogue
+    for (let s = 0; s < satelliteList.length; s++) {
+      isMatchFound = false;
+      if (typeof satelliteList[s].SCC == 'undefined') continue;
+      if (typeof satelliteList[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
+      if (typeof satelliteList[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
+      if (typeof satSet.sccIndex[`${satelliteList[s].SCC}`] !== 'undefined') {
+        i = satSet.sccIndex[`${satelliteList[s].SCC}`];
+        tempSatData[i].ON = satelliteList[s].ON;
+        tempSatData[i].OT = typeof satelliteList[s].OT != 'undefined' ? satelliteList[s].OT : null;
+        tempSatData[i].TLE1 = satelliteList[s].TLE1;
+        tempSatData[i].TLE2 = satelliteList[s].TLE2;
+        isMatchFound = true;
+        break;
+      }
+      if (!isMatchFound) {
+        if (typeof satelliteList[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
+        if (typeof satelliteList[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
+        settingsManager.isExtraSatellitesAdded = true;
+
+        if (typeof satelliteList[s].ON == 'undefined') {
+          satelliteList[s].ON = 'Unknown';
+        }
+        if (typeof satelliteList[s].OT == 'undefined') {
+          satelliteList[s].OT = null;
+        }
+        year = satelliteList[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+        prefix = year > 50 ? '19' : '20';
+        year = prefix + year;
+        rest = satelliteList[s].TLE1.substr(9, 8).trim().substring(2);
+        extrasSatInfo = {
+          static: false,
+          missile: false,
+          active: true,
+          ON: satelliteList[s].ON,
+          OT: satelliteList[s].OT,
+          C: 'Unknown',
+          LV: 'Unknown',
+          LS: 'Unknown',
+          SCC_NUM: satelliteList[s].SCC.toString(),
+          TLE1: satelliteList[s].TLE1,
+          TLE2: satelliteList[s].TLE2,
+          intlDes: year + '-' + rest,
+          type: 'sat',
+          id: tempSatData.length,
+          vmag: satelliteList[s].vmag,
+        };
+        satSet.sccIndex[`${satelliteList[s].SCC.toString()}`] = tempSatData.length;
+        satSet.cosparIndex[`${year}-${rest}`] = tempSatData.length;
+        tempSatData.push(extrasSatInfo);
+      }
+    }
+    satelliteList = null;
+  }
+  // if (
+  //   typeof satInfoList !== 'undefined' &&
+  //   settingsManager.offline
+  // ) {
+  //   // If extra catalogue
+  //   for (let s = 0; s < satInfoList.length; s++) {
+  //     settingsManager.isExtraSatellitesAdded = true;
+  //     isMatchFound = false;
+  //     // NOTE i=s may need to be i=0, but this should be more effecient.
+  //     // There should be some sorting done earlier
+  //     for (i = s; i < tempSatData.length; i++) {
+  //       if (satInfoList[s].SCC === tempSatData[i].SCC_NUM) {
+  //         tempSatData[i].ON = satInfoList[s].ON;
+  //         tempSatData[i].C = satInfoList[s].C;
+  //         tempSatData[i].LV = satInfoList[s].LV;
+  //         tempSatData[i].LS = satInfoList[s].LS;
+  //         tempSatData[i].URL = satInfoList[s].URL;
+  //         isMatchFound = true;
+  //         break;
+  //       }
+  //     }
+  //   }
+  //   satInfoList = null;
+  // }
+  // console.log(`${Date.now()} - Merging TruSat TLEs`);
+  // if (
+  //   typeof trusatList !== 'undefined' &&
+  //   settingsManager.trusatMode
+  // ) {
+  //   // If extra catalogue
+  //   for (let s = 0; s < trusatList.length; s++) {
+  //     if (typeof trusatList[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
+  //     if (typeof trusatList[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
+  //     if (typeof trusatList[s].ON == 'undefined') {
+  //       trusatList[s].ON = 'Unknown';
+  //     }
+  //     if (typeof trusatList[s].OT == 'undefined') {
+  //       trusatList[s].OT = null;
+  //     }
+  //     year = trusatList[s].TLE1.substr(9, 8)
+  //     .trim()
+  //     .substring(0, 2); // clean up intl des for display
+  //     prefix = year > 50 ? '19' : '20';
+  //     year = prefix + year;
+  //     rest = trusatList[s].TLE1.substr(9, 8)
+  //     .trim()
+  //     .substring(2);
+  //     scc = pad0(
+  //       parseInt(
+  //         trusatList[s].TLE1.substr(2, 5).trim()
+  //       ).toString(),
+  //       5
+  //     );
+  //     extrasSatInfo = {
+  //       static: false,
+  //       missile: false,
+  //       active: true,
+  //       trusat: true,
+  //       ON: trusatList[s].ON,
+  //       OT: 4, // Amateur Report
+  //       C: 'Unknown',
+  //       LV: 'Unknown',
+  //       LS: 'Unknown',
+  //       SCC_NUM: `T${scc.toString()}`,
+  //       TLE1: trusatList[s].TLE1,
+  //       TLE2: trusatList[s].TLE2,
+  //       intlDes: year + '-' + rest,
+  //       type: 'sat',
+  //       id: tempSatData.length,
+  //     };
+  //     tempSatData.push(extrasSatInfo);
+  //   }
+  //   trusatList = null;
+  // }
+
+  if (settingsManager.isExtraSatellitesAdded) {
+    $('.legend-pink-box').show();
+    $('.legend-trusat-box')[1].parentElement.style.display = '';
+    $('.legend-trusat-box')[2].parentElement.style.display = '';
+    $('.legend-trusat-box')[3].parentElement.style.display = '';
+    $('.legend-trusat-box')[1].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
+    $('.legend-trusat-box')[2].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
+    $('.legend-trusat-box')[3].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
+  }
+
+  satSet.orbitalSats = tempSatData.length;
+  objectManager.starIndex1 += satSet.orbitalSats;
+  objectManager.starIndex2 += satSet.orbitalSats;
+
+  if (settingsManager.isEnableGsCatalog) satSet.initGsData();
+
+  for (i = 0; i < objectManager.staticSet.length; i++) {
+    tempSatData.push(objectManager.staticSet[i]);
+  }
+  for (i = 0; i < objectManager.analSatSet.length; i++) {
+    objectManager.analSatSet[i].id = tempSatData.length;
+    tempSatData.push(objectManager.analSatSet[i]);
+  }
+
+  radarDataManager.satDataStartIndex = tempSatData.length + 1;
+
+  for (let i = 0; i < objectManager.radarDataSet.length; i++) {
+    tempSatData.push(objectManager.radarDataSet[i]);
+  }
+
+  for (i = 0; i < objectManager.missileSet.length; i++) {
+    tempSatData.push(objectManager.missileSet[i]);
+  }
+
+  satSet.missileSats = tempSatData.length;
+
+  for (i = 0; i < objectManager.fieldOfViewSet.length; i++) {
+    objectManager.fieldOfViewSet[i].id = tempSatData.length;
+    tempSatData.push(objectManager.fieldOfViewSet[i]);
+  }
+  // console.log(tempSatData.length);
+  return tempSatData;
 };
 
 satSet.setupGpuBuffers = () => {

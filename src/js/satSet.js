@@ -952,6 +952,22 @@ satSet.parseCatalog = (resp) => {
 
   delete objectManager.fieldOfViewSet;
 
+  if (!settingsManager.trusatOnly) {
+    // If No Visual Magnitudes, Add The VMag Database
+    try {
+      if (typeof satSet.getSat(satSet.getIdFromObjNum(44235)).vmag == 'undefined') {
+        satVmagManager.init(satSet);
+      }
+    } catch (e) {
+      console.debug('satVmagManager Not Loaded');
+    }
+  }
+
+  satSet.isInitDone = true;
+  return satData;
+};
+
+satSet.setupGpuBuffers = () => {
   // populate GPU mem buffers, now that we know how many sats there are
   satPosBuf = gl.createBuffer();
   satPos = new Float32Array(satData.length * 3);
@@ -975,20 +991,6 @@ satSet.parseCatalog = (resp) => {
   satSet.numSats = satData.length;
   satSet.setColorScheme(ColorScheme.default, true);
   settingsManager.shadersReady = true;
-
-  if (!settingsManager.trusatOnly) {
-    // If No Visual Magnitudes, Add The VMag Database
-    try {
-      if (typeof satSet.getSat(satSet.getIdFromObjNum(44235)).vmag == 'undefined') {
-        satVmagManager.init(satSet);
-      }
-    } catch (e) {
-      console.debug('satVmagManager Not Loaded');
-    }
-  }
-
-  satSet.isInitDone = true;
-  return satData;
 };
 
 satSet.getSatData = () => {

@@ -71,6 +71,7 @@ $(document).ready(async function initalizeKeepTrack() {
   selectSatManager.init(ColorScheme.group);
   objectManager.init();
   await satSet.loadCatalog(); // Needs Object Manager and gl first
+  satSet.setupGpuBuffers();
   await earth.init(gl);
   earth.loadHiRes();
   earth.loadHiResNight();

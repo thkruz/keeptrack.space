@@ -73,7 +73,7 @@ $(document).ready(async function initalizeKeepTrack() {
   dotsManager = new Dots(gl, pMatrix, cameraManager, timeManager, ColorScheme);
   satSet.init(cameraManager, dotsManager);
   selectSatManager.init(ColorScheme.group);
-  objectManager.init();
+  objectManager.init(dotsManager);
   await satSet.loadCatalog(); // Needs Object Manager and gl first
 
   dotsManager.setupPickingBuffer(satSet.satData);
@@ -94,6 +94,7 @@ $(document).ready(async function initalizeKeepTrack() {
   starManager.init(lineManager, getIdFromStarName);
   uiManager.init(cameraManager, lineManager, starManager, groupsManager, satSet, orbitManager, groupsManager, ColorScheme);
   await satellite.initLookangles(satSet, satCruncher, sensorManager, groupsManager);
+  dotsManager.updateSizeBuffer(satSet.satData);
   await radarDataManager.init(sensorManager, timeManager, satSet, satCruncher, satellite);
   satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
   satLinkManager.idToSatnum();

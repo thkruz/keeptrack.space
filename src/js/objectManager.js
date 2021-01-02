@@ -114,8 +114,6 @@ objectManager.init = async () => {
     objectManager.isStarManagerLoaded = false;
     console.log('You do not have the Star Module');
   }
-  // objectManager.starIndex2 = objectManager.staticSet.length - 1;
-
   // Try Loading Sensor Module
   var sensor;
   try {

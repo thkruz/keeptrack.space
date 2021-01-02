@@ -397,98 +397,6 @@ var parseFromGETVariables = () => {
   }
 };
 
-satSet.shader = {
-  frag: `
-      ${settingsManager.desktopOnlySatShaderFix1}
-      precision mediump float;
-
-      varying vec4 vColor;
-      varying float vStar;
-      varying float vDist;
-
-      float when_lt(float x, float y) {
-      return max(sign(y - x), 0.0);
-      }
-      float when_ge(float x, float y) {
-      return 1.0 - when_lt(x, y);
-      }
-
-      void main(void) {
-
-      vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
-      float r = 0.0;
-      float alpha = 0.0;
-      // If not a star and not on the ground
-      r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
-      alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
-
-      // If on the ground
-      r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 6421.0);
-      alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0)) * when_lt(vDist, 6471.0);
-
-      // If a star
-      r += (${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0)) * when_ge(vDist, 200000.0);
-      alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor4}, 3.0)) * when_ge(vDist, 200000.0);
-
-      alpha = min(alpha, 1.0);
-      if (alpha == 0.0) discard;
-      gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
-      // Reduce Flickering from Depth Fighting
-      ${settingsManager.desktopOnlySatShaderFix2}
-      }
-    `,
-  vert: `
-    attribute vec3 aPos;
-    attribute vec4 aColor;
-    attribute float aStar;
-
-    uniform float minSize;
-    uniform float maxSize;
-
-    uniform mat4 uCamMatrix;
-    uniform mat4 uMvMatrix;
-    uniform mat4 uPMatrix;
-
-    varying vec4 vColor;
-    varying float vStar;
-    varying float vDist;
-
-    float when_lt(float x, float y) {
-        return max(sign(y - x), 0.0);
-    }
-    float when_ge(float x, float y) {
-        return 1.0 - when_lt(x, y);
-    }
-
-    void main(void) {
-        vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
-        float drawSize = 0.0;
-        float dist = distance(vec3(0.0, 0.0, 0.0),aPos.xyz);
-
-        // Satellite
-        drawSize +=
-        when_lt(aStar, 0.5) *
-        (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize * 0.9), maxSize) * 1.0);
-
-        // Something on the ground
-        drawSize +=
-        when_ge(aStar, 0.5) * when_lt(dist, 6421.0) *
-        (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize * 0.75), maxSize) * 1.0);
-
-        // Star or Searched Object
-        drawSize +=
-        when_ge(aStar, 0.5) * when_ge(dist, 6421.0) *
-        (min(max(${settingsManager.satShader.starSize} * 100000.0 \/ dist, ${settingsManager.satShader.starSize}),${settingsManager.satShader.starSize} * 1.0));
-
-        gl_PointSize = drawSize;
-        gl_Position = position;
-        vColor = aColor;
-        vStar = aStar * 1.0;
-        vDist = dist;
-    }
-  `,
-};
-
 var cameraManager;
 satSet.init = async (cameraManagerRef, dotManagerRef) => {
   cameraManager = cameraManagerRef;
@@ -895,8 +803,8 @@ satSet.filterTLEDatabase = (resp, limitSatsArray) => {
   }
 
   satSet.orbitalSats = tempSatData.length;
-  objectManager.starIndex1 += satSet.orbitalSats;
-  objectManager.starIndex2 += satSet.orbitalSats;
+  dotManager.starIndex1 = objectManager.starIndex1 + satSet.orbitalSats;
+  dotManager.starIndex2 = objectManager.starIndex2 + satSet.orbitalSats;
 
   if (settingsManager.isEnableGsCatalog) satSet.initGsData();
 
@@ -1842,13 +1750,7 @@ satSet.setHover = (i) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
-    try {
-      gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.hoveringSat)).color));
-    } catch (e) {
-      console.log(objectManager.hoveringSat);
-      console.log(satSet.getSat(objectManager.hoveringSat));
-      console.log(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.hoveringSat)));
-    }
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.hoveringSat)).color));
   }
   // If New Select Sat Picked Color it
   if (i !== -1 && i !== objectManager.selectedSat) {
@@ -1878,7 +1780,6 @@ satSet.selectSat = (i) => {
     }
     // If New Select Sat Picked Color it
     if (i !== -1) {
-      // isSatView = true;
       gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
     }
   }

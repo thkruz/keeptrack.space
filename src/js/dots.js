@@ -1,6 +1,5 @@
 /* eslint-disable no-useless-escape */
 import * as glm from '@app/js/lib/gl-matrix.js';
-// import * as twgl from 'twgl.js';
 
 class Dots {
   constructor(gl, pMatrix, cameraManager, timeManager) {

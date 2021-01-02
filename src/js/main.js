@@ -62,12 +62,15 @@ var pMatrix = glm.mat4.create();
 var cameraManager;
 // EVERYTHING SHOULD START HERE
 $(document).ready(async function initalizeKeepTrack() {
+  // A lot of things rely on a satellite catalog
   await mobile.checkMobileMode();
   await webGlInit();
   cameraManager = new Camera();
   await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
+  satSet.init(cameraManager);
   selectSatManager.init(ColorScheme.group);
   objectManager.init();
+  await satSet.loadCatalog(); // Needs Object Manager and gl first
   await earth.init(gl);
   earth.loadHiRes();
   earth.loadHiResNight();
@@ -76,9 +79,6 @@ $(document).ready(async function initalizeKeepTrack() {
   await sun.init(gl, earth);
   let moon = new Moon(gl, sun);
   settingsManager.loadStr('dots');
-
-  // Returns a Reference to satData
-  await satSet.init(cameraManager);
 
   groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
   await orbitManager.init(cameraManager, groupsManager);

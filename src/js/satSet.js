@@ -538,18 +538,17 @@ satSet.init = async (cameraManagerRef) => {
   dotShader.uMvMatrix = gl.getUniformLocation(dotShader, 'uMvMatrix');
   dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
   dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
-
-  let satSetRef = await satSet.startCatalogLoad();
-  return satSetRef;
 };
-// Setup Catalog Now that SatSet is setup
-satSet.startCatalogLoad = async () => {
+
+// This is a wrapper that tries various combinations to figure out which file to use for the satellites
+// It should be cleaned up later
+satSet.loadCatalog = async () => {
   settingsManager.isCatalogPreloaded = true;
   if (typeof settingsManager.tleSource == 'undefined') {
     settingsManager.tleSource = `${settingsManager.installDirectory}tle/TLE.json`;
   }
   if (settingsManager.offline) {
-    satSet.loadTLEs(jsTLEfile);
+    satSet.parseCatalog(jsTLEfile);
     // jsTLEfile = null;
   } else {
     try {
@@ -561,7 +560,7 @@ satSet.startCatalogLoad = async () => {
       })
         .done(function (resp) {
           // if the .json loads then use it
-          return satSet.loadTLEs(resp);
+          return satSet.parseCatalog(resp);
         })
         .fail(function () {
           // Disable Caching
@@ -572,14 +571,14 @@ satSet.startCatalogLoad = async () => {
           })
             .done(function (resp) {
               // if the .json loads then use it
-              return satSet.loadTLEs(resp);
+              return satSet.parseCatalog(resp);
             })
             .fail(function () {
               // Try the js file without caching
               $.getScript(
                 `${settingsManager.installDirectory}offline/tle.js`,
                 function () {
-                  return satSet.loadTLEs(jsTLEfile);
+                  return satSet.parseCatalog(jsTLEfile);
                 },
                 true
               );
@@ -587,13 +586,13 @@ satSet.startCatalogLoad = async () => {
         });
     } catch (e) {
       console.log(e);
-      return satSet.loadTLEs(jsTLEfile);
+      return satSet.parseCatalog(jsTLEfile);
     }
   }
 };
 
 // Load the Catalog
-satSet.loadTLEs = (resp) => {
+satSet.parseCatalog = (resp) => {
   var obslatitude;
   var obslongitude;
   var obsheight;
@@ -610,12 +609,13 @@ satSet.loadTLEs = (resp) => {
     // console.log(`${Date.now()} - TruSat TLEs Loading...`);
     $.getScript('/tle/trusat.js', function (resp) {
       // console.log(`${Date.now()} - TruSat TLEs Loaded!`);
-      satSet.loadTLEs(resp); // Try again when you have all TLEs
+      satSet.parseCatalog(resp); // Try again when you have all TLEs
     });
     return; // Stop and Wait for the TruSat TLEs to Load
   }
 
   /** Parses GET variables for SatCruncher initialization */
+  // This should be somewhere else!!
   (function parseFromGETVariables() {
     var queryStr = window.location.search.substring(1);
     var params = queryStr.split('&');
@@ -951,15 +951,6 @@ satSet.loadTLEs = (resp) => {
   });
 
   delete objectManager.fieldOfViewSet;
-
-  // multThreadCruncher1.postMessage({type: 'init', data: satSet.satDataString});
-  // multThreadCruncher2.postMessage({type: 'init', data: satSet.satDataString});
-  // multThreadCruncher3.postMessage({type: 'init', data: satSet.satDataString});
-  // multThreadCruncher4.postMessage({type: 'init', data: satSet.satDataString});
-  // multThreadCruncher5.postMessage({type: 'init', data: satSet.satDataString});
-  // multThreadCruncher6.postMessage({type: 'init', data: satSet.satDataString});
-  // multThreadCruncher7.postMessage({type: 'init', data: satSet.satDataString});
-  // multThreadCruncher8.postMessage({type: 'init', data: satSet.satDataString});
 
   // populate GPU mem buffers, now that we know how many sats there are
   satPosBuf = gl.createBuffer();

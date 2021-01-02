@@ -81,24 +81,6 @@ class SatDots {
 
     gl.depthMask(true);
     gl.disable(gl.BLEND);
-
-    // // now pickbuffer stuff......
-    // gl.useProgram(gl.pickShaderProgram);
-    // gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-    // //  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    // gl.uniformMatrix4fv(gl.pickShaderProgram.uMvMatrix, false, glm.mat4.create());
-    // gl.uniformMatrix4fv(gl.pickShaderProgram.uCamMatrix, false, camMatrix);
-    // gl.uniformMatrix4fv(gl.pickShaderProgram.uPMatrix, false, pMatrix);
-
-    // gl.enableVertexAttribArray(gl.pickShaderProgram.aColor);
-    // gl.bindBuffer(gl.ARRAY_BUFFER, pickColorBuf);
-    // gl.vertexAttribPointer(gl.pickShaderProgram.aColor, 3, gl.FLOAT, false, 0, 0);
-
-    // gl.bindBuffer(gl.ARRAY_BUFFER, pickableBuf);
-    // gl.enableVertexAttribArray(gl.pickShaderProgram.aPickable);
-    // gl.vertexAttribPointer(gl.pickShaderProgram.aPickable, 1, gl.FLOAT, false, 0, 0);
-
-    // gl.drawArrays(gl.POINTS, 0, satData.length); // draw pick
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -223,93 +205,42 @@ class SatDots {
   }
 }
 
-// radarDataLen = radarDataManager.radarData.length;
-//     if (radarDataLen > 0) {
-//       // Get Time
-//       if (timeManager.propRate === 0) {
-//         timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset);
-//       } else {
-//         timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset + (Number(timeManager.now) - Number(timeManager.propRealTime)) * timeManager.propRate);
-//       }
-//       drawPropTime = timeManager.propTimeVar * 1;
-
-//       // Find the First Radar Return Time
-//       if (radarDataManager.drawT1 == 0) {
-//         for (rrI = 0; rrI < radarDataLen; rrI++) {
-//           if (radarDataManager.radarData[rrI].t > timeManager.now - 3000) {
-//             radarDataManager.drawT1 = rrI;
-//             break;
-//           }
-//         }
-//       }
-
-//       isDidOnce = false;
-//       for (drawI = radarDataManager.drawT1; drawI < radarDataLen; drawI++) {
-//         // Don't Exceed Max Radar Data Allocation
-//         // if (drawI > settingsManager.maxRadarData) break;
-
-//         if (radarDataManager.radarData[drawI].t >= drawPropTime - 3000 && radarDataManager.radarData[drawI].t <= drawPropTime + 3000) {
-//           if (!isDidOnce) {
-//             radarDataManager.drawT1 = drawI;
-//             isDidOnce = true;
-//           }
-//           // Skip if Already done
-//           if (satPos[(radarDataManager.satDataStartIndex + drawI) * 3] !== 0) continue;
-
-//           // Update Radar Marker Position
-//           satPos[(radarDataManager.satDataStartIndex + drawI) * 3] = radarDataManager.radarData[drawI].x;
-//           satPos[(radarDataManager.satDataStartIndex + drawI) * 3 + 1] = radarDataManager.radarData[drawI].y;
-//           satPos[(radarDataManager.satDataStartIndex + drawI) * 3 + 2] = radarDataManager.radarData[drawI].z;
-//           // NOTE: satVel could be added later
-//         } else {
-//           // Reset all positions outside time window
-//           satPos[(radarDataManager.satDataStartIndex + drawI) * 3] = 0;
-//           satPos[(radarDataManager.satDataStartIndex + drawI) * 3 + 1] = 0;
-//           satPos[(radarDataManager.satDataStartIndex + drawI) * 3 + 2] = 0;
-//         }
-
-//         if (radarDataManager.radarData[drawI].t > drawPropTime + 3000) {
-//           break;
-//         }
-//       }
-//     }
-
 /*
-// Note: This won't work as is but is kept as a reference
-satSet.changeShaders = (newShaders) => {
-  gl.detachShader(dotShader, vertShader);
-  gl.detachShader(dotShader, fragShader);
-  switch (newShaders) {
-    case 'var':
-      gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-var.glsl'));
-      break;
-    case 12:
-      gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-12.glsl'));
-      break;
-    case 6:
-      gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-6.glsl'));
-      break;
-    case 2:
-      gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-2.glsl'));
-      break;
-  }
-  gl.compileShader(vertShader);
+  // Note: This won't work as is but is kept as a reference
+  satSet.changeShaders = (newShaders) => {
+    gl.detachShader(dotShader, vertShader);
+    gl.detachShader(dotShader, fragShader);
+    switch (newShaders) {
+      case 'var':
+        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-var.glsl'));
+        break;
+      case 12:
+        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-12.glsl'));
+        break;
+      case 6:
+        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-6.glsl'));
+        break;
+      case 2:
+        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-2.glsl'));
+        break;
+    }
+    gl.compileShader(vertShader);
 
-  gl.shaderSource(fragShader, shaderLoader.getShaderCode('dot-fragment.glsl'));
-  gl.compileShader(fragShader);
+    gl.shaderSource(fragShader, shaderLoader.getShaderCode('dot-fragment.glsl'));
+    gl.compileShader(fragShader);
 
-  gl.attachShader(dotShader, vertShader);
-  gl.attachShader(dotShader, fragShader);
-  gl.linkProgram(dotShader);
-  dotShader.aPos = gl.getAttribLocation(dotShader, 'aPos');
-  dotShader.aColor = gl.getAttribLocation(dotShader, 'aColor');
-  dotShader.aStar = gl.getAttribLocation(dotShader, 'aStar');
-  dotShader.minSize = gl.getUniformLocation(dotShader, 'minSize');
-  dotShader.maxSize = gl.getUniformLocation(dotShader, 'maxSize');
-  dotShader.uMvMatrix = gl.getUniformLocation(dotShader, 'uMvMatrix');
-  dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
-  dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
-};
+    gl.attachShader(dotShader, vertShader);
+    gl.attachShader(dotShader, fragShader);
+    gl.linkProgram(dotShader);
+    dotShader.aPos = gl.getAttribLocation(dotShader, 'aPos');
+    dotShader.aColor = gl.getAttribLocation(dotShader, 'aColor');
+    dotShader.aStar = gl.getAttribLocation(dotShader, 'aStar');
+    dotShader.minSize = gl.getUniformLocation(dotShader, 'minSize');
+    dotShader.maxSize = gl.getUniformLocation(dotShader, 'maxSize');
+    dotShader.uMvMatrix = gl.getUniformLocation(dotShader, 'uMvMatrix');
+    dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
+    dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
+  };
 */
 
 export { SatDots };

@@ -404,158 +404,117 @@ satCruncher.onmessage = (m) => {
   }
 };
 
-var vertShader;
-var fragShader;
-/*
-// Note: This won't work as is but is kept as a reference
-
-satSet.changeShaders = (newShaders) => {
-  gl.detachShader(dotShader, vertShader);
-  gl.detachShader(dotShader, fragShader);
-  switch (newShaders) {
-    case 'var':
-      gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-var.glsl'));
-      break;
-    case 12:
-      gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-12.glsl'));
-      break;
-    case 6:
-      gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-6.glsl'));
-      break;
-    case 2:
-      gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-2.glsl'));
-      break;
-  }
-  gl.compileShader(vertShader);
-
-  gl.shaderSource(fragShader, shaderLoader.getShaderCode('dot-fragment.glsl'));
-  gl.compileShader(fragShader);
-
-  gl.attachShader(dotShader, vertShader);
-  gl.attachShader(dotShader, fragShader);
-  gl.linkProgram(dotShader);
-  dotShader.aPos = gl.getAttribLocation(dotShader, 'aPos');
-  dotShader.aColor = gl.getAttribLocation(dotShader, 'aColor');
-  dotShader.aStar = gl.getAttribLocation(dotShader, 'aStar');
-  dotShader.minSize = gl.getUniformLocation(dotShader, 'minSize');
-  dotShader.maxSize = gl.getUniformLocation(dotShader, 'maxSize');
-  dotShader.uMvMatrix = gl.getUniformLocation(dotShader, 'uMvMatrix');
-  dotShader.uCamMatrix = gl.getUniformLocation(dotShader, 'uCamMatrix');
-  dotShader.uPMatrix = gl.getUniformLocation(dotShader, 'uPMatrix');
-};
-*/
-var cameraManager;
-satSet.init = async (cameraManagerRef) => {
-  cameraManager = cameraManagerRef;
-  db.log('satSet.init');
-  /** Parses GET variables for Possible sharperShaders */
-  (function parseFromGETVariables() {
-    var queryStr = window.location.search.substring(1);
-    var params = queryStr.split('&');
-    for (var i = 0; i < params.length; i++) {
-      var key = params[i].split('=')[0];
-      if (key === 'vertShadersSize') {
-        settingsManager.vertShadersSize = 6;
-        document.getElementById('settings-shaders').checked = true;
-      }
+var parseFromGETVariables = () => {
+  var queryStr = window.location.search.substring(1);
+  var params = queryStr.split('&');
+  for (var i = 0; i < params.length; i++) {
+    var key = params[i].split('=')[0];
+    if (key === 'vertShadersSize') {
+      settingsManager.vertShadersSize = 6;
+      document.getElementById('settings-shaders').checked = true;
     }
-  })();
+  }
+};
 
-  satSet.shader = {
-    frag: `
-        ${settingsManager.desktopOnlySatShaderFix1}
-        precision mediump float;
-
-        varying vec4 vColor;
-        varying float vStar;
-        varying float vDist;
-
-        float when_lt(float x, float y) {
-        return max(sign(y - x), 0.0);
-        }
-        float when_ge(float x, float y) {
-        return 1.0 - when_lt(x, y);
-        }
-
-        void main(void) {
-
-        vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
-        float r = 0.0;
-        float alpha = 0.0;
-        // If not a star and not on the ground
-        r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
-        alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
-
-        // If on the ground
-        r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 6421.0);
-        alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0)) * when_lt(vDist, 6471.0);
-
-        // If a star
-        r += (${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0)) * when_ge(vDist, 200000.0);
-        alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor4}, 3.0)) * when_ge(vDist, 200000.0);
-
-        alpha = min(alpha, 1.0);
-        if (alpha == 0.0) discard;
-        gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
-        // Reduce Flickering from Depth Fighting
-        ${settingsManager.desktopOnlySatShaderFix2}
-        }
-      `,
-    vert: `
-      attribute vec3 aPos;
-      attribute vec4 aColor;
-      attribute float aStar;
-
-      uniform float minSize;
-      uniform float maxSize;
-
-      uniform mat4 uCamMatrix;
-      uniform mat4 uMvMatrix;
-      uniform mat4 uPMatrix;
+satSet.shader = {
+  frag: `
+      ${settingsManager.desktopOnlySatShaderFix1}
+      precision mediump float;
 
       varying vec4 vColor;
       varying float vStar;
       varying float vDist;
 
       float when_lt(float x, float y) {
-          return max(sign(y - x), 0.0);
+      return max(sign(y - x), 0.0);
       }
       float when_ge(float x, float y) {
-          return 1.0 - when_lt(x, y);
+      return 1.0 - when_lt(x, y);
       }
 
       void main(void) {
-          vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
-          float drawSize = 0.0;
-          float dist = distance(vec3(0.0, 0.0, 0.0),aPos.xyz);
 
-          // Satellite
-          drawSize +=
-          when_lt(aStar, 0.5) *
-          (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize * 0.9), maxSize) * 1.0);
+      vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
+      float r = 0.0;
+      float alpha = 0.0;
+      // If not a star and not on the ground
+      r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
+      alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
 
-          // Something on the ground
-          drawSize +=
-          when_ge(aStar, 0.5) * when_lt(dist, 6421.0) *
-          (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize * 0.75), maxSize) * 1.0);
+      // If on the ground
+      r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 6421.0);
+      alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0)) * when_lt(vDist, 6471.0);
 
-          // Star or Searched Object
-          drawSize +=
-          when_ge(aStar, 0.5) * when_ge(dist, 6421.0) *
-          (min(max(${settingsManager.satShader.starSize} * 100000.0 \/ dist, ${settingsManager.satShader.starSize}),${settingsManager.satShader.starSize} * 1.0));
+      // If a star
+      r += (${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0)) * when_ge(vDist, 200000.0);
+      alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor4}, 3.0)) * when_ge(vDist, 200000.0);
 
-          gl_PointSize = drawSize;
-          gl_Position = position;
-          vColor = aColor;
-          vStar = aStar * 1.0;
-          vDist = dist;
+      alpha = min(alpha, 1.0);
+      if (alpha == 0.0) discard;
+      gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
+      // Reduce Flickering from Depth Fighting
+      ${settingsManager.desktopOnlySatShaderFix2}
       }
     `,
-  };
+  vert: `
+    attribute vec3 aPos;
+    attribute vec4 aColor;
+    attribute float aStar;
 
-  // Make New Vertex Array Objects
-  // satSet.vao = gl.createVertexArray();
-  // gl.bindVertexArray(satSet.vao);
+    uniform float minSize;
+    uniform float maxSize;
+
+    uniform mat4 uCamMatrix;
+    uniform mat4 uMvMatrix;
+    uniform mat4 uPMatrix;
+
+    varying vec4 vColor;
+    varying float vStar;
+    varying float vDist;
+
+    float when_lt(float x, float y) {
+        return max(sign(y - x), 0.0);
+    }
+    float when_ge(float x, float y) {
+        return 1.0 - when_lt(x, y);
+    }
+
+    void main(void) {
+        vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
+        float drawSize = 0.0;
+        float dist = distance(vec3(0.0, 0.0, 0.0),aPos.xyz);
+
+        // Satellite
+        drawSize +=
+        when_lt(aStar, 0.5) *
+        (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize * 0.9), maxSize) * 1.0);
+
+        // Something on the ground
+        drawSize +=
+        when_ge(aStar, 0.5) * when_lt(dist, 6421.0) *
+        (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), minSize * 0.75), maxSize) * 1.0);
+
+        // Star or Searched Object
+        drawSize +=
+        when_ge(aStar, 0.5) * when_ge(dist, 6421.0) *
+        (min(max(${settingsManager.satShader.starSize} * 100000.0 \/ dist, ${settingsManager.satShader.starSize}),${settingsManager.satShader.starSize} * 1.0));
+
+        gl_PointSize = drawSize;
+        gl_Position = position;
+        vColor = aColor;
+        vStar = aStar * 1.0;
+        vDist = dist;
+    }
+  `,
+};
+
+var vertShader;
+var fragShader;
+var cameraManager;
+satSet.init = async (cameraManagerRef) => {
+  cameraManager = cameraManagerRef;
+  /** Parses GET variables for Possible sharperShaders */
+  parseFromGETVariables();
 
   dotShader = gl.createProgram();
 

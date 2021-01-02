@@ -30,7 +30,6 @@ import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
 import { helpers, mathValue, saveCsv } from '@app/js/helpers.js';
-import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { gl } from '@app/js/main.js';
 import { jsTLEfile } from '@app/offline/tle.js';
@@ -62,12 +61,8 @@ var satColorBuf;
 var starBuf;
 
 // Removed to reduce garbage collection
-var buffers;
 var pickColorBuf;
 var pickableBuf;
-
-// var uFOVi; // Update FOV function iteration i variable
-// var uFOVs; // Update FOV function iteration S variable
 
 var satPos;
 var satVel;
@@ -542,6 +537,7 @@ satSet.init = async (cameraManagerRef) => {
 
 // This is a wrapper that tries various combinations to figure out which file to use for the satellites
 // It should be cleaned up later
+// It returns the result of satSet.parseCatalog (they are chained together)
 satSet.loadCatalog = async () => {
   settingsManager.isCatalogPreloaded = true;
   if (typeof settingsManager.tleSource == 'undefined') {
@@ -591,13 +587,11 @@ satSet.loadCatalog = async () => {
   }
 };
 
-// Load the Catalog
+// Parse the Catalog from satSet.loadCatalog and then return it back -- they are chained together!
 satSet.parseCatalog = (resp) => {
   // Get TruSat TLEs if in TruSat Mode
   if (typeof trusatList == 'undefined' && settingsManager.trusatMode && !settingsManager.trusatOnly) {
-    // console.log(`${Date.now()} - TruSat TLEs Loading...`);
     $.getScript('/tle/trusat.js', function (resp) {
-      // console.log(`${Date.now()} - TruSat TLEs Loaded!`);
       satSet.parseCatalog(resp); // Try again when you have all TLEs
     });
     return; // Stop and Wait for the TruSat TLEs to Load
@@ -632,6 +626,7 @@ satSet.parseCatalog = (resp) => {
     }
   }
 
+  satSet.numSats = satData.length;
   satSet.isInitDone = true;
   return satData;
 };
@@ -972,34 +967,47 @@ satSet.filterTLEDatabase = (resp, limitSatsArray) => {
 
 satSet.setupGpuBuffers = () => {
   // populate GPU mem buffers, now that we know how many sats there are
+
+  // Make a buffer for satellite data
   satPosBuf = gl.createBuffer();
+  // Create an empty set of data -- why isn't this being assigned to the buffer?
   satPos = new Float32Array(satData.length * 3);
 
-  var pickColorData = [];
+  // Make a buffer for star/selected satellite data
+  starBuf = gl.createBuffer();
+  satSet.setupStarBuffer();
+
+  // This name is misleading
+  settingsManager.shadersReady = true;
+};
+
+satSet.setupGpuBuffersPicking = () => {
+  // Array for which colors go to which ids
+  let pickColorData = [];
+  // Make a buffer
   pickColorBuf = gl.createBuffer();
-  for (var i = 0; i < satData.length; i++) {
-    var byteR = (i + 1) & 0xff;
-    var byteG = ((i + 1) & 0xff00) >> 8;
-    var byteB = ((i + 1) & 0xff0000) >> 16;
+
+  // loop assinging random colors to ids
+  let byteR, byteG, byteB; // reuse color variables
+  for (let i = 0; i < satData.length; i++) {
+    byteR = (i + 1) & 0xff;
+    byteG = ((i + 1) & 0xff00) >> 8;
+    byteB = ((i + 1) & 0xff0000) >> 16;
+
+    // Normalize colors to 1 and flatten them
     pickColorData.push(byteR / 255.0);
     pickColorData.push(byteG / 255.0);
     pickColorData.push(byteB / 255.0);
   }
+
+  // Switch to the pick buffer
   gl.bindBuffer(gl.ARRAY_BUFFER, pickColorBuf);
+
+  // Update the data
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pickColorData), gl.STATIC_DRAW);
-
-  starBuf = gl.createBuffer();
-  satSet.setupStarBuffer();
-
-  satSet.numSats = satData.length;
-  satSet.setColorScheme(ColorScheme.default, true);
-  settingsManager.shadersReady = true;
 };
 
-satSet.getSatData = () => {
-  db.log('satSet.getSatData');
-  return satData;
-};
+satSet.getSatData = () => satData;
 
 satSet.getSatInView = () => {
   db.log('satSet.getSatInView');

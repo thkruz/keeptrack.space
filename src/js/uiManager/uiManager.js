@@ -38,7 +38,7 @@ import { adviceList } from '@app/js/advice-module.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
 import { dlManager } from '@app/js/dlManager/dlManager.js';
 import { earth } from '@app/js/sceneManager/sceneManager.js';
-import { mapManager } from '@app/js/mapManager.js';
+import { mapManager } from '@app/js/uiManager/mapManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
 import { mobile } from '@app/js/mobile.js';
 import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';

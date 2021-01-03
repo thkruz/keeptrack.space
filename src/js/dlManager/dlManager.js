@@ -262,7 +262,6 @@ dlManager.drawLoop = (preciseDt) => {
 dlManager.satCalculate = () => {
   if (objectManager.selectedSat !== -1) {
     dlManager.sat = satSet.getSat(objectManager.selectedSat);
-    objectManager.lastSelectedSat(objectManager.selectedSat);
     if (!dlManager.sat.static) {
       cameraManager.camSnapToSat(dlManager.sat);
 
@@ -294,6 +293,9 @@ dlManager.satCalculate = () => {
     if (dlManager.sat.missile) orbitManager.setSelectOrbit(dlManager.sat.satId);
   }
   if (objectManager.selectedSat !== dlManager.lastSelectedSat) {
+    if (objectManager.selectedSat === -1 && !isselectedSatNegativeOne) {
+      orbitManager.clearSelectOrbit();
+    }
     selectSatManager.selectSat(objectManager.selectedSat, cameraManager);
     if (objectManager.selectedSat !== -1) {
       orbitManager.setSelectOrbit(objectManager.selectedSat);
@@ -302,13 +304,11 @@ dlManager.satCalculate = () => {
       }
       uiManager.updateMap();
     }
-    if (objectManager.selectedSat === -1 && !isselectedSatNegativeOne) {
-      orbitManager.clearSelectOrbit();
-    }
     if (objectManager.selectedSat !== -1 || (objectManager.selectedSat == -1 && !isselectedSatNegativeOne)) {
       lineManager.drawWhenSelected();
     }
     dlManager.lastSelectedSat = objectManager.selectedSat;
+    objectManager.lastSelectedSat(objectManager.selectedSat);
   }
 };
 
@@ -854,8 +854,6 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
         }
       }
     }
-
-    objectManager.setLasthoveringSat = objectManager.hoveringSat;
 
     satHoverBoxDOM.css({
       'display': 'block',

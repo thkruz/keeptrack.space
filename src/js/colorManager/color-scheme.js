@@ -91,6 +91,7 @@ class ColorScheme {
       this.colorData[this.i * 4 + 3] = this.colors.color[3]; // A
       this.pickableData[this.i] = this.colors.pickable ? 1 : 0;
 
+      // If we don't do this then everytime the color refreshes it will undo any effect being applied outside of this loop
       if (this.i == this.selectSat) {
         // Selected satellites are always one color so forget whatever we just did
         this.colorData[this.i * 4] = settingsManager.selectedColor[0]; // R

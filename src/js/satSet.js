@@ -1719,20 +1719,22 @@ satSet.exportTle2Txt = () => {
 };
 
 satSet.setHover = (i) => {
-  if (i === objectManager.hoveringSat) return;
+  objectManager.setHoveringSat(i);
+  if (i === objectManager.lasthoveringSat) return;
   settingsManager.currentColorScheme.hoverSat = objectManager.hoveringSat;
+
   gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
-  if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
-    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.hoveringSat)).color));
+  if (objectManager.lasthoveringSat !== -1 && objectManager.lasthoveringSat !== objectManager.selectedSat) {
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lasthoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.lasthoveringSat)).color));
   }
   // If New Select Sat Picked Color it
-  if (i !== -1 && i !== objectManager.selectedSat) {
-    gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.hoverColor));
+  if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.hoverColor));
   }
-  objectManager.setHoveringSat(i);
+  objectManager.setLasthoveringSat(objectManager.hoveringSat);
 
-  satSet.setColorScheme(settingsManager.currentColorScheme, true);
+  // satSet.setColorScheme(settingsManager.currentColorScheme, true);
 };
 
 satSet.selectSat = (i) => {
@@ -1759,7 +1761,7 @@ satSet.selectSat = (i) => {
 
   objectManager.setSelectedSat(i);
 
-  satSet.setColorScheme(settingsManager.currentColorScheme, true);
+  // satSet.setColorScheme(settingsManager.currentColorScheme, true);
 
   if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
     $('#menu-lookangles').removeClass('bmenu-item-disabled');

@@ -248,7 +248,11 @@ dlManager.drawLoop = (preciseDt) => {
   drawScene();
 
   // Update orbit currently being hovered over
-  dlManager.updateHover();
+  // Only if last frame was 50 FPS or more readpixels used to determine which satellite is hovered
+  // is the biggest performance hit and we should throttle that. Maybe we should limit the picking frame buffer too?
+  if (1000 / timeManager.dt > 50) {
+    dlManager.updateHover();
+  }
 
   // callbacks at the end of the draw loop (this should be used more!)
   dlManager.onDrawLoopComplete(dlManager.drawLoopCallback);

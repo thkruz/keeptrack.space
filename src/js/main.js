@@ -24,7 +24,6 @@
  */
 
 import 'jquery-ui-bundle';
-import '@app/js/keeptrack-foot.js';
 import 'materialize-css';
 import { Atmosphere, LineFactory, Moon, earth, sun } from '@app/js/sceneManager/sceneManager.js';
 import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satSet } from '@app/js/satSet.js';
@@ -69,7 +68,7 @@ jQAlt.docReady(async function initalizeKeepTrack() {
   earth.loadHiRes();
   earth.loadHiResNight();
   meshManager.init(gl, earth);
-  let atmosphere = new Atmosphere(gl, earth);
+  let atmosphere = new Atmosphere(gl, earth, settingsManager);
   await sun.init(gl, earth);
   let moon = new Moon(gl, sun);
 
@@ -112,7 +111,10 @@ jQAlt.docReady(async function initalizeKeepTrack() {
   );
 
   // Now that everything is loaded, start rendering to thg canvas
-  dlManager.drawLoop();
+  await dlManager.drawLoop();
+
+  // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
+  uiManager.postStart();
 
   // Reveleal Key Components to the Console
   window.satSet = satSet;

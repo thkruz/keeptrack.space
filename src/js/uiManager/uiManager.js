@@ -29,7 +29,6 @@ import '@app/js/lib/jquery.colorbox.min.js';
 import '@app/js/lib/jquery-ajax.js';
 import '@app/js/lib/colorPick.js';
 import 'materialize-css';
-import '@app/js/keeptrack-foot.js';
 import { db, settingsManager } from '@app/js/settings.js';
 import { helpers, mathValue, saveAs, saveCsv } from '@app/js/helpers.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
@@ -141,6 +140,39 @@ uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef, groupsRef, s
   lineManager = lineManagerRef;
   starManager = starManagerRef;
   groups = groupsRef;
+};
+
+// This runs after the dlManager starts
+uiManager.postStart = () => {
+  // Enable Satbox Overlay
+  if (settingsManager.enableHoverOverlay) {
+    const hoverboxDOM = document.createElement('DIV');
+    hoverboxDOM.innerHTML = `
+    <div id="sat-hoverbox">
+      <span id="sat-hoverbox1"></span>
+      <br/>
+      <span id="sat-hoverbox2"></span>
+      <br/>
+      <span id="sat-hoverbox3"></span>
+    </div>`;
+
+    document.getElementById('keeptrack-canvas').parentElement.append(hoverboxDOM);
+  }
+
+  // Load Bottom icons
+  if (!settingsManager.disableUI) {
+    $(document).ready(function () {
+      $.event.special.touchstart = {
+        setup: function (_, ns, handle) {
+          if (ns.includes('noPreventDefault')) {
+            this.addEventListener('touchstart', handle, { passive: false });
+          } else {
+            this.addEventListener('touchstart', handle, { passive: true });
+          }
+        },
+      };
+    });
+  }
 };
 
 var touchHoldButton = '';

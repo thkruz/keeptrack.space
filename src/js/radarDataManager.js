@@ -1,16 +1,17 @@
 import * as $ from 'jquery';
 import { db } from '@app/js/settings.js';
 import { mathValue } from '@app/js/helpers.js';
-var satellite, sensorManager, timeManager, satSet, satCruncher;
+import { timeManager } from '@app/js/timeManager.js';
+
+var satellite, sensorManager, satSet, satCruncher;
 let radarDataManager = {};
 
 radarDataManager.radarData = [];
 radarDataManager.drawT1 = 0;
 
-radarDataManager.init = async (sensorManagerRef, timeManagerRef, satSetRef, satCruncherRef, satelliteRef) => {
+radarDataManager.init = async (sensorManagerRef, satSetRef, satCruncherRef, satelliteRef) => {
   if (!settingsManager.isEnableRadarData) return;
   sensorManager = sensorManagerRef;
-  timeManager = timeManagerRef;
   satSet = satSetRef;
   satCruncher = satCruncherRef;
   satellite = satelliteRef;

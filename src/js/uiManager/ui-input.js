@@ -1,6 +1,7 @@
 import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { RADIUS_OF_EARTH } from '@app/js/constants.js';
+import { mobile } from '@app/js/mobile.js';
 import { sMM } from '@app/js/sideMenuManager.js';
 let M = window.M;
 
@@ -38,11 +39,10 @@ var uiInput = {};
 uiInput.isMouseMoving = false;
 uiInput.mouseSat = -1;
 
-var cameraManager, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, dlManager, dotsManager;
-uiInput.init = (cameraManagerRef, mobileRef, objectManagerRef, satelliteRef, satSetRef, lineManagerRef, sensorManagerRef, starManagerRef, ColorSchemeRef, satCruncherRef, earthRef, glRef, uiManagerRef, dlManagerRef, dotsManagerRef) => {
+var cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, dlManager, dotsManager;
+uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lineManagerRef, sensorManagerRef, starManagerRef, ColorSchemeRef, satCruncherRef, earthRef, glRef, uiManagerRef, dlManagerRef, dotsManagerRef) => {
   cameraManager = cameraManagerRef;
   dotsManager = dotsManagerRef;
-  mobile = mobileRef;
   objectManager = objectManagerRef;
   satellite = satelliteRef;
   satSet = satSetRef;

@@ -49,10 +49,11 @@ import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 
 jQAlt.docReady(async function initalizeKeepTrack() {
-  timeManager.propRealTime = Date.now();
+  timeManager.init();
   settingsManager.loadStr('dots');
-  await mobile.checkMobileMode();
+  await mobile.init();
   const cameraManager = new Camera();
+  // We need to know if we are on a small screen before starting webgl
   const gl = await dlManager.glInit(mobile);
   const dotsManager = new Dots(gl);
   satSet.init(gl, dotsManager, cameraManager);
@@ -81,34 +82,13 @@ jQAlt.docReady(async function initalizeKeepTrack() {
   uiManager.init(cameraManager, lineManager, starManager, groupsManager, satSet, orbitManager, groupsManager, ColorScheme);
   await satellite.initLookangles(satSet, satCruncher, sensorManager, groupsManager);
   dotsManager.updateSizeBuffer(satSet.satData);
-  await radarDataManager.init(sensorManager, timeManager, satSet, satCruncher, satellite);
+  await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
   satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
   satLinkManager.idToSatnum(satSet);
 
-  uiInput.init(cameraManager, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, dlManager, dotsManager);
+  uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, dlManager, dotsManager);
 
-  await dlManager.init(
-    groupsManager,
-    uiInput,
-    moon,
-    sun,
-    searchBox,
-    atmosphere,
-    starManager,
-    satellite,
-    ColorScheme,
-    cameraManager,
-    objectManager,
-    orbitManager,
-    meshManager,
-    earth,
-    sensorManager,
-    uiManager,
-    lineManager,
-    gl,
-    timeManager,
-    dotsManager
-  );
+  await dlManager.init(groupsManager, uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, dotsManager);
 
   // Now that everything is loaded, start rendering to thg canvas
   await dlManager.drawLoop();

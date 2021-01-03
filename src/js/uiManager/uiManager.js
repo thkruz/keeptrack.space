@@ -4152,7 +4152,7 @@ uiManager.hideLoadingScreen = () => {
   if (settingsManager.isMobileModeEnabled) {
     $('#spinner').hide();
     settingsManager.loadStr('math');
-    // settingsManager.loadStr('');
+    $('#loading-screen').hide();
   } else {
     // Loading Screen Resized and Hidden
     if (settingsManager.trusatMode) {
@@ -4177,14 +4177,6 @@ uiManager.hideLoadingScreen = () => {
       }, 1500);
     }
   }
-
-  // if (!settingsManager.isMobileModeEnabled) {
-  //   // settingsManager.loadStr('painting');
-  //   $('#loading-screen').hide();
-  // } else {
-  //   // settingsManager.loadStr('painting');
-  //   $('#loading-screen').hide();
-  // }
 };
 
 uiManager.resize2DMap = function () {

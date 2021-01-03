@@ -5,6 +5,7 @@ import { mathValue, watermarkedDataURL } from '@app/js/helpers.js';
 import { satScreenPositionArray, satSet } from '@app/js/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { missileManager } from '@app/modules/missileManager.js';
+import { timeManager } from '@app/js/timeManager.js';
 
 const canvasDOM = $('#keeptrack-canvas');
 const satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
@@ -41,7 +42,13 @@ var dlManager = {};
   dlManager.isShowFPS = false;
 }
 
+dlManager.mobileRef = null;
 dlManager.glInit = async (mobile) => {
+  if (mobile) {
+    dlManager.mobileRef = mobile;
+  } else {
+    mobile = dlManager.mobileRef;
+  }
   const canvasDOM = $('#keeptrack-canvas');
   let can = canvasDOM[0];
   const dpi = typeof settingsManager.dpi != 'undefined' ? settingsManager.dpi : window.devicePixelRatio;
@@ -147,7 +154,7 @@ var resizeCanvas = () => {
   }
 };
 
-var groupsManager, uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, timeManager, dotsManager;
+var groupsManager, uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, dotsManager;
 dlManager.init = (
   groupsManagerRef,
   uiInputRef,
@@ -167,7 +174,6 @@ dlManager.init = (
   uiManagerRef,
   lineManagerRef,
   glRef,
-  timeManagerRef,
   dotsManagerRef
 ) => {
   uiInput = uiInputRef;
@@ -187,7 +193,6 @@ dlManager.init = (
   uiManager = uiManagerRef;
   lineManager = lineManagerRef;
   gl = glRef;
-  timeManager = timeManagerRef;
   dotsManager = dotsManagerRef;
   groupsManager = groupsManagerRef;
 

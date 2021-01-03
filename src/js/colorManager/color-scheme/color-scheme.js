@@ -12,7 +12,7 @@ class ColorScheme {
 
     // Generate some public buffers
     this.colorBuffer = gl.createBuffer();
-    this.pickableBuf = gl.createBuffer();
+    this.pickableBuffer = gl.createBuffer();
   }
 
   calculateColorBuffers(isForceRecolor) {
@@ -23,6 +23,7 @@ class ColorScheme {
       this.colorData = new Float32Array(this.satSet.numSats * 4);
       this.pickableData = new Float32Array(this.satSet.numSats);
     }
+    const gl = this.gl;
 
     // Determine what time it is so we know if its time to recolor everything
     this.now = Date.now();
@@ -109,14 +110,23 @@ class ColorScheme {
     }
 
     // Now that we have all the information, load the color buffer
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
     // And update it
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, this.colorData, this.gl.STATIC_DRAW);
+    if (!this.colorBufferOneTime) {
+      gl.bufferData(gl.ARRAY_BUFFER, this.colorData, gl.DYNAMIC_DRAW);
+      this.colorBufferOneTime = true;
+    } else {
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.colorData);
+    }
 
-    // Next the pickable buffer
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.pickableBuf);
-    // and update it
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, this.pickableData, this.gl.STATIC_DRAW);
+    // Next the buffer for which objects can be picked -- different than what color they are on the pickable frame (that is in the dots class)
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.pickableBuffer);
+    if (!this.pickableBufferOneTime) {
+      gl.bufferData(gl.ARRAY_BUFFER, this.pickableData, gl.DYNAMIC_DRAW);
+      this.pickableBufferOneTime = true;
+    } else {
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.pickableData);
+    }
   }
 }
 

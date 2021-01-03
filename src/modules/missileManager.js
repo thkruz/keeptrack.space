@@ -1,6 +1,6 @@
 /* */
 import * as $ from 'jquery';
-import { getMissileSatsLen, getSat, getSatData, satCruncher, setSat } from '@app/js/satSet.js';
+import { getMissileSatsLen, getSat, getSatData, satSet, setSat } from '@app/js/satSet.js';
 import { doSearch } from '@app/js/uiManager/uiManager.js';
 import { mathValue } from '@app/js/helpers.js';
 import { satellite } from '@app/js/lookangles.js';
@@ -477,7 +477,7 @@ missileManager.MassRaidPre = function (time, simFile) {
       var MissileObject = getSat(x);
       if (MissileObject) {
         MissileObject.id = satSetLen - 500 + i;
-        satCruncher.postMessage({
+        satSet.satCruncher.postMessage({
           id: MissileObject.id,
           typ: 'newMissile',
           ON: 'M00' + MissileObject.id,
@@ -1340,10 +1340,10 @@ missileManager.Missile = function (CurrentLatitude, CurrentLongitude, TargetLati
     if (MissileDesc) MissileObject.desc = MissileDesc;
     // console.log(MissileObject);
     missileArray.push(MissileObject);
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       id: MissileObject.id,
       typ: 'newMissile',
-      ON: 'RV_' + MissileObject.id, // Don't think satCruncher needs this
+      ON: 'RV_' + MissileObject.id, // Don't think satSet.satCruncher needs this
       satId: MissileObject.id,
       static: MissileObject.static,
       missile: MissileObject.missile,
@@ -1925,10 +1925,10 @@ missileManager.asatPreFlight = (CurrentLatitude, CurrentLongitude, TargetLatitud
   //     if (MissileDesc) MissileObject.desc = MissileDesc;
   //     // console.log(MissileObject);
   //     missileArray.push(MissileObject);
-  //     satCruncher.postMessage({
+  //     satSet.satCruncher.postMessage({
   //       id: MissileObject.id,
   //       typ: 'newMissile',
-  //       ON: 'RV_' + MissileObject.id, // Don't think satCruncher needs this
+  //       ON: 'RV_' + MissileObject.id, // Don't think satSet.satCruncher needs this
   //       satId: MissileObject.id,
   //       static: MissileObject.static,
   //       missile: MissileObject.missile,
@@ -2503,10 +2503,10 @@ missileManager.asatFlight = function (
     if (MissileDesc) MissileObject.desc = MissileDesc;
     // console.log(MissileObject);
     missileArray.push(MissileObject);
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       id: MissileObject.id,
       typ: 'newMissile',
-      ON: 'RV_' + MissileObject.id, // Don't think satCruncher needs this
+      ON: 'RV_' + MissileObject.id, // Don't think satSet.satCruncher needs this
       satId: MissileObject.id,
       static: MissileObject.static,
       missile: MissileObject.missile,
@@ -3161,7 +3161,7 @@ var _clearMissiles = () => {
     var MissileObject = getSat(x);
     MissileObject.active = false;
 
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       id: MissileObject.id,
       typ: 'newMissile',
       ON: 'RV_' + MissileObject.id,

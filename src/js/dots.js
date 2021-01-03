@@ -2,32 +2,35 @@
 import * as glm from '@app/js/lib/gl-matrix.js';
 
 class Dots {
-  constructor(gl, pMatrix, cameraManager, timeManager) {
-    this.pickingDotSize = '16.0'; // glsl code - keep as a string
+  constructor(gl) {
+    // We draw the picking object bigger than the actual dot to make it easier to select objects
+    // glsl code - keep as a string
+    this.pickingDotSize = '16.0';
 
+    // This is so you don't have to pass references so often -- bad? not sure
     this.gl = gl;
-    this.cameraManager = cameraManager;
-    this.timeManager = timeManager;
-    this.pMatrix = pMatrix;
+
+    // Make this so we don't have to recreate it
     this.emptyMat4 = glm.mat4.create();
 
+    // Create our shaders using the strings from settingsManager
     this.setupShaders();
+
+    // Create a program for drawing the dots and setup its attributes/uniforms
     this.createDrawProgram(gl);
+    // Create a program for drawing pickable dots and setup its attributes/uniforms
     this.createPickingProgram(gl);
 
-    // Make a buffer for satellite positions
+    // Make buffers for satellite positions and size -- color and pickability are created in ColorScheme class
     this.positionBuffer = gl.createBuffer();
-    // Make a buffer for star/selected satellite data
     this.sizeBuffer = gl.createBuffer();
 
     this.loaded = true;
-    // This name is misleading
-    settingsManager.shadersReady = true;
   }
 
   // eslint-disable-next-line class-methods-use-this
   draw(pMatrix, cameraManager, colorScheme) {
-    if (!settingsManager.shadersReady || !settingsManager.cruncherReady) return;
+    if (!this.loaded || !settingsManager.cruncherReady) return;
     const gl = this.gl;
 
     // gl.bindVertexArray(satSet.vao);
@@ -48,7 +51,6 @@ class Dots {
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, this.positionData, gl.DYNAMIC_DRAW);
     gl.vertexAttribPointer(this.drawProgram.aPos, 3, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorScheme.colorBuffer);
@@ -71,8 +73,8 @@ class Dots {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  drawPicking(pMatrix, cameraManager) {
-    if (!settingsManager.shadersReady || !settingsManager.cruncherReady) return;
+  drawPicking(pMatrix, cameraManager, colorScheme) {
+    if (!this.loaded || !settingsManager.cruncherReady) return;
     const gl = this.gl;
 
     gl.useProgram(this.pickingProgram);
@@ -82,11 +84,11 @@ class Dots {
     gl.uniformMatrix4fv(this.pickingProgram.uCamMatrix, false, cameraManager.camMatrix);
     gl.uniformMatrix4fv(this.pickingProgram.uPMatrix, false, pMatrix);
 
-    gl.enableVertexAttribArray(this.pickingProgram.aColor);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.pickingColorBuffer);
+    gl.enableVertexAttribArray(this.pickingProgram.aColor);
     gl.vertexAttribPointer(this.pickingProgram.aColor, 3, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.pickingBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorScheme.pickableBuffer);
     gl.enableVertexAttribArray(this.pickingProgram.aPickable);
     gl.vertexAttribPointer(this.pickingProgram.aPickable, 1, gl.FLOAT, false, 0, 0);
 
@@ -350,9 +352,14 @@ class Dots {
       timeManager.setDrawDt(timeManager.drawDt * timeManager.propRate); // Adjust drawDt correspond to the propagation rate
       satSet.satDataLenInDraw = satSet.satData.length;
       if (!settingsManager.lowPerf && timeManager.drawDt > settingsManager.minimumDrawDt) {
+        // Don't Interpolate Static Objects
         satSet.satDataLenInDraw -= settingsManager.maxFieldOfViewMarkers + settingsManager.maxRadarData;
+        // Flat Array of X, Y, and Z so times by 3
         satSet.satDataLenInDraw3 = satSet.satDataLenInDraw * 3;
+        // Do we want to treat non-satellites different?
         satSet.orbitalSats3 = satSet.orbitalSats * 3;
+
+        // Interpolate position since last draw by adding the velocity
         for (this.drawI = 0; this.drawI < satSet.satDataLenInDraw3; this.drawI++) {
           if (this.drawI > satSet.orbitalSats3) {
             this.positionData[this.drawI] += this.velocityData[this.drawI] * timeManager.drawDt;
@@ -363,19 +370,31 @@ class Dots {
       }
     }
 
+    // Select the position buffer
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.positionData), gl.DYNAMIC_DRAW);
+
+    // Either allocate and assign the data to the buffer
+    if (!this.positionBufferOneTime) {
+      gl.bufferData(gl.ARRAY_BUFFER, this.positionData, gl.DYNAMIC_DRAW);
+      this.positionBufferOneTime = true;
+    } else {
+      // Or just update it if we have already allocated it - the length won't change
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.positionData);
+    }
   }
 
   updateSizeBuffer(satData) {
     const gl = this.gl;
-    this.sizeData = [];
-    for (var i = 0; i < satData.length; i++) {
+    if (!this.sizeBufferOneTime) {
+      this.sizeData = new Float32Array(satData.length);
+    }
+
+    for (let i = 0; i < satData.length; i++) {
       // Stars are always bigger
       if (i >= this.starIndex1 && i <= this.starIndex2) {
-        this.sizeData.push(1.0);
+        this.sizeData[i] = 1.0;
       } else {
-        this.sizeData.push(0.0);
+        this.sizeData[i] = 0.0;
       }
     }
     // Pretend Satellites that are currently being searched are stars
@@ -388,7 +407,12 @@ class Dots {
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.sizeBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.sizeData), gl.DYNAMIC_DRAW);
+    if (!this.sizeBufferOneTime) {
+      gl.bufferData(gl.ARRAY_BUFFER, this.sizeData, gl.DYNAMIC_DRAW);
+      this.sizeBufferOneTime = true;
+    } else {
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.sizeData);
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -416,8 +440,8 @@ class Dots {
     // Switch to the pick buffer
     gl.bindBuffer(gl.ARRAY_BUFFER, this.pickingColorBuffer);
 
-    // Update the data
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.pickingColorData), gl.DYNAMIC_DRAW);
+    // Setup the colorpicking data -- this doesnt change
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.pickingColorData), gl.STATIC_DRAW);
   }
 }
 

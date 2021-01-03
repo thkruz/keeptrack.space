@@ -32,7 +32,6 @@ import 'materialize-css';
 import '@app/js/keeptrack-foot.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
 import { helpers, mathValue, saveAs, saveCsv } from '@app/js/helpers.js';
-import { satCruncher, satSet } from '@app/js/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { CanvasRecorder } from '@app/js/lib/CanvasRecorder.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
@@ -50,6 +49,7 @@ import { orbitManager } from '@app/js/orbitManager.js';
 import { radarDataManager } from '@app/js/radarDataManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
 import { satLinkManager } from '@app/modules/satLinkManager.js';
+import { satSet } from '@app/js/satSet.js';
 import { satellite } from '@app/js/lookangles.js';
 import { searchBox } from '@app/js/search-box.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
@@ -408,7 +408,7 @@ $(document).ready(function () {
     if (settingsManager.retro) {
       timeManager.propOffset = new Date(2000, 2, 13) - Date.now();
       $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
-      satCruncher.postMessage({
+      satSet.satCruncher.postMessage({
         typ: 'offset',
         dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       });
@@ -1121,7 +1121,7 @@ $(document).ready(function () {
       var jday = timeManager.getDayOfYear(timeManager.propTime());
       $('#jday').html(jday);
       timeManager.propOffset = selectedDate - today;
-      satCruncher.postMessage({
+      satSet.satCruncher.postMessage({
         typ: 'offset',
         dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
       });
@@ -1556,7 +1556,7 @@ $(document).ready(function () {
         }
         var TLE1 = TLEs[0];
         var TLE2 = TLEs[1];
-        satCruncher.postMessage({
+        satSet.satCruncher.postMessage({
           typ: 'satEdit',
           id: satId,
           TLE1: TLE1,
@@ -1690,7 +1690,7 @@ $(document).ready(function () {
       var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
 
       if (satellite.altitudeCheck(TLE1, TLE2, timeManager.propOffset) > 1) {
-        satCruncher.postMessage({
+        satSet.satCruncher.postMessage({
           typ: 'satEdit',
           id: satId,
           active: true,
@@ -1743,7 +1743,7 @@ $(document).ready(function () {
         var satId = satSet.getIdFromObjNum(scc);
         var sat = satSet.getSatExtraOnly(satId);
         if (satellite.altitudeCheck(object.TLE1, object.TLE2, timeManager.propOffset) > 1) {
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             typ: 'satEdit',
             id: sat.id,
             active: true,
@@ -1774,8 +1774,8 @@ $(document).ready(function () {
         time = new Date(time[0] + 'T' + time[1] + 'Z');
         var today = new Date(); // Need to know today for offset calculation
         timeManager.propOffset = time - today; // Find the offset from today
-        satCruncher.postMessage({
-          // Tell satCruncher we have changed times for orbit calculations
+        satSet.satCruncher.postMessage({
+          // Tell satSet.satCruncher we have changed times for orbit calculations
           typ: 'offset',
           dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
         });
@@ -1947,8 +1947,8 @@ $(document).ready(function () {
 
         timeManager.propOffset = quadZTime - today; // Find the offset from today
         cameraManager.camSnapMode = false;
-        satCruncher.postMessage({
-          // Tell satCruncher we have changed times for orbit calculations
+        satSet.satCruncher.postMessage({
+          // Tell satSet.satCruncher we have changed times for orbit calculations
           typ: 'offset',
           dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
         });
@@ -1959,7 +1959,7 @@ $(document).ready(function () {
         var TLE2 = TLEs[1];
 
         if (satellite.altitudeCheck(TLE1, TLE2, timeManager.propOffset) > 1) {
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             typ: 'satEdit',
             id: satId,
             active: true,
@@ -2023,7 +2023,7 @@ $(document).ready(function () {
         }
         var TLE1 = TLEs[0];
         var TLE2 = TLEs[1];
-        satCruncher.postMessage({
+        satSet.satCruncher.postMessage({
           typ: 'satEdit',
           id: satId,
           TLE1: TLE1,
@@ -2092,7 +2092,7 @@ $(document).ready(function () {
                 sat.TLE2 = iTLE2;
                 sat.active = true;
                 if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.propOffset) > 1) {
-                  satCruncher.postMessage({
+                  satSet.satCruncher.postMessage({
                     typ: 'satEdit',
                     id: satId,
                     TLE1: iTLE1,
@@ -2405,11 +2405,11 @@ $(document).ready(function () {
       var minrange = $('#cs-minrange').val();
       var maxrange = $('#cs-maxrange').val();
 
-      satCruncher.postMessage({
-        // Send SatCruncher File information on this radar
-        typ: 'offset', // Tell satcruncher to update something
-        dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(), // Tell satcruncher what time it is and how fast time is moving
-        setlatlong: true, // Tell satcruncher we are changing observer location
+      satSet.satCruncher.postMessage({
+        // Send satSet.satCruncher File information on this radar
+        typ: 'offset', // Tell satSet.satCruncher to update something
+        dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(), // Tell satSet.satCruncher what time it is and how fast time is moving
+        setlatlong: true, // Tell satSet.satCruncher we are changing observer location
         sensor: {
           lat: lat * 1,
           long: lon * 1,
@@ -2587,8 +2587,8 @@ $(document).ready(function () {
     var today = new Date(); // Need to know today for offset calculation
     timeManager.propOffset = selectedDate - today; // Find the offset from today
     cameraManager.camSnapMode = false;
-    satCruncher.postMessage({
-      // Tell satCruncher we have changed times for orbit calculations
+    satSet.satCruncher.postMessage({
+      // Tell satSet.satCruncher we have changed times for orbit calculations
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
     });
@@ -2669,7 +2669,7 @@ $(document).ready(function () {
       findFutureDate(socratesObjTwo, row); // Jump to the date/time of the collision
 
       uiManager.doSearch(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Actually perform the search of the two objects
-      settingsManager.socratesOnSatCruncher = satSet.getIdFromObjNum(socratesObjOne[row][1]);
+      settingsManager.socratesOnsatSet.satCruncher = satSet.getIdFromObjNum(socratesObjOne[row][1]);
     } // If a row was selected
   };
 
@@ -3280,7 +3280,7 @@ $(document).ready(function () {
         if (settingsManager.isFOVBubbleModeOn && !settingsManager.isShowSurvFence) {
           settingsManager.isFOVBubbleModeOn = false;
           $('#menu-fov-bubble').removeClass('bmenu-item-selected');
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             isShowFOVBubble: 'reset',
             isShowSurvFence: 'disable',
           });
@@ -3294,7 +3294,7 @@ $(document).ready(function () {
           settingsManager.isShowSurvFence = false;
           $('#menu-fov-bubble').addClass('bmenu-item-selected');
           $('#menu-surveillance').removeClass('bmenu-item-selected');
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             isShowSatOverfly: 'reset',
             isShowFOVBubble: 'enable',
             isShowSurvFence: 'disable',
@@ -3316,7 +3316,7 @@ $(document).ready(function () {
         if (settingsManager.isShowSurvFence) {
           settingsManager.isShowSurvFence = false;
           $('#menu-surveillance').removeClass('bmenu-item-selected');
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             isShowSurvFence: 'disable',
             isShowFOVBubble: 'reset',
           });
@@ -3329,7 +3329,7 @@ $(document).ready(function () {
           settingsManager.isShowSurvFence = true;
           $('#menu-surveillance').addClass('bmenu-item-selected');
           $('#menu-fov-bubble').removeClass('bmenu-item-selected');
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             isShowSatOverfly: 'reset',
             isShowFOVBubble: 'enable',
             isShowSurvFence: 'enable',
@@ -3351,7 +3351,7 @@ $(document).ready(function () {
         if (settingsManager.isSatOverflyModeOn) {
           settingsManager.isSatOverflyModeOn = false;
           $('#menu-sat-fov').removeClass('bmenu-item-selected');
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             isShowSatOverfly: 'reset',
           });
           break;
@@ -3370,7 +3370,7 @@ $(document).ready(function () {
 
           var satFieldOfView = $('#satFieldOfView').val() * 1;
           $('#menu-sat-fov').addClass('bmenu-item-selected');
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             isShowFOVBubble: 'reset',
             isShowSurvFence: 'disable',
             isShowSatOverfly: 'enable',
@@ -4080,7 +4080,7 @@ uiManager.keyHandler = (evt) => {
   if (settingsManager.isPropRateChange) {
     timeManager.propRealTime = Date.now();
     timeManager.propTime();
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
     });
@@ -4357,7 +4357,7 @@ $('#colors-menu>ul>li').on('click', function () {
   objectManager.setSelectedSat(-1); // clear selected sat
   var colorName = $(this).data('color');
   if (colorName !== 'sunlight') {
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       isSunlightView: false,
     });
   }
@@ -4393,7 +4393,7 @@ $('#colors-menu>ul>li').on('click', function () {
       satSet.setColorScheme(ColorScheme.sunlight, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       settingsManager.isForceColorScheme = true;
-      satCruncher.postMessage({
+      satSet.satCruncher.postMessage({
         isSunlightView: true,
       });
       // if (settingsManager.isOfficialWebsite)
@@ -4557,11 +4557,11 @@ uiManager.useCurrentGeolocationAsSensor = function () {
       var minrange = settingsManager.geolocation.minrange;
       var maxrange = settingsManager.geolocation.maxrange;
 
-      satCruncher.postMessage({
-        // Send SatCruncher File information on this radar
-        typ: 'offset', // Tell satcruncher to update something
-        dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(), // Tell satcruncher what time it is and how fast time is moving
-        setlatlong: true, // Tell satcruncher we are changing observer location
+      satSet.satCruncher.postMessage({
+        // Send satSet.satCruncher File information on this radar
+        typ: 'offset', // Tell satSet.satCruncher to update something
+        dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(), // Tell satSet.satCruncher what time it is and how fast time is moving
+        setlatlong: true, // Tell satSet.satCruncher we are changing observer location
         sensor: {
           lat: lat,
           long: lon,
@@ -5140,14 +5140,14 @@ var _resetSensorSelected = function () {
   // Return to default settings with nothing 'inview'
   satellite.setobs(null);
   sensorManager.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
-  satCruncher.postMessage({
+  satSet.satCruncher.postMessage({
     typ: 'offset',
     dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
     setlatlong: true,
     resetObserverGd: true,
     sensor: sensorManager.defaultSensor,
   });
-  satCruncher.postMessage({
+  satSet.satCruncher.postMessage({
     isShowFOVBubble: 'reset',
     isShowSurvFence: 'disable',
   });
@@ -5324,7 +5324,7 @@ let doSearch = (searchString, isPreventDropDown) => {
 uiManager.doSearch = (searchString, isPreventDropDown) => {
   let idList = searchBox.doSearch(searchString, isPreventDropDown);
   if (settingsManager.isSatOverflyModeOn) {
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       satelliteSelected: idList,
     });
   }

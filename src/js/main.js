@@ -35,7 +35,7 @@ import '@app/js/keeptrack-foot.js';
 import 'materialize-css';
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { Atmosphere, LineFactory, Moon, earth, sun } from '@app/js/sceneManager/sceneManager.js';
-import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satCruncher, satSet } from '@app/js/satSet.js';
+import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satSet } from '@app/js/satSet.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
@@ -67,14 +67,15 @@ $(document).ready(async function initalizeKeepTrack() {
   // A lot of things rely on a satellite catalog
   await mobile.checkMobileMode();
   await webGlInit();
-  cameraManager = new Camera();
-  await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
   settingsManager.loadStr('dots');
-  dotsManager = new Dots(gl, pMatrix, cameraManager, timeManager, ColorScheme);
-  satSet.init(cameraManager, dotsManager);
-  selectSatManager.init(ColorScheme.group);
+  cameraManager = new Camera();
+  dotsManager = new Dots(gl);
+  satSet.init(dotsManager);
   objectManager.init(dotsManager);
+  await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
+  selectSatManager.init(ColorScheme.group);
   await satSet.loadCatalog(); // Needs Object Manager and gl first
+  const satCruncher = satSet.satCruncher;
 
   dotsManager.setupPickingBuffer(satSet.satData);
   satSet.setColorScheme(ColorScheme.default, true);
@@ -219,6 +220,7 @@ var webGlInit = async () => {
   }
 
   gl.getExtension('EXT_frag_depth');
+  gl.getExtension('OES_vertex_array_object');
 
   gl.viewport(0, 0, can.width, can.height);
 

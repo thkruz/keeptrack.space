@@ -259,7 +259,7 @@ var drawScene = () => {
   dotsManager.draw(pMatrix, cameraManager, settingsManager.currentColorScheme);
 
   // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-  dotsManager.drawPicking(pMatrix, cameraManager);
+  dotsManager.drawPicking(pMatrix, cameraManager, settingsManager.currentColorScheme);
 
   orbitManager.draw(pMatrix, cameraManager.camMatrix);
 

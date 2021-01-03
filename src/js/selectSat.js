@@ -1,10 +1,10 @@
 import * as $ from 'jquery';
-import { satCruncher, satSet } from '@app/js/satSet.js';
 import { SunCalc } from '@app/js/suncalc.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { mathValue } from '@app/js/helpers.js';
 import { objectManager } from '@app/js/objectManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
+import { satSet } from '@app/js/satSet.js';
 import { satellite } from '@app/js/lookangles.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
 import { settingsManager } from '@app/js/keeptrack-head.js';
@@ -38,7 +38,7 @@ selectSatManager.selectSat = (satId, cameraManager) => {
       $('#menu-sat-fov').removeClass('bmenu-item-selected');
       $('#menu-sat-fov').addClass('bmenu-item-disabled');
       settingsManager.isSatOverflyModeOn = false;
-      satCruncher.postMessage({
+      satSet.satCruncher.postMessage({
         isShowSatOverfly: 'reset',
       });
     }

@@ -512,7 +512,6 @@ let settingsManager = {};
   settingsManager.fieldOfView = 0.6;
 
   // Determines if the Loading is complete
-  settingsManager.shadersReady = false;
   settingsManager.cruncherReady = false;
 
   settingsManager.altLoadMsgs = true;

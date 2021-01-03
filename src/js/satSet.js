@@ -30,6 +30,7 @@ import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { db, settingsManager } from '@app/js/keeptrack-head.js';
 import { helpers, mathValue, saveCsv } from '@app/js/helpers.js';
+import { RAD2DEG } from '@app/js/constants.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { gl } from '@app/js/main.js';
 import { jsTLEfile } from '@app/offline/tle.js';
@@ -48,16 +49,10 @@ import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 // 'use strict';
 var satSet = {};
-var TAU = 2 * Math.PI;
-var RAD2DEG = 360 / TAU;
 
-var satCruncher = {};
+var satCruncher;
 var limitSats = settingsManager.limitSats;
 
-var satColorBuf;
-
-var satInView;
-var satInSun;
 var satData;
 var satExtraData;
 
@@ -84,13 +79,10 @@ var checkPeriod = (possibles, minPeriod, maxPeriod) => {
   return periodRes;
 };
 var checkRcs = (possibles, minRcs, maxRcs) => {
-  console.log(minRcs);
-  console.log(maxRcs);
   var rcsRes = [];
   for (var i = 0; i < possibles.length; i++) {
     if (parseFloat(possibles[i].R) < maxRcs && parseFloat(possibles[i].R) > minRcs && rcsRes.length <= 200) {
       // Don't display more than 200 results - this is because LEO and GEO belt have a lot of satellites
-      console.log(possibles[i]);
       rcsRes.push(possibles[i]);
     }
   }
@@ -100,28 +92,12 @@ var checkRcs = (possibles, minRcs, maxRcs) => {
   return rcsRes;
 };
 
-// eslint-disable-next-line no-unused-vars
-var _doDelayedSearch = (val) => {
-  setTimeout(() => {
-    uiManager.doSearch(val);
-  }, 2000);
-};
-
 var satelliteList;
 if (settingsManager.offline) {
   import('../offline/extra.js').then((resp) => {
     satelliteList = resp;
     console.debug(resp);
   });
-}
-
-try {
-  settingsManager.loadStr('elsets');
-  satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
-} catch (E) {
-  console.log(E);
-  $('#canvas-holder').hide();
-  $('#no-webgl').css('display', 'block');
 }
 
 /**
@@ -136,254 +112,7 @@ try {
  */
 var satCrunchIndex;
 var satCrunchNow = 0;
-
-// var lastFOVUpdateTime = 0;
-// var cruncherReadyCallback;
 var gotExtraData = false;
-
-var dotManager;
-satCruncher.onmessage = (m) => {
-  if (!gotExtraData) {
-    // store extra data that comes from crunching
-    // Only do this once
-
-    satExtraData = JSON.parse(m.data.extraData);
-
-    for (satCrunchIndex = 0; satCrunchIndex < satSet.numSats; satCrunchIndex++) {
-      satData[satCrunchIndex].inclination = satExtraData[satCrunchIndex].inclination;
-      satData[satCrunchIndex].eccentricity = satExtraData[satCrunchIndex].eccentricity;
-      satData[satCrunchIndex].raan = satExtraData[satCrunchIndex].raan;
-      satData[satCrunchIndex].argPe = satExtraData[satCrunchIndex].argPe;
-      satData[satCrunchIndex].meanMotion = satExtraData[satCrunchIndex].meanMotion;
-
-      satData[satCrunchIndex].semiMajorAxis = satExtraData[satCrunchIndex].semiMajorAxis;
-      satData[satCrunchIndex].semiMinorAxis = satExtraData[satCrunchIndex].semiMinorAxis;
-      satData[satCrunchIndex].apogee = satExtraData[satCrunchIndex].apogee;
-      satData[satCrunchIndex].perigee = satExtraData[satCrunchIndex].perigee;
-      satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
-      satData[satCrunchIndex].velocity = {};
-    }
-
-    gotExtraData = true;
-    satExtraData = null;
-    return;
-  }
-
-  if (m.data.extraUpdate) {
-    satExtraData = JSON.parse(m.data.extraData);
-    satCrunchIndex = m.data.satId;
-
-    satData[satCrunchIndex].inclination = satExtraData[0].inclination;
-    satData[satCrunchIndex].eccentricity = satExtraData[0].eccentricity;
-    satData[satCrunchIndex].raan = satExtraData[0].raan;
-    satData[satCrunchIndex].argPe = satExtraData[0].argPe;
-    satData[satCrunchIndex].meanMotion = satExtraData[0].meanMotion;
-
-    satData[satCrunchIndex].semiMajorAxis = satExtraData[0].semiMajorAxis;
-    satData[satCrunchIndex].semiMinorAxis = satExtraData[0].semiMinorAxis;
-    satData[satCrunchIndex].apogee = satExtraData[0].apogee;
-    satData[satCrunchIndex].perigee = satExtraData[0].perigee;
-    satData[satCrunchIndex].period = satExtraData[0].period;
-    satData[satCrunchIndex].TLE1 = satExtraData[0].TLE1;
-    satData[satCrunchIndex].TLE2 = satExtraData[0].TLE2;
-    satExtraData = null;
-    return;
-  }
-
-  if (typeof dotManager.positionData == 'undefined') {
-    dotManager.positionData = new Float32Array(m.data.satPos);
-  } else {
-    dotManager.positionData.set(m.data.satPos, 0);
-  }
-
-  if (typeof dotManager.velocityData == 'undefined') {
-    dotManager.velocityData = new Float32Array(m.data.satVel);
-  } else {
-    dotManager.velocityData.set(m.data.satVel, 0);
-  }
-
-  if (typeof m.data.satInView != 'undefined') {
-    if (typeof satInView == 'undefined') {
-      dotManager.inViewData = new Int8Array(m.data.satInView);
-    } else {
-      dotManager.inViewData.set(m.data.satInView, 0);
-    }
-  }
-
-  if (typeof m.data.satInSun != 'undefined') {
-    if (typeof satInSun == 'undefined') {
-      dotManager.inSunData = new Int8Array(m.data.satInSun);
-    } else {
-      dotManager.inSunData.set(m.data.satInSun, 0);
-    }
-  }
-
-  if (typeof m.data.sensorMarkerArray != 'undefined') {
-    satSet.satSensorMarkerArray = m.data.sensorMarkerArray;
-  }
-
-  if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
-    satCrunchNow = Date.now();
-    if (satCrunchNow > settingsManager.lastMapUpdateTime + 30000) {
-      uiManager.updateMap();
-      settingsManager.lastMapUpdateTime = satCrunchNow;
-      settingsManager.isMapUpdateOverride = false;
-    } else if (settingsManager.isMapUpdateOverride) {
-      uiManager.updateMap();
-      settingsManager.lastMapUpdateTime = satCrunchNow;
-      settingsManager.isMapUpdateOverride = false;
-    }
-  }
-
-  if (settingsManager.socratesOnSatCruncher) {
-    objectManager.setSelectedSat(settingsManager.socratesOnSatCruncher);
-    settingsManager.socratesOnSatCruncher = null;
-  }
-
-  // Don't force color recalc if default colors and no sensor for inview color
-  if ((objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) || settingsManager.isForceColorScheme) {
-    // Don't change colors while dragging
-    if (!cameraManager.isDragging) {
-      satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-    }
-  }
-
-  if (!settingsManager.cruncherReady) {
-    /** Hide SOCRATES menu if not all the satellites are currently available to view */
-    if (limitSats !== '') {
-      $('#menu-satellite-collision').hide();
-    }
-
-    satSet.onCruncherReady();
-    if (!settingsManager.disableUI) {
-      uiManager.reloadLastSensor();
-      (function _watchlistInit() {
-        let watchlistJSON;
-        try {
-          watchlistJSON = localStorage.getItem('watchlistList');
-        } catch (e) {
-          watchlistJSON = null;
-        }
-        if (watchlistJSON !== null) {
-          let newWatchlist = JSON.parse(watchlistJSON);
-          let watchlistInViewList = [];
-          for (let i = 0; i < newWatchlist.length; i++) {
-            let sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
-            if (sat !== null) {
-              newWatchlist[i] = sat.id;
-              watchlistInViewList.push(false);
-            } else {
-              console.error('Watchlist File Format Incorret');
-              return;
-            }
-          }
-          uiManager.updateWatchlist(newWatchlist, watchlistInViewList);
-        }
-      })();
-    }
-
-    try {
-      nextLaunchManager.init();
-    } catch (e) {
-      // Might not have this module
-    }
-
-    (function _parseGetParameters() {
-      // do querystring stuff
-      let params = satSet.queryStr.split('&');
-
-      // Do Searches First
-      for (let i = 0; i < params.length; i++) {
-        let key = params[i].split('=')[0];
-        let val = params[i].split('=')[1];
-        if (key == 'search') {
-          // console.log('preloading search to ' + val);
-          // Sensor Selection takes 1.5 seconds to update color Scheme
-          // TODO: SensorManager might be the problem here, but this works
-          // _doDelayedSearch(val);
-          if (!settingsManager.disableUI) {
-            uiManager.doSearch(val);
-            if (settingsManager.lastSearchResults.length == 0) {
-              uiManager.toast(`Search for "${val}" found nothing!`, 'caution', true);
-              searchBox.hideResults();
-            }
-          }
-        }
-      }
-
-      // Then Do Other Stuff
-      for (let i = 0; i < params.length; i++) {
-        let key = params[i].split('=')[0];
-        let val = params[i].split('=')[1];
-        let urlSatId;
-        switch (key) {
-          case 'intldes':
-            urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
-            if (urlSatId !== null) {
-              objectManager.setSelectedSat(urlSatId);
-            } else {
-              uiManager.toast(`International Designator "${val.toUpperCase()}" was not found!`, 'caution', true);
-            }
-            break;
-          case 'sat':
-            urlSatId = satSet.getIdFromObjNum(val.toUpperCase());
-            if (urlSatId !== null) {
-              objectManager.setSelectedSat(urlSatId);
-            } else {
-              uiManager.toast(`Satellite "${val.toUpperCase()}" was not found!`, 'caution', true);
-            }
-            break;
-          case 'misl':
-            var subVal = val.split(',');
-            $('#ms-type').val(subVal[0].toString());
-            $('#ms-attacker').val(subVal[1].toString());
-            // $('#ms-lat-lau').val() * 1;
-            // ('#ms-lon-lau').val() * 1;
-            $('#ms-target').val(subVal[2].toString());
-            // $('#ms-lat').val() * 1;
-            // $('#ms-lon').val() * 1;
-            $('#missile').trigger('submit');
-            break;
-          case 'date':
-            if (isNaN(parseInt(val))) {
-              uiManager.toast(`Date value of "${val}" is not a proper unix timestamp!`, 'caution', true);
-              break;
-            }
-            timeManager.propOffset = Number(val) - Date.now();
-            $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
-            satCruncher.postMessage({
-              typ: 'offset',
-              dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-            });
-            break;
-          case 'rate':
-            if (isNaN(parseFloat(val))) {
-              uiManager.toast(`Propagation rate of "${val}" is not a valid float!`, 'caution', true);
-              break;
-            }
-            val = Math.min(val, 1000);
-            // could run time backwards, but let's not!
-            val = Math.max(val, 0.0);
-            timeManager.propRate = Number(val);
-            satCruncher.postMessage({
-              typ: 'offset',
-              dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-            });
-            break;
-        }
-      }
-    })();
-
-    // Load ALl The Images Now
-    setTimeout(function () {
-      $('img').each(function () {
-        $(this).attr('src', $(this).attr('delayedsrc'));
-      });
-    }, 0);
-
-    settingsManager.cruncherReady = true;
-  }
-};
 
 var parseFromGETVariables = () => {
   var queryStr = window.location.search.substring(1);
@@ -397,12 +126,258 @@ var parseFromGETVariables = () => {
   }
 };
 
-var cameraManager;
-satSet.init = async (cameraManagerRef, dotManagerRef) => {
-  cameraManager = cameraManagerRef;
+var dotManager;
+satSet.init = async (dotManagerRef) => {
   dotManager = dotManagerRef;
   /** Parses GET variables for Possible sharperShaders */
   parseFromGETVariables();
+
+  settingsManager.loadStr('elsets');
+  satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
+  addSatCruncherOnMessage();
+
+  satSet.satCruncher = satCruncher;
+};
+
+var addSatCruncherOnMessage = () => {
+  satCruncher.onmessage = (m) => {
+    if (!gotExtraData) {
+      // store extra data that comes from crunching
+      // Only do this once
+
+      satExtraData = JSON.parse(m.data.extraData);
+
+      for (satCrunchIndex = 0; satCrunchIndex < satSet.numSats; satCrunchIndex++) {
+        satData[satCrunchIndex].inclination = satExtraData[satCrunchIndex].inclination;
+        satData[satCrunchIndex].eccentricity = satExtraData[satCrunchIndex].eccentricity;
+        satData[satCrunchIndex].raan = satExtraData[satCrunchIndex].raan;
+        satData[satCrunchIndex].argPe = satExtraData[satCrunchIndex].argPe;
+        satData[satCrunchIndex].meanMotion = satExtraData[satCrunchIndex].meanMotion;
+
+        satData[satCrunchIndex].semiMajorAxis = satExtraData[satCrunchIndex].semiMajorAxis;
+        satData[satCrunchIndex].semiMinorAxis = satExtraData[satCrunchIndex].semiMinorAxis;
+        satData[satCrunchIndex].apogee = satExtraData[satCrunchIndex].apogee;
+        satData[satCrunchIndex].perigee = satExtraData[satCrunchIndex].perigee;
+        satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
+        satData[satCrunchIndex].velocity = {};
+      }
+
+      gotExtraData = true;
+      satExtraData = null;
+      return;
+    }
+
+    if (m.data.extraUpdate) {
+      satExtraData = JSON.parse(m.data.extraData);
+      satCrunchIndex = m.data.satId;
+
+      satData[satCrunchIndex].inclination = satExtraData[0].inclination;
+      satData[satCrunchIndex].eccentricity = satExtraData[0].eccentricity;
+      satData[satCrunchIndex].raan = satExtraData[0].raan;
+      satData[satCrunchIndex].argPe = satExtraData[0].argPe;
+      satData[satCrunchIndex].meanMotion = satExtraData[0].meanMotion;
+
+      satData[satCrunchIndex].semiMajorAxis = satExtraData[0].semiMajorAxis;
+      satData[satCrunchIndex].semiMinorAxis = satExtraData[0].semiMinorAxis;
+      satData[satCrunchIndex].apogee = satExtraData[0].apogee;
+      satData[satCrunchIndex].perigee = satExtraData[0].perigee;
+      satData[satCrunchIndex].period = satExtraData[0].period;
+      satData[satCrunchIndex].TLE1 = satExtraData[0].TLE1;
+      satData[satCrunchIndex].TLE2 = satExtraData[0].TLE2;
+      satExtraData = null;
+      return;
+    }
+
+    if (typeof dotManager.positionData == 'undefined') {
+      dotManager.positionData = new Float32Array(m.data.satPos);
+    } else {
+      dotManager.positionData.set(m.data.satPos, 0);
+    }
+
+    if (typeof dotManager.velocityData == 'undefined') {
+      dotManager.velocityData = new Float32Array(m.data.satVel);
+    } else {
+      dotManager.velocityData.set(m.data.satVel, 0);
+    }
+
+    if (typeof m.data.satInView != 'undefined') {
+      if (typeof dotManager.inViewData == 'undefined') {
+        dotManager.inViewData = new Int8Array(m.data.satInView);
+      } else {
+        dotManager.inViewData.set(m.data.satInView, 0);
+      }
+    }
+
+    if (typeof m.data.satInSun != 'undefined') {
+      if (typeof dotManager.inSunData == 'undefined') {
+        dotManager.inSunData = new Int8Array(m.data.satInSun);
+      } else {
+        dotManager.inSunData.set(m.data.satInSun, 0);
+      }
+    }
+
+    if (typeof m.data.sensorMarkerArray != 'undefined') {
+      satSet.satSensorMarkerArray = m.data.sensorMarkerArray;
+    }
+
+    if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
+      satCrunchNow = Date.now();
+      if (satCrunchNow > settingsManager.lastMapUpdateTime + 30000) {
+        uiManager.updateMap();
+        settingsManager.lastMapUpdateTime = satCrunchNow;
+        settingsManager.isMapUpdateOverride = false;
+      } else if (settingsManager.isMapUpdateOverride) {
+        uiManager.updateMap();
+        settingsManager.lastMapUpdateTime = satCrunchNow;
+        settingsManager.isMapUpdateOverride = false;
+      }
+    }
+
+    if (settingsManager.socratesOnSatCruncher) {
+      objectManager.setSelectedSat(settingsManager.socratesOnSatCruncher);
+      settingsManager.socratesOnSatCruncher = null;
+    }
+
+    // Don't force color recalc if default colors and no sensor for inview color
+    if ((objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) || settingsManager.isForceColorScheme) {
+      // Don't change colors while dragging
+      if (!cameraManager.isDragging) {
+        satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+      }
+    }
+
+    if (!settingsManager.cruncherReady) {
+      /** Hide SOCRATES menu if not all the satellites are currently available to view */
+      if (limitSats !== '') {
+        $('#menu-satellite-collision').hide();
+      }
+
+      satSet.onCruncherReady();
+      if (!settingsManager.disableUI) {
+        uiManager.reloadLastSensor();
+        (function _watchlistInit() {
+          let watchlistJSON;
+          try {
+            watchlistJSON = localStorage.getItem('watchlistList');
+          } catch (e) {
+            watchlistJSON = null;
+          }
+          if (watchlistJSON !== null) {
+            let newWatchlist = JSON.parse(watchlistJSON);
+            let watchlistInViewList = [];
+            for (let i = 0; i < newWatchlist.length; i++) {
+              let sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
+              if (sat !== null) {
+                newWatchlist[i] = sat.id;
+                watchlistInViewList.push(false);
+              } else {
+                console.error('Watchlist File Format Incorret');
+                return;
+              }
+            }
+            uiManager.updateWatchlist(newWatchlist, watchlistInViewList);
+          }
+        })();
+      }
+
+      try {
+        nextLaunchManager.init();
+      } catch (e) {
+        // Might not have this module
+      }
+
+      (function _parseGetParameters() {
+        // do querystring stuff
+        let params = satSet.queryStr.split('&');
+
+        // Do Searches First
+        for (let i = 0; i < params.length; i++) {
+          let key = params[i].split('=')[0];
+          let val = params[i].split('=')[1];
+          if (key == 'search') {
+            if (!settingsManager.disableUI) {
+              uiManager.doSearch(val);
+              if (settingsManager.lastSearchResults.length == 0) {
+                uiManager.toast(`Search for "${val}" found nothing!`, 'caution', true);
+                searchBox.hideResults();
+              }
+            }
+          }
+        }
+
+        // Then Do Other Stuff
+        for (let i = 0; i < params.length; i++) {
+          let key = params[i].split('=')[0];
+          let val = params[i].split('=')[1];
+          let urlSatId;
+          switch (key) {
+            case 'intldes':
+              urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
+              if (urlSatId !== null) {
+                objectManager.setSelectedSat(urlSatId);
+              } else {
+                uiManager.toast(`International Designator "${val.toUpperCase()}" was not found!`, 'caution', true);
+              }
+              break;
+            case 'sat':
+              urlSatId = satSet.getIdFromObjNum(val.toUpperCase());
+              if (urlSatId !== null) {
+                objectManager.setSelectedSat(urlSatId);
+              } else {
+                uiManager.toast(`Satellite "${val.toUpperCase()}" was not found!`, 'caution', true);
+              }
+              break;
+            case 'misl':
+              var subVal = val.split(',');
+              $('#ms-type').val(subVal[0].toString());
+              $('#ms-attacker').val(subVal[1].toString());
+              // $('#ms-lat-lau').val() * 1;
+              // ('#ms-lon-lau').val() * 1;
+              $('#ms-target').val(subVal[2].toString());
+              // $('#ms-lat').val() * 1;
+              // $('#ms-lon').val() * 1;
+              $('#missile').trigger('submit');
+              break;
+            case 'date':
+              if (isNaN(parseInt(val))) {
+                uiManager.toast(`Date value of "${val}" is not a proper unix timestamp!`, 'caution', true);
+                break;
+              }
+              timeManager.propOffset = Number(val) - Date.now();
+              $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
+              satCruncher.postMessage({
+                typ: 'offset',
+                dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
+              });
+              break;
+            case 'rate':
+              if (isNaN(parseFloat(val))) {
+                uiManager.toast(`Propagation rate of "${val}" is not a valid float!`, 'caution', true);
+                break;
+              }
+              val = Math.min(val, 1000);
+              // could run time backwards, but let's not!
+              val = Math.max(val, 0.0);
+              timeManager.propRate = Number(val);
+              satCruncher.postMessage({
+                typ: 'offset',
+                dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
+              });
+              break;
+          }
+        }
+      })();
+
+      // Load ALl The Images Now
+      setTimeout(function () {
+        $('img').each(function () {
+          $(this).attr('src', $(this).attr('delayedsrc'));
+        });
+      }, 0);
+
+      settingsManager.cruncherReady = true;
+    }
+  };
 };
 
 // This is a wrapper that tries various combinations to figure out which file to use for the satellites
@@ -473,13 +448,10 @@ satSet.parseCatalog = (resp) => {
   satSet.satData = satData; // Expose this to everyone
   resp = null; // is this needed?
 
-  // WebWorkers need this in a string format for initialization
-  satSet.satDataString = JSON.stringify(satData);
-
   /** Send satDataString to satCruncher to begin propagation loop */
   satCruncher.postMessage({
     typ: 'satdata',
-    dat: satSet.satDataString,
+    dat: JSON.stringify(satData),
     fieldOfViewSetLength: objectManager.fieldOfViewSet.length,
     isLowPerf: settingsManager.lowPerf,
   });
@@ -836,8 +808,6 @@ satSet.filterTLEDatabase = (resp, limitSatsArray) => {
   return tempSatData;
 };
 
-satSet.setupGpuBuffersPicking = () => {};
-
 satSet.getSatData = () => satData;
 
 satSet.getSatInView = () => {
@@ -854,21 +824,20 @@ satSet.getSatVel = () => {
 };
 
 satSet.resetSatInView = () => {
-  satInView = new Int8Array(satInView.length);
-  satInView.fill(0);
+  dotManager.inViewData = new Int8Array(dotManager.inViewData.length);
+  dotManager.inViewData.fill(0);
 };
 
 satSet.resetSatInSun = () => {
-  satInSun = new Int8Array(satInSun.length);
-  satInSun.fill(0);
+  dotManager.inSunData = new Int8Array(dotManager.inSunData.length);
+  dotManager.inSunData.fill(0);
 };
 
 satSet.setColorScheme = (scheme, isForceRecolor) => {
   settingsManager.setCurrentColorScheme(scheme);
 
   scheme.calculateColorBuffers(isForceRecolor);
-  satColorBuf = scheme.colorBuf;
-  dotManager.colorBuffer = satColorBuf;
+  dotManager.colorBuffer = scheme.colorBuf;
   dotManager.pickingBuffer = scheme.pickableBuf;
 };
 
@@ -1117,17 +1086,17 @@ satSet.getSat = (i) => {
   if (!satData[i]) return null;
   if (gotExtraData) {
     satData[i].inViewChange = false;
-    if (typeof satInView != 'undefined' && typeof satInView[i] != 'undefined') {
-      if (satData[i].inview !== satInView[i]) satData[i].inViewChange = true;
-      satData[i].inview = satInView[i];
+    if (typeof dotManager.inViewData != 'undefined' && typeof dotManager.inViewData[i] != 'undefined') {
+      if (satData[i].inview !== dotManager.inViewData[i]) satData[i].inViewChange = true;
+      satData[i].inview = dotManager.inViewData[i];
     } else {
       satData[i].inview = false;
       satData[i].inViewChange = false;
     }
 
-    if (typeof satInSun != 'undefined' && typeof satInSun[i] != 'undefined') {
-      if (satData[i].inSun !== satInSun[i]) satData[i].inSunChange = true;
-      satData[i].inSun = satInSun[i];
+    if (typeof dotManager.inSunData != 'undefined' && typeof dotManager.inSunData[i] != 'undefined') {
+      if (satData[i].inSun !== dotManager.inSunData[i]) satData[i].inSunChange = true;
+      satData[i].inSun = dotManager.inSunData[i];
     }
 
     // if (satData[i].velocity == 0) debugger;
@@ -1340,7 +1309,7 @@ satSet.getSatInViewOnly = (i) => {
   if (!satData) return null;
   if (!satData[i]) return null;
 
-  satData[i].inview = satInView[i];
+  satData[i].inview = dotManager.inViewData[i];
   return satData[i];
 };
 satSet.getSatPosOnly = (i) => {
@@ -1444,7 +1413,6 @@ satSet.getScreenCoords = (i, pMatrix, camMatrix, pos) => {
   satScreenPositionArray.error = false;
   if (!pos) pos = satSet.getSatPosOnly(i).position;
   posVec4 = glm.vec4.fromValues(pos.x, pos.y, pos.z, 1);
-  // var transform = glm.mat4.create();
 
   glm.vec4.transformMat4(posVec4, posVec4, camMatrix);
   glm.vec4.transformMat4(posVec4, posVec4, pMatrix);
@@ -1801,10 +1769,8 @@ satSet.selectSat = (i) => {
 };
 
 satSet.onCruncherReady = () => {
-  db.log('satSet.onCruncherReady', true);
   satSet.queryStr = window.location.search.substring(1);
-  // searchBox.init(satData);
-  satSet.satDataString = null; // Clears stringified json file and clears 7MB of memory.
+  // Anything else?
 };
 
 let getIdFromStarName = (starName) => satSet.getIdFromStarName(starName);
@@ -1816,4 +1782,4 @@ let getMissileSatsLen = () => satSet.missileSats;
 let setSat = (i, satObject) => satSet.setSat(i, satObject);
 let getSatPosOnly = (id) => satSet.getSatPosOnly(id);
 
-export { getIdFromSensorName, getIdFromStarName, getMissileSatsLen, getSat, getSatPosOnly, getSatData, getStar, satSet, satCruncher, satScreenPositionArray, setSat };
+export { getIdFromSensorName, getIdFromStarName, getMissileSatsLen, getSat, getSatPosOnly, getSatData, getStar, satSet, satScreenPositionArray, setSat };

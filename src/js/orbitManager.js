@@ -2,9 +2,8 @@
 
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
-import { gl } from '@app/js/main.js';
 import { satSet } from '@app/js/satSet.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 let M = window.M;
 
@@ -28,6 +27,7 @@ var currentInView = [];
 
 var orbitMvMat = glm.mat4.create();
 
+// Webpack will place this IN ./js not in ./js/webworker like in the source code
 var orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
 
 var initialized = false;
@@ -63,8 +63,9 @@ orbitManager.shader = {
     `,
 };
 
-var cameraManager, groupsManager;
-orbitManager.init = function (cameraManagerRef, groupsManagerRef) {
+var gl, cameraManager, groupsManager;
+orbitManager.init = function (glRef, cameraManagerRef, groupsManagerRef) {
+  gl = glRef;
   cameraManager = cameraManagerRef;
   groupsManager = groupsManagerRef;
 
@@ -89,11 +90,11 @@ orbitManager.init = function (cameraManagerRef, groupsManagerRef) {
 
   selectOrbitBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.DYNAMIC_DRAW);
 
   hoverOrbitBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.DYNAMIC_DRAW);
 
   for (var i = 0; i < satSet.missileSats; i++) {
     glBuffers.push(allocateBuffer());
@@ -101,19 +102,12 @@ orbitManager.init = function (cameraManagerRef, groupsManagerRef) {
   orbitWorker.postMessage({
     isInit: true,
     orbitFadeFactor: settingsManager.orbitFadeFactor,
-    satData: satSet.satDataString,
+    satData: JSON.stringify(satSet.satData),
     numSegs: NUM_SEGS,
   });
   initialized = true;
 
   orbitManager.shader = pathShader;
-
-  // Discard now that we are loaded
-  satSet.satDataString = null;
-  // objectManager.fieldOfViewSet = null;
-
-  // var time = performance.now() - startTime;
-  // console.log('orbitManager init: ' + time + ' ms');
 };
 
 orbitManager.updateOrbitBuffer = function (satId, force, TLE1, TLE2, missile, latList, lonList, altList) {
@@ -307,7 +301,7 @@ orbitManager.draw = function (pMatrix, camMatrix) {
 var allocateBuffer = () => {
   var buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.DYNAMIC_DRAW);
   return buf;
 };
 

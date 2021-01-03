@@ -16,11 +16,11 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 
 import * as $ from 'jquery';
-import { satCruncher, satSet } from '@app/js/satSet.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { objectManager } from '@app/js/objectManager.js';
+import { satSet } from '@app/js/satSet.js';
 import { satellite } from '@app/js/lookangles.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
 
@@ -1055,7 +1055,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
         allSSNSensors.push(sensorList[sensor]);
       }
     }
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
@@ -1105,7 +1105,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
       obsmaxrange: 5556,
       volume: false,
     });
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
@@ -1124,7 +1124,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     natoMWSensors.push(sensorManager.sensorList.CLR);
     natoMWSensors.push(sensorManager.sensorList.FYL);
     natoMWSensors.push(sensorManager.sensorList.THL);
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
@@ -1146,7 +1146,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     rusSensors.push(sensorManager.sensorList.OLE);
     rusSensors.push(sensorManager.sensorList.PEC);
     rusSensors.push(sensorManager.sensorList.PIO);
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
@@ -1163,7 +1163,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     leolabsSensors.push(sensorManager.sensorList.MSR);
     leolabsSensors.push(sensorManager.sensorList.PFISR);
     leolabsSensors.push(sensorManager.sensorList.KSR);
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
@@ -1188,7 +1188,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     mdSensors.push(sensorManager.sensorList.SHA);
     mdSensors.push(sensorManager.sensorList.KCS);
     mdSensors.push(sensorManager.sensorList.SBX);
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
@@ -1207,7 +1207,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
         sensorManager.selectedSensor = sensorList[sensor];
         // Do For All Sensors
         sensorManager.whichRadar = sensorManager.selectedSensor.shortName;
-        satCruncher.postMessage({
+        satSet.satCruncher.postMessage({
           typ: 'offset',
           dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
           setlatlong: true,

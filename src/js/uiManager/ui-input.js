@@ -1,6 +1,7 @@
 import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { RADIUS_OF_EARTH } from '@app/js/constants.js';
+import { mobile } from '@app/js/mobile.js';
 import { sMM } from '@app/js/sideMenuManager.js';
 let M = window.M;
 
@@ -38,12 +39,10 @@ var uiInput = {};
 uiInput.isMouseMoving = false;
 uiInput.mouseSat = -1;
 
-var cameraManager, webGlInit, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, pMatrix, pickColorBuf;
-uiInput.init = (cameraManagerRef, webGlInitRef, mobileRef, objectManagerRef, satelliteRef, satSetRef, lineManagerRef, sensorManagerRef, starManagerRef, ColorSchemeRef, satCruncherRef, earthRef, glRef, uiManagerRef, pMatrixRef, pickColorBufRef) => {
+var cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, dlManager, dotsManager;
+uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lineManagerRef, sensorManagerRef, starManagerRef, ColorSchemeRef, satCruncherRef, earthRef, glRef, uiManagerRef, dlManagerRef, dotsManagerRef) => {
   cameraManager = cameraManagerRef;
-  webGlInit = webGlInitRef;
-  pickColorBuf = pickColorBufRef;
-  mobile = mobileRef;
+  dotsManager = dotsManagerRef;
   objectManager = objectManagerRef;
   satellite = satelliteRef;
   satSet = satSetRef;
@@ -55,7 +54,7 @@ uiInput.init = (cameraManagerRef, webGlInitRef, mobileRef, objectManagerRef, sat
   earth = earthRef;
   gl = glRef;
   uiManager = uiManagerRef;
-  pMatrix = pMatrixRef;
+  dlManager = dlManagerRef;
 
   // 2020 Key listener
   // TODO: Migrate most things from UI to Here
@@ -182,12 +181,12 @@ uiInput.init = (cameraManagerRef, webGlInitRef, mobileRef, objectManagerRef, sat
         $('#canvas-holder').css('overflow', 'hidden');
       }
     }
-    if (!settingsManager.isResizing) {
-      window.setTimeout(function () {
-        settingsManager.isResizing = false;
-        webGlInit();
-      }, 500);
-    }
+    // if (!settingsManager.isResizing) {
+    //   window.setTimeout(function () {
+    //     settingsManager.isResizing = false;
+    //     webGlInit();
+    //   }, 500);
+    // }
     settingsManager.isResizing = true;
   });
 
@@ -351,7 +350,7 @@ uiInput.init = (cameraManagerRef, webGlInitRef, mobileRef, objectManagerRef, sat
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
           if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
-          webGlInit();
+          dlManager.glInit();
         }
       });
       canvasDOM.on('click', function (evt) {
@@ -1209,9 +1208,10 @@ uiInput.init = (cameraManagerRef, webGlInitRef, mobileRef, objectManagerRef, sat
 
 uiInput.getSatIdFromCoord = (x, y) => {
   // NOTE: gl.readPixels is a huge bottleneck
-  gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
-  gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickColorBuf);
-  return ((pickColorBuf[2] << 16) | (pickColorBuf[1] << 8) | pickColorBuf[0]) - 1;
+  gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
+  gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManager.pickReadPixelBuffer);
+  // const id = ((dotsManager.pickReadPixelBuffer[2] << 16) | (dotsManager.pickReadPixelBuffer[1] << 8) | dotsManager.pickReadPixelBuffer[0]) - 1;
+  return ((dotsManager.pickReadPixelBuffer[2] << 16) | (dotsManager.pickReadPixelBuffer[1] << 8) | dotsManager.pickReadPixelBuffer[0]) - 1;
 };
 
 // Raycasting in getEarthScreenPoint would provide a lot of powerful (but slow) options later
@@ -1254,7 +1254,7 @@ var _unProject = (mx, my) => {
   screenVec = [glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
 
   comboPMat = glm.mat4.create();
-  glm.mat4.mul(comboPMat, pMatrix, cameraManager.camMatrix);
+  glm.mat4.mul(comboPMat, dlManager.pMatrix, cameraManager.camMatrix);
   invMat = glm.mat4.create();
   glm.mat4.invert(invMat, comboPMat);
   worldVec = glm.vec4.create();

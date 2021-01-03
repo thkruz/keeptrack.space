@@ -5,7 +5,6 @@
 
 import { controlSiteManager } from '@app/modules/controlSiteManager.js';
 import { launchSiteManager } from '@app/modules/launchSiteManager.js';
-import { satLinkManager } from '@app/modules/satLinkManager.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
 import { stars } from '@app/js/starManager/stars.js';
 
@@ -29,12 +28,6 @@ objectManager.radarDataSet = [];
 objectManager.analSatSet = [];
 objectManager.staticSet = [];
 objectManager.fieldOfViewSet = [];
-
-if (typeof satLinkManager == 'undefined') {
-  objectManager.issatLinkManagerLoaded = false;
-} else {
-  objectManager.issatLinkManagerLoaded = true;
-}
 
 objectManager.init = async () => {
   for (let i = 0; i < settingsManager.maxMissiles; i++) {
@@ -114,8 +107,6 @@ objectManager.init = async () => {
     objectManager.isStarManagerLoaded = false;
     console.log('You do not have the Star Module');
   }
-  // objectManager.starIndex2 = objectManager.staticSet.length - 1;
-
   // Try Loading Sensor Module
   var sensor;
   try {

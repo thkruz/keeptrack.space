@@ -1,296 +1,180 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 
+// eslint-disable-next-line max-classes-per-file
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { SunCalc } from '@app/js/suncalc.js';
-import { mathValue } from '@app/js/helpers.js';
+import * as twgl from 'twgl.js';
+import { RAD2DEG } from '@app/js/constants.js';
+import { SunCalc } from '@app/js/SunCalc/suncalc.js';
 import { satellite } from '@app/js/lookangles.js';
 
-let mvMatrixEmpty = glm.mat4.create();
-let nMatrixEmpty = glm.mat3.create();
-var gl, sun;
+class Moon {
+  static NUM_LAT_SEGS = 32;
+  static NUM_LON_SEGS = 32;
+  static DRAW_RADIUS = 4000;
+  static SCALAR_DISTANCE = 200000;
+  static textureSrc = 'textures/moon-1024.jpg';
+  // static ambientLight = [0.05, 0.05, 0.05];
+  static ambientLight = [0.0025, 0.0025, 0.0025];
 
-let moon = {};
-let NUM_LAT_SEGS = 32;
-let NUM_LON_SEGS = 32;
+  constructor(gl, sun) {
+    // Move to the code the creates the moon?
+    if (settingsManager.enableLimitedUI || settingsManager.isDrawLess) return;
 
-let vertPosBuf, vertNormBuf, texCoordBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
-let vertCount;
-let mvMatrix;
-let nMatrix;
-let moonShader;
-moon.pos = [0, 0, 0];
-moon.shader = {
-  frag: `
-    precision mediump float;
+    // Setup References to World
+    this.gl = gl;
+    this.sun = sun;
 
-    uniform vec3 uLightDirection;
-    varying vec2 vUv;
-    varying vec3 vNormal;
+    // We draw the moon way closer than it actually is because of depthBuffer issues
+    // Each draw loop we will scale the real position so it is consistent
+    this.drawPosition = [0, 0, 0];
 
-    uniform sampler2D uSampler;
-    uniform vec3 uSunPos;
+    // Create these once and reuse them a lot
+    this.mvMatrixEmpty = glm.mat4.create();
+    this.nMatrixEmpty = glm.mat3.create();
 
-    varying float vDist;
+    // Create a gl program from the vert/frag shaders
+    this.programInfo = twgl.createProgramInfo(gl, [Moon.shaders.vert, Moon.shaders.frag]);
 
-    void main(void) {
-        // Moon Position - Sun Position
-        vec3 LightDirection = uSunPos - vec3(0.0,0.0,0.0);
-        LightDirection = normalize(LightDirection);
+    // Create a texture from the moon's texture
+    this.texture = twgl.createTexture(
+      gl,
+      {
+        src: Moon.textureSrc,
+        mag: gl.LINEAR,
+        min: gl.LINEAR,
+        wrapS: gl.REPEAT,
+      },
+      () => {
+        this.loaded = true;
+      }
+    );
 
-        float diffuse = max(dot(vNormal, LightDirection), 0.0);
-        vec3 ambientLight = vec3(0.05,0.05,0.05);
-
-        vec3 litTexColor = texture2D(uSampler, vUv).rgb * (ambientLight + diffuse * 1.5);
-
-        if (vDist > 1.0) {
-        discard;
-        // litTexColor = vec3(1.0,0.0,0.0);
-        }
-
-        gl_FragColor = vec4(litTexColor, 1.0);
-    }
-    `,
-  vert: `
-    attribute vec3 aVertexPosition;
-
-    attribute vec2 aTexCoord;
-    attribute vec3 aVertexNormal;
-
-    uniform mat4 uPMatrix;
-    uniform mat4 uCamMatrix;
-    uniform mat4 uMvMatrix;
-    uniform mat3 uNormalMatrix;
-    uniform float uMoonDis;
-
-    varying vec2 vUv;
-    varying vec3 vNormal;
-    varying float vDist;
-
-    void main(void) {
-        vec4 position = uMvMatrix * vec4(aVertexPosition, 1.0);
-        gl_Position = uPMatrix * uCamMatrix * position;
-        vDist = distance(position.xyz,vec3(0.0,0.0,0.0)) \/ uMoonDis;
-        vUv = aTexCoord;
-
-        vNormal = uNormalMatrix * aVertexNormal;
-    }
-    `,
-};
-
-var texture;
-var texLoaded = false;
-
-var onImageLoaded = () => {
-  if (texLoaded) {
-    moon.loaded = true;
-  }
-};
-
-moon.getXYZ = () => {
-  // sun.sunvar.gmst and sun.now get calculated before the moon on each draw loop
-  // reusing them speeds up the draw loop
-
-  moon.moonPos = SunCalc.getMoonPosition(sun.now, 0, 0);
-  moon.position = satellite.ecfToEci(satellite.lookAnglesToEcf(180 + moon.moonPos.azimuth * mathValue.RAD2DEG, moon.moonPos.altitude * mathValue.RAD2DEG, moon.moonPos.distance, 0, 0, 0), sun.sunvar.gmst);
-
-  return {
-    x: moon.position.x,
-    y: moon.position.y,
-    z: moon.position.z,
-  };
-};
-
-moon.init = async (glRef, sunRef) => {
-  if (settingsManager.enableLimitedUI || settingsManager.isDrawLess) return;
-  gl = glRef;
-  sun = sunRef;
-  let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-  gl.shaderSource(fragShader, moon.shader.frag);
-  gl.compileShader(fragShader);
-
-  let vertShader = gl.createShader(gl.VERTEX_SHADER);
-  gl.shaderSource(vertShader, moon.shader.vert);
-  gl.compileShader(vertShader);
-
-  moonShader = gl.createProgram();
-  gl.attachShader(moonShader, vertShader);
-  gl.attachShader(moonShader, fragShader);
-  gl.linkProgram(moonShader);
-
-  moonShader.aVertexPosition = gl.getAttribLocation(moonShader, 'aVertexPosition');
-  moonShader.aTexCoord = gl.getAttribLocation(moonShader, 'aTexCoord');
-  moonShader.aVertexNormal = gl.getAttribLocation(moonShader, 'aVertexNormal');
-  moonShader.uPMatrix = gl.getUniformLocation(moonShader, 'uPMatrix');
-  moonShader.uCamMatrix = gl.getUniformLocation(moonShader, 'uCamMatrix');
-  moonShader.uMvMatrix = gl.getUniformLocation(moonShader, 'uMvMatrix');
-  moonShader.uNormalMatrix = gl.getUniformLocation(moonShader, 'uNormalMatrix');
-  moonShader.uSunPos = gl.getUniformLocation(moonShader, 'uSunPos');
-  moonShader.uMoonDis = gl.getUniformLocation(moonShader, 'uMoonDis');
-  moonShader.uSampler = gl.getUniformLocation(moonShader, 'uSampler');
-
-  texture = gl.createTexture();
-  var img = new Image();
-  img.onload = function () {
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-    // console.log('moon.js loaded texture');
-
-    let moonXYZ = moon.getXYZ();
-    let moonMaxDist = Math.max(Math.max(Math.abs(moonXYZ.x), Math.abs(moonXYZ.y)), Math.abs(moonXYZ.z));
-    moon.pos[0] = (moonXYZ.x / moonMaxDist) * mathValue.MOON_SCALAR_DISTANCE;
-    moon.pos[1] = (moonXYZ.y / moonMaxDist) * mathValue.MOON_SCALAR_DISTANCE;
-    moon.pos[2] = (moonXYZ.z / moonMaxDist) * mathValue.MOON_SCALAR_DISTANCE;
-
-    texLoaded = true;
-    onImageLoaded();
-  };
-  img.src = 'textures/moon-1024.jpg';
-
-  // generate a uvsphere bottom up, CCW order
-  var vertPos = [];
-  var vertNorm = [];
-  var texCoord = [];
-  for (let lat = 0; lat <= NUM_LAT_SEGS; lat++) {
-    var latAngle = (Math.PI / NUM_LAT_SEGS) * lat - Math.PI / 2;
-    var diskRadius = Math.cos(Math.abs(latAngle));
-    var z = Math.sin(latAngle);
-    // console.log('LAT: ' + latAngle * mathValue.RAD2DEG + ' , Z: ' + z);
-    // var i = 0;
-    for (let lon = 0; lon <= NUM_LON_SEGS; lon++) {
-      // add an extra vertex for texture funness
-      var lonAngle = ((Math.PI * 2) / NUM_LON_SEGS) * lon;
-      var x = Math.cos(lonAngle) * diskRadius;
-      var y = Math.sin(lonAngle) * diskRadius;
-      // console.log('i: ' + i + '    LON: ' + lonAngle * mathValue.RAD2DEG + ' X: ' + x + ' Y: ' + y)
-
-      // mercator cylindrical projection (simple angle interpolation)
-      var v = 1 - lat / NUM_LAT_SEGS;
-      var u = 0.5 + lon / NUM_LON_SEGS; // may need to change to move map
-      // console.log('u: ' + u + ' v: ' + v);
-      // normals: should just be a vector from center to point (aka the point itself!
-
-      vertPos.push(x * mathValue.RADIUS_OF_DRAW_MOON);
-      vertPos.push(y * mathValue.RADIUS_OF_DRAW_MOON);
-      vertPos.push(z * mathValue.RADIUS_OF_DRAW_MOON);
-      texCoord.push(u);
-      texCoord.push(v);
-      vertNorm.push(x);
-      vertNorm.push(y);
-      vertNorm.push(z);
-
-      // i++;
-    }
+    // Create buffers from the geomerty
+    this.bufferInfo = twgl.primitives.createSphereBufferInfo(gl, Moon.DRAW_RADIUS, Moon.NUM_LON_SEGS, Moon.NUM_LAT_SEGS);
   }
 
-  // ok let's calculate vertex draw orders.... indiv triangles
-  var vertIndex = [];
-  for (let lat = 0; lat < NUM_LAT_SEGS; lat++) {
-    // this is for each QUAD, not each vertex, so <
-    for (let lon = 0; lon < NUM_LON_SEGS; lon++) {
-      var blVert = lat * (NUM_LON_SEGS + 1) + lon; // there's NUM_LON_SEGS + 1 verts in each horizontal band
-      var brVert = blVert + 1;
-      var tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;
-      var trVert = tlVert + 1;
-      // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
-      vertIndex.push(blVert);
-      vertIndex.push(brVert);
-      vertIndex.push(tlVert);
+  updateUniforms(pMatrix, camMatrix) {
+    this.mvMatrix = glm.mat4.create();
+    this.nMatrix = glm.mat3.create();
+    glm.mat4.identity(this.mvMatrix);
+    glm.mat4.translate(this.mvMatrix, this.mvMatrix, this.drawPosition);
+    glm.mat3.normalFromMat4(this.nMatrix, this.mvMatrix);
 
-      vertIndex.push(tlVert);
-      vertIndex.push(trVert);
-      vertIndex.push(brVert);
-    }
+    this.uniforms = {
+      u_nMatrix: this.nMatrix,
+      u_mvMatrix: this.mvMatrix,
+      u_pMatrix: pMatrix,
+      u_camMatrix: camMatrix,
+      u_sunPos: this.sun.pos2,
+      u_drawPosition: Math.sqrt(this.drawPosition[0] ** 2 + this.drawPosition[1] ** 2 + this.drawPosition[2] ** 2),
+      u_ambientLight: Moon.ambientLight,
+      u_sampler: this.texture,
+    };
   }
-  vertCount = vertIndex.length;
 
-  vertPosBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertPos), gl.STATIC_DRAW);
+  draw(pMatrix, camMatrix) {
+    // Move this to the draw loop?
+    if (!this.loaded) return;
+    const gl = this.gl;
 
-  vertNormBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertNorm), gl.STATIC_DRAW);
+    this.updatePosition(this.sun);
+    this.updateUniforms(pMatrix, camMatrix);
 
-  texCoordBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoord), gl.STATIC_DRAW);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-  vertIndexBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
-};
+    gl.useProgram(this.programInfo.program);
+    twgl.setBuffersAndAttributes(gl, this.programInfo, this.bufferInfo);
+    twgl.setUniforms(this.programInfo, this.uniforms);
+    twgl.drawBufferInfo(gl, this.bufferInfo);
 
-moon.draw = function (pMatrix, camMatrix) {
-  if (!moon.loaded) return;
-  // Switch Vertex Array Objects
-  // gl.bindVertexArray(moon.vao);
+    // gl.disableVertexAttribArray(this.programInfo.program.aTexCoord);
+    // gl.disableVertexAttribArray(this.programInfo.program.aVertexPosition);
+    // gl.disableVertexAttribArray(this.programInfo.program.aVertexNormal);
 
-  // Needed because geocentric earth
-  moon.moonPos = SunCalc.getMoonPosition(sun.now, 0, 0);
-  moon.position = satellite.ecfToEci(satellite.lookAnglesToEcf(180 + moon.moonPos.azimuth * mathValue.RAD2DEG, moon.moonPos.altitude * mathValue.RAD2DEG, moon.moonPos.distance, 0, 0, 0), sun.sunvar.gmst);
+    // Done Drawing
+    return true;
+  }
 
-  moon.moonXYZ = {
-    x: moon.position.x,
-    y: moon.position.y,
-    z: moon.position.z,
+  updatePosition(sun) {
+    // Calculate RAE
+    this.rae = SunCalc.getMoonPosition(sun.now, 0, 0);
+
+    // RAE2ECF and then ECF2ECI
+    this.position = satellite.ecfToEci(satellite.lookAnglesToEcf(180 + this.rae.azimuth * RAD2DEG, this.rae.altitude * RAD2DEG, this.rae.distance, 0, 0, 0), sun.sunvar.gmst);
+
+    const scaleFactor = Moon.SCALAR_DISTANCE / Math.max(Math.max(Math.abs(this.position.x), Math.abs(this.position.y)), Math.abs(this.position.z));
+    this.drawPosition[0] = this.position.x * scaleFactor;
+    this.drawPosition[1] = this.position.y * scaleFactor;
+    this.drawPosition[2] = this.position.z * scaleFactor;
+  }
+
+  static shaders = {
+    frag: `
+      #ifdef GL_FRAGMENT_PRECISION_HIGH
+        precision highp float;
+      #else
+        precision mediump float;
+      #endif
+  
+      uniform vec3 u_ambientLight;
+      uniform sampler2D u_sampler;
+      uniform vec3 u_sunPos;
+
+      varying vec2 v_texcoord;
+      varying vec3 v_normal;
+      varying float v_dist;
+  
+      void main(void) {
+          // Sun is shining opposite of its direction from the center of the earth
+          vec3 lightDirection = u_sunPos - vec3(0.0,0.0,0.0);
+
+          // Normalize this to a max of 1.0
+          lightDirection = normalize(lightDirection);
+  
+          // Smooth the light across the sphere
+          float lightFromSun = max(dot(v_normal, lightDirection), 0.0)  * 1.0;
+          
+          // Calculate the color by merging the texture with the light
+          vec3 litTexColor = texture2D(u_sampler, v_texcoord).rgb * (u_ambientLight + lightFromSun);
+  
+          // Don't draw the back of the sphere
+          if (v_dist > 1.0) {
+            discard;
+          }
+  
+          gl_FragColor = vec4(litTexColor, 1.0);
+      }
+      `,
+    vert: `
+      uniform mat4 u_pMatrix;
+      uniform mat4 u_camMatrix;
+      uniform mat4 u_mvMatrix;
+      uniform mat3 u_nMatrix;
+      uniform float u_drawPosition;
+      
+      attribute vec3 position;
+      attribute vec2 texcoord;
+      attribute vec3 normal;
+    
+      varying vec2 v_texcoord;
+      varying vec3 v_normal;
+      varying float v_dist;
+  
+      void main(void) {
+          vec4 position = u_mvMatrix * vec4(position, 1.0);
+          gl_Position = u_pMatrix * u_camMatrix * position;
+
+          // Ratio of the vertex distance compared to the center of the sphere
+          // This lets us figure out which verticies are on the back half
+          v_dist = distance(position.xyz,vec3(0.0,0.0,0.0)) \/ u_drawPosition;
+          
+          v_texcoord = texcoord;
+          v_normal = u_nMatrix * normal;
+      }
+      `,
   };
+}
 
-  moon.moonMaxDist = Math.max(Math.max(Math.abs(moon.moonXYZ.x), Math.abs(moon.moonXYZ.y)), Math.abs(moon.moonXYZ.z));
-  moon.pos[0] = (moon.moonXYZ.x / moon.moonMaxDist) * mathValue.MOON_SCALAR_DISTANCE;
-  moon.pos[1] = (moon.moonXYZ.y / moon.moonMaxDist) * mathValue.MOON_SCALAR_DISTANCE;
-  moon.pos[2] = (moon.moonXYZ.z / moon.moonMaxDist) * mathValue.MOON_SCALAR_DISTANCE;
-
-  mvMatrix = mvMatrixEmpty;
-  glm.mat4.identity(mvMatrix);
-  glm.mat4.translate(mvMatrix, mvMatrix, moon.pos);
-
-  nMatrix = nMatrixEmpty;
-  glm.mat3.normalFromMat4(nMatrix, mvMatrix);
-
-  // gl.enable(gl.CULL_FACE);
-
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-  gl.useProgram(moonShader);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-  gl.uniformMatrix3fv(moonShader.uNormalMatrix, false, nMatrix);
-  gl.uniformMatrix4fv(moonShader.uMvMatrix, false, mvMatrix);
-  gl.uniformMatrix4fv(moonShader.uPMatrix, false, pMatrix);
-  gl.uniformMatrix4fv(moonShader.uCamMatrix, false, camMatrix);
-  gl.uniform3fv(moonShader.uSunPos, sun.pos2);
-  gl.uniform1f(moonShader.uMoonDis, Math.sqrt(moon.pos[0] ** 2 + moon.pos[1] ** 2 + moon.pos[2] ** 2));
-
-  gl.uniform1i(moonShader.uSampler, 0); // point sampler to TEXTURE0
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, texture); // bind texture to TEXTURE0
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
-  gl.enableVertexAttribArray(moonShader.aTexCoord);
-  gl.vertexAttribPointer(moonShader.aTexCoord, 2, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
-  gl.enableVertexAttribArray(moonShader.aVertexPosition);
-  gl.vertexAttribPointer(moonShader.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
-  gl.enableVertexAttribArray(moonShader.aVertexNormal);
-  gl.vertexAttribPointer(moonShader.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
-  gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
-
-  gl.disableVertexAttribArray(moonShader.aTexCoord);
-  gl.disableVertexAttribArray(moonShader.aVertexPosition);
-  gl.disableVertexAttribArray(moonShader.aVertexNormal);
-
-  // gl.disable(gl.CULL_FACE);
-
-  // Done Drawing
-  return true;
-};
-export { moon };
+export { Moon };

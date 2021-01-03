@@ -2,7 +2,7 @@
 
 import * as $ from 'jquery';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 
 var hoverSatId = -1;
 var searchBox = {};
@@ -44,7 +44,7 @@ searchBox.hideResults = function () {
 
   settingsManager.lastSearch = '';
   settingsManager.lastSearchResults = [];
-  satSet.setupStarBuffer();
+  dotsManager.updateSizeBuffer(satSet.satData);
 
   if (settingsManager.currentColorScheme === ColorScheme.group) {
     satSet.setColorScheme(ColorScheme.default, true);
@@ -70,7 +70,7 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
   if (searchString.length === 0) {
     settingsManager.lastSearch = '';
     settingsManager.lastSearchResults = [];
-    satSet.setupStarBuffer();
+    dotsManager.updateSizeBuffer(satSet.satData);
     $('#search').val('');
     searchBox.hideResults();
     return;
@@ -202,7 +202,7 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
 
   settingsManager.lastSearchResults = idList;
 
-  satSet.setupStarBuffer();
+  dotsManager.updateSizeBuffer(satSet.satData);
 
   var dispGroup = groupsManager.createGroup('idList', idList);
   lastResultGroup = dispGroup;
@@ -274,12 +274,13 @@ searchBox.fillResultBox = function (results) {
   satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 };
 
-var satSet, groupsManager, orbitManager;
-searchBox.init = function (satSetRef, groupsManagerRef, orbitManagerRef) {
+var satSet, groupsManager, orbitManager, dotsManager;
+searchBox.init = function (satSetRef, groupsManagerRef, orbitManagerRef, dotsManagerRef) {
   if (settingsManager.disableUI) return;
   satSet = satSetRef;
   groupsManager = groupsManagerRef;
   orbitManager = orbitManagerRef;
+  dotsManager = dotsManagerRef;
 };
 
 export { searchBox };

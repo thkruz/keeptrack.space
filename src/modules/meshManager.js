@@ -294,12 +294,11 @@ meshManager.updatePosition = (pos) => {
 
     // Assign vertex buffer
     gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.vertexBuffer);
+    // Enable attributes
+    meshManager.shaderProgram.enableVertexAttribArrays(model);
 
     // Update Buffers
     meshManager.shaderProgram.applyAttributePointers(model);
-
-    // Enable attributes
-    meshManager.shaderProgram.enableVertexAttribArrays(model);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, model.mesh.indexBuffer);
     gl.drawElements(gl.TRIANGLES, model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);

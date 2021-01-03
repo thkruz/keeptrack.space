@@ -181,12 +181,6 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         $('#canvas-holder').css('overflow', 'hidden');
       }
     }
-    // if (!settingsManager.isResizing) {
-    //   window.setTimeout(function () {
-    //     settingsManager.isResizing = false;
-    //     webGlInit();
-    //   }, 500);
-    // }
     settingsManager.isResizing = true;
   });
 

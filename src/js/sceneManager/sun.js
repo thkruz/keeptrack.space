@@ -2,15 +2,17 @@
 /* eslint-disable no-useless-escape */
 
 import * as glm from '@app/js/lib/gl-matrix.js';
+import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/constants.js';
 import { A } from '@app/js/lib/meuusjs.js';
-import { mathValue } from '@app/js/helpers.js';
 import { satellite } from '@app/js/lookangles.js';
 import { timeManager } from '@app/js/timeManager.js';
 
 let mvMatrixEmpty = glm.mat4.create();
 let nMatrixEmpty = glm.mat3.create();
-let NUM_LAT_SEGS = 64;
-let NUM_LON_SEGS = 64;
+const NUM_LAT_SEGS = 64;
+const NUM_LON_SEGS = 64;
+const RADIUS_OF_DRAW_SUN = 9000;
+const SUN_SCALAR_DISTANCE = 250000;
 var gl, earth;
 
 let vertPosBuf, vertNormBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
@@ -73,7 +75,7 @@ sun.shader = {
         vec4 position0 = uCamMatrix * uMvMatrix * vec4(vec3(0.0,0.0,0.0), 1.0);
         vec4 position1 = uCamMatrix * position;
         gl_Position = uPMatrix * position1;
-        vDist = distance(position0.xz,position1.xz) \/ ${mathValue.RADIUS_OF_DRAW_SUN}.0;
+        vDist = distance(position0.xz,position1.xz) \/ ${RADIUS_OF_DRAW_SUN}.0;
         vDist2 = distance(position.xyz,vec3(0.0,0.0,0.0)) \/ uSunDis;
         vNormal = uNormalMatrix * aVertexNormal;
     }`,
@@ -117,14 +119,14 @@ sun.init = async (glRef, earthRef) => {
     var latAngle = (Math.PI / NUM_LAT_SEGS) * lat - Math.PI / 2;
     var diskRadius = Math.cos(Math.abs(latAngle));
     var z = Math.sin(latAngle);
-    // console.log('LAT: ' + latAngle * mathValue.RAD2DEG + ' , Z: ' + z);
+    // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
     // var i = 0;
     for (let lon = 0; lon <= NUM_LON_SEGS; lon++) {
       // add an extra vertex for texture funness
       var lonAngle = ((Math.PI * 2) / NUM_LON_SEGS) * lon;
       var x = Math.cos(lonAngle) * diskRadius;
       var y = Math.sin(lonAngle) * diskRadius;
-      // console.log('i: ' + i + '    LON: ' + lonAngle * mathValue.RAD2DEG + ' X: ' + x + ' Y: ' + y)
+      // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
 
       // mercator cylindrical projection (simple angle interpolation)
       var v = 1 - lat / NUM_LAT_SEGS;
@@ -132,9 +134,9 @@ sun.init = async (glRef, earthRef) => {
       // console.log('u: ' + u + ' v: ' + v);
       // normals: should just be a vector from center to point (aka the point itself!
 
-      vertPos.push(x * mathValue.RADIUS_OF_DRAW_SUN);
-      vertPos.push(y * mathValue.RADIUS_OF_DRAW_SUN);
-      vertPos.push(z * mathValue.RADIUS_OF_DRAW_SUN);
+      vertPos.push(x * RADIUS_OF_DRAW_SUN);
+      vertPos.push(y * RADIUS_OF_DRAW_SUN);
+      vertPos.push(z * RADIUS_OF_DRAW_SUN);
       texCoord.push(u);
       texCoord.push(v);
       vertNorm.push(x);
@@ -203,15 +205,15 @@ sun.draw = function (pMatrix, camMatrix) {
     sun.now.getUTCMinutes(),
     sun.now.getUTCSeconds()
   );
-  sun.sunvar.j += sun.now.getUTCMilliseconds() * mathValue.MILLISECONDS_PER_DAY;
+  sun.sunvar.j += sun.now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
   sun.sunvar.gmst = satellite.gstime(sun.sunvar.j);
   sun.sunvar.jdo = new A.JulianDay(sun.sunvar.j); // now
   sun.sunvar.coord = A.EclCoord.fromWgs84(0, 0, 0);
 
   // AZ / EL Calculation
   sun.sunvar.tp = A.Solar.topocentricPosition(sun.sunvar.jdo, sun.sunvar.coord, false);
-  sun.sunvar.azimuth = sun.sunvar.tp.hz.az * mathValue.RAD2DEG + (180 % 360);
-  sun.sunvar.elevation = (sun.sunvar.tp.hz.alt * mathValue.RAD2DEG) % 360;
+  sun.sunvar.azimuth = sun.sunvar.tp.hz.az * RAD2DEG + (180 % 360);
+  sun.sunvar.elevation = (sun.sunvar.tp.hz.alt * RAD2DEG) % 360;
 
   // Range Calculation
   var T = new A.JulianDay(A.JulianDay.dateToJD(sun.now)).jdJ2000Century();
@@ -227,9 +229,9 @@ sun.draw = function (pMatrix, camMatrix) {
   // #### sun.getXYZ ###
 
   sunMaxDist = Math.max(Math.max(Math.abs(sun.realXyz.x), Math.abs(sun.realXyz.y)), Math.abs(sun.realXyz.z));
-  sun.pos[0] = (sun.realXyz.x / sunMaxDist) * mathValue.SUN_SCALAR_DISTANCE;
-  sun.pos[1] = (sun.realXyz.y / sunMaxDist) * mathValue.SUN_SCALAR_DISTANCE;
-  sun.pos[2] = (sun.realXyz.z / sunMaxDist) * mathValue.SUN_SCALAR_DISTANCE;
+  sun.pos[0] = (sun.realXyz.x / sunMaxDist) * SUN_SCALAR_DISTANCE;
+  sun.pos[1] = (sun.realXyz.y / sunMaxDist) * SUN_SCALAR_DISTANCE;
+  sun.pos[2] = (sun.realXyz.z / sunMaxDist) * SUN_SCALAR_DISTANCE;
   sun.pos2[0] = sun.pos[0] * 100;
   sun.pos2[1] = sun.pos[1] * 100;
   sun.pos2[2] = sun.pos[2] * 100;

@@ -1086,6 +1086,9 @@ satSet.getSat = (i) => {
   db.log('satSet.getSat', true);
   if (!satData) return null;
   if (!satData[i]) return null;
+
+  if (!satData[i].type == 'Star') return;
+
   if (gotExtraData) {
     satData[i].inViewChange = false;
     if (typeof dotManager.inViewData != 'undefined' && typeof dotManager.inViewData[i] != 'undefined') {
@@ -1717,6 +1720,7 @@ satSet.exportTle2Txt = () => {
 
 satSet.setHover = (i) => {
   if (i === objectManager.hoveringSat) return;
+  settingsManager.currentColorScheme.hoverSat = objectManager.hoveringSat;
   gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
@@ -1732,7 +1736,7 @@ satSet.setHover = (i) => {
 };
 
 satSet.selectSat = (i) => {
-  if (i === objectManager.selectedSat) return;
+  if (i === objectManager.lastSelectedSat()) return;
   if (uiManager.isAnalysisMenuOpen && i != -1) {
     $('#anal-sat').val(satSet.getSat(i).SCC_NUM);
   }
@@ -1742,16 +1746,15 @@ satSet.selectSat = (i) => {
   });
   if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
 
-  if (typeof meshManager !== 'undefined') {
-    gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
-    // If Old Select Sat Picked Color it Correct Color
-    if (objectManager.selectedSat !== -1) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.selectedSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.selectedSat)).color));
-    }
-    // If New Select Sat Picked Color it
-    if (i !== -1) {
-      gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
-    }
+  settingsManager.currentColorScheme.selectSat = objectManager.selectedSat;
+  gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
+  // If Old Select Sat Picked Color it Correct Color
+  if (objectManager.lastSelectedSat() !== -1) {
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lastSelectedSat() * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.lastSelectedSat())).color));
+  }
+  // If New Select Sat Picked Color it
+  if (i !== -1) {
+    gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
   }
 
   objectManager.setSelectedSat(i);

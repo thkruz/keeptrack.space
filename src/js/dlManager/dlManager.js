@@ -132,6 +132,7 @@ dlManager.glInit = async (mobile) => {
   gl.viewport(0, 0, can.width, can.height);
 
   gl.enable(gl.DEPTH_TEST);
+  // gl.enable(gl.SAMPLE_COVERAGE);
 
   dlManager.pMatrix = glm.mat4.create();
   glm.mat4.perspective(dlManager.pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);

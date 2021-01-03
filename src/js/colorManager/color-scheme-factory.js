@@ -9,14 +9,7 @@
 // ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 // FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-// eslint-disable-next-line max-classes-per-file
-import * as $ from 'jquery';
-import { ColorScheme } from './color-scheme/color-scheme.js';
-
-/**
- * @todo Remove DOM Modifcations from this.lostobjects
- * @body There should be no references to the UI in this code - move it to whoever calls the lost objects coloring
- */
+import { ColorScheme } from './color-scheme.js';
 
 class ColorSchemeFactory {
   static objectTypeFlags = {};
@@ -603,7 +596,7 @@ class ColorSchemeFactory {
       if (sat.TLE1.substr(18, 2) === now) {
         daysold = jday - sat.TLE1.substr(20, 3);
       } else {
-        daysold = jday - sat.TLE1.substr(20, 3) + sat.TLE1.substr(17, 2) * 365;
+        daysold = jday + parseInt(now) * 365 - (parseInt(sat.TLE1.substr(18, 2)) * 365 + parseInt(sat.TLE1.substr(20, 3)));
       }
 
       if (daysold < 3 && ColorSchemeFactory.objectTypeFlags.ageNew) {
@@ -703,11 +696,9 @@ class ColorSchemeFactory {
           pickable: false,
         };
       } else {
-        if ($('#search').val() === '') {
-          $('#search').val($('#search').val() + sat.SCC_NUM);
-        } else {
-          $('#search').val($('#search').val() + ',' + sat.SCC_NUM);
-        }
+        this.searchBox = document.querySelector('#search');
+        // Add the satellite number and if it isn't the first satellite then prepend a comma
+        this.searchBox += this.searchBox === '' ? sat.SCC_NUM : `,${sat.SCC_NUM}`;
         return {
           color: ColorSchemeFactory.colorTheme.lostobjects,
           pickable: true,

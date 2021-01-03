@@ -113,4 +113,7 @@ jQAlt.docReady(async function initalizeKeepTrack() {
 
   // Now that everything is loaded, start rendering to thg canvas
   dlManager.drawLoop();
+
+  // Reveleal Key Components to the Console
+  window.satSet = satSet;
 });

@@ -418,7 +418,7 @@ selectSatManager.selectSat = (satId, cameraManager) => {
       if (satSet.getSat(satId).TLE1.substr(18, 2) === now) {
         daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3);
       } else {
-        daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3) + satSet.getSat(satId).TLE1.substr(17, 2) * 365;
+        daysold = jday + parseInt(now) * 365 - (parseInt(satSet.getSat(satId).TLE1.substr(18, 2)) * 365 + parseInt(satSet.getSat(satId).TLE1.substr(20, 3)));
       }
       $('#sat-elset-age').html(daysold + ' Days');
       $('#sat-elset-age').tooltip({

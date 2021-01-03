@@ -5,7 +5,7 @@
  * interaction with the application.
  * http://keeptrack.space
  *
- * Copyright (C) 2016-2020 Theodore Kruczek
+ * Copyright (C) 2016-2021 Theodore Kruczek
  * Copyright (C) 2020 Heather Kruczek
  * Copyright (C) 2015-2016, James Yoder
  *
@@ -23,13 +23,6 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-/**
- * @todo Remove jQuery
- * @body Removing as Many jQuery references as possible will make testing easier REF: https://tobiasahlin.com/blog/move-from-jquery-to-vanilla-javascript/
- */
-
-import * as $ from 'jquery';
-// eslint-disable-next-line sort-imports
 import 'jquery-ui-bundle';
 import '@app/js/keeptrack-foot.js';
 import 'materialize-css';
@@ -41,6 +34,7 @@ import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-sc
 import { Dots } from './dots';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
 import { dlManager } from '@app/js/dlManager/dlManager.js';
+import { jQAlt } from '@app/js/jqalt/jqalt.js';
 import { meshManager } from '@app/modules/meshManager.js';
 import { mobile } from '@app/js/mobile.js';
 import { objectManager } from '@app/js/objectManager.js';
@@ -55,19 +49,14 @@ import { settingsManager } from '@app/js/keeptrack-head.js';
 import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 
-// Common Variables
-var gl, lineManager, groupsManager;
-var cameraManager, dotsManager;
-// EVERYTHING SHOULD START HERE
-$(document).ready(async function initalizeKeepTrack() {
-  timeManager.propRealTime = Date.now(); // assumed same as value in Worker, not passing
-  // A lot of things rely on a satellite catalog
-  await mobile.checkMobileMode();
-  gl = await dlManager.glInit(mobile);
+jQAlt.docReady(async function initalizeKeepTrack() {
+  timeManager.propRealTime = Date.now();
   settingsManager.loadStr('dots');
-  cameraManager = new Camera();
-  dotsManager = new Dots(gl);
-  satSet.init(dotsManager);
+  await mobile.checkMobileMode();
+  const cameraManager = new Camera();
+  const gl = await dlManager.glInit(mobile);
+  const dotsManager = new Dots(gl);
+  satSet.init(gl, dotsManager, cameraManager);
   objectManager.init(dotsManager);
   await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
   selectSatManager.init(ColorScheme.group);
@@ -84,10 +73,10 @@ $(document).ready(async function initalizeKeepTrack() {
   await sun.init(gl, earth);
   let moon = new Moon(gl, sun);
 
-  groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
-  await orbitManager.init(cameraManager, groupsManager);
+  const groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
+  await orbitManager.init(gl, cameraManager, groupsManager);
   searchBox.init(satSet, groupsManager, orbitManager, dotsManager);
-  lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
+  const lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
   satLinkManager.init(lineManager, satSet, sensorManager);
   starManager.init(lineManager, getIdFromStarName);
   uiManager.init(cameraManager, lineManager, starManager, groupsManager, satSet, orbitManager, groupsManager, ColorScheme);
@@ -125,5 +114,3 @@ $(document).ready(async function initalizeKeepTrack() {
   // Now that everything is loaded, start rendering to thg canvas
   dlManager.drawLoop();
 });
-
-export { gl };

@@ -32,7 +32,6 @@ import { db, settingsManager } from '@app/js/keeptrack-head.js';
 import { helpers, mathValue, saveCsv } from '@app/js/helpers.js';
 import { RAD2DEG } from '@app/js/constants.js';
 import { adviceList } from '@app/js/advice-module.js';
-import { gl } from '@app/js/main.js';
 import { jsTLEfile } from '@app/offline/tle.js';
 import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
 import { objectManager } from '@app/js/objectManager.js';
@@ -49,6 +48,7 @@ import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 // 'use strict';
 var satSet = {};
+var gl;
 
 var satCruncher;
 var limitSats = settingsManager.limitSats;
@@ -127,19 +127,20 @@ var parseFromGETVariables = () => {
 };
 
 var dotManager;
-satSet.init = async (dotManagerRef) => {
+satSet.init = async (glRef, dotManagerRef, cameraManager) => {
+  gl = glRef;
   dotManager = dotManagerRef;
   /** Parses GET variables for Possible sharperShaders */
   parseFromGETVariables();
 
   settingsManager.loadStr('elsets');
   satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
-  addSatCruncherOnMessage();
+  addSatCruncherOnMessage(cameraManager);
 
   satSet.satCruncher = satCruncher;
 };
 
-var addSatCruncherOnMessage = () => {
+var addSatCruncherOnMessage = (cameraManager) => {
   satCruncher.onmessage = (m) => {
     if (!gotExtraData) {
       // store extra data that comes from crunching

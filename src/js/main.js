@@ -33,7 +33,6 @@ import * as $ from 'jquery';
 import 'jquery-ui-bundle';
 import '@app/js/keeptrack-foot.js';
 import 'materialize-css';
-import * as glm from '@app/js/lib/gl-matrix.js';
 import { Atmosphere, LineFactory, Moon, earth, sun } from '@app/js/sceneManager/sceneManager.js';
 import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satSet } from '@app/js/satSet.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
@@ -58,15 +57,13 @@ import { timeManager } from '@app/js/timeManager.js';
 
 // Common Variables
 var gl, lineManager, groupsManager;
-var pMatrix = glm.mat4.create();
-
 var cameraManager, dotsManager;
 // EVERYTHING SHOULD START HERE
 $(document).ready(async function initalizeKeepTrack() {
   timeManager.propRealTime = Date.now(); // assumed same as value in Worker, not passing
   // A lot of things rely on a satellite catalog
   await mobile.checkMobileMode();
-  await webGlInit();
+  gl = await dlManager.glInit(mobile);
   settingsManager.loadStr('dots');
   cameraManager = new Camera();
   dotsManager = new Dots(gl);
@@ -101,31 +98,9 @@ $(document).ready(async function initalizeKeepTrack() {
   satLinkManager.idToSatnum(satSet);
   startWithOrbits();
 
-  uiInput.init(cameraManager, webGlInit, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, pMatrix, dotsManager);
+  uiInput.init(cameraManager, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, dlManager, dotsManager);
 
-  await dlManager.init(
-    uiInput,
-    moon,
-    pMatrix,
-    sun,
-    searchBox,
-    atmosphere,
-    starManager,
-    satellite,
-    ColorScheme,
-    cameraManager,
-    objectManager,
-    orbitManager,
-    meshManager,
-    earth,
-    sensorManager,
-    uiManager,
-    lineManager,
-    gl,
-    webGlInit,
-    timeManager,
-    dotsManager
-  );
+  await dlManager.init(uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, timeManager, dotsManager);
   dlManager.drawLoop();
 });
 
@@ -140,100 +115,4 @@ var startWithOrbits = async () => {
   }
 };
 
-/* WebGl Code */
-var webGlInit = async () => {
-  const canvasDOM = $('#keeptrack-canvas');
-  const can = canvasDOM[0];
-  const dpi = typeof settingsManager.dpi != 'undefined' ? settingsManager.dpi : window.devicePixelRatio;
-  settingsManager.dpi = dpi;
-
-  // Using minimum allows the canvas to be full screen without fighting with scrollbars
-  let cw = document.documentElement.clientWidth || 0;
-  let iw = window.innerWidth || 0;
-  let vw = Math.min.apply(null, [cw, iw].filter(Boolean));
-  let vh = Math.min(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-
-  // If taking a screenshot then resize no matter what to get high resolution
-  if (settingsManager.screenshotMode) {
-    can.width = settingsManager.hiResWidth;
-    can.height = settingsManager.hiResHeight;
-  } else {
-    // If not autoresizing then don't do anything to the canvas
-    if (settingsManager.isAutoResizeCanvas) {
-      // If this is a cellphone avoid the keyboard forcing resizes but
-      // always resize on rotation
-      if (settingsManager.isMobileModeEnabled) {
-        // Changes more than 35% of height but not due to rotation are likely
-        // the keyboard! Ignore them
-        if ((((vw - can.width) / can.width) * 100 < 1 && ((vh - can.height) / can.height) * 100 < 1) || mobile.isRotationEvent || mobile.forceResize) {
-          can.width = vw;
-          can.height = vh;
-          mobile.forceResize = false;
-          mobile.isRotationEvent = false;
-        }
-      } else {
-        can.width = vw;
-        can.height = vh;
-      }
-    }
-  }
-
-  if (settingsManager.satShader.isUseDynamicSizing) {
-    settingsManager.satShader.dynamicSize = (1920 / can.width) * settingsManager.satShader.dynamicSizeScalar * settingsManager.dpi;
-    settingsManager.satShader.minSize = Math.max(settingsManager.satShader.minSize, settingsManager.satShader.dynamicSize);
-  }
-
-  if (!settingsManager.disableUI) {
-    gl =
-      can.getContext('webgl', {
-        alpha: false,
-        premultipliedAlpha: false,
-        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
-        antialias: true,
-        powerPreference: 'high-performance',
-        preserveDrawingBuffer: true,
-        stencil: false,
-      }) || // Or...
-      can.getContext('experimental-webgl', {
-        alpha: false,
-        premultipliedAlpha: false,
-        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
-        antialias: true,
-        powerPreference: 'high-performance',
-        preserveDrawingBuffer: true,
-        stencil: false,
-      });
-  } else {
-    gl =
-      can.getContext('webgl', {
-        alpha: false,
-        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
-      }) || // Or...
-      can.getContext('experimental-webgl', {
-        alpha: false,
-        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
-      });
-  }
-  if (!gl) {
-    $('#canvas-holder').hide();
-    $('#no-webgl').css('display', 'block');
-  }
-
-  gl.getExtension('EXT_frag_depth');
-  gl.getExtension('OES_vertex_array_object');
-
-  gl.viewport(0, 0, can.width, can.height);
-
-  gl.enable(gl.DEPTH_TEST);
-
-  pMatrix = glm.mat4.create();
-  glm.mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
-
-  // This converts everything from 3D space to ECI (z and y planes are swapped)
-  const eciToOpenGlMat = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
-  glm.mat4.mul(pMatrix, pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
-
-  window.gl = gl;
-};
-
-export { gl, webGlInit };
+export { gl };

@@ -1,7 +1,7 @@
 /* */
 
+import { RAD2DEG } from '@app/js/constants.js';
 import { controlSiteManager } from '@app/modules/controlSiteManager.js';
-import { mathValue } from '@app/js/helpers.js';
 
 var satLinkManager = {};
 satLinkManager.aehfUsers = [];
@@ -146,7 +146,7 @@ satLinkManager.showLinks = async function (lineManager, satSet, group) {
               window.numeric.dot([-sat1.position.x, -sat1.position.y, -sat1.position.z], [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z]) /
                 (Math.sqrt(Math.pow(-sat1.position.x, 2) + Math.pow(-sat1.position.y, 2) + Math.pow(-sat1.position.z, 2)) *
                   Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2)))
-            ) * mathValue.RAD2DEG;
+            ) * RAD2DEG;
           if (theta < minTheta) {
             // Intentional
           } else {

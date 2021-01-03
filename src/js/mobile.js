@@ -1,11 +1,8 @@
-/* */
-
-import { db, settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/keeptrack-head.js';
 
 var mobile = {};
 
 mobile.fullscreenToggle = function () {
-  db.log('mobile.fullscreenToggle');
   if ((document.fullScreenElement && document.fullScreenElement !== null) || (!document.mozFullScreen && !document.webkitIsFullScreen)) {
     if (document.documentElement.requestFullScreen) {
       document.documentElement.requestFullScreen();
@@ -26,7 +23,6 @@ mobile.fullscreenToggle = function () {
 };
 
 mobile.checkMobileMode = async () => {
-  db.log('mobile.checkMobileMode');
   if (mobile.checkIfMobileDevice()) {
     mobile.forceResize = true;
     settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;

@@ -23,7 +23,7 @@ or mirrored at any other location without the express written permission of the 
 import '@app/js/lib/numeric.js';
 import * as satellite from '@app/js/lib/satellite.js';
 import { A } from '@app/js/lib/meuusjs.js';
-import { SunCalc } from '@app/js/suncalc.js';
+import { SunCalc } from '@app/js/SunCalc/suncalc.js';
 
 /** CONSTANTS */
 const PI = Math.PI;

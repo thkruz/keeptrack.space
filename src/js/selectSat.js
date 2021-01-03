@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import { SunCalc } from '@app/js/suncalc.js';
+import { SunCalc } from '@app/js/SunCalc/suncalc.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { mathValue } from '@app/js/helpers.js';
 import { objectManager } from '@app/js/objectManager.js';

@@ -38,10 +38,9 @@ var uiInput = {};
 uiInput.isMouseMoving = false;
 uiInput.mouseSat = -1;
 
-var cameraManager, webGlInit, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, pMatrix, dotsManager;
-uiInput.init = (cameraManagerRef, webGlInitRef, mobileRef, objectManagerRef, satelliteRef, satSetRef, lineManagerRef, sensorManagerRef, starManagerRef, ColorSchemeRef, satCruncherRef, earthRef, glRef, uiManagerRef, pMatrixRef, dotsManagerRef) => {
+var cameraManager, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, dlManager, dotsManager;
+uiInput.init = (cameraManagerRef, mobileRef, objectManagerRef, satelliteRef, satSetRef, lineManagerRef, sensorManagerRef, starManagerRef, ColorSchemeRef, satCruncherRef, earthRef, glRef, uiManagerRef, dlManagerRef, dotsManagerRef) => {
   cameraManager = cameraManagerRef;
-  webGlInit = webGlInitRef;
   dotsManager = dotsManagerRef;
   mobile = mobileRef;
   objectManager = objectManagerRef;
@@ -55,7 +54,7 @@ uiInput.init = (cameraManagerRef, webGlInitRef, mobileRef, objectManagerRef, sat
   earth = earthRef;
   gl = glRef;
   uiManager = uiManagerRef;
-  pMatrix = pMatrixRef;
+  dlManager = dlManagerRef;
 
   // 2020 Key listener
   // TODO: Migrate most things from UI to Here
@@ -182,12 +181,12 @@ uiInput.init = (cameraManagerRef, webGlInitRef, mobileRef, objectManagerRef, sat
         $('#canvas-holder').css('overflow', 'hidden');
       }
     }
-    if (!settingsManager.isResizing) {
-      window.setTimeout(function () {
-        settingsManager.isResizing = false;
-        webGlInit();
-      }, 500);
-    }
+    // if (!settingsManager.isResizing) {
+    //   window.setTimeout(function () {
+    //     settingsManager.isResizing = false;
+    //     webGlInit();
+    //   }, 500);
+    // }
     settingsManager.isResizing = true;
   });
 
@@ -351,7 +350,7 @@ uiInput.init = (cameraManagerRef, webGlInitRef, mobileRef, objectManagerRef, sat
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
           if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
-          webGlInit();
+          dlManager.glInit();
         }
       });
       canvasDOM.on('click', function (evt) {
@@ -1255,7 +1254,7 @@ var _unProject = (mx, my) => {
   screenVec = [glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
 
   comboPMat = glm.mat4.create();
-  glm.mat4.mul(comboPMat, pMatrix, cameraManager.camMatrix);
+  glm.mat4.mul(comboPMat, dlManager.pMatrix, cameraManager.camMatrix);
   invMat = glm.mat4.create();
   glm.mat4.invert(invMat, comboPMat);
   worldVec = glm.vec4.create();

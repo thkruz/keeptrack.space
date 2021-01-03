@@ -56,7 +56,6 @@ import { sensorManager } from '@app/modules/sensorManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { uiInput } from './ui-input.js';
 import { uiLimited } from './ui-limited.js';
-import { webGlInit } from '@app/js/main.js';
 let M = window.M;
 
 // Public Variables
@@ -3470,7 +3469,7 @@ $(document).ready(function () {
           cameraManager.panReset = true;
           cameraManager.localRotateReset = true;
           settingsManager.fieldOfView = 0.6;
-          webGlInit();
+          dlManager.glInit();
           uiManager.hideSideMenus();
           orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
           cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
@@ -3506,7 +3505,7 @@ $(document).ready(function () {
           cameraManager.panReset = true;
           cameraManager.localRotateReset = true;
           settingsManager.fieldOfView = 0.6;
-          webGlInit();
+          dlManager.glInit();
           uiManager.hideSideMenus();
           cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
           uiManager.legendMenuChange('default');
@@ -3958,7 +3957,7 @@ uiManager.keyHandler = (evt) => {
         // 7 is a placeholder to reset camera type
         cameraManager.localRotateReset = true;
         settingsManager.fieldOfView = 0.6;
-        webGlInit();
+        dlManager.glInit();
         if (objectManager.selectedSat !== -1) {
           cameraManager.camZoomSnappedOnSat(true);
           curCam = cameraManager.cameraType.fixedToSat;

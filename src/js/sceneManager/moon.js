@@ -5,7 +5,7 @@
 import * as glm from '@app/js/lib/gl-matrix.js';
 import * as twgl from 'twgl.js';
 import { RAD2DEG } from '@app/js/constants.js';
-import { SunCalc } from '@app/js/suncalc.js';
+import { SunCalc } from '@app/js/SunCalc/suncalc.js';
 import { satellite } from '@app/js/lookangles.js';
 
 class Moon {

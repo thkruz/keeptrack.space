@@ -134,7 +134,7 @@ satSet.init = async (glRef, dotManagerRef, cameraManager) => {
   parseFromGETVariables();
 
   settingsManager.loadStr('elsets');
-  satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
+  satCruncher = new Worker(settingsManager.installDirectory + 'js/webworker/positionCruncher.js');
   addSatCruncherOnMessage(cameraManager);
 
   satSet.satCruncher = satCruncher;

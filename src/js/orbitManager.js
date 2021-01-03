@@ -27,7 +27,7 @@ var currentInView = [];
 
 var orbitMvMat = glm.mat4.create();
 
-var orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
+var orbitWorker = new Worker(settingsManager.installDirectory + 'js/webworker/orbitCruncher.js');
 
 var initialized = false;
 

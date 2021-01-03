@@ -98,7 +98,7 @@ $(document).ready(async function initalizeKeepTrack() {
   dotsManager.updateSizeBuffer(satSet.satData);
   await radarDataManager.init(sensorManager, timeManager, satSet, satCruncher, satellite);
   satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
-  satLinkManager.idToSatnum();
+  satLinkManager.idToSatnum(satSet);
   startWithOrbits();
 
   uiInput.init(cameraManager, webGlInit, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, pMatrix, dotsManager);

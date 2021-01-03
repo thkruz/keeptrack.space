@@ -3,18 +3,13 @@
 import { controlSiteManager } from '@app/modules/controlSiteManager.js';
 import { mathValue } from '@app/js/helpers.js';
 
-var lineManager, satSet, sensorManager;
-
 var satLinkManager = {};
 satLinkManager.aehfUsers = [];
 satLinkManager.wgsUsers = [];
 satLinkManager.iridiumUsers = [];
 satLinkManager.starlinkUsers = [];
 satLinkManager.galileoUsers = [];
-satLinkManager.init = (lineManagerRef, satSetRef, sensorManagerRef) => {
-  lineManager = lineManagerRef;
-  satSet = satSetRef;
-  sensorManager = sensorManagerRef;
+satLinkManager.init = (sensorManager) => {
   try {
     for (let controlSite in controlSiteManager.controlSiteList) {
       if (controlSiteManager.controlSiteList[controlSite].linkAehf) {
@@ -55,7 +50,7 @@ satLinkManager.init = (lineManagerRef, satSetRef, sensorManagerRef) => {
     }
   }
 };
-satLinkManager.idToSatnum = () => {
+satLinkManager.idToSatnum = (satSet) => {
   satLinkManager.aehf = satSet.convertSatnumArrayToIdArray(satLinkManager.aehf);
   satLinkManager.dscs = satSet.convertSatnumArrayToIdArray(satLinkManager.dscs);
   satLinkManager.wgs = satSet.convertSatnumArrayToIdArray(satLinkManager.wgs);
@@ -66,7 +61,7 @@ satLinkManager.idToSatnum = () => {
   satLinkManager.starlink = satSet.convertSatnumArrayToIdArray(satLinkManager.starlink);
 };
 
-satLinkManager.showLinks = async function (group) {
+satLinkManager.showLinks = async function (lineManager, satSet, group) {
   let satlist;
   let userlist;
   let minTheta;

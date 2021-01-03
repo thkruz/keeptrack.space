@@ -5057,7 +5057,7 @@ $('#constellation-menu>ul>li').on('click', function () {
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
-        satLinkManager.showLinks('aehf');
+        satLinkManager.showLinks(lineManager, satSet, 'aehf');
         $('#loading-screen').fadeOut('slow');
       });
       break;
@@ -5069,7 +5069,7 @@ $('#constellation-menu>ul>li').on('click', function () {
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
         try {
-          satLinkManager.showLinks('wgs');
+          satLinkManager.showLinks(lineManager, satSet, 'wgs');
         } catch (e) {
           // Maybe the satLinkManager isn't installed?
         }
@@ -5084,7 +5084,7 @@ $('#constellation-menu>ul>li').on('click', function () {
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
         try {
-          satLinkManager.showLinks('starlink');
+          satLinkManager.showLinks(lineManager, satSet, 'starlink');
         } catch (e) {
           // Maybe the satLinkManager isn't installed?
         }
@@ -5099,7 +5099,7 @@ $('#constellation-menu>ul>li').on('click', function () {
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
         try {
-          satLinkManager.showLinks('sbirs');
+          satLinkManager.showLinks(lineManager, satSet, 'sbirs');
         } catch (e) {
           // Maybe the satLinkManager isn't installed?
         }

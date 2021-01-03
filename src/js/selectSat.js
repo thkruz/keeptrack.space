@@ -1,7 +1,7 @@
 import * as $ from 'jquery';
+import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/constants.js';
 import { SunCalc } from '@app/js/SunCalc/suncalc.js';
 import { adviceList } from '@app/js/advice-module.js';
-import { mathValue } from '@app/js/helpers.js';
 import { objectManager } from '@app/js/objectManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
 import { satSet } from '@app/js/satSet.js';
@@ -294,13 +294,13 @@ selectSatManager.selectSat = (satId, cameraManager) => {
       });
       $('#sat-apogee').html(sat.apogee.toFixed(0) + ' km');
       $('#sat-perigee').html(sat.perigee.toFixed(0) + ' km');
-      $('#sat-inclination').html((sat.inclination * mathValue.RAD2DEG).toFixed(2) + '°');
+      $('#sat-inclination').html((sat.inclination * RAD2DEG).toFixed(2) + '°');
       $('#sat-eccentricity').html(sat.eccentricity.toFixed(3));
 
       $('#sat-period').html(sat.period.toFixed(2) + ' min');
       $('#sat-period').tooltip({
         delay: 50,
-        html: 'Mean Motion: ' + mathValue.MINUTES_PER_DAY / sat.period.toFixed(2),
+        html: 'Mean Motion: ' + MINUTES_PER_DAY / sat.period.toFixed(2),
         position: 'left',
       });
 

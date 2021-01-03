@@ -1,5 +1,5 @@
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { mathValue } from '@app/js/helpers.js';
+import { DEG2RAD, MILLISECONDS_PER_DAY, RADIUS_OF_EARTH } from '@app/js/constants.js';
 import { satellite } from '@app/js/lookangles.js';
 import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
@@ -275,14 +275,14 @@ earth.init = async (glRef) => {
     var latAngle = (Math.PI / settingsManager.earthNumLatSegs) * lat - Math.PI / 2;
     var diskRadius = Math.cos(Math.abs(latAngle));
     var z = Math.sin(latAngle);
-    // console.log('LAT: ' + latAngle * mathValue.RAD2DEG + ' , Z: ' + z);
+    // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
     // var i = 0;
     for (let lon = 0; lon <= settingsManager.earthNumLonSegs; lon++) {
       // add an extra vertex for texture funness
       var lonAngle = ((Math.PI * 2) / settingsManager.earthNumLonSegs) * lon;
       var x = Math.cos(lonAngle) * diskRadius;
       var y = Math.sin(lonAngle) * diskRadius;
-      // console.log('i: ' + i + '    LON: ' + lonAngle * mathValue.RAD2DEG + ' X: ' + x + ' Y: ' + y)
+      // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
 
       // mercator cylindrical projection (simple angle interpolation)
       var v = 1 - lat / settingsManager.earthNumLatSegs;
@@ -290,9 +290,9 @@ earth.init = async (glRef) => {
       // console.log('u: ' + u + ' v: ' + v);
       // normals: should just be a vector from center to point (aka the point itself!
 
-      vertPos.push(x * mathValue.RADIUS_OF_EARTH);
-      vertPos.push(y * mathValue.RADIUS_OF_EARTH);
-      vertPos.push(z * mathValue.RADIUS_OF_EARTH);
+      vertPos.push(x * RADIUS_OF_EARTH);
+      vertPos.push(y * RADIUS_OF_EARTH);
+      vertPos.push(z * RADIUS_OF_EARTH);
       texCoord.push(u);
       texCoord.push(v);
       vertNorm.push(x);
@@ -354,7 +354,7 @@ earth.update = () => {
     earthNow.getUTCMinutes(),
     earthNow.getUTCSeconds()
   );
-  earth.earthJ += earthNow.getUTCMilliseconds() * mathValue.MILLISECONDS_PER_DAY;
+  earth.earthJ += earthNow.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
 
   earth.earthEra = satellite.gstime(earth.earthJ);
 
@@ -381,7 +381,7 @@ var updateSunCurrentDirection = function () {
     earth.sunvar.now.getUTCMinutes(),
     earth.sunvar.now.getUTCSeconds()
   );
-  earth.sunvar.jd += earth.sunvar.now.getUTCMilliseconds() * mathValue.MILLISECONDS_PER_DAY;
+  earth.sunvar.jd += earth.sunvar.now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
 
   earth.sunvar.n = earth.sunvar.jd - 2451545;
   earth.sunvar.L = 280.46 + 0.9856474 * earth.sunvar.n; // mean longitude of sun
@@ -389,7 +389,7 @@ var updateSunCurrentDirection = function () {
   earth.sunvar.L = earth.sunvar.L % 360.0;
   earth.sunvar.g = earth.sunvar.g % 360.0;
 
-  earth.sunvar.ecLon = earth.sunvar.L + 1.915 * Math.sin(earth.sunvar.g * mathValue.DEG2RAD) + 0.02 * Math.sin(2 * earth.sunvar.g * mathValue.DEG2RAD);
+  earth.sunvar.ecLon = earth.sunvar.L + 1.915 * Math.sin(earth.sunvar.g * DEG2RAD) + 0.02 * Math.sin(2 * earth.sunvar.g * DEG2RAD);
 
   earth.sunvar.t = (earth.sunvar.jd - 2451545) / 3652500;
 
@@ -408,9 +408,9 @@ var updateSunCurrentDirection = function () {
 
   earth.sunvar.ob = earth.sunvar.obliq / 3600.0;
 
-  earth.lightDirection[0] = Math.cos(earth.sunvar.ecLon * mathValue.DEG2RAD);
-  earth.lightDirection[1] = Math.cos(earth.sunvar.ob * mathValue.DEG2RAD) * Math.sin(earth.sunvar.ecLon * mathValue.DEG2RAD);
-  earth.lightDirection[2] = Math.sin(earth.sunvar.ob * mathValue.DEG2RAD) * Math.sin(earth.sunvar.ecLon * mathValue.DEG2RAD);
+  earth.lightDirection[0] = Math.cos(earth.sunvar.ecLon * DEG2RAD);
+  earth.lightDirection[1] = Math.cos(earth.sunvar.ob * DEG2RAD) * Math.sin(earth.sunvar.ecLon * DEG2RAD);
+  earth.lightDirection[2] = Math.sin(earth.sunvar.ob * DEG2RAD) * Math.sin(earth.sunvar.ecLon * DEG2RAD);
 };
 
 earth.draw = function (pMatrix, camMatrix, dotsManager) {

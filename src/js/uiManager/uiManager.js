@@ -29,8 +29,9 @@ import '@app/js/lib/jquery.colorbox.min.js';
 import '@app/js/lib/jquery-ajax.js';
 import '@app/js/lib/colorPick.js';
 import 'materialize-css';
+import { DEG2RAD, RAD2DEG } from '@app/js/constants.js';
 import { db, settingsManager } from '@app/js/settings.js';
-import { helpers, mathValue, saveAs, saveCsv } from '@app/js/helpers.js';
+import { helpers, saveAs, saveCsv } from '@app/js/helpers.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { CanvasRecorder } from '@app/js/lib/CanvasRecorder.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
@@ -1600,7 +1601,7 @@ $(document).ready(function () {
         let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
         $('#es-scc').val(sat.SCC_NUM);
 
-        var inc = (sat.inclination * mathValue.RAD2DEG).toPrecision(7);
+        var inc = (sat.inclination * RAD2DEG).toPrecision(7);
         inc = inc.split('.');
         inc[0] = inc[0].substr(-3, 3);
         inc[1] = inc[1].substr(0, 4);
@@ -1611,7 +1612,7 @@ $(document).ready(function () {
         $('#es-day').val(sat.TLE1.substr(20, 12));
         $('#es-meanmo').val(sat.TLE2.substr(52, 11));
 
-        var rasc = (sat.raan * mathValue.RAD2DEG).toPrecision(7);
+        var rasc = (sat.raan * RAD2DEG).toPrecision(7);
         rasc = rasc.split('.');
         rasc[0] = rasc[0].substr(-3, 3);
         rasc[1] = rasc[1].substr(0, 4);
@@ -1620,7 +1621,7 @@ $(document).ready(function () {
         $('#es-rasc').val(helpers.pad0(rasc, 8));
         $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
 
-        var argPe = (sat.argPe * mathValue.RAD2DEG).toPrecision(7);
+        var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
         argPe = argPe.split('.');
         argPe[0] = argPe[0].substr(-3, 3);
         argPe[1] = argPe[1].substr(0, 4);
@@ -3173,7 +3174,7 @@ $(document).ready(function () {
             let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
             $('#es-scc').val(sat.SCC_NUM);
 
-            var inc = (sat.inclination * mathValue.RAD2DEG).toPrecision(7);
+            var inc = (sat.inclination * RAD2DEG).toPrecision(7);
             inc = inc.split('.');
             inc[0] = inc[0].substr(-3, 3);
             inc[1] = inc[1].substr(0, 4);
@@ -3184,7 +3185,7 @@ $(document).ready(function () {
             $('#es-day').val(sat.TLE1.substr(20, 12));
             $('#es-meanmo').val(sat.TLE2.substr(52, 11));
 
-            var rasc = (sat.raan * mathValue.RAD2DEG).toPrecision(7);
+            var rasc = (sat.raan * RAD2DEG).toPrecision(7);
             rasc = rasc.split('.');
             rasc[0] = rasc[0].substr(-3, 3);
             rasc[1] = rasc[1].substr(0, 4);
@@ -3193,7 +3194,7 @@ $(document).ready(function () {
             $('#es-rasc').val(helpers.pad0(rasc, 8));
             $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
 
-            var argPe = (sat.argPe * mathValue.RAD2DEG).toPrecision(7);
+            var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
             argPe = argPe.split('.');
             argPe[0] = argPe[0].substr(-3, 3);
             argPe[1] = argPe[1].substr(0, 4);
@@ -3227,7 +3228,7 @@ $(document).ready(function () {
 
             let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
             $('#nl-scc').val(sat.SCC_NUM);
-            $('#nl-inc').val((sat.inclination * mathValue.RAD2DEG).toPrecision(2));
+            $('#nl-inc').val((sat.inclination * RAD2DEG).toPrecision(2));
           } else {
             adviceList.newLaunchDisabled();
             if (!$('#menu-newLaunch:animated').length) {
@@ -5442,9 +5443,9 @@ uiManager.panToStar = function (c) {
   // ======================================================
   // Need to calculate the time to get the right RA offset
   // ======================================================
-  cameraManager.camSnap(Camera.latToPitch(sat.dec) * -1, Camera.longToYaw(sat.ra * mathValue.DEG2RAD, timeManager.selectedDate));
+  cameraManager.camSnap(Camera.latToPitch(sat.dec) * -1, Camera.longToYaw(sat.ra * DEG2RAD, timeManager.selectedDate));
   setTimeout(function () {
-    // console.log(`pitch ${camPitch * mathValue.RAD2DEG} -- yaw ${camYaw * mathValue.RAD2DEG}`);
+    // console.log(`pitch ${camPitch * RAD2DEG} -- yaw ${camYaw * RAD2DEG}`);
   }, 2000);
 };
 

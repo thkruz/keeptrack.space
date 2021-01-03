@@ -1,5 +1,5 @@
+import { MILLISECONDS_PER_DAY } from '@app/js/constants.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
-import { mathValue } from '@app/js/helpers.js';
 import { settingsManager } from '@app/js/settings.js';
 
 ('use strict');
@@ -152,7 +152,7 @@ timeManager.init = () => {
       let now = new Date();
       jDayStart = new Date(now.getFullYear(), 0, 0);
       jDayDiff = now - jDayStart;
-      return Math.floor(jDayDiff / mathValue.MILLISECONDS_PER_DAY);
+      return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);
     } else {
       return (
         367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor((275 * mon) / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0 //  ut in days

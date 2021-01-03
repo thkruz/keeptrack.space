@@ -28,9 +28,9 @@
 import '@app/js/lib/numeric.js';
 import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
+import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/constants.js';
 import { db, settingsManager } from '@app/js/settings.js';
-import { helpers, mathValue, saveCsv } from '@app/js/helpers.js';
-import { RAD2DEG } from '@app/js/constants.js';
+import { helpers, saveCsv } from '@app/js/helpers.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { jsTLEfile } from '@app/offline/tle.js';
 import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
@@ -1134,7 +1134,7 @@ satSet.getSat = (i) => {
       // var distSatEarthZ = Math.pow(-satData[i].position.z, 2);
       // var distSatEarth = Math.sqrt(distSatEarthX + distSatEarthY + distSatEarthZ);
       // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
-      let semiDiamEarth = Math.asin(mathValue.RADIUS_OF_EARTH / Math.sqrt(Math.pow(-satData[i].position.x, 2) + Math.pow(-satData[i].position.y, 2) + Math.pow(-satData[i].position.z, 2))) * RAD2DEG;
+      let semiDiamEarth = Math.asin(RADIUS_OF_EARTH / Math.sqrt(Math.pow(-satData[i].position.x, 2) + Math.pow(-satData[i].position.y, 2) + Math.pow(-satData[i].position.z, 2))) * RAD2DEG;
 
       // Position needs to be relative to satellite NOT ECI
       // var distSatSunX = Math.pow(-satData[i].position.x + sunECI.x, 2);
@@ -1142,7 +1142,7 @@ satSet.getSat = (i) => {
       // var distSatSunZ = Math.pow(-satData[i].position.z + sunECI.z, 2);
       // var distSatSun = Math.sqrt(distSatSunX + distSatSunY + distSatSunZ);
       // var semiDiamSun = Math.asin(RADIUS_OF_SUN/distSatSun) * RAD2DEG;
-      let semiDiamSun = Math.asin(mathValue.RADIUS_OF_SUN / Math.sqrt(Math.pow(-satData[i].position.x + sunECI.x, 2) + Math.pow(-satData[i].position.y + sunECI.y, 2) + Math.pow(-satData[i].position.z + sunECI.z, 2))) * RAD2DEG;
+      let semiDiamSun = Math.asin(RADIUS_OF_SUN / Math.sqrt(Math.pow(-satData[i].position.x + sunECI.x, 2) + Math.pow(-satData[i].position.y + sunECI.y, 2) + Math.pow(-satData[i].position.z + sunECI.z, 2))) * RAD2DEG;
 
       // Angle between earth and sun
       let theta =
@@ -1223,8 +1223,8 @@ satSet.getSat = (i) => {
           try {
             sensor.observerGd = {
               height: sensor.alt,
-              latitude: sensor.lat * mathValue.DEG2RAD,
-              longitude: sensor.lon * mathValue.DEG2RAD,
+              latitude: sensor.lat * DEG2RAD,
+              longitude: sensor.lon * DEG2RAD,
             };
           } catch (e) {
             throw 'observerGd is not set and could not be guessed.';
@@ -1248,10 +1248,10 @@ satSet.getSat = (i) => {
         now.getUTCMinutes(),
         now.getUTCSeconds()
       ); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * mathValue.MILLISECONDS_PER_DAY;
+      j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
       let gmst = satellite.gstime(j);
 
-      let m = (j - satrec.jdsatepoch) * mathValue.MINUTES_PER_DAY;
+      let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
       let positionEci = satellite.sgp4(satrec, m);
 
       try {
@@ -1393,10 +1393,10 @@ satSet.getIdFromSensorName = (sensorName) => {
     j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
 
     var gmst = satellite.gstime(j);
-    let cosLat = Math.cos(sensorManager.currentSensor.lat * mathValue.DEG2RAD);
-    let sinLat = Math.sin(sensorManager.currentSensor.lat * mathValue.DEG2RAD);
-    let cosLon = Math.cos(sensorManager.currentSensor.long * mathValue.DEG2RAD + gmst);
-    let sinLon = Math.sin(sensorManager.currentSensor.long * mathValue.DEG2RAD + gmst);
+    let cosLat = Math.cos(sensorManager.currentSensor.lat * DEG2RAD);
+    let sinLat = Math.sin(sensorManager.currentSensor.lat * DEG2RAD);
+    let cosLon = Math.cos(sensorManager.currentSensor.long * DEG2RAD + gmst);
+    let sinLon = Math.sin(sensorManager.currentSensor.long * DEG2RAD + gmst);
     let sensor = {};
     sensor.position = {};
     sensor.name = 'Custom Sensor';

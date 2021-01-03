@@ -1,24 +1,4 @@
 import { saveAs } from '@app/js/lib/file-saver.min.js';
-var mathValue = {};
-
-let ZOOM_EXP = 3;
-mathValue.ZOOM_EXP = ZOOM_EXP;
-let TAU = 2 * Math.PI;
-mathValue.TAU = TAU;
-let DEG2RAD = mathValue.TAU / 360;
-mathValue.DEG2RAD = DEG2RAD;
-mathValue.RAD2DEG = 360 / mathValue.TAU;
-let RADIUS_OF_EARTH = 6371.0;
-mathValue.RADIUS_OF_EARTH = RADIUS_OF_EARTH;
-mathValue.RADIUS_OF_SUN = 695700;
-mathValue.MINUTES_PER_DAY = 1440;
-mathValue.PLANETARIUM_DIST = 3;
-mathValue.MILLISECONDS_PER_DAY = 1.15741e-8;
-
-mathValue.RADIUS_OF_DRAW_SUN = 9000;
-mathValue.SUN_SCALAR_DISTANCE = 250000;
-mathValue.RADIUS_OF_DRAW_MOON = 4000;
-mathValue.MOON_SCALAR_DISTANCE = 200000;
 
 var helpers = {};
 helpers.pad = (val, len) => {
@@ -88,4 +68,4 @@ var fixDpi = (canvas, dpi) => {
   canvas.setAttribute('height', style.height() * dpi);
 };
 
-export { ZOOM_EXP, TAU, DEG2RAD, RADIUS_OF_EARTH, mathValue, helpers, fixDpi, saveVariable, saveCsv, saveAs, watermarkedDataURL };
+export { helpers, fixDpi, saveVariable, saveCsv, saveAs, watermarkedDataURL };

@@ -1,8 +1,9 @@
+/* eslint-disable block-scoped-var */
 /* */
 import * as $ from 'jquery';
+import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/constants.js';
 import { getMissileSatsLen, getSat, getSatData, satSet, setSat } from '@app/js/satSet.js';
 import { doSearch } from '@app/js/uiManager/uiManager.js';
-import { mathValue } from '@app/js/helpers.js';
 import { satellite } from '@app/js/lookangles.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
 import { timeManager } from '@app/js/timeManager.js';
@@ -1377,8 +1378,8 @@ missileManager.asat = (CurrentLatitude, CurrentLongitude, satId, MissileObjectNu
   let sat = getSat(satId);
   let satTEARR = sat.getTEARR();
   let satAlt = satTEARR.alt;
-  console.log(satTEARR.lat * mathValue.RAD2DEG);
-  console.log(satTEARR.lon * mathValue.RAD2DEG);
+  console.log(satTEARR.lat * RAD2DEG);
+  console.log(satTEARR.lon * RAD2DEG);
   console.log(satTEARR.alt);
   let TargetLatitude = CurrentLatitude * -1;
   let TargetLongitude = CurrentLongitude >= 0 ? CurrentLongitude - 180 : CurrentLongitude + 180;
@@ -1391,11 +1392,11 @@ missileManager.asat = (CurrentLatitude, CurrentLongitude, satId, MissileObjectNu
   console.log(propOffset);
   let satTEARR2 = satellite.getTEARR(sat, sensorManager.sensorList.COD, propOffset);
   let satAlt2 = satTEARR2.alt;
-  console.log(satTEARR2.lat * mathValue.RAD2DEG);
-  console.log(satTEARR2.lon * mathValue.RAD2DEG);
+  console.log(satTEARR2.lat * RAD2DEG);
+  console.log(satTEARR2.lon * RAD2DEG);
   console.log(satTEARR2.alt);
-  TargetLatitude = satTEARR2.lat * mathValue.RAD2DEG;
-  TargetLongitude = satTEARR2.lon * mathValue.RAD2DEG;
+  TargetLatitude = satTEARR2.lat * RAD2DEG;
+  TargetLongitude = satTEARR2.lon * RAD2DEG;
   TargetLongitude = TargetLongitude > 180 ? TargetLongitude - 360 : TargetLongitude;
   TargetLongitude = TargetLongitude < -180 ? TargetLongitude + 360 : TargetLongitude;
   let [timeInFlight2, tgtLat, tgtLon] = missileManager.asatFlight(
@@ -1423,11 +1424,11 @@ missileManager.asat = (CurrentLatitude, CurrentLongitude, satId, MissileObjectNu
   console.log(propOffset);
   let satTEARR3 = satellite.getTEARR(sat, sensorManager.sensorList.COD, propOffset);
   let satAlt3 = satTEARR3.alt;
-  console.log(satTEARR3.lat * mathValue.RAD2DEG);
-  console.log(satTEARR3.lon * mathValue.RAD2DEG);
+  console.log(satTEARR3.lat * RAD2DEG);
+  console.log(satTEARR3.lon * RAD2DEG);
   console.log(satTEARR3.alt);
-  TargetLatitude = satTEARR3.lat * mathValue.RAD2DEG;
-  TargetLongitude = satTEARR3.lon * mathValue.RAD2DEG;
+  TargetLatitude = satTEARR3.lat * RAD2DEG;
+  TargetLongitude = satTEARR3.lon * RAD2DEG;
   TargetLongitude = TargetLongitude > 180 ? TargetLongitude - 360 : TargetLongitude;
   TargetLongitude = TargetLongitude < -180 ? TargetLongitude + 360 : TargetLongitude;
   let [timeInFlight3, tgtLat2, tgtLon2] = missileManager.asatFlight(
@@ -2544,7 +2545,7 @@ missileManager.getMissileTEARR = function (missile, sensor) {
     now.getUTCMinutes(),
     now.getUTCSeconds()
   ); // Converts time to jday (TLEs use epoch year/day)
-  j += now.getUTCMilliseconds() * mathValue.MILLISECONDS_PER_DAY;
+  j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
   var gmst = satellite.gstime(j);
 
   // If no sensor passed to function then try to use the 'currentSensor'
@@ -2578,14 +2579,14 @@ missileManager.getMissileTEARR = function (missile, sensor) {
       break;
     }
   }
-  let cosLat = Math.cos(missile.latList[curMissileTime] * mathValue.DEG2RAD);
-  let sinLat = Math.sin(missile.latList[curMissileTime] * mathValue.DEG2RAD);
-  let cosLon = Math.cos(missile.lonList[curMissileTime] * mathValue.DEG2RAD + gmst);
-  let sinLon = Math.sin(missile.lonList[curMissileTime] * mathValue.DEG2RAD + gmst);
+  let cosLat = Math.cos(missile.latList[curMissileTime] * DEG2RAD);
+  let sinLat = Math.sin(missile.latList[curMissileTime] * DEG2RAD);
+  let cosLon = Math.cos(missile.lonList[curMissileTime] * DEG2RAD + gmst);
+  let sinLon = Math.sin(missile.lonList[curMissileTime] * DEG2RAD + gmst);
 
-  let x = (mathValue.RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * cosLon;
-  let y = (mathValue.RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * sinLon;
-  let z = (mathValue.RADIUS_OF_EARTH + missile.altList[curMissileTime]) * sinLat;
+  let x = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * cosLon;
+  let y = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * sinLon;
+  let z = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * sinLat;
 
   try {
     var gpos = satellite.eciToGeodetic({ x: x, y: y, z: z }, gmst);
@@ -2594,8 +2595,8 @@ missileManager.getMissileTEARR = function (missile, sensor) {
     currentTEARR.lat = gpos.latitude;
     var positionEcf = satellite.eciToEcf({ x: x, y: y, z: z }, gmst);
     var lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-    currentTEARR.azimuth = lookAngles.azimuth * mathValue.RAD2DEG;
-    currentTEARR.elevation = lookAngles.elevation * mathValue.RAD2DEG;
+    currentTEARR.azimuth = lookAngles.azimuth * RAD2DEG;
+    currentTEARR.elevation = lookAngles.elevation * RAD2DEG;
     currentTEARR.range = lookAngles.rangeSat;
   } catch (e) {
     currentTEARR.alt = 0;

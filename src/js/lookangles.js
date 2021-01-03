@@ -22,7 +22,8 @@
 'use strict';
 import * as $ from 'jquery';
 import * as satelliteBase from 'satellite.js';
-import { helpers, mathValue, saveCsv, saveVariable } from '@app/js/helpers.js';
+import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/js/constants.js';
+import { helpers, saveCsv, saveVariable } from '@app/js/helpers.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
 import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
@@ -2071,7 +2072,7 @@ var getSunDirection = (jd) => {
   L = L % 360.0;
   g = g % 360.0;
 
-  let ecLon = L + 1.915 * Math.sin(g * mathValue.DEG2RAD) + 0.02 * Math.sin(2 * g * DEG2RAD);
+  let ecLon = L + 1.915 * Math.sin(g * DEG2RAD) + 0.02 * Math.sin(2 * g * DEG2RAD);
 
   let t = (jd - 2451545) / 3652500;
 
@@ -2090,9 +2091,9 @@ var getSunDirection = (jd) => {
 
   let ob = obliq / 3600.0;
 
-  let x = 1000000 * Math.cos(ecLon * mathValue.DEG2RAD);
-  let y = 1000000 * Math.cos(ob * mathValue.DEG2RAD) * Math.sin(ecLon * mathValue.DEG2RAD);
-  let z = 1000000 * Math.sin(ob * mathValue.DEG2RAD) * Math.sin(ecLon * mathValue.DEG2RAD);
+  let x = 1000000 * Math.cos(ecLon * DEG2RAD);
+  let y = 1000000 * Math.cos(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
+  let z = 1000000 * Math.sin(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
 
   return [x, y, z];
 };
@@ -2336,15 +2337,15 @@ satellite.calculateSensorPos = (sensor) => {
   j += now.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
   var gmst = satellite.gstime(j);
 
-  var cosLat = Math.cos(sensor.lat * mathValue.DEG2RAD);
-  var sinLat = Math.sin(sensor.lat * mathValue.DEG2RAD);
-  var cosLon = Math.cos(sensor.long * mathValue.DEG2RAD + gmst);
-  var sinLon = Math.sin(sensor.long * mathValue.DEG2RAD + gmst);
+  var cosLat = Math.cos(sensor.lat * DEG2RAD);
+  var sinLat = Math.sin(sensor.lat * DEG2RAD);
+  var cosLon = Math.cos(sensor.long * DEG2RAD + gmst);
+  var sinLon = Math.sin(sensor.long * DEG2RAD + gmst);
 
   let pos = {};
-  pos.x = (mathValue.RADIUS_OF_EARTH + mathValue.PLANETARIUM_DIST) * cosLat * cosLon;
-  pos.y = (mathValue.RADIUS_OF_EARTH + mathValue.PLANETARIUM_DIST) * cosLat * sinLon;
-  pos.z = (mathValue.RADIUS_OF_EARTH + mathValue.PLANETARIUM_DIST) * sinLat;
+  pos.x = (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * cosLon;
+  pos.y = (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * sinLon;
+  pos.z = (RADIUS_OF_EARTH + PLANETARIUM_DIST) * sinLat;
   pos.gmst = gmst;
   pos.lat = sensor.lat;
   pos.long = sensor.long;

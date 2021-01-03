@@ -1,11 +1,12 @@
 import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
+import { DEG2RAD, RAD2DEG } from '@app/js/constants.js';
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/selectSat.js';
-import { mathValue, watermarkedDataURL } from '@app/js/helpers.js';
 import { satScreenPositionArray, satSet } from '@app/js/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { missileManager } from '@app/modules/missileManager.js';
 import { timeManager } from '@app/js/timeManager.js';
+import { watermarkedDataURL } from '@app/js/helpers.js';
 
 const canvasDOM = $('#keeptrack-canvas');
 const satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
@@ -404,7 +405,7 @@ var drawScene = () => {
       if (!sat.static) {
         if (sat.SCC_NUM == 25544) {
           meshManager.models.iss.position = meshManager.selectedSatPosition;
-          dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+          dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
           meshManager.drawObject(meshManager.models.iss, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
           return;
         }
@@ -413,41 +414,41 @@ var drawScene = () => {
           // Default Satellite
           if (sat.ON.slice(0, 5) == 'FLOCK' || sat.ON.slice(0, 5) == 'LEMUR') {
             meshManager.models.s3u.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.s3u, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
           if (sat.ON.slice(0, 8) == 'STARLINK') {
             meshManager.models.starlink.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.starlink, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
           if (sat.ON.slice(0, 10) == 'GLOBALSTAR') {
             meshManager.models.globalstar.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.globalstar, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
           if (sat.ON.slice(0, 7) == 'IRIDIUM') {
             meshManager.models.iridium.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.iridium, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
           if (sat.ON.slice(0, 7) == 'ORBCOMM') {
             meshManager.models.orbcomm.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.orbcomm, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
           if (sat.ON.slice(0, 3) == 'O3B') {
             meshManager.models.o3b.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.o3b, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
@@ -455,7 +456,7 @@ var drawScene = () => {
           // Is this a GPS Satellite (Called NAVSTAR)
           if (sat.ON.slice(0, 7) == 'NAVSTAR' || sat.ON.slice(10, 17) == 'NAVSTAR') {
             meshManager.models.gps.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.gps, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
@@ -463,7 +464,7 @@ var drawScene = () => {
           // Is this a Galileo Satellite
           if (sat.ON.slice(0, 7) == 'GALILEO') {
             meshManager.models.galileo.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.galileo, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
@@ -493,7 +494,7 @@ var drawScene = () => {
             sat.SCC_NUM == '28158'
           ) {
             meshManager.models.dsp.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.dsp, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
@@ -501,7 +502,7 @@ var drawScene = () => {
           // Is this an AEHF Satellite?
           if (sat.SCC_NUM == '36868' || sat.SCC_NUM == '38254' || sat.SCC_NUM == '39256' || sat.SCC_NUM == '43651' || sat.SCC_NUM == '44481' || sat.SCC_NUM == '45465') {
             meshManager.models.aehf.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.aehf, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
@@ -509,25 +510,25 @@ var drawScene = () => {
           // Is this a 1U Cubesat?
           if (parseFloat(sat.R) < 0.1 && parseFloat(sat.R) > 0.04) {
             meshManager.models.s1u.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.s1u, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
           if (parseFloat(sat.R) < 0.22 && parseFloat(sat.R) >= 0.1) {
             meshManager.models.s2u.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.s2u, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
           if (parseFloat(sat.R) < 0.33 && parseFloat(sat.R) >= 0.22) {
             meshManager.models.s3u.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
             meshManager.drawObject(meshManager.models.s3u, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
           // Generic Model
           meshManager.models.sat2.position = meshManager.selectedSatPosition;
-          dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * mathValue.RAD2DEG, timeManager.selectedDate) + 180 * mathValue.DEG2RAD;
+          dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
           meshManager.drawObject(meshManager.models.sat2, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
           return;
         }

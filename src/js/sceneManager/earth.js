@@ -1,7 +1,7 @@
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { mathValue } from '@app/js/helpers.js';
 import { satellite } from '@app/js/lookangles.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 
 var earth = {};

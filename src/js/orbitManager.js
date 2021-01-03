@@ -3,7 +3,7 @@
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { satSet } from '@app/js/satSet.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 let M = window.M;
 

@@ -45,7 +45,7 @@ import { satellite } from '@app/js/lookangles.js';
 import { searchBox } from '@app/js/search-box.js';
 import { selectSatManager } from '@app/js/selectSat.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 

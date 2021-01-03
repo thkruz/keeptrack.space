@@ -4,7 +4,7 @@
   expect
 */
 
-import '@app/js/keeptrack-head.js';
+import '@app/js/settings.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 
 let cameraManager = new Camera();

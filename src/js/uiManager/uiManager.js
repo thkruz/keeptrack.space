@@ -30,7 +30,7 @@ import '@app/js/lib/jquery-ajax.js';
 import '@app/js/lib/colorPick.js';
 import 'materialize-css';
 import '@app/js/keeptrack-foot.js';
-import { db, settingsManager } from '@app/js/keeptrack-head.js';
+import { db, settingsManager } from '@app/js/settings.js';
 import { helpers, mathValue, saveAs, saveCsv } from '@app/js/helpers.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { CanvasRecorder } from '@app/js/lib/CanvasRecorder.js';

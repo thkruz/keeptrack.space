@@ -24,7 +24,7 @@ import * as $ from 'jquery';
 import * as satelliteBase from '@app/js/lib/satellite.js';
 import { helpers, mathValue, saveCsv, saveVariable } from '@app/js/helpers.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 let satellite = satelliteBase;
 

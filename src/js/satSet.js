@@ -28,7 +28,7 @@
 import '@app/js/lib/numeric.js';
 import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { db, settingsManager } from '@app/js/keeptrack-head.js';
+import { db, settingsManager } from '@app/js/settings.js';
 import { helpers, mathValue, saveCsv } from '@app/js/helpers.js';
 import { RAD2DEG } from '@app/js/constants.js';
 import { adviceList } from '@app/js/advice-module.js';

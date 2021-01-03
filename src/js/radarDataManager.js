@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import { db } from '@app/js/keeptrack-head.js';
+import { db } from '@app/js/settings.js';
 import { mathValue } from '@app/js/helpers.js';
 var satellite, sensorManager, timeManager, satSet, satCruncher;
 let radarDataManager = {};

@@ -1,4 +1,4 @@
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 
 var mobile = {};
 

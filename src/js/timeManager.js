@@ -1,6 +1,6 @@
 import { dateFormat } from '@app/js/lib/dateFormat.js';
 import { mathValue } from '@app/js/helpers.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 
 ('use strict');
 var timeManager = {};

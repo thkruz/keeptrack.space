@@ -17,7 +17,7 @@
  */
 
 import * as $ from 'jquery';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 
 // Enable Satbox Overlay
 if (settingsManager.enableHoverOverlay) {

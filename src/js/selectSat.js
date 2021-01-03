@@ -7,7 +7,7 @@ import { sMM } from '@app/js/sideMenuManager.js';
 import { satSet } from '@app/js/satSet.js';
 import { satellite } from '@app/js/lookangles.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 
 var isLookanglesMenuOpen = false;

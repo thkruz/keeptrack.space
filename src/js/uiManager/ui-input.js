@@ -266,19 +266,31 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         }, 250);
       }
     });
+
+    uiInput.mouseMoveTimeout = null;
     canvasDOM.on('mousemove', function (evt) {
-      cameraManager.mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
-      cameraManager.mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
-      if (cameraManager.isDragging && cameraManager.screenDragPoint[0] !== cameraManager.mouseX && cameraManager.screenDragPoint[1] !== cameraManager.mouseY) {
-        dragHasMoved = true;
-        cameraManager.camAngleSnappedOnSat = false;
-        cameraManager.camZoomSnappedOnSat = false;
+      if (uiInput.mouseMoveTimeout == null) {
+        uiInput.mouseMoveTimeout = window.setTimeout(() => {
+          cameraManager.mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
+          cameraManager.mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
+          if (cameraManager.isDragging && cameraManager.screenDragPoint[0] !== cameraManager.mouseX && cameraManager.screenDragPoint[1] !== cameraManager.mouseY) {
+            dragHasMoved = true;
+            cameraManager.camAngleSnappedOnSat = false;
+            cameraManager.camZoomSnappedOnSat = false;
+          }
+          uiInput.isMouseMoving = true;
+
+          // This is so you have to keep moving the mouse or the ui says it has stopped (why?)
+          clearTimeout(mouseTimeout);
+          mouseTimeout = setTimeout(function () {
+            uiInput.isMouseMoving = false;
+          }, 150);
+
+          // This is to prevent mousemove being called between drawframes (who cares if it has moved at that point)
+          window.clearTimeout(uiInput.mouseMoveTimeout);
+          uiInput.mouseMoveTimeout = null;
+        }, 16);
       }
-      uiInput.isMouseMoving = true;
-      clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(function () {
-        uiInput.isMouseMoving = false;
-      }, 150);
     });
 
     if (settingsManager.disableUI) {

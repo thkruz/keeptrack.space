@@ -134,7 +134,8 @@ satSet.init = async (glRef, dotManagerRef, cameraManager) => {
   parseFromGETVariables();
 
   settingsManager.loadStr('elsets');
-  satCruncher = new Worker(settingsManager.installDirectory + 'js/webworker/positionCruncher.js');
+  // Webpack will place this IN ./js not in ./js/webworker like in the source code
+  satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
   addSatCruncherOnMessage(cameraManager);
 
   satSet.satCruncher = satCruncher;

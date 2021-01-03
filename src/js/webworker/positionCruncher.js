@@ -21,7 +21,7 @@ or mirrored at any other location without the express written permission of the 
 
 'use strict';
 import '@app/js/lib/numeric.js';
-import * as satellite from '@app/js/lib/satellite.js';
+import * as satellite from 'satellite.js';
 import { A } from '@app/js/lib/meuusjs.js';
 import { SunCalc } from '@app/js/SunCalc/suncalc.js';
 
@@ -638,8 +638,8 @@ var propagateCruncher = () => {
       z = satPos[i * 3 + 2];
 
       positionEcf = satellite.eciToEcf({ x: x, y: y, z: z }, gmst);
-      if (satellite.eciToGeodetic({ x: x, y: y, z: z }, gmst).height <= 150 && satellite.missile === false) {
-        console.error(satellite.SCC_NUM);
+      if (satellite.eciToGeodetic({ x: x, y: y, z: z }, gmst).height <= 150 && satCache[i].missile === false) {
+        console.error(satCache[i].SCC_NUM);
         satCache[i].skip = true;
       }
       lookangles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);

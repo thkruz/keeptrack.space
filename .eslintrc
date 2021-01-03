@@ -14,7 +14,10 @@
   //   "ecmaVersion": 12,
   //   "sourceType": "module"
   // },
-  "plugins": ["classPrivateProperties","classPrivateMethods"],
+  "plugins": [
+    // "classPrivateMethods",
+    // "babel"
+  ],
   "rules": {
     "accessor-pairs": "error",
     "array-bracket-newline": "error",
@@ -244,7 +247,7 @@
     "quotes": "off",
     "radix": ["error", "as-needed"],
     "require-atomic-updates": "error",
-    "require-await": "error",
+    "require-await": "off",
     "require-jsdoc": "off",
     "require-unicode-regexp": "error",
     "rest-spread-spacing": "error",

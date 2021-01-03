@@ -49,8 +49,8 @@ var jsConfig = Object.assign({}, config, {
   mode: 'development',
   entry: {
     'main': ['./src/js/main.js'],
-    'positionCruncher': ['./src/js/positionCruncher.js'],
-    'orbitCruncher': ['./src/js/orbitCruncher.js'],
+    'positionCruncher': ['./src/js/webworker/positionCruncher.js'],
+    'orbitCruncher': ['./src/js/webworker/orbitCruncher.js'],
     'checker-script': ['./src/js/checker-script.js'],
   },
   resolve: {

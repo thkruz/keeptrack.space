@@ -17,7 +17,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 /*global gremlins, randomizer*/
 import * as $ from 'jquery';
-import { mathValue } from '@app/js/helpers.js';
+import { RADIUS_OF_EARTH } from '@app/js/constants.js';
 
 // Settings Manager Setup
 let settingsManager = {};
@@ -175,7 +175,7 @@ let settingsManager = {};
   settingsManager.atmospherelatSegs = 64;
   settingsManager.atmospherelonSegs = 64;
 
-  settingsManager.atmosphereSize = mathValue.RADIUS_OF_EARTH + 250;
+  settingsManager.atmosphereSize = RADIUS_OF_EARTH + 250;
   settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)';
 
   settingsManager.satShader = {};
@@ -512,7 +512,6 @@ let settingsManager = {};
   settingsManager.fieldOfView = 0.6;
 
   // Determines if the Loading is complete
-  settingsManager.shadersReady = false;
   settingsManager.cruncherReady = false;
 
   settingsManager.altLoadMsgs = true;

@@ -1,10 +1,7 @@
 /* */
 
+import { RAD2DEG } from '@app/js/constants.js';
 import { controlSiteManager } from '@app/modules/controlSiteManager.js';
-import { lineManager } from '@app/js/sceneManager/line.js';
-import { mathValue } from '@app/js/helpers.js';
-import { satSet } from '@app/js/satSet.js';
-import { sensorManager } from '@app/modules/sensorManager.js';
 
 var satLinkManager = {};
 satLinkManager.aehfUsers = [];
@@ -12,7 +9,7 @@ satLinkManager.wgsUsers = [];
 satLinkManager.iridiumUsers = [];
 satLinkManager.starlinkUsers = [];
 satLinkManager.galileoUsers = [];
-satLinkManager.init = (function () {
+satLinkManager.init = (sensorManager) => {
   try {
     for (let controlSite in controlSiteManager.controlSiteList) {
       if (controlSiteManager.controlSiteList[controlSite].linkAehf) {
@@ -52,8 +49,8 @@ satLinkManager.init = (function () {
       satLinkManager.starlinkUsers.push(sensorManager.sensorList[sensor].name);
     }
   }
-})();
-satLinkManager.idToSatnum = () => {
+};
+satLinkManager.idToSatnum = (satSet) => {
   satLinkManager.aehf = satSet.convertSatnumArrayToIdArray(satLinkManager.aehf);
   satLinkManager.dscs = satSet.convertSatnumArrayToIdArray(satLinkManager.dscs);
   satLinkManager.wgs = satSet.convertSatnumArrayToIdArray(satLinkManager.wgs);
@@ -64,7 +61,7 @@ satLinkManager.idToSatnum = () => {
   satLinkManager.starlink = satSet.convertSatnumArrayToIdArray(satLinkManager.starlink);
 };
 
-satLinkManager.showLinks = async function (group) {
+satLinkManager.showLinks = async function (lineManager, satSet, group) {
   let satlist;
   let userlist;
   let minTheta;
@@ -149,7 +146,7 @@ satLinkManager.showLinks = async function (group) {
               window.numeric.dot([-sat1.position.x, -sat1.position.y, -sat1.position.z], [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z]) /
                 (Math.sqrt(Math.pow(-sat1.position.x, 2) + Math.pow(-sat1.position.y, 2) + Math.pow(-sat1.position.z, 2)) *
                   Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2)))
-            ) * mathValue.RAD2DEG;
+            ) * RAD2DEG;
           if (theta < minTheta) {
             // Intentional
           } else {

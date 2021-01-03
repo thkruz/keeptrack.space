@@ -21,10 +21,10 @@
 
 'use strict';
 import * as $ from 'jquery';
-import * as satelliteBase from '@app/js/lib/satellite.js';
+import * as satelliteBase from 'satellite.js';
 import { helpers, mathValue, saveCsv, saveVariable } from '@app/js/helpers.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 let satellite = satelliteBase;
 
@@ -35,12 +35,12 @@ const RAD2DEG = 360 / TAU;
 const MINUTES_PER_DAY = 1440;
 const MILLISECONDS_PER_DAY = 1.15741e-8;
 
-var satSet, satCruncher, sensorManager, groups;
-satellite.initLookangles = (satSetRef, satCruncherRef, sensorManagerRef, groupsRef) => {
+var satSet, satCruncher, sensorManager, groupsManager;
+satellite.initLookangles = (satSetRef, satCruncherRef, sensorManagerRef, groupsManagerRef) => {
   satSet = satSetRef;
   satCruncher = satCruncherRef;
   sensorManager = sensorManagerRef;
-  groups = groupsRef;
+  groupsManager = groupsManagerRef;
 };
 
 var _propagate = (propTempOffset, satrec, sensor, lookanglesInterval) => {
@@ -1963,8 +1963,8 @@ satellite.getDOPs = (lat, lon, alt, propTime) => {
   // var elList = [];
   var inViewList = [];
 
-  if (typeof groups.GPSGroup == 'undefined') {
-    groups.GPSGroup = new groups.SatGroup('nameRegex', /NAVSTAR/iu);
+  if (typeof groupsManager.GPSGroup == 'undefined') {
+    groupsManager.GPSGroup = groupsManager.createGroup('nameRegex', /NAVSTAR/iu);
   }
 
   if (typeof propTime == 'undefined') propTime = timeManager.propTime();
@@ -1979,8 +1979,8 @@ satellite.getDOPs = (lat, lon, alt, propTime) => {
   j += propTime.getUTCMilliseconds() * 1.15741e-8;
   var gmst = satellite.gstime(j);
 
-  for (var i = 0; i < groups.GPSGroup.sats.length; i++) {
-    sat = satSet.getSat(groups.GPSGroup.sats[i].satId);
+  for (var i = 0; i < groupsManager.GPSGroup.sats.length; i++) {
+    sat = satSet.getSat(groupsManager.GPSGroup.sats[i].satId);
     lookAngles = satellite.ecfToLookAngles({ longitude: lon, latitude: lat, height: alt }, satellite.eciToEcf(sat.position, gmst));
     sat.az = lookAngles.azimuth * RAD2DEG;
     sat.el = lookAngles.elevation * RAD2DEG;

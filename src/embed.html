@@ -1,32 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title></title>
-        <!-- <script src="js/lib/mobileConsole.js"></script> -->
-        <link rel="preload" href="textures/earthmap512.jpg" as="image" />
-        <link rel="preload" href="textures/earthlights512.jpg" as="image" />
-        <link rel="preload" href="textures/earthbump256.jpg" as="image" />
-        <link rel="preload" href="textures/earthspec256.jpg" as="image" />
-        <script src="js/lib/jquery.min.js"></script>
-    </head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <!-- <script src="js/lib/mobileConsole.js"></script> -->
+    <link rel="preload" href="textures/earthmap512.jpg" as="image" />
+    <link rel="preload" href="textures/earthlights512.jpg" as="image" />
+    <link rel="preload" href="textures/earthbump256.jpg" as="image" />
+    <link rel="preload" href="textures/earthspec256.jpg" as="image" />
+    <script src="js/lib/jquery.min.js"></script>
+  </head>
 
-    <body>
-        <div style="width: 400px; height: 600px;"></div>
-        <script type="text/javascript" src="js/keeptrack-head.js"></script>
-        <div>
-            <canvas
-                id="keeptrack-canvas"
-                width="800"
-                height="600"
-                style="position: absolute; background: black; cursor: default;"
-                tabindex="0"
-            ></canvas>
-        </div>
-        <script type="text/javascript" src="js/keeptrack-foot.js"></script>
-        <script>
-            zoomTarget = 0.9;
-        </script>
-    </body>
+  <body>
+    <div style="width: 400px; height: 600px;"></div>
+    <script type="text/javascript" src="js/settings.js"></script>
+    <div>
+      <canvas id="keeptrack-canvas" width="800" height="600" style="position: absolute; background: black; cursor: default;" tabindex="0"></canvas>
+    </div>
+    <script>
+      zoomTarget = 0.9;
+    </script>
+  </body>
 </html>

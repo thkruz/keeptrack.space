@@ -1,11 +1,9 @@
 /* */
 
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { ColorScheme } from '@app/js/color-scheme.js';
-import { gl } from '@app/js/main.js';
-import { groups } from '@app/js/groups.js';
+import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { satSet } from '@app/js/satSet.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 let M = window.M;
 
@@ -29,6 +27,7 @@ var currentInView = [];
 
 var orbitMvMat = glm.mat4.create();
 
+// Webpack will place this IN ./js not in ./js/webworker like in the source code
 var orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
 
 var initialized = false;
@@ -64,10 +63,11 @@ orbitManager.shader = {
     `,
 };
 
-var cameraManager;
-
-orbitManager.init = function (cameraManagerRef) {
+var gl, cameraManager, groupsManager;
+orbitManager.init = function (glRef, cameraManagerRef, groupsManagerRef) {
+  gl = glRef;
   cameraManager = cameraManagerRef;
+  groupsManager = groupsManagerRef;
 
   var vs = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vs, orbitManager.shader.vert);
@@ -90,11 +90,11 @@ orbitManager.init = function (cameraManagerRef) {
 
   selectOrbitBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.DYNAMIC_DRAW);
 
   hoverOrbitBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.DYNAMIC_DRAW);
 
   for (var i = 0; i < satSet.missileSats; i++) {
     glBuffers.push(allocateBuffer());
@@ -102,19 +102,12 @@ orbitManager.init = function (cameraManagerRef) {
   orbitWorker.postMessage({
     isInit: true,
     orbitFadeFactor: settingsManager.orbitFadeFactor,
-    satData: satSet.satDataString,
+    satData: JSON.stringify(satSet.satData),
     numSegs: NUM_SEGS,
   });
   initialized = true;
 
   orbitManager.shader = pathShader;
-
-  // Discard now that we are loaded
-  satSet.satDataString = null;
-  // objectManager.fieldOfViewSet = null;
-
-  // var time = performance.now() - startTime;
-  // console.log('orbitManager init: ' + time + ' ms');
 };
 
 orbitManager.updateOrbitBuffer = function (satId, force, TLE1, TLE2, missile, latList, lonList, altList) {
@@ -285,9 +278,9 @@ orbitManager.draw = function (pMatrix, camMatrix) {
     });
   }
 
-  if (groups.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
+  if (groupsManager.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
     gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
-    groups.selectedGroup.forEach(function (id) {
+    groupsManager.selectedGroup.forEach(function (id) {
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
       gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
       gl.enableVertexAttribArray(pathShader.aPos);
@@ -308,7 +301,7 @@ orbitManager.draw = function (pMatrix, camMatrix) {
 var allocateBuffer = () => {
   var buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.DYNAMIC_DRAW);
   return buf;
 };
 
@@ -328,10 +321,10 @@ orbitManager.historyOfSatellitesPlay = () => {
         if (!orbitManager.isTimeMachineVisible) return;
         // Kill all old async calls if run count updates
         if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
-        let yearGroup = new groups.SatGroup('yearOrLess', year);
-        // groups.selectGroupNoOverlay(yearGroup);
-        groups.selectGroup(yearGroup);
-        yearGroup.updateOrbits();
+        let yearGroup = groupsManager.createGroup('yearOrLess', year);
+        // groupsManager.selectGroupNoOverlay(yearGroup);
+        groupsManager.selectGroup(yearGroup, orbitManager);
+        yearGroup.updateOrbits(orbitManager, orbitManager);
         satSet.setColorScheme(ColorScheme.group, true); // force color recalc
         if (year >= 59 && year < 100) {
           M.toast({ html: `Time Machine In Year 19${year}!` });
@@ -346,7 +339,7 @@ orbitManager.historyOfSatellitesPlay = () => {
             if (!orbitManager.isTimeMachineVisible) return;
             settingsManager.colors.transparent = orbitManager.tempTransColor;
             orbitManager.isTimeMachineRunning = false;
-            groups.clearSelect();
+            groupsManager.clearSelect();
             satSet.setColorScheme(ColorScheme.default, true); // force color recalc
           }, 10000); // Linger for 10 seconds
         }

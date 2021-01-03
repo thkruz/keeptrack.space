@@ -1,7 +1,7 @@
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { mathValue } from '@app/js/helpers.js';
 import { satellite } from '@app/js/lookangles.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 
 var earth = {};
@@ -95,7 +95,7 @@ earth.isDayNightToggle = (val) => {
   isDayNightToggle = val;
 };
 
-earth.init = function (glRef) {
+earth.init = async (glRef) => {
   gl = glRef;
   // Make Fragment Shader
   let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -146,7 +146,7 @@ earth.init = function (glRef) {
     };
     img.src = 'textures/earthmap512.jpg';
 
-    earth.loadHiRes = () => {
+    earth.loadHiRes = async () => {
       var imgHiRes = new Image();
       imgHiRes.src = 'textures/earthmap4k.jpg';
       if (settingsManager.nasaImages) imgHiRes.src = 'textures/mercator-tex.jpg';
@@ -185,7 +185,7 @@ earth.init = function (glRef) {
     };
     nightImg.src = 'textures/earthlights512.jpg';
 
-    earth.loadHiResNight = () => {
+    earth.loadHiResNight = async () => {
       var nightImgHiRes = new Image();
       if (!settingsManager.smallImages) nightImgHiRes.src = 'textures/earthlights4k.jpg';
       if (settingsManager.vectorImages) nightImgHiRes.src = 'textures/dayearthvector-4096.jpg';
@@ -390,7 +390,7 @@ var updateSunCurrentDirection = function () {
   earth.lightDirection[2] = Math.sin(earth.sunvar.ob * mathValue.DEG2RAD) * Math.sin(earth.sunvar.ecLon * mathValue.DEG2RAD);
 };
 
-earth.draw = function (pMatrix, camMatrix) {
+earth.draw = function (pMatrix, camMatrix, dotsManager) {
   if (!earth.loaded) return;
   // //////////////////////////////////////////////////////////////////////
   // Draw Colored Earth First
@@ -447,7 +447,7 @@ earth.draw = function (pMatrix, camMatrix) {
     gl.enableVertexAttribArray(earthShader.aVertexPosition);
     gl.vertexAttribPointer(earthShader.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
     // This needs to be up here not down with the GPU Picking
-    gl.vertexAttribPointer(gl.pickShaderProgram.aPos, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(dotsManager.pickingProgram.aPos, 3, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
     gl.enableVertexAttribArray(earthShader.aVertexNormal);
@@ -468,22 +468,22 @@ earth.draw = function (pMatrix, camMatrix) {
   // //////////////////////////////////////////////////////////////////////
 
   // Switch to GPU Picking Shader
-  gl.useProgram(gl.pickShaderProgram);
+  gl.useProgram(dotsManager.pickingProgram);
   // Switch to the GPU Picking Frame Buffer
-  gl.bindFramebuffer(gl.FRAMEBUFFER, gl.pickFb);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
 
   // Set Uniforms
-  gl.uniformMatrix4fv(gl.pickShaderProgram.uMvMatrix, false, mvMatrix);
+  gl.uniformMatrix4fv(dotsManager.pickingProgram.uMvMatrix, false, mvMatrix);
 
   // Only Enable Position Attribute Since Color Doesn't Matter
   // for blacking out the earth
-  gl.disableVertexAttribArray(gl.pickShaderProgram.aColor);
-  gl.enableVertexAttribArray(gl.pickShaderProgram.aPos);
+  gl.disableVertexAttribArray(dotsManager.pickingProgram.aColor);
+  gl.enableVertexAttribArray(dotsManager.pickingProgram.aPos);
   gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 
   // Disable attributes to avoid conflict with other shaders
   // NOTE: This breaks satellite gpu picking.
-  // gl.disableVertexAttribArray(gl.pickShaderProgram.aPos);
+  // gl.disableVertexAttribArray(dotsManager.pickingProgram.aPos);
 
   return true;
 };

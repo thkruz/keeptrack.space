@@ -19,10 +19,10 @@
 ('use strict');
 
 // This file should contain all of the webgl code for generating non .obj meshes
-import { atmosphere } from '@app/js/sceneManager/atmosphere.js';
-import { earth } from '@app/js/sceneManager/earth.js';
-import { lineManager } from '@app/js/sceneManager/line.js';
-import { moon } from '@app/js/sceneManager/moon.js';
-import { sun } from '@app/js/sceneManager/sun.js';
+import { Atmosphere } from './atmosphere.js';
+import { LineFactory } from './line-factory.js';
+import { Moon } from './moon.js';
+import { earth } from './earth.js';
+import { sun } from './sun.js';
 
-export { lineManager, sun, earth, atmosphere, moon };
+export { Atmosphere, LineFactory, sun, earth, Moon };

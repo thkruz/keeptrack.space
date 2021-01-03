@@ -2,7 +2,7 @@
 
 import * as $ from 'jquery';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 
 let nextLaunchManager = {};
 (function () {

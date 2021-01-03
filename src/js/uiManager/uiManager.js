@@ -29,19 +29,16 @@ import '@app/js/lib/jquery.colorbox.min.js';
 import '@app/js/lib/jquery-ajax.js';
 import '@app/js/lib/colorPick.js';
 import 'materialize-css';
-import '@app/js/keeptrack-foot.js';
-import { db, settingsManager } from '@app/js/keeptrack-head.js';
-import { dlManager, webGlInit } from '@app/js/main.js';
-import { earth, lineManager } from '@app/js/sceneManager/sceneManager.js';
+import { db, settingsManager } from '@app/js/settings.js';
 import { helpers, mathValue, saveAs, saveCsv } from '@app/js/helpers.js';
-import { satCruncher, satSet } from '@app/js/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { CanvasRecorder } from '@app/js/lib/CanvasRecorder.js';
-import { ColorScheme } from '@app/js/color-scheme.js';
+import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
-import { groups } from '@app/js/groups.js';
-import { mapManager } from '@app/js/mapManager.js';
+import { dlManager } from '@app/js/dlManager/dlManager.js';
+import { earth } from '@app/js/sceneManager/sceneManager.js';
+import { mapManager } from '@app/js/uiManager/mapManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
 import { mobile } from '@app/js/mobile.js';
 import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
@@ -51,11 +48,13 @@ import { orbitManager } from '@app/js/orbitManager.js';
 import { radarDataManager } from '@app/js/radarDataManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
 import { satLinkManager } from '@app/modules/satLinkManager.js';
+import { satSet } from '@app/js/satSet.js';
 import { satellite } from '@app/js/lookangles.js';
 import { searchBox } from '@app/js/search-box.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
-import { starManager } from '@app/modules/starManager.js';
 import { timeManager } from '@app/js/timeManager.js';
+import { uiInput } from './ui-input.js';
+import { uiLimited } from './ui-limited.js';
 let M = window.M;
 
 // Public Variables
@@ -131,9 +130,49 @@ var isWatchlistChanged = null;
  * @todo Merge _uiInit and uiManager.init
  * @body Managers will become Classes and won't autoInit
  */
-var cameraManager;
-uiManager.init = (cameraManagerRef) => {
+var cameraManager, lineManager, starManager, groups;
+uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef, groupsRef, satSet, orbitManager, groupsManager, ColorScheme) => {
+  if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
+    // Pass the references through to the limited UI
+    uiLimited.init(satSet, orbitManager, groupsManager, ColorScheme);
+  }
   cameraManager = cameraManagerRef;
+  lineManager = lineManagerRef;
+  starManager = starManagerRef;
+  groups = groupsRef;
+};
+
+// This runs after the dlManager starts
+uiManager.postStart = () => {
+  // Enable Satbox Overlay
+  if (settingsManager.enableHoverOverlay) {
+    const hoverboxDOM = document.createElement('DIV');
+    hoverboxDOM.innerHTML = `
+    <div id="sat-hoverbox">
+      <span id="sat-hoverbox1"></span>
+      <br/>
+      <span id="sat-hoverbox2"></span>
+      <br/>
+      <span id="sat-hoverbox3"></span>
+    </div>`;
+
+    document.getElementById('keeptrack-canvas').parentElement.append(hoverboxDOM);
+  }
+
+  // Load Bottom icons
+  if (!settingsManager.disableUI) {
+    $(document).ready(function () {
+      $.event.special.touchstart = {
+        setup: function (_, ns, handle) {
+          if (ns.includes('noPreventDefault')) {
+            this.addEventListener('touchstart', handle, { passive: false });
+          } else {
+            this.addEventListener('touchstart', handle, { passive: true });
+          }
+        },
+      };
+    });
+  }
 };
 
 var touchHoldButton = '';
@@ -149,6 +188,14 @@ $(document).ready(function () {
       $('#geolocation-btn').hide();
     }
   })();
+
+  // Version Info Updated
+  $('#version-info').html(settingsManager.versionNumber);
+  $('#version-info').tooltip({
+    delay: 50,
+    html: settingsManager.versionDate,
+    position: 'top',
+  });
 
   (function _uiInit() {
     // Register all UI callback functions with drawLoop in main.js
@@ -184,7 +231,7 @@ $(document).ready(function () {
     jday = null; // Garbage collect
 
     // Initialize Navigation Menu
-    document.addEventListener('DOMContentLoaded', function () {
+    $(document).ready(function () {
       var elems = document.querySelectorAll('.dropdown-button');
       M.Dropdown.init(elems);
     });
@@ -392,7 +439,7 @@ $(document).ready(function () {
     if (settingsManager.retro) {
       timeManager.propOffset = new Date(2000, 2, 13) - Date.now();
       $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
-      satCruncher.postMessage({
+      satSet.satCruncher.postMessage({
         typ: 'offset',
         dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       });
@@ -1105,7 +1152,7 @@ $(document).ready(function () {
       var jday = timeManager.getDayOfYear(timeManager.propTime());
       $('#jday').html(jday);
       timeManager.propOffset = selectedDate - today;
-      satCruncher.postMessage({
+      satSet.satCruncher.postMessage({
         typ: 'offset',
         dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
       });
@@ -1540,7 +1587,7 @@ $(document).ready(function () {
         }
         var TLE1 = TLEs[0];
         var TLE2 = TLEs[1];
-        satCruncher.postMessage({
+        satSet.satCruncher.postMessage({
           typ: 'satEdit',
           id: satId,
           TLE1: TLE1,
@@ -1674,7 +1721,7 @@ $(document).ready(function () {
       var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
 
       if (satellite.altitudeCheck(TLE1, TLE2, timeManager.propOffset) > 1) {
-        satCruncher.postMessage({
+        satSet.satCruncher.postMessage({
           typ: 'satEdit',
           id: satId,
           active: true,
@@ -1727,7 +1774,7 @@ $(document).ready(function () {
         var satId = satSet.getIdFromObjNum(scc);
         var sat = satSet.getSatExtraOnly(satId);
         if (satellite.altitudeCheck(object.TLE1, object.TLE2, timeManager.propOffset) > 1) {
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             typ: 'satEdit',
             id: sat.id,
             active: true,
@@ -1758,8 +1805,8 @@ $(document).ready(function () {
         time = new Date(time[0] + 'T' + time[1] + 'Z');
         var today = new Date(); // Need to know today for offset calculation
         timeManager.propOffset = time - today; // Find the offset from today
-        satCruncher.postMessage({
-          // Tell satCruncher we have changed times for orbit calculations
+        satSet.satCruncher.postMessage({
+          // Tell satSet.satCruncher we have changed times for orbit calculations
           typ: 'offset',
           dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
         });
@@ -1931,8 +1978,8 @@ $(document).ready(function () {
 
         timeManager.propOffset = quadZTime - today; // Find the offset from today
         cameraManager.camSnapMode = false;
-        satCruncher.postMessage({
-          // Tell satCruncher we have changed times for orbit calculations
+        satSet.satCruncher.postMessage({
+          // Tell satSet.satCruncher we have changed times for orbit calculations
           typ: 'offset',
           dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
         });
@@ -1943,7 +1990,7 @@ $(document).ready(function () {
         var TLE2 = TLEs[1];
 
         if (satellite.altitudeCheck(TLE1, TLE2, timeManager.propOffset) > 1) {
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             typ: 'satEdit',
             id: satId,
             active: true,
@@ -2007,7 +2054,7 @@ $(document).ready(function () {
         }
         var TLE1 = TLEs[0];
         var TLE2 = TLEs[1];
-        satCruncher.postMessage({
+        satSet.satCruncher.postMessage({
           typ: 'satEdit',
           id: satId,
           TLE1: TLE1,
@@ -2076,7 +2123,7 @@ $(document).ready(function () {
                 sat.TLE2 = iTLE2;
                 sat.active = true;
                 if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.propOffset) > 1) {
-                  satCruncher.postMessage({
+                  satSet.satCruncher.postMessage({
                     typ: 'satEdit',
                     id: satId,
                     TLE1: iTLE1,
@@ -2389,11 +2436,11 @@ $(document).ready(function () {
       var minrange = $('#cs-minrange').val();
       var maxrange = $('#cs-maxrange').val();
 
-      satCruncher.postMessage({
-        // Send SatCruncher File information on this radar
-        typ: 'offset', // Tell satcruncher to update something
-        dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(), // Tell satcruncher what time it is and how fast time is moving
-        setlatlong: true, // Tell satcruncher we are changing observer location
+      satSet.satCruncher.postMessage({
+        // Send satSet.satCruncher File information on this radar
+        typ: 'offset', // Tell satSet.satCruncher to update something
+        dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(), // Tell satSet.satCruncher what time it is and how fast time is moving
+        setlatlong: true, // Tell satSet.satCruncher we are changing observer location
         sensor: {
           lat: lat * 1,
           long: lon * 1,
@@ -2571,8 +2618,8 @@ $(document).ready(function () {
     var today = new Date(); // Need to know today for offset calculation
     timeManager.propOffset = selectedDate - today; // Find the offset from today
     cameraManager.camSnapMode = false;
-    satCruncher.postMessage({
-      // Tell satCruncher we have changed times for orbit calculations
+    satSet.satCruncher.postMessage({
+      // Tell satSet.satCruncher we have changed times for orbit calculations
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
     });
@@ -2653,7 +2700,7 @@ $(document).ready(function () {
       findFutureDate(socratesObjTwo, row); // Jump to the date/time of the collision
 
       uiManager.doSearch(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Actually perform the search of the two objects
-      settingsManager.socratesOnSatCruncher = satSet.getIdFromObjNum(socratesObjOne[row][1]);
+      settingsManager.socratesOnsatSet.satCruncher = satSet.getIdFromObjNum(socratesObjOne[row][1]);
     } // If a row was selected
   };
 
@@ -2891,7 +2938,7 @@ $(document).ready(function () {
             );
           }
           // Reinitialize the Material CSS Code
-          document.addEventListener('DOMContentLoaded', function () {
+          $(document).ready(function () {
             var elems = document.querySelectorAll('anal-type');
             M.FormSelect.init(elems);
           });
@@ -3264,7 +3311,7 @@ $(document).ready(function () {
         if (settingsManager.isFOVBubbleModeOn && !settingsManager.isShowSurvFence) {
           settingsManager.isFOVBubbleModeOn = false;
           $('#menu-fov-bubble').removeClass('bmenu-item-selected');
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             isShowFOVBubble: 'reset',
             isShowSurvFence: 'disable',
           });
@@ -3278,7 +3325,7 @@ $(document).ready(function () {
           settingsManager.isShowSurvFence = false;
           $('#menu-fov-bubble').addClass('bmenu-item-selected');
           $('#menu-surveillance').removeClass('bmenu-item-selected');
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             isShowSatOverfly: 'reset',
             isShowFOVBubble: 'enable',
             isShowSurvFence: 'disable',
@@ -3300,7 +3347,7 @@ $(document).ready(function () {
         if (settingsManager.isShowSurvFence) {
           settingsManager.isShowSurvFence = false;
           $('#menu-surveillance').removeClass('bmenu-item-selected');
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             isShowSurvFence: 'disable',
             isShowFOVBubble: 'reset',
           });
@@ -3313,7 +3360,7 @@ $(document).ready(function () {
           settingsManager.isShowSurvFence = true;
           $('#menu-surveillance').addClass('bmenu-item-selected');
           $('#menu-fov-bubble').removeClass('bmenu-item-selected');
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             isShowSatOverfly: 'reset',
             isShowFOVBubble: 'enable',
             isShowSurvFence: 'enable',
@@ -3335,7 +3382,7 @@ $(document).ready(function () {
         if (settingsManager.isSatOverflyModeOn) {
           settingsManager.isSatOverflyModeOn = false;
           $('#menu-sat-fov').removeClass('bmenu-item-selected');
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             isShowSatOverfly: 'reset',
           });
           break;
@@ -3354,7 +3401,7 @@ $(document).ready(function () {
 
           var satFieldOfView = $('#satFieldOfView').val() * 1;
           $('#menu-sat-fov').addClass('bmenu-item-selected');
-          satCruncher.postMessage({
+          satSet.satCruncher.postMessage({
             isShowFOVBubble: 'reset',
             isShowSurvFence: 'disable',
             isShowSatOverfly: 'enable',
@@ -3454,7 +3501,7 @@ $(document).ready(function () {
           cameraManager.panReset = true;
           cameraManager.localRotateReset = true;
           settingsManager.fieldOfView = 0.6;
-          webGlInit();
+          dlManager.glInit();
           uiManager.hideSideMenus();
           orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
           cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
@@ -3490,7 +3537,7 @@ $(document).ready(function () {
           cameraManager.panReset = true;
           cameraManager.localRotateReset = true;
           settingsManager.fieldOfView = 0.6;
-          webGlInit();
+          dlManager.glInit();
           uiManager.hideSideMenus();
           cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
           uiManager.legendMenuChange('default');
@@ -3766,6 +3813,20 @@ $(document).ready(function () {
     uiManager.resize2DMap();
   });
 
+  if ($(window).width() > $(window).height()) {
+    settingsManager.mapHeight = $(window).width(); // Subtract 12 px for the scroll
+    $('#map-image').width(settingsManager.mapHeight);
+    settingsManager.mapHeight = (settingsManager.mapHeight * 3) / 4;
+    $('#map-image').height(settingsManager.mapHeight);
+    $('#map-menu').width($(window).width());
+  } else {
+    settingsManager.mapHeight = $(window).height() - 100; // Subtract 12 px for the scroll
+    $('#map-image').height(settingsManager.mapHeight);
+    settingsManager.mapHeight = (settingsManager.mapHeight * 4) / 3;
+    $('#map-image').width(settingsManager.mapHeight);
+    $('#map-menu').width($(window).width());
+  }
+
   $('#nav-footer-toggle').on('click', function () {
     uiManager.footerToggle();
   });
@@ -3928,7 +3989,7 @@ uiManager.keyHandler = (evt) => {
         // 7 is a placeholder to reset camera type
         cameraManager.localRotateReset = true;
         settingsManager.fieldOfView = 0.6;
-        webGlInit();
+        dlManager.glInit();
         if (objectManager.selectedSat !== -1) {
           cameraManager.camZoomSnappedOnSat(true);
           curCam = cameraManager.cameraType.fixedToSat;
@@ -4050,7 +4111,7 @@ uiManager.keyHandler = (evt) => {
   if (settingsManager.isPropRateChange) {
     timeManager.propRealTime = Date.now();
     timeManager.propTime();
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
     });
@@ -4091,7 +4152,7 @@ uiManager.hideLoadingScreen = () => {
   if (settingsManager.isMobileModeEnabled) {
     $('#spinner').hide();
     settingsManager.loadStr('math');
-    // settingsManager.loadStr('');
+    $('#loading-screen').hide();
   } else {
     // Loading Screen Resized and Hidden
     if (settingsManager.trusatMode) {
@@ -4116,14 +4177,6 @@ uiManager.hideLoadingScreen = () => {
       }, 1500);
     }
   }
-
-  // if (!settingsManager.isMobileModeEnabled) {
-  //   // settingsManager.loadStr('painting');
-  //   $('#loading-screen').hide();
-  // } else {
-  //   // settingsManager.loadStr('painting');
-  //   $('#loading-screen').hide();
-  // }
 };
 
 uiManager.resize2DMap = function () {
@@ -4327,7 +4380,7 @@ $('#colors-menu>ul>li').on('click', function () {
   objectManager.setSelectedSat(-1); // clear selected sat
   var colorName = $(this).data('color');
   if (colorName !== 'sunlight') {
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       isSunlightView: false,
     });
   }
@@ -4363,7 +4416,7 @@ $('#colors-menu>ul>li').on('click', function () {
       satSet.setColorScheme(ColorScheme.sunlight, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       settingsManager.isForceColorScheme = true;
-      satCruncher.postMessage({
+      satSet.satCruncher.postMessage({
         isSunlightView: true,
       });
       // if (settingsManager.isOfficialWebsite)
@@ -4527,11 +4580,11 @@ uiManager.useCurrentGeolocationAsSensor = function () {
       var minrange = settingsManager.geolocation.minrange;
       var maxrange = settingsManager.geolocation.maxrange;
 
-      satCruncher.postMessage({
-        // Send SatCruncher File information on this radar
-        typ: 'offset', // Tell satcruncher to update something
-        dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(), // Tell satcruncher what time it is and how fast time is moving
-        setlatlong: true, // Tell satcruncher we are changing observer location
+      satSet.satCruncher.postMessage({
+        // Send satSet.satCruncher File information on this radar
+        typ: 'offset', // Tell satSet.satCruncher to update something
+        dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(), // Tell satSet.satCruncher what time it is and how fast time is moving
+        setlatlong: true, // Tell satSet.satCruncher we are changing observer location
         sensor: {
           lat: lat,
           long: lon,
@@ -4862,47 +4915,47 @@ $('#country-menu>ul>li').on('click', function () {
   switch (groupName) {
     case 'Canada':
       if (typeof groups.Canada == 'undefined') {
-        groups.Canada = new groups.SatGroup('countryRegex', /CA/u);
+        groups.Canada = groups.createGroup('countryRegex', /CA/u);
       }
       break;
     case 'China':
       if (typeof groups.China == 'undefined') {
-        groups.China = new groups.SatGroup('countryRegex', /PRC/u);
+        groups.China = groups.createGroup('countryRegex', /PRC/u);
       }
       break;
     case 'France':
       if (typeof groups.France == 'undefined') {
-        groups.France = new groups.SatGroup('countryRegex', /FR/u);
+        groups.France = groups.createGroup('countryRegex', /FR/u);
       }
       break;
     case 'India':
       if (typeof groups.India == 'undefined') {
-        groups.India = new groups.SatGroup('countryRegex', /IND/u);
+        groups.India = groups.createGroup('countryRegex', /IND/u);
       }
       break;
     case 'Israel':
       if (typeof groups.Israel == 'undefined') {
-        groups.Israel = new groups.SatGroup('countryRegex', /ISRA/u);
+        groups.Israel = groups.createGroup('countryRegex', /ISRA/u);
       }
       break;
     case 'Japan':
       if (typeof groups.Japan == 'undefined') {
-        groups.Japan = new groups.SatGroup('countryRegex', /JPN/u);
+        groups.Japan = groups.createGroup('countryRegex', /JPN/u);
       }
       break;
     case 'Russia':
       if (typeof groups.Russia == 'undefined') {
-        groups.Russia = new groups.SatGroup('countryRegex', /CIS/u);
+        groups.Russia = groups.createGroup('countryRegex', /CIS/u);
       }
       break;
     case 'UnitedKingdom':
       if (typeof groups.UnitedKingdom == 'undefined') {
-        groups.UnitedKingdom = new groups.SatGroup('countryRegex', /UK/u);
+        groups.UnitedKingdom = groups.createGroup('countryRegex', /UK/u);
       }
       break;
     case 'UnitedStates':
       if (typeof groups.UnitedStates == 'undefined') {
-        groups.UnitedStates = new groups.SatGroup('countryRegex', /US/u);
+        groups.UnitedStates = groups.createGroup('countryRegex', /US/u);
       }
       break;
   }
@@ -4913,27 +4966,27 @@ $('#constellation-menu>ul>li').on('click', function () {
   switch (groupName) {
     case 'SpaceStations':
       if (typeof groups.SpaceStations == 'undefined') {
-        groups.SpaceStations = new groups.SatGroup('objNum', [25544, 41765]);
+        groups.SpaceStations = groups.createGroup('objNum', [25544, 41765]);
       }
       break;
     case 'GlonassGroup':
       if (typeof groups.GlonassGroup == 'undefined') {
-        groups.GlonassGroup = new groups.SatGroup('nameRegex', /GLONASS/u);
+        groups.GlonassGroup = groups.createGroup('nameRegex', /GLONASS/u);
       }
       break;
     case 'GalileoGroup':
       if (typeof groups.GalileoGroup == 'undefined') {
-        groups.GalileoGroup = new groups.SatGroup('nameRegex', /GALILEO/u);
+        groups.GalileoGroup = groups.createGroup('nameRegex', /GALILEO/u);
       }
       break;
     case 'GPSGroup':
       if (typeof groups.GPSGroup == 'undefined') {
-        groups.GPSGroup = new groups.SatGroup('nameRegex', /NAVSTAR/u);
+        groups.GPSGroup = groups.createGroup('nameRegex', /NAVSTAR/u);
       }
       break;
     case 'AmatuerRadio':
       if (typeof groups.AmatuerRadio == 'undefined') {
-        groups.AmatuerRadio = new groups.SatGroup('objNum', [
+        groups.AmatuerRadio = groups.createGroup('objNum', [
           7530,
           14781,
           20442,
@@ -5023,23 +5076,23 @@ $('#constellation-menu>ul>li').on('click', function () {
       break;
     case 'aehf':
       if (typeof groups.aehf == 'undefined') {
-        groups.aehf = new groups.SatGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.aehf));
+        groups.aehf = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.aehf));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
-        satLinkManager.showLinks('aehf');
+        satLinkManager.showLinks(lineManager, satSet, 'aehf');
         $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'wgs':
       // WGS also selects DSCS
       if (typeof groups.wgs == 'undefined') {
-        groups.wgs = new groups.SatGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.wgs.concat(satLinkManager.dscs)));
+        groups.wgs = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.wgs.concat(satLinkManager.dscs)));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
         try {
-          satLinkManager.showLinks('wgs');
+          satLinkManager.showLinks(lineManager, satSet, 'wgs');
         } catch (e) {
           // Maybe the satLinkManager isn't installed?
         }
@@ -5049,12 +5102,12 @@ $('#constellation-menu>ul>li').on('click', function () {
     case 'starlink':
       // WGS also selects DSCS
       if (typeof groups.starlink == 'undefined') {
-        groups.starlink = new groups.SatGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.starlink));
+        groups.starlink = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.starlink));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
         try {
-          satLinkManager.showLinks('starlink');
+          satLinkManager.showLinks(lineManager, satSet, 'starlink');
         } catch (e) {
           // Maybe the satLinkManager isn't installed?
         }
@@ -5064,12 +5117,12 @@ $('#constellation-menu>ul>li').on('click', function () {
     case 'sbirs':
       // SBIRS and DSP
       if (typeof groups.sbirs == 'undefined') {
-        groups.sbirs = new groups.SatGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.sbirs));
+        groups.sbirs = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.sbirs));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
         try {
-          satLinkManager.showLinks('sbirs');
+          satLinkManager.showLinks(lineManager, satSet, 'sbirs');
         } catch (e) {
           // Maybe the satLinkManager isn't installed?
         }
@@ -5083,7 +5136,7 @@ $('#constellation-menu>ul>li').on('click', function () {
 var _groupSelected = function (groupName) {
   if (typeof groupName == 'undefined') return;
   if (typeof groups[groupName] == 'undefined') return;
-  groups.selectGroup(groups[groupName]);
+  groups.selectGroup(groups[groupName], orbitManager);
   $search.val('');
 
   var results = groups[groupName].sats;
@@ -5110,14 +5163,14 @@ var _resetSensorSelected = function () {
   // Return to default settings with nothing 'inview'
   satellite.setobs(null);
   sensorManager.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
-  satCruncher.postMessage({
+  satSet.satCruncher.postMessage({
     typ: 'offset',
     dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
     setlatlong: true,
     resetObserverGd: true,
     sensor: sensorManager.defaultSensor,
   });
-  satCruncher.postMessage({
+  satSet.satCruncher.postMessage({
     isShowFOVBubble: 'reset',
     isShowSurvFence: 'disable',
   });
@@ -5294,7 +5347,7 @@ let doSearch = (searchString, isPreventDropDown) => {
 uiManager.doSearch = (searchString, isPreventDropDown) => {
   let idList = searchBox.doSearch(searchString, isPreventDropDown);
   if (settingsManager.isSatOverflyModeOn) {
-    satCruncher.postMessage({
+    satSet.satCruncher.postMessage({
       satelliteSelected: idList,
     });
   }
@@ -5457,4 +5510,4 @@ uiManager.updateMap = function () {
   }
 };
 
-export { doSearch, uiManager };
+export { doSearch, uiManager, uiLimited, uiInput };

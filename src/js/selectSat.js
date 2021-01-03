@@ -1,13 +1,13 @@
 import * as $ from 'jquery';
-import { satCruncher, satSet } from '@app/js/satSet.js';
-import { SunCalc } from '@app/js/lib/suncalc.js';
+import { SunCalc } from '@app/js/SunCalc/suncalc.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { mathValue } from '@app/js/helpers.js';
 import { objectManager } from '@app/js/objectManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
+import { satSet } from '@app/js/satSet.js';
 import { satellite } from '@app/js/lookangles.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
-import { settingsManager } from '@app/js/keeptrack-head.js';
+import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 
 var isLookanglesMenuOpen = false;
@@ -38,7 +38,7 @@ selectSatManager.selectSat = (satId, cameraManager) => {
       $('#menu-sat-fov').removeClass('bmenu-item-selected');
       $('#menu-sat-fov').addClass('bmenu-item-disabled');
       settingsManager.isSatOverflyModeOn = false;
-      satCruncher.postMessage({
+      satSet.satCruncher.postMessage({
         isShowSatOverfly: 'reset',
       });
     }
@@ -418,7 +418,7 @@ selectSatManager.selectSat = (satId, cameraManager) => {
       if (satSet.getSat(satId).TLE1.substr(18, 2) === now) {
         daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3);
       } else {
-        daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3) + satSet.getSat(satId).TLE1.substr(17, 2) * 365;
+        daysold = jday + parseInt(now) * 365 - (parseInt(satSet.getSat(satId).TLE1.substr(18, 2)) * 365 + parseInt(satSet.getSat(satId).TLE1.substr(20, 3)));
       }
       $('#sat-elset-age').html(daysold + ' Days');
       $('#sat-elset-age').tooltip({

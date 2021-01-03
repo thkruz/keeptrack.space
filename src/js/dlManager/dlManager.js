@@ -147,8 +147,9 @@ var resizeCanvas = () => {
   }
 };
 
-var uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, timeManager, dotsManager;
+var groupsManager, uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, timeManager, dotsManager;
 dlManager.init = (
+  groupsManagerRef,
   uiInputRef,
   moonRef,
   sunRef,
@@ -188,6 +189,20 @@ dlManager.init = (
   gl = glRef;
   timeManager = timeManagerRef;
   dotsManager = dotsManagerRef;
+  groupsManager = groupsManagerRef;
+
+  startWithOrbits();
+};
+
+var startWithOrbits = async () => {
+  if (settingsManager.startWithOrbitsDisplayed) {
+    // All Orbits
+    groupsManager.debris = groupsManager.createGroup('all', '');
+    groupsManager.selectGroup(groupsManager.debris, orbitManager);
+    satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+    groupsManager.debris.updateOrbits(orbitManager);
+    settingsManager.isOrbitOverlayVisible = true;
+  }
 };
 
 dlManager.drawLoop = (preciseDt) => {

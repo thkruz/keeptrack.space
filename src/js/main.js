@@ -96,23 +96,34 @@ $(document).ready(async function initalizeKeepTrack() {
   await radarDataManager.init(sensorManager, timeManager, satSet, satCruncher, satellite);
   satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
   satLinkManager.idToSatnum(satSet);
-  startWithOrbits();
 
   uiInput.init(cameraManager, mobile, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, dlManager, dotsManager);
 
-  await dlManager.init(uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, timeManager, dotsManager);
+  await dlManager.init(
+    groupsManager,
+    uiInput,
+    moon,
+    sun,
+    searchBox,
+    atmosphere,
+    starManager,
+    satellite,
+    ColorScheme,
+    cameraManager,
+    objectManager,
+    orbitManager,
+    meshManager,
+    earth,
+    sensorManager,
+    uiManager,
+    lineManager,
+    gl,
+    timeManager,
+    dotsManager
+  );
+
+  // Now that everything is loaded, start rendering to thg canvas
   dlManager.drawLoop();
 });
-
-var startWithOrbits = async () => {
-  if (settingsManager.startWithOrbitsDisplayed) {
-    // All Orbits
-    groupsManager.debris = groupsManager.createGroup('all', '');
-    groupsManager.selectGroup(groupsManager.debris, orbitManager);
-    satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-    groupsManager.debris.updateOrbits(orbitManager);
-    settingsManager.isOrbitOverlayVisible = true;
-  }
-};
 
 export { gl };

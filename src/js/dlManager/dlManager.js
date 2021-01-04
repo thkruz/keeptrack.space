@@ -354,10 +354,16 @@ dlManager.screenShot = () => {
 };
 
 var drawScene = () => {
-  // Drawing ColorIds for Picking Satellites
+  // Clear the Picking Frame Buffer
   gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  // Clear the godraysPostProcessing Frame Buffer
+  gl.bindFramebuffer(gl.FRAMEBUFFER, sun.godraysFrameBuffer);
+  gl.clearColor(0.0, 0.0, 0.0, 0.0);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  // Switch back to the canvas
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
   dlManager.orbitsAbove();

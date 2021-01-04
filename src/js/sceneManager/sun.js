@@ -11,12 +11,11 @@ let mvMatrixEmpty = glm.mat4.create();
 let nMatrixEmpty = glm.mat3.create();
 const NUM_LAT_SEGS = 64;
 const NUM_LON_SEGS = 64;
-const RADIUS_OF_DRAW_SUN = 9000;
+const RADIUS_OF_DRAW_SUN = 6000;
 const SUN_SCALAR_DISTANCE = 250000;
 var gl, earth;
 
 let vertPosBuf, vertNormBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
-let vertCount;
 let mvMatrix;
 let nMatrix;
 let sunShader;
@@ -28,33 +27,26 @@ sun.pos = [0, 0, 0];
 sun.pos2 = [0, 0, 0];
 sun.shader = {
   frag: `
-    precision mediump float;
+    precision highp float;
     uniform vec3 uLightDirection;
 
-    varying vec3 vNormal;
-    varying float vDist;
+    varying vec3 vNormal;    
     varying float vDist2;
 
     void main(void) {
         // Hide the Back Side of the Sphere to prevent duplicate suns
-        float darkAmount = max(dot(vNormal, -uLightDirection), 0.1);
-        // Create blur effect
-        float a = pow(vDist \/ 2.0 * -1.0 + 1.1, 10.0) * darkAmount;
+        float a = max(dot(vNormal, -uLightDirection), 0.1);                        
         // Set colors
         float r = 1.0 * a;
         float g = 1.0 * a;
-        float b = 0.4 * a;
+        float b = 0.7 * a;
 
         if (vDist2 > 1.0) {
         discard;
-        // r = 0.0;
-        // g = 1.0;
-        // b = 0.0;
-        // a = 1.0;
         }
 
         gl_FragColor = vec4(vec3(r,g,b), a);
-    }
+    }  
     `,
   vert: `
     attribute vec3 aVertexPosition;
@@ -66,19 +58,16 @@ sun.shader = {
     uniform mat3 uNormalMatrix;
     uniform float uSunDis;
 
-    varying vec3 vNormal;
-    varying float vDist;
+    varying vec3 vNormal;    
     varying float vDist2;
 
     void main(void) {
-        vec4 position = uMvMatrix * vec4(aVertexPosition, 1.0);
-        vec4 position0 = uCamMatrix * uMvMatrix * vec4(vec3(0.0,0.0,0.0), 1.0);
-        vec4 position1 = uCamMatrix * position;
-        gl_Position = uPMatrix * position1;
-        vDist = distance(position0.xz,position1.xz) \/ ${RADIUS_OF_DRAW_SUN}.0;
-        vDist2 = distance(position.xyz,vec3(0.0,0.0,0.0)) \/ uSunDis;
+        vec4 position = uMvMatrix * vec4(aVertexPosition, 1.0);        
+        gl_Position = uPMatrix * uCamMatrix * position;         
+        vDist2 = distance(position.xyz,vec3(0.0,0.0,0.0)) / uSunDis;
         vNormal = uNormalMatrix * aVertexNormal;
-    }`,
+    }
+  `,
 };
 
 sun.init = async (glRef, earthRef) => {
@@ -166,7 +155,7 @@ sun.init = async (glRef, earthRef) => {
       vertIndex.push(brVert);
     }
   }
-  vertCount = vertIndex.length;
+  sun.vertCount = vertIndex.length;
 
   vertPosBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
@@ -180,8 +169,69 @@ sun.init = async (glRef, earthRef) => {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
 
+  sun.setupGodrays(gl);
+
   sun.loaded = true;
 };
+
+sun.setupGodrays = (gl) => {
+  sun.godraysProgram = gl.createProgram();
+  {
+    sun.godraysProgram.vertShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(sun.godraysProgram.vertShader, sun.godraysShaderCode.vert);
+    gl.compileShader(sun.godraysProgram.vertShader);
+
+    sun.godraysProgram.fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(sun.godraysProgram.fragShader, sun.godraysShaderCode.frag);
+    gl.compileShader(sun.godraysProgram.fragShader);
+
+    gl.attachShader(sun.godraysProgram, sun.godraysProgram.vertShader);
+    gl.attachShader(sun.godraysProgram, sun.godraysProgram.fragShader);
+  }
+  gl.linkProgram(sun.godraysProgram);
+
+  sun.positionLocation = gl.getAttribLocation(sun.godraysProgram, 'a_position');
+  sun.texcoordLocation = gl.getAttribLocation(sun.godraysProgram, 'a_texCoord');
+
+  // lookup uniforms
+  sun.uSunPosition = gl.getUniformLocation(sun.godraysProgram, 'u_sunPosition');
+  sun.resolutionLocation = gl.getUniformLocation(sun.godraysProgram, 'u_resolution');
+
+  sun.positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, sun.positionBuffer);
+  let x1 = 0;
+  let x2 = 0 + gl.drawingBufferWidth;
+  let y1 = 0;
+  let y2 = 0 + gl.drawingBufferHeight;
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([x1, y1, x2, y1, x1, y2, x1, y2, x2, y1, x2, y2]), gl.STATIC_DRAW);
+
+  // provide texture coordinates for the rectangle.
+  sun.texcoordBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, sun.texcoordBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]), gl.STATIC_DRAW);
+
+  sun.godraysTexture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, sun.godraysTexture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); // makes clearing work
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.drawingBufferWidth, gl.drawingBufferHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+  ////////////////////////////////////////////////////////////////////////
+  sun.godraysFrameBuffer = gl.createFramebuffer();
+  {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, sun.godraysFrameBuffer);
+
+    sun.godraysRenderBuffer = gl.createRenderbuffer(); // create RB to store the depth buffer
+    gl.bindRenderbuffer(gl.RENDERBUFFER, sun.godraysRenderBuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, sun.godraysTexture, 0);
+  }
+  gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, sun.godraysRenderBuffer);
+};
+
 sun.draw = function (pMatrix, camMatrix) {
   if (!sun.loaded) return;
 
@@ -236,6 +286,9 @@ sun.draw = function (pMatrix, camMatrix) {
   sun.pos2[1] = sun.pos[1] * 100;
   sun.pos2[2] = sun.pos[2] * 100;
 
+  sun.sunScreenPosition = sun.getScreenCoords(pMatrix, camMatrix);
+  if (sun.sunScreenPosition == false) return; // Sun is off screen
+
   mvMatrix = mvMatrixEmpty;
   glm.mat4.identity(mvMatrix);
 
@@ -253,7 +306,8 @@ sun.draw = function (pMatrix, camMatrix) {
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   gl.useProgram(sunShader);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  // Draw to the bloom frame buffer for post processing
+  gl.bindFramebuffer(gl.FRAMEBUFFER, sun.godraysFrameBuffer);
 
   gl.uniformMatrix3fv(sunShader.uNormalMatrix, false, nMatrix);
   gl.uniformMatrix4fv(sunShader.uMvMatrix, false, mvMatrix);
@@ -271,10 +325,143 @@ sun.draw = function (pMatrix, camMatrix) {
   gl.vertexAttribPointer(sunShader.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
-  gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
+  gl.drawElements(gl.TRIANGLES, sun.vertCount, gl.UNSIGNED_SHORT, 0);
+
+  sun.godraysPostProcessing(gl);
 
   // gl.disable(gl.BLEND);
   return true;
+};
+
+sun.godraysPostProcessing = (gl) => {
+  gl.useProgram(sun.godraysProgram);
+
+  // Make sure this texture doesn't prevent the rest of the scene from rendering
+  gl.depthMask(false);
+
+  // Turn on the position attribute
+  gl.enableVertexAttribArray(sun.positionLocation);
+  // Bind the position buffer.
+  gl.bindBuffer(gl.ARRAY_BUFFER, sun.positionBuffer);
+  // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+  gl.vertexAttribPointer(sun.positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+  // Turn on the texcoord attribute
+  gl.enableVertexAttribArray(sun.texcoordLocation);
+  // bind the texcoord buffer.
+  gl.bindBuffer(gl.ARRAY_BUFFER, sun.texcoordBuffer);
+  // Tell the texcoord attribute how to get data out of texcoordBuffer (ARRAY_BUFFER)
+  gl.vertexAttribPointer(sun.texcoordLocation, 2, gl.FLOAT, false, 0, 0);
+
+  // Load the original image
+  gl.uniform1i(sun.uCanvasSampler, 0);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, sun.godraysTexture);
+  // Identify where the sun is in the picture
+  gl.uniform2f(sun.uSunPosition, sun.sunScreenPosition.x, sun.sunScreenPosition.y);
+  // set the resolution
+  gl.uniform2f(sun.resolutionLocation, gl.canvas.width, gl.canvas.height);
+
+  // Draw the new version to the screen
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+  // Future writing needs to have a depth test
+  gl.depthMask(true);
+};
+
+sun.getScreenCoords = (pMatrix, camMatrix) => {
+  const posVec4 = glm.vec4.fromValues(sun.pos[0], sun.pos[1], sun.pos[2], 1);
+
+  glm.vec4.transformMat4(posVec4, posVec4, camMatrix);
+  glm.vec4.transformMat4(posVec4, posVec4, pMatrix);
+
+  // In 0.0 to 1.0 space
+  sun.sunScreenPositionArray = {};
+  sun.sunScreenPositionArray.x = posVec4[0] / posVec4[3];
+  sun.sunScreenPositionArray.y = posVec4[1] / posVec4[3];
+  // sun.sunScreenPositionArray.z = posVec4[2] / posVec4[3];
+
+  sun.sunScreenPositionArray.x = (sun.sunScreenPositionArray.x + 1) * 0.5; // * window.innerWidth;
+  sun.sunScreenPositionArray.y = (-sun.sunScreenPositionArray.y + 1) * 0.5; // * window.innerHeight;
+
+  // If we can see the sun
+  if (sun.sunScreenPositionArray.x >= -0.5 && sun.sunScreenPositionArray.x <= 1.5 && sun.sunScreenPositionArray.y >= -0.5 && sun.sunScreenPositionArray.y <= 1.5) {
+    // Then return where the sun is so we can draw it and apply godrays
+    return sun.sunScreenPositionArray;
+  } else {
+    return false;
+  }
+};
+
+sun.godraysShaderCode = {
+  frag: `
+    precision mediump float;
+
+    // our texture
+    uniform sampler2D uCanvasSampler;
+
+    uniform vec2 u_sunPosition;
+    
+    // the texCoords passed in from the vertex shader.
+    varying vec2 v_texCoord;
+    
+    void main() {
+      float decay=1.0;
+      float exposure=0.95;
+      float density=1.0;
+      float weight=0.04;
+      vec2 lightPositionOnScreen = vec2(u_sunPosition.x,1.0 - u_sunPosition.y);
+      vec2 texCoord = v_texCoord;
+
+      /// NUM_SAMPLES will describe the rays quality, you can play with
+      const int samples = 50;      
+
+      vec2 deltaTexCoord = (v_texCoord - lightPositionOnScreen.xy);
+      deltaTexCoord *= 1.0 / float(samples) * density;
+      float illuminationDecay = 1.0;
+      vec4 color =texture2D(uCanvasSampler, texCoord.xy)*0.4;
+      
+      for(int i= 0; i <= samples ; i++)
+      {
+          if(samples < i) {
+            break;
+          }
+          texCoord -= deltaTexCoord;
+          vec4 sample = texture2D(uCanvasSampler, texCoord);
+          sample *= illuminationDecay * weight;
+          color += sample;
+          illuminationDecay *= decay;
+      }
+        color *= exposure;
+      gl_FragColor = color;
+    }
+  `,
+  vert: `
+    attribute vec2 a_position;
+    attribute vec2 a_texCoord;
+
+    uniform vec2 u_resolution;
+    
+    varying vec2 v_texCoord;
+    
+    void main() {
+      // convert the rectangle from pixels to 0.0 to 1.0
+      vec2 zeroToOne = a_position / u_resolution;
+    
+      // convert from 0->1 to 0->2
+      vec2 zeroToTwo = zeroToOne * 2.0;
+    
+      // convert from 0->2 to -1->+1 (clipspace)
+      vec2 clipSpace = zeroToTwo - 1.0;
+    
+      gl_Position = vec4(clipSpace, 0, 1);
+    
+      // pass the texCoord to the fragment shader
+      // The GPU will interpolate this value between points.
+      v_texCoord = a_texCoord;
+    }
+  `,
 };
 
 export { sun };

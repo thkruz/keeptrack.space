@@ -25,7 +25,6 @@ mobile.init = async () => {
 
   mobile.checkMobileMode = async () => {
     if (mobile.checkIfMobileDevice()) {
-      mobile.forceResize = true;
       settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
       settingsManager.enableHoverOverlay = false;
       settingsManager.isMobileModeEnabled = true;
@@ -53,12 +52,6 @@ mobile.init = async () => {
       settingsManager.maxLabels = settingsManager.desktopMaxLabels;
     }
   };
-
-  // Reinitialize the canvas on mobile rotation
-  window.addEventListener('orientationchange', function () {
-    // console.log('rotate');
-    mobile.isRotationEvent = true;
-  });
 
   mobile.checkIfMobileDevice = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu.test(navigator.userAgent);
 

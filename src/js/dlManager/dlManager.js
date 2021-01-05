@@ -43,18 +43,36 @@ var dlManager = {};
   dlManager.isShowFPS = false;
 }
 
-dlManager.mobileRef = null;
-dlManager.glInit = async (mobile) => {
-  if (mobile) {
-    dlManager.mobileRef = mobile;
-  } else {
-    mobile = dlManager.mobileRef;
-  }
-  const canvasDOM = $('#keeptrack-canvas');
-  let can = canvasDOM[0];
-  const dpi = typeof settingsManager.dpi != 'undefined' ? settingsManager.dpi : window.devicePixelRatio;
-  settingsManager.dpi = dpi;
+// Reinitialize the canvas on mobile rotation
+window.addEventListener('orientationchange', function () {
+  // console.log('rotate');
+  dlManager.isRotationEvent = true;
+});
 
+dlManager.glInit = async () => {
+  const canvasDOM = $('#keeptrack-canvas');
+  dlManager.canvas = canvasDOM[0];
+
+  gl = dlManager.canvas.getContext('webgl', {
+    alpha: false,
+    premultipliedAlpha: false,
+    desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
+    antialias: true,
+    powerPreference: 'high-performance',
+    preserveDrawingBuffer: true,
+    stencil: false,
+  });
+
+  dlManager.resizeCanvas();
+
+  gl.getExtension('EXT_frag_depth');
+  gl.enable(gl.DEPTH_TEST);
+
+  dlManager.gl = gl;
+  return gl;
+};
+
+dlManager.resizeCanvas = () => {
   // Using minimum allows the canvas to be full screen without fighting with scrollbars
   let cw = document.documentElement.clientWidth || 0;
   let iw = window.innerWidth || 0;
@@ -62,10 +80,7 @@ dlManager.glInit = async (mobile) => {
   let vh = Math.min(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 
   // If taking a screenshot then resize no matter what to get high resolution
-  if (settingsManager.screenshotMode) {
-    can.width = settingsManager.hiResWidth;
-    can.height = settingsManager.hiResHeight;
-  } else {
+  if (gl.canvas.width != vw || gl.canvas.height != vh) {
     // If not autoresizing then don't do anything to the canvas
     if (settingsManager.isAutoResizeCanvas) {
       // If this is a cellphone avoid the keyboard forcing resizes but
@@ -73,87 +88,40 @@ dlManager.glInit = async (mobile) => {
       if (settingsManager.isMobileModeEnabled) {
         // Changes more than 35% of height but not due to rotation are likely
         // the keyboard! Ignore them
-        if ((((vw - can.width) / can.width) * 100 < 1 && ((vh - can.height) / can.height) * 100 < 1) || mobile.isRotationEvent || mobile.forceResize) {
-          can.width = vw;
-          can.height = vh;
-          mobile.forceResize = false;
-          mobile.isRotationEvent = false;
+        if ((((vw - dlManager.canvas.width) / dlManager.canvas.width) * 100 < 1 && ((vh - dlManager.canvas.height) / dlManager.canvas.height) * 100 < 1) || dlManager.isRotationEvent) {
+          dlManager.canvas.width = vw;
+          dlManager.canvas.height = vh;
+          dlManager.isRotationEvent = false;
         }
+        // No Canvas Change
+        return;
       } else {
-        can.width = vw;
-        can.height = vh;
+        dlManager.canvas.width = vw;
+        dlManager.canvas.height = vh;
       }
+    }
+  } else {
+    if (settingsManager.screenshotMode) {
+      dlManager.canvas.width = settingsManager.hiResWidth;
+      dlManager.canvas.height = settingsManager.hiResHeight;
+    } else {
+      // No screen size change and not taking a photo
+      return;
     }
   }
 
-  if (settingsManager.satShader.isUseDynamicSizing) {
-    settingsManager.satShader.dynamicSize = (1920 / can.width) * settingsManager.satShader.dynamicSizeScalar * settingsManager.dpi;
-    settingsManager.satShader.minSize = Math.max(settingsManager.satShader.minSize, settingsManager.satShader.dynamicSize);
-  }
+  gl.viewport(0, 0, dlManager.canvas.width, dlManager.canvas.height);
+  dlManager.calculatePMatrix(settingsManager);
+  dlManager.isPostProcessingResizeNeeded = true;
+};
 
-  if (!settingsManager.disableUI) {
-    gl =
-      can.getContext('webgl', {
-        alpha: false,
-        premultipliedAlpha: false,
-        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
-        antialias: true,
-        powerPreference: 'high-performance',
-        preserveDrawingBuffer: true,
-        stencil: false,
-      }) || // Or...
-      can.getContext('experimental-webgl', {
-        alpha: false,
-        premultipliedAlpha: false,
-        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
-        antialias: true,
-        powerPreference: 'high-performance',
-        preserveDrawingBuffer: true,
-        stencil: false,
-      });
-  } else {
-    gl =
-      can.getContext('webgl', {
-        alpha: false,
-        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
-      }) || // Or...
-      can.getContext('experimental-webgl', {
-        alpha: false,
-        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
-      });
-  }
-  if (!gl) {
-    $('#canvas-holder').hide();
-    $('#no-webgl').css('display', 'block');
-  }
-
-  gl.getExtension('EXT_frag_depth');
-  gl.getExtension('OES_vertex_array_object');
-
-  gl.viewport(0, 0, can.width, can.height);
-
-  gl.enable(gl.DEPTH_TEST);
-  // gl.enable(gl.SAMPLE_COVERAGE);
-
+dlManager.calculatePMatrix = (settingsManager) => {
   dlManager.pMatrix = glm.mat4.create();
   glm.mat4.perspective(dlManager.pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
 
   // This converts everything from 3D space to ECI (z and y planes are swapped)
   const eciToOpenGlMat = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
   glm.mat4.mul(dlManager.pMatrix, dlManager.pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
-
-  return gl;
-};
-
-var resizeCanvas = () => {
-  let cw = document.documentElement.clientWidth || 0;
-  let iw = window.innerWidth || 0;
-  let vw = Math.min.apply(null, [cw, iw].filter(Boolean));
-  let vh = Math.min(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-
-  if (gl.canvas.width != vw || gl.canvas.height != vh) {
-    dlManager.glInit();
-  }
 };
 
 var groupsManager, uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, dotsManager;
@@ -242,7 +210,7 @@ dlManager.drawLoop = (preciseDt) => {
   // Update Earth Direction
   earth.update();
 
-  resizeCanvas();
+  dlManager.resizeCanvas();
 
   // Actually draw things now that math is done
   drawScene();
@@ -380,6 +348,7 @@ var drawScene = () => {
 
   if (1000 / timeManager.dt > settingsManager.fpsThrottle1) {
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
+      if (dlManager.isPostProcessingResizeNeeded) dlManager.resizePostProcessingTexture(sun);
       sun.draw(dlManager.pMatrix, cameraManager.camMatrix);
       moon.draw(dlManager.pMatrix, cameraManager.camMatrix);
     }
@@ -879,6 +848,12 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
 dlManager.onDrawLoopComplete = (cb) => {
   if (typeof cb == 'undefined' || cb == null) return;
   cb();
+};
+
+dlManager.resizePostProcessingTexture = (sun) => {
+  // Post Processing Texture Needs Scaled
+  sun.setupGodrays(dlManager.gl);
+  dlManager.isPostProcessingResizeNeeded = false;
 };
 
 var demoModeLastTime = 0;

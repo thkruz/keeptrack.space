@@ -15,7 +15,7 @@ const satHoverBoxDOM = document.getElementById('sat-hoverbox');
 const satMiniBox = document.getElementById('sat-minibox');
 
 var updateHoverDelay = 0;
-var updateHoverDelayLimit = 1;
+var updateHoverDelayLimit = 3;
 var satLabelModeLastTime = 0;
 var isSatMiniBoxInUse = false;
 var labelCount;
@@ -646,10 +646,6 @@ dlManager.updateHover = () => {
     //   _hoverBoxOnSat(-1, 0, 0)
     // }
   } else {
-    if (!uiInput.isMouseMoving || cameraManager.isDragging || settingsManager.isMobileModeEnabled) {
-      return;
-    }
-
     // gl.readPixels in uiInput.getSatIdFromCoord creates a lot of jank
     // Earlier in the loop we decided how much to throttle updateHover
     // if we skip it this loop, we want to still draw the last thing
@@ -660,7 +656,11 @@ dlManager.updateHover = () => {
     } else if (1000 / timeManager.dt < 50) {
       updateHoverDelayLimit = settingsManager.updateHoverDelayLimitSmall;
     } else {
-      if (updateHoverDelayLimit > 1) --updateHoverDelayLimit;
+      if (updateHoverDelayLimit > 3) --updateHoverDelayLimit;
+    }
+
+    if (!uiInput.isMouseMoving || cameraManager.isDragging || settingsManager.isMobileModeEnabled) {
+      return;
     }
 
     if (++updateHoverDelay >= updateHoverDelayLimit) {

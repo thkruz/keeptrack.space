@@ -1353,6 +1353,25 @@ satSet.getIdFromObjNum = (objNum) => {
     return null;
   }
 };
+
+satSet.getIdFromEci = (eci) => {
+  let x, y, z;
+  for (let id = 0; id < satSet.orbitalSats; id++) {
+    x = dotManager.positionData[id * 3];
+    if (x > eci.x - 100 && x < eci.x + 100) {
+      y = dotManager.positionData[id * 3 + 1];
+      if (y > eci.y - 100 && y < eci.y + 100) {
+        console.log(`y: ${id}`);
+        z = dotManager.positionData[id * 3 + 2];
+        if (z > eci.z - 100 && z < eci.z + 100) {
+          return id;
+        }
+      }
+    }
+  }
+  return -1;
+};
+
 satSet.getIdFromIntlDes = (intlDes) => {
   if (typeof satSet.cosparIndex[`${intlDes}`] !== 'undefined') {
     return satSet.cosparIndex[`${intlDes}`];

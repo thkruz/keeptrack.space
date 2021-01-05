@@ -356,7 +356,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         }
 
         if (evt.button === 2) {
-          dragPoint = getEarthScreenPoint(cameraManager.mouseX, cameraManager.mouseY);
+          dragPoint = uiInput.getEarthScreenPoint(cameraManager.mouseX, cameraManager.mouseY);
           latLon = satellite.eci2ll(dragPoint[0], dragPoint[1], dragPoint[2]);
         }
         cameraManager.screenDragPoint = [cameraManager.mouseX, cameraManager.mouseY];
@@ -1188,6 +1188,17 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
   })();
 };
 
+// This Doesn't Work Yet
+uiInput.getSatIdFromCoordAlt = (x, y) => {
+  const eci = uiInput.unProject(x, y);
+  const eciArray = {
+    x: eci[0],
+    y: eci[1],
+    z: eci[2],
+  };
+  return satSet.getIdFromEci(eciArray);
+};
+
 uiInput.getSatIdFromCoord = (x, y) => {
   // NOTE: gl.readPixels is a huge bottleneck
   gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
@@ -1197,12 +1208,12 @@ uiInput.getSatIdFromCoord = (x, y) => {
 };
 
 // Raycasting in getEarthScreenPoint would provide a lot of powerful (but slow) options later
-var getEarthScreenPoint = (x, y) => {
+uiInput.getEarthScreenPoint = (x, y) => {
   // getEarthScreenPoint
   var rayOrigin, ptThru, rayDir, toCenterVec, dParallel, longDir, dPerp, dSubSurf, dSurf, ptSurf;
 
   rayOrigin = cameraManager.getCamPos();
-  ptThru = _unProject(x, y);
+  ptThru = uiInput.unProject(x, y);
 
   rayDir = glm.vec3.create();
   glm.vec3.subtract(rayDir, ptThru, rayOrigin); // rayDir = ptThru - rayOrigin
@@ -1227,22 +1238,20 @@ var getEarthScreenPoint = (x, y) => {
   return ptSurf;
 };
 
-// _unProject variables
-var _unProject = (mx, my) => {
-  var glScreenX, glScreenY, screenVec, comboPMat, invMat, worldVec;
+// Convert Screen X,Y back to ECI
+uiInput.unProject = (x, y) => {
+  const glScreenX = (x / gl.drawingBufferWidth) * 2 - 1.0;
+  const glScreenY = 1.0 - (y / gl.drawingBufferHeight) * 2;
+  const screenVec = [glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
 
-  glScreenX = (mx / gl.drawingBufferWidth) * 2 - 1.0;
-  glScreenY = 1.0 - (my / gl.drawingBufferHeight) * 2;
-  screenVec = [glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
-
-  comboPMat = glm.mat4.create();
+  let comboPMat = glm.mat4.create();
   glm.mat4.mul(comboPMat, dlManager.pMatrix, cameraManager.camMatrix);
-  invMat = glm.mat4.create();
+  let invMat = glm.mat4.create();
   glm.mat4.invert(invMat, comboPMat);
-  worldVec = glm.vec4.create();
+  let worldVec = glm.vec4.create();
   glm.vec4.transformMat4(worldVec, screenVec, invMat);
 
-  return [worldVec[0] / worldVec[3], worldVec[1] / worldVec[3], worldVec[2] / worldVec[3]];
+  return [worldVec[0] / worldVec[3], worldVec[2] / worldVec[3], worldVec[1] / worldVec[3]];
 };
 
 export { uiInput };

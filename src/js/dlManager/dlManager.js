@@ -8,12 +8,12 @@ import { missileManager } from '@app/modules/missileManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { watermarkedDataURL } from '@app/js/helpers.js';
 
-const canvasDOM = $('#keeptrack-canvas');
+const canvasDOM = document.getElementById('#keeptrack-canvas');
 const satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
 const satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
 const satHoverBoxNode3 = document.getElementById('sat-hoverbox3');
-const satHoverBoxDOM = $('#sat-hoverbox');
-const satMiniBox = document.querySelector('#sat-minibox');
+const satHoverBoxDOM = document.getElementById('#sat-hoverbox');
+const satMiniBox = document.getElementById('#sat-minibox');
 
 var updateHoverDelay = 0;
 var updateHoverDelayLimit = 1;
@@ -27,21 +27,63 @@ let updateHoverSatId;
 let isHoverBoxVisible = false;
 let isShowDistance = true;
 
-var dlManager = {};
-// Setup dlManager
-{
-  dlManager.drawLoopCallback = null;
-  dlManager.setDrawLoopCallback = (cb) => {
+var dlManager = {
+  i: 0,
+  demoModeSatellite: 0,
+  demoModeLastTime: 0,
+  dt: null,
+  t0: 0,
+  isShowFPS: false,
+  drawLoopCallback: null,
+  setDrawLoopCallback: (cb) => {
     dlManager.drawLoopCallback = cb;
-  };
-  dlManager.i = 0;
-  dlManager.sat;
-  dlManager.demoModeSatellite = 0;
-  dlManager.demoModeLastTime = 0;
-  dlManager.dt = null;
-  dlManager.t0 = 0;
-  dlManager.isShowFPS = false;
-}
+  },
+};
+
+var groupsManager, uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, dotsManager;
+dlManager.init = (
+  groupsManagerRef,
+  uiInputRef,
+  moonRef,
+  sunRef,
+  searchBoxRef,
+  atmosphereRef,
+  starManagerRef,
+  satelliteRef,
+  ColorSchemeRef,
+  cameraManagerRef,
+  objectManagerRef,
+  orbitManagerRef,
+  meshManagerRef,
+  earthRef,
+  sensorManagerRef,
+  uiManagerRef,
+  lineManagerRef,
+  glRef,
+  dotsManagerRef
+) => {
+  uiInput = uiInputRef;
+  moon = moonRef;
+  sun = sunRef;
+  searchBox = searchBoxRef;
+  atmosphere = atmosphereRef;
+  starManager = starManagerRef;
+  satellite = satelliteRef;
+  ColorScheme = ColorSchemeRef;
+  cameraManager = cameraManagerRef;
+  objectManager = objectManagerRef;
+  orbitManager = orbitManagerRef;
+  meshManager = meshManagerRef;
+  earth = earthRef;
+  sensorManager = sensorManagerRef;
+  uiManager = uiManagerRef;
+  lineManager = lineManagerRef;
+  gl = glRef;
+  dotsManager = dotsManagerRef;
+  groupsManager = groupsManagerRef;
+
+  startWithOrbits();
+};
 
 // Reinitialize the canvas on mobile rotation
 window.addEventListener('orientationchange', function () {
@@ -124,51 +166,6 @@ dlManager.calculatePMatrix = (settingsManager) => {
   glm.mat4.mul(dlManager.pMatrix, dlManager.pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
 };
 
-var groupsManager, uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, dotsManager;
-dlManager.init = (
-  groupsManagerRef,
-  uiInputRef,
-  moonRef,
-  sunRef,
-  searchBoxRef,
-  atmosphereRef,
-  starManagerRef,
-  satelliteRef,
-  ColorSchemeRef,
-  cameraManagerRef,
-  objectManagerRef,
-  orbitManagerRef,
-  meshManagerRef,
-  earthRef,
-  sensorManagerRef,
-  uiManagerRef,
-  lineManagerRef,
-  glRef,
-  dotsManagerRef
-) => {
-  uiInput = uiInputRef;
-  moon = moonRef;
-  sun = sunRef;
-  searchBox = searchBoxRef;
-  atmosphere = atmosphereRef;
-  starManager = starManagerRef;
-  satellite = satelliteRef;
-  ColorScheme = ColorSchemeRef;
-  cameraManager = cameraManagerRef;
-  objectManager = objectManagerRef;
-  orbitManager = orbitManagerRef;
-  meshManager = meshManagerRef;
-  earth = earthRef;
-  sensorManager = sensorManagerRef;
-  uiManager = uiManagerRef;
-  lineManager = lineManagerRef;
-  gl = glRef;
-  dotsManager = dotsManagerRef;
-  groupsManager = groupsManagerRef;
-
-  startWithOrbits();
-};
-
 var startWithOrbits = async () => {
   if (settingsManager.startWithOrbitsDisplayed) {
     // All Orbits
@@ -188,32 +185,45 @@ dlManager.drawLoop = (preciseDt) => {
   dlManager.dt = preciseDt - dlManager.t0 || 0;
   // Record last Draw Time for Calculating Difference
   dlManager.t0 = preciseDt;
-
   // Display it if that settings is enabled
   if (dlManager.isShowFPS) console.log(1000 / timeManager.dt);
-
   // Update official time for everyone else
   timeManager.setNow(Date.now(), dlManager.dt, $('#datetime-input-tb'));
 
-  // Calculate changes related to satellites objects
-  dlManager.satCalculate();
-
-  // Calculate camera changes needed since last draw
-  cameraManager.calculate(objectManager.selectedSat, dlManager.dt);
-
-  // Missile oribts have to be updated every draw or they quickly become innacurate
-  dlManager.updateMissileOrbits();
-
-  // If in satellite view the orbit buffer needs to be updated every time
-  if (cameraManager.cameraType.current == cameraManager.cameraType.satellite) orbitManager.updateOrbitBuffer(objectManager.lastSelectedSat());
-
-  // Update Earth Direction
-  earth.update();
-
-  dlManager.resizeCanvas();
+  // Do any per frame calculations
+  dlManager.updateLoop();
 
   // Actually draw things now that math is done
-  drawScene();
+  dlManager.resizeCanvas();
+  dlManager.clearFrameBuffers();
+
+  dlManager.orbitsAbove();
+
+  // Sun, Moon, and Atmosphere
+  dlManager.drawOptionalScenery();
+
+  earth.draw(dlManager.pMatrix, cameraManager.camMatrix, dotsManager);
+
+  // Update Draw Positions
+  dotsManager.updatePositionBuffer(satSet, timeManager);
+
+  // Draw Dots
+  dotsManager.draw(dlManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
+
+  // Draw GPU Picking Overlay -- This is what lets us pick a satellite
+  dotsManager.drawGpuPickingFrameBuffer(dlManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
+
+  orbitManager.draw(dlManager.pMatrix, cameraManager.camMatrix);
+
+  lineManager.draw();
+
+  if (objectManager.selectedSat !== -1 && settingsManager.enableConstantSelectedSatRedraw) {
+    orbitManager.clearSelectOrbit();
+    orbitManager.setSelectOrbit(objectManager.selectedSat);
+  }
+
+  // Draw Satellite Model if a satellite is selected and meshManager is loaded
+  dlManager.drawSatelliteModel();
 
   // Update orbit currently being hovered over
   // Only if last frame was 50 FPS or more readpixels used to determine which satellite is hovered
@@ -232,151 +242,26 @@ dlManager.drawLoop = (preciseDt) => {
   if (settingsManager.screenshotMode) dlManager.screenShot();
 };
 
-dlManager.satCalculate = () => {
-  if (objectManager.selectedSat !== -1) {
-    dlManager.sat = satSet.getSat(objectManager.selectedSat);
-    if (!dlManager.sat.static) {
-      cameraManager.camSnapToSat(dlManager.sat);
+dlManager.updateLoop = () => {
+  // Calculate changes related to satellites objects
+  dlManager.satCalculate();
 
-      if (dlManager.sat.missile || typeof meshManager == 'undefined') {
-        settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0];
-      } else {
-        settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
-      }
+  // Calculate camera changes needed since last draw
+  cameraManager.calculate(objectManager.selectedSat, dlManager.dt);
 
-      // If 3D Models Available, then update their position on the screen
-      if (typeof meshManager !== 'undefined' && !dlManager.sat.missile) {
-        // Try to reduce some jitter
-        if (
-          typeof meshManager.selectedSatPosition !== 'undefined' &&
-          meshManager.selectedSatPosition.x > dlManager.sat.position.x - 1.0 &&
-          meshManager.selectedSatPosition.x < dlManager.sat.position.x + 1.0 &&
-          meshManager.selectedSatPosition.y > dlManager.sat.position.y - 1.0 &&
-          meshManager.selectedSatPosition.y < dlManager.sat.position.y + 1.0 &&
-          meshManager.selectedSatPosition.z > dlManager.sat.position.z - 1.0 &&
-          meshManager.selectedSatPosition.z < dlManager.sat.position.z + 1.0
-        ) {
-          // Lerp to smooth difference between SGP4 and position+velocity
-          meshManager.lerpPosition(dlManager.sat.position, timeManager.drawDt);
-        } else {
-          meshManager.updatePosition(dlManager.sat.position);
-        }
-      }
-    }
-    if (dlManager.sat.missile) orbitManager.setSelectOrbit(dlManager.sat.satId);
-  }
-  if (objectManager.selectedSat !== dlManager.lastSelectedSat) {
-    if (objectManager.selectedSat === -1 && !isselectedSatNegativeOne) {
-      orbitManager.clearSelectOrbit();
-    }
-    selectSatManager.selectSat(objectManager.selectedSat, cameraManager);
-    if (objectManager.selectedSat !== -1) {
-      orbitManager.setSelectOrbit(objectManager.selectedSat);
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
-        lineManager.updateLineToSat(objectManager.selectedSat, satSet.getIdFromSensorName(sensorManager.currentSensor.name));
-      }
-      uiManager.updateMap();
-    }
-    if (objectManager.selectedSat !== -1 || (objectManager.selectedSat == -1 && !isselectedSatNegativeOne)) {
-      lineManager.drawWhenSelected();
-    }
-    dlManager.lastSelectedSat = objectManager.selectedSat;
-    objectManager.lastSelectedSat(objectManager.selectedSat);
-  }
-};
+  // Missile oribts have to be updated every draw or they quickly become innacurate
+  dlManager.updateMissileOrbits();
 
-dlManager.updateMissileOrbits = () => {
-  if (typeof missileManager != 'undefined' && missileManager.missileArray.length > 0) {
-    for (dlManager.i = 0; dlManager.i < missileManager.missileArray.length; dlManager.i++) {
-      orbitManager.updateOrbitBuffer(missileManager.missileArray[dlManager.i].id);
-    }
-  }
-};
+  // If in satellite view the orbit buffer needs to be updated every time
+  if (cameraManager.cameraType.current == cameraManager.cameraType.satellite) orbitManager.updateOrbitBuffer(objectManager.lastSelectedSat());
 
-dlManager.screenShot = () => {
-  dlManager.glInit();
-  if (settingsManager.queuedScreenshot) return;
-
-  setTimeout(function () {
-    let link = document.createElement('a');
-    link.download = 'keeptrack.png';
-
-    let d = new Date();
-    let n = d.getFullYear();
-    let copyrightStr;
-    if (!settingsManager.copyrightOveride) {
-      copyrightStr = `©${n} KEEPTRACK.SPACE`;
-    } else {
-      copyrightStr = '';
-    }
-
-    link.href = watermarkedDataURL(canvasDOM[0], copyrightStr);
-    settingsManager.screenshotMode = false;
-    settingsManager.queuedScreenshot = false;
-    setTimeout(function () {
-      link.click();
-    }, 10);
-    dlManager.glInit();
-  }, 200);
-  settingsManager.queuedScreenshot = true;
-};
-
-var drawScene = () => {
-  // Clear the Picking Frame Buffer
-  gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  // Clear the godraysPostProcessing Frame Buffer
-  gl.bindFramebuffer(gl.FRAMEBUFFER, sun.godraysFrameBuffer);
-  gl.clearColor(0.0, 0.0, 0.0, 0.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-  // Switch back to the canvas
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-  dlManager.orbitsAbove();
+  // Update Earth Direction
+  earth.update();
 
   cameraManager.update(dlManager.sat, dlManager.sensorPos);
+};
 
-  // This should be moved TODO
-  gl.useProgram(dotsManager.pickingProgram);
-  gl.uniformMatrix4fv(dotsManager.pickingProgram.uPMatrix, false, dlManager.pMatrix);
-  gl.uniformMatrix4fv(dotsManager.pickingProgram.camMatrix, false, cameraManager.camMatrix);
-
-  // gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-  if (1000 / timeManager.dt > settingsManager.fpsThrottle1) {
-    if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
-      if (dlManager.isPostProcessingResizeNeeded) dlManager.resizePostProcessingTexture(sun);
-      sun.draw(dlManager.pMatrix, cameraManager.camMatrix);
-      moon.draw(dlManager.pMatrix, cameraManager.camMatrix);
-    }
-  }
-  if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
-    atmosphere.draw(dlManager.pMatrix, cameraManager);
-  }
-  earth.draw(dlManager.pMatrix, cameraManager.camMatrix, dotsManager);
-
-  // Update Draw Positions
-  dotsManager.updatePositionBuffer(satSet, timeManager);
-
-  // Draw Dots
-  dotsManager.draw(dlManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
-
-  // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-  dotsManager.drawPicking(dlManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
-
-  orbitManager.draw(dlManager.pMatrix, cameraManager.camMatrix);
-
-  lineManager.draw();
-
-  if (objectManager.selectedSat !== -1 && settingsManager.enableConstantSelectedSatRedraw) {
-    orbitManager.clearSelectOrbit();
-    orbitManager.setSelectOrbit(objectManager.selectedSat);
-  }
-
-  // Draw Satellite Model if a satellite is selected and meshManager is loaded
+dlManager.drawSatelliteModel = () => {
   if (objectManager.selectedSat !== -1 && typeof meshManager != 'undefined' && meshManager.isReady) {
     let sat = dlManager.sat;
     // If 3D Models Available, then draw them on the screen
@@ -540,6 +425,109 @@ var drawScene = () => {
       }
     }
   }
+};
+
+dlManager.drawOptionalScenery = () => {
+  if (1000 / timeManager.dt > settingsManager.fpsThrottle1) {
+    if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
+      if (dlManager.isPostProcessingResizeNeeded) dlManager.resizePostProcessingTexture(sun);
+      sun.draw(dlManager.pMatrix, cameraManager.camMatrix);
+      moon.draw(dlManager.pMatrix, cameraManager.camMatrix);
+    }
+  }
+
+  if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
+    atmosphere.draw(dlManager.pMatrix, cameraManager);
+  }
+};
+
+dlManager.satCalculate = () => {
+  if (objectManager.selectedSat !== -1) {
+    dlManager.sat = satSet.getSat(objectManager.selectedSat);
+    if (!dlManager.sat.static) {
+      cameraManager.camSnapToSat(dlManager.sat);
+
+      if (dlManager.sat.missile || typeof meshManager == 'undefined') {
+        settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0];
+      } else {
+        settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
+      }
+
+      // If 3D Models Available, then update their position on the screen
+      if (typeof meshManager !== 'undefined' && !dlManager.sat.missile) {
+        // Try to reduce some jitter
+        if (
+          typeof meshManager.selectedSatPosition !== 'undefined' &&
+          meshManager.selectedSatPosition.x > dlManager.sat.position.x - 1.0 &&
+          meshManager.selectedSatPosition.x < dlManager.sat.position.x + 1.0 &&
+          meshManager.selectedSatPosition.y > dlManager.sat.position.y - 1.0 &&
+          meshManager.selectedSatPosition.y < dlManager.sat.position.y + 1.0 &&
+          meshManager.selectedSatPosition.z > dlManager.sat.position.z - 1.0 &&
+          meshManager.selectedSatPosition.z < dlManager.sat.position.z + 1.0
+        ) {
+          // Lerp to smooth difference between SGP4 and position+velocity
+          meshManager.lerpPosition(dlManager.sat.position, timeManager.drawDt);
+        } else {
+          meshManager.updatePosition(dlManager.sat.position);
+        }
+      }
+    }
+    if (dlManager.sat.missile) orbitManager.setSelectOrbit(dlManager.sat.satId);
+  }
+  if (objectManager.selectedSat !== dlManager.lastSelectedSat) {
+    if (objectManager.selectedSat === -1 && !isselectedSatNegativeOne) {
+      orbitManager.clearSelectOrbit();
+    }
+    selectSatManager.selectSat(objectManager.selectedSat, cameraManager);
+    if (objectManager.selectedSat !== -1) {
+      orbitManager.setSelectOrbit(objectManager.selectedSat);
+      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
+        lineManager.updateLineToSat(objectManager.selectedSat, satSet.getIdFromSensorName(sensorManager.currentSensor.name));
+      }
+      uiManager.updateMap();
+    }
+    if (objectManager.selectedSat !== -1 || (objectManager.selectedSat == -1 && !isselectedSatNegativeOne)) {
+      lineManager.drawWhenSelected();
+    }
+    dlManager.lastSelectedSat = objectManager.selectedSat;
+    objectManager.lastSelectedSat(objectManager.selectedSat);
+  }
+};
+
+dlManager.updateMissileOrbits = () => {
+  if (typeof missileManager != 'undefined' && missileManager.missileArray.length > 0) {
+    for (dlManager.i = 0; dlManager.i < missileManager.missileArray.length; dlManager.i++) {
+      orbitManager.updateOrbitBuffer(missileManager.missileArray[dlManager.i].id);
+    }
+  }
+};
+
+dlManager.screenShot = () => {
+  dlManager.glInit();
+  if (settingsManager.queuedScreenshot) return;
+
+  setTimeout(function () {
+    let link = document.createElement('a');
+    link.download = 'keeptrack.png';
+
+    let d = new Date();
+    let n = d.getFullYear();
+    let copyrightStr;
+    if (!settingsManager.copyrightOveride) {
+      copyrightStr = `©${n} KEEPTRACK.SPACE`;
+    } else {
+      copyrightStr = '';
+    }
+
+    link.href = watermarkedDataURL(canvasDOM[0], copyrightStr);
+    settingsManager.screenshotMode = false;
+    settingsManager.queuedScreenshot = false;
+    setTimeout(function () {
+      link.click();
+    }, 10);
+    dlManager.glInit();
+  }, 200);
+  settingsManager.queuedScreenshot = true;
 };
 
 dlManager.isDrawOrbitsAbove = false;
@@ -883,6 +871,20 @@ dlManager.demoMode = () => {
     dlManager.demoModeSatellite = dlManager.i + 1;
     return;
   }
+};
+
+dlManager.clearFrameBuffers = () => {
+  gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  // Clear the godraysPostProcessing Frame Buffer
+  gl.bindFramebuffer(gl.FRAMEBUFFER, sun.godraysFrameBuffer);
+  gl.clearColor(0.0, 0.0, 0.0, 0.0);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  // Switch back to the canvas
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  // gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 };
 
 export { dlManager };

@@ -73,7 +73,7 @@ class Dots {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  drawPicking(pMatrix, cameraManager, colorScheme) {
+  drawGpuPickingFrameBuffer(pMatrix, cameraManager, colorScheme) {
     if (!this.loaded || !settingsManager.cruncherReady) return;
     const gl = this.gl;
 

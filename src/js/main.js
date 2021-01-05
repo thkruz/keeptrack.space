@@ -51,10 +51,10 @@ import { timeManager } from '@app/js/timeManager.js';
 jQAlt.docReady(async function initalizeKeepTrack() {
   timeManager.init();
   settingsManager.loadStr('dots');
-  await mobile.init();
+  mobile.init();
   const cameraManager = new Camera();
   // We need to know if we are on a small screen before starting webgl
-  const gl = await dlManager.glInit(mobile);
+  const gl = await dlManager.glInit();
   const dotsManager = new Dots(gl);
   satSet.init(gl, dotsManager, cameraManager);
   objectManager.init(dotsManager);

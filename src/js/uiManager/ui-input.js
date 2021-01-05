@@ -39,8 +39,8 @@ var uiInput = {};
 uiInput.isMouseMoving = false;
 uiInput.mouseSat = -1;
 
-var cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, dlManager, dotsManager;
-uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lineManagerRef, sensorManagerRef, starManagerRef, ColorSchemeRef, satCruncherRef, earthRef, glRef, uiManagerRef, dlManagerRef, dotsManagerRef) => {
+var cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, gl, uiManager, dlManager, dotsManager;
+uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lineManagerRef, sensorManagerRef, starManagerRef, ColorSchemeRef, satCruncherRef, uiManagerRef, dlManagerRef, dotsManagerRef) => {
   cameraManager = cameraManagerRef;
   dotsManager = dotsManagerRef;
   objectManager = objectManagerRef;
@@ -51,10 +51,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
   starManager = starManagerRef;
   ColorScheme = ColorSchemeRef;
   satCruncher = satCruncherRef;
-  earth = earthRef;
-  gl = glRef;
   uiManager = uiManagerRef;
   dlManager = dlManagerRef;
+  gl = dlManager.gl;
 
   // 2020 Key listener
   // TODO: Migrate most things from UI to Here
@@ -1092,9 +1091,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = false;
           localStorage.setItem('lastMap', 'blue');
-          earth.init(gl);
-          earth.loadHiRes();
-          earth.loadHiResNight();
+          dlManager.sceneManager.earth.init(gl);
+          dlManager.sceneManager.earth.loadHiRes();
+          dlManager.sceneManager.earth.loadHiResNight();
           break;
         case 'earth-nasa-rmb':
           settingsManager.blueImages = false;
@@ -1105,9 +1104,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = false;
           localStorage.setItem('lastMap', 'nasa');
-          earth.init(gl);
-          earth.loadHiRes();
-          earth.loadHiResNight();
+          dlManager.sceneManager.earth.init(gl);
+          dlManager.sceneManager.earth.loadHiRes();
+          dlManager.sceneManager.earth.loadHiResNight();
           break;
         case 'earth-trusat-rmb':
           settingsManager.blueImages = false;
@@ -1118,9 +1117,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = false;
           localStorage.setItem('lastMap', 'trusat');
-          earth.init(gl);
-          earth.loadHiRes();
-          earth.loadHiResNight();
+          dlManager.sceneManager.earth.init(gl);
+          dlManager.sceneManager.earth.loadHiRes();
+          dlManager.sceneManager.earth.loadHiResNight();
           break;
         case 'earth-low-rmb':
           settingsManager.blueImages = false;
@@ -1131,9 +1130,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = false;
           localStorage.setItem('lastMap', 'low');
-          earth.init(gl);
-          earth.loadHiRes();
-          earth.loadHiResNight();
+          dlManager.sceneManager.earth.init(gl);
+          dlManager.sceneManager.earth.loadHiRes();
+          dlManager.sceneManager.earth.loadHiResNight();
           break;
         case 'earth-high-rmb':
           $('#loading-screen').fadeIn(1000, function () {
@@ -1145,9 +1144,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
             localStorage.setItem('lastMap', 'high');
-            earth.init(gl);
-            earth.loadHiRes();
-            earth.loadHiResNight();
+            dlManager.sceneManager.earth.init(gl);
+            dlManager.sceneManager.earth.loadHiRes();
+            dlManager.sceneManager.earth.loadHiResNight();
             $('#loading-screen').fadeOut('slow');
           });
           break;
@@ -1161,9 +1160,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
             settingsManager.hiresNoCloudsImages = true;
             settingsManager.vectorImages = false;
             localStorage.setItem('lastMap', 'high-nc');
-            earth.init(gl);
-            earth.loadHiRes();
-            earth.loadHiResNight();
+            dlManager.sceneManager.earth.init(gl);
+            dlManager.sceneManager.earth.loadHiRes();
+            dlManager.sceneManager.earth.loadHiResNight();
             $('#loading-screen').fadeOut('slow');
           });
           break;
@@ -1176,9 +1175,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = true;
           localStorage.setItem('lastMap', 'vec');
-          earth.init(gl);
-          earth.loadHiRes();
-          earth.loadHiResNight();
+          dlManager.sceneManager.earth.init(gl);
+          dlManager.sceneManager.earth.loadHiRes();
+          dlManager.sceneManager.earth.loadHiResNight();
           break;
         case 'clear-screen-rmb':
           (function clearScreenRMB() {

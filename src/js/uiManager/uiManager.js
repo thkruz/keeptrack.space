@@ -38,7 +38,6 @@ import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-sc
 import { adviceList } from '@app/js/advice-module.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
 import { dlManager } from '@app/js/dlManager/dlManager.js';
-import { earth } from '@app/js/sceneManager/sceneManager.js';
 import { mapManager } from '@app/js/uiManager/mapManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
 import { mobile } from '@app/js/mobile.js';
@@ -3412,12 +3411,12 @@ $(document).ready(function () {
           break;
         }
       case 'menu-day-night': // No Keyboard Commands
-        if (earth.isDayNightToggle()) {
-          earth.isDayNightToggle(false);
+        if (dlManager.sceneManager.earth.isDayNightToggle()) {
+          dlManager.sceneManager.earth.isDayNightToggle(false);
           $('#menu-day-night').removeClass('bmenu-item-selected');
           break;
         } else {
-          earth.isDayNightToggle(true);
+          dlManager.sceneManager.earth.isDayNightToggle(true);
           $('#menu-day-night').addClass('bmenu-item-selected');
           break;
         }
@@ -4138,7 +4137,7 @@ uiManager.keyHandler = (evt) => {
 };
 
 uiManager.hideLoadingScreen = () => {
-  if (earth.isUseHiRes && earth.isHiResReady !== true) {
+  if (dlManager.sceneManager.earth.isUseHiRes && dlManager.sceneManager.earth.isHiResReady !== true) {
     setTimeout(function () {
       uiManager.hideLoadingScreen();
     }, 100);

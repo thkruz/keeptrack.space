@@ -42,7 +42,6 @@ import { satellite } from '@app/js/lookangles.js';
 import { saveAs } from '@app/js/lib/file-saver.min.js';
 import { searchBox } from '@app/js/search-box.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
-import { sun } from '@app/js/sceneManager/sceneManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
 
@@ -1124,7 +1123,8 @@ satSet.getSat = (i) => {
   if (typeof satData[i].isInSun == 'undefined') {
     satData[i].isInSun = () => {
       // Distances all in km
-      let sunECI = sun.realXyz;
+      // satSet.sunECI is updated by dlManager every draw frame
+      let sunECI = satSet.sunECI;
 
       // NOTE: Code is mashed to save memory when used on the whole catalog
 

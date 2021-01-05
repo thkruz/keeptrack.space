@@ -1,19 +1,19 @@
-import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { DEG2RAD, RAD2DEG } from '@app/js/constants.js';
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/selectSat.js';
 import { satScreenPositionArray, satSet } from '@app/js/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
+import { meshManager } from '@app/modules/meshManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
+import { sceneManager } from '@app/js/dlManager/sceneManager/sceneManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { watermarkedDataURL } from '@app/js/helpers.js';
 
-const canvasDOM = document.getElementById('#keeptrack-canvas');
 const satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
 const satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
 const satHoverBoxNode3 = document.getElementById('sat-hoverbox3');
-const satHoverBoxDOM = document.getElementById('#sat-hoverbox');
-const satMiniBox = document.getElementById('#sat-minibox');
+const satHoverBoxDOM = document.getElementById('sat-hoverbox');
+const satMiniBox = document.getElementById('sat-minibox');
 
 var updateHoverDelay = 0;
 var updateHoverDelayLimit = 1;
@@ -26,6 +26,7 @@ var isShowNextPass = false;
 let updateHoverSatId;
 let isHoverBoxVisible = false;
 let isShowDistance = true;
+var gl;
 
 var dlManager = {
   i: 0,
@@ -40,45 +41,19 @@ var dlManager = {
   },
 };
 
-var groupsManager, uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, dotsManager;
-dlManager.init = (
-  groupsManagerRef,
-  uiInputRef,
-  moonRef,
-  sunRef,
-  searchBoxRef,
-  atmosphereRef,
-  starManagerRef,
-  satelliteRef,
-  ColorSchemeRef,
-  cameraManagerRef,
-  objectManagerRef,
-  orbitManagerRef,
-  meshManagerRef,
-  earthRef,
-  sensorManagerRef,
-  uiManagerRef,
-  lineManagerRef,
-  glRef,
-  dotsManagerRef
-) => {
+var groupsManager, uiInput, searchBox, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager;
+dlManager.init = (groupsManagerRef, uiInputRef, searchBoxRef, starManagerRef, satelliteRef, ColorSchemeRef, cameraManagerRef, objectManagerRef, orbitManagerRef, sensorManagerRef, uiManagerRef, lineManagerRef, dotsManagerRef) => {
   uiInput = uiInputRef;
-  moon = moonRef;
-  sun = sunRef;
   searchBox = searchBoxRef;
-  atmosphere = atmosphereRef;
   starManager = starManagerRef;
   satellite = satelliteRef;
   ColorScheme = ColorSchemeRef;
   cameraManager = cameraManagerRef;
   objectManager = objectManagerRef;
   orbitManager = orbitManagerRef;
-  meshManager = meshManagerRef;
-  earth = earthRef;
   sensorManager = sensorManagerRef;
   uiManager = uiManagerRef;
   lineManager = lineManagerRef;
-  gl = glRef;
   dotsManager = dotsManagerRef;
   groupsManager = groupsManagerRef;
 
@@ -91,10 +66,9 @@ window.addEventListener('orientationchange', function () {
   dlManager.isRotationEvent = true;
 });
 
+dlManager.canvas = document.getElementById('keeptrack-canvas');
 dlManager.glInit = async () => {
-  const canvasDOM = $('#keeptrack-canvas');
-  dlManager.canvas = canvasDOM[0];
-
+  // dlManager Scope
   gl = dlManager.canvas.getContext('webgl', {
     alpha: false,
     premultipliedAlpha: false,
@@ -112,6 +86,19 @@ dlManager.glInit = async () => {
 
   dlManager.gl = gl;
   return gl;
+};
+
+dlManager.loadScene = async () => {
+  await sceneManager.earth.init(gl);
+  sceneManager.earth.loadHiRes();
+  sceneManager.earth.loadHiResNight();
+  meshManager.init(gl, sceneManager.earth);
+  sceneManager.atmosphere = new sceneManager.classes.Atmosphere(gl, sceneManager.earth, settingsManager);
+  await sceneManager.sun.init(gl, sceneManager.earth);
+  sceneManager.moon = new sceneManager.classes.Moon(gl, sceneManager.sun);
+
+  // Make this public
+  dlManager.sceneManager = sceneManager;
 };
 
 dlManager.resizeCanvas = () => {
@@ -188,7 +175,7 @@ dlManager.drawLoop = (preciseDt) => {
   // Display it if that settings is enabled
   if (dlManager.isShowFPS) console.log(1000 / timeManager.dt);
   // Update official time for everyone else
-  timeManager.setNow(Date.now(), dlManager.dt, $('#datetime-input-tb'));
+  timeManager.setNow(Date.now(), dlManager.dt, document.getElementById('datetime-input-tb'));
 
   // Do any per frame calculations
   dlManager.updateLoop();
@@ -202,7 +189,7 @@ dlManager.drawLoop = (preciseDt) => {
   // Sun, Moon, and Atmosphere
   dlManager.drawOptionalScenery();
 
-  earth.draw(dlManager.pMatrix, cameraManager.camMatrix, dotsManager);
+  sceneManager.earth.draw(dlManager.pMatrix, cameraManager.camMatrix, dotsManager);
 
   // Update Draw Positions
   dotsManager.updatePositionBuffer(satSet, timeManager);
@@ -256,7 +243,9 @@ dlManager.updateLoop = () => {
   if (cameraManager.cameraType.current == cameraManager.cameraType.satellite) orbitManager.updateOrbitBuffer(objectManager.lastSelectedSat());
 
   // Update Earth Direction
-  earth.update();
+  sceneManager.earth.update();
+
+  satSet.sunECI = sceneManager.sun.realXyz;
 
   cameraManager.update(dlManager.sat, dlManager.sensorPos);
 };
@@ -430,14 +419,14 @@ dlManager.drawSatelliteModel = () => {
 dlManager.drawOptionalScenery = () => {
   if (1000 / timeManager.dt > settingsManager.fpsThrottle1) {
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
-      if (dlManager.isPostProcessingResizeNeeded) dlManager.resizePostProcessingTexture(sun);
-      sun.draw(dlManager.pMatrix, cameraManager.camMatrix);
-      moon.draw(dlManager.pMatrix, cameraManager.camMatrix);
+      if (dlManager.isPostProcessingResizeNeeded) dlManager.resizePostProcessingTexture(sceneManager.sun);
+      sceneManager.sun.draw(dlManager.pMatrix, cameraManager.camMatrix);
+      sceneManager.moon.draw(dlManager.pMatrix, cameraManager.camMatrix);
     }
   }
 
   if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
-    atmosphere.draw(dlManager.pMatrix, cameraManager);
+    sceneManager.atmosphere.draw(dlManager.pMatrix, cameraManager);
   }
 };
 
@@ -519,7 +508,7 @@ dlManager.screenShot = () => {
       copyrightStr = '';
     }
 
-    link.href = watermarkedDataURL(canvasDOM[0], copyrightStr);
+    link.href = watermarkedDataURL(dlManager.canvas, copyrightStr);
     settingsManager.screenshotMode = false;
     settingsManager.queuedScreenshot = false;
     setTimeout(function () {
@@ -543,7 +532,8 @@ dlManager.orbitsAbove = () => {
     // Previously called showOrbitsAbove();
     if (!settingsManager.isSatLabelModeOn || cameraManager.cameraType.current !== cameraManager.cameraType.planetarium) {
       if (isSatMiniBoxInUse) {
-        $('#sat-minibox').html('');
+        hoverBoxOnSatMiniElements = document.getElementById('sat-minibox');
+        hoverBoxOnSatMiniElements.innerHTML = '';
       }
       isSatMiniBoxInUse = false;
       return;
@@ -590,14 +580,12 @@ dlManager.orbitsAbove = () => {
       satHoverMiniDOM = document.createElement('div');
       satHoverMiniDOM.id = 'sat-minibox-' + i;
       satHoverMiniDOM.textContent = sat.SCC_NUM;
-      satHoverMiniDOM.setAttribute(
-        'style',
-        `display: block;
-       position: absolute;
-       left: ${satScreenPositionArray.x + 10}px;
-       top: ${satScreenPositionArray.y}px
-       `
-      );
+
+      satHoverMiniDOM.style.display = 'block';
+      satHoverMiniDOM.style.position = 'absolute';
+      satHoverMiniDOM.style.left = `${satScreenPositionArray.x + 20}px`;
+      satHoverMiniDOM.style.top = `${satScreenPositionArray.y}px`;
+
       hoverBoxOnSatMiniElements.appendChild(satHoverMiniDOM);
       labelCount++;
     }
@@ -679,11 +667,11 @@ dlManager.updateHover = () => {
 let sat2;
 var _hoverBoxOnSat = (satId, satX, satY) => {
   if (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && !settingsManager.isDemoModeOn) {
-    satHoverBoxDOM.css({ display: 'none' });
+    satHoverBoxDOM.style.display = 'none;';
     if (satId === -1) {
-      canvasDOM.css({ cursor: 'default' });
+      dlManager.canvas.style.cursor = 'default';
     } else {
-      canvasDOM.css({ cursor: 'pointer' });
+      dlManager.canvas.style.cursor = 'pointer';
     }
     return;
   }
@@ -693,8 +681,8 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
       if (starManager.isConstellationVisible === true && !starManager.isAllConstellationVisible) starManager.clearConstellations();
     }
     // satHoverBoxDOM.html('(none)')
-    satHoverBoxDOM.css({ display: 'none' });
-    canvasDOM.css({ cursor: 'default' });
+    satHoverBoxDOM.style.display = 'none;';
+    dlManager.canvas.style.cursor = 'default';
     isHoverBoxVisible = false;
   } else if (!cameraManager.isDragging && !!settingsManager.enableHoverOverlay) {
     var sat = satSet.getSatExtraOnly(satId);
@@ -823,14 +811,12 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
       }
     }
 
-    satHoverBoxDOM.css({
-      'display': 'block',
-      'text-align': 'center',
-      'position': 'fixed',
-      'left': satX + 20,
-      'top': satY - 10,
-    });
-    canvasDOM.css({ cursor: 'pointer' });
+    satHoverBoxDOM.style.display = 'block';
+    satHoverBoxDOM.style.textAlign = 'center';
+    satHoverBoxDOM.style.position = 'fixed';
+    satHoverBoxDOM.style.left = `${satX + 20}px`;
+    satHoverBoxDOM.style.top = `${satY - 10}px`;
+    dlManager.canvas.style.cursor = 'pointer';
   }
 };
 dlManager.onDrawLoopComplete = (cb) => {
@@ -878,7 +864,7 @@ dlManager.clearFrameBuffers = () => {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   // Clear the godraysPostProcessing Frame Buffer
-  gl.bindFramebuffer(gl.FRAMEBUFFER, sun.godraysFrameBuffer);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, sceneManager.sun.godraysFrameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   // Switch back to the canvas

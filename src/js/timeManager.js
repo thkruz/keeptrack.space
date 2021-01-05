@@ -63,7 +63,7 @@ timeManager.init = () => {
 
     // Passing datetimeInput eliminates needing jQuery in this module
     if (timeManager.lastTime - timeManager.propTimeVar < 300 && (settingsManager.isEditTime || !settingsManager.cruncherReady)) {
-      datetimeInput.val(timeManager.selectedDate.toISOString().slice(0, 10) + ' ' + timeManager.selectedDate.toISOString().slice(11, 19));
+      datetimeInput.val = timeManager.selectedDate.toISOString().slice(0, 10) + ' ' + timeManager.selectedDate.toISOString().slice(11, 19);
     }
   };
 

@@ -16,8 +16,6 @@
  * // /////////////////////////////////////////////////////////////////////////////
  */
 
-('use strict');
-
 // This file should contain all of the webgl code for generating non .obj meshes
 import { Atmosphere } from './atmosphere.js';
 import { LineFactory } from './line-factory.js';
@@ -25,4 +23,13 @@ import { Moon } from './moon.js';
 import { earth } from './earth.js';
 import { sun } from './sun.js';
 
-export { Atmosphere, LineFactory, sun, earth, Moon };
+const sceneManager = {
+  classes: {
+    Atmosphere: Atmosphere,
+    Moon: Moon,
+  },
+  earth: earth,
+  sun: sun,
+};
+
+export { LineFactory, sceneManager };

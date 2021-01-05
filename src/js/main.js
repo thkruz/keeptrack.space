@@ -25,16 +25,15 @@
 
 import 'jquery-ui-bundle';
 import 'materialize-css';
-import { Atmosphere, LineFactory, Moon, earth, sun } from '@app/js/sceneManager/sceneManager.js';
 import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satSet } from '@app/js/satSet.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { Dots } from './dots';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
+import { LineFactory } from '@app/js/dlManager/sceneManager/sceneManager.js';
 import { dlManager } from '@app/js/dlManager/dlManager.js';
 import { jQAlt } from '@app/js/jqalt/jqalt.js';
-import { meshManager } from '@app/modules/meshManager.js';
 import { mobile } from '@app/js/mobile.js';
 import { objectManager } from '@app/js/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager.js';
@@ -55,6 +54,7 @@ jQAlt.docReady(async function initalizeKeepTrack() {
   const cameraManager = new Camera();
   // We need to know if we are on a small screen before starting webgl
   const gl = await dlManager.glInit();
+  dlManager.loadScene();
   const dotsManager = new Dots(gl);
   satSet.init(gl, dotsManager, cameraManager);
   objectManager.init(dotsManager);
@@ -65,13 +65,6 @@ jQAlt.docReady(async function initalizeKeepTrack() {
 
   dotsManager.setupPickingBuffer(satSet.satData);
   satSet.setColorScheme(ColorScheme.default, true);
-  await earth.init(gl);
-  earth.loadHiRes();
-  earth.loadHiResNight();
-  meshManager.init(gl, earth);
-  let atmosphere = new Atmosphere(gl, earth, settingsManager);
-  await sun.init(gl, earth);
-  let moon = new Moon(gl, sun);
 
   const groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
   await orbitManager.init(gl, cameraManager, groupsManager);
@@ -86,9 +79,9 @@ jQAlt.docReady(async function initalizeKeepTrack() {
   satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
   satLinkManager.idToSatnum(satSet);
 
-  uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, dlManager, dotsManager);
+  uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, uiManager, dlManager, dotsManager);
 
-  await dlManager.init(groupsManager, uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, dotsManager);
+  await dlManager.init(groupsManager, uiInput, searchBox, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
 
   // Now that everything is loaded, start rendering to thg canvas
   await dlManager.drawLoop();

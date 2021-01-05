@@ -13,6 +13,7 @@ timeManager.init = () => {
 
   timeManager.dateObject = new Date();
   timeManager.propTimeVar = timeManager.dateObject;
+  timeManager.datetimeInputDOM = $('#datetime-input-tb');
 
   timeManager.timeTextStr = '';
   timeManager.timeTextStrEmpty = '';
@@ -64,7 +65,7 @@ timeManager.init = () => {
 
     // Passing datetimeInput eliminates needing jQuery in main module
     if (timeManager.lastTime - timeManager.propTimeVar < 300 && (settingsManager.isEditTime || !settingsManager.cruncherReady)) {
-      $('#' + datetimeInput.id).val(timeManager.selectedDate.toISOString().slice(0, 10) + ' ' + timeManager.selectedDate.toISOString().slice(11, 19));
+      timeManager.datetimeInputDOM.val(timeManager.selectedDate.toISOString().slice(0, 10) + ' ' + timeManager.selectedDate.toISOString().slice(11, 19));
     }
   };
 

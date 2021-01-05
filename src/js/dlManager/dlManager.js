@@ -174,7 +174,13 @@ dlManager.drawLoop = (preciseDt) => {
   // Display it if that settings is enabled
   if (dlManager.isShowFPS) console.log(1000 / timeManager.dt);
   // Update official time for everyone else
-  timeManager.setNow(Date.now(), dlManager.dt, document.getElementById('datetime-input-tb'));
+  if (!dlManager.isUpdateTimeThrottle) {
+    dlManager.isUpdateTimeThrottle = true;
+    timeManager.setNow(Date.now(), dlManager.dt);
+    setTimeout(() => {
+      dlManager.isUpdateTimeThrottle = false;
+    }, 500);
+  }
 
   // Do any per frame calculations
   dlManager.updateLoop();

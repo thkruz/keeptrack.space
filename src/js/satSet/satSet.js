@@ -34,9 +34,9 @@ import { helpers, saveCsv } from '@app/js/helpers.js';
 import { adviceList } from '@app/js/advice-module.js';
 import { jsTLEfile } from '@app/offline/tle.js';
 import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
-import { objectManager } from '@app/js/objectManager.js';
+import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager.js';
-import { radarDataManager } from '@app/js/radarDataManager.js';
+import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 import { satVmagManager } from '@app/modules/satVmagManager.js';
 import { satellite } from '@app/js/lookangles.js';
 import { saveAs } from '@app/js/lib/file-saver.min.js';
@@ -93,7 +93,7 @@ var checkRcs = (possibles, minRcs, maxRcs) => {
 
 var satelliteList;
 if (settingsManager.offline) {
-  import('../offline/extra.js').then((resp) => {
+  import('../../offline/extra.js').then((resp) => {
     satelliteList = resp;
     console.debug(resp);
   });
@@ -138,6 +138,7 @@ satSet.init = async (glRef, dotManagerRef, cameraManager) => {
   addSatCruncherOnMessage(cameraManager);
 
   satSet.satCruncher = satCruncher;
+  satSet.radarDataManager = radarDataManager;
 };
 
 var addSatCruncherOnMessage = (cameraManager) => {

@@ -1,9 +1,9 @@
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { DEG2RAD, RAD2DEG } from '@app/js/constants.js';
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/selectSat.js';
-import { satScreenPositionArray, satSet } from '@app/js/satSet.js';
+import { satScreenPositionArray, satSet } from '@app/js/satSet/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
-import { meshManager } from '@app/modules/meshManager.js';
+import { meshManager } from '@app/js/dlManager/meshManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
 import { sceneManager } from '@app/js/dlManager/sceneManager/sceneManager.js';
 import { timeManager } from '@app/js/timeManager.js';

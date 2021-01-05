@@ -1,7 +1,6 @@
 import * as $ from 'jquery';
 import * as glm from '@app/js/lib/gl-matrix.js';
 import { RADIUS_OF_EARTH } from '@app/js/constants.js';
-import { mobile } from '@app/js/mobile.js';
 import { sMM } from '@app/js/sideMenuManager.js';
 let M = window.M;
 
@@ -160,28 +159,6 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
       { passive: false }
     );
   }
-
-  // Resizing Listener
-  $(window).on('resize', function () {
-    if (!settingsManager.disableUI) {
-      uiManager.resize2DMap();
-    }
-    mobile.checkMobileMode();
-    if (!settingsManager.disableUI) {
-      if (settingsManager.screenshotMode) {
-        bodyDOM.css('overflow', 'visible');
-        $('#canvas-holder').css('overflow', 'visible');
-        $('#canvas-holder').width = 3840;
-        $('#canvas-holder').height = 2160;
-        bodyDOM.width = 3840;
-        bodyDOM.height = 2160;
-      } else {
-        bodyDOM.css('overflow', 'hidden');
-        $('#canvas-holder').css('overflow', 'hidden');
-      }
-    }
-    settingsManager.isResizing = true;
-  });
 
   $(window).mousedown(function (evt) {
     // Camera Manager Events
@@ -409,8 +386,8 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           // _pinchStart(evt)
         } else {
           // Single Finger Touch
-          mobile.startMouseX = evt.originalEvent.touches[0].clientX;
-          mobile.startMouseY = evt.originalEvent.touches[0].clientY;
+          cameraManager.startMouseX = evt.originalEvent.touches[0].clientX;
+          cameraManager.startMouseY = evt.originalEvent.touches[0].clientY;
           cameraManager.mouseX = evt.originalEvent.touches[0].clientX;
           cameraManager.mouseY = evt.originalEvent.touches[0].clientY;
           uiInput.mouseSat = uiInput.getSatIdFromCoord(cameraManager.mouseX, cameraManager.mouseY);
@@ -621,7 +598,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
     canvasDOM.on('touchend', function () {
       let touchTime = Date.now() - touchStartTime;
 
-      if (touchTime > 150 && !isPinching && Math.abs(mobile.startMouseX - cameraManager.mouseX) < 50 && Math.abs(mobile.startMouseY - cameraManager.mouseY) < 50) {
+      if (touchTime > 150 && !isPinching && Math.abs(cameraManager.startMouseX - cameraManager.mouseX) < 50 && Math.abs(cameraManager.startMouseY - cameraManager.mouseY) < 50) {
         _openRmbMenu();
         uiInput.mouseSat = -1;
       }

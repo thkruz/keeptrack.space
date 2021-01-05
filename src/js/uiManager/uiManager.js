@@ -40,14 +40,13 @@ import { dateFormat } from '@app/js/lib/dateFormat.js';
 import { dlManager } from '@app/js/dlManager/dlManager.js';
 import { mapManager } from '@app/js/uiManager/mapManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
-import { mobile } from '@app/js/mobile.js';
+import { mobileManager } from '@app/js/uiManager/mobileManager.js';
 import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
-import { objectManager } from '@app/js/objectManager.js';
+import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { omManager } from '@app/js/omManager.js';
 import { orbitManager } from '@app/js/orbitManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
-import { satLinkManager } from '@app/modules/satLinkManager.js';
-import { satSet } from '@app/js/satSet.js';
+import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lookangles.js';
 import { searchBox } from '@app/js/search-box.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
@@ -66,6 +65,7 @@ try {
 // var dropdownInstance;
 const mapImageDOM = $('#map-image');
 const mapMenuDOM = $('#map-menu');
+const bodyDOM = $('#bodyDOM');
 
 const rightBtnSaveMenuDOM = $('#save-rmb-menu');
 const rightBtnViewMenuDOM = $('#view-rmb-menu');
@@ -89,6 +89,7 @@ var updateInterval = 1000;
 var createClockDOMOnce = false;
 
 var uiManager = {};
+uiManager.mobileManager = mobileManager;
 uiManager.isAnalysisMenuOpen = false;
 
 uiManager.isCurrentlyTyping = false;
@@ -1956,10 +1957,10 @@ $(document).ready(function () {
         var launchLat, launchLon;
 
         if (objectManager.isLaunchSiteManagerLoaded) {
-          for (var launchSite in window.launchSiteManager.launchSiteList) {
-            if (window.launchSiteManager.launchSiteList[launchSite].name === launchFac) {
-              launchLat = window.launchSiteManager.launchSiteList[launchSite].lat;
-              launchLon = window.launchSiteManager.launchSiteList[launchSite].lon;
+          for (var launchSite in objectManager.launchSiteManager.launchSiteList) {
+            if (objectManager.launchSiteManager.launchSiteList[launchSite].name === launchFac) {
+              launchLat = objectManager.launchSiteManager.launchSiteList[launchSite].lat;
+              launchLon = objectManager.launchSiteManager.launchSiteList[launchSite].lon;
             }
           }
         }
@@ -2703,20 +2704,27 @@ $(document).ready(function () {
     } // If a row was selected
   };
 
-  uiManager.loginPopup = () => {
-    if (uiManager.isMembershipMenuOpen) {
-      uiManager.hideSideMenus();
-      uiManager.isMembershipMenuOpen = false;
-      return;
-    } else {
-      uiManager.toast(`Membership Required for this Feature!`, 'critical');
-      uiManager.hideSideMenus();
-      $('#membership-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-      uiManager.isMembershipMenuOpen = true;
-      // $('#menu-sensor-info').addClass('bmenu-item-selected');
-      return;
+  // Resizing Listener
+  $(window).on('resize', function () {
+    if (!settingsManager.disableUI) {
+      uiManager.resize2DMap();
     }
-  };
+    mobileManager.checkMobileMode();
+    if (!settingsManager.disableUI) {
+      if (settingsManager.screenshotMode) {
+        bodyDOM.css('overflow', 'visible');
+        $('#canvas-holder').css('overflow', 'visible');
+        $('#canvas-holder').width = 3840;
+        $('#canvas-holder').height = 2160;
+        bodyDOM.width = 3840;
+        bodyDOM.height = 2160;
+      } else {
+        bodyDOM.css('overflow', 'hidden');
+        $('#canvas-holder').css('overflow', 'hidden');
+      }
+    }
+    settingsManager.isResizing = true;
+  });
 
   uiManager.bottomIconPress = (evt) => {
     _bottomIconPress(evt);
@@ -2733,9 +2741,6 @@ $(document).ready(function () {
     //         'Selected'
     //     );
     switch (evt.currentTarget.id) {
-      case 'menu-membership': // No Keyboard Commands
-        uiManager.loginPopup();
-        break;
       case 'menu-sensor-list': // No Keyboard Commands
         if (isSensorListMenuOpen) {
           uiManager.hideSideMenus();
@@ -3808,7 +3813,7 @@ $(document).ready(function () {
   };
 
   $('#fullscreen-icon').on('click', function () {
-    mobile.fullscreenToggle();
+    mobileManager.fullscreenToggle();
     uiManager.resize2DMap();
   });
 
@@ -4146,7 +4151,7 @@ uiManager.hideLoadingScreen = () => {
   // Display content when loading is complete.
   $('#canvas-holder').attr('style', 'display:block');
 
-  mobile.checkMobileMode();
+  mobileManager.checkMobileMode();
 
   if (settingsManager.isMobileModeEnabled) {
     $('#spinner').hide();
@@ -5075,25 +5080,25 @@ $('#constellation-menu>ul>li').on('click', function () {
       break;
     case 'aehf':
       if (typeof groups.aehf == 'undefined') {
-        groups.aehf = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.aehf));
+        groups.aehf = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.aehf));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
-        satLinkManager.showLinks(lineManager, satSet, 'aehf');
+        objectManager.satLinkManager.showLinks(lineManager, satSet, 'aehf');
         $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'wgs':
       // WGS also selects DSCS
       if (typeof groups.wgs == 'undefined') {
-        groups.wgs = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.wgs.concat(satLinkManager.dscs)));
+        groups.wgs = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.wgs.concat(objectManager.satLinkManager.dscs)));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
         try {
-          satLinkManager.showLinks(lineManager, satSet, 'wgs');
+          objectManager.satLinkManager.showLinks(lineManager, satSet, 'wgs');
         } catch (e) {
-          // Maybe the satLinkManager isn't installed?
+          // Maybe the objectManager.satLinkManager isn't installed?
         }
         $('#loading-screen').fadeOut('slow');
       });
@@ -5101,14 +5106,14 @@ $('#constellation-menu>ul>li').on('click', function () {
     case 'starlink':
       // WGS also selects DSCS
       if (typeof groups.starlink == 'undefined') {
-        groups.starlink = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.starlink));
+        groups.starlink = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.starlink));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
         try {
-          satLinkManager.showLinks(lineManager, satSet, 'starlink');
+          objectManager.satLinkManager.showLinks(lineManager, satSet, 'starlink');
         } catch (e) {
-          // Maybe the satLinkManager isn't installed?
+          // Maybe the objectManager.satLinkManager isn't installed?
         }
         $('#loading-screen').fadeOut('slow');
       });
@@ -5116,14 +5121,14 @@ $('#constellation-menu>ul>li').on('click', function () {
     case 'sbirs':
       // SBIRS and DSP
       if (typeof groups.sbirs == 'undefined') {
-        groups.sbirs = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.sbirs));
+        groups.sbirs = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.sbirs));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
         try {
-          satLinkManager.showLinks(lineManager, satSet, 'sbirs');
+          objectManager.satLinkManager.showLinks(lineManager, satSet, 'sbirs');
         } catch (e) {
-          // Maybe the satLinkManager isn't installed?
+          // Maybe the objectManager.satLinkManager isn't installed?
         }
         $('#loading-screen').fadeOut('slow');
       });

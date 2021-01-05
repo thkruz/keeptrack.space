@@ -17,8 +17,8 @@ or mirrored at any other location without the express written permission of the 
 
 import * as $ from 'jquery';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
-import { objectManager } from '@app/js/objectManager.js';
-import { satSet } from '@app/js/satSet.js';
+import { objectManager } from '@app/js/objectManager/objectManager.js';
+import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lookangles.js';
 import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';

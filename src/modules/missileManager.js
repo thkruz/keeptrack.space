@@ -2,7 +2,7 @@
 /* */
 import * as $ from 'jquery';
 import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/constants.js';
-import { getMissileSatsLen, getSat, getSatData, satSet, setSat } from '@app/js/satSet.js';
+import { getMissileSatsLen, getSat, getSatData, satSet, setSat } from '@app/js/satSet/satSet.js';
 import { doSearch } from '@app/js/uiManager/uiManager.js';
 import { satellite } from '@app/js/lookangles.js';
 import { sensorManager } from '@app/modules/sensorManager.js';

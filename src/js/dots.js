@@ -294,7 +294,7 @@ class Dots {
     const gl = this.gl;
 
     // If we have radar data -- let's update that first
-    // if (radarDataManager.radarData.length > 0) {
+    // if (satSet.radarDataManager.radarData.length > 0) {
     //   // Get Time
     //   if (timeManager.propRate === 0) {
     //     timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset);
@@ -304,41 +304,41 @@ class Dots {
     //   drawPropTime = timeManager.propTimeVar * 1;
 
     //   // Find the First Radar Return Time
-    //   if (radarDataManager.drawT1 == 0) {
+    //   if (satSet.radarDataManager.drawT1 == 0) {
     //     for (rrI = 0; rrI < radarDataLen; rrI++) {
-    //       if (radarDataManager.radarData[rrI].t > timeManager.now - 3000) {
-    //         radarDataManager.drawT1 = rrI;
+    //       if (satSet.radarDataManager.radarData[rrI].t > timeManager.now - 3000) {
+    //         satSet.radarDataManager.drawT1 = rrI;
     //         break;
     //       }
     //     }
     //   }
 
     //   isDidOnce = false;
-    //   for (this.drawI = radarDataManager.drawT1; this.drawI < radarDataLen; this.drawI++) {
+    //   for (this.drawI = satSet.radarDataManager.drawT1; this.drawI < radarDataLen; this.drawI++) {
     //     // Don't Exceed Max Radar Data Allocation
     //     // if (this.drawI > settingsManager.maxRadarData) break;
 
-    //     if (radarDataManager.radarData[this.drawI].t >= drawPropTime - 3000 && radarDataManager.radarData[this.drawI].t <= drawPropTime + 3000) {
+    //     if (satSet.radarDataManager.radarData[this.drawI].t >= drawPropTime - 3000 && satSet.radarDataManager.radarData[this.drawI].t <= drawPropTime + 3000) {
     //       if (!isDidOnce) {
-    //         radarDataManager.drawT1 = this.drawI;
+    //         satSet.radarDataManager.drawT1 = this.drawI;
     //         isDidOnce = true;
     //       }
     //       // Skip if Already done
-    //       if (this.positionData[(radarDataManager.satDataStartIndex + this.drawI) * 3] !== 0) continue;
+    //       if (this.positionData[(satSet.radarDataManager.satDataStartIndex + this.drawI) * 3] !== 0) continue;
 
     //       // Update Radar Marker Position
-    //       this.positionData[(radarDataManager.satDataStartIndex + this.drawI) * 3] = radarDataManager.radarData[this.drawI].x;
-    //       this.positionData[(radarDataManager.satDataStartIndex + this.drawI) * 3 + 1] = radarDataManager.radarData[this.drawI].y;
-    //       this.positionData[(radarDataManager.satDataStartIndex + this.drawI) * 3 + 2] = radarDataManager.radarData[this.drawI].z;
+    //       this.positionData[(satSet.radarDataManager.satDataStartIndex + this.drawI) * 3] = satSet.radarDataManager.radarData[this.drawI].x;
+    //       this.positionData[(satSet.radarDataManager.satDataStartIndex + this.drawI) * 3 + 1] = satSet.radarDataManager.radarData[this.drawI].y;
+    //       this.positionData[(satSet.radarDataManager.satDataStartIndex + this.drawI) * 3 + 2] = satSet.radarDataManager.radarData[this.drawI].z;
     //       // NOTE: satVel could be added later
     //     } else {
     //       // Reset all positions outside time window
-    //       this.positionData[(radarDataManager.satDataStartIndex + this.drawI) * 3] = 0;
-    //       this.positionData[(radarDataManager.satDataStartIndex + this.drawI) * 3 + 1] = 0;
-    //       this.positionData[(radarDataManager.satDataStartIndex + this.drawI) * 3 + 2] = 0;
+    //       this.positionData[(satSet.radarDataManager.satDataStartIndex + this.drawI) * 3] = 0;
+    //       this.positionData[(satSet.radarDataManager.satDataStartIndex + this.drawI) * 3 + 1] = 0;
+    //       this.positionData[(satSet.radarDataManager.satDataStartIndex + this.drawI) * 3 + 2] = 0;
     //     }
 
-    //     if (radarDataManager.radarData[this.drawI].t > drawPropTime + 3000) {
+    //     if (satSet.radarDataManager.radarData[this.drawI].t > drawPropTime + 3000) {
     //       break;
     //     }
     //   }

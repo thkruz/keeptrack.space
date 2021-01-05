@@ -1,7 +1,6 @@
 /* */
 
 import { RAD2DEG } from '@app/js/constants.js';
-import { controlSiteManager } from '@app/modules/controlSiteManager.js';
 
 var satLinkManager = {};
 satLinkManager.aehfUsers = [];
@@ -9,7 +8,7 @@ satLinkManager.wgsUsers = [];
 satLinkManager.iridiumUsers = [];
 satLinkManager.starlinkUsers = [];
 satLinkManager.galileoUsers = [];
-satLinkManager.init = (sensorManager) => {
+satLinkManager.init = (sensorManager, controlSiteManager) => {
   try {
     for (let controlSite in controlSiteManager.controlSiteList) {
       if (controlSiteManager.controlSiteList[controlSite].linkAehf) {

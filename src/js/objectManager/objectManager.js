@@ -3,9 +3,9 @@
 
 'use strict';
 
-import { controlSiteManager } from '@app/modules/controlSiteManager.js';
-import { launchSiteManager } from '@app/modules/launchSiteManager.js';
-import { sensorManager } from '@app/modules/sensorManager.js';
+import { controlSiteManager } from '@app/js/objectManager/controlSiteManager.js';
+import { launchSiteManager } from '@app/js/objectManager/launchSiteManager.js';
+import { satLinkManager } from '@app/js/objectManager/satLinkManager.js';
 import { stars } from '@app/js/starManager/stars.js';
 
 var objectManager = {};
@@ -29,7 +29,7 @@ objectManager.analSatSet = [];
 objectManager.staticSet = [];
 objectManager.fieldOfViewSet = [];
 
-objectManager.init = async () => {
+objectManager.init = async (sensorManager) => {
   for (let i = 0; i < settingsManager.maxMissiles; i++) {
     var missileInfo = {
       static: false,
@@ -145,6 +145,7 @@ objectManager.init = async () => {
       };
       objectManager.staticSet.push(launchSiteInfo);
     }
+    objectManager.launchSiteManager = launchSiteManager;
     objectManager.isLaunchSiteManagerLoaded = true;
   } catch (e) {
     objectManager.isLaunchSiteManagerLoaded = false;
@@ -188,8 +189,11 @@ objectManager.init = async () => {
     };
     objectManager.fieldOfViewSet.push(fieldOfViewMarker);
   }
+
+  // Initialize the satLinkMananger and then attach it to the object manager
+  satLinkManager.init(sensorManager, controlSiteManager);
+  objectManager.satLinkManager = satLinkManager;
 };
-// objectManager.init();
 objectManager.extractCountry = function (C) {
   var country;
   country = C; // Assume it is right and overwrite if it is a code below.

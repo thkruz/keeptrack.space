@@ -1,9 +1,9 @@
 import { settingsManager } from '@app/js/settings.js';
 
-var mobile = {};
+var mobileManager = {};
 // Wrap everything in an init to make sure the loading order is respected
-mobile.init = async () => {
-  mobile.fullscreenToggle = function () {
+mobileManager.init = async () => {
+  mobileManager.fullscreenToggle = function () {
     if ((document.fullScreenElement && document.fullScreenElement !== null) || (!document.mozFullScreen && !document.webkitIsFullScreen)) {
       if (document.documentElement.requestFullScreen) {
         document.documentElement.requestFullScreen();
@@ -23,8 +23,8 @@ mobile.init = async () => {
     }
   };
 
-  mobile.checkMobileMode = async () => {
-    if (mobile.checkIfMobileDevice()) {
+  mobileManager.checkMobileMode = async () => {
+    if (mobileManager.checkIfMobileDevice()) {
       settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
       settingsManager.enableHoverOverlay = false;
       settingsManager.isMobileModeEnabled = true;
@@ -53,13 +53,13 @@ mobile.init = async () => {
     }
   };
 
-  mobile.checkIfMobileDevice = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu.test(navigator.userAgent);
+  mobileManager.checkIfMobileDevice = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu.test(navigator.userAgent);
 
   // //////////////////////////////////////////////////////////////
-  // This is AUTO RUN
+  // This is run at the end of init
   // The assignments have to happen first
   // //////////////////////////////////////////////////////////////
-  mobile.checkMobileMode();
+  mobileManager.checkMobileMode();
 };
 
-export { mobile };
+export { mobileManager };

@@ -7,7 +7,6 @@ import { meshManager } from '@app/modules/meshManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
 import { sceneManager } from '@app/js/dlManager/sceneManager/sceneManager.js';
 import { timeManager } from '@app/js/timeManager.js';
-import { watermarkedDataURL } from '@app/js/helpers.js';
 
 const satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
 const satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
@@ -492,10 +491,10 @@ dlManager.updateMissileOrbits = () => {
 };
 
 dlManager.screenShot = () => {
-  dlManager.glInit();
-  if (settingsManager.queuedScreenshot) return;
-
-  setTimeout(function () {
+  if (!settingsManager.queuedScreenshot) {
+    dlManager.resizeCanvas();
+    settingsManager.queuedScreenshot = true;
+  } else {
     let link = document.createElement('a');
     link.download = 'keeptrack.png';
 
@@ -508,15 +507,33 @@ dlManager.screenShot = () => {
       copyrightStr = '';
     }
 
-    link.href = watermarkedDataURL(dlManager.canvas, copyrightStr);
+    link.href = dlManager.watermarkedDataUrl(dlManager.canvas, copyrightStr);
+    link.click();
     settingsManager.screenshotMode = false;
     settingsManager.queuedScreenshot = false;
-    setTimeout(function () {
-      link.click();
-    }, 10);
-    dlManager.glInit();
-  }, 200);
-  settingsManager.queuedScreenshot = true;
+    dlManager.resizeCanvas();
+  }
+};
+
+dlManager.watermarkedDataUrl = (canvas, text) => {
+  var tempCanvas = document.createElement('canvas');
+  var tempCtx = tempCanvas.getContext('2d');
+  var cw, ch;
+  cw = tempCanvas.width = canvas.width;
+  ch = tempCanvas.height = canvas.height;
+  tempCtx.drawImage(canvas, 0, 0);
+  tempCtx.font = '24px nasalization';
+  var textWidth = tempCtx.measureText(text).width;
+  tempCtx.globalAlpha = 1.0;
+  tempCtx.fillStyle = 'white';
+  tempCtx.fillText(text, cw - textWidth - 30, ch - 30);
+  // tempCtx.fillStyle ='black'
+  // tempCtx.fillText(text,cw-textWidth-10+2,ch-20+2)
+  // just testing by adding tempCanvas to document
+  document.body.appendChild(tempCanvas);
+  let image = tempCanvas.toDataURL();
+  tempCanvas.parentNode.removeChild(tempCanvas);
+  return image;
 };
 
 dlManager.isDrawOrbitsAbove = false;
@@ -667,7 +684,7 @@ dlManager.updateHover = () => {
 let sat2;
 var _hoverBoxOnSat = (satId, satX, satY) => {
   if (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && !settingsManager.isDemoModeOn) {
-    satHoverBoxDOM.style.display = 'none;';
+    satHoverBoxDOM.style.display = 'none';
     if (satId === -1) {
       dlManager.canvas.style.cursor = 'default';
     } else {
@@ -681,7 +698,7 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
       if (starManager.isConstellationVisible === true && !starManager.isAllConstellationVisible) starManager.clearConstellations();
     }
     // satHoverBoxDOM.html('(none)')
-    satHoverBoxDOM.style.display = 'none;';
+    satHoverBoxDOM.style.display = 'none';
     dlManager.canvas.style.cursor = 'default';
     isHoverBoxVisible = false;
   } else if (!cameraManager.isDragging && !!settingsManager.enableHoverOverlay) {

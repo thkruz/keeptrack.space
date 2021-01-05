@@ -1,3 +1,4 @@
+import * as $ from 'jquery';
 import { MILLISECONDS_PER_DAY } from '@app/js/constants.js';
 import { dateFormat } from '@app/js/lib/dateFormat.js';
 import { settingsManager } from '@app/js/settings.js';
@@ -61,9 +62,9 @@ timeManager.init = () => {
     timeManager.updatePropTime();
     timeManager.setSelectedDate(timeManager.propTimeVar);
 
-    // Passing datetimeInput eliminates needing jQuery in this module
+    // Passing datetimeInput eliminates needing jQuery in main module
     if (timeManager.lastTime - timeManager.propTimeVar < 300 && (settingsManager.isEditTime || !settingsManager.cruncherReady)) {
-      datetimeInput.val = timeManager.selectedDate.toISOString().slice(0, 10) + ' ' + timeManager.selectedDate.toISOString().slice(11, 19);
+      $('#' + datetimeInput.id).val(timeManager.selectedDate.toISOString().slice(0, 10) + ' ' + timeManager.selectedDate.toISOString().slice(11, 19));
     }
   };
 

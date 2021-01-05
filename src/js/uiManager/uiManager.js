@@ -45,7 +45,6 @@ import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
 import { objectManager } from '@app/js/objectManager.js';
 import { omManager } from '@app/js/omManager.js';
 import { orbitManager } from '@app/js/orbitManager.js';
-import { radarDataManager } from '@app/js/radarDataManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
 import { satLinkManager } from '@app/modules/satLinkManager.js';
 import { satSet } from '@app/js/satSet.js';
@@ -1163,7 +1162,7 @@ $(document).ready(function () {
       lastBoxUpdateTime = timeManager.now;
       _updateNextPassOverlay(true);
 
-      radarDataManager.findFirstDataTime();
+      satSet.findRadarDataFirstDataTime();
 
       e.preventDefault();
     });

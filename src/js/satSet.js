@@ -1775,6 +1775,8 @@ satSet.selectSat = (i) => {
   $('#menu-breakup').removeClass('bmenu-item-disabled');
 };
 
+satSet.findRadarDataFirstDataTime = () => radarDataManager.findFirstDataTime();
+
 satSet.onCruncherReady = () => {
   satSet.queryStr = window.location.search.substring(1);
   // Anything else?

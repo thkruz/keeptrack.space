@@ -20,7 +20,8 @@ pPM.init = (gl) => {
   pPM.frameBufferInfos.one = pPM.createFrameBufferInfo(gl.drawingBufferWidth, gl.drawingBufferHeight);
   pPM.frameBufferInfos.two = pPM.createFrameBufferInfo(gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-  pPM.curBuffer = pPM.frameBufferInfos.one.frameBuffer;
+  // pPM.curBuffer = pPM.frameBufferInfos.one.frameBuffer;
+  pPM.curBuffer = null;
 };
 
 pPM.createProgram = (vertCode, fragCode) => {

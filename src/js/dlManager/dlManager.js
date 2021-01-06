@@ -41,10 +41,9 @@ var dlManager = {
   },
 };
 
-var groupsManager, uiInput, searchBox, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager;
-dlManager.init = (groupsManagerRef, uiInputRef, searchBoxRef, starManagerRef, satelliteRef, ColorSchemeRef, cameraManagerRef, objectManagerRef, orbitManagerRef, sensorManagerRef, uiManagerRef, lineManagerRef, dotsManagerRef) => {
+var groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager;
+dlManager.init = (groupsManagerRef, uiInputRef, starManagerRef, satelliteRef, ColorSchemeRef, cameraManagerRef, objectManagerRef, orbitManagerRef, sensorManagerRef, uiManagerRef, lineManagerRef, dotsManagerRef) => {
   uiInput = uiInputRef;
-  searchBox = searchBoxRef;
   starManager = starManagerRef;
   satellite = satelliteRef;
   ColorScheme = ColorSchemeRef;
@@ -170,6 +169,7 @@ var startWithOrbits = async () => {
 dlManager.drawLoop = (preciseDt) => {
   // Restart the draw loop when ready to draw again
   requestAnimationFrame(dlManager.drawLoop);
+  if (dlManager.sceneManager.earth.isUseHiRes && dlManager.sceneManager.earth.isHiResReady !== true) return;
 
   // Record milliseconds since last drawLoop - default is 0
   dlManager.dt = preciseDt - dlManager.t0 || 0;
@@ -499,7 +499,7 @@ dlManager.orbitsAbove = () => {
 var currentSearchSats;
 dlManager.updateHover = () => {
   if (!settingsManager.disableUI && !settingsManager.lowPerf) {
-    currentSearchSats = searchBox.getLastResultGroup();
+    currentSearchSats = uiManager.searchBox.getLastResultGroup();
     if (typeof currentSearchSats !== 'undefined') {
       currentSearchSats = currentSearchSats['sats'];
       for (dlManager.i = 0; dlManager.i < currentSearchSats.length; dlManager.i++) {
@@ -507,8 +507,8 @@ dlManager.updateHover = () => {
       }
     }
   }
-  if (!settingsManager.disableUI && searchBox.isHovering()) {
-    updateHoverSatId = searchBox.getHoverSat();
+  if (!settingsManager.disableUI && uiManager.searchBox.isHovering()) {
+    updateHoverSatId = uiManager.searchBox.getHoverSat();
     satSet.getScreenCoords(updateHoverSatId, dlManager.pMatrix, cameraManager.camMatrix);
     // if (!cameraManager.earthHitTest(gl, pickColorBuf, satScreenPositionArray.x, satScreenPositionArray.y)) {
     try {

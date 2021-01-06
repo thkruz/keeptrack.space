@@ -38,7 +38,7 @@ import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager.js';
 import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 import { satellite } from '@app/js/lookangles.js';
-import { searchBox } from '@app/js/search-box.js';
+import { searchBox } from '@app/js/uiManager/search-box.js';
 import { selectSatManager } from '@app/js/selectSat.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
 import { settingsManager } from '@app/js/settings.js';
@@ -78,7 +78,7 @@ jQAlt.docReady(async function initalizeKeepTrack() {
 
   uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, uiManager, dlManager, dotsManager);
 
-  await dlManager.init(groupsManager, uiInput, searchBox, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
+  await dlManager.init(groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
 
   // Now that everything is loaded, start rendering to thg canvas
   await dlManager.drawLoop();

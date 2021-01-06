@@ -48,7 +48,7 @@ import { orbitManager } from '@app/js/orbitManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
 import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lookangles.js';
-import { searchBox } from '@app/js/search-box.js';
+import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { uiInput } from './ui-input.js';
@@ -89,6 +89,7 @@ var updateInterval = 1000;
 var createClockDOMOnce = false;
 
 var uiManager = {};
+uiManager.searchBox = searchBox;
 uiManager.mobileManager = mobileManager;
 uiManager.isAnalysisMenuOpen = false;
 
@@ -4168,7 +4169,7 @@ uiManager.hideLoadingScreen = () => {
         $('#logo-trusat').hide();
         $('#loading-screen').hide();
         settingsManager.loadStr('math');
-      }, 3000);
+      }, 100);
     } else {
       setTimeout(function () {
         $('#loading-screen').removeClass('full-loader');
@@ -4178,7 +4179,7 @@ uiManager.hideLoadingScreen = () => {
         $('#logo-trusat').hide();
         $('#loading-screen').hide();
         settingsManager.loadStr('math');
-      }, 1500);
+      }, 100);
     }
   }
 };

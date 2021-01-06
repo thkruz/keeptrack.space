@@ -40,7 +40,6 @@ import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 import { satVmagManager } from '@app/modules/satVmagManager.js';
 import { satellite } from '@app/js/lookangles.js';
 import { saveAs } from '@app/js/lib/file-saver.min.js';
-import { searchBox } from '@app/js/search-box.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
@@ -301,7 +300,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
               uiManager.doSearch(val);
               if (settingsManager.lastSearchResults.length == 0) {
                 uiManager.toast(`Search for "${val}" found nothing!`, 'caution', true);
-                searchBox.hideResults();
+                uiManager.searchBox.hideResults();
               }
             }
           }

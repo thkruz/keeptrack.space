@@ -1130,7 +1130,7 @@ class Camera {
     }
   }
 
-  /* For RayCasting -- Not Used Yet */
+  /* For RayCasting */
   getCamPos() {
     let gCPr = this.getCamDist();
     let gCPz = gCPr * Math.sin(this.camPitch);

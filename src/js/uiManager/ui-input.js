@@ -1251,7 +1251,7 @@ uiInput.unProject = (x, y) => {
   let worldVec = glm.vec4.create();
   glm.vec4.transformMat4(worldVec, screenVec, invMat);
 
-  return [worldVec[0] / worldVec[3], worldVec[2] / worldVec[3], worldVec[1] / worldVec[3]];
+  return [worldVec[0] / worldVec[3], worldVec[1] / worldVec[3], worldVec[2] / worldVec[3]];
 };
 
 export { uiInput };

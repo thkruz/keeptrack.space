@@ -40,7 +40,7 @@ import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { saveAs } from '@app/js/lib/external/file-saver.min.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
-import { timeManager } from '@app/js/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.js';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 // 'use strict';

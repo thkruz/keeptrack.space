@@ -21,7 +21,7 @@ import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
-import { timeManager } from '@app/js/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.js';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 var sensorManager = {};

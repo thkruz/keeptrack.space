@@ -6,7 +6,7 @@ import { getMissileSatsLen, getSat, getSatData, satSet, setSat } from '@app/js/s
 import { doSearch } from '@app/js/uiManager/uiManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
-import { timeManager } from '@app/js/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.js';
 import { updateOrbitBuffer } from '@app/js/orbitManager/orbitManager.js';
 
 var isResetMissilesLaunched = false;

@@ -49,7 +49,7 @@ import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
-import { timeManager } from '@app/js/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.js';
 import { uiInput } from './ui-input.js';
 import { uiLimited } from './ui-limited.js';
 let M = window.M;

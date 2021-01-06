@@ -38,11 +38,10 @@ import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
-import { selectSatManager } from '@app/js/selectSat.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { starManager } from '@app/js/starManager/starManager.js';
-import { timeManager } from '@app/js/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 jQAlt.docReady(async function initalizeKeepTrack() {
   timeManager.init();
@@ -56,7 +55,7 @@ jQAlt.docReady(async function initalizeKeepTrack() {
   satSet.init(gl, dotsManager, cameraManager);
   objectManager.init(sensorManager);
   await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
-  selectSatManager.init(ColorScheme.group);
+  drawManager.selectSatManager.init(ColorScheme.group);
   await satSet.loadCatalog(); // Needs Object Manager and gl first
   const satCruncher = satSet.satCruncher;
 

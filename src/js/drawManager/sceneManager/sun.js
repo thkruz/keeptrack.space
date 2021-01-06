@@ -5,7 +5,7 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
 import { A } from '@app/js/lib/external/meuusjs.js';
 import { satellite } from '@app/js/lib/lookangles.js';
-import { timeManager } from '@app/js/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 let mvMatrixEmpty = glm.mat4.create();
 let nMatrixEmpty = glm.mat3.create();

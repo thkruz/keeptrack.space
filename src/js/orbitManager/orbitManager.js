@@ -4,7 +4,7 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { satSet } from '@app/js/satSet/satSet.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
-import { timeManager } from '@app/js/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.js';
 let M = window.M;
 
 var NUM_SEGS = 255;

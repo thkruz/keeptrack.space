@@ -97,7 +97,7 @@ We use [SemVer](http://semver.org/) for versioning.
 * color-scheme.js - Handles the calculation of rgba colors for objects.
 * earth.js - Draws the earth and the atmosphere. Currently (bad!) responsible for updating time string timeManager references. Called from main.js
 * lookangles.js - My personal modifications to [@shashwata](https://github.com/shashwatak/)'s amazing library [satellite.js](https://github.com/shashwatak/satellite-js).
-* timeManager.js - Tracks internal time and controls time manipulation.
+* timeManager/timeManager.js - Tracks internal time and controls time manipulation.
 * search-box.js - Functions for searching the catalog and manipulating the search drop-down.
 * sun-calc.js - [@mourner](https://github.com/mourner/suncalc)'s library used for star position calculations.
 * satCruncher.js - Web Worker that provides x, y, z coordinates of the satellites and if it is in a sensor's FOV.

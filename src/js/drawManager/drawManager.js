@@ -1,5 +1,5 @@
 import * as glm from '@app/js/lib/external/gl-matrix.js';
-import { isselectedSatNegativeOne, selectSatManager } from '@app/js/selectSat.js';
+import { isselectedSatNegativeOne, selectSatManager } from '@app/js/drawManager/selectSatManager.js';
 import { satScreenPositionArray, satSet } from '@app/js/satSet/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { Dots } from '@app/js/drawManager/dots.js';
@@ -7,7 +7,7 @@ import { meshManager } from '@app/js/drawManager/meshManager.js';
 import { missileManager } from '@app/js/missileManager/missileManager.js';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
 import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
-import { timeManager } from '@app/js/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 const satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
 const satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
@@ -29,6 +29,7 @@ let isShowDistance = true;
 var gl;
 
 var drawManager = {
+  selectSatManager: selectSatManager,
   i: 0,
   demoModeSatellite: 0,
   demoModeLastTime: 0,

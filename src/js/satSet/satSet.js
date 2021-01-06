@@ -36,7 +36,7 @@ import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
-import { satVmagManager } from '@app/modules/satVmagManager.js';
+import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { saveAs } from '@app/js/lib/external/file-saver.min.js';
 import { sensorManager } from '@app/modules/sensorManager.js';

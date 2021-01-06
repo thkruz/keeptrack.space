@@ -2,8 +2,8 @@
  * @!format -- DONT FORMAT THIS YET
  */
 /* eslint-disable no-unused-vars */
-import { GPU } from '@app/js/lib/gpu-browser.min.js';
-import { satellite } from '@app/js/lookangles.js';
+import { GPU } from '@app/js/lib/external/gpu-browser.min.js';
+import { satellite } from '@app/js/lib/lookangles.js';
 import { settingsManager } from '@app/js/settings.js';
 
 const MINUTES_PER_DAY = 1440;

@@ -1,5 +1,5 @@
 /* eslint-disable no-useless-escape */
-import * as glm from '@app/js/lib/gl-matrix.js';
+import * as glm from '@app/js/lib/external/gl-matrix.js';
 
 class Dots {
   constructor(gl) {

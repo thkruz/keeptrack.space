@@ -23,8 +23,8 @@
 import * as $ from 'jquery';
 import * as satelliteBase from 'satellite.js';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/js/constants.js';
-import { helpers, saveCsv, saveVariable } from '@app/js/helpers.js';
-import { dateFormat } from '@app/js/lib/dateFormat.js';
+import { saveCsv, saveVariable, stringPad } from '@app/js/lib/helpers.js';
+import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 let satellite = satelliteBase;
@@ -101,10 +101,10 @@ satellite.currentEpoch = (currentDate) => {
   currentDate = new Date(currentDate);
   let epochYear = currentDate.getUTCFullYear();
   epochYear = parseInt(epochYear.toString().substr(2, 2));
-  let epochDay = helpers.pad0(timeManager.getDayOfYear(currentDate), 3);
+  let epochDay = stringPad.pad0(timeManager.getDayOfYear(currentDate), 3);
   let timeOfDay = (currentDate.getUTCHours() * 60 + currentDate.getUTCMinutes()) / 1440;
   epochDay = (epochDay + timeOfDay).toFixed(8);
-  epochDay = helpers.pad0(epochDay, 12);
+  epochDay = stringPad.pad0(epochDay, 12);
   return [epochYear, epochDay];
 };
 
@@ -873,7 +873,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
     meana[0] = meana[0].substr(-3, 3);
     meana[1] = meana[1].substr(0, 4);
     meana = (meana[0] + '.' + meana[1]).toString();
-    meana = helpers.pad0(meana, 8);
+    meana = stringPad.pad0(meana, 8);
 
     var rasc;
     if (typeof mainRasc == 'undefined') {
@@ -885,7 +885,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
     rasc[0] = rasc[0].substr(-3, 3);
     rasc[1] = rasc[1].substr(0, 4);
     rasc = (rasc[0] + '.' + rasc[1]).toString();
-    rasc = helpers.pad0(rasc, 8);
+    rasc = stringPad.pad0(rasc, 8);
     mainRasc = rasc;
 
     var scc = sat.SCC_NUM;
@@ -897,7 +897,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
     inc[1] = inc[1].substr(0, 4);
     inc = (inc[0] + '.' + inc[1]).toString();
 
-    inc = helpers.pad0(inc, 8);
+    inc = stringPad.pad0(inc, 8);
     var epochyr = sat.TLE1.substr(18, 2);
     var epochday = sat.TLE1.substr(20, 12);
 
@@ -907,7 +907,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
 
     argPe = argPe / 10;
     argPe = parseFloat(argPe).toPrecision(7);
-    argPe = helpers.pad0(argPe, 8);
+    argPe = stringPad.pad0(argPe, 8);
 
     var TLE1Ending = sat.TLE1.substr(32, 39);
 
@@ -932,7 +932,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
 
     meana = meana / 10;
     meana = parseFloat(meana).toPrecision(7);
-    meana = helpers.pad0(meana, 8);
+    meana = stringPad.pad0(meana, 8);
 
     var rasc = (sat.raan * RAD2DEG).toPrecision(7);
     mainRasc = rasc;
@@ -940,7 +940,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
     rasc[0] = rasc[0].substr(-3, 3);
     rasc[1] = rasc[1].substr(0, 4);
     rasc = (rasc[0] + '.' + rasc[1]).toString();
-    rasc = helpers.pad0(rasc, 8);
+    rasc = stringPad.pad0(rasc, 8);
 
     var scc = sat.SCC_NUM;
 
@@ -951,7 +951,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
     inc[1] = inc[1].substr(0, 4);
     inc = (inc[0] + '.' + inc[1]).toString();
 
-    inc = helpers.pad0(inc, 8);
+    inc = stringPad.pad0(inc, 8);
     var epochyr = sat.TLE1.substr(18, 2);
     var epochday = sat.TLE1.substr(20, 12);
 
@@ -969,7 +969,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
     argPe[0] = argPe[0].substr(-3, 3);
     argPe[1] = argPe[1].substr(0, 4);
     argPe = (argPe[0] + '.' + argPe[1]).toString();
-    argPe = helpers.pad0(argPe, 8);
+    argPe = stringPad.pad0(argPe, 8);
 
     var TLE1Ending = sat.TLE1.substr(32, 39);
 
@@ -1002,7 +1002,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
     rasc[0] = rasc[0].substr(-3, 3);
     rasc[1] = rasc[1].substr(0, 4);
     rasc = (rasc[0] + '.' + rasc[1]).toString();
-    rasc = helpers.pad0(rasc, 8);
+    rasc = stringPad.pad0(rasc, 8);
     mainRasc = rasc;
 
     var scc = sat.SCC_NUM;
@@ -1014,7 +1014,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
     inc[1] = inc[1].substr(0, 4);
     inc = (inc[0] + '.' + inc[1]).toString();
 
-    inc = helpers.pad0(inc, 8);
+    inc = stringPad.pad0(inc, 8);
     var epochyr = sat.TLE1.substr(18, 2);
     var epochday = sat.TLE1.substr(20, 12);
 
@@ -1032,7 +1032,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
     argPe[0] = argPe[0].substr(-3, 3);
     argPe[1] = argPe[1].substr(0, 4);
     argPe = (argPe[0] + '.' + argPe[1]).toString();
-    argPe = helpers.pad0(argPe, 8);
+    argPe = stringPad.pad0(argPe, 8);
 
     var TLE1Ending = sat.TLE1.substr(32, 39);
 
@@ -1058,7 +1058,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
       rasc[0] = rasc[0].substr(-3, 3);
       rasc[1] = rasc[1].substr(0, 4);
       rasc = (rasc[0] + '.' + rasc[1]).toString();
-      rasc = helpers.pad0(rasc, 8);
+      rasc = stringPad.pad0(rasc, 8);
       mainRasc = rasc;
 
       mainTLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
@@ -1808,7 +1808,7 @@ satellite.createManeuverAnalyst = (satId, incVariation, meanmoVariation, rascVar
     inc[1] = '0000';
   }
   inc = (inc[0] + '.' + inc[1]).toString();
-  inc = helpers.padEmpty(inc, 8);
+  inc = stringPad.padEmpty(inc, 8);
 
   // For the second 30
   var meanmo = iTLE2.substr(52, 10);

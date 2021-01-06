@@ -2,7 +2,7 @@
 /* eslint-disable no-useless-escape */
 
 // eslint-disable-next-line max-classes-per-file
-import * as glm from '@app/js/lib/gl-matrix.js';
+import * as glm from '@app/js/lib/external/gl-matrix.js';
 import * as twgl from 'twgl.js';
 import { DEG2RAD } from '@app/js/constants.js';
 

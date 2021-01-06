@@ -19,7 +19,7 @@ import * as $ from 'jquery';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { satSet } from '@app/js/satSet/satSet.js';
-import { satellite } from '@app/js/lookangles.js';
+import { satellite } from '@app/js/lib/lookangles.js';
 import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { uiManager } from '@app/js/uiManager/uiManager.js';

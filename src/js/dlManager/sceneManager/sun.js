@@ -1,10 +1,10 @@
 // Shaders should NOT be modified
 /* eslint-disable no-useless-escape */
 
-import * as glm from '@app/js/lib/gl-matrix.js';
+import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/constants.js';
-import { A } from '@app/js/lib/meuusjs.js';
-import { satellite } from '@app/js/lookangles.js';
+import { A } from '@app/js/lib/external/meuusjs.js';
+import { satellite } from '@app/js/lib/lookangles.js';
 import { timeManager } from '@app/js/timeManager.js';
 
 let mvMatrixEmpty = glm.mat4.create();

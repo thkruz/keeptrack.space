@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import { MILLISECONDS_PER_DAY } from '@app/js/constants.js';
-import { dateFormat } from '@app/js/lib/dateFormat.js';
+import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { settingsManager } from '@app/js/settings.js';
 
 ('use strict');

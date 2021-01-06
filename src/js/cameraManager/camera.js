@@ -21,7 +21,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * @body Complete 100% testing coverage and input validation for @app/test/cameraManager.test.js. Use cameraManager.setZoomLevel() as an example of a correct test/validation.
  */
 
-import * as glm from '@app/js/lib/gl-matrix.js';
+import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/constants.js';
 
 /* Used for managing the movement of the camera during the draw loop */

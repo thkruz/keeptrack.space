@@ -25,21 +25,20 @@
  */
 /* eslint-disable no-useless-escape */
 
-import '@app/js/lib/numeric.js';
+import '@app/js/lib/external/numeric.js';
 import * as $ from 'jquery';
-import * as glm from '@app/js/lib/gl-matrix.js';
+import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/constants.js';
 import { db, settingsManager } from '@app/js/settings.js';
-import { helpers, saveCsv } from '@app/js/helpers.js';
-import { adviceList } from '@app/js/advice-module.js';
+import { saveCsv, stringPad } from '@app/js/lib/helpers.js';
 import { jsTLEfile } from '@app/offline/tle.js';
 import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager.js';
 import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 import { satVmagManager } from '@app/modules/satVmagManager.js';
-import { satellite } from '@app/js/lookangles.js';
-import { saveAs } from '@app/js/lib/file-saver.min.js';
+import { satellite } from '@app/js/lib/lookangles.js';
+import { saveAs } from '@app/js/lib/external/file-saver.min.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
@@ -92,7 +91,7 @@ var checkRcs = (possibles, minRcs, maxRcs) => {
 
 var satelliteList;
 if (settingsManager.offline) {
-  import('../../offline/extra.js').then((resp) => {
+  import('@app/offline/extra.js').then((resp) => {
     satelliteList = resp;
     console.debug(resp);
   });
@@ -589,7 +588,7 @@ satSet.filterTLEDatabase = (resp, limitSatsArray) => {
 
   let i = 0;
   for (i = 0; i < resp.length; i++) {
-    resp[i].SCC_NUM = helpers.pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
+    resp[i].SCC_NUM = stringPad.pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
     if (limitSats === '') {
       // If there are no limits then just process like normal
       year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
@@ -1757,7 +1756,14 @@ satSet.selectSat = (i) => {
   if (uiManager.isAnalysisMenuOpen && i != -1) {
     $('#anal-sat').val(satSet.getSat(i).SCC_NUM);
   }
-  adviceList.satelliteSelected();
+
+  let sat = satSet.getSat(i);
+  if (sat !== null && sat.static && typeof sat.staticNum !== 'undefined') {
+    uiManager.adviceList.sensor();
+  } else {
+    uiManager.adviceList.satelliteSelected();
+  }
+
   satCruncher.postMessage({
     satelliteSelected: [i],
   });

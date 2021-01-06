@@ -1,11 +1,10 @@
 import * as $ from 'jquery';
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/constants.js';
 import { SunCalc } from '@app/js/SunCalc/suncalc.js';
-import { adviceList } from '@app/js/advice-module.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
 import { satSet } from '@app/js/satSet/satSet.js';
-import { satellite } from '@app/js/lookangles.js';
+import { satellite } from '@app/js/lib/lookangles.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
 import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
@@ -103,7 +102,6 @@ selectSatManager.selectSat = (satId, cameraManager) => {
     }
     if (sat.static) {
       if (typeof sat.staticNum == 'undefined') return;
-      adviceList.sensor();
       sat = satSet.getSat(satId);
       if (objectManager.isSensorManagerLoaded) sensorManager.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
       if (objectManager.isSensorManagerLoaded) sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];

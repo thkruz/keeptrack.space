@@ -1,7 +1,7 @@
 /* */
 
 import * as $ from 'jquery';
-import { dateFormat } from '@app/js/lib/dateFormat.js';
+import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { settingsManager } from '@app/js/settings.js';
 
 let nextLaunchManager = {};

@@ -20,9 +20,9 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 
 'use strict';
-import '@app/js/lib/numeric.js';
+import '@app/js/lib/external/numeric.js';
 import * as satellite from 'satellite.js';
-import { A } from '@app/js/lib/meuusjs.js';
+import { A } from '@app/js/lib/external/meuusjs.js';
 import { SunCalc } from '@app/js/SunCalc/suncalc.js';
 
 /** CONSTANTS */

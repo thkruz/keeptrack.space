@@ -37,7 +37,7 @@ import { jQAlt } from '@app/js/jqalt/jqalt.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager.js';
 import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
-import { satellite } from '@app/js/lookangles.js';
+import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { selectSatManager } from '@app/js/selectSat.js';
 import { sensorManager } from '@app/modules/sensorManager.js';

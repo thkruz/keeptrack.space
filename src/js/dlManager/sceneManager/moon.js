@@ -2,11 +2,11 @@
 /* eslint-disable no-useless-escape */
 
 // eslint-disable-next-line max-classes-per-file
-import * as glm from '@app/js/lib/gl-matrix.js';
+import * as glm from '@app/js/lib/external/gl-matrix.js';
 import * as twgl from 'twgl.js';
 import { RAD2DEG } from '@app/js/constants.js';
 import { SunCalc } from '@app/js/SunCalc/suncalc.js';
-import { satellite } from '@app/js/lookangles.js';
+import { satellite } from '@app/js/lib/lookangles.js';
 
 class Moon {
   static NUM_LAT_SEGS = 32;

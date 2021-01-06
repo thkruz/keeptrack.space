@@ -29,7 +29,7 @@ import '@app/js/lib/external/jquery.colorbox.min.js';
 import '@app/js/lib/external/jquery-ajax.js';
 import '@app/js/lib/external/colorPick.js';
 import 'materialize-css';
-import { DEG2RAD, RAD2DEG } from '@app/js/constants.js';
+import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
 import { db, settingsManager } from '@app/js/settings.js';
 import { saveAs, saveCsv, stringPad } from '@app/js/lib/helpers.js';
 import { Camera } from '@app/js/cameraManager/camera.js';

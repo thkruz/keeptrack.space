@@ -17,7 +17,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 /*global gremlins, randomizer*/
 import * as $ from 'jquery';
-import { RADIUS_OF_EARTH } from '@app/js/constants.js';
+import { RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 
 // Settings Manager Setup
 let settingsManager = {};

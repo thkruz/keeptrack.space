@@ -1,6 +1,6 @@
 /* */
 
-import { RAD2DEG } from '@app/js/constants.js';
+import { RAD2DEG } from '@app/js/lib/constants.js';
 
 var satLinkManager = {};
 satLinkManager.aehfUsers = [];

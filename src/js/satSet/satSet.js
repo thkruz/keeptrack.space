@@ -28,7 +28,7 @@
 import '@app/js/lib/external/numeric.js';
 import * as $ from 'jquery';
 import * as glm from '@app/js/lib/external/gl-matrix.js';
-import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/constants.js';
+import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants.js';
 import { db, settingsManager } from '@app/js/settings.js';
 import { saveCsv, stringPad } from '@app/js/lib/helpers.js';
 import { jsTLEfile } from '@app/offline/tle.js';

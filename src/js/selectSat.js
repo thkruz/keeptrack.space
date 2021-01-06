@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
-import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/constants.js';
-import { SunCalc } from '@app/js/SunCalc/suncalc.js';
+import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
+import { SunCalc } from '@app/js/lib/suncalc.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
 import { satSet } from '@app/js/satSet/satSet.js';

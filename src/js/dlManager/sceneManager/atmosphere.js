@@ -4,7 +4,7 @@
 // eslint-disable-next-line max-classes-per-file
 import * as glm from '@app/js/lib/external/gl-matrix.js';
 import * as twgl from 'twgl.js';
-import { DEG2RAD } from '@app/js/constants.js';
+import { DEG2RAD } from '@app/js/lib/constants.js';
 
 class Atmosphere {
   constructor(gl, earth, settingsManager) {

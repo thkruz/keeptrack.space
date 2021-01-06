@@ -33,7 +33,7 @@ import { Dots } from './dots';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
 import { LineFactory } from '@app/js/dlManager/sceneManager/sceneManager.js';
 import { dlManager } from '@app/js/dlManager/dlManager.js';
-import { jQAlt } from '@app/js/jqalt/jqalt.js';
+import { jQAlt } from '@app/js/lib/jqalt.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager.js';
 import { radarDataManager } from '@app/js/satSet/radarDataManager.js';

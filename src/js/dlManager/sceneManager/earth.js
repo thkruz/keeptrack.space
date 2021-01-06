@@ -1,5 +1,5 @@
 import * as glm from '@app/js/lib/external/gl-matrix.js';
-import { DEG2RAD, MILLISECONDS_PER_DAY, RADIUS_OF_EARTH } from '@app/js/constants.js';
+import { DEG2RAD, MILLISECONDS_PER_DAY, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';

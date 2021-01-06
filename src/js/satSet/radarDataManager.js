@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import { DEG2RAD } from '@app/js/constants.js';
+import { DEG2RAD } from '@app/js/lib/constants.js';
 import { db } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 

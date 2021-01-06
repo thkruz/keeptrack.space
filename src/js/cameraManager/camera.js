@@ -22,7 +22,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  */
 
 import * as glm from '@app/js/lib/external/gl-matrix.js';
-import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/constants.js';
+import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants.js';
 
 /* Used for managing the movement of the camera during the draw loop */
 class Camera {

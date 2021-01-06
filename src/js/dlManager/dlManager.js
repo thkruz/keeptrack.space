@@ -323,11 +323,11 @@ dlManager.satCalculate = () => {
     if (!dlManager.sat.static) {
       cameraManager.camSnapToSat(dlManager.sat);
 
-      if (dlManager.sat.missile || typeof meshManager == 'undefined') {
-        settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0];
-      } else {
-        settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
-      }
+      // if (dlManager.sat.missile || typeof meshManager == 'undefined') {
+      //   settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0];
+      // } else {
+      //   settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
+      // }
 
       // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
       if (!settingsManager.modelsOnSatelliteViewOverride) {

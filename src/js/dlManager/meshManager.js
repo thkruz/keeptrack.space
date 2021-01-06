@@ -1,6 +1,7 @@
 /* */
 
 import * as glm from '@app/js/lib/gl-matrix.js';
+import { DEG2RAD, RAD2DEG } from '@app/js/constants.js';
 import { OBJ } from '@app/js/lib/webgl-obj-loader.js';
 let meshManager = {};
 var gl, earth;
@@ -144,24 +145,21 @@ var initBuffers = () => {
 };
 
 meshManager.lerpPosition = (pos, dt) => {
-  meshManager.selectedSatPosition.x = pos.x + (meshManager.selectedSatPosition.x - pos.x) * dt;
-  meshManager.selectedSatPosition.y = pos.y + (meshManager.selectedSatPosition.y - pos.y) * dt;
-  meshManager.selectedSatPosition.z = pos.z + (meshManager.selectedSatPosition.z - pos.z) * dt;
+  meshManager.currentModel.position.x = pos.x + (meshManager.currentModel.position.x - pos.x) * dt;
+  meshManager.currentModel.position.y = pos.y + (meshManager.currentModel.position.y - pos.y) * dt;
+  meshManager.currentModel.position.z = pos.z + (meshManager.currentModel.position.z - pos.z) * dt;
 };
 
 meshManager.updatePosition = (pos) => {
-  meshManager.selectedSatPosition = pos;
+  meshManager.currentModel.position = pos;
 };
 
 (function () {
   if (settingsManager.noMeshManager) return;
   if (settingsManager.disableUI || settingsManager.isDrawLess) return;
 
-  meshManager.selectedSatPosition = { x: 0, y: 0, z: 0 };
   let mvMatrix;
-  let mvMatrixEmpty = glm.mat4.create();
   let nMatrix;
-  let nMatrixEmpty = glm.mat3.create();
 
   meshManager.fileList = [];
   let meshList = ['sat2', 's1u', 's2u', 's3u', 'starlink', 'iss', 'gps', 'aehf', 'dsp', 'galileo', 'o3b', 'orbcomm', 'iridium', 'globalstar', 'debris0', 'debris1', 'debris2', 'rocketbody'];
@@ -243,37 +241,28 @@ meshManager.updatePosition = (pos) => {
   // main app object
   meshManager.meshes = {};
   meshManager.models = {};
+  meshManager.currentModel = {
+    position: { x: 0, y: 0, z: 0 },
+  };
   meshManager.mvMatrix = glm.mat4.create();
   meshManager.mvMatrixStack = [];
   meshManager.pMatrix = glm.mat4.create();
-  meshManager.drawObject = (model, pMatrix, camMatrix, tgtBuffer, inSun, isFacingNadir) => {
-    if (typeof model == 'undefined') return;
-
+  meshManager.draw = (pMatrix, camMatrix, tgtBuffer) => {
     // Meshes aren't finished loading
     if (!meshManager.loaded) return;
 
-    // gl.bindVertexArray(meshManager.vao);
-
-    // Assigned an origin at 0,0,0
-    mvMatrix = mvMatrixEmpty;
-    glm.mat4.identity(mvMatrix);
-
     // Move the mesh to its location in world space
-    glm.mat4.translate(mvMatrix, mvMatrix, glm.vec3.fromValues(model.position.x, model.position.y, model.position.z));
+    mvMatrix = glm.mat4.create();
+    glm.mat4.identity(mvMatrix);
+    glm.mat4.translate(mvMatrix, mvMatrix, glm.vec3.fromValues(meshManager.currentModel.position.x, meshManager.currentModel.position.y, meshManager.currentModel.position.z));
 
-    // Rotate the Satellite to Face Nadir
-    if (isFacingNadir !== null) {
-      glm.mat4.rotateZ(mvMatrix, mvMatrix, isFacingNadir);
+    // Rotate the Satellite to Face Nadir if needed
+    if (meshManager.currentModel.nadirYaw !== null) {
+      glm.mat4.rotateZ(mvMatrix, mvMatrix, meshManager.currentModel.nadirYaw);
     }
 
-    // glm.mat4.scale(
-    //     mvMatrix,
-    //     mvMatrix,
-    //     glm.vec3.fromValues(model.size.x, model.size.y, model.size.z)
-    // );
-
     // Assign the normal matrix the opposite of the mvMatrix
-    nMatrix = nMatrixEmpty;
+    nMatrix = glm.mat3.create();
     glm.mat3.normalFromMat4(nMatrix, mvMatrix);
 
     gl.enable(gl.BLEND);
@@ -290,23 +279,205 @@ meshManager.updatePosition = (pos) => {
     gl.uniformMatrix4fv(meshManager.shaderProgram.uMvMatrix, false, mvMatrix);
     gl.uniformMatrix4fv(meshManager.shaderProgram.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(meshManager.shaderProgram.uCamMatrix, false, camMatrix);
-    gl.uniform1f(meshManager.shaderProgram.uInSun, inSun);
+    gl.uniform1f(meshManager.shaderProgram.uInSun, meshManager.currentModel.inSun);
 
     // Assign vertex buffer
-    gl.bindBuffer(gl.ARRAY_BUFFER, model.mesh.vertexBuffer);
-    // Enable attributes
-    meshManager.shaderProgram.enableVertexAttribArrays(model);
+    gl.bindBuffer(gl.ARRAY_BUFFER, meshManager.currentModel.model.mesh.vertexBuffer);
+    meshManager.shaderProgram.enableVertexAttribArrays(meshManager.currentModel.model);
+    meshManager.shaderProgram.applyAttributePointers(meshManager.currentModel.model);
 
-    // Update Buffers
-    meshManager.shaderProgram.applyAttributePointers(model);
+    // Not sure why we do this?
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, meshManager.currentModel.model.mesh.indexBuffer);
+    gl.drawElements(gl.TRIANGLES, meshManager.currentModel.model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, model.mesh.indexBuffer);
-    gl.drawElements(gl.TRIANGLES, model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-
-    // Enable attributes
-    meshManager.shaderProgram.disableVertexAttribArrays(model);
-
+    // disable attributes
+    meshManager.shaderProgram.disableVertexAttribArrays(meshManager.currentModel.model);
     gl.disable(gl.BLEND);
+  };
+
+  meshManager.updateNadirYaw = (Camera, sat, timeManager) => {
+    meshManager.currentModel.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
+  };
+
+  meshManager.update = (Camera, sat, timeManager) => {
+    // Try to reduce some jitter
+    if (
+      typeof meshManager.currentModel.position !== 'undefined' &&
+      meshManager.currentModel.position.x > sat.position.x - 1.0 &&
+      meshManager.currentModel.position.x < sat.position.x + 1.0 &&
+      meshManager.currentModel.position.y > sat.position.y - 1.0 &&
+      meshManager.currentModel.position.y < sat.position.y + 1.0 &&
+      meshManager.currentModel.position.z > sat.position.z - 1.0 &&
+      meshManager.currentModel.position.z < sat.position.z + 1.0
+    ) {
+      // Lerp to smooth difference between SGP4 and position+velocity
+      meshManager.lerpPosition(sat.position, timeManager.drawDt);
+    } else {
+      meshManager.updatePosition(sat.position);
+    }
+
+    meshManager.currentModel.inSun = sat.isInSun();
+    meshManager.currentModel.nadirYaw = null;
+
+    if (sat.SCC_NUM == 25544) {
+      meshManager.updateNadirYaw(Camera, sat, timeManager);
+      meshManager.currentModel.model = meshManager.models.iss;
+      return;
+    }
+
+    if (sat.OT == 1) {
+      // Default Satellite
+      if (sat.ON.slice(0, 5) == 'FLOCK' || sat.ON.slice(0, 5) == 'LEMUR') {
+        meshManager.updateNadirYaw(Camera, sat, timeManager);
+        meshManager.currentModel.model = meshManager.models.s3u;
+        return;
+      }
+      if (sat.ON.slice(0, 8) == 'STARLINK') {
+        meshManager.updateNadirYaw(Camera, sat, timeManager);
+        meshManager.currentModel.model = meshManager.models.starlink;
+        return;
+      }
+
+      if (sat.ON.slice(0, 10) == 'GLOBALSTAR') {
+        meshManager.updateNadirYaw(Camera, sat, timeManager);
+        meshManager.currentModel.model = meshManager.models.globalstar;
+        return;
+      }
+
+      if (sat.ON.slice(0, 7) == 'IRIDIUM') {
+        meshManager.updateNadirYaw(Camera, sat, timeManager);
+        meshManager.currentModel.model = meshManager.models.iridium;
+        return;
+      }
+
+      if (sat.ON.slice(0, 7) == 'ORBCOMM') {
+        meshManager.updateNadirYaw(Camera, sat, timeManager);
+        meshManager.currentModel.model = meshManager.models.orbcomm;
+        return;
+      }
+
+      if (sat.ON.slice(0, 3) == 'O3B') {
+        meshManager.updateNadirYaw(Camera, sat, timeManager);
+        meshManager.currentModel.model = meshManager.models.o3b;
+        return;
+      }
+
+      // Is this a GPS Satellite (Called NAVSTAR)
+      if (sat.ON.slice(0, 7) == 'NAVSTAR' || sat.ON.slice(10, 17) == 'NAVSTAR') {
+        meshManager.updateNadirYaw(Camera, sat, timeManager);
+        meshManager.currentModel.model = meshManager.models.gps;
+        return;
+      }
+
+      // Is this a Galileo Satellite
+      if (sat.ON.slice(0, 7) == 'GALILEO') {
+        meshManager.updateNadirYaw(Camera, sat, timeManager);
+        meshManager.currentModel.model = meshManager.models.galileo;
+        return;
+      }
+
+      // Is this a DSP Satellite?
+      if (
+        sat.SCC_NUM == '04630' ||
+        sat.SCC_NUM == '05204' ||
+        sat.SCC_NUM == '05851' ||
+        sat.SCC_NUM == '06691' ||
+        sat.SCC_NUM == '08482' ||
+        sat.SCC_NUM == '08916' ||
+        sat.SCC_NUM == '09803' ||
+        sat.SCC_NUM == '11397' ||
+        sat.SCC_NUM == '12339' ||
+        sat.SCC_NUM == '13086' ||
+        sat.SCC_NUM == '14930' ||
+        sat.SCC_NUM == '15453' ||
+        sat.SCC_NUM == '18583' ||
+        sat.SCC_NUM == '20066' ||
+        sat.SCC_NUM == '20929' ||
+        sat.SCC_NUM == '21805' ||
+        sat.SCC_NUM == '23435' ||
+        sat.SCC_NUM == '24737' ||
+        sat.SCC_NUM == '26356' ||
+        sat.SCC_NUM == '26880' ||
+        sat.SCC_NUM == '28158'
+      ) {
+        meshManager.updateNadirYaw(Camera, sat, timeManager);
+        meshManager.currentModel.model = meshManager.models.dsp;
+        return;
+      }
+
+      // Is this an AEHF Satellite?
+      if (sat.SCC_NUM == '36868' || sat.SCC_NUM == '38254' || sat.SCC_NUM == '39256' || sat.SCC_NUM == '43651' || sat.SCC_NUM == '44481' || sat.SCC_NUM == '45465') {
+        meshManager.updateNadirYaw(Camera, sat, timeManager);
+        meshManager.currentModel.model = meshManager.models.aehf;
+        return;
+      }
+
+      // Is this a 1U Cubesat?
+      if (parseFloat(sat.R) < 0.1 && parseFloat(sat.R) > 0.04) {
+        meshManager.currentModel.model = meshManager.models.s1u;
+        return;
+      }
+      if (parseFloat(sat.R) < 0.22 && parseFloat(sat.R) >= 0.1) {
+        meshManager.currentModel.model = meshManager.models.s2u;
+        return;
+      }
+      if (parseFloat(sat.R) < 0.33 && parseFloat(sat.R) >= 0.22) {
+        meshManager.currentModel.model = meshManager.models.s3u;
+        return;
+      }
+      // Generic Model
+      meshManager.currentModel.model = meshManager.models.sat2;
+      return;
+    }
+
+    if (sat.OT == 2) {
+      // Rocket Body
+      meshManager.currentModel.model = meshManager.models.rocketbody;
+      return;
+    }
+
+    if (sat.OT == 3) {
+      if (sat.SCC_NUM <= 20000) {
+        // Debris
+        meshManager.currentModel.model = meshManager.models.debris0;
+        return;
+      } else if (sat.SCC_NUM <= 35000) {
+        // Debris
+        meshManager.currentModel.model = meshManager.models.debris1;
+        return;
+      } else if (sat.SCC_NUM > 35000) {
+        // Debris
+        meshManager.currentModel.model = meshManager.models.debris2;
+        return;
+      }
+    }
+  };
+
+  meshManager.drawOcclusion = function (pMatrix, camMatrix, occlusionPrgm, tgtBuffer) {
+    // Move the mesh to its location in world space
+    mvMatrix = glm.mat4.create();
+    glm.mat4.identity(mvMatrix);
+    glm.mat4.translate(mvMatrix, mvMatrix, glm.vec3.fromValues(meshManager.currentModel.position.x, meshManager.currentModel.position.y, meshManager.currentModel.position.z));
+
+    // Rotate the Satellite to Face Nadir if needed
+    if (meshManager.currentModel.nadirYaw !== null) {
+      glm.mat4.rotateZ(mvMatrix, mvMatrix, meshManager.currentModel.nadirYaw);
+    }
+
+    // Change to the earth shader
+    gl.useProgram(occlusionPrgm);
+    // Change to the main drawing buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+
+    occlusionPrgm.attrSetup(occlusionPrgm, meshManager.currentModel.model.mesh.vertexBuffer, 80);
+
+    // Set the uniforms
+    occlusionPrgm.uniformSetup(occlusionPrgm, mvMatrix, pMatrix, camMatrix);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, meshManager.currentModel.model.mesh.indexBuffer);
+    gl.drawElements(gl.TRIANGLES, meshManager.currentModel.model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+    occlusionPrgm.attrOff(occlusionPrgm);
   };
 
   {

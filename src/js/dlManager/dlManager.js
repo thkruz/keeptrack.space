@@ -1,5 +1,4 @@
 import * as glm from '@app/js/lib/gl-matrix.js';
-import { DEG2RAD, RAD2DEG } from '@app/js/constants.js';
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/selectSat.js';
 import { satScreenPositionArray, satSet } from '@app/js/satSet/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
@@ -280,165 +279,21 @@ dlManager.updateLoop = () => {
 
 dlManager.drawSatelliteModel = () => {
   if (objectManager.selectedSat !== -1 && typeof meshManager != 'undefined' && meshManager.isReady) {
-    let sat = dlManager.sat;
     // If 3D Models Available, then draw them on the screen
     if (typeof meshManager !== 'undefined' && (settingsManager.modelsOnSatelliteViewOverride || cameraManager.cameraType.current !== cameraManager.cameraType.satellite)) {
-      if (!sat.static) {
-        if (sat.SCC_NUM == 25544) {
-          meshManager.models.iss.position = meshManager.selectedSatPosition;
-          dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-          meshManager.drawObject(meshManager.models.iss, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-          return;
-        }
+      if (!dlManager.sat.static) {
+        meshManager.draw(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
+      }
+    }
+  }
+};
 
-        if (sat.OT == 1) {
-          // Default Satellite
-          if (sat.ON.slice(0, 5) == 'FLOCK' || sat.ON.slice(0, 5) == 'LEMUR') {
-            meshManager.models.s3u.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.s3u, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-          if (sat.ON.slice(0, 8) == 'STARLINK') {
-            meshManager.models.starlink.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.starlink, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-
-          if (sat.ON.slice(0, 10) == 'GLOBALSTAR') {
-            meshManager.models.globalstar.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.globalstar, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-
-          if (sat.ON.slice(0, 7) == 'IRIDIUM') {
-            meshManager.models.iridium.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.iridium, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-
-          if (sat.ON.slice(0, 7) == 'ORBCOMM') {
-            meshManager.models.orbcomm.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.orbcomm, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-
-          if (sat.ON.slice(0, 3) == 'O3B') {
-            meshManager.models.o3b.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.o3b, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-
-          // Is this a GPS Satellite (Called NAVSTAR)
-          if (sat.ON.slice(0, 7) == 'NAVSTAR' || sat.ON.slice(10, 17) == 'NAVSTAR') {
-            meshManager.models.gps.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.gps, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-
-          // Is this a Galileo Satellite
-          if (sat.ON.slice(0, 7) == 'GALILEO') {
-            meshManager.models.galileo.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.galileo, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-
-          // Is this a DSP Satellite?
-          if (
-            sat.SCC_NUM == '04630' ||
-            sat.SCC_NUM == '05204' ||
-            sat.SCC_NUM == '05851' ||
-            sat.SCC_NUM == '06691' ||
-            sat.SCC_NUM == '08482' ||
-            sat.SCC_NUM == '08916' ||
-            sat.SCC_NUM == '09803' ||
-            sat.SCC_NUM == '11397' ||
-            sat.SCC_NUM == '12339' ||
-            sat.SCC_NUM == '13086' ||
-            sat.SCC_NUM == '14930' ||
-            sat.SCC_NUM == '15453' ||
-            sat.SCC_NUM == '18583' ||
-            sat.SCC_NUM == '20066' ||
-            sat.SCC_NUM == '20929' ||
-            sat.SCC_NUM == '21805' ||
-            sat.SCC_NUM == '23435' ||
-            sat.SCC_NUM == '24737' ||
-            sat.SCC_NUM == '26356' ||
-            sat.SCC_NUM == '26880' ||
-            sat.SCC_NUM == '28158'
-          ) {
-            meshManager.models.dsp.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.dsp, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-
-          // Is this an AEHF Satellite?
-          if (sat.SCC_NUM == '36868' || sat.SCC_NUM == '38254' || sat.SCC_NUM == '39256' || sat.SCC_NUM == '43651' || sat.SCC_NUM == '44481' || sat.SCC_NUM == '45465') {
-            meshManager.models.aehf.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.aehf, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-
-          // Is this a 1U Cubesat?
-          if (parseFloat(sat.R) < 0.1 && parseFloat(sat.R) > 0.04) {
-            meshManager.models.s1u.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.s1u, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-          if (parseFloat(sat.R) < 0.22 && parseFloat(sat.R) >= 0.1) {
-            meshManager.models.s2u.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.s2u, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-          if (parseFloat(sat.R) < 0.33 && parseFloat(sat.R) >= 0.22) {
-            meshManager.models.s3u.position = meshManager.selectedSatPosition;
-            dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.s3u, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-            return;
-          }
-          // Generic Model
-          meshManager.models.sat2.position = meshManager.selectedSatPosition;
-          dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-          meshManager.drawObject(meshManager.models.sat2, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
-          return;
-        }
-
-        if (sat.OT == 2) {
-          // Rocket Body
-          meshManager.models.rocketbody.position = meshManager.selectedSatPosition;
-          meshManager.drawObject(meshManager.models.rocketbody, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), null);
-          return;
-        }
-
-        if (sat.OT == 3) {
-          if (sat.SCC_NUM <= 20000) {
-            // Debris
-            meshManager.models.debris0.position = meshManager.selectedSatPosition;
-            meshManager.drawObject(meshManager.models.debris0, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), null);
-            return;
-          } else if (sat.SCC_NUM <= 35000) {
-            // Debris
-            meshManager.models.debris1.position = meshManager.selectedSatPosition;
-            meshManager.drawObject(meshManager.models.debris1, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), null);
-            return;
-          } else if (sat.SCC_NUM > 35000) {
-            // Debris
-            meshManager.models.debris2.position = meshManager.selectedSatPosition;
-            meshManager.drawObject(meshManager.models.debris2, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), null);
-            return;
-          }
-        }
+dlManager.updateSatelliteModel = () => {
+  if (objectManager.selectedSat !== -1 && typeof meshManager != 'undefined' && meshManager.isReady) {
+    // If 3D Models Available, then draw them on the screen
+    if (typeof meshManager !== 'undefined' && (settingsManager.modelsOnSatelliteViewOverride || cameraManager.cameraType.current !== cameraManager.cameraType.satellite)) {
+      if (!dlManager.sat.static) {
+        meshManager.update(Camera, dlManager.sat, timeManager);
       }
     }
   }
@@ -450,16 +305,31 @@ dlManager.drawOptionalScenery = () => {
       if (dlManager.isPostProcessingResizeNeeded) dlManager.resizePostProcessingTexture(sceneManager.sun);
       // Draw the Sun to the Godrays Frame Buffer
       sceneManager.sun.draw(dlManager.pMatrix, cameraManager.camMatrix, sceneManager.sun.godraysFrameBuffer);
-      // Draw a black earth on top of the sun in the godrays frame buffer
+
+      // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
       sceneManager.earth.drawOcclusion(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
-      // Add the godrays effect to the godrays frame buffer and then apply it to the current postprocessing buffer
-      sceneManager.sun.godraysPostProcessing(gl, postProcessingManager.curBuffer);
+      if (objectManager.selectedSat !== -1) {
+        meshManager.drawOcclusion(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
+      }
+      // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
+      // todo: this should be a dynamic buffer not hardcoded to bufffer two
+      sceneManager.sun.godraysPostProcessing(gl, postProcessingManager.frameBufferInfos.two.frameBuffer);
+
+      if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
+        sceneManager.atmosphere.draw(dlManager.pMatrix, cameraManager);
+      }
+
+      // Apply two pass gaussian blur to the godrays to smooth them out
+      postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
+      postProcessingManager.programs.gaussian.uniformValues.dir = { x: 1.0, y: 0.0 };
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.frameBufferInfos.two.frameBuffer, postProcessingManager.frameBufferInfos.one.frameBuffer);
+      postProcessingManager.programs.gaussian.uniformValues.dir = { x: 0.0, y: 1.0 };
+      // After second pass apply the results to the canvas
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.frameBufferInfos.one.frameBuffer, postProcessingManager.curBuffer);
+
+      // Draw the moon
       sceneManager.moon.draw(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
     }
-  }
-
-  if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
-    sceneManager.atmosphere.draw(dlManager.pMatrix, cameraManager);
   }
 };
 
@@ -475,24 +345,7 @@ dlManager.satCalculate = () => {
         settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
       }
 
-      // If 3D Models Available, then update their position on the screen
-      if (typeof meshManager !== 'undefined' && !dlManager.sat.missile) {
-        // Try to reduce some jitter
-        if (
-          typeof meshManager.selectedSatPosition !== 'undefined' &&
-          meshManager.selectedSatPosition.x > dlManager.sat.position.x - 1.0 &&
-          meshManager.selectedSatPosition.x < dlManager.sat.position.x + 1.0 &&
-          meshManager.selectedSatPosition.y > dlManager.sat.position.y - 1.0 &&
-          meshManager.selectedSatPosition.y < dlManager.sat.position.y + 1.0 &&
-          meshManager.selectedSatPosition.z > dlManager.sat.position.z - 1.0 &&
-          meshManager.selectedSatPosition.z < dlManager.sat.position.z + 1.0
-        ) {
-          // Lerp to smooth difference between SGP4 and position+velocity
-          meshManager.lerpPosition(dlManager.sat.position, timeManager.drawDt);
-        } else {
-          meshManager.updatePosition(dlManager.sat.position);
-        }
-      }
+      dlManager.updateSatelliteModel();
     }
     if (dlManager.sat.missile) orbitManager.setSelectOrbit(dlManager.sat.satId);
   }
@@ -878,6 +731,7 @@ dlManager.onDrawLoopComplete = (cb) => {
 dlManager.resizePostProcessingTexture = (sun) => {
   // Post Processing Texture Needs Scaled
   sun.setupGodrays(dlManager.gl);
+  postProcessingManager.init(dlManager.gl);
   dlManager.isPostProcessingResizeNeeded = false;
 };
 
@@ -939,9 +793,9 @@ dlManager.clearFrameBuffers = () => {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   // Clear all post processing frame buffers
-  if (dlManager.isNeedPostProcessing) {
-    postProcessingManager.clearAll();
-  }
+  // if (dlManager.isNeedPostProcessing) {
+  postProcessingManager.clearAll();
+  // }
   // Clear the godraysPostProcessing Frame Buffer
   gl.bindFramebuffer(gl.FRAMEBUFFER, sceneManager.sun.godraysFrameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);

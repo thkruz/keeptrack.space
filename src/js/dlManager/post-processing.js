@@ -92,10 +92,11 @@ pPM.setupOcclusion = (gl, program) => {
     uCamMatrix: gl.getUniformLocation(program, 'uCamMatrix'),
     uMvMatrix: gl.getUniformLocation(program, 'uMvMatrix'),
   };
-  program.attrSetup = (program, vertPosBuf) => {
+  program.attrSetup = (program, vertPosBuf, stride) => {
+    stride = stride || 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
     gl.enableVertexAttribArray(program.attr.position);
-    gl.vertexAttribPointer(program.attr.position, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(program.attr.position, 3, gl.FLOAT, false, stride, 0);
   };
   program.attrOff = (program) => {
     gl.disableVertexAttribArray(program.attr.position);
@@ -164,14 +165,12 @@ pPM.getFrameBufferInfo = (curBuffer) => {
 
 pPM.clearAll = () => {
   const gl = pPM.gl;
-  gl.bindFramebuffer(gl.FRAMEBUFFER, pPM.curBuffer);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, pPM.frameBufferInfos.one.frameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  pPM.switchFrameBuffer();
-  gl.bindFramebuffer(gl.FRAMEBUFFER, pPM.curBuffer);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, pPM.frameBufferInfos.two.frameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  pPM.switchFrameBuffer();
 };
 
 pPM.doPostProcessing = (gl, program, curBuffer, tgtBuffer) => {

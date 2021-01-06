@@ -39,7 +39,7 @@ sun.shader = {
         // Set colors
         float r = 1.0 * a;
         float g = 1.0 * a;
-        float b = 0.7 * a;
+        float b = 0.9 * a;
 
         if (vDist2 > 1.0) {
         discard;
@@ -289,17 +289,11 @@ sun.draw = function (pMatrix, camMatrix, tgtBuffer) {
   // gl.bindVertexArray(sun.vao);
 
   sun.sunScreenPosition = sun.getScreenCoords(pMatrix, camMatrix);
-  if (sun.sunScreenPosition == false) return; // Sun is off screen
 
   mvMatrix = mvMatrixEmpty;
   glm.mat4.identity(mvMatrix);
 
   glm.mat4.translate(mvMatrix, mvMatrix, sun.pos);
-  // Keep the back of the sun sphere directly behind the front of the
-  // sun sphere so there is only one sun
-  // Depricated with use of fragment discard
-  // glm.mat4.rotateX(mvMatrix, mvMatrix, -camPitch);
-  // glm.mat4.rotateZ(mvMatrix, mvMatrix, -camYaw);
 
   nMatrix = nMatrixEmpty;
   glm.mat3.normalFromMat4(nMatrix, mvMatrix);
@@ -382,13 +376,7 @@ sun.getScreenCoords = (pMatrix, camMatrix) => {
   sun.sunScreenPositionArray.x = (sun.sunScreenPositionArray.x + 1) * 0.5; // * window.innerWidth;
   sun.sunScreenPositionArray.y = (-sun.sunScreenPositionArray.y + 1) * 0.5; // * window.innerHeight;
 
-  // If we can see the sun
-  if (sun.sunScreenPositionArray.x >= -0.5 && sun.sunScreenPositionArray.x <= 1.5 && sun.sunScreenPositionArray.y >= -0.5 && sun.sunScreenPositionArray.y <= 1.5) {
-    // Then return where the sun is so we can draw it and apply godrays
-    return sun.sunScreenPositionArray;
-  } else {
-    return false;
-  }
+  return sun.sunScreenPositionArray;
 };
 
 sun.godraysShaderCode = {
@@ -404,10 +392,10 @@ sun.godraysShaderCode = {
     varying vec2 v_texCoord;
     
     void main() {
-      float decay=0.996;
+      float decay=1.0;
       float exposure=1.0;
       float density=1.0;
-      float weight=0.02;
+      float weight=0.022;
       vec2 lightPositionOnScreen = vec2(u_sunPosition.x,1.0 - u_sunPosition.y);      
       vec2 texCoord = v_texCoord;
 

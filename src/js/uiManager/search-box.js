@@ -2,7 +2,7 @@
 
 import * as $ from 'jquery';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
-import { settingsManager } from '@app/js/settings.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 
 var hoverSatId = -1;
 var searchBox = {};

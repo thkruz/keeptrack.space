@@ -1,4 +1,4 @@
-import { settingsManager } from '@app/js/settings.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 
 var mobileManager = {};
 // Wrap everything in an init to make sure the loading order is respected

@@ -2,7 +2,7 @@
 
 import * as $ from 'jquery';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { settingsManager } from '@app/js/settings.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 
 let nextLaunchManager = {};
 (function () {

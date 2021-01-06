@@ -2,10 +2,11 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/selectSat.js';
 import { satScreenPositionArray, satSet } from '@app/js/satSet/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
-import { meshManager } from '@app/js/dlManager/meshManager.js';
+import { Dots } from '@app/js/drawManager/dots.js';
+import { meshManager } from '@app/js/drawManager/meshManager.js';
 import { missileManager } from '@app/js/missileManager/missileManager.js';
-import { pPM as postProcessingManager } from '@app/js/dlManager/post-processing.js';
-import { sceneManager } from '@app/js/dlManager/sceneManager/sceneManager.js';
+import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
+import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 
 const satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
@@ -27,7 +28,7 @@ let isHoverBoxVisible = false;
 let isShowDistance = true;
 var gl;
 
-var dlManager = {
+var drawManager = {
   i: 0,
   demoModeSatellite: 0,
   demoModeLastTime: 0,
@@ -37,12 +38,12 @@ var dlManager = {
   drawLoopCallback: null,
   gaussianAmt: 0,
   setDrawLoopCallback: (cb) => {
-    dlManager.drawLoopCallback = cb;
+    drawManager.drawLoopCallback = cb;
   },
 };
 
 var groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager;
-dlManager.init = (groupsManagerRef, uiInputRef, starManagerRef, satelliteRef, ColorSchemeRef, cameraManagerRef, objectManagerRef, orbitManagerRef, sensorManagerRef, uiManagerRef, lineManagerRef, dotsManagerRef) => {
+drawManager.init = (groupsManagerRef, uiInputRef, starManagerRef, satelliteRef, ColorSchemeRef, cameraManagerRef, objectManagerRef, orbitManagerRef, sensorManagerRef, uiManagerRef, lineManagerRef, dotsManagerRef) => {
   uiInput = uiInputRef;
   starManager = starManagerRef;
   satellite = satelliteRef;
@@ -62,13 +63,13 @@ dlManager.init = (groupsManagerRef, uiInputRef, starManagerRef, satelliteRef, Co
 // Reinitialize the canvas on mobile rotation
 window.addEventListener('orientationchange', function () {
   // console.log('rotate');
-  dlManager.isRotationEvent = true;
+  drawManager.isRotationEvent = true;
 });
 
-dlManager.canvas = document.getElementById('keeptrack-canvas');
-dlManager.glInit = async () => {
-  // dlManager Scope
-  gl = dlManager.canvas.getContext('webgl', {
+drawManager.canvas = document.getElementById('keeptrack-canvas');
+drawManager.glInit = async () => {
+  // drawManager Scope
+  gl = drawManager.canvas.getContext('webgl', {
     alpha: false,
     premultipliedAlpha: false,
     desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
@@ -78,19 +79,24 @@ dlManager.glInit = async () => {
     stencil: false,
   });
 
-  dlManager.resizeCanvas();
+  drawManager.resizeCanvas();
 
   gl.getExtension('EXT_frag_depth');
   gl.enable(gl.DEPTH_TEST);
 
   postProcessingManager.init(gl);
 
-  dlManager.postProcessingManager = postProcessingManager;
-  dlManager.gl = gl;
+  drawManager.postProcessingManager = postProcessingManager;
+  drawManager.gl = gl;
   return gl;
 };
 
-dlManager.loadScene = async () => {
+drawManager.createDotsManager = () => {
+  drawManager.dotsManager = new Dots(drawManager.gl);
+  return drawManager.dotsManager;
+};
+
+drawManager.loadScene = async () => {
   await sceneManager.earth.init(gl);
   sceneManager.earth.loadHiRes();
   sceneManager.earth.loadHiResNight();
@@ -100,10 +106,10 @@ dlManager.loadScene = async () => {
   sceneManager.moon = new sceneManager.classes.Moon(gl, sceneManager.sun);
 
   // Make this public
-  dlManager.sceneManager = sceneManager;
+  drawManager.sceneManager = sceneManager;
 };
 
-dlManager.resizeCanvas = () => {
+drawManager.resizeCanvas = () => {
   // Using minimum allows the canvas to be full screen without fighting with scrollbars
   let cw = document.documentElement.clientWidth || 0;
   let iw = window.innerWidth || 0;
@@ -119,40 +125,40 @@ dlManager.resizeCanvas = () => {
       if (settingsManager.isMobileModeEnabled) {
         // Changes more than 35% of height but not due to rotation are likely
         // the keyboard! Ignore them
-        if ((((vw - dlManager.canvas.width) / dlManager.canvas.width) * 100 < 1 && ((vh - dlManager.canvas.height) / dlManager.canvas.height) * 100 < 1) || dlManager.isRotationEvent) {
-          dlManager.canvas.width = vw;
-          dlManager.canvas.height = vh;
-          dlManager.isRotationEvent = false;
+        if ((((vw - drawManager.canvas.width) / drawManager.canvas.width) * 100 < 1 && ((vh - drawManager.canvas.height) / drawManager.canvas.height) * 100 < 1) || drawManager.isRotationEvent) {
+          drawManager.canvas.width = vw;
+          drawManager.canvas.height = vh;
+          drawManager.isRotationEvent = false;
         }
         // No Canvas Change
         return;
       } else {
-        dlManager.canvas.width = vw;
-        dlManager.canvas.height = vh;
+        drawManager.canvas.width = vw;
+        drawManager.canvas.height = vh;
       }
     }
   } else {
     if (settingsManager.screenshotMode) {
-      dlManager.canvas.width = settingsManager.hiResWidth;
-      dlManager.canvas.height = settingsManager.hiResHeight;
+      drawManager.canvas.width = settingsManager.hiResWidth;
+      drawManager.canvas.height = settingsManager.hiResHeight;
     } else {
       // No screen size change and not taking a photo
       return;
     }
   }
 
-  gl.viewport(0, 0, dlManager.canvas.width, dlManager.canvas.height);
-  dlManager.calculatePMatrix(settingsManager);
-  dlManager.isPostProcessingResizeNeeded = true;
+  gl.viewport(0, 0, drawManager.canvas.width, drawManager.canvas.height);
+  drawManager.calculatePMatrix(settingsManager);
+  drawManager.isPostProcessingResizeNeeded = true;
 };
 
-dlManager.calculatePMatrix = (settingsManager) => {
-  dlManager.pMatrix = glm.mat4.create();
-  glm.mat4.perspective(dlManager.pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
+drawManager.calculatePMatrix = (settingsManager) => {
+  drawManager.pMatrix = glm.mat4.create();
+  glm.mat4.perspective(drawManager.pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
 
   // This converts everything from 3D space to ECI (z and y planes are swapped)
   const eciToOpenGlMat = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
-  glm.mat4.mul(dlManager.pMatrix, dlManager.pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
+  glm.mat4.mul(drawManager.pMatrix, drawManager.pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
 };
 
 var startWithOrbits = async () => {
@@ -166,50 +172,50 @@ var startWithOrbits = async () => {
   }
 };
 
-dlManager.drawLoop = (preciseDt) => {
+drawManager.drawLoop = (preciseDt) => {
   // Restart the draw loop when ready to draw again
-  requestAnimationFrame(dlManager.drawLoop);
-  if (dlManager.sceneManager.earth.isUseHiRes && dlManager.sceneManager.earth.isHiResReady !== true) return;
+  requestAnimationFrame(drawManager.drawLoop);
+  if (drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) return;
 
   // Record milliseconds since last drawLoop - default is 0
-  dlManager.dt = preciseDt - dlManager.t0 || 0;
+  drawManager.dt = preciseDt - drawManager.t0 || 0;
   // Record last Draw Time for Calculating Difference
-  dlManager.t0 = preciseDt;
+  drawManager.t0 = preciseDt;
   // Display it if that settings is enabled
-  if (dlManager.isShowFPS) console.log(1000 / timeManager.dt);
+  if (drawManager.isShowFPS) console.log(1000 / timeManager.dt);
   // Update official time for everyone else
-  if (!dlManager.isUpdateTimeThrottle) {
-    dlManager.isUpdateTimeThrottle = true;
-    timeManager.setNow(Date.now(), dlManager.dt);
+  if (!drawManager.isUpdateTimeThrottle) {
+    drawManager.isUpdateTimeThrottle = true;
+    timeManager.setNow(Date.now(), drawManager.dt);
     setTimeout(() => {
-      dlManager.isUpdateTimeThrottle = false;
+      drawManager.isUpdateTimeThrottle = false;
     }, 500);
   }
 
-  dlManager.checkIfPostProcessingRequired();
+  drawManager.checkIfPostProcessingRequired();
 
   // Do any per frame calculations
-  dlManager.updateLoop();
+  drawManager.updateLoop();
 
   // Actually draw things now that math is done
-  dlManager.resizeCanvas();
-  dlManager.clearFrameBuffers();
+  drawManager.resizeCanvas();
+  drawManager.clearFrameBuffers();
 
   // Sun, Moon, and Atmosphere
-  dlManager.drawOptionalScenery();
+  drawManager.drawOptionalScenery();
 
-  sceneManager.earth.draw(dlManager.pMatrix, cameraManager.camMatrix, dotsManager, postProcessingManager.curBuffer);
+  sceneManager.earth.draw(drawManager.pMatrix, cameraManager.camMatrix, dotsManager, postProcessingManager.curBuffer);
 
   // Update Draw Positions
   dotsManager.updatePositionBuffer(satSet, timeManager);
 
   // Draw Dots
-  dotsManager.draw(dlManager.pMatrix, cameraManager, settingsManager.currentColorScheme, postProcessingManager.curBuffer);
+  dotsManager.draw(drawManager.pMatrix, cameraManager, settingsManager.currentColorScheme, postProcessingManager.curBuffer);
 
   // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-  dotsManager.drawGpuPickingFrameBuffer(dlManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
+  dotsManager.drawGpuPickingFrameBuffer(drawManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
 
-  orbitManager.draw(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
+  orbitManager.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
 
   lineManager.draw();
 
@@ -221,20 +227,20 @@ dlManager.drawLoop = (preciseDt) => {
   // Draw Satellite Model if a satellite is selected and meshManager is loaded
   // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
   if (!settingsManager.modelsOnSatelliteViewOverride) {
-    meshManager.draw(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
+    meshManager.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
   }
 
   // Update orbit currently being hovered over
   // Only if last frame was 50 FPS or more readpixels used to determine which satellite is hovered
   // is the biggest performance hit and we should throttle that. Maybe we should limit the picking frame buffer too?
   if (1000 / timeManager.dt > 50) {
-    dlManager.updateHover();
+    drawManager.updateHover();
   }
 
   // Do Post Processing
-  if (dlManager.isNeedPostProcessing) {
+  if (drawManager.isNeedPostProcessing) {
     if (postProcessingManager.isGaussianNeeded) {
-      postProcessingManager.programs.gaussian.uniformValues.radius = Math.min(0.5, dlManager.gaussianAmt / 500);
+      postProcessingManager.programs.gaussian.uniformValues.radius = Math.min(0.5, drawManager.gaussianAmt / 500);
       postProcessingManager.programs.gaussian.uniformValues.dir = { x: 1.0, y: 0.0 };
       postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
       postProcessingManager.switchFrameBuffer();
@@ -246,24 +252,24 @@ dlManager.drawLoop = (preciseDt) => {
   }
 
   // callbacks at the end of the draw loop (this should be used more!)
-  dlManager.onDrawLoopComplete(dlManager.drawLoopCallback);
+  drawManager.onDrawLoopComplete(drawManager.drawLoopCallback);
 
   // If Demo Mode do stuff
-  if (settingsManager.isDemoModeOn) dlManager.demoMode();
+  if (settingsManager.isDemoModeOn) drawManager.demoMode();
 
   // If in the process of taking a screenshot complete work for that
-  if (settingsManager.screenshotMode) dlManager.screenShot();
+  if (settingsManager.screenshotMode) drawManager.screenShot();
 };
 
-dlManager.updateLoop = () => {
+drawManager.updateLoop = () => {
   // Calculate changes related to satellites objects
-  dlManager.satCalculate();
+  drawManager.satCalculate();
 
   // Calculate camera changes needed since last draw
-  cameraManager.calculate(objectManager.selectedSat, dlManager.dt);
+  cameraManager.calculate(objectManager.selectedSat, drawManager.dt);
 
   // Missile oribts have to be updated every draw or they quickly become innacurate
-  dlManager.updateMissileOrbits();
+  drawManager.updateMissileOrbits();
 
   // If in satellite view the orbit buffer needs to be updated every time
   if (cameraManager.cameraType.current == cameraManager.cameraType.satellite) orbitManager.updateOrbitBuffer(objectManager.lastSelectedSat());
@@ -275,30 +281,30 @@ dlManager.updateLoop = () => {
 
   satSet.sunECI = sceneManager.sun.realXyz;
 
-  dlManager.orbitsAbove(); //dlManager.sensorPos is set here for the Camera Manager
+  drawManager.orbitsAbove(); //drawManager.sensorPos is set here for the Camera Manager
 
-  cameraManager.update(dlManager.sat, dlManager.sensorPos);
+  cameraManager.update(drawManager.sat, drawManager.sensorPos);
 };
 
-dlManager.drawOptionalScenery = () => {
+drawManager.drawOptionalScenery = () => {
   if (1000 / timeManager.dt > settingsManager.fpsThrottle1) {
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
-      if (dlManager.isPostProcessingResizeNeeded) dlManager.resizePostProcessingTexture(sceneManager.sun);
+      if (drawManager.isPostProcessingResizeNeeded) drawManager.resizePostProcessingTexture(sceneManager.sun);
       // Draw the Sun to the Godrays Frame Buffer
-      sceneManager.sun.draw(dlManager.pMatrix, cameraManager.camMatrix, sceneManager.sun.godraysFrameBuffer);
+      sceneManager.sun.draw(drawManager.pMatrix, cameraManager.camMatrix, sceneManager.sun.godraysFrameBuffer);
 
       // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
-      sceneManager.earth.drawOcclusion(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
+      sceneManager.earth.drawOcclusion(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
       // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
       if (!settingsManager.modelsOnSatelliteViewOverride) {
-        meshManager.drawOcclusion(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
+        meshManager.drawOcclusion(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
       }
       // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
       // todo: this should be a dynamic buffer not hardcoded to bufffer two
       sceneManager.sun.godraysPostProcessing(gl, postProcessingManager.frameBufferInfos.two.frameBuffer);
 
       if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
-        sceneManager.atmosphere.draw(dlManager.pMatrix, cameraManager);
+        sceneManager.atmosphere.draw(drawManager.pMatrix, cameraManager);
       }
 
       // Apply two pass gaussian blur to the godrays to smooth them out
@@ -310,20 +316,20 @@ dlManager.drawOptionalScenery = () => {
       postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.frameBufferInfos.one.frameBuffer, postProcessingManager.curBuffer);
 
       // Draw the moon
-      sceneManager.moon.draw(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
+      sceneManager.moon.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
 
-      sceneManager.atmosphere.draw(dlManager.pMatrix, cameraManager);
+      sceneManager.atmosphere.draw(drawManager.pMatrix, cameraManager);
     }
   }
 };
 
-dlManager.satCalculate = () => {
+drawManager.satCalculate = () => {
   if (objectManager.selectedSat !== -1) {
-    dlManager.sat = satSet.getSat(objectManager.selectedSat);
-    if (!dlManager.sat.static) {
-      cameraManager.camSnapToSat(dlManager.sat);
+    drawManager.sat = satSet.getSat(objectManager.selectedSat);
+    if (!drawManager.sat.static) {
+      cameraManager.camSnapToSat(drawManager.sat);
 
-      // if (dlManager.sat.missile || typeof meshManager == 'undefined') {
+      // if (drawManager.sat.missile || typeof meshManager == 'undefined') {
       //   settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0];
       // } else {
       //   settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
@@ -331,12 +337,12 @@ dlManager.satCalculate = () => {
 
       // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
       if (!settingsManager.modelsOnSatelliteViewOverride) {
-        meshManager.update(Camera, cameraManager, dlManager.sat, timeManager);
+        meshManager.update(Camera, cameraManager, drawManager.sat, timeManager);
       }
     }
-    if (dlManager.sat.missile) orbitManager.setSelectOrbit(dlManager.sat.satId);
+    if (drawManager.sat.missile) orbitManager.setSelectOrbit(drawManager.sat.satId);
   }
-  if (objectManager.selectedSat !== dlManager.lastSelectedSat) {
+  if (objectManager.selectedSat !== drawManager.lastSelectedSat) {
     if (objectManager.selectedSat === -1 && !isselectedSatNegativeOne) {
       orbitManager.clearSelectOrbit();
     }
@@ -351,22 +357,22 @@ dlManager.satCalculate = () => {
     if (objectManager.selectedSat !== -1 || (objectManager.selectedSat == -1 && !isselectedSatNegativeOne)) {
       lineManager.drawWhenSelected();
     }
-    dlManager.lastSelectedSat = objectManager.selectedSat;
+    drawManager.lastSelectedSat = objectManager.selectedSat;
     objectManager.lastSelectedSat(objectManager.selectedSat);
   }
 };
 
-dlManager.updateMissileOrbits = () => {
+drawManager.updateMissileOrbits = () => {
   if (typeof missileManager != 'undefined' && missileManager.missileArray.length > 0) {
-    for (dlManager.i = 0; dlManager.i < missileManager.missileArray.length; dlManager.i++) {
-      orbitManager.updateOrbitBuffer(missileManager.missileArray[dlManager.i].id);
+    for (drawManager.i = 0; drawManager.i < missileManager.missileArray.length; drawManager.i++) {
+      orbitManager.updateOrbitBuffer(missileManager.missileArray[drawManager.i].id);
     }
   }
 };
 
-dlManager.screenShot = () => {
+drawManager.screenShot = () => {
   if (!settingsManager.queuedScreenshot) {
-    dlManager.resizeCanvas();
+    drawManager.resizeCanvas();
     settingsManager.queuedScreenshot = true;
   } else {
     let link = document.createElement('a');
@@ -381,15 +387,15 @@ dlManager.screenShot = () => {
       copyrightStr = '';
     }
 
-    link.href = dlManager.watermarkedDataUrl(dlManager.canvas, copyrightStr);
+    link.href = drawManager.watermarkedDataUrl(drawManager.canvas, copyrightStr);
     link.click();
     settingsManager.screenshotMode = false;
     settingsManager.queuedScreenshot = false;
-    dlManager.resizeCanvas();
+    drawManager.resizeCanvas();
   }
 };
 
-dlManager.watermarkedDataUrl = (canvas, text) => {
+drawManager.watermarkedDataUrl = (canvas, text) => {
   var tempCanvas = document.createElement('canvas');
   var tempCtx = tempCanvas.getContext('2d');
   var cw, ch;
@@ -410,14 +416,14 @@ dlManager.watermarkedDataUrl = (canvas, text) => {
   return image;
 };
 
-dlManager.isDrawOrbitsAbove = false;
-dlManager.orbitsAbove = () => {
+drawManager.isDrawOrbitsAbove = false;
+drawManager.orbitsAbove = () => {
   if (cameraManager.cameraType.current == cameraManager.cameraType.astronomy || cameraManager.cameraType.current == cameraManager.cameraType.planetarium) {
-    dlManager.sensorPos = satellite.calculateSensorPos(sensorManager.currentSensor);
-    if (!dlManager.isDrawOrbitsAbove) {
+    drawManager.sensorPos = satellite.calculateSensorPos(sensorManager.currentSensor);
+    if (!drawManager.isDrawOrbitsAbove) {
       // Don't do this until the scene is redrawn with a new camera or thousands of satellites will
       // appear to be in the field of view
-      dlManager.isDrawOrbitsAbove = true;
+      drawManager.isDrawOrbitsAbove = true;
       return;
     }
     // Previously called showOrbitsAbove();
@@ -456,7 +462,7 @@ dlManager.orbitsAbove = () => {
       if (sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
       if (sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
 
-      satSet.getScreenCoords(i, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.position);
+      satSet.getScreenCoords(i, drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.position);
       if (satScreenPositionArray.error) continue;
       if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
       if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
@@ -483,8 +489,8 @@ dlManager.orbitsAbove = () => {
     isSatMiniBoxInUse = true;
     satLabelModeLastTime = timeManager.now;
   } else {
-    dlManager.sensorPos = null;
-    dlManager.isDrawOrbitsAbove = false;
+    drawManager.sensorPos = null;
+    drawManager.isDrawOrbitsAbove = false;
   }
 
   // Hide satMiniBoxes When Not in Use
@@ -497,19 +503,19 @@ dlManager.orbitsAbove = () => {
 };
 
 var currentSearchSats;
-dlManager.updateHover = () => {
+drawManager.updateHover = () => {
   if (!settingsManager.disableUI && !settingsManager.lowPerf) {
     currentSearchSats = uiManager.searchBox.getLastResultGroup();
     if (typeof currentSearchSats !== 'undefined') {
       currentSearchSats = currentSearchSats['sats'];
-      for (dlManager.i = 0; dlManager.i < currentSearchSats.length; dlManager.i++) {
-        orbitManager.updateOrbitBuffer(currentSearchSats[dlManager.i].satId);
+      for (drawManager.i = 0; drawManager.i < currentSearchSats.length; drawManager.i++) {
+        orbitManager.updateOrbitBuffer(currentSearchSats[drawManager.i].satId);
       }
     }
   }
   if (!settingsManager.disableUI && uiManager.searchBox.isHovering()) {
     updateHoverSatId = uiManager.searchBox.getHoverSat();
-    satSet.getScreenCoords(updateHoverSatId, dlManager.pMatrix, cameraManager.camMatrix);
+    satSet.getScreenCoords(updateHoverSatId, drawManager.pMatrix, cameraManager.camMatrix);
     // if (!cameraManager.earthHitTest(gl, pickColorBuf, satScreenPositionArray.x, satScreenPositionArray.y)) {
     try {
       _hoverBoxOnSat(updateHoverSatId, satScreenPositionArray.x, satScreenPositionArray.y);
@@ -560,9 +566,9 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
   if (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && !settingsManager.isDemoModeOn) {
     satHoverBoxDOM.style.display = 'none';
     if (satId === -1) {
-      dlManager.canvas.style.cursor = 'default';
+      drawManager.canvas.style.cursor = 'default';
     } else {
-      dlManager.canvas.style.cursor = 'pointer';
+      drawManager.canvas.style.cursor = 'pointer';
     }
     return;
   }
@@ -573,7 +579,7 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
     }
     // satHoverBoxDOM.html('(none)')
     satHoverBoxDOM.style.display = 'none';
-    dlManager.canvas.style.cursor = 'default';
+    drawManager.canvas.style.cursor = 'default';
     isHoverBoxVisible = false;
   } else if (!cameraManager.isDragging && !!settingsManager.enableHoverOverlay) {
     var sat = satSet.getSatExtraOnly(satId);
@@ -707,80 +713,80 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
     satHoverBoxDOM.style.position = 'fixed';
     satHoverBoxDOM.style.left = `${satX + 20}px`;
     satHoverBoxDOM.style.top = `${satY - 10}px`;
-    dlManager.canvas.style.cursor = 'pointer';
+    drawManager.canvas.style.cursor = 'pointer';
   }
 };
-dlManager.onDrawLoopComplete = (cb) => {
+drawManager.onDrawLoopComplete = (cb) => {
   if (typeof cb == 'undefined' || cb == null) return;
   cb();
 };
 
-dlManager.resizePostProcessingTexture = (sun) => {
+drawManager.resizePostProcessingTexture = (sun) => {
   // Post Processing Texture Needs Scaled
-  sun.setupGodrays(dlManager.gl);
-  postProcessingManager.init(dlManager.gl);
-  dlManager.isPostProcessingResizeNeeded = false;
+  sun.setupGodrays(drawManager.gl);
+  postProcessingManager.init(drawManager.gl);
+  drawManager.isPostProcessingResizeNeeded = false;
 };
 
 var demoModeLastTime = 0;
-dlManager.demoMode = () => {
+drawManager.demoMode = () => {
   if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat == null) return;
   if (timeManager.now - demoModeLastTime < settingsManager.demoModeInterval) return;
 
-  dlManager.demoModeLast = timeManager.now;
+  drawManager.demoModeLast = timeManager.now;
 
-  if (dlManager.demoModeSatellite === satSet.getSatData().length) dlManager.demoModeSatellite = 0;
+  if (drawManager.demoModeSatellite === satSet.getSatData().length) drawManager.demoModeSatellite = 0;
   let satData = satSet.getSatData();
-  for (dlManager.i = dlManager.demoModeSatellite; dlManager.i < satData.length; dlManager.i++) {
-    dlManager.sat = satData[dlManager.i];
-    if (dlManager.sat.static) continue;
-    if (dlManager.sat.missile) continue;
-    // if (!dlManager.sat.inview) continue
-    if (dlManager.sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) continue;
-    if (dlManager.sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false) continue;
-    if (dlManager.sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
-    if (dlManager.sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
-    satSet.getScreenCoords(dlManager.i, dlManager.pMatrix, cameraManager.camMatrix);
+  for (drawManager.i = drawManager.demoModeSatellite; drawManager.i < satData.length; drawManager.i++) {
+    drawManager.sat = satData[drawManager.i];
+    if (drawManager.sat.static) continue;
+    if (drawManager.sat.missile) continue;
+    // if (!drawManager.sat.inview) continue
+    if (drawManager.sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) continue;
+    if (drawManager.sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false) continue;
+    if (drawManager.sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
+    if (drawManager.sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
+    satSet.getScreenCoords(drawManager.i, drawManager.pMatrix, cameraManager.camMatrix);
     if (satScreenPositionArray.error) continue;
     if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
     if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
-    _hoverBoxOnSat(dlManager.i, satScreenPositionArray.x, satScreenPositionArray.y);
-    orbitManager.setSelectOrbit(dlManager.i);
-    dlManager.demoModeSatellite = dlManager.i + 1;
+    _hoverBoxOnSat(drawManager.i, satScreenPositionArray.x, satScreenPositionArray.y);
+    orbitManager.setSelectOrbit(drawManager.i);
+    drawManager.demoModeSatellite = drawManager.i + 1;
     return;
   }
 };
 
-dlManager.checkIfPostProcessingRequired = () => {
+drawManager.checkIfPostProcessingRequired = () => {
   // if (cameraManager.camPitchAccel > 0.0002 || cameraManager.camPitchAccel < -0.0002 || cameraManager.camYawAccel > 0.0002 || cameraManager.camYawAccel < -0.0002) {
-  //   // dlManager.gaussianAmt += dlManager.dt * 2;
-  //   // dlManager.gaussianAmt = Math.min(500, Math.max(dlManager.gaussianAmt, 0));
-  //   dlManager.gaussianAmt = 500;
+  //   // drawManager.gaussianAmt += drawManager.dt * 2;
+  //   // drawManager.gaussianAmt = Math.min(500, Math.max(drawManager.gaussianAmt, 0));
+  //   drawManager.gaussianAmt = 500;
   // }
 
-  // if (dlManager.gaussianAmt > 0) {
-  //   dlManager.gaussianAmt -= dlManager.dt * 2;
-  //   dlManager.isNeedPostProcessing = true;
+  // if (drawManager.gaussianAmt > 0) {
+  //   drawManager.gaussianAmt -= drawManager.dt * 2;
+  //   drawManager.isNeedPostProcessing = true;
   //   postProcessingManager.isGaussianNeeded = true;
   // } else {
   //   postProcessingManager.isGaussianNeeded = false;
   // }
 
   if (postProcessingManager.isGaussianNeeded) {
-    dlManager.isNeedPostProcessing = true;
+    drawManager.isNeedPostProcessing = true;
     postProcessingManager.switchFrameBuffer();
   } else {
     postProcessingManager.curBuffer = null;
-    dlManager.isNeedPostProcessing = false;
+    drawManager.isNeedPostProcessing = false;
   }
 };
 
-dlManager.clearFrameBuffers = () => {
+drawManager.clearFrameBuffers = () => {
   gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   // Clear all post processing frame buffers
-  // if (dlManager.isNeedPostProcessing) {
+  // if (drawManager.isNeedPostProcessing) {
   postProcessingManager.clearAll();
   // }
   // Clear the godraysPostProcessing Frame Buffer
@@ -796,4 +802,4 @@ dlManager.clearFrameBuffers = () => {
   gl.bindFramebuffer(gl.FRAMEBUFFER, postProcessingManager.curBuffer);
 };
 
-export { dlManager };
+export { drawManager };

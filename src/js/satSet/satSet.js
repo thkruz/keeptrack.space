@@ -29,7 +29,7 @@ import '@app/js/lib/external/numeric.js';
 import * as $ from 'jquery';
 import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants.js';
-import { db, settingsManager } from '@app/js/settings.js';
+import { db, settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { saveCsv, stringPad } from '@app/js/lib/helpers.js';
 import { jsTLEfile } from '@app/offline/tle.js';
 import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager.js';
@@ -1123,7 +1123,7 @@ satSet.getSat = (i) => {
   if (typeof satData[i].isInSun == 'undefined') {
     satData[i].isInSun = () => {
       // Distances all in km
-      // satSet.sunECI is updated by dlManager every draw frame
+      // satSet.sunECI is updated by drawManager every draw frame
       let sunECI = satSet.sunECI;
 
       // NOTE: Code is mashed to save memory when used on the whole catalog

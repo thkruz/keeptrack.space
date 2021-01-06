@@ -4,7 +4,7 @@
 /* eslint-disable no-unused-vars */
 import { GPU } from '@app/js/lib/external/gpu-browser.min.js';
 import { satellite } from '@app/js/lib/lookangles.js';
-import { settingsManager } from '@app/js/settings.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 
 const MINUTES_PER_DAY = 1440;
 let gM = {};

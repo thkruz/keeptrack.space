@@ -4,7 +4,7 @@
   expect
 */
 
-import '@app/js/settings.js';
+import '@app/js/settingsManager/settingsManager.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 
 let cameraManager = new Camera();

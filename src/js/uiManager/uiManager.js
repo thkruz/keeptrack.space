@@ -30,14 +30,14 @@ import '@app/js/lib/external/jquery-ajax.js';
 import '@app/js/lib/external/colorPick.js';
 import 'materialize-css';
 import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
-import { db, settingsManager } from '@app/js/settings.js';
+import { db, settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { saveAs, saveCsv, stringPad } from '@app/js/lib/helpers.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { CanvasRecorder } from '@app/js/lib/external/CanvasRecorder.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { adviceList } from '@app/js/uiManager/advice-module.js';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { dlManager } from '@app/js/dlManager/dlManager.js';
+import { drawManager } from '@app/js/drawManager/drawManager.js';
 import { mapManager } from '@app/js/uiManager/mapManager.js';
 import { missileManager } from '@app/js/missileManager/missileManager.js';
 import { mobileManager } from '@app/js/uiManager/mobileManager.js';
@@ -143,7 +143,7 @@ uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef, groupsRef, s
   groups = groupsRef;
 };
 
-// This runs after the dlManager starts
+// This runs after the drawManager starts
 uiManager.postStart = () => {
   // Enable Satbox Overlay
   if (settingsManager.enableHoverOverlay) {
@@ -201,7 +201,7 @@ $(document).ready(function () {
   (function _uiInit() {
     // Register all UI callback functions with drawLoop in main.js
     // These run during the draw loop
-    dlManager.setDrawLoopCallback(function () {
+    drawManager.setDrawLoopCallback(function () {
       // _showSatTest();
       _updateNextPassOverlay();
       _checkWatchlist();
@@ -3418,12 +3418,12 @@ $(document).ready(function () {
           break;
         }
       case 'menu-day-night': // No Keyboard Commands
-        if (dlManager.sceneManager.earth.isDayNightToggle()) {
-          dlManager.sceneManager.earth.isDayNightToggle(false);
+        if (drawManager.sceneManager.earth.isDayNightToggle()) {
+          drawManager.sceneManager.earth.isDayNightToggle(false);
           $('#menu-day-night').removeClass('bmenu-item-selected');
           break;
         } else {
-          dlManager.sceneManager.earth.isDayNightToggle(true);
+          drawManager.sceneManager.earth.isDayNightToggle(true);
           $('#menu-day-night').addClass('bmenu-item-selected');
           break;
         }
@@ -3508,7 +3508,7 @@ $(document).ready(function () {
           cameraManager.panReset = true;
           cameraManager.localRotateReset = true;
           settingsManager.fieldOfView = 0.6;
-          dlManager.glInit();
+          drawManager.glInit();
           uiManager.hideSideMenus();
           orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
           cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
@@ -3544,7 +3544,7 @@ $(document).ready(function () {
           cameraManager.panReset = true;
           cameraManager.localRotateReset = true;
           settingsManager.fieldOfView = 0.6;
-          dlManager.glInit();
+          drawManager.glInit();
           uiManager.hideSideMenus();
           cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
           uiManager.legendMenuChange('default');
@@ -3996,7 +3996,7 @@ uiManager.keyHandler = (evt) => {
         // 7 is a placeholder to reset camera type
         cameraManager.localRotateReset = true;
         settingsManager.fieldOfView = 0.6;
-        dlManager.glInit();
+        drawManager.glInit();
         if (objectManager.selectedSat !== -1) {
           cameraManager.camZoomSnappedOnSat = true;
           curCam = cameraManager.cameraType.fixedToSat;
@@ -4144,7 +4144,7 @@ uiManager.keyHandler = (evt) => {
 };
 
 uiManager.hideLoadingScreen = () => {
-  if (dlManager.sceneManager.earth.isUseHiRes && dlManager.sceneManager.earth.isHiResReady !== true) {
+  if (drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) {
     setTimeout(function () {
       uiManager.hideLoadingScreen();
     }, 100);

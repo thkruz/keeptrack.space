@@ -25,7 +25,7 @@ import * as satelliteBase from 'satellite.js';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 import { saveCsv, saveVariable, stringPad } from '@app/js/lib/helpers.js';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { settingsManager } from '@app/js/settings.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 let satellite = satelliteBase;
 

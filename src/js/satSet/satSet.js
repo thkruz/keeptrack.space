@@ -32,19 +32,20 @@ import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EART
 import { db, settingsManager } from '@app/js/settings.js';
 import { saveCsv, stringPad } from '@app/js/lib/helpers.js';
 import { jsTLEfile } from '@app/offline/tle.js';
-import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
+import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { saveAs } from '@app/js/lib/external/file-saver.min.js';
-import { sensorManager } from '@app/modules/sensorManager.js';
+import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 // 'use strict';
 var satSet = {};
+satSet.nextLaunchManager = nextLaunchManager;
 var gl;
 
 var satCruncher;
@@ -129,6 +130,10 @@ satSet.init = async (glRef, dotManagerRef, cameraManager) => {
   dotManager = dotManagerRef;
   /** Parses GET variables for Possible sharperShaders */
   parseFromGETVariables();
+
+  if (!settingsManager.disableUI) {
+    import('@app/js/satSet/nextLaunchManager.css').then((resp) => resp);
+  }
 
   settingsManager.loadStr('elsets');
   // Webpack will place this IN ./js not in ./js/webworker like in the source code

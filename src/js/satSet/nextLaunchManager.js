@@ -48,9 +48,17 @@ let nextLaunchManager = {};
   nextLaunchManager.showTable = function () {
     let tbl = document.getElementById('nextLaunch-table'); // Identify the table to update
 
-    // Only needs populated once
-    if (tbl.innerHTML == '') _initTable();
+    var _truncateString = (str, num) => {
+      if (typeof str == 'undefined') return 'Unknown';
 
+      // If the length of str is less than or equal to num
+      // just return str--don't truncate it.
+      if (str.length <= num) {
+        return str;
+      }
+      // Return str truncated with '...' concatenated to the end of str.
+      return str.slice(0, num) + '...';
+    };
     var _initTable = () => {
       let launchList = nextLaunchManager.launchList;
 
@@ -150,17 +158,9 @@ let nextLaunchManager = {};
         closeButton: false,
       });
     };
-    var _truncateString = (str, num) => {
-      if (typeof str == 'undefined') return 'Unknown';
 
-      // If the length of str is less than or equal to num
-      // just return str--don't truncate it.
-      if (str.length <= num) {
-        return str;
-      }
-      // Return str truncated with '...' concatenated to the end of str.
-      return str.slice(0, num) + '...';
-    };
+    // Only needs populated once
+    if (tbl.innerHTML == '') _initTable();
   };
 })();
 

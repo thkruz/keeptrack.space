@@ -39,7 +39,7 @@ let settingsManager = {};
         // Comment Out the Next Two Lines if you are testing on a local server
         // and have the keeptrack files installed in a subdirectory
         settingsManager.installDirectory = '/';
-        settingsManager.offline = true;
+        // settingsManager.offline = true;
         settingsManager.breakTheLaw = true;
         break;
       case 'thkruz.github.io':
@@ -870,7 +870,6 @@ if (!settingsManager.disableUI) {
   import('@app/css/fonts.css').then((resp) => resp);
   import('@app/css/materialize.css').then(import('@app/css/materialize-local.css').then((resp) => resp));
   import('@app/js/lib/external/colorPick.css').then((resp) => resp);
-  import('@app/modules/nextLaunchManager.css').then((resp) => resp);
   import('@app/css/perfect-scrollbar.min.css').then((resp) => resp);
   import('@app/css/jquery-ui.min.css').then((resp) => resp);
   import('@app/css/jquery-ui-timepicker-addon.css').then((resp) => resp);

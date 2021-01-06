@@ -5,7 +5,7 @@ import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
 import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
-import { sensorManager } from '@app/modules/sensorManager.js';
+import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
 import { settingsManager } from '@app/js/settings.js';
 import { timeManager } from '@app/js/timeManager.js';
 

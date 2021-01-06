@@ -3,7 +3,7 @@ import { isselectedSatNegativeOne, selectSatManager } from '@app/js/selectSat.js
 import { satScreenPositionArray, satSet } from '@app/js/satSet/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { meshManager } from '@app/js/dlManager/meshManager.js';
-import { missileManager } from '@app/modules/missileManager.js';
+import { missileManager } from '@app/js/missileManager/missileManager.js';
 import { pPM as postProcessingManager } from '@app/js/dlManager/post-processing.js';
 import { sceneManager } from '@app/js/dlManager/sceneManager/sceneManager.js';
 import { timeManager } from '@app/js/timeManager.js';

@@ -1,7 +1,7 @@
 /* Cell Phone Only */
 @media (max-width: 694px) {
-    .side-menu {
-    }
+    /* .side-menu {
+    } */
     #nextLaunch-content {
         width: 100%;
     }
@@ -12,8 +12,8 @@
 
 /* Tablet Only */
 @media (min-width: 695px) and (max-width: 1300px) {
-    .side-menu {
-    }
+    /* .side-menu {
+    } */
     #nextLaunch-content {
         width: 625px;
     }
@@ -28,8 +28,8 @@
 
 /* Desktop Only */
 @media (min-width: 1301px) {
-    .side-menu {
-    }
+    /* .side-menu {
+    } */
     #nextLaunch-content {
         width: 625px;
     }

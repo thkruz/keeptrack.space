@@ -39,9 +39,8 @@ import { adviceList } from '@app/js/uiManager/advice-module.js';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { dlManager } from '@app/js/dlManager/dlManager.js';
 import { mapManager } from '@app/js/uiManager/mapManager.js';
-import { missileManager } from '@app/modules/missileManager.js';
+import { missileManager } from '@app/js/missileManager/missileManager.js';
 import { mobileManager } from '@app/js/uiManager/mobileManager.js';
-import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { omManager } from '@app/js/uiManager/omManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
@@ -49,7 +48,7 @@ import { sMM } from '@app/js/sideMenuManager.js';
 import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
-import { sensorManager } from '@app/modules/sensorManager.js';
+import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 import { uiInput } from './ui-input.js';
 import { uiLimited } from './ui-limited.js';
@@ -3497,7 +3496,7 @@ $(document).ready(function () {
           break;
         } else {
           uiManager.hideSideMenus();
-          nextLaunchManager.showTable();
+          satSet.nextLaunchManager.showTable();
           $('#nextLaunch-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           isNextLaunchMenuOpen = true;
           $('#menu-nextLaunch').addClass('bmenu-item-selected');
@@ -3844,7 +3843,7 @@ $(document).ready(function () {
   });
 
   $('#export-launch-info').on('click', function () {
-    saveCsv(nextLaunchManager.launchList, 'launchList');
+    saveCsv(satSet.nextLaunchManager.launchList, 'launchList');
   });
 
   $('#export-multiSiteArray').on('click', function () {

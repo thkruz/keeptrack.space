@@ -73,7 +73,7 @@ class Moon {
     };
   }
 
-  draw(pMatrix, camMatrix) {
+  draw(pMatrix, camMatrix, tgtBuffer) {
     // Move this to the draw loop?
     if (!this.loaded) return;
     const gl = this.gl;
@@ -87,6 +87,10 @@ class Moon {
     gl.useProgram(this.programInfo.program);
     twgl.setBuffersAndAttributes(gl, this.programInfo, this.bufferInfo);
     twgl.setUniforms(this.programInfo, this.uniforms);
+
+    // determine where we are drawing
+    gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+
     twgl.drawBufferInfo(gl, this.bufferInfo);
 
     // gl.disableVertexAttribArray(this.programInfo.program.aTexCoord);

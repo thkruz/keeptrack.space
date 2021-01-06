@@ -413,7 +413,7 @@ var updateSunCurrentDirection = function () {
   earth.lightDirection[2] = Math.sin(earth.sunvar.ob * DEG2RAD) * Math.sin(earth.sunvar.ecLon * DEG2RAD);
 };
 
-earth.draw = function (pMatrix, camMatrix, dotsManager) {
+earth.draw = function (pMatrix, camMatrix, dotsManager, tgtBuffer) {
   if (!earth.loaded) return;
   // //////////////////////////////////////////////////////////////////////
   // Draw Colored Earth First
@@ -422,7 +422,7 @@ earth.draw = function (pMatrix, camMatrix, dotsManager) {
   // Change to the earth shader
   gl.useProgram(earthShader);
   // Change to the main drawing buffer
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
   // Set the uniforms
   gl.uniformMatrix3fv(earthShader.uNormalMatrix, false, nMatrix);
@@ -509,6 +509,22 @@ earth.draw = function (pMatrix, camMatrix, dotsManager) {
   // gl.disableVertexAttribArray(dotsManager.pickingProgram.aPos);
 
   return true;
+};
+
+earth.drawOcclusion = function (pMatrix, camMatrix, occlusionPrgm, tgtBuffer) {
+  // Change to the earth shader
+  gl.useProgram(occlusionPrgm);
+  // Change to the main drawing buffer
+  gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+
+  occlusionPrgm.attrSetup(occlusionPrgm, vertPosBuf);
+
+  // Set the uniforms
+  occlusionPrgm.uniformSetup(occlusionPrgm, mvMatrix, pMatrix, camMatrix);
+
+  gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
+
+  occlusionPrgm.attrOff(occlusionPrgm);
 };
 
 export { earth };

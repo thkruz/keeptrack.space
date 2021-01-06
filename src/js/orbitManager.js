@@ -227,11 +227,11 @@ orbitManager.clearHoverOrbit = function () {
   gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.DYNAMIC_DRAW);
 };
 
-orbitManager.draw = function (pMatrix, camMatrix) {
+orbitManager.draw = function (pMatrix, camMatrix, tgtBuffer) {
   // lol what do I do here
   if (!initialized) return;
 
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
   gl.useProgram(pathShader);
 
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

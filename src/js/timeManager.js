@@ -55,7 +55,7 @@ timeManager.init = () => {
     return now;
   };
 
-  timeManager.setNow = (now, dt, datetimeInput) => {
+  timeManager.setNow = (now, dt) => {
     timeManager.now = now;
     timeManager.dt = dt;
 

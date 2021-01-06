@@ -29,14 +29,14 @@ class Dots {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  draw(pMatrix, cameraManager, colorScheme) {
+  draw(pMatrix, cameraManager, colorScheme, tgtBuffer) {
     if (!this.loaded || !settingsManager.cruncherReady) return;
     const gl = this.gl;
 
     // gl.bindVertexArray(satSet.vao);
 
     gl.useProgram(this.drawProgram);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     //  gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
 
     gl.uniformMatrix4fv(this.drawProgram.uMvMatrix, false, this.emptyMat4);
@@ -233,6 +233,11 @@ class Dots {
     gl.attachShader(this.drawProgram, this.drawProgram.vertShader);
     gl.attachShader(this.drawProgram, this.drawProgram.fragShader);
     gl.linkProgram(this.drawProgram);
+
+    if (!gl.getProgramParameter(this.drawProgram, gl.LINK_STATUS)) {
+      var info = gl.getProgramInfoLog(this.drawProgram);
+      throw new Error('Could not compile WebGL program. \n\n' + info);
+    }
 
     this.drawProgram.aPos = gl.getAttribLocation(this.drawProgram, 'aPos');
     this.drawProgram.aColor = gl.getAttribLocation(this.drawProgram, 'aColor');

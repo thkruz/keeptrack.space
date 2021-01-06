@@ -5,6 +5,7 @@ import { satScreenPositionArray, satSet } from '@app/js/satSet/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { meshManager } from '@app/js/dlManager/meshManager.js';
 import { missileManager } from '@app/modules/missileManager.js';
+import { pPM as postProcessingManager } from '@app/js/dlManager/post-processing.js';
 import { sceneManager } from '@app/js/dlManager/sceneManager/sceneManager.js';
 import { timeManager } from '@app/js/timeManager.js';
 
@@ -35,6 +36,7 @@ var dlManager = {
   t0: 0,
   isShowFPS: false,
   drawLoopCallback: null,
+  gaussianAmt: 0,
   setDrawLoopCallback: (cb) => {
     dlManager.drawLoopCallback = cb;
   },
@@ -83,6 +85,9 @@ dlManager.glInit = async () => {
   gl.getExtension('EXT_frag_depth');
   gl.enable(gl.DEPTH_TEST);
 
+  postProcessingManager.init(gl);
+
+  dlManager.postProcessingManager = postProcessingManager;
   dlManager.gl = gl;
   return gl;
 };
@@ -182,6 +187,8 @@ dlManager.drawLoop = (preciseDt) => {
     }, 500);
   }
 
+  dlManager.checkIfPostProcessingRequired();
+
   // Do any per frame calculations
   dlManager.updateLoop();
 
@@ -194,18 +201,18 @@ dlManager.drawLoop = (preciseDt) => {
   // Sun, Moon, and Atmosphere
   dlManager.drawOptionalScenery();
 
-  sceneManager.earth.draw(dlManager.pMatrix, cameraManager.camMatrix, dotsManager);
+  sceneManager.earth.draw(dlManager.pMatrix, cameraManager.camMatrix, dotsManager, postProcessingManager.curBuffer);
 
   // Update Draw Positions
   dotsManager.updatePositionBuffer(satSet, timeManager);
 
   // Draw Dots
-  dotsManager.draw(dlManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
+  dotsManager.draw(dlManager.pMatrix, cameraManager, settingsManager.currentColorScheme, postProcessingManager.curBuffer);
 
   // Draw GPU Picking Overlay -- This is what lets us pick a satellite
   dotsManager.drawGpuPickingFrameBuffer(dlManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
 
-  orbitManager.draw(dlManager.pMatrix, cameraManager.camMatrix);
+  orbitManager.draw(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
 
   lineManager.draw();
 
@@ -222,6 +229,20 @@ dlManager.drawLoop = (preciseDt) => {
   // is the biggest performance hit and we should throttle that. Maybe we should limit the picking frame buffer too?
   if (1000 / timeManager.dt > 50) {
     dlManager.updateHover();
+  }
+
+  // Do Post Processing
+  if (dlManager.isNeedPostProcessing) {
+    if (postProcessingManager.isGaussianNeeded) {
+      postProcessingManager.programs.gaussian.uniformValues.radius = Math.min(0.5, dlManager.gaussianAmt / 500);
+      postProcessingManager.programs.gaussian.uniformValues.dir = { x: 1.0, y: 0.0 };
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
+      postProcessingManager.switchFrameBuffer();
+      postProcessingManager.programs.gaussian.uniformValues.dir = { x: 0.0, y: 1.0 };
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
+    } else {
+      // Test
+    }
   }
 
   // callbacks at the end of the draw loop (this should be used more!)
@@ -247,6 +268,8 @@ dlManager.updateLoop = () => {
   // If in satellite view the orbit buffer needs to be updated every time
   if (cameraManager.cameraType.current == cameraManager.cameraType.satellite) orbitManager.updateOrbitBuffer(objectManager.lastSelectedSat());
 
+  sceneManager.sun.update();
+
   // Update Earth Direction
   sceneManager.earth.update();
 
@@ -264,7 +287,7 @@ dlManager.drawSatelliteModel = () => {
         if (sat.SCC_NUM == 25544) {
           meshManager.models.iss.position = meshManager.selectedSatPosition;
           dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-          meshManager.drawObject(meshManager.models.iss, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+          meshManager.drawObject(meshManager.models.iss, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
           return;
         }
 
@@ -273,41 +296,41 @@ dlManager.drawSatelliteModel = () => {
           if (sat.ON.slice(0, 5) == 'FLOCK' || sat.ON.slice(0, 5) == 'LEMUR') {
             meshManager.models.s3u.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.s3u, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.s3u, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
           if (sat.ON.slice(0, 8) == 'STARLINK') {
             meshManager.models.starlink.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.starlink, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.starlink, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
           if (sat.ON.slice(0, 10) == 'GLOBALSTAR') {
             meshManager.models.globalstar.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.globalstar, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.globalstar, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
           if (sat.ON.slice(0, 7) == 'IRIDIUM') {
             meshManager.models.iridium.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.iridium, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.iridium, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
           if (sat.ON.slice(0, 7) == 'ORBCOMM') {
             meshManager.models.orbcomm.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.orbcomm, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.orbcomm, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
           if (sat.ON.slice(0, 3) == 'O3B') {
             meshManager.models.o3b.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.o3b, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.o3b, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
@@ -315,7 +338,7 @@ dlManager.drawSatelliteModel = () => {
           if (sat.ON.slice(0, 7) == 'NAVSTAR' || sat.ON.slice(10, 17) == 'NAVSTAR') {
             meshManager.models.gps.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.gps, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.gps, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
@@ -323,7 +346,7 @@ dlManager.drawSatelliteModel = () => {
           if (sat.ON.slice(0, 7) == 'GALILEO') {
             meshManager.models.galileo.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.galileo, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.galileo, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
@@ -353,7 +376,7 @@ dlManager.drawSatelliteModel = () => {
           ) {
             meshManager.models.dsp.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.dsp, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.dsp, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
@@ -361,7 +384,7 @@ dlManager.drawSatelliteModel = () => {
           if (sat.SCC_NUM == '36868' || sat.SCC_NUM == '38254' || sat.SCC_NUM == '39256' || sat.SCC_NUM == '43651' || sat.SCC_NUM == '44481' || sat.SCC_NUM == '45465') {
             meshManager.models.aehf.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.aehf, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.aehf, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
 
@@ -369,32 +392,32 @@ dlManager.drawSatelliteModel = () => {
           if (parseFloat(sat.R) < 0.1 && parseFloat(sat.R) > 0.04) {
             meshManager.models.s1u.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.s1u, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.s1u, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
           if (parseFloat(sat.R) < 0.22 && parseFloat(sat.R) >= 0.1) {
             meshManager.models.s2u.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.s2u, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.s2u, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
           if (parseFloat(sat.R) < 0.33 && parseFloat(sat.R) >= 0.22) {
             meshManager.models.s3u.position = meshManager.selectedSatPosition;
             dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-            meshManager.drawObject(meshManager.models.s3u, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+            meshManager.drawObject(meshManager.models.s3u, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
             return;
           }
           // Generic Model
           meshManager.models.sat2.position = meshManager.selectedSatPosition;
           dlManager.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
-          meshManager.drawObject(meshManager.models.sat2, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), dlManager.nadirYaw);
+          meshManager.drawObject(meshManager.models.sat2, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), dlManager.nadirYaw);
           return;
         }
 
         if (sat.OT == 2) {
           // Rocket Body
           meshManager.models.rocketbody.position = meshManager.selectedSatPosition;
-          meshManager.drawObject(meshManager.models.rocketbody, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), null);
+          meshManager.drawObject(meshManager.models.rocketbody, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), null);
           return;
         }
 
@@ -402,17 +425,17 @@ dlManager.drawSatelliteModel = () => {
           if (sat.SCC_NUM <= 20000) {
             // Debris
             meshManager.models.debris0.position = meshManager.selectedSatPosition;
-            meshManager.drawObject(meshManager.models.debris0, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), null);
+            meshManager.drawObject(meshManager.models.debris0, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), null);
             return;
           } else if (sat.SCC_NUM <= 35000) {
             // Debris
             meshManager.models.debris1.position = meshManager.selectedSatPosition;
-            meshManager.drawObject(meshManager.models.debris1, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), null);
+            meshManager.drawObject(meshManager.models.debris1, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), null);
             return;
           } else if (sat.SCC_NUM > 35000) {
             // Debris
             meshManager.models.debris2.position = meshManager.selectedSatPosition;
-            meshManager.drawObject(meshManager.models.debris2, dlManager.pMatrix, cameraManager.camMatrix, sat.isInSun(), null);
+            meshManager.drawObject(meshManager.models.debris2, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.isInSun(), null);
             return;
           }
         }
@@ -425,8 +448,13 @@ dlManager.drawOptionalScenery = () => {
   if (1000 / timeManager.dt > settingsManager.fpsThrottle1) {
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
       if (dlManager.isPostProcessingResizeNeeded) dlManager.resizePostProcessingTexture(sceneManager.sun);
-      sceneManager.sun.draw(dlManager.pMatrix, cameraManager.camMatrix);
-      sceneManager.moon.draw(dlManager.pMatrix, cameraManager.camMatrix);
+      // Draw the Sun to the Godrays Frame Buffer
+      sceneManager.sun.draw(dlManager.pMatrix, cameraManager.camMatrix, sceneManager.sun.godraysFrameBuffer);
+      // Draw a black earth on top of the sun in the godrays frame buffer
+      sceneManager.earth.drawOcclusion(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
+      // Add the godrays effect to the godrays frame buffer and then apply it to the current postprocessing buffer
+      sceneManager.sun.godraysPostProcessing(gl, postProcessingManager.curBuffer);
+      sceneManager.moon.draw(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
     }
   }
 
@@ -588,7 +616,7 @@ dlManager.orbitsAbove = () => {
       if (sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
       if (sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
 
-      satSet.getScreenCoords(i, dlManager.pMatrix, cameraManager.camMatrix, sat.position);
+      satSet.getScreenCoords(i, dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.position);
       if (satScreenPositionArray.error) continue;
       if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
       if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
@@ -882,10 +910,38 @@ dlManager.demoMode = () => {
   }
 };
 
+dlManager.checkIfPostProcessingRequired = () => {
+  // if (cameraManager.camPitchAccel > 0.0002 || cameraManager.camPitchAccel < -0.0002 || cameraManager.camYawAccel > 0.0002 || cameraManager.camYawAccel < -0.0002) {
+  //   // dlManager.gaussianAmt += dlManager.dt * 2;
+  //   // dlManager.gaussianAmt = Math.min(500, Math.max(dlManager.gaussianAmt, 0));
+  //   dlManager.gaussianAmt = 500;
+  // }
+
+  // if (dlManager.gaussianAmt > 0) {
+  //   dlManager.gaussianAmt -= dlManager.dt * 2;
+  //   dlManager.isNeedPostProcessing = true;
+  //   postProcessingManager.isGaussianNeeded = true;
+  // } else {
+  //   postProcessingManager.isGaussianNeeded = false;
+  // }
+
+  if (postProcessingManager.isGaussianNeeded) {
+    dlManager.isNeedPostProcessing = true;
+    postProcessingManager.switchFrameBuffer();
+  } else {
+    postProcessingManager.curBuffer = null;
+    dlManager.isNeedPostProcessing = false;
+  }
+};
+
 dlManager.clearFrameBuffers = () => {
   gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  // Clear all post processing frame buffers
+  if (dlManager.isNeedPostProcessing) {
+    postProcessingManager.clearAll();
+  }
   // Clear the godraysPostProcessing Frame Buffer
   gl.bindFramebuffer(gl.FRAMEBUFFER, sceneManager.sun.godraysFrameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -894,6 +950,9 @@ dlManager.clearFrameBuffers = () => {
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   // gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  // Setup Initial Frame Buffer for Offscreen Drawing
+  gl.bindFramebuffer(gl.FRAMEBUFFER, postProcessingManager.curBuffer);
 };
 
 export { dlManager };

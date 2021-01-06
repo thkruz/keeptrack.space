@@ -232,12 +232,7 @@ sun.setupGodrays = (gl) => {
   gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, sun.godraysRenderBuffer);
 };
 
-sun.draw = function (pMatrix, camMatrix) {
-  if (!sun.loaded) return;
-
-  // Switch Vertex Array Objects
-  // gl.bindVertexArray(sun.vao);
-
+sun.update = () => {
   // #### sun.getXYZ ###
   // Get Time
   if (timeManager.propRate === 0) {
@@ -285,6 +280,13 @@ sun.draw = function (pMatrix, camMatrix) {
   sun.pos2[0] = sun.pos[0] * 100;
   sun.pos2[1] = sun.pos[1] * 100;
   sun.pos2[2] = sun.pos[2] * 100;
+};
+
+sun.draw = function (pMatrix, camMatrix, tgtBuffer) {
+  if (!sun.loaded) return;
+
+  // Switch Vertex Array Objects
+  // gl.bindVertexArray(sun.vao);
 
   sun.sunScreenPosition = sun.getScreenCoords(pMatrix, camMatrix);
   if (sun.sunScreenPosition == false) return; // Sun is off screen
@@ -307,7 +309,7 @@ sun.draw = function (pMatrix, camMatrix) {
 
   gl.useProgram(sunShader);
   // Draw to the bloom frame buffer for post processing
-  gl.bindFramebuffer(gl.FRAMEBUFFER, sun.godraysFrameBuffer);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
   gl.uniformMatrix3fv(sunShader.uNormalMatrix, false, nMatrix);
   gl.uniformMatrix4fv(sunShader.uMvMatrix, false, mvMatrix);
@@ -326,14 +328,9 @@ sun.draw = function (pMatrix, camMatrix) {
 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
   gl.drawElements(gl.TRIANGLES, sun.vertCount, gl.UNSIGNED_SHORT, 0);
-
-  sun.godraysPostProcessing(gl);
-
-  // gl.disable(gl.BLEND);
-  return true;
 };
 
-sun.godraysPostProcessing = (gl) => {
+sun.godraysPostProcessing = (gl, tgtBuffer) => {
   gl.useProgram(sun.godraysProgram);
 
   // Make sure this texture doesn't prevent the rest of the scene from rendering
@@ -363,7 +360,7 @@ sun.godraysPostProcessing = (gl) => {
   gl.uniform2f(sun.resolutionLocation, gl.canvas.width, gl.canvas.height);
 
   // Draw the new version to the screen
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
   gl.drawArrays(gl.TRIANGLES, 0, 6);
 
   // Future writing needs to have a depth test
@@ -407,20 +404,20 @@ sun.godraysShaderCode = {
     varying vec2 v_texCoord;
     
     void main() {
-      float decay=1.0;
-      float exposure=0.95;
+      float decay=0.996;
+      float exposure=1.0;
       float density=1.0;
-      float weight=0.04;
-      vec2 lightPositionOnScreen = vec2(u_sunPosition.x,1.0 - u_sunPosition.y);
+      float weight=0.02;
+      vec2 lightPositionOnScreen = vec2(u_sunPosition.x,1.0 - u_sunPosition.y);      
       vec2 texCoord = v_texCoord;
 
-      /// NUM_SAMPLES will describe the rays quality, you can play with
-      const int samples = 50;      
+      /// samples will describe the rays quality, you can play with
+      const int samples = 75;      
 
       vec2 deltaTexCoord = (v_texCoord - lightPositionOnScreen.xy);
       deltaTexCoord *= 1.0 / float(samples) * density;
       float illuminationDecay = 1.0;
-      vec4 color =texture2D(uCanvasSampler, texCoord.xy)*0.4;
+      vec4 color =texture2D(uCanvasSampler, texCoord.xy);
       
       for(int i= 0; i <= samples ; i++)
       {

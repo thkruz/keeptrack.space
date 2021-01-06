@@ -246,7 +246,7 @@ meshManager.updatePosition = (pos) => {
   meshManager.mvMatrix = glm.mat4.create();
   meshManager.mvMatrixStack = [];
   meshManager.pMatrix = glm.mat4.create();
-  meshManager.drawObject = (model, pMatrix, camMatrix, inSun, isFacingNadir) => {
+  meshManager.drawObject = (model, pMatrix, camMatrix, tgtBuffer, inSun, isFacingNadir) => {
     if (typeof model == 'undefined') return;
 
     // Meshes aren't finished loading
@@ -281,8 +281,8 @@ meshManager.updatePosition = (pos) => {
     // Use the mesh shader program
     gl.useProgram(meshManager.shaderProgram);
 
-    // Not sure what this does?!
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    // Determine where we are drawing
+    gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
     // Assign uniforms
     gl.uniform3fv(meshManager.shaderProgram.uLightDirection, earth.lightDirection);

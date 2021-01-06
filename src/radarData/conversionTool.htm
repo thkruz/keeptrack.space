@@ -1,15 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="canonical" href="https://www.keeptrack.space"/>
-    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
-    <link rel="manifest" href="./manifest.webmanifest">
-    <meta name="theme-color" content="#1f3347"/>
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0"
-    />
+    <link rel="canonical" href="https://www.keeptrack.space" />
+    <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="theme-color" content="#1f3347" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" />
     <meta http-equiv="CACHE-CONTROL" content="NO-CACHE" />
     <title>Keeptrack.space Conversion Tool</title>
 
@@ -17,118 +14,118 @@
     <script src="../js/lib/materialize.js"></script>
     <script src="../js/lib/file-saver.min.js"></script>
     <script src="../js/lib/satellite.js"></script>
-    <script src="../js/lookangles.js"></script>
-    <script src="../js/timeManager.js"></script>
+    <script src="../js/lib/lookangles.js"></script>
+    <script src="../js/timeManager/timeManager.js"></script>
 
-    <link rel="stylesheet" href="../css/fonts.css" type="text/css"\>
-    <link rel="stylesheet" href="../css/materialize.css" type="text/css"\>
-    <link rel="stylesheet" href="../css/materialize-local.css" type="text/css"\>
-    <link rel="stylesheet" href="../css/perfect-scrollbar.min.css" type="text/css"\>
+    <link rel="stylesheet" href="../css/fonts.css" type="text/css" \ />
+    <link rel="stylesheet" href="../css/materialize.css" type="text/css" \ />
+    <link rel="stylesheet" href="../css/materialize-local.css" type="text/css" \ />
+    <link rel="stylesheet" href="../css/perfect-scrollbar.min.css" type="text/css" \ />
     <!-- <link rel="stylesheet" href="../css/style.css" type="text/css"\> -->
     <!-- <link rel="stylesheet" href="../css/responsive.css" type="text/css"\> -->
-    </head>
-    <body id="editor-menu">
-      <button id="rae2eci-btn" class="btn waves-effect waves-light" type="button" name="action" onclick="rae2eci();">Convert Text File TLEs &#9658;</button>
-      <input id="editor-file" type="file" style="display: none;" />
+  </head>
+  <body id="editor-menu">
+    <button id="rae2eci-btn" class="btn waves-effect waves-light" type="button" name="action" onclick="rae2eci();">Convert Text File TLEs &#9658;</button>
+    <input id="editor-file" type="file" style="display: none;" />
 
-      <!-- Scripts that Load after HTML is Loaded -->
-      <script>
-        const TAU = 2 * Math.PI;
-        const DEG2RAD = TAU / 360;
-        const RAD2DEG = 360 / TAU;
-        const RADIUS_OF_EARTH = 6371.0;
-        const MINUTES_PER_DAY = 1440;
-        const MILLISECONDS_PER_DAY = 1.15741e-8;
-        var sensorList = {};
+    <!-- Scripts that Load after HTML is Loaded -->
+    <script>
+      const TAU = 2 * Math.PI;
+      const DEG2RAD = TAU / 360;
+      const RAD2DEG = 360 / TAU;
+      const RADIUS_OF_EARTH = 6371.0;
+      const MINUTES_PER_DAY = 1440;
+      const MILLISECONDS_PER_DAY = 1.15741e-8;
+      var sensorList = {};
 
-        sensorList.COD = {
-            name: 'Cape Cod AFS, Massachusetts',
-            shortName: 'COD',
-            type: 'Phased Array Radar',
-            lat: 41.754785,
-            long: -70.539151,
-            obshei: 0.060966,
-            obsminaz: 347,
-            obsmaxaz: 227,
-            obsminel: 3,
-            obsmaxel: 85,
-            obsminrange: 200,
-            obsmaxrange: 5556,
-            changeObjectInterval: 1000,
-            linkAehf: true,
-            linkWgs: true,
-            zoom: 'leo',
-            url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
-            country: 'United States',
-            sun: 'No Impact',
-            volume: false,
+      sensorList.COD = {
+          name: 'Cape Cod AFS, Massachusetts',
+          shortName: 'COD',
+          type: 'Phased Array Radar',
+          lat: 41.754785,
+          long: -70.539151,
+          obshei: 0.060966,
+          obsminaz: 347,
+          obsmaxaz: 227,
+          obsminel: 3,
+          obsmaxel: 85,
+          obsminrange: 200,
+          obsmaxrange: 5556,
+          changeObjectInterval: 1000,
+          linkAehf: true,
+          linkWgs: true,
+          zoom: 'leo',
+          url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
+          country: 'United States',
+          sun: 'No Impact',
+          volume: false,
+      };
+
+      function rae2eci() {
+        $('#editor-file').trigger('click');
+      }
+      $('#editor-file').change(function (evt) {
+        console.log(1);
+        if (!window.FileReader) return; // Browser is not compatible
+        var reader = new FileReader();
+
+        reader.onload = function (evt) {
+          if (evt.target.readyState !== 2) return;
+          if (evt.target.error) {
+            console.log('error');
+            return;
+          }
+
+          let radarDataECIArray = [];
+          radarData = JSON.parse(evt.target.result);
+
+          let j, gmst, nowDate;
+          for (let i = 0; i < radarData.length; i++) {
+            nowDate = new Date(radarData[i].t);
+
+            j = timeManager.jday(
+              nowDate.getUTCFullYear(),
+              nowDate.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+              nowDate.getUTCDate(),
+              nowDate.getUTCHours(),
+              nowDate.getUTCMinutes(),
+              nowDate.getUTCSeconds()
+            );
+            j += nowDate.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+
+            gmst = satellite.gstime(j);
+
+            // Update Radar Marker Position
+            radarDataECF = satellite.lookAnglesToEcf(
+                radarData[i].a,
+                radarData[i].e,
+                radarData[i].r,
+                sensorList.COD.lat * DEG2RAD,
+                sensorList.COD.long * DEG2RAD,
+                sensorList.COD.obshei
+            );
+            radarDataECI = satellite.ecfToEci(radarDataECF, gmst);
+            radarDataECI.t = radarData[i].t;
+            radarDataECI.rc = radarData[i].rc;
+            radarDataECI.m = radarData[i].m;
+            radarDataECI.ti = radarData[i].ti;
+            radarDataECI.oi = radarData[i].oi;
+            radarDataECI.si = radarData[i].si;
+            radarDataECI.mc = radarData[i].mc;
+            radarDataECI.mo = radarData[i].mo;
+            radarDataECI.ae = radarData[i].ae;
+            radarDataECI.ee = radarData[i].ee;
+            radarDataECI.dataType = radarData[i].dataType;
+            radarDataECIArray.push(radarDataECI);
+          }
+
+          var variable = JSON.stringify(radarDataECIArray);
+          var blob = new Blob([variable], { type: 'octet/stream' });
+          saveAs(blob, 'radarData.json');
         };
-
-        function rae2eci() {
-          $('#editor-file').trigger('click');
-        }
-        $('#editor-file').change(function (evt) {
-          console.log(1);
-          if (!window.FileReader) return; // Browser is not compatible
-          var reader = new FileReader();
-
-          reader.onload = function (evt) {
-            if (evt.target.readyState !== 2) return;
-            if (evt.target.error) {
-              console.log('error');
-              return;
-            }
-
-            let radarDataECIArray = [];
-            radarData = JSON.parse(evt.target.result);
-
-            let j, gmst, nowDate;
-            for (let i = 0; i < radarData.length; i++) {
-              nowDate = new Date(radarData[i].t);
-
-              j = timeManager.jday(
-                nowDate.getUTCFullYear(),
-                nowDate.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
-                nowDate.getUTCDate(),
-                nowDate.getUTCHours(),
-                nowDate.getUTCMinutes(),
-                nowDate.getUTCSeconds()
-              );
-              j += nowDate.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-
-              gmst = satellite.gstime(j);
-
-              // Update Radar Marker Position
-              radarDataECF = satellite.lookAnglesToEcf(
-                  radarData[i].a,
-                  radarData[i].e,
-                  radarData[i].r,
-                  sensorList.COD.lat * DEG2RAD,
-                  sensorList.COD.long * DEG2RAD,
-                  sensorList.COD.obshei
-              );
-              radarDataECI = satellite.ecfToEci(radarDataECF, gmst);
-              radarDataECI.t = radarData[i].t;
-              radarDataECI.rc = radarData[i].rc;
-              radarDataECI.m = radarData[i].m;
-              radarDataECI.ti = radarData[i].ti;
-              radarDataECI.oi = radarData[i].oi;
-              radarDataECI.si = radarData[i].si;
-              radarDataECI.mc = radarData[i].mc;
-              radarDataECI.mo = radarData[i].mo;
-              radarDataECI.ae = radarData[i].ae;
-              radarDataECI.ee = radarData[i].ee;
-              radarDataECI.dataType = radarData[i].dataType;
-              radarDataECIArray.push(radarDataECI);
-            }
-
-            var variable = JSON.stringify(radarDataECIArray);
-            var blob = new Blob([variable], { type: 'octet/stream' });
-            saveAs(blob, 'radarData.json');
-          };
-          reader.readAsText(evt.target.files[0]);
-          evt.preventDefault();
-        });
-      </script>
-    </body>
-  </html>
+        reader.readAsText(evt.target.files[0]);
+        evt.preventDefault();
+      });
+    </script>
+  </body>
+</html>

@@ -22,37 +22,34 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 import * as $ from 'jquery';
 // eslint-disable-next-line sort-imports
 import 'jquery-ui-bundle';
-import '@app/js/lib/jquery-ui-slideraccess.js';
-import '@app/js/lib/jquery-ui-timepicker.js';
-import '@app/js/lib/perfect-scrollbar.min.js';
-import '@app/js/lib/jquery.colorbox.min.js';
-import '@app/js/lib/jquery-ajax.js';
-import '@app/js/lib/colorPick.js';
+import '@app/js/lib/external/jquery-ui-slideraccess.js';
+import '@app/js/lib/external/jquery-ui-timepicker.js';
+import '@app/js/lib/external/perfect-scrollbar.min.js';
+import '@app/js/lib/external/jquery.colorbox.min.js';
+import '@app/js/lib/external/jquery-ajax.js';
+import '@app/js/lib/external/colorPick.js';
 import 'materialize-css';
-import { db, settingsManager } from '@app/js/settings.js';
-import { helpers, mathValue, saveAs, saveCsv } from '@app/js/helpers.js';
+import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
+import { db, settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import { saveAs, saveCsv, stringPad } from '@app/js/lib/helpers.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
-import { CanvasRecorder } from '@app/js/lib/CanvasRecorder.js';
+import { CanvasRecorder } from '@app/js/lib/external/CanvasRecorder.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
-import { adviceList } from '@app/js/advice-module.js';
-import { dateFormat } from '@app/js/lib/dateFormat.js';
-import { dlManager } from '@app/js/dlManager/dlManager.js';
-import { earth } from '@app/js/sceneManager/sceneManager.js';
+import { adviceList } from '@app/js/uiManager/advice-module.js';
+import { dateFormat } from '@app/js/lib/external/dateFormat.js';
+import { drawManager } from '@app/js/drawManager/drawManager.js';
 import { mapManager } from '@app/js/uiManager/mapManager.js';
-import { missileManager } from '@app/modules/missileManager.js';
-import { mobile } from '@app/js/mobile.js';
-import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
-import { objectManager } from '@app/js/objectManager.js';
-import { omManager } from '@app/js/omManager.js';
-import { orbitManager } from '@app/js/orbitManager.js';
-import { radarDataManager } from '@app/js/radarDataManager.js';
-import { sMM } from '@app/js/sideMenuManager.js';
-import { satLinkManager } from '@app/modules/satLinkManager.js';
-import { satSet } from '@app/js/satSet.js';
-import { satellite } from '@app/js/lookangles.js';
-import { searchBox } from '@app/js/search-box.js';
-import { sensorManager } from '@app/modules/sensorManager.js';
-import { timeManager } from '@app/js/timeManager.js';
+import { missileManager } from '@app/js/missileManager/missileManager.js';
+import { mobileManager } from '@app/js/uiManager/mobileManager.js';
+import { objectManager } from '@app/js/objectManager/objectManager.js';
+import { omManager } from '@app/js/uiManager/omManager.js';
+import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
+import { sMM } from '@app/js/uiManager/sideMenuManager.js';
+import { satSet } from '@app/js/satSet/satSet.js';
+import { satellite } from '@app/js/lib/lookangles.js';
+import { searchBox } from '@app/js/uiManager/search-box.js';
+import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.js';
 import { uiInput } from './ui-input.js';
 import { uiLimited } from './ui-limited.js';
 let M = window.M;
@@ -67,6 +64,7 @@ try {
 // var dropdownInstance;
 const mapImageDOM = $('#map-image');
 const mapMenuDOM = $('#map-menu');
+const bodyDOM = $('#bodyDOM');
 
 const rightBtnSaveMenuDOM = $('#save-rmb-menu');
 const rightBtnViewMenuDOM = $('#view-rmb-menu');
@@ -90,6 +88,9 @@ var updateInterval = 1000;
 var createClockDOMOnce = false;
 
 var uiManager = {};
+uiManager.searchBox = searchBox;
+uiManager.adviceList = adviceList;
+uiManager.mobileManager = mobileManager;
 uiManager.isAnalysisMenuOpen = false;
 
 uiManager.isCurrentlyTyping = false;
@@ -142,7 +143,7 @@ uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef, groupsRef, s
   groups = groupsRef;
 };
 
-// This runs after the dlManager starts
+// This runs after the drawManager starts
 uiManager.postStart = () => {
   // Enable Satbox Overlay
   if (settingsManager.enableHoverOverlay) {
@@ -200,7 +201,7 @@ $(document).ready(function () {
   (function _uiInit() {
     // Register all UI callback functions with drawLoop in main.js
     // These run during the draw loop
-    dlManager.setDrawLoopCallback(function () {
+    drawManager.setDrawLoopCallback(function () {
       // _showSatTest();
       _updateNextPassOverlay();
       _checkWatchlist();
@@ -1163,7 +1164,7 @@ $(document).ready(function () {
       lastBoxUpdateTime = timeManager.now;
       _updateNextPassOverlay(true);
 
-      radarDataManager.findFirstDataTime();
+      satSet.findRadarDataFirstDataTime();
 
       e.preventDefault();
     });
@@ -1600,33 +1601,33 @@ $(document).ready(function () {
         let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
         $('#es-scc').val(sat.SCC_NUM);
 
-        var inc = (sat.inclination * mathValue.RAD2DEG).toPrecision(7);
+        var inc = (sat.inclination * RAD2DEG).toPrecision(7);
         inc = inc.split('.');
         inc[0] = inc[0].substr(-3, 3);
         inc[1] = inc[1].substr(0, 4);
         inc = (inc[0] + '.' + inc[1]).toString();
 
-        $('#es-inc').val(helpers.pad0(inc, 8));
+        $('#es-inc').val(stringPad.pad0(inc, 8));
         $('#es-year').val(sat.TLE1.substr(18, 2));
         $('#es-day').val(sat.TLE1.substr(20, 12));
         $('#es-meanmo').val(sat.TLE2.substr(52, 11));
 
-        var rasc = (sat.raan * mathValue.RAD2DEG).toPrecision(7);
+        var rasc = (sat.raan * RAD2DEG).toPrecision(7);
         rasc = rasc.split('.');
         rasc[0] = rasc[0].substr(-3, 3);
         rasc[1] = rasc[1].substr(0, 4);
         rasc = (rasc[0] + '.' + rasc[1]).toString();
 
-        $('#es-rasc').val(helpers.pad0(rasc, 8));
+        $('#es-rasc').val(stringPad.pad0(rasc, 8));
         $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
 
-        var argPe = (sat.argPe * mathValue.RAD2DEG).toPrecision(7);
+        var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
         argPe = argPe.split('.');
         argPe[0] = argPe[0].substr(-3, 3);
         argPe[1] = argPe[1].substr(0, 4);
         argPe = (argPe[0] + '.' + argPe[1]).toString();
 
-        $('#es-argPe').val(helpers.pad0(argPe, 8));
+        $('#es-argPe').val(stringPad.pad0(argPe, 8));
         $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
 
         $('#loading-screen').fadeOut('slow');
@@ -1657,7 +1658,7 @@ $(document).ready(function () {
         inc[1] = '0000';
       }
       inc = (inc[0] + '.' + inc[1]).toString();
-      inc = helpers.pad0(inc, 8);
+      inc = stringPad.pad0(inc, 8);
 
       var meanmo = $('#es-meanmo').val();
 
@@ -1670,7 +1671,7 @@ $(document).ready(function () {
         meanmo[1] = '00000000';
       }
       meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
-      meanmo = helpers.pad0(meanmo, 8);
+      meanmo = stringPad.pad0(meanmo, 8);
 
       var rasc = $('#es-rasc').val();
 
@@ -1683,7 +1684,7 @@ $(document).ready(function () {
         rasc[1] = '0000';
       }
       rasc = (rasc[0] + '.' + rasc[1]).toString();
-      rasc = helpers.pad0(rasc, 8);
+      rasc = stringPad.pad0(rasc, 8);
 
       var ecen = $('#es-ecen').val();
       var argPe = $('#es-argPe').val();
@@ -1697,7 +1698,7 @@ $(document).ready(function () {
         argPe[1] = '0000';
       }
       argPe = (argPe[0] + '.' + argPe[1]).toString();
-      argPe = helpers.pad0(argPe, 8);
+      argPe = stringPad.pad0(argPe, 8);
 
       var meana = $('#es-meana').val();
 
@@ -1710,7 +1711,7 @@ $(document).ready(function () {
         meana[1] = '0000';
       }
       meana = (meana[0] + '.' + meana[1]).toString();
-      meana = helpers.pad0(meana, 8);
+      meana = stringPad.pad0(meana, 8);
 
       var epochyr = $('#es-year').val();
       var epochday = $('#es-day').val();
@@ -1770,7 +1771,7 @@ $(document).ready(function () {
         }
 
         var object = JSON.parse(evt.target.result);
-        var scc = parseInt(helpers.pad0(object.TLE1.substr(2, 5).trim(), 5));
+        var scc = parseInt(stringPad.pad0(object.TLE1.substr(2, 5).trim(), 5));
         var satId = satSet.getIdFromObjNum(scc);
         var sat = satSet.getSatExtraOnly(satId);
         if (satellite.altitudeCheck(object.TLE1, object.TLE2, timeManager.propOffset) > 1) {
@@ -1856,7 +1857,7 @@ $(document).ready(function () {
     });
     // Add button selected on watchlist menu
     $('#watchlist-content').on('click', '.watchlist-add', function () {
-      var satId = satSet.getIdFromObjNum(helpers.pad0($('#watchlist-new').val(), 5));
+      var satId = satSet.getIdFromObjNum(stringPad.pad0($('#watchlist-new').val(), 5));
       var duplicate = false;
       for (var i = 0; i < watchlistList.length; i++) {
         // No duplicates
@@ -1874,7 +1875,7 @@ $(document).ready(function () {
     });
     // Enter pressed/selected on watchlist menu
     $('#watchlist-content').on('submit', function (e) {
-      var satId = satSet.getIdFromObjNum(helpers.pad0($('#watchlist-new').val(), 5));
+      var satId = satSet.getIdFromObjNum(stringPad.pad0($('#watchlist-new').val(), 5));
       var duplicate = false;
       for (var i = 0; i < watchlistList.length; i++) {
         // No duplicates
@@ -1957,10 +1958,10 @@ $(document).ready(function () {
         var launchLat, launchLon;
 
         if (objectManager.isLaunchSiteManagerLoaded) {
-          for (var launchSite in window.launchSiteManager.launchSiteList) {
-            if (window.launchSiteManager.launchSiteList[launchSite].name === launchFac) {
-              launchLat = window.launchSiteManager.launchSiteList[launchSite].lat;
-              launchLon = window.launchSiteManager.launchSiteList[launchSite].lon;
+          for (var launchSite in objectManager.launchSiteManager.launchSiteList) {
+            if (objectManager.launchSiteManager.launchSiteList[launchSite].name === launchFac) {
+              launchLat = objectManager.launchSiteManager.launchSiteList[launchSite].lat;
+              launchLon = objectManager.launchSiteManager.launchSiteList[launchSite].lon;
             }
           }
         }
@@ -2102,7 +2103,7 @@ $(document).ready(function () {
                   inc[1] = '0000';
                 }
                 inc = (inc[0] + '.' + inc[1]).toString();
-                inc = helpers.padEmpty(inc, 8);
+                inc = stringPad.padEmpty(inc, 8);
 
                 // For the second 30
                 var meanmo = iTLE2.substr(52, 10);
@@ -2687,7 +2688,9 @@ $(document).ready(function () {
           var socratesDate = socratesObjTwo[i][4].split(' '); // Date/time is on the second line 5th column
           var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
           var socratesTimeS = socratesTime[2].split('.'); // Split time from date for easier management
-          tdT.appendChild(document.createTextNode(socratesDate[2] + ' ' + socratesDate[1] + ' ' + socratesDate[0] + ' - ' + helpers.pad0(socratesTime[0], 2) + ':' + helpers.pad0(socratesTime[1], 2) + ':' + helpers.pad0(socratesTimeS[0], 2) + 'Z'));
+          tdT.appendChild(
+            document.createTextNode(socratesDate[2] + ' ' + socratesDate[1] + ' ' + socratesDate[0] + ' - ' + stringPad.pad0(socratesTime[0], 2) + ':' + stringPad.pad0(socratesTime[1], 2) + ':' + stringPad.pad0(socratesTimeS[0], 2) + 'Z')
+          );
           tdS1 = tr.insertCell();
           tdS1.appendChild(document.createTextNode(socratesObjOne[i][1]));
           tdS2 = tr.insertCell();
@@ -2704,20 +2707,27 @@ $(document).ready(function () {
     } // If a row was selected
   };
 
-  uiManager.loginPopup = () => {
-    if (uiManager.isMembershipMenuOpen) {
-      uiManager.hideSideMenus();
-      uiManager.isMembershipMenuOpen = false;
-      return;
-    } else {
-      uiManager.toast(`Membership Required for this Feature!`, 'critical');
-      uiManager.hideSideMenus();
-      $('#membership-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-      uiManager.isMembershipMenuOpen = true;
-      // $('#menu-sensor-info').addClass('bmenu-item-selected');
-      return;
+  // Resizing Listener
+  $(window).on('resize', function () {
+    if (!settingsManager.disableUI) {
+      uiManager.resize2DMap();
     }
-  };
+    mobileManager.checkMobileMode();
+    if (!settingsManager.disableUI) {
+      if (settingsManager.screenshotMode) {
+        bodyDOM.css('overflow', 'visible');
+        $('#canvas-holder').css('overflow', 'visible');
+        $('#canvas-holder').width = 3840;
+        $('#canvas-holder').height = 2160;
+        bodyDOM.width = 3840;
+        bodyDOM.height = 2160;
+      } else {
+        bodyDOM.css('overflow', 'hidden');
+        $('#canvas-holder').css('overflow', 'hidden');
+      }
+    }
+    settingsManager.isResizing = true;
+  });
 
   uiManager.bottomIconPress = (evt) => {
     _bottomIconPress(evt);
@@ -2734,9 +2744,6 @@ $(document).ready(function () {
     //         'Selected'
     //     );
     switch (evt.currentTarget.id) {
-      case 'menu-membership': // No Keyboard Commands
-        uiManager.loginPopup();
-        break;
       case 'menu-sensor-list': // No Keyboard Commands
         if (isSensorListMenuOpen) {
           uiManager.hideSideMenus();
@@ -3173,33 +3180,33 @@ $(document).ready(function () {
             let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
             $('#es-scc').val(sat.SCC_NUM);
 
-            var inc = (sat.inclination * mathValue.RAD2DEG).toPrecision(7);
+            var inc = (sat.inclination * RAD2DEG).toPrecision(7);
             inc = inc.split('.');
             inc[0] = inc[0].substr(-3, 3);
             inc[1] = inc[1].substr(0, 4);
             inc = (inc[0] + '.' + inc[1]).toString();
 
-            $('#es-inc').val(helpers.pad0(inc, 8));
+            $('#es-inc').val(stringPad.pad0(inc, 8));
             $('#es-year').val(sat.TLE1.substr(18, 2));
             $('#es-day').val(sat.TLE1.substr(20, 12));
             $('#es-meanmo').val(sat.TLE2.substr(52, 11));
 
-            var rasc = (sat.raan * mathValue.RAD2DEG).toPrecision(7);
+            var rasc = (sat.raan * RAD2DEG).toPrecision(7);
             rasc = rasc.split('.');
             rasc[0] = rasc[0].substr(-3, 3);
             rasc[1] = rasc[1].substr(0, 4);
             rasc = (rasc[0] + '.' + rasc[1]).toString();
 
-            $('#es-rasc').val(helpers.pad0(rasc, 8));
+            $('#es-rasc').val(stringPad.pad0(rasc, 8));
             $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
 
-            var argPe = (sat.argPe * mathValue.RAD2DEG).toPrecision(7);
+            var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
             argPe = argPe.split('.');
             argPe[0] = argPe[0].substr(-3, 3);
             argPe[1] = argPe[1].substr(0, 4);
             argPe = (argPe[0] + '.' + argPe[1]).toString();
 
-            $('#es-argPe').val(helpers.pad0(argPe, 8));
+            $('#es-argPe').val(stringPad.pad0(argPe, 8));
             $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
             // $('#es-rasc').val(sat.TLE2.substr(18 - 1, 7 + 1).toString());
           } else {
@@ -3227,7 +3234,7 @@ $(document).ready(function () {
 
             let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
             $('#nl-scc').val(sat.SCC_NUM);
-            $('#nl-inc').val((sat.inclination * mathValue.RAD2DEG).toPrecision(2));
+            $('#nl-inc').val((sat.inclination * RAD2DEG).toPrecision(2));
           } else {
             adviceList.newLaunchDisabled();
             if (!$('#menu-newLaunch:animated').length) {
@@ -3411,12 +3418,12 @@ $(document).ready(function () {
           break;
         }
       case 'menu-day-night': // No Keyboard Commands
-        if (earth.isDayNightToggle()) {
-          earth.isDayNightToggle(false);
+        if (drawManager.sceneManager.earth.isDayNightToggle()) {
+          drawManager.sceneManager.earth.isDayNightToggle(false);
           $('#menu-day-night').removeClass('bmenu-item-selected');
           break;
         } else {
-          earth.isDayNightToggle(true);
+          drawManager.sceneManager.earth.isDayNightToggle(true);
           $('#menu-day-night').addClass('bmenu-item-selected');
           break;
         }
@@ -3489,7 +3496,7 @@ $(document).ready(function () {
           break;
         } else {
           uiManager.hideSideMenus();
-          nextLaunchManager.showTable();
+          satSet.nextLaunchManager.showTable();
           $('#nextLaunch-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           isNextLaunchMenuOpen = true;
           $('#menu-nextLaunch').addClass('bmenu-item-selected');
@@ -3501,7 +3508,7 @@ $(document).ready(function () {
           cameraManager.panReset = true;
           cameraManager.localRotateReset = true;
           settingsManager.fieldOfView = 0.6;
-          dlManager.glInit();
+          drawManager.glInit();
           uiManager.hideSideMenus();
           orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
           cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
@@ -3537,7 +3544,7 @@ $(document).ready(function () {
           cameraManager.panReset = true;
           cameraManager.localRotateReset = true;
           settingsManager.fieldOfView = 0.6;
-          dlManager.glInit();
+          drawManager.glInit();
           uiManager.hideSideMenus();
           cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
           uiManager.legendMenuChange('default');
@@ -3809,7 +3816,7 @@ $(document).ready(function () {
   };
 
   $('#fullscreen-icon').on('click', function () {
-    mobile.fullscreenToggle();
+    mobileManager.fullscreenToggle();
     uiManager.resize2DMap();
   });
 
@@ -3836,7 +3843,7 @@ $(document).ready(function () {
   });
 
   $('#export-launch-info').on('click', function () {
-    saveCsv(nextLaunchManager.launchList, 'launchList');
+    saveCsv(satSet.nextLaunchManager.launchList, 'launchList');
   });
 
   $('#export-multiSiteArray').on('click', function () {
@@ -3989,9 +3996,9 @@ uiManager.keyHandler = (evt) => {
         // 7 is a placeholder to reset camera type
         cameraManager.localRotateReset = true;
         settingsManager.fieldOfView = 0.6;
-        dlManager.glInit();
+        drawManager.glInit();
         if (objectManager.selectedSat !== -1) {
-          cameraManager.camZoomSnappedOnSat(true);
+          cameraManager.camZoomSnappedOnSat = true;
           curCam = cameraManager.cameraType.fixedToSat;
         } else {
           curCam = cameraManager.cameraType.default;
@@ -4137,7 +4144,7 @@ uiManager.keyHandler = (evt) => {
 };
 
 uiManager.hideLoadingScreen = () => {
-  if (earth.isUseHiRes && earth.isHiResReady !== true) {
+  if (drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) {
     setTimeout(function () {
       uiManager.hideLoadingScreen();
     }, 100);
@@ -4147,7 +4154,7 @@ uiManager.hideLoadingScreen = () => {
   // Display content when loading is complete.
   $('#canvas-holder').attr('style', 'display:block');
 
-  mobile.checkMobileMode();
+  mobileManager.checkMobileMode();
 
   if (settingsManager.isMobileModeEnabled) {
     $('#spinner').hide();
@@ -4164,7 +4171,7 @@ uiManager.hideLoadingScreen = () => {
         $('#logo-trusat').hide();
         $('#loading-screen').hide();
         settingsManager.loadStr('math');
-      }, 3000);
+      }, 100);
     } else {
       setTimeout(function () {
         $('#loading-screen').removeClass('full-loader');
@@ -4174,7 +4181,7 @@ uiManager.hideLoadingScreen = () => {
         $('#logo-trusat').hide();
         $('#loading-screen').hide();
         settingsManager.loadStr('math');
-      }, 1500);
+      }, 100);
     }
   }
 };
@@ -5076,25 +5083,25 @@ $('#constellation-menu>ul>li').on('click', function () {
       break;
     case 'aehf':
       if (typeof groups.aehf == 'undefined') {
-        groups.aehf = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.aehf));
+        groups.aehf = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.aehf));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
-        satLinkManager.showLinks(lineManager, satSet, 'aehf');
+        objectManager.satLinkManager.showLinks(lineManager, satSet, 'aehf');
         $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'wgs':
       // WGS also selects DSCS
       if (typeof groups.wgs == 'undefined') {
-        groups.wgs = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.wgs.concat(satLinkManager.dscs)));
+        groups.wgs = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.wgs.concat(objectManager.satLinkManager.dscs)));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
         try {
-          satLinkManager.showLinks(lineManager, satSet, 'wgs');
+          objectManager.satLinkManager.showLinks(lineManager, satSet, 'wgs');
         } catch (e) {
-          // Maybe the satLinkManager isn't installed?
+          // Maybe the objectManager.satLinkManager isn't installed?
         }
         $('#loading-screen').fadeOut('slow');
       });
@@ -5102,14 +5109,14 @@ $('#constellation-menu>ul>li').on('click', function () {
     case 'starlink':
       // WGS also selects DSCS
       if (typeof groups.starlink == 'undefined') {
-        groups.starlink = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.starlink));
+        groups.starlink = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.starlink));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
         try {
-          satLinkManager.showLinks(lineManager, satSet, 'starlink');
+          objectManager.satLinkManager.showLinks(lineManager, satSet, 'starlink');
         } catch (e) {
-          // Maybe the satLinkManager isn't installed?
+          // Maybe the objectManager.satLinkManager isn't installed?
         }
         $('#loading-screen').fadeOut('slow');
       });
@@ -5117,14 +5124,14 @@ $('#constellation-menu>ul>li').on('click', function () {
     case 'sbirs':
       // SBIRS and DSP
       if (typeof groups.sbirs == 'undefined') {
-        groups.sbirs = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(satLinkManager.sbirs));
+        groups.sbirs = groups.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.sbirs));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
         try {
-          satLinkManager.showLinks(lineManager, satSet, 'sbirs');
+          objectManager.satLinkManager.showLinks(lineManager, satSet, 'sbirs');
         } catch (e) {
-          // Maybe the satLinkManager isn't installed?
+          // Maybe the objectManager.satLinkManager isn't installed?
         }
         $('#loading-screen').fadeOut('slow');
       });
@@ -5442,9 +5449,9 @@ uiManager.panToStar = function (c) {
   // ======================================================
   // Need to calculate the time to get the right RA offset
   // ======================================================
-  cameraManager.camSnap(Camera.latToPitch(sat.dec) * -1, Camera.longToYaw(sat.ra * mathValue.DEG2RAD, timeManager.selectedDate));
+  cameraManager.camSnap(Camera.latToPitch(sat.dec) * -1, Camera.longToYaw(sat.ra * DEG2RAD, timeManager.selectedDate));
   setTimeout(function () {
-    // console.log(`pitch ${camPitch * mathValue.RAD2DEG} -- yaw ${camYaw * mathValue.RAD2DEG}`);
+    // console.log(`pitch ${camPitch * RAD2DEG} -- yaw ${camYaw * RAD2DEG}`);
   }, 2000);
 };
 

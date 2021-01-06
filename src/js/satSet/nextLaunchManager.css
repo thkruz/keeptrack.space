@@ -1,0 +1,39 @@
+/* Cell Phone Only */
+@media (max-width: 694px) {
+    /* .side-menu {
+    } */
+    #nextLaunch-content {
+        width: 100%;
+    }
+    #nextLaunch-table tbody tr td {
+        padding: 5px 5px;
+    }
+}
+
+/* Tablet Only */
+@media (min-width: 695px) and (max-width: 1300px) {
+    /* .side-menu {
+    } */
+    #nextLaunch-content {
+        width: 625px;
+    }
+    #nextLaunch-table tbody tr td {
+        padding: 5px 5px;
+    }
+}
+
+/* Small Screens Only */
+@media (max-width: 1300px) {
+}
+
+/* Desktop Only */
+@media (min-width: 1301px) {
+    /* .side-menu {
+    } */
+    #nextLaunch-content {
+        width: 625px;
+    }
+    #nextLaunch-table tbody tr td {
+        padding: 5px 5px;
+    }
+}

@@ -1,8 +1,7 @@
 import * as $ from 'jquery';
-import * as glm from '@app/js/lib/gl-matrix.js';
-import { RADIUS_OF_EARTH } from '@app/js/constants.js';
-import { mobile } from '@app/js/mobile.js';
-import { sMM } from '@app/js/sideMenuManager.js';
+import * as glm from '@app/js/lib/external/gl-matrix.js';
+import { RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
+import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 let M = window.M;
 
 const bodyDOM = $('#bodyDOM');
@@ -39,8 +38,8 @@ var uiInput = {};
 uiInput.isMouseMoving = false;
 uiInput.mouseSat = -1;
 
-var cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, dlManager, dotsManager;
-uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lineManagerRef, sensorManagerRef, starManagerRef, ColorSchemeRef, satCruncherRef, earthRef, glRef, uiManagerRef, dlManagerRef, dotsManagerRef) => {
+var cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, gl, uiManager, drawManager, dotsManager;
+uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lineManagerRef, sensorManagerRef, starManagerRef, ColorSchemeRef, satCruncherRef, uiManagerRef, drawManagerRef, dotsManagerRef) => {
   cameraManager = cameraManagerRef;
   dotsManager = dotsManagerRef;
   objectManager = objectManagerRef;
@@ -51,10 +50,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
   starManager = starManagerRef;
   ColorScheme = ColorSchemeRef;
   satCruncher = satCruncherRef;
-  earth = earthRef;
-  gl = glRef;
   uiManager = uiManagerRef;
-  dlManager = dlManagerRef;
+  drawManager = drawManagerRef;
+  gl = drawManager.gl;
 
   // 2020 Key listener
   // TODO: Migrate most things from UI to Here
@@ -162,34 +160,6 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
     );
   }
 
-  // Resizing Listener
-  $(window).on('resize', function () {
-    if (!settingsManager.disableUI) {
-      uiManager.resize2DMap();
-    }
-    mobile.checkMobileMode();
-    if (!settingsManager.disableUI) {
-      if (settingsManager.screenshotMode) {
-        bodyDOM.css('overflow', 'visible');
-        $('#canvas-holder').css('overflow', 'visible');
-        $('#canvas-holder').width = 3840;
-        $('#canvas-holder').height = 2160;
-        bodyDOM.width = 3840;
-        bodyDOM.height = 2160;
-      } else {
-        bodyDOM.css('overflow', 'hidden');
-        $('#canvas-holder').css('overflow', 'hidden');
-      }
-    }
-    // if (!settingsManager.isResizing) {
-    //   window.setTimeout(function () {
-    //     settingsManager.isResizing = false;
-    //     webGlInit();
-    //   }, 500);
-    // }
-    settingsManager.isResizing = true;
-  });
-
   $(window).mousedown(function (evt) {
     // Camera Manager Events
     {
@@ -272,19 +242,31 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         }, 250);
       }
     });
+
+    uiInput.mouseMoveTimeout = null;
     canvasDOM.on('mousemove', function (evt) {
-      cameraManager.mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
-      cameraManager.mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
-      if (cameraManager.isDragging && cameraManager.screenDragPoint[0] !== cameraManager.mouseX && cameraManager.screenDragPoint[1] !== cameraManager.mouseY) {
-        dragHasMoved = true;
-        cameraManager.camAngleSnappedOnSat = false;
-        cameraManager.camZoomSnappedOnSat = false;
+      if (uiInput.mouseMoveTimeout == null) {
+        uiInput.mouseMoveTimeout = window.setTimeout(() => {
+          cameraManager.mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
+          cameraManager.mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
+          if (cameraManager.isDragging && cameraManager.screenDragPoint[0] !== cameraManager.mouseX && cameraManager.screenDragPoint[1] !== cameraManager.mouseY) {
+            dragHasMoved = true;
+            cameraManager.camAngleSnappedOnSat = false;
+            cameraManager.camZoomSnappedOnSat = false;
+          }
+          uiInput.isMouseMoving = true;
+
+          // This is so you have to keep moving the mouse or the ui says it has stopped (why?)
+          clearTimeout(mouseTimeout);
+          mouseTimeout = setTimeout(function () {
+            uiInput.isMouseMoving = false;
+          }, 150);
+
+          // This is to prevent mousemove being called between drawframes (who cares if it has moved at that point)
+          window.clearTimeout(uiInput.mouseMoveTimeout);
+          uiInput.mouseMoveTimeout = null;
+        }, 16);
       }
-      uiInput.isMouseMoving = true;
-      clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(function () {
-        uiInput.isMouseMoving = false;
-      }, 150);
     });
 
     if (settingsManager.disableUI) {
@@ -350,7 +332,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
           if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
-          dlManager.glInit();
+          drawManager.glInit();
         }
       });
       canvasDOM.on('click', function (evt) {
@@ -374,7 +356,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         }
 
         if (evt.button === 2) {
-          dragPoint = getEarthScreenPoint(cameraManager.mouseX, cameraManager.mouseY);
+          dragPoint = uiInput.getEarthScreenPoint(cameraManager.mouseX, cameraManager.mouseY);
           latLon = satellite.eci2ll(dragPoint[0], dragPoint[1], dragPoint[2]);
         }
         cameraManager.screenDragPoint = [cameraManager.mouseX, cameraManager.mouseY];
@@ -404,8 +386,8 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           // _pinchStart(evt)
         } else {
           // Single Finger Touch
-          mobile.startMouseX = evt.originalEvent.touches[0].clientX;
-          mobile.startMouseY = evt.originalEvent.touches[0].clientY;
+          cameraManager.startMouseX = evt.originalEvent.touches[0].clientX;
+          cameraManager.startMouseY = evt.originalEvent.touches[0].clientY;
           cameraManager.mouseX = evt.originalEvent.touches[0].clientX;
           cameraManager.mouseY = evt.originalEvent.touches[0].clientY;
           uiInput.mouseSat = uiInput.getSatIdFromCoord(cameraManager.mouseX, cameraManager.mouseY);
@@ -616,7 +598,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
     canvasDOM.on('touchend', function () {
       let touchTime = Date.now() - touchStartTime;
 
-      if (touchTime > 150 && !isPinching && Math.abs(mobile.startMouseX - cameraManager.mouseX) < 50 && Math.abs(mobile.startMouseY - cameraManager.mouseY) < 50) {
+      if (touchTime > 150 && !isPinching && Math.abs(cameraManager.startMouseX - cameraManager.mouseX) < 50 && Math.abs(cameraManager.startMouseY - cameraManager.mouseY) < 50) {
         _openRmbMenu();
         uiInput.mouseSat = -1;
       }
@@ -1086,9 +1068,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = false;
           localStorage.setItem('lastMap', 'blue');
-          earth.init(gl);
-          earth.loadHiRes();
-          earth.loadHiResNight();
+          drawManager.sceneManager.earth.init(gl);
+          drawManager.sceneManager.earth.loadHiRes();
+          drawManager.sceneManager.earth.loadHiResNight();
           break;
         case 'earth-nasa-rmb':
           settingsManager.blueImages = false;
@@ -1099,9 +1081,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = false;
           localStorage.setItem('lastMap', 'nasa');
-          earth.init(gl);
-          earth.loadHiRes();
-          earth.loadHiResNight();
+          drawManager.sceneManager.earth.init(gl);
+          drawManager.sceneManager.earth.loadHiRes();
+          drawManager.sceneManager.earth.loadHiResNight();
           break;
         case 'earth-trusat-rmb':
           settingsManager.blueImages = false;
@@ -1112,9 +1094,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = false;
           localStorage.setItem('lastMap', 'trusat');
-          earth.init(gl);
-          earth.loadHiRes();
-          earth.loadHiResNight();
+          drawManager.sceneManager.earth.init(gl);
+          drawManager.sceneManager.earth.loadHiRes();
+          drawManager.sceneManager.earth.loadHiResNight();
           break;
         case 'earth-low-rmb':
           settingsManager.blueImages = false;
@@ -1125,9 +1107,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = false;
           localStorage.setItem('lastMap', 'low');
-          earth.init(gl);
-          earth.loadHiRes();
-          earth.loadHiResNight();
+          drawManager.sceneManager.earth.init(gl);
+          drawManager.sceneManager.earth.loadHiRes();
+          drawManager.sceneManager.earth.loadHiResNight();
           break;
         case 'earth-high-rmb':
           $('#loading-screen').fadeIn(1000, function () {
@@ -1139,9 +1121,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
             localStorage.setItem('lastMap', 'high');
-            earth.init(gl);
-            earth.loadHiRes();
-            earth.loadHiResNight();
+            drawManager.sceneManager.earth.init(gl);
+            drawManager.sceneManager.earth.loadHiRes();
+            drawManager.sceneManager.earth.loadHiResNight();
             $('#loading-screen').fadeOut('slow');
           });
           break;
@@ -1155,9 +1137,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
             settingsManager.hiresNoCloudsImages = true;
             settingsManager.vectorImages = false;
             localStorage.setItem('lastMap', 'high-nc');
-            earth.init(gl);
-            earth.loadHiRes();
-            earth.loadHiResNight();
+            drawManager.sceneManager.earth.init(gl);
+            drawManager.sceneManager.earth.loadHiRes();
+            drawManager.sceneManager.earth.loadHiResNight();
             $('#loading-screen').fadeOut('slow');
           });
           break;
@@ -1170,9 +1152,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           settingsManager.hiresNoCloudsImages = false;
           settingsManager.vectorImages = true;
           localStorage.setItem('lastMap', 'vec');
-          earth.init(gl);
-          earth.loadHiRes();
-          earth.loadHiResNight();
+          drawManager.sceneManager.earth.init(gl);
+          drawManager.sceneManager.earth.loadHiRes();
+          drawManager.sceneManager.earth.loadHiResNight();
           break;
         case 'clear-screen-rmb':
           (function clearScreenRMB() {
@@ -1206,6 +1188,17 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
   })();
 };
 
+// This Doesn't Work Yet
+uiInput.getSatIdFromCoordAlt = (x, y) => {
+  const eci = uiInput.unProject(x, y);
+  const eciArray = {
+    x: eci[0],
+    y: eci[1],
+    z: eci[2],
+  };
+  return satSet.getIdFromEci(eciArray);
+};
+
 uiInput.getSatIdFromCoord = (x, y) => {
   // NOTE: gl.readPixels is a huge bottleneck
   gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
@@ -1215,12 +1208,12 @@ uiInput.getSatIdFromCoord = (x, y) => {
 };
 
 // Raycasting in getEarthScreenPoint would provide a lot of powerful (but slow) options later
-var getEarthScreenPoint = (x, y) => {
+uiInput.getEarthScreenPoint = (x, y) => {
   // getEarthScreenPoint
   var rayOrigin, ptThru, rayDir, toCenterVec, dParallel, longDir, dPerp, dSubSurf, dSurf, ptSurf;
 
   rayOrigin = cameraManager.getCamPos();
-  ptThru = _unProject(x, y);
+  ptThru = uiInput.unProject(x, y);
 
   rayDir = glm.vec3.create();
   glm.vec3.subtract(rayDir, ptThru, rayOrigin); // rayDir = ptThru - rayOrigin
@@ -1245,19 +1238,17 @@ var getEarthScreenPoint = (x, y) => {
   return ptSurf;
 };
 
-// _unProject variables
-var _unProject = (mx, my) => {
-  var glScreenX, glScreenY, screenVec, comboPMat, invMat, worldVec;
+// Convert Screen X,Y back to ECI
+uiInput.unProject = (x, y) => {
+  const glScreenX = (x / gl.drawingBufferWidth) * 2 - 1.0;
+  const glScreenY = 1.0 - (y / gl.drawingBufferHeight) * 2;
+  const screenVec = [glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
 
-  glScreenX = (mx / gl.drawingBufferWidth) * 2 - 1.0;
-  glScreenY = 1.0 - (my / gl.drawingBufferHeight) * 2;
-  screenVec = [glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
-
-  comboPMat = glm.mat4.create();
-  glm.mat4.mul(comboPMat, dlManager.pMatrix, cameraManager.camMatrix);
-  invMat = glm.mat4.create();
+  let comboPMat = glm.mat4.create();
+  glm.mat4.mul(comboPMat, drawManager.pMatrix, cameraManager.camMatrix);
+  let invMat = glm.mat4.create();
   glm.mat4.invert(invMat, comboPMat);
-  worldVec = glm.vec4.create();
+  let worldVec = glm.vec4.create();
   glm.vec4.transformMat4(worldVec, screenVec, invMat);
 
   return [worldVec[0] / worldVec[3], worldVec[1] / worldVec[3], worldVec[2] / worldVec[3]];

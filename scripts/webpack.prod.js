@@ -47,10 +47,10 @@ var jsConfig = Object.assign({}, config, {
   name: 'jsConfig',
   mode: 'production',
   entry: {
-    'main': ['./src/js/main.js'],
-    'positionCruncher': ['./src/js/webworker/positionCruncher.js'],
-    'orbitCruncher': ['./src/js/webworker/orbitCruncher.js'],
-    'checker-script': ['./src/js/checker-script.js'],
+    main: ['./src/js/main.js'],
+    positionCruncher: ['./src/js/webworker/positionCruncher.js'],
+    orbitCruncher: ['./src/js/webworker/orbitCruncher.js'],
+    // 'checker-script': ['./src/js/checker-script.js'],
   },
   resolve: {
     alias: {

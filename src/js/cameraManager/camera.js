@@ -21,8 +21,8 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * @body Complete 100% testing coverage and input validation for @app/test/cameraManager.test.js. Use cameraManager.setZoomLevel() as an example of a correct test/validation.
  */
 
-import * as glm from '@app/js/lib/gl-matrix.js';
-import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/constants.js';
+import * as glm from '@app/js/lib/external/gl-matrix.js';
+import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants.js';
 
 /* Used for managing the movement of the camera during the draw loop */
 class Camera {
@@ -35,6 +35,8 @@ class Camera {
     this.screenDragPoint = [0, 0];
     this.camYaw = 0;
     this.camPitch = 0;
+    this.camPitchSpeed = 0;
+    this.camYawSpeed = 0;
     this.zoomLevel = 0.6925;
     this.zoomTarget = 0.6925;
     this.isCtrlPressed = false;
@@ -147,8 +149,6 @@ class Camera {
   #panMovementSpeed = 0.5;
   #panTarget = { x: 0, y: 0, z: 0 };
   #panDif = { x: 0, y: 0, z: 0 };
-  #camPitchSpeed = 0;
-  #camYawSpeed = 0;
   #localRotateSpeed = { pitch: 0, roll: 0, yaw: 0 };
   #localRotateMovementSpeed = 0.00005;
   #localRotateTarget = { pitch: 0, roll: 0, yaw: 0 };
@@ -720,8 +720,8 @@ class Camera {
     if (this.isPanning || this.panReset) {
       // If user is actively moving
       if (this.isPanning) {
-        this.#camPitchSpeed = 0;
-        this.#camYawSpeed = 0;
+        this.camPitchSpeed = 0;
+        this.camYawSpeed = 0;
         this.#panDif.x = this.screenDragPoint[0] - this.mouseX;
         this.#panDif.y = this.screenDragPoint[1] - this.mouseY;
         this.#panDif.z = this.screenDragPoint[1] - this.mouseY;
@@ -857,8 +857,12 @@ class Camera {
         this.yDif = this.screenDragPoint[1] - this.mouseY;
         this.yawTarget = this.dragStartYaw + this.xDif * settingsManager.cameraMovementSpeed;
         this.pitchTarget = this.dragStartPitch + this.yDif * -settingsManager.cameraMovementSpeed;
-        this.#camPitchSpeed = Camera.normalizeAngle(this.camPitch - this.pitchTarget) * -settingsManager.cameraMovementSpeed;
-        this.#camYawSpeed = Camera.normalizeAngle(this.camYaw - this.yawTarget) * -settingsManager.cameraMovementSpeed;
+        this.camPitchSpeed = Camera.normalizeAngle(this.camPitch - this.pitchTarget) * -settingsManager.cameraMovementSpeed;
+        this.camYawSpeed = Camera.normalizeAngle(this.camYaw - this.yawTarget) * -settingsManager.cameraMovementSpeed;
+        this.camPitchAccel = this.camPitchSpeedLast - this.camPitchSpeed;
+        this.camYawAccel = this.camYawSpeedLast - this.camYawSpeed;
+        this.camPitchSpeedLast = this.camPitchSpeed * 1;
+        this.camYawSpeedLast = this.camYawSpeed * 1;
       } else {
         // This is how we handle a raycast that hit the earth to make it feel like you are grabbing onto the surface
         // of the earth instead of the screen
@@ -872,8 +876,8 @@ class Camera {
           // dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
           // pitchDif = dragPointLat - dragTargetLat;
           // yawDif = Camera.normalizeAngle(dragPointLon - dragTargetLon);
-          // this.#camPitchSpeed = pitchDif * settingsManager.cameraMovementSpeed;
-          // this.#camYawSpeed = yawDif * settingsManager.cameraMovementSpeed;
+          // this.camPitchSpeed = pitchDif * settingsManager.cameraMovementSpeed;
+          // this.camYawSpeed = yawDif * settingsManager.cameraMovementSpeed;
         */
       }
       this.camSnapMode = false;
@@ -883,31 +887,33 @@ class Camera {
       // It makes KeepTrack feel more like a game and less like a toolkit
       if (!settingsManager.isMobileModeEnabled) {
         // DESKTOP ONLY
-        this.#camPitchSpeed -= this.#camPitchSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor; // decay speeds when globe is "thrown"
-        this.#camYawSpeed -= this.#camYawSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor;
+        this.camPitchSpeed -= this.camPitchSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor; // decay speeds when globe is "thrown"
+        this.camYawSpeed -= this.camYawSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor;
       } else if (settingsManager.isMobileModeEnabled) {
         // MOBILE
-        this.#camPitchSpeed -= this.#camPitchSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor; // decay speeds when globe is "thrown"
-        this.#camYawSpeed -= this.#camYawSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor;
+        this.camPitchSpeed -= this.camPitchSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor; // decay speeds when globe is "thrown"
+        this.camYawSpeed -= this.camYawSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor;
       }
+      this.camPitchAccel *= 0.95;
+      this.camYawAccel *= 0.95;
     }
     if (this.ftsRotateReset) {
       if (this.cameraType.current !== this.cameraType.fixedToSat) {
         this.ftsRotateReset = false;
         this.#ftsPitch = 0;
-        this.#camPitchSpeed = 0;
+        this.camPitchSpeed = 0;
       }
 
-      this.#camPitchSpeed = settingsManager.cameraMovementSpeed * 0.2;
-      this.#camYawSpeed = settingsManager.cameraMovementSpeed * 0.2;
+      this.camPitchSpeed = settingsManager.cameraMovementSpeed * 0.2;
+      this.camYawSpeed = settingsManager.cameraMovementSpeed * 0.2;
 
       if (this.camPitch >= this.#ecPitch - 0.05 && this.camPitch <= this.#ecPitch + 0.05) {
         this.camPitch = this.#ecPitch;
-        this.#camPitchSpeed = 0;
+        this.camPitchSpeed = 0;
       }
       if (this.camYaw >= this.#ecYaw - 0.05 && this.camYaw <= this.#ecYaw + 0.01) {
         this.camYaw = this.#ecYaw;
-        this.#camYawSpeed = 0;
+        this.camYawSpeed = 0;
       }
 
       if (this.camYaw == this.#ecYaw && this.camPitch == this.#ecPitch) {
@@ -915,23 +921,23 @@ class Camera {
       }
 
       if (this.camPitch > this.#ecPitch) {
-        this.camPitch -= this.#camPitchSpeed * dt * settingsManager.cameraDecayFactor;
+        this.camPitch -= this.camPitchSpeed * dt * settingsManager.cameraDecayFactor;
       } else if (this.camPitch < this.#ecPitch) {
-        this.camPitch += this.#camPitchSpeed * dt * settingsManager.cameraDecayFactor;
+        this.camPitch += this.camPitchSpeed * dt * settingsManager.cameraDecayFactor;
       }
 
       if (this.camYaw > this.#ecYaw) {
-        this.camYaw -= this.#camYawSpeed * dt * settingsManager.cameraDecayFactor;
+        this.camYaw -= this.camYawSpeed * dt * settingsManager.cameraDecayFactor;
       } else if (this.camYaw < this.#ecYaw) {
-        this.camYaw += this.#camYawSpeed * dt * settingsManager.cameraDecayFactor;
+        this.camYaw += this.camYawSpeed * dt * settingsManager.cameraDecayFactor;
       }
     }
 
     this.#camRotateSpeed -= this.#camRotateSpeed * dt * settingsManager.cameraMovementSpeed;
 
     if (this.cameraType.current === this.cameraType.fps || this.cameraType.current === this.cameraType.satellite || this.cameraType.current === this.cameraType.astronomy) {
-      this.#fpsPitch -= 20 * this.#camPitchSpeed * dt;
-      this.#fpsYaw -= 20 * this.#camYawSpeed * dt;
+      this.#fpsPitch -= 20 * this.camPitchSpeed * dt;
+      this.#fpsYaw -= 20 * this.camYawSpeed * dt;
       this.#fpsRotate -= 20 * this.#camRotateSpeed * dt;
 
       // Prevent Over Rotation
@@ -942,8 +948,8 @@ class Camera {
       if (this.#fpsYaw > 360) this.#fpsYaw -= 360;
       if (this.#fpsYaw < 0) this.#fpsYaw += 360;
     } else {
-      this.camPitch += this.#camPitchSpeed * dt;
-      this.camYaw += this.#camYawSpeed * dt;
+      this.camPitch += this.camPitchSpeed * dt;
+      this.camYaw += this.camYawSpeed * dt;
       this.#fpsRotate += this.#camRotateSpeed * dt;
     }
 
@@ -1007,13 +1013,10 @@ class Camera {
   update(sat, sensorPos) {
     this.camMatrix = this.#camMatrixEmpty;
     {
-      glm.mat4.identity(this.camMatrix);
-
       /*
        * For FPS style movement rotate the camera and then translate it
        * for traditional view, move the camera and then rotate it
        */
-
       if (isNaN(this.camPitch) || isNaN(this.camYaw) || isNaN(this.#camPitchTarget) || isNaN(this.#camYawTarget) || isNaN(this.zoomLevel) || isNaN(this.zoomTarget)) {
         try {
           console.group('Camera Math Error');
@@ -1036,6 +1039,12 @@ class Camera {
         this.zoomTarget = 0.5;
       }
 
+      if (typeof sensorPos == 'undefined' && (this.cameraType.current == this.cameraType.planetarium || this.cameraType.current == this.cameraType.astronomy)) {
+        this.cameraType.current = this.cameraType.default;
+        console.warn('A sensor should be selected first if camera mode is allowed to be planetarium or astronmy.');
+      }
+
+      glm.mat4.identity(this.camMatrix);
       switch (this.cameraType.current) {
         case this.cameraType.default: // pivot around the earth with earth in the center
           glm.mat4.translate(this.camMatrix, this.camMatrix, [this.panCurrent.x, this.panCurrent.y, this.panCurrent.z]);
@@ -1124,7 +1133,7 @@ class Camera {
     }
   }
 
-  /* For RayCasting -- Not Used Yet */
+  /* For RayCasting */
   getCamPos() {
     let gCPr = this.getCamDist();
     let gCPz = gCPr * Math.sin(this.camPitch);

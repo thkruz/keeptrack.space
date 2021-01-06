@@ -25,73 +25,61 @@
 
 import 'jquery-ui-bundle';
 import 'materialize-css';
-import { Atmosphere, LineFactory, Moon, earth, sun } from '@app/js/sceneManager/sceneManager.js';
-import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satSet } from '@app/js/satSet.js';
+import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satSet } from '@app/js/satSet/satSet.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
-import { Dots } from './dots';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
-import { dlManager } from '@app/js/dlManager/dlManager.js';
-import { jQAlt } from '@app/js/jqalt/jqalt.js';
-import { meshManager } from '@app/modules/meshManager.js';
-import { mobile } from '@app/js/mobile.js';
-import { objectManager } from '@app/js/objectManager.js';
-import { orbitManager } from '@app/js/orbitManager.js';
-import { radarDataManager } from '@app/js/radarDataManager.js';
-import { satLinkManager } from '@app/modules/satLinkManager.js';
-import { satellite } from '@app/js/lookangles.js';
-import { searchBox } from '@app/js/search-box.js';
-import { selectSatManager } from '@app/js/selectSat.js';
-import { sensorManager } from '@app/modules/sensorManager.js';
-import { settingsManager } from '@app/js/settings.js';
+import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager.js';
+import { drawManager } from '@app/js/drawManager/drawManager.js';
+import { jQAlt } from '@app/js/lib/jqalt.js';
+import { objectManager } from '@app/js/objectManager/objectManager.js';
+import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
+import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
+import { satellite } from '@app/js/lib/lookangles.js';
+import { searchBox } from '@app/js/uiManager/search-box.js';
+import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { starManager } from '@app/js/starManager/starManager.js';
-import { timeManager } from '@app/js/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 jQAlt.docReady(async function initalizeKeepTrack() {
   timeManager.init();
   settingsManager.loadStr('dots');
-  await mobile.init();
+  uiManager.mobileManager.init();
   const cameraManager = new Camera();
   // We need to know if we are on a small screen before starting webgl
-  const gl = await dlManager.glInit(mobile);
-  const dotsManager = new Dots(gl);
+  const gl = await drawManager.glInit();
+  drawManager.loadScene();
+  const dotsManager = await drawManager.createDotsManager();
   satSet.init(gl, dotsManager, cameraManager);
-  objectManager.init(dotsManager);
+  objectManager.init(sensorManager);
   await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
-  selectSatManager.init(ColorScheme.group);
+  drawManager.selectSatManager.init(ColorScheme.group);
   await satSet.loadCatalog(); // Needs Object Manager and gl first
   const satCruncher = satSet.satCruncher;
 
   dotsManager.setupPickingBuffer(satSet.satData);
   satSet.setColorScheme(ColorScheme.default, true);
-  await earth.init(gl);
-  earth.loadHiRes();
-  earth.loadHiResNight();
-  meshManager.init(gl, earth);
-  let atmosphere = new Atmosphere(gl, earth, settingsManager);
-  await sun.init(gl, earth);
-  let moon = new Moon(gl, sun);
 
   const groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
   await orbitManager.init(gl, cameraManager, groupsManager);
   searchBox.init(satSet, groupsManager, orbitManager, dotsManager);
   const lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
-  satLinkManager.init(lineManager, satSet, sensorManager);
   starManager.init(lineManager, getIdFromStarName);
   uiManager.init(cameraManager, lineManager, starManager, groupsManager, satSet, orbitManager, groupsManager, ColorScheme);
   await satellite.initLookangles(satSet, satCruncher, sensorManager, groupsManager);
   dotsManager.updateSizeBuffer(satSet.satData);
   await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
   satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
-  satLinkManager.idToSatnum(satSet);
+  objectManager.satLinkManager.idToSatnum(satSet);
 
-  uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, earth, gl, uiManager, dlManager, dotsManager);
+  uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, uiManager, drawManager, dotsManager);
 
-  await dlManager.init(groupsManager, uiInput, moon, sun, searchBox, atmosphere, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, meshManager, earth, sensorManager, uiManager, lineManager, gl, dotsManager);
+  await drawManager.init(groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
 
   // Now that everything is loaded, start rendering to thg canvas
-  await dlManager.drawLoop();
+  await drawManager.drawLoop();
 
   // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
   uiManager.postStart();

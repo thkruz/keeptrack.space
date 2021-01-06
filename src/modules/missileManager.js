@@ -7,7 +7,7 @@ import { doSearch } from '@app/js/uiManager/uiManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { sensorManager } from '@app/modules/sensorManager.js';
 import { timeManager } from '@app/js/timeManager.js';
-import { updateOrbitBuffer } from '@app/js/orbitManager.js';
+import { updateOrbitBuffer } from '@app/js/orbitManager/orbitManager.js';
 
 var isResetMissilesLaunched = false;
 var missilesLaunched = 0;

@@ -44,7 +44,7 @@ import { mobileManager } from '@app/js/uiManager/mobileManager.js';
 import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { omManager } from '@app/js/uiManager/omManager.js';
-import { orbitManager } from '@app/js/orbitManager.js';
+import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 import { sMM } from '@app/js/sideMenuManager.js';
 import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';

@@ -35,7 +35,7 @@ import { LineFactory } from '@app/js/dlManager/sceneManager/sceneManager.js';
 import { dlManager } from '@app/js/dlManager/dlManager.js';
 import { jQAlt } from '@app/js/lib/jqalt.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
-import { orbitManager } from '@app/js/orbitManager.js';
+import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';

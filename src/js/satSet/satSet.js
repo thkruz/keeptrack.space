@@ -34,7 +34,7 @@ import { saveCsv, stringPad } from '@app/js/lib/helpers.js';
 import { jsTLEfile } from '@app/offline/tle.js';
 import { nextLaunchManager } from '@app/modules/nextLaunchManager.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
-import { orbitManager } from '@app/js/orbitManager.js';
+import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 import { satVmagManager } from '@app/modules/satVmagManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';

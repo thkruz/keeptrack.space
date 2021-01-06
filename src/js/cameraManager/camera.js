@@ -1013,13 +1013,10 @@ class Camera {
   update(sat, sensorPos) {
     this.camMatrix = this.#camMatrixEmpty;
     {
-      glm.mat4.identity(this.camMatrix);
-
       /*
        * For FPS style movement rotate the camera and then translate it
        * for traditional view, move the camera and then rotate it
        */
-
       if (isNaN(this.camPitch) || isNaN(this.camYaw) || isNaN(this.#camPitchTarget) || isNaN(this.#camYawTarget) || isNaN(this.zoomLevel) || isNaN(this.zoomTarget)) {
         try {
           console.group('Camera Math Error');
@@ -1042,6 +1039,12 @@ class Camera {
         this.zoomTarget = 0.5;
       }
 
+      if (typeof sensorPos == 'undefined' && (this.cameraType.current == this.cameraType.planetarium || this.cameraType.current == this.cameraType.astronomy)) {
+        this.cameraType.current = this.cameraType.default;
+        console.warn('A sensor should be selected first if camera mode is allowed to be planetarium or astronmy.');
+      }
+
+      glm.mat4.identity(this.camMatrix);
       switch (this.cameraType.current) {
         case this.cameraType.default: // pivot around the earth with earth in the center
           glm.mat4.translate(this.camMatrix, this.camMatrix, [this.panCurrent.x, this.panCurrent.y, this.panCurrent.z]);

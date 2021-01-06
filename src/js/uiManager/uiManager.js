@@ -3995,7 +3995,7 @@ uiManager.keyHandler = (evt) => {
         settingsManager.fieldOfView = 0.6;
         dlManager.glInit();
         if (objectManager.selectedSat !== -1) {
-          cameraManager.camZoomSnappedOnSat(true);
+          cameraManager.camZoomSnappedOnSat = true;
           curCam = cameraManager.cameraType.fixedToSat;
         } else {
           curCam = cameraManager.cameraType.default;

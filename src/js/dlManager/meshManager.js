@@ -250,6 +250,7 @@ meshManager.updatePosition = (pos) => {
   meshManager.draw = (pMatrix, camMatrix, tgtBuffer) => {
     // Meshes aren't finished loading
     if (!meshManager.loaded) return;
+    if (typeof meshManager.currentModel.id == 'undefined' || meshManager.currentModel.id == -1 || meshManager.currentModel.static) return;
 
     // Move the mesh to its location in world space
     mvMatrix = glm.mat4.create();
@@ -299,7 +300,13 @@ meshManager.updatePosition = (pos) => {
     meshManager.currentModel.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
   };
 
-  meshManager.update = (Camera, sat, timeManager) => {
+  meshManager.update = (Camera, cameraManager, sat, timeManager) => {
+    meshManager.currentModel.id = sat.id;
+    meshManager.currentModel.static = sat.static;
+
+    if (typeof meshManager.currentModel.id == 'undefined' || meshManager.currentModel.id == -1 || meshManager.currentModel.static) return;
+    if (settingsManager.modelsOnSatelliteViewOverride) return;
+
     // Try to reduce some jitter
     if (
       typeof meshManager.currentModel.position !== 'undefined' &&
@@ -454,6 +461,8 @@ meshManager.updatePosition = (pos) => {
   };
 
   meshManager.drawOcclusion = function (pMatrix, camMatrix, occlusionPrgm, tgtBuffer) {
+    if (typeof meshManager.currentModel.id == 'undefined' || meshManager.currentModel.id == -1 || meshManager.currentModel.static) return;
+
     // Move the mesh to its location in world space
     mvMatrix = glm.mat4.create();
     glm.mat4.identity(mvMatrix);
@@ -479,37 +488,5 @@ meshManager.updatePosition = (pos) => {
 
     occlusionPrgm.attrOff(occlusionPrgm);
   };
-
-  {
-    // var getShader = (gl, id) => {
-    //   var shaderScript = document.getElementById(id);
-    //   if (!shaderScript) {
-    //     return null;
-    //   }
-    //   var str = '';
-    //   var k = shaderScript.firstChild;
-    //   while (k) {
-    //     if (k.nodeType == 3) {
-    //       str += k.textContent;
-    //     }
-    //     k = k.nextSibling;
-    //   }
-    //   var shader;
-    //   if (shaderScript.type == 'x-shader/x-fragment') {
-    //     shader = gl.createShader(gl.FRAGMENT_SHADER);
-    //   } else if (shaderScript.type == 'x-shader/x-vertex') {
-    //     shader = gl.createShader(gl.VERTEX_SHADER);
-    //   } else {
-    //     return null;
-    //   }
-    //   gl.shaderSource(shader, str);
-    //   gl.compileShader(shader);
-    //   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    //     // alert(gl.getShaderInfoLog(shader));
-    //     return null;
-    //   }
-    //   return shader;
-    // };
-  }
 })();
 export { meshManager };

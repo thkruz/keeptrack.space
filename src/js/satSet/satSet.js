@@ -391,7 +391,8 @@ satSet.loadCatalog = async () => {
     settingsManager.tleSource = `${settingsManager.installDirectory}tle/TLE.json`;
   }
   if (settingsManager.offline) {
-    satSet.parseCatalog(jsTLEfile);
+    await import('@app/offline/tle.js').then(() => satSet.parseCatalog(window.jsTLEfile));
+    return satData;
     // jsTLEfile = null;
   } else {
     try {
@@ -416,15 +417,10 @@ satSet.loadCatalog = async () => {
               // if the .json loads then use it
               return satSet.parseCatalog(resp);
             })
-            .fail(function () {
+            .fail(async function () {
               // Try the js file without caching
-              $.getScript(
-                `${settingsManager.installDirectory}offline/tle.js`,
-                function () {
-                  return satSet.parseCatalog(jsTLEfile);
-                },
-                true
-              );
+              await import('@app/offline/tle.js').then(() => satSet.parseCatalog(window.jsTLEfile));
+              return satData;
             });
         });
     } catch (e) {

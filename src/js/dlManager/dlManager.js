@@ -195,8 +195,6 @@ dlManager.drawLoop = (preciseDt) => {
   dlManager.resizeCanvas();
   dlManager.clearFrameBuffers();
 
-  dlManager.orbitsAbove();
-
   // Sun, Moon, and Atmosphere
   dlManager.drawOptionalScenery();
 
@@ -221,7 +219,10 @@ dlManager.drawLoop = (preciseDt) => {
   }
 
   // Draw Satellite Model if a satellite is selected and meshManager is loaded
-  dlManager.drawSatelliteModel();
+  // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
+  if (!settingsManager.modelsOnSatelliteViewOverride) {
+    meshManager.draw(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
+  }
 
   // Update orbit currently being hovered over
   // Only if last frame was 50 FPS or more readpixels used to determine which satellite is hovered
@@ -274,29 +275,9 @@ dlManager.updateLoop = () => {
 
   satSet.sunECI = sceneManager.sun.realXyz;
 
+  dlManager.orbitsAbove(); //dlManager.sensorPos is set here for the Camera Manager
+
   cameraManager.update(dlManager.sat, dlManager.sensorPos);
-};
-
-dlManager.drawSatelliteModel = () => {
-  if (objectManager.selectedSat !== -1 && typeof meshManager != 'undefined' && meshManager.isReady) {
-    // If 3D Models Available, then draw them on the screen
-    if (typeof meshManager !== 'undefined' && (settingsManager.modelsOnSatelliteViewOverride || cameraManager.cameraType.current !== cameraManager.cameraType.satellite)) {
-      if (!dlManager.sat.static) {
-        meshManager.draw(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
-      }
-    }
-  }
-};
-
-dlManager.updateSatelliteModel = () => {
-  if (objectManager.selectedSat !== -1 && typeof meshManager != 'undefined' && meshManager.isReady) {
-    // If 3D Models Available, then draw them on the screen
-    if (typeof meshManager !== 'undefined' && (settingsManager.modelsOnSatelliteViewOverride || cameraManager.cameraType.current !== cameraManager.cameraType.satellite)) {
-      if (!dlManager.sat.static) {
-        meshManager.update(Camera, dlManager.sat, timeManager);
-      }
-    }
-  }
 };
 
 dlManager.drawOptionalScenery = () => {
@@ -308,7 +289,8 @@ dlManager.drawOptionalScenery = () => {
 
       // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
       sceneManager.earth.drawOcclusion(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
-      if (objectManager.selectedSat !== -1) {
+      // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
+      if (!settingsManager.modelsOnSatelliteViewOverride) {
         meshManager.drawOcclusion(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
       }
       // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
@@ -329,6 +311,8 @@ dlManager.drawOptionalScenery = () => {
 
       // Draw the moon
       sceneManager.moon.draw(dlManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
+
+      sceneManager.atmosphere.draw(dlManager.pMatrix, cameraManager);
     }
   }
 };
@@ -345,7 +329,10 @@ dlManager.satCalculate = () => {
         settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
       }
 
-      dlManager.updateSatelliteModel();
+      // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
+      if (!settingsManager.modelsOnSatelliteViewOverride) {
+        meshManager.update(Camera, cameraManager, dlManager.sat, timeManager);
+      }
     }
     if (dlManager.sat.missile) orbitManager.setSelectOrbit(dlManager.sat.satId);
   }

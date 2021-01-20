@@ -708,7 +708,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
         sMM.watchlistInViewList.splice(i, 1);
       }
     }
-    uiManager.updateWatchlist();
+    sMM.updateWatchlist();
     if (sMM.watchlistList.length <= 0) {
       uiManager.doSearch('');
       satSet.setColorScheme(ColorScheme.default, true);
@@ -731,7 +731,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
     if (!duplicate) {
       sMM.watchlistList.push(satId);
       sMM.watchlistInViewList.push(false);
-      uiManager.updateWatchlist();
+      sMM.updateWatchlist();
     }
     if (sensorManager.checkSensorSelected()) {
       $('#menu-info-overlay').removeClass('bmenu-item-disabled');
@@ -749,7 +749,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
     if (!duplicate) {
       sMM.watchlistList.push(satId);
       sMM.watchlistInViewList.push(false);
-      uiManager.updateWatchlist();
+      sMM.updateWatchlist();
     }
     if (sensorManager.checkSensorSelected()) {
       $('#menu-info-overlay').removeClass('bmenu-item-disabled');
@@ -798,7 +798,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
         }
       }
       sMM.watchlistList = newWatchlist;
-      uiManager.updateWatchlist();
+      sMM.updateWatchlist();
       if (sensorManager.checkSensorSelected()) {
         $('#menu-info-overlay').removeClass('bmenu-item-disabled');
       }
@@ -1500,7 +1500,62 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
     } // If a row was selected
   };
 
-  sMM.hideSideMenus = function () {
+  sMM.updateWatchlist = (updateWatchlistList, updateWatchlistInViewList) => {
+    if (typeof updateWatchlistList !== 'undefined') {
+      sMM.watchlistList = updateWatchlistList;
+    }
+    if (typeof updateWatchlistInViewList !== 'undefined') {
+      sMM.watchlistInViewList = updateWatchlistInViewList;
+    }
+
+    if (!sMM.watchlistList) return;
+    settingsManager.isThemesNeeded = true;
+    if (sMM.isWatchlistChanged == null) {
+      sMM.isWatchlistChanged = false;
+    } else {
+      sMM.isWatchlistChanged = true;
+    }
+    var watchlistString = '';
+    var watchlistListHTML = '';
+    var sat;
+    for (let i = 0; i < sMM.watchlistList.length; i++) {
+      sat = satSet.getSatExtraOnly(sMM.watchlistList[i]);
+      if (sat == null) {
+        sMM.watchlistList.splice(i, 1);
+        continue;
+      }
+      watchlistListHTML +=
+        '<div class="row">' +
+        '<div class="col s3 m3 l3">' +
+        sat.SCC_NUM +
+        '</div>' +
+        '<div class="col s7 m7 l7">' +
+        sat.ON +
+        '</div>' +
+        '<div class="col s2 m2 l2 center-align remove-icon"><img class="watchlist-remove" data-sat-id="' +
+        sat.id +
+        '" src="img/remove.png"></img></div>' +
+        '</div>';
+    }
+    $('#watchlist-list').html(watchlistListHTML);
+    for (let i = 0; i < sMM.watchlistList.length; i++) {
+      // No duplicates
+      watchlistString += satSet.getSatExtraOnly(sMM.watchlistList[i]).SCC_NUM;
+      if (i !== sMM.watchlistList.length - 1) watchlistString += ',';
+    }
+    uiManager.doSearch(watchlistString, true);
+    satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+
+    var saveWatchlist = [];
+    for (let i = 0; i < sMM.watchlistList.length; i++) {
+      sat = satSet.getSatExtraOnly(sMM.watchlistList[i]);
+      saveWatchlist[i] = sat.SCC_NUM;
+    }
+    var variable = JSON.stringify(saveWatchlist);
+    localStorage.setItem('watchlistList', variable);
+  };
+
+  sMM.hideSideMenus = () => {
     // Close any open colorboxes
     $.colorbox.close();
 

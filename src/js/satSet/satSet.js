@@ -281,7 +281,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
                 return;
               }
             }
-            uiManager.updateWatchlist(newWatchlist, watchlistInViewList);
+            sMM.updateWatchlist(newWatchlist, watchlistInViewList);
           }
         })();
       }

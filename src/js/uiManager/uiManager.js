@@ -31,7 +31,6 @@ import '@app/js/lib/external/colorPick.js';
 import 'materialize-css';
 import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
 import { saveAs, saveCsv, stringPad } from '@app/js/lib/helpers.js';
-import { Camera } from '@app/js/cameraManager/camera.js';
 import { CanvasRecorder } from '@app/js/lib/external/CanvasRecorder.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { adviceList } from '@app/js/uiManager/advice-module.js';
@@ -52,15 +51,9 @@ import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 import { uiInput } from './ui-input.js';
 import { uiLimited } from './ui-limited.js';
-let M = window.M;
+const M = window.M;
 
 // Public Variables
-var recorder;
-try {
-  recorder = new CanvasRecorder(document.getElementById('canvas'));
-} catch (e) {
-  console.log(e);
-}
 const mapImageDOM = $('#map-image');
 const mapMenuDOM = $('#map-menu');
 const bodyDOM = $('#bodyDOM');
@@ -71,6 +64,18 @@ const rightBtnCreateMenuDOM = $('#create-rmb-menu');
 const rightBtnDrawMenuDOM = $('#draw-rmb-menu');
 const rightBtnColorsMenuDOM = $('#colors-rmb-menu');
 const rightBtnEarthMenuDOM = $('#earth-rmb-menu');
+
+let isPlanetariumView = false;
+let isAstronomyView = false;
+let isVideoRecording = false;
+let nextPassEarliestTime;
+var recorder;
+
+try {
+  recorder = new CanvasRecorder(document.getElementById('canvas'));
+} catch (e) {
+  console.log(e);
+}
 
 $.ajaxSetup({
   cache: false,
@@ -83,40 +88,14 @@ var uiManager = {};
 uiManager.searchBox = searchBox;
 uiManager.adviceList = adviceList;
 uiManager.mobileManager = mobileManager;
-uiManager.isAnalysisMenuOpen = false;
-
 uiManager.isCurrentlyTyping = false;
 
 var lastBoxUpdateTime = 0;
 var lastOverlayUpdateTime = 0;
-// var lastSatUpdateTime = 0;
-
-var isSensorListMenuOpen = false;
-var isInfoOverlayMenuOpen = false;
-var isTwitterMenuOpen = false;
-var isFindByLooksMenuOpen = false;
-var isSensorInfoMenuOpen = false;
-var isWatchlistMenuOpen = false;
-var isLaunchMenuOpen = false;
-var isAboutSelected = false;
-var isColorSchemeMenuOpen = false;
-var isConstellationsMenuOpen = false;
-var isCountriesMenuOpen = false;
-var isExternalMenuOpen = false;
-var isSocratesMenuOpen = false;
-var isNextLaunchMenuOpen = false;
-var issatChngMenuOpen = false;
-var isSettingsMenuOpen = false;
-var isObfitMenuOpen = false;
-var isPlanetariumView = false;
-var isAstronomyView = false;
-// var isSatView = false;
-var isVideoRecording = false;
 
 var watchlistList = [];
 var watchlistInViewList = [];
 var nextPassArray = [];
-var nextPassEarliestTime;
 var isWatchlistChanged = null;
 
 /**
@@ -194,7 +173,7 @@ $(document).ready(function () {
     // These run during the draw loop
     drawManager.setDrawLoopCallback(function () {
       // _showSatTest();
-      _updateNextPassOverlay();
+      uiManager.updateNextPassOverlay();
       _checkWatchlist();
       _updateSelectBox();
       _mobileScreenControls();
@@ -251,7 +230,7 @@ $(document).ready(function () {
       .on('change.dp', function () {
         // This code gets called when the done button is pressed or the time sliders are closed
         $('#datetime-input').fadeOut();
-        _updateNextPassOverlay(true);
+        uiManager.updateNextPassOverlay(true);
         settingsManager.isEditTime = false;
       });
 
@@ -264,8 +243,8 @@ $(document).ready(function () {
       return false;
     };
     $(document).on('cbox_closed', function () {
-      if (isLaunchMenuOpen) {
-        isLaunchMenuOpen = false;
+      if (sMM.isLaunchMenuOpen) {
+        sMM.isLaunchMenuOpen = false;
         $('#menu-launches').removeClass('bmenu-item-selected');
       }
     });
@@ -468,7 +447,7 @@ $(document).ready(function () {
     });
 
     $('#bottom-icons').on('click', '.bmenu-item', function (evt) {
-      _bottomIconPress(evt);
+      uiManager.bottomIconPress(evt);
     });
 
     $('#bottom-menu').on('click', '.FOV-object', function (evt) {
@@ -1148,7 +1127,7 @@ $(document).ready(function () {
       // Reset last update times when going backwards in time
       lastOverlayUpdateTime = timeManager.now * 1 - 7000;
       lastBoxUpdateTime = timeManager.now;
-      _updateNextPassOverlay(true);
+      uiManager.updateNextPassOverlay(true);
 
       satSet.findRadarDataFirstDataTime();
 
@@ -1253,9 +1232,9 @@ $(document).ready(function () {
       ColorScheme.reloadColors();
 
       if (isSNPChecked) {
-        sMM.isShowNextPass(true);
+        sMM.isShowNextPass = true;
       } else {
-        sMM.isShowNextPass(false);
+        sMM.isShowNextPass = false;
       }
 
       if (isRiseSetChecked) {
@@ -2463,14 +2442,14 @@ $(document).ready(function () {
       } else {
         cameraManager.changeZoom('leo');
       }
-      cameraManager.camSnap(Camera.latToPitch(lat), Camera.longToYaw(lon, timeManager.selectedDate));
+      cameraManager.camSnap(cameraManager.latToPitch(lat), cameraManager.longToYaw(lon, timeManager.selectedDate));
 
       e.preventDefault();
     });
 
     $('#dops-form').on('submit', function (e) {
       uiManager.hideSideMenus();
-      sMM.isDOPMenuOpen(true);
+      sMM.isDOPMenuOpen = true;
       $('#loading-screen').fadeIn(1000, function () {
         var lat = $('#dops-lat').val() * 1;
         var lon = $('#dops-lon').val() * 1;
@@ -2713,20 +2692,17 @@ $(document).ready(function () {
   });
 
   uiManager.bottomIconPress = (evt) => {
-    _bottomIconPress(evt);
-  };
-  var _bottomIconPress = (evt) => {
     switch (evt.currentTarget.id) {
       case 'menu-sensor-list': // No Keyboard Commands
-        if (isSensorListMenuOpen) {
+        if (sMM.isSensorListMenuOpen) {
           uiManager.hideSideMenus();
-          isSensorListMenuOpen = false;
+          sMM.isSensorListMenuOpen = false;
           break;
         } else {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
           $('#sensor-list-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isSensorListMenuOpen = true;
+          sMM.isSensorListMenuOpen = true;
           $('#menu-sensor-list').addClass('bmenu-item-selected');
           break;
         }
@@ -2741,8 +2717,8 @@ $(document).ready(function () {
           }
           break;
         }
-        if (isInfoOverlayMenuOpen) {
-          isInfoOverlayMenuOpen = false;
+        if (sMM.isInfoOverlayMenuOpen) {
+          sMM.isInfoOverlayMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
@@ -2764,16 +2740,16 @@ $(document).ready(function () {
               });
               nextPassEarliestTime = timeManager.now;
               lastOverlayUpdateTime = 0;
-              _updateNextPassOverlay(true);
+              uiManager.updateNextPassOverlay(true);
               $('#loading-screen').fadeOut('slow');
               isWatchlistChanged = false;
             });
           } else {
-            _updateNextPassOverlay(true);
+            uiManager.updateNextPassOverlay(true);
           }
           $('#info-overlay-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           $('#menu-info-overlay').addClass('bmenu-item-selected');
-          isInfoOverlayMenuOpen = true;
+          sMM.isInfoOverlayMenuOpen = true;
           break;
         }
       case 'menu-sensor-info': // No Keyboard Commands
@@ -2788,16 +2764,16 @@ $(document).ready(function () {
           }
           break;
         }
-        if (isSensorInfoMenuOpen) {
+        if (sMM.isSensorInfoMenuOpen) {
           uiManager.hideSideMenus();
-          isSensorInfoMenuOpen = false;
+          sMM.isSensorInfoMenuOpen = false;
           break;
         } else {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
           uiManager.getsensorinfo();
           $('#sensor-info-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isSensorInfoMenuOpen = true;
+          sMM.isSensorInfoMenuOpen = true;
           $('#menu-sensor-info').addClass('bmenu-item-selected');
           break;
         }
@@ -2832,10 +2808,6 @@ $(document).ready(function () {
           break;
         }
       case 'menu-dops': // S
-        // if (!$('#menu-dops:animated').length) {
-        //     $('#menu-dops').effect('shake', {distance: 10});
-        // }
-        // break;
         if (sMM.isDOPMenuOpen()) {
           sMM.isDOPMenuOpen(false);
           uiManager.hideSideMenus();
@@ -2857,8 +2829,8 @@ $(document).ready(function () {
         }
         break;
       case 'menu-watchlist': // S
-        if (isWatchlistMenuOpen) {
-          isWatchlistMenuOpen = false;
+        if (sMM.isWatchlistMenuOpen) {
+          sMM.isWatchlistMenuOpen = false;
           $('#menu-watchlist').removeClass('bmenu-item-selected');
           // $('#search-holder').hide();
           uiManager.hideSideMenus();
@@ -2869,19 +2841,19 @@ $(document).ready(function () {
           $('#watchlist-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           // uiManager.searchToggle(true);
           uiManager.updateWatchlist();
-          isWatchlistMenuOpen = true;
+          sMM.isWatchlistMenuOpen = true;
           $('#menu-watchlist').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-analysis':
-        if (uiManager.isAnalysisMenuOpen) {
-          uiManager.isAnalysisMenuOpen = false;
+        if (sMM.isAnalysisMenuOpen) {
+          sMM.isAnalysisMenuOpen = false;
           $('#menu-analysis').removeClass('bmenu-item-selected');
           uiManager.hideSideMenus();
           break;
         } else {
           uiManager.hideSideMenus();
-          uiManager.isAnalysisMenuOpen = true;
+          sMM.isAnalysisMenuOpen = true;
           if (objectManager.selectedSat != -1) {
             let sat = satSet.getSat(objectManager.selectedSat);
             $('#anal-sat').val(sat.SCC_NUM);
@@ -2929,8 +2901,8 @@ $(document).ready(function () {
           break;
         }
       case 'menu-external':
-        if (isExternalMenuOpen) {
-          isExternalMenuOpen = false;
+        if (sMM.isExternalMenuOpen) {
+          sMM.isExternalMenuOpen = false;
           $('#menu-external').removeClass('bmenu-item-selected');
           uiManager.hideSideMenus();
           break;
@@ -2938,7 +2910,7 @@ $(document).ready(function () {
           uiManager.hideSideMenus();
           $('#external-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           uiManager.updateWatchlist();
-          isExternalMenuOpen = true;
+          sMM.isExternalMenuOpen = true;
           $('#menu-external').addClass('bmenu-item-selected');
           break;
         }
@@ -2973,21 +2945,21 @@ $(document).ready(function () {
           break;
         }
       case 'menu-find-sat': // F
-        if (isFindByLooksMenuOpen) {
-          isFindByLooksMenuOpen = false;
+        if (sMM.isFindByLooksMenuOpen) {
+          sMM.isFindByLooksMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
           $('#findByLooks-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isFindByLooksMenuOpen = true;
+          sMM.isFindByLooksMenuOpen = true;
           $('#menu-find-sat').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-twitter': // T
-        if (isTwitterMenuOpen) {
-          isTwitterMenuOpen = false;
+        if (sMM.isTwitterMenuOpen) {
+          sMM.isTwitterMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
@@ -2999,17 +2971,17 @@ $(document).ready(function () {
             );
           }
           $('#twitter-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isTwitterMenuOpen = true;
+          sMM.isTwitterMenuOpen = true;
           $('#menu-twitter').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-map': // W
-        if (settingsManager.isMapMenuOpen) {
-          settingsManager.isMapMenuOpen = false;
+        if (sMM.isMapMenuOpen) {
+          sMM.isMapMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         }
-        if (!settingsManager.isMapMenuOpen) {
+        if (!sMM.isMapMenuOpen) {
           if (objectManager.selectedSat === -1) {
             // No Satellite Selected
             adviceList.mapDisabled();
@@ -3024,7 +2996,7 @@ $(document).ready(function () {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
           $('#map-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          settingsManager.isMapMenuOpen = true;
+          sMM.isMapMenuOpen = true;
           uiManager.updateMap();
           var satData = satSet.getSatExtraOnly(objectManager.selectedSat);
           $('#map-sat').tooltip({
@@ -3037,8 +3009,8 @@ $(document).ready(function () {
         }
         break;
       case 'menu-launches': // L
-        if (isLaunchMenuOpen) {
-          isLaunchMenuOpen = false;
+        if (sMM.isLaunchMenuOpen) {
+          sMM.isLaunchMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
@@ -3067,79 +3039,79 @@ $(document).ready(function () {
               closeButton: false,
             });
           }
-          isLaunchMenuOpen = true;
+          sMM.isLaunchMenuOpen = true;
           $('#menu-launches').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-about': // No Keyboard Shortcut
-        if (isAboutSelected) {
-          isAboutSelected = false;
+        if (sMM.isAboutSelected) {
+          sMM.isAboutSelected = false;
           uiManager.hideSideMenus();
           break;
         } else {
           uiManager.hideSideMenus();
           $('#about-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isAboutSelected = true;
+          sMM.isAboutSelected = true;
           $('#menu-about').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-satellite-collision': // No Keyboard Shortcut
-        if (isSocratesMenuOpen) {
-          isSocratesMenuOpen = false;
+        if (sMM.isSocratesMenuOpen) {
+          sMM.isSocratesMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
           $('#socrates-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isSocratesMenuOpen = true;
+          sMM.isSocratesMenuOpen = true;
           _socrates(-1);
           $('#menu-satellite-collision').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-satChng': // No Keyboard Shortcut
-        if (issatChngMenuOpen) {
-          issatChngMenuOpen = false;
+        if (sMM.issatChngMenuOpen) {
+          sMM.issatChngMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
           $('#satChng-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          issatChngMenuOpen = true;
+          sMM.issatChngMenuOpen = true;
           uiManager.satChng(-1);
           $('#menu-satChng').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-obfit': // T
-        if (isObfitMenuOpen) {
-          isObfitMenuOpen = false;
+        if (sMM.isObfitMenuOpen) {
+          sMM.isObfitMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
           $('#obfit-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isObfitMenuOpen = true;
+          sMM.isObfitMenuOpen = true;
           $('#menu-obfit').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-settings': // T
-        if (isSettingsMenuOpen) {
-          isSettingsMenuOpen = false;
+        if (sMM.isSettingsMenuOpen) {
+          sMM.isSettingsMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
           $('#settings-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isSettingsMenuOpen = true;
+          sMM.isSettingsMenuOpen = true;
           $('#menu-settings').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-editSat':
-        if (sMM.isEditSatMenuOpen()) {
-          sMM.isEditSatMenuOpen(false);
+        if (sMM.isEditSatMenuOpen) {
+          sMM.isEditSatMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
@@ -3148,7 +3120,7 @@ $(document).ready(function () {
             uiManager.hideSideMenus();
             $('#editSat-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             $('#menu-editSat').addClass('bmenu-item-selected');
-            sMM.isEditSatMenuOpen(true);
+            sMM.isEditSatMenuOpen = true;
 
             let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
             $('#es-scc').val(sat.SCC_NUM);
@@ -3193,8 +3165,8 @@ $(document).ready(function () {
         }
         break;
       case 'menu-newLaunch':
-        if (sMM.isNewLaunchMenuOpen()) {
-          sMM.isNewLaunchMenuOpen(false);
+        if (sMM.isNewLaunchMenuOpen) {
+          sMM.isNewLaunchMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
@@ -3203,7 +3175,7 @@ $(document).ready(function () {
             uiManager.hideSideMenus();
             $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             $('#menu-newLaunch').addClass('bmenu-item-selected');
-            sMM.isNewLaunchMenuOpen(true);
+            sMM.isNewLaunchMenuOpen = true;
 
             let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
             $('#nl-scc').val(sat.SCC_NUM);
@@ -3219,8 +3191,8 @@ $(document).ready(function () {
           break;
         }
       case 'menu-breakup':
-        if (sMM.isBreakupMenuOpen()) {
-          sMM.isBreakupMenuOpen(false);
+        if (sMM.isBreakupMenuOpen) {
+          sMM.isBreakupMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
@@ -3229,7 +3201,7 @@ $(document).ready(function () {
             uiManager.hideSideMenus();
             $('#breakup-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             $('#menu-breakup').addClass('bmenu-item-selected');
-            sMM.isBreakupMenuOpen(true);
+            sMM.isBreakupMenuOpen = true;
 
             let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
             $('#hc-scc').val(sat.SCC_NUM);
@@ -3424,54 +3396,54 @@ $(document).ready(function () {
         uiManager.saveHiResPhoto('4k');
         break;
       case 'menu-color-scheme': // No Keyboard Commands
-        if (isColorSchemeMenuOpen) {
+        if (sMM.isColorSchemeMenuOpen) {
           uiManager.hideSideMenus();
-          isColorSchemeMenuOpen = false;
+          sMM.isColorSchemeMenuOpen = false;
           break;
         } else {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
           $('#color-scheme-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isColorSchemeMenuOpen = true;
+          sMM.isColorSchemeMenuOpen = true;
           $('#menu-color-scheme').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-constellations': // No Keyboard Commands
-        if (isConstellationsMenuOpen) {
+        if (sMM.isConstellationsMenuOpen) {
           uiManager.hideSideMenus();
-          isConstellationsMenuOpen = false;
+          sMM.isConstellationsMenuOpen = false;
           break;
         } else {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
           $('#constellations-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isConstellationsMenuOpen = true;
+          sMM.isConstellationsMenuOpen = true;
           $('#menu-constellations').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-countries': // No Keyboard Commands
-        if (isCountriesMenuOpen) {
+        if (sMM.isCountriesMenuOpen) {
           uiManager.hideSideMenus();
-          isCountriesMenuOpen = false;
+          sMM.isCountriesMenuOpen = false;
           break;
         } else {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
           $('#countries-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isCountriesMenuOpen = true;
+          sMM.isCountriesMenuOpen = true;
           $('#menu-countries').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-nextLaunch': // No Keyboard Commands
-        if (isNextLaunchMenuOpen) {
+        if (sMM.isNextLaunchMenuOpen) {
           uiManager.hideSideMenus();
-          isNextLaunchMenuOpen = false;
+          sMM.isNextLaunchMenuOpen = false;
           break;
         } else {
           uiManager.hideSideMenus();
           satSet.nextLaunchManager.showTable();
           $('#nextLaunch-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isNextLaunchMenuOpen = true;
+          sMM.isNextLaunchMenuOpen = true;
           $('#menu-nextLaunch').addClass('bmenu-item-selected');
           break;
         }
@@ -3690,98 +3662,7 @@ $(document).ready(function () {
     }
   });
 
-  uiManager.hideSideMenus = function () {
-    // Close any open colorboxes
-    $.colorbox.close();
-
-    // Hide all side menus
-    $('#membership-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#sensor-list-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#info-overlay-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#sensor-info-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#watchlist-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#dops-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#findByLooks-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#twitter-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#map-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#socrates-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#satChng-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#nextLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#obfit-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#settings-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#editSat-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#breakup-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#missile-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#external-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#analysis-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#color-scheme-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#countries-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#constellations-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#about-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-
-    // Remove red color from all menu icons
-    $('#menu-sensor-list').removeClass('bmenu-item-selected');
-    $('#menu-info-overlay').removeClass('bmenu-item-selected');
-    $('#menu-sensor-info').removeClass('bmenu-item-selected');
-    $('#menu-watchlist').removeClass('bmenu-item-selected');
-    $('#menu-lookangles').removeClass('bmenu-item-selected');
-    $('#menu-dops').removeClass('bmenu-item-selected');
-    $('#menu-lookanglesmultisite').removeClass('bmenu-item-selected');
-    $('#menu-launches').removeClass('bmenu-item-selected');
-    $('#menu-find-sat').removeClass('bmenu-item-selected');
-    $('#menu-twitter').removeClass('bmenu-item-selected');
-    $('#menu-map').removeClass('bmenu-item-selected');
-    $('#menu-satellite-collision').removeClass('bmenu-item-selected');
-    $('#menu-satChng').removeClass('bmenu-item-selected');
-    $('#menu-settings').removeClass('bmenu-item-selected');
-    $('#menu-editSat').removeClass('bmenu-item-selected');
-    $('#menu-newLaunch').removeClass('bmenu-item-selected');
-    $('#menu-nextLaunch').removeClass('bmenu-item-selected');
-    $('#menu-breakup').removeClass('bmenu-item-selected');
-    $('#menu-missile').removeClass('bmenu-item-selected');
-    $('#menu-external').removeClass('bmenu-item-selected');
-    $('#menu-analysis').removeClass('bmenu-item-selected');
-    $('#menu-customSensor').removeClass('bmenu-item-selected');
-    $('#menu-color-scheme').removeClass('bmenu-item-selected');
-    $('#menu-countries').removeClass('bmenu-item-selected');
-    $('#menu-constellations').removeClass('bmenu-item-selected');
-    $('#menu-obfit').removeClass('bmenu-item-selected');
-    $('#menu-about').removeClass('bmenu-item-selected');
-
-    // Unflag all open menu variables
-    uiManager.isMembershipMenuOpen = false;
-    isSensorListMenuOpen = false;
-    isInfoOverlayMenuOpen = false;
-    isSensorInfoMenuOpen = false;
-    isWatchlistMenuOpen = false;
-    isLaunchMenuOpen = false;
-    isTwitterMenuOpen = false;
-    isFindByLooksMenuOpen = false;
-    settingsManager.isMapMenuOpen = false;
-    sMM.isLookanglesMenuOpen(false);
-    sMM.isDOPMenuOpen(false);
-    sMM.isLookanglesMultiSiteMenuOpen(false);
-    isSocratesMenuOpen = false;
-    isNextLaunchMenuOpen = false;
-    issatChngMenuOpen = false;
-    isSettingsMenuOpen = false;
-    isObfitMenuOpen = false;
-    sMM.isEditSatMenuOpen(false);
-    sMM.isNewLaunchMenuOpen(false);
-    sMM.isBreakupMenuOpen(false);
-    sMM.isMissileMenuOpen(false);
-    sMM.isCustomSensorMenuOpen = false;
-    isColorSchemeMenuOpen = false;
-    sMM.isAnalysisMenuOpen(false);
-    isExternalMenuOpen = false;
-    isConstellationsMenuOpen = false;
-    isCountriesMenuOpen = false;
-    isAboutSelected = false;
-  };
+  uiManager.hideSideMenus = () => sMM.hideSideMenus();
 
   $('#fullscreen-icon').on('click', function () {
     mobileManager.fullscreenToggle();
@@ -4183,8 +4064,8 @@ var infoOverlayDOM = [];
 // }
 // };
 
-var _updateNextPassOverlay = (isForceUpdate) => {
-  if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
+uiManager.updateNextPassOverlay = (isForceUpdate) => {
+  if (nextPassArray.length <= 0 && !sMM.isInfoOverlayMenuOpen) return;
 
   // FIXME This should auto update the overlay when the time changes outside the original search window
   // Update once every 10 seconds
@@ -4277,7 +4158,7 @@ var _updateSelectBox = () => {
     var jday = timeManager.getDayOfYear(timeManager.propTimeVar);
     $('#jday').html(jday);
 
-    if (settingsManager.isMapMenuOpen && timeManager.now > settingsManager.lastMapUpdateTime + 30000) {
+    if (sMM.isMapMenuOpen && timeManager.now > settingsManager.lastMapUpdateTime + 30000) {
       uiManager.updateMap();
       settingsManager.lastMapUpdateTime = timeManager.now;
     }
@@ -4583,7 +4464,7 @@ uiManager.useCurrentGeolocationAsSensor = function () {
       } else {
         cameraManager.changeZoom('leo');
       }
-      cameraManager.camSnap(Camera.latToPitch(lat), Camera.longToYaw(lon, timeManager.selectedDate));
+      cameraManager.camSnap(cameraManager.latToPitch(lat), cameraManager.longToYaw(lon, timeManager.selectedDate));
     });
   }
 };
@@ -5392,7 +5273,7 @@ uiManager.panToStar = function (c) {
   // ======================================================
   // Need to calculate the time to get the right RA offset
   // ======================================================
-  cameraManager.camSnap(Camera.latToPitch(sat.dec) * -1, Camera.longToYaw(sat.ra * DEG2RAD, timeManager.selectedDate));
+  cameraManager.camSnap(cameraManager.latToPitch(sat.dec) * -1, cameraManager.longToYaw(sat.ra * DEG2RAD, timeManager.selectedDate));
   setTimeout(function () {
     // console.log(`pitch ${camPitch * RAD2DEG} -- yaw ${camYaw * RAD2DEG}`);
   }, 2000);
@@ -5400,7 +5281,7 @@ uiManager.panToStar = function (c) {
 
 uiManager.updateMap = function () {
   if (objectManager.selectedSat === -1) return;
-  if (!settingsManager.isMapMenuOpen) return;
+  if (!sMM.isMapMenuOpen) return;
   var sat = satSet.getSat(objectManager.selectedSat);
   var map;
   sat.getTEARR();

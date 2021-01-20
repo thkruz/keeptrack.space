@@ -225,7 +225,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
       satSet.satSensorMarkerArray = m.data.sensorMarkerArray;
     }
 
-    if (settingsManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
+    if (sMM.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
       satCrunchNow = Date.now();
       if (satCrunchNow > settingsManager.lastMapUpdateTime + 30000) {
         uiManager.updateMap();
@@ -1759,7 +1759,7 @@ satSet.setHover = (i) => {
 
 satSet.selectSat = (i) => {
   if (i === objectManager.lastSelectedSat()) return;
-  if (uiManager.isAnalysisMenuOpen && i != -1) {
+  if (sMM.isAnalysisMenuOpen && i != -1) {
     $('#anal-sat').val(satSet.getSat(i).SCC_NUM);
   }
 

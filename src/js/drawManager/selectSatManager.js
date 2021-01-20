@@ -82,7 +82,7 @@ selectSatManager.selectSat = (satId, cameraManager) => {
     // Toggle the side menus as closed
     sMM.isEditSatMenuOpen(false);
     isLookanglesMenuOpen = false;
-    settingsManager.isMapMenuOpen = false;
+    sMM.isMapMenuOpen = false;
     sMM.isLookanglesMultiSiteMenuOpen(false);
     sMM.isNewLaunchMenuOpen(false);
     sMM.isBreakupMenuOpen(false);

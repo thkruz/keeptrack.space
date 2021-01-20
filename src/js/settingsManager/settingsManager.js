@@ -604,7 +604,6 @@ let settingsManager = {};
   settingsManager.isPropRateChange = false;
   settingsManager.isOnlyFOVChecked = false;
   settingsManager.isBottomMenuOpen = false;
-  settingsManager.isMapMenuOpen = false;
   settingsManager.isForceColorScheme = false;
 
   settingsManager.isDemoModeOn = false;

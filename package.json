@@ -27,6 +27,7 @@
     "getExtras": "npm run updateTle && npm run updateTextures && npm run updateRadarData && npm run updateSocrates",
     "gpr": "node ./scripts/gpr.js",
     "stage": "node ./scripts/prebuild.mjs",
+    "server:start": "http-server ./dist/",
     "coverage": "jest --coverage --coverageReporters lcov",
     "test": "jest --coverage --coverageReporters text",
     "test-html": "jest --coverage --coverageReporters html",

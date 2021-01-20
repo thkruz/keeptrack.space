@@ -337,12 +337,13 @@ drawManager.satCalculate = () => {
       // }
 
       // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
-      if (!settingsManager.modelsOnSatelliteViewOverride) {
-        meshManager.update(Camera, cameraManager, drawManager.sat, timeManager);
-      }
     }
     if (drawManager.sat.missile) orbitManager.setSelectOrbit(drawManager.sat.satId);
+  } else {
+    // Reset the selected satellite if no satellite is selected
+    drawManager.sat = { id: -1 };
   }
+  meshManager.update(Camera, cameraManager, timeManager, drawManager.sat);
   if (objectManager.selectedSat !== drawManager.lastSelectedSat) {
     if (objectManager.selectedSat === -1 && !isselectedSatNegativeOne) {
       orbitManager.clearSelectOrbit();
@@ -355,7 +356,7 @@ drawManager.satCalculate = () => {
       }
       uiManager.updateMap();
     }
-    if (objectManager.selectedSat !== -1 || (objectManager.selectedSat == -1 && !isselectedSatNegativeOne)) {
+    if (objectManager.selectedSat == -1) {
       lineManager.drawWhenSelected();
     }
     drawManager.lastSelectedSat = objectManager.selectedSat;

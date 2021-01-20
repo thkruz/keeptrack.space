@@ -540,6 +540,7 @@ class Camera {
       if (sat.missile) {
         this.#cSTS.altitude = sat.maxAlt + 1000; // if it is a missile use its altitude
       }
+      let debugVar = this.#cSTS.altitude;
       if (this.#cSTS.altitude) {
         this.#cSTS.camDistTarget = this.#cSTS.altitude + RADIUS_OF_EARTH + settingsManager.camDistBuffer;
       } else {

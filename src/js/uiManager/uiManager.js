@@ -30,7 +30,6 @@ import '@app/js/lib/external/jquery-ajax.js';
 import '@app/js/lib/external/colorPick.js';
 import 'materialize-css';
 import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
-import { db, settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { saveAs, saveCsv, stringPad } from '@app/js/lib/helpers.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { CanvasRecorder } from '@app/js/lib/external/CanvasRecorder.js';
@@ -49,6 +48,7 @@ import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 import { uiInput } from './ui-input.js';
 import { uiLimited } from './ui-limited.js';
@@ -61,11 +61,9 @@ try {
 } catch (e) {
   console.log(e);
 }
-// var dropdownInstance;
 const mapImageDOM = $('#map-image');
 const mapMenuDOM = $('#map-menu');
 const bodyDOM = $('#bodyDOM');
-
 const rightBtnSaveMenuDOM = $('#save-rmb-menu');
 const rightBtnViewMenuDOM = $('#view-rmb-menu');
 const rightBtnEditMenuDOM = $('#edit-rmb-menu');
@@ -73,12 +71,6 @@ const rightBtnCreateMenuDOM = $('#create-rmb-menu');
 const rightBtnDrawMenuDOM = $('#draw-rmb-menu');
 const rightBtnColorsMenuDOM = $('#colors-rmb-menu');
 const rightBtnEarthMenuDOM = $('#earth-rmb-menu');
-
-// const viewInfoRMB = $('#view-info-rmb');
-// const editSatRMB = $('#edit-sat-rmb');
-// const createObserverRMB = $('#create-observer-rmb');
-// const createSensorRMB = $('#create-sensor-rmb');
-// const clearScreenRMB = $('#clear-screen-rmb');
 
 $.ajaxSetup({
   cache: false,
@@ -183,7 +175,6 @@ $(document).ready(function () {
   $('#versionNumber-text')[0].innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
   uiManager.resize2DMap();
   (function _httpsCheck() {
-    db.log('_httpsCheck');
     if (location.protocol !== 'https:') {
       $('#cs-geolocation').hide();
       $('#geolocation-btn').hide();
@@ -225,7 +216,6 @@ $(document).ready(function () {
   })();
 
   (function _menuInit() {
-    db.log('_menuInit');
     // Load the current JDAY
     var jday = timeManager.getDayOfYear(timeManager.propTime());
     $('#jday').html(jday);
@@ -283,7 +273,6 @@ $(document).ready(function () {
 
   var isNotColorPickerInitialSetup = false;
   (function _setupColorPicker() {
-    db.log('_setupColorPicker');
     var colorPalette = [
       _rgbCSS([1.0, 0.0, 0.0, 1.0]), // Red
       _rgbCSS([1.0, 0.75, 0.0, 1.0]), // Orange
@@ -424,7 +413,6 @@ $(document).ready(function () {
   })();
 
   uiManager.clearRMBSubMenu = () => {
-    db.log('uiManager.clearRMBSubMenu', true);
     rightBtnSaveMenuDOM.hide();
     rightBtnViewMenuDOM.hide();
     rightBtnEditMenuDOM.hide();
@@ -434,8 +422,6 @@ $(document).ready(function () {
     rightBtnEarthMenuDOM.hide();
   };
   (function _menuController() {
-    db.log('_menuController');
-
     // Reset time if in retro mode
     if (settingsManager.retro) {
       timeManager.propOffset = new Date(2000, 2, 13) - Date.now();
@@ -2502,8 +2488,6 @@ $(document).ready(function () {
 
   var satChngTable = [];
   uiManager.satChng = function (row) {
-    db.log('uiManager.satChng');
-
     if (row === -1 && satChngTable.length === 0) {
       // Only generate the table if receiving the -1 argument for the first time
       $.get('/analysis/satchng.json?v=' + settingsManager.versionNumber).done(function (resp) {
@@ -2628,7 +2612,6 @@ $(document).ready(function () {
     timeManager.propTime();
   }; // Allows passing -1 argument to socrates function to skip these steps
   var _socrates = (row) => {
-    db.log('_socrates');
     // SOCRATES Variables
 
     /* SOCRATES.htm is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
@@ -2733,16 +2716,6 @@ $(document).ready(function () {
     _bottomIconPress(evt);
   };
   var _bottomIconPress = (evt) => {
-    db.log('_bottomIconPress');
-    db.log(evt.currentTarget.id);
-    // if (settingsManager.isOfficialWebsite)
-    //     ga(
-    //         'send',
-    //         'event',
-    //         'Bottom Icon',
-    //         evt.currentTarget.id,
-    //         'Selected'
-    //     );
     switch (evt.currentTarget.id) {
       case 'menu-sensor-list': // No Keyboard Commands
         if (isSensorListMenuOpen) {
@@ -3632,20 +3605,16 @@ $(document).ready(function () {
   };
 
   $('#search').on('focus', function () {
-    db.log("$('#search').focus");
     uiManager.isCurrentlyTyping = true;
   });
   $('#ui-wrapper').on('focusin', function () {
-    db.log("$('#ui-wrapper').focusin");
     uiManager.isCurrentlyTyping = true;
   });
 
   $('#search').on('blur', function () {
-    db.log("('#search').blur");
     uiManager.isCurrentlyTyping = false;
   });
   $('#ui-wrapper').on('focusout', function () {
-    db.log("('#ui-wrapper').focusout");
     uiManager.isCurrentlyTyping = false;
   });
 
@@ -3722,7 +3691,6 @@ $(document).ready(function () {
   });
 
   uiManager.hideSideMenus = function () {
-    db.log('uiManager.hideSideMenus');
     // Close any open colorboxes
     $.colorbox.close();
 
@@ -3856,7 +3824,6 @@ $(document).ready(function () {
 });
 
 uiManager.updateWatchlist = function (updateWatchlistList, updateWatchlistInViewList) {
-  db.log('uiManager.updateWatchlist');
   if (typeof updateWatchlistList !== 'undefined') {
     watchlistList = updateWatchlistList;
   }
@@ -3915,7 +3882,6 @@ var isSearchOpen = false;
 var forceClose = false;
 var forceOpen = false;
 uiManager.searchToggle = function (force) {
-  db.log('uiManager.searchToggle');
   // Reset Force Options
   forceClose = false;
   forceOpen = false;
@@ -3955,7 +3921,6 @@ uiManager.searchToggle = function (force) {
 };
 
 uiManager.keyHandler = (evt) => {
-  db.log('uiManager.keyHandler');
   // Error Handling
   if (typeof evt.key == 'undefined') return;
 
@@ -4187,7 +4152,6 @@ uiManager.hideLoadingScreen = () => {
 };
 
 uiManager.resize2DMap = function () {
-  db.log('uiManager.resize2DMap');
   if ($(window).width() > $(window).height()) {
     // If widescreen
     settingsManager.mapWidth = $(window).width();
@@ -4210,7 +4174,6 @@ var infoOverlayDOM = [];
 // eslint-disable-next-line arrow-body-style
 // var _showSatTest = () => {
 // return;
-// db.log('_showSatTest');
 // if (timeManager.now > (lastSatUpdateTime * 1 + 10000)) {
 //   for (var i = 0; i < satSet.getSatData().length; i++) {
 //     satNumberOverlay[i] = satSet.getScreenCoords(i, pMatrix, camMatrix);
@@ -4222,7 +4185,6 @@ var infoOverlayDOM = [];
 
 var _updateNextPassOverlay = (isForceUpdate) => {
   if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
-  db.log('_updateNextPassOverlay');
 
   // FIXME This should auto update the overlay when the time changes outside the original search window
   // Update once every 10 seconds
@@ -4261,7 +4223,6 @@ var _updateNextPassOverlay = (isForceUpdate) => {
 };
 var _checkWatchlist = () => {
   if (watchlistList.length <= 0) return;
-  db.log('_checkWatchlist');
   for (let i = 0; i < watchlistList.length; i++) {
     var sat = satSet.getSat(watchlistList[i]);
     if (sat.inview === 1 && watchlistInViewList[i] === false) {
@@ -4288,7 +4249,6 @@ var _checkWatchlist = () => {
 var _updateSelectBox = () => {
   // Don't update if no object is selected
   if (objectManager.selectedSat === -1) return;
-  db.log('_updateSelectBox', true);
 
   var sat = satSet.getSat(objectManager.selectedSat);
 
@@ -4331,16 +4291,16 @@ var _updateSelectBox = () => {
 
     if (objectManager.isSensorManagerLoaded) {
       if (satellite.currentTEARR.inview) {
-        $('#sat-azimuth').html(satellite.currentTEARR.azimuth.toFixed(0) + '°'); // Convert to Degrees
-        $('#sat-elevation').html(satellite.currentTEARR.elevation.toFixed(1) + '°');
-        $('#sat-range').html(satellite.currentTEARR.range.toFixed(2) + ' km');
+        $('#sat-azimuth').html(satellite.currentTEARR.az.toFixed(0) + '°'); // Convert to Degrees
+        $('#sat-elevation').html(satellite.currentTEARR.el.toFixed(1) + '°');
+        $('#sat-range').html(satellite.currentTEARR.rng.toFixed(2) + ' km');
       } else {
         $('#sat-azimuth').html('Out of FOV');
-        $('#sat-azimuth').prop('title', 'Azimuth: ' + satellite.currentTEARR.azimuth.toFixed(0) + '°');
+        $('#sat-azimuth').prop('title', 'Azimuth: ' + satellite.currentTEARR.az.toFixed(0) + '°');
         $('#sat-elevation').html('Out of FOV');
-        $('#sat-elevation').prop('title', 'Elevation: ' + satellite.currentTEARR.elevation.toFixed(1) + '°');
+        $('#sat-elevation').prop('title', 'Elevation: ' + satellite.currentTEARR.el.toFixed(1) + '°');
         $('#sat-range').html('Out of FOV');
-        $('#sat-range').prop('title', 'Range: ' + satellite.currentTEARR.range.toFixed(2) + ' km');
+        $('#sat-range').prop('title', 'Range: ' + satellite.currentTEARR.rng.toFixed(2) + ' km');
       }
     } else {
       $('#sat-azimuth').parent().hide();
@@ -4370,7 +4330,6 @@ var _updateSelectBox = () => {
 };
 var _mobileScreenControls = () => {
   if (settingsManager.isMobileModeEnabled) {
-    db.log('_mobileScreenControls', true);
     if (touchHoldButton === '') return;
     if (touchHoldButton === 'zoom-in') {
       cameraManager.zoomTarget = cameraManager.zoomTarget - 0.0025;
@@ -4535,11 +4494,10 @@ $('#colors-menu>ul>li').on('click', function () {
 });
 
 uiManager.useCurrentGeolocationAsSensor = function () {
-  db.log('uiManager.legendColorsChange');
   if (location.protocol === 'https:' && !settingsManager.geolocationUsed && settingsManager.isMobileModeEnabled) {
     navigator.geolocation.getCurrentPosition(function (position) {
-      settingsManager.geolocation.lat = position.coords.latitude;
-      settingsManager.geolocation.long = position.coords.longitude;
+      settingsManager.geolocation.lat = position.coords.lat;
+      settingsManager.geolocation.long = position.coords.lon;
       settingsManager.geolocation.obshei = 0;
       settingsManager.geolocation.minaz = 0;
       settingsManager.geolocation.maxaz = 360;
@@ -4654,8 +4612,6 @@ $('#near-orbits-link').on('click', () => {
 });
 
 uiManager.legendColorsChange = function () {
-  db.log('uiManager.legendColorsChange');
-
   ColorScheme.resetObjectTypeFlags();
 
   $('.legend-payload-box').css('background', _rgbCSS(settingsManager.colors.payload));
@@ -4693,8 +4649,6 @@ uiManager.legendColorsChange = function () {
 };
 
 uiManager.legendMenuChange = function (menu) {
-  db.log('uiManager.legendMenuChange');
-  db.log(menu);
   $('#legend-list-default').hide();
   $('#legend-list-default-sensor').hide();
   $('#legend-list-rcs').hide();
@@ -5209,7 +5163,6 @@ var _offlineMessage = () => {
 };
 
 var getRGBA = (str) => {
-  db.log('getRGBA');
   // eslint-disable-next-line no-useless-escape
   var [r, g, b, a] = str.match(/[\d\.]+/gu);
   r = parseInt(r) / 255;
@@ -5221,7 +5174,6 @@ var getRGBA = (str) => {
 
 // eslint-disable-next-line no-unused-vars
 var hexToRgbA = (hex) => {
-  db.log('_hexToRgbA');
   var c;
   // eslint-disable-next-line prefer-named-capture-group
   if (/^#([A-Fa-f0-9]{3}){1,2}$/u.test(hex)) {
@@ -5238,15 +5190,11 @@ var hexToRgbA = (hex) => {
   throw new Error('Bad Hex');
 };
 
-var _rgbCSS = (values) => {
-  db.log('_rgbCSS');
-  return `rgba(${values[0] * 255},${values[1] * 255},${values[2] * 255},${values[3]})`;
-};
+var _rgbCSS = (values) => `rgba(${values[0] * 255},${values[1] * 255},${values[2] * 255},${values[3]})`;
 
 var isFooterShown = true;
 
 uiManager.updateURL = () => {
-  db.log('uiManager.updateURL', true);
   var arr = window.location.href.split('?');
   var url = arr[0];
   var paramSlices = [];
@@ -5315,7 +5263,6 @@ uiManager.reloadLastSensor = () => {
 };
 
 uiManager.footerToggle = function () {
-  db.log('uiManager.footerToggle');
   if (isFooterShown) {
     isFooterShown = false;
     // uiManager.hideSideMenus();
@@ -5364,7 +5311,6 @@ uiManager.doSearch = (searchString, isPreventDropDown) => {
 };
 
 uiManager.startLowPerf = function () {
-  db.log('uiManager.startLowPerf');
   // IDEA: Replace browser variables with localStorage
   // The settings passed as browser variables could be saved as localStorage items
   window.location.replace('index.htm?lowperf');
@@ -5419,9 +5365,6 @@ uiManager.saveHiResPhoto = (resolution) => {
 // TODO: uiManager.panToStar needs to be finished
 // Yaw needs fixed. Needs to incorporate a time calculation
 uiManager.panToStar = function (c) {
-  db.log('uiManager.panToStar');
-  db.log(`c: ${c}`, true);
-
   // Try with the pname
   var satId = satSet.getIdFromStarName(c.pname);
   var sat = satSet.getSat(satId);
@@ -5456,7 +5399,6 @@ uiManager.panToStar = function (c) {
 };
 
 uiManager.updateMap = function () {
-  db.log('uiManager.updateMap');
   if (objectManager.selectedSat === -1) return;
   if (!settingsManager.isMapMenuOpen) return;
   var sat = satSet.getSat(objectManager.selectedSat);

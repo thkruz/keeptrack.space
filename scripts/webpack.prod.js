@@ -57,6 +57,7 @@ var jsConfig = Object.assign({}, config, {
       '@app': __dirname + '/../src',
     },
   },
+  devtool: 'source-map',
   output: {
     filename: '[name].js',
     path: __dirname + '/../dist/js',

@@ -85,11 +85,12 @@ $.ajaxSetup({
 var updateInterval = 1000;
 var createClockDOMOnce = false;
 
-var uiManager = {};
+const uiManager = {};
 uiManager.searchBox = searchBox;
 uiManager.adviceList = adviceList;
 uiManager.mobileManager = mobileManager;
 uiManager.isCurrentlyTyping = false;
+uiManager.isTimeMachineRunning = false;
 
 var lastBoxUpdateTime = 0;
 var lastOverlayUpdateTime = 0;
@@ -1473,8 +1474,6 @@ uiManager.startLowPerf = function () {
   // The settings passed as browser variables could be saved as localStorage items
   window.location.replace('index.htm?lowperf');
 };
-
-uiManager.isTimeMachineRunning = false;
 
 uiManager.toast = (toastText, type, isLong) => {
   let toastMsg = M.toast({

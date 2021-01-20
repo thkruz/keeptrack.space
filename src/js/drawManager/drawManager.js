@@ -210,6 +210,8 @@ drawManager.drawLoop = (preciseDt) => {
   // Update Draw Positions
   dotsManager.updatePositionBuffer(satSet, timeManager);
 
+  dotsManager.updatePMvCamMatrix(drawManager.pMatrix, cameraManager);
+
   // Draw Dots
   dotsManager.draw(drawManager.pMatrix, cameraManager, settingsManager.currentColorScheme, postProcessingManager.curBuffer);
 

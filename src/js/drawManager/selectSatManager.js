@@ -9,7 +9,6 @@ import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 
-var isLookanglesMenuOpen = false;
 var isselectedSatNegativeOne = false;
 
 var selectSatManager = {};
@@ -46,18 +45,11 @@ selectSatManager.selectSat = (satId, cameraManager) => {
   if (satId === -1 && !isselectedSatNegativeOne) {
     cameraManager.fts2default();
     isselectedSatNegativeOne = true;
-    $('#sat-infobox').fadeOut();
-    // $('#iss-stream').html('')
-    // $('#iss-stream-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000)
-    // Remove Red Box
-    $('#menu-lookanglesmultisite').removeClass('bmenu-item-selected');
-    $('#menu-lookangles').removeClass('bmenu-item-selected');
-    $('#menu-editSat').removeClass('bmenu-item-selected');
 
-    $('#menu-map').removeClass('bmenu-item-selected');
-    $('#menu-newLaunch').removeClass('bmenu-item-selected');
-    $('#menu-breakup').removeClass('bmenu-item-selected');
-    $('#menu-customSensor').removeClass('bmenu-item-selected');
+    sMM.hideSideMenus();
+
+    $('#sat-infobox').fadeOut();
+
     // Add Grey Out
     $('#menu-lookanglesmultisite').addClass('bmenu-item-disabled');
     $('#menu-lookangles').addClass('bmenu-item-disabled');
@@ -66,28 +58,10 @@ selectSatManager.selectSat = (satId, cameraManager) => {
     $('#menu-map').addClass('bmenu-item-disabled');
     $('#menu-newLaunch').addClass('bmenu-item-disabled');
     $('#menu-breakup').addClass('bmenu-item-disabled');
-    // Remove Side Menus
-    // $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000)
-    // $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000)
-    $('#editSat-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#map-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#breakup-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-    $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
 
     if ($('#search').val().length > 0) {
       $('#search-results').attr('style', 'display: block; max-height:auto');
     }
-
-    // Toggle the side menus as closed
-    sMM.isEditSatMenuOpen(false);
-    isLookanglesMenuOpen = false;
-    sMM.isMapMenuOpen = false;
-    sMM.isLookanglesMultiSiteMenuOpen(false);
-    sMM.isNewLaunchMenuOpen(false);
-    sMM.isBreakupMenuOpen(false);
-    sMM.isMissileMenuOpen(false);
-    sMM.setCustomSensorMenuOpen(false);
   } else if (satId !== -1) {
     if (cameraManager.cameraType.current == cameraManager.cameraType.default) {
       cameraManager.ecLastZoom = cameraManager.zoomLevel;
@@ -457,7 +431,7 @@ selectSatManager.selectSat = (satId, cameraManager) => {
       }
     }
     if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
-      if (isLookanglesMenuOpen) {
+      if (sMM.isLookanglesMenuOpen) {
         satellite.getlookangles(sat);
       }
     }

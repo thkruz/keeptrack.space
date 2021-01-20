@@ -33,7 +33,7 @@ import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
 import { saveAs, saveCsv, stringPad } from '@app/js/lib/helpers.js';
 import { CanvasRecorder } from '@app/js/lib/external/CanvasRecorder.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
-import { adviceList } from '@app/js/uiManager/advice-module.js';
+import { adviceList } from '@app/js/uiManager/ui-advice.js';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { drawManager } from '@app/js/drawManager/drawManager.js';
 import { mapManager } from '@app/js/uiManager/mapManager.js';
@@ -2808,13 +2808,13 @@ $(document).ready(function () {
           break;
         }
       case 'menu-dops': // S
-        if (sMM.isDOPMenuOpen()) {
-          sMM.isDOPMenuOpen(false);
+        if (sMM.isDOPMenuOpen) {
+          sMM.isDOPMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
           uiManager.hideSideMenus();
-          sMM.isDOPMenuOpen(true);
+          sMM.isDOPMenuOpen = true;
           $('#loading-screen').fadeIn(1000, function () {
             var lat = $('#dops-lat').val() * 1;
             var lon = $('#dops-lon').val() * 1;
@@ -2896,7 +2896,6 @@ $(document).ready(function () {
           });
 
           $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          sMM.isAnalysisMenuOpen(true);
           $('#menu-analysis').addClass('bmenu-item-selected');
           break;
         }
@@ -3236,8 +3235,8 @@ $(document).ready(function () {
           break;
         }
       case 'menu-missile':
-        if (sMM.isMissileMenuOpen()) {
-          sMM.isMissileMenuOpen(false);
+        if (sMM.isMissileMenuOpen) {
+          sMM.isMissileMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
@@ -3245,7 +3244,7 @@ $(document).ready(function () {
           uiManager.hideSideMenus();
           $('#missile-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           $('#menu-missile').addClass('bmenu-item-selected');
-          sMM.isMissileMenuOpen(true);
+          sMM.isMissileMenuOpen = true;
           break;
         }
       case 'menu-fov-bubble': // No Keyboard Commands
@@ -4049,21 +4048,7 @@ uiManager.resize2DMap = function () {
   }
 };
 
-// Callbacks from DrawLoop
 var infoOverlayDOM = [];
-// var satNumberOverlay = [];
-// eslint-disable-next-line arrow-body-style
-// var _showSatTest = () => {
-// return;
-// if (timeManager.now > (lastSatUpdateTime * 1 + 10000)) {
-//   for (var i = 0; i < satSet.getSatData().length; i++) {
-//     satNumberOverlay[i] = satSet.getScreenCoords(i, pMatrix, camMatrix);
-//     if (satNumberOverlay[i] !== 1) console.log(satNumberOverlay[i]);
-//     lastSatUpdateTime = timeManager.now;
-//   }
-// }
-// };
-
 uiManager.updateNextPassOverlay = (isForceUpdate) => {
   if (nextPassArray.length <= 0 && !sMM.isInfoOverlayMenuOpen) return;
 
@@ -5340,4 +5325,5 @@ uiManager.updateMap = function () {
   }
 };
 
+uiManager.sMM = sMM;
 export { doSearch, uiManager, uiLimited, uiInput };

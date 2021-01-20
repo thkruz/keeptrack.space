@@ -21,6 +21,7 @@ sMM.isObfitMenuOpen = false;
 sMM.isLookanglesMenuOpen = false;
 sMM.isDOPMenuOpen = false;
 sMM.isLookanglesMultiSiteMenuOpen = false;
+sMM.isLookanglesMenuOpen = false;
 sMM.isAnalysisMenuOpen = false;
 sMM.isEditSatMenuOpen = false;
 sMM.setCustomSensorMenuOpen = false;

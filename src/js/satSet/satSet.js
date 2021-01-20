@@ -35,6 +35,7 @@ import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
+import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { saveAs } from '@app/js/lib/external/file-saver.min.js';
@@ -1759,7 +1760,7 @@ satSet.setHover = (i) => {
 
 satSet.selectSat = (i) => {
   if (i === objectManager.lastSelectedSat()) return;
-  if (sMM.isAnalysisMenuOpen && i != -1) {
+  if (uiManager.isAnalysisMenuOpen && i != -1) {
     $('#anal-sat').val(satSet.getSat(i).SCC_NUM);
   }
 

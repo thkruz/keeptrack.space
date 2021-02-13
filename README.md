@@ -3,7 +3,7 @@
 <img src="./src/img/logo192.png" width=128 height=128 alt="KeepTrack.Space" align="right">
 
 # KeepTrack.Space
-> Astrodyanmics Software for Non-Engineers
+> Astrodynamics Software for Non-Engineers
 
 KeepTrack aims to provide orbital analysis tools to the average user. By providing features that are usually only found in expensive toolkits, we make learning about orbital mechanics and satellite operations accessible to everyone.
 

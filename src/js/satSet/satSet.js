@@ -92,12 +92,6 @@ var checkRcs = (possibles, minRcs, maxRcs) => {
 };
 
 var satelliteList;
-if (settingsManager.offline) {
-  import('@app/offline/extra.js').then((resp) => {
-    satelliteList = resp;
-    console.debug(resp);
-  });
-}
 
 /**
  * These variables are here rather inside the function because as they
@@ -395,7 +389,10 @@ satSet.loadCatalog = async () => {
     settingsManager.tleSource = `${settingsManager.installDirectory}tle/TLE.json`;
   }
   if (settingsManager.offline) {
-    await import('@app/offline/tle.js').then(() => satSet.parseCatalog(window.jsTLEfile));
+    await import('@app/offline/extra.js').then((resp) => {
+      satelliteList = resp.satelliteList;
+    });
+    await import('@app/offline/tle.js').then(() => satSet.parseCatalog(jsTLEfile));
     return satData;
     // jsTLEfile = null;
   } else {
@@ -423,7 +420,7 @@ satSet.loadCatalog = async () => {
             })
             .fail(async function () {
               // Try the js file without caching
-              await import('@app/offline/tle.js').then(() => satSet.parseCatalog(window.jsTLEfile));
+              await import('@app/offline/tle.js').then(() => satSet.parseCatalog(jsTLEfile));
               return satData;
             });
         });
@@ -650,7 +647,7 @@ satSet.filterTLEDatabase = (resp, limitSatsArray) => {
         tempSatData[i].TLE1 = satelliteList[s].TLE1;
         tempSatData[i].TLE2 = satelliteList[s].TLE2;
         isMatchFound = true;
-        break;
+        continue;
       }
       if (!isMatchFound) {
         if (typeof satelliteList[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
@@ -835,10 +832,10 @@ satSet.resetSatInSun = () => {
   dotManager.inSunData.fill(0);
 };
 
-satSet.setColorScheme = (scheme, isForceRecolor) => {
+satSet.setColorScheme = async (scheme, isForceRecolor) => {
   settingsManager.setCurrentColorScheme(scheme);
 
-  scheme.calculateColorBuffers(isForceRecolor);
+  await scheme.calculateColorBuffers(isForceRecolor);
   dotManager.colorBuffer = scheme.colorBuf;
   dotManager.pickingBuffer = scheme.pickableBuf;
 };

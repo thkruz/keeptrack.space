@@ -1842,6 +1842,7 @@ $(document).ready(function () {
     rightBtnDrawMenuDOM.hide();
     rightBtnEarthMenuDOM.hide();
   };
+
   (function _menuController() {
     // Reset time if in retro mode
     if (settingsManager.retro) {
@@ -2607,8 +2608,8 @@ $(document).ready(function () {
           break;
         }
       case 'menu-lookangles': // S
-        if (sMM.isLookanglesMenuOpen()) {
-          sMM.isLookanglesMenuOpen(false);
+        if (sMM.isLookanglesMenuOpen) {
+          sMM.isLookanglesMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
@@ -2627,7 +2628,7 @@ $(document).ready(function () {
           }
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
-          sMM.isLookanglesMenuOpen(true);
+          sMM.isLookanglesMenuOpen = true;
           $('#loading-screen').fadeIn(1000, function () {
             satellite.getlookangles(sat);
             $('#menu-lookangles').addClass('bmenu-item-selected');
@@ -2743,8 +2744,8 @@ $(document).ready(function () {
           break;
         }
       case 'menu-lookanglesmultisite':
-        if (sMM.isLookanglesMultiSiteMenuOpen()) {
-          sMM.isLookanglesMultiSiteMenuOpen(false);
+        if (sMM.isLookanglesMultiSiteMenuOpen) {
+          sMM.isLookanglesMultiSiteMenuOpen = false;
           uiManager.hideSideMenus();
           break;
         } else {
@@ -2760,7 +2761,7 @@ $(document).ready(function () {
           }
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
           uiManager.hideSideMenus();
-          sMM.isLookanglesMultiSiteMenuOpen(true);
+          sMM.isLookanglesMultiSiteMenuOpen = true;
           $('#menu-lookanglesmultisite').addClass('bmenu-item-selected');
           if (objectManager.selectedSat !== -1) {
             $('#loading-screen').fadeIn(1000, function () {

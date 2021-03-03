@@ -75,16 +75,7 @@
   <body id="bodyDOM" class="no-text-select">
     <div id="loading-screen" class="valign-wrapper full-loader">
       <div id="logo-inner-container" class="valign">
-          <span id="logo-text" class="logo-font">KEEP TRACK</span>
-          <!-- <script>
-              if (window.settingsManager.trusatMode) {
-                  document.write(
-                      '<span id="logo-trusat"><img src="' +
-                        window.settingsManager.installDirectory +
-                          'img/trusat.png"></span>'
-                  );
-              }
-          </script> -->
+          <span id="logo-text" class="logo-font">KEEP TRACK</span>          
           <br />
           <div id="spinner" class="preloader-wrapper active">
               <div class="spinner-layer spinner-white-only">
@@ -137,10 +128,6 @@
                               ><i class="material-icons">location_on</i></a
                           >
                       </li>
-                      <!-- <li><a id="time-machine-btn" class="top-menu-btns">
-                        <div id="time-machine-icon" class="top-menu-icons"><img src="img/history.png"></div>
-                        </a>
-                      </li> -->
                       <li>
                           <a
                               id="github-share1"
@@ -210,7 +197,6 @@
                               placeholder="Search.."
                               required
                           />
-                          <!-- <span id="search-close" style="margin-left:5px">X</span> -->
                       </div>
                   </ul>
               </div>
@@ -309,7 +295,6 @@
               <li id="earth-trusat-rmb"><a href="#">TruSat Map</a></li>
               <li id="earth-low-rmb"><a href="#">Low Resolution Map</a></li>
               <li id="earth-high-no-clouds-rmb"><a href="#">High Resoultion Map</a></li>
-              <!-- <li id="earth-high-rmb"><a href="#">High Resolution Map Plus Clouds</a></li> -->
               <li id="earth-vec-rmb"><a href="#">Vector Image Map</a></li>
             </ul>
           </div>
@@ -665,7 +650,7 @@
                   data-tooltip="Large are > 1^2 meter, Small are < 0.1^2 meters">
                   RCS
                 </div>
-                <div class="sat-info-value" id="sat-rcs">
+                <div class="sat-info-value tooltipped" id="sat-rcs">
                   NO DATA
                 </div>
               </div>

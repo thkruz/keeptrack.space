@@ -462,6 +462,11 @@ meshManager.update = (Camera, cameraManager, timeManager, sat = { id: -1, static
       return;
     }
   }
+
+  // Catch All for Special Satellites
+  // Generic Model
+  meshManager.currentModel.model = meshManager.models.sat2;
+  return;
 };
 
 meshManager.drawOcclusion = function (pMatrix, camMatrix, occlusionPrgm, tgtBuffer) {

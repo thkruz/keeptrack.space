@@ -1556,6 +1556,8 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
   };
 
   sMM.hideSideMenus = () => {
+    // TODO: This needs optimized to skip steps that don't need done
+
     // Close any open colorboxes
     $.colorbox.close();
 

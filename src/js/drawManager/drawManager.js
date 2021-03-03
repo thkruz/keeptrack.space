@@ -236,7 +236,7 @@ drawManager.drawLoop = (preciseDt) => {
   // Update orbit currently being hovered over
   // Only if last frame was 50 FPS or more readpixels used to determine which satellite is hovered
   // is the biggest performance hit and we should throttle that. Maybe we should limit the picking frame buffer too?
-  if (1000 / timeManager.dt > 50) {
+  if (1000 / timeManager.dt > 50 && !settingsManager.lowPerf) {
     drawManager.updateHover();
   }
 

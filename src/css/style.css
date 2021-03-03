@@ -1016,7 +1016,7 @@ input:focus {
 }
 
 .bmenu-item-disabled img {
-    filter: grayscale();
+    filter: grayscale(1);
 }
 
 .bmenu-item-disabled .status-icon {

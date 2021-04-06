@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "3.0.6",
+  "version": "3.0.7",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
   "contributors": [
@@ -22,8 +22,8 @@
     "access": "public"
   },
   "scripts": {
-    "build": "node --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.prod.js",
-    "build-dev": "node --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.dev.js",
+    "build": "node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.prod.js",
+    "build-dev": "node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.dev.js",
     "getExtras": "npm run updateTle && npm run updateTextures && npm run updateRadarData && npm run updateSocrates",
     "gpr": "node ./scripts/gpr.js",
     "stage": "node ./scripts/prebuild.mjs",
@@ -92,6 +92,7 @@
     "style-loader": "^2.0.0",
     "webpack": "^5.11.0",
     "webpack-cli": "^4.2.0",
+    "webpack-glob": "^2.0.2",
     "worker-loader": "^3.0.7"
   },
   "dependencies": {

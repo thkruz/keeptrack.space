@@ -1319,6 +1319,10 @@ var _resetSensorSelected = function () {
   // Return to default settings with nothing 'inview'
   satellite.setobs(null);
   sensorManager.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
+  uiManager.getsensorinfo();
+  if (settingsManager.currentColorScheme == ColorScheme.default) {
+    uiManager.legendMenuChange('default');
+  }
   satSet.satCruncher.postMessage({
     typ: 'offset',
     dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
@@ -1399,16 +1403,19 @@ uiManager.reloadLastSensor = () => {
       // If there is a staticnum set use that
       if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
         sensorManager.setSensor(null, currentSensor[1]);
+        uiManager.getsensorinfo();
         uiManager.legendMenuChange('default');
       } else {
         // If the sensor is a string, load that collection of sensors
         if (typeof currentSensor[0].shortName == 'undefined') {
           sensorManager.setSensor(currentSensor[0], currentSensor[1]);
+          uiManager.getsensorinfo();
           uiManager.legendMenuChange('default');
           uiManager.lookAtSensor();
         } else {
           // Seems to be a single sensor without a staticnum, load that
           sensorManager.setSensor(sensorManager.sensorList[currentSensor[0].shortName], currentSensor[1]);
+          uiManager.getsensorinfo();
           uiManager.legendMenuChange('default');
           uiManager.lookAtSensor();
         }
@@ -1426,16 +1433,22 @@ uiManager.footerToggle = function () {
     isFooterShown = false;
     // uiManager.hideSideMenus();
     $('#sat-infobox').addClass('sat-infobox-fullsize');
+    $('#nav-footer').addClass('footer-slide-trans');
     $('#nav-footer').removeClass('footer-slide-up');
     $('#nav-footer').addClass('footer-slide-down');
     $('#nav-footer-toggle').html('&#x25B2;');
   } else {
     isFooterShown = true;
     $('#sat-infobox').removeClass('sat-infobox-fullsize');
+    $('#nav-footer').addClass('footer-slide-trans');
     $('#nav-footer').removeClass('footer-slide-down');
     $('#nav-footer').addClass('footer-slide-up');
     $('#nav-footer-toggle').html('&#x25BC;');
   }
+  // After 1 second the transition should be complete so lets stop moving slowly
+  setTimeout(() => {
+    $('#nav-footer').removeClass('footer-slide-trans');
+  }, 1000);
 };
 
 uiManager.getsensorinfo = () => {
@@ -1619,7 +1632,11 @@ uiManager.updateMap = function () {
 $(document).ready(function () {
   // Code Once index.htm is loaded
   if (settingsManager.offline) updateInterval = 250;
-  $('#versionNumber-text')[0].innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
+  try {
+    $('#versionNumber-text')[0].innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
+  } catch (e) {
+    //
+  }
   uiManager.resize2DMap();
   (function _httpsCheck() {
     if (location.protocol !== 'https:') {
@@ -1642,17 +1659,19 @@ $(document).ready(function () {
     $('#jday').html(jday);
     jday = null; // Garbage collect
 
-    // Initialize Navigation Menu
-    $(document).ready(function () {
-      var elems = document.querySelectorAll('.dropdown-button');
-      M.Dropdown.init(elems);
-    });
-
-    $('.tooltipped').tooltip({ delay: 50 });
-
-    // Initialize Materialize Select Menus
+    // Initialize Materialize
     M.AutoInit();
     // dropdownInstance = M.Dropdown.getInstance($('.dropdown-trigger'));
+
+    // Initialize Navigation and Select Menus
+    let elems;
+    elems = document.querySelectorAll('.dropdown-button');
+    M.Dropdown.init(elems);
+
+    // elems = document.querySelectorAll('select');
+    // M.FormSelect.init(elems);
+
+    $('.tooltipped').tooltip({ delay: 50 });
 
     // Initialize Perfect Scrollbar
     $('#search-results').perfectScrollbar();
@@ -2396,7 +2415,11 @@ $(document).ready(function () {
           break;
       }
 
+      uiManager.getsensorinfo();
       uiManager.lookAtSensor();
+      if (settingsManager.currentColorScheme == ColorScheme.default) {
+        uiManager.legendMenuChange('default');
+      }
     });
 
     $('#reset-sensor-button').on('click', function () {
@@ -2720,10 +2743,8 @@ $(document).ready(function () {
             );
           }
           // Reinitialize the Material CSS Code
-          $(document).ready(function () {
-            var elems = document.querySelectorAll('anal-type');
-            M.FormSelect.init(elems);
-          });
+          let elems = document.querySelectorAll('select');
+          M.FormSelect.init(elems);
 
           $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           $('#menu-analysis').addClass('bmenu-item-selected');
@@ -3514,6 +3535,224 @@ $(document).ready(function () {
 
   $('#nav-footer-toggle').on('click', function () {
     uiManager.footerToggle();
+  });
+
+  // Allow Resizing the bottom menu
+  $('.resizable').resizable({
+    handles: {
+      n: '#footer-handle',
+    },
+    alsoResize: '#bottom-icons-container',
+    maxHeight: 260,
+    minHeight: 50,
+  });
+
+  // Allow All Side Menu Resizing
+  $('#sensor-list-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 400,
+    minWidth: 280,
+  });
+
+  $('#sensor-info-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 400,
+    minWidth: 280,
+  });
+
+  $('#watchlist-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#lookangles-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#lookanglesmultisite-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 300,
+  });
+
+  $('#findByLooks-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#socrates-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 290,
+  });
+
+  $('#editSat-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#newLaunch-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#breakup-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#missile-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#dops-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#customSensor-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#color-scheme-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#constellations-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#countries-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#satChng-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#obfit-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 650,
+    minWidth: 400,
+  });
+
+  $('#analysis-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#external-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#nextLaunch-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 650,
+    minWidth: 450,
+  });
+
+  $('#settings-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#about-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
   });
 
   $('#export-lookangles').on('click', function () {

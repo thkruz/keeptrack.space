@@ -126,13 +126,15 @@ drawManager.resizeCanvas = () => {
       if (settingsManager.isMobileModeEnabled) {
         // Changes more than 35% of height but not due to rotation are likely
         // the keyboard! Ignore them
-        if ((((vw - drawManager.canvas.width) / drawManager.canvas.width) * 100 < 1 && ((vh - drawManager.canvas.height) / drawManager.canvas.height) * 100 < 1) || drawManager.isRotationEvent) {
+        // But Make sure we have set this at least once to trigger
+        if ((((vw - drawManager.canvas.width) / drawManager.canvas.width) * 100 < 1 && ((vh - drawManager.canvas.height) / drawManager.canvas.height) * 100 < 1) || drawManager.isRotationEvent || typeof drawManager.pMatrix == 'undefined') {
           drawManager.canvas.width = vw;
           drawManager.canvas.height = vh;
           drawManager.isRotationEvent = false;
+        } else {
+          // No Canvas Change
+          return;
         }
-        // No Canvas Change
-        return;
       } else {
         drawManager.canvas.width = vw;
         drawManager.canvas.height = vh;

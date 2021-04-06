@@ -23,8 +23,8 @@ import { RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 let settingsManager = {};
 {
   //  Version Control
-  settingsManager.versionNumber = '3.0.6';
-  settingsManager.versionDate = 'December 28, 2020';
+  settingsManager.versionNumber = '3.0.7';
+  settingsManager.versionDate = 'April 5, 2021';
 
   // Install Folder Settings
   {

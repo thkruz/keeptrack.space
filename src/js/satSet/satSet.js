@@ -1815,5 +1815,6 @@ let getSatData = () => satSet.getSatData();
 let getMissileSatsLen = () => satSet.missileSats;
 let setSat = (i, satObject) => satSet.setSat(i, satObject);
 let getSatPosOnly = (id) => satSet.getSatPosOnly(id);
+let setColorScheme = (colorScheme, force) => satSet.setColorScheme(colorScheme, force);
 
-export { getIdFromSensorName, getIdFromStarName, getMissileSatsLen, getSat, getSatPosOnly, getSatData, getStar, satSet, satScreenPositionArray, setSat };
+export { getIdFromSensorName, getIdFromStarName, getMissileSatsLen, getSat, getSatPosOnly, getSatData, getStar, satSet, satScreenPositionArray, setSat, satCruncher, setColorScheme };

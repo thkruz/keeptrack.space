@@ -69,7 +69,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
     let sensor = sensorManager.currentSensor.shortName;
     if (typeof sensor == 'undefined') {
       $.colorbox({
-        href: `https://keeptrack.space/analysis/?sat=${sat}&type=${chartType}`,
+        href: `analysis/index.htm?sat=${sat}&type=${chartType}`,
         iframe: true,
         width: '60%',
         height: '60%',
@@ -78,7 +78,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
       });
     } else {
       $.colorbox({
-        href: `https://keeptrack.space/analysis/?sat=${sat}&type=${chartType}&sensor=${sensor}`,
+        href: `analysis/index.htm?sat=${sat}&type=${chartType}&sensor=${sensor}`,
         iframe: true,
         width: '60%',
         height: '60%',

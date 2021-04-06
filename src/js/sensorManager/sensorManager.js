@@ -16,13 +16,11 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 
 import * as $ from 'jquery';
-import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
+import { satCruncher, setColorScheme } from '@app/js/satSet/satSet.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
-import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
-import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 var sensorManager = {};
 sensorManager.tempSensor = {};
@@ -1042,9 +1040,6 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     console.log(`Couldn't clear the current sensor info!`);
   }
   if (selectedSensor == null && staticNum == null) {
-    if (settingsManager.currentColorScheme == ColorScheme.default) {
-      uiManager.legendMenuChange('default');
-    }
     return;
   }
   var sensor;
@@ -1055,7 +1050,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
         allSSNSensors.push(sensorList[sensor]);
       }
     }
-    satSet.satCruncher.postMessage({
+    satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
@@ -1063,10 +1058,9 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
       multiSensor: true,
     });
     satellite.setobs(sensorManager.sensorList.COD);
-    uiManager.getsensorinfo();
     objectManager.setSelectedSat(-1);
-    satSet.setColorScheme(settingsManager.currentColorScheme, true);
-    // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+    setColorScheme(settingsManager.currentColorScheme, true);
+    // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
   } else if (selectedSensor === 'CapeCodMulti') {
     let multiSensor = [];
     multiSensor.push({
@@ -1105,7 +1099,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
       obsmaxrange: 5556,
       volume: false,
     });
-    satSet.satCruncher.postMessage({
+    satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
@@ -1113,9 +1107,8 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
       multiSensor: true,
     });
     satellite.setobs(sensorManager.sensorList.COD);
-    uiManager.getsensorinfo();
     objectManager.setSelectedSat(-1);
-    satSet.setColorScheme(settingsManager.currentColorScheme, true);
+    setColorScheme(settingsManager.currentColorScheme, true);
   } else if (selectedSensor === 'NATO-MW') {
     var natoMWSensors = [];
     natoMWSensors.push(sensorManager.sensorList.BLE);
@@ -1124,7 +1117,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     natoMWSensors.push(sensorManager.sensorList.CLR);
     natoMWSensors.push(sensorManager.sensorList.FYL);
     natoMWSensors.push(sensorManager.sensorList.THL);
-    satSet.satCruncher.postMessage({
+    satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
@@ -1132,10 +1125,9 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
       multiSensor: true,
     });
     satellite.setobs(sensorManager.sensorList.COD);
-    uiManager.getsensorinfo();
     objectManager.setSelectedSat(-1);
-    satSet.setColorScheme(settingsManager.currentColorScheme, true);
-    // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+    setColorScheme(settingsManager.currentColorScheme, true);
+    // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
   } else if (selectedSensor === 'RUS-ALL') {
     var rusSensors = [];
     rusSensors.push(sensorManager.sensorList.ARM);
@@ -1146,7 +1138,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     rusSensors.push(sensorManager.sensorList.OLE);
     rusSensors.push(sensorManager.sensorList.PEC);
     rusSensors.push(sensorManager.sensorList.PIO);
-    satSet.satCruncher.postMessage({
+    satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
@@ -1154,16 +1146,15 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
       multiSensor: true,
     });
     satellite.setobs(sensorManager.sensorList.ARM);
-    uiManager.getsensorinfo();
     objectManager.setSelectedSat(-1);
-    satSet.setColorScheme(settingsManager.currentColorScheme, true);
-    // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+    setColorScheme(settingsManager.currentColorScheme, true);
+    // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
   } else if (selectedSensor === 'LEO-LABS') {
     var leolabsSensors = [];
     leolabsSensors.push(sensorManager.sensorList.MSR);
     leolabsSensors.push(sensorManager.sensorList.PFISR);
     leolabsSensors.push(sensorManager.sensorList.KSR);
-    satSet.satCruncher.postMessage({
+    satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
@@ -1171,10 +1162,9 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
       multiSensor: true,
     });
     satellite.setobs(sensorManager.sensorList.MSR);
-    uiManager.getsensorinfo();
     objectManager.setSelectedSat(-1);
-    satSet.setColorScheme(settingsManager.currentColorScheme, true);
-    // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+    setColorScheme(settingsManager.currentColorScheme, true);
+    // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
   } else if (selectedSensor === 'MD-ALL') {
     var mdSensors = [];
     mdSensors.push(sensorManager.sensorList.COD);
@@ -1188,7 +1178,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     mdSensors.push(sensorManager.sensorList.SHA);
     mdSensors.push(sensorManager.sensorList.KCS);
     mdSensors.push(sensorManager.sensorList.SBX);
-    satSet.satCruncher.postMessage({
+    satCruncher.postMessage({
       typ: 'offset',
       dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
@@ -1196,10 +1186,9 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
       multiSensor: true,
     });
     satellite.setobs(sensorManager.sensorList.MSR);
-    uiManager.getsensorinfo();
     objectManager.setSelectedSat(-1);
-    satSet.setColorScheme(settingsManager.currentColorScheme, true);
-    // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
+    setColorScheme(settingsManager.currentColorScheme, true);
+    // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
   } else {
     for (sensor in sensorList) {
       // console.log(sensorList[sensor] == selectedSensor);
@@ -1207,7 +1196,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
         sensorManager.selectedSensor = sensorList[sensor];
         // Do For All Sensors
         sensorManager.whichRadar = sensorManager.selectedSensor.shortName;
-        satSet.satCruncher.postMessage({
+        satCruncher.postMessage({
           typ: 'offset',
           dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
           setlatlong: true,
@@ -1226,15 +1215,10 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
         $('#sensor-type').html(sensorManager.selectedSensor.type);
         $('#sensor-country').html(sensorManager.selectedSensor.country);
         objectManager.setSelectedSat(-1);
-        satSet.setColorScheme(settingsManager.currentColorScheme, true);
-        // setTimeout(satSet.setColorScheme, 1500, settingsManager.currentColorScheme, true);
-        uiManager.getsensorinfo();
+        setColorScheme(settingsManager.currentColorScheme, true);
+        // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
       }
     }
-  }
-
-  if (settingsManager.currentColorScheme == ColorScheme.default) {
-    uiManager.legendMenuChange('default');
   }
 };
 sensorManager.sensorListUS = [sensorList.COD, sensorList.BLE, sensorList.CAV, sensorList.CLR, sensorList.EGL, sensorList.FYL, sensorList.THL, sensorList.MIL, sensorList.ALT, sensorList.ASC, sensorList.CDN];

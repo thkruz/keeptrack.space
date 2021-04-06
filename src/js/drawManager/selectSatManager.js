@@ -78,6 +78,9 @@ selectSatManager.selectSat = (satId, cameraManager) => {
       if (typeof sat.staticNum == 'undefined') return;
       sat = satSet.getSat(satId);
       if (objectManager.isSensorManagerLoaded) sensorManager.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
+
+      // Todo: Needs to run uiManager.getsensorinfo();
+
       if (objectManager.isSensorManagerLoaded) sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
       objectManager.setSelectedSat(-1);
       $('#menu-sensor-info').removeClass('bmenu-item-disabled');

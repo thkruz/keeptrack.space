@@ -3,7 +3,7 @@
 }
 
 .spinner-layer {
-    border-color: #ffffff;
+    border-color: #ffffff !important;
 }
 
 label {
@@ -11,7 +11,7 @@ label {
 }
 
 .switch label input[type='checkbox']:checked + .lever:after {
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(255, 255, 255) !important;
 }
 
 /* Text inputs */
@@ -54,8 +54,8 @@ textarea.materialize-textarea {
 
 .dropdown-content li > a,
 .dropdown-content li > span {
-    color: #005a8f;
-    font-size: 14px;
+    color: #005a8f !important;
+    font-size: 14px !important;
 }
 
 .toast {
@@ -63,10 +63,12 @@ textarea.materialize-textarea {
     min-height: 4.25rem !important;
 }
 
-@media only screen and (min-width: 601px) nav,
+@media only screen and (min-width: 601px) {
+    nav,
     nav .nav-wrapper i,
     nav a.sidenav-trigger,
     nav a.sidenav-trigger i {
-    height: 64px;
-    line-height: 64px;
+        height: 64px;
+        line-height: 64px;
+    }
 }

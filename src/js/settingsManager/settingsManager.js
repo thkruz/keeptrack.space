@@ -867,7 +867,8 @@ if (typeof window.$ == 'undefined') {
 // Import CSS needed for loading screen
 if (!settingsManager.disableUI) {
   import('@app/css/fonts.css').then((resp) => resp);
-  import('@app/css/materialize.css').then(import('@app/css/materialize-local.css').then((resp) => resp));
+  import('@app/css/materialize-local.css').then((resp) => resp);
+  import('@app/css/materialize.css').then((resp) => resp);
   import('@app/js/lib/external/colorPick.css').then((resp) => resp);
   import('@app/css/perfect-scrollbar.min.css').then((resp) => resp);
   import('@app/css/jquery-ui.min.css').then((resp) => resp);

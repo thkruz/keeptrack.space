@@ -67,10 +67,11 @@ var _propagate = (propTempOffset, satrec, sensor, lookanglesInterval) => {
     if (satellite.isRiseSetLookangles) {
       // Previous Pass to Calculate first line of coverage
       var now1 = new Date();
-      now1.setTime(Number(Date.now()) + propTempOffset - lookanglesInterval * 1000);
+      now1.setTime(Number(now) - 1000);
       let aer1 = satellite.getRae(now1, satrec, sensor);
       let isInFOV1 = satellite.checkIsInFOV(sensor, aer1);
 
+      // Is in FOV and Wasn't Last Time so First Line of Coverage
       if (!isInFOV1) {
         return {
           time: dateFormat(now, 'isoDateTime', true),
@@ -80,10 +81,11 @@ var _propagate = (propTempOffset, satrec, sensor, lookanglesInterval) => {
         };
       } else {
         // Next Pass to Calculate Last line of coverage
-        now1.setTime(Number(Date.now()) + propTempOffset - satellite.lookanglesInterval * 1000);
+        now1.setTime(Number(now) + 1000);
         aer1 = satellite.getRae(now1, satrec, sensor);
         isInFOV1 = satellite.checkIsInFOV(sensor, aer1);
 
+        // Is in FOV and Wont Be Next Time so Last Line of Coverage
         if (!isInFOV1) {
           return {
             time: dateFormat(now, 'isoDateTime', true),
@@ -93,7 +95,7 @@ var _propagate = (propTempOffset, satrec, sensor, lookanglesInterval) => {
           };
         }
       }
-      return;
+      return false;
     }
     return {
       time: dateFormat(now, 'isoDateTime', true),
@@ -1408,43 +1410,19 @@ satellite.findBestPass = (sat, sensor, propOffset) => {
   let looksLength = 7;
 
   // Setup flags for passes
-  var score = 0;
-  var sAz = null;
-  var sEl = null;
-  var srng = null;
-  var sTime = null;
-  var passMinrng = sensor.obsmaxrange; // This is set each look to find minimum rng (start at max rng)
-  var passMaxEl = 0;
-  var start3 = false;
-  var stop3 = false;
+  let score = 0;
+  let sAz = null;
+  let sEl = null;
+  let srng = null;
+  let sTime = null;
+  let passMinrng = sensor.obsmaxrange; // This is set each look to find minimum rng (start at max rng)
+  let passMaxEl = 0;
+  let start3 = false;
+  let stop3 = false;
 
-  var orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
+  let orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
 
-  for (var i = 0; i < looksLength * 24 * 60 * 60; i += looksInterval) {
-    // satellite.lookanglesInterval in seconds
-    propTempOffset = i * 1000 + propOffset; // Offset in seconds (msec * 1000)
-    if (lookanglesTable.length <= 5000) {
-      // Maximum of 1500 lines in the look angles table
-      let lookanglesRow = _propagateBestPass(propTempOffset, satrec);
-      // If data came back...
-      if (typeof lookanglesRow != 'undefined') {
-        lookanglesTable.push(lookanglesRow); // Update the table with looks for this 5 second chunk and then increase table counter by 1
-        // Reset flags for next pass
-        score = 0;
-        sAz = null;
-        sEl = null;
-        srng = null;
-        sTime = null;
-        passMinrng = sensor.obsmaxrange; // This is set each look to find minimum rng
-        passMaxEl = 0;
-        start3 = false;
-        stop3 = false;
-        i = i + orbitalPeriod * 60 * 0.75; // Jump 3/4th to the next orbit
-      }
-    }
-  }
-
-  var _propagateBestPass = (propTempOffset, satrec) => {
+  let _propagateBestPass = (propTempOffset, satrec) => {
     let now = new Date(); // Make a time variable
     now.setTime(Number(Date.now()) + propTempOffset); // Set the time variable to the time in the future
     let aer = satellite.getRae(now, satrec, sensor);
@@ -1493,6 +1471,9 @@ satellite.findBestPass = (sat, sensor, propOffset) => {
             tic = 0;
           }
 
+          // Skip pass if satellite is in track right now
+          if (sTime == null) return;
+
           // Last Line of Coverage
           return {
             sortTime: sTime,
@@ -1520,6 +1501,30 @@ satellite.findBestPass = (sat, sensor, propOffset) => {
     }
     return;
   };
+
+  for (var i = 0; i < looksLength * 24 * 60 * 60; i += looksInterval) {
+    // satellite.lookanglesInterval in seconds
+    propTempOffset = i * 1000 + propOffset; // Offset in seconds (msec * 1000)
+    if (lookanglesTable.length <= 5000) {
+      // Maximum of 1500 lines in the look angles table
+      let lookanglesRow = _propagateBestPass(propTempOffset, satrec);
+      // If data came back...
+      if (typeof lookanglesRow != 'undefined') {
+        lookanglesTable.push(lookanglesRow); // Update the table with looks for this 5 second chunk and then increase table counter by 1
+        // Reset flags for next pass
+        score = 0;
+        sAz = null;
+        sEl = null;
+        srng = null;
+        sTime = null;
+        passMinrng = sensor.obsmaxrange; // This is set each look to find minimum rng
+        passMaxEl = 0;
+        start3 = false;
+        stop3 = false;
+        i = i + orbitalPeriod * 60 * 0.75; // Jump 3/4th to the next orbit
+      }
+    }
+  }
 
   return lookanglesTable;
 };

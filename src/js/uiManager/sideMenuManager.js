@@ -92,6 +92,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
     let sats = $('#analysis-bpt-sats').val();
     if (!sensorManager.checkSensorSelected()) {
       // Default to COD
+      // TODO: Should be an error message instead
       satellite.findBestPasses(sats, sensorManager.sensorList.COD);
     } else {
       satellite.findBestPasses(sats, sensorManager.selectedSensor);
@@ -112,12 +113,29 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
       $('#settings-sat-label-mode').removeClass('lever:after');
     }
   });
+
+  $('#settings-riseset').on('change', function (e) {
+    let isRiseSetChecked = document.getElementById('settings-riseset').checked;
+    if (isRiseSetChecked) {
+      satellite.isRiseSetLookangles = true;
+    } else {
+      satellite.isRiseSetLookangles = false;
+    }
+  });
+
+  $('#lookanglesLength').on('change', function (e) {
+    satellite.lookanglesLength = $('#lookanglesLength').val() * 1;
+  });
+
+  $('#lookanglesInterval').on('change', function (e) {
+    satellite.lookanglesInterval = $('#lookanglesInterval').val() * 1;
+  });
+
   $('#settings-form').on('submit', function (e) {
     var isHOSChecked = document.getElementById('settings-hos').checked;
     var isDMChecked = document.getElementById('settings-demo-mode').checked;
     var isSLMChecked = document.getElementById('settings-sat-label-mode').checked;
     var isSNPChecked = document.getElementById('settings-snp').checked;
-    var isRiseSetChecked = document.getElementById('settings-riseset').checked;
 
     if (isSLMChecked) {
       settingsManager.isSatLabelModeOn = true;
@@ -143,15 +161,6 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
     } else {
       sMM.isShowNextPass = false;
     }
-
-    if (isRiseSetChecked) {
-      satellite.isRiseSetLookangles = true;
-    } else {
-      satellite.isRiseSetLookangles = false;
-    }
-
-    satellite.lookanglesLength = $('#lookanglesLength').val() * 1;
-    satellite.lookanglesInterval = $('#lookanglesInterval').val() * 1;
 
     settingsManager.isForceColorScheme = true;
     satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
@@ -1351,10 +1360,10 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
     uiManager.hideSideMenus();
     sMM.isDOPMenuOpen = true;
     $('#loading-screen').fadeIn(1000, function () {
-      var lat = $('#dops-lat').val() * 1;
-      var lon = $('#dops-lon').val() * 1;
-      var alt = $('#dops-alt').val() * 1;
-      var el = $('#dops-el').val() * 1;
+      let lat = $('#dops-lat').val() * 1;
+      let lon = $('#dops-lon').val() * 1;
+      let alt = $('#dops-alt').val() * 1;
+      let el = $('#dops-el').val() * 1;
       settingsManager.gpsElevationMask = el;
       satellite.getDOPsTable(lat, lon, alt);
       $('#menu-dops').addClass('bmenu-item-selected');
@@ -1363,20 +1372,13 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
     });
     e.preventDefault();
   });
-  var socratesObjOne = []; // Array for tr containing CATNR1
-  var socratesObjTwo = []; // Array for tr containing CATNR2
-  var findFutureDate = (socratesObjTwo, row) => {
-    var socratesDate = socratesObjTwo[row][4].split(' '); // Date/time is on the second line 5th column
-    var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
+  let socratesObjOne = []; // Array for tr containing CATNR1
+  let socratesObjTwo = []; // Array for tr containing CATNR2
+  let findFutureDate = (socratesObjTwo, row) => {
+    let socratesDate = socratesObjTwo[row][4].split(' '); // Date/time is on the second line 5th column
+    let socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
 
-    var sYear = parseInt(socratesDate[0]); // UTC Year
-    var sMon = MMMtoInt(socratesDate[1]); // UTC Month in MMM prior to converting
-    var sDay = parseInt(socratesDate[2]); // UTC Day
-    var sHour = parseInt(socratesTime[0]); // UTC Hour
-    var sMin = parseInt(socratesTime[1]); // UTC Min
-    var sSec = parseInt(socratesTime[2]); // UTC Sec - This is a decimal, but when we convert to int we drop those
-
-    var MMMtoInt = (month) => {
+    let MMMtoInt = (month) => {
       switch (month) {
         case 'Jan':
           return 0;
@@ -1405,12 +1407,19 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
       }
     }; // Convert MMM format to an int for Date() constructor
 
-    var selectedDate = new Date(sYear, sMon, sDay, sHour, sMin, sSec); // New Date object of the future collision
+    let sYear = parseInt(socratesDate[0]); // UTC Year
+    let sMon = MMMtoInt(socratesDate[1]); // UTC Month in MMM prior to converting
+    let sDay = parseInt(socratesDate[2]); // UTC Day
+    let sHour = parseInt(socratesTime[0]); // UTC Hour
+    let sMin = parseInt(socratesTime[1]); // UTC Min
+    let sSec = parseInt(socratesTime[2]); // UTC Sec - This is a decimal, but when we convert to int we drop those
+
+    let selectedDate = new Date(sYear, sMon, sDay, sHour, sMin, sSec); // New Date object of the future collision
     // Date object defaults to local time.
     selectedDate.setUTCDate(sDay); // Move to UTC day.
     selectedDate.setUTCHours(sHour); // Move to UTC Hour
 
-    var today = new Date(); // Need to know today for offset calculation
+    let today = new Date(); // Need to know today for offset calculation
     timeManager.propOffset = selectedDate - today; // Find the offset from today
     cameraManager.camSnapMode = false;
     satSet.satCruncher.postMessage({
@@ -1496,7 +1505,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
       findFutureDate(socratesObjTwo, row); // Jump to the date/time of the collision
 
       uiManager.doSearch(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Actually perform the search of the two objects
-      settingsManager.socratesOnsatSet.satCruncher = satSet.getIdFromObjNum(socratesObjOne[row][1]);
+      settingsManager.socratesOnSatCruncher = satSet.getIdFromObjNum(socratesObjOne[row][1]);
     } // If a row was selected
   };
 

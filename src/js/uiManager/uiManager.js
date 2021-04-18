@@ -1728,17 +1728,11 @@ $(document).ready(function () {
       rgbCss([0.5, 0.5, 0.5, 1]), // Gray
       rgbCss([1, 1, 1, 1]), // White
     ];
-    $('#settings-color-payload').css({
-      backgroundColor: rgbCss(settingsManager.colors.payload),
-    });
     $('#settings-color-payload').colorPick({
       initialColor: rgbCss(settingsManager.colors.payload),
       palette: colorPalette,
       onColorSelected: function () {
-        this.element.css({
-          backgroundColor: this.color,
-          color: this.color,
-        });
+        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
         if (isNotColorPickerInitialSetup) {
           settingsManager.colors.payload = parseRgba(this.color);
           uiManager.legendColorsChange();
@@ -1747,17 +1741,11 @@ $(document).ready(function () {
         }
       },
     });
-    $('#settings-color-rocketBody').css({
-      backgroundColor: rgbCss(settingsManager.colors.rocketBody),
-    });
     $('#settings-color-rocketBody').colorPick({
       initialColor: rgbCss(settingsManager.colors.rocketBody),
       palette: colorPalette,
       onColorSelected: function () {
-        this.element.css({
-          backgroundColor: this.color,
-          color: this.color,
-        });
+        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
         if (isNotColorPickerInitialSetup) {
           settingsManager.colors.rocketBody = parseRgba(this.color);
           uiManager.legendColorsChange();
@@ -1766,17 +1754,11 @@ $(document).ready(function () {
         }
       },
     });
-    $('#settings-color-debris').css({
-      backgroundColor: rgbCss(settingsManager.colors.debris),
-    });
     $('#settings-color-debris').colorPick({
       initialColor: rgbCss(settingsManager.colors.debris),
       palette: colorPalette,
       onColorSelected: function () {
-        this.element.css({
-          backgroundColor: this.color,
-          color: this.color,
-        });
+        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
         if (isNotColorPickerInitialSetup) {
           settingsManager.colors.debris = parseRgba(this.color);
           uiManager.legendColorsChange();
@@ -1789,10 +1771,7 @@ $(document).ready(function () {
       initialColor: rgbCss(settingsManager.colors.inview),
       palette: colorPalette,
       onColorSelected: function () {
-        this.element.css({
-          backgroundColor: this.color,
-          color: this.color,
-        });
+        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
         if (isNotColorPickerInitialSetup) {
           settingsManager.colors.inview = parseRgba(this.color);
           uiManager.legendColorsChange();
@@ -1805,10 +1784,7 @@ $(document).ready(function () {
       initialColor: rgbCss(settingsManager.colors.missile),
       palette: colorPalette,
       onColorSelected: function () {
-        this.element.css({
-          backgroundColor: this.color,
-          color: this.color,
-        });
+        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
         if (isNotColorPickerInitialSetup) {
           settingsManager.colors.missile = parseRgba(this.color);
           uiManager.legendColorsChange();
@@ -1821,10 +1797,7 @@ $(document).ready(function () {
       initialColor: rgbCss(settingsManager.colors.missileInview),
       palette: colorPalette,
       onColorSelected: function () {
-        this.element.css({
-          backgroundColor: this.color,
-          color: this.color,
-        });
+        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
         if (isNotColorPickerInitialSetup) {
           settingsManager.colors.missileInview = parseRgba(this.color);
           uiManager.legendColorsChange();
@@ -1837,10 +1810,7 @@ $(document).ready(function () {
       initialColor: rgbCss(settingsManager.colors.trusat),
       palette: colorPalette,
       onColorSelected: function () {
-        this.element.css({
-          backgroundColor: this.color,
-          color: this.color,
-        });
+        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
         if (isNotColorPickerInitialSetup) {
           settingsManager.colors.trusat = parseRgba(this.color);
           uiManager.legendColorsChange();
@@ -2353,6 +2323,9 @@ $(document).ready(function () {
             satSet.setColorScheme(settingsManager.currentColorScheme, true);
           }
           break;
+        default:
+          debugger;
+          break;
       }
     });
 
@@ -2416,7 +2389,13 @@ $(document).ready(function () {
       }
 
       uiManager.getsensorinfo();
-      uiManager.lookAtSensor();
+
+      try {
+        uiManager.lookAtSensor();
+      } catch (e) {
+        // TODO: More intentional conditional statement
+        // Multi-sensors break this
+      }
       if (settingsManager.currentColorScheme == ColorScheme.default) {
         uiManager.legendMenuChange('default');
       }
@@ -2577,6 +2556,11 @@ $(document).ready(function () {
         } else {
           if (sMM.watchlistList.length === 0 && !sMM.isWatchlistChanged) {
             uiManager.toast(`Add Satellites to Watchlist!`, 'caution');
+            if (!$('#menu-info-overlay:animated').length) {
+              $('#menu-info-overlay').effect('shake', {
+                distance: 10,
+              });
+            }
             sMM.nextPassArray = [];
             break;
           }
@@ -2600,6 +2584,7 @@ $(document).ready(function () {
           } else {
             uiManager.updateNextPassOverlay(true);
           }
+
           $('#info-overlay-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           $('#menu-info-overlay').addClass('bmenu-item-selected');
           sMM.isInfoOverlayMenuOpen = true;
@@ -2642,6 +2627,7 @@ $(document).ready(function () {
           if (!sensorManager.checkSensorSelected() || sat.static || sat.missile || objectManager.selectedSat === -1) {
             // No Sensor or Satellite Selected
             adviceList.lookanglesDisabled();
+            uiManager.toast(`Select a Satellite First!`, 'caution');
             if (!$('#menu-lookangles:animated').length) {
               $('#menu-lookangles').effect('shake', {
                 distance: 10,
@@ -2773,6 +2759,7 @@ $(document).ready(function () {
           if (objectManager.selectedSat === -1) {
             // No Satellite Selected
             adviceList.ssnLookanglesDisabled();
+            uiManager.toast(`Select a Satellite First!`, 'caution');
             if (!$('#menu-lookanglesmultisite:animated').length) {
               $('#menu-lookanglesmultisite').effect('shake', {
                 distance: 10,
@@ -3006,6 +2993,7 @@ $(document).ready(function () {
             // $('#es-rasc').val(sat.TLE2.substr(18 - 1, 7 + 1).toString());
           } else {
             adviceList.editSatDisabled();
+            uiManager.toast(`Select a Satellite First!`, 'caution');
             if (!$('#menu-editSat:animated').length) {
               $('#menu-editSat').effect('shake', {
                 distance: 10,
@@ -3032,6 +3020,7 @@ $(document).ready(function () {
             $('#nl-inc').val((sat.inclination * RAD2DEG).toPrecision(2));
           } else {
             adviceList.newLaunchDisabled();
+            uiManager.toast(`Select a Satellite First!`, 'caution');
             if (!$('#menu-newLaunch:animated').length) {
               $('#menu-newLaunch').effect('shake', {
                 distance: 10,

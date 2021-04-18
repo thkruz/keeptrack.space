@@ -36,20 +36,20 @@ textarea.materialize-textarea {
 .btn,
 .btn-large,
 .btn-small {
-    background-color: #005a8f;
+    background-color: #005a8f !important;
 }
 
 .btn:hover,
 .btn-large:hover,
 .btn-small:hover {
-    background-color: rgb(0, 165, 244);
+    background-color: rgb(0, 165, 244) !important;
 }
 
 .btn:focus,
 .btn-large:focus,
 .btn-small:focus,
 .btn-floating:focus {
-    background-color: rgb(0, 115, 214);
+    background-color: rgb(0, 115, 214) !important;
 }
 
 .dropdown-content li > a,

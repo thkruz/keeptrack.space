@@ -1272,6 +1272,28 @@
                 <div id="lookangles-content" class="side-menu">
                   <div class="row">
                     <h5 class="center-align">Sensor Look Angles</h5>
+                    <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
+                    <div id="settings-lookangles">
+                      <h5 class="center-align">Lookangles Settings</h5>
+                      <div class="switch row">
+                        <label>
+                          <input id="settings-riseset" type="checkbox">
+                          <span class="lever"></span>
+                          Show Only Rise and Set Times
+                        </label>
+                      </div>
+                      <div class="input-field col s6">
+                        <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right"
+                          data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated">
+                        <label for="lookanglesLength">Length (Days)</label>
+                      </div>
+                      <div class="input-field col s6">
+                        <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right"
+                          data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
+                        <label for="lookanglesInterval">Interval</label>
+                      </div>
+                      <div class="row"></div>
+                    </div>
                     <table id="looks" class="center-align striped-light centered"></table>
                     <br />
                     <center>
@@ -1638,29 +1660,7 @@
                           </center>
                         </div>
                       </div>
-                      <div class="row"></div>
-                      <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-                      <div id="settings-lookangles">
-                        <h5 class="center-align">Lookangles Settings</h5>
-                        <div class="switch row">
-                          <label>
-                            <input id="settings-riseset" type="checkbox">
-                            <span class="lever"></span>
-                            Show Only Rise and Set Times
-                          </label>
-                        </div>
-                        <div class="input-field col s6">
-                          <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right"
-                            data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated">
-                          <label for="lookanglesLength">Length (Days)</label>
-                        </div>
-                        <div class="input-field col s6">
-                          <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right"
-                            data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
-                          <label for="lookanglesInterval">Interval</label>
-                        </div>
-                        <div class="row"></div>
-                      </div>
+                      <div class="row"></div>                      
                       <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
                       <div id="satOverfly-opt">
                         <h5 class="center-align">Satellite Overfly Settings</h5>

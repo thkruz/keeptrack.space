@@ -42,15 +42,18 @@ $(document).ready(function () {
   if (wasAdviceEnabled == 'true' || wasAdviceEnabled == null) {
     adviceManager.on();
     adviceList.welcome();
-    setTimeout(adviceList.useLegend, 5 * 1000 * 6);
-    setTimeout(adviceList.showSensors, 10 * 1000 * 6);
-    setTimeout(adviceList.findISS, 15 * 1000 * 6);
-    setTimeout(adviceList.missileMenu, 20 * 1000 * 6);
-    setTimeout(adviceList.toggleNight, 25 * 1000 * 6);
-    setTimeout(adviceList.socrates, 30 * 1000 * 6);
-    setTimeout(adviceList.colorScheme, 35 * 1000 * 6);
-    setTimeout(adviceList.customSensors, 40 * 1000 * 6);
-    setTimeout(adviceList.countries, 45 * 1000 * 6);
+
+    let adviceDisplayTime = 60 * 1000; // 60s
+
+    setTimeout(adviceList.useLegend, adviceDisplayTime);
+    setTimeout(adviceList.showSensors, 2 * adviceDisplayTime);
+    setTimeout(adviceList.findISS, 3 * adviceDisplayTime);
+    setTimeout(adviceList.missileMenu, 4 * adviceDisplayTime);
+    setTimeout(adviceList.toggleNight, 5 * adviceDisplayTime);
+    setTimeout(adviceList.socrates, 6 * adviceDisplayTime);
+    setTimeout(adviceList.colorScheme, 7 * adviceDisplayTime);
+    setTimeout(adviceList.customSensors, 8 * adviceDisplayTime);
+    setTimeout(adviceList.countries, 9 * adviceDisplayTime);
   } else {
     adviceManager.off();
   }

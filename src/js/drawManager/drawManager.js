@@ -250,9 +250,20 @@ drawManager.drawLoop = (preciseDt) => {
       postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
       postProcessingManager.switchFrameBuffer();
       postProcessingManager.programs.gaussian.uniformValues.dir = { x: 0.0, y: 1.0 };
-      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
-    } else {
-      // Test
+      if (postProcessingManager.isFxaaNeeded) {
+        postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
+        postProcessingManager.switchFrameBuffer();
+      } else {
+        postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
+      }
+    }
+    if (postProcessingManager.isFxaaNeeded) {
+      if (postProcessingManager.isSmaaNeeded) {
+        postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.fxaa, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
+        postProcessingManager.switchFrameBuffer();
+      } else {
+        postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.fxaa, postProcessingManager.curBuffer, null);
+      }
     }
   }
 
@@ -323,7 +334,9 @@ drawManager.drawOptionalScenery = () => {
       // Draw the moon
       sceneManager.moon.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
 
-      sceneManager.atmosphere.draw(drawManager.pMatrix, cameraManager);
+      if (cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
+        sceneManager.atmosphere.draw(drawManager.pMatrix, cameraManager);
+      }
     }
   }
 };
@@ -773,18 +786,27 @@ drawManager.checkIfPostProcessingRequired = () => {
   // if (drawManager.gaussianAmt > 0) {
   //   drawManager.gaussianAmt -= drawManager.dt * 2;
   //   drawManager.isNeedPostProcessing = true;
-  //   postProcessingManager.isGaussianNeeded = true;
+  postProcessingManager.isGaussianNeeded = false;
   // } else {
   //   postProcessingManager.isGaussianNeeded = false;
   // }
 
+  postProcessingManager.isFxaaNeeded = true;
+
   if (postProcessingManager.isGaussianNeeded) {
     drawManager.isNeedPostProcessing = true;
     postProcessingManager.switchFrameBuffer();
-  } else {
-    postProcessingManager.curBuffer = null;
-    drawManager.isNeedPostProcessing = false;
+    return;
   }
+
+  if (postProcessingManager.isFxaaNeeded) {
+    drawManager.isNeedPostProcessing = true;
+    postProcessingManager.switchFrameBuffer();
+    return;
+  }
+
+  postProcessingManager.curBuffer = null;
+  drawManager.isNeedPostProcessing = false;
 };
 
 drawManager.clearFrameBuffers = () => {

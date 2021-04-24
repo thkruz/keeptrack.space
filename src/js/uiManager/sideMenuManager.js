@@ -114,7 +114,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
     }
   });
 
-  $('#settings-riseset').on('change', function (e) {
+  $('#settings-riseset').on('change', function () {
     let isRiseSetChecked = document.getElementById('settings-riseset').checked;
     if (isRiseSetChecked) {
       satellite.isRiseSetLookangles = true;
@@ -123,11 +123,11 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
     }
   });
 
-  $('#lookanglesLength').on('change', function (e) {
+  $('#lookanglesLength').on('change', function () {
     satellite.lookanglesLength = $('#lookanglesLength').val() * 1;
   });
 
-  $('#lookanglesInterval').on('change', function (e) {
+  $('#lookanglesInterval').on('change', function () {
     satellite.lookanglesInterval = $('#lookanglesInterval').val() * 1;
   });
 

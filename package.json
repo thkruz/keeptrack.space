@@ -119,8 +119,7 @@
     "materialize-css": "github:Dogfalo/materialize",
     "meeusjs": "^1.0.4",
     "ootk": "github:thkruz/ootk#develop",
-    "satellite.js": "^4.1.3",
-    "sgp4-js": "github:thkruz/sgp4-js",
+    "satellite.js": "^4.1.3",    
     "twgl.js": "github:greggman/twgl.js"
   }
 }

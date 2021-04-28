@@ -65,7 +65,7 @@ src/social/*
 src/textures-extra
 src/radarData/radar*
 src/admin
-src/analysis
+src/analysis/sathist
 src/tle/2006*
 src/tle/TLE.json.bak
 src/tle/mw*

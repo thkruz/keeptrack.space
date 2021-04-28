@@ -1,0 +1,122 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+  <!--Import Fonts-->
+  <link href="/css/fonts.css" rel="stylesheet">
+  <!--Import Materialize CSS-->
+  <link rel="stylesheet" href="/css/materialize.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body id="editor-menu">
+  <div class="text-select">
+    <div id="editor-content">
+      <form id="editorForm" target="_blank" method="get">
+        <div class="row">
+          <div class="col s12"><h5 class="center-align">Analyst Toolkit</h5></div>
+        </div>
+        <div class="row">
+          <div class="input-field col s3 center-align">
+            <button id="find-sun-button" class="btn waves-effect waves-light" type="submit" formaction="findsun.php" >Find Sun &#9658;</button>
+          </div>
+          <div class="input-field col s3 center-align">
+            <button id="get-tle-button" class="btn waves-effect waves-light" type="submit" formaction="tle.php" >Get TLE &#9658;</button>
+          </div>
+          <div class="input-field col s3 center-align">
+            <button id="lookup-button" class="btn waves-effect waves-light" type="submit" formaction="lookup.php" >Lookup Satellite &#9658;</button>
+          </div>
+          <div class="input-field col s3 center-align">
+            <button id="lookangles-button" class="btn waves-effect waves-light" type="submit" formaction="lookangles.php" >Get Lookangles &#9658;</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
+            <input id="hide-config" name="hide-config" type="checkbox">
+            <label for="hide-config">Hide Config Header</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
+            <input placeholder="00005" id="sat" name="sat" type="text">
+            <label for="sat">Satellite SCC#</label>
+          </div>
+          <div class="input-field col s6">
+            <input placeholder="Payload A" id="editor-ON" type="text">
+            <label for="editor-ON">Object Name</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
+            <input placeholder="Unknown" id="editor-C" type="text">
+            <label for="editor-C">Country (Payload Owner)</label>
+          </div>
+          <div class="input-field col s6" id="editor-LS-menu">
+            <select id="editor-LS">
+                <option value="U">Unknown</option>
+              <optgroup label="United States">
+                <option value="CAS">Canary Island Air Space (Pegasus)</option>
+                <option value="AFETR">Cape Canaveral AFS | Kennedy Space Center</option>
+                <option value="ERAS">Eastern Range Air Space (Pegasus)</option>
+                <option value="KODAK">Kodiak Launch Complex</option>
+                <option value="KWAJ">Reagan Test Site</option>
+                <option value="AFWTR">Vandenberg AFB</option>
+                <option value="WLPIS">Wallops Flight Facility</option>
+                <option value="WRAS">Western Range Air Space (Pegasus)</option>
+              </optgroup>
+              <optgroup label="Russia">
+                <option value="KYMTR">Kasputin Yar MSC</option>
+                <option value="PKMTR">Plesetsk MSC</option>
+                <option value="SEAL">Sea Launch Platform</option>
+                <option value="SADOL">Submarine Launch, Barents Sea</option>
+                <option value="TTMTR">Tyuratam MSC | Baikonur Cosmodrome</option>
+                <option value="VOSTO">Vostochny Cosmodrome</option>
+                <option value="OREN">Yasny (Dombarovskiy) Cosmodrome</option>
+              </optgroup>
+              <optgroup label="China">
+                <option value="JSC">Jiuquan SLC</option>
+                <option value="TSC">Taiyuan SLC</option>
+                <option value="WSC">Wenchang SLC</option>
+                <option value="XSC">Xichang SLC</option>
+              </optgroup>
+              <optgroup label="Japan">
+                <option value="TNSTA">Tanegashima Space Center</option>
+                <option value="KSCUT">Uchinoura Space Center</option>
+              </optgroup>
+              <optgroup label="North Korea">
+                <option value="YUN">Sohae Satellite Launch Station</option>
+                <option value="TNGH">Tonghae Satellite Launching Ground</option>
+              </optgroup>
+              <optgroup label="Other">
+                <option value="FRGUI">Guiana Space Centre (Kourou FG)</option>
+                <option value="HGSTR">Hammaguira Space Track Range</option>
+                <option value="NSC">Naro Space Center</option>
+                <option value="YAVNE">Palmachim Air Force Base</option>
+                <option value="RLLC">Rocket Labs Launch Complex</option>
+                <option value="SNMLP">San Marco Launch Platform</option>
+                <option value="SRI">Satish Dhawan Space Centre (Sriharikota IN)</option>
+                <option value="SEM">Semnan Spaceport</option>
+                <option value="WOMRA">Woomera Test Range</option>
+              </optgroup>
+            </select>
+            <label>Launch Site</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
+            <input placeholder="Unknown" id="editor-LV" type="text">
+            <label for="editor-LV">Launch Vehicle</label>
+          </div>
+          <div class="input-field col s6">
+            <input placeholder="0.1" id="editor-R" type="text">
+            <label for="editor-LV">RCS (m^2)</label>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <link rel="stylesheet" href="/css/perfect-scrollbar.min.css" type="text/css">
+  <script src="/js/lib/jquery.min.js"></script>
+  <script src="/js/lib/materialize.js"></script>
+  <!--  -->
+</body>
+</html>

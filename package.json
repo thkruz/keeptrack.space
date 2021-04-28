@@ -118,8 +118,8 @@
     "jquery-ui-bundle": "^1.12.1-migrate",
     "materialize-css": "github:Dogfalo/materialize",
     "meeusjs": "^1.0.4",
-    "ootk": "github:thkruz/ootk#develop",
-    "satellite.js": "^4.1.3",    
+    "ootk": "^1.0.4",
+    "satellite.js": "^4.1.3",
     "twgl.js": "github:greggman/twgl.js"
   }
 }

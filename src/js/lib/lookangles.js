@@ -20,7 +20,7 @@
  */
 
 'use strict';
-import * as Ootk from '@app/js/lib/external/ootk/lib/ootk.es.js';
+import * as Ootk from 'ootk';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 import { saveCsv, saveVariable, stringPad } from '@app/js/lib/helpers.js';
 import $ from 'jquery';

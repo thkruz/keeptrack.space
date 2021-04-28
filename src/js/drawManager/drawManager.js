@@ -250,21 +250,41 @@ drawManager.drawLoop = (preciseDt) => {
       postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
       postProcessingManager.switchFrameBuffer();
       postProcessingManager.programs.gaussian.uniformValues.dir = { x: 0.0, y: 1.0 };
-      if (postProcessingManager.isFxaaNeeded) {
-        postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
-        postProcessingManager.switchFrameBuffer();
-      } else {
-        postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
-      }
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
+      postProcessingManager.switchFrameBuffer();
     }
+
+    // Makes small amount of blur that isn't helpful
     if (postProcessingManager.isFxaaNeeded) {
-      if (postProcessingManager.isSmaaNeeded) {
-        postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.fxaa, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
-        postProcessingManager.switchFrameBuffer();
-      } else {
-        postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.fxaa, postProcessingManager.curBuffer, null);
-      }
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.fxaa, postProcessingManager.curBuffer, null);
+      postProcessingManager.switchFrameBuffer();
     }
+
+    // SMAA Makes this noticeablly blurry.
+    if (postProcessingManager.isSmaaNeeded) {
+      // Reuse godrays frame buffer to reduce GPU Memory Requirements
+      // Clear it first
+      gl.bindFramebuffer(gl.FRAMEBUFFER, sceneManager.sun.godraysFrameBuffer);
+      gl.clearColor(0.0, 0.0, 0.0, 0.0);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+      // postProcessingManager.switchFrameBuffer();
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.hdr, postProcessingManager.curBuffer, sceneManager.sun.godraysFrameBuffer);
+
+      // Load input into edges
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.smaaEdges, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
+      postProcessingManager.switchFrameBuffer();
+      // Load edges into weights
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.smaaWeights, postProcessingManager.curBuffer, postProcessingManager.curBuffer);
+
+      // Load weights into blend along with original
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.smaaBlend, postProcessingManager.curBuffer, null, sceneManager.sun);
+    }
+
+    // if (!postProcessingManager.isSmaaNeeded) {
+    // NOTE: HDR makes jagged edges on images
+    //   postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.hdr, postProcessingManager.curBuffer, null);
+    // }
   }
 
   // callbacks at the end of the draw loop (this should be used more!)
@@ -317,19 +337,21 @@ drawManager.drawOptionalScenery = () => {
       }
       // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
       // todo: this should be a dynamic buffer not hardcoded to bufffer two
-      sceneManager.sun.godraysPostProcessing(gl, postProcessingManager.frameBufferInfos.two.frameBuffer);
+      postProcessingManager.curBuffer = null;
+      sceneManager.sun.godraysPostProcessing(gl, postProcessingManager.curBuffer);
 
       if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
         sceneManager.atmosphere.draw(drawManager.pMatrix, cameraManager);
       }
 
       // Apply two pass gaussian blur to the godrays to smooth them out
-      postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
-      postProcessingManager.programs.gaussian.uniformValues.dir = { x: 1.0, y: 0.0 };
-      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.frameBufferInfos.two.frameBuffer, postProcessingManager.frameBufferInfos.one.frameBuffer);
-      postProcessingManager.programs.gaussian.uniformValues.dir = { x: 0.0, y: 1.0 };
-      // After second pass apply the results to the canvas
-      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.frameBufferInfos.one.frameBuffer, postProcessingManager.curBuffer);
+      // postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
+      // postProcessingManager.programs.gaussian.uniformValues.dir = { x: 1.0, y: 0.0 };
+      // postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
+      // postProcessingManager.switchFrameBuffer();
+      // postProcessingManager.programs.gaussian.uniformValues.dir = { x: 0.0, y: 1.0 };
+      // // After second pass apply the results to the canvas
+      // postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
 
       // Draw the moon
       sceneManager.moon.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
@@ -339,6 +361,7 @@ drawManager.drawOptionalScenery = () => {
       }
     }
   }
+  postProcessingManager.curBuffer = null;
 };
 
 drawManager.satCalculate = () => {
@@ -791,7 +814,10 @@ drawManager.checkIfPostProcessingRequired = () => {
   //   postProcessingManager.isGaussianNeeded = false;
   // }
 
-  postProcessingManager.isFxaaNeeded = true;
+  // Slight Blur
+  postProcessingManager.isFxaaNeeded = false;
+  // Horrible Results
+  postProcessingManager.isSmaaNeeded = false;
 
   if (postProcessingManager.isGaussianNeeded) {
     drawManager.isNeedPostProcessing = true;
@@ -805,7 +831,13 @@ drawManager.checkIfPostProcessingRequired = () => {
     return;
   }
 
-  postProcessingManager.curBuffer = null;
+  if (postProcessingManager.isSmaaNeeded) {
+    drawManager.isNeedPostProcessing = true;
+    postProcessingManager.switchFrameBuffer();
+    return;
+  }
+
+  // postProcessingManager.switchFrameBuffer();
   drawManager.isNeedPostProcessing = false;
 };
 
@@ -814,9 +846,9 @@ drawManager.clearFrameBuffers = () => {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   // Clear all post processing frame buffers
-  // if (drawManager.isNeedPostProcessing) {
-  postProcessingManager.clearAll();
-  // }
+  if (drawManager.isNeedPostProcessing) {
+    postProcessingManager.clearAll();
+  }
   // Clear the godraysPostProcessing Frame Buffer
   gl.bindFramebuffer(gl.FRAMEBUFFER, sceneManager.sun.godraysFrameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);

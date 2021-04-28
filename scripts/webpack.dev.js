@@ -1,5 +1,6 @@
 /* eslint-disable */
 var webpack = require('webpack');
+var glob = require('glob');
 
 let config = {
   module: {
@@ -43,8 +44,14 @@ let config = {
   stats: 'minimal',
 };
 
+function getDirectories(srcpath) {
+  return fs.readdirSync(srcpath).filter(function (file) {
+    return fs.statSync(path.join(srcpath, file)).isDirectory();
+  });
+}
+
 var jsConfig = Object.assign({}, config, {
-  name: 'jsConfig',
+  name: 'MainFiles',
   devtool: 'source-map',
   mode: 'development',
   entry: {
@@ -64,5 +71,23 @@ var jsConfig = Object.assign({}, config, {
   },
 });
 
+var jsConfig2 = Object.assign({}, config, {
+  name: 'Libraries',
+  devtool: 'source-map',
+  mode: 'development',
+  entry: {
+    'analysis-tools': ['./src/analysis/js/analysis-tools.js'],
+  },
+  resolve: {
+    alias: {
+      '@app': __dirname + '/../src',
+    },
+  },
+  output: {
+    filename: '[name].js',
+    path: __dirname + '/../dist/analysis/js/',
+  },
+});
+
 // Return Array of Configurations
-module.exports = [jsConfig];
+module.exports = [jsConfig, jsConfig2];

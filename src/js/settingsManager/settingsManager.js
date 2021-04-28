@@ -23,8 +23,8 @@ import { RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 let settingsManager = {};
 {
   //  Version Control
-  settingsManager.versionNumber = '3.0.6';
-  settingsManager.versionDate = 'December 28, 2020';
+  settingsManager.versionNumber = '3.0.7';
+  settingsManager.versionDate = 'April 5, 2021';
 
   // Install Folder Settings
   {
@@ -604,7 +604,6 @@ let settingsManager = {};
   settingsManager.isPropRateChange = false;
   settingsManager.isOnlyFOVChecked = false;
   settingsManager.isBottomMenuOpen = false;
-  settingsManager.isMapMenuOpen = false;
   settingsManager.isForceColorScheme = false;
 
   settingsManager.isDemoModeOn = false;
@@ -868,7 +867,8 @@ if (typeof window.$ == 'undefined') {
 // Import CSS needed for loading screen
 if (!settingsManager.disableUI) {
   import('@app/css/fonts.css').then((resp) => resp);
-  import('@app/css/materialize.css').then(import('@app/css/materialize-local.css').then((resp) => resp));
+  import('@app/css/materialize.css').then((resp) => resp);
+  import('@app/css/materialize-local.css').then((resp) => resp);
   import('@app/js/lib/external/colorPick.css').then((resp) => resp);
   import('@app/css/perfect-scrollbar.min.css').then((resp) => resp);
   import('@app/css/jquery-ui.min.css').then((resp) => resp);

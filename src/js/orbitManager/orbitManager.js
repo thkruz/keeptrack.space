@@ -111,19 +111,19 @@ orbitManager.init = function (glRef, cameraManagerRef, groupsManagerRef) {
 };
 
 orbitManager.updateOrbitBuffer = function (satId, force, TLE1, TLE2, missile, latList, lonList, altList) {
-  if (!inProgress[satId] && !satSet.getSat(satId).static) {
-    if (force) {
-      orbitWorker.postMessage({
-        isInit: false,
-        isUpdate: true,
-        satId: satId,
-        realTime: timeManager.propRealTime,
-        offset: timeManager.propOffset,
-        rate: timeManager.propRate,
-        TLE1: TLE1,
-        TLE2: TLE2,
-      });
-    } else if (missile) {
+  if (force) {
+    orbitWorker.postMessage({
+      isInit: false,
+      isUpdate: true,
+      satId: satId,
+      realTime: timeManager.propRealTime,
+      offset: timeManager.propOffset,
+      rate: timeManager.propRate,
+      TLE1: TLE1,
+      TLE2: TLE2,
+    });
+  } else if (!inProgress[satId] && !satSet.getSat(satId).static) {
+    if (missile) {
       orbitWorker.postMessage({
         isInit: false,
         isUpdate: true,

@@ -1,5 +1,6 @@
 /* eslint-disable no-useless-escape */
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+import { mat4 } from 'gl-matrix';
 
 class Dots {
   constructor(gl) {
@@ -28,6 +29,12 @@ class Dots {
     this.loaded = true;
   }
 
+  updatePMvCamMatrix = (pMatrix, cameraManager) => {
+    this.pMvCamMatrix = glm.mat4.create();
+    mat4.mul(this.pMvCamMatrix, this.pMvCamMatrix, pMatrix);
+    mat4.mul(this.pMvCamMatrix, this.pMvCamMatrix, cameraManager.camMatrix);
+  };
+
   // eslint-disable-next-line class-methods-use-this
   draw(pMatrix, cameraManager, colorScheme, tgtBuffer) {
     if (!this.loaded || !settingsManager.cruncherReady) return;
@@ -37,11 +44,8 @@ class Dots {
 
     gl.useProgram(this.drawProgram);
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
-    //  gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
+    gl.uniformMatrix4fv(this.drawProgram.pMvCamMatrix, false, this.pMvCamMatrix);
 
-    gl.uniformMatrix4fv(this.drawProgram.uMvMatrix, false, this.emptyMat4);
-    gl.uniformMatrix4fv(this.drawProgram.uCamMatrix, false, cameraManager.camMatrix);
-    gl.uniformMatrix4fv(this.drawProgram.uPMatrix, false, pMatrix);
     if (cameraManager.cameraType.current == cameraManager.cameraType.planetarium) {
       gl.uniform1f(this.drawProgram.minSize, settingsManager.satShader.minSizePlanetarium);
       gl.uniform1f(this.drawProgram.maxSize, settingsManager.satShader.maxSizePlanetarium);
@@ -79,10 +83,8 @@ class Dots {
 
     gl.useProgram(this.pickingProgram);
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.pickingFrameBuffer);
-    //  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.uniformMatrix4fv(this.pickingProgram.uMvMatrix, false, this.emptyMat4);
-    gl.uniformMatrix4fv(this.pickingProgram.uCamMatrix, false, cameraManager.camMatrix);
-    gl.uniformMatrix4fv(this.pickingProgram.uPMatrix, false, pMatrix);
+
+    gl.uniformMatrix4fv(this.pickingProgram.pMvCamMatrix, false, this.pMvCamMatrix);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.pickingColorBuffer);
     gl.enableVertexAttribArray(this.pickingProgram.aColor);
@@ -145,9 +147,7 @@ class Dots {
         uniform float minSize;
         uniform float maxSize;
 
-        uniform mat4 uCamMatrix;
-        uniform mat4 uMvMatrix;
-        uniform mat4 uPMatrix;
+        uniform mat4 pMvCamMatrix;
 
         varying vec4 vColor;
         varying float vStar;
@@ -161,7 +161,7 @@ class Dots {
         }
 
         void main(void) {
-            vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
+            vec4 position = pMvCamMatrix * vec4(aPos, 1.0);
             float drawSize = 0.0;
             float dist = distance(vec3(0.0, 0.0, 0.0),aPos.xyz);
 
@@ -194,14 +194,12 @@ class Dots {
               attribute vec3 aColor;
               attribute float aPickable;
       
-              uniform mat4 uCamMatrix;
-              uniform mat4 uMvMatrix;
-              uniform mat4 uPMatrix;
+              uniform mat4 pMvCamMatrix;
       
               varying vec3 vColor;
       
               void main(void) {
-              vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos, 1.0);
+              vec4 position = pMvCamMatrix * vec4(aPos, 1.0);
               gl_Position = position;
               gl_PointSize = ${this.pickingDotSize} * aPickable;
               vColor = aColor * aPickable;
@@ -244,9 +242,7 @@ class Dots {
     this.drawProgram.aStar = gl.getAttribLocation(this.drawProgram, 'aStar');
     this.drawProgram.minSize = gl.getUniformLocation(this.drawProgram, 'minSize');
     this.drawProgram.maxSize = gl.getUniformLocation(this.drawProgram, 'maxSize');
-    this.drawProgram.uMvMatrix = gl.getUniformLocation(this.drawProgram, 'uMvMatrix');
-    this.drawProgram.uCamMatrix = gl.getUniformLocation(this.drawProgram, 'uCamMatrix');
-    this.drawProgram.uPMatrix = gl.getUniformLocation(this.drawProgram, 'uPMatrix');
+    this.drawProgram.pMvCamMatrix = gl.getUniformLocation(this.drawProgram, 'pMvCamMatrix');
   }
 
   createPickingProgram(gl) {
@@ -267,9 +263,7 @@ class Dots {
     this.pickingProgram.aPos = gl.getAttribLocation(this.pickingProgram, 'aPos');
     this.pickingProgram.aColor = gl.getAttribLocation(this.pickingProgram, 'aColor');
     this.pickingProgram.aPickable = gl.getAttribLocation(this.pickingProgram, 'aPickable');
-    this.pickingProgram.uCamMatrix = gl.getUniformLocation(this.pickingProgram, 'uCamMatrix');
-    this.pickingProgram.uMvMatrix = gl.getUniformLocation(this.pickingProgram, 'uMvMatrix');
-    this.pickingProgram.uPMatrix = gl.getUniformLocation(this.pickingProgram, 'uPMatrix');
+    this.pickingProgram.pMvCamMatrix = gl.getUniformLocation(this.pickingProgram, 'pMvCamMatrix');
 
     this.pickingFrameBuffer = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.pickingFrameBuffer);
@@ -484,7 +478,7 @@ class Dots {
     this.drawProgram.maxSize = gl.getUniformLocation(this.drawProgram, 'maxSize');
     this.drawProgram.uMvMatrix = gl.getUniformLocation(this.drawProgram, 'uMvMatrix');
     this.drawProgram.uCamMatrix = gl.getUniformLocation(this.drawProgram, 'uCamMatrix');
-    this.drawProgram.uPMatrix = gl.getUniformLocation(this.drawProgram, 'uPMatrix');
+    this.drawProgram.pMvCamMatrix = gl.getUniformLocation(this.drawProgram, 'pMvCamMatrix');
   };
 */
 

@@ -5,7 +5,6 @@ class LineFactory {
   #getIdFromStarName = null;
   #getSat = null;
   #getSatPosOnly = null;
-  #i = 0;
   #tempStar1 = null;
   #tempStar2 = null;
 
@@ -20,9 +19,9 @@ class LineFactory {
   }
 
   drawWhenSelected() {
-    for (this.#i = 0; this.#i < this.drawLineList.length; this.#i++) {
-      if (this.drawLineList[this.#i].isDrawWhenSelected) {
-        this.drawLineList.splice(this.#i, 1);
+    for (let i = 0; i < this.drawLineList.length; i++) {
+      if (this.drawLineList[i].isDrawWhenSelected) {
+        this.drawLineList.splice(i, 1);
       }
     }
   }
@@ -33,9 +32,9 @@ class LineFactory {
 
   removeStars() {
     let starFound = false;
-    for (this.#i = 0; this.#i < this.drawLineList.length; this.#i++) {
-      if ((typeof this.drawLineList[this.#i].sat !== 'undefined' && this.drawLineList[this.#i].sat.type == 'Star') || (typeof this.drawLineList[this.#i].sat2 !== 'undefined' && this.drawLineList[this.#i].sat2.type == 'Star')) {
-        this.drawLineList.splice(this.#i, 1);
+    for (let i = 0; i < this.drawLineList.length; i++) {
+      if ((typeof this.drawLineList[i].sat !== 'undefined' && this.drawLineList[i].sat.type == 'Star') || (typeof this.drawLineList[i].sat2 !== 'undefined' && this.drawLineList[i].sat2.type == 'Star')) {
+        this.drawLineList.splice(i, 1);
         starFound = true;
       }
     }
@@ -43,6 +42,9 @@ class LineFactory {
   }
 
   create(type, value, color) {
+    let sat = null;
+    let sat2 = null;
+
     if (typeof color == 'undefined') color = [1.0, 0, 1.0, 1.0];
     switch (color) {
       case 'r':
@@ -81,7 +83,7 @@ class LineFactory {
       });
     }
     if (type == 'sat2') {
-      let sat = this.#getSat(value[0]);
+      sat = this.#getSat(value[0]);
       this.drawLineList.push({
         line: new Line(this.gl, this.shader),
         sat: sat,
@@ -91,8 +93,8 @@ class LineFactory {
       });
     }
     if (type == 'sat3') {
-      let sat = this.#getSat(value[0]);
-      let sat2 = this.#getSat(value[1]);
+      sat = this.#getSat(value[0]);
+      sat2 = this.#getSat(value[1]);
       this.drawLineList.push({
         line: new Line(this.gl, this.shader),
         sat: sat,
@@ -105,8 +107,8 @@ class LineFactory {
       });
     }
     if (type == 'sat4') {
-      let sat = this.#getSat(value[0]);
-      let sat2 = this.#getSat(value[1]);
+      sat = this.#getSat(value[0]);
+      sat2 = this.#getSat(value[1]);
       this.drawLineList.push({
         line: new Line(this.gl, this.shader),
         sat: sat,
@@ -119,8 +121,8 @@ class LineFactory {
       });
     }
     if (type == 'sat5') {
-      let sat = this.#getSat(value[0]);
-      let sat2 = this.#getSat(value[1]);
+      sat = this.#getSat(value[0]);
+      sat2 = this.#getSat(value[1]);
       this.drawLineList.push({
         line: new Line(this.gl, this.shader),
         sat: sat,
@@ -152,10 +154,10 @@ class LineFactory {
 
   updateLineToSat(satId, sensorId) {
     let isLineDrawnToSat = false;
-    for (this.#i = 0; this.#i < this.drawLineList.length; this.#i++) {
-      if (typeof this.drawLineList[this.#i].sat == 'undefined') continue;
+    for (let i = 0; i < this.drawLineList.length; i++) {
+      if (typeof this.drawLineList[i].sat == 'undefined') continue;
 
-      if (this.drawLineList[this.#i].sat.id == satId) {
+      if (this.drawLineList[i].sat.id == satId) {
         isLineDrawnToSat = true;
       }
     }
@@ -170,54 +172,54 @@ class LineFactory {
 
   draw() {
     if (this.drawLineList.length == 0) return;
-    for (this.#i = 0; this.#i < this.drawLineList.length; this.#i++) {
-      if (typeof this.drawLineList[this.#i].sat != 'undefined' && this.drawLineList[this.#i].sat != null && typeof this.drawLineList[this.#i].sat.id != 'undefined') {
+    for (let i = 0; i < this.drawLineList.length; i++) {
+      if (typeof this.drawLineList[i].sat != 'undefined' && this.drawLineList[i].sat != null && typeof this.drawLineList[i].sat.id != 'undefined') {
         // At least One Satellite
-        this.drawLineList[this.#i].sat = this.#getSatPosOnly(this.drawLineList[this.#i].sat.id);
-        if (typeof this.drawLineList[this.#i].sat2 != 'undefined' && this.drawLineList[this.#i].sat2 != null) {
+        this.drawLineList[i].sat = this.#getSatPosOnly(this.drawLineList[i].sat.id);
+        if (typeof this.drawLineList[i].sat2 != 'undefined' && this.drawLineList[i].sat2 != null) {
           // Satellite and Static
-          if (typeof this.drawLineList[this.#i].sat2.name != 'undefined') {
-            if (typeof this.drawLineList[this.#i].sat2.id == 'undefined' && this.drawLineList[this.#i].sat2.id != null) {
-              this.drawLineList[this.#i].sat2.id = this.#getIdFromSensorName(this.drawLineList[this.#i].sat2.name);
+          if (typeof this.drawLineList[i].sat2.name != 'undefined') {
+            if (typeof this.drawLineList[i].sat2.id == 'undefined' && this.drawLineList[i].sat2 != null) {
+              this.drawLineList[i].sat2.id = this.#getIdFromSensorName(this.drawLineList[i].sat2.name);
             }
-            this.drawLineList[this.#i].sat2 = this.#getSat(this.drawLineList[this.#i].sat2.id);
-            if (this.drawLineList[this.#i].isOnlyInFOV && !this.drawLineList[this.#i].sat.getTEARR().inview) {
-              this.drawLineList.splice(this.#i, 1);
+            this.drawLineList[i].sat2 = this.#getSat(this.drawLineList[i].sat2.id);
+            if (this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].sat.getTEARR().inview) {
+              this.drawLineList.splice(i, 1);
               continue;
             }
-            this.drawLineList[this.#i].line.set(
-              [this.drawLineList[this.#i].sat.position.x, this.drawLineList[this.#i].sat.position.y, this.drawLineList[this.#i].sat.position.z],
-              [this.drawLineList[this.#i].sat2.position.x, this.drawLineList[this.#i].sat2.position.y, this.drawLineList[this.#i].sat2.position.z]
+            this.drawLineList[i].line.set(
+              [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z],
+              [this.drawLineList[i].sat2.position.x, this.drawLineList[i].sat2.position.y, this.drawLineList[i].sat2.position.z]
             );
           } else {
             // Two Satellites
-            this.drawLineList[this.#i].sat2 = this.#getSatPosOnly(this.drawLineList[this.#i].sat2.id);
-            this.drawLineList[this.#i].line.set(
-              [this.drawLineList[this.#i].sat.position.x, this.drawLineList[this.#i].sat.position.y, this.drawLineList[this.#i].sat.position.z],
-              [this.drawLineList[this.#i].sat2.position.x, this.drawLineList[this.#i].sat2.position.y, this.drawLineList[this.#i].sat2.position.z]
+            this.drawLineList[i].sat2 = this.#getSatPosOnly(this.drawLineList[i].sat2.id);
+            this.drawLineList[i].line.set(
+              [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z],
+              [this.drawLineList[i].sat2.position.x, this.drawLineList[i].sat2.position.y, this.drawLineList[i].sat2.position.z]
             );
           }
         } else {
           // Just One Satellite
-          this.drawLineList[this.#i].line.set(this.drawLineList[this.#i].ref, [this.drawLineList[this.#i].sat.position.x, this.drawLineList[this.#i].sat.position.y, this.drawLineList[this.#i].sat.position.z]);
+          this.drawLineList[i].line.set(this.drawLineList[i].ref, [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]);
         }
-      } else if (typeof this.drawLineList[this.#i].star1 != 'undefined' && typeof this.drawLineList[this.#i].star2 != 'undefined' && this.drawLineList[this.#i].star1 != null && this.drawLineList[this.#i].star2 != null) {
+      } else if (typeof this.drawLineList[i].star1 != 'undefined' && typeof this.drawLineList[i].star2 != 'undefined' && this.drawLineList[i].star1 != null && this.drawLineList[i].star2 != null) {
         // Constellation
-        if (typeof this.drawLineList[this.#i].star1ID == 'undefined') {
-          this.drawLineList[this.#i].star1ID = this.#getIdFromStarName(this.drawLineList[this.#i].star1);
+        if (typeof this.drawLineList[i].star1ID == 'undefined') {
+          this.drawLineList[i].star1ID = this.#getIdFromStarName(this.drawLineList[i].star1);
         }
-        if (typeof this.drawLineList[this.#i].star2ID == 'undefined') {
-          this.drawLineList[this.#i].star2ID = this.#getIdFromStarName(this.drawLineList[this.#i].star2);
+        if (typeof this.drawLineList[i].star2ID == 'undefined') {
+          this.drawLineList[i].star2ID = this.#getIdFromStarName(this.drawLineList[i].star2);
         }
-        this.#tempStar1 = this.#getSatPosOnly(this.drawLineList[this.#i].star1ID);
-        this.#tempStar2 = this.#getSatPosOnly(this.drawLineList[this.#i].star2ID);
-        this.drawLineList[this.#i].line.set([this.#tempStar1.position.x, this.#tempStar1.position.y, this.#tempStar1.position.z], [this.#tempStar2.position.x, this.#tempStar2.position.y, this.#tempStar2.position.z]);
+        this.#tempStar1 = this.#getSatPosOnly(this.drawLineList[i].star1ID);
+        this.#tempStar2 = this.#getSatPosOnly(this.drawLineList[i].star2ID);
+        this.drawLineList[i].line.set([this.#tempStar1.position.x, this.#tempStar1.position.y, this.#tempStar1.position.z], [this.#tempStar2.position.x, this.#tempStar2.position.y, this.#tempStar2.position.z]);
       } else {
         // Arbitrary Lines
-        this.drawLineList[this.#i].line.set(this.drawLineList[this.#i].ref, this.drawLineList[this.#i].ref2);
+        this.drawLineList[i].line.set(this.drawLineList[i].ref, this.drawLineList[i].ref2);
       }
 
-      this.drawLineList[this.#i].line.draw(this.drawLineList[this.#i].color);
+      this.drawLineList[i].line.draw(this.drawLineList[i].color);
     }
   }
 }

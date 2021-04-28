@@ -31,4 +31,32 @@ var saveCsv = (items, name) => {
   saveAs(blob, `${name}.csv`);
 };
 
-export { stringPad, saveVariable, saveCsv, saveAs };
+const parseRgba = (str) => {
+  // eslint-disable-next-line no-useless-escape
+  let [r, g, b, a] = str.match(/[\d\.]+/gu);
+  r = parseInt(r) / 255;
+  g = parseInt(g) / 255;
+  b = parseInt(b) / 255;
+  a = parseFloat(a);
+  return [r, g, b, a];
+};
+
+const hex2RgbA = (hex) => {
+  // eslint-disable-next-line prefer-named-capture-group
+  if (/^#([A-Fa-f0-9]{3}){1,2}$/u.test(hex)) {
+    let c = hex.substring(1).split('');
+    if (c.length == 3) {
+      c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    }
+    c = '0x' + c.join('');
+    const r = ((c >> 16) & 255) / 255;
+    const g = ((c >> 8) & 255) / 255;
+    const b = (c & 255) / 255;
+    return [r, g, b, 1];
+  }
+  throw new Error('Bad Hex');
+};
+
+const rgbCss = (values) => `rgba(${values[0] * 255},${values[1] * 255},${values[2] * 255},${values[3]})`;
+
+export { stringPad, saveVariable, saveCsv, saveAs, parseRgba, hex2RgbA, rgbCss };

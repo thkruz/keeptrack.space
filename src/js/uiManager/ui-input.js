@@ -350,6 +350,8 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           evt.preventDefault();
         }
 
+        uiInput.isStartedOnCanvas = true;
+
         if (cameraManager.speedModifier === 1) {
           settingsManager.cameraMovementSpeed = 0.003;
           settingsManager.cameraMovementSpeedMin = 0.005;
@@ -415,6 +417,12 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         if (settingsManager.disableNormalEvents) {
           evt.preventDefault();
         }
+
+        if (!uiInput.isStartedOnCanvas) {
+          return;
+        }
+        uiInput.isStartedOnCanvas = false;
+
         if (!dragHasMoved) {
           if (settingsManager.isMobileModeEnabled) {
             uiInput.mouseSat = uiInput.getSatIdFromCoord(cameraManager.mouseX, cameraManager.mouseY);
@@ -538,7 +546,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
       //
       // This not the Earth
 
-      if (typeof latLon == 'undefined' || isNaN(latLon.latitude) || isNaN(latLon.longitude)) {
+      if (typeof latLon == 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
         // Intentional
       } else {
         // This is the Earth

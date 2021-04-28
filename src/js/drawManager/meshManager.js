@@ -304,7 +304,7 @@ meshManager.updateNadirYaw = (Camera, sat, timeManager) => {
   meshManager.currentModel.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
 };
 
-meshManager.update = (Camera, cameraManager, sat, timeManager) => {
+meshManager.update = (Camera, cameraManager, timeManager, sat = { id: -1, static: false }) => {
   meshManager.currentModel.id = sat.id;
   meshManager.currentModel.static = sat.static;
 
@@ -462,6 +462,11 @@ meshManager.update = (Camera, cameraManager, sat, timeManager) => {
       return;
     }
   }
+
+  // Catch All for Special Satellites
+  // Generic Model
+  meshManager.currentModel.model = meshManager.models.sat2;
+  return;
 };
 
 meshManager.drawOcclusion = function (pMatrix, camMatrix, occlusionPrgm, tgtBuffer) {

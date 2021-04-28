@@ -75,16 +75,7 @@
   <body id="bodyDOM" class="no-text-select">
     <div id="loading-screen" class="valign-wrapper full-loader">
       <div id="logo-inner-container" class="valign">
-          <span id="logo-text" class="logo-font">KEEP TRACK</span>
-          <!-- <script>
-              if (window.settingsManager.trusatMode) {
-                  document.write(
-                      '<span id="logo-trusat"><img src="' +
-                        window.settingsManager.installDirectory +
-                          'img/trusat.png"></span>'
-                  );
-              }
-          </script> -->
+          <span id="logo-text" class="logo-font">KEEP TRACK</span>          
           <br />
           <div id="spinner" class="preloader-wrapper active">
               <div class="spinner-layer spinner-white-only">
@@ -137,10 +128,6 @@
                               ><i class="material-icons">location_on</i></a
                           >
                       </li>
-                      <!-- <li><a id="time-machine-btn" class="top-menu-btns">
-                        <div id="time-machine-icon" class="top-menu-icons"><img src="img/history.png"></div>
-                        </a>
-                      </li> -->
                       <li>
                           <a
                               id="github-share1"
@@ -210,7 +197,6 @@
                               placeholder="Search.."
                               required
                           />
-                          <!-- <span id="search-close" style="margin-left:5px">X</span> -->
                       </div>
                   </ul>
               </div>
@@ -309,7 +295,6 @@
               <li id="earth-trusat-rmb"><a href="#">TruSat Map</a></li>
               <li id="earth-low-rmb"><a href="#">Low Resolution Map</a></li>
               <li id="earth-high-no-clouds-rmb"><a href="#">High Resoultion Map</a></li>
-              <!-- <li id="earth-high-rmb"><a href="#">High Resolution Map Plus Clouds</a></li> -->
               <li id="earth-vec-rmb"><a href="#">Vector Image Map</a></li>
             </ul>
           </div>
@@ -665,7 +650,7 @@
                   data-tooltip="Large are > 1^2 meter, Small are < 0.1^2 meters">
                   RCS
                 </div>
-                <div class="sat-info-value" id="sat-rcs">
+                <div class="sat-info-value tooltipped" id="sat-rcs">
                   NO DATA
                 </div>
               </div>
@@ -807,7 +792,7 @@
             </div>
             <aside id="left-menus">
               <div id="sensor-list-menu" class="side-menu-parent start-hidden text-select">
-                <div id="sensor-list-content" class="side-menu">
+                <div id="sensor-list-content" class="side-menu">                  
                   <div class="row">
                     <ul id="reset-sensor-text" class="sensor-reset-menu">
                       <h5 id="reset-sensor-button" class="center-align menu-selectable">Reset Sensor</h5>
@@ -816,122 +801,122 @@
                     <ul>
                       <h5 class="center-align">CSpOC Sensors</h5>
                       <li class="divider"></li>
-                      <li class="menu-selectable" id="radar-cspocAll">All CSpOC Sensors<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="cspocAll">All CSpOC Sensors<span class="badge dark-blue-badge"
                           data-badge-caption="Coalition"></span></li>
-                      <li class="menu-selectable" id="radar-mwAll">All MW Sensors<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="mwAll">All MW Sensors<span class="badge dark-blue-badge"
                           data-badge-caption="Coalition"></span></li>
-                      <li class="menu-selectable" id="radar-beale">Beale<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="BLE">Beale<span class="badge dark-blue-badge"
                           data-badge-caption="USSF"></span></li>
-                      <li class="menu-selectable" id="radar-capecod">Cape Cod<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="COD">Cape Cod<span class="badge dark-blue-badge"
                           data-badge-caption="USSF"></span></li>
-                      <li class="menu-selectable" id="radar-parcs">Cavalier<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="CAV">Cavalier<span class="badge dark-blue-badge"
                           data-badge-caption="USSF"></span></li>
-                      <li class="menu-selectable" id="radar-clear">Clear<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="CLR">Clear<span class="badge dark-blue-badge"
                           data-badge-caption="USSF"></span></li>
-                      <li class="menu-selectable" id="radar-cobradane">Cobra Dane<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="CDN">Cobra Dane<span class="badge dark-blue-badge"
                           data-badge-caption="USSF"></span></li>
-                      <li class="menu-selectable" id="radar-eglin">Eglin<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="EGL">Eglin<span class="badge dark-blue-badge"
                           data-badge-caption="USSF"></span></li>
-                      <li class="menu-selectable radar-fylingdales">Fylingdales<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="FYL">Fylingdales<span class="badge dark-blue-badge"
                           data-badge-caption="RAF"></span></li>
-                      <li class="menu-selectable" id="radar-globus">Globus II<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="GLB">Globus II<span class="badge dark-blue-badge"
                           data-badge-caption="NOR"></span></li>
-                      <li class="menu-selectable" id="radar-millstone">Millstone<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="MIL">Millstone<span class="badge dark-blue-badge"
                           data-badge-caption="MIT"></span></li>
-                      <li class="menu-selectable" id="radar-thule">Thule<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="THL">Thule<span class="badge dark-blue-badge"
                           data-badge-caption="USSF"></span></li>
-                      <li class="menu-selectable" id="radar-ascension">Ascension<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="ASC">Ascension<span class="badge dark-blue-badge"
                           data-badge-caption="USSF"></span></li>
-                      <li class="menu-selectable" id="radar-altair">ALTAIR<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="ALT">ALTAIR<span class="badge dark-blue-badge"
                           data-badge-caption="USA"></span></li>
-                      <li class="menu-selectable" id="radar-mmw">Millimeter Wave<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="MMW">Millimeter Wave<span class="badge dark-blue-badge"
                           data-badge-caption="USA"></span></li>
-                      <li class="menu-selectable" id="radar-alcor">ALCOR<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="ALC">ALCOR<span class="badge dark-blue-badge"
                           data-badge-caption="USA"></span></li>
-                      <li class="menu-selectable" id="radar-tradex">TRADEX<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="TDX">TRADEX<span class="badge dark-blue-badge"
                           data-badge-caption="USA"></span></li>
-                      <li class="menu-selectable" id="optical-diego-garcia">Diego Garcia<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="DGC">Diego Garcia<span class="badge dark-blue-badge"
                           data-badge-caption="USSF"></span></li>
-                      <li class="menu-selectable" id="optical-maui">Maui<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="MAU">Maui<span class="badge dark-blue-badge"
                           data-badge-caption="USSF"></span></li>
-                      <li class="menu-selectable" id="optical-socorro">Socorro<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="SOC">Socorro<span class="badge dark-blue-badge"
                           data-badge-caption="USSF"></span></li>
                       <li class="divider"></li>
                       <h5 class="center-align">MDA Sensors</h5>
                       <li class="divider"></li>
-                      <li class="menu-selectable" id="radar-md-all">All Sensors<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="mdAll">All Sensors<span class="badge dark-blue-badge"
                           data-badge-caption="Coalition"></span></li>
-                      <li class="menu-selectable" id="radar-md-har">Har Keren<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="HAR">Har Keren<span class="badge dark-blue-badge"
                           data-badge-caption="ISR"></span></li>
-                      <li class="menu-selectable" id="radar-md-qtr">CENTCOM<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="QTR">CENTCOM<span class="badge dark-blue-badge"
                           data-badge-caption="USA"></span></li>
-                      <li class="menu-selectable" id="radar-md-kur">Kürecik<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="KUR">Kürecik<span class="badge dark-blue-badge"
                           data-badge-caption="USA"></span></li>
-                      <li class="menu-selectable" id="radar-md-sha">Shariki<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="SHA">Shariki<span class="badge dark-blue-badge"
                           data-badge-caption="USA"></span></li>
-                      <li class="menu-selectable" id="radar-md-kcs">Kyogamisaki<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="KCS">Kyogamisaki<span class="badge dark-blue-badge"
                           data-badge-caption="USA"></span></li>
-                      <li class="menu-selectable" id="radar-md-sbx">Sea-Based X-Band<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="SBX">Sea-Based X-Band<span class="badge dark-blue-badge"
                           data-badge-caption="USN"></span></li>
-                      <li class="menu-selectable" id="radar-taiwan">Taiwan SRP<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="TAI">Taiwan SRP<span class="badge dark-blue-badge"
                           data-badge-caption="TAI"></span></li>
                       <li class="divider"></li>
                       <h5 class="center-align">LeoLabs Sensors</h5>
                       <li class="divider"></li>
-                      <li class="menu-selectable" id="radar-ll-all">All Sensors<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="llAll">All Sensors<span class="badge dark-blue-badge"
                           data-badge-caption="Comm"></span></li>
-                      <li class="menu-selectable" id="radar-ll-msr">Midland Radar<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="MSR">Mdata-sensorland Radar<span class="badge dark-blue-badge"
                           data-badge-caption="Comm"></span></li>
-                      <li class="menu-selectable" id="radar-ll-pfisr">PFIS Radar<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="PFISR">PFIS Radar<span class="badge dark-blue-badge"
                           data-badge-caption="Comm"></span></li>
-                      <li class="menu-selectable" id="radar-ll-ksr">Kiwi Space Radar<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="KSR">Kiwi Space Radar<span class="badge dark-blue-badge"
                           data-badge-caption="Comm"></span></li>
                       <li class="divider"></li>
                       <h5 class="center-align">ESOC Sensors</h5>
                       <li class="divider"></li>
-                      <li class="menu-selectable" id="esoc-graves">GRAVES<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="GRV">GRAVES<span class="badge dark-blue-badge"
                           data-badge-caption="FRA"></span></li>
-                      <li class="menu-selectable radar-fylingdales">Fylingdales<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="FYL">Fylingdales<span class="badge dark-blue-badge"
                           data-badge-caption="RAF"></span></li>
-                      <li class="menu-selectable" id="esoc-tira">TIRA<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="TIR">TIRA<span class="badge dark-blue-badge"
                           data-badge-caption="GER"></span></li>
-                      <li class="menu-selectable" id="esoc-northern-cross">Northern Cross<span
+                      <li class="menu-selectable" data-sensor="NRC">Northern Cross<span
                           class="badge dark-blue-badge" data-badge-caption="ITA"></span></li>
-                      <li class="menu-selectable" id="esoc-troodos">Troodos<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="TRO">Troodos<span class="badge dark-blue-badge"
                           data-badge-caption="RAF"></span></li>
-                      <li class="menu-selectable" id="esoc-space-debris-telescope">Space Debris Telescope<span
+                      <li class="menu-selectable" data-sensor="SDT">Space Debris Telescope<span
                           class="badge dark-blue-badge" data-badge-caption="ESA"></span></li>
                           <!-- GALILEO GROUND SENSOR STATION -->
-                      <li class="menu-selectable" id="esoc-galileo-station">GSS Fucino<span
+                      <li class="menu-selectable" data-sensor="GGS">GSS Fucino<span
                           class="badge dark-blue-badge" data-badge-caption="ITA"></span></li>
                           <!-- GALILEO GROUND SENSOR STATION -->
                       <li class="divider"></li>
                       <h5 class="center-align">Russian Sensors</h5>
                       <li class="divider"></li>
-                      <li class="menu-selectable" id="radar-rus-all">All Russian Sensors<span
+                      <li class="menu-selectable" data-sensor="rusAll">All Russian Sensors<span
                           class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
-                      <li class="menu-selectable" id="russian-armavir">Armavir<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="ARM">Armavir<span class="badge dark-blue-badge"
                           data-badge-caption="RUS"></span></li>
-                      <li class="menu-selectable" id="russian-balkhash">Balkhash<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="BAL">Balkhash<span class="badge dark-blue-badge"
                           data-badge-caption="RUS"></span></li>
-                      <li class="menu-selectable" id="russian-gantsevichi">Gantsevichi<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="GAN">Gantsevichi<span class="badge dark-blue-badge"
                           data-badge-caption="RUS"></span></li>
-                      <li class="menu-selectable" id="russian-lekhtusi">Lekhtusi<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="LEK">Lekhtusi<span class="badge dark-blue-badge"
                           data-badge-caption="RUS"></span></li>
-                      <li class="menu-selectable" id="russian-mishelevka-d">Mishelevka<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="MIS">Mishelevka<span class="badge dark-blue-badge"
                           data-badge-caption="RUS"></span></li>
-                      <li class="menu-selectable" id="russian-olenegorsk">Olenegorsk<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="OLE">Olenegorsk<span class="badge dark-blue-badge"
                           data-badge-caption="RUS"></span></li>
-                      <li class="menu-selectable" id="russian-pechora">Pechora<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="PEC">Pechora<span class="badge dark-blue-badge"
                           data-badge-caption="RUS"></span></li>
-                      <li class="menu-selectable" id="russian-pionersky">Pionersky<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="PIO">Pionersky<span class="badge dark-blue-badge"
                           data-badge-caption="RUS"></span></li>
                       <li class="divider"></li>
                       <h5 class="center-align">Chinese Sensors</h5>
                       <li class="divider"></li>
-                      <li class="menu-selectable" id="chinese-xuanhua">Xuanhua<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="XUA">Xuanhua<span class="badge dark-blue-badge"
                           data-badge-caption="PRC"></span></li>
-                      <li class="menu-selectable" id="chinese-purple">Purple Mountain<span class="badge dark-blue-badge"
+                      <li class="menu-selectable" data-sensor="PMO">Purple Mountain<span class="badge dark-blue-badge"
                           data-badge-caption="PRC"></span></li>
                     </ul>
                   </div>
@@ -1287,6 +1272,28 @@
                 <div id="lookangles-content" class="side-menu">
                   <div class="row">
                     <h5 class="center-align">Sensor Look Angles</h5>
+                    <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
+                    <div id="settings-lookangles">
+                      <h5 class="center-align">Lookangles Settings</h5>
+                      <div class="switch row">
+                        <label>
+                          <input id="settings-riseset" type="checkbox">
+                          <span class="lever"></span>
+                          Show Only Rise and Set Times
+                        </label>
+                      </div>
+                      <div class="input-field col s6">
+                        <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right"
+                          data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated">
+                        <label for="lookanglesLength">Length (Days)</label>
+                      </div>
+                      <div class="input-field col s6">
+                        <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right"
+                          data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
+                        <label for="lookanglesInterval">Interval</label>
+                      </div>
+                      <div class="row"></div>
+                    </div>
                     <table id="looks" class="center-align striped-light centered"></table>
                     <br />
                     <center>
@@ -1653,29 +1660,7 @@
                           </center>
                         </div>
                       </div>
-                      <div class="row"></div>
-                      <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-                      <div id="settings-lookangles">
-                        <h5 class="center-align">Lookangles Settings</h5>
-                        <div class="switch row">
-                          <label>
-                            <input id="settings-riseset" type="checkbox">
-                            <span class="lever"></span>
-                            Show Only Rise and Set Times
-                          </label>
-                        </div>
-                        <div class="input-field col s6">
-                          <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right"
-                            data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated">
-                          <label for="lookanglesLength">Length (Days)</label>
-                        </div>
-                        <div class="input-field col s6">
-                          <input value="5" id="lookanglesInterval" type="text" class="tooltipped" data-position="right"
-                            data-delay="50" data-tooltip="Seconds Between Each Line of Lookangles">
-                          <label for="lookanglesInterval">Interval</label>
-                        </div>
-                        <div class="row"></div>
-                      </div>
+                      <div class="row"></div>                      
                       <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
                       <div id="satOverfly-opt">
                         <h5 class="center-align">Satellite Overfly Settings</h5>
@@ -1967,7 +1952,7 @@
                           <option value="2.25">2.25 Degrees</option>
                           <option value="2.5">2.5 Degrees</option>
                         </select>
-                        <label>Right Ascension of the Ascending Node Variation</label>
+                        <label>Right Ascension Variation</label>
                       </div>
                       <div class="center-align">
                         <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Breakup
@@ -2236,7 +2221,8 @@
       </main>
 
       <!-- FOOTER -->
-      <footer id="nav-footer" class="page-footer">
+      <footer id="nav-footer" class="page-footer resizable">
+        <div id="footer-handle" class="ui-resizable-handle ui-resizable-n"></div>
         <div id="footer-toggle-wrapper">
             <div id="nav-footer-toggle">
                 &#x25BC;

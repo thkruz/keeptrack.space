@@ -126,13 +126,15 @@ drawManager.resizeCanvas = () => {
       if (settingsManager.isMobileModeEnabled) {
         // Changes more than 35% of height but not due to rotation are likely
         // the keyboard! Ignore them
-        if ((((vw - drawManager.canvas.width) / drawManager.canvas.width) * 100 < 1 && ((vh - drawManager.canvas.height) / drawManager.canvas.height) * 100 < 1) || drawManager.isRotationEvent) {
+        // But Make sure we have set this at least once to trigger
+        if ((((vw - drawManager.canvas.width) / drawManager.canvas.width) * 100 < 1 && ((vh - drawManager.canvas.height) / drawManager.canvas.height) * 100 < 1) || drawManager.isRotationEvent || typeof drawManager.pMatrix == 'undefined') {
           drawManager.canvas.width = vw;
           drawManager.canvas.height = vh;
           drawManager.isRotationEvent = false;
+        } else {
+          // No Canvas Change
+          return;
         }
-        // No Canvas Change
-        return;
       } else {
         drawManager.canvas.width = vw;
         drawManager.canvas.height = vh;
@@ -210,6 +212,8 @@ drawManager.drawLoop = (preciseDt) => {
   // Update Draw Positions
   dotsManager.updatePositionBuffer(satSet, timeManager);
 
+  dotsManager.updatePMvCamMatrix(drawManager.pMatrix, cameraManager);
+
   // Draw Dots
   dotsManager.draw(drawManager.pMatrix, cameraManager, settingsManager.currentColorScheme, postProcessingManager.curBuffer);
 
@@ -234,7 +238,7 @@ drawManager.drawLoop = (preciseDt) => {
   // Update orbit currently being hovered over
   // Only if last frame was 50 FPS or more readpixels used to determine which satellite is hovered
   // is the biggest performance hit and we should throttle that. Maybe we should limit the picking frame buffer too?
-  if (1000 / timeManager.dt > 50) {
+  if (1000 / timeManager.dt > 50 && !settingsManager.lowPerf) {
     drawManager.updateHover();
   }
 
@@ -246,10 +250,41 @@ drawManager.drawLoop = (preciseDt) => {
       postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
       postProcessingManager.switchFrameBuffer();
       postProcessingManager.programs.gaussian.uniformValues.dir = { x: 0.0, y: 1.0 };
-      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
-    } else {
-      // Test
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
+      postProcessingManager.switchFrameBuffer();
     }
+
+    // Makes small amount of blur that isn't helpful
+    if (postProcessingManager.isFxaaNeeded) {
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.fxaa, postProcessingManager.curBuffer, null);
+      postProcessingManager.switchFrameBuffer();
+    }
+
+    // SMAA Makes this noticeablly blurry.
+    if (postProcessingManager.isSmaaNeeded) {
+      // Reuse godrays frame buffer to reduce GPU Memory Requirements
+      // Clear it first
+      gl.bindFramebuffer(gl.FRAMEBUFFER, sceneManager.sun.godraysFrameBuffer);
+      gl.clearColor(0.0, 0.0, 0.0, 0.0);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+      // postProcessingManager.switchFrameBuffer();
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.hdr, postProcessingManager.curBuffer, sceneManager.sun.godraysFrameBuffer);
+
+      // Load input into edges
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.smaaEdges, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
+      postProcessingManager.switchFrameBuffer();
+      // Load edges into weights
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.smaaWeights, postProcessingManager.curBuffer, postProcessingManager.curBuffer);
+
+      // Load weights into blend along with original
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.smaaBlend, postProcessingManager.curBuffer, null, sceneManager.sun);
+    }
+
+    // if (!postProcessingManager.isSmaaNeeded) {
+    // NOTE: HDR makes jagged edges on images
+    //   postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.hdr, postProcessingManager.curBuffer, null);
+    // }
   }
 
   // callbacks at the end of the draw loop (this should be used more!)
@@ -302,26 +337,31 @@ drawManager.drawOptionalScenery = () => {
       }
       // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
       // todo: this should be a dynamic buffer not hardcoded to bufffer two
-      sceneManager.sun.godraysPostProcessing(gl, postProcessingManager.frameBufferInfos.two.frameBuffer);
+      postProcessingManager.curBuffer = null;
+      sceneManager.sun.godraysPostProcessing(gl, postProcessingManager.curBuffer);
 
       if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
         sceneManager.atmosphere.draw(drawManager.pMatrix, cameraManager);
       }
 
       // Apply two pass gaussian blur to the godrays to smooth them out
-      postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
-      postProcessingManager.programs.gaussian.uniformValues.dir = { x: 1.0, y: 0.0 };
-      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.frameBufferInfos.two.frameBuffer, postProcessingManager.frameBufferInfos.one.frameBuffer);
-      postProcessingManager.programs.gaussian.uniformValues.dir = { x: 0.0, y: 1.0 };
-      // After second pass apply the results to the canvas
-      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.frameBufferInfos.one.frameBuffer, postProcessingManager.curBuffer);
+      // postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
+      // postProcessingManager.programs.gaussian.uniformValues.dir = { x: 1.0, y: 0.0 };
+      // postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
+      // postProcessingManager.switchFrameBuffer();
+      // postProcessingManager.programs.gaussian.uniformValues.dir = { x: 0.0, y: 1.0 };
+      // // After second pass apply the results to the canvas
+      // postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
 
       // Draw the moon
       sceneManager.moon.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
 
-      sceneManager.atmosphere.draw(drawManager.pMatrix, cameraManager);
+      if (cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
+        sceneManager.atmosphere.draw(drawManager.pMatrix, cameraManager);
+      }
     }
   }
+  postProcessingManager.curBuffer = null;
 };
 
 drawManager.satCalculate = () => {
@@ -337,12 +377,13 @@ drawManager.satCalculate = () => {
       // }
 
       // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
-      if (!settingsManager.modelsOnSatelliteViewOverride) {
-        meshManager.update(Camera, cameraManager, drawManager.sat, timeManager);
-      }
     }
     if (drawManager.sat.missile) orbitManager.setSelectOrbit(drawManager.sat.satId);
+  } else {
+    // Reset the selected satellite if no satellite is selected
+    drawManager.sat = { id: -1 };
   }
+  meshManager.update(Camera, cameraManager, timeManager, drawManager.sat);
   if (objectManager.selectedSat !== drawManager.lastSelectedSat) {
     if (objectManager.selectedSat === -1 && !isselectedSatNegativeOne) {
       orbitManager.clearSelectOrbit();
@@ -355,7 +396,7 @@ drawManager.satCalculate = () => {
       }
       uiManager.updateMap();
     }
-    if (objectManager.selectedSat !== -1 || (objectManager.selectedSat == -1 && !isselectedSatNegativeOne)) {
+    if (objectManager.selectedSat == -1) {
       lineManager.drawWhenSelected();
     }
     drawManager.lastSelectedSat = objectManager.selectedSat;
@@ -768,18 +809,36 @@ drawManager.checkIfPostProcessingRequired = () => {
   // if (drawManager.gaussianAmt > 0) {
   //   drawManager.gaussianAmt -= drawManager.dt * 2;
   //   drawManager.isNeedPostProcessing = true;
-  //   postProcessingManager.isGaussianNeeded = true;
+  postProcessingManager.isGaussianNeeded = false;
   // } else {
   //   postProcessingManager.isGaussianNeeded = false;
   // }
 
+  // Slight Blur
+  postProcessingManager.isFxaaNeeded = false;
+  // Horrible Results
+  postProcessingManager.isSmaaNeeded = false;
+
   if (postProcessingManager.isGaussianNeeded) {
     drawManager.isNeedPostProcessing = true;
     postProcessingManager.switchFrameBuffer();
-  } else {
-    postProcessingManager.curBuffer = null;
-    drawManager.isNeedPostProcessing = false;
+    return;
   }
+
+  if (postProcessingManager.isFxaaNeeded) {
+    drawManager.isNeedPostProcessing = true;
+    postProcessingManager.switchFrameBuffer();
+    return;
+  }
+
+  if (postProcessingManager.isSmaaNeeded) {
+    drawManager.isNeedPostProcessing = true;
+    postProcessingManager.switchFrameBuffer();
+    return;
+  }
+
+  // postProcessingManager.switchFrameBuffer();
+  drawManager.isNeedPostProcessing = false;
 };
 
 drawManager.clearFrameBuffers = () => {
@@ -787,9 +846,9 @@ drawManager.clearFrameBuffers = () => {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   // Clear all post processing frame buffers
-  // if (drawManager.isNeedPostProcessing) {
-  postProcessingManager.clearAll();
-  // }
+  if (drawManager.isNeedPostProcessing) {
+    postProcessingManager.clearAll();
+  }
   // Clear the godraysPostProcessing Frame Buffer
   gl.bindFramebuffer(gl.FRAMEBUFFER, sceneManager.sun.godraysFrameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);

@@ -15,7 +15,7 @@ class ColorScheme {
     this.pickableBuffer = gl.createBuffer();
   }
 
-  calculateColorBuffers(isForceRecolor) {
+  async calculateColorBuffers(isForceRecolor) {
     // These two variables only need to be set once, but we want to make sure they aren't called before the satellites
     // are loaded into satSet. Don't move the buffer data creation into the constructor!
     if (!this.pickableData || !this.colorData) {

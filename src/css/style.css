@@ -68,6 +68,19 @@ html body {
 
 footer {
     padding-top: 5px !important;
+    position: absolute !important;
+    /* jquery resize will lock the top and left when resizing the window after resizing the bottom menu */
+    top: auto !important;
+    height: auto !important;
+}
+
+#footer-handle {
+    width: 100%;
+    height: 5px;
+    top: 0px;
+    /* Make sure its drawn on top of the container for the slider button */
+    z-index: 2;
+    background-color: #172635 !important;
 }
 
 ul {
@@ -239,12 +252,13 @@ ul {
     background-color: #3a87cf;
 }
 
-.right-btn-menu ul li a:hover {
+.right-btn-menu ul li:hover a {
+    color: #ffffff !important;
     background-color: rgba(0, 0, 0, 0);
 }
 
 .rmb-menu-item:hover {
-    background-color: #1d4367 !important;
+    background-color: #002439 !important;
 }
 
 .rmb-menu-item a {
@@ -641,6 +655,10 @@ ul {
     margin: 0 auto;
 }
 
+#socrates-menu {
+    width: 290px;
+}
+
 #socrates-table {
     line-height: 0.05;
     font-size: 13px;
@@ -687,6 +705,10 @@ ul {
 
 .side-menu-parent {
     height: 100% !important;
+    position: absolute !important;
+    width: 265px;
+    top: 0px;
+    left: 0px;
 }
 
 input[type='checkbox'].css-checkbox {
@@ -798,7 +820,7 @@ fieldset {
 
 a {
     text-decoration: none;
-    color: inherit;
+    color: #92cbff !important;
 }
 
 ul li {
@@ -933,9 +955,11 @@ input:focus {
 }
 
 #bottom-icons-container {
-    width: 100%;
+    /* alsoResize in jquery-ui will override this if not important */
+    width: 100% !important;
     height: 120px;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: scroll;
     text-align: left;
 }
 
@@ -989,6 +1013,10 @@ input:focus {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAAAgCAMAAABzRoe3AAAAgVBMVEUAAAD/tQv/swL/OTn/PDzftl9W8QBW8AAtzP8v0P9Z9gD/tAP/uQb/tAItzf8tzf+eqK2ep60uzP9X8QCfqK4uzf8uzf9X8QAuzP9X8ACeqK4vzP9Y8QAuzv9Y8gCeqq4wz/8xzv9A1f9Y8QD/tAP86DpW8AD/swL/ODgtzP+ep63tgXPUAAAAJXRSTlMAGNfAQAv98/IdG8Io52zz8+DZ2dC9trabm4F+a05OQjAaDG6dAJcYcwAAAfdJREFUWMPtmNlygkAQRScyrBp3QTZFNBj8/w9MCGI3dBOHMg9jyvOmVFnn1HUSULx4LibjN/HMTN7Po2cu+PY/cwUfPYg2XhKsbHsVJJ5gcaf+cjZb+lN3qJjxyWIw/lAwNMALreKKFTIJh215Y3sYFiD5AEn9oWBowM4uEPau65A6JcJJ/2ACg/pDwdCAo1W0sI6ixbTsMH18Akn9oWBgwK7xh4LWBmlJSB+dwCD+pEA5wLMLgo3OwcGpvzhxludZfH1Bz4EZrefzdWSqTSCJPylQDggLhhA+oD6/G7d+5W7qk9yV3C8uPyz2KhMYxJ8UKAd4Fhdg3SZwa3/4wLrA7fhfbuwVJpDEnxQoByQFS9I6wQ7ydR16js0FBCzMuxMY1J8WqAYEfEDQXPcr3RjbxNU7vsBEF0R0dwJJ/LkCxYAVH7Bqri8r3QzbZNU7S4FZ44B1/ymgA4zPfZwUA2w+wG6uzyrdHMvk1TszgZnjgLmgyL4T8Dbq8R+bWgUIgw4ABby/Vl8hIckAUMD7a3WIYQIYgC0Af73+jOIJpKAF1F+vf2QwAQxAC7C/ZrcSeAIpegvAX7ObOZgABiAF2F+322mYAAagBeCv2wMNTEAGIAWVv3aPlDABDMAW1P7aPdQjDBiALaj89ftZBSGl+LXgZIoXL/4VXyptNwzuHR/QAAAAAElFTkSuQmCC);
 }
 
+.bmenu-item:not(.bmenu-item-disabled,.bmenu-item-selected,.bmenu-item-help):hover * {
+    filter: brightness(3);
+}
+
 /* .bmenu-item:hover {
    background: rgba(255, 255, 255, 0.4);
 } */
@@ -1007,6 +1035,14 @@ input:focus {
     background-position-x: -45px;
 }
 
+.bmenu-item-selected:hover img {
+    filter: hue-rotate(275deg) brightness(1.8);
+}
+
+.bmenu-item-selected:hover .status-icon {
+    filter: brightness(1.8);
+}
+
 .bmenu-item-help img {
     filter: hue-rotate(227deg) brightness(1.2);
 }
@@ -1015,8 +1051,16 @@ input:focus {
     background-position-x: -30px;
 }
 
+.bmenu-item-help:hover img {
+    filter: hue-rotate(227deg) brightness(1.8);
+}
+
+.bmenu-item-help:hover .status-icon {
+    filter: brightness(1.8);
+}
+
 .bmenu-item-disabled img {
-    filter: grayscale();
+    filter: grayscale(1);
 }
 
 .bmenu-item-disabled .status-icon {
@@ -1191,10 +1235,10 @@ input:focus {
 }
 
 .ui-widget-content {
-    background: #172635;
+    background: #172635 !important;
     border: 1px solid #274059 !important;
-    font-family: 'Open Sans', sans-serif;
-    color: #fff;
+    font-family: 'Open Sans', sans-serif !important;
+    color: #fff !important;
     z-index: 25 !important;
 }
 
@@ -1217,10 +1261,10 @@ input:focus {
 }
 
 .ui-widget-header {
-    border: 1px solid #274059;
-    background: #274059;
-    font-family: 'Open Sans', sans-serif;
-    color: #fff;
+    border: 1px solid #274059 !important;
+    background: #274059 !important;
+    font-family: 'Open Sans', sans-serif !important;
+    color: #fff !important;
 }
 
 .ui-slider {
@@ -1228,12 +1272,12 @@ input:focus {
 }
 
 .ui-button {
-    border: 1px solid #274059;
-    background: #274059;
+    border: 1px solid #274059 !important;
+    background: #274059 !important;
 }
 
 .ui-button span {
-    filter: brightness(5);
+    filter: brightness(5) !important;
 }
 
 .ui-icon-circle-triangle-e {

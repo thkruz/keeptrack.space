@@ -116,6 +116,11 @@ class Camera {
     return pitch;
   }
 
+  normalizeAngle = Camera.normalizeAngle;
+  longToYaw = Camera.longToYaw;
+  latToPitch = Camera.latToPitch;
+  latToPitch = Camera.latToPitch;
+
   /* Private Fields */
   #camMatrixEmpty = glm.mat4.create();
   #normUp = [0, 0, 0];

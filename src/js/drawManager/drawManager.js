@@ -67,7 +67,13 @@ window.addEventListener('orientationchange', function () {
   drawManager.isRotationEvent = true;
 });
 
-drawManager.canvas = document.getElementById('keeptrack-canvas');
+// See if we are running jest right now for testing
+if (typeof process !== 'undefined') {
+  drawManager.canvas = document.canvas;
+} else {
+  drawManager.canvas = document.getElementById('keeptrack-canvas');
+}
+
 drawManager.glInit = async () => {
   // drawManager Scope
   gl = drawManager.canvas.getContext('webgl', {

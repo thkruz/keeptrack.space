@@ -27,8 +27,14 @@ var currentInView = [];
 
 var orbitMvMat = glm.mat4.create();
 
-// Webpack will place this IN ./js not in ./js/webworker like in the source code
-var orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
+let orbitWorker;
+// See if we are running jest right now for testing
+if (typeof process !== 'undefined') {
+  let url = 'http://localhost:8080/js/orbitCruncher.js';
+  orbitWorker = new Worker(url.toString());
+} else {
+  orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
+}
 
 var initialized = false;
 

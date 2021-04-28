@@ -15,7 +15,7 @@ for derivative works, or offered for sale, or used to construct any kind of data
 or mirrored at any other location without the express written permission of the author.
 
 ///////////////////////////////////////////////////////////////////////////// */
-import * as $ from 'jquery';
+import $ from 'jquery';
 // eslint-disable-next-line sort-imports
 import 'jquery-ui-bundle';
 // import 'jquery-ui.min.css';

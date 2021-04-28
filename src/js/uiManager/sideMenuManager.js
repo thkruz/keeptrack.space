@@ -1,5 +1,5 @@
-import * as $ from 'jquery';
 import { saveAs, stringPad } from '@app/js/lib/helpers.js';
+import $ from 'jquery';
 import { RAD2DEG } from '@app/js/lib/constants.js';
 import { omManager } from '@app/js/uiManager/omManager.js';
 
@@ -1296,7 +1296,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
     $('#menu-planetarium').removeClass('bmenu-item-disabled');
     $('#menu-astronomy').removeClass('bmenu-item-disabled');
     sensorManager.whichRadar = 'CUSTOM';
-    $('#sensor-type').html($('#cs-type').val());
+    $('#sensor-type').html($('#cs-type').val().replace(/</gu, '&lt;').replace(/>/gu, '&gt;'));
     $('#sensor-info-title').html('Custom Sensor');
     $('#sensor-country').html('Custom Sensor');
 

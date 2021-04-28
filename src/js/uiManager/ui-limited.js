@@ -1,4 +1,4 @@
-import * as $ from 'jquery';
+import $ from 'jquery';
 let M = window.M;
 
 var uiLimited = {};

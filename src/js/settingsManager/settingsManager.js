@@ -16,15 +16,15 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 */
 
 /*global gremlins, randomizer*/
-import * as $ from 'jquery';
+import $ from 'jquery';
 import { RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 
 // Settings Manager Setup
 let settingsManager = {};
 {
   //  Version Control
-  settingsManager.versionNumber = '3.0.7';
-  settingsManager.versionDate = 'April 5, 2021';
+  settingsManager.versionNumber = '3.0.8';
+  settingsManager.versionDate = 'April 28, 2021';
 
   // Install Folder Settings
   {

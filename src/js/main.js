@@ -44,7 +44,7 @@ import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 jQAlt.docReady(async function initalizeKeepTrack() {
-  timeManager.init();
+  await timeManager.init();
   settingsManager.loadStr('dots');
   uiManager.mobileManager.init();
   const cameraManager = new Camera();

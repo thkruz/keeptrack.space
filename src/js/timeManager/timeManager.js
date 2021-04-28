@@ -1,4 +1,4 @@
-import * as $ from 'jquery';
+import $ from 'jquery';
 import { MILLISECONDS_PER_DAY } from '@app/js/lib/constants.js';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';

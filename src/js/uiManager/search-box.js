@@ -1,6 +1,6 @@
 /* */
 
-import * as $ from 'jquery';
+import $ from 'jquery';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 

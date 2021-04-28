@@ -15,8 +15,8 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-import * as $ from 'jquery';
 import { satCruncher, setColorScheme } from '@app/js/satSet/satSet.js';
+import $ from 'jquery';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';

@@ -1,5 +1,5 @@
-import * as $ from 'jquery';
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+import $ from 'jquery';
 import { RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 let M = window.M;

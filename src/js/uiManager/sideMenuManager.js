@@ -1,5 +1,5 @@
-import * as $ from 'jquery';
 import { saveAs, stringPad } from '@app/js/lib/helpers.js';
+import $ from 'jquery';
 import { RAD2DEG } from '@app/js/lib/constants.js';
 import { omManager } from '@app/js/uiManager/omManager.js';
 

@@ -1,5 +1,5 @@
-import * as $ from 'jquery';
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
+import $ from 'jquery';
 import { SunCalc } from '@app/js/lib/suncalc.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { sMM } from '@app/js/uiManager/sideMenuManager.js';

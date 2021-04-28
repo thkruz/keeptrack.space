@@ -44,11 +44,24 @@
     "setupFiles": [
       "<rootDir>/test/test-env.js"
     ],
+    "moduleDirectories": [
+      "node_modules",
+      "offline"
+    ],
     "moduleNameMapper": {
       "\\.(css|less|sass|scss)$": "<rootDir>/scripts/styleMock.js",
       "\\.(gif|ttf|eot|svg)$": "<rootDir>/scripts/fileMock.js",
-      "@app(.*)$": "<rootDir>/src/$1"
-    }
+      "@app(.*)$": "<rootDir>/src/$1",
+      "@lib(.*)$": "<rootDir>/src/js/lib/external/ootk/lib/$1",
+      "@test(.*)$": "<rootDir>/src/js/lib/external/ootk/test/$1"
+    },
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/src/js/lib/external/"
+    ]
+  },
+  "directories": {
+    "app": "src"
   },
   "prettier": {
     "printWidth": 250,
@@ -78,6 +91,7 @@
     "@babel/preset-env": "^7.12.11",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
+    "canvas": "^2.7.0",
     "codecov": "^3.8.1",
     "copy-dir": "^1.3.0",
     "css-loader": "^5.0.1",
@@ -87,9 +101,11 @@
     "imports-loader": "^1.2.0",
     "jest": "^26.6.3",
     "jsdom": "^16.4.0",
+    "jsdom-worker": "^0.2.1",
     "mkdirp": "^1.0.4",
     "prettier": "^2.2.1",
     "style-loader": "^2.0.0",
+    "webgl-mock": "^0.1.7",
     "webpack": "^5.11.0",
     "webpack-cli": "^4.2.0",
     "webpack-glob": "^2.0.2",

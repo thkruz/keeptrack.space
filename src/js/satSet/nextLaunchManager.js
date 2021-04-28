@@ -1,6 +1,6 @@
 /* */
 
-import * as $ from 'jquery';
+import $ from 'jquery';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 
@@ -12,6 +12,9 @@ let nextLaunchManager = {};
   }
   nextLaunchManager.launchList = [];
   nextLaunchManager.init = () => {
+    // Won't Work Offline
+    if (window.location.hostname === 'localhost') return;
+
     $.get('https://launchlibrary.net/1.4/launch/next/20').done(function (resp) {
       for (let i = 0; i < resp.launches.length; i++) {
         let launchInfo = {};

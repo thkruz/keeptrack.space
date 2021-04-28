@@ -62,7 +62,7 @@ sun.shader = {
     varying float vDist2;
 
     void main(void) {
-        vec4 position = uMvMatrix * vec4(aVertexPosition, 1.0);        
+        vec4 position = uMvMatrix * vec4(aVertexPosition / 1.6, 1.0);        
         gl_Position = uPMatrix * uCamMatrix * position;         
         vDist2 = distance(position.xyz,vec3(0.0,0.0,0.0)) / uSunDis;
         vNormal = uNormalMatrix * aVertexNormal;

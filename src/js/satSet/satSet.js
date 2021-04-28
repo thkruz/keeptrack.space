@@ -26,10 +26,10 @@
 /* eslint-disable no-useless-escape */
 
 import '@app/js/lib/external/numeric.js';
-import * as $ from 'jquery';
 import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants.js';
 import { saveCsv, stringPad } from '@app/js/lib/helpers.js';
+import $ from 'jquery';
 import { jsTLEfile } from '@app/offline/tle.js';
 import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
@@ -131,8 +131,13 @@ satSet.init = async (glRef, dotManagerRef, cameraManager) => {
   }
 
   settingsManager.loadStr('elsets');
-  // Webpack will place this IN ./js not in ./js/webworker like in the source code
-  satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
+  // See if we are running jest right now for testing
+  if (typeof process !== 'undefined') {
+    let url = 'http://localhost:8080/js/positionCruncher.js';
+    satCruncher = new Worker(url.toString());
+  } else {
+    satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
+  }
   addSatCruncherOnMessage(cameraManager);
 
   satSet.satCruncher = satCruncher;
@@ -384,50 +389,70 @@ var addSatCruncherOnMessage = (cameraManager) => {
 // It should be cleaned up later
 // It returns the result of satSet.parseCatalog (they are chained together)
 satSet.loadCatalog = async () => {
-  settingsManager.isCatalogPreloaded = true;
-  if (typeof settingsManager.tleSource == 'undefined') {
-    settingsManager.tleSource = `${settingsManager.installDirectory}tle/TLE.json`;
-  }
-  if (settingsManager.offline) {
-    await import('@app/offline/extra.js').then((resp) => {
-      satelliteList = resp.satelliteList;
-    });
-    await import('@app/offline/tle.js').then(() => satSet.parseCatalog(jsTLEfile));
-    return satData;
-    // jsTLEfile = null;
-  } else {
-    try {
-      var tleSource = settingsManager.tleSource;
-      // $.get('' + tleSource + '?v=' + settingsManager.versionNumber)
-      await $.get({
-        url: '' + tleSource,
-        cache: false,
-      })
-        .done(function (resp) {
-          // if the .json loads then use it
-          return satSet.parseCatalog(resp);
-        })
-        .fail(function () {
-          // Disable Caching
-          // Try using a cached version - mainly for serviceWorker
-          $.get({
-            url: '' + tleSource,
-            cache: true,
-          })
-            .done(function (resp) {
-              // if the .json loads then use it
-              return satSet.parseCatalog(resp);
-            })
-            .fail(async function () {
-              // Try the js file without caching
-              await import('@app/offline/tle.js').then(() => satSet.parseCatalog(jsTLEfile));
-              return satData;
-            });
-        });
-    } catch (e) {
-      console.log(e);
-      return satSet.parseCatalog(jsTLEfile);
+  try {
+    settingsManager.isCatalogPreloaded = true;
+    if (typeof settingsManager.tleSource == 'undefined') {
+      settingsManager.tleSource = `${settingsManager.installDirectory}tle/TLE.json`;
     }
+
+    // See if we are running jest right now for testing
+    if (typeof process !== 'undefined') {
+      try {
+        await import('@app/offline/extra.js').then((resp) => {
+          satelliteList = resp.satelliteList;
+        });
+        await import('@app/offline/tle.js').then((resp) => {
+          satSet.parseCatalog(resp.jsTLEfile);
+        });
+        return satData;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    if (settingsManager.offline) {
+      await import('@app/offline/extra.js').then((resp) => {
+        satelliteList = resp.satelliteList;
+      });
+      await import('@app/offline/tle.js').then((resp) => satSet.parseCatalog(resp.jsTLEfile));
+      return satData;
+      // jsTLEfile = null;
+    } else {
+      try {
+        var tleSource = settingsManager.tleSource;
+        // $.get('' + tleSource + '?v=' + settingsManager.versionNumber)
+        await $.get({
+          url: '' + tleSource,
+          cache: false,
+        })
+          .done(function (resp) {
+            // if the .json loads then use it
+            return satSet.parseCatalog(resp);
+          })
+          .fail(function () {
+            // Disable Caching
+            // Try using a cached version - mainly for serviceWorker
+            $.get({
+              url: '' + tleSource,
+              cache: true,
+            })
+              .done(function (resp) {
+                // if the .json loads then use it
+                return satSet.parseCatalog(resp);
+              })
+              .fail(async function () {
+                // Try the js file without caching
+                await import('@app/offline/tle.js').then(() => satSet.parseCatalog(jsTLEfile));
+                return satData;
+              });
+          });
+      } catch (e) {
+        console.log(e);
+        return satSet.parseCatalog(jsTLEfile);
+      }
+    }
+  } catch (error) {
+    console.error(error);
   }
 };
 

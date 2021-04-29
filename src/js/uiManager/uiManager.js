@@ -849,13 +849,13 @@ uiManager.useCurrentGeolocationAsSensor = function () {
   }
 };
 
-uiManager.showCSObjects = () => {
+$('#findCsoBtn').on('click', function () {
   $('#loading-screen').fadeIn(1000, function () {
     let searchStr = satellite.findCloseObjects();
     uiManager.doSearch(searchStr);
     $('#loading-screen').fadeOut('slow');
   });
-};
+});
 
 $('#all-objects-link').on('click', function () {
   if (objectManager.selectedSat === -1) {
@@ -869,7 +869,8 @@ $('#all-objects-link').on('click', function () {
 
 $('#near-orbits-link').on('click', () => {
   // searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(objectManager.selectedSat)));
-  searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(window.selectedSat)));
+  let searchStr = searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(window.selectedSat)));
+  searchBox.doSearch(searchStr);
 });
 
 uiManager.legendColorsChange = function () {
@@ -1306,7 +1307,7 @@ var _groupSelected = function (groupName) {
     }
   }
 
-  searchBox.fillResultBox(groups[groupName].sats);
+  searchBox.fillResultBox(groups[groupName].sats, satSet);
 
   objectManager.setSelectedSat(-1); // Clear selected sat
 
@@ -1471,7 +1472,7 @@ let doSearch = (searchString, isPreventDropDown) => {
 };
 
 uiManager.doSearch = (searchString, isPreventDropDown) => {
-  let idList = searchBox.doSearch(searchString, isPreventDropDown);
+  let idList = searchBox.doSearch(searchString, isPreventDropDown, satSet);
   if (settingsManager.isSatOverflyModeOn) {
     satSet.satCruncher.postMessage({
       satelliteSelected: idList,
@@ -2324,7 +2325,6 @@ $(document).ready(function () {
           }
           break;
         default:
-          debugger;
           break;
       }
     });

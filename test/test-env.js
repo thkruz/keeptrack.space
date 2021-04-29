@@ -23,3 +23,5 @@ document.body.innerHTML += '<div id="keeptrack-canvas"></div>';
 
 global.$ = global.jQuery = $;
 window.jQuery = $;
+
+global.document.canvas.addEventListener = () => true;

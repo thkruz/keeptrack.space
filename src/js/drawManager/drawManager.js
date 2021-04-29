@@ -74,6 +74,16 @@ if (typeof process !== 'undefined') {
   drawManager.canvas = document.getElementById('keeptrack-canvas');
 }
 
+// Try to prevent crashes
+drawManager.canvas.addEventListener('webglcontextlost', (e) => {
+  console.debug(e);
+  e.preventDefault(); // allows the context to be restored
+});
+drawManager.canvas.addEventListener('webglcontextrestored', (e) => {
+  console.debug(e);
+  drawManager.glInit();
+});
+
 drawManager.glInit = async () => {
   // drawManager Scope
   gl = drawManager.canvas.getContext('webgl', {

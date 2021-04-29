@@ -63,10 +63,10 @@ searchBox.doArraySearch = (array) => {
       searchStr += `${satData[array[i]].SCC_NUM},`;
     }
   }
-  searchBox.doSearch(searchStr);
+  return searchStr;
 };
 
-searchBox.doSearch = function (searchString, isPreventDropDown) {
+searchBox.doSearch = function (searchString, isPreventDropDown, satSet) {
   if (searchString.length === 0) {
     settingsManager.lastSearch = '';
     settingsManager.lastSearchResults = [];
@@ -90,6 +90,10 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
   for (var i = 0; i < satSet.missileSats; i++) {
     // Stop once you get to the markers to save time
     var sat = satData[i];
+    if (typeof sat == 'undefined') {
+      console.debug(`Undefined sat in searchBox.doSearch() - ${i}`);
+      continue;
+    }
     for (var j = 0; j < searchList.length; j++) {
       // Move one search string at a time (separated by ',')
       searchString = searchList[j];
@@ -209,14 +213,14 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
   groupsManager.selectGroup(dispGroup, orbitManager);
 
   if (!isPreventDropDown) {
-    searchBox.fillResultBox(results);
+    searchBox.fillResultBox(results, satSet);
   }
 
   settingsManager.themes.retheme();
   return idList;
 };
 
-searchBox.fillResultBox = function (results) {
+searchBox.fillResultBox = function (results, satSet) {
   let satData = satSet.getSatData();
   var resultBox = $('#search-results');
   var html = '';

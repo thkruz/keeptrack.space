@@ -133,8 +133,12 @@ satSet.init = async (glRef, dotManagerRef, cameraManager) => {
   settingsManager.loadStr('elsets');
   // See if we are running jest right now for testing
   if (typeof process !== 'undefined') {
-    let url = 'http://localhost:8080/js/positionCruncher.js';
-    satCruncher = new Worker(url.toString());
+    try {
+      let url = 'http://localhost:8080/js/positionCruncher.js';
+      satCruncher = new Worker(url);
+    } catch (error) {
+      console.error(error);
+    }
   } else {
     satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
   }
@@ -480,7 +484,7 @@ satSet.parseCatalog = (resp) => {
     isLowPerf: settingsManager.lowPerf,
   });
 
-  delete objectManager.fieldOfViewSet;
+  // delete objectManager.fieldOfViewSet;
 
   if (!settingsManager.trusatOnly) {
     // If No Visual Magnitudes, Add The VMag Database
@@ -858,11 +862,15 @@ satSet.resetSatInSun = () => {
 };
 
 satSet.setColorScheme = async (scheme, isForceRecolor) => {
-  settingsManager.setCurrentColorScheme(scheme);
+  try {
+    settingsManager.setCurrentColorScheme(scheme);
 
-  await scheme.calculateColorBuffers(isForceRecolor);
-  dotManager.colorBuffer = scheme.colorBuf;
-  dotManager.pickingBuffer = scheme.pickableBuf;
+    await scheme.calculateColorBuffers(isForceRecolor);
+    dotManager.colorBuffer = scheme.colorBuf;
+    dotManager.pickingBuffer = scheme.pickableBuf;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 satSet.convertIdArrayToSatnumArray = (satIdArray) => {

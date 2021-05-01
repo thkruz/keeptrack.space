@@ -20,15 +20,19 @@ var saveVariable = (variable, filename) => {
   saveAs(blob, filename);
 };
 
-var saveCsv = (items, name) => {
-  const replacer = (key, value) => (value === null ? '' : value); // specify how you want to handle null values here
-  const header = Object.keys(items[0]);
-  let csv = items.map((row) => header.map((fieldName) => JSON.stringify(row[fieldName], replacer)).join(','));
-  csv.unshift(header.join(','));
-  csv = csv.join('\r\n');
+const saveCsv = (items, name) => {
+  try {
+    const replacer = (key, value) => (value === null ? '' : value); // specify how you want to handle null values here
+    const header = Object.keys(items[0]);
+    let csv = items.map((row) => header.map((fieldName) => JSON.stringify(row[fieldName], replacer)).join(','));
+    csv.unshift(header.join(','));
+    csv = csv.join('\r\n');
 
-  var blob = new Blob([csv], { type: 'text/plain;charset=utf-8' });
-  saveAs(blob, `${name}.csv`);
+    var blob = new Blob([csv], { type: 'text/plain;charset=utf-8' });
+    saveAs(blob, `${name}.csv`);
+  } catch (error) {
+    console.warn(error);
+  }
 };
 
 const parseRgba = (str) => {

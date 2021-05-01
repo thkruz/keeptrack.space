@@ -13,38 +13,49 @@ let nMatrix;
 
 meshManager.isReady = false;
 meshManager.init = async (glRef, earthRef) => {
-  if (settingsManager.disableUI || settingsManager.isDrawLess) return;
-  gl = glRef;
-  earth = earthRef;
+  try {
+    if (settingsManager.disableUI || settingsManager.isDrawLess) return;
+    // this doesn't work in jest at the moment (5/1/2021)
+    if (typeof process !== 'undefined') return;
+    gl = glRef;
+    earth = earthRef;
 
-  settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
+    settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
 
-  meshManager.fileList = [];
+    meshManager.fileList = [];
 
-  // Don't Continue until you have populated the mesh list
-  await meshManager.populateFileList();
+    // Don't Continue until you have populated the mesh list
+    await meshManager.populateFileList();
 
-  let p = OBJ.downloadModels(meshManager.fileList);
-  p.then((models) => {
-    // eslint-disable-next-line no-unused-vars
-    for (var [name, mesh] of Object.entries(models)) {
-      // console.log("Name:", name);
-      // console.log("Mesh:", mesh);
-    }
-    meshManager.meshes = models;
-    initShaders();
-    initBuffers();
-    meshManager.isReady = true;
-  });
+    let p = OBJ.downloadModels(meshManager.fileList);
+
+    p.then((models) => {
+      // eslint-disable-next-line no-unused-vars
+      for (var [name, mesh] of Object.entries(models)) {
+        // console.log("Name:", name);
+        // console.log("Mesh:", mesh);
+      }
+      meshManager.meshes = models;
+      initShaders();
+      initBuffers();
+      meshManager.isReady = true;
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 meshManager.populateFileList = () => {
-  for (var i = 0; i < meshList.length; i++) {
-    let meshFiles = {
-      obj: `${settingsManager.installDirectory}meshes/${meshList[i]}.obj`,
-      mtl: `${settingsManager.installDirectory}meshes/${meshList[i]}.mtl`,
-    };
-    meshManager.fileList.push(meshFiles);
+  try {
+    for (var i = 0; i < meshList.length; i++) {
+      let meshFiles = {
+        obj: `${settingsManager.installDirectory}meshes/${meshList[i]}.obj`,
+        mtl: `${settingsManager.installDirectory}meshes/${meshList[i]}.mtl`,
+      };
+      meshManager.fileList.push(meshFiles);
+    }
+  } catch (error) {
+    console.error(error);
   }
 };
 

@@ -18,13 +18,15 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 /*global gremlins, randomizer*/
 import $ from 'jquery';
 import { RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
+import { VERSION } from '@app/js/settingsManager/version.js';
+import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
 
 // Settings Manager Setup
 let settingsManager = {};
 {
   //  Version Control
-  settingsManager.versionNumber = '3.0.8';
-  settingsManager.versionDate = 'April 28, 2021';
+  settingsManager.versionNumber = VERSION;
+  settingsManager.versionDate = VERSION_DATE;
 
   // Install Folder Settings
   {
@@ -69,7 +71,8 @@ let settingsManager = {};
   // Most Commonly Used Settings
   // //////////////////////////////////////////////////////////////////////////
 
-  settingsManager.maxFieldOfViewMarkers = 105000;
+  // This needed to be increased to support large number of CSpOC sensors
+  settingsManager.maxFieldOfViewMarkers = 500000;
   settingsManager.maxMissiles = 500;
   settingsManager.maxAnalystSats = 256;
 
@@ -120,11 +123,11 @@ let settingsManager = {};
 
   // How many draw calls to wait before updating orbit overlay if last draw
   // time was greater than 20ms
-  settingsManager.updateHoverDelayLimitSmall = 5;
+  settingsManager.updateHoverDelayLimitSmall = 3;
 
   // How many draw calls to wait before updating orbit overlay if last draw
   // time was greater than 50ms
-  settingsManager.updateHoverDelayLimitBig = 10;
+  settingsManager.updateHoverDelayLimitBig = 5;
 
   settingsManager.fieldOfViewMin = 0.04; // 4 Degrees (I think)
   settingsManager.fieldOfViewMax = 1.2; // 120 Degrees (I think)
@@ -133,9 +136,9 @@ let settingsManager = {};
   settingsManager.maxZoomDistance = 120000;
 
   // Minimum fps or sun/moon/atmosphere are skipped
-  settingsManager.fpsThrottle1 = 3;
+  settingsManager.fpsThrottle1 = 0;
   // Minimum fps or satellite velocities are ignored
-  settingsManager.fpsThrottle2 = 40;
+  settingsManager.fpsThrottle2 = 15;
 
   settingsManager.timeMachineDelay = 5000;
 
@@ -294,11 +297,7 @@ let settingsManager = {};
     settingsManager.colors.radarDataSatellite = [0.0, 1.0, 0.0, 1.0];
     settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
     settingsManager.colors.rocketBody = [0.2, 0.4, 1.0, 1];
-    if (settingsManager.trusatOnly) {
-      settingsManager.colors.debris = [0.9, 0.9, 0.9, 1];
-    } else {
-      settingsManager.colors.debris = [0.5, 0.5, 0.5, 1];
-    }
+    settingsManager.colors.debris = [0.5, 0.5, 0.5, 1];
     settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
     settingsManager.colors.trusat = [1.0, 0.0, 0.6, 1.0];
     settingsManager.colors.analyst = [1.0, 1.0, 1.0, 0.8];
@@ -693,6 +692,7 @@ if (!settingsManager.disableUI) {
         case 'trusat-only':
           settingsManager.trusatMode = true;
           settingsManager.trusatOnly = true;
+          settingsManager.colors.debris = [0.9, 0.9, 0.9, 1];
           settingsManager.trusatImages = true;
           settingsManager.tleSource = 'tle/trusat.json';
           break;

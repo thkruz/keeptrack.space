@@ -10,6 +10,8 @@ class Atmosphere {
   constructor(gl, earth, settingsManager) {
     // Move to the code the creates the moon?
     if (settingsManager.enableLimitedUI || settingsManager.isDrawLess) return;
+    // twgl doesn't work in jest at the moment (5/1/2021)
+    if (typeof process !== 'undefined') return;
 
     this.NUM_LAT_SEGS = 64;
     this.NUM_LON_SEGS = 64;

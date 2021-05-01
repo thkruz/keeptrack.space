@@ -36,7 +36,8 @@ var helpTextDOM = $('#help-text');
 // var helpTextDOM2 = $('#help-text2');
 var tutIconDOM = $('#tutorial-icon');
 var curFocusDOM;
-$(document).ready(function () {
+
+adviceManager.onReady = () => {
   // Code Once index.htm is loaded
   var wasAdviceEnabled = localStorage.getItem('isAdviceEnabled');
   if (wasAdviceEnabled == 'true' || wasAdviceEnabled == null) {
@@ -57,7 +58,9 @@ $(document).ready(function () {
   } else {
     adviceManager.off();
   }
-});
+};
+
+$(document).ready(() => adviceManager.onReady());
 
 adviceCount.welcome = 0;
 adviceCount.findISS = 0;

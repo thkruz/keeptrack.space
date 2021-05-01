@@ -29,6 +29,11 @@ window.location = Object.defineProperties(
   }
 );
 
+document.body.innerHTML = global.docBody;
+// jest.spyOn(document, 'createElement').mockReturnValueOnce(true);
+
 import '@app/js/main.js';
 
-test('UI should not be disabled.', () => {});
+test('UI should not be disabled.', () => {
+  expect(true).toBe(true);
+});

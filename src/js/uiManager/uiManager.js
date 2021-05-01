@@ -137,32 +137,21 @@ uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef, groupsRef, s
 uiManager.postStart = () => {
   // Enable Satbox Overlay
   if (settingsManager.enableHoverOverlay) {
-    const hoverboxDOM = document.createElement('DIV');
-    hoverboxDOM.innerHTML = `
-    <div id="sat-hoverbox">
-      <span id="sat-hoverbox1"></span>
-      <br/>
-      <span id="sat-hoverbox2"></span>
-      <br/>
-      <span id="sat-hoverbox3"></span>
-    </div>`;
+    try {
+      const hoverboxDOM = document.createElement('DIV');
+      hoverboxDOM.innerHTML = `
+      <div id="sat-hoverbox">
+        <span id="sat-hoverbox1"></span>
+        <br/>
+        <span id="sat-hoverbox2"></span>
+        <br/>
+        <span id="sat-hoverbox3"></span>
+      </div>`;
 
-    document.getElementById('keeptrack-canvas').parentElement.append(hoverboxDOM);
-  }
-
-  // Load Bottom icons
-  if (!settingsManager.disableUI) {
-    $(document).ready(function () {
-      $.event.special.touchstart = {
-        setup: function (_, ns, handle) {
-          if (ns.includes('noPreventDefault')) {
-            this.addEventListener('touchstart', handle, { passive: false });
-          } else {
-            this.addEventListener('touchstart', handle, { passive: true });
-          }
-        },
-      };
-    });
+      document.getElementById('keeptrack-canvas').parentElement.append(hoverboxDOM);
+    } catch {
+      console.debug('document.createElement() failed!');
+    }
   }
 };
 
@@ -1630,7 +1619,7 @@ uiManager.updateMap = function () {
   }
 };
 
-$(document).ready(function () {
+uiManager.onReady = () => {
   // Code Once index.htm is loaded
   if (settingsManager.offline) updateInterval = 250;
   try {
@@ -1645,6 +1634,19 @@ $(document).ready(function () {
       $('#geolocation-btn').hide();
     }
   })();
+
+  // Load Bottom icons
+  if (!settingsManager.disableUI) {
+    $.event.special.touchstart = {
+      setup: function (_, ns, handle) {
+        if (ns.includes('noPreventDefault')) {
+          this.addEventListener('touchstart', handle, { passive: false });
+        } else {
+          this.addEventListener('touchstart', handle, { passive: true });
+        }
+      },
+    };
+  }
 
   // Version Info Updated
   $('#version-info').html(settingsManager.versionNumber);
@@ -3759,7 +3761,8 @@ $(document).ready(function () {
   $('#search-icon').on('click', function () {
     uiManager.searchToggle();
   });
-});
+};
+$(document).ready(() => uiManager.onReady());
 
 uiManager.sMM = sMM;
 export { doSearch, uiManager, uiLimited, uiInput };

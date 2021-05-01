@@ -71,7 +71,8 @@ let settingsManager = {};
   // Most Commonly Used Settings
   // //////////////////////////////////////////////////////////////////////////
 
-  settingsManager.maxFieldOfViewMarkers = 105000;
+  // This needed to be increased to support large number of CSpOC sensors
+  settingsManager.maxFieldOfViewMarkers = 500000;
   settingsManager.maxMissiles = 500;
   settingsManager.maxAnalystSats = 256;
 
@@ -296,11 +297,7 @@ let settingsManager = {};
     settingsManager.colors.radarDataSatellite = [0.0, 1.0, 0.0, 1.0];
     settingsManager.colors.payload = [0.2, 1.0, 0.0, 0.5];
     settingsManager.colors.rocketBody = [0.2, 0.4, 1.0, 1];
-    if (settingsManager.trusatOnly) {
-      settingsManager.colors.debris = [0.9, 0.9, 0.9, 1];
-    } else {
-      settingsManager.colors.debris = [0.5, 0.5, 0.5, 1];
-    }
+    settingsManager.colors.debris = [0.5, 0.5, 0.5, 1];
     settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
     settingsManager.colors.trusat = [1.0, 0.0, 0.6, 1.0];
     settingsManager.colors.analyst = [1.0, 1.0, 1.0, 0.8];
@@ -695,6 +692,7 @@ if (!settingsManager.disableUI) {
         case 'trusat-only':
           settingsManager.trusatMode = true;
           settingsManager.trusatOnly = true;
+          settingsManager.colors.debris = [0.9, 0.9, 0.9, 1];
           settingsManager.trusatImages = true;
           settingsManager.tleSource = 'tle/trusat.json';
           break;

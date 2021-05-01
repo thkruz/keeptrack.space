@@ -96,72 +96,48 @@ earth.isDayNightToggle = (val) => {
 };
 
 earth.init = async (glRef) => {
-  gl = glRef;
-  // Make Fragment Shader
-  let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-  gl.shaderSource(fragShader, earth.shader.frag);
-  gl.compileShader(fragShader);
+  try {
+    gl = glRef;
+    // Make Fragment Shader
+    let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragShader, earth.shader.frag);
+    gl.compileShader(fragShader);
 
-  // Make Vertex Shader
-  let vertShader = gl.createShader(gl.VERTEX_SHADER);
-  gl.shaderSource(vertShader, earth.shader.vert);
-  gl.compileShader(vertShader);
+    // Make Vertex Shader
+    let vertShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertShader, earth.shader.vert);
+    gl.compileShader(vertShader);
 
-  // Create Program with Two Shaders
-  earthShader = gl.createProgram();
-  gl.attachShader(earthShader, vertShader);
-  gl.attachShader(earthShader, fragShader);
-  gl.linkProgram(earthShader);
+    // Create Program with Two Shaders
+    earthShader = gl.createProgram();
+    gl.attachShader(earthShader, vertShader);
+    gl.attachShader(earthShader, fragShader);
+    gl.linkProgram(earthShader);
 
-  // Assign Attributes
-  earthShader.aVertexPosition = gl.getAttribLocation(earthShader, 'aVertexPosition');
-  earthShader.aTexCoord = gl.getAttribLocation(earthShader, 'aTexCoord');
-  earthShader.aVertexNormal = gl.getAttribLocation(earthShader, 'aVertexNormal');
-  earthShader.uPMatrix = gl.getUniformLocation(earthShader, 'uPMatrix');
-  earthShader.uCamMatrix = gl.getUniformLocation(earthShader, 'uCamMatrix');
-  earthShader.uMvMatrix = gl.getUniformLocation(earthShader, 'uMvMatrix');
-  earthShader.uNormalMatrix = gl.getUniformLocation(earthShader, 'uNormalMatrix');
-  earthShader.uLightDirection = gl.getUniformLocation(earthShader, 'uLightDirection');
-  earthShader.uAmbientLightColor = gl.getUniformLocation(earthShader, 'uAmbientLightColor');
-  earthShader.uDirectionalLightColor = gl.getUniformLocation(earthShader, 'uDirectionalLightColor');
-  earthShader.uSampler = gl.getUniformLocation(earthShader, 'uSampler');
-  earthShader.uNightSampler = gl.getUniformLocation(earthShader, 'uNightSampler');
-  earthShader.uBumpMap = gl.getUniformLocation(earthShader, 'uBumpMap');
-  earthShader.uSpecMap = gl.getUniformLocation(earthShader, 'uSpecMap');
+    // Assign Attributes
+    earthShader.aVertexPosition = gl.getAttribLocation(earthShader, 'aVertexPosition');
+    earthShader.aTexCoord = gl.getAttribLocation(earthShader, 'aTexCoord');
+    earthShader.aVertexNormal = gl.getAttribLocation(earthShader, 'aVertexNormal');
+    earthShader.uPMatrix = gl.getUniformLocation(earthShader, 'uPMatrix');
+    earthShader.uCamMatrix = gl.getUniformLocation(earthShader, 'uCamMatrix');
+    earthShader.uMvMatrix = gl.getUniformLocation(earthShader, 'uMvMatrix');
+    earthShader.uNormalMatrix = gl.getUniformLocation(earthShader, 'uNormalMatrix');
+    earthShader.uLightDirection = gl.getUniformLocation(earthShader, 'uLightDirection');
+    earthShader.uAmbientLightColor = gl.getUniformLocation(earthShader, 'uAmbientLightColor');
+    earthShader.uDirectionalLightColor = gl.getUniformLocation(earthShader, 'uDirectionalLightColor');
+    earthShader.uSampler = gl.getUniformLocation(earthShader, 'uSampler');
+    earthShader.uNightSampler = gl.getUniformLocation(earthShader, 'uNightSampler');
+    earthShader.uBumpMap = gl.getUniformLocation(earthShader, 'uBumpMap');
+    earthShader.uSpecMap = gl.getUniformLocation(earthShader, 'uSpecMap');
 
-  // Day Color Texture
-  {
-    texture = gl.createTexture();
-    var img = new Image();
-    img.onload = function () {
-      settingsManager.loadStr('painting');
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-
-      gl.generateMipmap(gl.TEXTURE_2D);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-
-      texLoaded = true;
-      onImageLoaded();
-    };
-    img.src = 'textures/earthmap512.jpg';
-
-    earth.loadHiRes = async () => {
-      var imgHiRes = new Image();
-      imgHiRes.src = 'textures/earthmap4k.jpg';
-      if (settingsManager.nasaImages) imgHiRes.src = 'textures/mercator-tex.jpg';
-      if (settingsManager.trusatImages) img.src = 'textures/trusatvector-4096.jpg';
-      if (settingsManager.blueImages) imgHiRes.src = 'textures/world_blue-2048.png';
-      if (settingsManager.vectorImages) imgHiRes.src = 'textures/dayearthvector-4096.jpg';
-      if (settingsManager.hiresImages) imgHiRes.src = 'textures/earthmap16k.jpg';
-      if (settingsManager.hiresNoCloudsImages) imgHiRes.src = 'textures/earthmap16k.jpg';
-      earth.isUseHiRes = true;
-      imgHiRes.onload = function () {
+    // Day Color Texture
+    {
+      texture = gl.createTexture();
+      var img = new Image();
+      img.onload = function () {
+        settingsManager.loadStr('painting');
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgHiRes);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
@@ -170,40 +146,44 @@ earth.init = async (glRef) => {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
 
         texLoaded = true;
-        earth.isHiResReady = true;
         onImageLoaded();
       };
-    };
-  }
+      img.src = 'textures/earthmap512.jpg';
 
-  // Night Color Texture
-  {
-    nightTexture = gl.createTexture();
-    var nightImg = new Image();
-    nightImg.onload = function () {
-      gl.bindTexture(gl.TEXTURE_2D, nightTexture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImg);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      earth.loadHiRes = async () => {
+        var imgHiRes = new Image();
+        imgHiRes.src = 'textures/earthmap4k.jpg';
+        if (settingsManager.nasaImages) imgHiRes.src = 'textures/mercator-tex.jpg';
+        if (settingsManager.trusatImages) img.src = 'textures/trusatvector-4096.jpg';
+        if (settingsManager.blueImages) imgHiRes.src = 'textures/world_blue-2048.png';
+        if (settingsManager.vectorImages) imgHiRes.src = 'textures/dayearthvector-4096.jpg';
+        if (settingsManager.hiresImages) imgHiRes.src = 'textures/earthmap16k.jpg';
+        if (settingsManager.hiresNoCloudsImages) imgHiRes.src = 'textures/earthmap16k.jpg';
+        earth.isUseHiRes = true;
+        imgHiRes.onload = function () {
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgHiRes);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 
-      gl.generateMipmap(gl.TEXTURE_2D);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+          gl.generateMipmap(gl.TEXTURE_2D);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
 
-      // console.log('earth.js loaded nightearth');
-      nightLoaded = true;
-      onImageLoaded();
-    };
-    nightImg.src = 'textures/earthlights512.jpg';
+          texLoaded = true;
+          earth.isHiResReady = true;
+          onImageLoaded();
+        };
+      };
+    }
 
-    earth.loadHiResNight = async () => {
-      var nightImgHiRes = new Image();
-      if (!settingsManager.smallImages) nightImgHiRes.src = 'textures/earthlights4k.jpg';
-      if (settingsManager.vectorImages) nightImgHiRes.src = 'textures/dayearthvector-4096.jpg';
-      if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) nightImgHiRes.src = 'textures/earthlights16k.jpg';
-      nightImgHiRes.onload = function () {
+    // Night Color Texture
+    {
+      nightTexture = gl.createTexture();
+      var nightImg = new Image();
+      nightImg.onload = function () {
         gl.bindTexture(gl.TEXTURE_2D, nightTexture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImgHiRes);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImg);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
@@ -211,136 +191,160 @@ earth.init = async (glRef) => {
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
 
+        // console.log('earth.js loaded nightearth');
         nightLoaded = true;
         onImageLoaded();
       };
-    };
-  }
+      nightImg.src = 'textures/earthlights512.jpg';
 
-  // Bump Map
-  {
-    earth.bumpMap = {};
-    earth.bumpMap.isReady = false;
-    earth.bumpMap.texture = gl.createTexture();
-    earth.bumpMap.img = new Image();
-    earth.bumpMap.img.onload = function () {
-      gl.bindTexture(gl.TEXTURE_2D, earth.bumpMap.texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.bumpMap.img);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      earth.loadHiResNight = async () => {
+        var nightImgHiRes = new Image();
+        if (!settingsManager.smallImages) nightImgHiRes.src = 'textures/earthlights4k.jpg';
+        if (settingsManager.vectorImages) nightImgHiRes.src = 'textures/dayearthvector-4096.jpg';
+        if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) nightImgHiRes.src = 'textures/earthlights16k.jpg';
+        nightImgHiRes.onload = function () {
+          gl.bindTexture(gl.TEXTURE_2D, nightTexture);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImgHiRes);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 
-      gl.generateMipmap(gl.TEXTURE_2D);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+          gl.generateMipmap(gl.TEXTURE_2D);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
 
-      earth.bumpMap.isReady = true;
-      onImageLoaded();
-    };
-    earth.bumpMap.img.src = 'textures/earthbump8k.jpg';
-    if (settingsManager.smallImages) earth.bumpMap.img.src = 'textures/earthbump256.jpg';
-    if (settingsManager.isMobileModeEnabled) earth.bumpMap.img.src = 'textures/earthbump4k.jpg';
-    // 'textures/earthbump1k.jpg';
-  }
-
-  // Specular Map
-  {
-    earth.specularMap = {};
-    earth.specularMap.isReady = false;
-    earth.specularMap.texture = gl.createTexture();
-    earth.specularMap.img = new Image();
-    earth.specularMap.img.onload = function () {
-      gl.bindTexture(gl.TEXTURE_2D, earth.specularMap.texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.specularMap.img);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-
-      gl.generateMipmap(gl.TEXTURE_2D);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-
-      earth.specularMap.isReady = true;
-      onImageLoaded();
-    };
-    earth.specularMap.img.src = 'textures/earthspec8k.jpg';
-    if (settingsManager.smallImages) earth.specularMap.img.src = 'textures/earthspec256.jpg';
-    if (settingsManager.isMobileModeEnabled) earth.specularMap.img.src = 'textures/earthspec4k.jpg';
-    // 'textures/earthspec1k.jpg';
-  }
-
-  // generate a uvsphere bottom up, CCW order
-  var vertPos = [];
-  var vertNorm = [];
-  var texCoord = [];
-  for (let lat = 0; lat <= settingsManager.earthNumLatSegs; lat++) {
-    var latAngle = (Math.PI / settingsManager.earthNumLatSegs) * lat - Math.PI / 2;
-    var diskRadius = Math.cos(Math.abs(latAngle));
-    var z = Math.sin(latAngle);
-    // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
-    // var i = 0;
-    for (let lon = 0; lon <= settingsManager.earthNumLonSegs; lon++) {
-      // add an extra vertex for texture funness
-      var lonAngle = ((Math.PI * 2) / settingsManager.earthNumLonSegs) * lon;
-      var x = Math.cos(lonAngle) * diskRadius;
-      var y = Math.sin(lonAngle) * diskRadius;
-      // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
-
-      // mercator cylindrical projection (simple angle interpolation)
-      var v = 1 - lat / settingsManager.earthNumLatSegs;
-      var u = 0.5 + lon / settingsManager.earthNumLonSegs; // may need to change to move map
-      // console.log('u: ' + u + ' v: ' + v);
-      // normals: should just be a vector from center to point (aka the point itself!
-
-      vertPos.push(x * RADIUS_OF_EARTH);
-      vertPos.push(y * RADIUS_OF_EARTH);
-      vertPos.push(z * RADIUS_OF_EARTH);
-      texCoord.push(u);
-      texCoord.push(v);
-      vertNorm.push(x);
-      vertNorm.push(y);
-      vertNorm.push(z);
-
-      // i++;
+          nightLoaded = true;
+          onImageLoaded();
+        };
+      };
     }
-  }
 
-  // ok let's calculate vertex draw orders.... indiv triangles
-  var vertIndex = [];
-  for (let lat = 0; lat < settingsManager.earthNumLatSegs; lat++) {
-    // this is for each QUAD, not each vertex, so <
-    for (let lon = 0; lon < settingsManager.earthNumLonSegs; lon++) {
-      var blVert = lat * (settingsManager.earthNumLonSegs + 1) + lon; // there's settingsManager.earthNumLonSegs + 1 verts in each horizontal band
-      var brVert = blVert + 1;
-      var tlVert = (lat + 1) * (settingsManager.earthNumLonSegs + 1) + lon;
-      var trVert = tlVert + 1;
-      // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
-      vertIndex.push(blVert);
-      vertIndex.push(brVert);
-      vertIndex.push(tlVert);
+    // Bump Map
+    {
+      earth.bumpMap = {};
+      earth.bumpMap.isReady = false;
+      earth.bumpMap.texture = gl.createTexture();
+      earth.bumpMap.img = new Image();
+      earth.bumpMap.img.onload = function () {
+        gl.bindTexture(gl.TEXTURE_2D, earth.bumpMap.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.bumpMap.img);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 
-      vertIndex.push(tlVert);
-      vertIndex.push(trVert);
-      vertIndex.push(brVert);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+
+        earth.bumpMap.isReady = true;
+        onImageLoaded();
+      };
+      earth.bumpMap.img.src = 'textures/earthbump8k.jpg';
+      if (settingsManager.smallImages) earth.bumpMap.img.src = 'textures/earthbump256.jpg';
+      if (settingsManager.isMobileModeEnabled) earth.bumpMap.img.src = 'textures/earthbump4k.jpg';
+      // 'textures/earthbump1k.jpg';
     }
+
+    // Specular Map
+    {
+      earth.specularMap = {};
+      earth.specularMap.isReady = false;
+      earth.specularMap.texture = gl.createTexture();
+      earth.specularMap.img = new Image();
+      earth.specularMap.img.onload = function () {
+        gl.bindTexture(gl.TEXTURE_2D, earth.specularMap.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.specularMap.img);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+
+        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+
+        earth.specularMap.isReady = true;
+        onImageLoaded();
+      };
+      earth.specularMap.img.src = 'textures/earthspec8k.jpg';
+      if (settingsManager.smallImages) earth.specularMap.img.src = 'textures/earthspec256.jpg';
+      if (settingsManager.isMobileModeEnabled) earth.specularMap.img.src = 'textures/earthspec4k.jpg';
+      // 'textures/earthspec1k.jpg';
+    }
+
+    // generate a uvsphere bottom up, CCW order
+    var vertPos = [];
+    var vertNorm = [];
+    var texCoord = [];
+    for (let lat = 0; lat <= settingsManager.earthNumLatSegs; lat++) {
+      var latAngle = (Math.PI / settingsManager.earthNumLatSegs) * lat - Math.PI / 2;
+      var diskRadius = Math.cos(Math.abs(latAngle));
+      var z = Math.sin(latAngle);
+      // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
+      // var i = 0;
+      for (let lon = 0; lon <= settingsManager.earthNumLonSegs; lon++) {
+        // add an extra vertex for texture funness
+        var lonAngle = ((Math.PI * 2) / settingsManager.earthNumLonSegs) * lon;
+        var x = Math.cos(lonAngle) * diskRadius;
+        var y = Math.sin(lonAngle) * diskRadius;
+        // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
+
+        // mercator cylindrical projection (simple angle interpolation)
+        var v = 1 - lat / settingsManager.earthNumLatSegs;
+        var u = 0.5 + lon / settingsManager.earthNumLonSegs; // may need to change to move map
+        // console.log('u: ' + u + ' v: ' + v);
+        // normals: should just be a vector from center to point (aka the point itself!
+
+        vertPos.push(x * RADIUS_OF_EARTH);
+        vertPos.push(y * RADIUS_OF_EARTH);
+        vertPos.push(z * RADIUS_OF_EARTH);
+        texCoord.push(u);
+        texCoord.push(v);
+        vertNorm.push(x);
+        vertNorm.push(y);
+        vertNorm.push(z);
+
+        // i++;
+      }
+    }
+
+    // ok let's calculate vertex draw orders.... indiv triangles
+    var vertIndex = [];
+    for (let lat = 0; lat < settingsManager.earthNumLatSegs; lat++) {
+      // this is for each QUAD, not each vertex, so <
+      for (let lon = 0; lon < settingsManager.earthNumLonSegs; lon++) {
+        var blVert = lat * (settingsManager.earthNumLonSegs + 1) + lon; // there's settingsManager.earthNumLonSegs + 1 verts in each horizontal band
+        var brVert = blVert + 1;
+        var tlVert = (lat + 1) * (settingsManager.earthNumLonSegs + 1) + lon;
+        var trVert = tlVert + 1;
+        // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
+        vertIndex.push(blVert);
+        vertIndex.push(brVert);
+        vertIndex.push(tlVert);
+
+        vertIndex.push(tlVert);
+        vertIndex.push(trVert);
+        vertIndex.push(brVert);
+      }
+    }
+    vertCount = vertIndex.length;
+
+    vertPosBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertPos), gl.STATIC_DRAW);
+
+    vertNormBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertNorm), gl.STATIC_DRAW);
+
+    texCoordBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoord), gl.STATIC_DRAW);
+
+    vertIndexBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
+
+    earth.loaded = true;
+  } catch (error) {
+    console.error(error);
   }
-  vertCount = vertIndex.length;
-
-  vertPosBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertPos), gl.STATIC_DRAW);
-
-  vertNormBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertNorm), gl.STATIC_DRAW);
-
-  texCoordBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoord), gl.STATIC_DRAW);
-
-  vertIndexBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
-
-  earth.loaded = true;
 };
 
 earth.update = () => {

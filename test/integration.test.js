@@ -1,27 +1,36 @@
-/**
- * /*! /////////////////////////////////////////////////////////////////////////////
- *
- * main.js is the primary javascript file for keeptrack.space. It manages all user
- * interaction with the application.
- * http://keeptrack.space
- *
- * Copyright (C) 2016-2021 Theodore Kruczek
- * Copyright (C) 2020 Heather Kruczek
- * Copyright (C) 2015-2016, James Yoder
- *
- * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
- * under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
- *
- * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- * /////////////////////////////////////////////////////////////////////////////
- */
+/* eslint-disable */
+// import 'jsdom-global/register';
+import 'jsdom-worker';
+
+// keep a copy of the window object to restore
+// it at the end of the tests
+const oldWindowLocation = window.location;
+
+// delete the existing `Location` object from `jsdom`
+delete window.location;
+
+// create a new `window.location` object that's *almost*
+// like the real thing
+window.location = Object.defineProperties(
+  // start with an empty object on which to define properties
+  {},
+  {
+    // grab all of the property descriptors for the
+    // `jsdom` `Location` object
+    ...Object.getOwnPropertyDescriptors(oldWindowLocation),
+
+    // overwrite a mocked method for `window.location.assign`
+    assign: {
+      search: '?sat=44444',
+      value: jest.fn(),
+    },
+
+    // more mocked methods here as needed
+  }
+);
+
+document.body.innerHTML = global.docBody;
+// jest.spyOn(document, 'createElement').mockReturnValueOnce(true);
 
 import 'jquery-ui-bundle';
 import 'materialize-css';
@@ -43,7 +52,27 @@ import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 
-const initalizeKeepTrack = async () => {
+import { adviceManager } from '@app/js/uiManager/ui-advice.js';
+
+const eventFire = (elStr, etype) => {
+  try {
+    el = document.getElementById(elStr);
+    if (el.fireEvent) {
+      el.fireEvent('on' + etype);
+    } else {
+      var evObj = document.createEvent('Events');
+      evObj.initEvent(etype, true, false);
+      el.dispatchEvent(evObj);
+    }
+  } catch (error) {
+    console.debug(elStr);
+  }
+};
+
+// const flushPromises = () => new Promise(setImmediate);
+
+test('Integration Testing', async () => {
+  // /////////////////////////////////////////////////////////////////////
   try {
     await timeManager.init();
     settingsManager.loadStr('dots');
@@ -90,6 +119,34 @@ const initalizeKeepTrack = async () => {
   } catch (error) {
     console.warn(error);
   }
-};
+  // /////////////////////////////////////////////////////////////////////
 
-jQAlt.docReady(initalizeKeepTrack);
+  adviceManager.onReady();
+  uiManager.onReady();
+
+  eventFire('clear-lines-rmb', 'click');
+  eventFire('findCsoBtn', 'click');
+  eventFire('all-objects-link', 'click');
+  eventFire('near-orbits-link', 'click');
+  eventFire('datetime-text', 'click');
+  eventFire('search-close', 'click');
+  eventFire('info-overlay-content', 'click');
+  eventFire('bottom-icons', 'click');
+  eventFire('bottom-menu', 'click');
+  eventFire('legend-hover-menu', 'click');
+  eventFire('time-machine-icon', 'click');
+  eventFire('legend-menu', 'click');
+  eventFire('menu-selectable', 'click');
+  eventFire('reset-sensor-button', 'click');
+  eventFire('search-results', 'click');
+  eventFire('share-icon', 'click');
+  eventFire('fullscreen-icon', 'click');
+  eventFire('nav-footer-toggle', 'click');
+  eventFire('export-lookangles', 'click');
+  eventFire('export-launch-info', 'click');
+  eventFire('export-multiSiteArray', 'click');
+
+  db.gremlins();
+
+  expect(true).toBe(true);
+});

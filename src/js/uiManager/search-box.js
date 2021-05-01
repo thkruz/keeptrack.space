@@ -91,7 +91,7 @@ searchBox.doSearch = function (searchString, isPreventDropDown, satSet) {
     // Stop once you get to the markers to save time
     var sat = satData[i];
     if (typeof sat == 'undefined') {
-      console.debug(`Undefined sat in searchBox.doSearch() - ${i}`);
+      // console.debug(`Undefined sat in searchBox.doSearch() - ${i}`);
       continue;
     }
     for (var j = 0; j < searchList.length; j++) {

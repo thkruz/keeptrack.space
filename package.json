@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "3.0.8",
+  "version": "3.0.10",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
   "contributors": [
@@ -31,8 +31,8 @@
     "stage": "node ./scripts/prebuild.mjs",
     "server:start": "http-server ./dist/",
     "coverage": "jest --coverage --coverageReporters lcov",
-    "test": "jest --coverage --coverageReporters text",
-    "test-html": "jest --coverage --coverageReporters html",
+    "test": "jest --coverage --coverageReporters html",
+    "test-text": "jest --coverage --coverageReporters text",
     "test-nocov": "jest",
     "updateTle": "node ./scripts/updateTle.mjs",
     "updateRadarData": "node ./scripts/updateRadarData.mjs",
@@ -44,7 +44,8 @@
       "^.+\\.[t|j]sx?$": "babel-jest"
     },
     "setupFiles": [
-      "<rootDir>/test/test-env.js"
+      "<rootDir>/test/test-env.js",
+      "<rootDir>/test/test-env-mocks.js"
     ],
     "moduleDirectories": [
       "node_modules",

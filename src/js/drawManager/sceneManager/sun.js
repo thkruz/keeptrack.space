@@ -5,15 +5,14 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
 import { A } from '@app/js/lib/external/meuusjs.js';
 import { satellite } from '@app/js/lib/lookangles.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 let mvMatrixEmpty = glm.mat4.create();
 let nMatrixEmpty = glm.mat3.create();
 const NUM_LAT_SEGS = 64;
 const NUM_LON_SEGS = 64;
 const RADIUS_OF_DRAW_SUN = 6000;
-const SUN_SCALAR_DISTANCE = 250000;
-var gl, earth;
+const SUN_SCALAR_DISTANCE = 220000;
+var gl, earth, timeManager;
 
 let vertPosBuf, vertNormBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
 let mvMatrix;
@@ -70,108 +69,114 @@ sun.shader = {
   `,
 };
 
-sun.init = async (glRef, earthRef) => {
-  gl = glRef;
-  earth = earthRef;
-  // Make New Vertex Array Objects
-  // sun.vao = gl.createVertexArray();
-  // gl.bindVertexArray(sun.vao);
+sun.init = async (glRef, earthRef, timeManagerRef) => {
+  try {
+    gl = glRef;
+    earth = earthRef;
+    timeManager = timeManagerRef;
+    // Make New Vertex Array Objects
+    // sun.vao = gl.createVertexArray();
+    // gl.bindVertexArray(sun.vao);
 
-  let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-  gl.shaderSource(fragShader, sun.shader.frag);
-  gl.compileShader(fragShader);
+    let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragShader, sun.shader.frag);
+    gl.compileShader(fragShader);
 
-  let vertShader = gl.createShader(gl.VERTEX_SHADER);
-  gl.shaderSource(vertShader, sun.shader.vert);
-  gl.compileShader(vertShader);
+    let vertShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertShader, sun.shader.vert);
+    gl.compileShader(vertShader);
 
-  sunShader = gl.createProgram();
-  gl.attachShader(sunShader, vertShader);
-  gl.attachShader(sunShader, fragShader);
-  gl.linkProgram(sunShader);
+    sunShader = gl.createProgram();
+    gl.attachShader(sunShader, vertShader);
+    gl.attachShader(sunShader, fragShader);
+    gl.linkProgram(sunShader);
 
-  sunShader.aVertexPosition = gl.getAttribLocation(sunShader, 'aVertexPosition');
-  sunShader.aTexCoord = gl.getAttribLocation(sunShader, 'aTexCoord');
-  sunShader.aVertexNormal = gl.getAttribLocation(sunShader, 'aVertexNormal');
-  sunShader.uPMatrix = gl.getUniformLocation(sunShader, 'uPMatrix');
-  sunShader.uCamMatrix = gl.getUniformLocation(sunShader, 'uCamMatrix');
-  sunShader.uMvMatrix = gl.getUniformLocation(sunShader, 'uMvMatrix');
-  sunShader.uNormalMatrix = gl.getUniformLocation(sunShader, 'uNormalMatrix');
-  sunShader.uLightDirection = gl.getUniformLocation(sunShader, 'uLightDirection');
-  sunShader.uSunDis = gl.getUniformLocation(sunShader, 'uSunDis');
+    sunShader.aVertexPosition = gl.getAttribLocation(sunShader, 'aVertexPosition');
+    sunShader.aTexCoord = gl.getAttribLocation(sunShader, 'aTexCoord');
+    sunShader.aVertexNormal = gl.getAttribLocation(sunShader, 'aVertexNormal');
+    sunShader.uPMatrix = gl.getUniformLocation(sunShader, 'uPMatrix');
+    sunShader.uCamMatrix = gl.getUniformLocation(sunShader, 'uCamMatrix');
+    sunShader.uMvMatrix = gl.getUniformLocation(sunShader, 'uMvMatrix');
+    sunShader.uNormalMatrix = gl.getUniformLocation(sunShader, 'uNormalMatrix');
+    sunShader.uLightDirection = gl.getUniformLocation(sunShader, 'uLightDirection');
+    sunShader.uSunDis = gl.getUniformLocation(sunShader, 'uSunDis');
 
-  // generate a uvsphere bottom up, CCW order
-  var vertPos = [];
-  var vertNorm = [];
-  var texCoord = [];
-  for (let lat = 0; lat <= NUM_LAT_SEGS; lat++) {
-    var latAngle = (Math.PI / NUM_LAT_SEGS) * lat - Math.PI / 2;
-    var diskRadius = Math.cos(Math.abs(latAngle));
-    var z = Math.sin(latAngle);
-    // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
-    // var i = 0;
-    for (let lon = 0; lon <= NUM_LON_SEGS; lon++) {
-      // add an extra vertex for texture funness
-      var lonAngle = ((Math.PI * 2) / NUM_LON_SEGS) * lon;
-      var x = Math.cos(lonAngle) * diskRadius;
-      var y = Math.sin(lonAngle) * diskRadius;
-      // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
+    // generate a uvsphere bottom up, CCW order
+    var vertPos = [];
+    var vertNorm = [];
+    var texCoord = [];
+    for (let lat = 0; lat <= NUM_LAT_SEGS; lat++) {
+      var latAngle = (Math.PI / NUM_LAT_SEGS) * lat - Math.PI / 2;
+      var diskRadius = Math.cos(Math.abs(latAngle));
+      var z = Math.sin(latAngle);
+      // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
+      // var i = 0;
+      for (let lon = 0; lon <= NUM_LON_SEGS; lon++) {
+        // add an extra vertex for texture funness
+        var lonAngle = ((Math.PI * 2) / NUM_LON_SEGS) * lon;
+        var x = Math.cos(lonAngle) * diskRadius;
+        var y = Math.sin(lonAngle) * diskRadius;
+        // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
 
-      // mercator cylindrical projection (simple angle interpolation)
-      var v = 1 - lat / NUM_LAT_SEGS;
-      var u = 0.5 + lon / NUM_LON_SEGS; // may need to change to move map
-      // console.log('u: ' + u + ' v: ' + v);
-      // normals: should just be a vector from center to point (aka the point itself!
+        // mercator cylindrical projection (simple angle interpolation)
+        var v = 1 - lat / NUM_LAT_SEGS;
+        var u = 0.5 + lon / NUM_LON_SEGS; // may need to change to move map
+        // console.log('u: ' + u + ' v: ' + v);
+        // normals: should just be a vector from center to point (aka the point itself!
 
-      vertPos.push(x * RADIUS_OF_DRAW_SUN);
-      vertPos.push(y * RADIUS_OF_DRAW_SUN);
-      vertPos.push(z * RADIUS_OF_DRAW_SUN);
-      texCoord.push(u);
-      texCoord.push(v);
-      vertNorm.push(x);
-      vertNorm.push(y);
-      vertNorm.push(z);
+        vertPos.push(x * RADIUS_OF_DRAW_SUN);
+        vertPos.push(y * RADIUS_OF_DRAW_SUN);
+        vertPos.push(z * RADIUS_OF_DRAW_SUN);
+        texCoord.push(u);
+        texCoord.push(v);
+        vertNorm.push(x);
+        vertNorm.push(y);
+        vertNorm.push(z);
 
-      // i++;
+        // i++;
+      }
     }
-  }
 
-  // ok let's calculate vertex draw orders.... indiv triangles
-  var vertIndex = [];
-  for (let lat = 0; lat < NUM_LAT_SEGS; lat++) {
-    // this is for each QUAD, not each vertex, so <
-    for (let lon = 0; lon < NUM_LON_SEGS; lon++) {
-      var blVert = lat * (NUM_LON_SEGS + 1) + lon; // there's NUM_LON_SEGS + 1 verts in each horizontal band
-      var brVert = blVert + 1;
-      var tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;
-      var trVert = tlVert + 1;
-      // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
-      vertIndex.push(blVert);
-      vertIndex.push(brVert);
-      vertIndex.push(tlVert);
+    // ok let's calculate vertex draw orders.... indiv triangles
+    var vertIndex = [];
+    for (let lat = 0; lat < NUM_LAT_SEGS; lat++) {
+      // this is for each QUAD, not each vertex, so <
+      for (let lon = 0; lon < NUM_LON_SEGS; lon++) {
+        var blVert = lat * (NUM_LON_SEGS + 1) + lon; // there's NUM_LON_SEGS + 1 verts in each horizontal band
+        var brVert = blVert + 1;
+        var tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;
+        var trVert = tlVert + 1;
+        // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
+        vertIndex.push(blVert);
+        vertIndex.push(brVert);
+        vertIndex.push(tlVert);
 
-      vertIndex.push(tlVert);
-      vertIndex.push(trVert);
-      vertIndex.push(brVert);
+        vertIndex.push(tlVert);
+        vertIndex.push(trVert);
+        vertIndex.push(brVert);
+      }
     }
+    sun.vertCount = vertIndex.length;
+
+    vertPosBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertPos), gl.STATIC_DRAW);
+
+    vertNormBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertNorm), gl.STATIC_DRAW);
+
+    vertIndexBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
+
+    sun.setupGodrays(gl);
+
+    sun.loaded = true;
+  } catch (error) {
+    /* istanbul ignore next */
+    console.error(error);
   }
-  sun.vertCount = vertIndex.length;
-
-  vertPosBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertPos), gl.STATIC_DRAW);
-
-  vertNormBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertNormBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertNorm), gl.STATIC_DRAW);
-
-  vertIndexBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
-
-  sun.setupGodrays(gl);
-
-  sun.loaded = true;
 };
 
 sun.setupGodrays = (gl) => {
@@ -395,12 +400,12 @@ sun.godraysShaderCode = {
       float decay=1.0;
       float exposure=1.0;
       float density=1.0;
-      float weight=0.022;
+      float weight=0.032;
       vec2 lightPositionOnScreen = vec2(u_sunPosition.x,1.0 - u_sunPosition.y);      
       vec2 texCoord = v_texCoord;
 
       /// samples will describe the rays quality, you can play with
-      const int samples = 75;      
+      const int samples = 60;      
 
       vec2 deltaTexCoord = (v_texCoord - lightPositionOnScreen.xy);
       deltaTexCoord *= 1.0 / float(samples) * density;

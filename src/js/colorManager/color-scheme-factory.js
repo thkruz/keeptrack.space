@@ -68,8 +68,10 @@ class ColorSchemeFactory {
       }
 
       if (sat.marker) {
-        if (sat.id === satSet.satSensorMarkerArray[ColorSchemeFactory.default.iSensor + 1]) {
-          ColorSchemeFactory.default.iSensor++;
+        if (typeof ColorSchemeFactory.default.iSensor !== 'undefined' && typeof satSet.satSensorMarkerArray !== 'undefined') {
+          if (sat.id === satSet.satSensorMarkerArray[ColorSchemeFactory.default.iSensor + 1]) {
+            ColorSchemeFactory.default.iSensor++;
+          }
         }
         if (ColorSchemeFactory.default.iSensor >= 0) {
           return {
@@ -304,8 +306,10 @@ class ColorSchemeFactory {
       }
 
       if (sat.marker) {
-        if (sat.id === satSet.satSensorMarkerArray[ColorSchemeFactory.sunlight.iSensor + 1]) {
-          ColorSchemeFactory.sunlight.iSensor++;
+        if (typeof ColorSchemeFactory.default.iSensor !== 'undefined' && typeof satSet.satSensorMarkerArray !== 'undefined') {
+          if (sat.id === satSet.satSensorMarkerArray[ColorSchemeFactory.sunlight.iSensor + 1]) {
+            ColorSchemeFactory.sunlight.iSensor++;
+          }
         }
         if (ColorSchemeFactory.sunlight.iSensor >= 0) {
           return {

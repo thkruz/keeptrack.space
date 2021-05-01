@@ -110,7 +110,12 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
     }
 
     var wheelOpt = supportsPassive ? { passive: false } : false;
-    var wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel';
+    var wheelEvent;
+    try {
+      wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel';
+    } catch (error) {
+      wheelEvent = 'mousewheel';
+    }
 
     // call this to Disable
     // eslint-disable-next-line no-unused-vars

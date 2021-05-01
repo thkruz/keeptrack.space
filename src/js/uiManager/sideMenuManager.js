@@ -1487,6 +1487,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
           tr.setAttribute('class', 'socrates-object link');
           tr.setAttribute('hiddenrow', i);
           tdT = tr.insertCell();
+          // TODO: Cannot read property '4' of undefined in sMM.socrates();
           var socratesDate = socratesObjTwo[i][4].split(' '); // Date/time is on the second line 5th column
           var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
           var socratesTimeS = socratesTime[2].split('.'); // Split time from date for easier management

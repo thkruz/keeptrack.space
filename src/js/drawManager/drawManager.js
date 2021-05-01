@@ -114,16 +114,20 @@ drawManager.createDotsManager = () => {
 };
 
 drawManager.loadScene = async () => {
-  await sceneManager.earth.init(gl);
-  sceneManager.earth.loadHiRes();
-  sceneManager.earth.loadHiResNight();
-  meshManager.init(gl, sceneManager.earth);
-  sceneManager.atmosphere = new sceneManager.classes.Atmosphere(gl, sceneManager.earth, settingsManager);
-  await sceneManager.sun.init(gl, sceneManager.earth);
-  sceneManager.moon = new sceneManager.classes.Moon(gl, sceneManager.sun);
+  try {
+    await sceneManager.earth.init(gl);
+    sceneManager.earth.loadHiRes();
+    sceneManager.earth.loadHiResNight();
+    meshManager.init(gl, sceneManager.earth);
+    sceneManager.atmosphere = new sceneManager.classes.Atmosphere(gl, sceneManager.earth, settingsManager);
+    await sceneManager.sun.init(gl, sceneManager.earth, timeManager);
+    sceneManager.moon = new sceneManager.classes.Moon(gl, sceneManager.sun);
 
-  // Make this public
-  drawManager.sceneManager = sceneManager;
+    // Make this public
+    drawManager.sceneManager = sceneManager;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 drawManager.resizeCanvas = () => {
@@ -194,7 +198,7 @@ var startWithOrbits = async () => {
 drawManager.drawLoop = (preciseDt) => {
   // Restart the draw loop when ready to draw again
   requestAnimationFrame(drawManager.drawLoop);
-  if (drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) return;
+  // if (drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) return;
 
   // Record milliseconds since last drawLoop - default is 0
   drawManager.dt = preciseDt - drawManager.t0 || 0;

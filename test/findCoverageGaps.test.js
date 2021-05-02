@@ -32,8 +32,9 @@ window.location = Object.defineProperties(
 document.body.innerHTML = global.docBody;
 // jest.spyOn(document, 'createElement').mockReturnValueOnce(true);
 
-import '@app/js/main.js';
+import { initalizeKeepTrack } from '../src/js/main';
 
 test('UI should not be disabled.', () => {
+  initalizeKeepTrack();
   expect(true).toBe(true);
 });

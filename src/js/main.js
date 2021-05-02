@@ -93,3 +93,6 @@ const initalizeKeepTrack = async () => {
 };
 
 jQAlt.docReady(initalizeKeepTrack);
+
+// For testing purposes
+export { initalizeKeepTrack };

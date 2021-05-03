@@ -5,6 +5,7 @@
 */
 
 import '@app/js/settingsManager/settingsManager.js';
+import 'jsdom-worker';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 
 test(`Basic Functions of Search Box`, () => {

@@ -71,9 +71,17 @@ class LineFactory {
       case 'w':
         color = [1.0, 1.0, 1.0, 1.0];
         break;
+      default:
+        // If color not a letter than assume its been set
+        break;
     }
     if (type == 'sat') {
       let sat = this.#getSat(value);
+      if (typeof sat.position == 'undefined') {
+        console.debug(`No Satellite Position Available for Line`);
+        console.debug(sat);
+        return;
+      }
       this.drawLineList.push({
         line: new Line(this.gl, this.shader),
         sat: sat,
@@ -84,6 +92,11 @@ class LineFactory {
     }
     if (type == 'sat2') {
       sat = this.#getSat(value[0]);
+      if (typeof sat.position == 'undefined') {
+        console.debug(`No Satellite Position Available for Line`);
+        console.debug(sat);
+        return;
+      }
       this.drawLineList.push({
         line: new Line(this.gl, this.shader),
         sat: sat,
@@ -95,6 +108,12 @@ class LineFactory {
     if (type == 'sat3') {
       sat = this.#getSat(value[0]);
       sat2 = this.#getSat(value[1]);
+      if (typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
+        console.debug(`No Satellite Position Available for Line`);
+        console.debug(sat);
+        console.debug(sat2);
+        return;
+      }
       this.drawLineList.push({
         line: new Line(this.gl, this.shader),
         sat: sat,
@@ -109,6 +128,12 @@ class LineFactory {
     if (type == 'sat4') {
       sat = this.#getSat(value[0]);
       sat2 = this.#getSat(value[1]);
+      if (typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
+        console.debug(`No Satellite Position Available for Line`);
+        console.debug(sat);
+        console.debug(sat2);
+        return;
+      }
       this.drawLineList.push({
         line: new Line(this.gl, this.shader),
         sat: sat,
@@ -123,6 +148,12 @@ class LineFactory {
     if (type == 'sat5') {
       sat = this.#getSat(value[0]);
       sat2 = this.#getSat(value[1]);
+      if (typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
+        console.debug(`No Satellite Position Available for Line`);
+        console.debug(sat);
+        console.debug(sat2);
+        return;
+      }
       this.drawLineList.push({
         line: new Line(this.gl, this.shader),
         sat: sat,

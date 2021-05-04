@@ -270,7 +270,7 @@ class SunCalc {
 
     return {
       fraction: (1 + Math.cos(inc)) / 2,
-      phase: 0.5 + (0.5 * inc * (angle < 0 ? -1 : 1)) / Math.SunCalc.TAU / 2,
+      phase: 0.5 + (0.5 * inc * (angle < 0 ? -1 : 1)) / SunCalc.TAU / 2,
       angle: angle,
     };
   }

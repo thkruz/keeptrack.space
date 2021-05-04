@@ -41,7 +41,6 @@ import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-sc
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
 import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager.js';
 import { drawManager } from '@app/js/drawManager/drawManager.js';
-import { jQAlt } from '@app/js/lib/jqalt.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
@@ -720,6 +719,28 @@ describe('Integration Testing', () => {
     cameraManager.getCamPos();
   });
 
+  test('satLinkManager Functional', () => {
+    objectManager.satLinkManager.showLinks(lineManager, satSet, 'aehf');
+    objectManager.satLinkManager.showLinks(lineManager, satSet, 'dscs');
+    objectManager.satLinkManager.showLinks(lineManager, satSet, 'wgs');
+    objectManager.satLinkManager.showLinks(lineManager, satSet, 'iridium');
+    objectManager.satLinkManager.showLinks(lineManager, satSet, 'starlink');
+    objectManager.satLinkManager.showLinks(lineManager, satSet, 'galileo');
+    objectManager.satLinkManager.showLinks(lineManager, satSet, 'sbirs');
+  });
+
+  test('Sensor Manager Functional', () => {
+    sensorManager.sensorListLength();
+    sensorManager.setSensor('SSN', 0);
+    sensorManager.setSensor('NATO-MW', 0);
+    sensorManager.setSensor('RUS-ALL', 0);
+    sensorManager.setSensor('LEO-LABS', 0);
+    sensorManager.setSensor('MD-ALL', 0);
+    sensorManager.setSensor('COD', 0);
+    sensorManager.setSensor('FAKE', 1);
+    sensorManager.checkSensorSelected();
+  });
+
   test('Missile Manager Functional', () => {
     let sim = 'simulation/Russia2USA.json';
     missileManager.MassRaidPre(new Date(), sim);
@@ -744,5 +765,11 @@ describe('Integration Testing', () => {
 
     missileManager.Missile(0, 0, 1, 1, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], null, null, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
     missileManager.Missile(0, 0, 0, 180, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], null, null, 0.07, 1000, 'United States', 13000);
+  });
+
+  test('lookangles Functional Tests', () => {
+    satellite.getlookangles(satSet.getSat(0));
+    satellite.getlookanglesMultiSite(satSet.getSat(0));
+    satellite.findCloseObjects();
   });
 });

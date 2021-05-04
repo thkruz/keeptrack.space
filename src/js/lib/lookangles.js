@@ -610,9 +610,32 @@ satellite.getlookanglesMultiSite = (sat) => {
 
 satellite.satSensorFOV = (sat1, sat2) => {
   // Set default timing settings. These will be changed to find look angles at different times in future.
-  let propOffset = timeManager.getPropOffset();
-  let propRealTimeTemp = Date.now();
-  let now = timeManager.propTimeCheck(propOffset, propRealTimeTemp);
+  let propOffset, propRealTimeTemp, now;
+  try {
+    propOffset = timeManager.getPropOffset() || 0;
+    propRealTimeTemp = Date.now();
+    now = timeManager.propTimeCheck(propOffset, propRealTimeTemp);
+  } catch {
+    now = new Date();
+  }
+
+  let _getEcf = (now, satrec) => {
+    let j = _jday(
+      now.getUTCFullYear(),
+      now.getUTCMonth() + 1, // NOTE:, this function requires months in rng 1-12.
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()
+    ); // Converts time to jday (TLEs use epoch year/day)
+    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+    let gmst = satellite.gstime(j);
+
+    let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+    let positionEci = satellite.sgp4(satrec, m);
+
+    return satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
+  };
 
   let satrec1 = satellite.twoline2satrec(sat1.TLE1, sat1.TLE2); // perform and store sat init calcs
   let sat1Ecf = _getEcf(now, satrec1);
@@ -738,24 +761,6 @@ satellite.satSensorFOV = (sat1, sat2) => {
         }
     }
     */
-
-  var _getEcf = (now, satrec) => {
-    let j = _jday(
-      now.getUTCFullYear(),
-      now.getUTCMonth() + 1, // NOTE:, this function requires months in rng 1-12.
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds()
-    ); // Converts time to jday (TLEs use epoch year/day)
-    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-    let gmst = satellite.gstime(j);
-
-    let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-    let positionEci = satellite.sgp4(satrec, m);
-
-    return satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-  };
   return;
 };
 
@@ -2239,6 +2244,7 @@ satellite.lookAnglesToEcf = (azDeg, elDeg, slantrng, obsLat, obsLong, obsAlt) =>
   return { x: x, y: y, z: z };
 };
 
+// Requires timeManager
 satellite.eci2ll = (x, y, z) => {
   var propTime = timeManager.propTime();
   var j = timeManager.jday(

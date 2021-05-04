@@ -14,10 +14,15 @@ stringPad.padEmpty = (num, size) => {
 stringPad.pad0 = (str, max) => (str.length < max ? stringPad.pad0('0' + str, max) : str);
 
 var saveVariable = (variable, filename) => {
-  filename = typeof filename == 'undefined' ? 'variable.txt' : filename;
-  variable = JSON.stringify(variable);
-  var blob = new Blob([variable], { type: 'text/plain;charset=utf-8' });
-  saveAs(blob, filename);
+  try {
+    filename = typeof filename == 'undefined' ? 'variable.txt' : filename;
+    variable = JSON.stringify(variable);
+    var blob = new Blob([variable], { type: 'text/plain;charset=utf-8' });
+    saveAs(blob, filename);
+  } catch (e) {
+    console.debug(console.error());
+    console.warn('Unable to Save File!');
+  }
 };
 
 const saveCsv = (items, name) => {
@@ -31,7 +36,8 @@ const saveCsv = (items, name) => {
     var blob = new Blob([csv], { type: 'text/plain;charset=utf-8' });
     saveAs(blob, `${name}.csv`);
   } catch (error) {
-    console.warn(error);
+    console.debug(console.error());
+    console.warn('Unable to Save File!');
   }
 };
 
@@ -42,7 +48,12 @@ const parseRgba = (str) => {
   g = parseInt(g) / 255;
   b = parseInt(b) / 255;
   a = parseFloat(a);
-  return [r, g, b, a];
+  if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a)) {
+    console.warn('Bad RGBA! Using White Instead.');
+    return [1, 1, 1, 1];
+  } else {
+    return [r, g, b, a];
+  }
 };
 
 const hex2RgbA = (hex) => {
@@ -58,7 +69,8 @@ const hex2RgbA = (hex) => {
     const b = (c & 255) / 255;
     return [r, g, b, 1];
   }
-  throw new Error('Bad Hex');
+  console.warn('Bad Hex! Using White Instead.');
+  return [1, 1, 1, 1];
 };
 
 const rgbCss = (values) => `rgba(${values[0] * 255},${values[1] * 255},${values[2] * 255},${values[3]})`;

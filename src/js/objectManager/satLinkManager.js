@@ -123,79 +123,87 @@ satLinkManager.showLinks = async function (lineManager, satSet, group) {
   // Show the users connected to the satellites and the satellites connected
   // to each other
   if (linkType == 1) {
-    for (let i = 0; i < satlist.length; i++) {
-      for (let j = 0; j < satlist.length; j++) {
-        if (i !== j) {
-          var sat1 = satSet.getSat(satlist[i]);
-          var sat2 = satSet.getSat(satlist[j]);
-          //
-          // Debug for finding decayed satellites
-          //
-          if (sat1.position.x === 0) continue;
-          if (sat1.position.y === 0) continue;
-          if (sat1.position.z === 0) continue;
-          if (sat2.position.x === 0) continue;
-          if (sat2.position.y === 0) continue;
-          if (sat2.position.z === 0) continue;
-          //
-          // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/Math.sqrt(Math.pow(-sat1.position.x, 2) + Math.pow(-sat1.position.y, 2) + Math.pow(-sat1.position.z, 2))) * RAD2DEG;
-          // var semiDiamSat2 = Math.asin(0.1/Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2))) * RAD2DEG;
-          var theta =
-            Math.acos(
-              window.numeric.dot([-sat1.position.x, -sat1.position.y, -sat1.position.z], [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z]) /
-                (Math.sqrt(Math.pow(-sat1.position.x, 2) + Math.pow(-sat1.position.y, 2) + Math.pow(-sat1.position.z, 2)) *
-                  Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2)))
-            ) * RAD2DEG;
-          if (theta < minTheta) {
-            // Intentional
-          } else {
-            lineManager.create('sat5', [sat1.id, sat2.id], [0, 0.6, 1, 1]);
+    try {
+      for (let i = 0; i < satlist.length; i++) {
+        for (let j = 0; j < satlist.length; j++) {
+          if (i !== j) {
+            var sat1 = satSet.getSat(satlist[i]);
+            var sat2 = satSet.getSat(satlist[j]);
+            //
+            // Debug for finding decayed satellites
+            //
+            if (sat1.position.x === 0) continue;
+            if (sat1.position.y === 0) continue;
+            if (sat1.position.z === 0) continue;
+            if (sat2.position.x === 0) continue;
+            if (sat2.position.y === 0) continue;
+            if (sat2.position.z === 0) continue;
+            //
+            // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/Math.sqrt(Math.pow(-sat1.position.x, 2) + Math.pow(-sat1.position.y, 2) + Math.pow(-sat1.position.z, 2))) * RAD2DEG;
+            // var semiDiamSat2 = Math.asin(0.1/Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2))) * RAD2DEG;
+            var theta =
+              Math.acos(
+                window.numeric.dot([-sat1.position.x, -sat1.position.y, -sat1.position.z], [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z]) /
+                  (Math.sqrt(Math.pow(-sat1.position.x, 2) + Math.pow(-sat1.position.y, 2) + Math.pow(-sat1.position.z, 2)) *
+                    Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2)))
+              ) * RAD2DEG;
+            if (theta < minTheta) {
+              // Intentional
+            } else {
+              lineManager.create('sat5', [sat1.id, sat2.id], [0, 0.6, 1, 1]);
+            }
           }
         }
       }
-    }
-    for (let i = 0; i < userlist.length; i++) {
-      let user = satSet.getSat(satSet.getIdFromSensorName(userlist[i]));
-      var bestSat;
-      var bestRange = 1000000;
-      for (let j = 0; j < satlist.length; j++) {
-        var sat = satSet.getSat(satlist[j]);
-        var tearr = sat.getTEARR(null, user);
-        if (tearr.elevation > elevationMask) {
-          if (tearr.range < bestRange) bestSat = sat;
+      for (let i = 0; i < userlist.length; i++) {
+        let user = satSet.getSat(satSet.getIdFromSensorName(userlist[i]));
+        var bestSat;
+        var bestRange = 1000000;
+        for (let j = 0; j < satlist.length; j++) {
+          var sat = satSet.getSat(satlist[j]);
+          var tearr = sat.getTEARR(null, user);
+          if (tearr.elevation > elevationMask) {
+            if (tearr.range < bestRange) bestSat = sat;
+          }
+        }
+        if (typeof bestSat.id !== 'undefined') {
+          lineManager.create('sat5', [bestSat.id, satSet.getIdFromSensorName(user.name)], [0, 1.0, 0.6, 1.0]);
         }
       }
-      if (typeof bestSat.id !== 'undefined') {
-        lineManager.create('sat5', [bestSat.id, satSet.getIdFromSensorName(user.name)], [0, 1.0, 0.6, 1.0]);
-      }
+    } catch (e) {
+      console.debug(e);
     }
   }
 
   // Only show the users connected to the satellites
   if (linkType == 2) {
-    // Loop through all the users
-    for (let i = 0; i < userlist.length; i++) {
-      // Select the current user
-      let user = satSet.getSat(satSet.getIdFromSensorName(userlist[i]));
-      // Loop through all of the satellites
-      for (let j = 0; j < satlist.length; j++) {
-        // Select the current satelltie
-        let sat = satSet.getSat(satlist[j]);
-        // Calculate Time, Elevation, Azimuth, Range, and Range Rate data
-        // of the current satellite relevant to the current user. This allows
-        // us to figure out if the user can see the satellite
-        let tearr = sat.getTEARR(null, user);
+    try {
+      // Loop through all the users
+      for (let i = 0; i < userlist.length; i++) {
+        // Select the current user
+        let user = satSet.getSat(satSet.getIdFromSensorName(userlist[i]));
+        // Loop through all of the satellites
+        for (let j = 0; j < satlist.length; j++) {
+          // Select the current satelltie
+          let sat = satSet.getSat(satlist[j]);
+          // Calculate Time, Elevation, Azimuth, Range, and Range Rate data
+          // of the current satellite relevant to the current user. This allows
+          // us to figure out if the user can see the satellite
+          let tearr = sat.getTEARR(null, user);
 
-        // Only draw the line between the user and the satellite if the
-        // elevation angle is greater than the elevation mask. This simulates
-        // the effects of hills, trees, and atmospheric ducting along the
-        // horizon.
-        //
-        if (tearr.elevation > elevationMask) {
-          // Draw a line from the user to the satellite
-          lineManager.create('sat5', [sat.id, satSet.getIdFromSensorName(user.name)], [0, 1.0, 0.6, 1.0]);
+          // Only draw the line between the user and the satellite if the
+          // elevation angle is greater than the elevation mask. This simulates
+          // the effects of hills, trees, and atmospheric ducting along the
+          // horizon.
+          //
+          if (tearr.elevation > elevationMask) {
+            // Draw a line from the user to the satellite
+            lineManager.create('sat5', [sat.id, satSet.getIdFromSensorName(user.name)], [0, 1.0, 0.6, 1.0]);
+          }
         }
       }
+    } catch (e) {
+      console.debug(e);
     }
   }
 };

@@ -7,6 +7,7 @@ import * as twgl from 'twgl.js';
 import { DEG2RAD } from '@app/js/lib/constants.js';
 
 class Atmosphere {
+  /* istanbul ignore next */
   constructor(gl, earth, settingsManager) {
     // Move to the code the creates the moon?
     if (settingsManager.enableLimitedUI || settingsManager.isDrawLess) return;
@@ -39,6 +40,7 @@ class Atmosphere {
     this.loaded = true;
   }
 
+  /* istanbul ignore next */
   updateUniforms(pMatrix, camMatrix) {
     this.mvMatrix = glm.mat4.create();
     this.nMatrix = glm.mat3.create();
@@ -55,6 +57,7 @@ class Atmosphere {
     };
   }
 
+  /* istanbul ignore next */
   draw(pMatrix, cameraManager) {
     // Move this to the draw loop?
     if (!this.loaded) return;
@@ -83,6 +86,7 @@ class Atmosphere {
     return true;
   }
 
+  /* istanbul ignore next */
   update(camPitch) {
     // Start with an empyy model view matrix
     this.mvMatrix = glm.mat4.create();
@@ -97,6 +101,7 @@ class Atmosphere {
     glm.mat3.normalFromMat4(this.nMatrix, this.mvMatrix);
   }
 
+  /* istanbul ignore next */
   setupShaderCode() {
     this.shaderCode = {
       frag: `

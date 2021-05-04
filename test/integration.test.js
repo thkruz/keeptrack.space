@@ -53,9 +53,9 @@ import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 import { adviceManager } from '@app/js/uiManager/ui-advice.js';
 
-const eventFire = (elStr, etype) => {
+const eventFire = (elObj, etype) => {
   try {
-    el = document.getElementById(elStr);
+    el = typeof elObj == 'string' ? document.getElementById(elObj) : elObj;
     if (el.fireEvent) {
       el.fireEvent('on' + etype);
     } else {
@@ -64,7 +64,7 @@ const eventFire = (elStr, etype) => {
       el.dispatchEvent(evObj);
     }
   } catch (error) {
-    console.debug(elStr);
+    console.debug(elObj);
   }
 };
 
@@ -72,6 +72,39 @@ const eventFire = (elStr, etype) => {
 
 describe('Integration Testing', () => {
   let lineManager, groupsManager, cameraManager;
+
+  const exampleSat = {
+    C: 'US',
+    LS: 'AFETR',
+    LV: 'U',
+    ON: 'VANGUARD 1',
+    OT: 1,
+    R: '0.1220',
+    SCC_NUM: '00005',
+    TLE1: '1     5U 58002B   21107.45725112 -.00000113  00000-0 -16194-3 0  9999',
+    TLE2: '2     5  34.2637  11.6832 1848228 280.4329  59.4145 10.84843191238363',
+    active: true,
+    apogee: 3845.1282721399293,
+    argPe: 4.894477435916007,
+    eccentricity: 0.1848228,
+    id: 0,
+    inclination: 0.5980143789155811,
+    intlDes: '1958-002B',
+    meanMotion: 10.843102290386977,
+    perigee: 657.8610581463026,
+    period: 132.80332154356245,
+    position: {
+      x: 4000,
+      y: 4000,
+      z: 4000,
+    },
+    raan: 0.2039103071690015,
+    semiMajorAxis: 8622.494665143116,
+    semiMinorAxis: 8473.945136538932,
+    velocity: {},
+    getAltitude: () => 100,
+  };
+
   test('main.js', async () => {
     // /////////////////////////////////////////////////////////////////////
     try {
@@ -136,8 +169,6 @@ describe('Integration Testing', () => {
     eventFire('bottom-icons', 'click');
     eventFire('bottom-menu', 'click');
     eventFire('legend-hover-menu', 'click');
-    eventFire('time-machine-icon', 'click');
-    eventFire('legend-menu', 'click');
     eventFire('menu-selectable', 'click');
     eventFire('reset-sensor-button', 'click');
     eventFire('search-results', 'click');
@@ -147,37 +178,110 @@ describe('Integration Testing', () => {
     eventFire('export-lookangles', 'click');
     eventFire('export-launch-info', 'click');
     eventFire('export-multiSiteArray', 'click');
-  });
 
-  test('Line Functional', () => {
-    lineManager.clear();
+    eventFire('editSat-newTLE', 'click');
+    // eventFire('editSat-save', 'click');
+    eventFire('editSat-open', 'click');
+    eventFire('map-menu', 'click');
+    eventFire('socrates-menu', 'click');
+    eventFire('satChng-menu', 'click');
+    eventFire('watchlist-list', 'click');
+    eventFire('watchlist-content', 'click');
+    eventFire('cs-telescope', 'click');
 
-    lineManager.create('ref', [10000, 0, 0], 'r');
-    lineManager.create('ref', [0, 10000, 0], 'g');
-    lineManager.create('ref', [0, 0, 10000], 'b');
-    lineManager.create('ref', [0, 0, 10000], 'o');
-    lineManager.create('ref', [0, 0, 10000], 'y');
-    lineManager.create('ref', [0, 0, 10000], 'c');
-    lineManager.create('ref', [0, 0, 10000], 'p');
-    lineManager.create('ref2', [0, 0, 10000, 0, 10000, 0], 'w');
+    // $('#obfit-form').submit
 
-    lineManager.drawWhenSelected();
-    lineManager.removeStars();
+    // Click Everything Twice
+    for (let i = 0; i < 2; i++) {
+      uiManager.countryMenuClick('Canada');
+      uiManager.countryMenuClick('China');
+      uiManager.countryMenuClick('France');
+      uiManager.countryMenuClick('India');
+      uiManager.countryMenuClick('Israel');
+      uiManager.countryMenuClick('Japan');
+      uiManager.countryMenuClick('Russia');
+      uiManager.countryMenuClick('UnitedKingdom');
+      uiManager.countryMenuClick('UnitedStates');
+      uiManager.constellationMenuClick('SpaceStations');
+      uiManager.constellationMenuClick('GlonassGroup');
+      uiManager.constellationMenuClick('GalileoGroup');
+      uiManager.constellationMenuClick('GPSGroup');
+      uiManager.constellationMenuClick('AmatuerRadio');
+      uiManager.constellationMenuClick('aehf');
+      uiManager.constellationMenuClick('wgs');
+      uiManager.constellationMenuClick('starlink');
+      uiManager.constellationMenuClick('sbirs');
 
-    lineManager.create('ref', [0, 0, 10000], [1, 1, 1, 1]);
-    lineManager.create('ref', [0, 0, 10000], [-1, 1, 1]);
-    lineManager.create('ref', [0, 0, 10000]);
+      uiManager.legendHoverMenuClick('legend-payload-box');
+      uiManager.legendHoverMenuClick('legend-payload-box');
+      uiManager.legendHoverMenuClick('legend-rocketBody-box');
+      uiManager.legendHoverMenuClick('legend-rocketBody-box');
+      uiManager.legendHoverMenuClick('legend-debris-box');
+      uiManager.legendHoverMenuClick('legend-debris-box');
+      uiManager.legendHoverMenuClick('legend-starHi-box');
+      uiManager.legendHoverMenuClick('legend-starHi-box');
+      uiManager.legendHoverMenuClick('legend-starMed-box');
+      uiManager.legendHoverMenuClick('legend-starMed-box');
+      uiManager.legendHoverMenuClick('legend-starLow-box');
+      uiManager.legendHoverMenuClick('legend-starLow-box');
+      uiManager.legendHoverMenuClick('legend-satHi-box');
+      uiManager.legendHoverMenuClick('legend-satHi-box');
+      uiManager.legendHoverMenuClick('legend-satMed-box');
+      uiManager.legendHoverMenuClick('legend-satMed-box');
+      uiManager.legendHoverMenuClick('legend-satLow-box');
+      uiManager.legendHoverMenuClick('legend-satLow-box');
+      uiManager.legendHoverMenuClick('legend-inFOV-box');
+      uiManager.legendHoverMenuClick('legend-inFOV-box');
+      uiManager.legendHoverMenuClick('legend-velocityFast-box');
+      uiManager.legendHoverMenuClick('legend-velocityFast-box');
+      uiManager.legendHoverMenuClick('legend-velocityMed-box');
+      uiManager.legendHoverMenuClick('legend-velocityMed-box');
+      uiManager.legendHoverMenuClick('legend-velocitySlow-box');
+      uiManager.legendHoverMenuClick('legend-velocitySlow-box');
+      uiManager.legendHoverMenuClick('legend-inviewAlt-box');
+      uiManager.legendHoverMenuClick('legend-inviewAlt-box');
+      uiManager.legendHoverMenuClick('legend-ageNew-box');
+      uiManager.legendHoverMenuClick('legend-ageNew-box');
+      uiManager.legendHoverMenuClick('legend-ageMed-box');
+      uiManager.legendHoverMenuClick('legend-ageMed-box');
+      uiManager.legendHoverMenuClick('legend-ageOld-box');
+      uiManager.legendHoverMenuClick('legend-ageOld-box');
+      uiManager.legendHoverMenuClick('legend-ageLost-box');
+      uiManager.legendHoverMenuClick('legend-ageLost-box');
+      uiManager.legendHoverMenuClick('legend-rcsSmall-box');
+      uiManager.legendHoverMenuClick('legend-rcsSmall-box');
+      uiManager.legendHoverMenuClick('legend-rcsMed-box');
+      uiManager.legendHoverMenuClick('legend-rcsMed-box');
+      uiManager.legendHoverMenuClick('legend-rcsLarge-box');
+      uiManager.legendHoverMenuClick('legend-rcsLarge-box');
+      uiManager.legendHoverMenuClick('legend-rcsUnknown-box');
+      uiManager.legendHoverMenuClick('legend-rcsUnknown-box');
+      uiManager.legendHoverMenuClick('legend-missile-box');
+      uiManager.legendHoverMenuClick('legend-missile-box');
+      uiManager.legendHoverMenuClick('legend-missileInview-box');
+      uiManager.legendHoverMenuClick('legend-missileInview-box');
+      uiManager.legendHoverMenuClick('legend-sensor-box');
+      uiManager.legendHoverMenuClick('legend-sensor-box');
+      uiManager.legendHoverMenuClick('legend-facility-box');
+      uiManager.legendHoverMenuClick('legend-facility-box');
+      uiManager.legendHoverMenuClick('legend-trusat-box');
+      uiManager.legendHoverMenuClick('legend-trusat-box');
+      uiManager.legendHoverMenuClick('legend-countryUS-box');
+      uiManager.legendHoverMenuClick('legend-countryUS-box');
+      uiManager.legendHoverMenuClick('legend-countryCIS-box');
+      uiManager.legendHoverMenuClick('legend-countryCIS-box');
+      uiManager.legendHoverMenuClick('legend-countryPRC-box');
+      uiManager.legendHoverMenuClick('legend-countryPRC-box');
+      uiManager.legendHoverMenuClick('legend-countryOther-box');
+      uiManager.legendHoverMenuClick('legend-countryOther-box');
+      uiManager.legendHoverMenuClick('fake');
 
-    lineManager.create('sat', 0);
-    lineManager.create('sat2', [0, 0, 0, 10000]);
-    lineManager.create('sat3', [0, 1]);
-    lineManager.create('sat4', [0, 1]);
-    lineManager.create('sat5', [0, 1]);
+      eventFire('time-machine-icon', 'click');
+      eventFire('legend-menu', 'click');
+    }
 
-    lineManager.draw();
-  });
+    uiManager.reloadLastSensor();
 
-  test('UI Manager Functional', () => {
     uiManager.searchToggle();
     uiManager.searchToggle(true);
     uiManager.searchToggle(false);
@@ -221,6 +325,7 @@ describe('Integration Testing', () => {
     uiManager.updateURL();
     uiManager.reloadLastSensor();
 
+    uiManager.footerToggle();
     uiManager.footerToggle();
 
     uiManager.toast('Test', 'normal', true);
@@ -635,6 +740,41 @@ describe('Integration Testing', () => {
         id: 'menu-record',
       },
     });
+
+    sensorManager.setSensor('COD', 0);
+    drawManager.sensorPos = satellite.calculateSensorPos(sensorManager.currentSensor);
+    for (let i = 0; i < 10; i++) {
+      cameraManager.cameraType.current++;
+      cameraManager.update(exampleSat);
+    }
+  });
+
+  test('Line Functional', () => {
+    lineManager.clear();
+
+    lineManager.create('ref', [10000, 0, 0], 'r');
+    lineManager.create('ref', [0, 10000, 0], 'g');
+    lineManager.create('ref', [0, 0, 10000], 'b');
+    lineManager.create('ref', [0, 0, 10000], 'o');
+    lineManager.create('ref', [0, 0, 10000], 'y');
+    lineManager.create('ref', [0, 0, 10000], 'c');
+    lineManager.create('ref', [0, 0, 10000], 'p');
+    lineManager.create('ref2', [0, 0, 10000, 0, 10000, 0], 'w');
+
+    lineManager.drawWhenSelected();
+    lineManager.removeStars();
+
+    lineManager.create('ref', [0, 0, 10000], [1, 1, 1, 1]);
+    lineManager.create('ref', [0, 0, 10000], [-1, 1, 1]);
+    lineManager.create('ref', [0, 0, 10000]);
+
+    lineManager.create('sat', 0);
+    lineManager.create('sat2', [0, 0, 0, 10000]);
+    lineManager.create('sat3', [0, 1]);
+    lineManager.create('sat4', [0, 1]);
+    lineManager.create('sat5', [0, 1]);
+
+    lineManager.draw();
   });
 
   test('Star Manager Functional', () => {
@@ -771,5 +911,43 @@ describe('Integration Testing', () => {
     satellite.getlookangles(satSet.getSat(0));
     satellite.getlookanglesMultiSite(satSet.getSat(0));
     satellite.findCloseObjects();
+  });
+
+  test('satSet Functional Tests', () => {
+    satSet.searchAzElRange(0, 10, 10, 90, 100, 100, 1000000, 90, 500, 500, 10, 10, 1);
+
+    satSet.exportTle2Txt();
+    satSet.exportTle2Csv();
+
+    satSet.setHover(0);
+    satSet.selectSat(0);
+
+    satSet.onCruncherReady();
+
+    satSet.searchN2yo(5, 80000);
+    satSet.searchCelestrak(5, 80000);
+
+    satSet.selectSat(1);
+  });
+
+  test('drawManager Functional Tests', () => {
+    drawManager.screenShot();
+    while (cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
+      cameraManager.cameraType++;
+    }
+    drawManager.orbitsAbove();
+
+    drawManager.checkIfPostProcessingRequired();
+
+    drawManager.demoMode();
+  });
+
+  test('orbitManager Functional Tests', () => {
+    orbitManager.setSelectOrbit(0);
+    orbitManager.addInViewOrbit(0);
+    orbitManager.removeInViewOrbit(0);
+    orbitManager.clearInViewOrbit();
+    orbitManager.setHoverOrbit(0);
+    orbitManager.clearHoverOrbit();
   });
 });

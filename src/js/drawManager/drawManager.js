@@ -276,6 +276,7 @@ drawManager.drawLoop = (preciseDt) => {
   }
 
   // Do Post Processing
+  /* istanbul ignore next */
   if (drawManager.isNeedPostProcessing) {
     if (postProcessingManager.isGaussianNeeded) {
       postProcessingManager.programs.gaussian.uniformValues.radius = Math.min(0.5, drawManager.gaussianAmt / 500);
@@ -809,22 +810,26 @@ drawManager.demoMode = () => {
   if (drawManager.demoModeSatellite === satSet.getSatData().length) drawManager.demoModeSatellite = 0;
   let satData = satSet.getSatData();
   for (drawManager.i = drawManager.demoModeSatellite; drawManager.i < satData.length; drawManager.i++) {
-    drawManager.sat = satData[drawManager.i];
-    if (drawManager.sat.static) continue;
-    if (drawManager.sat.missile) continue;
-    // if (!drawManager.sat.inview) continue
-    if (drawManager.sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) continue;
-    if (drawManager.sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false) continue;
-    if (drawManager.sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
-    if (drawManager.sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
-    satSet.getScreenCoords(drawManager.i, drawManager.pMatrix, cameraManager.camMatrix);
-    if (satScreenPositionArray.error) continue;
-    if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
-    if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
-    _hoverBoxOnSat(drawManager.i, satScreenPositionArray.x, satScreenPositionArray.y);
-    orbitManager.setSelectOrbit(drawManager.i);
-    drawManager.demoModeSatellite = drawManager.i + 1;
-    return;
+    try {
+      drawManager.sat = satData[drawManager.i];
+      if (drawManager.sat.static) continue;
+      if (drawManager.sat.missile) continue;
+      // if (!drawManager.sat.inview) continue
+      if (drawManager.sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) continue;
+      if (drawManager.sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false) continue;
+      if (drawManager.sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
+      if (drawManager.sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
+      satSet.getScreenCoords(drawManager.i, drawManager.pMatrix, cameraManager.camMatrix);
+      if (satScreenPositionArray.error) continue;
+      if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
+      if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
+      _hoverBoxOnSat(drawManager.i, satScreenPositionArray.x, satScreenPositionArray.y);
+      orbitManager.setSelectOrbit(drawManager.i);
+      drawManager.demoModeSatellite = drawManager.i + 1;
+      return;
+    } catch {
+      continue;
+    }
   }
 };
 
@@ -877,6 +882,7 @@ drawManager.clearFrameBuffers = () => {
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   // Clear all post processing frame buffers
+  /* istanbul ignore next */
   if (drawManager.isNeedPostProcessing) {
     postProcessingManager.clearAll();
   }

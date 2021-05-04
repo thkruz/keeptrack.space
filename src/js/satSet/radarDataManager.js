@@ -27,6 +27,7 @@ radarDataManager.init = async (sensorManagerRef, satSetRef, satCruncherRef, sate
   });
 };
 
+/* istanbul ignore next */
 radarDataManager.changeTimeToFirstDataTime = () => {
   if (!settingsManager.isEnableRadarData) return;
   timeManager.propOffset = new Date(radarDataManager.radarData[0].t) - Date.now();
@@ -37,6 +38,7 @@ radarDataManager.changeTimeToFirstDataTime = () => {
   });
 };
 
+/* istanbul ignore next */
 radarDataManager.findFirstDataTime = () => {
   if (!settingsManager.isEnableRadarData) return;
   let now = timeManager.propTime() * 1;
@@ -48,6 +50,7 @@ radarDataManager.findFirstDataTime = () => {
   }
 };
 
+/* istanbul ignore next */
 radarDataManager.setup = (resp) => {
   if (!settingsManager.isEnableRadarData) return;
   db.log('radarDataManager.init');
@@ -89,6 +92,7 @@ radarDataManager.setup = (resp) => {
   settingsManager.radarDataReady = true;
 };
 
+/* istanbul ignore next */
 radarDataManager.createFakeData = () => {
   let fakeData = [];
   let now = Date.now();

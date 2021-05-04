@@ -5,6 +5,7 @@ import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 
 let nextLaunchManager = {};
+/* istanbul ignore next */
 (function () {
   if (settingsManager.offline) {
     $('#menu-nextLaunch').hide();

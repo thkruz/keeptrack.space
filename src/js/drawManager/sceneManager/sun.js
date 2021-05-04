@@ -226,7 +226,7 @@ sun.setupGodrays = (gl) => {
   ////////////////////////////////////////////////////////////////////////
   sun.godraysFrameBuffer = gl.createFramebuffer();
   {
-    gl.bindFramebuffer(gl.FRAMEBUFFER, sun.godraysFrameBuffer);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, sun.godraysFrameBuffer);    
 
     sun.godraysRenderBuffer = gl.createRenderbuffer(); // create RB to store the depth buffer
     gl.bindRenderbuffer(gl.RENDERBUFFER, sun.godraysRenderBuffer);
@@ -303,8 +303,8 @@ sun.draw = function (pMatrix, camMatrix, tgtBuffer) {
   nMatrix = nMatrixEmpty;
   glm.mat3.normalFromMat4(nMatrix, mvMatrix);
 
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  // gl.enable(gl.BLEND);
+  // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   gl.useProgram(sunShader);
   // Draw to the bloom frame buffer for post processing

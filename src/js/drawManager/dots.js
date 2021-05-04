@@ -55,6 +55,18 @@ class Dots {
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+
+    // Buffering data here reduces the need to bind the buffer twice!
+
+    // Either allocate and assign the data to the buffer
+    if (!this.positionBufferOneTime) {
+      gl.bufferData(gl.ARRAY_BUFFER, this.positionData, gl.DYNAMIC_DRAW);
+      this.positionBufferOneTime = true;
+    } else {
+      // Or just update it if we have already allocated it - the length won't change
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.positionData);
+    }
+
     gl.vertexAttribPointer(this.drawProgram.aPos, 3, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorScheme.colorBuffer);
@@ -65,7 +77,7 @@ class Dots {
     gl.enableVertexAttribArray(this.drawProgram.aStar);
     gl.vertexAttribPointer(this.drawProgram.aStar, 1, gl.FLOAT, false, 0, 0);
 
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
     gl.depthMask(false);
 
@@ -287,10 +299,9 @@ class Dots {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  updatePositionBuffer(satSet, timeManager) {
+  updatePositionBuffer(satSetLen, orbitalSats, timeManager) {
     // Don't update positions until positionCruncher finishes its first loop and creates data in position and velocity data arrays
     if (!this.positionData || !this.velocityData) return;
-    const gl = this.gl;
 
     // If we have radar data -- let's update that first
     // if (satSet.radarDataManager.radarData.length > 0) {
@@ -349,36 +360,24 @@ class Dots {
     // 1000 / dt = fps
     if (1000 / timeManager.dt > settingsManager.fpsThrottle2) {
       timeManager.setDrawDt(timeManager.drawDt * timeManager.propRate); // Adjust drawDt correspond to the propagation rate
-      satSet.satDataLenInDraw = satSet.satData.length;
+      this.satDataLenInDraw = satSetLen;
       if (!settingsManager.lowPerf && timeManager.drawDt > settingsManager.minimumDrawDt) {
         // Don't Interpolate Static Objects
-        satSet.satDataLenInDraw -= settingsManager.maxFieldOfViewMarkers + settingsManager.maxRadarData;
+        this.satDataLenInDraw -= settingsManager.maxFieldOfViewMarkers + settingsManager.maxRadarData;
         // Flat Array of X, Y, and Z so times by 3
-        satSet.satDataLenInDraw3 = satSet.satDataLenInDraw * 3;
+        this.satDataLenInDraw3 = this.satDataLenInDraw * 3;
         // Do we want to treat non-satellites different?
-        satSet.orbitalSats3 = satSet.orbitalSats * 3;
+        this.orbitalSats3 = orbitalSats * 3;
 
         // Interpolate position since last draw by adding the velocity
-        for (this.drawI = 0; this.drawI < satSet.satDataLenInDraw3; this.drawI++) {
-          if (this.drawI > satSet.orbitalSats3) {
+        for (this.drawI = 0; this.drawI < this.satDataLenInDraw3; this.drawI++) {
+          if (this.drawI > this.orbitalSats3) {
             this.positionData[this.drawI] += this.velocityData[this.drawI] * timeManager.drawDt;
           } else {
             this.positionData[this.drawI] += this.velocityData[this.drawI] * timeManager.drawDt;
           }
         }
       }
-    }
-
-    // Select the position buffer
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-
-    // Either allocate and assign the data to the buffer
-    if (!this.positionBufferOneTime) {
-      gl.bufferData(gl.ARRAY_BUFFER, this.positionData, gl.DYNAMIC_DRAW);
-      this.positionBufferOneTime = true;
-    } else {
-      // Or just update it if we have already allocated it - the length won't change
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.positionData);
     }
   }
 

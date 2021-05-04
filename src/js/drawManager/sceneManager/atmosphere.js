@@ -63,10 +63,12 @@ class Atmosphere {
     this.update(cameraManager.camPitch);
     this.updateUniforms(pMatrix, cameraManager.camMatrix);
 
-    // Enable blending and ignore depth test (especially on self)
+    // This is done during sun.draw
     gl.enable(gl.BLEND);
+    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    // ignore depth test (especially on self)
     gl.disable(gl.DEPTH_TEST);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     gl.useProgram(this.programInfo.program);
     twgl.setBuffersAndAttributes(gl, this.programInfo, this.bufferInfo);

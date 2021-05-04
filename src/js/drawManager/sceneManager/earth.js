@@ -486,9 +486,9 @@ earth.draw = function (pMatrix, camMatrix, dotsManager, tgtBuffer) {
   gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 
   // Disable attributes to avoid conflict with other shaders
-  gl.disableVertexAttribArray(earthShader.aTexCoord);
-  gl.disableVertexAttribArray(earthShader.aVertexPosition);
-  gl.disableVertexAttribArray(earthShader.aVertexNormal);
+  // gl.disableVertexAttribArray(earthShader.aTexCoord);
+  // gl.disableVertexAttribArray(earthShader.aVertexPosition);
+  // gl.disableVertexAttribArray(earthShader.aVertexNormal);
 
   // //////////////////////////////////////////////////////////////////////
   // Draw Black GPU Picking Earth Mask Second
@@ -502,9 +502,9 @@ earth.draw = function (pMatrix, camMatrix, dotsManager, tgtBuffer) {
   // Set Uniforms
   gl.uniformMatrix4fv(dotsManager.pickingProgram.uMvMatrix, false, mvMatrix);
 
-  // Only Enable Position Attribute Since Color Doesn't Matter
-  // for blacking out the earth
-  gl.disableVertexAttribArray(dotsManager.pickingProgram.aColor);
+  // Disable color vertex so that the earth is drawn black
+  gl.disableVertexAttribArray(dotsManager.pickingProgram.aColor); // IMPORTANT!
+  // Only Enable Position Attribute
   gl.enableVertexAttribArray(dotsManager.pickingProgram.aPos);
   gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 

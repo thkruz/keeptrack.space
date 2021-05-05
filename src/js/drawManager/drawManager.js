@@ -100,6 +100,7 @@ drawManager.glInit = async () => {
 
   gl.getExtension('EXT_frag_depth');
   gl.enable(gl.DEPTH_TEST);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   postProcessingManager.init(gl);
 
@@ -215,30 +216,42 @@ drawManager.drawLoop = (preciseDt) => {
     }, 500);
   }
 
-  drawManager.checkIfPostProcessingRequired();
+  // Unused currently
+  // drawManager.checkIfPostProcessingRequired();
 
   // Do any per frame calculations
+  var start = window.performance.now();
+  // PERFORMANCE: 0.110 ms
   drawManager.updateLoop();
+  settingsManager.pTime.push(window.performance.now() - start);
 
   // Actually draw things now that math is done
+  // PERFORMANCE: 0.0337ms
   drawManager.resizeCanvas();
   drawManager.clearFrameBuffers();
 
   // Sun, Moon, and Atmosphere
+  // PERFORMANCE: 0.106 ms
   drawManager.drawOptionalScenery();
 
   sceneManager.earth.draw(drawManager.pMatrix, cameraManager.camMatrix, dotsManager, postProcessingManager.curBuffer);
 
   // Update Draw Positions
-  dotsManager.updatePositionBuffer(satSet, timeManager);
+  // PERFORMANCE: 0.281 ms - minor increase with stars disabled
+  dotsManager.updatePositionBuffer(satSet.satData.length, satSet.orbitalSats, timeManager);
 
   dotsManager.updatePMvCamMatrix(drawManager.pMatrix, cameraManager);
 
   // Draw Dots
+  // PERFORMANCE: 0.6813 ms
   dotsManager.draw(drawManager.pMatrix, cameraManager, settingsManager.currentColorScheme, postProcessingManager.curBuffer);
 
   // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-  dotsManager.drawGpuPickingFrameBuffer(drawManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
+  // Only if last frame was 30 FPS or more. readpixels used to determine which satellite is hovered
+  // is the biggest performance hit and we should throttle that.
+  if (1000 / timeManager.dt > 30 && !settingsManager.lowPerf) {
+    dotsManager.drawGpuPickingFrameBuffer(drawManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
+  }
 
   orbitManager.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
 
@@ -256,13 +269,14 @@ drawManager.drawLoop = (preciseDt) => {
   }
 
   // Update orbit currently being hovered over
-  // Only if last frame was 50 FPS or more readpixels used to determine which satellite is hovered
-  // is the biggest performance hit and we should throttle that. Maybe we should limit the picking frame buffer too?
-  if (1000 / timeManager.dt > 50 && !settingsManager.lowPerf) {
+  // Only if last frame was 30 FPS or more. readpixels used to determine which satellite is hovered
+  // is the biggest performance hit and we should throttle that.
+  if (1000 / timeManager.dt > 30 && !settingsManager.lowPerf) {
     drawManager.updateHover();
   }
 
   // Do Post Processing
+  /* istanbul ignore next */
   if (drawManager.isNeedPostProcessing) {
     if (postProcessingManager.isGaussianNeeded) {
       postProcessingManager.programs.gaussian.uniformValues.radius = Math.min(0.5, drawManager.gaussianAmt / 500);
@@ -360,10 +374,6 @@ drawManager.drawOptionalScenery = () => {
       postProcessingManager.curBuffer = null;
       sceneManager.sun.godraysPostProcessing(gl, postProcessingManager.curBuffer);
 
-      if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
-        sceneManager.atmosphere.draw(drawManager.pMatrix, cameraManager);
-      }
-
       // Apply two pass gaussian blur to the godrays to smooth them out
       // postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
       // postProcessingManager.programs.gaussian.uniformValues.dir = { x: 1.0, y: 0.0 };
@@ -376,7 +386,7 @@ drawManager.drawOptionalScenery = () => {
       // Draw the moon
       sceneManager.moon.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
 
-      if (cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
+      if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
         sceneManager.atmosphere.draw(drawManager.pMatrix, cameraManager);
       }
     }
@@ -800,22 +810,26 @@ drawManager.demoMode = () => {
   if (drawManager.demoModeSatellite === satSet.getSatData().length) drawManager.demoModeSatellite = 0;
   let satData = satSet.getSatData();
   for (drawManager.i = drawManager.demoModeSatellite; drawManager.i < satData.length; drawManager.i++) {
-    drawManager.sat = satData[drawManager.i];
-    if (drawManager.sat.static) continue;
-    if (drawManager.sat.missile) continue;
-    // if (!drawManager.sat.inview) continue
-    if (drawManager.sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) continue;
-    if (drawManager.sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false) continue;
-    if (drawManager.sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
-    if (drawManager.sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
-    satSet.getScreenCoords(drawManager.i, drawManager.pMatrix, cameraManager.camMatrix);
-    if (satScreenPositionArray.error) continue;
-    if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
-    if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
-    _hoverBoxOnSat(drawManager.i, satScreenPositionArray.x, satScreenPositionArray.y);
-    orbitManager.setSelectOrbit(drawManager.i);
-    drawManager.demoModeSatellite = drawManager.i + 1;
-    return;
+    try {
+      drawManager.sat = satData[drawManager.i];
+      if (drawManager.sat.static) continue;
+      if (drawManager.sat.missile) continue;
+      // if (!drawManager.sat.inview) continue
+      if (drawManager.sat.OT === 1 && ColorScheme.objectTypeFlags.payload === false) continue;
+      if (drawManager.sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false) continue;
+      if (drawManager.sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
+      if (drawManager.sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
+      satSet.getScreenCoords(drawManager.i, drawManager.pMatrix, cameraManager.camMatrix);
+      if (satScreenPositionArray.error) continue;
+      if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
+      if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
+      _hoverBoxOnSat(drawManager.i, satScreenPositionArray.x, satScreenPositionArray.y);
+      orbitManager.setSelectOrbit(drawManager.i);
+      drawManager.demoModeSatellite = drawManager.i + 1;
+      return;
+    } catch {
+      continue;
+    }
   }
 };
 
@@ -862,10 +876,13 @@ drawManager.checkIfPostProcessingRequired = () => {
 };
 
 drawManager.clearFrameBuffers = () => {
+  // NOTE: clearColor is set here because two different colors are used. If you set it during
+  // frameBuffer init then the wrong color will be applied (this can break gpuPicking)
   gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   // Clear all post processing frame buffers
+  /* istanbul ignore next */
   if (drawManager.isNeedPostProcessing) {
     postProcessingManager.clearAll();
   }
@@ -873,13 +890,14 @@ drawManager.clearFrameBuffers = () => {
   gl.bindFramebuffer(gl.FRAMEBUFFER, sceneManager.sun.godraysFrameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
   // Switch back to the canvas
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  // gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+  // Only needed when doing post processing - otherwise just stay where we are
   // Setup Initial Frame Buffer for Offscreen Drawing
-  gl.bindFramebuffer(gl.FRAMEBUFFER, postProcessingManager.curBuffer);
+  // gl.bindFramebuffer(gl.FRAMEBUFFER, postProcessingManager.curBuffer);
 };
 
 export { drawManager };

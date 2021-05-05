@@ -303,8 +303,8 @@ sun.draw = function (pMatrix, camMatrix, tgtBuffer) {
   nMatrix = nMatrixEmpty;
   glm.mat3.normalFromMat4(nMatrix, mvMatrix);
 
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  // gl.enable(gl.BLEND);
+  // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   gl.useProgram(sunShader);
   // Draw to the bloom frame buffer for post processing
@@ -400,12 +400,12 @@ sun.godraysShaderCode = {
       float decay=1.0;
       float exposure=1.0;
       float density=1.0;
-      float weight=0.032;
+      float weight=0.021;
       vec2 lightPositionOnScreen = vec2(u_sunPosition.x,1.0 - u_sunPosition.y);      
       vec2 texCoord = v_texCoord;
 
       /// samples will describe the rays quality, you can play with
-      const int samples = 60;      
+      const int samples = 75;      
 
       vec2 deltaTexCoord = (v_texCoord - lightPositionOnScreen.xy);
       deltaTexCoord *= 1.0 / float(samples) * density;

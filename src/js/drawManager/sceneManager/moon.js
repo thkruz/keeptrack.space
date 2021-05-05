@@ -17,6 +17,7 @@ class Moon {
   // static ambientLight = [0.05, 0.05, 0.05];
   static ambientLight = [0.0025, 0.0025, 0.0025];
 
+  /* istanbul ignore next */
   constructor(gl, sun) {
     // Move to the code the creates the moon?
     if (settingsManager.enableLimitedUI || settingsManager.isDrawLess) return;
@@ -56,6 +57,7 @@ class Moon {
     this.bufferInfo = twgl.primitives.createSphereBufferInfo(gl, Moon.DRAW_RADIUS, Moon.NUM_LON_SEGS, Moon.NUM_LAT_SEGS);
   }
 
+  /* istanbul ignore next */
   updateUniforms(pMatrix, camMatrix) {
     this.mvMatrix = glm.mat4.create();
     this.nMatrix = glm.mat3.create();
@@ -75,6 +77,7 @@ class Moon {
     };
   }
 
+  /* istanbul ignore next */
   draw(pMatrix, camMatrix, tgtBuffer) {
     // Move this to the draw loop?
     if (!this.loaded) return;
@@ -83,8 +86,9 @@ class Moon {
     this.updatePosition(this.sun);
     this.updateUniforms(pMatrix, camMatrix);
 
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // This is done by sun.draw
+    // gl.enable(gl.BLEND);
+    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     gl.useProgram(this.programInfo.program);
     twgl.setBuffersAndAttributes(gl, this.programInfo, this.bufferInfo);
@@ -103,6 +107,7 @@ class Moon {
     return true;
   }
 
+  /* istanbul ignore next */
   updatePosition(sun) {
     // Calculate RAE
     this.rae = SunCalc.getMoonPosition(sun.now, 0, 0);

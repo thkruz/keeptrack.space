@@ -244,7 +244,7 @@ orbitManager.draw = function (pMatrix, camMatrix, tgtBuffer) {
   gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
   gl.useProgram(pathShader);
 
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.enable(gl.BLEND);
   if (settingsManager.showOrbitThroughEarth) {
     gl.disable(gl.DEPTH_TEST);
@@ -298,8 +298,8 @@ orbitManager.draw = function (pMatrix, camMatrix, tgtBuffer) {
     });
   }
 
-  gl.disableVertexAttribArray(pathShader.aPos);
-  gl.disableVertexAttribArray(pathShader.aColor);
+  // gl.disableVertexAttribArray(pathShader.aPos);
+  // gl.disableVertexAttribArray(pathShader.aColor);
 
   gl.disable(gl.BLEND);
   gl.enable(gl.DEPTH_TEST);

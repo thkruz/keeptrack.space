@@ -418,7 +418,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManage
       }
     }
     console.log(svs);
-    omManager.svs2analyst(svs);
+    omManager.svs2analyst(svs, satSet, timeManager, satellite);
     e.preventDefault();
   });
 

@@ -4,6 +4,7 @@
 // Post Processing Manager
 const pPM = {};
 pPM.isInitOnce = false;
+/* istanbul ignore next */
 pPM.init = (gl) => {
   pPM.gl = gl;
 
@@ -41,6 +42,7 @@ pPM.init = (gl) => {
   pPM.curBuffer = null;
 };
 
+/* istanbul ignore next */
 pPM.createProgram = (vertCode, fragCode) => {
   const gl = pPM.gl;
   const program = gl.createProgram();
@@ -63,6 +65,7 @@ pPM.createProgram = (vertCode, fragCode) => {
   return program;
 };
 
+/* istanbul ignore next */
 pPM.setupHdr = (gl, program) => {
   program.attr = {
     position: gl.getAttribLocation(program, 'a_position'),
@@ -76,6 +79,7 @@ pPM.setupHdr = (gl, program) => {
   return program;
 };
 
+/* istanbul ignore next */
 pPM.setupFxaa = (gl, program) => {
   program.attr = {
     position: gl.getAttribLocation(program, 'a_position'),
@@ -89,6 +93,7 @@ pPM.setupFxaa = (gl, program) => {
   return program;
 };
 
+/* istanbul ignore next */
 pPM.setupSmaaBlend = (gl, program) => {
   program.attr = {
     position: gl.getAttribLocation(program, 'a_position'),
@@ -103,6 +108,7 @@ pPM.setupSmaaBlend = (gl, program) => {
   return program;
 };
 
+/* istanbul ignore next */
 pPM.setupSmaaEdges = (gl, program) => {
   program.attr = {
     position: gl.getAttribLocation(program, 'a_position'),
@@ -116,6 +122,7 @@ pPM.setupSmaaEdges = (gl, program) => {
   return program;
 };
 
+/* istanbul ignore next */
 pPM.setupSmaaWeights = (gl, program) => {
   program.attr = {
     position: gl.getAttribLocation(program, 'a_position'),
@@ -164,6 +171,7 @@ pPM.setupSmaaWeights = (gl, program) => {
   return program;
 };
 
+/* istanbul ignore next */
 pPM.setupGaussian = (gl, program) => {
   program.attr = {
     position: gl.getAttribLocation(program, 'a_position'),
@@ -189,6 +197,7 @@ pPM.setupGaussian = (gl, program) => {
   return program;
 };
 
+/* istanbul ignore next */
 pPM.setupOcclusion = (gl, program) => {
   program.attr = {
     position: gl.getAttribLocation(program, 'a_position'),
@@ -215,10 +224,12 @@ pPM.setupOcclusion = (gl, program) => {
   return program;
 };
 
+/* istanbul ignore next */
 pPM.setupAdditionalUniforms = (program) => {
   program.uniformSetup(program);
 };
 
+/* istanbul ignore next */
 pPM.createFrameBufferInfo = (width, height) => {
   const gl = pPM.gl;
   const frameBufferInfo = {};
@@ -259,11 +270,13 @@ pPM.createFrameBufferInfo = (width, height) => {
   return frameBufferInfo;
 };
 
+/* istanbul ignore next */
 pPM.switchFrameBuffer = () => {
   pPM.curBuffer = pPM.curBuffer == pPM.frameBufferInfos.one.frameBuffer ? pPM.frameBufferInfos.two.frameBuffer : pPM.frameBufferInfos.one.frameBuffer;
   pPM.secBuffer = pPM.curBuffer == pPM.frameBufferInfos.one.frameBuffer ? pPM.frameBufferInfos.two.frameBuffer : pPM.frameBufferInfos.one.frameBuffer;
 };
 
+/* istanbul ignore next */
 pPM.getFrameBufferInfo = (curBuffer) => {
   if (curBuffer == pPM.frameBufferInfos.one.frameBuffer || curBuffer == pPM.frameBufferInfos.two.frameBuffer) {
     const frameBufferInfo = curBuffer == pPM.frameBufferInfos.one.frameBuffer ? pPM.frameBufferInfos.one : pPM.frameBufferInfos.two;
@@ -280,16 +293,18 @@ pPM.getFrameBufferInfo = (curBuffer) => {
   }
 };
 
+/* istanbul ignore next */
 pPM.clearAll = () => {
   const gl = pPM.gl;
   gl.bindFramebuffer(gl.FRAMEBUFFER, pPM.frameBufferInfos.one.frameBuffer);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.bindFramebuffer(gl.FRAMEBUFFER, pPM.frameBufferInfos.two.frameBuffer);
-  gl.clearColor(0.0, 0.0, 0.0, 0.0);
+  // gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 };
 
+/* istanbul ignore next */
 pPM.doPostProcessing = (gl, program, curBuffer, tgtBuffer, secBuffer) => {
   gl.useProgram(program);
   // Make sure pPM texture doesn't prevent the rest of the scene from rendering

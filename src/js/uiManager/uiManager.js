@@ -1055,9 +1055,7 @@ uiManager.colorSchemeChangeAlert = (scheme) => {
   }
 };
 
-var $search = $('#search');
-$('#country-menu>ul>li').on('click', function () {
-  var groupName = $(this).data('group');
+uiManager.countryMenuClick = (groupName) => {
   switch (groupName) {
     case 'Canada':
       if (typeof groups.Canada == 'undefined') {
@@ -1106,9 +1104,13 @@ $('#country-menu>ul>li').on('click', function () {
       break;
   }
   _groupSelected(groupName);
+};
+var $search = $('#search');
+$('#country-menu>ul>li').on('click', () => {
+  uiManager.countryMenuClick($(this).data('group'));
 });
-$('#constellation-menu>ul>li').on('click', function () {
-  var groupName = $(this).data('group');
+
+uiManager.constellationMenuClick = (groupName) => {
   switch (groupName) {
     case 'SpaceStations':
       if (typeof groups.SpaceStations == 'undefined') {
@@ -1278,6 +1280,10 @@ $('#constellation-menu>ul>li').on('click', function () {
   }
   _groupSelected(groupName);
   uiManager.doSearch($('#search').val());
+};
+
+$('#constellation-menu>ul>li').on('click', function () {
+  uiManager.constellationMenuClick($(this).data('group'));
 });
 var _groupSelected = function (groupName) {
   if (typeof groupName == 'undefined') return;
@@ -1524,6 +1530,7 @@ uiManager.saveHiResPhoto = (resolution) => {
 // c is string name of star
 // TODO: uiManager.panToStar needs to be finished
 // Yaw needs fixed. Needs to incorporate a time calculation
+/* istanbul ignore next */
 uiManager.panToStar = function (c) {
   // Try with the pname
   var satId = satSet.getIdFromStarName(c.pname);
@@ -1894,8 +1901,8 @@ uiManager.onReady = () => {
       }
     });
 
-    $('#legend-hover-menu').on('click', function (e) {
-      switch (e.target.classList[1]) {
+    uiManager.legendHoverMenuClick = (legendType) => {
+      switch (legendType) {
         case 'legend-payload-box':
           if (ColorScheme.objectTypeFlags.payload) {
             ColorScheme.objectTypeFlags.payload = false;
@@ -1943,7 +1950,7 @@ uiManager.onReady = () => {
             satSet.setColorScheme(settingsManager.currentColorScheme, true);
           } else {
             ColorScheme.objectTypeFlags.starHi = true;
-            $('.legend-starHi-box').css('background', rgbCss(settingsManager.colors.star100));
+            $('.legend-starHi-box').css('background', rgbCss(settingsManager.colors.starHi));
             settingsManager.isForceColorScheme = true;
             satSet.setColorScheme(settingsManager.currentColorScheme, true);
           }
@@ -1956,7 +1963,7 @@ uiManager.onReady = () => {
             satSet.setColorScheme(settingsManager.currentColorScheme, true);
           } else {
             ColorScheme.objectTypeFlags.starMed = true;
-            $('.legend-starMed-box').css('background', rgbCss(settingsManager.colors.star75));
+            $('.legend-starMed-box').css('background', rgbCss(settingsManager.colors.starMed));
             settingsManager.isForceColorScheme = true;
             satSet.setColorScheme(settingsManager.currentColorScheme, true);
           }
@@ -1969,7 +1976,7 @@ uiManager.onReady = () => {
             satSet.setColorScheme(settingsManager.currentColorScheme, true);
           } else {
             ColorScheme.objectTypeFlags.starLow = true;
-            $('.legend-starLow-box').css('background', rgbCss(settingsManager.colors.star100));
+            $('.legend-starLow-box').css('background', rgbCss(settingsManager.colors.starLow));
             settingsManager.isForceColorScheme = true;
             satSet.setColorScheme(settingsManager.currentColorScheme, true);
           }
@@ -2329,6 +2336,10 @@ uiManager.onReady = () => {
         default:
           break;
       }
+    };
+
+    $('#legend-hover-menu').on('click', function (e) {
+      uiManager.legendHoverMenuClick(e.target.classList[1]);
     });
 
     $('#time-machine-icon').on('click', function () {

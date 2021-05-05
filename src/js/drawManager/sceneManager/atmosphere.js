@@ -7,6 +7,7 @@ import * as twgl from 'twgl.js';
 import { DEG2RAD } from '@app/js/lib/constants.js';
 
 class Atmosphere {
+  /* istanbul ignore next */
   constructor(gl, earth, settingsManager) {
     // Move to the code the creates the moon?
     if (settingsManager.enableLimitedUI || settingsManager.isDrawLess) return;
@@ -39,6 +40,7 @@ class Atmosphere {
     this.loaded = true;
   }
 
+  /* istanbul ignore next */
   updateUniforms(pMatrix, camMatrix) {
     this.mvMatrix = glm.mat4.create();
     this.nMatrix = glm.mat3.create();
@@ -55,6 +57,7 @@ class Atmosphere {
     };
   }
 
+  /* istanbul ignore next */
   draw(pMatrix, cameraManager) {
     // Move this to the draw loop?
     if (!this.loaded) return;
@@ -63,10 +66,12 @@ class Atmosphere {
     this.update(cameraManager.camPitch);
     this.updateUniforms(pMatrix, cameraManager.camMatrix);
 
-    // Enable blending and ignore depth test (especially on self)
+    // This is done during sun.draw
     gl.enable(gl.BLEND);
+    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    // ignore depth test (especially on self)
     gl.disable(gl.DEPTH_TEST);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     gl.useProgram(this.programInfo.program);
     twgl.setBuffersAndAttributes(gl, this.programInfo, this.bufferInfo);
@@ -81,6 +86,7 @@ class Atmosphere {
     return true;
   }
 
+  /* istanbul ignore next */
   update(camPitch) {
     // Start with an empyy model view matrix
     this.mvMatrix = glm.mat4.create();
@@ -95,6 +101,7 @@ class Atmosphere {
     glm.mat3.normalFromMat4(this.nMatrix, this.mvMatrix);
   }
 
+  /* istanbul ignore next */
   setupShaderCode() {
     this.shaderCode = {
       frag: `

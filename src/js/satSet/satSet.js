@@ -148,6 +148,7 @@ satSet.init = async (glRef, dotManagerRef, cameraManager) => {
   satSet.radarDataManager = radarDataManager;
 };
 
+/* istanbul ignore next */
 var addSatCruncherOnMessage = (cameraManager) => {
   satCruncher.onmessage = (m) => {
     if (!gotExtraData) {
@@ -893,6 +894,7 @@ satSet.convertSatnumArrayToIdArray = (satnumArray) => {
   return satIdArray;
 };
 
+/* istanbul ignore next */
 satSet.initGsData = () => {
   $.getScript('satData/gs.json', function (resp) {
     settingsManager.loadStr('satIntel');
@@ -1058,6 +1060,7 @@ satSet.insertNewAnalystSatellite = (TLE1, TLE2, analsat) => {
   }
 };
 
+/* istanbul ignore next */
 satSet.updateRadarData = () => {
   for (let i = 0; i < radarDataManager.radarData.length; i++) {
     try {
@@ -1550,6 +1553,54 @@ satSet.searchAzElRange = (azimuth, elevation, range, inclination, azMarg, elMarg
 
   if (!isCheckEl && !isCheckRange && !isCheckAz && !isCheckInclination && !isCheckPeriod && !isCheckRcs) return; // Ensure there is a number typed.
 
+  var checkInview = (possibles) => {
+    var inviewRes = [];
+    for (var i = 0; i < possibles.length; i++) {
+      if (possibles[i].inview) {
+        inviewRes.push(possibles[i]);
+      }
+    }
+    return inviewRes;
+  };
+
+  var checkObjtype = (possibles) => {
+    var objtypeRes = [];
+    for (var i = 0; i < possibles.length; i++) {
+      if (possibles[i].OT === objtype) {
+        objtypeRes.push(possibles[i]);
+      }
+    }
+    return objtypeRes;
+  };
+
+  var checkAz = (possibles, minaz, maxaz) => {
+    var azRes = [];
+    for (var i = 0; i < possibles.length; i++) {
+      if (possibles[i].az < maxaz && possibles[i].az > minaz) {
+        azRes.push(possibles[i]);
+      }
+    }
+    return azRes;
+  };
+  var checkEl = (possibles, minel, maxel) => {
+    var elRes = [];
+    for (var i = 0; i < possibles.length; i++) {
+      if (possibles[i].el < maxel && possibles[i].el > minel) {
+        elRes.push(possibles[i]);
+      }
+    }
+    return elRes;
+  };
+  var checkRange = (possibles, minrange, maxrange) => {
+    var rangeRes = [];
+    for (var i = 0; i < possibles.length; i++) {
+      if (possibles[i].rng < maxrange && possibles[i].rng > minrange) {
+        rangeRes.push(possibles[i]);
+      }
+    }
+    return rangeRes;
+  };
+
   if (!isCheckAzMarg) {
     azMarg = 5;
   }
@@ -1639,54 +1690,6 @@ satSet.searchAzElRange = (azimuth, elevation, range, inclination, azMarg, elMarg
     var maxRcs = rcs + rcsMarg;
     res = checkRcs(res, minRcs, maxRcs);
   }
-
-  var checkInview = (possibles) => {
-    var inviewRes = [];
-    for (var i = 0; i < possibles.length; i++) {
-      if (possibles[i].inview) {
-        inviewRes.push(possibles[i]);
-      }
-    }
-    return inviewRes;
-  };
-
-  var checkObjtype = (possibles) => {
-    var objtypeRes = [];
-    for (var i = 0; i < possibles.length; i++) {
-      if (possibles[i].OT === objtype) {
-        objtypeRes.push(possibles[i]);
-      }
-    }
-    return objtypeRes;
-  };
-
-  var checkAz = (possibles, minaz, maxaz) => {
-    var azRes = [];
-    for (var i = 0; i < possibles.length; i++) {
-      if (possibles[i].az < maxaz && possibles[i].az > minaz) {
-        azRes.push(possibles[i]);
-      }
-    }
-    return azRes;
-  };
-  var checkEl = (possibles, minel, maxel) => {
-    var elRes = [];
-    for (var i = 0; i < possibles.length; i++) {
-      if (possibles[i].el < maxel && possibles[i].el > minel) {
-        elRes.push(possibles[i]);
-      }
-    }
-    return elRes;
-  };
-  var checkRange = (possibles, minrange, maxrange) => {
-    var rangeRes = [];
-    for (var i = 0; i < possibles.length; i++) {
-      if (possibles[i].rng < maxrange && possibles[i].rng > minrange) {
-        rangeRes.push(possibles[i]);
-      }
-    }
-    return rangeRes;
-  };
   // $('#findByLooks-results').text('');
   // IDEA: Intentionally doesn't clear previous searches. Could be an option later.
   var sccList = [];
@@ -1705,68 +1708,76 @@ satSet.searchAzElRange = (azimuth, elevation, range, inclination, azMarg, elMarg
 };
 
 satSet.exportTle2Csv = () => {
-  let catalogTLE2 = [];
-  let satCat = satSet.getSatData();
-  satCat.sort((a, b) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
-  for (let s = 0; s < satCat.length; s++) {
-    let sat = satCat[s];
-    if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
-      continue;
+  try {
+    let catalogTLE2 = [];
+    let satCat = satSet.getSatData();
+    satCat.sort((a, b) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
+    for (let s = 0; s < satCat.length; s++) {
+      let sat = satCat[s];
+      if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
+        continue;
+      }
+      if (sat.C == 'ANALSAT') continue;
+      catalogTLE2.push({
+        satId: sat.SCC_NUM,
+        TLE1: sat.TLE1,
+        TLE2: sat.TLE2,
+        inclination: sat.inclination * RAD2DEG,
+        eccentricity: sat.eccentricity,
+        period: sat.period,
+        raan: sat.raan * RAD2DEG,
+        apogee: sat.apogee,
+        perigee: sat.perigee,
+        site: sat.LS,
+        country: sat.C,
+        name: sat.ON,
+        mission: sat.M,
+        purpose: sat.P,
+        user: sat.U,
+        rocket: sat.LV,
+        contractor: sat.Con,
+        dryMass: sat.DM,
+        liftMass: sat.LM,
+        lifeExpected: sat.Li,
+        power: sat.Pw,
+        visualMagnitude: sat.vmag,
+        source1: sat.S1,
+        source2: sat.S2,
+        source3: sat.S3,
+        source4: sat.S4,
+        source5: sat.S5,
+        source6: sat.S6,
+        source7: sat.S7,
+        source8: sat.URL,
+      });
     }
-    if (sat.C == 'ANALSAT') continue;
-    catalogTLE2.push({
-      satId: sat.SCC_NUM,
-      TLE1: sat.TLE1,
-      TLE2: sat.TLE2,
-      inclination: sat.inclination * RAD2DEG,
-      eccentricity: sat.eccentricity,
-      period: sat.period,
-      raan: sat.raan * RAD2DEG,
-      apogee: sat.apogee,
-      perigee: sat.perigee,
-      site: sat.LS,
-      country: sat.C,
-      name: sat.ON,
-      mission: sat.M,
-      purpose: sat.P,
-      user: sat.U,
-      rocket: sat.LV,
-      contractor: sat.Con,
-      dryMass: sat.DM,
-      liftMass: sat.LM,
-      lifeExpected: sat.Li,
-      power: sat.Pw,
-      visualMagnitude: sat.vmag,
-      source1: sat.S1,
-      source2: sat.S2,
-      source3: sat.S3,
-      source4: sat.S4,
-      source5: sat.S5,
-      source6: sat.S6,
-      source7: sat.S7,
-      source8: sat.URL,
-    });
+    saveCsv(catalogTLE2, 'catalogInfo');
+  } catch {
+    console.warn('Failed to Export TLEs!');
   }
-  saveCsv(catalogTLE2, 'catalogInfo');
 };
 satSet.exportTle2Txt = () => {
-  let catalogTLE2 = [];
-  let satCat = satSet.getSatData();
-  satCat.sort((a, b) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
-  for (let s = 0; s < satCat.length; s++) {
-    let sat = satCat[s];
-    if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
-      continue;
+  try {
+    let catalogTLE2 = [];
+    let satCat = satSet.getSatData();
+    satCat.sort((a, b) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
+    for (let s = 0; s < satCat.length; s++) {
+      let sat = satCat[s];
+      if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
+        continue;
+      }
+      if (sat.C == 'ANALSAT') continue;
+      catalogTLE2.push(sat.TLE1);
+      catalogTLE2.push(sat.TLE2);
     }
-    if (sat.C == 'ANALSAT') continue;
-    catalogTLE2.push(sat.TLE1);
-    catalogTLE2.push(sat.TLE2);
+    catalogTLE2 = catalogTLE2.join('\n');
+    var blob = new Blob([catalogTLE2], {
+      type: 'text/plain;charset=utf-8',
+    });
+    saveAs(blob, 'TLE.txt');
+  } catch {
+    console.warn('Failed to Export TLEs!');
   }
-  catalogTLE2 = catalogTLE2.join('\n');
-  var blob = new Blob([catalogTLE2], {
-    type: 'text/plain;charset=utf-8',
-  });
-  saveAs(blob, 'TLE.txt');
 };
 
 satSet.setHover = (i) => {

@@ -3,6 +3,7 @@ let M = window.M;
 
 var uiLimited = {};
 var satSet, orbitManager, groupsManager, ColorScheme;
+/* istanbul ignore next */
 uiLimited.init = async (satSetRef, orbitManagerRef, groupsManagerRef, ColorSchemeRef) => {
   satSet = satSetRef;
   orbitManager = orbitManagerRef;

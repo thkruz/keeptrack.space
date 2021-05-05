@@ -30,51 +30,69 @@ objectManager.staticSet = [];
 objectManager.fieldOfViewSet = [];
 
 objectManager.init = async (sensorManager) => {
-  for (let i = 0; i < settingsManager.maxMissiles; i++) {
-    var missileInfo = {
-      static: false,
-      missile: true,
-      active: false,
-      type: '',
-      name: i,
-      latList: [],
-      lonList: [],
-      altList: [],
-      timeList: [],
-    };
-    objectManager.missileSet.push(missileInfo);
+  // settingsManager should be a globally accessible object
+  if (typeof settingsManager == 'undefined') {
+    console.warn(`settingsManager missing!`);
+    return;
   }
 
-  for (let i = 0; i < settingsManager.maxRadarData; i++) {
-    var radarDataInfo = {
-      static: true,
-      missile: false,
-      active: false,
-      isRadarData: true,
-      type: '',
-      name: `Radar Data ${i}`,
-    };
-    objectManager.radarDataSet.push(radarDataInfo);
+  if (typeof settingsManager.maxMissiles !== 'undefined') {
+    for (let i = 0; i < settingsManager.maxMissiles; i++) {
+      var missileInfo = {
+        static: false,
+        missile: true,
+        active: false,
+        type: '',
+        name: i,
+        latList: [],
+        lonList: [],
+        altList: [],
+        timeList: [],
+      };
+      objectManager.missileSet.push(missileInfo);
+    }
+  } else {
+    console.debug(`settingsManager.maxMissiles missing or broken!`);
   }
 
-  var maxAnalystSats = settingsManager.maxAnalystSats;
-  for (let i = 0; i < maxAnalystSats; i++) {
-    var analSatInfo = {
-      static: false,
-      missile: false,
-      active: false,
-      ON: 'Analyst Sat ' + i,
-      C: 'ANALSAT',
-      LV: 'Analyst Satellite',
-      LS: 'ANALSAT',
-      SCC_NUM: (80000 + i).toString(),
-      TLE1: '1 ' + (80000 + i).toString() + 'U 58002B   17115.48668720 +.00000144 +00000-0 +16234-3 0  9994',
-      TLE2: '2 ' + (80000 + i).toString() + ' 034.2502 167.2636 0042608 222.6554 121.5501 24.84703551080477',
-      intlDes: (80000 + i).toString(),
-      type: 'sat',
-      id: i,
-    };
-    objectManager.analSatSet.push(analSatInfo);
+  if (typeof settingsManager.maxRadarData !== 'undefined') {
+    for (let i = 0; i < settingsManager.maxRadarData; i++) {
+      var radarDataInfo = {
+        static: true,
+        missile: false,
+        active: false,
+        isRadarData: true,
+        type: '',
+        name: `Radar Data ${i}`,
+      };
+      objectManager.radarDataSet.push(radarDataInfo);
+    }
+  } else {
+    console.debug(`settingsManager.maxRadarData missing or broken!`);
+  }
+
+  if (typeof settingsManager.maxAnalystSats !== 'undefined') {
+    var maxAnalystSats = settingsManager.maxAnalystSats;
+    for (let i = 0; i < maxAnalystSats; i++) {
+      var analSatInfo = {
+        static: false,
+        missile: false,
+        active: false,
+        ON: 'Analyst Sat ' + i,
+        C: 'ANALSAT',
+        LV: 'Analyst Satellite',
+        LS: 'ANALSAT',
+        SCC_NUM: (80000 + i).toString(),
+        TLE1: '1 ' + (80000 + i).toString() + 'U 58002B   17115.48668720 +.00000144 +00000-0 +16234-3 0  9994',
+        TLE2: '2 ' + (80000 + i).toString() + ' 034.2502 167.2636 0042608 222.6554 121.5501 24.84703551080477',
+        intlDes: (80000 + i).toString(),
+        type: 'sat',
+        id: i,
+      };
+      objectManager.analSatSet.push(analSatInfo);
+    }
+  } else {
+    console.debug(`settingsManager.maxRadarData missing or broken!`);
   }
 
   // Try Loading Star Module
@@ -97,6 +115,7 @@ objectManager.init = async (sensorManager) => {
       } else if (stars[star].bf != '') {
         starInfo.name = stars[star].bf;
       } else {
+        /* istanbul ignore next */
         starInfo.name = 'HD ' + stars[star].name;
       }
 
@@ -110,6 +129,7 @@ objectManager.init = async (sensorManager) => {
   // Try Loading Sensor Module
   var sensor;
   try {
+    // if (typeof sensorManager == 'undefined') throw 'You do not have the Sensor Module';
     sensorList = sensorManager.sensorList;
     for (sensor in sensorList) {
       var sensorInfo = {
@@ -175,23 +195,33 @@ objectManager.init = async (sensorManager) => {
     }
     objectManager.isControlSiteManagerLoaded = true;
   } catch (e) {
+    /* istanbul ignore next */
     objectManager.isControlSiteManagerLoaded = false;
+    /* istanbul ignore next */
     console.log('You do not have the Control Site Module');
   }
 
   objectManager.starIndex2 = objectManager.staticSet.length - 1;
 
-  for (let i = 0; i < settingsManager.maxFieldOfViewMarkers; i++) {
-    var fieldOfViewMarker = {
-      static: true,
-      marker: true,
-      id: i,
-    };
-    objectManager.fieldOfViewSet.push(fieldOfViewMarker);
+  if (typeof settingsManager.maxFieldOfViewMarkers !== 'undefined') {
+    for (let i = 0; i < settingsManager.maxFieldOfViewMarkers; i++) {
+      var fieldOfViewMarker = {
+        static: true,
+        marker: true,
+        id: i,
+      };
+      objectManager.fieldOfViewSet.push(fieldOfViewMarker);
+    }
+  } else {
+    console.debug(`settingsManager.maxFieldOfViewMarkers missing or broken!`);
   }
 
   // Initialize the satLinkMananger and then attach it to the object manager
-  satLinkManager.init(sensorManager, controlSiteManager);
+  try {
+    satLinkManager.init(sensorManager, controlSiteManager);
+  } catch (e) {
+    console.log('satLinkManager Failed to Initialize!');
+  }
   objectManager.satLinkManager = satLinkManager;
 };
 objectManager.extractCountry = function (C) {
@@ -505,7 +535,7 @@ objectManager.extractLaunchSite = function (LS) {
     sitec = 'Analyst Satellite';
   } else {
     if (LS === 'AFETR') {
-      site = 'Cape Canaveral AFS';
+      site = 'Cape Canaveral SFS';
       sitec = 'United States';
     }
     if (LS === 'AFWTR') {
@@ -518,7 +548,7 @@ objectManager.extractLaunchSite = function (LS) {
     }
     if (LS === 'FRGUI') {
       site = 'French Guiana';
-      sitec = 'United States';
+      sitec = 'French Guiana';
     }
     if (LS === 'HGSTR') {
       site = 'Hammaguira STR';
@@ -592,10 +622,6 @@ objectManager.extractLaunchSite = function (LS) {
       site = 'Svobodny';
       sitec = 'Russia';
     }
-    if (LS === 'UNKN') {
-      site = 'Unknown';
-      sitec = 'Unknown';
-    }
     if (LS === 'TSC') {
       site = 'Taiyaun SC';
       sitec = 'China';
@@ -652,6 +678,7 @@ objectManager.extractLaunchSite = function (LS) {
         sitec = site[1];
         site = site[0];
       } catch (e) {
+        /* istanbul ignore next */
         console.log('Launch Site Module not Loaded');
       }
     }

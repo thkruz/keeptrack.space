@@ -28,6 +28,8 @@ let settingsManager = {};
   settingsManager.versionNumber = VERSION;
   settingsManager.versionDate = VERSION_DATE;
 
+  settingsManager.pTime = [];
+
   // Install Folder Settings
   {
     switch (window.location.host) {

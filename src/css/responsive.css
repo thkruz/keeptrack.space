@@ -578,7 +578,7 @@
   }
 
   #jday {
-    display: none;
+    display: none !important;
   }
 
   #sat-infobox {

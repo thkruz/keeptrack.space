@@ -264,7 +264,7 @@ drawManager.drawLoop = (preciseDt) => {
 
   // Draw Satellite Model if a satellite is selected and meshManager is loaded
   // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
-  if (!settingsManager.modelsOnSatelliteViewOverride) {
+  if (!settingsManager.modelsOnSatelliteViewOverride && objectManager.selectedSat !== -1) {
     meshManager.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
   }
 
@@ -366,7 +366,7 @@ drawManager.drawOptionalScenery = () => {
       // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
       sceneManager.earth.drawOcclusion(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
       // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
-      if (!settingsManager.modelsOnSatelliteViewOverride) {
+      if (!settingsManager.modelsOnSatelliteViewOverride && objectManager.selectedSat !== -1) {
         meshManager.drawOcclusion(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
       }
       // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two

@@ -1,8 +1,7 @@
-/* eslint-disable */
-/**
- * @todo Convert gpr.js to import format
- * @body Remove require statements and turn eslint on
- */
+/* globals
+  __dirname
+  require
+*/
 
 const fs = require('fs');
 const { join } = require('path');
@@ -12,4 +11,5 @@ const pkg = require('../package.json');
 pkg.name = '@thkruz/keeptrack.space';
 
 // Update package.json with the udpated name
+// eslint-disable-next-line no-sync
 fs.writeFileSync(join(__dirname, '../package.json'), JSON.stringify(pkg));

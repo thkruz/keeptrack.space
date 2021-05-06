@@ -24,7 +24,7 @@ const rightBtnEarthMenuDOM = $('#earth-rmb-menu');
 const satHoverBoxDOM = $('#sat-hoverbox');
 
 var clickedSat = 0;
-var maxPinchSize = Math.hypot(window.innerWidth, $(document).height());
+var maxPinchSize = Math.hypot(window.innerWidth, window.innerHeight);
 var isDOPMenuOpen = false;
 var mouseTimeout = null;
 var dragPoint = [0, 0, 0];
@@ -228,7 +228,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
 
         deltaPinchDistance = (startPinchDistance - currentPinchDistance) / maxPinchSize;
         let zoomTarget = cameraManager.zoomTarget;
-        zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed / 10);
+        zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed * 20);
         zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
         cameraManager.zoomTarget = zoomTarget;
       } else {

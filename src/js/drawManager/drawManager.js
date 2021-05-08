@@ -174,6 +174,8 @@ drawManager.resizeCanvas = () => {
   gl.viewport(0, 0, drawManager.canvas.width, drawManager.canvas.height);
   drawManager.calculatePMatrix(settingsManager);
   drawManager.isPostProcessingResizeNeeded = true;
+  // Fix the gpu picker texture size if it has already been created
+  if (typeof dotsManager !== 'undefined') dotsManager.createPickingProgram(drawManager.gl);
 };
 
 drawManager.calculatePMatrix = (settingsManager) => {

@@ -5,15 +5,16 @@ import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
-import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 var isselectedSatNegativeOne = false;
 
 var selectSatManager = {};
+var sensorManager;
 
-selectSatManager.init = (groupColorScheme) => {
+selectSatManager.init = (groupColorScheme, sensorManagerRef) => {
+  sensorManager = sensorManagerRef;
   selectSatManager.groupColorScheme = groupColorScheme;
 };
 
@@ -65,7 +66,12 @@ selectSatManager.selectSat = (satId, cameraManager) => {
   } else if (satId !== -1) {
     if (cameraManager.cameraType.current == cameraManager.cameraType.default) {
       cameraManager.ecLastZoom = cameraManager.zoomLevel;
-      cameraManager.cameraType.set(cameraManager.cameraType.fixedToSat);
+      if (!sat.static) {
+        cameraManager.cameraType.set(cameraManager.cameraType.fixedToSat);
+      } else if (typeof sat.staticNum !== 'undefined') {
+        sensorManager.setSensor(null, sat.staticNum);
+        cameraManager.lookAtSensor(sensorManager.selectedSensor.zoom, sensorManager.selectedSensor.lat, sensorManager.selectedSensor.long, timeManager.selectedDate);
+      }
     }
     isselectedSatNegativeOne = false;
     objectManager.setSelectedSat(satId);

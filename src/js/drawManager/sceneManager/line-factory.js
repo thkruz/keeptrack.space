@@ -149,9 +149,9 @@ class LineFactory {
       sat = this.#getSat(value[0]);
       sat2 = this.#getSat(value[1]);
       if (typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
-        console.debug(`No Satellite Position Available for Line`);
-        console.debug(sat);
-        console.debug(sat2);
+        // console.debug(`No Satellite Position Available for Line`);
+        // console.debug(sat);
+        // console.debug(sat2);
         return;
       }
       this.drawLineList.push({

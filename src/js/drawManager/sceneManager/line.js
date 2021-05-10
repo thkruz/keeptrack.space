@@ -29,6 +29,7 @@ class Line {
     try {
       this.#gl.uniform4fv(this.#shader.uColor, color);
     } catch (e) {
+      /* istanbul ignore next */
       this.#gl.uniform4fv(this.#shader.uColor, [1.0, 0.0, 1.0, 1.0]);
     }
     this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.vertBuf);

@@ -35,7 +35,7 @@ import { drawManager } from '@app/js/drawManager/drawManager.js';
 import { jQAlt } from '@app/js/lib/jqalt.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
-import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
+// import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
@@ -57,7 +57,7 @@ const initalizeKeepTrack = async () => {
     satSet.init(gl, dotsManager, cameraManager);
     objectManager.init(sensorManager);
     await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
-    drawManager.selectSatManager.init(ColorScheme.group);
+    drawManager.selectSatManager.init(ColorScheme.group, sensorManager);
     await satSet.loadCatalog(); // Needs Object Manager and gl first
     const satCruncher = satSet.satCruncher;
 
@@ -72,7 +72,7 @@ const initalizeKeepTrack = async () => {
     uiManager.init(cameraManager, lineManager, starManager, groupsManager, satSet, orbitManager, groupsManager, ColorScheme);
     await satellite.initLookangles(satSet, satCruncher, sensorManager, groupsManager);
     dotsManager.updateSizeBuffer(satSet.satData);
-    await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
+    // await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
     satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
     objectManager.satLinkManager.idToSatnum(satSet);
 
@@ -85,10 +85,8 @@ const initalizeKeepTrack = async () => {
 
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
     uiManager.postStart();
-
-    // Reveleal Key Components to the Console
-    window.satSet = satSet;
   } catch (error) {
+    /* istanbul ignore next */
     console.warn(error);
   }
 };

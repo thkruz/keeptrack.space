@@ -153,6 +153,7 @@ earth.init = async (glRef) => {
       earth.loadHiRes = async () => {
         var imgHiRes = new Image();
         imgHiRes.src = 'textures/earthmap4k.jpg';
+        if (settingsManager.smallImages) imgHiRes.src = 'textures/earthmap512.jpg';
         if (settingsManager.nasaImages) imgHiRes.src = 'textures/mercator-tex.jpg';
         if (settingsManager.trusatImages) img.src = 'textures/trusatvector-4096.jpg';
         if (settingsManager.blueImages) imgHiRes.src = 'textures/world_blue-2048.png';
@@ -417,7 +418,7 @@ var updateSunCurrentDirection = function () {
   earth.lightDirection[2] = Math.sin(earth.sunvar.ob * DEG2RAD) * Math.sin(earth.sunvar.ecLon * DEG2RAD);
 };
 
-earth.draw = function (pMatrix, camMatrix, dotsManager, tgtBuffer) {
+earth.draw = function (pMatrix, cameraManager, dotsManager, tgtBuffer) {
   if (!earth.loaded) return;
   // //////////////////////////////////////////////////////////////////////
   // Draw Colored Earth First
@@ -432,7 +433,7 @@ earth.draw = function (pMatrix, camMatrix, dotsManager, tgtBuffer) {
   gl.uniformMatrix3fv(earthShader.uNormalMatrix, false, nMatrix);
   gl.uniformMatrix4fv(earthShader.uMvMatrix, false, mvMatrix);
   gl.uniformMatrix4fv(earthShader.uPMatrix, false, pMatrix);
-  gl.uniformMatrix4fv(earthShader.uCamMatrix, false, camMatrix);
+  gl.uniformMatrix4fv(earthShader.uCamMatrix, false, cameraManager.camMatrix);
   gl.uniform3fv(earthShader.uLightDirection, earth.lightDirection);
   gl.uniform3fv(earthShader.uAmbientLightColor, [0.1, 0.1, 0.1]); // RGB ambient light
   gl.uniform3fv(earthShader.uDirectionalLightColor, [1.0, 1.0, 1.0]); // RGB directional light
@@ -506,7 +507,15 @@ earth.draw = function (pMatrix, camMatrix, dotsManager, tgtBuffer) {
   gl.disableVertexAttribArray(dotsManager.pickingProgram.aColor); // IMPORTANT!
   // Only Enable Position Attribute
   gl.enableVertexAttribArray(dotsManager.pickingProgram.aPos);
+
+  // no reason to render 100000s of pixels when
+  // we're only going to read one
+  gl.enable(gl.SCISSOR_TEST);
+  gl.scissor(cameraManager.mouseX, gl.drawingBufferHeight - cameraManager.mouseY, 1, 1);
+
   gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
+
+  gl.disable(gl.SCISSOR_TEST);
 
   // Disable attributes to avoid conflict with other shaders
   // NOTE: This breaks satellite gpu picking.

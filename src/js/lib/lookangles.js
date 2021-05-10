@@ -137,7 +137,7 @@ satellite.distance = (hoverSat, selectedSat) => {
   let distanceApartY = Math.pow(hoverSat.position.y - selectedSat.position.y, 2);
   let distanceApartZ = Math.pow(hoverSat.position.z - selectedSat.position.z, 2);
   let distanceApart = Math.sqrt(distanceApartX + distanceApartY + distanceApartZ).toFixed(0);
-  return '<br />rng: ' + distanceApart + ' km';
+  return '<br />Range: ' + distanceApart + ' km';
 };
 
 // TODO: UI element changes/references should be moved to ui.js

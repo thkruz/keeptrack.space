@@ -82,7 +82,7 @@ class Dots {
     gl.depthMask(false);
 
     // Should not be relying on sizeData -- but temporary
-    gl.drawArrays(gl.POINTS, 0, this.sizeData.length);
+    gl.drawArrays(gl.POINTS, 0, settingsManager.dotsOnScreen);
 
     gl.depthMask(true);
     gl.disable(gl.BLEND);
@@ -98,6 +98,9 @@ class Dots {
 
     gl.uniformMatrix4fv(this.pickingProgram.pMvCamMatrix, false, this.pMvCamMatrix);
 
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+    gl.vertexAttribPointer(this.drawProgram.aPos, 3, gl.FLOAT, false, 0, 0);
+
     gl.bindBuffer(gl.ARRAY_BUFFER, this.pickingColorBuffer);
     gl.enableVertexAttribArray(this.pickingProgram.aColor);
     gl.vertexAttribPointer(this.pickingProgram.aColor, 3, gl.FLOAT, false, 0, 0);
@@ -106,8 +109,15 @@ class Dots {
     gl.enableVertexAttribArray(this.pickingProgram.aPickable);
     gl.vertexAttribPointer(this.pickingProgram.aPickable, 1, gl.FLOAT, false, 0, 0);
 
+    // no reason to render 100000s of pixels when
+    // we're only going to read one
+    gl.enable(gl.SCISSOR_TEST);
+    gl.scissor(cameraManager.mouseX, gl.drawingBufferHeight - cameraManager.mouseY, 1, 1);
+
     // Should not be relying on sizeData -- but temporary
-    gl.drawArrays(gl.POINTS, 0, this.sizeData.length); // draw pick
+    gl.drawArrays(gl.POINTS, 0, settingsManager.dotsOnScreen); // draw pick
+
+    gl.disable(gl.SCISSOR_TEST);
   }
 
   setupShaders() {

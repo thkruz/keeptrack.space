@@ -642,6 +642,9 @@ if (!settingsManager.disableUI) {
           settingsManager.isEnableRadarData = true;
           settingsManager.maxRadarData = 150000;
           break;
+        case 'smallImages':
+          settingsManager.smallImages = true;
+          break;
         case 'lowperf':
           settingsManager.lowPerf = true;
           settingsManager.isDrawLess = true;

@@ -210,25 +210,28 @@ var addSatCruncherOnMessage = (cameraManager) => {
       dotManager.velocityData.set(m.data.satVel, 0);
     }
 
-    if (typeof m.data.satInView != 'undefined') {
-      if (typeof dotManager.inViewData == 'undefined') {
+    if (typeof m.data.satInView != 'undefined' && m.data.satInView !== []) {
+      if (typeof dotManager.inViewData == 'undefined' || dotManager.inViewData.length !== m.data.satInView.length) {
         dotManager.inViewData = new Int8Array(m.data.satInView);
       } else {
         dotManager.inViewData.set(m.data.satInView, 0);
       }
     }
 
-    if (typeof m.data.satInSun != 'undefined') {
-      if (typeof dotManager.inSunData == 'undefined') {
+    if (typeof m.data.satInSun != 'undefined' && m.data.satInSun !== []) {
+      if (typeof dotManager.inSunData == 'undefined' || dotManager.inSunData.length !== m.data.satInSun.length) {
         dotManager.inSunData = new Int8Array(m.data.satInSun);
       } else {
         dotManager.inSunData.set(m.data.satInSun, 0);
       }
     }
 
-    if (typeof m.data.sensorMarkerArray != 'undefined') {
+    if (typeof m.data.sensorMarkerArray != 'undefined' || m.data.sensorMarkerArray == []) {
       satSet.satSensorMarkerArray = m.data.sensorMarkerArray;
     }
+
+    const highestMarkerNumber = satSet.satSensorMarkerArray[satSet.satSensorMarkerArray.length - 1] || 0;
+    settingsManager.dotsOnScreen = Math.max(satSet.numSats - settingsManager.maxFieldOfViewMarkers, highestMarkerNumber) * 3;
 
     if (sMM.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
       satCrunchNow = Date.now();

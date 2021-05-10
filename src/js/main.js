@@ -51,6 +51,7 @@ const initalizeKeepTrack = async () => {
     const cameraManager = new Camera();
     // We need to know if we are on a small screen before starting webgl
     const gl = await drawManager.glInit();
+    window.addEventListener('resize', drawManager.resizeCanvas);
     drawManager.loadScene();
     const dotsManager = await drawManager.createDotsManager();
     satSet.init(gl, dotsManager, cameraManager);

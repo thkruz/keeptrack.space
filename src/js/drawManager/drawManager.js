@@ -174,6 +174,8 @@ drawManager.resizeCanvas = () => {
   gl.viewport(0, 0, drawManager.canvas.width, drawManager.canvas.height);
   drawManager.calculatePMatrix(settingsManager);
   drawManager.isPostProcessingResizeNeeded = true;
+  // Fix the gpu picker texture size if it has already been created
+  if (typeof dotsManager !== 'undefined') dotsManager.createPickingProgram(drawManager.gl);
 };
 
 drawManager.calculatePMatrix = (settingsManager) => {
@@ -220,21 +222,21 @@ drawManager.drawLoop = (preciseDt) => {
   // drawManager.checkIfPostProcessingRequired();
 
   // Do any per frame calculations
-  var start = window.performance.now();
+  // var start = window.performance.now();
   // PERFORMANCE: 0.110 ms
   drawManager.updateLoop();
-  settingsManager.pTime.push(window.performance.now() - start);
+  // settingsManager.pTime.push(window.performance.now() - start);
 
   // Actually draw things now that math is done
   // PERFORMANCE: 0.0337ms
-  drawManager.resizeCanvas();
+  // drawManager.resizeCanvas();
   drawManager.clearFrameBuffers();
 
   // Sun, Moon, and Atmosphere
   // PERFORMANCE: 0.106 ms
   drawManager.drawOptionalScenery();
 
-  sceneManager.earth.draw(drawManager.pMatrix, cameraManager.camMatrix, dotsManager, postProcessingManager.curBuffer);
+  sceneManager.earth.draw(drawManager.pMatrix, cameraManager, dotsManager, postProcessingManager.curBuffer);
 
   // Update Draw Positions
   // PERFORMANCE: 0.281 ms - minor increase with stars disabled
@@ -247,11 +249,7 @@ drawManager.drawLoop = (preciseDt) => {
   dotsManager.draw(drawManager.pMatrix, cameraManager, settingsManager.currentColorScheme, postProcessingManager.curBuffer);
 
   // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-  // Only if last frame was 30 FPS or more. readpixels used to determine which satellite is hovered
-  // is the biggest performance hit and we should throttle that.
-  if (1000 / timeManager.dt > 30 && !settingsManager.lowPerf) {
-    dotsManager.drawGpuPickingFrameBuffer(drawManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
-  }
+  dotsManager.drawGpuPickingFrameBuffer(drawManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
 
   orbitManager.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
 
@@ -271,7 +269,7 @@ drawManager.drawLoop = (preciseDt) => {
   // Update orbit currently being hovered over
   // Only if last frame was 30 FPS or more. readpixels used to determine which satellite is hovered
   // is the biggest performance hit and we should throttle that.
-  if (1000 / timeManager.dt > 30 && !settingsManager.lowPerf) {
+  if (1000 / timeManager.dt > 5 && !settingsManager.lowPerf) {
     drawManager.updateHover();
   }
 
@@ -603,15 +601,15 @@ drawManager.updateHover = () => {
     // if we skip it this loop, we want to still draw the last thing
     // it was looking at
 
-    if (1000 / timeManager.dt < 30) {
+    if (1000 / timeManager.dt < 15) {
       updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;
-    } else if (1000 / timeManager.dt < 50) {
+    } else if (1000 / timeManager.dt < 30) {
       updateHoverDelayLimit = settingsManager.updateHoverDelayLimitSmall;
     } else {
-      if (updateHoverDelayLimit > 3) --updateHoverDelayLimit;
+      if (updateHoverDelayLimit > 0) --updateHoverDelayLimit;
     }
 
-    if (!uiInput.isMouseMoving || cameraManager.isDragging || settingsManager.isMobileModeEnabled) {
+    if (cameraManager.isDragging || settingsManager.isMobileModeEnabled) {
       return;
     }
 
@@ -656,6 +654,11 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
   } else if (!cameraManager.isDragging && !!settingsManager.enableHoverOverlay) {
     var sat = satSet.getSatExtraOnly(satId);
     isHoverBoxVisible = true;
+
+    const parentNode = satHoverBoxDOM.parentNode;
+    const nextSibling = satHoverBoxDOM.nextSibling;
+    parentNode.removeChild(satHoverBoxDOM); // reflow
+
     if (sat.static || sat.isRadarData) {
       if (sat.type === 'Launch Facility') {
         var launchSite = objectManager.extractLaunchSite(sat.name);
@@ -728,8 +731,10 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
         } else if (isShowDistance) {
           satHoverBoxNode1.textContent = sat.ON;
           sat2 = satSet.getSat(objectManager.selectedSat);
-          satHoverBoxNode2.innerHTML = sat.SCC_NUM + satellite.distance(sat, sat2) + '';
           if (sat2 !== null && sat !== sat2) {
+            satHoverBoxNode2.innerHTML = `${sat.SCC_NUM}${satellite.distance(sat, sat2)}</br>ΔVel: ${Math.sqrt((sat.velocity.x - sat2.velocity.x) ** 2 + (sat.velocity.y - sat2.velocity.y) ** 2 + (sat.velocity.z - sat2.velocity.z) ** 2).toFixed(
+              2
+            )} km/s`;
             satHoverBoxNode3.innerHTML =
               'X: ' +
               sat.position.x.toFixed(2) +
@@ -746,6 +751,7 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
               (sat.velocity.z - sat2.velocity.z).toFixed(2) +
               'km/s';
           } else {
+            satHoverBoxNode2.innerHTML = `${sat.SCC_NUM}${satellite.distance(sat, sat2)}`;
             satHoverBoxNode3.innerHTML =
               'X: ' +
               sat.position.x.toFixed(2) +
@@ -786,6 +792,7 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
     satHoverBoxDOM.style.left = `${satX + 20}px`;
     satHoverBoxDOM.style.top = `${satY - 10}px`;
     drawManager.canvas.style.cursor = 'pointer';
+    parentNode.insertBefore(satHoverBoxDOM, nextSibling); // reflow
   }
 };
 drawManager.onDrawLoopComplete = (cb) => {

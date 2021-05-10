@@ -18,12 +18,11 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
-      "program": "${workspaceFolder}\\node_modules\\.bin\\jest",
       "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npm",
       "args": [
-        "--coverage",
-        "--coverageReporters",
-        "html",
+        "test",
+        "--",
         "--runInBand"
       ]
     }

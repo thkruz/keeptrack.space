@@ -40,6 +40,7 @@ import { mapManager } from '@app/js/uiManager/mapManager.js';
 import { missileManager } from '@app/js/missileManager/missileManager.js';
 import { mobileManager } from '@app/js/uiManager/mobileManager.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
+import { omManager } from '@app/js/uiManager/omManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 import { satSet } from '@app/js/satSet/satSet.js';
@@ -107,7 +108,7 @@ uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef, groupsRef, s
   groups = groupsRef;
 
   uiValidation();
-  sMM.init(satSet, uiManager, sensorManager, satellite, ColorScheme, timeManager, cameraManager, orbitManager, objectManager, missileManager);
+  sMM.init(satSet, uiManager, sensorManager, satellite, ColorScheme, omManager, timeManager, cameraManager, orbitManager, objectManager, missileManager);
 
   // Register all UI callback functions with drawLoop in main.js
   // These run during the draw loop

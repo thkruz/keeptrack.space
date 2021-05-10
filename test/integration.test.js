@@ -950,4 +950,19 @@ describe('Integration Testing', () => {
     orbitManager.setHoverOrbit(0);
     orbitManager.clearHoverOrbit();
   });
+
+  test('color-scheme-factory Functional Tests', () => {
+    ColorScheme.reloadColors();
+    satSet.setColorScheme(ColorScheme.onlyFOV, true);
+    satSet.setColorScheme(ColorScheme.sunlight, true);
+    satSet.setColorScheme(ColorScheme.smallsats, true);
+    satSet.setColorScheme(ColorScheme.rcs, true);
+    satSet.setColorScheme(ColorScheme.countries, true);
+    satSet.setColorScheme(ColorScheme.ageOfElset, true);
+    satSet.setColorScheme(ColorScheme.lostobjects, true);
+    satSet.setColorScheme(ColorScheme.leo, true);
+    satSet.setColorScheme(ColorScheme.geo, true);
+    satSet.setColorScheme(ColorScheme.velocity, true);
+    satSet.setColorScheme(ColorScheme.default, true);
+  });
 });

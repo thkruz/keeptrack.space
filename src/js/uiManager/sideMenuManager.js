@@ -1,7 +1,6 @@
 import { saveAs, stringPad } from '@app/js/lib/helpers.js';
 import $ from 'jquery';
 import { RAD2DEG } from '@app/js/lib/constants.js';
-import { omManager } from '@app/js/uiManager/omManager.js';
 
 // Side Menu Manager
 var sMM = {};
@@ -39,7 +38,7 @@ sMM.isMissileMenuOpen = false;
 sMM.isInfoOverlayMenuOpen = false;
 sMM.isLaunchMenuOpen = false;
 
-sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, timeManager, cameraManager, orbitManager, objectManager, missileManager) => {
+sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager, timeManager, cameraManager, orbitManager, objectManager, missileManager) => {
   $('#findByLooks').on('submit', function (e) {
     var fblAzimuth = $('#fbl-azimuth').val();
     var fblElevation = $('#fbl-elevation').val();

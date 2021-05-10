@@ -31,6 +31,7 @@
     "stage": "node ./scripts/prebuild.mjs",
     "server:start": "http-server ./dist/",
     "test": "jest --coverage",
+    "test-vscode": "jest --coverage",
     "test-nocov": "jest",
     "updateTle": "node ./scripts/updateTle.mjs",
     "updateRadarData": "node ./scripts/updateRadarData.mjs",

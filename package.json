@@ -30,9 +30,7 @@
     "gpr": "node ./scripts/gpr.js",
     "stage": "node ./scripts/prebuild.mjs",
     "server:start": "http-server ./dist/",
-    "coverage": "jest --coverage --coverageReporters lcov",
-    "test": "jest --coverage --coverageReporters html",
-    "test-text": "jest --coverage --coverageReporters text",
+    "test": "jest --coverage",
     "test-nocov": "jest",
     "updateTle": "node ./scripts/updateTle.mjs",
     "updateRadarData": "node ./scripts/updateRadarData.mjs",
@@ -58,6 +56,11 @@
       "@lib(.*)$": "<rootDir>/src/js/lib/external/ootk/lib/$1",
       "@test(.*)$": "<rootDir>/src/js/lib/external/ootk/test/$1"
     },
+    "coverageReporters": [
+      "lcov",
+      "html",
+      "text"
+    ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "/src/js/lib/external/"

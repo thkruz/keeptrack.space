@@ -162,7 +162,7 @@ describe('ObjectManager Unit Tests', () => {
     objectManager.extractLiftVehicle('A');
   });
 
-  test('ObjectManager extractLaunchSite ', () => {
+  test('ObjectManager extractLaunchSite', () => {
     expect(objectManager.extractLaunchSite('U')).toStrictEqual({
       site: 'Unknown',
       sitec: 'Unknown',
@@ -310,6 +310,15 @@ describe('ObjectManager Unit Tests', () => {
     expect(objectManager.extractLaunchSite('RLLC')).toStrictEqual({
       site: 'Rocket Labs LC',
       sitec: 'New Zealand',
+    });
+
+    expect(objectManager.extractLaunchSite('AMH')).toStrictEqual({
+      site: "A' Mhòine",
+      sitec: 'Scotland',
+    });
+    expect(objectManager.extractLaunchSite('ALC')).toStrictEqual({
+      site: 'Alcântara Launch Center',
+      sitec: 'Brazil',
     });
 
     expect(objectManager.extractLaunchSite('FAKE')).toStrictEqual({

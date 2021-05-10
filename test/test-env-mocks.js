@@ -1,3 +1,8 @@
+/*globals
+  global
+  jest
+*/
+
 global.mocks = {};
 global.mocks.glMock = {
   canvas: { height: 1080, width: 1920 },
@@ -40,4 +45,9 @@ global.mocks.glMock = {
   uniform1f: jest.fn(),
   uniform1i: jest.fn(),
   uniform2f: jest.fn(),
+  getProgramParameter: jest.fn(() => true),
+  getProgramInfoLog: jest.fn(),
+  disable: jest.fn(),
+  scissor: jest.fn(),
+  bufferSubData: jest.fn(),
 };

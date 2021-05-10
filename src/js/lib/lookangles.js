@@ -637,13 +637,13 @@ satellite.satSensorFOV = (sat1, sat2) => {
     return satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
   };
 
-  let satrec1 = satellite.twoline2satrec(sat1.TLE1, sat1.TLE2); // perform and store sat init calcs
-  let sat1Ecf = _getEcf(now, satrec1);
-  let satrec2 = satellite.twoline2satrec(sat2.TLE1, sat2.TLE2); // perform and store sat init calcs
-  let sat2Ecf = _getEcf(now, satrec2);
+  // let satrec1 = satellite.twoline2satrec(sat1.TLE1, sat1.TLE2); // perform and store sat init calcs
+  // let sat1Ecf = _getEcf(now, satrec1);
+  // let satrec2 = satellite.twoline2satrec(sat2.TLE1, sat2.TLE2); // perform and store sat init calcs
+  // let sat2Ecf = _getEcf(now, satrec2);
 
-  console.log(sat1Ecf);
-  console.log(sat2Ecf);
+  // console.log(sat1Ecf);
+  // console.log(sat2Ecf);
   // Find the ECI position of the Selected Satellite
   /*
   satSelPosX = satPos[satelliteSelected[snum] * 3];

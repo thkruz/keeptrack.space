@@ -10,6 +10,22 @@
       "name": "Launch Chrome against localhost",
       "url": "http://localhost:80",
       "webRoot": "${workspaceFolder}"
+    },
+    {
+      "type": "node",
+      "name": "vscode-jest-tests",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "program": "${workspaceFolder}\\node_modules\\.bin\\jest",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--coverage",
+        "--coverageReporters",
+        "html",
+        "--runInBand"
+      ]
     }
   ]
 }

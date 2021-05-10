@@ -751,7 +751,7 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
               (sat.velocity.z - sat2.velocity.z).toFixed(2) +
               'km/s';
           } else {
-            satHoverBoxNode2.innerHTML = `${sat.SCC_NUM}${satellite.distance(sat, sat2)}`;
+            gitsatHoverBoxNode2.innerHTML = `${sat.SCC_NUM}${satellite.distance(sat, sat2)}`;
             satHoverBoxNode3.innerHTML =
               'X: ' +
               sat.position.x.toFixed(2) +

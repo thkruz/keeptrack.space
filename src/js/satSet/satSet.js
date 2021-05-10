@@ -231,7 +231,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
     }
 
     const highestMarkerNumber = satSet.satSensorMarkerArray[satSet.satSensorMarkerArray.length - 1] || 0;
-    settingsManager.dotsOnScreen = Math.max(satSet.numSats - settingsManager.maxFieldOfViewMarkers, highestMarkerNumber) * 3;
+    settingsManager.dotsOnScreen = Math.max(satSet.numSats - settingsManager.maxFieldOfViewMarkers, highestMarkerNumber);
 
     if (sMM.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
       satCrunchNow = Date.now();

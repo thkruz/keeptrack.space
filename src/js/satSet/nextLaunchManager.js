@@ -154,13 +154,17 @@ let nextLaunchManager = {};
         let tdC = tr.insertCell();
         tdC.innerHTML = `<span class="badge dark-blue-badge" data-badge-caption="${launchList[i].country}"></span>`;
       }
-      $('a.iframe').colorbox({
-        iframe: true,
-        width: '80%',
-        height: '80%',
-        fastIframe: false,
-        closeButton: false,
-      });
+      try {
+        $('a.iframe').colorbox({
+          iframe: true,
+          width: '80%',
+          height: '80%',
+          fastIframe: false,
+          closeButton: false,
+        });
+      } catch (error) {
+        console.warn(error);
+      }
     };
 
     // Only needs populated once

@@ -171,7 +171,7 @@ satLinkManager.showLinks = async function (lineManager, satSet, group) {
         }
       }
     } catch (e) {
-      console.debug(e);
+      // console.debug(e);
     }
   }
 

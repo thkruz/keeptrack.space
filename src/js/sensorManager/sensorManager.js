@@ -1205,13 +1205,17 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
         satellite.setobs(sensorManager.selectedSensor);
 
         $('#sensor-info-title').html("<a class='iframe' href='" + sensorManager.selectedSensor.url + "'>" + sensorManager.selectedSensor.name + '</a>');
-        $('a.iframe').colorbox({
-          iframe: true,
-          width: '80%',
-          height: '80%',
-          fastIframe: false,
-          closeButton: false,
-        });
+        try {
+          $('a.iframe').colorbox({
+            iframe: true,
+            width: '80%',
+            height: '80%',
+            fastIframe: false,
+            closeButton: false,
+          });
+        } catch (error) {
+          console.warn(error);
+        }
         $('#sensor-type').html(sensorManager.selectedSensor.type);
         $('#sensor-country').html(sensorManager.selectedSensor.country);
         objectManager.setSelectedSat(-1);

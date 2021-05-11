@@ -41,9 +41,11 @@ import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-sc
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
 import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager.js';
 import { drawManager } from '@app/js/drawManager/drawManager.js';
+import { jQAlt } from '@app/js/lib/jqalt.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
-import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
+// import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
+import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
@@ -71,8 +73,8 @@ const eventFire = (elObj, etype) => {
 // const flushPromises = () => new Promise(setImmediate);
 
 describe('Integration Testing', () => {
-  let lineManager, groupsManager, cameraManager;
-
+  var lineManager, groupsManager, cameraManager;
+  console.debug = jest.fn();
   const exampleSat = {
     C: 'US',
     LS: 'AFETR',
@@ -105,54 +107,42 @@ describe('Integration Testing', () => {
     getAltitude: () => 100,
   };
 
-  test('main.js', async () => {
+  test('main loading files', async () => {
     // /////////////////////////////////////////////////////////////////////
-    try {
-      await timeManager.init();
-      settingsManager.loadStr('dots');
-      uiManager.mobileManager.init();
-      cameraManager = new Camera();
-      // We need to know if we are on a small screen before starting webgl
-      const gl = await drawManager.glInit();
-      drawManager.loadScene();
-      const dotsManager = await drawManager.createDotsManager();
-      satSet.init(gl, dotsManager, cameraManager);
-      objectManager.init(sensorManager);
-      await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
-      drawManager.selectSatManager.init(ColorScheme.group);
-      await satSet.loadCatalog(); // Needs Object Manager and gl first
-      const satCruncher = satSet.satCruncher;
+    await timeManager.init();
+    settingsManager.loadStr('dots');
+    uiManager.mobileManager.init();
+    cameraManager = new Camera();
+    // We need to know if we are on a small screen before starting webgl
+    const gl = await drawManager.glInit();
+    window.addEventListener('resize', drawManager.resizeCanvas);
+    drawManager.loadScene();
+    const dotsManager = await drawManager.createDotsManager();
+    satSet.init(gl, dotsManager, cameraManager);
+    objectManager.init(sensorManager);
+    await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
+    drawManager.selectSatManager.init(ColorScheme.group, sensorManager, satSet, objectManager, sMM, timeManager);
+    await satSet.loadCatalog(); // Needs Object Manager and gl first
+    const satCruncher = satSet.satCruncher;
 
-      dotsManager.setupPickingBuffer(satSet.satData);
-      satSet.setColorScheme(ColorScheme.default, true);
+    dotsManager.setupPickingBuffer(satSet.satData);
+    satSet.setColorScheme(ColorScheme.default, true);
 
-      groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
-      await orbitManager.init(gl, cameraManager, groupsManager);
-      searchBox.init(satSet, groupsManager, orbitManager, dotsManager);
-      lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
-      starManager.init(lineManager, getIdFromStarName);
-      uiManager.init(cameraManager, lineManager, starManager, groupsManager, satSet, orbitManager, groupsManager, ColorScheme);
-      await satellite.initLookangles(satSet, satCruncher, sensorManager, groupsManager);
-      dotsManager.updateSizeBuffer(satSet.satData);
-      await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
-      satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
-      objectManager.satLinkManager.idToSatnum(satSet);
+    groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
+    await orbitManager.init(gl, cameraManager, groupsManager);
+    searchBox.init(satSet, groupsManager, orbitManager, dotsManager);
+    lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
+    starManager.init(lineManager, getIdFromStarName);
+    uiManager.init(cameraManager, lineManager, starManager, groupsManager, satSet, orbitManager, groupsManager, ColorScheme);
+    await satellite.initLookangles(satSet, satCruncher, sensorManager, groupsManager);
+    dotsManager.updateSizeBuffer(satSet.satData);
+    // await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
+    satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
+    objectManager.satLinkManager.idToSatnum(satSet);
 
-      uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, uiManager, drawManager, dotsManager);
+    uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, uiManager, drawManager, dotsManager);
 
-      await drawManager.init(groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
-
-      // Now that everything is loaded, start rendering to thg canvas
-      await drawManager.drawLoop();
-
-      // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
-      uiManager.postStart();
-
-      // Reveleal Key Components to the Console
-      window.satSet = satSet;
-    } catch (error) {
-      console.warn(error);
-    }
+    await drawManager.init(groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
     // /////////////////////////////////////////////////////////////////////
   });
   test('UI Manager Functional', () => {
@@ -284,7 +274,7 @@ describe('Integration Testing', () => {
 
     uiManager.searchToggle();
     uiManager.searchToggle(true);
-    uiManager.searchToggle(false);
+    // uiManager.searchToggle(false);
 
     uiManager.keyHandler({ key: undefined });
     uiManager.keyHandler({ key: 'R' });
@@ -293,6 +283,8 @@ describe('Integration Testing', () => {
     uiManager.keyHandler({ key: 'C' });
     uiManager.keyHandler({ key: 'C' });
     uiManager.keyHandler({ key: 'C' });
+
+    document.getElementById('datetime-text').appendChild(document.createElement('div'));
 
     uiManager.keyHandler({ key: '!' });
     uiManager.keyHandler({ key: ',' });
@@ -304,7 +296,6 @@ describe('Integration Testing', () => {
     uiManager.keyHandler({ key: '=' });
     uiManager.keyHandler({ key: '-' });
     uiManager.keyHandler({ key: '_' });
-    uiManager.keyHandler({ key: '+' });
     uiManager.keyHandler({ key: '1' });
 
     uiManager.hideLoadingScreen();
@@ -548,16 +539,16 @@ describe('Integration Testing', () => {
       },
     });
 
-    uiManager.bottomIconPress({
-      currentTarget: {
-        id: 'menu-newLaunch',
-      },
-    });
-    uiManager.bottomIconPress({
-      currentTarget: {
-        id: 'menu-newLaunch',
-      },
-    });
+    // uiManager.bottomIconPress({
+    //   currentTarget: {
+    //     id: 'menu-newLaunch',
+    //   },
+    // });
+    // uiManager.bottomIconPress({
+    //   currentTarget: {
+    //     id: 'menu-newLaunch',
+    //   },
+    // });
 
     uiManager.bottomIconPress({
       currentTarget: {
@@ -871,6 +862,8 @@ describe('Integration Testing', () => {
 
   test('Sensor Manager Functional', () => {
     sensorManager.sensorListLength();
+    timeManager.propRate = 0;
+    timeManager.propOffset = 0;
     sensorManager.setSensor('SSN', 0);
     sensorManager.setSensor('NATO-MW', 0);
     sensorManager.setSensor('RUS-ALL', 0);
@@ -933,7 +926,7 @@ describe('Integration Testing', () => {
   test('drawManager Functional Tests', () => {
     drawManager.screenShot();
     while (cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
-      cameraManager.cameraType++;
+      cameraManager.cameraType.current++;
     }
     drawManager.orbitsAbove();
 
@@ -964,5 +957,47 @@ describe('Integration Testing', () => {
     satSet.setColorScheme(ColorScheme.geo, true);
     satSet.setColorScheme(ColorScheme.velocity, true);
     satSet.setColorScheme(ColorScheme.default, true);
+  });
+
+  test('updateLoop Functional Tests', () => {
+    satSet.getSatExtraOnly = () => exampleSat;
+    satSet.getSat = () => exampleSat;
+
+    timeManager.propRate = 0;
+    timeManager.propOffset = 0;
+    objectManager.selectedSat = 1;
+
+    drawManager.updateLoop();
+
+    drawManager.sat = exampleSat;
+
+    drawManager.satCalculate();
+    drawManager.screenShot();
+    drawManager.screenShot();
+    drawManager.watermarkedDataUrl(global.document.canvas, 'test');
+
+    settingsManager.enableHoverOverlay = true;
+    settingsManager.isDemoModeOn = false;
+
+    cameraManager.cameraType.current = cameraManager.cameraType.astronomy;
+    drawManager.orbitsAbove();
+    drawManager.isDrawOrbitsAbove = true;
+    drawManager.orbitsAbove();
+    cameraManager.cameraType.current = cameraManager.cameraType.planetarium;
+    drawManager.orbitsAbove();
+    sensorManager.currentSensor = sensorManager.sensorList.COD;
+    drawManager.orbitsAbove();
+
+    // drawManager.updateHover();
+    drawManager.demoMode();
+    drawManager.checkIfPostProcessingRequired();
+
+    settingsManager.isMobileModeEnabled = true;
+    global.window.resizeTo(5000, 2000);
+    drawManager.resizeCanvas();
+
+    cameraManager.cameraType.current = cameraManager.cameraType.default;
+    settingsManager.enableHoverOverlay = false;
+    drawManager.hoverBoxOnSat(1, 100, 100);
   });
 });

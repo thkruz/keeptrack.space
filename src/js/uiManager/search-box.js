@@ -38,18 +38,22 @@ searchBox.getHoverSat = function () {
   return hoverSatId;
 };
 searchBox.hideResults = function () {
-  $('#search-results').slideUp();
-  groupsManager.clearSelect();
-  resultsOpen = false;
+  try {
+    $('#search-results').slideUp();
+    groupsManager.clearSelect();
+    resultsOpen = false;
 
-  settingsManager.lastSearch = '';
-  settingsManager.lastSearchResults = [];
-  dotsManager.updateSizeBuffer(satSet.satData);
+    settingsManager.lastSearch = '';
+    settingsManager.lastSearchResults = [];
+    dotsManager.updateSizeBuffer(satSet.satData);
 
-  if (settingsManager.currentColorScheme === ColorScheme.group) {
-    satSet.setColorScheme(ColorScheme.default, true);
-  } else {
-    satSet.setColorScheme(settingsManager.currentColorScheme, true);
+    if (settingsManager.currentColorScheme === ColorScheme.group) {
+      satSet.setColorScheme(ColorScheme.default, true);
+    } else {
+      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+    }
+  } catch (error) {
+    console.warn(error);
   }
 };
 

@@ -9,11 +9,11 @@ import { pPM as postProcessingManager } from '@app/js/drawManager/post-processin
 import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 
-const satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
-const satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
-const satHoverBoxNode3 = document.getElementById('sat-hoverbox3');
-const satHoverBoxDOM = document.getElementById('sat-hoverbox');
-const satMiniBox = document.getElementById('sat-minibox');
+let satHoverBoxNode1;
+let satHoverBoxNode2;
+let satHoverBoxNode3;
+let satHoverBoxDOM;
+let satMiniBox;
 
 var updateHoverDelay = 0;
 var updateHoverDelayLimit = 3;
@@ -57,6 +57,12 @@ drawManager.init = (groupsManagerRef, uiInputRef, starManagerRef, satelliteRef, 
   lineManager = lineManagerRef;
   dotsManager = dotsManagerRef;
   groupsManager = groupsManagerRef;
+
+  satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
+  satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
+  satHoverBoxNode3 = document.getElementById('sat-hoverbox3');
+  satHoverBoxDOM = document.getElementById('sat-hoverbox');
+  satMiniBox = document.getElementById('sat-minibox');
 
   startWithOrbits();
 };
@@ -411,7 +417,11 @@ drawManager.satCalculate = () => {
     // Reset the selected satellite if no satellite is selected
     drawManager.sat = { id: -1 };
   }
-  meshManager.update(Camera, cameraManager, timeManager, drawManager.sat);
+  try {
+    meshManager.update(Camera, cameraManager, timeManager, drawManager.sat);
+  } catch {
+    // Don't Let meshManager break everything
+  }
   if (objectManager.selectedSat !== drawManager.lastSelectedSat) {
     if (objectManager.selectedSat === -1 && !isselectedSatNegativeOne) {
       orbitManager.clearSelectOrbit();
@@ -466,24 +476,28 @@ drawManager.screenShot = () => {
 };
 
 drawManager.watermarkedDataUrl = (canvas, text) => {
-  var tempCanvas = document.createElement('canvas');
-  var tempCtx = tempCanvas.getContext('2d');
-  var cw, ch;
-  cw = tempCanvas.width = canvas.width;
-  ch = tempCanvas.height = canvas.height;
-  tempCtx.drawImage(canvas, 0, 0);
-  tempCtx.font = '24px nasalization';
-  var textWidth = tempCtx.measureText(text).width;
-  tempCtx.globalAlpha = 1.0;
-  tempCtx.fillStyle = 'white';
-  tempCtx.fillText(text, cw - textWidth - 30, ch - 30);
-  // tempCtx.fillStyle ='black'
-  // tempCtx.fillText(text,cw-textWidth-10+2,ch-20+2)
-  // just testing by adding tempCanvas to document
-  document.body.appendChild(tempCanvas);
-  let image = tempCanvas.toDataURL();
-  tempCanvas.parentNode.removeChild(tempCanvas);
-  return image;
+  try {
+    var tempCanvas = document.createElement('canvas');
+    var tempCtx = tempCanvas.getContext('2d');
+    var cw, ch;
+    cw = tempCanvas.width = canvas.width;
+    ch = tempCanvas.height = canvas.height;
+    tempCtx.drawImage(canvas, 0, 0);
+    tempCtx.font = '24px nasalization';
+    var textWidth = tempCtx.measureText(text).width;
+    tempCtx.globalAlpha = 1.0;
+    tempCtx.fillStyle = 'white';
+    tempCtx.fillText(text, cw - textWidth - 30, ch - 30);
+    // tempCtx.fillStyle ='black'
+    // tempCtx.fillText(text,cw-textWidth-10+2,ch-20+2)
+    // just testing by adding tempCanvas to document
+    document.body.appendChild(tempCanvas);
+    let image = tempCanvas.toDataURL();
+    tempCanvas.parentNode.removeChild(tempCanvas);
+    return image;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 drawManager.isDrawOrbitsAbove = false;
@@ -588,12 +602,12 @@ drawManager.updateHover = () => {
     satSet.getScreenCoords(updateHoverSatId, drawManager.pMatrix, cameraManager.camMatrix);
     // if (!cameraManager.earthHitTest(gl, pickColorBuf, satScreenPositionArray.x, satScreenPositionArray.y)) {
     try {
-      _hoverBoxOnSat(updateHoverSatId, satScreenPositionArray.x, satScreenPositionArray.y);
+      drawManager.hoverBoxOnSat(updateHoverSatId, satScreenPositionArray.x, satScreenPositionArray.y);
     } catch (e) {
       // Intentionally Empty
     }
     // } else {
-    //   _hoverBoxOnSat(-1, 0, 0)
+    //   drawManager.hoverBoxOnSat(-1, 0, 0)
     // }
   } else {
     // gl.readPixels in uiInput.getSatIdFromCoord creates a lot of jank
@@ -627,12 +641,12 @@ drawManager.updateHover = () => {
       satSet.setHover(uiInput.mouseSat);
     }
     if (settingsManager.enableHoverOverlay) {
-      _hoverBoxOnSat(uiInput.mouseSat, cameraManager.mouseX, cameraManager.mouseY);
+      drawManager.hoverBoxOnSat(uiInput.mouseSat, cameraManager.mouseX, cameraManager.mouseY);
     }
   }
 };
 let sat2;
-var _hoverBoxOnSat = (satId, satX, satY) => {
+drawManager.hoverBoxOnSat = (satId, satX, satY) => {
   if (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && !settingsManager.isDemoModeOn) {
     satHoverBoxDOM.style.display = 'none';
     if (satId === -1) {
@@ -651,7 +665,7 @@ var _hoverBoxOnSat = (satId, satX, satY) => {
     satHoverBoxDOM.style.display = 'none';
     drawManager.canvas.style.cursor = 'default';
     isHoverBoxVisible = false;
-  } else if (!cameraManager.isDragging && !!settingsManager.enableHoverOverlay) {
+  } else if (!cameraManager.isDragging && settingsManager.enableHoverOverlay) {
     var sat = satSet.getSatExtraOnly(satId);
     isHoverBoxVisible = true;
 
@@ -830,7 +844,7 @@ drawManager.demoMode = () => {
       if (satScreenPositionArray.error) continue;
       if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
       if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
-      _hoverBoxOnSat(drawManager.i, satScreenPositionArray.x, satScreenPositionArray.y);
+      drawManager.hoverBoxOnSat(drawManager.i, satScreenPositionArray.x, satScreenPositionArray.y);
       orbitManager.setSelectOrbit(drawManager.i);
       drawManager.demoModeSatellite = drawManager.i + 1;
       return;
@@ -840,6 +854,7 @@ drawManager.demoMode = () => {
   }
 };
 
+/* istanbul ignore next */
 drawManager.checkIfPostProcessingRequired = () => {
   // if (cameraManager.camPitchAccel > 0.0002 || cameraManager.camPitchAccel < -0.0002 || cameraManager.camYawAccel > 0.0002 || cameraManager.camYawAccel < -0.0002) {
   //   // drawManager.gaussianAmt += drawManager.dt * 2;

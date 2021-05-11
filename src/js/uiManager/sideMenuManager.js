@@ -1492,6 +1492,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
         tdS2.setAttribute('style', 'text-decoration: underline');
 
         for (var i = 0; i < 20; i++) {
+          if (typeof socratesObjTwo[i] == 'undefined') break;
           // 20 rows
           tr = tbl.insertRow();
           tr.setAttribute('class', 'socrates-object link');

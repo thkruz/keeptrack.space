@@ -20,7 +20,6 @@ var saveVariable = (variable, filename) => {
     var blob = new Blob([variable], { type: 'text/plain;charset=utf-8' });
     saveAs(blob, filename);
   } catch (e) {
-    console.debug(console.error());
     console.warn('Unable to Save File!');
   }
 };
@@ -36,7 +35,6 @@ const saveCsv = (items, name) => {
     var blob = new Blob([csv], { type: 'text/plain;charset=utf-8' });
     saveAs(blob, `${name}.csv`);
   } catch (error) {
-    console.debug(console.error());
     console.warn('Unable to Save File!');
   }
 };

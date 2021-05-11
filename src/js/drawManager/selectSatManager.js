@@ -1,20 +1,24 @@
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
 import $ from 'jquery';
 import { SunCalc } from '@app/js/lib/suncalc.js';
-import { objectManager } from '@app/js/objectManager/objectManager.js';
-import { sMM } from '@app/js/uiManager/sideMenuManager.js';
-import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 var isselectedSatNegativeOne = false;
 
 var selectSatManager = {};
 var sensorManager;
+var satSet;
+var objectManager;
+var sMM;
+var timeManager;
 
-selectSatManager.init = (groupColorScheme, sensorManagerRef) => {
+selectSatManager.init = (groupColorScheme, sensorManagerRef, satSetRef, objectManagerRef, sMMRef, timeManagerRef) => {
+  sMM = sMMRef;
+  timeManager = timeManagerRef;
   sensorManager = sensorManagerRef;
+  satSet = satSetRef;
+  objectManager = objectManagerRef;
   selectSatManager.groupColorScheme = groupColorScheme;
 };
 
@@ -266,13 +270,18 @@ selectSatManager.selectSat = (satId, cameraManager) => {
     }
 
     if (!sat.missile) {
-      $('a.iframe').colorbox({
-        iframe: true,
-        width: '80%',
-        height: '80%',
-        fastIframe: false,
-        closeButton: false,
-      });
+      try {
+        $('a.iframe').colorbox({
+          iframe: true,
+          width: '80%',
+          height: '80%',
+          fastIframe: false,
+          closeButton: false,
+        });
+      } catch (error) {
+        console.warn(error);
+      }
+
       $('#sat-apogee').html(sat.apogee.toFixed(0) + ' km');
       $('#sat-perigee').html(sat.perigee.toFixed(0) + ' km');
       $('#sat-inclination').html((sat.inclination * RAD2DEG).toFixed(2) + '°');
@@ -396,10 +405,11 @@ selectSatManager.selectSat = (satId, cameraManager) => {
       now = now.getFullYear();
       now = now.toString().substr(2, 2);
       var daysold;
-      if (satSet.getSat(satId).TLE1.substr(18, 2) === now) {
-        daysold = jday - satSet.getSat(satId).TLE1.substr(20, 3);
+      sat = satSet.getSat(satId);
+      if (sat.TLE1.substr(18, 2) === now) {
+        daysold = jday - sat.TLE1.substr(20, 3);
       } else {
-        daysold = jday + parseInt(now) * 365 - (parseInt(satSet.getSat(satId).TLE1.substr(18, 2)) * 365 + parseInt(satSet.getSat(satId).TLE1.substr(20, 3)));
+        daysold = jday + parseInt(now) * 365 - (parseInt(sat.TLE1.substr(18, 2)) * 365 + parseInt(sat.TLE1.substr(20, 3)));
       }
       $('#sat-elset-age').html(daysold + ' Days');
       $('#sat-elset-age').tooltip({

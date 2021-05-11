@@ -46,4 +46,16 @@ global.requestAnimationFrame = function (cb) {
 global.$ = global.jQuery = $;
 window.jQuery = $;
 
+$.colorbox = {
+  close: jest.fn(),
+};
+$.fn.colorbox = jest.fn();
+$.fn.effect = jest.fn();
+$.fn.tooltip = jest.fn();
+$.fn.fadeIn = jest.fn((time, cb) => {
+  if (typeof cb !== 'undefined') {
+    cb();
+  }
+});
+
 global.document.canvas.addEventListener = () => true;

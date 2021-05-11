@@ -5,6 +5,7 @@ import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 
 ('use strict');
 let timeManager = {};
+const document = window.document;
 
 timeManager.init = () => {
   // Variables pulled from timeManager.jday function to reduce garbage collection
@@ -94,12 +95,20 @@ timeManager.init = () => {
       settingsManager.isPropRateChange = false;
     }
     // textContent doesn't remove the Node! No unecessary DOM changes everytime time updates.
-    document.getElementById('datetime-text').textContent = timeManager.timeTextStr;
+    if (typeof timeManager.dateDOM == 'undefined') timeManager.dateDOM = document.getElementById('datetime-text');
+    if (timeManager.dateDOM == null) {
+      console.warn('Cant find datetime-text!');
+      return;
+    }
+    timeManager.dateDOM.textContent = timeManager.timeTextStr;
   };
 
   timeManager.getPropOffset = function () {
     // timeManager.selectedDate = $('#datetime-text').text().substr(0, 19);
-    if (!timeManager.selectedDate) return;
+    if (!timeManager.selectedDate) {
+      // console.error(timeManager);
+      return;
+    }
     // selectedDate = selectedDate.split(' ');
     // selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
     var today = new Date();
@@ -161,5 +170,9 @@ timeManager.init = () => {
       );
     }
   };
+
+  // Initialize
+  timeManager.updatePropTime();
+  timeManager.setSelectedDate(timeManager.propTimeVar);
 };
 export { timeManager };

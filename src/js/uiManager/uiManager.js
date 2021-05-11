@@ -1057,6 +1057,7 @@ uiManager.colorSchemeChangeAlert = (scheme) => {
 };
 
 uiManager.countryMenuClick = (groupName) => {
+  if (typeof groups == 'undefined') return;
   switch (groupName) {
     case 'Canada':
       if (typeof groups.Canada == 'undefined') {
@@ -1112,6 +1113,7 @@ $('#country-menu>ul>li').on('click', () => {
 });
 
 uiManager.constellationMenuClick = (groupName) => {
+  if (typeof groups == 'undefined') return;
   switch (groupName) {
     case 'SpaceStations':
       if (typeof groups.SpaceStations == 'undefined') {
@@ -2430,7 +2432,9 @@ uiManager.onReady = () => {
       let today = new Date();
       let jday = timeManager.getDayOfYear(timeManager.propTime());
       $('#jday').html(jday);
+      console.warn(timeManager.propOffset);
       timeManager.propOffset = selectedDate - today;
+      console.warn(timeManager.propOffset);
       satSet.satCruncher.postMessage({
         typ: 'offset',
         dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
@@ -2871,24 +2875,28 @@ uiManager.onReady = () => {
           setTimeout(function () {
             settingsManager.isPreventColorboxClose = false;
           }, 2000);
-          if (location.protocol === 'https:') {
-            $.colorbox({
-              href: 'https://space.skyrocket.de/doc_chr/lau2020.htm',
-              iframe: true,
-              width: '80%',
-              height: '80%',
-              fastIframe: false,
-              closeButton: false,
-            });
-          } else {
-            $.colorbox({
-              href: 'http://space.skyrocket.de/doc_chr/lau2020.htm',
-              iframe: true,
-              width: '80%',
-              height: '80%',
-              fastIframe: false,
-              closeButton: false,
-            });
+          try {
+            if (location.protocol === 'https:') {
+              $.colorbox({
+                href: 'https://space.skyrocket.de/doc_chr/lau2020.htm',
+                iframe: true,
+                width: '80%',
+                height: '80%',
+                fastIframe: false,
+                closeButton: false,
+              });
+            } else {
+              $.colorbox({
+                href: 'http://space.skyrocket.de/doc_chr/lau2020.htm',
+                iframe: true,
+                width: '80%',
+                height: '80%',
+                fastIframe: false,
+                closeButton: false,
+              });
+            }
+          } catch (error) {
+            console.warn(error);
           }
           sMM.isLaunchMenuOpen = true;
           $('#menu-launches').addClass('bmenu-item-selected');
@@ -3232,7 +3240,11 @@ uiManager.onReady = () => {
           orbitManager.isTimeMachineVisible = false;
 
           settingsManager.colors.transparent = orbitManager.tempTransColor;
-          groups.clearSelect();
+          try {
+            groups.clearSelect();
+          } catch {
+            // Intentionally Blank
+          }
           satSet.setColorScheme(ColorScheme.default, true); // force color recalc
 
           $('#menu-time-machine').removeClass('bmenu-item-selected');

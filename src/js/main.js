@@ -36,6 +36,7 @@ import { jQAlt } from '@app/js/lib/jqalt.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 // import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
+import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
@@ -57,7 +58,7 @@ const initalizeKeepTrack = async () => {
     satSet.init(gl, dotsManager, cameraManager);
     objectManager.init(sensorManager);
     await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
-    drawManager.selectSatManager.init(ColorScheme.group, sensorManager);
+    drawManager.selectSatManager.init(ColorScheme.group, sensorManager, satSet, objectManager, sMM, timeManager);
     await satSet.loadCatalog(); // Needs Object Manager and gl first
     const satCruncher = satSet.satCruncher;
 

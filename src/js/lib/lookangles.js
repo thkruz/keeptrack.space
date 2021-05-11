@@ -144,25 +144,29 @@ satellite.distance = (hoverSat, selectedSat) => {
 // There are a series of referecnes, especially in satellite.obs, to ui elements.
 // These should be moved to ui.js and then called before/after calling satellite.setobs
 satellite.setobs = (sensor) => {
-  if (typeof sensor == 'undefined' || sensor == null) {
-    sensorManager.setCurrentSensor(sensorManager.defaultSensor);
-    $('.sensor-reset-menu').hide();
-    return;
-  } else {
-    $('#menu-sensor-info').removeClass('bmenu-item-disabled');
-    $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
-    $('#menu-surveillance').removeClass('bmenu-item-disabled');
-    $('#menu-planetarium').removeClass('bmenu-item-disabled');
-    $('#menu-astronomy').removeClass('bmenu-item-disabled');
-    $('.sensor-reset-menu').show();
+  try {
+    if (typeof sensor == 'undefined' || sensor == null) {
+      sensorManager.setCurrentSensor(sensorManager.defaultSensor);
+      $('.sensor-reset-menu').hide();
+      return;
+    } else {
+      $('#menu-sensor-info').removeClass('bmenu-item-disabled');
+      $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
+      $('#menu-surveillance').removeClass('bmenu-item-disabled');
+      $('#menu-planetarium').removeClass('bmenu-item-disabled');
+      $('#menu-astronomy').removeClass('bmenu-item-disabled');
+      $('.sensor-reset-menu').show();
+    }
+    sensorManager.setCurrentSensor(sensor);
+    sensorManager.currentSensor.observerGd = {
+      // Array to calculate look angles in propagate()
+      lat: sensor.lat * DEG2RAD,
+      lon: sensor.long * DEG2RAD,
+      alt: parseFloat(sensor.obshei), // Converts from string to number
+    };
+  } catch (error) {
+    console.warn(error);
   }
-  sensorManager.setCurrentSensor(sensor);
-  sensorManager.currentSensor.observerGd = {
-    // Array to calculate look angles in propagate()
-    lat: sensor.lat * DEG2RAD,
-    lon: sensor.long * DEG2RAD,
-    alt: parseFloat(sensor.obshei), // Converts from string to number
-  };
 };
 
 satellite.altitudeCheck = (tle1, tle2, propOffset) => {
@@ -1932,88 +1936,96 @@ satellite.checkIsInFOV = (sensor, rae) => {
 };
 
 satellite.getDOPsTable = (lat, lon, alt) => {
-  let now;
-  let tbl = document.getElementById('dops'); // Identify the table to update
-  tbl.innerHTML = ''; // Clear the table from old object data
-  // let tblLength = 0;
-  let propOffset = timeManager.getPropOffset();
-  let propTempOffset = 0;
+  try {
+    let now;
+    let tbl = document.getElementById('dops'); // Identify the table to update
+    tbl.innerHTML = ''; // Clear the table from old object data
+    // let tblLength = 0;
+    let propOffset = timeManager.getPropOffset();
+    let propTempOffset = 0;
 
-  let tr = tbl.insertRow();
-  let tdT = tr.insertCell();
-  tdT.appendChild(document.createTextNode('Time'));
-  let tdH = tr.insertCell();
-  tdH.appendChild(document.createTextNode('HDOP'));
-  let tdP = tr.insertCell();
-  tdP.appendChild(document.createTextNode('PDOP'));
-  let tdG = tr.insertCell();
-  tdG.appendChild(document.createTextNode('GDOP'));
+    let tr = tbl.insertRow();
+    let tdT = tr.insertCell();
+    tdT.appendChild(document.createTextNode('Time'));
+    let tdH = tr.insertCell();
+    tdH.appendChild(document.createTextNode('HDOP'));
+    let tdP = tr.insertCell();
+    tdP.appendChild(document.createTextNode('PDOP'));
+    let tdG = tr.insertCell();
+    tdG.appendChild(document.createTextNode('GDOP'));
 
-  for (let t = 0; t < 1440; t++) {
-    propTempOffset = t * 1000 * 60 + propOffset; // Offset in seconds (msec * 1000)
-    now = timeManager.propTimeCheck(propTempOffset, timeManager.propRealTime);
+    for (let t = 0; t < 1440; t++) {
+      propTempOffset = t * 1000 * 60 + propOffset; // Offset in seconds (msec * 1000)
+      now = timeManager.propTimeCheck(propTempOffset, timeManager.propRealTime);
 
-    let dops = satellite.getDOPs(lat, lon, alt, now);
+      let dops = satellite.getDOPs(lat, lon, alt, now);
 
-    tr = tbl.insertRow();
-    tdT = tr.insertCell();
-    tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
-    tdH = tr.insertCell();
-    tdH.appendChild(document.createTextNode(dops.HDOP));
-    tdP = tr.insertCell();
-    tdP.appendChild(document.createTextNode(dops.PDOP));
-    tdG = tr.insertCell();
-    tdG.appendChild(document.createTextNode(dops.GDOP));
+      tr = tbl.insertRow();
+      tdT = tr.insertCell();
+      tdT.appendChild(document.createTextNode(dateFormat(now, 'isoDateTime', true)));
+      tdH = tr.insertCell();
+      tdH.appendChild(document.createTextNode(dops.HDOP));
+      tdP = tr.insertCell();
+      tdP.appendChild(document.createTextNode(dops.PDOP));
+      tdG = tr.insertCell();
+      tdG.appendChild(document.createTextNode(dops.GDOP));
+    }
+  } catch (error) {
+    console.warn(error);
   }
 };
 satellite.getDOPs = (lat, lon, alt, propTime) => {
-  if (typeof lat == 'undefined') {
-    console.error('Latitude Required');
-    return;
-  }
-  if (typeof lon == 'undefined') {
-    console.error('Longitude Required');
-    return;
-  }
-  alt = typeof alt != 'undefined' ? alt : 0;
-
-  lat = lat * DEG2RAD;
-  lon = lon * DEG2RAD;
-
-  var sat;
-  var lookAngles;
-  // let az, el;
-  // var azList = [];
-  // var elList = [];
-  var inViewList = [];
-
-  if (typeof groupsManager.GPSGroup == 'undefined') {
-    groupsManager.GPSGroup = groupsManager.createGroup('nameRegex', /NAVSTAR/iu);
-  }
-
-  if (typeof propTime == 'undefined') propTime = timeManager.propTime();
-  var j = timeManager.jday(
-    propTime.getUTCFullYear(),
-    propTime.getUTCMonth() + 1, // NOTE:, this function requires months in rng 1-12.
-    propTime.getUTCDate(),
-    propTime.getUTCHours(),
-    propTime.getUTCMinutes(),
-    propTime.getUTCSeconds()
-  ); // Converts time to jday (TLEs use epoch year/day)
-  j += propTime.getUTCMilliseconds() * 1.15741e-8;
-  var gmst = satellite.gstime(j);
-
-  for (var i = 0; i < groupsManager.GPSGroup.sats.length; i++) {
-    sat = satSet.getSat(groupsManager.GPSGroup.sats[i].satId);
-    lookAngles = satellite.ecfToLookAngles({ lon: lon, lat: lat, alt: alt }, satellite.eciToEcf(sat.position, gmst));
-    sat.az = lookAngles.az * RAD2DEG;
-    sat.el = lookAngles.el * RAD2DEG;
-    if (sat.el > settingsManager.gpselMask) {
-      inViewList.push(sat);
+  try {
+    if (typeof lat == 'undefined') {
+      console.error('Latitude Required');
+      return;
     }
-  }
+    if (typeof lon == 'undefined') {
+      console.error('Longitude Required');
+      return;
+    }
+    alt = typeof alt != 'undefined' ? alt : 0;
 
-  return satellite.calculateDOPs(inViewList);
+    lat = lat * DEG2RAD;
+    lon = lon * DEG2RAD;
+
+    var sat;
+    var lookAngles;
+    // let az, el;
+    // var azList = [];
+    // var elList = [];
+    var inViewList = [];
+
+    if (typeof groupsManager.GPSGroup == 'undefined') {
+      groupsManager.GPSGroup = groupsManager.createGroup('nameRegex', /NAVSTAR/iu);
+    }
+
+    if (typeof propTime == 'undefined') propTime = timeManager.propTime();
+    var j = timeManager.jday(
+      propTime.getUTCFullYear(),
+      propTime.getUTCMonth() + 1, // NOTE:, this function requires months in rng 1-12.
+      propTime.getUTCDate(),
+      propTime.getUTCHours(),
+      propTime.getUTCMinutes(),
+      propTime.getUTCSeconds()
+    ); // Converts time to jday (TLEs use epoch year/day)
+    j += propTime.getUTCMilliseconds() * 1.15741e-8;
+    var gmst = satellite.gstime(j);
+
+    for (var i = 0; i < groupsManager.GPSGroup.sats.length; i++) {
+      sat = satSet.getSat(groupsManager.GPSGroup.sats[i].satId);
+      lookAngles = satellite.ecfToLookAngles({ lon: lon, lat: lat, alt: alt }, satellite.eciToEcf(sat.position, gmst));
+      sat.az = lookAngles.az * RAD2DEG;
+      sat.el = lookAngles.el * RAD2DEG;
+      if (sat.el > settingsManager.gpselMask) {
+        inViewList.push(sat);
+      }
+    }
+
+    return satellite.calculateDOPs(inViewList);
+  } catch (error) {
+    console.warn(error);
+  }
 };
 satellite.calculateDOPs = (satList) => {
   var dops = {};
@@ -2397,7 +2409,7 @@ var _jday = (year, mon, day, hr, minute, sec) => {
   if (!year) {
     // console.error('timeManager.jday should always have a date passed to it!');
     var now;
-    now = Date.now();
+    now = new Date();
     let jDayStart = new Date(now.getFullYear(), 0, 0);
     let jDayDiff = now - jDayStart;
     return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);

@@ -441,75 +441,78 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
 
   $('#editSat-newTLE').on('click', function () {
     $('#loading-screen').fadeIn(1000, function () {
-      // Update Satellite TLE so that Epoch is Now but ECI position is very very close
-      var satId = satSet.getIdFromObjNum($('#es-scc').val());
-      var mainsat = satSet.getSat(satId);
+      try {
+        // Update Satellite TLE so that Epoch is Now but ECI position is very very close
+        var satId = satSet.getIdFromObjNum($('#es-scc').val());
+        var mainsat = satSet.getSat(satId);
 
-      // Launch Points are the Satellites Current Location
-      var TEARR = mainsat.getTEARR();
-      var launchLat, launchLon, alt;
-      launchLon = satellite.degreesLong(TEARR.lon);
-      launchLat = satellite.degreesLat(TEARR.lat);
-      alt = TEARR.alt;
+        // Launch Points are the Satellites Current Location
+        var TEARR = mainsat.getTEARR();
+        var launchLat, launchLon, alt;
+        launchLon = satellite.degreesLong(TEARR.lon);
+        launchLat = satellite.degreesLat(TEARR.lat);
+        alt = TEARR.alt;
 
-      var upOrDown = mainsat.getDirection();
+        var upOrDown = mainsat.getDirection();
 
-      var currentEpoch = satellite.currentEpoch(timeManager.propTime());
-      mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
+        var currentEpoch = satellite.currentEpoch(timeManager.propTime());
+        mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
 
-      cameraManager.camSnapMode = false;
+        cameraManager.camSnapMode = false;
 
-      var TLEs;
-      // Ignore argument of perigee for round orbits OPTIMIZE
-      if (mainsat.apogee - mainsat.perigee < 300) {
-        TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.propOffset);
-      } else {
-        TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.propOffset, alt);
+        var TLEs;
+        // Ignore argument of perigee for round orbits OPTIMIZE
+        if (mainsat.apogee - mainsat.perigee < 300) {
+          TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.propOffset);
+        } else {
+          TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.propOffset, alt);
+        }
+        var TLE1 = TLEs[0];
+        var TLE2 = TLEs[1];
+        satSet.satCruncher.postMessage({
+          typ: 'satEdit',
+          id: satId,
+          TLE1: TLE1,
+          TLE2: TLE2,
+        });
+        orbitManager.updateOrbitBuffer(satId, true, TLE1, TLE2);
+        //
+        // Reload Menu with new TLE
+        //
+        let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
+        $('#es-scc').val(sat.SCC_NUM);
+
+        var inc = (sat.inclination * RAD2DEG).toPrecision(7);
+        inc = inc.split('.');
+        inc[0] = inc[0].substr(-3, 3);
+        inc[1] = inc[1].substr(0, 4);
+        inc = (inc[0] + '.' + inc[1]).toString();
+
+        $('#es-inc').val(stringPad.pad0(inc, 8));
+        $('#es-year').val(sat.TLE1.substr(18, 2));
+        $('#es-day').val(sat.TLE1.substr(20, 12));
+        $('#es-meanmo').val(sat.TLE2.substr(52, 11));
+
+        var rasc = (sat.raan * RAD2DEG).toPrecision(7);
+        rasc = rasc.split('.');
+        rasc[0] = rasc[0].substr(-3, 3);
+        rasc[1] = rasc[1].substr(0, 4);
+        rasc = (rasc[0] + '.' + rasc[1]).toString();
+
+        $('#es-rasc').val(stringPad.pad0(rasc, 8));
+        $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
+
+        var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
+        argPe = argPe.split('.');
+        argPe[0] = argPe[0].substr(-3, 3);
+        argPe[1] = argPe[1].substr(0, 4);
+        argPe = (argPe[0] + '.' + argPe[1]).toString();
+
+        $('#es-argPe').val(stringPad.pad0(argPe, 8));
+        $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
+      } catch (error) {
+        console.warn(error);
       }
-      var TLE1 = TLEs[0];
-      var TLE2 = TLEs[1];
-      satSet.satCruncher.postMessage({
-        typ: 'satEdit',
-        id: satId,
-        TLE1: TLE1,
-        TLE2: TLE2,
-      });
-      orbitManager.updateOrbitBuffer(satId, true, TLE1, TLE2);
-      //
-      // Reload Menu with new TLE
-      //
-      let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
-      $('#es-scc').val(sat.SCC_NUM);
-
-      var inc = (sat.inclination * RAD2DEG).toPrecision(7);
-      inc = inc.split('.');
-      inc[0] = inc[0].substr(-3, 3);
-      inc[1] = inc[1].substr(0, 4);
-      inc = (inc[0] + '.' + inc[1]).toString();
-
-      $('#es-inc').val(stringPad.pad0(inc, 8));
-      $('#es-year').val(sat.TLE1.substr(18, 2));
-      $('#es-day').val(sat.TLE1.substr(20, 12));
-      $('#es-meanmo').val(sat.TLE2.substr(52, 11));
-
-      var rasc = (sat.raan * RAD2DEG).toPrecision(7);
-      rasc = rasc.split('.');
-      rasc[0] = rasc[0].substr(-3, 3);
-      rasc[1] = rasc[1].substr(0, 4);
-      rasc = (rasc[0] + '.' + rasc[1]).toString();
-
-      $('#es-rasc').val(stringPad.pad0(rasc, 8));
-      $('#es-ecen').val(sat.eccentricity.toPrecision(7).substr(2, 7));
-
-      var argPe = (sat.argPe * RAD2DEG).toPrecision(7);
-      argPe = argPe.split('.');
-      argPe[0] = argPe[0].substr(-3, 3);
-      argPe[1] = argPe[1].substr(0, 4);
-      argPe = (argPe[0] + '.' + argPe[1]).toString();
-
-      $('#es-argPe').val(stringPad.pad0(argPe, 8));
-      $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
-
       $('#loading-screen').fadeOut('slow');
     });
   });
@@ -619,18 +622,22 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
   });
 
   $('#editSat-save').on('click', function (e) {
-    var scc = $('#es-scc').val();
-    var satId = satSet.getIdFromObjNum(scc);
-    var sat = satSet.getSatExtraOnly(satId);
-    var sat2 = {
-      TLE1: sat.TLE1,
-      TLE2: sat.TLE2,
-    };
-    var variable = JSON.stringify(sat2);
-    var blob = new Blob([variable], {
-      type: 'text/plain;charset=utf-8',
-    });
-    saveAs(blob, scc + '.tle');
+    try {
+      var scc = $('#es-scc').val();
+      var satId = satSet.getIdFromObjNum(scc);
+      var sat = satSet.getSatExtraOnly(satId);
+      var sat2 = {
+        TLE1: sat.TLE1,
+        TLE2: sat.TLE2,
+      };
+      var variable = JSON.stringify(sat2);
+      var blob = new Blob([variable], {
+        type: 'text/plain;charset=utf-8',
+      });
+      saveAs(blob, scc + '.tle');
+    } catch (error) {
+      console.warn(error);
+    }
     e.preventDefault();
   });
 
@@ -641,36 +648,40 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
   $('#editSat-file').on('change', function (evt) {
     if (!window.FileReader) return; // Browser is not compatible
 
-    var reader = new FileReader();
+    try {
+      var reader = new FileReader();
 
-    reader.onload = function (evt) {
-      if (evt.target.readyState !== 2) return;
-      if (evt.target.error) {
-        console.log('error');
-        return;
-      }
+      reader.onload = function (evt) {
+        if (evt.target.readyState !== 2) return;
+        if (evt.target.error) {
+          console.log('error');
+          return;
+        }
 
-      var object = JSON.parse(evt.target.result);
-      var scc = parseInt(stringPad.pad0(object.TLE1.substr(2, 5).trim(), 5));
-      var satId = satSet.getIdFromObjNum(scc);
-      var sat = satSet.getSatExtraOnly(satId);
-      if (satellite.altitudeCheck(object.TLE1, object.TLE2, timeManager.propOffset) > 1) {
-        satSet.satCruncher.postMessage({
-          typ: 'satEdit',
-          id: sat.id,
-          active: true,
-          TLE1: object.TLE1,
-          TLE2: object.TLE2,
-        });
-        orbitManager.updateOrbitBuffer(sat.id, true, object.TLE1, object.TLE2);
-        sat.active = true;
-      } else {
-        $('#es-error').html('Failed Altitude Check</br>Try Different Parameters');
-        $('#es-error').show();
-      }
-    };
-    reader.readAsText(evt.target.files[0]);
-    evt.preventDefault();
+        var object = JSON.parse(evt.target.result);
+        var scc = parseInt(stringPad.pad0(object.TLE1.substr(2, 5).trim(), 5));
+        var satId = satSet.getIdFromObjNum(scc);
+        var sat = satSet.getSatExtraOnly(satId);
+        if (satellite.altitudeCheck(object.TLE1, object.TLE2, timeManager.propOffset) > 1) {
+          satSet.satCruncher.postMessage({
+            typ: 'satEdit',
+            id: sat.id,
+            active: true,
+            TLE1: object.TLE1,
+            TLE2: object.TLE2,
+          });
+          orbitManager.updateOrbitBuffer(sat.id, true, object.TLE1, object.TLE2);
+          sat.active = true;
+        } else {
+          $('#es-error').html('Failed Altitude Check</br>Try Different Parameters');
+          $('#es-error').show();
+        }
+      };
+      reader.readAsText(evt.target.files[0]);
+      evt.preventDefault();
+    } catch (error) {
+      console.warn(error);
+    }
   });
 
   $('#es-error').on('click', function () {
@@ -1481,6 +1492,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
         tdS2.setAttribute('style', 'text-decoration: underline');
 
         for (var i = 0; i < 20; i++) {
+          if (typeof socratesObjTwo[i] == 'undefined') break;
           // 20 rows
           tr = tbl.insertRow();
           tr.setAttribute('class', 'socrates-object link');
@@ -1568,7 +1580,11 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
     // TODO: This needs optimized to skip steps that don't need done
 
     // Close any open colorboxes
-    $.colorbox.close();
+    try {
+      $.colorbox.close();
+    } catch {
+      // Intentionally Left Blank (Fails Jest Testing)
+    }
 
     // Hide all side menus
     $('#membership-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);

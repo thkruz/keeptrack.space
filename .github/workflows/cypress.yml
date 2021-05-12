@@ -18,25 +18,6 @@ jobs:
         config: baseUrl=http://localhost:8080
         browser: chrome
 
-  firefox-ubuntu:
-    runs-on: ubuntu-latest
-    name: Ubuntu E2E on Firefox
-    container:
-      image: cypress/browsers:node12.16.1-chrome80-ff73
-      options: --user 1001
-    steps:
-      - uses: actions/checkout@v2
-      - run: npm install
-      - run: npm run stage
-      - uses: cypress-io/github-action@v2
-        with:
-          working-directory: ./
-          build: npm run build-test
-          start: npm run server:start
-          wait-on: 'http://localhost:8080'
-          config: baseUrl=http://localhost:8080
-          browser: firefox
-
   windows-edge:
     runs-on: windows-latest
     name: Windows E2E on Edge

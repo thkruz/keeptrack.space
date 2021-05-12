@@ -110,7 +110,7 @@ jobs:
       - run: node ./node_modules/.bin/codecov
  
   mac-chrome:
-     runs-on: macos-latest
+    runs-on: macos-latest
       name: Mac E2E on Chrome
       steps:
       - uses: actions/checkout@v2

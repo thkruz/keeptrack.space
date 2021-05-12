@@ -111,7 +111,6 @@ jobs:
  
   mac-chrome:
      runs-on: macos-latest
-          steps:
       name: Mac E2E on Chrome
       steps:
       - uses: actions/checkout@v2

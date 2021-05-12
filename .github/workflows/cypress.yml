@@ -111,16 +111,16 @@ jobs:
  
   mac-chrome:
     runs-on: macos-latest
-      name: Mac E2E on Chrome
-      steps:
-      - uses: actions/checkout@v2
-      - run: npm install
-      - run: npm run stage
-      - uses: cypress-io/github-action@v2
-        with:
-          working-directory: dist
-          build: npm run build-test
-          start: npm server:start
-          wait-on: 'http://localhost:8080'
-          config: baseUrl=http://localhost:8080
-          browser: chrome
+    name: Mac E2E on Chrome
+    steps:
+    - uses: actions/checkout@v2
+    - run: npm install
+    - run: npm run stage
+    - uses: cypress-io/github-action@v2
+      with:
+        working-directory: dist
+        build: npm run build-test
+        start: npm server:start
+        wait-on: 'http://localhost:8080'
+        config: baseUrl=http://localhost:8080
+        browser: chrome

@@ -14,7 +14,7 @@ context('KeepTrack Startup', () => {
 
   it('Load Site', () => {
     cy.window().then((win) => {
-      cy.wait(10000); // wait 10 seconds
+      cy.wait(30000); // wait 10 seconds
       cy.get('#menu-time-machine').trigger('click'); // Trigger mousedown event on link
     });
   });

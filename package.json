@@ -128,6 +128,7 @@
     "coverage-istanbul-loader": "^3.0.5",
     "cross-env": "^7.0.3",
     "css-loader": "^5.0.1",
+    "cypress": "^7.3.0",
     "download-file": "^0.1.5",
     "eslint": "^7.16.0",
     "gh-pages": "^3.1.0",

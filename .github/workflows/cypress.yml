@@ -1,0 +1,127 @@
+name: Cypress E2E Tests
+on: [push]
+jobs:
+
+  ubuntu-chrome:
+    runs-on: ubuntu-latest
+    steps:
+      name: E2E on Chrome
+      steps:
+      - uses: actions/checkout@v2
+      - run: npm install
+      - run: npm run stage
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: dist
+          build: npm run build-test
+          start: npm server:start
+          wait-on: 'http://localhost:8080'
+          config: baseUrl=http://localhost:8080
+          browser: chrome
+
+  firefox-ubuntu:
+    runs-on: ubuntu-latest
+    name: Ubuntu E2E on Firefox
+    container:
+      image: cypress/browsers:node12.16.1-chrome80-ff73
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm install
+      - run: npm run stage
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: dist
+          build: npm run build-test
+          start: npm server:start
+          wait-on: 'http://localhost:8080'
+          config: baseUrl=http://localhost:8080
+          browser: firefox
+
+  windows-edge:
+    runs-on: windows-latest
+    name: Windows E2E on Edge
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm install
+      - run: npm run stage
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: dist
+          build: npm run build-test
+          start: npm server:start
+          wait-on: 'http://localhost:8080'
+          config: baseUrl=http://localhost:8080
+          browser: edge
+
+  windows-firefox:
+    runs-on: windows-latest
+    name: Windows E2E on Firefox
+    container:
+      image: cypress/browsers:node12.16.1-chrome80-ff73
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm install
+      - run: npm run stage
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: dist
+          build: npm run build-test
+          start: npm server:start
+          wait-on: 'http://localhost:8080'
+          config: baseUrl=http://localhost:8080
+          browser: firefox
+
+  windows-chrome:
+    runs-on: windows-latest
+    name: Windows E2E on Chrome
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm install
+      - run: npm run stage
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: dist
+          build: npm run build-test
+          start: npm server:start
+          wait-on: 'http://localhost:8080'
+          config: baseUrl=http://localhost:8080
+          browser: chrome
+
+  mac-firefox:
+    runs-on: macos-latest
+    container:
+      image: cypress/browsers:node12.16.1-chrome80-ff73
+      options: --user 1001
+    name: Mac E2E on Firefox
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm install
+      - run: npm run stage
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: dist
+          build: npm run build-test
+          start: npm server:start
+          wait-on: 'http://localhost:8080'
+          config: baseUrl=http://localhost:8080
+          browser: firefox
+      - run: node ./node_modules/.bin/codecov
+ 
+  mac-chrome:
+     runs-on: macos-latest
+          steps:
+      name: Mac E2E on Chrome
+      steps:
+      - uses: actions/checkout@v2
+      - run: npm install
+      - run: npm run stage
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: dist
+          build: npm run build-test
+          start: npm server:start
+          wait-on: 'http://localhost:8080'
+          config: baseUrl=http://localhost:8080
+          browser: chrome

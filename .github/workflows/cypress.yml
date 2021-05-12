@@ -4,11 +4,10 @@ jobs:
 
   ubuntu-chrome:
     runs-on: ubuntu-latest
-    name: E2E on Chrome
+    name: Ubuntu E2E on Chrome
     steps:
     - uses: actions/checkout@v2
     - run: npm install
-    - run: npm run stage
     - uses: cypress-io/github-action@v2
       with:
         working-directory: ./
@@ -24,7 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: npm install
-      - run: npm run stage
       - uses: cypress-io/github-action@v2
         with:
           working-directory: ./
@@ -40,7 +38,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: npm install
-      - run: npm run stage
       - uses: cypress-io/github-action@v2
         with:
           working-directory: ./
@@ -56,7 +53,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: npm install
-    - run: npm run stage
     - uses: cypress-io/github-action@v2
       with:
         working-directory: ./

@@ -7,17 +7,14 @@ context('KeepTrack Startup', () => {
 
   it('Gremlins', () => {
     cy.window().then((win) => {
-      // win is the remote window
-      // of the page at: http://localhost:8080/app
+      cy.wait(3500); // wait 3.5 seconds
       win.db.gremlins();
     });
   });
 
   it('Load Site', () => {
     cy.window().then((win) => {
-      // win is the remote window
-      // of the page at: http://localhost:8080/app
-      cy.wait(2500); // wait 2.5 seconds
+      cy.wait(3500); // wait 3.5 seconds
       cy.get('#menu-time-machine').trigger('click'); // Trigger mousedown event on link
     });
   });

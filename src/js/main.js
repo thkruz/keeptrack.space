@@ -79,10 +79,10 @@ const initalizeKeepTrack = async () => {
 
     uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, uiManager, drawManager, dotsManager);
 
-    await drawManager.init(groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
+    drawManager.init(groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
 
     // Now that everything is loaded, start rendering to thg canvas
-    await drawManager.drawLoop();
+    drawManager.drawLoop();
 
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
     uiManager.postStart();

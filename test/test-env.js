@@ -49,6 +49,24 @@ window.jQuery = $;
 $.colorbox = {
   close: jest.fn(),
 };
+
+const jQueryVal = {};
+$.fn.val = (val) => {
+  // Get
+  if (typeof val == 'undefined') {
+    if (typeof jQueryVal[$.fn.toString()] == 'undefined') {
+      return '';
+    } else {
+      return jQueryVal[$.fn.toString()].toString();
+    }
+    // Set
+  } else {
+    jQueryVal[$.fn.toString()] = val;
+  }
+};
+
+$.fn.replace = (input, output) => $.fn.toString().replace(input, output);
+
 $.fn.colorbox = jest.fn();
 $.fn.effect = jest.fn();
 $.fn.tooltip = jest.fn();

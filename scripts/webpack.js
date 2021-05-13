@@ -46,7 +46,8 @@ let config = {
 
 if (MAKE_MODE == 'development') {
   Object.assign(config, {
-    devtool: 'inline-source-map',
+    // devtool: 'inline-source-map',
+    devtool: 'source-map',
     optimization: {
       minimize: false,
     },
@@ -77,7 +78,7 @@ let jsConfig = Object.assign({}, config, {
   output: {
     filename: '[name].js',
     path: __dirname + '/../dist/js',
-    publicPath: '/js/',
+    publicPath: './js/',
   },
 });
 
@@ -94,7 +95,7 @@ let jsConfig2 = Object.assign({}, config, {
   output: {
     filename: '[name].js',
     path: __dirname + '/../dist/analysis/js/',
-    publicPath: '/js/',
+    publicPath: './js/',
   },
 });
 

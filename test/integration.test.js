@@ -100,11 +100,22 @@ describe('Integration Testing', () => {
       y: 4000,
       z: 4000,
     },
+    velocity: {
+      x: 7,
+      y: 7,
+      z: 7,
+      total: 14,
+    },
     raan: 0.2039103071690015,
     semiMajorAxis: 8622.494665143116,
     semiMinorAxis: 8473.945136538932,
-    velocity: {},
     getAltitude: () => 100,
+    getDirection: () => 'N',
+    getTEARR: () => ({
+      lat: 0.1,
+      lon: 0.1,
+      alt: 50000,
+    }),
   };
 
   test('main loading files', async () => {
@@ -142,7 +153,13 @@ describe('Integration Testing', () => {
 
     uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, uiManager, drawManager, dotsManager);
 
-    await drawManager.init(groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
+    drawManager.init(groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
+
+    // Now that everything is loaded, start rendering to thg canvas
+    drawManager.drawLoop();
+
+    // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
+    uiManager.postStart();
     // /////////////////////////////////////////////////////////////////////
   });
   test('UI Manager Functional', () => {
@@ -904,6 +921,17 @@ describe('Integration Testing', () => {
     satellite.getlookangles(satSet.getSat(0));
     satellite.getlookanglesMultiSite(satSet.getSat(0));
     satellite.findCloseObjects();
+
+    satellite.map(exampleSat, 0);
+    satellite.eci2ll(5000, 5000, 5000);
+    satellite.getSunTimes(exampleSat);
+    // satellite.calculateDOPs({});
+    satSet.getSatExtraOnly = () => exampleSat;
+    satSet.getSat = () => exampleSat;
+    satellite.findChangeOrbitToDock(exampleSat, exampleSat, 0, 5000);
+    satellite.createManeuverAnalyst(0, 1, 1, 1);
+    satellite.findClosestApproachTime(exampleSat, exampleSat, 0, 5000);
+    satellite.findNearbyObjectsByOrbit(exampleSat);
   });
 
   test('satSet Functional Tests', () => {
@@ -933,6 +961,26 @@ describe('Integration Testing', () => {
     drawManager.checkIfPostProcessingRequired();
 
     drawManager.demoMode();
+
+    settingsManager.startWithOrbitsDisplayed = true;
+    drawManager.startWithOrbits();
+
+    settingsManager.enableConstantSelectedSatRedraw = true;
+    objectManager.selectedSat = 0;
+    satSet.getSatExtraOnly = () => exampleSat;
+    satSet.getSat = () => exampleSat;
+    drawManager.drawLoop();
+
+    settingsManager.lowPerf = true;
+    drawManager.updateHover();
+
+    cameraManager.cameraType.current = cameraManager.cameraType.planetarium;
+    drawManager.canvas.style = {};
+    drawManager.hoverBoxOnSat();
+
+    cameraManager.cameraType.current = cameraManager.cameraType.default;
+    settingsManager.enableHoverOverlay = true;
+    drawManager.hoverBoxOnSat(0, 0, 0);
   });
 
   test('orbitManager Functional Tests', () => {

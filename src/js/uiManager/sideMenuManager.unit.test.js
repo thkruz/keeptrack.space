@@ -112,6 +112,7 @@ test(`sMM Unit Testing`, () => {
     missilesInUse: 500,
     Missile: jest.fn(),
     UsaICBM: [1, 1, 1, 1],
+    globalBMTargets: [1, 1, 1, 1],
   };
 
   $.colorbox = jest.fn();

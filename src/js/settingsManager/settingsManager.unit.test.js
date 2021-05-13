@@ -103,8 +103,8 @@ describe('settingsManager URL Test', () => {
   });
 
   test('http://localhost', () => {
-    expect(settingsManager.installDirectory).toBe('/');
-    expect(settingsManager.breakTheLaw).toBe(true);
+    // Caused by Node being active
+    expect(settingsManager.installDirectory).toBe('http://127.0.0.1:8080/');
   });
 
   test('http://thkruz.github.io', () => {

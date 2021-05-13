@@ -40,11 +40,16 @@ let settingsManager = {};
         break;
       case 'localhost':
       case '10.0.0.34':
-        // Comment Out the Next Two Lines if you are testing on a local server
-        // and have the keeptrack files installed in a subdirectory
-        settingsManager.installDirectory = '/';
-        // settingsManager.offline = true;
-        settingsManager.breakTheLaw = true;
+        // Is node running? This must be some kind of test
+        if (typeof process !== 'undefined') {
+          settingsManager.installDirectory = 'http://127.0.0.1:8080/';
+        } else {
+          // Comment Out the Next Two Lines if you are testing on a local server
+          // and have the keeptrack files installed in a subdirectory
+          settingsManager.installDirectory = '/';
+          // settingsManager.offline = true;
+          settingsManager.breakTheLaw = true;
+        }
         break;
       case 'thkruz.github.io':
       case 'www.thkruz.github.io':

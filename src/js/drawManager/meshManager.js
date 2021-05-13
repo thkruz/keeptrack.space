@@ -15,8 +15,7 @@ meshManager.isReady = false;
 meshManager.init = async (glRef, earthRef) => {
   try {
     if (settingsManager.disableUI || settingsManager.isDrawLess) return;
-    // this doesn't work in jest at the moment (5/1/2021)
-    if (typeof process !== 'undefined') return;
+
     gl = glRef;
     earth = earthRef;
 
@@ -484,30 +483,34 @@ meshManager.drawOcclusion = function (pMatrix, camMatrix, occlusionPrgm, tgtBuff
   if (settingsManager.disableUI || settingsManager.isDrawLess) return;
   if (typeof meshManager.currentModel.id == 'undefined' || meshManager.currentModel.id == -1 || meshManager.currentModel.static) return;
 
-  // Move the mesh to its location in world space
-  mvMatrix = glm.mat4.create();
-  glm.mat4.identity(mvMatrix);
-  glm.mat4.translate(mvMatrix, mvMatrix, glm.vec3.fromValues(meshManager.currentModel.position.x, meshManager.currentModel.position.y, meshManager.currentModel.position.z));
+  try {
+    // Move the mesh to its location in world space
+    mvMatrix = glm.mat4.create();
+    glm.mat4.identity(mvMatrix);
+    glm.mat4.translate(mvMatrix, mvMatrix, glm.vec3.fromValues(meshManager.currentModel.position.x, meshManager.currentModel.position.y, meshManager.currentModel.position.z));
 
-  // Rotate the Satellite to Face Nadir if needed
-  if (meshManager.currentModel.nadirYaw !== null) {
-    glm.mat4.rotateZ(mvMatrix, mvMatrix, meshManager.currentModel.nadirYaw);
+    // Rotate the Satellite to Face Nadir if needed
+    if (meshManager.currentModel.nadirYaw !== null) {
+      glm.mat4.rotateZ(mvMatrix, mvMatrix, meshManager.currentModel.nadirYaw);
+    }
+
+    // Change to the earth shader
+    gl.useProgram(occlusionPrgm);
+    // Change to the main drawing buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+
+    occlusionPrgm.attrSetup(occlusionPrgm, meshManager.currentModel.model.mesh.vertexBuffer, 80);
+
+    // Set the uniforms
+    occlusionPrgm.uniformSetup(occlusionPrgm, mvMatrix, pMatrix, camMatrix);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, meshManager.currentModel.model.mesh.indexBuffer);
+    gl.drawElements(gl.TRIANGLES, meshManager.currentModel.model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+    occlusionPrgm.attrOff(occlusionPrgm);
+  } catch {
+    return;
   }
-
-  // Change to the earth shader
-  gl.useProgram(occlusionPrgm);
-  // Change to the main drawing buffer
-  gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
-
-  occlusionPrgm.attrSetup(occlusionPrgm, meshManager.currentModel.model.mesh.vertexBuffer, 80);
-
-  // Set the uniforms
-  occlusionPrgm.uniformSetup(occlusionPrgm, mvMatrix, pMatrix, camMatrix);
-
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, meshManager.currentModel.model.mesh.indexBuffer);
-  gl.drawElements(gl.TRIANGLES, meshManager.currentModel.model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-
-  occlusionPrgm.attrOff(occlusionPrgm);
 };
 
 export { meshManager };

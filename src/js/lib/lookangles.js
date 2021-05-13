@@ -1893,9 +1893,9 @@ satellite.findChangeOrbitToDock = (sat, sat2, propOffset, propLength) => {
             // let closestInc = incTemp;
             // let closestRaan = raanTemp;
             // let closestMeanMo = meanMoTemp;
-            console.log(`Distance: ${minDistArray.dist}`);
-            console.log(`Time: ${minDistArray.time}`);
-            console.log(satSet.getSatFromObjNum(80000));
+            // console.log(`Distance: ${minDistArray.dist}`);
+            // console.log(`Time: ${minDistArray.time}`);
+            // console.log(satSet.getSatFromObjNum(80000));
           }
         }
       }

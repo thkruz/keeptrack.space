@@ -82,4 +82,8 @@ coverage/
 # Build Folder
 dist
 
+# Work In Progress
+src/js/wip/
+
+# nyc Output
 .nyc_output

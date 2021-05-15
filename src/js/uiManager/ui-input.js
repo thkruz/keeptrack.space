@@ -565,14 +565,6 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
       // Is this the Earth?
       //
       // This not the Earth
-
-      if (typeof latLon == 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
-        // Intentional
-      } else {
-        // This is the Earth
-        uiManager.earthClicked();
-      }
-
       uiManager.earthClicked = () => {
         if (!isViewDOM) {
           rightBtnViewDOM.show();
@@ -612,6 +604,13 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         if (settingsManager.hiresNoCloudsImages == true) $('#earth-high-no-clouds-rmb').hide();
         if (settingsManager.vectorImages == true) $('#earth-vec-rmb').hide();
       };
+
+      if (typeof latLon == 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
+        // Intentional
+      } else {
+        // This is the Earth
+        uiManager.earthClicked();
+      }
 
       rightBtnMenuDOM.show();
       satHoverBoxDOM.hide();

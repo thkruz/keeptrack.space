@@ -121,6 +121,7 @@ var parseFromGETVariables = () => {
 
 var dotManager;
 satSet.init = async (glRef, dotManagerRef, cameraManager) => {
+  window.satSet = satSet;
   gl = glRef;
   dotManager = dotManagerRef;
   /** Parses GET variables for Possible sharperShaders */

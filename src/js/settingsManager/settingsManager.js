@@ -870,6 +870,7 @@ settingsManager.init = () => {
       }
     };
   }
+  window.db = db;
 
   // Try to Make Older Versions of Jquery Work
   if (typeof window.$ == 'undefined') {
@@ -899,5 +900,5 @@ settingsManager.init();
 
 // Expose these to the console
 window.settingsManager = settingsManager;
-window.db = db;
+
 export { db, settingsManager };

@@ -6,7 +6,7 @@ context('KeepTrack Startup', () => {
   });
 
   it('Load Site', () => {
-    cy.window().then((win) => {
+    cy.window().then(() => {
       cy.wait(60000); // wait 60 seconds
     });
   });

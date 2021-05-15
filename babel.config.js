@@ -1,5 +1,4 @@
 module.exports = (api) => {
-  console.log(`Currently in ${api.env()} environment!`);
   const testPlugins = [
     [
       'istanbul',

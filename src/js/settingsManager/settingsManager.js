@@ -1,7 +1,7 @@
 /**
 // /////////////////////////////////////////////////////////////////////////////
 
-Copyright (C) 2016-2020 Theodore Kruczek
+Copyright (C) 2016-2021 Theodore Kruczek
 Copyright (C) 2020 Heather Kruczek
 
 This program is free software: you can redistribute it and/or modify it under
@@ -23,7 +23,9 @@ import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
 
 // Settings Manager Setup
 let settingsManager = {};
-{
+let db = {};
+
+settingsManager.init = () => {
   //  Version Control
   settingsManager.versionNumber = VERSION;
   settingsManager.versionDate = VERSION_DATE;
@@ -59,6 +61,10 @@ let settingsManager = {};
         settingsManager.offline = true;
         settingsManager.breakTheLaw = true;
         settingsManager.installDirectory = './';
+        break;
+      default:
+        settingsManager.installDirectory = '/';
+        break;
     }
     if (typeof settingsManager.installDirectory == 'undefined') {
       // Put Your Custom Install Directory Here
@@ -627,268 +633,269 @@ let settingsManager = {};
 
   // Export settingsManager to everyone else
   window.settingsManager = settingsManager;
-}
 
-// This is an initial parse of the GET variables
-// to determine critical settings. Other variables are checked later during
-// satSet.init
-if (!settingsManager.disableUI) {
-  (function initParseFromGETVariables() {
-    let queryStr = window.location.search.substring(1);
-    let params = queryStr.split('&');
-    for (let i = 0; i < params.length; i++) {
-      let key = params[i].split('=')[0];
-      // let val = params[i].split('=')[1];
-      switch (key) {
-        case 'console':
-          settingsManager.isEnableConsole = true;
-          break;
-        case 'radarData':
-          settingsManager.isEnableRadarData = true;
-          settingsManager.maxRadarData = 150000;
-          break;
-        case 'smallImages':
-          settingsManager.smallImages = true;
-          break;
-        case 'lowperf':
-          settingsManager.lowPerf = true;
-          settingsManager.isDrawLess = true;
-          settingsManager.zFar = 250000.0;
-          settingsManager.noMeshManager = true;
-          settingsManager.maxFieldOfViewMarkers = 1;
-          settingsManager.smallImages = true;
-          break;
-        case 'hires':
-          settingsManager.hiresImages = true;
-          settingsManager.earthNumLatSegs = 256;
-          settingsManager.earthNumLonSegs = 256;
-          settingsManager.atmospherelatSegs = 128;
-          settingsManager.atmospherelonSegs = 128;
-          settingsManager.minimumDrawDt = 0.01667;
-          break;
-        case 'nostars':
-          settingsManager.noStars = true;
-          break;
-        case 'draw-less':
-          settingsManager.isDrawLess = true;
-          settingsManager.zFar = 250000.0;
-          settingsManager.noMeshManager = true;
-          break;
-        case 'draw-more':
-          settingsManager.isDrawLess = false;
-          settingsManager.noMeshManager = false;
-          settingsManager.smallImages = false;
-          break;
-        case 'vec':
-          settingsManager.vectorImages = true;
-          break;
-        case 'retro':
-          settingsManager.retro = true;
-          settingsManager.tleSource = 'tle/retro.json';
-          break;
-        case 'offline':
-          settingsManager.offline = true;
-          break;
-        case 'debris':
-          settingsManager.tleSource = 'tle/TLEdebris.json';
-          break;
-        case 'mw':
-          settingsManager.tleSource = 'tle/mw.json';
-          break;
-        case 'trusat':
-          settingsManager.trusatMode = true;
-          settingsManager.trusatImages = true;
-          break;
-        case 'trusat-only':
-          settingsManager.trusatMode = true;
-          settingsManager.trusatOnly = true;
-          settingsManager.colors.debris = [0.9, 0.9, 0.9, 1];
-          settingsManager.trusatImages = true;
-          settingsManager.tleSource = 'tle/trusat.json';
-          break;
-        case 'cpo':
-          settingsManager.copyrightOveride = true;
-          break;
-        case 'logo':
-          settingsManager.isShowLogo = true;
-          break;
-        case 'noPropRate':
-          settingsManager.isAlwaysHidePropRate = true;
-          break;
+  // This is an initial parse of the GET variables
+  // to determine critical settings. Other variables are checked later during
+  // satSet.init
+  if (!settingsManager.disableUI) {
+    (function initParseFromGETVariables() {
+      let queryStr = window.location.search.substring(1);
+      let params = queryStr.split('&');
+      for (let i = 0; i < params.length; i++) {
+        let key = params[i].split('=')[0];
+        // let val = params[i].split('=')[1];
+        switch (key) {
+          case 'console':
+            settingsManager.isEnableConsole = true;
+            break;
+          case 'radarData':
+            settingsManager.isEnableRadarData = true;
+            settingsManager.maxRadarData = 150000;
+            break;
+          case 'smallImages':
+            settingsManager.smallImages = true;
+            break;
+          case 'lowperf':
+            settingsManager.lowPerf = true;
+            settingsManager.isDrawLess = true;
+            settingsManager.zFar = 250000.0;
+            settingsManager.noMeshManager = true;
+            settingsManager.maxFieldOfViewMarkers = 1;
+            settingsManager.smallImages = true;
+            break;
+          case 'hires':
+            settingsManager.hiresImages = true;
+            settingsManager.earthNumLatSegs = 256;
+            settingsManager.earthNumLonSegs = 256;
+            settingsManager.atmospherelatSegs = 128;
+            settingsManager.atmospherelonSegs = 128;
+            settingsManager.minimumDrawDt = 0.01667;
+            break;
+          case 'nostars':
+            settingsManager.noStars = true;
+            break;
+          case 'draw-less':
+            settingsManager.isDrawLess = true;
+            settingsManager.zFar = 250000.0;
+            settingsManager.noMeshManager = true;
+            break;
+          case 'draw-more':
+            settingsManager.isDrawLess = false;
+            settingsManager.noMeshManager = false;
+            settingsManager.smallImages = false;
+            break;
+          case 'vec':
+            settingsManager.vectorImages = true;
+            break;
+          case 'retro':
+            settingsManager.retro = true;
+            settingsManager.tleSource = 'tle/retro.json';
+            break;
+          case 'offline':
+            settingsManager.offline = true;
+            break;
+          case 'debris':
+            settingsManager.tleSource = 'tle/TLEdebris.json';
+            break;
+          case 'mw':
+            settingsManager.tleSource = 'tle/mw.json';
+            break;
+          case 'trusat':
+            settingsManager.trusatMode = true;
+            settingsManager.trusatImages = true;
+            break;
+          case 'trusat-only':
+            settingsManager.trusatMode = true;
+            settingsManager.trusatOnly = true;
+            settingsManager.colors.debris = [0.9, 0.9, 0.9, 1];
+            settingsManager.trusatImages = true;
+            settingsManager.tleSource = 'tle/trusat.json';
+            break;
+          case 'cpo':
+            settingsManager.copyrightOveride = true;
+            break;
+          case 'logo':
+            settingsManager.isShowLogo = true;
+            break;
+          case 'noPropRate':
+            settingsManager.isAlwaysHidePropRate = true;
+            break;
+        }
       }
+    })();
+  }
+
+  // Load the previously saved map
+  if (settingsManager.isLoadLastMap && !settingsManager.isDrawLess) {
+    let lastMap = localStorage.getItem('lastMap');
+    switch (lastMap) {
+      case 'blue':
+        settingsManager.blueImages = true;
+        break;
+      case 'nasa':
+        settingsManager.nasaImages = true;
+        break;
+      case 'low':
+        settingsManager.lowresImages = true;
+        break;
+      case 'trusat':
+        settingsManager.trusatImages = true;
+        break;
+      case 'high':
+        settingsManager.hiresImages = true;
+        break;
+      case 'high-nc':
+        settingsManager.hiresNoCloudsImages = true;
+        break;
+      case 'vec':
+        settingsManager.vectorImages = true;
+        break;
+      default:
+        settingsManager.lowresImages = true;
+        break;
     }
-  })();
-}
-
-// Load the previously saved map
-if (settingsManager.isLoadLastMap && !settingsManager.isDrawLess) {
-  let lastMap = localStorage.getItem('lastMap');
-  switch (lastMap) {
-    case 'blue':
-      settingsManager.blueImages = true;
-      break;
-    case 'nasa':
-      settingsManager.nasaImages = true;
-      break;
-    case 'low':
-      settingsManager.lowresImages = true;
-      break;
-    case 'trusat':
-      settingsManager.trusatImages = true;
-      break;
-    case 'high':
-      settingsManager.hiresImages = true;
-      break;
-    case 'high-nc':
-      settingsManager.hiresNoCloudsImages = true;
-      break;
-    case 'vec':
-      settingsManager.vectorImages = true;
-      break;
-    default:
-      settingsManager.lowresImages = true;
-      break;
   }
-}
 
-// Make sure there is some map loaded!
-if (!settingsManager.smallImages && !settingsManager.nasaImages && !settingsManager.blueImages && !settingsManager.lowresImages && !settingsManager.hiresImages && !settingsManager.hiresNoCloudsImages && !settingsManager.vectorImages) {
-  settingsManager.lowresImages = true;
-}
-
-//Global Debug Manager
-let db = {};
-{
-  try {
-    db = JSON.parse(localStorage.getItem('db'));
-    if (db == null) throw new Error('Reload Debug Manager');
-    if (typeof db.enabled == 'undefined') throw new Error('Reload Debug Manager');
-  } catch (e) {
-    db = {};
-    db.enabled = false;
-    db.verbose = false;
-    localStorage.setItem('db', JSON.stringify(db));
+  // Make sure there is some map loaded!
+  if (!settingsManager.smallImages && !settingsManager.nasaImages && !settingsManager.blueImages && !settingsManager.lowresImages && !settingsManager.hiresImages && !settingsManager.hiresNoCloudsImages && !settingsManager.vectorImages) {
+    settingsManager.lowresImages = true;
   }
-  db.init = (function () {
-    db.log = function (message, isVerbose) {
-      // Don't Log Verbose Stuff Normally
-      if (isVerbose && !db.verbose) return;
 
-      // If Logging is Enabled - Log It
-      if (db.enabled) {
-        console.log(message);
-      }
-    };
-    db.on = function () {
-      db.enabled = true;
-      console.log('db is now on!');
-      localStorage.setItem('db', JSON.stringify(db));
-    };
-    db.off = function () {
+  //Global Debug Manager
+  {
+    try {
+      db = JSON.parse(localStorage.getItem('db'));
+      if (db == null) throw new Error('Reload Debug Manager');
+      if (typeof db.enabled == 'undefined') throw new Error('Reload Debug Manager');
+    } catch (e) {
+      db = {};
       db.enabled = false;
-      console.log('db is now off!');
+      db.verbose = false;
       localStorage.setItem('db', JSON.stringify(db));
-    };
-  })();
-  db.gremlinsSettings = {};
-  db.gremlinsSettings.nb = 100000;
-  db.gremlinsSettings.delay = 5;
-  db.gremlins = () => {
-    $('#nav-footer').height(200);
-    $('#nav-footer-toggle').hide();
-    $('#bottom-icons-container').height(200);
-    $('#bottom-icons').height(200);
-    let startGremlins = () => {
-      const bottomMenuGremlinClicker = gremlins.species.clicker({
-        // Click only if parent is has class test-class
-        canClick: (element) => {
-          if (typeof element.parentElement == 'undefined' || element.parentElement == null) return null;
-          return element.parentElement.className === 'bmenu-item';
-        },
-        defaultPositionSelector: () => {
-          [
-            randomizer.natural({
-              max: Math.max(0, document.documentElement.clientWidth - 1),
-            }),
-            randomizer.natural({
-              min: Math.max(0, document.documentElement.clientHeight - 100),
-              max: Math.max(0, document.documentElement.clientHeight - 1),
-            }),
-          ];
-        },
-      });
-      const bottomMenuGremlinScroller = gremlins.species.toucher({
-        touchTypes: ['gesture'],
-        defaultPositionSelector: () => {
-          [
-            randomizer.natural({
-              max: Math.max(0, document.documentElement.clientWidth - 1),
-            }),
-            randomizer.natural({
-              min: Math.max(0, document.documentElement.clientHeight - 100),
-              max: Math.max(0, document.documentElement.clientHeight - 1),
-            }),
-          ];
-        },
-      });
-      const distributionStrategy = gremlins.strategies.distribution({
-        distribution: [0.3, 0.3, 0.1, 0.1, 0.1, 0.1], // the first three gremlins have more chances to be executed than the last
-        delay: 5, // wait 5 ms between each action
-      });
-      gremlins
-        .createHorde({
-          species: [
-            bottomMenuGremlinClicker,
-            bottomMenuGremlinScroller,
-            // gremlins.species.scroller(),
-            gremlins.species.clicker(),
-            gremlins.species.toucher(),
-            gremlins.species.formFiller(),
-            gremlins.species.typer(),
-          ],
-          mogwais: [gremlins.mogwais.alert(), gremlins.mogwais.fps(), gremlins.mogwais.gizmo({ maxErrors: 1000 })],
-          strategies: [distributionStrategy],
-        })
-        .unleash();
-      return;
-    };
-    if (typeof gremlins == 'undefined') {
-      var s = document.createElement('script');
-      s.src = 'https://unpkg.com/gremlins.js';
-      if (s.addEventListener) {
-        s.addEventListener('load', startGremlins, false);
-      } else if (s.readyState) {
-        s.onreadystatechange = startGremlins;
-      }
-      document.body.appendChild(s);
-    } else {
-      startGremlins();
     }
-  };
-}
+    db.init = (function () {
+      db.log = function (message, isVerbose) {
+        // Don't Log Verbose Stuff Normally
+        if (isVerbose && !db.verbose) return;
 
-// Try to Make Older Versions of Jquery Work
-if (typeof window.$ == 'undefined') {
-  if (typeof window.jQuery !== 'undefined') {
-    window.$ = window.jQuery;
+        // If Logging is Enabled - Log It
+        if (db.enabled) {
+          console.log(message);
+        }
+      };
+      db.on = function () {
+        db.enabled = true;
+        console.log('db is now on!');
+        localStorage.setItem('db', JSON.stringify(db));
+      };
+      db.off = function () {
+        db.enabled = false;
+        console.log('db is now off!');
+        localStorage.setItem('db', JSON.stringify(db));
+      };
+    })();
+    db.gremlinsSettings = {};
+    db.gremlinsSettings.nb = 100000;
+    db.gremlinsSettings.delay = 5;
+    db.gremlins = () => {
+      $('#nav-footer').height(200);
+      $('#nav-footer-toggle').hide();
+      $('#bottom-icons-container').height(200);
+      $('#bottom-icons').height(200);
+      let startGremlins = () => {
+        const bottomMenuGremlinClicker = gremlins.species.clicker({
+          // Click only if parent is has class test-class
+          canClick: (element) => {
+            if (typeof element.parentElement == 'undefined' || element.parentElement == null) return null;
+            return element.parentElement.className === 'bmenu-item';
+          },
+          defaultPositionSelector: () => {
+            [
+              randomizer.natural({
+                max: Math.max(0, document.documentElement.clientWidth - 1),
+              }),
+              randomizer.natural({
+                min: Math.max(0, document.documentElement.clientHeight - 100),
+                max: Math.max(0, document.documentElement.clientHeight - 1),
+              }),
+            ];
+          },
+        });
+        const bottomMenuGremlinScroller = gremlins.species.toucher({
+          touchTypes: ['gesture'],
+          defaultPositionSelector: () => {
+            [
+              randomizer.natural({
+                max: Math.max(0, document.documentElement.clientWidth - 1),
+              }),
+              randomizer.natural({
+                min: Math.max(0, document.documentElement.clientHeight - 100),
+                max: Math.max(0, document.documentElement.clientHeight - 1),
+              }),
+            ];
+          },
+        });
+        const distributionStrategy = gremlins.strategies.distribution({
+          distribution: [0.3, 0.3, 0.1, 0.1, 0.1, 0.1], // the first three gremlins have more chances to be executed than the last
+          delay: 5, // wait 5 ms between each action
+        });
+        gremlins
+          .createHorde({
+            species: [
+              bottomMenuGremlinClicker,
+              bottomMenuGremlinScroller,
+              // gremlins.species.scroller(),
+              gremlins.species.clicker(),
+              gremlins.species.toucher(),
+              gremlins.species.formFiller(),
+              gremlins.species.typer(),
+            ],
+            mogwais: [gremlins.mogwais.alert(), gremlins.mogwais.fps(), gremlins.mogwais.gizmo({ maxErrors: 1000 })],
+            strategies: [distributionStrategy],
+          })
+          .unleash();
+        return;
+      };
+      if (typeof gremlins == 'undefined') {
+        var s = document.createElement('script');
+        s.src = 'https://unpkg.com/gremlins.js';
+        if (s.addEventListener) {
+          s.addEventListener('load', startGremlins, false);
+        } else if (s.readyState) {
+          s.onreadystatechange = startGremlins;
+        }
+        document.body.appendChild(s);
+      } else {
+        startGremlins();
+      }
+    };
   }
-}
 
-// Import CSS needed for loading screen
-if (!settingsManager.disableUI) {
-  import('@app/css/fonts.css').then((resp) => resp);
-  import('@app/css/materialize.css').then((resp) => resp);
-  import('@app/css/materialize-local.css').then((resp) => resp);
-  import('@app/js/lib/external/colorPick.css').then((resp) => resp);
-  import('@app/css/perfect-scrollbar.min.css').then((resp) => resp);
-  import('@app/css/jquery-ui.min.css').then((resp) => resp);
-  import('@app/css/jquery-ui-timepicker-addon.css').then((resp) => resp);
-  import('@app/css/style.css').then(import('@app/css/responsive.css').then((resp) => resp));
-} else if (settingsManager.enableLimitedUI) {
-  import('@app/css/limitedUI.css').then((resp) => resp);
-} else {
-  // console.log('ERROR');
-}
+  // Try to Make Older Versions of Jquery Work
+  if (typeof window.$ == 'undefined') {
+    if (typeof window.jQuery !== 'undefined') {
+      window.$ = window.jQuery;
+    }
+  }
+
+  // Import CSS needed for loading screen
+  if (!settingsManager.disableUI) {
+    import('@app/css/fonts.css').then((resp) => resp);
+    import('@app/css/materialize.css').then((resp) => resp);
+    import('@app/css/materialize-local.css').then((resp) => resp);
+    import('@app/js/lib/external/colorPick.css').then((resp) => resp);
+    import('@app/css/perfect-scrollbar.min.css').then((resp) => resp);
+    import('@app/css/jquery-ui.min.css').then((resp) => resp);
+    import('@app/css/jquery-ui-timepicker-addon.css').then((resp) => resp);
+    import('@app/css/style.css').then(import('@app/css/responsive.css').then((resp) => resp));
+  } else if (settingsManager.enableLimitedUI) {
+    import('@app/css/limitedUI.css').then((resp) => resp);
+  } else {
+    // console.log('ERROR');
+  }
+};
+
+settingsManager.init();
 
 // Expose these to the console
 window.settingsManager = settingsManager;

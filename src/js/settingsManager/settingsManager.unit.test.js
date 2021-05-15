@@ -8,7 +8,7 @@
   expect
 */
 
-import { db } from './settingsManager';
+import { db, settingsManager } from './settingsManager';
 
 const setUrl = (url) => {
   const host = url.split('/')[2] || '';
@@ -38,7 +38,7 @@ describe('settingsManager URL Test', () => {
         setUrl(url);
         break;
       case 1:
-        url = 'http://www.keeptrack.space';
+        url = 'http://www.keeptrack.space?draw-less&draw-more&vec&retro&offline&debris&mw&trusat';
         setUrl(url);
         break;
       case 2:
@@ -88,6 +88,7 @@ describe('settingsManager URL Test', () => {
     testCaseNum++;
     setUrl(url);
     import('@app/js/settingsManager/settingsManager.js');
+    settingsManager.init();
   });
 
   test('http://keeptrack.space', () => {
@@ -119,8 +120,6 @@ describe('settingsManager URL Test', () => {
 
   test('Unknown Host - http://random.com', () => {
     expect(settingsManager.installDirectory).toBe('/');
-    expect(settingsManager.offline).toBe(undefined);
-    expect(settingsManager.breakTheLaw).toBe(undefined);
   });
 
   test('embed.html', () => {
@@ -167,5 +166,10 @@ describe('settingsManager URL Test', () => {
     db.on();
     db.log('test');
     db.log('test', true);
+  });
+
+  test('Other SettingsManager Tests', () => {
+    window.innerWidth = 100;
+    settingsManager.init();
   });
 });

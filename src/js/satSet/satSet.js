@@ -6,7 +6,7 @@
  * It manages all interaction with the satellite catalogue.
  * http://keeptrack.space
  *
- * Copyright (C) 2016-2020 Theodore Kruczek
+ * Copyright (C) 2016-2021 Theodore Kruczek
  * Copyright (C) 2020 Heather Kruczek
  * Copyright (C) 2015-2016, James Yoder
  *
@@ -34,7 +34,7 @@ import { jsTLEfile } from '@app/offline/tle.js';
 import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
-import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
+// import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
@@ -145,7 +145,7 @@ satSet.init = async (glRef, dotManagerRef, cameraManager) => {
   addSatCruncherOnMessage(cameraManager);
 
   satSet.satCruncher = satCruncher;
-  satSet.radarDataManager = radarDataManager;
+  // satSet.radarDataManager = radarDataManager;
 };
 
 /* istanbul ignore next */
@@ -532,75 +532,23 @@ satSet.setupGetVariables = () => {
         $('#limitSats-Label').addClass('active');
         limitSatsArray = val.split(',');
         break;
-      case 'lat':
-        if (val >= -90 && val <= 90) obslatitude = val;
-        break;
-      case 'long':
-        if (val >= -180 && val <= 360) obslongitude = val;
-        break;
-      case 'hei':
-        if (val >= -20 && val <= 20) obsheight = val;
-        break;
-      case 'minaz':
-        if (val >= 0 && val <= 360) obsminaz = val;
-        break;
-      case 'maxaz':
-        if (val >= 0 && val <= 360) obsmaxaz = val;
-        break;
-      case 'minel':
-        if (val >= -10 && val <= 180) obsminel = val;
-        break;
-      case 'maxel':
-        if (val >= -10 && val <= 180) obsmaxel = val;
-        break;
-      case 'minrange':
-        if (val >= 0) obsminrange = val;
-        break;
-      case 'maxrange':
-        if (val <= 10000000) obsmaxrange = val;
-        break;
     }
   }
 
-  /** If custom sensor set then send parameters to lookangles and satCruncher */
-  if (
-    typeof obslatitude !== 'undefined' &&
-    typeof obslongitude !== 'undefined' &&
-    typeof obsheight !== 'undefined' &&
-    typeof obsminaz !== 'undefined' &&
-    typeof obsmaxaz !== 'undefined' &&
-    typeof obsminel !== 'undefined' &&
-    typeof obsmaxel !== 'undefined' &&
-    typeof obsminrange !== 'undefined' &&
-    typeof obsmaxrange !== 'undefined'
-  ) {
-    satellite.setobs({
-      lat: obslatitude,
-      long: obslongitude,
-      obshei: obsheight,
-      obsminaz: obsminaz,
-      obsmaxaz: obsmaxaz,
-      obsminel: obsminel,
-      obsmaxel: obsmaxel,
-      obsminrange: obsminrange,
-      obsmaxrange: obsmaxrange,
-    });
-
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-      setlatlong: true,
-      lat: obslatitude,
-      long: obslongitude,
-      obshei: obsheight,
-      obsminaz: obsminaz,
-      obsmaxaz: obsmaxaz,
-      obsminel: obsminel,
-      obsmaxel: obsmaxel,
-      obsminrange: obsminrange,
-      obsmaxrange: obsmaxrange,
-    });
-  }
+  satCruncher.postMessage({
+    typ: 'offset',
+    dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
+    setlatlong: true,
+    lat: obslatitude,
+    long: obslongitude,
+    obshei: obsheight,
+    obsminaz: obsminaz,
+    obsmaxaz: obsmaxaz,
+    obsminel: obsminel,
+    obsmaxel: obsmaxel,
+    obsminrange: obsminrange,
+    obsmaxrange: obsmaxrange,
+  });
 
   return limitSatsArray;
 };
@@ -820,7 +768,7 @@ satSet.filterTLEDatabase = (resp, limitSatsArray) => {
     tempSatData.push(objectManager.analSatSet[i]);
   }
 
-  radarDataManager.satDataStartIndex = tempSatData.length + 1;
+  // radarDataManager.satDataStartIndex = tempSatData.length + 1;
 
   for (let i = 0; i < objectManager.radarDataSet.length; i++) {
     tempSatData.push(objectManager.radarDataSet[i]);
@@ -1063,28 +1011,27 @@ satSet.insertNewAnalystSatellite = (TLE1, TLE2, analsat) => {
   }
 };
 
-/* istanbul ignore next */
-satSet.updateRadarData = () => {
-  for (let i = 0; i < radarDataManager.radarData.length; i++) {
-    try {
-      satData[radarDataManager.satDataStartIndex + i].isRadarData = true;
-      satData[radarDataManager.satDataStartIndex + i].mId = parseInt(radarDataManager.radarData[i].m);
-      satData[radarDataManager.satDataStartIndex + i].t = radarDataManager.radarData[i].t;
-      satData[radarDataManager.satDataStartIndex + i].rcs = parseInt(radarDataManager.radarData[i].rc);
-      satData[radarDataManager.satDataStartIndex + i].trackId = parseInt(radarDataManager.radarData[i].ti);
-      satData[radarDataManager.satDataStartIndex + i].objectId = parseInt(radarDataManager.radarData[i].oi);
-      satData[radarDataManager.satDataStartIndex + i].satId = parseInt(radarDataManager.radarData[i].si);
-      satData[radarDataManager.satDataStartIndex + i].missileComplex = parseInt(radarDataManager.radarData[i].mc);
-      satData[radarDataManager.satDataStartIndex + i].missileObject = parseInt(radarDataManager.radarData[i].mo);
-      satData[radarDataManager.satDataStartIndex + i].azError = radarDataManager.radarData[i].ae;
-      satData[radarDataManager.satDataStartIndex + i].elError = radarDataManager.radarData[i].ee;
-      satData[radarDataManager.satDataStartIndex + i].dataType = radarDataManager.radarData[i].dataType;
-    } catch (e) {
-      // console.log(radarDataManager.radarData[i]);
-    }
-  }
-  satSet.setColorScheme(settingsManager.currentColorScheme, true);
-};
+// satSet.updateRadarData = () => {
+//   for (let i = 0; i < radarDataManager.radarData.length; i++) {
+//     try {
+//       satData[radarDataManager.satDataStartIndex + i].isRadarData = true;
+//       satData[radarDataManager.satDataStartIndex + i].mId = parseInt(radarDataManager.radarData[i].m);
+//       satData[radarDataManager.satDataStartIndex + i].t = radarDataManager.radarData[i].t;
+//       satData[radarDataManager.satDataStartIndex + i].rcs = parseInt(radarDataManager.radarData[i].rc);
+//       satData[radarDataManager.satDataStartIndex + i].trackId = parseInt(radarDataManager.radarData[i].ti);
+//       satData[radarDataManager.satDataStartIndex + i].objectId = parseInt(radarDataManager.radarData[i].oi);
+//       satData[radarDataManager.satDataStartIndex + i].satId = parseInt(radarDataManager.radarData[i].si);
+//       satData[radarDataManager.satDataStartIndex + i].missileComplex = parseInt(radarDataManager.radarData[i].mc);
+//       satData[radarDataManager.satDataStartIndex + i].missileObject = parseInt(radarDataManager.radarData[i].mo);
+//       satData[radarDataManager.satDataStartIndex + i].azError = radarDataManager.radarData[i].ae;
+//       satData[radarDataManager.satDataStartIndex + i].elError = radarDataManager.radarData[i].ee;
+//       satData[radarDataManager.satDataStartIndex + i].dataType = radarDataManager.radarData[i].dataType;
+//     } catch (e) {
+//       // console.log(radarDataManager.radarData[i]);
+//     }
+//   }
+//   satSet.setColorScheme(settingsManager.currentColorScheme, true);
+// };
 
 satSet.setSat = (i, satObject) => {
   if (!satData) return null;
@@ -1093,7 +1040,9 @@ satSet.setSat = (i, satObject) => {
 };
 satSet.mergeSat = (satObject) => {
   if (!satData) return null;
-  var i = satSet.getIdFromObjNum(satObject.SCC);
+  const satId = satObject.SCC || satObject.SCC_NUM || -1;
+  if (satId === -1) return;
+  var i = satSet.getIdFromObjNum(satId);
   satData[i].ON = satObject.ON;
   satData[i].C = satObject.C;
   satData[i].LV = satObject.LV;
@@ -1851,7 +1800,7 @@ satSet.selectSat = (i) => {
   $('#menu-breakup').removeClass('bmenu-item-disabled');
 };
 
-satSet.findRadarDataFirstDataTime = () => radarDataManager.findFirstDataTime();
+// satSet.findRadarDataFirstDataTime = () => radarDataManager.findFirstDataTime();
 
 satSet.onCruncherReady = () => {
   satSet.queryStr = window.location.search.substring(1);

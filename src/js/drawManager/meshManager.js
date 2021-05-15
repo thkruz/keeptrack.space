@@ -35,8 +35,8 @@ meshManager.init = async (glRef, earthRef) => {
         // console.log("Mesh:", mesh);
       }
       meshManager.meshes = models;
-      initShaders();
-      initBuffers();
+      meshManager.initShaders();
+      meshManager.initBuffers();
       meshManager.isReady = true;
     });
   } catch (error) {
@@ -58,7 +58,7 @@ meshManager.populateFileList = () => {
   }
 };
 
-var initShaders = () => {
+meshManager.initShaders = () => {
   // meshManager.vao = gl.createVertexArray();
   // gl.bindVertexArray(meshManager.vao);
 
@@ -143,7 +143,7 @@ var initShaders = () => {
     }
   };
 };
-var initBuffers = () => {
+meshManager.initBuffers = () => {
   var layout = new OBJ.Layout(OBJ.Layout.POSITION, OBJ.Layout.NORMAL, OBJ.Layout.AMBIENT, OBJ.Layout.DIFFUSE, OBJ.Layout.UV, OBJ.Layout.SPECULAR, OBJ.Layout.SPECULAR_EXPONENT);
 
   // initialize the mesh's buffers

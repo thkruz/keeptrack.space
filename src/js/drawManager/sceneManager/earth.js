@@ -151,19 +151,19 @@ earth.init = async (glRef) => {
       img.src = 'textures/earthmap512.jpg';
 
       earth.loadHiRes = async () => {
-        var imgHiRes = new Image();
-        imgHiRes.src = 'textures/earthmap4k.jpg';
-        if (settingsManager.smallImages) imgHiRes.src = 'textures/earthmap512.jpg';
-        if (settingsManager.nasaImages) imgHiRes.src = 'textures/mercator-tex.jpg';
+        earth.imgHiRes = new Image();
+        earth.imgHiRes.src = 'textures/earthmap4k.jpg';
+        if (settingsManager.smallImages) earth.imgHiRes.src = 'textures/earthmap512.jpg';
+        if (settingsManager.nasaImages) earth.imgHiRes.src = 'textures/mercator-tex.jpg';
         if (settingsManager.trusatImages) img.src = 'textures/trusatvector-4096.jpg';
-        if (settingsManager.blueImages) imgHiRes.src = 'textures/world_blue-2048.png';
-        if (settingsManager.vectorImages) imgHiRes.src = 'textures/dayearthvector-4096.jpg';
-        if (settingsManager.hiresImages) imgHiRes.src = 'textures/earthmap16k.jpg';
-        if (settingsManager.hiresNoCloudsImages) imgHiRes.src = 'textures/earthmap16k.jpg';
+        if (settingsManager.blueImages) earth.imgHiRes.src = 'textures/world_blue-2048.png';
+        if (settingsManager.vectorImages) earth.imgHiRes.src = 'textures/dayearthvector-4096.jpg';
+        if (settingsManager.hiresImages) earth.imgHiRes.src = 'textures/earthmap16k.jpg';
+        if (settingsManager.hiresNoCloudsImages) earth.imgHiRes.src = 'textures/earthmap16k.jpg';
         earth.isUseHiRes = true;
-        imgHiRes.onload = function () {
+        earth.imgHiRes.onload = function () {
           gl.bindTexture(gl.TEXTURE_2D, texture);
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgHiRes);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.imgHiRes);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
@@ -181,10 +181,10 @@ earth.init = async (glRef) => {
     // Night Color Texture
     {
       nightTexture = gl.createTexture();
-      var nightImg = new Image();
-      nightImg.onload = function () {
+      earth.nightImg = new Image();
+      earth.nightImg.onload = function () {
         gl.bindTexture(gl.TEXTURE_2D, nightTexture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImg);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.nightImg);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
@@ -196,16 +196,16 @@ earth.init = async (glRef) => {
         nightLoaded = true;
         onImageLoaded();
       };
-      nightImg.src = 'textures/earthlights512.jpg';
+      earth.nightImg.src = 'textures/earthlights512.jpg';
 
       earth.loadHiResNight = async () => {
-        var nightImgHiRes = new Image();
-        if (!settingsManager.smallImages) nightImgHiRes.src = 'textures/earthlights4k.jpg';
-        if (settingsManager.vectorImages) nightImgHiRes.src = 'textures/dayearthvector-4096.jpg';
-        if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) nightImgHiRes.src = 'textures/earthlights16k.jpg';
-        nightImgHiRes.onload = function () {
+        earth.nightImgHiRes = new Image();
+        if (!settingsManager.smallImages) earth.nightImgHiRes.src = 'textures/earthlights4k.jpg';
+        if (settingsManager.vectorImages) earth.nightImgHiRes.src = 'textures/dayearthvector-4096.jpg';
+        if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) earth.nightImgHiRes.src = 'textures/earthlights16k.jpg';
+        earth.nightImgHiRes.onload = function () {
           gl.bindTexture(gl.TEXTURE_2D, nightTexture);
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, nightImgHiRes);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.nightImgHiRes);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);

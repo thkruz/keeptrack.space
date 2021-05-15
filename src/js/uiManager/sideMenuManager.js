@@ -1045,39 +1045,39 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
 
       let launchTime = timeManager.selectedDate * 1;
 
-      if (type > 0) {
-        let sim = '';
-        if (type === 1) {
-          sim = 'simulation/Russia2USA.json';
-          missileManager.MassRaidPre(launchTime, sim);
-        }
-        if (type === 2) {
-          sim = 'simulation/Russia2USAalt.json';
-          missileManager.MassRaidPre(launchTime, sim);
-        }
-        if (type === 3) {
-          sim = 'simulation/China2USA.json';
-          missileManager.MassRaidPre(launchTime, sim);
-        }
-        if (type === 4) {
-          sim = 'simulation/NorthKorea2USA.json';
-          missileManager.MassRaidPre(launchTime, sim);
-        }
-        if (type === 5) {
-          sim = 'simulation/USA2Russia.json';
-          missileManager.MassRaidPre(launchTime, sim);
-        }
-        if (type === 6) {
-          sim = 'simulation/USA2China.json';
-          missileManager.MassRaidPre(launchTime, sim);
-        }
-        if (type === 7) {
-          sim = 'simulation/USA2NorthKorea.json';
-          missileManager.MassRaidPre(launchTime, sim);
-        }
-        // if (settingsManager.isOfficialWebsite) ga('send','event','Missile Sim',type,'Sim Number');
+      let sim = '';
+      if (type === 1) {
+        sim = 'simulation/Russia2USA.json';
+        missileManager.MassRaidPre(launchTime, sim);
+      }
+      if (type === 2) {
+        sim = 'simulation/Russia2USAalt.json';
+        missileManager.MassRaidPre(launchTime, sim);
+      }
+      if (type === 3) {
+        sim = 'simulation/China2USA.json';
+        missileManager.MassRaidPre(launchTime, sim);
+      }
+      if (type === 4) {
+        sim = 'simulation/NorthKorea2USA.json';
+        missileManager.MassRaidPre(launchTime, sim);
+      }
+      if (type === 5) {
+        sim = 'simulation/USA2Russia.json';
+        missileManager.MassRaidPre(launchTime, sim);
+      }
+      if (type === 6) {
+        sim = 'simulation/USA2China.json';
+        missileManager.MassRaidPre(launchTime, sim);
+      }
+      if (type === 7) {
+        sim = 'simulation/USA2NorthKorea.json';
+        missileManager.MassRaidPre(launchTime, sim);
+      }
+      if (type !== 0) {
         uiManager.toast(`${sim} Loaded`, 'standby', true);
-      } else {
+      }
+      if (type === 0) {
         if (target === -1) {
           // Custom Target
           if (isNaN(tgtLat)) {

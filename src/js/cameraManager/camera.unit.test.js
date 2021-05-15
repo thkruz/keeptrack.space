@@ -141,3 +141,16 @@ test(`normalizeAngle`, () => {
   expect(Camera.normalizeAngle(-3.16)).toStrictEqual(3.123185307179586);
   expect(Camera.normalizeAngle(6.2)).toStrictEqual(-0.08318530717958605);
 });
+
+test(`panning/rotate`, () => {
+  cameraManager.isPanning = true;
+  cameraManager.panReset = true;
+  cameraManager.isLocalRotate = true;
+  cameraManager.isLocalRotateRoll = true;
+  cameraManager.isLocalRotateYaw = true;
+  settingsManager.isMobileModeEnabled = false;
+  settingsManager.ftsRotateReset = true;
+  cameraManager.calculate(1, 1);
+
+  cameraManager.update();
+});

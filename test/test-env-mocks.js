@@ -50,6 +50,7 @@ global.mocks.glMock = {
   disable: jest.fn(),
   scissor: jest.fn(),
   bufferSubData: jest.fn(),
+  generateMipmap: jest.fn(),
 };
 
 // mock_requestAnimationFrame.js

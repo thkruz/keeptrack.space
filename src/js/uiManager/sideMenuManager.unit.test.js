@@ -20,7 +20,7 @@ test(`sMM Unit Testing`, () => {
     setColorScheme: jest.fn(),
     searchN2yo: jest.fn(),
     searchCelestrak: jest.fn(),
-    getIdFromObjNum: jest.fn(() => null),
+    getIdFromObjNum: jest.fn(() => satSet.getSatExtraOnly()),
     getSatExtraOnly: () => ({
       SCC_NUM: 25544,
       eccentricity: 0.01,
@@ -112,6 +112,7 @@ test(`sMM Unit Testing`, () => {
     missilesInUse: 500,
     Missile: jest.fn(),
     UsaICBM: [1, 1, 1, 1],
+    globalBMTargets: [1, 1, 1, 1],
   };
 
   $.colorbox = jest.fn();
@@ -149,6 +150,7 @@ test(`sMM Unit Testing`, () => {
 
   $('#editSat-newTLE').trigger('click');
 
+  $('#es-error').val('25544');
   $('#editSat').trigger('submit');
 
   $('#editSat-save').trigger('click');

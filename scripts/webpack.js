@@ -1,7 +1,11 @@
 /* eslint-disable */
 var webpack = require('webpack');
+var glob = require('glob');
+
+const MAKE_MODE = process.env.NODE_ENV == 'test' || process.env.NODE_ENV == 'development' ? 'development' : 'production';
 
 let config = {
+  mode: MAKE_MODE,
   module: {
     rules: [
       {
@@ -36,16 +40,30 @@ let config = {
       'windows.jQuery': 'jquery',
     }),
   ],
-  optimization: {
-    minimize: true,
-  },
   ignoreWarnings: [/asset size limit/, /combined asset size exceeds the recommended limit/],
   stats: 'minimal',
 };
 
-var jsConfig = Object.assign({}, config, {
-  name: 'jsConfig',
-  mode: 'production',
+if (MAKE_MODE == 'development') {
+  Object.assign(config, {
+    // devtool: 'inline-source-map',
+    devtool: 'source-map',
+    optimization: {
+      minimize: false,
+    },
+  });
+}
+
+if (MAKE_MODE == 'production') {
+  Object.assign(config, {
+    optimization: {
+      minimize: true,
+    },
+  });
+}
+
+let jsConfig = Object.assign({}, config, {
+  name: 'MainFiles',
   entry: {
     main: ['./src/js/main.js'],
     positionCruncher: ['./src/js/webworker/positionCruncher.js'],
@@ -57,12 +75,29 @@ var jsConfig = Object.assign({}, config, {
       '@app': __dirname + '/../src',
     },
   },
-  devtool: 'source-map',
   output: {
     filename: '[name].js',
     path: __dirname + '/../dist/js',
+    publicPath: './js/',
+  },
+});
+
+let jsConfig2 = Object.assign({}, config, {
+  name: 'Libraries',
+  entry: {
+    'analysis-tools': ['./src/analysis/js/analysis-tools.js'],
+  },
+  resolve: {
+    alias: {
+      '@app': __dirname + '/../src',
+    },
+  },
+  output: {
+    filename: '[name].js',
+    path: __dirname + '/../dist/analysis/js/',
+    publicPath: './js/',
   },
 });
 
 // Return Array of Configurations
-module.exports = [jsConfig];
+module.exports = [jsConfig, jsConfig2];

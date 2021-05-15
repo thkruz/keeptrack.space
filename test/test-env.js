@@ -49,6 +49,9 @@ window.jQuery = $;
 $.colorbox = {
   close: jest.fn(),
 };
+
+$.fn.replace = (input, output) => $.fn.toString().replace(input, output);
+
 $.fn.colorbox = jest.fn();
 $.fn.effect = jest.fn();
 $.fn.tooltip = jest.fn();

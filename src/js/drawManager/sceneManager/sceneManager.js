@@ -2,7 +2,7 @@
  * /*
  * // /////////////////////////////////////////////////////////////////////////////
  *
- * Copyright (C) 2016-2020 Theodore Kruczek
+ * Copyright (C) 2016-2021 Theodore Kruczek
  * Copyright (C) 2020 Heather Kruczek
  *
  * This program is free software: you can redistribute it and/or modify it under

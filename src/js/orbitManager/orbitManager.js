@@ -315,6 +315,34 @@ var allocateBuffer = () => {
   return buf;
 };
 
+orbitManager.playNextSatellite = (runCount, year) => {
+  if (!orbitManager.isTimeMachineVisible) return;
+  // Kill all old async calls if run count updates
+  if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
+  let yearGroup = groupsManager.createGroup('yearOrLess', year);
+  // groupsManager.selectGroupNoOverlay(yearGroup);
+  groupsManager.selectGroup(yearGroup, orbitManager);
+  yearGroup.updateOrbits(orbitManager, orbitManager);
+  satSet.setColorScheme(ColorScheme.group, true); // force color recalc
+  if (year >= 59 && year < 100) {
+    M.toast({ html: `Time Machine In Year 19${year}!` });
+  } else {
+    let yearStr = year < 10 ? `0${year}` : `${year}`;
+    M.toast({ html: `Time Machine In Year 20${yearStr}!` });
+  }
+
+  if (year == parseInt(new Date().getUTCFullYear().toString().slice(2, 4))) {
+    setTimeout(function () {
+      if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
+      if (!orbitManager.isTimeMachineVisible) return;
+      settingsManager.colors.transparent = orbitManager.tempTransColor;
+      orbitManager.isTimeMachineRunning = false;
+      groupsManager.clearSelect();
+      satSet.setColorScheme(ColorScheme.default, true); // force color recalc
+    }, 10000); // Linger for 10 seconds
+  }
+};
+
 // Used to kill old async calls
 orbitManager.historyOfSatellitesRunCount = 0;
 orbitManager.historyOfSatellitesPlay = () => {
@@ -328,31 +356,7 @@ orbitManager.historyOfSatellitesPlay = () => {
     setTimeout(
       // eslint-disable-next-line no-loop-func
       function (runCount) {
-        if (!orbitManager.isTimeMachineVisible) return;
-        // Kill all old async calls if run count updates
-        if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
-        let yearGroup = groupsManager.createGroup('yearOrLess', year);
-        // groupsManager.selectGroupNoOverlay(yearGroup);
-        groupsManager.selectGroup(yearGroup, orbitManager);
-        yearGroup.updateOrbits(orbitManager, orbitManager);
-        satSet.setColorScheme(ColorScheme.group, true); // force color recalc
-        if (year >= 59 && year < 100) {
-          M.toast({ html: `Time Machine In Year 19${year}!` });
-        } else {
-          let yearStr = year < 10 ? `0${year}` : `${year}`;
-          M.toast({ html: `Time Machine In Year 20${yearStr}!` });
-        }
-
-        if (year == parseInt(new Date().getUTCFullYear().toString().slice(2, 4))) {
-          setTimeout(function () {
-            if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
-            if (!orbitManager.isTimeMachineVisible) return;
-            settingsManager.colors.transparent = orbitManager.tempTransColor;
-            orbitManager.isTimeMachineRunning = false;
-            groupsManager.clearSelect();
-            satSet.setColorScheme(ColorScheme.default, true); // force color recalc
-          }, 10000); // Linger for 10 seconds
-        }
+        orbitManager.playNextSatellite(runCount, year);
       },
       settingsManager.timeMachineDelay * yy,
       orbitManager.historyOfSatellitesRunCount

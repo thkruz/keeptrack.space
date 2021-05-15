@@ -2,7 +2,7 @@
 
 http://keeptrack.space
 
-Copyright (C) 2016-2020 Theodore Kruczek
+Copyright (C) 2016-2021 Theodore Kruczek
 Copyright (C) 2020 Heather Kruczek
 Copyright (C) 2015-2016, James Yoder
 
@@ -141,16 +141,17 @@ uiManager.postStart = () => {
     try {
       const hoverboxDOM = document.createElement('DIV');
       hoverboxDOM.innerHTML = `
-      <div id="sat-hoverbox">
-        <span id="sat-hoverbox1"></span>
-        <br/>
-        <span id="sat-hoverbox2"></span>
-        <br/>
-        <span id="sat-hoverbox3"></span>
-      </div>`;
+        <div id="sat-hoverbox">
+          <span id="sat-hoverbox1"></span>
+          <br/>
+          <span id="sat-hoverbox2"></span>
+          <br/>
+          <span id="sat-hoverbox3"></span>
+        </div>`;
 
       document.getElementById('keeptrack-canvas').parentElement.append(hoverboxDOM);
     } catch {
+      /* istanbul ignore next */
       console.debug('document.createElement() failed!');
     }
   }
@@ -190,7 +191,7 @@ uiManager.searchToggle = function (force) {
     }, 500);
     uiManager.hideSideMenus();
     searchBox.hideResults();
-    $('#menu-space-stations').removeClass('bmenu-item-selected');
+    // $('#menu-space-stations').removeClass('bmenu-item-selected');
 
     // This is getting called too much. Not sure what it was meant to prevent?
     // satSet.setColorScheme(ColorScheme.default, true);
@@ -387,7 +388,8 @@ uiManager.keyHandler = (evt) => {
 };
 
 uiManager.hideLoadingScreen = () => {
-  if (drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) {
+  // Don't wait if we are running Jest
+  if ((drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) || typeof process !== 'undefined') {
     setTimeout(function () {
       uiManager.hideLoadingScreen();
     }, 100);
@@ -2446,7 +2448,7 @@ uiManager.onReady = () => {
       lastBoxUpdateTime = timeManager.now;
       uiManager.updateNextPassOverlay(true);
 
-      satSet.findRadarDataFirstDataTime();
+      // satSet.findRadarDataFirstDataTime();
 
       e.preventDefault();
     });

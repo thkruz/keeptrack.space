@@ -40,11 +40,12 @@ import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
 import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager.js';
+import { adviceList } from '@app/js/uiManager/ui-advice.js';
 import { drawManager } from '@app/js/drawManager/drawManager.js';
+import { meshManager } from '@app/js/drawManager/meshManager.js';
 import { jQAlt } from '@app/js/lib/jqalt.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
-// import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
@@ -54,6 +55,7 @@ import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 import { adviceManager } from '@app/js/uiManager/ui-advice.js';
+import { omManager } from '../src/js/uiManager/omManager';
 
 const eventFire = (elObj, etype) => {
   try {
@@ -73,8 +75,10 @@ const eventFire = (elObj, etype) => {
 // const flushPromises = () => new Promise(setImmediate);
 
 describe('Integration Testing', () => {
-  var lineManager, groupsManager, cameraManager;
+  var lineManager, groupsManager, cameraManager, gl, dotsManager;
   console.debug = jest.fn();
+  console.warn = jest.fn();
+  console.log = jest.fn();
   const exampleSat = {
     C: 'US',
     LS: 'AFETR',
@@ -100,11 +104,30 @@ describe('Integration Testing', () => {
       y: 4000,
       z: 4000,
     },
+    velocity: {
+      x: 7,
+      y: 7,
+      z: 7,
+      total: 14,
+    },
     raan: 0.2039103071690015,
     semiMajorAxis: 8622.494665143116,
     semiMinorAxis: 8473.945136538932,
-    velocity: {},
     getAltitude: () => 100,
+    getDirection: () => 'N',
+    isInSun: () => true,
+    getTEARR: () => {
+      const currentTEARR = {
+        lat: 0.1,
+        lon: 0.1,
+        alt: 50000,
+        az: 0,
+        el: 0,
+        rng: 0,
+      };
+      satellite.setTEARR(currentTEARR);
+      return currentTEARR;
+    },
   };
 
   test('main loading files', async () => {
@@ -114,10 +137,10 @@ describe('Integration Testing', () => {
     uiManager.mobileManager.init();
     cameraManager = new Camera();
     // We need to know if we are on a small screen before starting webgl
-    const gl = await drawManager.glInit();
+    gl = await drawManager.glInit();
     window.addEventListener('resize', drawManager.resizeCanvas);
     drawManager.loadScene();
-    const dotsManager = await drawManager.createDotsManager();
+    dotsManager = await drawManager.createDotsManager();
     satSet.init(gl, dotsManager, cameraManager);
     objectManager.init(sensorManager);
     await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
@@ -142,10 +165,20 @@ describe('Integration Testing', () => {
 
     uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, uiManager, drawManager, dotsManager);
 
-    await drawManager.init(groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
+    drawManager.init(groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
+
+    // Now that everything is loaded, start rendering to thg canvas
+    drawManager.drawLoop();
+
+    // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
+    uiManager.postStart();
     // /////////////////////////////////////////////////////////////////////
+
+    // Make testing go faster
+    satellite.lookanglesLength = 0.5;
   });
-  test('UI Manager Functional', () => {
+
+  test('UI Manager Functional 2', () => {
     adviceManager.onReady();
     uiManager.onReady();
 
@@ -163,11 +196,13 @@ describe('Integration Testing', () => {
     eventFire('reset-sensor-button', 'click');
     eventFire('search-results', 'click');
     eventFire('share-icon', 'click');
+    eventFire('share-icon', 'click');
     eventFire('fullscreen-icon', 'click');
     eventFire('nav-footer-toggle', 'click');
     eventFire('export-lookangles', 'click');
     eventFire('export-launch-info', 'click');
     eventFire('export-multiSiteArray', 'click');
+    eventFire('search-icon', 'click');
 
     eventFire('editSat-newTLE', 'click');
     // eventFire('editSat-save', 'click');
@@ -274,7 +309,7 @@ describe('Integration Testing', () => {
 
     uiManager.searchToggle();
     uiManager.searchToggle(true);
-    // uiManager.searchToggle(false);
+    uiManager.searchToggle(false);
 
     uiManager.keyHandler({ key: undefined });
     uiManager.keyHandler({ key: 'R' });
@@ -539,16 +574,16 @@ describe('Integration Testing', () => {
       },
     });
 
-    // uiManager.bottomIconPress({
-    //   currentTarget: {
-    //     id: 'menu-newLaunch',
-    //   },
-    // });
-    // uiManager.bottomIconPress({
-    //   currentTarget: {
-    //     id: 'menu-newLaunch',
-    //   },
-    // });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-newLaunch',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-newLaunch',
+      },
+    });
 
     uiManager.bottomIconPress({
       currentTarget: {
@@ -738,6 +773,17 @@ describe('Integration Testing', () => {
       cameraManager.cameraType.current++;
       cameraManager.update(exampleSat);
     }
+
+    cameraManager.camPitch = NaN;
+    cameraManager.update(exampleSat);
+
+    cameraManager.cameraType.current = cameraManager.cameraType.planetarium;
+    cameraManager.update(exampleSat);
+
+    cameraManager.cameraType.current = cameraManager.cameraType.satellite;
+    cameraManager.update(exampleSat);
+
+    // cameraManager.earthHitTest(gl, dotsManager, 1, 1);
   });
 
   test('Line Functional', () => {
@@ -768,6 +814,7 @@ describe('Integration Testing', () => {
     lineManager.draw();
   });
 
+  // Slower
   test('Star Manager Functional', () => {
     starManager.findStarsConstellation('Ursa Minor');
     starManager.drawAllConstellations();
@@ -775,6 +822,7 @@ describe('Integration Testing', () => {
     starManager.clearConstellations();
   });
 
+  // Fast
   test('Group Manager Functional', () => {
     groupsManager.createGroup('yearOrLess', 1965);
     groupsManager.createGroup('idList', [0]);
@@ -793,6 +841,7 @@ describe('Integration Testing', () => {
     testGroup.forEach(() => {});
   });
 
+  // Fast
   test('Camera Manager Functional', () => {
     Camera.longToYaw(60, new Date());
     Camera.latToPitch(60);
@@ -850,6 +899,7 @@ describe('Integration Testing', () => {
     cameraManager.getCamPos();
   });
 
+  // Fast
   test('satLinkManager Functional', () => {
     objectManager.satLinkManager.showLinks(lineManager, satSet, 'aehf');
     objectManager.satLinkManager.showLinks(lineManager, satSet, 'dscs');
@@ -860,6 +910,7 @@ describe('Integration Testing', () => {
     objectManager.satLinkManager.showLinks(lineManager, satSet, 'sbirs');
   });
 
+  // Slower
   test('Sensor Manager Functional', () => {
     sensorManager.sensorListLength();
     timeManager.propRate = 0;
@@ -874,6 +925,7 @@ describe('Integration Testing', () => {
     sensorManager.checkSensorSelected();
   });
 
+  // Slow
   test('Missile Manager Functional', () => {
     let sim = 'simulation/Russia2USA.json';
     missileManager.MassRaidPre(new Date(), sim);
@@ -888,7 +940,7 @@ describe('Integration Testing', () => {
     missileManager.Missile(0, 0, 40, -501, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
     missileManager.Missile(0, 0, 40, 501, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
 
-    console.error = jest.fn();
+    // console.error = jest.fn();
     missileManager.Missile(100, 0, 0, -71, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
     missileManager.Missile(-100, 0, 0, -71, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
     missileManager.Missile(0, 300, 40, 1, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
@@ -898,14 +950,90 @@ describe('Integration Testing', () => {
 
     missileManager.Missile(0, 0, 1, 1, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], null, null, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
     missileManager.Missile(0, 0, 0, 180, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], null, null, 0.07, 1000, 'United States', 13000);
+
+    $('#ms-type').val(0);
+    $('#ms-attacker').val(101);
+    $('#ms-lat-lau').val(0);
+    $('#ms-lon-lau').val(0);
+    $('#ms-target').val('-1');
+    $('#ms-lat').val(40);
+    $('#ms-lon').val(180);
+    eventFire('missile', 'submit');
+    $('#ms-attacker').val(201);
+    eventFire('missile', 'submit');
+    $('#ms-attacker').val(301);
+    eventFire('missile', 'submit');
+    $('#ms-attacker').val(401);
+    eventFire('missile', 'submit');
+    $('#ms-attacker').val(501);
+    eventFire('missile', 'submit');
+    $('#ms-attacker').val(601);
+    eventFire('missile', 'submit');
+    $('#ms-attacker').val(701);
+    eventFire('missile', 'submit');
+
+    $('#ms-type').val(1);
+    eventFire('missile', 'submit');
+    $('#ms-type').val(2);
+    eventFire('missile', 'submit');
+    $('#ms-type').val(3);
+    eventFire('missile', 'submit');
+    $('#ms-type').val(4);
+    eventFire('missile', 'submit');
+    $('#ms-type').val(5);
+    eventFire('missile', 'submit');
+    $('#ms-type').val(6);
+    eventFire('missile', 'submit');
+    $('#ms-type').val(7);
+    eventFire('missile', 'submit');
+
+    $('#ms-lat-lau').val('a');
+    eventFire('missile', 'submit');
+    $('#ms-lon-lau').val('a');
+    $('#ms-lat').val('a');
+    eventFire('missile', 'submit');
+    $('#ms-lon').val('a');
+    eventFire('missile', 'submit');
   });
 
+  // Average
   test('lookangles Functional Tests', () => {
     satellite.getlookangles(satSet.getSat(0));
     satellite.getlookanglesMultiSite(satSet.getSat(0));
     satellite.findCloseObjects();
+
+    satellite.map(exampleSat, 0);
+    satellite.eci2ll(5000, 5000, 5000);
+    satellite.getSunTimes(exampleSat);
+    satellite.getDOPs(0, 0, 0);
+    satSet.getSatExtraOnly = () => exampleSat;
+    satSet.getSat = () => exampleSat;
+    satellite.findChangeOrbitToDock(exampleSat, exampleSat, 0, 5000);
+    satellite.createManeuverAnalyst(0, 1, 1, 1);
+    satellite.findClosestApproachTime(exampleSat, exampleSat, 0, 5000);
+    satellite.findNearbyObjectsByOrbit(exampleSat);
+
+    satellite.calculateLookAngles(exampleSat);
+    satellite.calculateLookAngles(exampleSat, sensorManager.sensorList.COD);
+    satellite.calculateLookAngles(exampleSat, sensorManager.sensorList.COD, 0);
+
+    satellite.findBestPasses('00000,00000', sensorManager.sensorList.COD);
+
+    satellite.distance(exampleSat, exampleSat);
+
+    satellite.nextpass(exampleSat);
+    satellite.nextpass(exampleSat, sensorManager.sensorList.COD);
+    satellite.nextpass(exampleSat, sensorManager.sensorList.COD, 1);
+    satellite.nextpass(exampleSat, sensorManager.sensorList.COD, 1, 30);
+
+    satellite.nextNpasses(exampleSat);
+    satellite.nextNpasses(exampleSat, sensorManager.sensorList.COD);
+    satellite.nextNpasses(exampleSat, sensorManager.sensorList.COD, 1);
+    satellite.nextNpasses(exampleSat, sensorManager.sensorList.COD, 1, 30);
+    satellite.nextNpasses(exampleSat, sensorManager.sensorList.COD, 1, 30, 2);
   });
 
+  // Fast
   test('satSet Functional Tests', () => {
     satSet.searchAzElRange(0, 10, 10, 90, 100, 100, 1000000, 90, 500, 500, 10, 10, 1);
 
@@ -921,6 +1049,23 @@ describe('Integration Testing', () => {
     satSet.searchCelestrak(5, 80000);
 
     satSet.selectSat(1);
+
+    satSet.setSat(2, exampleSat);
+    satSet.mergeSat(exampleSat);
+    dotsManager.inViewData = [];
+    dotsManager.inViewData[0] = true;
+    satSet.getSatInViewOnly(0);
+
+    dotsManager.positionData = [1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+
+    satSet.getIdFromEci({ x: 5000, y: 5000, z: 50000 });
+    satSet.getIdFromSensorName();
+    satSet.getScreenCoords(0, drawManager.pMatrix, cameraManager.camMatrix, null, exampleSat.position);
+
+    settingsManager.offline = true;
+    satSet.loadCatalog();
+    settingsManager.offline = false;
+    satSet.loadCatalog();
   });
 
   test('drawManager Functional Tests', () => {
@@ -933,8 +1078,109 @@ describe('Integration Testing', () => {
     drawManager.checkIfPostProcessingRequired();
 
     drawManager.demoMode();
+
+    settingsManager.startWithOrbitsDisplayed = true;
+    drawManager.startWithOrbits();
+
+    settingsManager.enableConstantSelectedSatRedraw = true;
+    objectManager.selectedSat = 0;
+    satSet.getSatExtraOnly = () => exampleSat;
+    satSet.getSat = () => exampleSat;
+    drawManager.canvas.style = {};
+    drawManager.drawLoop();
+
+    settingsManager.lowPerf = true;
+    drawManager.updateHover();
+
+    meshManager.shaderProgram = {
+      uLightDirection: 0,
+      uNormalMatrix: 0,
+      uMvMatrix: 0,
+      uPMatrix: 0,
+      uCamMatrix: 0,
+      uInSun: 0,
+      enableVertexAttribArrays: jest.fn(),
+      applyAttributePointers: jest.fn(),
+      disableVertexAttribArrays: jest.fn(),
+    };
+    meshManager.currentModel = {
+      inSun: true,
+      model: {
+        mesh: {
+          vertexBuffer: 0,
+          indexBuffer: 0,
+          indexBuffer: {
+            numItems: 0,
+          },
+        },
+      },
+    };
+
+    meshManager.loaded = true;
+    meshManager.draw(drawManager.pMatrix, cameraManager.camMatrix, null);
+
+    meshManager.currentModel = {
+      id: 1,
+      model: {
+        mesh: {
+          indexBuffer: 0,
+        },
+      },
+      nadirYaw: true,
+      inSun: true,
+      position: {
+        x: 1000,
+        y: 1000,
+        z: 1000,
+      },
+    };
+    meshManager.draw(drawManager.pMatrix, cameraManager.camMatrix, null);
+
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.SCC_NUM = '25544';
+    exampleSat.OT = 1;
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.SCC_NUM = '00005';
+    exampleSat.ON = 'FLOCK';
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.ON = 'STARLINK';
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.ON = 'GLOBALSTAR';
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.ON = 'IRIDIUM';
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.ON = 'ORBCOMM';
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.ON = 'O3B';
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.ON = 'NAVSTAR';
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.ON = 'GALILEO';
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.ON = 'FAKE';
+    exampleSat.SCC_NUM = '04630';
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.SCC_NUM = '36868';
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.SCC_NUM = '00005';
+    exampleSat.R = 0.05;
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.R = 0.23;
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.R = 5.23;
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.OT = 2;
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.OT = 3;
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    exampleSat.SCC_NUM = '50000';
+    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
+    meshManager.initShaders();
+    // meshManager.meshes = [{}];
+    meshManager.initBuffers();
   });
 
+  // Fast
   test('orbitManager Functional Tests', () => {
     orbitManager.setSelectOrbit(0);
     orbitManager.addInViewOrbit(0);
@@ -942,12 +1188,22 @@ describe('Integration Testing', () => {
     orbitManager.clearInViewOrbit();
     orbitManager.setHoverOrbit(0);
     orbitManager.clearHoverOrbit();
+
+    orbitManager.playNextSatellite(10, 1970);
   });
 
+  // Fast
+  test('Orbit Math Manager Functional Tests', () => {
+    const sv = omManager.sat2sv(exampleSat, timeManager);
+    omManager.svs2analyst([sv, sv], satSet, timeManager, satellite);
+  });
+
+  // Average
   test('color-scheme-factory Functional Tests', () => {
     ColorScheme.reloadColors();
     satSet.setColorScheme(ColorScheme.onlyFOV, true);
     satSet.setColorScheme(ColorScheme.sunlight, true);
+    satSet.setColorScheme(ColorScheme.velocity, true);
     satSet.setColorScheme(ColorScheme.smallsats, true);
     satSet.setColorScheme(ColorScheme.rcs, true);
     satSet.setColorScheme(ColorScheme.countries, true);
@@ -955,7 +1211,6 @@ describe('Integration Testing', () => {
     satSet.setColorScheme(ColorScheme.lostobjects, true);
     satSet.setColorScheme(ColorScheme.leo, true);
     satSet.setColorScheme(ColorScheme.geo, true);
-    satSet.setColorScheme(ColorScheme.velocity, true);
     satSet.setColorScheme(ColorScheme.default, true);
   });
 
@@ -999,5 +1254,342 @@ describe('Integration Testing', () => {
     cameraManager.cameraType.current = cameraManager.cameraType.default;
     settingsManager.enableHoverOverlay = false;
     drawManager.hoverBoxOnSat(1, 100, 100);
+
+    cameraManager.isDragging = false;
+    settingsManager.enableHoverOverlay = true;
+    drawManager.hoverBoxOnSat(1, 100, 100);
+
+    cameraManager.cameraType.current = cameraManager.cameraType.planetarium;
+    drawManager.canvas.style = {};
+    drawManager.hoverBoxOnSat();
+  });
+
+  test('UI Manager Functional 1', () => {
+    adviceList.findISS();
+    adviceList.findISS();
+    adviceList.findISS();
+    adviceList.showSensors();
+    adviceList.showSensors();
+    adviceList.showSensors();
+    adviceList.useLegend();
+    adviceList.useLegend();
+    adviceList.useLegend();
+    adviceList.toggleNight();
+    adviceList.toggleNight();
+    adviceList.toggleNight();
+    adviceList.missileMenu();
+    adviceList.missileMenu();
+    adviceList.missileMenu();
+    adviceList.satelliteSelected();
+    adviceList.satelliteSelected();
+    adviceList.satelliteSelected();
+    adviceList.satelliteSelected();
+    adviceList.satelliteSelected();
+    adviceList.colorScheme();
+    adviceList.colorScheme();
+    adviceList.colorScheme();
+    adviceList.countries();
+    adviceList.countries();
+    adviceList.countries();
+    adviceList.socrates();
+    adviceList.socrates();
+    adviceList.socrates();
+    adviceList.cspocSensors();
+    adviceList.cspocSensors();
+    adviceList.cspocSensors();
+    adviceList.mwSensors();
+    adviceList.mwSensors();
+    adviceList.mwSensors();
+    adviceList.customSensors();
+    adviceList.customSensors();
+    adviceList.customSensors();
+    adviceList.lookanglesDisabled();
+    adviceList.lookanglesDisabled();
+    adviceList.lookanglesDisabled();
+
+    uiInput.rmbMenuActions({ target: { id: 'save-hd-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'save-4k-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'save-8k-rmb' } });
+    // uiInput.rmbMenuActions({ target: { id: 'view-info-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'view-sat-info-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'view-sensor-info-rmb' } });
+    // uiInput.rmbMenuActions({ target: { id: 'view-related-sats-rmb' } });
+    // uiInput.rmbMenuActions({ target: { id: 'view-curdops-rmb' } });
+    // uiInput.rmbMenuActions({ target: { id: 'view-24dops-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'edit-sat-rmb' } });
+    // uiInput.rmbMenuActions({ target: { id: 'create-sensor-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'reset-camera-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'clear-lines-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'line-eci-axis-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'line-earth-sat-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'line-sensor-sat-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'line-sat-sat-rmb' } });
+    // uiInput.rmbMenuActions({ target: { id: 'create-observer-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'colors-default-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'colors-sunlight-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'colors-country-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'colors-velocity-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'colors-ageOfElset-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'earth-blue-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'earth-nasa-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'earth-trusat-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'earth-low-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'earth-high-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'earth-high-no-clouds-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'earth-vec-rmb' } });
+    uiInput.rmbMenuActions({ target: { id: 'clear-screen-rmb' } });
+
+    eventFire('help-header', 'click');
+    eventFire('help-close', 'click');
+
+    uiInput.openRmbMenu();
+    uiInput.mouseSat = 1;
+    uiInput.openRmbMenu();
+    uiManager.earthClicked();
+    uiInput.canvasMouseUp({ button: 0 });
+    uiInput.canvasMouseUp({ button: 2 });
+    uiInput.canvasTouchStart({
+      originalEvent: {
+        touches: [
+          {
+            pageX: 100,
+            pageY: 100,
+          },
+          {
+            pageX: 200,
+            pageY: 200,
+          },
+        ],
+      },
+    });
+    uiInput.canvasTouchStart({
+      originalEvent: {
+        touches: [
+          {
+            clientX: 100,
+            clientY: 100,
+          },
+        ],
+      },
+    });
+    uiInput.canvasMouseDown({ button: 0 });
+    uiInput.canvasMouseDown({ button: 2 });
+    uiInput.canvasWheel({
+      originalEvent: {
+        deltaY: 10,
+        deltaMode: 1,
+      },
+    });
+    uiInput.canvasWheel({
+      originalEvent: {
+        deltaY: -10,
+        deltaMode: 0,
+      },
+    });
+    uiInput.canvasClick();
+
+    eventFire('keeptrack-canvas', 'click');
+    eventFire('keeptrack-canvas', 'touchmove');
+    eventFire('keeptrack-canvas', 'mousemove');
+    eventFire('keeptrack-canvas', 'wheel');
+    eventFire('keeptrack-canvas', 'mousedown');
+    eventFire('keeptrack-canvas', 'touchstart');
+    eventFire('keeptrack-canvas', 'mouseup');
+    eventFire('keeptrack-canvas', 'touchend');
+
+    uiManager.keyHandler({ key: 'C' });
+    uiManager.keyHandler({ key: 'C' });
+    uiManager.keyHandler({ key: 'C' });
+    uiManager.keyHandler({ key: 'C' });
+    uiManager.keyHandler({ key: 'C' });
+    uiManager.keyHandler({ key: 'C' });
+    uiManager.keyHandler({ key: 'C' });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-info-overlay',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-info-overlay',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-sensor-info',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-sensor-info',
+      },
+    });
+
+    satSet.getSatInSun();
+    satSet.getSatVel();
+
+    satSet.getSatExtraOnly = () => exampleSat;
+    satSet.getSat = () => exampleSat;
+    satSet.selectSat(0);
+
+    // SUPER SLOW
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-lookangles',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-lookangles',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-lookanglesmultisite',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-lookanglesmultisite',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-editSat',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-editSat',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-newLaunch',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-newLaunch',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-breakup',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-breakup',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-fov-bubble',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-fov-bubble',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-surveillance',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-surveillance',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-sat-fov',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-sat-fov',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-planetarium',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-planetarium',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-astronomy',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-astronomy',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-satview',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-satview',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-map',
+      },
+    });
+
+    uiManager.updateMap();
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-map',
+      },
+    });
+
+    objectManager.selectedSat = -1;
+    eventFire('near-objects-link', 'click');
+
+    // One of these broke everything!
+
+    // objectManager.selectedSat = 0;
+    // eventFire('near-objects-link', 'click');
+    // eventFire('search-results', 'mouseout');
+
+    settingsManager.themes.redTheme();
+    settingsManager.themes.redThemeSearch();
+
+    db.gremlins();
+
+    settingsManager.trusatMode = true;
+    settingsManager.isShowLogo = true;
+    settingsManager.lowPerf = true;
+    uiManager.init(cameraManager, lineManager, starManager, groupsManager, satSet, orbitManager, groupsManager, ColorScheme);
+    settingsManager.trusatMode = false;
+    settingsManager.isShowLogo = false;
+    settingsManager.lowPerf = false;
+    uiManager.init(cameraManager, lineManager, starManager, groupsManager, satSet, orbitManager, groupsManager, ColorScheme);
   });
 });

@@ -2,7 +2,6 @@
   global
   test
   expect
-  $
   jest
 */
 

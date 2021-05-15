@@ -56,15 +56,11 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
 
   // 2020 Key listener
   // TODO: Migrate most things from UI to Here
-  $(window).on({
-    keydown: function (e) {
-      if (e.ctrlKey === true || e.metaKey === true) cameraManager.isCtrlPressed = true;
-    },
+  window.addEventListener('keydown', (e) => {
+    if (e.ctrlKey === true || e.metaKey === true) cameraManager.isCtrlPressed = true;
   });
-  $(window).on({
-    keyup: function (e) {
-      if (e.ctrlKey === false && e.metaKey === false) cameraManager.isCtrlPressed = false;
-    },
+  window.addEventListener('keyup', (e) => {
+    if (e.ctrlKey === false || e.metaKey === false) cameraManager.isCtrlPressed = false;
   });
 
   if (settingsManager.disableWindowScroll || settingsManager.disableNormalEvents) {
@@ -79,61 +75,61 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
 
     // left: 37, up: 38, right: 39, down: 40,
     // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
-    var keys = { 37: 1, 38: 1, 39: 1, 40: 1 };
+    // var keys = { 37: 1, 38: 1, 39: 1, 40: 1 };
 
-    var preventDefault = (e) => {
-      e.preventDefault();
-    };
+    // var preventDefault = (e) => {
+    //   e.preventDefault();
+    // };
 
-    var preventDefaultForScrollKeys = (e) => {
-      if (keys[e.keyCode]) {
-        preventDefault(e);
-        return false;
-      }
-    };
+    // var preventDefaultForScrollKeys = (e) => {
+    //   if (keys[e.keyCode]) {
+    //     preventDefault(e);
+    //     return false;
+    //   }
+    // };
 
     // modern Chrome requires { passive: false } when adding event
-    var supportsPassive = false;
-    try {
-      window.addEventListener(
-        'test',
-        null,
-        Object.defineProperty({}, 'passive', {
-          // eslint-disable-next-line getter-return
-          get: function () {
-            supportsPassive = true;
-          },
-        })
-      );
-    } catch (e) {
-      // Intentional
-    }
+    // var supportsPassive = false;
+    // try {
+    //   window.addEventListener(
+    //     'test',
+    //     null,
+    //     Object.defineProperty({}, 'passive', {
+    //       // eslint-disable-next-line getter-return
+    //       get: function () {
+    //         supportsPassive = true;
+    //       },
+    //     })
+    //   );
+    // } catch (e) {
+    //   // Intentional
+    // }
 
-    var wheelOpt = supportsPassive ? { passive: false } : false;
-    var wheelEvent;
-    try {
-      wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel';
-    } catch (error) {
-      wheelEvent = 'mousewheel';
-    }
+    // var wheelOpt = supportsPassive ? { passive: false } : false;
+    // var wheelEvent;
+    // try {
+    //   wheelEvent = 'onwheel' in document.createElement('div') ? 'wheel' : 'mousewheel';
+    // } catch (error) {
+    //   wheelEvent = 'mousewheel';
+    // }
 
     // call this to Disable
     // eslint-disable-next-line no-unused-vars
-    var disableScroll = () => {
-      window.addEventListener('DOMMouseScroll', preventDefault, false); // older FF
-      window.addEventListener(wheelEvent, preventDefault, wheelOpt); // modern desktop
-      window.addEventListener('touchmove', preventDefault, wheelOpt); // mobile
-      window.addEventListener('keydown', preventDefaultForScrollKeys, false);
-    };
+    // var disableScroll = () => {
+    //   window.addEventListener('DOMMouseScroll', preventDefault, false); // older FF
+    //   window.addEventListener(wheelEvent, preventDefault, wheelOpt); // modern desktop
+    //   window.addEventListener('touchmove', preventDefault, wheelOpt); // mobile
+    //   window.addEventListener('keydown', preventDefaultForScrollKeys, false);
+    // };
 
     // call this to Enable
     // eslint-disable-next-line no-unused-vars
-    var enableScroll = () => {
-      window.removeEventListener('DOMMouseScroll', preventDefault, false);
-      window.removeEventListener(wheelEvent, preventDefault, wheelOpt);
-      window.removeEventListener('touchmove', preventDefault, wheelOpt);
-      window.removeEventListener('keydown', preventDefaultForScrollKeys, false);
-    };
+    // var enableScroll = () => {
+    //   window.removeEventListener('DOMMouseScroll', preventDefault, false);
+    //   window.removeEventListener(wheelEvent, preventDefault, wheelOpt);
+    //   window.removeEventListener('touchmove', preventDefault, wheelOpt);
+    //   window.removeEventListener('keydown', preventDefaultForScrollKeys, false);
+    // };
   }
 
   if (settingsManager.disableZoomControls || settingsManager.disableNormalEvents) {
@@ -165,7 +161,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
     );
   }
 
-  $(window).mousedown(function (evt) {
+  window.addEventListener('mousedown', (evt) => {
     // Camera Manager Events
     {
       if (!settingsManager.disableCameraControls) {
@@ -282,7 +278,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
       });
     }
     if (!settingsManager.disableUI) {
-      canvasDOM.on('wheel', function (evt) {
+      uiInput.canvasWheel = (evt) => {
         if (settingsManager.disableNormalEvents) {
           evt.preventDefault();
         }
@@ -339,8 +335,12 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
           drawManager.glInit();
         }
+      };
+      canvasDOM.on('wheel', function (evt) {
+        uiInput.canvasWheel(evt);
       });
-      canvasDOM.on('click', function (evt) {
+
+      uiInput.canvasClick = (evt) => {
         if (settingsManager.disableNormalEvents) {
           evt.preventDefault();
         }
@@ -349,8 +349,12 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         if ($('#colorbox').css('display') === 'block') {
           $.colorbox.close(); // Close colorbox if it was open
         }
+      };
+      canvasDOM.on('click', function (evt) {
+        uiInput.canvasClick(evt);
       });
-      canvasDOM.on('mousedown', function (evt) {
+
+      uiInput.canvasMouseDown = (evt) => {
         if (settingsManager.disableNormalEvents) {
           evt.preventDefault();
         }
@@ -382,8 +386,12 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
 
         // TODO: Make uiManager.updateURL() a setting that is disabled by default
         uiManager.updateURL();
+      };
+      canvasDOM.on('mousedown', function (evt) {
+        uiInput.canvasMouseDown(evt);
       });
-      canvasDOM.on('touchstart', function (evt) {
+
+      uiInput.canvasTouchStart = (evt) => {
         settingsManager.cameraMovementSpeed = 0.0001;
         settingsManager.cameraMovementSpeedMin = 0.0001;
         if (evt.originalEvent.touches.length > 1) {
@@ -417,8 +425,12 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           // TODO: Make updateUrl() a setting that is disabled by default
           uiManager.updateURL();
         }
+      };
+      canvasDOM.on('touchstart', function (evt) {
+        uiInput.canvasTouchStart(evt);
       });
-      canvasDOM.on('mouseup', function (evt) {
+
+      uiInput.canvasMouseUp = (evt) => {
         if (settingsManager.disableNormalEvents) {
           evt.preventDefault();
         }
@@ -446,7 +458,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           if (evt.button === 2) {
             // Right Mouse Button Clicked
             if (!cameraManager.isCtrlPressed && !cameraManager.isShiftPressed) {
-              _openRmbMenu();
+              uiInput.openRmbMenu();
             }
           }
         }
@@ -459,10 +471,13 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         if (!settingsManager.disableUI) {
           cameraManager.rotateEarth(false);
         }
+      };
+      canvasDOM.on('mouseup', function (evt) {
+        uiInput.canvasMouseUp(evt);
       });
     }
 
-    var _openRmbMenu = () => {
+    uiInput.openRmbMenu = () => {
       let numMenuItems = 0;
       $('#clear-lines-rmb').hide();
 
@@ -555,6 +570,10 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         // Intentional
       } else {
         // This is the Earth
+        uiManager.earthClicked();
+      }
+
+      uiManager.earthClicked = () => {
         if (!isViewDOM) {
           rightBtnViewDOM.show();
           ++numMenuItems;
@@ -592,7 +611,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         if (settingsManager.lowresImages == true) $('#earth-low-rmb').hide();
         if (settingsManager.hiresNoCloudsImages == true) $('#earth-high-no-clouds-rmb').hide();
         if (settingsManager.vectorImages == true) $('#earth-vec-rmb').hide();
-      }
+      };
 
       rightBtnMenuDOM.show();
       satHoverBoxDOM.hide();
@@ -612,7 +631,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
       let touchTime = Date.now() - touchStartTime;
 
       if (touchTime > 150 && !isPinching && Math.abs(cameraManager.startMouseX - cameraManager.mouseX) < 50 && Math.abs(cameraManager.startMouseY - cameraManager.mouseY) < 50) {
-        _openRmbMenu();
+        uiInput.openRmbMenu();
         uiInput.mouseSat = -1;
       }
 
@@ -672,34 +691,34 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
       }); // On Key Press Event Run _keyHandler Function
 
       rightBtnSaveMenuDOM.on('click', function (e) {
-        _rmbMenuActions(e);
+        uiInput.rmbMenuActions(e);
       });
       rightBtnViewMenuDOM.on('click', function (e) {
-        _rmbMenuActions(e);
+        uiInput.rmbMenuActions(e);
       });
       rightBtnEditMenuDOM.on('click', function (e) {
-        _rmbMenuActions(e);
+        uiInput.rmbMenuActions(e);
       });
       rightBtnCreateMenuDOM.on('click', function (e) {
-        _rmbMenuActions(e);
+        uiInput.rmbMenuActions(e);
       });
       rightBtnDrawMenuDOM.on('click', function (e) {
-        _rmbMenuActions(e);
+        uiInput.rmbMenuActions(e);
       });
       rightBtnColorsMenuDOM.on('click', function (e) {
-        _rmbMenuActions(e);
+        uiInput.rmbMenuActions(e);
       });
       rightBtnEarthMenuDOM.on('click', function (e) {
-        _rmbMenuActions(e);
+        uiInput.rmbMenuActions(e);
       });
       $('#reset-camera-rmb').on('click', function (e) {
-        _rmbMenuActions(e);
+        uiInput.rmbMenuActions(e);
       });
       $('#clear-screen-rmb').on('click', function (e) {
-        _rmbMenuActions(e);
+        uiInput.rmbMenuActions(e);
       });
       $('#clear-lines-rmb').on('click', function (e) {
-        _rmbMenuActions(e);
+        uiInput.rmbMenuActions(e);
       });
 
       rightBtnSaveDOM.hover(() => {
@@ -893,7 +912,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         rightBtnEarthMenuDOM.hide();
       }
     };
-    var _rmbMenuActions = (e) => {
+    uiInput.rmbMenuActions = (e) => {
       // No Right Click Without UI
       if (settingsManager.disableUI) return;
 
@@ -967,7 +986,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           break;
         case 'edit-sat-rmb':
           objectManager.setSelectedSat(clickedSat);
-          if (!sMM.isEditSatMenuOpen()) {
+          if (!sMM.isEditSatMenuOpen) {
             uiManager.bottomIconPress({
               currentTarget: { id: 'menu-editSat' },
             });
@@ -976,7 +995,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         case 'create-sensor-rmb':
           $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           $('#menu-customSensor').addClass('bmenu-item-selected');
-          sMM.isCustomSensorMenuOpen(true);
+          sMM.isCustomSensorMenuOpen = true;
           $('#cs-telescope').on('click', () => {});
           $('#cs-lat').val(latLon.latitude);
           $('#cs-lon').val(latLon.longitude);
@@ -1025,7 +1044,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         case 'create-observer-rmb':
           $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           $('#menu-customSensor').addClass('bmenu-item-selected');
-          sMM.setCustomSensorMenuOpen(true);
+          sMM.setCustomSensorMenuOpen = true;
           $('#cs-lat').val(latLon.latitude);
           $('#cs-lon').val(latLon.longitude);
           $('#cs-hei').val(0);

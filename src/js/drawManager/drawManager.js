@@ -64,7 +64,7 @@ drawManager.init = (groupsManagerRef, uiInputRef, starManagerRef, satelliteRef, 
   satHoverBoxDOM = document.getElementById('sat-hoverbox');
   satMiniBox = document.getElementById('sat-minibox');
 
-  startWithOrbits();
+  drawManager.startWithOrbits();
 };
 
 // Reinitialize the canvas on mobile rotation
@@ -193,7 +193,7 @@ drawManager.calculatePMatrix = (settingsManager) => {
   glm.mat4.mul(drawManager.pMatrix, drawManager.pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
 };
 
-var startWithOrbits = async () => {
+drawManager.startWithOrbits = async () => {
   if (settingsManager.startWithOrbitsDisplayed) {
     // All Orbits
     groupsManager.debris = groupsManager.createGroup('all', '');

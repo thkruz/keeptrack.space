@@ -34,7 +34,7 @@ document.body.innerHTML = global.docBody;
 
 import { initalizeKeepTrack } from '../src/js/main';
 
-test('UI should not be disabled.', () => {
+test('findCoverageGaps', () => {
   initalizeKeepTrack();
   expect(true).toBe(true);
 });

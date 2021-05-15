@@ -1,14 +1,40 @@
-module.exports = {
-  presets: [
+module.exports = (api) => {
+  const testPlugins = [
     [
-      '@babel/preset-env',
+      'istanbul',
       {
-        targets: {
-          esmodules: true,
-        },
+        exclude: ['node_modules/', 'src/js/lib/external/*', '**/*.test.js', '**/serviceWorker.js', 'src/js/__mocks__', 'src/js/webworker/*', 'src/js/wip/*', 'src/tle/*'],
       },
     ],
-  ],
-  compact: 'auto',
-  plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-proposal-private-methods'],
+    '@babel/plugin-proposal-class-properties',
+    '@babel/plugin-proposal-private-methods',
+  ];
+
+  const normPlugins = ['@babel/plugin-proposal-class-properties', '@babel/plugin-proposal-private-methods'];
+
+  return {
+    env: {
+      // dev: {},
+      test: {
+        plugins: api.env() == 'test' ? testPlugins : normPlugins,
+      },
+      development: {
+        plugins: normPlugins,
+      },
+      production: {
+        plugins: normPlugins,
+      },
+    },
+    presets: [
+      [
+        '@babel/preset-env',
+        {
+          targets: {
+            esmodules: true,
+          },
+        },
+      ],
+    ],
+    compact: 'auto',
+  };
 };

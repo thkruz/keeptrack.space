@@ -81,3 +81,5 @@ coverage/
 
 # Build Folder
 dist
+
+.nyc_output

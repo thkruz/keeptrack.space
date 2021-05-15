@@ -204,50 +204,54 @@ class LineFactory {
   draw() {
     if (this.drawLineList.length == 0) return;
     for (let i = 0; i < this.drawLineList.length; i++) {
-      if (typeof this.drawLineList[i].sat != 'undefined' && this.drawLineList[i].sat != null && typeof this.drawLineList[i].sat.id != 'undefined') {
-        // At least One Satellite
-        this.drawLineList[i].sat = this.#getSatPosOnly(this.drawLineList[i].sat.id);
-        if (typeof this.drawLineList[i].sat2 != 'undefined' && this.drawLineList[i].sat2 != null) {
-          // Satellite and Static
-          if (typeof this.drawLineList[i].sat2.name != 'undefined') {
-            if (typeof this.drawLineList[i].sat2.id == 'undefined' && this.drawLineList[i].sat2 != null) {
-              this.drawLineList[i].sat2.id = this.#getIdFromSensorName(this.drawLineList[i].sat2.name);
+      try {
+        if (typeof this.drawLineList[i].sat != 'undefined' && this.drawLineList[i].sat != null && typeof this.drawLineList[i].sat.id != 'undefined') {
+          // At least One Satellite
+          this.drawLineList[i].sat = this.#getSatPosOnly(this.drawLineList[i].sat.id);
+          if (typeof this.drawLineList[i].sat2 != 'undefined' && this.drawLineList[i].sat2 != null) {
+            // Satellite and Static
+            if (typeof this.drawLineList[i].sat2.name != 'undefined') {
+              if (typeof this.drawLineList[i].sat2.id == 'undefined' && this.drawLineList[i].sat2 != null) {
+                this.drawLineList[i].sat2.id = this.#getIdFromSensorName(this.drawLineList[i].sat2.name);
+              }
+              this.drawLineList[i].sat2 = this.#getSat(this.drawLineList[i].sat2.id);
+              if (this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].sat.getTEARR().inview) {
+                this.drawLineList.splice(i, 1);
+                continue;
+              }
+              this.drawLineList[i].line.set(
+                [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z],
+                [this.drawLineList[i].sat2.position.x, this.drawLineList[i].sat2.position.y, this.drawLineList[i].sat2.position.z]
+              );
+            } else {
+              // Two Satellites
+              this.drawLineList[i].sat2 = this.#getSatPosOnly(this.drawLineList[i].sat2.id);
+              this.drawLineList[i].line.set(
+                [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z],
+                [this.drawLineList[i].sat2.position.x, this.drawLineList[i].sat2.position.y, this.drawLineList[i].sat2.position.z]
+              );
             }
-            this.drawLineList[i].sat2 = this.#getSat(this.drawLineList[i].sat2.id);
-            if (this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].sat.getTEARR().inview) {
-              this.drawLineList.splice(i, 1);
-              continue;
-            }
-            this.drawLineList[i].line.set(
-              [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z],
-              [this.drawLineList[i].sat2.position.x, this.drawLineList[i].sat2.position.y, this.drawLineList[i].sat2.position.z]
-            );
           } else {
-            // Two Satellites
-            this.drawLineList[i].sat2 = this.#getSatPosOnly(this.drawLineList[i].sat2.id);
-            this.drawLineList[i].line.set(
-              [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z],
-              [this.drawLineList[i].sat2.position.x, this.drawLineList[i].sat2.position.y, this.drawLineList[i].sat2.position.z]
-            );
+            // Just One Satellite
+            this.drawLineList[i].line.set(this.drawLineList[i].ref, [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]);
           }
+        } else if (typeof this.drawLineList[i].star1 != 'undefined' && typeof this.drawLineList[i].star2 != 'undefined' && this.drawLineList[i].star1 != null && this.drawLineList[i].star2 != null) {
+          // Constellation
+          if (typeof this.drawLineList[i].star1ID == 'undefined') {
+            this.drawLineList[i].star1ID = this.#getIdFromStarName(this.drawLineList[i].star1);
+          }
+          if (typeof this.drawLineList[i].star2ID == 'undefined') {
+            this.drawLineList[i].star2ID = this.#getIdFromStarName(this.drawLineList[i].star2);
+          }
+          this.#tempStar1 = this.#getSatPosOnly(this.drawLineList[i].star1ID);
+          this.#tempStar2 = this.#getSatPosOnly(this.drawLineList[i].star2ID);
+          this.drawLineList[i].line.set([this.#tempStar1.position.x, this.#tempStar1.position.y, this.#tempStar1.position.z], [this.#tempStar2.position.x, this.#tempStar2.position.y, this.#tempStar2.position.z]);
         } else {
-          // Just One Satellite
-          this.drawLineList[i].line.set(this.drawLineList[i].ref, [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]);
+          // Arbitrary Lines
+          this.drawLineList[i].line.set(this.drawLineList[i].ref, this.drawLineList[i].ref2);
         }
-      } else if (typeof this.drawLineList[i].star1 != 'undefined' && typeof this.drawLineList[i].star2 != 'undefined' && this.drawLineList[i].star1 != null && this.drawLineList[i].star2 != null) {
-        // Constellation
-        if (typeof this.drawLineList[i].star1ID == 'undefined') {
-          this.drawLineList[i].star1ID = this.#getIdFromStarName(this.drawLineList[i].star1);
-        }
-        if (typeof this.drawLineList[i].star2ID == 'undefined') {
-          this.drawLineList[i].star2ID = this.#getIdFromStarName(this.drawLineList[i].star2);
-        }
-        this.#tempStar1 = this.#getSatPosOnly(this.drawLineList[i].star1ID);
-        this.#tempStar2 = this.#getSatPosOnly(this.drawLineList[i].star2ID);
-        this.drawLineList[i].line.set([this.#tempStar1.position.x, this.#tempStar1.position.y, this.#tempStar1.position.z], [this.#tempStar2.position.x, this.#tempStar2.position.y, this.#tempStar2.position.z]);
-      } else {
-        // Arbitrary Lines
-        this.drawLineList[i].line.set(this.drawLineList[i].ref, this.drawLineList[i].ref2);
+      } catch (error) {
+        console.debug(error);
       }
 
       this.drawLineList[i].line.draw(this.drawLineList[i].color);

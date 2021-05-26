@@ -1,3 +1,9 @@
+/* globals
+  global
+  jest
+  require
+*/
+
 import 'webgl-mock';
 import $ from 'jquery';
 
@@ -39,6 +45,21 @@ window.resizeTo(1920, 1080);
 
 global.requestAnimationFrame = function (cb) {
   return setTimeout(cb, 0);
+};
+
+global.console = {
+  log: jest.fn(), // console.log are ignored in tests
+  // log: console.log, // console.log are ignored in tests
+
+  // Keep native behaviour for other methods, use those to print out things in your own tests, not `console.log`
+  error: console.error,
+  // error: jest.fn(),
+  warn: console.warn,
+  // warn: jest.fn(),
+  // info: console.info,
+  info: jest.fn(),
+  // debug: console.debug,
+  debug: jest.fn(),
 };
 
 // document.body.innerHTML += '<div id="keeptrack-canvas"></div>';

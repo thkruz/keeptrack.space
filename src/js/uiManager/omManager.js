@@ -202,14 +202,15 @@ om.fitTles = async (epoch, svs, kps, timeManager, satellite) => {
         let zError = 0;
         let posErrorAvg = 0;
         for (let svI = 0; svI < svs.length; svI++) {
+          let eci;
           try {
-            const eci = _propagate(tles.tle1, tles.tle2, new Date(epoch + (svs[svI][0] - svs[0][0])), satellite);
+            eci = _propagate(tles.tle1, tles.tle2, new Date(epoch + (svs[svI][0] - svs[0][0])), satellite);
             xError += Math.abs(eci.position.x - svs[svI][1]);
             yError += Math.abs(eci.position.y - svs[svI][2]);
             zError += Math.abs(eci.position.z - svs[svI][3]);
             posErrorAvg += Math.sqrt(xError ** 2 + yError ** 2 + zError ** 2);
           } catch (error) {
-            console.warn(error);
+            // console.warn(eci);
           }
         }
         posErrorAvg /= svs.length;

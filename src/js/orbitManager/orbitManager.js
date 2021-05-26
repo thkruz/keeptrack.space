@@ -43,26 +43,28 @@ if (typeof process !== 'undefined') {
 var initialized = false;
 
 orbitManager.shader = {
-  frag: `
+  frag: `#version 300 es
     precision mediump float;
 
-    varying vec4 vColor;
-    varying float vAlpha;
+    in vec4 vColor;
+    in float vAlpha;
+
+    out vec4 fragColor;
 
     void main(void) {
-    gl_FragColor = vec4(vColor[0],vColor[1],vColor[2], vColor[3] * vAlpha);
+      fragColor = vec4(vColor[0],vColor[1],vColor[2], vColor[3] * vAlpha);
     }
     `,
-  vert: `
-    attribute vec4 aPos;
+  vert: `#version 300 es
+    in vec4 aPos;
 
     uniform mat4 uCamMatrix;
     uniform mat4 uMvMatrix;
     uniform mat4 uPMatrix;
     uniform vec4 uColor;
 
-    varying vec4 vColor;
-    varying float vAlpha;
+    out vec4 vColor;
+    out float vAlpha;
 
     void main(void) {
         vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(aPos[0],aPos[1],aPos[2], 1.0);

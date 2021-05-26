@@ -32,7 +32,7 @@ objectManager.fieldOfViewSet = [];
 objectManager.init = async (sensorManager) => {
   // settingsManager should be a globally accessible object
   if (typeof settingsManager == 'undefined') {
-    console.warn(`settingsManager missing!`);
+    // console.warn(`settingsManager missing!`);
     return;
   }
 

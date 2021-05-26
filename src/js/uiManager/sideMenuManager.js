@@ -636,7 +636,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
       });
       saveAs(blob, scc + '.tle');
     } catch (error) {
-      console.warn(error);
+      // console.warn(error);
     }
     e.preventDefault();
   });
@@ -680,7 +680,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
       reader.readAsText(evt.target.files[0]);
       evt.preventDefault();
     } catch (error) {
-      console.warn(error);
+      // console.warn(error);
     }
   });
 

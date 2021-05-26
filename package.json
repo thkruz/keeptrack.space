@@ -27,7 +27,7 @@
     "build:dev": "npm run prebuild && cross-env NODE_ENV=development node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "build:test": "npm run prebuild && cross-env NODE_ENV=test node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "http": "http-server ./dist/",
-    "test": "cross-env NODE_ENV=development jest --coverage",
+    "test": "cross-env NODE_ENV=development jest --max-old-space-size=1024 --coverage",
     "test:nocov": "jest",
     "cypress": "npx cypress open",
     "version:major": "npm version major --no-git-tag-version",
@@ -47,6 +47,7 @@
       "^.+\\.[t|j]sx?$": "babel-jest"
     },
     "setupFiles": [
+      "jest-canvas-mock",
       "<rootDir>/test/test-env.js",
       "<rootDir>/test/test-env-mocks.js"
     ],
@@ -139,11 +140,13 @@
     "http-server": "^0.12.3",
     "imports-loader": "^2.0.0",
     "jest": "^26.6.3",
+    "jest-canvas-mock": "^2.3.1",
     "jsdom": "^16.4.0",
     "jsdom-worker": "^0.2.1",
     "mkdirp": "^1.0.4",
     "nyc": "^15.1.0",
     "prettier": "^2.2.1",
+    "spectorjs": "^0.9.22",
     "style-loader": "^2.0.0",
     "webgl-mock": "^0.1.7",
     "webpack": "^5.11.0",

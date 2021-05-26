@@ -360,26 +360,28 @@ pPM.doPostProcessing = (gl, program, curBuffer, tgtBuffer, secBuffer) => {
 
 pPM.shaderCode = {
   hdr: {
-    frag: `
+    frag: `#version 300 es
     precision mediump float;
 
     // our texture
     uniform sampler2D u_canvas;
 
     // the texCoords passed in from the vertex shader.
-    varying vec2 v_texCoord;
+    in vec2 v_texCoord;
+
+    out vec4 fragColor;
     
     void main() {
-      gl_FragColor = texture2D(u_canvas, v_texCoord);
+      fragColor = texture(u_canvas, v_texCoord);
     }
   `,
-    vert: `
-    attribute vec2 a_position;
-    attribute vec2 a_texCoord;
+    vert: `#version 300 es
+    in vec2 a_position;
+    in vec2 a_texCoord;
 
     uniform vec2 u_resolution;
     
-    varying vec2 v_texCoord;
+    out vec2 v_texCoord;
     
     void main() {
       // convert the rectangle from pixels to 0.0 to 1.0
@@ -400,7 +402,7 @@ pPM.shaderCode = {
   `,
   },
   gaussian: {
-    frag: `
+    frag: `#version 300 es
     precision highp float;
 
     // our texture
@@ -410,7 +412,9 @@ pPM.shaderCode = {
     uniform vec2 u_dir;
 
     // the texCoords passed in from the vertex shader.
-    varying vec2 v_texCoord;
+    in vec2 v_texCoord;
+
+    out vec4 fragColor;
     
     void main() {
       //this will be our RGBA sum
@@ -432,31 +436,31 @@ pPM.shaderCode = {
         
       //apply blurring, using a 9-tap filter with predefined gaussian weights
         
-      sum += texture2D(u_canvas, vec2(tc.x - 4.0*blur*hstep, tc.y - 4.0*blur*vstep)) * 0.0162162162;
-      sum += texture2D(u_canvas, vec2(tc.x - 3.0*blur*hstep, tc.y - 3.0*blur*vstep)) * 0.0540540541;
-      sum += texture2D(u_canvas, vec2(tc.x - 2.0*blur*hstep, tc.y - 2.0*blur*vstep)) * 0.1216216216;
-      sum += texture2D(u_canvas, vec2(tc.x - 1.0*blur*hstep, tc.y - 1.0*blur*vstep)) * 0.1945945946;
+      sum += texture(u_canvas, vec2(tc.x - 4.0*blur*hstep, tc.y - 4.0*blur*vstep)) * 0.0162162162;
+      sum += texture(u_canvas, vec2(tc.x - 3.0*blur*hstep, tc.y - 3.0*blur*vstep)) * 0.0540540541;
+      sum += texture(u_canvas, vec2(tc.x - 2.0*blur*hstep, tc.y - 2.0*blur*vstep)) * 0.1216216216;
+      sum += texture(u_canvas, vec2(tc.x - 1.0*blur*hstep, tc.y - 1.0*blur*vstep)) * 0.1945945946;
       
-      sum += texture2D(u_canvas, vec2(tc.x, tc.y)) * 0.2270270270;
+      sum += texture(u_canvas, vec2(tc.x, tc.y)) * 0.2270270270;
       
-      sum += texture2D(u_canvas, vec2(tc.x + 1.0*blur*hstep, tc.y + 1.0*blur*vstep)) * 0.1945945946;
-      sum += texture2D(u_canvas, vec2(tc.x + 2.0*blur*hstep, tc.y + 2.0*blur*vstep)) * 0.1216216216;
-      sum += texture2D(u_canvas, vec2(tc.x + 3.0*blur*hstep, tc.y + 3.0*blur*vstep)) * 0.0540540541;
-      sum += texture2D(u_canvas, vec2(tc.x + 4.0*blur*hstep, tc.y + 4.0*blur*vstep)) * 0.0162162162;
+      sum += texture(u_canvas, vec2(tc.x + 1.0*blur*hstep, tc.y + 1.0*blur*vstep)) * 0.1945945946;
+      sum += texture(u_canvas, vec2(tc.x + 2.0*blur*hstep, tc.y + 2.0*blur*vstep)) * 0.1216216216;
+      sum += texture(u_canvas, vec2(tc.x + 3.0*blur*hstep, tc.y + 3.0*blur*vstep)) * 0.0540540541;
+      sum += texture(u_canvas, vec2(tc.x + 4.0*blur*hstep, tc.y + 4.0*blur*vstep)) * 0.0162162162;
     
       //discard alpha for our simple demo, multiply by vertex color and return
-      gl_FragColor = vec4(sum.rgb, 1.0);
+      fragColor = vec4(sum.rgb, 1.0);
     }
   `,
-    vert: `
+    vert: `#version 300 es
     precision highp float;
 
-    attribute vec2 a_position;
-    attribute vec2 a_texCoord;
+    in vec2 a_position;
+    in vec2 a_texCoord;
 
     uniform vec2 u_resolution;
     
-    varying vec2 v_texCoord;
+    out vec2 v_texCoord;
     
     void main() {
       // convert the rectangle from pixels to 0.0 to 1.0
@@ -477,8 +481,8 @@ pPM.shaderCode = {
   `,
   },
   occlusion: {
-    vert: `
-              attribute vec3 a_position;
+    vert: `#version 300 es
+              in vec3 a_position;
       
               uniform mat4 uCamMatrix;
               uniform mat4 uMvMatrix;
@@ -489,22 +493,24 @@ pPM.shaderCode = {
               gl_Position = position;
               }
           `,
-    frag: `
+    frag: `#version 300 es
               precision mediump float;
+
+              out vec4 fragColor;
       
               void main(void) {
-                  gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+                  fragColor = vec4(0.0, 0.0, 0.0, 1.0);
               }
           `,
   },
   fxaa: {
-    vert: `          
-          attribute vec2 a_position;
-          attribute vec2 a_texCoord;
+    vert: `#version 300 es          
+          in vec2 a_position;
+          in vec2 a_texCoord;
 
           uniform vec2 u_resolution;
           
-          varying vec2 v_texCoord;
+          out vec2 v_texCoord;
           
           void main() {
             // convert the rectangle from pixels to 0.0 to 1.0
@@ -523,7 +529,7 @@ pPM.shaderCode = {
             v_texCoord = a_texCoord;
           }            
           `,
-    frag: `      
+    frag: `#version 300 es    
             precision highp float;    
 
             #ifndef FXAA_REDUCE_MIN
@@ -544,11 +550,11 @@ pPM.shaderCode = {
                         vec2 v_rgbM) {
                 vec4 color;
                 vec2 inverseVP = vec2(1.0 / resolution.x, 1.0 / resolution.y);
-                vec3 rgbNW = texture2D(tex, v_rgbNW).xyz;
-                vec3 rgbNE = texture2D(tex, v_rgbNE).xyz;
-                vec3 rgbSW = texture2D(tex, v_rgbSW).xyz;
-                vec3 rgbSE = texture2D(tex, v_rgbSE).xyz;
-                vec4 texColor = texture2D(tex, v_rgbM);
+                vec3 rgbNW = texture(tex, v_rgbNW).xyz;
+                vec3 rgbNE = texture(tex, v_rgbNE).xyz;
+                vec3 rgbSW = texture(tex, v_rgbSW).xyz;
+                vec3 rgbSE = texture(tex, v_rgbSE).xyz;
+                vec4 texColor = texture(tex, v_rgbM);
                 vec3 rgbM  = texColor.xyz;
                 vec3 luma = vec3(0.299, 0.587, 0.114);
                 float lumaNW = dot(rgbNW, luma);
@@ -572,11 +578,11 @@ pPM.shaderCode = {
                           dir * rcpDirMin)) * inverseVP;
                 
                 vec3 rgbA = 0.5 * (
-                    texture2D(tex, fragCoord * inverseVP + dir * (1.0 / 3.0 - 0.5)).xyz +
-                    texture2D(tex, fragCoord * inverseVP + dir * (2.0 / 3.0 - 0.5)).xyz);
+                    texture(tex, fragCoord * inverseVP + dir * (1.0 / 3.0 - 0.5)).xyz +
+                    texture(tex, fragCoord * inverseVP + dir * (2.0 / 3.0 - 0.5)).xyz);
                 vec3 rgbB = rgbA * 0.5 + 0.25 * (
-                    texture2D(tex, fragCoord * inverseVP + dir * -0.5).xyz +
-                    texture2D(tex, fragCoord * inverseVP + dir * 0.5).xyz);
+                    texture(tex, fragCoord * inverseVP + dir * -0.5).xyz +
+                    texture(tex, fragCoord * inverseVP + dir * 0.5).xyz);
 
                 float lumaB = dot(rgbB, luma);
                 if ((lumaB < lumaMin) || (lumaB > lumaMax))
@@ -617,22 +623,24 @@ pPM.shaderCode = {
             uniform vec2 u_resolution;
             uniform sampler2D u_canvas;            
 
-            varying vec2 v_texCoord;
+            in vec2 v_texCoord;
+
+            out vec4 fragColor;
 
             void main() {
                 vec2 fragCoord = v_texCoord * u_resolution;
-                gl_FragColor = apply(u_canvas, fragCoord, u_resolution);
+                fragColor = apply(u_canvas, fragCoord, u_resolution);
             }
           `,
   },
   fxaaNvidia: {
-    vert: `          
-          attribute vec2 a_position;
-          attribute vec2 a_texCoord;
+    vert: `#version 300 es          
+          in vec2 a_position;
+          in vec2 a_texCoord;
 
           uniform vec2 u_resolution;
           
-          varying vec2 v_texCoord;
+          out vec2 v_texCoord;
           
           void main() {
             // convert the rectangle from pixels to 0.0 to 1.0
@@ -651,7 +659,7 @@ pPM.shaderCode = {
             v_texCoord = a_texCoord;
           }            
           `,
-    frag: `      
+    frag: `#version 300 es      
           // FXAA 3.11 implementation by NVIDIA, ported to WebGL by Agost Biro (biro@archilogic.com)
 
           //----------------------------------------------------------------------------------
@@ -694,7 +702,9 @@ pPM.shaderCode = {
       
           uniform vec2 u_resolution;
       
-          varying vec2 v_texCoord;
+          in vec2 v_texCoord;
+
+          out vec4 fragColor;
       
           #define FXAA_PC 1
           #define FXAA_GLSL_100 1
@@ -1090,8 +1100,8 @@ pPM.shaderCode = {
           #endif
           /*--------------------------------------------------------------------------*/
           #if (FXAA_GLSL_100 == 1)
-            #define FxaaTexTop(t, p) texture2D(t, p, 0.0)
-            #define FxaaTexOff(t, p, o, r) texture2D(t, p + (o * r), 0.0)
+            #define FxaaTexTop(t, p) texture(t, p, 0.0)
+            #define FxaaTexOff(t, p, o, r) texture(t, p + (o * r), 0.0)
           #endif
           /*--------------------------------------------------------------------------*/
           #if (FXAA_GLSL_120 == 1)
@@ -1100,11 +1110,11 @@ pPM.shaderCode = {
               // And at least,
               //  #extension GL_EXT_gpu_shader4 : enable
               //  (or set FXAA_FAST_PIXEL_OFFSET 1 to work like DX9)
-              #define FxaaTexTop(t, p) texture2DLod(t, p, 0.0)
+              #define FxaaTexTop(t, p) textureLod(t, p, 0.0)
               #if (FXAA_FAST_PIXEL_OFFSET == 1)
-                  #define FxaaTexOff(t, p, o, r) texture2DLodOffset(t, p, 0.0, o)
+                  #define FxaaTexOff(t, p, o, r) textureLodOffset(t, p, 0.0, o)
               #else
-                  #define FxaaTexOff(t, p, o, r) texture2DLod(t, p + (o * r), 0.0)
+                  #define FxaaTexOff(t, p, o, r) textureLod(t, p + (o * r), 0.0)
               #endif
               #if (FXAA_GATHER4_ALPHA == 1)
                   // use #extension GL_ARB_gpu_shader5 : enable
@@ -1137,14 +1147,14 @@ pPM.shaderCode = {
           /*--------------------------------------------------------------------------*/
           #if (FXAA_HLSL_4 == 1)
               #define FxaaInt2 int2
-              struct FxaaTex { SamplerState smpl; Texture2D tex; };
+              struct FxaaTex { SamplerState smpl; texture tex; };
               #define FxaaTexTop(t, p) t.tex.SampleLevel(t.smpl, p, 0.0)
               #define FxaaTexOff(t, p, o, r) t.tex.SampleLevel(t.smpl, p, 0.0, o)
           #endif
           /*--------------------------------------------------------------------------*/
           #if (FXAA_HLSL_5 == 1)
               #define FxaaInt2 int2
-              struct FxaaTex { SamplerState smpl; Texture2D tex; };
+              struct FxaaTex { SamplerState smpl; texture tex; };
               #define FxaaTexTop(t, p) t.tex.SampleLevel(t.smpl, p, 0.0)
               #define FxaaTexOff(t, p, o, r) t.tex.SampleLevel(t.smpl, p, 0.0, o)
               #define FxaaTexAlpha4(t, p) t.tex.GatherAlpha(t.smpl, p)
@@ -1709,7 +1719,7 @@ pPM.shaderCode = {
           #endif
       
           void main() {
-            gl_FragColor = FxaaPixelShader(
+            fragColor = FxaaPixelShader(
               v_texCoord,
               vec4(0.0),
               u_canvas,
@@ -1729,19 +1739,19 @@ pPM.shaderCode = {
             );
       
             // TODO avoid querying texture twice for same texel
-            gl_FragColor.a = texture2D(u_canvas, v_texCoord).a;
+            fragColor.a = texture(u_canvas, v_texCoord).a;
           }
           `,
   },
   smaaEdges: {
-    vert: `          
-          attribute vec2 a_position;
-          attribute vec2 a_texCoord;
+    vert: `#version 300 es          
+          in vec2 a_position;
+          in vec2 a_texCoord;
 
           uniform vec2 u_resolution;
           
-          varying vec2 v_texCoord;
-          varying vec4 v_offset[ 3 ];
+          out vec2 v_texCoord;
+          out vec4 v_offset[ 3 ];
 
           void SMAAEdgeDetectionVS( vec2 texcoord ) {
             v_offset[ 0 ] = texcoord.xyxy + u_resolution.xyxy * vec4( -1.0, 0.0, 0.0,  1.0 ); // WebGL port note: Changed sign in W component
@@ -1767,7 +1777,7 @@ pPM.shaderCode = {
             SMAAEdgeDetectionVS( v_texCoord );
           }            
           `,
-    frag: `      
+    frag: `#version 300 es      
             precision highp float;
 
             #ifndef SMAA_THRESHOLD
@@ -1780,8 +1790,10 @@ pPM.shaderCode = {
 
             uniform sampler2D u_canvas;
 
-            varying vec2 v_texCoord;
-            varying vec4 v_offset[ 3 ];
+            in vec2 v_texCoord;
+            in vec4 v_offset[ 3 ];
+
+            out vec4 fragColor;
 
             void main() {
               // Calculate the threshold:
@@ -1789,13 +1801,13 @@ pPM.shaderCode = {
 
               // Calculate color deltas:
               vec4 delta;
-              vec3 c = texture2D(u_canvas, v_texCoord).rgb;
+              vec3 c = texture(u_canvas, v_texCoord).rgb;
 
-              vec3 cLeft = texture2D(u_canvas, v_offset[0].xy).rgb;
+              vec3 cLeft = texture(u_canvas, v_offset[0].xy).rgb;
               vec3 t = abs(c - cLeft);
               delta.x = max(max(t.r, t.g), t.b);
 
-              vec3 cTop  = texture2D(u_canvas, v_offset[0].zw).rgb;
+              vec3 cTop  = texture(u_canvas, v_offset[0].zw).rgb;
               t = abs(c - cTop);
               delta.y = max(max(t.r, t.g), t.b);
 
@@ -1807,11 +1819,11 @@ pPM.shaderCode = {
                   discard;
 
               // Calculate right and bottom deltas:
-              vec3 cRight = texture2D(u_canvas, v_offset[1].xy).rgb;
+              vec3 cRight = texture(u_canvas, v_offset[1].xy).rgb;
               t = abs(c - cRight);
               delta.z = max(max(t.r, t.g), t.b);
 
-              vec3 cBottom  = texture2D(u_canvas, v_offset[1].zw).rgb;
+              vec3 cBottom  = texture(u_canvas, v_offset[1].zw).rgb;
               t = abs(c - cBottom);
               delta.w = max(max(t.r, t.g), t.b);
 
@@ -1819,11 +1831,11 @@ pPM.shaderCode = {
               vec2 maxDelta = max(delta.xy, delta.zw);
 
               // Calculate left-left and top-top deltas:
-              vec3 cLeftLeft  = texture2D(u_canvas, v_offset[2].xy).rgb;
+              vec3 cLeftLeft  = texture(u_canvas, v_offset[2].xy).rgb;
               t = abs(c - cLeftLeft);
               delta.z = max(max(t.r, t.g), t.b);
 
-              vec3 cTopTop = texture2D(u_canvas, v_offset[2].zw).rgb;
+              vec3 cTopTop = texture(u_canvas, v_offset[2].zw).rgb;
               t = abs(c - cTopTop);
               delta.w = max(max(t.r, t.g), t.b);
 
@@ -1834,20 +1846,20 @@ pPM.shaderCode = {
               // Local contrast adaptation:
               edges.xy *= step(finalDelta, SMAA_LOCAL_CONTRAST_ADAPTATION_FACTOR * delta.xy);
 
-              gl_FragColor = vec4(edges, 0.0, 1.0);
+              fragColor = vec4(edges, 0.0, 1.0);
             }
           `,
   },
   smaaWeights: {
-    vert: `          
-          attribute vec2 a_position;
-          attribute vec2 a_texCoord;
+    vert: `#version 300 es          
+          in vec2 a_position;
+          in vec2 a_texCoord;
 
           uniform vec2 u_resolution;
           
-          varying vec2 v_texCoord;
-          varying vec4 v_offset[ 3 ];
-          varying vec2 v_pixcoord;
+          out vec2 v_texCoord;
+          out vec4 v_offset[ 3 ];
+          out vec2 v_pixcoord;
 
           #ifndef SMAA_MAX_SEARCH_STEPS 
             #define SMAA_MAX_SEARCH_STEPS 8
@@ -1880,7 +1892,7 @@ pPM.shaderCode = {
             SMAABlendingWeightCalculationVS( v_texCoord );
           }            
           `,
-    frag: `      
+    frag: `#version 300 es      
             precision highp float;
             precision highp int;
 
@@ -1922,16 +1934,18 @@ pPM.shaderCode = {
             uniform sampler2D u_area;
             uniform sampler2D u_search;
 
-            varying vec2 v_texCoord;
-            varying vec4 v_offset[3];
-            varying vec2 v_pixcoord;
+            in vec2 v_texCoord;
+            in vec4 v_offset[3];
+            in vec2 v_pixcoord;
+
+            out vec4 fragColor;
 
             vec4 SMAA_RT_METRICS = vec4(1.0 / u_resolution.x, 1.0 / u_resolution.y, u_resolution.x, u_resolution.y);
 
             #define mad(a, b, c) (a * b + c)
             #define saturate(a) clamp(a, 0.0, 1.0)
             #define round(v) floor(v + 0.5)
-            #define SMAASampleLevelZeroOffset(tex, coord, offset) texture2D(tex, coord + offset * SMAA_RT_METRICS.xy)
+            #define SMAASampleLevelZeroOffset(tex, coord, offset) texture(tex, coord + offset * SMAA_RT_METRICS.xy)
 
             /**
              * Conditional move:
@@ -1982,7 +1996,7 @@ pPM.shaderCode = {
               for (int i = 0; i < SMAA_MAX_SEARCH_STEPS; i++) {
                 if (!(coord.z < float(SMAA_MAX_SEARCH_STEPS_DIAG - 1) && coord.w > 0.9)) break;
                 coord.xyz = mad(t, vec3(dir, 1.0), coord.xyz);
-                e = texture2D(u_canvas, coord.xy).rg; // LinearSampler
+                e = texture(u_canvas, coord.xy).rg; // LinearSampler
                 coord.w = dot(e, vec2(0.5, 0.5));
               }
               return coord.zw;
@@ -1999,11 +2013,11 @@ pPM.shaderCode = {
 
                 // @SearchDiag2Optimization
                 // Fetch both edges at once using bilinear filtering:
-                e = texture2D(u_canvas, coord.xy).rg; // LinearSampler
+                e = texture(u_canvas, coord.xy).rg; // LinearSampler
                 e = SMAADecodeDiagBilinearAccess(e);
 
                 // Non-optimized version:
-                // e.g = texture2D(u_canvas, coord.xy).g; // LinearSampler
+                // e.g = texture(u_canvas, coord.xy).g; // LinearSampler
                 // e.r = SMAASampleLevelZeroOffset(u_canvas, coord.xy, vec2(1, 0)).r;
 
                 coord.w = dot(e, vec2(0.5, 0.5));
@@ -2028,7 +2042,7 @@ pPM.shaderCode = {
               texcoord.y += SMAA_AREATEX_SUBTEX_SIZE * offset;
 
               // Do it!
-              return SMAA_AREATEX_SELECT(texture2D(u_area, texcoord)); // LinearSampler
+              return SMAA_AREATEX_SELECT(texture(u_area, texcoord)); // LinearSampler
             }
 
             /**
@@ -2123,7 +2137,7 @@ pPM.shaderCode = {
               bias *= 1.0 / SMAA_SEARCHTEX_PACKED_SIZE;
 
               // Lookup the search texture:
-              return SMAA_SEARCHTEX_SELECT(texture2D(u_search, mad(scale, e, bias))); // LinearSampler
+              return SMAA_SEARCHTEX_SELECT(texture(u_search, mad(scale, e, bias))); // LinearSampler
             }
 
             /**
@@ -2140,7 +2154,7 @@ pPM.shaderCode = {
               vec2 e = vec2(0.0, 1.0);
               for (int i = 0; i < SMAA_MAX_SEARCH_STEPS; i++) {
                 if (!(texcoord.x > end && e.g > 0.8281 && e.r == 0.0)) break;
-                e = texture2D(u_canvas, texcoord).rg; // LinearSampler
+                e = texture(u_canvas, texcoord).rg; // LinearSampler
                 texcoord = mad(-vec2(2.0, 0.0), SMAA_RT_METRICS.xy, texcoord);
               }
 
@@ -2163,7 +2177,7 @@ pPM.shaderCode = {
             float SMAASearchXRight(sampler2D u_canvas, sampler2D u_search, vec2 texcoord, float end) {
               vec2 e = vec2(0.0, 1.0);
               for (int i = 0; i < SMAA_MAX_SEARCH_STEPS; i++) { if (!(texcoord.x < end && e.g > 0.8281 && e.r == 0.0)) break;
-                e = texture2D(u_canvas, texcoord).rg; // LinearSampler
+                e = texture(u_canvas, texcoord).rg; // LinearSampler
                 texcoord = mad(vec2(2.0, 0.0), SMAA_RT_METRICS.xy, texcoord);
               }
               float offset = mad(-(255.0 / 127.0), SMAASearchLength(u_search, e, 0.5), 3.25);
@@ -2173,7 +2187,7 @@ pPM.shaderCode = {
             float SMAASearchYUp(sampler2D u_canvas, sampler2D u_search, vec2 texcoord, float end) {
               vec2 e = vec2(1.0, 0.0);
               for (int i = 0; i < SMAA_MAX_SEARCH_STEPS; i++) { if (!(texcoord.y > end && e.r > 0.8281 && e.g == 0.0)) break;
-                e = texture2D(u_canvas, texcoord).rg; // LinearSampler
+                e = texture(u_canvas, texcoord).rg; // LinearSampler
                 texcoord = mad(-vec2(0.0, 2.0), SMAA_RT_METRICS.xy, texcoord);
               }
               float offset = mad(-(255.0 / 127.0), SMAASearchLength(u_search, e.gr, 0.0), 3.25);
@@ -2183,7 +2197,7 @@ pPM.shaderCode = {
             float SMAASearchYDown(sampler2D u_canvas, sampler2D u_search, vec2 texcoord, float end) {
               vec2 e = vec2(1.0, 0.0);
               for (int i = 0; i < SMAA_MAX_SEARCH_STEPS; i++) { if (!(texcoord.y < end && e.r > 0.8281 && e.g == 0.0)) break;
-                e = texture2D(u_canvas, texcoord).rg; // LinearSampler
+                e = texture(u_canvas, texcoord).rg; // LinearSampler
                 texcoord = mad(vec2(0.0, 2.0), SMAA_RT_METRICS.xy, texcoord);
               }
               float offset = mad(-(255.0 / 127.0), SMAASearchLength(u_search, e.gr, 0.5), 3.25);
@@ -2205,7 +2219,7 @@ pPM.shaderCode = {
               texcoord.y = mad(SMAA_AREATEX_SUBTEX_SIZE, offset, texcoord.y);
 
               // Do it!
-              return SMAA_AREATEX_SELECT(texture2D(u_area, texcoord)); // LinearSampler
+              return SMAA_AREATEX_SELECT(texture(u_area, texcoord)); // LinearSampler
             }
 
             // Corner Detection Functions
@@ -2247,7 +2261,7 @@ pPM.shaderCode = {
               vec4 subsampleIndices = vec4(0.0); // Just pass zero for SMAA 1x, see @SUBSAMPLE_INDICES.
               // subsampleIndices = vec4(1.0, 1.0, 1.0, 0.0);
               vec4 weights = vec4(0.0, 0.0, 0.0, 0.0);
-              vec2 e = texture2D(u_canvas, v_texCoord).rg;
+              vec2 e = texture(u_canvas, v_texCoord).rg;
 
               if (e.g > 0.0) { // Edge at north
 
@@ -2272,7 +2286,7 @@ pPM.shaderCode = {
                 // Now fetch the left crossing edges, two at a time using bilinear
                 // filtering. Sampling at -0.25 (see @CROSSING_OFFSET) enables to
                 // discern what value each edge has:
-                float e1 = texture2D(u_canvas, coords.xy).r; // LinearSampler
+                float e1 = texture(u_canvas, coords.xy).r; // LinearSampler
 
                 // Find the distance to the right:
                 coords.z = SMAASearchXRight(u_canvas, u_search, v_offset[0].zw, v_offset[2].y);
@@ -2313,7 +2327,7 @@ pPM.shaderCode = {
                 d.x = coords.y;
 
                 // Fetch the top crossing edges:
-                float e1 = texture2D(u_canvas, coords.xy).g; // LinearSampler
+                float e1 = texture(u_canvas, coords.xy).g; // LinearSampler
 
                 // Find the distance to the bottom:
                 coords.z = SMAASearchYDown(u_canvas, u_search, v_offset[1].zw, v_offset[2].w);
@@ -2337,20 +2351,20 @@ pPM.shaderCode = {
                 SMAADetectVerticalCornerPattern(u_canvas, weights.ba, coords.xyxz, d);
               }
 
-              gl_FragColor = weights;
+              fragColor = weights;
             }
     `,
   },
   smaaBlend: {
-    vert: `       
+    vert: `#version 300 es       
           #define mad(a, b, c) (a * b + c)   
-          attribute vec2 a_position;
-          attribute vec2 a_texCoord;
+          in vec2 a_position;
+          in vec2 a_texCoord;
 
           uniform vec2 u_resolution;
           
-          varying vec2 v_texCoord;
-          varying vec4 v_offset;
+          out vec2 v_texCoord;
+          out vec4 v_offset;
                         
           void main() {
             // convert the rectangle from pixels to 0.0 to 1.0
@@ -2373,7 +2387,7 @@ pPM.shaderCode = {
             v_offset = mad(SMAA_RT_METRICS.xyxy, vec4(1.0, 0.0, 0.0,  1.0), v_texCoord.xyxy);
           }            
           `,
-    frag: `      
+    frag: `#version 300 es      
           precision highp float;
 
           #define mad(a, b, c) (a * b + c)
@@ -2383,8 +2397,10 @@ pPM.shaderCode = {
 
           uniform vec2 u_resolution;
 
-          varying vec2 v_texCoord;
-          varying vec4 v_offset;
+          in vec2 v_texCoord;
+          in vec4 v_offset;
+
+          out vec4 fragColor;
 
           vec4 SMAA_RT_METRICS = vec4(1.0 / u_resolution.x, 1.0 / u_resolution.y, u_resolution.x, u_resolution.y);
 
@@ -2406,13 +2422,13 @@ pPM.shaderCode = {
 
             // Fetch the blending weights for current pixel:
             vec4 a;
-            a.x = texture2D(u_canvas, v_offset.xy).a; // Right
-            a.y = texture2D(u_canvas, v_offset.zw).g; // Top
-            a.wz = texture2D(u_canvas, v_texCoord).xz; // Bottom / Left
+            a.x = texture(u_canvas, v_offset.xy).a; // Right
+            a.y = texture(u_canvas, v_offset.zw).g; // Top
+            a.wz = texture(u_canvas, v_texCoord).xz; // Bottom / Left
 
             // Is there any blending weight with a value greater than 0.0?
             if (dot(a, vec4(1.0, 1.0, 1.0, 1.0)) <= 1e-5) {
-              color = texture2D(u_color, v_texCoord); // LinearSampler
+              color = texture(u_color, v_texCoord); // LinearSampler
             } else {
               bool h = max(a.x, a.z) > max(a.y, a.w); // max(horizontal) > max(vertical)
 
@@ -2428,11 +2444,11 @@ pPM.shaderCode = {
 
               // We exploit bilinear filtering to mix current pixel with the chosen
               // neighbor:
-              color = blendingWeight.x * texture2D(u_color, blendingCoord.xy); // LinearSampler
-              color += blendingWeight.y * texture2D(u_color, blendingCoord.zw); // LinearSampler
+              color = blendingWeight.x * texture(u_color, blendingCoord.xy); // LinearSampler
+              color += blendingWeight.y * texture(u_color, blendingCoord.zw); // LinearSampler
             }
 
-            gl_FragColor = color;
+            fragColor = color;
           }
     `,
   },

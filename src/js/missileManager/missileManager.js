@@ -573,11 +573,11 @@ missileManager.Missile = function (CurrentLatitude, CurrentLongitude, TargetLati
   Diameter = Diameter || 3.1; // (m)
 
   if (CurrentLatitude > 90 || CurrentLatitude < -90) {
-    console.error('Error: Current Latitude must be between 90 and -90 degrees');
+    // console.error('Error: Current Latitude must be between 90 and -90 degrees');
     return 0;
   }
   if (CurrentLongitude > 180 || CurrentLongitude < -180) {
-    console.error('Error: Current Longitude must be between 180 and -180 degrees');
+    // console.error('Error: Current Longitude must be between 180 and -180 degrees');
     return 0;
   }
   if (TargetLatitude > 90 || TargetLatitude < -90) {
@@ -593,11 +593,11 @@ missileManager.Missile = function (CurrentLatitude, CurrentLongitude, TargetLati
     return 0;
   }
   if (NumberWarheads > 12) {
-    console.error('Error: Rocket can hold up to 12 warheads');
+    // console.error('Error: Rocket can hold up to 12 warheads');
     return 0;
   }
   if (parseFloat(NumberWarheads) % 1 > 0) {
-    console.error('Error: The number of warheads must be a whole number');
+    // console.error('Error: The number of warheads must be a whole number');
     return 0;
   }
 

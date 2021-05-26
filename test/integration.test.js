@@ -76,9 +76,7 @@ const eventFire = (elObj, etype) => {
 
 describe('Integration Testing', () => {
   var lineManager, groupsManager, cameraManager, gl, dotsManager;
-  console.debug = jest.fn();
-  console.warn = jest.fn();
-  console.log = jest.fn();
+
   const exampleSat = {
     C: 'US',
     LS: 'AFETR',
@@ -138,8 +136,13 @@ describe('Integration Testing', () => {
     cameraManager = new Camera();
     // We need to know if we are on a small screen before starting webgl
     gl = await drawManager.glInit();
+
+    // NOTE: Jest fails with webgl2 so we use webgl1 during testing
+    // This means we need to mock some of the webgl2 code
+    gl = global.mocks.glMock;
+
     window.addEventListener('resize', drawManager.resizeCanvas);
-    drawManager.loadScene();
+    drawManager.loadScene(gl);
     dotsManager = await drawManager.createDotsManager();
     satSet.init(gl, dotsManager, cameraManager);
     objectManager.init(sensorManager);
@@ -940,7 +943,6 @@ describe('Integration Testing', () => {
     missileManager.Missile(0, 0, 40, -501, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
     missileManager.Missile(0, 0, 40, 501, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
 
-    // console.error = jest.fn();
     missileManager.Missile(100, 0, 0, -71, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
     missileManager.Missile(-100, 0, 0, -71, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
     missileManager.Missile(0, 300, 40, 1, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);

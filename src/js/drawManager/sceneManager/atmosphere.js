@@ -3,90 +3,182 @@
 
 // eslint-disable-next-line max-classes-per-file
 import * as glm from '@app/js/lib/external/gl-matrix.js';
-import * as twgl from 'twgl.js';
 import { DEG2RAD } from '@app/js/lib/constants.js';
 
 class Atmosphere {
-  /* istanbul ignore next */
   constructor(gl, earth, settingsManager) {
     // Move to the code the creates the moon?
     if (settingsManager.enableLimitedUI || settingsManager.isDrawLess) return;
-    // twgl doesn't work in jest at the moment (5/1/2021)
-    if (typeof process !== 'undefined') return;
-
-    this.NUM_LAT_SEGS = 64;
-    this.NUM_LON_SEGS = 64;
 
     // Setup References to World
     this.gl = gl;
     this.earth = earth;
 
-    this.setupShaderCode();
+    this.numLatSegs = 64;
+    this.numLonSegs = 64;
 
     // We draw the moon way closer than it actually is because of depthBuffer issues
     // Each draw loop we will scale the real position so it is consistent
     this.drawPosition = [0, 0, 0];
 
-    // Create these once and reuse them a lot
-    this.mvMatrixEmpty = glm.mat4.create();
-    this.nMatrixEmpty = glm.mat3.create();
-
-    // Create a gl program from the vert/frag shaders
-    this.programInfo = twgl.createProgramInfo(gl, [this.shaderCode.vert, this.shaderCode.frag]);
-
-    // Create buffers from the geomerty
-    this.bufferInfo = twgl.primitives.createSphereBufferInfo(gl, settingsManager.atmosphereSize, this.NUM_LON_SEGS, this.NUM_LAT_SEGS);
+    // Create a gl program from the vert/frag shaders and geometry buffers
+    this.init(gl);
 
     this.loaded = true;
   }
 
-  /* istanbul ignore next */
-  updateUniforms(pMatrix, camMatrix) {
-    this.mvMatrix = glm.mat4.create();
-    this.nMatrix = glm.mat3.create();
-    glm.mat4.identity(this.mvMatrix);
-    glm.mat4.translate(this.mvMatrix, this.mvMatrix, this.drawPosition);
-    glm.mat3.normalFromMat4(this.nMatrix, this.mvMatrix);
+  init(gl) {
+    const program = gl.createProgram();
+    program.vertShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(program.vertShader, Atmosphere.shaderCode.vert);
+    gl.compileShader(program.vertShader);
 
-    this.uniforms = {
-      u_nMatrix: this.nMatrix,
-      u_mvMatrix: this.mvMatrix,
-      u_pMatrix: pMatrix,
-      u_camMatrix: camMatrix,
-      u_lightDirection: this.earth.lightDirection,
-    };
+    program.fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(program.fragShader, Atmosphere.shaderCode.frag);
+    gl.compileShader(program.fragShader);
+
+    gl.attachShader(program, program.vertShader);
+    gl.attachShader(program, program.fragShader);
+    gl.linkProgram(program);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      var info = gl.getProgramInfoLog(program);
+      throw new Error('Could not compile WebGL program. \n\n' + info);
+    }
+    this.program = program;
+
+    // Assign Attributes
+    this.program.aVertexPosition = gl.getAttribLocation(this.program, 'position');
+    this.program.aVertexNormal = gl.getAttribLocation(this.program, 'normal');
+    this.program.u_pMatrix = gl.getUniformLocation(this.program, 'u_pMatrix');
+    this.program.u_camMatrix = gl.getUniformLocation(this.program, 'u_camMatrix');
+    this.program.u_mvMatrix = gl.getUniformLocation(this.program, 'u_mvMatrix');
+    this.program.u_nMatrix = gl.getUniformLocation(this.program, 'u_nMatrix');
+    this.program.u_lightDirection = gl.getUniformLocation(this.program, 'u_lightDirection');
+
+    // generate a uvsphere bottom up, CCW order
+    var vertPos = [];
+    var vertNorm = [];
+    var texCoord = [];
+    for (let lat = 0; lat <= this.numLatSegs; lat++) {
+      var latAngle = (Math.PI / this.numLatSegs) * lat - Math.PI / 2;
+      var diskRadius = Math.cos(Math.abs(latAngle));
+      var z = Math.sin(latAngle);
+      // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
+      // var i = 0;
+      for (let lon = 0; lon <= this.numLonSegs; lon++) {
+        // add an extra vertex for texture funness
+        var lonAngle = ((Math.PI * 2) / this.numLonSegs) * lon;
+        var x = Math.cos(lonAngle) * diskRadius;
+        var y = Math.sin(lonAngle) * diskRadius;
+        // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
+
+        // mercator cylindrical projection (simple angle interpolation)
+        var v = 1 - lat / this.numLatSegs;
+        var u = 0.5 + lon / this.numLonSegs; // may need to change to move map
+        // console.log('u: ' + u + ' v: ' + v);
+        // normals: should just be a vector from center to point (aka the point itself!
+
+        vertPos.push(x * settingsManager.atmosphereSize);
+        vertPos.push(y * settingsManager.atmosphereSize);
+        vertPos.push(z * settingsManager.atmosphereSize);
+        texCoord.push(u);
+        texCoord.push(v);
+        vertNorm.push(x);
+        vertNorm.push(y);
+        vertNorm.push(z);
+
+        // i++;
+      }
+    }
+
+    // ok let's calculate vertex draw orders.... indiv triangles
+    var vertIndex = [];
+    for (let lat = 0; lat < this.numLatSegs; lat++) {
+      // this is for each QUAD, not each vertex, so <
+      for (let lon = 0; lon < this.numLonSegs; lon++) {
+        var blVert = lat * (this.numLonSegs + 1) + lon; // there's this.numLonSegs + 1 verts in each horizontal band
+        var brVert = blVert + 1;
+        var tlVert = (lat + 1) * (this.numLonSegs + 1) + lon;
+        var trVert = tlVert + 1;
+        // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
+        vertIndex.push(blVert);
+        vertIndex.push(brVert);
+        vertIndex.push(tlVert);
+
+        vertIndex.push(tlVert);
+        vertIndex.push(trVert);
+        vertIndex.push(brVert);
+      }
+    }
+    this.buffers = {};
+    this.buffers.vertCount = vertIndex.length;
+
+    this.buffers.vertPosBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.vertPosBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertPos), gl.STATIC_DRAW);
+
+    this.buffers.vertNormBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.vertNormBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertNorm), gl.STATIC_DRAW);
+
+    this.buffers.vertIndexBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.vertIndexBuf);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
+
+    this.vao = gl.createVertexArray();
+    gl.bindVertexArray(this.vao);
+
+    // Select the vertex position buffer
+    // Enable the attribute
+    // Set the attribute
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.vertPosBuf);
+    gl.enableVertexAttribArray(this.program.aVertexPosition);
+    gl.vertexAttribPointer(this.program.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+
+    // Select the vertex normals buffer
+    // Enable the attribute
+    // Set the attribute
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.vertNormBuf);
+    gl.enableVertexAttribArray(this.program.aVertexNormal);
+    gl.vertexAttribPointer(this.program.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
+
+    // Select the vertex indicies buffer
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.vertIndexBuf);
+
+    gl.bindVertexArray(null);
   }
 
-  /* istanbul ignore next */
   draw(pMatrix, cameraManager) {
-    // Move this to the draw loop?
     if (!this.loaded) return;
     const gl = this.gl;
 
-    this.update(cameraManager.camPitch);
-    this.updateUniforms(pMatrix, cameraManager.camMatrix);
-
-    // This is done during sun.draw
+    // Enable blending and ignore depth test (especially on self)
     gl.enable(gl.BLEND);
-    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-    // ignore depth test (especially on self)
     gl.disable(gl.DEPTH_TEST);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    gl.useProgram(this.programInfo.program);
-    twgl.setBuffersAndAttributes(gl, this.programInfo, this.bufferInfo);
-    twgl.setUniforms(this.programInfo, this.uniforms);
-    twgl.drawBufferInfo(gl, this.bufferInfo);
+    // Change to the atmosphere shader
+    gl.useProgram(this.program);
+    gl.bindVertexArray(this.vao);
+
+    // Set the uniforms
+    this.update(cameraManager.camPitch);
+    gl.uniformMatrix3fv(this.program.u_nMatrix, false, this.nMatrix);
+    gl.uniformMatrix4fv(this.program.u_mvMatrix, false, this.mvMatrix);
+    gl.uniformMatrix4fv(this.program.u_pMatrix, false, pMatrix);
+    gl.uniformMatrix4fv(this.program.u_camMatrix, false, cameraManager.camMatrix);
+    gl.uniform3fv(this.program.u_lightDirection, this.earth.lightDirection);
+
+    // Draw everythign to screen
+    gl.drawElements(gl.TRIANGLES, this.buffers.vertCount, gl.UNSIGNED_SHORT, 0);
+    gl.bindVertexArray(null);
 
     // Disable blending and reeneable depth test
     gl.disable(gl.BLEND);
     gl.enable(gl.DEPTH_TEST);
-
-    // Done Drawing
-    return true;
   }
 
-  /* istanbul ignore next */
   update(camPitch) {
     // Start with an empyy model view matrix
     this.mvMatrix = glm.mat4.create();
@@ -101,19 +193,15 @@ class Atmosphere {
     glm.mat3.normalFromMat4(this.nMatrix, this.mvMatrix);
   }
 
-  /* istanbul ignore next */
-  setupShaderCode() {
-    this.shaderCode = {
-      frag: `
-        #ifdef GL_FRAGMENT_PRECISION_HIGH
-          precision highp float;
-        #else
-          precision mediump float;
-        #endif
+  static shaderCode = {
+    frag: `#version 300 es
+        precision highp float;        
   
         uniform vec3 u_lightDirection;
-        varying vec3 v_normal;
-        varying float v_dist;
+        in vec3 v_normal;
+        in float v_dist;
+
+        out vec4 fragColor;
   
         void main () {
             float sunAmount = max(dot(v_normal, u_lightDirection), 0.1);
@@ -126,20 +214,20 @@ class Atmosphere {
             float a2 = min(pow(darkAmount / 1.15, 2.0),0.2);
             float a3 = pow(v_dist,2.0) * -1.0 + 1.2;
             float a = min(a1 - a2, a3) * a4;
-            gl_FragColor    = vec4(vec3(r,g,b), a);
+            fragColor    = vec4(vec3(r,g,b), a);
         }
         `,
-      vert: `
-        attribute vec3 position;
-        attribute vec3 normal;
+    vert: `#version 300 es
+        in vec3 position;
+        in vec3 normal;
   
         uniform mat4 u_pMatrix;
         uniform mat4 u_camMatrix;
         uniform mat4 u_mvMatrix;
         uniform mat3 u_nMatrix;
   
-        varying vec3 v_normal;
-        varying float v_dist;
+        out vec3 v_normal;
+        out float v_dist;
   
         void main(void) {
             vec4 position1 = u_camMatrix * u_mvMatrix * vec4(position, 1.0);
@@ -149,8 +237,7 @@ class Atmosphere {
             v_normal = normalize( u_nMatrix * normal );
         }
         `,
-    };
-  }
+  };
 }
 
 export { Atmosphere };

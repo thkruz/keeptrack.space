@@ -25,12 +25,14 @@ sun.sunvar = {};
 sun.pos = [0, 0, 0];
 sun.pos2 = [0, 0, 0];
 sun.shader = {
-  frag: `
+  frag: `#version 300 es
     precision highp float;
     uniform vec3 uLightDirection;
 
-    varying vec3 vNormal;    
-    varying float vDist2;
+    in vec3 vNormal;    
+    in float vDist2;
+
+    out vec4 fragColor;
 
     void main(void) {
         // Hide the Back Side of the Sphere to prevent duplicate suns
@@ -44,12 +46,12 @@ sun.shader = {
         discard;
         }
 
-        gl_FragColor = vec4(vec3(r,g,b), a);
+        fragColor = vec4(vec3(r,g,b), a);
     }  
     `,
-  vert: `
-    attribute vec3 aVertexPosition;
-    attribute vec3 aVertexNormal;
+  vert: `#version 300 es
+    in vec3 aVertexPosition;
+    in vec3 aVertexNormal;
 
     uniform mat4 uPMatrix;
     uniform mat4 uCamMatrix;
@@ -57,8 +59,8 @@ sun.shader = {
     uniform mat3 uNormalMatrix;
     uniform float uSunDis;
 
-    varying vec3 vNormal;    
-    varying float vDist2;
+    out vec3 vNormal;    
+    out float vDist2;
 
     void main(void) {
         vec4 position = uMvMatrix * vec4(aVertexPosition / 1.6, 1.0);        
@@ -200,6 +202,7 @@ sun.setupGodrays = (gl) => {
 
   // lookup uniforms
   sun.uSunPosition = gl.getUniformLocation(sun.godraysProgram, 'u_sunPosition');
+  sun.uCanvasSampler = gl.getUniformLocation(sun.godraysProgram, 'uCanvasSampler');
   sun.resolutionLocation = gl.getUniformLocation(sun.godraysProgram, 'u_resolution');
 
   sun.positionBuffer = gl.createBuffer();
@@ -290,9 +293,6 @@ sun.update = () => {
 sun.draw = function (pMatrix, camMatrix, tgtBuffer) {
   if (!sun.loaded) return;
 
-  // Switch Vertex Array Objects
-  // gl.bindVertexArray(sun.vao);
-
   sun.sunScreenPosition = sun.getScreenCoords(pMatrix, camMatrix);
 
   mvMatrix = mvMatrixEmpty;
@@ -302,9 +302,6 @@ sun.draw = function (pMatrix, camMatrix, tgtBuffer) {
 
   nMatrix = nMatrixEmpty;
   glm.mat3.normalFromMat4(nMatrix, mvMatrix);
-
-  // gl.enable(gl.BLEND);
-  // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   gl.useProgram(sunShader);
   // Draw to the bloom frame buffer for post processing
@@ -332,6 +329,9 @@ sun.draw = function (pMatrix, camMatrix, tgtBuffer) {
 sun.godraysPostProcessing = (gl, tgtBuffer) => {
   gl.useProgram(sun.godraysProgram);
 
+  // Draw the new version to the screen
+  gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+
   // Make sure this texture doesn't prevent the rest of the scene from rendering
   gl.depthMask(false);
 
@@ -358,8 +358,6 @@ sun.godraysPostProcessing = (gl, tgtBuffer) => {
   // set the resolution
   gl.uniform2f(sun.resolutionLocation, gl.canvas.width, gl.canvas.height);
 
-  // Draw the new version to the screen
-  gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
   gl.drawArrays(gl.TRIANGLES, 0, 6);
 
   // Future writing needs to have a depth test
@@ -385,7 +383,7 @@ sun.getScreenCoords = (pMatrix, camMatrix) => {
 };
 
 sun.godraysShaderCode = {
-  frag: `
+  frag: `#version 300 es    
     precision mediump float;
 
     // our texture
@@ -394,7 +392,9 @@ sun.godraysShaderCode = {
     uniform vec2 u_sunPosition;
     
     // the texCoords passed in from the vertex shader.
-    varying vec2 v_texCoord;
+  in vec2 v_texCoord;
+
+  out vec4 fragColor;
     
     void main() {
       float decay=1.0;
@@ -410,7 +410,7 @@ sun.godraysShaderCode = {
       vec2 deltaTexCoord = (v_texCoord - lightPositionOnScreen.xy);
       deltaTexCoord *= 1.0 / float(samples) * density;
       float illuminationDecay = 1.0;
-      vec4 color =texture2D(uCanvasSampler, texCoord.xy);
+    vec4 color = texture(uCanvasSampler, texCoord.xy);
       
       for(int i= 0; i <= samples ; i++)
       {
@@ -418,22 +418,22 @@ sun.godraysShaderCode = {
             break;
           }
           texCoord -= deltaTexCoord;
-          vec4 sample = texture2D(uCanvasSampler, texCoord);
-          sample *= illuminationDecay * weight;
-          color += sample;
+        vec4 texSample = texture(uCanvasSampler, texCoord);
+        texSample *= illuminationDecay * weight;
+        color += texSample;
           illuminationDecay *= decay;
       }
         color *= exposure;
-      gl_FragColor = color;
+    fragColor = color;
     }
   `,
-  vert: `
-    attribute vec2 a_position;
-    attribute vec2 a_texCoord;
+  vert: `#version 300 es
+    in vec2 a_position;
+    in vec2 a_texCoord;
 
     uniform vec2 u_resolution;
     
-    varying vec2 v_texCoord;
+    out vec2 v_texCoord;
     
     void main() {
       // convert the rectangle from pixels to 0.0 to 1.0

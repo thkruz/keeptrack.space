@@ -16,6 +16,6 @@ jobs:
       with:
         node-version: 14.x
     - run: npm install    
-    - run: npm run build-dev
+    - run: npm run build:dev
     - run: npm run test
     - run: node ./node_modules/.bin/codecov

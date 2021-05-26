@@ -12,7 +12,7 @@ jobs:
       with:
         working-directory: ./
         build: npm run build-test
-        start: npm run server:start
+        start: npm run http
         wait-on: 'http://localhost:8080'
         config: baseUrl=http://localhost:8080
         browser: chrome
@@ -27,7 +27,7 @@ jobs:
         with:
           working-directory: ./
           build: npm run build-test
-          start: npm run server:start
+          start: npm run http
           wait-on: 'http://localhost:8080'
           config: baseUrl=http://localhost:8080
           browser: edge
@@ -42,7 +42,7 @@ jobs:
         with:
           working-directory: ./
           build: npm run build-test
-          start: npm run server:start
+          start: npm run http
           wait-on: 'http://localhost:8080'
           config: baseUrl=http://localhost:8080
           browser: chrome
@@ -57,7 +57,7 @@ jobs:
       with:
         working-directory: ./
         build: npm run build-test
-        start: npm run server:start
+        start: npm run http
         wait-on: 'http://localhost:8080'
         config: baseUrl=http://localhost:8080
         browser: chrome

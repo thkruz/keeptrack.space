@@ -15,8 +15,6 @@ jobs:
       - name: Install and Build 🔧
         run: |
           npm install
-          npm run stage
-          npm run getExtras
           npm run build-dev
 
       - name: Deploy 🚀

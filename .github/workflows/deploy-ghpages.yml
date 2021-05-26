@@ -15,9 +15,7 @@ jobs:
       - name: Install and Build 🔧
         run: |
           npm install
-          npm run stage
-          npm run getExtras
-          npm run build-dev
+          npm run build:dev
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1

@@ -11,8 +11,8 @@ jobs:
     - uses: cypress-io/github-action@v2
       with:
         working-directory: ./
-        build: npm run build-test
-        start: npm run server:start
+        build: npm run build:test
+        start: npm run http
         wait-on: 'http://localhost:8080'
         config: baseUrl=http://localhost:8080
         browser: chrome
@@ -26,8 +26,8 @@ jobs:
       - uses: cypress-io/github-action@v2
         with:
           working-directory: ./
-          build: npm run build-test
-          start: npm run server:start
+          build: npm run build:test
+          start: npm run http
           wait-on: 'http://localhost:8080'
           config: baseUrl=http://localhost:8080
           browser: edge
@@ -41,8 +41,8 @@ jobs:
       - uses: cypress-io/github-action@v2
         with:
           working-directory: ./
-          build: npm run build-test
-          start: npm run server:start
+          build: npm run build:test
+          start: npm run http
           wait-on: 'http://localhost:8080'
           config: baseUrl=http://localhost:8080
           browser: chrome
@@ -56,8 +56,8 @@ jobs:
     - uses: cypress-io/github-action@v2
       with:
         working-directory: ./
-        build: npm run build-test
-        start: npm run server:start
+        build: npm run build:test
+        start: npm run http
         wait-on: 'http://localhost:8080'
         config: baseUrl=http://localhost:8080
         browser: chrome

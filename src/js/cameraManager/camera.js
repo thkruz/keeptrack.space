@@ -503,6 +503,7 @@ class Camera {
     this.#camYawTarget = Camera.normalizeAngle(yaw);
     this.#ecPitch = pitch;
     this.#ecYaw = yaw;
+    if (this.#ecYaw < 0) this.#ecYaw += TAU;
     this.camSnapMode = true;
   }
 
@@ -916,7 +917,7 @@ class Camera {
         this.camPitch = this.#ecPitch;
         this.camPitchSpeed = 0;
       }
-      if (this.camYaw >= this.#ecYaw - 0.05 && this.camYaw <= this.#ecYaw + 0.01) {
+      if (this.camYaw >= this.#ecYaw - 0.05 && this.camYaw <= this.#ecYaw + 0.05) {
         this.camYaw = this.#ecYaw;
         this.camYawSpeed = 0;
       }
@@ -930,6 +931,8 @@ class Camera {
       } else if (this.camPitch < this.#ecPitch) {
         this.camPitch += this.camPitchSpeed * dt * settingsManager.cameraDecayFactor;
       }
+
+      console.log(`${this.camYaw} - ${this.#ecYaw}`);
 
       if (this.camYaw > this.#ecYaw) {
         this.camYaw -= this.camYawSpeed * dt * settingsManager.cameraDecayFactor;
@@ -1005,6 +1008,7 @@ class Camera {
     if (this.cameraType.current == this.cameraType.default || this.cameraType.current == this.cameraType.offset) {
       this.#ecPitch = this.camPitch;
       this.#ecYaw = this.camYaw;
+      if (this.#ecYaw < 0) this.#ecYaw += TAU;
     } else if (this.cameraType.current == this.cameraType.fixedToSat) {
       this.#ftsPitch = this.camPitch;
       this.#ftsYaw = this.camYaw;

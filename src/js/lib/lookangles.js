@@ -1345,13 +1345,16 @@ satellite.calculateLookAngles = (sat, sensor, propOffset) => {
   return lookanglesTable;
 };
 satellite.findBestPasses = (sats, sensor) => {
-  var satArray = sats.split(',');
-  var tableSatTimes = [];
-  for (var i = 0; i < satArray.length; i++) {
+  sats = sats.replace(' ', ',');
+  const satArray = sats.split(',');
+  let tableSatTimes = [];
+  for (let i = 0; i < satArray.length; i++) {
     try {
-      var sat = satSet.getSat(satSet.getIdFromObjNum(satArray[i]));
-      var satPasses = satellite.findBestPass(sat, sensor, 0);
-      for (var s = 0; s < satPasses.length; s++) {
+      let satId = satArray[i];
+      if (typeof satId == 'undefined' || satId == null || satId == '' || satId == ' ') continue;
+      let sat = satSet.getSatFromObjNum(parseInt(satId));
+      let satPasses = satellite.findBestPass(sat, sensor, 0);
+      for (let s = 0; s < satPasses.length; s++) {
         tableSatTimes.push(satPasses[s]);
         // }
       }
@@ -1383,7 +1386,7 @@ satellite.findBestPass = (sat, sensor, propOffset) => {
       if (sensorManager.checkSensorSelected()) {
         sensor = sensorManager.currentSensor;
       } else {
-        console.error('getlookangles2 requires a sensor!');
+        console.error('findBestPass requires a sensor!');
         return;
       }
       // Simple Error Checking
@@ -1467,12 +1470,12 @@ satellite.findBestPass = (sat, sensor, propOffset) => {
           stop3 = aer.el <= 3.5;
 
           score = Math.min((((now - sTime) / 1000 / 60) * 10) / 8, 10); // 8 minute pass is max score
-          let elScore = Math.min((passMaxEl / 40) * 10, 10); // 40 el or above is max score
-          elScore -= Math.max((passMaxEl - 50) / 5, 0); // subtract points for being over 50 el
+          let elScore = Math.min((passMaxEl / 50) * 10, 10); // 50 el or above is max score
+          // elScore -= Math.max((passMaxEl - 50) / 5, 0); // subtract points for being over 50 el
           elScore *= start3 && stop3 ? 2 : 1; // Double points for start and stop at 3
           score += elScore;
-          score += Math.min((10 * 900) / passMinrng, 10); // 750 or less is max score
-          score -= Math.max((900 - passMinrng) / 10, 0); // subtract points for being closer than 750
+          score += Math.min((10 * 750) / passMinrng, 10); // 750 or less is max score
+          // score -= Math.max((750 - passMinrng) / 10, 0); // subtract points for being closer than 750
 
           let tic = 0;
           try {

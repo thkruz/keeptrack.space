@@ -31,15 +31,17 @@ earth.loaded = false;
 earth.sunvar = {};
 
 earth.shader = {
-  frag: `
+  frag: `#version 300 es
     precision mediump float;
 
     uniform vec3 uAmbientLightColor;
     uniform vec3 uDirectionalLightColor;
     uniform vec3 uLightDirection;
 
-    varying vec2 vUv;
-    varying vec3 vNormal;
+    in vec2 vUv;
+    in vec3 vNormal;
+
+    out vec4 fragColor;
 
     uniform sampler2D uSampler;
     uniform sampler2D uNightSampler;
@@ -51,28 +53,28 @@ earth.shader = {
         // float diffuse = pow(max(dot(vNormal, uLightDirection), 0.0),shininess);
         // float diffuseLight = 0.7;
         float diffuse = max(dot(vNormal, uLightDirection), 0.0);
-        vec3 bumpTexColor = texture2D(uBumpMap, vUv).rgb * diffuse * 0.4;
-        vec3 specLightColor = texture2D(uSpecMap, vUv).rgb * diffuse * 0.1;
+        vec3 bumpTexColor = texture(uBumpMap, vUv).rgb * diffuse * 0.4;
+        vec3 specLightColor = texture(uSpecMap, vUv).rgb * diffuse * 0.1;
 
         vec3 dayColor = uAmbientLightColor + (uDirectionalLightColor * diffuse);
-        vec3 dayTexColor = texture2D(uSampler, vUv).rgb * dayColor;
-        vec3 nightColor = texture2D(uNightSampler, vUv).rgb * pow(1.0 - diffuse, 2.0);
+        vec3 dayTexColor = texture(uSampler, vUv).rgb * dayColor;
+        vec3 nightColor = texture(uNightSampler, vUv).rgb * pow(1.0 - diffuse, 2.0);
 
-        gl_FragColor = vec4(dayTexColor + nightColor + bumpTexColor + specLightColor, 1.0);
+        fragColor = vec4(dayTexColor + nightColor + bumpTexColor + specLightColor, 1.0);
     }
     `,
-  vert: `
-    attribute vec3 aVertexPosition;
+  vert: `#version 300 es
+    in vec3 aVertexPosition;
 
-    attribute vec2 aTexCoord;
-    attribute vec3 aVertexNormal;
+    in vec2 aTexCoord;
+    in vec3 aVertexNormal;
     uniform mat4 uPMatrix;
     uniform mat4 uCamMatrix;
     uniform mat4 uMvMatrix;
     uniform mat3 uNormalMatrix;
 
-    varying vec2 vUv;
-    varying vec3 vNormal;
+    out vec2 vUv;
+    out vec3 vNormal;
 
     void main(void) {
         gl_Position = uPMatrix * uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
@@ -510,12 +512,16 @@ earth.draw = function (pMatrix, cameraManager, dotsManager, tgtBuffer) {
 
   // no reason to render 100000s of pixels when
   // we're only going to read one
-  gl.enable(gl.SCISSOR_TEST);
-  gl.scissor(cameraManager.mouseX, gl.drawingBufferHeight - cameraManager.mouseY, 1, 1);
+  if (!settingsManager.isMobileModeEnabled) {
+    gl.enable(gl.SCISSOR_TEST);
+    gl.scissor(cameraManager.mouseX, gl.drawingBufferHeight - cameraManager.mouseY, 1, 1);
+  }
 
   gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 
-  gl.disable(gl.SCISSOR_TEST);
+  if (!settingsManager.isMobileModeEnabled) {
+    gl.disable(gl.SCISSOR_TEST);
+  }
 
   // Disable attributes to avoid conflict with other shaders
   // NOTE: This breaks satellite gpu picking.

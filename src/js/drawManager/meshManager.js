@@ -59,9 +59,6 @@ meshManager.populateFileList = () => {
 };
 
 meshManager.initShaders = () => {
-  // meshManager.vao = gl.createVertexArray();
-  // gl.bindVertexArray(meshManager.vao);
-
   let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
   let fragCode = meshManager.fragShaderCode;
   gl.shaderSource(fragShader, fragCode);
@@ -148,28 +145,32 @@ meshManager.initBuffers = () => {
 
   // initialize the mesh's buffers
   for (var mesh in meshManager.meshes) {
-    // Create the vertex buffer for this mesh
-    var vertexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    var vertexData = meshManager.meshes[mesh].makeBufferData(layout);
-    gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
-    vertexBuffer.numItems = vertexData.numItems;
-    vertexBuffer.layout = layout;
-    meshManager.meshes[mesh].vertexBuffer = vertexBuffer;
+    try {
+      // Create the vertex buffer for this mesh
+      var vertexBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+      var vertexData = meshManager.meshes[mesh].makeBufferData(layout);
+      gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
+      vertexBuffer.numItems = vertexData.numItems;
+      vertexBuffer.layout = layout;
+      meshManager.meshes[mesh].vertexBuffer = vertexBuffer;
 
-    // Create the index buffer for this mesh
-    var indexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    var indexData = meshManager.meshes[mesh].makeIndexBufferDataForMaterials(...Object.values(meshManager.meshes[mesh].materialIndices));
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
-    indexBuffer.numItems = indexData.numItems;
-    meshManager.meshes[mesh].indexBuffer = indexBuffer;
+      // Create the index buffer for this mesh
+      var indexBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+      var indexData = meshManager.meshes[mesh].makeIndexBufferDataForMaterials(...Object.values(meshManager.meshes[mesh].materialIndices));
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
+      indexBuffer.numItems = indexData.numItems;
+      meshManager.meshes[mesh].indexBuffer = indexBuffer;
 
-    // this loops through the mesh names and creates new
-    // model objects and setting their mesh to the current mesh
-    meshManager.models[mesh] = {};
-    meshManager.models[mesh].mesh = meshManager.meshes[mesh];
-    // meshManager.models[mesh].size = meshManager.sizeInfo[mesh];
+      // this loops through the mesh names and creates new
+      // model objects and setting their mesh to the current mesh
+      meshManager.models[mesh] = {};
+      meshManager.models[mesh].mesh = meshManager.meshes[mesh];
+      // meshManager.models[mesh].size = meshManager.sizeInfo[mesh];
+    } catch (error) {
+      // console.warn(error);
+    }
   }
   meshManager.loaded = true;
 };
@@ -185,18 +186,20 @@ meshManager.updatePosition = (pos) => {
 };
 
 // main shader program
-meshManager.fragShaderCode = `
+meshManager.fragShaderCode = `#version 300 es
     precision mediump float;
 
-    varying vec3 vLightDirection;
-    varying float vInSun;
-    varying vec3 vTransformedNormal;
-    varying vec2 vTextureCoord;
-    varying vec4 vPosition;
-    varying vec3 vAmbient;
-    varying vec3 vDiffuse;
-    varying vec3 vSpecular;
-    varying float vSpecularExponent;
+    in vec3 vLightDirection;
+    in float vInSun;
+    in vec3 vTransformedNormal;
+    in vec2 vTextureCoord;
+    in vec4 vPosition;
+    in vec3 vAmbient;
+    in vec3 vDiffuse;
+    in vec3 vSpecular;
+    in float vSpecularExponent;
+
+    out vec4 fragColor;
 
     void main(void) {
       float lightAmt = max(dot(vTransformedNormal, vLightDirection), 0.0);
@@ -207,17 +210,17 @@ meshManager.fragShaderCode = `
 
       vec3 color = ambientColor + dirColor + specColor;
 
-      gl_FragColor = vec4(color, 1.0);
+      fragColor = vec4(color, 1.0);
     }
   `;
-meshManager.vertShaderCode = `
-    attribute vec3 aVertexPosition;
-    attribute vec3 aVertexNormal;
-    attribute vec3 aSpecular;
-    attribute float aSpecularExponent;
-    attribute vec3 aAmbient;
-    attribute vec3 aDiffuse;
-    attribute vec2 aTextureCoord;
+meshManager.vertShaderCode = `#version 300 es    
+    in vec3 aVertexPosition;
+    in vec3 aVertexNormal;
+    in vec3 aSpecular;
+    in float aSpecularExponent;
+    in vec3 aAmbient;
+    in vec3 aDiffuse;
+    in vec2 aTextureCoord;
 
     uniform mat4 uPMatrix;
     uniform mat4 uCamMatrix;
@@ -226,16 +229,16 @@ meshManager.vertShaderCode = `
     uniform vec3 uLightDirection;
     uniform float uInSun;
 
-    varying vec2 vTextureCoord;
-    varying vec3 vTransformedNormal;
-    varying vec4 vPosition;
-    varying vec3 vLightDirection;
-    varying float vInSun;
+    out vec2 vTextureCoord;
+    out vec3 vTransformedNormal;
+    out vec4 vPosition;
+    out vec3 vLightDirection;
+    out float vInSun;
 
-    varying vec3 vAmbient;
-    varying vec3 vDiffuse;
-    varying vec3 vSpecular;
-    varying float vSpecularExponent;
+    out vec3 vAmbient;
+    out vec3 vDiffuse;
+    out vec3 vSpecular;
+    out float vSpecularExponent;
 
     void main(void) {
       vLightDirection = uLightDirection;
@@ -301,7 +304,6 @@ meshManager.draw = (pMatrix, camMatrix, tgtBuffer) => {
   meshManager.shaderProgram.enableVertexAttribArrays(meshManager.currentModel.model);
   meshManager.shaderProgram.applyAttributePointers(meshManager.currentModel.model);
 
-  // Not sure why we do this?
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, meshManager.currentModel.model.mesh.indexBuffer);
   gl.drawElements(gl.TRIANGLES, meshManager.currentModel.model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 

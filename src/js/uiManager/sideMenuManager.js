@@ -90,9 +90,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
   $('#analysis-bpt').on('submit', function (e) {
     let sats = $('#analysis-bpt-sats').val();
     if (!sensorManager.checkSensorSelected()) {
-      // Default to COD
-      // TODO: Should be an error message instead
-      satellite.findBestPasses(sats, sensorManager.sensorList.COD);
+      uiManager.toast(`You must select a sensor first!`, 'critical');
     } else {
       satellite.findBestPasses(sats, sensorManager.selectedSensor);
     }
@@ -636,7 +634,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
       });
       saveAs(blob, scc + '.tle');
     } catch (error) {
-      console.warn(error);
+      // console.warn(error);
     }
     e.preventDefault();
   });
@@ -680,7 +678,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
       reader.readAsText(evt.target.files[0]);
       evt.preventDefault();
     } catch (error) {
-      console.warn(error);
+      // console.warn(error);
     }
   });
 
@@ -854,6 +852,12 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
         launchLon -= 360; // Convert from 0-360 to -180-180
       }
 
+      // if (sat.inclination * RAD2DEG < launchLat) {
+      //   uiManager.toast(`Satellite Inclination Lower than Launch Latitude!`, 'critical');
+      //   $('#loading-screen').fadeOut('slow');
+      //   return;
+      // }
+
       // Set time to 0000z for relative time.
 
       var today = new Date(); // Need to know today for offset calculation
@@ -886,8 +890,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
 
         sat = satSet.getSat(satId);
       } else {
-        $('#nl-error').html('Failed Altitude Check</br>Try Editing Manually');
-        $('#nl-error').show();
+        uiManager.toast(`Failed Altitude Test - Try a Different Satellite!`, 'critical');
       }
       $('#loading-screen').fadeOut('slow');
     });

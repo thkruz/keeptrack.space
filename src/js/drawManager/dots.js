@@ -40,8 +40,6 @@ class Dots {
     if (!this.loaded || !settingsManager.cruncherReady) return;
     const gl = this.gl;
 
-    // gl.bindVertexArray(satSet.vao);
-
     gl.useProgram(this.drawProgram);
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.uniformMatrix4fv(this.drawProgram.pMvCamMatrix, false, this.pMvCamMatrix);
@@ -111,24 +109,29 @@ class Dots {
 
     // no reason to render 100000s of pixels when
     // we're only going to read one
-    gl.enable(gl.SCISSOR_TEST);
-    gl.scissor(cameraManager.mouseX, gl.drawingBufferHeight - cameraManager.mouseY, 1, 1);
+    if (!settingsManager.isMobileModeEnabled) {
+      gl.enable(gl.SCISSOR_TEST);
+      gl.scissor(cameraManager.mouseX, gl.drawingBufferHeight - cameraManager.mouseY, 1, 1);
+    }
 
     // Should not be relying on sizeData -- but temporary
     gl.drawArrays(gl.POINTS, 0, settingsManager.dotsOnScreen); // draw pick
 
-    gl.disable(gl.SCISSOR_TEST);
+    if (!settingsManager.isMobileModeEnabled) {
+      gl.disable(gl.SCISSOR_TEST);
+    }
   }
 
   setupShaders() {
     this.drawShaderCode = {
-      frag: `
-          ${settingsManager.desktopOnlySatShaderFix1}
+      frag: `#version 300 es          
           precision mediump float;
 
-          varying vec4 vColor;
-          varying float vStar;
-          varying float vDist;
+          in vec4 vColor;
+          in float vStar;
+          in float vDist;
+
+          out vec4 fragColor;
 
           float when_lt(float x, float y) {
           return max(sign(y - x), 0.0);
@@ -144,36 +147,37 @@ class Dots {
           float alpha = 0.0;
           // If not a star and not on the ground
           r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
-          alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
+          alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
 
           // If on the ground
           r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 6421.0);
-          alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor2}, 3.0)) * when_lt(vDist, 6471.0);
+          alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 6471.0);
 
           // If a star
           r += (${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0)) * when_ge(vDist, 200000.0);
-          alpha += (pow(2.0 * r + ${settingsManager.satShader.blurFactor4}, 3.0)) * when_ge(vDist, 200000.0);
+          alpha += (2.0 * r - ${settingsManager.satShader.blurFactor4}) * when_ge(vDist, 200000.0);
 
           alpha = min(alpha, 1.0);
           if (alpha == 0.0) discard;
-          gl_FragColor = vec4(vColor.rgb, vColor.a * alpha);
+          fragColor = vec4(vColor.rgb, vColor.a * alpha);
+
           // Reduce Flickering from Depth Fighting
-          ${settingsManager.desktopOnlySatShaderFix2}
+          gl_FragDepth = gl_FragCoord.z * 0.99999975;
           }
         `,
-      vert: `
-        attribute vec3 aPos;
-        attribute vec4 aColor;
-        attribute float aStar;
+      vert: `#version 300 es
+        in vec3 aPos;
+        in vec4 aColor;
+        in float aStar;
 
         uniform float minSize;
         uniform float maxSize;
 
         uniform mat4 pMvCamMatrix;
 
-        varying vec4 vColor;
-        varying float vStar;
-        varying float vDist;
+        out vec4 vColor;
+        out float vStar;
+        out float vDist;
 
         float when_lt(float x, float y) {
             return max(sign(y - x), 0.0);
@@ -211,14 +215,14 @@ class Dots {
       `,
     };
     this.pickingShaderCode = {
-      vert: `
-              attribute vec3 aPos;
-              attribute vec3 aColor;
-              attribute float aPickable;
+      vert: `#version 300 es
+              in vec3 aPos;
+              in vec3 aColor;
+              in float aPickable;
       
               uniform mat4 pMvCamMatrix;
       
-              varying vec3 vColor;
+              out vec3 vColor;
       
               void main(void) {
               vec4 position = pMvCamMatrix * vec4(aPos, 1.0);
@@ -227,13 +231,15 @@ class Dots {
               vColor = aColor * aPickable;
               }
           `,
-      frag: `
+      frag: `#version 300 es
               precision mediump float;
       
-              varying vec3 vColor;
+              in vec3 vColor;
+
+              out vec4 fragColor;
       
               void main(void) {
-                  gl_FragColor = vec4(vColor, 1.0);
+                  fragColor = vec4(vColor, 1.0);
               }
           `,
     };

@@ -41,6 +41,7 @@ global.mocks.glMock = {
   vertexAttribPointer: jest.fn(),
   uniformMatrix3fv: jest.fn(),
   uniformMatrix4fv: jest.fn(),
+  uniform4fv: jest.fn(),
   uniform3fv: jest.fn(),
   uniform1f: jest.fn(),
   uniform1i: jest.fn(),
@@ -51,6 +52,9 @@ global.mocks.glMock = {
   scissor: jest.fn(),
   bufferSubData: jest.fn(),
   generateMipmap: jest.fn(),
+  createVertexArray: jest.fn(),
+  bindVertexArray: jest.fn(),
+  disableVertexAttribArray: jest.fn(),
 };
 
 // mock_requestAnimationFrame.js
@@ -91,3 +95,5 @@ export const requestAnimationFrameMock = new RequestAnimationFrameMockSession();
 
 window.requestAnimationFrame = requestAnimationFrameMock.requestAnimationFrame.bind(requestAnimationFrameMock);
 window.cancelAnimationFrame = requestAnimationFrameMock.cancelAnimationFrame.bind(requestAnimationFrameMock);
+
+window.scrollTo = jest.fn();

@@ -565,14 +565,6 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
       // Is this the Earth?
       //
       // This not the Earth
-
-      if (typeof latLon == 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
-        // Intentional
-      } else {
-        // This is the Earth
-        uiManager.earthClicked();
-      }
-
       uiManager.earthClicked = () => {
         if (!isViewDOM) {
           rightBtnViewDOM.show();
@@ -612,6 +604,13 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         if (settingsManager.hiresNoCloudsImages == true) $('#earth-high-no-clouds-rmb').hide();
         if (settingsManager.vectorImages == true) $('#earth-vec-rmb').hide();
       };
+
+      if (typeof latLon == 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
+        // Intentional
+      } else {
+        // This is the Earth
+        uiManager.earthClicked();
+      }
 
       rightBtnMenuDOM.show();
       satHoverBoxDOM.hide();
@@ -1231,10 +1230,75 @@ uiInput.getSatIdFromCoordAlt = (x, y) => {
   return satSet.getIdFromEci(eciArray);
 };
 
+/* istanbul ignore next */
+uiInput.clientWaitAsync = (gl, sync, flags, intervalMs) =>
+  // eslint-disable-next-line implicit-arrow-linebreak
+  new Promise((resolve, reject) => {
+    const test = () => {
+      // eslint-disable-next-line no-sync
+      const res = gl.clientWaitSync(sync, flags, 0);
+      if (res == gl.WAIT_FAILED) {
+        // eslint-disable-next-line prefer-promise-reject-errors
+        reject();
+        return;
+      }
+      if (res == gl.TIMEOUT_EXPIRED) {
+        setTimeout(test, intervalMs);
+        return;
+      }
+      resolve();
+    };
+
+    test();
+  });
+
+/* istanbul ignore next */
+uiInput.getBufferSubDataAsync = async (gl, target, buffer, srcByteOffset, dstBuffer, /* optional */ dstOffset, /* optional */ length) => {
+  // eslint-disable-next-line no-sync
+  const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+  gl.flush();
+
+  await uiInput.clientWaitAsync(gl, sync, 0, 10);
+  // eslint-disable-next-line no-sync
+  gl.deleteSync(sync);
+
+  gl.bindBuffer(target, buffer);
+  gl.getBufferSubData(target, srcByteOffset, dstBuffer, dstOffset, length);
+  gl.bindBuffer(target, null);
+
+  return dstBuffer;
+};
+
+/* istanbul ignore next */
+uiInput.readPixelsAsync = async (gl, x, y, w, h, format, type, dstBuffer) => {
+  try {
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, buf);
+    gl.bufferData(gl.PIXEL_PACK_BUFFER, dstBuffer.byteLength, gl.STREAM_READ);
+    gl.readPixels(x, y, w, h, format, type, 0);
+    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+
+    await uiInput.getBufferSubDataAsync(gl, gl.PIXEL_PACK_BUFFER, buf, 0, dstBuffer);
+
+    gl.deleteBuffer(buf);
+    // eslint-disable-next-line require-atomic-updates
+    uiInput.isAsyncWorking = true;
+  } catch (error) {
+    // eslint-disable-next-line require-atomic-updates
+    uiInput.isAsyncWorking = false;
+  }
+};
+
+uiInput.isAsyncWorking = true;
 uiInput.getSatIdFromCoord = (x, y) => {
   // NOTE: gl.readPixels is a huge bottleneck
   gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
-  gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManager.pickReadPixelBuffer);
+  if (typeof process === 'undefined' && uiInput.isAsyncWorking) {
+    uiInput.readPixelsAsync(gl, x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManager.pickReadPixelBuffer);
+  }
+  if (!uiInput.isAsyncWorking) {
+    gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManager.pickReadPixelBuffer);
+  }
   // const id = ((dotsManager.pickReadPixelBuffer[2] << 16) | (dotsManager.pickReadPixelBuffer[1] << 8) | dotsManager.pickReadPixelBuffer[0]) - 1;
   return ((dotsManager.pickReadPixelBuffer[2] << 16) | (dotsManager.pickReadPixelBuffer[1] << 8) | dotsManager.pickReadPixelBuffer[0]) - 1;
 };

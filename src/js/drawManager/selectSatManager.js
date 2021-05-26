@@ -255,18 +255,18 @@ selectSatManager.selectSat = (satId, cameraManager) => {
     if (sat.R === null || typeof sat.R == 'undefined') {
       $('#sat-rcs').html('Unknown');
     } else {
-      var rcs;
-      if (sat.R < 0.1) {
-        rcs = 'Small';
-      }
-      if (sat.R >= 0.1) {
-        rcs = 'Medium';
-      }
-      if (sat.R > 1) {
-        rcs = 'Large';
-      }
-      $('#sat-rcs').html(rcs);
-      $('#sat-rcs').tooltip({ delay: 50, html: sat.R, position: 'left' });
+      // var rcs;
+      // if (sat.R < 0.1) {
+      //   rcs = 'Small';
+      // }
+      // if (sat.R >= 0.1) {
+      //   rcs = 'Medium';
+      // }
+      // if (sat.R > 1) {
+      //   rcs = 'Large';
+      // }
+      $('#sat-rcs').html(sat.R);
+      // $('#sat-rcs').tooltip({ delay: 50, html: sat.R, position: 'left' });
     }
 
     if (!sat.missile) {

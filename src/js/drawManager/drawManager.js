@@ -92,15 +92,27 @@ drawManager.canvas.addEventListener('webglcontextrestored', (e) => {
 
 drawManager.glInit = async () => {
   // drawManager Scope
-  gl = drawManager.canvas.getContext('webgl', {
-    alpha: false,
-    premultipliedAlpha: false,
-    desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
-    antialias: true,
-    powerPreference: 'high-performance',
-    preserveDrawingBuffer: true,
-    stencil: false,
-  });
+  if (typeof process !== 'undefined') {
+    gl = drawManager.canvas.getContext('webgl', {
+      alpha: false,
+      premultipliedAlpha: false,
+      desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
+      antialias: true,
+      powerPreference: 'high-performance',
+      preserveDrawingBuffer: true,
+      stencil: false,
+    });
+  } else {
+    gl = drawManager.canvas.getContext('webgl2', {
+      alpha: false,
+      premultipliedAlpha: false,
+      desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
+      antialias: true,
+      powerPreference: 'high-performance',
+      preserveDrawingBuffer: true,
+      stencil: false,
+    });
+  }
 
   drawManager.resizeCanvas();
 
@@ -120,7 +132,7 @@ drawManager.createDotsManager = () => {
   return drawManager.dotsManager;
 };
 
-drawManager.loadScene = async () => {
+drawManager.loadScene = async (gl) => {
   try {
     await sceneManager.earth.init(gl);
     sceneManager.earth.loadHiRes();
@@ -388,7 +400,7 @@ drawManager.drawOptionalScenery = () => {
       // postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
 
       // Draw the moon
-      sceneManager.moon.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
+      sceneManager.moon.draw(drawManager.pMatrix, cameraManager.camMatrix);
 
       if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
         sceneManager.atmosphere.draw(drawManager.pMatrix, cameraManager);

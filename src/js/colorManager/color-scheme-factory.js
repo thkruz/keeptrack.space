@@ -700,9 +700,7 @@ class ColorSchemeFactory {
           pickable: false,
         };
       } else {
-        this.searchBox = document.querySelector('#search');
-        // Add the satellite number and if it isn't the first satellite then prepend a comma
-        this.searchBox += this.searchBox === '' ? sat.SCC_NUM : `,${sat.SCC_NUM}`;
+        settingsManager.lostSatStr += settingsManager.lostSatStr === '' ? sat.SCC_NUM : `,${sat.SCC_NUM}`;
         return {
           color: ColorSchemeFactory.colorTheme.lostobjects,
           pickable: true,

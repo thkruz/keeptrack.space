@@ -608,27 +608,11 @@ $('#colors-menu>ul>li').on('click', function () {
       uiManager.legendMenuChange('default');
       satSet.setColorScheme(ColorScheme.default, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      // if (settingsManager.isOfficialWebsite)
-      //     ga(
-      //         'send',
-      //         'event',
-      //         'ColorScheme Menu',
-      //         'Default Color',
-      //         'Selected'
-      //     );
       break;
     case 'velocity':
       uiManager.legendMenuChange('velocity');
       satSet.setColorScheme(ColorScheme.velocity);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      // if (settingsManager.isOfficialWebsite)
-      //     ga(
-      //         'send',
-      //         'event',
-      //         'ColorScheme Menu',
-      //         'Velocity',
-      //         'Selected'
-      //     );
       break;
     case 'sunlight':
       uiManager.legendMenuChange('sunlight');
@@ -638,70 +622,32 @@ $('#colors-menu>ul>li').on('click', function () {
       satSet.satCruncher.postMessage({
         isSunlightView: true,
       });
-      // if (settingsManager.isOfficialWebsite)
-      //     ga(
-      //         'send',
-      //         'event',
-      //         'ColorScheme Menu',
-      //         'Sunlight',
-      //         'Selected'
-      //     );
       break;
     case 'near-earth':
       uiManager.legendMenuChange('near');
       satSet.setColorScheme(ColorScheme.leo);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      // if (settingsManager.isOfficialWebsite)
-      //     ga(
-      //         'send',
-      //         'event',
-      //         'ColorScheme Menu',
-      //         'near-earth',
-      //         'Selected'
-      //     );
       break;
     case 'deep-space':
       uiManager.legendMenuChange('deep');
       satSet.setColorScheme(ColorScheme.geo);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      // if (settingsManager.isOfficialWebsite)
-      //     ga(
-      //         'send',
-      //         'event',
-      //         'ColorScheme Menu',
-      //         'Deep-Space',
-      //         'Selected'
-      //     );
       break;
     case 'elset-age':
       $('#loading-screen').fadeIn(1000, function () {
         uiManager.legendMenuChange('ageOfElset');
         satSet.setColorScheme(ColorScheme.ageOfElset);
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        // if (settingsManager.isOfficialWebsite)
-        //     ga(
-        //         'send',
-        //         'event',
-        //         'ColorScheme Menu',
-        //         'Age of Elset',
-        //         'Selected'
-        //     );
         $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'lost-objects':
       $('#search').val('');
       $('#loading-screen').fadeIn(1000, function () {
+        settingsManager.lostSatStr = '';
         satSet.setColorScheme(ColorScheme.lostobjects);
+        document.getElementById('search').value = settingsManager.lostSatStr;
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        // if (settingsManager.isOfficialWebsite)
-        //     ga(
-        //         'send',
-        //         'event',
-        //         'ColorScheme Menu',
-        //         'Lost Objects',
-        //         'Selected'
-        //     );
         uiManager.doSearch($('#search').val());
         $('#loading-screen').fadeOut('slow');
       });
@@ -710,34 +656,16 @@ $('#colors-menu>ul>li').on('click', function () {
       uiManager.legendMenuChange('rcs');
       satSet.setColorScheme(ColorScheme.rcs);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      // if (settingsManager.isOfficialWebsite)
-      //     ga('send', 'event', 'ColorScheme Menu', 'RCS', 'Selected');
       break;
     case 'smallsats':
       uiManager.legendMenuChange('small');
       satSet.setColorScheme(ColorScheme.smallsats);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      // if (settingsManager.isOfficialWebsite)
-      //     ga(
-      //         'send',
-      //         'event',
-      //         'ColorScheme Menu',
-      //         'Small Satellites',
-      //         'Selected'
-      //     );
       break;
     case 'countries':
       uiManager.legendMenuChange('countries');
       satSet.setColorScheme(ColorScheme.countries);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      // if (settingsManager.isOfficialWebsite)
-      //     ga(
-      //         'send',
-      //         'event',
-      //         'ColorScheme Menu',
-      //         'Countries',
-      //         'Selected'
-      //     );
       break;
   }
 

@@ -54,8 +54,7 @@
     ],
     "coverageDirectory": "<rootDir>/coverage/unit",
     "moduleDirectories": [
-      "node_modules",
-      "offline"
+      "node_modules"
     ],
     "moduleNameMapper": {
       "\\.(css|less|sass|scss)$": "<rootDir>/scripts/styleMock.js",

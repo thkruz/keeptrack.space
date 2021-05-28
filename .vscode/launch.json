@@ -23,8 +23,8 @@
       "runtimeExecutable": "npm",
       "args": [
         "test",
-        "--",
-        "--runInBand"
+        // "--",
+        // "--runInBand"
       ]
     }
   ]

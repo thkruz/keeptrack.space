@@ -4,12 +4,12 @@
 
 module.exports = (api) => {
   const testPlugins = [
-    [
-      'istanbul',
-      {
-        exclude: ['node_modules/', 'src/js/lib/external/*', '**/*.test.js', '**/serviceWorker.js', 'src/js/__mocks__', 'src/js/webworker/*', 'src/js/wip/*', 'src/tle/*'],
-      },
-    ],
+    // [
+    //   'istanbul',
+    //   {
+    //     exclude: ['node_modules/', 'src/js/lib/external/*', '**/*.test.js', '**/serviceWorker.js', 'src/js/__mocks__', 'src/js/webworker/*', 'src/js/wip/*', 'src/tle/*'],
+    //   },
+    // ],
     '@babel/plugin-proposal-class-properties',
     '@babel/plugin-proposal-private-methods',
   ];

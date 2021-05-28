@@ -134,6 +134,7 @@ satSet.init = async (glRef, dotManagerRef, cameraManager) => {
   settingsManager.loadStr('elsets');
   // See if we are running jest right now for testing
   if (typeof process !== 'undefined') {
+    satCruncher = {};
     // if (process.env.CI == true) {
     //   // Intentionally Left Blank
     // } else {

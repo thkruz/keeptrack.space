@@ -30,6 +30,7 @@ var orbitMvMat = glm.mat4.create();
 let orbitWorker;
 // See if we are running jest right now for testing
 if (typeof process !== 'undefined') {
+  orbitWorker = {};
   // if (process.env.CI == true) {
   //   // Intentionally Left Blank
   // } else {

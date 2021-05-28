@@ -134,16 +134,16 @@ satSet.init = async (glRef, dotManagerRef, cameraManager) => {
   settingsManager.loadStr('elsets');
   // See if we are running jest right now for testing
   if (typeof process !== 'undefined') {
-    if (process.env.CI == true) {
-      // Intentionally Left Blank
-    } else {
-      try {
-        let url = 'http://localhost:8080/js/positionCruncher.js';
-        satCruncher = new Worker(url);
-      } catch (error) {
-        // console.error(error);
-      }
-    }
+    // if (process.env.CI == true) {
+    //   // Intentionally Left Blank
+    // } else {
+    //   try {
+    //     let url = 'http://localhost:8080/js/positionCruncher.js';
+    //     satCruncher = new Worker(url);
+    //   } catch (error) {
+    //     // console.error(error);
+    //   }
+    // }
   } else {
     satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
   }

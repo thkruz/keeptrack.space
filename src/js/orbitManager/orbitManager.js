@@ -30,17 +30,12 @@ var orbitMvMat = glm.mat4.create();
 let orbitWorker;
 // See if we are running jest right now for testing
 if (typeof process !== 'undefined') {
-  orbitWorker = {};
-  // if (process.env.CI == true) {
-  //   // Intentionally Left Blank
-  // } else {
-  //   try {
-  //     let url = 'http://localhost:8080/js/orbitCruncher.js';
-  //     orbitWorker = new Worker(url);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
+  try {
+    let url = 'http://localhost:8080/js/orbitCruncher.js';
+    orbitWorker = new Worker(url);
+  } catch (error) {
+    console.error(error);
+  }
 } else {
   orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
 }

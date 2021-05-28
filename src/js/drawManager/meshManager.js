@@ -15,7 +15,8 @@ meshManager.isReady = false;
 meshManager.init = async (glRef, earthRef) => {
   try {
     if (settingsManager.disableUI || settingsManager.isDrawLess) return;
-    if (typeof process == 'undefined') return;
+    // Github Actions doesn't like this
+    if (typeof process !== 'undefined') return;
 
     gl = glRef;
     earth = earthRef;

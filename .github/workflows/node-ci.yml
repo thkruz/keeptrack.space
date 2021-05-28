@@ -16,7 +16,7 @@ jobs:
       with:
         node-version: 14.x
     - run: npm install --save-dev        
-    - run: npm run test --if-present
+    - run: npm run test
       env:
-        CI: false
+        CI: true
     - run: node ./node_modules/.bin/codecov

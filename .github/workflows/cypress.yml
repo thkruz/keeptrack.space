@@ -16,6 +16,7 @@ jobs:
         wait-on: 'http://localhost:8080'
         config: baseUrl=http://localhost:8080
         browser: chrome
+        headless: true
 
   windows-edge:
     runs-on: windows-latest
@@ -31,6 +32,7 @@ jobs:
           wait-on: 'http://localhost:8080'
           config: baseUrl=http://localhost:8080
           browser: edge
+          headless: true
 
   windows-chrome:
     runs-on: windows-latest
@@ -46,6 +48,7 @@ jobs:
           wait-on: 'http://localhost:8080'
           config: baseUrl=http://localhost:8080
           browser: chrome
+          headless: true
  
   mac-chrome:
     runs-on: macos-latest
@@ -61,3 +64,4 @@ jobs:
         wait-on: 'http://localhost:8080'
         config: baseUrl=http://localhost:8080
         browser: chrome
+        headless: true

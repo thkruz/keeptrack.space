@@ -1038,7 +1038,7 @@ class Camera {
           console.log(`settingsManager.cameraMovementSpeed: ${settingsManager.cameraMovementSpeed}`);
           console.groupEnd();
         } catch (e) {
-          console.warn('Camera Math Error');
+          console.debug('Camera Math Error');
         }
         this.camPitch = 0.5;
         this.camYaw = 0.5;
@@ -1050,7 +1050,7 @@ class Camera {
 
       if (typeof sensorPos == 'undefined' && (this.cameraType.current == this.cameraType.planetarium || this.cameraType.current == this.cameraType.astronomy)) {
         this.cameraType.current = this.cameraType.default;
-        console.warn('A sensor should be selected first if camera mode is allowed to be planetarium or astronmy.');
+        console.debug('A sensor should be selected first if camera mode is allowed to be planetarium or astronmy.');
       }
 
       glm.mat4.identity(this.camMatrix);

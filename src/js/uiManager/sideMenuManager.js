@@ -509,7 +509,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
         $('#es-argPe').val(stringPad.pad0(argPe, 8));
         $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
       } catch (error) {
-        console.warn(error);
+        console.debug(error);
       }
       $('#loading-screen').fadeOut('slow');
     });

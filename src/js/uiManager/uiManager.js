@@ -2826,7 +2826,7 @@ uiManager.onReady = () => {
               });
             }
           } catch (error) {
-            console.warn(error);
+            console.debug(error);
           }
           sMM.isLaunchMenuOpen = true;
           $('#menu-launches').addClass('bmenu-item-selected');

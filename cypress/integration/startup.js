@@ -1,9 +1,3 @@
-/* globals
-  context
-  beforeEach
-  cy
-  it
-*/
 /// <reference types="cypress" />
 
 context('KeepTrack Startup', () => {

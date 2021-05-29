@@ -1,7 +1,3 @@
-/* globals
-  module
-*/
-
 module.exports = (api) => {
   const testPlugins = [
     // [

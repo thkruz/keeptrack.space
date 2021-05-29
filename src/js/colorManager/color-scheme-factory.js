@@ -635,10 +635,6 @@ class ColorSchemeFactory {
       };
     });
     ColorSchemeFactory.lostobjects = new ColorScheme(gl, satSet, objectManager, function (sat) {
-      // TODO: Constantly adjusting the search bar makes this really slow
-      // The objects should be appended to an array and the DOM modified once at
-      // the end of the color initialization.
-      //
       // Objects beyond sensor coverage are hidden
       if (sat.static && sat.type === 'Star') {
         if (sat.vmag >= 4.7 && ColorSchemeFactory.objectTypeFlags.starLow) {
@@ -700,9 +696,7 @@ class ColorSchemeFactory {
           pickable: false,
         };
       } else {
-        this.searchBox = document.querySelector('#search');
-        // Add the satellite number and if it isn't the first satellite then prepend a comma
-        this.searchBox += this.searchBox === '' ? sat.SCC_NUM : `,${sat.SCC_NUM}`;
+        settingsManager.lostSatStr += settingsManager.lostSatStr === '' ? sat.SCC_NUM : `,${sat.SCC_NUM}`;
         return {
           color: ColorSchemeFactory.colorTheme.lostobjects,
           pickable: true,

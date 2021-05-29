@@ -509,7 +509,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
         $('#es-argPe').val(stringPad.pad0(argPe, 8));
         $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
       } catch (error) {
-        console.warn(error);
+        console.debug(error);
       }
       $('#loading-screen').fadeOut('slow');
     });
@@ -1497,11 +1497,11 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
         for (var i = 0; i < 20; i++) {
           if (typeof socratesObjTwo[i] == 'undefined') break;
           // 20 rows
+          if (typeof socratesObjTwo[i][4] == 'undefined') continue;
           tr = tbl.insertRow();
           tr.setAttribute('class', 'socrates-object link');
           tr.setAttribute('hiddenrow', i);
           tdT = tr.insertCell();
-          // TODO: Cannot read property '4' of undefined in sMM.socrates();
           var socratesDate = socratesObjTwo[i][4].split(' '); // Date/time is on the second line 5th column
           var socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
           var socratesTimeS = socratesTime[2].split('.'); // Split time from date for easier management

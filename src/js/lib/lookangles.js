@@ -1977,7 +1977,7 @@ satellite.getDOPsTable = (lat, lon, alt) => {
       tdG.appendChild(document.createTextNode(dops.GDOP));
     }
   } catch (error) {
-    console.warn(error);
+    console.debug(error);
   }
 };
 satellite.getDOPs = (lat, lon, alt, propTime) => {
@@ -2030,7 +2030,7 @@ satellite.getDOPs = (lat, lon, alt, propTime) => {
 
     return satellite.calculateDOPs(inViewList);
   } catch (error) {
-    console.warn(error);
+    console.debug(error);
   }
 };
 satellite.calculateDOPs = (satList) => {

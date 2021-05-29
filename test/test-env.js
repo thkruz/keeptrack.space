@@ -19,11 +19,11 @@ const documentHTML = fs.readFileSync(path.resolve(__dirname, '../src/index.htm')
 const body = '<body>';
 const bodyEnd = '</body>';
 const docBody = documentHTML.substring(documentHTML.indexOf(body) + body.length, documentHTML.indexOf(bodyEnd));
-const dom = new JSDOM(documentHTML, { runScripts: 'dangerously', resources: 'usable' });
+const dom = new JSDOM(documentHTML, { pretendToBeVisual: true, runScripts: 'dangerously', resources: 'usable' });
 
 // set the global window and document objects using JSDOM
 // global is a node.js global object
-if (global !== undefined) {
+if (typeof global !== 'undefined') {
   global.window = dom.window;
   global.document = dom.window.document;
   global.docBody = docBody;
@@ -31,14 +31,19 @@ if (global !== undefined) {
 
 global.document.url = 'https://keeptrack.space';
 global.document.includeNodeLocations = true;
-global.window = document.parentWindow;
+if (typeof global.window == 'undefined') {
+  global.window = global.document.parentWindow;
+}
 
 global.document.canvas = new HTMLCanvasElement(1920, 1080);
 
 global.window.resizeTo = (width, height) => {
   global.window.innerWidth = width || global.window.innerWidth;
   global.window.innerHeight = height || global.window.innerHeight;
-  global.window.dispatchEvent(new Event('resize'));
+
+  // Simulate window resize event
+  const resizeEvent = global.document.createEvent('Event');
+  resizeEvent.initEvent('resize', true, true);
 };
 
 window.resizeTo(1920, 1080);

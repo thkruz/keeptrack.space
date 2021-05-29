@@ -15,7 +15,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
-    - run: npm install    
+    - run: npm install --save-dev        
     - run: npm run build:dev
-    - run: npm run test
+    - run: npm run test      
     - run: node ./node_modules/.bin/codecov

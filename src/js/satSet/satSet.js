@@ -917,12 +917,12 @@ satSet.searchCelestrak = (satNum, analsat) => {
       satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
     } else {
       // We reached our target server, but it returned an error
-      console.warn('Celestrack request returned an error!');
+      console.debug('Celestrack request returned an error!');
     }
   };
 
   request.onerror = function () {
-    console.warn('Celestrack request failed!');
+    console.debug('Celestrack request failed!');
   };
 
   request.send();
@@ -967,12 +967,12 @@ satSet.searchN2yo = (satNum, analsat) => {
       satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
     } else {
       // We reached our target server, but it returned an error
-      console.warn('N2YO request returned an error!');
+      console.debug('N2YO request returned an error!');
     }
   };
 
   request.onerror = function () {
-    console.warn('N2YO request failed!');
+    console.debug('N2YO request failed!');
   };
 
   request.send();

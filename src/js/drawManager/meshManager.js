@@ -19,9 +19,6 @@ meshManager.init = async (glRef, earthRef) => {
     gl = glRef;
     earth = earthRef;
 
-    // Github Actions doesn't like this
-    if (typeof process !== 'undefined') return;
-
     settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
 
     meshManager.fileList = [];

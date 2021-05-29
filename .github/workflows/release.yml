@@ -49,7 +49,7 @@ jobs:
           scope: '@thkruz'
 
       - run: npm install
-      - run: npm run gpr
+      - run: npm run publish:github
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_NPM_TOKEN }}

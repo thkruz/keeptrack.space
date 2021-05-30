@@ -300,6 +300,16 @@ ul {
     margin-top: -15px;
 }
 
+.alertColorTheme {
+    background: lightcoral !important;
+    border-color: darkred !important;
+    border: 10px solid darkred !important;
+}
+
+.alertColorTheme:hover {
+    background: darkred !important;
+}
+
 .truncate-search {
     width: 140px;
     white-space: nowrap;

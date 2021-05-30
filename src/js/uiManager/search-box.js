@@ -220,7 +220,6 @@ searchBox.doSearch = function (searchString, isPreventDropDown, satSet) {
     searchBox.fillResultBox(results, satSet);
   }
 
-  settingsManager.themes.retheme();
   return idList;
 };
 
@@ -277,7 +276,6 @@ searchBox.fillResultBox = function (results, satSet) {
   }
   resultBox[0].innerHTML = html;
   resultBox.slideDown();
-  settingsManager.themes.retheme();
   resultsOpen = true;
   satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 };

@@ -1580,9 +1580,6 @@ describe('Integration Testing', () => {
     // eventFire('near-objects-link', 'click');
     // eventFire('search-results', 'mouseout');
 
-    settingsManager.themes.redTheme();
-    settingsManager.themes.redThemeSearch();
-
     db.gremlins();
 
     settingsManager.trusatMode = true;

@@ -730,7 +730,6 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
       uiManager.doSearch('');
       satSet.setColorScheme(ColorScheme.default, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      settingsManager.themes.blueTheme();
     }
     if (!sensorManager.checkSensorSelected() || sMM.watchlistList.length <= 0) {
       sMM.isWatchlistChanged = false;

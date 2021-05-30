@@ -52,6 +52,7 @@ import { timeManager } from '@app/js/timeManager/timeManager.js';
 import { uiInput } from './ui-input.js';
 import { uiLimited } from './ui-limited.js';
 import { uiValidation } from './ui-validation.js';
+import { toast } from 'materialize-css';
 
 const M = window.M;
 
@@ -494,23 +495,22 @@ var _checkWatchlist = () => {
     if (sat.inview === 1 && sMM.watchlistInViewList[i] === false) {
       // Is inview and wasn't previously
       sMM.watchlistInViewList[i] = true;
+      uiManager.toast(`Satellite ${sat.SCC_NUM} is In Field of View!`, 'normal');
+      lineManager.create('sat3', [sat.id, satSet.getIdFromSensorName(sensorManager.currentSensor.name)], 'g');
       orbitManager.addInViewOrbit(sMM.watchlistList[i]);
     }
     if (sat.inview === 0 && sMM.watchlistInViewList[i] === true) {
       // Isn't inview and was previously
       sMM.watchlistInViewList[i] = false;
+      uiManager.toast(`Satellite ${sat.SCC_NUM} left Field of View!`, 'standby');
       orbitManager.removeInViewOrbit(sMM.watchlistList[i]);
     }
   }
   for (let i = 0; i < sMM.watchlistInViewList.length; i++) {
     if (sMM.watchlistInViewList[i] === true) {
-      // Someone is still in view on the watchlist
-      settingsManager.themes.redTheme();
       return;
     }
   }
-  // None of the sats on the watchlist are in view
-  settingsManager.themes.blueTheme();
 };
 var _updateSelectBox = () => {
   // Don't update if no object is selected

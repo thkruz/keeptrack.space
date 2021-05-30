@@ -368,7 +368,6 @@ class ColorSchemeFactory {
       if (!sat.inView && typeof sat.vmag !== 'undefined') {
         if (sat.inSun == 2 && ColorSchemeFactory.objectTypeFlags.satHi === true) {
           // If vmag is undefined color it like a star
-          // TODO: Better way of doing this
           if (sat.vmag < 3) {
             return {
               color: ColorSchemeFactory.colorTheme.starHi,

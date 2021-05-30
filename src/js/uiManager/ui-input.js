@@ -462,10 +462,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
             }
           }
         }
-        // Repaint the theme to ensure it is the right color
-        settingsManager.themes.retheme();
         // Force the serach bar to get repainted because it gets overwrote a lot
-        settingsManager.themes.redThemeSearch();
         dragHasMoved = false;
         cameraManager.isDragging = false;
         if (!settingsManager.disableUI) {

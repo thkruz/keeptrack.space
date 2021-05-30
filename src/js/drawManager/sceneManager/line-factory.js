@@ -75,6 +75,7 @@ class LineFactory {
         // If color not a letter than assume its been set
         break;
     }
+    // Center of the Earth to the Satellite
     if (type == 'sat') {
       let sat = this.#getSat(value);
       if (typeof sat.position == 'undefined') {
@@ -90,6 +91,7 @@ class LineFactory {
         color: color,
       });
     }
+    // Reference Point to Satellite
     if (type == 'sat2') {
       sat = this.#getSat(value[0]);
       if (typeof sat.position == 'undefined') {
@@ -105,6 +107,7 @@ class LineFactory {
         color: color,
       });
     }
+    // Satellite to Satellite When in View
     if (type == 'sat3') {
       sat = this.#getSat(value[0]);
       sat2 = this.#getSat(value[1]);
@@ -125,6 +128,7 @@ class LineFactory {
         isDrawWhenSelected: false,
       });
     }
+    // Satellite to Satellite - Draw When Selected and in View
     if (type == 'sat4') {
       sat = this.#getSat(value[0]);
       sat2 = this.#getSat(value[1]);
@@ -145,6 +149,8 @@ class LineFactory {
         isDrawWhenSelected: true,
       });
     }
+
+    // Satellite to Satellite
     if (type == 'sat5') {
       sat = this.#getSat(value[0]);
       sat2 = this.#getSat(value[1]);
@@ -215,7 +221,7 @@ class LineFactory {
                 this.drawLineList[i].sat2.id = this.#getIdFromSensorName(this.drawLineList[i].sat2.name);
               }
               this.drawLineList[i].sat2 = this.#getSat(this.drawLineList[i].sat2.id);
-              if (this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].sat.getTEARR().inview) {
+              if (this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].sat.inview) {
                 this.drawLineList.splice(i, 1);
                 continue;
               }

@@ -2362,9 +2362,7 @@ uiManager.onReady = () => {
       let today = new Date();
       let jday = timeManager.getDayOfYear(timeManager.propTime());
       $('#jday').html(jday);
-      console.warn(timeManager.propOffset);
       timeManager.propOffset = selectedDate - today;
-      console.warn(timeManager.propOffset);
       satSet.satCruncher.postMessage({
         typ: 'offset',
         dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
@@ -2484,6 +2482,18 @@ uiManager.onReady = () => {
           $('#sensor-list-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           sMM.isSensorListMenuOpen = true;
           $('#menu-sensor-list').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-sat-photo': // No Keyboard Commands
+        if (sMM.isSatPhotoMenuOpen) {
+          uiManager.hideSideMenus();
+          sMM.isSatPhotoMenuOpen = false;
+          break;
+        } else {
+          uiManager.hideSideMenus();
+          $('#sat-photo-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+          sMM.isSatPhotoMenuOpen = true;
+          $('#menu-sat-photo').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-info-overlay':
@@ -2800,11 +2810,11 @@ uiManager.onReady = () => {
           break;
         } else {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-          uiManager.hideSideMenus();
           settingsManager.isPreventColorboxClose = true;
           setTimeout(function () {
             settingsManager.isPreventColorboxClose = false;
           }, 2000);
+          uiManager.hideSideMenus();
           try {
             if (location.protocol === 'https:') {
               $.colorbox({

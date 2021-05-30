@@ -56,9 +56,9 @@ earth.shader = {
         vec3 bumpTexColor = texture(uBumpMap, vUv).rgb * diffuse * 0.4;
         vec3 specLightColor = texture(uSpecMap, vUv).rgb * diffuse * 0.1;
 
-        vec3 dayColor = uAmbientLightColor + (uDirectionalLightColor * diffuse);
+        vec3 dayColor = (uAmbientLightColor + uDirectionalLightColor) * diffuse;
         vec3 dayTexColor = texture(uSampler, vUv).rgb * dayColor;
-        vec3 nightColor = texture(uNightSampler, vUv).rgb * pow(1.0 - diffuse, 2.0);
+        vec3 nightColor = 0.5 * texture(uNightSampler, vUv).rgb * pow(1.0 - diffuse, 2.0);
 
         fragColor = vec4(dayTexColor + nightColor + bumpTexColor + specLightColor, 1.0);
     }

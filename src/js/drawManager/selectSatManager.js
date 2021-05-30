@@ -30,7 +30,12 @@ selectSatManager.selectSat = (satId, cameraManager) => {
     if (sat.type == 'Star') return;
     if ((sat.active == false || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') return; // Non-Missile Non-Sensor Object
   }
-  satSet.selectSat(satId);
+
+  // Don't select -1 twice
+  if (!(satId === -1 && isselectedSatNegativeOne)) {
+    satSet.selectSat(satId);
+  }
+
   cameraManager.camSnapMode = false;
 
   if (satId === -1) {
@@ -51,7 +56,7 @@ selectSatManager.selectSat = (satId, cameraManager) => {
     cameraManager.fts2default();
     isselectedSatNegativeOne = true;
 
-    sMM.hideSideMenus();
+    // sMM.hideSideMenus();
 
     $('#sat-infobox').fadeOut();
 

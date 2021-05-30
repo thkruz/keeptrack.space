@@ -29,6 +29,7 @@ sMM.isLookanglesMenuOpen = false;
 sMM.isDOPMenuOpen = false;
 sMM.isLookanglesMultiSiteMenuOpen = false;
 sMM.isLookanglesMenuOpen = false;
+sMM.isSatPhotoMenuOpen = false;
 sMM.isAnalysisMenuOpen = false;
 sMM.isEditSatMenuOpen = false;
 sMM.setCustomSensorMenuOpen = false;
@@ -1612,6 +1613,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
     $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#external-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#analysis-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+    $('#sat-photo-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#color-scheme-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#countries-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#constellations-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
@@ -1638,6 +1640,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
     $('#menu-breakup').removeClass('bmenu-item-selected');
     $('#menu-missile').removeClass('bmenu-item-selected');
     $('#menu-external').removeClass('bmenu-item-selected');
+    $('#menu-sat-photo').removeClass('bmenu-item-selected');
     $('#menu-analysis').removeClass('bmenu-item-selected');
     $('#menu-customSensor').removeClass('bmenu-item-selected');
     $('#menu-color-scheme').removeClass('bmenu-item-selected');
@@ -1670,6 +1673,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
     sMM.isCustomSensorMenuOpen = false;
     sMM.isColorSchemeMenuOpen = false;
     sMM.isAnalysisMenuOpen = false;
+    sMM.isSatPhotoMenuOpen = false;
     sMM.isExternalMenuOpen = false;
     sMM.isConstellationsMenuOpen = false;
     sMM.isCountriesMenuOpen = false;

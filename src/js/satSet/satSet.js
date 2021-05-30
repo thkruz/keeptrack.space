@@ -289,6 +289,9 @@ var addSatCruncherOnMessage = (cameraManager) => {
                 return;
               }
             }
+            if (sensorManager.checkSensorSelected()) {
+              $('#menu-info-overlay').removeClass('bmenu-item-disabled');
+            }
             sMM.updateWatchlist(newWatchlist, watchlistInViewList);
           }
         })();

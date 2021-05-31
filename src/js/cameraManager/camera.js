@@ -87,20 +87,42 @@ class Camera {
     return angle;
   }
 
+  static getDayOfYear = function (date) {
+    date = date || new Date();
+    var _isLeapYear = (date) => {
+      var year = date.getFullYear();
+      if ((year & 3) !== 0) return false;
+      return year % 100 !== 0 || year % 400 === 0;
+    };
+
+    var dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    var mn = date.getMonth();
+    var dn = date.getUTCDate();
+    var dayOfYear = dayCount[mn] + dn;
+    if (mn > 1 && _isLeapYear(date)) dayOfYear++;
+    return dayOfYear;
+  };
+
   static longToYaw(long, selectedDate) {
-    let today = new Date();
+    let realTime = new Date();
+    let propTime = new Date();
     let angle = 0;
 
     // NOTE: This formula sometimes is incorrect, but has been stable for over a year
     // NOTE: Looks wrong again as of 8/29/2020 - time of year issue?
-    today.setUTCHours(selectedDate.getUTCHours() + selectedDate.getUTCMonth() * 2 - 11); // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
+    // NOTE: Could this be related to daylight savings time? Subtracting one hour from selected date works
+    const doy = Camera.getDayOfYear(selectedDate);
+    const modifier = 1000 * 60 * 60 * (-11.23 + 0.065666667 * doy);
 
-    today.setUTCMinutes(selectedDate.getUTCMinutes());
-    today.setUTCSeconds(selectedDate.getUTCSeconds());
-    selectedDate.setUTCHours(0);
-    selectedDate.setUTCMinutes(0);
-    selectedDate.setUTCSeconds(0);
-    let longOffset = (today - selectedDate) / 60 / 60 / 1000; // In Hours
+    propTime.setUTCHours(selectedDate.getUTCHours()); // + (selectedDate.getUTCMonth() * 2 - 11) / 2); // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
+    propTime.setUTCMinutes(selectedDate.getUTCMinutes());
+    propTime.setUTCSeconds(selectedDate.getUTCSeconds());
+    propTime = new Date(propTime * 1 + modifier);
+
+    realTime.setUTCHours(0);
+    realTime.setUTCMinutes(0);
+    realTime.setUTCSeconds(0);
+    let longOffset = (propTime - realTime) / 60 / 60 / 1000; // In Hours
     if (longOffset > 24) longOffset = longOffset - 24;
     longOffset = longOffset * 15; // 15 Degress Per Hour longitude Offset
 

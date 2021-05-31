@@ -2,6 +2,7 @@
   global
   jest
   require
+  __dirname
 */
 
 import 'webgl-mock';
@@ -11,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 const jsdom = require('jsdom');
+// eslint-disable-next-line no-unused-vars
 const { createCanvas } = require('canvas');
 const { JSDOM } = jsdom;
 
@@ -78,6 +80,7 @@ $.colorbox = {
 
 $.fn.replace = (input, output) => $.fn.toString().replace(input, output);
 
+$.colorbox = jest.fn();
 $.fn.colorbox = jest.fn();
 $.fn.effect = jest.fn();
 $.fn.tooltip = jest.fn();

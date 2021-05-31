@@ -300,6 +300,16 @@ ul {
     margin-top: -15px;
 }
 
+.alertColorTheme {
+    background: lightcoral !important;
+    border-color: darkred !important;
+    border: 10px solid darkred !important;
+}
+
+.alertColorTheme:hover {
+    background: darkred !important;
+}
+
 .truncate-search {
     width: 140px;
     white-space: nowrap;
@@ -844,6 +854,11 @@ ul li {
     height: 100%;
 }
 
+.satPhotoRow {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    text-align: center;
+}
+
 #sat-infobox a {
     color: white;
 }
@@ -1006,7 +1021,7 @@ input:focus {
     background-size: cover;
     position: relative;
     top: -62px;
-    z-index: 20;
+    z-index: 5;
     left: 15px;
     display: block;
     background-position-x: -60px;
@@ -1160,7 +1175,7 @@ input:focus {
 }
 
 .menu-selectable:hover {
-    background-color: gray;
+    background: rgba(0, 0, 0, 0.2);
     cursor: pointer;
 }
 

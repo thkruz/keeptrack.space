@@ -462,10 +462,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
             }
           }
         }
-        // Repaint the theme to ensure it is the right color
-        settingsManager.themes.retheme();
         // Force the serach bar to get repainted because it gets overwrote a lot
-        settingsManager.themes.redThemeSearch();
         dragHasMoved = false;
         cameraManager.isDragging = false;
         if (!settingsManager.disableUI) {
@@ -501,6 +498,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
       $('#line-sensor-sat-rmb').hide();
       $('#line-earth-sat-rmb').hide();
       $('#line-sat-sat-rmb').hide();
+      $('#line-sat-sun-rmb').hide();
 
       // Earth
       $('#earth-low-rmb').hide();
@@ -550,6 +548,7 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           }
           $('#line-earth-sat-rmb').show();
           $('#line-sat-sat-rmb').show();
+          $('#line-sat-sun-rmb').show();
           rightBtnDrawDOM.show();
           isDrawDOM = true;
           numMenuItems++;
@@ -1040,6 +1039,9 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
         case 'line-sat-sat-rmb':
           lineManager.create('sat3', [clickedSat, objectManager.selectedSat], 'p');
           break;
+        case 'line-sat-sun-rmb':
+          lineManager.create('sat2', [clickedSat, drawManager.sceneManager.sun.pos[0], drawManager.sceneManager.sun.pos[1], drawManager.sceneManager.sun.pos[2]], 'o');
+          break;
         case 'create-observer-rmb':
           $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           $('#menu-customSensor').addClass('bmenu-item-selected');
@@ -1189,13 +1191,6 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
           break;
         case 'clear-screen-rmb':
           (function clearScreenRMB() {
-            // Clear Lines first
-            lineManager.clear();
-            if (objectManager.isStarManagerLoaded) {
-              starManager.isAllConstellationVisible = false;
-            }
-
-            // Now clear everything else
             uiManager.doSearch('');
             uiManager.searchToggle(false);
             uiManager.hideSideMenus();

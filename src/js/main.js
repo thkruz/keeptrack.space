@@ -35,6 +35,7 @@ import { drawManager } from '@app/js/drawManager/drawManager.js';
 import { jQAlt } from '@app/js/lib/jqalt.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
+import { photoManager } from '@app/js/photoManager/photoManager.js';
 // import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
@@ -86,6 +87,7 @@ const initalizeKeepTrack = async () => {
 
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
     uiManager.postStart();
+    photoManager.init(cameraManager, satSet, timeManager, uiManager, drawManager.selectSatManager);
   } catch (error) {
     /* istanbul ignore next */
     console.warn(error);

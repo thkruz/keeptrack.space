@@ -149,7 +149,6 @@ satSet.init = async (glRef, dotManagerRef, cameraManager) => {
   // satSet.radarDataManager = radarDataManager;
 };
 
-/* istanbul ignore next */
 var addSatCruncherOnMessage = (cameraManager) => {
   satCruncher.onmessage = (m) => {
     if (!gotExtraData) {
@@ -288,6 +287,9 @@ var addSatCruncherOnMessage = (cameraManager) => {
                 console.error('Watchlist File Format Incorret');
                 return;
               }
+            }
+            if (sensorManager.checkSensorSelected()) {
+              $('#menu-info-overlay').removeClass('bmenu-item-disabled');
             }
             sMM.updateWatchlist(newWatchlist, watchlistInViewList);
           }

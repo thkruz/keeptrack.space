@@ -52,6 +52,7 @@ import { timeManager } from '@app/js/timeManager/timeManager.js';
 import { uiInput } from './ui-input.js';
 import { uiLimited } from './ui-limited.js';
 import { uiValidation } from './ui-validation.js';
+import { toast } from 'materialize-css';
 
 const M = window.M;
 
@@ -494,23 +495,22 @@ var _checkWatchlist = () => {
     if (sat.inview === 1 && sMM.watchlistInViewList[i] === false) {
       // Is inview and wasn't previously
       sMM.watchlistInViewList[i] = true;
+      uiManager.toast(`Satellite ${sat.SCC_NUM} is In Field of View!`, 'normal');
+      lineManager.create('sat3', [sat.id, satSet.getIdFromSensorName(sensorManager.currentSensor.name)], 'g');
       orbitManager.addInViewOrbit(sMM.watchlistList[i]);
     }
     if (sat.inview === 0 && sMM.watchlistInViewList[i] === true) {
       // Isn't inview and was previously
       sMM.watchlistInViewList[i] = false;
+      uiManager.toast(`Satellite ${sat.SCC_NUM} left Field of View!`, 'standby');
       orbitManager.removeInViewOrbit(sMM.watchlistList[i]);
     }
   }
   for (let i = 0; i < sMM.watchlistInViewList.length; i++) {
     if (sMM.watchlistInViewList[i] === true) {
-      // Someone is still in view on the watchlist
-      settingsManager.themes.redTheme();
       return;
     }
   }
-  // None of the sats on the watchlist are in view
-  settingsManager.themes.blueTheme();
 };
 var _updateSelectBox = () => {
   // Don't update if no object is selected
@@ -2362,9 +2362,7 @@ uiManager.onReady = () => {
       let today = new Date();
       let jday = timeManager.getDayOfYear(timeManager.propTime());
       $('#jday').html(jday);
-      console.warn(timeManager.propOffset);
       timeManager.propOffset = selectedDate - today;
-      console.warn(timeManager.propOffset);
       satSet.satCruncher.postMessage({
         typ: 'offset',
         dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
@@ -2484,6 +2482,18 @@ uiManager.onReady = () => {
           $('#sensor-list-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           sMM.isSensorListMenuOpen = true;
           $('#menu-sensor-list').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-sat-photo': // No Keyboard Commands
+        if (sMM.isSatPhotoMenuOpen) {
+          uiManager.hideSideMenus();
+          sMM.isSatPhotoMenuOpen = false;
+          break;
+        } else {
+          uiManager.hideSideMenus();
+          $('#sat-photo-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+          sMM.isSatPhotoMenuOpen = true;
+          $('#menu-sat-photo').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-info-overlay':
@@ -2800,11 +2810,11 @@ uiManager.onReady = () => {
           break;
         } else {
           if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-          uiManager.hideSideMenus();
           settingsManager.isPreventColorboxClose = true;
           setTimeout(function () {
             settingsManager.isPreventColorboxClose = false;
           }, 2000);
+          uiManager.hideSideMenus();
           try {
             if (location.protocol === 'https:') {
               $.colorbox({

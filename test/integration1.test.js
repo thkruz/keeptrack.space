@@ -343,6 +343,18 @@ describe('Integration Testing', () => {
 
     uiManager.bottomIconPress({
       currentTarget: {
+        id: 'menu-sat-photo',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-sat-photo',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
         id: 'menu-info-overlay',
       },
     });

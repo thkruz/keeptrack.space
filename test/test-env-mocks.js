@@ -1,3 +1,4 @@
+/* eslint-disable no-undefined */
 /*globals
   global
   jest

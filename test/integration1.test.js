@@ -1,36 +1,11 @@
-/* eslint-disable */
-// import 'jsdom-global/register';
+/* eslint-disable no-undefined */
+/* globals
+  describe
+  global
+  test
+*/
+
 import 'jsdom-worker';
-
-// keep a copy of the window object to restore
-// it at the end of the tests
-const oldWindowLocation = window.location;
-
-// delete the existing `Location` object from `jsdom`
-delete window.location;
-
-// create a new `window.location` object that's *almost*
-// like the real thing
-window.location = Object.defineProperties(
-  // start with an empty object on which to define properties
-  {},
-  {
-    // grab all of the property descriptors for the
-    // `jsdom` `Location` object
-    ...Object.getOwnPropertyDescriptors(oldWindowLocation),
-
-    // overwrite a mocked method for `window.location.assign`
-    assign: {
-      search: '?sat=44444',
-      value: jest.fn(),
-    },
-
-    // more mocked methods here as needed
-  }
-);
-
-document.body.innerHTML = global.docBody;
-// jest.spyOn(document, 'createElement').mockReturnValueOnce(true);
 
 import 'jquery-ui-bundle';
 import 'materialize-css';
@@ -42,10 +17,9 @@ import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
 import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager.js';
 import { adviceList } from '@app/js/uiManager/ui-advice.js';
 import { drawManager } from '@app/js/drawManager/drawManager.js';
-import { meshManager } from '@app/js/drawManager/meshManager.js';
-import { jQAlt } from '@app/js/lib/jqalt.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
+import { photoManager } from '@app/js/photoManager/photoManager.js';
 import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
@@ -54,82 +28,70 @@ import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 
+// eslint-disable-next-line no-duplicate-imports
+// eslint-disable-next-line
 import { adviceManager } from '@app/js/uiManager/ui-advice.js';
-import { omManager } from '../src/js/uiManager/omManager';
 
-const eventFire = (elObj, etype) => {
-  try {
-    el = typeof elObj == 'string' ? document.getElementById(elObj) : elObj;
-    if (el.fireEvent) {
-      el.fireEvent('on' + etype);
-    } else {
-      var evObj = document.createEvent('Events');
-      evObj.initEvent(etype, true, false);
-      el.dispatchEvent(evObj);
-    }
-  } catch (error) {
-    console.debug(elObj);
-  }
+// eslint-disable-next-line sort-imports
+import { eventFire, setup } from './setup.js';
+
+setup.init();
+
+const exampleSat = {
+  C: 'US',
+  LS: 'AFETR',
+  LV: 'U',
+  ON: 'VANGUARD 1',
+  OT: 1,
+  R: '0.1220',
+  SCC_NUM: '00005',
+  TLE1: '1     5U 58002B   21107.45725112 -.00000113  00000-0 -16194-3 0  9999',
+  TLE2: '2     5  34.2637  11.6832 1848228 280.4329  59.4145 10.84843191238363',
+  active: true,
+  apogee: 3845.1282721399293,
+  argPe: 4.894477435916007,
+  eccentricity: 0.1848228,
+  id: 0,
+  inclination: 0.5980143789155811,
+  intlDes: '1958-002B',
+  meanMotion: 10.843102290386977,
+  perigee: 657.8610581463026,
+  period: 132.80332154356245,
+  position: {
+    x: 4000,
+    y: 4000,
+    z: 4000,
+  },
+  velocity: {
+    x: 7,
+    y: 7,
+    z: 7,
+    total: 14,
+  },
+  raan: 0.2039103071690015,
+  semiMajorAxis: 8622.494665143116,
+  semiMinorAxis: 8473.945136538932,
+  getAltitude: () => 100,
+  getDirection: () => 'N',
+  isInSun: () => true,
+  getTEARR: () => {
+    const currentTEARR = {
+      lat: 0.1,
+      lon: 0.1,
+      alt: 50000,
+      az: 0,
+      el: 0,
+      rng: 0,
+    };
+    satellite.setTEARR(currentTEARR);
+    return currentTEARR;
+  },
 };
 
-// const flushPromises = () => new Promise(setImmediate);
-
 describe('Integration Testing', () => {
-  var lineManager, groupsManager, cameraManager, gl, dotsManager;
+  var lineManager, groupsManager, cameraManager, gl, dotsManager, satCruncher;
 
-  const exampleSat = {
-    C: 'US',
-    LS: 'AFETR',
-    LV: 'U',
-    ON: 'VANGUARD 1',
-    OT: 1,
-    R: '0.1220',
-    SCC_NUM: '00005',
-    TLE1: '1     5U 58002B   21107.45725112 -.00000113  00000-0 -16194-3 0  9999',
-    TLE2: '2     5  34.2637  11.6832 1848228 280.4329  59.4145 10.84843191238363',
-    active: true,
-    apogee: 3845.1282721399293,
-    argPe: 4.894477435916007,
-    eccentricity: 0.1848228,
-    id: 0,
-    inclination: 0.5980143789155811,
-    intlDes: '1958-002B',
-    meanMotion: 10.843102290386977,
-    perigee: 657.8610581463026,
-    period: 132.80332154356245,
-    position: {
-      x: 4000,
-      y: 4000,
-      z: 4000,
-    },
-    velocity: {
-      x: 7,
-      y: 7,
-      z: 7,
-      total: 14,
-    },
-    raan: 0.2039103071690015,
-    semiMajorAxis: 8622.494665143116,
-    semiMinorAxis: 8473.945136538932,
-    getAltitude: () => 100,
-    getDirection: () => 'N',
-    isInSun: () => true,
-    getTEARR: () => {
-      const currentTEARR = {
-        lat: 0.1,
-        lon: 0.1,
-        alt: 50000,
-        az: 0,
-        el: 0,
-        rng: 0,
-      };
-      satellite.setTEARR(currentTEARR);
-      return currentTEARR;
-    },
-  };
-
-  test('main loading files', async () => {
-    // /////////////////////////////////////////////////////////////////////
+  test('Setup Test Environment', async () => {
     await timeManager.init();
     settingsManager.loadStr('dots');
     uiManager.mobileManager.init();
@@ -149,7 +111,7 @@ describe('Integration Testing', () => {
     await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
     drawManager.selectSatManager.init(ColorScheme.group, sensorManager, satSet, objectManager, sMM, timeManager);
     await satSet.loadCatalog(); // Needs Object Manager and gl first
-    const satCruncher = satSet.satCruncher;
+    satCruncher = satSet.satCruncher;
 
     dotsManager.setupPickingBuffer(satSet.satData);
     satSet.setColorScheme(ColorScheme.default, true);
@@ -175,13 +137,13 @@ describe('Integration Testing', () => {
 
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
     uiManager.postStart();
-    // /////////////////////////////////////////////////////////////////////
+    photoManager.init(cameraManager, satSet, timeManager, uiManager, drawManager.selectSatManager);
 
     // Make testing go faster
     satellite.lookanglesLength = 0.5;
   });
 
-  test('UI Manager Functional 2', () => {
+  test('UI Manager Functional 1', () => {
     adviceManager.onReady();
     uiManager.onReady();
 
@@ -817,7 +779,6 @@ describe('Integration Testing', () => {
     lineManager.draw();
   });
 
-  // Slower
   test('Star Manager Functional', () => {
     starManager.findStarsConstellation('Ursa Minor');
     starManager.drawAllConstellations();
@@ -825,7 +786,6 @@ describe('Integration Testing', () => {
     starManager.clearConstellations();
   });
 
-  // Fast
   test('Group Manager Functional', () => {
     groupsManager.createGroup('yearOrLess', 1965);
     groupsManager.createGroup('idList', [0]);
@@ -844,7 +804,6 @@ describe('Integration Testing', () => {
     testGroup.forEach(() => {});
   });
 
-  // Fast
   test('Camera Manager Functional', () => {
     Camera.longToYaw(60, new Date());
     Camera.latToPitch(60);
@@ -857,6 +816,7 @@ describe('Integration Testing', () => {
     test = cameraManager.isLocalRotateYaw;
     test = cameraManager.isLocalRotateYaw = 1;
     test = cameraManager.camZoomSnappedOnSat;
+    // eslint-disable-next-line no-unused-vars
     test = cameraManager.camAngleSnappedOnSat;
 
     cameraManager.camSnap(1, 1);
@@ -902,7 +862,6 @@ describe('Integration Testing', () => {
     cameraManager.getCamPos();
   });
 
-  // Fast
   test('satLinkManager Functional', () => {
     objectManager.satLinkManager.showLinks(lineManager, satSet, 'aehf');
     objectManager.satLinkManager.showLinks(lineManager, satSet, 'dscs');
@@ -913,7 +872,6 @@ describe('Integration Testing', () => {
     objectManager.satLinkManager.showLinks(lineManager, satSet, 'sbirs');
   });
 
-  // Slower
   test('Sensor Manager Functional', () => {
     sensorManager.sensorListLength();
     timeManager.propRate = 0;
@@ -928,77 +886,6 @@ describe('Integration Testing', () => {
     sensorManager.checkSensorSelected();
   });
 
-  // Slow
-  test('Missile Manager Functional', () => {
-    let sim = 'simulation/Russia2USA.json';
-    missileManager.MassRaidPre(new Date(), sim);
-
-    let a = 101 - 100;
-    let b = 500 - 0;
-    missileManager.Missile(0, 0, 41, -71, 3, satSet.missileSats - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
-    missileManager.clearMissiles();
-
-    missileManager.Missile(0, 0, 100, -71, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], null, null, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
-    missileManager.Missile(0, 0, -100, -71, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
-    missileManager.Missile(0, 0, 40, -501, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
-    missileManager.Missile(0, 0, 40, 501, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
-
-    missileManager.Missile(100, 0, 0, -71, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
-    missileManager.Missile(-100, 0, 0, -71, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
-    missileManager.Missile(0, 300, 40, 1, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
-    missileManager.Missile(0, -300, 40, 1, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
-    missileManager.Missile(0, 0, 40, 1, 15, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
-    missileManager.Missile(0, 0, 40, 1, 15.1, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
-
-    missileManager.Missile(0, 0, 1, 1, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], null, null, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', 13000);
-    missileManager.Missile(0, 0, 0, 180, 3, 500 - b, new Date(), missileManager.UsaICBM[a * 4 + 2], null, null, 0.07, 1000, 'United States', 13000);
-
-    $('#ms-type').val(0);
-    $('#ms-attacker').val(101);
-    $('#ms-lat-lau').val(0);
-    $('#ms-lon-lau').val(0);
-    $('#ms-target').val('-1');
-    $('#ms-lat').val(40);
-    $('#ms-lon').val(180);
-    eventFire('missile', 'submit');
-    $('#ms-attacker').val(201);
-    eventFire('missile', 'submit');
-    $('#ms-attacker').val(301);
-    eventFire('missile', 'submit');
-    $('#ms-attacker').val(401);
-    eventFire('missile', 'submit');
-    $('#ms-attacker').val(501);
-    eventFire('missile', 'submit');
-    $('#ms-attacker').val(601);
-    eventFire('missile', 'submit');
-    $('#ms-attacker').val(701);
-    eventFire('missile', 'submit');
-
-    $('#ms-type').val(1);
-    eventFire('missile', 'submit');
-    $('#ms-type').val(2);
-    eventFire('missile', 'submit');
-    $('#ms-type').val(3);
-    eventFire('missile', 'submit');
-    $('#ms-type').val(4);
-    eventFire('missile', 'submit');
-    $('#ms-type').val(5);
-    eventFire('missile', 'submit');
-    $('#ms-type').val(6);
-    eventFire('missile', 'submit');
-    $('#ms-type').val(7);
-    eventFire('missile', 'submit');
-
-    $('#ms-lat-lau').val('a');
-    eventFire('missile', 'submit');
-    $('#ms-lon-lau').val('a');
-    $('#ms-lat').val('a');
-    eventFire('missile', 'submit');
-    $('#ms-lon').val('a');
-    eventFire('missile', 'submit');
-  });
-
-  // Average
   test('lookangles Functional Tests', () => {
     satellite.getlookangles(satSet.getSat(0));
     satellite.getlookanglesMultiSite(satSet.getSat(0));
@@ -1035,7 +922,6 @@ describe('Integration Testing', () => {
     satellite.nextNpasses(exampleSat, sensorManager.sensorList.COD, 1, 30, 2);
   });
 
-  // Fast
   test('satSet Functional Tests', () => {
     satSet.searchAzElRange(0, 10, 10, 90, 100, 100, 1000000, 90, 500, 500, 10, 10, 1);
 
@@ -1054,6 +940,45 @@ describe('Integration Testing', () => {
 
     satSet.setSat(2, exampleSat);
     satSet.mergeSat(exampleSat);
+
+    satCruncher.onmessage({
+      data: {
+        extraData: JSON.stringify(satSet.satData),
+      },
+    });
+
+    satCruncher.onmessage({
+      data: {
+        extraUpdate: true,
+        extraData: JSON.stringify(satSet.satData),
+        satId: 0,
+      },
+    });
+
+    sMM.isMapMenuOpen = true;
+    satCruncher.onmessage({
+      data: {
+        satPos: [0],
+        satVel: [0],
+        satInView: [0],
+        satInSun: [0],
+        sensorMarkerArray: [0],
+      },
+    });
+
+    sMM.isMapMenuOpen = false;
+    settingsManager.isMapUpdateOverride = true;
+    settingsManager.socratesOnSatCruncher = true;
+    satCruncher.onmessage({
+      data: {
+        satPos: [0],
+        satVel: [0],
+        satInView: [0],
+        satInSun: [0],
+        sensorMarkerArray: [0],
+      },
+    });
+
     dotsManager.inViewData = [];
     dotsManager.inViewData[0] = true;
     satSet.getSatInViewOnly(0);
@@ -1070,203 +995,7 @@ describe('Integration Testing', () => {
     satSet.loadCatalog();
   });
 
-  test('drawManager Functional Tests', () => {
-    drawManager.screenShot();
-    while (cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
-      cameraManager.cameraType.current++;
-    }
-    drawManager.orbitsAbove();
-
-    drawManager.checkIfPostProcessingRequired();
-
-    drawManager.demoMode();
-
-    settingsManager.startWithOrbitsDisplayed = true;
-    drawManager.startWithOrbits();
-
-    settingsManager.enableConstantSelectedSatRedraw = true;
-    objectManager.selectedSat = 0;
-    satSet.getSatExtraOnly = () => exampleSat;
-    satSet.getSat = () => exampleSat;
-    drawManager.canvas.style = {};
-    drawManager.drawLoop();
-
-    settingsManager.lowPerf = true;
-    drawManager.updateHover();
-
-    meshManager.shaderProgram = {
-      uLightDirection: 0,
-      uNormalMatrix: 0,
-      uMvMatrix: 0,
-      uPMatrix: 0,
-      uCamMatrix: 0,
-      uInSun: 0,
-      enableVertexAttribArrays: jest.fn(),
-      applyAttributePointers: jest.fn(),
-      disableVertexAttribArrays: jest.fn(),
-    };
-    meshManager.currentModel = {
-      inSun: true,
-      model: {
-        mesh: {
-          vertexBuffer: 0,
-          indexBuffer: 0,
-          indexBuffer: {
-            numItems: 0,
-          },
-        },
-      },
-    };
-
-    meshManager.loaded = true;
-    meshManager.draw(drawManager.pMatrix, cameraManager.camMatrix, null);
-
-    meshManager.currentModel = {
-      id: 1,
-      model: {
-        mesh: {
-          indexBuffer: 0,
-        },
-      },
-      nadirYaw: true,
-      inSun: true,
-      position: {
-        x: 1000,
-        y: 1000,
-        z: 1000,
-      },
-    };
-    meshManager.draw(drawManager.pMatrix, cameraManager.camMatrix, null);
-
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.SCC_NUM = '25544';
-    exampleSat.OT = 1;
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.SCC_NUM = '00005';
-    exampleSat.ON = 'FLOCK';
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.ON = 'STARLINK';
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.ON = 'GLOBALSTAR';
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.ON = 'IRIDIUM';
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.ON = 'ORBCOMM';
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.ON = 'O3B';
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.ON = 'NAVSTAR';
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.ON = 'GALILEO';
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.ON = 'FAKE';
-    exampleSat.SCC_NUM = '04630';
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.SCC_NUM = '36868';
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.SCC_NUM = '00005';
-    exampleSat.R = 0.05;
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.R = 0.23;
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.R = 5.23;
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.OT = 2;
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.OT = 3;
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    exampleSat.SCC_NUM = '50000';
-    meshManager.update(Camera, cameraManager, timeManager, exampleSat);
-    meshManager.initShaders();
-    // meshManager.meshes = [{}];
-    meshManager.initBuffers();
-  });
-
-  // Fast
-  test('orbitManager Functional Tests', () => {
-    orbitManager.setSelectOrbit(0);
-    orbitManager.addInViewOrbit(0);
-    orbitManager.removeInViewOrbit(0);
-    orbitManager.clearInViewOrbit();
-    orbitManager.setHoverOrbit(0);
-    orbitManager.clearHoverOrbit();
-
-    orbitManager.playNextSatellite(10, 1970);
-  });
-
-  // Fast
-  test('Orbit Math Manager Functional Tests', () => {
-    const sv = omManager.sat2sv(exampleSat, timeManager);
-    omManager.svs2analyst([sv, sv], satSet, timeManager, satellite);
-  });
-
-  // Average
-  test('color-scheme-factory Functional Tests', () => {
-    ColorScheme.reloadColors();
-    satSet.setColorScheme(ColorScheme.onlyFOV, true);
-    satSet.setColorScheme(ColorScheme.sunlight, true);
-    satSet.setColorScheme(ColorScheme.velocity, true);
-    satSet.setColorScheme(ColorScheme.smallsats, true);
-    satSet.setColorScheme(ColorScheme.rcs, true);
-    satSet.setColorScheme(ColorScheme.countries, true);
-    satSet.setColorScheme(ColorScheme.ageOfElset, true);
-    satSet.setColorScheme(ColorScheme.lostobjects, true);
-    satSet.setColorScheme(ColorScheme.leo, true);
-    satSet.setColorScheme(ColorScheme.geo, true);
-    satSet.setColorScheme(ColorScheme.default, true);
-  });
-
-  test('updateLoop Functional Tests', () => {
-    satSet.getSatExtraOnly = () => exampleSat;
-    satSet.getSat = () => exampleSat;
-
-    timeManager.propRate = 0;
-    timeManager.propOffset = 0;
-    objectManager.selectedSat = 1;
-
-    drawManager.updateLoop();
-
-    drawManager.sat = exampleSat;
-
-    drawManager.satCalculate();
-    drawManager.screenShot();
-    drawManager.screenShot();
-    drawManager.watermarkedDataUrl(global.document.canvas, 'test');
-
-    settingsManager.enableHoverOverlay = true;
-    settingsManager.isDemoModeOn = false;
-
-    cameraManager.cameraType.current = cameraManager.cameraType.astronomy;
-    drawManager.orbitsAbove();
-    drawManager.isDrawOrbitsAbove = true;
-    drawManager.orbitsAbove();
-    cameraManager.cameraType.current = cameraManager.cameraType.planetarium;
-    drawManager.orbitsAbove();
-    sensorManager.currentSensor = sensorManager.sensorList.COD;
-    drawManager.orbitsAbove();
-
-    // drawManager.updateHover();
-    drawManager.demoMode();
-    drawManager.checkIfPostProcessingRequired();
-
-    settingsManager.isMobileModeEnabled = true;
-    global.window.resizeTo(5000, 2000);
-    drawManager.resizeCanvas();
-
-    cameraManager.cameraType.current = cameraManager.cameraType.default;
-    settingsManager.enableHoverOverlay = false;
-    drawManager.hoverBoxOnSat(1, 100, 100);
-
-    cameraManager.isDragging = false;
-    settingsManager.enableHoverOverlay = true;
-    drawManager.hoverBoxOnSat(1, 100, 100);
-
-    cameraManager.cameraType.current = cameraManager.cameraType.planetarium;
-    drawManager.canvas.style = {};
-    drawManager.hoverBoxOnSat();
-  });
-
-  test('UI Manager Functional 1', () => {
+  test('UI Manager Functional 2', () => {
     adviceList.findISS();
     adviceList.findISS();
     adviceList.findISS();
@@ -1580,6 +1309,7 @@ describe('Integration Testing', () => {
     // eventFire('near-objects-link', 'click');
     // eventFire('search-results', 'mouseout');
 
+    // eslint-disable-next-line no-undef
     db.gremlins();
 
     settingsManager.trusatMode = true;

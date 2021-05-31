@@ -71,7 +71,8 @@
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
-      "/src/js/lib/external/"
+      "/src/js/lib/external/",
+      "/test/"
     ]
   },
   "nyc": {

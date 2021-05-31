@@ -149,7 +149,6 @@ satSet.init = async (glRef, dotManagerRef, cameraManager) => {
   // satSet.radarDataManager = radarDataManager;
 };
 
-/* istanbul ignore next */
 var addSatCruncherOnMessage = (cameraManager) => {
   satCruncher.onmessage = (m) => {
     if (!gotExtraData) {

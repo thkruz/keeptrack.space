@@ -19,10 +19,14 @@ photoManager.dscovr = () => {
   let request = new XMLHttpRequest();
   request.open('GET', `https://epic.gsfc.nasa.gov/api/natural`, true);
 
-  request.onload = function () {
-    if (this.status >= 200 && this.status < 400) {
+  request.onload = () => {
+    photoManager.dscovrLoaded(this);
+  };
+
+  photoManager.dscovrLoaded = (req) => {
+    if (req.status >= 200 && req.status < 400) {
       // Success!
-      const response = JSON.parse(this.response);
+      const response = JSON.parse(req.response);
       const imageUrl = response[0].image;
       const dateStr = response[0].identifier;
       const year = dateStr.slice(0, 4);

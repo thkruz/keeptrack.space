@@ -20,13 +20,14 @@
   },
   "publishConfig": {
     "access": "public"
-  },
+  },  
   "scripts": {
     "prebuild": "node ./scripts/prebuild.mjs && npm run updateVersion && npm run updateTime",
     "build": "cross-env NODE_ENV=production node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "build:dev": "npm run prebuild && cross-env NODE_ENV=development node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "build:test": "npm run prebuild && cross-env NODE_ENV=test node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "http": "http-server ./dist/",
+    "start": "http-server ./dist/ -o index.htm",
     "test": "start-server-and-test http http://localhost:8080 test:noserver",
     "test:noserver": "cross-env NODE_ENV=development && jest --max-old-space-size=1024 --coverage",
     "test:nocov": "jest",
@@ -136,6 +137,7 @@
     "css-loader": "^5.0.1",
     "cypress": "^7.3.0",
     "cypress-wait-until": "^1.7.1",
+    "cz": "^1.8.2",
     "download-file": "^0.1.5",
     "eslint": "^7.16.0",
     "gh-pages": "^3.1.0",
@@ -148,7 +150,6 @@
     "mkdirp": "^1.0.4",
     "nyc": "^15.1.0",
     "prettier": "^2.2.1",
-    "spectorjs": "^0.9.22",
     "start-server-and-test": "^1.12.3",
     "style-loader": "^2.0.0",
     "webgl-mock": "^0.1.7",
@@ -158,8 +159,6 @@
     "worker-loader": "^3.0.7"
   },
   "dependencies": {
-    "cz": "^1.8.2",
-    "d3-time-format": "^3.0.0",
     "gl-matrix": "^3.3.0",
     "jquery": "^3.5.1",
     "jquery-ui-bundle": "^1.12.1-migrate",

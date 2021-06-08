@@ -52,7 +52,6 @@ import { timeManager } from '@app/js/timeManager/timeManager.js';
 import { uiInput } from './ui-input.js';
 import { uiLimited } from './ui-limited.js';
 import { uiValidation } from './ui-validation.js';
-import { toast } from 'materialize-css';
 
 const M = window.M;
 
@@ -790,7 +789,7 @@ $('#all-objects-link').on('click', function () {
 $('#near-orbits-link').on('click', () => {
   // searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(objectManager.selectedSat)));
   let searchStr = searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(window.selectedSat)));
-  searchBox.doSearch(searchStr);
+  searchBox.doSearch(searchStr, false, satSet);
 });
 
 uiManager.legendColorsChange = function () {

@@ -8,6 +8,7 @@
   "globals": {
     "settingsManager": "writable"
   },
+  "ignorePatterns": ["**/**/*.min.js","**/**/tle.js"],
   "extends": "eslint:recommended",
   "parser": "babel-eslint",
   // "parserOptions": {

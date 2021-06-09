@@ -1,5 +1,6 @@
 /* eslint-disable */
 var webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 var glob = require('glob');
 
 const MAKE_MODE = process.env.NODE_ENV == 'test' || process.env.NODE_ENV == 'development' ? 'development' : 'production';
@@ -39,6 +40,10 @@ let config = {
       'jQuery': 'jquery',
       'windows.jQuery': 'jquery',
     }),
+    new HtmlWebpackPlugin({
+      filename: '../index.htm',
+      template: './src/index.htm',
+    }),
   ],
   ignoreWarnings: [/asset size limit/, /combined asset size exceeds the recommended limit/],
   stats: 'minimal',
@@ -66,9 +71,24 @@ let jsConfig = Object.assign({}, config, {
   name: 'MainFiles',
   entry: {
     main: ['./src/js/main.js'],
+  },
+  resolve: {
+    alias: {
+      '@app': __dirname + '/../src',
+    },
+  },
+  output: {
+    filename: '[name].[contenthash].js',
+    path: __dirname + '/../dist/js',
+    publicPath: './js/',
+  },
+});
+
+let jsConfig2 = Object.assign({}, config, {
+  name: 'WebWorkers',
+  entry: {
     positionCruncher: ['./src/js/webworker/positionCruncher.js'],
     orbitCruncher: ['./src/js/webworker/orbitCruncher.js'],
-    // 'checker-script': ['./src/js/checker-script.js'],
   },
   resolve: {
     alias: {
@@ -82,7 +102,7 @@ let jsConfig = Object.assign({}, config, {
   },
 });
 
-let jsConfig2 = Object.assign({}, config, {
+let jsConfig3 = Object.assign({}, config, {
   name: 'Libraries',
   entry: {
     'analysis-tools': ['./src/analysis/js/analysis-tools.js'],
@@ -100,4 +120,4 @@ let jsConfig2 = Object.assign({}, config, {
 });
 
 // Return Array of Configurations
-module.exports = [jsConfig, jsConfig2];
+module.exports = [jsConfig, jsConfig2, jsConfig3];

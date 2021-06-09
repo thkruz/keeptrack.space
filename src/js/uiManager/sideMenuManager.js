@@ -722,6 +722,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
     var satId = $(this).data('sat-id');
     for (var i = 0; i < sMM.watchlistList.length; i++) {
       if (sMM.watchlistList[i] === satId) {
+        orbitManager.removeInViewOrbit(sMM.watchlistList[i]);
         sMM.watchlistList.splice(i, 1);
         sMM.watchlistInViewList.splice(i, 1);
       }

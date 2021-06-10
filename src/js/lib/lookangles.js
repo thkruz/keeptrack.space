@@ -2426,4 +2426,6 @@ var _jday = (year, mon, day, hr, minute, sec) => {
   }
 };
 
+window.satellite = satellite;
+
 export { satellite };

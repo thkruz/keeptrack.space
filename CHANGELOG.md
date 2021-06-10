@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v3.2.1](https://github.com/thkruz/keeptrack.space/compare/v3.2.0...v3.2.1)
+
+> 1 June 2021 
+
+- docs(changelog): generated auto changelog [`257101e`](https://github.com/thkruz/keeptrack.space/commit/257101e0ca01d187b016baf394c762101d569dbd)
+- docs(readme.md): updated readme for version 3 [`53b120d`](https://github.com/thkruz/keeptrack.space/commit/53b120d97b4db708e7de2f531a4378c67559516d)
+- fix(uimanager): fixed find objects in this orbit and orbit remaining after watchlist item removed [`e0a79b4`](https://github.com/thkruz/keeptrack.space/commit/e0a79b4969f9ed1d6507efe451d75cd00e37dc01)
+- fix(style.css): bottom menu was hiding some input selection options. changed max-heigh of popups [`6d6d119`](https://github.com/thkruz/keeptrack.space/commit/6d6d119eed60d90472946fc0ade6b36d32f8d397)
+- chore(package.json): bumped version number [`0d52ce5`](https://github.com/thkruz/keeptrack.space/commit/0d52ce551dae48e50adcd1435671220ed5e5149f)
+- build(auto-changelog): added changelog dependency [`9d83296`](https://github.com/thkruz/keeptrack.space/commit/9d83296a8e3d2b4d4e16b6a27c6edd8cb81a8ff5)
+
 #### [v3.2.0](https://github.com/thkruz/keeptrack.space/compare/v3.1.3...v3.2.0)
 
 > 31 May 2021 

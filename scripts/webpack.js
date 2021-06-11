@@ -112,6 +112,17 @@ let jsConfig3 = Object.assign({}, config, {
       '@app': __dirname + '/../src',
     },
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+      '$': 'jquery',
+      'jQuery': 'jquery',
+      'windows.jQuery': 'jquery',
+    }),
+    new HtmlWebpackPlugin({
+      filename: '../index.htm',
+      template: './src/analysis/index.htm',
+    }),
+  ],
   output: {
     filename: '[name].js',
     path: __dirname + '/../dist/analysis/js/',

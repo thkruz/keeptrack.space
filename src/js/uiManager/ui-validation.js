@@ -15,7 +15,7 @@ export const uiValidation = () => {
 
   $('#es-day').on('keyup', function () {
     if ($('#es-day').val() < 0) $('#es-day').val('000.00000000');
-    if ($('#es-day').val() > 367) $('#es-day').val('366.00000000');
+    if ($('#es-day').val() >= 367) $('#es-day').val('366.00000000');
   });
   $('#es-inc').on('keyup', function () {
     if ($('#es-inc').val() < 0) $('#es-inc').val('000.0000');

@@ -302,6 +302,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
         // Might not have this module
       }
 
+      /* istanbul ignore next */
       (function _parseGetParameters() {
         // do querystring stuff
         let params = satSet.queryStr.split('&');

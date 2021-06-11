@@ -29,7 +29,7 @@ import '@app/js/lib/external/jquery.colorbox.min.js';
 import '@app/js/lib/external/jquery-ajax.js';
 import '@app/js/lib/external/colorPick.js';
 import 'materialize-css';
-import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
+import { DEG2RAD, RAD2DEG, cKmPerMs } from '@app/js/lib/constants.js';
 import { parseRgba, rgbCss, saveCsv, stringPad } from '@app/js/lib/helpers.js';
 import { CanvasRecorder } from '@app/js/lib/external/CanvasRecorder.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
@@ -559,6 +559,9 @@ var _updateSelectBox = () => {
         $('#sat-azimuth').html(satellite.currentTEARR.az.toFixed(0) + '°'); // Convert to Degrees
         $('#sat-elevation').html(satellite.currentTEARR.el.toFixed(1) + '°');
         $('#sat-range').html(satellite.currentTEARR.rng.toFixed(2) + ' km');
+        let beamwidthString = sensorManager.currentSensor.beamwidth ? (satellite.currentTEARR.rng * Math.sin(DEG2RAD * sensorManager.currentSensor.beamwidth)).toFixed(2) + ' km' : 'Unknown';
+        $('#sat-beamwidth').html(beamwidthString);
+        $('#sat-maxTmx').html(((satellite.currentTEARR.rng / cKmPerMs) * 2).toFixed(2) + ' ms'); // Time for RF to hit target and bounce back
       } else {
         $('#sat-azimuth').html('Out of FOV');
         $('#sat-azimuth').prop('title', 'Azimuth: ' + satellite.currentTEARR.az.toFixed(0) + '°');
@@ -566,11 +569,17 @@ var _updateSelectBox = () => {
         $('#sat-elevation').prop('title', 'Elevation: ' + satellite.currentTEARR.el.toFixed(1) + '°');
         $('#sat-range').html('Out of FOV');
         $('#sat-range').prop('title', 'Range: ' + satellite.currentTEARR.rng.toFixed(2) + ' km');
+        let beamwidthString = sensorManager.currentSensor.beamwidth ? sensorManager.currentSensor.beamwidth + '°' : 'Unknown';
+        $('#sat-beamwidth').html('Out of FOV');
+        $('#sat-beamwidth').prop('title', beamwidthString);
+        $('#sat-maxTmx').html('Out of FOV');
       }
     } else {
       $('#sat-azimuth').parent().hide();
       $('#sat-elevation').parent().hide();
       $('#sat-range').parent().hide();
+      $('#sat-beamwidth').parent().hide();
+      $('#sat-maxTmx').parent().hide();
     }
 
     if (objectManager.isSensorManagerLoaded) {

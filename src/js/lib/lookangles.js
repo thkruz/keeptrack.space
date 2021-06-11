@@ -137,7 +137,21 @@ satellite.distance = (hoverSat, selectedSat) => {
   let distanceApartY = Math.pow(hoverSat.position.y - selectedSat.position.y, 2);
   let distanceApartZ = Math.pow(hoverSat.position.z - selectedSat.position.z, 2);
   let distanceApart = Math.sqrt(distanceApartX + distanceApartY + distanceApartZ).toFixed(0);
-  return '<br />Range: ' + distanceApart + ' km';
+
+  let sameBeamStr = '';
+  try {
+    if (satellite.currentTEARR.inview) {
+      if (distanceApart < satellite.currentTEARR.rng * Math.sin(DEG2RAD * sensorManager.currentSensor.beamwidth)) {
+        if (satellite.currentTEARR.rng < sensorManager.currentSensor.obsmaxrange && satellite.currentTEARR.rng > 0) {
+          sameBeamStr = ' (Within One Beam)';
+        }
+      }
+    }
+  } catch {
+    // Intentionally Blank
+  }
+
+  return '<br />Range: ' + distanceApart + ' km' + sameBeamStr;
 };
 
 // TODO: UI element changes/references should be moved to ui.js
@@ -772,12 +786,31 @@ satellite.getlookanglesMultiSite = (sat) => {
 satellite.findCloseObjects = () => {
   let csoList = [];
   let satList = [];
+
+  const _getSatPos = (propTempOffset, satrec) => {
+    let now = new Date(); // Make a time variable
+    now.setTime(Number(Date.now()) + propTempOffset); // Set the time variable to the time in the future
+    let j = _jday(
+      now.getUTCFullYear(),
+      now.getUTCMonth() + 1, // NOTE:, this function requires months in rng 1-12.
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()
+    ); // Converts time to jday (TLEs use epoch year/day)
+    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+    // let gmst = satellite.gstime(j);
+
+    let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+    return satellite.sgp4(satrec, m);
+  };
+
   for (let i = 0; i < satSet.numSats; i++) {
     let sat = satSet.getSat(i);
     if (typeof sat.TLE1 == 'undefined') continue;
     if (sat.apogee > 5556) continue;
     sat.satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);
-    let pos = _propagate(0, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval);
+    let pos = _getSatPos(0, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval);
     sat.position = pos.position;
     if (typeof sat.position == 'undefined') continue;
     satList.push(sat);
@@ -805,24 +838,6 @@ satellite.findCloseObjects = () => {
   let csoListUnique = Array.from(new Set(csoList));
   csoList = []; // Clear CSO List
   satList = []; // Clear CSO List
-
-  var _getSatPos = (propTempOffset, satrec) => {
-    let now = new Date(); // Make a time variable
-    now.setTime(Number(Date.now()) + propTempOffset); // Set the time variable to the time in the future
-    let j = _jday(
-      now.getUTCFullYear(),
-      now.getUTCMonth() + 1, // NOTE:, this function requires months in rng 1-12.
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds()
-    ); // Converts time to jday (TLEs use epoch year/day)
-    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-    // let gmst = satellite.gstime(j);
-
-    let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-    return satellite.sgp4(satrec, m);
-  };
 
   for (let i = 0; i < csoListUnique.length; i++) {
     let sat = csoListUnique[i].sat1;

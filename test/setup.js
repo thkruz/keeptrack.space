@@ -30,8 +30,7 @@ const eventFire = (elObj, etype) => {
     if (el.fireEvent) {
       el.fireEvent('on' + etype);
     } else {
-      var evObj = document.createEvent('Events');
-      evObj.initEvent(etype, true, false);
+      const evObj = new Event(etype, { bubbles: true, cancelable: false });
       el.dispatchEvent(evObj);
     }
   } catch (error) {

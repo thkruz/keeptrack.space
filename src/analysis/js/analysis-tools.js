@@ -16,8 +16,9 @@ or mirrored at any other location without the express written permission of the 
 
 import '@app/js/lib/external/Chart.js';
 import * as $ from 'jquery';
+import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { satellite } from '@app/js/lib/lookangles.js';
-import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
+import { sensorList } from '@app/js/sensorManager/sensorList.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 var requestInfo = {};
@@ -96,32 +97,7 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
   var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   var lookanglesTable = []; // Iniially no rows to the table
 
-  var tempLookanglesInterval;
-  if (satellite.isRiseSetLookangles) {
-    tempLookanglesInterval = satellite.lookanglesInterval;
-    satellite.lookanglesInterval = 1;
-  }
-
-  if (typeof satellite.lookanglesLength == 'undefined') {
-    satellite.lookanglesLength = 1.0;
-  }
-
-  for (var i = 0; i < satellite.lookanglesLength * 24 * 60 * 60; i += satellite.lookanglesInterval) {
-    // satellite.lookanglesInterval in seconds
-    propTempOffset = i * 1000 + propOffset; // Offset in seconds (msec * 1000)
-    if (lookanglesTable.length <= 15000) {
-      // Maximum of 1500 lines in the look angles table
-      let lookanglesRow = propagate2(propTempOffset, satrec);
-      if (typeof lookanglesRow != 'undefined') {
-        lookanglesTable.push(lookanglesRow); // Update the table with looks for this 5 second chunk and then increase table counter by 1
-      }
-    }
-  }
-
-  if (satellite.isRiseSetLookangles) {
-    satellite.lookanglesInterval = tempLookanglesInterval;
-  }
-  var propagate2 = (propTempOffset, satrec) => {
+  const propagate2 = (propTempOffset, satrec) => {
     // var lookAngleRecord = {};
     var now = new Date(); // Make a time variable
     now.setTime(Number(Date.now()) + propTempOffset); // Set the time variable to the time in the future
@@ -141,10 +117,15 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
     var positionEcf, lookAngles, azimuth, elevation, range;
 
     positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-    lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
-    azimuth = lookAngles.azimuth * RAD2DEG;
-    elevation = lookAngles.elevation * RAD2DEG;
-    range = lookAngles.rangeSat;
+    const lla = {
+      lat: sensor.observerGd.latitude,
+      lon: sensor.observerGd.longitude,
+      alt: sensor.observerGd.height,
+    };
+    lookAngles = satellite.ecfToLookAngles(lla, positionEcf);
+    azimuth = lookAngles.az * RAD2DEG;
+    elevation = lookAngles.el * RAD2DEG;
+    range = lookAngles.rng;
 
     if (sensor.obsminaz < sensor.obsmaxaz) {
       if (
@@ -153,14 +134,14 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
       ) {
         if (tableType == 1) {
           return {
-            time: timeManager.dateFormat(now, 'isoDateTime', true),
+            time: dateFormat(now, 'isoDateTime', true),
             rng: range,
             az: azimuth,
             el: elevation,
           };
         } else if (tableType == 2) {
           return {
-            time: timeManager.dateFormat(now, 'isoDateTime', true),
+            time: dateFormat(now, 'isoDateTime', true),
             rng: null,
             az: null,
             el: null,
@@ -193,17 +174,22 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
         var positionEci1 = satellite.sgp4(satrec, m1);
         var positionEcf1, lookAngles1, azimuth1, elevation1, range1;
 
+        const lla = {
+          lat: sensor.observerGd.latitude,
+          lon: sensor.observerGd.longitude,
+          alt: sensor.observerGd.height,
+        };
         positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
-        lookAngles1 = satellite.ecfToLookAngles(sensor.observerGd, positionEcf1);
-        azimuth1 = lookAngles1.azimuth * RAD2DEG;
-        elevation1 = lookAngles1.elevation * RAD2DEG;
-        range1 = lookAngles1.rangeSat;
+        lookAngles1 = satellite.ecfToLookAngles(lla, positionEcf1);
+        azimuth1 = lookAngles1.az * RAD2DEG;
+        elevation1 = lookAngles1.el * RAD2DEG;
+        range1 = lookAngles1.rng;
         if (
           !((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && elevation >= sensor.obsminel && elevation <= sensor.obsmaxel && range <= sensor.obsmaxrange && range >= sensor.obsminrange) ||
           ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2 && range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2)
         ) {
           return {
-            time: timeManager.dateFormat(now, 'isoDateTime', true),
+            time: dateFormat(now, 'isoDateTime', true),
             rng: range,
             az: azimuth,
             el: elevation,
@@ -225,17 +211,22 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
           m1 = (j1 - satrec.jdsatepoch) * minutesPerDay;
           positionEci1 = satellite.sgp4(satrec, m1);
 
+          const lla = {
+            lat: sensor.observerGd.latitude,
+            lon: sensor.observerGd.longitude,
+            alt: sensor.observerGd.height,
+          };
           positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
-          lookAngles1 = satellite.ecfToLookAngles(sensor.observerGd, positionEcf1);
-          azimuth1 = lookAngles1.azimuth * RAD2DEG;
-          elevation1 = lookAngles1.elevation * RAD2DEG;
-          range1 = lookAngles1.rangeSat;
+          lookAngles1 = satellite.ecfToLookAngles(lla, positionEcf1);
+          azimuth1 = lookAngles1.az * RAD2DEG;
+          elevation1 = lookAngles1.el * RAD2DEG;
+          range1 = lookAngles1.rng;
           if (
             !((azimuth1 >= sensor.obsminaz || azimuth1 <= sensor.obsmaxaz) && elevation1 >= sensor.obsminel && elevation1 <= sensor.obsmaxel && range1 <= sensor.obsmaxrange && range1 >= sensor.obsminrange) ||
             ((azimuth1 >= sensor.obsminaz2 || azimuth1 <= sensor.obsmaxaz2) && elevation1 >= sensor.obsminel2 && elevation1 <= sensor.obsmaxel2 && range1 <= sensor.obsmaxrange2 && range1 >= sensor.obsminrange2)
           ) {
             return {
-              time: timeManager.dateFormat(now, 'isoDateTime', true),
+              time: dateFormat(now, 'isoDateTime', true),
               rng: range,
               az: azimuth,
               el: elevation,
@@ -244,14 +235,14 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
         }
         if (tableType == 1) {
           return {
-            time: timeManager.dateFormat(now, 'isoDateTime', true),
+            time: dateFormat(now, 'isoDateTime', true),
             rng: range,
             az: azimuth,
             el: elevation,
           };
         } else if (tableType == 2) {
           return {
-            time: timeManager.dateFormat(now, 'isoDateTime', true),
+            time: dateFormat(now, 'isoDateTime', true),
             rng: null,
             az: null,
             el: null,
@@ -261,7 +252,7 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
         }
       }
       return {
-        time: timeManager.dateFormat(now, 'isoDateTime', true),
+        time: dateFormat(now, 'isoDateTime', true),
         rng: range,
         az: azimuth,
         el: elevation,
@@ -269,14 +260,14 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
     }
     if (tableType == 1) {
       return {
-        time: timeManager.dateFormat(now, 'isoDateTime', true),
+        time: dateFormat(now, 'isoDateTime', true),
         rng: range,
         az: azimuth,
         el: elevation,
       };
     } else if (tableType == 2) {
       return {
-        time: timeManager.dateFormat(now, 'isoDateTime', true),
+        time: dateFormat(now, 'isoDateTime', true),
         rng: null,
         az: null,
         el: null,
@@ -285,7 +276,7 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
       return;
     }
   };
-  var _jday = (year, mon, day, hr, minute, sec) => {
+  const _jday = (year, mon, day, hr, minute, sec) => {
     // from satellite.js
     if (!year) {
       // console.error('timeManager.jday should always have a date passed to it!');
@@ -300,6 +291,32 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
       );
     }
   };
+
+  var tempLookanglesInterval;
+  if (satellite.isRiseSetLookangles) {
+    tempLookanglesInterval = satellite.lookanglesInterval;
+    satellite.lookanglesInterval = 1;
+  }
+
+  if (typeof satellite.lookanglesLength == 'undefined') {
+    satellite.lookanglesLength = 1.0;
+  }
+
+  for (var i = 0; i < satellite.lookanglesLength * 24 * 60 * 60; i += satellite.lookanglesInterval) {
+    // satellite.lookanglesInterval in seconds
+    propTempOffset = i * 1000 + propOffset; // Offset in seconds (msec * 1000)
+    if (lookanglesTable.length <= 15000) {
+      // Maximum of 1500 lines in the look angles table
+      let lookanglesRow = propagate2(propTempOffset, satrec);
+      if (typeof lookanglesRow != 'undefined') {
+        lookanglesTable.push(lookanglesRow); // Update the table with looks for this 5 second chunk and then increase table counter by 1
+      }
+    }
+  }
+
+  if (satellite.isRiseSetLookangles) {
+    satellite.lookanglesInterval = tempLookanglesInterval;
+  }
   return lookanglesTable;
 };
 
@@ -611,10 +628,10 @@ var loadJSON = () => {
         }
         break;
       case 'sensor':
-        if (val == 'BLE') sensor = sensorManager.sensorList.BLE;
-        if (val == 'CLR') sensor = sensorManager.sensorList.CLR;
-        if (val == 'COD') sensor = sensorManager.sensorList.COD;
-        if (val == 'FYL') sensor = sensorManager.sensorList.FYL;
+        if (val == 'BLE') sensor = sensorList.BLE;
+        if (val == 'CLR') sensor = sensorList.CLR;
+        if (val == 'COD') sensor = sensorList.COD;
+        if (val == 'FYL') sensor = sensorList.FYL;
         break;
       case 'lookanglesLength':
         satellite.lookanglesLength = parseFloat(val);

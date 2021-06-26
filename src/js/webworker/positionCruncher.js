@@ -399,7 +399,7 @@ var propagateCruncher = () => {
   let sat;
   let isSensorChecked = false;
   let az, el, rng, pos;
-  let q;
+  let q, q2;
   let semiDiamEarth, semiDiamSun, theta;
   let starPosition;
   let snum;
@@ -711,7 +711,8 @@ var propagateCruncher = () => {
           }
 
           // az, el, rng, pos;
-          q = 20;
+          q = Math.abs(sensor.obsmaxaz - sensor.obsminaz) < 30 ? 0.25 : 2;
+          q2 = sensor.obsmaxrange - sensor.obsminrange < 500 ? 3000 : 30;
 
           // Don't show anything but the floor if in surveillance only mode
           // Unless it is a volume search radar
@@ -721,9 +722,9 @@ var propagateCruncher = () => {
               // //////////////////////////////////
               // Min AZ FOV
               // //////////////////////////////////
-              for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / 30) {
+              for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
                 az = sensor.obsminaz;
-                for (el = sensor.obsminel; el < sensor.obsmaxel; el += 2) {
+                for (el = sensor.obsminel; el < sensor.obsmaxel; el += q) {
                   pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                   try {
                     satCache[i].active = true;
@@ -744,9 +745,9 @@ var propagateCruncher = () => {
               // //////////////////////////////////
               // Max AZ FOV
               // //////////////////////////////////
-              for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / 30) {
+              for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
                 az = sensor.obsmaxaz;
-                for (el = sensor.obsminel; el < sensor.obsmaxel; el += 2) {
+                for (el = sensor.obsminel; el < sensor.obsmaxel; el += q) {
                   pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                   satCache[i].active = true;
                   satPos[i * 3] = pos.x;
@@ -768,9 +769,9 @@ var propagateCruncher = () => {
                 // //////////////////////////////////
                 // Min AZ 2 FOV
                 // //////////////////////////////////
-                for (rng = Math.max(sensor.obsminrange2, 100); rng < Math.min(sensor.obsmaxrange2, 60000); rng += Math.min(sensor.obsmaxrange2, 60000) / 30) {
+                for (rng = Math.max(sensor.obsminrange2, 100); rng < Math.min(sensor.obsmaxrange2, 60000); rng += Math.min(sensor.obsmaxrange2, 60000) / q2) {
                   az = sensor.obsminaz2;
-                  for (el = sensor.obsminel2; el < sensor.obsmaxel2; el += 2) {
+                  for (el = sensor.obsminel2; el < sensor.obsmaxel2; el += q) {
                     pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                     satCache[i].active = true;
                     satPos[i * 3] = pos.x;
@@ -787,9 +788,9 @@ var propagateCruncher = () => {
                 // //////////////////////////////////
                 // Max AZ 2 FOV
                 // //////////////////////////////////
-                for (rng = Math.max(sensor.obsminrange2, 100); rng < Math.min(sensor.obsmaxrange2, 60000); rng += Math.min(sensor.obsmaxrange2, 60000) / 30) {
+                for (rng = Math.max(sensor.obsminrange2, 100); rng < Math.min(sensor.obsmaxrange2, 60000); rng += Math.min(sensor.obsmaxrange2, 60000) / q2) {
                   az = sensor.obsmaxaz2;
-                  for (el = sensor.obsminel2; el < sensor.obsmaxel2; el += 2) {
+                  for (el = sensor.obsminel2; el < sensor.obsmaxel2; el += q) {
                     pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                     satCache[i].active = true;
                     satPos[i * 3] = pos.x;
@@ -806,9 +807,9 @@ var propagateCruncher = () => {
 
               // Only on 360 FOV
             } else {
-              for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / 30) {
+              for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
                 el = sensor.obsmaxel;
-                for (az = sensor.obsminaz; az < sensor.obsmaxaz; az += 2) {
+                for (az = sensor.obsminaz; az < sensor.obsmaxaz; az += q) {
                   pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                   satCache[i].active = true;
                   satPos[i * 3] = pos.x;
@@ -827,9 +828,8 @@ var propagateCruncher = () => {
           // //////////////////////////////////
           // Floor of FOV
           // //////////////////////////////////
-          q = 2;
-          for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / 30) {
-            for (az = 0; az < 360; az += 1 * q) {
+          for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
+            for (az = 0; az < 360; az += q) {
               if (sensor.obsminaz > sensor.obsmaxaz) {
                 if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
                   // Intentional
@@ -860,6 +860,43 @@ var propagateCruncher = () => {
             }
           }
 
+          // //////////////////////////////////
+          // Top of FOV for Small FOV
+          // //////////////////////////////////
+          if (sensor.obsmaxel - sensor.obsminel < 20) {
+            for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
+              for (az = 0; az < 360; az += q) {
+                if (sensor.obsminaz > sensor.obsmaxaz) {
+                  if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
+                    // Intentional
+                  } else {
+                    continue;
+                  }
+                } else {
+                  if (az >= sensor.obsminaz && az <= sensor.obsmaxaz) {
+                    // Intentional
+                  } else {
+                    continue;
+                  }
+                }
+                pos = satellite.ecfToEci(_lookAnglesToEcf(az, sensor.obsmaxel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
+                if (i === len) {
+                  console.error('No More Markers');
+                  break;
+                }
+                satCache[i].active = true;
+                satPos[i * 3] = pos.x;
+                satPos[i * 3 + 1] = pos.y;
+                satPos[i * 3 + 2] = pos.z;
+
+                satVel[i * 3] = 0;
+                satVel[i * 3 + 1] = 0;
+                satVel[i * 3 + 2] = 0;
+                i++;
+              }
+            }
+          }
+
           if (typeof sensor.obsminaz2 != 'undefined') {
             ////////////////////////////////
             // Cobra DANE Types
@@ -869,7 +906,7 @@ var propagateCruncher = () => {
             // Floor of FOV
             // //////////////////////////////////
             q = 2;
-            for (rng = Math.max(sensor.obsminrange2, 100); rng < Math.min(sensor.obsmaxrange2, 60000); rng += Math.min(sensor.obsmaxrange2, 60000) / 30) {
+            for (rng = Math.max(sensor.obsminrange2, 100); rng < Math.min(sensor.obsmaxrange2, 60000); rng += Math.min(sensor.obsmaxrange2, 60000) / q2) {
               for (az = 0; az < 360; az += 1 * q) {
                 if (sensor.obsminaz2 > sensor.obsmaxaz2) {
                   if (az >= sensor.obsminaz2 || az <= sensor.obsmaxaz2) {

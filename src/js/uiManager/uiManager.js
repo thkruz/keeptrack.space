@@ -307,8 +307,8 @@ uiManager.keyHandler = (evt) => {
       $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
       break;
     case '0':
-      timeManager.setPropRateZero();
       timeManager.updatePropTime();
+      timeManager.setPropRateZero();
       timeManager.propOffset = timeManager.getPropOffset();
       settingsManager.isPropRateChange = true;
       break;
@@ -584,14 +584,16 @@ var _updateSelectBox = () => {
 
     if (objectManager.isSensorManagerLoaded) {
       if (sensorManager.checkSensorSelected()) {
-        if (objectManager.selectedSat !== objectManager.lastSelectedSat() && !sat.missile) {
+        // If we didn't just calculate next pass time for this satellite and sensor combination do it
+        if (objectManager.selectedSat !== uiManager.lastNextPassCalcSatId && sensorManager.currentSensor.shortName !== uiManager.lastNextPassCalcSensorId && !sat.missile) {
           $('#sat-nextpass').html(satellite.nextpass(sat));
 
           // IDEA: Code isInSun()
           //sun.getXYZ();
           //lineManager.create('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
         }
-        objectManager.lastSelectedSat(objectManager.selectedSat);
+        uiManager.lastNextPassCalcSatId = objectManager.selectedSat;
+        uiManager.lastNextPassCalcSensorId = sensorManager.currentSensor.shortName;
       } else {
         $('#sat-nextpass').html('Unavailable');
       }

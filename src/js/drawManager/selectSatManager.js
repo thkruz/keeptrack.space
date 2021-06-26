@@ -259,6 +259,7 @@ selectSatManager.selectSat = (satId, cameraManager) => {
     // /////////////////////////////////////////////////////////////////////////
     if (sat.R === null || typeof sat.R == 'undefined') {
       $('#sat-rcs').html('Unknown');
+      // $('#sat-rcs').tooltip({ delay: 50, html: 'Unknown', position: 'left' });
     } else {
       // var rcs;
       // if (sat.R < 0.1) {
@@ -428,7 +429,7 @@ selectSatManager.selectSat = (satId, cameraManager) => {
       } else {
         now = new Date(timeManager.propRealTime + timeManager.propOffset);
         var sunTime = SunCalc.getTimes(now, sensorManager.currentSensor.lat, sensorManager.currentSensor.long);
-        var satInSun = sat.isInSun;
+        var satInSun = sat.isInSun();
         // If No Sensor, then Ignore Sun Exclusion
         if (sensorManager.currentSensor.lat == null) {
           if (satInSun == 0) $('#sat-sun').html('No Sunlight');
@@ -452,6 +453,7 @@ selectSatManager.selectSat = (satId, cameraManager) => {
           // Unless you are in sun exclusion
           $('#sat-sun').html('Sun Exclusion');
         }
+        if (satInSun == -1) $('#sat-sun').html('Unable to Calculate');
       }
     }
     if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {

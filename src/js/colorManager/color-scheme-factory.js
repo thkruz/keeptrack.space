@@ -397,14 +397,14 @@ class ColorSchemeFactory {
 
         if (sat.inSun == 0 && ColorSchemeFactory.objectTypeFlags.satLow === true) {
           return {
-            color: ColorSchemeFactory.colorTheme.umbral,
-            pickable: true,
+            color: ColorSchemeFactory.colorTheme.deselected,
+            pickable: false,
           };
         }
         // Not in the vmag database
         return {
-          color: ColorSchemeFactory.colorTheme.umbral,
-          pickable: true,
+          color: ColorSchemeFactory.colorTheme.deselected,
+          pickable: false,
         };
       }
 

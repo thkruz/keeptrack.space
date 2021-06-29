@@ -712,7 +712,7 @@ var propagateCruncher = () => {
 
           // az, el, rng, pos;
           q = Math.abs(sensor.obsmaxaz - sensor.obsminaz) < 30 ? 0.25 : 2;
-          q2 = sensor.obsmaxrange - sensor.obsminrange < 500 ? 3000 : 30;
+          q2 = sensor.obsmaxrange - sensor.obsminrange < 500 ? 1000 : 30;
 
           // Don't show anything but the floor if in surveillance only mode
           // Unless it is a volume search radar
@@ -829,7 +829,7 @@ var propagateCruncher = () => {
           // Floor of FOV
           // //////////////////////////////////
           for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
-            for (az = 0; az < 360; az += q) {
+            for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
               if (sensor.obsminaz > sensor.obsmaxaz) {
                 if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
                   // Intentional
@@ -865,7 +865,7 @@ var propagateCruncher = () => {
           // //////////////////////////////////
           if (sensor.obsmaxel - sensor.obsminel < 20) {
             for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
-              for (az = 0; az < 360; az += q) {
+              for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
                 if (sensor.obsminaz > sensor.obsmaxaz) {
                   if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
                     // Intentional
@@ -943,10 +943,10 @@ var propagateCruncher = () => {
           // Unless it is a volume search radar
           if (!isShowSurvFence || sensor.volume) {
             // //////////////////////////////////
-            // Outside of FOV
+            // Outside Edge of FOV
             // //////////////////////////////////
             rng = Math.min(sensor.obsmaxrange, 60000);
-            for (az = 0; az < 360; az += 2) {
+            for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
               if (sensor.obsminaz > sensor.obsmaxaz) {
                 if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
                   // Intentional
@@ -960,7 +960,7 @@ var propagateCruncher = () => {
                   continue;
                 }
               }
-              for (el = sensor.obsminel; el < sensor.obsmaxel; el += 2) {
+              for (el = sensor.obsminel; el < sensor.obsmaxel; el += q) {
                 pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                 if (i === len) {
                   console.error('No More Markers');
@@ -986,7 +986,7 @@ var propagateCruncher = () => {
               // Outside of FOV
               // //////////////////////////////////
               rng = Math.min(sensor.obsmaxrange2, 60000);
-              for (az = 0; az < 360; az += 2) {
+              for (az = 0; az < Math.max(360, sensor.obsmaxaz2); az += q) {
                 if (sensor.obsminaz2 > sensor.obsmaxaz2) {
                   if (az >= sensor.obsminaz2 || az <= sensor.obsmaxaz2) {
                     // Intentional
@@ -1000,7 +1000,7 @@ var propagateCruncher = () => {
                     continue;
                   }
                 }
-                for (el = sensor.obsminel2; el < sensor.obsmaxel2; el += 2) {
+                for (el = sensor.obsminel2; el < sensor.obsmaxel2; el += q) {
                   pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                   if (i === len) {
                     console.error('No More Markers');

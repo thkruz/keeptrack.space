@@ -922,6 +922,8 @@ describe('Integration Testing', () => {
 
     satellite.distance(exampleSat, exampleSat);
 
+    satellite.calculateVisMag(satSet.getSatFromObjNum(25544), sensorManager.currentSensor, timeManager.propTime(), drawManager.sceneManager.sun);
+
     satellite.nextpass(exampleSat);
     satellite.nextpass(exampleSat, sensorManager.sensorList.COD);
     satellite.nextpass(exampleSat, sensorManager.sensorList.COD, 1);

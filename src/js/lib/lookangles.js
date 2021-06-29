@@ -183,10 +183,6 @@ satellite.setobs = (sensor) => {
   }
 };
 
-window.testVisMag = (drawManager) => {
-  satellite.calculateVisMag(satSet.getSatFromObjNum(25544), sensorManager.currentSensor, timeManager.propTime(), drawManager.sceneManager.sun);
-};
-
 satellite.calculateVisMag = (sat, sensor, propTime, sun) => {
   const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   const rae = satellite.getRae(propTime, satrec, sensor);

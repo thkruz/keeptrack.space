@@ -442,6 +442,7 @@ drawManager.satCalculate = () => {
     if (objectManager.selectedSat !== -1) {
       orbitManager.setSelectOrbit(objectManager.selectedSat);
       if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
+        lineManager.drawWhenSelected();
         lineManager.updateLineToSat(objectManager.selectedSat, satSet.getIdFromSensorName(sensorManager.currentSensor.name));
       }
       uiManager.updateMap();

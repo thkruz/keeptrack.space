@@ -205,6 +205,7 @@ test(`selectSatManager Unit Testing`, () => {
     constellation: '1',
     maneuver: '1',
     associates: '1',
+    isInSun: () => {},
   });
   selectSatManager.selectSat(5, cameraManager);
 

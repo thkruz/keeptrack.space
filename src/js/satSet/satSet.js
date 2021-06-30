@@ -1063,9 +1063,8 @@ satSet.mergeSat = (satObject) => {
 };
 satSet.vmagUpdate = (vmagObject) => {
   if (!satData) return null;
-  var i = satSet.getIdFromObjNum(vmagObject.satid);
   try {
-    satData[i].vmag = vmagObject.vmag;
+    satData[vmagObject.satid].vmag = vmagObject.vmag;
   } catch (e) {
     // console.warn('Old Satellite in vmagManager: ' + vmagObject.satid);
   }
@@ -1112,6 +1111,9 @@ satSet.getSat = (i) => {
   // Add Functions One Time
   if (typeof satData[i].isInSun == 'undefined') {
     satData[i].isInSun = () => {
+      //
+      if (typeof satData[i].position == 'undefined') return -1;
+
       // Distances all in km
       // satSet.sunECI is updated by drawManager every draw frame
       let sunECI = satSet.sunECI;

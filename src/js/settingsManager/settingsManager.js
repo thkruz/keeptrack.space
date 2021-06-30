@@ -151,7 +151,7 @@ settingsManager.init = () => {
   // Minimum fps or sun/moon/atmosphere are skipped
   settingsManager.fpsThrottle1 = 0;
   // Minimum fps or satellite velocities are ignored
-  settingsManager.fpsThrottle2 = 15;
+  settingsManager.fpsThrottle2 = 10;
 
   settingsManager.timeMachineDelay = 5000;
 

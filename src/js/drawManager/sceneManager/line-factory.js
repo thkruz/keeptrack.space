@@ -132,6 +132,7 @@ class LineFactory {
     if (type == 'sat4') {
       sat = this.#getSat(value[0]);
       sat2 = this.#getSat(value[1]);
+      if (sat == null || sat2 == null) return;
       if (typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
         console.debug(`No Satellite Position Available for Line`);
         console.debug(sat);

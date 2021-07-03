@@ -3,6 +3,7 @@
   describe
   global
   test
+  $
 */
 
 import 'jsdom-worker';
@@ -178,6 +179,8 @@ describe('Integration Testing', () => {
     eventFire('watchlist-list', 'click');
     eventFire('watchlist-content', 'click');
     eventFire('cs-telescope', 'click');
+
+    $('#stfForm').trigger('submit');
 
     // $('#obfit-form').submit
 
@@ -1216,6 +1219,17 @@ describe('Integration Testing', () => {
 
     uiManager.bottomIconPress({
       currentTarget: {
+        id: 'menu-stf',
+      },
+    });
+    uiManager.bottomIconPress({
+      currentTarget: {
+        id: 'menu-stf',
+      },
+    });
+
+    uiManager.bottomIconPress({
+      currentTarget: {
         id: 'menu-newLaunch',
       },
     });
@@ -1316,6 +1330,7 @@ describe('Integration Testing', () => {
 
     objectManager.selectedSat = -1;
     eventFire('near-objects-link', 'click');
+    eventFire('stf-on-object-link', 'click');
 
     // One of these broke everything!
 

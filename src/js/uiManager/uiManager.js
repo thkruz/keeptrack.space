@@ -2479,6 +2479,23 @@ uiManager.onReady = () => {
     settingsManager.isResizing = true;
   });
 
+  // Extracted because it is used in sideMenuManager
+  uiManager.enableFovView = () => {
+    // Disable Satellite Overfly
+    settingsManager.isSatOverflyModeOn = false;
+    $('#menu-sat-fov').removeClass('bmenu-item-selected');
+
+    settingsManager.isFOVBubbleModeOn = true;
+    settingsManager.isShowSurvFence = false;
+    $('#menu-fov-bubble').addClass('bmenu-item-selected');
+    $('#menu-surveillance').removeClass('bmenu-item-selected');
+    satSet.satCruncher.postMessage({
+      isShowSatOverfly: 'reset',
+      isShowFOVBubble: 'enable',
+      isShowSurvFence: 'disable',
+    });
+  };
+
   uiManager.bottomIconPress = (evt) => {
     switch (evt.currentTarget.id) {
       case 'menu-sensor-list': // No Keyboard Commands
@@ -2504,6 +2521,18 @@ uiManager.onReady = () => {
           $('#sat-photo-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           sMM.isSatPhotoMenuOpen = true;
           $('#menu-sat-photo').addClass('bmenu-item-selected');
+          break;
+        }
+      case 'menu-stf': // No Keyboard Commands
+        if (sMM.isStfMenuOpen) {
+          uiManager.hideSideMenus();
+          sMM.isStfMenuOpen = false;
+          break;
+        } else {
+          uiManager.hideSideMenus();
+          $('#stf-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+          sMM.isStfMenuOpen = true;
+          $('#menu-stf').addClass('bmenu-item-selected');
           break;
         }
       case 'menu-info-overlay':
@@ -3080,19 +3109,7 @@ uiManager.onReady = () => {
           });
           break;
         } else {
-          // Disable Satellite Overfly
-          settingsManager.isSatOverflyModeOn = false;
-          $('#menu-sat-fov').removeClass('bmenu-item-selected');
-
-          settingsManager.isFOVBubbleModeOn = true;
-          settingsManager.isShowSurvFence = false;
-          $('#menu-fov-bubble').addClass('bmenu-item-selected');
-          $('#menu-surveillance').removeClass('bmenu-item-selected');
-          satSet.satCruncher.postMessage({
-            isShowSatOverfly: 'reset',
-            isShowFOVBubble: 'enable',
-            isShowSurvFence: 'disable',
-          });
+          uiManager.enableFovView();
           break;
         }
       case 'menu-surveillance': // No Keyboard Commands
@@ -3403,6 +3420,16 @@ uiManager.onReady = () => {
   });
   $('#ui-wrapper').on('focusout', function () {
     uiManager.isCurrentlyTyping = false;
+  });
+
+  $('#stf-on-object-link').on('click', function () {
+    $('#stf-az').val(satellite.currentTEARR.az.toFixed(1));
+    $('#stf-el').val(satellite.currentTEARR.el.toFixed(1));
+    $('#stf-rng').val(satellite.currentTEARR.rng.toFixed(1));
+    uiManager.hideSideMenus();
+    $('#stf-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+    sMM.isStfMenuOpen = true;
+    $('#menu-stf').addClass('bmenu-item-selected');
   });
 
   $('#near-objects-link').on('click', function () {

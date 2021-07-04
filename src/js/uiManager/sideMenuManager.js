@@ -1303,6 +1303,75 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
     }
   });
 
+  $('#stfForm').on('submit', function (e) {
+    if (!sensorManager.checkSensorSelected()) {
+      uiManager.toast(`Select a Sensor First!`, 'caution', true);
+    }
+
+    const lat = sensorManager.currentSensor.lat;
+    const lon = sensorManager.currentSensor.long;
+    const obshei = sensorManager.currentSensor.obshei;
+    const sensorType = 'Short Range Fence';
+
+    // Multiply everything by 1 to convert string to number
+    const az = $('#stf-az').val() * 1;
+    const azExt = $('#stf-azExt').val() * 1;
+    const el = $('#stf-el').val() * 1;
+    const elExt = $('#stf-elExt').val() * 1;
+    const rng = $('#stf-rng').val() * 1;
+    const rngExt = $('#stf-rngExt').val() * 1;
+
+    const minaz = az - azExt < 0 ? az - azExt + 360 : az - azExt;
+    const maxaz = az + azExt > 360 ? az + azExt - 360 : az + azExt;
+    const minel = el - elExt;
+    const maxel = el + elExt;
+    const minrange = rng - rngExt;
+    const maxrange = rng + rngExt;
+
+    satSet.satCruncher.postMessage({
+      // Send satSet.satCruncher File information on this radar
+      typ: 'offset', // Tell satSet.satCruncher to update something
+      dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(), // Tell satSet.satCruncher what time it is and how fast time is moving
+      setlatlong: true, // Tell satSet.satCruncher we are changing observer location
+      sensor: {
+        lat: lat,
+        long: lon,
+        obshei: obshei,
+        obsminaz: minaz,
+        obsmaxaz: maxaz,
+        obsminel: minel,
+        obsmaxel: maxel,
+        obsminrange: minrange,
+        obsmaxrange: maxrange,
+        type: sensorType,
+      },
+    });
+
+    satellite.setobs({
+      lat: lat,
+      long: lon,
+      obshei: obshei,
+      obsminaz: minaz,
+      obsmaxaz: maxaz,
+      obsminel: minel,
+      obsmaxel: maxel,
+      obsminrange: minrange,
+      obsmaxrange: maxrange,
+      type: sensorType,
+    });
+
+    uiManager.enableFovView();
+
+    if (maxrange > 6000) {
+      cameraManager.changeZoom('geo');
+    } else {
+      cameraManager.changeZoom('leo');
+    }
+    cameraManager.camSnap(cameraManager.latToPitch(lat), cameraManager.longToYaw(lon, timeManager.selectedDate));
+
+    e.preventDefault();
+  });
+
   $('#customSensor').on('submit', function (e) {
     $('#menu-sensor-info').removeClass('bmenu-item-disabled');
     $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
@@ -1595,6 +1664,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
     $('#sensor-list-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#info-overlay-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#sensor-info-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+    $('#stf-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#watchlist-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
     $('#dops-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
@@ -1624,6 +1694,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
     $('#menu-sensor-list').removeClass('bmenu-item-selected');
     $('#menu-info-overlay').removeClass('bmenu-item-selected');
     $('#menu-sensor-info').removeClass('bmenu-item-selected');
+    $('#menu-stf').removeClass('bmenu-item-selected');
     $('#menu-watchlist').removeClass('bmenu-item-selected');
     $('#menu-lookangles').removeClass('bmenu-item-selected');
     $('#menu-dops').removeClass('bmenu-item-selected');
@@ -1654,6 +1725,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
     sMM.isSensorListMenuOpen = false;
     sMM.isInfoOverlayMenuOpen = false;
     sMM.isSensorInfoMenuOpen = false;
+    sMM.isStfMenuOpen = false;
     sMM.isWatchlistMenuOpen = false;
     sMM.isLaunchMenuOpen = false;
     sMM.isTwitterMenuOpen = false;

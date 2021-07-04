@@ -362,7 +362,7 @@ settingsManager.init = () => {
   settingsManager.orbitPlanetariumColor = [1.0, 1.0, 1.0, 0.2]; // Transparent White
   // settingsManager.orbitInViewColor = [1.0, 1.0, 0.0, 1.0] // Applies to Planetarium View
   //settingsManager.orbitGroupColor = [0.3, 0.5, 1.0, 0.4]
-  settingsManager.orbitGroupColor = [0.3, 1.0, 1.0, 0.7];
+  settingsManager.orbitGroupColor = [1.0, 1.0, 0.0, 0.7];
 
   // //////////////////////////////////////////////////////////////////////////
   // UI Settings

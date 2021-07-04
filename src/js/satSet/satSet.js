@@ -31,7 +31,7 @@ import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EART
 import { saveCsv, stringPad } from '@app/js/lib/helpers.js';
 import $ from 'jquery';
 import { jsTLEfile } from '@app/offline/tle.js';
-import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager.js';
+import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 // import { radarDataManager } from '@app/js/satSet/radarDataManager.js';

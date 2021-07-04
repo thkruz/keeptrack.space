@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "allowJs": true,
+    "checkJs": false,
+    "newLine": "LF",
+    "target": "es5",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+  },
+  "include": ["./src/**/*"]
+}

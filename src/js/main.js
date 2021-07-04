@@ -25,25 +25,25 @@
 
 import 'jquery-ui-bundle';
 import 'materialize-css';
-import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satSet } from '@app/js/satSet/satSet.js';
-import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
-import { Camera } from '@app/js/cameraManager/camera.js';
-import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
-import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
-import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager.js';
-import { drawManager } from '@app/js/drawManager/drawManager.js';
-import { jQAlt } from '@app/js/lib/jqalt.js';
-import { objectManager } from '@app/js/objectManager/objectManager.js';
-import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
-import { photoManager } from '@app/js/photoManager/photoManager.js';
-// import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
-import { sMM } from '@app/js/uiManager/sideMenuManager.js';
-import { satellite } from '@app/js/lib/lookangles.js';
-import { searchBox } from '@app/js/uiManager/search-box.js';
-import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
-import { starManager } from '@app/js/starManager/starManager.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satSet } from './satSet/satSet.js';
+import { uiInput, uiManager } from './uiManager/uiManager.js';
+import { Camera } from './cameraManager/camera.js';
+import { ColorSchemeFactory as ColorScheme } from './colorManager/color-scheme-factory.js';
+import { GroupFactory } from './groupsManager/group-factory.js';
+import { LineFactory } from './drawManager/sceneManager/sceneManager.js';
+import { drawManager } from './drawManager/drawManager.js';
+import { jQAlt } from './lib/jqalt.js';
+import { objectManager } from './objectManager/objectManager.js';
+import { orbitManager } from './orbitManager/orbitManager.js';
+import { photoManager } from './photoManager/photoManager.js';
+// import { radarDataManager } from './satSet/radarDataManager.js';
+import { sMM } from './uiManager/sideMenuManager.js';
+import { satellite } from './lib/lookangles.js';
+import { searchBox } from './uiManager/search-box.js';
+import { sensorManager } from './sensorManager/sensorManager.js';
+import { settingsManager } from './settingsManager/settingsManager.js';
+import { starManager } from './starManager/starManager.js';
+import { timeManager } from './timeManager/timeManager.js';
 
 const initalizeKeepTrack = async () => {
   try {

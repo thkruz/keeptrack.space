@@ -21,6 +21,8 @@ let config = {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/resource',
       },
+      // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
+      { test: /\.tsx?$/, loader: 'ts-loader' },
       {
         test: /\.worker\.js$/i,
         use: { loader: 'worker-loader' },
@@ -73,6 +75,8 @@ let jsConfig = Object.assign({}, config, {
     main: ['./src/js/main.js'],
   },
   resolve: {
+    // Add '.ts' and '.tsx' as resolvable extensions.
+    extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
     alias: {
       '@app': __dirname + '/../src',
     },

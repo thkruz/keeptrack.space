@@ -28,10 +28,10 @@
 import '@app/js/lib/external/numeric.js';
 import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants.js';
-import { saveCsv, stringPad } from '@app/js/lib/helpers.js';
+import { saveCsv, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import { jsTLEfile } from '@app/offline/tle.js';
-import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager.js';
+import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 // import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
@@ -293,7 +293,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
             }
             sMM.updateWatchlist(newWatchlist, watchlistInViewList);
           }
-        })();
+        }());
       }
 
       try {
@@ -383,7 +383,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
               break;
           }
         }
-      })();
+      }());
 
       // Load ALl The Images Now
       setTimeout(function () {

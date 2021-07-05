@@ -22,7 +22,7 @@
 'use strict';
 import * as Ootk from 'ootk';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
-import { saveCsv, saveVariable, stringPad } from '@app/js/lib/helpers.js';
+import { saveCsv, saveVariable, stringPad } from './helpers.ts';
 import $ from 'jquery';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 // import { satellite as satelliteBase } from 'sgp4-js/src/satellite';

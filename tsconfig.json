@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "allowJs": true,
+    "checkJs": false,
+    "newLine": "LF",
+    "target": "es5",
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true
+  },
+  "paths": {
+    "app": ["src"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

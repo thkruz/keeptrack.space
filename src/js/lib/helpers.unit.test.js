@@ -5,7 +5,7 @@
   expect
 */
 
-import { hex2RgbA, parseRgba, rgbCss, saveCsv, saveVariable, stringPad } from '@app/js/lib/helpers.js';
+import { hex2RgbA, parseRgba, rgbCss, saveCsv, saveVariable, stringPad } from '@app/js/lib/helpers';
 
 test('helpers Unit Tests', () => {
   console.warn = jest.fn();

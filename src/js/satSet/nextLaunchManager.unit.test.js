@@ -3,7 +3,7 @@
   test
 */
 
-import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager.js';
+import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager';
 
 test(`nextLaunchManager Unit Tests`, () => {
   nextLaunchManager.init();

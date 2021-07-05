@@ -1205,13 +1205,13 @@ uiInput.init = (cameraManagerRef, objectManagerRef, satelliteRef, satSetRef, lin
             }
 
             objectManager.setSelectedSat(-1);
-          })();
+          }());
           break;
       }
       rightBtnMenuDOM.hide();
       uiManager.clearRMBSubMenu();
     };
-  })();
+  }());
 };
 
 // This Doesn't Work Yet

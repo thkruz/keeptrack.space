@@ -89,7 +89,7 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
     if (typeof satellite.lookanglesInterval == 'undefined') {
       satellite.lookanglesInterval = 1;
     }
-  })();
+  }());
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
   var propTempOffset = 0; // offset letting us propagate in the future (or past)
@@ -363,7 +363,7 @@ var drawChart = (data) => {
       extra.TLE2 = data[i].TLE2;
       satData[i] = extra;
     }
-  })();
+  }());
   (function setupDataInfo() {
     if (typeof sensor == 'undefined' || isDrawInc || isDrawApogee || isDrawEcc || isDrawInc || isDrawPerigee || isDrawPeriod || isDrawRAAN) {
       for (let i = 0; i < satData.length; i++) {
@@ -520,7 +520,7 @@ var drawChart = (data) => {
         fill: false,
       });
     }
-  })();
+  }());
 
   // Actually Draw the Charts
   var context = document.getElementById('satChart').getContext('2d');
@@ -565,7 +565,7 @@ var drawChart = (data) => {
       isRedraw = false;
     };
     resizeCanvas();
-  })();
+  }());
 };
 
 var loadJSON = () => {
@@ -645,4 +645,4 @@ var loadJSON = () => {
     }
   }
   loadJSON();
-})();
+}());

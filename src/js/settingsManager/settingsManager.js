@@ -621,7 +621,7 @@ settingsManager.init = () => {
             break;
         }
       }
-    })();
+    }());
   }
 
   // Load the previously saved map
@@ -692,7 +692,7 @@ settingsManager.init = () => {
         console.log('db is now off!');
         localStorage.setItem('db', JSON.stringify(db));
       };
-    })();
+    }());
     db.gremlinsSettings = {};
     db.gremlinsSettings.nb = 100000;
     db.gremlinsSettings.delay = 5;

@@ -521,7 +521,7 @@ satellite.getlookangles = (sat) => {
       let tdR = tr.insertCell();
       tdR.appendChild(document.createTextNode(looksArray[i].rng.toFixed(0)));
     }
-  })();
+  }());
 };
 satellite.lastMultiSiteArray = [];
 satellite.getlookanglesMultiSite = (sat) => {
@@ -641,7 +641,7 @@ satellite.getlookanglesMultiSite = (sat) => {
       let tdS = tr.insertCell();
       tdS.appendChild(document.createTextNode(multiSiteArray[i].name));
     }
-  })();
+  }());
 
   if (isResetToDefault) {
     sensorManager.setCurrentSensor(sensorManager.defaultSensor);
@@ -1350,7 +1350,7 @@ satellite.calculateLookAngles = (sat, sensor, propOffset) => {
     if (typeof satellite.isRiseSetLookangles == 'undefined') {
       satellite.isRiseSetLookangles = false;
     }
-  })();
+  }());
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
   if (typeof propOffset == 'undefined') propOffset = 0; // Could be used for changing the time start
@@ -1448,7 +1448,7 @@ satellite.findBestPass = (sat, sensor, propOffset) => {
         console.error('sat parameter invalid format!');
       }
     }
-  })();
+  }());
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
   if (typeof propOffset == 'undefined') propOffset = 0; // Could be used for changing the time start

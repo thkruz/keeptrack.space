@@ -57,9 +57,7 @@ const _makeTableHeaders = (tbl: HTMLTableElement): void => {
   tdC.setAttribute('style', 'text-decoration: underline');
 };
 
-const _initTable = (tbl: HTMLTableElement) => {
-  let launchList = nextLaunchManager.launchList;
-
+const _initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => {
   _makeTableHeaders(tbl);
 
   for (let i = 0; i < launchList.length; i++) {
@@ -206,7 +204,7 @@ const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void
 
     // Only needs populated once
     if (tbl.innerHTML == '') {
-      _initTable(tbl);
+      _initTable(tbl, nextLaunchManager.launchList);
       try {
         (<JQueryColorbox>$('a.iframe')).colorbox({
           iframe: true,

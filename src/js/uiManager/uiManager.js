@@ -1505,7 +1505,7 @@ uiManager.onReady = () => {
       $('#cs-geolocation').hide();
       $('#geolocation-btn').hide();
     }
-  })();
+  }());
 
   // Load Bottom icons
   if (!settingsManager.disableUI) {
@@ -1584,7 +1584,7 @@ uiManager.onReady = () => {
         $('#menu-launches').removeClass('bmenu-item-selected');
       }
     });
-  })();
+  }());
 
   var isNotColorPickerInitialSetup = false;
   (function _setupColorPicker() {
@@ -1695,7 +1695,7 @@ uiManager.onReady = () => {
       },
     });
     isNotColorPickerInitialSetup = true;
-  })();
+  }());
 
   uiManager.clearRMBSubMenu = () => {
     rightBtnSaveMenuDOM.hide();
@@ -2310,7 +2310,7 @@ uiManager.onReady = () => {
 
       e.preventDefault();
     });
-  })();
+  }());
 
   var satChngTable = [];
   uiManager.satChng = function (row) {

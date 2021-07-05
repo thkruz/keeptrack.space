@@ -293,7 +293,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
             }
             sMM.updateWatchlist(newWatchlist, watchlistInViewList);
           }
-        })();
+        }());
       }
 
       try {
@@ -383,7 +383,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
               break;
           }
         }
-      })();
+      }());
 
       // Load ALl The Images Now
       setTimeout(function () {

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 module.exports = (api) => {
   const testPlugins = [
     // [
@@ -14,7 +15,6 @@ module.exports = (api) => {
 
   return {
     env: {
-      // dev: {},
       test: {
         plugins: api.env() == 'test' ? testPlugins : normPlugins,
       },

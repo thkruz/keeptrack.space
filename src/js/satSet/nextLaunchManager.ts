@@ -1,34 +1,32 @@
 /* */
 
 import $ from 'jquery';
+import { JQueryColorbox } from '../../types/colorbox';
 import { dateFormat } from '../lib/external/dateFormat.js';
-import { settingsManager as settingsManagerObj} from '../settingsManager/settingsManager.js';
-
-// TODO: Remove this fix once settingsManager is converted to TS
-const settingsManager: any = settingsManagerObj;
+import { settingsManager } from '../settingsManager/settingsManager.js';
 
 type LaunchInfoObject = {
-  name: any;
-  updated: any;
-  windowStart: any;
-  windowEnd: any;
-  location: any;
-  locationURL: any;
-  agency: any;
-  agencyURL: any;
-  country: any;
-  mission: any;
-  missionName: any;
-  missionType: any;
-  missionURL: any;
-  rocket: any;
-  rocketConfig: any;
-  rocketFamily: any;
-  rocketURL: any;
+  name: string;
+  updated: Date;
+  windowStart: Date;
+  windowEnd: Date;
+  location: string;
+  locationURL: string;
+  agency: string;
+  agencyURL: string;
+  country: string;
+  mission: string;
+  missionName: string;
+  missionType: string;
+  missionURL: string;
+  rocket: string;
+  rocketConfig: string;
+  rocketFamily: string;
+  rocketURL: string;
 };
 
-const _getTableElement = (): HTMLElement | boolean => {
-  const tbl = document.getElementById('nextLaunch-table'); // Identify the table to update
+const _getTableElement = (): HTMLTableElement | boolean => {
+  const tbl: HTMLTableElement = <HTMLTableElement>document.getElementById('nextLaunch-table'); // Identify the table to update
   if (tbl == null) {
     console.warn('nextLaunchManager.showTable failed to find nextLaunch-table element!');
     return false;
@@ -36,7 +34,7 @@ const _getTableElement = (): HTMLElement | boolean => {
   return tbl;
 };
 
-const _makeTableHeaders = (tbl: HTMLElement) => {
+const _makeTableHeaders = (tbl: HTMLTableElement) => {
   let tr = tbl.insertRow();
   let tdT = tr.insertCell();
   tdT.appendChild(document.createTextNode('Launch Window'));
@@ -67,7 +65,7 @@ const _truncateString = (str: string, num: number) => {
   return str.slice(0, num) + '...';
 };
 
-const _initTable = (tbl: HTMLElement) => {
+const _initTable = (tbl: HTMLTableElement) => {
   let launchList = nextLaunchManager.launchList;
 
   _makeTableHeaders(tbl);
@@ -78,7 +76,7 @@ const _initTable = (tbl: HTMLElement) => {
     // Time Cells
     let tdT = tr.insertCell();
     let timeText;
-    if (launchList[i].windowStart <= Date.now() - 1000 * 60 * 60 * 24) {
+    if (launchList[i].windowStart.valueOf() <= Date.now() - 1000 * 60 * 60 * 24) {
       timeText = 'TBD';
     } else {
       timeText = dateFormat(launchList[i].windowStart, 'isoDateTime', true) + ' UTC';
@@ -145,10 +143,10 @@ const _initTable = (tbl: HTMLElement) => {
   }
 };
 
-const nextLaunchManager: { launchList: any; init: Function; showTable: Function } = {
+const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void; showTable: () => void } = {
   launchList: [],
   init: () => {
-    if (settingsManager.offline) {
+    if ((<any>settingsManager).offline) {
       $('#menu-nextLaunch').hide();
       return;
     }
@@ -156,16 +154,18 @@ const nextLaunchManager: { launchList: any; init: Function; showTable: Function 
     // Won't Work Offline
     if (window.location.hostname === 'localhost') return;
 
-    $.get('https://launchlibrary.net/1.4/launch/next/20').done((resp: any) => {
+    $.get('https://launchlibrary.net/1.4/launch/next/20').done((resp: {launches: Array<any>}) => {
       for (let i = 0; i < resp.launches.length; i++) {
         /**
          * Info from launchlibrary.net
          */
+        const launchLibResult = resp.launches[i];
+
         let launchInfo: LaunchInfoObject = {
           name: '',
-          updated: '',
-          windowStart: '',
-          windowEnd: '',
+          updated: new Date(launchLibResult.changed),
+          windowStart: new Date(launchLibResult.wsstamp * 1000), // sec to ms
+          windowEnd: new Date(launchLibResult.westamp * 1000), //sec to ms
           location: '',
           locationURL: '',
           agency: '',
@@ -181,32 +181,29 @@ const nextLaunchManager: { launchList: any; init: Function; showTable: Function 
           rocketURL: '',
         };
 
-        launchInfo.name = typeof resp.launches[i].name != 'undefined' ? resp.launches[i].name : 'Unknown';
-        launchInfo.updated = new Date(resp.launches[i].changed);
-        launchInfo.windowStart = new Date(resp.launches[i].wsstamp * 1000); // sec to ms
-        launchInfo.windowEnd = new Date(resp.launches[i].westamp * 1000); //sec to ms
-        launchInfo.location = resp.launches[i].location.name.split(',', 1);
+        launchInfo.name = typeof launchLibResult.name != 'undefined' ? launchLibResult.name : 'Unknown';
+        launchInfo.location = launchLibResult.location.name.split(',', 1);
         launchInfo.location = launchInfo.location[0];
-        launchInfo.locationURL = resp.launches[i].location.pads[0].wikiURL;
-        if (typeof resp.launches[i].lsp != 'undefined') {
-          launchInfo.agency = typeof resp.launches[i].lsp.name != 'undefined' ? resp.launches[i].lsp.name : 'Unknown';
-          launchInfo.country = typeof resp.launches[i].lsp.countryCode != 'undefined' ? resp.launches[i].lsp.countryCode : 'Unknown';
-          launchInfo.agencyURL = typeof resp.launches[i].lsp.wikiURL != 'undefined' ? resp.launches[i].lsp.wikiURL : 'Unknown';
+        launchInfo.locationURL = launchLibResult.location.pads[0].wikiURL;
+        if (typeof launchLibResult.lsp != 'undefined') {
+          launchInfo.agency = typeof launchLibResult.lsp.name != 'undefined' ? launchLibResult.lsp.name : 'Unknown';
+          launchInfo.country = typeof launchLibResult.lsp.countryCode != 'undefined' ? launchLibResult.lsp.countryCode : 'Unknown';
+          launchInfo.agencyURL = typeof launchLibResult.lsp.wikiURL != 'undefined' ? launchLibResult.lsp.wikiURL : 'Unknown';
         } else {
           launchInfo.agency = 'Unknown';
           launchInfo.country = 'UNK';
           launchInfo.agencyURL = '';
         }
-        if (typeof resp.launches[i].missions[0] != 'undefined') {
-          launchInfo.mission = resp.launches[i].missions[0].description;
-          launchInfo.missionName = resp.launches[i].missions[0].name;
-          launchInfo.missionType = resp.launches[i].missions[0].typeName;
-          launchInfo.missionURL = resp.launches[i].missions[0].wikiURL;
+        if (typeof launchLibResult.missions[0] != 'undefined') {
+          launchInfo.mission = launchLibResult.missions[0].description;
+          launchInfo.missionName = launchLibResult.missions[0].name;
+          launchInfo.missionType = launchLibResult.missions[0].typeName;
+          launchInfo.missionURL = launchLibResult.missions[0].wikiURL;
         }
-        launchInfo.rocket = resp.launches[i].rocket.name;
-        launchInfo.rocketConfig = resp.launches[i].rocket.configuration;
-        launchInfo.rocketFamily = resp.launches[i].rocket.familyname;
-        launchInfo.rocketURL = resp.launches[i].rocket.wikiURL;
+        launchInfo.rocket = launchLibResult.rocket.name;
+        launchInfo.rocketConfig = launchLibResult.rocket.configuration;
+        launchInfo.rocketFamily = launchLibResult.rocket.familyname;
+        launchInfo.rocketURL = launchLibResult.rocket.wikiURL;
         nextLaunchManager.launchList[i] = launchInfo;
       }
     });
@@ -219,8 +216,7 @@ const nextLaunchManager: { launchList: any; init: Function; showTable: Function 
     if (tbl.innerHTML == '') {
       _initTable(tbl);
       try {
-        // @ts-ignore
-        $('a.iframe').colorbox({
+        (<JQueryColorbox>$('a.iframe')).colorbox({
           iframe: true,
           width: '80%',
           height: '80%',

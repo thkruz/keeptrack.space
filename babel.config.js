@@ -34,6 +34,7 @@ module.exports = (api) => {
           },
         },
       ],
+      '@babel/preset-typescript',
     ],
     compact: 'auto',
   };

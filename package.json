@@ -126,6 +126,7 @@
     "@babel/plugin-proposal-private-methods": "^7.12.1",
     "@babel/plugin-transform-modules-commonjs": "^7.12.1",
     "@babel/preset-env": "^7.12.11",
+    "@babel/preset-typescript": "^7.14.5",
     "@cypress/code-coverage": "^3.9.5",
     "@types/jquery": "^3.5.5",
     "@typescript-eslint/eslint-plugin": "^4.28.1",

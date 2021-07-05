@@ -1,4 +1,4 @@
-import { saveAs, stringPad } from '@app/js/lib/helpers.js';
+import { saveAs, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import { RAD2DEG } from '@app/js/lib/constants.js';
 

@@ -4,6 +4,7 @@ import $ from 'jquery';
 import { JQueryColorbox } from '../../types/colorbox';
 import { dateFormat } from '../lib/external/dateFormat.js';
 import { settingsManager } from '../settingsManager/settingsManager.js';
+import { truncateString } from '../lib/helpers';
 
 type LaunchInfoObject = {
   name: string;
@@ -25,6 +26,9 @@ type LaunchInfoObject = {
   rocketURL: string;
 };
 
+/**
+ * @returns {HTMLTableElement | boolean} The Table Element to be modified in the UI or a false boolean to kill the parent method
+ */
 const _getTableElement = (): HTMLTableElement | boolean => {
   const tbl: HTMLTableElement = <HTMLTableElement>document.getElementById('nextLaunch-table'); // Identify the table to update
   if (tbl == null) {
@@ -34,7 +38,7 @@ const _getTableElement = (): HTMLTableElement | boolean => {
   return tbl;
 };
 
-const _makeTableHeaders = (tbl: HTMLTableElement) => {
+const _makeTableHeaders = (tbl: HTMLTableElement): void => {
   let tr = tbl.insertRow();
   let tdT = tr.insertCell();
   tdT.appendChild(document.createTextNode('Launch Window'));
@@ -51,18 +55,6 @@ const _makeTableHeaders = (tbl: HTMLTableElement) => {
   let tdC = tr.insertCell();
   tdC.appendChild(document.createTextNode('Country'));
   tdC.setAttribute('style', 'text-decoration: underline');
-};
-
-const _truncateString = (str: string, num: number) => {
-  if (typeof str == 'undefined') return 'Unknown';
-
-  // If the length of str is less than or equal to num
-  // just return str--don't truncate it.
-  if (str.length <= num) {
-    return str;
-  }
-  // Return str truncated with '...' concatenated to the end of str.
-  return str.slice(0, num) + '...';
 };
 
 const _initTable = (tbl: HTMLTableElement) => {
@@ -91,9 +83,9 @@ const _initTable = (tbl: HTMLTableElement) => {
     // Mission Name HTML Setup
     let nameHTML;
     if (typeof launchList[i].missionURL == 'undefined' || launchList[i].missionURL == '') {
-      nameHTML = `${_truncateString(nameText, 15)}`;
+      nameHTML = `${truncateString(nameText, 15)}`;
     } else {
-      nameHTML = `<a class='iframe' href="${launchList[i].missionURL}">${_truncateString(nameText, 15)}</a>`;
+      nameHTML = `<a class='iframe' href="${launchList[i].missionURL}">${truncateString(nameText, 15)}</a>`;
     }
 
     // Rocket Name HTML Setup
@@ -110,12 +102,12 @@ const _initTable = (tbl: HTMLTableElement) => {
     // Location Name HTML Setup
     let locationHTML;
     if (typeof launchList[i].locationURL == 'undefined' || launchList[i].locationURL == '') {
-      locationHTML = `${_truncateString(launchList[i].location, 25)}`;
+      locationHTML = `${truncateString(launchList[i].location, 25)}`;
     } else {
       if (window.location.protocol === 'http:') {
-        locationHTML = `<a class='iframe' href="http://${launchList[i].locationURL}">${_truncateString(launchList[i].location, 25)}</a>`;
+        locationHTML = `<a class='iframe' href="http://${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
       } else {
-        locationHTML = `<a class='iframe' href="https://${launchList[i].locationURL}">${_truncateString(launchList[i].location, 25)}</a>`;
+        locationHTML = `<a class='iframe' href="https://${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
       }
     }
 
@@ -125,12 +117,12 @@ const _initTable = (tbl: HTMLTableElement) => {
     // Agency Name HTML Setup
     let agencyHTML;
     if (typeof launchList[i].agencyURL == 'undefined') {
-      agencyHTML = `${_truncateString(launchList[i].agency, 30)}`;
+      agencyHTML = `${truncateString(launchList[i].agency, 30)}`;
     } else {
       if (window.location.protocol === 'http:') {
-        agencyHTML = `<a class='iframe' href="http://${launchList[i].agencyURL}">${_truncateString(launchList[i].agency, 30)}</a>`;
+        agencyHTML = `<a class='iframe' href="http://${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
       } else {
-        agencyHTML = `<a class='iframe' href="https://${launchList[i].agencyURL}">${_truncateString(launchList[i].agency, 30)}</a>`;
+        agencyHTML = `<a class='iframe' href="https://${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
       }
     }
 

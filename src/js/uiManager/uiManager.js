@@ -30,7 +30,7 @@ import '@app/js/lib/external/jquery-ajax.js';
 import '@app/js/lib/external/colorPick.js';
 import 'materialize-css';
 import { DEG2RAD, RAD2DEG, cKmPerMs } from '@app/js/lib/constants.js';
-import { parseRgba, rgbCss, saveCsv, stringPad } from '@app/js/lib/helpers.js';
+import { parseRgba, rgbCss, saveCsv, stringPad } from '@app/js/lib/helpers';
 import { CanvasRecorder } from '@app/js/lib/external/CanvasRecorder.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { adviceList } from '@app/js/uiManager/ui-advice.js';
@@ -1077,92 +1077,14 @@ uiManager.constellationMenuClick = (groupName) => {
       break;
     case 'AmatuerRadio':
       if (typeof groups.AmatuerRadio == 'undefined') {
-        groups.AmatuerRadio = groups.createGroup('objNum', [
-          7530,
-          14781,
-          20442,
-          22826,
-          24278,
-          25338,
-          25397,
-          25544,
-          26931,
-          27607,
-          27844,
-          27848,
-          28895,
-          32785,
-          32788,
-          32789,
-          32791,
-          33493,
-          33498,
-          33499,
-          35932,
-          35933,
-          35935,
-          37224,
-          37839,
-          37841,
-          37855,
-          38760,
-          39090,
-          39134,
-          39136,
-          39161,
-          39417,
-          39430,
-          39436,
-          39439,
-          39440,
-          39444,
-          39469,
-          39770,
-          40014,
-          40021,
-          40024,
-          40025,
-          40030,
-          40032,
-          40042,
-          40043,
-          40057,
-          40071,
-          40074,
-          40377,
-          40378,
-          40379,
-          40380,
-          40654,
-          40719,
-          40900,
-          40903,
-          40906,
-          40907,
-          40908,
-          40910,
-          40911,
-          40912,
-          40926,
-          40927,
-          40928,
-          40931,
-          40967,
-          40968,
-          41168,
-          41171,
-          41340,
-          41459,
-          41460,
-          41465,
-          41474,
-          41600,
-          41619,
-          41789,
-          41932,
-          41935,
-          42017,
-        ]);
+        groups.AmatuerRadio = groups.createGroup(
+          'objNum',
+          [
+            7530, 14781, 20442, 22826, 24278, 25338, 25397, 25544, 26931, 27607, 27844, 27848, 28895, 32785, 32788, 32789, 32791, 33493, 33498, 33499, 35932, 35933, 35935, 37224, 37839, 37841, 37855, 38760, 39090, 39134, 39136, 39161, 39417, 39430,
+            39436, 39439, 39440, 39444, 39469, 39770, 40014, 40021, 40024, 40025, 40030, 40032, 40042, 40043, 40057, 40071, 40074, 40377, 40378, 40379, 40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928,
+            40931, 40967, 40968, 41168, 41171, 41340, 41459, 41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017,
+          ]
+        );
       }
       break;
     case 'aehf':

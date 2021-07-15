@@ -1,7 +1,6 @@
 /* */
 
 import $ from 'jquery';
-import { JQueryColorbox } from '../../types/colorbox';
 import { dateFormat } from '../lib/external/dateFormat.js';
 import { settingsManager } from '../settingsManager/settingsManager.js';
 import { truncateString } from '../lib/helpers';
@@ -206,7 +205,7 @@ const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void
     if (tbl.innerHTML == '') {
       _initTable(tbl, nextLaunchManager.launchList);
       try {
-        (<JQueryColorbox>$('a.iframe')).colorbox({
+        $('a.iframe').colorbox({
           iframe: true,
           width: '80%',
           height: '80%',

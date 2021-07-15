@@ -49,7 +49,7 @@ import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
-import { uiInput } from './ui-input.js';
+import { uiInput } from './ui-input';
 import { uiLimited } from './ui-limited.js';
 import { uiValidation } from './ui-validation.js';
 
@@ -1505,7 +1505,7 @@ uiManager.onReady = () => {
       $('#cs-geolocation').hide();
       $('#geolocation-btn').hide();
     }
-  }());
+  })();
 
   // Load Bottom icons
   if (!settingsManager.disableUI) {
@@ -1584,7 +1584,7 @@ uiManager.onReady = () => {
         $('#menu-launches').removeClass('bmenu-item-selected');
       }
     });
-  }());
+  })();
 
   var isNotColorPickerInitialSetup = false;
   (function _setupColorPicker() {
@@ -1695,7 +1695,7 @@ uiManager.onReady = () => {
       },
     });
     isNotColorPickerInitialSetup = true;
-  }());
+  })();
 
   uiManager.clearRMBSubMenu = () => {
     rightBtnSaveMenuDOM.hide();
@@ -2310,7 +2310,7 @@ uiManager.onReady = () => {
 
       e.preventDefault();
     });
-  }());
+  })();
 
   var satChngTable = [];
   uiManager.satChng = function (row) {

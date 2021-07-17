@@ -5,45 +5,67 @@
  * interaction with the application.
  * http://keeptrack.space
  *
- * Copyright (C) 2016-2021 Theodore Kruczek
- * Copyright (C) 2020 Heather Kruczek
- * Copyright (C) 2015-2016, James Yoder
+ * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2020 Heather Kruczek
+ * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
  * under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
  *
- * This program is free software: you can redistribute it and/or modify it under
+ * KeepTrack is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
+ * KeepTrack is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with
+ * KeepTrack. If not, see <http://www.gnu.org/licenses/>.
  *
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import '@app/js/api/externalApi';
 import 'jquery-ui-bundle';
 import 'materialize-css';
-import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satSet } from './satSet/satSet.js';
-import { uiInput, uiManager } from './uiManager/uiManager.js';
-import { Camera } from './cameraManager/camera.js';
-import { ColorSchemeFactory as ColorScheme } from './colorManager/color-scheme-factory.js';
-import { GroupFactory } from './groupsManager/group-factory.js';
-import { LineFactory } from './drawManager/sceneManager/sceneManager.js';
-import { drawManager } from './drawManager/drawManager.js';
-import { jQAlt } from './lib/jqalt.js';
-import { objectManager } from './objectManager/objectManager.js';
-import { orbitManager } from './orbitManager/orbitManager.js';
-import { photoManager } from './photoManager/photoManager.js';
-// import { radarDataManager } from './satSet/radarDataManager.js';
-import { sMM } from './uiManager/sideMenuManager.js';
-import { satellite } from './lib/lookangles.js';
-import { searchBox } from './uiManager/search-box.js';
-import { sensorManager } from './sensorManager/sensorManager.js';
-import { settingsManager } from './settingsManager/settingsManager.js';
-import { starManager } from './starManager/starManager.js';
-import { timeManager } from './timeManager/timeManager.js';
+import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
+import { Camera } from '@app/js/cameraManager/camera.js';
+import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
+import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
+import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager.js';
+import { drawManager } from '@app/js/drawManager/drawManager.js';
+import { jQAlt } from '@app/js/lib/jqalt.js';
+import { missileManager } from '@app/js/missileManager/missileManager.js';
+import { objectManager } from '@app/js/objectManager/objectManager.js';
+import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
+import { photoManager } from '@app/js/photoManager/photoManager.js';
+// import { radarDataManager } from'@app/js/satSet/radarDataManager.js';
+import { sMM } from '@app/js/uiManager/sideMenuManager.js';
+import { satSet } from '@app/js/satSet/satSet.js';
+import { satellite } from '@app/js/lib/lookangles.js';
+import { searchBox } from '@app/js/uiManager/search-box.js';
+import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
+import { starManager } from '@app/js/starManager/starManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.js';
+
+const keepTrackApi = window.keepTrackApi;
+keepTrackApi.programs.ColorScheme = ColorScheme;
+keepTrackApi.programs.drawManager = drawManager;
+keepTrackApi.programs.missileManager = missileManager;
+keepTrackApi.programs.objectManager = objectManager;
+keepTrackApi.programs.orbitManager = orbitManager;
+keepTrackApi.programs.photoManager = photoManager;
+keepTrackApi.programs.satSet = satSet;
+keepTrackApi.programs.satellite = satellite;
+keepTrackApi.programs.searchBox = searchBox;
+keepTrackApi.programs.sensorManager = sensorManager;
+keepTrackApi.programs.settingsManager = settingsManager;
+keepTrackApi.programs.starManager = starManager;
+keepTrackApi.programs.sMM = sMM;
+keepTrackApi.programs.timeManager = timeManager;
+keepTrackApi.programs.uiManager = uiManager;
+keepTrackApi.programs.uiInput = uiInput;
 
 const initalizeKeepTrack = async () => {
   try {
@@ -51,43 +73,55 @@ const initalizeKeepTrack = async () => {
     settingsManager.loadStr('dots');
     uiManager.mobileManager.init();
     const cameraManager = new Camera();
+    keepTrackApi.programs.cameraManager = cameraManager;
     // We need to know if we are on a small screen before starting webgl
-    const gl = await drawManager.glInit();
+    await drawManager.glInit();
     window.addEventListener('resize', drawManager.resizeCanvas);
-    drawManager.loadScene(gl);
+
+    drawManager.loadScene();
+
     const dotsManager = await drawManager.createDotsManager();
-    satSet.init(gl, dotsManager, cameraManager);
-    objectManager.init(sensorManager);
-    await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
-    drawManager.selectSatManager.init(ColorScheme.group, sensorManager, satSet, objectManager, sMM, timeManager);
+    keepTrackApi.programs.dotsManager = dotsManager;
+
+    satSet.init();
+    objectManager.init();
+    await ColorScheme.init();
+    drawManager.selectSatManager.init();
+
     await satSet.loadCatalog(); // Needs Object Manager and gl first
     const satCruncher = satSet.satCruncher;
+    keepTrackApi.programs.satCruncher = satCruncher;
 
     dotsManager.setupPickingBuffer(satSet.satData);
     satSet.setColorScheme(ColorScheme.default, true);
 
-    const groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
-    await orbitManager.init(gl, cameraManager, groupsManager);
-    searchBox.init(satSet, groupsManager, orbitManager, dotsManager);
-    const lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
-    starManager.init(lineManager, getIdFromStarName);
-    uiManager.init(cameraManager, lineManager, starManager, groupsManager, satSet, orbitManager, groupsManager, ColorScheme);
-    await satellite.initLookangles(satSet, satCruncher, sensorManager, groupsManager);
+    const groupsManager = new GroupFactory();
+    keepTrackApi.programs.groupsManager = groupsManager;
+
+    await orbitManager.init();
+    searchBox.init();
+
+    const lineManager = new LineFactory();
+    keepTrackApi.programs.lineManager = lineManager;
+
+    starManager.init();
+    uiManager.init();
+    await satellite.initLookangles();
     dotsManager.updateSizeBuffer(satSet.satData);
     // await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
     satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
     objectManager.satLinkManager.idToSatnum(satSet);
 
-    uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, uiManager, drawManager, dotsManager);
+    uiInput.init();
 
-    drawManager.init(groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
+    drawManager.init();
 
     // Now that everything is loaded, start rendering to thg canvas
     drawManager.drawLoop();
 
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
     uiManager.postStart();
-    photoManager.init(cameraManager, satSet, timeManager, uiManager, drawManager.selectSatManager);
+    photoManager.init();
   } catch (error) {
     /* istanbul ignore next */
     console.warn(error);

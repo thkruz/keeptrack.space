@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v3.5.0](https://github.com/thkruz/keeptrack.space/compare/v3.4.3...v3.5.0)
+
+> 17 July 2021 
+
+- refactor(settingsmanager): converted settingsmanager from js to ts [`2f55ca8`](https://github.com/thkruz/keeptrack.space/commit/2f55ca8d39643e66fd8d646cf32b664504389e9f)
+- refactor(uimanager): ui-input converted to ts and uiManager updated to be more dynamic [`3098853`](https://github.com/thkruz/keeptrack.space/commit/30988533d261bcf9e1532c9eff71cfc67227edbf)
+- feat(satinfoboxcore): refactored satInfoBox as plugin [`eff0c50`](https://github.com/thkruz/keeptrack.space/commit/eff0c503457abbd9871c5f79eb51de4f34e60087)
+- chore(contributing.md): removed contributing.md file [`d6f0ed5`](https://github.com/thkruz/keeptrack.space/commit/d6f0ed5340129d48921aadea325088bfc3c30ee8)
+- refactor(multiple): standardized use of lat, lon, alt vs lat, long, obshei [`74f3b3f`](https://github.com/thkruz/keeptrack.space/commit/74f3b3faa2349576935f8b2d1c3bf512c05903a4)
+- refactor(selectsatmanager): refactored selectSatManager as a plugin to keeptrackApi [`7a5a789`](https://github.com/thkruz/keeptrack.space/commit/7a5a789414d9018349147c540feb15ebeeb6ca4d)
+- feat(externalapi): implemented API for external plugins [`27ed24e`](https://github.com/thkruz/keeptrack.space/commit/27ed24e57849ca3eec8bcbf63ac4330d99ea54a6)
+- chore(tsconfig.json): updated tsconfig rules [`d5a901f`](https://github.com/thkruz/keeptrack.space/commit/d5a901f895932e622eb3eade8fc5a694afe83706)
+- chore(tle): updated TLEs [`09b691f`](https://github.com/thkruz/keeptrack.space/commit/09b691fa93c0f1d4c66a7ea13672b9e6881cdf35)
+- chore(declaration.d.ts): enabled css for typescript [`743bff7`](https://github.com/thkruz/keeptrack.space/commit/743bff7eb0a1e7d071024cb237b99d7fd6a01557)
+- chore(.eslintrc): removed no-explicit-any rule [`c1426ef`](https://github.com/thkruz/keeptrack.space/commit/c1426efa225a02c774344af1247d86542b3ae0d9)
+
 #### [v3.4.3](https://github.com/thkruz/keeptrack.space/compare/v3.4.1...v3.4.3)
 
 > 15 July 2021 

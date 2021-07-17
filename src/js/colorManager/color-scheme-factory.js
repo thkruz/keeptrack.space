@@ -10,12 +10,22 @@
 // FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 import { ColorScheme } from './color-scheme.js';
+import { keepTrackApi } from '@app/js/api/externalApi.ts';
 
 class ColorSchemeFactory {
   static objectTypeFlags = {};
 
   // Take in references to major components needed for correctly displaying the colors
-  static init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager) {
+  static init() {
+    const gl = keepTrackApi.programs.drawManager.gl;
+    const cameraManager = keepTrackApi.programs.cameraManager;
+    const timeManager = keepTrackApi.programs.timeManager;
+    const sensorManager = keepTrackApi.programs.sensorManager;
+    const objectManager = keepTrackApi.programs.objectManager;
+    const satSet = keepTrackApi.programs.satSet;
+    const satellite = keepTrackApi.programs.satellite;
+    const settingsManager = keepTrackApi.programs.settingsManager;
+
     let color;
     ColorSchemeFactory.colorTheme = settingsManager.colors;
     ColorSchemeFactory.resetObjectTypeFlags();

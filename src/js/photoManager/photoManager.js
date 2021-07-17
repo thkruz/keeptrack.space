@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { keepTrackApi } from '../api/externalApi';
 
 let photoManager = {};
 let cameraManager;
@@ -7,12 +8,12 @@ let timeManager;
 let uiManager;
 let selectSatManager;
 
-photoManager.init = (cameraManagerRef, satSetRef, timeManagerRef, uiManagerRef, selectSatManagerRef) => {
-  cameraManager = cameraManagerRef;
-  satSet = satSetRef;
-  timeManager = timeManagerRef;
-  uiManager = uiManagerRef;
-  selectSatManager = selectSatManagerRef;
+photoManager.init = () => {
+  cameraManager = keepTrackApi.programs.cameraManager;
+  satSet = keepTrackApi.programs.satSet;
+  timeManager = keepTrackApi.programs.timeManager;
+  uiManager = keepTrackApi.programs.uiManager;
+  selectSatManager = keepTrackApi.programs.drawManager.selectSatManager;
 };
 
 photoManager.dscovr = () => {

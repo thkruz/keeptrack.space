@@ -1,28 +1,30 @@
-/* */
 /**
- * /* /////////////////////////////////////////////////////////////////////////////
+ * /////////////////////////////////////////////////////////////////////////////
  *
  * satSet.js is the primary interface between sat-cruncher and the main application.
  * It manages all interaction with the satellite catalogue.
  * http://keeptrack.space
  *
- * Copyright (C) 2016-2021 Theodore Kruczek
- * Copyright (C) 2020 Heather Kruczek
- * Copyright (C) 2015-2016, James Yoder
+ * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2020 Heather Kruczek
+ * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
  * under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
  *
- * This program is free software: you can redistribute it and/or modify it under
+ * KeepTrack is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
+ * KeepTrack is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with
+ * KeepTrack. If not, see <http://www.gnu.org/licenses/>.
  *
  * /////////////////////////////////////////////////////////////////////////////
  */
+
 /* eslint-disable no-useless-escape */
 
 import '@app/js/lib/external/numeric.js';
@@ -31,6 +33,7 @@ import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EART
 import { saveCsv, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import { jsTLEfile } from '@app/offline/tle.js';
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
@@ -40,14 +43,13 @@ import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { saveAs } from '@app/js/lib/external/file-saver.min.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 // 'use strict';
 var satSet = {};
 satSet.nextLaunchManager = nextLaunchManager;
-var gl;
 
 var satCruncher;
 var limitSats = settingsManager.limitSats;
@@ -119,11 +121,12 @@ var parseFromGETVariables = () => {
   }
 };
 
-var dotManager;
-satSet.init = async (glRef, dotManagerRef, cameraManager) => {
+let dotManager, gl, cameraManager;
+satSet.init = async () => {
   window.satSet = satSet;
-  gl = glRef;
-  dotManager = dotManagerRef;
+  gl = keepTrackApi.programs.drawManager.gl;
+  dotManager = keepTrackApi.programs.dotsManager;
+  cameraManager = keepTrackApi.programs.cameraManager;
   /** Parses GET variables for Possible sharperShaders */
   parseFromGETVariables();
 
@@ -293,7 +296,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
             }
             sMM.updateWatchlist(newWatchlist, watchlistInViewList);
           }
-        }());
+        })();
       }
 
       try {
@@ -383,7 +386,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
               break;
           }
         }
-      }());
+      })();
 
       // Load ALl The Images Now
       setTimeout(function () {
@@ -544,8 +547,8 @@ satSet.setupGetVariables = () => {
     dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
     setlatlong: true,
     lat: obslatitude,
-    long: obslongitude,
-    obshei: obsheight,
+    lon: obslongitude,
+    alt: obsheight,
     obsminaz: obsminaz,
     obsmaxaz: obsmaxaz,
     obsminel: obsminel,
@@ -1203,9 +1206,9 @@ satSet.getSat = (i) => {
       if (typeof sensor.observerGd == 'undefined') {
         try {
           sensor.observerGd = {
-            alt: sensor.obshei,
+            alt: sensor.alt,
             lat: sensor.lat,
-            lon: sensor.long,
+            lon: sensor.lon,
           };
         } catch (e) {
           throw 'observerGd is not set and could not be guessed.';
@@ -1407,14 +1410,14 @@ satSet.getIdFromSensorName = (sensorName) => {
     var gmst = satellite.gstime(j);
     let cosLat = Math.cos(sensorManager.currentSensor.lat * DEG2RAD);
     let sinLat = Math.sin(sensorManager.currentSensor.lat * DEG2RAD);
-    let cosLon = Math.cos(sensorManager.currentSensor.long * DEG2RAD + gmst);
-    let sinLon = Math.sin(sensorManager.currentSensor.long * DEG2RAD + gmst);
+    let cosLon = Math.cos(sensorManager.currentSensor.lon * DEG2RAD + gmst);
+    let sinLon = Math.sin(sensorManager.currentSensor.lon * DEG2RAD + gmst);
     let sensor = {};
     sensor.position = {};
     sensor.name = 'Custom Sensor';
-    sensor.position.x = (6371 + 0.25 + sensorManager.currentSensor.obshei) * cosLat * cosLon; // 6371 is radius of earth
-    sensor.position.y = (6371 + 0.25 + sensorManager.currentSensor.obshei) * cosLat * sinLon;
-    sensor.position.z = (6371 + 0.25 + sensorManager.currentSensor.obshei) * sinLat;
+    sensor.position.x = (6371 + 0.25 + sensorManager.currentSensor.alt) * cosLat * cosLon; // 6371 is radius of earth
+    sensor.position.y = (6371 + 0.25 + sensorManager.currentSensor.alt) * cosLat * sinLon;
+    sensor.position.z = (6371 + 0.25 + sensorManager.currentSensor.alt) * sinLat;
     // console.log('No Sensor Found. Using Current Sensor');
     // console.log(sensor);
     return sensor;

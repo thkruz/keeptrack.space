@@ -15,15 +15,17 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 
 import { constellations } from './constellations.js';
+import { keepTrackApi } from '@app/js/api/externalApi.ts';
 import { stars } from './stars.js';
 
 var starManager = {};
 starManager.stars = stars;
 
-var lineManager, getIdFromStarName;
-starManager.init = (lineManagerRef, getIdFromStarNameRef) => {
-  lineManager = lineManagerRef;
-  getIdFromStarName = getIdFromStarNameRef;
+let lineManager, getIdFromStarName;
+starManager.init = () => {
+  lineManager = keepTrackApi.programs.lineManager;
+  getIdFromStarName = keepTrackApi.programs.satSet.getIdFromStarName;
+
   // Requires starManager Module
   try {
     starManager.isConstellationVisible = false;

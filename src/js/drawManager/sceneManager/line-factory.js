@@ -1,4 +1,5 @@
 import { Line } from './line.js';
+import { keepTrackApi } from '@app/js/api/externalApi';
 
 class LineFactory {
   #getIdFromSensorName = null;
@@ -8,13 +9,13 @@ class LineFactory {
   #tempStar1 = null;
   #tempStar2 = null;
 
-  constructor(gl, shader, getIdFromSensorNameRef, getIdFromStarNameRef, getSatRef, getSatPosOnlyRef) {
-    this.#getIdFromSensorName = getIdFromSensorNameRef;
-    this.#getIdFromStarName = getIdFromStarNameRef;
-    this.#getSat = getSatRef;
-    this.#getSatPosOnly = getSatPosOnlyRef;
-    this.gl = gl;
-    this.shader = shader;
+  constructor() {
+    this.#getIdFromSensorName = keepTrackApi.programs.satSet.getIdFromSensorName;
+    this.#getIdFromStarName = keepTrackApi.programs.satSet.getIdFromStarName;
+    this.#getSat = keepTrackApi.programs.satSet.getSat;
+    this.#getSatPosOnly = keepTrackApi.programs.satSet.getSatPosOnly;
+    this.gl = keepTrackApi.programs.drawManager.gl;
+    this.shader = keepTrackApi.programs.orbitManager.shader;
     this.drawLineList = [];
   }
 

@@ -1,8 +1,9 @@
 import * as glm from '@app/js/lib/external/gl-matrix.js';
-import { isselectedSatNegativeOne, selectSatManager } from '@app/js/drawManager/selectSatManager.js';
+import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins/selectSatManager/selectSatManager.js';
 import { satScreenPositionArray, satSet } from '@app/js/satSet/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { Dots } from '@app/js/drawManager/dots.js';
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { meshManager } from '@app/js/drawManager/meshManager.js';
 import { missileManager } from '@app/js/missileManager/missileManager.js';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
@@ -43,20 +44,20 @@ var drawManager = {
   },
 };
 
-var groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager;
-drawManager.init = (groupsManagerRef, uiInputRef, starManagerRef, satelliteRef, ColorSchemeRef, cameraManagerRef, objectManagerRef, orbitManagerRef, sensorManagerRef, uiManagerRef, lineManagerRef, dotsManagerRef) => {
-  uiInput = uiInputRef;
-  starManager = starManagerRef;
-  satellite = satelliteRef;
-  ColorScheme = ColorSchemeRef;
-  cameraManager = cameraManagerRef;
-  objectManager = objectManagerRef;
-  orbitManager = orbitManagerRef;
-  sensorManager = sensorManagerRef;
-  uiManager = uiManagerRef;
-  lineManager = lineManagerRef;
-  dotsManager = dotsManagerRef;
-  groupsManager = groupsManagerRef;
+let groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager;
+drawManager.init = () => {
+  uiInput = keepTrackApi.programs.uiInput;
+  starManager = keepTrackApi.programs.starManager;
+  satellite = keepTrackApi.programs.satellite;
+  ColorScheme = keepTrackApi.programs.ColorScheme;
+  cameraManager = keepTrackApi.programs.cameraManager;
+  objectManager = keepTrackApi.programs.objectManager;
+  orbitManager = keepTrackApi.programs.orbitManager;
+  sensorManager = keepTrackApi.programs.sensorManager;
+  uiManager = keepTrackApi.programs.uiManager;
+  lineManager = keepTrackApi.programs.lineManager;
+  dotsManager = keepTrackApi.programs.dotsManager;
+  groupsManager = keepTrackApi.programs.groupsManager;
 
   satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
   satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
@@ -132,7 +133,8 @@ drawManager.createDotsManager = () => {
   return drawManager.dotsManager;
 };
 
-drawManager.loadScene = async (gl) => {
+drawManager.loadScene = async () => {
+  const gl = drawManager.gl;
   try {
     await sceneManager.earth.init(gl);
     sceneManager.earth.loadHiRes();

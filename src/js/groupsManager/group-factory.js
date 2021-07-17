@@ -13,6 +13,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ///////////////////////////////////////////////////////////////////////////// */
 import { SatGroup } from './sat-group.js';
+import { keepTrackApi } from '@app/js/api/externalApi.ts';
 
 class GroupFactory {
   // Create Internal References to Other Modules
@@ -20,10 +21,10 @@ class GroupFactory {
   #ColorScheme = null;
   #settingsManager = null;
 
-  constructor(satSetRef, ColorSchemeRef, settingsManagerRef) {
-    this.#satSet = satSetRef;
-    this.#ColorScheme = ColorSchemeRef;
-    this.#settingsManager = settingsManagerRef;
+  constructor() {
+    this.#satSet = keepTrackApi.programs.satSet;
+    this.#ColorScheme = keepTrackApi.programs.ColorScheme;
+    this.#settingsManager = keepTrackApi.programs.settingsManager;
     this.selectedGroup = null;
   }
 

@@ -4,7 +4,7 @@
   expect
 */
 
-import '@app/js/settingsManager/settingsManager.js';
+import '@app/js/settingsManager/settingsManager.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 test(`Basic Functions of Time Manager`, () => {

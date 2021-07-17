@@ -1126,9 +1126,9 @@ missileManager.getMissileTEARR = function (missile, sensor) {
   if (typeof sensor.observerGd == 'undefined') {
     try {
       sensor.observerGd = {
-        height: sensor.obshei,
+        height: sensor.alt,
         latitude: sensor.lat,
-        longitude: sensor.long,
+        longitude: sensor.lon,
       };
     } catch (e) {
       throw 'observerGd is not set and could not be guessed.';

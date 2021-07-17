@@ -1,20 +1,22 @@
 /**
- * /* /////////////////////////////////////////////////////////////////////////////
+ * /////////////////////////////////////////////////////////////////////////////
  *
  * lookangles.js is an expansion library for satellite.js providing tailored
  * functions for calculating orbital data.
  * http://keeptrack.space
  *
- * Copyright (C) 2016-2021 Theodore Kruczek
- * Copyright (C) 2020 Heather Kruczek
+ * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2020 Heather Kruczek
  *
- * This program is free software: you can redistribute it and/or modify it under
+ * KeepTrack is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
+ * KeepTrack is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with
+ * KeepTrack. If not, see <http://www.gnu.org/licenses/>.
  *
  * /////////////////////////////////////////////////////////////////////////////
  */
@@ -25,8 +27,7 @@ import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 import { saveCsv, saveVariable, stringPad } from './helpers.ts';
 import $ from 'jquery';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-// import { satellite as satelliteBase } from 'sgp4-js/src/satellite';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import { keepTrackApi } from '@app/js/api/externalApi.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 let satellite = {};
 
@@ -36,6 +37,8 @@ const DEG2RAD = TAU / 360;
 const RAD2DEG = 360 / TAU;
 const MINUTES_PER_DAY = 1440;
 const MILLISECONDS_PER_DAY = 1.15741e-8;
+
+const settingsManager = keepTrackApi.programs.settingsManager;
 
 // Legacy API
 satellite.sgp4 = Ootk.Sgp4.propagate;
@@ -49,12 +52,12 @@ satellite.degreesLat = Ootk.Transforms.getDegLat;
 satellite.degreesLong = Ootk.Transforms.getDegLon;
 satellite.ecfToLookAngles = Ootk.Transforms.ecf2rae;
 
-var satSet, satCruncher, sensorManager, groupsManager;
-satellite.initLookangles = (satSetRef, satCruncherRef, sensorManagerRef, groupsManagerRef) => {
-  satSet = satSetRef;
-  satCruncher = satCruncherRef;
-  sensorManager = sensorManagerRef;
-  groupsManager = groupsManagerRef;
+let satSet, satCruncher, sensorManager, groupsManager;
+satellite.initLookangles = () => {
+  satSet = keepTrackApi.programs.satSet;
+  satCruncher = keepTrackApi.programs.satCruncher;
+  sensorManager = keepTrackApi.programs.sensorManager;
+  groupsManager = keepTrackApi.programs.groupsManager;
 };
 
 var _propagate = (propTempOffset, satrec, sensor) => {
@@ -175,8 +178,8 @@ satellite.setobs = (sensor) => {
     sensorManager.currentSensor.observerGd = {
       // Array to calculate look angles in propagate()
       lat: sensor.lat * DEG2RAD,
-      lon: sensor.long * DEG2RAD,
-      alt: parseFloat(sensor.obshei), // Converts from string to number
+      lon: sensor.lon * DEG2RAD,
+      alt: parseFloat(sensor.alt), // Converts from string to number
     };
   } catch (error) {
     console.warn(error);
@@ -250,9 +253,9 @@ satellite.getTEARR = (sat, sensor, propTime) => {
   if (typeof sensor.observerGd == 'undefined') {
     try {
       sensor.observerGd = {
-        alt: sensor.obshei,
+        alt: sensor.alt,
         lat: sensor.lat,
-        lon: sensor.long,
+        lon: sensor.lon,
       };
     } catch (e) {
       throw 'observerGd is not set and could not be guessed.';
@@ -347,9 +350,9 @@ satellite.nextpass = (sat, sensor, searchLength, interval) => {
   if (typeof sensor.observerGd == 'undefined') {
     try {
       sensor.observerGd = {
-        alt: sensor.obshei,
+        alt: sensor.alt,
         lat: sensor.lat,
-        lon: sensor.long,
+        lon: sensor.lon,
       };
     } catch (e) {
       throw 'observerGd is not set and could not be guessed.';
@@ -388,9 +391,9 @@ satellite.nextNpasses = (sat, sensor, searchLength, interval, numPasses) => {
   if (typeof sensor.observerGd == 'undefined') {
     try {
       sensor.observerGd = {
-        alt: sensor.obshei,
+        alt: sensor.alt,
         lat: sensor.lat,
-        lon: sensor.long,
+        lon: sensor.lon,
       };
     } catch (e) {
       throw 'observerGd is not set and could not be guessed.';
@@ -1330,8 +1333,8 @@ satellite.calculateLookAngles = (sat, sensor, propOffset) => {
       sensor.observerGd = {
         // Array to calculate look angles in propagate()
         lat: sensor.lat * DEG2RAD,
-        lon: sensor.long * DEG2RAD,
-        alt: parseFloat(sensor.obshei),
+        lon: sensor.lon * DEG2RAD,
+        alt: parseFloat(sensor.alt),
       };
     }
 
@@ -1436,8 +1439,8 @@ satellite.findBestPass = (sat, sensor, propOffset) => {
       sensor.observerGd = {
         // Array to calculate look angles in propagate()
         lat: sensor.lat * DEG2RAD,
-        lon: sensor.long * DEG2RAD,
-        alt: parseFloat(sensor.obshei),
+        lon: sensor.lon * DEG2RAD,
+        alt: parseFloat(sensor.alt),
       };
     }
 
@@ -2190,9 +2193,9 @@ satellite.getSunTimes = (sat, sensor, searchLength, interval) => {
   if (typeof sensor.observerGd == 'undefined') {
     try {
       sensor.observerGd = {
-        alt: sensor.obshei,
+        alt: sensor.alt,
         lat: sensor.lat,
-        lon: sensor.long,
+        lon: sensor.lon,
       };
     } catch (e) {
       throw 'observerGd is not set and could not be guessed.';
@@ -2419,8 +2422,8 @@ satellite.calculateSensorPos = (sensor) => {
 
   var cosLat = Math.cos(sensor.lat * DEG2RAD);
   var sinLat = Math.sin(sensor.lat * DEG2RAD);
-  var cosLon = Math.cos(sensor.long * DEG2RAD + gmst);
-  var sinLon = Math.sin(sensor.long * DEG2RAD + gmst);
+  var cosLon = Math.cos(sensor.lon * DEG2RAD + gmst);
+  var sinLon = Math.sin(sensor.lon * DEG2RAD + gmst);
 
   let pos = {};
   pos.x = (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * cosLon;
@@ -2428,7 +2431,7 @@ satellite.calculateSensorPos = (sensor) => {
   pos.z = (RADIUS_OF_EARTH + PLANETARIUM_DIST) * sinLat;
   pos.gmst = gmst;
   pos.lat = sensor.lat;
-  pos.long = sensor.long;
+  pos.lon = sensor.lon;
   return pos;
 };
 

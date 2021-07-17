@@ -25,7 +25,7 @@ import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 

@@ -1,13 +1,14 @@
 import $ from 'jquery';
 import { MILLISECONDS_PER_DAY } from '@app/js/lib/constants.js';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import { keepTrackApi } from '@app/js/api/externalApi.ts';
 
 ('use strict');
 let timeManager = {};
 const document = window.document;
 
 timeManager.init = () => {
+  const settingsManager = keepTrackApi.programs.settingsManager;
   // Variables pulled from timeManager.jday function to reduce garbage collection
   let jDayStart;
   let jDayDiff;

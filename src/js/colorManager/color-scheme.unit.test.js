@@ -6,7 +6,7 @@
 */
 
 import { ColorScheme } from '@app/js/colorManager/color-scheme.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 
 const glMock = global.mocks.glMock;
 document.body.innerHTML = global.docBody;

@@ -2,8 +2,9 @@
 
 import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { satSet } from '@app/js/satSet/satSet.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 let M = window.M;
 
@@ -75,11 +76,11 @@ orbitManager.shader = {
     `,
 };
 
-var gl, cameraManager, groupsManager;
-orbitManager.init = function (glRef, cameraManagerRef, groupsManagerRef) {
-  gl = glRef;
-  cameraManager = cameraManagerRef;
-  groupsManager = groupsManagerRef;
+let gl, cameraManager, groupsManager;
+orbitManager.init = function () {
+  gl = keepTrackApi.programs.drawManager.gl;
+  cameraManager = keepTrackApi.programs.cameraManager;
+  groupsManager = keepTrackApi.programs.groupsManager;
 
   var vs = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vs, orbitManager.shader.vert);

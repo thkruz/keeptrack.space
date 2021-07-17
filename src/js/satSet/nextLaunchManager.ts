@@ -1,9 +1,9 @@
 /* */
 
 import $ from 'jquery';
-import { dateFormat } from '../lib/external/dateFormat.js';
-import { settingsManager } from '../settingsManager/settingsManager.js';
-import { truncateString } from '../lib/helpers';
+import { dateFormat } from '@app/js/lib/external/dateFormat.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager';
+import { truncateString } from '@app/js/lib/helpers';
 
 type LaunchInfoObject = {
   name: string;

@@ -1118,7 +1118,7 @@ class Camera {
           // Pitch is the opposite of the angle to the latitude
           // Yaw is 90 degrees to the left of the angle to the longitude
           this.pitchRotate = -1 * sensorPos.lat * DEG2RAD;
-          this.yawRotate = (90 - sensorPos.long) * DEG2RAD - sensorPos.gmst;
+          this.yawRotate = (90 - sensorPos.lon) * DEG2RAD - sensorPos.gmst;
           glm.mat4.rotate(this.camMatrix, this.camMatrix, this.pitchRotate, [1, 0, 0]);
           glm.mat4.rotate(this.camMatrix, this.camMatrix, this.yawRotate, [0, 0, 1]);
 

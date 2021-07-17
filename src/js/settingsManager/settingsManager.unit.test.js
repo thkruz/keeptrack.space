@@ -87,7 +87,7 @@ describe('settingsManager URL Test', () => {
     }
     testCaseNum++;
     setUrl(url);
-    import('@app/js/settingsManager/settingsManager.js');
+    import('@app/js/settingsManager/settingsManager.ts');
     settingsManager.init();
   });
 

@@ -2,7 +2,8 @@
 
 import $ from 'jquery';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import { keepTrackApi } from '@app/js/api/externalApi';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 
 var hoverSatId = -1;
 var searchBox = {};
@@ -280,13 +281,13 @@ searchBox.fillResultBox = function (results, satSet) {
   satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 };
 
-var satSet, groupsManager, orbitManager, dotsManager;
-searchBox.init = function (satSetRef, groupsManagerRef, orbitManagerRef, dotsManagerRef) {
+let satSet, groupsManager, orbitManager, dotsManager;
+searchBox.init = function () {
   if (settingsManager.disableUI) return;
-  satSet = satSetRef;
-  groupsManager = groupsManagerRef;
-  orbitManager = orbitManagerRef;
-  dotsManager = dotsManagerRef;
+  satSet = keepTrackApi.programs.satSet;
+  groupsManager = keepTrackApi.programs.groupsManager;
+  orbitManager = keepTrackApi.programs.orbitManager;
+  dotsManager = keepTrackApi.programs.dotsManager;
 };
 
 export { searchBox };

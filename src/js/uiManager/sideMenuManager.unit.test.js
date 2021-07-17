@@ -7,7 +7,7 @@
 */
 
 import { sMM } from '@app/js/uiManager/sideMenuManager.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 
 document.body.innerHTML = global.docBody;
 

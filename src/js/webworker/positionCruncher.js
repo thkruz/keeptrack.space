@@ -165,9 +165,9 @@ onmessage = function (m) {
       } else {
         globalPropagationRate = 2000;
         sensor.observerGd = {
-          longitude: m.data.sensor.long * DEG2RAD,
+          longitude: m.data.sensor.lon * DEG2RAD,
           latitude: m.data.sensor.lat * DEG2RAD,
-          height: m.data.sensor.obshei * 1, // Convert from string
+          height: m.data.sensor.alt * 1, // Convert from string
         };
         if (isResetInView == false) isResetInView = true;
       }
@@ -508,9 +508,9 @@ var propagateCruncher = () => {
               if (satInView[i]) break;
               sensor = mSensor[s];
               sensor.observerGd = {
-                longitude: sensor.long * DEG2RAD,
+                longitude: sensor.lon * DEG2RAD,
                 latitude: sensor.lat * DEG2RAD,
-                height: sensor.obshei * 1, // Convert from string
+                height: sensor.alt * 1, // Convert from string
               };
               try {
                 positionEcf = satellite.eciToEcf(pv.position, gmst); // pv.position is called positionEci originally
@@ -697,9 +697,9 @@ var propagateCruncher = () => {
         if (s == mSensor.length) break;
         sensor = mSensor[s];
         sensor.observerGd = {
-          longitude: sensor.long * DEG2RAD,
+          longitude: sensor.lon * DEG2RAD,
           latitude: sensor.lat * DEG2RAD,
-          height: sensor.obshei * 1, // Convert from string
+          height: sensor.alt * 1, // Convert from string
         };
         if (satCache[i].marker) {
           satPos[i * 3] = 0;

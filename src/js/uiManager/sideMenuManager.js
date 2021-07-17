@@ -1309,8 +1309,8 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
     }
 
     const lat = sensorManager.currentSensor.lat;
-    const lon = sensorManager.currentSensor.long;
-    const obshei = sensorManager.currentSensor.obshei;
+    const lon = sensorManager.currentSensor.lon;
+    const alt = sensorManager.currentSensor.alt;
     const sensorType = 'Short Range Fence';
 
     // Multiply everything by 1 to convert string to number
@@ -1335,8 +1335,8 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
       setlatlong: true, // Tell satSet.satCruncher we are changing observer location
       sensor: {
         lat: lat,
-        long: lon,
-        obshei: obshei,
+        lon: lon,
+        alt: alt,
         obsminaz: minaz,
         obsmaxaz: maxaz,
         obsminel: minel,
@@ -1349,8 +1349,8 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
 
     satellite.setobs({
       lat: lat,
-      long: lon,
-      obshei: obshei,
+      lon: lon,
+      alt: alt,
       obsminaz: minaz,
       obsmaxaz: maxaz,
       obsminel: minel,
@@ -1385,7 +1385,7 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
 
     var lon = $('#cs-lon').val();
     var lat = $('#cs-lat').val();
-    var obshei = $('#cs-hei').val();
+    var alt = $('#cs-hei').val();
     var sensorType = $('#cs-type').val();
     var minaz = $('#cs-minaz').val();
     var maxaz = $('#cs-maxaz').val();
@@ -1401,8 +1401,8 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
       setlatlong: true, // Tell satSet.satCruncher we are changing observer location
       sensor: {
         lat: lat * 1,
-        long: lon * 1,
-        obshei: obshei * 1,
+        lon: lon * 1,
+        alt: alt * 1,
         obsminaz: minaz * 1,
         obsmaxaz: maxaz * 1,
         obsminel: minel * 1,
@@ -1415,8 +1415,8 @@ sMM.init = (satSet, uiManager, sensorManager, satellite, ColorScheme, omManager,
 
     satellite.setobs({
       lat: lat * 1,
-      long: lon * 1,
-      obshei: obshei * 1,
+      lon: lon * 1,
+      alt: alt * 1,
       obsminaz: minaz * 1,
       obsmaxaz: maxaz * 1,
       obsminel: minel * 1,

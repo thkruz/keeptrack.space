@@ -20,7 +20,7 @@ import $ from 'jquery';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { sensorList } from '@app/js/sensorManager/sensorList.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 var sensorManager = {};
@@ -90,8 +90,8 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     let multiSensor = [];
     multiSensor.push({
       lat: 41.754785,
-      long: -70.539151,
-      obshei: 0.060966,
+      lon: -70.539151,
+      alt: 0.060966,
       obsminaz: 347,
       obsmaxaz: 227,
       obsminel: 6,
@@ -102,8 +102,8 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     });
     multiSensor.push({
       lat: 41.754785,
-      long: -70.539151,
-      obshei: 0.060966,
+      lon: -70.539151,
+      alt: 0.060966,
       obsminaz: 347,
       obsmaxaz: 227,
       obsminel: 3,
@@ -114,8 +114,8 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     });
     multiSensor.push({
       lat: 41.754785,
-      long: -70.539151,
-      obshei: 0.060966,
+      lon: -70.539151,
+      alt: 0.060966,
       obsminaz: 347,
       obsmaxaz: 227,
       obsminel: 3,

@@ -61,8 +61,8 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
       sensor.observerGd = {
         // Array to calculate look angles in propagate()
         latitude: sensor.lat * DEG2RAD,
-        longitude: sensor.long * DEG2RAD,
-        height: sensor.obshei * 1, // Converts from string to number TODO: Find correct way to convert string to integer
+        longitude: sensor.lon * DEG2RAD,
+        height: sensor.alt * 1, // Converts from string to number TODO: Find correct way to convert string to integer
       };
     }
 

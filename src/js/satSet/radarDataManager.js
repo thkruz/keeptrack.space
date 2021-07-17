@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import { DEG2RAD } from '@app/js/lib/constants.js';
-import { db } from '@app/js/settingsManager/settingsManager.js';
+import { db } from '@app/js/settingsManager/settingsManager.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 
 var satellite, sensorManager, satSet, satCruncher;
@@ -78,8 +78,8 @@ radarDataManager.setup = (resp) => {
       radarDataManager.radarData[i].e,
       radarDataManager.radarData[i].r,
       sensorManager.sensorList.COD.lat * DEG2RAD,
-      sensorManager.sensorList.COD.long * DEG2RAD,
-      sensorManager.sensorList.COD.obshei
+      sensorManager.sensorList.COD.lon * DEG2RAD,
+      sensorManager.sensorList.COD.alt
     );
     radarDataECI = satellite.ecfToEci(radarDataECF, gmst);
     radarDataManager.radarData[i].x = radarDataECI.x;

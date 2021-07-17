@@ -1,30 +1,12 @@
 import * as glm from '../lib/external/gl-matrix.js';
 import $ from 'jquery';
 import { RADIUS_OF_EARTH } from '../lib/constants.js';
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { sMM } from '../uiManager/sideMenuManager.js';
-import { settingsManager as settingsManagerAny } from '../settingsManager/settingsManager.js';
+import { settingsManager as settingsManagerAny } from '@app/js/settingsManager/settingsManager';
 const settingsManager: any = settingsManagerAny;
 
 let M = window.M;
-
-const bodyDOM = $('#bodyDOM');
-const canvasDOM = $('#keeptrack-canvas');
-const rightBtnMenuDOM = $('#right-btn-menu');
-const rightBtnSaveDOM = $('#save-rmb');
-const rightBtnViewDOM = $('#view-rmb');
-const rightBtnEditDOM = $('#edit-rmb');
-const rightBtnCreateDOM = $('#create-rmb');
-const rightBtnDrawDOM = $('#draw-rmb');
-const rightBtnColorsDOM = $('#colors-rmb');
-const rightBtnEarthDOM = $('#earth-rmb');
-const rightBtnSaveMenuDOM = $('#save-rmb-menu');
-const rightBtnViewMenuDOM = $('#view-rmb-menu');
-const rightBtnEditMenuDOM = $('#edit-rmb-menu');
-const rightBtnCreateMenuDOM = $('#create-rmb-menu');
-const rightBtnDrawMenuDOM = $('#draw-rmb-menu');
-const rightBtnColorsMenuDOM = $('#colors-rmb-menu');
-const rightBtnEarthMenuDOM = $('#earth-rmb-menu');
-const satHoverBoxDOM = $('#sat-hoverbox');
 
 let clickedSat = 0;
 let maxPinchSize = Math.hypot(window.innerWidth, window.innerHeight);
@@ -37,31 +19,30 @@ let deltaPinchDistance = 0;
 let startPinchDistance = 0;
 let touchStartTime: number;
 
-let cameraManager: any, objectManager: any, satellite: any, satSet: any, lineManager: any, sensorManager: any, starManager: any, ColorScheme: any, satCruncher: any, gl: any, uiManager: any, drawManager: any, dotsManager: any;
 interface uiInputInterface {
-  isMouseMoving: boolean,
-  isStartedOnCanvas: boolean,
-  isAsyncWorking: boolean,
-  unProject: any,
-  clientWaitAsync: any,
-  getBufferSubDataAsync: any,
-  readPixelsAsync: any,
-  init: any,
-  canvasWheel: any,
-  canvasClick: any,
-  canvasMouseDown: any,
-  canvasTouchStart: any,
-  canvasMouseUp: any,
-  mouseMoveTimeout: any,
-  getEarthScreenPoint: any,
-  mouseSat: any,
-  getSatIdFromCoord: any,
-  getSatIdFromCoordAlt: any,
-  openRmbMenu: any,
-  rmbMenuActions: any,  
+  isMouseMoving: boolean;
+  isStartedOnCanvas: boolean;
+  isAsyncWorking: boolean;
+  unProject: any;
+  clientWaitAsync: any;
+  getBufferSubDataAsync: any;
+  readPixelsAsync: any;
+  init: any;
+  canvasWheel: any;
+  canvasClick: any;
+  canvasMouseDown: any;
+  canvasTouchStart: any;
+  canvasMouseUp: any;
+  mouseMoveTimeout: any;
+  getEarthScreenPoint: any;
+  mouseSat: any;
+  getSatIdFromCoord: any;
+  getSatIdFromCoordAlt: any;
+  openRmbMenu: any;
+  rmbMenuActions: any;
 }
 
-let uiInput:uiInputInterface = {
+let uiInput: uiInputInterface = {
   isMouseMoving: false,
   isStartedOnCanvas: false,
   mouseSat: -1,
@@ -71,8 +52,12 @@ let uiInput:uiInputInterface = {
   canvasTouchStart: null,
   canvasMouseUp: null,
   openRmbMenu: null,
-  rmbMenuActions: null, 
+  rmbMenuActions: null,
   canvasWheel: (evt: any): void => {
+    const cameraManager = keepTrackApi.programs.cameraManager;
+    const objectManager = keepTrackApi.programs.objectManager;
+    const drawManager = keepTrackApi.programs.drawManager;
+
     if (!settingsManager.disableUI && settingsManager.disableNormalEvents) {
       evt.preventDefault();
     }
@@ -130,33 +115,111 @@ let uiInput:uiInputInterface = {
       drawManager.glInit();
     }
   },
-  init: (
-    cameraManagerRef: unknown,
-    objectManagerRef: unknown,
-    satelliteRef: unknown,
-    satSetRef: unknown,
-    lineManagerRef: unknown,
-    sensorManagerRef: unknown,
-    starManagerRef: unknown,
-    ColorSchemeRef: unknown,
-    satCruncherRef: unknown,
-    uiManagerRef: unknown,
-    drawManagerRef: unknown,
-    dotsManagerRef: unknown
-  ): void => {
-    cameraManager = cameraManagerRef;
-    dotsManager = dotsManagerRef;
-    objectManager = objectManagerRef;
-    satellite = satelliteRef;
-    satSet = satSetRef;
-    lineManager = lineManagerRef;
-    sensorManager = sensorManagerRef;
-    starManager = starManagerRef;
-    ColorScheme = ColorSchemeRef;
-    satCruncher = satCruncherRef;
-    uiManager = uiManagerRef;
-    drawManager = drawManagerRef;
-    gl = drawManager.gl;
+  init: (): void => {
+    const cameraManager = keepTrackApi.programs.cameraManager;    
+    const objectManager = keepTrackApi.programs.objectManager;
+    const satellite = keepTrackApi.programs.satellite;
+    const satSet = keepTrackApi.programs.satSet;
+    const lineManager = keepTrackApi.programs.lineManager;
+    const sensorManager = keepTrackApi.programs.sensorManager;
+    const starManager = keepTrackApi.programs.starManager;
+    const ColorScheme = keepTrackApi.programs.ColorScheme;
+    const satCruncher = keepTrackApi.programs.satCruncher;
+    const uiManager = keepTrackApi.programs.uiManager;
+    const drawManager = keepTrackApi.programs.drawManager;
+    const gl = keepTrackApi.programs.drawManager.gl;
+
+    $('#rmb-wrapper').append(`
+      <div id="right-btn-menu" class="right-btn-menu">
+        <ul class='dropdown-contents'>
+          <li class="rmb-menu-item" id="save-rmb"><a href="#">Save Image &#x27A4;</a></li>
+          <li class="rmb-menu-item" id="view-rmb"><a href="#">View &#x27A4;</a></li>
+          <li class="rmb-menu-item" id="edit-rmb"><a href="#">Edit &#x27A4;</a></li>
+          <li class="rmb-menu-item" id="draw-rmb"><a href="#">Draw &#x27A4;</a></li>
+          <li class="rmb-menu-item" id="create-rmb"><a href="#">Create &#x27A4;</a></li>
+          <li class="rmb-menu-item" id="earth-rmb"><a href="#">Earth &#x27A4;</a></li>
+          <li class="rmb-menu-item" id="colors-rmb"><a href="#">Colors &#x27A4;</a></li>
+          <li id="reset-camera-rmb"><a href="#">Reset Camera</a></li>
+          <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
+          <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
+        </ul>
+      </div>
+      <div id="save-rmb-menu" class="right-btn-menu">
+        <ul class='dropdown-contents'>
+          <li id="save-hd-rmb"><a href="#">HD (1920 x 1080)</a></li>
+          <li id="save-4k-rmb"><a href="#">4K (3840 x 2160)</a></li>
+          <li id="save-8k-rmb"><a href="#">8K (7680 x 4320)</a></li>
+        </ul>
+      </div>
+      <div id="view-rmb-menu" class="right-btn-menu">
+        <ul class='dropdown-contents'>
+          <li id="view-info-rmb"><a href="#">Earth Info</a></li>
+          <li id="view-sensor-info-rmb"><a href="#">Sensor Info</a></li>
+          <li id="view-sat-info-rmb"><a href="#">Satellite Info</a></li>
+          <li id="view-related-sats-rmb"><a href="#">Related Satellites</a></li>
+          <li id="view-curdops-rmb"><a href="#">Current GPS DOPs</a></li>
+          <li id="view-24dops-rmb"><a href="#">24 Hour GPS DOPs</a></li>
+        </ul>
+      </div>
+      <div id="edit-rmb-menu" class="right-btn-menu">
+        <ul class='dropdown-contents'>
+          <li id="edit-sat-rmb"><a href="#">Edit Satellite</a></li>
+        </ul>
+      </div>
+      <div id="draw-rmb-menu" class="right-btn-menu">
+        <ul class='dropdown-contents'>
+          <li id="line-eci-axis-rmb"><a href="#">Earth Centered Inertial Axes</a></li>
+          <li id="line-earth-sat-rmb"><a href="#">Earth to Satellite</a></li>
+          <li id="line-sensor-sat-rmb"><a href="#">Sensor to Satellite</a></li>
+          <li id="line-sat-sat-rmb"><a href="#">Satellite to Satellite</a></li>
+          <li id="line-sat-sun-rmb"><a href="#">Satellite to Sun</a></li>
+        </ul>
+      </div>
+      <div id="create-rmb-menu" class="right-btn-menu">
+        <ul class='dropdown-contents'>
+          <li id="create-observer-rmb"><a href="#">Create Observer Here</a></li>
+          <li id="create-sensor-rmb"><a href="#">Create Sensor Here</a></li>
+        </ul>
+      </div>
+      <div id="colors-rmb-menu" class="right-btn-menu">
+        <ul class='dropdown-contents'>
+          <li id="colors-default-rmb"><a href="#">Object Types</a></li>
+          <li id="colors-sunlight-rmb"><a href="#">Sunlight Status</a></li>
+          <li id="colors-country-rmb"><a href="#">Country</a></li>
+          <li id="colors-velocity-rmb"><a href="#">Velocity</a></li>
+          <li id="colors-ageOfElset-rmb"><a href="#">Age of Elset</a></li>
+        </ul>
+      </div>
+      <div id="earth-rmb-menu" class="right-btn-menu">
+        <ul class='dropdown-contents'>
+          <li id="earth-blue-rmb"><a href="#">Blue Map</a></li>
+          <li id="earth-nasa-rmb"><a href="#">NASA Map</a></li>
+          <li id="earth-trusat-rmb"><a href="#">TruSat Map</a></li>
+          <li id="earth-low-rmb"><a href="#">Low Resolution Map</a></li>
+          <li id="earth-high-no-clouds-rmb"><a href="#">High Resoultion Map</a></li>
+          <li id="earth-vec-rmb"><a href="#">Vector Image Map</a></li>
+        </ul>
+      </div>
+    `);
+
+    const bodyDOM = $('#bodyDOM');
+    const canvasDOM = $('#keeptrack-canvas');
+    const rightBtnMenuDOM = $('#right-btn-menu');
+    const rightBtnSaveDOM = $('#save-rmb');
+    const rightBtnViewDOM = $('#view-rmb');
+    const rightBtnEditDOM = $('#edit-rmb');
+    const rightBtnCreateDOM = $('#create-rmb');
+    const rightBtnDrawDOM = $('#draw-rmb');
+    const rightBtnColorsDOM = $('#colors-rmb');
+    const rightBtnEarthDOM = $('#earth-rmb');
+    const rightBtnSaveMenuDOM = $('#save-rmb-menu');
+    const rightBtnViewMenuDOM = $('#view-rmb-menu');
+    const rightBtnEditMenuDOM = $('#edit-rmb-menu');
+    const rightBtnCreateMenuDOM = $('#create-rmb-menu');
+    const rightBtnDrawMenuDOM = $('#draw-rmb-menu');
+    const rightBtnColorsMenuDOM = $('#colors-rmb-menu');
+    const rightBtnEarthMenuDOM = $('#earth-rmb-menu');
+    const satHoverBoxDOM = $('#sat-hoverbox');
 
     // 2020 Key listener
     // TODO: Migrate most things from UI to Here
@@ -383,7 +446,7 @@ let uiInput:uiInputInterface = {
           });
         });
       }
-      if (!settingsManager.disableUI) {        
+      if (!settingsManager.disableUI) {
         canvasDOM.on('wheel', function (evt) {
           uiInput.canvasWheel(evt);
         });
@@ -770,7 +833,7 @@ let uiInput:uiInputInterface = {
         rightBtnSaveDOM.on('mouseenter', () => {
           rightBtnSaveDOMDropdown();
         });
-        rightBtnSaveDOM.on("click", () => {
+        rightBtnSaveDOM.on('click', () => {
           rightBtnSaveDOMDropdown();
         });
         rightBtnSaveMenuDOM.on('mouseleave', () => {
@@ -781,7 +844,7 @@ let uiInput:uiInputInterface = {
         rightBtnViewDOM.on('mouseenter', () => {
           rightBtnViewDOMDropdown();
         });
-        rightBtnViewDOM.on("click", () => {
+        rightBtnViewDOM.on('click', () => {
           rightBtnViewDOMDropdown();
         });
         rightBtnViewMenuDOM.on('mouseleave', () => {
@@ -792,7 +855,7 @@ let uiInput:uiInputInterface = {
         rightBtnEditDOM.on('mouseenter', () => {
           rightBtnEditDOMDropdown();
         });
-        rightBtnEditDOM.on("click", () => {
+        rightBtnEditDOM.on('click', () => {
           rightBtnEditDOMDropdown();
         });
         rightBtnEditMenuDOM.on('mouseleave', () => {
@@ -803,7 +866,7 @@ let uiInput:uiInputInterface = {
         rightBtnCreateDOM.on('mouseenter', () => {
           rightBtnCreateDOMDropdown();
         });
-        rightBtnCreateDOM.on("click", () => {
+        rightBtnCreateDOM.on('click', () => {
           rightBtnCreateDOMDropdown();
         });
         rightBtnCreateMenuDOM.on('mouseleave', () => {
@@ -814,7 +877,7 @@ let uiInput:uiInputInterface = {
         rightBtnDrawDOM.on('mouseenter', () => {
           rightBtnDrawDOMDropdown();
         });
-        rightBtnDrawDOM.on("click", () => {
+        rightBtnDrawDOM.on('click', () => {
           rightBtnDrawDOMDropdown();
         });
         rightBtnDrawMenuDOM.on('mouseleave', () => {
@@ -825,7 +888,7 @@ let uiInput:uiInputInterface = {
         rightBtnColorsDOM.on('mouseenter', () => {
           rightBtnColorsDOMDropdown();
         });
-        rightBtnColorsDOM.on("click", () => {
+        rightBtnColorsDOM.on('click', () => {
           rightBtnColorsDOMDropdown();
         });
         rightBtnEarthMenuDOM.on('mouseleave', () => {
@@ -836,7 +899,7 @@ let uiInput:uiInputInterface = {
         rightBtnEarthDOM.on('mouseenter', () => {
           rightBtnEarthDOMDropdown();
         });
-        rightBtnEarthDOM.on("click", () => {
+        rightBtnEarthDOM.on('click', () => {
           rightBtnEarthDOMDropdown();
         });
         rightBtnEarthMenuDOM.on('mouseleave', () => {
@@ -910,7 +973,7 @@ let uiInput:uiInputInterface = {
           rightBtnCreateMenuDOM.hide();
         }
       };
-      var rightBtnDrawDOMDropdown = () => {        
+      var rightBtnDrawDOMDropdown = () => {
         const canvasWidth = canvasDOM.innerWidth();
         if (!canvasWidth) {
           console.warn('canvasDOM undefined!');
@@ -1030,9 +1093,9 @@ let uiInput:uiInputInterface = {
                 $('#dops-lon').val(latLon.lon.toFixed(3));
                 $('#dops-alt').val(0);
                 $('#dops-el').val(settingsManager.gpsElevationMask);
-                const lat:number = parseFloat(<string>$('#dops-lat').val());
-                const lon:number = parseFloat(<string>$('#dops-lon').val());
-                const alt:number = parseFloat(<string>$('#dops-alt').val());
+                const lat: number = parseFloat(<string>$('#dops-lat').val());
+                const lon: number = parseFloat(<string>$('#dops-lon').val());
+                const alt: number = parseFloat(<string>$('#dops-alt').val());
                 // var el = $('#dops-el').val() * 1;
                 satellite.getDOPsTable(lat, lon, alt);
                 $('#menu-dops').addClass('bmenu-item-selected');
@@ -1059,7 +1122,7 @@ let uiInput:uiInputInterface = {
             $('#cs-lat').val(latLon.lat);
             $('#cs-lon').val(latLon.lon);
             $('#cs-hei').val(0);
-            $('#cs-type').val('Phased Array Radar');            
+            $('#cs-type').val('Phased Array Radar');
             $('#cs-minaz').val(0);
             $('#cs-maxaz').val(360);
             $('#cs-minel').val(10);
@@ -1287,6 +1350,10 @@ let uiInput:uiInputInterface = {
 
   // Convert Screen X,Y back to ECI
   unProject: (x: number, y: number): [number, number, number] => {
+    const gl = keepTrackApi.programs.drawManager.gl;
+    const drawManager = keepTrackApi.programs.drawManager;
+    const cameraManager = keepTrackApi.programs.cameraManager;
+
     const glScreenX = (x / gl.drawingBufferWidth) * 2 - 1.0;
     const glScreenY = 1.0 - (y / gl.drawingBufferHeight) * 2;
     const screenVec = [glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
@@ -1310,7 +1377,7 @@ let uiInput:uiInputInterface = {
       y: eci[1],
       z: eci[2],
     };
-    return <number>satSet.getIdFromEci(eciArray);
+    return <number>keepTrackApi.programs.satSet.getIdFromEci(eciArray);
   },
 
   /* istanbul ignore next */
@@ -1329,7 +1396,7 @@ let uiInput:uiInputInterface = {
           setTimeout(test, intervalMs);
           return;
         }
-        resolve("Async Resolved!");
+        resolve('Async Resolved!');
       };
 
       test();
@@ -1374,6 +1441,9 @@ let uiInput:uiInputInterface = {
 
   isAsyncWorking: true,
   getSatIdFromCoord: (x: number, y: number): number => {
+    const gl = keepTrackApi.programs.drawManager.gl;
+    const dotsManager = keepTrackApi.programs.dotsManager;
+
     // NOTE: gl.readPixels is a huge bottleneck
     gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
     if (typeof process === 'undefined' && uiInput.isAsyncWorking) {
@@ -1388,6 +1458,8 @@ let uiInput:uiInputInterface = {
 
   // Raycasting in getEarthScreenPoint would provide a lot of powerful (but slow) options later
   getEarthScreenPoint: (x: number, y: number) => {
+    const cameraManager = keepTrackApi.programs.cameraManager;
+
     // getEarthScreenPoint
     var rayOrigin, ptThru, rayDir, toCenterVec, dParallel, longDir, dPerp, dSubSurf, dSurf, ptSurf;
 

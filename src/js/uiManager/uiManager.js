@@ -29,13 +29,14 @@ import '@app/js/lib/external/jquery.colorbox.min.js';
 import '@app/js/lib/external/jquery-ajax.js';
 import '@app/js/lib/external/colorPick.js';
 import 'materialize-css';
-import { DEG2RAD, RAD2DEG, cKmPerMs } from '@app/js/lib/constants.js';
+import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
 import { parseRgba, rgbCss, saveCsv, stringPad } from '@app/js/lib/helpers';
 import { CanvasRecorder } from '@app/js/lib/external/CanvasRecorder.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { adviceList } from '@app/js/uiManager/ui-advice.js';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { drawManager } from '@app/js/drawManager/drawManager.js';
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { mapManager } from '@app/js/uiManager/mapManager.js';
 import { missileManager } from '@app/js/missileManager/missileManager.js';
 import { mobileManager } from '@app/js/uiManager/mobileManager.js';
@@ -47,25 +48,14 @@ import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.js';
 import { uiInput } from './ui-input';
 import { uiLimited } from './ui-limited.js';
 import { uiValidation } from './ui-validation.js';
+import { updateSelectBoxCore } from '@app/js/plugins/updateSelectBox/updateSelectBoxCore';
 
 const M = window.M;
-
-// Public Variables
-const mapImageDOM = $('#map-image');
-const mapMenuDOM = $('#map-menu');
-const bodyDOM = $('#bodyDOM');
-const rightBtnSaveMenuDOM = $('#save-rmb-menu');
-const rightBtnViewMenuDOM = $('#view-rmb-menu');
-const rightBtnEditMenuDOM = $('#edit-rmb-menu');
-const rightBtnCreateMenuDOM = $('#create-rmb-menu');
-const rightBtnDrawMenuDOM = $('#draw-rmb-menu');
-const rightBtnColorsMenuDOM = $('#colors-rmb-menu');
-const rightBtnEarthMenuDOM = $('#earth-rmb-menu');
 
 let isPlanetariumView = false;
 let isAstronomyView = false;
@@ -96,16 +86,202 @@ uiManager.isTimeMachineRunning = false;
 var lastBoxUpdateTime = 0;
 var lastOverlayUpdateTime = 0;
 
-var cameraManager, lineManager, starManager, groups;
-uiManager.init = (cameraManagerRef, lineManagerRef, starManagerRef, groupsRef, satSet, orbitManager, groupsManager, ColorScheme) => {
+let cameraManager, lineManager, starManager, groups;
+uiManager.init = () => {
   if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
     // Pass the references through to the limited UI
-    uiLimited.init(satSet, orbitManager, groupsManager, ColorScheme);
+    uiLimited.init(keepTrackApi.programs.satSet, keepTrackApi.programs.orbitManager, keepTrackApi.programs.groupsManager, keepTrackApi.programs.ColorScheme);
   }
-  cameraManager = cameraManagerRef;
-  lineManager = lineManagerRef;
-  starManager = starManagerRef;
-  groups = groupsRef;
+  cameraManager = keepTrackApi.programs.cameraManager;
+  lineManager = keepTrackApi.programs.lineManager;
+  starManager = keepTrackApi.programs.starManager;
+  groups = keepTrackApi.programs.groupsManager;
+
+  keepTrackApi.register({ method: 'updateSelectBox', cbName: 'sensorInfo', cb: updateSelectBoxCore.sensorInfo.cb });
+
+  // Add sensor menu to left menu
+  $('#left-menus').append(`
+      <div id="sensor-list-menu" class="side-menu-parent start-hidden text-select">
+        <div id="sensor-list-content" class="side-menu">                  
+          <div class="row">
+            <ul id="reset-sensor-text" class="sensor-reset-menu">
+              <h5 id="reset-sensor-button" class="center-align menu-selectable">Reset Sensor</h5>
+              <li class="divider"></li>
+            </ul>
+            <ul>
+              <h5 class="center-align">CSpOC Sensors</h5>
+              <li class="divider"></li>
+              <li class="menu-selectable" data-sensor="cspocAll">All CSpOC Sensors<span class="badge dark-blue-badge"
+                  data-badge-caption="Coalition"></span></li>
+              <li class="menu-selectable" data-sensor="mwAll">All MW Sensors<span class="badge dark-blue-badge"
+                  data-badge-caption="Coalition"></span></li>
+              <li class="menu-selectable" data-sensor="BLE">Beale<span class="badge dark-blue-badge"
+                  data-badge-caption="USSF"></span></li>
+              <li class="menu-selectable" data-sensor="COD">Cape Cod<span class="badge dark-blue-badge"
+                  data-badge-caption="USSF"></span></li>
+              <li class="menu-selectable" data-sensor="CAV">Cavalier<span class="badge dark-blue-badge"
+                  data-badge-caption="USSF"></span></li>
+              <li class="menu-selectable" data-sensor="CLR">Clear<span class="badge dark-blue-badge"
+                  data-badge-caption="USSF"></span></li>
+              <li class="menu-selectable" data-sensor="CDN">Cobra Dane<span class="badge dark-blue-badge"
+                  data-badge-caption="USSF"></span></li>
+              <li class="menu-selectable" data-sensor="EGL">Eglin<span class="badge dark-blue-badge"
+                  data-badge-caption="USSF"></span></li>
+              <li class="menu-selectable" data-sensor="FYL">Fylingdales<span class="badge dark-blue-badge"
+                  data-badge-caption="RAF"></span></li>
+              <li class="menu-selectable" data-sensor="GLB">Globus II<span class="badge dark-blue-badge"
+                  data-badge-caption="NOR"></span></li>
+              <li class="menu-selectable" data-sensor="MIL">Millstone<span class="badge dark-blue-badge"
+                  data-badge-caption="MIT"></span></li>
+              <li class="menu-selectable" data-sensor="THL">Thule<span class="badge dark-blue-badge"
+                  data-badge-caption="USSF"></span></li>
+              <li class="menu-selectable" data-sensor="ASC">Ascension<span class="badge dark-blue-badge"
+                  data-badge-caption="USSF"></span></li>
+              <li class="menu-selectable" data-sensor="ALT">ALTAIR<span class="badge dark-blue-badge"
+                  data-badge-caption="USA"></span></li>
+              <li class="menu-selectable" data-sensor="MMW">Millimeter Wave<span class="badge dark-blue-badge"
+                  data-badge-caption="USA"></span></li>
+              <li class="menu-selectable" data-sensor="ALC">ALCOR<span class="badge dark-blue-badge"
+                  data-badge-caption="USA"></span></li>
+              <li class="menu-selectable" data-sensor="TDX">TRADEX<span class="badge dark-blue-badge"
+                  data-badge-caption="USA"></span></li>
+              <li class="menu-selectable" data-sensor="DGC">Diego Garcia<span class="badge dark-blue-badge"
+                  data-badge-caption="USSF"></span></li>
+              <li class="menu-selectable" data-sensor="MAU">Maui<span class="badge dark-blue-badge"
+                  data-badge-caption="USSF"></span></li>
+              <li class="menu-selectable" data-sensor="SOC">Socorro<span class="badge dark-blue-badge"
+                  data-badge-caption="USSF"></span></li>
+              <li class="divider"></li>
+              <h5 class="center-align">MDA Sensors</h5>
+              <li class="divider"></li>
+              <li class="menu-selectable" data-sensor="mdAll">All Sensors<span class="badge dark-blue-badge"
+                  data-badge-caption="Coalition"></span></li>
+              <li class="menu-selectable" data-sensor="HAR">Har Keren<span class="badge dark-blue-badge"
+                  data-badge-caption="ISR"></span></li>
+              <li class="menu-selectable" data-sensor="QTR">CENTCOM<span class="badge dark-blue-badge"
+                  data-badge-caption="USA"></span></li>
+              <li class="menu-selectable" data-sensor="KUR">Kürecik<span class="badge dark-blue-badge"
+                  data-badge-caption="USA"></span></li>
+              <li class="menu-selectable" data-sensor="SHA">Shariki<span class="badge dark-blue-badge"
+                  data-badge-caption="USA"></span></li>
+              <li class="menu-selectable" data-sensor="KCS">Kyogamisaki<span class="badge dark-blue-badge"
+                  data-badge-caption="USA"></span></li>
+              <li class="menu-selectable" data-sensor="SBX">Sea-Based X-Band<span class="badge dark-blue-badge"
+                  data-badge-caption="USN"></span></li>
+              <li class="menu-selectable" data-sensor="TAI">Taiwan SRP<span class="badge dark-blue-badge"
+                  data-badge-caption="TAI"></span></li>
+              <li class="divider"></li>
+              <h5 class="center-align">LeoLabs Sensors</h5>
+              <li class="divider"></li>
+              <li class="menu-selectable" data-sensor="llAll">All Sensors<span class="badge dark-blue-badge"
+                  data-badge-caption="Comm"></span></li>
+              <li class="menu-selectable" data-sensor="MSR">Mdata-sensorland Radar<span class="badge dark-blue-badge"
+                  data-badge-caption="Comm"></span></li>
+              <li class="menu-selectable" data-sensor="PFISR">PFIS Radar<span class="badge dark-blue-badge"
+                  data-badge-caption="Comm"></span></li>
+              <li class="menu-selectable" data-sensor="KSR">Kiwi Space Radar<span class="badge dark-blue-badge"
+                  data-badge-caption="Comm"></span></li>
+              <li class="divider"></li>
+              <h5 class="center-align">ESOC Sensors</h5>
+              <li class="divider"></li>
+              <li class="menu-selectable" data-sensor="GRV">GRAVES<span class="badge dark-blue-badge"
+                  data-badge-caption="FRA"></span></li>
+              <li class="menu-selectable" data-sensor="FYL">Fylingdales<span class="badge dark-blue-badge"
+                  data-badge-caption="RAF"></span></li>
+              <li class="menu-selectable" data-sensor="TIR">TIRA<span class="badge dark-blue-badge"
+                  data-badge-caption="GER"></span></li>
+              <li class="menu-selectable" data-sensor="NRC">Northern Cross<span
+                  class="badge dark-blue-badge" data-badge-caption="ITA"></span></li>
+              <li class="menu-selectable" data-sensor="TRO">Troodos<span class="badge dark-blue-badge"
+                  data-badge-caption="RAF"></span></li>
+              <li class="menu-selectable" data-sensor="SDT">Space Debris Telescope<span
+                  class="badge dark-blue-badge" data-badge-caption="ESA"></span></li>
+                  <!-- GALILEO GROUND SENSOR STATION -->
+              <li class="menu-selectable" data-sensor="GGS">GSS Fucino<span
+                  class="badge dark-blue-badge" data-badge-caption="ITA"></span></li>
+                  <!-- GALILEO GROUND SENSOR STATION -->
+              <li class="divider"></li>
+              <h5 class="center-align">Russian Sensors</h5>
+              <li class="divider"></li>
+              <li class="menu-selectable" data-sensor="rusAll">All Russian Sensors<span
+                  class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" data-sensor="ARM">Armavir<span class="badge dark-blue-badge"
+                  data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" data-sensor="BAL">Balkhash<span class="badge dark-blue-badge"
+                  data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" data-sensor="GAN">Gantsevichi<span class="badge dark-blue-badge"
+                  data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" data-sensor="LEK">Lekhtusi<span class="badge dark-blue-badge"
+                  data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" data-sensor="MIS">Mishelevka<span class="badge dark-blue-badge"
+                  data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" data-sensor="OLE">Olenegorsk<span class="badge dark-blue-badge"
+                  data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" data-sensor="PEC">Pechora<span class="badge dark-blue-badge"
+                  data-badge-caption="RUS"></span></li>
+              <li class="menu-selectable" data-sensor="PIO">Pionersky<span class="badge dark-blue-badge"
+                  data-badge-caption="RUS"></span></li>
+              <li class="divider"></li>
+              <h5 class="center-align">Chinese Sensors</h5>
+              <li class="divider"></li>
+              <li class="menu-selectable" data-sensor="XUA">Xuanhua<span class="badge dark-blue-badge"
+                  data-badge-caption="PRC"></span></li>
+              <li class="menu-selectable" data-sensor="PMO">Purple Mountain<span class="badge dark-blue-badge"
+                  data-badge-caption="PRC"></span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    `);
+
+  $('#sensor-list-content > div > ul > .menu-selectable').on('click', function () {
+    adviceList.sensor();
+
+    switch (this.dataset.sensor) {
+      case 'cspocAll':
+        adviceList.cspocSensors();
+        sensorManager.setSensor('SSN');
+        break;
+      case 'mwAll':
+        adviceList.mwSensors();
+        sensorManager.setSensor('NATO-MW');
+        break;
+      case 'mdAll':
+        sensorManager.setSensor('MD-ALL');
+        break;
+      case 'llAll':
+        sensorManager.setSensor('LEO-LABS');
+        break;
+      case 'rusAll':
+        sensorManager.setSensor('RUS-ALL');
+        break;
+      default:
+        sensorManager.setSensor(sensorManager.sensorList[`${this.dataset.sensor}`]);
+        break;
+    }
+
+    uiManager.getsensorinfo();
+
+    try {
+      uiManager.lookAtSensor();
+    } catch (e) {
+      // TODO: More intentional conditional statement
+      // Multi-sensors break this
+    }
+    if (settingsManager.currentColorScheme == ColorScheme.default) {
+      uiManager.legendMenuChange('default');
+    }
+  });
+
+  $('#reset-sensor-button').on('click', function () {
+    settingsManager.isForceColorScheme = false;
+    $('#menu-sensor-info').addClass('bmenu-item-disabled');
+    $('#menu-fov-bubble').addClass('bmenu-item-disabled');
+    $('#menu-surveillance').addClass('bmenu-item-disabled');
+    $('#menu-planetarium').addClass('bmenu-item-disabled');
+    $('#menu-astronomy').addClass('bmenu-item-disabled');
+    _resetSensorSelected();
+  });
 
   uiValidation();
   sMM.init(satSet, uiManager, sensorManager, satellite, ColorScheme, omManager, timeManager, cameraManager, orbitManager, objectManager, missileManager);
@@ -432,6 +608,9 @@ uiManager.hideLoadingScreen = () => {
 };
 
 uiManager.resize2DMap = function () {
+  const mapImageDOM = $('#map-image');
+  const mapMenuDOM = $('#map-menu');
+
   if ($(window).width() > $(window).height()) {
     // If widescreen
     settingsManager.mapWidth = $(window).width();
@@ -511,96 +690,20 @@ var _checkWatchlist = () => {
     }
   }
 };
+
 var _updateSelectBox = () => {
+  // IDEA: Include updates when satellite edited regardless of time.
+
   // Don't update if no object is selected
   if (objectManager.selectedSat === -1) return;
 
-  var sat = satSet.getSat(objectManager.selectedSat);
+  const sat = satSet.getSat(objectManager.selectedSat);
 
   // Don't bring up the update box for static dots
   if (sat.static) return;
 
-  // IDEA: Include updates when satellite edited regardless of time.
   if (timeManager.now * 1 > lastBoxUpdateTime * 1 + updateInterval) {
-    if (!sat.missile) {
-      if (objectManager.isSensorManagerLoaded) {
-        sat.getTEARR();
-      }
-    } else {
-      satellite.setTEARR(missileManager.getMissileTEARR(sat));
-    }
-    if (satellite.degreesLong(satellite.currentTEARR.lon) >= 0) {
-      $('#sat-longitude').html(satellite.degreesLong(satellite.currentTEARR.lon).toFixed(3) + '°E');
-    } else {
-      $('#sat-longitude').html((satellite.degreesLong(satellite.currentTEARR.lon) * -1).toFixed(3) + '°W');
-    }
-    if (satellite.degreesLat(satellite.currentTEARR.lat) >= 0) {
-      $('#sat-latitude').html(satellite.degreesLat(satellite.currentTEARR.lat).toFixed(3) + '°N');
-    } else {
-      $('#sat-latitude').html((satellite.degreesLat(satellite.currentTEARR.lat) * -1).toFixed(3) + '°S');
-    }
-    var jday = timeManager.getDayOfYear(timeManager.propTimeVar);
-    $('#jday').html(jday);
-
-    if (sMM.isMapMenuOpen && timeManager.now > settingsManager.lastMapUpdateTime + 30000) {
-      uiManager.updateMap();
-      settingsManager.lastMapUpdateTime = timeManager.now;
-    }
-
-    if (!sat.missile) {
-      $('#sat-altitude').html(sat.getAltitude().toFixed(2) + ' km');
-      $('#sat-velocity').html(sat.velocity.total.toFixed(2) + ' km/s');
-    } else {
-      $('#sat-altitude').html(satellite.currentTEARR.alt.toFixed(2) + ' km');
-    }
-
-    if (objectManager.isSensorManagerLoaded) {
-      if (satellite.currentTEARR.inview) {
-        $('#sat-azimuth').html(satellite.currentTEARR.az.toFixed(0) + '°'); // Convert to Degrees
-        $('#sat-elevation').html(satellite.currentTEARR.el.toFixed(1) + '°');
-        $('#sat-range').html(satellite.currentTEARR.rng.toFixed(2) + ' km');
-        let beamwidthString = sensorManager.currentSensor.beamwidth ? (satellite.currentTEARR.rng * Math.sin(DEG2RAD * sensorManager.currentSensor.beamwidth)).toFixed(2) + ' km' : 'Unknown';
-        $('#sat-beamwidth').html(beamwidthString);
-        $('#sat-maxTmx').html(((satellite.currentTEARR.rng / cKmPerMs) * 2).toFixed(2) + ' ms'); // Time for RF to hit target and bounce back
-      } else {
-        $('#sat-azimuth').html('Out of FOV');
-        $('#sat-azimuth').prop('title', 'Azimuth: ' + satellite.currentTEARR.az.toFixed(0) + '°');
-        $('#sat-elevation').html('Out of FOV');
-        $('#sat-elevation').prop('title', 'Elevation: ' + satellite.currentTEARR.el.toFixed(1) + '°');
-        $('#sat-range').html('Out of FOV');
-        $('#sat-range').prop('title', 'Range: ' + satellite.currentTEARR.rng.toFixed(2) + ' km');
-        let beamwidthString = sensorManager.currentSensor.beamwidth ? sensorManager.currentSensor.beamwidth + '°' : 'Unknown';
-        $('#sat-beamwidth').html('Out of FOV');
-        $('#sat-beamwidth').prop('title', beamwidthString);
-        $('#sat-maxTmx').html('Out of FOV');
-      }
-    } else {
-      $('#sat-azimuth').parent().hide();
-      $('#sat-elevation').parent().hide();
-      $('#sat-range').parent().hide();
-      $('#sat-beamwidth').parent().hide();
-      $('#sat-maxTmx').parent().hide();
-    }
-
-    if (objectManager.isSensorManagerLoaded) {
-      if (sensorManager.checkSensorSelected()) {
-        // If we didn't just calculate next pass time for this satellite and sensor combination do it
-        if (objectManager.selectedSat !== uiManager.lastNextPassCalcSatId && sensorManager.currentSensor.shortName !== uiManager.lastNextPassCalcSensorId && !sat.missile) {
-          $('#sat-nextpass').html(satellite.nextpass(sat));
-
-          // IDEA: Code isInSun()
-          //sun.getXYZ();
-          //lineManager.create('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
-        }
-        uiManager.lastNextPassCalcSatId = objectManager.selectedSat;
-        uiManager.lastNextPassCalcSensorId = sensorManager.currentSensor.shortName;
-      } else {
-        $('#sat-nextpass').html('Unavailable');
-      }
-    } else {
-      $('#sat-nextpass').parent().hide();
-    }
-
+    keepTrackApi.methods.updateSelectBox(sat);
     lastBoxUpdateTime = timeManager.now;
   }
 };
@@ -688,8 +791,8 @@ uiManager.useCurrentGeolocationAsSensor = function () {
   if (location.protocol === 'https:' && !settingsManager.geolocationUsed && settingsManager.isMobileModeEnabled) {
     navigator.geolocation.getCurrentPosition(function (position) {
       settingsManager.geolocation.lat = position.coords.lat;
-      settingsManager.geolocation.long = position.coords.lon;
-      settingsManager.geolocation.obshei = 0;
+      settingsManager.geolocation.lon = position.coords.lon;
+      settingsManager.geolocation.alt = 0;
       settingsManager.geolocation.minaz = 0;
       settingsManager.geolocation.maxaz = 360;
       settingsManager.geolocation.minel = 30;
@@ -699,8 +802,8 @@ uiManager.useCurrentGeolocationAsSensor = function () {
       sensorManager.whichRadar = 'CUSTOM';
 
       $('#cs-lat').val(settingsManager.geolocation.lat).trigger('change');
-      $('#cs-lon').val(settingsManager.geolocation.long).trigger('change');
-      $('#cs-hei').val(settingsManager.geolocation.obshei).trigger('change');
+      $('#cs-lon').val(settingsManager.geolocation.lon).trigger('change');
+      $('#cs-hei').val(settingsManager.geolocation.alt).trigger('change');
 
       $('#cs-telescope').attr('checked', 'checked');
       $('#cs-minaz').attr('disabled', true);
@@ -726,9 +829,9 @@ uiManager.useCurrentGeolocationAsSensor = function () {
       $('#sensor-info-title').html('Custom Sensor');
       $('#sensor-country').html('Custom Sensor');
 
-      var lon = settingsManager.geolocation.long;
+      var lon = settingsManager.geolocation.lon;
       var lat = settingsManager.geolocation.lat;
-      var obshei = settingsManager.geolocation.obshei;
+      var alt = settingsManager.geolocation.alt;
       var minaz = settingsManager.geolocation.minaz;
       var maxaz = settingsManager.geolocation.maxaz;
       var minel = settingsManager.geolocation.minel;
@@ -743,8 +846,8 @@ uiManager.useCurrentGeolocationAsSensor = function () {
         setlatlong: true, // Tell satSet.satCruncher we are changing observer location
         sensor: {
           lat: lat,
-          long: lon,
-          obshei: obshei,
+          lon: lon,
+          alt: alt,
           obsminaz: minaz,
           obsmaxaz: maxaz,
           obsminel: minel,
@@ -756,8 +859,8 @@ uiManager.useCurrentGeolocationAsSensor = function () {
 
       satellite.setobs({
         lat: lat,
-        long: lon,
-        obshei: obshei,
+        lon: lon,
+        alt: alt,
         obsminaz: minaz,
         obsmaxaz: maxaz,
         obsminel: minel,
@@ -1249,7 +1352,7 @@ uiManager.updateURL = () => {
 };
 
 uiManager.lookAtSensor = () => {
-  cameraManager.lookAtSensor(sensorManager.selectedSensor.zoom, sensorManager.selectedSensor.lat, sensorManager.selectedSensor.long, timeManager.selectedDate);
+  cameraManager.lookAtSensor(sensorManager.selectedSensor.zoom, sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, timeManager.selectedDate);
 };
 
 uiManager.reloadLastSensor = () => {
@@ -1314,7 +1417,7 @@ uiManager.footerToggle = function () {
 
 uiManager.getsensorinfo = () => {
   $('#sensor-latitude').html(sensorManager.currentSensor.lat);
-  $('#sensor-longitude').html(sensorManager.currentSensor.long);
+  $('#sensor-longitude').html(sensorManager.currentSensor.lon);
   $('#sensor-minazimuth').html(sensorManager.currentSensor.obsminaz);
   $('#sensor-maxazimuth').html(sensorManager.currentSensor.obsmaxaz);
   $('#sensor-minelevation').html(sensorManager.currentSensor.obsminel);
@@ -1449,7 +1552,7 @@ uiManager.updateMap = function () {
   if (sensorManager.checkSensorSelected()) {
     map = mapManager.braun(
       {
-        lon: sensorManager.currentSensor.long,
+        lon: sensorManager.currentSensor.lon,
         lat: sensorManager.currentSensor.lat,
       },
       { meridian: 0, latLimit: 90 }
@@ -1698,13 +1801,13 @@ uiManager.onReady = () => {
   })();
 
   uiManager.clearRMBSubMenu = () => {
-    rightBtnSaveMenuDOM.hide();
-    rightBtnViewMenuDOM.hide();
-    rightBtnEditMenuDOM.hide();
-    rightBtnCreateMenuDOM.hide();
-    rightBtnColorsMenuDOM.hide();
-    rightBtnDrawMenuDOM.hide();
-    rightBtnEarthMenuDOM.hide();
+    $('#save-rmb-menu').hide();
+    $('#view-rmb-menu').hide();
+    $('#edit-rmb-menu').hide();
+    $('#create-rmb-menu').hide();
+    $('#colors-rmb-menu').hide();
+    $('#draw-rmb-menu').hide();
+    $('#earth-rmb-menu').hide();
   };
 
   (function _menuController() {
@@ -2240,55 +2343,6 @@ uiManager.onReady = () => {
       }
     });
 
-    $('#sensor-list-content > div > ul > .menu-selectable').on('click', function () {
-      adviceList.sensor();
-
-      switch (this.dataset.sensor) {
-        case 'cspocAll':
-          adviceList.cspocSensors();
-          sensorManager.setSensor('SSN');
-          break;
-        case 'mwAll':
-          adviceList.mwSensors();
-          sensorManager.setSensor('NATO-MW');
-          break;
-        case 'mdAll':
-          sensorManager.setSensor('MD-ALL');
-          break;
-        case 'llAll':
-          sensorManager.setSensor('LEO-LABS');
-          break;
-        case 'rusAll':
-          sensorManager.setSensor('RUS-ALL');
-          break;
-        default:
-          sensorManager.setSensor(sensorManager.sensorList[`${this.dataset.sensor}`]);
-          break;
-      }
-
-      uiManager.getsensorinfo();
-
-      try {
-        uiManager.lookAtSensor();
-      } catch (e) {
-        // TODO: More intentional conditional statement
-        // Multi-sensors break this
-      }
-      if (settingsManager.currentColorScheme == ColorScheme.default) {
-        uiManager.legendMenuChange('default');
-      }
-    });
-
-    $('#reset-sensor-button').on('click', function () {
-      settingsManager.isForceColorScheme = false;
-      $('#menu-sensor-info').addClass('bmenu-item-disabled');
-      $('#menu-fov-bubble').addClass('bmenu-item-disabled');
-      $('#menu-surveillance').addClass('bmenu-item-disabled');
-      $('#menu-planetarium').addClass('bmenu-item-disabled');
-      $('#menu-astronomy').addClass('bmenu-item-disabled');
-      _resetSensorSelected();
-    });
-
     $('#datetime-input-form').on('change', function (e) {
       let selectedDate = $('#datetime-input-tb').datepicker('getDate');
       let today = new Date();
@@ -2386,6 +2440,7 @@ uiManager.onReady = () => {
     }
     mobileManager.checkMobileMode();
     if (!settingsManager.disableUI) {
+      const bodyDOM = $('#bodyDOM');
       if (settingsManager.screenshotMode) {
         bodyDOM.css('overflow', 'visible');
         $('#canvas-holder').css('overflow', 'visible');
@@ -2989,8 +3044,8 @@ uiManager.onReady = () => {
 
           if (sensorManager.checkSensorSelected()) {
             $('#cs-lat').val(sensorManager.selectedSensor.lat);
-            $('#cs-lon').val(sensorManager.selectedSensor.long);
-            $('#cs-hei').val(sensorManager.selectedSensor.obshei);
+            $('#cs-lon').val(sensorManager.selectedSensor.lon);
+            $('#cs-hei').val(sensorManager.selectedSensor.alt);
           }
           $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           sMM.isCustomSensorMenuOpen = true;

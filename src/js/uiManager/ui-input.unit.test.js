@@ -4,7 +4,7 @@
   global
 */
 
-import '@app/js/settingsManager/settingsManager.js';
+import '@app/js/settingsManager/settingsManager.ts';
 import { uiInput } from './ui-input';
 
 document.body.innerHTML = global.docBody;

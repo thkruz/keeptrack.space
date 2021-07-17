@@ -20,6 +20,7 @@
     // "babel"
   ],
   "rules": {    
+    "@typescript-eslint/no-explicit-any": ["off"],
     "accessor-pairs": "error",
     "array-bracket-newline": "error",
     "array-bracket-spacing": ["error", "never"],

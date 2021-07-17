@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v3.4.3](https://github.com/thkruz/keeptrack.space/compare/v3.4.1...v3.4.3)
+
+> 15 July 2021 
+
+- fix(nextlaunchmanager.ts): fixed type error [`95deee4`](https://github.com/thkruz/keeptrack.space/commit/95deee49257b6de422d21cf6e2d1a96fcc774e2e)
+- build(package.json): updated version npm scripts to include git tag [`ac16981`](https://github.com/thkruz/keeptrack.space/commit/ac1698195d65c52771305814372ec1af47c8f257)
+
 #### [v3.4.1](https://github.com/thkruz/keeptrack.space/compare/v3.2.1...v3.4.1)
 
 > 26 June 2021 

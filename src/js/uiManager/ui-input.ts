@@ -1085,9 +1085,8 @@ let uiInput: uiInputInterface = {
               uiManager.bottomIconPress({
                 currentTarget: { id: 'menu-dops' },
               });
-            } else {
-              uiManager.hideSideMenus();
               isDOPMenuOpen = true;
+            } else {
               $('#loading-screen').fadeIn(1000, function () {
                 $('#dops-lat').val(latLon.lat.toFixed(3));
                 $('#dops-lon').val(latLon.lon.toFixed(3));

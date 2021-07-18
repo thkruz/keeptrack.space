@@ -40,6 +40,7 @@ if (typeof process !== 'undefined') {
 } else {
   orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
 }
+orbitManager.orbitWorker = orbitWorker;
 
 var initialized = false;
 

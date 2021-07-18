@@ -5,6 +5,7 @@
 */
 
 import '@app/js/settingsManager/settingsManager.ts';
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { uiInput } from './ui-input';
 
 document.body.innerHTML = global.docBody;
@@ -27,25 +28,30 @@ test('UI Input Validation Test', () => {
   const cameraManager = {
     rotateEarth: () => true,
   };
+  keepTrackApi.programs.cameraManager = cameraManager;
+
   const uiManager = {
     clearRMBSubMenu: () => true,
     updateURL: () => true,
   };
+  keepTrackApi.programs.uiManager = uiManager;
+
   const lineManager = {
     getLineListLen: () => 0,
   };
+  keepTrackApi.programs.lineManager = lineManager;
 
-  uiInput.init(cameraManager, {}, {}, {}, lineManager, {}, {}, {}, {}, uiManager, { gl: {} }, {});
+  uiInput.init();
   window.dispatchEvent(new CustomEvent('scroll'));
   settingsManager.disableWindowScroll = false;
   settingsManager.disableNormalEvents = true;
-  uiInput.init(cameraManager, {}, {}, {}, lineManager, {}, {}, {}, {}, uiManager, { gl: {} }, {});
+  uiInput.init();
   settingsManager.disableUI = true;
-  uiInput.init(cameraManager, {}, {}, {}, lineManager, {}, {}, {}, {}, uiManager, { gl: {} }, {});
+  uiInput.init();
   settingsManager.disableUI = false;
   settingsManager.disableWindowScroll = false;
   settingsManager.disableNormalEvents = false;
-  uiInput.init(cameraManager, {}, {}, {}, lineManager, {}, {}, {}, {}, uiManager, { gl: {} }, {});
+  uiInput.init();
   keyEvt('keydown', { ctrlKey: true });
   keyEvt('keydown', { metaKey: true });
   keyEvt('keydown', {});
@@ -64,7 +70,7 @@ test('UI Input Validation Test', () => {
   mouseEvt('mousedown', { button: 2 });
   mouseEvt('mouseup', { button: 2 });
   cameraManager.isShiftPressed = true;
-  uiInput.init(cameraManager, {}, {}, {}, lineManager, {}, {}, {}, {}, uiManager, { gl: {} }, {});
+  uiInput.init();
   mouseEvt('mousedown', { button: 1 });
   mouseEvt('mouseup', { button: 1 });
   mouseEvt('mousedown', { button: 2 });

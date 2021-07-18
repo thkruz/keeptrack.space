@@ -5,13 +5,14 @@
   jest
 */
 
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { selectSatManager } from '@app/js/plugins/selectSatManager/selectSatManager.js';
 
 document.body.innerHTML = global.docBody;
 
 test(`selectSatManager Unit Testing`, () => {
-  const groupColorScheme = {};
-  const sensorManager = {
+  keepTrackApi.programs.groupColorScheme = {};
+  keepTrackApi.programs.sensorManager = {
     setSensor: jest.fn(),
     selectedSensor: {
       zoom: 1,
@@ -23,9 +24,9 @@ test(`selectSatManager Unit Testing`, () => {
       lon: 1,
     },
   };
-  const cameraManager = {
-    rotateEarth: () => {},
-    fts2default: () => {},
+  keepTrackApi.programs.cameraManager = {
+    rotateEarth: jest.fn(),
+    fts2default: jest.fn(),
     cameraType: {
       current: 1,
       default: 1,
@@ -34,10 +35,10 @@ test(`selectSatManager Unit Testing`, () => {
     },
     lookAtSensor: jest.fn(),
   };
-  const sMM = {
+  keepTrackApi.programs.sMM = {
     hideSideMenus: jest.fn(),
   };
-  const satSet = {
+  keepTrackApi.programs.satSet = {
     getSat: () => ({
       type: 'Sat',
       TLE1: '1111111111111111111111111111111111111111111111111111111111',
@@ -55,18 +56,23 @@ test(`selectSatManager Unit Testing`, () => {
     },
     getSatExtraOnly: () => satSet.getSat(),
   };
-  const timeManager = {
+  keepTrackApi.programs.timeManager = {
     getDayOfYear: () => 172,
     selectedDate: 1,
   };
-  const objectManager = {
+  keepTrackApi.programs.objectManager = {
     rotateEarth: jest.fn(),
     setSelectedSat: jest.fn(),
     extractCountry: () => 'US',
     extractLaunchSite: () => 'ESTR',
     extractLiftVehicle: () => 'Falcon 9',
   };
-  selectSatManager.init(groupColorScheme, sensorManager, satSet, objectManager, sMM, timeManager);
+
+  const cameraManager = keepTrackApi.programs.cameraManager;
+  const satSet = keepTrackApi.programs.satSet;
+  const objectManager = keepTrackApi.programs.objectManager;
+
+  selectSatManager.init();
   selectSatManager.selectSat(-1, cameraManager);
   selectSatManager.selectSat(-1, cameraManager);
   selectSatManager.selectSat(5, cameraManager);
@@ -205,7 +211,7 @@ test(`selectSatManager Unit Testing`, () => {
     constellation: '1',
     maneuver: '1',
     associates: '1',
-    isInSun: () => {},
+    isInSun: jest.fn(),
   });
   selectSatManager.selectSat(5, cameraManager);
 

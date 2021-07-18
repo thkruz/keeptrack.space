@@ -38,7 +38,7 @@ const RAD2DEG = 360 / TAU;
 const MINUTES_PER_DAY = 1440;
 const MILLISECONDS_PER_DAY = 1.15741e-8;
 
-const settingsManager = keepTrackApi.programs.settingsManager;
+let settingsManager;
 
 // Legacy API
 satellite.sgp4 = Ootk.Sgp4.propagate;
@@ -58,6 +58,7 @@ satellite.initLookangles = () => {
   satCruncher = keepTrackApi.programs.satCruncher;
   sensorManager = keepTrackApi.programs.sensorManager;
   groupsManager = keepTrackApi.programs.groupsManager;
+  settingsManager = keepTrackApi.programs.settingsManager;
 };
 
 var _propagate = (propTempOffset, satrec, sensor) => {

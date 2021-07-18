@@ -31,7 +31,7 @@
     "start": "http-server ./dist/ -o index.htm",
     "lint": "eslint ./src/**/*",
     "test": "start-server-and-test http http://localhost:8080 test:noserver",
-    "test:noserver": "cross-env NODE_ENV=development && jest --max-old-space-size=1024 --coverage",
+    "test:noserver": "cross-env NODE_ENV=development && jest --max-old-space-size=1024 --coverage --bail",
     "test:nocov": "jest",
     "cypress": "npx cypress open",
     "version:major": "npm version major && npm run changelog",

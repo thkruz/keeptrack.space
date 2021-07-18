@@ -20,6 +20,7 @@
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
       "cwd": "${workspaceFolder}",
+      "outFiles": ["${workspaceFolder}/js/**/*.js"],
       "runtimeExecutable": "npm",
       "args": [
         "test",

@@ -282,7 +282,12 @@ export const satInfoboxCore = {
         } else {
           now = new Date(keepTrackApi.programs.timeManager.propRealTime + keepTrackApi.programs.timeManager.propOffset);
           const sunTime: any = SunCalc.getTimes(now, keepTrackApi.programs.sensorManager.currentSensor.lat, keepTrackApi.programs.sensorManager.currentSensor.lon);
-          const satInSun = sat.isInSun();
+          
+          let satInSun = -1;
+          if (typeof sat.isInSun !== 'undefined') {
+            satInSun = sat.isInSun();
+          }
+
           // If No Sensor, then Ignore Sun Exclusion
           if (keepTrackApi.programs.sensorManager.currentSensor.lat == null) {
             if (satInSun == 0) $('#sat-sun').html('No Sunlight');

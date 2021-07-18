@@ -9,7 +9,6 @@ import 'jsdom-worker';
 
 import 'jquery-ui-bundle';
 import 'materialize-css';
-import { getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly, satSet } from '@app/js/satSet/satSet.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
@@ -20,6 +19,7 @@ import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 import { photoManager } from '@app/js/photoManager/photoManager.js';
 import { sMM } from '@app/js/uiManager/sideMenuManager.js';
+import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
@@ -88,58 +88,85 @@ const exampleSat = {
 };
 
 describe('Integration Testing', () => {
-  var lineManager, groupsManager, cameraManager, gl, dotsManager;
+  const keepTrackApi = window.keepTrackApi;
+  keepTrackApi.programs.ColorScheme = ColorScheme;
+  keepTrackApi.programs.drawManager = drawManager;
+  keepTrackApi.programs.objectManager = objectManager;
+  keepTrackApi.programs.orbitManager = orbitManager;
+  keepTrackApi.programs.photoManager = photoManager;
+  keepTrackApi.programs.satSet = satSet;
+  keepTrackApi.programs.satellite = satellite;
+  keepTrackApi.programs.searchBox = searchBox;
+  keepTrackApi.programs.sensorManager = sensorManager;
+  keepTrackApi.programs.settingsManager = settingsManager;
+  keepTrackApi.programs.starManager = starManager;
+  keepTrackApi.programs.sMM = sMM;
+  keepTrackApi.programs.timeManager = timeManager;
+  keepTrackApi.programs.uiManager = uiManager;
+  keepTrackApi.programs.uiInput = uiInput;
+
+  let lineManager, groupsManager, cameraManager, satCruncher, dotsManager;
+
+  // Make testing go faster
+  satellite.lookanglesLength = 0.5;
 
   test('Setup Test Environment', async () => {
     await timeManager.init();
     settingsManager.loadStr('dots');
     uiManager.mobileManager.init();
     cameraManager = new Camera();
+    keepTrackApi.programs.cameraManager = cameraManager;
     // We need to know if we are on a small screen before starting webgl
-    gl = await drawManager.glInit();
-
+    await drawManager.glInit();
     // NOTE: Jest fails with webgl2 so we use webgl1 during testing
     // This means we need to mock some of the webgl2 code
-    gl = global.mocks.glMock;
-
+    keepTrackApi.programs.drawManager.gl = global.mocks.glMock;
     window.addEventListener('resize', drawManager.resizeCanvas);
-    drawManager.loadScene(gl);
+
+    drawManager.loadScene();
+
     dotsManager = await drawManager.createDotsManager();
-    satSet.init(gl, dotsManager, cameraManager);
-    objectManager.init(sensorManager);
-    await ColorScheme.init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager);
-    drawManager.selectSatManager.init(ColorScheme.group, sensorManager, satSet, objectManager, sMM, timeManager);
+    keepTrackApi.programs.dotsManager = dotsManager;
+
+    satSet.init();
+    objectManager.init();
+    await ColorScheme.init();
+    drawManager.selectSatManager.init();
+
     await satSet.loadCatalog(); // Needs Object Manager and gl first
-    const satCruncher = satSet.satCruncher;
+    satCruncher = satSet.satCruncher;
+    keepTrackApi.programs.satCruncher = satCruncher;
 
     dotsManager.setupPickingBuffer(satSet.satData);
     satSet.setColorScheme(ColorScheme.default, true);
 
-    groupsManager = new GroupFactory(satSet, ColorScheme, settingsManager);
-    await orbitManager.init(gl, cameraManager, groupsManager);
-    searchBox.init(satSet, groupsManager, orbitManager, dotsManager);
-    lineManager = new LineFactory(gl, orbitManager.shader, getIdFromSensorName, getIdFromStarName, getSat, getSatPosOnly);
-    starManager.init(lineManager, getIdFromStarName);
-    uiManager.init(cameraManager, lineManager, starManager, groupsManager, satSet, orbitManager, groupsManager, ColorScheme);
-    await satellite.initLookangles(satSet, satCruncher, sensorManager, groupsManager);
+    groupsManager = new GroupFactory();
+    keepTrackApi.programs.groupsManager = groupsManager;
+
+    await orbitManager.init();
+    searchBox.init();
+
+    lineManager = new LineFactory();
+    keepTrackApi.programs.lineManager = lineManager;
+
+    starManager.init();
+    uiManager.init();
+    await satellite.initLookangles();
     dotsManager.updateSizeBuffer(satSet.satData);
     // await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
     satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
     objectManager.satLinkManager.idToSatnum(satSet);
 
-    uiInput.init(cameraManager, objectManager, satellite, satSet, lineManager, sensorManager, starManager, ColorScheme, satCruncher, uiManager, drawManager, dotsManager);
+    uiInput.init();
 
-    drawManager.init(groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager);
+    drawManager.init();
 
     // Now that everything is loaded, start rendering to thg canvas
     drawManager.drawLoop();
 
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
     uiManager.postStart();
-    photoManager.init(cameraManager, satSet, timeManager, uiManager, drawManager.selectSatManager);
-
-    // Make testing go faster
-    satellite.lookanglesLength = 0.5;
+    photoManager.init();
   });
 
   test('Missile Manager Functional', () => {

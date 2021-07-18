@@ -102,9 +102,9 @@ const _initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => {
       locationHTML = `${truncateString(launchList[i].location, 25)}`;
     } else {
       if (window.location.protocol === 'http:') {
-        locationHTML = `<a class='iframe' href="http://${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
+        locationHTML = `<a class='iframe' href="${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
       } else {
-        locationHTML = `<a class='iframe' href="https://${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
+        locationHTML = `<a class='iframe' href="${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
       }
     }
 
@@ -117,9 +117,9 @@ const _initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => {
       agencyHTML = `${truncateString(launchList[i].agency, 30)}`;
     } else {
       if (window.location.protocol === 'http:') {
-        agencyHTML = `<a class='iframe' href="http://${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
+        agencyHTML = `<a class='iframe' href="${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
       } else {
-        agencyHTML = `<a class='iframe' href="https://${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
+        agencyHTML = `<a class='iframe' href="${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
       }
     }
 
@@ -132,7 +132,7 @@ const _initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => {
   }
 };
 
-const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void; showTable: () => void } = {
+const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void; showTable: () => void; processData: (resp: { results: Array<any> }) => void } = {
   launchList: [],
   init: () => {
     if ((<any>settingsManager).offline) {
@@ -143,59 +143,9 @@ const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void
     // Won't Work Offline
     if (window.location.hostname === 'localhost') return;
 
-    $.get('https://launchlibrary.net/1.4/launch/next/20').done((resp: {launches: Array<any>}) => {
-      for (let i = 0; i < resp.launches.length; i++) {
-        /**
-         * Info from launchlibrary.net
-         */
-        const launchLibResult = resp.launches[i];
-
-        let launchInfo: LaunchInfoObject = {
-          name: '',
-          updated: new Date(launchLibResult.changed),
-          windowStart: new Date(launchLibResult.wsstamp * 1000), // sec to ms
-          windowEnd: new Date(launchLibResult.westamp * 1000), //sec to ms
-          location: '',
-          locationURL: '',
-          agency: '',
-          agencyURL: '',
-          country: '',
-          mission: '',
-          missionName: '',
-          missionType: '',
-          missionURL: '',
-          rocket: '',
-          rocketConfig: '',
-          rocketFamily: '',
-          rocketURL: '',
-        };
-
-        launchInfo.name = typeof launchLibResult.name != 'undefined' ? launchLibResult.name : 'Unknown';
-        launchInfo.location = launchLibResult.location.name.split(',', 1);
-        launchInfo.location = launchInfo.location[0];
-        launchInfo.locationURL = launchLibResult.location.pads[0].wikiURL;
-        if (typeof launchLibResult.lsp != 'undefined') {
-          launchInfo.agency = typeof launchLibResult.lsp.name != 'undefined' ? launchLibResult.lsp.name : 'Unknown';
-          launchInfo.country = typeof launchLibResult.lsp.countryCode != 'undefined' ? launchLibResult.lsp.countryCode : 'Unknown';
-          launchInfo.agencyURL = typeof launchLibResult.lsp.wikiURL != 'undefined' ? launchLibResult.lsp.wikiURL : 'Unknown';
-        } else {
-          launchInfo.agency = 'Unknown';
-          launchInfo.country = 'UNK';
-          launchInfo.agencyURL = '';
-        }
-        if (typeof launchLibResult.missions[0] != 'undefined') {
-          launchInfo.mission = launchLibResult.missions[0].description;
-          launchInfo.missionName = launchLibResult.missions[0].name;
-          launchInfo.missionType = launchLibResult.missions[0].typeName;
-          launchInfo.missionURL = launchLibResult.missions[0].wikiURL;
-        }
-        launchInfo.rocket = launchLibResult.rocket.name;
-        launchInfo.rocketConfig = launchLibResult.rocket.configuration;
-        launchInfo.rocketFamily = launchLibResult.rocket.familyname;
-        launchInfo.rocketURL = launchLibResult.rocket.wikiURL;
-        nextLaunchManager.launchList[i] = launchInfo;
-      }
-    });
+    $.get('https://ll.thespacedevs.com/2.0.0/launch/upcoming/?format=json&limit=20&mode=detailed')
+      .done((resp) => nextLaunchManager.processData(resp))
+      .fail(() => console.warn(`https://ll.thespacedevs.com/2.0.0/ is Unavailable!`));
   },
   showTable: () => {
     const tbl = _getTableElement();
@@ -215,6 +165,66 @@ const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void
       } catch (error) {
         console.warn(error);
       }
+    }
+  },
+  processData: (resp: { results: Array<any> }) => {
+    for (let i = 0; i < resp.results.length; i++) {
+      /**
+       * Info from launchlibrary.net
+       */
+      const launchLibResult = resp.results[i];
+
+      let launchInfo: LaunchInfoObject = {
+        name: '',
+        updated: null,
+        windowStart: new Date(launchLibResult.window_start),
+        windowEnd: new Date(launchLibResult.window_end),
+        location: '',
+        locationURL: '',
+        agency: '',
+        agencyURL: '',
+        country: '',
+        mission: '',
+        missionName: '',
+        missionType: '',
+        missionURL: '',
+        rocket: '',
+        rocketConfig: '',
+        rocketFamily: '',
+        rocketURL: '',
+      };
+
+      if (typeof launchLibResult.last_updated !== 'undefined') launchInfo.updated = new Date(launchLibResult.last_updated);
+      launchInfo.name = typeof launchLibResult.name != 'undefined' ? launchLibResult.name : 'Unknown';
+      launchInfo.location = launchLibResult.pad.location.name.split(',', 1);
+      launchInfo.location = launchInfo.location[0];
+      launchInfo.locationURL = launchLibResult.pad.wiki_url;
+      if (typeof launchLibResult.launch_service_provider != 'undefined') {
+        launchInfo.agency = typeof launchLibResult.launch_service_provider.name != 'undefined' ? launchLibResult.launch_service_provider.name : 'Unknown';
+        launchInfo.country = typeof launchLibResult.launch_service_provider.country_code != 'undefined' ? launchLibResult.launch_service_provider.country_code : 'Unknown';
+        if (typeof launchLibResult.launch_service_provider.wiki_url != 'undefined') {
+          launchInfo.agencyURL = launchLibResult.launch_service_provider.wiki_url;
+        }
+      } else {
+        launchInfo.agency = 'Unknown';
+        launchInfo.country = 'UNK';
+        launchInfo.agencyURL = '';
+      }
+      if (launchLibResult.mission != null) {
+        launchInfo.mission = launchLibResult.mission.description;
+        launchInfo.missionName = launchLibResult.mission.name;
+        launchInfo.missionType = launchLibResult.mission.type;
+        if (typeof launchLibResult.mission.wiki_url != 'undefined') {
+          launchInfo.missionURL = launchLibResult.mission.wiki_url;
+        }
+      }
+      launchInfo.rocket = launchLibResult.rocket.configuration.full_name;
+      launchInfo.rocketConfig = launchLibResult.rocket.configuration.name;
+      launchInfo.rocketFamily = launchLibResult.rocket.configuration.family;
+      if (typeof launchLibResult.rocket.configuration.wiki_url != 'undefined') {
+        launchInfo.rocketURL = launchLibResult.rocket.configuration.wiki_url;
+      }
+      nextLaunchManager.launchList[i] = launchInfo;
     }
   },
 };

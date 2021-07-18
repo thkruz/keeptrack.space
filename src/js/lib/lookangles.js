@@ -2065,7 +2065,7 @@ satellite.getDOPs = (lat, lon, alt, propTime) => {
       lookAngles = satellite.ecfToLookAngles({ lon: lon, lat: lat, alt: alt }, satellite.eciToEcf(sat.position, gmst));
       sat.az = lookAngles.az * RAD2DEG;
       sat.el = lookAngles.el * RAD2DEG;
-      if (sat.el > settingsManager.gpselMask) {
+      if (sat.el > settingsManager.gpsElevationMask) {
         inViewList.push(sat);
       }
     }

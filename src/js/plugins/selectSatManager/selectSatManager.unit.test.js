@@ -35,9 +35,6 @@ test(`selectSatManager Unit Testing`, () => {
     },
     lookAtSensor: jest.fn(),
   };
-  keepTrackApi.programs.sMM = {
-    hideSideMenus: jest.fn(),
-  };
   keepTrackApi.programs.satSet = {
     getSat: () => ({
       type: 'Sat',

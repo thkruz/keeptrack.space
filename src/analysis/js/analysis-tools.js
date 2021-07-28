@@ -18,8 +18,8 @@ import '@app/js/lib/external/Chart.js';
 import * as $ from 'jquery';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { satellite } from '@app/js/lib/lookangles.js';
-import { sensorList } from '@app/js/sensorManager/sensorList.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import { sensorList } from '@app/js/plugins/sensor/sensorList.js';
+import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 var requestInfo = {};
 var isDrawApogee = false;

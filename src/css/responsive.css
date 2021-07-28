@@ -130,14 +130,14 @@
     position: relative;
     background: #1f3347;
     color: white;
-    top: 25px;
+    top: calc(var(--top-menu-height) + var(--class-banner));
     bottom: 100px;
     width: 100%;
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
     z-index: 10;
-    padding: 0px 5px 275px 0px;
+    padding: 0px 5px calc(var(--bottom-menu-height) + 15px) 0px;
     border-width: 0px 5px 0px 0px;
     border-color: #172635;
     border-style: solid;
@@ -166,24 +166,23 @@
     display: inline;
   }
   #sat-infobox {
-    display: none;
     background: #1f3347;
     cursor: default;
     position: absolute;
-    top: 27%;
+    top: calc(27% - 5px);
     bottom: 0px;
     margin-top: 25px;
     padding: 0 10px 0px 10px;
     right: 0px;
     width: 350px;
-    border-width: 5px 0px 0px 5px;
+    border-width: 5px;
     border-color: #172635;
     border-style: solid;
-    overflow: auto;
+    overflow: hidden auto;
   }
   #sat-infobox:after {
     content: '';
-    height: 120px;
+    height: calc(var(--bottom-menu-height) + 15px);
     display: block;
   }
   /* .sat-infobox-fullsize {} */
@@ -193,6 +192,7 @@
     height: 20px;
     text-overflow: ellipsis;
     overflow: hidden;
+    text-align: center;
   }
   #footer-toggle-wrapper {
     width: 100%;
@@ -201,8 +201,8 @@
     position: relative;
   }
   .footer-slide-down {    
-    bottom: -115px !important;
-    height: 120px !important;
+    bottom: calc(-1 * var(--bottom-menu-height) + 5px) !important;
+    height: var(--bottom-menu-height) !important;
     top: auto !important;
   }
   .footer-slide-trans {
@@ -239,11 +239,7 @@
   #mobile-warning {
     display: none;
   }
-  #version-info {    
-    display: none;
-    margin-top: -70px !important;
-    margin-right: 25px !important;
-  }
+
   .search-slide-down {
     transition: 1s;
     margin-right: 0px;
@@ -271,7 +267,7 @@
     position: relative;
     background: #1f3347;
     color: white;
-    top: 50px;
+    top: calc(var(--top-menu-height) * 2 + var(--class-banner));
     bottom: 100px;
     width: 100%;
     height: 100%;
@@ -403,7 +399,6 @@
   #menu-twitter,
   #menu-color-scheme,
   #social,
-  #version-info,
   #fastCompSettings {
     display: none;
   }
@@ -650,7 +645,7 @@
     background: #1f3347;
     color: white;
     width: 100%;
-    top: 50px;
+    top: calc(var(--top-menu-height) * 2 + var(--class-banner));
     bottom: 0px;
     overflow: auto;
     z-index: 10;

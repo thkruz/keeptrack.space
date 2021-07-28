@@ -19,18 +19,17 @@ import { drawManager } from '@app/js/drawManager/drawManager.js';
 import { meshManager } from '@app/js/drawManager/meshManager.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
-import { photoManager } from '@app/js/photoManager/photoManager.js';
-import { sMM } from '@app/js/uiManager/sideMenuManager.js';
+import { photoManager } from '@app/js/plugins/photoManager/photoManager.js';
 import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 import { starManager } from '@app/js/starManager/starManager.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 // eslint-disable-next-line sort-imports
-import { omManager } from '../src/js/uiManager/omManager';
+import { omManager } from '../src/js/plugins/initialOrbit/omManager';
 
 // eslint-disable-next-line sort-imports
 import { setup } from './setup.js';
@@ -103,7 +102,6 @@ describe('Integration Testing 3', () => {
   keepTrackApi.programs.sensorManager = sensorManager;
   keepTrackApi.programs.settingsManager = settingsManager;
   keepTrackApi.programs.starManager = starManager;
-  keepTrackApi.programs.sMM = sMM;
   keepTrackApi.programs.timeManager = timeManager;
   keepTrackApi.programs.uiManager = uiManager;
   keepTrackApi.programs.uiInput = uiInput;

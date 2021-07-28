@@ -2,7 +2,6 @@ import * as glm from '../lib/external/gl-matrix.js';
 import $ from 'jquery';
 import { RADIUS_OF_EARTH } from '../lib/constants.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { sMM } from '../uiManager/sideMenuManager.js';
 import { settingsManager as settingsManagerAny } from '@app/js/settingsManager/settingsManager';
 const settingsManager: any = settingsManagerAny;
 
@@ -116,7 +115,7 @@ let uiInput: uiInputInterface = {
     }
   },
   init: (): void => {
-    const cameraManager = keepTrackApi.programs.cameraManager;    
+    const cameraManager = keepTrackApi.programs.cameraManager;
     const objectManager = keepTrackApi.programs.objectManager;
     const satellite = keepTrackApi.programs.satellite;
     const satSet = keepTrackApi.programs.satSet;
@@ -129,28 +128,29 @@ let uiInput: uiInputInterface = {
     const drawManager = keepTrackApi.programs.drawManager;
     const gl = keepTrackApi.programs.drawManager.gl;
 
-    $('#rmb-wrapper').append(`
+    $('#rmb-wrapper').append(keepTrackApi.html`    
       <div id="right-btn-menu" class="right-btn-menu">
-        <ul class='dropdown-contents'>
-          <li class="rmb-menu-item" id="save-rmb"><a href="#">Save Image &#x27A4;</a></li>
+        <ul id="right-btn-menu-ul" class='dropdown-contents'>          
           <li class="rmb-menu-item" id="view-rmb"><a href="#">View &#x27A4;</a></li>
           <li class="rmb-menu-item" id="edit-rmb"><a href="#">Edit &#x27A4;</a></li>
           <li class="rmb-menu-item" id="draw-rmb"><a href="#">Draw &#x27A4;</a></li>
           <li class="rmb-menu-item" id="create-rmb"><a href="#">Create &#x27A4;</a></li>
-          <li class="rmb-menu-item" id="earth-rmb"><a href="#">Earth &#x27A4;</a></li>
-          <li class="rmb-menu-item" id="colors-rmb"><a href="#">Colors &#x27A4;</a></li>
-          <li id="reset-camera-rmb"><a href="#">Reset Camera</a></li>
-          <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
-          <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
+          <li class="rmb-menu-item" id="earth-rmb"><a href="#">Earth &#x27A4;</a></li>          
         </ul>
-      </div>
-      <div id="save-rmb-menu" class="right-btn-menu">
-        <ul class='dropdown-contents'>
-          <li id="save-hd-rmb"><a href="#">HD (1920 x 1080)</a></li>
-          <li id="save-4k-rmb"><a href="#">4K (3840 x 2160)</a></li>
-          <li id="save-8k-rmb"><a href="#">8K (7680 x 4320)</a></li>
-        </ul>
-      </div>
+      </div> 
+    `);
+
+    // Append any other menus before putting the reset/clear options
+    keepTrackApi.methods.rightBtnMenuAdd();
+
+    // Now add the reset/clear options
+    $('#right-btn-menu-ul').append(keepTrackApi.html`
+      <li id="reset-camera-rmb"><a href="#">Reset Camera</a></li>
+      <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
+      <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
+    `);
+
+    $('#rmb-wrapper').append(keepTrackApi.html`    
       <div id="view-rmb-menu" class="right-btn-menu">
         <ul class='dropdown-contents'>
           <li id="view-info-rmb"><a href="#">Earth Info</a></li>
@@ -180,16 +180,7 @@ let uiInput: uiInputInterface = {
           <li id="create-observer-rmb"><a href="#">Create Observer Here</a></li>
           <li id="create-sensor-rmb"><a href="#">Create Sensor Here</a></li>
         </ul>
-      </div>
-      <div id="colors-rmb-menu" class="right-btn-menu">
-        <ul class='dropdown-contents'>
-          <li id="colors-default-rmb"><a href="#">Object Types</a></li>
-          <li id="colors-sunlight-rmb"><a href="#">Sunlight Status</a></li>
-          <li id="colors-country-rmb"><a href="#">Country</a></li>
-          <li id="colors-velocity-rmb"><a href="#">Velocity</a></li>
-          <li id="colors-ageOfElset-rmb"><a href="#">Age of Elset</a></li>
-        </ul>
-      </div>
+      </div>      
       <div id="earth-rmb-menu" class="right-btn-menu">
         <ul class='dropdown-contents'>
           <li id="earth-blue-rmb"><a href="#">Blue Map</a></li>
@@ -1043,16 +1034,7 @@ let uiInput: uiInputInterface = {
         if (e.target.tagName == 'UL') {
           targetId = e.target.firstChild.id;
         }
-        switch (targetId) {
-          case 'save-hd-rmb':
-            uiManager.saveHiResPhoto('hd');
-            break;
-          case 'save-4k-rmb':
-            uiManager.saveHiResPhoto('4k');
-            break;
-          case 'save-8k-rmb':
-            uiManager.saveHiResPhoto('8k');
-            break;
+        switch (targetId) {          
           case 'view-info-rmb':
             M.toast({
               html: 'Lat: ' + latLon.lat.toFixed(3) + '<br/>Lon: ' + latLon.lon.toFixed(3),
@@ -1102,19 +1084,11 @@ let uiInput: uiInputInterface = {
                 $('#dops-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
               });
             }
-            break;
-          case 'edit-sat-rmb':
-            objectManager.setSelectedSat(clickedSat);
-            if (!sMM.isEditSatMenuOpen) {
-              uiManager.bottomIconPress({
-                currentTarget: { id: 'menu-editSat' },
-              });
-            }
-            break;
+            break;          
           case 'create-sensor-rmb':
             $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             $('#menu-customSensor').addClass('bmenu-item-selected');
-            (<any>sMM).isCustomSensorMenuOpen = true;
+            keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = true;
             if ($('#cs-telescope').prop('checked')) {
               $('#cs-telescope').trigger('click');
             }
@@ -1175,7 +1149,7 @@ let uiInput: uiInputInterface = {
           case 'create-observer-rmb':
             $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             $('#menu-customSensor').addClass('bmenu-item-selected');
-            sMM.setCustomSensorMenuOpen = true;
+            keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = true;
             if (!$('#cs-telescope').prop('checked')) {
               $('#cs-telescope').trigger('click');
             }
@@ -1339,6 +1313,9 @@ let uiInput: uiInputInterface = {
 
               objectManager.setSelectedSat(-1);
             })();
+            break;
+          default:
+            keepTrackApi.methods.rmbMenuActions(targetId, clickedSat);
             break;
         }
         rightBtnMenuDOM.hide();

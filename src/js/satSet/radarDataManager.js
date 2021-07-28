@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import { DEG2RAD } from '@app/js/lib/constants.js';
 import { db } from '@app/js/settingsManager/settingsManager.ts';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 var satellite, sensorManager, satSet, satCruncher;
 let radarDataManager = {};

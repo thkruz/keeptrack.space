@@ -28,7 +28,7 @@ import { saveCsv, saveVariable, stringPad } from './helpers.ts';
 import $ from 'jquery';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { keepTrackApi } from '@app/js/api/externalApi.ts';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.ts';
 let satellite = {};
 
 // Constants
@@ -811,9 +811,12 @@ satellite.getlookanglesMultiSite = (sat) => {
 // };
 
 satellite.findCloseObjects = () => {
+  const searchRadius = 50; // km
+
   let csoList = [];
   let satList = [];
 
+  // Short internal function to find the satellites position
   const _getSatPos = (propTempOffset, satrec) => {
     let now = new Date(); // Make a time variable
     now.setTime(Number(Date.now()) + propTempOffset); // Set the time variable to the time in the future
@@ -832,31 +835,46 @@ satellite.findCloseObjects = () => {
     return satellite.sgp4(satrec, m);
   };
 
+  // Loop through all the satellites
   for (let i = 0; i < satSet.numSats; i++) {
-    let sat = satSet.getSat(i);
+    // Get the satellite
+    const sat = satSet.getSat(i);
+    // Avoid unnecessary errors
     if (typeof sat.TLE1 == 'undefined') continue;
+    // Only look at satellites in LEO
     if (sat.apogee > 5556) continue;
-    sat.satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);
-    let pos = _getSatPos(0, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval);
-    sat.position = pos.position;
+    // Find where the satellite is right now
+    sat.position = _getSatPos(0, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval).position;
+    // If it fails, skip it
     if (typeof sat.position == 'undefined') continue;
+    // Add the satellite to the list
     satList.push(sat);
   }
 
+  // Loop through all the satellites with valid positions
   for (let i = 0; i < satList.length; i++) {
     let sat1 = satList[i];
     let pos1 = sat1.position;
-    let posXmin = pos1.x - 20;
-    let posXmax = pos1.x + 20;
-    let posYmin = pos1.y - 20;
-    let posYmax = pos1.y + 20;
-    let posZmin = pos1.z - 20;
-    let posZmax = pos1.z + 20;
+
+    // Calculate the area around the satellite
+    let posXmin = pos1.x - searchRadius;
+    let posXmax = pos1.x + searchRadius;
+    let posYmin = pos1.y - searchRadius;
+    let posYmax = pos1.y + searchRadius;
+    let posZmin = pos1.z - searchRadius;
+    let posZmax = pos1.z + searchRadius;
+
+    // Loop through the list again
     for (let j = 0; j < satList.length; j++) {
+      // Get the second satellite
       let sat2 = satList[j];
+      // Skip the same satellite
       if (sat1 == sat2) continue;
+      // Get the second satellite's position
       let pos2 = sat2.position;
+      // Check to see if the second satellite is in the search area
       if (pos2.x < posXmax && pos2.x > posXmin && pos2.y < posYmax && pos2.y > posYmin && pos2.z < posZmax && pos2.z > posZmin) {
+        // Add the second satellite to the list if it is close
         csoList.push({ sat1: sat1, sat2: sat2 });
       }
     }
@@ -866,38 +884,51 @@ satellite.findCloseObjects = () => {
   csoList = []; // Clear CSO List
   satList = []; // Clear CSO List
 
+  // Loop through the possible CSOs
   for (let i = 0; i < csoListUnique.length; i++) {
+    // Calculate the first CSO's position 30 minutes later
     let sat = csoListUnique[i].sat1;
     let pos = _getSatPos(1000 * 60 * 30, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval);
     csoListUnique[i].sat1.position = pos.position;
 
+    // Calculate the second CSO's position 30 minutes later
     sat = csoListUnique[i].sat2;
     pos = _getSatPos(1000 * 60 * 30, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval);
     sat.position = pos.position;
     csoListUnique[i].sat2.position = pos.position;
   }
 
-  satList = Array.from(new Set(satList)); // Remove duplicates
+  // Remove duplicates
+  satList = Array.from(new Set(satList));
 
+  // Loop through the CSOs
   for (let i = 0; i < csoListUnique.length; i++) {
+    // Check the first CSO
     let sat1 = csoListUnique[i].sat1;
     let pos1 = sat1.position;
     if (typeof pos1 == 'undefined') continue;
-    let posXmin = pos1.x - 20;
-    let posXmax = pos1.x + 20;
-    let posYmin = pos1.y - 20;
-    let posYmax = pos1.y + 20;
-    let posZmin = pos1.z - 20;
-    let posZmax = pos1.z + 20;
+
+    // Calculate the area around the CSO
+    let posXmin = pos1.x - searchRadius;
+    let posXmax = pos1.x + searchRadius;
+    let posYmin = pos1.y - searchRadius;
+    let posYmax = pos1.y + searchRadius;
+    let posZmin = pos1.z - searchRadius;
+    let posZmax = pos1.z + searchRadius;
+
+    // Get the second CSO object
     let sat2 = csoListUnique[i].sat2;
     let pos2 = sat2.position;
     if (typeof pos2 == 'undefined') continue;
+
+    // If it is still in the search area, add it to the list
     if (pos2.x < posXmax && pos2.x > posXmin && pos2.y < posYmax && pos2.y > posYmin && pos2.z < posZmax && pos2.z > posZmin) {
       csoList.push(sat1.SCC_NUM);
       csoList.push(sat2.SCC_NUM);
     }
   }
 
+  // Generate the search string
   csoListUnique = Array.from(new Set(csoList));
   let searchStr = '';
   for (let i = 0; i < csoListUnique.length; i++) {

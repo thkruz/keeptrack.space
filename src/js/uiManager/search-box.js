@@ -85,14 +85,15 @@ searchBox.doSearch = function (searchString, isPreventDropDown, satSet) {
 
   // Uppercase to make this search not case sensitive
   searchString = searchString.toUpperCase();
-  var searchList = searchString.split(',');
+  // Split string into array using comma or space as delimiter
+  let searchList = searchString.split(/[,\s]/u);
+  // Update last search with the most recent search results
   settingsManager.lastSearch = searchList;
 
-  var results = [];
-
-  let satData = satSet.getSatData();
-
-  for (var i = 0; i < satSet.missileSats; i++) {
+  // Initialize search results
+  const results = [];
+  const satData = satSet.getSatData();
+  for (let i = 0; i < satSet.missileSats; i++) {
     // Stop once you get to the markers to save time
     var sat = satData[i];
     if (typeof sat == 'undefined') {

@@ -214,6 +214,7 @@ onmessage = function (m) {
             satData[i].TLE1,
             satData[i].TLE2
           );
+          extra.lowAlt = satrec.isimp;
           extra.inclination = satrec.inclo; // rads
           extra.eccentricity = satrec.ecco;
           extra.raan = satrec.nodeo; // rads
@@ -222,6 +223,7 @@ onmessage = function (m) {
           extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, 2 / 3);
           extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));
           extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - RADIUS_OF_EARTH;
+          satrec.apogee = extra.apogee;
           extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - RADIUS_OF_EARTH;
           extra.period = 1440.0 / extra.meanMotion;
 
@@ -438,6 +440,38 @@ var propagateCruncher = () => {
         satVel[i * 3] = pv.velocity.x;
         satVel[i * 3 + 1] = pv.velocity.y;
         satVel[i * 3 + 2] = pv.velocity.z;
+
+        // Make sure that objects with an imprecise orbit or an old elset
+        // are not failing to propagate
+        if (sat.isimp || m / 1440 > 30) {
+          const a = 6378.137;
+          const b = 6356.7523142;
+          const R = Math.sqrt(pv.position.x * pv.position.x + pv.position.y * pv.position.y);
+          const f = (a - b) / a;
+          const e2 = 2 * f - f * f;
+
+          let lon = Math.atan2(pv.position.y, pv.position.x) - gmst;
+          while (lon < -PI) {
+            lon += TAU;
+          }
+          while (lon > PI) {
+            lon -= TAU;
+          }
+
+          const kmax = 20;
+          let k = 0;
+          let lat = Math.atan2(pv.position.z, Math.sqrt(pv.position.x * pv.position.x + pv.position.y * pv.position.y));
+          let C;
+          while (k < kmax) {
+            C = 1 / Math.sqrt(1 - e2 * (Math.sin(lat) * Math.sin(lat)));
+            lat = Math.atan2(pv.position.z + a * C * e2 * Math.sin(lat), R);
+            k += 1;
+          }
+          const alt = R / Math.cos(lat) - a * C;
+          if (alt > sat.apogee + 1000) {
+            throw new Error('Impossible orbit');
+          }
+        }
 
         // Skip Calculating Lookangles if No Sensor is Selected
         if (!isSensorChecked) {
@@ -1054,7 +1088,11 @@ var propagateCruncher = () => {
           satVel[i * 3 + 2] = 0;
           continue;
         }
-        for (snum = 0; snum < satelliteSelected.length; snum++) {
+        for (snum = 0; snum < satelliteSelected.length + 1; snum++) {
+          if (snum === satelliteSelected.length) {
+            sensorMarkerArray.push(i);
+            break;
+          }
           if (satelliteSelected[snum] !== -1) {
             if (!isShowSatOverfly) continue;
             // Find the ECI position of the Selected Satellite

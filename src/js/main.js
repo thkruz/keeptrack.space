@@ -28,48 +28,66 @@
 import '@app/js/api/externalApi';
 import 'jquery-ui-bundle';
 import 'materialize-css';
+import { LineFactory, sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
-import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager.js';
+import { adviceManager } from './uiManager/ui-advice';
 import { drawManager } from '@app/js/drawManager/drawManager.js';
 import { jQAlt } from '@app/js/lib/jqalt.js';
-import { missileManager } from '@app/js/missileManager/missileManager.js';
+import { mapManager } from '@app/js/plugins/stereoMap/stereoMap';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
-import { photoManager } from '@app/js/photoManager/photoManager.js';
 // import { radarDataManager } from'@app/js/satSet/radarDataManager.js';
-import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
-import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
+import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 import { starManager } from '@app/js/starManager/starManager.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 const keepTrackApi = window.keepTrackApi;
-keepTrackApi.programs.ColorScheme = ColorScheme;
-keepTrackApi.programs.drawManager = drawManager;
-keepTrackApi.programs.missileManager = missileManager;
-keepTrackApi.programs.objectManager = objectManager;
-keepTrackApi.programs.orbitManager = orbitManager;
-keepTrackApi.programs.photoManager = photoManager;
-keepTrackApi.programs.satSet = satSet;
-keepTrackApi.programs.satellite = satellite;
-keepTrackApi.programs.searchBox = searchBox;
-keepTrackApi.programs.sensorManager = sensorManager;
-keepTrackApi.programs.settingsManager = settingsManager;
-keepTrackApi.programs.starManager = starManager;
-keepTrackApi.programs.sMM = sMM;
-keepTrackApi.programs.timeManager = timeManager;
-keepTrackApi.programs.uiManager = uiManager;
-keepTrackApi.programs.uiInput = uiInput;
+keepTrackApi.programs = {
+  adviceManager: adviceManager,
+  cameraManager: null,
+  ColorScheme: ColorScheme,
+  drawManager: drawManager,
+  mapManager: mapManager,
+  objectManager: objectManager,
+  orbitManager: orbitManager,
+  satSet: satSet,
+  satellite: satellite,
+  sceneManager: sceneManager,
+  searchBox: searchBox,
+  sensorManager: sensorManager,
+  settingsManager: settingsManager,
+  starManager: starManager,
+  timeManager: timeManager,
+  uiManager: uiManager,
+  uiInput: uiInput,
+};
+
+(function redirectHttpToHttps() {
+  // This is necessary for some of the geolocation based functions
+  // but it only runs on the main website
+  if (window.location.protocol === 'http:' && (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space')) {
+    var httpURL = window.location.hostname + window.location.pathname + window.location.search;
+    var httpsURL = 'https://' + httpURL;
+    window.location = httpsURL;
+  }
+})();
 
 const initalizeKeepTrack = async () => {
   try {
-    await timeManager.init();
+    // Load all the plugins now that we have the API initialized
+    await import('@app/js/plugins/core').then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins));
+    await import('@app/js/plugins/plugins').then((mod) => mod.loadExtraPlugins());
+
+    // Start initializing the rest of the website
+    timeManager.init();
+    uiManager.onReady();
     settingsManager.loadStr('dots');
     uiManager.mobileManager.init();
     const cameraManager = new Camera();
@@ -85,7 +103,7 @@ const initalizeKeepTrack = async () => {
 
     satSet.init();
     objectManager.init();
-    await ColorScheme.init();
+    ColorScheme.init();
     drawManager.selectSatManager.init();
 
     await satSet.loadCatalog(); // Needs Object Manager and gl first
@@ -98,7 +116,7 @@ const initalizeKeepTrack = async () => {
     const groupsManager = new GroupFactory();
     keepTrackApi.programs.groupsManager = groupsManager;
 
-    await orbitManager.init();
+    orbitManager.init();
     searchBox.init();
 
     const lineManager = new LineFactory();
@@ -106,7 +124,7 @@ const initalizeKeepTrack = async () => {
 
     starManager.init();
     uiManager.init();
-    await satellite.initLookangles();
+    satellite.initLookangles();
     dotsManager.updateSizeBuffer(satSet.satData);
     // await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
     satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
@@ -121,7 +139,9 @@ const initalizeKeepTrack = async () => {
 
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
     uiManager.postStart();
-    photoManager.init();
+
+    // Update any CSS now that we know what is loaded
+    keepTrackApi.methods.uiManagerFinal();
   } catch (error) {
     /* istanbul ignore next */
     console.warn(error);

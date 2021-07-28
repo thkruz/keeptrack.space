@@ -1,19 +1,12 @@
 import { DEG2RAD, cKmPerMs } from '@app/js/lib/constants.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
-export const updateSelectBoxCore = {
+const updateSelectBoxCore = {
   sensorInfo: {
     isLoaded: false,
     cbName: 'sensorInfo',
     cb: (sat: any) => {
-      const satellite = keepTrackApi.programs.satellite;
-      const missileManager = keepTrackApi.programs.missileManager;
-      const timeManager = keepTrackApi.programs.timeManager;
-      const uiManager = keepTrackApi.programs.uiManager;
-      const sMM = keepTrackApi.programs.sMM;
-      const settingsManager = keepTrackApi.programs.settingsManager;
-      const objectManager = keepTrackApi.programs.objectManager;
-      const sensorManager = keepTrackApi.programs.sensorManager;
+      const { satellite, missileManager, timeManager, settingsManager, objectManager, sensorManager, uiManager } = keepTrackApi.programs;
 
       if (!sat.missile) {
         if (keepTrackApi.programs.objectManager.isSensorManagerLoaded) {
@@ -35,8 +28,8 @@ export const updateSelectBoxCore = {
       var jday = timeManager.getDayOfYear(timeManager.propTimeVar);
       $('#jday').html(jday);
 
-      if (sMM.isMapMenuOpen && timeManager.now > settingsManager.lastMapUpdateTime + 30000) {
-        uiManager.updateMap();
+      if (settingsManager.plugins.stereoMap && keepTrackApi.programs.mapManager.isMapMenuOpen && timeManager.now > settingsManager.lastMapUpdateTime + 30000) {
+        keepTrackApi.programs.mapManager.updateMap();
         settingsManager.lastMapUpdateTime = timeManager.now;
       }
 
@@ -95,4 +88,13 @@ export const updateSelectBoxCore = {
       }
     },
   },
+};
+
+export const init = (): void => {
+  // Register updateSelectBox
+  keepTrackApi.register({
+    method: 'updateSelectBox',
+    cbName: 'sensorInfo',
+    cb: updateSelectBoxCore.sensorInfo.cb,
+  });
 };

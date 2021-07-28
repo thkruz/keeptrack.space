@@ -78,9 +78,14 @@ class ColorSchemeFactory {
       }
 
       if (sat.marker) {
-        if (typeof ColorSchemeFactory.default.iSensor !== 'undefined' && typeof satSet.satSensorMarkerArray !== 'undefined') {
-          if (sat.id === satSet.satSensorMarkerArray[ColorSchemeFactory.default.iSensor + 1]) {
-            ColorSchemeFactory.default.iSensor++;
+        // This doesn't apply to sat overfly mode
+        if (!settingsManager.isSatOverflyModeOn) {
+          // But it doesn't work if we don't have marker info from the sensor
+          if (typeof ColorSchemeFactory.default.iSensor !== 'undefined' && typeof satSet.satSensorMarkerArray !== 'undefined') {
+            // if we have sensor markers enabled then we need to rotate colors as the marker numbers increase
+            if (sat.id === satSet.satSensorMarkerArray[ColorSchemeFactory.default.iSensor + 1]) {
+              ColorSchemeFactory.default.iSensor++;
+            }
           }
         }
         if (ColorSchemeFactory.default.iSensor >= 0) {

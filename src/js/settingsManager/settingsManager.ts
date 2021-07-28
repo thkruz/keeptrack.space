@@ -31,10 +31,52 @@ declare global {
 }
 
 // Settings Manager Setup
-const settingsManager: any = {
+export const settingsManager: any = {
   //  Version Control
   versionNumber: VERSION,
   versionDate: VERSION_DATE,
+  plugins: {
+    atmosphere: true,
+    satInfoboxCore: true,
+    updateSelectBoxCore: true,
+    aboutManager: true,
+    collisions: true,
+    dops: true,
+    findSat: true,
+    launchCalendar: true,
+    newLaunch: true,
+    nextLaunch: true,
+    nightToggle: true,
+    photoManager: true,
+    recorderManager: true,
+    satChanges: true,
+    stereoMap: true,
+    timeMachine: true,
+    twitter: true,
+    initialOrbit: true,
+    missile: true,
+    breakup: true,
+    editSat: true,
+    constellations: true,
+    countries: true,
+    colorsMenu: true,
+    shortTermFences: true,
+    externalSources: true,
+    analysis: true,
+    sensorFov: true,
+    sensorSurv: true,
+    satelliteView: true,
+    satelliteFov: true,
+    planetarium: true,
+    astronomy: true,
+    photo: true,
+    watchlist: true,
+    sensor: true,
+    settingsMenu: true,
+    datetime: true,
+    social: true,
+    topMenu: true,
+  },
   init: async (): Promise<void> => {    
     settingsManager.pTime = [];
 
@@ -139,6 +181,9 @@ const settingsManager: any = {
     // Changing the zoom with the mouse wheel will stop the camera from following
     // the satellite.
     settingsManager.isZoomStopsSnappedOnSat = false;
+
+    // Settings this to true will hide the earth textures and make the globe black
+    settingsManager.isBlackEarth = false;
 
     // How many draw calls to wait before updating orbit overlay if last draw
     // time was greater than 20ms
@@ -454,8 +499,7 @@ const settingsManager: any = {
     settingsManager.geolocationUsed = false;
     settingsManager.mapWidth = 800;
     settingsManager.mapHeight = 600;
-    settingsManager.currentLegend = 'default';
-    settingsManager.socratesOnSatCruncher = null;
+    settingsManager.currentLegend = 'default';    
     settingsManager.queuedScreenshot = false;
 
     settingsManager.isResizing = false;
@@ -807,5 +851,3 @@ settingsManager.init();
 
 // Expose these to the console
 window.settingsManager = settingsManager;
-
-export { settingsManager };

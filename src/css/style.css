@@ -1,3 +1,12 @@
+:root {
+    --bottom-menu-height: 85px;
+    --bottom-icon-width: 105px; 
+    --bottom-icon-height: 75px; 
+    --bottom-icon-img-size: 40px;
+    --top-menu-height: 0px;
+    --class-banner: 0px;
+  }
+
 /*Min Scrollbar for Webkit Browsers */
 
 ::-webkit-scrollbar {
@@ -972,7 +981,7 @@ input:focus {
 #bottom-icons-container {
     /* alsoResize in jquery-ui will override this if not important */
     width: 100% !important;
-    height: 120px;
+    height: var(--bottom-menu-height);
     overflow-x: hidden;
     overflow-y: scroll;
     text-align: left;
@@ -981,8 +990,8 @@ input:focus {
 #bottom-icons {
     display: grid;
     grid-template-columns:
-        minmax(120px, max-content)
-        repeat(auto-fill, 120px);
+        minmax(var(--bottom-icon-width), max-content)
+        repeat(auto-fill, var(--bottom-icon-width));
     justify-content: center;
     row-gap: 0px;
     background: #1f3347;
@@ -993,7 +1002,7 @@ input:focus {
 }
 
 .bmenu-item {
-    height: 86px;
+    height: var(--bottom-icon-height);
     padding: 5px;
     text-align: center;
 }
@@ -1009,7 +1018,7 @@ input:focus {
 }
 
 .bmenu-item img {
-    width: 45px;
+    width: var(--bottom-icon-img-size);
     height: auto;
     margin: 0 auto;
     display: block;

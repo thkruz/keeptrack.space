@@ -72,7 +72,7 @@ starManager.init = () => {
             var star1, star2;
             star1 = getIdFromStarName(starManager.constellations[i].stars[s][0]);
             star2 = getIdFromStarName(starManager.constellations[i].stars[s][1]);
-            if (star1 == null || star2 == null) {
+            if (typeof star1 == 'undefined' || star1 == null || typeof star2 == 'undefined' || star2 == null) {
               continue;
             }
             lineManager.create('sat5', [star1, star2], 'p');

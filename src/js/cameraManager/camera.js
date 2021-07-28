@@ -1076,6 +1076,12 @@ class Camera {
       }
 
       glm.mat4.identity(this.camMatrix);
+
+      // Workaround for bug with selecting stars
+      if (typeof sat === 'undefined' && this.cameraType.current == this.cameraType.fixedToSat) {
+        this.cameraType.current = this.cameraType.default;
+      }
+
       switch (this.cameraType.current) {
         case this.cameraType.default: // pivot around the earth with earth in the center
           glm.mat4.translate(this.camMatrix, this.camMatrix, [this.panCurrent.x, this.panCurrent.y, this.panCurrent.z]);

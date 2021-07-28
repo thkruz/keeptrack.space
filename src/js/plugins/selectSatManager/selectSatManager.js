@@ -1,53 +1,12 @@
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { satInfoboxCore } from '@app/js/plugins/selectSatManager/satInfoboxCore';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 
 let isselectedSatNegativeOne = false;
 const selectSatManager = {
   init: () => {
-    // Register launch data
-    keepTrackApi.register({
-      method: 'selectSatData',
-      cbName: satInfoboxCore.launchData.cbName,
-      cb: satInfoboxCore.launchData.cb,
-    });
-
-    // Register orbital element data
-    keepTrackApi.register({
-      method: 'selectSatData',
-      cbName: satInfoboxCore.orbitalData.cbName,
-      cb: satInfoboxCore.orbitalData.cb,
-    });
-
-    // Register sensor data
-    keepTrackApi.register({
-      method: 'selectSatData',
-      cbName: satInfoboxCore.sensorInfo.cbName,
-      cb: satInfoboxCore.sensorInfo.cb,
-    });
-
-    // Register mission data
-    keepTrackApi.register({
-      method: 'selectSatData',
-      cbName: satInfoboxCore.satMissionData.cbName,
-      cb: satInfoboxCore.satMissionData.cb,
-    });
-
-    // Register intel data
-    keepTrackApi.register({
-      method: 'selectSatData',
-      cbName: satInfoboxCore.intelData.cbName,
-      cb: satInfoboxCore.intelData.cb,
-    });
-
-    // Register object data
-    keepTrackApi.register({
-      method: 'selectSatData',
-      cbName: satInfoboxCore.objectData.cbName,
-      cb: satInfoboxCore.objectData.cb,
-    });
+    // Nothing yet
   },
 
   selectSat: (satId, cameraManager) => {
@@ -77,7 +36,7 @@ const selectSatManager = {
 
     // If deselecting an object
     if (satId === -1) {
-      if (settingsManager.currentColorScheme === keepTrackApi.programs.ColorScheme.group || $('#search').val().length >= 3) {
+      if (settingsManager.currentColorScheme === keepTrackApi.programs.ColorScheme.group || (typeof $('#search').val() !== 'undefined' && $('#search').val().length >= 3)) {
         // If group selected
         $('#menu-sat-fov').removeClass('bmenu-item-disabled');
       } else {
@@ -106,8 +65,10 @@ const selectSatManager = {
       $('#menu-newLaunch').addClass('bmenu-item-disabled');
       $('#menu-breakup').addClass('bmenu-item-disabled');
 
-      if ($('#search').val().length > 0) {
-        $('#search-results').attr('style', 'display: block; max-height:auto');
+      if (settingsManager.plugins.topMenu) {
+        if (typeof $('#search').val() !== 'undefined' && $('#search').val().length > 0) {
+          $('#search-results').attr('style', 'display: block; max-height:auto');
+        }
       }
     } else if (satId !== -1) {
       if (cameraManager.cameraType.current == cameraManager.cameraType.default) {
@@ -171,8 +132,10 @@ const selectSatManager = {
         }
       } else {
         if (window.innerWidth > 1000) {
-          if ($('#search').val().length > 0) {
-            $('#search-results').attr('style', 'display:block; max-height:auto');
+          if (settingsManager.plugins.topMenu) {
+            if ($('#search').val().length > 0) {
+              $('#search-results').attr('style', 'display:block; max-height:auto');
+            }
           }
           if (cameraManager.cameraType.current !== cameraManager.cameraType.planetarium) {
             // Unclear why this was needed...
@@ -181,16 +144,10 @@ const selectSatManager = {
         }
       }
 
-      if (!sat.missile) {
-        $('.sat-only-info').show();
-      } else {
-        $('.sat-only-info').hide();
-      }
-
       $('#sat-infobox').fadeIn();
 
       if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
-        if (keepTrackApi.programs.sMM.isLookanglesMenuOpen) {
+        if (keepTrackApi.programs.sensorManager.isLookanglesMenuOpen) {
           satellite.getlookangles(sat);
         }
       }

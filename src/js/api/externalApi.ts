@@ -1,5 +1,6 @@
 interface keepTrackApiInterface {
-  register: (params: { method: string; cbName: string; cb: () => void }) => void;
+  html: (strings: TemplateStringsArray, ...placeholders: any[]) => string;
+  register: (params: { method: string; cbName: string; cb: any }) => void;
   unregister: (params: { method: string; cbName: string }) => void;
   callbacks: any;
   methods: any;
@@ -7,7 +8,15 @@ interface keepTrackApiInterface {
 }
 
 const keepTrackApi: keepTrackApiInterface = {
-  register: (params: { method: string; cbName: string; cb: () => void }) => {
+  html: (strings: TemplateStringsArray, ...placeholders: any[]) => {
+    for (const placeholder of placeholders) {
+      if (typeof placeholder !== 'string') {
+        throw Error('Invalid input');
+      }
+    }
+    return String.raw(strings, ...placeholders);
+  },
+  register: (params: { method: string; cbName: string; cb: any }) => {
     // If this is a valid callback
     if (typeof keepTrackApi.callbacks[params.method] !== 'undefined') {
       // Add the callback
@@ -36,24 +45,85 @@ const keepTrackApi: keepTrackApiInterface = {
   callbacks: {
     selectSatData: [],
     updateSelectBox: [],
+    onCruncherReady: [],
+    onCruncherMessage: [],
+    uiManagerInit: [],
+    uiManagerOnReady: [],
+    bottomMenuClick: [],
+    hideSideMenus: [],
+    nightToggle: [],
+    orbitManagerInit: [],
+    adviceReady: [],
+    drawManagerLoadScene: [],
+    drawOptionalScenery: [],
+    updateLoop: [],
+    rmbMenuActions: [],
+    rightBtnMenuAdd: [],
+    updateDateTime: [],
+    uiManagerFinal: [],
   },
   methods: {
     selectSatData: (sat: any, satId: number) => {
-      for (let i = 0; i < keepTrackApi.callbacks.selectSatData.length; i++) {
-        keepTrackApi.callbacks.selectSatData[i].cb(sat, satId);
-      }
+      keepTrackApi.callbacks.selectSatData.forEach((cb: any) => cb.cb(sat, satId));
     },
     updateSelectBox: (sat: any) => {
-      for (let i = 0; i < keepTrackApi.callbacks.updateSelectBox.length; i++) {
-        keepTrackApi.callbacks.updateSelectBox[i].cb(sat);
-      }
+      keepTrackApi.callbacks.updateSelectBox.forEach((cb: any) => cb.cb(sat));
     },
+    onCruncherReady: () => {
+      keepTrackApi.callbacks.onCruncherReady.forEach((cb: any) => cb.cb());
+    },
+    onCruncherMessage: () => {
+      keepTrackApi.callbacks.onCruncherMessage.forEach((cb: any) => cb.cb());
+    },
+    uiManagerInit: () => {
+      keepTrackApi.callbacks.uiManagerInit.forEach((cb: any) => cb.cb());
+    },
+    uiManagerOnReady: () => {
+      keepTrackApi.callbacks.uiManagerOnReady.forEach((cb: any) => cb.cb());
+    },
+    bottomMenuClick: (iconName: string) => {
+      keepTrackApi.callbacks.bottomMenuClick.forEach((cb: any) => cb.cb(iconName));
+    },
+    hideSideMenus: () => {
+      keepTrackApi.callbacks.hideSideMenus.forEach((cb: any) => cb.cb());
+    },
+    nightToggle: (gl: any, nightTexture: any, texture: any) => {
+      keepTrackApi.callbacks.nightToggle.forEach((cb: any) => cb.cb(gl, nightTexture, texture));
+    },
+    orbitManagerInit: () => {
+      keepTrackApi.callbacks.orbitManagerInit.forEach((cb: any) => cb.cb());
+    },
+    adviceReady: () => {
+      keepTrackApi.callbacks.adviceReady.forEach((cb: any) => cb.cb());
+    },
+    drawManagerLoadScene: () => {
+      keepTrackApi.callbacks.drawManagerLoadScene.forEach((cb: any) => cb.cb());
+    },
+    drawOptionalScenery: () => {
+      keepTrackApi.callbacks.drawOptionalScenery.forEach((cb: any) => cb.cb());
+    },
+    updateLoop: () => {
+      keepTrackApi.callbacks.updateLoop.forEach((cb: any) => cb.cb());
+    },
+    rmbMenuActions: (menuName: string) => {
+      keepTrackApi.callbacks.rmbMenuActions.forEach((cb: any) => cb.cb(menuName));
+    },
+    rightBtnMenuAdd: () => {
+      keepTrackApi.callbacks.rightBtnMenuAdd.forEach((cb: any) => cb.cb());
+    },
+    updateDateTime: (date: Date) => {
+      keepTrackApi.callbacks.updateDateTime.forEach((cb: any) => cb.cb(date));
+    },
+    uiManagerFinal: () => {
+      keepTrackApi.callbacks.uiManagerFinal.forEach((cb: any) => cb.cb());
+    } 
   },
   programs: {
     timeManager: {},
     settingsManager: {},
     ColorScheme: {},
     drawManager: {},
+    mapManager: {},
     missileManager: {},
     objectManager: {},
     orbitManager: {},
@@ -63,7 +133,6 @@ const keepTrackApi: keepTrackApiInterface = {
     searchBox: {},
     sensorManager: {},
     starManager: {},
-    sMM: {},
     uiManager: {},
     uiInput: {},
   },

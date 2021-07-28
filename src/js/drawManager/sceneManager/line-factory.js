@@ -43,6 +43,7 @@ class LineFactory {
   }
 
   create(type, value, color) {
+    const getSat = keepTrackApi.programs.satSet.getSat;
     let sat = null;
     let sat2 = null;
 
@@ -78,7 +79,7 @@ class LineFactory {
     }
     // Center of the Earth to the Satellite
     if (type == 'sat') {
-      let sat = this.#getSat(value);
+      let sat = getSat(value);
       if (typeof sat.position == 'undefined') {
         console.debug(`No Satellite Position Available for Line`);
         console.debug(sat);
@@ -94,7 +95,7 @@ class LineFactory {
     }
     // Reference Point to Satellite
     if (type == 'sat2') {
-      sat = this.#getSat(value[0]);
+      sat = getSat(value[0]);
       if (typeof sat.position == 'undefined') {
         console.debug(`No Satellite Position Available for Line`);
         console.debug(sat);
@@ -110,8 +111,8 @@ class LineFactory {
     }
     // Satellite to Satellite When in View
     if (type == 'sat3') {
-      sat = this.#getSat(value[0]);
-      sat2 = this.#getSat(value[1]);
+      sat = getSat(value[0]);
+      sat2 = getSat(value[1]);
       if (typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
         console.debug(`No Satellite Position Available for Line`);
         console.debug(sat);
@@ -131,8 +132,8 @@ class LineFactory {
     }
     // Satellite to Satellite - Draw When Selected and in View
     if (type == 'sat4') {
-      sat = this.#getSat(value[0]);
-      sat2 = this.#getSat(value[1]);
+      sat = getSat(value[0]);
+      sat2 = getSat(value[1]);
       if (sat == null || sat2 == null) return;
       if (typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
         console.debug(`No Satellite Position Available for Line`);
@@ -154,9 +155,9 @@ class LineFactory {
 
     // Satellite to Satellite
     if (type == 'sat5') {
-      sat = this.#getSat(value[0]);
-      sat2 = this.#getSat(value[1]);
-      if (typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
+      sat = getSat(value[0]);
+      sat2 = getSat(value[1]);
+      if (typeof sat == 'undefined' || typeof sat2 == 'undefined' || typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
         // console.debug(`No Satellite Position Available for Line`);
         // console.debug(sat);
         // console.debug(sat2);
@@ -222,7 +223,7 @@ class LineFactory {
               if (typeof this.drawLineList[i].sat2.id == 'undefined' && this.drawLineList[i].sat2 != null) {
                 this.drawLineList[i].sat2.id = this.#getIdFromSensorName(this.drawLineList[i].sat2.name);
               }
-              this.drawLineList[i].sat2 = this.#getSat(this.drawLineList[i].sat2.id);
+              this.drawLineList[i].sat2 = keepTrackApi.programs.satSet.getSat(this.drawLineList[i].sat2.id);
               if (this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].sat.inview) {
                 this.drawLineList.splice(i, 1);
                 continue;

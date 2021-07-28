@@ -30,9 +30,9 @@ export const saveVariable = (variable: string, filename: string): void => {
 
 export const saveCsv = (items: Array<never>, name: string): void => {
   try {
-    const replacer = (key: string, value:never) => (value === null ? '' : value); // specify how you want to handle null values here
+    const replacer: any = (value:never) => (value === null ? '' : value); // specify how you want to handle null values here
     const header = Object.keys(items[0]);
-    let csv: string|string[] = items.map((row: Array<string>) => header.map((fieldName:string) => JSON.stringify(row[fieldName], replacer)).join(','));
+    let csv: string|string[] = items.map((row: any) => header.map((fieldName:string) => JSON.stringify(row[fieldName], replacer)).join(','));
     csv.unshift(header.join(','));
     csv = csv.join('\r\n');
 

@@ -1,13 +1,13 @@
 import * as glm from '@app/js/lib/external/gl-matrix.js';
-import { isselectedSatNegativeOne, selectSatManager } from '@app/js/drawManager/selectSatManager.js';
+import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins/selectSatManager/selectSatManager.js';
 import { satScreenPositionArray, satSet } from '@app/js/satSet/satSet.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { Dots } from '@app/js/drawManager/dots.js';
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { meshManager } from '@app/js/drawManager/meshManager.js';
-import { missileManager } from '@app/js/missileManager/missileManager.js';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
 import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 let satHoverBoxNode1;
 let satHoverBoxNode2;
@@ -22,7 +22,7 @@ var isSatMiniBoxInUse = false;
 var labelCount;
 var hoverBoxOnSatMiniElements = [];
 var satHoverMiniDOM;
-var isShowNextPass = false;
+settingsManager.isShowNextPass = false;
 let updateHoverSatId;
 let isHoverBoxVisible = false;
 let isShowDistance = true;
@@ -43,20 +43,20 @@ var drawManager = {
   },
 };
 
-var groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager;
-drawManager.init = (groupsManagerRef, uiInputRef, starManagerRef, satelliteRef, ColorSchemeRef, cameraManagerRef, objectManagerRef, orbitManagerRef, sensorManagerRef, uiManagerRef, lineManagerRef, dotsManagerRef) => {
-  uiInput = uiInputRef;
-  starManager = starManagerRef;
-  satellite = satelliteRef;
-  ColorScheme = ColorSchemeRef;
-  cameraManager = cameraManagerRef;
-  objectManager = objectManagerRef;
-  orbitManager = orbitManagerRef;
-  sensorManager = sensorManagerRef;
-  uiManager = uiManagerRef;
-  lineManager = lineManagerRef;
-  dotsManager = dotsManagerRef;
-  groupsManager = groupsManagerRef;
+let groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager;
+drawManager.init = () => {
+  uiInput = keepTrackApi.programs.uiInput;
+  starManager = keepTrackApi.programs.starManager;
+  satellite = keepTrackApi.programs.satellite;
+  ColorScheme = keepTrackApi.programs.ColorScheme;
+  cameraManager = keepTrackApi.programs.cameraManager;
+  objectManager = keepTrackApi.programs.objectManager;
+  orbitManager = keepTrackApi.programs.orbitManager;
+  sensorManager = keepTrackApi.programs.sensorManager;
+  uiManager = keepTrackApi.programs.uiManager;
+  lineManager = keepTrackApi.programs.lineManager;
+  dotsManager = keepTrackApi.programs.dotsManager;
+  groupsManager = keepTrackApi.programs.groupsManager;
 
   satHoverBoxNode1 = document.getElementById('sat-hoverbox1');
   satHoverBoxNode2 = document.getElementById('sat-hoverbox2');
@@ -132,18 +132,18 @@ drawManager.createDotsManager = () => {
   return drawManager.dotsManager;
 };
 
-drawManager.loadScene = async (gl) => {
+drawManager.loadScene = async () => {
+  const gl = drawManager.gl;
+  // Make this public
+  drawManager.sceneManager = sceneManager;
   try {
     await sceneManager.earth.init(gl);
     sceneManager.earth.loadHiRes();
     sceneManager.earth.loadHiResNight();
     meshManager.init(gl, sceneManager.earth);
-    sceneManager.atmosphere = new sceneManager.classes.Atmosphere(gl, sceneManager.earth, settingsManager);
+    keepTrackApi.methods.drawManagerLoadScene();
     await sceneManager.sun.init(gl, sceneManager.earth, timeManager);
     sceneManager.moon = new sceneManager.classes.Moon(gl, sceneManager.sun);
-
-    // Make this public
-    drawManager.sceneManager = sceneManager;
   } catch (error) {
     console.error(error);
   }
@@ -354,9 +354,6 @@ drawManager.updateLoop = () => {
   // Calculate camera changes needed since last draw
   cameraManager.calculate(objectManager.selectedSat, drawManager.dt);
 
-  // Missile oribts have to be updated every draw or they quickly become innacurate
-  drawManager.updateMissileOrbits();
-
   // If in satellite view the orbit buffer needs to be updated every time
   if (cameraManager.cameraType.current == cameraManager.cameraType.satellite) orbitManager.updateOrbitBuffer(objectManager.lastSelectedSat());
 
@@ -370,6 +367,7 @@ drawManager.updateLoop = () => {
   drawManager.orbitsAbove(); //drawManager.sensorPos is set here for the Camera Manager
 
   cameraManager.update(drawManager.sat, drawManager.sensorPos);
+  keepTrackApi.methods.updateLoop();
 };
 
 drawManager.drawOptionalScenery = () => {
@@ -402,9 +400,7 @@ drawManager.drawOptionalScenery = () => {
       // Draw the moon
       sceneManager.moon.draw(drawManager.pMatrix, cameraManager.camMatrix);
 
-      if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium && cameraManager.cameraType.current !== cameraManager.cameraType.astronomy) {
-        sceneManager.atmosphere.draw(drawManager.pMatrix, cameraManager);
-      }
+      keepTrackApi.methods.drawOptionalScenery();
     }
   }
   postProcessingManager.curBuffer = null;
@@ -413,6 +409,9 @@ drawManager.drawOptionalScenery = () => {
 drawManager.satCalculate = () => {
   if (objectManager.selectedSat !== -1) {
     drawManager.sat = satSet.getSat(objectManager.selectedSat);
+    // Can't Draw a Star
+    if (typeof drawManager.sat === 'undefined') return;
+
     if (!drawManager.sat.static) {
       cameraManager.camSnapToSat(drawManager.sat);
 
@@ -445,21 +444,16 @@ drawManager.satCalculate = () => {
         lineManager.drawWhenSelected();
         lineManager.updateLineToSat(objectManager.selectedSat, satSet.getIdFromSensorName(sensorManager.currentSensor.name));
       }
-      uiManager.updateMap();
+      // TODO: #281 keepTrackApi.programs.mapManager.updateMap should be a callback
+      if (keepTrackApi.programs.mapManager) {
+        keepTrackApi.programs.mapManager.updateMap();
+      }
     }
     if (objectManager.selectedSat == -1) {
       lineManager.drawWhenSelected();
     }
     drawManager.lastSelectedSat = objectManager.selectedSat;
     objectManager.lastSelectedSat(objectManager.selectedSat);
-  }
-};
-
-drawManager.updateMissileOrbits = () => {
-  if (typeof missileManager != 'undefined' && missileManager.missileArray.length > 0) {
-    for (drawManager.i = 0; drawManager.i < missileManager.missileArray.length; drawManager.i++) {
-      orbitManager.updateOrbitBuffer(missileManager.missileArray[drawManager.i].id);
-    }
   }
 };
 
@@ -646,7 +640,7 @@ drawManager.updateHover = () => {
     }
 
     if (settingsManager.enableHoverOrbits) {
-      if (uiInput.mouseSat !== -1) {
+      if (uiInput.mouseSat !== -1 && keepTrackApi.programs.satSet.satData[uiInput.mouseSat].type !== 'Star') {
         orbitManager.setHoverOrbit(uiInput.mouseSat);
       } else {
         orbitManager.clearHoverOrbit();
@@ -731,7 +725,7 @@ drawManager.hoverBoxOnSat = (satId, satX, satY) => {
         }
         satHoverBoxNode2.innerHTML = sat.type;
         satHoverBoxNode3.innerHTML = 'RA: ' + sat.ra.toFixed(3) + ' deg </br> DEC: ' + sat.dec.toFixed(3) + ' deg';
-        if (objectManager.lasthoveringSat !== satId) {
+        if (objectManager.lasthoveringSat !== satId && typeof sat !== 'undefined') {
           starManager.drawConstellations(starManager.findStarsConstellation(sat.name));
         }
       } else {
@@ -751,14 +745,14 @@ drawManager.hoverBoxOnSat = (satId, satX, satY) => {
         satHoverBoxNode2.textContent = sat.SCC_NUM;
         satHoverBoxNode3.textContent = objectManager.extractCountry(sat.C);
       } else {
-        if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null && isShowNextPass && isShowDistance) {
+        if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null && settingsManager.isShowNextPass && isShowDistance) {
           satHoverBoxNode1.textContent = sat.ON;
           satHoverBoxNode2.textContent = sat.SCC_NUM;
           satHoverBoxNode3.innerHTML = satellite.nextpass(sat) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
         } else if (isShowDistance) {
           satHoverBoxNode1.textContent = sat.ON;
           sat2 = satSet.getSat(objectManager.selectedSat);
-          if (sat2 !== null && sat !== sat2) {
+          if (typeof sat2 !== 'undefined' && sat2 !== null && sat !== sat2) {
             satHoverBoxNode2.innerHTML = `${sat.SCC_NUM}${satellite.distance(sat, sat2)}</br>ΔVel: ${Math.sqrt((sat.velocity.x - sat2.velocity.x) ** 2 + (sat.velocity.y - sat2.velocity.y) ** 2 + (sat.velocity.z - sat2.velocity.z) ** 2).toFixed(
               2
             )} km/s`;
@@ -800,7 +794,7 @@ drawManager.hoverBoxOnSat = (satId, satX, satY) => {
               sat.velocity.z.toFixed(2) +
               ' km/s';
           }
-        } else if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null && isShowNextPass) {
+        } else if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null && settingsManager.isShowNextPass) {
           satHoverBoxNode1.textContent = sat.ON;
           satHoverBoxNode2.textContent = sat.SCC_NUM;
           satHoverBoxNode3.textContent = satellite.nextpass(sat);

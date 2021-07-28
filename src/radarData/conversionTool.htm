@@ -43,8 +43,8 @@
           shortName: 'COD',
           type: 'Phased Array Radar',
           lat: 41.754785,
-          long: -70.539151,
-          obshei: 0.060966,
+          lon: -70.539151,
+          alt: 0.060966,
           obsminaz: 347,
           obsmaxaz: 227,
           obsminel: 3,
@@ -101,8 +101,8 @@
                 radarData[i].e,
                 radarData[i].r,
                 sensorList.COD.lat * DEG2RAD,
-                sensorList.COD.long * DEG2RAD,
-                sensorList.COD.obshei
+                sensorList.COD.lon * DEG2RAD,
+                sensorList.COD.alt
             );
             radarDataECI = satellite.ecfToEci(radarDataECF, gmst);
             radarDataECI.t = radarData[i].t;

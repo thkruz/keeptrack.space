@@ -2,9 +2,10 @@
 
 import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { satSet } from '@app/js/satSet/satSet.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
+import { timeManager } from '@app/js/timeManager/timeManager.ts';
 let M = window.M;
 
 var NUM_SEGS = 255;
@@ -39,6 +40,7 @@ if (typeof process !== 'undefined') {
 } else {
   orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
 }
+orbitManager.orbitWorker = orbitWorker;
 
 var initialized = false;
 
@@ -75,11 +77,11 @@ orbitManager.shader = {
     `,
 };
 
-var gl, cameraManager, groupsManager;
-orbitManager.init = function (glRef, cameraManagerRef, groupsManagerRef) {
-  gl = glRef;
-  cameraManager = cameraManagerRef;
-  groupsManager = groupsManagerRef;
+let gl, cameraManager, groupsManager;
+orbitManager.init = function () {
+  gl = keepTrackApi.programs.drawManager.gl;
+  cameraManager = keepTrackApi.programs.cameraManager;
+  groupsManager = keepTrackApi.programs.groupsManager;
 
   var vs = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vs, orbitManager.shader.vert);
@@ -120,9 +122,13 @@ orbitManager.init = function (glRef, cameraManagerRef, groupsManagerRef) {
   initialized = true;
 
   orbitManager.shader = pathShader;
+  keepTrackApi.methods.orbitManagerInit();
 };
 
 orbitManager.updateOrbitBuffer = function (satId, force, TLE1, TLE2, missile, latList, lonList, altList) {
+  const sat = satSet.getSat(satId);
+  if (typeof sat === 'undefined') return;
+
   if (force) {
     orbitWorker.postMessage({
       isInit: false,
@@ -134,7 +140,7 @@ orbitManager.updateOrbitBuffer = function (satId, force, TLE1, TLE2, missile, la
       TLE1: TLE1,
       TLE2: TLE2,
     });
-  } else if (!inProgress[satId] && !satSet.getSat(satId).static) {
+  } else if (!inProgress[satId] && !sat.static) {
     if (missile) {
       orbitWorker.postMessage({
         isInit: false,
@@ -315,56 +321,6 @@ var allocateBuffer = () => {
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
   gl.bufferData(gl.ARRAY_BUFFER, orbitManager.emptyOrbitBuffer, gl.DYNAMIC_DRAW);
   return buf;
-};
-
-orbitManager.playNextSatellite = (runCount, year) => {
-  if (!orbitManager.isTimeMachineVisible) return;
-  // Kill all old async calls if run count updates
-  if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
-  let yearGroup = groupsManager.createGroup('yearOrLess', year);
-  // groupsManager.selectGroupNoOverlay(yearGroup);
-  groupsManager.selectGroup(yearGroup, orbitManager);
-  yearGroup.updateOrbits(orbitManager, orbitManager);
-  satSet.setColorScheme(ColorScheme.group, true); // force color recalc
-  if (year >= 59 && year < 100) {
-    M.toast({ html: `Time Machine In Year 19${year}!` });
-  } else {
-    let yearStr = year < 10 ? `0${year}` : `${year}`;
-    M.toast({ html: `Time Machine In Year 20${yearStr}!` });
-  }
-
-  if (year == parseInt(new Date().getUTCFullYear().toString().slice(2, 4))) {
-    setTimeout(function () {
-      if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
-      if (!orbitManager.isTimeMachineVisible) return;
-      settingsManager.colors.transparent = orbitManager.tempTransColor;
-      orbitManager.isTimeMachineRunning = false;
-      groupsManager.clearSelect();
-      satSet.setColorScheme(ColorScheme.default, true); // force color recalc
-    }, 10000); // Linger for 10 seconds
-  }
-};
-
-// Used to kill old async calls
-orbitManager.historyOfSatellitesRunCount = 0;
-orbitManager.historyOfSatellitesPlay = () => {
-  orbitManager.historyOfSatellitesRunCount++;
-  orbitManager.isTimeMachineRunning = true;
-  orbitManager.tempTransColor = settingsManager.colors.transparent;
-  settingsManager.colors.transparent = [0, 0, 0, 0];
-  for (let yy = 0; yy <= 200; yy++) {
-    let year = 59 + yy;
-    if (year >= 100) year = year - 100;
-    setTimeout(
-      // eslint-disable-next-line no-loop-func
-      function (runCount) {
-        orbitManager.playNextSatellite(runCount, year);
-      },
-      settingsManager.timeMachineDelay * yy,
-      orbitManager.historyOfSatellitesRunCount
-    );
-    if (year == 20) break;
-  }
 };
 
 let updateOrbitBuffer = (satId, force, TLE1, TLE2, missile, latList, lonList, altList) => orbitManager.updateOrbitBuffer(satId, force, TLE1, TLE2, missile, latList, lonList, altList);

@@ -87,3 +87,7 @@ src/js/wip/
 
 # nyc Output
 .nyc_output
+
+#ssl
+cert.pem
+key.pem

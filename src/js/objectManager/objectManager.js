@@ -4,6 +4,7 @@
 'use strict';
 
 import { controlSiteManager } from '@app/js/objectManager/controlSiteManager.js';
+import { keepTrackApi } from '@app/js/api/externalApi.ts';
 import { launchSiteManager } from '@app/js/objectManager/launchSiteManager.js';
 import { satLinkManager } from '@app/js/objectManager/satLinkManager.js';
 import { stars } from '@app/js/starManager/stars.js';
@@ -29,7 +30,8 @@ objectManager.analSatSet = [];
 objectManager.staticSet = [];
 objectManager.fieldOfViewSet = [];
 
-objectManager.init = async (sensorManager) => {
+objectManager.init = async () => {
+  const sensorManager = keepTrackApi.programs.sensorManager;
   // settingsManager should be a globally accessible object
   if (typeof settingsManager == 'undefined') {
     // console.warn(`settingsManager missing!`);
@@ -138,8 +140,8 @@ objectManager.init = async (sensorManager) => {
         name: sensorList[sensor].name,
         type: sensorList[sensor].type,
         lat: sensorList[sensor].lat,
-        lon: sensorList[sensor].long,
-        alt: sensorList[sensor].obshei,
+        lon: sensorList[sensor].lon,
+        alt: sensorList[sensor].alt,
         changeObjectInterval: sensorList[sensor].changeObjectInterval,
       };
       objectManager.staticSet.push(sensorInfo);
@@ -161,7 +163,7 @@ objectManager.init = async (sensorManager) => {
         type: 'Launch Facility',
         lat: launchSiteList[launchSite].lat,
         lon: launchSiteList[launchSite].lon,
-        alt: sensorList[sensor].obshei,
+        alt: sensorList[sensor].alt,
       };
       objectManager.staticSet.push(launchSiteInfo);
     }

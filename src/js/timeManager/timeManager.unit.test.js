@@ -4,8 +4,8 @@
   expect
 */
 
-import '@app/js/settingsManager/settingsManager.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import '@app/js/settingsManager/settingsManager.ts';
+import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 test(`Basic Functions of Time Manager`, () => {
   // Setup a unit test enviornment that doesn't worry about other modules

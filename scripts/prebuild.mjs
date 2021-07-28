@@ -34,6 +34,13 @@ try {
   //
 }
 
+console.log(`Creating ./dist/plugins...`);
+try {
+  mkdirp.sync('./dist/plugins');
+} catch (error) {
+  //
+}
+
 console.log(`Creating ./dist/css...`);
 try {
   mkdirp.sync('./dist/css');

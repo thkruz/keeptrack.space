@@ -10,12 +10,22 @@
 // FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 import { ColorScheme } from './color-scheme.js';
+import { keepTrackApi } from '@app/js/api/externalApi.ts';
 
 class ColorSchemeFactory {
   static objectTypeFlags = {};
 
   // Take in references to major components needed for correctly displaying the colors
-  static init(gl, cameraManager, timeManager, sensorManager, objectManager, satSet, satellite, settingsManager) {
+  static init() {
+    const gl = keepTrackApi.programs.drawManager.gl;
+    const cameraManager = keepTrackApi.programs.cameraManager;
+    const timeManager = keepTrackApi.programs.timeManager;
+    const sensorManager = keepTrackApi.programs.sensorManager;
+    const objectManager = keepTrackApi.programs.objectManager;
+    const satSet = keepTrackApi.programs.satSet;
+    const satellite = keepTrackApi.programs.satellite;
+    const settingsManager = keepTrackApi.programs.settingsManager;
+
     let color;
     ColorSchemeFactory.colorTheme = settingsManager.colors;
     ColorSchemeFactory.resetObjectTypeFlags();
@@ -68,9 +78,14 @@ class ColorSchemeFactory {
       }
 
       if (sat.marker) {
-        if (typeof ColorSchemeFactory.default.iSensor !== 'undefined' && typeof satSet.satSensorMarkerArray !== 'undefined') {
-          if (sat.id === satSet.satSensorMarkerArray[ColorSchemeFactory.default.iSensor + 1]) {
-            ColorSchemeFactory.default.iSensor++;
+        // This doesn't apply to sat overfly mode
+        if (!settingsManager.isSatOverflyModeOn) {
+          // But it doesn't work if we don't have marker info from the sensor
+          if (typeof ColorSchemeFactory.default.iSensor !== 'undefined' && typeof satSet.satSensorMarkerArray !== 'undefined') {
+            // if we have sensor markers enabled then we need to rotate colors as the marker numbers increase
+            if (sat.id === satSet.satSensorMarkerArray[ColorSchemeFactory.default.iSensor + 1]) {
+              ColorSchemeFactory.default.iSensor++;
+            }
           }
         }
         if (ColorSchemeFactory.default.iSensor >= 0) {

@@ -18,8 +18,8 @@ import '@app/js/lib/external/Chart.js';
 import * as $ from 'jquery';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { satellite } from '@app/js/lib/lookangles.js';
-import { sensorList } from '@app/js/sensorManager/sensorList.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import { sensorList } from '@app/js/plugins/sensor/sensorList.js';
+import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 var requestInfo = {};
 var isDrawApogee = false;
@@ -61,8 +61,8 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
       sensor.observerGd = {
         // Array to calculate look angles in propagate()
         latitude: sensor.lat * DEG2RAD,
-        longitude: sensor.long * DEG2RAD,
-        height: sensor.obshei * 1, // Converts from string to number TODO: Find correct way to convert string to integer
+        longitude: sensor.lon * DEG2RAD,
+        height: sensor.alt * 1, // Converts from string to number TODO: Find correct way to convert string to integer
       };
     }
 

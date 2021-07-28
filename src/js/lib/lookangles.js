@@ -1,20 +1,22 @@
 /**
- * /* /////////////////////////////////////////////////////////////////////////////
+ * /////////////////////////////////////////////////////////////////////////////
  *
  * lookangles.js is an expansion library for satellite.js providing tailored
  * functions for calculating orbital data.
  * http://keeptrack.space
  *
- * Copyright (C) 2016-2021 Theodore Kruczek
- * Copyright (C) 2020 Heather Kruczek
+ * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2020 Heather Kruczek
  *
- * This program is free software: you can redistribute it and/or modify it under
+ * KeepTrack is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
+ * KeepTrack is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with
+ * KeepTrack. If not, see <http://www.gnu.org/licenses/>.
  *
  * /////////////////////////////////////////////////////////////////////////////
  */
@@ -25,9 +27,8 @@ import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 import { saveCsv, saveVariable, stringPad } from './helpers.ts';
 import $ from 'jquery';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-// import { satellite as satelliteBase } from 'sgp4-js/src/satellite';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import { keepTrackApi } from '@app/js/api/externalApi.ts';
+import { timeManager } from '@app/js/timeManager/timeManager.ts';
 let satellite = {};
 
 // Constants
@@ -36,6 +37,8 @@ const DEG2RAD = TAU / 360;
 const RAD2DEG = 360 / TAU;
 const MINUTES_PER_DAY = 1440;
 const MILLISECONDS_PER_DAY = 1.15741e-8;
+
+let settingsManager;
 
 // Legacy API
 satellite.sgp4 = Ootk.Sgp4.propagate;
@@ -49,12 +52,13 @@ satellite.degreesLat = Ootk.Transforms.getDegLat;
 satellite.degreesLong = Ootk.Transforms.getDegLon;
 satellite.ecfToLookAngles = Ootk.Transforms.ecf2rae;
 
-var satSet, satCruncher, sensorManager, groupsManager;
-satellite.initLookangles = (satSetRef, satCruncherRef, sensorManagerRef, groupsManagerRef) => {
-  satSet = satSetRef;
-  satCruncher = satCruncherRef;
-  sensorManager = sensorManagerRef;
-  groupsManager = groupsManagerRef;
+let satSet, satCruncher, sensorManager, groupsManager;
+satellite.initLookangles = () => {
+  satSet = keepTrackApi.programs.satSet;
+  satCruncher = keepTrackApi.programs.satCruncher;
+  sensorManager = keepTrackApi.programs.sensorManager;
+  groupsManager = keepTrackApi.programs.groupsManager;
+  settingsManager = keepTrackApi.programs.settingsManager;
 };
 
 var _propagate = (propTempOffset, satrec, sensor) => {
@@ -175,8 +179,8 @@ satellite.setobs = (sensor) => {
     sensorManager.currentSensor.observerGd = {
       // Array to calculate look angles in propagate()
       lat: sensor.lat * DEG2RAD,
-      lon: sensor.long * DEG2RAD,
-      alt: parseFloat(sensor.obshei), // Converts from string to number
+      lon: sensor.lon * DEG2RAD,
+      alt: parseFloat(sensor.alt), // Converts from string to number
     };
   } catch (error) {
     console.warn(error);
@@ -250,9 +254,9 @@ satellite.getTEARR = (sat, sensor, propTime) => {
   if (typeof sensor.observerGd == 'undefined') {
     try {
       sensor.observerGd = {
-        alt: sensor.obshei,
+        alt: sensor.alt,
         lat: sensor.lat,
-        lon: sensor.long,
+        lon: sensor.lon,
       };
     } catch (e) {
       throw 'observerGd is not set and could not be guessed.';
@@ -347,9 +351,9 @@ satellite.nextpass = (sat, sensor, searchLength, interval) => {
   if (typeof sensor.observerGd == 'undefined') {
     try {
       sensor.observerGd = {
-        alt: sensor.obshei,
+        alt: sensor.alt,
         lat: sensor.lat,
-        lon: sensor.long,
+        lon: sensor.lon,
       };
     } catch (e) {
       throw 'observerGd is not set and could not be guessed.';
@@ -388,9 +392,9 @@ satellite.nextNpasses = (sat, sensor, searchLength, interval, numPasses) => {
   if (typeof sensor.observerGd == 'undefined') {
     try {
       sensor.observerGd = {
-        alt: sensor.obshei,
+        alt: sensor.alt,
         lat: sensor.lat,
-        lon: sensor.long,
+        lon: sensor.lon,
       };
     } catch (e) {
       throw 'observerGd is not set and could not be guessed.';
@@ -807,9 +811,12 @@ satellite.getlookanglesMultiSite = (sat) => {
 // };
 
 satellite.findCloseObjects = () => {
+  const searchRadius = 50; // km
+
   let csoList = [];
   let satList = [];
 
+  // Short internal function to find the satellites position
   const _getSatPos = (propTempOffset, satrec) => {
     let now = new Date(); // Make a time variable
     now.setTime(Number(Date.now()) + propTempOffset); // Set the time variable to the time in the future
@@ -828,31 +835,46 @@ satellite.findCloseObjects = () => {
     return satellite.sgp4(satrec, m);
   };
 
+  // Loop through all the satellites
   for (let i = 0; i < satSet.numSats; i++) {
-    let sat = satSet.getSat(i);
+    // Get the satellite
+    const sat = satSet.getSat(i);
+    // Avoid unnecessary errors
     if (typeof sat.TLE1 == 'undefined') continue;
+    // Only look at satellites in LEO
     if (sat.apogee > 5556) continue;
-    sat.satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);
-    let pos = _getSatPos(0, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval);
-    sat.position = pos.position;
+    // Find where the satellite is right now
+    sat.position = _getSatPos(0, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval).position;
+    // If it fails, skip it
     if (typeof sat.position == 'undefined') continue;
+    // Add the satellite to the list
     satList.push(sat);
   }
 
+  // Loop through all the satellites with valid positions
   for (let i = 0; i < satList.length; i++) {
     let sat1 = satList[i];
     let pos1 = sat1.position;
-    let posXmin = pos1.x - 20;
-    let posXmax = pos1.x + 20;
-    let posYmin = pos1.y - 20;
-    let posYmax = pos1.y + 20;
-    let posZmin = pos1.z - 20;
-    let posZmax = pos1.z + 20;
+
+    // Calculate the area around the satellite
+    let posXmin = pos1.x - searchRadius;
+    let posXmax = pos1.x + searchRadius;
+    let posYmin = pos1.y - searchRadius;
+    let posYmax = pos1.y + searchRadius;
+    let posZmin = pos1.z - searchRadius;
+    let posZmax = pos1.z + searchRadius;
+
+    // Loop through the list again
     for (let j = 0; j < satList.length; j++) {
+      // Get the second satellite
       let sat2 = satList[j];
+      // Skip the same satellite
       if (sat1 == sat2) continue;
+      // Get the second satellite's position
       let pos2 = sat2.position;
+      // Check to see if the second satellite is in the search area
       if (pos2.x < posXmax && pos2.x > posXmin && pos2.y < posYmax && pos2.y > posYmin && pos2.z < posZmax && pos2.z > posZmin) {
+        // Add the second satellite to the list if it is close
         csoList.push({ sat1: sat1, sat2: sat2 });
       }
     }
@@ -862,38 +884,51 @@ satellite.findCloseObjects = () => {
   csoList = []; // Clear CSO List
   satList = []; // Clear CSO List
 
+  // Loop through the possible CSOs
   for (let i = 0; i < csoListUnique.length; i++) {
+    // Calculate the first CSO's position 30 minutes later
     let sat = csoListUnique[i].sat1;
     let pos = _getSatPos(1000 * 60 * 30, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval);
     csoListUnique[i].sat1.position = pos.position;
 
+    // Calculate the second CSO's position 30 minutes later
     sat = csoListUnique[i].sat2;
     pos = _getSatPos(1000 * 60 * 30, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval);
     sat.position = pos.position;
     csoListUnique[i].sat2.position = pos.position;
   }
 
-  satList = Array.from(new Set(satList)); // Remove duplicates
+  // Remove duplicates
+  satList = Array.from(new Set(satList));
 
+  // Loop through the CSOs
   for (let i = 0; i < csoListUnique.length; i++) {
+    // Check the first CSO
     let sat1 = csoListUnique[i].sat1;
     let pos1 = sat1.position;
     if (typeof pos1 == 'undefined') continue;
-    let posXmin = pos1.x - 20;
-    let posXmax = pos1.x + 20;
-    let posYmin = pos1.y - 20;
-    let posYmax = pos1.y + 20;
-    let posZmin = pos1.z - 20;
-    let posZmax = pos1.z + 20;
+
+    // Calculate the area around the CSO
+    let posXmin = pos1.x - searchRadius;
+    let posXmax = pos1.x + searchRadius;
+    let posYmin = pos1.y - searchRadius;
+    let posYmax = pos1.y + searchRadius;
+    let posZmin = pos1.z - searchRadius;
+    let posZmax = pos1.z + searchRadius;
+
+    // Get the second CSO object
     let sat2 = csoListUnique[i].sat2;
     let pos2 = sat2.position;
     if (typeof pos2 == 'undefined') continue;
+
+    // If it is still in the search area, add it to the list
     if (pos2.x < posXmax && pos2.x > posXmin && pos2.y < posYmax && pos2.y > posYmin && pos2.z < posZmax && pos2.z > posZmin) {
       csoList.push(sat1.SCC_NUM);
       csoList.push(sat2.SCC_NUM);
     }
   }
 
+  // Generate the search string
   csoListUnique = Array.from(new Set(csoList));
   let searchStr = '';
   for (let i = 0; i < csoListUnique.length; i++) {
@@ -1330,8 +1365,8 @@ satellite.calculateLookAngles = (sat, sensor, propOffset) => {
       sensor.observerGd = {
         // Array to calculate look angles in propagate()
         lat: sensor.lat * DEG2RAD,
-        lon: sensor.long * DEG2RAD,
-        alt: parseFloat(sensor.obshei),
+        lon: sensor.lon * DEG2RAD,
+        alt: parseFloat(sensor.alt),
       };
     }
 
@@ -1436,8 +1471,8 @@ satellite.findBestPass = (sat, sensor, propOffset) => {
       sensor.observerGd = {
         // Array to calculate look angles in propagate()
         lat: sensor.lat * DEG2RAD,
-        lon: sensor.long * DEG2RAD,
-        alt: parseFloat(sensor.obshei),
+        lon: sensor.lon * DEG2RAD,
+        alt: parseFloat(sensor.alt),
       };
     }
 
@@ -2061,7 +2096,7 @@ satellite.getDOPs = (lat, lon, alt, propTime) => {
       lookAngles = satellite.ecfToLookAngles({ lon: lon, lat: lat, alt: alt }, satellite.eciToEcf(sat.position, gmst));
       sat.az = lookAngles.az * RAD2DEG;
       sat.el = lookAngles.el * RAD2DEG;
-      if (sat.el > settingsManager.gpselMask) {
+      if (sat.el > settingsManager.gpsElevationMask) {
         inViewList.push(sat);
       }
     }
@@ -2190,9 +2225,9 @@ satellite.getSunTimes = (sat, sensor, searchLength, interval) => {
   if (typeof sensor.observerGd == 'undefined') {
     try {
       sensor.observerGd = {
-        alt: sensor.obshei,
+        alt: sensor.alt,
         lat: sensor.lat,
-        lon: sensor.long,
+        lon: sensor.lon,
       };
     } catch (e) {
       throw 'observerGd is not set and could not be guessed.';
@@ -2419,8 +2454,8 @@ satellite.calculateSensorPos = (sensor) => {
 
   var cosLat = Math.cos(sensor.lat * DEG2RAD);
   var sinLat = Math.sin(sensor.lat * DEG2RAD);
-  var cosLon = Math.cos(sensor.long * DEG2RAD + gmst);
-  var sinLon = Math.sin(sensor.long * DEG2RAD + gmst);
+  var cosLon = Math.cos(sensor.lon * DEG2RAD + gmst);
+  var sinLon = Math.sin(sensor.lon * DEG2RAD + gmst);
 
   let pos = {};
   pos.x = (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * cosLon;
@@ -2428,7 +2463,7 @@ satellite.calculateSensorPos = (sensor) => {
   pos.z = (RADIUS_OF_EARTH + PLANETARIUM_DIST) * sinLat;
   pos.gmst = gmst;
   pos.lat = sensor.lat;
-  pos.long = sensor.long;
+  pos.lon = sensor.lon;
   return pos;
 };
 

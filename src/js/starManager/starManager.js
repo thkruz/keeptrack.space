@@ -15,15 +15,17 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 
 import { constellations } from './constellations.js';
+import { keepTrackApi } from '@app/js/api/externalApi.ts';
 import { stars } from './stars.js';
 
 var starManager = {};
 starManager.stars = stars;
 
-var lineManager, getIdFromStarName;
-starManager.init = (lineManagerRef, getIdFromStarNameRef) => {
-  lineManager = lineManagerRef;
-  getIdFromStarName = getIdFromStarNameRef;
+let lineManager, getIdFromStarName;
+starManager.init = () => {
+  lineManager = keepTrackApi.programs.lineManager;
+  getIdFromStarName = keepTrackApi.programs.satSet.getIdFromStarName;
+
   // Requires starManager Module
   try {
     starManager.isConstellationVisible = false;
@@ -70,7 +72,7 @@ starManager.init = (lineManagerRef, getIdFromStarNameRef) => {
             var star1, star2;
             star1 = getIdFromStarName(starManager.constellations[i].stars[s][0]);
             star2 = getIdFromStarName(starManager.constellations[i].stars[s][1]);
-            if (star1 == null || star2 == null) {
+            if (typeof star1 == 'undefined' || star1 == null || typeof star2 == 'undefined' || star2 == null) {
               continue;
             }
             lineManager.create('sat5', [star1, star2], 'p');

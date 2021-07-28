@@ -1,28 +1,30 @@
-/* */
 /**
- * /* /////////////////////////////////////////////////////////////////////////////
+ * /////////////////////////////////////////////////////////////////////////////
  *
  * satSet.js is the primary interface between sat-cruncher and the main application.
  * It manages all interaction with the satellite catalogue.
  * http://keeptrack.space
  *
- * Copyright (C) 2016-2021 Theodore Kruczek
- * Copyright (C) 2020 Heather Kruczek
- * Copyright (C) 2015-2016, James Yoder
+ * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2020 Heather Kruczek
+ * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
  * under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
  *
- * This program is free software: you can redistribute it and/or modify it under
+ * KeepTrack is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
+ * KeepTrack is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with
+ * KeepTrack. If not, see <http://www.gnu.org/licenses/>.
  *
  * /////////////////////////////////////////////////////////////////////////////
  */
+
 /* eslint-disable no-useless-escape */
 
 import '@app/js/lib/external/numeric.js';
@@ -31,66 +33,26 @@ import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EART
 import { saveCsv, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import { jsTLEfile } from '@app/offline/tle.js';
-import { nextLaunchManager } from '@app/js/satSet/nextLaunchManager';
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 // import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
-import { sMM } from '@app/js/uiManager/sideMenuManager.js';
 import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { saveAs } from '@app/js/lib/external/file-saver.min.js';
-import { sensorManager } from '@app/js/sensorManager/sensorManager.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
+import { timeManager } from '@app/js/timeManager/timeManager.ts';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
 
 // 'use strict';
 var satSet = {};
-satSet.nextLaunchManager = nextLaunchManager;
-var gl;
 
 var satCruncher;
 var limitSats = settingsManager.limitSats;
 
 var satData;
 var satExtraData;
-
-var checkInc = (possibles, minInc, maxInc) => {
-  var incRes = [];
-  for (var i = 0; i < possibles.length; i++) {
-    if ((possibles[i].inclination * RAD2DEG).toFixed(2) < maxInc && (possibles[i].inclination * RAD2DEG).toFixed(2) > minInc) {
-      incRes.push(possibles[i]);
-    }
-  }
-  return incRes;
-};
-var checkPeriod = (possibles, minPeriod, maxPeriod) => {
-  var periodRes = [];
-  for (var i = 0; i < possibles.length; i++) {
-    if (possibles[i].period < maxPeriod && possibles[i].period > minPeriod && periodRes.length <= 200) {
-      // Don't display more than 200 results - this is because LEO and GEO belt have a lot of satellites
-      periodRes.push(possibles[i]);
-    }
-  }
-  if (periodRes.length >= 200) {
-    $('#findByLooks-results').text('Limited to 200 Results!');
-  }
-  return periodRes;
-};
-var checkRcs = (possibles, minRcs, maxRcs) => {
-  var rcsRes = [];
-  for (var i = 0; i < possibles.length; i++) {
-    if (parseFloat(possibles[i].R) < maxRcs && parseFloat(possibles[i].R) > minRcs && rcsRes.length <= 200) {
-      // Don't display more than 200 results - this is because LEO and GEO belt have a lot of satellites
-      rcsRes.push(possibles[i]);
-    }
-  }
-  if (rcsRes.length >= 200) {
-    $('#findByLooks-results').text('Limited to 200 Results!');
-  }
-  return rcsRes;
-};
-
 var satelliteList;
 
 /**
@@ -104,7 +66,6 @@ var satelliteList;
  * (ex: now --> drawNow) (ex: i --> satCrunchIndex)
  */
 var satCrunchIndex;
-var satCrunchNow = 0;
 var gotExtraData = false;
 
 var parseFromGETVariables = () => {
@@ -119,17 +80,14 @@ var parseFromGETVariables = () => {
   }
 };
 
-var dotManager;
-satSet.init = async (glRef, dotManagerRef, cameraManager) => {
+let dotManager, gl, cameraManager;
+satSet.init = async () => {
   window.satSet = satSet;
-  gl = glRef;
-  dotManager = dotManagerRef;
+  gl = keepTrackApi.programs.drawManager.gl;
+  dotManager = keepTrackApi.programs.dotsManager;
+  cameraManager = keepTrackApi.programs.cameraManager;
   /** Parses GET variables for Possible sharperShaders */
   parseFromGETVariables();
-
-  if (!settingsManager.disableUI) {
-    import('@app/js/satSet/nextLaunchManager.css').then((resp) => resp);
-  }
 
   settingsManager.loadStr('elsets');
   // See if we are running jest right now for testing
@@ -233,23 +191,8 @@ var addSatCruncherOnMessage = (cameraManager) => {
     const highestMarkerNumber = satSet.satSensorMarkerArray[satSet.satSensorMarkerArray.length - 1] || 0;
     settingsManager.dotsOnScreen = Math.max(satSet.numSats - settingsManager.maxFieldOfViewMarkers, highestMarkerNumber);
 
-    if (sMM.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
-      satCrunchNow = Date.now();
-      if (satCrunchNow > settingsManager.lastMapUpdateTime + 30000) {
-        uiManager.updateMap();
-        settingsManager.lastMapUpdateTime = satCrunchNow;
-        settingsManager.isMapUpdateOverride = false;
-      } else if (settingsManager.isMapUpdateOverride) {
-        uiManager.updateMap();
-        settingsManager.lastMapUpdateTime = satCrunchNow;
-        settingsManager.isMapUpdateOverride = false;
-      }
-    }
-
-    if (settingsManager.socratesOnSatCruncher) {
-      objectManager.setSelectedSat(settingsManager.socratesOnSatCruncher);
-      settingsManager.socratesOnSatCruncher = null;
-    }
+    // Run any callbacks for a normal position cruncher message
+    keepTrackApi.methods.onCruncherMessage();
 
     // Don't force color recalc if default colors and no sensor for inview color
     if ((objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) || settingsManager.isForceColorScheme) {
@@ -260,46 +203,9 @@ var addSatCruncherOnMessage = (cameraManager) => {
     }
 
     if (!settingsManager.cruncherReady) {
-      /** Hide SOCRATES menu if not all the satellites are currently available to view */
-      if (limitSats !== '') {
-        $('#menu-satellite-collision').hide();
-      }
-
       satSet.onCruncherReady();
       if (!settingsManager.disableUI) {
         uiManager.reloadLastSensor();
-        (function _watchlistInit() {
-          let watchlistJSON;
-          try {
-            watchlistJSON = localStorage.getItem('watchlistList');
-          } catch (e) {
-            watchlistJSON = null;
-          }
-          if (watchlistJSON !== null) {
-            let newWatchlist = JSON.parse(watchlistJSON);
-            let watchlistInViewList = [];
-            for (let i = 0; i < newWatchlist.length; i++) {
-              let sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
-              if (sat !== null) {
-                newWatchlist[i] = sat.id;
-                watchlistInViewList.push(false);
-              } else {
-                console.error('Watchlist File Format Incorret');
-                return;
-              }
-            }
-            if (sensorManager.checkSensorSelected()) {
-              $('#menu-info-overlay').removeClass('bmenu-item-disabled');
-            }
-            sMM.updateWatchlist(newWatchlist, watchlistInViewList);
-          }
-        }());
-      }
-
-      try {
-        nextLaunchManager.init();
-      } catch (e) {
-        // Might not have this module
       }
 
       /* istanbul ignore next */
@@ -383,7 +289,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
               break;
           }
         }
-      }());
+      })();
 
       // Load ALl The Images Now
       setTimeout(function () {
@@ -391,6 +297,9 @@ var addSatCruncherOnMessage = (cameraManager) => {
           $(this).attr('src', $(this).attr('delayedsrc'));
         });
       }, 0);
+
+      // Run any functions registered with the API
+      keepTrackApi.methods.onCruncherReady();
 
       settingsManager.cruncherReady = true;
     }
@@ -544,8 +453,8 @@ satSet.setupGetVariables = () => {
     dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
     setlatlong: true,
     lat: obslatitude,
-    long: obslongitude,
-    obshei: obsheight,
+    lon: obslongitude,
+    alt: obsheight,
     obsminaz: obsminaz,
     obsmaxaz: obsmaxaz,
     obsminel: obsminel,
@@ -894,106 +803,6 @@ satSet.initGsData = () => {
   });
 };
 
-satSet.searchCelestrak = (satNum, analsat) => {
-  // If no Analyst Satellite specified find the first unused one
-  if (typeof analsat == 'undefined') {
-    for (var i = 15000; i < satData.length; i++) {
-      if (satData[i].SCC_NUM >= 80000 && !satData[i].active) {
-        analsat = i;
-        break;
-      }
-    }
-  } else {
-    // Satnum to Id
-    analsat = satSet.getIdFromObjNum(analsat);
-  }
-
-  let request = new XMLHttpRequest();
-  request.open('GET', `php/get_data.php?type=c&sat=${satNum}`, true);
-
-  request.onload = function () {
-    if (this.status >= 200 && this.status < 400) {
-      // Success!
-      let tles = JSON.parse(this.response).split('\n');
-      let TLE1 = tles[1];
-      let TLE2 = tles[2];
-      satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-    } else {
-      // We reached our target server, but it returned an error
-      console.debug('Celestrack request returned an error!');
-    }
-  };
-
-  request.onerror = function () {
-    console.debug('Celestrack request failed!');
-  };
-
-  request.send();
-
-  // $.ajax({
-  //     async:true,
-  //     // dataType : 'jsonp',   //you may use jsonp for cross origin request
-  //     crossDomain:true,
-  //     url: `php/get_data.php?type=c&sat=${satNum}`,
-  //     success: function(data) {
-  //         let tles = data.split('\n');
-  //         let TLE1 = tles[1];
-  //         let TLE2 = tles[2];
-  //         satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-  //     }
-  // });
-};
-
-satSet.searchN2yo = (satNum, analsat) => {
-  // If no Analyst Satellite specified find the first unused one
-  if (typeof analsat == 'undefined') {
-    for (var i = 15000; i < satData.length; i++) {
-      if (satData[i].SCC_NUM >= 80000 && !satData[i].active) {
-        analsat = i;
-        break;
-      }
-    }
-  } else {
-    // Satnum to Id
-    analsat = satSet.getIdFromObjNum(analsat);
-  }
-
-  let request = new XMLHttpRequest();
-  request.open('GET', `php/get_data.php?type=n&sat=${satNum}`, true);
-
-  request.onload = function () {
-    if (this.status >= 200 && this.status < 400) {
-      // Success!
-      let tles = this.response.split('<div id="tle">')[1].split('<pre>')[1].split('\n');
-      let TLE1 = tles[0];
-      let TLE2 = tles[1];
-      satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-    } else {
-      // We reached our target server, but it returned an error
-      console.debug('N2YO request returned an error!');
-    }
-  };
-
-  request.onerror = function () {
-    console.debug('N2YO request failed!');
-  };
-
-  request.send();
-
-  // $.ajax({
-  //     async:true,
-  //     // dataType : 'jsonp',   //you may use jsonp for cross origin request
-  //     crossDomain:true,
-  //     url: `php/get_data.php?type=n&sat=${satNum}`,
-  //     success: function(data) {
-  //         let tles = data.split('<div id="tle">')[1].split('\n');
-  //         let TLE1 = tles[2];
-  //         let TLE2 = tles[3];
-  //         satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-  //     }
-  // });
-};
-
 satSet.insertNewAnalystSatellite = (TLE1, TLE2, analsat) => {
   if (satellite.altitudeCheck(TLE1, TLE2, timeManager.propOffset) > 1) {
     satCruncher.postMessage({
@@ -1075,7 +884,7 @@ satSet.getSat = (i) => {
   if (!satData) return null;
   if (!satData[i]) return null;
 
-  if (!satData[i].type == 'Star') return;
+  if (satData[i].type == 'Star') return;
 
   if (gotExtraData) {
     satData[i].inViewChange = false;
@@ -1179,6 +988,9 @@ satSet.getSat = (i) => {
   }
   if (typeof satData[i].getAltitude == 'undefined') {
     satData[i].getAltitude = () => {
+      // Stars don't have an altitude
+      if (satData[i].type == 'Star') return;
+
       if (satData[i].missile) {
         return satellite.eci2ll(satData[i].position.x, satData[i].position.y, satData[i].position.z).alt;
       } else {
@@ -1203,9 +1015,9 @@ satSet.getSat = (i) => {
       if (typeof sensor.observerGd == 'undefined') {
         try {
           sensor.observerGd = {
-            alt: sensor.obshei,
+            alt: sensor.alt,
             lat: sensor.lat,
-            lon: sensor.long,
+            lon: sensor.lon,
           };
         } catch (e) {
           throw 'observerGd is not set and could not be guessed.';
@@ -1222,12 +1034,19 @@ satSet.getSat = (i) => {
             throw 'observerGd is not set and could not be guessed.';
           }
         }
+      } else {
+        // Convert observer grid to radians
+        sensor.observerGd = {
+          alt: sensor.alt,
+          lat: sensor.lat * DEG2RAD,
+          lon: sensor.lon * DEG2RAD,
+        };
       }
 
       // Set default timing settings. These will be changed to find look angles at different times in future.
       let satrec = satellite.twoline2satrec(satData[i].TLE1, satData[i].TLE2); // perform and store sat init calcs
       let now;
-      if (typeof propTime != 'undefined') {
+      if (typeof propTime != 'undefined' && propTime !== null) {
         now = propTime;
       } else {
         now = timeManager.propTime();
@@ -1407,14 +1226,14 @@ satSet.getIdFromSensorName = (sensorName) => {
     var gmst = satellite.gstime(j);
     let cosLat = Math.cos(sensorManager.currentSensor.lat * DEG2RAD);
     let sinLat = Math.sin(sensorManager.currentSensor.lat * DEG2RAD);
-    let cosLon = Math.cos(sensorManager.currentSensor.long * DEG2RAD + gmst);
-    let sinLon = Math.sin(sensorManager.currentSensor.long * DEG2RAD + gmst);
+    let cosLon = Math.cos(sensorManager.currentSensor.lon * DEG2RAD + gmst);
+    let sinLon = Math.sin(sensorManager.currentSensor.lon * DEG2RAD + gmst);
     let sensor = {};
     sensor.position = {};
     sensor.name = 'Custom Sensor';
-    sensor.position.x = (6371 + 0.25 + sensorManager.currentSensor.obshei) * cosLat * cosLon; // 6371 is radius of earth
-    sensor.position.y = (6371 + 0.25 + sensorManager.currentSensor.obshei) * cosLat * sinLon;
-    sensor.position.z = (6371 + 0.25 + sensorManager.currentSensor.obshei) * sinLat;
+    sensor.position.x = (6371 + 0.25 + sensorManager.currentSensor.alt) * cosLat * cosLon; // 6371 is radius of earth
+    sensor.position.y = (6371 + 0.25 + sensorManager.currentSensor.alt) * cosLat * sinLon;
+    sensor.position.z = (6371 + 0.25 + sensorManager.currentSensor.alt) * sinLat;
     // console.log('No Sensor Found. Using Current Sensor');
     // console.log(sensor);
     return sensor;
@@ -1498,176 +1317,6 @@ satSet.searchCountryRegex = (regex) => {
   }
   return res;
 };
-satSet.searchAzElRange = (azimuth, elevation, range, inclination, azMarg, elMarg, rangeMarg, incMarg, period, periodMarg, rcs, rcsMarg, objtype) => {
-  var isCheckAz = !isNaN(parseFloat(azimuth)) && isFinite(azimuth);
-  var isCheckEl = !isNaN(parseFloat(elevation)) && isFinite(elevation);
-  var isCheckRange = !isNaN(parseFloat(range)) && isFinite(range);
-  var isCheckInclination = !isNaN(parseFloat(inclination)) && isFinite(inclination);
-  var isCheckPeriod = !isNaN(parseFloat(period)) && isFinite(period);
-  var isCheckRcs = !isNaN(parseFloat(rcs)) && isFinite(rcs);
-  var isCheckAzMarg = !isNaN(parseFloat(azMarg)) && isFinite(azMarg);
-  var isCheckElMarg = !isNaN(parseFloat(elMarg)) && isFinite(elMarg);
-  var isCheckRangeMarg = !isNaN(parseFloat(rangeMarg)) && isFinite(rangeMarg);
-  var isCheckIncMarg = !isNaN(parseFloat(incMarg)) && isFinite(incMarg);
-  var isCheckPeriodMarg = !isNaN(parseFloat(periodMarg)) && isFinite(periodMarg);
-  var isCheckRcsMarg = !isNaN(parseFloat(rcsMarg)) && isFinite(rcsMarg);
-  objtype *= 1; // String to Number
-
-  if (!isCheckEl && !isCheckRange && !isCheckAz && !isCheckInclination && !isCheckPeriod && !isCheckRcs) return; // Ensure there is a number typed.
-
-  var checkInview = (possibles) => {
-    var inviewRes = [];
-    for (var i = 0; i < possibles.length; i++) {
-      if (possibles[i].inview) {
-        inviewRes.push(possibles[i]);
-      }
-    }
-    return inviewRes;
-  };
-
-  var checkObjtype = (possibles) => {
-    var objtypeRes = [];
-    for (var i = 0; i < possibles.length; i++) {
-      if (possibles[i].OT === objtype) {
-        objtypeRes.push(possibles[i]);
-      }
-    }
-    return objtypeRes;
-  };
-
-  var checkAz = (possibles, minaz, maxaz) => {
-    var azRes = [];
-    for (var i = 0; i < possibles.length; i++) {
-      if (possibles[i].az < maxaz && possibles[i].az > minaz) {
-        azRes.push(possibles[i]);
-      }
-    }
-    return azRes;
-  };
-  var checkEl = (possibles, minel, maxel) => {
-    var elRes = [];
-    for (var i = 0; i < possibles.length; i++) {
-      if (possibles[i].el < maxel && possibles[i].el > minel) {
-        elRes.push(possibles[i]);
-      }
-    }
-    return elRes;
-  };
-  var checkRange = (possibles, minrange, maxrange) => {
-    var rangeRes = [];
-    for (var i = 0; i < possibles.length; i++) {
-      if (possibles[i].rng < maxrange && possibles[i].rng > minrange) {
-        rangeRes.push(possibles[i]);
-      }
-    }
-    return rangeRes;
-  };
-
-  if (!isCheckAzMarg) {
-    azMarg = 5;
-  }
-  if (!isCheckElMarg) {
-    elMarg = 5;
-  }
-  if (!isCheckRangeMarg) {
-    rangeMarg = 200;
-  }
-  if (!isCheckIncMarg) {
-    incMarg = 1;
-  }
-  if (!isCheckPeriodMarg) {
-    periodMarg = 0.5;
-  }
-  if (!isCheckRcsMarg) {
-    rcsMarg = rcs / 10;
-  }
-  var res = [];
-
-  var s = 0;
-  for (var i = 0; i < satData.length; i++) {
-    if (satData[i].static || satData[i].missile || !satData[i].active) {
-      continue;
-    }
-    res.push(satData[i]);
-    satellite.getTEARR(res[s]);
-    res[s].az = satellite.currentTEARR.az;
-    res[s].el = satellite.currentTEARR.el;
-    res[s].rng = satellite.currentTEARR.rng;
-    res[s].inview = satellite.currentTEARR.inview;
-    s++;
-  }
-
-  if (!isCheckInclination && !isCheckPeriod) {
-    res = checkInview(res);
-  }
-
-  if (objtype !== 0) {
-    res = checkObjtype(res);
-  }
-
-  if (isCheckAz) {
-    azimuth = azimuth * 1; // Convert azimuth to int
-    azMarg = azMarg * 1;
-    var minaz = azimuth - azMarg;
-    var maxaz = azimuth + azMarg;
-    res = checkAz(res, minaz, maxaz);
-  }
-
-  if (isCheckEl) {
-    elevation = elevation * 1; // Convert elevation to int
-    elMarg = elMarg * 1;
-    var minel = elevation - elMarg;
-    var maxel = elevation + elMarg;
-    res = checkEl(res, minel, maxel);
-  }
-
-  if (isCheckRange) {
-    range = range * 1; // Convert range to int
-    rangeMarg = rangeMarg * 1;
-    var minrange = range - rangeMarg;
-    var maxrange = range + rangeMarg;
-    res = checkRange(res, minrange, maxrange);
-  }
-
-  if (isCheckInclination) {
-    inclination = inclination * 1; // Convert inclination to int
-    incMarg = incMarg * 1;
-    var minInc = inclination - incMarg;
-    var maxInc = inclination + incMarg;
-    res = checkInc(res, minInc, maxInc);
-  }
-
-  if (isCheckPeriod) {
-    period = period * 1; // Convert period to int
-    periodMarg = periodMarg * 1;
-    var minPeriod = period - periodMarg;
-    var maxPeriod = period + periodMarg;
-    res = checkPeriod(res, minPeriod, maxPeriod);
-  }
-
-  if (isCheckRcs) {
-    rcs = rcs * 1; // Convert period to int
-    rcsMarg = rcsMarg * 1;
-    var minRcs = rcs - rcsMarg;
-    var maxRcs = rcs + rcsMarg;
-    res = checkRcs(res, minRcs, maxRcs);
-  }
-  // $('#findByLooks-results').text('');
-  // IDEA: Intentionally doesn't clear previous searches. Could be an option later.
-  var sccList = [];
-  for (let i = 0; i < res.length; i++) {
-    // $('#findByLooks-results').append(res[i].SCC_NUM + '<br />');
-    if (i < res.length - 1) {
-      $('#search').val($('#search').val() + res[i].SCC_NUM + ',');
-    } else {
-      $('#search').val($('#search').val() + res[i].SCC_NUM);
-    }
-    sccList.push(res[i].SCC_NUM);
-  }
-  uiManager.doSearch($('#search').val());
-  // console.log(sccList);
-  return res;
-};
 
 satSet.exportTle2Csv = () => {
   try {
@@ -1745,6 +1394,8 @@ satSet.exportTle2Txt = () => {
 satSet.setHover = (i) => {
   objectManager.setHoveringSat(i);
   if (i === objectManager.lasthoveringSat) return;
+  if (i !== -1 && satData[i].type == 'Star') return;
+
   settingsManager.currentColorScheme.hoverSat = objectManager.hoveringSat;
 
   gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
@@ -1763,15 +1414,12 @@ satSet.setHover = (i) => {
 
 satSet.selectSat = (i) => {
   if (i === objectManager.lastSelectedSat()) return;
-  if (uiManager.isAnalysisMenuOpen && i != -1) {
-    $('#anal-sat').val(satSet.getSat(i).SCC_NUM);
-  }
 
   let sat = satSet.getSat(i);
   if (sat !== null && sat.static && typeof sat.staticNum !== 'undefined') {
-    uiManager.adviceList.sensor();
+    if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.sensor();
   } else {
-    uiManager.adviceList.satelliteSelected();
+    if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.satelliteSelected();
   }
 
   satCruncher.postMessage({

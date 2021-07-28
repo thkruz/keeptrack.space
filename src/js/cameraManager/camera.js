@@ -1076,6 +1076,12 @@ class Camera {
       }
 
       glm.mat4.identity(this.camMatrix);
+
+      // Workaround for bug with selecting stars
+      if (typeof sat === 'undefined' && this.cameraType.current == this.cameraType.fixedToSat) {
+        this.cameraType.current = this.cameraType.default;
+      }
+
       switch (this.cameraType.current) {
         case this.cameraType.default: // pivot around the earth with earth in the center
           glm.mat4.translate(this.camMatrix, this.camMatrix, [this.panCurrent.x, this.panCurrent.y, this.panCurrent.z]);
@@ -1118,7 +1124,7 @@ class Camera {
           // Pitch is the opposite of the angle to the latitude
           // Yaw is 90 degrees to the left of the angle to the longitude
           this.pitchRotate = -1 * sensorPos.lat * DEG2RAD;
-          this.yawRotate = (90 - sensorPos.long) * DEG2RAD - sensorPos.gmst;
+          this.yawRotate = (90 - sensorPos.lon) * DEG2RAD - sensorPos.gmst;
           glm.mat4.rotate(this.camMatrix, this.camMatrix, this.pitchRotate, [1, 0, 0]);
           glm.mat4.rotate(this.camMatrix, this.camMatrix, this.yawRotate, [0, 0, 1]);
 

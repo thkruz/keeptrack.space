@@ -1,5 +1,7 @@
 /* eslint-disable */
 var webpack = require('webpack');
+var path = require('path');
+
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 var glob = require('glob');
 
@@ -36,6 +38,9 @@ let config = {
       },
     ],
   },
+  experiments: {
+    topLevelAwait: true,
+  },
   plugins: [
     new webpack.ProvidePlugin({
       '$': 'jquery',
@@ -71,15 +76,15 @@ if (MAKE_MODE == 'production') {
 
 let jsConfig = Object.assign({}, config, {
   name: 'MainFiles',
-  entry: {
-    main: ['./src/js/main.js'],
-  },
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
+    extensions: ['.ts', '.js'],
     alias: {
-      '@app': __dirname + '/../src',
+      '@app': path.resolve(__dirname + '/../src'),
     },
+  },
+  entry: {
+    main: ['./src/js/main.js'],
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -95,6 +100,7 @@ let jsConfig2 = Object.assign({}, config, {
     orbitCruncher: ['./src/js/webworker/orbitCruncher.js'],
   },
   resolve: {
+    extensions: ['.ts', '.js'],
     alias: {
       '@app': __dirname + '/../src',
     },
@@ -112,6 +118,7 @@ let jsConfig3 = Object.assign({}, config, {
     'analysis-tools': ['./src/analysis/js/analysis-tools.js'],
   },
   resolve: {
+    extensions: ['.ts', '.js'],
     alias: {
       '@app': __dirname + '/../src',
     },

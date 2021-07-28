@@ -6,7 +6,7 @@
 */
 
 import { sun } from '@app/js/drawManager/sceneManager/sun.js';
-import { timeManager } from '@app/js/timeManager/timeManager.js';
+import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 const glMock = global.mocks.glMock;
 document.body.innerHTML = global.docBody;

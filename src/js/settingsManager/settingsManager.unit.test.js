@@ -8,7 +8,7 @@
   expect
 */
 
-import { db, settingsManager } from './settingsManager';
+import { settingsManager } from '@app/js/settingsManager/settingsManager';
 
 const setUrl = (url) => {
   const host = url.split('/')[2] || '';
@@ -87,7 +87,7 @@ describe('settingsManager URL Test', () => {
     }
     testCaseNum++;
     setUrl(url);
-    import('@app/js/settingsManager/settingsManager.js');
+    import('@app/js/settingsManager/settingsManager.ts');
     settingsManager.init();
   });
 
@@ -162,10 +162,10 @@ describe('settingsManager URL Test', () => {
     settingsManager.loadStr('elsets');
     settingsManager.loadStr('easterEgg');
 
-    db.off();
-    db.on();
-    db.log('test');
-    db.log('test', true);
+    settingsManager.db.off();
+    settingsManager.db.on();
+    settingsManager.db.log('test');
+    settingsManager.db.log('test', true);
   });
 
   test('Other SettingsManager Tests', () => {

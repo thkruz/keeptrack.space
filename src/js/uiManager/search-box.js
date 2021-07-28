@@ -2,7 +2,8 @@
 
 import $ from 'jquery';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import { keepTrackApi } from '@app/js/api/externalApi';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 
 var hoverSatId = -1;
 var searchBox = {};
@@ -84,14 +85,15 @@ searchBox.doSearch = function (searchString, isPreventDropDown, satSet) {
 
   // Uppercase to make this search not case sensitive
   searchString = searchString.toUpperCase();
-  var searchList = searchString.split(',');
+  // Split string into array using comma or space as delimiter
+  let searchList = searchString.split(/[,\s]/u);
+  // Update last search with the most recent search results
   settingsManager.lastSearch = searchList;
 
-  var results = [];
-
-  let satData = satSet.getSatData();
-
-  for (var i = 0; i < satSet.missileSats; i++) {
+  // Initialize search results
+  const results = [];
+  const satData = satSet.getSatData();
+  for (let i = 0; i < satSet.missileSats; i++) {
     // Stop once you get to the markers to save time
     var sat = satData[i];
     if (typeof sat == 'undefined') {
@@ -280,13 +282,13 @@ searchBox.fillResultBox = function (results, satSet) {
   satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 };
 
-var satSet, groupsManager, orbitManager, dotsManager;
-searchBox.init = function (satSetRef, groupsManagerRef, orbitManagerRef, dotsManagerRef) {
+let satSet, groupsManager, orbitManager, dotsManager;
+searchBox.init = function () {
   if (settingsManager.disableUI) return;
-  satSet = satSetRef;
-  groupsManager = groupsManagerRef;
-  orbitManager = orbitManagerRef;
-  dotsManager = dotsManagerRef;
+  satSet = keepTrackApi.programs.satSet;
+  groupsManager = keepTrackApi.programs.groupsManager;
+  orbitManager = keepTrackApi.programs.orbitManager;
+  dotsManager = keepTrackApi.programs.dotsManager;
 };
 
 export { searchBox };

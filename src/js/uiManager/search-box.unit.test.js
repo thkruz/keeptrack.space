@@ -4,8 +4,9 @@
   expect
 */
 
-import '@app/js/settingsManager/settingsManager.js';
+import '@app/js/settingsManager/settingsManager.ts';
 import 'jsdom-worker';
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 
 test(`Basic Functions of Search Box`, () => {
@@ -67,7 +68,12 @@ test(`Basic Functions of Search Box`, () => {
   let dotsManager = {};
   dotsManager.updateSizeBuffer = () => true;
 
-  searchBox.init(satSet, groupsManager, orbitManager, dotsManager);
+  keepTrackApi.programs.satSet = satSet;
+  keepTrackApi.programs.groupsManager = groupsManager;
+  keepTrackApi.programs.orbitManager = orbitManager;
+  keepTrackApi.programs.dotsManager = dotsManager;
+
+  searchBox.init();
 
   // Run Tests
   expect(searchBox.isResultBoxOpen()).toBe(false);

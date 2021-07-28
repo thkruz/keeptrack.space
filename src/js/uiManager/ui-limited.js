@@ -1,3 +1,7 @@
+// Deprecated
+// ------------------------
+// Plan is to remove this functionality
+
 import $ from 'jquery';
 let M = window.M;
 

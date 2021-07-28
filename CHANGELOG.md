@@ -2,6 +2,61 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v3.5.0](https://github.com/thkruz/keeptrack.space/compare/v3.4.3...v3.5.0)
+
+> 17 July 2021 
+
+- refactor(settingsmanager): converted settingsmanager from js to ts [`2f55ca8`](https://github.com/thkruz/keeptrack.space/commit/2f55ca8d39643e66fd8d646cf32b664504389e9f)
+- refactor(uimanager): ui-input converted to ts and uiManager updated to be more dynamic [`3098853`](https://github.com/thkruz/keeptrack.space/commit/30988533d261bcf9e1532c9eff71cfc67227edbf)
+- feat(satinfoboxcore): refactored satInfoBox as plugin [`eff0c50`](https://github.com/thkruz/keeptrack.space/commit/eff0c503457abbd9871c5f79eb51de4f34e60087)
+- chore(contributing.md): removed contributing.md file [`d6f0ed5`](https://github.com/thkruz/keeptrack.space/commit/d6f0ed5340129d48921aadea325088bfc3c30ee8)
+- refactor(multiple): standardized use of lat, lon, alt vs lat, long, obshei [`74f3b3f`](https://github.com/thkruz/keeptrack.space/commit/74f3b3faa2349576935f8b2d1c3bf512c05903a4)
+- refactor(selectsatmanager): refactored selectSatManager as a plugin to keeptrackApi [`7a5a789`](https://github.com/thkruz/keeptrack.space/commit/7a5a789414d9018349147c540feb15ebeeb6ca4d)
+- feat(externalapi): implemented API for external plugins [`27ed24e`](https://github.com/thkruz/keeptrack.space/commit/27ed24e57849ca3eec8bcbf63ac4330d99ea54a6)
+- chore(tsconfig.json): updated tsconfig rules [`d5a901f`](https://github.com/thkruz/keeptrack.space/commit/d5a901f895932e622eb3eade8fc5a694afe83706)
+- chore(tle): updated TLEs [`09b691f`](https://github.com/thkruz/keeptrack.space/commit/09b691fa93c0f1d4c66a7ea13672b9e6881cdf35)
+- chore(declaration.d.ts): enabled css for typescript [`743bff7`](https://github.com/thkruz/keeptrack.space/commit/743bff7eb0a1e7d071024cb237b99d7fd6a01557)
+- chore(.eslintrc): removed no-explicit-any rule [`c1426ef`](https://github.com/thkruz/keeptrack.space/commit/c1426efa225a02c774344af1247d86542b3ae0d9)
+
+#### [v3.4.3](https://github.com/thkruz/keeptrack.space/compare/v3.4.1...v3.4.3)
+
+> 15 July 2021 
+
+- fix(nextlaunchmanager.ts): fixed type error [`95deee4`](https://github.com/thkruz/keeptrack.space/commit/95deee49257b6de422d21cf6e2d1a96fcc774e2e)
+- build(package.json): updated version npm scripts to include git tag [`ac16981`](https://github.com/thkruz/keeptrack.space/commit/ac1698195d65c52771305814372ec1af47c8f257)
+
+#### [v3.4.1](https://github.com/thkruz/keeptrack.space/compare/v3.2.1...v3.4.1)
+
+> 26 June 2021 
+
+- feat(uimanager.js): added Short Term Fence menu [`#275`](https://github.com/thkruz/keeptrack.space/pull/275)
+- build(deps-dev): bump style-loader from 2.0.0 to 3.0.0 [`#272`](https://github.com/thkruz/keeptrack.space/pull/272)
+- feat(satvmagmanager): expanded sunlight color scheme, fixed propagati… [`#273`](https://github.com/thkruz/keeptrack.space/pull/273)
+- fix(analysis-tools): fixed analysis tools to work with OOTK [`#269`](https://github.com/thkruz/keeptrack.space/pull/269)
+- fix(style.css): bottom menu was hiding some input selection options. … [`#268`](https://github.com/thkruz/keeptrack.space/pull/268)
+- fix(uimanager): fixed find objects in this orbit and orbit remaining … [`#267`](https://github.com/thkruz/keeptrack.space/pull/267)
+- docs(changelog): generated auto changelog [`#259`](https://github.com/thkruz/keeptrack.space/pull/259)
+- docs(readme.md): updated readme for version 3 [`#258`](https://github.com/thkruz/keeptrack.space/pull/258)
+- feat(uimanager.js): improved alerts for watchlist items entering/exit… [`#256`](https://github.com/thkruz/keeptrack.space/pull/256)
+- build(release.yml): fixed github publishing reference [`#255`](https://github.com/thkruz/keeptrack.space/pull/255)
+- chore(package.json): version bump [`#254`](https://github.com/thkruz/keeptrack.space/pull/254)
+- fix(uimanager): fixes issues #223 and #237 [`#252`](https://github.com/thkruz/keeptrack.space/pull/252)
+- ci(github workflows): updated to match package.json new script names [`#251`](https://github.com/thkruz/keeptrack.space/pull/251)
+- feat(satvmagmanager): expanded sunlight color scheme, fixed propagation speed code and line to sat [`6604b8d`](https://github.com/thkruz/keeptrack.space/commit/6604b8d4fc628f141a989fe53de44bcda1e34d0d)
+- fix(ui-input.ts): migrated ui-input to typescript. fixed on click and create sensor/observer bugs [`03175c7`](https://github.com/thkruz/keeptrack.space/commit/03175c7943e0724d85cb5959384f6207b154242a)
+- build(typescript): started migration to typescript [`49932b0`](https://github.com/thkruz/keeptrack.space/commit/49932b056d32c58379814201e09dc75436d89630)
+- refactor(helpers.ts): migrated helper module to typescript [`34cc7f5`](https://github.com/thkruz/keeptrack.space/commit/34cc7f5118961b7a07a0ce1ef06ef1d8af233467)
+- refactor(nextlaunchmanager.ts): fixed typing errors during build [`1a16244`](https://github.com/thkruz/keeptrack.space/commit/1a16244a84cc13691f8f96d8dea0081c1ad56dbe)
+- test(integration1): increased code coverage [`b4096c3`](https://github.com/thkruz/keeptrack.space/commit/b4096c3d7368ec71755eda356118800088deb18e)
+- build(typescript): updated types and lint rules [`dcccb6e`](https://github.com/thkruz/keeptrack.space/commit/dcccb6e4959ea1f3f2b577b0fb7d2cec0334b145)
+- test(integration1.test.js): increased lookangles code coverage [`a4888bf`](https://github.com/thkruz/keeptrack.space/commit/a4888bfdae4511f538114845957d06872d4bdac1)
+- build(uimanager.js): fixed import to use new typescript file [`fedf20f`](https://github.com/thkruz/keeptrack.space/commit/fedf20fab697b5ffb9f616d762da2d95f3a33dc8)
+- Autofix issues in 2 files [`b84ff87`](https://github.com/thkruz/keeptrack.space/commit/b84ff8731f9fa4b88781259cf87dd74bc9f49be2)
+- chore(changelog): updated changelog [`2ab055e`](https://github.com/thkruz/keeptrack.space/commit/2ab055ebb1525c1ee69a3672ff74ad8b2e5b4afa)
+- fix(nextlaunchmanager): removed race condition involving launchList [`357ea3c`](https://github.com/thkruz/keeptrack.space/commit/357ea3c174e849a9edb1d8d6ffb7c7d7abbc20b5)
+- build(helper.ts): fixed type error [`85c83d1`](https://github.com/thkruz/keeptrack.space/commit/85c83d1d495d24e0022d21f764579521d62e72b9)
+- ci(deepsource): fixed exclude to ignore external libraries [`0ad6ba8`](https://github.com/thkruz/keeptrack.space/commit/0ad6ba8efee563b3a22865cc817f748c6278d666)
+
 #### [v3.2.1](https://github.com/thkruz/keeptrack.space/compare/v3.2.0...v3.2.1)
 
 > 1 June 2021 

@@ -122,7 +122,7 @@ const selectSatManager = {
 
       if ($('#search-results').css('display') === 'block') {
         if (window.innerWidth > 1000) {
-          if ($('#search').val().length > 0) {
+          if (typeof $('#search').val() !== 'undefined' && $('#search').val().length > 0) {
             $('#search-results').attr('style', 'display:block; max-height:27%');
           }
           if (cameraManager.cameraType.current !== cameraManager.cameraType.planetarium) {

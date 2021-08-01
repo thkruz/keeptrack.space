@@ -5,7 +5,6 @@
     display: none;
   }
   #datetime {
-    position: fixed;
     top: 1px;
     z-index: 11;
     left: 55px;
@@ -45,7 +44,6 @@
   }
   #datetime-text:hover {
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 5px;
   }
   .top-menu-icons {
     display: inline-flex;
@@ -71,15 +69,14 @@
     position: absolute;
     right: 0px;
     width: 230px;
-    background: #1f3347 !important;
+    background: var(--colorTertiaryDarken2) !important;
     z-index: 1;
-    top: 0px;
-    margin-top: 25px;
-    margin-bottom: -50px;
+    top: var(--top-menu-height);
+    bottom: var(--bottom-menu-top);
     max-height: 100%;
     border-width: 0px 0px 5px 5px;
     border-style: solid;
-    border-color: #172635;
+    border-color: var(--colorTertiaryDarken3);
   }
   #search-holder {
     right: 0px;
@@ -92,13 +89,13 @@
     padding-top: 5px;
   }
   #ui-datepicker-div {
-    top: 25px !important;
+    position: relative !important;
     border-radius: 0px;
   }
   #time-machine-menu {
     padding-left: 35px;
     color: white;
-    background: #1f3347;
+    background: var(--colorTertiaryDarken2);
     width: 300px;
     top: 25px;
     right: 0px;
@@ -107,7 +104,7 @@
     overflow: auto;
     border-width: 0px 0px 5px 5px;
     border-style: solid;
-    border-color: #172635;
+    border-color: var(--colorTertiaryDarken3);
   }
   #obfit-menu {
     width: 500px;
@@ -115,31 +112,28 @@
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
-    background: #1f3347;
+    background: var(--colorTertiaryDarken2);
     width: 300px;
-    top: 25px;
+    top: var(--top-menu-height);
     right: 0px;
     z-index: 100;
     position: absolute;
     overflow: auto;
     border-width: 0px 0px 5px 5px;
     border-style: solid;
-    border-color: #172635;
+    border-color: var(--colorTertiaryDarken3);
   }  
   .side-menu {
-    position: relative;
-    background: #1f3347;
+    position: absolute;
+    background: var(--colorTertiaryDarken2);
     color: white;
-    top: calc(var(--top-menu-height) + var(--class-banner));
-    bottom: 100px;
     width: 100%;
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
     z-index: 10;
-    padding: 0px 5px calc(var(--bottom-menu-height) + 15px) 0px;
-    border-width: 0px 5px 0px 0px;
-    border-color: #172635;
+    /* border-width: 0px 5px 0px 0px; */
+    border-color: var(--colorTertiaryDarken3);
     border-style: solid;
   }
   #membership-menu {
@@ -149,6 +143,8 @@
   nav .nav-wrapper i,
   nav a.sidenav-trigger,
   nav a.sidenav-trigger i {
+    box-shadow: none;
+    -webkit-box-shadow: none;
     height: 25px !important;
     line-height: 25px !important;
   }
@@ -166,7 +162,7 @@
     display: inline;
   }
   #sat-infobox {
-    background: #1f3347;
+    background: var(--colorTertiaryDarken2);
     cursor: default;
     position: absolute;
     top: calc(27% - 5px);
@@ -176,7 +172,7 @@
     right: 0px;
     width: 350px;
     border-width: 5px;
-    border-color: #172635;
+    border-color: var(--colorTertiaryDarken3);
     border-style: solid;
     overflow: hidden auto;
   }
@@ -265,9 +261,9 @@
   }
   .side-menu {
     position: relative;
-    background: #1f3347;
+    background: var(--colorTertiaryDarken2);
     color: white;
-    top: calc(var(--top-menu-height) * 2 + var(--class-banner));
+    top: calc(var(--top-menu-height) * 2);
     bottom: 100px;
     width: 100%;
     height: 100%;
@@ -276,7 +272,7 @@
     z-index: 10;
     padding: 0px 5px 275px 0px;
     border-width: 0px 5px 0px 0px;
-    border-color: #172635;
+    border-color: var(--colorTertiaryDarken3);
     border-style: solid;
   }
   #membership-menu {
@@ -294,7 +290,7 @@
   }
   #sat-infobox {
     display: none;
-    background: #1f3347;
+    background: var(--colorTertiaryDarken2);
     cursor: default;
     position: absolute;
     top: 60%;
@@ -303,7 +299,7 @@
     padding: 0 10px 0px 10px;
     right: 0px;
     border-top: 5px;
-    border-top-color: #172635;
+    border-top-color: var(--colorTertiaryDarken3);
     border-top-style: solid;
     overflow: auto;
   }
@@ -439,14 +435,14 @@
     position: absolute;
     right: 0px;
     width: 100%;
-    background: #1f3347 !important;
+    background: var(--colorTertiaryDarken2) !important;
     z-index: 1;
     top: 50px;
     bottom: 250px;
     max-height: 20%;
     border-width: 0px 0px 5px 0px;
     border-style: solid;
-    border-color: #172635;
+    border-color: var(--colorTertiaryDarken3);
   }
   #search-holder {
     display: flex;
@@ -460,8 +456,8 @@
     margin-top: 15px;
   }
   #search-holder input:-webkit-autofill {
-    box-shadow: 0 0 0px 1000px #172635 inset;
-    background-color: #172635 !important;
+    box-shadow: 0 0 0px 1000px var(--colorTertiaryDarken3) inset;
+    background-color: var(--colorTertiaryDarken2) !important;
     -webkit-text-fill-color: white !important;
     color: white !important;
   }
@@ -493,7 +489,7 @@
     width: 50px;
     height: 50px;
     padding: 9px;
-    background: #1f3347 !important;
+    background: var(--colorTertiaryDarken2) !important;
   }
   .share-up {
     transition: 1s;
@@ -502,7 +498,7 @@
   #time-machine-menu {
     padding-left: 35px;
     color: white;
-    background: #1f3347;
+    background: var(--colorTertiaryDarken2);
     top: 50px;
     right: 0px;
     z-index: 100;
@@ -511,7 +507,7 @@
     width: 100%;
     border-width: 0px 0px 5px 0px;
     border-style: solid;
-    border-color: #172635;
+    border-color: var(--colorTertiaryDarken3);
   }
 
   #obfit-menu {
@@ -521,7 +517,7 @@
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
-    background: #1f3347;
+    background: var(--colorTertiaryDarken2);
     top: 50px;
     right: 0px;
     z-index: 100;
@@ -530,7 +526,7 @@
     width: 100%;
     border-width: 0px 0px 5px 0px;
     border-style: solid;
-    border-color: #172635;
+    border-color: var(--colorTertiaryDarken3);
   }
   nav,
   nav .nav-wrapper i,
@@ -578,7 +574,7 @@
 
   #sat-infobox {
     display: none;
-    background: #1f3347;
+    background: var(--colorTertiaryDarken2);
     cursor: default;
     position: absolute;
     top: 60%;
@@ -588,7 +584,7 @@
     right: 0px;
     width: 100%;
     border-top: 5px;
-    border-top-color: #172635;
+    border-top-color: var(--colorTertiaryDarken3);
     border-top-style: solid;
     overflow: auto;
   }
@@ -642,10 +638,10 @@
   }
   .side-menu {
     position: absolute;
-    background: #1f3347;
+    background: var(--colorTertiaryDarken2);
     color: white;
     width: 100%;
-    top: calc(var(--top-menu-height) * 2 + var(--class-banner));
+    top: calc(var(--top-menu-height) * 2);
     bottom: 0px;
     overflow: auto;
     z-index: 10;

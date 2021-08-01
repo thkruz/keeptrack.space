@@ -39,7 +39,13 @@ export const init = () => {
 
   adviceManager.onReady = () => {
     // Code Once index.htm is loaded
-    var wasAdviceEnabled = localStorage.getItem('isAdviceEnabled');
+    let wasAdviceEnabled = null;
+    try {
+      wasAdviceEnabled = localStorage.getItem('isAdviceEnabled');
+    } catch (e) {
+      console.debug(e);
+    }
+
     if (wasAdviceEnabled == 'true' || wasAdviceEnabled == null) {
       adviceManager.on();
 
@@ -384,12 +390,20 @@ export const init = () => {
     return isAdviceEnabled;
   };
   adviceManager.on = function () {
-    localStorage.setItem('isAdviceEnabled', true);
+    try {
+      localStorage.setItem('isAdviceEnabled', true);
+    } catch {
+      // Do Nothing
+    }
     isAdviceEnabled = true;
     tutIconDOM.addClass('bmenu-item-selected');
   };
   adviceManager.off = function () {
-    localStorage.setItem('isAdviceEnabled', false);
+    try {
+      localStorage.setItem('isAdviceEnabled', false);
+    } catch {
+      // Do Nothing
+    }
     isAdviceEnabled = false;
     helpDOM.hide();
     tutIconDOM.removeClass('bmenu-item-selected');

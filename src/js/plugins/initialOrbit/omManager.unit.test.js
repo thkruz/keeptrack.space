@@ -3,7 +3,7 @@
   test
 */
 
-import { omManager } from '../plugins/initialOrbit/omManager';
+import { omManager } from '@app/js/plugins/initialOrbit/omManager';
 
 const exampleSat = {
   C: 'US',

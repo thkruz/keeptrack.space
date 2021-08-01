@@ -10,7 +10,7 @@ const copySync = (src, dest) => {
   fs.writeFileSync(dest, data);
 };
 
-const dirs = ['admin', 'css/fonts', 'analysis', 'img', 'licenses', 'meshes', 'offline', 'php', 'radarData', 'res', 'satData', 'simulation', 'social', 'textures', 'tle'];
+const dirs = ['audio', 'admin', 'css/fonts', 'analysis', 'img', 'licenses', 'meshes', 'offline', 'php', 'radarData', 'res', 'satData', 'simulation', 'social', 'textures', 'tle'];
 
 const files = ['.htaccess', 'embed.html', 'favicon.ico', 'index.htm', 'manifest.webmanifest', 'serviceWorker.js', 'SOCRATES.htm', 'css/loading-screen.css', 'css/fonts.css', 'css/materialize.css', 'css/materialize-local.css'];
 

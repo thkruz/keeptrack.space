@@ -32,7 +32,6 @@ import 'materialize-css';
 import { rgbCss, saveCsv } from '@app/js/lib/helpers';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { DEG2RAD } from '@app/js/lib/constants.js';
-import { adviceList } from '@app/js/uiManager/ui-advice.js';
 import { drawManager } from '@app/js/drawManager/drawManager.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { mobileManager } from '@app/js/uiManager/mobileManager.js';
@@ -99,7 +98,7 @@ uiManager.init = () => {
   keepTrackApi.methods.uiManagerInit();
 
   // Allow Resizing the bottom menu
-  const maxHeight = document.getElementById('bottom-icons').offsetHeight;
+  const maxHeight = document.getElementById('bottom-icons') !== null ? document.getElementById('bottom-icons').offsetHeight : 0;
   $('.resizable').resizable({
     handles: {
       n: '#footer-handle',
@@ -111,6 +110,12 @@ uiManager.init = () => {
     stop: () => {
       const bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
       document.documentElement.style.setProperty('--bottom-menu-height', bottomHeight + 'px');
+      if (window.getComputedStyle(document.getElementById('nav-footer')).bottom !== '0px') {
+        document.documentElement.style.setProperty('--bottom-menu-top', '0px');
+      } else {
+        const bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
+        document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
+      }
     },
   });
 
@@ -865,19 +870,21 @@ uiManager.toast = (toastText, type, isLong) => {
   if (isLong) toastMsg.timeRemaining = 100000;
   switch (type) {
     case 'standby':
-      toastMsg.$el[0].style.background = '#2dccff';
+      toastMsg.$el[0].style.background = 'var(--statusDarkStandby)';
+      keepTrackApi.programs.soundManager.play('standby');
       break;
     case 'normal':
-      toastMsg.$el[0].style.background = '#56f000';
+      toastMsg.$el[0].style.background = 'var(--statusDarkNormal)';
+      keepTrackApi.programs.soundManager.play('standby');
       break;
     case 'caution':
-      toastMsg.$el[0].style.background = '#fce83a';
+      toastMsg.$el[0].style.background = 'var(--statusDarkCaution)';
       break;
     case 'serious':
-      toastMsg.$el[0].style.background = '#ffb302';
+      toastMsg.$el[0].style.background = 'var(--statusDarkSerious)';
       break;
     case 'critical':
-      toastMsg.$el[0].style.background = '#ff3838';
+      toastMsg.$el[0].style.background = 'var(--statusDarkCritical)';
       break;
   }
 };
@@ -923,11 +930,6 @@ uiManager.panToStar = function (c) {
 uiManager.onReady = () => {
   // Code Once index.htm is loaded
   if (settingsManager.offline) updateInterval = 250;
-  try {
-    $('#versionNumber-text')[0].innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
-  } catch (e) {
-    //
-  }
   (function _httpsCheck() {
     if (location.protocol !== 'https:') {
       $('#cs-geolocation').hide();
@@ -1423,10 +1425,12 @@ uiManager.onReady = () => {
     $('#legend-menu').on('click', function () {
       if (settingsManager.legendMenuOpen) {
         $('#legend-hover-menu').hide();
+        $('#legend-icon').removeClass('bmenu-item-selected');
         settingsManager.legendMenuOpen = false;
       } else {
         // uiManager.legendColorsChange(); // Disabled colors show up again.
         $('#legend-hover-menu').show();
+        $('#legend-icon').addClass('bmenu-item-selected');
         searchBox.hideResults();
         $('#search-results').hide();
         settingsManager.legendMenuOpen = true;
@@ -1520,6 +1524,15 @@ uiManager.onReady = () => {
 
     $('#nav-footer-toggle').on('click', function () {
       uiManager.footerToggle();
+      if (parseInt(window.getComputedStyle(document.getElementById('nav-footer')).bottom.replace('px', '')) < 0) {
+        setTimeout(() => {
+          const bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
+          document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
+        }, 1000); // Wait for the footer to be fully visible.
+      } else {
+        // If the footer is open, then it will be hidden shortly but we don't want to wait for it to be hidden
+        document.documentElement.style.setProperty('--bottom-menu-top', '0px');
+      }
     });
 
     // Allow All Side Menu Resizing

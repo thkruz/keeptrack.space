@@ -28,15 +28,15 @@
 import '@app/js/api/externalApi';
 import 'jquery-ui-bundle';
 import 'materialize-css';
+import '@app/css/astroux/css/astro.css';
 import { LineFactory, sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
-import { adviceManager } from './uiManager/ui-advice';
+import { adviceManager } from '@app/js/uiManager/ui-advice.js';
 import { drawManager } from '@app/js/drawManager/drawManager.js';
 import { jQAlt } from '@app/js/lib/jqalt.js';
-import { mapManager } from '@app/js/plugins/stereoMap/stereoMap';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
 // import { radarDataManager } from'@app/js/satSet/radarDataManager.js';
@@ -54,7 +54,7 @@ keepTrackApi.programs = {
   cameraManager: null,
   ColorScheme: ColorScheme,
   drawManager: drawManager,
-  mapManager: mapManager,
+  mapManager: null,
   objectManager: objectManager,
   orbitManager: orbitManager,
   satSet: satSet,
@@ -79,7 +79,7 @@ keepTrackApi.programs = {
   }
 })();
 
-const initalizeKeepTrack = async () => {
+export const initalizeKeepTrack = async () => {
   try {
     // Load all the plugins now that we have the API initialized
     await import('@app/js/plugins/core').then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins));
@@ -94,6 +94,13 @@ const initalizeKeepTrack = async () => {
     keepTrackApi.programs.cameraManager = cameraManager;
     // We need to know if we are on a small screen before starting webgl
     await drawManager.glInit();
+    if (typeof process !== 'undefined') {
+      // NOTE: Jest fails with webgl2 so we use webgl1 during testing
+      // This means we need to mock some of the webgl2 code
+      // eslint-disable-next-line no-undef
+      keepTrackApi.programs.drawManager.gl = global.mocks.glMock;
+    }
+
     window.addEventListener('resize', drawManager.resizeCanvas);
 
     drawManager.loadScene();
@@ -149,6 +156,3 @@ const initalizeKeepTrack = async () => {
 };
 
 jQAlt.docReady(initalizeKeepTrack);
-
-// For testing purposes
-export { initalizeKeepTrack };

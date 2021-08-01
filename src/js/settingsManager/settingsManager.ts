@@ -35,6 +35,7 @@ export const settingsManager: any = {
   //  Version Control
   versionNumber: VERSION,
   versionDate: VERSION_DATE,
+  classificationStr: '',
   plugins: {
     atmosphere: true,
     satInfoboxCore: true,
@@ -76,6 +77,8 @@ export const settingsManager: any = {
     datetime: true,
     social: true,
     topMenu: true,
+    classification: true,
+    soundManager: true,
   },
   init: async (): Promise<void> => {    
     settingsManager.pTime = [];

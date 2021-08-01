@@ -21,8 +21,8 @@
     }
   ],
   "start_url": "/",
-  "background_color": "#1f3347",
+  "background_color": "#172635",
   "display": "fullscreen",
   "scope": "/",
-  "theme_color": "#1f3347"
+  "theme_color": "#172635"
 }

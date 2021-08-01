@@ -26,127 +26,127 @@ import { keepTrackApi } from '@app/js/api/externalApi';
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+export const init = (): void => {
+  const { uiManager, settingsManager, objectManager, satSet } = keepTrackApi.programs;
+  
+  let mapManager: any = {};
+  mapManager.isMapMenuOpen = false;
+  const rad = (deg: number) => (deg * Math.PI) / 180;
+  const tan = (deg: number) => Math.tan(rad(deg));
+  const deg = (rad: number) => (rad * 180) / Math.PI;
 
-('use strict');
-let mapManager: any = {};
-const rad = (deg: number) => (deg * Math.PI) / 180;
-const tan = (deg: number) => Math.tan(rad(deg));
-const deg = (rad: number) => (rad * 180) / Math.PI;
+  const defaults = {
+    meridian: 0,
+    standardParallel: 0,
+    latLimit: 90,
+  };
 
-const defaults = {
-  meridian: 0,
-  standardParallel: 0,
-  latLimit: 90,
-};
+  let satCrunchNow = 0;
 
-let satCrunchNow = 0;
+  mapManager.options = (opt: any) => ({ ...defaults, ...(opt || {}) });
 
-mapManager.options = (opt: any) => ({ ...defaults, ...(opt || {}) });
+  mapManager.braun = (point: { wgs: any; lon: any; lat: number; x: number; y: number }, opt: { meridian: number; latLimit: number }) => {
+    point = mapManager.check(point);
+    // opt = options(opt);
+    if (point.wgs) {
+      point = mapManager.addMeridian(point, opt.meridian);
+      return {
+        x: rad(point.lon) / (2 * Math.PI) + 0.5,
+        y: (tan(opt.latLimit / 2) - tan(point.lat / 2)) / Math.PI,
+      };
+    } else {
+      var result = {
+        lon: deg((2 * point.x - 1) * Math.PI),
+        lat: deg(2 * Math.atan(tan(opt.latLimit / 2) - point.y * Math.PI)),
+      };
+      return mapManager.addMeridian(result, opt.meridian * -1);
+    }
+  };
 
-mapManager.braun = (point: { wgs: any; lon: any; lat: number; x: number; y: number }, opt: { meridian: number; latLimit: number }) => {
-  point = mapManager.check(point);
-  // opt = options(opt);
-  if (point.wgs) {
-    point = mapManager.addMeridian(point, opt.meridian);
-    return {
-      x: rad(point.lon) / (2 * Math.PI) + 0.5,
-      y: (tan(opt.latLimit / 2) - tan(point.lat / 2)) / Math.PI,
-    };
-  } else {
-    var result = {
-      lon: deg((2 * point.x - 1) * Math.PI),
-      lat: deg(2 * Math.atan(tan(opt.latLimit / 2) - point.y * Math.PI)),
-    };
-    return mapManager.addMeridian(result, opt.meridian * -1);
-  }
-};
+  mapManager.check = (point: { x: number; y: string | number; lon: string | number; lat: string | number }) => {
+    if (typeof point.x !== 'undefined' && point.x >= 0 && point.x <= 1 && typeof point.y !== 'undefined' && typeof point.lon === 'undefined' && typeof point.lat === 'undefined') {
+      return { x: +point.x, y: +point.y, wgs: false };
+    }
+    if (typeof point.lon !== 'undefined' && typeof point.lat !== 'undefined' && typeof point.x === 'undefined' && typeof point.y === 'undefined') {
+      return { lon: +point.lon, lat: +point.lat, wgs: true };
+    }
+    throw new Error('Invalid input point.');
+  };
 
-mapManager.check = (point: { x: number; y: string | number; lon: string | number; lat: string | number }) => {
-  if (typeof point.x !== 'undefined' && point.x >= 0 && point.x <= 1 && typeof point.y !== 'undefined' && typeof point.lon === 'undefined' && typeof point.lat === 'undefined') {
-    return { x: +point.x, y: +point.y, wgs: false };
-  }
-  if (typeof point.lon !== 'undefined' && typeof point.lat !== 'undefined' && typeof point.x === 'undefined' && typeof point.y === 'undefined') {
-    return { lon: +point.lon, lat: +point.lat, wgs: true };
-  }
-  throw new Error('Invalid input point.');
-};
+  mapManager.addMeridian = (point: { lon: number; lat: any }, meridian: number) => {
+    point = mapManager.check(point);
+    if (meridian !== 0) {
+      return mapManager.check({
+        lon: ((point.lon + 180 + 360 - meridian) % 360) - 180,
+        lat: point.lat,
+      });
+    }
+    return point;
+  };
 
-mapManager.addMeridian = (point: { lon: number; lat: any }, meridian: number) => {
-  point = mapManager.check(point);
-  if (meridian !== 0) {
-    return mapManager.check({
-      lon: ((point.lon + 180 + 360 - meridian) % 360) - 180,
-      lat: point.lat,
-    });
-  }
-  return point;
-};
-
-mapManager.updateMap = function () {
-  const { sensorManager, satellite, mapManager, settingsManager, objectManager, satSet } = keepTrackApi.programs;
-  if (objectManager.selectedSat === -1) return;
-  if (!mapManager.isMapMenuOpen) return;
-  var sat = satSet.getSat(objectManager.selectedSat);
-  var map;
-  sat.getTEARR();
-  map = mapManager.braun(
-    {
-      lon: satellite.degreesLong(satellite.currentTEARR.lon),
-      lat: satellite.degreesLat(satellite.currentTEARR.lat),
-    },
-    { meridian: 0, latLimit: 90 }
-  );
-  map.x = map.x * settingsManager.mapWidth - 10;
-  map.y = (map.y / 0.6366197723675813) * settingsManager.mapHeight - 10;
-  $('#map-sat').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
-  if (sensorManager.checkSensorSelected()) {
+  mapManager.updateMap = () => {
+    const { sensorManager, satellite, mapManager, settingsManager, objectManager, satSet } = keepTrackApi.programs;
+    if (objectManager.selectedSat === -1) return;
+    if (!mapManager.isMapMenuOpen) return;
+    var sat = satSet.getSat(objectManager.selectedSat);
+    var map;
+    sat.getTEARR();
     map = mapManager.braun(
       {
-        lon: sensorManager.currentSensor.lon,
-        lat: sensorManager.currentSensor.lat,
+        lon: satellite.degreesLong(satellite.currentTEARR.lon),
+        lat: satellite.degreesLat(satellite.currentTEARR.lat),
       },
       { meridian: 0, latLimit: 90 }
     );
     map.x = map.x * settingsManager.mapWidth - 10;
     map.y = (map.y / 0.6366197723675813) * settingsManager.mapHeight - 10;
-    $('#map-sensor').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;z-index:11;'); // Set to size of the map image (800x600)
-  }
-  for (var i = 1; i <= 50; i++) {
-    map = mapManager.braun(
-      {
-        lon: satellite.map(sat, i).lon,
-        lat: satellite.map(sat, i).lat,
-      },
-      { meridian: 0, latLimit: 90 }
-    );
-    map.x = map.x * settingsManager.mapWidth - 3.5;
-    map.y = (map.y / 0.6366197723675813) * settingsManager.mapHeight - 3.5;
-    if (map.y > settingsManager.mapHeight / 2) {
-      $('#map-look' + i).tooltip({
-        // delay: 50,
-        html: satellite.map(sat, i).time,
-        position: 'top',
-      });
-    } else {
-      $('#map-look' + i).tooltip({
-        // delay: 50,
-        html: satellite.map(sat, i).time,
-        position: 'bottom',
-      });
+    $('#map-sat').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
+    if (sensorManager.checkSensorSelected()) {
+      map = mapManager.braun(
+        {
+          lon: sensorManager.currentSensor.lon,
+          lat: sensorManager.currentSensor.lat,
+        },
+        { meridian: 0, latLimit: 90 }
+      );
+      map.x = map.x * settingsManager.mapWidth - 10;
+      map.y = (map.y / 0.6366197723675813) * settingsManager.mapHeight - 10;
+      $('#map-sensor').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;z-index:11;'); // Set to size of the map image (800x600)
     }
-    if (satellite.map(sat, i).inview === 1) {
-      $('#map-look' + i).attr('src', 'img/yellow-square.png'); // If inview then make yellow
-    } else {
-      $('#map-look' + i).attr('src', 'img/red-square.png'); // If not inview then make red
+    for (var i = 1; i <= 50; i++) {
+      map = mapManager.braun(
+        {
+          lon: satellite.map(sat, i).lon,
+          lat: satellite.map(sat, i).lat,
+        },
+        { meridian: 0, latLimit: 90 }
+      );
+      map.x = map.x * settingsManager.mapWidth - 3.5;
+      map.y = (map.y / 0.6366197723675813) * settingsManager.mapHeight - 3.5;
+      if (map.y > settingsManager.mapHeight / 2) {
+        $('#map-look' + i).tooltip({
+          // delay: 50,
+          html: satellite.map(sat, i).time,
+          position: 'top',
+        });
+      } else {
+        $('#map-look' + i).tooltip({
+          // delay: 50,
+          html: satellite.map(sat, i).time,
+          position: 'bottom',
+        });
+      }
+      if (satellite.map(sat, i).inview === 1) {
+        $('#map-look' + i).attr('src', 'img/yellow-square.png'); // If inview then make yellow
+      } else {
+        $('#map-look' + i).attr('src', 'img/red-square.png'); // If not inview then make red
+      }
+      $('#map-look' + i).attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
+      $('#map-look' + i).attr('time', satellite.map(sat, i).time);
     }
-    $('#map-look' + i).attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;'); // Set to size of the map image (800x600)
-    $('#map-look' + i).attr('time', satellite.map(sat, i).time);
-  }
-};
+  };
 
-export const init = (): void => {
-  const { uiManager, mapManager, settingsManager, objectManager, satSet } = keepTrackApi.programs;
-  mapManager.isMapMenuOpen = false;
+  keepTrackApi.programs.mapManager = mapManager;
 
   // Add HTML
   keepTrackApi.register({
@@ -210,7 +210,7 @@ export const init = (): void => {
           <img id="map-look48" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
           <img id="map-look49" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
           <img id="map-look50" class="lazyload map-item map-look" data-src="img/red-square.png" width="7px" height="7px">
-          <div id="braun-credit" style="position:fixed;right:10px;bottom:10px;z-index:5;color:#1f3347;">
+          <div id="braun-credit" style="position:fixed;right:10px;bottom:10px;z-index:5;color:var(--colorTertiaryDarken2);">
             Braun Stereographic Projection (c) Tobias Jung
           </div>
         </div>
@@ -318,6 +318,7 @@ export const init = (): void => {
           uiManager.hideSideMenus();
           $('#map-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           mapManager.isMapMenuOpen = true;
+          console.warn(mapManager);
           mapManager.updateMap();
           var satData = satSet.getSatExtraOnly(objectManager.selectedSat);
           $('#map-sat').tooltip({
@@ -362,5 +363,3 @@ export const init = (): void => {
     },
   });
 };
-
-export { mapManager };

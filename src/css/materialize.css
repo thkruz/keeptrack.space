@@ -821,19 +821,19 @@
 }
 
 .light-blue.darken-3 {
-    background-color: #172635 !important;
+    background-color: var(--colorTertiaryDarken2) !important;
 }
 
 .light-blue-text.text-darken-3 {
-    color: #172635 !important;
+    color: var(--colorTertiaryDarken2) !important;
 }
 
 .light-blue.darken-4 {
-    background-color: #4dacff !important;
+    background-color: var(--colorSecondary) !important;
 }
 
 .light-blue-text.text-darken-4 {
-    color: #4dacff !important;
+    color: var(--colorSecondary) !important;
 }
 
 .light-blue.accent-1 {
@@ -861,11 +861,11 @@
 }
 
 .light-blue.accent-4 {
-    background-color: #005a8f !important;
+    background-color: var(--colorPrimary) !important;
 }
 
 .light-blue-text.text-accent-4 {
-    color: #005a8f !important;
+    color: var(--colorPrimary) !important;
 }
 
 .cyan {

@@ -5,6 +5,7 @@
 */
 
 import '@app/js/settingsManager/settingsManager.ts';
+import { keepTrackApi } from '../api/externalApi';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 test(`Basic Functions of Time Manager`, () => {
@@ -13,6 +14,7 @@ test(`Basic Functions of Time Manager`, () => {
     <div id="datetime-text"><div>
   `;
 
+  keepTrackApi.programs.settingsManager = { plugins: {} };
   timeManager.init();
   expect(timeManager.timeTextStr).toBe('');
   expect(timeManager.drawDt).toBe(0);

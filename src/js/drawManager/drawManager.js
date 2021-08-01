@@ -484,20 +484,30 @@ drawManager.screenShot = () => {
 
 drawManager.watermarkedDataUrl = (canvas, text) => {
   try {
-    var tempCanvas = document.createElement('canvas');
-    var tempCtx = tempCanvas.getContext('2d');
-    var cw, ch;
+    let tempCanvas = document.createElement('canvas');
+    let tempCtx = tempCanvas.getContext('2d');
+    let cw, ch;
     cw = tempCanvas.width = canvas.width;
     ch = tempCanvas.height = canvas.height;
     tempCtx.drawImage(canvas, 0, 0);
     tempCtx.font = '24px nasalization';
-    var textWidth = tempCtx.measureText(text).width;
+    let textWidth = tempCtx.measureText(text).width;
     tempCtx.globalAlpha = 1.0;
     tempCtx.fillStyle = 'white';
     tempCtx.fillText(text, cw - textWidth - 30, ch - 30);
     // tempCtx.fillStyle ='black'
     // tempCtx.fillText(text,cw-textWidth-10+2,ch-20+2)
     // just testing by adding tempCanvas to document
+
+    if (settingsManager.classificationStr !== '') {
+      tempCtx.font = '24px nasalization';
+      textWidth = tempCtx.measureText('Secret').width;
+      tempCtx.globalAlpha = 1.0;
+      tempCtx.fillStyle = 'red';
+      tempCtx.fillText(settingsManager.classificationStr, cw / 2 - textWidth, ch - 20);
+      tempCtx.fillText(settingsManager.classificationStr, cw / 2 - textWidth, 34);
+    }
+
     document.body.appendChild(tempCanvas);
     let image = tempCanvas.toDataURL();
     tempCanvas.parentNode.removeChild(tempCanvas);

@@ -62,6 +62,7 @@ export const init = (): void => {
     method: 'orbitManagerInit',
     cbName: 'timeMachine',
     cb: (): void => {
+      const groupsManager = keepTrackApi.programs.groupsManager;
       orbitManager.playNextSatellite = (runCount: number, year: number) => {
         if (!orbitManager.isTimeMachineVisible) return;
         // Kill all old async calls if run count updates

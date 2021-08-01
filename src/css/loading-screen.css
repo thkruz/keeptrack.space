@@ -1,128 +1,138 @@
 body {
-    overflow: hidden;
-    font-family: 'Open Sans', sans-serif;
-    color: white;
-    background: #172635;
-    /* Old browsers */
-    background: -moz-linear-gradient(45deg, #172635, #172635);
-    /* FF3.6-15 */
-    background: -webkit-linear-gradient(45deg, #172635, #172635);
-    /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(45deg, #172635, #172635);
-    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
-    /* IE6-9 fallback on horizontal gradient */
+  overflow: hidden;
+  font-family: 'Open Sans', sans-serif;
+  color: white;
+  background: var(--colorTertiaryDarken2);
+  /* Old browsers */
+  background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken2), var(--colorTertiaryDarken2));
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken2), var(--colorTertiaryDarken2));
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(45deg, var(--colorTertiaryDarken2), var(--colorTertiaryDarken2));
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
 }
 
 .ui-icon-minus {
-    margin: auto !important;
+  margin: auto !important;
 }
 
 .ui-icon-plus {
-    margin: auto !important;
+  margin: auto !important;
 }
 
 .ui-datepicker td a {
-    text-align: center !important;
+  text-align: center !important;
 }
 
 /* Display none till loading is complete main.js -227 */
 
 #canvas-holder {
-    display: none;
+  display: none;
 }
 
 /* Display none till loading is complete main.js -227 */
 
 #loading-screen {
-    padding: 0;
-    z-index: 101;
-    text-align: center;
-    background: #172635;
-    /* Old browsers */
-    background: -moz-linear-gradient(45deg, #080c11, #274059);
-    /* FF3.6-15 */
-    background: -webkit-linear-gradient(45deg, #080c11, #274059);
-    /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(45deg, #080c11, #274059);
-    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
-    /* IE6-9 fallback on horizontal gradient */
+  padding: 0;
+  z-index: 101;
+  text-align: center;
+  background: var(--colorTertiaryDarken2);
+  /* Old browsers */
+  background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
 }
 
 .full-loader {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    overflow: hidden;
-    top: 0;
-    bottom: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+  bottom: 0;
 }
 
 .mini-loader-container {
-    background: rgba(0, 0, 0, 0) !important;
-    /* Old browsers */
-    position: absolute;
-    width: 100%;
-    height: 100%;
+  background: rgba(0, 0, 0, 0) !important;
+  /* Old browsers */
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 .mini-loader {
-    border-radius: 35px;
-    z-index: 101;
-    border: 5px solid rgba(0, 0, 0, 0.3);
-    width: 300px;
-    padding-top: 25px;
-    padding-bottom: 5px;
-    overflow: hidden;
-    background: #172635;
-    /* Old browsers */
-    background: -moz-linear-gradient(45deg, #080c11, #274059);
-    /* FF3.6-15 */
-    background: -webkit-linear-gradient(45deg, #080c11, #274059);
-    /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(45deg, #080c11, #274059);
-    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#172635', endColorstr='#4096ee', GradientType=1);
-    /* IE6-9 fallback on horizontal gradient */
+  border-radius: 35px;
+  z-index: 101;
+  border: 5px solid rgba(0, 0, 0, 0.3);
+  width: 300px;
+  padding-top: 25px;
+  padding-bottom: 5px;
+  overflow: hidden;
+  background: var(--colorTertiaryDarken2);
+  /* Old browsers */
+  background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
+  /* IE6-9 fallback on horizontal gradient */
 
-    -moz-background-clip: padding;     /* Firefox 3.6 */
-    -webkit-background-clip: padding;  /* Safari 4? Chrome 6? */
-    background-clip: padding-box;      /* Firefox 4, Safari 5, Opera 10, IE 9 */
+  -moz-background-clip: padding; /* Firefox 3.6 */
+  -webkit-background-clip: padding; /* Safari 4? Chrome 6? */
+  background-clip: padding-box; /* Firefox 4, Safari 5, Opera 10, IE 9 */
 }
 
 #logo-inner-container {
-    margin: auto;
+  margin: auto;
 }
 
 #logo-text {
-    display: block;
+  display: block;
+}
+
+#logo-text-version {
+  display: block;
+  font-size: 8em;
+  padding-left: 50px;
+  color: var(--colorPrimaryLighten2) !important;
 }
 
 .logo-font {
-    font-family: 'nasalization', sans-serif;
-    font-size: 8em;
+  font-family: 'nasalization', sans-serif;
+  font-size: 8em;
 }
 
 @media (max-width: 800px) {
-    #logo-text {
-        font-size: 4em;
-    }
+  #logo-text {
+    font-size: 4em;
+  }
+  #logo-text-version {
+    font-size: 4em;
+  }
 }
 
 #loader-text {
-    display: block;
-    line-height: 50px;
+  display: block;
+  line-height: 50px;
 }
 
 #spinner {
-    display: inline-block;
-    height: 50px;
-    width: 50px;
-    position: relative;
+  display: inline-block;
+  height: 50px;
+  width: 50px;
+  position: relative;
 }
 
 #mobile-start-button {
-    display: none;
-    margin-top: 10px;
+  display: none;
+  margin-top: 10px;
 }

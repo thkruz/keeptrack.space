@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+### [v4.0.0](https://github.com/thkruz/keeptrack.space/compare/v3.5.0...v4.0.0)
+
+> 28 July 2021 
+
+- feat(keeptrack): complete overhaul to TypeScript and implement KeepTrackApi [`dc7c26e`](https://github.com/thkruz/keeptrack.space/commit/dc7c26ed778a92faca7416efa2ed9d96c568dc2b)
+- feat(astroux): implemented astroux css and soundManager [`3a0b6a2`](https://github.com/thkruz/keeptrack.space/commit/3a0b6a2eb1969409f8f32e68e7bc1df0f75a05bd)
+- fix(nextlaunchmanager): upgraded to launch library 2 api [`0c4e9f8`](https://github.com/thkruz/keeptrack.space/commit/0c4e9f8f5cf8b8aa42e2e25c7dc8d3ecc3273b99)
+- test(integration tests): updated integration tests to support keeptrackApi [`27e3538`](https://github.com/thkruz/keeptrack.space/commit/27e3538ffc860ed03f51916c42b35fc9dd4e0e91)
+- feat(main): updated main.js to use keeptrackApi [`b3296cc`](https://github.com/thkruz/keeptrack.space/commit/b3296cc020af641e9d382c934fa08bf3dfc33fdb)
+- feat(multiple): implemented keeptrackApi instead of passing variables to functions [`d54e04a`](https://github.com/thkruz/keeptrack.space/commit/d54e04a918a41b8fe3286898d75f0f630321446f)
+- fix(satinfoboxcore): provided a fix for when isInSun is unavailable (testing only so far) [`7815b9e`](https://github.com/thkruz/keeptrack.space/commit/7815b9ef67ce35d72d6346f03785a1617b646955)
+- fix(tle.js): fixed missing export call in offline TLEs [`2efdb66`](https://github.com/thkruz/keeptrack.space/commit/2efdb662e905796d939ffabdaa61a30e9dbd3b8f)
+- fix(ui-input.ts): fixed DOP calculation bug [`56808d3`](https://github.com/thkruz/keeptrack.space/commit/56808d37cd58532f856c9c79cc7bd9c03138e8f5)
+- fix(lookangles.js): fixed dop calculation bug [`86654ad`](https://github.com/thkruz/keeptrack.space/commit/86654add1d020826111049d2989c77827e616047)
+- build(package.json): changed jest testing to stop on first failure [`f666e4b`](https://github.com/thkruz/keeptrack.space/commit/f666e4ba0956b79f71ae06cc7c7f279185d19fe5)
+- chore(launch.json): changed vscode config for debugging [`c6fbb11`](https://github.com/thkruz/keeptrack.space/commit/c6fbb1126dea69c372c80ae20240050e997d972f)
+
 #### [v3.5.0](https://github.com/thkruz/keeptrack.space/compare/v3.4.3...v3.5.0)
 
 > 17 July 2021 

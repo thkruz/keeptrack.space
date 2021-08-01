@@ -97,4 +97,8 @@ export const init = (): void => {
       }
     },
   });
+  
+  keepTrackApi.programs.sensorFov = {
+    enableFovView: enableFovView,
+  };
 };

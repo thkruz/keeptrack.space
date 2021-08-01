@@ -1,5 +1,5 @@
 .page-footer {
-    background-color: #172635 !important;
+    background-color: var(--colorTertiaryDarken2) !important;
 }
 
 .spinner-layer {
@@ -36,7 +36,7 @@ textarea.materialize-textarea {
 .btn,
 .btn-large,
 .btn-small {
-    background-color: #005a8f !important;
+    background-color: var(--colorPrimary) !important;
 }
 
 .btn:hover,
@@ -54,7 +54,7 @@ textarea.materialize-textarea {
 
 .dropdown-content li > a,
 .dropdown-content li > span {
-    color: #005a8f !important;
+    color: var(--colorPrimary) !important;
     font-size: 14px !important;
 }
 

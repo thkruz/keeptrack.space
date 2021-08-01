@@ -116,7 +116,7 @@ const keepTrackApi: keepTrackApiInterface = {
     },
     uiManagerFinal: () => {
       keepTrackApi.callbacks.uiManagerFinal.forEach((cb: any) => cb.cb());
-    } 
+    },
   },
   programs: {
     timeManager: {},
@@ -134,7 +134,7 @@ const keepTrackApi: keepTrackApiInterface = {
     sensorManager: {},
     starManager: {},
     uiManager: {},
-    uiInput: {},
+    uiInput: {},    
   },
 };
 

@@ -9,7 +9,7 @@ export const init = (): void => {
       // Bottom Icon
       (<any>$('#header')).append(keepTrackApi.html`
         <nav>
-          <div id="nav-wrapper" class="nav-wrapper light-blue darken-3">
+          <div id="nav-wrapper" class="nav-wrapper">
             <a id="share-icon" class="top-menu-icons"><img src="img/share-icon.png" alt="" /></a>
             <ul id="nav-mobile2" class="right">
               <li>

@@ -21,7 +21,7 @@ export const init = (): void => {
           <span class="bmenu-title">Twitter</span>
           <div class="status-icon"></div>
         </div>
-      `);      
+      `);
     },
   });
 
@@ -38,7 +38,7 @@ export const init = (): void => {
         } else {
           if (keepTrackApi.programs.settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
           keepTrackApi.programs.uiManager.hideSideMenus();
-          if ($('#twitter-menu').is(':empty')) {
+          if ($('#twitter-menu').html() == '') {
             $('#twitter-menu').html(
               '<a class="twitter-timeline" data-theme="dark" data-link-color="#2B7BB9" href="https://twitter.com/RedKosmonaut/lists/space-news">A Twitter List by RedKosmonaut</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>'
             );

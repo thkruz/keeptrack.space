@@ -65,7 +65,6 @@ var satelliteList;
  * variable is part of at the front of what the name used to be
  * (ex: now --> drawNow) (ex: i --> satCrunchIndex)
  */
-var satCrunchIndex;
 var gotExtraData = false;
 
 var parseFromGETVariables = () => {
@@ -109,35 +108,44 @@ satSet.init = async () => {
 
 var addSatCruncherOnMessage = (cameraManager) => {
   satCruncher.onmessage = (m) => {
-    if (!gotExtraData) {
+    if (!gotExtraData && m.data.extraData) {
       // store extra data that comes from crunching
       // Only do this once
 
-      satExtraData = JSON.parse(m.data.extraData);
+      const satExtraData = JSON.parse(m.data.extraData);
+      const satData = satSet.satData;
 
-      for (satCrunchIndex = 0; satCrunchIndex < satSet.numSats; satCrunchIndex++) {
-        satData[satCrunchIndex].inclination = satExtraData[satCrunchIndex].inclination;
-        satData[satCrunchIndex].eccentricity = satExtraData[satCrunchIndex].eccentricity;
-        satData[satCrunchIndex].raan = satExtraData[satCrunchIndex].raan;
-        satData[satCrunchIndex].argPe = satExtraData[satCrunchIndex].argPe;
-        satData[satCrunchIndex].meanMotion = satExtraData[satCrunchIndex].meanMotion;
+      for (let satCrunchIndex = 0; satCrunchIndex < satSet.numSats; satCrunchIndex++) {
+        if (typeof satData === 'undefined') throw new Error('No sat data');
+        if (typeof satExtraData === 'undefined') throw new Error('No extra data');
+        if (satExtraData[satCrunchIndex] === 'undefined') throw new Error('No extra data for sat ' + satCrunchIndex);
+        if (satData[satCrunchIndex] === 'undefined') throw new Error('No data for sat ' + satCrunchIndex);
 
-        satData[satCrunchIndex].semiMajorAxis = satExtraData[satCrunchIndex].semiMajorAxis;
-        satData[satCrunchIndex].semiMinorAxis = satExtraData[satCrunchIndex].semiMinorAxis;
-        satData[satCrunchIndex].apogee = satExtraData[satCrunchIndex].apogee;
-        satData[satCrunchIndex].perigee = satExtraData[satCrunchIndex].perigee;
-        satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
-        satData[satCrunchIndex].velocity = {};
+        try {
+          satData[satCrunchIndex].inclination = satExtraData[satCrunchIndex].inclination;
+          satData[satCrunchIndex].eccentricity = satExtraData[satCrunchIndex].eccentricity;
+          satData[satCrunchIndex].raan = satExtraData[satCrunchIndex].raan;
+          satData[satCrunchIndex].argPe = satExtraData[satCrunchIndex].argPe;
+          satData[satCrunchIndex].meanMotion = satExtraData[satCrunchIndex].meanMotion;
+
+          satData[satCrunchIndex].semiMajorAxis = satExtraData[satCrunchIndex].semiMajorAxis;
+          satData[satCrunchIndex].semiMinorAxis = satExtraData[satCrunchIndex].semiMinorAxis;
+          satData[satCrunchIndex].apogee = satExtraData[satCrunchIndex].apogee;
+          satData[satCrunchIndex].perigee = satExtraData[satCrunchIndex].perigee;
+          satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
+          satData[satCrunchIndex].velocity = {};
+        } catch (error) {
+          console.error(satCrunchIndex);
+        }
       }
 
       gotExtraData = true;
-      satExtraData = null;
       return;
     }
 
     if (m.data.extraUpdate) {
       satExtraData = JSON.parse(m.data.extraData);
-      satCrunchIndex = m.data.satId;
+      let satCrunchIndex = m.data.satId;
 
       satData[satCrunchIndex].inclination = satExtraData[0].inclination;
       satData[satCrunchIndex].eccentricity = satExtraData[0].eccentricity;
@@ -1457,7 +1465,11 @@ satSet.selectSat = (i) => {
 // satSet.findRadarDataFirstDataTime = () => radarDataManager.findFirstDataTime();
 
 satSet.onCruncherReady = () => {
-  satSet.queryStr = window.location.search.substring(1);
+  try {
+    satSet.queryStr = window.location.search.substring(1);
+  } catch {
+    satSet.queryStr = '';
+  }
   // Anything else?
 };
 

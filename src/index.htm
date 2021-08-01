@@ -13,7 +13,7 @@
     <meta property="og:url" content="https://www.keeptrack.space" />
     <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <meta name="theme-color" content="#1f3347" />
+    <meta name="theme-color" content="var(--colorTertiaryDarken2)" />
     <link rel="apple-touch-icon" href="./img/logo192.png" />
     <meta
       name="viewport"
@@ -30,7 +30,10 @@
   <body id="bodyDOM" class="no-text-select">
     <div id="loading-screen" class="valign-wrapper full-loader">
       <div id="logo-inner-container" class="valign">
-        <span id="logo-text" class="logo-font">KEEP TRACK 4</span>
+        <div style="display: flex;">
+          <span id="logo-text" class="logo-font">KEEP TRACK</span>
+          <span id="logo-text-version" class="logo-font">4</span>
+        </div>
         <br />
         <div id="spinner" class="preloader-wrapper active">
           <div class="spinner-layer spinner-white-only">

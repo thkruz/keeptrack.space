@@ -29,7 +29,7 @@ import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
 export const init = (): void => {
-  const { satellite, satSet, objectManager, lineManager, orbitManager, uiManager, ColorScheme, sensorManager, settingsManager, timeManager } = keepTrackApi.programs;
+  const { satellite, satSet, objectManager, orbitManager, uiManager, ColorScheme, sensorManager, settingsManager, timeManager } = keepTrackApi.programs;
   keepTrackApi.programs.watchlist = {};
   keepTrackApi.programs.watchlist.lastOverlayUpdateTime = 0;
   let watchlistList: any[] = [];
@@ -357,7 +357,7 @@ export const init = (): void => {
           // Is inview and wasn't previously
           watchlistInViewList[i] = true;
           uiManager.toast(`Satellite ${sat.SCC_NUM} is In Field of View!`, 'normal');
-          lineManager.create('sat3', [sat.id, satSet.getIdFromSensorName(sensorManager.currentSensor.name)], 'g');
+          keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getIdFromSensorName(sensorManager.currentSensor.name)], 'g');
           orbitManager.addInViewOrbit(watchlistList[i]);
         }
         if (sat.inview === 0 && watchlistInViewList[i] === true) {

@@ -50,10 +50,6 @@ export const init = (): void => {
         </div>
       `);
 
-      $('#sat-info-top-links').append(keepTrackApi.html`
-        <div id="stf-on-object-link" class="link sat-infobox-links">Build Short Term Fence on this object...</div>
-      `);
-
       // Bottom Icon
       $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-stf" class="bmenu-item">
@@ -65,6 +61,30 @@ export const init = (): void => {
           <div class="status-icon"></div>
         </div>
       `);
+
+      let stfInfoLinks = false;
+      // Register orbital element data
+      keepTrackApi.register({
+        method: 'selectSatData',
+        cbName: 'stfInfoTopLinks',
+        cb: () => {
+          if (!stfInfoLinks) {
+            $('#sat-info-top-links').append(keepTrackApi.html`
+              <div id="stf-on-object-link" class="link sat-infobox-links">Build Short Term Fence on this object...</div>
+            `);
+            $('#stf-on-object-link').on('click', function () {
+              $('#stf-az').val(satellite.currentTEARR.az.toFixed(1));
+              $('#stf-el').val(satellite.currentTEARR.el.toFixed(1));
+              $('#stf-rng').val(satellite.currentTEARR.rng.toFixed(1));
+              uiManager.hideSideMenus();
+              $('#stf-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+              isStfMenuOpen = true;
+              $('#menu-stf').addClass('bmenu-item-selected');
+            });
+            stfInfoLinks = true;
+          }
+        },
+      });
 
       $('#stfForm').on('submit', function (e) {
         e.preventDefault();
@@ -126,7 +146,7 @@ export const init = (): void => {
           type: sensorType,
         });
 
-        uiManager.enableFovView();
+        keepTrackApi.programs.sensorFov.enableFovView();
 
         const cameraManager = keepTrackApi.programs.cameraManager;
         if (maxrange > 6000) {
@@ -136,16 +156,6 @@ export const init = (): void => {
         }
         cameraManager.camSnap(cameraManager.latToPitch(lat), cameraManager.longToYaw(lon, timeManager.selectedDate));
       });
-
-      $('#stf-on-object-link').on('click', function () {
-        $('#stf-az').val(satellite.currentTEARR.az.toFixed(1));
-        $('#stf-el').val(satellite.currentTEARR.el.toFixed(1));
-        $('#stf-rng').val(satellite.currentTEARR.rng.toFixed(1));
-        uiManager.hideSideMenus();
-        $('#stf-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-        isStfMenuOpen = true;
-        $('#menu-stf').addClass('bmenu-item-selected');
-      });      
     },
   });
 

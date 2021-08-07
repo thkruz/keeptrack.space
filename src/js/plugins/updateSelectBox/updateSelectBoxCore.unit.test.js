@@ -1,7 +1,5 @@
 /*globals
-  global
   test
-  expect
   jest
 */
 

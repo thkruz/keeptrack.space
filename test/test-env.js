@@ -13,7 +13,7 @@ const path = require('path');
 
 const jsdom = require('jsdom');
 // eslint-disable-next-line no-unused-vars
-const { createCanvas } = require('canvas');
+// const { createCanvas } = require('canvas');
 const { JSDOM } = jsdom;
 
 // eslint-disable-next-line no-sync

@@ -1,4 +1,6 @@
 {
   "jest.jestCommandLine": "npm test-vscode --",
   "typescript.validate.enable": true,
+  "npm-scripts.showStartNotification": false,
+  "testExplorer.useNativeTesting": true,
 }

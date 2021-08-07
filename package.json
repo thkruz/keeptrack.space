@@ -147,7 +147,7 @@
     "coverage-istanbul-loader": "^3.0.5",
     "cross-env": "^7.0.3",
     "css-loader": "^6.2.0",
-    "cypress": "^7.3.0",
+    "cypress": "^8.2.0",
     "cypress-wait-until": "^1.7.1",
     "cz-conventional-changelog": "^3.3.0",
     "download-file": "^0.1.5",

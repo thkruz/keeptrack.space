@@ -10,59 +10,72 @@ const satInfoboxCore = {
     cb: (sat: any): void => {
       if (!satInfoboxCore.sensorInfo.isLoaded && settingsManager.plugins.sensor) {
         $('#sat-infobox').append(keepTrackApi.html`
-        <li class="divider"></li>
-        <div class="sat-info-row">
-          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
-            data-tooltip="Distance from the Sensor">
-            Range
+        <div id="sensor-sat-info">
+          <li class="divider"></li>
+          <div class="sat-info-row">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Distance from the Sensor">
+              Range
+            </div>
+            <div class="sat-info-value" id="sat-range">xxxx km</div>
           </div>
-          <div class="sat-info-value" id="sat-range">xxxx km</div>
-        </div>
-        <div class="sat-info-row">
-          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
-            data-tooltip="Angle (Left/Right) from the Sensor">
-            Azimuth
+          <div class="sat-info-row">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Angle (Left/Right) from the Sensor">
+              Azimuth
+            </div>
+            <div class="sat-info-value" id="sat-azimuth">XX deg</div>
           </div>
-          <div class="sat-info-value" id="sat-azimuth">XX deg</div>
-        </div>
-        <div class="sat-info-row">
-          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
-            data-tooltip="Angle (Up/Down) from the Sensor">
-            Elevation
+          <div class="sat-info-row">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Angle (Up/Down) from the Sensor">
+              Elevation
+            </div>
+            <div class="sat-info-value" id="sat-elevation">XX deg</div>
           </div>
-          <div class="sat-info-value" id="sat-elevation">XX deg</div>
-        </div>
-        <div class="sat-info-row">
-          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
-            data-tooltip="Linear Width at Target's Range">
-            Beam Width
+          <div class="sat-info-row">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Linear Width at Target's Range">
+              Beam Width
+            </div>
+            <div class="sat-info-value" id="sat-beamwidth">xxxx km</div>
           </div>
-          <div class="sat-info-value" id="sat-beamwidth">xxxx km</div>
-        </div>
-        <div class="sat-info-row">
-          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
-            data-tooltip="Time for RF/Light to Reach Target">
-            Max Tmx Time
+          <div class="sat-info-row">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Time for RF/Light to Reach Target">
+              Max Tmx Time
+            </div>
+            <div class="sat-info-value" id="sat-maxTmx">xxxx ms</div>
           </div>
-          <div class="sat-info-value" id="sat-maxTmx">xxxx ms</div>
-        </div>
-        <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
-            data-tooltip="Is the Sun Affected the Sensor">
-            Sun
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Is the Sun Affected the Sensor">
+              Sun
+            </div>
+            <div class="sat-info-value" id="sat-sun">Sun Stuff</div>
           </div>
-          <div class="sat-info-value" id="sat-sun">Sun Stuff</div>
-        </div>
-        <div id="sat-info-nextpass-row" class="sat-info-row sat-only-info">
-          <div id="sat-info-nextpass" class="sat-info-key  tooltipped" data-position="left" data-delay="50"
-            data-tooltip="Next Time in Coverage">
-            Next Pass
+          <div id="sat-info-nextpass-row" class="sat-info-row sat-only-info">
+            <div id="sat-info-nextpass" class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Next Time in Coverage">
+              Next Pass
+            </div>
+            <div id="sat-nextpass" class="sat-info-value">00:00:00z</div>
           </div>
-          <div id="sat-nextpass" class="sat-info-value">00:00:00z</div>
         </div> 
         `);
         satInfoboxCore.sensorInfo.isLoaded = true;
       }
+
+      // If we are using the sensor manager plugin then we should hide the sensor to satellite
+      // info when there is no sensor selected
+      if (settingsManager.plugins.sensor) {
+        if (keepTrackApi.programs.sensorManager.checkSensorSelected()) {
+          $('#sensor-sat-info').show();
+        } else {
+          $('#sensor-sat-info').hide();
+        }
+      }
+
       if (!sat.missile) {
         $('.sat-only-info').show();
       } else {

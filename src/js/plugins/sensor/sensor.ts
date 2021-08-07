@@ -715,6 +715,31 @@ export const init = (): void => {
     },
   });
 
+  // Register satinfobox links
+  let sensorLinks = false;
+  keepTrackApi.register({
+    method: 'selectSatData',
+    cbName: 'sensor',
+    cb: () => {
+      if (!sensorLinks) {
+        $('#sat-info-top-links').append(keepTrackApi.html`
+          <div id="sensors-in-fov-link" class="link sat-infobox-links">Show All Sensors with FOV...</div>
+        `);
+        $('#sensors-in-fov-link').on('click', () => {
+          Object.keys(keepTrackApi.programs.sensorManager.sensorList).forEach((key) => {
+            const sensor = keepTrackApi.programs.sensorManager.sensorList[key];
+            const sat = keepTrackApi.programs.satSet.getSat(keepTrackApi.programs.objectManager.selectedSat);
+            let tearr = sat.getTEARR(null, sensor);
+            if (tearr.inview) {
+              keepTrackApi.programs.lineManager.create('sat6', [sat.id, satSet.getIdFromSensorName(sensor.name)], 'g');
+            }
+          });
+        });
+        sensorLinks = true;
+      }
+    },
+  });
+
   keepTrackApi.register({
     method: 'hideSideMenus',
     cbName: 'sensor',

@@ -1124,6 +1124,7 @@ let uiInput: uiInputInterface = {
             break;
           case 'clear-lines-rmb':
             lineManager.clear();
+            keepTrackApi.programs.sensorManager.showAllWithFovList = [];
             if (objectManager.isStarManagerLoaded) {
               starManager.isAllConstellationVisible = false;
             }

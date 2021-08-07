@@ -1024,8 +1024,8 @@ satSet.getSat = (i) => {
         try {
           sensor.observerGd = {
             alt: sensor.alt,
-            lat: sensor.lat,
-            lon: sensor.lon,
+            lat: sensor.lat * DEG2RAD,
+            lon: sensor.lon * DEG2RAD,
           };
         } catch (e) {
           throw 'observerGd is not set and could not be guessed.';

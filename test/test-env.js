@@ -83,6 +83,7 @@ $.fn.replace = (input, output) => $.fn.toString().replace(input, output);
 $.colorbox = jest.fn();
 $.fn.colorbox = jest.fn();
 $.fn.effect = jest.fn();
+$.fn.resizable = jest.fn();
 $.fn.tooltip = jest.fn();
 $.fn.fadeIn = jest.fn((time, cb) => {
   if (typeof cb !== 'undefined') {

@@ -77,8 +77,11 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
         document.getElementById('nav-footer').style.visibility = 'hidden';
       }
 
-      const bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
-      document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
+      const bottomContainer = document.getElementById('bottom-icons-container');
+      if (bottomContainer) {
+        const bottomHeight = bottomContainer.offsetHeight;
+        document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
+      }
 
       $('#versionNumber-text').html(`${keepTrackApi.programs.settingsManager.versionNumber} - ${keepTrackApi.programs.settingsManager.versionDate}`);
 

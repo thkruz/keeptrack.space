@@ -109,7 +109,7 @@ class LineFactory {
         color: color,
       });
     }
-    // Satellite to Satellite When in View
+    // Sensor to Satellite When in View of Currently Selected Sensor
     if (type == 'sat3') {
       sat = getSat(value[0]);
       sat2 = getSat(value[1]);
@@ -130,7 +130,7 @@ class LineFactory {
         isDrawWhenSelected: false,
       });
     }
-    // Satellite to Satellite - Draw When Selected and in View
+    // Sensor to Satellite When in View of Currently Selected Sensor and Satellite Selected
     if (type == 'sat4') {
       sat = getSat(value[0]);
       sat2 = getSat(value[1]);
@@ -153,7 +153,7 @@ class LineFactory {
       });
     }
 
-    // Satellite to Satellite
+    // One Sensor to Satellite
     if (type == 'sat5') {
       sat = getSat(value[0]);
       sat2 = getSat(value[1]);
@@ -172,6 +172,28 @@ class LineFactory {
         color: color,
         isOnlyInFOV: false,
         isDrawWhenSelected: false,
+      });
+    }
+    // Multiple Sensors to Satellite
+    if (type == 'sat6') {
+      sat = getSat(value[0]);
+      sat2 = getSat(value[1]);
+      if (typeof sat == 'undefined' || typeof sat2 == 'undefined' || typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
+        // console.debug(`No Satellite Position Available for Line`);
+        // console.debug(sat);
+        // console.debug(sat2);
+        return;
+      }
+      this.drawLineList.push({
+        line: new Line(this.gl, this.shader),
+        sat: sat,
+        sat2: sat2,
+        ref: [sat.position.x, sat.position.y, sat.position.z],
+        ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
+        color: color,
+        isOnlyInFOV: true,
+        isDrawWhenSelected: false,
+        isCalculateIfInFOV: true,
       });
     }
     if (type == 'ref') {
@@ -224,9 +246,20 @@ class LineFactory {
                 this.drawLineList[i].sat2.id = this.#getIdFromSensorName(this.drawLineList[i].sat2.name);
               }
               this.drawLineList[i].sat2 = keepTrackApi.programs.satSet.getSat(this.drawLineList[i].sat2.id);
-              if (this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].sat.inview) {
+              if (!this.drawLineList[i].isCalculateIfInFOV && this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].sat.inview) {
                 this.drawLineList.splice(i, 1);
                 continue;
+              }
+              if (this.drawLineList[i].isCalculateIfInFOV && this.drawLineList[i].isOnlyInFOV) {
+                Object.keys(keepTrackApi.programs.sensorManager.sensorList).forEach((key) => {
+                  const sensor = keepTrackApi.programs.sensorManager.sensorList[key];
+                  if (sensor.name == this.drawLineList[i].sat2.name) {
+                    let tearr = this.drawLineList[i].sat.getTEARR(null, sensor);
+                    if (!tearr.inview) {
+                      this.drawLineList.splice(i, 1);
+                    }
+                  }
+                });
               }
               this.drawLineList[i].line.set(
                 [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z],

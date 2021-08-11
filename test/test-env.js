@@ -13,7 +13,7 @@ const path = require('path');
 
 const jsdom = require('jsdom');
 // eslint-disable-next-line no-unused-vars
-const { createCanvas } = require('canvas');
+// const { createCanvas } = require('canvas');
 const { JSDOM } = jsdom;
 
 // eslint-disable-next-line no-sync
@@ -83,6 +83,7 @@ $.fn.replace = (input, output) => $.fn.toString().replace(input, output);
 $.colorbox = jest.fn();
 $.fn.colorbox = jest.fn();
 $.fn.effect = jest.fn();
+$.fn.resizable = jest.fn();
 $.fn.tooltip = jest.fn();
 $.fn.fadeIn = jest.fn((time, cb) => {
   if (typeof cb !== 'undefined') {

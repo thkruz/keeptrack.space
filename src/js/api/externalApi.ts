@@ -7,7 +7,7 @@ interface keepTrackApiInterface {
   programs: any;
 }
 
-const keepTrackApi: keepTrackApiInterface = {
+const keepTrackApi: keepTrackApiInterface = (<any>window).keepTrackApi || {
   html: (strings: TemplateStringsArray, ...placeholders: any[]) => {
     for (const placeholder of placeholders) {
       if (typeof placeholder !== 'string') {
@@ -134,7 +134,7 @@ const keepTrackApi: keepTrackApiInterface = {
     sensorManager: {},
     starManager: {},
     uiManager: {},
-    uiInput: {},    
+    uiInput: {},
   },
 };
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-unreachable */
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
  *
@@ -31,6 +32,7 @@ import 'materialize-css';
 import '@app/css/astroux/css/astro.css';
 import { LineFactory, sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
+import $ from 'jquery';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
@@ -81,10 +83,12 @@ keepTrackApi.programs = {
 
 export const initalizeKeepTrack = async () => {
   try {
+    settingsManager.loadStr('science');
     // Load all the plugins now that we have the API initialized
     await import('@app/js/plugins/core').then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins));
     await import('@app/js/plugins/plugins').then((mod) => mod.loadExtraPlugins());
 
+    settingsManager.loadStr('science2');
     // Start initializing the rest of the website
     timeManager.init();
     uiManager.onReady();
@@ -150,7 +154,15 @@ export const initalizeKeepTrack = async () => {
     // Update any CSS now that we know what is loaded
     keepTrackApi.methods.uiManagerFinal();
   } catch (error) {
-    /* istanbul ignore next */
+    let errorHtml = '';
+    errorHtml += error.message + '<br>';
+    if (error.lineNumber) {
+      errorHtml += 'Line: ' + error.lineNumber + '<br>';
+    }
+    if (error.stack) {
+      errorHtml += error.stack + '<br>';
+    }
+    $('#loader-text').html(errorHtml);
     console.warn(error);
   }
 };

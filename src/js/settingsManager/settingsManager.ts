@@ -21,8 +21,8 @@ import { VERSION } from '@app/js/settingsManager/version.js';
 import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
 
 declare global {
-  interface Window { 
-    settingsManager: unknown; 
+  interface Window {
+    settingsManager: unknown;
     jQuery: unknown;
     $: unknown;
     gremlins: any;
@@ -80,7 +80,7 @@ export const settingsManager: any = {
     classification: true,
     soundManager: true,
   },
-  init: async (): Promise<void> => {    
+  init: async (): Promise<void> => {
     settingsManager.pTime = [];
 
     // Install Folder Settings
@@ -479,7 +479,7 @@ export const settingsManager: any = {
     // Determines if the Loading is complete
     settingsManager.cruncherReady = false;
 
-    settingsManager.altLoadMsgs = true;
+    settingsManager.altLoadMsgs = false;
 
     settingsManager.lkVerify = Date.now();
 
@@ -502,7 +502,7 @@ export const settingsManager: any = {
     settingsManager.geolocationUsed = false;
     settingsManager.mapWidth = 800;
     settingsManager.mapHeight = 600;
-    settingsManager.currentLegend = 'default';    
+    settingsManager.currentLegend = 'default';
     settingsManager.queuedScreenshot = false;
 
     settingsManager.isResizing = false;
@@ -825,6 +825,9 @@ export const settingsManager: any = {
     switch (str) {
       case 'science':
         $('#loader-text').html('Locating Science...');
+        break;
+      case 'science2':
+        $('#loader-text').html('Found Science...');
         break;
       case 'dots':
         $('#loader-text').html('Drawing Dots in Space...');

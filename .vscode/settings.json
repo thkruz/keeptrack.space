@@ -1,5 +1,5 @@
 {
-  "jest.jestCommandLine": "npm test-vscode --",
+  "jest.jestCommandLine": "npm run test:noserver --",
   "typescript.validate.enable": true,
   "npm-scripts.showStartNotification": false,
   "testExplorer.useNativeTesting": true,

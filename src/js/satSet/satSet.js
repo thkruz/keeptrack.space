@@ -98,7 +98,14 @@ satSet.init = async () => {
       console.error(error);
     }
   } else {
+    if (typeof Worker === 'undefined') {
+      throw new Error('Your browser does not support web workers.');
+    }
     satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
+    satCruncher.onerror = (error) => {
+      $('#loader-text').html(`Error loading ${settingsManager.installDirectory}js/positionCruncher.js!`);
+      console.warn(error);
+    };
   }
   addSatCruncherOnMessage(cameraManager);
 

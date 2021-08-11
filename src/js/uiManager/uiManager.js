@@ -407,6 +407,7 @@ uiManager.hideLoadingScreen = () => {
         $('#loading-screen').addClass('mini-loader-container');
         $('#logo-inner-container').addClass('mini-loader');
         $('#logo-text').html('');
+        $('#logo-text-version').html('');
         $('#logo-trusat').hide();
         $('#loading-screen').hide();
         settingsManager.loadStr('math');
@@ -417,6 +418,7 @@ uiManager.hideLoadingScreen = () => {
         $('#loading-screen').addClass('mini-loader-container');
         $('#logo-inner-container').addClass('mini-loader');
         $('#logo-text').html('');
+        $('#logo-text-version').html('');
         $('#logo-trusat').hide();
         $('#loading-screen').hide();
         settingsManager.loadStr('math');

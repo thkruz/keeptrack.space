@@ -20,12 +20,12 @@ const opts = {
   cover: true, // cover file when exists, default is true
 };
 
-// console.log(`Removing ./dist...`);
-// try {
-//   rimraf.sync('./dist');
-// } catch (error) {
-//   //
-// }
+console.log(`Removing ./dist...`);
+try {
+  rimraf.sync('./dist');
+} catch (error) {
+  //
+}
 
 console.log(`Creating ./dist...`);
 try {

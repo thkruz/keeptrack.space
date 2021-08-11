@@ -24,7 +24,7 @@
   "scripts": {
     "changelog": "npx auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs",
     "prebuild": "node ./scripts/prebuild.mjs && npm run updateVersion && npm run updateTime",
-    "build": "cross-env NODE_ENV=production node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
+    "build": "npm run build:dev",
     "build:dev": "npm run prebuild && cross-env NODE_ENV=development node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "build:test": "npm run prebuild && cross-env NODE_ENV=test node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "http": "http-server ./dist/",

@@ -2,7 +2,6 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { DEG2RAD, MILLISECONDS_PER_DAY, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { satellite } from '@app/js/lib/lookangles.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 var earth = {};
@@ -132,7 +131,8 @@ earth.init = async (glRef) => {
       texture = gl.createTexture();
       var img = new Image();
       img.onload = function () {
-        settingsManager.loadStr('painting');
+        const uiManager = keepTrackApi.programs.uiManager;
+        uiManager.loadStr('painting');
         if (!settingsManager.isBlackEarth) {
           gl.bindTexture(gl.TEXTURE_2D, texture);
           gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);

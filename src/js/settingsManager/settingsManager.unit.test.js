@@ -149,18 +149,18 @@ describe('settingsManager URL Test', () => {
     settingsManager.setCurrentColorScheme('test');
     expect(settingsManager.currentColorScheme).toBe('test');
 
-    settingsManager.loadStr('');
-    settingsManager.loadStr('math');
-    settingsManager.loadStr('science');
+    uiManager.loadStr('');
+    uiManager.loadStr('math');
+    uiManager.loadStr('science');
     settingsManager.altLoadMsgs = false;
-    settingsManager.loadStr('science');
-    settingsManager.loadStr('dots');
-    settingsManager.loadStr('satIntel');
-    settingsManager.loadStr('radarData');
-    settingsManager.loadStr('painting');
-    settingsManager.loadStr('coloring');
-    settingsManager.loadStr('elsets');
-    settingsManager.loadStr('easterEgg');
+    uiManager.loadStr('science');
+    uiManager.loadStr('dots');
+    uiManager.loadStr('satIntel');
+    uiManager.loadStr('radarData');
+    uiManager.loadStr('painting');
+    uiManager.loadStr('coloring');
+    uiManager.loadStr('elsets');
+    uiManager.loadStr('easterEgg');
 
     settingsManager.db.off();
     settingsManager.db.on();

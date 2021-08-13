@@ -6,7 +6,7 @@
 */
 
 import { Dots } from '@app/js/drawManager/dots.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 
 const glMock = global.mocks.glMock;
 document.body.innerHTML = global.docBody;

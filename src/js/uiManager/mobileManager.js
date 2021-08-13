@@ -1,5 +1,3 @@
-import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
-
 var mobileManager = {};
 // Wrap everything in an init to make sure the loading order is respected
 mobileManager.init = async () => {

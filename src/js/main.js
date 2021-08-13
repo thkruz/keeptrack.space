@@ -56,20 +56,26 @@ settingsManager.versionNumber = VERSION;
 settingsManager.versionDate = VERSION_DATE;
 
 // Import CSS needed for loading screen
-if (!settingsManager.disableUI) {
-  import('@app/css/fonts.css').then((resp) => resp);
-  import('@app/css/materialize.css').then((resp) => resp);
-  import('@app/css/materialize-local.css').then((resp) => resp);
-  import('@app/js/lib/external/colorPick.css').then((resp) => resp);
-  import('@app/css/perfect-scrollbar.min.css').then((resp) => resp);
-  import('@app/css/jquery-ui.min.css').then((resp) => resp);
-  import('@app/css/jquery-ui-timepicker-addon.css').then((resp) => resp);
-  import('@app/css/style.css').then(await import('@app/css/responsive.css').then((resp) => resp));
-} else if (settingsManager.enableLimitedUI) {
-  import('@app/css/limitedUI.css').then((resp) => resp);
-} else {
-  // console.log('ERROR');
-}
+(async () => {
+  try {
+    if (!settingsManager.disableUI) {
+      import('@app/css/fonts.css').then((resp) => resp);
+      import('@app/css/materialize.css').then((resp) => resp);
+      import('@app/css/materialize-local.css').then((resp) => resp);
+      import('@app/js/lib/external/colorPick.css').then((resp) => resp);
+      import('@app/css/perfect-scrollbar.min.css').then((resp) => resp);
+      import('@app/css/jquery-ui.min.css').then((resp) => resp);
+      import('@app/css/jquery-ui-timepicker-addon.css').then((resp) => resp);
+      import('@app/css/style.css').then(await import('@app/css/responsive.css').then((resp) => resp));
+    } else if (settingsManager.enableLimitedUI) {
+      import('@app/css/limitedUI.css').then((resp) => resp);
+    } else {
+      // console.log('ERROR');
+    }
+  } catch (e) {
+    console.error(e);
+  }
+})();
 
 const keepTrackApi = window.keepTrackApi;
 keepTrackApi.programs = {

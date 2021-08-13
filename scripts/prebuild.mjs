@@ -47,8 +47,12 @@ try {
 }
 
 dirs.forEach((dir) => {
-  console.log(`Copying ${dir}...`);
-  copydir.sync(`./src/${dir}`, `./dist/${dir}`, opts);
+  try {
+    console.log(`Copying ${dir}...`);
+    copydir.sync(`./src/${dir}`, `./dist/${dir}`, opts);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 files.forEach((file) => {

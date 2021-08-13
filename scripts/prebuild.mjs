@@ -10,9 +10,9 @@ const copySync = (src, dest) => {
   fs.writeFileSync(dest, data);
 };
 
-const dirs = ['audio', 'admin', 'css/fonts', 'analysis', 'img', 'licenses', 'meshes', 'offline', 'php', 'radarData', 'res', 'satData', 'simulation', 'social', 'textures', 'tle'];
+const dirs = ['audio', 'admin', 'css/fonts', 'analysis', 'img', 'meshes', 'offline', 'php', 'radarData', 'res', 'satData', 'simulation', 'social', 'textures', 'tle'];
 
-const files = ['.htaccess', 'embed.html', 'favicon.ico', 'index.htm', 'manifest.webmanifest', 'serviceWorker.js', 'SOCRATES.htm', 'css/loading-screen.css', 'css/fonts.css', 'css/materialize.css', 'css/materialize-local.css'];
+const files = ['embed.html', 'favicon.ico', 'index.htm', 'manifest.webmanifest', 'serviceWorker.js', 'SOCRATES.htm', 'css/loading-screen.css', 'css/fonts.css', 'css/materialize.css', 'css/materialize-local.css'];
 
 const opts = {
   utimes: true, // keep add time and modify time
@@ -35,11 +35,9 @@ try {
 }
 
 console.log(`Creating ./dist/plugins...`);
-try {
-  mkdirp.sync('./dist/plugins');
-} catch (error) {
-  //
-}
+mkdirp.sync('./dist/plugins');
+console.log(`Creating ./dist/settings...`);
+mkdirp.sync('./dist/settings');
 
 console.log(`Creating ./dist/css...`);
 try {
@@ -53,15 +51,14 @@ dirs.forEach((dir) => {
     console.log(`Copying ${dir}...`);
     copydir.sync(`./src/${dir}`, `./dist/${dir}`, opts);
   } catch (error) {
-    //
+    console.log(error);
   }
 });
 
 files.forEach((file) => {
-  try {
-    console.log(`Copying ${file}...`);
-    copySync(`./src/${file}`, `./dist/${file}`);
-  } catch (error) {
-    //
-  }
+  console.log(`Copying ${file}...`);
+  copySync(`./src/${file}`, `./dist/${file}`);
 });
+
+console.log(`Copying settings...`);
+copySync(`./src/js/settingsManager/settingsManager.js`, `./dist/settings/settings.js`);

@@ -3,7 +3,6 @@
 import $ from 'jquery';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 
 var hoverSatId = -1;
 var searchBox = {};

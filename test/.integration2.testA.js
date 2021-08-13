@@ -26,7 +26,7 @@ import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
+import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
 import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
@@ -128,7 +128,7 @@ describe('Integration Testing', () => {
     // Start initializing the rest of the website
     timeManager.init();
     uiManager.onReady();
-    settingsManager.loadStr('dots');
+    uiManager.loadStr('dots');
     uiManager.mobileManager.init();
     cameraManager = new Camera();
     keepTrackApi.programs.cameraManager = cameraManager;

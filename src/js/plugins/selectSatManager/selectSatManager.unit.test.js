@@ -5,6 +5,7 @@
   jest
 */
 
+import '@app/js/settingsManager/settingsManager.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { selectSatManager } from '@app/js/plugins/selectSatManager/selectSatManager.js';
 

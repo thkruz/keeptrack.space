@@ -1,6 +1,19 @@
+declare global {
+  interface Window {
+    settingsManager: unknown;
+    jQuery: unknown;
+    $: unknown;
+    gremlins: any;
+    randomizer: any;
+  }
+}
+
 // Register all core modules
 export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any; plugins?: any }): Promise<void> => {
   const { plugins } = keepTrackApi.programs.settingsManager;
+  // Load Debug Plugins
+  await import('@app/js/plugins/debug/debug').then((mod) => mod.init());
+
   // Register selectSatData
   if (plugins.satInfoboxCore) await import('@app/js/plugins/selectSatManager/satInfoboxCore').then((mod) => mod.init());
 

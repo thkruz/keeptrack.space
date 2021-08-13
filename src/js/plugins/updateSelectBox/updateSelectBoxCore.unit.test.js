@@ -5,6 +5,7 @@
 
 import 'jsdom-worker';
 
+import '@app/js/settingsManager/settingsManager.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { missileManager } from '@app/js/plugins/missile/missileManager';
 import { orbitManager } from '@app/js/orbitManager/orbitManager';

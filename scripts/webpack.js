@@ -9,6 +9,12 @@ const MAKE_MODE = process.env.NODE_ENV == 'test' || process.env.NODE_ENV == 'dev
 
 let config = {
   mode: MAKE_MODE,
+  resolve: {
+    extensions: ['.ts', '.js'],
+    alias: {
+      '@app': __dirname + '/../src',
+    },
+  },
   module: {
     rules: [
       {
@@ -24,14 +30,17 @@ let config = {
         type: 'asset/resource',
       },
       // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
-      { test: /\.tsx?$/, loader: 'ts-loader' },
+      {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+      },
       {
         test: /\.worker\.js$/i,
         use: { loader: 'worker-loader' },
       },
       {
         test: /\.m?js$/,
-        exclude: /(node_modules|bower_components)/,
+        exclude: [/(node_modules|bower_components)/, /\settingsManager\.js/i],
         use: {
           loader: 'babel-loader',
         },
@@ -76,13 +85,6 @@ if (MAKE_MODE == 'production') {
 
 let jsConfig = Object.assign({}, config, {
   name: 'MainFiles',
-  resolve: {
-    // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: ['.ts', '.js'],
-    alias: {
-      '@app': path.resolve(__dirname + '/../src'),
-    },
-  },
   entry: {
     main: ['./src/js/main.js'],
   },
@@ -99,12 +101,6 @@ let jsConfig2 = Object.assign({}, config, {
     positionCruncher: ['./src/js/webworker/positionCruncher.js'],
     orbitCruncher: ['./src/js/webworker/orbitCruncher.js'],
   },
-  resolve: {
-    extensions: ['.ts', '.js'],
-    alias: {
-      '@app': __dirname + '/../src',
-    },
-  },
   output: {
     filename: '[name].js',
     path: __dirname + '/../dist/js',
@@ -116,12 +112,6 @@ let jsConfig3 = Object.assign({}, config, {
   name: 'Libraries',
   entry: {
     'analysis-tools': ['./src/analysis/js/analysis-tools.js'],
-  },
-  resolve: {
-    extensions: ['.ts', '.js'],
-    alias: {
-      '@app': __dirname + '/../src',
-    },
   },
   plugins: [
     new webpack.ProvidePlugin({

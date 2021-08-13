@@ -41,7 +41,6 @@ import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { saveAs } from '@app/js/lib/external/file-saver.min.js';
 import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
 
@@ -88,7 +87,7 @@ satSet.init = async () => {
   /** Parses GET variables for Possible sharperShaders */
   parseFromGETVariables();
 
-  settingsManager.loadStr('elsets');
+  uiManager.loadStr('elsets');
   // See if we are running jest right now for testing
   if (typeof process !== 'undefined') {
     try {
@@ -776,7 +775,7 @@ satSet.convertSatnumArrayToIdArray = (satnumArray) => {
 /* istanbul ignore next */
 satSet.initGsData = () => {
   $.getScript('satData/gs.json', function (resp) {
-    settingsManager.loadStr('satIntel');
+    uiManager.loadStr('satIntel');
     $('#loading-screen').fadeIn(1000, function loadGsInfo() {
       satSet.gsInfo = JSON.parse(resp);
       for (let gsI = 0; gsI < satSet.gsInfo.length; gsI++) {

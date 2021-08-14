@@ -158,6 +158,7 @@ earth.init = async (glRef) => {
           if (settingsManager.trusatImages) img.src = 'textures/trusatvector-4096.jpg';
           if (settingsManager.blueImages) earth.imgHiRes.src = 'textures/world_blue-2048.png';
           if (settingsManager.vectorImages) earth.imgHiRes.src = 'textures/dayearthvector-4096.jpg';
+          if (settingsManager.politicalImages) earth.imgHiRes.src = 'textures/political8k.jpg';
           if (settingsManager.hiresImages) earth.imgHiRes.src = 'textures/earthmap16k.jpg';
           if (settingsManager.hiresNoCloudsImages) earth.imgHiRes.src = 'textures/earthmap16k.jpg';
           earth.isUseHiRes = true;
@@ -210,6 +211,7 @@ earth.init = async (glRef) => {
           earth.nightImgHiRes = new Image();
           if (!settingsManager.smallImages) earth.nightImgHiRes.src = 'textures/earthlights4k.jpg';
           if (settingsManager.vectorImages) earth.nightImgHiRes.src = 'textures/dayearthvector-4096.jpg';
+          if (settingsManager.politicalImages) earth.nightImgHiRes.src = 'textures/political8k.jpg';
           if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) earth.nightImgHiRes.src = 'textures/earthlights16k.jpg';
           earth.nightImgHiRes.onload = function () {
             if (!settingsManager.isBlackEarth) {

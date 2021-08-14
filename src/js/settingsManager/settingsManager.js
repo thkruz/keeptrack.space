@@ -294,6 +294,7 @@ const settingsManager = {
     settingsManager.hiresImages = false;
     settingsManager.hiresNoCloudsImages = false;
     settingsManager.vectorImages = false;
+    settingsManager.politicalImages = false;
     settingsManager.isLoadLastMap = true;
     if (settingsManager.disableUI) {
       settingsManager.isLoadLastMap = false;
@@ -571,6 +572,9 @@ const settingsManager = {
             case 'vec':
               settingsManager.vectorImages = true;
               break;
+            case 'political':
+              settingsManager.politicalImages = true;
+              break;
             case 'retro':
               settingsManager.retro = true;
               settingsManager.tleSource = 'tle/retro.json';
@@ -633,6 +637,9 @@ const settingsManager = {
           break;
         case 'vec':
           settingsManager.vectorImages = true;
+          break;
+        case 'political':
+          settingsManager.politicalImages = true;
           break;
         default:
           settingsManager.lowresImages = true;

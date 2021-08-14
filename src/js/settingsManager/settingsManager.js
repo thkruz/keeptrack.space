@@ -16,7 +16,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 */
 
 // Settings Manager Setup
-export const settingsManager = {
+const settingsManager = {
   // Classification can be "Unclassified", "Secret", "Top Secret", "Top Secret//SCI"
   classificationStr: '',
   // This controls which of the built-in plugins are loaded

@@ -8,7 +8,7 @@
   expect
 */
 
-import { settingsManager } from '@app/js/settingsManager/settingsManager.js';
+import '@app/js/settingsManager/settingsManager.js';
 
 const setUrl = (url) => {
   const host = url.split('/')[2] || '';

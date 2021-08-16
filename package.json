@@ -49,6 +49,7 @@
     "getExtra:textures": "node ./scripts/updateTextures.mjs"
   },
   "jest": {
+    "testEnvironment": "jsdom",
     "transform": {
       "^.+\\.[t|j]sx?$": "babel-jest"
     },

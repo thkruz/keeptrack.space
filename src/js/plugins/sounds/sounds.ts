@@ -37,7 +37,7 @@ export const init = (): void => {
           window.speechSynthesis.speak(msg);
         },
         sounds: {
-          standby: new Audio('/audio/Synth-Pop-Small-01.m4a'),
+          standby: new Audio('./audio/Synth-Pop-Small-01.m4a'),
         },
         play: (sound: string) => {
           keepTrackApi.programs.soundManager.sounds[sound].play();

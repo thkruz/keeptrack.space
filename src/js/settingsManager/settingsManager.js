@@ -16,7 +16,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 */
 
 // Settings Manager Setup
-export const settingsManager = {
+const settingsManager = {
   // Classification can be "Unclassified", "Secret", "Top Secret", "Top Secret//SCI"
   classificationStr: '',
   // This controls which of the built-in plugins are loaded
@@ -294,6 +294,7 @@ export const settingsManager = {
     settingsManager.hiresImages = false;
     settingsManager.hiresNoCloudsImages = false;
     settingsManager.vectorImages = false;
+    settingsManager.politicalImages = false;
     settingsManager.isLoadLastMap = true;
     if (settingsManager.disableUI) {
       settingsManager.isLoadLastMap = false;
@@ -571,6 +572,9 @@ export const settingsManager = {
             case 'vec':
               settingsManager.vectorImages = true;
               break;
+            case 'political':
+              settingsManager.politicalImages = true;
+              break;
             case 'retro':
               settingsManager.retro = true;
               settingsManager.tleSource = 'tle/retro.json';
@@ -633,6 +637,9 @@ export const settingsManager = {
           break;
         case 'vec':
           settingsManager.vectorImages = true;
+          break;
+        case 'political':
+          settingsManager.politicalImages = true;
           break;
         default:
           settingsManager.lowresImages = true;

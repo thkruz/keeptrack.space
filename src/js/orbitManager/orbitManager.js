@@ -1,6 +1,7 @@
 /* */
 
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { satSet } from '@app/js/satSet/satSet.js';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
@@ -35,7 +36,19 @@ if (typeof process !== 'undefined') {
     console.error(error);
   }
 } else {
-  orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
+  if (typeof Worker === 'undefined') {
+    throw new Error('Your browser does not support web workers.');
+  }
+  try {
+    orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
+  } catch (error) {
+    // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
+    if (window.location.href.indexOf('file://') === 0) {
+      $('#loader-text').text('Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.');
+    } else {
+      console.error(error);
+    }
+  }
 }
 orbitManager.orbitWorker = orbitWorker;
 

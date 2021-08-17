@@ -8,7 +8,7 @@
   expect
 */
 
-import { settingsManager } from '@app/js/settingsManager/settingsManager';
+import '@app/js/settingsManager/settingsManager';
 
 const setUrl = (url) => {
   const host = url.split('/')[2] || '';
@@ -99,7 +99,6 @@ describe('settingsManager URL Test', () => {
 
   test('http://www.keeptrack.space', () => {
     expect(settingsManager.installDirectory).toBe('/');
-    expect(settingsManager.isOfficialWebsite).toBe(true);
     expect(settingsManager.breakTheLaw).toBe(undefined);
   });
 

@@ -31,7 +31,7 @@ declare global {
 }
 
 // Settings Manager Setup
-export const settingsManager: any = {
+const settingsManager: any = {
   //  Version Control
   versionNumber: VERSION,
   versionDate: VERSION_DATE,
@@ -854,3 +854,7 @@ settingsManager.init();
 
 // Expose these to the console
 window.settingsManager = settingsManager;
+
+if (typeof process !== 'undefined') {
+  global.window.settingsManager = settingsManager;
+}

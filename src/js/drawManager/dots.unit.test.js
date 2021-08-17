@@ -5,14 +5,14 @@
   jest
 */
 
+import '@app/js/settingsManager/settingsManager';
 import { Dots } from '@app/js/drawManager/dots.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 
 const glMock = global.mocks.glMock;
 document.body.innerHTML = global.docBody;
 
 test(`Dots Unit Testing`, () => {
-  window.settingsManager = settingsManager;
+  const settingsManager = window.settingsManager;
   const dotManager = new Dots(glMock);
   dotManager.draw({}, {}, {}, {});
   dotManager.drawGpuPickingFrameBuffer({}, {}, {});

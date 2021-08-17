@@ -4,7 +4,7 @@ import { saveCsv, truncateString } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { settingsManager } from '@app/js/settingsManager/settingsManager';
+import '@app/js/settingsManager/settingsManager';
 
 type LaunchInfoObject = {
   name: string;

@@ -1,7 +1,7 @@
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
 import { SunCalc } from '@app/js/lib/suncalc.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { settingsManager } from '@app/js/settingsManager/settingsManager';
+import '@app/js/settingsManager/settingsManager';
 
 const satInfoboxCore = {
   sensorInfo: {

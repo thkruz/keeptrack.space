@@ -41,11 +41,11 @@ import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { saveAs } from '@app/js/lib/external/file-saver.min.js';
 import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
 
-// 'use strict';
+const settingsManager = window.settingsManager;
+
 var satSet = {};
 
 var satCruncher;

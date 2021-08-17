@@ -568,8 +568,6 @@ const settingsManager = {
             case 'vec':
               settingsManager.vectorImages = true;
               break;
-<<<<<<< HEAD:src/js/settingsManager/settingsManager.ts
-=======
             case 'political':
               settingsManager.politicalImages = true;
               break;
@@ -577,7 +575,6 @@ const settingsManager = {
               settingsManager.retro = true;
               settingsManager.tleSource = 'tle/retro.json';
               break;
->>>>>>> 1c6fe12a4adf99011974b9fe5734d167a13d320d:src/js/settingsManager/settingsManager.js
             case 'offline':
               settingsManager.offline = true;
               break;

@@ -1,4 +1,4 @@
-/* globals it describe */
+/* globals it jest describe */
 
 import '@app/js/settingsManager/settingsManager.js';
 import { init } from './topMenu';
@@ -10,6 +10,9 @@ describe('topMenu', () => {
   });
 
   it('should add the top menu', () => {
+    keepTrackApi.programs.uiManager = {
+      menuController: jest.fn(),
+    };
     keepTrackApi.methods.uiManagerInit();
   });
 });

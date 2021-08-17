@@ -4,6 +4,7 @@
   test
 */
 
+import '@app/js/settingsManager/settingsManager.js';
 import { mobileManager } from '@app/js/uiManager/mobileManager.js';
 
 test(`mobileManager Unit Tests`, () => {

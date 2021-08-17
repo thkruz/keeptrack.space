@@ -1,20 +1,14 @@
 /* globals
   global
   jest
-  require
   __dirname
 */
 
 import 'webgl-mock';
 import $ from 'jquery';
-
-const fs = require('fs');
-const path = require('path');
-
-const jsdom = require('jsdom');
-// eslint-disable-next-line no-unused-vars
-// const { createCanvas } = require('canvas');
-const { JSDOM } = jsdom;
+import { JSDOM } from 'jsdom';
+import fs from 'fs';
+import path from 'path';
 
 // eslint-disable-next-line no-sync
 const documentHTML = fs.readFileSync(path.resolve(__dirname, '../src/index.htm'), 'utf8').toString();

@@ -123,6 +123,7 @@ class Dots {
   }
 
   setupShaders() {
+    const settingsManager = window.settingsManager;
     this.drawShaderCode = {
       frag: `#version 300 es          
           precision mediump float;

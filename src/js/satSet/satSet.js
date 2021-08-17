@@ -39,11 +39,11 @@ import { satellite } from '@app/js/lib/lookangles.js';
 import { saveAs } from '@app/js/lib/external/file-saver.min.js';
 import { saveCsv } from '@app/js/lib/helpers';
 import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
 
-// 'use strict';
+const settingsManager = window.settingsManager;
+
 var satSet = {};
 
 var satCruncher;
@@ -83,7 +83,7 @@ satSet.init = async () => {
   /** Parses GET variables for Possible sharperShaders */
   parseFromGETVariables();
 
-  settingsManager.loadStr('elsets');
+  uiManager.loadStr('elsets');
   // See if we are running jest right now for testing
   if (typeof process !== 'undefined') {
     try {
@@ -93,7 +93,19 @@ satSet.init = async () => {
       console.error(error);
     }
   } else {
-    satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
+    if (typeof Worker === 'undefined') {
+      throw new Error('Your browser does not support web workers.');
+    }
+    try {
+      satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
+    } catch (error) {
+      // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
+      if (window.location.href.indexOf('file://') === 0) {
+        $('#loader-text').text('Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.');
+      } else {
+        console.error(error);
+      }
+    }
   }
   addSatCruncherOnMessage(cameraManager);
 
@@ -372,7 +384,7 @@ satSet.convertSatnumArrayToIdArray = (satnumArray) => {
 /* istanbul ignore next */
 satSet.initGsData = () => {
   $.getScript('satData/gs.json', function (resp) {
-    settingsManager.loadStr('satIntel');
+    uiManager.loadStr('satIntel');
     $('#loading-screen').fadeIn(1000, function loadGsInfo() {
       satSet.gsInfo = JSON.parse(resp);
       for (let gsI = 0; gsI < satSet.gsInfo.length; gsI++) {

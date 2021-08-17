@@ -15,27 +15,11 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 // /////////////////////////////////////////////////////////////////////////////
 */
 
-import $ from 'jquery';
-import { RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
-import { VERSION } from '@app/js/settingsManager/version.js';
-import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
-
-declare global {
-  interface Window { 
-    settingsManager: unknown; 
-    jQuery: unknown;
-    $: unknown;
-    gremlins: any;
-    randomizer: any;
-  }
-}
-
 // Settings Manager Setup
-export const settingsManager: any = {
-  //  Version Control
-  versionNumber: VERSION,
-  versionDate: VERSION_DATE,
+const settingsManager = {
+  // Classification can be "Unclassified", "Secret", "Top Secret", "Top Secret//SCI"
   classificationStr: '',
+  // This controls which of the built-in plugins are loaded
   plugins: {
     atmosphere: true,
     satInfoboxCore: true,
@@ -80,7 +64,7 @@ export const settingsManager: any = {
     classification: true,
     soundManager: true,
   },
-  init: async (): Promise<void> => {    
+  init: async () => {
     settingsManager.pTime = [];
 
     // Install Folder Settings
@@ -242,6 +226,7 @@ export const settingsManager: any = {
     settingsManager.atmospherelatSegs = 64;
     settingsManager.atmospherelonSegs = 64;
 
+    const RADIUS_OF_EARTH = 6371.0;
     settingsManager.atmosphereSize = RADIUS_OF_EARTH + 250;
     settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)';
 
@@ -305,6 +290,7 @@ export const settingsManager: any = {
     settingsManager.hiresImages = false;
     settingsManager.hiresNoCloudsImages = false;
     settingsManager.vectorImages = false;
+    settingsManager.politicalImages = false;
     settingsManager.isLoadLastMap = true;
     if (settingsManager.disableUI) {
       settingsManager.isLoadLastMap = false;
@@ -314,7 +300,7 @@ export const settingsManager: any = {
     // Color Settings
     // //////////////////////////////////////////////////////////////////////////
     settingsManager.currentColorScheme = null;
-    settingsManager.setCurrentColorScheme = (val: any) => {
+    settingsManager.setCurrentColorScheme = (val) => {
       settingsManager.currentColorScheme = val;
     };
 
@@ -475,7 +461,7 @@ export const settingsManager: any = {
     // Determines if the Loading is complete
     settingsManager.cruncherReady = false;
 
-    settingsManager.altLoadMsgs = true;
+    settingsManager.altLoadMsgs = false;
 
     settingsManager.lkVerify = Date.now();
 
@@ -498,7 +484,7 @@ export const settingsManager: any = {
     settingsManager.geolocationUsed = false;
     settingsManager.mapWidth = 800;
     settingsManager.mapHeight = 600;
-    settingsManager.currentLegend = 'default';    
+    settingsManager.currentLegend = 'default';
     settingsManager.queuedScreenshot = false;
 
     settingsManager.isResizing = false;
@@ -582,6 +568,16 @@ export const settingsManager: any = {
             case 'vec':
               settingsManager.vectorImages = true;
               break;
+<<<<<<< HEAD:src/js/settingsManager/settingsManager.ts
+=======
+            case 'political':
+              settingsManager.politicalImages = true;
+              break;
+            case 'retro':
+              settingsManager.retro = true;
+              settingsManager.tleSource = 'tle/retro.json';
+              break;
+>>>>>>> 1c6fe12a4adf99011974b9fe5734d167a13d320d:src/js/settingsManager/settingsManager.js
             case 'offline':
               settingsManager.offline = true;
               break;
@@ -624,6 +620,9 @@ export const settingsManager: any = {
         case 'vec':
           settingsManager.vectorImages = true;
           break;
+        case 'political':
+          settingsManager.politicalImages = true;
+          break;
         default:
           settingsManager.lowresImages = true;
           break;
@@ -633,194 +632,6 @@ export const settingsManager: any = {
     // Make sure there is some map loaded!
     if (!settingsManager.smallImages && !settingsManager.nasaImages && !settingsManager.blueImages && !settingsManager.lowresImages && !settingsManager.hiresImages && !settingsManager.hiresNoCloudsImages && !settingsManager.vectorImages) {
       settingsManager.lowresImages = true;
-    }
-
-    //Global Debug Manager
-    let db: any = {};
-    {
-      try {
-        db = JSON.parse(localStorage.getItem('db'));
-        if (db == null) throw new Error('Reload Debug Manager');
-        if (typeof db.enabled == 'undefined') throw new Error('Reload Debug Manager');
-      } catch (e) {
-        db = {};
-        db.enabled = false;
-        db.verbose = false;
-        localStorage.setItem('db', JSON.stringify(db));
-      }
-      db.init = (function () {
-        db.log = function (message: string, isVerbose: boolean) {
-          // Don't Log Verbose Stuff Normally
-          if (isVerbose && !db.verbose) return;
-
-          // If Logging is Enabled - Log It
-          if (db.enabled) {
-            console.log(message);
-          }
-        };
-        db.on = function () {
-          db.enabled = true;
-          console.log('db is now on!');
-          localStorage.setItem('db', JSON.stringify(db));
-        };
-        db.off = function () {
-          db.enabled = false;
-          console.log('db is now off!');
-          localStorage.setItem('db', JSON.stringify(db));
-        };
-      })();
-      db.gremlinsSettings = {};
-      db.gremlinsSettings.nb = 100000;
-      db.gremlinsSettings.delay = 5;
-      db.gremlins = () => {
-        $('#nav-footer').height(200);
-        $('#nav-footer-toggle').hide();
-        $('#bottom-icons-container').height(200);
-        $('#bottom-icons').height(200);
-        let startGremlins = () => {
-          const bottomMenuGremlinClicker = window.gremlins.species.clicker({
-            // Click only if parent is has class test-class
-            canClick: (element: any) => {
-              if (typeof element.parentElement == 'undefined' || element.parentElement == null) return null;
-              return element.parentElement.className === 'bmenu-item';
-            },
-            defaultPositionSelector: () => {
-              [
-                window.randomizer.natural({
-                  max: Math.max(0, document.documentElement.clientWidth - 1),
-                }),
-                window.randomizer.natural({
-                  min: Math.max(0, document.documentElement.clientHeight - 100),
-                  max: Math.max(0, document.documentElement.clientHeight - 1),
-                }),
-              ];
-            },
-          });
-          const bottomMenuGremlinScroller = window.gremlins.species.toucher({
-            touchTypes: ['gesture'],
-            defaultPositionSelector: () => {
-              [
-                window.randomizer.natural({
-                  max: Math.max(0, document.documentElement.clientWidth - 1),
-                }),
-                window.randomizer.natural({
-                  min: Math.max(0, document.documentElement.clientHeight - 100),
-                  max: Math.max(0, document.documentElement.clientHeight - 1),
-                }),
-              ];
-            },
-          });
-          const distributionStrategy = window.gremlins.strategies.distribution({
-            distribution: [0.3, 0.3, 0.1, 0.1, 0.1, 0.1], // the first three gremlins have more chances to be executed than the last
-            delay: 5, // wait 5 ms between each action
-          });
-          window.gremlins
-            .createHorde({
-              species: [
-                bottomMenuGremlinClicker,
-                bottomMenuGremlinScroller,
-                // gremlins.species.scroller(),
-                window.gremlins.species.clicker(),
-                window.gremlins.species.toucher(),
-                window.gremlins.species.formFiller(),
-                window.gremlins.species.typer(),
-              ],
-              mogwais: [window.gremlins.mogwais.alert(), window.gremlins.mogwais.fps(), window.gremlins.mogwais.gizmo({ maxErrors: 1000 })],
-              strategies: [distributionStrategy],
-            })
-            .unleash();
-          return;
-        };
-        if (typeof window.gremlins == 'undefined') {
-          let s: any = document.createElement('script');
-          s.src = 'https://unpkg.com/gremlins.js';
-          if (s.addEventListener) {
-            s.addEventListener('load', startGremlins, false);
-          } else if (s.readyState) {
-            s.onreadystatechange = startGremlins;
-          }
-          document.body.appendChild(s);
-        } else {
-          startGremlins();
-        }
-      };
-    }
-    settingsManager.db = db;
-
-    // Try to Make Older Versions of Jquery Work
-    if (typeof window.$ == 'undefined') {
-      if (typeof window.jQuery !== 'undefined') {
-        window.$ = window.jQuery;
-      }
-    }
-
-    // Import CSS needed for loading screen
-    if (!settingsManager.disableUI) {
-      import('@app/css/fonts.css').then((resp) => resp);
-      import('@app/css/materialize.css').then((resp) => resp);
-      import('@app/css/materialize-local.css').then((resp) => resp);
-      import('@app/js/lib/external/colorPick.css').then((resp) => resp);
-      import('@app/css/perfect-scrollbar.min.css').then((resp) => resp);
-      import('@app/css/jquery-ui.min.css').then((resp) => resp);
-      import('@app/css/jquery-ui-timepicker-addon.css').then((resp) => resp);
-      import('@app/css/style.css').then(await import('@app/css/responsive.css').then((resp) => resp));
-    } else if (settingsManager.enableLimitedUI) {
-      import('@app/css/limitedUI.css').then((resp) => resp);
-    } else {
-      // console.log('ERROR');
-    }
-  },
-  loadStr: (str: string): void => {
-    if (str == '') {
-      $('#loader-text').html('');
-      return;
-    }
-    if (str == 'math') {
-      $('#loader-text').html('Attempting to Math...');
-    }
-
-    if (settingsManager.altLoadMsgs) {
-      if (typeof settingsManager.altMsgNum !== 'undefined') return;
-      settingsManager.altMsgNum = Math.random();
-      let msg = '';
-
-      if (settingsManager.altMsgNum > 0) {
-        msg = `KeepTrack is on the front page of <a style="color: #48f3e3 !important;" href="https://clearspace.today" target="_blank">ClearSpace-1's Website</a>!`;
-      }
-      if (settingsManager.altMsgNum > 0.33) {
-        msg = `KeepTrack provided visuals for Studio Roosegaarde's <a style="color: #48f3e3 !important;" href="https://www.studioroosegaarde.net/project/space-waste-lab" target="_blank">Space Waste Lab</a>!`;
-      }
-      if (settingsManager.altMsgNum > 0.66) {
-        msg = `KeepTrack was used by the <a style="color: #48f3e3 !important;" href="https://www.youtube.com/embed/OfvkKBNup5A?autoplay=0&start=521&modestbranding=1" target="_blank">Joint Space Operations Center</a>!`;
-      }
-      $('#loader-text').html(msg);
-      return;
-    }
-
-    switch (str) {
-      case 'science':
-        $('#loader-text').html('Locating Science...');
-        break;
-      case 'dots':
-        $('#loader-text').html('Drawing Dots in Space...');
-        break;
-      case 'satIntel':
-        $('#loader-text').html('Integrating Satellite Intel...');
-        break;
-      case 'radarData':
-        $('#loader-text').html('Importing Radar Data...');
-        break;
-      case 'painting':
-        $('#loader-text').html('Painting the Earth...');
-        break;
-      case 'coloring':
-        $('#loader-text').html('Coloring Inside the Lines...');
-        break;
-      case 'elsets':
-        $('#loader-text').html('Locating ELSETs...');
-        break;
-      case 'easterEgg':
-        $('#loader-text').html('Llama Llama Llama Duck!');
     }
   },
 };

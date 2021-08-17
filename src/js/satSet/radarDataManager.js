@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import { DEG2RAD } from '@app/js/lib/constants.js';
-import { db } from '@app/js/settingsManager/settingsManager.ts';
+import { keepTrackApi } from '../api/externalApi';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 var satellite, sensorManager, satSet, satCruncher;
@@ -16,12 +16,13 @@ radarDataManager.init = async (sensorManagerRef, satSetRef, satCruncherRef, sate
   satCruncher = satCruncherRef;
   satellite = satelliteRef;
   $.getScript(`${settingsManager.installDirectory}radarData/radarData.txt`, function (resp) {
-    settingsManager.loadStr('radarData');
+    const uiManager = keepTrackApi.programs.uiManager;
+    uiManager.loadStr('radarData');
     $('#loading-screen').fadeIn(1000, function () {
       radarDataManager.setup(resp);
       $('#loading-screen').fadeOut('slow');
       setTimeout(function () {
-        settingsManager.loadStr('math');
+        uiManager.loadStr('math');
       }, 800);
     });
   });

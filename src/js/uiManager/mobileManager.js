@@ -1,5 +1,3 @@
-import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
-
 var mobileManager = {};
 // Wrap everything in an init to make sure the loading order is respected
 mobileManager.init = async () => {
@@ -24,32 +22,36 @@ mobileManager.init = async () => {
   };
 
   mobileManager.checkMobileMode = async () => {
-    if (mobileManager.checkIfMobileDevice()) {
-      settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
-      settingsManager.enableHoverOverlay = false;
-      settingsManager.isMobileModeEnabled = true;
-      settingsManager.cameraMovementSpeed = 0.0001;
-      settingsManager.cameraMovementSpeedMin = 0.0001;
-      if (settingsManager.isUseHigherFOVonMobile) {
-        settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+    try {
+      if (mobileManager.checkIfMobileDevice()) {
+        settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
+        settingsManager.enableHoverOverlay = false;
+        settingsManager.isMobileModeEnabled = true;
+        settingsManager.cameraMovementSpeed = 0.0001;
+        settingsManager.cameraMovementSpeedMin = 0.0001;
+        if (settingsManager.isUseHigherFOVonMobile) {
+          settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+        } else {
+          settingsManager.fieldOfView = 0.6;
+        }
+        settingsManager.maxLabels = settingsManager.mobileMaxLabels;
       } else {
-        settingsManager.fieldOfView = 0.6;
+        settingsManager.maxOribtsDisplayed = settingsManager.maxOribtsDisplayedDesktop;
+        if (typeof settingsManager.enableHoverOverlay == 'undefined') {
+          settingsManager.enableHoverOverlay = true;
+        }
+        settingsManager.isMobileModeEnabled = false;
+        settingsManager.cameraMovementSpeed = 0.003;
+        settingsManager.cameraMovementSpeedMin = 0.005;
+        if (settingsManager.isUseHigherFOVonMobile) {
+          settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+        } else {
+          settingsManager.fieldOfView = 0.6;
+        }
+        settingsManager.maxLabels = settingsManager.desktopMaxLabels;
       }
-      settingsManager.maxLabels = settingsManager.mobileMaxLabels;
-    } else {
-      settingsManager.maxOribtsDisplayed = settingsManager.maxOribtsDisplayedDesktop;
-      if (typeof settingsManager.enableHoverOverlay == 'undefined') {
-        settingsManager.enableHoverOverlay = true;
-      }
-      settingsManager.isMobileModeEnabled = false;
-      settingsManager.cameraMovementSpeed = 0.003;
-      settingsManager.cameraMovementSpeedMin = 0.005;
-      if (settingsManager.isUseHigherFOVonMobile) {
-        settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
-      } else {
-        settingsManager.fieldOfView = 0.6;
-      }
-      settingsManager.maxLabels = settingsManager.desktopMaxLabels;
+    } catch (e) {
+      console.error(e);
     }
   };
 

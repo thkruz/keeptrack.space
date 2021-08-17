@@ -1,13 +1,13 @@
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
 import { SunCalc } from '@app/js/lib/suncalc.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { settingsManager } from '@app/js/settingsManager/settingsManager';
 
 const satInfoboxCore = {
   sensorInfo: {
     isLoaded: false,
     cbName: 'sensorInfo',
     cb: (sat: any): void => {
+      const settingsManager = keepTrackApi.programs.settingsManager;
       if (!satInfoboxCore.sensorInfo.isLoaded && settingsManager.plugins.sensor) {
         $('#sat-infobox').append(keepTrackApi.html`
         <div id="sensor-sat-info">

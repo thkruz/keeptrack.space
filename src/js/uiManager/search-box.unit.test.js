@@ -4,7 +4,7 @@
   expect
 */
 
-import '@app/js/settingsManager/settingsManager.ts';
+import '@app/js/settingsManager/settingsManager.js';
 import 'jsdom-worker';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { searchBox } from '@app/js/uiManager/search-box.js';

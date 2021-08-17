@@ -8,8 +8,8 @@
   $
 */
 
+import '@app/js/settingsManager/settingsManager';
 import { nextLaunchManager } from '@app/js/plugins/nextLaunch/nextLaunch';
-import { settingsManager } from '@app/js/settingsManager/settingsManager';
 
 const setUrl = (url) => {
   const host = url.split('/')[2] || '';

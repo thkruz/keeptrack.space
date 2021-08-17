@@ -1,7 +1,6 @@
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { satellite } from '@app/js/lib/lookangles.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 
 let isselectedSatNegativeOne = false;
 const selectSatManager = {
@@ -10,6 +9,7 @@ const selectSatManager = {
   },
 
   selectSat: (satId, cameraManager) => {
+    const settingsManager = window.settingsManager;
     const objectManager = keepTrackApi.programs.objectManager;
     const satSet = keepTrackApi.programs.satSet;
     const sensorManager = keepTrackApi.programs.sensorManager;

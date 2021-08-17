@@ -2,7 +2,6 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { DEG2RAD, MILLISECONDS_PER_DAY, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { satellite } from '@app/js/lib/lookangles.js';
-import { settingsManager } from '@app/js/settingsManager/settingsManager.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 var earth = {};
@@ -132,7 +131,8 @@ earth.init = async (glRef) => {
       texture = gl.createTexture();
       var img = new Image();
       img.onload = function () {
-        settingsManager.loadStr('painting');
+        const uiManager = keepTrackApi.programs.uiManager;
+        uiManager.loadStr('painting');
         if (!settingsManager.isBlackEarth) {
           gl.bindTexture(gl.TEXTURE_2D, texture);
           gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
@@ -150,32 +150,37 @@ earth.init = async (glRef) => {
       img.src = 'textures/earthmap512.jpg';
 
       earth.loadHiRes = async () => {
-        earth.imgHiRes = new Image();
-        earth.imgHiRes.src = 'textures/earthmap4k.jpg';
-        if (settingsManager.smallImages) earth.imgHiRes.src = 'textures/earthmap512.jpg';
-        if (settingsManager.nasaImages) earth.imgHiRes.src = 'textures/mercator-tex.jpg';
-        if (settingsManager.trusatImages) img.src = 'textures/trusatvector-4096.jpg';
-        if (settingsManager.blueImages) earth.imgHiRes.src = 'textures/world_blue-2048.png';
-        if (settingsManager.vectorImages) earth.imgHiRes.src = 'textures/dayearthvector-4096.jpg';
-        if (settingsManager.hiresImages) earth.imgHiRes.src = 'textures/earthmap16k.jpg';
-        if (settingsManager.hiresNoCloudsImages) earth.imgHiRes.src = 'textures/earthmap16k.jpg';
-        earth.isUseHiRes = true;
-        earth.imgHiRes.onload = function () {
-          if (!settingsManager.isBlackEarth) {
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.imgHiRes);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        try {
+          earth.imgHiRes = new Image();
+          earth.imgHiRes.src = 'textures/earthmap4k.jpg';
+          if (settingsManager.smallImages) earth.imgHiRes.src = 'textures/earthmap512.jpg';
+          if (settingsManager.nasaImages) earth.imgHiRes.src = 'textures/mercator-tex.jpg';
+          if (settingsManager.trusatImages) img.src = 'textures/trusatvector-4096.jpg';
+          if (settingsManager.blueImages) earth.imgHiRes.src = 'textures/world_blue-2048.png';
+          if (settingsManager.vectorImages) earth.imgHiRes.src = 'textures/dayearthvector-4096.jpg';
+          if (settingsManager.politicalImages) earth.imgHiRes.src = 'textures/political8k.jpg';
+          if (settingsManager.hiresImages) earth.imgHiRes.src = 'textures/earthmap16k.jpg';
+          if (settingsManager.hiresNoCloudsImages) earth.imgHiRes.src = 'textures/earthmap16k.jpg';
+          earth.isUseHiRes = true;
+          earth.imgHiRes.onload = function () {
+            if (!settingsManager.isBlackEarth) {
+              gl.bindTexture(gl.TEXTURE_2D, texture);
+              gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.imgHiRes);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 
-            gl.generateMipmap(gl.TEXTURE_2D);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-          }
+              gl.generateMipmap(gl.TEXTURE_2D);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+            }
 
-          texLoaded = true;
-          earth.isHiResReady = true;
-          onImageLoaded();
-        };
+            texLoaded = true;
+            earth.isHiResReady = true;
+            onImageLoaded();
+          };
+        } catch (e) {
+          console.error(e);
+        }
       };
     }
 
@@ -202,25 +207,30 @@ earth.init = async (glRef) => {
       earth.nightImg.src = 'textures/earthlights512.jpg';
 
       earth.loadHiResNight = async () => {
-        earth.nightImgHiRes = new Image();
-        if (!settingsManager.smallImages) earth.nightImgHiRes.src = 'textures/earthlights4k.jpg';
-        if (settingsManager.vectorImages) earth.nightImgHiRes.src = 'textures/dayearthvector-4096.jpg';
-        if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) earth.nightImgHiRes.src = 'textures/earthlights16k.jpg';
-        earth.nightImgHiRes.onload = function () {
-          if (!settingsManager.isBlackEarth) {
-            gl.bindTexture(gl.TEXTURE_2D, nightTexture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.nightImgHiRes);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        try {
+          earth.nightImgHiRes = new Image();
+          if (!settingsManager.smallImages) earth.nightImgHiRes.src = 'textures/earthlights4k.jpg';
+          if (settingsManager.vectorImages) earth.nightImgHiRes.src = 'textures/dayearthvector-4096.jpg';
+          if (settingsManager.politicalImages) earth.nightImgHiRes.src = 'textures/political8k.jpg';
+          if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) earth.nightImgHiRes.src = 'textures/earthlights16k.jpg';
+          earth.nightImgHiRes.onload = function () {
+            if (!settingsManager.isBlackEarth) {
+              gl.bindTexture(gl.TEXTURE_2D, nightTexture);
+              gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, earth.nightImgHiRes);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 
-            gl.generateMipmap(gl.TEXTURE_2D);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-          }
+              gl.generateMipmap(gl.TEXTURE_2D);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+            }
 
-          nightLoaded = true;
-          onImageLoaded();
-        };
+            nightLoaded = true;
+            onImageLoaded();
+          };
+        } catch (e) {
+          console.error(e);
+        }
       };
     }
 

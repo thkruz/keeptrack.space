@@ -69,6 +69,16 @@ Launch a local webserver and then open index.htm in your preferred browser.
 npm start
 ```
 
+### Launching Offline Mode
+
+KeepTrack was designed to run without the need for a webserver. On Windows, create a shortcut to the following target:
+
+`"C:\Program Files\Google\Chrome\Application\chrome.exe" --allow-file-access-from-files`
+
+Close all open copies of chrome and then launch the shortcut. Now open the downloaded index.htm file in the dist folder.
+
+NOTE: You MUST compile the code first. Opening the index.htm file in the src folder will not work.
+
 ## Usage
 The main index.htm page loads a canvas element set to the size of the window that displays the earth, satellites, and stars. The UI is loaded in DOM elements on top of the canvas element. Two webworkers are loaded (positionCruncher.js and orbitCruncher.js) to handle constant calculation of satellite locations and updating orbit lines when an object is highlighted.
 

@@ -10,6 +10,7 @@ import 'jsdom-worker';
 import { eventFire, setup } from './setup.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
+import '@app/js/settingsManager/settingsManager.js';
 import 'jquery-ui-bundle';
 import 'materialize-css';
 import { LineFactory, sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
@@ -26,7 +27,6 @@ import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
-import '@app/js/settingsManager/settingsManager.js';
 import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 

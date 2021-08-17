@@ -2,7 +2,6 @@ import * as glm from '../lib/external/gl-matrix.js';
 import $ from 'jquery';
 import { RADIUS_OF_EARTH } from '../lib/constants.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
-
 const settingsManager: any = window.settingsManager;
 
 let M = window.M;

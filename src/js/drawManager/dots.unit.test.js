@@ -12,7 +12,7 @@ const glMock = global.mocks.glMock;
 document.body.innerHTML = global.docBody;
 
 test(`Dots Unit Testing`, () => {
-  window.settingsManager = settingsManager;
+  const settingsManager = window.settingsManager;
   const dotManager = new Dots(glMock);
   dotManager.draw({}, {}, {}, {});
   dotManager.drawGpuPickingFrameBuffer({}, {}, {});

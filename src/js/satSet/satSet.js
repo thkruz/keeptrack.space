@@ -44,7 +44,8 @@ import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 import { uiManager } from '@app/js/uiManager/uiManager.js';
 
-// 'use strict';
+const settingsManager = window.settingsManager;
+
 var satSet = {};
 
 var satCruncher;

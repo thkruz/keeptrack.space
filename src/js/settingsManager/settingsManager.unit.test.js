@@ -99,7 +99,6 @@ describe('settingsManager URL Test', () => {
 
   test('http://www.keeptrack.space', () => {
     expect(settingsManager.installDirectory).toBe('/');
-    expect(settingsManager.isOfficialWebsite).toBe(true);
     expect(settingsManager.breakTheLaw).toBe(undefined);
   });
 

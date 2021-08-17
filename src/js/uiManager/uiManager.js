@@ -47,6 +47,7 @@ import { uiLimited } from './ui-limited.js';
 import { uiValidation } from './ui-validation.js';
 
 const M = window.M;
+const settingsManager = window.settingsManager;
 
 $.ajaxSetup({
   cache: false,

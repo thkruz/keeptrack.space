@@ -19,7 +19,7 @@ import { stringPad } from '@app/js/lib/helpers';
  *  If all files are missing, the function will return an error.
  */
 const catalogLoader = async (): Promise<any> => {
-  const { settingsManager } = keepTrackApi.programs;
+  const settingsManager: any = window.settingsManager;
   // let extraSats: any;
 
   // See if we are running jest right now for testing
@@ -64,7 +64,9 @@ const catalogLoader = async (): Promise<any> => {
 
 // Parse the Catalog from satSet.loadCatalog and then return it back -- they are chained together!
 const parseCatalog = (resp: any, extraSats: any, asciiCatalog: any) => {
-  const {satSet, settingsManager, objectManager} = keepTrackApi.programs;
+  const {satSet, objectManager} = keepTrackApi.programs;
+  const settingsManager: any = window.settingsManager;
+
   let limitSatsArray = setupGetVariables();
 
   // Filter TLEs
@@ -197,25 +199,20 @@ const filterTLEDatabase = (resp: string | any[], limitSatsArray: string | any[],
       }
     }
   }
-  let isMatchFound = false;
   let extrasSatInfo;
   if (typeof extraSats !== 'undefined' && (<any>settingsManager).offline) {
     // If extra catalogue
     for (let s = 0; s < extraSats.length; s++) {
-      isMatchFound = false;
       if (typeof extraSats[s].SCC == 'undefined') continue;
       if (typeof extraSats[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
       if (typeof extraSats[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
       if (typeof satSet.sccIndex[`${extraSats[s].SCC}`] !== 'undefined') {
         i = satSet.sccIndex[`${extraSats[s].SCC}`];
-        tempSatData[i].ON = extraSats[s].ON;
-        tempSatData[i].OT = typeof extraSats[s].OT != 'undefined' ? extraSats[s].OT : null;
+        if (typeof extraSats[s].ON != 'undefined') tempSatData[i].ON = extraSats[s].ON;
+        if (typeof extraSats[s].OT != 'undefined') tempSatData[i].OT = extraSats[s].OT;
         tempSatData[i].TLE1 = extraSats[s].TLE1;
         tempSatData[i].TLE2 = extraSats[s].TLE2;
-        isMatchFound = true;
-        continue;
-      }
-      if (!isMatchFound) {
+      } else {
         if (typeof extraSats[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
         if (typeof extraSats[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
         (<any>settingsManager).isExtraSatellitesAdded = true;
@@ -258,17 +255,13 @@ const filterTLEDatabase = (resp: string | any[], limitSatsArray: string | any[],
   if (typeof asciiCatalog !== 'undefined' && (<any>settingsManager).offline) {
     // If asciiCatalog catalogue
     for (let s = 0; s < asciiCatalog.length; s++) {
-      isMatchFound = false;
       if (typeof asciiCatalog[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
       if (typeof asciiCatalog[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
       if (typeof satSet.sccIndex[`${asciiCatalog[s].SCC}`] !== 'undefined') {
         i = satSet.sccIndex[`${asciiCatalog[s].SCC}`];
         tempSatData[i].TLE1 = asciiCatalog[s].TLE1;
         tempSatData[i].TLE2 = asciiCatalog[s].TLE2;
-        isMatchFound = true;
-        continue;
-      }
-      if (!isMatchFound) {
+      } else {
         if (typeof asciiCatalog[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
         if (typeof asciiCatalog[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
         (<any>settingsManager).isExtraSatellitesAdded = true;

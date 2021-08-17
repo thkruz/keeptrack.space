@@ -127,19 +127,6 @@ describe('settingsManager URL Test', () => {
     expect(settingsManager.smallImages).toBe(true);
   });
 
-  test('?radarData&console', () => {
-    expect(settingsManager.isEnableConsole).toBe(true);
-    expect(settingsManager.isEnableRadarData).toBe(true);
-  });
-
-  test('?lowperf&nostars', () => {
-    expect(settingsManager.lowPerf).toBe(true);
-  });
-
-  test('?hires&cpo&logo&noPropRate', () => {
-    expect(settingsManager.hiresImages).toBe(true);
-  });
-
   // These need to be moved
   test.skip('Other functions of settingsManager', () => {
     settingsManager.setCurrentColorScheme('test');

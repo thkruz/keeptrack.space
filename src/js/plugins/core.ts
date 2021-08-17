@@ -1,6 +1,10 @@
 // Register all core modules
 export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any; plugins?: any }): Promise<void> => {
   const { plugins } = keepTrackApi.programs.settingsManager;
+
+  // Register Catalog Loader
+  await import('@app/js/plugins/catalogLoader/catalogLoader').then((mod) => mod.init());
+
   // Register selectSatData
   if (plugins.satInfoboxCore) await import('@app/js/plugins/selectSatManager/satInfoboxCore').then((mod) => mod.init());
 

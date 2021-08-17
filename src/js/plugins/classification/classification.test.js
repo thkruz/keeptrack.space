@@ -1,4 +1,4 @@
-/* globals it jest describe */
+/* globals it describe */
 
 import { init } from './classification';
 import { keepTrackApi } from '@app/js/api/externalApi';

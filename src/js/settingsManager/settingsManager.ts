@@ -211,9 +211,6 @@ export const settingsManager: any = {
 
     // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 
-    // Use to Override TLE Settings
-    // settingsManager.tleSource = settingsManager.installDirectory + 'tle/TLEdebris.json'
-
     // Use these to default smallest resolution maps and limited "extras" like
     // the atmosphere and sun. Really useful on small screens and for faster
     // loading times
@@ -286,7 +283,6 @@ export const settingsManager: any = {
       settingsManager.isDrawLess = true;
       settingsManager.smallImages = true;
       settingsManager.hiresNoCloudsImages = false;
-      settingsManager.tleSource = 'tle/TLEdebris.json';
       settingsManager.updateHoverDelayLimitSmall = 25;
       settingsManager.updateHoverDelayLimitBig = 45;
     }
@@ -586,29 +582,8 @@ export const settingsManager: any = {
             case 'vec':
               settingsManager.vectorImages = true;
               break;
-            case 'retro':
-              settingsManager.retro = true;
-              settingsManager.tleSource = 'tle/retro.json';
-              break;
             case 'offline':
               settingsManager.offline = true;
-              break;
-            case 'debris':
-              settingsManager.tleSource = 'tle/TLEdebris.json';
-              break;
-            case 'mw':
-              settingsManager.tleSource = 'tle/mw.json';
-              break;
-            case 'trusat':
-              settingsManager.trusatMode = true;
-              settingsManager.trusatImages = true;
-              break;
-            case 'trusat-only':
-              settingsManager.trusatMode = true;
-              settingsManager.trusatOnly = true;
-              settingsManager.colors.debris = [0.9, 0.9, 0.9, 1];
-              settingsManager.trusatImages = true;
-              settingsManager.tleSource = 'tle/trusat.json';
               break;
             case 'cpo':
               settingsManager.copyrightOveride = true;

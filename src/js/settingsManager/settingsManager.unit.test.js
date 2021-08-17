@@ -128,10 +128,6 @@ describe('settingsManager URL Test', () => {
     expect(settingsManager.smallImages).toBe(true);
   });
 
-  test('?trusat-only', () => {
-    expect(settingsManager.colors.debris).toStrictEqual([0.9, 0.9, 0.9, 1]);
-  });
-
   test('?radarData&console', () => {
     expect(settingsManager.isEnableConsole).toBe(true);
     expect(settingsManager.isEnableRadarData).toBe(true);

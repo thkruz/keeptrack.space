@@ -4,8 +4,6 @@ import $ from 'jquery';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
-const settingsManager = window.settingsManager;
-
 var hoverSatId = -1;
 var searchBox = {};
 

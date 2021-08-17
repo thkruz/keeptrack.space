@@ -4,7 +4,7 @@
   global
 */
 
-import '@app/js/settingsManager/settingsManager.ts';
+import '@app/js/settingsManager/settingsManager.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { uiInput } from './ui-input';
 

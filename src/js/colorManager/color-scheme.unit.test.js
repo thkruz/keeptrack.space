@@ -5,8 +5,8 @@
   jest
 */
 
+import '@app/js/settingsManager/settingsManager.js';
 import { ColorScheme } from '@app/js/colorManager/color-scheme.js';
-import '@app/js/settingsManager/settingsManager.ts';
 
 const glMock = global.mocks.glMock;
 document.body.innerHTML = global.docBody;

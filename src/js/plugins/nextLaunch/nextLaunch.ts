@@ -4,7 +4,6 @@ import { saveCsv, truncateString } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
-import '@app/js/settingsManager/settingsManager';
 
 type LaunchInfoObject = {
   name: string;
@@ -136,6 +135,7 @@ const _initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => {
 export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void; showTable: () => void; processData: (resp: { results: Array<any> }) => void } = {
   launchList: [],
   init: () => {
+    const settingsManager = keepTrackApi.programs.settingsManager;
     if ((<any>settingsManager).offline) {
       $('#menu-nextLaunch').hide();
       return;

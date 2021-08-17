@@ -210,27 +210,27 @@ export const init = (): void => {
                   </label>
                 </div>
                 <div id="cs-minaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
-                  <input id="cs-minaz" type="text" disabled value="0" />
+                  <input id="cs-minaz" type="text" value="0" />
                   <label for="cs-minaz" class="active">Minimum Azimuth</label>
                 </div>
                 <div id="cs-maxaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 120)">
-                  <input id="cs-maxaz" type="text" disabled value="360" />
+                  <input id="cs-maxaz" type="text" value="360" />
                   <label for="cs-maxaz" class="active">Maximum Azimuth</label>
                 </div>
                 <div id="cs-minel-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 10)">
-                  <input id="cs-minel" type="text" disabled value="10" />
+                  <input id="cs-minel" type="text" value="10" />
                   <label for="cs-minel" class="active">Minimum Elevation</label>
                 </div>
                 <div id="cs-maxel-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 90)">
-                  <input id="cs-maxel" type="text" disabled value="90" />
+                  <input id="cs-maxel" type="text" value="90" />
                   <label for="cs-maxel" class="active">Maximum Elevation</label>
                 </div>
                 <div id="cs-minrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 500)">
-                  <input id="cs-minrange" type="text" disabled value="100" />
+                  <input id="cs-minrange" type="text" value="100" />
                   <label for="cs-minrange" class="active">Minimum Range</label>
                 </div>
                 <div id="cs-maxrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 20000)">
-                  <input id="cs-maxrange" type="text" disabled value="50000" />
+                  <input id="cs-maxrange" type="text" value="50000" />
                   <label for="cs-maxrange" class="active">Maximum Range</label>
                 </div>
                 <div class="center-align">
@@ -424,7 +424,7 @@ export const init = (): void => {
 
         try {
           uiManager.lookAtSensor();
-        } catch (e) {
+        } catch {
           // TODO: More intentional conditional statement
           // Multi-sensors break this
         }
@@ -488,12 +488,6 @@ export const init = (): void => {
 
       $('#cs-telescope').on('click', function () {
         if ($('#cs-telescope').is(':checked')) {
-          $('#cs-minaz').attr('disabled', 'true');
-          $('#cs-maxaz').attr('disabled', 'true');
-          $('#cs-minel').attr('disabled', 'true');
-          $('#cs-maxel').attr('disabled', 'true');
-          $('#cs-minrange').attr('disabled', 'true');
-          $('#cs-maxrange').attr('disabled', 'true');
           $('#cs-minaz-div').hide();
           $('#cs-maxaz-div').hide();
           $('#cs-minel-div').hide();
@@ -507,12 +501,6 @@ export const init = (): void => {
           $('#cs-minrange').val(100);
           $('#cs-maxrange').val(1000000);
         } else {
-          $('#cs-minaz').attr('disabled', 'false');
-          $('#cs-maxaz').attr('disabled', 'false');
-          $('#cs-minel').attr('disabled', 'false');
-          $('#cs-maxel').attr('disabled', 'false');
-          $('#cs-minrange').attr('disabled', 'false');
-          $('#cs-maxrange').attr('disabled', 'false');
           $('#cs-minaz-div').show();
           $('#cs-maxaz-div').show();
           $('#cs-minel-div').show();
@@ -723,6 +711,31 @@ export const init = (): void => {
             $('#menu-customSensor').addClass('bmenu-item-selected');
             break;
           }
+      }
+    },
+  });
+
+  // Register satinfobox links
+  let sensorLinks = false;
+  keepTrackApi.register({
+    method: 'selectSatData',
+    cbName: 'sensor',
+    cb: () => {
+      if (!sensorLinks) {
+        $('#sat-info-top-links').append(keepTrackApi.html`
+          <div id="sensors-in-fov-link" class="link sat-infobox-links">Show All Sensors with FOV...</div>
+        `);
+        $('#sensors-in-fov-link').on('click', () => {
+          Object.keys(keepTrackApi.programs.sensorManager.sensorList).forEach((key) => {
+            const sensor = keepTrackApi.programs.sensorManager.sensorList[key];
+            const sat = keepTrackApi.programs.satSet.getSat(keepTrackApi.programs.objectManager.selectedSat);
+            let tearr = sat.getTEARR(null, sensor);
+            if (tearr.inview) {
+              keepTrackApi.programs.lineManager.create('sat6', [sat.id, satSet.getIdFromSensorName(sensor.name)], 'g');
+            }
+          });
+        });
+        sensorLinks = true;
       }
     },
   });

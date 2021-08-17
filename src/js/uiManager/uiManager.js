@@ -397,7 +397,7 @@ uiManager.hideLoadingScreen = () => {
 
   if (settingsManager.isMobileModeEnabled) {
     $('#spinner').hide();
-    settingsManager.loadStr('math');
+    uiManager.loadStr('math');
     $('#loading-screen').hide();
   } else {
     // Loading Screen Resized and Hidden
@@ -407,9 +407,10 @@ uiManager.hideLoadingScreen = () => {
         $('#loading-screen').addClass('mini-loader-container');
         $('#logo-inner-container').addClass('mini-loader');
         $('#logo-text').html('');
+        $('#logo-text-version').html('');
         $('#logo-trusat').hide();
         $('#loading-screen').hide();
-        settingsManager.loadStr('math');
+        uiManager.loadStr('math');
       }, 100);
     } else {
       setTimeout(function () {
@@ -417,9 +418,10 @@ uiManager.hideLoadingScreen = () => {
         $('#loading-screen').addClass('mini-loader-container');
         $('#logo-inner-container').addClass('mini-loader');
         $('#logo-text').html('');
+        $('#logo-text-version').html('');
         $('#logo-trusat').hide();
         $('#loading-screen').hide();
-        settingsManager.loadStr('math');
+        uiManager.loadStr('math');
       }, 100);
     }
   }
@@ -925,6 +927,63 @@ uiManager.panToStar = function (c) {
   setTimeout(function () {
     // console.log(`pitch ${camPitch * RAD2DEG} -- yaw ${camYaw * RAD2DEG}`);
   }, 2000);
+};
+
+uiManager.loadStr = (str) => {
+  if (str == '') {
+    $('#loader-text').html('');
+    return;
+  }
+  if (str == 'math') {
+    $('#loader-text').html('Attempting to Math...');
+  }
+
+  if (settingsManager.altLoadMsgs) {
+    if (typeof settingsManager.altMsgNum !== 'undefined') return;
+    settingsManager.altMsgNum = Math.random();
+    let msg = '';
+
+    if (settingsManager.altMsgNum > 0) {
+      msg = `KeepTrack is on the front page of <a style="color: #48f3e3 !important;" href="https://clearspace.today" target="_blank">ClearSpace-1's Website</a>!`;
+    }
+    if (settingsManager.altMsgNum > 0.33) {
+      msg = `KeepTrack provided visuals for Studio Roosegaarde's <a style="color: #48f3e3 !important;" href="https://www.studioroosegaarde.net/project/space-waste-lab" target="_blank">Space Waste Lab</a>!`;
+    }
+    if (settingsManager.altMsgNum > 0.66) {
+      msg = `KeepTrack was used by the <a style="color: #48f3e3 !important;" href="https://www.youtube.com/embed/OfvkKBNup5A?autoplay=0&start=521&modestbranding=1" target="_blank">Joint Space Operations Center</a>!`;
+    }
+    $('#loader-text').html(msg);
+    return;
+  }
+
+  switch (str) {
+    case 'science':
+      $('#loader-text').html('Locating Science...');
+      break;
+    case 'science2':
+      $('#loader-text').html('Found Science...');
+      break;
+    case 'dots':
+      $('#loader-text').html('Drawing Dots in Space...');
+      break;
+    case 'satIntel':
+      $('#loader-text').html('Integrating Satellite Intel...');
+      break;
+    case 'radarData':
+      $('#loader-text').html('Importing Radar Data...');
+      break;
+    case 'painting':
+      $('#loader-text').html('Painting the Earth...');
+      break;
+    case 'coloring':
+      $('#loader-text').html('Coloring Inside the Lines...');
+      break;
+    case 'elsets':
+      $('#loader-text').html('Locating ELSETs...');
+      break;
+    case 'easterEgg':
+      $('#loader-text').html('Llama Llama Llama Duck!');
+  }
 };
 
 uiManager.onReady = () => {

@@ -4,7 +4,7 @@ export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerFinal',
-    cbName: 'datetime',
+    cbName: 'social',
     cb: () => {
       // Bottom Icon
       (<any>$('#nav-mobile2')).prepend(keepTrackApi.html`

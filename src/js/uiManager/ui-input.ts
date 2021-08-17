@@ -188,6 +188,7 @@ let uiInput: uiInputInterface = {
           <li id="earth-low-rmb"><a href="#">Low Resolution Map</a></li>
           <li id="earth-high-no-clouds-rmb"><a href="#">High Resoultion Map</a></li>
           <li id="earth-vec-rmb"><a href="#">Vector Image Map</a></li>
+          <li id="earth-political-rmb"><a href="#">Political Map</a></li>
         </ul>
       </div>
     `);
@@ -605,6 +606,7 @@ let uiInput: uiInputInterface = {
         $('#earth-low-rmb').hide();
         $('#earth-high-rmb').hide();
         $('#earth-vec-rmb').hide();
+        $('#earth-political-rmb').hide();
 
         // Reset Camera
         // $('#reset-camera-rmb').hide();
@@ -697,12 +699,16 @@ let uiInput: uiInputInterface = {
           $('#earth-low-rmb').show();
           $('#earth-high-no-clouds-rmb').show();
           $('#earth-vec-rmb').show();
+          $('#earth-political-rmb').show();
           if (settingsManager.nasaImages == true) $('#earth-nasa-rmb').hide();
           if (settingsManager.trusatImages == true) $('#earth-trusat-rmb').hide();
           if (settingsManager.blueImages == true) $('#earth-blue-rmb').hide();
           if (settingsManager.lowresImages == true) $('#earth-low-rmb').hide();
           if (settingsManager.hiresNoCloudsImages == true) $('#earth-high-no-clouds-rmb').hide();
           if (settingsManager.vectorImages == true) $('#earth-vec-rmb').hide();
+          if (settingsManager.politicalImages == true) $('#earth-political-rmb').hide();
+
+          rightBtnSaveDOM.hide();
         };
 
         if (typeof latLon == 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
@@ -1123,6 +1129,7 @@ let uiInput: uiInputInterface = {
             break;
           case 'clear-lines-rmb':
             lineManager.clear();
+            keepTrackApi.programs.sensorManager.showAllWithFovList = [];
             if (objectManager.isStarManagerLoaded) {
               starManager.isAllConstellationVisible = false;
             }
@@ -1206,6 +1213,7 @@ let uiInput: uiInputInterface = {
             settingsManager.hiresImages = false;
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
+            settingsManager.politicalImages = false;
             localStorage.setItem('lastMap', 'blue');
             drawManager.sceneManager.earth.init(gl);
             drawManager.sceneManager.earth.loadHiRes();
@@ -1219,6 +1227,7 @@ let uiInput: uiInputInterface = {
             settingsManager.hiresImages = false;
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
+            settingsManager.politicalImages = false;
             localStorage.setItem('lastMap', 'nasa');
             drawManager.sceneManager.earth.init(gl);
             drawManager.sceneManager.earth.loadHiRes();
@@ -1232,6 +1241,7 @@ let uiInput: uiInputInterface = {
             settingsManager.hiresImages = false;
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
+            settingsManager.politicalImages = false;
             localStorage.setItem('lastMap', 'trusat');
             drawManager.sceneManager.earth.init(gl);
             drawManager.sceneManager.earth.loadHiRes();
@@ -1245,6 +1255,7 @@ let uiInput: uiInputInterface = {
             settingsManager.hiresImages = false;
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
+            settingsManager.politicalImages = false;
             localStorage.setItem('lastMap', 'low');
             drawManager.sceneManager.earth.init(gl);
             drawManager.sceneManager.earth.loadHiRes();
@@ -1259,6 +1270,7 @@ let uiInput: uiInputInterface = {
               settingsManager.hiresImages = true;
               settingsManager.hiresNoCloudsImages = false;
               settingsManager.vectorImages = false;
+              settingsManager.politicalImages = false;
               localStorage.setItem('lastMap', 'high');
               drawManager.sceneManager.earth.init(gl);
               drawManager.sceneManager.earth.loadHiRes();
@@ -1275,6 +1287,7 @@ let uiInput: uiInputInterface = {
               settingsManager.hiresImages = false;
               settingsManager.hiresNoCloudsImages = true;
               settingsManager.vectorImages = false;
+              settingsManager.politicalImages = false;
               localStorage.setItem('lastMap', 'high-nc');
               drawManager.sceneManager.earth.init(gl);
               drawManager.sceneManager.earth.loadHiRes();
@@ -1290,6 +1303,21 @@ let uiInput: uiInputInterface = {
             settingsManager.hiresImages = false;
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = true;
+            settingsManager.politicalImages = false;
+            localStorage.setItem('lastMap', 'vec');
+            drawManager.sceneManager.earth.init(gl);
+            drawManager.sceneManager.earth.loadHiRes();
+            drawManager.sceneManager.earth.loadHiResNight();
+            break;
+          case 'earth-political-rmb':
+            settingsManager.blueImages = false;
+            settingsManager.nasaImages = false;
+            settingsManager.trusatImages = false;
+            settingsManager.lowresImages = false;
+            settingsManager.hiresImages = false;
+            settingsManager.hiresNoCloudsImages = false;
+            settingsManager.vectorImages = false;
+            settingsManager.politicalImages = true;
             localStorage.setItem('lastMap', 'vec');
             drawManager.sceneManager.earth.init(gl);
             drawManager.sceneManager.earth.loadHiRes();

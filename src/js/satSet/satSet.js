@@ -88,7 +88,7 @@ satSet.init = async () => {
   /** Parses GET variables for Possible sharperShaders */
   parseFromGETVariables();
 
-  settingsManager.loadStr('elsets');
+  uiManager.loadStr('elsets');
   // See if we are running jest right now for testing
   if (typeof process !== 'undefined') {
     try {
@@ -98,7 +98,14 @@ satSet.init = async () => {
       console.error(error);
     }
   } else {
+    if (typeof Worker === 'undefined') {
+      throw new Error('Your browser does not support web workers.');
+    }
     satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
+    satCruncher.onerror = (error) => {
+      $('#loader-text').html(`Error loading ${settingsManager.installDirectory}js/positionCruncher.js!`);
+      console.warn(error);
+    };
   }
   addSatCruncherOnMessage(cameraManager);
 
@@ -769,7 +776,7 @@ satSet.convertSatnumArrayToIdArray = (satnumArray) => {
 /* istanbul ignore next */
 satSet.initGsData = () => {
   $.getScript('satData/gs.json', function (resp) {
-    settingsManager.loadStr('satIntel');
+    uiManager.loadStr('satIntel');
     $('#loading-screen').fadeIn(1000, function loadGsInfo() {
       satSet.gsInfo = JSON.parse(resp);
       for (let gsI = 0; gsI < satSet.gsInfo.length; gsI++) {
@@ -1024,8 +1031,8 @@ satSet.getSat = (i) => {
         try {
           sensor.observerGd = {
             alt: sensor.alt,
-            lat: sensor.lat,
-            lon: sensor.lon,
+            lat: sensor.lat * DEG2RAD,
+            lon: sensor.lon * DEG2RAD,
           };
         } catch (e) {
           throw 'observerGd is not set and could not be guessed.';

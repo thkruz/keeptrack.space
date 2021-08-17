@@ -1,6 +1,19 @@
+declare global {
+  interface Window {
+    settingsManager: unknown;
+    jQuery: unknown;
+    $: unknown;
+    gremlins: any;
+    randomizer: any;
+  }
+}
+
 // Register all core modules
 export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any; plugins?: any }): Promise<void> => {
   const { plugins } = keepTrackApi.programs.settingsManager;
+  // Load Debug Plugins
+  await import('@app/js/plugins/debug/debug').then((mod) => mod.init());
+
   // Register selectSatData
   if (plugins.satInfoboxCore) await import('@app/js/plugins/selectSatManager/satInfoboxCore').then((mod) => mod.init());
 
@@ -77,8 +90,11 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
         document.getElementById('nav-footer').style.visibility = 'hidden';
       }
 
-      const bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
-      document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
+      const bottomContainer = document.getElementById('bottom-icons-container');
+      if (bottomContainer) {
+        const bottomHeight = bottomContainer.offsetHeight;
+        document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
+      }
 
       $('#versionNumber-text').html(`${keepTrackApi.programs.settingsManager.versionNumber} - ${keepTrackApi.programs.settingsManager.versionDate}`);
 

@@ -1,5 +1,3 @@
-import '@app/js/settingsManager/settingsManager.ts';
-
 var mobileManager = {};
 // Wrap everything in an init to make sure the loading order is respected
 mobileManager.init = async () => {
@@ -25,7 +23,6 @@ mobileManager.init = async () => {
 
   mobileManager.checkMobileMode = async () => {
     try {
-      const settingsManager = window.settingsManager;
       if (mobileManager.checkIfMobileDevice()) {
         settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
         settingsManager.enableHoverOverlay = false;

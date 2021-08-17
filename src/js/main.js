@@ -1,3 +1,4 @@
+/* eslint-disable no-unreachable */
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
  *
@@ -31,9 +32,12 @@ import 'materialize-css';
 import '@app/css/astroux/css/astro.css';
 import { LineFactory, sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
+import $ from 'jquery';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
+import { VERSION } from '@app/js/settingsManager/version.js';
+import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
 import { adviceManager } from '@app/js/uiManager/ui-advice.js';
 import { drawManager } from '@app/js/drawManager/drawManager.js';
 import { jQAlt } from '@app/js/lib/jqalt.js';
@@ -44,9 +48,34 @@ import { satSet } from '@app/js/satSet/satSet.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
-import '@app/js/settingsManager/settingsManager.ts';
 import { starManager } from '@app/js/starManager/starManager.js';
-import { timeManager } from '@app/js/timeManager/timeManager.ts';
+import { timeManager } from '@app/js/timeManager/timeManager';
+
+// Upodate the version number and date
+settingsManager.versionNumber = VERSION;
+settingsManager.versionDate = VERSION_DATE;
+
+// Import CSS needed for loading screen
+(async () => {
+  try {
+    if (!settingsManager.disableUI) {
+      import('@app/css/fonts.css').then((resp) => resp);
+      import('@app/css/materialize.css').then((resp) => resp);
+      import('@app/css/materialize-local.css').then((resp) => resp);
+      import('@app/js/lib/external/colorPick.css').then((resp) => resp);
+      import('@app/css/perfect-scrollbar.min.css').then((resp) => resp);
+      import('@app/css/jquery-ui.min.css').then((resp) => resp);
+      import('@app/css/jquery-ui-timepicker-addon.css').then((resp) => resp);
+      import('@app/css/style.css').then(await import('@app/css/responsive.css').then((resp) => resp));
+    } else if (settingsManager.enableLimitedUI) {
+      import('@app/css/limitedUI.css').then((resp) => resp);
+    } else {
+      // console.log('ERROR');
+    }
+  } catch (e) {
+    console.error(e);
+  }
+})();
 
 const keepTrackApi = window.keepTrackApi;
 keepTrackApi.programs = {
@@ -81,14 +110,16 @@ keepTrackApi.programs = {
 
 export const initalizeKeepTrack = async () => {
   try {
+    uiManager.loadStr('science');
     // Load all the plugins now that we have the API initialized
     await import('@app/js/plugins/core').then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins));
     await import('@app/js/plugins/plugins').then((mod) => mod.loadExtraPlugins());
 
+    uiManager.loadStr('science2');
     // Start initializing the rest of the website
     timeManager.init();
     uiManager.onReady();
-    settingsManager.loadStr('dots');
+    uiManager.loadStr('dots');
     uiManager.mobileManager.init();
     const cameraManager = new Camera();
     keepTrackApi.programs.cameraManager = cameraManager;
@@ -150,7 +181,15 @@ export const initalizeKeepTrack = async () => {
     // Update any CSS now that we know what is loaded
     keepTrackApi.methods.uiManagerFinal();
   } catch (error) {
-    /* istanbul ignore next */
+    let errorHtml = '';
+    errorHtml += error.message + '<br>';
+    if (error.lineNumber) {
+      errorHtml += 'Line: ' + error.lineNumber + '<br>';
+    }
+    if (error.stack) {
+      errorHtml += error.stack + '<br>';
+    }
+    $('#loader-text').html(errorHtml);
     console.warn(error);
   }
 };

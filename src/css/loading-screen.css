@@ -93,6 +93,10 @@ body {
 
 #logo-inner-container {
   margin: auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
 #logo-text {

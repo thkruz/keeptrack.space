@@ -139,7 +139,7 @@ export const initalizeKeepTrack = async () => {
     const dotsManager = await drawManager.createDotsManager();
     keepTrackApi.programs.dotsManager = dotsManager;
 
-    satSet.init();
+    await satSet.init();
     objectManager.init();
     ColorScheme.init();
     drawManager.selectSatManager.init();

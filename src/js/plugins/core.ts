@@ -11,6 +11,10 @@ declare global {
 // Register all core modules
 export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any; plugins?: any }): Promise<void> => {
   const { plugins } = keepTrackApi.programs.settingsManager;
+
+  // Register Catalog Loader
+  await import('@app/js/plugins/catalogLoader/catalogLoader').then((mod) => mod.init());
+
   // Load Debug Plugins
   await import('@app/js/plugins/debug/debug').then((mod) => mod.init());
 

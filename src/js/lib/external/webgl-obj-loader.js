@@ -2645,7 +2645,7 @@
                                 }
                                 const url = root + mapData.filename;
                                 textures.push(
-                                    fetch(url)
+                                    $.get(url)
                                         .then((response) => {
                                             if (!response.ok) {
                                                 throw new Error();
@@ -2745,8 +2745,8 @@
                                 );
                             }
                             const namePromise = Promise.resolve(name);
-                            const meshPromise = fetch(model.obj)
-                                .then((response) => response.text())
+                            const meshPromise = $.get(model.obj)
+                                .then((response) => response)
                                 .then((data) => {
                                     return new _mesh__WEBPACK_IMPORTED_MODULE_0__[
                                         'default'
@@ -2756,8 +2756,8 @@
                             // Download MaterialLibrary file?
                             if (model.mtl) {
                                 const mtl = getMtl(model);
-                                mtlPromise = fetch(mtl)
-                                    .then((response) => response.text())
+                                mtlPromise = $.get(mtl)
+                                    .then((response) => response)
                                     .then((data) => {
                                         const material = new _material__WEBPACK_IMPORTED_MODULE_1__[
                                             'MaterialLibrary'
@@ -2849,8 +2849,8 @@
                             }
                             const url = nameAndURLs[mesh_name];
                             completed.push(
-                                fetch(url)
-                                    .then((response) => response.text())
+                                $.get(url)
+                                    .then((response) => response)
                                     .then((data) => {
                                         return [
                                             mesh_name,

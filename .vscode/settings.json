@@ -3,5 +3,5 @@
   "typescript.validate.enable": true,
   "npm-scripts.showStartNotification": false,
   "testExplorer.useNativeTesting": true,
-  "editor.maxTokenizationLineLength": 20000000,
+  // "editor.maxTokenizationLineLength": 20000000,
 }

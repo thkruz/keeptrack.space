@@ -12,7 +12,22 @@ const copySync = (src, dest) => {
 
 const dirs = ['audio', 'admin', 'css/fonts', 'analysis', 'img', 'meshes', 'offline', 'php', 'radarData', 'res', 'satData', 'simulation', 'social', 'textures', 'tle'];
 
-const files = ['OfflineVersion.lnk', 'embed.html', 'favicon.ico', 'index.htm', 'manifest.webmanifest', 'serviceWorker.js', 'SOCRATES.htm', 'css/loading-screen.css', 'css/fonts.css', 'css/materialize.css', 'css/materialize-local.css'];
+const files = [
+  'README.txt',
+  'KeepTrack.bat',
+  'KeepTrack.lnk',
+  'Chrome With Local Files.lnk',
+  'embed.html',
+  'favicon.ico',
+  'index.htm',
+  'manifest.webmanifest',
+  'serviceWorker.js',
+  'SOCRATES.htm',
+  'css/loading-screen.css',
+  'css/fonts.css',
+  'css/materialize.css',
+  'css/materialize-local.css',
+];
 
 const opts = {
   utimes: true, // keep add time and modify time
@@ -62,3 +77,5 @@ files.forEach((file) => {
 
 console.log(`Copying settings...`);
 copySync(`./src/js/settingsManager/settingsManager.js`, `./dist/settings/settings.js`);
+console.log(`Copying settingsOverride...`);
+copySync(`./src/js/settingsManager/settingsOverride.js`, `./dist/settings/settingsOverride.js`);

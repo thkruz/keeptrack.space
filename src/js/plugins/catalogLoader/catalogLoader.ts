@@ -9,8 +9,8 @@ import { stringPad } from '@app/js/lib/helpers';
  *  There are three catalog files that are loaded:
  *
  *  1. TLE.json - this contains extended object information including launch location and RCS.
- *  2. TLE.txt - this contains ASCII TLE data similar to that found on space-track.org.
- *  3. extra.js - this contains supplemental information about the catalog.
+ *  2. extra.json - this contains supplemental information about the catalog.
+ *  3. TLE.txt - this contains ASCII TLE data similar to that found on space-track.org.
  *
  *  The catalog is loaded in the above order appending the information each step of the way.
  *
@@ -40,8 +40,8 @@ const catalogLoader = async (): Promise<any> => {
   try {
     let extraSats: any = [];
     if (settingsManager.offline) {
-      await import('@app/offline/extra.js').then((resp) => {
-        extraSats = resp.satelliteList;
+      $.get('./tle/extra.json').then((resp) => {
+        extraSats = JSON.parse(resp);
       });
     }
 

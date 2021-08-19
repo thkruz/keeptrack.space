@@ -16,7 +16,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 */
 
 // Settings Manager Setup
-const settingsManager = {
+let settingsManager = {
   // Classification can be "Unclassified", "Secret", "Top Secret", "Top Secret//SCI"
   classificationStr: '',
   // This controls which of the built-in plugins are loaded
@@ -448,6 +448,11 @@ const settingsManager = {
     settingsManager.camDistBuffer = 75;
     settingsManager.zNear = 1.0;
     settingsManager.zFar = 450000.0;
+
+    // //////////////////////////////////////////////////////////////////////////
+    // Load Overrides
+    // //////////////////////////////////////////////////////////////////////////
+    settingsManager = { ...settingsManager, ...window.settingsManagerOverride };
 
     // //////////////////////////////////////////////////////////////////////////
     // Defaults that should never be changed

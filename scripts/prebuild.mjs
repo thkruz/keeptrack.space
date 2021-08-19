@@ -77,3 +77,5 @@ files.forEach((file) => {
 
 console.log(`Copying settings...`);
 copySync(`./src/js/settingsManager/settingsManager.js`, `./dist/settings/settings.js`);
+console.log(`Copying settingsOverride...`);
+copySync(`./src/js/settingsManager/settingsOverride.js`, `./dist/settings/settingsOverride.js`);

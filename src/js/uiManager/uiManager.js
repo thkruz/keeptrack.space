@@ -799,8 +799,12 @@ uiManager.reloadLastSensor = () => {
       }
     } catch (e) {
       // Clear old settings because they seem corrupted
-      localStorage.setItem('currentSensor', null);
-      console.warn('Saved Sensor Information Invalid');
+      try {
+        localStorage.setItem('currentSensor', null);
+        console.warn('Saved Sensor Information Invalid');
+      } catch {
+        // do nothing
+      }
     }
   }
 };

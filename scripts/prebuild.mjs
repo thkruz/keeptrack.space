@@ -28,6 +28,7 @@ const files = [
   'css/fonts.css',
   'css/materialize.css',
   'css/materialize-local.css',
+  'js/lib/modernizr-custom.js',
 ];
 
 const opts = {
@@ -54,13 +55,10 @@ console.log(`Creating ./dist/plugins...`);
 mkdirp.sync('./dist/plugins');
 console.log(`Creating ./dist/settings...`);
 mkdirp.sync('./dist/settings');
-
 console.log(`Creating ./dist/css...`);
-try {
-  mkdirp.sync('./dist/css');
-} catch (error) {
-  //
-}
+mkdirp.sync('./dist/css');
+console.log(`Creating ./dist/js/lib...`);
+mkdirp.sync('./dist/js/lib');
 
 dirs.forEach((dir) => {
   try {

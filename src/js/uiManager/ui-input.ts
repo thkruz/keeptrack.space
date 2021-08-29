@@ -1039,7 +1039,7 @@ let uiInput: uiInputInterface = {
         if (e.target.tagName == 'UL') {
           targetId = e.target.firstChild.id;
         }
-        switch (targetId) {          
+        switch (targetId) {
           case 'view-info-rmb':
             M.toast({
               html: 'Lat: ' + latLon.lat.toFixed(3) + '<br/>Lon: ' + latLon.lon.toFixed(3),
@@ -1089,7 +1089,7 @@ let uiInput: uiInputInterface = {
                 $('#dops-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
               });
             }
-            break;          
+            break;
           case 'create-sensor-rmb':
             $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
             $('#menu-customSensor').addClass('bmenu-item-selected');
@@ -1214,7 +1214,11 @@ let uiInput: uiInputInterface = {
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
             settingsManager.politicalImages = false;
-            localStorage.setItem('lastMap', 'blue');
+            try {
+              localStorage.setItem('lastMap', 'blue');
+            } catch {
+              // do nothing
+            }
             drawManager.sceneManager.earth.init(gl);
             drawManager.sceneManager.earth.loadHiRes();
             drawManager.sceneManager.earth.loadHiResNight();
@@ -1228,7 +1232,11 @@ let uiInput: uiInputInterface = {
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
             settingsManager.politicalImages = false;
-            localStorage.setItem('lastMap', 'nasa');
+            try {
+              localStorage.setItem('lastMap', 'nasa');
+            } catch {
+              // do nothing
+            }
             drawManager.sceneManager.earth.init(gl);
             drawManager.sceneManager.earth.loadHiRes();
             drawManager.sceneManager.earth.loadHiResNight();
@@ -1242,7 +1250,11 @@ let uiInput: uiInputInterface = {
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
             settingsManager.politicalImages = false;
-            localStorage.setItem('lastMap', 'trusat');
+            try {
+              localStorage.setItem('lastMap', 'trusat');
+            } catch {
+              // do nothing
+            }
             drawManager.sceneManager.earth.init(gl);
             drawManager.sceneManager.earth.loadHiRes();
             drawManager.sceneManager.earth.loadHiResNight();
@@ -1256,7 +1268,11 @@ let uiInput: uiInputInterface = {
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
             settingsManager.politicalImages = false;
-            localStorage.setItem('lastMap', 'low');
+            try {
+              localStorage.setItem('lastMap', 'low');
+            } catch {
+              // do nothing
+            }
             drawManager.sceneManager.earth.init(gl);
             drawManager.sceneManager.earth.loadHiRes();
             drawManager.sceneManager.earth.loadHiResNight();
@@ -1271,7 +1287,11 @@ let uiInput: uiInputInterface = {
               settingsManager.hiresNoCloudsImages = false;
               settingsManager.vectorImages = false;
               settingsManager.politicalImages = false;
-              localStorage.setItem('lastMap', 'high');
+              try {
+                localStorage.setItem('lastMap', 'high');
+              } catch {
+                // do nothing
+              }
               drawManager.sceneManager.earth.init(gl);
               drawManager.sceneManager.earth.loadHiRes();
               drawManager.sceneManager.earth.loadHiResNight();
@@ -1288,7 +1308,11 @@ let uiInput: uiInputInterface = {
               settingsManager.hiresNoCloudsImages = true;
               settingsManager.vectorImages = false;
               settingsManager.politicalImages = false;
-              localStorage.setItem('lastMap', 'high-nc');
+              try {
+                localStorage.setItem('lastMap', 'high-nc');
+              } catch {
+                // do nothing
+              }
               drawManager.sceneManager.earth.init(gl);
               drawManager.sceneManager.earth.loadHiRes();
               drawManager.sceneManager.earth.loadHiResNight();
@@ -1304,7 +1328,11 @@ let uiInput: uiInputInterface = {
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = true;
             settingsManager.politicalImages = false;
-            localStorage.setItem('lastMap', 'vec');
+            try {
+              localStorage.setItem('lastMap', 'vec');
+            } catch {
+              // do nothing
+            }
             drawManager.sceneManager.earth.init(gl);
             drawManager.sceneManager.earth.loadHiRes();
             drawManager.sceneManager.earth.loadHiResNight();
@@ -1318,7 +1346,11 @@ let uiInput: uiInputInterface = {
             settingsManager.hiresNoCloudsImages = false;
             settingsManager.vectorImages = false;
             settingsManager.politicalImages = true;
-            localStorage.setItem('lastMap', 'vec');
+            try {
+              localStorage.setItem('lastMap', 'vec');
+            } catch {
+              // do nothing
+            }
             drawManager.sceneManager.earth.init(gl);
             drawManager.sceneManager.earth.loadHiRes();
             drawManager.sceneManager.earth.loadHiResNight();

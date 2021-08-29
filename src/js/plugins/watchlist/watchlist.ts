@@ -299,7 +299,11 @@ export const init = (): void => {
       saveWatchlist[i] = sat.SCC_NUM;
     }
     var variable = JSON.stringify(saveWatchlist);
+    try {
     localStorage.setItem('watchlistList', variable);
+  } catch {
+    console.warn('Watchlist Plugin: Unable to save watchlist - localStorage issue!');
+  }
   };  
   keepTrackApi.programs.watchlist.updateWatchlist = updateWatchlist;
 

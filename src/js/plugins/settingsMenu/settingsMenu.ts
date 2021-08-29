@@ -29,7 +29,7 @@ import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
 export const init = (): void => {
-  const { satellite, satSet, ColorScheme, settingsManager, uiManager} = keepTrackApi.programs;
+  const { satellite, satSet, ColorScheme, settingsManager, uiManager } = keepTrackApi.programs;
   let isSettingsMenuOpen = false;
 
   // Add HTML
@@ -220,117 +220,145 @@ export const init = (): void => {
         satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
         e.preventDefault();
       });
-      
+
       var isNotColorPickerInitialSetup = false;
-  (() => {
-    var colorPalette = [
-      rgbCss([1.0, 0.0, 0.0, 1.0]), // Red
-      rgbCss([1.0, 0.75, 0.0, 1.0]), // Orange
-      rgbCss([0.85, 0.5, 0.0, 1.0]), // Dark Orange
-      rgbCss([1.0, 1.0, 0.0, 1.0]), // Yellow
-      rgbCss([0, 1, 0, 1]), // Green
-      rgbCss([0.2, 1.0, 0.0, 0.5]), // Mint
-      rgbCss([0.2, 1.0, 1.0, 1.0]), // Bright Green
-      rgbCss([0, 0, 1, 1]), // Royal Blue
-      rgbCss([0.2, 0.4, 1.0, 1]), // Dark Blue
-      rgbCss([0.64, 0.0, 0.64, 1.0]), // Purple
-      rgbCss([1.0, 0.0, 0.6, 1.0]), // Pink
-      rgbCss([0.5, 0.5, 0.5, 1]), // Gray
-      rgbCss([1, 1, 1, 1]), // White
-    ];
-    (<any>$('#settings-color-payload')).colorPick({
-      initialColor: rgbCss(settingsManager.colors.payload),
-      palette: colorPalette,
-      onColorSelected: function () {
-        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
-        if (isNotColorPickerInitialSetup) {
-          settingsManager.colors.payload = parseRgba(this.color);
-          uiManager.legendColorsChange();
-          satSet.setColorScheme(settingsManager.currentColorScheme, true);
-          localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
-        }
-      },
-    });
-    (<any>$('#settings-color-rocketBody')).colorPick({
-      initialColor: rgbCss(settingsManager.colors.rocketBody),
-      palette: colorPalette,
-      onColorSelected: function () {
-        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
-        if (isNotColorPickerInitialSetup) {
-          settingsManager.colors.rocketBody = parseRgba(this.color);
-          uiManager.legendColorsChange();
-          satSet.setColorScheme(settingsManager.currentColorScheme, true);
-          localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
-        }
-      },
-    });
-    (<any>$('#settings-color-debris')).colorPick({
-      initialColor: rgbCss(settingsManager.colors.debris),
-      palette: colorPalette,
-      onColorSelected: function () {
-        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
-        if (isNotColorPickerInitialSetup) {
-          settingsManager.colors.debris = parseRgba(this.color);
-          uiManager.legendColorsChange();
-          satSet.setColorScheme(settingsManager.currentColorScheme, true);
-          localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
-        }
-      },
-    });
-    (<any>$('#settings-color-inview')).colorPick({
-      initialColor: rgbCss(settingsManager.colors.inview),
-      palette: colorPalette,
-      onColorSelected: function () {
-        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
-        if (isNotColorPickerInitialSetup) {
-          settingsManager.colors.inview = parseRgba(this.color);
-          uiManager.legendColorsChange();
-          satSet.setColorScheme(settingsManager.currentColorScheme, true);
-          localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
-        }
-      },
-    });
-    (<any>$('#settings-color-missile')).colorPick({
-      initialColor: rgbCss(settingsManager.colors.missile),
-      palette: colorPalette,
-      onColorSelected: function () {
-        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
-        if (isNotColorPickerInitialSetup) {
-          settingsManager.colors.missile = parseRgba(this.color);
-          uiManager.legendColorsChange();
-          satSet.setColorScheme(settingsManager.currentColorScheme, true);
-          localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
-        }
-      },
-    });
-    (<any>$('#settings-color-missileInview')).colorPick({
-      initialColor: rgbCss(settingsManager.colors.missileInview),
-      palette: colorPalette,
-      onColorSelected: function () {
-        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
-        if (isNotColorPickerInitialSetup) {
-          settingsManager.colors.missileInview = parseRgba(this.color);
-          uiManager.legendColorsChange();
-          satSet.setColorScheme(settingsManager.currentColorScheme, true);
-          localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
-        }
-      },
-    });
-    (<any>$('#settings-color-trusat')).colorPick({
-      initialColor: rgbCss(settingsManager.colors.trusat),
-      palette: colorPalette,
-      onColorSelected: function () {
-        this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
-        if (isNotColorPickerInitialSetup) {
-          settingsManager.colors.trusat = parseRgba(this.color);
-          uiManager.legendColorsChange();
-          satSet.setColorScheme(settingsManager.currentColorScheme, true);
-          localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
-        }
-      },
-    });
-    isNotColorPickerInitialSetup = true;
-  })();
+      (() => {
+        var colorPalette = [
+          rgbCss([1.0, 0.0, 0.0, 1.0]), // Red
+          rgbCss([1.0, 0.75, 0.0, 1.0]), // Orange
+          rgbCss([0.85, 0.5, 0.0, 1.0]), // Dark Orange
+          rgbCss([1.0, 1.0, 0.0, 1.0]), // Yellow
+          rgbCss([0, 1, 0, 1]), // Green
+          rgbCss([0.2, 1.0, 0.0, 0.5]), // Mint
+          rgbCss([0.2, 1.0, 1.0, 1.0]), // Bright Green
+          rgbCss([0, 0, 1, 1]), // Royal Blue
+          rgbCss([0.2, 0.4, 1.0, 1]), // Dark Blue
+          rgbCss([0.64, 0.0, 0.64, 1.0]), // Purple
+          rgbCss([1.0, 0.0, 0.6, 1.0]), // Pink
+          rgbCss([0.5, 0.5, 0.5, 1]), // Gray
+          rgbCss([1, 1, 1, 1]), // White
+        ];
+        (<any>$('#settings-color-payload')).colorPick({
+          initialColor: rgbCss(settingsManager.colors.payload),
+          palette: colorPalette,
+          onColorSelected: function () {
+            this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
+            if (isNotColorPickerInitialSetup) {
+              settingsManager.colors.payload = parseRgba(this.color);
+              uiManager.legendColorsChange();
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              try {
+                localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
+              } catch {
+                console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
+              }
+            }
+          },
+        });
+        (<any>$('#settings-color-rocketBody')).colorPick({
+          initialColor: rgbCss(settingsManager.colors.rocketBody),
+          palette: colorPalette,
+          onColorSelected: function () {
+            this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
+            if (isNotColorPickerInitialSetup) {
+              settingsManager.colors.rocketBody = parseRgba(this.color);
+              uiManager.legendColorsChange();
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              try {
+                localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
+              } catch {
+                console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
+              }
+            }
+          },
+        });
+        (<any>$('#settings-color-debris')).colorPick({
+          initialColor: rgbCss(settingsManager.colors.debris),
+          palette: colorPalette,
+          onColorSelected: function () {
+            this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
+            if (isNotColorPickerInitialSetup) {
+              settingsManager.colors.debris = parseRgba(this.color);
+              uiManager.legendColorsChange();
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              try {
+                localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
+              } catch {
+                console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
+              }
+            }
+          },
+        });
+        (<any>$('#settings-color-inview')).colorPick({
+          initialColor: rgbCss(settingsManager.colors.inview),
+          palette: colorPalette,
+          onColorSelected: function () {
+            this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
+            if (isNotColorPickerInitialSetup) {
+              settingsManager.colors.inview = parseRgba(this.color);
+              uiManager.legendColorsChange();
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              try {
+                localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
+              } catch {
+                console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
+              }
+            }
+          },
+        });
+        (<any>$('#settings-color-missile')).colorPick({
+          initialColor: rgbCss(settingsManager.colors.missile),
+          palette: colorPalette,
+          onColorSelected: function () {
+            this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
+            if (isNotColorPickerInitialSetup) {
+              settingsManager.colors.missile = parseRgba(this.color);
+              uiManager.legendColorsChange();
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              try {
+                localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
+              } catch {
+                console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
+              }
+            }
+          },
+        });
+        (<any>$('#settings-color-missileInview')).colorPick({
+          initialColor: rgbCss(settingsManager.colors.missileInview),
+          palette: colorPalette,
+          onColorSelected: function () {
+            this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
+            if (isNotColorPickerInitialSetup) {
+              settingsManager.colors.missileInview = parseRgba(this.color);
+              uiManager.legendColorsChange();
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              try {
+                localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
+              } catch {
+                console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
+              }
+            }
+          },
+        });
+        (<any>$('#settings-color-trusat')).colorPick({
+          initialColor: rgbCss(settingsManager.colors.trusat),
+          palette: colorPalette,
+          onColorSelected: function () {
+            this.element.css('cssText', `background-color: ${this.color} !important; color: ${this.color};`);
+            if (isNotColorPickerInitialSetup) {
+              settingsManager.colors.trusat = parseRgba(this.color);
+              uiManager.legendColorsChange();
+              satSet.setColorScheme(settingsManager.currentColorScheme, true);
+              try {
+                localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
+              } catch {
+                console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
+              }
+            }
+          },
+        });
+        isNotColorPickerInitialSetup = true;
+      })();
     },
   });
 

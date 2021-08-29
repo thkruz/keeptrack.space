@@ -81,8 +81,8 @@ sensorManager.whichRadar = '';
 sensorManager.setSensor = function (selectedSensor, staticNum) {
   try {
     localStorage.setItem('currentSensor', JSON.stringify([selectedSensor, staticNum]));
-  } catch (e) {
-    console.log(`Couldn't clear the current sensor info!`);
+  } catch {
+    console.warn('Sensor Manager: Unable to set current sensor - localStorage issue!');
   }
 
   // Run any callbacks

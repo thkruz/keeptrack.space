@@ -80,17 +80,22 @@ if (typeof process !== 'undefined') {
   drawManager.canvas = document.getElementById('keeptrack-canvas');
 }
 
-// Try to prevent crashes
-drawManager.canvas.addEventListener('webglcontextlost', (e) => {
-  console.debug(e);
-  e.preventDefault(); // allows the context to be restored
-});
-drawManager.canvas.addEventListener('webglcontextrestored', (e) => {
-  console.debug(e);
-  drawManager.glInit();
-});
 
 drawManager.glInit = async () => {
+  // Ensure the canvas is available
+  if (drawManager.canvas === null) {
+    throw new Error(`The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.`);
+  }
+  
+  // Try to prevent crashes
+  drawManager.canvas.addEventListener('webglcontextlost', (e) => {
+    console.debug(e);
+    e.preventDefault(); // allows the context to be restored
+  });
+  drawManager.canvas.addEventListener('webglcontextrestored', (e) => {
+    console.debug(e);
+    drawManager.glInit();
+  });
   // drawManager Scope
   if (typeof process !== 'undefined') {
     gl = drawManager.canvas.getContext('webgl', {
@@ -112,6 +117,11 @@ drawManager.glInit = async () => {
       preserveDrawingBuffer: true,
       stencil: false,
     });
+  }
+
+  // Check for WebGL Issues
+  if (gl === null) {
+    throw new Error('WebGL is not available. Contact your LAN Office or System Administrator.');
   }
 
   drawManager.resizeCanvas();

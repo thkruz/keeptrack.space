@@ -11,7 +11,11 @@ export const init = (): void => {
     db = {};
     db.enabled = false;
     db.verbose = false;
-    localStorage.setItem('db', JSON.stringify(db));
+    try {
+      localStorage.setItem('db', JSON.stringify(db));
+    } catch {
+      console.warn('Debug Manager: Unable to save debug settings - localStorage issue!');
+    }
   }
   db.init = (function () {
     db.log = function (message: string, isVerbose: boolean) {
@@ -26,12 +30,20 @@ export const init = (): void => {
     db.on = function () {
       db.enabled = true;
       console.log('db is now on!');
-      localStorage.setItem('db', JSON.stringify(db));
+      try {
+        localStorage.setItem('db', JSON.stringify(db));
+      } catch {
+        console.warn('Debug Manager: Unable to save debug settings - localStorage issue!');
+      }
     };
     db.off = function () {
       db.enabled = false;
       console.log('db is now off!');
-      localStorage.setItem('db', JSON.stringify(db));
+      try {
+        localStorage.setItem('db', JSON.stringify(db));
+      } catch {
+        console.warn('Debug Manager: Unable to save debug settings - localStorage issue!');
+      }
     };
   })();
   db.gremlinsSettings = {};

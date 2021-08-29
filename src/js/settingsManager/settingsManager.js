@@ -309,8 +309,12 @@ let settingsManager = {
 
     settingsManager.reColorMinimumTime = 1000;
     settingsManager.colors = {};
-    settingsManager.colors = JSON.parse(localStorage.getItem('settingsManager-colors'));
-    if (settingsManager.colors == null || settingsManager.colors.version !== '1.0.3') {
+    try {
+      settingsManager.colors = JSON.parse(localStorage.getItem('settingsManager-colors'));
+    } catch {
+      console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
+    }
+    if (settingsManager.colors == null || settingsManager.colors == {} || settingsManager.colors.version !== '1.0.3') {
       settingsManager.colors = {};
       settingsManager.colors.version = '1.0.3';
       settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
@@ -385,7 +389,11 @@ let settingsManager = {
       settingsManager.colors.countryUS = [0.2, 0.4, 1.0, 1];
       settingsManager.colors.countryCIS = [1.0, 1.0, 1.0, 1.0];
       settingsManager.colors.countryOther = [0, 1.0, 0, 0.6];
-      localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
+      try {
+        localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
+      } catch {
+        console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
+      }
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -460,11 +468,13 @@ let settingsManager = {
       const val = params[i].split('=')[1];
       if (key === 'settingsManagerOverride') {
         const overrides = JSON.parse(decodeURIComponent(val));
-        Object.keys(overrides.plugins).filter(key => key in settingsManager.plugins).forEach(key => {
-          if (typeof overrides.plugins[key] == 'undefined') continue;
-          settingsManager.plugins[key] = overrides.plugins[key]
-        });
-      }  
+        Object.keys(overrides.plugins)
+          .filter((key) => key in settingsManager.plugins)
+          .forEach((key) => {
+            if (typeof overrides.plugins[key] == 'undefined') return;
+            settingsManager.plugins[key] = overrides.plugins[key];
+          });
+      }
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -612,7 +622,13 @@ let settingsManager = {
 
     // Load the previously saved map
     if (settingsManager.isLoadLastMap && !settingsManager.isDrawLess) {
-      let lastMap = localStorage.getItem('lastMap');
+      let lastMap;
+      try {
+        lastMap = localStorage.getItem('lastMap');
+      } catch {
+        lastMap = null;
+        console.warn('Settings Manager: localStorage not available!');
+      }
       switch (lastMap) {
         case 'blue':
           settingsManager.blueImages = true;

@@ -453,6 +453,19 @@ let settingsManager = {
     // Load Overrides
     // //////////////////////////////////////////////////////////////////////////
     settingsManager = { ...settingsManager, ...window.settingsManagerOverride };
+    const queryStr = window.location.search.substring(1);
+    const params = queryStr.split('&');
+    for (let i = 0; i < params.length; i++) {
+      const key = params[i].split('=')[0];
+      const val = params[i].split('=')[1];
+      if (key === 'settingsManagerOverride') {
+        const overrides = JSON.parse(decodeURIComponent(val));
+        Object.keys(overrides.plugins).filter(key => key in settingsManager.plugins).forEach(key => {
+          if (typeof overrides.plugins[key] == 'undefined') continue;
+          settingsManager.plugins[key] = overrides.plugins[key]
+        });
+      }  
+    }
 
     // //////////////////////////////////////////////////////////////////////////
     // Defaults that should never be changed

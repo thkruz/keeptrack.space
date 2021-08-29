@@ -28,7 +28,7 @@ import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
 export const init = (): void => {
-  const { objectManager, settingsManager, uiManager } = keepTrackApi.programs;
+  const { adviceManager, objectManager, uiManager } = keepTrackApi.programs;
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
@@ -69,7 +69,7 @@ export const init = (): void => {
             // isSatView = true;
           } else {
             uiManager.toast(`Select a Satellite First!`, 'caution');
-            if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.satViewDisabled();
+            if (settingsManager.plugins.topMenu) adviceManager.adviceList.satViewDisabled();
             if (!$('#menu-satview:animated').length) {
               $('#menu-satview').effect('shake', {
                 distance: 10,

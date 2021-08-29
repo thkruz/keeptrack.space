@@ -18,6 +18,7 @@ const files = [
   'KeepTrack.lnk',
   'Chrome With Local Files.lnk',
   'embed.html',
+  'config.htm',
   'favicon.ico',
   'index.htm',
   'manifest.webmanifest',
@@ -66,7 +67,7 @@ dirs.forEach((dir) => {
     console.log(`Copying ${dir}...`);
     copydir.sync(`./src/${dir}`, `./dist/${dir}`, opts);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 });
 

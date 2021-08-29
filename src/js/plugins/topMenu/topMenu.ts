@@ -86,6 +86,7 @@ export const init = (): void => {
           keepTrackApi.programs.uiManager.menuController();
         });
       } catch (e) {
+        /* istanbul ignore next */
         console.error(e);
       }
     },

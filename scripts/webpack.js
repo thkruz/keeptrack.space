@@ -40,7 +40,7 @@ let config = {
       },
       {
         test: /\.m?js$/,
-        exclude: [/(node_modules|bower_components)/, /\settingsManager\.js/i],
+        exclude: [/(node_modules|bower_components)/, /\cypress/, /\settingsManager\.js/i],
         use: {
           loader: 'babel-loader',
         },

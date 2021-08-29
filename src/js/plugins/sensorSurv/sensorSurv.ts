@@ -28,7 +28,7 @@ import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
 export const init = (): void => {
-  const { settingsManager, sensorManager, satSet, uiManager } = keepTrackApi.programs;
+  const { sensorManager, satSet, uiManager } = keepTrackApi.programs;
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
@@ -65,8 +65,8 @@ export const init = (): void => {
           }
           return;
         }
-        if (settingsManager.isShowSurvFence) {
-          settingsManager.isShowSurvFence = false;
+        if ((<any>settingsManager).isShowSurvFence) {
+          (<any>settingsManager).isShowSurvFence = false;
           $('#menu-surveillance').removeClass('bmenu-item-selected');
           satSet.satCruncher.postMessage({
             isShowSurvFence: 'disable',
@@ -75,10 +75,10 @@ export const init = (): void => {
           return;
         } else {
           // Disable Satellite Overfly
-          settingsManager.isSatOverflyModeOn = false;
+          (<any>settingsManager).isSatOverflyModeOn = false;
           $('#menu-sat-fov').removeClass('bmenu-item-selected');
 
-          settingsManager.isShowSurvFence = true;
+          (<any>settingsManager).isShowSurvFence = true;
           $('#menu-surveillance').addClass('bmenu-item-selected');
           $('#menu-fov-bubble').removeClass('bmenu-item-selected');
           satSet.satCruncher.postMessage({

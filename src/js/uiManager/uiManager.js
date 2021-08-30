@@ -19,7 +19,6 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-import $ from 'jquery';
 // eslint-disable-next-line sort-imports
 import 'jquery-ui-bundle';
 import '@app/js/lib/external/jquery-ui-slideraccess.js';
@@ -29,7 +28,10 @@ import '@app/js/lib/external/jquery.colorbox.min.js';
 import '@app/js/lib/external/jquery-ajax.js';
 import '@app/js/lib/external/colorPick.js';
 import 'materialize-css';
+
 import { rgbCss, saveCsv } from '@app/js/lib/helpers';
+
+import $ from 'jquery';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { DEG2RAD } from '@app/js/lib/constants.js';
 import { drawManager } from '@app/js/drawManager/drawManager.js';
@@ -133,7 +135,7 @@ uiManager.postStart = () => {
   // Enable Satbox Overlay
   if (settingsManager.enableHoverOverlay) {
     try {
-      const hoverboxDOM = document.createElement('DIV');
+      const hoverboxDOM = document.createElement('div');
       hoverboxDOM.innerHTML = `
         <div id="sat-hoverbox">
           <span id="sat-hoverbox1"></span>
@@ -401,29 +403,16 @@ uiManager.hideLoadingScreen = () => {
     $('#loading-screen').hide();
   } else {
     // Loading Screen Resized and Hidden
-    if (settingsManager.trusatMode) {
-      setTimeout(function () {
-        $('#loading-screen').removeClass('full-loader');
-        $('#loading-screen').addClass('mini-loader-container');
-        $('#logo-inner-container').addClass('mini-loader');
-        $('#logo-text').html('');
-        $('#logo-text-version').html('');
-        $('#logo-trusat').hide();
-        $('#loading-screen').hide();
-        uiManager.loadStr('math');
-      }, 100);
-    } else {
-      setTimeout(function () {
-        $('#loading-screen').removeClass('full-loader');
-        $('#loading-screen').addClass('mini-loader-container');
-        $('#logo-inner-container').addClass('mini-loader');
-        $('#logo-text').html('');
-        $('#logo-text-version').html('');
-        $('#logo-trusat').hide();
-        $('#loading-screen').hide();
-        uiManager.loadStr('math');
-      }, 100);
-    }
+    setTimeout(function () {
+      $('#loading-screen').removeClass('full-loader');
+      $('#loading-screen').addClass('mini-loader-container');
+      $('#logo-inner-container').addClass('mini-loader');
+      $('#logo-text').html('');
+      $('#logo-text-version').html('');
+      $('#logo-trusat').hide();
+      $('#loading-screen').hide();
+      uiManager.loadStr('math');
+    }, 100);
   }
 };
 
@@ -873,6 +862,7 @@ uiManager.toast = (toastText, type, isLong) => {
   let toastMsg = M.toast({
     html: toastText,
   });
+  type = type || 'standby';
   if (isLong) toastMsg.timeRemaining = 100000;
   switch (type) {
     case 'standby':

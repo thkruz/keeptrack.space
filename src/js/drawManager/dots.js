@@ -1,5 +1,6 @@
 /* eslint-disable no-useless-escape */
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+
 import { mat4 } from 'gl-matrix';
 
 class Dots {
@@ -29,11 +30,11 @@ class Dots {
     this.loaded = true;
   }
 
-  updatePMvCamMatrix = (pMatrix, cameraManager) => {
+  updatePMvCamMatrix(pMatrix, cameraManager) {
     this.pMvCamMatrix = glm.mat4.create();
     mat4.mul(this.pMvCamMatrix, this.pMvCamMatrix, pMatrix);
     mat4.mul(this.pMvCamMatrix, this.pMvCamMatrix, cameraManager.camMatrix);
-  };
+  }
 
   // eslint-disable-next-line class-methods-use-this
   draw(pMatrix, cameraManager, colorScheme, tgtBuffer) {
@@ -388,11 +389,7 @@ class Dots {
 
         // Interpolate position since last draw by adding the velocity
         for (this.drawI = 0; this.drawI < this.satDataLenInDraw3; this.drawI++) {
-          if (this.drawI > this.orbitalSats3) {
-            this.positionData[this.drawI] += this.velocityData[this.drawI] * timeManager.drawDt;
-          } else {
-            this.positionData[this.drawI] += this.velocityData[this.drawI] * timeManager.drawDt;
-          }
+          this.positionData[this.drawI] += this.velocityData[this.drawI] * timeManager.drawDt;
         }
       }
     }

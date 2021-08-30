@@ -22,13 +22,17 @@
  */
 
 'use strict';
+
 import * as Ootk from 'ootk';
+
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 import { saveCsv, saveVariable, stringPad } from './helpers.ts';
+
 import $ from 'jquery';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { keepTrackApi } from '@app/js/api/externalApi.ts';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
+
 let satellite = {};
 
 // Constants
@@ -451,7 +455,7 @@ satellite.getlookangles = (sat) => {
   let looksArray = [];
   for (let i = 0; i < satellite.lookanglesLength * 24 * 60 * 60; i += lookanglesInterval) {
     let propTempOffset = i * 1000 + propOffset; // Offset in seconds
-    let looksPass = _propagate(propTempOffset, satrec, sensor, lookanglesInterval);
+    let looksPass = _propagate(propTempOffset, satrec, sensor);
     if (looksPass !== false) {
       looksArray.push(looksPass); // Update the table with looks for this 5 second chunk and then increase table counter by 1
       // i = i + (orbitalPeriod * 60 * 0.75); // Jump 3/4th to the next orbit
@@ -844,7 +848,7 @@ satellite.findCloseObjects = () => {
     // Only look at satellites in LEO
     if (sat.apogee > 5556) continue;
     // Find where the satellite is right now
-    sat.position = _getSatPos(0, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval).position;
+    sat.position = _getSatPos(0, sat.satrec).position;
     // If it fails, skip it
     if (typeof sat.position == 'undefined') continue;
     // Add the satellite to the list
@@ -888,12 +892,12 @@ satellite.findCloseObjects = () => {
   for (let i = 0; i < csoListUnique.length; i++) {
     // Calculate the first CSO's position 30 minutes later
     let sat = csoListUnique[i].sat1;
-    let pos = _getSatPos(1000 * 60 * 30, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval);
+    let pos = _getSatPos(1000 * 60 * 30, sat.satrec);
     csoListUnique[i].sat1.position = pos.position;
 
     // Calculate the second CSO's position 30 minutes later
     sat = csoListUnique[i].sat2;
-    pos = _getSatPos(1000 * 60 * 30, sat.satrec, sensorManager.currentSensor, satellite.lookanglesInterval);
+    pos = _getSatPos(1000 * 60 * 30, sat.satrec);
     sat.position = pos.position;
     csoListUnique[i].sat2.position = pos.position;
   }
@@ -1405,7 +1409,7 @@ satellite.calculateLookAngles = (sat, sensor, propOffset) => {
     propTempOffset = i * 1000 + propOffset; // Offset in seconds (msec * 1000)
     if (lookanglesTable.length <= 5000) {
       // Maximum of 1500 lines in the look angles table
-      let lookanglesRow = _propagate(propTempOffset, satrec, sensor, satellite.lookanglesInterval);
+      let lookanglesRow = _propagate(propTempOffset, satrec, sensor);
       if (lookanglesRow == false) {
         lookanglesTable.push(lookanglesRow); // Update the table with looks for this 5 second chunk and then increase table counter by 1
       }
@@ -1418,7 +1422,7 @@ satellite.calculateLookAngles = (sat, sensor, propOffset) => {
   return lookanglesTable;
 };
 satellite.findBestPasses = (sats, sensor) => {
-  sats = sats.replace(' ', ',');
+  sats = sats.replace(/ /gu, ',');
   const satArray = sats.split(',');
   let tableSatTimes = [];
   for (let i = 0; i < satArray.length; i++) {

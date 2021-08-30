@@ -129,11 +129,10 @@ objectManager.init = async () => {
     console.log('You do not have the Star Module');
   }
   // Try Loading Sensor Module
-  var sensor;
   try {
     // if (typeof sensorManager == 'undefined') throw 'You do not have the Sensor Module';
     sensorList = sensorManager.sensorList;
-    for (sensor in sensorList) {
+    for (const sensor in sensorList) {
       var sensorInfo = {
         static: true,
         staticNum: sensorList[sensor].staticNum,
@@ -163,7 +162,7 @@ objectManager.init = async () => {
         type: 'Launch Facility',
         lat: launchSiteList[launchSite].lat,
         lon: launchSiteList[launchSite].lon,
-        alt: sensorList[sensor].alt,
+        alt: launchSiteList[launchSite].alt,
       };
       objectManager.staticSet.push(launchSiteInfo);
     }

@@ -59,7 +59,7 @@ var dateFormat = function (date, mask, utc) {
 
   // Passing date through Date applies Date.parse, if necessary
   date = date ? new Date(date) : new Date();
-  if (isNaN(date)) throw SyntaxError(`invalid date - ${date}`);
+  if (Number.isNaN(date)) throw SyntaxError(`invalid date - ${date}`);
 
   mask = String(formats.masks[mask] || mask || formats.masks['default']);
 

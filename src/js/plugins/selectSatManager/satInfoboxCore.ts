@@ -1,4 +1,5 @@
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
+
 import { SunCalc } from '@app/js/lib/suncalc.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
@@ -121,7 +122,7 @@ const satInfoboxCore = {
       // /////////////////////////////////////////////////////////////////////////
       // Country Correlation Table
       // /////////////////////////////////////////////////////////////////////////
-      let country = keepTrackApi.programs.objectManager.extractCountry(sat.C);
+      const country = keepTrackApi.programs.objectManager.extractCountry(sat.C);
       $('#sat-country').html(country);
 
       // /////////////////////////////////////////////////////////////////////////
@@ -381,30 +382,30 @@ const satInfoboxCore = {
         if (objectManager.selectedSat === -1) {
           return;
         }
-        let intldes = satSet.getSatExtraOnly(objectManager.selectedSat).intlDes;
-        let searchStr = intldes.slice(0, 8);
+        const intldes = satSet.getSatExtraOnly(objectManager.selectedSat).intlDes;
+        const searchStr = intldes.slice(0, 8);
         uiManager.doSearch(searchStr);
         $('#search').val(searchStr);
       });
 
       $('#near-orbits-link').on('click', () => {
         // searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(objectManager.selectedSat)));
-        let searchStr = searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(keepTrackApi.programs.objectManager.selectedSat)));
+        const searchStr = searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(keepTrackApi.programs.objectManager.selectedSat)));
         searchBox.doSearch(searchStr, false, satSet);
       });
       $('#near-objects-link').on('click', function () {
         if (objectManager.selectedSat === -1) {
           return;
         }
-        var sat = objectManager.selectedSat;
-        var SCCs = [];
-        var pos = satSet.getSatPosOnly(sat).position;
-        var posXmin = pos.x - 100;
-        var posXmax = pos.x + 100;
-        var posYmin = pos.y - 100;
-        var posYmax = pos.y + 100;
-        var posZmin = pos.z - 100;
-        var posZmax = pos.z + 100;
+        const sat = objectManager.selectedSat;
+        const SCCs = [];
+        let pos = satSet.getSatPosOnly(sat).position;
+        const posXmin = pos.x - 100;
+        const posXmax = pos.x + 100;
+        const posYmin = pos.y - 100;
+        const posYmax = pos.y + 100;
+        const posZmin = pos.z - 100;
+        const posZmax = pos.z + 100;
         $('#search').val('');
         for (let i = 0; i < satSet.numSats; i++) {
           pos = satSet.getSatPosOnly(i).position;

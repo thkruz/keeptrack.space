@@ -29,7 +29,7 @@ import { keepTrackApi } from '@app/js/api/externalApi';
 export const init = (): void => {
   const { uiManager, settingsManager, objectManager, satSet } = keepTrackApi.programs;
   
-  let mapManager: any = {};
+  const mapManager: any = {};
   mapManager.isMapMenuOpen = false;
   const rad = (deg: number) => (deg * Math.PI) / 180;
   const tan = (deg: number) => Math.tan(rad(deg));
@@ -55,7 +55,7 @@ export const init = (): void => {
         y: (tan(opt.latLimit / 2) - tan(point.lat / 2)) / Math.PI,
       };
     } else {
-      var result = {
+      const result = {
         lon: deg((2 * point.x - 1) * Math.PI),
         lat: deg(2 * Math.atan(tan(opt.latLimit / 2) - point.y * Math.PI)),
       };
@@ -88,8 +88,8 @@ export const init = (): void => {
     const { sensorManager, satellite, mapManager, settingsManager, objectManager, satSet } = keepTrackApi.programs;
     if (objectManager.selectedSat === -1) return;
     if (!mapManager.isMapMenuOpen) return;
-    var sat = satSet.getSat(objectManager.selectedSat);
-    var map;
+    const sat = satSet.getSat(objectManager.selectedSat);
+    let map;
     sat.getTEARR();
     map = mapManager.braun(
       {
@@ -113,7 +113,7 @@ export const init = (): void => {
       map.y = (map.y / 0.6366197723675813) * settingsManager.mapHeight - 10;
       $('#map-sensor').attr('style', 'left:' + map.x + 'px;top:' + map.y + 'px;z-index:11;'); // Set to size of the map image (800x600)
     }
-    for (var i = 1; i <= 50; i++) {
+    for (let i = 1; i <= 50; i++) {
       map = mapManager.braun(
         {
           lon: satellite.map(sat, i).lon,
@@ -261,11 +261,11 @@ export const init = (): void => {
         const { timeManager } = keepTrackApi.programs;
         settingsManager.isMapUpdateOverride = true;
         // Might be better code for this.
-        var time = evt.currentTarget.attributes.time.value;
+        let time = evt.currentTarget.attributes.time.value;
         if (time !== null) {
           time = time.split(' ');
           time = new Date(time[0] + 'T' + time[1] + 'Z');
-          var today = new Date(); // Need to know today for offset calculation
+          const today = new Date(); // Need to know today for offset calculation
           timeManager.propOffset = time.getTime() - today.getTime(); // Find the offset from today
           satSet.satCruncher.postMessage({
             // Tell satSet.satCruncher we have changed times for orbit calculations
@@ -320,7 +320,7 @@ export const init = (): void => {
           mapManager.isMapMenuOpen = true;
           console.warn(mapManager);
           mapManager.updateMap();
-          var satData = satSet.getSatExtraOnly(objectManager.selectedSat);
+          const satData = satSet.getSatExtraOnly(objectManager.selectedSat);
           $('#map-sat').tooltip({
             // delay: 50,
             html: satData.SCC_NUM,
@@ -350,11 +350,7 @@ export const init = (): void => {
     cb: (): void => {
       if (mapManager.isMapMenuOpen || settingsManager.isMapUpdateOverride) {
         satCrunchNow = Date.now();
-        if (satCrunchNow > settingsManager.lastMapUpdateTime + 30000) {
-          mapManager.updateMap();
-          settingsManager.lastMapUpdateTime = satCrunchNow;
-          settingsManager.isMapUpdateOverride = false;
-        } else if (settingsManager.isMapUpdateOverride) {
+        if (satCrunchNow > settingsManager.lastMapUpdateTime + 30000 || settingsManager.isMapUpdateOverride) {
           mapManager.updateMap();
           settingsManager.lastMapUpdateTime = satCrunchNow;
           settingsManager.isMapUpdateOverride = false;

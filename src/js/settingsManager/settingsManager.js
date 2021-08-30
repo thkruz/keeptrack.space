@@ -314,7 +314,7 @@ let settingsManager = {
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (settingsManager.colors == null || settingsManager.colors == {} || settingsManager.colors.version !== '1.0.3') {
+    if (settingsManager.colors == null || settingsManager.colors.length === 0 || settingsManager.colors.version !== '1.0.3') {
       settingsManager.colors = {};
       settingsManager.colors.version = '1.0.3';
       settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
@@ -463,13 +463,15 @@ let settingsManager = {
     settingsManager = { ...settingsManager, ...window.settingsManagerOverride };
     const queryStr = window.location.search.substring(1);
     const params = queryStr.split('&');
+    const plugins = settingsManager.plugins;
     for (let i = 0; i < params.length; i++) {
       const key = params[i].split('=')[0];
       const val = params[i].split('=')[1];
       if (key === 'settingsManagerOverride') {
         const overrides = JSON.parse(decodeURIComponent(val));
         Object.keys(overrides.plugins)
-          .filter((key) => key in settingsManager.plugins)
+          .filter((key) => key in plugins)
+          // eslint-disable-next-line no-loop-func
           .forEach((key) => {
             if (typeof overrides.plugins[key] == 'undefined') return;
             settingsManager.plugins[key] = overrides.plugins[key];
@@ -654,6 +656,7 @@ let settingsManager = {
         case 'political':
           settingsManager.politicalImages = true;
           break;
+        // file deepcode ignore DuplicateCaseBody: The default image could change in the future
         default:
           settingsManager.lowresImages = true;
           break;

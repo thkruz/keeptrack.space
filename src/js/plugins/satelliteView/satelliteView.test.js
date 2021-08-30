@@ -4,8 +4,8 @@
 */
 
 import 'jsdom-worker';
-
 import '@app/js/settingsManager/settingsManager.js';
+
 import { keepTrackApi } from '@app/js/api/externalApi';
 
 keepTrackApi.programs.settingsManager = {
@@ -15,8 +15,8 @@ keepTrackApi.programs.settingsManager = {
 };
 keepTrackApi.programs = {
   uiManager: {
-  hideSideMenus: jest.fn(),
-  toast: jest.fn(),
+    hideSideMenus: jest.fn(),
+    toast: jest.fn(),
   },
   cameraManager: {
     cameraType: {
@@ -36,17 +36,21 @@ keepTrackApi.programs = {
 };
 
 test(`satelliteView Unit Testing`, () => {
-  import('@app/js/plugins/satelliteView/satelliteView').then((mod) => {
-    mod.init();
-    keepTrackApi.methods.uiManagerInit();
-    keepTrackApi.methods.bottomMenuClick('menu-fake');
-    keepTrackApi.methods.bottomMenuClick('menu-satview');
-    keepTrackApi.methods.bottomMenuClick('menu-satview');
-    
-    keepTrackApi.programs.objectManager.selectedSat = 0;
-    keepTrackApi.methods.bottomMenuClick('menu-satview');
-    
-    keepTrackApi.settingsManager.plugins.topMenu = true;
-    keepTrackApi.methods.bottomMenuClick('menu-satview');
-  });
+  import('@app/js/plugins/satelliteView/satelliteView')
+    .then((mod) => {
+      mod.init();
+      keepTrackApi.methods.uiManagerInit();
+      keepTrackApi.methods.bottomMenuClick('menu-fake');
+      keepTrackApi.methods.bottomMenuClick('menu-satview');
+      keepTrackApi.methods.bottomMenuClick('menu-satview');
+
+      keepTrackApi.programs.objectManager.selectedSat = 0;
+      keepTrackApi.methods.bottomMenuClick('menu-satview');
+
+      keepTrackApi.settingsManager.plugins.topMenu = true;
+      keepTrackApi.methods.bottomMenuClick('menu-satview');
+    })
+    .catch((err) => {
+      console.error(err);
+    });
 });

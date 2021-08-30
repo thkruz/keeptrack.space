@@ -1,7 +1,6 @@
 import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 import { getMissileSatsLen, getSat, satSet, setSat } from '@app/js/satSet/satSet.js';
 import $ from 'jquery';
-import { doSearch } from '@app/js/uiManager/uiManager.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
@@ -498,12 +497,12 @@ missileManager.MassRaidPre = function (time: any, simFile: string) {
     }
     missileManager.missileArray = missileArray;
   }).done(() => {
-    doSearch('RV_');
+    keepTrackApi.programs.uiManager.doSearch('RV_');
   });
 };
 missileManager.clearMissiles = () => {
   missileManager.missilesInUse = 0;
-  doSearch('');
+  keepTrackApi.programs.uiManager.doSearch('');
   var satSetLen = (<any>satSet).satData.length;
   for (var i = 0; i < 500; i++) {
     var x = satSetLen - 500 + i;

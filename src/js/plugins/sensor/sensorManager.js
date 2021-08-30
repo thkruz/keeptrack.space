@@ -54,14 +54,13 @@ sensorManager.checkSensorSelected = () => {
 };
 
 sensorManager.defaultSensor = {};
-sensorManager.currentSensor = {};
 sensorManager.defaultSensor.observerGd = {
   lat: null,
   longitude: 0,
   latitude: 0,
   height: 0,
 };
-sensorManager.currentSensor = sensorManager.defaultSensor;
+sensorManager.currentSensor = sensorManager.defaultSensor || {};
 sensorManager.setCurrentSensor = (sensor) => {
   sensorManager.currentSensor = sensor;
 };
@@ -92,10 +91,9 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
   if (selectedSensor == null && staticNum == null) {
     return;
   }
-  var sensor;
   if (selectedSensor === 'SSN') {
     var allSSNSensors = [];
-    for (sensor in sensorList) {
+    for (const sensor in sensorList) {
       if (sensorList[sensor].country === 'United States' || sensorList[sensor].country === 'United Kingdom' || sensorList[sensor].country === 'Norway') {
         allSSNSensors.push(sensorList[sensor]);
       }
@@ -240,7 +238,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     setColorScheme(settingsManager.currentColorScheme, true);
     // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
   } else {
-    for (sensor in sensorList) {
+    for (const sensor in sensorList) {
       // console.log(sensorList[sensor] == selectedSensor);
       if (sensorList[sensor] == selectedSensor || (sensorList[sensor].staticNum === staticNum && typeof staticNum != 'undefined')) {
         sensorManager.selectedSensor = sensorList[sensor];

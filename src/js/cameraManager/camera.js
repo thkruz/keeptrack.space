@@ -22,6 +22,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  */
 
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants.js';
 
 /* Used for managing the movement of the camera during the draw loop */
@@ -87,7 +88,7 @@ class Camera {
     return angle;
   }
 
-  static getDayOfYear = function (date) {
+  static getDayOfYear(date) {
     date = date || new Date();
     var _isLeapYear = (date) => {
       var year = date.getFullYear();
@@ -101,7 +102,7 @@ class Camera {
     var dayOfYear = dayCount[mn] + dn;
     if (mn > 1 && _isLeapYear(date)) dayOfYear++;
     return dayOfYear;
-  };
+  }
 
   static longToYaw(long, selectedDate) {
     let realTime = new Date();
@@ -910,18 +911,11 @@ class Camera {
       }
       this.camSnapMode = false;
     } else {
-      // This block of code is what causes the moment effect when moving the camera
+      // This block of code is what causes the momentum effect when moving the camera
       // Most applications like Goolge Earth or STK do not have this effect as pronounced
       // It makes KeepTrack feel more like a game and less like a toolkit
-      if (!settingsManager.isMobileModeEnabled) {
-        // DESKTOP ONLY
-        this.camPitchSpeed -= this.camPitchSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor; // decay speeds when globe is "thrown"
-        this.camYawSpeed -= this.camYawSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor;
-      } else if (settingsManager.isMobileModeEnabled) {
-        // MOBILE
-        this.camPitchSpeed -= this.camPitchSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor; // decay speeds when globe is "thrown"
-        this.camYawSpeed -= this.camYawSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor;
-      }
+      this.camPitchSpeed -= this.camPitchSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor; // decay speeds when globe is "thrown"
+      this.camYawSpeed -= this.camYawSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor;
       this.camPitchAccel *= 0.95;
       this.camYawAccel *= 0.95;
     }

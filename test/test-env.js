@@ -5,6 +5,7 @@
 */
 
 import 'webgl-mock';
+
 import $ from 'jquery';
 import { JSDOM } from 'jsdom';
 import fs from 'fs';
@@ -65,12 +66,21 @@ global.console = {
 
 // document.body.innerHTML += '<div id="keeptrack-canvas"></div>';
 
+window.HTMLMediaElement.prototype.load = () => {
+  /* do nothing */
+};
+window.HTMLMediaElement.prototype.play = () => {
+  /* do nothing */
+};
+window.HTMLMediaElement.prototype.pause = () => {
+  /* do nothing */
+};
+window.HTMLMediaElement.prototype.addTextTrack = () => {
+  /* do nothing */
+};
+
 global.$ = global.jQuery = $;
 window.jQuery = $;
-
-$.colorbox = {
-  close: jest.fn(),
-};
 
 $.fn.replace = (input, output) => $.fn.toString().replace(input, output);
 

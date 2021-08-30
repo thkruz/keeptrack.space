@@ -29,7 +29,17 @@ import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
 export const init = (): void => {
-  const { satellite, satSet, objectManager, orbitManager, uiManager, ColorScheme, sensorManager, settingsManager, timeManager } = keepTrackApi.programs;
+  const {
+    satellite,
+    satSet,
+    objectManager,
+    orbitManager,
+    uiManager,
+    ColorScheme,
+    sensorManager,
+    settingsManager,
+    timeManager,
+  }: { satellite: any; satSet: any; objectManager: any; orbitManager: any; uiManager: uiManagerI; ColorScheme: any; sensorManager: any; settingsManager: any; timeManager: any } = keepTrackApi.programs;
   keepTrackApi.programs.watchlist = {};
   keepTrackApi.programs.watchlist.lastOverlayUpdateTime = 0;
   let watchlistList: any[] = [];
@@ -40,7 +50,7 @@ export const init = (): void => {
   let nextPassArray: any = [];
   let isInfoOverlayMenuOpen = false;
   isWatchlistMenuOpen = false;
-  
+
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
@@ -223,16 +233,28 @@ export const init = (): void => {
             return;
           }
 
-          var newWatchlist = JSON.parse(<string>evt.target.result);
+          let newWatchlist;
+          try {
+            newWatchlist = JSON.parse(<string>evt.target.result);
+          } catch {
+            uiManager.toast('Watchlist file format incorrect!', 'critical');
+            return;
+          }
+
+          if (newWatchlist.length === 0) {
+            uiManager.toast('Watchlist file format incorrect!', 'critical');
+            return;
+          }
+
           watchlistInViewList = [];
-          for (var i = 0; i < newWatchlist.length; i++) {
-            var sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
-            if (sat !== null) {
+          for (let i = 0; i < newWatchlist.length; i++) {
+            const sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
+            if (sat !== null && sat.id > 0) {
               newWatchlist[i] = sat.id;
               watchlistInViewList.push(false);
             } else {
-              console.error('Watchlist File Format Incorret');
-              return;
+              uiManager.toast('Sat ' + newWatchlist[i] + ' not found!', 'caution');
+              continue;
             }
           }
           watchlistList = newWatchlist;
@@ -243,7 +265,7 @@ export const init = (): void => {
         };
         reader.readAsText((<HTMLInputElement>evt.target).files[0]);
         evt.preventDefault();
-      });      
+      });
     },
   });
 
@@ -300,11 +322,11 @@ export const init = (): void => {
     }
     var variable = JSON.stringify(saveWatchlist);
     try {
-    localStorage.setItem('watchlistList', variable);
-  } catch {
-    console.warn('Watchlist Plugin: Unable to save watchlist - localStorage issue!');
-  }
-  };  
+      localStorage.setItem('watchlistList', variable);
+    } catch {
+      console.warn('Watchlist Plugin: Unable to save watchlist - localStorage issue!');
+    }
+  };
   keepTrackApi.programs.watchlist.updateWatchlist = updateWatchlist;
 
   var infoOverlayDOM = [];

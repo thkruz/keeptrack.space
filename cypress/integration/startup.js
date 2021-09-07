@@ -7,6 +7,8 @@ context('KeepTrack Startup', () => {
   });
 
   it('Load Site', () => {
-    cy.window().then(() => {});
+    cy.window()
+      .then(() => {})
+      .catch((err) => console.log(err));
   });
 });

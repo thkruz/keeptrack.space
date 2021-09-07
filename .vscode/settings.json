@@ -3,5 +3,6 @@
   "typescript.validate.enable": true,
   "npm-scripts.showStartNotification": false,
   "testExplorer.useNativeTesting": true,
+  "ponicode.testSettings.testLocation.locationType": "Same folder as source file",
   // "editor.maxTokenizationLineLength": 20000000,
 }

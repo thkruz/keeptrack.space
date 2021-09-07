@@ -86,6 +86,7 @@ $.fn.replace = (input, output) => $.fn.toString().replace(input, output);
 
 $.colorbox = jest.fn();
 $.fn.colorbox = jest.fn();
+$.fn.colorPick = jest.fn();
 $.fn.effect = jest.fn();
 $.fn.resizable = jest.fn();
 $.fn.tooltip = jest.fn();

@@ -20,9 +20,11 @@ module.exports = (api) => {
       },
       development: {
         plugins: normPlugins,
+        compact: false,
       },
       production: {
         plugins: normPlugins,
+        compact: true,
       },
     },
     presets: [

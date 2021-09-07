@@ -2,7 +2,7 @@
   "typeAcquisition": {
     "enable": true,
     // "include": ["react"],
-    // "exclude": ["leftpad"]
+    // "exclude": ["**/*.test.ts"],
   },
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
@@ -77,5 +77,6 @@
     "newLine": "LF" /* Specify the end of line sequence to be used when emitting files: ‘CRLF’ (dos) or ‘LF’ (unix). */,
     "suppressImplicitAnyIndexErrors": false /* suppresses the errors about accessing any as a type */,
     "resolveJsonModule": true /* Allows a module id to be a json file. */
-  }
+  },
+  "exclude": ["dist", "cypress", "coverage", "node_modules", "node_modules/"], //"**/*.test.ts"  
 }

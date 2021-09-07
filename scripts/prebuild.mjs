@@ -28,7 +28,6 @@ const files = [
   'css/fonts.css',
   'css/materialize.css',
   'css/materialize-local.css',
-  'js/lib/modernizr-custom.js',
 ];
 
 const opts = {

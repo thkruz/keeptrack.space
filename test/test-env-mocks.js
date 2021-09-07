@@ -56,6 +56,8 @@ global.mocks.glMock = {
   createVertexArray: jest.fn(),
   bindVertexArray: jest.fn(),
   disableVertexAttribArray: jest.fn(),
+  clearColor: jest.fn(),
+  clear: jest.fn(),
 };
 
 // mock_requestAnimationFrame.js

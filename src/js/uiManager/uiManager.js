@@ -196,6 +196,22 @@ uiManager.searchToggle = function (force) {
   }
 };
 
+const hideUi = () => {
+  if (uiManager.isUiVisible) {
+    $('#header').hide();
+    $('#ui-wrapper').hide();
+    $('#nav-footer').hide();
+    uiManager.isUiVisible = false;
+  } else {
+    $('#header').show();
+    $('#ui-wrapper').show();
+    $('#nav-footer').show();
+    uiManager.isUiVisible = true;
+  }
+};
+uiManager.hideUi = hideUi;
+uiManager.isUiVisible = false;
+
 uiManager.keyHandler = (evt) => {
   // Error Handling
   if (typeof evt.key == 'undefined') return;
@@ -274,6 +290,23 @@ uiManager.keyHandler = (evt) => {
           uiManager.legendMenuChange('astronomy');
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
+      }
+      break;
+    // Open the search bar for faster searching
+    // TODO: What if it isn't available?
+    case 'F':
+      if (cameraManager.isShiftPressed) {
+        evt.preventDefault();
+        uiManager.searchToggle(true);
+        $('#search').trigger('focus');
+        cameraManager.isShiftPressed = false;
+      }
+      break;
+    // Hide the UI
+    case 'H':
+      if (cameraManager.isShiftPressed) {
+        uiManager.hideUi();
+        cameraManager.isShiftPressed = false;
       }
       break;
   }

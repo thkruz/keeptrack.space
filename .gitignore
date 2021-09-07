@@ -75,6 +75,8 @@ src/tle/TLEAltNemo*
 src/.htaccess
 .notes.js
 classfd.tle
+src/textures/earthmap16ak.jpg
+src/textures/earthmapclouds16k.jpg
 
 # Jest Coverage
 coverage/

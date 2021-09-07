@@ -1,5 +1,7 @@
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+
 import { DEG2RAD, MILLISECONDS_PER_DAY, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
+
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
@@ -159,7 +161,7 @@ earth.init = async (glRef) => {
           if (settingsManager.blueImages) earth.imgHiRes.src = 'textures/world_blue-2048.png';
           if (settingsManager.vectorImages) earth.imgHiRes.src = 'textures/dayearthvector-4096.jpg';
           if (settingsManager.politicalImages) earth.imgHiRes.src = 'textures/political8k.jpg';
-          if (settingsManager.hiresImages) earth.imgHiRes.src = 'textures/earthmap16k.jpg';
+          if (settingsManager.hiresImages) earth.imgHiRes.src = 'textures/earthmapclouds16k.jpg';
           if (settingsManager.hiresNoCloudsImages) earth.imgHiRes.src = 'textures/earthmap16k.jpg';
           earth.isUseHiRes = true;
           earth.imgHiRes.onload = function () {

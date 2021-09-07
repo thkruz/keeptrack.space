@@ -202,7 +202,7 @@ export const uiManagerInit = (): void => {
     (<any>$('#settings-color-payload')).colorPick({
       initialColor: rgbCss((<any>settingsManager).colors?.payload || [0.2, 1.0, 0.0, 0.5]),
       palette: colorPalette,
-      onColorSelected: () => {
+      onColorSelected: function() {
         const context = this;
         onColorSelected(context, 'payload');
       },
@@ -210,7 +210,7 @@ export const uiManagerInit = (): void => {
     (<any>$('#settings-color-rocketBody')).colorPick({
       initialColor: rgbCss((<any>settingsManager).colors?.rocketBody || [0.2, 0.4, 1.0, 1]),
       palette: colorPalette,
-      onColorSelected: () => {
+      onColorSelected: function() {
         const context = this;
         onColorSelected(context, 'rocketBody');
       },
@@ -218,7 +218,7 @@ export const uiManagerInit = (): void => {
     (<any>$('#settings-color-debris')).colorPick({
       initialColor: rgbCss((<any>settingsManager).colors?.debris || [0.5, 0.5, 0.5, 1]),
       palette: colorPalette,
-      onColorSelected: () => {
+      onColorSelected: function() {
         const context = this;
         onColorSelected(context, 'debris');
       },
@@ -226,7 +226,7 @@ export const uiManagerInit = (): void => {
     (<any>$('#settings-color-inview')).colorPick({
       initialColor: rgbCss((<any>settingsManager).colors?.inview || [0.85, 0.5, 0.0, 1.0]),
       palette: colorPalette,
-      onColorSelected: () => {
+      onColorSelected: function() {
         const context = this;
         onColorSelected(context, 'inview');
       },
@@ -234,7 +234,7 @@ export const uiManagerInit = (): void => {
     (<any>$('#settings-color-missile')).colorPick({
       initialColor: rgbCss((<any>settingsManager).colors?.missile || [1.0, 1.0, 0.0, 1.0]),
       palette: colorPalette,
-      onColorSelected: () => {
+      onColorSelected: function() {
         const context = this;
         onColorSelected(context, 'missile');
       },
@@ -242,7 +242,7 @@ export const uiManagerInit = (): void => {
     (<any>$('#settings-color-missileInview')).colorPick({
       initialColor: rgbCss((<any>settingsManager).colors?.missileInview || [1.0, 0.0, 0.0, 1.0]),
       palette: colorPalette,
-      onColorSelected: () => {
+      onColorSelected: function() {
         const context = this;
         onColorSelected(context, 'missileInview');
       },
@@ -250,7 +250,7 @@ export const uiManagerInit = (): void => {
     (<any>$('#settings-color-trusat')).colorPick({
       initialColor: rgbCss((<any>settingsManager).colors?.trusat || [1.0, 0.0, 0.6, 1.0]),
       palette: colorPalette,
-      onColorSelected: () => {
+      onColorSelected: function() {
         const context = this;
         onColorSelected(context, 'trusat');
       },

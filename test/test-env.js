@@ -1,9 +1,3 @@
-/* globals
-  global
-  jest
-  __dirname
-*/
-
 import 'webgl-mock';
 
 import $ from 'jquery';

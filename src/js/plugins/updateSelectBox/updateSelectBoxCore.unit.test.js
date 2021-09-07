@@ -4,8 +4,8 @@
 */
 
 import 'jsdom-worker';
-
 import '@app/js/settingsManager/settingsManager.js';
+
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { missileManager } from '@app/js/plugins/missile/missileManager';
 import { orbitManager } from '@app/js/orbitManager/orbitManager';
@@ -27,7 +27,11 @@ test(`updateSelectBoxCore Unit Testing`, () => {
     missile: true,
   };
 
-  import('@app/js/plugins/updateSelectBox/updateSelectBoxCore').then((mod) => mod.init());
+  import('@app/js/plugins/updateSelectBox/updateSelectBoxCore')
+    .then((mod) => mod.init())
+    .catch((err) => {
+      console.error(err);
+    });
   timeManager.init();
   orbitManager.orbitWorker = {
     onmessage: jest.fn(),

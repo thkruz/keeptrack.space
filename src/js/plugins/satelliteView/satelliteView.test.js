@@ -6,32 +6,15 @@
 import 'jsdom-worker';
 import '@app/js/settingsManager/settingsManager.js';
 
+import { expect } from '@jest/globals';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 keepTrackApi.programs.settingsManager = {
   plugins: {
     datetime: {},
-  },
-};
-keepTrackApi.programs = {
-  uiManager: {
-    hideSideMenus: jest.fn(),
-    toast: jest.fn(),
-  },
-  cameraManager: {
-    cameraType: {
-      current: 1,
-      satellite: 1,
-      fixedToSat: 2,
-    },
-  },
-  objectManager: {
-    selectedSat: -1,
-  },
-  adviceManager: {
-    adviceList: {
-      satViewDisabled: jest.fn(),
-    },
   },
 };
 

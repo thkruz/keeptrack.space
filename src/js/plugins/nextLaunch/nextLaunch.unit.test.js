@@ -2,14 +2,14 @@
 /* eslint-disable no-undefined */
 /* eslint-disable camelcase */
 
-/*globals
-  global
-  test
-  $
-*/
-
 import '@app/js/settingsManager/settingsManager';
+
+import { expect } from '@jest/globals';
+import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 import { nextLaunchManager } from '@app/js/plugins/nextLaunch/nextLaunch';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 const setUrl = (url) => {
   const host = url.split('/')[2] || '';

@@ -1,8 +1,11 @@
-/* globals it jest describe */
-
 import '@app/js/settingsManager/settingsManager.js';
+
+import { expect } from '@jest/globals';
 import { init } from './sensorSurv';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 describe('sensorSurv', () => {
   it('should be initialized', () => {
@@ -40,5 +43,4 @@ describe('sensorSurv', () => {
     keepTrackApi.methods.bottomMenuClick('menu-surveillance');
     keepTrackApi.methods.bottomMenuClick('menu-surveillance');
   });
-
 });

@@ -1,7 +1,11 @@
-/* globals it jest describe */
+import * as settingsMenu from '@app/js/plugins/settingsMenu/settingsMenu';
 
+import { expect } from '@jest/globals';
 import { init } from './nightToggle';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 describe('nightToggle', () => {
   it('should be initialized', () => {

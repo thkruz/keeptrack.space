@@ -78,5 +78,5 @@
     "suppressImplicitAnyIndexErrors": false /* suppresses the errors about accessing any as a type */,
     "resolveJsonModule": true /* Allows a module id to be a json file. */
   },
-  "exclude": ["dist", "cypress", "coverage", "node_modules", "node_modules/"], //"**/*.test.ts"  
+  "exclude": ["dist", "coverage"], //"**/*.test.ts"  
 }

@@ -3,6 +3,7 @@
 
 // eslint-disable-next-line max-classes-per-file
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+
 import { RAD2DEG } from '@app/js/lib/constants.js';
 import { SunCalc } from '@app/js/lib/suncalc.js';
 import { satellite } from '@app/js/lib/lookangles.js';

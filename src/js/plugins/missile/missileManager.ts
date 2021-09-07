@@ -7,466 +7,12 @@ import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager';
 import { updateOrbitBuffer } from '@app/js/orbitManager/orbitManager.js';
 
-// var isResetMissilesLaunched = false;
-// var missilesLaunched = 0;
 
-var missileManager: any = {};
-missileManager.isLoaded = true;
-missileManager.lastMissileErrorType = '';
-missileManager.missilesInUse = 0;
-missileManager.lastMissileError = '';
-missileManager.RussianICBM = [
-  52 + 30 * 0.01666667,
-  82 + 45 * 0.01666667,
-  'Aleysk (SS-18)',
-  16000,
-  50 + 45 * 0.01666667,
-  59 + 30 * 0.01666667,
-  'Dombarovskiy (SS-18)',
-  16000,
-  55 + 20 * 0.01666667,
-  89 + 48 * 0.01666667,
-  'Uzhur (SS-18)',
-  16000,
-  53 + 58 * 0.01666667,
-  57 + 50 * 0.01666667,
-  'Kartaly (SS-18)',
-  16000,
-  52 + 19 * 0.01666667,
-  104 + 14 * 0.01666667,
-  'Irkutsk (SS-25)',
-  10500,
-  56 + 22 * 0.01666667,
-  95 + 28 * 0.01666667,
-  'Kansk (SS-25)',
-  10500,
-  54 + 2 * 0.01666667,
-  35 + 46 * 0.01666667,
-  'Kozel`sk (SS-19)',
-  10000,
-  56 + 22 * 0.01666667,
-  92 + 25 * 0.01666667,
-  'Krasnoyarsk (SS-25)',
-  10500,
-  58 + 4 * 0.01666667,
-  60 + 33 * 0.01666667,
-  'Nizhniy Tagil (SS-25)',
-  10500,
-  55 + 20 * 0.01666667,
-  83 + 0 * 0.01666667,
-  'Novosibirsk (SS-25)',
-  10500,
-  51 + 40 * 0.01666667,
-  45 + 34 * 0.01666667,
-  'Tatishchevo (SS-19)',
-  10000,
-  51 + 40 * 0.01666667,
-  45 + 34 * 0.01666667,
-  'Tatishchevo (SS-27)',
-  10500,
-  56 + 51 * 0.01666667,
-  40 + 32 * 0.01666667,
-  'Teykovo (SS-25)',
-  10500,
-  56 + 38 * 0.01666667,
-  47 + 51 * 0.01666667,
-  'Yoshkar Ola (SS-25)',
-  10500,
-  72.039545,
-  42.696683,
-  'Verkhoturye (SS-N-23A)',
-  8300,
-  73.902056,
-  3.133463,
-  'Ekaterinburg (SS-N-23A)',
-  8300,
-  76.502284,
-  -158.871984,
-  'Tula (SS-N-23A)',
-  8300,
-  82.25681,
-  -10.161045,
-  'Bryansk (SS-N-23A)',
-  8300,
-  81.564646,
-  32.553796,
-  'Karelia (SS-N-23A)',
-  8300,
-  74.67366,
-  6.538173,
-  'Novomoskovsk (SS-N-23A)',
-  8300,
-  71.920763,
-  41.039876,
-  'Borei Sub (Bulava)',
-  9300, // Sub
-  71.920763,
-  41.039876,
-  'Delta IV Sub (Sineva)',
-  8300, // Sub
-  71.920763,
-  41.039876,
-  'Delta IV Sub (Layner)',
-  12000, // Sub
-];
-missileManager.ChinaICBM = [
-  32.997534,
-  112.537904,
-  'Nanyang (DF-31)',
-  8000,
-  36.621398,
-  101.773908,
-  'Xining (DF-31)',
-  8000,
-  37.797257,
-  97.079547,
-  'Delingha (DF-31A)',
-  11000,
-  37.07045,
-  100.805779,
-  'Haiyan (DF-31A)',
-  11000,
-  40.079969,
-  113.29994,
-  'Datong (DF-31A)',
-  11000,
-  34.583156,
-  105.724525,
-  'Tainshui (DF-31A)',
-  11000,
-  38.552936,
-  106.020538,
-  'Xixia (DF-31A)',
-  11000,
-  27.242253,
-  111.465223,
-  'Shaoyang (DF-31A)',
-  11000,
-  24.34658,
-  102.527838,
-  'Yuxi (DF-31A)',
-  11000,
-  34.345845,
-  111.491062,
-  'Luoyang (DF-5A/B)',
-  13000,
-  38.917086,
-  111.847057,
-  'Wuzhai (DF-5A/B)',
-  13000,
-  40.615707,
-  115.107604,
-  'Xuanhua (DF-5A/B)',
-  13000,
-  26.163848,
-  109.790408,
-  'Tongdao (DF-5A/B)',
-  13000,
-  34.061291,
-  111.054379,
-  'Lushi (DF-5A/B)',
-  13000,
-  30.691542,
-  118.437169,
-  'Jingxian (DF-5A/B)',
-  13000,
-  37.707532,
-  116.271994,
-  'Jingxian (DF-5A/B)',
-  13000,
-  27.415932,
-  111.792471,
-  'Hunan (DF-5A/B)',
-  13000,
-  46.585153,
-  125.104037,
-  'Daqing City (DF-41)',
-  13500,
-  32.154153,
-  114.099875,
-  'Xinyang City (DF-41)',
-  13500,
-  40.4417,
-  85.530745,
-  'Xinjiang Province (DF-41)',
-  13500,
-  31.271257,
-  88.699152,
-  'Tibet Province (DF-41)',
-  13500,
-  29.573548,
-  122.923151,
-  'Type 092 Sub (JL-2)',
-  8000,
-];
-missileManager.NorthKoreanBM = [40.0, 128.3, 'Sinpo Sub (Pukkŭksŏng-1)', 2500, 40.019, 128.193, 'Sinpo (KN-14)', 8000, 39.365, 126.165, 'P`yong`an (KN-20)', 10000, 39.046, 125.667, 'Pyongyang (KN-22)', 13000];
-missileManager.UsaICBM = [
-  48.420079,
-  -101.33356,
-  'Ohio Sub (Trident II)',
-  12000,
-  48.420079,
-  -101.33356,
-  'Minot (Minuteman III)',
-  13000,
-  47.505958,
-  -111.181776,
-  'Malmstrom (Minuteman III)',
-  13000,
-  41.149931,
-  -104.860645,
-  'F.E. Warren (Minuteman III)',
-  13000,
-];
-missileManager.FraSLBM = [
-  47.878,
-  -4.263,
-  'Triomphant Sub (M51)',
-  10000, // Custom Lat/Lon Replaced
-  47.878,
-  -4.263,
-  'Triomphant Sub (M51)',
-  10000,
-];
-missileManager.ukSLBM = [56.066111, -4.8175, 'Vanguard Sub (Trident II)', 12000, 56.066111, -4.8175, 'HMNB Clyde (Trident II)', 12000];
-missileManager.globalBMTargets = [
-  38.951,
-  -77.013,
-  'Washington DC',
-  40.679,
-  -73.947,
-  'New York City',
-  34.073,
-  -118.248,
-  'Los Angeles',
-  41.877,
-  -87.622,
-  'Chicago',
-  42.361,
-  -71.058,
-  'Boston',
-  47.749,
-  -122.317,
-  'Seattle',
-  25.784,
-  -80.196,
-  'Miami',
-  32.828,
-  -96.759,
-  'Dallas',
-  38.765,
-  -104.837,
-  'Colorado Springs',
-  41.33,
-  -96.054,
-  'Omaha',
-  19.832,
-  -155.491,
-  'Hawaii',
-  13.588,
-  144.922,
-  'Guam',
-  51.50634,
-  -0.097485,
-  'London',
-  48.874195,
-  2.378987,
-  'Paris',
-  24.503,
-  -66.127,
-  'French Caribean',
-  40.449889,
-  -3.717309,
-  'Madrid',
-  41.931955,
-  12.520198,
-  'Rome',
-  52.501746,
-  13.416486,
-  'Berlin',
-  43.706946,
-  -79.423854,
-  'Toronto',
-  55.750246,
-  37.691525,
-  'Moscow',
-  59.887535,
-  30.38409,
-  'St. Petersburg',
-  55.017165,
-  82.965879,
-  'Novosibirsk',
-  39.974338,
-  116.396057,
-  'Beijing',
-  39.044051,
-  125.735244,
-  'Pyongyang',
-];
-
-// Settings
-// var maxChineseMissiles = 252;
-// var maxUSAMissiles = 350;
-// var maxRussianMissiles = 400;
-// var maxNorthKoreanMissiles = 30;
-
-// Internal Variables
-/*
-  var USATargets = [
-    40.679,
-    -73.947, // NYC NY
-    42.361,
-    -71.058, // Boston MA
-    41.755,
-    -70.539, // Cape Cod MA
-    41.763,
-    -72.684, // Hartford CT
-    42.101,
-    -72.59, // Springfield MA
-    39.408,
-    -74.441, // Atlantic City NJ
-    39.191,
-    -75.534, // Dover DE
-    39.331,
-    -76.671, // Baltimore MD
-    38.951,
-    -77.013, // Washington DC
-    37.608,
-    -77.378, // Richmond VA (10)
-    42.36,
-    -83.048, // Detriot MI
-    39.844,
-    -86.172, // Indianapolis IN
-    40.008,
-    -83.0, // Columbus OH
-    40.538,
-    -79.934, // Pittsburgh PA
-    40.034,
-    -75.131, // Philadelphia PA
-    47.749,
-    -122.317, // Seattle WA
-    45.7,
-    -122.581, // Portland OR
-    47.732,
-    -117.389, // Spokane WA
-    37.889,
-    -122.562, // San Francisco CA
-    36.257,
-    -115.159, // Las Vegas NV (20)
-    48.034,
-    -101.295, // Minot ND
-    49.134,
-    -101.495, // Minot ND
-    48.234,
-    -100.295, // Minot ND
-    48.334,
-    -101.095, // Minot ND
-    48.434,
-    -101.295, // Minot ND
-    47.948,
-    -97.027, // Grand Forks ND
-    45.107,
-    -93.306, // Minneapolis MN
-    47.092,
-    -110.334, // Grand Falls MO
-    47.292,
-    -111.834, // Grand Falls MO
-    47.592,
-    -111.934, // Grand Falls MO (30)
-    46.792,
-    -111.334, // Grand Falls MO
-    47.992,
-    -111.534, // Grand Falls MO
-    47.792,
-    -110.734, // Grand Falls MO
-    48.592,
-    -111.534, // Grand Falls MO
-    47.292,
-    -111.334, // Grand Falls MO
-    46.092,
-    -111.134, // Grand Falls MO
-    47.592,
-    -110.034, // Grand Falls MO
-    40.21,
-    -104.811, // Cheyene WY
-    41.51,
-    -105.811, // Cheyene WY
-    41.21,
-    -104.211, // Cheyene WY (40)
-    40.51,
-    -104.211, // Cheyene WY
-    41.21,
-    -105.611, // Cheyene WY
-    41.51,
-    -104.611, // Cheyene WY
-    41.21,
-    -103.011, // Cheyene WY
-    42.21,
-    -104.011, // Cheyene WY
-    41.91,
-    -104.811, // Cheyene WY
-    41.91,
-    -104.811, // Cheyene WY
-    34.048,
-    -118.28, // Las Angeles CA
-    19.832,
-    -155.491, // Hawaii
-    13.588,
-    144.922, // Guam (50)
-    36.318,
-    -86.718, // Nashville TN
-    32.782,
-    -97.343, // Forth Worth TX
-    32.584,
-    -99.707, // Abilene TX
-    35.208,
-    -101.837, // Amarillo TX
-    35.188,
-    -106.595, // Albuquerque NM
-    33.603,
-    -111.965, // Phoenix AZ
-    38.765,
-    -104.837, // Colorado Springs CO
-    38.737,
-    -104.883, // Cheyenne Moutain CO
-    39.847,
-    -104.902, // Denver CO
-    40.684,
-    -105.059, // Fort Collins CO (60)
-    40.852,
-    -111.827, // Salt Lake City UT
-    61.343,
-    -150.187, // Anchorage AK
-    64.94,
-    -147.881, // Fairbanks AK
-    58.488,
-    -134.238, // Juneau AK
-    30.46,
-    -86.549, // Eglin AFB FL
-    41.33,
-    -96.054, // Omaha NE
-    39.113276,
-    -121.356137, // Beale AFB
-    64.303735,
-    -149.148768, // Clear AFS
-    76.534322,
-    -68.718288, // Thule AFB
-    41.875523,
-    -87.634038, // Chicago IL
-    35.145865,
-    -89.979153, // Memphis TN
-    43.663448,
-    -70.278127, // Portland MA
-    43.612156,
-    -116.231845, // Boise ID
-  ];
-*/
-var EarthRadius: number, EarthMass: number, FuelDensity: number, BurnRate: number, WarheadMass: number, R: number, G: number, h: number;
-var missileArray: any[] = [];
-missileManager.missileArray = missileArray;
+let EarthRadius: number, EarthMass: number, FuelDensity: number, BurnRate: number, WarheadMass: number, R: number, G: number, h: number;
+let missileArray: any[] = [];
 
 // External Functions
-missileManager.MassRaidPre = function (time: any, simFile: string) {
+export const MassRaidPre = (time: any, simFile: string) => {
   missileManager.clearMissiles();
   $.get(simFile, function (missileArray) {
     var satSetLen = getMissileSatsLen();
@@ -499,8 +45,8 @@ missileManager.MassRaidPre = function (time: any, simFile: string) {
   }).done(() => {
     keepTrackApi.programs.uiManager.doSearch('RV_');
   });
-};
-missileManager.clearMissiles = () => {
+}
+export const clearMissiles = () => {
   missileManager.missilesInUse = 0;
   keepTrackApi.programs.uiManager.doSearch('');
   var satSetLen = (<any>satSet).satData.length;
@@ -527,7 +73,7 @@ missileManager.clearMissiles = () => {
     });
   }
 };
-missileManager.Missile = function (
+export const Missile = (
   CurrentLatitude: number,
   CurrentLongitude: number,
   TargetLatitude: number,
@@ -542,7 +88,7 @@ missileManager.Missile = function (
   MaxMissileRange: number,
   country: any,
   minAltitude: number
-) {
+) => {
   // This is the main function for this program. It calculates and designs the flight path of an intercontinental
   // ballistic missile (ICBM). This function calls upon many sub-functions to help it iteratively calculate many of the
   // changing variables as the rocket makes its path around the world. Changing variables that had to be taken into
@@ -1098,8 +644,8 @@ missileManager.Missile = function (
   missileManager.lastMissileErrorType = 'normal';
   missileManager.lastMissileError = 'Missile Named RV_' + MissileObject.id + '<br>has been created.';
   return 1; // Successful Launch
-};
-missileManager.getMissileTEARR = function (
+}
+export const getMissileTEARR = (
   missile: { altList: string | any[]; startTime: number; latList: number[]; lonList: number[] },
   sensor: {
     observerGd?: any;
@@ -1119,7 +665,7 @@ missileManager.getMissileTEARR = function (
     obsmaxrange2?: any;
     obsminrange2?: any;
   }
-) {
+) => {
   var currentTEARR: any = {}; // Most current TEARR data that is set in satellite object and returned.
   var propOffset = timeManager.getPropOffset(); // offset letting us propagate in the future (or past)
   var now = timeManager.propTimeCheck(propOffset, timeManager.propRealTime);
@@ -1198,16 +744,8 @@ missileManager.getMissileTEARR = function (
   // Check if satellite is in field of view of a sensor.
   if (sensor.obsminaz > sensor.obsmaxaz) {
     if (
-      ((currentTEARR.az >= sensor.obsminaz || currentTEARR.az <= sensor.obsmaxaz) &&
-        currentTEARR.el >= sensor.obsminel &&
-        currentTEARR.el <= sensor.obsmaxel &&
-        currentTEARR.rng <= sensor.obsmaxrange &&
-        currentTEARR.rng >= sensor.obsminrange) ||
-      ((currentTEARR.az >= sensor.obsminaz2 || currentTEARR.az <= sensor.obsmaxaz2) &&
-        currentTEARR.el >= sensor.obsminel2 &&
-        currentTEARR.el <= sensor.obsmaxel2 &&
-        currentTEARR.rng <= sensor.obsmaxrange2 &&
-        currentTEARR.rng >= sensor.obsminrange2)
+      ((currentTEARR.az >= sensor.obsminaz || currentTEARR.az <= sensor.obsmaxaz) && currentTEARR.el >= sensor.obsminel && currentTEARR.el <= sensor.obsmaxel && currentTEARR.rng <= sensor.obsmaxrange && currentTEARR.rng >= sensor.obsminrange) ||
+      ((currentTEARR.az >= sensor.obsminaz2 || currentTEARR.az <= sensor.obsmaxaz2) && currentTEARR.el >= sensor.obsminel2 && currentTEARR.el <= sensor.obsmaxel2 && currentTEARR.rng <= sensor.obsmaxrange2 && currentTEARR.rng >= sensor.obsminrange2)
     ) {
       currentTEARR.inview = true;
     } else {
@@ -1215,18 +753,8 @@ missileManager.getMissileTEARR = function (
     }
   } else {
     if (
-      (currentTEARR.az >= sensor.obsminaz &&
-        currentTEARR.az <= sensor.obsmaxaz &&
-        currentTEARR.el >= sensor.obsminel &&
-        currentTEARR.el <= sensor.obsmaxel &&
-        currentTEARR.rng <= sensor.obsmaxrange &&
-        currentTEARR.rng >= sensor.obsminrange) ||
-      (currentTEARR.az >= sensor.obsminaz2 &&
-        currentTEARR.az <= sensor.obsmaxaz2 &&
-        currentTEARR.el >= sensor.obsminel2 &&
-        currentTEARR.el <= sensor.obsmaxel2 &&
-        currentTEARR.rng <= sensor.obsmaxrange2 &&
-        currentTEARR.rng >= sensor.obsminrange2)
+      (currentTEARR.az >= sensor.obsminaz && currentTEARR.az <= sensor.obsmaxaz && currentTEARR.el >= sensor.obsminel && currentTEARR.el <= sensor.obsmaxel && currentTEARR.rng <= sensor.obsmaxrange && currentTEARR.rng >= sensor.obsminrange) ||
+      (currentTEARR.az >= sensor.obsminaz2 && currentTEARR.az <= sensor.obsmaxaz2 && currentTEARR.el >= sensor.obsminel2 && currentTEARR.el <= sensor.obsmaxel2 && currentTEARR.rng <= sensor.obsmaxrange2 && currentTEARR.rng >= sensor.obsminrange2)
     ) {
       currentTEARR.inview = true;
     } else {
@@ -2705,9 +2233,9 @@ missileManager.asatFlight = function (
 */
 
 // Internal Functions
-var _Pressure = (Altitude: number) => {
+export const _Pressure = (Altitude: number) => {
   // This function calculates the atmospheric pressure. The only iMathut is the
-  // Altitude. The variables in the function are:
+  // Altitude. The constiables in the function are:
 
   // Po:   Atmospheric pressure at sea level
   // mol:  Amount of air in one gram
@@ -2717,14 +2245,14 @@ var _Pressure = (Altitude: number) => {
 
   // The function will return the calculated atmospheric pressure
 
-  var Po = 101325; // (Pa)
-  var mol = 0.02897; // (mol)
-  var Tsea = 288; // (K)
-  var R = 8.31451; // (J / K mol)
-  var g = 9.81; // (m/s^2)
+  const Po = 101325; // (Pa)
+  const mol = 0.02897; // (mol)
+  const Tsea = 288; // (K)
+  const R = 8.31451; // (J / K mol)
+  const g = 9.81; // (m/s^2)
   return Po * Math.exp((-mol * g * Altitude) / (R * Tsea)); // (Pa)
 };
-var _Temperature = (Altitude: number) => {
+export const _Temperature = (Altitude: number) => {
   // This function calculates the atmospheric temperature at any given altitude.
   // The function has one iMathut for altitude. Because atmospheric temperature can not
   // be represented as one equation, this function is made up of a series of curve fits
@@ -2743,7 +2271,7 @@ var _Temperature = (Altitude: number) => {
   if (Altitude < 120) return -894.0 + 10.6 * Altitude; // (K)
   if (Altitude >= 120) return -894.0 + 10.6 * 120; // (K)
 };
-var _CD = (M: number) => {
+export const _CD = (M: number) => {
   // This function calculates the drag coefficient of the rocket. This function is based
   // off of a plot that relates the drag coefficient with the mach number of the rocket.
   // Because the plot can not be represented with one equation it is broken up into multiple
@@ -2755,7 +2283,7 @@ var _CD = (M: number) => {
   if (M < 3.625) return 0.97916002909 + -0.540978181863 * M + 0.125235817144 * Math.pow(M, 2) + -0.00666103733277 * Math.pow(M, 3) + -0.000558009790208 * Math.pow(M, 4);
   if (M > 3.625) return 0.25;
 };
-var _ThrustFun = (MassOut: number, Altitude: any, FuelArea: number, NozzleAltitude: any) => {
+export const _ThrustFun = (MassOut: number, Altitude: any, FuelArea: number, NozzleAltitude: any) => {
   // This function calculates the thrust force of the rocket by maximizing the efficiency
   // through designing the correct shaped nozzle for the given rocket scenario. For this
   // function is gives the option for stages of the rocket to be introduced. Theoretically
@@ -2788,25 +2316,25 @@ var _ThrustFun = (MassOut: number, Altitude: any, FuelArea: number, NozzleAltitu
   // of the fuel in units of Newtons. This function will also make sure that the exit nozzle area will
   // not exceed that of the cross sectional area for the inside of rocket casing.
 
-  var k = 1.2; // Heat Ratio
-  var Ru = 8314.4621; // Universal Gas Constant (m^3 Pa / K mol)
-  var Tc = 3700; // (K)
-  var Pc = 25 * Math.pow(10, 6); // Chamber Pressure (Pa)
-  var Mw = 22; // Molecular Weight
-  var q = MassOut; // Mass Flow Rate (kg/s)
-  var Pa = _Pressure(NozzleAltitude); // Ambient pressure used to calculate nozzle (Pa)
-  var Pe = _Pressure(Altitude); // Actual Atmospheric Pressure (Pa)
-  var Pt = Math.pow(Pc * (1 + (k - 1) / 2), -k / (k - 1)); // Throat Pressure (Pa)
-  var Tt = Tc / (1 + (k - 1) / 2); // Throat Temperature (k)
-  var At = (q / Pt) * Math.sqrt((Ru * Tt) / (Mw * k)); // Throat Area (m^2)
-  var Nm = Math.sqrt((2 / (k - 1)) * Math.pow(Pc / Pa, (k - 1) / k - 1)); // Mach Number
-  var Ae = (At / Nm) * Math.pow(1 + (((k - 1) / 2) * Math.pow(Nm, 2)) / ((k + 1) / 2), (k + 1) / (2 * (k - 1))); // Exit Nozzle Area (m^2)
+  const k = 1.2; // Heat Ratio
+  const Ru = 8314.4621; // Universal Gas Constant (m^3 Pa / K mol)
+  const Tc = 3700; // (K)
+  const Pc = 25 * Math.pow(10, 6); // Chamber Pressure (Pa)
+  const Mw = 22; // Molecular Weight
+  let q = MassOut; // Mass Flow Rate (kg/s)
+  let Pa = _Pressure(NozzleAltitude); // Ambient pressure used to calculate nozzle (Pa)
+  let Pe = _Pressure(Altitude); // Actual Atmospheric Pressure (Pa)
+  let Pt = Math.pow(Pc * (1 + (k - 1) / 2), -k / (k - 1)); // Throat Pressure (Pa)
+  let Tt = Tc / (1 + (k - 1) / 2); // Throat Temperature (k)
+  let At = (q / Pt) * Math.sqrt((Ru * Tt) / (Mw * k)); // Throat Area (m^2)
+  let Nm = Math.sqrt((2 / (k - 1)) * Math.pow(Pc / Pa, (k - 1) / k - 1)); // Mach Number
+  let Ae = (At / Nm) * Math.pow(1 + (((k - 1) / 2) * Math.pow(Nm, 2)) / ((k + 1) / 2), (k + 1) / (2 * (k - 1))); // Exit Nozzle Area (m^2)
   if (Ae > FuelArea) Ae = FuelArea;
-  var VeSub = ((2 * k) / (k - 1)) * ((Ru * Tc) / Mw) * Math.pow(1 - Pe / Pc, (k - 1) / k);
-  var Ve = Math.sqrt(VeSub); // Partical Exit Velocity (m/s)
+  let VeSub = ((2 * k) / (k - 1)) * ((Ru * Tc) / Mw) * Math.pow(1 - Pe / Pc, (k - 1) / k);
+  let Ve = Math.sqrt(VeSub); // Partical Exit Velocity (m/s)
   return q * Ve + (Pe - Pa) * Ae; // Thrust (N)
 };
-var _CoordinateCalculator = (CurrentLatitude: number, CurrentLongitude: number, TargetLatitude: number, TargetLongitude: number): [number[], number[], number, number, number[], number] => {
+export const _CoordinateCalculator = (CurrentLatitude: number, CurrentLongitude: number, TargetLatitude: number, TargetLongitude: number): [number[], number[], number, number, number[], number] => {
   // This function calculates the path of the rocket across the earth in terms of coordinates by using
   // great-circle equations. It will also calculate which direction will be the shortest distance to the
   // target and then calculate the distance across the surface of the earth to the target. There is only
@@ -2900,7 +2428,7 @@ var _CoordinateCalculator = (CurrentLatitude: number, CurrentLongitude: number, 
 
   return [EstLatList, EstLongList, (Alpha1 * 180) / Math.PI, ArcLength, EstDistanceList, GoalDistance];
 };
-var _IterationFun = (
+export const _IterationFun = (
   FuelArea: number,
   FuelMass: number,
   RocketArea: number,
@@ -3014,7 +2542,7 @@ var _IterationFun = (
 
   return [FuelMass, RocketMass, Tatm, Patm, AirDensity, c, M, cD, Thrust, DragForce, WeightForce, dr2dt, drdt, Altitude, Distance, ArcVelocity, ArcDistance, dtheta2dt, dthetadt];
 };
-var _Bisection = (
+export const _Bisection = (
   FuelArea1: number,
   FuelArea2: number,
   FuelMass: number,
@@ -3109,7 +2637,7 @@ var _Bisection = (
   AngleCoefficient = ACNew;
   return AngleCoefficient;
 };
-var _QuickRun = (
+export const _QuickRun = (
   FuelArea1: any,
   FuelArea2: any,
   FuelMass: number,
@@ -3259,5 +2787,462 @@ var _QuickRun = (
 
   return Distance;
 };
+
+const missileManager: any = {};
+missileManager.isLoaded = true;
+missileManager.lastMissileErrorType = '';
+missileManager.missilesInUse = 0;
+missileManager.lastMissileError = '';
+missileManager.RussianICBM = [
+  52 + 30 * 0.01666667,
+  82 + 45 * 0.01666667,
+  'Aleysk (SS-18)',
+  16000,
+  50 + 45 * 0.01666667,
+  59 + 30 * 0.01666667,
+  'Dombarovskiy (SS-18)',
+  16000,
+  55 + 20 * 0.01666667,
+  89 + 48 * 0.01666667,
+  'Uzhur (SS-18)',
+  16000,
+  53 + 58 * 0.01666667,
+  57 + 50 * 0.01666667,
+  'Kartaly (SS-18)',
+  16000,
+  52 + 19 * 0.01666667,
+  104 + 14 * 0.01666667,
+  'Irkutsk (SS-25)',
+  10500,
+  56 + 22 * 0.01666667,
+  95 + 28 * 0.01666667,
+  'Kansk (SS-25)',
+  10500,
+  54 + 2 * 0.01666667,
+  35 + 46 * 0.01666667,
+  'Kozel`sk (SS-19)',
+  10000,
+  56 + 22 * 0.01666667,
+  92 + 25 * 0.01666667,
+  'Krasnoyarsk (SS-25)',
+  10500,
+  58 + 4 * 0.01666667,
+  60 + 33 * 0.01666667,
+  'Nizhniy Tagil (SS-25)',
+  10500,
+  55 + 20 * 0.01666667,
+  83 + 0 * 0.01666667,
+  'Novosibirsk (SS-25)',
+  10500,
+  51 + 40 * 0.01666667,
+  45 + 34 * 0.01666667,
+  'Tatishchevo (SS-19)',
+  10000,
+  51 + 40 * 0.01666667,
+  45 + 34 * 0.01666667,
+  'Tatishchevo (SS-27)',
+  10500,
+  56 + 51 * 0.01666667,
+  40 + 32 * 0.01666667,
+  'Teykovo (SS-25)',
+  10500,
+  56 + 38 * 0.01666667,
+  47 + 51 * 0.01666667,
+  'Yoshkar Ola (SS-25)',
+  10500,
+  72.039545,
+  42.696683,
+  'Verkhoturye (SS-N-23A)',
+  8300,
+  73.902056,
+  3.133463,
+  'Ekaterinburg (SS-N-23A)',
+  8300,
+  76.502284,
+  -158.871984,
+  'Tula (SS-N-23A)',
+  8300,
+  82.25681,
+  -10.161045,
+  'Bryansk (SS-N-23A)',
+  8300,
+  81.564646,
+  32.553796,
+  'Karelia (SS-N-23A)',
+  8300,
+  74.67366,
+  6.538173,
+  'Novomoskovsk (SS-N-23A)',
+  8300,
+  71.920763,
+  41.039876,
+  'Borei Sub (Bulava)',
+  9300, // Sub
+  71.920763,
+  41.039876,
+  'Delta IV Sub (Sineva)',
+  8300, // Sub
+  71.920763,
+  41.039876,
+  'Delta IV Sub (Layner)',
+  12000, // Sub
+];
+missileManager.ChinaICBM = [
+  32.997534,
+  112.537904,
+  'Nanyang (DF-31)',
+  8000,
+  36.621398,
+  101.773908,
+  'Xining (DF-31)',
+  8000,
+  37.797257,
+  97.079547,
+  'Delingha (DF-31A)',
+  11000,
+  37.07045,
+  100.805779,
+  'Haiyan (DF-31A)',
+  11000,
+  40.079969,
+  113.29994,
+  'Datong (DF-31A)',
+  11000,
+  34.583156,
+  105.724525,
+  'Tainshui (DF-31A)',
+  11000,
+  38.552936,
+  106.020538,
+  'Xixia (DF-31A)',
+  11000,
+  27.242253,
+  111.465223,
+  'Shaoyang (DF-31A)',
+  11000,
+  24.34658,
+  102.527838,
+  'Yuxi (DF-31A)',
+  11000,
+  34.345845,
+  111.491062,
+  'Luoyang (DF-5A/B)',
+  13000,
+  38.917086,
+  111.847057,
+  'Wuzhai (DF-5A/B)',
+  13000,
+  40.615707,
+  115.107604,
+  'Xuanhua (DF-5A/B)',
+  13000,
+  26.163848,
+  109.790408,
+  'Tongdao (DF-5A/B)',
+  13000,
+  34.061291,
+  111.054379,
+  'Lushi (DF-5A/B)',
+  13000,
+  30.691542,
+  118.437169,
+  'Jingxian (DF-5A/B)',
+  13000,
+  37.707532,
+  116.271994,
+  'Jingxian (DF-5A/B)',
+  13000,
+  27.415932,
+  111.792471,
+  'Hunan (DF-5A/B)',
+  13000,
+  46.585153,
+  125.104037,
+  'Daqing City (DF-41)',
+  13500,
+  32.154153,
+  114.099875,
+  'Xinyang City (DF-41)',
+  13500,
+  40.4417,
+  85.530745,
+  'Xinjiang Province (DF-41)',
+  13500,
+  31.271257,
+  88.699152,
+  'Tibet Province (DF-41)',
+  13500,
+  29.573548,
+  122.923151,
+  'Type 092 Sub (JL-2)',
+  8000,
+];
+missileManager.NorthKoreanBM = [40.0, 128.3, 'Sinpo Sub (Pukkŭksŏng-1)', 2500, 40.019, 128.193, 'Sinpo (KN-14)', 8000, 39.365, 126.165, 'P`yong`an (KN-20)', 10000, 39.046, 125.667, 'Pyongyang (KN-22)', 13000];
+missileManager.UsaICBM = [
+  48.420079,
+  -101.33356,
+  'Ohio Sub (Trident II)',
+  12000,
+  48.420079,
+  -101.33356,
+  'Minot (Minuteman III)',
+  13000,
+  47.505958,
+  -111.181776,
+  'Malmstrom (Minuteman III)',
+  13000,
+  41.149931,
+  -104.860645,
+  'F.E. Warren (Minuteman III)',
+  13000,
+];
+missileManager.FraSLBM = [
+  47.878,
+  -4.263,
+  'Triomphant Sub (M51)',
+  10000, // Custom Lat/Lon Replaced
+  47.878,
+  -4.263,
+  'Triomphant Sub (M51)',
+  10000,
+];
+missileManager.ukSLBM = [56.066111, -4.8175, 'Vanguard Sub (Trident II)', 12000, 56.066111, -4.8175, 'HMNB Clyde (Trident II)', 12000];
+missileManager.globalBMTargets = [
+  38.951,
+  -77.013,
+  'Washington DC',
+  40.679,
+  -73.947,
+  'New York City',
+  34.073,
+  -118.248,
+  'Los Angeles',
+  41.877,
+  -87.622,
+  'Chicago',
+  42.361,
+  -71.058,
+  'Boston',
+  47.749,
+  -122.317,
+  'Seattle',
+  25.784,
+  -80.196,
+  'Miami',
+  32.828,
+  -96.759,
+  'Dallas',
+  38.765,
+  -104.837,
+  'Colorado Springs',
+  41.33,
+  -96.054,
+  'Omaha',
+  19.832,
+  -155.491,
+  'Hawaii',
+  13.588,
+  144.922,
+  'Guam',
+  51.50634,
+  -0.097485,
+  'London',
+  48.874195,
+  2.378987,
+  'Paris',
+  24.503,
+  -66.127,
+  'French Caribean',
+  40.449889,
+  -3.717309,
+  'Madrid',
+  41.931955,
+  12.520198,
+  'Rome',
+  52.501746,
+  13.416486,
+  'Berlin',
+  43.706946,
+  -79.423854,
+  'Toronto',
+  55.750246,
+  37.691525,
+  'Moscow',
+  59.887535,
+  30.38409,
+  'St. Petersburg',
+  55.017165,
+  82.965879,
+  'Novosibirsk',
+  39.974338,
+  116.396057,
+  'Beijing',
+  39.044051,
+  125.735244,
+  'Pyongyang',
+];
+
+// Settings
+// var maxChineseMissiles = 252;
+// var maxUSAMissiles = 350;
+// var maxRussianMissiles = 400;
+// var maxNorthKoreanMissiles = 30;
+
+// Internal Variables
+/*
+  var USATargets = [
+    40.679,
+    -73.947, // NYC NY
+    42.361,
+    -71.058, // Boston MA
+    41.755,
+    -70.539, // Cape Cod MA
+    41.763,
+    -72.684, // Hartford CT
+    42.101,
+    -72.59, // Springfield MA
+    39.408,
+    -74.441, // Atlantic City NJ
+    39.191,
+    -75.534, // Dover DE
+    39.331,
+    -76.671, // Baltimore MD
+    38.951,
+    -77.013, // Washington DC
+    37.608,
+    -77.378, // Richmond VA (10)
+    42.36,
+    -83.048, // Detriot MI
+    39.844,
+    -86.172, // Indianapolis IN
+    40.008,
+    -83.0, // Columbus OH
+    40.538,
+    -79.934, // Pittsburgh PA
+    40.034,
+    -75.131, // Philadelphia PA
+    47.749,
+    -122.317, // Seattle WA
+    45.7,
+    -122.581, // Portland OR
+    47.732,
+    -117.389, // Spokane WA
+    37.889,
+    -122.562, // San Francisco CA
+    36.257,
+    -115.159, // Las Vegas NV (20)
+    48.034,
+    -101.295, // Minot ND
+    49.134,
+    -101.495, // Minot ND
+    48.234,
+    -100.295, // Minot ND
+    48.334,
+    -101.095, // Minot ND
+    48.434,
+    -101.295, // Minot ND
+    47.948,
+    -97.027, // Grand Forks ND
+    45.107,
+    -93.306, // Minneapolis MN
+    47.092,
+    -110.334, // Grand Falls MO
+    47.292,
+    -111.834, // Grand Falls MO
+    47.592,
+    -111.934, // Grand Falls MO (30)
+    46.792,
+    -111.334, // Grand Falls MO
+    47.992,
+    -111.534, // Grand Falls MO
+    47.792,
+    -110.734, // Grand Falls MO
+    48.592,
+    -111.534, // Grand Falls MO
+    47.292,
+    -111.334, // Grand Falls MO
+    46.092,
+    -111.134, // Grand Falls MO
+    47.592,
+    -110.034, // Grand Falls MO
+    40.21,
+    -104.811, // Cheyene WY
+    41.51,
+    -105.811, // Cheyene WY
+    41.21,
+    -104.211, // Cheyene WY (40)
+    40.51,
+    -104.211, // Cheyene WY
+    41.21,
+    -105.611, // Cheyene WY
+    41.51,
+    -104.611, // Cheyene WY
+    41.21,
+    -103.011, // Cheyene WY
+    42.21,
+    -104.011, // Cheyene WY
+    41.91,
+    -104.811, // Cheyene WY
+    41.91,
+    -104.811, // Cheyene WY
+    34.048,
+    -118.28, // Las Angeles CA
+    19.832,
+    -155.491, // Hawaii
+    13.588,
+    144.922, // Guam (50)
+    36.318,
+    -86.718, // Nashville TN
+    32.782,
+    -97.343, // Forth Worth TX
+    32.584,
+    -99.707, // Abilene TX
+    35.208,
+    -101.837, // Amarillo TX
+    35.188,
+    -106.595, // Albuquerque NM
+    33.603,
+    -111.965, // Phoenix AZ
+    38.765,
+    -104.837, // Colorado Springs CO
+    38.737,
+    -104.883, // Cheyenne Moutain CO
+    39.847,
+    -104.902, // Denver CO
+    40.684,
+    -105.059, // Fort Collins CO (60)
+    40.852,
+    -111.827, // Salt Lake City UT
+    61.343,
+    -150.187, // Anchorage AK
+    64.94,
+    -147.881, // Fairbanks AK
+    58.488,
+    -134.238, // Juneau AK
+    30.46,
+    -86.549, // Eglin AFB FL
+    41.33,
+    -96.054, // Omaha NE
+    39.113276,
+    -121.356137, // Beale AFB
+    64.303735,
+    -149.148768, // Clear AFS
+    76.534322,
+    -68.718288, // Thule AFB
+    41.875523,
+    -87.634038, // Chicago IL
+    35.145865,
+    -89.979153, // Memphis TN
+    43.663448,
+    -70.278127, // Portland MA
+    43.612156,
+    -116.231845, // Boise ID
+  ];
+*/
+missileManager.missileArray = missileArray;
+missileManager.clearMissiles = clearMissiles;
+missileManager.Missile = Missile;
+missileManager.MassRaidPre = MassRaidPre;
+missileManager.getMissileTEARR = getMissileTEARR;
 
 export { missileManager };

@@ -878,8 +878,8 @@ class Camera {
     if ((this.isDragging && !settingsManager.isMobileModeEnabled) || (this.isDragging && settingsManager.isMobileModeEnabled && (this.mouseX !== 0 || this.mouseY !== 0))) {
       // Disable Raycasting for Performance
       // dragTarget = getEarthScreenPoint(mouseX, mouseY)
-      // if (isNaN(dragTarget[0]) || isNaN(dragTarget[1]) || isNaN(dragTarget[2]) ||
-      // isNaN(dragPoint[0]) || isNaN(dragPoint[1]) || isNaN(dragPoint[2]) ||
+      // if (Number.isNaN(dragTarget[0]) || Number.isNaN(dragTarget[1]) || Number.isNaN(dragTarget[2]) ||
+      // Number.isNaN(dragPoint[0]) || Number.isNaN(dragPoint[1]) || Number.isNaN(dragPoint[2]) ||
       if (!this.#isRayCastingEarth || this.cameraType.current === this.cameraType.fps || this.cameraType.current === this.cameraType.satellite || this.cameraType.current === this.cameraType.astronomy || settingsManager.isMobileModeEnabled) {
         // random screen drag
         this.xDif = this.screenDragPoint[0] - this.mouseX;
@@ -1042,7 +1042,7 @@ class Camera {
        * For FPS style movement rotate the camera and then translate it
        * for traditional view, move the camera and then rotate it
        */
-      if (isNaN(this.camPitch) || isNaN(this.camYaw) || isNaN(this.#camPitchTarget) || isNaN(this.#camYawTarget) || isNaN(this.zoomLevel) || isNaN(this.zoomTarget)) {
+      if (Number.isNaN(this.camPitch) || Number.isNaN(this.camYaw) || Number.isNaN(this.#camPitchTarget) || Number.isNaN(this.#camYawTarget) || Number.isNaN(this.zoomLevel) || Number.isNaN(this.zoomTarget)) {
         try {
           console.group('Camera Math Error');
           console.log(`camPitch: ${this.camPitch}`);

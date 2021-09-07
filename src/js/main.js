@@ -30,11 +30,14 @@ import '@app/js/api/externalApi';
 import 'jquery-ui-bundle';
 import 'materialize-css';
 import '@app/css/astroux/css/astro.css';
+
 import { LineFactory, sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
+
 import $ from 'jquery';
 import { Camera } from '@app/js/cameraManager/camera.js';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
+import { Dots } from '@app/js/drawManager/dots';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
 import { VERSION } from '@app/js/settingsManager/version.js';
 import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
@@ -50,32 +53,6 @@ import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
 import { starManager } from '@app/js/starManager/starManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager';
-
-// Upodate the version number and date
-settingsManager.versionNumber = VERSION;
-settingsManager.versionDate = VERSION_DATE;
-
-// Import CSS needed for loading screen
-(async () => {
-  try {
-    if (!settingsManager.disableUI) {
-      import('@app/css/fonts.css').then((resp) => resp);
-      import('@app/css/materialize.css').then((resp) => resp);
-      import('@app/css/materialize-local.css').then((resp) => resp);
-      import('@app/js/lib/external/colorPick.css').then((resp) => resp);
-      import('@app/css/perfect-scrollbar.min.css').then((resp) => resp);
-      import('@app/css/jquery-ui.min.css').then((resp) => resp);
-      import('@app/css/jquery-ui-timepicker-addon.css').then((resp) => resp);
-      import('@app/css/style.css').then(await import('@app/css/responsive.css').then((resp) => resp));
-    } else if (settingsManager.enableLimitedUI) {
-      import('@app/css/limitedUI.css').then((resp) => resp);
-    } else {
-      // console.log('ERROR');
-    }
-  } catch (e) {
-    console.error(e);
-  }
-})();
 
 const keepTrackApi = window.keepTrackApi;
 keepTrackApi.programs = {
@@ -98,7 +75,7 @@ keepTrackApi.programs = {
   uiInput: uiInput,
 };
 
-(function redirectHttpToHttps() {
+export const redirectHttpToHttps = () => {
   // This is necessary for some of the geolocation based functions
   // but it only runs on the main website
   if (window.location.protocol === 'http:' && (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space')) {
@@ -106,14 +83,33 @@ keepTrackApi.programs = {
     var httpsURL = 'https://' + httpURL;
     window.location = httpsURL;
   }
-})();
+};
+
+export const showErrorCode = (error) => {
+  let errorHtml = '';
+  if (error?.message) {
+    errorHtml += error.message + '<br>';
+  }
+  if (error?.lineNumber) {
+    errorHtml += 'Line: ' + error.lineNumber + '<br>';
+  }
+  if (error?.stack) {
+    errorHtml += error.stack + '<br>';
+  }
+  $('#loader-text').html(errorHtml);
+  console.warn(error);
+};
 
 export const initalizeKeepTrack = async () => {
   try {
     uiManager.loadStr('science');
     // Load all the plugins now that we have the API initialized
-    await import('@app/js/plugins/core').then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins));
-    await import('@app/js/plugins/plugins').then((mod) => mod.loadExtraPlugins());
+    await import('@app/js/plugins/core')
+      .then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins))
+      .catch((err) => console.log(err));
+    await import('@app/js/plugins/plugins')
+      .then((mod) => mod.loadExtraPlugins())
+      .catch((err) => console.log(err));
 
     uiManager.loadStr('science2');
     // Start initializing the rest of the website
@@ -136,7 +132,7 @@ export const initalizeKeepTrack = async () => {
 
     drawManager.loadScene();
 
-    const dotsManager = await drawManager.createDotsManager();
+    const dotsManager = await drawManager.createDotsManager(Dots);
     keepTrackApi.programs.dotsManager = dotsManager;
 
     await satSet.init();
@@ -181,17 +177,59 @@ export const initalizeKeepTrack = async () => {
     // Update any CSS now that we know what is loaded
     keepTrackApi.methods.uiManagerFinal();
   } catch (error) {
-    let errorHtml = '';
-    errorHtml += error.message + '<br>';
-    if (error.lineNumber) {
-      errorHtml += 'Line: ' + error.lineNumber + '<br>';
-    }
-    if (error.stack) {
-      errorHtml += error.stack + '<br>';
-    }
-    $('#loader-text').html(errorHtml);
-    console.warn(error);
+    showErrorCode(error);
   }
 };
 
+// Upodate the version number and date
+settingsManager.versionNumber = VERSION;
+settingsManager.versionDate = VERSION_DATE;
+
+// Import CSS needed for loading screen
+(async () => {
+  try {
+    if (!settingsManager.disableUI) {
+      import('@app/css/fonts.css')
+        .then((resp) => resp)
+        .catch((err) => console.log(err));
+      import('@app/css/materialize.css')
+        .then((resp) => resp)
+        .catch((err) => console.log(err));
+      import('@app/css/materialize-local.css')
+        .then((resp) => resp)
+        .catch((err) => console.log(err));
+      import('@app/js/lib/external/colorPick.css')
+        .then((resp) => resp)
+        .catch((err) => console.log(err));
+      import('@app/css/perfect-scrollbar.min.css')
+        .then((resp) => resp)
+        .catch((err) => console.log(err));
+      import('@app/css/jquery-ui.min.css')
+        .then((resp) => resp)
+        .catch((err) => console.log(err));
+      import('@app/css/jquery-ui-timepicker-addon.css')
+        .then((resp) => resp)
+        .catch((err) => console.log(err));
+      import('@app/css/style.css')
+        .then(
+          await import('@app/css/responsive.css')
+            .catch((err) => console.log(err))
+            .then((resp) => resp)
+        )
+        .catch((err) => console.log(err));
+    } else if (settingsManager.enableLimitedUI) {
+      import('@app/css/limitedUI.css')
+        .then((resp) => resp)
+        .catch((err) => console.log(err));
+    } else {
+      // console.log('ERROR');
+    }
+  } catch (e) {
+    console.error(e);
+  }
+})();
+
+// Force HTTPS on main website
+redirectHttpToHttps();
+// Load the main website
 jQAlt.docReady(initalizeKeepTrack);

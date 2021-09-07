@@ -377,20 +377,32 @@ export const init = (): void => {
       uiManager.updateNextPassOverlay();
 
       if (watchlistList.length <= 0) return;
-      for (let i = 0; i < watchlistList.length; i++) {
-        var sat = satSet.getSat(watchlistList[i]);
-        if (sat.inview === 1 && watchlistInViewList[i] === false) {
-          // Is inview and wasn't previously
-          watchlistInViewList[i] = true;
-          uiManager.toast(`Satellite ${sat.SCC_NUM} is In Field of View!`, 'normal');
-          keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getIdFromSensorName(sensorManager.currentSensor.name)], 'g');
-          orbitManager.addInViewOrbit(watchlistList[i]);
-        }
-        if (sat.inview === 0 && watchlistInViewList[i] === true) {
-          // Isn't inview and was previously
-          watchlistInViewList[i] = false;
-          uiManager.toast(`Satellite ${sat.SCC_NUM} left Field of View!`, 'standby');
-          orbitManager.removeInViewOrbit(watchlistList[i]);
+        for (let i = 0; i < watchlistList.length; i++) {
+          var sat = satSet.getSat(watchlistList[i]);
+          if (sensorManager.currentSensorMultiSensor) {
+            orbitManager.removeInViewOrbit(watchlistList[i]);
+            for (let j = 0; j < sensorManager.currentSensorList.length; j++) {
+              const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+              const sensor = sensorManager.currentSensorList[j];
+              const rae = satellite.getRae(timeManager.dateObject, satrec, sensor);
+              const isInFov = satellite.checkIsInFOV(sensor, rae); 
+              if (!isInFov) continue;
+              keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getIdFromSensorName(sensor.name)], 'g');
+            }
+          } else {
+          if (sat.inview === 1 && watchlistInViewList[i] === false) {
+            // Is inview and wasn't previously
+            watchlistInViewList[i] = true;
+            uiManager.toast(`Satellite ${sat.SCC_NUM} is In Field of View!`, 'normal');          
+            keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getIdFromSensorName(sensorManager.currentSensor.name)], 'g');          
+            orbitManager.addInViewOrbit(watchlistList[i]);
+          }
+          if (sat.inview === 0 && watchlistInViewList[i] === true) {
+            // Isn't inview and was previously
+            watchlistInViewList[i] = false;
+            uiManager.toast(`Satellite ${sat.SCC_NUM} left Field of View!`, 'standby');
+            orbitManager.removeInViewOrbit(watchlistList[i]);
+          }
         }
       }
       for (let i = 0; i < watchlistInViewList.length; i++) {

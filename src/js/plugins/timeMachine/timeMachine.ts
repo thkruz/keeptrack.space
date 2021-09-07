@@ -50,7 +50,7 @@ export const init = (): void => {
           // Merge to one variable?
           orbitManager.isTimeMachineRunning = true;
           orbitManager.isTimeMachineVisible = true;
-          $('#menu-time-machine').addClass('bmenu-item-selected');
+          $('#menu-time-machine').addClass('bmenu-item-selected');          
           orbitManager.historyOfSatellitesPlay();
           return;
         }
@@ -64,7 +64,7 @@ export const init = (): void => {
     cb: (): void => {
       const groupsManager = keepTrackApi.programs.groupsManager;
       orbitManager.playNextSatellite = (runCount: number, year: number) => {
-        if (!orbitManager.isTimeMachineVisible) return;
+        if (!keepTrackApi.programs.orbitManager.isTimeMachineVisible) return;
         // Kill all old async calls if run count updates
         if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
         let yearGroup = groupsManager.createGroup('yearOrLess', year);

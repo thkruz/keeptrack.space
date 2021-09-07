@@ -18,7 +18,7 @@ import { stringPad } from '@app/js/lib/helpers';
  *
  *  If all files are missing, the function will return an error.
  */
-const catalogLoader = async (): Promise<any> => {
+export const catalogLoader = async (): Promise<any> => {
   const settingsManager: any = window.settingsManager;
   // let extraSats: any;
 
@@ -63,7 +63,7 @@ const catalogLoader = async (): Promise<any> => {
 };
 
 // Parse the Catalog from satSet.loadCatalog and then return it back -- they are chained together!
-const parseCatalog = (resp: any, extraSats: any, asciiCatalog: any) => {
+export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any) => {
   const {satSet, objectManager} = keepTrackApi.programs;
   const settingsManager: any = window.settingsManager;
 
@@ -93,8 +93,7 @@ const parseCatalog = (resp: any, extraSats: any, asciiCatalog: any) => {
   }
 };
 
-var limitSats = (<any>settingsManager).limitSats;
-const setupGetVariables = () => {
+export const setupGetVariables = () => {
   const { satSet, timeManager } = keepTrackApi.programs;
   var obslatitude;
   var obslongitude;
@@ -115,7 +114,7 @@ const setupGetVariables = () => {
     var val = params[i].split('=')[1];
     switch (key) {
       case 'limitSats':
-        limitSats = val;
+        (<any>settingsManager).limitSats = val;
         $('#limitSats').val(val);
         // document.getElementById('settings-limitSats-enabled').checked = true;
         $('#limitSats-Label').addClass('active');
@@ -142,15 +141,16 @@ const setupGetVariables = () => {
   return limitSatsArray;
 };
 
-const filterTLEDatabase = (resp: string | any[], limitSatsArray: string | any[], extraSats: string | any[], asciiCatalog: string | any[]) => {
+export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string | any[], extraSats?: string | any[], asciiCatalog?: string | any[]) => {
   const { dotsManager, objectManager, satSet } = keepTrackApi.programs;
   
   var tempSatData = [];
   satSet.sccIndex = {};
   satSet.cosparIndex = {};
-  if (limitSatsArray[0] == null) {
+
+  if (typeof limitSatsArray === 'undefined' || limitSatsArray.length == 0 || limitSatsArray[0] == null) {
     // If there are no limits then just process like normal
-    limitSats = '';
+    (<any>settingsManager).limitSats = '';
   }
 
   var year;
@@ -160,7 +160,7 @@ const filterTLEDatabase = (resp: string | any[], limitSatsArray: string | any[],
   let i = 0;
   for (i = 0; i < resp.length; i++) {
     resp[i].SCC_NUM = stringPad.pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
-    if (limitSats === '') {
+    if ((<any>settingsManager).limitSats === '') {
       // If there are no limits then just process like normal
       year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
       if (year === '') {
@@ -302,12 +302,14 @@ const filterTLEDatabase = (resp: string | any[], limitSatsArray: string | any[],
 
   if ((<any>settingsManager).isExtraSatellitesAdded) {
     $('.legend-pink-box').show();
-    $('.legend-trusat-box')[1].parentElement.style.display = '';
-    $('.legend-trusat-box')[2].parentElement.style.display = '';
-    $('.legend-trusat-box')[3].parentElement.style.display = '';
-    $('.legend-trusat-box')[1].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
-    $('.legend-trusat-box')[2].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
-    $('.legend-trusat-box')[3].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
+    if (typeof process === 'undefined') {
+      $('.legend-trusat-box')[1].parentElement.style.display = '';
+      $('.legend-trusat-box')[2].parentElement.style.display = '';
+      $('.legend-trusat-box')[3].parentElement.style.display = '';
+      $('.legend-trusat-box')[1].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
+      $('.legend-trusat-box')[2].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
+      $('.legend-trusat-box')[3].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
+    }    
   }
 
   satSet.orbitalSats = tempSatData.length;

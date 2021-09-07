@@ -179,13 +179,28 @@ satellite.setobs = (sensor) => {
       $('#menu-astronomy').removeClass('bmenu-item-disabled');
       $('.sensor-reset-menu').show();
     }
-    sensorManager.setCurrentSensor(sensor);
-    sensorManager.currentSensor.observerGd = {
-      // Array to calculate look angles in propagate()
-      lat: sensor.lat * DEG2RAD,
-      lon: sensor.lon * DEG2RAD,
-      alt: parseFloat(sensor.alt), // Converts from string to number
-    };
+
+    if (sensor.length > 1) {
+      sensorManager.setCurrentSensor(sensor[0]);
+      sensorManager.currentSensorList = sensor;
+      sensorManager.currentSensorMultiSensor = true;
+      sensorManager.currentSensor.observerGd = {
+        // Array to calculate look angles in propagate()
+        lat: sensor[0].lat * DEG2RAD,
+        lon: sensor[0].lon * DEG2RAD,
+        alt: parseFloat(sensor[0].alt), // Converts from string to number
+      };
+    } else {
+      sensorManager.setCurrentSensor(sensor);
+      sensorManager.currentSensorList = [sensor];
+      sensorManager.currentSensorMultiSensor = true;
+      sensorManager.currentSensor.observerGd = {
+        // Array to calculate look angles in propagate()
+        lat: sensor.lat * DEG2RAD,
+        lon: sensor.lon * DEG2RAD,
+        alt: parseFloat(sensor.alt), // Converts from string to number
+      };
+    }
   } catch (error) {
     console.warn(error);
   }
@@ -1640,6 +1655,7 @@ satellite.getRae = (now, satrec, sensor) => {
   }
 
   let positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
+  sensor.observerGd = sensor.observerGd || { lat: sensor.lat * DEG2RAD, lon: sensor.lon * DEG2RAD, alt: sensor.alt };
   let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
   let az = lookAngles.az * RAD2DEG;
   let el = lookAngles.el * RAD2DEG;

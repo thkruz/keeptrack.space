@@ -105,7 +105,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
       sensor: allSSNSensors,
       multiSensor: true,
     });
-    satellite.setobs(sensorManager.sensorList.COD);
+    satellite.setobs(allSSNSensors);
     objectManager.setSelectedSat(-1);
     setColorScheme(settingsManager.currentColorScheme, true);
     // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
@@ -172,7 +172,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
       sensor: natoMWSensors,
       multiSensor: true,
     });
-    satellite.setobs(sensorManager.sensorList.COD);
+    satellite.setobs(sensorManager.natoMWSensors);
     objectManager.setSelectedSat(-1);
     setColorScheme(settingsManager.currentColorScheme, true);
     // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);

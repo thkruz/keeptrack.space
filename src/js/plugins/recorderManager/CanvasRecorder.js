@@ -64,47 +64,51 @@ export class CanvasRecorder {
       let selectCapture = new Promise(function (resolve, reject) {
         resolve(startCapture());
       });
-      selectCapture.then(function startRecording(srcObject) {
-        if (srcObject == false) return;
-        isVideoRecording = true;
-        $('#menu-record').addClass('bmenu-item-selected');
-        let stream = srcObject;
-        video.srcObject = srcObject;
-        let types = ['video/webm', 'video/webm,codecs=vp9', 'video/vp8', 'video/webm;codecs=vp8', 'video/webm;codecs=daala', 'video/webm;codecs=h264', 'video/mpeg'];
+      selectCapture
+        .then(function startRecording(srcObject) {
+          if (srcObject == false) return;
+          isVideoRecording = true;
+          $('#menu-record').addClass('bmenu-item-selected');
+          let stream = srcObject;
+          video.srcObject = srcObject;
+          let types = ['video/webm', 'video/webm,codecs=vp9', 'video/vp8', 'video/webm;codecs=vp8', 'video/webm;codecs=daala', 'video/webm;codecs=h264', 'video/mpeg'];
 
-        for (let i in types) {
-          if (MediaRecorder.isTypeSupported(types[i])) {
-            supportedType = types[i];
-            break;
+          for (let i in types) {
+            if (MediaRecorder.isTypeSupported(types[i])) {
+              supportedType = types[i];
+              break;
+            }
           }
-        }
-        if (supportedType == null) {
-          console.log('No supported type found for MediaRecorder');
-        }
-        let options = {
-          mimeType: supportedType,
-          videoBitsPerSecond: videoBitsPerSec || 10000000, // 10.0Mbps
-          // videoBitsPerSecond: videoBitsPerSec || 5000000 // 5.0Mbps
-          // videoBitsPerSecond: videoBitsPerSec || 2500000 // 2.5Mbps
-        };
+          if (supportedType == null) {
+            console.log('No supported type found for MediaRecorder');
+          }
+          let options = {
+            mimeType: supportedType,
+            videoBitsPerSecond: videoBitsPerSec || 10000000, // 10.0Mbps
+            // videoBitsPerSecond: videoBitsPerSec || 5000000 // 5.0Mbps
+            // videoBitsPerSecond: videoBitsPerSec || 2500000 // 2.5Mbps
+          };
 
-        recordedBlobs = [];
-        try {
-          mediaRecorder = new MediaRecorder(stream, options);
-        } catch (e) {
-          // alert('MediaRecorder is not supported by this browser.');
-          isVideoRecording = false;
-          $('#menu-record').removeClass('bmenu-item-selected');
-          console.warn('Exception while creating MediaRecorder:', e);
-          return;
-        }
+          recordedBlobs = [];
+          try {
+            mediaRecorder = new MediaRecorder(stream, options);
+          } catch (e) {
+            // alert('MediaRecorder is not supported by this browser.');
+            isVideoRecording = false;
+            $('#menu-record').removeClass('bmenu-item-selected');
+            console.warn('Exception while creating MediaRecorder:', e);
+            return;
+          }
 
-        console.log('Created MediaRecorder', mediaRecorder, 'with options', options);
-        mediaRecorder.onstop = handleStop;
-        mediaRecorder.ondataavailable = handleDataAvailable;
-        mediaRecorder.start(100); // collect 100ms of data blobs
-        console.log('MediaRecorder started', mediaRecorder);
-      });
+          console.log('Created MediaRecorder', mediaRecorder, 'with options', options);
+          mediaRecorder.onstop = handleStop;
+          mediaRecorder.ondataavailable = handleDataAvailable;
+          mediaRecorder.start(100); // collect 100ms of data blobs
+          console.log('MediaRecorder started', mediaRecorder);
+        })
+        .catch((err) => {
+          console.warn('Error:' + err);
+        });
     };
 
     const handleDataAvailable = (event) => {

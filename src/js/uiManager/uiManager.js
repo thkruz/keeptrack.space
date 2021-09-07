@@ -78,6 +78,7 @@ uiManager.init = () => {
 
   // Register all UI callback functions with drawLoop in main.js
   // These run during the draw loop
+  // TODO: Move DrawLoopCallback logic to the API so that plugins can use it too!
   drawManager.setDrawLoopCallback(function () {
     // _showSatTest();
     _updateSelectBox();
@@ -540,9 +541,13 @@ uiManager.legendColorsChange = function () {
   if (settingsManager.trusatMode || settingsManager.isExtraSatellitesAdded) {
     $('.legend-trusat-box').css('background', rgbCss(settingsManager.colors.trusat));
   } else {
-    $('.legend-trusat-box')[1].parentElement.style.display = 'none';
-    $('.legend-trusat-box')[2].parentElement.style.display = 'none';
-    $('.legend-trusat-box')[3].parentElement.style.display = 'none';
+    try {
+      $('.legend-trusat-box')[1].parentElement.style.display = 'none';
+      $('.legend-trusat-box')[2].parentElement.style.display = 'none';
+      $('.legend-trusat-box')[3].parentElement.style.display = 'none';
+    } catch {
+      // do nothing
+    }
   }
   $('.legend-velocityFast-box').css('background', rgbCss([0.75, 0.75, 0, 1]));
   $('.legend-velocityMed-box').css('background', rgbCss([0.75, 0.25, 0, 1]));

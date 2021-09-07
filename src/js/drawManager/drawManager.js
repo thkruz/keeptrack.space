@@ -1,8 +1,9 @@
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins/selectSatManager/selectSatManager.js';
 import { satScreenPositionArray, satSet } from '@app/js/satSet/satSet.js';
+
 import { Camera } from '@app/js/cameraManager/camera.js';
-import { Dots } from '@app/js/drawManager/dots.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { meshManager } from '@app/js/drawManager/meshManager.js';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
@@ -44,7 +45,7 @@ var drawManager = {
 };
 
 let groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager;
-drawManager.init = () => {
+export const init = () => {
   uiInput = keepTrackApi.programs.uiInput;
   starManager = keepTrackApi.programs.starManager;
   satellite = keepTrackApi.programs.satellite;
@@ -80,13 +81,12 @@ if (typeof process !== 'undefined') {
   drawManager.canvas = document.getElementById('keeptrack-canvas');
 }
 
-
-drawManager.glInit = async () => {
+export const glInit = async () => {
   // Ensure the canvas is available
   if (drawManager.canvas === null) {
     throw new Error(`The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.`);
   }
-  
+
   // Try to prevent crashes
   drawManager.canvas.addEventListener('webglcontextlost', (e) => {
     console.debug(e);
@@ -137,12 +137,15 @@ drawManager.glInit = async () => {
   return gl;
 };
 
-drawManager.createDotsManager = () => {
+export const createDotsManager = (Dots, gl) => {
+  gl ??= drawManager.gl; // use the global gl if not passed in
+  if (typeof gl === 'undefined') throw new Error('gl is undefined');
+
   drawManager.dotsManager = new Dots(drawManager.gl);
   return drawManager.dotsManager;
 };
 
-drawManager.loadScene = async () => {
+export const loadScene = async () => {
   const gl = drawManager.gl;
   // Make this public
   drawManager.sceneManager = sceneManager;
@@ -159,7 +162,7 @@ drawManager.loadScene = async () => {
   }
 };
 
-drawManager.resizeCanvas = () => {
+export const resizeCanvas = () => {
   // Using minimum allows the canvas to be full screen without fighting with scrollbars
   let cw = document.documentElement.clientWidth || 0;
   let iw = window.innerWidth || 0;
@@ -206,7 +209,7 @@ drawManager.resizeCanvas = () => {
   if (typeof dotsManager !== 'undefined') dotsManager.createPickingProgram(drawManager.gl);
 };
 
-drawManager.calculatePMatrix = (settingsManager) => {
+export const calculatePMatrix = (settingsManager) => {
   drawManager.pMatrix = glm.mat4.create();
   glm.mat4.perspective(drawManager.pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
 
@@ -215,7 +218,7 @@ drawManager.calculatePMatrix = (settingsManager) => {
   glm.mat4.mul(drawManager.pMatrix, drawManager.pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
 };
 
-drawManager.startWithOrbits = async () => {
+export const startWithOrbits = async () => {
   if (settingsManager.startWithOrbitsDisplayed) {
     // All Orbits
     groupsManager.debris = groupsManager.createGroup('all', '');
@@ -226,7 +229,7 @@ drawManager.startWithOrbits = async () => {
   }
 };
 
-drawManager.drawLoop = (preciseDt) => {
+export const drawLoop = (preciseDt) => {
   // Restart the draw loop when ready to draw again
   requestAnimationFrame(drawManager.drawLoop);
   // if (drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) return;
@@ -258,7 +261,7 @@ drawManager.drawLoop = (preciseDt) => {
   // Actually draw things now that math is done
   // PERFORMANCE: 0.0337ms
   // drawManager.resizeCanvas();
-  drawManager.clearFrameBuffers();
+  drawManager.clearFrameBuffers(drawManager.gl, dotsManager.pickingFrameBuffer, sceneManager.sun.godraysFrameBuffer);
 
   // Sun, Moon, and Atmosphere
   // PERFORMANCE: 0.106 ms
@@ -357,7 +360,7 @@ drawManager.drawLoop = (preciseDt) => {
   if (settingsManager.screenshotMode) drawManager.screenShot();
 };
 
-drawManager.updateLoop = () => {
+export const updateLoop = () => {
   // Calculate changes related to satellites objects
   drawManager.satCalculate();
 
@@ -380,10 +383,10 @@ drawManager.updateLoop = () => {
   keepTrackApi.methods.updateLoop();
 };
 
-drawManager.drawOptionalScenery = () => {
+export const drawOptionalScenery = () => {
   if (1000 / timeManager.dt > settingsManager.fpsThrottle1) {
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
-      if (drawManager.isPostProcessingResizeNeeded) drawManager.resizePostProcessingTexture(sceneManager.sun);
+      if (drawManager.isPostProcessingResizeNeeded) drawManager.resizePostProcessingTexture(drawManager.gl, sceneManager.sun, drawManager.postProcessingManager);
       // Draw the Sun to the Godrays Frame Buffer
       sceneManager.sun.draw(drawManager.pMatrix, cameraManager.camMatrix, sceneManager.sun.godraysFrameBuffer);
 
@@ -416,7 +419,7 @@ drawManager.drawOptionalScenery = () => {
   postProcessingManager.curBuffer = null;
 };
 
-drawManager.satCalculate = () => {
+export const satCalculate = () => {
   if (objectManager.selectedSat !== -1) {
     drawManager.sat = satSet.getSat(objectManager.selectedSat);
     // Can't Draw a Star
@@ -467,7 +470,7 @@ drawManager.satCalculate = () => {
   }
 };
 
-drawManager.screenShot = () => {
+export const screenShot = () => {
   if (!settingsManager.queuedScreenshot) {
     drawManager.resizeCanvas();
     settingsManager.queuedScreenshot = true;
@@ -492,7 +495,7 @@ drawManager.screenShot = () => {
   }
 };
 
-drawManager.watermarkedDataUrl = (canvas, text) => {
+export const watermarkedDataUrl = (canvas, text) => {
   try {
     let tempCanvas = document.createElement('canvas');
     let tempCtx = tempCanvas.getContext('2d');
@@ -527,8 +530,7 @@ drawManager.watermarkedDataUrl = (canvas, text) => {
   }
 };
 
-drawManager.isDrawOrbitsAbove = false;
-drawManager.orbitsAbove = () => {
+export const orbitsAbove = () => {
   if (cameraManager.cameraType.current == cameraManager.cameraType.astronomy || cameraManager.cameraType.current == cameraManager.cameraType.planetarium) {
     drawManager.sensorPos = satellite.calculateSensorPos(sensorManager.currentSensor);
     if (!drawManager.isDrawOrbitsAbove) {
@@ -614,7 +616,7 @@ drawManager.orbitsAbove = () => {
 };
 
 var currentSearchSats;
-drawManager.updateHover = () => {
+export const updateHover = () => {
   if (!settingsManager.disableUI && !settingsManager.lowPerf) {
     currentSearchSats = uiManager.searchBox.getLastResultGroup();
     if (typeof currentSearchSats !== 'undefined') {
@@ -673,7 +675,7 @@ drawManager.updateHover = () => {
   }
 };
 let sat2;
-drawManager.hoverBoxOnSat = (satId, satX, satY) => {
+export const hoverBoxOnSat = (satId, satX, satY) => {
   if (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && !settingsManager.isDemoModeOn) {
     satHoverBoxDOM.style.display = 'none';
     if (satId === -1) {
@@ -836,21 +838,27 @@ drawManager.hoverBoxOnSat = (satId, satX, satY) => {
     parentNode.insertBefore(satHoverBoxDOM, nextSibling); // reflow
   }
 };
-drawManager.onDrawLoopComplete = (cb) => {
-  if (typeof cb == 'undefined' || cb == null) return;
+export const onDrawLoopComplete = (cb) => {
+  if (typeof cb === 'undefined' || cb === null) throw new Error('Callback is not defined');
   cb();
 };
 
-drawManager.resizePostProcessingTexture = (sun) => {
+export const resizePostProcessingTexture = (gl, sun, postProcessingManager) => {
+  if (typeof gl === 'undefined' || gl === null) throw new Error('gl is undefined or null');
+  if (typeof sun === 'undefined' || sun === null) throw new Error('sun is undefined or null');
+  if (typeof postProcessingManager === 'undefined' || postProcessingManager === null) throw new Error('postProcessingManager is undefined or null');
+
   // Post Processing Texture Needs Scaled
-  sun.setupGodrays(drawManager.gl);
-  postProcessingManager.init(drawManager.gl);
+  sun.setupGodrays(gl);
+  postProcessingManager.init(gl);
+
+  // Reset Flag now that textures are reinitialized
   drawManager.isPostProcessingResizeNeeded = false;
 };
 
 var demoModeLastTime = 0;
-drawManager.demoMode = () => {
-  if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat == null) return;
+export const demoMode = () => {
+  if (objectManager?.isSensorManagerLoaded && sensorManager?.currentSensor?.lat == null) return;
   if (timeManager.now - demoModeLastTime < settingsManager.demoModeInterval) return;
 
   drawManager.demoModeLast = timeManager.now;
@@ -881,8 +889,7 @@ drawManager.demoMode = () => {
   }
 };
 
-/* istanbul ignore next */
-drawManager.checkIfPostProcessingRequired = () => {
+export const checkIfPostProcessingRequired = () => {
   // if (cameraManager.camPitchAccel > 0.0002 || cameraManager.camPitchAccel < -0.0002 || cameraManager.camYawAccel > 0.0002 || cameraManager.camYawAccel < -0.0002) {
   //   // drawManager.gaussianAmt += drawManager.dt * 2;
   //   // drawManager.gaussianAmt = Math.min(500, Math.max(drawManager.gaussianAmt, 0));
@@ -924,10 +931,18 @@ drawManager.checkIfPostProcessingRequired = () => {
   drawManager.isNeedPostProcessing = false;
 };
 
-drawManager.clearFrameBuffers = () => {
+/**
+ *
+ * @param {*} gl - WebGL Context
+ * @param {*} pickFb - Frame Buffer Object Used for GPU Picking.
+ * This will be reset to black.
+ * @param {*} godFb  - Frame Buffer Object Used for God Rays
+ * This will be reset to transparent.
+ */
+export const clearFrameBuffers = (gl, pickFb, godFb) => {
   // NOTE: clearColor is set here because two different colors are used. If you set it during
   // frameBuffer init then the wrong color will be applied (this can break gpuPicking)
-  gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, pickFb);
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   // Clear all post processing frame buffers
@@ -936,7 +951,7 @@ drawManager.clearFrameBuffers = () => {
     postProcessingManager.clearAll();
   }
   // Clear the godraysPostProcessing Frame Buffer
-  gl.bindFramebuffer(gl.FRAMEBUFFER, sceneManager.sun.godraysFrameBuffer);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, godFb);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -948,5 +963,28 @@ drawManager.clearFrameBuffers = () => {
   // Setup Initial Frame Buffer for Offscreen Drawing
   // gl.bindFramebuffer(gl.FRAMEBUFFER, postProcessingManager.curBuffer);
 };
+
+drawManager.init = init;
+drawManager.glInit = glInit;
+drawManager.createDotsManager = createDotsManager;
+drawManager.loadScene = loadScene;
+drawManager.resizeCanvas = resizeCanvas;
+drawManager.calculatePMatrix = calculatePMatrix;
+drawManager.startWithOrbits = startWithOrbits;
+drawManager.drawLoop = drawLoop;
+drawManager.updateLoop = updateLoop;
+drawManager.demoMode = demoMode;
+drawManager.hoverBoxOnSat = hoverBoxOnSat;
+drawManager.drawOptionalScenery = drawOptionalScenery;
+drawManager.onDrawLoopComplete = onDrawLoopComplete;
+drawManager.updateHover = updateHover;
+drawManager.isDrawOrbitsAbove = false;
+drawManager.orbitsAbove = orbitsAbove;
+drawManager.screenShot = screenShot;
+drawManager.satCalculate = satCalculate;
+drawManager.watermarkedDataUrl = watermarkedDataUrl;
+drawManager.resizePostProcessingTexture = resizePostProcessingTexture;
+drawManager.checkIfPostProcessingRequired = checkIfPostProcessingRequired;
+drawManager.clearFrameBuffers = clearFrameBuffers;
 
 export { drawManager };

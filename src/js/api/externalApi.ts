@@ -62,6 +62,8 @@ const keepTrackApi: keepTrackApiInterface = (<any>window).keepTrackApi || {
     updateDateTime: [],
     uiManagerFinal: [],
     loadCatalog: [],
+    resetSensor: [],
+    setSensor: [],
   },
   methods: {
     selectSatData: (sat: any, satId: number) => {
@@ -121,6 +123,12 @@ const keepTrackApi: keepTrackApiInterface = (<any>window).keepTrackApi || {
     loadCatalog: async () => {
       const satData = await keepTrackApi.callbacks.loadCatalog[0].cb();
       return satData;
+    },
+    resetSensor: () => {
+      keepTrackApi.callbacks.resetSensor.forEach((cb: any) => cb.cb());
+    },
+    setSensor: (sensor: any, id: number) => {
+      keepTrackApi.callbacks.setSensor.forEach((cb: any) => cb.cb(sensor, id));
     },
   },
   programs: {

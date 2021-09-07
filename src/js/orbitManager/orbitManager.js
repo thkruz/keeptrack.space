@@ -1,6 +1,7 @@
 /* */
 
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { satSet } from '@app/js/satSet/satSet.js';
@@ -237,7 +238,7 @@ orbitManager.removeInViewOrbit = function (satId) {
 };
 
 orbitManager.clearInViewOrbit = function () {
-  if (currentInView === []) return;
+  if (currentInView.length === 0) return;
   currentInView = [];
 };
 

@@ -1,7 +1,9 @@
 /* */
 
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+
 import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
+
 import { OBJ } from '@app/js/lib/external/webgl-obj-loader.js';
 const meshManager = {};
 let gl, earth;
@@ -38,6 +40,8 @@ meshManager.init = async (glRef, earthRef) => {
       meshManager.initShaders();
       meshManager.initBuffers();
       meshManager.isReady = true;
+    }).catch((error) => {
+      console.warn(error);
     });
   } catch (error) {
     console.error(error);

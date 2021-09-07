@@ -111,6 +111,7 @@ om.svs2kps = (svs) => {
     r.avg.tl = 0;
   }
 
+  // deepcode ignore UnusedIterator: false positive
   for (let i = 0; i < kpList.length; i++) {
     if (kpList[i].apogee < r.min.apogee) r.min.apogee = kpList[i].apogee;
     if (kpList[i].apogee > r.max.apogee) r.max.apogee = kpList[i].apogee;
@@ -238,9 +239,13 @@ om.fitTles = async (epoch, svs, kps, timeManager, satellite) => {
   return om.kp2tle(kp, epoch);
 };
 om.svs2analyst = async (svs, satSet, timeManager, satellite) => {
-  om.iod(svs, timeManager, satellite).then((tles) => {
-    satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(80000));
-  });
+  om.iod(svs, timeManager, satellite)
+    .then((tles) => {
+      satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(80000));
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
 
 om.testIod = (satSet) => {
@@ -253,13 +258,16 @@ om.testIod = (satSet) => {
       }
       om.debug.closestApproach /= metObs.length;
       console.log(`Average Approach: ${om.debug.closestApproach}`);
+    })
+    .catch((error) => {
+      console.error(error);
     });
 };
 
 om.debug = {};
 om.debug.closestApproach = 0;
 
-const _propagate = async (tle1, tle2, epoch, satellite) => {
+export const _propagate = async (tle1, tle2, epoch, satellite) => {
   let satrec = satellite.twoline2satrec(tle1, tle2); // perform and store sat init calcs
   let j = _jday(
     epoch.getUTCFullYear(),
@@ -276,14 +284,14 @@ const _propagate = async (tle1, tle2, epoch, satellite) => {
   let eci = satellite.sgp4(satrec, m);
   return eci;
 };
-const _jday = (year, mon, day, hr, minute, sec) => {
+export const _jday = (year, mon, day, hr, minute, sec) => {
   'use strict';
   return (
     367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor((275 * mon) / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0 //  ut in days
   );
 };
 // Converts State Vectors to Keplerian Elements
-const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2) => {
+export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2) => {
   let rx = vector[1] * 1000;
   let ry = vector[2] * 1000;
   let rz = vector[3] * 1000;
@@ -1412,7 +1420,7 @@ const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU
   */
 
 // Internal Functions
-const _arctan2 = (y, x) => {
+export const _arctan2 = (y, x) => {
   let u;
   if (x != 0) {
     u = Math.atan(y / x);
@@ -1425,11 +1433,10 @@ const _arctan2 = (y, x) => {
   }
   return u;
 };
-const _dayOfYear = (mon, day, hr, minute, sec) =>
+export const _dayOfYear = (mon, day, hr, minute, sec) =>
   // eslint-disable-next-line implicit-arrow-linebreak
   (Math.floor((275 * mon) / 9.0) + day + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0) //  ut in days
     .toFixed(5);
-const _pad0 = (str, max) => (str.length < max ? _pad0('0' + str, max) : str);
+export const _pad0 = (str, max) => (str?.length < max ? _pad0('0' + str, max) : str);
 
-const omManager = om;
-export { omManager };
+export const omManager = om;

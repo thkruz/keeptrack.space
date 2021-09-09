@@ -2,6 +2,8 @@ import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
 let isStfMenuOpen = false;
+let stfInfoLinks = false;
+
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
@@ -89,12 +91,14 @@ export const uiManagerInit = (): void => {
       </div>
     `);
 
-  let stfInfoLinks = false;
   // Register orbital element data
   keepTrackApi.register({
     method: 'selectSatData',
     cbName: 'stfInfoTopLinks',
-    cb: () => selectSatData(stfInfoLinks),
+    cb: () => {
+      selectSatData(stfInfoLinks);
+      stfInfoLinks = true;
+    },
   });
 
   $('#stfForm').on('submit', stfFormOnSubmit);
@@ -144,7 +148,6 @@ export const selectSatData = (stfInfoLinks: boolean) => {
         <div id="stf-on-object-link" class="link sat-infobox-links">Build Short Term Fence on this object...</div>
       `);
     $('#stf-on-object-link').on('click', stfOnObjectLinkClick);
-    stfInfoLinks = true;
   }
 };
 
@@ -229,7 +232,14 @@ export const stfFormOnSubmit = (e: Event) => {
 };
 
 export const stfOnObjectLinkClick = () => {
-  const { satellite, uiManager } = keepTrackApi.programs;
+  const { satellite, uiManager, sensorManager } = keepTrackApi.programs;
+
+  if (!sensorManager.checkSensorSelected()) {
+    // No Sensor Selected
+    uiManager.toast(`Select a Sensor First!`, 'caution', true);
+    return;
+  }
+
   $('#stf-az').val(satellite.currentTEARR.az.toFixed(1));
   $('#stf-el').val(satellite.currentTEARR.el.toFixed(1));
   $('#stf-rng').val(satellite.currentTEARR.rng.toFixed(1));

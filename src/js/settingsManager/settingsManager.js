@@ -148,8 +148,6 @@ let settingsManager = {
     settingsManager.enableLimitedUI = false;
     // Allows canvas will steal focus on load
     settingsManager.startWithFocus = false;
-    // Enables/Disables drawing of the orbit path
-    settingsManager.isDrawOrbits = true;
     // Shows an overlay with object information
     settingsManager.enableHoverOverlay = true;
     // Shows the oribt of the object when highlighted

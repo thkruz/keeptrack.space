@@ -7,7 +7,11 @@ class Atmosphere {
   glm: any;
   numLatSegs: number;
   numLonSegs: number;
-  drawPosition: number[];
+  positionModifier: {
+    x: number;
+    y: number;
+    z: number;
+  };
   loaded: boolean;
   program: any;
   buffers: any;
@@ -75,9 +79,8 @@ class Atmosphere {
     this.numLatSegs = 64;
     this.numLonSegs = 64;
 
-    // We draw the moon way closer than it actually is because of depthBuffer issues
     // Each draw loop we will scale the real position so it is consistent
-    this.drawPosition = [0, 0, 0];
+    this.positionModifier = { x: 0, y: 0, z: 0 };
 
     // Create a gl program from the vert/frag shaders and geometry buffers
     this.init(gl);
@@ -244,8 +247,8 @@ class Atmosphere {
     this.glm.mat4.identity(this.mvMatrix);
     // Rotate model view matrix to prevent lines showing as camera rotates
     this.glm.mat4.rotateY(this.mvMatrix, this.mvMatrix, 90 * (Math.PI / 180) - camPitch);
-    // Scale the atmosphere to 0,0,0 - needed?
-    this.glm.mat4.translate(this.mvMatrix, this.mvMatrix, [0, 0, 0]);
+    // Move the model if there is an override in place (debugging/videos) 
+    this.glm.mat4.translate(this.mvMatrix, this.mvMatrix, [this.positionModifier.x, this.positionModifier.y, this.positionModifier.z]);
     // Calculate normals
     this.nMatrix = this.glm.mat3.create();
     this.glm.mat3.normalFromMat4(this.nMatrix, this.mvMatrix);

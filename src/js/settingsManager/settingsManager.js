@@ -148,6 +148,8 @@ let settingsManager = {
     settingsManager.enableLimitedUI = false;
     // Allows canvas will steal focus on load
     settingsManager.startWithFocus = false;
+    // Enables/Disables drawing of the orbit path
+    settingsManager.isDrawOrbits = true;
     // Shows an overlay with object information
     settingsManager.enableHoverOverlay = true;
     // Shows the oribt of the object when highlighted
@@ -185,6 +187,14 @@ let settingsManager = {
 
     settingsManager.minZoomDistance = 6800;
     settingsManager.maxZoomDistance = 120000;
+    settingsManager.zoomSpeed = 0.01;
+    settingsManager.isZoomStopsRotation = true;
+
+    // Speed at which isScan lines are drawn (each draw will be +speed lat/lon)
+    settingsManager.lineScanSpeedSat = 6; // About 6 seconds to scan earth (no source, just a guess)
+    settingsManager.lineScanSpeedRadar = 0.25; // About 30 seconds to scan earth (arbitrary)
+    // Minimum elevation to draw a line scan
+    settingsManager.lineScanMinEl = 5;
 
     // Minimum fps or sun/moon/atmosphere are skipped
     settingsManager.fpsThrottle1 = 0;
@@ -192,6 +202,8 @@ let settingsManager = {
     settingsManager.fpsThrottle2 = 10;
 
     settingsManager.timeMachineDelay = 5000;
+
+    settingsManager.videoBitsPerSecond = 30000000; // 10.0Mbps
 
     // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 
@@ -319,8 +331,8 @@ let settingsManager = {
       settingsManager.colors.version = '1.0.3';
       settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
       settingsManager.colors.starHi = [1.0, 1.0, 1.0, 1.0];
-      settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.35];
-      settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.15];
+      settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.85];
+      settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.65];
       settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
       settingsManager.colors.marker = [
         [0.2, 1.0, 1.0, 1.0],
@@ -449,6 +461,12 @@ let settingsManager = {
     // //////////////////////////////////////////////////////////////////////////
 
     settingsManager.modelsOnSatelliteViewOverride = false;
+    settingsManager.meshOverride = null;
+    settingsManager.meshRotation = {
+      x: 0,
+      y: 0,
+      z: 0,
+    };
 
     // Frames Per Second Limiter
     settingsManager.minimumDrawDt = 0.0; // 20 FPS // 60 FPS = 0.01667
@@ -575,12 +593,12 @@ let settingsManager = {
               settingsManager.smallImages = true;
               break;
             case 'hires':
-              settingsManager.hiresImages = true;
-              settingsManager.earthNumLatSegs = 256;
-              settingsManager.earthNumLonSegs = 256;
+              // settingsManager.hiresImages = true;
+              settingsManager.earthNumLatSegs = 128;
+              settingsManager.earthNumLonSegs = 128;
               settingsManager.atmospherelatSegs = 128;
               settingsManager.atmospherelonSegs = 128;
-              settingsManager.minimumDrawDt = 0.01667;
+              // settingsManager.minimumDrawDt = 0.01667;
               break;
             case 'nostars':
               settingsManager.noStars = true;

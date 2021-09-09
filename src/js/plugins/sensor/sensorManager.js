@@ -289,7 +289,7 @@ sensorManager.drawFov = (sensor) => {
       // TODO: Find actual face directions
       keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), 0, 120, sensor.obsminel, sensor.obsmaxrange], 'c');
       keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), 120, 240, sensor.obsminel, sensor.obsmaxrange], 'c');
-      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), 240, 360, sensor.obsminel, sensor.obsmaxrange], 'c');
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), 240, 0, sensor.obsminel, sensor.obsmaxrange], 'c');
       break;
     case 'CDN':
       // NOTE: This will be a bit more complicated later

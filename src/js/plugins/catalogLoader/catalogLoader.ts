@@ -319,6 +319,7 @@ export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string 
   if ((<any>settingsManager).isEnableGsCatalog) satSet.initGsData();
 
   for (i = 0; i < objectManager.staticSet.length; i++) {
+    objectManager.staticSet[i].id = tempSatData.length;
     tempSatData.push(objectManager.staticSet[i]);
   }
   for (i = 0; i < objectManager.analSatSet.length; i++) {

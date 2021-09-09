@@ -161,6 +161,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
     var natoMWSensors = [];
     natoMWSensors.push(sensorManager.sensorList.BLE);
     natoMWSensors.push(sensorManager.sensorList.CAV);
+    natoMWSensors.push(sensorManager.sensorList.CDN);
     natoMWSensors.push(sensorManager.sensorList.COD);
     natoMWSensors.push(sensorManager.sensorList.CLR);
     natoMWSensors.push(sensorManager.sensorList.FYL);
@@ -172,7 +173,7 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
       sensor: natoMWSensors,
       multiSensor: true,
     });
-    satellite.setobs(sensorManager.natoMWSensors);
+    satellite.setobs(natoMWSensors);
     objectManager.setSelectedSat(-1);
     setColorScheme(settingsManager.currentColorScheme, true);
     // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
@@ -274,6 +275,31 @@ sensorManager.setSensor = function (selectedSensor, staticNum) {
   }
 };
 sensorManager.sensorListUS = [sensorList.COD, sensorList.BLE, sensorList.CAV, sensorList.CLR, sensorList.EGL, sensorList.FYL, sensorList.THL, sensorList.MIL, sensorList.ALT, sensorList.ASC, sensorList.CDN];
+
+sensorManager.drawFov = (sensor) => {
+  switch (sensor.shortName) {
+    case 'COD':
+    case 'BLE':
+    case 'CLR':
+    case 'THL':
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), sensor.obsminaz, sensor.obsminaz + 120, sensor.obsminel, sensor.obsmaxrange], 'c');
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), sensor.obsminaz + 120, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
+      break;
+    case 'FYL':
+      // TODO: Find actual face directions
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), 0, 120, sensor.obsminel, sensor.obsmaxrange], 'c');
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), 120, 240, sensor.obsminel, sensor.obsmaxrange], 'c');
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), 240, 360, sensor.obsminel, sensor.obsmaxrange], 'c');
+      break;
+    case 'CDN':
+      // NOTE: This will be a bit more complicated later
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), sensor.obsminaz, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
+      break;
+    default:
+      console.warn('Sensor not found');
+      break;
+  }
+};
 
 for (var i = 0; i < Object.keys(sensorList).length; i++) {
   sensorList[Object.keys(sensorList)[i]].staticNum = i;

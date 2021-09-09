@@ -28,7 +28,7 @@ export const init = (): void => {
     cbName: 'recorderManager',
     cb: () => {
       try {
-        recorder = new CanvasRecorder(document.getElementById('keeptrack-canvas'));
+        recorder = new CanvasRecorder(document.getElementById('keeptrack-canvas'), (<any>settingsManager).videoBitsPerSecond);
       } catch (e) {
         console.log(e);
       }

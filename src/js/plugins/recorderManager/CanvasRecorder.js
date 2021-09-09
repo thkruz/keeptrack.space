@@ -11,7 +11,9 @@ export class CanvasRecorder {
 
     // var stream = canvas.captureStream();
     const displayMediaOptions = {
-      video: { cursor: 'always' },
+      video: {
+        cursor: 'never',
+      },
       audio: false,
     };
 
@@ -84,7 +86,8 @@ export class CanvasRecorder {
           }
           let options = {
             mimeType: supportedType,
-            videoBitsPerSecond: videoBitsPerSec || 10000000, // 10.0Mbps
+            videoBitsPerSecond: videoBitsPerSec || 30000000, // 30.0Mbps
+            // videoBitsPerSecond: videoBitsPerSec || 10000000, // 10.0Mbps
             // videoBitsPerSecond: videoBitsPerSec || 5000000 // 5.0Mbps
             // videoBitsPerSecond: videoBitsPerSec || 2500000 // 2.5Mbps
           };

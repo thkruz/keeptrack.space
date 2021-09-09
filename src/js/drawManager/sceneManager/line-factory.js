@@ -1,3 +1,5 @@
+import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
+
 import { Line } from './line.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
@@ -196,6 +198,70 @@ class LineFactory {
         isCalculateIfInFOV: true,
       });
     }
+    // Scanning Satellite to Reference Points on Earth in FOV
+    if (type == 'scan') {
+      sat = getSat(value[0]);
+      if (typeof sat.position == 'undefined') {
+        console.debug(`No Satellite Position Available for Line`);
+        console.debug(sat);
+        return;
+      }
+      this.drawLineList.push({
+        line: new Line(this.gl, this.shader),
+        sat: sat,
+        ref: [0, 0, 0],
+        ref2: [sat.position.x, sat.position.y, sat.position.z],
+        color: color,
+        isScan: true,
+        lat: -90,
+        lon: 0,
+      });
+    }
+
+    // Scanning Satellite to Reference Points on Earth in FOV
+    if (type == 'scan2') {
+      sat = getSat(value[0]);
+      if (typeof sat.position == 'undefined') {
+        console.debug(`No Satellite Position Available for Line`);
+        console.debug(sat);
+        return;
+      }
+      this.drawLineList.push({
+        line: new Line(this.gl, this.shader),
+        sat: sat,
+        ref: [0, 0, 0],
+        ref2: [sat.position.x, sat.position.y, sat.position.z],
+        color: color,
+        isScan2: true,
+        az: value[1],
+        minAz: value[1],
+        maxAz: value[2],
+        minEl: value[3],
+        maxRng: value[4],
+      });
+    }
+
+    // Satellite to Missile
+    if (type == 'misl') {
+      sat = getSat(value[0]);
+      sat2 = getSat(value[1]);
+      if (sat == null || sat2 == null) return;
+      if (typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
+        console.debug(`No Satellite Position Available for Line`);
+        console.debug(sat);
+        console.debug(sat2);
+        return;
+      }
+      this.drawLineList.push({
+        line: new Line(this.gl, this.shader),
+        sat: sat,
+        sat2: sat2,
+        ref: [sat.position.x, sat.position.y, sat.position.z],
+        ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
+        color: color,
+      });
+    }
+
     if (type == 'ref') {
       this.drawLineList.push({
         line: new Line(this.gl, this.shader),
@@ -274,8 +340,72 @@ class LineFactory {
               );
             }
           } else {
-            // Just One Satellite
-            this.drawLineList[i].line.set(this.drawLineList[i].ref, [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]);
+            if (this.drawLineList[i].isScan) {
+              let t = 0;
+              while (t < 1000) {
+                this.drawLineList[i].lon += settingsManager.lineScanSpeedSat;
+                if (this.drawLineList[i].lon > 180) {
+                  this.drawLineList[i].lon = -180;
+                }
+                if (this.drawLineList[i].lon >= 0 && this.drawLineList[i].lon < settingsManager.lineScanSpeedSat) {
+                  this.drawLineList[i].lat += settingsManager.lineScanSpeedSat;
+                }
+                if (this.drawLineList[i].lat > 90) {
+                  this.drawLineList[i].lat = -90;
+                }
+
+                const lla = { lat: this.drawLineList[i].lat * DEG2RAD, lon: this.drawLineList[i].lon * DEG2RAD, alt: 0.05 };
+                const ecf = keepTrackApi.programs.satellite.eciToEcf(this.drawLineList[i].sat.position, 0);
+                const rae = keepTrackApi.programs.satellite.ecfToLookAngles(lla, ecf);
+                const el = rae.el * RAD2DEG;
+                if (el > settingsManager.lineScanMinEl) {
+                  const pos = keepTrackApi.programs.satellite.geodeticToEcf(lla);
+                  this.drawLineList[i].line.set([pos.x, pos.y, pos.z], [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]);
+                  break;
+                }
+
+                if (this.drawLineList[i].lat === -90) {
+                  this.drawLineList[i].lat += settingsManager.lineScanSpeedSat;
+                }
+                if (this.drawLineList[i].lat === 90) {
+                  this.drawLineList[i].lat = -90;
+                }
+
+                t++;
+              }
+            } else if (this.drawLineList[i].isScan2) {
+              this.drawLineList[i].az += settingsManager.lineScanSpeedRadar;
+              // Normalize azimuth
+              if (this.drawLineList[i].az > 360) {
+                this.drawLineList[i].az = 0;
+              }
+              // Is azimuth outside of FOV?
+              if (
+                (this.drawLineList[i].maxAz > this.drawLineList[i].minAz && this.drawLineList[i].az > this.drawLineList[i].maxAz) ||
+                (this.drawLineList[i].maxAz < this.drawLineList[i].minAz && this.drawLineList[i].az > this.drawLineList[i].maxAz && this.drawLineList[i].az < this.drawLineList[i].minAz)
+              ) {
+                // Reset it
+                this.drawLineList[i].az = this.drawLineList[i].minAz;
+              }
+              // Calculate ECI for that RAE coordinate
+              // Adding 30km to altitude to avoid clipping the earth
+              const pos = keepTrackApi.programs.satellite.ecfToEci(
+                keepTrackApi.programs.satellite.lookAnglesToEcf(
+                  this.drawLineList[i].az,
+                  this.drawLineList[i].minEl,
+                  this.drawLineList[i].maxRng,
+                  this.drawLineList[i].sat.lat * DEG2RAD,
+                  this.drawLineList[i].sat.lon * DEG2RAD,
+                  this.drawLineList[i].sat.alt + 30
+                ),
+                keepTrackApi.programs.drawManager.sceneManager.sun.sunvar.gmst
+              );
+              // Update the line
+              this.drawLineList[i].line.set([pos.x, pos.y, pos.z], [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]);
+            } else {
+              // Just One Satellite
+              this.drawLineList[i].line.set(this.drawLineList[i].ref, [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]);
+            }
           }
         } else if (typeof this.drawLineList[i].star1 != 'undefined' && typeof this.drawLineList[i].star2 != 'undefined' && this.drawLineList[i].star1 != null && this.drawLineList[i].star2 != null) {
           // Constellation

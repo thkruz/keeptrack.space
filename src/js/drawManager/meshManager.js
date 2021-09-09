@@ -5,10 +5,11 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
 
 import { OBJ } from '@app/js/lib/external/webgl-obj-loader.js';
+
 const meshManager = {};
 let gl, earth;
 
-const meshList = ['sat2', 's1u', 's2u', 's3u', 'starlink', 'iss', 'gps', 'aehf', 'dsp', 'galileo', 'o3b', 'orbcomm', 'iridium', 'globalstar', 'debris0', 'debris1', 'debris2', 'rocketbody'];
+const meshList = ['sat2', 's1u', 's2u', 's3u', 'starlink', 'iss', 'gps', 'aehf', 'dsp', 'galileo', 'o3b', 'orbcomm', 'iridium', 'globalstar', 'debris0', 'debris1', 'debris2', 'rocketbody', 'sbirs', 'misl', 'misl2', 'misl3', 'misl4', 'rv'];
 
 let mvMatrix;
 let nMatrix;
@@ -283,6 +284,11 @@ meshManager.draw = (pMatrix, camMatrix, tgtBuffer) => {
     glm.mat4.rotateZ(mvMatrix, mvMatrix, meshManager.currentModel.nadirYaw);
   }
 
+  // Allow Manual Rotation of Meshes
+  glm.mat4.rotateX(mvMatrix, mvMatrix, settingsManager.meshRotation.x * DEG2RAD);
+  glm.mat4.rotateY(mvMatrix, mvMatrix, settingsManager.meshRotation.y * DEG2RAD);
+  glm.mat4.rotateZ(mvMatrix, mvMatrix, settingsManager.meshRotation.z * DEG2RAD);
+
   // Assign the normal matrix the opposite of the mvMatrix
   nMatrix = glm.mat3.create();
   glm.mat3.normalFromMat4(nMatrix, mvMatrix);
@@ -346,6 +352,16 @@ meshManager.update = (Camera, cameraManager, timeManager, sat = { id: -1, static
   meshManager.currentModel.inSun = sat.isInSun();
   meshManager.currentModel.nadirYaw = null;
 
+  if (settingsManager.meshOverride) {
+    if (typeof meshManager.models[settingsManager.meshOverride] === 'undefined') {
+      console.warn(`Mesh override not found: ${settingsManager.meshOverride}`);
+      settingsManager.meshOverride = null;
+    } else {
+      meshManager.currentModel.model = meshManager.models[settingsManager.meshOverride];
+      return;
+    }
+  }
+
   if (sat.SCC_NUM == 25544) {
     meshManager.updateNadirYaw(Camera, sat, timeManager);
     meshManager.currentModel.model = meshManager.models.iss;
@@ -400,6 +416,13 @@ meshManager.update = (Camera, cameraManager, timeManager, sat = { id: -1, static
     if (sat.ON.slice(0, 7) == 'GALILEO') {
       meshManager.updateNadirYaw(Camera, sat, timeManager);
       meshManager.currentModel.model = meshManager.models.galileo;
+      return;
+    }
+
+    // Is this a SBIRS Satellite
+    if (sat.ON.slice(0, 5) == 'SBIRS') {
+      meshManager.updateNadirYaw(Camera, sat, timeManager);
+      meshManager.currentModel.model = meshManager.models.sbirs;
       return;
     }
 
@@ -499,6 +522,11 @@ meshManager.drawOcclusion = function (pMatrix, camMatrix, occlusionPrgm, tgtBuff
     if (meshManager.currentModel.nadirYaw !== null) {
       glm.mat4.rotateZ(mvMatrix, mvMatrix, meshManager.currentModel.nadirYaw);
     }
+
+    // Allow Manual Rotation of Meshes
+    glm.mat4.rotateX(mvMatrix, mvMatrix, settingsManager.meshRotation.x * DEG2RAD);
+    glm.mat4.rotateY(mvMatrix, mvMatrix, settingsManager.meshRotation.y * DEG2RAD);
+    glm.mat4.rotateZ(mvMatrix, mvMatrix, settingsManager.meshRotation.z * DEG2RAD);
 
     // Change to the earth shader
     gl.useProgram(occlusionPrgm);

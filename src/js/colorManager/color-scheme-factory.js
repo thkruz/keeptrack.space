@@ -932,6 +932,32 @@ class ColorSchemeFactory {
           pickable: false,
         };
       }
+
+      if (sat.static && sat.type === 'Star') {
+        if (sat.vmag >= 4.7 && ColorSchemeFactory.objectTypeFlags.starLow) {
+          return {
+            color: ColorSchemeFactory.colorTheme.starLow,
+            pickable: true,
+          };
+        } else if (sat.vmag >= 3.5 && sat.vmag < 4.7 && ColorSchemeFactory.objectTypeFlags.starMed) {
+          return {
+            color: ColorSchemeFactory.colorTheme.starMed,
+            pickable: true,
+          };
+        } else if (sat.vmag < 3.5 && ColorSchemeFactory.objectTypeFlags.starHi) {
+          return {
+            color: ColorSchemeFactory.colorTheme.starHi,
+            pickable: true,
+          };
+        } else {
+          // Deselected
+          return {
+            color: ColorSchemeFactory.colorTheme.deselected,
+            pickable: false,
+          };
+        }
+      }
+
       // Hide Everything Else
       return {
         color: ColorSchemeFactory.colorTheme.transparent,

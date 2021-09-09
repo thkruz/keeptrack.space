@@ -28,8 +28,11 @@
 /* eslint-disable no-useless-escape */
 
 import '@app/js/lib/external/numeric.js';
+
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants.js';
+
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
@@ -397,7 +400,13 @@ satSet.initGsData = () => {
           if (typeof satSet.cosparIndex[`${gsSat.cospar}`] !== 'undefined') {
             satSetI = satSet.cosparIndex[`${gsSat.cospar}`];
             if (typeof gsSat.name != 'undefined') {
-              if (typeof satSet.satData[satSetI].ON == 'undefined' || satSet.satData[satSetI].ON == 'TBA' || satSet.satData[satSetI].ON == 'Unknown' || satSet.satData[satSetI].ON.slice(0, 7) == 'PAYLOAD' || satSet.satData[satSetI].ON.slice(0, 6) == 'OBJECT') {
+              if (
+                typeof satSet.satData[satSetI].ON == 'undefined' ||
+                satSet.satData[satSetI].ON == 'TBA' ||
+                satSet.satData[satSetI].ON == 'Unknown' ||
+                satSet.satData[satSetI].ON.slice(0, 7) == 'PAYLOAD' ||
+                satSet.satData[satSetI].ON.slice(0, 6) == 'OBJECT'
+              ) {
                 satSet.satData[satSetI].ON = gsSat.name;
               }
             }
@@ -570,7 +579,10 @@ satSet.getSat = (i) => {
       // Angle between earth and sun
       let theta =
         Math.acos(
-          window.numeric.dot([-satSet.satData[i].position.x, -satSet.satData[i].position.y, -satSet.satData[i].position.z], [-satSet.satData[i].position.x + sunECI.x, -satSet.satData[i].position.y + sunECI.y, -satSet.satData[i].position.z + sunECI.z]) /
+          window.numeric.dot(
+            [-satSet.satData[i].position.x, -satSet.satData[i].position.y, -satSet.satData[i].position.z],
+            [-satSet.satData[i].position.x + sunECI.x, -satSet.satData[i].position.y + sunECI.y, -satSet.satData[i].position.z + sunECI.z]
+          ) /
             (Math.sqrt(Math.pow(-satSet.satData[i].position.x, 2) + Math.pow(-satSet.satData[i].position.y, 2) + Math.pow(-satSet.satData[i].position.z, 2)) *
               Math.sqrt(Math.pow(-satSet.satData[i].position.x + sunECI.x, 2) + Math.pow(-satSet.satData[i].position.y + sunECI.y, 2) + Math.pow(-satSet.satData[i].position.z + sunECI.z, 2)))
         ) * RAD2DEG;
@@ -622,12 +634,6 @@ satSet.getSat = (i) => {
   }
   if (objectManager.isSensorManagerLoaded && typeof satSet.satData[i].getTEARR == 'undefined') {
     satSet.satData[i].getTEARR = (propTime, sensor) => {
-      if (satSet.satData[i].missile) {
-        return {
-          inview: satSet.satData[i].inView,
-        };
-      }
-
       let currentTEARR = {}; // Most current TEARR data that is set in satellite object and returned.
 
       if (typeof sensor == 'undefined') {
@@ -665,8 +671,6 @@ satSet.getSat = (i) => {
         };
       }
 
-      // Set default timing settings. These will be changed to find look angles at different times in future.
-      let satrec = satellite.twoline2satrec(satSet.satData[i].TLE1, satSet.satData[i].TLE2); // perform and store sat init calcs
       let now;
       if (typeof propTime != 'undefined' && propTime !== null) {
         now = propTime;
@@ -683,6 +687,28 @@ satSet.getSat = (i) => {
       ); // Converts time to jday (TLEs use epoch year/day)
       j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
       let gmst = satellite.gstime(j);
+
+      if (satSet.satData[i].missile) {
+        // ECI to ECF
+        let positionEcf = satellite.eciToEcf(satSet.satData[i].position, gmst);
+        // ECF to RAE
+        const Rae = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+        const inview = satellite.checkIsInFOV(sensor, {
+          az: Rae.az * RAD2DEG,
+          el: Rae.el * RAD2DEG,
+          rng: Rae.rng,
+        });
+        const lla = satellite.eciToGeodetic(satSet.satData[i].position, gmst);
+        return {
+          lat: lla.lat,
+          lon: lla.lon,
+          alt: lla.alt,
+          inview: inview,
+        };
+      }
+
+      // Set default timing settings. These will be changed to find look angles at different times in future.
+      let satrec = satellite.twoline2satrec(satSet.satData[i].TLE1, satSet.satData[i].TLE2); // perform and store sat init calcs
 
       let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
       let positionEci = satellite.sgp4(satrec, m);

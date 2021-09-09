@@ -71,7 +71,9 @@ let uiInput: uiInputInterface = {
       cameraManager.isZoomIn = false;
     }
 
-    cameraManager.rotateEarth(false);
+    if (settingsManager.isZoomStopsRotation) {
+      cameraManager.rotateEarth(false);
+    }
 
     if (settingsManager.isZoomStopsSnappedOnSat || objectManager.selectedSat == -1) {
       let zoomTarget = cameraManager.zoomTarget;

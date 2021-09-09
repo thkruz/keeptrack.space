@@ -150,6 +150,7 @@ class Camera {
   #normForward = [0, 0, 0];
   #normLeft = [0, 0, 0];
   #isRotateEarth = true;
+  #isAutoPanEarth = false;
   #yawErr = 0;
   #camYawTarget = 0;
   #camPitchTarget = 0;
@@ -502,6 +503,15 @@ class Camera {
     this.#isRotateEarth = val;
   }
 
+  autoPanEarth(val) {
+    if (typeof val == 'undefined') {
+      this.#isAutoPanEarth = !this.#isAutoPanEarth;
+      return;
+    }
+    if (typeof val !== 'boolean') throw new TypeError();
+    this.#isAutoPanEarth = val;
+  }
+
   changeZoom(zoom) {
     if (zoom === 'geo') {
       this.zoomTarget = 0.82;
@@ -562,12 +572,9 @@ class Camera {
     if (this.camZoomSnappedOnSat) {
       // #cSTS.altitude;
       // #cSTS.camDistTarget;
-      if (!sat.missile && !sat.static && sat.active) {
+      if (!sat.static && sat.active) {
         // if this is a satellite not a missile
         this.#cSTS.altitude = sat.getAltitude();
-      }
-      if (sat.missile) {
-        this.#cSTS.altitude = sat.maxAlt + 1000; // if it is a missile use its altitude
       }
       if (this.#cSTS.altitude) {
         this.#cSTS.camDistTarget = this.#cSTS.altitude + RADIUS_OF_EARTH + settingsManager.camDistBuffer;
@@ -981,6 +988,10 @@ class Camera {
       this.camYaw -= settingsManager.autoRotateSpeed * dt;
     }
 
+    if (this.#isAutoPanEarth) {
+      this.panCurrent.z -= settingsManager.autoRotateSpeed * dt;
+    }
+
     // Zoom Changing
     // This code might be better if applied directly to the shader versus a multiplier effect
     if (this.zoomLevel !== this.zoomTarget) {
@@ -1002,12 +1013,12 @@ class Camera {
       this.zoomLevel = this.zoomLevel + (this.zoomTarget - this.zoomLevel) * dt * 0.0025;
     } else {
       if (this.isZoomIn) {
-        this.zoomLevel -= ((this.zoomLevel * dt) / 100) * Math.abs(this.zoomTarget - this.zoomLevel);
+        this.zoomLevel -= this.zoomLevel * dt * settingsManager.zoomSpeed * Math.abs(this.zoomTarget - this.zoomLevel);
       } else {
-        this.zoomLevel += ((this.zoomLevel * dt) / 100) * Math.abs(this.zoomTarget - this.zoomLevel);
+        this.zoomLevel += this.zoomLevel * dt * settingsManager.zoomSpeed * Math.abs(this.zoomTarget - this.zoomLevel);
       }
 
-      if ((this.zoomLevel >= this.zoomTarget && !this.isZoomIn) || (this.zoomLevel <= this.zoomTarget && this.isZoomIn)) {
+      if ((this.zoomLevel > this.zoomTarget && !this.isZoomIn) || (this.zoomLevel < this.zoomTarget && this.isZoomIn)) {
         this.zoomLevel = this.zoomTarget;
       }
     }

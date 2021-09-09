@@ -24,6 +24,8 @@ class Moon {
     this.drawRadius = 4000;
     this.scalarDistance = 200000;
 
+    this.positionModifier = { x: 0, y: 0, z: 0 };
+
     // We draw the moon way closer than it actually is because of depthBuffer issues
     // Each draw loop we will scale the real position so it is consistent
     this.drawPosition = [0, 0, 0];
@@ -213,9 +215,9 @@ class Moon {
     this.position = satellite.ecfToEci(satellite.lookAnglesToEcf(180 + this.rae.azimuth * RAD2DEG, this.rae.altitude * RAD2DEG, this.rae.distance, 0, 0, 0), sun.sunvar.gmst);
 
     const scaleFactor = this.scalarDistance / Math.max(Math.max(Math.abs(this.position.x), Math.abs(this.position.y)), Math.abs(this.position.z));
-    this.drawPosition[0] = this.position.x * scaleFactor;
-    this.drawPosition[1] = this.position.y * scaleFactor;
-    this.drawPosition[2] = this.position.z * scaleFactor;
+    this.drawPosition[0] = this.position.x * scaleFactor + this.positionModifier.x;
+    this.drawPosition[1] = this.position.y * scaleFactor + this.positionModifier.y;
+    this.drawPosition[2] = this.position.z * scaleFactor + this.positionModifier.z;
 
     this.mvMatrix = glm.mat4.create();
     this.nMatrix = glm.mat3.create();

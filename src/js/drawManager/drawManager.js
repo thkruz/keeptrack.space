@@ -744,15 +744,16 @@ export const hoverBoxOnSat = (satId, satX, satY) => {
         satHoverBoxNode2.innerHTML = sat.typeExt + satellite.distance(sat, objectManager.selectedSatData) + '';
         satHoverBoxNode3.textContent = '';
       } else if (sat.type === 'Star') {
-        if (starManager.findStarsConstellation(sat.name) !== null) {
-          satHoverBoxNode1.innerHTML = sat.name + '</br>' + starManager.findStarsConstellation(sat.name);
+        const constellationName = starManager.findStarsConstellation(sat.name);
+        if (constellationName !== null) {
+          satHoverBoxNode1.innerHTML = sat.name + '</br>' + constellationName;
         } else {
           satHoverBoxNode1.textContent = sat.name;
         }
         satHoverBoxNode2.innerHTML = sat.type;
         satHoverBoxNode3.innerHTML = 'RA: ' + sat.ra.toFixed(3) + ' deg </br> DEC: ' + sat.dec.toFixed(3) + ' deg';
-        if (objectManager.lasthoveringSat !== satId && typeof sat !== 'undefined') {
-          starManager.drawConstellations(starManager.findStarsConstellation(sat.name));
+        if (objectManager.lasthoveringSat !== satId && typeof sat !== 'undefined' && constellationName !== null) {
+          starManager.drawConstellations(constellationName);
         }
       } else {
         satHoverBoxNode1.textContent = sat.name;

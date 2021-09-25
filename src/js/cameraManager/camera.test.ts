@@ -1,3 +1,5 @@
+// file deepcode ignore OverwriteAssignment/test: this is a test file!
+
 import * as camera from "@app/js/cameraManager/camera"
 
 import { expect } from "@jest/globals"
@@ -673,7 +675,14 @@ describe("zoomLevels", () => {
     test("0", () => {
         let callFunction: any = () => {
             inst.zoomLevel = inst.zoomTarget;
-            inst.zoomTarget = inst.zoomLevel;
+            inst.zoomTarget = inst.zoomLevel;            
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+
+    test("1", () => {
+        let callFunction: any = () => {            
             inst.zoomLevel = 1.1;
             inst.zoomLevel = -1;
             inst.zoomTarget = 1.1;

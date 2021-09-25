@@ -521,8 +521,6 @@ satSet.getSat = (i) => {
   if (!satSet.satData) return null;
   if (!satSet.satData[i]) return null;
 
-  if (satSet.satData[i].type == 'Star') return;
-
   if (gotExtraData) {
     satSet.satData[i].inViewChange = false;
     if (typeof dotManager.inViewData != 'undefined' && typeof dotManager.inViewData[i] != 'undefined') {
@@ -553,6 +551,8 @@ satSet.getSat = (i) => {
       z: dotManager.positionData[i * 3 + 2],
     };
   }
+
+  if (satSet.satData[i].type == 'Star') return satSet.satData[i];
 
   // Add Functions One Time
   if (typeof satSet.satData[i].isInSun == 'undefined') {

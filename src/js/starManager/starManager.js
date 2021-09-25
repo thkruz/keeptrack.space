@@ -41,9 +41,7 @@ export const drawAllConstellations = () => {
       try {
         star1 = getIdFromStarName(starManager.constellations[i].stars[s][0]);
         star2 = getIdFromStarName(starManager.constellations[i].stars[s][1]);
-        if (star1 == null || star2 == null) {
-          continue;
-        }
+        if (star1 == null || star2 == null) continue;
       } catch (e) {
         // IF this isn't Jest testing, then throw a warning
         if (typeof process === 'undefined') {
@@ -60,6 +58,7 @@ export const drawAllConstellations = () => {
 export const drawConstellations = (C) => {
   const getIdFromStarName = keepTrackApi.programs.satSet.getIdFromStarName;
   const { lineManager } = keepTrackApi.programs;
+  if (starManager.currentConstellationName === C) return;
   for (var i = 0; i < starManager.constellations.length; i++) {
     if (starManager.constellations[i].name === C) {
       for (var s = 0; s < starManager.constellations[i].stars.length; s++) {
@@ -67,18 +66,21 @@ export const drawConstellations = (C) => {
         var star1, star2;
         star1 = getIdFromStarName(starManager.constellations[i].stars[s][0]);
         star2 = getIdFromStarName(starManager.constellations[i].stars[s][1]);
+        if (star1 == null && star2 == null) return; // TODO: Not all constellations are ready yet
         if (typeof star1 == 'undefined' || star1 == null || typeof star2 == 'undefined' || star2 == null) {
           continue;
         }
         lineManager.create('sat5', [star1, star2], 'p');
         starManager.isConstellationVisible = true;
       }
+      return;
     }
   }
 };
 export const clearConstellations = () => {
   const { lineManager } = keepTrackApi.programs;
   starManager.isConstellationVisible = false;
+  starManager.currentConstellationName = null;
   var isFoundStar = true;
   var attempts = 0;
   // No idea why this took 3 tries -- maybe unnecessary now?
@@ -92,6 +94,7 @@ export const init = () => {
   try {
     starManager.isConstellationVisible = false;
     starManager.isAllConstellationVisible = false;
+    starManager.currentConstellationName = null;
     starManager.findStarsConstellation = findStarsConstellation;
     starManager.drawAllConstellations = drawAllConstellations;
     starManager.drawConstellations = drawConstellations;

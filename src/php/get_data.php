@@ -6,6 +6,6 @@
 
   if ($_GET['type'] == "n") {
     $SAT_ID = filter_var($_GET['sat'], FILTER_SANITIZE_NUMBER_INT);
-    echo file_get_contents("https://www.n2yo.com/satellite/?s=" . $SAT_ID);
+    echo htmlspecialchars(file_get_contents("https://www.n2yo.com/satellite/?s=" . $SAT_ID));
   }
 ?>

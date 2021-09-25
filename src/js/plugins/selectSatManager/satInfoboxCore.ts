@@ -175,7 +175,7 @@ const satInfoboxCore = {
     isLoaded: false,
     cbName: 'orbitalData',
     cb: (sat: any): void => {
-      const { uiManager, satSet, objectManager, searchBox, satellite } = keepTrackApi.programs;      
+      const { uiManager, satSet, objectManager, searchBox, satellite } = keepTrackApi.programs;
 
       if (!satInfoboxCore.orbitalData.isLoaded) {
         $('#ui-wrapper').append(keepTrackApi.html`
@@ -354,11 +354,14 @@ const satInfoboxCore = {
 
           // If No Sensor, then Ignore Sun Exclusion
           if (keepTrackApi.programs.sensorManager.currentSensor.lat === null) {
-            if (satInSun == 0) $('#sat-sun').html('No Sunlight');
-            if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
-            if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
-            // If Radar Selected, then Say the Sun Doesn't Matter
-          } else if (keepTrackApi.programs.sensorManager.currentSensor.type !== 'Optical' && keepTrackApi.programs.sensorManager.currentSensor.type !== 'Observer') {
+            $('#sat-sun').hide();
+            return;
+          } else {
+            $('#sat-sun').show();
+          }
+
+          // If Radar Selected, then Say the Sun Doesn't Matter
+          if (keepTrackApi.programs.sensorManager.currentSensor.type !== 'Optical' && keepTrackApi.programs.sensorManager.currentSensor.type !== 'Observer') {
             $('#sat-sun').html('No Effect');
             // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
           } else if (sunTime.dawn.getTime() - now.getTime() > 0 || sunTime.dusk.getTime() - now.getTime() < 0) {
@@ -368,6 +371,8 @@ const satInfoboxCore = {
             // If Optical Sesnor but Dawn Dusk Can't Be Calculated, then you are at a
             // high latitude and we need to figure that out
           } else if (sunTime.night != 'Invalid Date' && (sunTime.dawn == 'Invalid Date' || sunTime.dusk == 'Invalid Date')) {
+            // TODO: Figure out how to calculate this
+            console.debug('No Dawn or Dusk');
             if (satInSun == 0) $('#sat-sun').html('No Sunlight');
             if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
             if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');

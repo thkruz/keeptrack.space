@@ -129,10 +129,10 @@ const satInfoboxCore = {
       // Launch Site Correlation Table
       // /////////////////////////////////////////////////////////////////////////
       let siteArr = [];
-      let site;
-      let missileLV;
-      let missileOrigin;
-      let satLvString;
+      let site = {} as any;
+      let missileLV: any;
+      let missileOrigin: any;
+      let satLvString: string | JQuery.Node | ((this: HTMLElement, index: number, oldhtml: string) => string | JQuery.Node);
       if (sat.missile) {
         siteArr = sat.desc.split('(');
         missileOrigin = siteArr[0].substr(0, siteArr[0].length - 1);

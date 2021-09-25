@@ -17,7 +17,6 @@ const files = [
   'KeepTrack.bat',
   'KeepTrack.lnk',
   'Chrome With Local Files.lnk',
-  'embed.html',
   'config.htm',
   'favicon.ico',
   'index.htm',

@@ -43,6 +43,7 @@ import { VERSION } from '@app/js/settingsManager/version.js';
 import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
 import { adviceManager } from '@app/js/uiManager/ui-advice.js';
 import { drawManager } from '@app/js/drawManager/drawManager.js';
+import { isThisJest } from '@app/js/api/externalApi';
 import { jQAlt } from '@app/js/lib/jqalt.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
@@ -97,7 +98,8 @@ export const showErrorCode = (error) => {
     errorHtml += error.stack + '<br>';
   }
   $('#loader-text').html(errorHtml);
-  console.warn(error);
+  // istanbul ignore next
+  if (!isThisJest()) console.warn(error);
 };
 
 export const initalizeKeepTrack = async () => {
@@ -106,10 +108,10 @@ export const initalizeKeepTrack = async () => {
     // Load all the plugins now that we have the API initialized
     await import('@app/js/plugins/core')
       .then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins))
-      .catch((err) => console.log(err));
+      .catch((err) => {});
     await import('@app/js/plugins/plugins')
       .then((mod) => mod.loadExtraPlugins())
-      .catch((err) => console.log(err));
+      .catch((err) => {});
 
     uiManager.loadStr('science2');
     // Start initializing the rest of the website
@@ -191,36 +193,36 @@ settingsManager.versionDate = VERSION_DATE;
     if (!settingsManager.disableUI) {
       import('@app/css/fonts.css')
         .then((resp) => resp)
-        .catch((err) => console.log(err));
+        .catch((err) => {});
       import('@app/css/materialize.css')
         .then((resp) => resp)
-        .catch((err) => console.log(err));
+        .catch((err) => {});
       import('@app/css/materialize-local.css')
         .then((resp) => resp)
-        .catch((err) => console.log(err));
+        .catch((err) => {});
       import('@app/js/lib/external/colorPick.css')
         .then((resp) => resp)
-        .catch((err) => console.log(err));
+        .catch((err) => {});
       import('@app/css/perfect-scrollbar.min.css')
         .then((resp) => resp)
-        .catch((err) => console.log(err));
+        .catch((err) => {});
       import('@app/css/jquery-ui.min.css')
         .then((resp) => resp)
-        .catch((err) => console.log(err));
+        .catch((err) => {});
       import('@app/css/jquery-ui-timepicker-addon.css')
         .then((resp) => resp)
-        .catch((err) => console.log(err));
+        .catch((err) => {});
       import('@app/css/style.css')
         .then(
           await import('@app/css/responsive.css')
-            .catch((err) => console.log(err))
+            .catch((err) => {})
             .then((resp) => resp)
         )
-        .catch((err) => console.log(err));
+        .catch((err) => {});
     } else if (settingsManager.enableLimitedUI) {
       import('@app/css/limitedUI.css')
         .then((resp) => resp)
-        .catch((err) => console.log(err));
+        .catch((err) => {});
     } else {
       // console.log('ERROR');
     }

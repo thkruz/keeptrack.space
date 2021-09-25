@@ -1,6 +1,7 @@
-import 'jsdom-worker';
-import '@app/js/settingsManager/settingsManager.js';
-const main = require('./main');
+import * as main from './main.js';
+
+import { expect } from '@jest/globals';
+import { useMockWorkers } from '@app/js/api/apiMocks';
 
 // @ponicode
 describe('main.redirectHttpToHttps', () => {
@@ -65,8 +66,9 @@ describe('main.showErrorCode', () => {
 });
 
 // @ponicode
-describe.skip('main.initalizeKeepTrack', () => {
+describe('main.initalizeKeepTrack', () => {
   test('0', async () => {
+    useMockWorkers();
     await main.initalizeKeepTrack();
   });
 });

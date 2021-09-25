@@ -40,7 +40,7 @@ export const newLaunchSubmit = () => {
   quadZTime.setUTCHours(0); // Move to UTC Hour
 
   keepTrackApi.programs.timeManager.propOffset = quadZTime.getTime() - today.getTime(); // Find the offset from today
-  keepTrackApi.programs.cameraManager.camSnapMode = false;
+  keepTrackApi.programs.cameraManager.isCamSnapMode = false;
   keepTrackApi.programs.satSet.satCruncher.postMessage({
     // Tell satSet.satCruncher we have changed times for orbit calculations
     typ: 'offset',

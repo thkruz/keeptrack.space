@@ -69,7 +69,7 @@ export const uiInput: uiInputInterface = {
     }
 
     if (settingsManager.isZoomStopsRotation) {
-      cameraManager.rotateEarth(false);
+      cameraManager.autoRotate(false);
     }
 
     if (settingsManager.isZoomStopsSnappedOnSat || objectManager.selectedSat == -1) {
@@ -321,7 +321,6 @@ export const uiInput: uiInputInterface = {
         // Camera Manager Events
         // Middle Mouse Button MMB
         if (evt.button === 1) {
-          cameraManager.isLocalRotate = true;
           cameraManager.localRotateStartPosition = cameraManager.localRotateCurrent;
           if (cameraManager.isShiftPressed) {
             cameraManager.isLocalRotateRoll = true;
@@ -335,7 +334,6 @@ export const uiInput: uiInputInterface = {
 
         // Right Mouse Button RMB
         if (evt.button === 2 && (cameraManager.isShiftPressed || cameraManager.isCtrlPressed)) {
-          cameraManager.isPanning = true;
           cameraManager.panStartPosition = cameraManager.panCurrent;
           if (cameraManager.isShiftPressed) {
             cameraManager.isScreenPan = false;
@@ -352,12 +350,10 @@ export const uiInput: uiInputInterface = {
       window.addEventListener('mouseup', function (evt) {
         // Camera Manager Events
         if (evt.button === 1) {
-          cameraManager.isLocalRotate = false;
-          cameraManager.localRotateRoll = false;
-          cameraManager.localRotateYaw = false;
+          cameraManager.isLocalRotateRoll = false;
+          cameraManager.isLocalRotateYaw = false;
         }
         if (evt.button === 2) {
-          cameraManager.isPanning = false;
           cameraManager.isScreenPan = false;
           cameraManager.isWorldPan = false;
         }
@@ -472,10 +468,9 @@ export const uiInput: uiInputInterface = {
           if (evt.button === 0) {
             cameraManager.isDragging = true;
           }
-          // debugLine.set(dragPoint, getCamPos())
-          cameraManager.camSnapMode = false;
+          cameraManager.isCamSnapMode = false;
           if (!settingsManager.disableUI) {
-            cameraManager.rotateEarth(false);
+            cameraManager.autoRotate(false);
           }
           rightBtnMenuDOM.hide();
           uiManager.clearRMBSubMenu();
@@ -508,14 +503,13 @@ export const uiInput: uiInputInterface = {
             dragPoint = cameraManager.screenDragPoint; // Ignore the earth on mobile
             cameraManager.dragStartPitch = cameraManager.camPitch;
             cameraManager.dragStartYaw = cameraManager.camYaw;
-            // debugLine.set(dragPoint, getCamPos())
             cameraManager.isDragging = true;
             touchStartTime = Date.now();
             // If you hit the canvas hide any popups
             _hidePopUps();
-            cameraManager.camSnapMode = false;
+            cameraManager.isCamSnapMode = false;
             if (!settingsManager.disableUI) {
-              cameraManager.rotateEarth(false);
+              cameraManager.autoRotate(false);
             }
 
             // TODO: Make updateUrl() a setting that is disabled by default
@@ -564,7 +558,7 @@ export const uiInput: uiInputInterface = {
           dragHasMoved = false;
           cameraManager.isDragging = false;
           if (!settingsManager.disableUI) {
-            cameraManager.rotateEarth(false);
+            cameraManager.autoRotate(false);
           }
         };
         canvasDOM.on('mouseup', function (evt) {
@@ -745,7 +739,7 @@ export const uiInput: uiInputInterface = {
         dragHasMoved = false;
         cameraManager.isDragging = false;
         if (!settingsManager.disableUI) {
-          cameraManager.rotateEarth(false);
+          cameraManager.autoRotate(false);
         }
       });
 
@@ -1119,8 +1113,8 @@ export const uiInput: uiInputInterface = {
             //   cameraManager.camPitch = 0;
             //   cameraManager.camYaw = 0;
             // }
-            cameraManager.panReset = true;
-            cameraManager.localRotateReset = true;
+            cameraManager.isPanReset = true;
+            cameraManager.isLocalRotateReset = true;
             cameraManager.ftsRotateReset = true;
             break;
           case 'clear-lines-rmb':

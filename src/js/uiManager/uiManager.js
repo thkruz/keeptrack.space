@@ -220,7 +220,7 @@ uiManager.keyHandler = (evt) => {
   // console.log(Number(evt.charCode));
   switch (evt.key.toUpperCase()) {
     case 'R':
-      cameraManager.rotateEarth();
+      cameraManager.autoRotate();
       break;
     case 'C':
       // Create a local reference to the current cameraType
@@ -251,7 +251,7 @@ uiManager.keyHandler = (evt) => {
 
       if (curCam === 7) {
         // 7 is a placeholder to reset camera type
-        cameraManager.localRotateReset = true;
+        cameraManager.isLocalRotateReset = true;
         settingsManager.fieldOfView = 0.6;
         drawManager.glInit();
         if (objectManager.selectedSat !== -1) {
@@ -267,7 +267,7 @@ uiManager.keyHandler = (evt) => {
       switch (curCam) {
         case cameraManager.cameraType.default:
           uiManager.toast('Earth Centered Camera Mode', 'standby');
-          cameraManager.zoomLevel = 0.5;
+          cameraManager.zoomTarget = 0.5;
           break;
         case cameraManager.cameraType.offset:
           uiManager.toast('Offset Camera Mode', 'standby');
@@ -791,8 +791,8 @@ uiManager.updateURL = () => {
   window.history.replaceState(null, 'Keeptrack', url);
 };
 
-uiManager.lookAtSensor = () => {
-  cameraManager.lookAtSensor(sensorManager.selectedSensor.zoom, sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, timeManager.selectedDate);
+uiManager.lookAtLatLon = () => {
+  cameraManager.lookAtLatLon(sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, sensorManager.selectedSensor.zoom, timeManager.selectedDate);
 };
 
 uiManager.reloadLastSensor = () => {
@@ -815,13 +815,13 @@ uiManager.reloadLastSensor = () => {
           sensorManager.setSensor(currentSensor[0], currentSensor[1]);
           uiManager.getsensorinfo();
           uiManager.legendMenuChange('default');
-          uiManager.lookAtSensor();
+          uiManager.lookAtLatLon();
         } else {
           // Seems to be a single sensor without a staticnum, load that
           sensorManager.setSensor(sensorManager.sensorList[currentSensor[0].shortName], currentSensor[1]);
           uiManager.getsensorinfo();
           uiManager.legendMenuChange('default');
-          uiManager.lookAtSensor();
+          uiManager.lookAtLatLon();
         }
       }
     } catch (e) {

@@ -101,7 +101,7 @@ export const init = (): void => {
 
     let today = new Date(); // Need to know today for offset calculation
     keepTrackApi.programs.timeManager.propOffset = selectedDate.getTime() - today.getTime(); // Find the offset from today
-    keepTrackApi.programs.cameraManager.camSnapMode = false;
+    keepTrackApi.programs.cameraManager.isCamSnapMode = false;
     keepTrackApi.programs.satSet.satCruncher.postMessage({
       // Tell satSet.satCruncher we have changed times for orbit calculations
       typ: 'offset',

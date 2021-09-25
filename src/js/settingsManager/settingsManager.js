@@ -164,6 +164,11 @@ let settingsManager = {
     settingsManager.maxRadarData = 1; // 70000;
     // Adjust to change camera speed of auto rotate around earth
     settingsManager.autoRotateSpeed = 1.0 * 0.000075;
+    // Adjust to change camera speed of auto pan around earth
+    settingsManager.autoPanSpeed = {
+      x: 1,
+      y: 0,
+    };
     // Disable main user interface. Currently an all or nothing package.
     settingsManager.disableUI = false;
     // Currently only disables panning. In the future it will disable all camera

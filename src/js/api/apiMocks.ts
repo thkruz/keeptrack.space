@@ -141,7 +141,7 @@ export const keepTrackApiStubs = {
       changeZoom: jest.fn(),
       latToPitch: jest.fn(),
       longToYaw: jest.fn(),
-      rotateEarth: jest.fn(),
+      autoRotate: jest.fn(),
     },
     ColorScheme: {
       reloadColors: jest.fn(),      
@@ -160,8 +160,7 @@ export const keepTrackApiStubs = {
         0,
         0,
       ],
-    },
-    gl: global.mocks.glMock,
+    },    
     groups: null,
     groupsManager: {
       Canada: null,

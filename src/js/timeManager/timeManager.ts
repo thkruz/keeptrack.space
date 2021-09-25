@@ -38,6 +38,22 @@ interface timeManagerObject {
   jday: (year: any, mon: any, day: any, hr: any, minute: any, sec: any) => any;
 }
 
+export const getDayOfYear = (date: Date) => {
+  date = date || new Date();
+  const _isLeapYear = (date: Date) => {
+    const year = date.getFullYear();
+    if ((year & 3) !== 0) return false;
+    return year % 100 !== 0 || year % 400 === 0;
+  };
+
+  const dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+  const mn = date.getMonth();
+  const dn = date.getUTCDate();
+  let dayOfYear = dayCount[mn] + dn;
+  if (mn > 1 && _isLeapYear(date)) dayOfYear++;
+  return dayOfYear;
+}
+
 export const timeManager: timeManagerObject = {
   dateObject: null,
   propTimeVar: null,
@@ -208,21 +224,7 @@ export const timeManager: timeManagerObject = {
     };
 
     // Get Day of Year
-    timeManager.getDayOfYear = function (date) {
-      date = date || new Date();
-      var _isLeapYear = (date: Date) => {
-        var year = date.getFullYear();
-        if ((year & 3) !== 0) return false;
-        return year % 100 !== 0 || year % 400 === 0;
-      };
-
-      var dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-      var mn = date.getMonth();
-      var dn = date.getUTCDate();
-      var dayOfYear = dayCount[mn] + dn;
-      if (mn > 1 && _isLeapYear(date)) dayOfYear++;
-      return dayOfYear;
-    };
+    timeManager.getDayOfYear = getDayOfYear;
 
     timeManager.dateFromDay = function (year, day) {
       var date = new Date(year, 0); // initialize a date in `year-01-01`

@@ -29,7 +29,7 @@ describe("sensorSurv.bottomMenuClick", () => {
     
         expect(callFunction).not.toThrow()
     })
-    test("0", () => {
+    test("1", () => {
         let callFunction: any = () => {
             sensorSurv.bottomMenuClick('')
         }

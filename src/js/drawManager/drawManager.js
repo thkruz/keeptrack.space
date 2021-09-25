@@ -3,7 +3,7 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins/selectSatManager/selectSatManager.js';
 import { satScreenPositionArray, satSet } from '@app/js/satSet/satSet.js';
 
-import { Camera } from '@app/js/cameraManager/camera.js';
+import { Camera } from '@app/js/cameraManager/camera';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { meshManager } from '@app/js/drawManager/meshManager.js';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
@@ -364,10 +364,10 @@ export const updateLoop = () => {
   drawManager.satCalculate();
 
   // Calculate camera changes needed since last draw
-  cameraManager.calculate(objectManager.selectedSat, drawManager.dt);
+  cameraManager.calculate(drawManager.dt, objectManager.selectedSat !== -1);
 
   // If in satellite view the orbit buffer needs to be updated every time
-  if (cameraManager.cameraType.current == cameraManager.cameraType.satellite) orbitManager.updateOrbitBuffer(objectManager.lastSelectedSat());
+  if (cameraManager.cameraType.current == cameraManager.cameraType.satellite && objectManager.selectedSat !== -1) orbitManager.updateOrbitBuffer(objectManager.lastSelectedSat());
 
   sceneManager.sun.update();
 

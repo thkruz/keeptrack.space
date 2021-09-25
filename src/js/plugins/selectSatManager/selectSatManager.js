@@ -25,10 +25,10 @@ const selectSatManager = {
       // Selecting a non-missile non-sensor object does nothing
       if ((sat.active == false || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') return;
       // stop rotation if it is on
-      cameraManager.rotateEarth(false);
+      cameraManager.autoRotate(false);
     }
 
-    cameraManager.camSnapMode = false;
+    cameraManager.isCamSnapMode = false;
     // Don't select -1 twice
     if (!(satId === -1 && isselectedSatNegativeOne)) {
       satSet.selectSat(satId);
@@ -77,7 +77,7 @@ const selectSatManager = {
           cameraManager.cameraType.set(cameraManager.cameraType.fixedToSat);
         } else if (typeof sat.staticNum !== 'undefined') {
           sensorManager.setSensor(null, sat.staticNum);
-          cameraManager.lookAtSensor(sensorManager.selectedSensor.zoom, sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, keepTrackApi.programs.timeManager.selectedDate);
+          cameraManager.lookAtLatLon(sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, sensorManager.selectedSensor.zoom, keepTrackApi.programs.timeManager.selectedDate);
         }
       }
       isselectedSatNegativeOne = false;

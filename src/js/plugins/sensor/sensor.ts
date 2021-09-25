@@ -423,7 +423,7 @@ export const init = (): void => {
         uiManager.getsensorinfo();
 
         try {
-          uiManager.lookAtSensor();
+          uiManager.lookAtLatLon();
         } catch {
           // TODO: More intentional conditional statement
           // Multi-sensors break this

@@ -65,8 +65,8 @@ export const bottomMenuClick = (iconName: string): void => {
     const cameraManager = keepTrackApi.programs.cameraManager;
     if (keepTrackApi.programs.planetarium.isPlanetariumView) {
       keepTrackApi.programs.planetarium.isPlanetariumView = false;
-      cameraManager.panReset = true;
-      cameraManager.localRotateReset = true;
+      cameraManager.isPanReset = true;
+      cameraManager.isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6;
       drawManager.glInit();
       uiManager.hideSideMenus();

@@ -35,7 +35,7 @@ import { LineFactory, sceneManager } from '@app/js/drawManager/sceneManager/scen
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 
 import $ from 'jquery';
-import { Camera } from '@app/js/cameraManager/camera.js';
+import { Camera } from '@app/js/cameraManager/camera';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { Dots } from '@app/js/drawManager/dots';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';

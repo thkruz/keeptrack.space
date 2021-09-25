@@ -25,7 +25,7 @@ test(`selectSatManager Unit Testing`, () => {
     },
   };
   keepTrackApi.programs.cameraManager = {
-    rotateEarth: jest.fn(),
+    autoRotate: jest.fn(),
     fts2default: jest.fn(),
     cameraType: {
       current: 1,
@@ -33,7 +33,7 @@ test(`selectSatManager Unit Testing`, () => {
       fixedToSat: 2,
       set: jest.fn(),
     },
-    lookAtSensor: jest.fn(),
+    lookAtLatLon: jest.fn(),
   };
   keepTrackApi.programs.satSet = {
     getSat: () => ({
@@ -58,7 +58,7 @@ test(`selectSatManager Unit Testing`, () => {
     selectedDate: 1,
   };
   keepTrackApi.programs.objectManager = {
-    rotateEarth: jest.fn(),
+    autoRotate: jest.fn(),
     setSelectedSat: jest.fn(),
     extractCountry: () => 'US',
     extractLaunchSite: () => 'ESTR',

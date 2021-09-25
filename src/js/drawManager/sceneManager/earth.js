@@ -489,17 +489,9 @@ earth.draw = function (pMatrix, cameraManager, dotsManager, tgtBuffer) {
 
   // Set the uniforms
   const uZoomModifier = cameraManager.cameraType.current === cameraManager.cameraType.fixedToSat || cameraManager.panCurrent.x !== 0 || cameraManager.panCurrent.y !== 0 || cameraManager.panCurrent.z ? cameraManager.zoomLevel : 1.0;
-  // let camPos = cameraManager.getCamPos();
-  // camPos[0] -= cameraManager.panCurrent.x;
-  // camPos[1] -= cameraManager.panCurrent.y;
-  // camPos[2] -= cameraManager.panCurrent.z;
-  let inverted = glm.mat4.create();
-  glm.mat4.invert(inverted, cameraManager.camMatrix);
-  const forward = glm.vec3.create();
-  glm.vec3.transformMat4(forward, forward, inverted);
 
   gl.uniform1f(earthShader.uZoomModifier, uZoomModifier);
-  gl.uniform3fv(earthShader.uCamPos, forward);
+  gl.uniform3fv(earthShader.uCamPos, cameraManager.getForwardVector());
   gl.uniformMatrix3fv(earthShader.uNormalMatrix, false, nMatrix);
   gl.uniformMatrix4fv(earthShader.uMvMatrix, false, mvMatrix);
   gl.uniformMatrix4fv(earthShader.uPMatrix, false, pMatrix);

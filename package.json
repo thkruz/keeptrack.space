@@ -24,6 +24,7 @@
   "scripts": {
     "build": "npm run build:dev",
     "build:dev": "npm run prebuild && cross-env NODE_ENV=development node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
+    "build:embed": "npm run prebuild:embed && cross-env NODE_ENV=embed node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "build:test": "npm run prebuild && cross-env NODE_ENV=test node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "changelog": "npx auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs",
     "cypress": "npx cypress open",
@@ -33,12 +34,14 @@
     "getExtra:textures": "node ./scripts/updateTextures.mjs",
     "getExtra:tle": "node ./scripts/updateTle.mjs",
     "http": "http-server ./dist/",
+    "http:embed": "http-server ./embed/",
     "lcov": "node ./scripts/openLcov.mjs",
     "lint": "eslint ./src/**/*",
-    "makePlugins": "node ./scripts/makePlugins.mjs",
     "prebuild": "node ./scripts/prebuild.mjs && npm run updateVersion && npm run updateTime",
+    "prebuild:embed": "node ./scripts/prebuildEmbed.mjs",
     "publish:github": "node ./scripts/githubPublish.js",
     "start": "http-server ./dist/ -o index.htm -a 127.0.0.1",
+    "start:embed": "http-server ./embed/ -o example.htm -a 127.0.0.1",
     "start:ssl": "http-server ./dist/ -o index.htm -a 127.0.0.1 --ssl",
     "test": "start-server-and-test http http://localhost:8080 test:noserver",
     "test:nocov": "jest",
@@ -54,6 +57,14 @@
     "transform": {
       "^.+\\.[t|j]sx?$": "babel-jest"
     },
+    "testMatch": [
+      "**/?(*.)+(spec|test).?(m)[jt]s?(x)"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "mjs",
+      "ts"
+    ],
     "setupFiles": [
       "jest-canvas-mock",
       "<rootDir>/test/polyfills.js",
@@ -160,6 +171,7 @@
     "gh-pages": "^3.1.0",
     "html-webpack-plugin": "^5.3.1",
     "http-server": "^13.0.0",
+    "ignore-loader": "^0.1.2",
     "imports-loader": "^3.0.0",
     "jest": "^27.0.6",
     "jest-canvas-mock": "^2.3.1",
@@ -178,10 +190,12 @@
     "webpack": "^5.11.0",
     "webpack-cli": "^4.2.0",
     "webpack-glob": "^2.0.2",
+    "webpackbar": "^5.0.0-3",
     "worker-loader": "^3.0.7"
   },
   "dependencies": {
     "gl-matrix": "^3.3.0",
+    "gremlins.js": "^2.2.0",
     "jquery": "^3.6.0",
     "jquery-ui-bundle": "^1.12.1-migrate",
     "materialize-css": "github:Dogfalo/materialize",

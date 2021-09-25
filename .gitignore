@@ -83,6 +83,7 @@ coverage/
 
 # Build Folder
 dist
+embed
 
 # Work In Progress
 src/js/wip/

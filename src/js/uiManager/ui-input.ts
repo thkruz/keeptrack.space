@@ -1,10 +1,9 @@
 import * as glm from '../lib/external/gl-matrix.js';
 import $ from 'jquery';
 import { RADIUS_OF_EARTH } from '../lib/constants.js';
-import { keepTrackApi } from '@app/js/api/externalApi';
-const settingsManager: any = window.settingsManager;
 
 let M = window.M;
+const keepTrackApi = (<any>window).keepTrackApi;
 
 let clickedSat = 0;
 let maxPinchSize = Math.hypot(window.innerWidth, window.innerHeight);
@@ -40,7 +39,7 @@ interface uiInputInterface {
   rmbMenuActions: any;
 }
 
-let uiInput: uiInputInterface = {
+export const uiInput: uiInputInterface = {
   isMouseMoving: false,
   isStartedOnCanvas: false,
   mouseSat: -1,
@@ -52,9 +51,7 @@ let uiInput: uiInputInterface = {
   openRmbMenu: null,
   rmbMenuActions: null,
   canvasWheel: (evt: any): void => {
-    const cameraManager = keepTrackApi.programs.cameraManager;
-    const objectManager = keepTrackApi.programs.objectManager;
-    const drawManager = keepTrackApi.programs.drawManager;
+    const { cameraManager, objectManager, drawManager } = keepTrackApi.programs;
 
     if (!settingsManager.disableUI && settingsManager.disableNormalEvents) {
       evt.preventDefault();
@@ -116,18 +113,8 @@ let uiInput: uiInputInterface = {
     }
   },
   init: (): void => {
-    const cameraManager = keepTrackApi.programs.cameraManager;
-    const objectManager = keepTrackApi.programs.objectManager;
-    const satellite = keepTrackApi.programs.satellite;
-    const satSet = keepTrackApi.programs.satSet;
-    const lineManager = keepTrackApi.programs.lineManager;
-    const sensorManager = keepTrackApi.programs.sensorManager;
-    const starManager = keepTrackApi.programs.starManager;
-    const ColorScheme = keepTrackApi.programs.ColorScheme;
-    const satCruncher = keepTrackApi.programs.satCruncher;
-    const uiManager = keepTrackApi.programs.uiManager;
-    const drawManager = keepTrackApi.programs.drawManager;
-    const gl = keepTrackApi.programs.drawManager.gl;
+    const { uiManager, satCruncher, ColorScheme, starManager, sensorManager, lineManager, satSet, satellite, cameraManager, objectManager, drawManager } = keepTrackApi.programs;
+    const gl = drawManager.gl;
 
     $('#rmb-wrapper').append(keepTrackApi.html`    
       <div id="right-btn-menu" class="right-btn-menu">
@@ -321,57 +308,62 @@ let uiInput: uiInputInterface = {
       );
     }
 
-    window.addEventListener('mousedown', (evt) => {
-      // Camera Manager Events
-      {
-        if (!settingsManager.disableCameraControls) {
-          // Middle Mouse Button MMB
-          if (evt.button === 1) {
-            cameraManager.isLocalRotate = true;
-            cameraManager.localRotateStartPosition = cameraManager.localRotateCurrent;
-            if (cameraManager.isShiftPressed) {
-              cameraManager.isLocalRotateRoll = true;
-              cameraManager.isLocalRotateYaw = false;
-            } else {
-              cameraManager.isLocalRotateRoll = false;
-              cameraManager.isLocalRotateYaw = true;
-            }
-            evt.preventDefault();
-          }
+    if (settingsManager.disableNormalEvents || settingsManager.disableDefaultContextMenu) {
+      window.oncontextmenu = function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
+      };
+    }
 
-          // Right Mouse Button RMB
-          if (evt.button === 2 && (cameraManager.isShiftPressed || cameraManager.isCtrlPressed)) {
-            cameraManager.isPanning = true;
-            cameraManager.panStartPosition = cameraManager.panCurrent;
-            if (cameraManager.isShiftPressed) {
-              cameraManager.isScreenPan = false;
-              cameraManager.isWorldPan = true;
-            } else {
-              cameraManager.isScreenPan = true;
-              cameraManager.isWorldPan = false;
-            }
+    if (!settingsManager.disableCameraControls) {
+      window.addEventListener('mousedown', (evt) => {
+        // Camera Manager Events
+        // Middle Mouse Button MMB
+        if (evt.button === 1) {
+          cameraManager.isLocalRotate = true;
+          cameraManager.localRotateStartPosition = cameraManager.localRotateCurrent;
+          if (cameraManager.isShiftPressed) {
+            cameraManager.isLocalRotateRoll = true;
+            cameraManager.isLocalRotateYaw = false;
+          } else {
+            cameraManager.isLocalRotateRoll = false;
+            cameraManager.isLocalRotateYaw = true;
           }
+          evt.preventDefault();
         }
-      }
-    });
 
-    $(window).mouseup(function (evt) {
-      // Camera Manager Events
-      {
-        if (!settingsManager.disableCameraControls) {
-          if (evt.button === 1) {
-            cameraManager.isLocalRotate = false;
-            cameraManager.localRotateRoll = false;
-            cameraManager.localRotateYaw = false;
-          }
-          if (evt.button === 2) {
-            cameraManager.isPanning = false;
+        // Right Mouse Button RMB
+        if (evt.button === 2 && (cameraManager.isShiftPressed || cameraManager.isCtrlPressed)) {
+          cameraManager.isPanning = true;
+          cameraManager.panStartPosition = cameraManager.panCurrent;
+          if (cameraManager.isShiftPressed) {
             cameraManager.isScreenPan = false;
+            cameraManager.isWorldPan = true;
+          } else {
+            cameraManager.isScreenPan = true;
             cameraManager.isWorldPan = false;
           }
         }
-      }
-    });
+      });
+    }
+
+    if (!settingsManager.disableCameraControls) {
+      window.addEventListener('mouseup', function (evt) {
+        // Camera Manager Events
+        if (evt.button === 1) {
+          cameraManager.isLocalRotate = false;
+          cameraManager.localRotateRoll = false;
+          cameraManager.localRotateYaw = false;
+        }
+        if (evt.button === 2) {
+          cameraManager.isPanning = false;
+          cameraManager.isScreenPan = false;
+          cameraManager.isWorldPan = false;
+        }
+      });
+    }
+
     (function _canvasController() {
       let latLon: any;
       canvasDOM.on('touchmove', function (evt) {
@@ -546,6 +538,8 @@ let uiInput: uiInputInterface = {
 
           if (!dragHasMoved) {
             if (settingsManager.isMobileModeEnabled) {
+              cameraManager.mouseX = isNaN(cameraManager.mouseX) ? 0 : cameraManager.mouseX;
+              cameraManager.mouseY = isNaN(cameraManager.mouseY) ? 0 : cameraManager.mouseY;
               uiInput.mouseSat = uiInput.getSatIdFromCoord(cameraManager.mouseX, cameraManager.mouseY);
             }
             clickedSat = uiInput.mouseSat;
@@ -1387,9 +1381,8 @@ let uiInput: uiInputInterface = {
 
   // Convert Screen X,Y back to ECI
   unProject: (x: number, y: number): [number, number, number] => {
-    const gl = keepTrackApi.programs.drawManager.gl;
-    const drawManager = keepTrackApi.programs.drawManager;
-    const cameraManager = keepTrackApi.programs.cameraManager;
+    const { cameraManager, drawManager } = keepTrackApi.programs;
+    const { gl } = drawManager;
 
     const glScreenX = (x / gl.drawingBufferWidth) * 2 - 1.0;
     const glScreenY = 1.0 - (y / gl.drawingBufferHeight) * 2;
@@ -1478,8 +1471,8 @@ let uiInput: uiInputInterface = {
 
   isAsyncWorking: true,
   getSatIdFromCoord: (x: number, y: number): number => {
-    const gl = keepTrackApi.programs.drawManager.gl;
-    const dotsManager = keepTrackApi.programs.dotsManager;
+    const { dotsManager } = keepTrackApi.programs;
+    const { gl } = keepTrackApi.programs.drawManager;
 
     // NOTE: gl.readPixels is a huge bottleneck
     gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
@@ -1495,10 +1488,10 @@ let uiInput: uiInputInterface = {
 
   // Raycasting in getEarthScreenPoint would provide a lot of powerful (but slow) options later
   getEarthScreenPoint: (x: number, y: number) => {
-    const cameraManager = keepTrackApi.programs.cameraManager;
+    const { cameraManager } = keepTrackApi.programs;
 
     // getEarthScreenPoint
-    var rayOrigin, ptThru, rayDir, toCenterVec, dParallel, longDir, dPerp, dSubSurf, dSurf, ptSurf;
+    let rayOrigin, ptThru, rayDir, toCenterVec, dParallel, longDir, dPerp, dSubSurf, dSurf, ptSurf;
 
     rayOrigin = cameraManager.getCamPos();
     ptThru = uiInput.unProject(x, y);
@@ -1526,5 +1519,3 @@ let uiInput: uiInputInterface = {
     return ptSurf;
   },
 };
-
-export { uiInput };

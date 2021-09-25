@@ -1,12 +1,8 @@
-/* eslint-disable no-undefined */
-/*globals
-  test
-  global
-*/
-
-import '@app/js/settingsManager/settingsManager.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApiStubs } from '../api/apiMocks';
 import { uiInput } from './ui-input';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 document.body.innerHTML = global.docBody;
 
@@ -25,21 +21,6 @@ test('UI Input Validation Test', () => {
   keyEvt('keydown', { which: '61', ctrlKey: true });
 
   settingsManager.disableWindowScroll = true;
-  const cameraManager = {
-    rotateEarth: () => true,
-  };
-  keepTrackApi.programs.cameraManager = cameraManager;
-
-  const uiManager = {
-    clearRMBSubMenu: () => true,
-    updateURL: () => true,
-  };
-  keepTrackApi.programs.uiManager = uiManager;
-
-  const lineManager = {
-    getLineListLen: () => 0,
-  };
-  keepTrackApi.programs.lineManager = lineManager;
 
   uiInput.init();
   window.dispatchEvent(new CustomEvent('scroll'));
@@ -65,23 +46,23 @@ test('UI Input Validation Test', () => {
   keyEvt('keydown', { ctrlKey: true, which: 187 });
   keyEvt('keydown', { ctrlKey: true, which: 189 });
 
-  mouseEvt('mousedown', { button: 1 });
-  mouseEvt('mouseup', { button: 1 });
-  mouseEvt('mousedown', { button: 2 });
-  mouseEvt('mouseup', { button: 2 });
-  cameraManager.isShiftPressed = true;
+  mouseEvt('mousedown', { button: 1 }, null);
+  mouseEvt('mouseup', { button: 1 }, null);
+  mouseEvt('mousedown', { button: 2 }, null);
+  mouseEvt('mouseup', { button: 2 }, null);
+  keepTrackApi.programs.cameraManager.isShiftPressed = true;
   uiInput.init();
-  mouseEvt('mousedown', { button: 1 });
-  mouseEvt('mouseup', { button: 1 });
-  mouseEvt('mousedown', { button: 2 });
-  mouseEvt('mouseup', { button: 2 });
+  mouseEvt('mousedown', { button: 1 }, null);
+  mouseEvt('mouseup', { button: 1 }, null);
+  mouseEvt('mousedown', { button: 2 }, null);
+  mouseEvt('mouseup', { button: 2 }, null);
   settingsManager.disableCameraControls = true;
-  mouseEvt('mousedown', { button: 1 });
-  mouseEvt('mouseup', { button: 1 });
+  mouseEvt('mousedown', { button: 1 }, null);
+  mouseEvt('mouseup', { button: 1 }, null);
 
   const evObj = new Event('touchmove', { bubbles: true, cancelable: false });
   uiInput.canvasMouseDown(evObj);
-  evObj.originalEvent = {
+  (<any>evObj).originalEvent = {
     touches: [
       { pageX: 100, pageY: 100 },
       { pageX: 100, pageY: 100 },

@@ -1,4 +1,5 @@
 import 'webgl-mock';
+import '@app/js/settingsManager/settingsManager';
 
 import $ from 'jquery';
 import { JSDOM } from 'jsdom';

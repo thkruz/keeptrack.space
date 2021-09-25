@@ -21,7 +21,7 @@ let settingsManager = {
   classificationStr: '',
   // This controls which of the built-in plugins are loaded
   plugins: {
-    atmosphere: true,
+    debug: true,
     satInfoboxCore: true,
     updateSelectBoxCore: true,
     aboutManager: true,
@@ -64,6 +64,27 @@ let settingsManager = {
     classification: true,
     soundManager: true,
   },
+  colors: {
+    transparent: null,
+  },
+  timeMachineDelay: null,
+  mapWidth: null,
+  mapHeight: null,
+  isMapUpdateOverride: null,
+  disableUI: null,
+  isMobileModeEnabled: null,
+  lastMapUpdateTime: null,
+  isFOVBubbleModeOn: null,
+  isShowSurvFence: null,
+  isSatOverflyModeOn: null,
+  currentColorScheme: null,
+  hiResWidth: null,
+  hiResHeight: null,
+  screenshotMode: null,
+  lastBoxUpdateTime: null,
+  isEditTime: null,
+  fieldOfView: null,
+  db: null,
   init: async () => {
     settingsManager.pTime = [];
 
@@ -124,6 +145,18 @@ let settingsManager = {
     settingsManager.maxMissiles = 500;
     settingsManager.maxAnalystSats = 256;
 
+    // Enable the debris only catalog
+    settingsManager.isUseDebrisCatalog = false;
+
+    // Dont load the sensors
+    settingsManager.isDisableSensors = false;
+
+    // Dont load the launch sites
+    settingsManager.isDisableLaunchSites = false;
+
+    // Dont Load the control sites
+    settingsManager.isDisableControlSites = false;
+
     // Enable/Disable gs.json catalog Information
     settingsManager.isEnableGsCatalog = true;
     // Enable/Disable radarData Information
@@ -138,6 +171,8 @@ let settingsManager = {
     settingsManager.disableCameraControls = false;
     // Disable normal browser events from keyboard/mouse
     settingsManager.disableNormalEvents = false;
+    // Disable normal browser right click menu
+    settingsManager.disableDefaultContextMenu = true;
     // Disable Scrolling the Window Object
     settingsManager.disableWindowScroll = true;
     // Disable Zoom Keyboard Keys
@@ -194,7 +229,7 @@ let settingsManager = {
     // Minimum elevation to draw a line scan
     settingsManager.lineScanMinEl = 5;
 
-    // Minimum fps or sun/moon/atmosphere are skipped
+    // Minimum fps or sun/moon are skipped
     settingsManager.fpsThrottle1 = 0;
     // Minimum fps or satellite velocities are ignored
     settingsManager.fpsThrottle2 = 10;
@@ -206,7 +241,7 @@ let settingsManager = {
     // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 
     // Use these to default smallest resolution maps and limited "extras" like
-    // the atmosphere and sun. Really useful on small screens and for faster
+    // the sun. Really useful on small screens and for faster
     // loading times
     // settingsManager.isDrawLess = true;
     // settingsManager.smallImages = true;
@@ -231,14 +266,10 @@ let settingsManager = {
     // //////////////////////////////////////////////////////////////////////////
     settingsManager.showOrbitThroughEarth = false;
 
-    settingsManager.earthNumLatSegs = 64;
-    settingsManager.earthNumLonSegs = 64;
-    settingsManager.atmospherelatSegs = 64;
-    settingsManager.atmospherelonSegs = 64;
+    settingsManager.earthNumLatSegs = 80;
+    settingsManager.earthNumLonSegs = 80;
 
     const RADIUS_OF_EARTH = 6371.0;
-    settingsManager.atmosphereSize = RADIUS_OF_EARTH + 250;
-    settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)';
 
     settingsManager.satShader = {};
     settingsManager.satShader.largeObjectMinZoom = 0.37;
@@ -594,8 +625,6 @@ let settingsManager = {
               // settingsManager.hiresImages = true;
               settingsManager.earthNumLatSegs = 128;
               settingsManager.earthNumLonSegs = 128;
-              settingsManager.atmospherelatSegs = 128;
-              settingsManager.atmospherelonSegs = 128;
               // settingsManager.minimumDrawDt = 0.01667;
               break;
             case 'nostars':

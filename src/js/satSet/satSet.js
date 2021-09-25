@@ -118,7 +118,7 @@ satSet.init = async () => {
 
 var addSatCruncherOnMessage = (cameraManager) => {
   satCruncher.onmessage = (m) => {
-    if (!gotExtraData && m.data.extraData) {
+    if (!gotExtraData && m.data?.extraData) {
       // store extra data that comes from crunching
       // Only do this once
 
@@ -152,7 +152,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
       return;
     }
 
-    if (m.data.extraUpdate) {
+    if (m.data?.extraUpdate) {
       satExtraData = JSON.parse(m.data.extraData);
       let satCrunchIndex = m.data.satId;
 
@@ -185,7 +185,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
       dotManager.velocityData.set(m.data.satVel, 0);
     }
 
-    if (typeof m.data.satInView != 'undefined' && m.data.satInView !== []) {
+    if (typeof m.data?.satInView != 'undefined' && m.data?.satInView.length > 0) {
       if (typeof dotManager.inViewData == 'undefined' || dotManager.inViewData.length !== m.data.satInView.length) {
         dotManager.inViewData = new Int8Array(m.data.satInView);
       } else {
@@ -193,7 +193,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
       }
     }
 
-    if (typeof m.data.satInSun != 'undefined' && m.data.satInSun !== []) {
+    if (typeof m.data?.satInSun != 'undefined' && m.data?.satInSun.length > 0) {
       if (typeof dotManager.inSunData == 'undefined' || dotManager.inSunData.length !== m.data.satInSun.length) {
         dotManager.inSunData = new Int8Array(m.data.satInSun);
       } else {
@@ -201,11 +201,11 @@ var addSatCruncherOnMessage = (cameraManager) => {
       }
     }
 
-    if (typeof m.data.sensorMarkerArray != 'undefined' || m.data.sensorMarkerArray == []) {
+    if (typeof m.data?.sensorMarkerArray != 'undefined' || m.data?.sensorMarkerArray?.length === 0) {
       satSet.satSensorMarkerArray = m.data.sensorMarkerArray;
     }
 
-    const highestMarkerNumber = satSet.satSensorMarkerArray[satSet.satSensorMarkerArray.length - 1] || 0;
+    const highestMarkerNumber = satSet.satSensorMarkerArray?.[satSet.satSensorMarkerArray?.length - 1] || 0;
     settingsManager.dotsOnScreen = Math.max(satSet.numSats - settingsManager.maxFieldOfViewMarkers, highestMarkerNumber);
 
     // Run any callbacks for a normal position cruncher message
@@ -219,7 +219,8 @@ var addSatCruncherOnMessage = (cameraManager) => {
       }
     }
 
-    if (!settingsManager.cruncherReady) {
+    // Only do this once after satSet.satData is ready
+    if (!settingsManager.cruncherReady && typeof satSet.satData !== 'undefined') {
       satSet.onCruncherReady();
       if (!settingsManager.disableUI) {
         uiManager.reloadLastSensor();
@@ -355,12 +356,17 @@ satSet.resetSatInSun = () => {
 satSet.setColorScheme = async (scheme, isForceRecolor) => {
   try {
     settingsManager.setCurrentColorScheme(scheme);
-
     await scheme.calculateColorBuffers(isForceRecolor);
     dotManager.colorBuffer = scheme.colorBuf;
     dotManager.pickingBuffer = scheme.pickableBuf;
   } catch (error) {
-    // console.error(error);
+    // If we can't load the color scheme, just use the default
+    console.debug(error);
+    settingsManager.setCurrentColorScheme(keepTrackApi.programs.ColorScheme.default);
+    scheme = keepTrackApi.programs.ColorScheme.default;
+    await scheme.calculateColorBuffers(isForceRecolor);
+    dotManager.colorBuffer = scheme.colorBuf;
+    dotManager.pickingBuffer = scheme.pickableBuf;
   }
 };
 
@@ -802,7 +808,7 @@ satSet.getSatFromObjNum = (objNum) => {
 };
 
 satSet.getIdFromObjNum = (objNum) => {
-  if (typeof satSet.sccIndex[`${objNum}`] !== 'undefined') {
+  if (typeof satSet.sccIndex?.[`${objNum}`] !== 'undefined') {
     return satSet.sccIndex[`${objNum}`];
   } else {
     for (let i = 0; i < satSet.satData.length; i++) {

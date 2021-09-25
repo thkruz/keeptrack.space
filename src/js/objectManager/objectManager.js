@@ -129,77 +129,83 @@ objectManager.init = async () => {
     console.log('You do not have the Star Module');
   }
   // Try Loading Sensor Module
-  try {
-    // if (typeof sensorManager == 'undefined') throw 'You do not have the Sensor Module';
-    sensorList = sensorManager.sensorList;
-    for (const sensor in sensorList) {
-      var sensorInfo = {
-        static: true,
-        staticNum: sensorList[sensor].staticNum,
-        name: sensorList[sensor].name,
-        type: sensorList[sensor].type,
-        lat: sensorList[sensor].lat,
-        lon: sensorList[sensor].lon,
-        alt: sensorList[sensor].alt,
-        changeObjectInterval: sensorList[sensor].changeObjectInterval,
-      };
-      objectManager.staticSet.push(sensorInfo);
+  if (!settingsManager.isDisableSensors) {
+    try {
+      // if (typeof sensorManager == 'undefined') throw 'You do not have the Sensor Module';
+      sensorList = sensorManager.sensorList;
+      for (const sensor in sensorList) {
+        var sensorInfo = {
+          static: true,
+          staticNum: sensorList[sensor].staticNum,
+          name: sensorList[sensor].name,
+          type: sensorList[sensor].type,
+          lat: sensorList[sensor].lat,
+          lon: sensorList[sensor].lon,
+          alt: sensorList[sensor].alt,
+          changeObjectInterval: sensorList[sensor].changeObjectInterval,
+        };
+        objectManager.staticSet.push(sensorInfo);
+      }
+      objectManager.isSensorManagerLoaded = true;
+    } catch (e) {
+      objectManager.isSensorManagerLoaded = false;
+      settingsManager.maxFieldOfViewMarkers = 1;
+      console.log('You do not have the Sensor Module');
     }
-    objectManager.isSensorManagerLoaded = true;
-  } catch (e) {
-    objectManager.isSensorManagerLoaded = false;
-    settingsManager.maxFieldOfViewMarkers = 1;
-    console.log('You do not have the Sensor Module');
   }
 
   // Try Loading the Launch Site Module
-  try {
-    var launchSiteList = launchSiteManager.launchSiteList;
-    for (var launchSite in launchSiteList) {
-      var launchSiteInfo = {
-        static: true,
-        name: launchSiteList[launchSite].name,
-        type: 'Launch Facility',
-        lat: launchSiteList[launchSite].lat,
-        lon: launchSiteList[launchSite].lon,
-        alt: launchSiteList[launchSite].alt,
-      };
-      objectManager.staticSet.push(launchSiteInfo);
+  if (!settingsManager.isDisableLaunchSites) {
+    try {
+      var launchSiteList = launchSiteManager.launchSiteList;
+      for (var launchSite in launchSiteList) {
+        var launchSiteInfo = {
+          static: true,
+          name: launchSiteList[launchSite].name,
+          type: 'Launch Facility',
+          lat: launchSiteList[launchSite].lat,
+          lon: launchSiteList[launchSite].lon,
+          alt: launchSiteList[launchSite].alt,
+        };
+        objectManager.staticSet.push(launchSiteInfo);
+      }
+      objectManager.launchSiteManager = launchSiteManager;
+      objectManager.isLaunchSiteManagerLoaded = true;
+    } catch (e) {
+      objectManager.isLaunchSiteManagerLoaded = false;
+      console.log('You do not have the Launch Site Module');
     }
-    objectManager.launchSiteManager = launchSiteManager;
-    objectManager.isLaunchSiteManagerLoaded = true;
-  } catch (e) {
-    objectManager.isLaunchSiteManagerLoaded = false;
-    console.log('You do not have the Launch Site Module');
   }
 
   // Try Loading the Control Site Module
-  try {
-    var controlSiteList = controlSiteManager.controlSiteList;
-    for (var controlSite in controlSiteList) {
-      var controlSiteInfo = {
-        static: true,
-        name: controlSiteList[controlSite].name,
-        type: controlSiteList[controlSite].type,
-        typeExt: controlSiteList[controlSite].typeExt,
-        lat: controlSiteList[controlSite].lat,
-        lon: controlSiteList[controlSite].lon,
-        alt: controlSiteList[controlSite].alt,
-        linkAehf: controlSiteList[controlSite].linkAehf,
-        linkWgs: controlSiteList[controlSite].linkWgsF,
-        linkGPS: controlSiteList[controlSite].linkGPS,
-        linkGalileo: controlSiteList[controlSite].linkGalileo,
-        linkBeidou: controlSiteList[controlSite].linkBeidou,
-        linkGlonass: controlSiteList[controlSite].linkGlonass,
-      };
-      objectManager.staticSet.push(controlSiteInfo);
+  if (!settingsManager.isDisableControlSites) {
+    try {
+      var controlSiteList = controlSiteManager.controlSiteList;
+      for (var controlSite in controlSiteList) {
+        var controlSiteInfo = {
+          static: true,
+          name: controlSiteList[controlSite].name,
+          type: controlSiteList[controlSite].type,
+          typeExt: controlSiteList[controlSite].typeExt,
+          lat: controlSiteList[controlSite].lat,
+          lon: controlSiteList[controlSite].lon,
+          alt: controlSiteList[controlSite].alt,
+          linkAehf: controlSiteList[controlSite].linkAehf,
+          linkWgs: controlSiteList[controlSite].linkWgsF,
+          linkGPS: controlSiteList[controlSite].linkGPS,
+          linkGalileo: controlSiteList[controlSite].linkGalileo,
+          linkBeidou: controlSiteList[controlSite].linkBeidou,
+          linkGlonass: controlSiteList[controlSite].linkGlonass,
+        };
+        objectManager.staticSet.push(controlSiteInfo);
+      }
+      objectManager.isControlSiteManagerLoaded = true;
+    } catch (e) {
+      /* istanbul ignore next */
+      objectManager.isControlSiteManagerLoaded = false;
+      /* istanbul ignore next */
+      console.log('You do not have the Control Site Module');
     }
-    objectManager.isControlSiteManagerLoaded = true;
-  } catch (e) {
-    /* istanbul ignore next */
-    objectManager.isControlSiteManagerLoaded = false;
-    /* istanbul ignore next */
-    console.log('You do not have the Control Site Module');
   }
 
   objectManager.starIndex2 = objectManager.staticSet.length - 1;

@@ -481,7 +481,7 @@ class ColorSchemeFactory {
           pickable: false,
         };
       }
-      if ((typeof rcs == 'undefined' || rcs == null || rcs == 'N/A') && ColorSchemeFactory.objectTypeFlags.rcsUnknown === false) {
+      if ((typeof rcs === 'undefined' || rcs === null || rcs === 'N/A') && ColorSchemeFactory.objectTypeFlags.rcsUnknown === false) {
         return {
           color: ColorSchemeFactory.colorTheme.deselected,
           pickable: false,

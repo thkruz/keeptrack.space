@@ -1,6 +1,8 @@
-import 'jsdom-worker';
-import '@app/js/settingsManager/settingsManager.js';
+import { useMockWorkers } from '@app/js/api/apiMocks';
+
 const drawManager = require('./drawManager');
+
+useMockWorkers();
 
 // @ponicode
 describe('drawManager.clearFrameBuffers', () => {

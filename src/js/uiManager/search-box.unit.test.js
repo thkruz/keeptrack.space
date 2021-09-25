@@ -4,10 +4,11 @@
   expect
 */
 
-import '@app/js/settingsManager/settingsManager.js';
-import 'jsdom-worker';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { searchBox } from '@app/js/uiManager/search-box.js';
+import { useMockWorkers } from '@app/js/api/apiMocks';
+
+useMockWorkers();
 
 test(`Basic Functions of Search Box`, () => {
   // Setup a unit test enviornment that doesn't worry about other modules

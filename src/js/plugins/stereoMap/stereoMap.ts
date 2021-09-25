@@ -1,6 +1,3 @@
-import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
-
 /*!
   mapManager.js was created by Theodore Kruczek using the work of
   Julius Tens' "projections" library (https://github.com/juliuste/projections).
@@ -26,8 +23,12 @@ import { keepTrackApi } from '@app/js/api/externalApi';
   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+
+import $ from 'jquery';
+import { keepTrackApi } from '@app/js/api/externalApi';
+
 export const init = (): void => {
-  const { uiManager, settingsManager, objectManager, satSet } = keepTrackApi.programs;
+  const { uiManager, objectManager, satSet } = keepTrackApi.programs;
   
   const mapManager: any = {};
   mapManager.isMapMenuOpen = false;
@@ -85,7 +86,7 @@ export const init = (): void => {
   };
 
   mapManager.updateMap = () => {
-    const { sensorManager, satellite, mapManager, settingsManager, objectManager, satSet } = keepTrackApi.programs;
+    const { sensorManager, satellite, mapManager, objectManager, satSet } = keepTrackApi.programs;
     if (objectManager.selectedSat === -1) return;
     if (!mapManager.isMapMenuOpen) return;
     const sat = satSet.getSat(objectManager.selectedSat);
@@ -223,27 +224,7 @@ export const init = (): void => {
           <span class="bmenu-title">Stereo Map</span>
           <div class="status-icon"></div>
         </div>
-      `);
-
-      const resize2DMap = function () {
-        const mapImageDOM = $('#map-image');
-        const mapMenuDOM = $('#map-menu');
-
-        if ($(window).width() > $(window).height()) {
-          // If widescreen
-          settingsManager.mapWidth = $(window).width();
-          mapImageDOM.width(settingsManager.mapWidth);
-          settingsManager.mapHeight = (settingsManager.mapWidth * 3) / 4;
-          mapImageDOM.height(settingsManager.mapHeight);
-          mapMenuDOM.width($(window).width());
-        } else {
-          settingsManager.mapHeight = $(window).height() - 100; // Subtract 100 portrait (mobile)
-          mapImageDOM.height(settingsManager.mapHeight);
-          settingsManager.mapWidth = (settingsManager.mapHeight * 4) / 3;
-          mapImageDOM.width(settingsManager.mapWidth);
-          mapMenuDOM.width($(window).width());
-        }
-      };
+      `);      
 
       resize2DMap();
 
@@ -275,19 +256,7 @@ export const init = (): void => {
         }
       });
 
-      if ($(window).width() > $(window).height()) {
-        settingsManager.mapHeight = $(window).width(); // Subtract 12 px for the scroll
-        $('#map-image').width(settingsManager.mapHeight);
-        settingsManager.mapHeight = (settingsManager.mapHeight * 3) / 4;
-        $('#map-image').height(settingsManager.mapHeight);
-        $('#map-menu').width($(window).width());
-      } else {
-        settingsManager.mapHeight = $(window).height() - 100; // Subtract 12 px for the scroll
-        $('#map-image').height(settingsManager.mapHeight);
-        settingsManager.mapHeight = (settingsManager.mapHeight * 4) / 3;
-        $('#map-image').width(settingsManager.mapHeight);
-        $('#map-menu').width($(window).width());
-      }
+      resize2DMap();
     },
   });
 
@@ -318,7 +287,6 @@ export const init = (): void => {
           uiManager.hideSideMenus();
           $('#map-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           mapManager.isMapMenuOpen = true;
-          console.warn(mapManager);
           mapManager.updateMap();
           const satData = satSet.getSatExtraOnly(objectManager.selectedSat);
           $('#map-sat').tooltip({
@@ -358,4 +326,25 @@ export const init = (): void => {
       }
     },
   });
+};
+
+export const resize2DMap = function (isForceWidescreen?: boolean): void {
+  isForceWidescreen ??= false;
+  const mapImageDOM = $('#map-image');
+  const mapMenuDOM = $('#map-menu');
+
+  if (isForceWidescreen || $(window).width() > $(window).height()) {
+    // If widescreen
+    settingsManager.mapWidth = $(window).width();
+    mapImageDOM.width(settingsManager.mapWidth);
+    settingsManager.mapHeight = (settingsManager.mapWidth * 3) / 4;
+    mapImageDOM.height(settingsManager.mapHeight);
+    mapMenuDOM.width($(window).width());
+  } else {
+    settingsManager.mapHeight = $(window).height() - 100; // Subtract 100 portrait (mobile)
+    mapImageDOM.height(settingsManager.mapHeight);
+    settingsManager.mapWidth = (settingsManager.mapHeight * 4) / 3;
+    mapImageDOM.width(settingsManager.mapWidth);
+    mapMenuDOM.width($(window).width());
+  }
 };

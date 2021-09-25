@@ -1049,12 +1049,6 @@ uiManager.onReady = () => {
 
     // Setup Legend Colors
     uiManager.legendColorsChange();
-
-    window.oncontextmenu = function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      return false;
-    };
   })();
 
   uiManager.clearRMBSubMenu = () => {

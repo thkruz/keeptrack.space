@@ -5,46 +5,16 @@
   expect
 */
 
-import { init } from '@app/js/plugins/stereoMap/stereoMap';
+import * as stereoMap from '@app/js/plugins/stereoMap/stereoMap';
+
+import { expect } from '@jest/globals';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 test(`mapManager Unit Tests`, () => {
-  keepTrackApi.programs = {
-    objectManager: {},
-    satSet: {
-      getSat: () => ({
-        getTEARR: jest.fn(),
-      }),
-      getSatExtraOnly: () => ({
-        SCC_NUM: '25544',
-      }),
-    },
-    satellite: {
-      currentTEARR: {
-        lat: 0,
-        lon: 0,
-      },
-      degreesLat: () => 0,
-      degreesLong: () => 0,
-      map: () => ({
-        lat: 0,
-        lon: 0,
-      }),
-    },
-    sensorManager: {
-      currentSensor: {
-        lat: 0,
-        lon: 0,
-      },
-      checkSensorSelected: () => true,
-    },
-    settingsManager: {},
-    uiManager: {
-      hideSideMenus: jest.fn(),
-    },
-  };
-
-  init();
+  stereoMap.init();
   keepTrackApi.methods.uiManagerInit();
   keepTrackApi.methods.bottomMenuClick('NOT-menu-map');
   keepTrackApi.methods.bottomMenuClick('menu-map');
@@ -96,4 +66,6 @@ test(`mapManager Unit Tests`, () => {
   mapManager.options();
 
   expect(() => mapManager.braun({}, { meridian: 0, latLimit: 50 })).toThrow('Invalid input point.');
+
+  stereoMap.resize2DMap(true);
 });

@@ -1,5 +1,3 @@
-import '@app/js/settingsManager/settingsManager.js';
-
 import * as settingsMenu from '@app/js/plugins/settingsMenu/settingsMenu';
 
 import { expect } from '@jest/globals';

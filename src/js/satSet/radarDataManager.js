@@ -54,7 +54,6 @@ radarDataManager.findFirstDataTime = () => {
 /* istanbul ignore next */
 radarDataManager.setup = (resp) => {
   if (!settingsManager.isEnableRadarData) return;
-  db.log('radarDataManager.init');
   radarDataManager.radarData = JSON.parse(resp);
 
   let j, gmst, nowDate, radarDataECF, radarDataECI;

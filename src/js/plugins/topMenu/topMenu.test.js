@@ -1,6 +1,5 @@
 /* globals it jest describe */
 
-import '@app/js/settingsManager/settingsManager.js';
 import { init } from './topMenu';
 import { keepTrackApi } from '@app/js/api/externalApi';
 

@@ -10,5 +10,5 @@ declare interface uiManagerI {
   colorSchemeChangeAlert: (colorScheme: any) => void;
   hideSideMenus: () => void;
   searchToggle: (force: boolean) => void;
-  updateNextPassOverlay: (isForceUpdate?: any) => void;
+  updateNextPassOverlay: (nextPassArray: any, isForceUpdate?: any) => void;
 }

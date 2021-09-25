@@ -4,7 +4,6 @@
   global
 */
 
-import '@app/js/settingsManager/settingsManager.js';
 import { earth } from '@app/js/drawManager/sceneManager/earth.js';
 
 test(`Earth Unit Testing`, () => {

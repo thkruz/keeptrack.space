@@ -28,30 +28,6 @@ var currentInView = [];
 var orbitMvMat = glm.mat4.create();
 
 let orbitWorker;
-// See if we are running jest right now for testing
-if (typeof process !== 'undefined') {
-  try {
-    let url = 'http://localhost:8080/js/orbitCruncher.js';
-    orbitWorker = new Worker(url);
-  } catch (error) {
-    console.error(error);
-  }
-} else {
-  if (typeof Worker === 'undefined') {
-    throw new Error('Your browser does not support web workers.');
-  }
-  try {
-    orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
-  } catch (error) {
-    // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
-    if (window.location.href.indexOf('file://') === 0) {
-      $('#loader-text').text('Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.');
-    } else {
-      console.error(error);
-    }
-  }
-}
-orbitManager.orbitWorker = orbitWorker;
 
 var initialized = false;
 
@@ -90,6 +66,39 @@ orbitManager.shader = {
 
 let gl, cameraManager, groupsManager;
 orbitManager.init = function () {
+  // See if we are running jest right now for testing
+  if (typeof process !== 'undefined') {
+    try {
+      let url = 'http://localhost:8080/js/orbitCruncher.js';
+      orbitWorker = new Worker(url);
+    } catch (error) {
+      throw new Error('Failed to create web worker.');
+    }
+  } else {
+    if (typeof Worker === 'undefined') {
+      throw new Error('Your browser does not support web workers.');
+    }
+    try {
+      orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
+    } catch (error) {
+      // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
+      if (window.location.href.indexOf('file://') === 0) {
+        $('#loader-text').text('Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.');
+      } else {
+        console.error(error);
+      }
+    }
+  }
+  orbitManager.orbitWorker = orbitWorker;
+
+  orbitWorker.onmessage = function (m) {
+    var satId = m.data.satId;
+    var pointsOut = new Float32Array(m.data.pointsOut);
+    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[satId]);
+    gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
+    inProgress[satId] = false;
+  };
+
   gl = keepTrackApi.programs.drawManager.gl;
   cameraManager = keepTrackApi.programs.cameraManager;
   groupsManager = keepTrackApi.programs.groupsManager;
@@ -173,14 +182,6 @@ orbitManager.updateOrbitBuffer = function (satId, force, TLE1, TLE2, missile, la
       inProgress[satId] = true;
     }
   }
-};
-
-orbitWorker.onmessage = function (m) {
-  var satId = m.data.satId;
-  var pointsOut = new Float32Array(m.data.pointsOut);
-  gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[satId]);
-  gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
-  inProgress[satId] = false;
 };
 
 /* orbitManager.setOrbit = function (satId) {

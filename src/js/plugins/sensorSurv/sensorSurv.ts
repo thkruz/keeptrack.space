@@ -27,15 +27,9 @@
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
-export const init = (): void => {
-  const { sensorManager, satSet, uiManager } = keepTrackApi.programs;
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'sensorFov',
-    cb: () => {
-      // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
+export const uiManagerInit = () => {
+  // Bottom Icon
+  $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-surveillance" class="bmenu-item bmenu-item-disabled">
           <img
             alt="fence"
@@ -46,49 +40,57 @@ export const init = (): void => {
           <div class="status-icon"></div>
         </div>
       `);
-    },
+};
+export const init = (): void => {
+  // Add HTML
+  keepTrackApi.register({
+    method: 'uiManagerInit',
+    cbName: 'sensorFov',
+    cb: uiManagerInit,
   });
 
   keepTrackApi.register({
     method: 'bottomMenuClick',
     cbName: 'sensorFov',
-    cb: (iconName: string): void => {
-      if (iconName === 'menu-surveillance') {
-        if (!sensorManager.checkSensorSelected()) {
-          // No Sensor Selected
-          if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.survFenceDisabled();
-          uiManager.toast(`Select a Sensor First!`, 'caution');
-          if (!$('#menu-surveillance:animated').length) {
-            $('#menu-surveillance').effect('shake', {
-              distance: 10,
-            });
-          }
-          return;
-        }
-        if ((<any>settingsManager).isShowSurvFence) {
-          (<any>settingsManager).isShowSurvFence = false;
-          $('#menu-surveillance').removeClass('bmenu-item-selected');
-          satSet.satCruncher.postMessage({
-            isShowSurvFence: 'disable',
-            isShowFOVBubble: 'reset',
-          });
-          return;
-        } else {
-          // Disable Satellite Overfly
-          (<any>settingsManager).isSatOverflyModeOn = false;
-          $('#menu-sat-fov').removeClass('bmenu-item-selected');
-
-          (<any>settingsManager).isShowSurvFence = true;
-          $('#menu-surveillance').addClass('bmenu-item-selected');
-          $('#menu-fov-bubble').removeClass('bmenu-item-selected');
-          satSet.satCruncher.postMessage({
-            isShowSatOverfly: 'reset',
-            isShowFOVBubble: 'enable',
-            isShowSurvFence: 'enable',
-          });
-          return;
-        }
-      }
-    },
+    cb: bottomMenuClick,
   });
+};
+export const bottomMenuClick = (iconName: string): void => {
+  const { sensorManager, satSet, uiManager } = keepTrackApi.programs;
+  if (iconName === 'menu-surveillance') {
+    if (!sensorManager.checkSensorSelected()) {
+      // No Sensor Selected
+      if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.survFenceDisabled();
+      uiManager.toast(`Select a Sensor First!`, 'caution');
+      if (!$('#menu-surveillance:animated').length) {
+        $('#menu-surveillance').effect('shake', {
+          distance: 10,
+        });
+      }
+      return;
+    }
+    if ((<any>settingsManager).isShowSurvFence) {
+      (<any>settingsManager).isShowSurvFence = false;
+      $('#menu-surveillance').removeClass('bmenu-item-selected');
+      satSet.satCruncher.postMessage({
+        isShowSurvFence: 'disable',
+        isShowFOVBubble: 'reset',
+      });
+      return;
+    } else {
+      // Disable Satellite Overfly
+      (<any>settingsManager).isSatOverflyModeOn = false;
+      $('#menu-sat-fov').removeClass('bmenu-item-selected');
+
+      (<any>settingsManager).isShowSurvFence = true;
+      $('#menu-surveillance').addClass('bmenu-item-selected');
+      $('#menu-fov-bubble').removeClass('bmenu-item-selected');
+      satSet.satCruncher.postMessage({
+        isShowSatOverfly: 'reset',
+        isShowFOVBubble: 'enable',
+        isShowSurvFence: 'enable',
+      });
+      return;
+    }
+  }
 };

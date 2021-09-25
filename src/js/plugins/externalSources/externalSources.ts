@@ -27,10 +27,14 @@
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
+let isExternalMenuOpen = false;
+
+export const hideSideMenus = (): void => {
+  $('#external-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  $('#menu-external').removeClass('bmenu-item-selected');
+  isExternalMenuOpen = false;
+};
 export const init = (): void => {
-  const { satSet, uiManager } = keepTrackApi.programs;
-  let isExternalMenuOpen = false;
-  // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
     cbName: 'shortTermFences',
@@ -93,20 +97,12 @@ export const init = (): void => {
       `);
 
       $('#n2yo-form').on('submit', function (e) {
-        $('#loading-screen').fadeIn(1000, function () {
-          let satnum = parseInt(<string>$('#ext-n2yo').val());
-          searchN2yo(satnum);
-          $('#loading-screen').fadeOut('slow');
-        });
+        n2yoFormSubmit();
         e.preventDefault();
       });
 
       $('#celestrak-form').on('submit', function (e) {
-        $('#loading-screen').fadeIn(1000, function () {
-          let satnum = parseInt(<string>$('#ext-celestrak').val());
-          searchCelestrak(satnum);
-          $('#loading-screen').fadeOut('slow');
-        });
+        celestrakFormSubmit();
         e.preventDefault();
       });
 
@@ -121,7 +117,108 @@ export const init = (): void => {
     },
   });
 
-  const searchCelestrak = (satNum: any, analsat?: number) => {
+  // Add JavaScript
+  keepTrackApi.register({
+    method: 'bottomMenuClick',
+    cbName: 'shortTermFences',
+    cb: bottomMenuClick,
+  });
+
+  keepTrackApi.register({
+    method: 'hideSideMenus',
+    cbName: 'shortTermFences',
+    cb: hideSideMenus,
+  });
+};
+
+export const n2yoFormSubmit = () =>  {
+  $('#loading-screen').fadeIn(1000, function () {
+    let satnum = parseInt(<string>$('#ext-n2yo').val());
+    searchN2yo(satnum);
+    $('#loading-screen').fadeOut('slow');
+  });
+}
+
+export const searchN2yo = (satNum: any, analsat?: number) => {
+  const { satSet } = keepTrackApi.programs;
+  const { satData } = keepTrackApi.programs.satSet;
+  
+  // If no Analyst Satellite specified find the first unused one
+  if (typeof analsat == 'undefined') {
+    for (var i = 15000; i < satData.length; i++) {
+      if (satData[i].SCC_NUM >= 80000 && !satData[i].active) {
+        analsat = i;
+        break;
+      }
+    }
+  } else {
+    // Satnum to Id
+    analsat = satSet.getIdFromObjNum(analsat);
+  }
+
+  let request = new XMLHttpRequest();
+  request.open('GET', `php/get_data.php?type=n&sat=${satNum}`, true);
+
+  request.onload = function () {
+    if (this.status >= 200 && this.status < 400) {
+      // Success!
+      let tles = this.response.split('<div id="tle">')[1].split('<pre>')[1].split('\n');
+      let TLE1 = tles[1];
+      let TLE2 = tles[2];
+      if (TLE1.substr(0, 2) !== '1 ') throw new Error('N2YO TLE 1 is not a valid TLE');
+      if (TLE2.substr(0, 2) !== '2 ') throw new Error('N2YO TLE 2 is not a valid TLE');
+      satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
+    } else {
+      // We reached our target server, but it returned an error
+      // console.debug('N2YO request returned an error!');
+    }
+  };
+
+  request.onerror = function () {
+    // console.debug('N2YO request failed!');
+  };
+
+  request.send();
+};
+
+export const bottomMenuClick = (iconName: string): void => {
+    const { uiManager } = keepTrackApi.programs;
+    if (iconName === 'menu-external') {
+      if (isExternalMenuOpen) {
+        isExternalMenuOpen = false;
+        $('#menu-external').removeClass('bmenu-item-selected');
+        uiManager.hideSideMenus();
+        return;
+      } else {
+        uiManager.hideSideMenus();
+        $('#external-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+        keepTrackApi.programs.watchlist.updateWatchlist();
+        isExternalMenuOpen = true;
+        $('#menu-external').addClass('bmenu-item-selected');
+        return;
+      }
+    }
+  };
+export const searchCelestrackOnLoad = (request: any, analsat: number): any => {
+    const { satSet } = keepTrackApi.programs;
+    if (request.status >= 200 && request.status < 400) {
+      // Success!
+      let tles = JSON.parse(request.response).split('\n');
+      let TLE1 = tles[1];
+      let TLE2 = tles[2];
+      if (TLE1.substr(0, 2) !== '1 ')
+        throw new Error('N2YO TLE 1 is not a valid TLE');
+      if (TLE2.substr(0, 2) !== '2 ')
+        throw new Error('N2YO TLE 2 is not a valid TLE');
+      satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
+    } else {
+      // We reached our target server, but it returned an error
+      // console.debug('Celestrack request returned an error!');
+    }
+  };
+
+  export const searchCelestrak = (satNum: any, analsat?: number) => {
+    const { satSet } = keepTrackApi.programs;
     const satData = keepTrackApi.programs.satSet.satData;
     // If no Analyst Satellite specified find the first unused one
     if (typeof analsat == 'undefined') {
@@ -139,98 +236,19 @@ export const init = (): void => {
     let request = new XMLHttpRequest();
     request.open('GET', `php/get_data.php?type=c&sat=${satNum}`, true);
 
-    request.onload = function () {
-      if (this.status >= 200 && this.status < 400) {
-        // Success!
-        let tles = JSON.parse(this.response).split('\n');
-        let TLE1 = tles[1];
-        let TLE2 = tles[2];
-        if (TLE1.substr(0, 2) !== '1 ') throw new Error('N2YO TLE 1 is not a valid TLE');
-        if (TLE2.substr(0, 2) !== '2 ') throw new Error('N2YO TLE 2 is not a valid TLE');
-        satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-      } else {
-        // We reached our target server, but it returned an error
-        console.debug('Celestrack request returned an error!');
-      }
-    };
+    request.onload = searchCelestrackOnLoad(request, analsat);
 
     request.onerror = function () {
-      console.debug('Celestrack request failed!');
+      // console.debug('Celestrack request failed!');
     };
 
     request.send();
-  };
+  };  
 
-  const searchN2yo = (satNum: any, analsat?: number) => {
-    const satData = keepTrackApi.programs.satSet.satData;
-    // If no Analyst Satellite specified find the first unused one
-    if (typeof analsat == 'undefined') {
-      for (var i = 15000; i < satData.length; i++) {
-        if (satData[i].SCC_NUM >= 80000 && !satData[i].active) {
-          analsat = i;
-          break;
-        }
-      }
-    } else {
-      // Satnum to Id
-      analsat = satSet.getIdFromObjNum(analsat);
-    }
-
-    let request = new XMLHttpRequest();
-    request.open('GET', `php/get_data.php?type=n&sat=${satNum}`, true);
-
-    request.onload = function () {
-      if (this.status >= 200 && this.status < 400) {
-        // Success!
-        let tles = this.response.split('<div id="tle">')[1].split('<pre>')[1].split('\n');
-        let TLE1 = tles[1];
-        let TLE2 = tles[2];
-        if (TLE1.substr(0, 2) !== '1 ') throw new Error('N2YO TLE 1 is not a valid TLE');
-        if (TLE2.substr(0, 2) !== '2 ') throw new Error('N2YO TLE 2 is not a valid TLE');
-        satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-      } else {
-        // We reached our target server, but it returned an error
-        console.debug('N2YO request returned an error!');
-      }
-    };
-
-    request.onerror = function () {
-      console.debug('N2YO request failed!');
-    };
-
-    request.send();
-  };
-
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'shortTermFences',
-    cb: (iconName: string): void => {
-      if (iconName === 'menu-external') {
-        if (isExternalMenuOpen) {
-          isExternalMenuOpen = false;
-          $('#menu-external').removeClass('bmenu-item-selected');
-          uiManager.hideSideMenus();
-          return;
-        } else {
-          uiManager.hideSideMenus();
-          $('#external-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          keepTrackApi.programs.watchlist.updateWatchlist();
-          isExternalMenuOpen = true;
-          $('#menu-external').addClass('bmenu-item-selected');
-          return;
-        }
-      }
-    },
+export const celestrakFormSubmit = () => {
+  $('#loading-screen').fadeIn(1000, function () {
+    let satnum = parseInt(<string>$('#ext-celestrak').val());
+    searchCelestrak(satnum);
+    $('#loading-screen').fadeOut('slow');
   });
-
-  keepTrackApi.register({
-    method: 'hideSideMenus',
-    cbName: 'shortTermFences',
-    cb: (): void => {
-      $('#external-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#menu-external').removeClass('bmenu-item-selected');
-      isExternalMenuOpen = false;
-    },
-  });
-};
+}

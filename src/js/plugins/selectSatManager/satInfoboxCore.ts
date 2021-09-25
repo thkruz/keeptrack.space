@@ -128,13 +128,14 @@ const satInfoboxCore = {
       // /////////////////////////////////////////////////////////////////////////
       // Launch Site Correlation Table
       // /////////////////////////////////////////////////////////////////////////
-      let site = [];
+      let siteArr = [];
+      let site;
       let missileLV;
       let missileOrigin;
       let satLvString;
       if (sat.missile) {
-        site = sat.desc.split('(');
-        missileOrigin = site[0].substr(0, site[0].length - 1);
+        siteArr = sat.desc.split('(');
+        missileOrigin = siteArr[0].substr(0, siteArr[0].length - 1);
         missileLV = sat.desc.split('(')[1].split(')')[0]; // Remove the () from the booster type
 
         site.site = missileOrigin;
@@ -352,7 +353,7 @@ const satInfoboxCore = {
           }
 
           // If No Sensor, then Ignore Sun Exclusion
-          if (keepTrackApi.programs.sensorManager.currentSensor.lat == null) {
+          if (keepTrackApi.programs.sensorManager.currentSensor.lat === null) {
             if (satInSun == 0) $('#sat-sun').html('No Sunlight');
             if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
             if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');

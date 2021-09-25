@@ -36,12 +36,15 @@ earth.shader = {
   frag: `#version 300 es
     precision mediump float;
 
+    uniform float uZoomModifier;
     uniform vec3 uAmbientLightColor;
     uniform vec3 uDirectionalLightColor;
     uniform vec3 uLightDirection;
 
     in vec2 vUv;
     in vec3 vNormal;
+    in vec3 vWorldPos;
+    in vec3 vVertToCamera;
 
     out vec4 fragColor;
 
@@ -51,18 +54,44 @@ earth.shader = {
     uniform sampler2D uSpecMap;
 
     void main(void) {
-        // float shininess = 1.0;
-        // float diffuse = pow(max(dot(vNormal, uLightDirection), 0.0),shininess);
-        // float diffuseLight = 0.7;
+      float fragToLightAngle	= dot( vNormal, uLightDirection ) * 0.5 + 0.5; //Remake -1 > 1 to 0 > 1
+      vec3 fragToCamera = normalize(vVertToCamera);
+
+      // .................................................
+      // Diffuse lighting
         float diffuse = max(dot(vNormal, uLightDirection), 0.0);
+
+      //.................................................
+      // Bump mapping
         vec3 bumpTexColor = texture(uBumpMap, vUv).rgb * diffuse * 0.4;
+
+        //................................................
+        // Specular lighting
         vec3 specLightColor = texture(uSpecMap, vUv).rgb * diffuse * 0.1;
 
+        //................................................
+        // Final color
         vec3 dayColor = (uAmbientLightColor + uDirectionalLightColor) * diffuse;
         vec3 dayTexColor = texture(uSampler, vUv).rgb * dayColor;
         vec3 nightColor = 0.5 * texture(uNightSampler, vUv).rgb * pow(1.0 - diffuse, 2.0);
 
         fragColor = vec4(dayTexColor + nightColor + bumpTexColor + specLightColor, 1.0);
+
+        // ...............................................
+        // Atmosphere
+
+        float sunAmount = max(dot(vNormal, uLightDirection), 0.1);
+        float darkAmount = max(dot(vNormal, -uLightDirection), 0.0);
+        float r = 1.0 - sunAmount;
+        float g = max(1.0 - sunAmount, 0.75) - darkAmount;
+        float b = max(sunAmount, 0.8) - darkAmount;        
+        vec3 atmosphereColor = vec3(r,g,b);
+
+        float fragToCameraAngle = (1.0 - dot(fragToCamera, vNormal));
+			  fragToCameraAngle = pow(fragToCameraAngle, 3.5); //Curve the change, Make the fresnel thinner
+
+		    fragColor.rgb += (atmosphereColor * fragToCameraAngle * smoothstep(0.0, 0.5, fragToLightAngle));
+
     }
     `,
   vert: `#version 300 es
@@ -70,6 +99,7 @@ earth.shader = {
 
     in vec2 aTexCoord;
     in vec3 aVertexNormal;
+    uniform vec3 uCamPos;
     uniform mat4 uPMatrix;
     uniform mat4 uCamMatrix;
     uniform mat4 uMvMatrix;
@@ -77,12 +107,17 @@ earth.shader = {
 
     out vec2 vUv;
     out vec3 vNormal;
+    out vec3 vWorldPos;
+    out vec3 vVertToCamera;
 
     void main(void) {
-        gl_Position = uPMatrix * uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
-        vUv = aTexCoord;
-
+        vec4 worldPosition = uMvMatrix * vec4(aVertexPosition, 1.0);
+        vWorldPos = worldPosition.xyz;
         vNormal = uNormalMatrix * aVertexNormal;
+        vUv = aTexCoord;
+		    vVertToCamera	= normalize(vec3(uCamPos) - worldPosition.xyz);
+
+        gl_Position = uPMatrix * uCamMatrix * worldPosition;
     }
     `,
 };
@@ -116,6 +151,8 @@ earth.init = async (glRef) => {
     earthShader.aVertexPosition = gl.getAttribLocation(earthShader, 'aVertexPosition');
     earthShader.aTexCoord = gl.getAttribLocation(earthShader, 'aTexCoord');
     earthShader.aVertexNormal = gl.getAttribLocation(earthShader, 'aVertexNormal');
+    earthShader.uZoomModifier = gl.getUniformLocation(earthShader, 'uZoomModifier');
+    earthShader.uCamPos = gl.getUniformLocation(earthShader, 'uCamPos');
     earthShader.uPMatrix = gl.getUniformLocation(earthShader, 'uPMatrix');
     earthShader.uCamMatrix = gl.getUniformLocation(earthShader, 'uCamMatrix');
     earthShader.uMvMatrix = gl.getUniformLocation(earthShader, 'uMvMatrix');
@@ -149,20 +186,20 @@ earth.init = async (glRef) => {
         texLoaded = true;
         onImageLoaded();
       };
-      img.src = 'textures/earthmap512.jpg';
+      img.src = `${settingsManager.installDirectory}textures/earthmap512.jpg`;
 
       earth.loadHiRes = async () => {
         try {
           earth.imgHiRes = new Image();
-          earth.imgHiRes.src = 'textures/earthmap4k.jpg';
-          if (settingsManager.smallImages) earth.imgHiRes.src = 'textures/earthmap512.jpg';
-          if (settingsManager.nasaImages) earth.imgHiRes.src = 'textures/mercator-tex.jpg';
-          if (settingsManager.trusatImages) img.src = 'textures/trusatvector-4096.jpg';
-          if (settingsManager.blueImages) earth.imgHiRes.src = 'textures/world_blue-2048.png';
-          if (settingsManager.vectorImages) earth.imgHiRes.src = 'textures/dayearthvector-4096.jpg';
-          if (settingsManager.politicalImages) earth.imgHiRes.src = 'textures/political8k.jpg';
-          if (settingsManager.hiresImages) earth.imgHiRes.src = 'textures/earthmapclouds16k.jpg';
-          if (settingsManager.hiresNoCloudsImages) earth.imgHiRes.src = 'textures/earthmap16k.jpg';
+          earth.imgHiRes.src = `${settingsManager.installDirectory}textures/earthmap4k.jpg`;
+          if (settingsManager.smallImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/earthmap512.jpg`;
+          if (settingsManager.nasaImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/mercator-tex.jpg`;
+          if (settingsManager.trusatImages) img.src = `${settingsManager.installDirectory}textures/trusatvector-4096.jpg`;
+          if (settingsManager.blueImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/world_blue-2048.png`;
+          if (settingsManager.vectorImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/dayearthvector-4096.jpg`;
+          if (settingsManager.politicalImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/political8k.jpg`;
+          if (settingsManager.hiresImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/earthmapclouds16k.jpg`;
+          if (settingsManager.hiresNoCloudsImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/earthmap16k.jpg`;
           earth.isUseHiRes = true;
           earth.imgHiRes.onload = function () {
             if (!settingsManager.isBlackEarth) {
@@ -206,15 +243,15 @@ earth.init = async (glRef) => {
         nightLoaded = true;
         onImageLoaded();
       };
-      earth.nightImg.src = 'textures/earthlights512.jpg';
+      earth.nightImg.src = `${settingsManager.installDirectory}textures/earthlights512.jpg`;
 
       earth.loadHiResNight = async () => {
         try {
           earth.nightImgHiRes = new Image();
-          if (!settingsManager.smallImages) earth.nightImgHiRes.src = 'textures/earthlights4k.jpg';
-          if (settingsManager.vectorImages) earth.nightImgHiRes.src = 'textures/dayearthvector-4096.jpg';
-          if (settingsManager.politicalImages) earth.nightImgHiRes.src = 'textures/political8k.jpg';
-          if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) earth.nightImgHiRes.src = 'textures/earthlights16k.jpg';
+          if (!settingsManager.smallImages) earth.nightImgHiRes.src = `${settingsManager.installDirectory}textures/earthlights4k.jpg`;
+          if (settingsManager.vectorImages) earth.nightImgHiRes.src = `${settingsManager.installDirectory}textures/dayearthvector-4096.jpg`;
+          if (settingsManager.politicalImages) earth.nightImgHiRes.src = `${settingsManager.installDirectory}textures/political8k.jpg`;
+          if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) earth.nightImgHiRes.src = `${settingsManager.installDirectory}textures/earthlights16k.jpg`;
           earth.nightImgHiRes.onload = function () {
             if (!settingsManager.isBlackEarth) {
               gl.bindTexture(gl.TEXTURE_2D, nightTexture);
@@ -257,10 +294,10 @@ earth.init = async (glRef) => {
         earth.bumpMap.isReady = true;
         onImageLoaded();
       };
-      earth.bumpMap.img.src = 'textures/earthbump8k.jpg';
-      if (settingsManager.smallImages) earth.bumpMap.img.src = 'textures/earthbump256.jpg';
-      if (settingsManager.isMobileModeEnabled) earth.bumpMap.img.src = 'textures/earthbump4k.jpg';
-      // 'textures/earthbump1k.jpg';
+      earth.bumpMap.img.src = `${settingsManager.installDirectory}textures/earthbump8k.jpg`;
+      if (settingsManager.smallImages) earth.bumpMap.img.src = `${settingsManager.installDirectory}textures/earthbump256.jpg`;
+      if (settingsManager.isMobileModeEnabled) earth.bumpMap.img.src = `${settingsManager.installDirectory}textures/earthbump4k.jpg`;
+      // `${settingsManager.installDirectory}textures/earthbump1k.jpg`;
     }
 
     // Specular Map
@@ -284,10 +321,10 @@ earth.init = async (glRef) => {
         earth.specularMap.isReady = true;
         onImageLoaded();
       };
-      earth.specularMap.img.src = 'textures/earthspec8k.jpg';
-      if (settingsManager.smallImages) earth.specularMap.img.src = 'textures/earthspec256.jpg';
-      if (settingsManager.isMobileModeEnabled) earth.specularMap.img.src = 'textures/earthspec4k.jpg';
-      // 'textures/earthspec1k.jpg';
+      earth.specularMap.img.src = `${settingsManager.installDirectory}textures/earthspec8k.jpg`;
+      if (settingsManager.smallImages) earth.specularMap.img.src = `${settingsManager.installDirectory}textures/earthspec256.jpg`;
+      if (settingsManager.isMobileModeEnabled) earth.specularMap.img.src = `${settingsManager.installDirectory}textures/earthspec4k.jpg`;
+      // `${settingsManager.installDirectory}textures/earthspec1k.jpg`;
     }
 
     // generate a uvsphere bottom up, CCW order
@@ -451,6 +488,18 @@ earth.draw = function (pMatrix, cameraManager, dotsManager, tgtBuffer) {
   gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
   // Set the uniforms
+  const uZoomModifier = cameraManager.cameraType.current === cameraManager.cameraType.fixedToSat || cameraManager.panCurrent.x !== 0 || cameraManager.panCurrent.y !== 0 || cameraManager.panCurrent.z ? cameraManager.zoomLevel : 1.0;
+  // let camPos = cameraManager.getCamPos();
+  // camPos[0] -= cameraManager.panCurrent.x;
+  // camPos[1] -= cameraManager.panCurrent.y;
+  // camPos[2] -= cameraManager.panCurrent.z;
+  let inverted = glm.mat4.create();
+  glm.mat4.invert(inverted, cameraManager.camMatrix);
+  const forward = glm.vec3.create();
+  glm.vec3.transformMat4(forward, forward, inverted);
+
+  gl.uniform1f(earthShader.uZoomModifier, uZoomModifier);
+  gl.uniform3fv(earthShader.uCamPos, forward);
   gl.uniformMatrix3fv(earthShader.uNormalMatrix, false, nMatrix);
   gl.uniformMatrix4fv(earthShader.uMvMatrix, false, mvMatrix);
   gl.uniformMatrix4fv(earthShader.uPMatrix, false, pMatrix);
@@ -536,6 +585,7 @@ earth.draw = function (pMatrix, cameraManager, dotsManager, tgtBuffer) {
     gl.scissor(cameraManager.mouseX, gl.drawingBufferHeight - cameraManager.mouseY, 1, 1);
   }
 
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
   gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 
   if (!settingsManager.isMobileModeEnabled) {
@@ -560,6 +610,7 @@ earth.drawOcclusion = function (pMatrix, camMatrix, occlusionPrgm, tgtBuffer) {
   // Set the uniforms
   occlusionPrgm.uniformSetup(occlusionPrgm, mvMatrix, pMatrix, camMatrix);
 
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
   gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 
   occlusionPrgm.attrOff(occlusionPrgm);

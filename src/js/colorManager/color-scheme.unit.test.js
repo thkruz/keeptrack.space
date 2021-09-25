@@ -5,7 +5,6 @@
   jest
 */
 
-import '@app/js/settingsManager/settingsManager.js';
 import { ColorScheme } from '@app/js/colorManager/color-scheme.js';
 
 const glMock = global.mocks.glMock;

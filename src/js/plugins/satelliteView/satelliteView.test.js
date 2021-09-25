@@ -1,14 +1,9 @@
-/*globals
-  test
-  jest
-*/
-
-import 'jsdom-worker';
-import '@app/js/settingsManager/settingsManager.js';
+import { keepTrackApiStubs, useMockWorkers } from '@app/js/api/apiMocks';
 
 import { expect } from '@jest/globals';
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+
+useMockWorkers();
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
@@ -30,7 +25,7 @@ test(`satelliteView Unit Testing`, () => {
       keepTrackApi.programs.objectManager.selectedSat = 0;
       keepTrackApi.methods.bottomMenuClick('menu-satview');
 
-      keepTrackApi.settingsManager.plugins.topMenu = true;
+      settingsManager.plugins.topMenu = true;
       keepTrackApi.methods.bottomMenuClick('menu-satview');
     })
     .catch((err) => {

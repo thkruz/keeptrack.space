@@ -31,7 +31,7 @@ type LaunchInfoObject = {
 const _getTableElement = (): HTMLTableElement | boolean => {
   const tbl: HTMLTableElement = <HTMLTableElement>document.getElementById('nextLaunch-table'); // Identify the table to update
   if (tbl == null) {
-    console.warn('nextLaunchManager.showTable failed to find nextLaunch-table element!');
+    // console.warn('nextLaunchManager.showTable failed to find nextLaunch-table element!');
     return false;
   }
   return tbl;

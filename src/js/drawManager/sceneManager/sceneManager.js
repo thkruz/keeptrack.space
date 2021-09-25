@@ -19,6 +19,7 @@
 
 // This file should contain all of the webgl code for generating non .obj meshes
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+
 import { LineFactory } from './line-factory.js';
 import { Moon } from './moon.js';
 import { earth } from './earth.js';
@@ -31,30 +32,6 @@ const sceneManager = {
   },
   earth: earth,
   sun: sun,
-  registerAtmoshpere: async (Atmosphere) => {
-    sceneManager.classes.Atmosphere = Atmosphere;
-    keepTrackApi.register({
-      method: 'drawManagerLoadScene',
-      cbName: 'atmosphere',
-      cb: () => {
-        sceneManager.atmosphere = new sceneManager.classes.Atmosphere(keepTrackApi.programs.drawManager.gl, sceneManager.earth, keepTrackApi.programs.settingsManager, glm);
-      },
-    });
-    keepTrackApi.register({
-      method: 'drawOptionalScenery',
-      cbName: 'atmosphere',
-      cb: () => {
-        if (
-          !settingsManager.enableLimitedUI &&
-          !settingsManager.isDrawLess &&
-          keepTrackApi.programs.cameraManager.cameraType.current !== keepTrackApi.programs.cameraManager.cameraType.planetarium &&
-          keepTrackApi.programs.cameraManager.cameraType.current !== keepTrackApi.programs.cameraManager.cameraType.astronomy
-        ) {
-          sceneManager.atmosphere.draw(keepTrackApi.programs.drawManager.pMatrix, keepTrackApi.programs.cameraManager);
-        }
-      },
-    });
-  },
 };
 
 export { LineFactory, sceneManager };

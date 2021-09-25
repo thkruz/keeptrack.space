@@ -330,7 +330,6 @@ export const init = (): void => {
 
       $('#newLaunch').on('submit', function (e) {
         $('#loading-screen').fadeIn(1000, function () {
-          $('#nl-error').hide();
           const scc = $('#nl-scc').val();
           const satId = keepTrackApi.programs.satSet.getIdFromObjNum(scc);
           let sat = keepTrackApi.programs.satSet.getSat(satId);

@@ -40,23 +40,30 @@ export const catalogLoader = async (): Promise<any> => {
   try {
     let extraSats: any = [];
     if (settingsManager.offline) {
-      $.get('./tle/extra.json').then((resp) => {
+      $.get(`${settingsManager.installDirectory}tle/extra.json`).then((resp) => {
         extraSats = JSON.parse(resp);
       });
     }
 
-    let asciiCatalog: { SCC: string; TLE1: any; TLE2: any; }[] = [];
-    $.get('./tle/TLE.txt').then((resp) => { 
-      let content=resp.split('\n');
-      for (let i = 0; i < content.length; i=i+2) {
-        asciiCatalog.push({
-          SCC: stringPad.pad0(content[i].substr(2, 5).trim(), 5),
-          TLE1: content[i],
-          TLE2: content[i+1],
-        });
-      }
-    });
-    await import('@app/tle/TLE.json').then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
+    let asciiCatalog: { SCC: string; TLE1: any; TLE2: any }[] = [];
+    if (!settingsManager.isDisableAsciiCatalog) {
+      $.get(`${settingsManager.installDirectory}tle/TLE.txt`).then((resp) => {
+        let content = resp.split('\n');
+        for (let i = 0; i < content.length; i = i + 2) {
+          asciiCatalog.push({
+            SCC: stringPad.pad0(content[i].substr(2, 5).trim(), 5),
+            TLE1: content[i],
+            TLE2: content[i + 1],
+          });
+        }
+      });
+    }
+    
+    if (settingsManager.isUseDebrisCatalog) {
+      await $.get(`${settingsManager.installDirectory}tle/TLEdebris.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
+    } else {
+      await $.get(`${settingsManager.installDirectory}tle/TLE.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
+    }
   } catch (e) {
     console.error(e);
   }
@@ -64,7 +71,7 @@ export const catalogLoader = async (): Promise<any> => {
 
 // Parse the Catalog from satSet.loadCatalog and then return it back -- they are chained together!
 export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any) => {
-  const {satSet, objectManager} = keepTrackApi.programs;
+  const { satSet, objectManager } = keepTrackApi.programs;
   const settingsManager: any = window.settingsManager;
 
   let limitSatsArray = setupGetVariables();
@@ -143,7 +150,7 @@ export const setupGetVariables = () => {
 
 export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string | any[], extraSats?: string | any[], asciiCatalog?: string | any[]) => {
   const { dotsManager, objectManager, satSet } = keepTrackApi.programs;
-  
+
   var tempSatData = [];
   satSet.sccIndex = {};
   satSet.cosparIndex = {};
@@ -309,7 +316,7 @@ export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string 
       $('.legend-trusat-box')[1].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
       $('.legend-trusat-box')[2].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
       $('.legend-trusat-box')[3].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
-    }    
+    }
   }
 
   satSet.orbitalSats = tempSatData.length;

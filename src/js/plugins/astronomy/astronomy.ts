@@ -27,15 +27,9 @@
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
-export const init = (): void => {
-  const { settingsManager, drawManager, starManager, objectManager, uiManager, orbitManager, sensorManager } = keepTrackApi.programs;
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'astronomy',
-    cb: () => {
-      // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
+export const uiManagerInit = () => {
+  // Bottom Icon
+  $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-astronomy" class="bmenu-item bmenu-item-disabled">
           <img
             alt="telescope"
@@ -46,7 +40,14 @@ export const init = (): void => {
           <div class="status-icon"></div>
         </div>
       `);
-    },
+};
+
+export const init = (): void => {
+  // Add HTML
+  keepTrackApi.register({
+    method: 'uiManagerInit',
+    cbName: 'astronomy',
+    cb: uiManagerInit,
   });
 
   keepTrackApi.programs.astronomy = {};
@@ -56,51 +57,55 @@ export const init = (): void => {
   keepTrackApi.register({
     method: 'bottomMenuClick',
     cbName: 'astronomy',
-    cb: (iconName: string): void => {
-      if (iconName === 'menu-astronomy') {
-        const cameraManager = keepTrackApi.programs.cameraManager;
-        if (keepTrackApi.programs.astronomy.isAstronomyView) {
-          keepTrackApi.programs.astronomy.isAstronomyView = false;
-          cameraManager.panReset = true;
-          cameraManager.localRotateReset = true;
-          settingsManager.fieldOfView = 0.6;
-          drawManager.glInit();
-          uiManager.hideSideMenus();
-          cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
-          uiManager.legendMenuChange('default');
-          if (objectManager.isStarManagerLoaded) {
-            starManager.clearConstellations();
-          }
-          $('#fov-text').html('');
-          // $('#el-text').html('');
-          $('#menu-astronomy').removeClass('bmenu-item-selected');
-          return;
-        } else {
-          if (sensorManager.checkSensorSelected()) {
-            if (objectManager.isStarManagerLoaded) {
-              // TODO: This takes way too long trying to find the star's
-              // satellite id from its name. The ids should be predetermined.
-              starManager.drawAllConstellations();
-            }
-            orbitManager.clearInViewOrbit();
-            cameraManager.cameraType.current = cameraManager.cameraType.astronomy; // Activate Astronomy Camera Mode
-            $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
-            uiManager.legendMenuChange('astronomy');
-            keepTrackApi.programs.planetarium.isPlanetariumView = false;
-            $('#menu-planetarium').removeClass('bmenu-item-selected');
-            keepTrackApi.programs.astronomy.isAstronomyView = true;
-            $('#menu-astronomy').addClass('bmenu-item-selected');
-          } else {
-            uiManager.toast(`Select a Sensor First!`, 'caution');
-            if (!$('#menu-astronomy:animated').length) {
-              $('#menu-astronomy').effect('shake', {
-                distance: 10,
-              });
-            }
-          }
-          return;
+    cb: bottomMenuClick,
+  });
+};
+export const bottomMenuClick = (iconName: string): void => {
+  const { drawManager, starManager, objectManager, uiManager, orbitManager, sensorManager } = keepTrackApi.programs;
+  if (iconName === 'menu-astronomy') {
+    const cameraManager = keepTrackApi.programs.cameraManager;
+    if (keepTrackApi.programs.astronomy.isAstronomyView) {
+      keepTrackApi.programs.astronomy.isAstronomyView = false;
+      cameraManager.panReset = true;
+      cameraManager.localRotateReset = true;
+      settingsManager.fieldOfView = 0.6;
+      drawManager.glInit();
+      uiManager.hideSideMenus();
+      cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
+      uiManager.legendMenuChange('default');
+      if (objectManager.isStarManagerLoaded) {
+        starManager.clearConstellations();
+      }
+      $('#fov-text').html('');
+      // $('#el-text').html('');
+      $('#menu-astronomy').removeClass('bmenu-item-selected');
+      return;
+    } else {
+      if (sensorManager.checkSensorSelected()) {
+        if (objectManager.isStarManagerLoaded) {
+          // TODO: This takes way too long trying to find the star's
+          // satellite id from its name. The ids should be predetermined.
+          starManager.drawAllConstellations();
+        }
+        orbitManager.clearInViewOrbit();
+        cameraManager.cameraType.current = cameraManager.cameraType.astronomy; // Activate Astronomy Camera Mode
+        $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+        uiManager.legendMenuChange('astronomy');
+        if (typeof keepTrackApi.programs.planetarium !== 'undefined') {
+          keepTrackApi.programs.planetarium.isPlanetariumView = false;
+          $('#menu-planetarium').removeClass('bmenu-item-selected');
+        }
+        keepTrackApi.programs.astronomy.isAstronomyView = true;
+        $('#menu-astronomy').addClass('bmenu-item-selected');
+      } else {
+        uiManager.toast(`Select a Sensor First!`, 'caution');
+        if (!$('#menu-astronomy:animated').length) {
+          $('#menu-astronomy').effect('shake', {
+            distance: 10,
+          });
         }
       }
-    },
-  });
+      return;
+    }
+  }
 };

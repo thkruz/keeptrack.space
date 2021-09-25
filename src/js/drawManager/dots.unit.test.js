@@ -5,7 +5,6 @@
   jest
 */
 
-import '@app/js/settingsManager/settingsManager.js';
 import { Dots } from '@app/js/drawManager/dots.js';
 
 const glMock = global.mocks.glMock;

@@ -1221,7 +1221,7 @@ satellite.getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, goalA
     lon = satellite.degreesLong(gpos.lon) * 1;
     alt = gpos.alt;
 
-    if (lastLat == null) {
+    if (typeof lastLat === 'undefined') {
       // Set it the first time
       lastLat = lat;
     }

@@ -9,7 +9,7 @@ import { SunCalc } from '@app/js/lib/suncalc.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 
 class Moon {
-  static textureSrc = 'textures/moon-1024.jpg';
+  static textureSrc = `${settingsManager.installDirectory}textures/moon-1024.jpg`;
 
   constructor(gl, sun) {
     // Move to the code the creates the moon?
@@ -204,6 +204,20 @@ class Moon {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.textureMap.texture);
 
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.texCoordBuf);
+    gl.enableVertexAttribArray(this.program.a_texcoord);
+    gl.vertexAttribPointer(this.program.a_texcoord, 2, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.vertPosBuf);
+    gl.enableVertexAttribArray(this.program.a_position);
+    gl.vertexAttribPointer(this.program.a_position, 3, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.vertNormBuf);
+    gl.enableVertexAttribArray(this.program.a_normal);
+    gl.vertexAttribPointer(this.program.a_normal, 3, gl.FLOAT, false, 0, 0);
+
+    // Select the vertex indicies buffer
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.vertIndexBuf);
     gl.drawElements(gl.TRIANGLES, this.buffers.vertCount, gl.UNSIGNED_SHORT, 0);
   }
 

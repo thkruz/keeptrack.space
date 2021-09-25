@@ -38,7 +38,7 @@ var drawManager = {
   t0: 0,
   isShowFPS: false,
   drawLoopCallback: null,
-  gaussianAmt: 0,
+  gaussianAmt: 2,
   setDrawLoopCallback: (cb) => {
     drawManager.drawLoopCallback = cb;
   },
@@ -263,7 +263,7 @@ export const drawLoop = (preciseDt) => {
   // drawManager.resizeCanvas();
   drawManager.clearFrameBuffers(drawManager.gl, dotsManager.pickingFrameBuffer, sceneManager.sun.godraysFrameBuffer);
 
-  // Sun, Moon, and Atmosphere
+  // Sun, and Moon
   // PERFORMANCE: 0.106 ms
   drawManager.drawOptionalScenery();
 
@@ -305,7 +305,6 @@ export const drawLoop = (preciseDt) => {
   }
 
   // Do Post Processing
-  /* istanbul ignore next */
   if (drawManager.isNeedPostProcessing) {
     if (postProcessingManager.isGaussianNeeded) {
       postProcessingManager.programs.gaussian.uniformValues.radius = Math.min(0.5, drawManager.gaussianAmt / 500);
@@ -549,7 +548,7 @@ export const orbitsAbove = () => {
       return;
     }
 
-    if (sensorManager.currentSensor.lat == null) return;
+    if (sensorManager?.currentSensor?.lat === null) return;
     if (timeManager.now - satLabelModeLastTime < settingsManager.satLabelInterval) return;
 
     orbitManager.clearInViewOrbit();
@@ -676,6 +675,10 @@ export const updateHover = () => {
 };
 let sat2;
 export const hoverBoxOnSat = (satId, satX, satY) => {
+  if (typeof satHoverBoxDOM === 'undefined' || satHoverBoxDOM === null) return;
+
+  const { starManager } = keepTrackApi.programs;
+
   if (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && !settingsManager.isDemoModeOn) {
     satHoverBoxDOM.style.display = 'none';
     if (satId === -1) {
@@ -699,6 +702,7 @@ export const hoverBoxOnSat = (satId, satX, satY) => {
     isHoverBoxVisible = true;
 
     const parentNode = satHoverBoxDOM.parentNode;
+    if (parentNode == null) return;
     const nextSibling = satHoverBoxDOM.nextSibling;
     parentNode.removeChild(satHoverBoxDOM); // reflow
 
@@ -858,7 +862,7 @@ export const resizePostProcessingTexture = (gl, sun, postProcessingManager) => {
 
 var demoModeLastTime = 0;
 export const demoMode = () => {
-  if (objectManager?.isSensorManagerLoaded && sensorManager?.currentSensor?.lat == null) return;
+  if (objectManager?.isSensorManagerLoaded && sensorManager?.currentSensor?.lat === null) return;
   if (timeManager.now - demoModeLastTime < settingsManager.demoModeInterval) return;
 
   drawManager.demoModeLast = timeManager.now;

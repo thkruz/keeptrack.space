@@ -4,7 +4,6 @@
   expect
 */
 
-import '@app/js/settingsManager/settingsManager.js';
 import { keepTrackApi } from '../api/externalApi';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 

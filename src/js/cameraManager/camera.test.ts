@@ -1,9 +1,8 @@
 import * as camera from "@app/js/cameraManager/camera"
 
-import { defaultSat, keepTrackApiStubs } from "../api/apiMocks"
-
 import { expect } from "@jest/globals"
 import { keepTrackApi } from "@app/js/api/externalApi"
+import { keepTrackApiStubs } from "../api/apiMocks"
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 // @ponicode

@@ -37,6 +37,7 @@ interface uiInputInterface {
   getSatIdFromCoordAlt: any;
   openRmbMenu: any;
   rmbMenuActions: any;
+  getRayOrigin: any;
 }
 
 export const uiInput: uiInputInterface = {
@@ -1487,7 +1488,7 @@ export const uiInput: uiInputInterface = {
     // getEarthScreenPoint
     let rayOrigin, ptThru, rayDir, toCenterVec, dParallel, longDir, dPerp, dSubSurf, dSurf, ptSurf;
 
-    rayOrigin = cameraManager.getCamPos();
+    rayOrigin = uiInput.getRayOrigin(cameraManager);
     ptThru = uiInput.unProject(x, y);
 
     rayDir = glm.vec3.create();
@@ -1512,4 +1513,13 @@ export const uiInput: uiInputInterface = {
 
     return ptSurf;
   },
+
+  getRayOrigin: (cameraManager: any) => {
+    let gCPr = cameraManager.getCamDist();
+    let gCPz = gCPr * Math.sin(cameraManager.camPitch);
+    let gCPrYaw = gCPr * Math.cos(cameraManager.camPitch);
+    let gCPx = gCPrYaw * Math.sin(cameraManager.camYaw);
+    let gCPy = gCPrYaw * -Math.cos(cameraManager.camYaw);
+    return [gCPx, gCPy, gCPz];
+  }
 };

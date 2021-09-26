@@ -83,14 +83,14 @@ earth.shader = {
         float sunAmount = max(dot(vNormal, uLightDirection), 0.1);
         float darkAmount = max(dot(vNormal, -uLightDirection), 0.0);
         float r = 1.0 - sunAmount;
-        float g = max(1.0 - sunAmount, 0.75) - darkAmount;
-        float b = max(sunAmount, 0.8) - darkAmount;        
+        float g = max(1.0 - sunAmount, 0.85) - darkAmount;
+        float b = max(sunAmount, 0.9) - darkAmount;        
         vec3 atmosphereColor = vec3(r,g,b);
 
         float fragToCameraAngle = (1.0 - dot(fragToCamera, vNormal));
-			  fragToCameraAngle = pow(fragToCameraAngle, 3.5); //Curve the change, Make the fresnel thinner
+			  fragToCameraAngle = pow(fragToCameraAngle, 3.8); //Curve the change, Make the fresnel thinner
 
-		    fragColor.rgb += (atmosphereColor * fragToCameraAngle * smoothstep(0.0, 0.5, fragToLightAngle));
+		    fragColor.rgb += (atmosphereColor * fragToCameraAngle * smoothstep(0.25, 0.5, fragToLightAngle));
 
     }
     `,

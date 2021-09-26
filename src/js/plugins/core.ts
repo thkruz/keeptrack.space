@@ -77,6 +77,7 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
     if (plugins.aboutManager) await import('@app/js/plugins/aboutManager/aboutManager').then((mod) => mod.init());
     if (plugins.settingsMenu) await import('@app/js/plugins/settingsMenu/settingsMenu').then((mod) => mod.init());
     if (plugins.soundManager) await import('@app/js/plugins/sounds/sounds').then((mod) => mod.init());
+    if (plugins.gamepad) await import('@app/js/plugins/gamepad/gamepad').then((mod) => mod.init());
 
     keepTrackApi.register({
       method: 'uiManagerFinal',

@@ -62,6 +62,7 @@ const settingsManagerOverride = {
     topMenu: true,
     classification: true,
     soundManager: true,
+    gamepad: true,
   },
 };
 

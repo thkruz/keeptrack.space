@@ -223,48 +223,9 @@ uiManager.keyHandler = (evt) => {
       cameraManager.autoRotate();
       break;
     case 'C':
-      // Create a local reference to the current cameraType
-      // This will get passed to the cameraManager after uiManager figures out
-      // what the new cameraType is
-      var curCam = cameraManager.cameraType.current;
-      if (curCam === cameraManager.cameraType.planetarium) {
-        orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
-      }
+      cameraManager.changeCameraType(orbitManager, drawManager, objectManager, sensorManager);
 
-      curCam++;
-
-      if (curCam == cameraManager.cameraType.fixedToSat && objectManager.selectedSat == -1) {
-        curCam++;
-      }
-
-      if (curCam === cameraManager.cameraType.planetarium && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
-        curCam++;
-      }
-
-      if (curCam === cameraManager.cameraType.satellite && objectManager.selectedSat === -1) {
-        curCam++;
-      }
-
-      if (curCam === cameraManager.cameraType.astronomy && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
-        curCam++;
-      }
-
-      if (curCam === 7) {
-        // 7 is a placeholder to reset camera type
-        cameraManager.isLocalRotateReset = true;
-        settingsManager.fieldOfView = 0.6;
-        drawManager.glInit();
-        if (objectManager.selectedSat !== -1) {
-          cameraManager.camZoomSnappedOnSat = true;
-          curCam = cameraManager.cameraType.fixedToSat;
-        } else {
-          curCam = cameraManager.cameraType.default;
-        }
-      }
-
-      cameraManager.cameraType.set(curCam);
-
-      switch (curCam) {
+      switch (cameraManager.cameraType.current) {
         case cameraManager.cameraType.default:
           uiManager.toast('Earth Centered Camera Mode', 'standby');
           cameraManager.zoomTarget = 0.5;

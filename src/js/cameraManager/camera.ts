@@ -44,17 +44,18 @@ export class Camera {
   isWorldPan: boolean;
   isScreenPan: boolean;
   isPanReset: boolean;
-  panCurrent: { x: number; y: number; z: number; };
-  panStartPosition: { x: number; y: number; z: number; };
+  panCurrent: { x: number; y: number; z: number };
+  panStartPosition: { x: number; y: number; z: number };
   isCamSnapMode: boolean;
   isLocalRotateReset: boolean;
   isLocalRotateRoll: boolean;
   isLocalRotateYaw: boolean;
-  localRotateCurrent: { pitch: number; roll: number; yaw: number; };
-  localRotateStartPosition: { pitch: number; roll: number; yaw: number; };
+  isLocalRotateOverride: boolean;
+  localRotateCurrent: { pitch: number; roll: number; yaw: number };
+  localRotateStartPosition: { pitch: number; roll: number; yaw: number };
   ftsRotateReset: boolean;
   ecLastZoom: number;
-  cameraType: { current: number; default: number; fixedToSat: number; offset: number; fps: number; planetarium: number; satellite: number; astronomy: number; set: (val: any) => void; };
+  cameraType: { current: number; default: number; fixedToSat: number; offset: number; fps: number; planetarium: number; satellite: number; astronomy: number; set: (val: any) => void };
   camMatrixEmpty: glm.mat4;
   isAutoRotate: boolean;
   isAutoPan: boolean;
@@ -76,23 +77,23 @@ export class Camera {
   isFPSVertSpeedLock: boolean;
   fpsRun: number;
   fpsLastTime: number;
-  cSTS: { pos: { x: number; y: number; z: number; }; radius: number; pitch: number; yaw: number; altitude: number; camDistTarget: number; };
+  cSTS: { pos: { x: number; y: number; z: number }; radius: number; pitch: number; yaw: number; altitude: number; camDistTarget: number };
   isRayCastingEarth: boolean;
   chaseSpeed: number;
-  panSpeed: { x: number; y: number; z: number; };
+  panSpeed: { x: number; y: number; z: number };
   panMovementSpeed: number;
-  panTarget: { x: number; y: number; z: number; };
-  panDif: { x: number; y: number; z: number; };
-  localRotateSpeed: { pitch: number; roll: number; yaw: number; };
+  panTarget: { x: number; y: number; z: number };
+  panDif: { x: number; y: number; z: number };
+  localRotateSpeed: { pitch: number; roll: number; yaw: number };
   localRotateMovementSpeed: number;
-  localRotateTarget: { pitch: number; roll: number; yaw: number; };
-  localRotateDif: { pitch: number; roll: number; yaw: number; };
+  localRotateTarget: { pitch: number; roll: number; yaw: number };
+  localRotateDif: { pitch: number; roll: number; yaw: number };
   ecPitch: number;
   ecYaw: number;
   ftsPitch: number;
   ftsYaw: number;
   camRotateSpeed: number;
-  
+
   constructor() {
     this.camMatrix = glm.mat4.create();
     this.isZoomIn = false;
@@ -121,6 +122,7 @@ export class Camera {
     this.isLocalRotateReset = false;
     this.isLocalRotateRoll = false;
     this.isLocalRotateYaw = false;
+    this.isLocalRotateOverride = false;
     this.localRotateCurrent = { pitch: 0, roll: 0, yaw: 0 };
     this.localRotateStartPosition = { pitch: 0, roll: 0, yaw: 0 };
     this.ftsRotateReset = false;
@@ -208,7 +210,7 @@ export class Camera {
   }
 
   /**
-   * 
+   *
    * @param angle angle in radians
    * @returns {number} normalized angle in radians
    */
@@ -330,14 +332,19 @@ export class Camera {
     return Math.pow(this._zoomLevel, ZOOM_EXP) * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance;
   }
 
+  private alt2zoom(alt: number): number {
+    const distanceFromCenter = alt + RADIUS_OF_EARTH + 30;
+    return Math.pow((distanceFromCenter - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance), 1 / ZOOM_EXP);
+  }
+
   /**
-   * @param val enable or disable the autoRotate (default: toggles the opposite of the current state) - true = enable, false = disable   
-   * 
+   * @param val enable or disable the autoRotate (default: toggles the opposite of the current state) - true = enable, false = disable
+   *
    * settingsManager.autoRotateSpeed will be set to 1 if it is currently 0
    */
   autoRotate(val?: boolean) {
     if (settingsManager.autoRotateSpeed === 0) settingsManager.autoRotateSpeed = 0.0075;
-    
+
     if (typeof val == 'undefined') {
       this.isAutoRotate = !this.isAutoRotate;
       return;
@@ -346,8 +353,8 @@ export class Camera {
   }
 
   /**
-   * @param val enable or disable the autopan (default: toggles the opposite of the current state) - true = enable, false = disable   
-   * 
+   * @param val enable or disable the autopan (default: toggles the opposite of the current state) - true = enable, false = disable
+   *
    * settingsManager.autoRotateSpeed will be set to 1 if it is currently 0
    */
   autoPan(val?: boolean) {
@@ -362,7 +369,7 @@ export class Camera {
   }
 
   /**
-   * 
+   *
    * @param zoom number between 0 and 1 (0 = center of earth, 1 = max zoom)
    *             or strings 'geo' or 'leo' to zoom to a specific orbit
    */
@@ -379,11 +386,51 @@ export class Camera {
     this._zoomTarget = zoom;
   }
 
+  changeCameraType(orbitManager, drawManager, objectManager, sensorManager) {
+    let curCam = this.cameraType.current;
+    if (curCam === this.cameraType.planetarium) {
+      orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
+    }
+
+    curCam++;
+
+    if (curCam == this.cameraType.fixedToSat && objectManager.selectedSat == -1) {
+      curCam++;
+    }
+
+    if (curCam === this.cameraType.planetarium && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
+      curCam++;
+    }
+
+    if (curCam === this.cameraType.satellite && objectManager.selectedSat === -1) {
+      curCam++;
+    }
+
+    if (curCam === this.cameraType.astronomy && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
+      curCam++;
+    }
+
+    if (curCam === 7) {
+      // 7 is a placeholder to reset camera type
+      this.isLocalRotateReset = true;
+      settingsManager.fieldOfView = 0.6;
+      drawManager.glInit();
+      if (objectManager.selectedSat !== -1) {
+        this.camZoomSnappedOnSat = true;
+        curCam = this.cameraType.fixedToSat;
+      } else {
+        curCam = this.cameraType.default;
+      }
+    }
+
+    this.cameraType.set(curCam);
+  }
+
   lookAtLatLon(lat: number, long: number, zoom?: string | number, date?: Date): void {
     // Setup some defaults if they aren't passed in
     zoom ??= 'leo';
     date ??= new Date();
-    
+
     // Convert the lat/long to a position on the globe and then set the camera to look at that position
     this.changeZoom(zoom);
     this.camSnap(Camera.latToPitch(lat), Camera.longToYaw(long, date));
@@ -429,8 +476,6 @@ export class Camera {
     }
 
     if (this.camZoomSnappedOnSat) {
-      // cSTS.altitude;
-      // cSTS.camDistTarget;
       if (!sat.static && sat.active) {
         // if this is a satellite not a missile
         this.cSTS.altitude = sat.getAltitude();
@@ -682,7 +727,7 @@ export class Camera {
         }
       }
     }
-    if (this.isLocalRotateRoll || this.isLocalRotateYaw || this.isLocalRotateReset) {
+    if (this.isLocalRotateRoll || this.isLocalRotateYaw || this.isLocalRotateReset || this.isLocalRotateOverride) {
       this.localRotateTarget.pitch = Camera.normalizeAngle(this.localRotateTarget.pitch);
       this.localRotateTarget.yaw = Camera.normalizeAngle(this.localRotateTarget.yaw);
       this.localRotateTarget.roll = Camera.normalizeAngle(this.localRotateTarget.roll);
@@ -708,6 +753,13 @@ export class Camera {
         }
       }
 
+      if (this.isLocalRotateOverride) {
+        this.localRotateTarget.pitch = this.localRotateStartPosition.pitch + this.localRotateDif.pitch * -settingsManager.cameraMovementSpeed;
+        this.localRotateSpeed.pitch = Camera.normalizeAngle(this.localRotateCurrent.pitch - this.localRotateTarget.pitch) * -settingsManager.cameraMovementSpeed;
+        this.localRotateTarget.yaw = this.localRotateStartPosition.yaw + this.localRotateDif.yaw * settingsManager.cameraMovementSpeed;
+        this.localRotateSpeed.yaw = Camera.normalizeAngle(this.localRotateCurrent.yaw - this.localRotateTarget.yaw) * -settingsManager.cameraMovementSpeed;
+      }
+
       if (this.isLocalRotateReset) {
         this.localRotateTarget.pitch = 0;
         this.localRotateTarget.roll = 0;
@@ -727,7 +779,7 @@ export class Camera {
         this.localRotateCurrent.roll += resetModifier * this.localRotateMovementSpeed * this.localRotateDif.roll;
       }
 
-      if (this.isLocalRotateYaw || this.isLocalRotateReset) {
+      if (this.isLocalRotateYaw || this.isLocalRotateReset || this.isLocalRotateOverride) {
         this.localRotateSpeed.yaw -= this.localRotateSpeed.yaw * dt * this.localRotateMovementSpeed;
         this.localRotateCurrent.yaw += resetModifier * this.localRotateMovementSpeed * this.localRotateDif.yaw;
       }
@@ -787,6 +839,7 @@ export class Camera {
       // this.camPitchAccel *= 0.95;
       // this.camYawAccel *= 0.95;
     }
+
     if (this.ftsRotateReset) {
       if (this.cameraType.current !== this.cameraType.fixedToSat) {
         this.ftsRotateReset = false;
@@ -875,15 +928,19 @@ export class Camera {
       this._zoomLevel = this._zoomLevel + (this._zoomTarget - this._zoomLevel) * dt * 0.0025;
     } else {
       if (this.isZoomIn) {
-        this._zoomLevel -= this._zoomLevel * dt * settingsManager.zoomSpeed * Math.abs(this._zoomTarget - this._zoomLevel);
+        this._zoomLevel -= dt * settingsManager.zoomSpeed * Math.abs(this._zoomTarget - this._zoomLevel);
       } else {
-        this._zoomLevel += this._zoomLevel * dt * settingsManager.zoomSpeed * Math.abs(this._zoomTarget - this._zoomLevel);
+        this._zoomLevel += dt * settingsManager.zoomSpeed * Math.abs(this._zoomTarget - this._zoomLevel);
       }
 
       if ((this._zoomLevel > this._zoomTarget && !this.isZoomIn) || (this._zoomLevel < this._zoomTarget && this.isZoomIn)) {
         this._zoomLevel = this._zoomTarget;
       }
     }
+
+    // Clamp Zoom between 0 and 1
+    this._zoomLevel = this._zoomLevel > 1 ? 1 : this._zoomLevel;
+    this._zoomLevel = this._zoomLevel < 0 ? 0 : this._zoomLevel;
 
     if (this.cameraType.current == this.cameraType.fixedToSat) {
       this.camPitch = Camera.normalizeAngle(this.camPitch);
@@ -953,6 +1010,14 @@ export class Camera {
         this.cameraType.current = this.cameraType.default;
       }
 
+      // Ensure we don't zoom in past our satellite
+      if (this.cameraType.current == this.cameraType.fixedToSat) {
+        if (this.getCamDist() < target.getAltitude() + RADIUS_OF_EARTH + 30) {
+          this._zoomTarget = this.alt2zoom(target.getAltitude());
+          this._zoomLevel = this._zoomTarget;
+        }
+      }      
+
       switch (this.cameraType.current) {
         case this.cameraType.default: // pivot around the earth with earth in the center
           glm.mat4.rotateX(this.camMatrix, this.camMatrix, -this.localRotateCurrent.pitch);
@@ -973,7 +1038,7 @@ export class Camera {
           glm.mat4.rotateX(this.camMatrix, this.camMatrix, this.ecPitch);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.ecYaw);
           break;
-        case this.cameraType.fixedToSat: // Pivot around the satellite
+        case this.cameraType.fixedToSat: // Pivot around the satellite          
           glm.mat4.rotateX(this.camMatrix, this.camMatrix, -this.localRotateCurrent.pitch);
           glm.mat4.rotateY(this.camMatrix, this.camMatrix, -this.localRotateCurrent.roll);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.localRotateCurrent.yaw);
@@ -1038,6 +1103,13 @@ export class Camera {
           break;
         }
       }
+
+      // Try to stay out of the earth
+      if (this.cameraType.current === this.cameraType.default || this.cameraType.current === this.cameraType.offset || this.cameraType.current === this.cameraType.fixedToSat) {
+        if (this.getDistFromEarth() < RADIUS_OF_EARTH + 30) {
+          this._zoomTarget = this._zoomLevel + 0.01;
+        }
+      }
     }
   }
 
@@ -1047,14 +1119,11 @@ export class Camera {
     glm.vec3.transformMat4(position, position, this.camMatrix);
 
     return position;
+  }
 
-    /* Old Method */
-    // let gCPr = this.getCamDist();
-    // let gCPz = gCPr * Math.sin(this.camPitch);
-    // let gCPrYaw = gCPr * Math.cos(this.camPitch);
-    // let gCPx = gCPrYaw * Math.sin(this.camYaw);
-    // let gCPy = gCPrYaw * -Math.cos(this.camYaw);
-    // return [gCPx, gCPy, gCPz];
+  getDistFromEarth(): number {
+    const position = this.getCamPos();
+    return Math.sqrt(position[0]**2 + position[1]**2 + position[2]**2);    
   }
 
   /**

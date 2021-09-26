@@ -63,6 +63,7 @@ let settingsManager = {
     topMenu: true,
     classification: true,
     soundManager: true,
+    gamepad: true,
   },
   colors: {
     transparent: null,
@@ -271,8 +272,8 @@ let settingsManager = {
     // //////////////////////////////////////////////////////////////////////////
     settingsManager.showOrbitThroughEarth = false;
 
-    settingsManager.earthNumLatSegs = 80;
-    settingsManager.earthNumLonSegs = 80;
+    settingsManager.earthNumLatSegs = 128;
+    settingsManager.earthNumLonSegs = 128;
 
     const RADIUS_OF_EARTH = 6371.0;
 

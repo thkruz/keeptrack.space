@@ -128,9 +128,9 @@ export const updateZoom = (zoomOut: number, zoomIn: number): void => {
 
   const { cameraManager, drawManager } = keepTrackApi.programs;
   switch (cameraManager.cameraType.current) {
-    case cameraManager.cameraType.default:
-    case cameraManager.cameraType.offset:    
-    case cameraManager.cameraType.fixedToSat:
+    case cameraManager.cameraType.Default:
+    case cameraManager.cameraType.Offset:    
+    case cameraManager.cameraType.FixedToSat:
       let zoomTarget = cameraManager.zoomLevel;
       zoomTarget += (zoomOut / 500) * drawManager.dt;
       zoomTarget -= (zoomIn / 500) * drawManager.dt;
@@ -144,10 +144,10 @@ export const updateZoom = (zoomOut: number, zoomIn: number): void => {
         cameraManager.isZoomIn = false;
       }
       break;
-    case cameraManager.cameraType.fps:
-    case cameraManager.cameraType.satellite:
-    case cameraManager.cameraType.planetarium:
-    case cameraManager.cameraType.astronomy:
+    case cameraManager.cameraType.Fps:
+    case cameraManager.cameraType.Satellite:
+    case cameraManager.cameraType.Planetarium:
+    case cameraManager.cameraType.Astronomy:
       if (zoomOut !== 0) {
         cameraManager.fpsVertSpeed += (zoomOut * 2) ** 3 * drawManager.dt * settingsManager.cameraMovementSpeed;
       }
@@ -163,18 +163,18 @@ export const updateLeftStick = (x: number, y: number): void => {
   if (x > gamepadSettings.deadzone || x < -gamepadSettings.deadzone || y > gamepadSettings.deadzone || y < -gamepadSettings.deadzone) {
     cameraManager.autoRotate(false);
     switch (cameraManager.cameraType.current) {
-      case cameraManager.cameraType.default:
-      case cameraManager.cameraType.offset:
-      case cameraManager.cameraType.fixedToSat:
+      case cameraManager.cameraType.Default:
+      case cameraManager.cameraType.Offset:
+      case cameraManager.cameraType.FixedToSat:
         cameraManager.camAngleSnappedOnSat = false;
         cameraManager.isCamSnapMode = false;
         cameraManager.camPitchSpeed -= (y ** 3 / 100) * drawManager.dt * settingsManager.cameraMovementSpeed;
         cameraManager.camYawSpeed += (x ** 3 / 100) * drawManager.dt * settingsManager.cameraMovementSpeed;
         break;
-      case cameraManager.cameraType.fps:
-      case cameraManager.cameraType.satellite:
-      case cameraManager.cameraType.planetarium:
-      case cameraManager.cameraType.astronomy:
+      case cameraManager.cameraType.Fps:
+      case cameraManager.cameraType.Satellite:
+      case cameraManager.cameraType.Planetarium:
+      case cameraManager.cameraType.Astronomy:
         if (y > gamepadSettings.deadzone || y < -gamepadSettings.deadzone) {
           cameraManager.fpsForwardSpeed = -(y ** 3) * drawManager.dt;
         }
@@ -192,17 +192,17 @@ export const updateRightStick = (x: number, y: number): void => {
   if (y > gamepadSettings.deadzone || y < -gamepadSettings.deadzone || x > gamepadSettings.deadzone || x < -gamepadSettings.deadzone) {
     cameraManager.autoRotate(false);
     switch (cameraManager.cameraType.current) {
-      case cameraManager.cameraType.default:
-      case cameraManager.cameraType.offset:
-      case cameraManager.cameraType.fixedToSat:
+      case cameraManager.cameraType.Default:
+      case cameraManager.cameraType.Offset:
+      case cameraManager.cameraType.FixedToSat:
         cameraManager.isLocalRotateOverride = true;
         cameraManager.localRotateDif.pitch = -y * 200;
         cameraManager.localRotateDif.yaw = -x * 200;
         break;
-      case cameraManager.cameraType.fps:
-      case cameraManager.cameraType.satellite:
-      case cameraManager.cameraType.planetarium:
-      case cameraManager.cameraType.astronomy:
+      case cameraManager.cameraType.Fps:
+      case cameraManager.cameraType.Satellite:
+      case cameraManager.cameraType.Planetarium:
+      case cameraManager.cameraType.Astronomy:
         cameraManager.camPitchSpeed += (y / 50) * drawManager.dt * settingsManager.cameraMovementSpeed;
         cameraManager.camYawSpeed -= (x / 50) * drawManager.dt * settingsManager.cameraMovementSpeed;
         break;

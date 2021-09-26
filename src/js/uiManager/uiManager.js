@@ -226,27 +226,27 @@ uiManager.keyHandler = (evt) => {
       cameraManager.changeCameraType(orbitManager, drawManager, objectManager, sensorManager);
 
       switch (cameraManager.cameraType.current) {
-        case cameraManager.cameraType.default:
+        case cameraManager.cameraType.Default:
           uiManager.toast('Earth Centered Camera Mode', 'standby');
           cameraManager.zoomTarget = 0.5;
           break;
-        case cameraManager.cameraType.offset:
+        case cameraManager.cameraType.Offset:
           uiManager.toast('Offset Camera Mode', 'standby');
           break;
-        case cameraManager.cameraType.fps:
+        case cameraManager.cameraType.Fps:
           uiManager.toast('Free Camera Mode', 'standby');
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
-        case cameraManager.cameraType.planetarium:
+        case cameraManager.cameraType.Planetarium:
           uiManager.toast('Planetarium Camera Mode', 'standby');
           uiManager.legendMenuChange('planetarium');
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
-        case cameraManager.cameraType.satellite:
+        case cameraManager.cameraType.Satellite:
           uiManager.toast('Satellite Camera Mode', 'standby');
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
-        case cameraManager.cameraType.astronomy:
+        case cameraManager.cameraType.Astronomy:
           uiManager.toast('Astronomy Camera Mode', 'standby');
           uiManager.legendMenuChange('astronomy');
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
@@ -911,7 +911,7 @@ uiManager.panToStar = function (c) {
   }
 
   lineManager.create('ref', [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
-  cameraManager.cameraType.current = cameraManager.cameraType.offset;
+  cameraManager.cameraType.current = cameraManager.cameraType.Offset;
   console.log(sat);
   // ======================================================
   // Need to calculate the time to get the right RA offset

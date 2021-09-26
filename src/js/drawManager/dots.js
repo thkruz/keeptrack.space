@@ -45,7 +45,7 @@ class Dots {
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.uniformMatrix4fv(this.drawProgram.pMvCamMatrix, false, this.pMvCamMatrix);
 
-    if (cameraManager.cameraType.current == cameraManager.cameraType.planetarium) {
+    if (cameraManager.cameraType.current == cameraManager.cameraType.Planetarium) {
       gl.uniform1f(this.drawProgram.minSize, settingsManager.satShader.minSizePlanetarium);
       gl.uniform1f(this.drawProgram.maxSize, settingsManager.satShader.maxSizePlanetarium);
     } else {

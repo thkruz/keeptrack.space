@@ -1090,7 +1090,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Added geolocation options when using https. [`d2167cb`](https://github.com/thkruz/keeptrack.space/commit/d2167cbdc56dd228ce859452ee084a4fef1599b5)
 - Added license info from James Yoder/thingsinspace. [`37e722f`](https://github.com/thkruz/keeptrack.space/commit/37e722f72f1df4b1143f5abafd07ae0d5e95a55f)
 - Add hires option from GET variable. [`24a3d57`](https://github.com/thkruz/keeptrack.space/commit/24a3d570c5855c3fc0a364365e769f2535b5f81d)
-- Adjusted cameraType.SATELLITE movement. Q and E for rotation. [`07601d4`](https://github.com/thkruz/keeptrack.space/commit/07601d48ec54bef5aed4aaa6a5bbd9428cc09964)
+- Adjusted cameraType.SateLLITE movement. Q and E for rotation. [`07601d4`](https://github.com/thkruz/keeptrack.space/commit/07601d48ec54bef5aed4aaa6a5bbd9428cc09964)
 - Allow passing mw, retro, vec, etc via GET instead of different filenames [`4c0b81a`](https://github.com/thkruz/keeptrack.space/commit/4c0b81ab4f4c09fbd2e8e1a29566055f4c356583)
 - Update .igtignore [`09365cf`](https://github.com/thkruz/keeptrack.space/commit/09365cff6f81a36838c849e3576da7d7f8231547)
 - Harder to deselect selectedsat when in satellite camera view. [`698b496`](https://github.com/thkruz/keeptrack.space/commit/698b496d16f34e6f40e742359203be415c6c1c80)

@@ -56,15 +56,15 @@ export const init = (): void => {
     cb: (iconName: string): void => {
       if (iconName === 'menu-satview') {
         const cameraManager = keepTrackApi.programs.cameraManager;
-        if (cameraManager.cameraType.current === cameraManager.cameraType.satellite) {
+        if (cameraManager.cameraType.current === cameraManager.cameraType.Satellite) {
           // isSatView = false;
           uiManager.hideSideMenus();
-          cameraManager.cameraType.current = cameraManager.cameraType.fixedToSat; // Back to normal Camera Mode
+          cameraManager.cameraType.current = cameraManager.cameraType.FixedToSat; // Back to normal Camera Mode
           $('#menu-satview').removeClass('bmenu-item-selected');
           return;
         } else {
           if (objectManager.selectedSat !== -1) {
-            cameraManager.cameraType.current = cameraManager.cameraType.satellite; // Activate Satellite Camera Mode
+            cameraManager.cameraType.current = cameraManager.cameraType.Satellite; // Activate Satellite Camera Mode
             $('#menu-satview').addClass('bmenu-item-selected');
             // isSatView = true;
           } else {

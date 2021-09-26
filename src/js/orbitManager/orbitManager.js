@@ -295,7 +295,7 @@ orbitManager.draw = function (pMatrix, camMatrix, tgtBuffer) {
 
   if (currentInView.length >= 1) {
     // There might be some z-fighting
-    if (cameraManager.cameraType.current == cameraManager.cameraType.planetarium) {
+    if (cameraManager.cameraType.current == cameraManager.cameraType.Planetarium) {
       gl.uniform4fv(pathShader.uColor, settingsManager.orbitPlanetariumColor);
     } else {
       gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);

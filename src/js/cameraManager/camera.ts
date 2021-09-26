@@ -55,7 +55,7 @@ export class Camera {
   localRotateStartPosition: { pitch: number; roll: number; yaw: number };
   ftsRotateReset: boolean;
   ecLastZoom: number;
-  cameraType: { current: number; default: number; fixedToSat: number; offset: number; fps: number; planetarium: number; satellite: number; astronomy: number; set: (val: any) => void };
+  cameraType: { current: number; Default: number; FixedToSat: number; Offset: number; Fps: number; Planetarium: number; Satellite: number; Astronomy: number; set: (val: any) => void };
   camMatrixEmpty: glm.mat4;
   isAutoRotate: boolean;
   isAutoPan: boolean;
@@ -77,7 +77,7 @@ export class Camera {
   isFPSVertSpeedLock: boolean;
   fpsRun: number;
   fpsLastTime: number;
-  cSTS: { pos: { x: number; y: number; z: number }; radius: number; pitch: number; yaw: number; altitude: number; camDistTarget: number };
+  camSnapToSat: { pos: { x: number; y: number; z: number }; radius: number; pitch: number; yaw: number; altitude: number; camDistTarget: number };
   isRayCastingEarth: boolean;
   chaseSpeed: number;
   panSpeed: { x: number; y: number; z: number };
@@ -129,13 +129,13 @@ export class Camera {
     this.ecLastZoom = 0.45;
     this.cameraType = {
       current: 0,
-      default: 0,
-      fixedToSat: 1,
-      offset: 2,
-      fps: 3,
-      planetarium: 4,
-      satellite: 5,
-      astronomy: 6,
+      Default: 0,
+      FixedToSat: 1,
+      Offset: 2,
+      Fps: 3,
+      Planetarium: 4,
+      Satellite: 5,
+      Astronomy: 6,
       set: (val) => {
         if (typeof val !== 'number') throw new TypeError();
         if (val > 6 || val < 0) throw new RangeError();
@@ -165,7 +165,7 @@ export class Camera {
     this.isFPSVertSpeedLock = false;
     this.fpsRun = 1;
     this.fpsLastTime = 1;
-    this.cSTS = {
+    this.camSnapToSat = {
       pos: {
         x: 0,
         y: 0,
@@ -296,7 +296,7 @@ export class Camera {
 
       // console.log('Front: ' + fpsForwardSpeed + ' - ' + 'Side: ' + fpsSideSpeed + ' - ' + 'Vert: ' + fpsVertSpeed)
 
-      if (this.cameraType.fps) {
+      if (this.cameraType.Fps) {
         if (this.fpsForwardSpeed !== 0) {
           this.fpsPos[0] -= Math.sin(this.fpsYaw * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
           this.fpsPos[1] -= Math.cos(this.fpsYaw * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
@@ -388,25 +388,25 @@ export class Camera {
 
   changeCameraType(orbitManager, drawManager, objectManager, sensorManager) {
     let curCam = this.cameraType.current;
-    if (curCam === this.cameraType.planetarium) {
+    if (curCam === this.cameraType.Planetarium) {
       orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
     }
 
     curCam++;
 
-    if (curCam == this.cameraType.fixedToSat && objectManager.selectedSat == -1) {
+    if (curCam == this.cameraType.FixedToSat && objectManager.selectedSat == -1) {
       curCam++;
     }
 
-    if (curCam === this.cameraType.planetarium && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
+    if (curCam === this.cameraType.Planetarium && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
       curCam++;
     }
 
-    if (curCam === this.cameraType.satellite && objectManager.selectedSat === -1) {
+    if (curCam === this.cameraType.Satellite && objectManager.selectedSat === -1) {
       curCam++;
     }
 
-    if (curCam === this.cameraType.astronomy && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
+    if (curCam === this.cameraType.Astronomy && (!objectManager.isSensorManagerLoaded || !sensorManager.checkSensorSelected())) {
       curCam++;
     }
 
@@ -417,9 +417,9 @@ export class Camera {
       drawManager.glInit();
       if (objectManager.selectedSat !== -1) {
         this.camZoomSnappedOnSat = true;
-        curCam = this.cameraType.fixedToSat;
+        curCam = this.cameraType.FixedToSat;
       } else {
-        curCam = this.cameraType.default;
+        curCam = this.cameraType.Default;
       }
     }
 
@@ -452,60 +452,60 @@ export class Camera {
     If so, don't change those targets. */
 
     if (this.camAngleSnappedOnSat) {
-      this.cSTS.pos = sat.position;
-      this.cSTS.radius = Math.sqrt(this.cSTS.pos.x ** 2 + this.cSTS.pos.y ** 2);
-      this.cSTS.yaw = Math.atan2(this.cSTS.pos.y, this.cSTS.pos.x) + TAU / 4;
-      this.cSTS.pitch = Math.atan2(this.cSTS.pos.z, this.cSTS.radius);
-      if (!this.cSTS.pitch) {
+      this.camSnapToSat.pos = sat.position;
+      this.camSnapToSat.radius = Math.sqrt(this.camSnapToSat.pos.x ** 2 + this.camSnapToSat.pos.y ** 2);
+      this.camSnapToSat.yaw = Math.atan2(this.camSnapToSat.pos.y, this.camSnapToSat.pos.x) + TAU / 4;
+      this.camSnapToSat.pitch = Math.atan2(this.camSnapToSat.pos.z, this.camSnapToSat.radius);
+      if (!this.camSnapToSat.pitch) {
         console.warn('Pitch Calculation Error');
-        this.cSTS.pitch = 0;
+        this.camSnapToSat.pitch = 0;
         this.camZoomSnappedOnSat = false;
         this.camAngleSnappedOnSat = false;
       }
-      if (!this.cSTS.yaw) {
+      if (!this.camSnapToSat.yaw) {
         console.warn('Yaw Calculation Error');
-        this.cSTS.yaw = 0;
+        this.camSnapToSat.yaw = 0;
         this.camZoomSnappedOnSat = false;
         this.camAngleSnappedOnSat = false;
       }
-      if (this.cameraType.current === this.cameraType.planetarium) {
+      if (this.cameraType.current === this.cameraType.Planetarium) {
         // camSnap(-pitch, -yaw)
       } else {
-        this.camSnap(this.cSTS.pitch, this.cSTS.yaw);
+        this.camSnap(this.camSnapToSat.pitch, this.camSnapToSat.yaw);
       }
     }
 
     if (this.camZoomSnappedOnSat) {
       if (!sat.static && sat.active) {
         // if this is a satellite not a missile
-        this.cSTS.altitude = sat.getAltitude();
+        this.camSnapToSat.altitude = sat.getAltitude();
       }
-      if (this.cSTS.altitude) {
-        this.cSTS.camDistTarget = this.cSTS.altitude + RADIUS_OF_EARTH + settingsManager.camDistBuffer;
+      if (this.camSnapToSat.altitude) {
+        this.camSnapToSat.camDistTarget = this.camSnapToSat.altitude + RADIUS_OF_EARTH + settingsManager.camDistBuffer;
       } else {
-        this.cSTS.camDistTarget = RADIUS_OF_EARTH + settingsManager.camDistBuffer; // Stay out of the center of the earth. You will get stuck there.
-        console.warn(`Zoom Calculation Error: ${this.cSTS.altitude} -- ${this.cSTS.camDistTarget}`);
+        this.camSnapToSat.camDistTarget = RADIUS_OF_EARTH + settingsManager.camDistBuffer; // Stay out of the center of the earth. You will get stuck there.
+        console.warn(`Zoom Calculation Error: ${this.camSnapToSat.altitude} -- ${this.camSnapToSat.camDistTarget}`);
         this.camZoomSnappedOnSat = false;
         this.camAngleSnappedOnSat = false;
       }
 
-      this.cSTS.camDistTarget = this.cSTS.camDistTarget < settingsManager.minZoomDistance ? settingsManager.minZoomDistance + 10 : this.cSTS.camDistTarget;
+      this.camSnapToSat.camDistTarget = this.camSnapToSat.camDistTarget < settingsManager.minZoomDistance ? settingsManager.minZoomDistance + 10 : this.camSnapToSat.camDistTarget;
 
-      this._zoomTarget = Math.pow((this.cSTS.camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance), 1 / ZOOM_EXP);
+      this._zoomTarget = Math.pow((this.camSnapToSat.camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance), 1 / ZOOM_EXP);
       this.ecLastZoom = this._zoomTarget + 0.1;
 
       // Only Zoom in Once on Mobile
       if (settingsManager.isMobileModeEnabled) this.camZoomSnappedOnSat = false;
     }
 
-    if (this.cameraType.current === this.cameraType.planetarium) {
+    if (this.cameraType.current === this.cameraType.Planetarium) {
       this._zoomTarget = 0.01;
     }
   }
 
   fts2default() {
-    this.cameraType.current = this.cameraType.current == this.cameraType.fixedToSat ? this.cameraType.default : this.cameraType.current;
-    if (this.cameraType.current == this.cameraType.default || this.cameraType.current == this.cameraType.offset) {
+    this.cameraType.current = this.cameraType.current == this.cameraType.FixedToSat ? this.cameraType.Default : this.cameraType.current;
+    if (this.cameraType.current == this.cameraType.Default || this.cameraType.current == this.cameraType.Offset) {
       this.camPitch = this.ecPitch;
       this.camYaw = this.ecYaw;
       this._zoomTarget = this.ecLastZoom; // Reset Zoom
@@ -537,7 +537,7 @@ export class Camera {
       this.fpsRotateRate = 0;
     }
     if (evt.key.toUpperCase() === 'J' || evt.key.toUpperCase() === 'L') {
-      if (this.cameraType.current === this.cameraType.astronomy) {
+      if (this.cameraType.current === this.cameraType.Astronomy) {
         this.fpsRotateRate = 0;
       } else {
         this.fpsYawRate = 0;
@@ -573,7 +573,7 @@ export class Camera {
 
     if (evt.key.toUpperCase() === 'SHIFT') {
       this.isShiftPressed = true;
-      if (this.cameraType.current === this.cameraType.fps) {
+      if (this.cameraType.current === this.cameraType.Fps) {
         this.fpsRun = 0.05;
       }
       this.speedModifier = 8;
@@ -582,75 +582,75 @@ export class Camera {
     }
     if (evt.key === 'ShiftRight') {
       this.isShiftPressed = true;
-      if (this.cameraType.current === this.cameraType.fps) {
+      if (this.cameraType.current === this.cameraType.Fps) {
         this.fpsRun = 3;
       }
     }
     if (evt.key.toUpperCase() === 'W') {
-      if (this.cameraType.current === this.cameraType.fps) {
+      if (this.cameraType.current === this.cameraType.Fps) {
         this.fpsForwardSpeed = settingsManager.fpsForwardSpeed;
         this.isFPSForwardSpeedLock = true;
       }
     }
     if (evt.key.toUpperCase() === 'A') {
-      if (this.cameraType.current === this.cameraType.fps) {
+      if (this.cameraType.current === this.cameraType.Fps) {
         this.fpsSideSpeed = -settingsManager.fpsSideSpeed;
         this.isFPSSideSpeedLock = true;
       }
     }
     if (evt.key.toUpperCase() === 'S') {
-      if (this.cameraType.current === this.cameraType.fps) {
+      if (this.cameraType.current === this.cameraType.Fps) {
         this.fpsForwardSpeed = -settingsManager.fpsForwardSpeed;
         this.isFPSForwardSpeedLock = true;
       }
     }
     if (evt.key.toUpperCase() === 'D') {
-      if (this.cameraType.current === this.cameraType.fps) {
+      if (this.cameraType.current === this.cameraType.Fps) {
         this.fpsSideSpeed = settingsManager.fpsSideSpeed;
         this.isFPSSideSpeedLock = true;
       }
     }
     if (evt.key.toUpperCase() === 'I') {
-      if (this.cameraType.current === this.cameraType.fps || this.cameraType.current === this.cameraType.satellite || this.cameraType.current === this.cameraType.astronomy) {
+      if (this.cameraType.current === this.cameraType.Fps || this.cameraType.current === this.cameraType.Satellite || this.cameraType.current === this.cameraType.Astronomy) {
         this.fpsPitchRate = settingsManager.fpsPitchRate / this.speedModifier;
       }
     }
     if (evt.key.toUpperCase() === 'K') {
-      if (this.cameraType.current === this.cameraType.fps || this.cameraType.current === this.cameraType.satellite || this.cameraType.current === this.cameraType.astronomy) {
+      if (this.cameraType.current === this.cameraType.Fps || this.cameraType.current === this.cameraType.Satellite || this.cameraType.current === this.cameraType.Astronomy) {
         this.fpsPitchRate = -settingsManager.fpsPitchRate / this.speedModifier;
       }
     }
     if (evt.key.toUpperCase() === 'J') {
-      if (this.cameraType.current === this.cameraType.fps || this.cameraType.current === this.cameraType.satellite) {
+      if (this.cameraType.current === this.cameraType.Fps || this.cameraType.current === this.cameraType.Satellite) {
         this.fpsYawRate = -settingsManager.fpsYawRate / this.speedModifier;
       }
-      if (this.cameraType.current === this.cameraType.astronomy) {
+      if (this.cameraType.current === this.cameraType.Astronomy) {
         this.fpsRotateRate = settingsManager.fpsRotateRate / this.speedModifier;
       }
     }
     if (evt.key.toUpperCase() === 'L') {
-      if (this.cameraType.current === this.cameraType.fps || this.cameraType.current === this.cameraType.satellite) {
+      if (this.cameraType.current === this.cameraType.Fps || this.cameraType.current === this.cameraType.Satellite) {
         this.fpsYawRate = settingsManager.fpsYawRate / this.speedModifier;
       }
-      if (this.cameraType.current === this.cameraType.astronomy) {
+      if (this.cameraType.current === this.cameraType.Astronomy) {
         this.fpsRotateRate = -settingsManager.fpsRotateRate / this.speedModifier;
       }
     }
     if (evt.key.toUpperCase() === 'Q') {
-      if (this.cameraType.current === this.cameraType.fps) {
+      if (this.cameraType.current === this.cameraType.Fps) {
         this.fpsVertSpeed = -settingsManager.fpsVertSpeed;
         this.isFPSVertSpeedLock = true;
       }
-      if (this.cameraType.current === this.cameraType.satellite || this.cameraType.current === this.cameraType.astronomy) {
+      if (this.cameraType.current === this.cameraType.Satellite || this.cameraType.current === this.cameraType.Astronomy) {
         this.fpsRotateRate = settingsManager.fpsRotateRate / this.speedModifier;
       }
     }
     if (evt.key.toUpperCase() === 'E') {
-      if (this.cameraType.current === this.cameraType.fps) {
+      if (this.cameraType.current === this.cameraType.Fps) {
         this.fpsVertSpeed = settingsManager.fpsVertSpeed;
         this.isFPSVertSpeedLock = true;
       }
-      if (this.cameraType.current === this.cameraType.satellite || this.cameraType.current === this.cameraType.astronomy) {
+      if (this.cameraType.current === this.cameraType.Satellite || this.cameraType.current === this.cameraType.Astronomy) {
         this.fpsRotateRate = -settingsManager.fpsRotateRate / this.speedModifier;
       }
     }
@@ -798,7 +798,7 @@ export class Camera {
       // dragTarget = getEarthScreenPoint(mouseX, mouseY)
       // if (Number.isNaN(dragTarget[0]) || Number.isNaN(dragTarget[1]) || Number.isNaN(dragTarget[2]) ||
       // Number.isNaN(dragPoint[0]) || Number.isNaN(dragPoint[1]) || Number.isNaN(dragPoint[2]) ||
-      if (!this.isRayCastingEarth || this.cameraType.current === this.cameraType.fps || this.cameraType.current === this.cameraType.satellite || this.cameraType.current === this.cameraType.astronomy || settingsManager.isMobileModeEnabled) {
+      if (!this.isRayCastingEarth || this.cameraType.current === this.cameraType.Fps || this.cameraType.current === this.cameraType.Satellite || this.cameraType.current === this.cameraType.Astronomy || settingsManager.isMobileModeEnabled) {
         // random screen drag
         const xDif = this.screenDragPoint[0] - this.mouseX;
         const yDif = this.screenDragPoint[1] - this.mouseY;
@@ -841,7 +841,7 @@ export class Camera {
     }
 
     if (this.ftsRotateReset) {
-      if (this.cameraType.current !== this.cameraType.fixedToSat) {
+      if (this.cameraType.current !== this.cameraType.FixedToSat) {
         this.ftsRotateReset = false;
         this.ftsPitch = 0;
         this.camPitchSpeed = 0;
@@ -880,7 +880,7 @@ export class Camera {
 
     this.camRotateSpeed -= this.camRotateSpeed * dt * settingsManager.cameraMovementSpeed;
 
-    if (this.cameraType.current === this.cameraType.fps || this.cameraType.current === this.cameraType.satellite || this.cameraType.current === this.cameraType.astronomy) {
+    if (this.cameraType.current === this.cameraType.Fps || this.cameraType.current === this.cameraType.Satellite || this.cameraType.current === this.cameraType.Astronomy) {
       this.fpsPitch -= 20 * this.camPitchSpeed * dt;
       this.fpsYaw -= 20 * this.camYawSpeed * dt;
       this.fpsRotate -= 20 * this.camRotateSpeed * dt;
@@ -942,7 +942,7 @@ export class Camera {
     this._zoomLevel = this._zoomLevel > 1 ? 1 : this._zoomLevel;
     this._zoomLevel = this._zoomLevel < 0 ? 0 : this._zoomLevel;
 
-    if (this.cameraType.current == this.cameraType.fixedToSat) {
+    if (this.cameraType.current == this.cameraType.FixedToSat) {
       this.camPitch = Camera.normalizeAngle(this.camPitch);
     } else {
       if (this.camPitch > TAU / 4) this.camPitch = TAU / 4;
@@ -951,16 +951,16 @@ export class Camera {
     if (this.camYaw > TAU) this.camYaw -= TAU;
     if (this.camYaw < 0) this.camYaw += TAU;
 
-    if (this.cameraType.current == this.cameraType.default || this.cameraType.current == this.cameraType.offset) {
+    if (this.cameraType.current == this.cameraType.Default || this.cameraType.current == this.cameraType.Offset) {
       this.ecPitch = this.camPitch;
       this.ecYaw = this.camYaw;
       if (this.ecYaw < 0) this.ecYaw += TAU;
-    } else if (this.cameraType.current == this.cameraType.fixedToSat) {
+    } else if (this.cameraType.current == this.cameraType.FixedToSat) {
       this.ftsPitch = this.camPitch;
       this.ftsYaw = this.camYaw;
     }
 
-    if (this.cameraType.current === this.cameraType.fps || this.cameraType.current === this.cameraType.satellite || this.cameraType.current === this.cameraType.astronomy) {
+    if (this.cameraType.current === this.cameraType.Fps || this.cameraType.current === this.cameraType.Satellite || this.cameraType.current === this.cameraType.Astronomy) {
       this.fpsMovement();
     }
   }
@@ -998,20 +998,20 @@ export class Camera {
         this._zoomTarget = 0.5;
       }
 
-      if (typeof sensorPos == 'undefined' && (this.cameraType.current == this.cameraType.planetarium || this.cameraType.current == this.cameraType.astronomy)) {
-        this.cameraType.current = this.cameraType.default;
+      if (typeof sensorPos == 'undefined' && (this.cameraType.current == this.cameraType.Planetarium || this.cameraType.current == this.cameraType.Astronomy)) {
+        this.cameraType.current = this.cameraType.Default;
         console.debug('A sensor should be selected first if camera mode is allowed to be planetarium or astronmy.');
       }
 
       glm.mat4.identity(this.camMatrix);
 
       // Workaround for bug with selecting stars
-      if (typeof target === 'undefined' && this.cameraType.current == this.cameraType.fixedToSat) {
-        this.cameraType.current = this.cameraType.default;
+      if (typeof target === 'undefined' && this.cameraType.current == this.cameraType.FixedToSat) {
+        this.cameraType.current = this.cameraType.Default;
       }
 
       // Ensure we don't zoom in past our satellite
-      if (this.cameraType.current == this.cameraType.fixedToSat) {
+      if (this.cameraType.current == this.cameraType.FixedToSat) {
         if (this.getCamDist() < target.getAltitude() + RADIUS_OF_EARTH + 30) {
           this._zoomTarget = this.alt2zoom(target.getAltitude());
           this._zoomLevel = this._zoomTarget;
@@ -1019,7 +1019,7 @@ export class Camera {
       }      
 
       switch (this.cameraType.current) {
-        case this.cameraType.default: // pivot around the earth with earth in the center
+        case this.cameraType.Default: // pivot around the earth with earth in the center
           glm.mat4.rotateX(this.camMatrix, this.camMatrix, -this.localRotateCurrent.pitch);
           glm.mat4.rotateY(this.camMatrix, this.camMatrix, -this.localRotateCurrent.roll);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.localRotateCurrent.yaw);
@@ -1029,7 +1029,7 @@ export class Camera {
           glm.mat4.rotateX(this.camMatrix, this.camMatrix, this.ecPitch);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.ecYaw);
           break;
-        case this.cameraType.offset: // pivot around the earth with earth offset to the bottom right
+        case this.cameraType.Offset: // pivot around the earth with earth offset to the bottom right
           glm.mat4.rotateX(this.camMatrix, this.camMatrix, -this.localRotateCurrent.pitch);
           glm.mat4.rotateY(this.camMatrix, this.camMatrix, -this.localRotateCurrent.roll);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.localRotateCurrent.yaw);
@@ -1038,7 +1038,7 @@ export class Camera {
           glm.mat4.rotateX(this.camMatrix, this.camMatrix, this.ecPitch);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.ecYaw);
           break;
-        case this.cameraType.fixedToSat: // Pivot around the satellite          
+        case this.cameraType.FixedToSat: // Pivot around the satellite          
           glm.mat4.rotateX(this.camMatrix, this.camMatrix, -this.localRotateCurrent.pitch);
           glm.mat4.rotateY(this.camMatrix, this.camMatrix, -this.localRotateCurrent.roll);
           glm.mat4.rotateZ(this.camMatrix, this.camMatrix, -this.localRotateCurrent.yaw);
@@ -1051,12 +1051,12 @@ export class Camera {
           const targetPosition = glm.vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
           glm.mat4.translate(this.camMatrix, this.camMatrix, targetPosition);
           break;
-        case this.cameraType.fps: // FPS style movement
+        case this.cameraType.Fps: // FPS style movement
           glm.mat4.rotate(this.camMatrix, this.camMatrix, -this.fpsPitch * DEG2RAD, [1, 0, 0]);
           glm.mat4.rotate(this.camMatrix, this.camMatrix, this.fpsYaw * DEG2RAD, [0, 0, 1]);
           glm.mat4.translate(this.camMatrix, this.camMatrix, [this.fpsPos[0], this.fpsPos[1], -this.fpsPos[2]]);
           break;
-        case this.cameraType.planetarium: {
+        case this.cameraType.Planetarium: {
           // Pitch is the opposite of the angle to the latitude
           // Yaw is 90 degrees to the left of the angle to the longitude
           this.fpsPitch = -1 * sensorPos.lat * DEG2RAD;
@@ -1067,7 +1067,7 @@ export class Camera {
           glm.mat4.translate(this.camMatrix, this.camMatrix, [-sensorPos.x, -sensorPos.y, -sensorPos.z]);
           break;
         }
-        case this.cameraType.satellite: {
+        case this.cameraType.Satellite: {
           const targetPosition = glm.vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
           glm.mat4.translate(this.camMatrix, this.camMatrix, targetPosition);
           glm.vec3.normalize(normUp, targetPosition);
@@ -1084,7 +1084,7 @@ export class Camera {
           glm.mat4.translate(this.camMatrix, this.camMatrix, targetPosition);
           break;
         }
-        case this.cameraType.astronomy: {
+        case this.cameraType.Astronomy: {
           // Pitch is the opposite of the angle to the latitude
           // Yaw is 90 degrees to the left of the angle to the longitude
           this.fpsPitch = -1 * sensorPos.lat * DEG2RAD;
@@ -1105,7 +1105,7 @@ export class Camera {
       }
 
       // Try to stay out of the earth
-      if (this.cameraType.current === this.cameraType.default || this.cameraType.current === this.cameraType.offset || this.cameraType.current === this.cameraType.fixedToSat) {
+      if (this.cameraType.current === this.cameraType.Default || this.cameraType.current === this.cameraType.Offset || this.cameraType.current === this.cameraType.FixedToSat) {
         if (this.getDistFromEarth() < RADIUS_OF_EARTH + 30) {
           this._zoomTarget = this._zoomLevel + 0.01;
         }

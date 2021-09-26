@@ -56,14 +56,14 @@ class ColorSchemeFactory {
         }
       }
 
-      if (cameraManager.cameraType.current === cameraManager.cameraType.astronomy) {
+      if (cameraManager.cameraType.current === cameraManager.cameraType.Astronomy) {
         return {
           color: ColorSchemeFactory.colorTheme.deselected,
           pickable: false,
         };
       }
 
-      if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility') && (ColorSchemeFactory.objectTypeFlags.facility === false || cameraManager.cameraType.current === cameraManager.cameraType.planetarium)) {
+      if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility') && (ColorSchemeFactory.objectTypeFlags.facility === false || cameraManager.cameraType.current === cameraManager.cameraType.Planetarium)) {
         return {
           color: ColorSchemeFactory.colorTheme.deselected,
           pickable: false,
@@ -130,7 +130,7 @@ class ColorSchemeFactory {
         };
       }
 
-      if (sat.static && (ColorSchemeFactory.objectTypeFlags.sensor === false || cameraManager.cameraType.current === cameraManager.cameraType.planetarium)) {
+      if (sat.static && (ColorSchemeFactory.objectTypeFlags.sensor === false || cameraManager.cameraType.current === cameraManager.cameraType.Planetarium)) {
         return {
           color: ColorSchemeFactory.colorTheme.deselected,
           pickable: false,
@@ -171,7 +171,7 @@ class ColorSchemeFactory {
 
       if (
         (!sat.inView && sat.OT === 1 && ColorSchemeFactory.objectTypeFlags.payload === false) ||
-        (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && sat.OT === 1 && ColorSchemeFactory.objectTypeFlags.payload === false) ||
+        (cameraManager.cameraType.current === cameraManager.cameraType.Planetarium && sat.OT === 1 && ColorSchemeFactory.objectTypeFlags.payload === false) ||
         (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 1 && ColorSchemeFactory.objectTypeFlags.payload === false)
       ) {
         return {
@@ -181,7 +181,7 @@ class ColorSchemeFactory {
       }
       if (
         (!sat.inView && sat.OT === 2 && ColorSchemeFactory.objectTypeFlags.rocketBody === false) ||
-        (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && sat.OT === 2 && ColorSchemeFactory.objectTypeFlags.rocketBody === false) ||
+        (cameraManager.cameraType.current === cameraManager.cameraType.Planetarium && sat.OT === 2 && ColorSchemeFactory.objectTypeFlags.rocketBody === false) ||
         (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 2 && ColorSchemeFactory.objectTypeFlags.rocketBody === false)
       ) {
         return {
@@ -191,7 +191,7 @@ class ColorSchemeFactory {
       }
       if (
         (!sat.inView && sat.OT === 3 && ColorSchemeFactory.objectTypeFlags.debris === false) ||
-        (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && sat.OT === 3 && ColorSchemeFactory.objectTypeFlags.debris === false) ||
+        (cameraManager.cameraType.current === cameraManager.cameraType.Planetarium && sat.OT === 3 && ColorSchemeFactory.objectTypeFlags.debris === false) ||
         (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 3 && ColorSchemeFactory.objectTypeFlags.debris === false)
       ) {
         return {
@@ -201,7 +201,7 @@ class ColorSchemeFactory {
       }
       if (
         (!sat.inView && sat.OT === 4 && ColorSchemeFactory.objectTypeFlags.trusat === false) ||
-        (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && sat.OT === 4 && ColorSchemeFactory.objectTypeFlags.trusat === false) ||
+        (cameraManager.cameraType.current === cameraManager.cameraType.Planetarium && sat.OT === 4 && ColorSchemeFactory.objectTypeFlags.trusat === false) ||
         (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 4 && ColorSchemeFactory.objectTypeFlags.trusat === false)
       ) {
         return {
@@ -210,14 +210,14 @@ class ColorSchemeFactory {
         };
       }
 
-      if (sat.inView && ColorSchemeFactory.objectTypeFlags.inFOV === false && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium) {
+      if (sat.inView && ColorSchemeFactory.objectTypeFlags.inFOV === false && cameraManager.cameraType.current !== cameraManager.cameraType.Planetarium) {
         return {
           color: ColorSchemeFactory.colorTheme.deselected,
           pickable: false,
         };
       }
 
-      if (sat.inView && cameraManager.cameraType.current !== cameraManager.cameraType.planetarium) {
+      if (sat.inView && cameraManager.cameraType.current !== cameraManager.cameraType.Planetarium) {
         if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined') {
           // Intentional
         } else {
@@ -513,19 +513,19 @@ class ColorSchemeFactory {
     });
     ColorSchemeFactory.countries = new ColorScheme(gl, satSet, objectManager, function (sat) {
       var country = sat.C;
-      if ((country === 'US' && ColorSchemeFactory.objectTypeFlags.countryUS === false) || (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && country === 'US' && ColorSchemeFactory.objectTypeFlags.countryUS === false)) {
+      if ((country === 'US' && ColorSchemeFactory.objectTypeFlags.countryUS === false) || (cameraManager.cameraType.current === cameraManager.cameraType.Planetarium && country === 'US' && ColorSchemeFactory.objectTypeFlags.countryUS === false)) {
         return {
           color: ColorSchemeFactory.colorTheme.deselected,
           pickable: false,
         };
       }
-      if ((country === 'PRC' && ColorSchemeFactory.objectTypeFlags.countryPRC === false) || (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && country === 'PRC' && ColorSchemeFactory.objectTypeFlags.countryPRC === false)) {
+      if ((country === 'PRC' && ColorSchemeFactory.objectTypeFlags.countryPRC === false) || (cameraManager.cameraType.current === cameraManager.cameraType.Planetarium && country === 'PRC' && ColorSchemeFactory.objectTypeFlags.countryPRC === false)) {
         return {
           color: ColorSchemeFactory.colorTheme.deselected,
           pickable: false,
         };
       }
-      if ((country === 'CIS' && ColorSchemeFactory.objectTypeFlags.countryCIS === false) || (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && country === 'CIS' && ColorSchemeFactory.objectTypeFlags.countryCIS === false)) {
+      if ((country === 'CIS' && ColorSchemeFactory.objectTypeFlags.countryCIS === false) || (cameraManager.cameraType.current === cameraManager.cameraType.Planetarium && country === 'CIS' && ColorSchemeFactory.objectTypeFlags.countryCIS === false)) {
         return {
           color: ColorSchemeFactory.colorTheme.deselected,
           pickable: false,
@@ -550,7 +550,7 @@ class ColorSchemeFactory {
         };
       }
       // Other Countries
-      if (ColorSchemeFactory.objectTypeFlags.countryOther === false || (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && ColorSchemeFactory.objectTypeFlags.countryOther === false)) {
+      if (ColorSchemeFactory.objectTypeFlags.countryOther === false || (cameraManager.cameraType.current === cameraManager.cameraType.Planetarium && ColorSchemeFactory.objectTypeFlags.countryOther === false)) {
         return {
           color: ColorSchemeFactory.colorTheme.deselected,
           pickable: false,

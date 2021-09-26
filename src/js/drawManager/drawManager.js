@@ -292,7 +292,7 @@ export const drawLoop = (preciseDt) => {
   }
 
   // Draw Satellite Model if a satellite is selected and meshManager is loaded
-  // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
+  // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.Satellite) {
   if (!settingsManager.modelsOnSatelliteViewOverride && objectManager.selectedSat !== -1) {
     meshManager.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
   }
@@ -367,7 +367,7 @@ export const updateLoop = () => {
   cameraManager.calculate(drawManager.dt, objectManager.selectedSat !== -1);
 
   // If in satellite view the orbit buffer needs to be updated every time
-  if (cameraManager.cameraType.current == cameraManager.cameraType.satellite && objectManager.selectedSat !== -1) orbitManager.updateOrbitBuffer(objectManager.lastSelectedSat());
+  if (cameraManager.cameraType.current == cameraManager.cameraType.Satellite && objectManager.selectedSat !== -1) orbitManager.updateOrbitBuffer(objectManager.lastSelectedSat());
 
   sceneManager.sun.update();
 
@@ -391,7 +391,7 @@ export const drawOptionalScenery = () => {
 
       // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
       sceneManager.earth.drawOcclusion(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
-      // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
+      // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.Satellite) {
       if (!settingsManager.modelsOnSatelliteViewOverride && objectManager.selectedSat !== -1) {
         meshManager.drawOcclusion(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
       }
@@ -425,7 +425,7 @@ export const satCalculate = () => {
     if (typeof drawManager.sat === 'undefined') return;
 
     if (!drawManager.sat.static) {
-      cameraManager.camSnapToSat(drawManager.sat);
+      cameraManager.snapToSat(drawManager.sat);
 
       // if (drawManager.sat.missile || typeof meshManager == 'undefined') {
       //   settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0];
@@ -433,7 +433,7 @@ export const satCalculate = () => {
       //   settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
       // }
 
-      // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.satellite) {
+      // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.Satellite) {
     }
     if (drawManager.sat.missile) orbitManager.setSelectOrbit(drawManager.sat.satId);
   } else {
@@ -530,7 +530,7 @@ export const watermarkedDataUrl = (canvas, text) => {
 };
 
 export const orbitsAbove = () => {
-  if (cameraManager.cameraType.current == cameraManager.cameraType.astronomy || cameraManager.cameraType.current == cameraManager.cameraType.planetarium) {
+  if (cameraManager.cameraType.current == cameraManager.cameraType.Astronomy || cameraManager.cameraType.current == cameraManager.cameraType.Planetarium) {
     drawManager.sensorPos = satellite.calculateSensorPos(sensorManager.currentSensor);
     if (!drawManager.isDrawOrbitsAbove) {
       // Don't do this until the scene is redrawn with a new camera or thousands of satellites will
@@ -539,7 +539,7 @@ export const orbitsAbove = () => {
       return;
     }
     // Previously called showOrbitsAbove();
-    if (!settingsManager.isSatLabelModeOn || cameraManager.cameraType.current !== cameraManager.cameraType.planetarium) {
+    if (!settingsManager.isSatLabelModeOn || cameraManager.cameraType.current !== cameraManager.cameraType.Planetarium) {
       if (isSatMiniBoxInUse) {
         hoverBoxOnSatMiniElements = document.getElementById('sat-minibox');
         hoverBoxOnSatMiniElements.innerHTML = '';
@@ -606,7 +606,7 @@ export const orbitsAbove = () => {
   }
 
   // Hide satMiniBoxes When Not in Use
-  if (!settingsManager.isSatLabelModeOn || cameraManager.cameraType.current !== cameraManager.cameraType.planetarium) {
+  if (!settingsManager.isSatLabelModeOn || cameraManager.cameraType.current !== cameraManager.cameraType.Planetarium) {
     if (isSatMiniBoxInUse) {
       satMiniBox.innerHTML = '';
     }
@@ -679,7 +679,7 @@ export const hoverBoxOnSat = (satId, satX, satY) => {
 
   const { starManager } = keepTrackApi.programs;
 
-  if (cameraManager.cameraType.current === cameraManager.cameraType.planetarium && !settingsManager.isDemoModeOn) {
+  if (cameraManager.cameraType.current === cameraManager.cameraType.Planetarium && !settingsManager.isDemoModeOn) {
     satHoverBoxDOM.style.display = 'none';
     if (satId === -1) {
       drawManager.canvas.style.cursor = 'default';

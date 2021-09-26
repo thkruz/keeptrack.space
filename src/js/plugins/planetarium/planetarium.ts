@@ -71,13 +71,13 @@ export const bottomMenuClick = (iconName: string): void => {
       drawManager.glInit();
       uiManager.hideSideMenus();
       orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
-      cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
+      cameraManager.cameraType.current = cameraManager.cameraType.Default; // Back to normal Camera Mode
       $('#fov-text').html('');
       $('#menu-planetarium').removeClass('bmenu-item-selected');
       return;
     } else {
       if (sensorManager.checkSensorSelected()) {
-        cameraManager.cameraType.current = cameraManager.cameraType.planetarium; // Activate Planetarium Camera Mode
+        cameraManager.cameraType.current = cameraManager.cameraType.Planetarium; // Activate Planetarium Camera Mode
         $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
         uiManager.legendMenuChange('planetarium');
         if (objectManager.isStarManagerLoaded) {

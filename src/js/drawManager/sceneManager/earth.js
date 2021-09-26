@@ -488,7 +488,7 @@ earth.draw = function (pMatrix, cameraManager, dotsManager, tgtBuffer) {
   gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
   // Set the uniforms
-  const uZoomModifier = cameraManager.cameraType.current === cameraManager.cameraType.fixedToSat || cameraManager.panCurrent.x !== 0 || cameraManager.panCurrent.y !== 0 || cameraManager.panCurrent.z ? cameraManager.zoomLevel : 1.0;
+  const uZoomModifier = cameraManager.cameraType.current === cameraManager.cameraType.FixedToSat || cameraManager.panCurrent.x !== 0 || cameraManager.panCurrent.y !== 0 || cameraManager.panCurrent.z ? cameraManager.zoomLevel : 1.0;
 
   gl.uniform1f(earthShader.uZoomModifier, uZoomModifier);
   gl.uniform3fv(earthShader.uCamPos, cameraManager.getForwardVector());

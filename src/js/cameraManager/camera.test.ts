@@ -201,7 +201,7 @@ describe("keyDownHandler", () => {
 
     test("1", () => {
         let callFunction: any = () => {
-            inst.cameraType.current = inst.cameraType.fps;
+            inst.cameraType.current = inst.cameraType.Fps;
             inst.keyDownHandler({ key: "SHIFT" })
             inst.keyDownHandler({ key: "ShiftRight" })
             inst.keyDownHandler({ key: "A" })
@@ -221,7 +221,7 @@ describe("keyDownHandler", () => {
 
     test("2", () => {
         let callFunction: any = () => {
-            inst.cameraType.current = inst.cameraType.astronomy;
+            inst.cameraType.current = inst.cameraType.Astronomy;
             inst.keyDownHandler({ key: "L" })
             inst.keyDownHandler({ key: "J" })
             inst.keyDownHandler({ key: "Q" })
@@ -282,7 +282,7 @@ describe("keyUpHandler", () => {
             inst.fpsVertSpeed = settingsManager.fpsVertSpeed;
             inst.keyUpHandler({ key: "E" })
             inst.keyUpHandler({ key: "J" })
-            inst.cameraType.current = inst.cameraType.astronomy
+            inst.cameraType.current = inst.cameraType.Astronomy
             inst.keyUpHandler({ key: "L" })
             inst.keyUpHandler({ key: "I" })
             inst.keyUpHandler({ key: "K" })
@@ -359,7 +359,7 @@ describe("camSnap", () => {
 })
 
 // @ponicode
-describe("camSnapToSat", () => {
+describe("snapToSat", () => {
     let inst: any
 
     beforeEach(() => {
@@ -368,7 +368,7 @@ describe("camSnapToSat", () => {
 
     test("0", () => {
         let callFunction: any = () => {
-            inst.camSnapToSat("v1.2.4")
+            inst.snapToSat("v1.2.4")
         }
     
         expect(callFunction).not.toThrow()
@@ -376,7 +376,7 @@ describe("camSnapToSat", () => {
 
     test("1", () => {
         let callFunction: any = () => {
-            inst.camSnapToSat("1.0.0")
+            inst.snapToSat("1.0.0")
         }
     
         expect(callFunction).not.toThrow()
@@ -384,7 +384,7 @@ describe("camSnapToSat", () => {
 
     test("2", () => {
         let callFunction: any = () => {
-            inst.camSnapToSat("v4.0.0-rc.4")
+            inst.snapToSat("v4.0.0-rc.4")
         }
     
         expect(callFunction).not.toThrow()
@@ -392,7 +392,7 @@ describe("camSnapToSat", () => {
 
     test("3", () => {
         let callFunction: any = () => {
-            inst.camSnapToSat(1)
+            inst.snapToSat(1)
         }
     
         expect(callFunction).not.toThrow()
@@ -400,7 +400,7 @@ describe("camSnapToSat", () => {
 
     test("4", () => {
         let callFunction: any = () => {
-            inst.camSnapToSat({ active: false, position: { x: 1, y: 1, z: 100 }, static: 0 })
+            inst.snapToSat({ active: false, position: { x: 1, y: 1, z: 100 }, static: 0 })
         }
     
         expect(callFunction).not.toThrow()
@@ -408,7 +408,7 @@ describe("camSnapToSat", () => {
 
     test("5", () => {
         let callFunction: any = () => {
-            inst.camSnapToSat({ active: true, position: { x: -Infinity, y: NaN, z: -Infinity }, static: undefined })
+            inst.snapToSat({ active: true, position: { x: -Infinity, y: NaN, z: -Infinity }, static: undefined })
         }
     
         expect(callFunction).not.toThrow()

@@ -71,7 +71,7 @@ export const bottomMenuClick = (iconName: string): void => {
       settingsManager.fieldOfView = 0.6;
       drawManager.glInit();
       uiManager.hideSideMenus();
-      cameraManager.cameraType.current = cameraManager.cameraType.default; // Back to normal Camera Mode
+      cameraManager.cameraType.current = cameraManager.cameraType.Default; // Back to normal Camera Mode
       uiManager.legendMenuChange('default');
       if (objectManager.isStarManagerLoaded) {
         starManager.clearConstellations();
@@ -88,7 +88,7 @@ export const bottomMenuClick = (iconName: string): void => {
           starManager.drawAllConstellations();
         }
         orbitManager.clearInViewOrbit();
-        cameraManager.cameraType.current = cameraManager.cameraType.astronomy; // Activate Astronomy Camera Mode
+        cameraManager.cameraType.current = cameraManager.cameraType.Astronomy; // Activate Astronomy Camera Mode
         $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
         uiManager.legendMenuChange('astronomy');
         if (typeof keepTrackApi.programs.planetarium !== 'undefined') {

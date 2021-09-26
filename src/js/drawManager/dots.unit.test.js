@@ -27,7 +27,7 @@ test(`Dots Unit Testing`, () => {
   dotManager.draw({}, cameraManager, {}, {});
   dotManager.drawGpuPickingFrameBuffer({}, {}, {});
 
-  cameraManager.cameraType.current = cameraManager.cameraType.planetarium;
+  cameraManager.cameraType.current = cameraManager.cameraType.Planetarium;
   dotManager.draw({}, cameraManager, {}, {});
 
   dotManager.setupPickingBuffer([0, 1, 2, 3]);

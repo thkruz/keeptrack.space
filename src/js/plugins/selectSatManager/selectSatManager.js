@@ -71,10 +71,10 @@ const selectSatManager = {
         }
       }
     } else if (satId !== -1) {
-      if (cameraManager.cameraType.current == cameraManager.cameraType.default) {
+      if (cameraManager.cameraType.current == cameraManager.cameraType.Default) {
         cameraManager.ecLastZoom = cameraManager.zoomLevel;
         if (!sat.static) {
-          cameraManager.cameraType.set(cameraManager.cameraType.fixedToSat);
+          cameraManager.cameraType.set(cameraManager.cameraType.FixedToSat);
         } else if (typeof sat.staticNum !== 'undefined') {
           sensorManager.setSensor(null, sat.staticNum);
           cameraManager.lookAtLatLon(sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, sensorManager.selectedSensor.zoom, keepTrackApi.programs.timeManager.selectedDate);
@@ -125,7 +125,7 @@ const selectSatManager = {
           if (typeof $('#search').val() !== 'undefined' && $('#search').val().length > 0) {
             $('#search-results').attr('style', 'display:block; max-height:27%');
           }
-          if (cameraManager.cameraType.current !== cameraManager.cameraType.planetarium) {
+          if (cameraManager.cameraType.current !== cameraManager.cameraType.Planetarium) {
             // Unclear why this was needed...
             // uiManager.legendMenuChange('default')
           }
@@ -137,7 +137,7 @@ const selectSatManager = {
               $('#search-results').attr('style', 'display:block; max-height:auto');
             }
           }
-          if (cameraManager.cameraType.current !== cameraManager.cameraType.planetarium) {
+          if (cameraManager.cameraType.current !== cameraManager.cameraType.Planetarium) {
             // Unclear why this was needed...
             // uiManager.legendMenuChange('default')
           }

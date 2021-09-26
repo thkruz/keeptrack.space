@@ -101,10 +101,10 @@ export const uiInput: uiInputInterface = {
     }
 
     if (
-      cameraManager.cameraType.current === cameraManager.cameraType.planetarium ||
-      cameraManager.cameraType.current === cameraManager.cameraType.fps ||
-      cameraManager.cameraType.current === cameraManager.cameraType.satellite ||
-      cameraManager.cameraType.current === cameraManager.cameraType.astronomy
+      cameraManager.cameraType.current === cameraManager.cameraType.Planetarium ||
+      cameraManager.cameraType.current === cameraManager.cameraType.Fps ||
+      cameraManager.cameraType.current === cameraManager.cameraType.Satellite ||
+      cameraManager.cameraType.current === cameraManager.cameraType.Astronomy
     ) {
       settingsManager.fieldOfView += delta * 0.0002;
       $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
@@ -540,7 +540,7 @@ export const uiInput: uiInputInterface = {
             clickedSat = uiInput.mouseSat;
             if (evt.button === 0) {
               // Left Mouse Button Clicked
-              if (cameraManager.cameraType.current === cameraManager.cameraType.satellite) {
+              if (cameraManager.cameraType.current === cameraManager.cameraType.Satellite) {
                 if (clickedSat !== -1 && !satSet.getSatExtraOnly(clickedSat).static) {
                   objectManager.setSelectedSat(clickedSat);
                 }
@@ -1109,7 +1109,7 @@ export const uiInput: uiInputInterface = {
             });
             break;
           case 'reset-camera-rmb':
-            // if (cameraManager.cameraType.current == cameraManager.cameraType.fixedToSat) {
+            // if (cameraManager.cameraType.current == cameraManager.cameraType.FixedToSat) {
             //   // NOTE: Maybe a reset flag to move back to original position over time?
             //   cameraManager.camPitch = 0;
             //   cameraManager.camYaw = 0;
@@ -1355,8 +1355,8 @@ export const uiInput: uiInputInterface = {
 
               if (
                 (!objectManager.isSensorManagerLoaded || sensorManager.currentSensor.lat != null) &&
-                cameraManager.cameraType.current !== cameraManager.cameraType.planetarium &&
-                cameraManager.cameraType.current !== cameraManager.cameraType.astronomy
+                cameraManager.cameraType.current !== cameraManager.cameraType.Planetarium &&
+                cameraManager.cameraType.current !== cameraManager.cameraType.Astronomy
               ) {
                 uiManager.legendMenuChange('default');
               }

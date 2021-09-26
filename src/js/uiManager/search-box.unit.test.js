@@ -56,7 +56,7 @@ test(`Basic Functions of Search Box`, () => {
     semiMinorAxis: 8473.945136538932,
     velocity: {},
   };
-  satSet.getSatData = () => satData;
+  satSet.satData = satData;
   satSet.missileSats = 100;
   satSet.setColorScheme = () => true;
   document.body.innerHTML += '<div id="search-results"></div>';
@@ -97,7 +97,7 @@ test(`Basic Functions of Search Box`, () => {
 
   expect(searchBox.doArraySearch([5, 5])).toBe('00005,00005');
 
-  let resultsA = satSet.getSatData();
+  let resultsA = satSet.satData;
   let resultsB = [];
   resultsB[0] = resultsA[5];
   resultsB[0].satId = 5;

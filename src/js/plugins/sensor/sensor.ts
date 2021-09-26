@@ -731,7 +731,7 @@ export const init = (): void => {
             const sat = keepTrackApi.programs.satSet.getSat(keepTrackApi.programs.objectManager.selectedSat);
             let tearr = sat.getTEARR(null, sensor);
             if (tearr.inview) {
-              keepTrackApi.programs.lineManager.create('sat6', [sat.id, satSet.getIdFromSensorName(sensor.name)], 'g');
+              keepTrackApi.programs.lineManager.create('sat6', [sat.id, satSet.getSensorFromSensorName(sensor.name)], 'g');
             }
           });
         });

@@ -1,5 +1,6 @@
 import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
-import { getMissileSatsLen, getSat, satSet, setSat } from '@app/js/satSet/satSet.js';
+import { getSat, setSat } from '@app/js/satSet/satSet';
+
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { satellite } from '@app/js/lib/lookangles.js';
@@ -7,15 +8,15 @@ import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager';
 import { updateOrbitBuffer } from '@app/js/orbitManager/orbitManager.js';
 
-
 let EarthRadius: number, EarthMass: number, FuelDensity: number, BurnRate: number, WarheadMass: number, R: number, G: number, h: number;
 let missileArray: any[] = [];
 
 // External Functions
 export const MassRaidPre = (time: any, simFile: string) => {
+  const {satSet} = keepTrackApi.programs;
   missileManager.clearMissiles();
   $.get(simFile, function (missileArray) {
-    var satSetLen = getMissileSatsLen();
+    var satSetLen = satSet.missileSats;
     for (var i = 0; i < missileArray.length; i++) {
       var x = satSetLen - 500 + i;
       missileArray[i].startTime = time;
@@ -47,9 +48,10 @@ export const MassRaidPre = (time: any, simFile: string) => {
   });
 }
 export const clearMissiles = () => {
+  const {satSet} = keepTrackApi.programs;
   missileManager.missilesInUse = 0;
   keepTrackApi.programs.uiManager.doSearch('');
-  var satSetLen = (<any>satSet).satData.length;
+  var satSetLen = satSet.satData.length;
   for (var i = 0; i < 500; i++) {
     var x = satSetLen - 500 + i;
     // satSet.setSat(x, missileArray[i]);
@@ -798,7 +800,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
             USATargets[i * 2],
             USATargets[i * 2 + 1],
             3,
-            getSatData().length - b,
+            satSet.satData.length - b,
             launchTime,
             missileManager.RussianICBM[a * 4 + 2],
             30,
@@ -845,7 +847,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
             USATargets[i * 2],
             USATargets[i * 2 + 1],
             3,
-            getSatData().length - b,
+            satSet.satData.length - b,
             launchTime,
             missileManager.ChinaICBM[a * 4 + 2],
             30,
@@ -889,7 +891,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
             USATargets[i * 2],
             USATargets[i * 2 + 1],
             3,
-            getSatData().length - b,
+            satSet.satData.length - b,
             launchTime,
             missileManager.NorthKoreanBM[a * 4 + 2],
             30,
@@ -935,7 +937,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
               missileManager.RussianICBM[i * 4],
               missileManager.RussianICBM[i * 4 + 1],
               3,
-              getSatData().length - b,
+              satSet.satData.length - b,
               launchTime,
               missileManager.UsaICBM[a * 4 + 2],
               30,
@@ -970,7 +972,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
               missileManager.ChinaICBM[i * 4],
               missileManager.ChinaICBM[i * 4 + 1],
               3,
-              getSatData().length - b,
+              satSet.satData.length - b,
               launchTime,
               missileManager.UsaICBM[a * 4 + 2],
               30,
@@ -1005,7 +1007,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
               missileManager.NorthKoreanBM[i * 4],
               missileManager.NorthKoreanBM[i * 4 + 1],
               3,
-              getSatData().length - b,
+              satSet.satData.length - b,
               launchTime,
               missileManager.UsaICBM[a * 4 + 2],
               30,
@@ -1046,7 +1048,7 @@ missileManager.minMaxSimulation = function (launchTime, lat, lon, missileDesc, m
         lat,
         lon,
         3, // Does this matter?
-        getMissileSatsLen() - (500 - missilesLaunched),
+        satSet.missileSats - (500 - missilesLaunched),
         launchTime,
         missileDesc,
         30,

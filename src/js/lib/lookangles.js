@@ -1673,7 +1673,7 @@ satellite.genMlData.eci2inc = (start, stop) => {
   let testTarget = [];
   let satEciData = [];
   //   let propLength = 1000 * 60 * 1440; //ms
-  let satData = satSet.getSatData();
+  let satData = satSet.satData;
   let tt = 0;
   let badSat = false;
   for (let s = start; s < stop; s++) {
@@ -1735,7 +1735,7 @@ satellite.genMlData.tlePredict = (start, stop) => {
   let satEciDataArray = [];
   let satEciData = [];
   //   let propLength = 1000 * 60 * 1440; //ms
-  let satData = satSet.getSatData();
+  let satData = satSet.satData;
   //   let tt = 0;
   let badSat = false;
   for (let s = start; s < stop; s++) {
@@ -1819,7 +1819,7 @@ satellite.getEci = (sat, propTime) => {
 
 satellite.findNearbyObjectsByOrbit = (sat) => {
   if (typeof sat == 'undefined' || sat == null) return;
-  let catalog = satSet.getSatData();
+  let catalog = satSet.satData;
   let possibleMatches = [];
   let maxPeriod = sat.period * 1.05;
   let minPeriod = sat.period * 0.95;

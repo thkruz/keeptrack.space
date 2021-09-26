@@ -23,6 +23,7 @@
 
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import { satObject } from '@app/js/api/keepTrack';
 
 export const init = (): void => {
   const { sensorManager, objectManager, satSet, uiManager } = keepTrackApi.programs;
@@ -49,7 +50,7 @@ export const init = (): void => {
           uiManager.hideSideMenus();
           isAnalysisMenuOpen = true;
           if (objectManager.selectedSat != -1) {
-            let sat = satSet.getSat(objectManager.selectedSat);
+            let sat: satObject = satSet.getSat(objectManager.selectedSat);
             $('#anal-sat').val(sat.SCC_NUM);
           }
           if (sensorManager.checkSensorSelected()) {
@@ -162,12 +163,12 @@ export const uiManagerInit = () => {
             </ul>
             <div class="row">
               <center>
-                <button class="btn btn-ui waves-effect waves-light" onclick="satSet.exportTle2Txt();">Export TLEs &#9658;</button>
+                <button class="btn btn-ui waves-effect waves-light" onclick="keepTrackApi.programs.satSet.exportTle2Txt(keepTrackApi.programs.satSet.satData);">Export TLEs &#9658;</button>
               </center>
             </div>
             <div class="row">
               <center>
-                <button class="btn btn-ui waves-effect waves-light" onclick="satSet.exportTle2Csv();">Export Catalog CSV &#9658;</button>
+                <button class="btn btn-ui waves-effect waves-light" onclick="keepTrackApi.programs.satSet.exportTle2Csv(keepTrackApi.programs.satSet.satData);">Export Catalog CSV &#9658;</button>
               </center>
             </div>
             <div class="row">

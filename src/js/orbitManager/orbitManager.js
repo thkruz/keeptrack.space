@@ -4,7 +4,7 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { satSet } from '@app/js/satSet/satSet.js';
+import { satSet } from '@app/js/satSet/satSet';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 var NUM_SEGS = 255;

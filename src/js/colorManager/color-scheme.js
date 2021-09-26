@@ -38,7 +38,7 @@ class ColorScheme {
       this.lastCalculation = this.now;
 
       // We need to know what all the satellites currently look like - ask satSet to give that information
-      this.satData = this.satSet.getSatData();
+      this.satData = this.satSet.satData;
 
       this.satInView = this.satSet.getSatInView();
 

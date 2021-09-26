@@ -1,4 +1,8 @@
 export declare interface satObject {
+  TLE1: string,
+  TLE2: string,
+  SCC_NUM: string,
+  active: boolean,
   C?: string;
   LS?: string;
   LV?: string;
@@ -44,6 +48,7 @@ export declare interface satObject {
   getTEARR?: any;
   getAltitude?: any;
   getDirection?: any;
+  vmag?: number;
 }
 
 export interface sensorObject {
@@ -74,6 +79,22 @@ export interface sensorObject {
   url?: string;
   volume: boolean;
   zoom: string;
+}
+
+export interface Lla {
+  lat: number;
+  lon: number;
+  alt: number;
+}
+
+export interface Rae {
+  rng: number;
+  az: number;
+  el: number;
+}
+
+export interface Inview {
+  inview: boolean;
 }
 
 export interface keepTrackApiInterface {

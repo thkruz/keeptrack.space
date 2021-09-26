@@ -1,6 +1,8 @@
 import { satObject, sensorObject } from './keepTrack';
 
 export const defaultSat: satObject = {
+  active: true,
+  SCC_NUM: '00005',
   C: 'ISS',
   LS: 'TTMTR',
   LV: 'Proton-K',
@@ -256,7 +258,7 @@ export const keepTrackApiStubs = {
         defaultSat,
       ],
       getIdFromObjNum: jest.fn(),
-      getIdFromSensorName: () => 0,
+      getSensorFromSensorName: () => 0,
       getSatExtraOnly: () => defaultSat,
       getSatFromObjNum : () => defaultSat,
       getSat: () => defaultSat,

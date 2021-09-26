@@ -39,7 +39,7 @@ import { keepTrackApi } from '@app/js/api/externalApi';
 import { mobileManager } from '@app/js/uiManager/mobileManager.js';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager.js';
-import { satSet } from '@app/js/satSet/satSet.js';
+import { satSet } from '@app/js/satSet/satSet';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';

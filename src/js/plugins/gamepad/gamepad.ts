@@ -38,7 +38,7 @@ export const initializeGamepad = (gamepad: Gamepad): void => {
     settings: gamepadSettings,
     index: gamepad.index,
     currentState: null,
-    getController: () => getController(gamepad.index),
+    getController: (index: number) => getController(index),
     vibrate: vibrate,
   };
 };

@@ -59,7 +59,7 @@ searchBox.hideResults = function () {
 
 searchBox.doArraySearch = (array) => {
   let searchStr = '';
-  let satData = satSet.getSatData();
+  let satData = satSet.satData;
   for (var i = 0; i < array.length; i++) {
     if (i == array.length - 1) {
       searchStr += `${satData[array[i]].SCC_NUM}`;
@@ -91,7 +91,7 @@ searchBox.doSearch = function (searchString, isPreventDropDown, satSet) {
 
   // Initialize search results
   const results = [];
-  const satData = satSet.getSatData();
+  const satData = satSet.satData;
   for (let i = 0; i < satSet.missileSats; i++) {
     // Stop once you get to the markers to save time
     var sat = satData[i];
@@ -225,7 +225,7 @@ searchBox.doSearch = function (searchString, isPreventDropDown, satSet) {
 };
 
 searchBox.fillResultBox = function (results, satSet) {
-  let satData = satSet.getSatData();
+  let satData = satSet.satData;
   var resultBox = $('#search-results');
   var html = '';
   for (i = 0; i < results.length; i++) {

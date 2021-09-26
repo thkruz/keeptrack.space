@@ -4,7 +4,7 @@ import { Line } from './line.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
 class LineFactory {
-  #getIdFromSensorName = null;
+  #getSensorFromSensorName = null;
   #getIdFromStarName = null;
   #getSat = null;
   #getSatPosOnly = null;
@@ -12,7 +12,7 @@ class LineFactory {
   #tempStar2 = null;
 
   constructor() {
-    this.#getIdFromSensorName = keepTrackApi.programs.satSet.getIdFromSensorName;
+    this.#getSensorFromSensorName = keepTrackApi.programs.satSet.getSensorFromSensorName;
     this.#getIdFromStarName = keepTrackApi.programs.satSet.getIdFromStarName;
     this.#getSat = keepTrackApi.programs.satSet.getSat;
     this.#getSatPosOnly = keepTrackApi.programs.satSet.getSatPosOnly;
@@ -309,7 +309,7 @@ class LineFactory {
             // Satellite and Static
             if (typeof this.drawLineList[i].sat2.name != 'undefined') {
               if (typeof this.drawLineList[i].sat2.id == 'undefined' && this.drawLineList[i].sat2 != null) {
-                this.drawLineList[i].sat2.id = this.#getIdFromSensorName(this.drawLineList[i].sat2.name);
+                this.drawLineList[i].sat2.id = this.#getSensorFromSensorName(this.drawLineList[i].sat2.name);
               }
               this.drawLineList[i].sat2 = keepTrackApi.programs.satSet.getSat(this.drawLineList[i].sat2.id);
               if (!this.drawLineList[i].isCalculateIfInFOV && this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].sat.inview) {

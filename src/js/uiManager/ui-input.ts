@@ -1135,7 +1135,7 @@ export const uiInput: uiInputInterface = {
             break;
           case 'line-sensor-sat-rmb':
             // Sensor always has to be #2
-            lineManager.create('sat5', [clickedSat, satSet.getIdFromSensorName(sensorManager.currentSensor.name)], 'p');
+            lineManager.create('sat5', [clickedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor.name)], 'p');
             break;
           case 'line-sat-sat-rmb':
             lineManager.create('sat3', [clickedSat, objectManager.selectedSat], 'p');

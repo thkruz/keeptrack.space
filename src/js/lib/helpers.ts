@@ -28,7 +28,7 @@ export const saveVariable = (variable: string, filename: string): void => {
   }
 };
 
-export const saveCsv = (items: Array<never>, name: string): void => {
+export const saveCsv = (items: Array<any>, name: string): void => {
   try {
     const replacer: any = (value:never) => (value === null ? '' : value); // specify how you want to handle null values here
     const header = Object.keys(items[0]);

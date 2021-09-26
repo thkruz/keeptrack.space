@@ -47,7 +47,7 @@ export const hideSideMenus = (): void => {
 };
 
 export const init = (): void => {
-  const { satSet, objectManager, uiManager, timeManager }: { satSet: any; objectManager: any; uiManager: uiManagerI; timeManager: any } = keepTrackApi.programs;
+  const { satSet, objectManager, uiManager, timeManager }: { satSet: any; objectManager: any; uiManager: any; timeManager: any } = keepTrackApi.programs;
   keepTrackApi.programs.watchlist = {};
   keepTrackApi.programs.watchlist.lastOverlayUpdateTime = 0;
 
@@ -63,11 +63,11 @@ export const init = (): void => {
   var infoOverlayDOM = [];
   uiManager.updateNextPassOverlay = (nextPassArray: any, isForceUpdate: any) => {
     if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
-    const mainCamera = keepTrackApi.programs.mainCamera;
+    const cameraManager = keepTrackApi.programs.cameraManager;
 
     // FIXME This should auto update the overlay when the time changes outside the original search window
     // Update once every 10 seconds
-    if ((timeManager.now > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 && objectManager.selectedSat === -1 && !mainCamera.isDragging && mainCamera.zoomLevel === mainCamera.zoomTarget) || isForceUpdate) {
+    if ((timeManager.now > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 && objectManager.selectedSat === -1 && !cameraManager.isDragging && cameraManager.zoomLevel === cameraManager.zoomTarget) || isForceUpdate) {
       var propTime = timeManager.propTime();
       infoOverlayDOM = [];
       infoOverlayDOM.push('<div>');
@@ -108,7 +108,7 @@ export const init = (): void => {
 
 export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInViewList?: any) => {
   const settingsManager: any = window.settingsManager;
-  const { satSet, uiManager }: { satSet: any; uiManager: uiManagerI } = keepTrackApi.programs;
+  const { satSet, uiManager }: { satSet: any; uiManager: any } = keepTrackApi.programs;
   if (typeof updateWatchlistList !== 'undefined') {
     watchlistList = updateWatchlistList;
   }
@@ -279,7 +279,7 @@ export const uiManagerInit = (): void => {
 };
 
 export const updateLoop = () => {
-  const { satellite, satSet, orbitManager, uiManager, sensorManager, timeManager }: { satellite: any; satSet: any; orbitManager: any; uiManager: uiManagerI; sensorManager: any; timeManager: any } = keepTrackApi.programs;
+  const { satellite, satSet, orbitManager, uiManager, sensorManager, timeManager }: { satellite: any; satSet: any; orbitManager: any; uiManager: any; sensorManager: any; timeManager: any } = keepTrackApi.programs;
 
   uiManager.updateNextPassOverlay(nextPassArray);
 
@@ -294,14 +294,14 @@ export const updateLoop = () => {
         const rae = satellite.getRae(timeManager.dateObject, satrec, sensor);
         const isInFov = satellite.checkIsInFOV(sensor, rae);
         if (!isInFov) continue;
-        keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getIdFromSensorName(sensor.name)], 'g');
+        keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getSensorFromSensorName(sensor.name)], 'g');
       }
     } else {
       if (sat.inview === 1 && watchlistInViewList[i] === false) {
         // Is inview and wasn't previously
         watchlistInViewList[i] = true;
         uiManager.toast(`Satellite ${sat.SCC_NUM} is In Field of View!`, 'normal');
-        keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getIdFromSensorName(sensorManager.currentSensor.name)], 'g');
+        keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getSensorFromSensorName(sensorManager.currentSensor.name)], 'g');
         orbitManager.addInViewOrbit(watchlistList[i]);
       }
       if (sat.inview === 0 && watchlistInViewList[i] === true) {
@@ -320,7 +320,7 @@ export const updateLoop = () => {
 };
 
 export const bottomMenuClick = (iconName: string) => {
-  const { satellite, satSet, uiManager, sensorManager, timeManager }: { satellite: any; satSet: any; uiManager: uiManagerI; sensorManager: any; timeManager: any } = keepTrackApi.programs;
+  const { satellite, satSet, uiManager, sensorManager, timeManager }: { satellite: any; satSet: any; uiManager: any; sensorManager: any; timeManager: any } = keepTrackApi.programs;
 
   if (iconName === 'menu-info-overlay') {
     if (!sensorManager.checkSensorSelected()) {

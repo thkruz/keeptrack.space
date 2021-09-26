@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { stringPad } from '@app/js/lib/helpers';
+import { satObject } from '@app/js/api/keepTrack';
 
 export const init = (): void => {
   const { orbitManager, satellite, timeManager, uiManager, satSet, objectManager, settingsManager } = keepTrackApi.programs;
@@ -87,7 +88,7 @@ export const init = (): void => {
       $('#breakup').on('submit', function (e) {
         $('#loading-screen').fadeIn(1000, function () {
           var satId = satSet.getIdFromObjNum($('#hc-scc').val());
-          var mainsat = satSet.getSat(satId);
+          var mainsat: satObject = satSet.getSat(satId);
           var origsat = mainsat;
 
           // Launch Points are the Satellites Current Location
@@ -146,7 +147,7 @@ export const init = (): void => {
                 for (var rascIterat = 0; rascIterat <= 4; rascIterat++) {
                   if (i >= breakupCount) continue;
                   satId = satSet.getIdFromObjNum(80000 + i);
-                  var sat = satSet.getSat(satId);
+                  var sat: satObject = satSet.getSat(satId);
                   sat = origsat;
                   var iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7);
 
@@ -246,7 +247,7 @@ export const init = (): void => {
             $('#menu-breakup').addClass('bmenu-item-selected');
             isBreakupMenuOpen = true;
 
-            let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
+            let sat: satObject = satSet.getSatExtraOnly(objectManager.selectedSat);
             $('#hc-scc').val(sat.SCC_NUM);
           } else {
             if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.breakupDisabled();

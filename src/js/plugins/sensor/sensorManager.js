@@ -29,7 +29,7 @@ import { keepTrackApi } from '@app/js/api/externalApi';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { satellite } from '@app/js/lib/lookangles.js';
 import { sensorList } from '@app/js/plugins/sensor/sensorList.js';
-import { setColorScheme } from '@app/js/satSet/satSet.js';
+import { setColorScheme } from '@app/js/satSet/satSet';
 
 let sensorManager = {};
 
@@ -282,18 +282,18 @@ sensorManager.drawFov = (sensor) => {
     case 'BLE':
     case 'CLR':
     case 'THL':
-      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), sensor.obsminaz, sensor.obsminaz + 120, sensor.obsminel, sensor.obsmaxrange], 'c');
-      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), sensor.obsminaz + 120, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getSensorFromSensorName(sensor.name), sensor.obsminaz, sensor.obsminaz + 120, sensor.obsminel, sensor.obsmaxrange], 'c');
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getSensorFromSensorName(sensor.name), sensor.obsminaz + 120, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
       break;
     case 'FYL':
       // TODO: Find actual face directions
-      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), 0, 120, sensor.obsminel, sensor.obsmaxrange], 'c');
-      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), 120, 240, sensor.obsminel, sensor.obsmaxrange], 'c');
-      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), 240, 0, sensor.obsminel, sensor.obsmaxrange], 'c');
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getSensorFromSensorName(sensor.name), 0, 120, sensor.obsminel, sensor.obsmaxrange], 'c');
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getSensorFromSensorName(sensor.name), 120, 240, sensor.obsminel, sensor.obsmaxrange], 'c');
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getSensorFromSensorName(sensor.name), 240, 0, sensor.obsminel, sensor.obsmaxrange], 'c');
       break;
     case 'CDN':
       // NOTE: This will be a bit more complicated later
-      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getIdFromSensorName(sensor.name), sensor.obsminaz, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
+      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getSensorFromSensorName(sensor.name), sensor.obsminaz, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
       break;
     default:
       console.warn('Sensor not found');

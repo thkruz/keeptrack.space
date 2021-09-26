@@ -12,11 +12,11 @@ document.body.innerHTML = global.docBody;
 
 test(`Dots Unit Testing`, () => {
   const settingsManager = window.settingsManager;
-  const dotManager = new Dots(glMock);
-  dotManager.draw({}, {}, {}, {});
-  dotManager.drawGpuPickingFrameBuffer({}, {}, {});
+  const dotsManager = new Dots(glMock);
+  dotsManager.draw({}, {}, {}, {});
+  dotsManager.drawGpuPickingFrameBuffer({}, {}, {});
   settingsManager.cruncherReady = true;
-  dotManager.loaded = true;
+  dotsManager.loaded = true;
   const mainCamera = {
     cameraType: {
       current: 0,
@@ -24,47 +24,47 @@ test(`Dots Unit Testing`, () => {
     },
     camMatrix: [0, 0, 0, 0],
   };
-  dotManager.draw({}, mainCamera, {}, {});
-  dotManager.drawGpuPickingFrameBuffer({}, {}, {});
+  dotsManager.draw({}, mainCamera, {}, {});
+  dotsManager.drawGpuPickingFrameBuffer({}, {}, {});
 
   mainCamera.cameraType.current = mainCamera.cameraType.Planetarium;
-  dotManager.draw({}, mainCamera, {}, {});
+  dotsManager.draw({}, mainCamera, {}, {});
 
-  dotManager.setupPickingBuffer([0, 1, 2, 3]);
+  dotsManager.setupPickingBuffer([0, 1, 2, 3]);
 
-  dotManager.updateSizeBuffer([0, 1, 2, 3]);
+  dotsManager.updateSizeBuffer([0, 1, 2, 3]);
   settingsManager.lastSearchResults = [1, 2];
-  dotManager.updateSizeBuffer([0, 1, 2, 3]);
-  dotManager.starIndex1 = 0;
-  dotManager.starIndex2 = 2;
-  dotManager.updateSizeBuffer([0, 1, 2, 3]);
+  dotsManager.updateSizeBuffer([0, 1, 2, 3]);
+  dotsManager.starIndex1 = 0;
+  dotsManager.starIndex2 = 2;
+  dotsManager.updateSizeBuffer([0, 1, 2, 3]);
 
   glMock.getProgramParameter = jest.fn(() => false);
   expect(() => new Dots(glMock)).toThrow('Could not compile WebGL program. \n\n');
 
-  dotManager.updatePositionBuffer();
-  dotManager.positionData = [
+  dotsManager.updatePositionBuffer();
+  dotsManager.positionData = [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   ];
-  dotManager.updatePositionBuffer();
-  dotManager.velocityData = true;
+  dotsManager.updatePositionBuffer();
+  dotsManager.velocityData = true;
   const timeManager = {
     propRate: 1,
     setDrawDt: jest.fn(),
   };
-  dotManager.updatePositionBuffer(2, 1, timeManager);
+  dotsManager.updatePositionBuffer(2, 1, timeManager);
   settingsManager.fpsThrottle2 = 0;
   timeManager.dt = 1;
-  dotManager.updatePositionBuffer(2, 1, timeManager);
+  dotsManager.updatePositionBuffer(2, 1, timeManager);
   settingsManager.minimumDrawDt = 0;
   timeManager.drawDt = 10;
   settingsManager.lowPerf = false;
   settingsManager.maxFieldOfViewMarkers = 1;
   settingsManager.maxRadarData = 1;
-  dotManager.updatePositionBuffer(10, 1, timeManager);
+  dotsManager.updatePositionBuffer(10, 1, timeManager);
 
-  dotManager.updatePMvCamMatrix([0, 0, 0, 0], mainCamera);
+  dotsManager.updatePMvCamMatrix([0, 0, 0, 0], mainCamera);
 
   expect(true).toBe(true);
 });

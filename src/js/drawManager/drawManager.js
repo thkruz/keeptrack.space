@@ -1,12 +1,12 @@
 import * as glm from '@app/js/lib/external/gl-matrix.js';
 
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins/selectSatManager/selectSatManager.js';
-import { satScreenPositionArray, satSet } from '@app/js/satSet/satSet.js';
 
 import { Camera } from '@app/js/camera/camera';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { meshManager } from '@app/js/drawManager/meshManager.js';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
+import { satSet } from '@app/js/satSet/satSet';
 import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
@@ -454,7 +454,7 @@ export const satCalculate = () => {
       orbitManager.setSelectOrbit(objectManager.selectedSat);
       if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
         lineManager.drawWhenSelected();
-        lineManager.updateLineToSat(objectManager.selectedSat, satSet.getIdFromSensorName(sensorManager.currentSensor.name));
+        lineManager.updateLineToSat(objectManager.selectedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor.name));
       }
       // TODO: #281 keepTrackApi.programs.mapManager.updateMap should be a callback
       if (keepTrackApi.programs.mapManager) {
@@ -574,7 +574,7 @@ export const orbitsAbove = () => {
       if (sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
       if (sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
 
-      satSet.getScreenCoords(i, drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.curBuffer, sat.position);
+      const satScreenPositionArray = satSet.getScreenCoords(i, drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.curBuffer, sat.position);
       if (satScreenPositionArray.error) continue;
       if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
       if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
@@ -868,8 +868,8 @@ export const demoMode = () => {
 
   drawManager.demoModeLast = timeManager.now;
 
-  if (drawManager.demoModeSatellite === satSet.getSatData().length) drawManager.demoModeSatellite = 0;
-  let satData = satSet.getSatData();
+  if (drawManager.demoModeSatellite === satSet.satData.length) drawManager.demoModeSatellite = 0;
+  let satData = satSet.satData;
   for (drawManager.i = drawManager.demoModeSatellite; drawManager.i < satData.length; drawManager.i++) {
     try {
       drawManager.sat = satData[drawManager.i];
@@ -880,7 +880,7 @@ export const demoMode = () => {
       if (drawManager.sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false) continue;
       if (drawManager.sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
       if (drawManager.sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
-      satSet.getScreenCoords(drawManager.i, drawManager.pMatrix, mainCamera.camMatrix);
+      const satScreenPositionArray = satSet.getScreenCoords(drawManager.i, drawManager.pMatrix, mainCamera.camMatrix);
       if (satScreenPositionArray.error) continue;
       if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
       if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;

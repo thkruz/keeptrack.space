@@ -4,7 +4,7 @@ class SatGroup {
     var i = 0;
     this.sats = [];
     if (groupType === 'all') {
-      data = satSet.getSatData();
+      data = satSet.satData;
       for (i = 0; i < data.length; i++) {
         if (this.sats.length > settingsManager.maxOribtsDisplayed) break;
         if (typeof data[i].SCC_NUM == 'undefined') continue;
@@ -15,7 +15,7 @@ class SatGroup {
       }
     }
     if (groupType === 'year') {
-      data = satSet.searchYear(data);
+      data = satSet.searchYear(satSet.satData, data);
       for (i = 0; i < data.length; i++) {
         if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
         this.sats.push({
@@ -23,7 +23,7 @@ class SatGroup {
         });
       }
     } else if (groupType === 'yearOrLess') {
-      data = satSet.searchYearOrLess(data);
+      data = satSet.searchYearOrLess(satSet.satData, data);
       for (i = 0; i < data.length; i++) {
         if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
         this.sats.push({
@@ -41,7 +41,7 @@ class SatGroup {
         });
       }
     } else if (groupType === 'nameRegex') {
-      data = satSet.searchNameRegex(data);
+      data = satSet.searchNameRegex(satSet.satData, data);
       for (i = 0; i < data.length; i++) {
         if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
         this.sats.push({
@@ -49,7 +49,7 @@ class SatGroup {
         });
       }
     } else if (groupType === 'countryRegex') {
-      data = satSet.searchCountryRegex(data);
+      data = satSet.searchCountryRegex(satSet.satData, data);
       for (i = 0; i < data.length; i++) {
         if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
         this.sats.push({

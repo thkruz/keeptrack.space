@@ -131,7 +131,7 @@ export const keepTrackApiStubs = {
       showAdvice: jest.fn(),
       adviceArray: (<any[]>[]),
     },
-    cameraManager: {
+    mainCamera: {
       cameraType: {
         current: 1,
         satellite: 1,

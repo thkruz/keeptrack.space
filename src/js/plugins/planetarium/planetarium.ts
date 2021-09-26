@@ -62,22 +62,22 @@ export const init = (): void => {
 export const bottomMenuClick = (iconName: string): void => {
   const { drawManager, starManager, objectManager, uiManager, orbitManager, sensorManager } = keepTrackApi.programs;
   if (iconName === 'menu-planetarium') {
-    const cameraManager = keepTrackApi.programs.cameraManager;
+    const mainCamera = keepTrackApi.programs.mainCamera;
     if (keepTrackApi.programs.planetarium.isPlanetariumView) {
       keepTrackApi.programs.planetarium.isPlanetariumView = false;
-      cameraManager.isPanReset = true;
-      cameraManager.isLocalRotateReset = true;
+      mainCamera.isPanReset = true;
+      mainCamera.isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6;
       drawManager.glInit();
       uiManager.hideSideMenus();
       orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
-      cameraManager.cameraType.current = cameraManager.cameraType.Default; // Back to normal Camera Mode
+      mainCamera.cameraType.current = mainCamera.cameraType.Default; // Back to normal Camera Mode
       $('#fov-text').html('');
       $('#menu-planetarium').removeClass('bmenu-item-selected');
       return;
     } else {
       if (sensorManager.checkSensorSelected()) {
-        cameraManager.cameraType.current = cameraManager.cameraType.Planetarium; // Activate Planetarium Camera Mode
+        mainCamera.cameraType.current = mainCamera.cameraType.Planetarium; // Activate Planetarium Camera Mode
         $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
         uiManager.legendMenuChange('planetarium');
         if (objectManager.isStarManagerLoaded) {

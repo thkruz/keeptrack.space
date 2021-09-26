@@ -30,14 +30,14 @@ class Dots {
     this.loaded = true;
   }
 
-  updatePMvCamMatrix(pMatrix, cameraManager) {
+  updatePMvCamMatrix(pMatrix, mainCamera) {
     this.pMvCamMatrix = glm.mat4.create();
     mat4.mul(this.pMvCamMatrix, this.pMvCamMatrix, pMatrix);
-    mat4.mul(this.pMvCamMatrix, this.pMvCamMatrix, cameraManager.camMatrix);
+    mat4.mul(this.pMvCamMatrix, this.pMvCamMatrix, mainCamera.camMatrix);
   }
 
   // eslint-disable-next-line class-methods-use-this
-  draw(pMatrix, cameraManager, colorScheme, tgtBuffer) {
+  draw(pMatrix, mainCamera, colorScheme, tgtBuffer) {
     if (!this.loaded || !settingsManager.cruncherReady) return;
     const gl = this.gl;
 
@@ -45,7 +45,7 @@ class Dots {
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.uniformMatrix4fv(this.drawProgram.pMvCamMatrix, false, this.pMvCamMatrix);
 
-    if (cameraManager.cameraType.current == cameraManager.cameraType.Planetarium) {
+    if (mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {
       gl.uniform1f(this.drawProgram.minSize, settingsManager.satShader.minSizePlanetarium);
       gl.uniform1f(this.drawProgram.maxSize, settingsManager.satShader.maxSizePlanetarium);
     } else {
@@ -88,7 +88,7 @@ class Dots {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  drawGpuPickingFrameBuffer(pMatrix, cameraManager, colorScheme) {
+  drawGpuPickingFrameBuffer(pMatrix, mainCamera, colorScheme) {
     if (!this.loaded || !settingsManager.cruncherReady) return;
     const gl = this.gl;
 
@@ -112,7 +112,7 @@ class Dots {
     // we're only going to read one
     if (!settingsManager.isMobileModeEnabled) {
       gl.enable(gl.SCISSOR_TEST);
-      gl.scissor(cameraManager.mouseX, gl.drawingBufferHeight - cameraManager.mouseY, 1, 1);
+      gl.scissor(mainCamera.mouseX, gl.drawingBufferHeight - mainCamera.mouseY, 1, 1);
     }
 
     // Should not be relying on sizeData -- but temporary

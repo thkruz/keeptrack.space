@@ -63,15 +63,15 @@ export const init = (): void => {
 export const bottomMenuClick = (iconName: string): void => {
   const { drawManager, starManager, objectManager, uiManager, orbitManager, sensorManager } = keepTrackApi.programs;
   if (iconName === 'menu-astronomy') {
-    const cameraManager = keepTrackApi.programs.cameraManager;
+    const mainCamera = keepTrackApi.programs.mainCamera;
     if (keepTrackApi.programs.astronomy.isAstronomyView) {
       keepTrackApi.programs.astronomy.isAstronomyView = false;
-      cameraManager.isPanReset = true;
-      cameraManager.isLocalRotateReset = true;
+      mainCamera.isPanReset = true;
+      mainCamera.isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6;
       drawManager.glInit();
       uiManager.hideSideMenus();
-      cameraManager.cameraType.current = cameraManager.cameraType.Default; // Back to normal Camera Mode
+      mainCamera.cameraType.current = mainCamera.cameraType.Default; // Back to normal Camera Mode
       uiManager.legendMenuChange('default');
       if (objectManager.isStarManagerLoaded) {
         starManager.clearConstellations();
@@ -88,7 +88,7 @@ export const bottomMenuClick = (iconName: string): void => {
           starManager.drawAllConstellations();
         }
         orbitManager.clearInViewOrbit();
-        cameraManager.cameraType.current = cameraManager.cameraType.Astronomy; // Activate Astronomy Camera Mode
+        mainCamera.cameraType.current = mainCamera.cameraType.Astronomy; // Activate Astronomy Camera Mode
         $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
         uiManager.legendMenuChange('astronomy');
         if (typeof keepTrackApi.programs.planetarium !== 'undefined') {

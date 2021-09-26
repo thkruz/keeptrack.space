@@ -52,7 +52,7 @@ export const uiInput: uiInputInterface = {
   openRmbMenu: null,
   rmbMenuActions: null,
   canvasWheel: (evt: any): void => {
-    const { cameraManager, objectManager, drawManager } = keepTrackApi.programs;
+    const { mainCamera, objectManager, drawManager } = keepTrackApi.programs;
 
     if (!settingsManager.disableUI && settingsManager.disableNormalEvents) {
       evt.preventDefault();
@@ -64,47 +64,47 @@ export const uiInput: uiInputInterface = {
     }
 
     if (delta < 0) {
-      cameraManager.isZoomIn = true;
+      mainCamera.isZoomIn = true;
     } else {
-      cameraManager.isZoomIn = false;
+      mainCamera.isZoomIn = false;
     }
 
     if (settingsManager.isZoomStopsRotation) {
-      cameraManager.autoRotate(false);
+      mainCamera.autoRotate(false);
     }
 
     if (settingsManager.isZoomStopsSnappedOnSat || objectManager.selectedSat == -1) {
-      let zoomTarget = cameraManager.zoomTarget;
-      zoomTarget += delta / 100 / 50 / cameraManager.speedModifier; // delta is +/- 100
+      let zoomTarget = mainCamera.zoomTarget;
+      zoomTarget += delta / 100 / 50 / mainCamera.speedModifier; // delta is +/- 100
       zoomTarget = Math.min(Math.max(zoomTarget, 0.001), 1); // Force between 0 and 1
-      cameraManager.zoomTarget = zoomTarget;
-      cameraManager.ecLastZoom = zoomTarget;
-      cameraManager.camZoomSnappedOnSat = false;
+      mainCamera.zoomTarget = zoomTarget;
+      mainCamera.ecLastZoom = zoomTarget;
+      mainCamera.camZoomSnappedOnSat = false;
     } else {
       if (settingsManager.camDistBuffer < 300 || settingsManager.nearZoomLevel == -1) {
         settingsManager.camDistBuffer += delta / 7.5; // delta is +/- 100
         settingsManager.camDistBuffer = Math.min(Math.max(settingsManager.camDistBuffer, 30), 300);
-        settingsManager.nearZoomLevel = cameraManager.zoomLevel;
+        settingsManager.nearZoomLevel = mainCamera.zoomLevel;
       }
       if (settingsManager.camDistBuffer >= 300) {
-        let zoomTarget = cameraManager.zoomTarget;
-        zoomTarget += delta / 100 / 50 / cameraManager.speedModifier; // delta is +/- 100
+        let zoomTarget = mainCamera.zoomTarget;
+        zoomTarget += delta / 100 / 50 / mainCamera.speedModifier; // delta is +/- 100
         zoomTarget = Math.min(Math.max(zoomTarget, 0.001), 1); // Force between 0 and 1
-        cameraManager.zoomTarget = zoomTarget;
-        cameraManager.ecLastZoom = zoomTarget;
-        cameraManager.camZoomSnappedOnSat = false;
+        mainCamera.zoomTarget = zoomTarget;
+        mainCamera.ecLastZoom = zoomTarget;
+        mainCamera.camZoomSnappedOnSat = false;
         if (zoomTarget < settingsManager.nearZoomLevel) {
-          cameraManager.camZoomSnappedOnSat = true;
+          mainCamera.camZoomSnappedOnSat = true;
           settingsManager.camDistBuffer = 200;
         }
       }
     }
 
     if (
-      cameraManager.cameraType.current === cameraManager.cameraType.Planetarium ||
-      cameraManager.cameraType.current === cameraManager.cameraType.Fps ||
-      cameraManager.cameraType.current === cameraManager.cameraType.Satellite ||
-      cameraManager.cameraType.current === cameraManager.cameraType.Astronomy
+      mainCamera.cameraType.current === mainCamera.cameraType.Planetarium ||
+      mainCamera.cameraType.current === mainCamera.cameraType.Fps ||
+      mainCamera.cameraType.current === mainCamera.cameraType.Satellite ||
+      mainCamera.cameraType.current === mainCamera.cameraType.Astronomy
     ) {
       settingsManager.fieldOfView += delta * 0.0002;
       $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
@@ -114,7 +114,7 @@ export const uiInput: uiInputInterface = {
     }
   },
   init: (): void => {
-    const { uiManager, satCruncher, ColorScheme, starManager, sensorManager, lineManager, satSet, satellite, cameraManager, objectManager, drawManager } = keepTrackApi.programs;
+    const { uiManager, satCruncher, ColorScheme, starManager, sensorManager, lineManager, satSet, satellite, mainCamera, objectManager, drawManager } = keepTrackApi.programs;
     const gl = drawManager.gl;
 
     $('#rmb-wrapper').append(keepTrackApi.html`    
@@ -205,10 +205,10 @@ export const uiInput: uiInputInterface = {
     // 2020 Key listener
     // TODO: Migrate most things from UI to Here
     window.addEventListener('keydown', (e) => {
-      if (e.ctrlKey === true || e.metaKey === true) cameraManager.isCtrlPressed = true;
+      if (e.ctrlKey === true || e.metaKey === true) mainCamera.isCtrlPressed = true;
     });
     window.addEventListener('keyup', (e) => {
-      if (e.ctrlKey === false || e.metaKey === false) cameraManager.isCtrlPressed = false;
+      if (e.ctrlKey === false || e.metaKey === false) mainCamera.isCtrlPressed = false;
     });
 
     if (settingsManager.disableWindowScroll || settingsManager.disableNormalEvents) {
@@ -288,7 +288,7 @@ export const uiInput: uiInputInterface = {
       };
 
       const stopWheelZoom = (event: Event) => {
-        if (cameraManager.isCtrlPressed == true) {
+        if (mainCamera.isCtrlPressed == true) {
           event.preventDefault();
         }
       };
@@ -322,26 +322,26 @@ export const uiInput: uiInputInterface = {
         // Camera Manager Events
         // Middle Mouse Button MMB
         if (evt.button === 1) {
-          cameraManager.localRotateStartPosition = cameraManager.localRotateCurrent;
-          if (cameraManager.isShiftPressed) {
-            cameraManager.isLocalRotateRoll = true;
-            cameraManager.isLocalRotateYaw = false;
+          mainCamera.localRotateStartPosition = mainCamera.localRotateCurrent;
+          if (mainCamera.isShiftPressed) {
+            mainCamera.isLocalRotateRoll = true;
+            mainCamera.isLocalRotateYaw = false;
           } else {
-            cameraManager.isLocalRotateRoll = false;
-            cameraManager.isLocalRotateYaw = true;
+            mainCamera.isLocalRotateRoll = false;
+            mainCamera.isLocalRotateYaw = true;
           }
           evt.preventDefault();
         }
 
         // Right Mouse Button RMB
-        if (evt.button === 2 && (cameraManager.isShiftPressed || cameraManager.isCtrlPressed)) {
-          cameraManager.panStartPosition = cameraManager.panCurrent;
-          if (cameraManager.isShiftPressed) {
-            cameraManager.isScreenPan = false;
-            cameraManager.isWorldPan = true;
+        if (evt.button === 2 && (mainCamera.isShiftPressed || mainCamera.isCtrlPressed)) {
+          mainCamera.panStartPosition = mainCamera.panCurrent;
+          if (mainCamera.isShiftPressed) {
+            mainCamera.isScreenPan = false;
+            mainCamera.isWorldPan = true;
           } else {
-            cameraManager.isScreenPan = true;
-            cameraManager.isWorldPan = false;
+            mainCamera.isScreenPan = true;
+            mainCamera.isWorldPan = false;
           }
         }
       });
@@ -351,12 +351,12 @@ export const uiInput: uiInputInterface = {
       window.addEventListener('mouseup', function (evt) {
         // Camera Manager Events
         if (evt.button === 1) {
-          cameraManager.isLocalRotateRoll = false;
-          cameraManager.isLocalRotateYaw = false;
+          mainCamera.isLocalRotateRoll = false;
+          mainCamera.isLocalRotateYaw = false;
         }
         if (evt.button === 2) {
-          cameraManager.isScreenPan = false;
-          cameraManager.isWorldPan = false;
+          mainCamera.isScreenPan = false;
+          mainCamera.isWorldPan = false;
         }
       });
     }
@@ -374,18 +374,18 @@ export const uiInput: uiInputInterface = {
           if (isNaN(currentPinchDistance)) return;
 
           deltaPinchDistance = (startPinchDistance - currentPinchDistance) / maxPinchSize;
-          let zoomTarget = cameraManager.zoomTarget;
+          let zoomTarget = mainCamera.zoomTarget;
           zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed * 20);
           zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
-          cameraManager.zoomTarget = zoomTarget;
+          mainCamera.zoomTarget = zoomTarget;
         } else {
           // Dont Move While Zooming
-          cameraManager.mouseX = evt.originalEvent.touches[0].clientX;
-          cameraManager.mouseY = evt.originalEvent.touches[0].clientY;
-          if (cameraManager.isDragging && cameraManager.screenDragPoint[0] !== cameraManager.mouseX && cameraManager.screenDragPoint[1] !== cameraManager.mouseY) {
+          mainCamera.mouseX = evt.originalEvent.touches[0].clientX;
+          mainCamera.mouseY = evt.originalEvent.touches[0].clientY;
+          if (mainCamera.isDragging && mainCamera.screenDragPoint[0] !== mainCamera.mouseX && mainCamera.screenDragPoint[1] !== mainCamera.mouseY) {
             dragHasMoved = true;
-            cameraManager.camAngleSnappedOnSat = false;
-            cameraManager.camZoomSnappedOnSat = false;
+            mainCamera.camAngleSnappedOnSat = false;
+            mainCamera.camZoomSnappedOnSat = false;
           }
           uiInput.isMouseMoving = true;
           clearTimeout(<number>mouseTimeout);
@@ -399,12 +399,12 @@ export const uiInput: uiInputInterface = {
       canvasDOM.on('mousemove', function (evt) {
         if (uiInput.mouseMoveTimeout == -1) {
           uiInput.mouseMoveTimeout = window.setTimeout(() => {
-            cameraManager.mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
-            cameraManager.mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
-            if (cameraManager.isDragging && cameraManager.screenDragPoint[0] !== cameraManager.mouseX && cameraManager.screenDragPoint[1] !== cameraManager.mouseY) {
+            mainCamera.mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
+            mainCamera.mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
+            if (mainCamera.isDragging && mainCamera.screenDragPoint[0] !== mainCamera.mouseX && mainCamera.screenDragPoint[1] !== mainCamera.mouseY) {
               dragHasMoved = true;
-              cameraManager.camAngleSnappedOnSat = false;
-              cameraManager.camZoomSnappedOnSat = false;
+              mainCamera.camAngleSnappedOnSat = false;
+              mainCamera.camZoomSnappedOnSat = false;
             }
             uiInput.isMouseMoving = true;
 
@@ -454,24 +454,24 @@ export const uiInput: uiInputInterface = {
 
           uiInput.isStartedOnCanvas = true;
 
-          if (cameraManager.speedModifier === 1) {
+          if (mainCamera.speedModifier === 1) {
             settingsManager.cameraMovementSpeed = 0.003;
             settingsManager.cameraMovementSpeedMin = 0.005;
           }
 
           if (evt.button === 2) {
-            dragPoint = uiInput.getEarthScreenPoint(cameraManager.mouseX, cameraManager.mouseY);
+            dragPoint = uiInput.getEarthScreenPoint(mainCamera.mouseX, mainCamera.mouseY);
             latLon = satellite.eci2ll(dragPoint[0], dragPoint[1], dragPoint[2]);
           }
-          cameraManager.screenDragPoint = [cameraManager.mouseX, cameraManager.mouseY];
-          cameraManager.dragStartPitch = cameraManager.camPitch;
-          cameraManager.dragStartYaw = cameraManager.camYaw;
+          mainCamera.screenDragPoint = [mainCamera.mouseX, mainCamera.mouseY];
+          mainCamera.dragStartPitch = mainCamera.camPitch;
+          mainCamera.dragStartYaw = mainCamera.camYaw;
           if (evt.button === 0) {
-            cameraManager.isDragging = true;
+            mainCamera.isDragging = true;
           }
-          cameraManager.isCamSnapMode = false;
+          mainCamera.isCamSnapMode = false;
           if (!settingsManager.disableUI) {
-            cameraManager.autoRotate(false);
+            mainCamera.autoRotate(false);
           }
           rightBtnMenuDOM.hide();
           uiManager.clearRMBSubMenu();
@@ -493,24 +493,24 @@ export const uiInput: uiInputInterface = {
             // _pinchStart(evt)
           } else {
             // Single Finger Touch
-            cameraManager.startMouseX = evt.originalEvent.touches[0].clientX;
-            cameraManager.startMouseY = evt.originalEvent.touches[0].clientY;
-            cameraManager.mouseX = evt.originalEvent.touches[0].clientX;
-            cameraManager.mouseY = evt.originalEvent.touches[0].clientY;
-            uiInput.mouseSat = uiInput.getSatIdFromCoord(cameraManager.mouseX, cameraManager.mouseY);
-            settingsManager.cameraMovementSpeed = Math.max(0.005 * cameraManager.zoomLevel, settingsManager.cameraMovementSpeedMin);
-            cameraManager.screenDragPoint = [cameraManager.mouseX, cameraManager.mouseY];
+            mainCamera.startMouseX = evt.originalEvent.touches[0].clientX;
+            mainCamera.startMouseY = evt.originalEvent.touches[0].clientY;
+            mainCamera.mouseX = evt.originalEvent.touches[0].clientX;
+            mainCamera.mouseY = evt.originalEvent.touches[0].clientY;
+            uiInput.mouseSat = uiInput.getSatIdFromCoord(mainCamera.mouseX, mainCamera.mouseY);
+            settingsManager.cameraMovementSpeed = Math.max(0.005 * mainCamera.zoomLevel, settingsManager.cameraMovementSpeedMin);
+            mainCamera.screenDragPoint = [mainCamera.mouseX, mainCamera.mouseY];
             // dragPoint = getEarthScreenPoint(x, y)
-            dragPoint = cameraManager.screenDragPoint; // Ignore the earth on mobile
-            cameraManager.dragStartPitch = cameraManager.camPitch;
-            cameraManager.dragStartYaw = cameraManager.camYaw;
-            cameraManager.isDragging = true;
+            dragPoint = mainCamera.screenDragPoint; // Ignore the earth on mobile
+            mainCamera.dragStartPitch = mainCamera.camPitch;
+            mainCamera.dragStartYaw = mainCamera.camYaw;
+            mainCamera.isDragging = true;
             touchStartTime = Date.now();
             // If you hit the canvas hide any popups
             _hidePopUps();
-            cameraManager.isCamSnapMode = false;
+            mainCamera.isCamSnapMode = false;
             if (!settingsManager.disableUI) {
-              cameraManager.autoRotate(false);
+              mainCamera.autoRotate(false);
             }
 
             // TODO: Make updateUrl() a setting that is disabled by default
@@ -533,14 +533,14 @@ export const uiInput: uiInputInterface = {
 
           if (!dragHasMoved) {
             if (settingsManager.isMobileModeEnabled) {
-              cameraManager.mouseX = isNaN(cameraManager.mouseX) ? 0 : cameraManager.mouseX;
-              cameraManager.mouseY = isNaN(cameraManager.mouseY) ? 0 : cameraManager.mouseY;
-              uiInput.mouseSat = uiInput.getSatIdFromCoord(cameraManager.mouseX, cameraManager.mouseY);
+              mainCamera.mouseX = isNaN(mainCamera.mouseX) ? 0 : mainCamera.mouseX;
+              mainCamera.mouseY = isNaN(mainCamera.mouseY) ? 0 : mainCamera.mouseY;
+              uiInput.mouseSat = uiInput.getSatIdFromCoord(mainCamera.mouseX, mainCamera.mouseY);
             }
             clickedSat = uiInput.mouseSat;
             if (evt.button === 0) {
               // Left Mouse Button Clicked
-              if (cameraManager.cameraType.current === cameraManager.cameraType.Satellite) {
+              if (mainCamera.cameraType.current === mainCamera.cameraType.Satellite) {
                 if (clickedSat !== -1 && !satSet.getSatExtraOnly(clickedSat).static) {
                   objectManager.setSelectedSat(clickedSat);
                 }
@@ -550,16 +550,16 @@ export const uiInput: uiInputInterface = {
             }
             if (evt.button === 2) {
               // Right Mouse Button Clicked
-              if (!cameraManager.isCtrlPressed && !cameraManager.isShiftPressed) {
+              if (!mainCamera.isCtrlPressed && !mainCamera.isShiftPressed) {
                 uiInput.openRmbMenu();
               }
             }
           }
           // Force the serach bar to get repainted because it gets overwrote a lot
           dragHasMoved = false;
-          cameraManager.isDragging = false;
+          mainCamera.isDragging = false;
           if (!settingsManager.disableUI) {
-            cameraManager.autoRotate(false);
+            mainCamera.autoRotate(false);
           }
         };
         canvasDOM.on('mouseup', function (evt) {
@@ -712,21 +712,21 @@ export const uiInput: uiInputInterface = {
         rightBtnMenuDOM.show();
         satHoverBoxDOM.hide();
         // Might need to be adjusted if number of menus change
-        var offsetX = cameraManager.mouseX < canvasDOM.innerWidth() / 2 ? 0 : -100;
-        var offsetY = cameraManager.mouseY < canvasDOM.innerHeight() / 2 ? 0 : numMenuItems * -50;
+        var offsetX = mainCamera.mouseX < canvasDOM.innerWidth() / 2 ? 0 : -100;
+        var offsetY = mainCamera.mouseY < canvasDOM.innerHeight() / 2 ? 0 : numMenuItems * -50;
         rightBtnMenuDOM.css({
           'display': 'block',
           'text-align': 'center',
           'position': 'absolute',
-          'left': cameraManager.mouseX + offsetX,
-          'top': cameraManager.mouseY + offsetY,
+          'left': mainCamera.mouseX + offsetX,
+          'top': mainCamera.mouseY + offsetY,
         });
       };
 
       canvasDOM.on('touchend', function () {
         let touchTime = Date.now() - touchStartTime;
 
-        if (touchTime > 150 && !isPinching && Math.abs(cameraManager.startMouseX - cameraManager.mouseX) < 50 && Math.abs(cameraManager.startMouseY - cameraManager.mouseY) < 50) {
+        if (touchTime > 150 && !isPinching && Math.abs(mainCamera.startMouseX - mainCamera.mouseX) < 50 && Math.abs(mainCamera.startMouseY - mainCamera.mouseY) < 50) {
           uiInput.openRmbMenu();
           uiInput.mouseSat = -1;
         }
@@ -735,12 +735,12 @@ export const uiInput: uiInputInterface = {
           // pinchEnd(e)
           isPinching = false;
         }
-        cameraManager.mouseX = 0;
-        cameraManager.mouseY = 0;
+        mainCamera.mouseX = 0;
+        mainCamera.mouseY = 0;
         dragHasMoved = false;
-        cameraManager.isDragging = false;
+        mainCamera.isDragging = false;
         if (!settingsManager.disableUI) {
-          cameraManager.autoRotate(false);
+          mainCamera.autoRotate(false);
         }
       });
 
@@ -779,11 +779,11 @@ export const uiInput: uiInputInterface = {
         }); // On Key Press Event Run _keyHandler Function
         bodyDOM.on('keydown', (e) => {
           if (uiManager.isCurrentlyTyping) return;
-          cameraManager.keyDownHandler(e);
+          mainCamera.keyDownHandler(e);
         }); // On Key Press Event Run _keyHandler Function
         bodyDOM.on('keyup', (e) => {
           if (uiManager.isCurrentlyTyping) return;
-          cameraManager.keyUpHandler(e);
+          mainCamera.keyUpHandler(e);
         }); // On Key Press Event Run _keyHandler Function
 
         rightBtnSaveMenuDOM.on('click', function (e) {
@@ -1109,14 +1109,14 @@ export const uiInput: uiInputInterface = {
             });
             break;
           case 'reset-camera-rmb':
-            // if (cameraManager.cameraType.current == cameraManager.cameraType.FixedToSat) {
+            // if (mainCamera.cameraType.current == mainCamera.cameraType.FixedToSat) {
             //   // NOTE: Maybe a reset flag to move back to original position over time?
-            //   cameraManager.camPitch = 0;
-            //   cameraManager.camYaw = 0;
+            //   mainCamera.camPitch = 0;
+            //   mainCamera.camYaw = 0;
             // }
-            cameraManager.isPanReset = true;
-            cameraManager.isLocalRotateReset = true;
-            cameraManager.ftsRotateReset = true;
+            mainCamera.isPanReset = true;
+            mainCamera.isLocalRotateReset = true;
+            mainCamera.ftsRotateReset = true;
             break;
           case 'clear-lines-rmb':
             lineManager.clear();
@@ -1355,8 +1355,8 @@ export const uiInput: uiInputInterface = {
 
               if (
                 (!objectManager.isSensorManagerLoaded || sensorManager.currentSensor.lat != null) &&
-                cameraManager.cameraType.current !== cameraManager.cameraType.Planetarium &&
-                cameraManager.cameraType.current !== cameraManager.cameraType.Astronomy
+                mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium &&
+                mainCamera.cameraType.current !== mainCamera.cameraType.Astronomy
               ) {
                 uiManager.legendMenuChange('default');
               }
@@ -1376,7 +1376,7 @@ export const uiInput: uiInputInterface = {
 
   // Convert Screen X,Y back to ECI
   unProject: (x: number, y: number): [number, number, number] => {
-    const { cameraManager, drawManager } = keepTrackApi.programs;
+    const { mainCamera, drawManager } = keepTrackApi.programs;
     const { gl } = drawManager;
 
     const glScreenX = (x / gl.drawingBufferWidth) * 2 - 1.0;
@@ -1384,7 +1384,7 @@ export const uiInput: uiInputInterface = {
     const screenVec = [glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
 
     let comboPMat = glm.mat4.create();
-    glm.mat4.mul(comboPMat, drawManager.pMatrix, cameraManager.camMatrix);
+    glm.mat4.mul(comboPMat, drawManager.pMatrix, mainCamera.camMatrix);
     let invMat = glm.mat4.create();
     glm.mat4.invert(invMat, comboPMat);
     let worldVec = glm.vec4.create();
@@ -1483,12 +1483,12 @@ export const uiInput: uiInputInterface = {
 
   // Raycasting in getEarthScreenPoint would provide a lot of powerful (but slow) options later
   getEarthScreenPoint: (x: number, y: number) => {
-    const { cameraManager } = keepTrackApi.programs;
+    const { mainCamera } = keepTrackApi.programs;
 
     // getEarthScreenPoint
     let rayOrigin, ptThru, rayDir, toCenterVec, dParallel, longDir, dPerp, dSubSurf, dSurf, ptSurf;
 
-    rayOrigin = uiInput.getRayOrigin(cameraManager);
+    rayOrigin = uiInput.getRayOrigin(mainCamera);
     ptThru = uiInput.unProject(x, y);
 
     rayDir = glm.vec3.create();
@@ -1514,12 +1514,12 @@ export const uiInput: uiInputInterface = {
     return ptSurf;
   },
 
-  getRayOrigin: (cameraManager: any) => {
-    let gCPr = cameraManager.getCamDist();
-    let gCPz = gCPr * Math.sin(cameraManager.camPitch);
-    let gCPrYaw = gCPr * Math.cos(cameraManager.camPitch);
-    let gCPx = gCPrYaw * Math.sin(cameraManager.camYaw);
-    let gCPy = gCPrYaw * -Math.cos(cameraManager.camYaw);
+  getRayOrigin: (mainCamera: any) => {
+    let gCPr = mainCamera.getCamDist();
+    let gCPz = gCPr * Math.sin(mainCamera.camPitch);
+    let gCPrYaw = gCPr * Math.cos(mainCamera.camPitch);
+    let gCPx = gCPrYaw * Math.sin(mainCamera.camYaw);
+    let gCPy = gCPrYaw * -Math.cos(mainCamera.camYaw);
     return [gCPx, gCPy, gCPz];
   }
 };

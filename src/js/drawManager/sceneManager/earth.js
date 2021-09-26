@@ -476,7 +476,7 @@ var updateSunCurrentDirection = function () {
   earth.lightDirection[2] = Math.sin(earth.sunvar.ob * DEG2RAD) * Math.sin(earth.sunvar.ecLon * DEG2RAD);
 };
 
-earth.draw = function (pMatrix, cameraManager, dotsManager, tgtBuffer) {
+earth.draw = function (pMatrix, mainCamera, dotsManager, tgtBuffer) {
   if (!earth.loaded) return;
   // //////////////////////////////////////////////////////////////////////
   // Draw Colored Earth First
@@ -488,14 +488,14 @@ earth.draw = function (pMatrix, cameraManager, dotsManager, tgtBuffer) {
   gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
   // Set the uniforms
-  const uZoomModifier = cameraManager.cameraType.current === cameraManager.cameraType.FixedToSat || cameraManager.panCurrent.x !== 0 || cameraManager.panCurrent.y !== 0 || cameraManager.panCurrent.z ? cameraManager.zoomLevel : 1.0;
+  const uZoomModifier = mainCamera.cameraType.current === mainCamera.cameraType.FixedToSat || mainCamera.panCurrent.x !== 0 || mainCamera.panCurrent.y !== 0 || mainCamera.panCurrent.z ? mainCamera.zoomLevel : 1.0;
 
   gl.uniform1f(earthShader.uZoomModifier, uZoomModifier);
-  gl.uniform3fv(earthShader.uCamPos, cameraManager.getForwardVector());
+  gl.uniform3fv(earthShader.uCamPos, mainCamera.getForwardVector());
   gl.uniformMatrix3fv(earthShader.uNormalMatrix, false, nMatrix);
   gl.uniformMatrix4fv(earthShader.uMvMatrix, false, mvMatrix);
   gl.uniformMatrix4fv(earthShader.uPMatrix, false, pMatrix);
-  gl.uniformMatrix4fv(earthShader.uCamMatrix, false, cameraManager.camMatrix);
+  gl.uniformMatrix4fv(earthShader.uCamMatrix, false, mainCamera.camMatrix);
   gl.uniform3fv(earthShader.uLightDirection, earth.lightDirection);
   gl.uniform3fv(earthShader.uAmbientLightColor, [0.1, 0.1, 0.1]); // RGB ambient light
   gl.uniform3fv(earthShader.uDirectionalLightColor, [1.0, 1.0, 1.0]); // RGB directional light
@@ -574,7 +574,7 @@ earth.draw = function (pMatrix, cameraManager, dotsManager, tgtBuffer) {
   // we're only going to read one
   if (!settingsManager.isMobileModeEnabled) {
     gl.enable(gl.SCISSOR_TEST);
-    gl.scissor(cameraManager.mouseX, gl.drawingBufferHeight - cameraManager.mouseY, 1, 1);
+    gl.scissor(mainCamera.mouseX, gl.drawingBufferHeight - mainCamera.mouseY, 1, 1);
   }
 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);

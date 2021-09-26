@@ -32,7 +32,7 @@ import { LineFactory, sceneManager } from '@app/js/drawManager/sceneManager/scen
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 
 import $ from 'jquery';
-import { Camera } from '@app/js/cameraManager/camera';
+import { Camera } from '@app/js/camera/camera';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
 import { Dots } from '@app/js/drawManager/dots';
 import { GroupFactory } from '@app/js/groupsManager/group-factory.js';
@@ -55,7 +55,7 @@ import { timeManager } from '@app/js/timeManager/timeManager';
 const keepTrackApi = window.keepTrackApi;
 keepTrackApi.programs = {
   adviceManager: adviceManager,
-  cameraManager: null,
+  mainCamera: null,
   ColorScheme: ColorScheme,
   drawManager: drawManager,
   mapManager: null,
@@ -90,8 +90,8 @@ export const initalizeKeepTrack = async () => {
     uiManager.onReady();
     uiManager.loadStr('dots');
     uiManager.mobileManager.init();
-    const cameraManager = new Camera();
-    keepTrackApi.programs.cameraManager = cameraManager;
+    const mainCamera = new Camera();
+    keepTrackApi.programs.mainCamera = mainCamera;
     // We need to know if we are on a small screen before starting webgl
     await drawManager.glInit();
     if (typeof process !== 'undefined') {

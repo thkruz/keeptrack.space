@@ -1,6 +1,6 @@
 // file deepcode ignore OverwriteAssignment/test: this is a test file!
 
-import * as camera from "@app/js/cameraManager/camera"
+import * as camera from "@app/js/camera/camera"
 
 import { expect } from "@jest/globals"
 import { keepTrackApi } from "@app/js/api/externalApi"

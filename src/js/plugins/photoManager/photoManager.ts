@@ -19,31 +19,31 @@ export const dscovrLoaded = (req: any): void => {
     // Hours are in EST? Daylight savings time might make this break
     let dateObj = new Date(Date.UTC(year, month - 1, day, hour - 4, min, sec));
 
-    keepTrackApi.programs.cameraManager.camSnap(keepTrackApi.programs.cameraManager.latToPitch(response[0].centroid_coordinates.lat), keepTrackApi.programs.cameraManager.longToYaw(response[0].centroid_coordinates.lon, dateObj));
-    keepTrackApi.programs.cameraManager.changeZoom(0.7);
+    keepTrackApi.programs.mainCamera.camSnap(keepTrackApi.programs.mainCamera.latToPitch(response[0].centroid_coordinates.lat), keepTrackApi.programs.mainCamera.longToYaw(response[0].centroid_coordinates.lon, dateObj));
+    keepTrackApi.programs.mainCamera.changeZoom(0.7);
 
     colorbox(`https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${imageUrl}.png`);
   }
 };
 
 export const meteosat11 = (): void => {
-  keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(40732).id, keepTrackApi.programs.cameraManager);
-  keepTrackApi.programs.cameraManager.changeZoom(0.7);
+  keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(40732).id, keepTrackApi.programs.mainCamera);
+  keepTrackApi.programs.mainCamera.changeZoom(0.7);
   colorbox(`https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_LowResolution.jpg`);
 };
 export const meteosat8 = (): void => {
-  keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(27509).id, keepTrackApi.programs.cameraManager);
-  keepTrackApi.programs.cameraManager.changeZoom(0.7);
+  keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(27509).id, keepTrackApi.programs.mainCamera);
+  keepTrackApi.programs.mainCamera.changeZoom(0.7);
   colorbox(`https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg`);
 };
 export const goes1 = (): void => {
-  keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(41866).id, keepTrackApi.programs.cameraManager);
-  keepTrackApi.programs.cameraManager.changeZoom(0.7);
+  keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(41866).id, keepTrackApi.programs.mainCamera);
+  keepTrackApi.programs.mainCamera.changeZoom(0.7);
   colorbox(`https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/latest.jpg`);
 };
 export const himawari8 = (): void => {
-  keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(40267).id, keepTrackApi.programs.cameraManager);
-  keepTrackApi.programs.cameraManager.changeZoom(0.7);
+  keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(40267).id, keepTrackApi.programs.mainCamera);
+  keepTrackApi.programs.mainCamera.changeZoom(0.7);
 
   let propTime = keepTrackApi.programs.timeManager.propTimeVar; // Propagation time minus 30 minutes so that the pictures have time to become available
   if (propTime < Date.now()) {
@@ -183,7 +183,7 @@ export const discovr = (): void => {
       console.debug('http://epic.gsfc.nasa.gov/ request failed!');
     };
 
-    keepTrackApi.programs.drawManager.selectSatManager.selectSat(-1, keepTrackApi.programs.cameraManager);
+    keepTrackApi.programs.drawManager.selectSatManager.selectSat(-1, keepTrackApi.programs.mainCamera);
     request.send();
 };
 

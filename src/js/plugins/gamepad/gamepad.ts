@@ -126,60 +126,60 @@ export const updateButtons = (buttons: readonly GamepadButton[]): void => {
 export const updateZoom = (zoomOut: number, zoomIn: number): void => {
   if (zoomOut === 0 && zoomIn === 0) return; // Not Zooming
 
-  const { cameraManager, drawManager } = keepTrackApi.programs;
-  switch (cameraManager.cameraType.current) {
-    case cameraManager.cameraType.Default:
-    case cameraManager.cameraType.Offset:    
-    case cameraManager.cameraType.FixedToSat:
-      let zoomTarget = cameraManager.zoomLevel;
+  const { mainCamera, drawManager } = keepTrackApi.programs;
+  switch (mainCamera.cameraType.current) {
+    case mainCamera.cameraType.Default:
+    case mainCamera.cameraType.Offset:    
+    case mainCamera.cameraType.FixedToSat:
+      let zoomTarget = mainCamera.zoomLevel;
       zoomTarget += (zoomOut / 500) * drawManager.dt;
       zoomTarget -= (zoomIn / 500) * drawManager.dt;
-      cameraManager.zoomTarget = zoomTarget;
-      cameraManager.camZoomSnappedOnSat = false;
-      cameraManager.isCamSnapMode = false;
+      mainCamera.zoomTarget = zoomTarget;
+      mainCamera.camZoomSnappedOnSat = false;
+      mainCamera.isCamSnapMode = false;
 
-      if (zoomTarget < cameraManager.zoomLevel) {
-        cameraManager.isZoomIn = true;
+      if (zoomTarget < mainCamera.zoomLevel) {
+        mainCamera.isZoomIn = true;
       } else {
-        cameraManager.isZoomIn = false;
+        mainCamera.isZoomIn = false;
       }
       break;
-    case cameraManager.cameraType.Fps:
-    case cameraManager.cameraType.Satellite:
-    case cameraManager.cameraType.Planetarium:
-    case cameraManager.cameraType.Astronomy:
+    case mainCamera.cameraType.Fps:
+    case mainCamera.cameraType.Satellite:
+    case mainCamera.cameraType.Planetarium:
+    case mainCamera.cameraType.Astronomy:
       if (zoomOut !== 0) {
-        cameraManager.fpsVertSpeed += (zoomOut * 2) ** 3 * drawManager.dt * settingsManager.cameraMovementSpeed;
+        mainCamera.fpsVertSpeed += (zoomOut * 2) ** 3 * drawManager.dt * settingsManager.cameraMovementSpeed;
       }
       if (zoomIn !== 0) {
-        cameraManager.fpsVertSpeed -= (zoomIn * 2) ** 3 * drawManager.dt * settingsManager.cameraMovementSpeed;
+        mainCamera.fpsVertSpeed -= (zoomIn * 2) ** 3 * drawManager.dt * settingsManager.cameraMovementSpeed;
       }
       break;
   }
 };
 
 export const updateLeftStick = (x: number, y: number): void => {
-  const { cameraManager, drawManager } = keepTrackApi.programs;
+  const { mainCamera, drawManager } = keepTrackApi.programs;
   if (x > gamepadSettings.deadzone || x < -gamepadSettings.deadzone || y > gamepadSettings.deadzone || y < -gamepadSettings.deadzone) {
-    cameraManager.autoRotate(false);
-    switch (cameraManager.cameraType.current) {
-      case cameraManager.cameraType.Default:
-      case cameraManager.cameraType.Offset:
-      case cameraManager.cameraType.FixedToSat:
-        cameraManager.camAngleSnappedOnSat = false;
-        cameraManager.isCamSnapMode = false;
-        cameraManager.camPitchSpeed -= (y ** 3 / 100) * drawManager.dt * settingsManager.cameraMovementSpeed;
-        cameraManager.camYawSpeed += (x ** 3 / 100) * drawManager.dt * settingsManager.cameraMovementSpeed;
+    mainCamera.autoRotate(false);
+    switch (mainCamera.cameraType.current) {
+      case mainCamera.cameraType.Default:
+      case mainCamera.cameraType.Offset:
+      case mainCamera.cameraType.FixedToSat:
+        mainCamera.camAngleSnappedOnSat = false;
+        mainCamera.isCamSnapMode = false;
+        mainCamera.camPitchSpeed -= (y ** 3 / 100) * drawManager.dt * settingsManager.cameraMovementSpeed;
+        mainCamera.camYawSpeed += (x ** 3 / 100) * drawManager.dt * settingsManager.cameraMovementSpeed;
         break;
-      case cameraManager.cameraType.Fps:
-      case cameraManager.cameraType.Satellite:
-      case cameraManager.cameraType.Planetarium:
-      case cameraManager.cameraType.Astronomy:
+      case mainCamera.cameraType.Fps:
+      case mainCamera.cameraType.Satellite:
+      case mainCamera.cameraType.Planetarium:
+      case mainCamera.cameraType.Astronomy:
         if (y > gamepadSettings.deadzone || y < -gamepadSettings.deadzone) {
-          cameraManager.fpsForwardSpeed = -(y ** 3) * drawManager.dt;
+          mainCamera.fpsForwardSpeed = -(y ** 3) * drawManager.dt;
         }
         if (x > gamepadSettings.deadzone || x < -gamepadSettings.deadzone) {
-          cameraManager.fpsSideSpeed = x ** 3 * drawManager.dt;
+          mainCamera.fpsSideSpeed = x ** 3 * drawManager.dt;
         }
         break;
     }
@@ -187,24 +187,24 @@ export const updateLeftStick = (x: number, y: number): void => {
 };
 
 export const updateRightStick = (x: number, y: number): void => {
-  const { cameraManager, drawManager } = keepTrackApi.programs;
-  cameraManager.isLocalRotateOverride = false;
+  const { mainCamera, drawManager } = keepTrackApi.programs;
+  mainCamera.isLocalRotateOverride = false;
   if (y > gamepadSettings.deadzone || y < -gamepadSettings.deadzone || x > gamepadSettings.deadzone || x < -gamepadSettings.deadzone) {
-    cameraManager.autoRotate(false);
-    switch (cameraManager.cameraType.current) {
-      case cameraManager.cameraType.Default:
-      case cameraManager.cameraType.Offset:
-      case cameraManager.cameraType.FixedToSat:
-        cameraManager.isLocalRotateOverride = true;
-        cameraManager.localRotateDif.pitch = -y * 200;
-        cameraManager.localRotateDif.yaw = -x * 200;
+    mainCamera.autoRotate(false);
+    switch (mainCamera.cameraType.current) {
+      case mainCamera.cameraType.Default:
+      case mainCamera.cameraType.Offset:
+      case mainCamera.cameraType.FixedToSat:
+        mainCamera.isLocalRotateOverride = true;
+        mainCamera.localRotateDif.pitch = -y * 200;
+        mainCamera.localRotateDif.yaw = -x * 200;
         break;
-      case cameraManager.cameraType.Fps:
-      case cameraManager.cameraType.Satellite:
-      case cameraManager.cameraType.Planetarium:
-      case cameraManager.cameraType.Astronomy:
-        cameraManager.camPitchSpeed += (y / 50) * drawManager.dt * settingsManager.cameraMovementSpeed;
-        cameraManager.camYawSpeed -= (x / 50) * drawManager.dt * settingsManager.cameraMovementSpeed;
+      case mainCamera.cameraType.Fps:
+      case mainCamera.cameraType.Satellite:
+      case mainCamera.cameraType.Planetarium:
+      case mainCamera.cameraType.Astronomy:
+        mainCamera.camPitchSpeed += (y / 50) * drawManager.dt * settingsManager.cameraMovementSpeed;
+        mainCamera.camYawSpeed -= (x / 50) * drawManager.dt * settingsManager.cameraMovementSpeed;
         break;
     }
   }

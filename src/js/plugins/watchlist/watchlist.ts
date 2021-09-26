@@ -63,11 +63,11 @@ export const init = (): void => {
   var infoOverlayDOM = [];
   uiManager.updateNextPassOverlay = (nextPassArray: any, isForceUpdate: any) => {
     if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
-    const cameraManager = keepTrackApi.programs.cameraManager;
+    const mainCamera = keepTrackApi.programs.mainCamera;
 
     // FIXME This should auto update the overlay when the time changes outside the original search window
     // Update once every 10 seconds
-    if ((timeManager.now > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 && objectManager.selectedSat === -1 && !cameraManager.isDragging && cameraManager.zoomLevel === cameraManager.zoomTarget) || isForceUpdate) {
+    if ((timeManager.now > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 && objectManager.selectedSat === -1 && !mainCamera.isDragging && mainCamera.zoomLevel === mainCamera.zoomTarget) || isForceUpdate) {
       var propTime = timeManager.propTime();
       infoOverlayDOM = [];
       infoOverlayDOM.push('<div>');

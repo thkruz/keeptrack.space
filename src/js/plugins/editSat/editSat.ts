@@ -277,7 +277,7 @@ export const editSatNewTleClickFadeIn = () => {
     var currentEpoch = satellite.currentEpoch(timeManager.propTime());
     mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
 
-    keepTrackApi.programs.cameraManager.isCamSnapMode = false;
+    keepTrackApi.programs.mainCamera.isCamSnapMode = false;
 
     var TLEs;
     // Ignore argument of perigee for round orbits OPTIMIZE

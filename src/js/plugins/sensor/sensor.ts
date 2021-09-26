@@ -41,7 +41,7 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'sensor',
     cb: () => {
-      const cameraManager = keepTrackApi.programs.cameraManager;
+      const mainCamera = keepTrackApi.programs.mainCamera;
 
       // Side Menu
       $('#left-menus').append(keepTrackApi.html`
@@ -577,11 +577,11 @@ export const init = (): void => {
         lat = parseFloat(<string>lat);
         lon = parseFloat(<string>lon);
         if (maxrange > 6000) {
-          cameraManager.changeZoom('geo');
+          mainCamera.changeZoom('geo');
         } else {
-          cameraManager.changeZoom('leo');
+          mainCamera.changeZoom('leo');
         }
-        cameraManager.camSnap(cameraManager.latToPitch(lat), cameraManager.longToYaw(lon, timeManager.selectedDate));
+        mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
 
         e.preventDefault();
       });

@@ -3,7 +3,7 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins/selectSatManager/selectSatManager.js';
 import { satScreenPositionArray, satSet } from '@app/js/satSet/satSet.js';
 
-import { Camera } from '@app/js/cameraManager/camera';
+import { Camera } from '@app/js/camera/camera';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { meshManager } from '@app/js/drawManager/meshManager.js';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
@@ -44,13 +44,13 @@ var drawManager = {
   },
 };
 
-let groupsManager, uiInput, starManager, satellite, ColorScheme, cameraManager, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager;
+let groupsManager, uiInput, starManager, satellite, ColorScheme, mainCamera, objectManager, orbitManager, sensorManager, uiManager, lineManager, dotsManager;
 export const init = () => {
   uiInput = keepTrackApi.programs.uiInput;
   starManager = keepTrackApi.programs.starManager;
   satellite = keepTrackApi.programs.satellite;
   ColorScheme = keepTrackApi.programs.ColorScheme;
-  cameraManager = keepTrackApi.programs.cameraManager;
+  mainCamera = keepTrackApi.programs.mainCamera;
   objectManager = keepTrackApi.programs.objectManager;
   orbitManager = keepTrackApi.programs.orbitManager;
   sensorManager = keepTrackApi.programs.sensorManager;
@@ -267,22 +267,22 @@ export const drawLoop = (preciseDt) => {
   // PERFORMANCE: 0.106 ms
   drawManager.drawOptionalScenery();
 
-  sceneManager.earth.draw(drawManager.pMatrix, cameraManager, dotsManager, postProcessingManager.curBuffer);
+  sceneManager.earth.draw(drawManager.pMatrix, mainCamera, dotsManager, postProcessingManager.curBuffer);
 
   // Update Draw Positions
   // PERFORMANCE: 0.281 ms - minor increase with stars disabled
   dotsManager.updatePositionBuffer(satSet.satData.length, satSet.orbitalSats, timeManager);
 
-  dotsManager.updatePMvCamMatrix(drawManager.pMatrix, cameraManager);
+  dotsManager.updatePMvCamMatrix(drawManager.pMatrix, mainCamera);
 
   // Draw Dots
   // PERFORMANCE: 0.6813 ms
-  dotsManager.draw(drawManager.pMatrix, cameraManager, settingsManager.currentColorScheme, postProcessingManager.curBuffer);
+  dotsManager.draw(drawManager.pMatrix, mainCamera, settingsManager.currentColorScheme, postProcessingManager.curBuffer);
 
   // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-  dotsManager.drawGpuPickingFrameBuffer(drawManager.pMatrix, cameraManager, settingsManager.currentColorScheme);
+  dotsManager.drawGpuPickingFrameBuffer(drawManager.pMatrix, mainCamera, settingsManager.currentColorScheme);
 
-  orbitManager.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
+  orbitManager.draw(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.curBuffer);
 
   lineManager.draw();
 
@@ -292,9 +292,9 @@ export const drawLoop = (preciseDt) => {
   }
 
   // Draw Satellite Model if a satellite is selected and meshManager is loaded
-  // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.Satellite) {
+  // if (!settingsManager.modelsOnSatelliteViewOverride && mainCamera.cameraType.current !== mainCamera.cameraType.Satellite) {
   if (!settingsManager.modelsOnSatelliteViewOverride && objectManager.selectedSat !== -1) {
-    meshManager.draw(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer);
+    meshManager.draw(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.curBuffer);
   }
 
   // Update orbit currently being hovered over
@@ -364,10 +364,10 @@ export const updateLoop = () => {
   drawManager.satCalculate();
 
   // Calculate camera changes needed since last draw
-  cameraManager.calculate(drawManager.dt, objectManager.selectedSat !== -1);
+  mainCamera.calculate(drawManager.dt, objectManager.selectedSat !== -1);
 
   // If in satellite view the orbit buffer needs to be updated every time
-  if (cameraManager.cameraType.current == cameraManager.cameraType.Satellite && objectManager.selectedSat !== -1) orbitManager.updateOrbitBuffer(objectManager.lastSelectedSat());
+  if (mainCamera.cameraType.current == mainCamera.cameraType.Satellite && objectManager.selectedSat !== -1) orbitManager.updateOrbitBuffer(objectManager.lastSelectedSat());
 
   sceneManager.sun.update();
 
@@ -378,7 +378,7 @@ export const updateLoop = () => {
 
   drawManager.orbitsAbove(); //drawManager.sensorPos is set here for the Camera Manager
 
-  cameraManager.update(drawManager.sat, drawManager.sensorPos);
+  mainCamera.update(drawManager.sat, drawManager.sensorPos);
   keepTrackApi.methods.updateLoop();
 };
 
@@ -387,13 +387,13 @@ export const drawOptionalScenery = () => {
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
       if (drawManager.isPostProcessingResizeNeeded) drawManager.resizePostProcessingTexture(drawManager.gl, sceneManager.sun, drawManager.postProcessingManager);
       // Draw the Sun to the Godrays Frame Buffer
-      sceneManager.sun.draw(drawManager.pMatrix, cameraManager.camMatrix, sceneManager.sun.godraysFrameBuffer);
+      sceneManager.sun.draw(drawManager.pMatrix, mainCamera.camMatrix, sceneManager.sun.godraysFrameBuffer);
 
       // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
-      sceneManager.earth.drawOcclusion(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
-      // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.Satellite) {
+      sceneManager.earth.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
+      // if (!settingsManager.modelsOnSatelliteViewOverride && mainCamera.cameraType.current !== mainCamera.cameraType.Satellite) {
       if (!settingsManager.modelsOnSatelliteViewOverride && objectManager.selectedSat !== -1) {
-        meshManager.drawOcclusion(drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
+        meshManager.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
       }
       // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
       // todo: this should be a dynamic buffer not hardcoded to bufffer two
@@ -410,7 +410,7 @@ export const drawOptionalScenery = () => {
       // postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
 
       // Draw the moon
-      sceneManager.moon.draw(drawManager.pMatrix, cameraManager.camMatrix);
+      sceneManager.moon.draw(drawManager.pMatrix, mainCamera.camMatrix);
 
       keepTrackApi.methods.drawOptionalScenery();
     }
@@ -425,7 +425,7 @@ export const satCalculate = () => {
     if (typeof drawManager.sat === 'undefined') return;
 
     if (!drawManager.sat.static) {
-      cameraManager.snapToSat(drawManager.sat);
+      mainCamera.snapToSat(drawManager.sat);
 
       // if (drawManager.sat.missile || typeof meshManager == 'undefined') {
       //   settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0];
@@ -433,7 +433,7 @@ export const satCalculate = () => {
       //   settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
       // }
 
-      // if (!settingsManager.modelsOnSatelliteViewOverride && cameraManager.cameraType.current !== cameraManager.cameraType.Satellite) {
+      // if (!settingsManager.modelsOnSatelliteViewOverride && mainCamera.cameraType.current !== mainCamera.cameraType.Satellite) {
     }
     if (drawManager.sat.missile) orbitManager.setSelectOrbit(drawManager.sat.satId);
   } else {
@@ -441,7 +441,7 @@ export const satCalculate = () => {
     drawManager.sat = { id: -1 };
   }
   try {
-    meshManager.update(Camera, cameraManager, timeManager, drawManager.sat);
+    meshManager.update(Camera, mainCamera, timeManager, drawManager.sat);
   } catch {
     // Don't Let meshManager break everything
   }
@@ -449,7 +449,7 @@ export const satCalculate = () => {
     if (objectManager.selectedSat === -1 && !isselectedSatNegativeOne) {
       orbitManager.clearSelectOrbit();
     }
-    selectSatManager.selectSat(objectManager.selectedSat, cameraManager);
+    selectSatManager.selectSat(objectManager.selectedSat, mainCamera);
     if (objectManager.selectedSat !== -1) {
       orbitManager.setSelectOrbit(objectManager.selectedSat);
       if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
@@ -530,7 +530,7 @@ export const watermarkedDataUrl = (canvas, text) => {
 };
 
 export const orbitsAbove = () => {
-  if (cameraManager.cameraType.current == cameraManager.cameraType.Astronomy || cameraManager.cameraType.current == cameraManager.cameraType.Planetarium) {
+  if (mainCamera.cameraType.current == mainCamera.cameraType.Astronomy || mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {
     drawManager.sensorPos = satellite.calculateSensorPos(sensorManager.currentSensor);
     if (!drawManager.isDrawOrbitsAbove) {
       // Don't do this until the scene is redrawn with a new camera or thousands of satellites will
@@ -539,7 +539,7 @@ export const orbitsAbove = () => {
       return;
     }
     // Previously called showOrbitsAbove();
-    if (!settingsManager.isSatLabelModeOn || cameraManager.cameraType.current !== cameraManager.cameraType.Planetarium) {
+    if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
       if (isSatMiniBoxInUse) {
         hoverBoxOnSatMiniElements = document.getElementById('sat-minibox');
         hoverBoxOnSatMiniElements.innerHTML = '';
@@ -574,7 +574,7 @@ export const orbitsAbove = () => {
       if (sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
       if (sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
 
-      satSet.getScreenCoords(i, drawManager.pMatrix, cameraManager.camMatrix, postProcessingManager.curBuffer, sat.position);
+      satSet.getScreenCoords(i, drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.curBuffer, sat.position);
       if (satScreenPositionArray.error) continue;
       if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
       if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
@@ -606,7 +606,7 @@ export const orbitsAbove = () => {
   }
 
   // Hide satMiniBoxes When Not in Use
-  if (!settingsManager.isSatLabelModeOn || cameraManager.cameraType.current !== cameraManager.cameraType.Planetarium) {
+  if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
     if (isSatMiniBoxInUse) {
       satMiniBox.innerHTML = '';
     }
@@ -627,8 +627,8 @@ export const updateHover = () => {
   }
   if (!settingsManager.disableUI && uiManager.searchBox.isHovering()) {
     updateHoverSatId = uiManager.searchBox.getHoverSat();
-    satSet.getScreenCoords(updateHoverSatId, drawManager.pMatrix, cameraManager.camMatrix);
-    // if (!cameraManager.earthHitTest(gl, pickColorBuf, satScreenPositionArray.x, satScreenPositionArray.y)) {
+    satSet.getScreenCoords(updateHoverSatId, drawManager.pMatrix, mainCamera.camMatrix);
+    // if (!mainCamera.earthHitTest(gl, pickColorBuf, satScreenPositionArray.x, satScreenPositionArray.y)) {
     try {
       drawManager.hoverBoxOnSat(updateHoverSatId, satScreenPositionArray.x, satScreenPositionArray.y);
     } catch (e) {
@@ -651,13 +651,13 @@ export const updateHover = () => {
       if (updateHoverDelayLimit > 0) --updateHoverDelayLimit;
     }
 
-    if (cameraManager.isDragging || settingsManager.isMobileModeEnabled) {
+    if (mainCamera.isDragging || settingsManager.isMobileModeEnabled) {
       return;
     }
 
     if (++updateHoverDelay >= updateHoverDelayLimit) {
       updateHoverDelay = 0;
-      uiInput.mouseSat = uiInput.getSatIdFromCoord(cameraManager.mouseX, cameraManager.mouseY);
+      uiInput.mouseSat = uiInput.getSatIdFromCoord(mainCamera.mouseX, mainCamera.mouseY);
     }
 
     if (settingsManager.enableHoverOrbits) {
@@ -669,7 +669,7 @@ export const updateHover = () => {
       satSet.setHover(uiInput.mouseSat);
     }
     if (settingsManager.enableHoverOverlay) {
-      drawManager.hoverBoxOnSat(uiInput.mouseSat, cameraManager.mouseX, cameraManager.mouseY);
+      drawManager.hoverBoxOnSat(uiInput.mouseSat, mainCamera.mouseX, mainCamera.mouseY);
     }
   }
 };
@@ -679,7 +679,7 @@ export const hoverBoxOnSat = (satId, satX, satY) => {
 
   const { starManager } = keepTrackApi.programs;
 
-  if (cameraManager.cameraType.current === cameraManager.cameraType.Planetarium && !settingsManager.isDemoModeOn) {
+  if (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && !settingsManager.isDemoModeOn) {
     satHoverBoxDOM.style.display = 'none';
     if (satId === -1) {
       drawManager.canvas.style.cursor = 'default';
@@ -697,7 +697,7 @@ export const hoverBoxOnSat = (satId, satX, satY) => {
     satHoverBoxDOM.style.display = 'none';
     drawManager.canvas.style.cursor = 'default';
     isHoverBoxVisible = false;
-  } else if (!cameraManager.isDragging && settingsManager.enableHoverOverlay) {
+  } else if (!mainCamera.isDragging && settingsManager.enableHoverOverlay) {
     var sat = satSet.getSatExtraOnly(satId);
     isHoverBoxVisible = true;
 
@@ -880,7 +880,7 @@ export const demoMode = () => {
       if (drawManager.sat.OT === 2 && ColorScheme.objectTypeFlags.rocketBody === false) continue;
       if (drawManager.sat.OT === 3 && ColorScheme.objectTypeFlags.debris === false) continue;
       if (drawManager.sat.inview && ColorScheme.objectTypeFlags.inFOV === false) continue;
-      satSet.getScreenCoords(drawManager.i, drawManager.pMatrix, cameraManager.camMatrix);
+      satSet.getScreenCoords(drawManager.i, drawManager.pMatrix, mainCamera.camMatrix);
       if (satScreenPositionArray.error) continue;
       if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
       if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
@@ -895,7 +895,7 @@ export const demoMode = () => {
 };
 
 export const checkIfPostProcessingRequired = () => {
-  // if (cameraManager.camPitchAccel > 0.0002 || cameraManager.camPitchAccel < -0.0002 || cameraManager.camYawAccel > 0.0002 || cameraManager.camYawAccel < -0.0002) {
+  // if (mainCamera.camPitchAccel > 0.0002 || mainCamera.camPitchAccel < -0.0002 || mainCamera.camYawAccel > 0.0002 || mainCamera.camYawAccel < -0.0002) {
   //   // drawManager.gaussianAmt += drawManager.dt * 2;
   //   // drawManager.gaussianAmt = Math.min(500, Math.max(drawManager.gaussianAmt, 0));
   //   drawManager.gaussianAmt = 500;

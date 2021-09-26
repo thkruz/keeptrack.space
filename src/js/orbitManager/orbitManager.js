@@ -64,7 +64,7 @@ orbitManager.shader = {
     `,
 };
 
-let gl, cameraManager, groupsManager;
+let gl, mainCamera, groupsManager;
 orbitManager.init = function () {
   // See if we are running jest right now for testing
   if (typeof process !== 'undefined') {
@@ -100,7 +100,7 @@ orbitManager.init = function () {
   };
 
   gl = keepTrackApi.programs.drawManager.gl;
-  cameraManager = keepTrackApi.programs.cameraManager;
+  mainCamera = keepTrackApi.programs.mainCamera;
   groupsManager = keepTrackApi.programs.groupsManager;
 
   var vs = gl.createShader(gl.VERTEX_SHADER);
@@ -295,7 +295,7 @@ orbitManager.draw = function (pMatrix, camMatrix, tgtBuffer) {
 
   if (currentInView.length >= 1) {
     // There might be some z-fighting
-    if (cameraManager.cameraType.current == cameraManager.cameraType.Planetarium) {
+    if (mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {
       gl.uniform4fv(pathShader.uColor, settingsManager.orbitPlanetariumColor);
     } else {
       gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);

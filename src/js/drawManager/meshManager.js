@@ -326,7 +326,7 @@ meshManager.updateNadirYaw = (Camera, sat, timeManager) => {
   meshManager.currentModel.nadirYaw = Camera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
 };
 
-meshManager.update = (Camera, cameraManager, timeManager, sat = { id: -1, static: false }) => {
+meshManager.update = (Camera, mainCamera, timeManager, sat = { id: -1, static: false }) => {
   meshManager.currentModel.id = sat.id;
   meshManager.currentModel.static = sat.static;
 

@@ -77,12 +77,12 @@ var parseFromGETVariables = () => {
   }
 };
 
-let dotManager, gl, cameraManager;
+let dotManager, gl, mainCamera;
 satSet.init = async () => {
   window.satSet = satSet;
   gl = keepTrackApi.programs.drawManager.gl;
   dotManager = keepTrackApi.programs.dotsManager;
-  cameraManager = keepTrackApi.programs.cameraManager;
+  mainCamera = keepTrackApi.programs.mainCamera;
   /** Parses GET variables for Possible sharperShaders */
   parseFromGETVariables();
 
@@ -110,13 +110,13 @@ satSet.init = async () => {
       }
     }
   }
-  addSatCruncherOnMessage(cameraManager);
+  addSatCruncherOnMessage(mainCamera);
 
   satSet.satCruncher = satCruncher;
   // satSet.radarDataManager = radarDataManager;
 };
 
-var addSatCruncherOnMessage = (cameraManager) => {
+var addSatCruncherOnMessage = (mainCamera) => {
   satCruncher.onmessage = (m) => {
     if (!gotExtraData && m.data?.extraData) {
       // store extra data that comes from crunching
@@ -214,7 +214,7 @@ var addSatCruncherOnMessage = (cameraManager) => {
     // Don't force color recalc if default colors and no sensor for inview color
     if ((objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) || settingsManager.isForceColorScheme) {
       // Don't change colors while dragging
-      if (!cameraManager.isDragging) {
+      if (!mainCamera.isDragging) {
         satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
       }
     }

@@ -50,7 +50,7 @@ test('UI Input Validation Test', () => {
   mouseEvt('mouseup', { button: 1 }, null);
   mouseEvt('mousedown', { button: 2 }, null);
   mouseEvt('mouseup', { button: 2 }, null);
-  keepTrackApi.programs.cameraManager.isShiftPressed = true;
+  keepTrackApi.programs.mainCamera.isShiftPressed = true;
   uiInput.init();
   mouseEvt('mousedown', { button: 1 }, null);
   mouseEvt('mouseup', { button: 1 }, null);

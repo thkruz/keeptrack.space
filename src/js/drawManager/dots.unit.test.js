@@ -17,18 +17,18 @@ test(`Dots Unit Testing`, () => {
   dotManager.drawGpuPickingFrameBuffer({}, {}, {});
   settingsManager.cruncherReady = true;
   dotManager.loaded = true;
-  const cameraManager = {
+  const mainCamera = {
     cameraType: {
       current: 0,
       planetarium: 1,
     },
     camMatrix: [0, 0, 0, 0],
   };
-  dotManager.draw({}, cameraManager, {}, {});
+  dotManager.draw({}, mainCamera, {}, {});
   dotManager.drawGpuPickingFrameBuffer({}, {}, {});
 
-  cameraManager.cameraType.current = cameraManager.cameraType.Planetarium;
-  dotManager.draw({}, cameraManager, {}, {});
+  mainCamera.cameraType.current = mainCamera.cameraType.Planetarium;
+  dotManager.draw({}, mainCamera, {}, {});
 
   dotManager.setupPickingBuffer([0, 1, 2, 3]);
 
@@ -64,7 +64,7 @@ test(`Dots Unit Testing`, () => {
   settingsManager.maxRadarData = 1;
   dotManager.updatePositionBuffer(10, 1, timeManager);
 
-  dotManager.updatePMvCamMatrix([0, 0, 0, 0], cameraManager);
+  dotManager.updatePMvCamMatrix([0, 0, 0, 0], mainCamera);
 
   expect(true).toBe(true);
 });

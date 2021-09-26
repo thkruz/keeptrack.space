@@ -64,13 +64,13 @@ uiManager.searchBox = searchBox;
 uiManager.mobileManager = mobileManager;
 uiManager.isCurrentlyTyping = false;
 
-let cameraManager, lineManager, starManager;
+let mainCamera, lineManager, starManager;
 uiManager.init = () => {
   if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
     // Pass the references through to the limited UI
     uiLimited.init(keepTrackApi.programs.satSet, keepTrackApi.programs.orbitManager, keepTrackApi.programs.groupsManager, keepTrackApi.programs.ColorScheme);
   }
-  cameraManager = keepTrackApi.programs.cameraManager;
+  mainCamera = keepTrackApi.programs.mainCamera;
   lineManager = keepTrackApi.programs.lineManager;
   starManager = keepTrackApi.programs.starManager;
 
@@ -220,33 +220,33 @@ uiManager.keyHandler = (evt) => {
   // console.log(Number(evt.charCode));
   switch (evt.key.toUpperCase()) {
     case 'R':
-      cameraManager.autoRotate();
+      mainCamera.autoRotate();
       break;
     case 'C':
-      cameraManager.changeCameraType(orbitManager, drawManager, objectManager, sensorManager);
+      mainCamera.changeCameraType(orbitManager, drawManager, objectManager, sensorManager);
 
-      switch (cameraManager.cameraType.current) {
-        case cameraManager.cameraType.Default:
+      switch (mainCamera.cameraType.current) {
+        case mainCamera.cameraType.Default:
           uiManager.toast('Earth Centered Camera Mode', 'standby');
-          cameraManager.zoomTarget = 0.5;
+          mainCamera.zoomTarget = 0.5;
           break;
-        case cameraManager.cameraType.Offset:
+        case mainCamera.cameraType.Offset:
           uiManager.toast('Offset Camera Mode', 'standby');
           break;
-        case cameraManager.cameraType.Fps:
+        case mainCamera.cameraType.Fps:
           uiManager.toast('Free Camera Mode', 'standby');
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
-        case cameraManager.cameraType.Planetarium:
+        case mainCamera.cameraType.Planetarium:
           uiManager.toast('Planetarium Camera Mode', 'standby');
           uiManager.legendMenuChange('planetarium');
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
-        case cameraManager.cameraType.Satellite:
+        case mainCamera.cameraType.Satellite:
           uiManager.toast('Satellite Camera Mode', 'standby');
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
-        case cameraManager.cameraType.Astronomy:
+        case mainCamera.cameraType.Astronomy:
           uiManager.toast('Astronomy Camera Mode', 'standby');
           uiManager.legendMenuChange('astronomy');
           $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
@@ -256,18 +256,18 @@ uiManager.keyHandler = (evt) => {
     // Open the search bar for faster searching
     // TODO: What if it isn't available?
     case 'F':
-      if (cameraManager.isShiftPressed) {
+      if (mainCamera.isShiftPressed) {
         evt.preventDefault();
         uiManager.searchToggle(true);
         $('#search').trigger('focus');
-        cameraManager.isShiftPressed = false;
+        mainCamera.isShiftPressed = false;
       }
       break;
     // Hide the UI
     case 'H':
-      if (cameraManager.isShiftPressed) {
+      if (mainCamera.isShiftPressed) {
         uiManager.hideUi();
-        cameraManager.isShiftPressed = false;
+        mainCamera.isShiftPressed = false;
       }
       break;
   }
@@ -514,11 +514,11 @@ uiManager.useCurrentGeolocationAsSensor = function () {
       lat = lat * 1;
       lon = lon * 1;
       if (maxrange > 6000) {
-        cameraManager.changeZoom('geo');
+        mainCamera.changeZoom('geo');
       } else {
-        cameraManager.changeZoom('leo');
+        mainCamera.changeZoom('leo');
       }
-      cameraManager.camSnap(cameraManager.latToPitch(lat), cameraManager.longToYaw(lon, timeManager.selectedDate));
+      mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
     });
   }
 };
@@ -753,7 +753,7 @@ uiManager.updateURL = () => {
 };
 
 uiManager.lookAtLatLon = () => {
-  cameraManager.lookAtLatLon(sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, sensorManager.selectedSensor.zoom, timeManager.selectedDate);
+  mainCamera.lookAtLatLon(sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, sensorManager.selectedSensor.zoom, timeManager.selectedDate);
 };
 
 uiManager.reloadLastSensor = () => {
@@ -911,12 +911,12 @@ uiManager.panToStar = function (c) {
   }
 
   lineManager.create('ref', [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
-  cameraManager.cameraType.current = cameraManager.cameraType.Offset;
+  mainCamera.cameraType.current = mainCamera.cameraType.Offset;
   console.log(sat);
   // ======================================================
   // Need to calculate the time to get the right RA offset
   // ======================================================
-  cameraManager.camSnap(cameraManager.latToPitch(sat.dec) * -1, cameraManager.longToYaw(sat.ra * DEG2RAD, timeManager.selectedDate));
+  mainCamera.camSnap(mainCamera.latToPitch(sat.dec) * -1, mainCamera.longToYaw(sat.ra * DEG2RAD, timeManager.selectedDate));
   setTimeout(function () {
     // console.log(`pitch ${camPitch * RAD2DEG} -- yaw ${camYaw * RAD2DEG}`);
   }, 2000);

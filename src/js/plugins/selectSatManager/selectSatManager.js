@@ -8,7 +8,7 @@ const selectSatManager = {
     // Nothing yet
   },
 
-  selectSat: (satId, cameraManager) => {
+  selectSat: (satId, mainCamera) => {
     const settingsManager = window.settingsManager;
     const objectManager = keepTrackApi.programs.objectManager;
     const satSet = keepTrackApi.programs.satSet;
@@ -25,10 +25,10 @@ const selectSatManager = {
       // Selecting a non-missile non-sensor object does nothing
       if ((sat.active == false || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') return;
       // stop rotation if it is on
-      cameraManager.autoRotate(false);
+      mainCamera.autoRotate(false);
     }
 
-    cameraManager.isCamSnapMode = false;
+    mainCamera.isCamSnapMode = false;
     // Don't select -1 twice
     if (!(satId === -1 && isselectedSatNegativeOne)) {
       satSet.selectSat(satId);
@@ -51,7 +51,7 @@ const selectSatManager = {
 
     // If we deselect an object but had previously selected one then disable/hide stuff
     if (satId === -1 && !isselectedSatNegativeOne) {
-      cameraManager.fts2default();
+      mainCamera.fts2default();
       isselectedSatNegativeOne = true;
 
       $('#sat-infobox').fadeOut();
@@ -71,13 +71,13 @@ const selectSatManager = {
         }
       }
     } else if (satId !== -1) {
-      if (cameraManager.cameraType.current == cameraManager.cameraType.Default) {
-        cameraManager.ecLastZoom = cameraManager.zoomLevel;
+      if (mainCamera.cameraType.current == mainCamera.cameraType.Default) {
+        mainCamera.ecLastZoom = mainCamera.zoomLevel;
         if (!sat.static) {
-          cameraManager.cameraType.set(cameraManager.cameraType.FixedToSat);
+          mainCamera.cameraType.set(mainCamera.cameraType.FixedToSat);
         } else if (typeof sat.staticNum !== 'undefined') {
           sensorManager.setSensor(null, sat.staticNum);
-          cameraManager.lookAtLatLon(sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, sensorManager.selectedSensor.zoom, keepTrackApi.programs.timeManager.selectedDate);
+          mainCamera.lookAtLatLon(sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, sensorManager.selectedSensor.zoom, keepTrackApi.programs.timeManager.selectedDate);
         }
       }
       isselectedSatNegativeOne = false;
@@ -106,8 +106,8 @@ const selectSatManager = {
         }
         return;
       }
-      cameraManager.camZoomSnappedOnSat = true;
-      cameraManager.camAngleSnappedOnSat = true;
+      mainCamera.camZoomSnappedOnSat = true;
+      mainCamera.camAngleSnappedOnSat = true;
 
       if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
         $('#menu-lookangles').removeClass('bmenu-item-disabled');
@@ -125,7 +125,7 @@ const selectSatManager = {
           if (typeof $('#search').val() !== 'undefined' && $('#search').val().length > 0) {
             $('#search-results').attr('style', 'display:block; max-height:27%');
           }
-          if (cameraManager.cameraType.current !== cameraManager.cameraType.Planetarium) {
+          if (mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
             // Unclear why this was needed...
             // uiManager.legendMenuChange('default')
           }
@@ -137,7 +137,7 @@ const selectSatManager = {
               $('#search-results').attr('style', 'display:block; max-height:auto');
             }
           }
-          if (cameraManager.cameraType.current !== cameraManager.cameraType.Planetarium) {
+          if (mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
             // Unclear why this was needed...
             // uiManager.legendMenuChange('default')
           }

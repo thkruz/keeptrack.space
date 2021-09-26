@@ -222,13 +222,13 @@ export const stfFormOnSubmit = (e: Event) => {
 
   keepTrackApi.programs.sensorFov.enableFovView();
 
-  const cameraManager = keepTrackApi.programs.cameraManager;
+  const mainCamera = keepTrackApi.programs.mainCamera;
   if (maxrange > 6000) {
-    cameraManager.changeZoom('geo');
+    mainCamera.changeZoom('geo');
   } else {
-    cameraManager.changeZoom('leo');
+    mainCamera.changeZoom('leo');
   }
-  cameraManager.camSnap(cameraManager.latToPitch(lat), cameraManager.longToYaw(lon, timeManager.selectedDate));
+  mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
 };
 
 export const stfOnObjectLinkClick = () => {

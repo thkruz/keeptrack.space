@@ -446,7 +446,7 @@ export class Camera {
     this.isCamSnapMode = true;
   }
 
-  camSnapToSat(sat) {
+  snapToSat(sat) {
     /* this function runs every frame that a satellite is selected.
     However, the user might have broken out of the zoom snap or angle snap.
     If so, don't change those targets. */

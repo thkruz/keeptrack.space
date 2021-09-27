@@ -1012,9 +1012,13 @@ export class Camera {
 
       // Ensure we don't zoom in past our satellite
       if (this.cameraType.current == this.cameraType.FixedToSat) {
-        if (this.getCamDist() < target.getAltitude() + RADIUS_OF_EARTH + 30) {
-          this._zoomTarget = this.alt2zoom(target.getAltitude());
-          this._zoomLevel = this._zoomTarget;
+        if (target.id === -1) {
+          this.cameraType.current = this.cameraType.Default;
+        } else {
+          if (typeof target.getAltitude !== 'undefined' && this.getCamDist() < target.getAltitude() + RADIUS_OF_EARTH + 30) {
+            this._zoomTarget = this.alt2zoom(target.getAltitude());
+            this._zoomLevel = this._zoomTarget;
+          }
         }
       }      
 

@@ -28,7 +28,7 @@
 
 import '@app/js/api/externalApi';
 
-import { LineFactory, sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
+import { LineFactory, sceneManager } from '@app/js/drawManager/sceneManager/sceneManager';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager.js';
 
 import $ from 'jquery';

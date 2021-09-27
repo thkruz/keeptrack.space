@@ -18,18 +18,13 @@
  */
 
 // This file should contain all of the webgl code for generating non .obj meshes
-import * as glm from '@app/js/lib/external/gl-matrix.js';
-
 import { LineFactory } from './line-factory.js';
-import { Moon } from './moon.js';
 import { earth } from './earth.js';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { sun } from './sun.js';
+import { moon } from './moon';
+import { sun } from './sun';
 
 const sceneManager = {
-  classes: {
-    Moon: Moon,
-  },
+  moon: moon,
   earth: earth,
   sun: sun,
 };

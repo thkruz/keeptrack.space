@@ -30,7 +30,7 @@ describe('drawManager.checkIfPostProcessingRequired', () => {
 describe('drawManager.resizePostProcessingTexture', () => {
   test('0', () => {
     let callFunction = () => {
-      drawManager.resizePostProcessingTexture({}, { setupGodrays: () => {} }, { init: () => {} });
+      drawManager.resizePostProcessingTexture({}, { initGodrays: () => {} }, { init: () => {} });
     };
 
     expect(callFunction).not.toThrow();
@@ -46,7 +46,7 @@ describe('drawManager.resizePostProcessingTexture', () => {
 
   test('2', () => {
     let callFunction = () => {
-      drawManager.resizePostProcessingTexture({}, { setupGodrays: () => {} }, null);
+      drawManager.resizePostProcessingTexture({}, { initGodrays: () => {} }, null);
     };
 
     expect(callFunction).toThrow();

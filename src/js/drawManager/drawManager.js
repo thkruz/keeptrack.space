@@ -7,7 +7,7 @@ import { keepTrackApi } from '@app/js/api/externalApi';
 import { meshManager } from '@app/js/drawManager/meshManager.js';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
 import { satSet } from '@app/js/satSet/satSet';
-import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager.js';
+import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 
 let satHoverBoxNode1;
@@ -155,8 +155,8 @@ export const loadScene = async () => {
     sceneManager.earth.loadHiResNight();
     meshManager.init(gl, sceneManager.earth);
     keepTrackApi.methods.drawManagerLoadScene();
-    await sceneManager.sun.init(gl, sceneManager.earth, timeManager);
-    sceneManager.moon = new sceneManager.classes.Moon(gl, sceneManager.sun);
+    await sceneManager.sun.init();
+    await sceneManager.moon.init();
   } catch (error) {
     console.error(error);
   }
@@ -231,7 +231,7 @@ export const startWithOrbits = async () => {
 
 export const drawLoop = (preciseDt) => {
   // Restart the draw loop when ready to draw again
-  requestAnimationFrame(drawManager.drawLoop);
+  requestAnimationFrame(drawLoop);
   // if (drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) return;
 
   // Record milliseconds since last drawLoop - default is 0
@@ -261,7 +261,7 @@ export const drawLoop = (preciseDt) => {
   // Actually draw things now that math is done
   // PERFORMANCE: 0.0337ms
   // drawManager.resizeCanvas();
-  drawManager.clearFrameBuffers(drawManager.gl, dotsManager.pickingFrameBuffer, sceneManager.sun.godraysFrameBuffer);
+  drawManager.clearFrameBuffers(drawManager.gl, dotsManager.pickingFrameBuffer, sceneManager.sun.godrays.frameBuffer);
 
   // Sun, and Moon
   // PERFORMANCE: 0.106 ms
@@ -326,12 +326,12 @@ export const drawLoop = (preciseDt) => {
     if (postProcessingManager.isSmaaNeeded) {
       // Reuse godrays frame buffer to reduce GPU Memory Requirements
       // Clear it first
-      gl.bindFramebuffer(gl.FRAMEBUFFER, sceneManager.sun.godraysFrameBuffer);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, sceneManager.sun.godrays.frameBuffer);
       gl.clearColor(0.0, 0.0, 0.0, 0.0);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
       // postProcessingManager.switchFrameBuffer();
-      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.hdr, postProcessingManager.curBuffer, sceneManager.sun.godraysFrameBuffer);
+      postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.hdr, postProcessingManager.curBuffer, sceneManager.sun.godrays.frameBuffer);
 
       // Load input into edges
       postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.smaaEdges, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
@@ -374,7 +374,7 @@ export const updateLoop = () => {
   // Update Earth Direction
   sceneManager.earth.update();
 
-  satSet.sunECI = sceneManager.sun.realXyz;
+  satSet.sunECI = sceneManager.sun.eci;
 
   drawManager.orbitsAbove(); //drawManager.sensorPos is set here for the Camera Manager
 
@@ -387,18 +387,18 @@ export const drawOptionalScenery = () => {
     if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
       if (drawManager.isPostProcessingResizeNeeded) drawManager.resizePostProcessingTexture(drawManager.gl, sceneManager.sun, drawManager.postProcessingManager);
       // Draw the Sun to the Godrays Frame Buffer
-      sceneManager.sun.draw(drawManager.pMatrix, mainCamera.camMatrix, sceneManager.sun.godraysFrameBuffer);
+      sceneManager.sun.draw(drawManager.pMatrix, mainCamera.camMatrix, sceneManager.sun.godrays.frameBuffer);
 
       // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
-      sceneManager.earth.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
+      sceneManager.earth.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godrays.frameBuffer);
       // if (!settingsManager.modelsOnSatelliteViewOverride && mainCamera.cameraType.current !== mainCamera.cameraType.Satellite) {
       if (!settingsManager.modelsOnSatelliteViewOverride && objectManager.selectedSat !== -1) {
-        meshManager.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godraysFrameBuffer);
+        meshManager.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.programs.occlusion, sceneManager.sun.godrays.frameBuffer);
       }
       // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
       // todo: this should be a dynamic buffer not hardcoded to bufffer two
       postProcessingManager.curBuffer = null;
-      sceneManager.sun.godraysPostProcessing(gl, postProcessingManager.curBuffer);
+      sceneManager.sun.drawGodrays(gl, postProcessingManager.curBuffer);
 
       // Apply two pass gaussian blur to the godrays to smooth them out
       // postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
@@ -854,7 +854,7 @@ export const resizePostProcessingTexture = (gl, sun, postProcessingManager) => {
   if (typeof postProcessingManager === 'undefined' || postProcessingManager === null) throw new Error('postProcessingManager is undefined or null');
 
   // Post Processing Texture Needs Scaled
-  sun.setupGodrays(gl);
+  sun.initGodrays(gl);
   postProcessingManager.init(gl);
 
   // Reset Flag now that textures are reinitialized
@@ -955,7 +955,7 @@ export const clearFrameBuffers = (gl, pickFb, godFb) => {
   if (drawManager.isNeedPostProcessing) {
     postProcessingManager.clearAll();
   }
-  // Clear the godraysPostProcessing Frame Buffer
+  // Clear the godrays Frame Buffer
   gl.bindFramebuffer(gl.FRAMEBUFFER, godFb);
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

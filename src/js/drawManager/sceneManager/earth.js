@@ -605,7 +605,7 @@ earth.drawOcclusion = function (pMatrix, camMatrix, occlusionPrgm, tgtBuffer) {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
   gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 
-  occlusionPrgm.attrOff(occlusionPrgm);
+  // occlusionPrgm.attrOff(occlusionPrgm);
 };
 
 export { earth };

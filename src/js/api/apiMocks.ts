@@ -154,6 +154,16 @@ export const keepTrackApiStubs = {
       selectSatManager: {
         selectSat: jest.fn(),
       },
+      sceneManager: {
+        sun: {
+          godrays: {
+            frameBuffer: {},
+          }
+        },
+        earth: {
+          lightDirection: [0,0,0],
+        },
+      }
     },    
     dotsManager: {
       starIndex1: 0,
@@ -289,10 +299,13 @@ export const keepTrackApiStubs = {
     },
     timeManager: {
       propOffset: 0,
+      propTimeVar: new Date(),
       propRate: 0,
       selectedDate: 0,
       propTime: () => 0,
       getDayOfYear: () => 0,
+      updatePropTime: jest.fn(),
+      jday: () => 0,
     },
     uiManager: {
       hideSideMenus: jest.fn(),

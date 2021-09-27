@@ -489,8 +489,9 @@ pPM.shaderCode = {
               uniform mat4 uPMatrix;
       
               void main(void) {
-              vec4 position = uPMatrix * uCamMatrix *  uMvMatrix * vec4(a_position, 1.0);
-              gl_Position = position;
+                float scale = 0.95;
+                mat4 scaleMatrix = mat4(vec4(scale, 0.0, 0.0, 0.0),vec4(0.0, scale, 0.0, 0.0),vec4(0.0, 0.0, scale, 0.0),vec4(0.0, 0.0, 0.0, 1.0));
+                gl_Position = uPMatrix * uCamMatrix *  uMvMatrix * scaleMatrix * vec4(a_position, 1.0);
               }
           `,
     frag: `#version 300 es

@@ -156,6 +156,10 @@ export const keepTrackApiStubs = {
       },
       sceneManager: {
         sun: {
+          pos: [0,0,0],
+          sunvar: {
+            gmst: 0,
+          },
           godrays: {
             frameBuffer: {},
           }

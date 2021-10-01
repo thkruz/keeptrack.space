@@ -51,18 +51,7 @@ export const initProgram = (gl: WebGL2RenderingContext) => {
 export const initTextures = (gl: WebGL2RenderingContext) => {
   moon.textureMap.texture = gl.createTexture();
   moon.textureMap.img = new Image();
-  moon.textureMap.img.onload = function () {
-    gl.bindTexture(gl.TEXTURE_2D, moon.textureMap.texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, moon.textureMap.img);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-
-    moon.textureMap.isReady = true;
-  };
+  moon.textureMap.img.onload = function () { onTextureLoaded(gl) };
   moon.textureMap.img.src = moon.textureMap.src;
 };
 export const initBuffers = (gl: WebGL2RenderingContext) => {
@@ -344,11 +333,23 @@ export const moon = {
   init: init,
   update: update,
   draw: draw,
-  eci: {x: 0, y: 0, z: 0 },
-  rae: {azimuth: 0, altitude: 0, distance: 0 },
+  eci: { x: 0, y: 0, z: 0 },
+  rae: { azimuth: 0, altitude: 0, distance: 0 },
   positionModifier: { x: 0, y: 0, z: 0 },
   drawPosition: [0, 0, 0],
   pos: [0, 0, 0],
   now: new Date(),
   isLoaded: false,
+};
+export const onTextureLoaded = (gl: WebGL2RenderingContext): any => {
+  gl.bindTexture(gl.TEXTURE_2D, moon.textureMap.texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, moon.textureMap.img);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+
+  moon.textureMap.isReady = true;
 };

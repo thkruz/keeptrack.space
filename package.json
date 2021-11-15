@@ -159,7 +159,7 @@
     "imports-loader": "^3.0.0",
     "jest": "^27.0.6",
     "jest-canvas-mock": "^2.3.1",
-    "jsdom": "^16.4.0",
+    "jsdom": "^18.1.0",
     "jsdom-worker": "^0.2.1",
     "mkdirp": "^1.0.4",
     "nyc": "^15.1.0",

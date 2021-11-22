@@ -23,11 +23,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-
+import { keepTrackApi } from '@app/js/api/externalApi';
+import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { saveAs, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
-import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 let watchlistList: any[] = [];
 let watchlistInViewList: boolean[] = [];
@@ -38,8 +37,8 @@ let nextPassArray: any = [];
 let isInfoOverlayMenuOpen = false;
 
 export const hideSideMenus = (): void => {
-  $('#watchlist-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#info-overlay-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  (<any>$('#watchlist-menu')).effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  (<any>$('#info-overlay-menu')).effect('slide', { direction: 'left', mode: 'hide' }, 1000);
   $('#menu-info-overlay').removeClass('bmenu-item-selected');
   $('#menu-watchlist').removeClass('bmenu-item-selected');
   isInfoOverlayMenuOpen = false;
@@ -60,7 +59,7 @@ export const init = (): void => {
 
   keepTrackApi.programs.watchlist.updateWatchlist = updateWatchlist;
 
-  var infoOverlayDOM = [];
+  let infoOverlayDOM = [];
   uiManager.updateNextPassOverlay = (nextPassArray: any, isForceUpdate: any) => {
     if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
     const cameraManager = keepTrackApi.programs.cameraManager;
@@ -68,10 +67,10 @@ export const init = (): void => {
     // FIXME This should auto update the overlay when the time changes outside the original search window
     // Update once every 10 seconds
     if ((timeManager.now > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 && objectManager.selectedSat === -1 && !cameraManager.isDragging && cameraManager.zoomLevel === cameraManager.zoomTarget) || isForceUpdate) {
-      var propTime = timeManager.propTime();
+      const propTime = timeManager.propTime();
       infoOverlayDOM = [];
       infoOverlayDOM.push('<div>');
-      for (var s = 0; s < nextPassArray.length; s++) {
+      for (let s = 0; s < nextPassArray.length; s++) {
         pushOverlayElement(satSet, nextPassArray, s, propTime, infoOverlayDOM);
       }
       infoOverlayDOM.push('</div>');
@@ -123,9 +122,9 @@ export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInVi
   } else {
     isWatchlistChanged = true;
   }
-  var watchlistString = '';
-  var watchlistListHTML = '';
-  var sat;
+  let watchlistString = '';
+  let watchlistListHTML = '';
+  let sat;
   for (let i = 0; i < watchlistList.length; i++) {
     sat = satSet.getSatExtraOnly(watchlistList[i]);
     if (sat == null) {
@@ -154,12 +153,12 @@ export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInVi
   uiManager.doSearch(watchlistString, true);
   satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 
-  var saveWatchlist = [];
+  const saveWatchlist = [];
   for (let i = 0; i < watchlistList.length; i++) {
     sat = satSet.getSatExtraOnly(watchlistList[i]);
     saveWatchlist[i] = sat.SCC_NUM;
   }
-  var variable = JSON.stringify(saveWatchlist);
+  const variable = JSON.stringify(saveWatchlist);
   try {
     localStorage.setItem('watchlistList', variable);
   } catch {
@@ -167,7 +166,7 @@ export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInVi
   }
 };
 
-export const uiManagerInit = (): void => {  
+export const uiManagerInit = (): void => {
   // Side Menu
   $('#left-menus').append(keepTrackApi.html`
   <div id="watchlist-menu" class="side-menu-parent start-hidden text-select">
@@ -236,7 +235,7 @@ export const uiManagerInit = (): void => {
   </div>
 `);
 
-  $('#watchlist-menu').resizable({
+  (<any>$('#watchlist-menu')).resizable({
     handles: 'e',
     stop: function () {
       $(this).css('height', '');
@@ -285,7 +284,7 @@ export const updateLoop = () => {
 
   if (watchlistList.length <= 0) return;
   for (let i = 0; i < watchlistList.length; i++) {
-    var sat = satSet.getSat(watchlistList[i]);
+    const sat = satSet.getSat(watchlistList[i]);
     if (sensorManager.currentSensorMultiSensor) {
       orbitManager.removeInViewOrbit(watchlistList[i]);
       for (let j = 0; j < sensorManager.currentSensorList.length; j++) {
@@ -297,14 +296,14 @@ export const updateLoop = () => {
         keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getSensorFromSensorName(sensor.name)], 'g');
       }
     } else {
-      if (sat.inview === 1 && watchlistInViewList[i] === false) {
+      if (sat.inView === 1 && watchlistInViewList[i] === false) {
         // Is inview and wasn't previously
         watchlistInViewList[i] = true;
         uiManager.toast(`Satellite ${sat.SCC_NUM} is In Field of View!`, 'normal');
         keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getSensorFromSensorName(sensorManager.currentSensor.name)], 'g');
         orbitManager.addInViewOrbit(watchlistList[i]);
       }
-      if (sat.inview === 0 && watchlistInViewList[i] === true) {
+      if (sat.inView === 0 && watchlistInViewList[i] === true) {
         // Isn't inview and was previously
         watchlistInViewList[i] = false;
         uiManager.toast(`Satellite ${sat.SCC_NUM} left Field of View!`, 'standby');
@@ -327,7 +326,7 @@ export const bottomMenuClick = (iconName: string) => {
       // No Sensor Selected
       uiManager.toast(`Select a Sensor First!`, 'caution', true);
       if (!$('#menu-info-overlay:animated').length) {
-        $('#menu-info-overlay').effect('shake', {
+        (<any>$('#menu-info-overlay')).effect('shake', {
           distance: 10,
         });
       }
@@ -341,7 +340,7 @@ export const bottomMenuClick = (iconName: string) => {
       if (watchlistList.length === 0 && !isWatchlistChanged) {
         uiManager.toast(`Add Satellites to Watchlist!`, 'caution');
         if (!$('#menu-info-overlay:animated').length) {
-          $('#menu-info-overlay').effect('shake', {
+          (<any>$('#menu-info-overlay')).effect('shake', {
             distance: 10,
           });
         }
@@ -352,7 +351,7 @@ export const bottomMenuClick = (iconName: string) => {
       if (nextPassArray.length === 0 || nextPassEarliestTime > timeManager.now || new Date(nextPassEarliestTime * 1 + 1000 * 60 * 60 * 24) < timeManager.now || isWatchlistChanged) {
         $('#loading-screen').fadeIn(1000, function () {
           nextPassArray = [];
-          for (var x = 0; x < watchlistList.length; x++) {
+          for (let x = 0; x < watchlistList.length; x++) {
             nextPassArray.push(satSet.getSatExtraOnly(watchlistList[x]));
           }
           nextPassArray = satellite.nextpassList(nextPassArray);
@@ -369,7 +368,7 @@ export const bottomMenuClick = (iconName: string) => {
         uiManager.updateNextPassOverlay(nextPassArray, true);
       }
 
-      $('#info-overlay-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      (<any>$('#info-overlay-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
       $('#menu-info-overlay').addClass('bmenu-item-selected');
       isInfoOverlayMenuOpen = true;
       return;
@@ -385,7 +384,7 @@ export const bottomMenuClick = (iconName: string) => {
     } else {
       if ((<any>settingsManager).isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#watchlist-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      (<any>$('#watchlist-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
       // uiManager.searchToggle(true);
       updateWatchlist();
       isWatchlistMenuOpen = true;
@@ -404,15 +403,15 @@ export const onCruncherReady = (): any => {
     watchlistJSON = null;
   }
   if (watchlistJSON !== null) {
-    let newWatchlist = JSON.parse(watchlistJSON);
-    let watchlistInViewList = [];
+    const newWatchlist = JSON.parse(watchlistJSON);
+    const watchlistInViewList = [];
     for (let i = 0; i < newWatchlist.length; i++) {
-      let sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
+      const sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
       if (sat !== null) {
         newWatchlist[i] = sat.id;
         watchlistInViewList.push(false);
       } else {
-        // console.error('Watchlist File Format Incorret');
+        // console.debug('Watchlist File Format Incorret');
         return;
       }
     }
@@ -426,7 +425,7 @@ export const onCruncherReady = (): any => {
 export const pushOverlayElement = (satSet: any, nextPassArray: any, s: number, propTime: any, infoOverlayDOM: any[]) => {
   if (typeof satSet?.getSatInViewOnly !== 'function') throw new Error('satSet is not proper satSet Object');
 
-  const satInView = satSet.getSatInViewOnly(satSet.getIdFromObjNum(nextPassArray[s].SCC_NUM)).inview;
+  const satInView = satSet.getSatInViewOnly(satSet.getIdFromObjNum(nextPassArray[s].SCC_NUM)).inView;
   // If old time and not in view, skip it
   if (nextPassArray[s].time - propTime < -1000 * 60 * 5 && !satInView) return;
 
@@ -452,9 +451,9 @@ export const pushOverlayElement = (satSet: any, nextPassArray: any, s: number, p
 
 export const infoOverlayContentClick = (evt: any) => {
   const { satSet, objectManager } = keepTrackApi.programs;
-  var objNum = evt.currentTarget.textContent.split(':');
+  let objNum = evt.currentTarget.textContent.split(':');
   objNum = objNum[0];
-  var satId = satSet.getIdFromObjNum(objNum);
+  const satId = satSet.getIdFromObjNum(objNum);
   if (satId !== null) {
     objectManager.setSelectedSat(satId);
   }
@@ -462,7 +461,7 @@ export const infoOverlayContentClick = (evt: any) => {
 
 export const watchlistListClick = function (satId: number) {
   const { orbitManager, uiManager, satSet, ColorScheme, sensorManager } = keepTrackApi.programs;
-  for (var i = 0; i < watchlistList.length; i++) {
+  for (let i = 0; i < watchlistList.length; i++) {
     if (watchlistList[i] === satId) {
       orbitManager.removeInViewOrbit(watchlistList[i]);
       watchlistList.splice(i, 1);
@@ -484,8 +483,8 @@ export const watchlistListClick = function (satId: number) {
 export const watchlistContentEvent = (e?: any, satId?: number) => {
   const { satSet, sensorManager } = keepTrackApi.programs;
   satId ??= satSet.getIdFromObjNum(stringPad.pad0(<string>$('#watchlist-new').val(), 5));
-  var duplicate = false;
-  for (var i = 0; i < watchlistList.length; i++) {
+  let duplicate = false;
+  for (let i = 0; i < watchlistList.length; i++) {
     // No duplicates
     if (watchlistList[i] === satId) duplicate = true;
   }
@@ -503,13 +502,13 @@ export const watchlistContentEvent = (e?: any, satId?: number) => {
 
 export const watchlistSaveClick = (evt: any) => {
   const { satSet } = keepTrackApi.programs;
-  var saveWatchlist = [];
-  for (var i = 0; i < watchlistList.length; i++) {
-    var sat = satSet.getSatExtraOnly(watchlistList[i]);
+  const saveWatchlist = [];
+  for (let i = 0; i < watchlistList.length; i++) {
+    const sat = satSet.getSatExtraOnly(watchlistList[i]);
     saveWatchlist[i] = sat.SCC_NUM;
   }
-  var variable = JSON.stringify(saveWatchlist);
-  var blob = new Blob([variable], {
+  const variable = JSON.stringify(saveWatchlist);
+  const blob = new Blob([variable], {
     type: 'text/plain;charset=utf-8',
   });
   try {
@@ -524,7 +523,7 @@ export const watchlistFileChange = (evt: any) => {
   if (evt === null) throw new Error('evt is null');
   if (!window.FileReader) return; // Browser is not compatible
 
-  var reader = new FileReader();
+  const reader = new FileReader();
 
   reader.onload = function (evt) {
     watchListReaderOnLoad(evt);

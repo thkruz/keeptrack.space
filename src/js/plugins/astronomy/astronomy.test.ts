@@ -1,15 +1,13 @@
-import * as astronomy from '@app/js/plugins/astronomy/astronomy';
-
-import { expect } from '@jest/globals';
-import { keepTrackApi } from '@app/js/api/externalApi';
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/externalApi';
+import * as astronomy from '@app/js/plugins/astronomy/astronomy';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
 describe('astronomy.uiManagerInit', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       astronomy.uiManagerInit();
     };
 
@@ -17,10 +15,9 @@ describe('astronomy.uiManagerInit', () => {
   });
 });
 
-// @ponicode
 describe('astronomy.bottomMenuClick', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       keepTrackApi.programs.astronomy = {};
       keepTrackApi.programs.astronomy.isAstronomyView = false;
       astronomy.bottomMenuClick('menu-astronomy');
@@ -35,7 +32,69 @@ describe('astronomy.bottomMenuClick', () => {
   });
 
   test('1', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
+      astronomy.bottomMenuClick('');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
+
+// @ponicode
+describe('astronomy.init', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      astronomy.init();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
+
+// @ponicode
+describe('astronomy.bottomMenuClick', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      astronomy.bottomMenuClick('menu-astronomy');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('1', () => {
+    const callFunction: any = () => {
+      astronomy.bottomMenuClick('Credit Card Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('2', () => {
+    const callFunction: any = () => {
+      astronomy.bottomMenuClick('Home Loan Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('3', () => {
+    const callFunction: any = () => {
+      astronomy.bottomMenuClick('Investment Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('4', () => {
+    const callFunction: any = () => {
+      astronomy.bottomMenuClick('Checking Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('5', () => {
+    const callFunction: any = () => {
       astronomy.bottomMenuClick('');
     };
 

@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`adviceManager.breakupDisabled 0 1`] = `undefined`;
+
+exports[`adviceManager.bubbleDisabled 0 1`] = `undefined`;
+
+exports[`adviceManager.clearAdvice 0 1`] = `undefined`;
+
+exports[`adviceManager.colorScheme 0 1`] = `undefined`;
+
+exports[`adviceManager.countries 0 1`] = `undefined`;
+
+exports[`adviceManager.cspocSensors 0 1`] = `undefined`;
+
+exports[`adviceManager.customSensors 0 1`] = `undefined`;
+
+exports[`adviceManager.editSatDisabled 0 1`] = `undefined`;
+
+exports[`adviceManager.findIss 0 1`] = `undefined`;
+
+exports[`adviceManager.isEnabled 0 1`] = `true`;
+
+exports[`adviceManager.isEnabled 1 1`] = `false`;
+
+exports[`adviceManager.lookanglesDisabled 0 1`] = `undefined`;
+
+exports[`adviceManager.mapDIsabled 0 1`] = `undefined`;
+
+exports[`adviceManager.missileMenu 0 1`] = `undefined`;
+
+exports[`adviceManager.mwSensors 0 1`] = `undefined`;
+
+exports[`adviceManager.off 0 1`] = `undefined`;
+
+exports[`adviceManager.on 0 1`] = `undefined`;
+
+exports[`adviceManager.onReady 0 1`] = `undefined`;
+
+exports[`adviceManager.onReady 1 1`] = `undefined`;
+
+exports[`adviceManager.planetariumDisabled 0 1`] = `undefined`;
+
+exports[`adviceManager.satFovDisabled 0 1`] = `undefined`;
+
+exports[`adviceManager.satViewDisabled 0 1`] = `undefined`;
+
+exports[`adviceManager.satelliteSelected 0 1`] = `undefined`;
+
+exports[`adviceManager.satelliteSelected 1 1`] = `undefined`;
+
+exports[`adviceManager.sensor 0 1`] = `undefined`;
+
+exports[`adviceManager.sensor 1 1`] = `undefined`;
+
+exports[`adviceManager.sensorInfoDisabled 0 1`] = `undefined`;
+
+exports[`adviceManager.showAdvice 0 1`] = `undefined`;
+
+exports[`adviceManager.showAdvice 1 1`] = `undefined`;
+
+exports[`adviceManager.showAdvice 2 1`] = `undefined`;
+
+exports[`adviceManager.showAdvice 3 1`] = `undefined`;
+
+exports[`adviceManager.showAdvice 4 1`] = `undefined`;
+
+exports[`adviceManager.showAdvice 5 1`] = `undefined`;
+
+exports[`adviceManager.showAdvice 6 1`] = `undefined`;
+
+exports[`adviceManager.showAdvice 7 1`] = `undefined`;
+
+exports[`adviceManager.showSensors 0 1`] = `undefined`;
+
+exports[`adviceManager.ssnLookanglesDisabled 0 1`] = `undefined`;
+
+exports[`adviceManager.survFenceDisabled 0 1`] = `undefined`;
+
+exports[`adviceManager.togleNight 0 1`] = `undefined`;
+
+exports[`adviceManager.useLegend 0 1`] = `undefined`;
+
+exports[`adviceManager.welcome 0 1`] = `undefined`;

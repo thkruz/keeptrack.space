@@ -1,0 +1,1391 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ColorSchemeFactory.ageOfElsetRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.ageOfElsetRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.ageOfElsetRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.ageOfElsetRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.ageOfElsetRules 4 1`] = `
+Object {
+  "color": Array [
+    0.64,
+    0,
+    0.64,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.ageOfElsetRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.ageOfElsetRules 6 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.1,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.ageOfElsetRules 7 1`] = `
+Object {
+  "color": Array [
+    0,
+    1,
+    0,
+    0.9,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.ageOfElsetRules 8 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    0,
+    0.9,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.ageOfElsetRules 9 1`] = `
+Object {
+  "color": Array [
+    1,
+    0.6,
+    0,
+    0.9,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.ageOfElsetRules 10 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    0.9,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.ageOfElsetRules 10 2`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.ageOfElsetRules 10 3`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    0.9,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.countriesRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.countriesRules 1 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    0.4,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.countriesRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.countriesRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    0.6,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.countriesRules 4 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.countriesRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.countriesRules 6 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 4 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 6 1`] = `
+Object {
+  "color": Array [
+    0.64,
+    0,
+    0.64,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 7 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    1,
+    1,
+  ],
+  "marker": true,
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 8 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 9 1`] = `
+Object {
+  "color": Array [
+    0,
+    1,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 10 1`] = `
+Object {
+  "color": Array [
+    0,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 11 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 12 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 13 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 13 2`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 14 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 14 2`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 15 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 16 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 17 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 18 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 19 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 20 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 21 1`] = `
+Object {
+  "color": Array [
+    0.85,
+    0.5,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 22 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.8,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 23 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.5,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 24 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    0.4,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 25 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 26 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0.6,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 27 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 28 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.1,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.defaultRules 29 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.geoRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.geoRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.geoRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.geoRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.geoRules 4 1`] = `
+Object {
+  "color": Array [
+    0.64,
+    0,
+    0.64,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.geoRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.geoRules 6 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.geoRules 7 1`] = `
+Object {
+  "color": Array [
+    0.85,
+    0.5,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.geoRules 8 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.1,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.geoRules 9 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.init 0 1`] = `undefined`;
+
+exports[`ColorSchemeFactory.leoRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.leoRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.leoRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.leoRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.leoRules 4 1`] = `
+Object {
+  "color": Array [
+    0.64,
+    0,
+    0.64,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.leoRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.leoRules 6 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.leoRules 7 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.1,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.leoRules 8 1`] = `
+Object {
+  "color": Array [
+    0.85,
+    0.5,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.leoRules 9 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.lostobjectsRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.lostobjectsRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.lostobjectsRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.lostobjectsRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.lostobjectsRules 4 1`] = `
+Object {
+  "color": Array [
+    0.64,
+    0,
+    0.64,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.lostobjectsRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.lostobjectsRules 6 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.1,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.lostobjectsRules 7 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.1,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.lostobjectsRules 8 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.rcsRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.rcsRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    0.6,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.rcsRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.rcsRules 3 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    0.4,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.rcsRules 4 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.rcsRules 5 1`] = `
+Object {
+  "color": Array [
+    0,
+    1,
+    0,
+    0.6,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.rcsRules 6 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.rcsRules 7 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    0,
+    0.6,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.reloadColors 0 1`] = `undefined`;
+
+exports[`ColorSchemeFactory.resetObjectTypeFlags 0 1`] = `undefined`;
+
+exports[`ColorSchemeFactory.smallsatsRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.smallsatsRules 1 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 1 1`] = `
+Object {
+  "color": Array [
+    0.64,
+    0,
+    0.64,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 4 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 6 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    1,
+    1,
+  ],
+  "marker": true,
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 7 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 8 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 9 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 9 2`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 10 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 11 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 12 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 13 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 14 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 15 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.3,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.sunlightRules 16 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`ColorSchemeFactory.velocityRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.velocityRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.velocityRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`ColorSchemeFactory.velocityRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`Test ColorRules 0 1`] = `undefined`;
+
+exports[`Test ColorRules 1 1`] = `undefined`;
+
+exports[`Test ColorRules 2 1`] = `undefined`;
+
+exports[`Test ColorRules 3 1`] = `undefined`;
+
+exports[`Test ColorRules 4 1`] = `undefined`;
+
+exports[`Test ColorRules 5 1`] = `undefined`;
+
+exports[`Test ColorRules 6 1`] = `undefined`;
+
+exports[`Test ColorRules 7 1`] = `undefined`;
+
+exports[`Test ColorRules 8 1`] = `undefined`;
+
+exports[`Test ColorRules 9 1`] = `undefined`;
+
+exports[`Test ColorRules 10 1`] = `undefined`;
+
+exports[`Test ColorRules 11 1`] = `undefined`;
+
+exports[`Test ColorRules 12 1`] = `undefined`;

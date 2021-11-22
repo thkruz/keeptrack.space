@@ -1,15 +1,13 @@
-import * as satelliteFov from '@app/js/plugins/satelliteFov/satelliteFov';
-
-import { expect } from '@jest/globals';
-import { keepTrackApi } from '@app/js/api/externalApi';
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/externalApi';
+import * as satelliteFov from '@app/js/plugins/satelliteFov/satelliteFov';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
 describe('satelliteFov.uiManagerInit', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       satelliteFov.uiManagerInit();
     };
 
@@ -17,10 +15,9 @@ describe('satelliteFov.uiManagerInit', () => {
   });
 });
 
-// @ponicode
 describe('satelliteFov.bottomMenuClick', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       satelliteFov.bottomMenuClick('menu-sat-fov');
       satelliteFov.bottomMenuClick('menu-sat-fov');
     };
@@ -29,7 +26,7 @@ describe('satelliteFov.bottomMenuClick', () => {
   });
 
   test('1', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `<input id="search" val=""></input>`;
       keepTrackApi.programs.objectManager.selectedSat = -1;
       satelliteFov.bottomMenuClick('menu-sat-fov');
@@ -40,7 +37,69 @@ describe('satelliteFov.bottomMenuClick', () => {
   });
 
   test('2', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
+      satelliteFov.bottomMenuClick('');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
+
+// @ponicode
+describe('satelliteFov.init', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      satelliteFov.init();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
+
+// @ponicode
+describe('satelliteFov.bottomMenuClick', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      satelliteFov.bottomMenuClick('menu-sat-fov');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('1', () => {
+    const callFunction: any = () => {
+      satelliteFov.bottomMenuClick('Checking Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('2', () => {
+    const callFunction: any = () => {
+      satelliteFov.bottomMenuClick('Credit Card Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('3', () => {
+    const callFunction: any = () => {
+      satelliteFov.bottomMenuClick('Home Loan Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('4', () => {
+    const callFunction: any = () => {
+      satelliteFov.bottomMenuClick('Investment Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('5', () => {
+    const callFunction: any = () => {
       satelliteFov.bottomMenuClick('');
     };
 

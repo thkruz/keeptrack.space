@@ -18,8 +18,8 @@
  */
 
 // This file should contain all of the webgl code for generating non .obj meshes
-import { LineFactory } from './line-factory.js';
-import { earth } from './earth.js';
+import { earth } from './earth';
+import { LineFactory } from './line-factory';
 import { moon } from './moon';
 import { sun } from './sun';
 

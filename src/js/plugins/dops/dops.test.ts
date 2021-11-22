@@ -1,14 +1,12 @@
-import * as dops from '@app/js/plugins/dops/dops';
-
-import { expect } from '@jest/globals';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/externalApi';
+import * as dops from '../../plugins/dops/dops';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 // @ponicode
 describe('dops.init', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       dops.init();
     };
 
@@ -19,7 +17,7 @@ describe('dops.init', () => {
 // @ponicode
 describe('dops.dopsFormSubmit', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       dops.dopsFormSubmit();
     };
 
@@ -30,7 +28,7 @@ describe('dops.dopsFormSubmit', () => {
 // @ponicode
 describe('dops.uiManagerInit', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       dops.uiManagerInit();
     };
 
@@ -38,10 +36,9 @@ describe('dops.uiManagerInit', () => {
   });
 });
 
-// @ponicode
 describe('dops.adviceReady', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       dops.adviceReady();
       keepTrackApi.programs.adviceManager.adviceList.socrates();
       keepTrackApi.programs.adviceManager.adviceList.socrates();
@@ -56,7 +53,7 @@ describe('dops.adviceReady', () => {
 // @ponicode
 describe('dops.loadingScreenFadeIn', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       dops.loadingScreenFadeIn();
     };
 
@@ -64,10 +61,9 @@ describe('dops.loadingScreenFadeIn', () => {
   });
 });
 
-// @ponicode
 describe('dops.bottomMenuClick', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       dops.bottomMenuClick('Credit Card Account');
     };
 
@@ -75,7 +71,7 @@ describe('dops.bottomMenuClick', () => {
   });
 
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       dops.bottomMenuClick('menu-dops');
       dops.bottomMenuClick('menu-dops');
     };
@@ -83,7 +79,7 @@ describe('dops.bottomMenuClick', () => {
     expect(callFunction).not.toThrow();
   });
   test('1', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       dops.bottomMenuClick('');
     };
 
@@ -94,8 +90,70 @@ describe('dops.bottomMenuClick', () => {
 // @ponicode
 describe('dops.hideSideMenus', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       dops.hideSideMenus();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
+
+// @ponicode
+describe('dops.adviceReady', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      dops.adviceReady();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
+
+// @ponicode
+describe('dops.bottomMenuClick', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      dops.bottomMenuClick('menu-dops');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('1', () => {
+    const callFunction: any = () => {
+      dops.bottomMenuClick('Credit Card Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('2', () => {
+    const callFunction: any = () => {
+      dops.bottomMenuClick('Checking Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('3', () => {
+    const callFunction: any = () => {
+      dops.bottomMenuClick('Investment Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('4', () => {
+    const callFunction: any = () => {
+      dops.bottomMenuClick('Home Loan Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('5', () => {
+    const callFunction: any = () => {
+      dops.bottomMenuClick('');
     };
 
     expect(callFunction).not.toThrow();

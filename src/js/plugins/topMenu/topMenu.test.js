@@ -1,5 +1,3 @@
-/* globals it jest describe */
-
 import { init } from './topMenu';
 import { keepTrackApi } from '@app/js/api/externalApi';
 

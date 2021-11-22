@@ -1,13 +1,12 @@
-import '@app/js/settingsManager/settingsManager';
-
-import * as catalogLoader from '@app/js/plugins/catalogLoader/catalogLoader';
-
-import { expect } from '@jest/globals';
-import { keepTrackApi } from '@app/js/api/externalApi';
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/externalApi';
+import * as catalogLoader from '@app/js/plugins/catalogLoader/catalogLoader';
+import '@app/js/settingsManager/settingsManager';
+import { expect } from '@jest/globals';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 keepTrackApi.programs.settingsManager = window.settingsManager;
+settingsManager.installDirectory = '/';
 
 const respMock = [
   {
@@ -65,7 +64,7 @@ const asciiSats = [
 // @ponicode
 describe('catalogLoader.parseCatalog', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       catalogLoader.parseCatalog(respMock);
     };
 
@@ -76,7 +75,7 @@ describe('catalogLoader.parseCatalog', () => {
 // @ponicode
 describe('catalogLoader.setupGetVariables', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       catalogLoader.setupGetVariables();
     };
 
@@ -87,13 +86,18 @@ describe('catalogLoader.setupGetVariables', () => {
 // @ponicode
 describe('catalogLoader.filterTLEDatabase', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       catalogLoader.filterTLEDatabase(respMock);
       catalogLoader.filterTLEDatabase(respMock, respMock);
       keepTrackApi.programs.settingsManager.offline = true;
       keepTrackApi.programs.settingsManager.limitSats = ['25544'];
       catalogLoader.filterTLEDatabase(respMock, respMock);
       keepTrackApi.programs.settingsManager.limitSats = '';
+      keepTrackApi.programs.settingsManager.isExtraSatellitesAdded = true;
+      document.body.innerHTML += '<div><div class="legend-trusat-box"></div></div>';
+      document.body.innerHTML += '<div><div class="legend-trusat-box"></div></div>';
+      document.body.innerHTML += '<div><div class="legend-trusat-box"></div></div>';
+      document.body.innerHTML += '<div><div class="legend-trusat-box"></div></div>';
       catalogLoader.filterTLEDatabase(respMock, respMock, extraSats, asciiSats);
     };
 
@@ -104,7 +108,7 @@ describe('catalogLoader.filterTLEDatabase', () => {
 // @ponicode
 describe('catalogLoader.init', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       catalogLoader.init();
     };
 

@@ -1,34 +1,16 @@
+import { keepTrackApi } from '@app/js/api/externalApi';
+import { dateFormat } from '@app/js/lib/external/dateFormat.js';
+import { saveCsv, truncateString } from '@app/js/lib/helpers';
+import { LaunchInfoObject } from '@app/types/types';
+import $ from 'jquery';
 /* */
 
-import { saveCsv, truncateString } from '@app/js/lib/helpers';
-import $ from 'jquery';
-import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { keepTrackApi } from '@app/js/api/externalApi';
-
-type LaunchInfoObject = {
-  name: string;
-  updated: Date;
-  windowStart: Date;
-  windowEnd: Date;
-  location: string;
-  locationURL: string;
-  agency: string;
-  agencyURL: string;
-  country: string;
-  mission: string;
-  missionName: string;
-  missionType: string;
-  missionURL: string;
-  rocket: string;
-  rocketConfig: string;
-  rocketFamily: string;
-  rocketURL: string;
-};
+let isNextLaunchMenuOpen = false;
 
 /**
  * @returns {HTMLTableElement | boolean} The Table Element to be modified in the UI or a false boolean to kill the parent method
  */
-const _getTableElement = (): HTMLTableElement | boolean => {
+export const getTableElement = (): HTMLTableElement | boolean => {
   const tbl: HTMLTableElement = <HTMLTableElement>document.getElementById('nextLaunch-table'); // Identify the table to update
   if (tbl == null) {
     // console.warn('nextLaunchManager.showTable failed to find nextLaunch-table element!');
@@ -37,33 +19,33 @@ const _getTableElement = (): HTMLTableElement | boolean => {
   return tbl;
 };
 
-const _makeTableHeaders = (tbl: HTMLTableElement): void => {
-  let tr = tbl.insertRow();
-  let tdT = tr.insertCell();
+export const makeTableHeaders = (tbl: HTMLTableElement): void => {
+  const tr = tbl.insertRow();
+  const tdT = tr.insertCell();
   tdT.appendChild(document.createTextNode('Launch Window'));
   tdT.setAttribute('style', 'text-decoration: underline; width: 120px;');
-  let tdN = tr.insertCell();
+  const tdN = tr.insertCell();
   tdN.appendChild(document.createTextNode('Mission'));
   tdN.setAttribute('style', 'text-decoration: underline; width: 140px;');
-  let tdL = tr.insertCell();
+  const tdL = tr.insertCell();
   tdL.appendChild(document.createTextNode('Location'));
   tdL.setAttribute('style', 'text-decoration: underline');
-  let tdA = tr.insertCell();
+  const tdA = tr.insertCell();
   tdA.appendChild(document.createTextNode('Agency'));
   tdA.setAttribute('style', 'text-decoration: underline');
-  let tdC = tr.insertCell();
+  const tdC = tr.insertCell();
   tdC.appendChild(document.createTextNode('Country'));
   tdC.setAttribute('style', 'text-decoration: underline');
 };
 
-const _initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => {
-  _makeTableHeaders(tbl);
+export const initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => {
+  makeTableHeaders(tbl);
 
   for (let i = 0; i < launchList.length; i++) {
-    let tr = tbl.insertRow();
+    const tr = tbl.insertRow();
 
     // Time Cells
-    let tdT = tr.insertCell();
+    const tdT = tr.insertCell();
     let timeText;
     if (launchList[i].windowStart.valueOf() <= Date.now() - 1000 * 60 * 60 * 24) {
       timeText = 'TBD';
@@ -73,10 +55,10 @@ const _initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => {
     tdT.appendChild(document.createTextNode(timeText));
 
     // Name Cells
-    let tdN = tr.insertCell();
+    const tdN = tr.insertCell();
 
     // Mission Name Text
-    let nameText = typeof launchList[i].missionName != 'undefined' ? launchList[i].missionName : 'Unknown';
+    const nameText = typeof launchList[i].missionName != 'undefined' ? launchList[i].missionName : 'Unknown';
     // Mission Name HTML Setup
     let nameHTML;
     if (typeof launchList[i].missionURL == 'undefined' || launchList[i].missionURL == '') {
@@ -108,7 +90,7 @@ const _initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => {
       }
     }
 
-    let tdL = tr.insertCell();
+    const tdL = tr.insertCell();
     tdL.innerHTML = locationHTML;
 
     // Agency Name HTML Setup
@@ -123,15 +105,111 @@ const _initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => {
       }
     }
 
-    let tdA = tr.insertCell();
+    const tdA = tr.insertCell();
     tdA.innerHTML = agencyHTML;
 
     // Country Cell
-    let tdC = tr.insertCell();
+    const tdC = tr.insertCell();
     tdC.innerHTML = `<span class="badge dark-blue-badge" data-badge-caption="${launchList[i].country}"></span>`;
   }
 };
 
+export const hideSideMenus = (): void => {
+  $('#nextLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  $('#menu-nextLaunch').removeClass('bmenu-item-selected');
+  isNextLaunchMenuOpen = false;
+};
+export const uiManagerInit = () => {
+  // Side Menu
+  $('#left-menus').append(keepTrackApi.html`
+      <div id="nextLaunch-menu" class="side-menu-parent start-hidden text-select">
+        <div id="nextLaunch-content" class="side-menu">
+          <div class="row">
+            <h5 class="center-align">Next Launches</h5>
+            <table id="nextLaunch-table" class="center-align striped-light centered"></table>
+          </div>
+          <div class="row">
+            <center>
+              <button id="export-launch-info" class="btn btn-ui waves-effect waves-light">Export Launch Info &#9658;</button>
+            </center>
+          </div>
+        </div>
+      </div>
+    `);
+
+  // Bottom Icon
+  $('#bottom-icons').append(keepTrackApi.html`
+        <div id="menu-nextLaunch" class="bmenu-item">
+          <img alt="calendar" src="" delayedsrc="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAABmJLR0QA/wD/AP+gvaeTAAABNUlEQVR4nO3cQWrCQBiAUS29Tne9/wm680C6Erow0GBnvtG8txQxkY8/jBP1dAIAAADgKM4zD/b1c70+evzyfZ56HncrnM/HrAPxmACxp0Zta4SP5plLlgmICRATICZATIDY54gX3VoVrPDB57e95zNi1WcCYgLEhlyCtlSXmi0rnI8JiAkQG3IJskf0dyYgJkBMgJgAMQFiU/eCXp29oDckQEyAmAAxAWJTt6P3+q87VivfoTMBMQFiAsQEiAkQW3oVtHc1Mvr5I5iAmAAxAWICxASITV0Frba3Yy8IAWoCxASICRAb8kv5FfZYRhjxfk1ATICYADEBYgLEDr0XtAITEBMgJkBMgJgAsaX/rOMVv+ezlwmICRATICZATICY/wuKmYCYADEBYgLEBAAAAAAAgPd3AzYrWtKgtEhrAAAAAElFTkSuQmCC">
+          <span class="bmenu-title">Next Launches</span>
+          <div class="status-icon"></div>
+        </div>
+      `);
+
+  $('#nextLaunch-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 650,
+    minWidth: 450,
+  });
+
+  $('#export-launch-info').on('click', function () {
+    saveCsv(<any>nextLaunchManager.launchList, 'launchList');
+  });
+};
+export const init = (): void => {
+  // Load CSS
+  import('@app/js/plugins/nextLaunch/nextLaunch.css').then((resp) => resp);
+
+  // Add HTML
+  keepTrackApi.register({
+    method: 'uiManagerInit',
+    cbName: 'nextLaunchManager',
+    cb: uiManagerInit,
+  });
+
+  // Add JavaScript
+  keepTrackApi.register({
+    method: 'bottomMenuClick',
+    cbName: 'nextLaunch',
+    cb: bottomMenuClick,
+  });
+
+  keepTrackApi.register({
+    method: 'hideSideMenus',
+    cbName: 'nextLaunch',
+    cb: hideSideMenus,
+  });
+
+  keepTrackApi.register({
+    method: 'onCruncherReady',
+    cbName: 'nextLaunch',
+    cb: (): void => {
+      nextLaunchManager.init();
+    },
+  });
+};
+
+export const bottomMenuClick = (iconName: string): void => {
+  if (iconName === 'menu-nextLaunch') {
+    if (isNextLaunchMenuOpen) {
+      keepTrackApi.programs.uiManager.hideSideMenus();
+      isNextLaunchMenuOpen = false;
+      return;
+    } else {
+      keepTrackApi.programs.uiManager.hideSideMenus();
+      nextLaunchManager.showTable();
+      $('#nextLaunch-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      isNextLaunchMenuOpen = true;
+      $('#menu-nextLaunch').addClass('bmenu-item-selected');
+      return;
+    }
+  }
+};
+
+// eslint-disable-next-line no-unused-vars
 export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void; showTable: () => void; processData: (resp: { results: Array<any> }) => void } = {
   launchList: [],
   init: () => {
@@ -146,15 +224,15 @@ export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () 
 
     $.get('https://ll.thespacedevs.com/2.0.0/launch/upcoming/?format=json&limit=20&mode=detailed')
       .done((resp) => nextLaunchManager.processData(resp))
-      .fail(() => console.warn(`https://ll.thespacedevs.com/2.0.0/ is Unavailable!`));
+      .fail(() => console.debug(`https://ll.thespacedevs.com/2.0.0/ is Unavailable!`));
   },
   showTable: () => {
-    const tbl = _getTableElement();
+    const tbl = getTableElement();
     if (typeof tbl == 'boolean') return;
 
     // Only needs populated once
     if (tbl.innerHTML == '') {
-      _initTable(tbl, nextLaunchManager.launchList);
+      initTable(tbl, nextLaunchManager.launchList);
       try {
         $('a.iframe').colorbox({
           iframe: true,
@@ -175,7 +253,7 @@ export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () 
        */
       const launchLibResult = resp.results[i];
 
-      let launchInfo: LaunchInfoObject = {
+      const launchInfo: LaunchInfoObject = {
         name: '',
         updated: null,
         windowStart: new Date(launchLibResult.window_start),
@@ -228,97 +306,4 @@ export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () 
       nextLaunchManager.launchList[i] = launchInfo;
     }
   },
-};
-
-export const init = (): void => {
-  // Load CSS
-  import('@app/js/plugins/nextLaunch/nextLaunch.css').then((resp) => resp);
-
-  let isNextLaunchMenuOpen = false;
-
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'nextLaunchManager',
-    cb: () => {
-      // Side Menu
-      $('#left-menus').append(keepTrackApi.html`
-      <div id="nextLaunch-menu" class="side-menu-parent start-hidden text-select">
-        <div id="nextLaunch-content" class="side-menu">
-          <div class="row">
-            <h5 class="center-align">Next Launches</h5>
-            <table id="nextLaunch-table" class="center-align striped-light centered"></table>
-          </div>
-          <div class="row">
-            <center>
-              <button id="export-launch-info" class="btn btn-ui waves-effect waves-light">Export Launch Info &#9658;</button>
-            </center>
-          </div>
-        </div>
-      </div>
-    `);
-
-      // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
-        <div id="menu-nextLaunch" class="bmenu-item">
-          <img alt="calendar" src="" delayedsrc="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAABmJLR0QA/wD/AP+gvaeTAAABNUlEQVR4nO3cQWrCQBiAUS29Tne9/wm680C6Erow0GBnvtG8txQxkY8/jBP1dAIAAADgKM4zD/b1c70+evzyfZ56HncrnM/HrAPxmACxp0Zta4SP5plLlgmICRATICZATIDY54gX3VoVrPDB57e95zNi1WcCYgLEhlyCtlSXmi0rnI8JiAkQG3IJskf0dyYgJkBMgJgAMQFiU/eCXp29oDckQEyAmAAxAWJTt6P3+q87VivfoTMBMQFiAsQEiAkQW3oVtHc1Mvr5I5iAmAAxAWICxASITV0Frba3Yy8IAWoCxASICRAb8kv5FfZYRhjxfk1ATICYADEBYgLEDr0XtAITEBMgJkBMgJgAsaX/rOMVv+ezlwmICRATICZATICY/wuKmYCYADEBYgLEBAAAAAAAgPd3AzYrWtKgtEhrAAAAAElFTkSuQmCC">
-          <span class="bmenu-title">Next Launches</span>
-          <div class="status-icon"></div>
-        </div>
-      `);
-
-      $('#nextLaunch-menu').resizable({
-        handles: 'e',
-        stop: function () {
-          $(this).css('height', '');
-        },
-        maxWidth: 650,
-        minWidth: 450,
-      });
-
-      $('#export-launch-info').on('click', function () {
-        saveCsv(<any>nextLaunchManager.launchList, 'launchList');
-      });
-    },
-  });
-
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'nextLaunch',
-    cb: (iconName: string): void => {
-      if (iconName === 'menu-nextLaunch') {
-        if (isNextLaunchMenuOpen) {
-          keepTrackApi.programs.uiManager.hideSideMenus();
-          isNextLaunchMenuOpen = false;
-          return;
-        } else {
-          keepTrackApi.programs.uiManager.hideSideMenus();
-          nextLaunchManager.showTable();
-          $('#nextLaunch-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isNextLaunchMenuOpen = true;
-          $('#menu-nextLaunch').addClass('bmenu-item-selected');
-          return;
-        }
-      }
-    },
-  });
-
-  keepTrackApi.register({
-    method: 'hideSideMenus',
-    cbName: 'nextLaunch',
-    cb: (): void => {
-      $('#nextLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#menu-nextLaunch').removeClass('bmenu-item-selected');
-      isNextLaunchMenuOpen = false;
-    },
-  });
-
-  keepTrackApi.register({
-    method: 'onCruncherReady',
-    cbName: 'nextLaunch',
-    cb: (): void => {
-      nextLaunchManager.init();
-    },
-  });
 };

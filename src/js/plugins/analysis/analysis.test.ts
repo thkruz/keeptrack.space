@@ -1,10 +1,9 @@
-import '@app/js/settingsManager/settingsManager';
-
-import * as analysis from "@app/js/plugins/analysis/analysis"
-
+import * as analysis from '@app/js/plugins/analysis/analysis';
 import { expect } from '@jest/globals';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import '@app/js/settingsManager/settingsManager';
+/* eslint-disable no-undefined */
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 keepTrackApi.programs.settingsManager = window.settingsManager;
@@ -12,7 +11,7 @@ keepTrackApi.programs.settingsManager = window.settingsManager;
 // @ponicode
 describe("analysis.analysisBptSumbit", () => {
     test("0", () => {
-        let callFunction: any = () => {
+        const callFunction: any = () => {
             analysis.analysisBptSumbit()
             keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
             analysis.analysisBptSumbit()
@@ -25,7 +24,7 @@ describe("analysis.analysisBptSumbit", () => {
 // @ponicode
 describe("analysis.findCsoBtnClick", () => {
     test("0", () => {
-        let callFunction: any = () => {
+        const callFunction: any = () => {
             analysis.findCsoBtnClick()
         }
     
@@ -36,7 +35,7 @@ describe("analysis.findCsoBtnClick", () => {
 // @ponicode
 describe("analysis.analysisFormSubmit", () => {
     test("0", () => {
-        let callFunction: any = () => {
+        const callFunction: any = () => {
             analysis.analysisFormSubmit()
             keepTrackApi.programs.sensorManager.currentSensor.shortName = undefined;
             analysis.analysisFormSubmit()
@@ -49,7 +48,7 @@ describe("analysis.analysisFormSubmit", () => {
 // @ponicode
 describe("analysis.uiManagerInit", () => {
     test("0", () => {
-        let callFunction: any = () => {
+        const callFunction: any = () => {
             analysis.uiManagerInit()
         }
     

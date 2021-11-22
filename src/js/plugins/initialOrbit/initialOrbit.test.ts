@@ -1,14 +1,12 @@
-import * as initialOrbit from '@app/js/plugins/initialOrbit/initialOrbit';
-
-import { expect } from '@jest/globals';
-import { keepTrackApi } from '@app/js/api/externalApi';
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/externalApi';
+import * as initialOrbit from '@app/js/plugins/initialOrbit/initialOrbit';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 // @ponicode
 describe('initialOrbit.init', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       initialOrbit.init();
     };
 
@@ -18,7 +16,7 @@ describe('initialOrbit.init', () => {
 
 describe('initialOrbit.hideSideMenus', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       initialOrbit.hideSideMenus();
     };
 
@@ -28,7 +26,7 @@ describe('initialOrbit.hideSideMenus', () => {
 
 describe('initialOrbit.uiManagerInit', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       initialOrbit.uiManagerInit();
     };
 
@@ -38,7 +36,7 @@ describe('initialOrbit.uiManagerInit', () => {
 
 describe('initialOrbit.bottomMenuClick', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       initialOrbit.bottomMenuClick('');
     };
 
@@ -46,7 +44,7 @@ describe('initialOrbit.bottomMenuClick', () => {
   });
 
   test('1', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       initialOrbit.bottomMenuClick('menu-obfit');
       initialOrbit.bottomMenuClick('menu-obfit');
     };
@@ -57,7 +55,7 @@ describe('initialOrbit.bottomMenuClick', () => {
 
 describe('initialOrbit.obfitFormSubmit', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -88,7 +86,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('1', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value=""></input>
                 <input id="obfit-t2" value=""></input>
@@ -119,7 +117,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('2', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                   <input id="obfit-t1" value="0"></input>
                   <input id="obfit-t2" value="a"></input>
@@ -150,7 +148,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('3', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                   <input id="obfit-t1" value="0"></input>
                   <input id="obfit-t2" value="0"></input>
@@ -181,7 +179,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('4', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                   <input id="obfit-t1" value="0"></input>
                   <input id="obfit-t2" value="0"></input>
@@ -212,7 +210,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('5', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -243,7 +241,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('6', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -274,7 +272,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('7', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -305,7 +303,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('8', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -336,7 +334,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('9', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -367,7 +365,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('10', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -398,7 +396,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('11', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -429,7 +427,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('12', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -460,7 +458,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('13', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -491,7 +489,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('14', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -522,7 +520,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('15', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -553,7 +551,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('16', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -584,7 +582,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('17', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -615,7 +613,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('18', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -646,7 +644,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('19', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -677,7 +675,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('20', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -708,7 +706,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('21', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -739,7 +737,7 @@ describe('initialOrbit.obfitFormSubmit', () => {
   });
 
   test('22', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
                 <input id="obfit-t1" value="0"></input>
                 <input id="obfit-t2" value="0"></input>
@@ -764,6 +762,79 @@ describe('initialOrbit.obfitFormSubmit', () => {
                 <input id="obfit-zd3"value="a"></input>
             `;
       initialOrbit.obfitFormSubmit(new Event('submit'));
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
+
+// @ponicode
+describe('initialOrbit.hideSideMenus', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      initialOrbit.hideSideMenus();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
+
+// @ponicode
+describe('initialOrbit.uiManagerInit', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      initialOrbit.uiManagerInit();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
+
+// @ponicode
+describe('initialOrbit.bottomMenuClick', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      initialOrbit.bottomMenuClick('Credit Card Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('1', () => {
+    const callFunction: any = () => {
+      initialOrbit.bottomMenuClick('menu-obfit');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('2', () => {
+    const callFunction: any = () => {
+      initialOrbit.bottomMenuClick('Checking Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('3', () => {
+    const callFunction: any = () => {
+      initialOrbit.bottomMenuClick('Home Loan Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('4', () => {
+    const callFunction: any = () => {
+      initialOrbit.bottomMenuClick('Investment Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('5', () => {
+    const callFunction: any = () => {
+      initialOrbit.bottomMenuClick('');
     };
 
     expect(callFunction).not.toThrow();

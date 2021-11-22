@@ -1,9 +1,4 @@
 /* eslint-disable no-undefined */
-/*globals
-  test
-  expect
-*/
-
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { useMockWorkers } from '@app/js/api/apiMocks';

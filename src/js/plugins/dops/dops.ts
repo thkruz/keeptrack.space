@@ -1,21 +1,21 @@
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import $ from 'jquery';
 
 let isDOPMenuOpen = false;
-export const dopsFormSubmit = (): void =>{
+export const dopsFormSubmit = (): void => {
   keepTrackApi.programs.uiManager.hideSideMenus();
   isDOPMenuOpen = true;
   $('#loading-screen').fadeIn(1000, function () {
-    let lat = parseFloat(<string>$('#dops-lat').val());
-    let lon = parseFloat(<string>$('#dops-lon').val());
-    let alt = parseFloat(<string>$('#dops-alt').val());
-    let el = parseFloat(<string>$('#dops-el').val());
+    const lat = parseFloat(<string>$('#dops-lat').val());
+    const lon = parseFloat(<string>$('#dops-lon').val());
+    const alt = parseFloat(<string>$('#dops-alt').val());
+    const el = parseFloat(<string>$('#dops-el').val());
     keepTrackApi.programs.settingsManager.gpsElevationMask = el;
-    keepTrackApi.programs.satellite.getDOPsTable(lat, lon, alt);
+    keepTrackApi.programs.satellite.updateDopsTable(lat, lon, alt);
     $('#menu-dops').addClass('bmenu-item-selected');
     $('#loading-screen').fadeOut('slow');
     $('#dops-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-  });  
+  });
 };
 export const uiManagerInit = () => {
   // Side Menu
@@ -59,8 +59,8 @@ export const uiManagerInit = () => {
         </div>
       `);
 
-  $('#dops-form').on('submit', function(e) {
-    dopsFormSubmit()
+  $('#dops-form').on('submit', function (e) {
+    dopsFormSubmit();
     e.preventDefault();
   });
 
@@ -89,8 +89,7 @@ export const adviceReady = () => {
 
   aM.adviceList.socrates = () => {
     // Only Do this Twice
-    if (aM.adviceCount.socrates >= 3)
-      return;
+    if (aM.adviceCount.socrates >= 3) return;
     aM.adviceCount.socrates += 1;
 
     aM.showAdvice(
@@ -104,12 +103,12 @@ export const adviceReady = () => {
 };
 
 export const loadingScreenFadeIn = (): void => {
-  let lat = parseFloat(<string>$('#dops-lat').val());
-  let lon = parseFloat(<string>$('#dops-lon').val());
-  let alt = parseFloat(<string>$('#dops-alt').val());
-  let el = parseFloat(<string>$('#dops-el').val());
+  const lat = parseFloat(<string>$('#dops-lat').val());
+  const lon = parseFloat(<string>$('#dops-lon').val());
+  const alt = parseFloat(<string>$('#dops-alt').val());
+  const el = parseFloat(<string>$('#dops-el').val());
   keepTrackApi.programs.settingsManager.gpsElevationMask = el;
-  keepTrackApi.programs.satellite.getDOPsTable(lat, lon, alt);
+  keepTrackApi.programs.satellite.updateDopsTable(lat, lon, alt);
   $('#menu-dops').addClass('bmenu-item-selected');
   $('#loading-screen').fadeOut('slow');
   $('#dops-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);

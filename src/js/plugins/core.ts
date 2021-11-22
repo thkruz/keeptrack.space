@@ -1,7 +1,7 @@
-
 import { isThisJest } from '../api/externalApi';
 
 declare global {
+  // eslint-disable-next-line no-unused-vars
   interface Window {
     settingsManager: unknown;
     jQuery: unknown;
@@ -39,6 +39,7 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
     if (plugins.nextLaunch) await import('@app/js/plugins/nextLaunch/nextLaunch').then((mod) => mod.init());
     if (plugins.findSat) await import('@app/js/plugins/findSat/findSat').then((mod) => mod.init());
     if (plugins.shortTermFences) await import('@app/js/plugins/shortTermFences/shortTermFences').then((mod) => mod.init());
+    if (plugins.orbitReferences) await import('@app/js/plugins/orbitReferences/orbitReferences').then((mod) => mod.init());
     if (plugins.collisions) await import('@app/js/plugins/collisions/collisions').then((mod) => mod.init());
     if (plugins.breakup) await import('@app/js/plugins/breakup/breakup').then((mod) => mod.init());
     if (plugins.editSat) await import('@app/js/plugins/editSat/editSat').then((mod) => mod.init());
@@ -51,7 +52,7 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
         .catch((err) => {
           // If this fails and it isn't jest then throw an error
           if (!isThisJest()) {
-            console.error(err);
+            console.debug(err);
           }
         });
     if (plugins.stereoMap) await import('@app/js/plugins/stereoMap/stereoMap').then((mod) => mod.init());
@@ -87,10 +88,10 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
       },
     });
   } catch (e) {
-    console.error(e);
+    console.debug(e);
   }
 };
-function uiManagerFinal(plugins: any, keepTrackApi: { programs?: any; register?: any; plugins?: any }) {
+export const uiManagerFinal = (plugins: any, keepTrackApi: { programs?: any; register?: any; plugins?: any }): void => {
   const bicDom = document.getElementById('bottom-icons-container');
   if (bicDom) {
     const bottomHeight = bicDom.offsetHeight;
@@ -117,26 +118,37 @@ function uiManagerFinal(plugins: any, keepTrackApi: { programs?: any; register?:
 
   $('#versionNumber-text').html(`${keepTrackApi.programs.settingsManager.versionNumber} - ${keepTrackApi.programs.settingsManager.versionDate}`);
 
-  // Only turn on analytics if on keeptrack.space ()  
+  // Only turn on analytics if on keeptrack.space ()
   if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
     startGoogleAnalytics();
   }
-}
+
+  const wheel = (dom, deltaY) => {
+    const step = 0.15;
+    const pos = dom.scrollTop();
+    const nextPos = pos + step * deltaY;
+    dom.scrollTop(nextPos);
+  };
+
+  $('#bottom-icons-container').bind('mousewheel', function (event) {
+    wheel($(this), event.originalEvent.deltaY);
+    event.preventDefault();
+  });
+};
 
 /* istanbul ignore next */
-function startGoogleAnalytics() {
+export const startGoogleAnalytics = (): void => {
   const newScript = document.createElement('script');
   newScript.type = 'text/javascript';
   newScript.setAttribute('async', 'true');
   newScript.setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id=G-ENHWK6L0X7');
   document.documentElement.firstChild.appendChild(newScript);
   (<any>window).dataLayer = (<any>window).dataLayer || [];
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line no-unused-vars
   const gtag = function (_a?: string, _b?: any): void {
     // eslint-disable-next-line prefer-rest-params
     (<any>window).dataLayer.push(arguments);
   };
   gtag('js', new Date());
   gtag('config', 'G-ENHWK6L0X7');
-}
-
+};

@@ -1,5 +1,4 @@
 /* globals
-  __dirname
   require
 */
 

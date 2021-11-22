@@ -1,7 +1,14 @@
 {
   "jest.jestCommandLine": "npm run test:noserver --coverage --",
-  "typescript.validate.enable": true,
-  "npm-scripts.showStartNotification": false,
   "ponicode.testSettings.testLocation.locationType": "Same folder as source file",
-  // "editor.maxTokenizationLineLength": 20000000,
+  "editor.formatOnSave": true,
+  "typescript.validate.enable": true,
+  "[typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll": true,
+      "source.organizeImports": true,
+      "source.fixAll.eslint": true,
+      "source.addMissingImports": true
+    }
+  }
 }

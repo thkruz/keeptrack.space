@@ -1,3 +1,6 @@
+import { keepTrackApi } from '@app/js/api/externalApi';
+import { SatObject } from '@app/js/api/keepTrack';
+import $ from 'jquery';
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -20,10 +23,6 @@
  *
  * /////////////////////////////////////////////////////////////////////////////
  */
-
-import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { satObject } from '@app/js/api/keepTrack';
 
 export const init = (): void => {
   const { sensorManager, objectManager, satSet, uiManager } = keepTrackApi.programs;
@@ -50,7 +49,7 @@ export const init = (): void => {
           uiManager.hideSideMenus();
           isAnalysisMenuOpen = true;
           if (objectManager.selectedSat != -1) {
-            let sat: satObject = satSet.getSat(objectManager.selectedSat);
+            const sat: SatObject = satSet.getSat(objectManager.selectedSat);
             $('#anal-sat').val(sat.SCC_NUM);
           }
           if (sensorManager.checkSensorSelected()) {
@@ -85,7 +84,7 @@ export const init = (): void => {
             );
           }
           // Reinitialize the Material CSS Code
-          let elems = document.querySelectorAll('select');
+          const elems = document.querySelectorAll('select');
           M.FormSelect.init(elems);
 
           $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
@@ -116,7 +115,7 @@ export const init = (): void => {
     },
   });
 };
-export const uiManagerInit = () => {  
+export const uiManagerInit = () => {
   // Side Menu
   $('#left-menus').append(keepTrackApi.html`
         <div id="analysis-menu" class="side-menu-parent start-hidden text-select">
@@ -237,9 +236,9 @@ export const uiManagerInit = () => {
 
 export const analysisFormSubmit = () => {
   const { sensorManager } = keepTrackApi.programs;
-  let chartType = $('#anal-type').val();
-  let sat = $('#anal-sat').val();
-  let sensor = sensorManager.currentSensor.shortName;
+  const chartType = $('#anal-type').val();
+  const sat = $('#anal-sat').val();
+  const sensor = sensorManager.currentSensor.shortName;
   if (typeof sensor == 'undefined') {
     $.colorbox({
       href: `analysis/index.htm?sat=${sat}&type=${chartType}`,
@@ -263,13 +262,13 @@ export const analysisFormSubmit = () => {
 
 export const findCsoBtnClick = () => {
   const { satellite, uiManager } = keepTrackApi.programs;
-  let searchStr = satellite.findCloseObjects();
+  const searchStr = satellite.findCloseObjects();
   uiManager.doSearch(searchStr);
   $('#loading-screen').fadeOut('slow');
 };
 export const analysisBptSumbit = () => {
   const { satellite, sensorManager, uiManager } = keepTrackApi.programs;
-  let sats = $('#analysis-bpt-sats').val();
+  const sats = $('#analysis-bpt-sats').val();
   if (!sensorManager.checkSensorSelected()) {
     uiManager.toast(`You must select a sensor first!`, 'critical');
   } else {

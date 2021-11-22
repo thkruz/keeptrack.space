@@ -5,14 +5,13 @@ import { saveCsv } from '@app/js/lib/helpers';
 export const exportTle2Csv = (satData: any[]) => {
   try {
     const catalogTLE2 = [];
-    satData.sort((a: { SCC_NUM: string; }, b: { SCC_NUM: string; }) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
+    satData.sort((a: { SCC_NUM: string }, b: { SCC_NUM: string }) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
     for (let s = 0; s < satData.length; s++) {
-      let sat = satData[s];
+      const sat = satData[s];
       if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
         continue;
       }
-      if (sat.C == 'ANALSAT')
-        continue;
+      if (sat.C == 'ANALSAT') continue;
       catalogTLE2.push({
         satId: sat.SCC_NUM,
         TLE1: sat.TLE1,
@@ -48,20 +47,19 @@ export const exportTle2Csv = (satData: any[]) => {
     }
     saveCsv(catalogTLE2, 'catalogInfo');
   } catch {
-    console.warn('Failed to Export TLEs!');
+    // console.warn('Failed to Export TLEs!');
   }
 };
 export const exportTle2Txt = (satData: any[]) => {
   try {
     const catalogTLE2 = [];
-    satData.sort((a: { SCC_NUM: string; }, b: { SCC_NUM: string; }) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
+    satData.sort((a: { SCC_NUM: string }, b: { SCC_NUM: string }) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
     for (let s = 0; s < satData.length; s++) {
-      let sat = satData[s];
+      const sat = satData[s];
       if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
         continue;
       }
-      if (sat.C == 'ANALSAT')
-        continue;
+      if (sat.C == 'ANALSAT') continue;
       catalogTLE2.push(sat.TLE1);
       catalogTLE2.push(sat.TLE2);
     }
@@ -71,6 +69,6 @@ export const exportTle2Txt = (satData: any[]) => {
     });
     saveAs(blob, 'TLE.txt');
   } catch {
-    console.warn('Failed to Export TLEs!');
+    // console.warn('Failed to Export TLEs!');
   }
 };

@@ -1,3 +1,16 @@
+import { keepTrackApi } from '@app/js/api/externalApi';
+import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants.js';
+import * as glm from '@app/js/lib/external/gl-matrix.js';
+import { SatCruncherMessage } from '@app/types/types';
+import { mat4 } from 'gl-matrix';
+import $ from 'jquery';
+import { InView, Lla, Rae, SatObject } from '../api/keepTrack';
+import { numeric } from '../lib/external/numeric';
+import { stringPad } from '../lib/helpers';
+import { CatalogManager } from './catalogManager';
+import { exportTle2Csv, exportTle2Txt } from './exportTle';
+import { searchCountryRegex, searchNameRegex, searchYear, searchYearOrLess } from './search';
+
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -25,278 +38,136 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import '@app/js/lib/external/numeric.js';
-
-import * as glm from '@app/js/lib/external/gl-matrix.js';
-
-import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants.js';
-
-import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
 // import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
-import { Inview, Lla, Rae } from '../api/keepTrack';
-import { CatalogManager } from './catalogManager';
-import { exportTle2Csv, exportTle2Txt } from './exportTle';
-import { searchCountryRegex, searchNameRegex, searchYear, searchYearOrLess } from './search';
 
 // ******************** Initialization ********************
 
-export const init = async (): Promise<void> => {
-  const { uiManager } = keepTrackApi.programs;
-  let satCruncher: Worker;
+export const init = async (satCruncherOveride?: any): Promise<void> => {
+  try {
+    const { uiManager } = keepTrackApi.programs;
+    let satCruncher: Worker;
 
-  uiManager.loadStr('elsets');
-  // See if we are running jest right now for testing
-  if (typeof process !== 'undefined') {
-    try {
-      let url = 'http://localhost:8080/js/positionCruncher.js';
-      satCruncher = new Worker(url);
-    } catch (error) {
-      console.error(error);
-    }
-  } else {
-    if (typeof Worker === 'undefined') {
-      throw new Error('Your browser does not support web workers.');
-    }
-    try {
-      satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
-    } catch (error) {
-      // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
-      if (window.location.href.indexOf('file://') === 0) {
-        $('#loader-text').text('Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.');
+    uiManager.loadStr('elsets');
+    // See if we are running jest right now for testing
+    if (typeof process !== 'undefined') {
+      if (satCruncherOveride) {
+        satCruncher = satCruncherOveride;
+        satSet.satCruncher = satCruncher;
       } else {
-        console.error(error);
-      }
-    }
-  }
-
-  
-  satSet.satCruncher = satCruncher;
-  addSatCruncherOnMessage();
-  satSet.gotExtraData = false;
-  // satSet.radarDataManager = radarDataManager;
-};
-export const parseGetVariables = () => {
-  const { timeManager, objectManager, uiManager } = keepTrackApi.programs;
-  // do querystring stuff
-  let params = satSet.queryStr.split('&');
-
-  // Do Searches First
-  for (let i = 0; i < params.length; i++) {
-    let key = params[i].split('=')[0];
-    let val = params[i].split('=')[1];
-    if (key == 'search') {
-      if (!settingsManager.disableUI) {
-        uiManager.doSearch(val);
-        if (settingsManager.lastSearchResults.length == 0) {
-          uiManager.toast(`Search for "${val}" found nothing!`, 'caution', true);
-          uiManager.searchBox.hideResults();
-        }
-      }
-    }
-  }
-
-  // Then Do Other Stuff
-  for (let i = 0; i < params.length; i++) {
-    let key = params[i].split('=')[0];
-    let val = params[i].split('=')[1];
-    let urlSatId: number;
-    switch (key) {
-      case 'intldes':
-        urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
-        if (urlSatId !== null) {
-          objectManager.setSelectedSat(urlSatId);
-        } else {
-          uiManager.toast(`International Designator "${val.toUpperCase()}" was not found!`, 'caution', true);
-        }
-        break;
-      case 'sat':
-        urlSatId = satSet.getIdFromObjNum(val.toUpperCase());
-        if (urlSatId !== null) {
-          objectManager.setSelectedSat(urlSatId);
-        } else {
-          uiManager.toast(`Satellite "${val.toUpperCase()}" was not found!`, 'caution', true);
-        }
-        break;
-      case 'misl':
-        var subVal = val.split(',');
-        $('#ms-type').val(subVal[0].toString());
-        $('#ms-attacker').val(subVal[1].toString());
-        // $('#ms-lat-lau').val() * 1;
-        // ('#ms-lon-lau').val() * 1;
-        $('#ms-target').val(subVal[2].toString());
-        // $('#ms-lat').val() * 1;
-        // $('#ms-lon').val() * 1;
-        $('#missile').trigger('submit');
-        break;
-      case 'date':
-        if (isNaN(parseInt(val))) {
-          uiManager.toast(`Date value of "${val}" is not a proper unix timestamp!`, 'caution', true);
-          break;
-        }
-        timeManager.propOffset = Number(val) - Date.now();
-        $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
-        satSet.satCruncher.postMessage({
-          typ: 'offset',
-          dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-        });
-        break;
-      case 'rate':
-        if (isNaN(parseFloat(val))) {
-          uiManager.toast(`Propagation rate of "${val}" is not a valid float!`, 'caution', true);
-          break;
-        }
-        val = Math.min(val, 1000);
-        // could run time backwards, but let's not!
-        val = Math.max(val, 0.0);
-        timeManager.propRate = Number(val);
-        satSet.satCruncher.postMessage({
-          typ: 'offset',
-          dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-        });
-        break;
-    }
-  }
-}
-export const addSatCruncherOnMessage = () => {
-  satSet.satCruncher.onmessage = (m) => {
-    const { dotsManager, mainCamera, sensorManager, objectManager, uiManager } = keepTrackApi.programs;
-    if (!satSet.gotExtraData && m.data?.extraData) {
-      // store extra data that comes from crunching
-      // Only do this once
-
-      const satExtraData = JSON.parse(m.data.extraData);
-
-      for (let satCrunchIndex = 0; satCrunchIndex < satSet.numSats; satCrunchIndex++) {
-        if (typeof satSet.satData === 'undefined') throw new Error('No sat data');
-        if (typeof satExtraData === 'undefined') throw new Error('No extra data');
-        if (satExtraData[satCrunchIndex] === 'undefined') throw new Error('No extra data for sat ' + satCrunchIndex);
-        if (satSet.satData[satCrunchIndex] === 'undefined') throw new Error('No data for sat ' + satCrunchIndex);
-
         try {
-          satSet.satData[satCrunchIndex].inclination = satExtraData[satCrunchIndex].inclination;
-          satSet.satData[satCrunchIndex].eccentricity = satExtraData[satCrunchIndex].eccentricity;
-          satSet.satData[satCrunchIndex].raan = satExtraData[satCrunchIndex].raan;
-          satSet.satData[satCrunchIndex].argPe = satExtraData[satCrunchIndex].argPe;
-          satSet.satData[satCrunchIndex].meanMotion = satExtraData[satCrunchIndex].meanMotion;
-
-          satSet.satData[satCrunchIndex].semiMajorAxis = satExtraData[satCrunchIndex].semiMajorAxis;
-          satSet.satData[satCrunchIndex].semiMinorAxis = satExtraData[satCrunchIndex].semiMinorAxis;
-          satSet.satData[satCrunchIndex].apogee = satExtraData[satCrunchIndex].apogee;
-          satSet.satData[satCrunchIndex].perigee = satExtraData[satCrunchIndex].perigee;
-          satSet.satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
-          satSet.satData[satCrunchIndex].velocity = {};
+          const url = 'http://localhost:8080/js/positionCruncher.js';
+          satCruncher = new Worker(url);
+          satSet.satCruncher = satCruncher;
         } catch (error) {
-          console.error(satCrunchIndex);
+          satSet.satCruncher = {} as any;
+          console.debug(error);
         }
       }
-
-      satSet.gotExtraData = true;
-      return;
-    }
-
-    if (m.data?.extraUpdate) {
-      const satExtraData = JSON.parse(m.data.extraData);
-      let satCrunchIndex = m.data.satId;
-
-      satSet.satData[satCrunchIndex].inclination = satExtraData[0].inclination;
-      satSet.satData[satCrunchIndex].eccentricity = satExtraData[0].eccentricity;
-      satSet.satData[satCrunchIndex].raan = satExtraData[0].raan;
-      satSet.satData[satCrunchIndex].argPe = satExtraData[0].argPe;
-      satSet.satData[satCrunchIndex].meanMotion = satExtraData[0].meanMotion;
-
-      satSet.satData[satCrunchIndex].semiMajorAxis = satExtraData[0].semiMajorAxis;
-      satSet.satData[satCrunchIndex].semiMinorAxis = satExtraData[0].semiMinorAxis;
-      satSet.satData[satCrunchIndex].apogee = satExtraData[0].apogee;
-      satSet.satData[satCrunchIndex].perigee = satExtraData[0].perigee;
-      satSet.satData[satCrunchIndex].period = satExtraData[0].period;
-      satSet.satData[satCrunchIndex].TLE1 = satExtraData[0].TLE1;
-      satSet.satData[satCrunchIndex].TLE2 = satExtraData[0].TLE2;
-      return;
-    }
-
-    if (typeof dotsManager.positionData == 'undefined') {
-      dotsManager.positionData = new Float32Array(m.data.satPos);
     } else {
-      dotsManager.positionData.set(m.data.satPos, 0);
-    }
-
-    if (typeof dotsManager.velocityData == 'undefined') {
-      dotsManager.velocityData = new Float32Array(m.data.satVel);
-    } else {
-      dotsManager.velocityData.set(m.data.satVel, 0);
-    }
-
-    if (typeof m.data?.satInView != 'undefined' && m.data?.satInView.length > 0) {
-      if (typeof dotsManager.inViewData == 'undefined' || dotsManager.inViewData.length !== m.data.satInView.length) {
-        dotsManager.inViewData = new Int8Array(m.data.satInView);
-      } else {
-        dotsManager.inViewData.set(m.data.satInView, 0);
+      if (typeof Worker === 'undefined') {
+        console.debug('Your browser does not support web workers.');
+        return;
+      }
+      /* istanbul ignore next */
+      try {
+        satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
+        satSet.satCruncher = satCruncher;
+      } catch (error) {
+        // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
+        if (window.location.href.indexOf('file://') === 0) {
+          $('#loader-text').text('Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.');
+        } else {
+          console.debug(error);
+        }
       }
     }
 
-    if (typeof m.data?.satInSun != 'undefined' && m.data?.satInSun.length > 0) {
-      if (typeof dotsManager.inSunData == 'undefined' || dotsManager.inSunData.length !== m.data.satInSun.length) {
-        dotsManager.inSunData = new Int8Array(m.data.satInSun);
-      } else {
-        dotsManager.inSunData.set(m.data.satInSun, 0);
-      }
+    satSet.satCruncher.onmessage = satCruncherOnMessage;
+    satSet.gotExtraData = false;
+    // satSet.radarDataManager = radarDataManager;
+  } catch (error) {
+    console.debug(error);
+  }
+};
+
+export const satCruncherOnMessage = (m: SatCruncherMessage) => {
+  const { mainCamera, sensorManager, objectManager, uiManager, timeManager } = keepTrackApi.programs;
+  if (m.data?.typ === 'timeSync') {
+    if (timeManager.propTime().getTime() === m.data.time) {
+      console.table([
+        { time: new Date(m.data.time), offset: m.data.propOffset, rate: m.data.propRate },
+        { time: timeManager.propTime(), offset: timeManager.propOffset, rate: timeManager.propRate },
+      ]);
+      satSet.satCruncher.postMessage({
+        typ: 'offset',
+        dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
+      });
     }
+    return;
+  }
 
-    if (typeof m.data?.sensorMarkerArray != 'undefined' || m.data?.sensorMarkerArray?.length === 0) {
-      satSet.satSensorMarkerArray = m.data.sensorMarkerArray;
-    }
+  // store extra data that comes from crunching
+  // Only do this once
+  if (!satSet.gotExtraData && m.data?.extraData) {
+    cruncherExtraData(m);
+    return;
+  }
 
-    const highestMarkerNumber = satSet.satSensorMarkerArray?.[satSet.satSensorMarkerArray?.length - 1] || 0;
-    settingsManager.dotsOnScreen = Math.max(satSet.numSats - settingsManager.maxFieldOfViewMarkers, highestMarkerNumber);
+  if (m.data?.extraUpdate) {
+    cruncherExtraUpdate(m);
+    return;
+  }
 
-    // Run any callbacks for a normal position cruncher message
-    keepTrackApi.methods.onCruncherMessage();
+  cruncherDotsManagerInteraction(m);
 
-    // Don't force color recalc if default colors and no sensor for inview color
-    if ((objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) || settingsManager.isForceColorScheme) {
-      // Don't change colors while dragging
-      if (!mainCamera.isDragging) {
+  // Run any callbacks for a normal position cruncher message
+  keepTrackApi.methods.onCruncherMessage();
+
+  // Don't force color recalc if default colors and no sensor for inview color
+  if ((objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) || settingsManager.isForceColorScheme) {
+    // Don't change colors while dragging
+    if (!mainCamera.isDragging) {
+      setTimeout(() => {
         satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-      }
-    }
-
-    // Only do this once after satSet.satData is ready
-    if (!settingsManager.cruncherReady && typeof satSet.satData !== 'undefined') {
-      satSet.onCruncherReady();
-      if (!settingsManager.disableUI) {
-        uiManager.reloadLastSensor();
-      }
-
-      parseGetVariables();
-
-      // Load ALl The Images Now
-      setTimeout(function () {
-        $('img').each(function () {
-          $(this).attr('src', $(this).attr('delayedsrc'));
-        });
       }, 0);
-
-      // Run any functions registered with the API
-      keepTrackApi.methods.onCruncherReady();
-
-      settingsManager.cruncherReady = true;
     }
-  };
+  }
+
+  // Only do this once after satSet.satData is ready
+  if (!settingsManager.cruncherReady && typeof satSet.satData !== 'undefined') {
+    satSet.onCruncherReady();
+    if (!settingsManager.disableUI) {
+      uiManager.reloadLastSensor();
+    }
+
+    parseGetVariables();
+
+    // Load ALl The Images Now
+    setTimeout(function () {
+      $('img').each(function () {
+        $(this).attr('src', $(this).attr('delayedsrc'));
+      });
+    }, 0);
+
+    // Run any functions registered with the API
+    keepTrackApi.methods.onCruncherReady();
+
+    settingsManager.cruncherReady = true;
+  }
 };
 /* istanbul ignore next */
-export const initGsData = () => {
+export const initGsData = (): void => {
   const { uiManager } = keepTrackApi.programs;
   $.getScript('satData/gs.json', function (resp: string) {
     uiManager.loadStr('satIntel');
     $('#loading-screen').fadeIn(1000, function loadGsInfo() {
       satSet.gsInfo = JSON.parse(resp);
       for (let gsI = 0; gsI < satSet.gsInfo.length; gsI++) {
-        let gsSatType = satSet.gsInfo[gsI];
+        const gsSatType = satSet.gsInfo[gsI];
         let satSetFirstI = 0;
         let satSetI = 0;
         for (let gsI2 = 0; gsI2 < gsSatType[1].length; gsI2++) {
-          let gsSat = gsSatType[1][gsI2];
+          const gsSat = gsSatType[1][gsI2];
           satSetFirstI = Math.max(satSetFirstI - 200, 0);
           if (typeof satSet.cosparIndex[`${gsSat.cospar}`] !== 'undefined') {
             satSetI = satSet.cosparIndex[`${gsSat.cospar}`];
@@ -336,28 +207,42 @@ export const initGsData = () => {
   });
 };
 
-// ******************** Complex Functions ********************
-export const insertNewAnalystSatellite = (TLE1: any, TLE2: any, analsat: number) => {
+// ******************** Simple Functions ********************
+
+export const parseGetVariables = (): void => {
+  // do querystring stuff
+  const params = satSet.queryStr.split('&');
+
+  // Do Searches First
+  getVariableSearch(params);
+
+  // Then Do Other Stuff
+  getVariableActions(params);
+};
+export const insertNewAnalystSatellite = (TLE1: string, TLE2: string, id: number, SCC_NUM?: string): any => {
   const { satellite, timeManager, orbitManager, uiManager } = keepTrackApi.programs;
   if (satellite.altitudeCheck(TLE1, TLE2, timeManager.propOffset) > 1) {
     satSet.satCruncher.postMessage({
       typ: 'satEdit',
-      id: analsat,
+      id: id,
       active: true,
       TLE1: TLE1,
       TLE2: TLE2,
     });
-    orbitManager.updateOrbitBuffer(analsat, true, TLE1, TLE2);
-    let sat = satSet.getSat(analsat);
+    orbitManager.updateOrbitBuffer(id, true, TLE1, TLE2);
+    const sat = satSet.getSat(id);
     sat.active = true;
     sat.OT = 1; // Default to Satellite
-    uiManager.doSearch(sat.SCC_NUM.toString());
+    sat.SCC_NUM = SCC_NUM || stringPad.pad0(TLE1.substr(2, 5).trim(), 5);
+    return sat;
   } else {
     console.debug(TLE1);
     console.debug(TLE2);
     uiManager.toast(`New Analyst Satellite is Invalid!`, 'critical');
+    return false;
   }
 };
+/*
 // export const updateRadarData = () => {
 //   for (let i = 0; i < radarDataManager.radarData.length; i++) {
 //     try {
@@ -379,18 +264,19 @@ export const insertNewAnalystSatellite = (TLE1: any, TLE2: any, analsat: number)
 //   }
 //   satSet.setColorScheme(settingsManager.currentColorScheme, true);
 // };
-export const getSat = (i: number) => {
-  const { dotsManager, sensorManager, satellite, timeManager, objectManager } = keepTrackApi.programs;
+*/
+export const getSat = (i: number): SatObject => {
   if (!satSet.satData) return null;
   if (!satSet.satData[i]) return null;
+  const { dotsManager } = keepTrackApi.programs;
 
   if (satSet.gotExtraData) {
     satSet.satData[i].inViewChange = false;
     if (typeof dotsManager.inViewData != 'undefined' && typeof dotsManager.inViewData[i] != 'undefined') {
-      if (satSet.satData[i].inview !== dotsManager.inViewData[i]) satSet.satData[i].inViewChange = true;
-      satSet.satData[i].inview = dotsManager.inViewData[i];
+      if (satSet.satData[i].inView !== dotsManager.inViewData[i]) satSet.satData[i].inViewChange = true;
+      satSet.satData[i].inView = dotsManager.inViewData[i];
     } else {
-      satSet.satData[i].inview = false;
+      satSet.satData[i].inView = false;
       satSet.satData[i].inViewChange = false;
     }
 
@@ -418,6 +304,397 @@ export const getSat = (i: number) => {
   if (satSet.satData[i].type == 'Star') return satSet.satData[i];
 
   // Add Functions One Time
+  addSatExtraFunctions(i);
+
+  return satSet.satData[i];
+};
+export const setHover = (i: number): void => {
+  const { objectManager } = keepTrackApi.programs;
+  const { gl } = keepTrackApi.programs.drawManager;
+  objectManager.setHoveringSat(i);
+  if (i === objectManager.lasthoveringSat) return;
+  if (i !== -1 && satSet.satData[i].type == 'Star') return;
+
+  settingsManager.currentColorScheme.hoverSat = objectManager.hoveringSat;
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
+  // If Old Select Sat Picked Color it Correct Color
+  if (objectManager.lasthoveringSat !== -1 && objectManager.lasthoveringSat !== objectManager.selectedSat) {
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lasthoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.lasthoveringSat)).color));
+  }
+  // If New Select Sat Picked Color it
+  if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.hoverColor));
+  }
+  objectManager.setLasthoveringSat(objectManager.hoveringSat);
+
+  // satSet.setColorScheme(settingsManager.currentColorScheme, true);
+};
+export const selectSat = (i: number): void => {
+  const { sensorManager, objectManager, uiManager } = keepTrackApi.programs;
+  const { gl } = keepTrackApi.programs.drawManager;
+  if (i === objectManager.lastSelectedSat()) return;
+
+  const sat = satSet.getSat(i);
+  if (sat !== null && sat.static && typeof sat.staticNum !== 'undefined') {
+    if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.sensor();
+  } else {
+    if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.satelliteSelected();
+  }
+
+  satSet.satCruncher.postMessage({
+    satelliteSelected: [i],
+  });
+  if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+
+  settingsManager.currentColorScheme.selectSat = objectManager.selectedSat;
+  gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
+  // If Old Select Sat Picked Color it Correct Color
+  if (objectManager.lastSelectedSat() !== -1) {
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lastSelectedSat() * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.lastSelectedSat())).color));
+  }
+  // If New Select Sat Picked Color it
+  if (i !== -1) {
+    gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
+  }
+
+  objectManager.setSelectedSat(i);
+
+  // satSet.setColorScheme(settingsManager.currentColorScheme, true);
+
+  if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
+    $('#menu-lookangles').removeClass('bmenu-item-disabled');
+  }
+  $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');
+  $('#menu-satview').removeClass('bmenu-item-disabled');
+  $('#menu-map').removeClass('bmenu-item-disabled');
+  $('#menu-editSat').removeClass('bmenu-item-disabled');
+  $('#menu-sat-fov').removeClass('bmenu-item-disabled');
+  $('#menu-newLaunch').removeClass('bmenu-item-disabled');
+  $('#menu-breakup').removeClass('bmenu-item-disabled');
+};
+export const getSatInViewOnly = (i: number): void => {
+  const { dotsManager } = keepTrackApi.programs;
+  if (!satSet.satData) return null;
+  if (!satSet.satData[i]) return null;
+
+  satSet.satData[i].inView = dotsManager.inViewData[i];
+  return satSet.satData[i];
+};
+export const getSatPosOnly = (i: number): SatObject => {
+  const { dotsManager } = keepTrackApi.programs;
+  if (!satSet.satData) return null;
+  if (!satSet.satData[i]) return null;
+
+  if (satSet.gotExtraData) {
+    satSet.satData[i].position = {
+      x: dotsManager.positionData[i * 3],
+      y: dotsManager.positionData[i * 3 + 1],
+      z: dotsManager.positionData[i * 3 + 2],
+    };
+  }
+
+  const sat = satSet.satData[i];
+  return sat;
+};
+export const getIdFromEci = (eci: { x: number; y: number; z: number }): number => {
+  const { dotsManager } = keepTrackApi.programs;
+  let x: number, y: number, z: number;
+  for (let id = 0; id < satSet.orbitalSats; id++) {
+    x = dotsManager.positionData[id * 3];
+    if (x > eci.x - 100 && x < eci.x + 100) {
+      y = dotsManager.positionData[id * 3 + 1];
+      if (y > eci.y - 100 && y < eci.y + 100) {
+        console.log(`y: ${id}`);
+        z = dotsManager.positionData[id * 3 + 2];
+        if (z > eci.z - 100 && z < eci.z + 100) {
+          return id;
+        }
+      }
+    }
+  }
+  return -1;
+};
+export const getSatInView = () => {
+  const { dotsManager } = keepTrackApi.programs;
+  if (typeof dotsManager.inViewData == 'undefined') return false;
+  return dotsManager.inViewData;
+};
+export const getSatInSun = () => {
+  const { dotsManager } = keepTrackApi.programs;
+  if (typeof dotsManager.inSunData == 'undefined') return false;
+  return dotsManager.inSunData;
+};
+export const getSatVel = () => {
+  const { dotsManager } = keepTrackApi.programs;
+  if (typeof dotsManager.velocityData == 'undefined') return false;
+  return dotsManager.velocityData;
+};
+export const resetSatInView = () => {
+  const { dotsManager } = keepTrackApi.programs;
+  dotsManager.inViewData = new Int8Array(dotsManager.inViewData.length);
+  dotsManager.inViewData.fill(0);
+};
+export const resetSatInSun = () => {
+  const { dotsManager } = keepTrackApi.programs;
+  dotsManager.inSunData = new Int8Array(dotsManager.inSunData.length);
+  dotsManager.inSunData.fill(0);
+};
+// eslint-disable-next-line no-unused-vars
+export const setColorScheme = async (scheme: { calculateColorBuffers: (arg0: any) => any; colorBuf: any; pickableBuf: any }, isForceRecolor?: boolean) => {
+  const { dotsManager } = keepTrackApi.programs;
+  try {
+    settingsManager.setCurrentColorScheme(scheme);
+    await scheme.calculateColorBuffers(isForceRecolor);
+    dotsManager.colorBuffer = scheme.colorBuf;
+    dotsManager.pickingBuffer = scheme.pickableBuf;
+  } catch (error) {
+    // If we can't load the color scheme, just use the default
+    console.debug(error);
+    settingsManager.setCurrentColorScheme(keepTrackApi.programs.ColorScheme.default);
+    scheme = keepTrackApi.programs.ColorScheme.default;
+    await scheme.calculateColorBuffers(isForceRecolor);
+    dotsManager.colorBuffer = scheme.colorBuf;
+    dotsManager.pickingBuffer = scheme.pickableBuf;
+  }
+};
+
+// ******************** PURE ********************
+export const getSatExtraOnly = (i: number): SatObject => {
+  if (!satSet.satData) return null;
+  if (!satSet.satData[i]) return null;
+  return satSet.satData[i];
+};
+export const getSatFromObjNum = (objNum: number): SatObject => {
+  const satIndex = satSet.getIdFromObjNum(objNum);
+  return satSet.getSat(satIndex);
+};
+export const getIdFromObjNum = (objNum: number): number => {
+  if (typeof satSet.sccIndex?.[`${objNum}`] !== 'undefined') {
+    return satSet.sccIndex[`${objNum}`];
+  } else {
+    for (let i = 0; i < satSet.satData.length; i++) {
+      if (parseInt(satSet.satData[i].SCC_NUM) == objNum) return i;
+    }
+    return null;
+  }
+};
+export const setSat = (i: number, sat: SatObject) => {
+  if (!satSet.satData) return null;
+  satSet.satData[i] = sat;
+  satSet.satData[i].velocity = satSet.satData[i].velocity == 0 ? {} : satSet.satData[i].velocity;
+};
+export const mergeSat = (sat: {
+  SCC?: any;
+  SCC_NUM?: number;
+  OT?: number;
+  ON?: string;
+  C?: string;
+  LV?: string;
+  LS?: string;
+  R?: number;
+  URL?: string;
+  NOTES?: string;
+  TTP?: string;
+  FMISSED?: string;
+  ORPO?: string;
+  constellation?: string;
+  associates?: string;
+  maneuver?: string;
+}) => {
+  if (!satSet.satData) return null;
+  const satId = sat.SCC || sat.SCC_NUM || -1;
+  if (satId === -1) return;
+  const i = satSet.getIdFromObjNum(satId);
+  satSet.satData[i].ON = sat.ON;
+  satSet.satData[i].OT = sat.OT;
+  satSet.satData[i].C = sat.C;
+  satSet.satData[i].LV = sat.LV;
+  satSet.satData[i].LS = sat.LS;
+  satSet.satData[i].R = sat.R;
+  satSet.satData[i].URL = sat.URL;
+  satSet.satData[i].NOTES = sat.NOTES;
+  satSet.satData[i].TTP = sat.TTP;
+  satSet.satData[i].FMISSED = sat.FMISSED;
+  satSet.satData[i].ORPO = sat.ORPO;
+  satSet.satData[i].constellation = sat.constellation;
+  satSet.satData[i].associates = sat.associates;
+  satSet.satData[i].maneuver = sat.maneuver;
+};
+export const vmagUpdate = (vmagObject: { satid: string | number; vmag: any }) => {
+  if (!satSet.satData) return null;
+  try {
+    satSet.satData[vmagObject.satid].vmag = vmagObject.vmag;
+  } catch (e) {
+    // console.warn('Old Satellite in vmagManager: ' + vmagObject.satid);
+  }
+};
+export const onCruncherReady = () => {
+  try {
+    satSet.queryStr = window.location.search.substring(1);
+  } catch {
+    satSet.queryStr = '';
+  }
+  // Anything else?
+};
+export const convertIdArrayToSatnumArray = (satIdArray: number[]) => {
+  const satnumArray = [];
+  for (let i = 0; i < satIdArray.length; i++) {
+    satnumArray.push(parseInt(satSet.getSat(satIdArray[i]).SCC_NUM));
+  }
+  return satnumArray;
+};
+export const convertSatnumArrayToIdArray = (satnumArray: number[]) => {
+  const satIdArray = [];
+  for (let i = 0; i < satnumArray.length; i++) {
+    try {
+      satIdArray.push(satSet.getSatFromObjNum(satnumArray[i]).id);
+    } catch (e) {
+      // console.log(`Missing Sat: ${satnumArray[i]}`);
+    }
+  }
+  return satIdArray;
+};
+export const getIdFromIntlDes = (intlDes: string) => {
+  if (typeof satSet.cosparIndex[`${intlDes}`] !== 'undefined') {
+    return satSet.cosparIndex[`${intlDes}`];
+  } else {
+    return null;
+  }
+};
+export const getIdFromStarName = (starName: string) => {
+  for (let i = 0; i < satSet.satData.length; i++) {
+    if (satSet.satData[i].type === 'Star') {
+      if (satSet.satData[i].name === starName) {
+        return i;
+      }
+    }
+  }
+  return null;
+};
+export const getSensorFromSensorName = (sensorName: string): number => {
+  for (let i = 0; i < satSet.satData.length; i++) {
+    if (satSet.satData[i].static === true && satSet.satData[i].missile !== true && satSet.satData[i].type !== 'Star') {
+      if (satSet.satData[i].name === sensorName) {
+        return i;
+      }
+    }
+  }
+  return -1;
+};
+export const getScreenCoords = (i: number, pMatrix: mat4, camMatrix: mat4, pos: { x: number; y: number; z: number }) => {
+  const satScreenPositionArray = { x: null, y: null, z: null, error: false };
+  try {
+    if (!pos) pos = satSet.getSatPosOnly(i).position;
+    const posVec4 = glm.vec4.fromValues(pos.x, pos.y, pos.z, 1);
+
+    glm.vec4.transformMat4(posVec4, posVec4, camMatrix);
+    glm.vec4.transformMat4(posVec4, posVec4, pMatrix);
+
+    satScreenPositionArray.x = posVec4[0] / posVec4[3];
+    satScreenPositionArray.y = posVec4[1] / posVec4[3];
+    satScreenPositionArray.z = posVec4[2] / posVec4[3];
+
+    satScreenPositionArray.x = (satScreenPositionArray.x + 1) * 0.5 * window.innerWidth;
+    satScreenPositionArray.y = (-satScreenPositionArray.y + 1) * 0.5 * window.innerHeight;
+
+    if (satScreenPositionArray.x >= 0 && satScreenPositionArray.y >= 0 && satScreenPositionArray.z >= 0 && satScreenPositionArray.z <= 1) {
+      // Passed Test
+    } else {
+      satScreenPositionArray.error = true;
+    }
+  } catch {
+    satScreenPositionArray.error = true;
+  }
+  return satScreenPositionArray;
+};
+
+export const replaceSatSet = (newSatSet: any) => {
+  satSet = newSatSet;
+};
+export const getVariableSearch = (params: string[]) => {
+  const { uiManager, searchBox } = keepTrackApi.programs;
+  for (let i = 0; i < params.length; i++) {
+    const key = params[i].split('=')[0];
+    const val = params[i].split('=')[1];
+    if (key == 'search') {
+      if (!settingsManager.disableUI) {
+        uiManager.doSearch(val);
+        if (settingsManager.lastSearchResults.length == 0) {
+          uiManager.toast(`Search for "${val}" found nothing!`, 'caution', true);
+          searchBox.hideResults();
+        }
+      }
+    }
+  }
+};
+
+export const getVariableActions = (params: string[]) => {
+  const { timeManager, objectManager, uiManager } = keepTrackApi.programs;
+  for (let i = 0; i < params.length; i++) {
+    const key = params[i].split('=')[0];
+    let val = params[i].split('=')[1];
+    let urlSatId: number;
+    switch (key) {
+      case 'intldes':
+        urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
+        if (urlSatId !== null) {
+          objectManager.setSelectedSat(urlSatId);
+        } else {
+          uiManager.toast(`International Designator "${val.toUpperCase()}" was not found!`, 'caution', true);
+        }
+        break;
+      case 'sat':
+        urlSatId = satSet.getIdFromObjNum(parseInt(val));
+        if (urlSatId !== null) {
+          objectManager.setSelectedSat(urlSatId);
+        } else {
+          uiManager.toast(`Satellite "${val.toUpperCase()}" was not found!`, 'caution', true);
+        }
+        break;
+      case 'misl':
+        var subVal = val.split(',');
+        $('#ms-type').val(subVal[0].toString());
+        $('#ms-attacker').val(subVal[1].toString());
+        // $('#ms-lat-lau').val() * 1;
+        // ('#ms-lon-lau').val() * 1;
+        $('#ms-target').val(subVal[2].toString());
+        // $('#ms-lat').val() * 1;
+        // $('#ms-lon').val() * 1;
+        $('#missile').trigger('submit');
+        break;
+      case 'date':
+        if (isNaN(parseInt(val))) {
+          uiManager.toast(`Date value of "${val}" is not a proper unix timestamp!`, 'caution', true);
+          break;
+        }
+        timeManager.propOffset = Number(val) - Date.now();
+        $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
+        satSet.satCruncher.postMessage({
+          typ: 'offset',
+          dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
+        });
+        break;
+      case 'rate':
+        var rate = parseFloat(val);
+        if (isNaN(rate)) {
+          uiManager.toast(`Propagation rate of "${rate}" is not a valid float!`, 'caution', true);
+          break;
+        }
+        rate = Math.min(rate, 1000);
+        // could run time backwards, but let's not!
+        rate = Math.max(rate, 0.0);
+        timeManager.propRate = Number(rate);
+        satSet.satCruncher.postMessage({
+          typ: 'offset',
+          dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
+        });
+        break;
+    }
+  }
+};
+export const addSatExtraFunctions = (i: number) => {
+  const { sensorManager, satellite, timeManager, objectManager } = keepTrackApi.programs;
   if (typeof satSet.satData[i].isInSun == 'undefined') {
     satSet.satData[i].isInSun = () => {
       //
@@ -425,17 +702,16 @@ export const getSat = (i: number) => {
 
       // Distances all in km
       // satSet.sunECI is updated by drawManager every draw frame
-      let sunECI = satSet.sunECI;
+      const sunECI = satSet.sunECI;
 
       // NOTE: Code is mashed to save memory when used on the whole catalog
-
       // Position needs to be relative to satellite NOT ECI
       // var distSatEarthX = Math.pow(-satSet.satData[i].position.x, 2);
       // var distSatEarthY = Math.pow(-satSet.satData[i].position.y, 2);
       // var distSatEarthZ = Math.pow(-satSet.satData[i].position.z, 2);
       // var distSatEarth = Math.sqrt(distSatEarthX + distSatEarthY + distSatEarthZ);
       // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
-      let semiDiamEarth = Math.asin(RADIUS_OF_EARTH / Math.sqrt(Math.pow(-satSet.satData[i].position.x, 2) + Math.pow(-satSet.satData[i].position.y, 2) + Math.pow(-satSet.satData[i].position.z, 2))) * RAD2DEG;
+      const semiDiamEarth = Math.asin(RADIUS_OF_EARTH / Math.sqrt(Math.pow(-satSet.satData[i].position.x, 2) + Math.pow(-satSet.satData[i].position.y, 2) + Math.pow(-satSet.satData[i].position.z, 2))) * RAD2DEG;
 
       // Position needs to be relative to satellite NOT ECI
       // var distSatSunX = Math.pow(-satSet.satData[i].position.x + sunECI.x, 2);
@@ -443,21 +719,19 @@ export const getSat = (i: number) => {
       // var distSatSunZ = Math.pow(-satSet.satData[i].position.z + sunECI.z, 2);
       // var distSatSun = Math.sqrt(distSatSunX + distSatSunY + distSatSunZ);
       // var semiDiamSun = Math.asin(RADIUS_OF_SUN/distSatSun) * RAD2DEG;
-      let semiDiamSun = Math.asin(RADIUS_OF_SUN / Math.sqrt(Math.pow(-satSet.satData[i].position.x + sunECI.x, 2) + Math.pow(-satSet.satData[i].position.y + sunECI.y, 2) + Math.pow(-satSet.satData[i].position.z + sunECI.z, 2))) * RAD2DEG;
+      const semiDiamSun = Math.asin(RADIUS_OF_SUN / Math.sqrt(Math.pow(-satSet.satData[i].position.x + sunECI.x, 2) + Math.pow(-satSet.satData[i].position.y + sunECI.y, 2) + Math.pow(-satSet.satData[i].position.z + sunECI.z, 2))) * RAD2DEG;
 
       // Angle between earth and sun
-      let theta =
+      const theta =
         Math.acos(
-          (<any>window).numeric.dot(
-            [-satSet.satData[i].position.x, -satSet.satData[i].position.y, -satSet.satData[i].position.z],
-            [-satSet.satData[i].position.x + sunECI.x, -satSet.satData[i].position.y + sunECI.y, -satSet.satData[i].position.z + sunECI.z]
+          <number>(
+            numeric.dot([-satSet.satData[i].position.x, -satSet.satData[i].position.y, -satSet.satData[i].position.z], [-satSet.satData[i].position.x + sunECI.x, -satSet.satData[i].position.y + sunECI.y, -satSet.satData[i].position.z + sunECI.z])
           ) /
             (Math.sqrt(Math.pow(-satSet.satData[i].position.x, 2) + Math.pow(-satSet.satData[i].position.y, 2) + Math.pow(-satSet.satData[i].position.z, 2)) *
               Math.sqrt(Math.pow(-satSet.satData[i].position.x + sunECI.x, 2) + Math.pow(-satSet.satData[i].position.y + sunECI.y, 2) + Math.pow(-satSet.satData[i].position.z + sunECI.z, 2)))
         ) * RAD2DEG;
 
       // var isSun = false;
-
       // var isUmbral = false;
       if (semiDiamEarth > semiDiamSun && theta < semiDiamEarth - semiDiamSun) {
         // isUmbral = true;
@@ -503,14 +777,14 @@ export const getSat = (i: number) => {
   }
   if (objectManager.isSensorManagerLoaded && typeof satSet.satData[i].getTEARR == 'undefined') {
     satSet.satData[i].getTEARR = (propTime: any, sensor: { observerGd?: any; alt?: any; lat?: any; lon?: any }) => {
-      let currentTEARR: Lla & Rae & Inview = {
+      const currentTEARR: Lla & Rae & InView = {
         lat: 0,
         lon: 0,
         alt: 0,
         rng: 0,
         az: 0,
         el: 0,
-        inview: false,
+        inView: false,
       }; // Most current TEARR data that is set in satellite object and returned.
 
       if (typeof sensor == 'undefined') {
@@ -554,20 +828,13 @@ export const getSat = (i: number) => {
       } else {
         now = timeManager.propTime();
       }
-      let j = timeManager.jday(
-        now.getUTCFullYear(),
-        now.getUTCMonth() + 1, // NOTE:, satSet.satData[i] function requires months in range 1-12.
-        now.getUTCDate(),
-        now.getUTCHours(),
-        now.getUTCMinutes(),
-        now.getUTCSeconds()
-      ); // Converts time to jday (TLEs use epoch year/day)
+      let j = timeManager.jday(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
       j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-      let gmst = satellite.gstime(j);
+      const gmst = satellite.gstime(j);
 
       if (satSet.satData[i].missile) {
         // ECI to ECF
-        let positionEcf = satellite.eciToEcf(satSet.satData[i].position, gmst);
+        const positionEcf = satellite.eciToEcf(satSet.satData[i].position, gmst);
         // ECF to RAE
         const Rae = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
         const inview = satellite.checkIsInFOV(sensor, {
@@ -580,23 +847,23 @@ export const getSat = (i: number) => {
           lat: lla.lat,
           lon: lla.lon,
           alt: lla.alt,
-          inview: inview,
+          inView: inview,
         };
       }
 
       // Set default timing settings. These will be changed to find look angles at different times in future.
-      let satrec = satellite.twoline2satrec(satSet.satData[i].TLE1, satSet.satData[i].TLE2); // perform and store sat init calcs
+      const satrec = satellite.twoline2satrec(satSet.satData[i].TLE1, satSet.satData[i].TLE2); // perform and store sat init calcs
 
-      let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-      let positionEci = satellite.sgp4(satrec, m);
+      const m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+      const positionEci = satellite.sgp4(satrec, m);
 
       try {
-        let gpos = satellite.eciToGeodetic(positionEci.position, gmst);
+        const gpos = satellite.eciToGeodetic(positionEci.position, gmst);
         currentTEARR.alt = gpos.alt;
         currentTEARR.lon = gpos.lon;
         currentTEARR.lat = gpos.lat;
-        let positionEcf = satellite.eciToEcf(positionEci.position, gmst);
-        let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+        const positionEcf = satellite.eciToEcf(positionEci.position, gmst);
+        const lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
         currentTEARR.az = lookAngles.az * RAD2DEG;
         currentTEARR.el = lookAngles.el * RAD2DEG;
         currentTEARR.rng = lookAngles.rng;
@@ -609,7 +876,7 @@ export const getSat = (i: number) => {
         currentTEARR.rng = 0;
       }
 
-      currentTEARR.inview = satellite.checkIsInFOV(sensor, {
+      currentTEARR.inView = satellite.checkIsInFOV(sensor, {
         az: currentTEARR.az,
         el: currentTEARR.el,
         rng: currentTEARR.rng,
@@ -621,16 +888,15 @@ export const getSat = (i: number) => {
   }
   if (typeof satSet.satData[i].getDirection == 'undefined') {
     satSet.satData[i].getDirection = () => {
-      let nowLat = satSet.satData[i].getTEARR().lat * RAD2DEG;
+      const nowLat = satSet.satData[i].getTEARR().lat * RAD2DEG;
       let futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
-      let futLat = satSet.satData[i].getTEARR(futureTime).lat * RAD2DEG;
+      const futLat = satSet.satData[i].getTEARR(futureTime).lat * RAD2DEG;
 
       // TODO: Remove getTEARR References
       // let nowLat = satellite.eci2ll(satSet.satData[i].position.x,satSet.satData[i].position.y,satSet.satData[i].position.z).lat;
       // let futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
       // let futureEci = satellite.getEci(satSet.satData[i], futureTime);
       // let futLat = satellite.eci2ll(futureEci.x,futureEci.y,futureEci.z).lat;
-
       if (nowLat < futLat) return 'N';
       if (nowLat > futLat) return 'S';
       if (nowLat === futLat) {
@@ -643,294 +909,95 @@ export const getSat = (i: number) => {
       return 'Error';
     };
   }
+};
+export const cruncherExtraData = (m: SatCruncherMessage) => {
+  if (!m.data?.extraData) throw new Error('extraData required!');
+  const satExtraData = JSON.parse(m.data.extraData);
 
-  return satSet.satData[i];
-};
-export const setHover = (i: number) => {
-  const { objectManager } = keepTrackApi.programs;
-  const { gl } = keepTrackApi.programs.drawManager;
-  objectManager.setHoveringSat(i);
-  if (i === objectManager.lasthoveringSat) return;
-  if (i !== -1 && satSet.satData[i].type == 'Star') return;
+  for (let satCrunchIndex = 0; satCrunchIndex < satSet.numSats; satCrunchIndex++) {
+    if (typeof satSet.satData === 'undefined') throw new Error('No sat data');
+    if (typeof satExtraData === 'undefined') throw new Error('No extra data');
+    if (satExtraData[satCrunchIndex] === 'undefined') throw new Error('No extra data for sat ' + satCrunchIndex);
+    if (satSet.satData[satCrunchIndex] === 'undefined') throw new Error('No data for sat ' + satCrunchIndex);
 
-  settingsManager.currentColorScheme.hoverSat = objectManager.hoveringSat;
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
-  // If Old Select Sat Picked Color it Correct Color
-  if (objectManager.lasthoveringSat !== -1 && objectManager.lasthoveringSat !== objectManager.selectedSat) {
-    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lasthoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.lasthoveringSat)).color));
-  }
-  // If New Select Sat Picked Color it
-  if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
-    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.hoverColor));
-  }
-  objectManager.setLasthoveringSat(objectManager.hoveringSat);
-
-  // satSet.setColorScheme(settingsManager.currentColorScheme, true);
-};
-export const selectSat = (i: number) => {
-  const { sensorManager, objectManager, uiManager } = keepTrackApi.programs;
-  const { gl } = keepTrackApi.programs.drawManager;
-  if (i === objectManager.lastSelectedSat()) return;
-
-  let sat = satSet.getSat(i);
-  if (sat !== null && sat.static && typeof sat.staticNum !== 'undefined') {
-    if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.sensor();
-  } else {
-    if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.satelliteSelected();
-  }
-
-  satSet.satCruncher.postMessage({
-    satelliteSelected: [i],
-  });
-  if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-
-  settingsManager.currentColorScheme.selectSat = objectManager.selectedSat;
-  gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
-  // If Old Select Sat Picked Color it Correct Color
-  if (objectManager.lastSelectedSat() !== -1) {
-    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lastSelectedSat() * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.lastSelectedSat())).color));
-  }
-  // If New Select Sat Picked Color it
-  if (i !== -1) {
-    gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
-  }
-
-  objectManager.setSelectedSat(i);
-
-  // satSet.setColorScheme(settingsManager.currentColorScheme, true);
-
-  if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
-    $('#menu-lookangles').removeClass('bmenu-item-disabled');
-  }
-  $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');
-  $('#menu-satview').removeClass('bmenu-item-disabled');
-  $('#menu-map').removeClass('bmenu-item-disabled');
-  $('#menu-editSat').removeClass('bmenu-item-disabled');
-  $('#menu-sat-fov').removeClass('bmenu-item-disabled');
-  $('#menu-newLaunch').removeClass('bmenu-item-disabled');
-  $('#menu-breakup').removeClass('bmenu-item-disabled');
-};
-
-// ******************** One Dependency ********************
-
-export const getSatInViewOnly = (i: number) => {
-  const { dotsManager } = keepTrackApi.programs;
-  if (!satSet.satData) return null;
-  if (!satSet.satData[i]) return null;
-
-  satSet.satData[i].inview = dotsManager.inViewData[i];
-  return satSet.satData[i];
-};
-export const getSatPosOnly = (i: number) => {
-  const { dotsManager } = keepTrackApi.programs;
-  if (!satSet.satData) return null;
-  if (!satSet.satData[i]) return null;
-
-  if (satSet.gotExtraData) {
-    satSet.satData[i].position = {
-      x: dotsManager.positionData[i * 3],
-      y: dotsManager.positionData[i * 3 + 1],
-      z: dotsManager.positionData[i * 3 + 2],
-    };
-  }
-
-  let sat = satSet.satData[i];
-  return sat;
-};
-export const getIdFromEci = (eci: { x: number; y: number; z: number }) => {
-  const { dotsManager } = keepTrackApi.programs;
-  let x: number, y: number, z: number;
-  for (let id = 0; id < satSet.orbitalSats; id++) {
-    x = dotsManager.positionData[id * 3];
-    if (x > eci.x - 100 && x < eci.x + 100) {
-      y = dotsManager.positionData[id * 3 + 1];
-      if (y > eci.y - 100 && y < eci.y + 100) {
-        console.log(`y: ${id}`);
-        z = dotsManager.positionData[id * 3 + 2];
-        if (z > eci.z - 100 && z < eci.z + 100) {
-          return id;
-        }
-      }
-    }
-  }
-  return -1;
-};
-export const getSatInView = () => {
-  const { dotsManager } = keepTrackApi.programs;
-  if (typeof dotsManager.inViewData == 'undefined') return false;
-  return dotsManager.inViewData;
-};
-export const getSatInSun = () => {
-  const { dotsManager } = keepTrackApi.programs;
-  if (typeof dotsManager.inSunData == 'undefined') return false;
-  return dotsManager.inSunData;
-};
-export const getSatVel = () => {
-  const { dotsManager } = keepTrackApi.programs;
-  if (typeof dotsManager.velocityData == 'undefined') return false;
-  return dotsManager.velocityData;
-};
-export const resetSatInView = () => {
-  const { dotsManager } = keepTrackApi.programs;
-  dotsManager.inViewData = new Int8Array(dotsManager.inViewData.length);
-  dotsManager.inViewData.fill(0);
-};
-export const resetSatInSun = () => {
-  const { dotsManager } = keepTrackApi.programs;
-  dotsManager.inSunData = new Int8Array(dotsManager.inSunData.length);
-  dotsManager.inSunData.fill(0);
-};
-export const setColorScheme = async (scheme: { calculateColorBuffers: (arg0: any) => any; colorBuf: any; pickableBuf: any }, isForceRecolor: boolean) => {
-  const { dotsManager } = keepTrackApi.programs;
-  try {
-    settingsManager.setCurrentColorScheme(scheme);
-    await scheme.calculateColorBuffers(isForceRecolor);
-    dotsManager.colorBuffer = scheme.colorBuf;
-    dotsManager.pickingBuffer = scheme.pickableBuf;
-  } catch (error) {
-    // If we can't load the color scheme, just use the default
-    console.debug(error);
-    settingsManager.setCurrentColorScheme(keepTrackApi.programs.ColorScheme.default);
-    scheme = keepTrackApi.programs.ColorScheme.default;
-    await scheme.calculateColorBuffers(isForceRecolor);
-    dotsManager.colorBuffer = scheme.colorBuf;
-    dotsManager.pickingBuffer = scheme.pickableBuf;
-  }
-};
-
-// ******************** PURE ********************
-export const getSatExtraOnly = (i: number) => {
-  if (!satSet.satData) return null;
-  if (!satSet.satData[i]) return null;
-  return satSet.satData[i];
-};
-export const getSatFromObjNum = (objNum: string) => {
-  let satIndex = satSet.getIdFromObjNum(objNum);
-  return satSet.getSat(satIndex);
-};
-export const getIdFromObjNum = (objNum: string | number) => {
-  if (typeof satSet.sccIndex?.[`${objNum}`] !== 'undefined') {
-    return satSet.sccIndex[`${objNum}`];
-  } else {
-    for (let i = 0; i < satSet.satData.length; i++) {
-      if (parseInt(satSet.satData[i].SCC_NUM) == objNum) return i;
-    }
-    return null;
-  }
-};
-export const setSat = (i: number, sat: any) => {
-  if (!satSet.satData) return null;
-  satSet.satData[i] = sat;
-  satSet.satData[i].velocity = satSet.satData[i].velocity == 0 ? {} : satSet.satData[i].velocity;
-};
-export const mergeSat = (sat: { SCC: any; SCC_NUM: any; ON: any; C: any; LV: any; LS: any; R: any; URL: any; NOTES: any; TTP: any; FMISSED: any; ORPO: any; constellation: any; associates: any; maneuver: any }) => {
-  if (!satSet.satData) return null;
-  const satId = sat.SCC || sat.SCC_NUM || -1;
-  if (satId === -1) return;
-  var i = satSet.getIdFromObjNum(satId);
-  satSet.satData[i].ON = sat.ON;
-  satSet.satData[i].C = sat.C;
-  satSet.satData[i].LV = sat.LV;
-  satSet.satData[i].LS = sat.LS;
-  satSet.satData[i].R = sat.R;
-  satSet.satData[i].URL = sat.URL;
-  satSet.satData[i].NOTES = sat.NOTES;
-  satSet.satData[i].TTP = sat.TTP;
-  satSet.satData[i].FMISSED = sat.FMISSED;
-  satSet.satData[i].ORPO = sat.ORPO;
-  satSet.satData[i].constellation = sat.constellation;
-  satSet.satData[i].associates = sat.associates;
-  satSet.satData[i].maneuver = sat.maneuver;
-};
-export const vmagUpdate = (vmagObject: { satid: string | number; vmag: any }) => {
-  if (!satSet.satData) return null;
-  try {
-    satSet.satData[vmagObject.satid].vmag = vmagObject.vmag;
-  } catch (e) {
-    // console.warn('Old Satellite in vmagManager: ' + vmagObject.satid);
-  }
-};
-export const onCruncherReady = () => {
-  try {
-    satSet.queryStr = window.location.search.substring(1);
-  } catch {
-    satSet.queryStr = '';
-  }
-  // Anything else?
-};
-export const convertIdArrayToSatnumArray = (satIdArray: string | any[]) => {
-  let satnumArray = [];
-  for (let i = 0; i < satIdArray.length; i++) {
-    satnumArray.push(parseInt(satSet.getSat(satIdArray[i]).SCC_NUM));
-  }
-  return satnumArray;
-};
-export const convertSatnumArrayToIdArray = (satnumArray: string | any[]) => {
-  let satIdArray = [];
-  for (let i = 0; i < satnumArray.length; i++) {
     try {
-      satIdArray.push(satSet.getSatFromObjNum(satnumArray[i]).id);
-    } catch (e) {
-      // console.log(`Missing Sat: ${satnumArray[i]}`);
+      satSet.satData[satCrunchIndex].inclination = satExtraData[satCrunchIndex].inclination;
+      satSet.satData[satCrunchIndex].eccentricity = satExtraData[satCrunchIndex].eccentricity;
+      satSet.satData[satCrunchIndex].raan = satExtraData[satCrunchIndex].raan;
+      satSet.satData[satCrunchIndex].argPe = satExtraData[satCrunchIndex].argPe;
+      satSet.satData[satCrunchIndex].meanMotion = satExtraData[satCrunchIndex].meanMotion;
+
+      satSet.satData[satCrunchIndex].semiMajorAxis = satExtraData[satCrunchIndex].semiMajorAxis;
+      satSet.satData[satCrunchIndex].semiMinorAxis = satExtraData[satCrunchIndex].semiMinorAxis;
+      satSet.satData[satCrunchIndex].apogee = satExtraData[satCrunchIndex].apogee;
+      satSet.satData[satCrunchIndex].perigee = satExtraData[satCrunchIndex].perigee;
+      satSet.satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
+      satSet.satData[satCrunchIndex].velocity = {};
+    } catch (error) {
+      console.debug(satCrunchIndex);
     }
   }
-  return satIdArray;
+
+  satSet.gotExtraData = true;
 };
-export const getIdFromIntlDes = (intlDes: any) => {
-  if (typeof satSet.cosparIndex[`${intlDes}`] !== 'undefined') {
-    return satSet.cosparIndex[`${intlDes}`];
+export const cruncherExtraUpdate = (m: SatCruncherMessage) => {
+  if (!m.data?.extraUpdate) throw new Error('extraUpdate required!');
+  const satExtraData = JSON.parse(m.data.extraData);
+  const satCrunchIndex = m.data.satId;
+
+  satSet.satData[satCrunchIndex].inclination = satExtraData[0].inclination;
+  satSet.satData[satCrunchIndex].eccentricity = satExtraData[0].eccentricity;
+  satSet.satData[satCrunchIndex].raan = satExtraData[0].raan;
+  satSet.satData[satCrunchIndex].argPe = satExtraData[0].argPe;
+  satSet.satData[satCrunchIndex].meanMotion = satExtraData[0].meanMotion;
+
+  satSet.satData[satCrunchIndex].semiMajorAxis = satExtraData[0].semiMajorAxis;
+  satSet.satData[satCrunchIndex].semiMinorAxis = satExtraData[0].semiMinorAxis;
+  satSet.satData[satCrunchIndex].apogee = satExtraData[0].apogee;
+  satSet.satData[satCrunchIndex].perigee = satExtraData[0].perigee;
+  satSet.satData[satCrunchIndex].period = satExtraData[0].period;
+  satSet.satData[satCrunchIndex].TLE1 = satExtraData[0].TLE1;
+  satSet.satData[satCrunchIndex].TLE2 = satExtraData[0].TLE2;
+};
+export const cruncherDotsManagerInteraction = (m: SatCruncherMessage) => {
+  const { dotsManager } = keepTrackApi.programs;
+  if (typeof dotsManager.positionData == 'undefined') {
+    dotsManager.positionData = new Float32Array(m.data.satPos);
   } else {
-    return null;
+    dotsManager.positionData.set(m.data.satPos, 0);
   }
-};
-export const getIdFromStarName = (starName: any) => {
-  for (var i = 0; i < satSet.satData.length; i++) {
-    if (satSet.satData[i].type === 'Star') {
-      if (satSet.satData[i].name === starName) {
-        return i;
-      }
-    }
+
+  if (typeof dotsManager.velocityData == 'undefined') {
+    dotsManager.velocityData = new Float32Array(m.data.satVel);
+  } else {
+    dotsManager.velocityData.set(m.data.satVel, 0);
   }
-  return null;
-};
-export const getSensorFromSensorName = (sensorName: any) => {
-  for (var i = 0; i < satSet.satData.length; i++) {
-    if (satSet.satData[i].static === true && satSet.satData[i].missile !== true && satSet.satData[i].type !== 'Star') {
-      if (satSet.satData[i].name === sensorName) {
-        return i;
-      }
-    }
-  }
-};
-export const getScreenCoords = (i: any, pMatrix: any, camMatrix: any, pos: { x: number; y: number; z: number }) => {
-  const satScreenPositionArray = { x: null, y: null, z: null, error: false };
-  try {
-    if (!pos) pos = satSet.getSatPosOnly(i).position;
-    const posVec4 = glm.vec4.fromValues(pos.x, pos.y, pos.z, 1);
 
-    glm.vec4.transformMat4(posVec4, posVec4, camMatrix);
-    glm.vec4.transformMat4(posVec4, posVec4, pMatrix);
-
-    satScreenPositionArray.x = posVec4[0] / posVec4[3];
-    satScreenPositionArray.y = posVec4[1] / posVec4[3];
-    satScreenPositionArray.z = posVec4[2] / posVec4[3];
-
-    satScreenPositionArray.x = (satScreenPositionArray.x + 1) * 0.5 * window.innerWidth;
-    satScreenPositionArray.y = (-satScreenPositionArray.y + 1) * 0.5 * window.innerHeight;
-
-    if (satScreenPositionArray.x >= 0 && satScreenPositionArray.y >= 0 && satScreenPositionArray.z >= 0 && satScreenPositionArray.z <= 1) {
-      // Passed Test
+  if (typeof m.data?.satInView != 'undefined' && m.data?.satInView.length > 0) {
+    if (typeof dotsManager.inViewData == 'undefined' || dotsManager.inViewData.length !== m.data.satInView.length) {
+      dotsManager.inViewData = new Int8Array(m.data.satInView);
     } else {
-      satScreenPositionArray.error = true;
+      dotsManager.inViewData.set(m.data.satInView, 0);
     }
-  } catch {
-    satScreenPositionArray.error = true;
   }
-  return satScreenPositionArray;
+
+  if (typeof m.data?.satInSun != 'undefined' && m.data?.satInSun.length > 0) {
+    if (typeof dotsManager.inSunData == 'undefined' || dotsManager.inSunData.length !== m.data.satInSun.length) {
+      dotsManager.inSunData = new Int8Array(m.data.satInSun);
+    } else {
+      dotsManager.inSunData.set(m.data.satInSun, 0);
+    }
+  }
+
+  if (typeof m.data?.sensorMarkerArray != 'undefined' && m.data?.sensorMarkerArray?.length !== 0) {
+    satSet.satSensorMarkerArray = m.data.sensorMarkerArray;
+  }
+
+  const highestMarkerNumber = satSet.satSensorMarkerArray?.[satSet.satSensorMarkerArray?.length - 1] || 0;
+  settingsManager.dotsOnScreen = Math.max(satSet.numSats - settingsManager.maxFieldOfViewMarkers, highestMarkerNumber);
 };
 
-export const satSet: CatalogManager = {
+export let satSet: CatalogManager = {
   convertIdArrayToSatnumArray: convertIdArrayToSatnumArray,
   convertSatnumArrayToIdArray: convertSatnumArrayToIdArray,
   cosparIndex: null,

@@ -1,6 +1,5 @@
 import { keepTrackApiStubs, useMockWorkers } from '@app/js/api/apiMocks';
 
-import { expect } from '@jest/globals';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
 useMockWorkers();
@@ -29,6 +28,6 @@ test(`satelliteView Unit Testing`, () => {
       keepTrackApi.methods.bottomMenuClick('menu-satview');
     })
     .catch((err) => {
-      console.error(err);
+      console.debug(err);
     });
 });

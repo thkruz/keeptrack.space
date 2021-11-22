@@ -1,6 +1,5 @@
 /* eslint-disable no-sync */
 
-import copydir from 'copy-dir';
 import fs from 'fs';
 import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';

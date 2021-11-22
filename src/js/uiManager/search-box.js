@@ -1,7 +1,7 @@
 /* */
 
 import $ from 'jquery';
-import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory.js';
+import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
 var hoverSatId = -1;

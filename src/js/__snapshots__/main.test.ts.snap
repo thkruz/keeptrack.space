@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`main.redirectHttpToHttps 0 1`] = `undefined`;
+
+exports[`main.showErrorCode 0 1`] = `undefined`;
+
+exports[`main.showErrorCode 1 1`] = `undefined`;
+
+exports[`main.showErrorCode 2 1`] = `undefined`;
+
+exports[`main.showErrorCode 3 1`] = `undefined`;
+
+exports[`main.showErrorCode 4 1`] = `undefined`;
+
+exports[`main.showErrorCode 5 1`] = `undefined`;

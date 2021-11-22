@@ -1,5 +1,3 @@
-/* globals it describe */
-
 import { init } from './social';
 import { keepTrackApi } from '@app/js/api/externalApi';
 

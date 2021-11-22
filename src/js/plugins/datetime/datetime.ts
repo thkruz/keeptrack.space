@@ -1,9 +1,13 @@
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
-
+import $ from 'jquery';
 
 export const updateDateTime = (date: Date) => {
+  const { satSet, timeManager } = keepTrackApi.programs;
   $('#datetime-input-tb').datepicker('setDate', date);
+  satSet.satCruncher.postMessage({
+    typ: 'offset',
+    dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
+  });
 };
 export const init = (): void => {
   // Add HTML
@@ -24,8 +28,8 @@ export const datetimeTextClick = (): void => {
   const { timeManager } = keepTrackApi.programs;
   timeManager.propRealTime = Date.now();
   timeManager.propTime();
-  keepTrackApi.methods.updateDateTime(new Date(timeManager.propRealTime + timeManager.propOffset));
-  
+  keepTrackApi.methods.updateDateTime(new Date(timeManager.propTime()));
+
   if (!settingsManager.isEditTime) {
     // $('#datetime-text').fadeOut();
     $('#datetime-input').fadeIn();
@@ -83,16 +87,16 @@ export const uiManagerInit = () => {
     });
 };
 
-export const datetimeInputFormChange = () => {
+export const datetimeInputFormChange = (jestOverride?: Date) => {
   const { timeManager, satSet, uiManager } = keepTrackApi.programs;
-  let selectedDate = $('#datetime-input-tb').datepicker('getDate');
-  let today = new Date();
-  let jday = timeManager.getDayOfYear(timeManager.propTime());
+  const selectedDate = $('#datetime-input-tb').datepicker('getDate') || jestOverride;
+  const today = new Date();
+  const jday = timeManager.getDayOfYear(timeManager.propTime());
   $('#jday').html(jday);
   timeManager.propOffset = selectedDate.getTime() - today.getTime();
   satSet.satCruncher.postMessage({
     typ: 'offset',
-    dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
+    dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
   });
   timeManager.propRealTime = Date.now();
   timeManager.propTime();

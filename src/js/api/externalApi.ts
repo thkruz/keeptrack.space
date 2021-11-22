@@ -144,9 +144,7 @@ export const keepTrackApi: keepTrackApiInterface = {
   },
 };
 
-export const isThisJest = () => {
-  return typeof process !== 'undefined' ? true : false;
-};
+export const isThisJest = () => (typeof process !== 'undefined');
 
 if (typeof (<any>window).keepTrackApi === 'undefined') {
   (<any>window).keepTrackApi = keepTrackApi;

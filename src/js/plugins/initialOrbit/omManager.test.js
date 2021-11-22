@@ -1,9 +1,10 @@
-const omManager = require('./omManager');
+/* eslint-disable no-undefined */
+import { _jday, _arctan2, _dayOfYear, _pad0, _sv2kp, _propagate } from './omManager';
 // @ponicode
 describe('omManager._jday', () => {
   test('0', () => {
     let callFunction = () => {
-      omManager._jday(0.0, 90, 1, 0.0, -10, 1.0);
+      _jday(0.0, 90, 1, 0.0, -10, 1.0);
     };
 
     expect(callFunction).not.toThrow();
@@ -11,7 +12,7 @@ describe('omManager._jday', () => {
 
   test('1', () => {
     let callFunction = () => {
-      omManager._jday(10, 0.0, 0, 10, 'December', -10);
+      _jday(10, 0.0, 0, 10, 'December', -10);
     };
 
     expect(callFunction).not.toThrow();
@@ -19,7 +20,7 @@ describe('omManager._jday', () => {
 
   test('2', () => {
     let callFunction = () => {
-      omManager._jday(1, 1, 29, 0, 'December', 0.0);
+      _jday(1, 1, 29, 0, 'December', 0.0);
     };
 
     expect(callFunction).not.toThrow();
@@ -27,7 +28,7 @@ describe('omManager._jday', () => {
 
   test('3', () => {
     let callFunction = () => {
-      omManager._jday(10, 1, 10, 0.0, 0, 0);
+      _jday(10, 1, 10, 0.0, 0, 0);
     };
 
     expect(callFunction).not.toThrow();
@@ -35,7 +36,7 @@ describe('omManager._jday', () => {
 
   test('4', () => {
     let callFunction = () => {
-      omManager._jday(-1, -1, 0, -10, 0, -0.5);
+      _jday(-1, -1, 0, -10, 0, -0.5);
     };
 
     expect(callFunction).not.toThrow();
@@ -43,7 +44,7 @@ describe('omManager._jday', () => {
 
   test('5', () => {
     let callFunction = () => {
-      omManager._jday(NaN, undefined, undefined, undefined, undefined, undefined);
+      _jday(NaN, undefined, undefined, undefined, undefined, undefined);
     };
 
     expect(callFunction).not.toThrow();
@@ -54,7 +55,7 @@ describe('omManager._jday', () => {
 describe('omManager._arctan2', () => {
   test('0', () => {
     let callFunction = () => {
-      omManager._arctan2(0, 0);
+      _arctan2(0, 0);
     };
 
     expect(callFunction).not.toThrow();
@@ -62,7 +63,7 @@ describe('omManager._arctan2', () => {
 
   test('1', () => {
     let callFunction = () => {
-      omManager._arctan2(0, 0.0);
+      _arctan2(0, 0.0);
     };
 
     expect(callFunction).not.toThrow();
@@ -70,7 +71,7 @@ describe('omManager._arctan2', () => {
 
   test('2', () => {
     let callFunction = () => {
-      omManager._arctan2(0, 10);
+      _arctan2(0, 10);
     };
 
     expect(callFunction).not.toThrow();
@@ -78,7 +79,7 @@ describe('omManager._arctan2', () => {
 
   test('3', () => {
     let callFunction = () => {
-      omManager._arctan2(1, 90);
+      _arctan2(1, 90);
     };
 
     expect(callFunction).not.toThrow();
@@ -86,7 +87,7 @@ describe('omManager._arctan2', () => {
 
   test('4', () => {
     let callFunction = () => {
-      omManager._arctan2(0, 410);
+      _arctan2(0, 410);
     };
 
     expect(callFunction).not.toThrow();
@@ -94,7 +95,7 @@ describe('omManager._arctan2', () => {
 
   test('5', () => {
     let callFunction = () => {
-      omManager._arctan2(-Infinity, -Infinity);
+      _arctan2(-Infinity, -Infinity);
     };
 
     expect(callFunction).not.toThrow();
@@ -105,7 +106,7 @@ describe('omManager._arctan2', () => {
 describe('omManager._dayOfYear', () => {
   test('0', () => {
     let callFunction = () => {
-      omManager._dayOfYear(-5.48, 0.0, 56784, 10, 1);
+      _dayOfYear(-5.48, 0.0, 56784, 10, 1);
     };
 
     expect(callFunction).not.toThrow();
@@ -113,7 +114,7 @@ describe('omManager._dayOfYear', () => {
 
   test('1', () => {
     let callFunction = () => {
-      omManager._dayOfYear(-1, 28, 0, 'December', 10.0);
+      _dayOfYear(-1, 28, 0, 'December', 10.0);
     };
 
     expect(callFunction).not.toThrow();
@@ -121,7 +122,7 @@ describe('omManager._dayOfYear', () => {
 
   test('2', () => {
     let callFunction = () => {
-      omManager._dayOfYear(0, 0.0, 10, 0.0, 1);
+      _dayOfYear(0, 0.0, 10, 0.0, 1);
     };
 
     expect(callFunction).not.toThrow();
@@ -129,7 +130,7 @@ describe('omManager._dayOfYear', () => {
 
   test('3', () => {
     let callFunction = () => {
-      omManager._dayOfYear(0, 0, 0.0, 'July', 10);
+      _dayOfYear(0, 0, 0.0, 'July', 10);
     };
 
     expect(callFunction).not.toThrow();
@@ -137,7 +138,7 @@ describe('omManager._dayOfYear', () => {
 
   test('4', () => {
     let callFunction = () => {
-      omManager._dayOfYear(-1, 1, 12345, 1, 0);
+      _dayOfYear(-1, 1, 12345, 1, 0);
     };
 
     expect(callFunction).not.toThrow();
@@ -145,7 +146,7 @@ describe('omManager._dayOfYear', () => {
 
   test('5', () => {
     let callFunction = () => {
-      omManager._dayOfYear(-Infinity, -Infinity, -Infinity, -Infinity, undefined);
+      _dayOfYear(-Infinity, -Infinity, -Infinity, -Infinity, undefined);
     };
 
     expect(callFunction).not.toThrow();
@@ -156,7 +157,7 @@ describe('omManager._dayOfYear', () => {
 describe('omManager._pad0', () => {
   test('0', () => {
     let callFunction = () => {
-      omManager._pad0({ length: 10 }, -1);
+      _pad0({ length: 10 }, -1);
     };
 
     expect(callFunction).not.toThrow();
@@ -164,7 +165,7 @@ describe('omManager._pad0', () => {
 
   test('1', () => {
     let callFunction = () => {
-      omManager._pad0({ length: 0 }, 1);
+      _pad0({ length: 0 }, 1);
     };
 
     expect(callFunction).not.toThrow();
@@ -172,7 +173,7 @@ describe('omManager._pad0', () => {
 
   test('2', () => {
     let callFunction = () => {
-      omManager._pad0({ length: 64 }, 100);
+      _pad0({ length: 64 }, 100);
     };
 
     expect(callFunction).not.toThrow();
@@ -180,7 +181,7 @@ describe('omManager._pad0', () => {
 
   test('3', () => {
     let callFunction = () => {
-      omManager._pad0({ length: 256 }, 1);
+      _pad0({ length: 256 }, 1);
     };
 
     expect(callFunction).not.toThrow();
@@ -188,7 +189,7 @@ describe('omManager._pad0', () => {
 
   test('4', () => {
     let callFunction = () => {
-      omManager._pad0({ length: 64 }, 0);
+      _pad0({ length: 64 }, 0);
     };
 
     expect(callFunction).not.toThrow();
@@ -196,7 +197,7 @@ describe('omManager._pad0', () => {
 
   test('5', () => {
     let callFunction = () => {
-      omManager._pad0(undefined, Infinity);
+      _pad0(undefined, Infinity);
     };
 
     expect(callFunction).not.toThrow();
@@ -206,11 +207,12 @@ describe('omManager._pad0', () => {
 // @ponicode
 describe('omManager._sv2kp', () => {
   test('0', () => {
+    let param3 = [-1, ['41.1994', '-115.9206'], 1, 10, 0, 1, ['-19.3366', '-46.1477'], 1, -1, 1, -10, -10, 0, 1, 0, ['41.1994', '-115.9206'], -1, 0.0, 0.0, ['-19.3366', '-46.1477']];
     let callFunction = () => {
-      omManager._sv2kp(
+      _sv2kp(
         1,
         'Apt. 716',
-        [-1, ['41.1994', '-115.9206'], 1, 10, 0, 1, ['-19.3366', '-46.1477'], 1, -1, 1, -10, -10, 0, 1, 0, ['41.1994', '-115.9206'], -1, 0.0, 0.0, ['-19.3366', '-46.1477']],
+        param3,
         'kg',
         'M_Earth',
         [
@@ -244,11 +246,12 @@ describe('omManager._sv2kp', () => {
   });
 
   test('1', () => {
+    let param3 = [-10, 0.0, 0.0, 0, 0.0, -10, 0, 0.0, 0.0, 10, 0, 1, 10, -10, 10, ['39.2233', '-78.8613'], 10, -10, -1, -10];
     let callFunction = () => {
-      omManager._sv2kp(
+      _sv2kp(
         1,
         -1,
-        [-10, 0.0, 0.0, 0, 0.0, -10, 0, 0.0, 0.0, 10, 0, 1, 10, -10, 10, ['39.2233', '-78.8613'], 10, -10, -1, -10],
+        param3,
         'Masai Lion',
         'Asiatic Lion',
         [
@@ -282,11 +285,12 @@ describe('omManager._sv2kp', () => {
   });
 
   test('2', () => {
+    let param3 = [0, 0.0, 1, 1, -1, 10, 10, -10, -1, -10, -10, 1, 0, -10, 1, 1, 1, 1, 0, ['-84.8577', '134.8560']];
     let callFunction = () => {
-      omManager._sv2kp(
+      _sv2kp(
         "Boston's most advanced compression wear technology increases muscle oxygenation, stabilizes active muscles",
         -1,
-        [0, 0.0, 1, 1, -1, 10, 10, -10, -1, -10, -10, 1, 0, -10, 1, 1, 1, 1, 0, ['-84.8577', '134.8560']],
+        param3,
         'Asiatic Lion',
         'Masai Lion',
         [
@@ -320,11 +324,12 @@ describe('omManager._sv2kp', () => {
   });
 
   test('3', () => {
+    let param3 = [1, -10, 0.0, 0.0, ['41.1994', '-115.9206'], -1, 0.0, -10, -1, 0.0, 1, 10, 0, -1, 10, -1, 0, 0.0, 1, ['39.2233', '-78.8613']];
     let callFunction = () => {
-      omManager._sv2kp(
+      _sv2kp(
         'The Apollotech B340 is an affordable wireless mouse with reliable connectivity, 12 months battery life and modern design',
         10,
-        [1, -10, 0.0, 0.0, ['41.1994', '-115.9206'], -1, 0.0, -10, -1, 0.0, 1, 10, 0, -1, 10, -1, 0, 0.0, 1, ['39.2233', '-78.8613']],
+        param3,
         'Transvaal lion',
         'Asiatic Lion',
         [
@@ -358,11 +363,12 @@ describe('omManager._sv2kp', () => {
   });
 
   test('4', () => {
+    let param3 = [['41.1994', '-115.9206'], -10, 1, 0, 0, 0, ['-84.8577', '134.8560'], -10, 0, 1, 1, 1, 10, 10, 1, 0.0, 10, -10, -1, -1];
     let callFunction = () => {
-      omManager._sv2kp(
+      _sv2kp(
         0,
         0.0,
-        [['41.1994', '-115.9206'], -10, 1, 0, 0, 0, ['-84.8577', '134.8560'], -10, 0, 1, 1, 1, 10, 10, 1, 0.0, 10, -10, -1, -1],
+        param3,
         undefined,
         'M_Earth',
         [
@@ -397,9 +403,61 @@ describe('omManager._sv2kp', () => {
 
   test('5', () => {
     let callFunction = () => {
-      omManager._sv2kp(Infinity, undefined, [], '', undefined, [], '', '');
+      _sv2kp(Infinity, undefined, [], '', undefined, [], '', '');
     };
 
     expect(callFunction).not.toThrow();
+  });
+});
+
+// @ponicode
+describe('omManager._propagate', () => {
+  test('0', async () => {
+    await _propagate(
+      410,
+      100,
+      { getUTCMonth: () => 1, getUTCMilliseconds: () => 520, getUTCFullYear: () => true, getUTCDate: () => '01-13-2020', getUTCHours: () => 56784, getUTCMinutes: () => 75, getUTCSeconds: () => 243 },
+      { twoline2satrec: () => 'Nile Crocodile', sgp4: () => 100 }
+    );
+  });
+
+  test('1', async () => {
+    await _propagate(
+      380,
+      1,
+      { getUTCMonth: () => 28, getUTCMilliseconds: () => 380, getUTCFullYear: () => false, getUTCDate: () => '32-01-2020', getUTCHours: () => 'bc23a9d531064583ace8f67dad60f6bb', getUTCMinutes: () => 75, getUTCSeconds: () => 161 },
+      { twoline2satrec: () => 'Spectacled Caiman', sgp4: () => -100 }
+    );
+  });
+
+  test('2', async () => {
+    await _propagate(
+      100,
+      -5.48,
+      { getUTCMonth: () => 0, getUTCMilliseconds: () => 410, getUTCFullYear: () => false, getUTCDate: () => '01-13-2020', getUTCHours: () => 987650, getUTCMinutes: () => 5, getUTCSeconds: () => 161 },
+      { twoline2satrec: () => 'Saltwater Crocodile', sgp4: () => 0 }
+    );
+  });
+
+  test('3', async () => {
+    await _propagate(
+      320,
+      -5.48,
+      { getUTCMonth: () => 3, getUTCMilliseconds: () => 30, getUTCFullYear: () => true, getUTCDate: () => '01-01-2030', getUTCHours: () => 'bc23a9d531064583ace8f67dad60f6bb', getUTCMinutes: () => 25, getUTCSeconds: () => 241 },
+      { twoline2satrec: () => 'Nile Crocodile', sgp4: () => -5.48 }
+    );
+  });
+
+  test('4', async () => {
+    await _propagate(
+      100,
+      -100,
+      { getUTCMonth: () => 0, getUTCMilliseconds: () => 320, getUTCFullYear: () => false, getUTCDate: () => '32-01-2020', getUTCHours: () => 'bc23a9d531064583ace8f67dad60f6bb', getUTCMinutes: () => 75, getUTCSeconds: () => 127 },
+      { twoline2satrec: () => 'Saltwater Crocodile', sgp4: () => -100 }
+    );
+  });
+
+  test('5', async () => {
+    await _propagate(-Infinity, -Infinity, {}, undefined);
   });
 });

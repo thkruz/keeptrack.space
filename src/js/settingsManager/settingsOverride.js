@@ -45,6 +45,7 @@ const settingsManagerOverride = {
     countries: true,
     colorsMenu: true,
     shortTermFences: true,
+    orbitReferences: true,
     externalSources: true,
     analysis: true,
     sensorFov: true,

@@ -1,0 +1,187 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`uiInput.getEarthScreenPoint 0 1`] = `
+Float32Array [
+  NaN,
+  NaN,
+  NaN,
+]
+`;
+
+exports[`uiInput.getEarthScreenPoint 1 1`] = `
+Float32Array [
+  NaN,
+  NaN,
+  NaN,
+]
+`;
+
+exports[`uiInput.getEarthScreenPoint 2 1`] = `
+Float32Array [
+  NaN,
+  NaN,
+  NaN,
+]
+`;
+
+exports[`uiInput.getEarthScreenPoint 3 1`] = `
+Float32Array [
+  NaN,
+  NaN,
+  NaN,
+]
+`;
+
+exports[`uiInput.getEarthScreenPoint 4 1`] = `
+Float32Array [
+  NaN,
+  NaN,
+  NaN,
+]
+`;
+
+exports[`uiInput.getEarthScreenPoint 5 1`] = `
+Float32Array [
+  NaN,
+  NaN,
+  NaN,
+]
+`;
+
+exports[`uiInput.getSatIdFromCoord 0 1`] = `-1`;
+
+exports[`uiInput.getSatIdFromCoord 1 1`] = `-1`;
+
+exports[`uiInput.getSatIdFromCoord 2 1`] = `-1`;
+
+exports[`uiInput.getSatIdFromCoord 3 1`] = `-1`;
+
+exports[`uiInput.getSatIdFromCoord 4 1`] = `-1`;
+
+exports[`uiInput.getSatIdFromCoord 5 1`] = `-1`;
+
+exports[`uiInput.getSatIdFromCoordAlt 0 1`] = `undefined`;
+
+exports[`uiInput.getSatIdFromCoordAlt 1 1`] = `undefined`;
+
+exports[`uiInput.getSatIdFromCoordAlt 2 1`] = `undefined`;
+
+exports[`uiInput.getSatIdFromCoordAlt 3 1`] = `undefined`;
+
+exports[`uiInput.getSatIdFromCoordAlt 4 1`] = `undefined`;
+
+exports[`uiInput.getSatIdFromCoordAlt 5 1`] = `undefined`;
+
+exports[`uiInput.hidePopUps 0 1`] = `undefined`;
+
+exports[`uiInput.init 0 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 0 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 1 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 2 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 3 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 4 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 5 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 6 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 7 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 8 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 9 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 10 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 11 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 12 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 13 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 15 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 16 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 17 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 18 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 19 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 20 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 21 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 22 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 23 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 24 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 25 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 26 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 27 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 28 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 29 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 30 1`] = `undefined`;
+
+exports[`uiInput.rmbMenuActions 30 2`] = `undefined`;
+
+exports[`uiInput.unProject 0 1`] = `
+Array [
+  NaN,
+  NaN,
+  NaN,
+]
+`;
+
+exports[`uiInput.unProject 1 1`] = `
+Array [
+  NaN,
+  NaN,
+  NaN,
+]
+`;
+
+exports[`uiInput.unProject 2 1`] = `
+Array [
+  NaN,
+  NaN,
+  NaN,
+]
+`;
+
+exports[`uiInput.unProject 3 1`] = `
+Array [
+  NaN,
+  NaN,
+  NaN,
+]
+`;
+
+exports[`uiInput.unProject 4 1`] = `
+Array [
+  NaN,
+  NaN,
+  NaN,
+]
+`;
+
+exports[`uiInput.unProject 5 1`] = `
+Array [
+  NaN,
+  NaN,
+  NaN,
+]
+`;

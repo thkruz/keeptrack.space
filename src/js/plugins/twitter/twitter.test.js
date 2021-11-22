@@ -1,6 +1,3 @@
-/* globals test jest */
-
-import $ from 'jquery';
 import { init } from './twitter';
 import { keepTrackApi } from '@app/js/api/externalApi';
 

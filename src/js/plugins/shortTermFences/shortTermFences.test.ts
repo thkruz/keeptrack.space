@@ -1,15 +1,15 @@
-import * as shortTermFences from '@app/js/plugins/shortTermFences/shortTermFences';
-
-import { expect } from '@jest/globals';
-import { keepTrackApi } from '@app/js/api/externalApi';
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/externalApi';
+import * as shortTermFences from '@app/js/plugins/shortTermFences/shortTermFences';
+import { expect } from '@jest/globals';
+/* eslint-disable no-undefined */
 
-keepTrackApi.programs = {...keepTrackApi.programs, ...keepTrackApiStubs.programs};
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
 describe('shortTermFences.init', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.init();
     };
 
@@ -20,7 +20,7 @@ describe('shortTermFences.init', () => {
 // @ponicode
 describe('shortTermFences.uiManagerInit', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.uiManagerInit();
     };
 
@@ -28,10 +28,9 @@ describe('shortTermFences.uiManagerInit', () => {
   });
 });
 
-// @ponicode
 describe('shortTermFences.bottomMenuClick', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.bottomMenuClick('menu-stf');
     };
 
@@ -39,7 +38,7 @@ describe('shortTermFences.bottomMenuClick', () => {
   });
 
   test('1', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.bottomMenuClick('');
     };
 
@@ -47,7 +46,7 @@ describe('shortTermFences.bottomMenuClick', () => {
   });
 
   test('2', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
       shortTermFences.bottomMenuClick('menu-stf');
       shortTermFences.bottomMenuClick('menu-stf');
@@ -60,7 +59,7 @@ describe('shortTermFences.bottomMenuClick', () => {
 // @ponicode
 describe('shortTermFences.resetSensor', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.resetSensor();
     };
 
@@ -71,7 +70,7 @@ describe('shortTermFences.resetSensor', () => {
 // @ponicode
 describe('shortTermFences.hideSideMenus', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.hideSideMenus();
     };
 
@@ -82,7 +81,7 @@ describe('shortTermFences.hideSideMenus', () => {
 // @ponicode
 describe('shortTermFences.selectSatData', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.selectSatData(true);
     };
 
@@ -90,7 +89,7 @@ describe('shortTermFences.selectSatData', () => {
   });
 
   test('1', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.selectSatData(false);
     };
 
@@ -101,7 +100,7 @@ describe('shortTermFences.selectSatData', () => {
 // @ponicode
 describe('shortTermFences.setSensor', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.setSensor(false, 987650);
     };
 
@@ -109,7 +108,7 @@ describe('shortTermFences.setSensor', () => {
   });
 
   test('1', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.setSensor(null, null);
     };
 
@@ -117,7 +116,7 @@ describe('shortTermFences.setSensor', () => {
   });
 
   test('4', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.setSensor('c466a48309794261b64a4f02cfcc3d64', 987650);
     };
 
@@ -125,18 +124,65 @@ describe('shortTermFences.setSensor', () => {
   });
 
   test('5', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.setSensor(NaN, NaN);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('4', () => {
+    const callFunction: any = () => {
+      shortTermFences.setSensor('c466a48309794261b64a4f02cf$cc3d64', 987650);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('5', () => {
+    const callFunction: any = () => {
+      shortTermFences.setSensor(undefined, undefined);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('6', () => {
+    const callFunction: any = () => {
+      shortTermFences.setSensor(false, undefined);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('7', () => {
+    const callFunction: any = () => {
+      shortTermFences.setSensor('c466a48309794261b64a4f02cfcc3d64', 987650);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('8', () => {
+    const callFunction: any = () => {
+      shortTermFences.setSensor(-5.48, 124515);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('9', () => {
+    const callFunction: any = () => {
+      shortTermFences.setSensor(false, Infinity);
     };
 
     expect(callFunction).not.toThrow();
   });
 });
 
-// @ponicode
 describe('shortTermFences.stfFormOnSubmit', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.stfFormOnSubmit({
         bubbles: false,
         cancelBubble: false,
@@ -163,7 +209,7 @@ describe('shortTermFences.stfFormOnSubmit', () => {
   });
 
   test('2', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
 
       shortTermFences.stfFormOnSubmit({
@@ -192,7 +238,7 @@ describe('shortTermFences.stfFormOnSubmit', () => {
   });
 
   test('2', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       keepTrackApi.programs.sensorManager.checkSensorSelected = () => false;
 
       shortTermFences.stfFormOnSubmit({
@@ -224,8 +270,59 @@ describe('shortTermFences.stfFormOnSubmit', () => {
 // @ponicode
 describe('shortTermFences.stfOnObjectLinkClick', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       shortTermFences.stfOnObjectLinkClick();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
+
+// @ponicode
+describe('shortTermFences.bottomMenuClick', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      shortTermFences.bottomMenuClick('menu-stf');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('1', () => {
+    const callFunction: any = () => {
+      shortTermFences.bottomMenuClick('Credit Card Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('2', () => {
+    const callFunction: any = () => {
+      shortTermFences.bottomMenuClick('Home Loan Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('3', () => {
+    const callFunction: any = () => {
+      shortTermFences.bottomMenuClick('Investment Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('4', () => {
+    const callFunction: any = () => {
+      shortTermFences.bottomMenuClick('Checking Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('5', () => {
+    const callFunction: any = () => {
+      shortTermFences.bottomMenuClick('');
     };
 
     expect(callFunction).not.toThrow();

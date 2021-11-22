@@ -1,8 +1,17 @@
-export declare interface satObject {
-  TLE1: string,
-  TLE2: string,
-  SCC_NUM: string,
-  active: boolean,
+/* eslint-disable no-unused-vars */
+export declare interface SatObject {
+  id: number;
+  satId?: number;
+  position: { x: number; y: number; z: number };
+  static?: boolean;
+  missile?: boolean;
+  type?: string;
+  name?: string;
+  intlDes?: string;
+  TLE1: string;
+  TLE2: string;
+  SCC_NUM: string;
+  active: boolean;
   C?: string;
   LS?: string;
   LV?: string;
@@ -29,7 +38,7 @@ export declare interface satObject {
   S6?: string;
   S7?: string;
   inclination: number;
-  longitude: number;
+  lon: number;
   perigee: number;
   apogee: number;
   period: number;
@@ -38,7 +47,7 @@ export declare interface satObject {
   eccentricity: number;
   raan: number;
   argPe: number;
-  inview: number;
+  inView: number;
   velocity: {
     total: number;
     x: number;
@@ -49,9 +58,29 @@ export declare interface satObject {
   getAltitude?: any;
   getDirection?: any;
   vmag?: number;
+  associates?: any;
+  maneuver?: any;
+  constellation?: any;
+  ORPO?: any;
+  FMISSED?: any;
+  NOTES?: any;
+  TTP?: any;
+  isInSun?: any;
+  inSun?: any;
+  desc?: string;
+  marker?: boolean;
+  isRadarData?: boolean;
+  isInGroup?: boolean;
+  missileComplex?: number;
 }
 
-export interface sensorObject {
+export interface SensorObject {
+  obsmaxel2?: any;
+  obsmaxrange2?: any;
+  obsminrange2?: any;
+  obsminel2?: any;
+  obsmaxaz2?: any;
+  obsminaz2?: any;
   alt: number;
   beamwidth?: number;
   changeObjectInterval?: number;
@@ -61,7 +90,8 @@ export interface sensorObject {
   linkWgs?: boolean;
   lon: number;
   name: string;
-  observerGd: { 
+  alt: number;
+  observerGd: {
     lat: number;
     lon: number;
     alt: number;
@@ -93,8 +123,33 @@ export interface Rae {
   el: number;
 }
 
-export interface Inview {
-  inview: boolean;
+export interface InView {
+  inView: boolean;
+}
+
+export interface EarthObject {
+  init: any;
+  draw: any;
+  program: any;
+  update: any;
+  drawOcclusion: any;
+  earthJ: number;
+  earthEra: number;
+  lightDirection: any;
+  pos: [number, number, number];
+  loaded: boolean;
+  sunvar: any;
+  shader: any;
+  specularMap: any;
+  imgHiRes: any;
+  isHiResReady: boolean;
+  nightImgHiRes: any;
+  nightImg: any;
+  bumpMap: any;
+  loadHiResNight: any;
+  loadHiRes: any;
+  isUseHiRes: boolean;
+  lightDirection: [number, number, number];
 }
 
 export interface keepTrackApiInterface {

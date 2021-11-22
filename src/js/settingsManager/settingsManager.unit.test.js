@@ -1,3 +1,4 @@
+/* eslint-disable no-undefined */
 import { keepTrackApi } from '../api/externalApi';
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 

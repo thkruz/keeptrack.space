@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { satellite } from '@app/js/lib/lookangles.js';
+import { satellite } from '@app/js/satMath/satMath';
 
 let isselectedSatNegativeOne = false;
 const selectSatManager = {
@@ -72,7 +72,7 @@ const selectSatManager = {
       }
     } else if (satId !== -1) {
       if (mainCamera.cameraType.current == mainCamera.cameraType.Default) {
-        mainCamera.ecLastZoom = mainCamera.zoomLevel;
+        mainCamera.ecLastZoom = mainCamera.zoomLevel();
         if (!sat.static) {
           mainCamera.cameraType.set(mainCamera.cameraType.FixedToSat);
         } else if (typeof sat.staticNum !== 'undefined') {
@@ -85,6 +85,7 @@ const selectSatManager = {
       sat = satSet.getSatExtraOnly(satId);
       if (!sat) return;
       if (sat.type == 'Star') {
+        selectSatManager.selectSat(-1, mainCamera);
         return;
       }
       if (sat.static) {

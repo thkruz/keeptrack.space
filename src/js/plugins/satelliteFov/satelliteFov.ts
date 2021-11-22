@@ -24,9 +24,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import $ from 'jquery';
 
 export const uiManagerInit = () => {
   // Bottom Icon
@@ -61,7 +60,7 @@ export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-sat-fov') {
     if (objectManager.selectedSat === -1 && $('#search').val() === '') {
       // No Sat Selected and No Search Present
-      if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.satFOVDisabled();
+      if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.satFovDisabled();
       uiManager.toast(`Select a Satellite First!`, 'caution');
       if (!$('#menu-sat-fov:animated').length) {
         $('#menu-sat-fov').effect('shake', {
@@ -90,7 +89,7 @@ export const bottomMenuClick = (iconName: string): void => {
         uiManager.doSearch($('#search').val());
       }
 
-      var satFieldOfView = parseFloat(<string>$('#satFieldOfView').val());
+      const satFieldOfView = parseFloat(<string>$('#satFieldOfView').val());
       $('#menu-sat-fov').addClass('bmenu-item-selected');
       satSet.satCruncher.postMessage({
         isShowFOVBubble: 'reset',

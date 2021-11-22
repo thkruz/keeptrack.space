@@ -1,10 +1,3 @@
-/*globals
-  global
-  test
-  expect
-  jest
-*/
-
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { selectSatManager } from '@app/js/plugins/selectSatManager/selectSatManager.js';
 

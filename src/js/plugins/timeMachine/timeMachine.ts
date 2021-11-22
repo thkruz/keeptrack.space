@@ -67,7 +67,7 @@ export const orbitManagerInit = (): void => {
     if (!keepTrackApi.programs.orbitManager.isTimeMachineVisible) return;
     // Kill all old async calls if run count updates
     if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
-    let yearGroup = groupsManager.createGroup('yearOrLess', year);
+    const yearGroup = groupsManager.createGroup('yearOrLess', year);
     // groupsManager.selectGroupNoOverlay(yearGroup);
     groupsManager.selectGroup(yearGroup, orbitManager);
     yearGroup.updateOrbits(orbitManager, orbitManager);
@@ -75,7 +75,7 @@ export const orbitManagerInit = (): void => {
     if (year >= 59 && year < 100) {
       keepTrackApi.programs.uiManager.toast(`Time Machine In Year 19${year}!`, 'normal');      
     } else {
-      let yearStr = year < 10 ? `0${year}` : `${year}`;
+      const yearStr = year < 10 ? `0${year}` : `${year}`;
       keepTrackApi.programs.uiManager.toast(`Time Machine In Year 20${yearStr}!`, 'normal');      
     }
 

@@ -1,3 +1,10 @@
+import { keepTrackApi } from '@app/js/api/externalApi';
+import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
+import { A } from '@app/js/lib/external/meuusjs.js';
+import { satellite } from '@app/js/satMath/satMath';
+import * as glm from 'gl-matrix';
+
+/* eslint-disable camelcase */
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -17,34 +24,26 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import * as glm from 'gl-matrix';
-
-import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
-
-import { A } from '@app/js/lib/external/meuusjs.js';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { satellite } from '@app/js/lib/lookangles.js';
-
 const NUM_LAT_SEGS = 64;
 const NUM_LON_SEGS = 64;
 const RADIUS_OF_DRAW_SUN = 6000;
 const SUN_SCALAR_DISTANCE = 220000;
 
-/** ***************************************************************************
+/* ***************************************************************************
  * Initialization Code
-* ***************************************************************************/
+ * ***************************************************************************/
 export const init = async () => {
   const { gl } = keepTrackApi.programs.drawManager;
 
   initProgram(gl);
-  initBuffers(gl);  
+  initBuffers(gl);
   initVao(gl);
 
   initGodrays(gl);
 
   sun.isLoaded = true;
 };
-export const initGodrays = (gl: WebGL2RenderingContext) => {  
+export const initGodrays = (gl: WebGL2RenderingContext) => {
   initGodraysProgram(gl);
   initGodraysBuffers(gl);
   initGodraysVao(gl);
@@ -60,7 +59,7 @@ export const initProgram = (gl: WebGL2RenderingContext) => {
   gl.shaderSource(vertShader, shaders.sun.vert);
   gl.compileShader(vertShader);
 
-  sun.program = (<any>gl.createProgram());
+  sun.program = <any>gl.createProgram();
   gl.attachShader(sun.program, vertShader);
   gl.attachShader(sun.program, fragShader);
   gl.linkProgram(sun.program);
@@ -80,22 +79,20 @@ export const initBuffers = (gl: WebGL2RenderingContext) => {
   const vertNorm = [];
   const texCoord = [];
   for (let lat = 0; lat <= NUM_LAT_SEGS; lat++) {
-    var latAngle = (Math.PI / NUM_LAT_SEGS) * lat - Math.PI / 2;
-    var diskRadius = Math.cos(Math.abs(latAngle));
-    var z = Math.sin(latAngle);
+    const latAngle = (Math.PI / NUM_LAT_SEGS) * lat - Math.PI / 2;
+    const diskRadius = Math.cos(Math.abs(latAngle));
+    const z = Math.sin(latAngle);
     // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
     // var i = 0;
     for (let lon = 0; lon <= NUM_LON_SEGS; lon++) {
       // add an extra vertex for texture funness
-      var lonAngle = ((Math.PI * 2) / NUM_LON_SEGS) * lon;
-      var x = Math.cos(lonAngle) * diskRadius;
-      var y = Math.sin(lonAngle) * diskRadius;
+      const lonAngle = ((Math.PI * 2) / NUM_LON_SEGS) * lon;
+      const x = Math.cos(lonAngle) * diskRadius;
+      const y = Math.sin(lonAngle) * diskRadius;
       // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
       // mercator cylindrical projection (simple angle interpolation)
-      var v = 1 - lat / NUM_LAT_SEGS;
-      var u = 0.5 + lon / NUM_LON_SEGS; // may need to change to move map
-
-
+      const v = 1 - lat / NUM_LAT_SEGS;
+      const u = 0.5 + lon / NUM_LON_SEGS; // may need to change to move map
 
       // console.log('u: ' + u + ' v: ' + v);
       // normals: should just be a vector from center to point (aka the point itself!
@@ -117,10 +114,10 @@ export const initBuffers = (gl: WebGL2RenderingContext) => {
   for (let lat = 0; lat < NUM_LAT_SEGS; lat++) {
     // this is for each QUAD, not each vertex, so <
     for (let lon = 0; lon < NUM_LON_SEGS; lon++) {
-      var blVert = lat * (NUM_LON_SEGS + 1) + lon; // there's NUM_LON_SEGS + 1 verts in each horizontal band
-      var brVert = blVert + 1;
-      var tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;
-      var trVert = tlVert + 1;
+      const blVert = lat * (NUM_LON_SEGS + 1) + lon; // there's NUM_LON_SEGS + 1 verts in each horizontal band
+      const brVert = blVert + 1;
+      const tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;
+      const trVert = tlVert + 1;
       // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
       vertIndex.push(blVert);
       vertIndex.push(brVert);
@@ -212,7 +209,7 @@ export const initGodraysBuffers = (gl: WebGL2RenderingContext) => {
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]), gl.STATIC_DRAW);
 };
 export const initGodraysProgram = (gl: WebGL2RenderingContext) => {
-  sun.godrays.program = (<any>gl.createProgram());
+  sun.godrays.program = <any>gl.createProgram();
   const vertShader = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vertShader, shaders.godrays.vert);
   gl.compileShader(vertShader);
@@ -232,11 +229,11 @@ export const initGodraysProgram = (gl: WebGL2RenderingContext) => {
   sun.godrays.program.u_resolution = gl.getUniformLocation(sun.godrays.program, 'u_resolution');
 };
 
-/** ***************************************************************************
+/* ***************************************************************************
  * Render Loop Code
-* ***************************************************************************/
+ * ***************************************************************************/
 export const update = () => {
-  const {timeManager} = keepTrackApi.programs;
+  const { timeManager } = keepTrackApi.programs;
   timeManager.updatePropTime();
   sun.now = timeManager.propTimeVar;
 
@@ -259,20 +256,20 @@ export const update = () => {
   sun.sunvar.elevation = (sun.sunvar.tp.hz.alt * RAD2DEG) % 360;
 
   // Range Calculation
-  var T = new A.JulianDay(A.JulianDay.dateToJD(sun.now)).jdJ2000Century();
+  const T = new A.JulianDay(A.JulianDay.dateToJD(sun.now)).jdJ2000Century();
   sun.sunvar.g = (A.Solar.meanAnomaly(T) * 180) / Math.PI;
   sun.sunvar.g = sun.sunvar.g % 360.0;
   sun.sunvar.R = 1.00014 - 0.01671 * Math.cos(sun.sunvar.g) - 0.00014 * Math.cos(2 * sun.sunvar.g);
   sun.sunvar.range = (sun.sunvar.R * 149597870700) / 1000; // au to km conversion
 
   // RAE to ECI
-  sun.eci = satellite.ecfToEci(satellite.lookAnglesToEcf(sun.sunvar.azimuth, sun.sunvar.elevation, sun.sunvar.range, 0, 0, 0), sun.sunvar.gmst);
+  sun.eci = satellite.ecfToEci(satellite.lookAngles2Ecf(sun.sunvar.azimuth, sun.sunvar.elevation, sun.sunvar.range, 0, 0, 0), sun.sunvar.gmst);
 
   const sunMaxDist = Math.max(Math.max(Math.abs(sun.eci.x), Math.abs(sun.eci.y)), Math.abs(sun.eci.z));
   sun.pos[0] = (sun.eci.x / sunMaxDist) * SUN_SCALAR_DISTANCE;
   sun.pos[1] = (sun.eci.y / sunMaxDist) * SUN_SCALAR_DISTANCE;
   sun.pos[2] = (sun.eci.z / sunMaxDist) * SUN_SCALAR_DISTANCE;
-  
+
   sun.mvMatrix = glm.mat4.create();
   sun.nMatrix = glm.mat3.create();
   glm.mat4.identity(sun.mvMatrix);
@@ -332,7 +329,6 @@ export const _getScreenCoords = (pMatrix: glm.mat4, camMatrix: glm.mat4) => {
   const screenPosition = {
     x: posVec4[0] / posVec4[3],
     y: posVec4[1] / posVec4[3],
-
   };
   // sun.sunScreenPositionArray.z = posVec4[2] / posVec4[3];
 
@@ -342,9 +338,9 @@ export const _getScreenCoords = (pMatrix: glm.mat4, camMatrix: glm.mat4) => {
   return screenPosition;
 };
 
-/** ***************************************************************************
+/* ***************************************************************************
  * Export Code
-* ***************************************************************************/
+ * ***************************************************************************/
 const shaders = {
   sun: {
     frag: `#version 300 es

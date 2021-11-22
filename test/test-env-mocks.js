@@ -1,9 +1,3 @@
-/* eslint-disable no-undefined */
-/*globals
-  global
-  jest
-*/
-
 global.mocks = {};
 global.mocks.glMock = {
   activeTexture: jest.fn(),
@@ -20,7 +14,7 @@ global.mocks.glMock = {
   clear: jest.fn(),
   clearColor: jest.fn(),
   compileShader: jest.fn(),
-  createBuffer: jest.fn(),
+  createBuffer: () => ({ numItems: 0, layout: {}, data: {} }),
   createFramebuffer: jest.fn(),
   createProgram: () => ({
     test: '',
@@ -58,13 +52,17 @@ global.mocks.glMock = {
   uniformMatrix3fv: jest.fn(),
   uniformMatrix4fv: jest.fn(),
   useProgram: jest.fn(),
+  viewport: jest.fn(),
   vertexAttribPointer: jest.fn(),
 };
 
 // mock_requestAnimationFrame.js
 class RequestAnimationFrameMockSession {
-  handleCounter = 0;
-  queue = new Map();
+  constructor() {
+    this.handleCounter = 0;
+    this.queue = new Map();
+  }
+
   requestAnimationFrame(callback) {
     const handle = this.handleCounter++;
     this.queue.set(handle, callback);
@@ -77,7 +75,7 @@ class RequestAnimationFrameMockSession {
 
   triggerNextAnimationFrame(time = performance.now()) {
     const nextEntry = this.queue.entries().next().value;
-    if (nextEntry === undefined) return;
+    if (typeof nextEntry === 'undefined') return;
 
     const [nextHandle, nextCallback] = nextEntry;
 

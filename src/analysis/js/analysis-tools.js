@@ -15,11 +15,13 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 
 import '@app/js/lib/external/Chart.js';
+
 import * as $ from 'jquery';
+
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { satellite } from '@app/js/lib/lookangles.js';
-import { sensorList } from '@app/js/plugins/sensor/sensorList.js';
-import { timeManager } from '@app/js/timeManager/timeManager.ts';
+import { satellite } from '@app/js/satMath/satMath';
+import { sensorList } from '@app/js/plugins/sensor/sensorList';
+import { timeManager } from '@app/js/timeManager/timeManager';
 
 var requestInfo = {};
 var isDrawApogee = false;
@@ -40,7 +42,7 @@ var millisecondsPerDay = 1.15741e-8;
 var raeType = 1;
 
 satellite.lookanglesInterval = 60;
-satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
+satellite.calculateLookAngles = function (sat, sensor, tableType) {
   var propOffset;
   (function _inputValidation() {
     // Check if there is a sensor
@@ -49,28 +51,28 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
       if (satellite.sensorSelected()) {
         sensor = satellite.currentSensor;
       } else {
-        console.error('getlookangles2 requires a sensor!');
+        console.debug('getlookangles2 requires a sensor!');
         return;
       }
       // Simple Error Checking
     } else {
       if (typeof sensor.obsminaz == 'undefined') {
-        console.error('sensor format incorrect');
+        console.debug('sensor format incorrect');
         return;
       }
       sensor.observerGd = {
         // Array to calculate look angles in propagate()
-        latitude: sensor.lat * DEG2RAD,
-        longitude: sensor.lon * DEG2RAD,
+        lat: sensor.lat * DEG2RAD,
+        lon: sensor.lon * DEG2RAD,
         height: sensor.alt * 1, // Converts from string to number TODO: Find correct way to convert string to integer
       };
     }
 
     if (typeof sat == 'undefined') {
-      console.error('sat parameter required!');
+      console.debug('sat parameter required!');
     } else {
       if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
-        console.error('sat parameter invalid format!');
+        console.debug('sat parameter invalid format!');
       }
     }
 
@@ -118,8 +120,8 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
 
     positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
     const lla = {
-      lat: sensor.observerGd.latitude,
-      lon: sensor.observerGd.longitude,
+      lat: sensor.observerGd.lat,
+      lon: sensor.observerGd.lon,
       alt: sensor.observerGd.height,
     };
     lookAngles = satellite.ecfToLookAngles(lla, positionEcf);
@@ -175,8 +177,8 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
         var positionEcf1, lookAngles1, azimuth1, elevation1, range1;
 
         const lla = {
-          lat: sensor.observerGd.latitude,
-          lon: sensor.observerGd.longitude,
+          lat: sensor.observerGd.lat,
+          lon: sensor.observerGd.lon,
           alt: sensor.observerGd.height,
         };
         positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
@@ -212,8 +214,8 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
           positionEci1 = satellite.sgp4(satrec, m1);
 
           const lla = {
-            lat: sensor.observerGd.latitude,
-            lon: sensor.observerGd.longitude,
+            lat: sensor.observerGd.lat,
+            lon: sensor.observerGd.lon,
             alt: sensor.observerGd.height,
           };
           positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
@@ -279,7 +281,7 @@ satellite.calculateLookAngles = function (sat, sensor, tableType, offset) {
   const _jday = (year, mon, day, hr, minute, sec) => {
     // from satellite.js
     if (!year) {
-      // console.error('timeManager.jday should always have a date passed to it!');
+      // console.debug('timeManager.jday should always have a date passed to it!');
       var now;
       now = Date.now();
       let jDayStart = new Date(now.getFullYear(), 0, 0);
@@ -524,7 +526,6 @@ var drawChart = (data) => {
 
   // Actually Draw the Charts
   var context = document.getElementById('satChart').getContext('2d');
-  // eslint-disable-next-line no-unused-vars
   var myChart = new Chart(context, {
     type: 'line',
     data: {
@@ -575,7 +576,7 @@ var loadJSON = () => {
       drawChart(resp);
     })
     .fail(function () {
-      console.error('Could Not Load JSON File!');
+      console.debug('Could Not Load JSON File!');
     });
 };
 

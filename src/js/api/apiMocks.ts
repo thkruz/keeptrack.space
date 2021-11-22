@@ -1,8 +1,11 @@
-import { satObject, sensorObject } from './keepTrack';
+import { SatObject, SensorObject } from './keepTrack';
+declare const jest: any;
 
-export const defaultSat: satObject = {
+export const defaultSat: SatObject = {
+  id: 0,
   active: true,
   SCC_NUM: '00005',
+  intlDes: '1998-AEF',
   C: 'ISS',
   LS: 'TTMTR',
   LV: 'Proton-K',
@@ -29,7 +32,7 @@ export const defaultSat: satObject = {
   S6: '',
   S7: '',
   inclination: 51.6423,
-  longitude: 168.5744,
+  lon: 168.5744,
   perigee: 1475,
   apogee: 184.3976,
   period: 313.3642,
@@ -38,7 +41,7 @@ export const defaultSat: satObject = {
   eccentricity: 0.00003453,
   raan: 0,
   argPe: 0,
-  inview: 1,
+  inView: 1,
   velocity: {
     total: 0,
     x: 0,
@@ -51,10 +54,17 @@ export const defaultSat: satObject = {
     alt: 1475,
   }),
   getAltitude: () => 0,
+  isInSun: () => true,
   getDirection: () => 'N',
+  position: {
+    x: 0,
+    y: 0,
+    z: 0,
+  },
+  static: false,
 };
 
-export const defaultSensor: sensorObject = {
+export const defaultSensor: SensorObject = {
   alt: 0.060966,
   beamwidth: 2,
   changeObjectInterval: 1000,
@@ -80,40 +90,42 @@ export const defaultSensor: sensorObject = {
   zoom: 'leo',
 };
 
-export const useMockWorkers = () => {
+export const useMockWorkers = (): void => {
   class Worker {
     url: any;
-    onmessage: (msg: any) => void;
+    // eslint-disable-next-line no-unused-vars
+    onmessage: (msg: any) => { data: {} };
     constructor(stringUrl: any) {
       this.url = stringUrl;
-      this.onmessage = () => {
+      this.onmessage = (msg: any) => {
+        console.debug(msg);
         return {
-          data: {}
-        }
+          data: {},
+        };
       };
     }
 
     postMessage(msg: any) {
       if (msg.dat) {
-        this.onmessage({          
+        this.onmessage({
           data: {
             extraData: JSON.stringify([defaultSat, defaultSensor]),
-            satPos: [0,0,0,0,0,0],
-            satVel: [0,0,0,0,0,0],
-          }
+            satPos: [0, 0, 0, 0, 0, 0],
+            satVel: [0, 0, 0, 0, 0, 0],
+          },
         });
       }
       this.onmessage({
         data: {
-          satPos: [0,0,0,0,0,0],
-          satVel: [0,0,0,0,0,0],
-        }
+          satPos: [0, 0, 0, 0, 0, 0],
+          satVel: [0, 0, 0, 0, 0, 0],
+        },
       });
     }
   }
 
   (<any>window).Worker = Worker;
-}
+};
 
 export const keepTrackApiStubs = {
   programs: {
@@ -123,60 +135,143 @@ export const keepTrackApiStubs = {
         editSatDisabled: jest.fn(),
         survFenceDisabled: jest.fn(),
         bubbleDisabled: jest.fn(),
-        satFOVDisabled: jest.fn(),
+        satFovDisabled: jest.fn(),
         planetariumDisabled: jest.fn(),
         mapDisabled: jest.fn(),
+        breakupDisabled: jest.fn(),
+        ssnLookanglesDisabled: jest.fn(),
+        sensorInfoDisabled: jest.fn(),
+        lookanglesDisabled: jest.fn(),
+        satelliteSelected: jest.fn(),
       },
       adviceCount: {
         socrates: 0,
       },
       showAdvice: jest.fn(),
-      adviceArray: (<any[]>[]),
+      adviceArray: <any[]>[],
     },
     mainCamera: {
+      camMatrix: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       cameraType: {
         current: 1,
-        satellite: 1,
-        fixedToSat: 2,
+        Default: 0,
+        Offset: 1,
+        FixedToSat: 2,
+        Fps: 3,
+        Planetarium: 4,
+        Satellite: 5,
+        Astronomy: 6,
       },
       camSnap: jest.fn(),
       changeZoom: jest.fn(),
       latToPitch: jest.fn(),
       longToYaw: jest.fn(),
+      calculate: jest.fn(),
+      update: jest.fn(),
+      getCamDist: jest.fn(),
+      localRotateDif: {
+        pitch: 0,
+        yaw: 0,
+      },
+      zoomLevel: () => 0,
+      zoomTarget: () => 0,
       autoRotate: jest.fn(),
+      fts2default: jest.fn(),
+      panCurrent: {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      getForwardVector: jest.fn(),
     },
     ColorScheme: {
-      reloadColors: jest.fn(),      
+      objectTypeFlags: {
+        payload: true,
+        rocketBody: true,
+        debris: true,
+        inFOV: true,
+      },
+      reloadColors: jest.fn(),
     },
     drawManager: {
+      pMatrix: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      resizeCanvas: jest.fn(),
       glInit: jest.fn(),
       gl: global.mocks.glMock,
       selectSatManager: {
         selectSat: jest.fn(),
       },
+      postProcessingManager: {
+        init: jest.fn(),
+        programs: {
+          occlusion: {
+            attrSetup: jest.fn(),
+            attrOff: jest.fn(),
+            uniformSetup: jest.fn(),
+          },
+        },
+      },
       sceneManager: {
         sun: {
-          pos: [0,0,0],
+          initGodrays: jest.fn(),
+          pos: [0, 0, 0],
           sunvar: {
             gmst: 0,
           },
           godrays: {
             frameBuffer: {},
-          }
+          },
         },
         earth: {
-          lightDirection: [0,0,0],
+          init: jest.fn(),
+          loadHiRes: jest.fn(),
+          loadHiResNight: jest.fn(),
+          lightDirection: [0, 0, 0],
         },
-      }
-    },    
+      },
+    },
     dotsManager: {
+      inSunData: new Float32Array([0, 0, 0]),
+      inViewData: new Float32Array([0, 0, 0]),
+      init: jest.fn(),
       starIndex1: 0,
-      pickReadPixelBuffer: [
-        0,
-        0,
-        0,
-      ],
-    },    
+      pickReadPixelBuffer: [0, 0, 0],
+      pickingDotSize: '1.0',
+      gl: null,
+      emptyMat4: null,
+      positionBuffer: null,
+      sizeBuffer: null,
+      loaded: true,
+      pMvCamMatrix: null,
+      drawProgram: null,
+      positionBufferOneTime: null,
+      positionData: new Float32Array([0, 0, 0]),
+      pickingProgram: {
+        aPos: null,
+      },
+      pickingColorBuffer: null,
+      drawShaderCode: { frag: null, vert: null },
+      pickingShaderCode: { vert: null, frag: null },
+      pickingTexture: null,
+      pickingRenderBuffer: null,
+      velocityData: new Float32Array([0, 0, 0]),
+      drawDivisor: null,
+      satDataLenInDraw: null,
+      satDataLenInDraw3: null,
+      orbitalSats3: null,
+      drawI: null,
+      draw: jest.fn(),
+      drawGpuPickingFrameBuffer: jest.fn(),
+      updatePositionBuffer: jest.fn(),
+      updatePMvCamMatrix: jest.fn(),
+      sizeBufferOneTime: null,
+      sizeData: null,
+      starIndex2: null,
+      pickingColorData: null,
+      pickingFrameBuffer: null,
+      createPickingProgram: jest.fn(),
+      sensorMarkerArray: new Float32Array([0, 0, 0]),
+    },
     groups: null,
     groupsManager: {
       Canada: null,
@@ -190,40 +285,50 @@ export const keepTrackApiStubs = {
       UnitedStates: null,
       SpaceStations: {
         sats: [
-          {satId: 1, SCC_NUM: '25544'},
-          {satId: 1, SCC_NUM: '25544'},
+          { satId: 1, SCC_NUM: '25544' },
+          { satId: 1, SCC_NUM: '25544' },
         ],
         updateOrbits: jest.fn(),
       },
       clearSelect: jest.fn(),
       createGroup: () => ({
+        sats: [
+          { satId: 1, SCC_NUM: '25544' },
+          { satId: 1, SCC_NUM: '25544' },
+        ],
         updateOrbits: jest.fn(),
       }),
       selectGroup: jest.fn(),
-    },    
+      selectedGroup: [1, 2, 3],
+    },
     lineManager: {
+      draw: jest.fn(),
       create: jest.fn(),
+      clear: jest.fn(),
       removeStars: jest.fn(),
       getLineListLen: jest.fn(),
+      drawWhenSelected: jest.fn(),
     },
     missileManager: {
       getMissileTEARR: jest.fn(),
     },
     objectManager: {
       isLaunchSiteManagerLoaded: true,
+      lastSelectedSat: jest.fn(),
+      extractCountry: jest.fn(),
+      setHoveringSat: jest.fn(),
+      setLasthoveringSat: jest.fn(),
+      extractLaunchSite: () => ({ site: 'test', sitec: 'test' }),
+      extractLiftVehicle: jest.fn(),
       launchSiteManager: {
-        launchSiteList: [
-          'AFWTR'
-        ],
+        launchSiteList: ['AFWTR'],
       },
       selectedSat: -1,
       setSelectedSat: jest.fn(),
       staticSet: {
         id: 0,
       },
-      analSatSet: {
-        id: 0,
-      },
+      analSatSet: [defaultSat],
       radarDataSet: {
         id: 0,
       },
@@ -233,12 +338,32 @@ export const keepTrackApiStubs = {
       fieldOfViewSet: {
         id: 0,
       },
+      satLinkManager: {
+        showLinks: jest.fn(),
+        aehf: [25544],
+        dscs: [25544],
+        wgs: [25544],
+        starlink: [25544],
+        sbirs: [25544],
+      },
+    },
+    meshManager: {
+      draw: jest.fn(),
     },
     orbitManager: {
+      orbitWorker: {
+        postMessage: jest.fn(),
+      },
+      setSelectOrbit: jest.fn(),
+      draw: jest.fn(),
+      clearSelectOrbit: jest.fn(),
       updateOrbitBuffer: jest.fn(),
       clearInViewOrbit: jest.fn(),
       removeInViewOrbit: jest.fn(),
       historyOfSatellitesPlay: jest.fn(),
+      shader: {
+        uColor: 1,
+      },
     },
     satellite: {
       currentTEARR: {
@@ -246,10 +371,14 @@ export const keepTrackApiStubs = {
         el: 0,
         rng: 0,
       },
-      sgp4: () => ([0,0,0]),
+      sgp4: () => [0, 0, 0],
       setobs: jest.fn(),
+      distance: jest.fn(),
       setTEARR: jest.fn(),
+      eci2ll: () => ({ lat: 0, lon: 0 }),
       altitudeCheck: jest.fn(),
+      calculateSensorPos: jest.fn(),
+      createTle: jest.fn(),
       degreesLong: (num: number) => num,
       degreesLat: (num: number) => num,
       currentEpoch: () => ['21', '150'],
@@ -259,32 +388,65 @@ export const keepTrackApiStubs = {
       getRae: () => [0, 0, 0],
       checkIsInFOV: () => true,
       findCloseObjects: () => '',
+      eci2Rae: jest.fn(),
       findBestPasses: () => jest.fn(),
+      findNearbyObjectsByOrbit: () => jest.fn(),
       nextpass: () => '2021-09-21 20:00:00Z',
-      getDOPsTable: jest.fn(),
+      getDops: () => ({
+        HDOP: 0,
+        VDOP: 0,
+        TDOP: 0,
+        GDOP: 0,
+        PDOP: 0,
+      }),
+      updateDopsTable: jest.fn(),
+      map: () => ({ lat: 0, lon: 0 }),
+      getTEARR: jest.fn(),
     },
     satSet: {
       satCruncher: {
         postMessage: jest.fn(),
+        onmessage: jest.fn(),
       },
-      satData: [
-        defaultSat,
-        defaultSat,
-      ],
-      getIdFromObjNum: jest.fn(),
+      getIdFromEci: jest.fn(),
+      selectSat: jest.fn(),
+      satData: [defaultSat, defaultSat, { type: 'Star', name: 'test' }, { type: 'Phased Array Radar', static: true, name: 'test' }],
+      convertIdArrayToSatnumArray: jest.fn(),
+      getIdFromObjNum: () => 0,
       getSensorFromSensorName: () => 0,
       getSatExtraOnly: () => defaultSat,
-      getSatFromObjNum : () => defaultSat,
+      getSatFromObjNum: () => defaultSat,
       getSat: () => defaultSat,
+      getIdFromStarName: jest.fn(),
       initGsData: jest.fn(),
       setColorScheme: jest.fn(),
+      getSatPosOnly: () => defaultSat,
+      getSatInView: () => jest.fn(),
+      getScreenCoords: () => ({
+        error: false,
+      }),
+      getSatVel: () => jest.fn(),
+      getSatInSun: () => jest.fn(),
       getSatInViewOnly: () => defaultSat,
       default: '',
       insertNewAnalystSatellite: jest.fn(),
+      searchYear: () => [25544],
+      searchYearOrLess: () => [25544],
+      getIdFromIntlDes: jest.fn(),
+      searchNameRegex: () => [25544],
+      searchCountryRegex: () => [25544],
+      queryStr: 'search=25544&intldes=1998-A&sat=25544&misl=0,0,0&date=1234567&rate=1&hires=true',
+      cosparIndex: { '1998-AB': 5 },
+      numSats: 1,
     },
     searchBox: {
       hideResults: jest.fn(),
       fillResultBox: jest.fn(),
+      doArraySearch: jest.fn(),
+      doSearch: jest.fn(),
+      getLastResultGroup: jest.fn(),
+      isHovering: jest.fn(),
+      isResultBoxOpen: jest.fn(),
     },
     sensorFov: {
       enableFovView: jest.fn(),
@@ -297,19 +459,27 @@ export const keepTrackApiStubs = {
         lon: 0,
         shortName: 'COD',
       },
+      sensorListUS: [defaultSensor, defaultSensor],
+      setCurrentSensor: jest.fn(),
     },
     starManager: {
       init: jest.fn(),
+      findStarsConstellation: jest.fn(),
+      drawConstellations: jest.fn(),
     },
     timeManager: {
       propOffset: 0,
-      propTimeVar: new Date(),
+      getPropOffset: () => 0,
+      propTimeVar: new Date(2020, 0, 1),
       propRate: 0,
       selectedDate: 0,
-      propTime: () => 0,
+      propTimeCheck: () => new Date(2020, 0, 1),
+      propTime: () => new Date(2020, 0, 1),
       getDayOfYear: () => 0,
       updatePropTime: jest.fn(),
       jday: () => 0,
+      dateFromDay: () => new Date(2020, 0, 1),
+      setNow: jest.fn(),
     },
     uiManager: {
       hideSideMenus: jest.fn(),
@@ -323,6 +493,7 @@ export const keepTrackApiStubs = {
       legendMenuChange: jest.fn(),
       clearRMBSubMenu: jest.fn(),
       updateURL: jest.fn(),
+      keyHandler: jest.fn(),
     },
     watchlist: {
       updateWatchlist: jest.fn(),

@@ -1,7 +1,7 @@
+import { keepTrackApi } from '@app/js/api/externalApi';
+import { RAD2DEG } from '@app/js/lib/constants';
 import { saveAs, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
-import { RAD2DEG } from '@app/js/lib/constants';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 let isEditSatMenuOpen = false;
 export const init = (): void => {
@@ -33,7 +33,6 @@ export const init = (): void => {
 };
 
 export const uiManagerInit = (): void => {
-  const { satellite, timeManager, orbitManager, satSet } = keepTrackApi.programs;
   // Side Menu
   $('#left-menus').append(keepTrackApi.html`
     <div id="editSat-menu" class="side-menu-parent start-hidden text-select">
@@ -132,46 +131,51 @@ export const uiManagerInit = (): void => {
 
   $('#editSat-file').on('change', function (evt) {
     if (!window.FileReader) return; // Browser is not compatible
-
-    try {
-      var reader = new FileReader();
-
-      reader.onload = function (evt) {
-        if (evt.target.readyState !== 2) return;
-        if (evt.target.error) {
-          console.log('error');
-          return;
-        }
-
-        var object = JSON.parse(<string>evt.target.result);
-        var scc = parseInt(stringPad.pad0(object.TLE1.substr(2, 5).trim(), 5));
-        var satId = satSet.getIdFromObjNum(scc);
-        var sat = satSet.getSatExtraOnly(satId);
-        if (satellite.altitudeCheck(object.TLE1, object.TLE2, timeManager.propOffset) > 1) {
-          satSet.satCruncher.postMessage({
-            typ: 'satEdit',
-            id: sat.id,
-            active: true,
-            TLE1: object.TLE1,
-            TLE2: object.TLE2,
-          });
-          orbitManager.updateOrbitBuffer(sat.id, true, object.TLE1, object.TLE2);
-          sat.active = true;
-        } else {
-          $('#es-error').html('Failed Altitude Check</br>Try Different Parameters');
-          $('#es-error').show();
-        }
-      };
-      reader.readAsText((<any>evt.target).files[0]);
-      evt.preventDefault();
-    } catch (error) {
-      // console.warn(error);
-    }
+    doReaderActions(evt);
+    evt.preventDefault();
   });
 
   $('#es-error').on('click', function () {
     $('#es-error').hide();
   });
+};
+
+export const doReaderActions = (evt) => {
+  try {
+    const reader = new FileReader();
+    reader.onload = readerOnLoad;
+    reader.readAsText((<any>evt.target).files[0]);
+  } catch (e) {
+    // Intentionally left blank
+  }
+};
+
+export const readerOnLoad = (evt) => {
+  const { satellite, timeManager, orbitManager, satSet } = keepTrackApi.programs;
+  if (evt.target.readyState !== 2) return;
+  if (evt.target.error) {
+    console.log('error');
+    return;
+  }
+
+  const object = JSON.parse(<string>evt.target.result);
+  const scc = parseInt(stringPad.pad0(object.TLE1.substr(2, 5).trim(), 5));
+  const satId = satSet.getIdFromObjNum(scc);
+  const sat = satSet.getSatExtraOnly(satId);
+  if (satellite.altitudeCheck(object.TLE1, object.TLE2, timeManager.propOffset) > 1) {
+    satSet.satCruncher.postMessage({
+      typ: 'satEdit',
+      id: sat.id,
+      active: true,
+      TLE1: object.TLE1,
+      TLE2: object.TLE2,
+    });
+    orbitManager.updateOrbitBuffer(sat.id, true, object.TLE1, object.TLE2);
+    sat.active = true;
+  } else {
+    $('#es-error').html('Failed Altitude Check</br>Try Different Parameters');
+    $('#es-error').show();
+  }
 };
 
 export const bottomMenuClick = (iconName: string) => {
@@ -189,7 +193,7 @@ export const bottomMenuClick = (iconName: string) => {
         $('#menu-editSat').addClass('bmenu-item-selected');
         isEditSatMenuOpen = true;
 
-        let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
+        const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
         $('#es-scc').val(sat.SCC_NUM);
 
         let inc: string | string[] = (sat.inclination * RAD2DEG).toPrecision(7);
@@ -222,7 +226,7 @@ export const bottomMenuClick = (iconName: string) => {
         $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
         // $('#es-rasc').val(sat.TLE2.substr(18 - 1, 7 + 1).toString());
       } else {
-        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.editSatDisabled();
+        if (settingsManager.plugins?.topMenu) keepTrackApi.programs.adviceManager.adviceList.editSatDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');
         if (!$('#menu-editSat:animated').length) {
           $('#menu-editSat').effect('shake', {
@@ -262,32 +266,32 @@ export const editSatNewTleClickFadeIn = () => {
   const { satellite, satSet, timeManager, objectManager, orbitManager } = keepTrackApi.programs;
   try {
     // Update Satellite TLE so that Epoch is Now but ECI position is very very close
-    var satId = satSet.getIdFromObjNum($('#es-scc').val());
-    var mainsat = satSet.getSat(satId);
+    const satId = satSet.getIdFromObjNum($('#es-scc').val());
+    const mainsat = satSet.getSat(satId);
 
     // Launch Points are the Satellites Current Location
-    var TEARR = mainsat.getTEARR();
-    var launchLat, launchLon, alt;
+    const TEARR = mainsat.getTEARR();
+    let launchLat, launchLon, alt;
     launchLon = satellite.degreesLong(TEARR.lon);
     launchLat = satellite.degreesLat(TEARR.lat);
     alt = TEARR.alt;
 
-    var upOrDown = mainsat.getDirection();
+    const upOrDown = mainsat.getDirection();
 
-    var currentEpoch = satellite.currentEpoch(timeManager.propTime());
+    const currentEpoch = satellite.currentEpoch(timeManager.propTime());
     mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
 
     keepTrackApi.programs.mainCamera.isCamSnapMode = false;
 
-    var TLEs;
+    let TLEs;
     // Ignore argument of perigee for round orbits OPTIMIZE
     if (mainsat.apogee - mainsat.perigee < 300) {
       TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.propOffset);
     } else {
       TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.propOffset, alt);
     }
-    var TLE1 = TLEs[0];
-    var TLE2 = TLEs[1];
+    const TLE1 = TLEs[0];
+    const TLE2 = TLEs[1];
     satSet.satCruncher.postMessage({
       typ: 'satEdit',
       id: satId,
@@ -298,7 +302,7 @@ export const editSatNewTleClickFadeIn = () => {
     //
     // Reload Menu with new TLE
     //
-    let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
+    const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
     $('#es-scc').val(sat.SCC_NUM);
 
     let inc: string | string[] = (sat.inclination * RAD2DEG).toPrecision(7);
@@ -338,90 +342,25 @@ export const editSatNewTleClickFadeIn = () => {
 export const editSatSubmit = (e: Event) => {
   const { satellite, satSet, timeManager, orbitManager } = keepTrackApi.programs;
   $('#es-error').hide();
-  var scc = $('#es-scc').val();
-  var satId = satSet.getIdFromObjNum(scc);
+  const scc = $('#es-scc').val();
+  const satId = satSet.getIdFromObjNum(scc);
   if (satId === null) {
     console.log('Not a Real Satellite');
     e.preventDefault();
     return false;
   }
-  var sat = satSet.getSatExtraOnly(satId);
-
-  var intl = sat.TLE1.substr(9, 8);
-
+  const sat = satSet.getSatExtraOnly(satId);
+  const intl = sat.TLE1.substr(9, 8);
   let inc: string | string[] = <string>$('#es-inc').val();
-
-  inc = parseFloat(inc).toPrecision(7);
-  inc = inc.split('.');
-  inc[0] = inc[0].substr(-3, 3);
-  if (inc[1]) {
-    inc[1] = inc[1].substr(0, 4);
-  } else {
-    inc[1] = '0000';
-  }
-  inc = (inc[0] + '.' + inc[1]).toString();
-  inc = stringPad.pad0(inc, 8);
-
   let meanmo: string | string[] = <string>$('#es-meanmo').val();
-
-  meanmo = parseFloat(meanmo).toPrecision(10);
-  meanmo = meanmo.split('.');
-  meanmo[0] = meanmo[0].substr(-2, 2);
-  if (meanmo[1]) {
-    meanmo[1] = meanmo[1].substr(0, 8);
-  } else {
-    meanmo[1] = '00000000';
-  }
-  meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
-  meanmo = stringPad.pad0(meanmo, 8);
-
   let rasc: string | string[] = <string>$('#es-rasc').val();
-
-  rasc = parseFloat(rasc).toPrecision(7);
-  rasc = rasc.split('.');
-  rasc[0] = rasc[0].substr(-3, 3);
-  if (rasc[1]) {
-    rasc[1] = rasc[1].substr(0, 4);
-  } else {
-    rasc[1] = '0000';
-  }
-  rasc = (rasc[0] + '.' + rasc[1]).toString();
-  rasc = stringPad.pad0(rasc, 8);
-
-  var ecen = $('#es-ecen').val();
+  const ecen = $('#es-ecen').val();
   let argPe: string | string[] = <string>$('#es-argPe').val();
-
-  argPe = parseFloat(argPe).toPrecision(7);
-  argPe = argPe.split('.');
-  argPe[0] = argPe[0].substr(-3, 3);
-  if (argPe[1]) {
-    argPe[1] = argPe[1].substr(0, 4);
-  } else {
-    argPe[1] = '0000';
-  }
-  argPe = (argPe[0] + '.' + argPe[1]).toString();
-  argPe = stringPad.pad0(argPe, 8);
-
   let meana: string | string[] = <string>$('#es-meana').val();
+  const epochyr = $('#es-year').val();
+  const epochday = $('#es-day').val();
 
-  meana = parseFloat(meana).toPrecision(7);
-  meana = meana.split('.');
-  meana[0] = meana[0].substr(-3, 3);
-  if (meana[1]) {
-    meana[1] = meana[1].substr(0, 4);
-  } else {
-    meana[1] = '0000';
-  }
-  meana = (meana[0] + '.' + meana[1]).toString();
-  meana = stringPad.pad0(meana, 8);
-
-  var epochyr = $('#es-year').val();
-  var epochday = $('#es-day').val();
-
-  var TLE1Ending = sat.TLE1.substr(32, 39);
-
-  var TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-  var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
+  const { TLE1, TLE2 } = satellite.createTle(sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc);
 
   if (satellite.altitudeCheck(TLE1, TLE2, timeManager.propOffset) > 1) {
     satSet.satCruncher.postMessage({
@@ -438,20 +377,21 @@ export const editSatSubmit = (e: Event) => {
     $('#es-error').show();
   }
   e.preventDefault();
+  return true;
 };
 
 export const editSatSaveClick = (e: Event) => {
   const { satSet } = keepTrackApi.programs;
   try {
-    var scc = $('#es-scc').val();
-    var satId = satSet.getIdFromObjNum(scc);
-    var sat = satSet.getSatExtraOnly(satId);
-    var sat2 = {
+    const scc = $('#es-scc').val();
+    const satId = satSet.getIdFromObjNum(scc);
+    const sat = satSet.getSatExtraOnly(satId);
+    const sat2 = {
       TLE1: sat.TLE1,
       TLE2: sat.TLE2,
     };
-    var variable = JSON.stringify(sat2);
-    var blob = new Blob([variable], {
+    const variable = JSON.stringify(sat2);
+    const blob = new Blob([variable], {
       type: 'text/plain;charset=utf-8',
     });
     saveAs(blob, scc + '.tle');

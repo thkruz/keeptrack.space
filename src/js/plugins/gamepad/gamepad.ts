@@ -8,14 +8,14 @@ export const init = (): void => {
   keepTrackApi.programs.gamepad = {
     currentState: null,
   };
-  window.addEventListener('gamepadconnected', (e: GamepadEvent) => {
+  (<any>window).addEventListener('gamepadconnected', (evt: any) => {
     if (settingsManager.cruncherReady) {
-      gamepadConnected(e);
+      gamepadConnected(<GamepadEvent>event);
     } else {
       keepTrackApi.register({
         method: 'uiManagerInit',
         cbName: 'gamepad',
-        cb: () => gamepadConnected(e),
+        cb: () => gamepadConnected(evt),
       });
     }
   });
@@ -127,18 +127,18 @@ export const updateZoom = (zoomOut: number, zoomIn: number): void => {
   if (zoomOut === 0 && zoomIn === 0) return; // Not Zooming
 
   const { mainCamera, drawManager } = keepTrackApi.programs;
+  let zoomTarget = mainCamera.zoomLevel();
   switch (mainCamera.cameraType.current) {
     case mainCamera.cameraType.Default:
-    case mainCamera.cameraType.Offset:    
+    case mainCamera.cameraType.Offset:
     case mainCamera.cameraType.FixedToSat:
-      let zoomTarget = mainCamera.zoomLevel;
       zoomTarget += (zoomOut / 500) * drawManager.dt;
       zoomTarget -= (zoomIn / 500) * drawManager.dt;
-      mainCamera.zoomTarget = zoomTarget;
+      mainCamera.zoomTarget(zoomTarget);
       mainCamera.camZoomSnappedOnSat = false;
       mainCamera.isCamSnapMode = false;
 
-      if (zoomTarget < mainCamera.zoomLevel) {
+      if (zoomTarget < mainCamera.zoomLevel()) {
         mainCamera.isZoomIn = true;
       } else {
         mainCamera.isZoomIn = false;

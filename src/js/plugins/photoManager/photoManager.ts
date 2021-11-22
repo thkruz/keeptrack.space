@@ -1,5 +1,5 @@
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import $ from 'jquery';
 
 let isSatPhotoMenuOpen = false;
 
@@ -17,7 +17,7 @@ export const dscovrLoaded = (req: any): void => {
     const sec = dateStr.slice(12, 14);
 
     // Hours are in EST? Daylight savings time might make this break
-    let dateObj = new Date(Date.UTC(year, month - 1, day, hour - 4, min, sec));
+    const dateObj = new Date(Date.UTC(year, month - 1, day, hour - 4, min, sec));
 
     keepTrackApi.programs.mainCamera.camSnap(keepTrackApi.programs.mainCamera.latToPitch(response[0].centroid_coordinates.lat), keepTrackApi.programs.mainCamera.longToYaw(response[0].centroid_coordinates.lon, dateObj));
     keepTrackApi.programs.mainCamera.changeZoom(0.7);
@@ -131,11 +131,11 @@ export const uiManagerInit = () => {
           <div id="sat-photo-menu-content" class="side-menu">
             <ul>
               <h5 class="center-align">Satellites Imagery List</h5>
-              <li class="link satPhotoRow" onmouseup="meteosat8()">MeteoSat 8</li>
-              <li class="link satPhotoRow" onmouseup="meteosat11()">MeteoSat 11</li>
-              <li class="link satPhotoRow" onmouseup="himawari8()">Himawari 8</li>
-              <li class="link satPhotoRow" onmouseup="dscovr()">DSCOVR</li>
-              <li class="link satPhotoRow" onmouseup="goes1()">GOES 1</li>
+              <li class="link satPhotoRow" onmouseup="keepTrackApi.programs.photoManager.meteosat8()">MeteoSat 8</li>
+              <li class="link satPhotoRow" onmouseup="keepTrackApi.programs.photoManager.meteosat11()">MeteoSat 11</li>
+              <li class="link satPhotoRow" onmouseup="keepTrackApi.programs.photoManager.himawari8()">Himawari 8</li>
+              <li class="link satPhotoRow" onmouseup="keepTrackApi.programs.photoManager.discovr()">DSCOVR</li>
+              <li class="link satPhotoRow" onmouseup="keepTrackApi.programs.photoManager.goes1()">GOES 1</li>
             </ul>
           </div>
         </div>
@@ -170,20 +170,27 @@ export const init = (): void => {
     cbName: 'photoManager',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.programs.photoManager = {
+    meteosat8: meteosat8,
+    meteosat11: meteosat11,
+    goes1: goes1,
+    himawari8: himawari8,
+    discovr: discovr,
+  };
 };
 export const discovr = (): void => {
-    let request = new XMLHttpRequest();
-    request.open('GET', `https://epic.gsfc.nasa.gov/api/natural`, true);
+  const request = new XMLHttpRequest();
+  request.open('GET', `https://epic.gsfc.nasa.gov/api/natural`, true);
 
-    request.onload = () => {
-      dscovrLoaded(request);
-    };
+  request.onload = () => {
+    dscovrLoaded(request);
+  };
 
-    request.onerror = function () {
-      console.debug('http://epic.gsfc.nasa.gov/ request failed!');
-    };
+  request.onerror = function () {
+    console.debug('http://epic.gsfc.nasa.gov/ request failed!');
+  };
 
-    keepTrackApi.programs.drawManager.selectSatManager.selectSat(-1, keepTrackApi.programs.mainCamera);
-    request.send();
+  keepTrackApi.programs.drawManager.selectSatManager.selectSat(-1, keepTrackApi.programs.mainCamera);
+  request.send();
 };
-

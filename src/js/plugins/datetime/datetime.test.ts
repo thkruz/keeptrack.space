@@ -1,17 +1,14 @@
+import * as datetime from '@app/js/plugins/datetime/datetime';
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/externalApi';
 import 'jquery-ui-bundle';
 import '@app/js/lib/external/jquery-ui-timepicker.js';
-
-import * as datetime from '@app/js/plugins/datetime/datetime';
-
-import { expect } from '@jest/globals';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 // @ponicode
 describe('datetime.init', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       datetime.init();
     };
 
@@ -22,7 +19,7 @@ describe('datetime.init', () => {
 // @ponicode
 describe('datetime.uiManagerInit', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = `
             <div id="datetime-text"></div>
             <div id="datetime-input-tb"></div>
@@ -39,8 +36,8 @@ describe('datetime.uiManagerInit', () => {
 // @ponicode
 describe('datetime.updateDateTime', () => {
   test('0', () => {
-    let param1: any = new Date('32-01-2020');
-    let callFunction: any = () => {
+    const param1: any = new Date('32-01-2020');
+    const callFunction: any = () => {
       datetime.updateDateTime(param1);
     };
 
@@ -48,8 +45,8 @@ describe('datetime.updateDateTime', () => {
   });
 
   test('1', () => {
-    let param1: any = new Date('01-01-2020');
-    let callFunction: any = () => {
+    const param1: any = new Date('01-01-2020');
+    const callFunction: any = () => {
       datetime.updateDateTime(param1);
     };
 
@@ -57,8 +54,8 @@ describe('datetime.updateDateTime', () => {
   });
 
   test('2', () => {
-    let param1: any = new Date('01-01-2030');
-    let callFunction: any = () => {
+    const param1: any = new Date('01-01-2030');
+    const callFunction: any = () => {
       datetime.updateDateTime(param1);
     };
 
@@ -66,8 +63,8 @@ describe('datetime.updateDateTime', () => {
   });
 
   test('3', () => {
-    let param1: any = new Date('01-13-2020');
-    let callFunction: any = () => {
+    const param1: any = new Date('01-13-2020');
+    const callFunction: any = () => {
       datetime.updateDateTime(param1);
     };
 
@@ -75,8 +72,8 @@ describe('datetime.updateDateTime', () => {
   });
 
   test('4', () => {
-    let param1: any = new Date('');
-    let callFunction: any = () => {
+    const param1: any = new Date('');
+    const callFunction: any = () => {
       datetime.updateDateTime(param1);
     };
 
@@ -84,8 +81,8 @@ describe('datetime.updateDateTime', () => {
   });
 
   test('5', () => {
-    let param1: any = new Date('2016-02-29');
-    let callFunction: any = () => {
+    const param1: any = new Date('2016-02-29');
+    const callFunction: any = () => {
       datetime.updateDateTime(param1);
     };
 
@@ -93,8 +90,8 @@ describe('datetime.updateDateTime', () => {
   });
 
   test('6', () => {
-    let param1: any = new Date('01-01-2020)');
-    let callFunction: any = () => {
+    const param1: any = new Date('01-01-2020)');
+    const callFunction: any = () => {
       datetime.updateDateTime(param1);
     };
 
@@ -102,8 +99,8 @@ describe('datetime.updateDateTime', () => {
   });
 
   test('7', () => {
-    let param1: any = new Date('2016-02-10');
-    let callFunction: any = () => {
+    const param1: any = new Date('2016-02-10');
+    const callFunction: any = () => {
       datetime.updateDateTime(param1);
     };
 
@@ -112,21 +109,21 @@ describe('datetime.updateDateTime', () => {
 });
 
 describe('datetime.datetimeInputFormChange', () => {
-    test('0', () => {
-      let callFunction: any = () => {
-        datetime.datetimeInputFormChange();
-      };
-  
-      expect(callFunction).not.toThrow();
-    });
-  });
+  test('0', () => {
+    const callFunction: any = () => {
+      datetime.datetimeInputFormChange(new Date());
+    };
 
-  describe('datetime.datetimeTextClick ', () => {
-    test('0', () => {
-      let callFunction: any = () => {
-        datetime.datetimeTextClick ();
-      };
-  
-      expect(callFunction).not.toThrow();
-    });
+    expect(callFunction).not.toThrow();
   });
+});
+
+describe('datetime.datetimeTextClick ', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      datetime.datetimeTextClick();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});

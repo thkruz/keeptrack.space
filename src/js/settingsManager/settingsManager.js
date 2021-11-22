@@ -46,6 +46,7 @@ let settingsManager = {
     countries: true,
     colorsMenu: true,
     shortTermFences: true,
+    orbitReferences: true,
     externalSources: true,
     analysis: true,
     sensorFov: true,
@@ -144,7 +145,7 @@ let settingsManager = {
     // This needed to be increased to support large number of CSpOC sensors
     settingsManager.maxFieldOfViewMarkers = 500000;
     settingsManager.maxMissiles = 500;
-    settingsManager.maxAnalystSats = 256;
+    settingsManager.maxAnalystSats = 30000;
 
     // Enable the debris only catalog
     settingsManager.isUseDebrisCatalog = false;
@@ -275,8 +276,6 @@ let settingsManager = {
     settingsManager.earthNumLatSegs = 128;
     settingsManager.earthNumLonSegs = 128;
 
-    const RADIUS_OF_EARTH = 6371.0;
-
     settingsManager.satShader = {};
     settingsManager.satShader.largeObjectMinZoom = 0.37;
     settingsManager.satShader.largeObjectMaxZoom = 0.58;
@@ -361,10 +360,13 @@ let settingsManager = {
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (settingsManager.colors == null || settingsManager.colors.length === 0 || settingsManager.colors.version !== '1.0.3') {
+    if (settingsManager.colors == null || settingsManager.colors.length === 0 || settingsManager.colors.version !== '1.0.4') {
       settingsManager.colors = {};
-      settingsManager.colors.version = '1.0.3';
+      settingsManager.colors.version = '1.0.4';
       settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
+      settingsManager.colors.sunlight100 = [1.0, 1.0, 1.0, 1.0];
+      settingsManager.colors.sunlight80 = [1.0, 1.0, 1.0, 0.85];
+      settingsManager.colors.sunlight60 = [1.0, 1.0, 1.0, 0.65];
       settingsManager.colors.starHi = [1.0, 1.0, 1.0, 1.0];
       settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.85];
       settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.65];
@@ -390,8 +392,8 @@ let settingsManager = {
         [0.6, 0.5, 1.0, 1.0],
       ];
       settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
-      settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
-      settingsManager.colors.inviewAlt = [0.2, 0.4, 1.0, 1];
+      settingsManager.colors.inView = [0.85, 0.5, 0.0, 1.0];
+      settingsManager.colors.inViewAlt = [0.2, 0.4, 1.0, 1];
       settingsManager.colors.radarData = [0.0, 1.0, 1.0, 1.0];
       settingsManager.colors.radarDataMissile = [1.0, 0.0, 0.0, 1.0];
       settingsManager.colors.radarDataSatellite = [0.0, 1.0, 0.0, 1.0];

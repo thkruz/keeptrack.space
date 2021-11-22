@@ -1,11 +1,12 @@
-import * as glm from 'gl-matrix';
-
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { RAD2DEG } from '@app/js/lib/constants.js';
 import { SunCalc } from '@app/js/lib/suncalc.js';
-import { satellite } from '@app/js/lib/lookangles.js';
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { satellite } from '@app/js/satMath/satMath';
+import * as glm from 'gl-matrix';
+/* eslint-disable no-useless-escape */
+/* eslint-disable camelcase */
 
-/** ***************************************************************************
+/* ***************************************************************************
  * Initialization Code
  * ***************************************************************************/
 const NUM_LAT_SEGS = 32;
@@ -51,7 +52,9 @@ export const initProgram = (gl: WebGL2RenderingContext) => {
 export const initTextures = (gl: WebGL2RenderingContext) => {
   moon.textureMap.texture = gl.createTexture();
   moon.textureMap.img = new Image();
-  moon.textureMap.img.onload = function () { onTextureLoaded(gl) };
+  moon.textureMap.img.onload = function () {
+    onTextureLoaded(gl);
+  };
   moon.textureMap.img.src = moon.textureMap.src;
 };
 export const initBuffers = (gl: WebGL2RenderingContext) => {
@@ -60,20 +63,20 @@ export const initBuffers = (gl: WebGL2RenderingContext) => {
   const vertNorm = [];
   const texCoord = [];
   for (let lat = 0; lat <= NUM_LAT_SEGS; lat++) {
-    var latAngle = (Math.PI / NUM_LAT_SEGS) * lat - Math.PI / 2;
-    var diskRadius = Math.cos(Math.abs(latAngle));
-    var z = Math.sin(latAngle);
+    const latAngle = (Math.PI / NUM_LAT_SEGS) * lat - Math.PI / 2;
+    const diskRadius = Math.cos(Math.abs(latAngle));
+    const z = Math.sin(latAngle);
     // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
     // var i = 0;
     for (let lon = 0; lon <= NUM_LON_SEGS; lon++) {
       // add an extra vertex for texture funness
-      var lonAngle = ((Math.PI * 2) / NUM_LON_SEGS) * lon;
-      var x = Math.cos(lonAngle) * diskRadius;
-      var y = Math.sin(lonAngle) * diskRadius;
+      const lonAngle = ((Math.PI * 2) / NUM_LON_SEGS) * lon;
+      const x = Math.cos(lonAngle) * diskRadius;
+      const y = Math.sin(lonAngle) * diskRadius;
       // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
       // mercator cylindrical projection (simple angle interpolation)
-      var v = 1 - lat / NUM_LAT_SEGS;
-      var u = 0.5 + lon / NUM_LON_SEGS; // may need to change to move map
+      const v = 1 - lat / NUM_LAT_SEGS;
+      const u = 0.5 + lon / NUM_LON_SEGS; // may need to change to move map
 
       // console.log('u: ' + u + ' v: ' + v);
       // normals: should just be a vector from center to point (aka the point itself!
@@ -95,10 +98,10 @@ export const initBuffers = (gl: WebGL2RenderingContext) => {
   for (let lat = 0; lat < NUM_LAT_SEGS; lat++) {
     // this is for each QUAD, not each vertex, so <
     for (let lon = 0; lon < NUM_LON_SEGS; lon++) {
-      var blVert = lat * (NUM_LON_SEGS + 1) + lon; // there's NUM_LON_SEGS + 1 verts in each horizontal band
-      var brVert = blVert + 1;
-      var tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;
-      var trVert = tlVert + 1;
+      const blVert = lat * (NUM_LON_SEGS + 1) + lon; // there's NUM_LON_SEGS + 1 verts in each horizontal band
+      const brVert = blVert + 1;
+      const tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;
+      const trVert = tlVert + 1;
       // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
       vertIndex.push(blVert);
       vertIndex.push(brVert);
@@ -150,7 +153,7 @@ export const initVao = (gl: WebGL2RenderingContext) => {
   gl.bindVertexArray(null);
 };
 
-/** ***************************************************************************
+/* ***************************************************************************
  * Render Loop Code
  * ***************************************************************************/
 export const update = () => {
@@ -159,7 +162,7 @@ export const update = () => {
   moon.rae = SunCalc.getMoonPosition(moon.now, 0, 0);
 
   // RAE2ECF and then ECF2ECI
-  moon.eci = satellite.ecfToEci(satellite.lookAnglesToEcf(180 + moon.rae.azimuth * RAD2DEG, moon.rae.altitude * RAD2DEG, moon.rae.distance, 0, 0, 0), sun.sunvar.gmst);
+  moon.eci = satellite.ecfToEci(satellite.lookAngles2Ecf(180 + moon.rae.azimuth * RAD2DEG, moon.rae.altitude * RAD2DEG, moon.rae.distance, 0, 0, 0), sun.sunvar.gmst);
 
   const scaleFactor = SCALAR_DISTANCE / Math.max(Math.max(Math.abs(moon.eci.x), Math.abs(moon.eci.y)), Math.abs(moon.eci.z));
   moon.drawPosition[0] = moon.eci.x * scaleFactor + moon.positionModifier.x;
@@ -201,7 +204,7 @@ export const draw = function (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer?
   gl.bindVertexArray(null);
 };
 
-/** ***************************************************************************
+/* ***************************************************************************
  * Export Code
  * ***************************************************************************/
 const shaders = {

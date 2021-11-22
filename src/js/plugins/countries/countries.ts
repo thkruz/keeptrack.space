@@ -1,5 +1,5 @@
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import $ from 'jquery';
 
 let isCountriesMenuOpen = false;
 export const hideSideMenus = (): void => {
@@ -7,14 +7,14 @@ export const hideSideMenus = (): void => {
   $('#menu-countries').removeClass('bmenu-item-selected');
   isCountriesMenuOpen = false;
 };
-export const init = (): void => {  
+export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
     cbName: 'countries',
     cb: uiManagerInit,
   });
-  
+
   // Add JavaScript
   keepTrackApi.register({
     method: 'bottomMenuClick',
@@ -36,8 +36,7 @@ export const bottomMenuClick = (iconName: string): void => {
       isCountriesMenuOpen = false;
       return;
     } else {
-      if (settingsManager.isMobileModeEnabled)
-        uiManager.searchToggle(false);
+      if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
       $('#countries-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
       isCountriesMenuOpen = true;
@@ -82,7 +81,8 @@ export const uiManagerInit = () => {
         </div>
       `);
 
-  $('#country-menu>ul>li').on('click', () => {
+  // NOTE: Must use function not arrow function to access 'this'
+  $('#country-menu>ul>li').on('click', function () {
     countryMenuClick($(this).data('group'));
   });
 
@@ -97,53 +97,53 @@ export const uiManagerInit = () => {
 };
 
 export const countryMenuClick = (groupName: any) => {
-  const { groups} = keepTrackApi.programs;
-  
-  if (typeof groups == 'undefined') return;
+  const { groupsManager } = keepTrackApi.programs;
+
+  if (typeof groupsManager == 'undefined') return;
   switch (groupName) {
     case 'Canada':
-      if (typeof groups.Canada == 'undefined') {
-        groups.Canada = groups.createGroup('countryRegex', /CA/u);
+      if (typeof groupsManager.Canada == 'undefined') {
+        groupsManager.Canada = groupsManager.createGroup('countryRegex', /CA/u);
       }
       break;
     case 'China':
-      if (typeof groups.China == 'undefined') {
-        groups.China = groups.createGroup('countryRegex', /PRC/u);
+      if (typeof groupsManager.China == 'undefined') {
+        groupsManager.China = groupsManager.createGroup('countryRegex', /PRC/u);
       }
       break;
     case 'France':
-      if (typeof groups.France == 'undefined') {
-        groups.France = groups.createGroup('countryRegex', /FR/u);
+      if (typeof groupsManager.France == 'undefined') {
+        groupsManager.France = groupsManager.createGroup('countryRegex', /FR/u);
       }
       break;
     case 'India':
-      if (typeof groups.India == 'undefined') {
-        groups.India = groups.createGroup('countryRegex', /IND/u);
+      if (typeof groupsManager.India == 'undefined') {
+        groupsManager.India = groupsManager.createGroup('countryRegex', /IND/u);
       }
       break;
     case 'Israel':
-      if (typeof groups.Israel == 'undefined') {
-        groups.Israel = groups.createGroup('countryRegex', /ISRA/u);
+      if (typeof groupsManager.Israel == 'undefined') {
+        groupsManager.Israel = groupsManager.createGroup('countryRegex', /ISRA/u);
       }
       break;
     case 'Japan':
-      if (typeof groups.Japan == 'undefined') {
-        groups.Japan = groups.createGroup('countryRegex', /JPN/u);
+      if (typeof groupsManager.Japan == 'undefined') {
+        groupsManager.Japan = groupsManager.createGroup('countryRegex', /JPN/u);
       }
       break;
     case 'Russia':
-      if (typeof groups.Russia == 'undefined') {
-        groups.Russia = groups.createGroup('countryRegex', /CIS/u);
+      if (typeof groupsManager.Russia == 'undefined') {
+        groupsManager.Russia = groupsManager.createGroup('countryRegex', /CIS/u);
       }
       break;
     case 'UnitedKingdom':
-      if (typeof groups.UnitedKingdom == 'undefined') {
-        groups.UnitedKingdom = groups.createGroup('countryRegex', /UK/u);
+      if (typeof groupsManager.UnitedKingdom == 'undefined') {
+        groupsManager.UnitedKingdom = groupsManager.createGroup('countryRegex', /UK/u);
       }
       break;
     case 'UnitedStates':
-      if (typeof groups.UnitedStates == 'undefined') {
-        groups.UnitedStates = groups.createGroup('countryRegex', /US/u);
+      if (typeof groupsManager.UnitedStates == 'undefined') {
+        groupsManager.UnitedStates = groupsManager.createGroup('countryRegex', /US/u);
       }
       break;
   }
@@ -151,17 +151,17 @@ export const countryMenuClick = (groupName: any) => {
 };
 
 export const groupSelected = (groupName: string | number) => {
-  const { groups, orbitManager, satSet, searchBox, objectManager, uiManager } = keepTrackApi.programs;
+  const { groupsManager, orbitManager, satSet, searchBox, objectManager, uiManager } = keepTrackApi.programs;
   const searchDOM = $('#search');
   if (typeof groupName == 'undefined') return;
-  if (typeof groups[groupName] == 'undefined') return;
-  groups.selectGroup(groups[groupName], orbitManager);
+  if (typeof groupsManager[groupName] == 'undefined') return;
+  groupsManager.selectGroup(groupsManager[groupName], orbitManager);
   searchDOM.val('');
 
-  var results = groups[groupName].sats;
-  for (var i = 0; i < results.length; i++) {
-    var satId = groups[groupName].sats[i].satId;
-    var scc = satSet.getSat(satId).SCC_NUM;
+  const results = groupsManager[groupName].sats;
+  for (let i = 0; i < results.length; i++) {
+    const satId = groupsManager[groupName].sats[i].satId;
+    const scc = satSet.getSat(satId).SCC_NUM;
     if (i === results.length - 1) {
       searchDOM.val(searchDOM.val() + scc);
     } else {
@@ -169,7 +169,7 @@ export const groupSelected = (groupName: string | number) => {
     }
   }
 
-  searchBox.fillResultBox(groups[groupName].sats, satSet);
+  searchBox.fillResultBox(groupsManager[groupName].sats, satSet);
 
   objectManager.setSelectedSat(-1); // Clear selected sat
 

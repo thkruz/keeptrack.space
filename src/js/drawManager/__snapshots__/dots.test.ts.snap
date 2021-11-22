@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`dots.createDrawProgram 0 1`] = `undefined`;
+
+exports[`dots.createPickingProgram 0 1`] = `undefined`;
+
+exports[`dots.draw 0 1`] = `undefined`;
+
+exports[`dots.draw 1 1`] = `undefined`;
+
+exports[`dots.drawGpuPickingFrameBuffer 0 1`] = `undefined`;
+
+exports[`dots.drawGpuPickingFrameBuffer 1 1`] = `undefined`;
+
+exports[`dots.init 0 1`] = `undefined`;
+
+exports[`dots.setupPickingBuffer 0 1`] = `undefined`;
+
+exports[`dots.setupShaders 0 1`] = `undefined`;
+
+exports[`dots.updatePMvCamMatrix 0 1`] = `undefined`;
+
+exports[`dots.updatePositionBuffer 0 1`] = `undefined`;
+
+exports[`dots.updateSizeBuffer 0 1`] = `undefined`;

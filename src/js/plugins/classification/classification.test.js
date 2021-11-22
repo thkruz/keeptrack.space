@@ -1,6 +1,5 @@
 import '@app/js/settingsManager/settingsManager';
 
-import { expect } from '@jest/globals';
 import { init } from './classification';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';

@@ -1,8 +1,6 @@
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { omManager } from '@app/js/plugins/initialOrbit/omManager.js';
-
-
+import $ from 'jquery';
 
 let isObfitMenuOpen = false;
 export const init = (): void => {
@@ -356,7 +354,7 @@ export const obfitFormSubmit = (e: any) => {
     isOb3 = false;
   }
 
-  let svs = [];
+  const svs = [];
   let sv1 = [];
   {
     if (isOb1 && isNaN(parseFloat(t1))) {
@@ -475,4 +473,5 @@ export const obfitFormSubmit = (e: any) => {
   console.log(svs);
   omManager.svs2analyst(svs, satSet, timeManager, satellite);
   e.preventDefault();
+  return true;
 };

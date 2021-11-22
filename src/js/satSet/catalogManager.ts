@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export interface CatalogManager {
   queryStr: any;
   resetSatInView: () => void;
@@ -32,7 +33,7 @@ export interface CatalogManager {
   getSatFromObjNum(arg0: any);
   convertIdArrayToSatnumArray: (satIdArray: any) => any[];
   getSat(arg0: number);
-  init: () => Promise<void>;
+  init: (satCruncherOveride?: any) => Promise<void>;
   satCruncher: Worker;
   gotExtraData: boolean;
   numSats: number;
@@ -42,7 +43,7 @@ export interface CatalogManager {
   setColorScheme: any;
   onCruncherReady: () => void;
   getIdFromIntlDes: (arg0: string) => number;
-  getIdFromObjNum: (objNum: string | number) => number;
+  getIdFromObjNum: (objNum: number) => number;
   getSatInSun: () => any;
   getSatInView: () => any;
   getSatVel: () => any;

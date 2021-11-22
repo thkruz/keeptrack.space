@@ -1,30 +1,29 @@
-import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
-import { getSat, setSat } from '@app/js/satSet/satSet';
-
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { satellite } from '@app/js/lib/lookangles.js';
-import { sensorManager } from '@app/js/plugins/sensor/sensorManager.js';
-import { timeManager } from '@app/js/timeManager/timeManager';
-import { updateOrbitBuffer } from '@app/js/orbitManager/orbitManager.js';
+import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
+import $ from 'jquery';
+
+const { satellite, sensorManager, timeManager } = keepTrackApi.programs;
 
 let EarthRadius: number, EarthMass: number, FuelDensity: number, BurnRate: number, WarheadMass: number, R: number, G: number, h: number;
-let missileArray: any[] = [];
+const missileArray: any[] = [];
 
 // External Functions
-export const MassRaidPre = (time: any, simFile: string) => {
-  const {satSet} = keepTrackApi.programs;
+
+// This function stalls Jest for multiple minutes.
+/* istanbul ignore next */
+export const MassRaidPre = (time: number, simFile: string) => {
+  const { satSet, orbitManager } = keepTrackApi.programs;
   missileManager.clearMissiles();
   $.get(simFile, function (missileArray) {
-    var satSetLen = satSet.missileSats;
-    for (var i = 0; i < missileArray.length; i++) {
-      var x = satSetLen - 500 + i;
+    const satSetLen = satSet.missileSats;
+    for (let i = 0; i < missileArray.length; i++) {
+      const x = satSetLen - 500 + i;
       missileArray[i].startTime = time;
-      setSat(x, missileArray[i]);
-      var MissileObject = getSat(x);
+      satSet.setSat(x, missileArray[i]);
+      const MissileObject = satSet.getSat(x);
       if (MissileObject) {
         MissileObject.id = satSetLen - 500 + i;
-        keepTrackApi.programs.satCruncher.postMessage({
+        keepTrackApi.programs.satSet.satCruncher.postMessage({
           id: MissileObject.id,
           typ: 'newMissile',
           ON: 'M00' + MissileObject.id,
@@ -39,26 +38,26 @@ export const MassRaidPre = (time: any, simFile: string) => {
           altList: MissileObject.altList,
           startTime: MissileObject.startTime,
         });
-        updateOrbitBuffer(MissileObject.id, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList); // , MissileObject.startTime -- Used to send this too??
+        orbitManager.updateOrbitBuffer(MissileObject.id, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList); // , MissileObject.startTime -- Used to send this too??
       }
     }
     missileManager.missileArray = missileArray;
   }).done(() => {
     keepTrackApi.programs.uiManager.doSearch('RV_');
   });
-}
+};
 export const clearMissiles = () => {
-  const {satSet} = keepTrackApi.programs;
+  const { satSet } = keepTrackApi.programs;
   missileManager.missilesInUse = 0;
   keepTrackApi.programs.uiManager.doSearch('');
-  var satSetLen = satSet.satData.length;
-  for (var i = 0; i < 500; i++) {
-    var x = satSetLen - 500 + i;
+  const satSetLen = satSet.satData.length;
+  for (let i = 0; i < 500; i++) {
+    const x = satSetLen - 500 + i;
     // satSet.setSat(x, missileArray[i]);
-    var MissileObject = getSat(x);
+    const MissileObject = satSet.getSat(x);
     MissileObject.active = false;
 
-    keepTrackApi.programs.satCruncher.postMessage({
+    keepTrackApi.programs.satSet.satCruncher.postMessage({
       id: MissileObject.id,
       typ: 'newMissile',
       ON: 'RV_' + MissileObject.id,
@@ -75,6 +74,9 @@ export const clearMissiles = () => {
     });
   }
 };
+
+// This function stalls Jest for multiple minutes.
+/* istanbul ignore next */
 export const Missile = (
   CurrentLatitude: number,
   CurrentLongitude: number,
@@ -111,10 +113,10 @@ export const Missile = (
   // Angular distance rocket travels vs time
   // Total distance rocket travels vs time
   // Many of these variables are dependent on each other. The inputs of this function are:
-  // CurrentLatitude:  Latitude of the starting position
-  // CurrentLongitude: Longitude of the starting position
-  // TargetLatitude:   Latitude of the ending position
-  // TargetLongitude:  Longitude of the ending position
+  // Currentlat:  Latitude of the starting position
+  // Currentlon: Longitude of the starting position
+  // Targetlat:   Latitude of the ending position
+  // Targetlon:  Longitude of the ending position
   // NumberWarheads:   Number of warhead loaded onto the missile
   // The coordinates are to be inputed as degrees and NumberWarheads must be an intagure. The first thing the
   // program does is calculate everything regarding the path the rocket will take to minimize
@@ -126,38 +128,39 @@ export const Missile = (
   // reaches an altitude of zero meters it ends the iterations. Using all the information gathers it
   // presents them in the form of print statements and also plots.
 
-  var MissileObject = getSat(MissileObjectNum);
+  const { satSet, orbitManager } = keepTrackApi.programs;
+  const MissileObject = satSet.getSat(MissileObjectNum);
 
   // Dimensions of the rocket
   Length = Length || 17; // (m)
   Diameter = Diameter || 3.1; // (m)
 
   if (CurrentLatitude > 90 || CurrentLatitude < -90) {
-    // console.error('Error: Current Latitude must be between 90 and -90 degrees');
+    // console.debug('Error: Current Latitude must be between 90 and -90 degrees');
     return 0;
   }
   if (CurrentLongitude > 180 || CurrentLongitude < -180) {
-    // console.error('Error: Current Longitude must be between 180 and -180 degrees');
+    // console.debug('Error: Current Longitude must be between 180 and -180 degrees');
     return 0;
   }
   if (TargetLatitude > 90 || TargetLatitude < -90) {
-    // console.error('Error: Target Latitude must be between 90 and -90 degrees');
+    // console.debug('Error: Target Latitude must be between 90 and -90 degrees');
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = 'Error: Target Latitude must be<br>between 90 and -90 degrees';
     return 0;
   }
   if (TargetLongitude > 180 || TargetLongitude < -180) {
-    // console.error('Error: Target Longitude must be between 180 and -180 degrees');
+    // console.debug('Error: Target Longitude must be between 180 and -180 degrees');
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = 'Error: Target Longitude must be<br>between 90 and -90 degrees';
     return 0;
   }
   if (NumberWarheads > 12) {
-    // console.error('Error: Rocket can hold up to 12 warheads');
+    // console.debug('Error: Rocket can hold up to 12 warheads');
     return 0;
   }
   if (NumberWarheads % 1 > 0) {
-    // console.error('Error: The number of warheads must be a whole number');
+    // console.debug('Error: The number of warheads must be a whole number');
     return 0;
   }
 
@@ -169,29 +172,29 @@ export const Missile = (
   EarthMass = 5.9726 * Math.pow(10, 24); // (kg)
 
   // This function will calculate the path the rocket will take in terms of coordinates
-  var LatList = [];
-  var LongList = [];
+  const LatList = [];
+  const LongList = [];
 
   const [EstLatList, EstLongList, , ArcLength, EstDistanceList, GoalDistance] = _CoordinateCalculator(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude);
 
   if (ArcLength < 320000) {
-    // console.error('Error: This missile has a minimum distance of 320 km.');
-    // console.error('Please choose different target coordinates.');
+    // console.debug('Error: This missile has a minimum distance of 320 km.');
+    // console.debug('Please choose different target coordinates.');
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = 'Error: This missile has a minimum distance of 320 km.';
     return 0;
   }
 
   if (ArcLength > MaxMissileRange * 1000) {
-    // console.error('Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.');
-    // console.error('Please choose different target coordinates.');
+    // console.debug('Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.');
+    // console.debug('Please choose different target coordinates.');
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = `Error: This missile has a maximum distance of ${MaxMissileRange} km.`;
     return 0;
   }
 
   // Calculate Notional Altitude
-  var minAltitudeTrue = minAltitude * (Math.min(3, MaxMissileRange / (ArcLength / 1000)) / 2);
+  const minAltitudeTrue = minAltitude * (Math.min(3, MaxMissileRange / (ArcLength / 1000)) / 2);
   // console.log(minAltitudeTrue);
 
   // Calculations for the warheads
@@ -201,80 +204,80 @@ export const Missile = (
   //   var PartialDestruction = 261.5888 * NumberWarheads; // (km^2)
 
   // Calculations for the casing
-  var Thickness = 0.050389573 * Diameter; // (m)
-  var RocketArea = 0.25 * Math.PI * Math.pow(Diameter, 2); // (m^2)
+  const Thickness = 0.050389573 * Diameter; // (m)
+  const RocketArea = 0.25 * Math.PI * Math.pow(Diameter, 2); // (m^2)
   //   var RocketVolume = RocketArea * Length; // (m^3)
-  var RocketCasingDensity = 1628.75; // (kg/m^3)http://scholar.lib.vt.edu/theses/available/etd-101198-161441/unrestricted/appendix.pdf
-  var RocketCasingVolume = 0.25 * Math.PI * Length * (Math.pow(Diameter, 2) - Math.pow(Diameter - Thickness, 2)); // (m^3)
-  var RocketCasingMass1 = RocketCasingDensity * RocketCasingVolume; // (kg)
-  var RocketCasingMass2 = RocketCasingDensity * 0.25 * Math.PI * (Length * 0.4937) * (Math.pow(Diameter, 2) - Math.pow(Diameter - Thickness, 2)); // (kg)
-  var RocketCasingMass3 = RocketCasingDensity * 0.25 * Math.PI * (Length * 0.157) * (Math.pow(Diameter * 0.75, 2) - (Diameter * 0.75 - Math.pow(Thickness / 2, 2), 2)); // (kg)
+  const RocketCasingDensity = 1628.75; // (kg/m^3)http://scholar.lib.vt.edu/theses/available/etd-101198-161441/unrestricted/appendix.pdf
+  const RocketCasingVolume = 0.25 * Math.PI * Length * (Math.pow(Diameter, 2) - Math.pow(Diameter - Thickness, 2)); // (m^3)
+  const RocketCasingMass1 = RocketCasingDensity * RocketCasingVolume; // (kg)
+  const RocketCasingMass2 = RocketCasingDensity * 0.25 * Math.PI * (Length * 0.4937) * (Math.pow(Diameter, 2) - Math.pow(Diameter - Thickness, 2)); // (kg)
+  const RocketCasingMass3 = RocketCasingDensity * 0.25 * Math.PI * (Length * 0.157) * (Math.pow(Diameter * 0.75, 2) - (Diameter * 0.75 - Math.pow(Thickness / 2, 2), 2)); // (kg)
 
   // Calculations for the fuel
   BurnRate = NewBurnRate || 0.042; // (m/s)
   FuelDensity = 1750; // (kg/m^2)
-  var FuelArea1 = 0.25 * Math.PI * Math.pow(Diameter - Thickness, 2); // (m^2)
-  var FuelArea2 = 0.25 * Math.PI * Math.pow(Diameter * 0.75 - Thickness, 2); // (m^2)
-  var FuelVolume = FuelArea1 * (Length * 0.651) + FuelArea2 * (Length * 0.178); // (m^3)
-  var FuelMass = FuelDensity * FuelVolume; // http://www.lr.tudelft.nl/en/organisation/departments/space-engineering/space-systems-engineering/expertise-areas/space-propulsion/design-of-elements/rocket-propellants/solids/
-  var RocketMass = FuelMass + RocketCasingMass1 + WarheadMass; // (kg)
+  const FuelArea1 = 0.25 * Math.PI * Math.pow(Diameter - Thickness, 2); // (m^2)
+  const FuelArea2 = 0.25 * Math.PI * Math.pow(Diameter * 0.75 - Thickness, 2); // (m^2)
+  const FuelVolume = FuelArea1 * (Length * 0.651) + FuelArea2 * (Length * 0.178); // (m^3)
+  let FuelMass = FuelDensity * FuelVolume; // http://www.lr.tudelft.nl/en/organisation/departments/space-engineering/space-systems-engineering/expertise-areas/space-propulsion/design-of-elements/rocket-propellants/solids/
+  let RocketMass = FuelMass + RocketCasingMass1 + WarheadMass; // (kg)
 
   // Here are the initial conditions
-  var dthetadt = 0.001; // (m/s)
-  var drdt = 0.001; // (m/s)
-  var Altitude = 0; // (m)
-  var NozzleAltitude1 = 0; // (m)
-  var Distance = 0; // (m)
-  var ArcDistance = 0; // (m)
-  var MassIn = 0; // (kg/s)
+  let dthetadt = 0.001; // (m/s)
+  let drdt = 0.001; // (m/s)
+  let Altitude = 0; // (m)
+  const NozzleAltitude1 = 0; // (m)
+  let Distance = 0; // (m)
+  let ArcDistance = 0; // (m)
+  const MassIn = 0; // (kg/s)
 
   // Here are the time steps and counters
   // var y = 0;
   // var z = 0;
-  var t = 0;
+  let t = 0;
   h = 1;
 
   // Here are the definitions for all the lists
-  var OppositeList = [];
-  var AdjacentList = [];
-  var WeightForceList = [];
-  var AltitudeList = [];
-  var DistanceList = [];
-  var ArcDistanceList = [];
-  var drdtList = [];
-  var dthetadtList = [];
-  var MList = [];
-  var FuelMassList = [];
-  var hList = [];
-  var ThrustList = [];
-  var NozzleAltitude = [];
-  for (var i = 0; i < 100000; i++) {
+  const OppositeList = [];
+  const AdjacentList = [];
+  const WeightForceList = [];
+  const AltitudeList = [];
+  const DistanceList = [];
+  const ArcDistanceList = [];
+  const drdtList = [];
+  const dthetadtList = [];
+  const MList = [];
+  const FuelMassList = [];
+  const hList = [];
+  const ThrustList = [];
+  const NozzleAltitude = [];
+  for (let i = 0; i < 100000; i++) {
     NozzleAltitude.push(i);
   }
-  var ExitcDList = [];
-  var Exitdr2dtList = [];
-  var Exitdtheta2dtList = [];
-  var ExitDragForceList = [];
-  var ExitcList = [];
-  var ExitAirDensityList = [];
-  var ExitPatmList = [];
-  var ExitTatmList = [];
-  var EntercDList = [];
-  var Enterdr2dtList = [];
-  var Enterdtheta2dtList = [];
-  var EnterDragForceList = [];
-  var EnterAirDensityList = [];
-  var EnterPatmList = [];
-  var EnterTatmList = [];
-  var EntercList = [];
+  const ExitcDList = [];
+  const Exitdr2dtList = [];
+  const Exitdtheta2dtList = [];
+  const ExitDragForceList = [];
+  const ExitcList = [];
+  const ExitAirDensityList = [];
+  const ExitPatmList = [];
+  const ExitTatmList = [];
+  const EntercDList = [];
+  const Enterdr2dtList = [];
+  const Enterdtheta2dtList = [];
+  const EnterDragForceList = [];
+  const EnterAirDensityList = [];
+  const EnterPatmList = [];
+  const EnterTatmList = [];
+  const EntercList = [];
   // var TotalDistanceList = [];
-  var TimeList = [];
-  var dtheta2dt, dr2dt, WeightForce, DragForce, Thrust, cD, M, c, AirDensity, Patm, Tatm, NozzleAltitude2, NozzleAltitude3;
+  const TimeList = [];
+  let dtheta2dt, dr2dt, WeightForce, DragForce, Thrust, cD, M, c, AirDensity, Patm, Tatm, NozzleAltitude2, NozzleAltitude3;
 
-  var AngleCoefficient = _Bisection(FuelArea1, FuelArea2, FuelMass, FuelVolume, RocketArea, Altitude, RocketCasingMass1, RocketCasingMass2, RocketCasingMass3, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, ArcLength, GoalDistance);
+  const AngleCoefficient = _Bisection(FuelArea1, FuelArea2, FuelMass, FuelVolume, RocketArea, Altitude, RocketCasingMass1, RocketCasingMass2, RocketCasingMass3, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, ArcLength, GoalDistance);
 
   while (FuelMass / FuelDensity / FuelVolume > 0.4 && Altitude >= 0) {
-    var iterationFunOutput = _IterationFun(FuelArea1, FuelMass, RocketArea, Altitude, RocketCasingMass1, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient);
+    const iterationFunOutput = _IterationFun(FuelArea1, FuelMass, RocketArea, Altitude, RocketCasingMass1, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient);
     FuelMass = iterationFunOutput[0];
     RocketMass = iterationFunOutput[1];
     Tatm = iterationFunOutput[2];
@@ -521,7 +524,7 @@ export const Missile = (
   //   var MaxAngularVelocity = dthetadtList.reduce(function (a, b) {
   //     return Math.max(a, b);
   //   });
-  var MaxAltitude = AltitudeList.reduce(function (a, b) {
+  const MaxAltitude = AltitudeList.reduce(function (a, b) {
     return Math.max(a, b);
   });
 
@@ -529,7 +532,7 @@ export const Missile = (
 
   if (MaxAltitude < minAltitudeTrue) {
     // Try again with 25% increase to burn rate
-    let burnMultiplier = Math.min(3, minAltitudeTrue / MaxAltitude);
+    const burnMultiplier = Math.min(3, minAltitudeTrue / MaxAltitude);
     // setTimeout(function () {
     missileManager.Missile(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude, NumberWarheads, MissileObjectNum, CurrentTime, MissileDesc, Length, Diameter, NewBurnRate * burnMultiplier, MaxMissileRange, country, minAltitude);
     // }, 10);
@@ -618,7 +621,7 @@ export const Missile = (
     if (MissileDesc) MissileObject.desc = MissileDesc;
     // console.log(MissileObject);
     missileArray.push(MissileObject);
-    keepTrackApi.programs.satCruncher.postMessage({
+    keepTrackApi.programs.satSet.satCruncher.postMessage({
       id: MissileObject.id,
       typ: 'newMissile',
       ON: 'RV_' + MissileObject.id, // Don't think satSet.satCruncher needs this
@@ -633,7 +636,7 @@ export const Missile = (
       altList: MissileObject.altList,
       startTime: MissileObject.startTime,
     });
-    updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList); // MissileObject.startTime - used to send this??
+    orbitManager.updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList); // MissileObject.startTime - used to send this??
 
     missileManager.missileArray = missileArray;
 
@@ -646,7 +649,7 @@ export const Missile = (
   missileManager.lastMissileErrorType = 'normal';
   missileManager.lastMissileError = 'Missile Named RV_' + MissileObject.id + '<br>has been created.';
   return 1; // Successful Launch
-}
+};
 export const getMissileTEARR = (
   missile: { altList: string | any[]; startTime: number; latList: number[]; lonList: number[] },
   sensor: {
@@ -668,10 +671,10 @@ export const getMissileTEARR = (
     obsminrange2?: any;
   }
 ) => {
-  var currentTEARR: any = {}; // Most current TEARR data that is set in satellite object and returned.
-  var propOffset = timeManager.getPropOffset(); // offset letting us propagate in the future (or past)
-  var now = timeManager.propTimeCheck(propOffset, timeManager.propRealTime);
-  var j = timeManager.jday(
+  const currentTEARR: any = {}; // Most current TEARR data that is set in satellite object and returned.
+  let propOffset = timeManager.getPropOffset(); // offset letting us propagate in the future (or past)
+  const now = timeManager.propTimeCheck(propOffset, timeManager.propRealTime);
+  let j = timeManager.jday(
     now.getUTCFullYear(),
     now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
     now.getUTCDate(),
@@ -680,7 +683,7 @@ export const getMissileTEARR = (
     now.getUTCSeconds()
   ); // Converts time to jday (TLEs use epoch year/day)
   j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-  var gmst = satellite.gstime(j);
+  const gmst = satellite.gstime(j);
 
   // If no sensor passed to function then try to use the 'currentSensor'
   if (typeof sensor == 'undefined') {
@@ -695,8 +698,8 @@ export const getMissileTEARR = (
     try {
       sensor.observerGd = {
         height: sensor.alt,
-        latitude: sensor.lat,
-        longitude: sensor.lon,
+        lat: sensor.lat,
+        lon: sensor.lon,
       };
     } catch (e) {
       throw 'observerGd is not set and could not be guessed.';
@@ -712,18 +715,18 @@ export const getMissileTEARR = (
       break;
     }
   }
-  let cosLat = Math.cos(missile.latList[curMissileTime] * DEG2RAD);
-  let sinLat = Math.sin(missile.latList[curMissileTime] * DEG2RAD);
-  let cosLon = Math.cos(missile.lonList[curMissileTime] * DEG2RAD + gmst);
-  let sinLon = Math.sin(missile.lonList[curMissileTime] * DEG2RAD + gmst);
+  const cosLat = Math.cos(missile.latList[curMissileTime] * DEG2RAD);
+  const sinLat = Math.sin(missile.latList[curMissileTime] * DEG2RAD);
+  const cosLon = Math.cos(missile.lonList[curMissileTime] * DEG2RAD + gmst);
+  const sinLon = Math.sin(missile.lonList[curMissileTime] * DEG2RAD + gmst);
 
-  let x = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * cosLon;
-  let y = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * sinLon;
-  let z = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * sinLat;
+  const x = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * cosLon;
+  const y = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * sinLon;
+  const z = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * sinLat;
 
   let positionEcf, lookAngles;
   try {
-    var gpos = satellite.eciToGeodetic({ x: x, y: y, z: z }, gmst);
+    const gpos = satellite.eciToGeodetic({ x: x, y: y, z: z }, gmst);
     currentTEARR.alt = gpos.alt;
     currentTEARR.lon = gpos.lon;
     currentTEARR.lat = gpos.lat;
@@ -749,18 +752,18 @@ export const getMissileTEARR = (
       ((currentTEARR.az >= sensor.obsminaz || currentTEARR.az <= sensor.obsmaxaz) && currentTEARR.el >= sensor.obsminel && currentTEARR.el <= sensor.obsmaxel && currentTEARR.rng <= sensor.obsmaxrange && currentTEARR.rng >= sensor.obsminrange) ||
       ((currentTEARR.az >= sensor.obsminaz2 || currentTEARR.az <= sensor.obsmaxaz2) && currentTEARR.el >= sensor.obsminel2 && currentTEARR.el <= sensor.obsmaxel2 && currentTEARR.rng <= sensor.obsmaxrange2 && currentTEARR.rng >= sensor.obsminrange2)
     ) {
-      currentTEARR.inview = true;
+      currentTEARR.inView = true;
     } else {
-      currentTEARR.inview = false;
+      currentTEARR.inView = false;
     }
   } else {
     if (
       (currentTEARR.az >= sensor.obsminaz && currentTEARR.az <= sensor.obsmaxaz && currentTEARR.el >= sensor.obsminel && currentTEARR.el <= sensor.obsmaxel && currentTEARR.rng <= sensor.obsmaxrange && currentTEARR.rng >= sensor.obsminrange) ||
       (currentTEARR.az >= sensor.obsminaz2 && currentTEARR.az <= sensor.obsmaxaz2 && currentTEARR.el >= sensor.obsminel2 && currentTEARR.el <= sensor.obsmaxel2 && currentTEARR.rng <= sensor.obsmaxrange2 && currentTEARR.rng >= sensor.obsminrange2)
     ) {
-      currentTEARR.inview = true;
+      currentTEARR.inView = true;
     } else {
-      currentTEARR.inview = false;
+      currentTEARR.inView = false;
     }
   }
   satellite.setTEARR(currentTEARR);
@@ -1168,10 +1171,10 @@ missileManager.asatPreFlight = (CurrentLatitude, CurrentLongitude, TargetLatitud
   // Angular distance rocket travels vs time
   // Total distance rocket travels vs time
   // Many of these variables are dependent on each other. The inputs of this function are:
-  // CurrentLatitude:  Latitude of the starting position
-  // CurrentLongitude: Longitude of the starting position
-  // TargetLatitude:   Latitude of the ending position
-  // TargetLongitude:  Longitude of the ending position
+  // Currentlat:  Latitude of the starting position
+  // Currentlon: Longitude of the starting position
+  // Targetlat:   Latitude of the ending position
+  // Targetlon:  Longitude of the ending position
   // NumberWarheads:   Number of warhead loaded onto the missile
 
   //   var MissileObject = getSat(MissileObjectNum);
@@ -1181,20 +1184,20 @@ missileManager.asatPreFlight = (CurrentLatitude, CurrentLongitude, TargetLatitud
   Diameter = Diameter || 3.1; // (m)
 
   if (CurrentLatitude > 90 || CurrentLatitude < -90) {
-    console.error('Error: Current Latitude must be between 90 and -90 degrees');
+    console.debug('Error: Current Latitude must be between 90 and -90 degrees');
     return 0;
   }
   if (CurrentLongitude > 180 || CurrentLongitude < -180) {
-    console.error('Error: Current Longitude must be between 180 and -180 degrees');
+    console.debug('Error: Current Longitude must be between 180 and -180 degrees');
     return 0;
   }
 
   if (NumberWarheads > 12) {
-    console.error('Error: Rocket can hold up to 12 warheads');
+    console.debug('Error: Rocket can hold up to 12 warheads');
     return 0;
   }
   if (parseFloat(NumberWarheads) % 1 > 0) {
-    console.error('Error: The number of warheads must be a whole number');
+    console.debug('Error: The number of warheads must be a whole number');
     return 0;
   }
 
@@ -1223,8 +1226,8 @@ missileManager.asatPreFlight = (CurrentLatitude, CurrentLongitude, TargetLatitud
   GoalDistance = calculatedCoordinates[5];
 
   if (ArcLength > MaxMissileRange * 1000) {
-    // console.error('Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.');
-    // console.error('Please choose different target coordinates.');
+    // console.debug('Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.');
+    // console.debug('Please choose different target coordinates.');
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = 'Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.';
     return 0;
@@ -1692,10 +1695,10 @@ missileManager.asatFlight = function (
   // Angular distance rocket travels vs time
   // Total distance rocket travels vs time
   // Many of these variables are dependent on each other. The inputs of this function are:
-  // CurrentLatitude:  Latitude of the starting position
-  // CurrentLongitude: Longitude of the starting position
-  // TargetLatitude:   Latitude of the ending position
-  // TargetLongitude:  Longitude of the ending position
+  // Currentlat:  Latitude of the starting position
+  // Currentlon: Longitude of the starting position
+  // Targetlat:   Latitude of the ending position
+  // Targetlon:  Longitude of the ending position
   // NumberWarheads:   Number of warhead loaded onto the missile
   // The coordinates are to be inputed as degrees and NumberWarheads must be an intagure. The first thing the
   // program does is calculate everything regarding the path the rocket will take to minimize
@@ -1714,32 +1717,32 @@ missileManager.asatFlight = function (
   Diameter = Diameter || 3.1; // (m)
 
   if (CurrentLatitude > 90 || CurrentLatitude < -90) {
-    console.error('Error: Current Latitude must be between 90 and -90 degrees');
+    console.debug('Error: Current Latitude must be between 90 and -90 degrees');
     return 0;
   }
   if (CurrentLongitude > 180 || CurrentLongitude < -180) {
-    console.error('Error: Current Longitude must be between 180 and -180 degrees');
+    console.debug('Error: Current Longitude must be between 180 and -180 degrees');
     return 0;
   }
   if (TargetLatitude > 90 || TargetLatitude < -90) {
-    // console.error('Error: Target Latitude must be between 90 and -90 degrees');
+    // console.debug('Error: Target Latitude must be between 90 and -90 degrees');
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = 'Error: Target Latitude must be<br>between 90 and -90 degrees';
     return 0;
   }
   if (TargetLongitude > 180 || TargetLongitude < -180) {
-    // console.error('Error: Target Longitude must be between 180 and -180 degrees');
+    // console.debug('Error: Target Longitude must be between 180 and -180 degrees');
     console.log(TargetLongitude);
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = 'Error: Target Longitude must be<br>between 180 and -180 degrees';
     return 0;
   }
   if (NumberWarheads > 12) {
-    console.error('Error: Rocket can hold up to 12 warheads');
+    console.debug('Error: Rocket can hold up to 12 warheads');
     return 0;
   }
   if (parseFloat(NumberWarheads) % 1 > 0) {
-    console.error('Error: The number of warheads must be a whole number');
+    console.debug('Error: The number of warheads must be a whole number');
     return 0;
   }
 
@@ -1770,15 +1773,15 @@ missileManager.asatFlight = function (
   //   GoalDistance = calculatedCoordinates[5];
 
   // if (ArcLength < 320000) {
-  //   // console.error('Error: This missile has a minimum distance of 320 km.');
-  //   // console.error('Please choose different target coordinates.');
+  //   // console.debug('Error: This missile has a minimum distance of 320 km.');
+  //   // console.debug('Please choose different target coordinates.');
   //   missileManager.lastMissileError = 'Error: This missile has a minimum distance of 320 km.';
   //   return 0;
   // }
 
   if (ArcLength > MaxMissileRange * 1000) {
-    // console.error('Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.');
-    // console.error('Please choose different target coordinates.');
+    // console.debug('Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.');
+    // console.debug('Please choose different target coordinates.');
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = 'Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.';
     return 0;
@@ -2272,6 +2275,9 @@ export const _Temperature = (Altitude: number) => {
   if (Altitude < 110) return -221.111111111 + 4.47 * Altitude; // (K)
   if (Altitude < 120) return -894.0 + 10.6 * Altitude; // (K)
   if (Altitude >= 120) return -894.0 + 10.6 * 120; // (K)
+
+  // Catch All
+  return -894.0 + 10.6 * 120; // (K)
 };
 export const _CD = (M: number) => {
   // This function calculates the drag coefficient of the rocket. This function is based
@@ -2284,6 +2290,9 @@ export const _CD = (M: number) => {
   if (M < 1.625) return 0.10937644721 + -4.61979595244 * M + 9.72917139612 * Math.pow(M, 2) + -6.33333563852 * Math.pow(M, 3) + 1.33333375211 * Math.pow(M, 4);
   if (M < 3.625) return 0.97916002909 + -0.540978181863 * M + 0.125235817144 * Math.pow(M, 2) + -0.00666103733277 * Math.pow(M, 3) + -0.000558009790208 * Math.pow(M, 4);
   if (M > 3.625) return 0.25;
+
+  // Catch All
+  return 0.25;
 };
 export const _ThrustFun = (MassOut: number, Altitude: any, FuelArea: number, NozzleAltitude: any) => {
   // This function calculates the thrust force of the rocket by maximizing the efficiency
@@ -2323,17 +2332,17 @@ export const _ThrustFun = (MassOut: number, Altitude: any, FuelArea: number, Noz
   const Tc = 3700; // (K)
   const Pc = 25 * Math.pow(10, 6); // Chamber Pressure (Pa)
   const Mw = 22; // Molecular Weight
-  let q = MassOut; // Mass Flow Rate (kg/s)
-  let Pa = _Pressure(NozzleAltitude); // Ambient pressure used to calculate nozzle (Pa)
-  let Pe = _Pressure(Altitude); // Actual Atmospheric Pressure (Pa)
-  let Pt = Math.pow(Pc * (1 + (k - 1) / 2), -k / (k - 1)); // Throat Pressure (Pa)
-  let Tt = Tc / (1 + (k - 1) / 2); // Throat Temperature (k)
-  let At = (q / Pt) * Math.sqrt((Ru * Tt) / (Mw * k)); // Throat Area (m^2)
-  let Nm = Math.sqrt((2 / (k - 1)) * Math.pow(Pc / Pa, (k - 1) / k - 1)); // Mach Number
+  const q = MassOut; // Mass Flow Rate (kg/s)
+  const Pa = _Pressure(NozzleAltitude); // Ambient pressure used to calculate nozzle (Pa)
+  const Pe = _Pressure(Altitude); // Actual Atmospheric Pressure (Pa)
+  const Pt = Math.pow(Pc * (1 + (k - 1) / 2), -k / (k - 1)); // Throat Pressure (Pa)
+  const Tt = Tc / (1 + (k - 1) / 2); // Throat Temperature (k)
+  const At = (q / Pt) * Math.sqrt((Ru * Tt) / (Mw * k)); // Throat Area (m^2)
+  const Nm = Math.sqrt((2 / (k - 1)) * Math.pow(Pc / Pa, (k - 1) / k - 1)); // Mach Number
   let Ae = (At / Nm) * Math.pow(1 + (((k - 1) / 2) * Math.pow(Nm, 2)) / ((k + 1) / 2), (k + 1) / (2 * (k - 1))); // Exit Nozzle Area (m^2)
   if (Ae > FuelArea) Ae = FuelArea;
-  let VeSub = ((2 * k) / (k - 1)) * ((Ru * Tc) / Mw) * Math.pow(1 - Pe / Pc, (k - 1) / k);
-  let Ve = Math.sqrt(VeSub); // Partical Exit Velocity (m/s)
+  const VeSub = ((2 * k) / (k - 1)) * ((Ru * Tc) / Mw) * Math.pow(1 - Pe / Pc, (k - 1) / k);
+  const Ve = Math.sqrt(VeSub); // Partical Exit Velocity (m/s)
   return q * Ve + (Pe - Pa) * Ae; // Thrust (N)
 };
 export const _CoordinateCalculator = (CurrentLatitude: number, CurrentLongitude: number, TargetLatitude: number, TargetLongitude: number): [number[], number[], number, number, number[], number] => {
@@ -2373,40 +2382,40 @@ export const _CoordinateCalculator = (CurrentLatitude: number, CurrentLongitude:
   // The angle from north to start the great circle
   // The angular distance between the starting and ending point
 
-  var r = EarthRadius; // (m)
-  var Phi1 = (CurrentLatitude * Math.PI) / 180; // (Rad)
-  var Lambda1 = (CurrentLongitude * Math.PI) / 180; // (Rad)
-  var Phi2 = (TargetLatitude * Math.PI) / 180; // (Rad)
-  var Lambda2 = (TargetLongitude * Math.PI) / 180; // (Rad)
-  var Lambda12;
+  const r = EarthRadius; // (m)
+  const Phi1 = (CurrentLatitude * Math.PI) / 180; // (Rad)
+  const Lambda1 = (CurrentLongitude * Math.PI) / 180; // (Rad)
+  const Phi2 = (TargetLatitude * Math.PI) / 180; // (Rad)
+  const Lambda2 = (TargetLongitude * Math.PI) / 180; // (Rad)
+  let Lambda12;
 
   if (Lambda2 - Lambda1 >= -180 && Lambda2 - Lambda1 <= 180) Lambda12 = Lambda2 - Lambda1; // (Rad)
   if (Lambda2 - Lambda1 > 180) Lambda12 = Lambda2 - Lambda1 - 2 * Math.PI; // (Rad)
   if (Lambda2 - Lambda1 < -180) Lambda12 = Lambda2 - Lambda1 + 2 * Math.PI; // (Rad)
 
-  var Alpha1 = Math.atan2(Math.sin(Lambda12), Math.cos(Phi1) * Math.tan(Phi2) - Math.sin(Phi1) * Math.cos(Lambda12)); // (Rad)
+  const Alpha1 = Math.atan2(Math.sin(Lambda12), Math.cos(Phi1) * Math.tan(Phi2) - Math.sin(Phi1) * Math.cos(Lambda12)); // (Rad)
   // var Alpha2 = Math.atan2((Math.sin(Lambda12)), (-Math.cos(Phi2) * Math.tan(Phi1) + Math.sin(Phi2) * Math.cos(Lambda12)));    // (Rad)
-  var DeltaTheta12 = Math.acos(Math.sin(Phi1) * Math.sin(Phi2) + Math.cos(Phi1) * Math.cos(Phi2) * Math.cos(Lambda12)); // (Rad)
-  var ArcLength = DeltaTheta12 * r; // (m)
-  var Alphao = Math.asin(Math.sin(Alpha1) * Math.cos(Phi1)); // (Rad)
-  var DeltaSigma01 = Math.atan2(Math.tan(Phi1), Math.cos(Alpha1)); // (Rad)
-  var DeltaSigma02 = DeltaSigma01 + DeltaTheta12; // (Rad)
-  var Lambda01 = Math.atan2(Math.sin(Alphao) * Math.sin(DeltaSigma01), Math.cos(DeltaSigma01)); // (Rad)
-  var Lambdao = Lambda1 - Lambda01; // (Rad)
-  var EstLatList = [];
-  var LatList1 = [];
-  var LatList2 = [];
-  var LatList3 = [];
-  var EstLongList = [];
-  var LongList1 = [];
-  var LongList2 = [];
-  var LongList3 = [];
-  var EstDistanceList: number[] = [];
-  var GoalDistance;
-  for (var i = 0; i <= 2400; i++) {
-    var Sigma = DeltaSigma01 + (i * (DeltaSigma02 - DeltaSigma01)) / 2000; // (Rad)
-    var Phi = (Math.asin(Math.cos(Alphao) * Math.sin(Sigma)) * 180) / Math.PI; // (Degrees)
-    var Lambda = ((Lambdao + Math.atan2(Math.sin(Alphao) * Math.sin(Sigma), Math.cos(Sigma))) * 180) / Math.PI; // (Degrees)
+  const DeltaTheta12 = Math.acos(Math.sin(Phi1) * Math.sin(Phi2) + Math.cos(Phi1) * Math.cos(Phi2) * Math.cos(Lambda12)); // (Rad)
+  const ArcLength = DeltaTheta12 * r; // (m)
+  const Alphao = Math.asin(Math.sin(Alpha1) * Math.cos(Phi1)); // (Rad)
+  const DeltaSigma01 = Math.atan2(Math.tan(Phi1), Math.cos(Alpha1)); // (Rad)
+  const DeltaSigma02 = DeltaSigma01 + DeltaTheta12; // (Rad)
+  const Lambda01 = Math.atan2(Math.sin(Alphao) * Math.sin(DeltaSigma01), Math.cos(DeltaSigma01)); // (Rad)
+  const Lambdao = Lambda1 - Lambda01; // (Rad)
+  const EstLatList = [];
+  const LatList1 = [];
+  const LatList2 = [];
+  const LatList3 = [];
+  const EstLongList = [];
+  const LongList1 = [];
+  const LongList2 = [];
+  const LongList3 = [];
+  const EstDistanceList: number[] = [];
+  let GoalDistance;
+  for (let i = 0; i <= 2400; i++) {
+    const Sigma = DeltaSigma01 + (i * (DeltaSigma02 - DeltaSigma01)) / 2000; // (Rad)
+    const Phi = (Math.asin(Math.cos(Alphao) * Math.sin(Sigma)) * 180) / Math.PI; // (Degrees)
+    const Lambda = ((Lambdao + Math.atan2(Math.sin(Alphao) * Math.sin(Sigma), Math.cos(Sigma))) * 180) / Math.PI; // (Degrees)
     if (i === 2000) GoalDistance = (Sigma - DeltaSigma01) * r;
     EstDistanceList.push(((Sigma - DeltaSigma01) * r) / 1000);
     if (Lambda >= -180 && Lambda <= 180) {
@@ -2484,7 +2493,7 @@ export const _IterationFun = (
   // in order to understand the flight of the missile and its governing principles
 
   // This governs the thrust angle as a function of altitude
-  var ThrustAngle;
+  let ThrustAngle;
   if (Altitude < 1200000)
     ThrustAngle =
       (90 -
@@ -2495,39 +2504,39 @@ export const _IterationFun = (
   else ThrustAngle = 30;
 
   // This calculates the angle the drag force acts upon the missile
-  var Radius = EarthRadius + Altitude; // (m)
-  var DragAngle = Math.atan2(drdt, dthetadt); // (Degrees)
+  const Radius = EarthRadius + Altitude; // (m)
+  const DragAngle = Math.atan2(drdt, dthetadt); // (Degrees)
 
   let MassOut = 0; // (kg)
 
   // This calculates fuel mass vs time
   if (FuelMass > 0) {
     MassOut = FuelDensity * FuelArea * BurnRate; // (kg)
-    var dmdt = MassIn - MassOut; // (kg/s)
+    const dmdt = MassIn - MassOut; // (kg/s)
     FuelMass = FuelMass + dmdt * h; // (kg)
   } else {
     FuelMass = 0;
   }
 
-  var RocketMass = FuelMass + RocketCasingMass + WarheadMass; // (Kg)
-  var Tatm = _Temperature(Altitude); // (K)
-  var Patm = _Pressure(Altitude); // (pa)
-  var AirDensity = Patm / (R * Tatm); // (kg/m^3)
+  const RocketMass = FuelMass + RocketCasingMass + WarheadMass; // (Kg)
+  const Tatm = _Temperature(Altitude); // (K)
+  const Patm = _Pressure(Altitude); // (pa)
+  const AirDensity = Patm / (R * Tatm); // (kg/m^3)
 
   // This calculates the drag coeficiant
-  var c = Math.pow(1.4 * R * Tatm, 1 / 2); // (m/s)
-  var M = Math.sqrt(Math.pow(drdt, 2) + Math.pow(dthetadt, 2)) / c; // (Unitless)
-  var cD = _CD(Math.abs(M)); // (Unitless)
+  const c = Math.pow(1.4 * R * Tatm, 1 / 2); // (m/s)
+  const M = Math.sqrt(Math.pow(drdt, 2) + Math.pow(dthetadt, 2)) / c; // (Unitless)
+  const cD = _CD(Math.abs(M)); // (Unitless)
 
   // This calculates all the forces acting upon the missile
-  var Thrust = 0;
+  let Thrust = 0;
   if (FuelMass > 0) Thrust = _ThrustFun(MassOut, Altitude, FuelArea, NozzleAltitude); // (N)
 
-  var DragForce = (1 / 2) * AirDensity * (Math.pow(drdt, 2) + Math.pow(dthetadt, 2)) * RocketArea * cD; // (N)
-  var WeightForce = (G * EarthMass * RocketMass) / Math.pow(Radius, 2); // (N)
+  const DragForce = (1 / 2) * AirDensity * (Math.pow(drdt, 2) + Math.pow(dthetadt, 2)) * RocketArea * cD; // (N)
+  const WeightForce = (G * EarthMass * RocketMass) / Math.pow(Radius, 2); // (N)
 
   // Vertical Acceleration and velocity
-  var dr2dt = (Thrust * Math.sin(ThrustAngle) - DragForce * Math.sin(DragAngle) - WeightForce) / RocketMass + Radius * Math.pow(dthetadt / Radius, 2); // (m/s^2)
+  const dr2dt = (Thrust * Math.sin(ThrustAngle) - DragForce * Math.sin(DragAngle) - WeightForce) / RocketMass + Radius * Math.pow(dthetadt / Radius, 2); // (m/s^2)
   drdt = drdt + dr2dt * h; // (m/s)
 
   Altitude = Altitude + drdt * h; // (m)
@@ -2535,11 +2544,11 @@ export const _IterationFun = (
   Distance = Distance + dthetadt * h; // (m)
 
   // Angular distance the missile traveled vs time
-  var ArcVelocity = (dthetadt * EarthRadius) / Radius; // (m/s)
+  const ArcVelocity = (dthetadt * EarthRadius) / Radius; // (m/s)
   ArcDistance = ArcDistance + ArcVelocity * h; // (m)
 
   // Angular acceleration and velocity
-  var dtheta2dt = (Thrust * Math.cos(ThrustAngle) - DragForce * Math.cos(DragAngle)) / RocketMass - 2 * drdt * (dthetadt / Radius); // (m/s^2)
+  const dtheta2dt = (Thrust * Math.cos(ThrustAngle) - DragForce * Math.cos(DragAngle)) / RocketMass - 2 * drdt * (dthetadt / Radius); // (m/s^2)
   dthetadt = dthetadt + dtheta2dt * h; // (m/s)
 
   return [FuelMass, RocketMass, Tatm, Patm, AirDensity, c, M, cD, Thrust, DragForce, WeightForce, dr2dt, drdt, Altitude, Distance, ArcVelocity, ArcDistance, dtheta2dt, dthetadt];
@@ -2591,20 +2600,20 @@ export const _Bisection = (
   // The functions output it:
   // AngleCoefficient:  The angle coefficient which directs the missile directly to it's target
 
-  var DistanceSteps = [];
+  const DistanceSteps = [];
   let AngleCoefficient = 0;
   let DistanceClosePossition = 0;
   let AC1 = 0;
   let AC2 = 0;
-  var Steps = 500;
-  for (var i = 0; i < Steps; i++) {
+  const Steps = 500;
+  for (let i = 0; i < Steps; i++) {
     AngleCoefficient = (i * 1) / Steps / 2 + 0.5;
     DistanceSteps.push(_QuickRun(FuelArea1, FuelArea2, FuelMass, FuelVolume, RocketArea, Altitude, RocketCasingMass1, RocketCasingMass2, RocketCasingMass3, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient));
   }
-  var DistanceClosest = DistanceSteps[0];
-  var oldDistanceClosest = Math.abs(DistanceSteps[0] - GoalDistance);
+  let DistanceClosest = DistanceSteps[0];
+  let oldDistanceClosest = Math.abs(DistanceSteps[0] - GoalDistance);
   for (let i = 0; i < DistanceSteps.length; i++) {
-    var newDistanceClosest = Math.abs(DistanceSteps[i] - GoalDistance);
+    const newDistanceClosest = Math.abs(DistanceSteps[i] - GoalDistance);
     if (newDistanceClosest < oldDistanceClosest) {
       oldDistanceClosest = newDistanceClosest;
       DistanceClosest = DistanceSteps[i];
@@ -2622,8 +2631,8 @@ export const _Bisection = (
   AC1 = (DistanceClosePossition - 2) / Steps / 2 + 0.5;
   AC2 = (DistanceClosePossition + 2) / Steps / 2 + 0.5;
   let ACNew: number = (AC1 + AC2) / 2;
-  var qRunACNew = _QuickRun(FuelArea1, FuelArea2, FuelMass, FuelVolume, RocketArea, Altitude, RocketCasingMass1, RocketCasingMass2, RocketCasingMass3, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, ACNew);
-  var error = Math.abs((GoalDistance - qRunACNew) / GoalDistance) * 100;
+  const qRunACNew = _QuickRun(FuelArea1, FuelArea2, FuelMass, FuelVolume, RocketArea, Altitude, RocketCasingMass1, RocketCasingMass2, RocketCasingMass3, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, ACNew);
+  let error = Math.abs((GoalDistance - qRunACNew) / GoalDistance) * 100;
   while (error > 0.01 && Math.abs(AC2 - AC1) >= 0.0001) {
     ACNew = (AC1 + AC2) / 2;
     error =
@@ -2680,9 +2689,9 @@ export const _QuickRun = (
   // The output for this function is:
   // ArcDistance:       The total distance traveled by the missile along the surface of the earth
   // var RocketMass, Tatm, Patm, AirDensity, c, M, cD, Thrust, DragForce, WeightForce, dr2dt, ArcVelocity, theta2dt;
-  var NozzleAltitude2, NozzleAltitude3;
-  var iterationFunOutput = [];
-  var MaxAltitude = [];
+  let NozzleAltitude2, NozzleAltitude3;
+  let iterationFunOutput = [];
+  const MaxAltitude = [];
 
   while (FuelMass / FuelDensity / FuelVolume > 0.4 && Altitude >= 0) {
     iterationFunOutput = _IterationFun(FuelArea1, FuelMass, RocketArea, Altitude, RocketCasingMass1, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient);
@@ -2780,8 +2789,8 @@ export const _QuickRun = (
     dthetadt = iterationFunOutput[18];
   }
 
-  var MaxAltitudeMax = 0;
-  for (var i = 0; i < MaxAltitude.length; i++) {
+  let MaxAltitudeMax = 0;
+  for (let i = 0; i < MaxAltitude.length; i++) {
     if (MaxAltitude[i] > MaxAltitudeMax) MaxAltitudeMax = MaxAltitude[i];
   }
 

@@ -1,9 +1,3 @@
-/* eslint-disable no-undefined */
-/*globals
-  test
-  expect
-*/
-
 import { keepTrackApi } from '../api/externalApi';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
 

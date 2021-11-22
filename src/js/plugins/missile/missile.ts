@@ -1,19 +1,245 @@
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import $ from 'jquery';
 import { missileManager } from './missileManager';
 
 keepTrackApi.programs.missileManager = missileManager;
-export const init = (): void => {
-  const { drawManager, orbitManager, uiManager, satSet, timeManager, settingsManager } = keepTrackApi.programs;
-  let isMissileMenuOpen = false;
 
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'missile',
-    cb: () => {
-      // Side Menu
-      $('#left-menus').append(keepTrackApi.html`
+let isMissileMenuOpen = false;
+let isSub = false;
+
+export const updateLoop = (): void => {
+  if (typeof missileManager != 'undefined' && missileManager.missileArray.length > 0) {
+    const { drawManager, orbitManager } = keepTrackApi.programs;
+    for (drawManager.i = 0; drawManager.i < missileManager.missileArray.length; drawManager.i++) {
+      orbitManager.updateOrbitBuffer(missileManager.missileArray[drawManager.i].id);
+    }
+  }
+};
+export const hideSideMenus = (): void => {
+  $('#missile-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  $('#menu-missile').removeClass('bmenu-item-selected');
+  isMissileMenuOpen = false;
+};
+export const bottomMenuClick = (iconName: string): void => {
+  if (iconName === 'menu-missile') {
+    const { uiManager } = keepTrackApi.programs;
+    if (isMissileMenuOpen) {
+      isMissileMenuOpen = false;
+      uiManager.hideSideMenus();
+      return;
+    } else {
+      if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+      uiManager.hideSideMenus();
+      $('#missile-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      $('#menu-missile').addClass('bmenu-item-selected');
+      isMissileMenuOpen = true;
+      return;
+    }
+  }
+};
+export const missileChange = (): void => {
+  if (parseFloat(<string>$('#ms-type').val()) !== 0) {
+    $('#ms-custom-opt').hide();
+  } else {
+    $('#ms-custom-opt').show();
+  }
+};
+export const msErrorClick = (): void => {
+  $('#ms-error').hide();
+};
+export const msTargetChange = () => {
+  if (parseInt(<string>$('#ms-target').val()) !== -1) {
+    $('#ms-tgt-holder-lat').hide();
+    $('#ms-tgt-holder-lon').hide();
+  } else {
+    $('#ms-tgt-holder-lat').show();
+    $('#ms-tgt-holder-lon').show();
+  }
+};
+export const missileSubmit = (): void => {
+  $('#loading-screen').fadeIn(1000, () => {
+    const { uiManager, satSet, timeManager } = keepTrackApi.programs;
+    $('#ms-error').hide();
+    const type = parseFloat(<string>$('#ms-type').val());
+    const attacker = parseFloat(<string>$('#ms-attacker').val());
+    let lauLat = parseFloat(<string>$('#ms-lat-lau').val());
+    let lauLon = parseFloat(<string>$('#ms-lon-lau').val());
+    const target = parseFloat(<string>$('#ms-target').val());
+    let tgtLat = parseFloat(<string>$('#ms-lat').val());
+    let tgtLon = parseFloat(<string>$('#ms-lon').val());
+    // var result = false;
+    const launchTime = timeManager.selectedDate * 1;
+
+    let sim = '';
+    if (type === 1) {
+      sim = 'simulation/Russia2USA.json';
+      missileManager.MassRaidPre(launchTime, sim);
+    }
+    if (type === 2) {
+      sim = 'simulation/Russia2USAalt.json';
+      missileManager.MassRaidPre(launchTime, sim);
+    }
+    if (type === 3) {
+      sim = 'simulation/China2USA.json';
+      missileManager.MassRaidPre(launchTime, sim);
+    }
+    if (type === 4) {
+      sim = 'simulation/NorthKorea2USA.json';
+      missileManager.MassRaidPre(launchTime, sim);
+    }
+    if (type === 5) {
+      sim = 'simulation/USA2Russia.json';
+      missileManager.MassRaidPre(launchTime, sim);
+    }
+    if (type === 6) {
+      sim = 'simulation/USA2China.json';
+      missileManager.MassRaidPre(launchTime, sim);
+    }
+    if (type === 7) {
+      sim = 'simulation/USA2NorthKorea.json';
+      missileManager.MassRaidPre(launchTime, sim);
+    }
+    if (type !== 0) {
+      uiManager.toast(`${sim} Loaded`, 'standby', true);
+    }
+    if (type === 0) {
+      if (target === -1) {
+        // Custom Target
+        if (isNaN(tgtLat)) {
+          uiManager.toast(`Invalid Target Latitude!`, 'critical');
+          // evt.preventDefault();
+          $('#loading-screen').hide();
+          return;
+        }
+        if (isNaN(tgtLon)) {
+          uiManager.toast(`Invalid Target Longitude!`, 'critical');
+          // evt.preventDefault();
+          $('#loading-screen').hide();
+          return;
+        }
+      } else {
+        // Premade Target
+        tgtLat = <number>missileManager.globalBMTargets[target * 3];
+        tgtLon = <number>missileManager.globalBMTargets[target * 3 + 1];
+      }
+
+      if (isSub) {
+        if (isNaN(lauLat)) {
+          uiManager.toast(`Invalid Launch Latitude!`, 'critical');
+          // evt.preventDefault();
+          $('#loading-screen').hide();
+          return;
+        }
+        if (isNaN(lauLon)) {
+          uiManager.toast(`Invalid Launch Longitude!`, 'critical');
+          // evt.preventDefault();
+          $('#loading-screen').hide();
+          return;
+        }
+      }
+
+      let a, b; //, attackerName;
+
+      if (attacker < 200) {
+        // USA
+        a = attacker - 100;
+        b = 500 - missileManager.missilesInUse;
+        let missileMinAlt = 1200;
+        if (attacker != 100) {
+          // Use Custom Launch Site
+          lauLat = <number>missileManager.UsaICBM[a * 4];
+          lauLon = <number>missileManager.UsaICBM[a * 4 + 1];
+          missileMinAlt = 1100; //https://www.space.com/8689-air-force-launches-ballistic-missile-suborbital-test.html
+        }
+        // attackerName = missileManager.UsaICBM[a * 4 + 2];
+        missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', missileMinAlt);
+      } else if (attacker < 300) {
+        // Russian
+        a = attacker - 200;
+        b = 500 - missileManager.missilesInUse;
+        const missileMinAlt = 1120;
+        if (attacker != 213 && attacker != 214 && attacker != 215) {
+          // Use Custom Launch Site
+          lauLat = <number>missileManager.RussianICBM[a * 4];
+          lauLon = <number>missileManager.RussianICBM[a * 4 + 1];
+        }
+        // attackerName = missileManager.RussianICBM[a * 4 + 2];
+        missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.RussianICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.RussianICBM[a * 4 + 3], 'Russia', missileMinAlt);
+      } else if (attacker < 400) {
+        // Chinese
+        a = attacker - 300;
+        b = 500 - missileManager.missilesInUse;
+        const missileMinAlt = 1120;
+        if (attacker != 321) {
+          // Use Custom Launch Site
+          lauLat = <number>missileManager.ChinaICBM[a * 4];
+          lauLon = <number>missileManager.ChinaICBM[a * 4 + 1];
+        }
+        // attackerName = missileManager.ChinaICBM[a * 4 + 2];
+        missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.ChinaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.ChinaICBM[a * 4 + 3], 'China', missileMinAlt);
+      } else if (attacker < 500) {
+        // North Korean
+        a = attacker - 400;
+        b = 500 - missileManager.missilesInUse;
+        const missileMinAlt = 1120;
+        if (attacker != 400) {
+          // Use Custom Launch Site
+          lauLat = <number>missileManager.NorthKoreanBM[a * 4];
+          lauLon = <number>missileManager.NorthKoreanBM[a * 4 + 1];
+        }
+        // attackerName = missileManager.NorthKoreanBM[a * 4 + 2];
+        missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.NorthKoreanBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.NorthKoreanBM[a * 4 + 3], 'North Korea', missileMinAlt);
+      } else if (attacker < 600) {
+        // French SLBM
+        a = attacker - 500;
+        b = 500 - missileManager.missilesInUse;
+        // attackerName = missileManager.FraSLBM[a * 4 + 2];
+        const missileMinAlt = 1000;
+        if (attacker != 500) {
+          // Use Custom Launch Site
+          lauLat = <number>missileManager.FraSLBM[a * 4];
+          lauLon = <number>missileManager.FraSLBM[a * 4 + 1];
+        }
+        // https://etikkradet.no/files/2017/02/EADS-Engelsk.pdf
+        missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.FraSLBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.FraSLBM[a * 4 + 3], 'France', missileMinAlt);
+      } else if (attacker < 700) {
+        // United Kingdom SLBM
+        a = attacker - 600;
+        b = 500 - missileManager.missilesInUse;
+        // attackerName = missileManager.ukSLBM[a * 4 + 2];
+        const missileMinAlt = 1200;
+        if (attacker != 600) {
+          // Use Custom Launch Site
+          lauLat = <number>missileManager.ukSLBM[a * 4];
+          lauLon = <number>missileManager.ukSLBM[a * 4 + 1];
+        }
+        missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.ukSLBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.ukSLBM[a * 4 + 3], 'United Kigndom', missileMinAlt);
+      }
+      // if (settingsManager.isOfficialWebsite)
+      //     ga(
+      //         'send',
+      //         'event',
+      //         'New Missile',
+      //         attackerName,
+      //         'Attacker'
+      //     );
+      // if (settingsManager.isOfficialWebsite)
+      //     ga(
+      //         'send',
+      //         'event',
+      //         'New Missile',
+      //         tgtLat + ', ' + tgtLon,
+      //         'Target'
+      //     );
+      uiManager.toast(missileManager.lastMissileError, missileManager.lastMissileErrorType);
+      uiManager.doSearch('RV_');
+    }
+    $('#loading-screen').hide();
+  });
+};
+export const uiManagerInit = (): void => {
+  // Side Menu
+  $('#left-menus').append(keepTrackApi.html`
         <div id="missile-menu" class="side-menu-parent start-hidden text-select">
           <div id="missile-content" class="side-menu">
             <div class="row">
@@ -169,8 +395,8 @@ export const init = (): void => {
         </div>   
       `);
 
-      // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
+  // Bottom Icon
+  $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-missile" class="bmenu-item">
           <img
             alt="missile"
@@ -181,282 +407,69 @@ export const init = (): void => {
         </div>
       `);
 
-      let isSub = false;
-      $('#missile').on('submit', function (e) {
-        $('#loading-screen').fadeIn(1000, function () {
-          $('#ms-error').hide();
-          var type = parseFloat(<string>$('#ms-type').val());
-          var attacker = parseFloat(<string>$('#ms-attacker').val());
-          let lauLat = parseFloat(<string>$('#ms-lat-lau').val());
-          let lauLon = parseFloat(<string>$('#ms-lon-lau').val());
-          var target = parseFloat(<string>$('#ms-target').val());
-          var tgtLat = parseFloat(<string>$('#ms-lat').val());
-          var tgtLon = parseFloat(<string>$('#ms-lon').val());
-          // var result = false;
+  $('#missile').on('submit', (e: Event): void => {
+    missileSubmit();
+    e.preventDefault();
+  });
 
-          let launchTime = timeManager.selectedDate * 1;
-
-          let sim = '';
-          if (type === 1) {
-            sim = 'simulation/Russia2USA.json';
-            missileManager.MassRaidPre(launchTime, sim);
-          }
-          if (type === 2) {
-            sim = 'simulation/Russia2USAalt.json';
-            missileManager.MassRaidPre(launchTime, sim);
-          }
-          if (type === 3) {
-            sim = 'simulation/China2USA.json';
-            missileManager.MassRaidPre(launchTime, sim);
-          }
-          if (type === 4) {
-            sim = 'simulation/NorthKorea2USA.json';
-            missileManager.MassRaidPre(launchTime, sim);
-          }
-          if (type === 5) {
-            sim = 'simulation/USA2Russia.json';
-            missileManager.MassRaidPre(launchTime, sim);
-          }
-          if (type === 6) {
-            sim = 'simulation/USA2China.json';
-            missileManager.MassRaidPre(launchTime, sim);
-          }
-          if (type === 7) {
-            sim = 'simulation/USA2NorthKorea.json';
-            missileManager.MassRaidPre(launchTime, sim);
-          }
-          if (type !== 0) {
-            uiManager.toast(`${sim} Loaded`, 'standby', true);
-          }
-          if (type === 0) {
-            if (target === -1) {
-              // Custom Target
-              if (isNaN(tgtLat)) {
-                uiManager.toast(`Invalid Target Latitude!`, 'critical');
-                e.preventDefault();
-                $('#loading-screen').hide();
-                return;
-              }
-              if (isNaN(tgtLon)) {
-                uiManager.toast(`Invalid Target Longitude!`, 'critical');
-                e.preventDefault();
-                $('#loading-screen').hide();
-                return;
-              }
-            } else {
-              // Premade Target
-              tgtLat = <number>missileManager.globalBMTargets[target * 3];
-              tgtLon = <number>missileManager.globalBMTargets[target * 3 + 1];
-            }
-
-            if (isSub) {
-              if (isNaN(lauLat)) {
-                uiManager.toast(`Invalid Launch Latitude!`, 'critical');
-                e.preventDefault();
-                $('#loading-screen').hide();
-                return;
-              }
-              if (isNaN(lauLon)) {
-                uiManager.toast(`Invalid Launch Longitude!`, 'critical');
-                e.preventDefault();
-                $('#loading-screen').hide();
-                return;
-              }
-            }
-
-            var a, b; //, attackerName;
-
-            if (attacker < 200) {
-              // USA
-              a = attacker - 100;
-              b = 500 - missileManager.missilesInUse;
-              let missileMinAlt = 1200;
-              if (attacker != 100) {
-                // Use Custom Launch Site
-                lauLat = <number>missileManager.UsaICBM[a * 4];
-                lauLon = <number>missileManager.UsaICBM[a * 4 + 1];
-                missileMinAlt = 1100; //https://www.space.com/8689-air-force-launches-ballistic-missile-suborbital-test.html
-              }
-              // attackerName = missileManager.UsaICBM[a * 4 + 2];
-              missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.UsaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.UsaICBM[a * 4 + 3], 'United States', missileMinAlt);
-            } else if (attacker < 300) {
-              // Russian
-              a = attacker - 200;
-              b = 500 - missileManager.missilesInUse;
-              let missileMinAlt = 1120;
-              if (attacker != 213 && attacker != 214 && attacker != 215) {
-                // Use Custom Launch Site
-                lauLat = <number>missileManager.RussianICBM[a * 4];
-                lauLon = <number>missileManager.RussianICBM[a * 4 + 1];
-              }
-              // attackerName = missileManager.RussianICBM[a * 4 + 2];
-              missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.RussianICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.RussianICBM[a * 4 + 3], 'Russia', missileMinAlt);
-            } else if (attacker < 400) {
-              // Chinese
-              a = attacker - 300;
-              b = 500 - missileManager.missilesInUse;
-              let missileMinAlt = 1120;
-              if (attacker != 321) {
-                // Use Custom Launch Site
-                lauLat = <number>missileManager.ChinaICBM[a * 4];
-                lauLon = <number>missileManager.ChinaICBM[a * 4 + 1];
-              }
-              // attackerName = missileManager.ChinaICBM[a * 4 + 2];
-              missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.ChinaICBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.ChinaICBM[a * 4 + 3], 'China', missileMinAlt);
-            } else if (attacker < 500) {
-              // North Korean
-              a = attacker - 400;
-              b = 500 - missileManager.missilesInUse;
-              let missileMinAlt = 1120;
-              if (attacker != 400) {
-                // Use Custom Launch Site
-                lauLat = <number>missileManager.NorthKoreanBM[a * 4];
-                lauLon = <number>missileManager.NorthKoreanBM[a * 4 + 1];
-              }
-              // attackerName = missileManager.NorthKoreanBM[a * 4 + 2];
-              missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.NorthKoreanBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.NorthKoreanBM[a * 4 + 3], 'North Korea', missileMinAlt);
-            } else if (attacker < 600) {
-              // French SLBM
-              a = attacker - 500;
-              b = 500 - missileManager.missilesInUse;
-              // attackerName = missileManager.FraSLBM[a * 4 + 2];
-              let missileMinAlt = 1000;
-              if (attacker != 500) {
-                // Use Custom Launch Site
-                lauLat = <number>missileManager.FraSLBM[a * 4];
-                lauLon = <number>missileManager.FraSLBM[a * 4 + 1];
-              }
-              // https://etikkradet.no/files/2017/02/EADS-Engelsk.pdf
-              missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.FraSLBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.FraSLBM[a * 4 + 3], 'France', missileMinAlt);
-            } else if (attacker < 700) {
-              // United Kingdom SLBM
-              a = attacker - 600;
-              b = 500 - missileManager.missilesInUse;
-              // attackerName = missileManager.ukSLBM[a * 4 + 2];
-              let missileMinAlt = 1200;
-              if (attacker != 600) {
-                // Use Custom Launch Site
-                lauLat = <number>missileManager.ukSLBM[a * 4];
-                lauLon = <number>missileManager.ukSLBM[a * 4 + 1];
-              }
-              missileManager.Missile(lauLat, lauLon, tgtLat, tgtLon, 3, satSet.missileSats - b, launchTime, missileManager.ukSLBM[a * 4 + 2], 30, 2.9, 0.07, missileManager.ukSLBM[a * 4 + 3], 'United Kigndom', missileMinAlt);
-            }
-            // if (settingsManager.isOfficialWebsite)
-            //     ga(
-            //         'send',
-            //         'event',
-            //         'New Missile',
-            //         attackerName,
-            //         'Attacker'
-            //     );
-            // if (settingsManager.isOfficialWebsite)
-            //     ga(
-            //         'send',
-            //         'event',
-            //         'New Missile',
-            //         tgtLat + ', ' + tgtLon,
-            //         'Target'
-            //     );
-            uiManager.toast(missileManager.lastMissileError, missileManager.lastMissileErrorType);
-            uiManager.doSearch('RV_');
-          }
-          $('#loading-screen').hide();
-        });
-        e.preventDefault();
-      });
-
-      $('#missile-menu').resizable({
-        handles: 'e',
-        stop: function () {
-          $(this).css('height', '');
-        },
-        maxWidth: 450,
-        minWidth: 280,
-      });
-
-      $('#ms-attacker').on('change', () => {
-        isSub = false;
-        let subList = [100, 600, 213, 214, 215, 321, 500, 400];
-        for (var i = 0; i < subList.length; i++) {
-          if (subList[i] == parseInt(<string>$('#ms-attacker').val())) {
-            isSub = true;
-          }
-        }
-        if (!isSub) {
-          $('#ms-lau-holder-lat').hide();
-          $('#ms-lau-holder-lon').hide();
-        } else {
-          $('#ms-lau-holder-lat').show();
-          $('#ms-lau-holder-lon').show();
-        }
-      });
-
-      $('#ms-target').on('change', () => {
-        if (parseInt(<string>$('#ms-target').val()) !== -1) {
-          $('#ms-tgt-holder-lat').hide();
-          $('#ms-tgt-holder-lon').hide();
-        } else {
-          $('#ms-tgt-holder-lat').show();
-          $('#ms-tgt-holder-lon').show();
-        }
-      });
-
-      $('#ms-error').on('click', function () {
-        $('#ms-error').hide();
-      });
-
-      $('#missile').on('change', function () {
-        if (parseFloat(<string>$('#ms-type').val()) !== 0) {
-          $('#ms-custom-opt').hide();
-        } else {
-          $('#ms-custom-opt').show();
-        }
-      });      
+  $('#missile-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
     },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#ms-attacker').on('change', msAttackerChange);
+
+  $('#ms-target').on('change', msTargetChange);
+
+  $('#ms-error').on('click', msErrorClick);
+
+  $('#missile').on('change', missileChange);
+};
+export const init = (): void => {
+  // Add HTML
+  keepTrackApi.register({
+    method: 'uiManagerInit',
+    cbName: 'missile',
+    cb: uiManagerInit,
   });
 
   // Add JavaScript
   keepTrackApi.register({
     method: 'bottomMenuClick',
     cbName: 'missile',
-    cb: (iconName: string): void => {
-      if (iconName === 'menu-missile') {
-        if (isMissileMenuOpen) {
-          isMissileMenuOpen = false;
-          uiManager.hideSideMenus();
-          return;
-        } else {
-          if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-          uiManager.hideSideMenus();
-          $('#missile-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          $('#menu-missile').addClass('bmenu-item-selected');
-          isMissileMenuOpen = true;
-          return;
-        }
-      }
-    },
+    cb: bottomMenuClick,
   });
 
   keepTrackApi.register({
     method: 'hideSideMenus',
     cbName: 'missile',
-    cb: (): void => {
-      $('#missile-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#menu-missile').removeClass('bmenu-item-selected');
-      isMissileMenuOpen = false;
-    },
+    cb: hideSideMenus,
   });
 
   // Missile oribts have to be updated every draw or they quickly become innacurate
   keepTrackApi.register({
     method: 'updateLoop',
     cbName: 'updateMissileOrbits',
-    cb: (): void => {
-      if (typeof missileManager != 'undefined' && missileManager.missileArray.length > 0) {
-        for (drawManager.i = 0; drawManager.i < missileManager.missileArray.length; drawManager.i++) {
-          orbitManager.updateOrbitBuffer(missileManager.missileArray[drawManager.i].id);
-        }
-      }
-    },
+    cb: updateLoop,
   });
+};
+export const msAttackerChange = () => {
+  isSub = false;
+  const subList = [100, 600, 213, 214, 215, 321, 500, 400];
+  for (let i = 0; i < subList.length; i++) {
+    if (subList[i] == parseInt(<string>$('#ms-attacker').val())) {
+      isSub = true;
+    }
+  }
+  if (!isSub) {
+    $('#ms-lau-holder-lat').hide();
+    $('#ms-lau-holder-lon').hide();
+  } else {
+    $('#ms-lau-holder-lat').show();
+    $('#ms-lau-holder-lon').show();
+  }
 };

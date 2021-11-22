@@ -1,5 +1,5 @@
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import $ from 'jquery';
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
@@ -81,13 +81,13 @@ export const init = (): void => {
           </div>
         `);
 
-        await import('@app/js/uiManager/ui-advice').then((mod) => {
+        await import('@app/js/uiManager/adviceManager').then((mod) => {
           mod.init();
           keepTrackApi.programs.uiManager.menuController();
         });
       } catch (e) {
         /* istanbul ignore next */
-        console.error(e);
+        console.debug(e);
       }
     },
   });

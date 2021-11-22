@@ -1,16 +1,26 @@
-import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
-
-import { SunCalc } from '@app/js/lib/suncalc.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import { SatObject } from '@app/js/api/keepTrack';
+import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
+import { SunCalc } from '@app/js/lib/suncalc.js';
 
 const satInfoboxCore = {
   sensorInfo: {
     isLoaded: false,
-    cbName: 'sensorInfo',
-    cb: (sat: any): void => {
-      const settingsManager = keepTrackApi.programs.settingsManager;
-      if (!satInfoboxCore.sensorInfo.isLoaded && settingsManager.plugins.sensor) {
-        $('#sat-infobox').append(keepTrackApi.html`
+  },
+  launchData: {
+    isLoaded: false,
+  },
+  orbitalData: {
+    isLoaded: false,
+  },
+  satMissionData: {
+    isLoaded: false,
+  },
+};
+
+export const sensorInfo = (sat: SatObject): void => {
+  if (!satInfoboxCore.sensorInfo.isLoaded && settingsManager.plugins.sensor) {
+    $('#sat-infobox').append(keepTrackApi.html`
         <div id="sensor-sat-info">
           <li class="divider"></li>
           <div class="sat-info-row">
@@ -64,32 +74,28 @@ const satInfoboxCore = {
           </div>
         </div> 
         `);
-        satInfoboxCore.sensorInfo.isLoaded = true;
-      }
+    satInfoboxCore.sensorInfo.isLoaded = true;
+  }
 
-      // If we are using the sensor manager plugin then we should hide the sensor to satellite
-      // info when there is no sensor selected
-      if (settingsManager.plugins.sensor) {
-        if (keepTrackApi.programs.sensorManager.checkSensorSelected()) {
-          $('#sensor-sat-info').show();
-        } else {
-          $('#sensor-sat-info').hide();
-        }
-      }
+  // If we are using the sensor manager plugin then we should hide the sensor to satellite
+  // info when there is no sensor selected
+  if (settingsManager.plugins.sensor) {
+    if (keepTrackApi.programs.sensorManager.checkSensorSelected()) {
+      $('#sensor-sat-info').show();
+    } else {
+      $('#sensor-sat-info').hide();
+    }
+  }
 
-      if (!sat.missile) {
-        $('.sat-only-info').show();
-      } else {
-        $('.sat-only-info').hide();
-      }
-    },
-  },
-  launchData: {
-    isLoaded: false,
-    cbName: 'launchData',
-    cb: (sat: any): void => {
-      if (!satInfoboxCore.launchData.isLoaded) {
-        $('#sat-infobox').append(`
+  if (!sat.missile) {
+    $('.sat-only-info').show();
+  } else {
+    $('.sat-only-info').hide();
+  }
+};
+export const launchData = (sat: SatObject): void => {
+  if (!satInfoboxCore.launchData.isLoaded) {
+    $('#sat-infobox').append(`
           <li class="divider"></li>
           <div class="sat-info-row">
             <div class="sat-info-key">Type</div>
@@ -116,69 +122,111 @@ const satInfoboxCore = {
             <div class="sat-info-value" id="sat-rcs">NO DATA</div>
           </div>  
         `);
-        satInfoboxCore.launchData.isLoaded = true;
-      }
+    satInfoboxCore.launchData.isLoaded = true;
+  }
 
-      // /////////////////////////////////////////////////////////////////////////
-      // Country Correlation Table
-      // /////////////////////////////////////////////////////////////////////////
-      const country = keepTrackApi.programs.objectManager.extractCountry(sat.C);
-      $('#sat-country').html(country);
+  // /////////////////////////////////////////////////////////////////////////
+  // Country Correlation Table
+  // /////////////////////////////////////////////////////////////////////////
+  const country = keepTrackApi.programs.objectManager.extractCountry(sat.C);
+  $('#sat-country').html(country);
 
-      // /////////////////////////////////////////////////////////////////////////
-      // Launch Site Correlation Table
-      // /////////////////////////////////////////////////////////////////////////
-      let siteArr = [];
-      let site = {} as any;
-      let missileLV: any;
-      let missileOrigin: any;
-      let satLvString: string | JQuery.Node | ((this: HTMLElement, index: number, oldhtml: string) => string | JQuery.Node);
-      if (sat.missile) {
-        siteArr = sat.desc.split('(');
-        missileOrigin = siteArr[0].substr(0, siteArr[0].length - 1);
-        missileLV = sat.desc.split('(')[1].split(')')[0]; // Remove the () from the booster type
+  // /////////////////////////////////////////////////////////////////////////
+  // Launch Site Correlation Table
+  // /////////////////////////////////////////////////////////////////////////
+  let siteArr = [];
+  let site = {} as any;
+  let missileLV: any;
+  let missileOrigin: any;
+  let satLvString: any;
+  if (sat.missile) {
+    siteArr = sat.desc.split('(');
+    missileOrigin = siteArr[0].substr(0, siteArr[0].length - 1);
+    missileLV = sat.desc.split('(')[1].split(')')[0]; // Remove the () from the booster type
 
-        site.site = missileOrigin;
-        site.sitec = sat.C;
-      } else {
-        site = keepTrackApi.programs.objectManager.extractLaunchSite(sat.LS);
-      }
+    site.site = missileOrigin;
+    site.sitec = sat.C;
+  } else {
+    site = keepTrackApi.programs.objectManager.extractLaunchSite(sat.LS);
+  }
 
-      $('#sat-site').html(site.site);
-      $('#sat-sitec').html(site.sitec);
+  $('#sat-site').html(site.site);
+  $('#sat-sitec').html(site.sitec);
 
-      // /////////////////////////////////////////////////////////////////////////
-      // Launch Vehicle Correlation Table
-      // /////////////////////////////////////////////////////////////////////////
-      if (sat.missile) {
-        sat.LV = missileLV;
-        $('#sat-vehicle').html(sat.LV);
-      } else {
-        $('#sat-vehicle').html(sat.LV); // Set to JSON record
-        if (sat.LV === 'U') {
-          $('#sat-vehicle').html('Unknown');
-        } // Replace with Unknown if necessary
-        satLvString = keepTrackApi.programs.objectManager.extractLiftVehicle(sat.LV); // Replace with link if available
-        $('#sat-vehicle').html(satLvString);
-      }
+  // /////////////////////////////////////////////////////////////////////////
+  // Launch Vehicle Correlation Table
+  // /////////////////////////////////////////////////////////////////////////
+  if (sat.missile) {
+    sat.LV = missileLV;
+    $('#sat-vehicle').html(sat.LV);
+  } else {
+    $('#sat-vehicle').html(sat.LV); // Set to JSON record
+    if (sat.LV === 'U') {
+      $('#sat-vehicle').html('Unknown');
+    } // Replace with Unknown if necessary
+    satLvString = keepTrackApi.programs.objectManager.extractLiftVehicle(sat.LV); // Replace with link if available
+    $('#sat-vehicle').html(satLvString);
+  }
 
-      $('a.iframe').colorbox({
-        iframe: true,
-        width: '80%',
-        height: '80%',
-        fastIframe: false,
-        closeButton: false,
-      });
-    },
-  },
-  orbitalData: {
-    isLoaded: false,
-    cbName: 'orbitalData',
-    cb: (sat: any): void => {
-      const { uiManager, satSet, objectManager, searchBox, satellite } = keepTrackApi.programs;
+  $('a.iframe').colorbox({
+    iframe: true,
+    width: '80%',
+    height: '80%',
+    fastIframe: false,
+    closeButton: false,
+  });
+};
+export const nearObjectsLinkClick = (): void => {
+  const { uiManager, satSet, objectManager } = keepTrackApi.programs;
+  if (objectManager.selectedSat === -1) {
+    return;
+  }
+  const sat = objectManager.selectedSat;
+  const SCCs = [];
+  let pos = satSet.getSatPosOnly(sat).position;
+  const posXmin = pos.x - 100;
+  const posXmax = pos.x + 100;
+  const posYmin = pos.y - 100;
+  const posYmax = pos.y + 100;
+  const posZmin = pos.z - 100;
+  const posZmax = pos.z + 100;
+  $('#search').val('');
+  for (let i = 0; i < satSet.numSats; i++) {
+    pos = satSet.getSatPosOnly(i).position;
+    if (pos.x < posXmax && pos.x > posXmin && pos.y < posYmax && pos.y > posYmin && pos.z < posZmax && pos.z > posZmin) {
+      SCCs.push(satSet.getSatExtraOnly(i).SCC_NUM);
+    }
+  }
 
-      if (!satInfoboxCore.orbitalData.isLoaded) {
-        $('#ui-wrapper').append(keepTrackApi.html`
+  for (let i = 0; i < SCCs.length; i++) {
+    if (i < SCCs.length - 1) {
+      $('#search').val($('#search').val() + SCCs[i] + ',');
+    } else {
+      $('#search').val($('#search').val() + SCCs[i]);
+    }
+  }
+
+  uiManager.doSearch($('#search').val());
+};
+export const nearOrbitsLink = () => {
+  const { satSet, searchBox, satellite } = keepTrackApi.programs;
+  // searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(objectManager.selectedSat)));
+  const searchStr = searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(keepTrackApi.programs.objectManager.selectedSat)));
+  searchBox.doSearch(searchStr, false, satSet);
+};
+export const allObjectsLink = (): void => {
+  const { uiManager, satSet, objectManager } = keepTrackApi.programs;
+  if (objectManager.selectedSat === -1) {
+    return;
+  }
+  const intldes = satSet.getSatExtraOnly(objectManager.selectedSat).intlDes;
+  const searchStr = intldes.slice(0, 8);
+  uiManager.doSearch(searchStr);
+  $('#search').val(searchStr);
+};
+export const orbitalData = (sat: SatObject): void => {
+  if (!satInfoboxCore.orbitalData.isLoaded) {
+    $('#ui-wrapper').append(keepTrackApi.html`
           <div id="sat-infobox" class="text-select">
             <div id="sat-info-top-links">
               <div id="sat-info-title" class="center-text">This is a title</div>
@@ -269,175 +317,127 @@ const satInfoboxCore = {
           </div>
         `);
 
-        // Create a Sat Info Box Initializing Script
-        $('#sat-infobox').draggable({
-          containment: 'window',
-          drag: () => {
-            $('#sat-infobox').height(600);
-          },
-        });
-        $('#sat-infobox').resizable({
-          handles: 'all',
-          // alsoResize: '#bottom-icons-container',
-          // No larger than the stack of icons
-          maxHeight: 900,
-          minHeight: 200,
-          maxWidth: 600,
-          minWidth: 350,
-        });
+    // Create a Sat Info Box Initializing Script
+    $('#sat-infobox').draggable({
+      containment: 'window',
+      drag: () => {
+        $('#sat-infobox').height(600);
+      },
+    });
+    $('#sat-infobox').resizable({
+      handles: 'all',
+      // alsoResize: '#bottom-icons-container',
+      // No larger than the stack of icons
+      maxHeight: 900,
+      minHeight: 200,
+      maxWidth: 600,
+      minWidth: 350,
+    });
 
-        // If right click kill and reinit
-        $('#sat-infobox').on('mousedown', (e) => {
-          if (e.button === 2) {
-            $('#sat-infobox').removeClass().removeAttr('style');
-            return;
-          }
-        });
+    // If right click kill and reinit
+    $('#sat-infobox').on('mousedown', (e) => {
+      if (e.button === 2) {
+        $('#sat-infobox').removeClass().removeAttr('style');
+        return;
+      }
+    });
 
-        satInfoboxCore.orbitalData.isLoaded = true;
+    satInfoboxCore.orbitalData.isLoaded = true;
+  }
+
+  if (!sat.missile) {
+    try {
+      $('a.iframe').colorbox({
+        iframe: true,
+        width: '80%',
+        height: '80%',
+        fastIframe: false,
+        closeButton: false,
+      });
+    } catch (error) {
+      // console.warn(error);
+    }
+
+    $('#sat-apogee').html(sat.apogee.toFixed(0) + ' km');
+    $('#sat-perigee').html(sat.perigee.toFixed(0) + ' km');
+    $('#sat-inclination').html((sat.inclination * RAD2DEG).toFixed(2) + '°');
+    $('#sat-eccentricity').html(sat.eccentricity.toFixed(3));
+
+    $('#sat-period').html(sat.period.toFixed(2) + ' min');
+    $('#sat-period').tooltip({
+      // delay: 50,
+      html: 'Mean Motion: ' + (MINUTES_PER_DAY / sat.period).toFixed(2),
+      position: 'left',
+    });
+
+    // TODO: Error checking on Iframe
+    let now: Date | number | string = new Date();
+    const jday = keepTrackApi.programs.timeManager.getDayOfYear(now);
+    now = now.getFullYear();
+    now = now.toString().substr(2, 2);
+    let daysold;
+    if (sat.TLE1.substr(18, 2) === now) {
+      daysold = jday - parseInt(sat.TLE1.substr(20, 3));
+    } else {
+      daysold = jday + parseInt(now) * 365 - (parseInt(sat.TLE1.substr(18, 2)) * 365 + parseInt(sat.TLE1.substr(20, 3)));
+    }
+    $('#sat-elset-age').html(daysold + ' Days');
+    $('#sat-elset-age').tooltip({
+      // delay: 50,
+      html: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(),
+      position: 'left',
+    });
+
+    if (!keepTrackApi.programs.objectManager.isSensorManagerLoaded) {
+      $('#sat-sun').parent().hide();
+    } else {
+      now = new Date(keepTrackApi.programs.timeManager.propRealTime + keepTrackApi.programs.timeManager.propOffset);
+      const sunTime: any = SunCalc.getTimes(now, keepTrackApi.programs.sensorManager.currentSensor.lat, keepTrackApi.programs.sensorManager.currentSensor.lon);
+
+      let satInSun = -1;
+      if (typeof sat.isInSun !== 'undefined') {
+        satInSun = sat.isInSun();
       }
 
-      if (!sat.missile) {
-        try {
-          $('a.iframe').colorbox({
-            iframe: true,
-            width: '80%',
-            height: '80%',
-            fastIframe: false,
-            closeButton: false,
-          });
-        } catch (error) {
-          console.warn(error);
-        }
-
-        $('#sat-apogee').html(sat.apogee.toFixed(0) + ' km');
-        $('#sat-perigee').html(sat.perigee.toFixed(0) + ' km');
-        $('#sat-inclination').html((sat.inclination * RAD2DEG).toFixed(2) + '°');
-        $('#sat-eccentricity').html(sat.eccentricity.toFixed(3));
-
-        $('#sat-period').html(sat.period.toFixed(2) + ' min');
-        $('#sat-period').tooltip({
-          // delay: 50,
-          html: 'Mean Motion: ' + MINUTES_PER_DAY / sat.period.toFixed(2),
-          position: 'left',
-        });
-
-        // TODO: Error checking on Iframe
-
-        let now: Date | number | string = new Date();
-        const jday = keepTrackApi.programs.timeManager.getDayOfYear(now);
-        now = now.getFullYear();
-        now = now.toString().substr(2, 2);
-        let daysold;
-        if (sat.TLE1.substr(18, 2) === now) {
-          daysold = jday - sat.TLE1.substr(20, 3);
-        } else {
-          daysold = jday + parseInt(now) * 365 - (parseInt(sat.TLE1.substr(18, 2)) * 365 + parseInt(sat.TLE1.substr(20, 3)));
-        }
-        $('#sat-elset-age').html(daysold + ' Days');
-        $('#sat-elset-age').tooltip({
-          // delay: 50,
-          html: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(),
-          position: 'left',
-        });
-
-        if (!keepTrackApi.programs.objectManager.isSensorManagerLoaded) {
-          $('#sat-sun').parent().hide();
-        } else {
-          now = new Date(keepTrackApi.programs.timeManager.propRealTime + keepTrackApi.programs.timeManager.propOffset);
-          const sunTime: any = SunCalc.getTimes(now, keepTrackApi.programs.sensorManager.currentSensor.lat, keepTrackApi.programs.sensorManager.currentSensor.lon);
-
-          let satInSun = -1;
-          if (typeof sat.isInSun !== 'undefined') {
-            satInSun = sat.isInSun();
-          }
-
-          // If No Sensor, then Ignore Sun Exclusion
-          if (keepTrackApi.programs.sensorManager.currentSensor.lat === null) {
-            $('#sat-sun').hide();
-            return;
-          } else {
-            $('#sat-sun').show();
-          }
-
-          // If Radar Selected, then Say the Sun Doesn't Matter
-          if (keepTrackApi.programs.sensorManager.currentSensor.type !== 'Optical' && keepTrackApi.programs.sensorManager.currentSensor.type !== 'Observer') {
-            $('#sat-sun').html('No Effect');
-            // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
-          } else if (sunTime.dawn.getTime() - now.getTime() > 0 || sunTime.dusk.getTime() - now.getTime() < 0) {
-            if (satInSun == 0) $('#sat-sun').html('No Sunlight');
-            if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
-            if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
-            // If Optical Sesnor but Dawn Dusk Can't Be Calculated, then you are at a
-            // high latitude and we need to figure that out
-          } else if (sunTime.night != 'Invalid Date' && (sunTime.dawn == 'Invalid Date' || sunTime.dusk == 'Invalid Date')) {
-            // TODO: Figure out how to calculate this
-            console.debug('No Dawn or Dusk');
-            if (satInSun == 0) $('#sat-sun').html('No Sunlight');
-            if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
-            if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
-          } else {
-            // Unless you are in sun exclusion
-            $('#sat-sun').html('Sun Exclusion');
-          }
-          if (satInSun == -1) $('#sat-sun').html('Unable to Calculate');
-        }
+      // If No Sensor, then Ignore Sun Exclusion
+      if (keepTrackApi.programs.sensorManager.currentSensor.lat === null) {
+        $('#sat-sun').hide();
+        return;
+      } else {
+        $('#sat-sun').show();
       }
 
-      $('#all-objects-link').on('click', function () {
-        if (objectManager.selectedSat === -1) {
-          return;
-        }
-        const intldes = satSet.getSatExtraOnly(objectManager.selectedSat).intlDes;
-        const searchStr = intldes.slice(0, 8);
-        uiManager.doSearch(searchStr);
-        $('#search').val(searchStr);
-      });
+      // If Radar Selected, then Say the Sun Doesn't Matter
+      if (keepTrackApi.programs.sensorManager.currentSensor.type !== 'Optical' && keepTrackApi.programs.sensorManager.currentSensor.type !== 'Observer') {
+        $('#sat-sun').html('No Effect');
+        // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
+      } else if (sunTime.dawn.getTime() - now.getTime() > 0 || sunTime.dusk.getTime() - now.getTime() < 0) {
+        if (satInSun == 0) $('#sat-sun').html('No Sunlight');
+        if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
+        if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
+        // If Optical Sesnor but Dawn Dusk Can't Be Calculated, then you are at a
+        // high latitude and we need to figure that out
+      } else if (sunTime.night != 'Invalid Date' && (sunTime.dawn == 'Invalid Date' || sunTime.dusk == 'Invalid Date')) {
+        // TODO: Figure out how to calculate this
+        console.debug('No Dawn or Dusk');
+        if (satInSun == 0) $('#sat-sun').html('No Sunlight');
+        if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
+        if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
+      } else {
+        // Unless you are in sun exclusion
+        $('#sat-sun').html('Sun Exclusion');
+      }
+      if (satInSun == -1) $('#sat-sun').html('Unable to Calculate');
+    }
+  }
 
-      $('#near-orbits-link').on('click', () => {
-        // searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(objectManager.selectedSat)));
-        const searchStr = searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(keepTrackApi.programs.objectManager.selectedSat)));
-        searchBox.doSearch(searchStr, false, satSet);
-      });
-      $('#near-objects-link').on('click', function () {
-        if (objectManager.selectedSat === -1) {
-          return;
-        }
-        const sat = objectManager.selectedSat;
-        const SCCs = [];
-        let pos = satSet.getSatPosOnly(sat).position;
-        const posXmin = pos.x - 100;
-        const posXmax = pos.x + 100;
-        const posYmin = pos.y - 100;
-        const posYmax = pos.y + 100;
-        const posZmin = pos.z - 100;
-        const posZmax = pos.z + 100;
-        $('#search').val('');
-        for (let i = 0; i < satSet.numSats; i++) {
-          pos = satSet.getSatPosOnly(i).position;
-          if (pos.x < posXmax && pos.x > posXmin && pos.y < posYmax && pos.y > posYmin && pos.z < posZmax && pos.z > posZmin) {
-            SCCs.push(satSet.getSatExtraOnly(i).SCC_NUM);
-          }
-        }
-
-        for (let i = 0; i < SCCs.length; i++) {
-          if (i < SCCs.length - 1) {
-            $('#search').val($('#search').val() + SCCs[i] + ',');
-          } else {
-            $('#search').val($('#search').val() + SCCs[i]);
-          }
-        }
-
-        uiManager.doSearch($('#search').val());
-      });
-    },
-  },
-  satMissionData: {
-    isLoaded: false,
-    cbName: 'satMissionData',
-    cb: (sat: any): void => {
-      if (!satInfoboxCore.satMissionData.isLoaded) {
-        $('#sat-infobox').append(`
+  $('#all-objects-link').on('click', allObjectsLink);
+  $('#near-orbits-link').on('click', nearOrbitsLink);
+  $('#near-objects-link').on('click', nearObjectsLinkClick);
+};
+export const satMissionData = (sat: SatObject): void => {
+  if (!satInfoboxCore.satMissionData.isLoaded) {
+    $('#sat-infobox').append(`
         <li class="divider"></li>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
@@ -575,283 +575,274 @@ const satInfoboxCore = {
           </div>
         </div>
         `);
-        satInfoboxCore.satMissionData.isLoaded = true;
-      }
+    satInfoboxCore.satMissionData.isLoaded = true;
+  }
 
-      if (!sat.missile) {
-        $('.sat-only-info').show();
-      } else {
-        $('.sat-only-info').hide();
-      }
+  if (!sat.missile) {
+    $('.sat-only-info').show();
+  } else {
+    $('.sat-only-info').hide();
+  }
 
-      if (!sat.missile) {
-        if (typeof sat.U != 'undefined' && sat.U != '') {
-          $('#sat-user').html(sat.U);
-        } else {
-          $('#sat-user').html('Unknown');
-        }
-        if (typeof sat.P != 'undefined' && sat.P != '') {
-          $('#sat-purpose').html(sat.P);
-        } else {
-          $('#sat-purpose').html('Unknown');
-        }
-        if (typeof sat.Con != 'undefined' && sat.Con != '') {
-          $('#sat-contractor').html(sat.Con);
-        } else {
-          $('#sat-contractor').html('Unknown');
-        }
-        if (typeof sat.LM != 'undefined' && sat.LM != '') {
-          $('#sat-lmass').html(sat.LM + ' kg');
-        } else {
-          $('#sat-lmass').html('Unknown');
-        }
-        if (typeof sat.DM != 'undefined' && sat.DM != '') {
-          $('#sat-dmass').html(sat.DM + ' kg');
-        } else {
-          $('#sat-dmass').html('Unknown');
-        }
-        if (typeof sat.Li != 'undefined' && sat.Li != '') {
-          $('#sat-life').html(sat.Li + ' yrs');
-        } else {
-          $('#sat-life').html('Unknown');
-        }
-        if (typeof sat.Pw != 'undefined' && sat.Pw != '') {
-          $('#sat-power').html(sat.Pw + ' w');
-        } else {
-          $('#sat-power').html('Unknown');
-        }
-        if (typeof sat.vmag != 'undefined' && sat.vmag != '') {
-          $('#sat-vmag').html(sat.vmag);
-        } else {
-          $('#sat-vmag').html('Unknown');
-        }
-        if (typeof sat.S1 != 'undefined' && sat.S1 != '') {
-          $('#sat-source1').html(`<a class="iframe" href="${sat.S1}">${sat.S1.split('//').splice(1)}</a>`);
-          $('#sat-source1w').show();
-        } else {
-          $('#sat-source1').html('Unknown');
-          $('#sat-source1w').hide();
-        }
-        if (typeof sat.S2 != 'undefined' && sat.S2 != '') {
-          $('#sat-source2').html(`<a class="iframe" href="${sat.S2}">${sat.S2.split('//').splice(1)}</a>`);
-          $('#sat-source2w').show();
-        } else {
-          $('#sat-source2').html('Unknown');
-          $('#sat-source2w').hide();
-        }
-        if (typeof sat.S3 != 'undefined' && sat.S3 != '') {
-          $('#sat-source3').html(`<a class="iframe" href="${sat.S3}">${sat.S3.split('//').splice(1)}</a>`);
-          $('#sat-source3w').show();
-        } else {
-          $('#sat-source3').html('Unknown');
-          $('#sat-source3w').hide();
-        }
-        if (typeof sat.S4 != 'undefined' && sat.S4 != '') {
-          $('#sat-source4').html(`<a class="iframe" href="${sat.S4}">${sat.S4.split('//').splice(1)}</a>`);
-          $('#sat-source4w').show();
-        } else {
-          $('#sat-source4').html('Unknown');
-          $('#sat-source4w').hide();
-        }
-        if (typeof sat.S5 != 'undefined' && sat.S5 != '') {
-          $('#sat-source5').html(`<a class="iframe" href="${sat.S5}">${sat.S5.split('//').splice(1)}</a>`);
-          $('#sat-source5w').show();
-        } else {
-          $('#sat-source5').html('Unknown');
-          $('#sat-source5w').hide();
-        }
-        if (typeof sat.S6 != 'undefined' && sat.S6 != '') {
-          $('#sat-source6').html(`<a class="iframe" href="${sat.S6}">${sat.S6.split('//').splice(1)}</a>`);
-          $('#sat-source6w').show();
-        } else {
-          $('#sat-source6').html('Unknown');
-          $('#sat-source6w').hide();
-        }
-        if (typeof sat.S7 != 'undefined' && sat.S7 != '') {
-          $('#sat-source7').html(`<a class="iframe" href="${sat.S7}">${sat.S7.split('//').splice(1)}</a>`);
-          $('#sat-source7w').show();
-        } else {
-          $('#sat-source7').html('Unknown');
-          $('#sat-source7w').hide();
-        }
-        if (typeof sat.URL != 'undefined' && sat.URL != '') {
-          $('#sat-source8').html(`<a class="iframe" href="${sat.URL}">${sat.URL.split('//').splice(1)}</a>`);
-          $('#sat-source8w').show();
-        } else {
-          $('#sat-source8').html('Unknown');
-          $('#sat-source8w').hide();
-        }
-        $('a.iframe').colorbox({
-          iframe: true,
-          width: '80%',
-          height: '80%',
-          fastIframe: false,
-          closeButton: false,
-        });
-      }
-    },
-  },
-  intelData: {
-    cbName: 'intelData',
-    cb: (sat: any, satId?: number): void => {
-      if (satId !== -1) {
-        if (typeof sat.TTP != 'undefined') {
-          $('#sat-ttp-wrapper').show();
-          $('#sat-ttp').html(sat.TTP);
-        } else {
-          $('#sat-ttp-wrapper').hide();
-        }
-        if (typeof sat.NOTES != 'undefined') {
-          $('#sat-notes-wrapper').show();
-          $('#sat-notes').html(sat.NOTES);
-        } else {
-          $('#sat-notes-wrapper').hide();
-        }
-        if (typeof sat.FMISSED != 'undefined') {
-          $('#sat-fmissed-wrapper').show();
-          $('#sat-fmissed').html(sat.FMISSED);
-        } else {
-          $('#sat-fmissed-wrapper').hide();
-        }
-        if (typeof sat.ORPO != 'undefined') {
-          $('#sat-oRPO-wrapper').show();
-          $('#sat-oRPO').html(sat.ORPO);
-        } else {
-          $('#sat-oRPO-wrapper').hide();
-        }
-        if (typeof sat.constellation != 'undefined') {
-          $('#sat-constellation-wrapper').show();
-          $('#sat-constellation').html(sat.constellation);
-        } else {
-          $('#sat-constellation-wrapper').hide();
-        }
-        if (typeof sat.maneuver != 'undefined') {
-          $('#sat-maneuver-wrapper').show();
-          $('#sat-maneuver').html(sat.maneuver);
-        } else {
-          $('#sat-maneuver-wrapper').hide();
-        }
-        if (typeof sat.associates != 'undefined') {
-          $('#sat-associates-wrapper').show();
-          $('#sat-associates').html(sat.associates);
-        } else {
-          $('#sat-associates-wrapper').hide();
-        }
-      }
-    },
-  },
-  objectData: {
-    cbName: 'objectData',
-    cb: (sat: any): void => {
-      $('#sat-info-title').html(sat.ON);
-
-      let objtype;
-      if (sat.OT === 0) {
-        objtype = 'TBA';
-      }
-      if (sat.OT === 1) {
-        objtype = 'Payload';
-      }
-      if (sat.OT === 2) {
-        objtype = 'Rocket Body';
-      }
-      if (sat.OT === 3) {
-        objtype = 'Debris';
-      }
-      if (sat.OT === 4) {
-        if (keepTrackApi.programs.settingsManager.offline) {
-          objtype = 'Special';
-        } else {
-          objtype = 'Amateur Sat';
-        }
-      }
-      if (sat.OT === 5) {
-        objtype = 'Measurement';
-      }
-      if (sat.OT === 6) {
-        objtype = 'Radar Track';
-      }
-      if (sat.OT === 7) {
-        objtype = 'Radar Object';
-      }
-      if (sat.missile) {
-        objtype = 'Ballistic Missile';
-      }
-      $('#sat-type').html(objtype);
-
-      if (sat.URL && sat.URL !== '') {
-        $('#sat-info-title').html("<a class='iframe' href='" + sat.URL + "'>" + sat.ON + '</a>');
-      }
-
-      $('#edit-satinfo-link').html("<a class='iframe' href='editor.htm?scc=" + sat.SCC_NUM + "&popup=true'>Edit Satellite Info</a>");
-
-      $('a.iframe').colorbox({
-        iframe: true,
-        width: '80%',
-        height: '80%',
-        fastIframe: false,
-        closeButton: false,
-      });
-
-      $('#sat-intl-des').html(sat.intlDes);
-      if (sat.OT === 'unknown') {
-        $('#sat-objnum').html(1 + sat.TLE2.substr(2, 7).toString());
-      } else {
-        $('#sat-objnum').html(sat.SCC_NUM);
-      }
-
-      // /////////////////////////////////////////////////////////////////////////
-      // RCS Correlation Table
-      // /////////////////////////////////////////////////////////////////////////
-      if (sat.R === null || typeof sat.R == 'undefined') {
-        $('#sat-rcs').html('Unknown');
-      } else {
-        $('#sat-rcs').html(sat.R);
-      }
-    },
-  },
+  if (!sat.missile) {
+    if (typeof sat.U != 'undefined' && sat.U != '') {
+      $('#sat-user').html(sat.U);
+    } else {
+      $('#sat-user').html('Unknown');
+    }
+    if (typeof sat.P != 'undefined' && sat.P != '') {
+      $('#sat-purpose').html(sat.P);
+    } else {
+      $('#sat-purpose').html('Unknown');
+    }
+    if (typeof sat.Con != 'undefined' && sat.Con != '') {
+      $('#sat-contractor').html(sat.Con);
+    } else {
+      $('#sat-contractor').html('Unknown');
+    }
+    if (typeof sat.LM != 'undefined' && sat.LM != '') {
+      $('#sat-lmass').html(sat.LM + ' kg');
+    } else {
+      $('#sat-lmass').html('Unknown');
+    }
+    if (typeof sat.DM != 'undefined' && sat.DM != '') {
+      $('#sat-dmass').html(sat.DM + ' kg');
+    } else {
+      $('#sat-dmass').html('Unknown');
+    }
+    if (typeof sat.Li != 'undefined' && sat.Li != '') {
+      $('#sat-life').html(sat.Li + ' yrs');
+    } else {
+      $('#sat-life').html('Unknown');
+    }
+    if (typeof sat.Pw != 'undefined' && sat.Pw != '') {
+      $('#sat-power').html(sat.Pw + ' w');
+    } else {
+      $('#sat-power').html('Unknown');
+    }
+    if (typeof sat.vmag != 'undefined' && sat.vmag.toString() != '') {
+      $('#sat-vmag').html(sat.vmag.toString());
+    } else {
+      $('#sat-vmag').html('Unknown');
+    }
+    if (typeof sat.S1 != 'undefined' && sat.S1 != '') {
+      $('#sat-source1').html(`<a class="iframe" href="${sat.S1}">${sat.S1.split('//').splice(1)}</a>`);
+      $('#sat-source1w').show();
+    } else {
+      $('#sat-source1').html('Unknown');
+      $('#sat-source1w').hide();
+    }
+    if (typeof sat.S2 != 'undefined' && sat.S2 != '') {
+      $('#sat-source2').html(`<a class="iframe" href="${sat.S2}">${sat.S2.split('//').splice(1)}</a>`);
+      $('#sat-source2w').show();
+    } else {
+      $('#sat-source2').html('Unknown');
+      $('#sat-source2w').hide();
+    }
+    if (typeof sat.S3 != 'undefined' && sat.S3 != '') {
+      $('#sat-source3').html(`<a class="iframe" href="${sat.S3}">${sat.S3.split('//').splice(1)}</a>`);
+      $('#sat-source3w').show();
+    } else {
+      $('#sat-source3').html('Unknown');
+      $('#sat-source3w').hide();
+    }
+    if (typeof sat.S4 != 'undefined' && sat.S4 != '') {
+      $('#sat-source4').html(`<a class="iframe" href="${sat.S4}">${sat.S4.split('//').splice(1)}</a>`);
+      $('#sat-source4w').show();
+    } else {
+      $('#sat-source4').html('Unknown');
+      $('#sat-source4w').hide();
+    }
+    if (typeof sat.S5 != 'undefined' && sat.S5 != '') {
+      $('#sat-source5').html(`<a class="iframe" href="${sat.S5}">${sat.S5.split('//').splice(1)}</a>`);
+      $('#sat-source5w').show();
+    } else {
+      $('#sat-source5').html('Unknown');
+      $('#sat-source5w').hide();
+    }
+    if (typeof sat.S6 != 'undefined' && sat.S6 != '') {
+      $('#sat-source6').html(`<a class="iframe" href="${sat.S6}">${sat.S6.split('//').splice(1)}</a>`);
+      $('#sat-source6w').show();
+    } else {
+      $('#sat-source6').html('Unknown');
+      $('#sat-source6w').hide();
+    }
+    if (typeof sat.S7 != 'undefined' && sat.S7 != '') {
+      $('#sat-source7').html(`<a class="iframe" href="${sat.S7}">${sat.S7.split('//').splice(1)}</a>`);
+      $('#sat-source7w').show();
+    } else {
+      $('#sat-source7').html('Unknown');
+      $('#sat-source7w').hide();
+    }
+    if (typeof sat.URL != 'undefined' && sat.URL != '') {
+      $('#sat-source8').html(`<a class="iframe" href="${sat.URL}">${sat.URL.split('//').splice(1)}</a>`);
+      $('#sat-source8w').show();
+    } else {
+      $('#sat-source8').html('Unknown');
+      $('#sat-source8w').hide();
+    }
+    $('a.iframe').colorbox({
+      iframe: true,
+      width: '80%',
+      height: '80%',
+      fastIframe: false,
+      closeButton: false,
+    });
+  }
 };
+export const intelData = (sat: SatObject, satId?: number): void => {
+  if (satId !== -1) {
+    if (typeof sat.TTP != 'undefined') {
+      $('#sat-ttp-wrapper').show();
+      $('#sat-ttp').html(sat.TTP);
+    } else {
+      $('#sat-ttp-wrapper').hide();
+    }
+    if (typeof sat.NOTES != 'undefined') {
+      $('#sat-notes-wrapper').show();
+      $('#sat-notes').html(sat.NOTES);
+    } else {
+      $('#sat-notes-wrapper').hide();
+    }
+    if (typeof sat.FMISSED != 'undefined') {
+      $('#sat-fmissed-wrapper').show();
+      $('#sat-fmissed').html(sat.FMISSED);
+    } else {
+      $('#sat-fmissed-wrapper').hide();
+    }
+    if (typeof sat.ORPO != 'undefined') {
+      $('#sat-oRPO-wrapper').show();
+      $('#sat-oRPO').html(sat.ORPO);
+    } else {
+      $('#sat-oRPO-wrapper').hide();
+    }
+    if (typeof sat.constellation != 'undefined') {
+      $('#sat-constellation-wrapper').show();
+      $('#sat-constellation').html(sat.constellation);
+    } else {
+      $('#sat-constellation-wrapper').hide();
+    }
+    if (typeof sat.maneuver != 'undefined') {
+      $('#sat-maneuver-wrapper').show();
+      $('#sat-maneuver').html(sat.maneuver);
+    } else {
+      $('#sat-maneuver-wrapper').hide();
+    }
+    if (typeof sat.associates != 'undefined') {
+      $('#sat-associates-wrapper').show();
+      $('#sat-associates').html(sat.associates);
+    } else {
+      $('#sat-associates-wrapper').hide();
+    }
+  }
+};
+export const objectData = (sat: SatObject): void => {
+  $('#sat-info-title').html(sat.ON);
 
+  let objtype;
+  if (sat.OT === 0) {
+    objtype = 'TBA';
+  }
+  if (sat.OT === 1) {
+    objtype = 'Payload';
+  }
+  if (sat.OT === 2) {
+    objtype = 'Rocket Body';
+  }
+  if (sat.OT === 3) {
+    objtype = 'Debris';
+  }
+  if (sat.OT === 4) {
+    if (settingsManager.offline) {
+      objtype = 'Special';
+    } else {
+      objtype = 'Amateur Sat';
+    }
+  }
+  if (sat.OT === 5) {
+    objtype = 'Measurement';
+  }
+  if (sat.OT === 6) {
+    objtype = 'Radar Track';
+  }
+  if (sat.OT === 7) {
+    objtype = 'Radar Object';
+  }
+  if (sat.missile) {
+    objtype = 'Ballistic Missile';
+  }
+  $('#sat-type').html(objtype);
+
+  if (sat.URL && sat.URL !== '') {
+    $('#sat-info-title').html("<a class='iframe' href='" + sat.URL + "'>" + sat.ON + '</a>');
+  }
+
+  $('#edit-satinfo-link').html("<a class='iframe' href='editor.htm?scc=" + sat.SCC_NUM + "&popup=true'>Edit Satellite Info</a>");
+
+  $('a.iframe').colorbox({
+    iframe: true,
+    width: '80%',
+    height: '80%',
+    fastIframe: false,
+    closeButton: false,
+  });
+
+  $('#sat-intl-des').html(sat.intlDes);
+  if (sat.OT > 4) {
+    $('#sat-objnum').html(1 + sat.TLE2.substr(2, 7).toString());
+  } else {
+    $('#sat-objnum').html(sat.SCC_NUM);
+  }
+
+  // /////////////////////////////////////////////////////////////////////////
+  // RCS Correlation Table
+  // /////////////////////////////////////////////////////////////////////////
+  if (sat.R === null || typeof sat.R == 'undefined') {
+    $('#sat-rcs').html('Unknown');
+  } else {
+    $('#sat-rcs').html(sat.R);
+  }
+};
 export const init = (): void => {
   // Register launch data
   keepTrackApi.register({
     method: 'selectSatData',
-    cbName: satInfoboxCore.launchData.cbName,
-    cb: satInfoboxCore.launchData.cb,
+    cbName: 'launchData',
+    cb: launchData,
   });
 
   // Register orbital element data
   keepTrackApi.register({
     method: 'selectSatData',
-    cbName: satInfoboxCore.orbitalData.cbName,
-    cb: satInfoboxCore.orbitalData.cb,
+    cbName: 'orbitalData',
+    cb: orbitalData,
   });
 
   // Register sensor data
   keepTrackApi.register({
     method: 'selectSatData',
-    cbName: satInfoboxCore.sensorInfo.cbName,
-    cb: satInfoboxCore.sensorInfo.cb,
+    cbName: 'sensorInfo',
+    cb: sensorInfo,
   });
 
   // Register mission data
   keepTrackApi.register({
     method: 'selectSatData',
-    cbName: satInfoboxCore.satMissionData.cbName,
-    cb: satInfoboxCore.satMissionData.cb,
+    cbName: 'satMissionData',
+    cb: satMissionData,
   });
 
   // Register intel data
   keepTrackApi.register({
     method: 'selectSatData',
-    cbName: satInfoboxCore.intelData.cbName,
-    cb: satInfoboxCore.intelData.cb,
+    cbName: 'intelData',
+    cb: intelData,
   });
 
   // Register object data
   keepTrackApi.register({
     method: 'selectSatData',
-    cbName: satInfoboxCore.objectData.cbName,
-    cb: satInfoboxCore.objectData.cb,
+    cbName: 'objectData',
+    cb: objectData,
   });
 };

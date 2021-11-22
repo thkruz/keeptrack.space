@@ -176,7 +176,7 @@ om.iod = async (svs, timeManager, satellite) => {
 
     return om.fitTles(epoch, svs, kps, timeManager, satellite);
   } catch (e) {
-    console.error(e);
+    console.debug(e);
   }
 };
 
@@ -243,7 +243,7 @@ om.fitTles = async (epoch, svs, kps, timeManager, satellite) => {
     kp.period = kps.avg.period;
     return om.kp2tle(kp, epoch);
   } catch (e) {
-    console.error(e);
+    console.debug(e);
   }
 };
 om.svs2analyst = async (svs, satSet, timeManager, satellite) => {
@@ -253,10 +253,10 @@ om.svs2analyst = async (svs, satSet, timeManager, satellite) => {
         satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(80000));
       })
       .catch((error) => {
-        console.error(error);
+        console.debug(error);
       });
   } catch (error) {
-    console.error(error);
+    console.debug(error);
   }
 };
 
@@ -272,7 +272,7 @@ om.testIod = (satSet) => {
       console.log(`Average Approach: ${om.debug.closestApproach}`);
     })
     .catch((error) => {
-      console.error(error);
+      console.debug(error);
     });
 };
 
@@ -297,7 +297,7 @@ export const _propagate = async (tle1, tle2, epoch, satellite) => {
     let eci = satellite.sgp4(satrec, m);
     return eci;
   } catch (error) {
-    console.error(error);
+    // console.debug(error);
   }
 };
 export const _jday = (year, mon, day, hr, minute, sec) => {

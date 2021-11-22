@@ -1,48 +1,56 @@
 import * as watchlist from '@app/js/plugins/watchlist/watchlist';
-
 import { defaultSat, defaultSensor, keepTrackApiStubs } from '@app/js/api/apiMocks';
-
 import { expect } from '@jest/globals';
 import { keepTrackApi } from '@app/js/api/externalApi';
+/* eslint-disable no-undefined */
+
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
-describe('watchlist.init', () => {
-  test('0', () => {
-    let callFunction: any = () => {
-      watchlist.init();
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-});
-
-// @ponicode
-describe('watchlist.updateWatchlist', () => {
-  test('0', () => {
-    let callFunction: any = () => {
-      watchlist.updateWatchlist();
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-});
+describe("watchlist.init", () => {
+    test("0", () => {
+        const callFunction: any = () => {
+            watchlist.init()
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+})
 
 // @ponicode
-describe('watchlist.uiManagerInit', () => {
-  test('0', () => {
-    let callFunction: any = () => {
-      watchlist.uiManagerInit();
-    };
+describe("watchlist.updateWatchlist", () => {
+    test("0", () => {
+        const callFunction: any = () => {
+            watchlist.updateWatchlist()
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
 
-    expect(callFunction).not.toThrow();
-  });
-});
+    test("1", () => {
+        const callFunction: any = () => {
+            watchlist.updateWatchlist(["ponicodeIsAwesome", -0.353, "**Hamburger**", 4653], [-1, 0.5, 1, 2, 3, 4, 5])
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+})
+
+// @ponicode
+describe("watchlist.uiManagerInit", () => {
+    test("0", () => {
+        const callFunction: any = () => {
+            watchlist.uiManagerInit()
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+})
 
 describe('watchlist.updateLoop', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.updateLoop();
       watchlist.updateWatchlist([25544]);
       watchlist.updateLoop();
@@ -52,7 +60,7 @@ describe('watchlist.updateLoop', () => {
   });
 
   test('1', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       keepTrackApi.programs.sensorManager.currentSensorMultiSensor = true;
       keepTrackApi.programs.sensorManager.currentSensorList = [defaultSensor, defaultSensor];
       watchlist.updateLoop();
@@ -68,7 +76,7 @@ describe('watchlist.bottomMenuClick', () => {
   keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
   watchlist.init();
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.bottomMenuClick('menu-watchlist');
       watchlist.bottomMenuClick('menu-watchlist');
     };
@@ -77,7 +85,7 @@ describe('watchlist.bottomMenuClick', () => {
   });
 
   test('1', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.updateWatchlist([25544]);
       watchlist.bottomMenuClick('menu-watchlist');
       watchlist.bottomMenuClick('menu-watchlist');
@@ -87,7 +95,7 @@ describe('watchlist.bottomMenuClick', () => {
   });
 
   test('2', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = '<div id="info-overlay-content"></div>';
       watchlist.bottomMenuClick('menu-info-overlay');
       watchlist.bottomMenuClick('menu-info-overlay');
@@ -97,7 +105,7 @@ describe('watchlist.bottomMenuClick', () => {
   });
 
   test('3', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       document.body.innerHTML = '<div id="info-overlay-content"></div>';
       watchlist.updateWatchlist([25544]);
       watchlist.bottomMenuClick('menu-info-overlay');
@@ -108,7 +116,7 @@ describe('watchlist.bottomMenuClick', () => {
   });
 
   test('4', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.bottomMenuClick('');
     };
 
@@ -116,7 +124,7 @@ describe('watchlist.bottomMenuClick', () => {
   });
 
   test('5', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       keepTrackApi.programs.sensorManager.checkSensorSelected = () => false;
       watchlist.bottomMenuClick('menu-info-overlay');
       watchlist.bottomMenuClick('menu-info-overlay');
@@ -128,7 +136,7 @@ describe('watchlist.bottomMenuClick', () => {
 
 describe('watchlist.onCruncherReady', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.onCruncherReady();
     };
 
@@ -137,21 +145,20 @@ describe('watchlist.onCruncherReady', () => {
 });
 
 // @ponicode
-describe('watchlist.hideSideMenus', () => {
-  test('0', () => {
-    let callFunction: any = () => {
-      watchlist.hideSideMenus();
-    };
+describe("watchlist.hideSideMenus", () => {
+    test("0", () => {
+        const callFunction: any = () => {
+            watchlist.hideSideMenus()
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+})
 
-    expect(callFunction).not.toThrow();
-  });
-});
-
-// @ponicode
 describe('watchlist.pushOverlayElement', () => {
   const nextPassArray = [defaultSat, defaultSat];
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.pushOverlayElement(keepTrackApi.programs.satSet, nextPassArray, 0, 'Lights', [false, '^5.0.0', 'bc23a9d531064583ace8f67dad60f6bb', '^5.0.0', 987650]);
     };
 
@@ -159,7 +166,7 @@ describe('watchlist.pushOverlayElement', () => {
   });
 
   test('1', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.pushOverlayElement(keepTrackApi.programs.satSet, nextPassArray, 3, 'Port', [true, '1.0.0', 56784, '^5.0.0', 56784]);
     };
 
@@ -167,7 +174,7 @@ describe('watchlist.pushOverlayElement', () => {
   });
 
   test('2', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.pushOverlayElement(keepTrackApi.programs.satSet, nextPassArray, 0, false, [true]);
     };
 
@@ -175,7 +182,7 @@ describe('watchlist.pushOverlayElement', () => {
   });
 
   test('3', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.pushOverlayElement(NaN, nextPassArray, NaN, '', []);
     };
 
@@ -185,7 +192,7 @@ describe('watchlist.pushOverlayElement', () => {
 
 describe('watchlist.infoOverlayContentClick', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.infoOverlayContentClick({
         currentTarget: {
           textContent: '25544:25544'
@@ -199,7 +206,7 @@ describe('watchlist.infoOverlayContentClick', () => {
 
 describe('watchlist.watchlistListClick', () => {
   test('0', () => {
-    let callFunction: any = () => {      
+    const callFunction: any = () => {      
       watchlist.watchlistListClick(25544);
     };
 
@@ -209,7 +216,7 @@ describe('watchlist.watchlistListClick', () => {
 
 describe('watchlist.watchlistContentEvent', () => {
   test('0', () => {
-    let callFunction: any = () => {      
+    const callFunction: any = () => {      
       watchlist.watchlistContentEvent(new Event('submit'), 25544);
     };
 
@@ -217,7 +224,7 @@ describe('watchlist.watchlistContentEvent', () => {
   });
 
   test('1', () => {
-    let callFunction: any = () => {      
+    const callFunction: any = () => {      
       watchlist.watchlistContentEvent(null, 25544);
     };
 
@@ -228,7 +235,7 @@ describe('watchlist.watchlistContentEvent', () => {
 describe('watchlist.watchlistSaveClick', () => {
   // NOTE: saveAs doesn't work in test mode, but it should throw an error properly
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.watchlistSaveClick(new Event('click'));
     };
 
@@ -238,7 +245,7 @@ describe('watchlist.watchlistSaveClick', () => {
 
 describe('watchlist.watchlistFileChange', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.watchlistFileChange(null);
     };
 
@@ -248,7 +255,7 @@ describe('watchlist.watchlistFileChange', () => {
 
 describe('watchlist.watchListReaderOnLoad', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.watchListReaderOnLoad(null);
     };
 
@@ -256,7 +263,7 @@ describe('watchlist.watchListReaderOnLoad', () => {
   });
 
   test('1', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       const evt = {
         target: {
           readyState: 4,
@@ -269,7 +276,7 @@ describe('watchlist.watchListReaderOnLoad', () => {
   });
 
   test('2', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       const evt = {
         target: {
           readyState: 2,
@@ -283,7 +290,7 @@ describe('watchlist.watchListReaderOnLoad', () => {
   });
 
   test('3', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       const evt = {
         target: {
           readyState: 2,
@@ -297,7 +304,7 @@ describe('watchlist.watchListReaderOnLoad', () => {
   });
 
   test('3', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       const evt = {
         target: {
           readyState: 2,
@@ -311,7 +318,7 @@ describe('watchlist.watchListReaderOnLoad', () => {
   });
 
   test('4', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       const evt = {
         target: {
           readyState: 2,
@@ -327,10 +334,156 @@ describe('watchlist.watchListReaderOnLoad', () => {
 
 describe('watchlist.menuSelectableClick', () => {
   test('0', () => {
-    let callFunction: any = () => {
+    const callFunction: any = () => {
       watchlist.menuSelectableClick();
     };
 
     expect(callFunction).not.toThrow();
   });
 });
+
+// @ponicode
+describe("watchlist.updateLoop", () => {
+    test("0", () => {
+        const callFunction: any = () => {
+            watchlist.updateLoop()
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+})
+
+// @ponicode
+describe("watchlist.bottomMenuClick", () => {
+    test("0", () => {
+        const callFunction: any = () => {
+            watchlist.bottomMenuClick("Credit Card Account")
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+
+    test("1", () => {
+        const callFunction: any = () => {
+            watchlist.bottomMenuClick("menu-info-overlay")
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+
+    test("2", () => {
+        const callFunction: any = () => {
+            watchlist.bottomMenuClick("menu-watchlist")
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+
+    test("3", () => {
+        const callFunction: any = () => {
+            watchlist.bottomMenuClick("Home Loan Account")
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+
+    test("4", () => {
+        const callFunction: any = () => {
+            watchlist.bottomMenuClick("Checking Account")
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+
+    test("5", () => {
+        const callFunction: any = () => {
+            watchlist.bottomMenuClick("")
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+})
+
+// @ponicode
+describe("watchlist.onCruncherReady", () => {
+    test("0", () => {
+        const callFunction: any = () => {
+            watchlist.onCruncherReady()
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+})
+
+// @ponicode
+describe("watchlist.watchlistListClick", () => {
+    test("0", () => {
+        const callFunction: any = () => {
+            watchlist.watchlistListClick(1)
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+
+    test("1", () => {
+        const callFunction: any = () => {
+            watchlist.watchlistListClick(12)
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+
+    test("2", () => {
+        const callFunction: any = () => {
+            watchlist.watchlistListClick(56784)
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+
+    test("3", () => {
+        const callFunction: any = () => {
+            watchlist.watchlistListClick(12345)
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+
+    test("4", () => {
+        const callFunction: any = () => {
+            watchlist.watchlistListClick(987650)
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+
+    test("5", () => {
+        const callFunction: any = () => {
+            watchlist.watchlistListClick(-Infinity)
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+})
+
+// @ponicode
+describe("watchlist.watchlistContentEvent", () => {
+    test("0", () => {
+        const callFunction: any = () => {
+            watchlist.watchlistContentEvent(undefined, -Infinity)
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+})
+
+// @ponicode
+describe("watchlist.menuSelectableClick", () => {
+    test("0", () => {
+        const callFunction: any = () => {
+            watchlist.menuSelectableClick()
+        }
+    
+        expect(callFunction).not.toThrow()
+    })
+})

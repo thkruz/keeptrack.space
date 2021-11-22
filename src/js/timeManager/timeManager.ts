@@ -1,42 +1,8 @@
-import $ from 'jquery';
+import { keepTrackApi } from '@app/js/api/externalApi';
 import { MILLISECONDS_PER_DAY } from '@app/js/lib/constants.js';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { keepTrackApi } from '@app/js/api/externalApi';
-
-interface timeManagerObject {
-  init: any;
-  dateObject: Date;
-  propTimeVar: any;
-  datetimeInputDOM: JQuery<HTMLElement>;
-  timeTextStr: string;
-  timeTextStrEmpty: string;
-  now: number;
-  propRealTime: number;
-  propOffset: number;
-  propRate: number;
-  dt: number;
-  drawDt: number;
-  updatePropTime: (propTimeVar?: any) => void;
-  propTime: () => any;
-  propTimeCheck: (propTempOffset: any, propRealTime: any) => Date;
-  setNow: (now: any, dt: any) => void;
-  setLastTime(propTimeVar: any): any;
-  setSelectedDate(propTimeVar: any): any;
-  lastTime: any;
-  selectedDate: any;
-  setDrawDt: (drawDt: any) => void;
-  setPropRateZero: () => void;
-  tDS: any;
-  iText: number;
-  propRate0: any;
-  dateDOM: any;
-  getPropOffset: () => number;
-  dateToISOLikeButLocal: (date: any) => string;
-  localToZulu: (date: any) => any;
-  getDayOfYear: (date: any) => any;
-  dateFromDay: (year: any, day: any) => Date;
-  jday: (year: any, mon: any, day: any, hr: any, minute: any, sec: any) => any;
-}
+import $ from 'jquery';
+import { timeManagerObject } from './timeManagerObject';
 
 export const getDayOfYear = (date: Date) => {
   date = date || new Date();
@@ -52,7 +18,7 @@ export const getDayOfYear = (date: Date) => {
   let dayOfYear = dayCount[mn] + dn;
   if (mn > 1 && _isLeapYear(date)) dayOfYear++;
   return dayOfYear;
-}
+};
 
 export const timeManager: timeManagerObject = {
   dateObject: null,
@@ -129,7 +95,7 @@ export const timeManager: timeManagerObject = {
       return timeManager.propTimeVar;
     };
 
-    timeManager.propTimeCheck = function (propTempOffset, propRealTime) {
+    timeManager.propTimeCheck = function (propTempOffset: number, propRealTime) {
       const now = new Date(); // Make a time variable
       now.setTime(Number(propRealTime) + propTempOffset); // Set the time variable to the time in the future
       return now;
@@ -166,7 +132,7 @@ export const timeManager: timeManagerObject = {
 
     timeManager.setSelectedDate = (selectedDate) => {
       timeManager.selectedDate = selectedDate;
-      
+
       // This function only applies when datetime plugin is enabled
       if (settingsManager.plugins.datetime) {
         if (timeManager.lastTime - timeManager.propTimeVar < 300) {
@@ -187,32 +153,32 @@ export const timeManager: timeManagerObject = {
         timeManager.dateDOM.textContent = timeManager.timeTextStr;
 
         // Load the current JDAY
-        let jday = timeManager.getDayOfYear(timeManager.propTime());
+        const jday = timeManager.getDayOfYear(timeManager.propTime());
         $('#jday').html(jday);
       }
     };
 
-    timeManager.getPropOffset = function () {
+    timeManager.getPropOffset = (): number => {
       // timeManager.selectedDate = $('#datetime-text').text().substr(0, 19);
       if (!timeManager.selectedDate) {
-        // console.error(timeManager);
-        return;
+        // console.debug(timeManager);
+        return 0;
       }
       // selectedDate = selectedDate.split(' ');
       // selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
-      var today = new Date();
+      const today = new Date();
       // Not using local scope caused time to drift backwards!
-      let propOffset = timeManager.selectedDate - today.getTime();
+      const propOffset = timeManager.selectedDate - today.getTime();
       return propOffset;
     };
 
     timeManager.dateToISOLikeButLocal = function (date) {
-      var offsetMs = date.getTimezoneOffset() * 60 * 1000;
-      var msLocal = date.getTime() - offsetMs;
-      var dateLocal = new Date(msLocal);
-      var iso = dateLocal.toISOString();
+      const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+      const msLocal = date.getTime() - offsetMs;
+      const dateLocal = new Date(msLocal);
+      let iso = dateLocal.toISOString();
       iso = iso.replace('T', ' ');
-      var isoLocal = iso.slice(0, 19) + ' ' + dateLocal.toString().slice(25, 31);
+      const isoLocal = iso.slice(0, 19) + ' ' + dateLocal.toString().slice(25, 31);
       return isoLocal;
     };
 
@@ -227,15 +193,15 @@ export const timeManager: timeManagerObject = {
     timeManager.getDayOfYear = getDayOfYear;
 
     timeManager.dateFromDay = function (year, day) {
-      var date = new Date(year, 0); // initialize a date in `year-01-01`
+      const date = new Date(year, 0); // initialize a date in `year-01-01`
       return new Date(date.setDate(day)); // add the number of days
     };
 
     timeManager.jday = function (year, mon, day, hr, minute, sec) {
       // from satellite.js
       if (!year) {
-        // console.error('timeManager.jday should always have a date passed to it!');
-        let now = new Date();
+        // console.debug('timeManager.jday should always have a date passed to it!');
+        const now = new Date();
         jDayStart = new Date(now.getFullYear(), 0, 0);
         jDayDiff = now.getDate() - jDayStart.getDate();
         return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);

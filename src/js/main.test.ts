@@ -1,74 +1,62 @@
-import * as main from './main.js';
+import { keepTrackApiStubs } from './api/apiMocks';
+import { keepTrackApi } from './api/externalApi';
+import * as main from './main';
 
-import { expect } from '@jest/globals';
-import { useMockWorkers } from '@app/js/api/apiMocks';
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+
+// @ponicode
+describe('main.importCss', () => {
+  test('0', async () => {
+    await main.importCss();
+  });
+});
 
 // @ponicode
 describe('main.redirectHttpToHttps', () => {
   test('0', () => {
-    let callFunction = () => {
-      main.redirectHttpToHttps();
-    };
-
-    expect(callFunction).not.toThrow();
+    let result: any = main.redirectHttpToHttps();
+    expect(result).toMatchSnapshot();
   });
 });
 
 // @ponicode
 describe('main.showErrorCode', () => {
   test('0', () => {
-    let callFunction = () => {
-      main.showErrorCode({ message: 'No os dependencies found. ', lineNumber: -10, stack: 1 });
-    };
-
-    expect(callFunction).not.toThrow();
+    let result: any = main.showErrorCode({ name: 'Jean-Philippe', message: '<br>', stack: '<br>', lineNumber: 4 });
+    expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let callFunction = () => {
-      main.showErrorCode({ message: 'Invalid Invitation Token.', lineNumber: -10, stack: 'Foo bar' });
-    };
-
-    expect(callFunction).not.toThrow();
+    let result: any = main.showErrorCode({ name: 'Anas', message: '<br>', stack: '<br>', lineNumber: 3 });
+    expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    let callFunction = () => {
-      main.showErrorCode({ message: 1, lineNumber: '(960) 322-6791 x982', stack: 10 });
-    };
-
-    expect(callFunction).not.toThrow();
+    let result: any = main.showErrorCode({ name: 'George', message: '<br>', stack: '<br>', lineNumber: 1 });
+    expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    let callFunction = () => {
-      main.showErrorCode({ message: 'Invalid [%s] value. %s', lineNumber: 'bar', stack: 'This is a Text' });
-    };
-
-    expect(callFunction).not.toThrow();
+    let result: any = main.showErrorCode({ name: 'Pierre Edouard', message: '<br>', stack: '<br>', lineNumber: 2 });
+    expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let callFunction = () => {
-      main.showErrorCode({ message: 'bar', lineNumber: '(843) 825-0940 x26936', stack: -10 });
-    };
-
-    expect(callFunction).not.toThrow();
+    let result: any = main.showErrorCode({ name: 'Michael', message: '<br>', stack: '<br>', lineNumber: 1 });
+    expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
-    let callFunction = () => {
-      main.showErrorCode(undefined);
-    };
-
-    expect(callFunction).not.toThrow();
+    let result: any = main.showErrorCode({ name: '', message: '', stack: '', lineNumber: 0 });
+    expect(result).toMatchSnapshot();
   });
 });
 
 // @ponicode
 describe('main.initalizeKeepTrack', () => {
   test('0', async () => {
-    useMockWorkers();
+    jest.setTimeout(60 * 1000);
+    keepTrackApi.methods.loadCatalog = jest.fn();
     await main.initalizeKeepTrack();
   });
 });

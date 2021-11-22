@@ -1,11 +1,14 @@
-/* eslint-disable */
-
 {
   "env": {
+    "jest/globals": true,
     "browser": true,
     "es2021": true
   },
   "globals": {
+    "M": "readonly",
+    "$": "readonly",
+    "global": "writable",
+    "__dirname": "readonly",
     "settingsManager": "writable"
   },
   "ignorePatterns": ["**/**/*.min.js", "**/**/tle.js"],
@@ -14,11 +17,8 @@
     "sourceType": "module",
     "ecmaVersion": 2021
   },
-  "plugins": [
-    "classPrivateMethods"
-  ],
+  "plugins": ["jest"],
   "rules": {
-    "@typescript-eslint/no-explicit-any": "off",
     "accessor-pairs": "error",
     "array-bracket-newline": "error",
     "array-bracket-spacing": ["error", "never"],
@@ -193,7 +193,7 @@
     "no-tabs": "error",
     "no-template-curly-in-string": "error",
     "no-ternary": "off",
-    "no-throw-literal": "off", //"error",
+    "no-throw-literal": "off",
     "no-trailing-spaces": "off",
     "no-undef-init": "error",
     "no-undefined": "error",
@@ -260,7 +260,7 @@
       }
     ],
     "semi-style": ["error", "last"],
-    "sort-imports": "error",
+    "sort-imports": "off",
     "sort-keys": "off",
     "sort-vars": "off",
     "space-before-blocks": "error",
@@ -290,7 +290,6 @@
   "overrides": [
     {
       "files": ["**/*.ts", "**/*.tsx"],
-      "extends": ["eslint:recommended", "plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended"],
       "parser": "@typescript-eslint/parser"
     }
   ]

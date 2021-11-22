@@ -1,9 +1,3 @@
-/* eslint-disable no-undefined */
-/*globals
-  global
-  test
-*/
-
 import { mobileManager } from '@app/js/uiManager/mobileManager.js';
 
 test(`mobileManager Unit Tests`, () => {

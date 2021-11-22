@@ -51,7 +51,7 @@ mobileManager.init = async () => {
         settingsManager.maxLabels = settingsManager.desktopMaxLabels;
       }
     } catch (e) {
-      console.error(e);
+      console.debug(e);
     }
   };
 

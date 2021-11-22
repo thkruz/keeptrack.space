@@ -1,10 +1,3 @@
-/* eslint-disable no-undefined */
-/*globals
-  jest
-  test
-  expect
-*/
-
 import { hex2RgbA, parseRgba, rgbCss, saveCsv, saveVariable, stringPad } from '@app/js/lib/helpers';
 
 test('helpers Unit Tests', () => {
@@ -29,5 +22,4 @@ test('helpers Unit Tests', () => {
   hex2RgbA('#FFF');
   hex2RgbA('#FFFFFF');
   hex2RgbA('FFF');
-  expect(console.warn).toHaveBeenCalled();
 });

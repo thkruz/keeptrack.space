@@ -14,7 +14,7 @@
     <script src="../js/lib/materialize.js"></script>
     <script src="../js/lib/file-saver.min.js"></script>
     <script src="../js/lib/satellite.js"></script>
-    <script src="../js/lib/lookangles.js"></script>
+    <script src="../js/satMath/satMath"></script>
     <script src="../js/timeManager/timeManager.js"></script>
 
     <link rel="stylesheet" href="../css/fonts.css" type="text/css" \ />
@@ -96,7 +96,7 @@
             gmst = satellite.gstime(j);
 
             // Update Radar Marker Position
-            radarDataECF = satellite.lookAnglesToEcf(
+            radarDataECF = satellite.lookAngles2Ecf(
                 radarData[i].a,
                 radarData[i].e,
                 radarData[i].r,

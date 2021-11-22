@@ -52,6 +52,9 @@ if (MAKE_MODE !== 'embed') {
         {
           test: /\.tsx?$/,
           loader: 'ts-loader',
+          options: {
+            transpileOnly: false,
+          },
         },
         {
           test: /\.worker\.js$/i,
@@ -170,7 +173,7 @@ if (MAKE_MODE !== 'embed') {
   const jsConfig = Object.assign({}, config, {
     name: 'MainFiles',
     entry: {
-      main: ['./src/js/main.js'],
+      main: ['./src/js/main.ts'],
     },
     output: {
       filename: '[name].[contenthash].js',

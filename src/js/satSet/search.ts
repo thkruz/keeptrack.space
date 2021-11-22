@@ -1,6 +1,6 @@
 export const searchYear = (satData: any, year: any) => {
-  var res = [];
-  for (var i = 0; i < satData.length; i++) {
+  const res = [];
+  for (let i = 0; i < satData.length; i++) {
     if (typeof satData[i].TLE1 == 'undefined')
       continue;
     if (satData[i].TLE1.substring(9, 11) == year) {
@@ -10,8 +10,8 @@ export const searchYear = (satData: any, year: any) => {
   return res;
 };
 export const searchYearOrLess = (satData: any, year: number) => {
-  var res = [];
-  for (var i = 0; i < satData.length; i++) {
+  const res = [];
+  for (let i = 0; i < satData.length; i++) {
     if (typeof satData[i].TLE1 == 'undefined')
       continue;
     if (year >= 59 && year < 100) {
@@ -26,18 +26,20 @@ export const searchYearOrLess = (satData: any, year: number) => {
   }
   return res;
 };
+// eslint-disable-next-line no-unused-vars
 export const searchNameRegex = (satData: any, regex: { test: (arg0: any) => any; }) => {
-  var res = [];
-  for (var i = 0; i < satData.length; i++) {
+  const res = [];
+  for (let i = 0; i < satData.length; i++) {
     if (regex.test(satData[i].ON)) {
       res.push(i);
     }
   }
   return res;
 };
+// eslint-disable-next-line no-unused-vars
 export const searchCountryRegex = (satData: any, regex: { test: (arg0: any) => any; }) => {
-  var res = [];
-  for (var i = 0; i < satData.length; i++) {
+  const res = [];
+  for (let i = 0; i < satData.length; i++) {
     if (regex.test(satData[i].C)) {
       res.push(i);
     }

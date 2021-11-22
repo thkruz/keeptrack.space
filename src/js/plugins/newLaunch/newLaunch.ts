@@ -1,6 +1,6 @@
-import $ from 'jquery';
-import { RAD2DEG } from '@app/js/lib/constants';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import { RAD2DEG } from '@app/js/lib/constants';
+import $ from 'jquery';
 
 let isNewLaunchMenuOpen = false;
 
@@ -9,12 +9,12 @@ export const newLaunchSubmit = () => {
   const satId = keepTrackApi.programs.satSet.getIdFromObjNum(scc);
   let sat = keepTrackApi.programs.satSet.getSat(satId);
 
-  let upOrDown = $('#nl-updown').val();
-  let launchFac = $('#nl-facility').val();
+  const upOrDown = $('#nl-updown').val();
+  const launchFac = $('#nl-facility').val();
   let launchLat, launchLon;
 
   if (keepTrackApi.programs.objectManager.isLaunchSiteManagerLoaded) {
-    for (var launchSite in keepTrackApi.programs.objectManager.launchSiteManager.launchSiteList) {
+    for (const launchSite in keepTrackApi.programs.objectManager.launchSiteManager.launchSiteList) {
       if (keepTrackApi.programs.objectManager.launchSiteManager.launchSiteList[launchSite].name === launchFac) {
         launchLat = keepTrackApi.programs.objectManager.launchSiteManager.launchSiteList[launchSite].lat;
         launchLon = keepTrackApi.programs.objectManager.launchSiteManager.launchSiteList[launchSite].lon;
@@ -32,9 +32,8 @@ export const newLaunchSubmit = () => {
   //   return;
   // }
   // Set time to 0000z for relative time.
-  var today = new Date(); // Need to know today for offset calculation
-  var quadZTime = new Date(today.getFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0); // New Date object of the future collision
-
+  const today = new Date(); // Need to know today for offset calculation
+  const quadZTime = new Date(today.getFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0); // New Date object of the future collision
 
   // Date object defaults to local time.
   quadZTime.setUTCHours(0); // Move to UTC Hour
@@ -47,10 +46,10 @@ export const newLaunchSubmit = () => {
     dat: keepTrackApi.programs.timeManager.propOffset.toString() + ' ' + (1.0).toString(),
   });
 
-  var TLEs = keepTrackApi.programs.satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, keepTrackApi.programs.timeManager.propOffset);
+  const TLEs = keepTrackApi.programs.satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, keepTrackApi.programs.timeManager.propOffset);
 
-  var TLE1 = TLEs[0];
-  var TLE2 = TLEs[1];
+  const TLE1 = TLEs[0];
+  const TLE2 = TLEs[1];
 
   if (keepTrackApi.programs.satellite.altitudeCheck(TLE1, TLE2, keepTrackApi.programs.timeManager.propOffset) > 1) {
     keepTrackApi.programs.satSet.satCruncher.postMessage({
@@ -185,14 +184,13 @@ export const bottomMenuClick = (iconName: string): void => {
       return;
     } else {
       if (keepTrackApi.programs.objectManager.selectedSat !== -1) {
-        if (keepTrackApi.programs.settingsManager.isMobileModeEnabled)
-          keepTrackApi.programs.uiManager.searchToggle(false);
+        if (keepTrackApi.programs.settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
         keepTrackApi.programs.uiManager.hideSideMenus();
         $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
         $('#menu-newLaunch').addClass('bmenu-item-selected');
         isNewLaunchMenuOpen = true;
 
-        let sat = keepTrackApi.programs.satSet.getSatExtraOnly(keepTrackApi.programs.objectManager.selectedSat);
+        const sat = keepTrackApi.programs.satSet.getSatExtraOnly(keepTrackApi.programs.objectManager.selectedSat);
         $('#nl-scc').val(sat.SCC_NUM);
         $('#nl-inc').val((sat.inclination * RAD2DEG).toPrecision(2));
       } else {
@@ -209,7 +207,6 @@ export const bottomMenuClick = (iconName: string): void => {
   }
 };
 export const init = (): void => {
-
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
@@ -230,7 +227,7 @@ export const init = (): void => {
     cbName: 'newLaunch',
     cb: bottomMenuClick,
   });
-  
+
   keepTrackApi.register({
     method: 'hideSideMenus',
     cbName: 'newLaunch',

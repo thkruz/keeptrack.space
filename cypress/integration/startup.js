@@ -1,5 +1,3 @@
-/// <reference types="cypress" />
-
 context('KeepTrack Startup', () => {
   beforeEach(() => {
     cy.viewport(1920, 1080);

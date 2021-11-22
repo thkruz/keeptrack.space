@@ -24,27 +24,24 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import $ from 'jquery';
 
-export const init = (): void => {
-  const { uiManager, sensorManager, timeManager, ColorScheme, satSet, objectManager, satellite, settingsManager } = keepTrackApi.programs;
-  keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = false;
-  keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = false;
-  keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = false;
-  let isSensorListMenuOpen = false;
-  let isSensorInfoMenuOpen = false;
-  let isLookanglesMultiSiteMenuOpen = false;
+let sensorLinks = false;
+let isSensorListMenuOpen = false;
+let isSensorInfoMenuOpen = false;
+let isLookanglesMultiSiteMenuOpen = false;
 
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'sensor',
-    cb: () => {
-      const mainCamera = keepTrackApi.programs.mainCamera;
+export const uiManagerInit = () => {
+  const { uiManager, sensorManager, timeManager, ColorScheme, satSet, satellite, settingsManager } = keepTrackApi.programs;
+  const mainCamera = keepTrackApi.programs.mainCamera;
 
-      // Side Menu
-      $('#left-menus').append(keepTrackApi.html`
+  (<any>$('#nav-mobile')).append(keepTrackApi.html`
+    <div id="sensor-selected"></div>
+  `);
+
+  // Side Menu
+  $('#left-menus').append(keepTrackApi.html`
         <div id="sensor-list-menu" class="side-menu-parent start-hidden text-select">
           <div id="sensor-list-content" class="side-menu">                  
             <div class="row">
@@ -336,8 +333,8 @@ export const init = (): void => {
         </div>
       `);
 
-      // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
+  // Bottom Icon
+  $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-sensor-list" class="bmenu-item">
           <img
             alt="radar"
@@ -380,385 +377,401 @@ export const init = (): void => {
         </div>
       `);
 
-      $('#lookanglesLength').on('change', function () {
-        satellite.lookanglesLength = parseInt(<string>$('#lookanglesLength').val());
-      });
+  $('#lookanglesLength').on('change', function () {
+    satellite.lookanglesLength = parseInt(<string>$('#lookanglesLength').val());
+  });
 
-      $('#lookanglesInterval').on('change', function () {
-        satellite.lookanglesInterval = parseInt(<string>$('#lookanglesInterval').val());
-      });
+  $('#lookanglesInterval').on('change', function () {
+    satellite.lookanglesInterval = parseInt(<string>$('#lookanglesInterval').val());
+  });
 
-      $('#sensor-list-content > div > ul > .menu-selectable').on('click', (e) => {
-        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.sensor();
+  $('#sensor-list-content > div > ul > .menu-selectable').on('click', (e) => {
+    if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.sensor();
 
-        const sensorClick = e.currentTarget.dataset.sensor;
-        if (typeof sensorClick == 'undefined') {
-          console.warn('The menu item was clicked but the menu was not defined.');
-          return;
+    const sensorClick = e.currentTarget.dataset.sensor;
+    if (typeof sensorClick == 'undefined') {
+      console.warn('The menu item was clicked but the menu was not defined.');
+      return;
+    }
+
+    switch (sensorClick) {
+      case 'cspocAll':
+        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.cspocSensors();
+        sensorManager.setSensor('SSN');
+        break;
+      case 'mwAll':
+        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.mwSensors();
+        sensorManager.setSensor('NATO-MW');
+        break;
+      case 'mdAll':
+        sensorManager.setSensor('MD-ALL');
+        break;
+      case 'llAll':
+        sensorManager.setSensor('LEO-LABS');
+        break;
+      case 'rusAll':
+        sensorManager.setSensor('RUS-ALL');
+        break;
+      default:
+        sensorManager.setSensor(sensorManager.sensorList[`${sensorClick}`]);
+        break;
+    }
+
+    uiManager.getsensorinfo();
+
+    try {
+      uiManager.lookAtLatLon();
+    } catch {
+      // TODO: More intentional conditional statement
+      // Multi-sensors break this
+    }
+    if (settingsManager.currentColorScheme == ColorScheme.default) {
+      uiManager.legendMenuChange('default');
+    }
+  });
+
+  const _resetSensorSelected = () => {
+    const satCruncher = keepTrackApi.programs.satCruncher;
+    // Return to default settings with nothing 'inview'
+    satellite.setobs(null);
+    sensorManager.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
+    uiManager.getsensorinfo();
+    if (settingsManager.currentColorScheme == ColorScheme.default) {
+      uiManager.legendMenuChange('default');
+    }
+    satCruncher.postMessage({
+      typ: 'offset',
+      dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
+      setlatlong: true,
+      resetObserverGd: true,
+      sensor: sensorManager.defaultSensor,
+    });
+    satCruncher.postMessage({
+      isShowFOVBubble: 'reset',
+      isShowSurvFence: 'disable',
+    });
+    settingsManager.isFOVBubbleModeOn = false;
+    settingsManager.isShowSurvFence = false;
+    $('#menu-sensor-info').removeClass('bmenu-item-selected');
+    $('#menu-fov-bubble').removeClass('bmenu-item-selected');
+    $('#menu-surveillance').removeClass('bmenu-item-selected');
+    $('#menu-lookangles').removeClass('bmenu-item-selected');
+    $('#menu-planetarium').removeClass('bmenu-item-selected');
+    $('#menu-astronomy').removeClass('bmenu-item-selected');
+    $('#menu-sensor-info').addClass('bmenu-item-disabled');
+    $('#menu-fov-bubble').addClass('bmenu-item-disabled');
+    $('#menu-surveillance').addClass('bmenu-item-disabled');
+    $('#menu-lookangles').addClass('bmenu-item-disabled');
+    $('#menu-planetarium').addClass('bmenu-item-disabled');
+    $('#menu-astronomy').addClass('bmenu-item-disabled');
+
+    setTimeout(function () {
+      satSet.resetSatInView();
+      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+    }, 2000);
+
+    keepTrackApi.methods.resetSensor();
+  };
+
+  $('#reset-sensor-button').on('click', function () {
+    settingsManager.isForceColorScheme = false;
+    $('#menu-sensor-info').addClass('bmenu-item-disabled');
+    $('#menu-fov-bubble').addClass('bmenu-item-disabled');
+    $('#menu-surveillance').addClass('bmenu-item-disabled');
+    $('#menu-planetarium').addClass('bmenu-item-disabled');
+    $('#menu-astronomy').addClass('bmenu-item-disabled');
+    _resetSensorSelected();
+  });
+
+  $('#cs-telescope').on('click', function () {
+    if ($('#cs-telescope').is(':checked')) {
+      $('#cs-minaz-div').hide();
+      $('#cs-maxaz-div').hide();
+      $('#cs-minel-div').hide();
+      $('#cs-maxel-div').hide();
+      $('#cs-minrange-div').hide();
+      $('#cs-maxrange-div').hide();
+      $('#cs-minaz').val(0);
+      $('#cs-maxaz').val(360);
+      $('#cs-minel').val(10);
+      $('#cs-maxel').val(90);
+      $('#cs-minrange').val(100);
+      $('#cs-maxrange').val(1000000);
+    } else {
+      $('#cs-minaz-div').show();
+      $('#cs-maxaz-div').show();
+      $('#cs-minel-div').show();
+      $('#cs-maxel-div').show();
+      $('#cs-minrange-div').show();
+      $('#cs-maxrange-div').show();
+      if (sensorManager.checkSensorSelected()) {
+        $('#cs-minaz').val(sensorManager.selectedSensor.obsminaz);
+        $('#cs-maxaz').val(sensorManager.selectedSensor.obsmaxaz);
+        $('#cs-minel').val(sensorManager.selectedSensor.obsminel);
+        $('#cs-maxel').val(sensorManager.selectedSensor.obsmaxel);
+        $('#cs-minrange').val(sensorManager.selectedSensor.obsminrange);
+        $('#cs-maxrange').val(sensorManager.selectedSensor.obsmaxrange);
+      }
+    }
+  });
+
+  $('#customSensor').on('submit', function (e) {
+    const satCruncher = keepTrackApi.programs.satCruncher;
+    $('#menu-sensor-info').removeClass('bmenu-item-disabled');
+    $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
+    $('#menu-surveillance').removeClass('bmenu-item-disabled');
+    $('#menu-planetarium').removeClass('bmenu-item-disabled');
+    $('#menu-astronomy').removeClass('bmenu-item-disabled');
+    sensorManager.whichRadar = 'CUSTOM';
+    $('#sensor-type').html((<string>$('#cs-type').val()).replace(/</gu, '&lt;').replace(/>/gu, '&gt;'));
+    $('#sensor-info-title').html('Custom Sensor');
+    $('#sensor-country').html('Custom Sensor');
+
+    let lon = $('#cs-lon').val();
+    let lat = $('#cs-lat').val();
+    const alt = $('#cs-hei').val();
+    const sensorType = $('#cs-type').val();
+    const minaz = $('#cs-minaz').val();
+    const maxaz = $('#cs-maxaz').val();
+    const minel = $('#cs-minel').val();
+    const maxel = $('#cs-maxel').val();
+    const minrange = $('#cs-minrange').val();
+    const maxrange = $('#cs-maxrange').val();
+
+    satCruncher.postMessage({
+      // Send satSet.satCruncher File information on this radar
+      typ: 'offset',
+      dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
+      setlatlong: true,
+      sensor: {
+        lat: parseFloat(<string>lat),
+        lon: parseFloat(<string>lon),
+        alt: parseFloat(<string>alt),
+        obsminaz: parseFloat(<string>minaz),
+        obsmaxaz: parseFloat(<string>maxaz),
+        obsminel: parseFloat(<string>minel),
+        obsmaxel: parseFloat(<string>maxel),
+        obsminrange: parseFloat(<string>minrange),
+        obsmaxrange: parseFloat(<string>maxrange),
+        type: sensorType,
+      },
+    });
+
+    satellite.setobs({
+      lat: parseFloat(<string>lat),
+      lon: parseFloat(<string>lon),
+      alt: parseFloat(<string>alt),
+      obsminaz: parseFloat(<string>minaz),
+      obsmaxaz: parseFloat(<string>maxaz),
+      obsminel: parseFloat(<string>minel),
+      obsmaxel: parseFloat(<string>maxel),
+      obsminrange: parseFloat(<string>minrange),
+      obsmaxrange: parseFloat(<string>maxrange),
+      type: sensorType,
+    });
+
+    // objectManager.setSelectedSat(-1);
+    lat = parseFloat(<string>lat);
+    lon = parseFloat(<string>lon);
+    if (maxrange > 6000) {
+      mainCamera.changeZoom('geo');
+    } else {
+      mainCamera.changeZoom('leo');
+    }
+    mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
+
+    e.preventDefault();
+  });
+};
+export const bottomMenuClick = (iconName: string): void => {
+  const { uiManager, sensorManager, satSet, objectManager, satellite } = keepTrackApi.programs;
+  switch (iconName) {
+    case 'menu-sensor-list': // No Keyboard Commands
+      if (isSensorListMenuOpen) {
+        uiManager.hideSideMenus();
+        isSensorListMenuOpen = false;
+        break;
+      } else {
+        if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+        uiManager.hideSideMenus();
+        $('#sensor-list-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+        isSensorListMenuOpen = true;
+        $('#menu-sensor-list').addClass('bmenu-item-selected');
+        break;
+      }
+    case 'menu-sensor-info': // No Keyboard Commands
+      if (!sensorManager.checkSensorSelected()) {
+        // No Sensor Selected
+        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.sensorInfoDisabled();
+        uiManager.toast(`Select a Sensor First!`, 'caution');
+        if (!$('#menu-sensor-info:animated').length) {
+          $('#menu-sensor-info').effect('shake', {
+            distance: 10,
+          });
         }
-
-        switch (sensorClick) {
-          case 'cspocAll':
-            if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.cspocSensors();
-            sensorManager.setSensor('SSN');
-            break;
-          case 'mwAll':
-            if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.mwSensors();
-            sensorManager.setSensor('NATO-MW');
-            break;
-          case 'mdAll':
-            sensorManager.setSensor('MD-ALL');
-            break;
-          case 'llAll':
-            sensorManager.setSensor('LEO-LABS');
-            break;
-          case 'rusAll':
-            sensorManager.setSensor('RUS-ALL');
-            break;
-          default:
-            sensorManager.setSensor(sensorManager.sensorList[`${sensorClick}`]);
-            break;
-        }
-
+        break;
+      }
+      if (isSensorInfoMenuOpen) {
+        uiManager.hideSideMenus();
+        isSensorInfoMenuOpen = false;
+        break;
+      } else {
+        if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+        uiManager.hideSideMenus();
         uiManager.getsensorinfo();
-
-        try {
-          uiManager.lookAtLatLon();
-        } catch {
-          // TODO: More intentional conditional statement
-          // Multi-sensors break this
-        }
-        if (settingsManager.currentColorScheme == ColorScheme.default) {
-          uiManager.legendMenuChange('default');
-        }
-      });
-
-      const _resetSensorSelected = () => {
-        const satCruncher = keepTrackApi.programs.satCruncher;
-        // Return to default settings with nothing 'inview'
-        satellite.setobs(null);
-        sensorManager.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
-        uiManager.getsensorinfo();
-        if (settingsManager.currentColorScheme == ColorScheme.default) {
-          uiManager.legendMenuChange('default');
-        }
-        satCruncher.postMessage({
-          typ: 'offset',
-          dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-          setlatlong: true,
-          resetObserverGd: true,
-          sensor: sensorManager.defaultSensor,
-        });
-        satCruncher.postMessage({
-          isShowFOVBubble: 'reset',
-          isShowSurvFence: 'disable',
-        });
-        settingsManager.isFOVBubbleModeOn = false;
-        settingsManager.isShowSurvFence = false;
-        $('#menu-sensor-info').removeClass('bmenu-item-selected');
-        $('#menu-fov-bubble').removeClass('bmenu-item-selected');
-        $('#menu-surveillance').removeClass('bmenu-item-selected');
-        $('#menu-lookangles').removeClass('bmenu-item-selected');
-        $('#menu-planetarium').removeClass('bmenu-item-selected');
-        $('#menu-astronomy').removeClass('bmenu-item-selected');
-        $('#menu-sensor-info').addClass('bmenu-item-disabled');
-        $('#menu-fov-bubble').addClass('bmenu-item-disabled');
-        $('#menu-surveillance').addClass('bmenu-item-disabled');
-        $('#menu-lookangles').addClass('bmenu-item-disabled');
-        $('#menu-planetarium').addClass('bmenu-item-disabled');
-        $('#menu-astronomy').addClass('bmenu-item-disabled');
-
-        setTimeout(function () {
-          satSet.resetSatInView();
-          satSet.setColorScheme(settingsManager.currentColorScheme, true);
-        }, 2000);
-
-        keepTrackApi.methods.resetSensor();
-      };
-
-      $('#reset-sensor-button').on('click', function () {
-        settingsManager.isForceColorScheme = false;
-        $('#menu-sensor-info').addClass('bmenu-item-disabled');
-        $('#menu-fov-bubble').addClass('bmenu-item-disabled');
-        $('#menu-surveillance').addClass('bmenu-item-disabled');
-        $('#menu-planetarium').addClass('bmenu-item-disabled');
-        $('#menu-astronomy').addClass('bmenu-item-disabled');
-        _resetSensorSelected();
-      });
-
-      $('#cs-telescope').on('click', function () {
-        if ($('#cs-telescope').is(':checked')) {
-          $('#cs-minaz-div').hide();
-          $('#cs-maxaz-div').hide();
-          $('#cs-minel-div').hide();
-          $('#cs-maxel-div').hide();
-          $('#cs-minrange-div').hide();
-          $('#cs-maxrange-div').hide();
-          $('#cs-minaz').val(0);
-          $('#cs-maxaz').val(360);
-          $('#cs-minel').val(10);
-          $('#cs-maxel').val(90);
-          $('#cs-minrange').val(100);
-          $('#cs-maxrange').val(1000000);
-        } else {
-          $('#cs-minaz-div').show();
-          $('#cs-maxaz-div').show();
-          $('#cs-minel-div').show();
-          $('#cs-maxel-div').show();
-          $('#cs-minrange-div').show();
-          $('#cs-maxrange-div').show();
-          if (sensorManager.checkSensorSelected()) {
-            $('#cs-minaz').val(sensorManager.selectedSensor.obsminaz);
-            $('#cs-maxaz').val(sensorManager.selectedSensor.obsmaxaz);
-            $('#cs-minel').val(sensorManager.selectedSensor.obsminel);
-            $('#cs-maxel').val(sensorManager.selectedSensor.obsmaxel);
-            $('#cs-minrange').val(sensorManager.selectedSensor.obsminrange);
-            $('#cs-maxrange').val(sensorManager.selectedSensor.obsmaxrange);
+        $('#sensor-info-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+        isSensorInfoMenuOpen = true;
+        $('#menu-sensor-info').addClass('bmenu-item-selected');
+        break;
+      }
+    case 'menu-lookangles': // S
+      if (keepTrackApi.programs.sensorManager.isLookanglesMenuOpen) {
+        keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = false;
+        uiManager.hideSideMenus();
+        break;
+      } else {
+        const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
+        if (!sensorManager.checkSensorSelected() || sat == null || sat.static || sat.missile || objectManager.selectedSat === -1) {
+          // No Sensor or Satellite Selected
+          if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.lookanglesDisabled();
+          uiManager.toast(`Select a Satellite First!`, 'caution');
+          if (!$('#menu-lookangles:animated').length) {
+            $('#menu-lookangles').effect('shake', {
+              distance: 10,
+            });
           }
+          break;
         }
-      });
-
-      $('#customSensor').on('submit', function (e) {
-        const satCruncher = keepTrackApi.programs.satCruncher;
-        $('#menu-sensor-info').removeClass('bmenu-item-disabled');
-        $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
-        $('#menu-surveillance').removeClass('bmenu-item-disabled');
-        $('#menu-planetarium').removeClass('bmenu-item-disabled');
-        $('#menu-astronomy').removeClass('bmenu-item-disabled');
-        sensorManager.whichRadar = 'CUSTOM';
-        $('#sensor-type').html((<string>$('#cs-type').val()).replace(/</gu, '&lt;').replace(/>/gu, '&gt;'));
-        $('#sensor-info-title').html('Custom Sensor');
-        $('#sensor-country').html('Custom Sensor');
-
-        var lon = $('#cs-lon').val();
-        var lat = $('#cs-lat').val();
-        var alt = $('#cs-hei').val();
-        var sensorType = $('#cs-type').val();
-        var minaz = $('#cs-minaz').val();
-        var maxaz = $('#cs-maxaz').val();
-        var minel = $('#cs-minel').val();
-        var maxel = $('#cs-maxel').val();
-        var minrange = $('#cs-minrange').val();
-        var maxrange = $('#cs-maxrange').val();
-
-        satCruncher.postMessage({
-          // Send satSet.satCruncher File information on this radar
-          typ: 'offset', // Tell satSet.satCruncher to update something
-          dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(), // Tell satSet.satCruncher what time it is and how fast time is moving
-          setlatlong: true, // Tell satSet.satCruncher we are changing observer location
-          sensor: {
-            lat: parseFloat(<string>lat),
-            lon: parseFloat(<string>lon),
-            alt: parseFloat(<string>alt),
-            obsminaz: parseFloat(<string>minaz),
-            obsmaxaz: parseFloat(<string>maxaz),
-            obsminel: parseFloat(<string>minel),
-            obsmaxel: parseFloat(<string>maxel),
-            obsminrange: parseFloat(<string>minrange),
-            obsmaxrange: parseFloat(<string>maxrange),
-            type: sensorType,
-          },
+        if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+        uiManager.hideSideMenus();
+        keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = true;
+        $('#loading-screen').fadeIn(1000, function () {
+          satellite.getlookangles(sat);
+          $('#menu-lookangles').addClass('bmenu-item-selected');
+          $('#loading-screen').fadeOut('slow');
+          $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
         });
-
-        satellite.setobs({
-          lat: parseFloat(<string>lat),
-          lon: parseFloat(<string>lon),
-          alt: parseFloat(<string>alt),
-          obsminaz: parseFloat(<string>minaz),
-          obsmaxaz: parseFloat(<string>maxaz),
-          obsminel: parseFloat(<string>minel),
-          obsmaxel: parseFloat(<string>maxel),
-          obsminrange: parseFloat(<string>minrange),
-          obsmaxrange: parseFloat(<string>maxrange),
-          type: sensorType,
-        });
-
-        // objectManager.setSelectedSat(-1);
-        lat = parseFloat(<string>lat);
-        lon = parseFloat(<string>lon);
-        if (maxrange > 6000) {
-          mainCamera.changeZoom('geo');
-        } else {
-          mainCamera.changeZoom('leo');
+        break;
+      }
+    case 'menu-lookanglesmultisite':
+      if (isLookanglesMultiSiteMenuOpen) {
+        isLookanglesMultiSiteMenuOpen = false;
+        uiManager.hideSideMenus();
+        break;
+      } else {
+        if (objectManager.selectedSat === -1) {
+          // No Satellite Selected
+          if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.ssnLookanglesDisabled();
+          uiManager.toast(`Select a Satellite First!`, 'caution');
+          if (!$('#menu-lookanglesmultisite:animated').length) {
+            $('#menu-lookanglesmultisite').effect('shake', {
+              distance: 10,
+            });
+          }
+          break;
         }
-        mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
+        if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+        uiManager.hideSideMenus();
+        isLookanglesMultiSiteMenuOpen = true;
+        $('#menu-lookanglesmultisite').addClass('bmenu-item-selected');
+        if (objectManager.selectedSat !== -1) {
+          $('#loading-screen').fadeIn(1000, function () {
+            const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
+            satellite.getlookanglesMultiSite(sat);
+            $('#loading-screen').fadeOut('slow');
+            $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+          });
+        }
+        break;
+      }
+    case 'menu-customSensor': // T
+      if (keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen) {
+        keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = false;
+        uiManager.hideSideMenus();
+        break;
+      } else {
+        if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+        uiManager.hideSideMenus();
 
-        e.preventDefault();
-      });
-    },
+        if (sensorManager.checkSensorSelected()) {
+          $('#cs-lat').val(sensorManager.selectedSensor.lat);
+          $('#cs-lon').val(sensorManager.selectedSensor.lon);
+          $('#cs-hei').val(sensorManager.selectedSensor.alt);
+        }
+        $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+        keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = true;
+        $('#menu-customSensor').addClass('bmenu-item-selected');
+        break;
+      }
+  }
+};
+export const init = (): void => {
+  keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = false;
+  keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = false;
+  keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = false;
+
+  // Add HTML
+  keepTrackApi.register({
+    method: 'uiManagerInit',
+    cbName: 'sensor',
+    cb: uiManagerInit,
   });
 
   // Add JavaScript
   keepTrackApi.register({
     method: 'bottomMenuClick',
     cbName: 'sensor',
-    cb: (iconName: string): void => {
-      switch (iconName) {
-        case 'menu-sensor-list': // No Keyboard Commands
-          if (isSensorListMenuOpen) {
-            uiManager.hideSideMenus();
-            isSensorListMenuOpen = false;
-            break;
-          } else {
-            if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-            uiManager.hideSideMenus();
-            $('#sensor-list-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            isSensorListMenuOpen = true;
-            $('#menu-sensor-list').addClass('bmenu-item-selected');
-            break;
-          }
-        case 'menu-sensor-info': // No Keyboard Commands
-          if (!sensorManager.checkSensorSelected()) {
-            // No Sensor Selected
-            if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.sensorInfoDisabled();
-            uiManager.toast(`Select a Sensor First!`, 'caution');
-            if (!$('#menu-sensor-info:animated').length) {
-              $('#menu-sensor-info').effect('shake', {
-                distance: 10,
-              });
-            }
-            break;
-          }
-          if (isSensorInfoMenuOpen) {
-            uiManager.hideSideMenus();
-            isSensorInfoMenuOpen = false;
-            break;
-          } else {
-            if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-            uiManager.hideSideMenus();
-            uiManager.getsensorinfo();
-            $('#sensor-info-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            isSensorInfoMenuOpen = true;
-            $('#menu-sensor-info').addClass('bmenu-item-selected');
-            break;
-          }
-        case 'menu-lookangles': // S
-          if (keepTrackApi.programs.sensorManager.isLookanglesMenuOpen) {
-            keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = false;
-            uiManager.hideSideMenus();
-            break;
-          } else {
-            let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
-            if (!sensorManager.checkSensorSelected() || sat == null || sat.static || sat.missile || objectManager.selectedSat === -1) {
-              // No Sensor or Satellite Selected
-              if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.lookanglesDisabled();
-              uiManager.toast(`Select a Satellite First!`, 'caution');
-              if (!$('#menu-lookangles:animated').length) {
-                $('#menu-lookangles').effect('shake', {
-                  distance: 10,
-                });
-              }
-              break;
-            }
-            if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-            uiManager.hideSideMenus();
-            keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = true;
-            $('#loading-screen').fadeIn(1000, function () {
-              satellite.getlookangles(sat);
-              $('#menu-lookangles').addClass('bmenu-item-selected');
-              $('#loading-screen').fadeOut('slow');
-              $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            });
-            break;
-          }
-        case 'menu-lookanglesmultisite':
-          if (isLookanglesMultiSiteMenuOpen) {
-            isLookanglesMultiSiteMenuOpen = false;
-            uiManager.hideSideMenus();
-            break;
-          } else {
-            if (objectManager.selectedSat === -1) {
-              // No Satellite Selected
-              if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.ssnLookanglesDisabled();
-              uiManager.toast(`Select a Satellite First!`, 'caution');
-              if (!$('#menu-lookanglesmultisite:animated').length) {
-                $('#menu-lookanglesmultisite').effect('shake', {
-                  distance: 10,
-                });
-              }
-              break;
-            }
-            if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-            uiManager.hideSideMenus();
-            isLookanglesMultiSiteMenuOpen = true;
-            $('#menu-lookanglesmultisite').addClass('bmenu-item-selected');
-            if (objectManager.selectedSat !== -1) {
-              $('#loading-screen').fadeIn(1000, function () {
-                let sat = satSet.getSatExtraOnly(objectManager.selectedSat);
-                satellite.getlookanglesMultiSite(sat);
-                $('#loading-screen').fadeOut('slow');
-                $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-              });
-            }
-            break;
-          }
-        case 'menu-customSensor': // T
-          if (keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen) {
-            keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = false;
-            uiManager.hideSideMenus();
-            break;
-          } else {
-            if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-            uiManager.hideSideMenus();
-
-            if (sensorManager.checkSensorSelected()) {
-              $('#cs-lat').val(sensorManager.selectedSensor.lat);
-              $('#cs-lon').val(sensorManager.selectedSensor.lon);
-              $('#cs-hei').val(sensorManager.selectedSensor.alt);
-            }
-            $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-            keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = true;
-            $('#menu-customSensor').addClass('bmenu-item-selected');
-            break;
-          }
-      }
-    },
+    cb: bottomMenuClick,
   });
 
   // Register satinfobox links
-  let sensorLinks = false;
   keepTrackApi.register({
     method: 'selectSatData',
     cbName: 'sensor',
-    cb: () => {
-      if (!sensorLinks) {
-        $('#sat-info-top-links').append(keepTrackApi.html`
-          <div id="sensors-in-fov-link" class="link sat-infobox-links">Show All Sensors with FOV...</div>
-        `);
-        $('#sensors-in-fov-link').on('click', () => {
-          Object.keys(keepTrackApi.programs.sensorManager.sensorList).forEach((key) => {
-            const sensor = keepTrackApi.programs.sensorManager.sensorList[key];
-            const sat = keepTrackApi.programs.satSet.getSat(keepTrackApi.programs.objectManager.selectedSat);
-            let tearr = sat.getTEARR(null, sensor);
-            if (tearr.inview) {
-              keepTrackApi.programs.lineManager.create('sat6', [sat.id, satSet.getSensorFromSensorName(sensor.name)], 'g');
-            }
-          });
-        });
-        sensorLinks = true;
-      }
-    },
+    cb: selectSatData,
   });
 
   keepTrackApi.register({
     method: 'hideSideMenus',
     cbName: 'sensor',
-    cb: (): void => {
-      $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#sensor-list-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#sensor-info-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#menu-customSensor').removeClass('bmenu-item-selected');
-      $('#menu-sensor-list').removeClass('bmenu-item-selected');
-      $('#menu-sensor-info').removeClass('bmenu-item-selected');
-      $('#menu-lookangles').removeClass('bmenu-item-selected');
-      $('#menu-lookanglesmultisite').removeClass('bmenu-item-selected');
-      keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = false;
-      isSensorListMenuOpen = false;
-      isSensorInfoMenuOpen = false;
-      keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = false;
-      isLookanglesMultiSiteMenuOpen = false;
-    },
+    cb: hideSideMenus,
   });
+};
+
+export const selectSatData = () => {
+  const { satSet } = keepTrackApi.programs;
+  if (!sensorLinks) {
+    $('#sat-info-top-links').append(keepTrackApi.html`
+        <div id="sensors-in-fov-link" class="link sat-infobox-links">Show All Sensors with FOV...</div>
+      `);
+    $('#sensors-in-fov-link').on('click', () => {
+      Object.keys(keepTrackApi.programs.sensorManager.sensorList).forEach((key) => {
+        const sensor = keepTrackApi.programs.sensorManager.sensorList[key];
+        const sat = keepTrackApi.programs.satSet.getSat(keepTrackApi.programs.objectManager.selectedSat);
+        const tearr = sat.getTEARR(null, sensor);
+        if (tearr.inView) {
+          keepTrackApi.programs.lineManager.create('sat6', [sat.id, satSet.getSensorFromSensorName(sensor.name)], 'g');
+        }
+      });
+    });
+    sensorLinks = true;
+  }
+};
+
+export const hideSideMenus = (): void => {
+  $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  $('#sensor-list-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  $('#sensor-info-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  $('#lookangles-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  $('#lookanglesmultisite-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  $('#menu-customSensor').removeClass('bmenu-item-selected');
+  $('#menu-sensor-list').removeClass('bmenu-item-selected');
+  $('#menu-sensor-info').removeClass('bmenu-item-selected');
+  $('#menu-lookangles').removeClass('bmenu-item-selected');
+  $('#menu-lookanglesmultisite').removeClass('bmenu-item-selected');
+  keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = false;
+  isSensorListMenuOpen = false;
+  isSensorInfoMenuOpen = false;
+  keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = false;
+  isLookanglesMultiSiteMenuOpen = false;
 };

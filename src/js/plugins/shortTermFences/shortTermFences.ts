@@ -1,5 +1,5 @@
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import $ from 'jquery';
 
 let isStfMenuOpen = false;
 let stfInfoLinks = false;
@@ -124,7 +124,7 @@ export const bottomMenuClick = (iconName: string) => {
       return;
     } else {
       uiManager.hideSideMenus();
-      $('#stf-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      (<any>$('#stf-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
       isStfMenuOpen = true;
       $('#menu-stf').addClass('bmenu-item-selected');
       return;
@@ -160,7 +160,7 @@ export const setSensor = (sensor: any, id: number) => {
 };
 
 export const stfFormOnSubmit = (e: Event) => {
-  const { sensorManager, satellite, satSet, uiManager, timeManager } = keepTrackApi.programs;
+  const { sensorManager, satellite, satSet, uiManager } = keepTrackApi.programs;
   e.preventDefault();
 
   if (!sensorManager.checkSensorSelected()) {
@@ -190,8 +190,6 @@ export const stfFormOnSubmit = (e: Event) => {
 
   satSet.satCruncher.postMessage({
     // Send satSet.satCruncher File information on this radar
-    typ: 'offset', // Tell satSet.satCruncher to update something
-    dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(), // Tell satSet.satCruncher what time it is and how fast time is moving
     setlatlong: true, // Tell satSet.satCruncher we are changing observer location
     sensor: {
       lat: lat,
@@ -220,19 +218,13 @@ export const stfFormOnSubmit = (e: Event) => {
     type: sensorType,
   });
 
-  keepTrackApi.programs.sensorFov.enableFovView();
+  $('#sensor-selected').text('Short Term Fence');
 
-  const mainCamera = keepTrackApi.programs.mainCamera;
-  if (maxrange > 6000) {
-    mainCamera.changeZoom('geo');
-  } else {
-    mainCamera.changeZoom('leo');
-  }
-  mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
+  keepTrackApi.programs.sensorFov.enableFovView();
 };
 
 export const stfOnObjectLinkClick = () => {
-  const { satellite, uiManager, sensorManager } = keepTrackApi.programs;
+  const { satellite, uiManager, sensorManager, objectManager, satSet } = keepTrackApi.programs;
 
   if (!sensorManager.checkSensorSelected()) {
     // No Sensor Selected
@@ -240,11 +232,14 @@ export const stfOnObjectLinkClick = () => {
     return;
   }
 
+  // Update TEARR
+  satellite.getTEARR(satSet.getSat(objectManager.selectedSat));
+
   $('#stf-az').val(satellite.currentTEARR.az.toFixed(1));
   $('#stf-el').val(satellite.currentTEARR.el.toFixed(1));
   $('#stf-rng').val(satellite.currentTEARR.rng.toFixed(1));
   uiManager.hideSideMenus();
-  $('#stf-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+  (<any>$('#stf-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
   isStfMenuOpen = true;
   $('#menu-stf').addClass('bmenu-item-selected');
 };

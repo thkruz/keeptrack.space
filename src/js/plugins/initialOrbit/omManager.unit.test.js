@@ -1,6 +1,5 @@
 /* eslint-disable no-undefined */
 
-import { expect } from '@jest/globals';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 import { omManager } from '@app/js/plugins/initialOrbit/omManager';

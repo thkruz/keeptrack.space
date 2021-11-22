@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+### [v5.0.0](https://github.com/thkruz/keeptrack.space/compare/v4.2.0...v5.0.0)
+
+> 22 November 2021 
+
+- Version 5 [`4eb1368`](https://github.com/thkruz/keeptrack.space/commit/4eb1368b11d0369a6ab16588e97816582cea1bfa)
+- refactor(camera): migrated camera to typescript [`8efff95`](https://github.com/thkruz/keeptrack.space/commit/8efff95004a9a61cc315de971d736d083b5b3d61)
+- refactor(satset): cleaned up satSet code [`4fb7ca3`](https://github.com/thkruz/keeptrack.space/commit/4fb7ca387aa22282967ba32189ebca9f698f8b3f)
+- refactor(sun): implement vao and move to typescript [`b40b0c3`](https://github.com/thkruz/keeptrack.space/commit/b40b0c384e36a4557c9ce33cf9389ffc4072df2a)
+- refactor(moon): add vao and move to typescript [`e9dc76c`](https://github.com/thkruz/keeptrack.space/commit/e9dc76c83a72531290bd3f75c84ea12615d55455)
+- refactor(camera): renamed cameraManager to setup future multi camera modes [`5db45d2`](https://github.com/thkruz/keeptrack.space/commit/5db45d2f37b0537e7b93debd1b6cd15a5ff3f8cf)
+- feat(gamepad): initial gamepad support [`56ccd1a`](https://github.com/thkruz/keeptrack.space/commit/56ccd1a9c20898c5f1b84b44e5ed1ff61469516c)
+- refactor(camera): refactor cameraTypes to be like enums [`51282a7`](https://github.com/thkruz/keeptrack.space/commit/51282a72f7b6f4ea2ce510ee33963c1852c0d185)
+- test(moon): added test for the moon [`2235689`](https://github.com/thkruz/keeptrack.space/commit/22356892beb758c0011e987e7fabdfa3fd860452)
+- docs(changelog.md): version bump [`024569e`](https://github.com/thkruz/keeptrack.space/commit/024569e83b4efd3a2746b2152b14503418a15969)
+- fix(starmanager): fixed bug where webGl lags hard after highlighting certain stars [`87e8308`](https://github.com/thkruz/keeptrack.space/commit/87e83084601db22e553218614fee4ca399380a13)
+- test(camera.test.ts): unneeded import [`4454bd0`](https://github.com/thkruz/keeptrack.space/commit/4454bd03389410114dfd8d60df8fca8da6c5f42b)
+
 #### [v4.2.0](https://github.com/thkruz/keeptrack.space/compare/v4.0.0...v4.2.0)
 
 > 9 September 2021 
@@ -1090,7 +1107,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Added geolocation options when using https. [`d2167cb`](https://github.com/thkruz/keeptrack.space/commit/d2167cbdc56dd228ce859452ee084a4fef1599b5)
 - Added license info from James Yoder/thingsinspace. [`37e722f`](https://github.com/thkruz/keeptrack.space/commit/37e722f72f1df4b1143f5abafd07ae0d5e95a55f)
 - Add hires option from GET variable. [`24a3d57`](https://github.com/thkruz/keeptrack.space/commit/24a3d570c5855c3fc0a364365e769f2535b5f81d)
-- Adjusted cameraType.SateLLITE movement. Q and E for rotation. [`07601d4`](https://github.com/thkruz/keeptrack.space/commit/07601d48ec54bef5aed4aaa6a5bbd9428cc09964)
+- Adjusted cameraType.SATELLITE movement. Q and E for rotation. [`07601d4`](https://github.com/thkruz/keeptrack.space/commit/07601d48ec54bef5aed4aaa6a5bbd9428cc09964)
 - Allow passing mw, retro, vec, etc via GET instead of different filenames [`4c0b81a`](https://github.com/thkruz/keeptrack.space/commit/4c0b81ab4f4c09fbd2e8e1a29566055f4c356583)
 - Update .igtignore [`09365cf`](https://github.com/thkruz/keeptrack.space/commit/09365cff6f81a36838c849e3576da7d7f8231547)
 - Harder to deselect selectedsat when in satellite camera view. [`698b496`](https://github.com/thkruz/keeptrack.space/commit/698b496d16f34e6f40e742359203be415c6c1c80)

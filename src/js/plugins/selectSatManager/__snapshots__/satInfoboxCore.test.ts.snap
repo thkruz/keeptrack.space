@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`satInfoboxCore.allObjectsLink 0 1`] = `undefined`;
+
+exports[`satInfoboxCore.allObjectsLink 1 1`] = `undefined`;
+
+exports[`satInfoboxCore.init 0 1`] = `undefined`;
+
+exports[`satInfoboxCore.intelData 0 1`] = `undefined`;
+
+exports[`satInfoboxCore.intelData 1 1`] = `undefined`;
+
+exports[`satInfoboxCore.intelData 2 1`] = `undefined`;
+
+exports[`satInfoboxCore.intelData 3 1`] = `undefined`;
+
+exports[`satInfoboxCore.intelData 4 1`] = `undefined`;
+
+exports[`satInfoboxCore.intelData 5 1`] = `undefined`;
+
+exports[`satInfoboxCore.intelData 6 1`] = `undefined`;
+
+exports[`satInfoboxCore.intelData 7 1`] = `undefined`;
+
+exports[`satInfoboxCore.intelData 8 1`] = `undefined`;
+
+exports[`satInfoboxCore.intelData 9 1`] = `undefined`;
+
+exports[`satInfoboxCore.launchData 0 1`] = `undefined`;
+
+exports[`satInfoboxCore.nearObjectsLinkClick 0 1`] = `undefined`;
+
+exports[`satInfoboxCore.nearObjectsLinkClick 1 1`] = `undefined`;
+
+exports[`satInfoboxCore.nearOrbitsLink 0 1`] = `undefined`;
+
+exports[`satInfoboxCore.nearOrbitsLink 1 1`] = `undefined`;
+
+exports[`satInfoboxCore.objectData 0 1`] = `undefined`;
+
+exports[`satInfoboxCore.objectData 1 1`] = `undefined`;
+
+exports[`satInfoboxCore.objectData 2 1`] = `undefined`;
+
+exports[`satInfoboxCore.objectData 3 1`] = `undefined`;
+
+exports[`satInfoboxCore.objectData 4 1`] = `undefined`;
+
+exports[`satInfoboxCore.objectData 5 1`] = `undefined`;
+
+exports[`satInfoboxCore.objectData 6 1`] = `undefined`;
+
+exports[`satInfoboxCore.objectData 7 1`] = `undefined`;
+
+exports[`satInfoboxCore.objectData 8 1`] = `undefined`;
+
+exports[`satInfoboxCore.objectData 9 1`] = `undefined`;
+
+exports[`satInfoboxCore.orbitalData 0 1`] = `undefined`;
+
+exports[`satInfoboxCore.orbitalData 1 1`] = `undefined`;
+
+exports[`satInfoboxCore.orbitalData 2 1`] = `undefined`;
+
+exports[`satInfoboxCore.orbitalData 3 1`] = `undefined`;
+
+exports[`satInfoboxCore.satMissionData 0 1`] = `undefined`;
+
+exports[`satInfoboxCore.satMissionData 1 1`] = `undefined`;
+
+exports[`satInfoboxCore.satMissionData 2 1`] = `undefined`;
+
+exports[`satInfoboxCore.sensorInfo 0 1`] = `undefined`;

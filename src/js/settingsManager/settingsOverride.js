@@ -21,7 +21,6 @@ const settingsManagerOverride = {
   classificationStr: '',
   // This controls which of the built-in plugins are loaded
   plugins: {
-    atmosphere: true,
     satInfoboxCore: true,
     updateSelectBoxCore: true,
     aboutManager: true,
@@ -46,6 +45,7 @@ const settingsManagerOverride = {
     countries: true,
     colorsMenu: true,
     shortTermFences: true,
+    orbitReferences: true,
     externalSources: true,
     analysis: true,
     sensorFov: true,
@@ -63,6 +63,7 @@ const settingsManagerOverride = {
     topMenu: true,
     classification: true,
     soundManager: true,
+    gamepad: true,
   },
 };
 

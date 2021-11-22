@@ -1,3 +1,6 @@
+import { keepTrackApi } from '@app/js/api/externalApi';
+import { SatObject } from '@app/js/api/keepTrack';
+import $ from 'jquery';
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -21,19 +24,100 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
-
 export const init = (): void => {
-  const { satellite, sensorManager, objectManager, satSet, uiManager } = keepTrackApi.programs;
+  const { sensorManager, objectManager, satSet, uiManager } = keepTrackApi.programs;
   let isAnalysisMenuOpen = false;
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
     cbName: 'analysis',
-    cb: () => {
-      // Side Menu
-      $('#left-menus').append(keepTrackApi.html`
+    cb: uiManagerInit,
+  });
+
+  // Add JavaScript
+  keepTrackApi.register({
+    method: 'bottomMenuClick',
+    cbName: 'analysis',
+    cb: (iconName: string): void => {
+      if (iconName === 'menu-analysis') {
+        if (isAnalysisMenuOpen) {
+          isAnalysisMenuOpen = false;
+          $('#menu-analysis').removeClass('bmenu-item-selected');
+          uiManager.hideSideMenus();
+          return;
+        } else {
+          uiManager.hideSideMenus();
+          isAnalysisMenuOpen = true;
+          if (objectManager.selectedSat != -1) {
+            const sat: SatObject = satSet.getSat(objectManager.selectedSat);
+            $('#anal-sat').val(sat.SCC_NUM);
+          }
+          if (sensorManager.checkSensorSelected()) {
+            $('#anal-type').html(
+              `<optgroup label="Orbital Parameters">
+                <option value='inc'>Inclination</option>
+                <option value='ap'>Apogee</option>
+                <option value='pe'>Perigee</option>
+                <option value='per'>Period</option>
+                <option value='e'>Eccentricity</option>
+                <option value='ra'>RAAN</option>
+                <option value='all'>All</option>
+              </optgroup>
+              <optgroup id="anal-look-opt" label="Look Angles">
+                <option value='az'>Azimuth</option>
+                <option value='el'>Elevation</option>
+                <option value='rng'>Range</option>
+                <option value='rae'>All</option>
+              </optgroup>`
+            );
+          } else {
+            $('#anal-type').html(
+              `<optgroup label="Orbital Parameters">
+                <option value='inc'>Inclination</option>
+                <option value='ap'>Apogee</option>
+                <option value='pe'>Perigee</option>
+                <option value='per'>Period</option>
+                <option value='e'>Eccentricity</option>
+                <option value='ra'>RAAN</option>
+                <option value='all'>All</option>
+              </optgroup>`
+            );
+          }
+          // Reinitialize the Material CSS Code
+          const elems = document.querySelectorAll('select');
+          M.FormSelect.init(elems);
+
+          $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+          $('#menu-analysis').addClass('bmenu-item-selected');
+          return;
+        }
+      }
+    },
+  });
+
+  keepTrackApi.register({
+    method: 'selectSatData',
+    cbName: 'analysis',
+    cb: (sat: any): void => {
+      if (uiManager.isAnalysisMenuOpen) {
+        $('#anal-sat').val(sat.SCC_NUM);
+      }
+    },
+  });
+
+  keepTrackApi.register({
+    method: 'hideSideMenus',
+    cbName: 'analysis',
+    cb: (): void => {
+      $('#analysis-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+      $('#menu-analysis').removeClass('bmenu-item-selected');
+      isAnalysisMenuOpen = false;
+    },
+  });
+};
+export const uiManagerInit = () => {
+  // Side Menu
+  $('#left-menus').append(keepTrackApi.html`
         <div id="analysis-menu" class="side-menu-parent start-hidden text-select">
           <div id="analysis-inner-menu" class="side-menu">
             <ul>
@@ -78,12 +162,12 @@ export const init = (): void => {
             </ul>
             <div class="row">
               <center>
-                <button class="btn btn-ui waves-effect waves-light" onclick="satSet.exportTle2Txt();">Export TLEs &#9658;</button>
+                <button class="btn btn-ui waves-effect waves-light" onclick="keepTrackApi.programs.satSet.exportTle2Txt(keepTrackApi.programs.satSet.satData);">Export TLEs &#9658;</button>
               </center>
             </div>
             <div class="row">
               <center>
-                <button class="btn btn-ui waves-effect waves-light" onclick="satSet.exportTle2Csv();">Export Catalog CSV &#9658;</button>
+                <button class="btn btn-ui waves-effect waves-light" onclick="keepTrackApi.programs.satSet.exportTle2Csv(keepTrackApi.programs.satSet.satData);">Export Catalog CSV &#9658;</button>
               </center>
             </div>
             <div class="row">
@@ -114,8 +198,8 @@ export const init = (): void => {
         </div>
       `);
 
-      // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
+  // Bottom Icon
+  $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-analysis" class="bmenu-item">
           <img
             alt="analysis"
@@ -127,138 +211,67 @@ export const init = (): void => {
         </div>
       `);
 
-      $('#analysis-form').on('submit', function (e) {
-        let chartType = $('#anal-type').val();
-        let sat = $('#anal-sat').val();
-        let sensor = sensorManager.currentSensor.shortName;
-        if (typeof sensor == 'undefined') {
-          $.colorbox({
-            href: `analysis/index.htm?sat=${sat}&type=${chartType}`,
-            iframe: true,
-            width: '60%',
-            height: '60%',
-            fastIframe: false,
-            closeButton: false,
-          });
-        } else {
-          $.colorbox({
-            href: `analysis/index.htm?sat=${sat}&type=${chartType}&sensor=${sensor}`,
-            iframe: true,
-            width: '60%',
-            height: '60%',
-            fastIframe: false,
-            closeButton: false,
-          });
-        }
-        e.preventDefault();
-      });
-      $('#analysis-bpt').on('submit', function (e) {
-        let sats = $('#analysis-bpt-sats').val();
-        if (!sensorManager.checkSensorSelected()) {
-          uiManager.toast(`You must select a sensor first!`, 'critical');
-        } else {
-          satellite.findBestPasses(sats, sensorManager.selectedSensor);
-        }
-        e.preventDefault();
-      });
-
-      $('#findCsoBtn').on('click', function () {
-        $('#loading-screen').fadeIn(1000, function () {
-          let searchStr = satellite.findCloseObjects();
-          uiManager.doSearch(searchStr);
-          $('#loading-screen').fadeOut('slow');
-        });
-      });
-
-      $('#analysis-menu').resizable({
-        handles: 'e',
-        stop: function () {
-          $(this).css('height', '');
-        },
-        maxWidth: 450,
-        minWidth: 280,
-      });      
-    },
+  $('#analysis-form').on('submit', function (e) {
+    e.preventDefault();
+    analysisFormSubmit();
+  });
+  $('#analysis-bpt').on('submit', function (e) {
+    e.preventDefault();
+    analysisBptSumbit();
   });
 
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'analysis',
-    cb: (iconName: string): void => {
-      if (iconName === 'menu-analysis') {
-        if (isAnalysisMenuOpen) {
-          isAnalysisMenuOpen = false;
-          $('#menu-analysis').removeClass('bmenu-item-selected');
-          uiManager.hideSideMenus();
-          return;
-        } else {
-          uiManager.hideSideMenus();
-          isAnalysisMenuOpen = true;
-          if (objectManager.selectedSat != -1) {
-            let sat = satSet.getSat(objectManager.selectedSat);
-            $('#anal-sat').val(sat.SCC_NUM);
-          }
-          if (sensorManager.checkSensorSelected()) {
-            $('#anal-type').html(
-              `<optgroup label="Orbital Parameters">
-                <option value='inc'>Inclination</option>
-                <option value='ap'>Apogee</option>
-                <option value='pe'>Perigee</option>
-                <option value='per'>Period</option>
-                <option value='e'>Eccentricity</option>
-                <option value='ra'>RAAN</option>
-                <option value='all'>All</option>
-              </optgroup>
-              <optgroup id="anal-look-opt" label="Look Angles">
-                <option value='az'>Azimuth</option>
-                <option value='el'>Elevation</option>
-                <option value='rng'>Range</option>
-                <option value='rae'>All</option>
-              </optgroup>`
-            );
-          } else {
-            $('#anal-type').html(
-              `<optgroup label="Orbital Parameters">
-                <option value='inc'>Inclination</option>
-                <option value='ap'>Apogee</option>
-                <option value='pe'>Perigee</option>
-                <option value='per'>Period</option>
-                <option value='e'>Eccentricity</option>
-                <option value='ra'>RAAN</option>
-                <option value='all'>All</option>
-              </optgroup>`
-            );
-          }
-          // Reinitialize the Material CSS Code
-          let elems = document.querySelectorAll('select');
-          M.FormSelect.init(elems);
-
-          $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          $('#menu-analysis').addClass('bmenu-item-selected');
-          return;
-        }
-      }
-    },
+  $('#findCsoBtn').on('click', () => {
+    $('#loading-screen').fadeIn(1000, findCsoBtnClick);
   });
 
-  keepTrackApi.register({
-    method: 'selectSatData',
-    cbName: 'analysis',
-    cb: (sat: any): void => {
-      if (uiManager.isAnalysisMenuOpen) {
-        $('#anal-sat').val(sat.SCC_NUM);
-      }
+  $('#analysis-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
     },
+    maxWidth: 450,
+    minWidth: 280,
   });
+};
 
-  keepTrackApi.register({
-    method: 'hideSideMenus',
-    cbName: 'analysis',
-    cb: (): void => {
-      $('#analysis-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#menu-analysis').removeClass('bmenu-item-selected');
-      isAnalysisMenuOpen = false;
-    },
-  });
+export const analysisFormSubmit = () => {
+  const { sensorManager } = keepTrackApi.programs;
+  const chartType = $('#anal-type').val();
+  const sat = $('#anal-sat').val();
+  const sensor = sensorManager.currentSensor.shortName;
+  if (typeof sensor == 'undefined') {
+    $.colorbox({
+      href: `analysis/index.htm?sat=${sat}&type=${chartType}`,
+      iframe: true,
+      width: '60%',
+      height: '60%',
+      fastIframe: false,
+      closeButton: false,
+    });
+  } else {
+    $.colorbox({
+      href: `analysis/index.htm?sat=${sat}&type=${chartType}&sensor=${sensor}`,
+      iframe: true,
+      width: '60%',
+      height: '60%',
+      fastIframe: false,
+      closeButton: false,
+    });
+  }
+};
+
+export const findCsoBtnClick = () => {
+  const { satellite, uiManager } = keepTrackApi.programs;
+  const searchStr = satellite.findCloseObjects();
+  uiManager.doSearch(searchStr);
+  $('#loading-screen').fadeOut('slow');
+};
+export const analysisBptSumbit = () => {
+  const { satellite, sensorManager, uiManager } = keepTrackApi.programs;
+  const sats = $('#analysis-bpt-sats').val();
+  if (!sensorManager.checkSensorSelected()) {
+    uiManager.toast(`You must select a sensor first!`, 'critical');
+  } else {
+    satellite.findBestPasses(sats, sensorManager.selectedSensor);
+  }
 };

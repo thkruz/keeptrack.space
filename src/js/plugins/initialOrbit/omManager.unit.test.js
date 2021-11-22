@@ -1,9 +1,10 @@
 /* eslint-disable no-undefined */
-/*globals
-  test
-*/
 
+import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 import { omManager } from '@app/js/plugins/initialOrbit/omManager';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 const exampleSat = {
   C: 'US',

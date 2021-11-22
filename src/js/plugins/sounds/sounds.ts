@@ -17,7 +17,7 @@ export const init = (): void => {
         // the queue.
         speak: (text: string) => {
           // Create a new instance of SpeechSynthesisUtterance.
-          let msg = new SpeechSynthesisUtterance();
+          const msg = new SpeechSynthesisUtterance();
     
           // Set the text.
           msg.text = text;

@@ -1,13 +1,6 @@
-interface keepTrackApiInterface {
-  html: (strings: TemplateStringsArray, ...placeholders: any[]) => string;
-  register: (params: { method: string; cbName: string; cb: any }) => void;
-  unregister: (params: { method: string; cbName: string }) => void;
-  callbacks: any;
-  methods: any;
-  programs: any;
-}
+import { keepTrackApiInterface } from './keepTrack';
 
-const keepTrackApi: keepTrackApiInterface = (<any>window).keepTrackApi || {
+export const keepTrackApi: keepTrackApiInterface = {
   html: (strings: TemplateStringsArray, ...placeholders: any[]) => {
     for (const placeholder of placeholders) {
       if (typeof placeholder !== 'string') {
@@ -62,6 +55,8 @@ const keepTrackApi: keepTrackApiInterface = (<any>window).keepTrackApi || {
     updateDateTime: [],
     uiManagerFinal: [],
     loadCatalog: [],
+    resetSensor: [],
+    setSensor: [],
   },
   methods: {
     selectSatData: (sat: any, satId: number) => {
@@ -122,6 +117,12 @@ const keepTrackApi: keepTrackApiInterface = (<any>window).keepTrackApi || {
       const satData = await keepTrackApi.callbacks.loadCatalog[0].cb();
       return satData;
     },
+    resetSensor: () => {
+      keepTrackApi.callbacks.resetSensor.forEach((cb: any) => cb.cb());
+    },
+    setSensor: (sensor: any, id: number) => {
+      keepTrackApi.callbacks.setSensor.forEach((cb: any) => cb.cb(sensor, id));
+    },
   },
   programs: {
     timeManager: {},
@@ -143,5 +144,8 @@ const keepTrackApi: keepTrackApiInterface = (<any>window).keepTrackApi || {
   },
 };
 
-(<any>window).keepTrackApi = keepTrackApi;
-export { keepTrackApi };
+export const isThisJest = () => (typeof process !== 'undefined');
+
+if (typeof (<any>window).keepTrackApi === 'undefined') {
+  (<any>window).keepTrackApi = keepTrackApi;
+}

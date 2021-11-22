@@ -1,0 +1,163 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`uiManager.footerToggle 0 1`] = `undefined`;
+
+exports[`uiManager.footerToggle 1 1`] = `undefined`;
+
+exports[`uiManager.getsensorinfo 0 1`] = `undefined`;
+
+exports[`uiManager.init 0 1`] = `undefined`;
+
+exports[`uiManager.init 0 2`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 1 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 2 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 3 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 4 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 5 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 6 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 7 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 8 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 9 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 10 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 11 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 12 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 13 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 14 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 15 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 16 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 17 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 18 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 19 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 20 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 21 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 22 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 23 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 24 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 25 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 26 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 27 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 28 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 29 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 30 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick 31 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 0 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 1 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 2 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 3 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 4 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 5 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 6 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 7 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 8 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 9 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 10 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 11 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 12 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 13 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 14 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 15 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 16 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 17 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 18 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 19 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 20 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 21 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 22 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 23 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 24 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 25 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 26 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 27 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 28 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 29 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 30 1`] = `undefined`;
+
+exports[`uiManager.legendHoverMenuClick-flagsOff 31 1`] = `undefined`;
+
+exports[`uiManager.legendMenuChange 0 1`] = `undefined`;
+
+exports[`uiManager.legendMenuChange 1 1`] = `undefined`;
+
+exports[`uiManager.legendMenuChange 2 1`] = `undefined`;
+
+exports[`uiManager.legendMenuChange 3 1`] = `undefined`;
+
+exports[`uiManager.legendMenuChange 4 1`] = `undefined`;
+
+exports[`uiManager.legendMenuChange 5 1`] = `undefined`;
+
+exports[`uiManager.legendMenuChange 6 1`] = `undefined`;
+
+exports[`uiManager.legendMenuChange 7 1`] = `undefined`;
+
+exports[`uiManager.legendMenuChange 8 1`] = `undefined`;
+
+exports[`uiManager.legendMenuChange 9 1`] = `undefined`;
+
+exports[`uiManager.legendMenuChange 10 1`] = `undefined`;
+
+exports[`uiManager.legendMenuChange 11 1`] = `undefined`;
+
+exports[`uiManager.onReady 0 1`] = `undefined`;

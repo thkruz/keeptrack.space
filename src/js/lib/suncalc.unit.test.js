@@ -1,8 +1,3 @@
-/* eslint-disable no-undefined */
-/*globals
-  test
-*/
-
 import { SunCalc } from '@app/js/lib/suncalc.js';
 
 test('sunCalc Unit Tests', () => {

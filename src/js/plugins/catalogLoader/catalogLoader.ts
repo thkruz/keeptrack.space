@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 import { stringPad } from '@app/js/lib/helpers';
+import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 
 /**
  *  @returns {Promise<any>}
@@ -18,7 +18,7 @@ import { stringPad } from '@app/js/lib/helpers';
  *
  *  If all files are missing, the function will return an error.
  */
-const catalogLoader = async (): Promise<any> => {
+export const catalogLoader = async (): Promise<any> => {
   const settingsManager: any = window.settingsManager;
   // let extraSats: any;
 
@@ -33,41 +33,48 @@ const catalogLoader = async (): Promise<any> => {
   //     });
   //     return satData;
   //   } catch (error) {
-  //     console.error(error);
+  //     console.debug(error);
   //   }
   // }
 
   try {
     let extraSats: any = [];
     if (settingsManager.offline) {
-      $.get('./tle/extra.json').then((resp) => {
+      $.get(`${settingsManager.installDirectory}tle/extra.json`).then((resp) => {
         extraSats = JSON.parse(resp);
       });
     }
 
-    let asciiCatalog: { SCC: string; TLE1: any; TLE2: any; }[] = [];
-    $.get('./tle/TLE.txt').then((resp) => { 
-      let content=resp.split('\n');
-      for (let i = 0; i < content.length; i=i+2) {
-        asciiCatalog.push({
-          SCC: stringPad.pad0(content[i].substr(2, 5).trim(), 5),
-          TLE1: content[i],
-          TLE2: content[i+1],
-        });
-      }
-    });
-    await import('@app/tle/TLE.json').then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
+    const asciiCatalog: { SCC: string; TLE1: any; TLE2: any }[] = [];
+    if (!settingsManager.isDisableAsciiCatalog) {
+      $.get(`${settingsManager.installDirectory}tle/TLE.txt`).then((resp) => {
+        const content = resp.split('\n');
+        for (let i = 0; i < content.length; i = i + 2) {
+          asciiCatalog.push({
+            SCC: stringPad.pad0(content[i].substr(2, 5).trim(), 5),
+            TLE1: content[i],
+            TLE2: content[i + 1],
+          });
+        }
+      });
+    }
+
+    if (settingsManager.isUseDebrisCatalog) {
+      await $.get(`${settingsManager.installDirectory}tle/TLEdebris.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
+    } else {
+      await $.get(`${settingsManager.installDirectory}tle/TLE.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
+    }
   } catch (e) {
-    console.error(e);
+    // console.debug(e);
   }
 };
 
 // Parse the Catalog from satSet.loadCatalog and then return it back -- they are chained together!
-const parseCatalog = (resp: any, extraSats: any, asciiCatalog: any) => {
-  const {satSet, objectManager} = keepTrackApi.programs;
+export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any) => {
+  const { satSet, objectManager } = keepTrackApi.programs;
   const settingsManager: any = window.settingsManager;
 
-  let limitSatsArray = setupGetVariables();
+  const limitSatsArray = setupGetVariables();
 
   // Filter TLEs
   // SatCruncher will use this when it returns so we need to expose it now
@@ -93,29 +100,28 @@ const parseCatalog = (resp: any, extraSats: any, asciiCatalog: any) => {
   }
 };
 
-var limitSats = (<any>settingsManager).limitSats;
-const setupGetVariables = () => {
+export const setupGetVariables = () => {
   const { satSet, timeManager } = keepTrackApi.programs;
-  var obslatitude;
-  var obslongitude;
-  var obsheight;
-  var obsminaz;
-  var obsmaxaz;
-  var obsminel;
-  var obsmaxel;
-  var obsminrange;
-  var obsmaxrange;
-  var limitSatsArray: string[] = [];
+  let obslatitude;
+  let obslongitude;
+  let obsheight;
+  let obsminaz;
+  let obsmaxaz;
+  let obsminel;
+  let obsmaxel;
+  let obsminrange;
+  let obsmaxrange;
+  let limitSatsArray: string[] = [];
   /** Parses GET variables for SatCruncher initialization */
   // This should be somewhere else!!
-  var queryStr = window.location.search.substring(1);
-  var params = queryStr.split('&');
-  for (var i = 0; i < params.length; i++) {
-    var key = params[i].split('=')[0];
-    var val = params[i].split('=')[1];
+  const queryStr = window.location.search.substring(1);
+  const params = queryStr.split('&');
+  for (let i = 0; i < params.length; i++) {
+    const key = params[i].split('=')[0];
+    const val = params[i].split('=')[1];
     switch (key) {
       case 'limitSats':
-        limitSats = val;
+        (<any>settingsManager).limitSats = val;
         $('#limitSats').val(val);
         // document.getElementById('settings-limitSats-enabled').checked = true;
         $('#limitSats-Label').addClass('active');
@@ -142,25 +148,26 @@ const setupGetVariables = () => {
   return limitSatsArray;
 };
 
-const filterTLEDatabase = (resp: string | any[], limitSatsArray: string | any[], extraSats: string | any[], asciiCatalog: string | any[]) => {
+export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string | any[], extraSats?: string | any[], asciiCatalog?: string | any[]) => {
   const { dotsManager, objectManager, satSet } = keepTrackApi.programs;
-  
-  var tempSatData = [];
+
+  const tempSatData = [];
   satSet.sccIndex = {};
   satSet.cosparIndex = {};
-  if (limitSatsArray[0] == null) {
+
+  if (typeof limitSatsArray === 'undefined' || limitSatsArray.length == 0 || limitSatsArray[0] == null) {
     // If there are no limits then just process like normal
-    limitSats = '';
+    (<any>settingsManager).limitSats = '';
   }
 
-  var year;
-  var prefix;
-  var rest;
+  let year;
+  let prefix;
+  let rest;
 
   let i = 0;
   for (i = 0; i < resp.length; i++) {
     resp[i].SCC_NUM = stringPad.pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
-    if (limitSats === '') {
+    if ((<any>settingsManager).limitSats === '') {
       // If there are no limits then just process like normal
       year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
       if (year === '') {
@@ -179,8 +186,8 @@ const filterTLEDatabase = (resp: string | any[], limitSatsArray: string | any[],
       continue;
     } else {
       // If there are limited satellites
-      for (var x = 0; x < limitSatsArray.length; x++) {
-        if (resp[i].SCC_NUM === limitSatsArray[x]) {
+      for (let x = 0; x < limitSatsArray.length; x++) {
+        if (resp[i].SCC_NUM === limitSatsArray[x].SCC_NUM) {
           year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
           if (year === '') {
             resp[i].intlDes = 'none';
@@ -240,7 +247,7 @@ const filterTLEDatabase = (resp: string | any[], limitSatsArray: string | any[],
           TLE1: extraSats[s].TLE1,
           TLE2: extraSats[s].TLE2,
           intlDes: year + '-' + rest,
-          type: 'sat',
+          typ: 'sat',
           id: tempSatData.length,
           vmag: extraSats[s].vmag,
         };
@@ -289,7 +296,7 @@ const filterTLEDatabase = (resp: string | any[], limitSatsArray: string | any[],
           TLE1: asciiCatalog[s].TLE1,
           TLE2: asciiCatalog[s].TLE2,
           intlDes: year + '-' + rest,
-          type: 'sat',
+          typ: 'sat',
           id: tempSatData.length,
         };
         satSet.sccIndex[`${asciiCatalog[s].SCC.toString()}`] = tempSatData.length;
@@ -302,12 +309,16 @@ const filterTLEDatabase = (resp: string | any[], limitSatsArray: string | any[],
 
   if ((<any>settingsManager).isExtraSatellitesAdded) {
     $('.legend-pink-box').show();
-    $('.legend-trusat-box')[1].parentElement.style.display = '';
-    $('.legend-trusat-box')[2].parentElement.style.display = '';
-    $('.legend-trusat-box')[3].parentElement.style.display = '';
-    $('.legend-trusat-box')[1].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
-    $('.legend-trusat-box')[2].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
-    $('.legend-trusat-box')[3].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
+    try {
+      $('.legend-trusat-box')[1].parentElement.style.display = '';
+      $('.legend-trusat-box')[2].parentElement.style.display = '';
+      $('.legend-trusat-box')[3].parentElement.style.display = '';
+      $('.legend-trusat-box')[1].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
+      $('.legend-trusat-box')[2].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
+      $('.legend-trusat-box')[3].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
+    } catch (e) {
+      // Intentionally Blank
+    }
   }
 
   satSet.orbitalSats = tempSatData.length;
@@ -317,6 +328,7 @@ const filterTLEDatabase = (resp: string | any[], limitSatsArray: string | any[],
   if ((<any>settingsManager).isEnableGsCatalog) satSet.initGsData();
 
   for (i = 0; i < objectManager.staticSet.length; i++) {
+    objectManager.staticSet[i].id = tempSatData.length;
     tempSatData.push(objectManager.staticSet[i]);
   }
   for (i = 0; i < objectManager.analSatSet.length; i++) {

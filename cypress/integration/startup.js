@@ -1,5 +1,3 @@
-/// <reference types="cypress" />
-
 context('KeepTrack Startup', () => {
   beforeEach(() => {
     cy.viewport(1920, 1080);
@@ -7,6 +5,8 @@ context('KeepTrack Startup', () => {
   });
 
   it('Load Site', () => {
-    cy.window().then(() => {});
+    cy.window()
+      .then(() => {})
+      .catch((err) => console.log(err));
   });
 });

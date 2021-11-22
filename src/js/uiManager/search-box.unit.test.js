@@ -1,13 +1,9 @@
 /* eslint-disable no-undefined */
-/*globals
-  test
-  expect
-*/
-
-import '@app/js/settingsManager/settingsManager.js';
-import 'jsdom-worker';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { searchBox } from '@app/js/uiManager/search-box.js';
+import { useMockWorkers } from '@app/js/api/apiMocks';
+
+useMockWorkers();
 
 test(`Basic Functions of Search Box`, () => {
   // Setup a unit test enviornment that doesn't worry about other modules
@@ -55,7 +51,7 @@ test(`Basic Functions of Search Box`, () => {
     semiMinorAxis: 8473.945136538932,
     velocity: {},
   };
-  satSet.getSatData = () => satData;
+  satSet.satData = satData;
   satSet.missileSats = 100;
   satSet.setColorScheme = () => true;
   document.body.innerHTML += '<div id="search-results"></div>';
@@ -96,7 +92,7 @@ test(`Basic Functions of Search Box`, () => {
 
   expect(searchBox.doArraySearch([5, 5])).toBe('00005,00005');
 
-  let resultsA = satSet.getSatData();
+  let resultsA = satSet.satData;
   let resultsB = [];
   resultsB[0] = resultsA[5];
   resultsB[0].satId = 5;

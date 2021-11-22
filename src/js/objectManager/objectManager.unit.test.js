@@ -1,11 +1,4 @@
 /* eslint-disable no-undefined */
-/*globals
-  global
-  test
-  expect
-  describe
-*/
-
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 
 describe('ObjectManager Unit Tests', () => {

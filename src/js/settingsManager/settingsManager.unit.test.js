@@ -1,14 +1,8 @@
 /* eslint-disable no-undefined */
-/*globals
-  global
-  describe
-  test
-  jest
-  beforeEach
-  expect
-*/
+import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 
-import '@app/js/settingsManager/settingsManager.js';
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 const setUrl = (url) => {
   const host = url.split('/')[2] || '';
@@ -128,7 +122,9 @@ describe('settingsManager URL Test', () => {
   });
 
   // These need to be moved
-  test.skip('Other functions of settingsManager', () => {
+  test('Other functions of settingsManager', () => {
+    const { uiManager } = keepTrackApi.programs;
+
     settingsManager.setCurrentColorScheme('test');
     expect(settingsManager.currentColorScheme).toBe('test');
 
@@ -144,11 +140,6 @@ describe('settingsManager URL Test', () => {
     uiManager.loadStr('coloring');
     uiManager.loadStr('elsets');
     uiManager.loadStr('easterEgg');
-
-    settingsManager.db.off();
-    settingsManager.db.on();
-    settingsManager.db.log('test');
-    settingsManager.db.log('test', true);
   });
 
   test('Other SettingsManager Tests', () => {

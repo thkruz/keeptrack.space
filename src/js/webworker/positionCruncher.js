@@ -20,10 +20,10 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 
 'use strict';
-import '@app/js/lib/external/numeric.js';
 import * as satellite from 'satellite.js';
 import { A } from '@app/js/lib/external/meuusjs.js';
 import { SunCalc } from '@app/js/lib/suncalc.js';
+import { numeric } from '../lib/external/numeric';
 
 /** CONSTANTS */
 const PI = Math.PI;
@@ -48,6 +48,7 @@ var satelliteSelected = [-1]; // Array used to determine which satellites are se
 let globalPropagationRate = 1000; // Limits how often the propagation loop runs
 let globalPropagationRateMultiplier = 1; // Used to slow down propagation rate on slow computers
 var propagationRunning = false; // Prevent Propagation From Running Twice
+let timeSyncRunning = false; // Prevent Time Sync Loop From Running Twice
 var divisor = 1; // When running at high speeds, allow faster propagation
 var propOffset = 0; // offset varting us propagate in the future (or past)
 var propRate = 1; // vars us run time faster (or slower) than normal
@@ -75,9 +76,8 @@ let postMessageArray = {};
 var sensor = {};
 var mSensor = {};
 var defaultGd = {
-  lat: null,
+  latitude: null,
   longitude: 0,
-  latitude: 0,
   height: 0,
 };
 sensor.defaultGd = defaultGd;
@@ -164,6 +164,7 @@ onmessage = function (m) {
         if (isResetInView == false) isResetInView = true;
       } else {
         globalPropagationRate = 2000;
+        // satellite.js requires this format - DONT use lon,lat,alt
         sensor.observerGd = {
           longitude: m.data.sensor.lon * DEG2RAD,
           latitude: m.data.sensor.lat * DEG2RAD,
@@ -175,17 +176,17 @@ onmessage = function (m) {
     isMultiSensor = false;
   }
 
-  const oldPropRate = propRate;
+  // const oldPropRate = propRate;
 
   switch (m.data.typ) {
     case 'offset':
       propOffset = Number(m.data.dat.split(' ')[0]);
       propRate = Number(m.data.dat.split(' ')[1]);
 
-      if (!(oldPropRate == 0 && propRate == 0)) {
-        // Update propRealTime only if updating propOffset
-        propRealTime = Date.now();
-      }
+      // if (!(oldPropRate == 0 && propRate == 0)) {
+      // Update propRealTime only if updating propOffset
+      propRealTime = Date.now();
+      // }
 
       // Changing this to 0.1 caused issues...
       divisor = 1;
@@ -278,11 +279,31 @@ onmessage = function (m) {
     case 'newMissile':
       satCache[m.data.id] = m.data;
       break;
+    case 'timeSync':
+      propRealTime = new Date(m.data.time);
+      break;
+    default:
+      console.warn('Unknown message typ: ' + m.data.typ);
+      break;
   }
   if (!propagationRunning) {
     len = -1; // propagteCruncher needs to start at -1 not 0
     propagateCruncher();
   }
+  if (!timeSyncRunning) {
+    timeSyncLoop();
+  }
+};
+
+const timeSyncLoop = () => {
+  const postMessageArray = {
+    typ: 'timeSync',
+    time: propTime().getTime(),
+    propRate: propRate,
+    propOffset: propOffset,
+  };
+  postMessage(postMessageArray);
+  setTimeout(timeSyncLoop, 250);
 };
 
 // Prevent Memory Leak by declaring variables outside of function
@@ -513,7 +534,7 @@ var propagateCruncher = () => {
         // Angle between earth and sun
         theta =
           Math.acos(
-            self.numeric.dot([-satPos[i * 3], -satPos[i * 3 + 1], -satPos[i * 3 + 2]], [-satPos[i * 3] + sunECI.x, -satPos[i * 3 + 1] + sunECI.y, -satPos[i * 3 + 2] + sunECI.z]) /
+            numeric.dot([-satPos[i * 3], -satPos[i * 3 + 1], -satPos[i * 3 + 2]], [-satPos[i * 3] + sunECI.x, -satPos[i * 3 + 1] + sunECI.y, -satPos[i * 3 + 2] + sunECI.z]) /
               (Math.sqrt(Math.pow(-satPos[i * 3], 2) + Math.pow(-satPos[i * 3 + 1], 2) + Math.pow(-satPos[i * 3 + 2], 2)) *
                 Math.sqrt(Math.pow(-satPos[i * 3] + sunECI.x, 2) + Math.pow(-satPos[i * 3 + 1] + sunECI.y, 2) + Math.pow(-satPos[i * 3 + 2] + sunECI.z, 2)))
           ) * RAD2DEG;
@@ -541,6 +562,7 @@ var propagateCruncher = () => {
             if (!(sensor.type == 'Optical' && satInSun[i] == 0)) {
               if (satInView[i]) break;
               sensor = mSensor[s];
+              // satellite.js requires this format - DONT use lon,lat,alt
               sensor.observerGd = {
                 longitude: sensor.lon * DEG2RAD,
                 latitude: sensor.lat * DEG2RAD,
@@ -730,6 +752,7 @@ var propagateCruncher = () => {
         // We intentionally go past the last sensor so we can record the last marker's id
         if (s == mSensor.length) break;
         sensor = mSensor[s];
+        // satellite.js requires this format - DONT use lon,lat,alt
         sensor.observerGd = {
           longitude: sensor.lon * DEG2RAD,
           latitude: sensor.lat * DEG2RAD,
@@ -758,8 +781,8 @@ var propagateCruncher = () => {
           }
 
           // az, el, rng, pos;
-          q = Math.abs(sensor.obsmaxaz - sensor.obsminaz) < 30 ? 0.25 : 3;
-          q2 = sensor.obsmaxrange - sensor.obsminrange < 500 ? 1000 : 30;
+          q = Math.abs(sensor.obsmaxaz - sensor.obsminaz) < 30 ? 0.5 : 3;
+          q2 = sensor.obsmaxrange - sensor.obsminrange < 720 ? 125 : 30;
 
           // Don't show anything but the floor if in surveillance only mode
           // Unless it is a volume search radar
@@ -892,7 +915,7 @@ var propagateCruncher = () => {
                 }
                 pos = satellite.ecfToEci(_lookAnglesToEcf(az, sensor.obsmaxel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                 if (i === len) {
-                  console.error('No More Markers');
+                  console.debug('No More Markers');
                   break;
                 }
                 satCache[i].active = true;
@@ -934,7 +957,7 @@ var propagateCruncher = () => {
                 }
                 pos = satellite.ecfToEci(_lookAnglesToEcf(az, sensor.obsminel2, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                 if (i === len) {
-                  console.error('No More Markers');
+                  console.debug('No More Markers');
                   break;
                 }
                 satCache[i].active = true;
@@ -974,7 +997,7 @@ var propagateCruncher = () => {
               for (el = sensor.obsminel; el < sensor.obsmaxel; el += q) {
                 pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                 if (i === len) {
-                  console.error('No More Markers');
+                  console.debug('No More Markers');
                   break;
                 }
                 satCache[i].active = true;
@@ -1014,7 +1037,7 @@ var propagateCruncher = () => {
                 for (el = sensor.obsminel2; el < sensor.obsmaxel2; el += q) {
                   pos = satellite.ecfToEci(_lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                   if (i === len) {
-                    console.error('No More Markers');
+                    console.debug('No More Markers');
                     break;
                   }
                   satCache[i].active = true;
@@ -1052,7 +1075,7 @@ var propagateCruncher = () => {
               }
               pos = satellite.ecfToEci(_lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
               if (i === len) {
-                console.error('No More Markers');
+                console.debug('No More Markers');
                 break;
               }
               satCache[i].active = true;
@@ -1084,7 +1107,7 @@ var propagateCruncher = () => {
               }
               pos = satellite.ecfToEci(_lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
               if (i === len) {
-                console.error('No More Markers');
+                console.debug('No More Markers');
                 break;
               }
               satCache[i].active = true;
@@ -1099,12 +1122,46 @@ var propagateCruncher = () => {
             }
           }
 
+          if (sensor.obsmaxrange - sensor.obsminrange < 720) {
+            for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
+              for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
+                if (sensor.obsminaz > sensor.obsmaxaz) {
+                  if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
+                    // Intentional
+                  } else {
+                    continue;
+                  }
+                } else {
+                  if (az >= sensor.obsminaz && az <= sensor.obsmaxaz) {
+                    // Intentional
+                  } else {
+                    continue;
+                  }
+                }
+                pos = satellite.ecfToEci(_lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
+                if (i === len) {
+                  console.debug('No More Markers');
+                  break;
+                }
+                satCache[i].active = true;
+                satPos[i * 3] = pos.x;
+                satPos[i * 3 + 1] = pos.y;
+                satPos[i * 3 + 2] = pos.z;
+
+                satVel[i * 3] = 0;
+                satVel[i * 3 + 1] = 0;
+                satVel[i * 3 + 2] = 0;
+                i++;
+              }
+            }
+          }
+
           if (sensor.obsminaz !== sensor.obsmaxaz && sensor.obsminaz !== sensor.obsmaxaz - 360) {
             for (az = sensor.obsmaxaz; az == sensor.obsmaxaz; az += 1) {
               for (rng = sensor.obsminrange; rng < sensor.obsmaxrange; rng += q) {
                 pos = satellite.ecfToEci(_lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                 if (i === len) {
-                  console.error('No More Markers');
+                  console.debug('No More Markers');
                   break;
                 }
                 satCache[i].active = true;
@@ -1123,7 +1180,7 @@ var propagateCruncher = () => {
               for (rng = sensor.obsminrange; rng < sensor.obsmaxrange; rng += q) {
                 pos = satellite.ecfToEci(_lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                 if (i === len) {
-                  console.error('No More Markers');
+                  console.debug('No More Markers');
                   break;
                 }
                 satCache[i].active = true;
@@ -1218,7 +1275,7 @@ var propagateCruncher = () => {
                   satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
 
                   if (i === len) {
-                    console.error('Ran out of Markers');
+                    console.debug('Ran out of Markers');
                     continue; // Only get so many markers.
                   }
                   satCache[i].active = true;
@@ -1252,7 +1309,7 @@ var propagateCruncher = () => {
                   satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
 
                   if (i === len) {
-                    console.error('Ran out of Markers');
+                    console.debug('Ran out of Markers');
                     continue; // Only get so many markers.
                   }
                   satCache[i].active = true;

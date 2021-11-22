@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`earth.bumpImgOnLoad 0 1`] = `undefined`;
+
+exports[`earth.dayImgHiOnLoad 0 1`] = `undefined`;
+
+exports[`earth.dayImgOnLoad 0 1`] = `undefined`;
+
+exports[`earth.draw 0 1`] = `true`;
+
+exports[`earth.drawOcclusion 0 1`] = `undefined`;
+
+exports[`earth.init 0 1`] = `Promise {}`;
+
+exports[`earth.initBuffers 0 1`] = `undefined`;
+
+exports[`earth.initBumpTexture 0 1`] = `undefined`;
+
+exports[`earth.initDayTexture 0 1`] = `undefined`;
+
+exports[`earth.initNightTexture 0 1`] = `undefined`;
+
+exports[`earth.initProgram 0 1`] = `undefined`;
+
+exports[`earth.initSpecularTexture 0 1`] = `undefined`;
+
+exports[`earth.initTextures 0 1`] = `undefined`;
+
+exports[`earth.nightImgHiOnLoad 0 1`] = `undefined`;
+
+exports[`earth.nightImgOnLoad 0 1`] = `undefined`;
+
+exports[`earth.onImageLoaded 0 1`] = `undefined`;
+
+exports[`earth.specularImgOnLoad 0 1`] = `undefined`;
+
+exports[`earth.update 0 1`] = `undefined`;
+
+exports[`earth.updateSunCurrentDirection 0 1`] = `undefined`;

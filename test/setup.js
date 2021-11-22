@@ -1,8 +1,3 @@
-/* globals
-  jest
-  global
-*/
-
 const setup = {};
 setup.init = () => {
   const oldWindowLocation = window.location;

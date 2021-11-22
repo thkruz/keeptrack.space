@@ -1,8 +1,3 @@
-/*globals
-  test
-  expect
-*/
-
 import { keepTrackApi } from './externalApi';
 
 test(`keepTrackApi Unit Testing`, () => {

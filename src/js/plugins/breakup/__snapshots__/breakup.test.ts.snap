@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`breakup.bottomMenuClick 0 1`] = `undefined`;
+
+exports[`breakup.bottomMenuClick 1 1`] = `undefined`;
+
+exports[`breakup.bottomMenuClick 2 1`] = `[Function]`;
+
+exports[`breakup.bottomMenuClick 3 1`] = `[Function]`;
+
+exports[`breakup.breakupOnSubmit 0 1`] = `undefined`;
+
+exports[`breakup.hideSideMenus 0 1`] = `undefined`;
+
+exports[`breakup.init 0 1`] = `undefined`;
+
+exports[`breakup.uiManagerInit 0 1`] = `undefined`;

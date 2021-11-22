@@ -34,7 +34,7 @@ radarDataManager.changeTimeToFirstDataTime = () => {
   timeManager.propOffset = new Date(radarDataManager.radarData[0].t) - Date.now();
   $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
   satCruncher.postMessage({
-    typ: 'offset',
+    type: 'offset',
     dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
   });
 };
@@ -54,7 +54,6 @@ radarDataManager.findFirstDataTime = () => {
 /* istanbul ignore next */
 radarDataManager.setup = (resp) => {
   if (!settingsManager.isEnableRadarData) return;
-  db.log('radarDataManager.init');
   radarDataManager.radarData = JSON.parse(resp);
 
   let j, gmst, nowDate, radarDataECF, radarDataECI;
@@ -74,7 +73,7 @@ radarDataManager.setup = (resp) => {
     gmst = satellite.gstime(j);
 
     // Update Radar Marker Position
-    radarDataECF = satellite.lookAnglesToEcf(
+    radarDataECF = satellite.lookAngles2Ecf(
       radarDataManager.radarData[i].a,
       radarDataManager.radarData[i].e,
       radarDataManager.radarData[i].r,

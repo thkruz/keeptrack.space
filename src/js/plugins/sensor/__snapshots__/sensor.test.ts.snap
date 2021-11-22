@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`sensor.bottomMenuClick 0 1`] = `undefined`;
+
+exports[`sensor.bottomMenuClick 1 1`] = `undefined`;
+
+exports[`sensor.bottomMenuClick 2 1`] = `undefined`;
+
+exports[`sensor.bottomMenuClick 3 1`] = `undefined`;
+
+exports[`sensor.bottomMenuClick 4 1`] = `undefined`;
+
+exports[`sensor.bottomMenuClick 5 1`] = `undefined`;
+
+exports[`sensor.hideSideMenus 0 1`] = `undefined`;
+
+exports[`sensor.init 0 1`] = `undefined`;
+
+exports[`sensor.selectSatData 0 1`] = `undefined`;
+
+exports[`sensor.uiManagerInit 0 1`] = `undefined`;

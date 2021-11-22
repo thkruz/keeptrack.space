@@ -13,7 +13,7 @@ self.addEventListener('install', (e) => {
         console.debug(`[Service Worker] Caching all: app shell and content`);
         return cache.addAll(contentToCache);
       })
-      .then(function (e) {
+      .then(function () {
         // return self.skipWaiting();
       })
   );
@@ -46,6 +46,7 @@ self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (cacheNames) {
       return Promise.all(
+        // eslint-disable-next-line array-callback-return
         cacheNames.map(function (cacheName) {
           if (cacheName !== currentCacheName && cacheName.startsWith('KeepTrack-')) {
             console.debug(`[Service Worker] Removing Old Cache: ${cacheName}`);

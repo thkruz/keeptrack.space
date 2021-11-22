@@ -1,5 +1,3 @@
-/* globals test jest */
-
 import { init } from './analysis';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
@@ -12,16 +10,16 @@ test('Load Analysis Plugin', () => {
       hideSideMenus: jest.fn(),
     },
     objectManager: {
-        selectedSat: 25544,
+      selectedSat: 25544,
     },
     sensorManager: {
-        checkSensorSelected: () => true,
-    }
+      checkSensorSelected: () => true,
+    },
   };
   window.M = {
-      FormSelect: {
-          init: () => true,
-      },
+    FormSelect: {
+      init: () => true,
+    },
   };
 
   init();

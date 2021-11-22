@@ -111,6 +111,7 @@ om.svs2kps = (svs) => {
     r.avg.tl = 0;
   }
 
+  // deepcode ignore UnusedIterator: false positive
   for (let i = 0; i < kpList.length; i++) {
     if (kpList[i].apogee < r.min.apogee) r.min.apogee = kpList[i].apogee;
     if (kpList[i].apogee > r.max.apogee) r.max.apogee = kpList[i].apogee;
@@ -162,85 +163,101 @@ om.svs2kps = (svs) => {
   return r;
 };
 om.iod = async (svs, timeManager, satellite) => {
-  const kps = om.svs2kps(svs);
+  try {
+    const kps = om.svs2kps(svs);
 
-  // Sort SVs by Time
-  svs.sort(function (a, b) {
-    return a[0].value - b[0].value;
-  });
+    // Sort SVs by Time
+    svs.sort(function (a, b) {
+      return a[0].value - b[0].value;
+    });
 
-  // Change Time to Relative to the First Observation
-  const epoch = new Date(svs[0][0]);
+    // Change Time to Relative to the First Observation
+    const epoch = new Date(svs[0][0]);
 
-  return om.fitTles(epoch, svs, kps, timeManager, satellite);
+    return om.fitTles(epoch, svs, kps, timeManager, satellite);
+  } catch (e) {
+    console.debug(e);
+  }
 };
 
 om.fitTles = async (epoch, svs, kps, timeManager, satellite) => {
-  om.debug.closestApproach = 0;
-  const STEPS = settingsManager.fitTleSteps;
-  // const incI = (kps.max.inclination - kps.min.inclination) / STEPS;
-  const raanI = (kps.max.raan - kps.min.raan) / STEPS;
-  // const eccI = (kps.max.eccentricity - kps.min.eccentricity) / STEPS;
-  const argpeI = (kps.max.argPe - kps.min.argPe) / STEPS;
-  const meanaI = (kps.max.mo - kps.min.mo) / STEPS;
-  // const periodI = (kps.max.period - kps.min.period) / STEPS;
-  let bestIndicies = [10000000]; // Starts Really Large To Ensure First One is Better
+  try {
+    om.debug.closestApproach = 0;
+    const STEPS = settingsManager.fitTleSteps;
+    // const incI = (kps.max.inclination - kps.min.inclination) / STEPS;
+    const raanI = (kps.max.raan - kps.min.raan) / STEPS;
+    // const eccI = (kps.max.eccentricity - kps.min.eccentricity) / STEPS;
+    const argpeI = (kps.max.argPe - kps.min.argPe) / STEPS;
+    const meanaI = (kps.max.mo - kps.min.mo) / STEPS;
+    // const periodI = (kps.max.period - kps.min.period) / STEPS;
+    let bestIndicies = [10000000]; // Starts Really Large To Ensure First One is Better
 
-  for (let r = -STEPS / 2; r < STEPS / 2; r++) {
-    for (let a = -STEPS; a < STEPS; a++) {
-      for (let m = -STEPS * 2; m < STEPS * 2; m++) {
-        let kp = {};
-        kp.inclination = kps.avg.inclination;
-        kp.raan = kps.avg.raan + raanI * r;
-        kp.eccentricity = kps.avg.eccentricity;
-        kp.argPe = kps.avg.argPe + argpeI * a;
-        kp.mo = kps.avg.mo + (meanaI * m) / 2;
-        kp.period = kps.avg.period;
-        const tles = om.kp2tle(kp, epoch, timeManager);
-        let xError = 0;
-        let yError = 0;
-        let zError = 0;
-        let posErrorAvg = 0;
-        for (let svI = 0; svI < svs.length; svI++) {
-          let eci;
-          try {
-            eci = _propagate(tles.tle1, tles.tle2, new Date(epoch + (svs[svI][0] - svs[0][0])), satellite);
-            xError += Math.abs(eci.position.x - svs[svI][1]);
-            yError += Math.abs(eci.position.y - svs[svI][2]);
-            zError += Math.abs(eci.position.z - svs[svI][3]);
-            posErrorAvg += Math.sqrt(xError ** 2 + yError ** 2 + zError ** 2);
-          } catch (error) {
-            // console.warn(eci);
+    for (let r = -STEPS / 2; r < STEPS / 2; r++) {
+      for (let a = -STEPS; a < STEPS; a++) {
+        for (let m = -STEPS * 2; m < STEPS * 2; m++) {
+          let kp = {};
+          kp.inclination = kps.avg.inclination;
+          kp.raan = kps.avg.raan + raanI * r;
+          kp.eccentricity = kps.avg.eccentricity;
+          kp.argPe = kps.avg.argPe + argpeI * a;
+          kp.mo = kps.avg.mo + (meanaI * m) / 2;
+          kp.period = kps.avg.period;
+          const tles = om.kp2tle(kp, epoch, timeManager);
+          let xError = 0;
+          let yError = 0;
+          let zError = 0;
+          let posErrorAvg = 0;
+          for (let svI = 0; svI < svs.length; svI++) {
+            let eci;
+            try {
+              eci = _propagate(tles.tle1, tles.tle2, new Date(epoch + (svs[svI][0] - svs[0][0])), satellite);
+              xError += Math.abs(eci.position.x - svs[svI][1]);
+              yError += Math.abs(eci.position.y - svs[svI][2]);
+              zError += Math.abs(eci.position.z - svs[svI][3]);
+              posErrorAvg += Math.sqrt(xError ** 2 + yError ** 2 + zError ** 2);
+            } catch (error) {
+              // console.warn(eci);
+            }
           }
-        }
-        posErrorAvg /= svs.length;
-        // console.log(posErrorAvg);
+          posErrorAvg /= svs.length;
+          // console.log(posErrorAvg);
 
-        // TODO: Better Decision on Best Indicies
-        if (posErrorAvg < bestIndicies[0]) {
-          bestIndicies = [posErrorAvg, r, a, m];
+          // TODO: Better Decision on Best Indicies
+          if (posErrorAvg < bestIndicies[0]) {
+            bestIndicies = [posErrorAvg, r, a, m];
+          }
         }
       }
     }
-  }
-  // debug
-  console.log(`Closest Approach: ${bestIndicies[0]}`);
-  om.debug.closestApproach += bestIndicies[0];
+    // debug
+    console.log(`Closest Approach: ${bestIndicies[0]}`);
+    om.debug.closestApproach += bestIndicies[0];
 
-  // Calculate Best TLE
-  let kp = {};
-  kp.inclination = kps.avg.inclination;
-  kp.raan = kps.avg.raan + raanI * bestIndicies[1];
-  kp.eccentricity = kps.avg.eccentricity;
-  kp.argPe = kps.avg.argPe + argpeI * bestIndicies[2];
-  kp.mo = kps.avg.mo + meanaI * bestIndicies[3];
-  kp.period = kps.avg.period;
-  return om.kp2tle(kp, epoch);
+    // Calculate Best TLE
+    let kp = {};
+    kp.inclination = kps.avg.inclination;
+    kp.raan = kps.avg.raan + raanI * bestIndicies[1];
+    kp.eccentricity = kps.avg.eccentricity;
+    kp.argPe = kps.avg.argPe + argpeI * bestIndicies[2];
+    kp.mo = kps.avg.mo + meanaI * bestIndicies[3];
+    kp.period = kps.avg.period;
+    return om.kp2tle(kp, epoch);
+  } catch (e) {
+    console.debug(e);
+  }
 };
 om.svs2analyst = async (svs, satSet, timeManager, satellite) => {
-  om.iod(svs, timeManager, satellite).then((tles) => {
-    satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(80000));
-  });
+  try {
+    om.iod(svs, timeManager, satellite)
+      .then((tles) => {
+        satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(80000));
+      })
+      .catch((error) => {
+        console.debug(error);
+      });
+  } catch (error) {
+    console.debug(error);
+  }
 };
 
 om.testIod = (satSet) => {
@@ -253,37 +270,44 @@ om.testIod = (satSet) => {
       }
       om.debug.closestApproach /= metObs.length;
       console.log(`Average Approach: ${om.debug.closestApproach}`);
+    })
+    .catch((error) => {
+      console.debug(error);
     });
 };
 
 om.debug = {};
 om.debug.closestApproach = 0;
 
-const _propagate = async (tle1, tle2, epoch, satellite) => {
-  let satrec = satellite.twoline2satrec(tle1, tle2); // perform and store sat init calcs
-  let j = _jday(
-    epoch.getUTCFullYear(),
-    epoch.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-    epoch.getUTCDate(),
-    epoch.getUTCHours(),
-    epoch.getUTCMinutes(),
-    epoch.getUTCSeconds()
-  ); // Converts time to jday (TLEs use epoch year/day)
-  j += epoch.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-  // let gmst = satellite.gstime(j);
+export const _propagate = async (tle1, tle2, epoch, satellite) => {
+  try {
+    let satrec = satellite.twoline2satrec(tle1, tle2); // perform and store sat init calcs
+    let j = _jday(
+      epoch.getUTCFullYear(),
+      epoch.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
+      epoch.getUTCDate(),
+      epoch.getUTCHours(),
+      epoch.getUTCMinutes(),
+      epoch.getUTCSeconds()
+    ); // Converts time to jday (TLEs use epoch year/day)
+    j += epoch.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+    // let gmst = satellite.gstime(j);
 
-  let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-  let eci = satellite.sgp4(satrec, m);
-  return eci;
+    let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
+    let eci = satellite.sgp4(satrec, m);
+    return eci;
+  } catch (error) {
+    // console.debug(error);
+  }
 };
-const _jday = (year, mon, day, hr, minute, sec) => {
+export const _jday = (year, mon, day, hr, minute, sec) => {
   'use strict';
   return (
     367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor((275 * mon) / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0 //  ut in days
   );
 };
 // Converts State Vectors to Keplerian Elements
-const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2) => {
+export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2) => {
   let rx = vector[1] * 1000;
   let ry = vector[2] * 1000;
   let rz = vector[3] * 1000;
@@ -1412,7 +1436,7 @@ const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU
   */
 
 // Internal Functions
-const _arctan2 = (y, x) => {
+export const _arctan2 = (y, x) => {
   let u;
   if (x != 0) {
     u = Math.atan(y / x);
@@ -1425,11 +1449,10 @@ const _arctan2 = (y, x) => {
   }
   return u;
 };
-const _dayOfYear = (mon, day, hr, minute, sec) =>
+export const _dayOfYear = (mon, day, hr, minute, sec) =>
   // eslint-disable-next-line implicit-arrow-linebreak
   (Math.floor((275 * mon) / 9.0) + day + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0) //  ut in days
     .toFixed(5);
-const _pad0 = (str, max) => (str.length < max ? _pad0('0' + str, max) : str);
+export const _pad0 = (str, max) => (str?.length < max ? _pad0('0' + str, max) : str);
 
-const omManager = om;
-export { omManager };
+export const omManager = om;

@@ -1,67 +1,68 @@
-/* eslint-disable no-undefined */
-/*globals
-  global
-  jest
-*/
-
 global.mocks = {};
 global.mocks.glMock = {
+  activeTexture: jest.fn(),
+  attachShader: jest.fn(),
+  bindBuffer: jest.fn(),
+  bindFramebuffer: jest.fn(),
+  bindRenderbuffer: jest.fn(),
+  bindTexture: jest.fn(),
+  bindVertexArray: jest.fn(),
+  blendFunc: jest.fn(),
+  bufferData: jest.fn(),
+  bufferSubData: jest.fn(),
   canvas: { height: 1080, width: 1920 },
-  createShader: jest.fn(),
+  clear: jest.fn(),
+  clearColor: jest.fn(),
+  compileShader: jest.fn(),
+  createBuffer: () => ({ numItems: 0, layout: {}, data: {} }),
+  createFramebuffer: jest.fn(),
   createProgram: () => ({
     test: '',
   }),
-  getAttribLocation: jest.fn(),
-  getUniformLocation: jest.fn(),
-  shaderSource: jest.fn(),
-  compileShader: jest.fn(),
-  attachShader: jest.fn(),
-  linkProgram: jest.fn(),
-  createBuffer: jest.fn(),
-  bindBuffer: jest.fn(),
-  bufferData: jest.fn(),
-  createTexture: jest.fn(),
-  activeTexture: jest.fn(),
-  enable: jest.fn(),
-  blendFunc: jest.fn(),
-  bindTexture: jest.fn(),
-  texParameteri: jest.fn(),
-  texImage2D: jest.fn(),
   createRenderbuffer: jest.fn(),
-  bindRenderbuffer: jest.fn(),
-  renderbufferStorage: jest.fn(),
-  createFramebuffer: jest.fn(),
-  bindFramebuffer: jest.fn(),
-  framebufferTexture2D: jest.fn(),
-  framebufferRenderbuffer: jest.fn(),
+  createShader: jest.fn(),
+  createTexture: jest.fn(),
+  createVertexArray: jest.fn(),
+  depthMask: jest.fn(),
+  disable: jest.fn(),
+  disableVertexAttribArray: jest.fn(),
   drawArrays: jest.fn(),
   drawElements: jest.fn(),
-  depthMask: jest.fn(),
-  useProgram: jest.fn(),
+  enable: jest.fn(),
   enableVertexAttribArray: jest.fn(),
-  vertexAttribPointer: jest.fn(),
-  uniformMatrix3fv: jest.fn(),
-  uniformMatrix4fv: jest.fn(),
-  uniform4fv: jest.fn(),
-  uniform3fv: jest.fn(),
+  framebufferRenderbuffer: jest.fn(),
+  framebufferTexture2D: jest.fn(),
+  generateMipmap: jest.fn(),
+  getAttribLocation: jest.fn(),
+  getProgramInfoLog: jest.fn(),
+  getProgramParameter: jest.fn(() => true),
+  getUniformLocation: jest.fn(),
+  linkProgram: jest.fn(),
+  readPixels: jest.fn(),
+  renderbufferStorage: jest.fn(),
+  scissor: jest.fn(),
+  shaderSource: jest.fn(),
+  texImage2D: jest.fn(),
+  texParameteri: jest.fn(),
   uniform1f: jest.fn(),
   uniform1i: jest.fn(),
   uniform2f: jest.fn(),
-  getProgramParameter: jest.fn(() => true),
-  getProgramInfoLog: jest.fn(),
-  disable: jest.fn(),
-  scissor: jest.fn(),
-  bufferSubData: jest.fn(),
-  generateMipmap: jest.fn(),
-  createVertexArray: jest.fn(),
-  bindVertexArray: jest.fn(),
-  disableVertexAttribArray: jest.fn(),
+  uniform3fv: jest.fn(),
+  uniform4fv: jest.fn(),
+  uniformMatrix3fv: jest.fn(),
+  uniformMatrix4fv: jest.fn(),
+  useProgram: jest.fn(),
+  viewport: jest.fn(),
+  vertexAttribPointer: jest.fn(),
 };
 
 // mock_requestAnimationFrame.js
 class RequestAnimationFrameMockSession {
-  handleCounter = 0;
-  queue = new Map();
+  constructor() {
+    this.handleCounter = 0;
+    this.queue = new Map();
+  }
+
   requestAnimationFrame(callback) {
     const handle = this.handleCounter++;
     this.queue.set(handle, callback);
@@ -74,7 +75,7 @@ class RequestAnimationFrameMockSession {
 
   triggerNextAnimationFrame(time = performance.now()) {
     const nextEntry = this.queue.entries().next().value;
-    if (nextEntry === undefined) return;
+    if (typeof nextEntry === 'undefined') return;
 
     const [nextHandle, nextCallback] = nextEntry;
 

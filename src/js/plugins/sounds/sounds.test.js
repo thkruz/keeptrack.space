@@ -1,5 +1,3 @@
-/* globals it jest describe beforeEach */
-
 import { init } from './sounds';
 import { keepTrackApi } from '@app/js/api/externalApi';
 

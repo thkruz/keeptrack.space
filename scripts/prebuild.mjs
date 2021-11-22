@@ -17,7 +17,7 @@ const files = [
   'KeepTrack.bat',
   'KeepTrack.lnk',
   'Chrome With Local Files.lnk',
-  'embed.html',
+  'config.htm',
   'favicon.ico',
   'index.htm',
   'manifest.webmanifest',
@@ -53,20 +53,17 @@ console.log(`Creating ./dist/plugins...`);
 mkdirp.sync('./dist/plugins');
 console.log(`Creating ./dist/settings...`);
 mkdirp.sync('./dist/settings');
-
 console.log(`Creating ./dist/css...`);
-try {
-  mkdirp.sync('./dist/css');
-} catch (error) {
-  //
-}
+mkdirp.sync('./dist/css');
+console.log(`Creating ./dist/js/lib...`);
+mkdirp.sync('./dist/js/lib');
 
 dirs.forEach((dir) => {
   try {
     console.log(`Copying ${dir}...`);
     copydir.sync(`./src/${dir}`, `./dist/${dir}`, opts);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 });
 

@@ -27,15 +27,14 @@
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
-export const init = (): void => {
-  const { settingsManager } = keepTrackApi.programs;
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'photo',
-    cb: () => {
-      // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
+export const rightBtnMenuAdd = () => {
+  $('#right-btn-menu-ul').append(keepTrackApi.html`   
+            <li class="rmb-menu-item" id="save-rmb"><a href="#">Save Image &#x27A4;</a></li>
+          `);
+};
+export const uiManagerInit = () => {
+  // Bottom Icon
+  $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-photo" class="bmenu-item">
           <img
             alt="camera"
@@ -47,17 +46,13 @@ export const init = (): void => {
         </div>
       `);
 
-      keepTrackApi.register({
-        method: 'rightBtnMenuAdd',
-        cbName: 'photo',
-        cb: () => {
-          $('#right-btn-menu-ul').append(keepTrackApi.html`   
-            <li class="rmb-menu-item" id="save-rmb"><a href="#">Save Image &#x27A4;</a></li>
-          `);          
-        },
-      });
+  keepTrackApi.register({
+    method: 'rightBtnMenuAdd',
+    cbName: 'photo',
+    cb: rightBtnMenuAdd,
+  });
 
-      $('#rmb-wrapper').append(keepTrackApi.html`
+  $('#rmb-wrapper').append(keepTrackApi.html`
         <div id="save-rmb-menu" class="right-btn-menu">
           <ul class='dropdown-contents'>
             <li id="save-hd-rmb"><a href="#">HD (1920 x 1080)</a></li>
@@ -65,56 +60,65 @@ export const init = (): void => {
             <li id="save-8k-rmb"><a href="#">8K (7680 x 4320)</a></li>
           </ul>
         </div>
-      `);      
-    },
+      `);
+};
+export const rmbMenuActions = (iconName: string): void => {
+  switch (iconName) {
+    case 'save-hd-rmb':
+      saveHiResPhoto('hd');
+      break;
+    case 'save-4k-rmb':
+      saveHiResPhoto('4k');
+      break;
+    case 'save-8k-rmb':
+      saveHiResPhoto('8k');
+      break;
+  }
+};
+export const bottomMenuClick = (iconName: string): void => {
+  if (iconName === 'menu-photo') {
+    saveHiResPhoto('4k');
+    return;
+  }
+};
+export const init = (): void => {
+  // Add HTML
+  keepTrackApi.register({
+    method: 'uiManagerInit',
+    cbName: 'photo',
+    cb: uiManagerInit,
   });
 
   keepTrackApi.programs.photo = {};
-  const saveHiResPhoto = (resolution: string) => {
-    switch (resolution) {
-      case 'hd':
-        settingsManager.hiResWidth = 1920;
-        settingsManager.hiResHeight = 1080;
-        break;
-      case '4k':
-        settingsManager.hiResWidth = 3840;
-        settingsManager.hiResHeight = 2160;
-        break;
-      case '8k':
-        settingsManager.hiResWidth = 7680;
-        settingsManager.hiResHeight = 4320;
-        break;
-    }
-    settingsManager.screenshotMode = true;
-  };
 
   // Add JavaScript
   keepTrackApi.register({
     method: 'bottomMenuClick',
     cbName: 'photo',
-    cb: (iconName: string): void => {
-      if (iconName === 'menu-photo') {
-        saveHiResPhoto('4k');
-        return;
-      }
-    },
+    cb: bottomMenuClick,
   });
 
   keepTrackApi.register({
     method: 'rmbMenuActions',
     cbName: 'editSat',
-    cb: (iconName: string): void => {
-      switch (iconName) {
-        case 'save-hd-rmb':
-          saveHiResPhoto('hd');
-          break;
-        case 'save-4k-rmb':
-          saveHiResPhoto('4k');
-          break;
-        case 'save-8k-rmb':
-          saveHiResPhoto('8k');
-          break;
-      }
-    },
+    cb: rmbMenuActions,
   });
+};
+
+export const saveHiResPhoto = (resolution: string) => {
+  switch (resolution) {
+    case 'hd':
+      settingsManager.hiResWidth = 1920;
+      settingsManager.hiResHeight = 1080;
+      break;
+    case '4k':
+      settingsManager.hiResWidth = 3840;
+      settingsManager.hiResHeight = 2160;
+      break;
+    case '8k':
+      settingsManager.hiResWidth = 7680;
+      settingsManager.hiResHeight = 4320;
+      break;
+  }
+  settingsManager.screenshotMode = true;
 };

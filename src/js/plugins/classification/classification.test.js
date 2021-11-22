@@ -1,7 +1,11 @@
-/* globals it describe */
+import '@app/js/settingsManager/settingsManager';
 
 import { init } from './classification';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs.settingsManager = {};
 
 describe('classification', () => {
   it('should be initialized', () => {

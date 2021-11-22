@@ -21,7 +21,7 @@ let settingsManager = {
   classificationStr: '',
   // This controls which of the built-in plugins are loaded
   plugins: {
-    atmosphere: true,
+    debug: true,
     satInfoboxCore: true,
     updateSelectBoxCore: true,
     aboutManager: true,
@@ -46,6 +46,7 @@ let settingsManager = {
     countries: true,
     colorsMenu: true,
     shortTermFences: true,
+    orbitReferences: true,
     externalSources: true,
     analysis: true,
     sensorFov: true,
@@ -63,7 +64,29 @@ let settingsManager = {
     topMenu: true,
     classification: true,
     soundManager: true,
+    gamepad: true,
   },
+  colors: {
+    transparent: null,
+  },
+  timeMachineDelay: null,
+  mapWidth: null,
+  mapHeight: null,
+  isMapUpdateOverride: null,
+  disableUI: null,
+  isMobileModeEnabled: null,
+  lastMapUpdateTime: null,
+  isFOVBubbleModeOn: null,
+  isShowSurvFence: null,
+  isSatOverflyModeOn: null,
+  currentColorScheme: null,
+  hiResWidth: null,
+  hiResHeight: null,
+  screenshotMode: null,
+  lastBoxUpdateTime: null,
+  isEditTime: null,
+  fieldOfView: null,
+  db: null,
   init: async () => {
     settingsManager.pTime = [];
 
@@ -122,7 +145,19 @@ let settingsManager = {
     // This needed to be increased to support large number of CSpOC sensors
     settingsManager.maxFieldOfViewMarkers = 500000;
     settingsManager.maxMissiles = 500;
-    settingsManager.maxAnalystSats = 256;
+    settingsManager.maxAnalystSats = 30000;
+
+    // Enable the debris only catalog
+    settingsManager.isUseDebrisCatalog = false;
+
+    // Dont load the sensors
+    settingsManager.isDisableSensors = false;
+
+    // Dont load the launch sites
+    settingsManager.isDisableLaunchSites = false;
+
+    // Dont Load the control sites
+    settingsManager.isDisableControlSites = false;
 
     // Enable/Disable gs.json catalog Information
     settingsManager.isEnableGsCatalog = true;
@@ -131,6 +166,11 @@ let settingsManager = {
     settingsManager.maxRadarData = 1; // 70000;
     // Adjust to change camera speed of auto rotate around earth
     settingsManager.autoRotateSpeed = 1.0 * 0.000075;
+    // Adjust to change camera speed of auto pan around earth
+    settingsManager.autoPanSpeed = {
+      x: 1,
+      y: 0,
+    };
     // Disable main user interface. Currently an all or nothing package.
     settingsManager.disableUI = false;
     // Currently only disables panning. In the future it will disable all camera
@@ -138,6 +178,8 @@ let settingsManager = {
     settingsManager.disableCameraControls = false;
     // Disable normal browser events from keyboard/mouse
     settingsManager.disableNormalEvents = false;
+    // Disable normal browser right click menu
+    settingsManager.disableDefaultContextMenu = true;
     // Disable Scrolling the Window Object
     settingsManager.disableWindowScroll = true;
     // Disable Zoom Keyboard Keys
@@ -185,18 +227,28 @@ let settingsManager = {
 
     settingsManager.minZoomDistance = 6800;
     settingsManager.maxZoomDistance = 120000;
+    settingsManager.zoomSpeed = 0.01;
+    settingsManager.isZoomStopsRotation = true;
 
-    // Minimum fps or sun/moon/atmosphere are skipped
+    // Speed at which isScan lines are drawn (each draw will be +speed lat/lon)
+    settingsManager.lineScanSpeedSat = 6; // About 6 seconds to scan earth (no source, just a guess)
+    settingsManager.lineScanSpeedRadar = 0.25; // About 30 seconds to scan earth (arbitrary)
+    // Minimum elevation to draw a line scan
+    settingsManager.lineScanMinEl = 5;
+
+    // Minimum fps or sun/moon are skipped
     settingsManager.fpsThrottle1 = 0;
     // Minimum fps or satellite velocities are ignored
     settingsManager.fpsThrottle2 = 10;
 
     settingsManager.timeMachineDelay = 5000;
 
+    settingsManager.videoBitsPerSecond = 30000000; // 10.0Mbps
+
     // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 
     // Use these to default smallest resolution maps and limited "extras" like
-    // the atmosphere and sun. Really useful on small screens and for faster
+    // the sun. Really useful on small screens and for faster
     // loading times
     // settingsManager.isDrawLess = true;
     // settingsManager.smallImages = true;
@@ -221,14 +273,8 @@ let settingsManager = {
     // //////////////////////////////////////////////////////////////////////////
     settingsManager.showOrbitThroughEarth = false;
 
-    settingsManager.earthNumLatSegs = 64;
-    settingsManager.earthNumLonSegs = 64;
-    settingsManager.atmospherelatSegs = 64;
-    settingsManager.atmospherelonSegs = 64;
-
-    const RADIUS_OF_EARTH = 6371.0;
-    settingsManager.atmosphereSize = RADIUS_OF_EARTH + 250;
-    settingsManager.atmosphereColor = 'vec3(0.35,0.8,1.0)';
+    settingsManager.earthNumLatSegs = 128;
+    settingsManager.earthNumLonSegs = 128;
 
     settingsManager.satShader = {};
     settingsManager.satShader.largeObjectMinZoom = 0.37;
@@ -309,14 +355,21 @@ let settingsManager = {
 
     settingsManager.reColorMinimumTime = 1000;
     settingsManager.colors = {};
-    settingsManager.colors = JSON.parse(localStorage.getItem('settingsManager-colors'));
-    if (settingsManager.colors == null || settingsManager.colors.version !== '1.0.3') {
+    try {
+      settingsManager.colors = JSON.parse(localStorage.getItem('settingsManager-colors'));
+    } catch {
+      console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
+    }
+    if (settingsManager.colors == null || settingsManager.colors.length === 0 || settingsManager.colors.version !== '1.0.4') {
       settingsManager.colors = {};
-      settingsManager.colors.version = '1.0.3';
+      settingsManager.colors.version = '1.0.4';
       settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
+      settingsManager.colors.sunlight100 = [1.0, 1.0, 1.0, 1.0];
+      settingsManager.colors.sunlight80 = [1.0, 1.0, 1.0, 0.85];
+      settingsManager.colors.sunlight60 = [1.0, 1.0, 1.0, 0.65];
       settingsManager.colors.starHi = [1.0, 1.0, 1.0, 1.0];
-      settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.35];
-      settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.15];
+      settingsManager.colors.starMed = [1.0, 1.0, 1.0, 0.85];
+      settingsManager.colors.starLow = [1.0, 1.0, 1.0, 0.65];
       settingsManager.colors.sensor = [1.0, 0.0, 0.0, 1.0];
       settingsManager.colors.marker = [
         [0.2, 1.0, 1.0, 1.0],
@@ -339,8 +392,8 @@ let settingsManager = {
         [0.6, 0.5, 1.0, 1.0],
       ];
       settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
-      settingsManager.colors.inview = [0.85, 0.5, 0.0, 1.0];
-      settingsManager.colors.inviewAlt = [0.2, 0.4, 1.0, 1];
+      settingsManager.colors.inView = [0.85, 0.5, 0.0, 1.0];
+      settingsManager.colors.inViewAlt = [0.2, 0.4, 1.0, 1];
       settingsManager.colors.radarData = [0.0, 1.0, 1.0, 1.0];
       settingsManager.colors.radarDataMissile = [1.0, 0.0, 0.0, 1.0];
       settingsManager.colors.radarDataSatellite = [0.0, 1.0, 0.0, 1.0];
@@ -385,7 +438,11 @@ let settingsManager = {
       settingsManager.colors.countryUS = [0.2, 0.4, 1.0, 1];
       settingsManager.colors.countryCIS = [1.0, 1.0, 1.0, 1.0];
       settingsManager.colors.countryOther = [0, 1.0, 0, 0.6];
-      localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
+      try {
+        localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
+      } catch {
+        console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
+      }
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -441,6 +498,12 @@ let settingsManager = {
     // //////////////////////////////////////////////////////////////////////////
 
     settingsManager.modelsOnSatelliteViewOverride = false;
+    settingsManager.meshOverride = null;
+    settingsManager.meshRotation = {
+      x: 0,
+      y: 0,
+      z: 0,
+    };
 
     // Frames Per Second Limiter
     settingsManager.minimumDrawDt = 0.0; // 20 FPS // 60 FPS = 0.01667
@@ -453,6 +516,23 @@ let settingsManager = {
     // Load Overrides
     // //////////////////////////////////////////////////////////////////////////
     settingsManager = { ...settingsManager, ...window.settingsManagerOverride };
+    const queryStr = window.location.search.substring(1);
+    const params = queryStr.split('&');
+    const plugins = settingsManager.plugins;
+    for (let i = 0; i < params.length; i++) {
+      const key = params[i].split('=')[0];
+      const val = params[i].split('=')[1];
+      if (key === 'settingsManagerOverride') {
+        const overrides = JSON.parse(decodeURIComponent(val));
+        Object.keys(overrides.plugins)
+          .filter((key) => key in plugins)
+          // eslint-disable-next-line no-loop-func
+          .forEach((key) => {
+            if (typeof overrides.plugins[key] == 'undefined') return;
+            settingsManager.plugins[key] = overrides.plugins[key];
+          });
+      }
+    }
 
     // //////////////////////////////////////////////////////////////////////////
     // Defaults that should never be changed
@@ -550,12 +630,10 @@ let settingsManager = {
               settingsManager.smallImages = true;
               break;
             case 'hires':
-              settingsManager.hiresImages = true;
-              settingsManager.earthNumLatSegs = 256;
-              settingsManager.earthNumLonSegs = 256;
-              settingsManager.atmospherelatSegs = 128;
-              settingsManager.atmospherelonSegs = 128;
-              settingsManager.minimumDrawDt = 0.01667;
+              // settingsManager.hiresImages = true;
+              settingsManager.earthNumLatSegs = 128;
+              settingsManager.earthNumLonSegs = 128;
+              // settingsManager.minimumDrawDt = 0.01667;
               break;
             case 'nostars':
               settingsManager.noStars = true;
@@ -599,7 +677,13 @@ let settingsManager = {
 
     // Load the previously saved map
     if (settingsManager.isLoadLastMap && !settingsManager.isDrawLess) {
-      let lastMap = localStorage.getItem('lastMap');
+      let lastMap;
+      try {
+        lastMap = localStorage.getItem('lastMap');
+      } catch {
+        lastMap = null;
+        console.warn('Settings Manager: localStorage not available!');
+      }
       switch (lastMap) {
         case 'blue':
           settingsManager.blueImages = true;
@@ -625,6 +709,7 @@ let settingsManager = {
         case 'political':
           settingsManager.politicalImages = true;
           break;
+        // file deepcode ignore DuplicateCaseBody: The default image could change in the future
         default:
           settingsManager.lowresImages = true;
           break;

@@ -1,5 +1,5 @@
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import $ from 'jquery';
 
 export const init = (): void => {
   let isTwitterMenuOpen = false;
@@ -11,7 +11,7 @@ export const init = (): void => {
     cb: () => {
       // Side Menu
       $('#left-menus').append(keepTrackApi.html`
-        <div id="twitter-menu" class="side-menu-parent start-hidden side-menu text-select"></div>
+        <div id="twitter-menu" class="side-menu-parent start-hidden text-select"></div>
       `);
 
       // Bottom Icon
@@ -43,7 +43,7 @@ export const init = (): void => {
               '<a class="twitter-timeline" data-theme="dark" data-link-color="#2B7BB9" href="https://twitter.com/RedKosmonaut/lists/space-news">A Twitter List by RedKosmonaut</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>'
             );
           }
-          $('#twitter-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+          (<any>$('#twitter-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
           isTwitterMenuOpen = true;
           $('#menu-twitter').addClass('bmenu-item-selected');
           return;
@@ -56,7 +56,7 @@ export const init = (): void => {
     method: 'hideSideMenus',
     cbName: 'twitter',
     cb: (): void => {
-      $('#twitter-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+      (<any>$('#twitter-menu')).effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#menu-twitter').removeClass('bmenu-item-selected');
       isTwitterMenuOpen = false;
     },

@@ -168,15 +168,19 @@ function _classCallCheck(instance, Constructor) {
     return new Init(selector, context);
   }
 
-  var fn = (cash.fn = cash.prototype = Init.prototype = {
-    // jshint ignore:line
-    cash: true,
-    length: 0,
-    push: push,
-    splice: ArrayProto.splice,
-    map: ArrayProto.map,
-    init: Init,
-  });
+  var fn =
+    (cash.fn =
+    cash.prototype =
+    Init.prototype =
+      {
+        // jshint ignore:line
+        cash: true,
+        length: 0,
+        push: push,
+        splice: ArrayProto.splice,
+        map: ArrayProto.map,
+        init: Init,
+      });
 
   Object.defineProperty(fn, 'constructor', { value: cash });
 
@@ -1090,7 +1094,7 @@ var Component = (function () {
 
     // Display error if el is valid HTML Element
     if (!(el instanceof Element)) {
-      console.error(Error(el + ' is not an HTML Element'));
+      console.debug(Error(el + ' is not an HTML Element'));
     }
 
     // If exists, destroy and reinitialize in child
@@ -7544,7 +7548,7 @@ var $jscomp$this = this;
     }
 
     if (!$textarea.length) {
-      console.error('No textarea element found');
+      console.debug('No textarea element found');
       return;
     }
 

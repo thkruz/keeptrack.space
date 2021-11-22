@@ -9,7 +9,7 @@ var options = {
 
 download(url, options, function (err) {
   if (err) {
-    console.error(err);
+    console.debug(err);
     return;
   }
   console.log('TLE.json updated from KeepTrack.space');
@@ -24,7 +24,7 @@ options = {
 
 download(url, options, function (err) {
   if (err) {
-    console.error(err);
+    console.debug(err);
     return;
   }
   console.log('tle.js updated from KeepTrack.space');

@@ -1,16 +1,11 @@
-/*globals
-  test
-  jest
-*/
-
-import 'jsdom-worker';
-
-import '@app/js/settingsManager/settingsManager.js';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { missileManager } from '@app/js/plugins/missile/missileManager';
 import { orbitManager } from '@app/js/orbitManager/orbitManager';
-import { satellite } from '@app/js/lib/lookangles';
+import { satellite } from '@app/js/satMath/satMath';
 import { timeManager } from '@app/js/timeManager/timeManager';
+import { useMockWorkers } from '@app/js/api/apiMocks';
+
+useMockWorkers();
 
 keepTrackApi.programs.missileManager = missileManager;
 keepTrackApi.programs.satellite = satellite;
@@ -23,11 +18,11 @@ keepTrackApi.programs.settingsManager = {
 };
 
 test(`updateSelectBoxCore Unit Testing`, () => {
-  const sat = {
-    missile: true,
-  };
-
-  import('@app/js/plugins/updateSelectBox/updateSelectBoxCore').then((mod) => mod.init());
+  import('@app/js/plugins/updateSelectBox/updateSelectBoxCore')
+    .then((mod) => mod.init())
+    .catch((err) => {
+      console.debug(err);
+    });
   timeManager.init();
   orbitManager.orbitWorker = {
     onmessage: jest.fn(),

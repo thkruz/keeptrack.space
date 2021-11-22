@@ -1,16 +1,59 @@
 import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 
+let isColorSchemeMenuOpen = false;
+export const hideSideMenus = (): void => {
+  $('#color-scheme-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  $('#menu-color-scheme').removeClass('bmenu-item-selected');
+  isColorSchemeMenuOpen = false;
+};
+export const rightBtnMenuAdd = () => {
+  $('#right-btn-menu-ul').append(keepTrackApi.html`   
+        <li class="rmb-menu-item" id="colors-rmb"><a href="#">Colors &#x27A4;</a></li>
+      `);
+};
 export const init = (): void => {
-  const { ColorScheme, satSet, objectManager, uiManager, settingsManager } = keepTrackApi.programs;
-  let isColorSchemeMenuOpen = false;
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
     cbName: 'colorsMenu',
-    cb: () => {
-      // Side Menu
-      $('#left-menus').append(keepTrackApi.html`
+    cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'rightBtnMenuAdd',
+    cbName: 'photo',
+    cb: rightBtnMenuAdd,
+  });
+
+  $('#rmb-wrapper').append(keepTrackApi.html`
+    <div id="colors-rmb-menu" class="right-btn-menu">
+      <ul class='dropdown-contents'>
+        <li id="colors-default-rmb"><a href="#">Object Types</a></li>
+        <li id="colors-sunlight-rmb"><a href="#">Sunlight Status</a></li>
+        <li id="colors-country-rmb"><a href="#">Country</a></li>
+        <li id="colors-velocity-rmb"><a href="#">Velocity</a></li>
+        <li id="colors-ageOfElset-rmb"><a href="#">Age of Elset</a></li>
+      </ul>
+    </div>
+  `);
+
+  // Add JavaScript
+  keepTrackApi.register({
+    method: 'bottomMenuClick',
+    cbName: 'colorsMenu',
+    cb: bottomMenuClick,
+  });
+
+  keepTrackApi.register({
+    method: 'hideSideMenus',
+    cbName: 'colorsMenu',
+    cb: hideSideMenus,
+  });
+};
+export const uiManagerInit = () => {
+  // Side Menu
+  $('#left-menus').append(keepTrackApi.html`
         <div id="color-scheme-menu" class="side-menu-parent start-hidden text-select">
           <div id="colors-menu" class="side-menu">
             <ul>
@@ -31,8 +74,8 @@ export const init = (): void => {
         </div>
       `);
 
-      // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
+  // Bottom Icon
+  $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-color-scheme" class="bmenu-item">
           <img
             alt="colors"
@@ -44,148 +87,113 @@ export const init = (): void => {
         </div>
       `);
 
-      $('#colors-menu>ul>li').on('click', function () {
-        objectManager.setSelectedSat(-1); // clear selected sat
-        var colorName = $(this).data('color');
-        if (colorName !== 'sunlight') {
-          satSet.satCruncher.postMessage({
-            isSunlightView: false,
-          });
-        }
-        switch (colorName) {
-          case 'default':
-            uiManager.legendMenuChange('default');
-            satSet.setColorScheme(ColorScheme.default, true);
-            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-            break;
-          case 'velocity':
-            uiManager.legendMenuChange('velocity');
-            satSet.setColorScheme(ColorScheme.velocity);
-            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-            break;
-          case 'sunlight':
-            uiManager.legendMenuChange('sunlight');
-            satSet.setColorScheme(ColorScheme.sunlight, true);
-            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-            settingsManager.isForceColorScheme = true;
-            satSet.satCruncher.postMessage({
-              isSunlightView: true,
-            });
-            break;
-          case 'near-earth':
-            uiManager.legendMenuChange('near');
-            satSet.setColorScheme(ColorScheme.leo);
-            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-            break;
-          case 'deep-space':
-            uiManager.legendMenuChange('deep');
-            satSet.setColorScheme(ColorScheme.geo);
-            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-            break;
-          case 'elset-age':
-            $('#loading-screen').fadeIn(1000, function () {
-              uiManager.legendMenuChange('ageOfElset');
-              satSet.setColorScheme(ColorScheme.ageOfElset);
-              uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-              $('#loading-screen').fadeOut('slow');
-            });
-            break;
-          case 'lost-objects':
-            $('#search').val('');
-            $('#loading-screen').fadeIn(1000, function () {
-              settingsManager.lostSatStr = '';
-              satSet.setColorScheme(ColorScheme.lostobjects);
-              (<HTMLInputElement>document.getElementById('search')).value = settingsManager.lostSatStr;
-              uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-              uiManager.doSearch($('#search').val());
-              $('#loading-screen').fadeOut('slow');
-            });            
-            break;
-          case 'rcs':
-            uiManager.legendMenuChange('rcs');
-            satSet.setColorScheme(ColorScheme.rcs);
-            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-            break;
-          case 'smallsats':
-            uiManager.legendMenuChange('small');
-            satSet.setColorScheme(ColorScheme.smallsats);
-            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-            break;
-          case 'countries':
-            uiManager.legendMenuChange('countries');
-            satSet.setColorScheme(ColorScheme.countries);
-            uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-            break;
-        }
-      
-        // Close Open Menus
-        if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-        uiManager.hideSideMenus();
-      });
-
-      $('#color-scheme-menu').resizable({
-        handles: 'e',
-        stop: function () {
-          $(this).css('height', '');
-        },
-        maxWidth: 450,
-        minWidth: 280,
-      });
-
-    },
+  $('#colors-menu>ul>li').on('click', function () {
+    const colorName = $(this).data('color');
+    colorsMenuClick(colorName);
   });
 
-  keepTrackApi.register({
-    method: 'rightBtnMenuAdd',
-    cbName: 'photo',
-    cb: () => {
-      $('#right-btn-menu-ul').append(keepTrackApi.html`   
-        <li class="rmb-menu-item" id="colors-rmb"><a href="#">Colors &#x27A4;</a></li>
-      `);          
+  $('#color-scheme-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
     },
+    maxWidth: 450,
+    minWidth: 280,
   });
+};
 
-  $('#rmb-wrapper').append(keepTrackApi.html`
-    <div id="colors-rmb-menu" class="right-btn-menu">
-      <ul class='dropdown-contents'>
-        <li id="colors-default-rmb"><a href="#">Object Types</a></li>
-        <li id="colors-sunlight-rmb"><a href="#">Sunlight Status</a></li>
-        <li id="colors-country-rmb"><a href="#">Country</a></li>
-        <li id="colors-velocity-rmb"><a href="#">Velocity</a></li>
-        <li id="colors-ageOfElset-rmb"><a href="#">Age of Elset</a></li>
-      </ul>
-    </div>
-  `);   
-
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'colorsMenu',
-    cb: (iconName: string): void => {
-      if (iconName === 'menu-color-scheme') {
-        if (isColorSchemeMenuOpen) {
-          uiManager.hideSideMenus();
-          isColorSchemeMenuOpen = false;
-          return;
-        } else {
-          if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-          uiManager.hideSideMenus();
-          $('#color-scheme-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isColorSchemeMenuOpen = true;
-          $('#menu-color-scheme').addClass('bmenu-item-selected');
-          return;
-        }
-      }
-    },
-  });
-
-  keepTrackApi.register({
-    method: 'hideSideMenus',
-    cbName: 'colorsMenu',
-    cb: (): void => {
-      $('#color-scheme-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#menu-color-scheme').removeClass('bmenu-item-selected');
+export const bottomMenuClick = (iconName: string): void => {
+  const { uiManager } = keepTrackApi.programs;
+  if (iconName === 'menu-color-scheme') {
+    if (isColorSchemeMenuOpen) {
+      uiManager.hideSideMenus();
       isColorSchemeMenuOpen = false;
-    },
-  });
+      return;
+    } else {
+      if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+      uiManager.hideSideMenus();
+      $('#color-scheme-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      isColorSchemeMenuOpen = true;
+      $('#menu-color-scheme').addClass('bmenu-item-selected');
+      return;
+    }
+  }
+};
+export const colorsMenuClick = (colorName: string) => {
+  const { ColorScheme, satSet, objectManager, uiManager } = keepTrackApi.programs;
+  objectManager.setSelectedSat(-1); // clear selected sat  
+  if (colorName !== 'sunlight') {
+    satSet.satCruncher.postMessage({
+      isSunlightView: false,
+    });
+  }
+  switch (colorName) {
+    case 'default':
+      uiManager.legendMenuChange('default');
+      satSet.setColorScheme(ColorScheme.default, true);
+      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      break;
+    case 'velocity':
+      uiManager.legendMenuChange('velocity');
+      satSet.setColorScheme(ColorScheme.velocity);
+      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      break;
+    case 'sunlight':
+      uiManager.legendMenuChange('sunlight');
+      satSet.setColorScheme(ColorScheme.sunlight, true);
+      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      settingsManager.isForceColorScheme = true;
+      satSet.satCruncher.postMessage({
+        isSunlightView: true,
+      });
+      break;
+    case 'near-earth':
+      uiManager.legendMenuChange('near');
+      satSet.setColorScheme(ColorScheme.leo);
+      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      break;
+    case 'deep-space':
+      uiManager.legendMenuChange('deep');
+      satSet.setColorScheme(ColorScheme.geo);
+      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      break;
+    case 'elset-age':
+      $('#loading-screen').fadeIn(1000, function () {
+        uiManager.legendMenuChange('ageOfElset');
+        satSet.setColorScheme(ColorScheme.ageOfElset);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        $('#loading-screen').fadeOut('slow');
+      });
+      break;
+    case 'lost-objects':
+      $('#search').val('');
+      $('#loading-screen').fadeIn(1000, function () {
+        settingsManager.lostSatStr = '';
+        satSet.setColorScheme(ColorScheme.lostobjects);
+        (<HTMLInputElement>document.getElementById('search')).value = settingsManager.lostSatStr;
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        uiManager.doSearch($('#search').val());
+        $('#loading-screen').fadeOut('slow');
+      });
+      break;
+    case 'rcs':
+      uiManager.legendMenuChange('rcs');
+      satSet.setColorScheme(ColorScheme.rcs);
+      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      break;
+    case 'smallsats':
+      uiManager.legendMenuChange('small');
+      satSet.setColorScheme(ColorScheme.smallsats);
+      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      break;
+    case 'countries':
+      uiManager.legendMenuChange('countries');
+      satSet.setColorScheme(ColorScheme.countries);
+      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      break;
+  }
+
+  // Close Open Menus
+  if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+  uiManager.hideSideMenus();
 };

@@ -1,16 +1,54 @@
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import $ from 'jquery';
 
+let isCountriesMenuOpen = false;
+export const hideSideMenus = (): void => {
+  $('#countries-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  $('#menu-countries').removeClass('bmenu-item-selected');
+  isCountriesMenuOpen = false;
+};
 export const init = (): void => {
-  const { groups, orbitManager, satSet, searchBox, objectManager, uiManager, settingsManager } = keepTrackApi.programs;
-  let isCountriesMenuOpen = false;
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
     cbName: 'countries',
-    cb: () => {
-      // Side Menu
-      $('#left-menus').append(keepTrackApi.html`
+    cb: uiManagerInit,
+  });
+
+  // Add JavaScript
+  keepTrackApi.register({
+    method: 'bottomMenuClick',
+    cbName: 'countries',
+    cb: bottomMenuClick,
+  });
+
+  keepTrackApi.register({
+    method: 'hideSideMenus',
+    cbName: 'countries',
+    cb: hideSideMenus,
+  });
+};
+export const bottomMenuClick = (iconName: string): void => {
+  const { uiManager, settingsManager } = keepTrackApi.programs;
+  if (iconName === 'menu-countries') {
+    if (isCountriesMenuOpen) {
+      uiManager.hideSideMenus();
+      isCountriesMenuOpen = false;
+      return;
+    } else {
+      if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+      uiManager.hideSideMenus();
+      $('#countries-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      isCountriesMenuOpen = true;
+      $('#menu-countries').addClass('bmenu-item-selected');
+      return;
+    }
+  }
+};
+
+export const uiManagerInit = () => {
+  // Side Menu
+  $('#left-menus').append(keepTrackApi.html`
         <div id="countries-menu" class="side-menu-parent start-hidden text-select">
           <div id="country-menu" class="side-menu">
             <ul>
@@ -30,8 +68,8 @@ export const init = (): void => {
         </div>
       `);
 
-      // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
+  // Bottom Icon
+  $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-countries" class="bmenu-item">
           <img
             alt="flag"
@@ -43,129 +81,99 @@ export const init = (): void => {
         </div>
       `);
 
-      const groupSelected = function (groupName: string | number) {
-        const searchDOM = $('#search');
-        if (typeof groupName == 'undefined') return;
-        if (typeof groups[groupName] == 'undefined') return;
-        groups.selectGroup(groups[groupName], orbitManager);
-        searchDOM.val('');
-
-        var results = groups[groupName].sats;
-        for (var i = 0; i < results.length; i++) {
-          var satId = groups[groupName].sats[i].satId;
-          var scc = satSet.getSat(satId).SCC_NUM;
-          if (i === results.length - 1) {
-            searchDOM.val(searchDOM.val() + scc);
-          } else {
-            searchDOM.val(searchDOM.val() + scc + ',');
-          }
-        }
-
-        searchBox.fillResultBox(groups[groupName].sats, satSet);
-
-        objectManager.setSelectedSat(-1); // Clear selected sat
-
-        // Close Menus
-        if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(true);
-        uiManager.hideSideMenus();
-      };
-
-      const countryMenuClick = (groupName: any) => {
-        if (typeof groups == 'undefined') return;
-        switch (groupName) {
-          case 'Canada':
-            if (typeof groups.Canada == 'undefined') {
-              groups.Canada = groups.createGroup('countryRegex', /CA/u);
-            }
-            break;
-          case 'China':
-            if (typeof groups.China == 'undefined') {
-              groups.China = groups.createGroup('countryRegex', /PRC/u);
-            }
-            break;
-          case 'France':
-            if (typeof groups.France == 'undefined') {
-              groups.France = groups.createGroup('countryRegex', /FR/u);
-            }
-            break;
-          case 'India':
-            if (typeof groups.India == 'undefined') {
-              groups.India = groups.createGroup('countryRegex', /IND/u);
-            }
-            break;
-          case 'Israel':
-            if (typeof groups.Israel == 'undefined') {
-              groups.Israel = groups.createGroup('countryRegex', /ISRA/u);
-            }
-            break;
-          case 'Japan':
-            if (typeof groups.Japan == 'undefined') {
-              groups.Japan = groups.createGroup('countryRegex', /JPN/u);
-            }
-            break;
-          case 'Russia':
-            if (typeof groups.Russia == 'undefined') {
-              groups.Russia = groups.createGroup('countryRegex', /CIS/u);
-            }
-            break;
-          case 'UnitedKingdom':
-            if (typeof groups.UnitedKingdom == 'undefined') {
-              groups.UnitedKingdom = groups.createGroup('countryRegex', /UK/u);
-            }
-            break;
-          case 'UnitedStates':
-            if (typeof groups.UnitedStates == 'undefined') {
-              groups.UnitedStates = groups.createGroup('countryRegex', /US/u);
-            }
-            break;
-        }
-        groupSelected(groupName);
-      };
-
-      $('#country-menu>ul>li').on('click', () => {
-        countryMenuClick($(this).data('group'));
-      });
-
-      $('#countries-menu').resizable({
-        handles: 'e',
-        stop: function () {
-          $(this).css('height', '');
-        },
-        maxWidth: 450,
-        minWidth: 280,
-      });      
-    },
+  // NOTE: Must use function not arrow function to access 'this'
+  $('#country-menu>ul>li').on('click', function () {
+    countryMenuClick($(this).data('group'));
   });
 
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'countries',
-    cb: (iconName: string): void => {
-      if (iconName === 'menu-countries') {
-        if (isCountriesMenuOpen) {
-          uiManager.hideSideMenus();
-          isCountriesMenuOpen = false;
-          return;
-        } else {
-          if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-          uiManager.hideSideMenus();
-          $('#countries-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          isCountriesMenuOpen = true;
-          $('#menu-countries').addClass('bmenu-item-selected');
-          return;
-        }
+  $('#countries-menu').resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+};
+
+export const countryMenuClick = (groupName: any) => {
+  const { groupsManager } = keepTrackApi.programs;
+
+  if (typeof groupsManager == 'undefined') return;
+  switch (groupName) {
+    case 'Canada':
+      if (typeof groupsManager.Canada == 'undefined') {
+        groupsManager.Canada = groupsManager.createGroup('countryRegex', /CA/u);
       }
-    },
-  });
+      break;
+    case 'China':
+      if (typeof groupsManager.China == 'undefined') {
+        groupsManager.China = groupsManager.createGroup('countryRegex', /PRC/u);
+      }
+      break;
+    case 'France':
+      if (typeof groupsManager.France == 'undefined') {
+        groupsManager.France = groupsManager.createGroup('countryRegex', /FR/u);
+      }
+      break;
+    case 'India':
+      if (typeof groupsManager.India == 'undefined') {
+        groupsManager.India = groupsManager.createGroup('countryRegex', /IND/u);
+      }
+      break;
+    case 'Israel':
+      if (typeof groupsManager.Israel == 'undefined') {
+        groupsManager.Israel = groupsManager.createGroup('countryRegex', /ISRA/u);
+      }
+      break;
+    case 'Japan':
+      if (typeof groupsManager.Japan == 'undefined') {
+        groupsManager.Japan = groupsManager.createGroup('countryRegex', /JPN/u);
+      }
+      break;
+    case 'Russia':
+      if (typeof groupsManager.Russia == 'undefined') {
+        groupsManager.Russia = groupsManager.createGroup('countryRegex', /CIS/u);
+      }
+      break;
+    case 'UnitedKingdom':
+      if (typeof groupsManager.UnitedKingdom == 'undefined') {
+        groupsManager.UnitedKingdom = groupsManager.createGroup('countryRegex', /UK/u);
+      }
+      break;
+    case 'UnitedStates':
+      if (typeof groupsManager.UnitedStates == 'undefined') {
+        groupsManager.UnitedStates = groupsManager.createGroup('countryRegex', /US/u);
+      }
+      break;
+  }
+  groupSelected(groupName);
+};
 
-  keepTrackApi.register({
-    method: 'hideSideMenus',
-    cbName: 'countries',
-    cb: (): void => {
-      $('#countries-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#menu-countries').removeClass('bmenu-item-selected');
-      isCountriesMenuOpen = false;
-    },
-  });
+export const groupSelected = (groupName: string | number) => {
+  const { groupsManager, orbitManager, satSet, searchBox, objectManager, uiManager } = keepTrackApi.programs;
+  const searchDOM = $('#search');
+  if (typeof groupName == 'undefined') return;
+  if (typeof groupsManager[groupName] == 'undefined') return;
+  groupsManager.selectGroup(groupsManager[groupName], orbitManager);
+  searchDOM.val('');
+
+  const results = groupsManager[groupName].sats;
+  for (let i = 0; i < results.length; i++) {
+    const satId = groupsManager[groupName].sats[i].satId;
+    const scc = satSet.getSat(satId).SCC_NUM;
+    if (i === results.length - 1) {
+      searchDOM.val(searchDOM.val() + scc);
+    } else {
+      searchDOM.val(searchDOM.val() + scc + ',');
+    }
+  }
+
+  searchBox.fillResultBox(groupsManager[groupName].sats, satSet);
+
+  objectManager.setSelectedSat(-1); // Clear selected sat
+
+  // Close Menus
+  if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(true);
+  uiManager.hideSideMenus();
 };

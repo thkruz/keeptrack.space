@@ -1,6 +1,7 @@
 /* */
 
 import { RAD2DEG } from '@app/js/lib/constants.js';
+import { numeric } from '../lib/external/numeric';
 
 var satLinkManager = {};
 satLinkManager.aehfUsers = [];
@@ -143,7 +144,7 @@ satLinkManager.showLinks = async function (lineManager, satSet, group) {
             // var semiDiamSat2 = Math.asin(0.1/Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2))) * RAD2DEG;
             var theta =
               Math.acos(
-                window.numeric.dot([-sat1.position.x, -sat1.position.y, -sat1.position.z], [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z]) /
+                numeric.dot([-sat1.position.x, -sat1.position.y, -sat1.position.z], [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z]) /
                   (Math.sqrt(Math.pow(-sat1.position.x, 2) + Math.pow(-sat1.position.y, 2) + Math.pow(-sat1.position.z, 2)) *
                     Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2)))
               ) * RAD2DEG;
@@ -156,7 +157,7 @@ satLinkManager.showLinks = async function (lineManager, satSet, group) {
         }
       }
       for (let i = 0; i < userlist.length; i++) {
-        let id = satSet.getIdFromSensorName(userlist[i]);
+        let id = satSet.getSensorFromSensorName(userlist[i]);
         let user = satSet.getSat(id);
         let bestSat = {};
         let bestRange = 1000000;
@@ -185,7 +186,7 @@ satLinkManager.showLinks = async function (lineManager, satSet, group) {
       // Loop through all the users
       for (let i = 0; i < userlist.length; i++) {
         // Select the current user
-        let user = satSet.getSat(satSet.getIdFromSensorName(userlist[i]));
+        let user = satSet.getSat(satSet.getSensorFromSensorName(userlist[i]));
         // Loop through all of the satellites
         for (let j = 0; j < satlist.length; j++) {
           // Select the current satelltie
@@ -202,7 +203,7 @@ satLinkManager.showLinks = async function (lineManager, satSet, group) {
           //
           if (tearr.el > elevationMask) {
             // Draw a line from the user to the satellite
-            lineManager.create('sat5', [sat.id, satSet.getIdFromSensorName(user.name)], [0, 1.0, 0.6, 1.0]);
+            lineManager.create('sat5', [sat.id, satSet.getSensorFromSensorName(user.name)], [0, 1.0, 0.6, 1.0]);
           }
         }
       }

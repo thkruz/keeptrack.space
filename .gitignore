@@ -75,12 +75,15 @@ src/tle/TLEAltNemo*
 src/.htaccess
 .notes.js
 classfd.tle
+src/textures/earthmap16ak.jpg
+src/textures/earthmapclouds16k.jpg
 
 # Jest Coverage
 coverage/
 
 # Build Folder
 dist
+embed
 
 # Work In Progress
 src/js/wip/
@@ -91,3 +94,7 @@ src/js/wip/
 #ssl
 cert.pem
 key.pem
+
+# dccache
+.dccache
+.dcignore

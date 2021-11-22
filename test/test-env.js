@@ -1,14 +1,10 @@
-/* globals
-  global
-  jest
-  __dirname
-*/
-
 import 'webgl-mock';
+import '@app/js/settingsManager/settingsManager';
+
 import $ from 'jquery';
-import { JSDOM } from 'jsdom';
 import fs from 'fs';
 import path from 'path';
+import { JSDOM } from 'jsdom';
 
 // eslint-disable-next-line no-sync
 const documentHTML = fs.readFileSync(path.resolve(__dirname, '../src/index.htm'), 'utf8').toString();
@@ -32,6 +28,7 @@ if (typeof global.window == 'undefined') {
 }
 
 global.document.canvas = new HTMLCanvasElement(1920, 1080);
+global.document.canvas.style = {};
 
 global.window.resizeTo = (width, height) => {
   global.window.innerWidth = width || global.window.innerWidth;
@@ -53,7 +50,7 @@ global.console = {
   // log: console.log, // console.log are ignored in tests
 
   // Keep native behaviour for other methods, use those to print out things in your own tests, not `console.log`
-  error: console.error,
+  error: console.debug,
   // error: jest.fn(),
   warn: console.warn,
   // warn: jest.fn(),
@@ -65,17 +62,29 @@ global.console = {
 
 // document.body.innerHTML += '<div id="keeptrack-canvas"></div>';
 
+window.HTMLMediaElement.prototype.load = () => {
+  /* do nothing */
+};
+window.HTMLMediaElement.prototype.play = () => {
+  /* do nothing */
+};
+window.HTMLMediaElement.prototype.pause = () => {
+  /* do nothing */
+};
+window.HTMLMediaElement.prototype.addTextTrack = () => {
+  /* do nothing */
+};
+
 global.$ = global.jQuery = $;
 window.jQuery = $;
-
-$.colorbox = {
-  close: jest.fn(),
-};
 
 $.fn.replace = (input, output) => $.fn.toString().replace(input, output);
 
 $.colorbox = jest.fn();
+$.datepicker = jest.fn();
+$.fn.datepicker = jest.fn();
 $.fn.colorbox = jest.fn();
+$.fn.colorPick = jest.fn();
 $.fn.effect = jest.fn();
 $.fn.resizable = jest.fn();
 $.fn.tooltip = jest.fn();

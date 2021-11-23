@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v5.0.1](https://github.com/thkruz/keeptrack.space/compare/v5.0.0...v5.0.1)
+
+> 22 November 2021 
+
+- changelog [`a446ad8`](https://github.com/thkruz/keeptrack.space/commit/a446ad866ff15abb87083e61077c371cc5913305)
+- fix(satmath): fixed issue with ecf calculations breaking sun and moon [`44c071a`](https://github.com/thkruz/keeptrack.space/commit/44c071a41ba6eefe1030071f8db659e4ba4a37c7)
+- fix(catalogloader): fixed offline catalog loading with JSON parse [`c5f0035`](https://github.com/thkruz/keeptrack.space/commit/c5f0035c34aee1c0df08f2321ba1abe0f9d89a3d)
+- github actions [`4e7546b`](https://github.com/thkruz/keeptrack.space/commit/4e7546bf1c9ec8f88a35139edbad61a2f4c4ff99)
+
 ### [v5.0.0](https://github.com/thkruz/keeptrack.space/compare/v4.2.0...v5.0.0)
 
 > 22 November 2021 

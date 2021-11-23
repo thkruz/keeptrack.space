@@ -2332,7 +2332,10 @@ export const lookAngles2Ecf = (az: number, el: number, rng: number, lat: number,
     alt: alt,
   };
 
-  const { sitex, sitey, sitez } = satellite.geodeticToEcf(geodeticCoords);
+  const site = satellite.geodeticToEcf(geodeticCoords);
+  const sitex = site.x;
+  const sitey = site.y;
+  const sitez = site.z;
 
   // some needed calculations
   const slat = Math.sin(lat);

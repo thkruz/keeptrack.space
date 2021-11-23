@@ -78,6 +78,7 @@ export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any) => 
 
   // Filter TLEs
   // SatCruncher will use this when it returns so we need to expose it now
+  if (typeof resp === 'string') resp = JSON.parse(resp);
   satSet.satData = filterTLEDatabase(resp, limitSatsArray, extraSats, asciiCatalog);
   satSet.numSats = satSet.satData.length;
   resp = null; // Force Garbage Collection

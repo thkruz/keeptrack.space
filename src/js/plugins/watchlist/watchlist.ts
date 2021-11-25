@@ -268,8 +268,7 @@ export const uiManagerInit = (): void => {
   });
 
   $('#watchlist-open').on('click', function () {
-    const satId = $(this).data('sat-id');
-    watchlistListClick(satId);
+    $('#watchlist-file').trigger('click');
   });
 
   $('#watchlist-file').on('change', function (evt) {

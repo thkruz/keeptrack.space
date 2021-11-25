@@ -49,6 +49,8 @@ const selectSatManager = {
       }
     }
 
+    const searchResultDom = $('#search-results');
+
     // If we deselect an object but had previously selected one then disable/hide stuff
     if (satId === -1 && !isselectedSatNegativeOne) {
       mainCamera.fts2default();
@@ -67,7 +69,11 @@ const selectSatManager = {
 
       if (settingsManager.plugins.topMenu) {
         if (typeof $('#search').val() !== 'undefined' && $('#search').val().length > 0) {
-          $('#search-results').attr('style', 'display: block; max-height:auto');
+          if (searchResultDom.css('display') === 'block') {
+            searchResultDom.attr('style', 'display: block; max-height:auto');
+          } else {
+            searchResultDom.attr('style', 'max-height:auto');
+          }
         }
       }
     } else if (satId !== -1) {
@@ -121,10 +127,10 @@ const selectSatManager = {
       $('#menu-map').removeClass('bmenu-item-disabled');
       $('#menu-newLaunch').removeClass('bmenu-item-disabled');
 
-      if ($('#search-results').css('display') === 'block') {
+      if (searchResultDom.css('display') === 'block') {
         if (window.innerWidth > 1000) {
           if (typeof $('#search').val() !== 'undefined' && $('#search').val().length > 0) {
-            $('#search-results').attr('style', 'display:block; max-height:27%');
+            searchResultDom.attr('style', 'display:block; max-height:27%');
           }
           if (mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
             // Unclear why this was needed...
@@ -135,7 +141,7 @@ const selectSatManager = {
         if (window.innerWidth > 1000) {
           if (settingsManager.plugins.topMenu) {
             if ($('#search').val().length > 0) {
-              $('#search-results').attr('style', 'display:block; max-height:auto');
+              searchResultDom.attr('style', 'max-height:27%');
             }
           }
           if (mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {

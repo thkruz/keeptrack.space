@@ -180,7 +180,7 @@
     "mkdirp": "^1.0.4",
     "nyc": "^15.1.0",
     "opener": "^1.5.2",
-    "ponicode": "^0.52.2",
+    "ponicode": "^0.57.1",
     "prettier": "^2.2.1",
     "source-map-loader": "^3.0.0",
     "start-server-and-test": "^1.12.3",

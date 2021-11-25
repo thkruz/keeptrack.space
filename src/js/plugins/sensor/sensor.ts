@@ -435,13 +435,11 @@ export const uiManagerInit = () => {
     // Return to default settings with nothing 'inview'
     satellite.setobs(null);
     sensorManager.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
-    uiManager.getsensorinfo();
+    // uiManager.getsensorinfo();
     if (settingsManager.currentColorScheme == ColorScheme.default) {
       uiManager.legendMenuChange('default');
     }
     satCruncher.postMessage({
-      typ: 'offset',
-      dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
       resetObserverGd: true,
       sensor: sensorManager.defaultSensor,

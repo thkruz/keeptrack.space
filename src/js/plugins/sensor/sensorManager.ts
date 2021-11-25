@@ -100,6 +100,8 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
   keepTrackApi.methods.setSensor(selectedSensor, staticNum);
 
   if (selectedSensor == null && staticNum == null) {
+    sensorManager.sensorTitle = '';
+    $('#sensor-selected').text(sensorManager.sensorTitle);
     return;
   }
   if (selectedSensor === 'SSN') {

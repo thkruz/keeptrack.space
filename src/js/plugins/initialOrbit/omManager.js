@@ -22,6 +22,9 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 // [unixTime, x, y, z, xDot, yDot, zDot]
 
 'use strict';
+
+import { searchBox } from '@app/js/uiManager/search-box';
+
 // Constants
 const RADIUS_OF_EARTH = 6371000; // Radius of Earth in meters
 const G = 6.6725985e-11;
@@ -250,7 +253,8 @@ om.svs2analyst = async (svs, satSet, timeManager, satellite) => {
   try {
     om.iod(svs, timeManager, satellite)
       .then((tles) => {
-        satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(80000));
+        satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
+        searchBox.doSearch('100500', true);
       })
       .catch((error) => {
         console.debug(error);

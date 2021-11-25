@@ -80,11 +80,11 @@ test(`Basic Functions of Search Box`, () => {
 
   expect(searchBox.fillResultBox(0, satSet)).toBe(undefined);
 
-  expect(searchBox.doSearch('', false, satSet)).toBe();
-  expect(searchBox.doSearch('25', false, satSet)).toBe();
-  expect(searchBox.doSearch('39208', false, satSet)).toStrictEqual([]);
-  expect(searchBox.doSearch('39208', true, satSet)).toStrictEqual([]);
-  expect(searchBox.doSearch('VANGUARD', true, satSet)).toStrictEqual([5]);
+  expect(searchBox.doSearch('', false)).toBe();
+  expect(searchBox.doSearch('25', false)).toBe();
+  expect(searchBox.doSearch('39208', false)).toStrictEqual([]);
+  expect(searchBox.doSearch('39208', true)).toStrictEqual([]);
+  expect(searchBox.doSearch('VANGUARD', true)).toStrictEqual([5]);
   expect(searchBox.getCurrentSearch()).toBe('VANGUARD');
 
   expect(searchBox.setHoverSat(39208)).toBe(undefined);

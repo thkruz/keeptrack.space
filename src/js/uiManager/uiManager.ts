@@ -371,7 +371,7 @@ let doSearch = (searchString, isPreventDropDown) => {
   }
 };
 
-export const legendHoverMenuClick = (legendType) => {
+export const legendHoverMenuClick = (legendType?: string) => {
   const { satSet } = keepTrackApi.programs;
 
   switch (legendType) {

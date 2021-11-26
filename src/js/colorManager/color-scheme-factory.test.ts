@@ -1,7 +1,9 @@
-import * as colorSchemeFactory from '@app/js/colorManager/color-scheme-factory';
+// @ts-nocheck
+
 import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/externalApi';
 import { getDayOfYear } from '../timeManager/timeManager';
+import * as colorSchemeFactory from './color-scheme-factory';
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode

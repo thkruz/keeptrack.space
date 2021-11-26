@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* /////////////////////////////////////////////////////////////////////////////
 
 (c) 2016-2020, Theodore Kruczek
@@ -526,6 +527,7 @@ var drawChart = (data) => {
 
   // Actually Draw the Charts
   var context = document.getElementById('satChart').getContext('2d');
+  // eslint-disable-next-line no-unused-vars
   var myChart = new Chart(context, {
     type: 'line',
     data: {

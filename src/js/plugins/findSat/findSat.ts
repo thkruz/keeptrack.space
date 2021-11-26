@@ -258,13 +258,8 @@ export const newLaunchSubmit = (): void => {
   // Date object defaults to local time.
   quadZTime.setUTCHours(0); // Move to UTC Hour
 
-  keepTrackApi.programs.timeManager.propOffset = quadZTime.getTime() - today.getTime(); // Find the offset from today
+  keepTrackApi.programs.timeManager.changePropOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
   keepTrackApi.programs.mainCamera.isCamSnapMode = false;
-  keepTrackApi.programs.satSet.satCruncher.postMessage({
-    // Tell satSet.satCruncher we have changed times for orbit calculations
-    typ: 'offset',
-    dat: keepTrackApi.programs.timeManager.propOffset.toString() + ' ' + (1.0).toString(),
-  });
 
   const TLEs = keepTrackApi.programs.satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, keepTrackApi.programs.timeManager.propOffset);
 

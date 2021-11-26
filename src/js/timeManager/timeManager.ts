@@ -1,7 +1,43 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
 import $ from 'jquery';
+import { keepTrackApi } from '../api/externalApi';
 import { timeManagerObject } from './timeManagerObject';
 import { dateFromJday, dateToLocalInIso, getDayOfYear, jday, localToZulu } from './transforms';
+
+// TODO: Simulation Time needs to be calculated using the following formula:
+//
+// simulationTime: The time in the simulation
+// realTime: The time in the real world
+// staticOffset: The time offset ignoring propRate (ex. New Launch)
+// dynamicOffset: The time offset that is impacted by propRate
+// simulationEpoch: The time taken when dynamicOffset or propRate changes
+// propRate: The rate of change applied to the dynamicOffset
+//
+// simulationTime = realTime + staticOffset + (dynamicOffset - simulationEpoch) * propRate;
+
+export const changePropRate = (propRate: number) => {
+  timeManager.propRate = propRate;
+
+  timeManager.propRealTime = Date.now();
+  // If we recalculate the propRealTime then our offset is 0 at that point
+  timeManager.propOffset = 0;
+  console.debug('changePropRate', propRate);
+  synchronize();
+};
+
+export const synchronize = () => {
+  const { satSet } = keepTrackApi.programs;
+  satSet.satCruncher.postMessage({
+    typ: 'offset',
+    dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
+  });
+};
+
+export const changePropOffset = (propOffset: number) => {
+  timeManager.propRealTime = Date.now();
+  timeManager.propOffset = propOffset;
+  console.debug('changePropOffset', propOffset);
+  synchronize();
+};
 
 export const timeManager: timeManagerObject = {
   dateObject: null,
@@ -23,15 +59,21 @@ export const timeManager: timeManagerObject = {
   setSelectedDate: null,
   lastTime: null,
   selectedDate: null,
-  setDrawDt: null,
-  setPropRateZero: null,
   tDS: null,
   iText: null,
   propRate0: null,
   dateDOM: null,
   getPropOffset: null,
+  dateToLocalInIso: dateToLocalInIso,
+  jday: jday,
+  getDayOfYear: getDayOfYear,
+  localToZulu: localToZulu,
+  dateFromJday: dateFromJday,
+  propFrozen: 0,
+  changePropRate: changePropRate,
+  changePropOffset: changePropOffset,
+  synchronize: synchronize,
   init: () => {
-    const settingsManager = keepTrackApi.programs.settingsManager;
     timeManager.dateObject = new Date();
     timeManager.propTimeVar = timeManager.dateObject;
     timeManager.datetimeInputDOM = $('#datetime-input-tb');
@@ -39,28 +81,20 @@ export const timeManager: timeManagerObject = {
     timeManager.timeTextStr = '';
     timeManager.timeTextStrEmpty = '';
 
-    let propFrozen = Date.now(); // for when propRate 0
-    timeManager.now = propFrozen; // (initialized as Date.now)
-    timeManager.propRealTime = propFrozen; // actual time we're running it (initialized as Date.now)
+    timeManager.propFrozen = Date.now(); // for when propRate 0
+    timeManager.now = timeManager.propFrozen; // (initialized as Date.now)
+    timeManager.propRealTime = timeManager.propFrozen; // actual time we're running it (initialized as Date.now)
     timeManager.propOffset = 0.0; // offset we're propagating to, msec
     timeManager.propRate = 1.0; // time rate multiplier for propagation
     timeManager.dt = 0;
     timeManager.drawDt = 0;
 
-    timeManager.updatePropTime = (propTimeVar?) => {
+    // Propagation Time Functions
+    timeManager.propTime = (propTimeVar?: any) => {
       if (typeof propTimeVar !== 'undefined' && propTimeVar !== null) {
         timeManager.propTimeVar.setTime(propTimeVar);
         return;
       }
-      if (timeManager.propRate === 0) {
-        timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset);
-      } else {
-        timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset + (Number(timeManager.now) - Number(timeManager.propRealTime)) * timeManager.propRate);
-      }
-    };
-
-    // Propagation Time Functions
-    timeManager.propTime = function () {
       if (timeManager.propRate === 0) {
         timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset);
       } else {
@@ -80,7 +114,7 @@ export const timeManager: timeManagerObject = {
       timeManager.dt = dt;
 
       timeManager.setLastTime(timeManager.propTimeVar);
-      timeManager.updatePropTime();
+      timeManager.propTime();
       timeManager.setSelectedDate(timeManager.propTimeVar);
 
       // Passing datetimeInput eliminates needing jQuery in main module
@@ -89,15 +123,6 @@ export const timeManager: timeManagerObject = {
           timeManager.datetimeInputDOM.val(timeManager.selectedDate.toISOString().slice(0, 10) + ' ' + timeManager.selectedDate.toISOString().slice(11, 19));
         }
       }
-    };
-
-    timeManager.setDrawDt = (drawDt) => {
-      timeManager.drawDt = drawDt;
-    };
-
-    timeManager.setPropRateZero = function () {
-      timeManager.propRate = 0;
-      propFrozen = Date.now();
     };
 
     timeManager.setLastTime = (now) => {
@@ -147,12 +172,7 @@ export const timeManager: timeManagerObject = {
     };
 
     // Initialize
-    timeManager.updatePropTime();
+    timeManager.propTime();
     timeManager.setSelectedDate(timeManager.propTimeVar);
   },
-  dateToLocalInIso: dateToLocalInIso,
-  jday: jday,
-  getDayOfYear: getDayOfYear,
-  localToZulu: localToZulu,
-  dateFromJday: dateFromJday,
 };

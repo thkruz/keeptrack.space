@@ -18,21 +18,19 @@ test(`Basic Functions of Time Manager`, () => {
   timeManager.setLastTime(new Date());
   timeManager.setSelectedDate(new Date());
 
-  timeManager.updatePropTime(new Date());
+  timeManager.propTime(new Date());
 
-  timeManager.updatePropTime(null);
+  timeManager.propTime(null);
 
   timeManager.setPropRateZero();
-  timeManager.updatePropTime();
+  timeManager.propTime();
 
   timeManager.propTime();
 
-  timeManager.propRate = 1;
+  timeManager.changePropRate(1);
   timeManager.propTime();
 
   timeManager.propTimeCheck();
-
-  timeManager.setDrawDt(new Date());
 
   timeManager.getPropOffset();
 

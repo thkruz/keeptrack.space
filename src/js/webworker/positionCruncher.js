@@ -52,7 +52,7 @@ let timeSyncRunning = false; // Prevent Time Sync Loop From Running Twice
 var divisor = 1; // When running at high speeds, allow faster propagation
 var propOffset = 0; // offset varting us propagate in the future (or past)
 var propRate = 1; // vars us run time faster (or slower) than normal
-var propRealTime = Date.now(); // vars us run time faster (or slower) than normal
+var propChangeTime = Date.now(); // vars us run time faster (or slower) than normal
 
 /** Settings */
 var selectedSatFOV = 90; // FOV in Degrees
@@ -85,9 +85,9 @@ sensor.observerGd = defaultGd;
 
 // Handles Incomming Messages to sat-cruncher from main thread
 onmessage = function (m) {
-  // Set propRealTime Once
-  if (typeof propRealTime == 'undefined') {
-    propRealTime = Date.now();
+  // Set propChangeTime Once
+  if (typeof propChangeTime == 'undefined') {
+    propChangeTime = Date.now();
   }
 
   if (m.data.isSunlightView) {
@@ -182,11 +182,7 @@ onmessage = function (m) {
     case 'offset':
       propOffset = Number(m.data.dat.split(' ')[0]);
       propRate = Number(m.data.dat.split(' ')[1]);
-
-      // if (!(oldPropRate == 0 && propRate == 0)) {
-      // Update propRealTime only if updating propOffset
-      propRealTime = Date.now();
-      // }
+      propChangeTime = Date.now();
 
       // Changing this to 0.1 caused issues...
       divisor = 1;
@@ -280,16 +276,19 @@ onmessage = function (m) {
       satCache[m.data.id] = m.data;
       break;
     case 'timeSync':
-      propRealTime = new Date(m.data.time);
+      // propChangeTime = new Date(m.data.time);
       break;
     default:
       console.warn('Unknown message typ: ' + m.data.typ);
       break;
   }
-  if (!propagationRunning) {
+
+  // Don't start before getting satData!
+  if (!propagationRunning && m.data.typ === 'satdata') {
     len = -1; // propagteCruncher needs to start at -1 not 0
     propagateCruncher();
   }
+
   if (!timeSyncRunning) {
     timeSyncLoop();
   }
@@ -1408,12 +1407,15 @@ var jday = (year, mon, day, hr, minute, sec) => {
 };
 
 /* Returns Current Propagation Time */
-var propTime = () => {
-  'use strict';
+const propTime = () => {
+  // NOTE: propChangeTime is the date object marking the exact
+  // time we changed the propagation rate. The amount of time
+  // since that time is the time multiplied by the propRate, plus
+  // the propRateOffset gives us the simulation time.
 
-  var now = new Date();
-  var realElapsedMsec = Number(now) - Number(propRealTime);
-  var scaledMsec = realElapsedMsec * propRate;
-  now.setTime(Number(propRealTime) + propOffset + scaledMsec);
+  const now = new Date();
+  const timeSincePropChange = now.getTime() - propChangeTime;
+  const dynamicPropOffset = timeSincePropChange * propRate;
+  now.setTime(propChangeTime + propOffset + dynamicPropOffset);
   return now;
 };

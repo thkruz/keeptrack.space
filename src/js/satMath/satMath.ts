@@ -1198,8 +1198,8 @@ export const getOrbitByLatLon = (sat, goalLat, goalLon, upOrDown, propOffset, go
   var getOrbitByLatLonPropagate = (propOffset, satrec, type) => {
     const { timeManager } = keepTrackApi.programs;
 
-    timeManager.propRealTime = Date.now();
-    var now = timeManager.propTimeCheck(propOffset, timeManager.propRealTime);
+    const thisTime = Date.now(); // TODO: standardize variable names
+    var now = timeManager.propTimeCheck(propOffset, thisTime);
     var j = timeManager.jday(
       now.getUTCFullYear(),
       now.getUTCMonth() + 1, // NOTE:, this function requires months in rng 1-12.

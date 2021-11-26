@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 
 export interface timeManagerObject {
+  propFrozen: number;
   dateFromJday: (year: any, day: any) => Date;
   init: any;
   dateObject: Date;
@@ -14,6 +15,9 @@ export interface timeManagerObject {
   propOffset: number;
   propRate: number;
   dt: number;
+  changePropRate: any;
+  changePropOffset: any;
+  synchronize: any;
   drawDt: number;
   updatePropTime: (propTimeVar?: any) => void;
   propTime: () => any;
@@ -23,8 +27,6 @@ export interface timeManagerObject {
   setSelectedDate(propTimeVar: any): any;
   lastTime: any;
   selectedDate: any;
-  setDrawDt: (drawDt: any) => void;
-  setPropRateZero: () => void;
   tDS: any;
   iText: number;
   propRate0: any;

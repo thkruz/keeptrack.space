@@ -369,11 +369,8 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
   // }
 
   dotsManager.drawDivisor = Math.max(timeManager.propRate, 0.001);
-  timeManager.setDrawDt(Math.min(timeManager.dt / 1000.0, 1.0 / dotsManager.drawDivisor));
-  // Skip Velocity Math if FPS is hurting
-  // 1000 / dt = fps
-  // if (1000 / timeManager.dt > settingsManager.fpsThrottle2) {
-  timeManager.setDrawDt(timeManager.drawDt * timeManager.propRate); // Adjust drawDt correspond to the propagation rate
+  timeManager.drawDt = Math.min(timeManager.dt / 1000.0, 1.0 / dotsManager.drawDivisor);
+  timeManager.drawDt *= timeManager.propRate; // Adjust drawDt correspond to the propagation rate
   dotsManager.satDataLenInDraw = satSetLen;
   if (!settingsManager.lowPerf && timeManager.drawDt > settingsManager.minimumDrawDt) {
     // Don't Interpolate Static Objects
@@ -388,7 +385,6 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
       dotsManager.positionData[dotsManager.drawI] += dotsManager.velocityData[dotsManager.drawI] * timeManager.drawDt;
     }
   }
-  // }
 };
 
 export const updateSizeBuffer = (satData) => {

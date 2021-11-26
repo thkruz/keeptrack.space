@@ -93,15 +93,13 @@ export const init = async (satCruncherOveride?: any): Promise<void> => {
 export const satCruncherOnMessage = (m: SatCruncherMessage) => {
   const { mainCamera, sensorManager, objectManager, uiManager, timeManager } = keepTrackApi.programs;
   if (m.data?.typ === 'timeSync') {
-    if (timeManager.propTime().getTime() === m.data.time) {
+    const timeDif = timeManager.propTime().getTime() - m.data.time;
+    if (timeDif > 100 || timeDif < -100) {
       console.table([
-        { time: new Date(m.data.time), offset: m.data.propOffset, rate: m.data.propRate },
-        { time: timeManager.propTime(), offset: timeManager.propOffset, rate: timeManager.propRate },
+        { time: new Date(m.data.time).toISOString(), unix: m.data.time, offset: m.data.propOffset, rate: m.data.propRate },
+        { time: timeManager.propTime().toISOString(), unix: timeManager.propTime().getTime(), offset: timeManager.propOffset, rate: timeManager.propRate },
+        { unix: timeDif },
       ]);
-      satSet.satCruncher.postMessage({
-        typ: 'offset',
-        dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-      });
     }
     return;
   }
@@ -668,12 +666,8 @@ export const getVariableActions = (params: string[]) => {
           uiManager.toast(`Date value of "${val}" is not a proper unix timestamp!`, 'caution', true);
           break;
         }
-        timeManager.propOffset = Number(val) - Date.now();
+        timeManager.changePropOffset(Number(val) - Date.now());
         $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
-        satSet.satCruncher.postMessage({
-          typ: 'offset',
-          dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-        });
         break;
       case 'rate':
         var rate = parseFloat(val);
@@ -684,11 +678,7 @@ export const getVariableActions = (params: string[]) => {
         rate = Math.min(rate, 1000);
         // could run time backwards, but let's not!
         rate = Math.max(rate, 0.0);
-        timeManager.propRate = Number(rate);
-        satSet.satCruncher.postMessage({
-          typ: 'offset',
-          dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-        });
+        timeManager.changePropRate(Number(rate));
         break;
     }
   }

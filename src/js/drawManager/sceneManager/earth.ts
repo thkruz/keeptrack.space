@@ -493,7 +493,7 @@ export const update = (): void => {
 };
 export const updateSunCurrentDirection = (): void => {
   const { timeManager } = keepTrackApi.programs;
-  timeManager.updatePropTime();
+  timeManager.propTime();
   earth.sunvar.now = timeManager.propTimeVar;
   earth.sunvar.jd = timeManager.jday(
     earth.sunvar.now.getUTCFullYear(),

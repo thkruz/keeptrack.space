@@ -234,7 +234,7 @@ export const initGodraysProgram = (gl: WebGL2RenderingContext) => {
  * ***************************************************************************/
 export const update = () => {
   const { timeManager } = keepTrackApi.programs;
-  timeManager.updatePropTime();
+  timeManager.propTime();
   sun.now = timeManager.propTimeVar;
 
   sun.sunvar.j = timeManager.jday(

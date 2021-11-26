@@ -538,8 +538,6 @@ export const uiManagerInit = () => {
 
     satCruncher.postMessage({
       // Send satSet.satCruncher File information on this radar
-      typ: 'offset',
-      dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
       setlatlong: true,
       sensor: {
         lat: parseFloat(<string>lat),

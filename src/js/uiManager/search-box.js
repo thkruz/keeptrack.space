@@ -73,6 +73,8 @@ searchBox.doArraySearch = (array) => {
 searchBox.doSearch = function (searchString, isPreventDropDown) {
   const { satSet } = keepTrackApi.programs;
 
+  if (satSet.satData.length === 0) throw new Error('No sat data loaded! Check if TLEs are corrupted!');
+
   if (searchString.length === 0) {
     settingsManager.lastSearch = '';
     settingsManager.lastSearchResults = [];

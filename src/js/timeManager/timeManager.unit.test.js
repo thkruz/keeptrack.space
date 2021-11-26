@@ -36,7 +36,7 @@ test(`Basic Functions of Time Manager`, () => {
 
   timeManager.getPropOffset();
 
-  timeManager.dateToISOLikeButLocal(new Date());
+  timeManager.dateToLocalInIso(new Date());
 
   timeManager.localToZulu(new Date());
 
@@ -46,7 +46,7 @@ test(`Basic Functions of Time Manager`, () => {
 
   timeManager.getDayOfYear(new Date(2020, 2, 1));
 
-  timeManager.dateFromDay(2021, 10);
+  timeManager.dateFromJday(2021, 10);
 
   timeManager.jday(2021, 3, 15, 12, 0, 0);
 

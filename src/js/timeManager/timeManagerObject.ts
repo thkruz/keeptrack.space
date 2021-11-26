@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 
 export interface timeManagerObject {
+  dateFromJday: (year: any, day: any) => Date;
   init: any;
   dateObject: Date;
   propTimeVar: any;
@@ -29,9 +30,8 @@ export interface timeManagerObject {
   propRate0: any;
   dateDOM: any;
   getPropOffset: () => number;
-  dateToISOLikeButLocal: (date: any) => string;
+  dateToLocalInIso: (date: any) => string;
   localToZulu: (date: any) => any;
   getDayOfYear: (date: any) => any;
-  dateFromDay: (year: any, day: any) => Date;
   jday: (year: any, mon: any, day: any, hr: any, minute: any, sec: any) => any;
 }

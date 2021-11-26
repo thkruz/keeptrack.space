@@ -1,24 +1,7 @@
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { MILLISECONDS_PER_DAY } from '@app/js/lib/constants.js';
-import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import $ from 'jquery';
 import { timeManagerObject } from './timeManagerObject';
-
-export const getDayOfYear = (date: Date) => {
-  date = date || new Date();
-  const _isLeapYear = (date: Date) => {
-    const year = date.getFullYear();
-    if ((year & 3) !== 0) return false;
-    return year % 100 !== 0 || year % 400 === 0;
-  };
-
-  const dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-  const mn = date.getMonth();
-  const dn = date.getUTCDate();
-  let dayOfYear = dayCount[mn] + dn;
-  if (mn > 1 && _isLeapYear(date)) dayOfYear++;
-  return dayOfYear;
-};
+import { dateFromJday, dateToLocalInIso, getDayOfYear, jday, localToZulu } from './transforms';
 
 export const timeManager: timeManagerObject = {
   dateObject: null,
@@ -47,17 +30,8 @@ export const timeManager: timeManagerObject = {
   propRate0: null,
   dateDOM: null,
   getPropOffset: null,
-  dateToISOLikeButLocal: null,
-  localToZulu: null,
-  getDayOfYear: null,
-  dateFromDay: null,
-  jday: null,
   init: () => {
     const settingsManager = keepTrackApi.programs.settingsManager;
-    // Variables pulled from timeManager.jday function to reduce garbage collection
-    let jDayStart;
-    let jDayDiff;
-
     timeManager.dateObject = new Date();
     timeManager.propTimeVar = timeManager.dateObject;
     timeManager.datetimeInputDOM = $('#datetime-input-tb');
@@ -172,48 +146,13 @@ export const timeManager: timeManagerObject = {
       return propOffset;
     };
 
-    timeManager.dateToISOLikeButLocal = function (date) {
-      const offsetMs = date.getTimezoneOffset() * 60 * 1000;
-      const msLocal = date.getTime() - offsetMs;
-      const dateLocal = new Date(msLocal);
-      let iso = dateLocal.toISOString();
-      iso = iso.replace('T', ' ');
-      const isoLocal = iso.slice(0, 19) + ' ' + dateLocal.toString().slice(25, 31);
-      return isoLocal;
-    };
-
-    timeManager.localToZulu = function (date) {
-      date = dateFormat(date, 'isoDateTime', true);
-      date = date.split(' ');
-      date = new Date(date[0] + 'T' + date[1] + 'Z');
-      return date;
-    };
-
-    // Get Day of Year
-    timeManager.getDayOfYear = getDayOfYear;
-
-    timeManager.dateFromDay = function (year, day) {
-      const date = new Date(year, 0); // initialize a date in `year-01-01`
-      return new Date(date.setDate(day)); // add the number of days
-    };
-
-    timeManager.jday = function (year, mon, day, hr, minute, sec) {
-      // from satellite.js
-      if (!year) {
-        // console.debug('timeManager.jday should always have a date passed to it!');
-        const now = new Date();
-        jDayStart = new Date(now.getFullYear(), 0, 0);
-        jDayDiff = now.getDate() - jDayStart.getDate();
-        return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);
-      } else {
-        return (
-          367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor((275 * mon) / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0 //  ut in days
-        );
-      }
-    };
-
     // Initialize
     timeManager.updatePropTime();
     timeManager.setSelectedDate(timeManager.propTimeVar);
   },
+  dateToLocalInIso: dateToLocalInIso,
+  jday: jday,
+  getDayOfYear: getDayOfYear,
+  localToZulu: localToZulu,
+  dateFromJday: dateFromJday,
 };

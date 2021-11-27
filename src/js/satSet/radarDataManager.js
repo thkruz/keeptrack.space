@@ -1,7 +1,8 @@
 import $ from 'jquery';
 import { DEG2RAD } from '@app/js/lib/constants.js';
 import { keepTrackApi } from '../api/externalApi';
-import { timeManager } from '@app/js/timeManager/timeManager.ts';
+import { timeManager } from '@app/js/timeManager/timeManager';
+import { jday } from '@app/js/timeManager/transforms';
 
 var satellite, sensorManager, satSet, satCruncher;
 let radarDataManager = {};
@@ -32,7 +33,7 @@ radarDataManager.init = async (sensorManagerRef, satSetRef, satCruncherRef, sate
 radarDataManager.changeTimeToFirstDataTime = () => {
   if (!settingsManager.isEnableRadarData) return;
   timeManager.propOffset = new Date(radarDataManager.radarData[0].t) - Date.now();
-  $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
+  $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.dynamicOffsetEpoch + timeManager.propOffset));
   satCruncher.postMessage({
     type: 'offset',
     dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
@@ -42,7 +43,7 @@ radarDataManager.changeTimeToFirstDataTime = () => {
 /* istanbul ignore next */
 radarDataManager.findFirstDataTime = () => {
   if (!settingsManager.isEnableRadarData) return;
-  let now = timeManager.propTime() * 1;
+  let now = timeManager.calculateSimulationTime() * 1;
   for (let i = 0; i < radarDataManager.radarData.length; i++) {
     if (radarDataManager.radarData[i].t > now - 3000) {
       radarDataManager.drawT1 = i;
@@ -60,7 +61,7 @@ radarDataManager.setup = (resp) => {
   for (let i = 0; i < radarDataManager.radarData.length; i++) {
     nowDate = new Date(radarDataManager.radarData[i].t);
 
-    j = timeManager.jday(
+    j = jday(
       nowDate.getUTCFullYear(),
       nowDate.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
       nowDate.getUTCDate(),

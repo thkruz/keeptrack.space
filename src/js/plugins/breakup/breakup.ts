@@ -138,9 +138,11 @@ export const breakupOnSubmit = (): void => {
   const launchLon = satellite.degreesLong(TEARR.lon);
   const alt = TEARR.alt;
 
+  const simulationTimeObj = timeManager.calculateSimulationTime();
+
   const upOrDown = mainsat.getDirection();
   // console.log(upOrDown);
-  const currentEpoch = satellite.currentEpoch(timeManager.propTime());
+  const currentEpoch = satellite.currentEpoch(simulationTimeObj);
   mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
 
   keepTrackApi.programs.mainCamera.isCamSnapMode = false;
@@ -148,9 +150,9 @@ export const breakupOnSubmit = (): void => {
   let TLEs;
   // Ignore argument of perigee for round orbits OPTIMIZE
   if (mainsat.apogee - mainsat.perigee < 300) {
-    TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.propOffset);
+    TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, simulationTimeObj);
   } else {
-    TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.propOffset, alt);
+    TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, simulationTimeObj, alt);
   }
   const TLE1 = TLEs[0];
   const TLE2 = TLEs[1];
@@ -184,9 +186,9 @@ export const breakupOnSubmit = (): void => {
           var iTLEs;
           // Ignore argument of perigee for round orbits OPTIMIZE
           if (sat.apogee - sat.perigee < 300) {
-            iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, timeManager.propOffset, 0, rascOffset);
+            iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj, 0, rascOffset);
           } else {
-            iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, timeManager.propOffset, alt, rascOffset);
+            iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj, alt, rascOffset);
           }
           iTLE1 = iTLEs[0];
           let iTLE2 = iTLEs[1];
@@ -222,7 +224,7 @@ export const breakupOnSubmit = (): void => {
           sat.TLE1 = iTLE1;
           sat.TLE2 = iTLE2;
           sat.active = true;
-          if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.propOffset) > 1) {
+          if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.calculateSimulationTime()) > 1) {
             satSet.satCruncher.postMessage({
               typ: 'satEdit',
               id: satId,

@@ -1,7 +1,7 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import * as externalApi from '@app/js/api/externalApi';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as earth from '@app/js/drawManager/sceneManager/earth';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import * as externalApi from '../../api/externalApi';
+import { keepTrackApi } from '../../api/externalApi';
+import * as earth from '../../drawManager/sceneManager/earth';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
@@ -135,7 +135,7 @@ describe('earth.dayImgHiOnLoad', () => {
 // @ponicode
 describe('earth.dayImgOnLoad', () => {
   test('0', () => {
-    let result: any = earth.dayImgOnLoad(externalApi.keepTrackApi.programs.drawManager.gl);
+    let result: any = earth.dayImgOnLoad(externalApi.keepTrackApi.programs.drawManager.gl, <HTMLImageElement>(<unknown>''));
     expect(result).toMatchSnapshot();
   });
 });

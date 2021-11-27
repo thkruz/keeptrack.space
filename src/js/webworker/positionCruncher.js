@@ -50,7 +50,8 @@ let globalPropagationRateMultiplier = 1; // Used to slow down propagation rate o
 var propagationRunning = false; // Prevent Propagation From Running Twice
 let timeSyncRunning = false; // Prevent Time Sync Loop From Running Twice
 var divisor = 1; // When running at high speeds, allow faster propagation
-var propOffset = 0; // offset varting us propagate in the future (or past)
+let dynamicOffsetEpoch = Date.now();
+let staticOffset = 0;
 var propRate = 1; // vars us run time faster (or slower) than normal
 var propChangeTime = Date.now(); // vars us run time faster (or slower) than normal
 
@@ -180,9 +181,9 @@ onmessage = function (m) {
 
   switch (m.data.typ) {
     case 'offset':
-      propOffset = Number(m.data.dat.split(' ')[0]);
-      propRate = Number(m.data.dat.split(' ')[1]);
-      propChangeTime = Date.now();
+      staticOffset = m.data.staticOffset;
+      dynamicOffsetEpoch = m.data.dynamicOffsetEpoch;
+      propRate = m.data.propRate;
 
       // Changing this to 0.1 caused issues...
       divisor = 1;
@@ -299,7 +300,8 @@ const timeSyncLoop = () => {
     typ: 'timeSync',
     time: propTime().getTime(),
     propRate: propRate,
-    propOffset: propOffset,
+    staticOffset: staticOffset,
+    dynamicOffsetEpoch: dynamicOffsetEpoch,
   };
   postMessage(postMessageArray);
   setTimeout(timeSyncLoop, 250);
@@ -1408,14 +1410,8 @@ var jday = (year, mon, day, hr, minute, sec) => {
 
 /* Returns Current Propagation Time */
 const propTime = () => {
-  // NOTE: propChangeTime is the date object marking the exact
-  // time we changed the propagation rate. The amount of time
-  // since that time is the time multiplied by the propRate, plus
-  // the propRateOffset gives us the simulation time.
-
   const now = new Date();
-  const timeSincePropChange = now.getTime() - propChangeTime;
-  const dynamicPropOffset = timeSincePropChange * propRate;
-  now.setTime(propChangeTime + propOffset + dynamicPropOffset);
+  const dynamicPropOffset = now.getTime() - dynamicOffsetEpoch;
+  now.setTime(dynamicOffsetEpoch + staticOffset + dynamicPropOffset * propRate);
   return now;
 };

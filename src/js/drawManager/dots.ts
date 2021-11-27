@@ -1,8 +1,7 @@
 /* eslint-disable no-useless-escape */
-import { Camera, DotsManager, DrawProgram, PickingProgram } from '@app/types/types';
+import { Camera, DotsManager, DrawProgram, PickingProgram, TimeManager } from '@app/types/types';
 import * as glm from 'gl-matrix';
 import { ColorSchemeFactory } from '../colorManager/color-scheme-factory';
-import { timeManagerObject as TimeManager } from '../timeManager/timeManagerObject';
 
 export const init = (gl: WebGL2RenderingContext) => {
   // We draw the picking object bigger than the actual dot to make it easier to select objects
@@ -321,16 +320,16 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
   // if (satSet.radarDataManager.radarData.length > 0) {
   //   // Get Time
   //   if (timeManager.propRate === 0) {
-  //     timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset);
+  //     timeManager.simulationTimeObj.setTime(Number(timeManager.dynamicOffsetEpoch) + timeManager.propOffset);
   //   } else {
-  //     timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset + (Number(timeManager.now) - Number(timeManager.propRealTime)) * timeManager.propRate);
+  //     timeManager.simulationTimeObj.setTime(Number(timeManager.dynamicOffsetEpoch) + timeManager.propOffset + (Number(timeManager.realTime) - Number(timeManager.dynamicOffsetEpoch)) * timeManager.propRate);
   //   }
-  //   drawPropTime = timeManager.propTimeVar * 1;
+  //   drawPropTime = timeManager.simulationTimeObj * 1;
 
   //   // Find the First Radar Return Time
   //   if (satSet.radarDataManager.drawT1 == 0) {
   //     for (rrI = 0; rrI < radarDataLen; rrI++) {
-  //       if (satSet.radarDataManager.radarData[rrI].t > timeManager.now - 3000) {
+  //       if (satSet.radarDataManager.radarData[rrI].t > timeManager.realTime - 3000) {
   //         satSet.radarDataManager.drawT1 = rrI;
   //         break;
   //       }

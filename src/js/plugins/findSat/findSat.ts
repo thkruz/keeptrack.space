@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { RAD2DEG } from '@app/js/lib/constants';
+import { timeManager } from '@app/js/timeManager/timeManager';
 import $ from 'jquery';
 
 let isFindByLooksMenuOpen = false;
@@ -258,15 +259,17 @@ export const newLaunchSubmit = (): void => {
   // Date object defaults to local time.
   quadZTime.setUTCHours(0); // Move to UTC Hour
 
-  keepTrackApi.programs.timeManager.changePropOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
+  keepTrackApi.programs.timeManager.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
   keepTrackApi.programs.mainCamera.isCamSnapMode = false;
 
-  const TLEs = keepTrackApi.programs.satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, keepTrackApi.programs.timeManager.propOffset);
+  const simulationTimeObj = timeManager.calculateSimulationTime();
+
+  const TLEs = keepTrackApi.programs.satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj);
 
   const TLE1 = TLEs[0];
   const TLE2 = TLEs[1];
 
-  if (keepTrackApi.programs.satellite.altitudeCheck(TLE1, TLE2, keepTrackApi.programs.timeManager.propOffset) > 1) {
+  if (keepTrackApi.programs.satellite.altitudeCheck(TLE1, TLE2, keepTrackApi.programs.timeManager.calculateSimulationTime()) > 1) {
     keepTrackApi.programs.satSet.satCruncher.postMessage({
       typ: 'satEdit',
       id: satId,

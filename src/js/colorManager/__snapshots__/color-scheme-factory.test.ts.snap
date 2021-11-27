@@ -132,7 +132,7 @@ Object {
 }
 `;
 
-exports[`ColorSchemeFactory.ageOfElsetRules 10 2`] = `
+exports[`ColorSchemeFactory.ageOfElsetRules 11 1`] = `
 Object {
   "color": Array [
     1,
@@ -141,18 +141,6 @@ Object {
     0,
   ],
   "pickable": false,
-}
-`;
-
-exports[`ColorSchemeFactory.ageOfElsetRules 10 3`] = `
-Object {
-  "color": Array [
-    1,
-    0,
-    0,
-    0.9,
-  ],
-  "pickable": true,
 }
 `;
 

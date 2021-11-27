@@ -184,9 +184,9 @@ var _updateSelectBox = () => {
   // Don't bring up the update box for static dots
   if (typeof sat === 'undefined' || sat.static) return;
 
-  if (timeManager.now * 1 > settingsManager.lastBoxUpdateTime * 1 + updateInterval) {
+  if (timeManager.realTime * 1 > settingsManager.lastBoxUpdateTime * 1 + updateInterval) {
     keepTrackApi.methods.updateSelectBox(sat);
-    settingsManager.lastBoxUpdateTime = timeManager.now;
+    settingsManager.lastBoxUpdateTime = timeManager.realTime;
   }
 };
 
@@ -829,8 +829,8 @@ export const onReady = () => {
   uiManager.menuController = () => {
     // Reset time if in retro mode
     if (settingsManager.retro) {
-      timeManager.propOffset = new Date(2000, 2, 13).getTime() - Date.now();
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.propRealTime + timeManager.propOffset));
+      timeManager.staticOffset = new Date(2000, 2, 13).getTime() - Date.now();
+      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
     }
 
     $('#search-icon').on('click', function () {
@@ -1275,8 +1275,8 @@ uiManager.updateURL = () => {
     paramSlices.push('rate=' + timeManager.propRate);
   }
 
-  if (timeManager.propOffset < -1000 || timeManager.propOffset > 1000) {
-    paramSlices.push('date=' + (timeManager.propRealTime + timeManager.propOffset).toString());
+  if (timeManager.staticOffset < -1000 || timeManager.staticOffset > 1000) {
+    paramSlices.push('date=' + (timeManager.dynamicOffsetEpoch + timeManager.staticOffset).toString());
   }
 
   if (paramSlices.length > 0) {
@@ -1410,48 +1410,41 @@ uiManager.keyHandler = (evt) => {
 
   switch (evt.key) {
     case '!':
-      timeManager.propOffset = 0; // Reset to Current Time
+      timeManager.changeStaticOffset(0); // Reset to Current Time
       settingsManager.isPropRateChange = true;
       break;
     case ',':
-      timeManager.propTime();
-      timeManager.propOffset = timeManager.getPropOffset();
-      timeManager.propOffset -= 1000 * 60; // Move back a Minute
+      timeManager.calculateSimulationTime();
+      timeManager.changeStaticOffset(timeManager.staticOffset - 1000 * 60); // Move back a Minute
       settingsManager.isPropRateChange = true;
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.propRealTime + timeManager.propOffset));
+      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
       break;
     case '.':
-      timeManager.propTime();
-      timeManager.propOffset = timeManager.getPropOffset();
-      timeManager.propOffset += 1000 * 60; // Move a Minute
+      timeManager.calculateSimulationTime();
+      timeManager.changeStaticOffset(timeManager.staticOffset + 1000 * 60); // Move forward a Minute
       settingsManager.isPropRateChange = true;
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.propRealTime + timeManager.propOffset));
+      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
       break;
     case '<':
-      timeManager.propTime();
-      timeManager.propOffset = timeManager.getPropOffset();
-      timeManager.propOffset -= 1000 * 60 * 4; // Move back 4 minutes
+      timeManager.calculateSimulationTime();
+      timeManager.changeStaticOffset(timeManager.staticOffset - 4000 * 60); // Move back 4 Minutes
       settingsManager.isPropRateChange = true;
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.propRealTime + timeManager.propOffset));
+      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
       break;
     case '>':
-      timeManager.propTime();
-      timeManager.propOffset = timeManager.getPropOffset();
-      timeManager.propOffset += 1000 * 60 * 4; // Move forward 4 minutes
+      timeManager.calculateSimulationTime();
+      timeManager.changeStaticOffset(timeManager.staticOffset + 4000 * 60); // Move forward 4 Minutes
       settingsManager.isPropRateChange = true;
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.propRealTime + timeManager.propOffset));
+      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
       break;
     case '0':
-      timeManager.propTime();
+      timeManager.calculateSimulationTime();
       timeManager.changePropRate(0);
-      timeManager.propFrozen = Date.now();
-      timeManager.propOffset = timeManager.getPropOffset();
       settingsManager.isPropRateChange = true;
       break;
     case '+':
     case '=':
-      timeManager.propTime();
-      timeManager.propOffset = timeManager.getPropOffset();
+      timeManager.calculateSimulationTime();
       if (timeManager.propRate < 0.001 && timeManager.propRate > -0.001) {
         timeManager.changePropRate(0.001);
       }
@@ -1469,9 +1462,7 @@ uiManager.keyHandler = (evt) => {
       break;
     case '-':
     case '_':
-      timeManager.propTime();
-      timeManager.propOffset = timeManager.getPropOffset();
-
+      timeManager.calculateSimulationTime();
       if (timeManager.propRate < 0.001 && timeManager.propRate > -0.001) {
         timeManager.changePropRate(-0.001);
       }
@@ -1488,15 +1479,14 @@ uiManager.keyHandler = (evt) => {
       settingsManager.isPropRateChange = true;
       break;
     case '1':
-      timeManager.propTime();
-      timeManager.propOffset = timeManager.getPropOffset();
+      timeManager.calculateSimulationTime();
       timeManager.changePropRate(1.0);
       settingsManager.isPropRateChange = true;
       break;
   }
 
   if (settingsManager.isPropRateChange) {
-    timeManager.propTime();
+    timeManager.calculateSimulationTime();
     timeManager.synchronize();
     if (settingsManager.isPropRateChange && !settingsManager.isAlwaysHidePropRate && timeManager.propRate0 !== timeManager.propRate) {
       if (timeManager.propRate > 1.01 || timeManager.propRate < 0.99) {

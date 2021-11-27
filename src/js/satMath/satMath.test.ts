@@ -892,7 +892,7 @@ describe('satMath.calculateVisMag', () => {
 
 describe('satMath.altitudeCheck', () => {
   test('0', () => {
-    let result = satMath.altitudeCheck(defaultSat.TLE1, defaultSat.TLE2, 0);
+    let result = satMath.altitudeCheck(defaultSat.TLE1, defaultSat.TLE2, new Date(2020, 0, 1));
     expect(result).toMatchSnapshot();
   });
 });
@@ -967,12 +967,12 @@ describe('satMath.getlookangles', () => {
 // @ponicode
 describe('satMath.propagate', () => {
   test('0', () => {
-    let result: any = satMath.getTearData(0, satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), defaultSensor);
+    let result: any = satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), defaultSensor);
     expect(() => result).not.toThrow();
   });
 
   test('1', () => {
-    let result: any = satMath.getTearData(0, satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), defaultSensor, true);
+    let result: any = satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), defaultSensor, true);
     expect(() => result).not.toThrow();
   });
 });
@@ -997,7 +997,7 @@ describe.skip('satMath.findCloseObjects', () => {
 // @ponicode
 describe.skip('satMath.getOrbitByLatLon', () => {
   test('0', () => {
-    let result: any = satMath.getOrbitByLatLon(defaultSat, 0, 0, 'N', 0, 1000, 0);
+    let result: any = satMath.getOrbitByLatLon(defaultSat, 0, 0, 'N', new Date(), 1000, 0);
     expect(result).toMatchSnapshot();
   });
 });
@@ -1005,7 +1005,7 @@ describe.skip('satMath.getOrbitByLatLon', () => {
 // @ponicode
 describe('satMath.calculateLookAngles', () => {
   test('0', () => {
-    let result: any = satMath.calculateLookAngles(defaultSat, defaultSensor, 0);
+    let result: any = satMath.calculateLookAngles(defaultSat, defaultSensor);
     expect(result).toMatchSnapshot();
   });
 });
@@ -1021,7 +1021,7 @@ describe.skip('satMath.findBestPasses', () => {
 // @ponicode
 describe('satMath.findBestPass', () => {
   test('0', () => {
-    let result: any = satMath.findBestPass(defaultSat, defaultSensor, 0);
+    let result: any = satMath.findBestPass(defaultSat, defaultSensor);
     expect(() => result).not.toThrow();
   });
 });
@@ -1157,12 +1157,12 @@ describe('satMath._jday', () => {
 // @ponicode
 describe('satMath.getLlaTimeView', () => {
   test('0', () => {
-    let result: any = satMath.getLlaTimeView(0, defaultSat);
+    let result: any = satMath.getLlaTimeView(new Date(2020, 0, 1), defaultSat);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satMath.getLlaTimeView(1000, defaultSat);
+    let result: any = satMath.getLlaTimeView(new Date(2020, 0, 2), defaultSat);
     expect(result).toMatchSnapshot();
   });
 });

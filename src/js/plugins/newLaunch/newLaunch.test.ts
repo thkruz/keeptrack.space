@@ -1,9 +1,8 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as newLaunch from '@app/js/plugins/newLaunch/newLaunch';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/externalApi';
+import * as newLaunch from './newLaunch';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
-keepTrackApi.programs.settingsManager = window.settingsManager;
 
 // @ponicode
 describe('newLaunch.init', () => {

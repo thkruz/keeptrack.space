@@ -391,7 +391,7 @@ export const orbitalData = (sat: SatObject): void => {
     if (!keepTrackApi.programs.objectManager.isSensorManagerLoaded) {
       $('#sat-sun').parent().hide();
     } else {
-      now = new Date(keepTrackApi.programs.timeManager.propRealTime + keepTrackApi.programs.timeManager.propOffset);
+      now = new Date(keepTrackApi.programs.timeManager.dynamicOffsetEpoch + keepTrackApi.programs.timeManager.propOffset);
       const sunTime: any = SunCalc.getTimes(now, keepTrackApi.programs.sensorManager.currentSensor.lat, keepTrackApi.programs.sensorManager.currentSensor.lon);
 
       let satInSun = -1;

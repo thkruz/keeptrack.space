@@ -1,15 +1,15 @@
 import * as satellite from 'satellite.js';
 ('use strict');
 
-var propRealTime;
-var propOffset;
-var propRate;
+let dynamicOffsetEpoch;
+let staticOffset;
+let propRate = 1.0;
 
 /** CONSTANTS */
-var TAU = 2 * Math.PI; // PI * 2 -- This makes understanding the formulas easier
-var DEG2RAD = TAU / 360; // Used to convert degrees to radians
+const TAU = 2 * Math.PI; // PI * 2 -- This makes understanding the formulas easier
+const DEG2RAD = TAU / 360; // Used to convert degrees to radians
 // var RAD2DEG = 360 / TAU;          // Used to convert radians to degrees
-var RADIUS_OF_EARTH = 6371; // Radius of Earth in kilometers
+const RADIUS_OF_EARTH = 6371; // Radius of Earth in kilometers
 
 var NUM_SEGS;
 var satCache = [];
@@ -28,6 +28,16 @@ onmessage = function (m) {
     // Don't Add Anything Else
   }
 
+  if (typeof m.data.dynamicOffsetEpoch !== 'undefined') {
+    dynamicOffsetEpoch = m.data.dynamicOffsetEpoch;
+  }
+  if (typeof m.data.staticOffset !== 'undefined') {
+    staticOffset = m.data.staticOffset;
+  }
+  if (typeof m.data.propRate !== 'undefined') {
+    propRate = m.data.propRate;
+  }
+
   if (m.data.isInit) {
     var satData = JSON.parse(m.data.satData);
     orbitFadeFactor = JSON.parse(m.data.orbitFadeFactor);
@@ -44,15 +54,14 @@ onmessage = function (m) {
     }
 
     NUM_SEGS = m.data.numSegs;
-  } else {
+  }
+
+  if (m.data.satId) {
     //  var start = performance.now();
     // IDEA: figure out how to calculate the orbit points on constant
     // position slices, not timeslices (ugly perigees on HEOs)
 
     var satId = m.data.satId;
-    propRealTime = m.data.realTime;
-    propOffset = m.data.offset;
-    propRate = m.data.rate;
     var pointsOut = new Float32Array((NUM_SEGS + 1) * 4);
 
     var nowDate = propTime();
@@ -131,14 +140,9 @@ var jday = (year, mon, day, hr, minute, sec) => {
   );
 };
 
-var propTime = () => {
-  'use strict';
-
-  var now = new Date();
-  var realElapsedMsec = Number(now) - Number(propRealTime);
-  var scaledMsec = realElapsedMsec * propRate;
-  now.setTime(Number(propRealTime) + propOffset + scaledMsec);
-  // next line will slow things down tremendously!
-  // console.log('orbit propTime: ' + now + ' elapsed=' + realElapsedMsec/1000);
+const propTime = () => {
+  const now = new Date();
+  const dynamicPropOffset = now.getTime() - dynamicOffsetEpoch;
+  now.setTime(dynamicOffsetEpoch + staticOffset + dynamicPropOffset * propRate);
   return now;
 };

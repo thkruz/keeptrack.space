@@ -2,7 +2,7 @@
 
 import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/externalApi';
-import { getDayOfYear } from '../timeManager/timeManager';
+import { getDayOfYear } from '../timeManager/transforms';
 import * as colorSchemeFactory from './color-scheme-factory';
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
@@ -783,7 +783,7 @@ describe('ColorSchemeFactory.ageOfElsetRules', () => {
     expect(result).toMatchSnapshot();
   });
 
-  test('10', () => {
+  test('11', () => {
     colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.ageLost = false;
     let now = new Date();
     now.setDate(now.getDate() - 80);
@@ -797,7 +797,7 @@ describe('ColorSchemeFactory.ageOfElsetRules', () => {
     colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.ageLost = true;
   });
 
-  test('10', () => {
+  test('12', () => {
     let now = new Date();
     now.setDate(now.getDate() - 600);
     const jday = getDayOfYear(now);
@@ -806,7 +806,7 @@ describe('ColorSchemeFactory.ageOfElsetRules', () => {
     let result: any = colorSchemeFactory.ageOfElsetRules({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
     });
-    expect(result).not.toThrow();
+    expect(() => result).not.toThrow();
   });
 });
 

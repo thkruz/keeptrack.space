@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v5.0.1](https://github.com/thkruz/keeptrack.space/compare/v5.0.0...v5.0.1)
 
-> 22 November 2021 
+> 22 November 2021
 
 - changelog [`a446ad8`](https://github.com/thkruz/keeptrack.space/commit/a446ad866ff15abb87083e61077c371cc5913305)
 - fix(satmath): fixed issue with ecf calculations breaking sun and moon [`44c071a`](https://github.com/thkruz/keeptrack.space/commit/44c071a41ba6eefe1030071f8db659e4ba4a37c7)
@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 ### [v5.0.0](https://github.com/thkruz/keeptrack.space/compare/v4.2.0...v5.0.0)
 
-> 22 November 2021 
+> 22 November 2021
 
 - Version 5 [`4eb1368`](https://github.com/thkruz/keeptrack.space/commit/4eb1368b11d0369a6ab16588e97816582cea1bfa)
 - refactor(camera): migrated camera to typescript [`8efff95`](https://github.com/thkruz/keeptrack.space/commit/8efff95004a9a61cc315de971d736d083b5b3d61)
@@ -30,7 +30,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v4.2.0](https://github.com/thkruz/keeptrack.space/compare/v4.0.0...v4.2.0)
 
-> 9 September 2021 
+> 9 September 2021
 
 - build(deps-dev): bump cypress from 7.7.0 to 8.2.0 [`#288`](https://github.com/thkruz/keeptrack.space/pull/288)
 - build(deps-dev): bump http-server from 0.12.3 to 13.0.0 [`#298`](https://github.com/thkruz/keeptrack.space/pull/298)
@@ -47,7 +47,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - build(typescript): started migration to typescript [`#276`](https://github.com/thkruz/keeptrack.space/pull/276)
 - fix(sensor.ts): fixes #295 [`#295`](https://github.com/thkruz/keeptrack.space/issues/295) [`#295`](https://github.com/thkruz/keeptrack.space/issues/295)
 - feat(meshes): added new meshes [`a506641`](https://github.com/thkruz/keeptrack.space/commit/a50664110dac12c07c92e7ddc5be751b1964b743)
-- added new  catalog loader [`d391366`](https://github.com/thkruz/keeptrack.space/commit/d39136637c30ca528d0cd279ec9e407c01c895ae)
+- added new catalog loader [`d391366`](https://github.com/thkruz/keeptrack.space/commit/d39136637c30ca528d0cd279ec9e407c01c895ae)
 - test(multiple): a lot of ponicode created unit tests [`8252451`](https://github.com/thkruz/keeptrack.space/commit/8252451b33b1840937a875383e00444bf484b7e4)
 - fix(multiple): improved code to allow more unit tests and catch async errors [`18bc080`](https://github.com/thkruz/keeptrack.space/commit/18bc0800437a52d0565279d90604cfd4675694d4)
 - feat(multiple): improved error detection and reporting for webgl issues [`f1c5794`](https://github.com/thkruz/keeptrack.space/commit/f1c5794bf3049819cbb36c4a713453873adb3819)
@@ -111,7 +111,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 ### [v4.0.0](https://github.com/thkruz/keeptrack.space/compare/v3.5.0...v4.0.0)
 
-> 28 July 2021 
+> 28 July 2021
 
 - feat(keeptrack): complete overhaul to TypeScript and implement KeepTrackApi [`dc7c26e`](https://github.com/thkruz/keeptrack.space/commit/dc7c26ed778a92faca7416efa2ed9d96c568dc2b)
 - feat(astroux): implemented astroux css and soundManager [`3a0b6a2`](https://github.com/thkruz/keeptrack.space/commit/3a0b6a2eb1969409f8f32e68e7bc1df0f75a05bd)
@@ -128,7 +128,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v3.5.0](https://github.com/thkruz/keeptrack.space/compare/v3.4.3...v3.5.0)
 
-> 17 July 2021 
+> 17 July 2021
 
 - refactor(settingsmanager): converted settingsmanager from js to ts [`2f55ca8`](https://github.com/thkruz/keeptrack.space/commit/2f55ca8d39643e66fd8d646cf32b664504389e9f)
 - refactor(uimanager): ui-input converted to ts and uiManager updated to be more dynamic [`3098853`](https://github.com/thkruz/keeptrack.space/commit/30988533d261bcf9e1532c9eff71cfc67227edbf)
@@ -144,14 +144,14 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v3.4.3](https://github.com/thkruz/keeptrack.space/compare/v3.4.1...v3.4.3)
 
-> 15 July 2021 
+> 15 July 2021
 
 - fix(nextlaunchmanager.ts): fixed type error [`95deee4`](https://github.com/thkruz/keeptrack.space/commit/95deee49257b6de422d21cf6e2d1a96fcc774e2e)
 - build(package.json): updated version npm scripts to include git tag [`ac16981`](https://github.com/thkruz/keeptrack.space/commit/ac1698195d65c52771305814372ec1af47c8f257)
 
 #### [v3.4.1](https://github.com/thkruz/keeptrack.space/compare/v3.2.1...v3.4.1)
 
-> 26 June 2021 
+> 26 June 2021
 
 - feat(uimanager.js): added Short Term Fence menu [`#275`](https://github.com/thkruz/keeptrack.space/pull/275)
 - build(deps-dev): bump style-loader from 2.0.0 to 3.0.0 [`#272`](https://github.com/thkruz/keeptrack.space/pull/272)
@@ -183,7 +183,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v3.2.1](https://github.com/thkruz/keeptrack.space/compare/v3.2.0...v3.2.1)
 
-> 1 June 2021 
+> 1 June 2021
 
 - docs(changelog): generated auto changelog [`257101e`](https://github.com/thkruz/keeptrack.space/commit/257101e0ca01d187b016baf394c762101d569dbd)
 - docs(readme.md): updated readme for version 3 [`53b120d`](https://github.com/thkruz/keeptrack.space/commit/53b120d97b4db708e7de2f531a4378c67559516d)
@@ -194,7 +194,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v3.2.0](https://github.com/thkruz/keeptrack.space/compare/v3.1.3...v3.2.0)
 
-> 31 May 2021 
+> 31 May 2021
 
 - feat(uimanager.js): improved alerts for watchlist items entering/exit… [`#256`](https://github.com/thkruz/keeptrack.space/pull/256)
 - build(release.yml): fixed github publishing reference [`#255`](https://github.com/thkruz/keeptrack.space/pull/255)
@@ -208,7 +208,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v3.1.3](https://github.com/thkruz/keeptrack.space/compare/v3.1.2...v3.1.3)
 
-> 30 May 2021 
+> 30 May 2021
 
 - feat(uimanager.js): improved alerts for watchlist items entering/exiting fov [`09ea302`](https://github.com/thkruz/keeptrack.space/commit/09ea30239dd37bf0c6e4704caabfaffc8d04f6a0)
 - fix(satset.js): fixed color of overlay icon when loading saved watchlist [`3ae4701`](https://github.com/thkruz/keeptrack.space/commit/3ae4701c4c0cd19a2bf7f2f99b521c16f1215d2f)
@@ -223,7 +223,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v3.1.0](https://github.com/thkruz/keeptrack.space/compare/v3.0.4...v3.1.0)
 
-> 12 May 2021 
+> 12 May 2021
 
 - fix(uimanager): fixes issues #223 and #237 [`#252`](https://github.com/thkruz/keeptrack.space/pull/252)
 - ci(github workflows): updated to match package.json new script names [`#251`](https://github.com/thkruz/keeptrack.space/pull/251)
@@ -425,7 +425,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v3.0.4](https://github.com/thkruz/keeptrack.space/compare/v3.0.3...v3.0.4)
 
-> 28 December 2020 
+> 28 December 2020
 
 - Fix .gitattributes Issue [`#206`](https://github.com/thkruz/keeptrack.space/pull/206)
 - Include All Req Image [`#205`](https://github.com/thkruz/keeptrack.space/pull/205)
@@ -451,7 +451,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v3.0.3](https://github.com/thkruz/keeptrack.space/compare/v3.0.2...v3.0.3)
 
-> 28 December 2020 
+> 28 December 2020
 
 - Development [`#198`](https://github.com/thkruz/keeptrack.space/pull/198)
 - Create CONTRIBUTING.md [`ddfbb28`](https://github.com/thkruz/keeptrack.space/commit/ddfbb285eed4f124b70330d14256d5f6c1eccf58)
@@ -478,7 +478,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v3.0.2](https://github.com/thkruz/keeptrack.space/compare/v3.0.1...v3.0.2)
 
-> 27 December 2020 
+> 27 December 2020
 
 - cameraManager testing added [`#195`](https://github.com/thkruz/keeptrack.space/pull/195)
 - Development [`#194`](https://github.com/thkruz/keeptrack.space/pull/194)
@@ -501,7 +501,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v3.0.1](https://github.com/thkruz/keeptrack.space/compare/v3.0.0...v3.0.1)
 
-> 27 December 2020 
+> 27 December 2020
 
 - updateRadarData script [`e08bc9f`](https://github.com/thkruz/keeptrack.space/commit/e08bc9ff410ee031eed9017f821ee943f02df842)
 - Remove highres images [`86cffdc`](https://github.com/thkruz/keeptrack.space/commit/86cffdc3e1254c15274c64a35f746b2b834b614d)
@@ -513,7 +513,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 ### [v3.0.0](https://github.com/thkruz/keeptrack.space/compare/v2.8.1...v3.0.0)
 
-> 27 December 2020 
+> 27 December 2020
 
 - Bump mkdirp from 0.5.5 to 1.0.4 [`#193`](https://github.com/thkruz/keeptrack.space/pull/193)
 - Upgrade to ES6+ [`f41ac76`](https://github.com/thkruz/keeptrack.space/commit/f41ac7630a77457a7920d5637650181670ff4ba0)
@@ -527,7 +527,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v2.8.1](https://github.com/thkruz/keeptrack.space/compare/v2.8.0...v2.8.1)
 
-> 23 December 2020 
+> 23 December 2020
 
 - satellite.js to 4.1.3 [`f278e8b`](https://github.com/thkruz/keeptrack.space/commit/f278e8bcae058f7a4312d21c78bb7405acd78cd3)
 - Implement npm [`f172cda`](https://github.com/thkruz/keeptrack.space/commit/f172cda3e34182fa4cad21315474507699e54f44)
@@ -536,37 +536,37 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v2.8.0](https://github.com/thkruz/keeptrack.space/compare/v2.7.5...v2.8.0)
 
-> 19 December 2020 
+> 19 December 2020
 
 - Missile bugfixes. Error toasts. New loading messages. [`11addbf`](https://github.com/thkruz/keeptrack.space/commit/11addbf4d2c43137e6d60abab3e77de2b716b3f9)
 
 #### [v2.7.5](https://github.com/thkruz/keeptrack.space/compare/v2.7.4...v2.7.5)
 
-> 18 December 2020 
+> 18 December 2020
 
 - Better orbit lines. Mobile scrolling bufix. [`9f2fe75`](https://github.com/thkruz/keeptrack.space/commit/9f2fe7524feec396d6b69171e41f64a295acd05e)
 
 #### [v2.7.4](https://github.com/thkruz/keeptrack.space/compare/v2.7.3...v2.7.4)
 
-> 18 December 2020 
+> 18 December 2020
 
 - Fixed to Satellite camera mode bugfixes [`b552b68`](https://github.com/thkruz/keeptrack.space/commit/b552b68221559ebd1577a186d9076a022a49b431)
 
 #### [v2.7.3](https://github.com/thkruz/keeptrack.space/compare/v2.7.2...v2.7.3)
 
-> 18 December 2020 
+> 18 December 2020
 
 - Reduce memory leaks [`e8e1baa`](https://github.com/thkruz/keeptrack.space/commit/e8e1baa642ab70e24d9c691e53960a9826a7de18)
 
 #### [v2.7.2](https://github.com/thkruz/keeptrack.space/compare/v2.7.1...v2.7.2)
 
-> 16 December 2020 
+> 16 December 2020
 
 - Selected dot color fix [`22bbbb3`](https://github.com/thkruz/keeptrack.space/commit/22bbbb392a55ce42489fc7b449892855f8b64afe)
 
 #### [v2.7.1](https://github.com/thkruz/keeptrack.space/compare/v2.5.1...v2.7.1)
 
-> 27 November 2020 
+> 27 November 2020
 
 - Initial Orbit Determination [`ae744f9`](https://github.com/thkruz/keeptrack.space/commit/ae744f9c46d6a759770a42dc1a771f3e1b7b7a3a)
 - Numerous bugfixes. [`111c008`](https://github.com/thkruz/keeptrack.space/commit/111c008ea2fd1eecec84443ccbd3962c49f5d823)
@@ -578,7 +578,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v2.5.1](https://github.com/thkruz/keeptrack.space/compare/v2.4.0...v2.5.1)
 
-> 20 November 2020 
+> 20 November 2020
 
 - RadarData toggle [`65a78d2`](https://github.com/thkruz/keeptrack.space/commit/65a78d2f7cd4f40bb8c11a1062e0f435a28e3ce8)
 - Performance fixes [`55d9629`](https://github.com/thkruz/keeptrack.space/commit/55d9629598f8aa9da906cf4e9ca786848429d4bd)
@@ -589,7 +589,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v2.4.0](https://github.com/thkruz/keeptrack.space/compare/v2.3.0...v2.4.0)
 
-> 19 November 2020 
+> 19 November 2020
 
 - Create LICENSE [`183057b`](https://github.com/thkruz/keeptrack.space/commit/183057bff2f4e60ad30e3a242c6f86708f5f1484)
 - Faster indexing and more radarData colors. [`367933d`](https://github.com/thkruz/keeptrack.space/commit/367933daac836ba185a48305e5f9bb68d059bafd)
@@ -602,26 +602,26 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v2.3.0](https://github.com/thkruz/keeptrack.space/compare/v2.2.0...v2.3.0)
 
-> 18 November 2020 
+> 18 November 2020
 
 - Moon fixed. GS database added. [`e51e941`](https://github.com/thkruz/keeptrack.space/commit/e51e94193db21254906af5081dafee02817357e1)
 - radarData module updates [`5aaa5d2`](https://github.com/thkruz/keeptrack.space/commit/5aaa5d2874dbe14dee09e1282a1d50863166bea2)
 
 #### [v2.2.0](https://github.com/thkruz/keeptrack.space/compare/v2.1.0...v2.2.0)
 
-> 14 November 2020 
+> 14 November 2020
 
 - RadarData module updated [`d29783b`](https://github.com/thkruz/keeptrack.space/commit/d29783b134fb8003dc31f39d44990be5477d43cb)
 
 #### [v2.1.0](https://github.com/thkruz/keeptrack.space/compare/v2.0.0...v2.1.0)
 
-> 13 November 2020 
+> 13 November 2020
 
 - Offline fixes and rmManager [`ec4d89f`](https://github.com/thkruz/keeptrack.space/commit/ec4d89fe9bd47db5fb6ee31402f72a32f3a4e447)
 
 ### [v2.0.0](https://github.com/thkruz/keeptrack.space/compare/v1.20.12...v2.0.0)
 
-> 11 November 2020 
+> 11 November 2020
 
 - Feature locks and bugfixes [`88d9afa`](https://github.com/thkruz/keeptrack.space/commit/88d9afa1b73589de3f9224bdb8827de07608d4f9)
 - Fixed running without webserver [`56d7171`](https://github.com/thkruz/keeptrack.space/commit/56d71715b7a7522f23c74c6ab14cf0699025832c)
@@ -629,39 +629,39 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.20.12](https://github.com/thkruz/keeptrack.space/compare/v1.20.11...v1.20.12)
 
-> 22 October 2020 
+> 22 October 2020
 
 - Relative velocity added [`d09a627`](https://github.com/thkruz/keeptrack.space/commit/d09a627667744cdec528d4baaed6c0216cdc86a5)
 
 #### [v1.20.11](https://github.com/thkruz/keeptrack.space/compare/v1.20.10...v1.20.11)
 
-> 22 October 2020 
+> 22 October 2020
 
 - Fix line to satellite from sensor [`54258b2`](https://github.com/thkruz/keeptrack.space/commit/54258b214c0fa20fa80969bee99beaefc2aa8008)
 
 #### [v1.20.10](https://github.com/thkruz/keeptrack.space/compare/v1.20.9...v1.20.10)
 
-> 22 October 2020 
+> 22 October 2020
 
 - External data fix [`1181cbd`](https://github.com/thkruz/keeptrack.space/commit/1181cbd0e13d7eee91ed49b11ac7e5aa9094b6bb)
 - Fixed edit satellite menu [`181214d`](https://github.com/thkruz/keeptrack.space/commit/181214d7a6cda00d0e342384e96abda9021c9da1)
 
 #### [v1.20.9](https://github.com/thkruz/keeptrack.space/compare/v1.20.8...v1.20.9)
 
-> 22 October 2020 
+> 22 October 2020
 
 - External data fix [`5718d49`](https://github.com/thkruz/keeptrack.space/commit/5718d49bbad3585b85c1209e5d16ab519f4474e6)
 
 #### [v1.20.8](https://github.com/thkruz/keeptrack.space/compare/v1.20.7...v1.20.8)
 
-> 22 October 2020 
+> 22 October 2020
 
 - Show sensor to satellite link. Fix external sensor requests. [`fab9ba2`](https://github.com/thkruz/keeptrack.space/commit/fab9ba28918eee2342089b75dfae4bf02f07918d)
 - Missing min files [`519aad3`](https://github.com/thkruz/keeptrack.space/commit/519aad3e49938e5c6f0b7c713feba76bafab48c8)
 
 #### [v1.20.7](https://github.com/thkruz/keeptrack.space/compare/v1.20.1...v1.20.7)
 
-> 15 September 2020 
+> 15 September 2020
 
 - Zoom more friendly. Fixes #182 [`#182`](https://github.com/thkruz/keeptrack.space/issues/182)
 - Multisite lookangles fix [`7e26ed0`](https://github.com/thkruz/keeptrack.space/commit/7e26ed0f543bf701debdfec45ee7965eeb7aba52)
@@ -714,7 +714,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.20.1](https://github.com/thkruz/keeptrack.space/compare/v1.19.10...v1.20.1)
 
-> 3 September 2020 
+> 3 September 2020
 
 - Pr/179 [`#180`](https://github.com/thkruz/keeptrack.space/pull/180)
 - Merge Le-Roi Changes [`#178`](https://github.com/thkruz/keeptrack.space/pull/178)
@@ -769,7 +769,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.19.10](https://github.com/thkruz/keeptrack.space/compare/v1.19.7...v1.19.10)
 
-> 23 August 2020 
+> 23 August 2020
 
 - Fixed mobile clock and unlinked datestring to close #169 and #170 [`#169`](https://github.com/thkruz/keeptrack.space/issues/169)
 - More 3D models [`26357b5`](https://github.com/thkruz/keeptrack.space/commit/26357b5c323755f0f7ad678d91ab8940c347c36f)
@@ -783,7 +783,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.19.7](https://github.com/thkruz/keeptrack.space/compare/v1.19.3...v1.19.7)
 
-> 18 August 2020 
+> 18 August 2020
 
 - After loading updated with readystate function [`#167`](https://github.com/thkruz/keeptrack.space/pull/167)
 - 17-08-2020 keeptrack.space response and compatibility update. [`#158`](https://github.com/thkruz/keeptrack.space/pull/158)
@@ -813,7 +813,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.19.3](https://github.com/thkruz/keeptrack.space/compare/v1.18.3...v1.19.3)
 
-> 17 August 2020 
+> 17 August 2020
 
 - mesh cleanup [`1de8689`](https://github.com/thkruz/keeptrack.space/commit/1de868915024a95ff432cc3b9cf902d45d6c80dd)
 - Merged sun.js and earth.js [`a92e8c7`](https://github.com/thkruz/keeptrack.space/commit/a92e8c725f652fed6fb77f58ee38c7732536604c)
@@ -832,7 +832,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.18.3](https://github.com/thkruz/keeptrack.space/compare/v1.17.0...v1.18.3)
 
-> 15 August 2020 
+> 15 August 2020
 
 - Added constellations [`#151`](https://github.com/thkruz/keeptrack.space/pull/151)
 - meshManager added with 3d satellite [`9adda07`](https://github.com/thkruz/keeptrack.space/commit/9adda0709e41481edb8a19fd69cb70739599248e)
@@ -856,7 +856,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.17.0](https://github.com/thkruz/keeptrack.space/compare/v1.11.2...v1.17.0)
 
-> 14 August 2020 
+> 14 August 2020
 
 - Atmosphere, performance improvements, and embed support. [`ab10303`](https://github.com/thkruz/keeptrack.space/commit/ab1030354d96c123e0241ef3fc4856b7de4ebe6b)
 - Atmosphere, Time Machine, and Optional Modules System [`dffd8b7`](https://github.com/thkruz/keeptrack.space/commit/dffd8b77961f54faa9d9a36aae68094bdfa1b643)
@@ -886,7 +886,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.11.2](https://github.com/thkruz/keeptrack.space/compare/v1.10.1...v1.11.2)
 
-> 2 June 2020 
+> 2 June 2020
 
 - Bugfixes and persistent sensor. Fixes #138 [`#138`](https://github.com/thkruz/keeptrack.space/issues/138)
 - CSO Search added. Group colorscheme fixed. [`9cc7137`](https://github.com/thkruz/keeptrack.space/commit/9cc7137bad65f245881364ba1fa85e9903600938)
@@ -905,7 +905,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.10.1](https://github.com/thkruz/keeptrack.space/compare/v1.9.3...v1.10.1)
 
-> 21 May 2020 
+> 21 May 2020
 
 - jQuery update and removed depricated references [`ae42ec3`](https://github.com/thkruz/keeptrack.space/commit/ae42ec337dbc00955ce351eb42c85893ff8c48a2)
 - Next Launch Manager added to solve #97 [`6c23270`](https://github.com/thkruz/keeptrack.space/commit/6c23270bf895ffd6ea3f73e27509f135b34caf23)
@@ -920,7 +920,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.9.3](https://github.com/thkruz/keeptrack.space/compare/v1.8.0...v1.9.3)
 
-> 10 May 2020 
+> 10 May 2020
 
 - Red theme fixes #125 [`#125`](https://github.com/thkruz/keeptrack.space/issues/125)
 - Dynamic object colors and color picker in settings [`f252b6a`](https://github.com/thkruz/keeptrack.space/commit/f252b6ae5d7b51fc23e608f4c3313dbd7f13d169)
@@ -943,7 +943,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.8.0](https://github.com/thkruz/keeptrack.space/compare/v1.5.1...v1.8.0)
 
-> 9 May 2020 
+> 9 May 2020
 
 - fix JS math expression [`#123`](https://github.com/thkruz/keeptrack.space/pull/123)
 - Bug fixes. [`56f8ba4`](https://github.com/thkruz/keeptrack.space/commit/56f8ba4304621e08a1ac6c4c00a5c33a615b4cf9)
@@ -957,7 +957,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.5.1](https://github.com/thkruz/keeptrack.space/compare/v1.2.6...v1.5.1)
 
-> 13 January 2020 
+> 13 January 2020
 
 - Updated video recording (now includes UI) and added sunlight view [`d642002`](https://github.com/thkruz/keeptrack.space/commit/d64200274db9b72adee5ef8e64a08c161ac5fcde)
 - Added Video Recorder [`583a912`](https://github.com/thkruz/keeptrack.space/commit/583a91277b2d719a7d4bf7f3cc20e326590bb8bd)
@@ -966,7 +966,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.2.6](https://github.com/thkruz/keeptrack.space/compare/v1.2.4...v1.2.6)
 
-> 14 June 2019 
+> 14 June 2019
 
 - Reorganized Files [`0264b78`](https://github.com/thkruz/keeptrack.space/commit/0264b7892a9e938bca42296f13bf35b786aebada)
 - Improved Responsive UI/CSS [`af8b526`](https://github.com/thkruz/keeptrack.space/commit/af8b52683aeb6b52b93d96a95d13591ada1e2cb7)
@@ -975,7 +975,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.2.4](https://github.com/thkruz/keeptrack.space/compare/v1.2.2...v1.2.4)
 
-> 14 June 2019 
+> 14 June 2019
 
 - Added Constellations [`2ece33a`](https://github.com/thkruz/keeptrack.space/commit/2ece33adae5231160d180fc42d28cda5c015486f)
 - drawLoop Fix [`dd2470e`](https://github.com/thkruz/keeptrack.space/commit/dd2470e0fb67a7714f29a148e4cda08de47b9664)
@@ -983,7 +983,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.2.2](https://github.com/thkruz/keeptrack.space/compare/v1.1.1...v1.2.2)
 
-> 10 June 2019 
+> 10 June 2019
 
 - Improved Stars and Constellations [`a54785b`](https://github.com/thkruz/keeptrack.space/commit/a54785b6a018ce5c6e782553f4872603d95e05f6)
 - Stars and Constellations [`27ece8f`](https://github.com/thkruz/keeptrack.space/commit/27ece8f690e5b23f38f9a29d267048ecdaa36264)
@@ -991,7 +991,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v1.1.1](https://github.com/thkruz/keeptrack.space/compare/v1.0.0...v1.1.1)
 
-> 5 June 2019 
+> 5 June 2019
 
 - Fixes for offline mode. [`6290320`](https://github.com/thkruz/keeptrack.space/commit/6290320ece7af06e23351e073cbfc88694876e6c)
 - Support for Mike McCant's TLEs [`b45a583`](https://github.com/thkruz/keeptrack.space/commit/b45a583ef791ea2e53ed5c375ee6bcb2a316ac89)
@@ -1007,7 +1007,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 ### [v1.0.0](https://github.com/thkruz/keeptrack.space/compare/v0.48.2...v1.0.0)
 
-> 5 June 2019 
+> 5 June 2019
 
 - License System Implemented [`b013779`](https://github.com/thkruz/keeptrack.space/commit/b0137792f09c6b68077dc5bf43d06bc2ea7a9396)
 - DOP Table Added [`f5f0bb8`](https://github.com/thkruz/keeptrack.space/commit/f5f0bb890d99e4eba3ab76d3828972121acd2691)
@@ -1022,14 +1022,14 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v0.48.2](https://github.com/thkruz/keeptrack.space/compare/v0.48.1...v0.48.2)
 
-> 31 May 2019 
+> 31 May 2019
 
 - PDOP function finished [`41ed04a`](https://github.com/thkruz/keeptrack.space/commit/41ed04af20155c7580d3757b4a76087d3159c31c)
 - Started PDOP Calculator [`be0eeda`](https://github.com/thkruz/keeptrack.space/commit/be0eeda1a0ebcb33319c5713386a7da6b76f7da0)
 
 #### [v0.48.1](https://github.com/thkruz/keeptrack.space/compare/v0.42.7...v0.48.1)
 
-> 22 May 2019 
+> 22 May 2019
 
 - Surveillance and FOV Bubble modes. [`a69043b`](https://github.com/thkruz/keeptrack.space/commit/a69043b7d8a68afb6f2eb51ad4b25cb115f4a190)
 - Right Click Menu Added [`b78eead`](https://github.com/thkruz/keeptrack.space/commit/b78eead2a58f681782abce92c16816d4098094c7)
@@ -1038,7 +1038,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v0.42.7](https://github.com/thkruz/keeptrack.space/compare/v0.36.1...v0.42.7)
 
-> 6 October 2018 
+> 6 October 2018
 
 - Performance Updates [`b6e952b`](https://github.com/thkruz/keeptrack.space/commit/b6e952b61627d79e754c07ded18988cb5933511b)
 - Bug Fixes [`f253a5c`](https://github.com/thkruz/keeptrack.space/commit/f253a5cc4f23d0f74e89814cb7b3dbf130f30687)
@@ -1070,7 +1070,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v0.36.1](https://github.com/thkruz/keeptrack.space/compare/v0.34.0...v0.36.1)
 
-> 12 August 2018 
+> 12 August 2018
 
 - Reworked mobile controls and consolidated html files. [`e7b427a`](https://github.com/thkruz/keeptrack.space/commit/e7b427ad73367330380b9ab561e59fb8b51677bc)
 - Reworked mobile controls and consolidated html files. [`42bf145`](https://github.com/thkruz/keeptrack.space/commit/42bf145f07a8e94d64e0b38a26a35b8e5de736e2)
@@ -1103,7 +1103,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v0.34.0](https://github.com/thkruz/keeptrack.space/compare/v0.33.0...v0.34.0)
 
-> 10 August 2018 
+> 10 August 2018
 
 - Fixed #89 and #90 [`#89`](https://github.com/thkruz/keeptrack.space/issues/89)
 - Fixed #89 and #90 [`#89`](https://github.com/thkruz/keeptrack.space/issues/89)
@@ -1126,20 +1126,20 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v0.33.0](https://github.com/thkruz/keeptrack.space/compare/v0.32.0...v0.33.0)
 
-> 29 July 2018 
+> 29 July 2018
 
 - Added planetarium and satellite camera views [`4ebf859`](https://github.com/thkruz/keeptrack.space/commit/4ebf859e9be34850e5b913a8ea8adf2e0b520c6a)
 
 #### [v0.32.0](https://github.com/thkruz/keeptrack.space/compare/v0.30.7...v0.32.0)
 
-> 14 February 2018 
+> 14 February 2018
 
 - Minor fixes. [`e9ad616`](https://github.com/thkruz/keeptrack.space/commit/e9ad6161a8f6a2b9944a2a9f3977d2ee9d1b905b)
 - Added an vector version of the offline version. [`30ed52c`](https://github.com/thkruz/keeptrack.space/commit/30ed52c4fd756f03224d3d8b8b87997ceb0daa53)
 - Added vector image. [`4f4c4a6`](https://github.com/thkruz/keeptrack.space/commit/4f4c4a6c8ab6e2795839183a93ee2f7b5eb55a99)
 - Added vector image. [`fbf7dd1`](https://github.com/thkruz/keeptrack.space/commit/fbf7dd18c014d7f332ce42c911728d3734d2d0ce)
 - Fixed bug in view sats in FOV. Started multithreading SGP4. [`25518a8`](https://github.com/thkruz/keeptrack.space/commit/25518a811c0e7a113c6cbb483e8d46857aea9d30)
-- Fixed timeManager.now errors and added Editor.htm [`04ed851`](https://github.com/thkruz/keeptrack.space/commit/04ed851a33058add9c74c6f2f34b1ecd2fdb482f)
+- Fixed timeManager.realTime errors and added Editor.htm [`04ed851`](https://github.com/thkruz/keeptrack.space/commit/04ed851a33058add9c74c6f2f34b1ecd2fdb482f)
 - Changed offline satbox update interval. Added more optional information for offline versions. [`9669950`](https://github.com/thkruz/keeptrack.space/commit/9669950c94aa6913c8ccfe49543eaa5abf0df030)
 - Planetarium Camera View Added [`5a02430`](https://github.com/thkruz/keeptrack.space/commit/5a0243015b3cc56f1da8787937cea2fff5e9b282)
 - Fixed error in offline only version due to load order. [`a9fff1f`](https://github.com/thkruz/keeptrack.space/commit/a9fff1f4173a7986cb6491d1c4622ef2e929131f)
@@ -1147,19 +1147,19 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v0.30.7](https://github.com/thkruz/keeptrack.space/compare/v0.30.6...v0.30.7)
 
-> 21 January 2018 
+> 21 January 2018
 
 - Updated merging function for offline use. [`f665259`](https://github.com/thkruz/keeptrack.space/commit/f665259a7c0ae8edcf92400e1b5c2d749df0fc90)
 
 #### [v0.30.6](https://github.com/thkruz/keeptrack.space/compare/v0.30.5...v0.30.6)
 
-> 3 January 2018 
+> 3 January 2018
 
 - Separated UI from main.js [`2295adb`](https://github.com/thkruz/keeptrack.space/commit/2295adbddb28b32134106bbf803aaf94ce4356f8)
 - InView for all SSN sensors added. [`acd9da8`](https://github.com/thkruz/keeptrack.space/commit/acd9da8df57c89f987eef71b610630051ade553c)
 - Fixed performance issue with sat-cruncher and overlay. [`8a59742`](https://github.com/thkruz/keeptrack.space/commit/8a59742b056f9fd3c573a14beab46aace057c1a0)
 - Overlay updated to recalculate times when needed. [`cc50520`](https://github.com/thkruz/keeptrack.space/commit/cc505200f07ed3fcd51732c4374a8c9247465cdd)
-- _updateOverlay causes jittering [`a051152`](https://github.com/thkruz/keeptrack.space/commit/a0511529daf113a9ad9bc665bcd2740b1175056b)
+- \_updateOverlay causes jittering [`a051152`](https://github.com/thkruz/keeptrack.space/commit/a0511529daf113a9ad9bc665bcd2740b1175056b)
 - Reduce garbage collection in sat-cruncher.js [`1a9a6eb`](https://github.com/thkruz/keeptrack.space/commit/1a9a6ebeffcd076552a0dcf7e8213d3ab9d29681)
 - Fixed theme problems [`a3e93c1`](https://github.com/thkruz/keeptrack.space/commit/a3e93c1c2286a161b97bb2ac2930a9de0d3991db)
 - In default view only calculate colors if inview changes. [`2a37f21`](https://github.com/thkruz/keeptrack.space/commit/2a37f2167d7b8b36c52c577fe2882a0a186381c1)
@@ -1167,7 +1167,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v0.30.5](https://github.com/thkruz/keeptrack.space/compare/v0.10.0...v0.30.5)
 
-> 28 April 2017 
+> 28 April 2017
 
 - Develop [`#52`](https://github.com/thkruz/keeptrack.space/pull/52)
 - Develop [`#50`](https://github.com/thkruz/keeptrack.space/pull/50)
@@ -1307,7 +1307,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v0.10.0](https://github.com/thkruz/keeptrack.space/compare/v0.9.2...v0.10.0)
 
-> 12 March 2017 
+> 12 March 2017
 
 - Develop [`#39`](https://github.com/thkruz/keeptrack.space/pull/39)
 - Develop [`#38`](https://github.com/thkruz/keeptrack.space/pull/38)
@@ -1319,7 +1319,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v0.9.2](https://github.com/thkruz/keeptrack.space/compare/v0.5.2...v0.9.2)
 
-> 4 January 2017 
+> 4 January 2017
 
 - Develop [`#35`](https://github.com/thkruz/keeptrack.space/pull/35)
 - TLE Update [`350e4de`](https://github.com/thkruz/keeptrack.space/commit/350e4de4f9f873b8649c32d98792dd279e919aac)
@@ -1365,20 +1365,20 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v0.5.2](https://github.com/thkruz/keeptrack.space/compare/v0.5.1...v0.5.2)
 
-> 31 December 2016 
+> 31 December 2016
 
 - Fixed Open Issues [`5ac84bc`](https://github.com/thkruz/keeptrack.space/commit/5ac84bc38a336e44f204a4618eed5e583fb4d8db)
 
 #### [v0.5.1](https://github.com/thkruz/keeptrack.space/compare/v0.5.0...v0.5.1)
 
-> 24 December 2016 
+> 24 December 2016
 
 - Admin Section Added [`51855bd`](https://github.com/thkruz/keeptrack.space/commit/51855bd9cb9a141da505d43f2016b1779a0362f3)
 - Updated README for v0.5.0 [`1b972f2`](https://github.com/thkruz/keeptrack.space/commit/1b972f2c76b55384c77a34e098d02b48a441c0d7)
 
 #### [v0.5.0](https://github.com/thkruz/keeptrack.space/compare/v0.4.0...v0.5.0)
 
-> 23 December 2016 
+> 23 December 2016
 
 - Revert "Javascript Semi-Standard Compliant" [`8288258`](https://github.com/thkruz/keeptrack.space/commit/8288258dd96be79d362d2b04d4616ceee8e1ec81)
 - Revert "SOCRATES" [`2702ca4`](https://github.com/thkruz/keeptrack.space/commit/2702ca4c2d0692f9897252f9be28deb27812f36e)
@@ -1388,7 +1388,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### [v0.4.0](https://github.com/thkruz/keeptrack.space/compare/v0.3.0...v0.4.0)
 
-> 22 December 2016 
+> 22 December 2016
 
 - Javascript Semi-Standard Compliant [`7681f65`](https://github.com/thkruz/keeptrack.space/commit/7681f655571d6a2030a6fdd5d82795790e925c12)
 - Create README.md [`fad74a3`](https://github.com/thkruz/keeptrack.space/commit/fad74a32786f09c8320a36f40fb91c50f32e739b)
@@ -1396,7 +1396,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 #### v0.3.0
 
-> 21 December 2016 
+> 21 December 2016
 
 - 12 October 2016 [`e6df11c`](https://github.com/thkruz/keeptrack.space/commit/e6df11c2b2d0a433338b6a1f4f9db5040c692fe3)
 - 21 December 2016 [`8a58715`](https://github.com/thkruz/keeptrack.space/commit/8a58715cab410026d017f3cd8ac91bdecd7c5d83)

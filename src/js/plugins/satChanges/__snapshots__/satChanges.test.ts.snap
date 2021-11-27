@@ -10,7 +10,7 @@ exports[`satChanges.getSatChngJson 0 1`] = `
 Object {
   "resp": Array [
     Object {
-      "date": 2020-01-01T05:00:00.000Z,
+      "date": +192020-04-09T04:00:00.000Z,
       "day": 100,
       "inc": 10,
       "year": 2020,
@@ -18,7 +18,7 @@ Object {
   ],
   "satChngTable": Array [
     Object {
-      "date": 2020-01-01T05:00:00.000Z,
+      "date": +192020-04-09T04:00:00.000Z,
       "day": 100,
       "inc": 10,
       "year": 2020,

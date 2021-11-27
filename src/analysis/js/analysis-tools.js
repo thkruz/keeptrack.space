@@ -22,7 +22,7 @@ import * as $ from 'jquery';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { satellite } from '@app/js/satMath/satMath';
 import { sensorList } from '@app/js/plugins/sensor/sensorList';
-import { timeManager } from '@app/js/timeManager/timeManager';
+import { jday } from '@app/js/timeManager/transforms';
 
 var requestInfo = {};
 var isDrawApogee = false;
@@ -104,7 +104,7 @@ satellite.calculateLookAngles = function (sat, sensor, tableType) {
     // var lookAngleRecord = {};
     var now = new Date(); // Make a time variable
     now.setTime(Number(Date.now()) + propTempOffset); // Set the time variable to the time in the future
-    var j = _jday(
+    var j = jday(
       now.getUTCFullYear(),
       now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
       now.getUTCDate(),
@@ -162,7 +162,7 @@ satellite.calculateLookAngles = function (sat, sensor, tableType) {
         // Previous Pass to Calculate first line of coverage
         var now1 = new Date();
         now1.setTime(Number(Date.now()) + propTempOffset - satellite.lookanglesInterval * 1000);
-        var j1 = timeManager.jday(
+        var j1 = jday(
           now1.getUTCFullYear(),
           now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
           now1.getUTCDate(),
@@ -200,7 +200,7 @@ satellite.calculateLookAngles = function (sat, sensor, tableType) {
         } else {
           // Next Pass to Calculate Last line of coverage
           now1.setTime(Number(Date.now()) + propTempOffset - satellite.lookanglesInterval * 1000);
-          j1 = _jday(
+          j1 = jday(
             now1.getUTCFullYear(),
             now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
             now1.getUTCDate(),
@@ -277,21 +277,6 @@ satellite.calculateLookAngles = function (sat, sensor, tableType) {
       };
     } else {
       return;
-    }
-  };
-  const _jday = (year, mon, day, hr, minute, sec) => {
-    // from satellite.js
-    if (!year) {
-      // console.debug('timeManager.jday should always have a date passed to it!');
-      var now;
-      now = Date.now();
-      let jDayStart = new Date(now.getFullYear(), 0, 0);
-      let jDayDiff = now - jDayStart;
-      return Math.floor(jDayDiff / millisecondsPerDay);
-    } else {
-      return (
-        367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor((275 * mon) / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0 //  ut in days
-      );
     }
   };
 

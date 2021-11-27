@@ -23,8 +23,8 @@ export const init = (): void => {
 
 export const datetimeTextClick = (): void => {
   const { timeManager } = keepTrackApi.programs;
-  timeManager.propTime();
-  keepTrackApi.methods.updateDateTime(new Date(timeManager.propTime()));
+  timeManager.calculateSimulationTime();
+  keepTrackApi.methods.updateDateTime(new Date(timeManager.calculateSimulationTime()));
 
   if (!settingsManager.isEditTime) {
     // $('#datetime-text').fadeOut();
@@ -87,16 +87,16 @@ export const datetimeInputFormChange = (jestOverride?: Date) => {
   const { timeManager, uiManager } = keepTrackApi.programs;
   const selectedDate = $('#datetime-input-tb').datepicker('getDate') || jestOverride;
   const today = new Date();
-  const jday = timeManager.getDayOfYear(timeManager.propTime());
+  const jday = timeManager.getDayOfYear(timeManager.calculateSimulationTime());
   $('#jday').html(jday);
-  timeManager.changePropOffset(selectedDate.getTime() - today.getTime());
-  timeManager.propTime();
+  timeManager.changeStaticOffset(selectedDate.getTime() - today.getTime());
+  timeManager.calculateSimulationTime();
   // Reset last update times when going backwards in time
-  settingsManager.lastBoxUpdateTime = timeManager.now;
+  settingsManager.lastBoxUpdateTime = timeManager.realTime;
 
   // TODO: Migrate to watchlist.ts
   try {
-    keepTrackApi.programs.watchlist.lastOverlayUpdateTime = timeManager.now * 1 - 7000;
+    keepTrackApi.programs.watchlist.lastOverlayUpdateTime = timeManager.realTime * 1 - 7000;
     uiManager.updateNextPassOverlay(true);
   } catch {
     // Ignore

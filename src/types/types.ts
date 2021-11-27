@@ -604,7 +604,8 @@ export type SatCruncherMessage = {
     typ?: string;
     time?: number;
     propRate?: number;
-    propOffset?: number;
+    staticOffset?: number;
+    dynamicOffsetEpoch?: number;
     satId?: number;
     extraData?: string; // JSON string
     extraUpdate?: boolean;
@@ -615,3 +616,35 @@ export type SatCruncherMessage = {
     sensorMarkerArray?: number[];
   };
 };
+
+export interface TimeManager {
+  propRate: number;
+  dynamicOffsetEpoch: number;
+  staticOffset: number;
+  dateObject: Date;
+  simulationTimeObj: any;
+  datetimeInputDOM: any;
+  timeTextStr: string;
+  timeTextStrEmpty: string;
+  propFrozen: number;
+  realTime: any;
+  dt: number;
+  drawDt: number;
+  calculateSimulationTime: (newSimulationTime?: any) => any;
+  getOffsetTimeObj: (offset: number, timeObj: Date) => Date;
+  setNow: (now: any, dt: any) => void;
+  setLastTime(simulationTimeObj: any);
+  setSelectedDate(simulationTimeObj: any);
+  lastTime: any;
+  selectedDate: any;
+  tDS: any;
+  iText: number;
+  propRate0: any;
+  dateDOM: any;
+  getDayOfYear(arg0: any);
+  getPropOffset: () => number;
+  changePropRate: any;
+  changeStaticOffset: any;
+  synchronize: any;
+  init: any;
+}

@@ -23,12 +23,12 @@ export const updateSelectBoxCoreCallback = (sat: any) => {
   } else {
     $('#sat-latitude').html((satellite.degreesLat(satellite.currentTEARR.lat) * -1).toFixed(3) + '°S');
   }
-  const jday = timeManager.getDayOfYear(timeManager.propTimeVar);
+  const jday = timeManager.getDayOfYear(timeManager.simulationTimeObj);
   $('#jday').html(jday);
 
-  if (settingsManager.plugins?.stereoMap && keepTrackApi.programs.mapManager.isMapMenuOpen && timeManager.now > settingsManager.lastMapUpdateTime + 30000) {
+  if (settingsManager.plugins?.stereoMap && keepTrackApi.programs.mapManager.isMapMenuOpen && timeManager.realTime > settingsManager.lastMapUpdateTime + 30000) {
     keepTrackApi.programs.mapManager.updateMap();
-    settingsManager.lastMapUpdateTime = timeManager.now;
+    settingsManager.lastMapUpdateTime = timeManager.realTime;
   }
 
   if (!sat.missile) {

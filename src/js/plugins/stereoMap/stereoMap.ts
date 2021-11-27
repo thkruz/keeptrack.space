@@ -347,6 +347,6 @@ export const mapMenuClick = (evt: any) => {
     time = time.split(' ');
     time = new Date(time[0] + 'T' + time[1] + 'Z');
     const today = new Date(); // Need to know today for offset calculation
-    timeManager.changePropOffset(time.getTime() - today.getTime()); // Find the offset from today
+    timeManager.changeStaticOffset(time.getTime() - today.getTime()); // Find the offset from today
   }
 };

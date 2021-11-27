@@ -1,8 +1,10 @@
-import * as drawManager from '@app/js/drawManager/drawManager';
 import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/externalApi';
+import * as drawManager from './drawManager';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+
+declare const settingsManager;
 
 // @ponicode
 describe('drawManager.init ', () => {
@@ -183,7 +185,7 @@ describe('drawManager.loadScene', () => {
 // @ponicode
 describe('drawManager.createDotsManager', () => {
   test('0', () => {
-    let result: any = drawManager.createDotsManager();
+    let result: any = drawManager.createDotsManager(keepTrackApi.programs.drawManager.gl);
     expect(result).toMatchSnapshot();
   });
 });

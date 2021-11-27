@@ -7,6 +7,7 @@ import $ from 'jquery';
 import { InView, Lla, Rae, SatObject } from '../api/keepTrack';
 import { numeric } from '../lib/external/numeric';
 import { stringPad } from '../lib/helpers';
+import { jday } from '../timeManager/transforms';
 import { CatalogManager } from './catalogManager';
 import { exportTle2Csv, exportTle2Txt } from './exportTle';
 import { searchCountryRegex, searchNameRegex, searchYear, searchYearOrLess } from './search';
@@ -93,11 +94,11 @@ export const init = async (satCruncherOveride?: any): Promise<void> => {
 export const satCruncherOnMessage = (m: SatCruncherMessage) => {
   const { mainCamera, sensorManager, objectManager, uiManager, timeManager } = keepTrackApi.programs;
   if (m.data?.typ === 'timeSync') {
-    const timeDif = timeManager.propTime().getTime() - m.data.time;
+    const timeDif = timeManager.calculateSimulationTime().getTime() - m.data.time;
     if (timeDif > 100 || timeDif < -100) {
       console.table([
-        { time: new Date(m.data.time).toISOString(), unix: m.data.time, offset: m.data.propOffset, rate: m.data.propRate },
-        { time: timeManager.propTime().toISOString(), unix: timeManager.propTime().getTime(), offset: timeManager.propOffset, rate: timeManager.propRate },
+        { time: new Date(m.data.time).toISOString(), unix: m.data.time, staticOffset: m.data.staticOffset, dynamicOffsetEpoch: m.data.dynamicOffsetEpoch, rate: m.data.propRate },
+        { time: timeManager.calculateSimulationTime().toISOString(), unix: timeManager.calculateSimulationTime().getTime(), staticOffset: timeManager.propOffset, dynamicOffsetEpoch: timeManager.dynamicOffsetEpoch, rate: timeManager.propRate },
         { unix: timeDif },
       ]);
     }
@@ -219,7 +220,7 @@ export const parseGetVariables = (): void => {
 };
 export const insertNewAnalystSatellite = (TLE1: string, TLE2: string, id: number, SCC_NUM?: string): any => {
   const { satellite, timeManager, orbitManager, uiManager } = keepTrackApi.programs;
-  if (satellite.altitudeCheck(TLE1, TLE2, timeManager.propOffset) > 1) {
+  if (satellite.altitudeCheck(TLE1, TLE2, timeManager.calculateSimulationTime()) > 1) {
     satSet.satCruncher.postMessage({
       typ: 'satEdit',
       id: id,
@@ -666,8 +667,8 @@ export const getVariableActions = (params: string[]) => {
           uiManager.toast(`Date value of "${val}" is not a proper unix timestamp!`, 'caution', true);
           break;
         }
-        timeManager.changePropOffset(Number(val) - Date.now());
-        $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.propRealTime + timeManager.propOffset));
+        timeManager.changeStaticOffset(Number(val) - Date.now());
+        $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.dynamicOffsetEpoch + timeManager.propOffset));
         break;
       case 'rate':
         var rate = parseFloat(val);
@@ -761,7 +762,7 @@ export const addSatExtraFunctions = (i: number) => {
       if (satSet.satData[i].missile) {
         return satellite.eci2ll(satSet.satData[i].position.x, satSet.satData[i].position.y, satSet.satData[i].position.z).alt;
       } else {
-        return satellite.altitudeCheck(satSet.satData[i].TLE1, satSet.satData[i].TLE2, timeManager.propOffset);
+        return satellite.altitudeCheck(satSet.satData[i].TLE1, satSet.satData[i].TLE2, timeManager.calculateSimulationTime());
       }
     };
   }
@@ -816,9 +817,9 @@ export const addSatExtraFunctions = (i: number) => {
       if (typeof propTime != 'undefined' && propTime !== null) {
         now = propTime;
       } else {
-        now = timeManager.propTime();
+        now = timeManager.calculateSimulationTime();
       }
-      let j = timeManager.jday(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
+      let j = jday(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()); // Converts time to jday (TLEs use epoch year/day)
       j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
       const gmst = satellite.gstime(j);
 
@@ -879,18 +880,18 @@ export const addSatExtraFunctions = (i: number) => {
   if (typeof satSet.satData[i].getDirection == 'undefined') {
     satSet.satData[i].getDirection = () => {
       const nowLat = satSet.satData[i].getTEARR().lat * RAD2DEG;
-      let futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
+      let futureTime = timeManager.getOffsetTimeObj(5000, timeManager.calculateSimulationTime());
       const futLat = satSet.satData[i].getTEARR(futureTime).lat * RAD2DEG;
 
       // TODO: Remove getTEARR References
       // let nowLat = satellite.eci2ll(satSet.satData[i].position.x,satSet.satData[i].position.y,satSet.satData[i].position.z).lat;
-      // let futureTime = timeManager.propTimeCheck(5000, timeManager.propTime());
+      // let futureTime = timeManager.getOffsetTimeObj(5000, timeManager.calculateSimulationTime());
       // let futureEci = satellite.getEci(satSet.satData[i], futureTime);
       // let futLat = satellite.eci2ll(futureEci.x,futureEci.y,futureEci.z).lat;
       if (nowLat < futLat) return 'N';
       if (nowLat > futLat) return 'S';
       if (nowLat === futLat) {
-        futureTime = timeManager.propTimeCheck(20000, timeManager.propTime());
+        futureTime = timeManager.getOffsetTimeObj(20000, timeManager.calculateSimulationTime());
         // futureTEARR = satSet.satData[i].getTEARR(futureTime);
         if (nowLat < futLat) return 'N';
         if (nowLat > futLat) return 'S';

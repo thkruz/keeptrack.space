@@ -2,6 +2,7 @@ import { keepTrackApi } from '@app/js/api/externalApi';
 import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
 import { A } from '@app/js/lib/external/meuusjs.js';
 import { satellite } from '@app/js/satMath/satMath';
+import { jday } from '@app/js/timeManager/transforms';
 import * as glm from 'gl-matrix';
 
 /* eslint-disable camelcase */
@@ -234,10 +235,9 @@ export const initGodraysProgram = (gl: WebGL2RenderingContext) => {
  * ***************************************************************************/
 export const update = () => {
   const { timeManager } = keepTrackApi.programs;
-  timeManager.propTime();
-  sun.now = timeManager.propTimeVar;
+  sun.now = timeManager.calculateSimulationTime();
 
-  sun.sunvar.j = timeManager.jday(
+  sun.sunvar.j = jday(
     sun.now.getUTCFullYear(),
     sun.now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
     sun.now.getUTCDate(),

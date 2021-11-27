@@ -8,8 +8,6 @@ exports[`sensor.bottomMenuClick 2 1`] = `[Function]`;
 
 exports[`sensor.bottomMenuClick 3 1`] = `undefined`;
 
-exports[`sensor.bottomMenuClick 4 1`] = `undefined`;
-
 exports[`sensor.bottomMenuClick 5 1`] = `undefined`;
 
 exports[`sensor.csTelescopeClick 0 1`] = `undefined`;

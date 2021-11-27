@@ -964,11 +964,11 @@ describe('satMath.getlookangles', () => {
 // @ponicode
 describe('satMath.propagate', () => {
   test('0', () => {
-    let result: any = satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), defaultSensor);
+    satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), defaultSensor);
   });
 
   test('1', () => {
-    let result: any = satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), defaultSensor, true);
+    satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), defaultSensor, true);
   });
 });
 
@@ -1015,7 +1015,7 @@ describe.skip('satMath.findBestPasses', () => {
 // @ponicode
 describe('satMath.findBestPass', () => {
   test('0', () => {
-    let result: any = satMath.findBestPass(defaultSat, defaultSensor);
+    satMath.findBestPass(defaultSat, defaultSensor);
   });
 });
 

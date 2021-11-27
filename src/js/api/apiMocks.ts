@@ -2,7 +2,7 @@ import { SatObject, SensorObject } from './keepTrack';
 declare const jest: any;
 
 export const defaultSat: SatObject = {
-  id: 0,
+  id: 1,
   active: true,
   SCC_NUM: '00005',
   intlDes: '1998-AEF',

@@ -1,6 +1,5 @@
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { RAD2DEG } from '@app/js/lib/constants';
-import { timeManager } from '@app/js/timeManager/timeManager';
 import $ from 'jquery';
 
 let isFindByLooksMenuOpen = false;
@@ -226,6 +225,8 @@ export const checkRange = (possibles: string | any[], minrange: number, maxrange
 };
 
 export const newLaunchSubmit = (): void => {
+  const { timeManager, mainCamera, satellite, satSet, orbitManager, uiManager } = keepTrackApi.programs;
+
   const scc = $('#nl-scc').val();
   const satId = keepTrackApi.programs.satSet.getIdFromObjNum(scc);
   let sat = keepTrackApi.programs.satSet.getSat(satId);
@@ -259,29 +260,29 @@ export const newLaunchSubmit = (): void => {
   // Date object defaults to local time.
   quadZTime.setUTCHours(0); // Move to UTC Hour
 
-  keepTrackApi.programs.timeManager.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
-  keepTrackApi.programs.mainCamera.isCamSnapMode = false;
+  timeManager.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
+  mainCamera.isCamSnapMode = false;
 
   const simulationTimeObj = timeManager.calculateSimulationTime();
 
-  const TLEs = keepTrackApi.programs.satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj);
+  const TLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj);
 
   const TLE1 = TLEs[0];
   const TLE2 = TLEs[1];
 
-  if (keepTrackApi.programs.satellite.altitudeCheck(TLE1, TLE2, keepTrackApi.programs.timeManager.calculateSimulationTime()) > 1) {
-    keepTrackApi.programs.satSet.satCruncher.postMessage({
+  if (satellite.altitudeCheck(TLE1, TLE2, timeManager.calculateSimulationTime()) > 1) {
+    satSet.satCruncher.postMessage({
       typ: 'satEdit',
       id: satId,
       active: true,
       TLE1: TLE1,
       TLE2: TLE2,
     });
-    keepTrackApi.programs.orbitManager.updateOrbitBuffer(satId, true, TLE1, TLE2);
+    orbitManager.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
-    sat = keepTrackApi.programs.satSet.getSat(satId);
+    sat = satSet.getSat(satId);
   } else {
-    keepTrackApi.programs.uiManager.toast(`Failed Altitude Test - Try a Different Satellite!`, 'critical');
+    uiManager.toast(`Failed Altitude Test - Try a Different Satellite!`, 'critical');
   }
   $('#loading-screen').fadeOut('slow');
 };

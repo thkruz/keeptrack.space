@@ -496,6 +496,55 @@ describe('uiManager.getsensorinfo', () => {
 });
 
 // @ponicode
+describe('uiManager.keyHandler', () => {
+  test('0', () => {
+    document.body.innerHTML = `
+      <div id="datetime-text">
+        <span id="datetime-text-date">
+      </div>
+    `;
+    let result = () => {
+      uiManager.keyHandler(<KeyboardEvent>{ key: 'R' });
+      keepTrackApi.programs.mainCamera.cameraType.current = 0;
+      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keepTrackApi.programs.mainCamera.cameraType.current = 1;
+      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keepTrackApi.programs.mainCamera.cameraType.current = 2;
+      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keepTrackApi.programs.mainCamera.cameraType.current = 3;
+      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keepTrackApi.programs.mainCamera.cameraType.current = 4;
+      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keepTrackApi.programs.mainCamera.cameraType.current = 5;
+      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keepTrackApi.programs.mainCamera.cameraType.current = 6;
+      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keepTrackApi.programs.mainCamera.cameraType.current = 7;
+      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: 'F' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: 'H' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '!' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: ',' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: ',' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '.' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '.' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '<' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '<' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '>' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '>' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '0' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '+' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '=' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '-' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '_' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '1' });
+      uiManager.keyHandler(<KeyboardEvent>{ key: '1' });
+    };
+    expect(result).not.toThrow();
+  });
+});
+
+// @ponicode
 describe('uiManager.footerToggle', () => {
   test('0', () => {
     let result = uiManager.footerToggle();

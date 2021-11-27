@@ -1,5 +1,5 @@
-import '@app/js/lib/external/jquery-ui-timepicker.js';
 import 'jquery-ui-bundle';
+import '@app/js/lib/external/jquery-ui-timepicker.js';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/externalApi';
 import * as datetime from '../../plugins/datetime/datetime';

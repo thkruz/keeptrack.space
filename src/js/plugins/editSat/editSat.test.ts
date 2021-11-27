@@ -170,7 +170,7 @@ describe('editSat.editSatNewTleClickFadeIn', () => {
 
 // @ponicode
 describe('editSat.editSatSubmit', () => {
-  test.skip('0', () => {
+  test('0', () => {
     const callFunction: any = () => {
       editSat.editSatSubmit({
         bubbles: true,
@@ -200,9 +200,9 @@ describe('editSat.editSatSubmit', () => {
 
 // @ponicode
 describe('editSat.editSatSaveClick', () => {
-  test.skip('0', () => {
+  test('0', () => {
     const callFunction: any = () => {
-      editSat.editSatSubmit({
+      editSat.editSatSaveClick({
         bubbles: true,
         cancelBubble: true,
         cancelable: true,

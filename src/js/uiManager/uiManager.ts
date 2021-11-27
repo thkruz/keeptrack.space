@@ -28,16 +28,18 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 // import '@app/js/lib/external/colorPick.js';
 // import 'materialize-css';
 // eslint-disable-next-line sort-imports
+import 'jquery-ui-bundle';
+import '@app/js/lib/external/jquery-ui-slideraccess.js';
+import '@app/js/lib/external/jquery-ui-timepicker.js';
+import '@app/js/lib/external/perfect-scrollbar.min.js';
+import '@app/js/lib/external/jquery.colorbox.min.js';
+import '@app/js/lib/external/jquery-ajax.js';
+import '@app/js/lib/external/colorPick.js';
+import 'materialize-css';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory';
 import { drawManager } from '@app/js/drawManager/drawManager';
 import { DEG2RAD } from '@app/js/lib/constants.js';
-import '@app/js/lib/external/colorPick.js';
-import '@app/js/lib/external/jquery-ajax.js';
-import '@app/js/lib/external/jquery-ui-slideraccess.js';
-import '@app/js/lib/external/jquery-ui-timepicker.js';
-import '@app/js/lib/external/jquery.colorbox.min.js';
-import '@app/js/lib/external/perfect-scrollbar.min.js';
 import { rgbCss, saveCsv } from '@app/js/lib/helpers';
 import { objectManager } from '@app/js/objectManager/objectManager.js';
 import { orbitManager } from '@app/js/orbitManager/orbitManager';
@@ -49,8 +51,6 @@ import { mobileManager } from '@app/js/uiManager/mobileManager.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { UiManager } from '@app/types/types';
 import $ from 'jquery';
-import 'jquery-ui-bundle';
-import 'materialize-css';
 import { uiLimited } from './ui-limited.js';
 import { uiInput } from './uiInput';
 import { initUiValidation } from './uiValidation';
@@ -1348,9 +1348,11 @@ uiManager.colorSchemeChangeAlert = (scheme) => {
 };
 uiManager.hideUi = hideUi;
 uiManager.isUiVisible = false;
-uiManager.keyHandler = (evt) => {
+export const keyHandler = (evt: KeyboardEvent) => {
   // Error Handling
   if (typeof evt.key == 'undefined') return;
+
+  const {mainCamera, timeManager} = keepTrackApi.programs;
 
   if (uiManager.isCurrentlyTyping) return;
   // console.log(Number(evt.charCode));
@@ -1508,6 +1510,7 @@ uiManager.keyHandler = (evt) => {
     }
   }
 };
+uiManager.keyHandler = keyHandler;
 uiManager.hideLoadingScreen = () => {
   // Don't wait if we are running Jest
   if ((drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) || typeof process !== 'undefined') {

@@ -886,8 +886,7 @@ describe('satSet.insertNewAnalystSatellite', () => {
   });
 
   test('0', () => {
-    let result: any = satSet.insertNewAnalystSatellite('1234567890', '1234567890', 0);
-    expect(() => result).not.toThrow();
+    satSet.insertNewAnalystSatellite('1234567890', '1234567890', 0);
   });
 });
 

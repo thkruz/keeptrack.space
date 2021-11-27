@@ -46,48 +46,48 @@ exports[`satSet.convertIdArrayToSatnumArray 5 1`] = `Array []`;
 
 exports[`satSet.convertSatnumArrayToIdArray 0 1`] = `
 Array [
-  0,
-  0,
-  0,
-  0,
-  0,
+  1,
+  1,
+  1,
+  1,
+  1,
 ]
 `;
 
 exports[`satSet.convertSatnumArrayToIdArray 1 1`] = `
 Array [
-  0,
-  0,
-  0,
-  0,
+  1,
+  1,
+  1,
+  1,
 ]
 `;
 
 exports[`satSet.convertSatnumArrayToIdArray 2 1`] = `
 Array [
-  0,
-  0,
-  0,
-  0,
-  0,
+  1,
+  1,
+  1,
+  1,
+  1,
 ]
 `;
 
 exports[`satSet.convertSatnumArrayToIdArray 3 1`] = `
 Array [
-  0,
-  0,
-  0,
-  0,
+  1,
+  1,
+  1,
+  1,
 ]
 `;
 
 exports[`satSet.convertSatnumArrayToIdArray 4 1`] = `
 Array [
-  0,
-  0,
-  0,
-  0,
+  1,
+  1,
+  1,
+  1,
 ]
 `;
 
@@ -160,7 +160,7 @@ Object {
   "getAltitude": [Function],
   "getDirection": [Function],
   "getTEARR": [Function],
-  "id": 0,
+  "id": 1,
   "inView": 1,
   "inclination": 51.6423,
   "intlDes": "1998-AEF",
@@ -224,7 +224,7 @@ Object {
   "getAltitude": [Function],
   "getDirection": [Function],
   "getTEARR": [Function],
-  "id": 0,
+  "id": 1,
   "inView": 1,
   "inclination": 51.6423,
   "intlDes": "1998-AEF",
@@ -288,7 +288,7 @@ Object {
   "getAltitude": [Function],
   "getDirection": [Function],
   "getTEARR": [Function],
-  "id": 0,
+  "id": 1,
   "inView": 0,
   "inclination": 51.6423,
   "intlDes": "1998-AEF",
@@ -352,7 +352,7 @@ Object {
   "getAltitude": [Function],
   "getDirection": [Function],
   "getTEARR": [Function],
-  "id": 0,
+  "id": 1,
   "inView": 0,
   "inclination": 51.6423,
   "intlDes": "1998-AEF",
@@ -440,7 +440,7 @@ Object {
   "getAltitude": [Function],
   "getDirection": [Function],
   "getTEARR": [Function],
-  "id": 0,
+  "id": 1,
   "inView": 0,
   "inclination": 51.6423,
   "intlDes": "1998-AEF",
@@ -502,7 +502,7 @@ Object {
   "getAltitude": [Function],
   "getDirection": [Function],
   "getTEARR": [Function],
-  "id": 0,
+  "id": 1,
   "inView": 0,
   "inclination": 51.6423,
   "intlDes": "1998-AEF",
@@ -572,7 +572,7 @@ Object {
   "getAltitude": [Function],
   "getDirection": [Function],
   "getTEARR": [Function],
-  "id": 0,
+  "id": 1,
   "inView": 0,
   "inclination": 51.6423,
   "intlDes": "1998-AEF",
@@ -634,7 +634,7 @@ Object {
   "getAltitude": [Function],
   "getDirection": [Function],
   "getTEARR": [Function],
-  "id": 0,
+  "id": 1,
   "inView": 0,
   "inclination": 51.6423,
   "intlDes": "1998-AEF",

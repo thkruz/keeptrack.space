@@ -18,11 +18,11 @@ SatGroup {
   "sats": Array [
     Object {
       "isIntlDes": true,
-      "satId": 0,
+      "satId": 1,
     },
     Object {
       "isIntlDes": true,
-      "satId": 0,
+      "satId": 1,
     },
   ],
   "updateOrbits": [Function],

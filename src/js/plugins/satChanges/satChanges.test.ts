@@ -1,7 +1,6 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as satChanges from '@app/js/plugins/satChanges/satChanges';
-import { expect } from '@jest/globals';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/externalApi';
+import * as satChanges from './satChanges';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 // @ponicode
@@ -90,7 +89,6 @@ describe('satChanges.getSatChngJson', () => {
   test('0', () => {
     const fakeTable = [{ SCC: 25544, inc: 51, meanmo: 120 }];
     window.document.body.innerHTML = `<table id="satChng-table"></table>`;
-    let result: any = () => satChanges.getSatChngJson([{ day: 100, year: 2020, inc: 10 }], fakeTable);
-    expect(() => result).not.toThrow();
+    satChanges.getSatChngJson([{ day: 100, year: 2020, inc: 10 }], fakeTable);
   });
 });

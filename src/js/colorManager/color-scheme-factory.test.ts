@@ -803,10 +803,9 @@ describe('ColorSchemeFactory.ageOfElsetRules', () => {
     const jday = getDayOfYear(now);
     now = now.getFullYear();
     now = now.toString().substr(2, 2);
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    colorSchemeFactory.ageOfElsetRules({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
     });
-    expect(() => result).not.toThrow();
   });
 });
 

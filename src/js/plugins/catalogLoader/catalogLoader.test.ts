@@ -1,11 +1,11 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as catalogLoader from '@app/js/plugins/catalogLoader/catalogLoader';
 import '@app/js/settingsManager/settingsManager';
 import { expect } from '@jest/globals';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/externalApi';
+import * as catalogLoader from './catalogLoader';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
-keepTrackApi.programs.settingsManager = window.settingsManager;
+keepTrackApi.programs.settingsManager = (<any>window).settingsManager;
 settingsManager.installDirectory = '/';
 
 const respMock = [

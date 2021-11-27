@@ -45,7 +45,7 @@ export const himawari8 = (): void => {
   keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(40267).id, keepTrackApi.programs.mainCamera);
   keepTrackApi.programs.mainCamera.changeZoom(0.7);
 
-  let propTime = keepTrackApi.programs.timeManager.propTimeVar; // Propagation time minus 30 minutes so that the pictures have time to become available
+  let propTime = keepTrackApi.programs.timeManager.simulationTimeObj; // Propagation time minus 30 minutes so that the pictures have time to become available
   if (propTime < Date.now()) {
     propTime = new Date(propTime - 1000 * 60 * 30);
   } else {

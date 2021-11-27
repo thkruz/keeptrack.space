@@ -22,6 +22,9 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 // [unixTime, x, y, z, xDot, yDot, zDot]
 
 'use strict';
+
+import { searchBox } from '@app/js/uiManager/search-box';
+
 // Constants
 const RADIUS_OF_EARTH = 6371000; // Radius of Earth in meters
 const G = 6.6725985e-11;
@@ -35,7 +38,7 @@ const RAD2DEG = 360 / TAU;
 let om = {};
 
 // Public Functions
-om.sat2sv = (sat, timeManager) => [timeManager.propTime(), sat.position.x, sat.position.y, sat.position.z, sat.velocity.x, sat.velocity.y, sat.velocity.z];
+om.sat2sv = (sat, timeManager) => [timeManager.calculateSimulationTime(), sat.position.x, sat.position.y, sat.position.z, sat.velocity.x, sat.velocity.y, sat.velocity.z];
 om.sat2kp = (sat, timeManager) => {
   const sv = om.sat2sv(sat, timeManager);
   return om.sv2kp(sv, timeManager);
@@ -55,7 +58,7 @@ om.kp2tle = (kp, epoch, timeManager) => {
   const argpe = kp.argPe;
   const meana = kp.mo;
   const meanmo = 1440 / kp.period;
-  epoch = typeof epoch == 'undefined' || epoch == null ? new Date(timeManager.propTime()) : epoch;
+  epoch = typeof epoch == 'undefined' || epoch == null ? new Date(timeManager.calculateSimulationTime()) : epoch;
   const yy = epoch.getUTCFullYear() - 2000; // This won't work before year 2000, but that shouldn't matter
   let epochd = _dayOfYear(epoch.getUTCMonth(), epoch.getUTCDate(), epoch.getUTCHours(), epoch.getUTCMinutes(), epoch.getUTCSeconds());
   epochd = epochd * 1 + epoch.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
@@ -250,7 +253,8 @@ om.svs2analyst = async (svs, satSet, timeManager, satellite) => {
   try {
     om.iod(svs, timeManager, satellite)
       .then((tles) => {
-        satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(80000));
+        satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
+        searchBox.doSearch('100500', true);
       })
       .catch((error) => {
         console.debug(error);

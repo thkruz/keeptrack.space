@@ -177,15 +177,9 @@ export const findFutureDate = (socratesObjTwo: any[][], row: number) => {
   selectedDate.setUTCHours(sHour); // Move to UTC Hour
 
   const today = new Date(); // Need to know today for offset calculation
-  keepTrackApi.programs.timeManager.propOffset = selectedDate.getTime() - today.getTime(); // Find the offset from today
+  keepTrackApi.programs.timeManager.changeStaticOffset(selectedDate.getTime() - today.getTime()); // Find the offset from today
   keepTrackApi.programs.mainCamera.isCamSnapMode = false;
-  keepTrackApi.programs.satSet.satCruncher.postMessage({
-    // Tell satSet.satCruncher we have changed times for orbit calculations
-    typ: 'offset',
-    dat: keepTrackApi.programs.timeManager.propOffset.toString() + ' ' + (1.0).toString(),
-  });
-  keepTrackApi.programs.timeManager.propRealTime = Date.now(); // Reset realtime...this might not be necessary...
-  keepTrackApi.programs.timeManager.propTime();
+  keepTrackApi.programs.timeManager.calculateSimulationTime();
 }; // Allows passing -1 argument to socrates function to skip these steps
 
 export const socrates = (row: number) => {

@@ -1,129 +1,130 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { MILLISECONDS_PER_DAY } from '@app/js/lib/constants.js';
-import { dateFormat } from '@app/js/lib/external/dateFormat.js';
+import { TimeManager } from '@app/types/types';
 import $ from 'jquery';
-import { timeManagerObject } from './timeManagerObject';
+import { keepTrackApi } from '../api/externalApi';
+import { getDayOfYear } from './transforms';
 
-export const getDayOfYear = (date: Date) => {
-  date = date || new Date();
-  const _isLeapYear = (date: Date) => {
-    const year = date.getFullYear();
-    if ((year & 3) !== 0) return false;
-    return year % 100 !== 0 || year % 400 === 0;
-  };
+export const changePropRate = (propRate: number) => {
+  if (timeManager.propRate === propRate) return; // no change
 
-  const dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-  const mn = date.getMonth();
-  const dn = date.getUTCDate();
-  let dayOfYear = dayCount[mn] + dn;
-  if (mn > 1 && _isLeapYear(date)) dayOfYear++;
-  return dayOfYear;
+  timeManager.staticOffset = timeManager.calculateSimulationTime() - timeManager.realTime;
+
+  // Changing propRate or dynamicOffsetEpoch before calculating the staticOffset will give incorrect results
+  timeManager.dynamicOffsetEpoch = Date.now();
+  timeManager.propRate = propRate;
+  console.debug('changePropRate', propRate);
+  synchronize();
 };
 
-export const timeManager: timeManagerObject = {
+export const synchronize = () => {
+  const { satSet, orbitManager } = keepTrackApi.programs;
+  const message = {
+    typ: 'offset',
+    staticOffset: timeManager.staticOffset,
+    dynamicOffsetEpoch: timeManager.dynamicOffsetEpoch,
+    propRate: timeManager.propRate,
+  };
+  satSet.satCruncher.postMessage(message);
+
+  // OrbitWorker starts later than the satCruncher so it might not be
+  // ready yet.
+  if (orbitManager.orbitWorker) {
+    orbitManager.orbitWorker.postMessage(message);
+  }
+};
+
+export const changeStaticOffset = (staticOffset: number) => {
+  timeManager.dynamicOffsetEpoch = Date.now();
+  timeManager.staticOffset = staticOffset;
+  console.debug('changeStaticOffset', staticOffset);
+  synchronize();
+};
+
+export const timeManager: TimeManager = {
   dateObject: null,
-  propTimeVar: null,
   datetimeInputDOM: null,
   timeTextStr: null,
   timeTextStrEmpty: null,
-  now: null,
-  propRealTime: null,
-  propOffset: null,
   propRate: null,
   dt: null,
   drawDt: null,
-  updatePropTime: null,
-  propTime: null,
-  propTimeCheck: null,
   setNow: null,
   setLastTime: null,
   setSelectedDate: null,
   lastTime: null,
   selectedDate: null,
-  setDrawDt: null,
-  setPropRateZero: null,
   tDS: null,
   iText: null,
   propRate0: null,
   dateDOM: null,
   getPropOffset: null,
-  dateToISOLikeButLocal: null,
-  localToZulu: null,
-  getDayOfYear: null,
-  dateFromDay: null,
-  jday: null,
+  getDayOfYear: getDayOfYear,
+  propFrozen: 0,
+  changePropRate: changePropRate,
+  changeStaticOffset: changeStaticOffset,
+  synchronize: synchronize,
   init: () => {
-    const settingsManager = keepTrackApi.programs.settingsManager;
-    // Variables pulled from timeManager.jday function to reduce garbage collection
-    let jDayStart;
-    let jDayDiff;
-
     timeManager.dateObject = new Date();
-    timeManager.propTimeVar = timeManager.dateObject;
+    timeManager.simulationTimeObj = timeManager.dateObject;
     timeManager.datetimeInputDOM = $('#datetime-input-tb');
 
     timeManager.timeTextStr = '';
     timeManager.timeTextStrEmpty = '';
 
-    let propFrozen = Date.now(); // for when propRate 0
-    timeManager.now = propFrozen; // (initialized as Date.now)
-    timeManager.propRealTime = propFrozen; // actual time we're running it (initialized as Date.now)
-    timeManager.propOffset = 0.0; // offset we're propagating to, msec
+    timeManager.propFrozen = Date.now(); // for when propRate 0
+    timeManager.realTime = timeManager.propFrozen; // (initialized as Date.now)
     timeManager.propRate = 1.0; // time rate multiplier for propagation
     timeManager.dt = 0;
     timeManager.drawDt = 0;
 
-    timeManager.updatePropTime = (propTimeVar?) => {
-      if (typeof propTimeVar !== 'undefined' && propTimeVar !== null) {
-        timeManager.propTimeVar.setTime(propTimeVar);
-        return;
-      }
-      if (timeManager.propRate === 0) {
-        timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset);
-      } else {
-        timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset + (Number(timeManager.now) - Number(timeManager.propRealTime)) * timeManager.propRate);
-      }
-    };
-
     // Propagation Time Functions
-    timeManager.propTime = function () {
-      if (timeManager.propRate === 0) {
-        timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset);
-      } else {
-        timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset + (Number(timeManager.now) - Number(timeManager.propRealTime)) * timeManager.propRate);
+    timeManager.calculateSimulationTime = (newSimulationTime?: Date): Date => {
+      if (typeof newSimulationTime !== 'undefined' && newSimulationTime !== null) {
+        timeManager.simulationTimeObj.setTime(newSimulationTime);
+        return timeManager.simulationTimeObj;
       }
-      return timeManager.propTimeVar;
+
+      // simulationTime: The time in the simulation
+      // realTime: The time in the real world
+      // staticOffset: The time offset ignoring propRate (ex. New Launch)
+      // dynamicOffset: The time offset that is impacted by propRate
+      // dynamicOffsetEpoch: The time taken when dynamicOffset or propRate changes
+      // propRate: The rate of change applied to the dynamicOffset
+      //
+      // dynamicOffset = realTime - dynamicOffsetEpoch;
+      // simulationTime = realTime + staticOffset + dynamicOffset * propRate;
+
+      if (timeManager.propRate === 0) {
+        const simulationTime = timeManager.dynamicOffsetEpoch + timeManager.staticOffset;
+        timeManager.simulationTimeObj.setTime(simulationTime);
+      } else {
+        const dynamicOffset = timeManager.realTime - timeManager.dynamicOffsetEpoch;
+        const simulationTime = timeManager.realTime + timeManager.staticOffset + dynamicOffset * timeManager.propRate;
+        timeManager.simulationTimeObj.setTime(simulationTime);
+      }
+
+      return timeManager.simulationTimeObj;
     };
 
-    timeManager.propTimeCheck = function (propTempOffset: number, propRealTime) {
+    timeManager.getOffsetTimeObj = (offset: number, timeObj: Date) => {
       const now = new Date(); // Make a time variable
-      now.setTime(Number(propRealTime) + propTempOffset); // Set the time variable to the time in the future
+      now.setTime(timeObj.getTime() + offset); // Set the time variable to the time in the future
       return now;
     };
 
     timeManager.setNow = (now, dt) => {
-      timeManager.now = now;
+      timeManager.realTime = now;
       timeManager.dt = dt;
 
-      timeManager.setLastTime(timeManager.propTimeVar);
-      timeManager.updatePropTime();
-      timeManager.setSelectedDate(timeManager.propTimeVar);
+      timeManager.setLastTime(timeManager.simulationTimeObj);
+      timeManager.calculateSimulationTime();
+      timeManager.setSelectedDate(timeManager.simulationTimeObj);
 
       // Passing datetimeInput eliminates needing jQuery in main module
-      if (timeManager.lastTime - timeManager.propTimeVar < 300 && (settingsManager.isEditTime || !settingsManager.cruncherReady)) {
+      if (timeManager.lastTime - timeManager.simulationTimeObj.getTime() < 300 && (settingsManager.isEditTime || !settingsManager.cruncherReady)) {
         if (settingsManager.plugins.datetime) {
           timeManager.datetimeInputDOM.val(timeManager.selectedDate.toISOString().slice(0, 10) + ' ' + timeManager.selectedDate.toISOString().slice(11, 19));
         }
       }
-    };
-
-    timeManager.setDrawDt = (drawDt) => {
-      timeManager.drawDt = drawDt;
-    };
-
-    timeManager.setPropRateZero = function () {
-      timeManager.propRate = 0;
-      propFrozen = Date.now();
     };
 
     timeManager.setLastTime = (now) => {
@@ -135,8 +136,8 @@ export const timeManager: timeManagerObject = {
 
       // This function only applies when datetime plugin is enabled
       if (settingsManager.plugins.datetime) {
-        if (timeManager.lastTime - timeManager.propTimeVar < 300) {
-          timeManager.tDS = timeManager.propTimeVar.toJSON();
+        if (timeManager.lastTime - timeManager.simulationTimeObj < 300) {
+          timeManager.tDS = timeManager.simulationTimeObj.toJSON();
           timeManager.timeTextStr = timeManager.timeTextStrEmpty;
           for (timeManager.iText = 11; timeManager.iText < 20; timeManager.iText++) {
             if (timeManager.iText > 11) timeManager.timeTextStr += timeManager.tDS[timeManager.iText - 1];
@@ -153,7 +154,7 @@ export const timeManager: timeManagerObject = {
         timeManager.dateDOM.textContent = timeManager.timeTextStr;
 
         // Load the current JDAY
-        const jday = timeManager.getDayOfYear(timeManager.propTime());
+        const jday = timeManager.getDayOfYear(timeManager.calculateSimulationTime());
         $('#jday').html(jday);
       }
     };
@@ -172,48 +173,14 @@ export const timeManager: timeManagerObject = {
       return propOffset;
     };
 
-    timeManager.dateToISOLikeButLocal = function (date) {
-      const offsetMs = date.getTimezoneOffset() * 60 * 1000;
-      const msLocal = date.getTime() - offsetMs;
-      const dateLocal = new Date(msLocal);
-      let iso = dateLocal.toISOString();
-      iso = iso.replace('T', ' ');
-      const isoLocal = iso.slice(0, 19) + ' ' + dateLocal.toString().slice(25, 31);
-      return isoLocal;
-    };
-
-    timeManager.localToZulu = function (date) {
-      date = dateFormat(date, 'isoDateTime', true);
-      date = date.split(' ');
-      date = new Date(date[0] + 'T' + date[1] + 'Z');
-      return date;
-    };
-
-    // Get Day of Year
-    timeManager.getDayOfYear = getDayOfYear;
-
-    timeManager.dateFromDay = function (year, day) {
-      const date = new Date(year, 0); // initialize a date in `year-01-01`
-      return new Date(date.setDate(day)); // add the number of days
-    };
-
-    timeManager.jday = function (year, mon, day, hr, minute, sec) {
-      // from satellite.js
-      if (!year) {
-        // console.debug('timeManager.jday should always have a date passed to it!');
-        const now = new Date();
-        jDayStart = new Date(now.getFullYear(), 0, 0);
-        jDayDiff = now.getDate() - jDayStart.getDate();
-        return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);
-      } else {
-        return (
-          367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor((275 * mon) / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0 //  ut in days
-        );
-      }
-    };
-
     // Initialize
-    timeManager.updatePropTime();
-    timeManager.setSelectedDate(timeManager.propTimeVar);
+    timeManager.calculateSimulationTime();
+    timeManager.setSelectedDate(timeManager.simulationTimeObj);
   },
+  dynamicOffsetEpoch: Date.now(),
+  realTime: 0,
+  staticOffset: 0,
+  simulationTimeObj: null,
+  calculateSimulationTime: null,
+  getOffsetTimeObj: null,
 };

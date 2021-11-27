@@ -91,13 +91,8 @@ const exampleSat2 = {
   }),
 };
 
-const timeManager = {
-  propTime: () => {
-    //
-  },
-};
-
 test('Orbit Math Manager Test', () => {
+  const { timeManager } = keepTrackApi.programs;
   omManager.sat2sv(exampleSat, timeManager);
   omManager.sat2kp(exampleSat, timeManager);
   omManager.sat2tle(exampleSat, timeManager);

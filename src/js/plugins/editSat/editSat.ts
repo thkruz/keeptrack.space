@@ -162,7 +162,7 @@ export const readerOnLoad = (evt) => {
   const scc = parseInt(stringPad.pad0(object.TLE1.substr(2, 5).trim(), 5));
   const satId = satSet.getIdFromObjNum(scc);
   const sat = satSet.getSatExtraOnly(satId);
-  if (satellite.altitudeCheck(object.TLE1, object.TLE2, timeManager.propOffset) > 1) {
+  if (satellite.altitudeCheck(object.TLE1, object.TLE2, timeManager.calculateSimulationTime()) > 1) {
     satSet.satCruncher.postMessage({
       typ: 'satEdit',
       id: sat.id,
@@ -278,7 +278,9 @@ export const editSatNewTleClickFadeIn = () => {
 
     const upOrDown = mainsat.getDirection();
 
-    const currentEpoch = satellite.currentEpoch(timeManager.propTime());
+    const simulationTimeObj = timeManager.calculateSimulationTime();
+
+    const currentEpoch = satellite.currentEpoch(simulationTimeObj);
     mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
 
     keepTrackApi.programs.mainCamera.isCamSnapMode = false;
@@ -286,9 +288,9 @@ export const editSatNewTleClickFadeIn = () => {
     let TLEs;
     // Ignore argument of perigee for round orbits OPTIMIZE
     if (mainsat.apogee - mainsat.perigee < 300) {
-      TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.propOffset);
+      TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, simulationTimeObj);
     } else {
-      TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.propOffset, alt);
+      TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, simulationTimeObj, alt);
     }
     const TLE1 = TLEs[0];
     const TLE2 = TLEs[1];
@@ -362,7 +364,7 @@ export const editSatSubmit = (e: Event) => {
 
   const { TLE1, TLE2 } = satellite.createTle(sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc);
 
-  if (satellite.altitudeCheck(TLE1, TLE2, timeManager.propOffset) > 1) {
+  if (satellite.altitudeCheck(TLE1, TLE2, timeManager.calculateSimulationTime()) > 1) {
     satSet.satCruncher.postMessage({
       typ: 'satEdit',
       id: satId,

@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
+import { jday } from '@app/js/timeManager/transforms';
 import $ from 'jquery';
 
 const { satellite, sensorManager, timeManager } = keepTrackApi.programs;
@@ -672,9 +673,8 @@ export const getMissileTEARR = (
   }
 ) => {
   const currentTEARR: any = {}; // Most current TEARR data that is set in satellite object and returned.
-  let propOffset = timeManager.getPropOffset(); // offset letting us propagate in the future (or past)
-  const now = timeManager.propTimeCheck(propOffset, timeManager.propRealTime);
-  let j = timeManager.jday(
+  const now = timeManager.calculateSimulationTime();
+  let j = jday(
     now.getUTCFullYear(),
     now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
     now.getUTCDate(),
@@ -708,7 +708,6 @@ export const getMissileTEARR = (
 
   let curMissileTime;
 
-  propOffset = timeManager.getPropOffset(); // offset letting us propagate in the future (or past)
   for (let t = 0; t < missile.altList.length; t++) {
     if (missile.startTime + t * 1000 > now.getTime()) {
       curMissileTime = t;
@@ -1088,9 +1087,9 @@ missileManager.asat = (CurrentLatitude, CurrentLongitude, satId, MissileObjectNu
   let timeInFlight;
   timeInFlight = missileManager.asatPreFlight(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude, NumberWarheads, MissileObjectNum, CurrentTime, MissileDesc, Length, Diameter, NewBurnRate, MaxMissileRange, country, satAlt);
   console.log(timeInFlight);
-  let startTime = timeManager.propTime();
+  let startTime = timeManager.calculateSimulationTime();
   // CurrentTime = startTime;
-  let propOffset = timeManager.propTimeCheck(timeInFlight * 1000, startTime);
+  let propOffset = timeManager.getOffsetTimeObj(timeInFlight * 1000, startTime);
   console.log(propOffset);
   let satTEARR2 = satellite.getTEARR(sat, sensorManager.sensorList.COD, propOffset);
   let satAlt2 = satTEARR2.alt;
@@ -1122,7 +1121,7 @@ missileManager.asat = (CurrentLatitude, CurrentLongitude, satId, MissileObjectNu
   console.log(timeInFlight2);
   console.log(`tgtLat: ${tgtLat} - tgtLon: ${tgtLon}`);
 
-  propOffset = timeManager.propTimeCheck(timeInFlight2 * 1000, startTime);
+  propOffset = timeManager.getOffsetTimeObj(timeInFlight2 * 1000, startTime);
   console.log(propOffset);
   let satTEARR3 = satellite.getTEARR(sat, sensorManager.sensorList.COD, propOffset);
   let satAlt3 = satTEARR3.alt;

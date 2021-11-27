@@ -40,7 +40,7 @@ describe('orbitReferences.selectSatData', () => {
 
 // @ponicode
 describe('orbitReferences.orbitReferencesLinkClick', () => {
-  test.skip('0', () => {
+  test('0', () => {
     let result: any = orbitReferences.orbitReferencesLinkClick();
     expect(result).toMatchSnapshot();
   });

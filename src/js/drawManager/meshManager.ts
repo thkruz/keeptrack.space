@@ -4,11 +4,10 @@ import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
 import * as glm from '@app/js/lib/external/gl-matrix.js';
 // @ts-ignore - using OBJ prevents ponicode from breaking
 import { OBJ } from '@app/js/lib/external/webgl-obj-loader.js';
-import { Camera } from '@app/types/types';
+import { Camera, TimeManager } from '@app/types/types';
 import { mat4 } from 'gl-matrix';
 import { keepTrackApi } from '../api/externalApi';
 import { SatObject } from '../api/keepTrack';
-import { timeManagerObject } from '../timeManager/timeManagerObject';
 
 const meshList = ['sat2', 's1u', 's2u', 's3u', 'starlink', 'iss', 'gps', 'aehf', 'dsp', 'galileo', 'o3b', 'orbcomm', 'iridium', 'globalstar', 'debris0', 'debris1', 'debris2', 'rocketbody', 'sbirs', 'misl', 'misl2', 'misl3', 'misl4', 'rv'];
 
@@ -262,11 +261,11 @@ export const draw = (pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLBuffer) => 
   gl.disable(gl.BLEND);
 };
 
-export const updateNadirYaw = (mainCamera: Camera, sat: SatObject, timeManager: timeManagerObject) => {
+export const updateNadirYaw = (mainCamera: Camera, sat: SatObject, timeManager: TimeManager) => {
   meshManager.currentModel.nadirYaw = mainCamera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
 };
 
-export const update = (mainCamera: Camera, timeManager: timeManagerObject, sat: any) => {
+export const update = (mainCamera: Camera, timeManager: TimeManager, sat: any) => {
   meshManager.currentModel.id = sat?.id || -1;
   meshManager.currentModel.static = sat?.static || false;
 

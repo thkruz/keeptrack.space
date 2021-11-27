@@ -2,6 +2,7 @@ import { keepTrackApi } from '@app/js/api/externalApi';
 import { EarthObject } from '@app/js/api/keepTrack';
 import { DEG2RAD, MILLISECONDS_PER_DAY, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
 import { satellite } from '@app/js/satMath/satMath';
+import { jday } from '@app/js/timeManager/transforms';
 import { Camera, DotsManager } from '@app/types/types';
 import * as glm from 'gl-matrix';
 
@@ -466,9 +467,9 @@ export const drawOcclusion = (pMatrix: glm.mat4, camMatrix: glm.mat4, occlusionP
 };
 export const update = (): void => {
   const { timeManager } = keepTrackApi.programs;
-  earthNow = timeManager.propTimeVar;
+  earthNow = timeManager.calculateSimulationTime();
 
-  earth.earthJ = timeManager.jday(
+  earth.earthJ = jday(
     earthNow.getUTCFullYear(),
     earthNow.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
     earthNow.getUTCDate(),
@@ -493,9 +494,8 @@ export const update = (): void => {
 };
 export const updateSunCurrentDirection = (): void => {
   const { timeManager } = keepTrackApi.programs;
-  timeManager.updatePropTime();
-  earth.sunvar.now = timeManager.propTimeVar;
-  earth.sunvar.jd = timeManager.jday(
+  earth.sunvar.now = timeManager.calculateSimulationTime();
+  earth.sunvar.jd = jday(
     earth.sunvar.now.getUTCFullYear(),
     earth.sunvar.now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
     earth.sunvar.now.getUTCDate(),

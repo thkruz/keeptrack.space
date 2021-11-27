@@ -603,7 +603,7 @@ export const orbitsAbove = () => {
     }
 
     if (sensorManager?.currentSensor?.lat === null) return;
-    if (timeManager.now - satLabelModeLastTime < settingsManager.satLabelInterval) return;
+    if (timeManager.realTime - satLabelModeLastTime < settingsManager.satLabelInterval) return;
 
     orbitManager.clearInViewOrbit();
 
@@ -653,7 +653,7 @@ export const orbitsAbove = () => {
       labelCount++;
     }
     isSatMiniBoxInUse = true;
-    satLabelModeLastTime = timeManager.now;
+    satLabelModeLastTime = timeManager.realTime;
   } else {
     drawManager.sensorPos = null;
     drawManager.isDrawOrbitsAbove = false;
@@ -922,9 +922,9 @@ export const demoMode = () => {
   const { mainCamera, objectManager, sensorManager, ColorScheme, timeManager, orbitManager, satSet } = keepTrackApi.programs;
 
   if (objectManager?.isSensorManagerLoaded && sensorManager?.currentSensor?.lat === null) return;
-  if (timeManager.now - demoModeLastTime < settingsManager.demoModeInterval) return;
+  if (timeManager.realTime - demoModeLastTime < settingsManager.demoModeInterval) return;
 
-  drawManager.demoModeLast = timeManager.now;
+  drawManager.demoModeLast = timeManager.realTime;
 
   if (drawManager.demoModeSatellite === satSet.satData.length) drawManager.demoModeSatellite = 0;
   let satData = satSet.satData;

@@ -1,8 +1,7 @@
 /* eslint-disable no-useless-escape */
-import { Camera, DotsManager, DrawProgram, PickingProgram } from '@app/types/types';
+import { Camera, DotsManager, DrawProgram, PickingProgram, TimeManager } from '@app/types/types';
 import * as glm from 'gl-matrix';
 import { ColorSchemeFactory } from '../colorManager/color-scheme-factory';
-import { timeManagerObject as TimeManager } from '../timeManager/timeManagerObject';
 
 export const init = (gl: WebGL2RenderingContext) => {
   // We draw the picking object bigger than the actual dot to make it easier to select objects
@@ -321,16 +320,16 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
   // if (satSet.radarDataManager.radarData.length > 0) {
   //   // Get Time
   //   if (timeManager.propRate === 0) {
-  //     timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset);
+  //     timeManager.simulationTimeObj.setTime(Number(timeManager.dynamicOffsetEpoch) + timeManager.propOffset);
   //   } else {
-  //     timeManager.propTimeVar.setTime(Number(timeManager.propRealTime) + timeManager.propOffset + (Number(timeManager.now) - Number(timeManager.propRealTime)) * timeManager.propRate);
+  //     timeManager.simulationTimeObj.setTime(Number(timeManager.dynamicOffsetEpoch) + timeManager.propOffset + (Number(timeManager.realTime) - Number(timeManager.dynamicOffsetEpoch)) * timeManager.propRate);
   //   }
-  //   drawPropTime = timeManager.propTimeVar * 1;
+  //   drawPropTime = timeManager.simulationTimeObj * 1;
 
   //   // Find the First Radar Return Time
   //   if (satSet.radarDataManager.drawT1 == 0) {
   //     for (rrI = 0; rrI < radarDataLen; rrI++) {
-  //       if (satSet.radarDataManager.radarData[rrI].t > timeManager.now - 3000) {
+  //       if (satSet.radarDataManager.radarData[rrI].t > timeManager.realTime - 3000) {
   //         satSet.radarDataManager.drawT1 = rrI;
   //         break;
   //       }
@@ -369,11 +368,8 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
   // }
 
   dotsManager.drawDivisor = Math.max(timeManager.propRate, 0.001);
-  timeManager.setDrawDt(Math.min(timeManager.dt / 1000.0, 1.0 / dotsManager.drawDivisor));
-  // Skip Velocity Math if FPS is hurting
-  // 1000 / dt = fps
-  // if (1000 / timeManager.dt > settingsManager.fpsThrottle2) {
-  timeManager.setDrawDt(timeManager.drawDt * timeManager.propRate); // Adjust drawDt correspond to the propagation rate
+  timeManager.drawDt = Math.min(timeManager.dt / 1000.0, 1.0 / dotsManager.drawDivisor);
+  timeManager.drawDt *= timeManager.propRate; // Adjust drawDt correspond to the propagation rate
   dotsManager.satDataLenInDraw = satSetLen;
   if (!settingsManager.lowPerf && timeManager.drawDt > settingsManager.minimumDrawDt) {
     // Don't Interpolate Static Objects
@@ -388,7 +384,6 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
       dotsManager.positionData[dotsManager.drawI] += dotsManager.velocityData[dotsManager.drawI] * timeManager.drawDt;
     }
   }
-  // }
 };
 
 export const updateSizeBuffer = (satData) => {

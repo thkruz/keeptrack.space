@@ -1,8 +1,8 @@
-import * as datetime from '@app/js/plugins/datetime/datetime';
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
 import 'jquery-ui-bundle';
 import '@app/js/lib/external/jquery-ui-timepicker.js';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/externalApi';
+import * as datetime from '../../plugins/datetime/datetime';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 // @ponicode

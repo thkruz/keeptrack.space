@@ -2,12 +2,9 @@ import { keepTrackApi } from '@app/js/api/externalApi';
 import $ from 'jquery';
 
 export const updateDateTime = (date: Date) => {
-  const { satSet, timeManager } = keepTrackApi.programs;
+  const { timeManager } = keepTrackApi.programs;
   $('#datetime-input-tb').datepicker('setDate', date);
-  satSet.satCruncher.postMessage({
-    typ: 'offset',
-    dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-  });
+  timeManager.synchronize();
 };
 export const init = (): void => {
   // Add HTML
@@ -26,9 +23,8 @@ export const init = (): void => {
 
 export const datetimeTextClick = (): void => {
   const { timeManager } = keepTrackApi.programs;
-  timeManager.propRealTime = Date.now();
-  timeManager.propTime();
-  keepTrackApi.methods.updateDateTime(new Date(timeManager.propTime()));
+  timeManager.calculateSimulationTime();
+  keepTrackApi.methods.updateDateTime(new Date(timeManager.calculateSimulationTime()));
 
   if (!settingsManager.isEditTime) {
     // $('#datetime-text').fadeOut();
@@ -88,24 +84,19 @@ export const uiManagerInit = () => {
 };
 
 export const datetimeInputFormChange = (jestOverride?: Date) => {
-  const { timeManager, satSet, uiManager } = keepTrackApi.programs;
+  const { timeManager, uiManager } = keepTrackApi.programs;
   const selectedDate = $('#datetime-input-tb').datepicker('getDate') || jestOverride;
   const today = new Date();
-  const jday = timeManager.getDayOfYear(timeManager.propTime());
+  const jday = timeManager.getDayOfYear(timeManager.calculateSimulationTime());
   $('#jday').html(jday);
-  timeManager.propOffset = selectedDate.getTime() - today.getTime();
-  satSet.satCruncher.postMessage({
-    typ: 'offset',
-    dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-  });
-  timeManager.propRealTime = Date.now();
-  timeManager.propTime();
+  timeManager.changeStaticOffset(selectedDate.getTime() - today.getTime());
+  timeManager.calculateSimulationTime();
   // Reset last update times when going backwards in time
-  settingsManager.lastBoxUpdateTime = timeManager.now;
+  settingsManager.lastBoxUpdateTime = timeManager.realTime;
 
   // TODO: Migrate to watchlist.ts
   try {
-    keepTrackApi.programs.watchlist.lastOverlayUpdateTime = timeManager.now * 1 - 7000;
+    keepTrackApi.programs.watchlist.lastOverlayUpdateTime = timeManager.realTime * 1 - 7000;
     uiManager.updateNextPassOverlay(true);
   } catch {
     // Ignore

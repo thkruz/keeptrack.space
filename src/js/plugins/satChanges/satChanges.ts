@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/js/api/externalApi';
+import { dateFromJday } from '@app/js/timeManager/transforms';
 import $ from 'jquery';
 
 let issatChngMenuOpen = false;
@@ -115,7 +116,7 @@ export const getSatChngJson = (resp: any, satChngTable: string | any[]) => {
   for (let i = 0; i < resp.length; i++) {
     const prefix = resp[i].year > 50 ? '19' : '20';
     const year = parseInt(prefix + resp[i].year.toString());
-    let date = keepTrackApi.programs.timeManager.dateFromDay(year, resp[i].day);
+    let date = dateFromJday(year, resp[i].day);
     date = new Date(date.getTime() + (resp[i].day % 1) * 1440 * 60000);
     resp[i].date = date;
   }

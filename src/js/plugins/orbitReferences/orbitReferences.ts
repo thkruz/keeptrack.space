@@ -19,19 +19,17 @@ export const uiManagerInit = (): void => {
   keepTrackApi.register({
     method: 'selectSatData',
     cbName: 'orbitReferences',
-    cb: () => {
-      selectSatData(doOnce);
-      doOnce = true;
-    },
+    cb: selectSatData,
   });
 };
 
-export const selectSatData = (doOnce: boolean) => {
+export const selectSatData = () => {
   if (!doOnce) {
     $('#sat-info-top-links').append(keepTrackApi.html`
         <div id="orbit-references-link" class="link sat-infobox-links">Generate Orbit Reference Satellites...</div>
       `);
     $('#orbit-references-link').on('click', orbitReferencesLinkClick);
+    doOnce = true;
   }
 };
 

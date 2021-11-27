@@ -733,8 +733,6 @@ exports[`satSet.getSensorFromSensorName 1 1`] = `-1`;
 
 exports[`satSet.initGsData 0 1`] = `undefined`;
 
-exports[`satSet.insertNewAnalystSatellite 0 1`] = `false`;
-
 exports[`satSet.mergeSat 0 1`] = `undefined`;
 
 exports[`satSet.onCruncherReady 0 1`] = `undefined`;

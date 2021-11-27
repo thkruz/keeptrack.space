@@ -20,7 +20,7 @@ import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants.j
 import { Camera, CameraType, DotsManager, DrawManager, ObjectManager, OrbitManager, SensorManager, ZoomValue } from '@app/types/types';
 import * as glm from 'gl-matrix';
 import { SatObject } from '../api/keepTrack';
-import { getDayOfYear } from '../timeManager/timeManager';
+import { getDayOfYear } from '../timeManager/transforms';
 
 export const normalizeAngle = (angle: number): number => {
   angle %= TAU;

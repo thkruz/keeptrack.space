@@ -184,9 +184,9 @@ var _updateSelectBox = () => {
   // Don't bring up the update box for static dots
   if (typeof sat === 'undefined' || sat.static) return;
 
-  if (timeManager.now * 1 > settingsManager.lastBoxUpdateTime * 1 + updateInterval) {
+  if (timeManager.realTime * 1 > settingsManager.lastBoxUpdateTime * 1 + updateInterval) {
     keepTrackApi.methods.updateSelectBox(sat);
-    settingsManager.lastBoxUpdateTime = timeManager.now;
+    settingsManager.lastBoxUpdateTime = timeManager.realTime;
   }
 };
 
@@ -371,7 +371,7 @@ let doSearch = (searchString, isPreventDropDown) => {
   }
 };
 
-export const legendHoverMenuClick = (legendType) => {
+export const legendHoverMenuClick = (legendType?: string) => {
   const { satSet } = keepTrackApi.programs;
 
   switch (legendType) {
@@ -829,8 +829,8 @@ export const onReady = () => {
   uiManager.menuController = () => {
     // Reset time if in retro mode
     if (settingsManager.retro) {
-      timeManager.propOffset = new Date(2000, 2, 13).getTime() - Date.now();
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.propRealTime + timeManager.propOffset));
+      timeManager.staticOffset = new Date(2000, 2, 13).getTime() - Date.now();
+      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
     }
 
     $('#search-icon').on('click', function () {
@@ -1214,7 +1214,7 @@ uiManager.loadStr = (str) => {
   }
 };
 uiManager.doSearch = (searchString, isPreventDropDown) => {
-  let idList = searchBox.doSearch(searchString, isPreventDropDown, satSet);
+  let idList = searchBox.doSearch(searchString, isPreventDropDown);
   if (settingsManager.isSatOverflyModeOn) {
     satSet.satCruncher.postMessage({
       satelliteSelected: idList,
@@ -1275,8 +1275,8 @@ uiManager.updateURL = () => {
     paramSlices.push('rate=' + timeManager.propRate);
   }
 
-  if (timeManager.propOffset < -1000 || timeManager.propOffset > 1000) {
-    paramSlices.push('date=' + (timeManager.propRealTime + timeManager.propOffset).toString());
+  if (timeManager.staticOffset < -1000 || timeManager.staticOffset > 1000) {
+    paramSlices.push('date=' + (timeManager.dynamicOffsetEpoch + timeManager.staticOffset).toString());
   }
 
   if (paramSlices.length > 0) {
@@ -1348,9 +1348,11 @@ uiManager.colorSchemeChangeAlert = (scheme) => {
 };
 uiManager.hideUi = hideUi;
 uiManager.isUiVisible = false;
-uiManager.keyHandler = (evt) => {
+export const keyHandler = (evt: KeyboardEvent) => {
   // Error Handling
   if (typeof evt.key == 'undefined') return;
+
+  const {mainCamera, timeManager} = keepTrackApi.programs;
 
   if (uiManager.isCurrentlyTyping) return;
   // console.log(Number(evt.charCode));
@@ -1410,102 +1412,89 @@ uiManager.keyHandler = (evt) => {
 
   switch (evt.key) {
     case '!':
-      timeManager.propOffset = 0; // Reset to Current Time
+      timeManager.changeStaticOffset(0); // Reset to Current Time
       settingsManager.isPropRateChange = true;
       break;
     case ',':
-      timeManager.updatePropTime();
-      timeManager.propOffset = timeManager.getPropOffset();
-      timeManager.propOffset -= 1000 * 60; // Move back a Minute
+      timeManager.calculateSimulationTime();
+      timeManager.changeStaticOffset(timeManager.staticOffset - 1000 * 60); // Move back a Minute
       settingsManager.isPropRateChange = true;
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.propRealTime + timeManager.propOffset));
+      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
       break;
     case '.':
-      timeManager.updatePropTime();
-      timeManager.propOffset = timeManager.getPropOffset();
-      timeManager.propOffset += 1000 * 60; // Move a Minute
+      timeManager.calculateSimulationTime();
+      timeManager.changeStaticOffset(timeManager.staticOffset + 1000 * 60); // Move forward a Minute
       settingsManager.isPropRateChange = true;
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.propRealTime + timeManager.propOffset));
+      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
       break;
     case '<':
-      timeManager.updatePropTime();
-      timeManager.propOffset = timeManager.getPropOffset();
-      timeManager.propOffset -= 1000 * 60 * 4; // Move back 4 minutes
+      timeManager.calculateSimulationTime();
+      timeManager.changeStaticOffset(timeManager.staticOffset - 4000 * 60); // Move back 4 Minutes
       settingsManager.isPropRateChange = true;
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.propRealTime + timeManager.propOffset));
+      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
       break;
     case '>':
-      timeManager.updatePropTime();
-      timeManager.propOffset = timeManager.getPropOffset();
-      timeManager.propOffset += 1000 * 60 * 4; // Move forward 4 minutes
+      timeManager.calculateSimulationTime();
+      timeManager.changeStaticOffset(timeManager.staticOffset + 4000 * 60); // Move forward 4 Minutes
       settingsManager.isPropRateChange = true;
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.propRealTime + timeManager.propOffset));
+      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
       break;
     case '0':
-      timeManager.updatePropTime();
-      timeManager.setPropRateZero();
-      timeManager.propOffset = timeManager.getPropOffset();
+      timeManager.calculateSimulationTime();
+      timeManager.changePropRate(0);
       settingsManager.isPropRateChange = true;
       break;
     case '+':
     case '=':
-      timeManager.updatePropTime();
-      timeManager.propOffset = timeManager.getPropOffset();
+      timeManager.calculateSimulationTime();
       if (timeManager.propRate < 0.001 && timeManager.propRate > -0.001) {
-        timeManager.propRate = 0.001;
+        timeManager.changePropRate(0.001);
       }
 
       if (timeManager.propRate > 1000) {
-        timeManager.propRate = 1000;
+        timeManager.changePropRate(1000);
       }
 
       if (timeManager.propRate < 0) {
-        timeManager.propRate *= 0.666666;
+        timeManager.changePropRate((timeManager.propRate * 2) / 3);
       } else {
-        timeManager.propRate *= 1.5;
+        timeManager.changePropRate(timeManager.propRate * 1.5);
       }
       settingsManager.isPropRateChange = true;
       break;
     case '-':
     case '_':
-      timeManager.updatePropTime();
-      timeManager.propOffset = timeManager.getPropOffset();
-
+      timeManager.calculateSimulationTime();
       if (timeManager.propRate < 0.001 && timeManager.propRate > -0.001) {
-        timeManager.propRate = -0.001;
+        timeManager.changePropRate(-0.001);
       }
 
       if (timeManager.propRate < -1000) {
-        timeManager.propRate = -1000;
+        timeManager.changePropRate(-1000);
       }
 
-      if (timeManager.propRate > 0) {
-        timeManager.propRate *= 0.666666;
+      if (timeManager.propRate < 0) {
+        timeManager.changePropRate(timeManager.propRate * 1.5);
       } else {
-        timeManager.propRate *= 1.5;
+        timeManager.changePropRate((timeManager.propRate * 2) / 3);
       }
       settingsManager.isPropRateChange = true;
       break;
     case '1':
-      timeManager.updatePropTime();
-      timeManager.propOffset = timeManager.getPropOffset();
-      timeManager.propRate = 1.0;
+      timeManager.calculateSimulationTime();
+      timeManager.changePropRate(1.0);
       settingsManager.isPropRateChange = true;
       break;
   }
 
   if (settingsManager.isPropRateChange) {
-    timeManager.propRealTime = Date.now();
-    timeManager.propTime();
-    satSet.satCruncher.postMessage({
-      typ: 'offset',
-      dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-    });
+    timeManager.calculateSimulationTime();
+    timeManager.synchronize();
     if (settingsManager.isPropRateChange && !settingsManager.isAlwaysHidePropRate && timeManager.propRate0 !== timeManager.propRate) {
       if (timeManager.propRate > 1.01 || timeManager.propRate < 0.99) {
         if (timeManager.propRate < 10) uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`, 'standby');
-        if (timeManager.propRate >= 10 && timeManager.propRate < 100) uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`, 'caution');
-        if (timeManager.propRate >= 100) uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`, 'serious');
+        if (timeManager.propRate >= 10 && timeManager.propRate < 60) uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`, 'caution');
+        if (timeManager.propRate >= 60) uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`, 'serious');
       } else {
         uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`, 'normal');
       }
@@ -1521,6 +1510,7 @@ uiManager.keyHandler = (evt) => {
     }
   }
 };
+uiManager.keyHandler = keyHandler;
 uiManager.hideLoadingScreen = () => {
   // Don't wait if we are running Jest
   if ((drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) || typeof process !== 'undefined') {

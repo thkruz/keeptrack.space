@@ -32,9 +32,49 @@ let isSensorListMenuOpen = false;
 let isSensorInfoMenuOpen = false;
 let isLookanglesMultiSiteMenuOpen = false;
 
+export const resetSensorButtonClick = () => {
+  settingsManager.isForceColorScheme = false;
+  $('#menu-sensor-info').addClass('bmenu-item-disabled');
+  $('#menu-fov-bubble').addClass('bmenu-item-disabled');
+  $('#menu-surveillance').addClass('bmenu-item-disabled');
+  $('#menu-planetarium').addClass('bmenu-item-disabled');
+  $('#menu-astronomy').addClass('bmenu-item-disabled');
+  resetSensorSelected();
+};
+export const csTelescopeClick = () => {
+  const { sensorManager } = keepTrackApi.programs;
+  if ($('#cs-telescope').is(':checked')) {
+    $('#cs-minaz-div').hide();
+    $('#cs-maxaz-div').hide();
+    $('#cs-minel-div').hide();
+    $('#cs-maxel-div').hide();
+    $('#cs-minrange-div').hide();
+    $('#cs-maxrange-div').hide();
+    $('#cs-minaz').val(0);
+    $('#cs-maxaz').val(360);
+    $('#cs-minel').val(10);
+    $('#cs-maxel').val(90);
+    $('#cs-minrange').val(100);
+    $('#cs-maxrange').val(1000000);
+  } else {
+    $('#cs-minaz-div').show();
+    $('#cs-maxaz-div').show();
+    $('#cs-minel-div').show();
+    $('#cs-maxel-div').show();
+    $('#cs-minrange-div').show();
+    $('#cs-maxrange-div').show();
+    if (sensorManager.checkSensorSelected()) {
+      $('#cs-minaz').val(sensorManager.selectedSensor.obsminaz);
+      $('#cs-maxaz').val(sensorManager.selectedSensor.obsmaxaz);
+      $('#cs-minel').val(sensorManager.selectedSensor.obsminel);
+      $('#cs-maxel').val(sensorManager.selectedSensor.obsmaxel);
+      $('#cs-minrange').val(sensorManager.selectedSensor.obsminrange);
+      $('#cs-maxrange').val(sensorManager.selectedSensor.obsmaxrange);
+    }
+  }
+};
 export const uiManagerInit = () => {
-  const { uiManager, sensorManager, timeManager, ColorScheme, satSet, satellite, settingsManager } = keepTrackApi.programs;
-  const mainCamera = keepTrackApi.programs.mainCamera;
+  const { satellite } = keepTrackApi.programs;
 
   (<any>$('#nav-mobile')).append(keepTrackApi.html`
     <div id="sensor-selected"></div>
@@ -386,203 +426,106 @@ export const uiManagerInit = () => {
   });
 
   $('#sensor-list-content > div > ul > .menu-selectable').on('click', (e) => {
-    if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.sensor();
-
     const sensorClick = e.currentTarget.dataset.sensor;
-    if (typeof sensorClick == 'undefined') {
-      console.warn('The menu item was clicked but the menu was not defined.');
-      return;
-    }
-
-    switch (sensorClick) {
-      case 'cspocAll':
-        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.cspocSensors();
-        sensorManager.setSensor('SSN');
-        break;
-      case 'mwAll':
-        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.mwSensors();
-        sensorManager.setSensor('NATO-MW');
-        break;
-      case 'mdAll':
-        sensorManager.setSensor('MD-ALL');
-        break;
-      case 'llAll':
-        sensorManager.setSensor('LEO-LABS');
-        break;
-      case 'rusAll':
-        sensorManager.setSensor('RUS-ALL');
-        break;
-      default:
-        sensorManager.setSensor(sensorManager.sensorList[`${sensorClick}`]);
-        break;
-    }
-
-    uiManager.getsensorinfo();
-
-    try {
-      uiManager.lookAtLatLon();
-    } catch {
-      // TODO: More intentional conditional statement
-      // Multi-sensors break this
-    }
-    if (settingsManager.currentColorScheme == ColorScheme.default) {
-      uiManager.legendMenuChange('default');
-    }
+    sensorListContentClick(sensorClick);
   });
 
-  const _resetSensorSelected = () => {
-    const satCruncher = keepTrackApi.programs.satCruncher;
-    // Return to default settings with nothing 'inview'
-    satellite.setobs(null);
-    sensorManager.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
-    uiManager.getsensorinfo();
-    if (settingsManager.currentColorScheme == ColorScheme.default) {
-      uiManager.legendMenuChange('default');
-    }
-    satCruncher.postMessage({
-      typ: 'offset',
-      dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-      setlatlong: true,
-      resetObserverGd: true,
-      sensor: sensorManager.defaultSensor,
-    });
-    satCruncher.postMessage({
-      isShowFOVBubble: 'reset',
-      isShowSurvFence: 'disable',
-    });
-    settingsManager.isFOVBubbleModeOn = false;
-    settingsManager.isShowSurvFence = false;
-    $('#menu-sensor-info').removeClass('bmenu-item-selected');
-    $('#menu-fov-bubble').removeClass('bmenu-item-selected');
-    $('#menu-surveillance').removeClass('bmenu-item-selected');
-    $('#menu-lookangles').removeClass('bmenu-item-selected');
-    $('#menu-planetarium').removeClass('bmenu-item-selected');
-    $('#menu-astronomy').removeClass('bmenu-item-selected');
-    $('#menu-sensor-info').addClass('bmenu-item-disabled');
-    $('#menu-fov-bubble').addClass('bmenu-item-disabled');
-    $('#menu-surveillance').addClass('bmenu-item-disabled');
-    $('#menu-lookangles').addClass('bmenu-item-disabled');
-    $('#menu-planetarium').addClass('bmenu-item-disabled');
-    $('#menu-astronomy').addClass('bmenu-item-disabled');
+  $('#reset-sensor-button').on('click', resetSensorButtonClick);
 
-    setTimeout(function () {
-      satSet.resetSatInView();
-      satSet.setColorScheme(settingsManager.currentColorScheme, true);
-    }, 2000);
+  $('#cs-telescope').on('click', csTelescopeClick);
 
-    keepTrackApi.methods.resetSensor();
-  };
-
-  $('#reset-sensor-button').on('click', function () {
-    settingsManager.isForceColorScheme = false;
-    $('#menu-sensor-info').addClass('bmenu-item-disabled');
-    $('#menu-fov-bubble').addClass('bmenu-item-disabled');
-    $('#menu-surveillance').addClass('bmenu-item-disabled');
-    $('#menu-planetarium').addClass('bmenu-item-disabled');
-    $('#menu-astronomy').addClass('bmenu-item-disabled');
-    _resetSensorSelected();
-  });
-
-  $('#cs-telescope').on('click', function () {
-    if ($('#cs-telescope').is(':checked')) {
-      $('#cs-minaz-div').hide();
-      $('#cs-maxaz-div').hide();
-      $('#cs-minel-div').hide();
-      $('#cs-maxel-div').hide();
-      $('#cs-minrange-div').hide();
-      $('#cs-maxrange-div').hide();
-      $('#cs-minaz').val(0);
-      $('#cs-maxaz').val(360);
-      $('#cs-minel').val(10);
-      $('#cs-maxel').val(90);
-      $('#cs-minrange').val(100);
-      $('#cs-maxrange').val(1000000);
-    } else {
-      $('#cs-minaz-div').show();
-      $('#cs-maxaz-div').show();
-      $('#cs-minel-div').show();
-      $('#cs-maxel-div').show();
-      $('#cs-minrange-div').show();
-      $('#cs-maxrange-div').show();
-      if (sensorManager.checkSensorSelected()) {
-        $('#cs-minaz').val(sensorManager.selectedSensor.obsminaz);
-        $('#cs-maxaz').val(sensorManager.selectedSensor.obsmaxaz);
-        $('#cs-minel').val(sensorManager.selectedSensor.obsminel);
-        $('#cs-maxel').val(sensorManager.selectedSensor.obsmaxel);
-        $('#cs-minrange').val(sensorManager.selectedSensor.obsminrange);
-        $('#cs-maxrange').val(sensorManager.selectedSensor.obsmaxrange);
-      }
-    }
-  });
-
-  $('#customSensor').on('submit', function (e) {
-    const satCruncher = keepTrackApi.programs.satCruncher;
-    $('#menu-sensor-info').removeClass('bmenu-item-disabled');
-    $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
-    $('#menu-surveillance').removeClass('bmenu-item-disabled');
-    $('#menu-planetarium').removeClass('bmenu-item-disabled');
-    $('#menu-astronomy').removeClass('bmenu-item-disabled');
-    sensorManager.whichRadar = 'CUSTOM';
-    $('#sensor-type').html((<string>$('#cs-type').val()).replace(/</gu, '&lt;').replace(/>/gu, '&gt;'));
-    $('#sensor-info-title').html('Custom Sensor');
-    $('#sensor-country').html('Custom Sensor');
-
-    let lon = $('#cs-lon').val();
-    let lat = $('#cs-lat').val();
-    const alt = $('#cs-hei').val();
-    const sensorType = $('#cs-type').val();
-    const minaz = $('#cs-minaz').val();
-    const maxaz = $('#cs-maxaz').val();
-    const minel = $('#cs-minel').val();
-    const maxel = $('#cs-maxel').val();
-    const minrange = $('#cs-minrange').val();
-    const maxrange = $('#cs-maxrange').val();
-
-    satCruncher.postMessage({
-      // Send satSet.satCruncher File information on this radar
-      typ: 'offset',
-      dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
-      setlatlong: true,
-      sensor: {
-        lat: parseFloat(<string>lat),
-        lon: parseFloat(<string>lon),
-        alt: parseFloat(<string>alt),
-        obsminaz: parseFloat(<string>minaz),
-        obsmaxaz: parseFloat(<string>maxaz),
-        obsminel: parseFloat(<string>minel),
-        obsmaxel: parseFloat(<string>maxel),
-        obsminrange: parseFloat(<string>minrange),
-        obsmaxrange: parseFloat(<string>maxrange),
-        type: sensorType,
-      },
-    });
-
-    satellite.setobs({
-      lat: parseFloat(<string>lat),
-      lon: parseFloat(<string>lon),
-      alt: parseFloat(<string>alt),
-      obsminaz: parseFloat(<string>minaz),
-      obsmaxaz: parseFloat(<string>maxaz),
-      obsminel: parseFloat(<string>minel),
-      obsmaxel: parseFloat(<string>maxel),
-      obsminrange: parseFloat(<string>minrange),
-      obsmaxrange: parseFloat(<string>maxrange),
-      type: sensorType,
-    });
-
-    // objectManager.setSelectedSat(-1);
-    lat = parseFloat(<string>lat);
-    lon = parseFloat(<string>lon);
-    if (maxrange > 6000) {
-      mainCamera.changeZoom('geo');
-    } else {
-      mainCamera.changeZoom('leo');
-    }
-    mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
-
+  $('#customSensor').on('submit', (e) => {
+    customSensorSubmit();
     e.preventDefault();
   });
 };
+
+export const resetSensorSelected = () => {
+  const { satellite, sensorManager, ColorScheme, uiManager, satSet } = keepTrackApi.programs;
+  // Return to default settings with nothing 'inview'
+  satellite.setobs(null);
+  sensorManager.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
+  // uiManager.getsensorinfo();
+  if (settingsManager.currentColorScheme == ColorScheme.default) {
+    uiManager.legendMenuChange('default');
+  }
+  satSet.satCruncher.postMessage({
+    setlatlong: true,
+    resetObserverGd: true,
+    sensor: sensorManager.defaultSensor,
+  });
+  satSet.satCruncher.postMessage({
+    isShowFOVBubble: 'reset',
+    isShowSurvFence: 'disable',
+  });
+  settingsManager.isFOVBubbleModeOn = false;
+  settingsManager.isShowSurvFence = false;
+  $('#menu-sensor-info').removeClass('bmenu-item-selected');
+  $('#menu-fov-bubble').removeClass('bmenu-item-selected');
+  $('#menu-surveillance').removeClass('bmenu-item-selected');
+  $('#menu-lookangles').removeClass('bmenu-item-selected');
+  $('#menu-planetarium').removeClass('bmenu-item-selected');
+  $('#menu-astronomy').removeClass('bmenu-item-selected');
+  $('#menu-sensor-info').addClass('bmenu-item-disabled');
+  $('#menu-fov-bubble').addClass('bmenu-item-disabled');
+  $('#menu-surveillance').addClass('bmenu-item-disabled');
+  $('#menu-lookangles').addClass('bmenu-item-disabled');
+  $('#menu-planetarium').addClass('bmenu-item-disabled');
+  $('#menu-astronomy').addClass('bmenu-item-disabled');
+
+  setTimeout(() => {
+    satSet.resetSatInView();
+    satSet.setColorScheme(settingsManager.currentColorScheme, true);
+  }, 2000);
+
+  keepTrackApi.methods.resetSensor();
+};
+
+export const sensorListContentClick = (sensorClick: string) => {
+  const { adviceManager, sensorManager, uiManager, ColorScheme } = keepTrackApi.programs;
+  if (settingsManager.plugins.topMenu) adviceManager.adviceList.sensor();
+
+  if (typeof sensorClick == 'undefined') {
+    console.warn('The menu item was clicked but the menu was not defined.');
+    return;
+  }
+
+  switch (sensorClick) {
+    case 'cspocAll':
+      if (settingsManager.plugins.topMenu) adviceManager.adviceList.cspocSensors();
+      sensorManager.setSensor('SSN');
+      break;
+    case 'mwAll':
+      if (settingsManager.plugins.topMenu) adviceManager.adviceList.mwSensors();
+      sensorManager.setSensor('NATO-MW');
+      break;
+    case 'mdAll':
+      sensorManager.setSensor('MD-ALL');
+      break;
+    case 'llAll':
+      sensorManager.setSensor('LEO-LABS');
+      break;
+    case 'rusAll':
+      sensorManager.setSensor('RUS-ALL');
+      break;
+    default:
+      sensorManager.setSensor(sensorManager.sensorList[`${sensorClick}`]);
+      break;
+  }
+
+  uiManager.getsensorinfo();
+
+  try {
+    uiManager.lookAtLatLon();
+  } catch {
+    // TODO: More intentional conditional statement
+    // Multi-sensors break this
+  }
+  if (settingsManager.currentColorScheme == ColorScheme.default) {
+    uiManager.legendMenuChange('default');
+  }
+};
+
 export const bottomMenuClick = (iconName: string): void => {
   const { uiManager, sensorManager, satSet, objectManager, satellite } = keepTrackApi.programs;
   switch (iconName) {
@@ -774,4 +717,67 @@ export const hideSideMenus = (): void => {
   isSensorInfoMenuOpen = false;
   keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = false;
   isLookanglesMultiSiteMenuOpen = false;
+};
+export const customSensorSubmit = (): void => {
+  const { sensorManager, satSet, satellite, mainCamera, timeManager } = keepTrackApi.programs;
+  $('#menu-sensor-info').removeClass('bmenu-item-disabled');
+  $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
+  $('#menu-surveillance').removeClass('bmenu-item-disabled');
+  $('#menu-planetarium').removeClass('bmenu-item-disabled');
+  $('#menu-astronomy').removeClass('bmenu-item-disabled');
+  sensorManager.whichRadar = 'CUSTOM';
+  $('#sensor-type').html((<string>$('#cs-type').val()).replace(/</gu, '&lt;').replace(/>/gu, '&gt;'));
+  $('#sensor-info-title').html('Custom Sensor');
+  $('#sensor-country').html('Custom Sensor');
+
+  let lon = $('#cs-lon').val();
+  let lat = $('#cs-lat').val();
+  const alt = $('#cs-hei').val();
+  const sensorType = $('#cs-type').val();
+  const minaz = $('#cs-minaz').val();
+  const maxaz = $('#cs-maxaz').val();
+  const minel = $('#cs-minel').val();
+  const maxel = $('#cs-maxel').val();
+  const minrange = $('#cs-minrange').val();
+  const maxrange = $('#cs-maxrange').val();
+
+  satSet.satCruncher.postMessage({
+    // Send satSet.satCruncher File information on this radar
+    setlatlong: true,
+    sensor: {
+      lat: parseFloat(<string>lat),
+      lon: parseFloat(<string>lon),
+      alt: parseFloat(<string>alt),
+      obsminaz: parseFloat(<string>minaz),
+      obsmaxaz: parseFloat(<string>maxaz),
+      obsminel: parseFloat(<string>minel),
+      obsmaxel: parseFloat(<string>maxel),
+      obsminrange: parseFloat(<string>minrange),
+      obsmaxrange: parseFloat(<string>maxrange),
+      type: sensorType,
+    },
+  });
+
+  satellite.setobs({
+    lat: parseFloat(<string>lat),
+    lon: parseFloat(<string>lon),
+    alt: parseFloat(<string>alt),
+    obsminaz: parseFloat(<string>minaz),
+    obsmaxaz: parseFloat(<string>maxaz),
+    obsminel: parseFloat(<string>minel),
+    obsmaxel: parseFloat(<string>maxel),
+    obsminrange: parseFloat(<string>minrange),
+    obsmaxrange: parseFloat(<string>maxrange),
+    type: sensorType,
+  });
+
+  // objectManager.setSelectedSat(-1);
+  lat = parseFloat(<string>lat);
+  lon = parseFloat(<string>lon);
+  if (maxrange > 6000) {
+    mainCamera.changeZoom('geo');
+  } else {
+    mainCamera.changeZoom('leo');
+  }
+  mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
 };

@@ -131,9 +131,10 @@ export const setupGetVariables = () => {
     }
   }
 
+  // Make sure everyone agrees on what time it is
+  timeManager.synchronize();
+
   satSet.satCruncher.postMessage({
-    typ: 'offset',
-    dat: timeManager.propOffset.toString() + ' ' + timeManager.propRate.toString(),
     setlatlong: true,
     lat: obslatitude,
     lon: obslongitude,

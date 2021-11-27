@@ -66,8 +66,8 @@ export const init = (): void => {
 
     // FIXME This should auto update the overlay when the time changes outside the original search window
     // Update once every 10 seconds
-    if ((timeManager.now > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 && objectManager.selectedSat === -1 && !cameraManager.isDragging && cameraManager.zoomLevel === cameraManager.zoomTarget) || isForceUpdate) {
-      const propTime = timeManager.propTime();
+    if ((timeManager.realTime > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 && objectManager.selectedSat === -1 && !cameraManager.isDragging && cameraManager.zoomLevel === cameraManager.zoomTarget) || isForceUpdate) {
+      const propTime = timeManager.calculateSimulationTime();
       infoOverlayDOM = [];
       infoOverlayDOM.push('<div>');
       for (let s = 0; s < nextPassArray.length; s++) {
@@ -75,7 +75,7 @@ export const init = (): void => {
       }
       infoOverlayDOM.push('</div>');
       document.getElementById('info-overlay-content').innerHTML = infoOverlayDOM.join('');
-      keepTrackApi.programs.watchlist.lastOverlayUpdateTime = timeManager.now;
+      keepTrackApi.programs.watchlist.lastOverlayUpdateTime = timeManager.realTime;
     }
   };
 
@@ -268,8 +268,7 @@ export const uiManagerInit = (): void => {
   });
 
   $('#watchlist-open').on('click', function () {
-    const satId = $(this).data('sat-id');
-    watchlistListClick(satId);
+    $('#watchlist-file').trigger('click');
   });
 
   $('#watchlist-file').on('change', function (evt) {
@@ -348,7 +347,7 @@ export const bottomMenuClick = (iconName: string) => {
         return;
       }
       uiManager.hideSideMenus();
-      if (nextPassArray.length === 0 || nextPassEarliestTime > timeManager.now || new Date(nextPassEarliestTime * 1 + 1000 * 60 * 60 * 24) < timeManager.now || isWatchlistChanged) {
+      if (nextPassArray.length === 0 || nextPassEarliestTime > timeManager.realTime || new Date(nextPassEarliestTime * 1 + 1000 * 60 * 60 * 24) < timeManager.realTime || isWatchlistChanged) {
         $('#loading-screen').fadeIn(1000, function () {
           nextPassArray = [];
           for (let x = 0; x < watchlistList.length; x++) {
@@ -358,7 +357,7 @@ export const bottomMenuClick = (iconName: string) => {
           nextPassArray.sort(function (a: { time: string | number | Date }, b: { time: string | number | Date }) {
             return new Date(a.time).getTime() - new Date(b.time).getTime();
           });
-          nextPassEarliestTime = timeManager.now;
+          nextPassEarliestTime = timeManager.realTime;
           keepTrackApi.programs.watchlist.lastOverlayUpdateTime = 0;
           uiManager.updateNextPassOverlay(nextPassArray, true);
           $('#loading-screen').fadeOut('slow');

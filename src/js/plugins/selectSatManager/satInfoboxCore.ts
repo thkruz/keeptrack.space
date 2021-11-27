@@ -212,7 +212,7 @@ export const nearOrbitsLink = () => {
   const { satSet, searchBox, satellite } = keepTrackApi.programs;
   // searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(objectManager.selectedSat)));
   const searchStr = searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(keepTrackApi.programs.objectManager.selectedSat)));
-  searchBox.doSearch(searchStr, false, satSet);
+  searchBox.doSearch(searchStr, false);
 };
 export const allObjectsLink = (): void => {
   const { uiManager, satSet, objectManager } = keepTrackApi.programs;
@@ -391,7 +391,7 @@ export const orbitalData = (sat: SatObject): void => {
     if (!keepTrackApi.programs.objectManager.isSensorManagerLoaded) {
       $('#sat-sun').parent().hide();
     } else {
-      now = new Date(keepTrackApi.programs.timeManager.propRealTime + keepTrackApi.programs.timeManager.propOffset);
+      now = new Date(keepTrackApi.programs.timeManager.dynamicOffsetEpoch + keepTrackApi.programs.timeManager.propOffset);
       const sunTime: any = SunCalc.getTimes(now, keepTrackApi.programs.sensorManager.currentSensor.lat, keepTrackApi.programs.sensorManager.currentSensor.lon);
 
       let satInSun = -1;

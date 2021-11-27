@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v5.0.2](https://github.com/thkruz/keeptrack.space/compare/v5.0.1...v5.0.2)
+
+> 27 November 2021 
+
+- fix(timemanager): improved time sync between satCruncher orbitCruncher and main thread [`85b8083`](https://github.com/thkruz/keeptrack.space/commit/85b80833e51dc122e01c107c1d5615a90e411a34)
+- refactor(timemanager): consolidated all propRate propOffset and satCruncher time communication [`f7cefae`](https://github.com/thkruz/keeptrack.space/commit/f7cefaed10208faecbd0decb76c43c25b73b38e3)
+- refactor(timemanager/transforms.ts): refactored time conversion functions out of timeManager.ts [`852a281`](https://github.com/thkruz/keeptrack.space/commit/852a2813cc6b3b79bcbf659c0056fa1e2204658b)
+- fix(initialorbit): creating an analyst satellite automatically searches for it now [`8e6fc22`](https://github.com/thkruz/keeptrack.space/commit/8e6fc22d731a665e4242387146e2bd509b6e51da)
+- fix(watchlist): load watchlist now calls the correct function [`6424758`](https://github.com/thkruz/keeptrack.space/commit/642475805e78a09b42ca30b190c89623cdd7047b)
+- fix(selectsatmanager): fixed bug where search box was displayed empty and updated political map [`01d2170`](https://github.com/thkruz/keeptrack.space/commit/01d2170cd45c15cb65070e99f8004b20b35be82b)
+- refactor(multiple): minor ts errors fixed or hidden [`79c2f38`](https://github.com/thkruz/keeptrack.space/commit/79c2f3801e7134539f8d9417e43dcde80a882bde)
+- changelog [`6dd5d52`](https://github.com/thkruz/keeptrack.space/commit/6dd5d5224d2e282e5c92bada665cfc378d69d32a)
+- fix(sensor): sensor reset button now sets the sensor back to defaults [`9aade41`](https://github.com/thkruz/keeptrack.space/commit/9aade4135e381f24acab439ab4e03cd484b18ce6)
+
 #### [v5.0.1](https://github.com/thkruz/keeptrack.space/compare/v5.0.0...v5.0.1)
 
 > 22 November 2021 

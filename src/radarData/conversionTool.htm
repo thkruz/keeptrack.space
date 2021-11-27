@@ -83,7 +83,7 @@
           for (let i = 0; i < radarData.length; i++) {
             nowDate = new Date(radarData[i].t);
 
-            j = timeManager.jday(
+            j = jday(
               nowDate.getUTCFullYear(),
               nowDate.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
               nowDate.getUTCDate(),

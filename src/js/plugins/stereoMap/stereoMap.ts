@@ -339,7 +339,7 @@ export const hideSideMenus = (): void => {
   mapManager.isMapMenuOpen = false;
 };
 export const mapMenuClick = (evt: any) => {
-  const { timeManager, satSet } = keepTrackApi.programs;
+  const { timeManager } = keepTrackApi.programs;
   settingsManager.isMapUpdateOverride = true;
   // Might be better code for this.
   let time = evt.currentTarget.attributes.time.value;
@@ -347,11 +347,6 @@ export const mapMenuClick = (evt: any) => {
     time = time.split(' ');
     time = new Date(time[0] + 'T' + time[1] + 'Z');
     const today = new Date(); // Need to know today for offset calculation
-    timeManager.propOffset = time.getTime() - today.getTime(); // Find the offset from today
-    satSet.satCruncher.postMessage({
-      // Tell satSet.satCruncher we have changed times for orbit calculations
-      typ: 'offset',
-      dat: timeManager.propOffset.toString() + ' ' + (1.0).toString(),
-    });
+    timeManager.changeStaticOffset(time.getTime() - today.getTime()); // Find the offset from today
   }
 };

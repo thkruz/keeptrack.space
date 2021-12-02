@@ -19,15 +19,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-// import 'jquery-ui-bundle';
-// import '@app/js/lib/external/jquery-ui-slideraccess.js';
-// import '@app/js/lib/external/jquery-ui-timepicker.js';
-// import '@app/js/lib/external/perfect-scrollbar.min.js';
-// import '@app/js/lib/external/jquery.colorbox.min.js';
-// import '@app/js/lib/external/jquery-ajax.js';
-// import '@app/js/lib/external/colorPick.js';
-// import 'materialize-css';
-// eslint-disable-next-line sort-imports
+// organize-imports-ignore
 import 'jquery-ui-bundle';
 import '@app/js/lib/external/jquery-ui-slideraccess.js';
 import '@app/js/lib/external/jquery-ui-timepicker.js';
@@ -36,21 +28,20 @@ import '@app/js/lib/external/jquery.colorbox.min.js';
 import '@app/js/lib/external/jquery-ajax.js';
 import '@app/js/lib/external/colorPick.js';
 import 'materialize-css';
+// eslint-disable-next-line sort-imports
 import { keepTrackApi } from '@app/js/api/externalApi';
-import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory';
 import { drawManager } from '@app/js/drawManager/drawManager';
+import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory';
 import { DEG2RAD } from '@app/js/lib/constants.js';
-import { rgbCss, saveCsv } from '@app/js/lib/helpers';
-import { objectManager } from '@app/js/objectManager/objectManager.js';
-import { orbitManager } from '@app/js/orbitManager/orbitManager';
-import { sensorManager } from '@app/js/plugins/sensor/sensorManager';
-import { satellite } from '@app/js/satMath/satMath';
-import { satSet } from '@app/js/satSet/satSet';
-import { timeManager } from '@app/js/timeManager/timeManager';
+import { rgbCss } from '@app/js/lib/helpers';
 import { mobileManager } from '@app/js/uiManager/mobileManager.js';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { UiManager } from '@app/types/types';
 import $ from 'jquery';
+import { SensorObject } from '../api/keepTrack';
+import { useCurrentGeolocationAsSensor } from './httpsOnly';
+import { keyHandler } from './keyHandler';
+import { initMenuController } from './menuController';
 import { uiLimited } from './ui-limited.js';
 import { uiInput } from './uiInput';
 import { initUiValidation } from './uiValidation';
@@ -62,18 +53,13 @@ $.ajaxSetup({
 });
 
 var updateInterval = 1000;
-var createClockDOMOnce = false;
 settingsManager.lastBoxUpdateTime = 0;
 
-let mainCamera, lineManager, starManager;
 export const init = () => {
   if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
     // Pass the references through to the limited UI
     uiLimited.init(keepTrackApi.programs.satSet, keepTrackApi.programs.orbitManager, keepTrackApi.programs.groupsManager, keepTrackApi.programs.ColorScheme);
   }
-  mainCamera = keepTrackApi.programs.mainCamera;
-  lineManager = keepTrackApi.programs.lineManager;
-  starManager = keepTrackApi.programs.starManager;
 
   initUiValidation();
 
@@ -173,7 +159,9 @@ const hideUi = () => {
   }
 };
 
-var _updateSelectBox = () => {
+const _updateSelectBox = () => {
+  const { objectManager, satSet, timeManager } = keepTrackApi.programs;
+
   // IDEA: Include updates when satellite edited regardless of time.
 
   // Don't update if no object is selected
@@ -190,7 +178,9 @@ var _updateSelectBox = () => {
   }
 };
 
-export const legendMenuChange = function (menu) {
+export const legendMenuChange = (menu: string) => {
+  const { objectManager, sensorManager } = keepTrackApi.programs;
+
   $('#legend-list-default').hide();
   $('#legend-list-default-sensor').hide();
   $('#legend-list-rcs').hide();
@@ -353,17 +343,19 @@ export const footerToggle = function () {
 };
 
 export const getsensorinfo = () => {
-  $('#sensor-latitude').html(sensorManager.currentSensor.lat.toString());
-  $('#sensor-longitude').html(sensorManager.currentSensor.lon.toString());
-  $('#sensor-minazimuth').html(sensorManager.currentSensor.obsminaz.toString());
-  $('#sensor-maxazimuth').html(sensorManager.currentSensor.obsmaxaz.toString());
-  $('#sensor-minelevation').html(sensorManager.currentSensor.obsminel.toString());
-  $('#sensor-maxelevation').html(sensorManager.currentSensor.obsmaxel.toString());
-  $('#sensor-minrange').html(sensorManager.currentSensor.obsminrange.toString());
-  $('#sensor-maxrange').html(sensorManager.currentSensor.obsmaxrange.toString());
+  const { currentSensor }: { currentSensor: SensorObject } = keepTrackApi.programs.sensorManager;
+
+  $('#sensor-latitude').html(currentSensor.lat.toString());
+  $('#sensor-longitude').html(currentSensor.lon.toString());
+  $('#sensor-minazimuth').html(currentSensor.obsminaz.toString());
+  $('#sensor-maxazimuth').html(currentSensor.obsmaxaz.toString());
+  $('#sensor-minelevation').html(currentSensor.obsminel.toString());
+  $('#sensor-maxelevation').html(currentSensor.obsmaxel.toString());
+  $('#sensor-minrange').html(currentSensor.obsminrange.toString());
+  $('#sensor-maxrange').html(currentSensor.obsmaxrange.toString());
 };
 
-let doSearch = (searchString, isPreventDropDown) => {
+let doSearch = (searchString: string, isPreventDropDown: boolean) => {
   if (searchString == '') {
     searchBox.hideResults();
   } else {
@@ -826,234 +818,7 @@ export const onReady = () => {
     $('#earth-rmb-menu').hide();
   };
 
-  uiManager.menuController = () => {
-    // Reset time if in retro mode
-    if (settingsManager.retro) {
-      timeManager.staticOffset = new Date(2000, 2, 13).getTime() - Date.now();
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
-    }
-
-    $('#search-icon').on('click', function () {
-      uiManager.searchToggle();
-    });
-
-    $('.menu-item').on('mouseover', function () {
-      $(this).children('.submenu').css({
-        display: 'block',
-      });
-    });
-
-    $('.menu-item').on('mouseout', function () {
-      $(this).children('.submenu').css({
-        display: 'none',
-      });
-    });
-
-    $('#search-close').on('click', function () {
-      searchBox.hideResults();
-      $('#menu-space-stations').removeClass('bmenu-item-selected');
-    });
-
-    uiManager.legendHoverMenuClick = legendHoverMenuClick;
-
-    $('#legend-hover-menu').on('click', function (e) {
-      uiManager.legendHoverMenuClick(e.target.classList[1]);
-    });
-
-    $('#legend-menu').on('click', function () {
-      if (settingsManager.legendMenuOpen) {
-        $('#legend-hover-menu').hide();
-        $('#legend-icon').removeClass('bmenu-item-selected');
-        settingsManager.legendMenuOpen = false;
-      } else {
-        // uiManager.legendColorsChange(); // Disabled colors show up again.
-        $('#legend-hover-menu').show();
-        $('#legend-icon').addClass('bmenu-item-selected');
-        searchBox.hideResults();
-        $('#search-results').hide();
-        settingsManager.legendMenuOpen = true;
-      }
-    });
-
-    $('.menu-selectable').on('click', function () {
-      if (objectManager.selectedSat !== -1) {
-        $('#menu-lookangles').removeClass('bmenu-item-disabled');
-        $('#menu-satview').removeClass('bmenu-item-disabled');
-      }
-    });
-
-    // Resizing Listener
-    $(window).on('resize', function () {
-      mobileManager.checkMobileMode();
-      if (!settingsManager.disableUI) {
-        const bodyDOM = $('#bodyDOM');
-        if (settingsManager.screenshotMode) {
-          bodyDOM.css('overflow', 'visible');
-          $('#canvas-holder').css('overflow', 'visible');
-          $('#canvas-holder').width(3840);
-          $('#canvas-holder').height(2160);
-          bodyDOM.width(3840);
-          bodyDOM.height(2160);
-        } else {
-          bodyDOM.css('overflow', 'hidden');
-          $('#canvas-holder').css('overflow', 'hidden');
-        }
-      }
-      settingsManager.isResizing = true;
-    });
-
-    $('#search').on('focus', function () {
-      uiManager.isCurrentlyTyping = true;
-    });
-    $('#ui-wrapper').on('focusin', function () {
-      uiManager.isCurrentlyTyping = true;
-    });
-
-    $('#search').on('blur', function () {
-      uiManager.isCurrentlyTyping = false;
-    });
-    $('#ui-wrapper').on('focusout', function () {
-      uiManager.isCurrentlyTyping = false;
-    });
-
-    $('#search-results').on('click', '.search-result', function () {
-      var satId = $(this).data('sat-id');
-      objectManager.setSelectedSat(satId);
-    });
-
-    $('#search-results').on('mouseover', '.search-result', function () {
-      var satId = $(this).data('sat-id');
-      orbitManager.setHoverOrbit(satId);
-      satSet.setHover(satId);
-      searchBox.isHovering(true);
-      searchBox.setHoverSat(satId);
-    });
-    $('#search-results').on('mouseout', function () {
-      orbitManager.clearHoverOrbit();
-      satSet.setHover(-1);
-      searchBox.isHovering(false);
-    });
-
-    $('#search').on('input', function () {
-      const searchStr = <string>$('#search').val();
-      uiManager.doSearch(searchStr);
-    });
-
-    var isSocialOpen = false;
-    $('#share-icon').on('click', function () {
-      if (!isSocialOpen) {
-        isSocialOpen = true;
-        $('#github-share').removeClass('share-up');
-        $('#twitter-share').removeClass('share-up');
-        $('#github-share').addClass('github-share-down');
-        $('#twitter-share').addClass('twitter-share-down');
-      } else {
-        isSocialOpen = false;
-        $('#github-share').addClass('share-up');
-        $('#twitter-share').addClass('share-up');
-        $('#github-share').removeClass('github-share-down');
-        $('#twitter-share').removeClass('twitter-share-down');
-      }
-    });
-
-    $('#fullscreen-icon').on('click', function () {
-      mobileManager.fullscreenToggle();
-    });
-
-    $('#nav-footer-toggle').on('click', function () {
-      uiManager.footerToggle();
-      if (parseInt(window.getComputedStyle(document.getElementById('nav-footer')).bottom.replace('px', '')) < 0) {
-        setTimeout(() => {
-          const bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
-          document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
-        }, 1000); // Wait for the footer to be fully visible.
-      } else {
-        // If the footer is open, then it will be hidden shortly but we don't want to wait for it to be hidden
-        document.documentElement.style.setProperty('--bottom-menu-top', '0px');
-      }
-    });
-
-    // Allow All Side Menu Resizing
-    (<any>$('#sensor-list-menu')).resizable({
-      handles: 'e',
-      stop: function () {
-        $(this).css('height', '');
-      },
-      maxWidth: 400,
-      minWidth: 280,
-    });
-
-    (<any>$('#sensor-info-menu')).resizable({
-      handles: 'e',
-      stop: function () {
-        $(this).css('height', '');
-      },
-      maxWidth: 400,
-      minWidth: 280,
-    });
-
-    (<any>$('#lookangles-menu')).resizable({
-      handles: 'e',
-      stop: function () {
-        $(this).css('height', '');
-      },
-      maxWidth: 450,
-      minWidth: 280,
-    });
-
-    (<any>$('#lookanglesmultisite-menu')).resizable({
-      handles: 'e',
-      stop: function () {
-        $(this).css('height', '');
-      },
-      maxWidth: 450,
-      minWidth: 300,
-    });
-
-    (<any>$('#findByLooks-menu')).resizable({
-      handles: 'e',
-      stop: function () {
-        $(this).css('height', '');
-      },
-      maxWidth: 450,
-      minWidth: 280,
-    });
-
-    (<any>$('#customSensor-menu')).resizable({
-      handles: 'e',
-      stop: function () {
-        $(this).css('height', '');
-      },
-      maxWidth: 450,
-      minWidth: 280,
-    });
-
-    (<any>$('#settings-menu')).resizable({
-      handles: 'e',
-      stop: function () {
-        $(this).css('height', '');
-      },
-      maxWidth: 450,
-      minWidth: 280,
-    });
-
-    (<any>$('#about-menu')).resizable({
-      handles: 'e',
-      stop: function () {
-        $(this).css('height', '');
-      },
-      maxWidth: 450,
-      minWidth: 280,
-    });
-
-    $('#export-lookangles').on('click', function () {
-      saveCsv(satellite.lastlooksArray, 'lookAngles');
-    });
-
-    $('#export-multiSiteArray').on('click', function () {
-      saveCsv(satellite.lastMultiSiteArray, 'multiSiteLooks');
-    });
-  };
+  uiManager.menuController = initMenuController;
 
   // Run any plugins code
   keepTrackApi.methods.uiManagerOnReady();
@@ -1075,59 +840,51 @@ export const onReady = () => {
 };
 
 export const uiManager: UiManager = {
-  uiInput: null,
-  searchBox: null,
-  mobileManager: null,
+  hideUi: hideUi,
+  isUiVisible: false,
+  keyHandler: keyHandler,
+  uiInput: uiInput,
+  useCurrentGeolocationAsSensor: useCurrentGeolocationAsSensor,
+  searchBox: searchBox,
+  mobileManager: mobileManager,
   isCurrentlyTyping: false,
+  onReady: onReady,
+  legendMenuChange: legendMenuChange,
+  init: init,
+  postStart: postStart,
+  getsensorinfo: getsensorinfo,
+  footerToggle: footerToggle,
   searchToggle: null,
   hideSideMenus: null,
-  isUiVisible: null,
-  hideUi: null,
-  keyHandler: null,
-  legendMenuChange: null,
   hideLoadingScreen: null,
   loadStr: null,
-  useCurrentGeolocationAsSensor: null,
   legendColorsChange: null,
   colorSchemeChangeAlert: null,
   lastColorScheme: null,
   updateURL: null,
   lookAtLatLon: null,
   reloadLastSensor: null,
-  getsensorinfo: null,
   doSearch: null,
   startLowPerf: null,
   panToStar: null,
   clearRMBSubMenu: null,
   menuController: null,
   legendHoverMenuClick: null,
-  footerToggle: null,
   bottomIconPress: null,
-  onReady: null,
-  init: null,
-  postStart: null,
   toast: null,
+  createClockDOMOnce: false,
 };
-
-uiManager.uiInput = uiInput;
-uiManager.searchBox = searchBox;
-uiManager.mobileManager = mobileManager;
-uiManager.isCurrentlyTyping = false;
-uiManager.onReady = onReady;
-uiManager.legendMenuChange = legendMenuChange;
-uiManager.init = init;
-uiManager.postStart = postStart;
-uiManager.getsensorinfo = getsensorinfo;
-uiManager.footerToggle = footerToggle;
 
 // c is string name of star
 // TODO: uiManager.panToStar needs to be finished
 // Yaw needs fixed. Needs to incorporate a time calculation
 /* istanbul ignore next */
 uiManager.panToStar = function (c) {
+  const { objectManager, satSet, timeManager, lineManager, mainCamera, starManager } = keepTrackApi.programs;
+
   // Try with the pname
-  var satId = satSet.getIdFromStarName(c.pname);
-  var sat = satSet.getSat(satId);
+  let satId = satSet.getIdFromStarName(c.pname);
+  let sat = satSet.getSat(satId);
 
   // If null try again with the bf
   if (sat == null) {
@@ -1214,6 +971,8 @@ uiManager.loadStr = (str) => {
   }
 };
 uiManager.doSearch = (searchString, isPreventDropDown) => {
+  const { satSet } = keepTrackApi.programs;
+
   let idList = searchBox.doSearch(searchString, isPreventDropDown);
   if (settingsManager.isSatOverflyModeOn) {
     satSet.satCruncher.postMessage({
@@ -1257,6 +1016,8 @@ uiManager.toast = (toastText: string, type: string, isLong: boolean) => {
   }
 };
 uiManager.updateURL = () => {
+  const { objectManager, satSet, timeManager, settingsManager } = keepTrackApi.programs;
+
   var arr = window.location.href.split('?');
   var url = arr[0];
   var paramSlices = [];
@@ -1285,9 +1046,6 @@ uiManager.updateURL = () => {
 
   window.history.replaceState(null, 'Keeptrack', url);
 };
-uiManager.lookAtLatLon = () => {
-  mainCamera.lookAtLatLon(sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, sensorManager.selectedSensor.zoom, timeManager.selectedDate);
-};
 uiManager.reloadLastSensor = () => {
   let currentSensor;
   try {
@@ -1297,6 +1055,8 @@ uiManager.reloadLastSensor = () => {
   }
   if (currentSensor !== null) {
     try {
+      const { sensorManager, mainCamera, timeManager } = keepTrackApi.programs;
+
       // If there is a staticnum set use that
       if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
         sensorManager.setSensor(null, currentSensor[1]);
@@ -1308,13 +1068,13 @@ uiManager.reloadLastSensor = () => {
           sensorManager.setSensor(currentSensor[0], currentSensor[1]);
           uiManager.getsensorinfo();
           uiManager.legendMenuChange('default');
-          uiManager.lookAtLatLon();
+          mainCamera.lookAtLatLon(sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, sensorManager.selectedSensor.zoom, timeManager.selectedDate);
         } else {
           // Seems to be a single sensor without a staticnum, load that
           sensorManager.setSensor(sensorManager.sensorList[currentSensor[0].shortName], currentSensor[1]);
           uiManager.getsensorinfo();
           uiManager.legendMenuChange('default');
-          uiManager.lookAtLatLon();
+          mainCamera.lookAtLatLon(sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, sensorManager.selectedSensor.zoom, timeManager.selectedDate);
         }
       }
     } catch (e) {
@@ -1328,189 +1088,30 @@ uiManager.reloadLastSensor = () => {
     }
   }
 };
-uiManager.colorSchemeChangeAlert = (scheme) => {
+uiManager.colorSchemeChangeAlert = (newScheme) => {
   // Don't Make an alert the first time!
-  if (typeof uiManager.lastColorScheme == 'undefined' && scheme.default) {
-    uiManager.lastColorScheme = scheme;
+  if (typeof uiManager.lastColorScheme == 'undefined' && newScheme.default) {
+    uiManager.lastColorScheme = newScheme;
     return;
   }
 
   // Don't make an alert unless something has really changed
-  if (uiManager.lastColorScheme == scheme) return;
-  uiManager.lastColorScheme = scheme;
-  for (var i = 0; i < Object.keys(ColorScheme).length; i++) {
-    if (scheme == ColorScheme[Object.keys(ColorScheme)[i]]) {
-      M.toast({
-        html: `Color Scheme changed to ${Object.keys(ColorScheme)[i]}`,
-      });
+  if (uiManager.lastColorScheme == newScheme) return;
+
+  for (const scheme in ColorScheme) {
+    if (newScheme == ColorScheme[scheme]) {
+      // record the new color scheme
+      uiManager.lastColorScheme = newScheme;
+      // Make an alert
+      uiManager.toast(`Color Scheme Changed to ${scheme}`, 'normal', false);
+      return;
     }
   }
+
+  // If we get here, the color scheme is invalid
+  throw new Error('Invalid Color Scheme');
 };
-uiManager.hideUi = hideUi;
-uiManager.isUiVisible = false;
-export const keyHandler = (evt: KeyboardEvent) => {
-  // Error Handling
-  if (typeof evt.key == 'undefined') return;
 
-  const {mainCamera, timeManager} = keepTrackApi.programs;
-
-  if (uiManager.isCurrentlyTyping) return;
-  // console.log(Number(evt.charCode));
-  switch (evt.key.toUpperCase()) {
-    case 'R':
-      mainCamera.autoRotate();
-      break;
-    case 'C':
-      mainCamera.changeCameraType(orbitManager, drawManager, objectManager, sensorManager);
-
-      switch (mainCamera.cameraType.current) {
-        case mainCamera.cameraType.Default:
-          uiManager.toast('Earth Centered Camera Mode', 'standby');
-          mainCamera.zoomTarget(0.5);
-          break;
-        case mainCamera.cameraType.Offset:
-          uiManager.toast('Offset Camera Mode', 'standby');
-          break;
-        case mainCamera.cameraType.Fps:
-          uiManager.toast('Free Camera Mode', 'standby');
-          $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
-          break;
-        case mainCamera.cameraType.Planetarium:
-          uiManager.toast('Planetarium Camera Mode', 'standby');
-          uiManager.legendMenuChange('planetarium');
-          $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
-          break;
-        case mainCamera.cameraType.Satellite:
-          uiManager.toast('Satellite Camera Mode', 'standby');
-          $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
-          break;
-        case mainCamera.cameraType.Astronomy:
-          uiManager.toast('Astronomy Camera Mode', 'standby');
-          uiManager.legendMenuChange('astronomy');
-          $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
-          break;
-      }
-      break;
-    // Open the search bar for faster searching
-    // TODO: What if it isn't available?
-    case 'F':
-      if (mainCamera.isShiftPressed) {
-        evt.preventDefault();
-        uiManager.searchToggle(true);
-        $('#search').trigger('focus');
-        mainCamera.isShiftPressed = false;
-      }
-      break;
-    // Hide the UI
-    case 'H':
-      if (mainCamera.isShiftPressed) {
-        uiManager.hideUi();
-        mainCamera.isShiftPressed = false;
-      }
-      break;
-  }
-
-  switch (evt.key) {
-    case '!':
-      timeManager.changeStaticOffset(0); // Reset to Current Time
-      settingsManager.isPropRateChange = true;
-      break;
-    case ',':
-      timeManager.calculateSimulationTime();
-      timeManager.changeStaticOffset(timeManager.staticOffset - 1000 * 60); // Move back a Minute
-      settingsManager.isPropRateChange = true;
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
-      break;
-    case '.':
-      timeManager.calculateSimulationTime();
-      timeManager.changeStaticOffset(timeManager.staticOffset + 1000 * 60); // Move forward a Minute
-      settingsManager.isPropRateChange = true;
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
-      break;
-    case '<':
-      timeManager.calculateSimulationTime();
-      timeManager.changeStaticOffset(timeManager.staticOffset - 4000 * 60); // Move back 4 Minutes
-      settingsManager.isPropRateChange = true;
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
-      break;
-    case '>':
-      timeManager.calculateSimulationTime();
-      timeManager.changeStaticOffset(timeManager.staticOffset + 4000 * 60); // Move forward 4 Minutes
-      settingsManager.isPropRateChange = true;
-      keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
-      break;
-    case '0':
-      timeManager.calculateSimulationTime();
-      timeManager.changePropRate(0);
-      settingsManager.isPropRateChange = true;
-      break;
-    case '+':
-    case '=':
-      timeManager.calculateSimulationTime();
-      if (timeManager.propRate < 0.001 && timeManager.propRate > -0.001) {
-        timeManager.changePropRate(0.001);
-      }
-
-      if (timeManager.propRate > 1000) {
-        timeManager.changePropRate(1000);
-      }
-
-      if (timeManager.propRate < 0) {
-        timeManager.changePropRate((timeManager.propRate * 2) / 3);
-      } else {
-        timeManager.changePropRate(timeManager.propRate * 1.5);
-      }
-      settingsManager.isPropRateChange = true;
-      break;
-    case '-':
-    case '_':
-      timeManager.calculateSimulationTime();
-      if (timeManager.propRate < 0.001 && timeManager.propRate > -0.001) {
-        timeManager.changePropRate(-0.001);
-      }
-
-      if (timeManager.propRate < -1000) {
-        timeManager.changePropRate(-1000);
-      }
-
-      if (timeManager.propRate < 0) {
-        timeManager.changePropRate(timeManager.propRate * 1.5);
-      } else {
-        timeManager.changePropRate((timeManager.propRate * 2) / 3);
-      }
-      settingsManager.isPropRateChange = true;
-      break;
-    case '1':
-      timeManager.calculateSimulationTime();
-      timeManager.changePropRate(1.0);
-      settingsManager.isPropRateChange = true;
-      break;
-  }
-
-  if (settingsManager.isPropRateChange) {
-    timeManager.calculateSimulationTime();
-    timeManager.synchronize();
-    if (settingsManager.isPropRateChange && !settingsManager.isAlwaysHidePropRate && timeManager.propRate0 !== timeManager.propRate) {
-      if (timeManager.propRate > 1.01 || timeManager.propRate < 0.99) {
-        if (timeManager.propRate < 10) uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`, 'standby');
-        if (timeManager.propRate >= 10 && timeManager.propRate < 60) uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`, 'caution');
-        if (timeManager.propRate >= 60) uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`, 'serious');
-      } else {
-        uiManager.toast(`Propagation Speed: ${timeManager.propRate.toFixed(1)}x`, 'normal');
-      }
-    }
-
-    if (!settingsManager.disableUI) {
-      if (!createClockDOMOnce) {
-        document.getElementById('datetime-text').innerText = timeManager.timeTextStr;
-        createClockDOMOnce = true;
-      } else {
-        document.getElementById('datetime-text').childNodes[0].nodeValue = timeManager.timeTextStr;
-      }
-    }
-  }
-};
-uiManager.keyHandler = keyHandler;
 uiManager.hideLoadingScreen = () => {
   // Don't wait if we are running Jest
   if ((drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) || typeof process !== 'undefined') {
@@ -1580,98 +1181,7 @@ uiManager.searchToggle = (force?: boolean) => {
     // uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
   }
 };
-uiManager.useCurrentGeolocationAsSensor = function () {
-  if (location.protocol === 'https:' && !settingsManager.geolocationUsed && settingsManager.isMobileModeEnabled) {
-    navigator.geolocation.getCurrentPosition(function (position) {
-      settingsManager.geolocation.lat = position.coords.latitude;
-      settingsManager.geolocation.lon = position.coords.longitude;
-      settingsManager.geolocation.alt = 0;
-      settingsManager.geolocation.minaz = 0;
-      settingsManager.geolocation.maxaz = 360;
-      settingsManager.geolocation.minel = 30;
-      settingsManager.geolocation.maxel = 90;
-      settingsManager.geolocation.minrange = 0;
-      settingsManager.geolocation.maxrange = 100000;
-      sensorManager.whichRadar = 'CUSTOM';
 
-      $('#cs-lat').val(settingsManager.geolocation.lat).trigger('change');
-      $('#cs-lon').val(settingsManager.geolocation.lon).trigger('change');
-      $('#cs-hei').val(settingsManager.geolocation.alt).trigger('change');
-
-      $('#cs-telescope').attr('checked', 'checked');
-      $('#cs-minaz').attr('disabled', true.toString());
-      $('#cs-maxaz').attr('disabled', true.toString());
-      $('#cs-minel').attr('disabled', true.toString());
-      $('#cs-maxel').attr('disabled', true.toString());
-      $('#cs-minrange').attr('disabled', true.toString());
-      $('#cs-maxrange').attr('disabled', true.toString());
-      $('#cs-minaz-div').hide();
-      $('#cs-maxaz-div').hide();
-      $('#cs-minel-div').hide();
-      $('#cs-maxel-div').hide();
-      $('#cs-minrange-div').hide();
-      $('#cs-maxrange-div').hide();
-      $('#cs-minaz').val(0);
-      $('#cs-maxaz').val(360);
-      $('#cs-minel').val(10);
-      $('#cs-maxel').val(90);
-      $('#cs-minrange').val(100);
-      $('#cs-maxrange').val(50000);
-
-      $('#sensor-type').html('Telescope');
-      $('#sensor-info-title').html('Custom Sensor');
-      $('#sensor-country').html('Custom Sensor');
-
-      var lon = settingsManager.geolocation.lon;
-      var lat = settingsManager.geolocation.lat;
-      var alt = settingsManager.geolocation.alt;
-      var minaz = settingsManager.geolocation.minaz;
-      var maxaz = settingsManager.geolocation.maxaz;
-      var minel = settingsManager.geolocation.minel;
-      var maxel = settingsManager.geolocation.maxel;
-      var minrange = settingsManager.geolocation.minrange;
-      var maxrange = settingsManager.geolocation.maxrange;
-
-      satSet.satCruncher.postMessage({
-        // Send satSet.satCruncher File information on this radar
-        setlatlong: true, // Tell satSet.satCruncher we are changing observer location
-        sensor: {
-          lat: lat,
-          lon: lon,
-          alt: alt,
-          obsminaz: minaz,
-          obsmaxaz: maxaz,
-          obsminel: minel,
-          obsmaxel: maxel,
-          obsminrange: minrange,
-          obsmaxrange: maxrange,
-        },
-      });
-
-      satellite.setobs({
-        lat: lat,
-        lon: lon,
-        alt: alt,
-        obsminaz: minaz,
-        obsmaxaz: maxaz,
-        obsminel: minel,
-        obsmaxel: maxel,
-        obsminrange: minrange,
-        obsmaxrange: maxrange,
-      });
-
-      objectManager.setSelectedSat(-1);
-      lat = lat * 1;
-      lon = lon * 1;
-      if (maxrange > 6000) {
-        mainCamera.changeZoom('geo');
-      } else {
-        mainCamera.changeZoom('leo');
-      }
-      mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
-    });
-  }
-};
 uiManager.legendColorsChange = function () {
   ColorScheme.resetObjectTypeFlags();
 

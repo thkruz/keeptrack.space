@@ -482,7 +482,7 @@ export const resetSensorSelected = () => {
 };
 
 export const sensorListContentClick = (sensorClick: string) => {
-  const { adviceManager, sensorManager, uiManager, ColorScheme } = keepTrackApi.programs;
+  const { adviceManager, sensorManager, uiManager, ColorScheme, mainCamera, timeManager } = keepTrackApi.programs;
   if (settingsManager.plugins.topMenu) adviceManager.adviceList.sensor();
 
   if (typeof sensorClick == 'undefined') {
@@ -516,7 +516,7 @@ export const sensorListContentClick = (sensorClick: string) => {
   uiManager.getsensorinfo();
 
   try {
-    uiManager.lookAtLatLon();
+    mainCamera.lookAtLatLon(sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, sensorManager.selectedSensor.zoom, timeManager.selectedDate);
   } catch {
     // TODO: More intentional conditional statement
     // Multi-sensors break this

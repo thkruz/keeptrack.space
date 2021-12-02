@@ -6,7 +6,7 @@
   "[typescript]": {
     "editor.codeActionsOnSave": {
       "source.fixAll": true,
-      "source.organizeImports": true,
+      "source.organizeImports": false,
       "source.fixAll.eslint": true,
       "source.addMissingImports": true
     }

@@ -25,6 +25,7 @@ export interface sunObject {
 }
 
 export interface UiManager {
+  createClockDOMOnce: boolean;
   toast: (toastText: string, type: string, isLong?: boolean) => void;
   uiInput: UiInputInterface;
   searchBox: typeof searchBox;

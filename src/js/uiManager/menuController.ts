@@ -1,0 +1,235 @@
+import { keepTrackApi } from '@app/js/api/externalApi';
+import { saveCsv } from '@app/js/lib/helpers';
+import $ from 'jquery';
+import { legendHoverMenuClick, uiManager } from './uiManager';
+
+export const initMenuController = () => {
+  const { objectManager, timeManager, orbitManager, satSet, satellite, searchBox, mobileManager } = keepTrackApi.programs;
+
+  // Reset time if in retro mode
+  if (settingsManager.retro) {
+    timeManager.staticOffset = new Date(2000, 2, 13).getTime() - Date.now();
+    keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
+  }
+
+  $('#search-icon').on('click', function () {
+    uiManager.searchToggle();
+  });
+
+  $('.menu-item').on('mouseover', function () {
+    $(this).children('.submenu').css({
+      display: 'block',
+    });
+  });
+
+  $('.menu-item').on('mouseout', function () {
+    $(this).children('.submenu').css({
+      display: 'none',
+    });
+  });
+
+  $('#search-close').on('click', function () {
+    searchBox.hideResults();
+    $('#menu-space-stations').removeClass('bmenu-item-selected');
+  });
+
+  uiManager.legendHoverMenuClick = legendHoverMenuClick;
+
+  $('#legend-hover-menu').on('click', function (e) {
+    uiManager.legendHoverMenuClick(e.target.classList[1]);
+  });
+
+  $('#legend-menu').on('click', function () {
+    if (settingsManager.legendMenuOpen) {
+      $('#legend-hover-menu').hide();
+      $('#legend-icon').removeClass('bmenu-item-selected');
+      settingsManager.legendMenuOpen = false;
+    } else {
+      // uiManager.legendColorsChange(); // Disabled colors show up again.
+      $('#legend-hover-menu').show();
+      $('#legend-icon').addClass('bmenu-item-selected');
+      searchBox.hideResults();
+      $('#search-results').hide();
+      settingsManager.legendMenuOpen = true;
+    }
+  });
+
+  $('.menu-selectable').on('click', function () {
+    if (objectManager.selectedSat !== -1) {
+      $('#menu-lookangles').removeClass('bmenu-item-disabled');
+      $('#menu-satview').removeClass('bmenu-item-disabled');
+    }
+  });
+
+  // Resizing Listener
+  $(window).on('resize', function () {
+    mobileManager.checkMobileMode();
+    if (!settingsManager.disableUI) {
+      const bodyDOM = $('#bodyDOM');
+      if (settingsManager.screenshotMode) {
+        bodyDOM.css('overflow', 'visible');
+        $('#canvas-holder').css('overflow', 'visible');
+        $('#canvas-holder').width(3840);
+        $('#canvas-holder').height(2160);
+        bodyDOM.width(3840);
+        bodyDOM.height(2160);
+      } else {
+        bodyDOM.css('overflow', 'hidden');
+        $('#canvas-holder').css('overflow', 'hidden');
+      }
+    }
+    settingsManager.isResizing = true;
+  });
+
+  $('#search').on('focus', function () {
+    uiManager.isCurrentlyTyping = true;
+  });
+  $('#ui-wrapper').on('focusin', function () {
+    uiManager.isCurrentlyTyping = true;
+  });
+
+  $('#search').on('blur', function () {
+    uiManager.isCurrentlyTyping = false;
+  });
+  $('#ui-wrapper').on('focusout', function () {
+    uiManager.isCurrentlyTyping = false;
+  });
+
+  $('#search-results').on('click', '.search-result', function () {
+    var satId = $(this).data('sat-id');
+    objectManager.setSelectedSat(satId);
+  });
+
+  $('#search-results').on('mouseover', '.search-result', function () {
+    var satId = $(this).data('sat-id');
+    orbitManager.setHoverOrbit(satId);
+    satSet.setHover(satId);
+    searchBox.isHovering(true);
+    searchBox.setHoverSat(satId);
+  });
+  $('#search-results').on('mouseout', function () {
+    orbitManager.clearHoverOrbit();
+    satSet.setHover(-1);
+    searchBox.isHovering(false);
+  });
+
+  $('#search').on('input', function () {
+    const searchStr = <string>$('#search').val();
+    uiManager.doSearch(searchStr);
+  });
+
+  var isSocialOpen = false;
+  $('#share-icon').on('click', function () {
+    if (!isSocialOpen) {
+      isSocialOpen = true;
+      $('#github-share').removeClass('share-up');
+      $('#twitter-share').removeClass('share-up');
+      $('#github-share').addClass('github-share-down');
+      $('#twitter-share').addClass('twitter-share-down');
+    } else {
+      isSocialOpen = false;
+      $('#github-share').addClass('share-up');
+      $('#twitter-share').addClass('share-up');
+      $('#github-share').removeClass('github-share-down');
+      $('#twitter-share').removeClass('twitter-share-down');
+    }
+  });
+
+  $('#fullscreen-icon').on('click', function () {
+    mobileManager.fullscreenToggle();
+  });
+
+  $('#nav-footer-toggle').on('click', function () {
+    uiManager.footerToggle();
+    if (parseInt(window.getComputedStyle(document.getElementById('nav-footer')).bottom.replace('px', '')) < 0) {
+      setTimeout(() => {
+        const bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
+        document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
+      }, 1000); // Wait for the footer to be fully visible.
+    } else {
+      // If the footer is open, then it will be hidden shortly but we don't want to wait for it to be hidden
+      document.documentElement.style.setProperty('--bottom-menu-top', '0px');
+    }
+  });
+
+  // Allow All Side Menu Resizing
+  (<any>$('#sensor-list-menu')).resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 400,
+    minWidth: 280,
+  });
+
+  (<any>$('#sensor-info-menu')).resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 400,
+    minWidth: 280,
+  });
+
+  (<any>$('#lookangles-menu')).resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  (<any>$('#lookanglesmultisite-menu')).resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 300,
+  });
+
+  (<any>$('#findByLooks-menu')).resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  (<any>$('#customSensor-menu')).resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  (<any>$('#settings-menu')).resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  (<any>$('#about-menu')).resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 450,
+    minWidth: 280,
+  });
+
+  $('#export-lookangles').on('click', function () {
+    saveCsv(satellite.lastlooksArray, 'lookAngles');
+  });
+
+  $('#export-multiSiteArray').on('click', function () {
+    saveCsv(satellite.lastMultiSiteArray, 'multiSiteLooks');
+  });
+};

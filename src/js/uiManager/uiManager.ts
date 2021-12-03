@@ -34,7 +34,7 @@ import { drawManager } from '@app/js/drawManager/drawManager';
 import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory';
 import { DEG2RAD } from '@app/js/lib/constants.js';
 import { rgbCss } from '@app/js/lib/helpers';
-import { mobileManager } from '@app/js/uiManager/mobileManager.js';
+import { mobileManager } from '@app/js/uiManager/mobileManager';
 import { searchBox } from '@app/js/uiManager/search-box.js';
 import { UiManager } from '@app/types/types';
 import $ from 'jquery';
@@ -869,7 +869,7 @@ export const uiManager: UiManager = {
   panToStar: null,
   clearRMBSubMenu: null,
   menuController: null,
-  legendHoverMenuClick: null,
+  legendHoverMenuClick: legendHoverMenuClick,
   bottomIconPress: null,
   toast: null,
   createClockDOMOnce: false,

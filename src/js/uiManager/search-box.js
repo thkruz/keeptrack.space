@@ -1,8 +1,8 @@
 /* */
 
-import $ from 'jquery';
-import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory';
 import { keepTrackApi } from '@app/js/api/externalApi';
+import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory';
+import $ from 'jquery';
 
 var hoverSatId = -1;
 var searchBox = {};
@@ -88,8 +88,15 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
 
   // Uppercase to make this search not case sensitive
   searchString = searchString.toUpperCase();
+
+  // NOTE: We are no longer using spaces because it is difficult
+  // to predict when a space is part of satellite name.
+
   // Split string into array using comma or space as delimiter
-  let searchList = searchString.split(/[,\s]/u);
+  // let searchList = searchString.split(/(?![0-9]+)\s(?=[0-9]+)|,/u);
+
+  // Split string into array using comma
+  let searchList = searchString.split(/,/u);
   // Update last search with the most recent search results
   settingsManager.lastSearch = searchList;
 

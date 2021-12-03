@@ -82,7 +82,7 @@ describe('search.searchCountryRegex', () => {
 describe('search.searchNameRegex', () => {
   test('0', () => {
     const callFunction: any = () => {
-      search.searchNameRegex(keepTrackApi.programs.satSet.satData, { test: (text) => !!(typeof text === 'string') });
+      search.searchNameRegex(keepTrackApi.programs.satSet.satData, { test: (text) => typeof text === 'string' });
     };
 
     expect(callFunction).not.toThrow();
@@ -103,7 +103,7 @@ describe('search.searchCountryRegex', () => {
   describe('search.searchCountryRegex', () => {
     test('0', () => {
       const callFunction: any = () => {
-        search.searchCountryRegex(keepTrackApi.programs.satSet.satData, { test: (text) => !!(typeof text === 'string') });
+        search.searchCountryRegex(keepTrackApi.programs.satSet.satData, { test: (text) => typeof text === 'string' });
       };
 
       expect(callFunction).not.toThrow();

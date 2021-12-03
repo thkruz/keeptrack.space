@@ -44,18 +44,15 @@ Array [
 ]
 `;
 
-exports[`findSat.checkObjtype 0 1`] = `Array []`;
-
-exports[`findSat.checkPeriod 0 1`] = `
+exports[`findSat.checkObjtype 0 1`] = `
 Array [
   Object {
-    "period": 0,
-  },
-  Object {
-    "period": 50,
+    "OT": 1,
   },
 ]
 `;
+
+exports[`findSat.checkPeriod 0 1`] = `Array []`;
 
 exports[`findSat.checkRange 0 1`] = `
 Array [
@@ -68,16 +65,7 @@ Array [
 ]
 `;
 
-exports[`findSat.checkRcs 0 1`] = `
-Array [
-  Object {
-    "R": 0,
-  },
-  Object {
-    "R": 50,
-  },
-]
-`;
+exports[`findSat.checkRcs 0 1`] = `Array []`;
 
 exports[`findSat.findByLooksSubmit 0 1`] = `undefined`;
 
@@ -87,6 +75,6 @@ exports[`findSat.init 0 1`] = `undefined`;
 
 exports[`findSat.newLaunchSubmit 0 1`] = `undefined`;
 
-exports[`findSat.searchAzElRange 0 1`] = `Array []`;
+exports[`findSat.searchSats 0 1`] = `Array []`;
 
 exports[`findSat.uiManagerInit 0 1`] = `undefined`;

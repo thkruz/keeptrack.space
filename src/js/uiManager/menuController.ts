@@ -1,10 +1,9 @@
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { saveCsv } from '@app/js/lib/helpers';
 import $ from 'jquery';
-import { legendHoverMenuClick, uiManager } from './uiManager';
 
 export const initMenuController = () => {
-  const { objectManager, timeManager, orbitManager, satSet, satellite, searchBox, mobileManager } = keepTrackApi.programs;
+  const { objectManager, timeManager, orbitManager, satSet, satellite, searchBox, uiManager } = keepTrackApi.programs;
 
   // Reset time if in retro mode
   if (settingsManager.retro) {
@@ -12,7 +11,7 @@ export const initMenuController = () => {
     keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
   }
 
-  $('#search-icon').on('click', function () {
+  $('#search-icon').on('click', () => {
     uiManager.searchToggle();
   });
 
@@ -28,18 +27,16 @@ export const initMenuController = () => {
     });
   });
 
-  $('#search-close').on('click', function () {
+  $('#search-close').on('click', () => {
     searchBox.hideResults();
     $('#menu-space-stations').removeClass('bmenu-item-selected');
   });
-
-  uiManager.legendHoverMenuClick = legendHoverMenuClick;
 
   $('#legend-hover-menu').on('click', function (e) {
     uiManager.legendHoverMenuClick(e.target.classList[1]);
   });
 
-  $('#legend-menu').on('click', function () {
+  $('#legend-menu').on('click', () => {
     if (settingsManager.legendMenuOpen) {
       $('#legend-hover-menu').hide();
       $('#legend-icon').removeClass('bmenu-item-selected');
@@ -54,7 +51,7 @@ export const initMenuController = () => {
     }
   });
 
-  $('.menu-selectable').on('click', function () {
+  $('.menu-selectable').on('click', () => {
     if (objectManager.selectedSat !== -1) {
       $('#menu-lookangles').removeClass('bmenu-item-disabled');
       $('#menu-satview').removeClass('bmenu-item-disabled');
@@ -62,8 +59,8 @@ export const initMenuController = () => {
   });
 
   // Resizing Listener
-  $(window).on('resize', function () {
-    mobileManager.checkMobileMode();
+  $(window).on('resize', () => {
+    uiManager.mobileManager.checkMobileMode();
     if (!settingsManager.disableUI) {
       const bodyDOM = $('#bodyDOM');
       if (settingsManager.screenshotMode) {
@@ -101,25 +98,25 @@ export const initMenuController = () => {
   });
 
   $('#search-results').on('mouseover', '.search-result', function () {
-    var satId = $(this).data('sat-id');
+    const satId = $(this).data('sat-id');
     orbitManager.setHoverOrbit(satId);
     satSet.setHover(satId);
     searchBox.isHovering(true);
     searchBox.setHoverSat(satId);
   });
-  $('#search-results').on('mouseout', function () {
+  $('#search-results').on('mouseout', () => {
     orbitManager.clearHoverOrbit();
     satSet.setHover(-1);
     searchBox.isHovering(false);
   });
 
-  $('#search').on('input', function () {
+  $('#search').on('input', () => {
     const searchStr = <string>$('#search').val();
     uiManager.doSearch(searchStr);
   });
 
   var isSocialOpen = false;
-  $('#share-icon').on('click', function () {
+  $('#share-icon').on('click', () => {
     if (!isSocialOpen) {
       isSocialOpen = true;
       $('#github-share').removeClass('share-up');
@@ -135,11 +132,11 @@ export const initMenuController = () => {
     }
   });
 
-  $('#fullscreen-icon').on('click', function () {
-    mobileManager.fullscreenToggle();
+  $('#fullscreen-icon').on('click', () => {
+    uiManager.mobileManager.fullscreenToggle();
   });
 
-  $('#nav-footer-toggle').on('click', function () {
+  $('#nav-footer-toggle').on('click', () => {
     uiManager.footerToggle();
     if (parseInt(window.getComputedStyle(document.getElementById('nav-footer')).bottom.replace('px', '')) < 0) {
       setTimeout(() => {
@@ -225,11 +222,11 @@ export const initMenuController = () => {
     minWidth: 280,
   });
 
-  $('#export-lookangles').on('click', function () {
+  $('#export-lookangles').on('click', () => {
     saveCsv(satellite.lastlooksArray, 'lookAngles');
   });
 
-  $('#export-multiSiteArray').on('click', function () {
+  $('#export-multiSiteArray').on('click', () => {
     saveCsv(satellite.lastMultiSiteArray, 'multiSiteLooks');
   });
 };

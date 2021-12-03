@@ -3,7 +3,7 @@ import { SatObject } from '../api/keepTrack';
 export const searchYear = (satData: any, year: any) => {
   const result = satData.filter((sat: SatObject) => {
     const tleYear = sat?.TLE1?.substring(9, 11) || '-1';
-    return !!(parseInt(tleYear) == year);
+    return parseInt(tleYear) == year;
   });
   return result;
 };
@@ -12,9 +12,9 @@ export const searchYearOrLess = (satData: any, year: number) => {
   const result = satData.filter((sat: SatObject) => {
     const tleYear = sat?.TLE1?.substring(9, 11) || '-1';
     if (year >= 59 && year < 100) {
-      return !!(parseInt(tleYear) <= year && parseInt(tleYear) >= 59);
+      return parseInt(tleYear) <= year && parseInt(tleYear) >= 59;
     } else {
-      return !!(parseInt(tleYear) <= year || parseInt(tleYear) >= 59);
+      return parseInt(tleYear) <= year || parseInt(tleYear) >= 59;
     }
   });
   return result;

@@ -272,6 +272,20 @@ export const orbitalData = (sat: SatObject): void => {
               </div>
               <div class="sat-info-value" id="sat-eccentricity">x.xx</div>
             </div>
+            <div class="sat-info-row sat-only-info">
+              <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+                data-tooltip="Where it Rises Above the Equator">
+                Right Ascension
+              </div>
+              <div class="sat-info-value" id="sat-raan">x.xx</div>
+            </div>
+            <div class="sat-info-row sat-only-info">
+              <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+                data-tooltip="Where the Lowest Part of the Orbit Is">
+                Arg of Perigee
+              </div>
+              <div class="sat-info-value" id="sat-argPe">x.xx</div>
+            </div>
             <div class="sat-info-row">
               <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
                 data-tooltip="Current Latitude Over Earth">
@@ -362,6 +376,8 @@ export const orbitalData = (sat: SatObject): void => {
     $('#sat-perigee').html(sat.perigee.toFixed(0) + ' km');
     $('#sat-inclination').html((sat.inclination * RAD2DEG).toFixed(2) + '°');
     $('#sat-eccentricity').html(sat.eccentricity.toFixed(3));
+    $('#sat-raan').html((sat.raan * RAD2DEG).toFixed(2) + '°');
+    $('#sat-argPe').html((sat.argPe * RAD2DEG).toFixed(2) + '°');
 
     $('#sat-period').html(sat.period.toFixed(2) + ' min');
     $('#sat-period').tooltip({

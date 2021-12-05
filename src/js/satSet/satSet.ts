@@ -123,7 +123,7 @@ export const satCruncherOnMessage = (m: SatCruncherMessage) => {
   keepTrackApi.methods.onCruncherMessage();
 
   // Don't force color recalc if default colors and no sensor for inview color
-  if ((objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) || settingsManager.isForceColorScheme) {
+  if ((objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) || settingsManager.isForceColorScheme) {
     // Don't change colors while dragging
     if (!mainCamera.isDragging) {
       setTimeout(() => {
@@ -140,13 +140,6 @@ export const satCruncherOnMessage = (m: SatCruncherMessage) => {
     }
 
     parseGetVariables();
-
-    // Load ALl The Images Now
-    setTimeout(function () {
-      $('img').each(function () {
-        $(this).attr('src', $(this).attr('delayedsrc'));
-      });
-    }, 0);
 
     // Run any functions registered with the API
     keepTrackApi.methods.onCruncherReady();
@@ -361,7 +354,7 @@ export const selectSat = (i: number): void => {
 
   // satSet.setColorScheme(settingsManager.currentColorScheme, true);
 
-  if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
+  if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
     $('#menu-lookangles').removeClass('bmenu-item-disabled');
   }
   $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');

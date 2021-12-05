@@ -12,10 +12,12 @@ test(`selectSatManager Unit Testing`, () => {
       lat: 1,
       lon: 1,
     },
-    currentSensor: {
-      lat: 1,
-      lon: 1,
-    },
+    currentSensor: [
+      {
+        lat: 1,
+        lon: 1,
+      },
+    ],
   };
   keepTrackApi.programs.mainCamera = {
     autoRotate: jest.fn(),

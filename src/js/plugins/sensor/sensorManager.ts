@@ -24,12 +24,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { SensorObject } from '@app/js/api/keepTrack';
-import { objectManager } from '@app/js/objectManager/objectManager.js';
-import { sensorList } from '@app/js/plugins/sensor/sensorList';
-import { setColorScheme } from '@app/js/satSet/satSet';
 import $ from 'jquery';
+import { keepTrackApi } from '../../api/externalApi';
+import { SensorObject } from '../../api/keepTrack';
+import { sensorList } from './sensorList';
 
 // Add new callbacks to the list of callbacks in keepTrackApi
 keepTrackApi.callbacks.setSensor = [];
@@ -42,52 +40,47 @@ keepTrackApi.methods.resetSensor = () => {
   keepTrackApi.callbacks.resetSensor.forEach((cb) => cb.cb());
 };
 
-export const checkSensorSelected = () => {
-  if (sensorManager.currentSensor.lat != null) {
-    return true;
-  } else {
-    return false;
-  }
+const emptySensor: SensorObject = {
+  observerGd: {
+    lat: null,
+    lon: 0,
+    alt: 0,
+  },
+  alt: null,
+  country: '',
+  lat: null,
+  lon: null,
+  name: '',
+  obsmaxaz: 0,
+  obsmaxel: 0,
+  obsmaxrange: 0,
+  obsminaz: 0,
+  obsminel: 0,
+  obsminrange: 0,
+  shortName: '',
+  staticNum: 0,
+  sun: '',
+  volume: false,
+  zoom: '',
 };
-export const setCurrentSensor = (sensor: SensorObject | null) => {
-  // If the sensor is null, reset the current sensor
-  if (sensor == null) {
-    sensor = {
-      observerGd: {
-        lat: null,
-        lon: 0,
-        alt: 0,
-      },
-      alt: 0,
-      country: '',
-      lat: 0,
-      lon: 0,
-      name: '',
-      obsmaxaz: 0,
-      obsmaxel: 0,
-      obsmaxrange: 0,
-      obsminaz: 0,
-      obsminel: 0,
-      obsminrange: 0,
-      shortName: '',
-      staticNum: 0,
-      sun: '',
-      volume: false,
-      zoom: '',
-    };
-  }
 
-  sensorManager.currentSensor = sensor;
-};
-export const sensorListLength = () => {
-  var sensorListCount = 0;
-  for (var sensor in sensorList) {
-    if (Object.prototype.hasOwnProperty.call(sensorList, sensor)) {
-      sensorListCount++;
-    }
+// NOTE: This doesn't account for sensorManager.selectedSensor
+export const checkSensorSelected = () => sensorManager.currentSensor[0].lat != null;
+
+export const setCurrentSensor = (sensor: SensorObject | SensorObject[] | null) => {
+  // TODO: This function is totally redundant to setSensor. There should be
+  // ONE selectedSensor/currentSensor and it should be an array of selected sensors.
+  if (sensor === null) {
+    sensorManager.currentSensor[0] = emptySensor;
+  } else if (sensor[0] != null) {
+    sensorManager.currentSensor = <SensorObject[]>sensor;
+  } else if (sensor != null) {
+    sensorManager.currentSensor[0] = <SensorObject>sensor;
   }
-  return sensorListCount;
 };
+
+export const sensorListLength = () => Object.values(sensorList).reduce((acc) => acc++, 0);
+
 export const setSensor = (selectedSensor: SensorObject | string, staticNum: number) => {
   try {
     localStorage.setItem('currentSensor', JSON.stringify([selectedSensor, staticNum]));
@@ -96,7 +89,7 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
   }
 
   // Run any callbacks
-  const { satSet, satellite } = keepTrackApi.programs;
+  const { satSet, satellite, objectManager } = keepTrackApi.programs;
   keepTrackApi.methods.setSensor(selectedSensor, staticNum);
 
   if (selectedSensor == null && staticNum == null) {
@@ -105,22 +98,9 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
     return;
   }
   if (selectedSensor === 'SSN') {
-    var allSSNSensors = [];
-    for (const sensor in sensorList) {
-      if (sensorList[sensor].country === 'United States' || sensorList[sensor].country === 'United Kingdom' || sensorList[sensor].country === 'Norway') {
-        allSSNSensors.push(sensorList[sensor]);
-      }
-    }
-    satSet.satCruncher.postMessage({
-      setlatlong: true,
-      sensor: allSSNSensors,
-      multiSensor: true,
-    });
-    satellite.setobs(allSSNSensors);
-    objectManager.setSelectedSat(-1);
-    setColorScheme(settingsManager.currentColorScheme, true);
     sensorManager.sensorTitle = 'All Space Surveillance Network Sensors';
-    // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
+    const filteredSensors = <SensorObject[]>Object.values(sensorList).filter((sensor) => sensor.country === 'United States' || sensor.country === 'United Kingdom' || sensor.country === 'Norway');
+    sendSensorToOtherPrograms(filteredSensors);
   } else if (selectedSensor === 'CapeCodMulti') {
     let multiSensor = [];
     multiSensor.push({
@@ -166,100 +146,72 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
     });
     satellite.setobs(sensorManager.sensorList.COD);
     objectManager.setSelectedSat(-1);
-    setColorScheme(settingsManager.currentColorScheme, true);
+    satSet.setColorScheme(settingsManager.currentColorScheme, true);
     sensorManager.sensorTitle = 'Cape Cod Multi Fence Radar';
   } else if (selectedSensor === 'NATO-MW') {
-    var natoMWSensors = [];
-    natoMWSensors.push(sensorManager.sensorList.BLE);
-    natoMWSensors.push(sensorManager.sensorList.CAV);
-    natoMWSensors.push(sensorManager.sensorList.CDN);
-    natoMWSensors.push(sensorManager.sensorList.COD);
-    natoMWSensors.push(sensorManager.sensorList.CLR);
-    natoMWSensors.push(sensorManager.sensorList.FYL);
-    natoMWSensors.push(sensorManager.sensorList.THL);
-    satSet.satCruncher.postMessage({
-      setlatlong: true,
-      sensor: natoMWSensors,
-      multiSensor: true,
-    });
-    satellite.setobs(natoMWSensors);
-    objectManager.setSelectedSat(-1);
-    setColorScheme(settingsManager.currentColorScheme, true);
-    // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
     sensorManager.sensorTitle = 'All North American Aerospace Defense Command Sensors';
+    const filteredSensors = <SensorObject[]>Object.values(sensorList).filter(
+      (sensor) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        sensor == sensorManager.sensorList.BLE ||
+        sensor == sensorManager.sensorList.CAV ||
+        sensor == sensorManager.sensorList.CDN ||
+        sensor == sensorManager.sensorList.COD ||
+        sensor == sensorManager.sensorList.CLR ||
+        sensor == sensorManager.sensorList.FYL ||
+        sensor == sensorManager.sensorList.THL
+    );
+    sendSensorToOtherPrograms(filteredSensors);
   } else if (selectedSensor === 'RUS-ALL') {
-    var rusSensors = [];
-    rusSensors.push(sensorManager.sensorList.ARM);
-    rusSensors.push(sensorManager.sensorList.BAL);
-    rusSensors.push(sensorManager.sensorList.GAN);
-    rusSensors.push(sensorManager.sensorList.LEK);
-    rusSensors.push(sensorManager.sensorList.MIS);
-    rusSensors.push(sensorManager.sensorList.OLE);
-    rusSensors.push(sensorManager.sensorList.PEC);
-    rusSensors.push(sensorManager.sensorList.PIO);
-    satSet.satCruncher.postMessage({
-      setlatlong: true,
-      sensor: rusSensors,
-      multiSensor: true,
-    });
-    satellite.setobs(sensorManager.sensorList.ARM);
-    objectManager.setSelectedSat(-1);
-    setColorScheme(settingsManager.currentColorScheme, true);
-    // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
     sensorManager.sensorTitle = 'All Russian Sensors';
+    const filteredSensors = <SensorObject[]>Object.values(sensorList).filter(
+      (sensor) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        sensor == sensorManager.sensorList.ARM ||
+        sensor == sensorManager.sensorList.BAL ||
+        sensor == sensorManager.sensorList.GAN ||
+        sensor == sensorManager.sensorList.LEK ||
+        sensor == sensorManager.sensorList.MIS ||
+        sensor == sensorManager.sensorList.OLE ||
+        sensor == sensorManager.sensorList.PEC ||
+        sensor == sensorManager.sensorList.PIO
+    );
+    sendSensorToOtherPrograms(filteredSensors);
   } else if (selectedSensor === 'LEO-LABS') {
-    var leolabsSensors = [];
-    leolabsSensors.push(sensorManager.sensorList.MSR);
-    leolabsSensors.push(sensorManager.sensorList.PFISR);
-    leolabsSensors.push(sensorManager.sensorList.KSR);
-    satSet.satCruncher.postMessage({
-      setlatlong: true,
-      sensor: leolabsSensors,
-      multiSensor: true,
-    });
-    satellite.setobs(sensorManager.sensorList.MSR);
-    objectManager.setSelectedSat(-1);
-    setColorScheme(settingsManager.currentColorScheme, true);
-    // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
     sensorManager.sensorTitle = 'All LEO Labs Sensors';
+    const filteredSensors = <SensorObject[]>Object.values(sensorList).filter(
+      (sensor) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        sensor == sensorManager.sensorList.MSR || sensor == sensorManager.sensorList.PFISR || sensor == sensorManager.sensorList.KSR
+    );
+    sendSensorToOtherPrograms(filteredSensors);
   } else if (selectedSensor === 'MD-ALL') {
-    var mdSensors = [];
-    mdSensors.push(sensorManager.sensorList.COD);
-    mdSensors.push(sensorManager.sensorList.BLE);
-    mdSensors.push(sensorManager.sensorList.CLR);
-    mdSensors.push(sensorManager.sensorList.FYL);
-    mdSensors.push(sensorManager.sensorList.THL);
-    mdSensors.push(sensorManager.sensorList.HAR);
-    mdSensors.push(sensorManager.sensorList.QTR);
-    mdSensors.push(sensorManager.sensorList.KUR);
-    mdSensors.push(sensorManager.sensorList.SHA);
-    mdSensors.push(sensorManager.sensorList.KCS);
-    mdSensors.push(sensorManager.sensorList.SBX);
-    satSet.satCruncher.postMessage({
-      setlatlong: true,
-      sensor: mdSensors,
-      multiSensor: true,
-    });
-    satellite.setobs(sensorManager.sensorList.MSR);
-    objectManager.setSelectedSat(-1);
-    setColorScheme(settingsManager.currentColorScheme, true);
-    // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
     sensorManager.sensorTitle = 'All Missile Defense Agency Sensors';
+    const filteredSensors = <SensorObject[]>Object.values(sensorList).filter(
+      (sensor) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        sensor == sensorManager.sensorList.COD ||
+        sensor == sensorManager.sensorList.BLE ||
+        sensor == sensorManager.sensorList.CLR ||
+        sensor == sensorManager.sensorList.FYL ||
+        sensor == sensorManager.sensorList.THL ||
+        sensor == sensorManager.sensorList.HAR ||
+        sensor == sensorManager.sensorList.QTR ||
+        sensor == sensorManager.sensorList.KUR ||
+        sensor == sensorManager.sensorList.SHA ||
+        sensor == sensorManager.sensorList.KCS ||
+        sensor == sensorManager.sensorList.SBX
+    );
+    sendSensorToOtherPrograms(filteredSensors);
   } else {
     for (const sensor in sensorList) {
-      // console.log(sensorList[sensor] == selectedSensor);
       if (sensorList[sensor] == selectedSensor || (sensorList[sensor].staticNum === staticNum && typeof staticNum != 'undefined')) {
+        // TODO: selectedSensor is redundant and should be merged with currentSensor (this will make bugs if you don't remove
+        // references to selectedSensor)
         sensorManager.selectedSensor = sensorList[sensor];
-        // Do For All Sensors
-        sensorManager.whichRadar = sensorManager.selectedSensor.shortName;
-        satSet.satCruncher.postMessage({
-          setlatlong: true,
-          sensor: sensorManager.selectedSensor,
-        });
-        satellite.setobs(sensorManager.selectedSensor);
 
         $('#sensor-info-title').html("<a class='iframe' href='" + sensorManager.selectedSensor.url + "'>" + sensorManager.selectedSensor.name + '</a>');
-        try {
+        new Promise(() => {
           $('a.iframe').colorbox({
             iframe: true,
             width: '80%',
@@ -267,16 +219,14 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
             fastIframe: false,
             closeButton: false,
           });
-        } catch (error) {
-          console.warn(error);
-        }
+        }).catch((err) => console.warn(err));
+
         $('#sensor-type').html(sensorManager.selectedSensor.type);
         $('#sensor-country').html(sensorManager.selectedSensor.country);
-        objectManager.setSelectedSat(-1);
-        if (typeof settingsManager.currentColorScheme === 'undefined') throw new Error('settingsManager.currentColorScheme is undefined');
-        setColorScheme(settingsManager.currentColorScheme, true);
-        // setTimeout(setColorScheme, 1500, settingsManager.currentColorScheme, true);
         sensorManager.sensorTitle = sensorManager.selectedSensor.name;
+
+        // Send single sensor as an array to other programs
+        sendSensorToOtherPrograms([sensorList[sensor]]);
       }
     }
   }
@@ -307,15 +257,6 @@ export const drawFov = (sensor: SensorObject) => {
   }
 };
 
-for (var i = 0; i < Object.keys(sensorList).length; i++) {
-  sensorList[Object.keys(sensorList)[i]].staticNum = i;
-  if (sensorList[Object.keys(sensorList)[i]].obsmaxrange < 8000) {
-    sensorList[Object.keys(sensorList)[i]].zoom = 'leo';
-  } else {
-    sensorList[Object.keys(sensorList)[i]].zoom = 'geo';
-  }
-}
-
 export const sensorManager = {
   sensorList: sensorList,
   setSensor: setSensor,
@@ -328,29 +269,31 @@ export const sensorManager = {
   whichRadar: '',
   selectedSensor: null,
   sensorListUS: [sensorList.COD, sensorList.BLE, sensorList.CAV, sensorList.CLR, sensorList.EGL, sensorList.FYL, sensorList.THL, sensorList.MIL, sensorList.ALT, sensorList.ASC, sensorList.CDN],
-  currentSensor: {
-    observerGd: {
-      lat: null,
-      lon: 0,
+  currentSensor: [
+    {
+      observerGd: {
+        lat: null,
+        lon: 0,
+        alt: 0,
+      },
       alt: 0,
+      country: '',
+      lat: 0,
+      lon: 0,
+      name: '',
+      obsmaxaz: 0,
+      obsmaxel: 0,
+      obsmaxrange: 0,
+      obsminaz: 0,
+      obsminel: 0,
+      obsminrange: 0,
+      shortName: '',
+      staticNum: 0,
+      sun: '',
+      volume: false,
+      zoom: '',
     },
-    alt: 0,
-    country: '',
-    lat: 0,
-    lon: 0,
-    name: '',
-    obsmaxaz: 0,
-    obsmaxel: 0,
-    obsmaxrange: 0,
-    obsminaz: 0,
-    obsminel: 0,
-    obsminrange: 0,
-    shortName: '',
-    staticNum: 0,
-    sun: '',
-    volume: false,
-    zoom: '',
-  },
+  ],
   defaultSensor: {
     observerGd: {
       lat: null,
@@ -358,4 +301,19 @@ export const sensorManager = {
       alt: 0,
     },
   },
+};
+
+export const sendSensorToOtherPrograms = (filteredSensors: SensorObject[]) => {
+  const { satSet, satellite, objectManager } = keepTrackApi.programs;
+  satSet.satCruncher.postMessage({
+    setlatlong: true,
+    sensor: filteredSensors,
+    multiSensor: filteredSensors.length > 1,
+  });
+  setCurrentSensor(filteredSensors[0]);
+  satellite.setobs(filteredSensors);
+  objectManager.setSelectedSat(-1);
+
+  if (typeof settingsManager.currentColorScheme === 'undefined') throw new Error('settingsManager.currentColorScheme is undefined');
+  satSet.setColorScheme(settingsManager.currentColorScheme, true);
 };

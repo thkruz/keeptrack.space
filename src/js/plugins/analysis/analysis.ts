@@ -238,7 +238,7 @@ export const analysisFormSubmit = () => {
   const { sensorManager } = keepTrackApi.programs;
   const chartType = $('#anal-type').val();
   const sat = $('#anal-sat').val();
-  const sensor = sensorManager.currentSensor.shortName;
+  const sensor = sensorManager.currentSensor[0].shortName;
   if (typeof sensor == 'undefined') {
     $.colorbox({
       href: `analysis/index.htm?sat=${sat}&type=${chartType}`,

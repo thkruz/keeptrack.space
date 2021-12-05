@@ -503,9 +503,9 @@ export const satCalculate = () => {
     selectSatManager.selectSat(objectManager.selectedSat, mainCamera);
     if (objectManager.selectedSat !== -1) {
       orbitManager.setSelectOrbit(objectManager.selectedSat);
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null && drawManager.sat.inView) {
+      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && drawManager.sat.inView) {
         lineManager.drawWhenSelected();
-        lineManager.updateLineToSat(objectManager.selectedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor.name));
+        lineManager.updateLineToSat(objectManager.selectedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name));
       }
       // TODO: #281 keepTrackApi.programs.mapManager.updateMap should be a callback
       if (keepTrackApi.programs.mapManager) {
@@ -828,7 +828,7 @@ export const hoverBoxOnSat = (satId, satX, satY) => {
         satHoverBoxNode2.textContent = sat.SCC_NUM;
         satHoverBoxNode3.textContent = objectManager.extractCountry(sat.C);
       } else {
-        if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null && settingsManager.isShowNextPass && isShowDistance) {
+        if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && settingsManager.isShowNextPass && isShowDistance) {
           satHoverBoxNode1.textContent = sat.ON;
           satHoverBoxNode2.textContent = sat.SCC_NUM;
           satHoverBoxNode3.innerHTML = satellite.nextpass(sat) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
@@ -877,7 +877,7 @@ export const hoverBoxOnSat = (satId, satX, satY) => {
               sat.velocity.z.toFixed(2) +
               ' km/s';
           }
-        } else if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null && settingsManager.isShowNextPass) {
+        } else if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && settingsManager.isShowNextPass) {
           satHoverBoxNode1.textContent = sat.ON;
           satHoverBoxNode2.textContent = sat.SCC_NUM;
           satHoverBoxNode3.textContent = satellite.nextpass(sat);

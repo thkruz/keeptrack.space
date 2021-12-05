@@ -191,65 +191,19 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 export const importCss = async (): Promise<void> => {
   try {
     if (!settingsManager.disableUI) {
-      import('@app/css/fonts.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/materialize.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/astroux/css/astro.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/materialize-local.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/js/lib/external/colorPick.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/perfect-scrollbar.min.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/jquery-ui.min.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/jquery-ui-timepicker-addon.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/style.css')
-        .then(
-          await import('@app/css/responsive.css')
-            .catch(() => {
-              // intentionally left blank
-            })
-            .then((resp) => resp)
-        )
-        .catch(() => {
-          // intentionally left blank
-        });
+      import('@app/css/fonts.css').catch(() => {});
+      import('@app/css/materialize.css').catch(() => {});
+      import('@app/css/astroux/css/astro.css').catch(() => {});
+      import('@app/css/materialize-local.css').catch(() => {});
+      import('@app/js/lib/external/colorPick.css').catch(() => {});
+      import('@app/css/perfect-scrollbar.min.css').catch(() => {});
+      import('@app/css/jquery-ui.min.css').catch(() => {});
+      import('@app/css/jquery-ui-timepicker-addon.css').catch(() => {});
+      import('@app/css/style.css').then(await import('@app/css/responsive.css').catch(() => {}).then((resp) => resp)).catch(() => {});
     } else if (settingsManager.enableLimitedUI) {
-      import('@app/css/limitedUI.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-    } else {
-      // intentionally left blank
+      import('@app/css/limitedUI.css').catch(() => {
+        // intentionally left blank
+      });
     }
   } catch (e) {
     // intentionally left blank

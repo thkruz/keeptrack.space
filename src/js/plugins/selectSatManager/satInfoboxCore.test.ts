@@ -1,14 +1,16 @@
-import { defaultSat, keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as satInfoboxCore from '@app/js/plugins/selectSatManager/satInfoboxCore';
 import 'jquery-ui-bundle';
+import { defaultSat, keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/externalApi';
+import * as satInfoboxCore from './satInfoboxCore';
+
+declare const settingsManager;
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
 describe('satInfoboxCore.sensorInfo', () => {
   beforeAll(() => {
-    window.settingsManager.plugins = {
+    settingsManager.plugins = {
       sensor: true,
     };
   });
@@ -47,7 +49,7 @@ describe('satInfoboxCore.orbitalData', () => {
   test('2', () => {
     window.document.body.innerHTML = '<div id="sat-infobox"></div>';
     keepTrackApi.programs.objectManager.isSensorManagerLoaded = true;
-    keepTrackApi.programs.sensorManager.currentSensor = {
+    keepTrackApi.programs.sensorManager.currentSensor[0] = {
       lat: null,
       type: 'mech',
     };
@@ -58,7 +60,7 @@ describe('satInfoboxCore.orbitalData', () => {
   test('3', () => {
     window.document.body.innerHTML = '<div id="sat-infobox"></div>';
     keepTrackApi.programs.objectManager.isSensorManagerLoaded = true;
-    keepTrackApi.programs.sensorManager.currentSensor = {
+    keepTrackApi.programs.sensorManager.currentSensor[0] = {
       lat: null,
       type: 'Optical',
     };

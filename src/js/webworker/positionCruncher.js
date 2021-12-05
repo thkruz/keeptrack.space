@@ -1,6 +1,6 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-(c) 2016-2020, Theodore Kruczek
+(c) 2016-2021, Theodore Kruczek
 (c) 2015-2016, James Yoder
 
 http://keeptrack.space
@@ -19,10 +19,12 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
+// TODO: This needs to be typed badly!
+
 'use strict';
-import * as satellite from 'satellite.js';
 import { A } from '@app/js/lib/external/meuusjs.js';
 import { SunCalc } from '@app/js/lib/suncalc.js';
+import * as satellite from 'satellite.js';
 import { numeric } from '../lib/external/numeric';
 
 /** CONSTANTS */
@@ -156,7 +158,7 @@ onmessage = function (m) {
     globalPropagationRate = 2000;
     if (isResetInView == false) isResetInView = true;
   } else if (m.data.sensor) {
-    sensor = m.data.sensor;
+    sensor = m.data.sensor[0];
     if (m.data.setlatlong) {
       if (m.data.resetObserverGd) {
         globalPropagationRate = 1000;
@@ -165,11 +167,12 @@ onmessage = function (m) {
         if (isResetInView == false) isResetInView = true;
       } else {
         globalPropagationRate = 2000;
-        // satellite.js requires this format - DONT use lon,lat,alt
+        // satellite.js requires this format - DONT use lat,lon,alt
+        // and we MUST do it (for now) because main thread is in lat,lon,alt
         sensor.observerGd = {
-          longitude: m.data.sensor.lon * DEG2RAD,
-          latitude: m.data.sensor.lat * DEG2RAD,
-          height: m.data.sensor.alt * 1, // Convert from string
+          longitude: m.data.sensor[0].lon * DEG2RAD,
+          latitude: m.data.sensor[0].lat * DEG2RAD,
+          height: parseFloat(m.data.sensor[0].alt),
         };
         if (isResetInView == false) isResetInView = true;
       }
@@ -560,6 +563,7 @@ var propagateCruncher = () => {
       if (sensor.observerGd !== defaultGd && !isSunExclusion) {
         if (isMultiSensor) {
           for (s = 0; s < mSensor.length; s++) {
+            // Skip satellites in the sun if you are an optical sensor
             if (!(sensor.type == 'Optical' && satInSun[i] == 0)) {
               if (satInView[i]) break;
               sensor = mSensor[s];

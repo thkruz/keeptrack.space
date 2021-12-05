@@ -1,6 +1,6 @@
-import $ from 'jquery';
 import { keepTrackApi } from '@app/js/api/externalApi';
 import { satellite } from '@app/js/satMath/satMath';
+import $ from 'jquery';
 
 let isselectedSatNegativeOne = false;
 const selectSatManager = {
@@ -116,7 +116,7 @@ const selectSatManager = {
       mainCamera.camZoomSnappedOnSat = true;
       mainCamera.camAngleSnappedOnSat = true;
 
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
+      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
         $('#menu-lookangles').removeClass('bmenu-item-disabled');
       }
 
@@ -153,7 +153,7 @@ const selectSatManager = {
 
       $('#sat-infobox').fadeIn();
 
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
+      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
         if (keepTrackApi.programs.sensorManager.isLookanglesMenuOpen) {
           satellite.getlookangles(sat);
         }

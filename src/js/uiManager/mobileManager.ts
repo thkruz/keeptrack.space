@@ -3,11 +3,11 @@ export const fullscreenToggle = function () {
   const doc = <any>document;
 
   if ((doc.fullScreenElement && doc.fullScreenElement !== null) || (!doc.mozFullScreen && !doc.webkitIsFullScreen)) {
-    if (doc.docElement.requestFullScreen) {
+    if (doc.docElement?.requestFullScreen) {
       doc.docElement.requestFullScreen();
-    } else if (doc.docElement.mozRequestFullScreen) {
+    } else if (doc.docElement?.mozRequestFullScreen) {
       doc.docElement.mozRequestFullScreen();
-    } else if (doc.docElement.webkitRequestFullScreen) {
+    } else if (doc.docElement?.webkitRequestFullScreen) {
       doc.docElement.webkitRequestFullScreen((<any>Element).ALLOW_KEYBOARD_INPUT);
     }
   } else {

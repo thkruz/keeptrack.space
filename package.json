@@ -24,7 +24,7 @@
   },
   "scripts": {
     "build": "npm run build:dev",
-    "build:dev": "npm run prebuild && cross-env NODE_ENV=development node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
+    "build:dev": "cross-env NODE_ENV=development node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "build:embed": "npm run prebuild:embed && cross-env NODE_ENV=embed node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "build:test": "npm run prebuild && cross-env NODE_ENV=test node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "changelog": "npx auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs",
@@ -46,7 +46,6 @@
     "start:embed": "http-server ./embed/ -o example.htm -a 127.0.0.1",
     "start:ssl": "http-server ./dist/ -o index.htm -a 127.0.0.1 --ssl",
     "test": "start-server-and-test 'http-server ./dist/ --cors' http://localhost:8080 test:noserver",
-    "test:nocov": "jest",
     "test:noserver": "cross-env NODE_ENV=development && jest --max-old-space-size=8192 --coverage",
     "updateTime": "node ./scripts/updateTime.mjs",
     "updateVersion": "const-version ./package.json src/js/settingsManager/version.js",

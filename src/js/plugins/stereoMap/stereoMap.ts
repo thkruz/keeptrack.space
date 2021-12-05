@@ -133,8 +133,8 @@ export const updateMap = (): void => {
   if (sensorManager.checkSensorSelected()) {
     map = mapManager.braun(
       {
-        lon: sensorManager.currentSensor.lon,
-        lat: sensorManager.currentSensor.lat,
+        lon: sensorManager.currentSensor[0].lon,
+        lat: sensorManager.currentSensor[0].lat,
       },
       { meridian: 0, latLimit: 90 }
     );

@@ -780,7 +780,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
       break;
     case 'line-sensor-sat-rmb':
       // Sensor always has to be #2
-      lineManager.create('sat5', [clickedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor.name)], 'p');
+      lineManager.create('sat5', [clickedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name)], 'p');
       break;
     case 'line-sat-sat-rmb':
       lineManager.create('sat3', [clickedSat, objectManager.selectedSat], 'p');
@@ -809,7 +809,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
       });
       break;
     case 'colors-default-rmb':
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
+      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
         uiManager.legendMenuChange('default');
       } else {
         uiManager.legendMenuChange('default');
@@ -998,7 +998,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
         uiManager.hideSideMenus();
         $('#menu-space-stations').removeClass('bmenu-item-selected');
 
-        if ((!objectManager.isSensorManagerLoaded || sensorManager.currentSensor.lat != null) && mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && mainCamera.cameraType.current !== mainCamera.cameraType.Astronomy) {
+        if ((!objectManager.isSensorManagerLoaded || sensorManager.currentSensor[0].lat != null) && mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && mainCamera.cameraType.current !== mainCamera.cameraType.Astronomy) {
           uiManager.legendMenuChange('default');
         }
 
@@ -1348,7 +1348,7 @@ export const openRmbMenu = () => {
       $('#view-sat-info-rmb').show();
       $('#view-related-sats-rmb').show();
 
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null && sensorManager.whichRadar !== 'CUSTOM') {
+      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && sensorManager.whichRadar !== 'CUSTOM') {
         $('#line-sensor-sat-rmb').show();
       }
       $('#line-earth-sat-rmb').show();

@@ -1,7 +1,10 @@
-import { defaultSensor, keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as sensorManager from '@app/js/plugins/sensor/sensorManager';
+import { defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/externalApi';
+import { SensorObject } from '../../api/keepTrack';
+import * as sensorManager from './sensorManager';
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+
+declare const settingsManager;
 
 describe('sensorManager.checkSensorSelected', () => {
   test('0', () => {
@@ -45,13 +48,13 @@ describe('sensorManager.setCurrentSensor', () => {
       obsminaz: -5.48,
       obsminel: -0.5,
       obsminrange: -5.48,
-      shortName: 333173976,
+      shortName: 'test',
       staticNum: 1000,
       sun: 'v4.0.0-rc.4',
       type: 'array',
       url: 'https://twitter.com/path?abc',
       volume: true,
-      zoom: ['-19.3366', '-46.1477'],
+      zoom: 'leo',
     });
     expect(result).toMatchSnapshot();
   });
@@ -74,13 +77,13 @@ describe('sensorManager.setCurrentSensor', () => {
       obsminaz: -100,
       obsminel: 10.0,
       obsminrange: 0,
-      shortName: 333173976,
+      shortName: 'test',
       staticNum: 1,
       sun: '1.0.0',
       type: 'array',
       url: 'http://www.croplands.org/account/confirm?t=',
       volume: true,
-      zoom: ['61.0865', '-144.7750'],
+      zoom: 'geo',
     });
     expect(result).toMatchSnapshot();
   });
@@ -103,13 +106,13 @@ describe('sensorManager.setCurrentSensor', () => {
       obsminaz: -5.48,
       obsminel: 10.0,
       obsminrange: -100,
-      shortName: 992686820,
+      shortName: 'test',
       staticNum: 1000,
       sun: '4.0.0-beta1\t',
       type: 'number',
       url: 'https://',
       volume: false,
-      zoom: ['61.0865', '-144.7750'],
+      zoom: 'leo',
     });
     expect(result).toMatchSnapshot();
   });
@@ -132,13 +135,13 @@ describe('sensorManager.setCurrentSensor', () => {
       obsminaz: 100,
       obsminel: -29.45,
       obsminrange: -100,
-      shortName: 254482186,
+      shortName: 'fake',
       staticNum: 1000,
       sun: '4.0.0-beta1\t',
       type: 'number',
       url: 'https://twitter.com/path?abc',
       volume: true,
-      zoom: ['41.1994', '-115.9206'],
+      zoom: 'geo',
     });
     expect(result).toMatchSnapshot();
   });
@@ -167,7 +170,7 @@ describe('sensorManager.setCurrentSensor', () => {
       type: 'object',
       url: 'https://accounts.google.com/o/oauth2/revoke?token=%s',
       volume: true,
-      zoom: ['-19.3366', '-46.1477'],
+      zoom: 'leo',
     });
     expect(result).toMatchSnapshot();
   });
@@ -227,13 +230,13 @@ describe('sensorManager.setSensor', () => {
         obsminaz: 0,
         obsminel: 10.23,
         obsminrange: -5.48,
-        shortName: 333173976,
+        shortName: 'test',
         staticNum: 1,
         sun: '1.0.0',
         type: 'object',
         url: 'https://accounts.google.com/o/oauth2/revoke?token=%s',
         volume: false,
-        zoom: ['61.0865', '-144.7750'],
+        zoom: 'geo',
       },
       10
     );
@@ -241,32 +244,32 @@ describe('sensorManager.setSensor', () => {
   });
 
   test('1', () => {
-    let result: any = sensorManager.setSensor('SSN');
+    let result: any = sensorManager.setSensor('SSN', 1);
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    let result: any = sensorManager.setSensor('CapeCodMulti');
+    let result: any = sensorManager.setSensor('CapeCodMulti', 1);
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    let result: any = sensorManager.setSensor('NATO-MW');
+    let result: any = sensorManager.setSensor('NATO-MW', 1);
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let result: any = sensorManager.setSensor('RUS-ALL');
+    let result: any = sensorManager.setSensor('RUS-ALL', 1);
     expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
-    let result: any = sensorManager.setSensor('LEO-LABS');
+    let result: any = sensorManager.setSensor('LEO-LABS', 1);
     expect(result).toMatchSnapshot();
   });
 
   test('6', () => {
-    let result: any = sensorManager.setSensor('MD-ALL');
+    let result: any = sensorManager.setSensor('MD-ALL', 1);
     expect(result).toMatchSnapshot();
   });
 });
@@ -274,22 +277,22 @@ describe('sensorManager.setSensor', () => {
 // @ponicode
 describe('sensorManager.drawFov', () => {
   test('0', () => {
-    let result: any = sensorManager.drawFov({ shortName: 'COD' }, 0);
+    let result: any = sensorManager.drawFov(<SensorObject>{ shortName: 'COD' });
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = sensorManager.drawFov({ shortName: 'FYL' }, 0);
+    let result: any = sensorManager.drawFov(<SensorObject>{ shortName: 'FYL' });
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    let result: any = sensorManager.drawFov({ shortName: 'CDN' }, 0);
+    let result: any = sensorManager.drawFov(<SensorObject>{ shortName: 'CDN' });
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    let result: any = sensorManager.drawFov({ shortName: 'FAKE' }, 0);
+    let result: any = sensorManager.drawFov(<SensorObject>{ shortName: 'FAKE' });
     expect(result).toMatchSnapshot();
   });
 });

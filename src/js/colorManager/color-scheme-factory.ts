@@ -283,7 +283,7 @@ export const defaultRules = (sat: SatObject) => {
   if (
     (!sat.inView && sat.OT === 1 && ColorSchemeFactory.objectTypeFlags.payload === false) ||
     (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.OT === 1 && ColorSchemeFactory.objectTypeFlags.payload === false) ||
-    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 1 && ColorSchemeFactory.objectTypeFlags.payload === false)
+    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 1 && ColorSchemeFactory.objectTypeFlags.payload === false)
   ) {
     return {
       color: ColorSchemeFactory.colorTheme.deselected,
@@ -293,7 +293,7 @@ export const defaultRules = (sat: SatObject) => {
   if (
     (!sat.inView && sat.OT === 2 && ColorSchemeFactory.objectTypeFlags.rocketBody === false) ||
     (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.OT === 2 && ColorSchemeFactory.objectTypeFlags.rocketBody === false) ||
-    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 2 && ColorSchemeFactory.objectTypeFlags.rocketBody === false)
+    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 2 && ColorSchemeFactory.objectTypeFlags.rocketBody === false)
   ) {
     return {
       color: ColorSchemeFactory.colorTheme.deselected,
@@ -303,7 +303,7 @@ export const defaultRules = (sat: SatObject) => {
   if (
     (!sat.inView && sat.OT === 3 && ColorSchemeFactory.objectTypeFlags.debris === false) ||
     (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.OT === 3 && ColorSchemeFactory.objectTypeFlags.debris === false) ||
-    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 3 && ColorSchemeFactory.objectTypeFlags.debris === false)
+    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 3 && ColorSchemeFactory.objectTypeFlags.debris === false)
   ) {
     return {
       color: ColorSchemeFactory.colorTheme.deselected,
@@ -313,7 +313,7 @@ export const defaultRules = (sat: SatObject) => {
   if (
     (!sat.inView && sat.OT === 4 && ColorSchemeFactory.objectTypeFlags.trusat === false) ||
     (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.OT === 4 && ColorSchemeFactory.objectTypeFlags.trusat === false) ||
-    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 4 && ColorSchemeFactory.objectTypeFlags.trusat === false)
+    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 4 && ColorSchemeFactory.objectTypeFlags.trusat === false)
   ) {
     return {
       color: ColorSchemeFactory.colorTheme.deselected,
@@ -329,7 +329,7 @@ export const defaultRules = (sat: SatObject) => {
   }
 
   if (sat.inView && mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
-    if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.type == 'Observer' && typeof sat.vmag == 'undefined') {
+    if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == 'Observer' && typeof sat.vmag == 'undefined') {
       // Intentional
     } else {
       return {

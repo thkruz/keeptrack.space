@@ -299,7 +299,7 @@ export const updateLoop = () => {
         // Is inview and wasn't previously
         watchlistInViewList[i] = true;
         uiManager.toast(`Satellite ${sat.SCC_NUM} is In Field of View!`, 'normal');
-        keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getSensorFromSensorName(sensorManager.currentSensor.name)], 'g');
+        keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name)], 'g');
         orbitManager.addInViewOrbit(watchlistList[i]);
       }
       if (sat.inView === 0 && watchlistInViewList[i] === true) {

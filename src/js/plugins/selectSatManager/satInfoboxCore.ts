@@ -408,7 +408,7 @@ export const orbitalData = (sat: SatObject): void => {
       $('#sat-sun').parent().hide();
     } else {
       now = new Date(keepTrackApi.programs.timeManager.dynamicOffsetEpoch + keepTrackApi.programs.timeManager.propOffset);
-      const sunTime: any = SunCalc.getTimes(now, keepTrackApi.programs.sensorManager.currentSensor.lat, keepTrackApi.programs.sensorManager.currentSensor.lon);
+      const sunTime: any = SunCalc.getTimes(now, keepTrackApi.programs.sensorManager.currentSensor[0].lat, keepTrackApi.programs.sensorManager.currentSensor[0].lon);
 
       let satInSun = -1;
       if (typeof sat.isInSun !== 'undefined') {
@@ -416,7 +416,7 @@ export const orbitalData = (sat: SatObject): void => {
       }
 
       // If No Sensor, then Ignore Sun Exclusion
-      if (keepTrackApi.programs.sensorManager.currentSensor.lat === null) {
+      if (keepTrackApi.programs.sensorManager.currentSensor[0].lat === null) {
         $('#sat-sun').hide();
         return;
       } else {
@@ -424,7 +424,7 @@ export const orbitalData = (sat: SatObject): void => {
       }
 
       // If Radar Selected, then Say the Sun Doesn't Matter
-      if (keepTrackApi.programs.sensorManager.currentSensor.type !== 'Optical' && keepTrackApi.programs.sensorManager.currentSensor.type !== 'Observer') {
+      if (keepTrackApi.programs.sensorManager.currentSensor[0].type !== 'Optical' && keepTrackApi.programs.sensorManager.currentSensor[0].type !== 'Observer') {
         $('#sat-sun').html('No Effect');
         // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
       } else if (sunTime.dawn.getTime() - now.getTime() > 0 || sunTime.dusk.getTime() - now.getTime() < 0) {

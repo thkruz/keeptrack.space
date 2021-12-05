@@ -122,8 +122,8 @@ export const distance = (hoverSat: SatObject, selectedSat: SatObject) => {
   let sameBeamStr = '';
   try {
     if (satellite.currentTEARR.inView) {
-      if (parseFloat(distanceApart) < satellite.currentTEARR.rng * Math.sin(DEG2RAD * sensorManager.currentSensor.beamwidth)) {
-        if (satellite.currentTEARR.rng < sensorManager.currentSensor.obsmaxrange && satellite.currentTEARR.rng > 0) {
+      if (parseFloat(distanceApart) < satellite.currentTEARR.rng * Math.sin(DEG2RAD * sensorManager.currentSensor[0].beamwidth)) {
+        if (satellite.currentTEARR.rng < sensorManager.currentSensor[0].obsmaxrange && satellite.currentTEARR.rng > 0) {
           sameBeamStr = ' (Within One Beam)';
         }
       }
@@ -155,27 +155,15 @@ export const setobs = (sensor: any) => {
       $('.sensor-reset-menu').show();
     }
 
-    if (sensor.length > 1) {
-      sensorManager.setCurrentSensor(sensor[0]);
-      sensorManager.currentSensorList = sensor;
-      sensorManager.currentSensorMultiSensor = true;
-      sensorManager.currentSensor.observerGd = {
-        // Array to calculate look angles in propagate()
-        lat: sensor[0].lat * DEG2RAD,
-        lon: sensor[0].lon * DEG2RAD,
-        alt: parseFloat(sensor[0].alt), // Converts from string to number
-      };
-    } else {
-      sensorManager.setCurrentSensor(sensor);
-      sensorManager.currentSensorList = [sensor];
-      sensorManager.currentSensorMultiSensor = true;
-      sensorManager.currentSensor.observerGd = {
-        // Array to calculate look angles in propagate()
-        lat: sensor.lat * DEG2RAD,
-        lon: sensor.lon * DEG2RAD,
-        alt: sensor.alt, // Converts from string to number
-      };
-    }
+    sensorManager.setCurrentSensor(sensor);
+    sensorManager.currentSensorList = sensor;
+    sensorManager.currentSensorMultiSensor = sensor.length > 1;
+    sensorManager.currentSensor[0].observerGd = {
+      // Array to calculate look angles in propagate()
+      lat: sensor[0].lat * DEG2RAD,
+      lon: sensor[0].lon * DEG2RAD,
+      alt: parseFloat(sensor[0].alt), // Converts from string to number
+    };
   } catch (error) {
     console.debug(error);
   }
@@ -2383,41 +2371,41 @@ export const getLlaTimeView = (now: Date, sat: SatObject) => {
   const time = dateFormat(now, 'isoDateTime', true);
 
   let positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-  let lookAngles = satellite.ecfToLookAngles(sensorManager.currentSensor.observerGd, positionEcf);
+  let lookAngles = satellite.ecfToLookAngles(sensorManager.currentSensor[0].observerGd, positionEcf);
   let az = lookAngles.az * RAD2DEG;
   let el = lookAngles.el * RAD2DEG;
   let rng = lookAngles.rng;
   let inView = 0;
 
-  if (sensorManager.currentSensor.obsminaz < sensorManager.currentSensor.obsmaxaz) {
+  if (sensorManager.currentSensor[0].obsminaz < sensorManager.currentSensor[0].obsmaxaz) {
     if (
-      (az >= sensorManager.currentSensor.obsminaz &&
-        az <= sensorManager.currentSensor.obsmaxaz &&
-        el >= sensorManager.currentSensor.obsminel &&
-        el <= sensorManager.currentSensor.obsmaxel &&
-        rng <= sensorManager.currentSensor.obsmaxrange &&
-        rng >= sensorManager.currentSensor.obsminrange) ||
-      (az >= sensorManager.currentSensor.obsminaz2 &&
-        az <= sensorManager.currentSensor.obsmaxaz2 &&
-        el >= sensorManager.currentSensor.obsminel2 &&
-        el <= sensorManager.currentSensor.obsmaxel2 &&
-        rng <= sensorManager.currentSensor.obsmaxrange2 &&
-        rng >= sensorManager.currentSensor.obsminrange2)
+      (az >= sensorManager.currentSensor[0].obsminaz &&
+        az <= sensorManager.currentSensor[0].obsmaxaz &&
+        el >= sensorManager.currentSensor[0].obsminel &&
+        el <= sensorManager.currentSensor[0].obsmaxel &&
+        rng <= sensorManager.currentSensor[0].obsmaxrange &&
+        rng >= sensorManager.currentSensor[0].obsminrange) ||
+      (az >= sensorManager.currentSensor[0].obsminaz2 &&
+        az <= sensorManager.currentSensor[0].obsmaxaz2 &&
+        el >= sensorManager.currentSensor[0].obsminel2 &&
+        el <= sensorManager.currentSensor[0].obsmaxel2 &&
+        rng <= sensorManager.currentSensor[0].obsmaxrange2 &&
+        rng >= sensorManager.currentSensor[0].obsminrange2)
     ) {
       inView = 1;
     }
   } else {
     if (
-      ((az >= sensorManager.currentSensor.obsminaz || az <= sensorManager.currentSensor.obsmaxaz) &&
-        el >= sensorManager.currentSensor.obsminel &&
-        el <= sensorManager.currentSensor.obsmaxel &&
-        rng <= sensorManager.currentSensor.obsmaxrange &&
-        rng >= sensorManager.currentSensor.obsminrange) ||
-      ((az >= sensorManager.currentSensor.obsminaz2 || az <= sensorManager.currentSensor.obsmaxaz2) &&
-        el >= sensorManager.currentSensor.obsminel2 &&
-        el <= sensorManager.currentSensor.obsmaxel2 &&
-        rng <= sensorManager.currentSensor.obsmaxrange2 &&
-        rng >= sensorManager.currentSensor.obsminrange2)
+      ((az >= sensorManager.currentSensor[0].obsminaz || az <= sensorManager.currentSensor[0].obsmaxaz) &&
+        el >= sensorManager.currentSensor[0].obsminel &&
+        el <= sensorManager.currentSensor[0].obsmaxel &&
+        rng <= sensorManager.currentSensor[0].obsmaxrange &&
+        rng >= sensorManager.currentSensor[0].obsminrange) ||
+      ((az >= sensorManager.currentSensor[0].obsminaz2 || az <= sensorManager.currentSensor[0].obsmaxaz2) &&
+        el >= sensorManager.currentSensor[0].obsminel2 &&
+        el <= sensorManager.currentSensor[0].obsmaxel2 &&
+        rng <= sensorManager.currentSensor[0].obsmaxrange2 &&
+        rng >= sensorManager.currentSensor[0].obsminrange2)
     ) {
       inView = 1;
     }

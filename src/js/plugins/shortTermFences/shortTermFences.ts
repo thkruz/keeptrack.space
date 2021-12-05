@@ -168,9 +168,9 @@ export const stfFormOnSubmit = (e: Event) => {
     return;
   }
 
-  const lat = sensorManager.currentSensor.lat;
-  const lon = sensorManager.currentSensor.lon;
-  const alt = sensorManager.currentSensor.alt;
+  const lat = sensorManager.currentSensor[0].lat;
+  const lon = sensorManager.currentSensor[0].lon;
+  const alt = sensorManager.currentSensor[0].alt;
   const sensorType = 'Short Range Fence';
 
   // Multiply everything by 1 to convert string to number

@@ -120,6 +120,12 @@ export const init = () => {
 
 // This runs after the drawManager starts
 export const postStart = () => {
+  setTimeout(() => {
+    $('img').each(function () {
+      $(this).attr('src', $(this).attr('delayedsrc'));
+    });
+  }, 0);
+
   // Enable Satbox Overlay
   if (settingsManager.enableHoverOverlay) {
     try {
@@ -345,14 +351,14 @@ export const footerToggle = function () {
 export const getsensorinfo = () => {
   const { currentSensor }: { currentSensor: SensorObject } = keepTrackApi.programs.sensorManager;
 
-  $('#sensor-latitude').html(currentSensor.lat.toString());
-  $('#sensor-longitude').html(currentSensor.lon.toString());
-  $('#sensor-minazimuth').html(currentSensor.obsminaz.toString());
-  $('#sensor-maxazimuth').html(currentSensor.obsmaxaz.toString());
-  $('#sensor-minelevation').html(currentSensor.obsminel.toString());
-  $('#sensor-maxelevation').html(currentSensor.obsmaxel.toString());
-  $('#sensor-minrange').html(currentSensor.obsminrange.toString());
-  $('#sensor-maxrange').html(currentSensor.obsmaxrange.toString());
+  $('#sensor-latitude').html(currentSensor[0].lat.toString());
+  $('#sensor-longitude').html(currentSensor[0].lon.toString());
+  $('#sensor-minazimuth').html(currentSensor[0].obsminaz.toString());
+  $('#sensor-maxazimuth').html(currentSensor[0].obsmaxaz.toString());
+  $('#sensor-minelevation').html(currentSensor[0].obsminel.toString());
+  $('#sensor-maxelevation').html(currentSensor[0].obsmaxel.toString());
+  $('#sensor-minrange').html(currentSensor[0].obsminrange.toString());
+  $('#sensor-maxrange').html(currentSensor[0].obsmaxrange.toString());
 };
 
 let doSearch = (searchString: string, isPreventDropDown: boolean) => {

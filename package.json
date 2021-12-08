@@ -23,7 +23,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm run build:dev",
+    "build": "npm install --save-dev && npm run build:dev",
     "build:dev": "npm run prebuild && cross-env NODE_ENV=development node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "build:embed": "npm run prebuild:embed && cross-env NODE_ENV=embed node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "build:test": "npm run prebuild && cross-env NODE_ENV=test node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",

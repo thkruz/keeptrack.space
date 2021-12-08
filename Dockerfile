@@ -16,7 +16,7 @@ FROM registry.il4.dso.mil/platform-one/devops/pipeline-templates/base-image/hard
 
 USER appuser
 
-COPY --from=builder --chown=appuser:appuser /app/build /var/www
+COPY --from=builder --chown=appuser:appuser /app/dist /var/www
 
 EXPOSE 8080
 

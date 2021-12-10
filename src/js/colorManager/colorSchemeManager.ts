@@ -425,11 +425,30 @@ export const sunlightRules = (sat: SatObject) => {
     };
   }
 
-  if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
-    return {
-      color: colorSchemeManager.colorTheme.facility,
-      pickable: true,
-    };
+  // Let's see if we can determine color based on the object type
+  switch (sat.type) {
+    case 'Intergovernmental Organization':
+    case 'Suborbital Payload Operator':
+    case 'Payload Owner':
+    case 'Meteorological Rocket Launch Agency or Manufacturer':
+    case 'Payload Manufacturer':
+    case 'Launch Agency':
+    case 'Launch Site':
+    case 'Launch Position':
+      // If the facility flag is off then we don't want to show this
+      if (colorSchemeManager.objectTypeFlags.facility === false) {
+        return {
+          color: colorSchemeManager.colorTheme.deselected,
+          pickable: false,
+        };
+        // Otherwise we want to show it
+      } else {
+        return {
+          color: colorSchemeManager.colorTheme.facility,
+          pickable: true,
+        };
+      }
+    default: // Since it wasn't one of those continue on
   }
 
   if (sat.static && sat.type === 'Star') {
@@ -742,12 +761,24 @@ export const ageOfElsetRules = (sat: SatObject) => {
       };
     }
   }
-  if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
-    return {
-      color: colorSchemeManager.colorTheme.facility,
-      pickable: true,
-    };
+
+  // Let's see if we can determine color based on the object type
+  switch (sat.type) {
+    case 'Intergovernmental Organization':
+    case 'Suborbital Payload Operator':
+    case 'Payload Owner':
+    case 'Meteorological Rocket Launch Agency or Manufacturer':
+    case 'Payload Manufacturer':
+    case 'Launch Agency':
+    case 'Launch Site':
+    case 'Launch Position':
+      return {
+        color: colorSchemeManager.colorTheme.facility,
+        pickable: true,
+      };
+    default: // Since it wasn't one of those continue on
   }
+
   if (sat.static) {
     return {
       color: colorSchemeManager.colorTheme.sensor,
@@ -831,12 +862,24 @@ export const lostobjectsRules = (sat: SatObject) => {
       };
     }
   }
-  if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
-    return {
-      color: colorSchemeManager.colorTheme.facility,
-      pickable: true,
-    };
+
+  // Let's see if we can determine color based on the object type
+  switch (sat.type) {
+    case 'Intergovernmental Organization':
+    case 'Suborbital Payload Operator':
+    case 'Payload Owner':
+    case 'Meteorological Rocket Launch Agency or Manufacturer':
+    case 'Payload Manufacturer':
+    case 'Launch Agency':
+    case 'Launch Site':
+    case 'Launch Position':
+      return {
+        color: colorSchemeManager.colorTheme.facility,
+        pickable: true,
+      };
+    default: // Since it wasn't one of those continue on
   }
+
   if (sat.static) {
     return {
       color: colorSchemeManager.colorTheme.sensor,
@@ -850,17 +893,16 @@ export const lostobjectsRules = (sat: SatObject) => {
     };
   }
 
-  var pe = sat.perigee;
-  var now = new Date();
-  var jday = timeManager.getDayOfYear(now);
+  const now = new Date();
+  const jday = timeManager.getDayOfYear(now);
   const year = now.getFullYear().toString().substr(2, 2);
-  var daysold;
+  let daysold;
   if (sat.TLE1.substr(18, 2) === year) {
     daysold = jday - parseInt(sat.TLE1.substr(20, 3));
   } else {
     daysold = jday - parseInt(sat.TLE1.substr(20, 3)) + parseInt(sat.TLE1.substr(17, 2)) * 365;
   }
-  if (pe > satellite.obsmaxrange || daysold < settingsManager.daysUntilObjectLost) {
+  if (sat.perigee > satellite.obsmaxrange || daysold < settingsManager.daysUntilObjectLost) {
     return {
       color: colorSchemeManager.colorTheme.transparent,
       pickable: false,
@@ -898,12 +940,23 @@ export const leoRules = (sat: SatObject) => {
       };
     }
   }
-  if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
-    return {
-      color: colorSchemeManager.colorTheme.facility,
-      pickable: true,
-    };
+  // Let's see if we can determine color based on the object type
+  switch (sat.type) {
+    case 'Intergovernmental Organization':
+    case 'Suborbital Payload Operator':
+    case 'Payload Owner':
+    case 'Meteorological Rocket Launch Agency or Manufacturer':
+    case 'Payload Manufacturer':
+    case 'Launch Agency':
+    case 'Launch Site':
+    case 'Launch Position':
+      return {
+        color: colorSchemeManager.colorTheme.facility,
+        pickable: true,
+      };
+    default: // Since it wasn't one of those continue on
   }
+
   if (sat.static) {
     return {
       color: colorSchemeManager.colorTheme.sensor,
@@ -956,12 +1009,23 @@ export const geoRules = (sat: SatObject) => {
       };
     }
   }
-  if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
-    return {
-      color: colorSchemeManager.colorTheme.facility,
-      pickable: true,
-    };
+  // Let's see if we can determine color based on the object type
+  switch (sat.type) {
+    case 'Intergovernmental Organization':
+    case 'Suborbital Payload Operator':
+    case 'Payload Owner':
+    case 'Meteorological Rocket Launch Agency or Manufacturer':
+    case 'Payload Manufacturer':
+    case 'Launch Agency':
+    case 'Launch Site':
+    case 'Launch Position':
+      return {
+        color: colorSchemeManager.colorTheme.facility,
+        pickable: true,
+      };
+    default: // Since it wasn't one of those continue on
   }
+
   if (sat.static) {
     return {
       color: colorSchemeManager.colorTheme.sensor,
@@ -1015,13 +1079,24 @@ export const velocityRules = (sat: SatObject) => {
       };
     }
   }
-  // Facilities
-  if (sat.static && (sat.type === 'Launch Facility' || sat.type === 'Control Facility')) {
-    return {
-      color: colorSchemeManager.colorTheme.facility,
-      pickable: true,
-    };
+
+  // Let's see if we can determine color based on the object type
+  switch (sat.type) {
+    case 'Intergovernmental Organization':
+    case 'Suborbital Payload Operator':
+    case 'Payload Owner':
+    case 'Meteorological Rocket Launch Agency or Manufacturer':
+    case 'Payload Manufacturer':
+    case 'Launch Agency':
+    case 'Launch Site':
+    case 'Launch Position':
+      return {
+        color: colorSchemeManager.colorTheme.facility,
+        pickable: true,
+      };
+    default: // Since it wasn't one of those continue on
   }
+
   // Sensors
   if (sat.static) {
     return {

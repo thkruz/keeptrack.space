@@ -3,101 +3,101 @@
 import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/externalApi';
 import { getDayOfYear } from '../timeManager/transforms';
-import * as colorSchemeFactory from './color-scheme-factory';
+import * as ColorSchemeManager from './colorSchemeManager';
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
-describe('ColorSchemeFactory.init', () => {
+describe('ColorSchemeManager.init', () => {
   test('0', () => {
-    let result: any = colorSchemeFactory.ColorSchemeFactory.init();
+    let result: any = ColorSchemeManager.ColorSchemeManager.init();
     expect(result).toMatchSnapshot();
   });
 });
 
 // @ponicode
-describe('ColorSchemeFactory.resetObjectTypeFlags', () => {
+describe('ColorSchemeManager.resetObjectTypeFlags', () => {
   test('0', () => {
-    let result: any = colorSchemeFactory.ColorSchemeFactory.resetObjectTypeFlags();
+    let result: any = ColorSchemeManager.ColorSchemeManager.resetObjectTypeFlags();
     expect(result).toMatchSnapshot();
   });
 });
 
 // @ponicode
-describe('ColorSchemeFactory.reloadColors', () => {
+describe('ColorSchemeManager.reloadColors', () => {
   test('0', () => {
-    let result: any = colorSchemeFactory.ColorSchemeFactory.reloadColors();
+    let result: any = ColorSchemeManager.ColorSchemeManager.reloadColors();
     expect(result).toMatchSnapshot();
   });
 });
 
 describe('Test ColorRules', () => {
   beforeEach(() => {
-    colorSchemeFactory.ColorSchemeFactory.init();
+    ColorSchemeManager.ColorSchemeManager.init();
     settingsManager.isFOVBubbleModeOn = true;
     keepTrackApi.programs.satSet.numSats = 2;
   });
   test('0', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.default.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.default.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
   test('1', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.onlyFOV.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.onlyFOV.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
   test('2', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.sunlight.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.sunlight.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
   test('3', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.apogee.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.apogee.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
   test('4', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.smallsats.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.smallsats.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
   test('5', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.rcs.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.rcs.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
   test('6', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.countries.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.countries.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
   test('7', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.ageOfElset.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.ageOfElset.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
   test('8', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.lostobjects.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.lostobjects.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
   test('9', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.leo.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.leo.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
   test('10', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.geo.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.geo.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
   test('11', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.velocity.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.velocity.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
   test('12', async () => {
-    let result: any = await colorSchemeFactory.ColorSchemeFactory.group.calculateColorBuffers(true);
+    let result: any = await ColorSchemeManager.ColorSchemeManager.group.calculateColorBuffers(true);
     expect(result).toMatchSnapshot();
   });
 });
 
 // @ponicode
-describe('ColorSchemeFactory.defaultRules', () => {
+describe('ColorSchemeManager.defaultRules', () => {
   beforeAll(() => {
-    colorSchemeFactory.ColorSchemeFactory.init();
+    ColorSchemeManager.ColorSchemeManager.init();
   });
 
   test('0', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       static: true,
       type: 'Star',
     });
@@ -105,7 +105,7 @@ describe('ColorSchemeFactory.defaultRules', () => {
   });
 
   test('1', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       static: true,
       vmag: 5,
       type: 'Star',
@@ -114,7 +114,7 @@ describe('ColorSchemeFactory.defaultRules', () => {
   });
 
   test('2', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       static: true,
       vmag: 3.6,
       type: 'Star',
@@ -123,7 +123,7 @@ describe('ColorSchemeFactory.defaultRules', () => {
   });
 
   test('3', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       static: true,
       vmag: 1,
       type: 'Star',
@@ -133,23 +133,23 @@ describe('ColorSchemeFactory.defaultRules', () => {
 
   test('4', () => {
     keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Astronomy;
-    let result: any = colorSchemeFactory.defaultRules({});
+    let result: any = ColorSchemeManager.defaultRules({});
     expect(result).toMatchSnapshot();
     keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Default;
   });
 
   test('5', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.facility = false;
-    let result: any = colorSchemeFactory.defaultRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.facility = false;
+    let result: any = ColorSchemeManager.defaultRules({
       static: true,
       type: 'Launch Facility',
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.facility = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.facility = true;
   });
 
   test('6', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       static: true,
       type: 'Launch Facility',
     });
@@ -157,14 +157,14 @@ describe('ColorSchemeFactory.defaultRules', () => {
   });
 
   test('7', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       marker: true,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('8', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       isRadarData: true,
       missileComplex: 1,
     });
@@ -172,7 +172,7 @@ describe('ColorSchemeFactory.defaultRules', () => {
   });
 
   test('9', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       isRadarData: true,
       satId: 1,
     });
@@ -180,110 +180,110 @@ describe('ColorSchemeFactory.defaultRules', () => {
   });
 
   test('10', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       isRadarData: true,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('11', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.sensor = false;
-    let result: any = colorSchemeFactory.defaultRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.sensor = false;
+    let result: any = ColorSchemeManager.defaultRules({
       static: true,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.sensor = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.sensor = true;
   });
 
   test('12', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       static: true,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('13', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       missile: true,
     });
     expect(result).toMatchSnapshot();
 
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.missile = false;
-    result = colorSchemeFactory.defaultRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.missile = false;
+    result = ColorSchemeManager.defaultRules({
       missile: true,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.missile = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.missile = true;
   });
 
   test('14', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       missile: true,
       inView: true,
     });
     expect(result).toMatchSnapshot();
 
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.missile = false;
-    result = colorSchemeFactory.defaultRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.missile = false;
+    result = ColorSchemeManager.defaultRules({
       missile: true,
       inView: true,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.missile = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.missile = true;
   });
 
   test('15', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.payload = false;
-    let result: any = colorSchemeFactory.defaultRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.payload = false;
+    let result: any = ColorSchemeManager.defaultRules({
       OT: 1,
       inView: false,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.payload = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.payload = true;
   });
 
   test('16', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.rocketBody = false;
-    let result: any = colorSchemeFactory.defaultRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.rocketBody = false;
+    let result: any = ColorSchemeManager.defaultRules({
       OT: 2,
       inView: false,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.rocketBody = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.rocketBody = true;
   });
 
   test('17', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.debris = false;
-    let result: any = colorSchemeFactory.defaultRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.debris = false;
+    let result: any = ColorSchemeManager.defaultRules({
       OT: 3,
       inView: false,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.debris = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.debris = true;
   });
 
   test('18', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.trusat = false;
-    let result: any = colorSchemeFactory.defaultRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.trusat = false;
+    let result: any = ColorSchemeManager.defaultRules({
       OT: 4,
       inView: false,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.trusat = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.trusat = true;
   });
 
   test('19', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.inFOV = false;
-    let result: any = colorSchemeFactory.defaultRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.inFOV = false;
+    let result: any = ColorSchemeManager.defaultRules({
       inView: true,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.inFOV = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.inFOV = true;
   });
 
   test('20', () => {
     keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Planetarium;
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       inView: true,
     });
     expect(result).toMatchSnapshot();
@@ -291,49 +291,49 @@ describe('ColorSchemeFactory.defaultRules', () => {
   });
 
   test('21', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       inView: true,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('22', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       C: 'ANALSAT',
     });
     expect(result).toMatchSnapshot();
   });
 
   test('23', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       OT: 1,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('24', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       OT: 2,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('25', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       OT: 3,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('26', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       OT: 4,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('27', () => {
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       OT: 5,
     });
     expect(result).toMatchSnapshot();
@@ -341,7 +341,7 @@ describe('ColorSchemeFactory.defaultRules', () => {
 
   test('28', () => {
     keepTrackApi.programs.satellite.obsmaxrange = 100;
-    let result: any = colorSchemeFactory.defaultRules({
+    let result: any = ColorSchemeManager.defaultRules({
       perigee: 10000,
     });
     expect(result).toMatchSnapshot();
@@ -349,28 +349,28 @@ describe('ColorSchemeFactory.defaultRules', () => {
   });
 
   test('29', () => {
-    let result: any = colorSchemeFactory.defaultRules({});
+    let result: any = ColorSchemeManager.defaultRules({});
     expect(result).toMatchSnapshot();
   });
 });
 
-describe('ColorSchemeFactory.sunlightRules', () => {
+describe('ColorSchemeManager.sunlightRules', () => {
   beforeAll(() => {
-    colorSchemeFactory.ColorSchemeFactory.init();
+    ColorSchemeManager.ColorSchemeManager.init();
   });
 
   test('0', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.facility = false;
-    let result: any = colorSchemeFactory.sunlightRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.facility = false;
+    let result: any = ColorSchemeManager.sunlightRules({
       static: true,
       type: 'Launch Facility',
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.facility = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.facility = true;
   });
 
   test('1', () => {
-    let result: any = colorSchemeFactory.sunlightRules({
+    let result: any = ColorSchemeManager.sunlightRules({
       static: true,
       type: 'Launch Facility',
     });
@@ -378,7 +378,7 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 
   test('2', () => {
-    let result: any = colorSchemeFactory.sunlightRules({
+    let result: any = ColorSchemeManager.sunlightRules({
       static: true,
       type: 'Star',
     });
@@ -386,7 +386,7 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 
   test('3', () => {
-    let result: any = colorSchemeFactory.sunlightRules({
+    let result: any = ColorSchemeManager.sunlightRules({
       static: true,
       type: 'Star',
       vmag: 5,
@@ -395,7 +395,7 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 
   test('4', () => {
-    let result: any = colorSchemeFactory.sunlightRules({
+    let result: any = ColorSchemeManager.sunlightRules({
       static: true,
       type: 'Star',
       vmag: 3.6,
@@ -404,7 +404,7 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 
   test('5', () => {
-    let result: any = colorSchemeFactory.sunlightRules({
+    let result: any = ColorSchemeManager.sunlightRules({
       static: true,
       type: 'Star',
       vmag: 1,
@@ -413,30 +413,30 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 
   test('6', () => {
-    let result: any = colorSchemeFactory.sunlightRules({
+    let result: any = ColorSchemeManager.sunlightRules({
       marker: true,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('7', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.sensor = false;
-    let result: any = colorSchemeFactory.sunlightRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.sensor = false;
+    let result: any = ColorSchemeManager.sunlightRules({
       static: true,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.sensor = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.sensor = true;
   });
 
   test('8', () => {
-    let result: any = colorSchemeFactory.sunlightRules({
+    let result: any = ColorSchemeManager.sunlightRules({
       static: true,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('9', () => {
-    let result: any = colorSchemeFactory.sunlightRules({
+    let result: any = ColorSchemeManager.sunlightRules({
       missile: true,
       inView: true,
     });
@@ -444,7 +444,7 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 
   test('9', () => {
-    let result: any = colorSchemeFactory.sunlightRules({
+    let result: any = ColorSchemeManager.sunlightRules({
       missile: true,
       inView: false,
     });
@@ -452,17 +452,17 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 
   test('10', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.inFOV = false;
-    let result: any = colorSchemeFactory.sunlightRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.inFOV = false;
+    let result: any = ColorSchemeManager.sunlightRules({
       inSun: 2,
       inView: true,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.inFOV = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.inFOV = true;
   });
 
   test('11', () => {
-    let result: any = colorSchemeFactory.sunlightRules({
+    let result: any = ColorSchemeManager.sunlightRules({
       inSun: 2,
       inView: true,
     });
@@ -470,8 +470,8 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 
   test('12', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.satHi = true;
-    let result: any = colorSchemeFactory.sunlightRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.satHi = true;
+    let result: any = ColorSchemeManager.sunlightRules({
       vmag: 0,
       inSun: 2,
       inView: false,
@@ -480,8 +480,8 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 
   test('13', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.satHi = true;
-    let result: any = colorSchemeFactory.sunlightRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.satHi = true;
+    let result: any = ColorSchemeManager.sunlightRules({
       vmag: 3.1,
       inSun: 2,
       inView: false,
@@ -490,8 +490,8 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 
   test('14', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.satHi = true;
-    let result: any = colorSchemeFactory.sunlightRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.satHi = true;
+    let result: any = ColorSchemeManager.sunlightRules({
       vmag: 5,
       inSun: 2,
       inView: false,
@@ -500,8 +500,8 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 
   test('15', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.satMed = true;
-    let result: any = colorSchemeFactory.sunlightRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.satMed = true;
+    let result: any = ColorSchemeManager.sunlightRules({
       vmag: 5,
       inSun: 1,
       inView: false,
@@ -510,8 +510,8 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 
   test('16', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.satLow = true;
-    let result: any = colorSchemeFactory.sunlightRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.satLow = true;
+    let result: any = ColorSchemeManager.sunlightRules({
       vmag: 5,
       inSun: 0,
       inView: false,
@@ -520,22 +520,22 @@ describe('ColorSchemeFactory.sunlightRules', () => {
   });
 });
 
-describe('ColorSchemeFactory.smallsatsRules', () => {
+describe('ColorSchemeManager.smallsatsRules', () => {
   beforeAll(() => {
-    colorSchemeFactory.ColorSchemeFactory.init();
+    ColorSchemeManager.ColorSchemeManager.init();
   });
 
   test('0', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.satSmall = false;
-    let result: any = colorSchemeFactory.smallsatsRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.satSmall = false;
+    let result: any = ColorSchemeManager.smallsatsRules({
       OT: 1,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.satSmall = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.satSmall = true;
   });
 
   test('1', () => {
-    let result: any = colorSchemeFactory.smallsatsRules({
+    let result: any = ColorSchemeManager.smallsatsRules({
       OT: 1,
       R: 0.01,
     });
@@ -543,141 +543,141 @@ describe('ColorSchemeFactory.smallsatsRules', () => {
   });
 });
 
-describe('ColorSchemeFactory.rcsRules', () => {
+describe('ColorSchemeManager.rcsRules', () => {
   beforeAll(() => {
-    colorSchemeFactory.ColorSchemeFactory.init();
+    ColorSchemeManager.ColorSchemeManager.init();
   });
 
   test('0', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.rcsSmall = false;
-    let result: any = colorSchemeFactory.rcsRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.rcsSmall = false;
+    let result: any = ColorSchemeManager.rcsRules({
       R: 0.01,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.rcsSmall = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.rcsSmall = true;
   });
 
   test('1', () => {
-    let result: any = colorSchemeFactory.rcsRules({
+    let result: any = ColorSchemeManager.rcsRules({
       R: 0.01,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.rcsMed = false;
-    let result: any = colorSchemeFactory.rcsRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.rcsMed = false;
+    let result: any = ColorSchemeManager.rcsRules({
       R: 0.5,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.rcsMed = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.rcsMed = true;
   });
 
   test('3', () => {
-    let result: any = colorSchemeFactory.rcsRules({
+    let result: any = ColorSchemeManager.rcsRules({
       R: 0.5,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.rcsLarge = false;
-    let result: any = colorSchemeFactory.rcsRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.rcsLarge = false;
+    let result: any = ColorSchemeManager.rcsRules({
       R: 1.5,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.rcsLarge = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.rcsLarge = true;
   });
 
   test('5', () => {
-    let result: any = colorSchemeFactory.rcsRules({
+    let result: any = ColorSchemeManager.rcsRules({
       R: 1.5,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('6', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.rcsUnknown = false;
-    let result: any = colorSchemeFactory.rcsRules({});
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.rcsUnknown = false;
+    let result: any = ColorSchemeManager.rcsRules({});
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.rcsUnknown = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.rcsUnknown = true;
   });
 
   test('7', () => {
-    let result: any = colorSchemeFactory.rcsRules({});
+    let result: any = ColorSchemeManager.rcsRules({});
     expect(result).toMatchSnapshot();
   });
 });
 
-describe('ColorSchemeFactory.countriesRules', () => {
+describe('ColorSchemeManager.countriesRules', () => {
   beforeAll(() => {
-    colorSchemeFactory.ColorSchemeFactory.init();
+    ColorSchemeManager.ColorSchemeManager.init();
   });
 
   test('0', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.countryUS = false;
-    let result: any = colorSchemeFactory.countriesRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.countryUS = false;
+    let result: any = ColorSchemeManager.countriesRules({
       C: 'US',
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.countryUS = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.countryUS = true;
   });
 
   test('1', () => {
-    let result: any = colorSchemeFactory.countriesRules({
+    let result: any = ColorSchemeManager.countriesRules({
       C: 'US',
     });
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.countryPRC = false;
-    let result: any = colorSchemeFactory.countriesRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.countryPRC = false;
+    let result: any = ColorSchemeManager.countriesRules({
       C: 'PRC',
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.countryPRC = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.countryPRC = true;
   });
 
   test('3', () => {
-    let result: any = colorSchemeFactory.countriesRules({
+    let result: any = ColorSchemeManager.countriesRules({
       C: 'PRC',
     });
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.countryCIS = false;
-    let result: any = colorSchemeFactory.countriesRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.countryCIS = false;
+    let result: any = ColorSchemeManager.countriesRules({
       C: 'CIS',
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.countryCIS = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.countryCIS = true;
   });
 
   test('5', () => {
-    let result: any = colorSchemeFactory.countriesRules({
+    let result: any = ColorSchemeManager.countriesRules({
       C: 'CIS',
     });
     expect(result).toMatchSnapshot();
   });
 
   test('6', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.countryOther = false;
-    let result: any = colorSchemeFactory.countriesRules({});
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.countryOther = false;
+    let result: any = ColorSchemeManager.countriesRules({});
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.countryOther = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.countryOther = true;
   });
 });
 
-describe('ColorSchemeFactory.ageOfElsetRules', () => {
+describe('ColorSchemeManager.ageOfElsetRules', () => {
   beforeAll(() => {
     keepTrackApi.programs.timeManager.getDayOfYear = getDayOfYear;
-    colorSchemeFactory.ColorSchemeFactory.init();
+    ColorSchemeManager.ColorSchemeManager.init();
   });
 
   test('0', () => {
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    let result: any = ColorSchemeManager.ageOfElsetRules({
       static: true,
       type: 'Star',
       vmag: 5,
@@ -686,7 +686,7 @@ describe('ColorSchemeFactory.ageOfElsetRules', () => {
   });
 
   test('1', () => {
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    let result: any = ColorSchemeManager.ageOfElsetRules({
       static: true,
       type: 'Star',
       vmag: 3.6,
@@ -695,7 +695,7 @@ describe('ColorSchemeFactory.ageOfElsetRules', () => {
   });
 
   test('2', () => {
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    let result: any = ColorSchemeManager.ageOfElsetRules({
       static: true,
       type: 'Star',
       vmag: 0,
@@ -704,7 +704,7 @@ describe('ColorSchemeFactory.ageOfElsetRules', () => {
   });
 
   test('3', () => {
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    let result: any = ColorSchemeManager.ageOfElsetRules({
       static: true,
       type: 'Star',
     });
@@ -712,7 +712,7 @@ describe('ColorSchemeFactory.ageOfElsetRules', () => {
   });
 
   test('4', () => {
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    let result: any = ColorSchemeManager.ageOfElsetRules({
       static: true,
       type: 'Control Facility',
     });
@@ -720,14 +720,14 @@ describe('ColorSchemeFactory.ageOfElsetRules', () => {
   });
 
   test('5', () => {
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    let result: any = ColorSchemeManager.ageOfElsetRules({
       static: true,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('6', () => {
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    let result: any = ColorSchemeManager.ageOfElsetRules({
       missile: true,
     });
     expect(result).toMatchSnapshot();
@@ -739,33 +739,33 @@ describe('ColorSchemeFactory.ageOfElsetRules', () => {
     const jday = getDayOfYear(now);
     now = now.getFullYear();
     now = now.toString().substr(2, 2);
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    let result: any = ColorSchemeManager.ageOfElsetRules({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('8', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.ageMed = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.ageMed = true;
     let now = new Date();
     now.setDate(now.getDate() - 3);
     const jday = getDayOfYear(now);
     now = now.getFullYear();
     now = now.toString().substr(2, 2);
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    let result: any = ColorSchemeManager.ageOfElsetRules({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('9', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.ageOld = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.ageOld = true;
     let now = new Date();
     now.setDate(now.getDate() - 15);
     const jday = getDayOfYear(now);
     now = now.getFullYear();
     now = now.toString().substr(2, 2);
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    let result: any = ColorSchemeManager.ageOfElsetRules({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
     });
     expect(result).toMatchSnapshot();
@@ -777,24 +777,24 @@ describe('ColorSchemeFactory.ageOfElsetRules', () => {
     const jday = getDayOfYear(now);
     now = now.getFullYear();
     now = now.toString().substr(2, 2);
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    let result: any = ColorSchemeManager.ageOfElsetRules({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('11', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.ageLost = false;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.ageLost = false;
     let now = new Date();
     now.setDate(now.getDate() - 80);
     const jday = getDayOfYear(now);
     now = now.getFullYear();
     now = now.toString().substr(2, 2);
-    let result: any = colorSchemeFactory.ageOfElsetRules({
+    let result: any = ColorSchemeManager.ageOfElsetRules({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.ageLost = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.ageLost = true;
   });
 
   test('12', () => {
@@ -803,22 +803,22 @@ describe('ColorSchemeFactory.ageOfElsetRules', () => {
     const jday = getDayOfYear(now);
     now = now.getFullYear();
     now = now.toString().substr(2, 2);
-    colorSchemeFactory.ageOfElsetRules({
+    ColorSchemeManager.ageOfElsetRules({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
     });
   });
 });
 
-describe('ColorSchemeFactory.lostobjectsRules', () => {
+describe('ColorSchemeManager.lostobjectsRules', () => {
   beforeAll(() => {
     keepTrackApi.programs.timeManager.getDayOfYear = getDayOfYear;
     settingsManager.daysUntilObjectLost = 50;
-    colorSchemeFactory.ColorSchemeFactory.init();
+    ColorSchemeManager.ColorSchemeManager.init();
   });
 
   test('0', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starLow = true;
-    let result: any = colorSchemeFactory.lostobjectsRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starLow = true;
+    let result: any = ColorSchemeManager.lostobjectsRules({
       static: true,
       type: 'Star',
       vmag: 5,
@@ -827,8 +827,8 @@ describe('ColorSchemeFactory.lostobjectsRules', () => {
   });
 
   test('1', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starMed = true;
-    let result: any = colorSchemeFactory.lostobjectsRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starMed = true;
+    let result: any = ColorSchemeManager.lostobjectsRules({
       static: true,
       type: 'Star',
       vmag: 3.5,
@@ -837,8 +837,8 @@ describe('ColorSchemeFactory.lostobjectsRules', () => {
   });
 
   test('2', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starHi = true;
-    let result: any = colorSchemeFactory.lostobjectsRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starHi = true;
+    let result: any = ColorSchemeManager.lostobjectsRules({
       static: true,
       type: 'Star',
       vmag: 0,
@@ -847,18 +847,18 @@ describe('ColorSchemeFactory.lostobjectsRules', () => {
   });
 
   test('3', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starHi = false;
-    let result: any = colorSchemeFactory.lostobjectsRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starHi = false;
+    let result: any = ColorSchemeManager.lostobjectsRules({
       static: true,
       type: 'Star',
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starHi = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starHi = true;
   });
 
   test('4', () => {
-    let result: any = colorSchemeFactory.lostobjectsRules({
+    let result: any = ColorSchemeManager.lostobjectsRules({
       static: true,
       type: 'Launch Facility',
     });
@@ -866,14 +866,14 @@ describe('ColorSchemeFactory.lostobjectsRules', () => {
   });
 
   test('5', () => {
-    let result: any = colorSchemeFactory.lostobjectsRules({
+    let result: any = ColorSchemeManager.lostobjectsRules({
       static: true,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('6', () => {
-    let result: any = colorSchemeFactory.lostobjectsRules({
+    let result: any = ColorSchemeManager.lostobjectsRules({
       missile: true,
     });
     expect(result).toMatchSnapshot();
@@ -885,7 +885,7 @@ describe('ColorSchemeFactory.lostobjectsRules', () => {
     const jday = getDayOfYear(now);
     now = now.getFullYear();
     now = now.toString().substr(2, 2);
-    let result: any = colorSchemeFactory.lostobjectsRules({
+    let result: any = ColorSchemeManager.lostobjectsRules({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
     });
     expect(result).toMatchSnapshot();
@@ -897,23 +897,23 @@ describe('ColorSchemeFactory.lostobjectsRules', () => {
     const jday = getDayOfYear(now);
     now = now.getFullYear();
     now = now.toString().substr(2, 2);
-    let result: any = colorSchemeFactory.lostobjectsRules({
+    let result: any = ColorSchemeManager.lostobjectsRules({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
     });
     expect(result).toMatchSnapshot();
   });
 });
 
-describe('ColorSchemeFactory.leoRules', () => {
+describe('ColorSchemeManager.leoRules', () => {
   beforeAll(() => {
     keepTrackApi.programs.timeManager.getDayOfYear = getDayOfYear;
     settingsManager.daysUntilObjectLost = 50;
-    colorSchemeFactory.ColorSchemeFactory.init();
+    ColorSchemeManager.ColorSchemeManager.init();
   });
 
   test('0', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starLow = true;
-    let result: any = colorSchemeFactory.leoRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starLow = true;
+    let result: any = ColorSchemeManager.leoRules({
       static: true,
       type: 'Star',
       vmag: 5,
@@ -922,8 +922,8 @@ describe('ColorSchemeFactory.leoRules', () => {
   });
 
   test('1', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starMed = true;
-    let result: any = colorSchemeFactory.leoRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starMed = true;
+    let result: any = ColorSchemeManager.leoRules({
       static: true,
       type: 'Star',
       vmag: 3.5,
@@ -932,8 +932,8 @@ describe('ColorSchemeFactory.leoRules', () => {
   });
 
   test('2', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starHi = true;
-    let result: any = colorSchemeFactory.leoRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starHi = true;
+    let result: any = ColorSchemeManager.leoRules({
       static: true,
       type: 'Star',
       vmag: 0,
@@ -942,18 +942,18 @@ describe('ColorSchemeFactory.leoRules', () => {
   });
 
   test('3', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starHi = false;
-    let result: any = colorSchemeFactory.leoRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starHi = false;
+    let result: any = ColorSchemeManager.leoRules({
       static: true,
       type: 'Star',
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starHi = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starHi = true;
   });
 
   test('4', () => {
-    let result: any = colorSchemeFactory.leoRules({
+    let result: any = ColorSchemeManager.leoRules({
       static: true,
       type: 'Launch Facility',
     });
@@ -961,28 +961,28 @@ describe('ColorSchemeFactory.leoRules', () => {
   });
 
   test('5', () => {
-    let result: any = colorSchemeFactory.leoRules({
+    let result: any = ColorSchemeManager.leoRules({
       static: true,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('6', () => {
-    let result: any = colorSchemeFactory.leoRules({
+    let result: any = ColorSchemeManager.leoRules({
       missile: true,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('7', () => {
-    let result: any = colorSchemeFactory.leoRules({
+    let result: any = ColorSchemeManager.leoRules({
       apogee: 500000,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('8', () => {
-    let result: any = colorSchemeFactory.leoRules({
+    let result: any = ColorSchemeManager.leoRules({
       apogee: 1000,
       inView: true,
     });
@@ -990,25 +990,25 @@ describe('ColorSchemeFactory.leoRules', () => {
   });
 
   test('9', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.inFOV = false;
-    let result: any = colorSchemeFactory.leoRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.inFOV = false;
+    let result: any = ColorSchemeManager.leoRules({
       apogee: 1000,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.inFOV = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.inFOV = true;
   });
 });
 
-describe('ColorSchemeFactory.geoRules', () => {
+describe('ColorSchemeManager.geoRules', () => {
   beforeAll(() => {
     keepTrackApi.programs.timeManager.getDayOfYear = getDayOfYear;
     settingsManager.daysUntilObjectLost = 50;
-    colorSchemeFactory.ColorSchemeFactory.init();
+    ColorSchemeManager.ColorSchemeManager.init();
   });
 
   test('0', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starLow = true;
-    let result: any = colorSchemeFactory.geoRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starLow = true;
+    let result: any = ColorSchemeManager.geoRules({
       static: true,
       type: 'Star',
       vmag: 5,
@@ -1017,8 +1017,8 @@ describe('ColorSchemeFactory.geoRules', () => {
   });
 
   test('1', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starMed = true;
-    let result: any = colorSchemeFactory.geoRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starMed = true;
+    let result: any = ColorSchemeManager.geoRules({
       static: true,
       type: 'Star',
       vmag: 3.5,
@@ -1027,8 +1027,8 @@ describe('ColorSchemeFactory.geoRules', () => {
   });
 
   test('2', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starHi = true;
-    let result: any = colorSchemeFactory.geoRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starHi = true;
+    let result: any = ColorSchemeManager.geoRules({
       static: true,
       type: 'Star',
       vmag: 0,
@@ -1037,18 +1037,18 @@ describe('ColorSchemeFactory.geoRules', () => {
   });
 
   test('3', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starHi = false;
-    let result: any = colorSchemeFactory.geoRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starHi = false;
+    let result: any = ColorSchemeManager.geoRules({
       static: true,
       type: 'Star',
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starHi = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starHi = true;
   });
 
   test('4', () => {
-    let result: any = colorSchemeFactory.geoRules({
+    let result: any = ColorSchemeManager.geoRules({
       static: true,
       type: 'Launch Facility',
     });
@@ -1056,21 +1056,21 @@ describe('ColorSchemeFactory.geoRules', () => {
   });
 
   test('5', () => {
-    let result: any = colorSchemeFactory.geoRules({
+    let result: any = ColorSchemeManager.geoRules({
       static: true,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('6', () => {
-    let result: any = colorSchemeFactory.geoRules({
+    let result: any = ColorSchemeManager.geoRules({
       missile: true,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('7', () => {
-    let result: any = colorSchemeFactory.geoRules({
+    let result: any = ColorSchemeManager.geoRules({
       inView: true,
       perigee: 500000,
     });
@@ -1078,30 +1078,30 @@ describe('ColorSchemeFactory.geoRules', () => {
   });
 
   test('8', () => {
-    let result: any = colorSchemeFactory.geoRules({
+    let result: any = ColorSchemeManager.geoRules({
       perigee: 1000,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('9', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.inFOV = false;
-    let result: any = colorSchemeFactory.geoRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.inFOV = false;
+    let result: any = ColorSchemeManager.geoRules({
       perigee: 500000,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.inFOV = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.inFOV = true;
   });
 });
 
-describe('ColorSchemeFactory.velocityRules', () => {
+describe('ColorSchemeManager.velocityRules', () => {
   beforeAll(() => {
-    colorSchemeFactory.ColorSchemeFactory.init();
+    ColorSchemeManager.ColorSchemeManager.init();
   });
 
   test('0', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starLow = true;
-    let result: any = colorSchemeFactory.velocityRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starLow = true;
+    let result: any = ColorSchemeManager.velocityRules({
       static: true,
       type: 'Star',
       vmag: 5,
@@ -1110,8 +1110,8 @@ describe('ColorSchemeFactory.velocityRules', () => {
   });
 
   test('1', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starMed = true;
-    let result: any = colorSchemeFactory.velocityRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starMed = true;
+    let result: any = ColorSchemeManager.velocityRules({
       static: true,
       type: 'Star',
       vmag: 3.5,
@@ -1120,8 +1120,8 @@ describe('ColorSchemeFactory.velocityRules', () => {
   });
 
   test('2', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starHi = true;
-    let result: any = colorSchemeFactory.velocityRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starHi = true;
+    let result: any = ColorSchemeManager.velocityRules({
       static: true,
       type: 'Star',
       vmag: 0,
@@ -1130,25 +1130,25 @@ describe('ColorSchemeFactory.velocityRules', () => {
   });
 
   test('3', () => {
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starHi = false;
-    let result: any = colorSchemeFactory.velocityRules({
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starHi = false;
+    let result: any = ColorSchemeManager.velocityRules({
       static: true,
       type: 'Star',
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
-    colorSchemeFactory.ColorSchemeFactory.objectTypeFlags.starHi = true;
+    ColorSchemeManager.ColorSchemeManager.objectTypeFlags.starHi = true;
   });
 });
 
 // Causes a Jest crash??
-// describe.skip('ColorSchemeFactory.velocityRules', () => {
+// describe.skip('ColorSchemeManager.velocityRules', () => {
 //   beforeAll(() => {
-//     colorSchemeFactory.ColorSchemeFactory.init();
+//     ColorSchemeManager.ColorSchemeManager.init();
 //   });
 
 //   test('4', () => {
-//     let result: any = colorSchemeFactory.velocityRules({
+//     let result: any = ColorSchemeManager.velocityRules({
 //       static: true,
 //       type: 'Launch Facility',
 //     });
@@ -1156,7 +1156,7 @@ describe('ColorSchemeFactory.velocityRules', () => {
 //   });
 
 //   test('5', () => {
-//     let result: any = colorSchemeFactory.velocityRules({
+//     let result: any = ColorSchemeManager.velocityRules({
 //       static: true,
 //     });
 //     expect(result).toMatchSnapshot();

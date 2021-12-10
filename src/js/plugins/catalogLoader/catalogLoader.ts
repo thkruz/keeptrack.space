@@ -1,7 +1,6 @@
 import { SatObject } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { stringPad } from '@app/js/lib/helpers';
-import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 
 /**
  *  @returns {Promise<any>}
@@ -91,15 +90,6 @@ export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any) => 
     fieldOfViewSetLength: objectManager.fieldOfViewSet.length,
     isLowPerf: settingsManager.lowPerf,
   });
-
-  // If No Visual Magnitudes, Add The VMag Database
-  try {
-    if (typeof satSet.getSat(satSet.getIdFromObjNum(44235)).vmag == 'undefined') {
-      satVmagManager.init(satSet);
-    }
-  } catch (e) {
-    console.debug('satVmagManager Not Loaded');
-  }
 };
 
 export const setupGetVariables = () => {

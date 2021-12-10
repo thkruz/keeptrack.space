@@ -95,6 +95,7 @@ export const colorSchemeManager: ColorSchemeManager = {
     colorSchemeManager.leo = new ColorScheme(gl, satSet, objectManager, leoRules);
     colorSchemeManager.geo = new ColorScheme(gl, satSet, objectManager, geoRules);
     colorSchemeManager.velocity = new ColorScheme(gl, satSet, objectManager, velocityRules);
+    colorSchemeManager.velocity.isVelocityColorScheme = true;
     // Used When Displaying a Group/Search of Objects
     colorSchemeManager.group = new ColorScheme(gl, satSet, objectManager, groupRules);
   },

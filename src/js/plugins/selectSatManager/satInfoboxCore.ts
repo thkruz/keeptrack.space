@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
 import { SatObject } from '@app/js/api/keepTrack';
-import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { SunCalc } from '@app/js/lib/suncalc.js';
 
 const satInfoboxCore = {
@@ -275,7 +275,7 @@ export const orbitalData = (sat: SatObject): void => {
             <div class="sat-info-row sat-only-info">
               <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
                 data-tooltip="Where it Rises Above the Equator">
-                Right Ascension
+                Right Asc.
               </div>
               <div class="sat-info-value" id="sat-raan">x.xx</div>
             </div>
@@ -349,7 +349,7 @@ export const orbitalData = (sat: SatObject): void => {
     });
 
     // If right click kill and reinit
-    $('#sat-infobox').on('mousedown', (e) => {
+    $('#sat-infobox').on('mousedown', (e: any) => {
       if (e.button === 2) {
         $('#sat-infobox').removeClass().removeAttr('style');
         return;
@@ -519,6 +519,69 @@ export const satMissionData = (sat: SatObject): void => {
         </div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+            data-tooltip="Satellite Bus">
+            Bus
+          </div>
+          <div class="sat-info-value" id="sat-bus">
+            NO DATA
+          </div>
+        </div>
+        <div class="sat-info-row sat-only-info">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+            data-tooltip="Primary Payload">
+            Payload
+          </div>
+          <div class="sat-info-value" id="sat-payload">
+            NO DATA
+          </div>
+        </div>    
+        <div class="sat-info-row sat-only-info">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+            data-tooltip="Primary Motor">
+            Motor
+          </div>
+          <div class="sat-info-value" id="sat-motor">
+            NO DATA
+          </div>
+        </div>      
+        <div class="sat-info-row sat-only-info">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+            data-tooltip="Length in Meters">
+            Length
+          </div>
+          <div class="sat-info-value" id="sat-length">
+            NO DATA
+          </div>
+        </div>      
+        <div class="sat-info-row sat-only-info">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+            data-tooltip="Diameter in Meters">
+            Diameter
+          </div>
+          <div class="sat-info-value" id="sat-diameter">
+            NO DATA
+          </div>
+        </div>   
+        <div class="sat-info-row sat-only-info">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+            data-tooltip="Span in Meters">
+            Span
+          </div>
+          <div class="sat-info-value" id="sat-span">
+            NO DATA
+          </div>
+        </div>         
+        <div class="sat-info-row sat-only-info">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+            data-tooltip="Description of Shape">
+            Shape
+          </div>
+          <div class="sat-info-value" id="sat-shape">
+            NO DATA
+          </div>
+        </div>      
+        <div class="sat-info-row sat-only-info">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
             data-tooltip="Power of the Satellite">
             Power
           </div>
@@ -601,96 +664,72 @@ export const satMissionData = (sat: SatObject): void => {
   }
 
   if (!sat.missile) {
-    if (typeof sat.U != 'undefined' && sat.U != '') {
-      $('#sat-user').html(sat.U);
-    } else {
-      $('#sat-user').html('Unknown');
-    }
-    if (typeof sat.P != 'undefined' && sat.P != '') {
-      $('#sat-purpose').html(sat.P);
-    } else {
-      $('#sat-purpose').html('Unknown');
-    }
-    if (typeof sat.Con != 'undefined' && sat.Con != '') {
-      $('#sat-contractor').html(sat.Con);
-    } else {
-      $('#sat-contractor').html('Unknown');
-    }
-    if (typeof sat.LM != 'undefined' && sat.LM != '') {
-      $('#sat-lmass').html(sat.LM + ' kg');
-    } else {
-      $('#sat-lmass').html('Unknown');
-    }
-    if (typeof sat.DM != 'undefined' && sat.DM != '') {
-      $('#sat-dmass').html(sat.DM + ' kg');
-    } else {
-      $('#sat-dmass').html('Unknown');
-    }
-    if (typeof sat.Li != 'undefined' && sat.Li != '') {
-      $('#sat-life').html(sat.Li + ' yrs');
-    } else {
-      $('#sat-life').html('Unknown');
-    }
-    if (typeof sat.Pw != 'undefined' && sat.Pw != '') {
-      $('#sat-power').html(sat.Pw + ' w');
-    } else {
-      $('#sat-power').html('Unknown');
-    }
-    if (typeof sat.vmag != 'undefined' && sat.vmag.toString() != '') {
-      $('#sat-vmag').html(sat.vmag.toString());
-    } else {
-      $('#sat-vmag').html('Unknown');
-    }
-    if (typeof sat.S1 != 'undefined' && sat.S1 != '') {
+    $('#sat-user').html(sat?.U && sat?.U !== '' ? sat?.U : 'Unknown');
+    $('#sat-purpose').html(sat?.P && sat?.P !== '' ? sat?.P : 'Unknown');
+    $('#sat-contractor').html(sat?.Con && sat?.Con !== '' ? sat?.Con : 'Unknown');
+    // Update with other mass options
+    $('#sat-lmass').html(sat?.LM && sat?.LM !== '' ? sat?.LM + ' kg' : 'Unknown');
+    $('#sat-dmass').html(sat?.DM && sat?.DM !== '' ? sat?.DM + ' kg' : 'Unknown');
+    $('#sat-life').html(sat?.Li && sat?.Li !== '' ? sat?.Li + ' yrs' : 'Unknown');
+    $('#sat-power').html(sat?.Pw && sat?.Pw !== '' ? sat?.Pw + ' w' : 'Unknown');
+    $('#sat-vmag').html(sat?.vmag && sat?.vmag?.toString() !== '' ? sat?.vmag?.toString() : 'Unknown');
+    $('#sat-bus').html(sat?.Bus && sat?.Bus !== '' ? sat?.Bus : 'Unknown');
+    $('#sat-payload').html(sat?.payload && sat?.payload !== '' ? sat?.payload : 'Unknown');
+    $('#sat-motor').html(sat?.Motor && sat?.Motor !== '' ? sat?.Motor : 'Unknown');
+    $('#sat-length').html(sat?.Length && sat?.Length !== '' ? sat?.Length + ' m' : 'Unknown');
+    $('#sat-diameter').html(sat?.Diameter && sat?.Diameter !== '' ? sat?.Diameter + ' m' : 'Unknown');
+    $('#sat-span').html(sat?.Span && sat?.Span !== '' ? sat?.Span + ' m' : 'Unknown');
+    $('#sat-shape').html(sat?.Shape && sat?.Shape !== '' ? sat?.Shape : 'Unknown');
+    if (sat?.S1 && sat?.S1 !== '') {
       $('#sat-source1').html(`<a class="iframe" href="${sat.S1}">${sat.S1.split('//').splice(1)}</a>`);
       $('#sat-source1w').show();
     } else {
       $('#sat-source1').html('Unknown');
       $('#sat-source1w').hide();
     }
-    if (typeof sat.S2 != 'undefined' && sat.S2 != '') {
+    if (sat?.S2 && sat?.S2 !== '') {
       $('#sat-source2').html(`<a class="iframe" href="${sat.S2}">${sat.S2.split('//').splice(1)}</a>`);
       $('#sat-source2w').show();
     } else {
       $('#sat-source2').html('Unknown');
       $('#sat-source2w').hide();
     }
-    if (typeof sat.S3 != 'undefined' && sat.S3 != '') {
+    if (sat?.S3 && sat?.S3 !== '') {
       $('#sat-source3').html(`<a class="iframe" href="${sat.S3}">${sat.S3.split('//').splice(1)}</a>`);
       $('#sat-source3w').show();
     } else {
       $('#sat-source3').html('Unknown');
       $('#sat-source3w').hide();
     }
-    if (typeof sat.S4 != 'undefined' && sat.S4 != '') {
+    if (sat?.S4 && sat?.S4 !== '') {
       $('#sat-source4').html(`<a class="iframe" href="${sat.S4}">${sat.S4.split('//').splice(1)}</a>`);
       $('#sat-source4w').show();
     } else {
       $('#sat-source4').html('Unknown');
       $('#sat-source4w').hide();
     }
-    if (typeof sat.S5 != 'undefined' && sat.S5 != '') {
+    if (sat?.S5 && sat?.S5 !== '') {
       $('#sat-source5').html(`<a class="iframe" href="${sat.S5}">${sat.S5.split('//').splice(1)}</a>`);
       $('#sat-source5w').show();
     } else {
       $('#sat-source5').html('Unknown');
       $('#sat-source5w').hide();
     }
-    if (typeof sat.S6 != 'undefined' && sat.S6 != '') {
+    if (sat?.S6 && sat?.S6 !== '') {
       $('#sat-source6').html(`<a class="iframe" href="${sat.S6}">${sat.S6.split('//').splice(1)}</a>`);
       $('#sat-source6w').show();
     } else {
       $('#sat-source6').html('Unknown');
       $('#sat-source6w').hide();
     }
-    if (typeof sat.S7 != 'undefined' && sat.S7 != '') {
+    if (sat?.S7 && sat?.S7 !== '') {
       $('#sat-source7').html(`<a class="iframe" href="${sat.S7}">${sat.S7.split('//').splice(1)}</a>`);
       $('#sat-source7w').show();
     } else {
       $('#sat-source7').html('Unknown');
       $('#sat-source7w').hide();
     }
-    if (typeof sat.URL != 'undefined' && sat.URL != '') {
+    if (sat?.URL && sat?.URL !== '') {
       $('#sat-source8').html(`<a class="iframe" href="${sat.URL}">${sat.URL.split('//').splice(1)}</a>`);
       $('#sat-source8w').show();
     } else {

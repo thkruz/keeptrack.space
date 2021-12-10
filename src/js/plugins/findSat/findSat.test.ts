@@ -1,5 +1,5 @@
 import * as apiMocks from '../../api/apiMocks';
-import { keepTrackApi } from '../../api/externalApi';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import * as findSat from '../../plugins/findSat/findSat';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...apiMocks.keepTrackApiStubs.programs };

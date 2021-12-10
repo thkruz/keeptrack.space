@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import $ from 'jquery';
 
@@ -149,7 +149,7 @@ export const uiManagerInit = () => {
         </div>
       `);
 
-  $('#newLaunch').on('submit', function (e) {
+  $('#newLaunch').on('submit', function (e: Event) {
     $('#loading-screen').fadeIn(1000, newLaunchSubmit);
     e.preventDefault();
   });
@@ -183,7 +183,7 @@ export const bottomMenuClick = (iconName: string): void => {
       return;
     } else {
       if (keepTrackApi.programs.objectManager.selectedSat !== -1) {
-        if (keepTrackApi.programs.settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
+        if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
         keepTrackApi.programs.uiManager.hideSideMenus();
         $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
         $('#menu-newLaunch').addClass('bmenu-item-selected');
@@ -193,7 +193,7 @@ export const bottomMenuClick = (iconName: string): void => {
         $('#nl-scc').val(sat.SCC_NUM);
         $('#nl-inc').val((sat.inclination * RAD2DEG).toPrecision(2));
       } else {
-        aM.adviceList.newLaunchDisabled();
+        aM.adviceList?.newLaunchDisabled();
         keepTrackApi.programs.uiManager.toast(`Select a Satellite First!`, 'caution');
         if (!$('#menu-newLaunch:animated').length) {
           $('#menu-newLaunch').effect('shake', {

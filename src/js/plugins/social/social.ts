@@ -1,5 +1,5 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({

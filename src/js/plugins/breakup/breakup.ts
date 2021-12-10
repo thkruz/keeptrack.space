@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
 import { SatObject } from '@app/js/api/keepTrack';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
@@ -101,7 +101,7 @@ export const uiManagerInit = (): void => {
       </div>
     `);
 
-  $('#breakup').on('submit', function (e) {
+  $('#breakup').on('submit', function (e: Event) {
     $('#loading-screen').fadeIn(1000, breakupOnSubmit);
     e.preventDefault();
   });

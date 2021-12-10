@@ -1,4 +1,5 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { SatObject } from '@app/js/api/keepTrack';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { stringPad } from '@app/js/lib/helpers';
 import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 
@@ -62,7 +63,7 @@ export const catalogLoader = async (): Promise<any> => {
     if (settingsManager.isUseDebrisCatalog) {
       await $.get(`${settingsManager.installDirectory}tle/TLEdebris.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
     } else {
-      await $.get(`${settingsManager.installDirectory}tle/TLE.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
+      await $.get(`${settingsManager.installDirectory}tle/TLE2.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
     }
   } catch (e) {
     // console.debug(e);
@@ -150,12 +151,13 @@ export const setupGetVariables = () => {
   return limitSatsArray;
 };
 
-export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string | any[], extraSats?: string | any[], asciiCatalog?: string | any[]) => {
+export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | any[], extraSats?: string | any[], asciiCatalog?: string | any[]) => {
   const { dotsManager, objectManager, satSet } = keepTrackApi.programs;
 
   const tempSatData = [];
-  satSet.sccIndex = {};
-  satSet.cosparIndex = {};
+
+  satSet.sccIndex = <{ [key: string]: number }>{};
+  satSet.cosparIndex = <{ [key: string]: number }>{};
 
   if (typeof limitSatsArray === 'undefined' || limitSatsArray.length == 0 || limitSatsArray[0] == null) {
     // If there are no limits then just process like normal
@@ -175,7 +177,7 @@ export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string 
       if (year === '') {
         resp[i].intlDes = 'none';
       } else {
-        prefix = year > 50 ? '19' : '20';
+        prefix = parseInt(year) > 50 ? '19' : '20';
         year = prefix + year;
         rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
         resp[i].intlDes = year + '-' + rest;
@@ -194,7 +196,7 @@ export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string 
           if (year === '') {
             resp[i].intlDes = 'none';
           } else {
-            prefix = year > 50 ? '19' : '20';
+            prefix = parseInt(year) > 50 ? '19' : '20';
             year = prefix + year;
             rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
             resp[i].intlDes = year + '-' + rest;

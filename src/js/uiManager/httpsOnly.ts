@@ -1,5 +1,6 @@
 import $ from 'jquery';
-import { keepTrackApi } from '../api/externalApi';
+import { SensorObject } from '../api/keepTrack';
+import { keepTrackApi } from '../api/keepTrackApi';
 
 export const useCurrentGeolocationAsSensor = () => {
   const { objectManager, sensorManager, timeManager, satellite, satSet, mainCamera } = keepTrackApi.programs;
@@ -71,17 +72,19 @@ export const useCurrentGeolocationAsSensor = () => {
         },
       });
 
-      satellite.setobs({
-        lat: lat,
-        lon: lon,
-        alt: alt,
-        obsminaz: minaz,
-        obsmaxaz: maxaz,
-        obsminel: minel,
-        obsmaxel: maxel,
-        obsminrange: minrange,
-        obsmaxrange: maxrange,
-      });
+      satellite.setobs(<SensorObject[]>[
+        {
+          lat: lat,
+          lon: lon,
+          alt: alt,
+          obsminaz: minaz,
+          obsmaxaz: maxaz,
+          obsminel: minel,
+          obsmaxel: maxel,
+          obsminrange: minrange,
+          obsmaxrange: maxrange,
+        },
+      ]);
 
       objectManager.setSelectedSat(-1);
       lat = lat * 1;

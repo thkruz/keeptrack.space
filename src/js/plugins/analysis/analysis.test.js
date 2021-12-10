@@ -1,5 +1,5 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { init } from './analysis';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 test('Load Analysis Plugin', () => {
   window.keepTrackApi.programs = {

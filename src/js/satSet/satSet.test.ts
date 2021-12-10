@@ -1,6 +1,6 @@
 import { SatCruncherMessage } from '../../types/types';
 import { keepTrackApiStubs } from '../api/apiMocks';
-import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApi } from '../api/keepTrackApi';
 import * as satSet from '../satSet/satSet';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };

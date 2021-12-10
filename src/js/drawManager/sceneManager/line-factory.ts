@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
-import { LineColors, LineTypes } from '@app/types/types';
+import { LineColors, LineTypes } from '@app/js/api/keepTrack';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants';
 import { Line } from './line';
 
 export class LineFactory {
@@ -47,7 +47,7 @@ export class LineFactory {
     return starFound;
   }
 
-  create(type: LineTypes, value: any[] | number, color?: LineColors): void {
+  create(type: LineTypes, value: number[] | number, color?: LineColors): void {
     const getSat = keepTrackApi.programs.satSet.getSat;
     let sat = null;
     let sat2 = null;
@@ -85,7 +85,7 @@ export class LineFactory {
     }
     // Center of the Earth to the Satellite
     if (type == 'sat') {
-      let sat = getSat(value);
+      let sat = getSat(<number>value);
       if (typeof sat.position == 'undefined') {
         console.debug(`No Satellite Position Available for Line`);
         console.debug(sat);
@@ -298,7 +298,7 @@ export class LineFactory {
     }
   }
 
-  getLineListLen(): void {
+  getLineListLen(): number {
     return this.drawLineList.length;
   }
 
@@ -316,7 +316,7 @@ export class LineFactory {
                 this.drawLineList[i].sat2.id = this.getSensorFromSensorName(this.drawLineList[i].sat2.name);
               }
               this.drawLineList[i].sat2 = keepTrackApi.programs.satSet.getSat(this.drawLineList[i].sat2.id);
-              if (!this.drawLineList[i].isCalculateIfInFOV && this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].sat.inView) {
+              if (!this.drawLineList[i].isCalculateIfInFOV && this.drawLineList[i].isOnlyInFOV && this.drawLineList[i].sat.inView === 0) {
                 this.drawLineList.splice(i, 1);
                 continue;
               }

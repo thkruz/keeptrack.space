@@ -1,7 +1,7 @@
 /* eslint-disable no-undefined */
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { searchBox } from '@app/js/uiManager/search-box.js';
 import { useMockWorkers } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { searchBox } from '@app/js/uiManager/search-box.js';
 
 useMockWorkers();
 

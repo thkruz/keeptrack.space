@@ -35,7 +35,7 @@ SatGroup {
   "hasSat": [Function],
   "sats": Array [
     Object {
-      "satId": 25544,
+      "satId": undefined,
     },
   ],
   "updateOrbits": [Function],
@@ -48,7 +48,7 @@ SatGroup {
   "hasSat": [Function],
   "sats": Array [
     Object {
-      "satId": 25544,
+      "satId": undefined,
     },
   ],
   "updateOrbits": [Function],
@@ -100,7 +100,7 @@ SatGroup {
   "hasSat": [Function],
   "sats": Array [
     Object {
-      "satId": 25544,
+      "satId": undefined,
     },
   ],
   "updateOrbits": [Function],

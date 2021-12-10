@@ -1,12 +1,11 @@
 /* */
 
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 let isLaunchMenuOpen = true;
 
 export const init = (): void => {
-
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
@@ -27,7 +26,6 @@ export const init = (): void => {
     cbName: 'launchCalendar',
     cb: hideSideMenus,
   });
-
 };
 
 export const bottomMenuClick = (iconName: string): void => {
@@ -37,11 +35,10 @@ export const bottomMenuClick = (iconName: string): void => {
       keepTrackApi.programs.uiManager.hideSideMenus();
       return;
     } else {
-      if (keepTrackApi.programs.settingsManager.isMobileModeEnabled)
-        keepTrackApi.programs.uiManager.searchToggle(false);
-      keepTrackApi.programs.settingsManager.isPreventColorboxClose = true;
+      if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
+      settingsManager.isPreventColorboxClose = true;
       setTimeout(function () {
-        keepTrackApi.programs.settingsManager.isPreventColorboxClose = false;
+        settingsManager.isPreventColorboxClose = false;
       }, 2000);
       keepTrackApi.programs.uiManager.hideSideMenus();
       try {
@@ -85,8 +82,8 @@ export const cboxClosed = (): void => {
   }
 };
 export const uiManagerInit = (): any => {
-    // Bottom Icon
-    $('#bottom-icons').append(keepTrackApi.html`
+  // Bottom Icon
+  $('#bottom-icons').append(keepTrackApi.html`
     <div id="menu-launches" class="bmenu-item">
       <img alt="calendar2" src="" delayedsrc="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAABmJLR0QA/wD/AP+gvaeTAAABRUlEQVR4nO3cQWoCQRBAUQ25Tna5/wmy80BmFXDhgIPp/u343jIEHfhU05YkpxMAAAAA7+I8882+fq7Xez+/fJ+nPsefFZ7nY9YbcZ8AsadGbWuE380zR5YJiAkQEyAmQEyA2OeIF926FazwwefW3ucZceszATEBYkOOoC3VUbNlhecxATEBYkOOIDuix5mAmAAxAWICxASITd0FvTq7oAMSICZATICYALGp6+i9/usbq5W/oTMBMQFiAsQEiAkQW/oWtPc2Mvr3RzABMQFiSx9Bj9i7Il7h2LllAmICxKYeQavtauyCEKAmQEyAmACxpf9AY/RtZIUPZSYgJkDs5XdBKxwjzzABMQFih9oFrbDb2csExASICRATICZA7FC7oJVvO1tMQEyAmAAxAWICxPy/oJgJiAkQEyAmQEwAAAAAAAA4vl/1Vlb9QHsXDQAAAABJRU5ErkJggg==">
       <span class="bmenu-title">Launch Calendar</span>
@@ -94,5 +91,5 @@ export const uiManagerInit = (): any => {
     </div> 
   `);
 
-    $(document).on('cbox_closed', cboxClosed);
+  $(document).on('cbox_closed', cboxClosed);
 };

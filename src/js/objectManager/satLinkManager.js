@@ -1,6 +1,6 @@
 /* */
 
-import { RAD2DEG } from '@app/js/lib/constants.js';
+import { RAD2DEG } from '@app/js/lib/constants';
 import { numeric } from '../lib/external/numeric';
 
 var satLinkManager = {};

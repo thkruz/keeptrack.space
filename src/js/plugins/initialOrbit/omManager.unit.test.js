@@ -1,7 +1,7 @@
 /* eslint-disable no-undefined */
 
-import { keepTrackApi } from '@app/js/api/externalApi';
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { omManager } from '@app/js/plugins/initialOrbit/omManager';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };

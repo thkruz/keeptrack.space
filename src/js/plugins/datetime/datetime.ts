@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
 export const updateDateTime = (date: Date) => {
@@ -53,7 +53,7 @@ export const uiManagerInit = () => {
 
   $('#datetime-text').on('click', datetimeTextClick);
 
-  $('#datetime-input-form').on('change', function (e) {
+  $('#datetime-input-form').on('change', function (e: Event) {
     datetimeInputFormChange();
     e.preventDefault();
   });

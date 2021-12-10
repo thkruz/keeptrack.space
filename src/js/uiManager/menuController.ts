@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { saveCsv } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
@@ -32,7 +32,7 @@ export const initMenuController = () => {
     $('#menu-space-stations').removeClass('bmenu-item-selected');
   });
 
-  $('#legend-hover-menu').on('click', function (e) {
+  $('#legend-hover-menu').on('click', function (e: any) {
     uiManager.legendHoverMenuClick(e.target.classList[1]);
   });
 
@@ -182,7 +182,7 @@ export const initMenuController = () => {
     stop: function () {
       $(this).css('height', '');
     },
-    maxWidth: 450,
+    maxWidth: 600,
     minWidth: 300,
   });
 

@@ -23,9 +23,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { Watchlist } from '@app/js/api/keepTrack';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { saveAs, stringPad } from '@app/js/lib/helpers';
+import { saveAs } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 let watchlistList: any[] = [];
@@ -47,7 +48,7 @@ export const hideSideMenus = (): void => {
 
 export const init = (): void => {
   const { satSet, objectManager, uiManager, timeManager }: { satSet: any; objectManager: any; uiManager: any; timeManager: any } = keepTrackApi.programs;
-  keepTrackApi.programs.watchlist = {};
+  keepTrackApi.programs.watchlist = <Watchlist>{};
   keepTrackApi.programs.watchlist.lastOverlayUpdateTime = 0;
 
   // Add HTML
@@ -62,11 +63,11 @@ export const init = (): void => {
   let infoOverlayDOM = [];
   uiManager.updateNextPassOverlay = (nextPassArray: any, isForceUpdate: any) => {
     if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
-    const cameraManager = keepTrackApi.programs.cameraManager;
+    const { mainCamera } = keepTrackApi.programs;
 
     // FIXME This should auto update the overlay when the time changes outside the original search window
     // Update once every 10 seconds
-    if ((timeManager.realTime > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 && objectManager.selectedSat === -1 && !cameraManager.isDragging && cameraManager.zoomLevel === cameraManager.zoomTarget) || isForceUpdate) {
+    if ((timeManager.realTime > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 && objectManager.selectedSat === -1 && !mainCamera.isDragging && mainCamera.zoomLevel === mainCamera.zoomTarget) || isForceUpdate) {
       const propTime = timeManager.calculateSimulationTime();
       infoOverlayDOM = [];
       infoOverlayDOM.push('<div>');
@@ -246,7 +247,7 @@ export const uiManagerInit = (): void => {
 
   $('.menu-selectable').on('click', menuSelectableClick);
 
-  $('#info-overlay-content').on('click', '.watchlist-object', function (evt) {
+  $('#info-overlay-content').on('click', '.watchlist-object', function (evt: Event) {
     infoOverlayContentClick(evt);
   });
 
@@ -259,11 +260,11 @@ export const uiManagerInit = (): void => {
   $('#watchlist-content').on('click', '.watchlist-add', watchlistContentEvent);
 
   // Enter pressed/selected on watchlist menu
-  $('#watchlist-content').on('submit', function (evt) {
+  $('#watchlist-content').on('submit', function (evt: Event) {
     watchlistContentEvent(evt);
   });
 
-  $('#watchlist-save').on('click', function (evt) {
+  $('#watchlist-save').on('click', function (evt: Event) {
     watchlistSaveClick(evt);
   });
 
@@ -271,7 +272,7 @@ export const uiManagerInit = (): void => {
     $('#watchlist-file').trigger('click');
   });
 
-  $('#watchlist-file').on('change', function (evt) {
+  $('#watchlist-file').on('change', function (evt: Event) {
     watchlistFileChange(evt);
   });
 };
@@ -290,7 +291,7 @@ export const updateLoop = () => {
         const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
         const sensor = sensorManager.currentSensorList[j];
         const rae = satellite.getRae(timeManager.dateObject, satrec, sensor);
-        const isInFov = satellite.checkIsInFOV(sensor, rae);
+        const isInFov = satellite.checkIsInView(sensor, rae);
         if (!isInFov) continue;
         keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getSensorFromSensorName(sensor.name)], 'g');
       }
@@ -458,8 +459,8 @@ export const infoOverlayContentClick = (evt: any) => {
   }
 };
 
-export const watchlistListClick = function (satId: number) {
-  const { orbitManager, uiManager, satSet, ColorScheme, sensorManager } = keepTrackApi.programs;
+export const watchlistListClick = (satId: number): void => {
+  const { orbitManager, uiManager, satSet, colorSchemeManager, sensorManager } = keepTrackApi.programs;
   for (let i = 0; i < watchlistList.length; i++) {
     if (watchlistList[i] === satId) {
       orbitManager.removeInViewOrbit(watchlistList[i]);
@@ -470,8 +471,8 @@ export const watchlistListClick = function (satId: number) {
   updateWatchlist();
   if (watchlistList.length <= 0) {
     uiManager.doSearch('');
-    satSet.setColorScheme(ColorScheme.default, true);
-    uiManager.colorSchemeChangeAlert(keepTrackApi.programs.settingsManager.currentColorScheme);
+    satSet.setColorScheme(colorSchemeManager.default, true);
+    uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
   }
   if (!sensorManager.checkSensorSelected() || watchlistList.length <= 0) {
     isWatchlistChanged = false;
@@ -481,7 +482,7 @@ export const watchlistListClick = function (satId: number) {
 
 export const watchlistContentEvent = (e?: any, satId?: number) => {
   const { satSet, sensorManager } = keepTrackApi.programs;
-  satId ??= satSet.getIdFromObjNum(stringPad.pad0(<string>$('#watchlist-new').val(), 5));
+  satId ??= satSet.getIdFromObjNum($('#watchlist-new').val());
   let duplicate = false;
   for (let i = 0; i < watchlistList.length; i++) {
     // No duplicates

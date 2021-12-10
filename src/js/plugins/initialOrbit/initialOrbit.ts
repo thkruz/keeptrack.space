@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { omManager } from '@app/js/plugins/initialOrbit/omManager.js';
 import $ from 'jquery';
 
@@ -198,7 +198,7 @@ export const uiManagerInit = () => {
     minWidth: 400,
   });
 
-  $('#obfit-form').on('submit', function (e) {
+  $('#obfit-form').on('submit', function (e: Event) {
     obfitFormSubmit(e);
   });
 };

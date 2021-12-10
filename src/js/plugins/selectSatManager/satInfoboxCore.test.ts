@@ -1,11 +1,11 @@
 import 'jquery-ui-bundle';
 import { defaultSat, keepTrackApiStubs } from '../../api/apiMocks';
-import { keepTrackApi } from '../../api/externalApi';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import * as satInfoboxCore from './satInfoboxCore';
 
 declare const settingsManager;
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
 describe('satInfoboxCore.sensorInfo', () => {

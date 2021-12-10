@@ -1,4 +1,10 @@
-export const sensorList = {
+import { SensorObject } from '@app/js/api/keepTrack';
+
+interface SensorList {
+  [key: string]: SensorObject;
+}
+
+const sensorList: SensorList = {
   COD: {
     name: 'Cape Cod AFS, Massachusetts',
     shortName: 'COD',
@@ -747,6 +753,8 @@ export const sensorList = {
     country: 'Russia',
     sun: 'No Impact',
     volume: false,
+
+    zoom: 'leo',
   },
   BAL: {
     name: 'Balkhash, Russia',
@@ -1025,3 +1033,11 @@ export const sensorList = {
     volume: false,
   },
 };
+
+let i = 0;
+for (const sensor in sensorList) {
+  sensorList[sensor].staticNum = i;
+  i++;
+}
+
+export { sensorList };

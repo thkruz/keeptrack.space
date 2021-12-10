@@ -24,14 +24,15 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { SensorObject } from '@app/js/api/keepTrack';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
 let sensorLinks = false;
 let isSensorListMenuOpen = false;
 let isSensorInfoMenuOpen = false;
 let isLookanglesMultiSiteMenuOpen = false;
-let customSensors = [];
+let customSensors = <SensorObject[]>[];
 
 export const resetSensorButtonClick = () => {
   settingsManager.isForceColorScheme = false;
@@ -440,7 +441,8 @@ export const uiManagerInit = () => {
     satellite.lookanglesInterval = parseInt(<string>$('#lookanglesInterval').val());
   });
 
-  $('#sensor-list-content > div > ul > .menu-selectable').on('click', (e) => {
+  $('#sensor-list-content > div > ul > .menu-selectable').on('click', (e: any) => {
+    if (e.target.id === 'reset-sensor-button') return;
     const sensorClick = e.currentTarget.dataset.sensor;
     sensorListContentClick(sensorClick);
   });
@@ -453,19 +455,19 @@ export const uiManagerInit = () => {
 
   $('#cs-telescope').on('click', csTelescopeClick);
 
-  $('#customSensor').on('submit', (e) => {
+  $('#customSensor').on('submit', (e: Event) => {
     customSensorSubmit();
     e.preventDefault();
   });
 };
 
 export const resetSensorSelected = () => {
-  const { satellite, sensorManager, ColorScheme, uiManager, satSet } = keepTrackApi.programs;
+  const { satellite, sensorManager, colorSchemeManager, uiManager, satSet } = keepTrackApi.programs;
   // Return to default settings with nothing 'inview'
   satellite.setobs(null);
   sensorManager.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
   // uiManager.getsensorinfo();
-  if (settingsManager.currentColorScheme == ColorScheme.default) {
+  if (settingsManager.currentColorScheme == colorSchemeManager.default) {
     uiManager.legendMenuChange('default');
   }
   satSet.satCruncher.postMessage({
@@ -501,7 +503,7 @@ export const resetSensorSelected = () => {
 };
 
 export const sensorListContentClick = (sensorClick: string) => {
-  const { adviceManager, sensorManager, uiManager, ColorScheme, mainCamera, timeManager } = keepTrackApi.programs;
+  const { adviceManager, sensorManager, uiManager, colorSchemeManager, mainCamera, timeManager } = keepTrackApi.programs;
   if (settingsManager.plugins.topMenu) adviceManager.adviceList.sensor();
 
   if (typeof sensorClick == 'undefined') {
@@ -540,7 +542,7 @@ export const sensorListContentClick = (sensorClick: string) => {
     // TODO: More intentional conditional statement
     // Multi-sensors break this
   }
-  if (settingsManager.currentColorScheme == ColorScheme.default) {
+  if (settingsManager.currentColorScheme == colorSchemeManager.default) {
     uiManager.legendMenuChange('default');
   }
 };
@@ -637,7 +639,7 @@ export const bottomMenuClick = (iconName: string): void => {
         isLookanglesMultiSiteMenuOpen = true;
         $('#menu-lookanglesmultisite').addClass('bmenu-item-selected');
         if (objectManager.selectedSat !== -1) {
-          $('#loading-screen').fadeIn(1000, function () {
+          $('#loading-screen').fadeIn(1000, () => {
             const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
             satellite.getlookanglesMultiSite(sat);
             $('#loading-screen').fadeOut('slow');
@@ -761,7 +763,7 @@ export const customSensorSubmit = (): void => {
   const minrange = $('#cs-minrange').val();
   const maxrange = $('#cs-maxrange').val();
 
-  customSensors.push({
+  customSensors.push(<SensorObject>{
     lat: lat,
     lon: lon,
     alt: parseFloat(<string>alt),

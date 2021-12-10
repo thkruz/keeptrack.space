@@ -1,9 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`satMath._jday 0 1`] = `2451544.5`;
-
-exports[`satMath._jday 1 1`] = `2458849.5`;
-
 exports[`satMath.calculateDops 0 1`] = `
 Object {
   "gdop": "2.21",
@@ -43,22 +39,22 @@ Array [
 
 exports[`satMath.currentEpoch 1 1`] = `
 Array [
-  "N",
-  "000000000NaN",
+  "30",
+  "000.20833333",
 ]
 `;
 
 exports[`satMath.currentEpoch 2 1`] = `
 Array [
-  "N",
-  "000000000NaN",
+  "20",
+  "000.20833333",
 ]
 `;
 
 exports[`satMath.currentEpoch 3 1`] = `
 Array [
-  "N",
-  "000000000NaN",
+  "20",
+  "000.20833333",
 ]
 `;
 
@@ -73,6 +69,8 @@ exports[`satMath.distance 0 1`] = `"<br />Range: 0 km"`;
 
 exports[`satMath.distance 1 1`] = `"<br />Range: 0 km"`;
 
+exports[`satMath.findBestPasses 0 1`] = `undefined`;
+
 exports[`satMath.getDops 0 1`] = `
 Object {
   "gdop": 50,
@@ -85,17 +83,17 @@ Object {
 
 exports[`satMath.getSunDirection 0 1`] = `
 Array [
-  994160.6817968423,
-  41371.883931458935,
-  99663.96534956724,
+  148724320.43455538,
+  6189145.714033483,
+  14909516.932049064,
 ]
 `;
 
 exports[`satMath.getSunDirection 1 1`] = `
 Array [
-  8735.341567543164,
-  -808044.7575527991,
-  -589056.3331287905,
+  1306788.4922269185,
+  -120881774.59456515,
+  -88121572.7460775,
 ]
 `;
 
@@ -103,9 +101,9 @@ exports[`satMath.getSunTimes 0 1`] = `undefined`;
 
 exports[`satMath.getSunTimes 1 1`] = `undefined`;
 
-exports[`satMath.getlookangles 0 1`] = `undefined`;
+exports[`satMath.getlookangles 0 1`] = `Array []`;
 
-exports[`satMath.getlookangles 1 1`] = `undefined`;
+exports[`satMath.getlookangles 1 1`] = `Array []`;
 
 exports[`satMath.getlookanglesMultiSite 0 1`] = `undefined`;
 

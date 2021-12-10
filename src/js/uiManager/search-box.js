@@ -1,7 +1,6 @@
 /* */
 
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
 var hoverSatId = -1;
@@ -39,16 +38,17 @@ searchBox.getHoverSat = function () {
 };
 searchBox.hideResults = function () {
   try {
+    const { colorSchemeManager } = keepTrackApi.programs;
     $('#search-results').slideUp();
     groupsManager.clearSelect();
     resultsOpen = false;
 
     settingsManager.lastSearch = '';
     settingsManager.lastSearchResults = [];
-    dotsManager.updateSizeBuffer(satSet.satData);
+    dotsManager.updateSizeBuffer(satSet.satData.length);
 
-    if (settingsManager.currentColorScheme === ColorScheme.group) {
-      satSet.setColorScheme(ColorScheme.default, true);
+    if (settingsManager.currentColorScheme === colorSchemeManager.group) {
+      satSet.setColorScheme(colorSchemeManager.default, true);
     } else {
       satSet.setColorScheme(settingsManager.currentColorScheme, true);
     }
@@ -78,7 +78,7 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
   if (searchString.length === 0) {
     settingsManager.lastSearch = '';
     settingsManager.lastSearchResults = [];
-    dotsManager.updateSizeBuffer(satSet.satData);
+    dotsManager.updateSizeBuffer(satSet.satData.length);
     $('#search').val('');
     searchBox.hideResults();
     return;
@@ -222,7 +222,7 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
 
   settingsManager.lastSearchResults = idList;
 
-  dotsManager.updateSizeBuffer(satSet.satData);
+  dotsManager.updateSizeBuffer(satSet.satData.length);
 
   var dispGroup = groupsManager.createGroup('idList', idList);
   lastResultGroup = dispGroup;

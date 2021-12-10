@@ -1,7 +1,10 @@
 /* eslint-disable no-useless-escape */
-import { Camera, DotsManager, DrawProgram, PickingProgram, TimeManager } from '@app/types/types';
 import * as glm from 'gl-matrix';
-import { ColorSchemeFactory } from '../colorManager/color-scheme-factory';
+import { Camera, DotsManager, DrawProgram, PickingProgram, TimeManager } from '../api/keepTrack';
+import { ColorSchemeManager } from '../colorManager/colorSchemeManager';
+import { DEG2RAD, GROUND_BUFFER_DISTANCE, RADIUS_OF_EARTH } from '../lib/constants';
+import { objectManager } from '../objectManager/objectManager';
+import { calculateTimeVariables } from '../satMath/satMath';
 
 export const init = (gl: WebGL2RenderingContext) => {
   // We draw the picking object bigger than the actual dot to make it easier to select objects
@@ -35,7 +38,7 @@ export const updatePMvCamMatrix = (pMatrix: glm.mat4, mainCamera: Camera) => {
   glm.mat4.mul(dotsManager.pMvCamMatrix, dotsManager.pMvCamMatrix, mainCamera.camMatrix);
 };
 
-export const draw = (mainCamera: Camera, colorScheme: ColorSchemeFactory, tgtBuffer: WebGLFramebuffer) => {
+export const draw = (mainCamera: Camera, colorSchemeManager: ColorSchemeManager, tgtBuffer: WebGLFramebuffer) => {
   if (!dotsManager.loaded || !settingsManager.cruncherReady) return;
   const gl = dotsManager.gl;
 
@@ -66,7 +69,7 @@ export const draw = (mainCamera: Camera, colorScheme: ColorSchemeFactory, tgtBuf
 
   gl.vertexAttribPointer(dotsManager.drawProgram.aPos, 3, gl.FLOAT, false, 0, 0);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, colorScheme.colorBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   gl.enableVertexAttribArray(dotsManager.drawProgram.aColor);
   gl.vertexAttribPointer(dotsManager.drawProgram.aColor, 4, gl.FLOAT, false, 0, 0);
 
@@ -85,7 +88,7 @@ export const draw = (mainCamera: Camera, colorScheme: ColorSchemeFactory, tgtBuf
   gl.disable(gl.BLEND);
 };
 
-export const drawGpuPickingFrameBuffer = (mainCamera: Camera, colorScheme: ColorSchemeFactory) => {
+export const drawGpuPickingFrameBuffer = (mainCamera: Camera, colorSchemeManager: ColorSchemeManager) => {
   if (!dotsManager.loaded || !settingsManager.cruncherReady) return;
   const gl = dotsManager.gl;
 
@@ -101,7 +104,7 @@ export const drawGpuPickingFrameBuffer = (mainCamera: Camera, colorScheme: Color
   gl.enableVertexAttribArray(dotsManager.pickingProgram.aColor);
   gl.vertexAttribPointer(dotsManager.pickingProgram.aColor, 3, gl.FLOAT, false, 0, 0);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, colorScheme.pickableBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.pickableBuffer);
   gl.enableVertexAttribArray(dotsManager.pickingProgram.aPickable);
   gl.vertexAttribPointer(dotsManager.pickingProgram.aPickable, 1, gl.FLOAT, false, 0, 0);
 
@@ -383,17 +386,29 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
     for (dotsManager.drawI = 0; dotsManager.drawI < dotsManager.satDataLenInDraw3; dotsManager.drawI++) {
       dotsManager.positionData[dotsManager.drawI] += dotsManager.velocityData[dotsManager.drawI] * timeManager.drawDt;
     }
+
+    const { gmst } = calculateTimeVariables(timeManager.calculateSimulationTime());
+    objectManager.staticSet
+      .filter((object) => object.static && !object.marker)
+      .forEach((object) => {
+        const cosLat = Math.cos(object.lat * DEG2RAD);
+        const sinLat = Math.sin(object.lat * DEG2RAD);
+        const cosLon = Math.cos(object.lon * DEG2RAD + gmst);
+        const sinLon = Math.sin(object.lon * DEG2RAD + gmst);
+        dotsManager.positionData[object.id * 3] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + object.alt) * cosLat * cosLon; // 6371 is radius of earth
+        dotsManager.positionData[object.id * 3 + 1] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + object.alt) * cosLat * sinLon;
+        dotsManager.positionData[object.id * 3 + 2] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + object.alt) * sinLat;
+      });
   }
 };
 
-export const updateSizeBuffer = (satData) => {
+export const updateSizeBuffer = (bufferLen: number = 3) => {
   const gl = dotsManager.gl;
   if (!dotsManager.sizeBufferOneTime) {
-    if (typeof process !== 'undefined') satData = [0, 0, 0];
-    dotsManager.sizeData = new Float32Array(satData.length);
+    dotsManager.sizeData = new Float32Array(bufferLen);
   }
 
-  for (let i = 0; i < satData.length; i++) {
+  for (let i = 0; i < bufferLen; i++) {
     // Stars are always bigger
     if (i >= dotsManager.starIndex1 && i <= dotsManager.starIndex2) {
       dotsManager.sizeData[i] = 1.0;
@@ -419,8 +434,7 @@ export const updateSizeBuffer = (satData) => {
   }
 };
 
-export const setupPickingBuffer = (satData) => {
-  if (typeof process !== 'undefined') satData = [0];
+export const setupPickingBuffer = (satDataLen = 1) => {
   const gl = dotsManager.gl;
 
   // Array for which colors go to which ids
@@ -430,7 +444,7 @@ export const setupPickingBuffer = (satData) => {
 
   // loop assinging random colors to ids
   let byteR, byteG, byteB; // reuse color variables
-  for (let i = 0; i < satData.length; i++) {
+  for (let i = 0; i < satDataLen; i++) {
     byteR = (i + 1) & 0xff;
     byteG = ((i + 1) & 0xff00) >> 8;
     byteB = ((i + 1) & 0xff0000) >> 16;

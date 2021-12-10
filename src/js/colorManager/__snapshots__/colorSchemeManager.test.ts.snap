@@ -1,0 +1,1379 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test ColorRules 0 1`] = `undefined`;
+
+exports[`Test ColorRules 1 1`] = `undefined`;
+
+exports[`Test ColorRules 2 1`] = `undefined`;
+
+exports[`Test ColorRules 3 1`] = `undefined`;
+
+exports[`Test ColorRules 4 1`] = `undefined`;
+
+exports[`Test ColorRules 5 1`] = `undefined`;
+
+exports[`Test ColorRules 6 1`] = `undefined`;
+
+exports[`Test ColorRules 7 1`] = `undefined`;
+
+exports[`Test ColorRules 8 1`] = `undefined`;
+
+exports[`Test ColorRules 9 1`] = `undefined`;
+
+exports[`Test ColorRules 10 1`] = `undefined`;
+
+exports[`Test ColorRules 11 1`] = `undefined`;
+
+exports[`Test ColorRules 12 1`] = `undefined`;
+
+exports[`colorSchemeManager.ageOfElsetRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.ageOfElsetRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.ageOfElsetRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.ageOfElsetRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.ageOfElsetRules 4 1`] = `
+Object {
+  "color": Array [
+    0.64,
+    0,
+    0.64,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.ageOfElsetRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.ageOfElsetRules 6 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.1,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.ageOfElsetRules 7 1`] = `
+Object {
+  "color": Array [
+    0,
+    1,
+    0,
+    0.9,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.ageOfElsetRules 8 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    0,
+    0.9,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.ageOfElsetRules 9 1`] = `
+Object {
+  "color": Array [
+    1,
+    0.6,
+    0,
+    0.9,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.ageOfElsetRules 10 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    0.9,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.ageOfElsetRules 11 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.countriesRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.countriesRules 1 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    0.4,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.countriesRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.countriesRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    0.6,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.countriesRules 4 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.countriesRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.countriesRules 6 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 4 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 6 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 7 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    1,
+    1,
+  ],
+  "marker": true,
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 8 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 9 1`] = `
+Object {
+  "color": Array [
+    0,
+    1,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 10 1`] = `
+Object {
+  "color": Array [
+    0,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 11 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 12 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 13 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 13 2`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 14 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 14 2`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 15 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.5,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 16 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    0.4,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 17 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 18 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0.6,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 19 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 20 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 21 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 22 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.8,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 23 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.5,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 24 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    0.4,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 25 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 26 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0.6,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 27 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 28 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules 29 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.geoRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.geoRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.geoRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.geoRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.geoRules 4 1`] = `
+Object {
+  "color": Array [
+    0.64,
+    0,
+    0.64,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.geoRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.geoRules 6 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.geoRules 7 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.geoRules 8 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.1,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.geoRules 9 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.init 0 1`] = `undefined`;
+
+exports[`colorSchemeManager.leoRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.leoRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.leoRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.leoRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.leoRules 4 1`] = `
+Object {
+  "color": Array [
+    0.64,
+    0,
+    0.64,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.leoRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.leoRules 6 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.leoRules 7 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.1,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.leoRules 8 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.leoRules 9 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.lostobjectsRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.lostobjectsRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.lostobjectsRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.lostobjectsRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.lostobjectsRules 4 1`] = `
+Object {
+  "color": Array [
+    0.64,
+    0,
+    0.64,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.lostobjectsRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.lostobjectsRules 6 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.1,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.lostobjectsRules 7 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.1,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.lostobjectsRules 8 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.rcsRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.rcsRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    0.6,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.rcsRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.rcsRules 3 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    0.4,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.rcsRules 4 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.rcsRules 5 1`] = `
+Object {
+  "color": Array [
+    0,
+    1,
+    0,
+    0.6,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.rcsRules 6 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.rcsRules 7 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    0,
+    0.6,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.reloadColors 0 1`] = `undefined`;
+
+exports[`colorSchemeManager.resetObjectTypeFlags 0 1`] = `undefined`;
+
+exports[`colorSchemeManager.smallsatsRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.smallsatsRules 1 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    0,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 1 1`] = `
+Object {
+  "color": Array [
+    0.64,
+    0,
+    0.64,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 4 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 5 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 6 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    1,
+    1,
+  ],
+  "marker": true,
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 7 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 8 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 9 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 9 2`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 10 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 11 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 12 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 13 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 14 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 15 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.sunlightRules 16 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;
+
+exports[`colorSchemeManager.velocityRules 0 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.velocityRules 1 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.velocityRules 2 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": true,
+}
+`;
+
+exports[`colorSchemeManager.velocityRules 3 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": false,
+}
+`;

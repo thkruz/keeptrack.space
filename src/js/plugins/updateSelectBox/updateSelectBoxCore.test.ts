@@ -1,5 +1,5 @@
 import { defaultSat, keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as updateSelectBoxCore from '@app/js/plugins/updateSelectBox/updateSelectBoxCore';
 import { expect } from '@jest/globals';
 /* eslint-disable no-undefined */

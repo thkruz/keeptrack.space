@@ -178,6 +178,7 @@ Object {
   "semimajorAxis": 21203.40407588,
   "setRAE": [Function],
   "static": false,
+  "staticNum": null,
   "velocity": Object {
     "total": 0,
     "x": 0,
@@ -242,6 +243,7 @@ Object {
   "semimajorAxis": 21203.40407588,
   "setRAE": [Function],
   "static": false,
+  "staticNum": null,
   "velocity": Object {
     "total": 0,
     "x": 0,
@@ -306,6 +308,7 @@ Object {
   "semimajorAxis": 21203.40407588,
   "setRAE": [Function],
   "static": false,
+  "staticNum": null,
   "velocity": Object {
     "total": 0,
     "x": 0,
@@ -370,6 +373,7 @@ Object {
   "semimajorAxis": 21203.40407588,
   "setRAE": [Function],
   "static": false,
+  "staticNum": null,
   "velocity": Object {
     "total": 0,
     "x": 0,
@@ -458,6 +462,7 @@ Object {
   "semimajorAxis": 21203.40407588,
   "setRAE": [Function],
   "static": false,
+  "staticNum": null,
   "velocity": Object {
     "total": 0,
     "x": 0,
@@ -520,6 +525,7 @@ Object {
   "semimajorAxis": 21203.40407588,
   "setRAE": [Function],
   "static": false,
+  "staticNum": null,
   "velocity": Object {
     "total": 0,
     "x": 0,
@@ -590,6 +596,7 @@ Object {
   "semimajorAxis": 21203.40407588,
   "setRAE": [Function],
   "static": false,
+  "staticNum": null,
   "velocity": Object {
     "total": 0,
     "x": 0,
@@ -652,6 +659,7 @@ Object {
   "semimajorAxis": 21203.40407588,
   "setRAE": [Function],
   "static": false,
+  "staticNum": null,
   "velocity": Object {
     "total": 0,
     "x": 0,

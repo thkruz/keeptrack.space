@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
 import { SatObject } from '@app/js/api/keepTrack';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -211,11 +211,11 @@ export const uiManagerInit = () => {
         </div>
       `);
 
-  $('#analysis-form').on('submit', function (e) {
+  $('#analysis-form').on('submit', function (e: Event) {
     e.preventDefault();
     analysisFormSubmit();
   });
-  $('#analysis-bpt').on('submit', function (e) {
+  $('#analysis-bpt').on('submit', function (e: Event) {
     e.preventDefault();
     analysisBptSumbit();
   });

@@ -24,8 +24,8 @@
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { MapManager } from '@app/types/types';
+import { MapManager } from '@app/js/api/keepTrack';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
 const defaults = {
@@ -38,15 +38,15 @@ export const rad = (deg: number) => (deg * Math.PI) / 180;
 export const tan = (deg: number) => Math.tan(rad(deg));
 export const deg = (rad: number) => (rad * 180) / Math.PI;
 export const init = (): void => {
-  const mapManager: MapManager = {
-    options: options,
-    braun: braun,
-    check: check,
-    addMeridian: addMeridian,
-    updateMap: updateMap,
+  const mapManager: MapManager = <MapManager>(<unknown>{
+    options,
+    braun,
+    check,
+    addMeridian,
+    updateMap,
     isMapMenuOpen: false,
     mapManager: 0,
-  };
+  });
 
   keepTrackApi.programs.mapManager = mapManager;
 
@@ -165,7 +165,7 @@ export const updateMap = (): void => {
         position: 'bottom',
       });
     }
-    if (satellite.map(sat, i).inView === 1) {
+    if (satellite.map(sat, i).inView) {
       $('#map-look' + i).attr('src', 'img/yellow-square.png'); // If inview then make yellow
     } else {
       $('#map-look' + i).attr('src', 'img/red-square.png'); // If not inview then make red
@@ -315,7 +315,7 @@ export const uiManagerInit = (): void => {
     uiManager.resize2DMap();
   });
 
-  $('#map-menu').on('click', '.map-look', function (evt) {
+  $('#map-menu').on('click', '.map-look', function (evt: Event) {
     mapMenuClick(evt);
   });
 

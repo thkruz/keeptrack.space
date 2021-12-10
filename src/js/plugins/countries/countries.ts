@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
 let isCountriesMenuOpen = false;
@@ -29,7 +29,7 @@ export const init = (): void => {
   });
 };
 export const bottomMenuClick = (iconName: string): void => {
-  const { uiManager, settingsManager } = keepTrackApi.programs;
+  const { uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-countries') {
     if (isCountriesMenuOpen) {
       uiManager.hideSideMenus();

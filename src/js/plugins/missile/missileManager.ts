@@ -1,5 +1,6 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
+import { MissileObject, SensorObject } from '@app/js/api/keepTrack';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { jday } from '@app/js/timeManager/transforms';
 import $ from 'jquery';
 
@@ -21,25 +22,25 @@ export const MassRaidPre = (time: number, simFile: string) => {
       const x = satSetLen - 500 + i;
       missileArray[i].startTime = time;
       satSet.setSat(x, missileArray[i]);
-      const MissileObject = satSet.getSat(x);
-      if (MissileObject) {
-        MissileObject.id = satSetLen - 500 + i;
+      const missileObj = <MissileObject>satSet.getSat(x);
+      if (missileObj) {
+        missileObj.id = satSetLen - 500 + i;
         keepTrackApi.programs.satSet.satCruncher.postMessage({
-          id: MissileObject.id,
+          id: missileObj.id,
           typ: 'newMissile',
-          ON: 'M00' + MissileObject.id,
-          satId: MissileObject.id,
-          static: MissileObject.static,
-          missile: MissileObject.missile,
-          active: MissileObject.active,
-          type: MissileObject.type,
-          name: MissileObject.id,
-          latList: MissileObject.latList,
-          lonList: MissileObject.lonList,
-          altList: MissileObject.altList,
-          startTime: MissileObject.startTime,
+          ON: 'M00' + missileObj.id,
+          satId: missileObj.id,
+          static: missileObj.static,
+          missile: missileObj.missile,
+          active: missileObj.active,
+          type: missileObj.type,
+          name: missileObj.id,
+          latList: missileObj.latList,
+          lonList: missileObj.lonList,
+          altList: missileObj.altList,
+          startTime: missileObj.startTime,
         });
-        orbitManager.updateOrbitBuffer(MissileObject.id, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList); // , MissileObject.startTime -- Used to send this too??
+        orbitManager.updateOrbitBuffer(missileObj.id, null, null, null, true, missileObj.latList, missileObj.lonList, missileObj.altList); // , missileObj.startTime -- Used to send this too??
       }
     }
     missileManager.missileArray = missileArray;
@@ -55,23 +56,23 @@ export const clearMissiles = () => {
   for (let i = 0; i < 500; i++) {
     const x = satSetLen - 500 + i;
     // satSet.setSat(x, missileArray[i]);
-    const MissileObject = satSet.getSat(x);
-    MissileObject.active = false;
+    const missileObj: MissileObject = <MissileObject>satSet.getSat(x);
+    missileObj.active = false;
 
     keepTrackApi.programs.satSet.satCruncher.postMessage({
-      id: MissileObject.id,
+      id: missileObj.id,
       typ: 'newMissile',
-      ON: 'RV_' + MissileObject.id,
-      satId: MissileObject.id,
-      static: MissileObject.static,
-      missile: MissileObject.missile,
-      active: MissileObject.active,
-      type: MissileObject.type,
-      name: MissileObject.id,
-      latList: MissileObject.latList,
-      lonList: MissileObject.lonList,
-      altList: MissileObject.altList,
-      startTime: MissileObject.startTime,
+      ON: 'RV_' + missileObj.id,
+      satId: missileObj.id,
+      static: missileObj.static,
+      missile: missileObj.missile,
+      active: missileObj.active,
+      type: missileObj.type,
+      name: missileObj.id,
+      latList: missileObj.latList,
+      lonList: missileObj.lonList,
+      altList: missileObj.altList,
+      startTime: missileObj.startTime,
     });
   }
 };
@@ -130,7 +131,7 @@ export const Missile = (
   // presents them in the form of print statements and also plots.
 
   const { satSet, orbitManager } = keepTrackApi.programs;
-  const MissileObject = satSet.getSat(MissileObjectNum);
+  const missileObj: MissileObject = <MissileObject>satSet.getSat(MissileObjectNum);
 
   // Dimensions of the rocket
   Length = Length || 17; // (m)
@@ -590,88 +591,68 @@ export const Missile = (
   // console.info('Total Blast area for complete structural destruction:' + Math.round(TotalDestruction, 2) + 'Square Kilometers');
   // console.info('Total Blast area for partial structural destruction:' + Math.round(PartialDestruction, 2) + 'Square Kilometers');
 
-  if (MissileObject) {
-    MissileObject.static = false;
-    MissileObject.altList = AltitudeList;
-    MissileObject.latList = LatList;
-    MissileObject.lonList = LongList;
-    // MissileObject.timeList = TimeList;
-    MissileObject.active = true;
-    MissileObject.missile = true;
-    MissileObject.type = '';
-    MissileObject.id = MissileObjectNum;
-    MissileObject.ON = 'RV_' + MissileObject.id;
-    MissileObject.satId = MissileObjectNum;
-    MissileObject.maxAlt = MaxAltitude;
-    MissileObject.startTime = CurrentTime;
-    if (country) MissileObject.C = country;
+  if (missileObj) {
+    missileObj.static = false;
+    missileObj.altList = AltitudeList;
+    missileObj.latList = LatList;
+    missileObj.lonList = LongList;
+    // missileObj.timeList = TimeList;
+    missileObj.active = true;
+    missileObj.missile = true;
+    missileObj.type = '';
+    missileObj.id = MissileObjectNum;
+    missileObj.ON = 'RV_' + missileObj.id;
+    missileObj.satId = MissileObjectNum;
+    missileObj.maxAlt = MaxAltitude;
+    missileObj.startTime = CurrentTime;
+    if (country) missileObj.C = country;
 
-    if (MissileObject.apogee) delete MissileObject.apogee;
-    if (MissileObject.argPe) delete MissileObject.argPe;
-    if (MissileObject.eccentricity) delete MissileObject.eccentricity;
-    if (MissileObject.inclination) delete MissileObject.inclination;
+    if (missileObj.apogee) delete missileObj.apogee;
+    if (missileObj.argPe) delete missileObj.argPe;
+    if (missileObj.eccentricity) delete missileObj.eccentricity;
+    if (missileObj.inclination) delete missileObj.inclination;
     // maxAlt is used for zoom controls
-    // if (MissileObject.maxAlt) delete MissileObject.maxAlt;
-    if (MissileObject.meanMotion) delete MissileObject.meanMotion;
-    if (MissileObject.perigee) delete MissileObject.perigee;
-    if (MissileObject.period) delete MissileObject.period;
-    if (MissileObject.raan) delete MissileObject.raan;
-    if (MissileObject.semiMajorAxis) delete MissileObject.semiMajorAxis;
-    if (MissileObject.semiMinorAxis) delete MissileObject.semiMinorAxis;
+    // if (missileObj.maxAlt) delete missileObj.maxAlt;
+    if (missileObj.meanMotion) delete missileObj.meanMotion;
+    if (missileObj.perigee) delete missileObj.perigee;
+    if (missileObj.period) delete missileObj.period;
+    if (missileObj.raan) delete missileObj.raan;
+    if (missileObj.semiMajorAxis) delete missileObj.semiMajorAxis;
+    if (missileObj.semiMinorAxis) delete missileObj.semiMinorAxis;
 
-    if (MissileDesc) MissileObject.desc = MissileDesc;
-    // console.log(MissileObject);
-    missileArray.push(MissileObject);
+    if (MissileDesc) missileObj.desc = MissileDesc;
+    // console.log(missileObj);
+    missileArray.push(missileObj);
     keepTrackApi.programs.satSet.satCruncher.postMessage({
-      id: MissileObject.id,
+      id: missileObj.id,
       typ: 'newMissile',
-      ON: 'RV_' + MissileObject.id, // Don't think satSet.satCruncher needs this
-      satId: MissileObject.id,
-      static: MissileObject.static,
-      missile: MissileObject.missile,
-      active: MissileObject.active,
-      type: MissileObject.type,
-      name: MissileObject.id,
-      latList: MissileObject.latList,
-      lonList: MissileObject.lonList,
-      altList: MissileObject.altList,
-      startTime: MissileObject.startTime,
+      ON: 'RV_' + missileObj.id, // Don't think satSet.satCruncher needs this
+      satId: missileObj.id,
+      static: missileObj.static,
+      missile: missileObj.missile,
+      active: missileObj.active,
+      type: missileObj.type,
+      name: missileObj.id,
+      latList: missileObj.latList,
+      lonList: missileObj.lonList,
+      altList: missileObj.altList,
+      startTime: missileObj.startTime,
     });
-    orbitManager.updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList); // MissileObject.startTime - used to send this??
+    orbitManager.updateOrbitBuffer(MissileObjectNum, null, null, null, true, missileObj.latList, missileObj.lonList, missileObj.altList); // missileObj.startTime - used to send this??
 
     missileManager.missileArray = missileArray;
 
-    // if (MissileObject.latList) delete MissileObject.latList;
-    // if (MissileObject.lonList) delete MissileObject.lonList;
-    // if (MissileObject.altList) delete MissileObject.altList;
-    // if (MissileObject.startTime) delete MissileObject.startTime;
+    // if (missileObj.latList) delete missileObj.latList;
+    // if (missileObj.lonList) delete missileObj.lonList;
+    // if (missileObj.altList) delete missileObj.altList;
+    // if (missileObj.startTime) delete missileObj.startTime;
   }
   missileManager.missilesInUse++;
   missileManager.lastMissileErrorType = 'normal';
-  missileManager.lastMissileError = 'Missile Named RV_' + MissileObject.id + '<br>has been created.';
+  missileManager.lastMissileError = 'Missile Named RV_' + missileObj.id + '<br>has been created.';
   return 1; // Successful Launch
 };
-export const getMissileTEARR = (
-  missile: { altList: string | any[]; startTime: number; latList: number[]; lonList: number[] },
-  sensor: {
-    observerGd?: any;
-    alt?: any;
-    lat?: any;
-    lon?: any;
-    obsminaz?: any;
-    obsmaxaz?: any;
-    obsminel?: any;
-    obsmaxel?: any;
-    obsmaxrange?: any;
-    obsminrange?: any;
-    obsminaz2?: any;
-    obsmaxaz2?: any;
-    obsminel2?: any;
-    obsmaxel2?: any;
-    obsmaxrange2?: any;
-    obsminrange2?: any;
-  }
-) => {
+export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[]) => {
   const currentTEARR: any = {}; // Most current TEARR data that is set in satellite object and returned.
   const now = timeManager.calculateSimulationTime();
   let j = jday(
@@ -686,25 +667,28 @@ export const getMissileTEARR = (
   const gmst = satellite.gstime(j);
 
   // If no sensor passed to function then try to use the 'currentSensor'
-  if (typeof sensor == 'undefined') {
+  if (typeof sensors == 'undefined') {
     if (typeof sensorManager.currentSensor == 'undefined') {
       throw 'getTEARR requires a sensor or for a sensor to be currently selected.';
     } else {
-      sensor = sensorManager.currentSensor;
+      sensors = sensorManager.currentSensor;
     }
   }
   // If sensor's observerGd is not set try to set it using it parameters
-  if (typeof sensor.observerGd == 'undefined') {
+  if (typeof sensors[0].observerGd == 'undefined') {
     try {
-      sensor.observerGd = {
-        height: sensor.alt,
-        lat: sensor.lat,
-        lon: sensor.lon,
+      sensors[0].observerGd = {
+        alt: sensors[0].alt,
+        lat: sensors[0].lat,
+        lon: sensors[0].lon,
       };
     } catch (e) {
       throw 'observerGd is not set and could not be guessed.';
     }
   }
+
+  // TODO: We should return an array
+  const sensor = sensors[0];
 
   let curMissileTime;
 

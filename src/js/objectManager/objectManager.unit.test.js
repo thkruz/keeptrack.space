@@ -1,5 +1,5 @@
 /* eslint-disable no-undefined */
-import { objectManager } from '@app/js/objectManager/objectManager.js';
+import { objectManager } from './objectManager';
 
 describe('ObjectManager Unit Tests', () => {
   test('ObjectManager Basic Functions', () => {
@@ -12,9 +12,6 @@ describe('ObjectManager Unit Tests', () => {
 
     objectManager.setLasthoveringSat(123);
     expect(objectManager.lasthoveringSat).toBe(123);
-
-    objectManager.setMissileManagerLoaded(true);
-    expect(objectManager.isMissileManagerLoaded).toBe(true);
 
     objectManager.lastSelectedSat(2);
     expect(objectManager.lastSelectedSat()).toBe(2);
@@ -315,8 +312,8 @@ describe('ObjectManager Unit Tests', () => {
     });
 
     expect(objectManager.extractLaunchSite('FAKE')).toStrictEqual({
-      site: undefined,
-      sitec: undefined,
+      site: 'Unknown',
+      sitec: 'Unknown',
     });
   });
 });

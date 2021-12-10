@@ -1,13 +1,12 @@
 /* */
 
-import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants.js';
+import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants';
 import * as glm from '@app/js/lib/external/gl-matrix.js';
 // @ts-ignore - using OBJ prevents ponicode from breaking
 import { OBJ } from '@app/js/lib/external/webgl-obj-loader.js';
-import { Camera, TimeManager } from '@app/types/types';
 import { mat4 } from 'gl-matrix';
-import { keepTrackApi } from '../api/externalApi';
-import { SatObject } from '../api/keepTrack';
+import { Camera, SatObject, TimeManager } from '../api/keepTrack';
+import { keepTrackApi } from '../api/keepTrackApi';
 
 const meshList = ['sat2', 's1u', 's2u', 's3u', 'starlink', 'iss', 'gps', 'aehf', 'dsp', 'galileo', 'o3b', 'orbcomm', 'iridium', 'globalstar', 'debris0', 'debris1', 'debris2', 'rocketbody', 'sbirs', 'misl', 'misl2', 'misl3', 'misl4', 'rv'];
 
@@ -27,7 +26,7 @@ export const init: any = async () => {
 
     let p = OBJ.downloadModels(meshManager.fileList);
 
-    p.then((models) => {
+    p.then((models: any[]) => {
       // for (var [name, mesh] of Object.entries(models)) {
       //   console.debug('Name:', name);
       //   console.debug('Mesh:', mesh);
@@ -106,7 +105,7 @@ export const initShaders = () => {
   meshManager.shaderProgram.disableVertexAttribArrays = disableVertexAttribArrays;
 };
 
-export const enableVertexAttribArrays = (attrs) => {
+export const enableVertexAttribArrays = (attrs: string[]) => {
   const { gl } = keepTrackApi.programs.drawManager;
   for (const attrName in attrs) {
     if (!Object.prototype.hasOwnProperty.call(attrs, attrName)) {
@@ -121,7 +120,7 @@ export const enableVertexAttribArrays = (attrs) => {
   }
 };
 
-export const disableVertexAttribArrays: any = (attrs) => {
+export const disableVertexAttribArrays = (attrs: string[]) => {
   const { gl } = keepTrackApi.programs.drawManager;
   for (const attrName in attrs) {
     if (!Object.prototype.hasOwnProperty.call(attrs, attrName)) {
@@ -136,7 +135,7 @@ export const disableVertexAttribArrays: any = (attrs) => {
   }
 };
 
-export const applyAttributePointers = (model, attrs) => {
+export const applyAttributePointers = (model: any, attrs: string[]) => {
   const { gl } = keepTrackApi.programs.drawManager;
   const layout = model.mesh.vertexBuffer.layout;
   for (const attrName in attrs) {
@@ -151,7 +150,7 @@ export const applyAttributePointers = (model, attrs) => {
   }
 };
 
-export const initBuffers = (meshes?) => {
+export const initBuffers = (meshes?: any) => {
   const { gl } = keepTrackApi.programs.drawManager;
   var layout = new OBJ.Layout(OBJ.Layout.POSITION, OBJ.Layout.NORMAL, OBJ.Layout.AMBIENT, OBJ.Layout.DIFFUSE, OBJ.Layout.UV, OBJ.Layout.SPECULAR, OBJ.Layout.SPECULAR_EXPONENT);
 
@@ -161,7 +160,7 @@ export const initBuffers = (meshes?) => {
   for (var mesh in meshManager.meshes) {
     try {
       // Create the vertex buffer for this mesh
-      var vertexBuffer = gl.createBuffer();
+      var vertexBuffer = <any>gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
       var vertexData = meshManager.meshes[mesh].makeBufferData(layout);
       gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
@@ -170,7 +169,7 @@ export const initBuffers = (meshes?) => {
       meshManager.meshes[mesh].vertexBuffer = vertexBuffer;
 
       // Create the index buffer for this mesh
-      var indexBuffer = gl.createBuffer();
+      var indexBuffer = <any>gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
       var indexData = meshManager.meshes[mesh].makeIndexBufferDataForMaterials(...Object.values(meshManager.meshes[mesh].materialIndices));
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
@@ -242,8 +241,8 @@ export const draw = (pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLBuffer) => 
 
   // Assign uniforms
   gl.uniform3fv(meshManager.shaderProgram.uLightDirection, earth.lightDirection);
-  gl.uniformMatrix3fv(meshManager.shaderProgram.uNormalMatrix, false, nMatrix);
-  gl.uniformMatrix4fv(meshManager.shaderProgram.uMvMatrix, false, mvMatrix);
+  gl.uniformMatrix3fv(meshManager.shaderProgram.uNormalMatrix, false, <Float32Array>(<unknown>nMatrix));
+  gl.uniformMatrix4fv(meshManager.shaderProgram.uMvMatrix, false, <Float32Array>(<unknown>mvMatrix));
   gl.uniformMatrix4fv(meshManager.shaderProgram.uPMatrix, false, pMatrix);
   gl.uniformMatrix4fv(meshManager.shaderProgram.uCamMatrix, false, camMatrix);
   gl.uniform1f(meshManager.shaderProgram.uInSun, meshManager.currentModel.inSun);

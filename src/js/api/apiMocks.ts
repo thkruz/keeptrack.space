@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { SatObject, SensorObject } from './keepTrack';
 declare const jest: any;
 
@@ -62,6 +64,7 @@ export const defaultSat: SatObject = {
     z: 0,
   },
   static: false,
+  staticNum: null,
 };
 
 export const defaultSensor: SensorObject = {
@@ -188,14 +191,16 @@ export const keepTrackApiStubs = {
       },
       getForwardVector: jest.fn(),
     },
-    ColorScheme: {
+    colorSchemeManager: {
       objectTypeFlags: {
         payload: true,
         rocketBody: true,
         debris: true,
         inFOV: true,
       },
+      resetObjectTypeFlags: jest.fn(),
       reloadColors: jest.fn(),
+      group: null,
     },
     drawManager: {
       pMatrix: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -207,6 +212,7 @@ export const keepTrackApiStubs = {
       },
       postProcessingManager: {
         init: jest.fn(),
+        curBuffer: null,
         programs: {
           occlusion: {
             attrSetup: jest.fn(),
@@ -291,6 +297,7 @@ export const keepTrackApiStubs = {
       UnitedKingdom: null,
       UnitedStates: null,
       SpaceStations: {
+        group: {},
         sats: [
           { satId: 1, SCC_NUM: '25544' },
           { satId: 1, SCC_NUM: '25544' },
@@ -392,7 +399,7 @@ export const keepTrackApiStubs = {
       nextpassList: () => [new Date().getTime(), new Date().getTime() + 1],
       twoline2satrec: () => ({ jdsatepoch: 2458000.5, ecco: 1, nodeo: 1, argpo: 1, meana: 1, argPe: 1, argPeA: 1 }),
       getRae: () => [0, 0, 0],
-      checkIsInFOV: () => true,
+      checkIsInView: () => true,
       getlookangles: jest.fn(),
       getlookanglesMultiSite: jest.fn(),
       findCloseObjects: () => '',

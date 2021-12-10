@@ -1,5 +1,5 @@
 import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
-import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApi } from '../api/keepTrackApi';
 import * as meshManager from './meshManager';
 
 declare const settingsManager;

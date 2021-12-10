@@ -1,5 +1,5 @@
 import { keepTrackApiStubs } from '../api/apiMocks';
-import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApi } from '../api/keepTrackApi';
 import * as uiInput from './uiInput';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };

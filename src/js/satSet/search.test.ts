@@ -1,6 +1,6 @@
 import { keepTrackApiStubs } from '../api/apiMocks';
-import * as externalApi from '../api/externalApi';
-import { keepTrackApi } from '../api/externalApi';
+import * as externalApi from '../api/keepTrackApi';
+import { keepTrackApi } from '../api/keepTrackApi';
 import * as search from '../satSet/search';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };

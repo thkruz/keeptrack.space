@@ -1,5 +1,5 @@
 /* eslint-disable no-undefined */
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { expect } from '@jest/globals';
 import { keepTrackApiStubs } from '../api/apiMocks';
 import * as starManager from './starManager';

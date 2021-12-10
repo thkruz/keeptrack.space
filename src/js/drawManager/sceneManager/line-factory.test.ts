@@ -1,9 +1,9 @@
-import { defaultSensor, keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as lineManager from '@app/js/drawManager/sceneManager/line-factory';
-/* eslint-disable no-undefined */
+import { defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
+import { SatObject } from '../../api/keepTrack';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import * as lineManager from './line-factory';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 describe('drawWhenSelected', () => {
   let inst: any;
@@ -238,7 +238,7 @@ describe('create', () => {
   });
 
   test('22', () => {
-    keepTrackApi.programs.satSet.getSat = () => ({});
+    keepTrackApi.programs.satSet.getSat = () => <SatObject>{};
     let result = inst.create('sat', [25544, 5]);
     expect(result).toMatchSnapshot();
     result = inst.create('sat2', [25544, 10, 10, 10]);

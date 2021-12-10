@@ -1,5 +1,5 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { init } from './topMenu';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 describe('topMenu', () => {
   it('should be initialized', () => {

@@ -1,12 +1,12 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as analysis from '@app/js/plugins/analysis/analysis';
 import '@app/js/settingsManager/settingsManager';
 import { expect } from '@jest/globals';
 /* eslint-disable no-undefined */
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
-keepTrackApi.programs.settingsManager = window.settingsManager;
+settingsManager = window.settingsManager;
 
 // @ponicode
 describe('analysis.analysisBptSumbit', () => {

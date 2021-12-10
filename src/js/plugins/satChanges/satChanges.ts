@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { dateFromJday } from '@app/js/timeManager/transforms';
 import $ from 'jquery';
 
@@ -60,9 +60,9 @@ export const uiManagerInit = () => {
     minWidth: 280,
   });
 
-  $('#satChng-menu').on('click', '.satChng-object', function (evt) {
+  $('#satChng-menu').on('click', '.satChng-object', function (evt: Event) {
     // Might be better code for this.
-    const hiddenRow = evt.currentTarget.attributes.hiddenrow.value;
+    const hiddenRow = (<any>evt.currentTarget).attributes.hiddenrow.value;
     if (hiddenRow !== null) {
       satChng(parseInt(hiddenRow));
     }
@@ -76,7 +76,7 @@ export const satChng = (row: number) => {
 
   if (row === -1 && satChngTable.length === 0) {
     // Only generate the table if receiving the -1 argument for the first time
-    $.get('/analysis/satchng.json?v=' + keepTrackApi.programs.settingsManager.versionNumber).done((resp) => {
+    $.get('/analysis/satchng.json?v=' + settingsManager.versionNumber).done((resp) => {
       ({ resp, satChngTable } = getSatChngJson(resp, satChngTable));
       keepTrackApi.programs.satChange.satChngTable = satChngTable;
     });
@@ -101,7 +101,7 @@ export const bottomMenuClick = (iconName: string): void => {
       keepTrackApi.programs.uiManager.hideSideMenus();
       return;
     } else {
-      if (keepTrackApi.programs.settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
+      if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
       keepTrackApi.programs.uiManager.hideSideMenus();
       $('#satChng-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
       issatChngMenuOpen = true;
@@ -161,8 +161,8 @@ export const getSatChngJson = (resp: any, satChngTable: string | any[]) => {
     tdPer = tr.insertCell();
     const deltaMeanMo = satChngTable[i].meanmo;
     const sat = keepTrackApi.programs.satSet.getSat(keepTrackApi.programs.satSet.getIdFromObjNum(satChngTable[i].SCC));
-    const origPer = 1440 / (parseFloat(sat.meanMotion) + deltaMeanMo);
-    const perDelta = 1440 / parseFloat(sat.meanMotion) - origPer;
+    const origPer = 1440 / (sat.meanMotion + deltaMeanMo);
+    const perDelta = 1440 / sat.meanMotion - origPer;
     tdPer.appendChild(document.createTextNode(perDelta.toFixed(2)));
   }
   return { resp, satChngTable };

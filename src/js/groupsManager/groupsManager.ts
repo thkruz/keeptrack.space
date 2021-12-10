@@ -12,18 +12,36 @@ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ///////////////////////////////////////////////////////////////////////////// */
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { OrbitManager } from '../api/keepTrack';
 import { SatGroup } from './sat-group';
 
 export class GroupFactory {
   _selectedGroup: SatGroup;
-  ColorScheme: any;
   satSet: any;
   stopUpdatingInViewSoon: boolean;
+  Canada: SatGroup;
+  China: SatGroup;
+  France: SatGroup;
+  India: SatGroup;
+  Israel: SatGroup;
+  Japan: SatGroup;
+  Russia: SatGroup;
+  UnitedKingdom: SatGroup;
+  UnitedStates: SatGroup;
+  debris: SatGroup;
+  GPSGroup: any;
+  SpaceStations: any;
+  GlonassGroup: any;
+  GalileoGroup: any;
+  AmatuerRadio: any;
+  aehf: any;
+  wgs: any;
+  starlink: any;
+  sbirs: any;
 
   constructor() {
     this.satSet = keepTrackApi.programs.satSet;
-    this.ColorScheme = keepTrackApi.programs.ColorScheme;
     this.selectedGroup = null;
     this.stopUpdatingInViewSoon = false;
   }
@@ -36,11 +54,11 @@ export class GroupFactory {
     this._selectedGroup = val;
   }
 
-  createGroup(groupType, data) {
+  createGroup(groupType: string, data: any) {
     return new SatGroup(groupType, data, this.satSet);
   }
 
-  selectGroup(group, orbitManager) {
+  selectGroup(group: SatGroup, orbitManager: OrbitManager) {
     if (group === null || typeof group === 'undefined') {
       return;
     }
@@ -48,7 +66,7 @@ export class GroupFactory {
     this.updateIsInGroup(this.selectedGroup, group);
     this.selectedGroup = group;
     group.updateOrbits(orbitManager);
-    settingsManager.setCurrentColorScheme(this.ColorScheme.group);
+    settingsManager.setCurrentColorScheme(keepTrackApi.programs.colorSchemeManager.group);
 
     this.stopUpdatingInViewSoon = false;
     // this.updateInViewSoon(this);
@@ -72,17 +90,17 @@ export class GroupFactory {
   //   setTimeout(() => self.updateInViewSoon(self), 1000);
   // }
 
-  selectGroupNoOverlay(group) {
+  selectGroupNoOverlay(group: SatGroup) {
     if (group === null || typeof group === 'undefined') {
       return;
     }
     this.updateIsInGroup(this.selectedGroup, group);
     this.selectedGroup = group;
     settingsManager.isGroupOverlayDisabled = true;
-    settingsManager.setCurrentColorScheme(keepTrackApi.programs.ColorScheme.group);
+    settingsManager.setCurrentColorScheme(keepTrackApi.programs.colorSchemeManager.group);
   }
 
-  updateIsInGroup(oldgroup, newgroup) {
+  updateIsInGroup(oldgroup: SatGroup, newgroup: SatGroup) {
     var sat;
     let i;
     if (oldgroup !== null && typeof oldgroup !== 'undefined') {

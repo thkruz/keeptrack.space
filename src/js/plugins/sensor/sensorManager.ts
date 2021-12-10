@@ -25,19 +25,19 @@
  */
 
 import $ from 'jquery';
-import { keepTrackApi } from '../../api/externalApi';
-import { SensorObject } from '../../api/keepTrack';
+import { SensorManager, SensorObject } from '../../api/keepTrack';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import { sensorList } from './sensorList';
 
 // Add new callbacks to the list of callbacks in keepTrackApi
 keepTrackApi.callbacks.setSensor = [];
-keepTrackApi.methods.setSensor = (sensor, id) => {
-  keepTrackApi.callbacks.setSensor.forEach((cb) => cb.cb(sensor, id));
+keepTrackApi.methods.setSensor = (sensor: SensorObject, id: number) => {
+  keepTrackApi.callbacks.setSensor.forEach((cb: any) => cb.cb(sensor, id));
 };
 
 keepTrackApi.callbacks.resetSensor = [];
 keepTrackApi.methods.resetSensor = () => {
-  keepTrackApi.callbacks.resetSensor.forEach((cb) => cb.cb());
+  keepTrackApi.callbacks.resetSensor.forEach((cb: any) => cb.cb());
 };
 
 const emptySensor: SensorObject = {
@@ -61,21 +61,21 @@ const emptySensor: SensorObject = {
   staticNum: 0,
   sun: '',
   volume: false,
-  zoom: '',
+  zoom: 'geo',
 };
 
 // NOTE: This doesn't account for sensorManager.selectedSensor
 export const checkSensorSelected = () => sensorManager.currentSensor[0].lat != null;
 
-export const setCurrentSensor = (sensor: SensorObject | SensorObject[] | null) => {
+export const setCurrentSensor = (sensor: SensorObject[] | null): void => {
   // TODO: This function is totally redundant to setSensor. There should be
   // ONE selectedSensor/currentSensor and it should be an array of selected sensors.
   if (sensor === null) {
     sensorManager.currentSensor[0] = emptySensor;
   } else if (sensor[0] != null) {
-    sensorManager.currentSensor = <SensorObject[]>sensor;
+    sensorManager.currentSensor = sensor;
   } else if (sensor != null) {
-    sensorManager.currentSensor[0] = <SensorObject>sensor;
+    throw new Error('SensorManager.setCurrentSensor: sensor is not an array');
   }
 };
 
@@ -144,7 +144,7 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
       sensor: multiSensor,
       multiSensor: true,
     });
-    satellite.setobs(sensorManager.sensorList.COD);
+    satellite.setobs([sensorManager.sensorList.COD]);
     objectManager.setSelectedSat(-1);
     satSet.setColorScheme(settingsManager.currentColorScheme, true);
     sensorManager.sensorTitle = 'Cape Cod Multi Fence Radar';
@@ -257,7 +257,7 @@ export const drawFov = (sensor: SensorObject) => {
   }
 };
 
-export const sensorManager = {
+export const sensorManager: SensorManager = {
   sensorList: sensorList,
   setSensor: setSensor,
   checkSensorSelected: checkSensorSelected,
@@ -267,12 +267,12 @@ export const sensorManager = {
   setCurrentSensor: setCurrentSensor,
   curSensorPositon: [0, 0, 0],
   whichRadar: '',
-  selectedSensor: null,
+  selectedSensor: <SensorObject>null,
   sensorListUS: [sensorList.COD, sensorList.BLE, sensorList.CAV, sensorList.CLR, sensorList.EGL, sensorList.FYL, sensorList.THL, sensorList.MIL, sensorList.ALT, sensorList.ASC, sensorList.CDN],
   currentSensor: [
     {
       observerGd: {
-        lat: null,
+        lat: <number>null,
         lon: 0,
         alt: 0,
       },
@@ -291,16 +291,23 @@ export const sensorManager = {
       staticNum: 0,
       sun: '',
       volume: false,
-      zoom: '',
+      zoom: 'leo',
     },
   ],
-  defaultSensor: {
-    observerGd: {
-      lat: null,
-      lon: 0,
-      alt: 0,
+  defaultSensor: <SensorObject[]>[
+    {
+      observerGd: {
+        lat: null,
+        lon: 0,
+        alt: 0,
+      },
     },
-  },
+  ],
+  currentSensorList: null,
+  currentSensorMultiSensor: false,
+  tempSensor: null,
+  isLookanglesMenuOpen: false,
+  isCustomSensorMenuOpen: false,
 };
 
 export const sendSensorToOtherPrograms = (filteredSensors: SensorObject[]) => {
@@ -310,7 +317,7 @@ export const sendSensorToOtherPrograms = (filteredSensors: SensorObject[]) => {
     sensor: filteredSensors,
     multiSensor: filteredSensors.length > 1,
   });
-  setCurrentSensor(filteredSensors[0]);
+  setCurrentSensor(filteredSensors);
   satellite.setobs(filteredSensors);
   objectManager.setSelectedSat(-1);
 

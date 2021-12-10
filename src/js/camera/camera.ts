@@ -16,10 +16,9 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 */
 
-import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants.js';
-import { Camera, CameraType, DotsManager, DrawManager, ObjectManager, OrbitManager, SensorManager, ZoomValue } from '@app/types/types';
+import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants';
 import * as glm from 'gl-matrix';
-import { SatObject } from '../api/keepTrack';
+import { Camera, CameraType, DotsManager, DrawManager, ObjectManager, OrbitManager, SatObject, SensorManager, ZoomValue } from '../api/keepTrack';
 import { getDayOfYear } from '../timeManager/transforms';
 
 export const normalizeAngle = (angle: number): number => {
@@ -1129,4 +1128,7 @@ export const camera: Camera = {
     }
     return camera._zoomTarget;
   },
+  startMouseY: 0,
+  startMouseX: 0,
+  isCtrlPressed: false,
 };

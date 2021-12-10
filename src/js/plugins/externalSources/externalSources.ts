@@ -24,7 +24,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
 let isExternalMenuOpen = false;
@@ -92,12 +92,12 @@ export const uiManagerInit = () => {
         </div>
       `);
 
-  $('#n2yo-form').on('submit', function (e) {
+  $('#n2yo-form').on('submit', function (e: Event) {
     n2yoFormSubmit();
     e.preventDefault();
   });
 
-  $('#celestrak-form').on('submit', function (e) {
+  $('#celestrak-form').on('submit', function (e: Event) {
     celestrakFormSubmit();
     e.preventDefault();
   });
@@ -147,7 +147,7 @@ export const searchN2yo = (satNum: any, analsat?: number) => {
   // If no Analyst Satellite specified find the first unused one
   if (typeof analsat == 'undefined') {
     for (let i = 15000; i < satData.length; i++) {
-      if (satData[i].SCC_NUM >= 80000 && !satData[i].active) {
+      if (parseInt(satData[i].SCC_NUM) >= 80000 && !satData[i].active) {
         analsat = i;
         break;
       }
@@ -228,7 +228,7 @@ export const searchCelestrak = (satNum: any, analsat?: number) => {
   // If no Analyst Satellite specified find the first unused one
   if (typeof analsat == 'undefined') {
     for (let i = 15000; i < satData.length; i++) {
-      if (satData[i].SCC_NUM >= 80000 && !satData[i].active) {
+      if (parseInt(satData[i].SCC_NUM) >= 80000 && !satData[i].active) {
         analsat = i;
         break;
       }

@@ -1,4 +1,4 @@
-import { ObjectManager } from '@app/types/types';
+import { ObjectManager } from '../api/keepTrack';
 
 export class ColorScheme {
   colorBuffer: WebGLBuffer;
@@ -23,10 +23,12 @@ export class ColorScheme {
   selectSat: any;
   tempNumOfSats: number;
   colorBufferOneTime: boolean;
+  colorBuf: any;
+  pickableBuf: any;
 
   // colorRuleSet is the rules that define which dots are what this.colors -- better name?
   constructor(gl: WebGL2RenderingContext, satSet: any, objectManager: ObjectManager, colorRuleSet: any) {
-    // Setup our references to the outside world when the ColorSchemeFactory first makes this Scheme
+    // Setup our references to the outside world when the ColorSchemeManager first makes this Scheme
     this.colorRuleSet = colorRuleSet;
     this.gl = gl;
     this.satSet = satSet;

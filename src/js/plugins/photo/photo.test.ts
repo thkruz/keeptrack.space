@@ -1,5 +1,5 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as photo from '@app/js/plugins/photo/photo';
 import { expect } from '@jest/globals';
 

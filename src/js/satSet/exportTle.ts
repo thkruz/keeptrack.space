@@ -1,4 +1,4 @@
-import { RAD2DEG } from '@app/js/lib/constants.js';
+import { RAD2DEG } from '@app/js/lib/constants';
 import { saveAs } from '@app/js/lib/external/file-saver.min.js';
 import { saveCsv } from '@app/js/lib/helpers';
 

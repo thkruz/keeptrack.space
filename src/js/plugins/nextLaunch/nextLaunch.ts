@@ -1,7 +1,7 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { LaunchInfoObject } from '@app/js/api/keepTrack';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { saveCsv, truncateString } from '@app/js/lib/helpers';
-import { LaunchInfoObject } from '@app/types/types';
 import $ from 'jquery';
 /* */
 
@@ -159,6 +159,7 @@ export const uiManagerInit = () => {
     saveCsv(<any>nextLaunchManager.launchList, 'launchList');
   });
 };
+
 export const init = (): void => {
   // Load CSS
   import('@app/js/plugins/nextLaunch/nextLaunch.css').then((resp) => resp);
@@ -209,40 +210,38 @@ export const bottomMenuClick = (iconName: string): void => {
   }
 };
 
-// eslint-disable-next-line no-unused-vars
-export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void; showTable: () => void; processData: (resp: { results: Array<any> }) => void } = {
+export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void; showTable: () => void; processData: any } = {
   launchList: [],
   init: () => {
-    const settingsManager = keepTrackApi.programs.settingsManager;
-    if ((<any>settingsManager).offline) {
-      $('#menu-nextLaunch').hide();
-      return;
-    }
-
-    // Won't Work Offline
-    if (window.location.hostname === 'localhost') return;
-
-    $.get('https://ll.thespacedevs.com/2.0.0/launch/upcoming/?format=json&limit=20&mode=detailed')
-      .done((resp) => nextLaunchManager.processData(resp))
-      .fail(() => console.debug(`https://ll.thespacedevs.com/2.0.0/ is Unavailable!`));
+    if (settingsManager.offline) $('#menu-nextLaunch').hide();
   },
   showTable: () => {
-    const tbl = getTableElement();
-    if (typeof tbl == 'boolean') return;
+    if (nextLaunchManager.launchList.length === 0) {
+      if (window.location.hostname !== 'localhost') {
+        fetch('https://ll.thespacedevs.com/2.0.0/launch/upcoming/?format=json&limit=20&mode=detailed')
+          .then((resp) => resp.json())
+          .then((data) => nextLaunchManager.processData(data))
+          .catch(() => console.debug(`https://ll.thespacedevs.com/2.0.0/ is Unavailable!`))
+          .finally(() => {
+            const tbl = getTableElement();
+            if (typeof tbl == 'boolean') return;
 
-    // Only needs populated once
-    if (tbl.innerHTML == '') {
-      initTable(tbl, nextLaunchManager.launchList);
-      try {
-        $('a.iframe').colorbox({
-          iframe: true,
-          width: '80%',
-          height: '80%',
-          fastIframe: false,
-          closeButton: false,
-        });
-      } catch (error) {
-        console.warn(error);
+            // Only needs populated once
+            if (tbl.innerHTML == '') {
+              initTable(tbl, nextLaunchManager.launchList);
+              try {
+                $('a.iframe').colorbox({
+                  iframe: true,
+                  width: '80%',
+                  height: '80%',
+                  fastIframe: false,
+                  closeButton: false,
+                });
+              } catch (error) {
+                console.warn(error);
+              }
+            }
+          });
       }
     }
   },

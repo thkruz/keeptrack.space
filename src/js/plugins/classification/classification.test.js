@@ -1,34 +1,33 @@
-import '@app/js/settingsManager/settingsManager';
-
-import { init } from './classification';
-import { keepTrackApi } from '@app/js/api/externalApi';
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import '@app/js/settingsManager/settingsManager';
+import { init } from './classification';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
-keepTrackApi.programs.settingsManager = {};
+settingsManager = {};
 
 describe('classification', () => {
   it('should be initialized', () => {
     init();
   });
   it('should ignore no classification', () => {
-    keepTrackApi.programs.settingsManager.classificationStr = '';
+    settingsManager.classificationStr = '';
     keepTrackApi.methods.uiManagerInit();
   });
   it('should add unclassified classification to the top', () => {
-    keepTrackApi.programs.settingsManager.classificationStr = 'Unclassified';
+    settingsManager.classificationStr = 'Unclassified';
     keepTrackApi.methods.uiManagerInit();
   });
   it('should add secret classification to the top', () => {
-    keepTrackApi.programs.settingsManager.classificationStr = 'Secret';
+    settingsManager.classificationStr = 'Secret';
     keepTrackApi.methods.uiManagerInit();
   });
   it('should add top secret classification to the top', () => {
-    keepTrackApi.programs.settingsManager.classificationStr = 'Top Secret';
+    settingsManager.classificationStr = 'Top Secret';
     keepTrackApi.methods.uiManagerInit();
   });
   it('should add sci classification to the top', () => {
-    keepTrackApi.programs.settingsManager.classificationStr = 'Top Secret//SCI LA';
+    settingsManager.classificationStr = 'Top Secret//SCI LA';
     keepTrackApi.methods.uiManagerInit();
   });
 });

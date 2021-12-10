@@ -1,4 +1,5 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { SensorObject } from '@app/js/api/keepTrack';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
 let isStfMenuOpen = false;
@@ -151,7 +152,7 @@ export const selectSatData = (stfInfoLinks: boolean) => {
   }
 };
 
-export const setSensor = (sensor: any, id: number) => {
+export const setSensor = (sensor: any, id?: number) => {
   if (sensor == null && id == null) {
     $('#menu-stf').addClass('bmenu-item-disabled');
   } else {
@@ -191,7 +192,24 @@ export const stfFormOnSubmit = (e: Event) => {
   satSet.satCruncher.postMessage({
     // Send satSet.satCruncher File information on this radar
     setlatlong: true, // Tell satSet.satCruncher we are changing observer location
-    sensor: {
+    sensor: [
+      {
+        lat: lat,
+        lon: lon,
+        alt: alt,
+        obsminaz: minaz,
+        obsmaxaz: maxaz,
+        obsminel: minel,
+        obsmaxel: maxel,
+        obsminrange: minrange,
+        obsmaxrange: maxrange,
+        type: sensorType,
+      },
+    ],
+  });
+
+  satellite.setobs(<SensorObject[]>[
+    {
       lat: lat,
       lon: lon,
       alt: alt,
@@ -203,20 +221,7 @@ export const stfFormOnSubmit = (e: Event) => {
       obsmaxrange: maxrange,
       type: sensorType,
     },
-  });
-
-  satellite.setobs({
-    lat: lat,
-    lon: lon,
-    alt: alt,
-    obsminaz: minaz,
-    obsmaxaz: maxaz,
-    obsminel: minel,
-    obsmaxel: maxel,
-    obsminrange: minrange,
-    obsmaxrange: maxrange,
-    type: sensorType,
-  });
+  ]);
 
   $('#sensor-selected').text('Short Term Fence');
 

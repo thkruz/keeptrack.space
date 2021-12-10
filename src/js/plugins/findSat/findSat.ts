@@ -1,6 +1,6 @@
 import { SatObject } from '@app/js/api/keepTrack';
 import $ from 'jquery';
-import { keepTrackApi } from '../../api/externalApi';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import { RAD2DEG } from '../../lib/constants';
 
 let isFindByLooksMenuOpen = false;
@@ -345,7 +345,7 @@ export const uiManagerInit = (): void => {
     $('#fbl-error').hide();
   });
 
-  $('#newLaunch').on('submit', function (e) {
+  $('#newLaunch').on('submit', function (e: Event) {
     $('#loading-screen').fadeIn(1000, newLaunchSubmit);
     e.preventDefault();
   });
@@ -369,7 +369,7 @@ export const uiManagerInit = (): void => {
         </div>     
       `);
 
-  $('#findByLooks').on('submit', function (e) {
+  $('#findByLooks').on('submit', function (e: Event) {
     findByLooksSubmit();
     e.preventDefault();
   });

@@ -1,22 +1,21 @@
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as countries from '@app/js/plugins/countries/countries';
 import { expect } from '@jest/globals';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 /* eslint-disable no-undefined */
 
-
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
-keepTrackApi.programs.settingsManager = window.settingsManager;
+settingsManager = window.settingsManager;
 // @ponicode
-describe("countries.init", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            countries.init()
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+describe('countries.init', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      countries.init();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
 
 describe('countries.countryMenuClick', () => {
   keepTrackApi.programs.groups.createGroup = () => ({
@@ -151,71 +150,71 @@ describe('countries.countryMenuClick', () => {
 });
 
 // @ponicode
-describe("countries.groupSelected", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            countries.groupSelected('SpaceStations')
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+describe('countries.groupSelected', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      countries.groupSelected('SpaceStations');
+    };
 
-    test("1", () => {
-        const callFunction: any = () => {
-            countries.groupSelected(undefined)
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+    expect(callFunction).not.toThrow();
+  });
 
-    test("2", () => {
-        const callFunction: any = () => {
-            countries.groupSelected("National Infrastructure Supervisor")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+  test('1', () => {
+    const callFunction: any = () => {
+      countries.groupSelected(undefined);
+    };
 
-    test("3", () => {
-        const callFunction: any = () => {
-            countries.groupSelected("spaces")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+    expect(callFunction).not.toThrow();
+  });
 
-    test("4", () => {
-        const callFunction: any = () => {
-            countries.groupSelected("callback detected, not supported yet")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+  test('2', () => {
+    const callFunction: any = () => {
+      countries.groupSelected('National Infrastructure Supervisor');
+    };
 
-    test("5", () => {
-        const callFunction: any = () => {
-            countries.groupSelected("bc23a9d531064583ace8f67dad60f6bb")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+    expect(callFunction).not.toThrow();
+  });
 
-    test("6", () => {
-        const callFunction: any = () => {
-            countries.groupSelected("SpaceStations")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+  test('3', () => {
+    const callFunction: any = () => {
+      countries.groupSelected('spaces');
+    };
 
-    test("7", () => {
-        const callFunction: any = () => {
-            countries.groupSelected(NaN)
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+    expect(callFunction).not.toThrow();
+  });
+
+  test('4', () => {
+    const callFunction: any = () => {
+      countries.groupSelected('callback detected, not supported yet');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('5', () => {
+    const callFunction: any = () => {
+      countries.groupSelected('bc23a9d531064583ace8f67dad60f6bb');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('6', () => {
+    const callFunction: any = () => {
+      countries.groupSelected('SpaceStations');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('7', () => {
+    const callFunction: any = () => {
+      countries.groupSelected(NaN);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
 
 describe('countries.bottomMenuClick', () => {
   test('0', () => {
@@ -237,125 +236,125 @@ describe('countries.bottomMenuClick', () => {
 });
 
 // @ponicode
-describe("countries.hideSideMenus", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            countries.hideSideMenus()
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+describe('countries.hideSideMenus', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      countries.hideSideMenus();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
 
 // @ponicode
-describe("countries.bottomMenuClick", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            countries.bottomMenuClick("menu-countries")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+describe('countries.bottomMenuClick', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      countries.bottomMenuClick('menu-countries');
+    };
 
-    test("1", () => {
-        const callFunction: any = () => {
-            countries.bottomMenuClick("Credit Card Account")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+    expect(callFunction).not.toThrow();
+  });
 
-    test("2", () => {
-        const callFunction: any = () => {
-            countries.bottomMenuClick("Investment Account")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+  test('1', () => {
+    const callFunction: any = () => {
+      countries.bottomMenuClick('Credit Card Account');
+    };
 
-    test("3", () => {
-        const callFunction: any = () => {
-            countries.bottomMenuClick("Home Loan Account")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+    expect(callFunction).not.toThrow();
+  });
 
-    test("4", () => {
-        const callFunction: any = () => {
-            countries.bottomMenuClick("Checking Account")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+  test('2', () => {
+    const callFunction: any = () => {
+      countries.bottomMenuClick('Investment Account');
+    };
 
-    test("5", () => {
-        const callFunction: any = () => {
-            countries.bottomMenuClick("")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+    expect(callFunction).not.toThrow();
+  });
 
-// @ponicode
-describe("countries.uiManagerInit", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            countries.uiManagerInit()
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+  test('3', () => {
+    const callFunction: any = () => {
+      countries.bottomMenuClick('Home Loan Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('4', () => {
+    const callFunction: any = () => {
+      countries.bottomMenuClick('Checking Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('5', () => {
+    const callFunction: any = () => {
+      countries.bottomMenuClick('');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
 
 // @ponicode
-describe("countries.countryMenuClick", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            countries.countryMenuClick(false)
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+describe('countries.uiManagerInit', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      countries.uiManagerInit();
+    };
 
-    test("1", () => {
-        const callFunction: any = () => {
-            countries.countryMenuClick("China")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+    expect(callFunction).not.toThrow();
+  });
+});
 
-    test("2", () => {
-        const callFunction: any = () => {
-            countries.countryMenuClick(true)
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+// @ponicode
+describe('countries.countryMenuClick', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      countries.countryMenuClick(false);
+    };
 
-    test("3", () => {
-        const callFunction: any = () => {
-            countries.countryMenuClick("France")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+    expect(callFunction).not.toThrow();
+  });
 
-    test("4", () => {
-        const callFunction: any = () => {
-            countries.countryMenuClick("Japan")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+  test('1', () => {
+    const callFunction: any = () => {
+      countries.countryMenuClick('China');
+    };
 
-    test("5", () => {
-        const callFunction: any = () => {
-            countries.countryMenuClick("")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+    expect(callFunction).not.toThrow();
+  });
+
+  test('2', () => {
+    const callFunction: any = () => {
+      countries.countryMenuClick(true);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('3', () => {
+    const callFunction: any = () => {
+      countries.countryMenuClick('France');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('4', () => {
+    const callFunction: any = () => {
+      countries.countryMenuClick('Japan');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('5', () => {
+    const callFunction: any = () => {
+      countries.countryMenuClick('');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});

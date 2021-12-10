@@ -1,9 +1,8 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as colorsMenu from '@app/js/plugins/colorsMenu/colorsMenu';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import * as colorsMenu from './colorsMenu';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
-keepTrackApi.programs.settingsManager = window.settingsManager;
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
 describe('colorsMenu.init', () => {

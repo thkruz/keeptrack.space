@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { MediaRecorderOptions } from '@app/types/types';
 
 export class CanvasRecorder {

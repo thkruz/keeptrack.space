@@ -9,8 +9,8 @@
 // ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 // FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-import { keepTrackApi } from '../api/externalApi';
 import { Colors, SatObject } from '../api/keepTrack';
+import { keepTrackApi } from '../api/keepTrackApi';
 import { ColorScheme } from './color-scheme';
 
 export interface ColorSchemeManager {

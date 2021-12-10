@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
@@ -22,7 +22,7 @@ export const uiManagerInit = () => {
         </div>
       `);
 
-  $('#socrates-menu').on('click', '.socrates-object', function (evt) {
+  $('#socrates-menu').on('click', '.socrates-object', (evt: any) => {
     // Might be better code for this.
     const hiddenRow = evt.currentTarget.attributes.hiddenrow.value;
     if (hiddenRow !== null) {
@@ -74,7 +74,7 @@ export const bottomMenuClick = (iconName: string): void => {
       keepTrackApi.programs.uiManager.hideSideMenus();
       return;
     } else {
-      if (keepTrackApi.programs.settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
+      if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
       keepTrackApi.programs.uiManager.hideSideMenus();
       $('#socrates-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
       isSocratesMenuOpen = true;
@@ -214,21 +214,21 @@ export const processSocratesHtm = (socratesHTM: Document): void => {
   const tableRowTwo = $("[name='CATNR2']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR2
 
   // eslint-disable-next-line no-unused-vars
-  tableRowOne.each(function (_rowIndex, _r) {
+  tableRowOne.each(function (_rowIndex: number, _r: number) {
     const cols: any[] = [];
     $(this)
       .find('td')
-      .each(function (_colIndex, c) {
+      .each(function (_colIndex: number, c: any) {
         cols.push(c.textContent);
       });
     socratesObjOne.push(cols);
   });
   // eslint-disable-next-line no-unused-vars
-  tableRowTwo.each(function (_rowIndex, _r) {
+  tableRowTwo.each(function (_rowIndex: number, _r: number) {
     const cols: any[] = [];
     $(this)
       .find('td')
-      .each(function (_colIndex, c) {
+      .each(function (_colIndex: number, c: any) {
         cols.push(c.textContent);
       });
     socratesObjTwo.push(cols);

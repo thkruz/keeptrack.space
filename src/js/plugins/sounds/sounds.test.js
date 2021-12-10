@@ -1,5 +1,5 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { init } from './sounds';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 describe('sounds', () => {
   beforeEach(() => {

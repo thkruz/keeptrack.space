@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { saveAs, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
@@ -129,7 +129,7 @@ export const uiManagerInit = (): void => {
     $('#editSat-file').trigger('click');
   });
 
-  $('#editSat-file').on('change', function (evt) {
+  $('#editSat-file').on('change', function (evt: Event) {
     if (!window.FileReader) return; // Browser is not compatible
     doReaderActions(evt);
     evt.preventDefault();
@@ -140,7 +140,7 @@ export const uiManagerInit = (): void => {
   });
 };
 
-export const doReaderActions = (evt) => {
+export const doReaderActions = (evt: Event) => {
   try {
     const reader = new FileReader();
     reader.onload = readerOnLoad;
@@ -150,7 +150,7 @@ export const doReaderActions = (evt) => {
   }
 };
 
-export const readerOnLoad = (evt) => {
+export const readerOnLoad = (evt: any) => {
   const { satellite, timeManager, orbitManager, satSet } = keepTrackApi.programs;
   if (evt.target.readyState !== 2) return;
   if (evt.target.error) {
@@ -179,7 +179,7 @@ export const readerOnLoad = (evt) => {
 };
 
 export const bottomMenuClick = (iconName: string) => {
-  const { uiManager, satSet, objectManager, settingsManager } = keepTrackApi.programs;
+  const { uiManager, satSet, objectManager } = keepTrackApi.programs;
   if (iconName === 'menu-editSat') {
     if (isEditSatMenuOpen) {
       isEditSatMenuOpen = false;

@@ -662,7 +662,7 @@ var propagateCruncher = () => {
       } // Skip inactive missiles
       tLen = satCache[i].altList.length;
       for (t = 0; t < tLen; t++) {
-        if (satCache[i].startTime * 1 + t * 1000 >= now.getDate()) {
+        if (satCache[i].startTime * 1 + t * 1000 >= now.getTime()) {
           curMissivarTime = t;
           break;
         }

@@ -1111,7 +1111,7 @@ uiManager.colorSchemeChangeAlert = (newScheme) => {
   if (uiManager.lastColorScheme == newScheme) return;
 
   for (const scheme in colorSchemeManager) {
-    if (newScheme == colorSchemeManager[scheme]) {
+    if (newScheme == colorSchemeManager[scheme] && scheme !== 'currentColorScheme') {
       // record the new color scheme
       uiManager.lastColorScheme = newScheme;
       // Make an alert

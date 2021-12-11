@@ -40,6 +40,7 @@ export const updatePMvCamMatrix = (pMatrix: glm.mat4, mainCamera: Camera) => {
 
 export const draw = (mainCamera: Camera, colorSchemeManager: ColorSchemeManager, tgtBuffer: WebGLFramebuffer) => {
   if (!dotsManager.loaded || !settingsManager.cruncherReady) return;
+  if (!colorSchemeManager.colorBuffer) return;
   const gl = dotsManager.gl;
 
   gl.useProgram(dotsManager.drawProgram);
@@ -90,6 +91,7 @@ export const draw = (mainCamera: Camera, colorSchemeManager: ColorSchemeManager,
 
 export const drawGpuPickingFrameBuffer = (mainCamera: Camera, colorSchemeManager: ColorSchemeManager) => {
   if (!dotsManager.loaded || !settingsManager.cruncherReady) return;
+  if (!colorSchemeManager.colorBuffer) return;
   const gl = dotsManager.gl;
 
   gl.useProgram(dotsManager.pickingProgram);

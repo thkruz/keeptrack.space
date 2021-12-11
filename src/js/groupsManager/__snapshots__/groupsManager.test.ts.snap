@@ -123,15 +123,6 @@ SatGroup {
 }
 `;
 
-exports[`createGroup 9 1`] = `
-SatGroup {
-  "forEach": [Function],
-  "hasSat": [Function],
-  "sats": Array [],
-  "updateOrbits": [Function],
-}
-`;
-
 exports[`satGroup Tests 0 1`] = `true`;
 
 exports[`satGroup Tests 1 1`] = `undefined`;

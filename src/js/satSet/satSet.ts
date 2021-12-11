@@ -4,7 +4,7 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { mat4 } from 'gl-matrix';
 import $ from 'jquery';
 import { CatalogManager, InView, Lla, Rae, SatCruncherMessage, SatObject, SensorObject } from '../api/keepTrack';
-import { ColorScheme } from '../colorManager/color-scheme';
+import { ColorInformation } from '../colorManager/colorSchemeManager';
 import { numeric } from '../lib/external/numeric';
 import { stringPad } from '../lib/helpers';
 import { jday } from '../timeManager/transforms';
@@ -300,18 +300,16 @@ export const getSat = (i: number): SatObject => {
   return satSet.satData[i];
 };
 export const setHover = (i: number): void => {
-  const { objectManager } = keepTrackApi.programs;
+  const { objectManager, colorSchemeManager } = keepTrackApi.programs;
   const { gl } = keepTrackApi.programs.drawManager;
   objectManager.setHoveringSat(i);
   if (i === objectManager.lasthoveringSat) return;
   if (i !== -1 && satSet.satData[i].type == 'Star') return;
 
-  settingsManager.currentColorScheme.hoverSat = objectManager.hoveringSat;
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.lasthoveringSat !== -1 && objectManager.lasthoveringSat !== objectManager.selectedSat) {
-    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lasthoveringSat * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.lasthoveringSat)).color));
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lasthoveringSat * 4 * 4, new Float32Array(colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lasthoveringSat)).color));
   }
   // If New Select Sat Picked Color it
   if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
@@ -322,7 +320,7 @@ export const setHover = (i: number): void => {
   // satSet.setColorScheme(settingsManager.currentColorScheme, true);
 };
 export const selectSat = (i: number): void => {
-  const { sensorManager, objectManager, uiManager } = keepTrackApi.programs;
+  const { sensorManager, objectManager, uiManager, colorSchemeManager } = keepTrackApi.programs;
   const { gl } = keepTrackApi.programs.drawManager;
   if (i === objectManager.lastSelectedSat()) return;
 
@@ -338,11 +336,10 @@ export const selectSat = (i: number): void => {
   });
   if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
 
-  settingsManager.currentColorScheme.selectSat = objectManager.selectedSat;
-  gl.bindBuffer(gl.ARRAY_BUFFER, settingsManager.currentColorScheme.colorBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.lastSelectedSat() !== -1) {
-    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lastSelectedSat() * 4 * 4, new Float32Array(settingsManager.currentColorScheme.colorRuleSet(satSet.getSat(objectManager.lastSelectedSat())).color));
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lastSelectedSat() * 4 * 4, new Float32Array(colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lastSelectedSat())).color));
   }
   // If New Select Sat Picked Color it
   if (i !== -1) {
@@ -432,21 +429,20 @@ export const resetSatInSun = () => {
   dotsManager.inSunData.fill(0);
 };
 // eslint-disable-next-line no-unused-vars
-export const setColorScheme = async (scheme: ColorScheme, isForceRecolor?: boolean) => {
+export const setColorScheme = async (scheme: (sat: SatObject) => ColorInformation, isForceRecolor?: boolean) => {
   const { dotsManager, colorSchemeManager } = keepTrackApi.programs;
   try {
-    settingsManager.setCurrentColorScheme(scheme);
-    await scheme.calculateColorBuffers(isForceRecolor);
-    dotsManager.colorBuffer = scheme.colorBuf;
-    dotsManager.pickingBuffer = scheme.pickableBuf;
+    settingsManager.setCurrentColorScheme(scheme); // Deprecated
+    colorSchemeManager.currentColorScheme = scheme;
+    colorSchemeManager.calculateColorBuffers(isForceRecolor);
+    dotsManager.colorBuffer = colorSchemeManager.colorBuffer;
+    dotsManager.pickingBuffer = colorSchemeManager.pickableBuffer;
   } catch (error) {
     // If we can't load the color scheme, just use the default
     console.debug(error);
     settingsManager.setCurrentColorScheme(colorSchemeManager.default);
-    scheme = colorSchemeManager.default;
-    await scheme.calculateColorBuffers(isForceRecolor);
-    dotsManager.colorBuffer = scheme.colorBuf;
-    dotsManager.pickingBuffer = scheme.pickableBuf;
+    colorSchemeManager.currentColorScheme = colorSchemeManager.default;
+    colorSchemeManager.calculateColorBuffers(isForceRecolor);
   }
 };
 

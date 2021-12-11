@@ -206,7 +206,7 @@ export const drawLoop = (preciseDt: number) => {
   requestAnimationFrame(drawLoop);
   // if (drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) return;
 
-  const { satSet, dotsManager, mainCamera, orbitManager, lineManager, objectManager, timeManager } = keepTrackApi.programs;
+  const { satSet, dotsManager, colorSchemeManager, mainCamera, orbitManager, lineManager, objectManager, timeManager } = keepTrackApi.programs;
 
   // Record milliseconds since last drawLoop - default is 0
   drawManager.dt = preciseDt - drawManager.t0 || 0;
@@ -251,10 +251,10 @@ export const drawLoop = (preciseDt: number) => {
 
   // Draw Dots
   // PERFORMANCE: 0.6813 ms
-  dotsManager.draw(mainCamera, settingsManager.currentColorScheme, drawManager.postProcessingManager.curBuffer);
+  dotsManager.draw(mainCamera, colorSchemeManager, drawManager.postProcessingManager.curBuffer);
 
   // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-  dotsManager.drawGpuPickingFrameBuffer(mainCamera, settingsManager.currentColorScheme);
+  dotsManager.drawGpuPickingFrameBuffer(mainCamera, colorSchemeManager);
 
   orbitManager.draw(drawManager.pMatrix, mainCamera.camMatrix, drawManager.postProcessingManager.curBuffer);
 

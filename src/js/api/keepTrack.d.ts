@@ -6,7 +6,7 @@ import * as glm from 'gl-matrix';
 import { mat4 } from 'gl-matrix';
 import { SatRec } from 'satellite.js';
 import { ColorScheme } from '../colorManager/color-scheme';
-import { ColorSchemeManager } from '../colorManager/colorSchemeManager';
+import { ColorRuleSet, ColorSchemeManager } from '../colorManager/colorSchemeManager';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { GroupFactory } from '../groupsManager/groupsManager';
 import { SatGroup } from '../groupsManager/sat-group';
@@ -350,7 +350,7 @@ export interface SettingsManager {
   colors: Colors;
   copyrightOveride: boolean;
   cruncherReady: boolean;
-  currentColorScheme: any;
+  currentColorScheme: ColorRuleSet;
   currentLegend: string;
   daysUntilObjectLost: number;
   demoModeInterval: number;
@@ -1044,7 +1044,7 @@ export interface CatalogManager {
   exportTle2Csv: any;
   exportTle2Txt: any;
   getIdFromEci: (eci: any) => number;
-  getSatInSun: (id: number) => any;
+  getSatInSun: () => number[];
   getSatInView: () => any;
   getSatInViewOnly: (i: number) => any;
   getSatVel: () => any;

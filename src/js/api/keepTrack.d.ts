@@ -143,7 +143,7 @@ interface GroupsManager {
   sbirs: SatGroup;
   selectedGroup: SatGroup;
   createGroup: (groupType: string, data: any) => SatGroup;
-  selectGroup: (group: SatGroup, orbitManager: OrbitManager) => void;
+  selectGroup: (group: SatGroup) => void;
   selectGroupNoOverlay: (group: SatGroup) => void;
   updateIsInGroup: (oldGroup: SatGroup, newGroup: SatGroup) => void;
   clearSelect: () => void;
@@ -1085,12 +1085,12 @@ export interface CatalogManager {
   missileSats: number;
 }
 
-type Kilometers = number;
-type Radians = number;
-type Degrees = number;
-type EciPos = { x: Kilometers; y: Kilometers; z: Kilometers };
-type EciVel = { x: Kilometers; y: Kilometers; z: Kilometers };
-type Eci = { position: EciPos; velocity: EciVel };
+export type Kilometers = number;
+export type Radians = number;
+export type Degrees = number;
+export type EciPos = { x: Kilometers; y: Kilometers; z: Kilometers };
+export type EciVel = { x: Kilometers; y: Kilometers; z: Kilometers };
+export type Eci = { position: EciPos; velocity: EciVel };
 
 export interface SatMath {
   obsmaxrange: number;
@@ -1115,7 +1115,7 @@ export interface SatMath {
   findBestPass(sat: any, sensors: SensorObject[], arg2: number);
   getEci(sat1: SatObject, now: any);
   currentEpoch(arg0: any);
-  getOrbitByLatLon(at: SatObject, goalLat: number, goalLon: number, upOrDown: string, now: Date, goalAlt?: number, rascOffset?: number): any;
+  getOrbitByLatLon(at: SatObject, goalLat: number, goalLon: number, upOrDown: string, now: Date, goalAlt?: number, rascOffset?: number): [string, string];
   altitudeCheck(iTLE1: string, iTLE2: any, arg2: any);
   getDops(lat: number, lon: number, alt?: number, now?: any);
   calculateDops: (satList: { az: number; el: number }[]) => { pdop: string; hdop: string; gdop: string; vdop: string; tdop: string };

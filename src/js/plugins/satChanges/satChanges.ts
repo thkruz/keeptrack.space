@@ -70,7 +70,7 @@ export const uiManagerInit = () => {
   });
 };
 
-export const satChng = (row: number) => {
+export const satChng = (row: number): void => {
   const { satChange } = keepTrackApi.programs;
   let satChngTable: string | any[] = satChange.satChngTable;
   if (typeof row !== 'number') throw new Error('Row must be a number');
@@ -85,6 +85,7 @@ export const satChng = (row: number) => {
   }
   if (row !== -1) {
     // If an object was selected from the menu
+    if (!satChngTable[row].SCC) return;
     uiManager.doSearch(satChngTable[row].SCC); // Actually perform the search of the two objects
     $('#anal-sat').val(satChngTable[row].SCC);
   } // If a row was selected

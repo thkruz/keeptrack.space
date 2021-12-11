@@ -6,7 +6,7 @@ export class SatGroup {
   updateOrbits: any;
   forEach: any;
 
-  constructor(groupType: string, data: any, satSet: CatalogManager) {
+  constructor(groupType: string, data: any[], satSet: CatalogManager) {
     switch (groupType) {
       case 'all':
         this.sats = [];
@@ -39,7 +39,7 @@ export class SatGroup {
       case 'intlDes':
         this.sats = data
           .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((id: number) => satSet.getIdFromIntlDes(id))
+          .map((intlDes: string) => satSet.getIdFromIntlDes(intlDes))
           .filter((sccNUm: number | null) => sccNUm !== null)
           .map((sccNUm: number) => ({
             satId: sccNUm,

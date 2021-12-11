@@ -2,7 +2,8 @@ import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import * as satChanges from './satChanges';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+
 // @ponicode
 describe('satChanges.init', () => {
   test('0', () => {
@@ -59,11 +60,13 @@ describe('satChanges.satChng', () => {
     ];
   });
   test('0', () => {
+    document.body.innerHTML = `<div id="search-results"></div>`;
     let result: any = satChanges.satChng(0);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
+    document.body.innerHTML = `<div id="search-results"></div>`;
     let result: any = satChanges.satChng(1);
     expect(result).toMatchSnapshot();
   });

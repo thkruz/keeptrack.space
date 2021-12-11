@@ -38,7 +38,7 @@ searchBox.getHoverSat = function () {
 };
 searchBox.hideResults = function () {
   try {
-    const { colorSchemeManager } = keepTrackApi.programs;
+    const { colorSchemeManager, groupsManager, dotsManager, satSet } = keepTrackApi.programs;
     $('#search-results').slideUp();
     groupsManager.clearSelect();
     resultsOpen = false;
@@ -58,6 +58,7 @@ searchBox.hideResults = function () {
 };
 
 searchBox.doArraySearch = (array) => {
+  const { satSet } = keepTrackApi.programs;
   let searchStr = '';
   let satData = satSet.satData;
   for (var i = 0; i < array.length; i++) {
@@ -70,8 +71,8 @@ searchBox.doArraySearch = (array) => {
   return searchStr;
 };
 
-searchBox.doSearch = function (searchString, isPreventDropDown) {
-  const { satSet } = keepTrackApi.programs;
+searchBox.doSearch = (searchString, isPreventDropDown) => {
+  const { satSet, dotsManager, groupsManager, orbitManager } = keepTrackApi.programs;
 
   if (satSet.satData.length === 0) throw new Error('No sat data loaded! Check if TLEs are corrupted!');
 
@@ -86,6 +87,8 @@ searchBox.doSearch = function (searchString, isPreventDropDown) {
 
   $('#search').val(searchString);
 
+  // TODO: typescript...typescript....typescript
+  if (typeof searchString === 'number') searchString = searchString.toString();
   // Uppercase to make this search not case sensitive
   searchString = searchString.toUpperCase();
 
@@ -292,13 +295,8 @@ searchBox.fillResultBox = function (results, satSet) {
   satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 };
 
-let satSet, groupsManager, orbitManager, dotsManager;
 searchBox.init = function () {
-  if (settingsManager.disableUI) return;
-  satSet = keepTrackApi.programs.satSet;
-  groupsManager = keepTrackApi.programs.groupsManager;
-  orbitManager = keepTrackApi.programs.orbitManager;
-  dotsManager = keepTrackApi.programs.dotsManager;
+  // Nothing yet
 };
 
 export { searchBox };

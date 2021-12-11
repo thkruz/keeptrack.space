@@ -4,8 +4,8 @@ import { keepTrackApi } from '../../api/keepTrackApi';
 import * as countries from './countries';
 /* eslint-disable no-undefined */
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
-settingsManager = window.settingsManager;
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+
 // @ponicode
 describe('countries.init', () => {
   test('0', () => {
@@ -18,7 +18,7 @@ describe('countries.init', () => {
 });
 
 describe('countries.countryMenuClick', () => {
-  keepTrackApi.programs.groups.createGroup = () => ({
+  keepTrackApi.programs.groupsManager.createGroup = () => ({
     sats: [
       { satId: 1, SCC_NUM: '25544' },
       { satId: 1, SCC_NUM: '25544' },
@@ -29,32 +29,8 @@ describe('countries.countryMenuClick', () => {
   test('0', () => {
     const callFunction: any = () => {
       countries.countryMenuClick('Canada');
-      keepTrackApi.programs.groups.Canada = undefined;
+      keepTrackApi.programs.groupsManager.Canada = undefined;
       countries.countryMenuClick('Canada');
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-
-  test('1', () => {
-    const callFunction: any = () => {
-      countries.countryMenuClick(true);
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-
-  test('2', () => {
-    const callFunction: any = () => {
-      countries.countryMenuClick(false);
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-
-  test('3', () => {
-    const callFunction: any = () => {
-      countries.countryMenuClick(987650);
     };
 
     expect(callFunction).not.toThrow();
@@ -63,16 +39,8 @@ describe('countries.countryMenuClick', () => {
   test('4', () => {
     const callFunction: any = () => {
       countries.countryMenuClick('Japan');
-      keepTrackApi.programs.groups.Japan = undefined;
+      keepTrackApi.programs.groupsManager.Japan = undefined;
       countries.countryMenuClick('Japan');
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-
-  test('5', () => {
-    const callFunction: any = () => {
-      countries.countryMenuClick(NaN);
     };
 
     expect(callFunction).not.toThrow();
@@ -81,7 +49,7 @@ describe('countries.countryMenuClick', () => {
   test('6', () => {
     const callFunction: any = () => {
       countries.countryMenuClick('France');
-      keepTrackApi.programs.groups.France = undefined;
+      keepTrackApi.programs.groupsManager.France = undefined;
       countries.countryMenuClick('France');
     };
 
@@ -91,7 +59,7 @@ describe('countries.countryMenuClick', () => {
   test('7', () => {
     const callFunction: any = () => {
       countries.countryMenuClick('China');
-      keepTrackApi.programs.groups.China = undefined;
+      keepTrackApi.programs.groupsManager.China = undefined;
       countries.countryMenuClick('China');
     };
 
@@ -101,7 +69,7 @@ describe('countries.countryMenuClick', () => {
   test('8', () => {
     const callFunction: any = () => {
       countries.countryMenuClick('India');
-      keepTrackApi.programs.groups.India = undefined;
+      keepTrackApi.programs.groupsManager.India = undefined;
       countries.countryMenuClick('India');
     };
 
@@ -111,7 +79,7 @@ describe('countries.countryMenuClick', () => {
   test('9', () => {
     const callFunction: any = () => {
       countries.countryMenuClick('Israel');
-      keepTrackApi.programs.groups.Israel = undefined;
+      keepTrackApi.programs.groupsManager.Israel = undefined;
       countries.countryMenuClick('Israel');
     };
 
@@ -121,7 +89,7 @@ describe('countries.countryMenuClick', () => {
   test('10', () => {
     const callFunction: any = () => {
       countries.countryMenuClick('Russia');
-      keepTrackApi.programs.groups.Russia = undefined;
+      keepTrackApi.programs.groupsManager.Russia = undefined;
       countries.countryMenuClick('Russia');
     };
 
@@ -131,7 +99,7 @@ describe('countries.countryMenuClick', () => {
   test('11', () => {
     const callFunction: any = () => {
       countries.countryMenuClick('UnitedKingdom');
-      keepTrackApi.programs.groups.UnitedKingdom = undefined;
+      keepTrackApi.programs.groupsManager.UnitedKingdom = undefined;
       countries.countryMenuClick('UnitedKingdom');
     };
 
@@ -141,7 +109,7 @@ describe('countries.countryMenuClick', () => {
   test('12', () => {
     const callFunction: any = () => {
       countries.countryMenuClick('UnitedStates');
-      keepTrackApi.programs.groups.UnitedStates = undefined;
+      keepTrackApi.programs.groupsManager.UnitedStates = undefined;
       countries.countryMenuClick('UnitedStates');
     };
 
@@ -202,14 +170,6 @@ describe('countries.groupSelected', () => {
   test('6', () => {
     const callFunction: any = () => {
       countries.groupSelected('SpaceStations');
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-
-  test('7', () => {
-    const callFunction: any = () => {
-      countries.groupSelected(NaN);
     };
 
     expect(callFunction).not.toThrow();
@@ -310,25 +270,9 @@ describe('countries.uiManagerInit', () => {
 
 // @ponicode
 describe('countries.countryMenuClick', () => {
-  test('0', () => {
-    const callFunction: any = () => {
-      countries.countryMenuClick(false);
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-
   test('1', () => {
     const callFunction: any = () => {
       countries.countryMenuClick('China');
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-
-  test('2', () => {
-    const callFunction: any = () => {
-      countries.countryMenuClick(true);
     };
 
     expect(callFunction).not.toThrow();
@@ -355,6 +299,6 @@ describe('countries.countryMenuClick', () => {
       countries.countryMenuClick('');
     };
 
-    expect(callFunction).not.toThrow();
+    expect(callFunction).toThrow();
   });
 });

@@ -273,6 +273,7 @@ export const keepTrackApiStubs = {
       draw: jest.fn(),
       drawGpuPickingFrameBuffer: jest.fn(),
       updatePositionBuffer: jest.fn(),
+      updateSizeBuffer: jest.fn(),
       updatePMvCamMatrix: jest.fn(),
       sizeBufferOneTime: null,
       sizeData: null,

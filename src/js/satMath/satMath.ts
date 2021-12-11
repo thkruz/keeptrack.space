@@ -667,10 +667,10 @@ export const findCloseObjects = () => {
   let satList = <SatObject[]>[];
 
   // Short internal function to find the satellites position
-  const _getSatPos = (propTempOffset: number, satrec: SatRec): Eci => {
+  const _getSatPos = (offset: number, satrec: SatRec): Eci => {
     try {
-      let now = new Date(); // Make a time variable
-      now.setTime(Number(Date.now()) + propTempOffset); // Set the time variable to the time in the future
+      const now = new Date(); // Make a time variable
+      now.setTime(Number(Date.now()) + offset); // Set the time variable to the time in the future
       const { m } = calculateTimeVariables(now, satrec);
       return satellite.sgp4(satrec, m);
     } catch {

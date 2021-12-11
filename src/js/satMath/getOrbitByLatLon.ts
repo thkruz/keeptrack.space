@@ -17,7 +17,7 @@ enum PropagationResults {
   Far = 3,
 }
 
-export const getOrbitByLatLon = (sat: SatObject, goalLat: number, goalLon: number, goalDirection: 'N' | 'S', now: Date, goalAlt?: number, raanOffset?: number) => {
+export const getOrbitByLatLon = (sat: SatObject, goalLat: number, goalLon: number, goalDirection: 'N' | 'S', now: Date, goalAlt?: number, raanOffset?: number): [string, string] => {
   let newMeana: string = null;
   let newArgPer: string = null;
   goalAlt = goalAlt || null;

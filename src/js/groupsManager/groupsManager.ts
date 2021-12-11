@@ -14,7 +14,6 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 ///////////////////////////////////////////////////////////////////////////// */
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { GroupsManager, SatGroupCollection } from '../api/keepTrack';
-import { satSet } from '../satSet/satSet';
 import { SatGroup } from './sat-group';
 
 export const createGroup = (groupType: string, data: any): SatGroup => new SatGroup(groupType, data, keepTrackApi.programs.satSet);
@@ -36,6 +35,7 @@ export const selectGroupNoOverlay = (group: SatGroup): void => {
   settingsManager.setCurrentColorScheme(keepTrackApi.programs.colorSchemeManager.group);
 };
 export const updateIsInGroup = (oldgroup: SatGroup, newgroup: SatGroup): void => {
+  const { satSet } = keepTrackApi.programs;
   if (oldgroup !== null && typeof oldgroup !== 'undefined') {
     oldgroup.sats.forEach((sat: SatGroupCollection) => {
       satSet.getSatExtraOnly(sat.satId).isInGroup = false;

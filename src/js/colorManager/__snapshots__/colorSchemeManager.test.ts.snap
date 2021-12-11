@@ -77,9 +77,9 @@ Object {
 exports[`colorSchemeManager.ageOfElsetRules 4 1`] = `
 Object {
   "color": Array [
-    0.64,
+    1,
     0,
-    0.64,
+    0,
     1,
   ],
   "pickable": true,
@@ -690,9 +690,9 @@ Object {
 exports[`colorSchemeManager.geoRules 4 1`] = `
 Object {
   "color": Array [
-    0.64,
+    1,
     0,
-    0.64,
+    0,
     1,
   ],
   "pickable": true,
@@ -812,9 +812,9 @@ Object {
 exports[`colorSchemeManager.leoRules 4 1`] = `
 Object {
   "color": Array [
-    0.64,
+    1,
     0,
-    0.64,
+    0,
     1,
   ],
   "pickable": true,
@@ -932,9 +932,9 @@ Object {
 exports[`colorSchemeManager.lostobjectsRules 4 1`] = `
 Object {
   "color": Array [
-    0.64,
+    1,
     0,
-    0.64,
+    0,
     1,
   ],
   "pickable": true,
@@ -1128,9 +1128,9 @@ Object {
 exports[`colorSchemeManager.sunlightRules 1 1`] = `
 Object {
   "color": Array [
-    0.64,
+    1,
     0,
-    0.64,
+    0,
     1,
   ],
   "pickable": true,

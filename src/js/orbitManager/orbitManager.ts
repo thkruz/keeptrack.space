@@ -2,8 +2,7 @@
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
-import { Camera, OrbitManager } from '../api/keepTrack';
-import { GroupFactory } from '../groupsManager/groupsManager';
+import { Camera, GroupsManager, OrbitManager } from '../api/keepTrack';
 
 const NUM_SEGS = 255;
 let glBuffers = <WebGLBuffer[]>[];
@@ -16,7 +15,7 @@ let currentSelectId = -1;
 let currentInView = <number[]>[];
 let gl: WebGL2RenderingContext;
 let mainCamera: Camera;
-let groupsManager: GroupFactory;
+let groupsManager: GroupsManager;
 let initialized = false;
 
 export const workerOnMessage: any = (m: any) => {

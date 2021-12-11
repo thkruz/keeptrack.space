@@ -32,7 +32,7 @@ import { colorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
 import { dotsManager } from '@app/js/drawManager/dots';
 import { drawManager } from '@app/js/drawManager/drawManager';
 import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager';
-import { GroupFactory } from '@app/js/groupsManager/groupsManager';
+import { groupsManager } from '@app/js/groupsManager/groupsManager';
 import { objectManager } from '@app/js/objectManager/objectManager';
 import { orbitManager } from '@app/js/orbitManager/orbitManager';
 import { sensorManager } from '@app/js/plugins/sensor/sensorManager';
@@ -83,21 +83,22 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     // Add all of the imported programs to the API
     keepTrackApi.programs = <any>{
-      adviceManager: adviceManager,
+      adviceManager,
       mainCamera: camera,
-      colorSchemeManager: colorSchemeManager,
-      drawManager: drawManager,
-      dotsManager: dotsManager,
+      colorSchemeManager,
+      drawManager,
+      dotsManager,
+      groupsManager,
       mapManager: <MapManager>(<unknown>{}),
       objectManager: <ObjectManager>(<unknown>objectManager),
       orbitManager: <OrbitManager>(<unknown>orbitManager),
-      satSet: satSet,
-      satellite: satellite,
-      searchBox: searchBox,
+      satSet,
+      satellite,
+      searchBox,
       sensorManager: <SensorManager>(<unknown>sensorManager),
-      starManager: starManager,
-      timeManager: timeManager,
-      uiManager: uiManager,
+      starManager,
+      timeManager,
+      uiManager,
     };
 
     uiManager.loadStr('science');
@@ -140,10 +141,6 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     keepTrackApi.programs.dotsManager.setupPickingBuffer(satSet.satData.length);
     satSet.setColorScheme(colorSchemeManager.default, true);
-
-    const groupsManager = new GroupFactory();
-    // eslint-disable-next-line require-atomic-updates
-    keepTrackApi.programs.groupsManager = groupsManager;
 
     orbitManager.init();
     searchBox.init();

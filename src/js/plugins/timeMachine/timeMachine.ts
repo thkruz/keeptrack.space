@@ -1,7 +1,6 @@
-import { CatalogManager, OrbitManager } from '@app/js/api/keepTrack';
+import { CatalogManager, GroupsManager, OrbitManager } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { ColorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
-import { GroupFactory } from '@app/js/groupsManager/groupsManager';
 import $ from 'jquery';
 
 export const init = (): void => {
@@ -121,7 +120,7 @@ export const timeMachineIconClick = () => {
     $('#search-results').hide();
   }
 };
-export const timeMachineRemoveSatellite = (runCount: number, orbitManager: OrbitManager, groupsManager: GroupFactory, satSet: CatalogManager, colorSchemeManager: ColorSchemeManager): void => {
+export const timeMachineRemoveSatellite = (runCount: number, orbitManager: OrbitManager, groupsManager: GroupsManager, satSet: CatalogManager, colorSchemeManager: ColorSchemeManager): void => {
   if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
   if (!orbitManager.isTimeMachineVisible) return;
   settingsManager.colors.transparent = orbitManager.tempTransColor;

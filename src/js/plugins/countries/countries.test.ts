@@ -1,7 +1,7 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import * as countries from '@app/js/plugins/countries/countries';
 import { expect } from '@jest/globals';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import * as countries from './countries';
 /* eslint-disable no-undefined */
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };

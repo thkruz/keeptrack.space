@@ -9,6 +9,7 @@ import { ColorScheme } from '../colorManager/color-scheme';
 import { ColorSchemeManager } from '../colorManager/colorSchemeManager';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { GroupFactory } from '../groupsManager/groupsManager';
+import { SatGroup } from '../groupsManager/sat-group';
 
 export declare enum CameraType {
   current = 0,
@@ -117,6 +118,42 @@ export interface TearrData {
   el: number;
   rng: number;
   name: string;
+}
+
+interface GroupsManager {
+  stopUpdatingInViewSoon: boolean;
+  Canada: SatGroup;
+  China: SatGroup;
+  France: SatGroup;
+  India: SatGroup;
+  Israel: SatGroup;
+  Japan: SatGroup;
+  Russia: SatGroup;
+  UnitedKingdom: SatGroup;
+  UnitedStates: SatGroup;
+  debris: SatGroup;
+  GPSGroup: SatGroup;
+  SpaceStations: SatGroup;
+  GlonassGroup: SatGroup;
+  GalileoGroup: SatGroup;
+  AmatuerRadio: SatGroup;
+  aehf: SatGroup;
+  wgs: SatGroup;
+  starlink: SatGroup;
+  sbirs: SatGroup;
+  selectedGroup: SatGroup;
+  createGroup: (groupType: string, data: any) => SatGroup;
+  selectGroup: (group: SatGroup, orbitManager: OrbitManager) => void;
+  selectGroupNoOverlay: (group: SatGroup) => void;
+  updateIsInGroup: (oldGroup: SatGroup, newGroup: SatGroup) => void;
+  clearSelect: () => void;
+}
+
+export interface SatGroupCollection {
+  satId: number;
+  isIntlDes?: boolean;
+  isObjnum?: boolean;
+  missile?: boolean;
 }
 
 export interface SatShader {
@@ -1019,11 +1056,11 @@ export interface CatalogManager {
   onCruncherReady();
   gsInfo: any;
   queryStr: any;
-  searchYear(satData: any[], data: any): any;
-  searchYearOrLess(satData: any[], data: any): any;
+  searchYear(satData: SatObject[], data: any): SatObject[];
+  searchYearOrLess(satData: SatObject[], data: any): SatObject[];
   getIdFromIntlDes(arg0: any);
-  searchNameRegex(satData: any[], data: any): any;
-  searchCountryRegex(satData: any[], data: any): any;
+  searchNameRegex(satData: SatObject[], data: any): SatObject[];
+  searchCountryRegex(satData: SatObject[], data: any): SatObject[];
   insertNewAnalystSatellite(TLE1: string, TLE2: string, id: number, SCC_NUM?: string);
   setSat(x: number, arg1: any);
   getSatFromObjNum(arg0: number);

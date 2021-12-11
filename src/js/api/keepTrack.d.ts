@@ -1085,6 +1085,13 @@ export interface CatalogManager {
   missileSats: number;
 }
 
+type Kilometers = number;
+type Radians = number;
+type Degrees = number;
+type EciPos = { x: Kilometers; y: Kilometers; z: Kilometers };
+type EciVel = { x: Kilometers; y: Kilometers; z: Kilometers };
+type Eci = { position: EciPos; velocity: EciVel };
+
 export interface SatMath {
   obsmaxrange: number;
   obsminrange: number;
@@ -1094,8 +1101,8 @@ export interface SatMath {
   currentTEARR: TearrData;
   twoline2satrec(TLE1: string, TLE2: string);
   gstime(j: number);
-  sgp4(satrec: any, m: number);
-  eciToGeodetic(position: any, gmst: any): any;
+  sgp4(satrec: SatRec, m: number): Eci;
+  eciToGeodetic(position: EciPos, gmst: number): { lat: Radians; lon: Radians; alt: Kilometers };
   eciToEcf(position: any, gmst: any);
   ecfToLookAngles(observerGd: { lat: number; lon: number; alt: number }, positionEcf: any);
   lookanglesInterval: number;
@@ -1103,8 +1110,8 @@ export interface SatMath {
   lastlooksArray: TearrData[];
   setobs(sensors: SensorObject[]);
   lastMultiSiteArray: TearrData[];
-  degreesLat(lat: any);
-  degreesLong(lon: any);
+  degreesLat(lat: Radians): Degrees;
+  degreesLong(lon: Radians): Degrees;
   findBestPass(sat: any, sensors: SensorObject[], arg2: number);
   getEci(sat1: SatObject, now: any);
   currentEpoch(arg0: any);

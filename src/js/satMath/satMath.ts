@@ -28,9 +28,10 @@ import { saveCsv, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import * as Ootk from 'ootk';
 import { SatRec } from 'satellite.js';
-import { EciArr3, SatMath, SatObject, SensorManager, SensorObject, SunObject, TearrData } from '../api/keepTrack';
+import { Eci, EciArr3, SatMath, SatObject, SensorManager, SensorObject, SunObject, TearrData } from '../api/keepTrack';
 import { numeric } from '../lib/external/numeric';
 import { jday } from '../timeManager/transforms';
+import { getOrbitByLatLon } from './getOrbitByLatLon';
 import { formatArgumentOfPerigee, formatInclination, formatMeanAnomaly, formatMeanMotion, formatRightAscension } from './tleFormater';
 
 (<any>window)._numeric = numeric; // numeric break if it is not available globally
@@ -666,14 +667,14 @@ export const findCloseObjects = () => {
   let satList = <SatObject[]>[];
 
   // Short internal function to find the satellites position
-  const _getSatPos = (propTempOffset: number, satrec: SatRec) => {
+  const _getSatPos = (propTempOffset: number, satrec: SatRec): Eci => {
     try {
       let now = new Date(); // Make a time variable
       now.setTime(Number(Date.now()) + propTempOffset); // Set the time variable to the time in the future
       const { m } = calculateTimeVariables(now, satrec);
       return satellite.sgp4(satrec, m);
     } catch {
-      return;
+      return { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } };
     }
   };
 
@@ -689,7 +690,7 @@ export const findCloseObjects = () => {
     sat.satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs)
     sat.position = _getSatPos(0, sat.satrec).position;
     // If it fails, skip it
-    if (typeof sat.position == 'undefined') continue;
+    if (sat.position === { x: 0, y: 0, z: 0 }) continue;
     // Add the satellite to the list
     satList.push(sat);
   }
@@ -732,16 +733,16 @@ export const findCloseObjects = () => {
   for (let i = 0; i < csoListUnique.length; i++) {
     // Calculate the first CSO's position 30 minutes later
     let sat = csoListUnique[i].sat1;
-    let pos = _getSatPos(1000 * 60 * 30, sat.satrec);
-    if (typeof pos === 'undefined') continue;
-    csoListUnique[i].sat1.position = pos.position;
+    let eci = _getSatPos(1000 * 60 * 30, sat.satrec);
+    if (eci.position === { x: 0, y: 0, z: 0 }) continue;
+    csoListUnique[i].sat1.position = eci.position;
 
     // Calculate the second CSO's position 30 minutes later
     sat = csoListUnique[i].sat2;
-    pos = _getSatPos(1000 * 60 * 30, sat.satrec);
-    if (typeof pos === 'undefined') continue;
-    sat.position = pos.position;
-    csoListUnique[i].sat2.position = pos.position;
+    eci = _getSatPos(1000 * 60 * 30, sat.satrec);
+    if (eci.position === { x: 0, y: 0, z: 0 }) continue;
+    sat.position = eci.position;
+    csoListUnique[i].sat2.position = eci.position;
   }
 
   // Remove duplicates
@@ -786,392 +787,6 @@ export const findCloseObjects = () => {
   }
 
   return searchStr; // csoListUnique;
-};
-// TODO: satellite.getOrbitByLatLon needs cleaned up badly
-/* istanbul ignore next */
-export const getOrbitByLatLon = (sat: SatObject, goalLat: number, goalLon: number, upOrDown: string, now: Date, goalAlt?: number, rascOffset?: number) => {
-  let mainTLE1;
-  let mainTLE2;
-  let mainMeana: string;
-  let mainRasc: string;
-  let mainArgPer: string;
-  let argPerCalcResults;
-  let meanACalcResults;
-  // var meanAiValue;
-  let lastLat: number;
-  let isUpOrDown;
-  let i;
-
-  if (typeof rascOffset == 'undefined') rascOffset = 0;
-
-  var argPerCalc = (argPe: string) => {
-    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
-
-    var meana;
-    if (typeof mainMeana == 'undefined') {
-      meana = (satrec.mo * RAD2DEG).toPrecision(10);
-    } else {
-      meana = mainMeana;
-    }
-    const meanaArr = meana.split('.');
-    meanaArr[0] = meanaArr[0].substr(-3, 3);
-    meanaArr[1] = meanaArr[1].substr(0, 4);
-    meana = (meanaArr[0] + '.' + meanaArr[1]).toString();
-    meana = stringPad.pad0(meana, 8);
-
-    var rasc;
-    if (typeof mainRasc == 'undefined') {
-      rasc = (sat.raan * RAD2DEG).toPrecision(7);
-    } else {
-      rasc = mainRasc;
-    }
-    rasc = rasc.split('.');
-    rasc[0] = rasc[0].substr(-3, 3);
-    rasc[1] = rasc[1].substr(0, 4);
-    rasc = (rasc[0] + '.' + rasc[1]).toString();
-    rasc = stringPad.pad0(rasc, 8);
-    mainRasc = rasc;
-
-    var scc = sat.SCC_NUM;
-
-    var intl = sat.TLE1.substr(9, 8);
-    var inc: any = (sat.inclination * RAD2DEG).toPrecision(7);
-    inc = inc.split('.');
-    inc[0] = inc[0].substr(-3, 3);
-    inc[1] = inc[1].substr(0, 4);
-    inc = (inc[0] + '.' + inc[1]).toString();
-
-    inc = stringPad.pad0(inc, 8);
-    var epochyr = sat.TLE1.substr(18, 2);
-    var epochday = sat.TLE1.substr(20, 12);
-
-    var meanmo = sat.TLE2.substr(52, 11);
-
-    var ecen = sat.eccentricity.toPrecision(7).substr(2, 7);
-
-    argPe = stringPad.pad0((parseFloat(argPe) / 10).toPrecision(7), 8);
-
-    var TLE1Ending = sat.TLE1.substr(32, 39);
-
-    mainTLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    mainTLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
-
-    satrec = satellite.twoline2satrec(mainTLE1, mainTLE2);
-
-    var propNewArgPe = getOrbitByLatLonPropagate(now, satrec, 3);
-    // if (propNewArgPe === 1) {
-    sat.TLE1 = mainTLE1;
-    sat.TLE2 = mainTLE2;
-    mainArgPer = argPe;
-    // }
-    // 1 === If RASC within 0.15 degrees then good enough
-    // 5 === If RASC outside 15 degrees then rotate RASC faster
-    return propNewArgPe;
-  };
-
-  var meanaCalc = (meana: number) => {
-    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
-
-    meana = meana / 10;
-    let meanaStr = meana.toPrecision(7);
-    meanaStr = stringPad.pad0(meanaStr, 8);
-
-    var rasc: any = (sat.raan * RAD2DEG).toPrecision(7);
-    mainRasc = rasc;
-    rasc = rasc.toString().split('.');
-    rasc[0] = rasc[0].substr(-3, 3);
-    rasc[1] = rasc[1].substr(0, 4);
-    rasc = (rasc[0] + '.' + rasc[1]).toString();
-    rasc = stringPad.pad0(rasc, 8);
-
-    var scc = sat.SCC_NUM;
-
-    var intl = sat.TLE1.substr(9, 8);
-    var inc: any = (sat.inclination * RAD2DEG).toPrecision(7);
-    inc = inc.split('.');
-    inc[0] = inc[0].substr(-3, 3);
-    inc[1] = inc[1].substr(0, 4);
-    inc = (inc[0] + '.' + inc[1]).toString();
-
-    inc = stringPad.pad0(inc, 8);
-    var epochyr = sat.TLE1.substr(18, 2);
-    var epochday = sat.TLE1.substr(20, 12);
-
-    var meanmo = sat.TLE2.substr(52, 11);
-
-    var ecen = sat.eccentricity.toPrecision(7).substr(2, 7);
-
-    var argPe;
-    if (typeof mainArgPer == 'undefined') {
-      argPe = (sat.argPe * RAD2DEG).toPrecision(7);
-    } else {
-      argPe = mainArgPer;
-    }
-    argPe = argPe.split('.');
-    argPe[0] = argPe[0].substr(-3, 3);
-    argPe[1] = argPe[1].substr(0, 4);
-    argPe = (argPe[0] + '.' + argPe[1]).toString();
-    argPe = stringPad.pad0(argPe, 8);
-
-    var TLE1Ending = sat.TLE1.substr(32, 39);
-
-    var TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    var TLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meanaStr + ' ' + meanmo + '    10';
-
-    satrec = satellite.twoline2satrec(TLE1, TLE2);
-    var propagateResults = getOrbitByLatLonPropagate(now, satrec, 1);
-    if (propagateResults === 1) {
-      mainTLE1 = TLE1;
-      mainTLE2 = TLE2;
-      sat.TLE1 = TLE1;
-      sat.TLE2 = TLE2;
-      mainMeana = meanaStr;
-    }
-    return propagateResults;
-  };
-
-  var rascCalc = (rasc: number, rascOffset: number) => {
-    var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
-    var meana = mainMeana;
-
-    let rascNum = rasc;
-    rasc = rasc / 100;
-    if (rasc > 360) {
-      rasc = rasc - 360; // angle can't be bigger than 360
-    }
-    const rascArr = rasc.toPrecision(7).split('.');
-    rascArr[0] = rascArr[0].substr(-3, 3);
-    rascArr[1] = rascArr[1].substr(0, 4);
-    let rascStr = (rascArr[0] + '.' + rascArr[1]).toString();
-    rascStr = stringPad.pad0(rascStr, 8);
-    mainRasc = rascStr;
-
-    var scc = sat.SCC_NUM;
-
-    var intl = sat.TLE1.substr(9, 8);
-    var inc: any = (sat.inclination * RAD2DEG).toPrecision(7);
-    inc = inc.split('.');
-    inc[0] = inc[0].substr(-3, 3);
-    inc[1] = inc[1].substr(0, 4);
-    inc = (inc[0] + '.' + inc[1]).toString();
-
-    inc = stringPad.pad0(inc, 8);
-    var epochyr = sat.TLE1.substr(18, 2);
-    var epochday = sat.TLE1.substr(20, 12);
-
-    var meanmo = sat.TLE2.substr(52, 11);
-
-    var ecen = sat.eccentricity.toPrecision(7).substr(2, 7);
-
-    var argPe;
-    if (typeof mainArgPer == 'undefined') {
-      argPe = (sat.argPe * RAD2DEG).toPrecision(7);
-    } else {
-      argPe = mainArgPer;
-    }
-    argPe = argPe.split('.');
-    argPe[0] = argPe[0].substr(-3, 3);
-    argPe[1] = argPe[1].substr(0, 4);
-    argPe = (argPe[0] + '.' + argPe[1]).toString();
-    argPe = stringPad.pad0(argPe, 8);
-
-    var TLE1Ending = sat.TLE1.substr(32, 39);
-
-    mainTLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    mainTLE2 = '2 ' + scc + ' ' + inc + ' ' + rasc + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
-
-    satrec = satellite.twoline2satrec(mainTLE1, mainTLE2);
-
-    var propNewRasc = getOrbitByLatLonPropagate(now, satrec, 2);
-
-    if (propNewRasc === 1) {
-      sat.TLE1 = mainTLE1;
-
-      rasc = rascNum / 100 + rascOffset;
-      if (rasc > 360) {
-        rasc = rasc - 360; // angle can't be bigger than 360 with offset
-      }
-      if (rasc < 0) {
-        rasc = rasc + 360; // angle can't be less than 360 with offset
-      }
-      let rascArr = rasc.toPrecision(7).split('.');
-      rascArr[0] = rascArr[0].substr(-3, 3);
-      rascArr[1] = rascArr[1].substr(0, 4);
-      let rascStr = (rascArr[0] + '.' + rascArr[1]).toString();
-      rascStr = stringPad.pad0(rascStr, 8);
-      mainRasc = rascStr;
-
-      mainTLE2 = '2 ' + scc + ' ' + inc + ' ' + rascStr + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
-
-      sat.TLE2 = mainTLE2;
-    }
-
-    // 1 === If RASC within 0.15 degrees then good enough
-    // 5 === If RASC outside 15 degrees then rotate RASC faster
-    return propNewRasc;
-  };
-
-  var getOrbitByLatLonPropagate = (now: Date, satrec: any, type: number) => {
-    const { m, gmst } = calculateTimeVariables(now, satrec);
-    var positionEci = satellite.sgp4(satrec, m);
-    if (typeof positionEci == 'undefined') {
-      console.log(satrec);
-    }
-
-    var gpos, lat, lon, alt;
-
-    try {
-      gpos = satellite.eciToGeodetic(positionEci.position, gmst);
-    } catch (err) {
-      console.debug(err);
-      return 2;
-    }
-
-    lat = satellite.degreesLat(gpos.lat) * 1;
-    lon = satellite.degreesLong(gpos.lon) * 1;
-    alt = gpos.alt;
-
-    if (typeof lastLat === 'undefined') {
-      // Set it the first time
-      lastLat = lat;
-    }
-
-    if (type === 1) {
-      if (lat === lastLat) {
-        return 0; // Not enough movement, skip this
-      }
-
-      if (lat > lastLat) {
-        isUpOrDown = 'N';
-      }
-      if (lat < lastLat) {
-        isUpOrDown = 'S';
-      }
-
-      lastLat = lat;
-    }
-
-    if (lat > goalLat - 0.15 && lat < goalLat + 0.15 && type === 1) {
-      // console.log('Lat: ' + lat);
-      return 1;
-    }
-
-    if (lon > goalLon - 0.15 && lon < goalLon + 0.15 && type === 2) {
-      // console.log('Lon: ' + lon);
-      return 1;
-    }
-
-    if (alt > goalAlt - 30 && alt < goalAlt + 30 && type === 3) {
-      return 1;
-    }
-
-    // If current latitude greater than 11 degrees off rotate meanA faster
-    if (!(lat > goalLat - 11 && lat < goalLat + 11) && type === 1) {
-      // console.log('Lat: ' + lat);
-      return 5;
-    }
-
-    // If current longitude greater than 11 degrees off rotate RASC faster
-    if (!(lon > goalLon - 11 && lon < goalLon + 11) && type === 2) {
-      return 5;
-    }
-
-    // If current altitude greater than 100 km off rotate augPerigee faster
-    if ((alt < goalAlt - 100 || alt > goalAlt + 100) && type === 3) {
-      // console.log('Lat: ' + lat);
-      // console.log('Alt: ' + alt + ' --- MeanMo: ' + satrec.mo * RAD2DEG + ' --- ArgPer: ' + satrec.argpo * RAD2DEG);
-      return 5;
-    }
-
-    return 0;
-  };
-
-  // ===== Mean Anomaly Loop =====
-  for (i = 0; i < 520 * 10; i += 1) {
-    /** Rotate Mean Anomaly 0.1 Degree at a Time for Up To 400 Degrees */
-    meanACalcResults = meanaCalc(i);
-    if (meanACalcResults === 1) {
-      if (isUpOrDown !== upOrDown) {
-        // If Object is moving opposite of the goal direction (upOrDown)
-        i = i + 20; // Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
-      } else {
-        // meanAiValue = i;
-        break; // Stop changing the Mean Anomaly
-      }
-    }
-    if (meanACalcResults === 5) {
-      i += 10 * 10; // Change meanA faster
-    }
-  }
-  if (meanACalcResults === 2) {
-    console.debug(`meanACalcResults failed after trying all combinations!`);
-    return ['Error', ''];
-  }
-
-  // Don't Bother Unless Specifically Requested
-  // Applies to eccentric orbits
-  // ===== Argument of Perigee Loop =====
-  if (typeof goalAlt != 'undefined' && goalAlt !== 0) {
-    meanACalcResults = 0; // Reset meanACalcResults
-    for (i = 0; i < 360 * 10; i += 1) {
-      /** Rotate ArgPer 0.1 Degree at a Time for Up To 400 Degrees */
-      argPerCalcResults = argPerCalc(i.toString());
-      if (argPerCalcResults === 1) {
-        // console.log('Found Correct Alt');
-        if (meanACalcResults === 1) {
-          // console.log('Found Correct Lat');
-          // console.log('Up Or Down: ' + upOrDown);
-          if (isUpOrDown === upOrDown) {
-            // If Object is moving in the goal direction (upOrDown)
-            break; // Stop changing ArgPer
-          }
-        } else {
-          // console.log('Found Wrong Lat');
-        }
-      } else {
-        // console.log('Failed Arg of Per Calc');
-      }
-      if (argPerCalcResults === 5) {
-        i += 5 * 10; // Change ArgPer faster
-      }
-      if (argPerCalcResults === 2) {
-        return ['Error', ''];
-      }
-
-      // ===== Mean Anomaly Loop =====
-      for (var j = 0; j < 520 * 10; j += 1) {
-        /** Rotate Mean Anomaly 0.1 Degree at a Time for Up To 400 Degrees */
-        meanACalcResults = meanaCalc(j);
-        if (meanACalcResults === 1) {
-          if (isUpOrDown !== upOrDown) {
-            // If Object is moving opposite of the goal direction (upOrDown)
-            j = j + 20; // Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
-          } else {
-            break; // Stop changing the Mean Anomaly
-          }
-        }
-        if (meanACalcResults === 5) {
-          j += 10 * 10; // Change meanA faster
-        }
-        if (meanACalcResults === 2) {
-          return ['Error', ''];
-        }
-      }
-    }
-  }
-
-  // ===== Right Ascension Loop =====
-  for (i = 0; i < 5200 * 100; i += 1) {
-    // 520 degress in 0.01 increments TODO More precise?
-    var rascCalcResults = rascCalc(i, rascOffset);
-    if (rascCalcResults === 1) {
-      break;
-    }
-    if (rascCalcResults === 5) {
-      i += 10 * 100;
-    }
-  }
-  return [mainTLE1, mainTLE2];
 };
 export const calculateLookAngles = (sat: SatObject, sensors: SensorObject[]) => {
   const { sensorManager, timeManager } = keepTrackApi.programs;

@@ -208,6 +208,7 @@
     "no-unreachable-loop": "error",
     "no-unsafe-optional-chaining": "error",
     "no-unused-expressions": "off",
+    "no-unused-vars": "off",
     "no-use-before-define": "off",
     "no-useless-backreference": "error",
     "no-useless-call": "error",

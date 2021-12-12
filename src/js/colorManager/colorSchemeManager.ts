@@ -52,7 +52,7 @@ export interface ColorSchemeManager {
   geo: ColorRuleSet;
   velocity: ColorRuleSet;
   group: ColorRuleSet;
-  calculateColorBuffers: any;
+  calculateColorBuffers: (isForceRecolor?: boolean) => Promise<void>;
   objectTypeFlags: any;
   objectTypeFlagsinViewAlt: boolean;
   satSet: CatalogManager;
@@ -175,7 +175,7 @@ export const colorSchemeManager: ColorSchemeManager = {
   currentColorScheme: null,
   iSensor: 0,
   lastCalculation: 0,
-  calculateColorBuffers: async (isForceRecolor?: boolean) => {
+  calculateColorBuffers: async (isForceRecolor?: boolean): Promise<void> => {
     try {
       // These two variables only need to be set once, but we want to make sure they aren't called before the satellites
       // are loaded into satSet. Don't move the buffer data creation into the constructor!

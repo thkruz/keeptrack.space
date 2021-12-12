@@ -27,9 +27,8 @@ describe('drawManager.drawLoop ', () => {
 
 // @ponicode
 describe('drawManager.glInit ', () => {
-  test.skip('0', async () => {
-    let result = await drawManager.glInit();
-    expect(result).toMatchSnapshot();
+  test('0', async () => {
+    drawManager.glInit().then(() => expect(drawManager.drawManager.gl).toMatchSnapshot());
   });
 });
 
@@ -41,9 +40,8 @@ describe('drawManager.startWithOrbits  ', () => {
   afterAll(() => {
     settingsManager.startWithOrbitsDisplayed = false;
   });
-  test('0', async () => {
-    let result = await drawManager.startWithOrbits();
-    expect(result).toMatchSnapshot();
+  test('0', () => {
+    drawManager.startWithOrbits().then(() => expect(drawManager).toMatchSnapshot());
   });
 });
 

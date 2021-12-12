@@ -37,7 +37,7 @@ export interface SunObject {
   pMatrix: glm.mat4;
   camMatrix: glm.mat4;
   screenPosition: { x: number; y: number };
-  init(): void;
+  init(): Promise<void>;
   godrays: any;
   update(): void;
   draw(pMatrix: glm.mat4, camMatrix: glm.mat4, frameBuffer: WebGLFramebuffer): void;
@@ -1015,7 +1015,7 @@ export interface InView {
 }
 
 export interface EarthObject {
-  init: any;
+  init: (WebGL2RenderingContext) => Promise<void>;
   draw: any;
   program: any;
   update: any;
@@ -1132,7 +1132,7 @@ export interface SatMath {
   nextpassList: (satArray: SatObject[]) => { SCC_NUM: string; time: any }[];
   nextNpasses: (sat: SatObject, sensors: SensorObject[], searchLength: number, interval: number, numPasses: number) => any[];
   nextpass: (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => any;
-  getlookangles: (sat: SatObject) => void;
+  getlookangles: (sat: SatObject) => TearrData[];
   getlookanglesMultiSite: (sat: SatObject) => void;
   findCloseObjects: () => string;
   calculateLookAngles: (sat: SatObject, sensors: SensorObject[]) => boolean[];

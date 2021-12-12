@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { KeepTrackApi } from './keepTrack';
+import { KeepTrackApi, SatObject } from './keepTrack';
 
 export const keepTrackApi: KeepTrackApi = {
   html: (strings: TemplateStringsArray, ...placeholders: any[]) => {
@@ -115,7 +115,7 @@ export const keepTrackApi: KeepTrackApi = {
     uiManagerFinal: () => {
       keepTrackApi.callbacks.uiManagerFinal.forEach((cb: any) => cb.cb());
     },
-    loadCatalog: async () => {
+    loadCatalog: async (): Promise<SatObject[]> => {
       const satData = await keepTrackApi.callbacks.loadCatalog[0].cb();
       return satData;
     },

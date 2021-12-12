@@ -15,21 +15,26 @@ describe('colorSchemeManager.init', () => {
 });
 
 describe('calculateColorBuffers', () => {
-  let inst: any;
-
   beforeEach(() => {
     colorSchemeManager.init();
+    settingsManager.dotsOnScreen = 4;
+    colorSchemeManager.pickableData = [0, 0, 0, 1];
+    colorSchemeManager.colorData = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
   });
 
-  test('0', async () => {
-    await colorSchemeManager.calculateColorBuffers(true);
+  test('0', () => {
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
 
-  test('1', async () => {
-    await colorSchemeManager.calculateColorBuffers(false);
+  test('1', () => {
+    colorSchemeManager.calculateColorBuffers(false).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
 
-  test('2', async () => {
+  test('2', () => {
     settingsManager.isFOVBubbleModeOn = true;
     keepTrackApi.programs.satSet.numSats = 2;
     // inst.satData = [0, 0, 0];
@@ -37,7 +42,9 @@ describe('calculateColorBuffers', () => {
     // inst.hoverSat = 0;
     // inst.isVelocityColorScheme = true;
     // inst.isSunlightColorScheme = true;
-    await colorSchemeManager.calculateColorBuffers(true);
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
 });
 
@@ -62,71 +69,87 @@ describe('Test ColorRules', () => {
     colorSchemeManager.init();
     settingsManager.isFOVBubbleModeOn = true;
     keepTrackApi.programs.satSet.numSats = 2;
+    settingsManager.dotsOnScreen = 4;
+    colorSchemeManager.pickableData = [0, 0, 0, 1];
+    colorSchemeManager.colorData = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
   });
   test('0', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.default;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
   test('1', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.onlyFOV;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
   test('2', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.sunlight;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
   test('3', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.apogee;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
   test('4', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.smallsats;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
   test('5', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.rcs;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
   test('6', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.countries;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
   test('7', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.ageOfElset;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
   test('8', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.lostobjects;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
   test('9', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.leo;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
   test('10', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.geo;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
   test('11', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.velocity;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
   test('12', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.group;
-    let result: any = await colorSchemeManager.calculateColorBuffers(true);
-    expect(result).toMatchSnapshot();
+    colorSchemeManager.calculateColorBuffers(true).then(() => {
+      expect(colorSchemeManager.colorData).toMatchSnapshot();
+    });
   });
 });
 

@@ -343,6 +343,7 @@ export const selectSat = (i: number): void => {
   }
   // If New Select Sat Picked Color it
   if (i !== -1) {
+    // TODO: Buffer overflow?
     gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
   }
 

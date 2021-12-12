@@ -609,7 +609,7 @@ export const bottomMenuClick = (iconName: string): void => {
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
         uiManager.hideSideMenus();
         keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = true;
-        $('#loading-screen').fadeIn(1000, function () {
+        $('#loading-screen').fadeIn(1000, () => {
           satellite.getlookangles(sat);
           $('#menu-lookangles').addClass('bmenu-item-selected');
           $('#loading-screen').fadeOut('slow');

@@ -131,10 +131,10 @@ export const resizeCanvas = () => {
   const { gl } = keepTrackApi.programs.drawManager;
 
   // Using minimum allows the canvas to be full screen without fighting with scrollbars
-  let cw = document.documentElement.clientWidth || 0;
-  let iw = window.innerWidth || 0;
-  let vw = Math.min.apply(null, [cw, iw].filter(Boolean));
-  let vh = Math.min(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+  const cw = document.documentElement.clientWidth || 0;
+  const iw = window.innerWidth || 0;
+  const vw = Math.min.apply(null, [cw, iw].filter(Boolean));
+  const vh = Math.min(document.documentElement.clientHeight || 0, window.innerHeight || 0);
 
   // If taking a screenshot then resize no matter what to get high resolution
   if (gl.canvas.width != vw || gl.canvas.height != vh) {
@@ -335,7 +335,7 @@ export const drawLoop = (preciseDt: number) => {
 
 export const updateLoop = () => {
   // Calculate changes related to satellites objects
-  drawManager.satCalculate();
+  satCalculate();
 
   const { mainCamera, orbitManager, objectManager, satSet } = keepTrackApi.programs;
 

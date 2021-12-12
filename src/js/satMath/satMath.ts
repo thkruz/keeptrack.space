@@ -398,7 +398,6 @@ export const getlookangles = (sat: SatObject): TearrData[] => {
     for (let i = 0; i < looksArray.length; i++) {
       let tr;
       if (tbl.rows.length > 0) {
-        // console.log(tbl.rows[0].cells[0].textContent);
         for (let r = 0; r < tbl.rows.length; r++) {
           var dateString = tbl.rows[r].cells[0].textContent;
 
@@ -1823,8 +1822,8 @@ export const satellite: SatMath = {
   degreesLong: Ootk.Transforms.getDegLon,
   ecfToLookAngles: Ootk.Transforms.ecf2rae,
   // Settings
-  lookanglesInterval: 5,
-  lookanglesLength: 2,
+  lookanglesInterval: 30,
+  lookanglesLength: 1,
   isRiseSetLookangles: false,
   currentEpoch,
   distance,

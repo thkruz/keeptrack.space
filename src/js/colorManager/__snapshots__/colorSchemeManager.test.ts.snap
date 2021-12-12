@@ -1,30 +1,340 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Test ColorRules 0 1`] = `undefined`;
+exports[`Test ColorRules 0 1`] = `
+Array [
+  0.2,
+  1,
+  0,
+  0.5,
+  0.2,
+  1,
+  0,
+  0.5,
+  0.5,
+  0.5,
+  0.5,
+  0.85,
+  1,
+  0,
+  0,
+  1,
+]
+`;
 
-exports[`Test ColorRules 1 1`] = `undefined`;
+exports[`Test ColorRules 1 1`] = `
+Array [
+  1,
+  1,
+  1,
+  0.1,
+  1,
+  1,
+  1,
+  0.1,
+  1,
+  1,
+  1,
+  0.1,
+  1,
+  1,
+  1,
+  0.1,
+]
+`;
 
-exports[`Test ColorRules 2 1`] = `undefined`;
+exports[`Test ColorRules 2 1`] = `
+Array [
+  1,
+  1,
+  1,
+  0,
+  1,
+  1,
+  1,
+  0,
+  1,
+  1,
+  1,
+  0,
+  1,
+  0,
+  0,
+  1,
+]
+`;
 
-exports[`Test ColorRules 3 1`] = `undefined`;
+exports[`Test ColorRules 3 1`] = `
+Array [
+  0.9959022755555555,
+  0.004097724444444444,
+  0,
+  1,
+  0.9959022755555555,
+  0.004097724444444444,
+  0,
+  1,
+  NaN,
+  NaN,
+  0,
+  1,
+  NaN,
+  NaN,
+  0,
+  1,
+]
+`;
 
-exports[`Test ColorRules 4 1`] = `undefined`;
+exports[`Test ColorRules 4 1`] = `
+Array [
+  1,
+  1,
+  1,
+  0.1,
+  1,
+  1,
+  1,
+  0.1,
+  1,
+  1,
+  1,
+  0.1,
+  1,
+  1,
+  1,
+  0.1,
+]
+`;
 
-exports[`Test ColorRules 5 1`] = `undefined`;
+exports[`Test ColorRules 5 1`] = `
+Array [
+  0,
+  1,
+  0,
+  0.6,
+  0,
+  1,
+  0,
+  0.6,
+  1,
+  1,
+  0,
+  0.6,
+  1,
+  1,
+  0,
+  0.6,
+]
+`;
 
-exports[`Test ColorRules 6 1`] = `undefined`;
+exports[`Test ColorRules 6 1`] = `
+Array [
+  0,
+  1,
+  0,
+  0.6,
+  0,
+  1,
+  0,
+  0.6,
+  0,
+  1,
+  0,
+  0.6,
+  0,
+  1,
+  0,
+  0.6,
+]
+`;
 
-exports[`Test ColorRules 7 1`] = `undefined`;
+exports[`Test ColorRules 7 1`] = `
+Array [
+  0,
+  1,
+  0,
+  0.9,
+  0,
+  1,
+  0,
+  0.9,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+]
+`;
 
-exports[`Test ColorRules 8 1`] = `undefined`;
+exports[`Test ColorRules 8 1`] = `
+Array [
+  1,
+  1,
+  1,
+  0.1,
+  1,
+  1,
+  1,
+  0.1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+]
+`;
 
-exports[`Test ColorRules 9 1`] = `undefined`;
+exports[`Test ColorRules 9 1`] = `
+Array [
+  0.2,
+  1,
+  0,
+  0.65,
+  0.2,
+  1,
+  0,
+  0.65,
+  0.2,
+  1,
+  0,
+  0.65,
+  1,
+  0,
+  0,
+  1,
+]
+`;
 
-exports[`Test ColorRules 10 1`] = `undefined`;
+exports[`Test ColorRules 10 1`] = `
+Array [
+  1,
+  1,
+  1,
+  0.1,
+  1,
+  1,
+  1,
+  0.1,
+  0.2,
+  1,
+  0,
+  0.65,
+  1,
+  0,
+  0,
+  1,
+]
+`;
 
-exports[`Test ColorRules 11 1`] = `undefined`;
+exports[`Test ColorRules 11 1`] = `
+Array [
+  NaN,
+  NaN,
+  0,
+  1,
+  NaN,
+  NaN,
+  0,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+]
+`;
 
-exports[`Test ColorRules 12 1`] = `undefined`;
+exports[`Test ColorRules 12 1`] = `
+Array [
+  1,
+  1,
+  1,
+  0.1,
+  1,
+  1,
+  1,
+  0.1,
+  1,
+  1,
+  1,
+  0.1,
+  1,
+  1,
+  1,
+  0.1,
+]
+`;
+
+exports[`calculateColorBuffers 0 1`] = `
+Array [
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+]
+`;
+
+exports[`calculateColorBuffers 1 1`] = `
+Array [
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+]
+`;
+
+exports[`calculateColorBuffers 2 1`] = `
+Array [
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+]
+`;
 
 exports[`colorSchemeManager.ageOfElsetRules 0 1`] = `
 Object {

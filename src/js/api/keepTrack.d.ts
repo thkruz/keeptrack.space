@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 import { mobileManager } from '@app/js/uiManager/mobileManager';
-import { searchBox } from '@app/js/uiManager/search-box';
+import { searchBox } from '@app/js/uiManager/searchBox';
 import * as glm from 'gl-matrix';
 import { mat4 } from 'gl-matrix';
 import { SatRec } from 'satellite.js';
@@ -314,6 +314,7 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  lastSearch: any;
   db: any;
   isGroupOverlayDisabled: any;
   nearZoomLevel: number;
@@ -1150,14 +1151,16 @@ export interface Watchlist {
 }
 
 export interface SearchBox {
-  isResultBoxOpen();
-  getLastResultGroup(): any;
-  fillResultBox(sats: any, satSet: CatalogManager);
-  doArraySearch(arg0: any[]);
-  doSearch(searchStr: any, arg1: boolean);
-  hideResults();
-  isHovering: any;
-  setHoverSat(satId: any);
+  isResultBoxOpen;
+  getLastResultGroup;
+  getCurrentSearch;
+  isHovering;
+  setHoverSat;
+  getHoverSat;
+  hideResults;
+  doArraySearch;
+  doSearch: (searchString: string, isPreventDropDown?: boolean) => number[];
+  fillResultBox;
 }
 export interface SoundManager {
   play(arg0: string);
@@ -1179,8 +1182,15 @@ export interface MissileManager {
   getMissileTEARR(sat: any): any;
 }
 
+export interface SatChngObject {
+  SCC: number;
+  inc: number;
+  meanmo: number;
+  date: Date;
+}
+
 export interface SatChangePlugin {
-  satChngTable: string | any[];
+  satChngTable: SatChngObject[];
 }
 
 export interface PhotoManager {}

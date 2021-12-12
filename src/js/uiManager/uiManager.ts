@@ -35,7 +35,7 @@ import { colorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
 import { DEG2RAD } from '@app/js/lib/constants';
 import { rgbCss } from '@app/js/lib/helpers';
 import { mobileManager } from '@app/js/uiManager/mobileManager';
-import { searchBox } from '@app/js/uiManager/search-box.js';
+import { searchBox } from '@app/js/uiManager/searchBox';
 import $ from 'jquery';
 import { SensorObject, UiManager } from '../api/keepTrack';
 import { useCurrentGeolocationAsSensor } from './httpsOnly';
@@ -982,10 +982,12 @@ uiManager.loadStr = (str) => {
       $('#loader-text').html('Llama Llama Llama Duck!');
   }
 };
-uiManager.doSearch = (searchString, isPreventDropDown) => {
+uiManager.doSearch = (searchString: string, isPreventDropDown: boolean) => {
   const { satSet } = keepTrackApi.programs;
 
   let idList = searchBox.doSearch(searchString, isPreventDropDown);
+  if (idList.length === 0) return;
+
   if (settingsManager.isSatOverflyModeOn) {
     satSet.satCruncher.postMessage({
       satelliteSelected: idList,

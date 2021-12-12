@@ -447,15 +447,8 @@ export const setColorScheme = async (scheme: (sat: SatObject) => ColorInformatio
 };
 
 // ******************** PURE ********************
-export const getSatExtraOnly = (i: number): SatObject => {
-  if (!satSet.satData) return null;
-  if (!satSet.satData[i]) return null;
-  return satSet.satData[i];
-};
-export const getSatFromObjNum = (objNum: number): SatObject => {
-  const satIndex = satSet.getIdFromObjNum(objNum);
-  return satSet.getSat(satIndex);
-};
+export const getSatExtraOnly = (i: number): SatObject => (!satSet.satData || !satSet.satData[i] ? null : satSet.satData[i]);
+export const getSatFromObjNum = (objNum: number): SatObject => satSet.getSat(satSet.getIdFromObjNum(objNum));
 export const getIdFromObjNum = (objNum: number): number => {
   if (typeof satSet.sccIndex?.[`${objNum}`] !== 'undefined') {
     return satSet.sccIndex[`${objNum}`];
@@ -473,7 +466,7 @@ export const setSat = (i: number, sat: SatObject): void => {
 };
 export const mergeSat = (sat: SatObject): void => {
   if (!satSet.satData) return null;
-  const satId = sat.SCC_NUM || -1;
+  const satId = sat?.SCC_NUM || -1;
   if (satId === -1) return;
   const i = satSet.getIdFromObjNum(parseInt(satId));
   satSet.satData[i].ON = sat.ON;
@@ -493,65 +486,27 @@ export const mergeSat = (sat: SatObject): void => {
 };
 export const vmagUpdate = (vmagObject: { satid: number; vmag: any }): void => {
   if (!satSet.satData) return null;
-  try {
-    satSet.satData[vmagObject.satid].vmag = vmagObject.vmag;
-  } catch (e) {
-    // console.warn('Old Satellite in vmagManager: ' + vmagObject.satid);
-  }
+  (satSet.satData[vmagObject.satid].vmag = vmagObject?.vmag) || null;
 };
 export const onCruncherReady = () => {
-  try {
-    satSet.queryStr = window.location.search.substring(1);
-  } catch {
-    satSet.queryStr = '';
-  }
-  // Anything else?
+  satSet.queryStr = window.location?.search?.substring(1) || '';
 };
-export const convertIdArrayToSatnumArray = (satIdArray: number[]) => {
-  const satnumArray = [];
-  for (let i = 0; i < satIdArray.length; i++) {
-    satnumArray.push(parseInt(satSet.getSat(satIdArray[i]).SCC_NUM));
-  }
-  return satnumArray;
-};
-export const convertSatnumArrayToIdArray = (satnumArray: number[]) => {
-  const satIdArray = [];
-  for (let i = 0; i < satnumArray.length; i++) {
-    try {
-      satIdArray.push(satSet.getSatFromObjNum(satnumArray[i]).id);
-    } catch (e) {
-      // console.log(`Missing Sat: ${satnumArray[i]}`);
-    }
-  }
-  return satIdArray;
-};
-export const getIdFromIntlDes = (intlDes: string) => {
-  if (typeof satSet.cosparIndex[`${intlDes}`] !== 'undefined') {
-    return satSet.cosparIndex[`${intlDes}`];
-  } else {
-    return null;
-  }
-};
+export const convertIdArrayToSatnumArray = (satIdArray: number[]) => satIdArray.map((id) => (satSet.getSat(id)?.SCC_NUM || -1).toString()).filter((satnum) => satnum !== '-1');
+export const convertSatnumArrayToIdArray = (satnumArray: number[]) => satnumArray.map((satnum) => satSet.getSatFromObjNum(satnum)?.id || null).filter((id) => id !== null);
+export const getIdFromIntlDes = (intlDes: string) => (typeof satSet.cosparIndex[`${intlDes}`] !== 'undefined' ? satSet.cosparIndex[`${intlDes}`] : null);
 export const getIdFromStarName = (starName: string) => {
-  for (let i = 0; i < satSet.satData.length; i++) {
-    if (satSet.satData[i].type === 'Star') {
-      if (satSet.satData[i].name === starName) {
-        return i;
-      }
-    }
-  }
-  return null;
+  const i = satSet.satData.findIndex((object: SatObject) => object?.type === 'Star' && object?.name === starName);
+  return i === -1 ? null : i;
 };
+
 export const getSensorFromSensorName = (sensorName: string): number => {
-  for (let i = 0; i < satSet.satData.length; i++) {
-    if (satSet.satData[i].static === true && satSet.satData[i].missile !== true && satSet.satData[i].type !== 'Star') {
-      if (satSet.satData[i].name === sensorName) {
-        return i;
-      }
-    }
-  }
-  return -1;
+  const i = satSet.satData.findIndex(
+    // Find the first static object that isn't a missile or a star
+    (object: SatObject) => (object?.static && !object?.missile && object?.type !== 'Star' ? object.name === sensorName : false) // Test
+  );
+  return i;
 };
+
 export const getScreenCoords = (i: number, pMatrix: mat4, camMatrix: mat4, pos: { x: number; y: number; z: number }) => {
   const screenPos = { x: 0, y: 0, z: 0, error: false };
   try {

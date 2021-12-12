@@ -44,7 +44,7 @@ import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
 import { starManager } from '@app/js/starManager/starManager';
 import { timeManager } from '@app/js/timeManager/timeManager';
 import { adviceManager } from '@app/js/uiManager/adviceManager';
-import { searchBox } from '@app/js/uiManager/search-box.js';
+import { searchBox } from '@app/js/uiManager/searchBox';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager';
 import { MapManager, ObjectManager, OrbitManager, SensorManager } from './api/keepTrack';
 
@@ -143,7 +143,6 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     satSet.setColorScheme(colorSchemeManager.default, true);
 
     orbitManager.init();
-    searchBox.init();
 
     const lineManager = new LineFactory();
     // eslint-disable-next-line require-atomic-updates

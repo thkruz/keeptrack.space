@@ -200,6 +200,8 @@ export const keepTrackApiStubs = {
       },
       resetObjectTypeFlags: jest.fn(),
       reloadColors: jest.fn(),
+      default: () => [0, 0, 0, 0],
+      currentColorScheme: () => [0, 0, 0, 0],
       group: null,
     },
     drawManager: {
@@ -432,7 +434,7 @@ export const keepTrackApiStubs = {
       },
       getIdFromEci: jest.fn(),
       selectSat: jest.fn(),
-      satData: [defaultSat, defaultSat, { type: 'Star', name: 'test' }, { type: 'Phased Array Radar', static: true, name: 'test' }],
+      satData: [{ ...defaultSat, ...{ id: 0 } }, defaultSat, { id: 2, type: 'Star', name: 'test' }, { id: 3, type: 'Phased Array Radar', static: true, name: 'test' }],
       convertIdArrayToSatnumArray: jest.fn(),
       getIdFromObjNum: () => 0,
       getSensorFromSensorName: () => 0,
@@ -460,6 +462,7 @@ export const keepTrackApiStubs = {
       queryStr: 'search=25544&intldes=1998-A&sat=25544&misl=0,0,0&date=1234567&rate=1&hires=true',
       cosparIndex: { '1998-AB': 5 },
       numSats: 1,
+      missileSats: 10000,
     },
     searchBox: {
       hideResults: jest.fn(),

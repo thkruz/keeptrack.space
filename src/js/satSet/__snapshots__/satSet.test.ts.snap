@@ -4,41 +4,41 @@ exports[`satSet.addSatExtraFunctions 0 1`] = `undefined`;
 
 exports[`satSet.convertIdArrayToSatnumArray 0 1`] = `
 Array [
-  5,
-  5,
-  5,
+  "00005",
+  "00005",
+  "00005",
 ]
 `;
 
 exports[`satSet.convertIdArrayToSatnumArray 1 1`] = `
 Array [
-  5,
-  5,
-  5,
+  "00005",
+  "00005",
+  "00005",
 ]
 `;
 
 exports[`satSet.convertIdArrayToSatnumArray 2 1`] = `
 Array [
-  5,
-  5,
-  5,
+  "00005",
+  "00005",
+  "00005",
 ]
 `;
 
 exports[`satSet.convertIdArrayToSatnumArray 3 1`] = `
 Array [
-  5,
-  5,
-  5,
+  "00005",
+  "00005",
+  "00005",
 ]
 `;
 
 exports[`satSet.convertIdArrayToSatnumArray 4 1`] = `
 Array [
-  5,
-  5,
-  5,
+  "00005",
+  "00005",
+  "00005",
 ]
 `;
 
@@ -160,7 +160,7 @@ Object {
   "getAltitude": [Function],
   "getDirection": [Function],
   "getTEARR": [Function],
-  "id": 1,
+  "id": 0,
   "inView": 1,
   "inclination": 51.6423,
   "intlDes": "1998-AEF",
@@ -290,7 +290,7 @@ Object {
   "getAltitude": [Function],
   "getDirection": [Function],
   "getTEARR": [Function],
-  "id": 1,
+  "id": 0,
   "inView": 0,
   "inclination": 51.6423,
   "intlDes": "1998-AEF",
@@ -507,7 +507,7 @@ Object {
   "getAltitude": [Function],
   "getDirection": [Function],
   "getTEARR": [Function],
-  "id": 1,
+  "id": 0,
   "inView": 0,
   "inclination": 51.6423,
   "intlDes": "1998-AEF",
@@ -641,7 +641,7 @@ Object {
   "getAltitude": [Function],
   "getDirection": [Function],
   "getTEARR": [Function],
-  "id": 1,
+  "id": 0,
   "inView": 0,
   "inclination": 51.6423,
   "intlDes": "1998-AEF",

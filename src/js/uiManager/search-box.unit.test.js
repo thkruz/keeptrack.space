@@ -1,32 +1,29 @@
 /* eslint-disable no-undefined */
 import { useMockWorkers } from '@app/js/api/apiMocks';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { searchBox } from '@app/js/uiManager/search-box.js';
+import { searchBox } from '@app/js/uiManager/searchBox';
+import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 useMockWorkers();
 
 test(`Basic Functions of Search Box`, () => {
+  const { satSet } = keepTrackApi.programs;
   // Setup a unit test enviornment that doesn't worry about other modules
-  let satSet = {};
-  let satData = [];
-  satData[0] = {
+  keepTrackApi.programs.satSet.satData[0] = {
     static: true,
   };
-  satData[1] = {
-    marker: true,
-  };
-  satData[2] = {
-    missile: true,
-    active: false,
-  };
-  satData[3] = {
+  keepTrackApi.programs.satSet.satData[1] = defaultSat;
+  keepTrackApi.programs.satSet.satData[2] = defaultSat;
+  keepTrackApi.programs.satSet.satData[3] = {
     C: 'ANALSAT',
     active: false,
   };
-  satData[4] = {
+  keepTrackApi.programs.satSet.satData[4] = {
     active: false,
   };
-  satData[5] = {
+  keepTrackApi.programs.satSet.satData[5] = {
     C: 'US',
     LS: 'AFETR',
     LV: 'U',
@@ -51,43 +48,35 @@ test(`Basic Functions of Search Box`, () => {
     semiMinorAxis: 8473.945136538932,
     velocity: {},
   };
-  satSet.satData = satData;
-  satSet.missileSats = 100;
-  satSet.setColorScheme = () => true;
+  keepTrackApi.programs.satSet.satData[6] = {
+    missile: true,
+    active: false,
+  };
+  keepTrackApi.programs.satSet.satData[7] = {
+    marker: true,
+  };
+
   document.body.innerHTML += '<div id="search-results"></div>';
   document.body.innerHTML += '<div id="search"></div>';
-  let groupsManager = {};
-  groupsManager.clearSelect = () => true;
-  groupsManager.createGroup = () => true;
-  groupsManager.selectGroup = () => true;
-  let orbitManager = {};
-  let dotsManager = {};
-  dotsManager.updateSizeBuffer = () => true;
-
-  keepTrackApi.programs.satSet = satSet;
-  keepTrackApi.programs.groupsManager = groupsManager;
-  keepTrackApi.programs.orbitManager = orbitManager;
-  keepTrackApi.programs.dotsManager = dotsManager;
-
-  searchBox.init();
 
   // Run Tests
   expect(searchBox.isResultBoxOpen()).toBe(false);
   expect(searchBox.getLastResultGroup()).toBe(undefined);
   expect(searchBox.getCurrentSearch()).toBe(null);
+  expect(searchBox.isHovering(false)).toBe(false);
   expect(searchBox.isHovering()).toBe(false);
-  expect(searchBox.isHovering(true)).toBe(undefined);
+  expect(searchBox.isHovering(true)).toBe(true);
 
-  expect(searchBox.fillResultBox(0, satSet)).toBe(undefined);
+  expect(searchBox.fillResultBox([{ ...defaultSat, ...{ satId: 0 } }], satSet)).toBe(undefined);
 
-  expect(searchBox.doSearch('', false)).toBe();
-  expect(searchBox.doSearch('25', false)).toBe();
+  expect(searchBox.doSearch('', false)).toStrictEqual([]);
+  expect(searchBox.doSearch('25', false)).toStrictEqual([]);
   expect(searchBox.doSearch('39208', false)).toStrictEqual([]);
   expect(searchBox.doSearch('39208', true)).toStrictEqual([]);
   expect(searchBox.doSearch('VANGUARD', true)).toStrictEqual([5]);
   expect(searchBox.getCurrentSearch()).toBe('VANGUARD');
 
-  expect(searchBox.setHoverSat(39208)).toBe(undefined);
+  expect(searchBox.setHoverSat(39208)).toBe(39208);
   expect(searchBox.getHoverSat()).toBe(39208);
 
   expect(searchBox.doArraySearch([5, 5])).toBe('00005,00005');
@@ -99,9 +88,9 @@ test(`Basic Functions of Search Box`, () => {
   expect(searchBox.fillResultBox(resultsB, satSet)).toBe(undefined);
 
   resultsB[0] = resultsA[5];
-  satData[5].missile = true;
+  keepTrackApi.programs.satSet.satData[5].missile = true;
   expect(searchBox.fillResultBox(resultsB, satSet)).toBe(undefined);
-  satData[5].missile = false;
+  keepTrackApi.programs.satSet.satData[5].missile = false;
 
   resultsB[0] = resultsA[5];
   resultsB[0].isON = true;
@@ -109,16 +98,16 @@ test(`Basic Functions of Search Box`, () => {
 
   resultsB[0] = resultsA[5];
   resultsB[0].isON = true;
-  satData[5].missile = true;
+  keepTrackApi.programs.satSet.satData[5].missile = true;
   expect(searchBox.fillResultBox(resultsB, satSet)).toBe(undefined);
-  satData[5].missile = false;
+  keepTrackApi.programs.satSet.satData[5].missile = false;
 
   resultsB[0] = resultsA[5];
   // eslint-disable-next-line camelcase
-  resultsB[0].isSCC_NUM = true;
+  resultsB[0].isSccNum = true;
   expect(searchBox.fillResultBox(resultsB, satSet)).toBe(undefined);
   // eslint-disable-next-line camelcase
-  resultsB[0].isSCC_NUM = false;
+  resultsB[0].isSccNum = false;
 
   resultsB[0] = resultsA[5];
   resultsB[0].isIntlDes = true;

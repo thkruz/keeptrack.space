@@ -1,3 +1,4 @@
+import { SatChngObject } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { dateFromJday } from '@app/js/timeManager/transforms';
 import { uiManager } from '@app/js/uiManager/uiManager';
@@ -5,7 +6,7 @@ import $ from 'jquery';
 
 let issatChngMenuOpen = false;
 keepTrackApi.programs.satChange = {
-  satChngTable: [],
+  satChngTable: null,
 };
 
 export const init = (): void => {
@@ -72,11 +73,11 @@ export const uiManagerInit = () => {
 
 export const satChng = (row: number): void => {
   const { satChange } = keepTrackApi.programs;
-  let satChngTable: string | any[] = satChange.satChngTable;
+  let satChngTable: SatChngObject[] = satChange.satChngTable;
   if (typeof row !== 'number') throw new Error('Row must be a number');
   if (row !== -1 && typeof satChngTable[row] === 'undefined') throw new Error('Row does not exist');
 
-  if (row === -1 && satChngTable.length === 0) {
+  if (row === -1 && satChngTable?.length === 0) {
     // Only generate the table if receiving the -1 argument for the first time
     $.get('/analysis/satchng.json?v=' + settingsManager.versionNumber).done((resp) => {
       ({ resp, satChngTable } = getSatChngJson(resp, satChngTable));
@@ -86,8 +87,8 @@ export const satChng = (row: number): void => {
   if (row !== -1) {
     // If an object was selected from the menu
     if (!satChngTable[row].SCC) return;
-    uiManager.doSearch(satChngTable[row].SCC); // Actually perform the search of the two objects
-    $('#anal-sat').val(satChngTable[row].SCC);
+    uiManager.doSearch(satChngTable[row].SCC.toString()); // Actually perform the search of the two objects
+    $('#anal-sat').val(satChngTable[row].SCC.toString());
   } // If a row was selected
 };
 
@@ -115,7 +116,8 @@ export const bottomMenuClick = (iconName: string): void => {
     }
   }
 };
-export const getSatChngJson = (resp: any, satChngTable: string | any[]) => {
+
+export const getSatChngJson = (resp: any, satChngTable: SatChngObject[]) => {
   resp = [...new Set(resp)];
 
   const { satSet } = keepTrackApi.programs;
@@ -167,7 +169,7 @@ export const getSatChngJson = (resp: any, satChngTable: string | any[]) => {
     }
     tdT.appendChild(document.createTextNode(timeTextStr));
     tdSat = tr.insertCell();
-    tdSat.appendChild(document.createTextNode(satChngTable[i].SCC));
+    tdSat.appendChild(document.createTextNode(satChngTable[i].SCC.toString()));
     tdInc = tr.insertCell();
     tdInc.appendChild(document.createTextNode(satChngTable[i].inc.toFixed(2)));
     tdPer = tr.insertCell();

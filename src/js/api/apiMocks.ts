@@ -427,6 +427,7 @@ export const keepTrackApiStubs = {
         inView: true,
       }),
     },
+    controlSiteManager: {},
     satSet: {
       satCruncher: {
         postMessage: jest.fn(),

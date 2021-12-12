@@ -99,7 +99,6 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
       if (sat.C == 'ANALSAT' && !sat.active) return true; // Skip Fake Analyst satellites
       if (!sat.ON) return true; // Everything has a name. If it doesn't then assume it isn't what we are searching for.
 
-      console.error(sat.ON);
       if (sat.ON.toUpperCase().indexOf(searchString) !== -1) {
         results.push({
           strIndex: sat.ON.indexOf(searchString),

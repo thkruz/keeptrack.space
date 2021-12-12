@@ -925,6 +925,9 @@ export interface RadarDataObject extends SatObject {
 }
 
 export interface SensorObject {
+  linkIridium?: any;
+  linkGalileo?: any;
+  linkStarlink?: any;
   obsmaxel2?: any;
   obsmaxrange2?: any;
   obsminrange2?: any;

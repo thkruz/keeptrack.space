@@ -6,7 +6,7 @@ import { keepTrackApi } from '../api/keepTrackApi';
 import { stars } from '../starManager/stars.js';
 import { controlSiteManager, ControlSiteObject } from './controlSiteManager';
 import { launchSiteManager } from './launchSiteManager';
-import { satLinkManager } from './satLinkManager.js';
+import { satLinkManager } from './satLinkManager';
 
 const TEMPLATE_TLE1_ENDING = 'U 58002B   17115.48668720 +.00000144 +00000-0 +16234-3 0  9994';
 const TEMPLATE_TLE2_ENDING = ' 034.2502 167.2636 0042608 222.6554 121.5501 24.84703551080477';

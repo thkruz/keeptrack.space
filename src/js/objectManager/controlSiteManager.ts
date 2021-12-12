@@ -3,6 +3,8 @@ export interface ControlSiteManager {
 }
 
 export interface ControlSiteObject {
+  linkIridium: any;
+  linkStarlink: any;
   Code: string;
   // UCode: string;
   StateC: string;

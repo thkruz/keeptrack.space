@@ -323,6 +323,14 @@ export const selectSat = (i: number): void => {
   const { sensorManager, objectManager, uiManager, colorSchemeManager } = keepTrackApi.programs;
   const { gl } = keepTrackApi.programs.drawManager;
   if (i === objectManager.lastSelectedSat()) return;
+  if (!colorSchemeManager.colorBufferOneTime) {
+    // TODO: Fix this
+    // Race condition where the color buffer isn't setup yet and we are getting
+    // ready to buffersubdata. There needs to be an await adjusted on main.ts
+    // more than likely to ensure satSet and colorSchemeManager are setup first.
+    console.debug('Color Buffer Not Initialized');
+    return;
+  }
 
   const sat = satSet.getSat(i);
   if (sat !== null && sat.static && typeof sat.staticNum !== 'undefined') {
@@ -343,7 +351,6 @@ export const selectSat = (i: number): void => {
   }
   // If New Select Sat Picked Color it
   if (i !== -1) {
-    // TODO: Buffer overflow?
     gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
   }
 

@@ -9,7 +9,7 @@ export const init = (): void => {
   keepTrackApi.programs.gamepad = <GamepadPlugin>{
     currentState: null,
   };
-  (<any>window).addEventListener('gamepadconnected', (evt: any) => {
+  window.addEventListener('gamepadconnected', (evt: any) => {
     if (settingsManager.cruncherReady) {
       gamepadConnected(<GamepadEvent>event);
     } else {

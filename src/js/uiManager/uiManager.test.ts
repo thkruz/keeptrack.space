@@ -2,7 +2,7 @@ import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
 import * as uiManager from './uiManager';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
 describe('uiManager.legendHoverMenuClick', () => {
@@ -168,7 +168,7 @@ describe('uiManager.legendHoverMenuClick', () => {
 describe('uiManager.legendHoverMenuClick-flagsOff', () => {
   beforeEach(() => {
     keepTrackApi.programs.satSet.setColorScheme = () => {};
-    keepTrackApi.programs.ColorScheme.objectTypeFlags = {
+    keepTrackApi.programs.colorSchemeManager.objectTypeFlags = {
       payload: false,
       radarData: false,
       rocketBody: false,
@@ -204,7 +204,7 @@ describe('uiManager.legendHoverMenuClick-flagsOff', () => {
   });
 
   afterAll(() => {
-    keepTrackApi.programs.ColorScheme.objectTypeFlags = {
+    keepTrackApi.programs.colorSchemeManager.objectTypeFlags = {
       payload: true,
       radarData: true,
       rocketBody: true,

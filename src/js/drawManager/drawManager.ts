@@ -21,7 +21,7 @@ var isSatMiniBoxInUse = false;
 var labelCount;
 var hoverBoxOnSatMiniElements = null;
 var satHoverMiniDOM;
-(<any>window).settingsManager.isShowNextPass = false;
+window.settingsManager.isShowNextPass = false;
 let updateHoverSatId;
 let isHoverBoxVisible = false;
 let isShowDistance = true;

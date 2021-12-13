@@ -1,8 +1,8 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import * as missile from '@app/js/plugins/missile/missile';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import * as missile from './missile';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
 describe('missile.init', () => {

@@ -1,11 +1,10 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import { init } from './twitter';
 
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+
 test(`main`, async () => {
-  keepTrackApi.programs.uiManager = {
-    hideSideMenus: jest.fn(),
-    searchToggle: jest.fn(),
-  };
   settingsManager = {
     isMobileModeEnabled: false,
   };

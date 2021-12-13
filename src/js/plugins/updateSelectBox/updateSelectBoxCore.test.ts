@@ -1,10 +1,8 @@
-import { defaultSat, keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import * as updateSelectBoxCore from '@app/js/plugins/updateSelectBox/updateSelectBoxCore';
-import { expect } from '@jest/globals';
-/* eslint-disable no-undefined */
+import { defaultSat, keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import * as updateSelectBoxCore from './updateSelectBoxCore';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 describe('updateSelectBoxCore.updateSelectBoxCoreCallback', () => {
   test('0', () => {
@@ -12,6 +10,7 @@ describe('updateSelectBoxCore.updateSelectBoxCoreCallback', () => {
       updateSelectBoxCore.updateSelectBoxCoreCallback(defaultSat);
       keepTrackApi.programs.objectManager.isSensorManagerLoaded = true;
       keepTrackApi.programs.satellite.currentTEARR = {
+        name: 'test',
         lat: 1,
         lon: 1,
         alt: 0,
@@ -23,6 +22,7 @@ describe('updateSelectBoxCore.updateSelectBoxCoreCallback', () => {
       updateSelectBoxCore.updateSelectBoxCoreCallback(defaultSat);
       keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
       keepTrackApi.programs.satellite.currentTEARR = {
+        name: '',
         lat: 1,
         lon: 1,
         alt: 0,
@@ -42,14 +42,6 @@ describe('updateSelectBoxCore.updateSelectBoxCoreCallback', () => {
   test('1', () => {
     const callFunction: any = () => {
       updateSelectBoxCore.updateSelectBoxCoreCallback(null);
-    };
-
-    expect(callFunction).toThrow();
-  });
-
-  test('2', () => {
-    const callFunction: any = () => {
-      updateSelectBoxCore.updateSelectBoxCoreCallback(undefined);
     };
 
     expect(callFunction).toThrow();

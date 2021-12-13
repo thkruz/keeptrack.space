@@ -45,7 +45,8 @@ import { uiLimited } from './ui-limited.js';
 import { uiInput } from './uiInput';
 import { initUiValidation } from './uiValidation';
 
-const M = <any>window.M;
+// materializecss/materialize goes to window.M, but we want a local reference
+const M = window.M;
 
 $.ajaxSetup({
   cache: false,

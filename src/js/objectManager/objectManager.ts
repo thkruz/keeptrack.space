@@ -453,8 +453,6 @@ const setHoveringSat = (id: number): void => {
 };
 const setSelectedSat = (id: number): void => {
   objectManager.selectedSat = id;
-  // TODO: Use of window is deprecated. This should be changed to use the keepTrackApi.
-  (<any>window).selectedSat = id;
 };
 const setLasthoveringSat = (id: number): void => {
   objectManager.lasthoveringSat = id;

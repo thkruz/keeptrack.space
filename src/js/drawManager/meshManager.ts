@@ -292,7 +292,7 @@ export const update = (mainCamera: Camera, timeManager: TimeManager, sat: any) =
 
   if (settingsManager.meshOverride) {
     if (typeof meshManager.models[settingsManager.meshOverride] === 'undefined') {
-      console.warn(`Mesh override not found: ${settingsManager.meshOverride}`);
+      console.debug(`Mesh override not found: ${settingsManager.meshOverride}`);
       settingsManager.meshOverride = null;
     } else {
       meshManager.currentModel.model = meshManager.models[settingsManager.meshOverride];

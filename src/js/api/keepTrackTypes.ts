@@ -526,7 +526,7 @@ export interface SensorManager {
   sensorTitle: string;
   whichRadar: string;
   drawFov: (val: SensorObject) => void;
-  setCurrentSensor: (val: SensorObject[] | SensorObject) => void;
+  setCurrentSensor: (val: SensorObject[] | null) => void;
   curSensorPositon: [number, number, number];
   currentSensorList: any;
   currentSensorMultiSensor: boolean;

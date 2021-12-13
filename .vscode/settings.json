@@ -4,6 +4,7 @@
   // "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "editor.formatOnSave": true,
   "typescript.validate.enable": true,
+  "typescript.tsdk": "./node_modules/typescript/lib",
   "[typescript]": {
     "editor.codeActionsOnSave": {
       "source.fixAll": false,

@@ -200,7 +200,6 @@
     "gremlins.js": "^2.2.0",
     "jquery": "^3.6.0",
     "jquery-ui-bundle": "^1.12.1-migrate",
-    "materialize-css": "github:Dogfalo/materialize",
     "meeusjs": "^1.0.4",
     "node-fetch": "^2.6.1",
     "numeric": "^1.2.6",

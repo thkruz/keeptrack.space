@@ -25,8 +25,8 @@
  */
 
 import $ from 'jquery';
-import { SensorManager, SensorObject } from '../../api/keepTrack';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { SensorManager, SensorObject } from '../../api/keepTrackTypes';
 import { sensorList } from './sensorList';
 
 // Add new callbacks to the list of callbacks in keepTrackApi

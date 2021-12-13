@@ -1,6 +1,6 @@
 import { defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
-import { SensorObject } from '../../api/keepTrack';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { SensorObject } from '../../api/keepTrackTypes';
 import * as sensorManager from './sensorManager';
 keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 

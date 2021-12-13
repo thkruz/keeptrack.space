@@ -1,5 +1,5 @@
-import { SunObject } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SunObject } from '@app/js/api/keepTrackTypes';
 import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { satellite } from '@app/js/satMath/satMath';
 import { jday } from '@app/js/timeManager/transforms';

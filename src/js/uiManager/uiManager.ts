@@ -37,7 +37,7 @@ import { rgbCss } from '@app/js/lib/helpers';
 import { mobileManager } from '@app/js/uiManager/mobileManager';
 import { searchBox } from '@app/js/uiManager/searchBox';
 import $ from 'jquery';
-import { SensorObject, UiManager } from '../api/keepTrack';
+import { SensorObject, UiManager } from '../api/keepTrackTypes';
 import { useCurrentGeolocationAsSensor } from './httpsOnly';
 import { keyHandler } from './keyHandler';
 import { initMenuController } from './menuController';
@@ -1039,8 +1039,8 @@ uiManager.updateURL = () => {
   if (settingsManager.trusatMode) {
     paramSlices.push('trusat');
   }
-  if (objectManager.selectedSat !== -1 && typeof satSet.getSatExtraOnly(objectManager.selectedSat).SCC_NUM != 'undefined') {
-    paramSlices.push('sat=' + satSet.getSatExtraOnly(objectManager.selectedSat).SCC_NUM);
+  if (objectManager.selectedSat !== -1 && typeof satSet.getSatExtraOnly(objectManager.selectedSat).sccNum != 'undefined') {
+    paramSlices.push('sat=' + satSet.getSatExtraOnly(objectManager.selectedSat).sccNum);
   }
   var currentSearch = searchBox.getCurrentSearch();
   if (currentSearch != null) {

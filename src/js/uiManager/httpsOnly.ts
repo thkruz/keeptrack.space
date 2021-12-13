@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import { SensorObject } from '../api/keepTrack';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { SensorObject } from '../api/keepTrackTypes';
 
 export const useCurrentGeolocationAsSensor = () => {
   const { objectManager, sensorManager, timeManager, satellite, satSet, mainCamera } = keepTrackApi.programs;

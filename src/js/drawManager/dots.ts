@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-escape */
 import * as glm from 'gl-matrix';
-import { Camera, DotsManager, DrawProgram, PickingProgram, TimeManager } from '../api/keepTrack';
+import { Camera, DotsManager, DrawProgram, PickingProgram, TimeManager } from '../api/keepTrackTypes';
 import { ColorSchemeManager } from '../colorManager/colorSchemeManager';
 import { DEG2RAD, GROUND_BUFFER_DISTANCE, RADIUS_OF_EARTH } from '../lib/constants';
 import { objectManager } from '../objectManager/objectManager';

@@ -1,6 +1,7 @@
 import $ from 'jquery';
-import { Camera, UiInputInterface } from '../api/keepTrack';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { Camera, UiInputInterface } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import * as glm from '../lib/external/gl-matrix.js';
 
@@ -1333,7 +1334,7 @@ export const openRmbMenu = () => {
     if (typeof clickedSat == 'undefined') return;
     const sat = satSet.getSat(clickedSat);
     if (typeof sat == 'undefined' || sat == null) return;
-    if (typeof satSet.getSat(clickedSat).type == 'undefined' || satSet.getSat(clickedSat).type !== 'Star') {
+    if (typeof satSet.getSat(clickedSat).type == 'undefined' || satSet.getSat(clickedSat).type !== SpaceObjectType.STAR) {
       rightBtnViewDOM.show();
       isViewDOM = true;
       numMenuItems++;
@@ -1356,8 +1357,14 @@ export const openRmbMenu = () => {
       isDrawDOM = true;
       numMenuItems++;
     } else {
-      if (satSet.getSat(clickedSat).type === 'Optical' || satSet.getSat(clickedSat).type === 'Mechanical' || satSet.getSat(clickedSat).type === 'Ground Sensor Station' || satSet.getSat(clickedSat).type === 'Phased Array Radar') {
-        $('#view-sensor-info-rmb').show();
+      switch (satSet.getSat(clickedSat).type) {
+        case SpaceObjectType.PHASED_ARRAY_RADAR:
+        case SpaceObjectType.OPTICAL:
+        case SpaceObjectType.MECHANICAL:
+        case SpaceObjectType.GROUND_SENSOR_STATION:
+          $('#view-sensor-info-rmb').show();
+          break;
+        default:
       }
     }
   } else {

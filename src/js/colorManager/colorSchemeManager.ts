@@ -9,8 +9,8 @@
 // ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 // FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-import { CatalogManager, Colors, SatObject } from '../api/keepTrack';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { CatalogManager, Colors, SatObject } from '../api/keepTrackTypes';
 import { ageOfElsetRules } from './ruleSets/ageOfElset';
 import { apogeeRules } from './ruleSets/apogee';
 import { countriesRules } from './ruleSets/countries';

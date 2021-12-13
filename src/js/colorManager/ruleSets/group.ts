@@ -1,4 +1,5 @@
-import { SatObject } from '@app/js/api/keepTrack';
+import { SatObject } from '@app/js/api/keepTrackTypes';
+import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
 
 export const groupRules = (sat: SatObject): ColorInformation => {
@@ -20,7 +21,7 @@ export const groupRules = (sat: SatObject): ColorInformation => {
     };
   }
 
-  if (sat.static && sat.type === 'Star') {
+  if (sat.static && sat.type === SpaceObjectType.STAR) {
     if (sat.vmag >= 4.7 && colorSchemeManager.objectTypeFlags.starLow) {
       return {
         color: colorSchemeManager.colorTheme.starLow,

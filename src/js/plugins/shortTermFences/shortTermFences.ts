@@ -1,5 +1,5 @@
-import { SensorObject } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SensorObject } from '@app/js/api/keepTrackTypes';
 import $ from 'jquery';
 
 let isStfMenuOpen = false;
@@ -208,7 +208,7 @@ export const stfFormOnSubmit = (e: Event) => {
     ],
   });
 
-  satellite.setobs(<SensorObject[]>[
+  satellite.setobs(<SensorObject[]>(<unknown>[
     {
       lat: lat,
       lon: lon,
@@ -221,7 +221,7 @@ export const stfFormOnSubmit = (e: Event) => {
       obsmaxrange: maxrange,
       type: sensorType,
     },
-  ]);
+  ]));
 
   $('#sensor-selected').text('Short Term Fence');
 

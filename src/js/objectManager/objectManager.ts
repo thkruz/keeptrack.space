@@ -1,8 +1,9 @@
 // Object Manager (objectManager)
 // This loads all of the various modules that provide objects for the screen
 
-import { ObjectManager } from '../api/keepTrack';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { ObjectManager } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import { stars } from '../starManager/stars.js';
 import { controlSiteManager, ControlSiteObject } from './controlSiteManager';
 import { launchSiteManager } from './launchSiteManager';
@@ -500,7 +501,7 @@ const init = () => {
       C: 'ANALSAT',
       LV: 'Analyst Satellite',
       LS: 'ANALSAT',
-      SCC_NUM: sccNum,
+      sccNum: sccNum,
       TLE1: `${TEMPLATE_TLE1_BEGINNING}${sccNum}${TEMPLATE_TLE1_ENDING}`,
       TLE2: `${TEMPLATE_TLE2_BEGINNING}${sccNum}${TEMPLATE_TLE2_ENDING}`,
       intlDes: TEMPLATE_INTLDES,
@@ -544,7 +545,7 @@ const init = () => {
       const launchSite = launchSiteManager.launchSiteList[launchSiteName];
       objectManager.staticSet.push({
         static: true,
-        type: 'Launch Facility',
+        type: SpaceObjectType.LAUNCH_FACILITY,
         name: launchSite.name,
         lat: launchSite.lat,
         lon: launchSite.lon,

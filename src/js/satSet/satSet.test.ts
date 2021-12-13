@@ -1,6 +1,7 @@
 import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
-import { SatCruncherMessage, SatObject } from '../api/keepTrack';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { SatCruncherMessage, SatObject } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import * as satSet from '../satSet/satSet';
 
 keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
@@ -533,7 +534,7 @@ describe('satSet.mergeSat', () => {
   });
 
   test('0', () => {
-    let result: any = satSet.mergeSat(<SatObject>{ SCC_NUM: '25544', OT: 1 });
+    let result: any = satSet.mergeSat(<SatObject>(<unknown>{ sccNum: '25544', type: SpaceObjectType.PAYLOAD }));
     expect(result).toMatchSnapshot();
   });
 });

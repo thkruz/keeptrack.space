@@ -5,8 +5,8 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 // @ts-ignore - using OBJ prevents ponicode from breaking
 import { OBJ } from '@app/js/lib/external/webgl-obj-loader.js';
 import { mat4 } from 'gl-matrix';
-import { Camera, SatObject, TimeManager } from '../api/keepTrack';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { Camera, SatObject, TimeManager } from '../api/keepTrackTypes';
 
 const meshList = ['sat2', 's1u', 's2u', 's3u', 'starlink', 'iss', 'gps', 'aehf', 'dsp', 'galileo', 'o3b', 'orbcomm', 'iridium', 'globalstar', 'debris0', 'debris1', 'debris2', 'rocketbody', 'sbirs', 'misl', 'misl2', 'misl3', 'misl4', 'rv'];
 
@@ -300,7 +300,7 @@ export const update = (mainCamera: Camera, timeManager: TimeManager, sat: any) =
     }
   }
 
-  if (sat.SCC_NUM == '25544') {
+  if (sat.sccNum == '25544') {
     meshManager.updateNadirYaw(mainCamera, sat, timeManager);
     meshManager.currentModel.model = meshManager.models.iss;
     return;
@@ -366,27 +366,27 @@ export const update = (mainCamera: Camera, timeManager: TimeManager, sat: any) =
 
     // Is this a DSP Satellite?
     if (
-      sat.SCC_NUM == '04630' ||
-      sat.SCC_NUM == '05204' ||
-      sat.SCC_NUM == '05851' ||
-      sat.SCC_NUM == '06691' ||
-      sat.SCC_NUM == '08482' ||
-      sat.SCC_NUM == '08916' ||
-      sat.SCC_NUM == '09803' ||
-      sat.SCC_NUM == '11397' ||
-      sat.SCC_NUM == '12339' ||
-      sat.SCC_NUM == '13086' ||
-      sat.SCC_NUM == '14930' ||
-      sat.SCC_NUM == '15453' ||
-      sat.SCC_NUM == '18583' ||
-      sat.SCC_NUM == '20066' ||
-      sat.SCC_NUM == '20929' ||
-      sat.SCC_NUM == '21805' ||
-      sat.SCC_NUM == '23435' ||
-      sat.SCC_NUM == '24737' ||
-      sat.SCC_NUM == '26356' ||
-      sat.SCC_NUM == '26880' ||
-      sat.SCC_NUM == '28158'
+      sat.sccNum == '04630' ||
+      sat.sccNum == '05204' ||
+      sat.sccNum == '05851' ||
+      sat.sccNum == '06691' ||
+      sat.sccNum == '08482' ||
+      sat.sccNum == '08916' ||
+      sat.sccNum == '09803' ||
+      sat.sccNum == '11397' ||
+      sat.sccNum == '12339' ||
+      sat.sccNum == '13086' ||
+      sat.sccNum == '14930' ||
+      sat.sccNum == '15453' ||
+      sat.sccNum == '18583' ||
+      sat.sccNum == '20066' ||
+      sat.sccNum == '20929' ||
+      sat.sccNum == '21805' ||
+      sat.sccNum == '23435' ||
+      sat.sccNum == '24737' ||
+      sat.sccNum == '26356' ||
+      sat.sccNum == '26880' ||
+      sat.sccNum == '28158'
     ) {
       meshManager.updateNadirYaw(mainCamera, sat, timeManager);
       meshManager.currentModel.model = meshManager.models.dsp;
@@ -394,7 +394,7 @@ export const update = (mainCamera: Camera, timeManager: TimeManager, sat: any) =
     }
 
     // Is this an AEHF Satellite?
-    if (sat.SCC_NUM == '36868' || sat.SCC_NUM == '38254' || sat.SCC_NUM == '39256' || sat.SCC_NUM == '43651' || sat.SCC_NUM == '44481' || sat.SCC_NUM == '45465') {
+    if (sat.sccNum == '36868' || sat.sccNum == '38254' || sat.sccNum == '39256' || sat.sccNum == '43651' || sat.sccNum == '44481' || sat.sccNum == '45465') {
       meshManager.updateNadirYaw(mainCamera, sat, timeManager);
       meshManager.currentModel.model = meshManager.models.aehf;
       return;
@@ -425,15 +425,15 @@ export const update = (mainCamera: Camera, timeManager: TimeManager, sat: any) =
   }
 
   if (sat.OT == 3) {
-    if (parseInt(sat.SCC_NUM) <= 20000) {
+    if (parseInt(sat.sccNum) <= 20000) {
       // Debris
       meshManager.currentModel.model = meshManager.models.debris0;
       return;
-    } else if (parseInt(sat.SCC_NUM) <= 35000) {
+    } else if (parseInt(sat.sccNum) <= 35000) {
       // Debris
       meshManager.currentModel.model = meshManager.models.debris1;
       return;
-    } else if (parseInt(sat.SCC_NUM) > 35000) {
+    } else if (parseInt(sat.sccNum) > 35000) {
       // Debris
       meshManager.currentModel.model = meshManager.models.debris2;
       return;

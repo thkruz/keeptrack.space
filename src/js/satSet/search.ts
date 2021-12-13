@@ -1,4 +1,4 @@
-import { SatObject } from '../api/keepTrack';
+import { SatObject } from '../api/keepTrackTypes';
 
 export const searchYear = (satData: any, year: any) => {
   const result = satData.filter((sat: SatObject) => {
@@ -22,11 +22,11 @@ export const searchYearOrLess = (satData: any, year: number) => {
 
 // eslint-disable-next-line no-unused-vars
 export const searchNameRegex = (satData: any, regex: { test: (arg0: any) => any }): SatObject[] => {
-  const result = satData.filter((sat: SatObject) => !!regex.test(sat.ON));
+  const result = satData.filter((sat: SatObject) => !!regex.test(sat.name));
   return result;
 };
 // eslint-disable-next-line no-unused-vars
 export const searchCountryRegex = (satData: any, regex: { test: (arg0: any) => any }): SatObject[] => {
-  const result = satData.filter((sat: SatObject) => !!regex.test(sat.C));
+  const result = satData.filter((sat: SatObject) => !!regex.test(sat.country));
   return result;
 };

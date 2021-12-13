@@ -4,7 +4,7 @@ import { init } from './analysis';
 test('Load Analysis Plugin', () => {
   window.keepTrackApi.programs = {
     satSet: {
-      getSat: () => ({ SCC_NUM: 25544 }),
+      getSat: () => ({ sccNum: 25544 }),
     },
     uiManager: {
       hideSideMenus: jest.fn(),

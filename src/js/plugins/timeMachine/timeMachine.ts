@@ -1,5 +1,5 @@
-import { CatalogManager, GroupsManager, OrbitManager } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { CatalogManager, GroupsManager, OrbitManager } from '@app/js/api/keepTrackTypes';
 import { ColorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
 import $ from 'jquery';
 
@@ -71,7 +71,7 @@ export const orbitManagerInit = (): void => {
     if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
     const yearGroup = groupsManager.createGroup('yearOrLess', year);
     // groupsManager.selectGroupNoOverlay(yearGroup);
-    groupsManager.selectGroup(yearGroup, orbitManager);
+    groupsManager.selectGroup(yearGroup);
     yearGroup.updateOrbits(orbitManager, orbitManager);
     satSet.setColorScheme(colorSchemeManager.group, true); // force color recalc
     if (year >= 59 && year < 100) {

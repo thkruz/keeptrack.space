@@ -3,7 +3,8 @@ import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EART
 import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { mat4 } from 'gl-matrix';
 import $ from 'jquery';
-import { CatalogManager, InView, Lla, Rae, SatCruncherMessage, SatObject, SensorObject } from '../api/keepTrack';
+import { CatalogManager, InView, Lla, Rae, SatCruncherMessage, SatObject, SensorObject } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import { ColorInformation } from '../colorManager/colorSchemeManager';
 import { numeric } from '../lib/external/numeric';
 import { stringPad } from '../lib/helpers';
@@ -164,32 +165,31 @@ export const initGsData = (): void => {
             satSetI = satSet.cosparIndex[`${gsSat.cospar}`];
             if (typeof gsSat.name != 'undefined') {
               if (
-                typeof satSet.satData[satSetI].ON == 'undefined' ||
-                satSet.satData[satSetI].ON == 'TBA' ||
-                satSet.satData[satSetI].ON == 'Unknown' ||
-                satSet.satData[satSetI].ON.slice(0, 7) == 'PAYLOAD' ||
-                satSet.satData[satSetI].ON.slice(0, 6) == 'OBJECT'
+                typeof satSet.satData[satSetI].name == 'undefined' ||
+                satSet.satData[satSetI].name == 'TBA' ||
+                satSet.satData[satSetI].name == 'Unknown' ||
+                satSet.satData[satSetI].name.slice(0, 7) == 'PAYLOAD' ||
+                satSet.satData[satSetI].name.slice(0, 6) == 'OBJECT'
               ) {
-                satSet.satData[satSetI].ON = gsSat.name;
+                satSet.satData[satSetI].name = gsSat.name;
               }
             }
             if (typeof gsSat.lv != 'undefined') {
-              if (typeof satSet.satData[satSetI].LV == 'undefined' || satSet.satData[satSetI].LV == 'U') {
-                satSet.satData[satSetI].LV = gsSat.lv;
+              if (typeof satSet.satData[satSetI].launchVehicle == 'undefined' || satSet.satData[satSetI].launchVehicle == 'U') {
+                satSet.satData[satSetI].launchVehicle = gsSat.lv;
               }
             }
             if (typeof gsSat.ls != 'undefined') {
-              if (typeof satSet.satData[satSetI].LS == 'undefined' || satSet.satData[satSetI].LS == 'U') {
-                satSet.satData[satSetI].LS = gsSat.ls;
+              if (typeof satSet.satData[satSetI].launchSite == 'undefined' || satSet.satData[satSetI].launchSite == 'U') {
+                satSet.satData[satSetI].launchSite = gsSat.ls;
               }
             }
-            if (typeof gsSatType[0].gsurl != 'undefined') satSet.satData[satSetI].URL = gsSatType[0].gsurl;
-            if (typeof gsSatType[0].sdpow != 'undefined') satSet.satData[satSetI].Pw = gsSatType[0].sdpow;
-            if (typeof gsSatType[0].sdtyp != 'undefined') satSet.satData[satSetI].P = gsSatType[0].sdtyp;
-            if (typeof gsSatType[0].sdcon != 'undefined') satSet.satData[satSetI].Con = gsSatType[0].sdcon;
-            if (typeof gsSatType[0].sdmas != 'undefined') satSet.satData[satSetI].DM = gsSatType[0].sdmas;
-            if (typeof gsSatType[0].sdope != 'undefined') satSet.satData[satSetI].U = gsSatType[0].sdope;
-            if (typeof gsSatType[0].sdlif != 'undefined') satSet.satData[satSetI].Li = gsSatType[0].sdlif;
+            if (typeof gsSatType[0].sdpow != 'undefined') satSet.satData[satSetI].power = gsSatType[0].sdpow;
+            if (typeof gsSatType[0].sdtyp != 'undefined') satSet.satData[satSetI].purpose = gsSatType[0].sdtyp;
+            if (typeof gsSatType[0].sdcon != 'undefined') satSet.satData[satSetI].manufacturer = gsSatType[0].sdcon;
+            if (typeof gsSatType[0].sdmas != 'undefined') satSet.satData[satSetI].dryMass = gsSatType[0].sdmas;
+            if (typeof gsSatType[0].sdope != 'undefined') satSet.satData[satSetI].user = gsSatType[0].sdope;
+            if (typeof gsSatType[0].sdlif != 'undefined') satSet.satData[satSetI].lifetime = gsSatType[0].sdlif;
           }
         }
       }
@@ -210,7 +210,7 @@ export const parseGetVariables = (): void => {
   // Then Do Other Stuff
   getVariableActions(params);
 };
-export const insertNewAnalystSatellite = (TLE1: string, TLE2: string, id: number, SCC_NUM?: string): any => {
+export const insertNewAnalystSatellite = (TLE1: string, TLE2: string, id: number, sccNum?: string): any => {
   const { satellite, timeManager, orbitManager, uiManager } = keepTrackApi.programs;
   if (satellite.altitudeCheck(TLE1, TLE2, timeManager.calculateSimulationTime()) > 1) {
     satSet.satCruncher.postMessage({
@@ -223,8 +223,8 @@ export const insertNewAnalystSatellite = (TLE1: string, TLE2: string, id: number
     orbitManager.updateOrbitBuffer(id, true, TLE1, TLE2);
     const sat = satSet.getSat(id);
     sat.active = true;
-    sat.OT = 1; // Default to Satellite
-    sat.SCC_NUM = SCC_NUM || stringPad.pad0(TLE1.substr(2, 5).trim(), 5);
+    sat.type = SpaceObjectType.PAYLOAD; // Default to Satellite
+    sat.sccNum = sccNum || stringPad.pad0(TLE1.substr(2, 5).trim(), 5);
     return sat;
   } else {
     console.debug(TLE1);
@@ -292,7 +292,7 @@ export const getSat = (i: number): SatObject => {
     };
   }
 
-  if (satSet.satData[i].type == 'Star') return satSet.satData[i];
+  if (satSet.satData[i].type === SpaceObjectType.STAR) return satSet.satData[i];
 
   // Add Functions One Time
   addSatExtraFunctions(i);
@@ -304,7 +304,7 @@ export const setHover = (i: number): void => {
   const { gl } = keepTrackApi.programs.drawManager;
   objectManager.setHoveringSat(i);
   if (i === objectManager.lasthoveringSat) return;
-  if (i !== -1 && satSet.satData[i].type == 'Star') return;
+  if (i !== -1 && satSet.satData[i].type === SpaceObjectType.STAR) return;
 
   gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
@@ -462,7 +462,7 @@ export const getIdFromObjNum = (objNum: number): number => {
     return satSet.sccIndex[`${objNum}`];
   } else {
     for (let i = 0; i < satSet.satData.length; i++) {
-      if (parseInt(satSet.satData[i].SCC_NUM) == objNum) return i;
+      if (parseInt(satSet.satData[i].sccNum) == objNum) return i;
     }
     return null;
   }
@@ -474,16 +474,15 @@ export const setSat = (i: number, sat: SatObject): void => {
 };
 export const mergeSat = (sat: SatObject): void => {
   if (!satSet.satData) return null;
-  const satId = sat?.SCC_NUM || -1;
+  const satId = sat?.sccNum || -1;
   if (satId === -1) return;
   const i = satSet.getIdFromObjNum(parseInt(satId));
-  satSet.satData[i].ON = sat.ON;
-  satSet.satData[i].OT = sat.OT;
-  satSet.satData[i].C = sat.C;
-  satSet.satData[i].LV = sat.LV;
-  satSet.satData[i].LS = sat.LS;
-  satSet.satData[i].R = sat.R;
-  satSet.satData[i].URL = sat.URL;
+  satSet.satData[i].name = sat.name;
+  satSet.satData[i].type = sat.type;
+  satSet.satData[i].country = sat.country;
+  satSet.satData[i].launchVehicle = sat.launchVehicle;
+  satSet.satData[i].launchSite = sat.launchSite;
+  satSet.satData[i].rcs = sat.rcs;
   satSet.satData[i].NOTES = sat.NOTES;
   satSet.satData[i].TTP = sat.TTP;
   satSet.satData[i].FMISSED = sat.FMISSED;
@@ -497,20 +496,22 @@ export const vmagUpdate = (vmagObject: { satid: number; vmag: any }): void => {
   (satSet.satData[vmagObject.satid].vmag = vmagObject?.vmag) || null;
 };
 export const onCruncherReady = () => {
+  const { uiManager } = keepTrackApi.programs;
   satSet.queryStr = window.location?.search?.substring(1) || '';
+  uiManager.hideLoadingScreen();
 };
-export const convertIdArrayToSatnumArray = (satIdArray: number[]) => satIdArray.map((id) => (satSet.getSat(id)?.SCC_NUM || -1).toString()).filter((satnum) => satnum !== '-1');
+export const convertIdArrayToSatnumArray = (satIdArray: number[]) => satIdArray.map((id) => (satSet.getSat(id)?.sccNum || -1).toString()).filter((satnum) => satnum !== '-1');
 export const convertSatnumArrayToIdArray = (satnumArray: number[]) => satnumArray.map((satnum) => satSet.getSatFromObjNum(satnum)?.id || null).filter((id) => id !== null);
 export const getIdFromIntlDes = (intlDes: string) => (typeof satSet.cosparIndex[`${intlDes}`] !== 'undefined' ? satSet.cosparIndex[`${intlDes}`] : null);
 export const getIdFromStarName = (starName: string) => {
-  const i = satSet.satData.findIndex((object: SatObject) => object?.type === 'Star' && object?.name === starName);
+  const i = satSet.satData.findIndex((object: SatObject) => object?.type === SpaceObjectType.STAR && object?.name === starName);
   return i === -1 ? null : i;
 };
 
 export const getSensorFromSensorName = (sensorName: string): number => {
   const i = satSet.satData.findIndex(
     // Find the first static object that isn't a missile or a star
-    (object: SatObject) => (object?.static && !object?.missile && object?.type !== 'Star' ? object.name === sensorName : false) // Test
+    (object: SatObject) => (object?.static && !object?.missile && object?.type !== SpaceObjectType.STAR ? object.name === sensorName : false) // Test
   );
   return i;
 };
@@ -687,7 +688,7 @@ export const addSatExtraFunctions = (i: number) => {
   if (typeof satSet.satData[i].getAltitude == 'undefined') {
     satSet.satData[i].getAltitude = () => {
       // Stars don't have an altitude
-      if (satSet.satData[i].type == 'Star') return;
+      if (satSet.satData[i].type === SpaceObjectType.STAR) return;
 
       if (satSet.satData[i].missile) {
         return satellite.eci2ll(satSet.satData[i].position.x, satSet.satData[i].position.y, satSet.satData[i].position.z).alt;

@@ -1,5 +1,5 @@
-import { LineColors, LineTypes } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { LineColors, LineTypes } from '@app/js/api/keepTrackTypes';
 import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants';
 import { Line } from './line';
 

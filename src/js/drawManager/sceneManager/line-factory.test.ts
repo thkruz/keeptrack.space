@@ -1,6 +1,6 @@
 import { defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
-import { SatObject } from '../../api/keepTrack';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { SatObject } from '../../api/keepTrackTypes';
 import * as lineManager from './line-factory';
 
 keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };

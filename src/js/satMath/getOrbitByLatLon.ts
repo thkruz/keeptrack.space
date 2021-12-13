@@ -1,7 +1,7 @@
 import { RAD2DEG } from '@app/js/lib/constants';
 import { stringPad } from '@app/js/lib/helpers';
 import { SatRec } from 'satellite.js';
-import { SatObject } from '../api/keepTrack';
+import { SatObject } from '../api/keepTrackTypes';
 import { calculateTimeVariables, satellite } from './satMath';
 
 enum PropagationOptions {
@@ -57,8 +57,8 @@ export const getOrbitByLatLon = (sat: SatObject, goalLat: number, goalLon: numbe
     const argPe = newArgPer ? stringPad.pad0((parseFloat(newArgPer) / 10).toPrecision(7), 8) : stringPad.pad0((sat.argPe * RAD2DEG).toPrecision(7), 8);
 
     const TLE1Ending = sat.TLE1.substr(32, 39);
-    const TLE1 = '1 ' + sat.SCC_NUM + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    const TLE2 = '2 ' + sat.SCC_NUM + ' ' + inc + ' ' + raan + ' ' + ecen + ' ' + argPe + ' ' + meanaStr + ' ' + meanmo + '    10';
+    const TLE1 = '1 ' + sat.sccNum + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+    const TLE2 = '2 ' + sat.sccNum + ' ' + inc + ' ' + raan + ' ' + ecen + ' ' + argPe + ' ' + meanaStr + ' ' + meanmo + '    10';
 
     satrec = satellite.twoline2satrec(TLE1, TLE2);
     const results = getOrbitByLatLonPropagate(now, satrec, PropagationOptions.MeanAnomaly);
@@ -81,8 +81,8 @@ export const getOrbitByLatLon = (sat: SatObject, goalLat: number, goalLon: numbe
     argPe = stringPad.pad0((parseFloat(argPe) / 10).toPrecision(7), 8);
 
     // Create the new TLEs
-    const TLE1 = '1 ' + sat.SCC_NUM + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending;
-    const TLE2 = '2 ' + sat.SCC_NUM + ' ' + inc + ' ' + raan + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
+    const TLE1 = '1 ' + sat.sccNum + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending;
+    const TLE2 = '2 ' + sat.sccNum + ' ' + inc + ' ' + raan + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
 
     // Calculate the orbit
     const satrec = <SatRec>satellite.twoline2satrec(TLE1, TLE2);
@@ -113,8 +113,8 @@ export const getOrbitByLatLon = (sat: SatObject, goalLat: number, goalLon: numbe
     // If we adjusted argPe use the new one - otherwise use the old one
     const argPe = newArgPer ? stringPad.pad0((parseFloat(newArgPer) / 10).toPrecision(7), 8) : stringPad.pad0((sat.argPe * RAD2DEG).toPrecision(7), 8);
 
-    const TLE1 = '1 ' + sat.SCC_NUM + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    const TLE2 = '2 ' + sat.SCC_NUM + ' ' + inc + ' ' + raanStr + ' ' + ecen + ' ' + argPe + ' ' + newMeana + ' ' + meanmo + '    10';
+    const TLE1 = '1 ' + sat.sccNum + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+    const TLE2 = '2 ' + sat.sccNum + ' ' + inc + ' ' + raanStr + ' ' + ecen + ' ' + argPe + ' ' + newMeana + ' ' + meanmo + '    10';
 
     const satrec = <SatRec>satellite.twoline2satrec(TLE1, TLE2);
     const results = getOrbitByLatLonPropagate(now, satrec, PropagationOptions.RightAscensionOfAscendingNode);
@@ -127,7 +127,7 @@ export const getOrbitByLatLon = (sat: SatObject, goalLat: number, goalLon: numbe
 
       const raanStr = stringPad.pad0(raan.toPrecision(7), 8);
 
-      const TLE2 = '2 ' + sat.SCC_NUM + ' ' + inc + ' ' + raanStr + ' ' + ecen + ' ' + argPe + ' ' + newMeana + ' ' + meanmo + '    10';
+      const TLE2 = '2 ' + sat.sccNum + ' ' + inc + ' ' + raanStr + ' ' + ecen + ' ' + argPe + ' ' + newMeana + ' ' + meanmo + '    10';
 
       sat.TLE1 = TLE1;
       sat.TLE2 = TLE2;

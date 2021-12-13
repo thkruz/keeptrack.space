@@ -20,8 +20,8 @@ describe('countries.init', () => {
 describe('countries.countryMenuClick', () => {
   keepTrackApi.programs.groupsManager.createGroup = () => ({
     sats: [
-      { satId: 1, SCC_NUM: '25544' },
-      { satId: 1, SCC_NUM: '25544' },
+      { satId: 1, sccNum: '25544' },
+      { satId: 1, sccNum: '25544' },
     ],
     updateOrbits: jest.fn(),
   });

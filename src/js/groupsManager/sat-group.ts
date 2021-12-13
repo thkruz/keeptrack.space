@@ -1,4 +1,4 @@
-import { CatalogManager, MissileObject, OrbitManager, SatGroupCollection, SatObject } from '../api/keepTrack';
+import { CatalogManager, MissileObject, OrbitManager, SatGroupCollection, SatObject } from '../api/keepTrackTypes';
 
 export class SatGroup {
   sats: SatGroupCollection[];
@@ -11,7 +11,7 @@ export class SatGroup {
       case 'all':
         this.sats = [];
         satSet.satData.every((sat) => {
-          if (typeof sat.SCC_NUM !== 'undefined') {
+          if (typeof sat.sccNum !== 'undefined') {
             this.sats.push({
               satId: sat.id,
               isIntlDes: true,
@@ -87,10 +87,10 @@ export class SatGroup {
     this.updateOrbits = (orbitManager: OrbitManager) => {
       this.sats.forEach((sat) => {
         if (sat.missile) {
-          const missile = <MissileObject>sat;
+          const missile = <MissileObject>(<unknown>sat);
           orbitManager.updateOrbitBuffer(missile.id, null, null, null, true, missile.latList, missile.lonList, missile.altList, missile.startTime);
         } else {
-          orbitManager.updateOrbitBuffer(sat?.satId);
+          orbitManager.updateOrbitBuffer(sat.satId);
         }
       });
     };

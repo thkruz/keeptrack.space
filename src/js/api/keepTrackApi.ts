@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { KeepTrackApi, SatObject } from './keepTrack';
+import { KeepTrackApi, SatObject } from './keepTrackTypes';
 
 export const keepTrackApi: KeepTrackApi = {
   html: (strings: TemplateStringsArray, ...placeholders: any[]) => {

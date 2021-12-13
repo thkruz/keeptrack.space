@@ -1,4 +1,5 @@
-import { SensorObject } from '@app/js/api/keepTrack';
+import { SensorObject } from '@app/js/api/keepTrackTypes';
+import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 
 interface SensorList {
   [key: string]: SensorObject;
@@ -8,7 +9,7 @@ const sensorList: SensorList = {
   COD: {
     name: 'Cape Cod AFS, Massachusetts',
     shortName: 'COD',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 41.754785,
     lon: -70.539151,
     alt: 0.060966,
@@ -31,7 +32,7 @@ const sensorList: SensorList = {
   BLE: {
     name: 'Beale AFB, California',
     shortName: 'BLE',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 39.136064,
     lon: -121.351237,
     alt: 0.112, // Open Street Maps
@@ -53,7 +54,7 @@ const sensorList: SensorList = {
   CLR: {
     name: 'Clear AFS, Alaska',
     shortName: 'CLR',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 64.290556,
     lon: -149.186944,
     alt: 0.175, // Open Street Maps
@@ -75,7 +76,7 @@ const sensorList: SensorList = {
   EGL: {
     name: 'Eglin AFB, Florida',
     shortName: 'EGL',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 30.572411,
     lon: -86.214836,
     alt: 0.039, // Open Street Maps
@@ -96,7 +97,7 @@ const sensorList: SensorList = {
   FYL: {
     name: 'RAF Fylingdales, United Kingdom',
     shortName: 'FYL',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 54.361758,
     lon: -0.670051,
     alt: 0.26, // Open Street Maps
@@ -118,7 +119,7 @@ const sensorList: SensorList = {
   CAV: {
     name: 'Cavalier AFS, North Dakota',
     shortName: 'CAV',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 48.724567,
     lon: -97.899755,
     alt: 0.352, // Open Street Maps
@@ -140,7 +141,7 @@ const sensorList: SensorList = {
   THL: {
     name: 'Thule AFB, Greenland',
     shortName: 'THL',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 76.570322,
     lon: -68.299211,
     alt: 0.392, // Open Street Maps
@@ -163,7 +164,7 @@ const sensorList: SensorList = {
   CDN: {
     name: 'Cobra Dane, Alaska',
     shortName: 'CDN',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 52.737,
     lon: 174.092,
     alt: 0.066, // Open Street Maps
@@ -190,7 +191,7 @@ const sensorList: SensorList = {
   ALT: {
     name: 'ALTAIR, Kwajalein Atoll',
     shortName: 'ALT',
-    type: 'Mechanical',
+    type: SpaceObjectType.MECHANICAL,
     lat: 8.716667,
     lon: 167.733333,
     alt: 0,
@@ -212,7 +213,7 @@ const sensorList: SensorList = {
   MMW: {
     name: 'Millimeter Wave Radar, Kwajalein Atoll',
     shortName: 'MMW',
-    type: 'Mechanical',
+    type: SpaceObjectType.MECHANICAL,
     lat: 8.756668,
     lon: 167.773334,
     alt: 0,
@@ -234,7 +235,7 @@ const sensorList: SensorList = {
   ALC: {
     name: 'ALCOR Radar, Kwajalein Atoll',
     shortName: 'ALC',
-    type: 'Mechanical',
+    type: SpaceObjectType.MECHANICAL,
     lat: 8.716668,
     lon: 167.773334,
     alt: 0,
@@ -256,7 +257,7 @@ const sensorList: SensorList = {
   TDX: {
     name: 'TRADEX Radar, Kwajalein Atoll',
     shortName: 'TDX',
-    type: 'Mechanical',
+    type: SpaceObjectType.MECHANICAL,
     lat: 8.756668,
     lon: 167.733334,
     alt: 0,
@@ -278,7 +279,7 @@ const sensorList: SensorList = {
   MIL: {
     name: 'Millstone, Massachusetts',
     shortName: 'MIL',
-    type: 'Mechanical',
+    type: SpaceObjectType.MECHANICAL,
     lat: 42.6233,
     lon: -71.4882,
     alt: 0.131,
@@ -298,7 +299,7 @@ const sensorList: SensorList = {
   DGC: {
     name: 'Diego Garcia',
     shortName: 'DGC',
-    type: 'Optical',
+    type: SpaceObjectType.OPTICAL,
     lat: -7.29648,
     lon: 72.390153,
     alt: 0.0,
@@ -318,7 +319,7 @@ const sensorList: SensorList = {
   MAU: {
     name: 'Maui, Hawaii',
     shortName: 'MAU',
-    type: 'Optical',
+    type: SpaceObjectType.OPTICAL,
     lat: 20.70835,
     lon: -156.257595,
     alt: 3.0,
@@ -338,7 +339,7 @@ const sensorList: SensorList = {
   SOC: {
     name: 'Socorro, New Mexico',
     shortName: 'SOC',
-    type: 'Optical',
+    type: SpaceObjectType.OPTICAL,
     lat: 33.817233,
     lon: -106.659961,
     alt: 1.24,
@@ -358,7 +359,7 @@ const sensorList: SensorList = {
   ASC: {
     name: 'Ascension Island, United Kingdom',
     shortName: 'ASC',
-    type: 'Mechanical',
+    type: SpaceObjectType.MECHANICAL,
     lat: -7.969444,
     lon: -14.393889,
     alt: 0.0,
@@ -378,7 +379,7 @@ const sensorList: SensorList = {
   GLB: {
     name: 'Globus II, NOR',
     shortName: 'GLB',
-    type: 'Mechanical',
+    type: SpaceObjectType.MECHANICAL,
     lat: 70.3671,
     lon: 31.1271,
     alt: 0.0,
@@ -398,7 +399,7 @@ const sensorList: SensorList = {
   HOL: {
     name: 'C-Band (Holt) Radar, Australia',
     shortName: 'HOL',
-    type: 'Mechanical',
+    type: SpaceObjectType.MECHANICAL,
     lat: -21.816195,
     lon: 114.165637,
     alt: 0.0,
@@ -423,7 +424,7 @@ const sensorList: SensorList = {
   HAR: {
     name: 'Har Keren TPY-2, Israel',
     shortName: 'HAR',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 30.995807,
     lon: 34.496062,
     alt: 0.173,
@@ -443,7 +444,7 @@ const sensorList: SensorList = {
   QTR: {
     name: 'Centcom TPY-2, Qatar',
     shortName: 'QTR',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 25.31598,
     lon: 51.146515,
     alt: 0.01,
@@ -463,7 +464,7 @@ const sensorList: SensorList = {
   KUR: {
     name: 'Kürecik Radar Station, Turkey',
     shortName: 'KUR',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 38.349444,
     lon: 37.793611,
     alt: 1.969,
@@ -484,7 +485,7 @@ const sensorList: SensorList = {
   SHA: {
     name: 'Shariki Communication Site, Japan',
     shortName: 'SHA',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 40.88809,
     lon: 140.337698,
     alt: 0.01,
@@ -505,7 +506,7 @@ const sensorList: SensorList = {
   KCS: {
     name: 'Kyogamisaki Communication Site, Japan',
     shortName: 'KCS',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 35.766667,
     lon: 135.195278,
     alt: 0.01,
@@ -526,7 +527,7 @@ const sensorList: SensorList = {
   SBX: {
     name: 'Sea-Based X-Band Radar, Pacific Ocean',
     shortName: 'SBX',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 36.5012,
     lon: 169.6941,
     alt: 0.0,
@@ -551,7 +552,7 @@ const sensorList: SensorList = {
   MSR: {
     name: 'Midland Space Radar, Texas',
     shortName: 'MSR',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 31.9643,
     lon: -103.233245,
     alt: 0.855,
@@ -578,7 +579,7 @@ const sensorList: SensorList = {
   PFISR: {
     name: 'Poker Flat Incoherent Scatter Radar, Alaska',
     shortName: 'PFISR',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 65.130029,
     lon: -147.470992,
     alt: 0.23,
@@ -599,7 +600,7 @@ const sensorList: SensorList = {
   KSR: {
     name: 'Kiwi Space Radar, New Zealand',
     shortName: 'KSR',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: -45.038725,
     lon: 170.095673,
     alt: 0.0,
@@ -629,7 +630,7 @@ const sensorList: SensorList = {
   GRV: {
     name: 'Grand Réseau Adapté à la Veille Spatiale, France',
     shortName: 'GRV',
-    type: 'Phased Array',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 47.347778,
     lon: 5.51638,
     alt: 0.0,
@@ -649,7 +650,7 @@ const sensorList: SensorList = {
   TIR: {
     name: 'Tracking and Imaging Radar, Germany',
     shortName: 'TIR',
-    type: 'Mechanical',
+    type: SpaceObjectType.MECHANICAL,
     lat: 50.6166,
     lon: 7.1296,
     alt: 0.0,
@@ -669,7 +670,7 @@ const sensorList: SensorList = {
   NRC: {
     name: 'Croce del Nord, Italy',
     shortName: 'NRC',
-    type: 'Bistatic Radio Telescope',
+    type: SpaceObjectType.BISTATIC_RADIO_TELESCOPE,
     lat: 44.5208,
     lon: 11.6469,
     alt: 0.025,
@@ -695,7 +696,7 @@ const sensorList: SensorList = {
   TRO: {
     name: 'RAF Troodos, United Kingdom',
     shortName: 'TRO',
-    type: 'Optical',
+    type: SpaceObjectType.OPTICAL,
     lat: 34.912778,
     lon: 32.883889,
     alt: 0,
@@ -715,7 +716,7 @@ const sensorList: SensorList = {
   SDT: {
     name: 'ESA Space Debris Telescope, Spain',
     shortName: 'SDT',
-    type: 'Optical',
+    type: SpaceObjectType.OPTICAL,
     lat: 28.3,
     lon: -16.5097,
     alt: 0,
@@ -739,7 +740,7 @@ const sensorList: SensorList = {
   ARM: {
     name: 'Armavir, Russia',
     shortName: 'ARM',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 44.925106,
     lon: 40.983894,
     alt: 0.0,
@@ -759,7 +760,7 @@ const sensorList: SensorList = {
   BAL: {
     name: 'Balkhash, Russia',
     shortName: 'BAL',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 46.603076,
     lon: 74.530985,
     alt: 0.0,
@@ -778,7 +779,7 @@ const sensorList: SensorList = {
   GAN: {
     name: 'Gantsevichi, Russia',
     shortName: 'GAN',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 52.85,
     lon: 26.48,
     alt: 0.0,
@@ -797,7 +798,7 @@ const sensorList: SensorList = {
   LEK: {
     name: 'Lekhtusi, Russia',
     shortName: 'LEK',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 60.275458,
     lon: 30.546017,
     alt: 0.0,
@@ -816,7 +817,7 @@ const sensorList: SensorList = {
   MIS: {
     name: 'Mishelevka-D, Russia',
     shortName: 'MIS',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 52.8555,
     lon: 103.2317,
     alt: 0.0,
@@ -835,7 +836,7 @@ const sensorList: SensorList = {
   OLE: {
     name: 'Olenegorsk, Russia',
     shortName: 'OLE',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 68.1141,
     lon: 33.9102,
     alt: 0.0,
@@ -854,7 +855,7 @@ const sensorList: SensorList = {
   PEC: {
     name: 'Pechora, Russia',
     shortName: 'PEC',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 65.21,
     lon: 57.295,
     alt: 0.0,
@@ -873,7 +874,7 @@ const sensorList: SensorList = {
   PIO: {
     name: 'Pionersky, Russia',
     shortName: 'PIO',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 54.857294,
     lon: 20.18235,
     alt: 0.0,
@@ -892,7 +893,7 @@ const sensorList: SensorList = {
   XUA: {
     name: 'Xuanhua, China',
     shortName: 'XUA',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 40.446944,
     lon: 115.116389,
     alt: 1.6,
@@ -913,7 +914,7 @@ const sensorList: SensorList = {
   MLS: {
     name: 'Mount Lemmon Survey, Arizona',
     shortName: 'MLS',
-    type: 'Optical',
+    type: SpaceObjectType.OPTICAL,
     lat: 32.442,
     lon: -110.789,
     alt: 2.791,
@@ -933,7 +934,7 @@ const sensorList: SensorList = {
   PMO: {
     name: 'Purple Mountain Observatory, China',
     shortName: 'PMO',
-    type: 'Optical',
+    type: SpaceObjectType.OPTICAL,
     lat: 32.064946,
     lon: 118.829677,
     alt: 0.267,
@@ -953,7 +954,7 @@ const sensorList: SensorList = {
   PO: {
     name: 'Palomar Observatory, California',
     shortName: 'PO',
-    type: 'Optical',
+    type: SpaceObjectType.OPTICAL,
     lat: 33.3564,
     lon: -116.865,
     alt: 1.712,
@@ -973,7 +974,7 @@ const sensorList: SensorList = {
   LSO: {
     name: 'La Sagra Observatory, Spain',
     shortName: 'LSO',
-    type: 'Optical',
+    type: SpaceObjectType.OPTICAL,
     lat: 37.9839,
     lon: -2.5644,
     alt: 0,
@@ -994,7 +995,7 @@ const sensorList: SensorList = {
   MAY: {
     name: 'Mayhill, New Mexico',
     shortName: 'MAY',
-    type: 'Optical',
+    type: SpaceObjectType.OPTICAL,
     lat: 32.9039,
     lon: -105.5289,
     alt: 2.225,
@@ -1013,7 +1014,7 @@ const sensorList: SensorList = {
   TAI: {
     name: 'Surveillance Radar Program, Taiwan',
     shortName: 'TAI',
-    type: 'Phased Array Radar',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 24.499,
     lon: 121.072,
     alt: 0.060966, // Find accurate altitude

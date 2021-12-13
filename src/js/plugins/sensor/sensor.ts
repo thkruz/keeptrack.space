@@ -24,8 +24,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { SensorObject } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SensorObject } from '@app/js/api/keepTrackTypes';
 import $ from 'jquery';
 
 let sensorLinks = false;

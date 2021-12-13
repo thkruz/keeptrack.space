@@ -1,4 +1,4 @@
-import { SatObject } from '@app/js/api/keepTrack';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import { ColorInformation, Pickable } from '../colorSchemeManager';
 
 /*

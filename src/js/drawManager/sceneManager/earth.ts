@@ -1,5 +1,5 @@
-import { Camera, DotsManager, EarthObject } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { Camera, DotsManager, EarthObject } from '@app/js/api/keepTrackTypes';
 import { DEG2RAD, MILLISECONDS_PER_DAY, RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { satellite } from '@app/js/satMath/satMath';
 import { jday } from '@app/js/timeManager/transforms';

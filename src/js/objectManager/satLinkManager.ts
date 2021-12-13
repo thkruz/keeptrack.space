@@ -1,4 +1,4 @@
-import { CatalogManager, SatObject, SensorManager } from '../api/keepTrack';
+import { CatalogManager, SatObject, SensorManager } from '../api/keepTrackTypes';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { RAD2DEG } from '../lib/constants';
 import { numeric } from '../lib/external/numeric';

@@ -1,8 +1,8 @@
-import { SatObject } from '@app/js/api/keepTrack';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
 
 export const rcsRules = (sat: SatObject): ColorInformation => {
-  const rcs: number = parseFloat(sat.R);
+  const rcs: number = parseFloat(sat.rcs);
   if (rcs < 0.1 && colorSchemeManager.objectTypeFlags.rcsSmall === false) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
@@ -21,7 +21,7 @@ export const rcsRules = (sat: SatObject): ColorInformation => {
       pickable: Pickable.No,
     };
   }
-  if ((typeof rcs === 'undefined' || rcs === null || typeof sat.R === 'undefined' || sat.R === 'N/A') && colorSchemeManager.objectTypeFlags.rcsUnknown === false) {
+  if ((typeof rcs === 'undefined' || rcs === null || typeof sat.rcs === 'undefined' || sat.rcs === 'N/A') && colorSchemeManager.objectTypeFlags.rcsUnknown === false) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
       pickable: Pickable.No,

@@ -24,8 +24,8 @@
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { MapManager } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { MapManager } from '@app/js/api/keepTrackTypes';
 import $ from 'jquery';
 
 const defaults = {
@@ -221,7 +221,7 @@ export const bottomMenuClick = (iconName: string): void => {
       const satData = satSet.getSatExtraOnly(objectManager.selectedSat);
       $('#map-sat').tooltip({
         // delay: 50,
-        html: satData.SCC_NUM,
+        html: satData.sccNum,
         position: 'left',
       });
       $('#menu-map').addClass('bmenu-item-selected');

@@ -147,7 +147,7 @@ export const searchN2yo = (satNum: any, analsat?: number) => {
   // If no Analyst Satellite specified find the first unused one
   if (typeof analsat == 'undefined') {
     for (let i = 15000; i < satData.length; i++) {
-      if (parseInt(satData[i].SCC_NUM) >= 80000 && !satData[i].active) {
+      if (parseInt(satData[i].sccNum) >= 80000 && !satData[i].active) {
         analsat = i;
         break;
       }
@@ -180,7 +180,7 @@ export const searchN2yoOnLoad = (request: { status: number; response: string }, 
     if (TLE1.substr(0, 2) !== '1 ') throw new Error('N2YO TLE 1 is not a valid TLE');
     if (TLE2.substr(0, 2) !== '2 ') throw new Error('N2YO TLE 2 is not a valid TLE');
     const sat = satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-    uiManager.doSearch(sat.SCC_NUM.toString());
+    uiManager.doSearch(sat.sccNum.toString());
   } else {
     // We reached our target server, but it returned an error
     // console.debug('N2YO request returned an error!');
@@ -215,7 +215,7 @@ export const searchCelestrackOnLoad = (request: any, analsat: number): any => {
     if (TLE1.substr(0, 2) !== '1 ') throw new Error(`N2YO TLE 1 is not a valid TLE -- ${TLE1.substr(0, 2)}`);
     if (TLE2.substr(0, 2) !== '2 ') throw new Error(`N2YO TLE 2 is not a valid TLE -- ${TLE2.substr(0, 2)}`);
     const sat = satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-    uiManager.doSearch(sat.SCC_NUM.toString());
+    uiManager.doSearch(sat.sccNum.toString());
   } else {
     // We reached our target server, but it returned an error
     // console.debug('Celestrack request returned an error!');
@@ -228,7 +228,7 @@ export const searchCelestrak = (satNum: any, analsat?: number) => {
   // If no Analyst Satellite specified find the first unused one
   if (typeof analsat == 'undefined') {
     for (let i = 15000; i < satData.length; i++) {
-      if (parseInt(satData[i].SCC_NUM) >= 80000 && !satData[i].active) {
+      if (parseInt(satData[i].sccNum) >= 80000 && !satData[i].active) {
         analsat = i;
         break;
       }

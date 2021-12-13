@@ -1,5 +1,5 @@
-import { SatChngObject } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SatChngObject } from '@app/js/api/keepTrackTypes';
 import { dateFromJday } from '@app/js/timeManager/transforms';
 import { uiManager } from '@app/js/uiManager/uiManager';
 import $ from 'jquery';

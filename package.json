@@ -23,6 +23,7 @@
     "access": "public"
   },
   "scripts": {
+    "catalogManager": "npx ts-node .\\src\\admin\\node\\catalogManager.ts -p .\\src\\admin\\node\\tsconfig.json",
     "build": "npm run build:dev",
     "build:dev": "cross-env NODE_ENV=development node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",
     "build:embed": "npm run prebuild:embed && cross-env NODE_ENV=embed node --max-old-space-size=8192 --no-deprecation node_modules/webpack/bin/webpack.js --config ./scripts/webpack.js",

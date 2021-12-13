@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import { TimeManager } from '../api/keepTrack';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { TimeManager } from '../api/keepTrackTypes';
 import { getDayOfYear } from './transforms';
 
 export const changePropRate = (propRate: number) => {

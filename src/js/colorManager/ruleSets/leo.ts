@@ -1,8 +1,9 @@
-import { SatObject } from '@app/js/api/keepTrack';
+import { SatObject } from '@app/js/api/keepTrackTypes';
+import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
 
 export const leoRules = (sat: SatObject): ColorInformation => {
-  if (sat.static && sat.type === 'Star') {
+  if (sat.static && sat.type === SpaceObjectType.STAR) {
     if (sat.vmag >= 4.7 && colorSchemeManager.objectTypeFlags.starLow) {
       return {
         color: colorSchemeManager.colorTheme.starLow,
@@ -28,14 +29,14 @@ export const leoRules = (sat: SatObject): ColorInformation => {
   }
   // Let's see if we can determine color based on the object type
   switch (sat.type) {
-    case 'Intergovernmental Organization':
-    case 'Suborbital Payload Operator':
-    case 'Payload Owner':
-    case 'Meteorological Rocket Launch Agency or Manufacturer':
-    case 'Payload Manufacturer':
-    case 'Launch Agency':
-    case 'Launch Site':
-    case 'Launch Position':
+    case SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION:
+    case SpaceObjectType.SUBORBITAL_PAYLOAD_OPERATOR:
+    case SpaceObjectType.PAYLOAD_OWNER:
+    case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
+    case SpaceObjectType.PAYLOAD_MANUFACTURER:
+    case SpaceObjectType.LAUNCH_AGENCY:
+    case SpaceObjectType.LAUNCH_SITE:
+    case SpaceObjectType.LAUNCH_POSITION:
       return {
         color: colorSchemeManager.colorTheme.facility,
         pickable: Pickable.Yes,

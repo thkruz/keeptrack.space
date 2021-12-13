@@ -1,5 +1,6 @@
-import { Camera, SatObject } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { Camera, SatObject } from '@app/js/api/keepTrackTypes';
+import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { satellite } from '@app/js/satMath/satMath';
 import $ from 'jquery';
 
@@ -19,7 +20,7 @@ const selectSatManager = {
       // Get the satellite object
       sat = satSet.getSat(satId);
       // Selecting a star does nothing
-      if (sat.type == 'Star') return;
+      if (sat.type == SpaceObjectType.STAR) return;
       // Selecting a non-missile non-sensor object does nothing
       if ((sat.active == false || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') return;
       // stop rotation if it is on
@@ -88,7 +89,7 @@ const selectSatManager = {
       objectManager.setSelectedSat(satId);
       sat = satSet.getSatExtraOnly(satId);
       if (!sat) return;
-      if (sat.type == 'Star') {
+      if (sat.type === SpaceObjectType.STAR) {
         selectSatManager.selectSat(-1, mainCamera);
         return;
       }

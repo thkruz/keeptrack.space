@@ -2,6 +2,7 @@
 
 import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import { getDayOfYear } from '../timeManager/transforms';
 import { colorSchemeManager } from './colorSchemeManager';
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
@@ -162,7 +163,7 @@ describe('colorSchemeManager.defaultRules', () => {
   test('0', () => {
     let result: any = colorSchemeManager.default({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
     });
     expect(result).toMatchSnapshot();
   });
@@ -171,7 +172,7 @@ describe('colorSchemeManager.defaultRules', () => {
     let result: any = colorSchemeManager.default({
       static: true,
       vmag: 5,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
     });
     expect(result).toMatchSnapshot();
   });
@@ -180,7 +181,7 @@ describe('colorSchemeManager.defaultRules', () => {
     let result: any = colorSchemeManager.default({
       static: true,
       vmag: 3.6,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
     });
     expect(result).toMatchSnapshot();
   });
@@ -189,7 +190,7 @@ describe('colorSchemeManager.defaultRules', () => {
     let result: any = colorSchemeManager.default({
       static: true,
       vmag: 1,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
     });
     expect(result).toMatchSnapshot();
   });
@@ -205,7 +206,7 @@ describe('colorSchemeManager.defaultRules', () => {
     colorSchemeManager.objectTypeFlags.facility = false;
     let result: any = colorSchemeManager.default({
       static: true,
-      type: 'Launch Facility',
+      type: SpaceObjectType.LAUNCH_FACILITY,
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.facility = true;
@@ -214,7 +215,7 @@ describe('colorSchemeManager.defaultRules', () => {
   test('6', () => {
     let result: any = colorSchemeManager.default({
       static: true,
-      type: 'Launch Facility',
+      type: SpaceObjectType.LAUNCH_FACILITY,
     });
     expect(result).toMatchSnapshot();
   });
@@ -298,7 +299,7 @@ describe('colorSchemeManager.defaultRules', () => {
   test('15', () => {
     colorSchemeManager.objectTypeFlags.payload = false;
     let result: any = colorSchemeManager.default({
-      OT: 1,
+      type: 1,
       inView: false,
     });
     expect(result).toMatchSnapshot();
@@ -308,7 +309,7 @@ describe('colorSchemeManager.defaultRules', () => {
   test('16', () => {
     colorSchemeManager.objectTypeFlags.rocketBody = false;
     let result: any = colorSchemeManager.default({
-      OT: 2,
+      type: 2,
       inView: false,
     });
     expect(result).toMatchSnapshot();
@@ -318,7 +319,7 @@ describe('colorSchemeManager.defaultRules', () => {
   test('17', () => {
     colorSchemeManager.objectTypeFlags.debris = false;
     let result: any = colorSchemeManager.default({
-      OT: 3,
+      type: 3,
       inView: false,
     });
     expect(result).toMatchSnapshot();
@@ -328,7 +329,7 @@ describe('colorSchemeManager.defaultRules', () => {
   test('18', () => {
     colorSchemeManager.objectTypeFlags.trusat = false;
     let result: any = colorSchemeManager.default({
-      OT: 4,
+      type: 4,
       inView: false,
     });
     expect(result).toMatchSnapshot();
@@ -362,42 +363,42 @@ describe('colorSchemeManager.defaultRules', () => {
 
   test('22', () => {
     let result: any = colorSchemeManager.default({
-      C: 'ANALSAT',
+      country: 'ANALSAT',
     });
     expect(result).toMatchSnapshot();
   });
 
   test('23', () => {
     let result: any = colorSchemeManager.default({
-      OT: 1,
+      type: 1,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('24', () => {
     let result: any = colorSchemeManager.default({
-      OT: 2,
+      type: 2,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('25', () => {
     let result: any = colorSchemeManager.default({
-      OT: 3,
+      type: 3,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('26', () => {
     let result: any = colorSchemeManager.default({
-      OT: 4,
+      type: 4,
     });
     expect(result).toMatchSnapshot();
   });
 
   test('27', () => {
     let result: any = colorSchemeManager.default({
-      OT: 5,
+      type: 5,
     });
     expect(result).toMatchSnapshot();
   });
@@ -426,7 +427,7 @@ describe('colorSchemeManager.sunlightRules', () => {
     colorSchemeManager.objectTypeFlags.facility = false;
     let result: any = colorSchemeManager.sunlight({
       static: true,
-      type: 'Launch Facility',
+      type: SpaceObjectType.LAUNCH_FACILITY,
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.facility = true;
@@ -435,7 +436,7 @@ describe('colorSchemeManager.sunlightRules', () => {
   test('1', () => {
     let result: any = colorSchemeManager.sunlight({
       static: true,
-      type: 'Launch Facility',
+      type: SpaceObjectType.LAUNCH_FACILITY,
     });
     expect(result).toMatchSnapshot();
   });
@@ -443,7 +444,7 @@ describe('colorSchemeManager.sunlightRules', () => {
   test('2', () => {
     let result: any = colorSchemeManager.sunlight({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
     });
     expect(result).toMatchSnapshot();
   });
@@ -451,7 +452,7 @@ describe('colorSchemeManager.sunlightRules', () => {
   test('3', () => {
     let result: any = colorSchemeManager.sunlight({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 5,
     });
     expect(result).toMatchSnapshot();
@@ -460,7 +461,7 @@ describe('colorSchemeManager.sunlightRules', () => {
   test('4', () => {
     let result: any = colorSchemeManager.sunlight({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 3.6,
     });
     expect(result).toMatchSnapshot();
@@ -469,7 +470,7 @@ describe('colorSchemeManager.sunlightRules', () => {
   test('5', () => {
     let result: any = colorSchemeManager.sunlight({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 1,
     });
     expect(result).toMatchSnapshot();
@@ -591,7 +592,7 @@ describe('colorSchemeManager.smallsatsRules', () => {
   test('0', () => {
     colorSchemeManager.objectTypeFlags.satSmall = false;
     let result: any = colorSchemeManager.smallsats({
-      OT: 1,
+      type: 1,
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.satSmall = true;
@@ -599,8 +600,8 @@ describe('colorSchemeManager.smallsatsRules', () => {
 
   test('1', () => {
     let result: any = colorSchemeManager.smallsats({
-      OT: 1,
-      R: 0.01,
+      type: 1,
+      rcs: '0.01',
     });
     expect(result).toMatchSnapshot();
   });
@@ -614,7 +615,7 @@ describe('colorSchemeManager.rcsRules', () => {
   test('0', () => {
     colorSchemeManager.objectTypeFlags.rcsSmall = false;
     let result: any = colorSchemeManager.rcs({
-      R: 0.01,
+      rcs: '0.01',
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.rcsSmall = true;
@@ -622,7 +623,7 @@ describe('colorSchemeManager.rcsRules', () => {
 
   test('1', () => {
     let result: any = colorSchemeManager.rcs({
-      R: 0.01,
+      rcs: '0.01',
     });
     expect(result).toMatchSnapshot();
   });
@@ -630,7 +631,7 @@ describe('colorSchemeManager.rcsRules', () => {
   test('2', () => {
     colorSchemeManager.objectTypeFlags.rcsMed = false;
     let result: any = colorSchemeManager.rcs({
-      R: 0.5,
+      rcs: '0.5',
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.rcsMed = true;
@@ -638,7 +639,7 @@ describe('colorSchemeManager.rcsRules', () => {
 
   test('3', () => {
     let result: any = colorSchemeManager.rcs({
-      R: 0.5,
+      rcs: '0.5',
     });
     expect(result).toMatchSnapshot();
   });
@@ -646,7 +647,7 @@ describe('colorSchemeManager.rcsRules', () => {
   test('4', () => {
     colorSchemeManager.objectTypeFlags.rcsLarge = false;
     let result: any = colorSchemeManager.rcs({
-      R: 1.5,
+      rcs: '1.5',
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.rcsLarge = true;
@@ -654,7 +655,7 @@ describe('colorSchemeManager.rcsRules', () => {
 
   test('5', () => {
     let result: any = colorSchemeManager.rcs({
-      R: 1.5,
+      rcs: '1.5',
     });
     expect(result).toMatchSnapshot();
   });
@@ -680,7 +681,7 @@ describe('colorSchemeManager.countriesRules', () => {
   test('0', () => {
     colorSchemeManager.objectTypeFlags.countryUS = false;
     let result: any = colorSchemeManager.countries({
-      C: 'US',
+      C: 'United States of America',
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.countryUS = true;
@@ -688,7 +689,7 @@ describe('colorSchemeManager.countriesRules', () => {
 
   test('1', () => {
     let result: any = colorSchemeManager.countries({
-      C: 'US',
+      C: 'United States of America',
     });
     expect(result).toMatchSnapshot();
   });
@@ -742,7 +743,7 @@ describe('colorSchemeManager.ageOfElsetRules', () => {
   test('0', () => {
     let result: any = colorSchemeManager.ageOfElset({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 5,
     });
     expect(result).toMatchSnapshot();
@@ -751,7 +752,7 @@ describe('colorSchemeManager.ageOfElsetRules', () => {
   test('1', () => {
     let result: any = colorSchemeManager.ageOfElset({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 3.6,
     });
     expect(result).toMatchSnapshot();
@@ -760,7 +761,7 @@ describe('colorSchemeManager.ageOfElsetRules', () => {
   test('2', () => {
     let result: any = colorSchemeManager.ageOfElset({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
@@ -769,7 +770,7 @@ describe('colorSchemeManager.ageOfElsetRules', () => {
   test('3', () => {
     let result: any = colorSchemeManager.ageOfElset({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
     });
     expect(result).toMatchSnapshot();
   });
@@ -777,7 +778,7 @@ describe('colorSchemeManager.ageOfElsetRules', () => {
   test('4', () => {
     let result: any = colorSchemeManager.ageOfElset({
       static: true,
-      type: 'Control Facility',
+      type: SpaceObjectType.CONTORL_FACILITY,
     });
     expect(result).toMatchSnapshot();
   });
@@ -883,7 +884,7 @@ describe('colorSchemeManager.lostobjectsRules', () => {
     colorSchemeManager.objectTypeFlags.starLow = true;
     let result: any = colorSchemeManager.lostobjects({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 5,
     });
     expect(result).toMatchSnapshot();
@@ -893,7 +894,7 @@ describe('colorSchemeManager.lostobjectsRules', () => {
     colorSchemeManager.objectTypeFlags.starMed = true;
     let result: any = colorSchemeManager.lostobjects({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 3.5,
     });
     expect(result).toMatchSnapshot();
@@ -903,7 +904,7 @@ describe('colorSchemeManager.lostobjectsRules', () => {
     colorSchemeManager.objectTypeFlags.starHi = true;
     let result: any = colorSchemeManager.lostobjects({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
@@ -913,7 +914,7 @@ describe('colorSchemeManager.lostobjectsRules', () => {
     colorSchemeManager.objectTypeFlags.starHi = false;
     let result: any = colorSchemeManager.lostobjects({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
@@ -923,7 +924,7 @@ describe('colorSchemeManager.lostobjectsRules', () => {
   test('4', () => {
     let result: any = colorSchemeManager.lostobjects({
       static: true,
-      type: 'Launch Facility',
+      type: SpaceObjectType.LAUNCH_FACILITY,
     });
     expect(result).toMatchSnapshot();
   });
@@ -978,7 +979,7 @@ describe('colorSchemeManager.leoRules', () => {
     colorSchemeManager.objectTypeFlags.starLow = true;
     let result: any = colorSchemeManager.leo({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 5,
     });
     expect(result).toMatchSnapshot();
@@ -988,7 +989,7 @@ describe('colorSchemeManager.leoRules', () => {
     colorSchemeManager.objectTypeFlags.starMed = true;
     let result: any = colorSchemeManager.leo({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 3.5,
     });
     expect(result).toMatchSnapshot();
@@ -998,7 +999,7 @@ describe('colorSchemeManager.leoRules', () => {
     colorSchemeManager.objectTypeFlags.starHi = true;
     let result: any = colorSchemeManager.leo({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
@@ -1008,7 +1009,7 @@ describe('colorSchemeManager.leoRules', () => {
     colorSchemeManager.objectTypeFlags.starHi = false;
     let result: any = colorSchemeManager.leo({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
@@ -1018,7 +1019,7 @@ describe('colorSchemeManager.leoRules', () => {
   test('4', () => {
     let result: any = colorSchemeManager.leo({
       static: true,
-      type: 'Launch Facility',
+      type: SpaceObjectType.LAUNCH_FACILITY,
     });
     expect(result).toMatchSnapshot();
   });
@@ -1073,7 +1074,7 @@ describe('colorSchemeManager.geoRules', () => {
     colorSchemeManager.objectTypeFlags.starLow = true;
     let result: any = colorSchemeManager.geo({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 5,
     });
     expect(result).toMatchSnapshot();
@@ -1083,7 +1084,7 @@ describe('colorSchemeManager.geoRules', () => {
     colorSchemeManager.objectTypeFlags.starMed = true;
     let result: any = colorSchemeManager.geo({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 3.5,
     });
     expect(result).toMatchSnapshot();
@@ -1093,7 +1094,7 @@ describe('colorSchemeManager.geoRules', () => {
     colorSchemeManager.objectTypeFlags.starHi = true;
     let result: any = colorSchemeManager.geo({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
@@ -1103,7 +1104,7 @@ describe('colorSchemeManager.geoRules', () => {
     colorSchemeManager.objectTypeFlags.starHi = false;
     let result: any = colorSchemeManager.geo({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
@@ -1113,7 +1114,7 @@ describe('colorSchemeManager.geoRules', () => {
   test('4', () => {
     let result: any = colorSchemeManager.geo({
       static: true,
-      type: 'Launch Facility',
+      type: SpaceObjectType.LAUNCH_FACILITY,
     });
     expect(result).toMatchSnapshot();
   });
@@ -1169,7 +1170,7 @@ describe.skip('colorSchemeManager.velocityRules', () => {
     colorSchemeManager.objectTypeFlags.starLow = true;
     let result: any = colorSchemeManager.velocity({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 5,
     });
     expect(result).toMatchSnapshot();
@@ -1179,7 +1180,7 @@ describe.skip('colorSchemeManager.velocityRules', () => {
     colorSchemeManager.objectTypeFlags.starMed = true;
     let result: any = colorSchemeManager.velocity({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 3.5,
     });
     expect(result).toMatchSnapshot();
@@ -1189,7 +1190,7 @@ describe.skip('colorSchemeManager.velocityRules', () => {
     colorSchemeManager.objectTypeFlags.starHi = true;
     let result: any = colorSchemeManager.velocity({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
@@ -1199,7 +1200,7 @@ describe.skip('colorSchemeManager.velocityRules', () => {
     colorSchemeManager.objectTypeFlags.starHi = false;
     let result: any = colorSchemeManager.velocity({
       static: true,
-      type: 'Star',
+      type: SpaceObjectType.STAR,
       vmag: 0,
     });
     expect(result).toMatchSnapshot();
@@ -1208,7 +1209,7 @@ describe.skip('colorSchemeManager.velocityRules', () => {
   test('4', () => {
     let result: any = colorSchemeManager.velocity({
       static: true,
-      type: 'Launch Facility',
+      type: SpaceObjectType.LAUNCH_FACILITY,
     });
     expect(result).toMatchSnapshot();
   });

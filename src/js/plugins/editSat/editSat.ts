@@ -194,7 +194,7 @@ export const bottomMenuClick = (iconName: string) => {
         isEditSatMenuOpen = true;
 
         const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
-        $('#es-scc').val(sat.SCC_NUM);
+        $('#es-scc').val(sat.sccNum);
 
         let inc: string | string[] = (sat.inclination * RAD2DEG).toPrecision(7);
         inc = inc.split('.');
@@ -305,7 +305,7 @@ export const editSatNewTleClickFadeIn = () => {
     // Reload Menu with new TLE
     //
     const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
-    $('#es-scc').val(sat.SCC_NUM);
+    $('#es-scc').val(sat.sccNum);
 
     let inc: string | string[] = (sat.inclination * RAD2DEG).toPrecision(7);
     inc = inc.split('.');

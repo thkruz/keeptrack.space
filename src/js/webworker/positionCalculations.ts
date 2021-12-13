@@ -1,5 +1,6 @@
 import * as satellite from 'satellite.js';
-import { SensorObjectCruncher } from '../api/keepTrack';
+import { SensorObjectCruncher } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import { DEG2RAD, PI, RAD2DEG } from '../lib/constants';
 import { A } from '../lib/external/meuusjs';
 import { defaultGd } from './positionCruncher';
@@ -67,5 +68,5 @@ export const checkSunExclusion = (sensor: SensorObjectCruncher, j: number, gmst:
 
   // RAE to ECI
   const sunECI = satellite.ecfToEci(lookAnglesToEcf(sunAz, sunEl, sunRange, 0, 0, 0), gmst);
-  return sensor.observerGd !== defaultGd && (sensor.type === 'Optical' || sensor.type === 'Observer') && sunElRel > -6 ? [true, sunECI] : [false, sunECI];
+  return sensor.observerGd !== defaultGd && (sensor.type === SpaceObjectType.OPTICAL || sensor.type === SpaceObjectType.OBSERVER) && sunElRel > -6 ? [true, sunECI] : [false, sunECI];
 };

@@ -2,8 +2,8 @@
 // should be updated to use the same time on all computers.
 
 import { defaultSat, defaultSensor, keepTrackApiStubs } from '../api/apiMocks';
-import { SatObject, SunObject, ZoomValue } from '../api/keepTrack';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { SatObject, SunObject, ZoomValue } from '../api/keepTrackTypes';
 import * as satMath from './satMath';
 
 keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
@@ -50,7 +50,7 @@ describe('satMath.distance', () => {
         static: true,
         TLE1: 'Foo bar',
         TLE2: 'Hello, world!',
-        SCC_NUM: 'MT',
+        sccNum: 'MT',
         active: false,
         C: 'rgb(0.1,0.2,0.3)',
         LS: 'B/.',
@@ -98,7 +98,7 @@ describe('satMath.distance', () => {
         static: false,
         TLE1: 'This is a Text',
         TLE2: 'Foo bar',
-        SCC_NUM: 'MT',
+        sccNum: 'MT',
         active: true,
         C: 'rgb(0.1,0.2,0.3)',
         LS: '₹',
@@ -152,7 +152,7 @@ describe('satMath.distance', () => {
         static: true,
         TLE1: 'Hello, world!',
         TLE2: 'Foo bar',
-        SCC_NUM: '₹',
+        sccNum: '₹',
         active: true,
         C: 'rgb(0.1,0.2,0.3)',
         LS: '£',
@@ -200,7 +200,7 @@ describe('satMath.distance', () => {
         static: true,
         TLE1: 'Foo bar',
         TLE2: 'Hello, world!',
-        SCC_NUM: 'лв',
+        sccNum: 'лв',
         active: true,
         C: 'red',
         LS: '£',
@@ -503,7 +503,7 @@ describe('satMath.calculateVisMag', () => {
         static: true,
         TLE1: 'Foo bar',
         TLE2: 'Foo bar',
-        SCC_NUM: 'MT',
+        sccNum: 'MT',
         active: true,
         C: 'red',
         LS: '₹',
@@ -585,7 +585,7 @@ describe('satMath.calculateVisMag', () => {
         static: false,
         TLE1: 'foo bar',
         TLE2: 'Hello, world!',
-        SCC_NUM: '£',
+        sccNum: '£',
         active: false,
         C: 'hsl(10%,20%,40%)',
         LS: 'B/.',
@@ -667,7 +667,7 @@ describe('satMath.calculateVisMag', () => {
         static: true,
         TLE1: 'Hello, world!',
         TLE2: 'foo bar',
-        SCC_NUM: '£',
+        sccNum: '£',
         active: true,
         C: 'rgb(0.1,0.2,0.3)',
         LS: 'B/.',
@@ -749,7 +749,7 @@ describe('satMath.calculateVisMag', () => {
         static: false,
         TLE1: 'This is a Text',
         TLE2: 'foo bar',
-        SCC_NUM: 'лв',
+        sccNum: 'лв',
         active: true,
         C: 'rgb(0,100,200)',
         LS: 'лв',
@@ -831,7 +831,7 @@ describe('satMath.calculateVisMag', () => {
         static: false,
         TLE1: 'Hello, world!',
         TLE2: 'Hello, world!',
-        SCC_NUM: 'B/.',
+        sccNum: 'B/.',
         active: true,
         C: 'rgb(0.1,0.2,0.3)',
         LS: '£',

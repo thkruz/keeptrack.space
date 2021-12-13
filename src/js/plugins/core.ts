@@ -1,5 +1,5 @@
-import { SettingsManager } from '../api/keepTrack';
 import { isThisJest } from '../api/keepTrackApi';
+import { SettingsManager } from '../api/keepTrackTypes';
 
 declare global {
   // eslint-disable-next-line no-unused-vars

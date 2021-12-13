@@ -1,5 +1,5 @@
-import { LaunchInfoObject } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { LaunchInfoObject } from '@app/js/api/keepTrackTypes';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { saveCsv, truncateString } from '@app/js/lib/helpers';
 import $ from 'jquery';

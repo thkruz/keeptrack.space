@@ -5,7 +5,8 @@ import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager';
 import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins/selectSatManager/selectSatManager';
 import { mat4 } from 'gl-matrix';
-import { DrawManager, PostProcessingManager, SatObject, SunObject } from '../api/keepTrack';
+import { DrawManager, PostProcessingManager, SatObject, SunObject } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 
 let satHoverBoxNode1: HTMLDivElement;
 let satHoverBoxNode2: HTMLDivElement;
@@ -194,7 +195,7 @@ export const startWithOrbits = async () => {
     const { groupsManager, orbitManager, satSet } = keepTrackApi.programs;
     // All Orbits
     groupsManager.debris = groupsManager.createGroup('all', '');
-    groupsManager.selectGroup(groupsManager.debris, orbitManager);
+    groupsManager.selectGroup(groupsManager.debris);
     satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
     groupsManager.debris.updateOrbits(orbitManager);
     settingsManager.isOrbitOverlayVisible = true;
@@ -417,16 +418,15 @@ export const satCalculate = () => {
 
       // if (!settingsManager.modelsOnSatelliteViewOverride && mainCamera.cameraType.current !== mainCamera.cameraType.Satellite) {
     }
-    if (drawManager.sat.missile) orbitManager.setSelectOrbit(drawManager.sat.satId);
+    if (drawManager.sat.missile) orbitManager.setSelectOrbit(drawManager.sat.id);
   } else {
     // Reset the selected satellite if no satellite is selected
     drawManager.sat = <SatObject>{
       id: -1,
       missile: false,
-      OT: 0,
+      type: SpaceObjectType.UNKNOWN,
       static: false,
       inView: 0,
-      satId: -1,
     };
   }
   try {
@@ -580,7 +580,7 @@ export const orbitsAbove = () => {
       // if (!settingsManager.enableHoverOverlay) continue
       satHoverMiniDOM = document.createElement('div');
       satHoverMiniDOM.id = 'sat-minibox-' + i;
-      satHoverMiniDOM.textContent = sat.SCC_NUM;
+      satHoverMiniDOM.textContent = sat.sccNum;
 
       satHoverMiniDOM.style.display = 'block';
       satHoverMiniDOM.style.position = 'absolute';
@@ -655,7 +655,7 @@ export const updateHover = () => {
     }
 
     if (settingsManager.enableHoverOrbits) {
-      if (uiManager.uiInput.mouseSat !== -1 && keepTrackApi.programs.satSet.satData[uiManager.uiInput.mouseSat].type !== 'Star') {
+      if (uiManager.uiInput.mouseSat !== -1 && keepTrackApi.programs.satSet.satData[uiManager.uiInput.mouseSat].type !== SpaceObjectType.STAR) {
         orbitManager.setHoverOrbit(uiManager.uiInput.mouseSat);
       } else {
         orbitManager.clearHoverOrbit();
@@ -692,7 +692,8 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
     drawManager.canvas.style.cursor = 'default';
     isHoverBoxVisible = false;
   } else if (!mainCamera.isDragging && settingsManager.enableHoverOverlay) {
-    var sat = satSet.getSatExtraOnly(satId);
+    // NOTE: The radar mesurement logic breaks if you call it a SatObject
+    const sat = <any>satSet.getSatExtraOnly(satId);
     isHoverBoxVisible = true;
 
     const parentNode = satHoverBoxDOM.parentNode;
@@ -701,7 +702,8 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
     parentNode.removeChild(satHoverBoxDOM); // reflow
 
     if (sat.static || sat.isRadarData) {
-      if (sat.type === 'Launch Facility') {
+      // TODO: This is a broken mess but only used offline
+      if (sat.type === SpaceObjectType.LAUNCH_FACILITY) {
         var launchSite = objectManager.extractLaunchSite(sat.name);
         satHoverBoxNode1.textContent = launchSite.site + ', ' + launchSite.sitec;
         satHoverBoxNode2.innerHTML = sat.type + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
@@ -712,7 +714,7 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
           satHoverBoxNode1.innerHTML += '</br>Missile Complex: ' + sat.missileComplex;
           satHoverBoxNode1.innerHTML += '</br>Missile Object: ' + sat.missileObject;
         }
-        if (sat.satId !== -1) satHoverBoxNode1.innerHTML += '</br>Satellite: ' + sat.satId;
+        if (parseInt(sat.sccNum) !== -1) satHoverBoxNode1.innerHTML += '</br>Satellite: ' + sat.sccNum;
         if (typeof sat.rae == 'undefined' && sensorManager.currentSensor !== sensorManager.defaultSensor) {
           sat.rae = satellite.eci2Rae(sat.t, sat.position, sensorManager.currentSensor[0]);
           sat.setRAE(sat.rae);
@@ -732,19 +734,19 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
           let measurementDate = new Date(sat.t);
           satHoverBoxNode2.innerHTML = `JDAY: ${timeManager.getDayOfYear(measurementDate)} - ${measurementDate.toLocaleString('en-GB', { timeZone: 'UTC' }).slice(-8)}`;
         }
-        satHoverBoxNode3.innerHTML = 'RCS: ' + sat.rcs.toFixed(2) + ' m^2 (' + (10 ** (sat.rcs / 10)).toFixed(2) + ' dBsm)</br>Az Error: ' + sat.azError.toFixed(2) + '° El Error: ' + sat.elError.toFixed(2) + '°';
-      } else if (sat.type === 'Control Facility') {
+        satHoverBoxNode3.innerHTML = 'RCS: ' + parseFloat(sat.rcs).toFixed(2) + ' m^2 (' + (10 ** (parseFloat(sat.rcs) / 10)).toFixed(2) + ' dBsm)</br>Az Error: ' + sat.azError.toFixed(2) + '° El Error: ' + sat.elError.toFixed(2) + '°';
+      } else if (sat.type === SpaceObjectType.CONTORL_FACILITY) {
         satHoverBoxNode1.textContent = sat.name;
-        satHoverBoxNode2.innerHTML = sat.typeExt + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
+        satHoverBoxNode2.innerHTML = sat.country + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
         satHoverBoxNode3.textContent = '';
-      } else if (sat.type === 'Star') {
+      } else if (sat.type === SpaceObjectType.STAR) {
         const constellationName = starManager.findStarsConstellation(sat.name);
         if (constellationName !== null) {
           satHoverBoxNode1.innerHTML = sat.name + '</br>' + constellationName;
         } else {
           satHoverBoxNode1.textContent = sat.name;
         }
-        satHoverBoxNode2.innerHTML = sat.type;
+        satHoverBoxNode2.innerHTML = 'Star';
         satHoverBoxNode3.innerHTML = 'RA: ' + sat.ra.toFixed(3) + ' deg </br> DEC: ' + sat.dec.toFixed(3) + ' deg';
         if (objectManager.lasthoveringSat !== satId && typeof sat !== 'undefined' && constellationName !== null) {
           starManager.drawConstellations(constellationName);
@@ -755,26 +757,26 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
         satHoverBoxNode3.textContent = '';
       }
     } else if (sat.missile) {
-      satHoverBoxNode1.innerHTML = sat.ON + '<br >' + sat.desc + '';
+      satHoverBoxNode1.innerHTML = sat.name + '<br >' + sat.desc + '';
       satHoverBoxNode2.textContent = '';
       satHoverBoxNode3.textContent = '';
     } else {
       if (!settingsManager.enableHoverOverlay) return;
       // Use this as a default if no UI
       if (settingsManager.disableUI) {
-        satHoverBoxNode1.textContent = sat.ON;
-        satHoverBoxNode2.textContent = sat.SCC_NUM;
-        satHoverBoxNode3.textContent = objectManager.extractCountry(sat.C);
+        satHoverBoxNode1.textContent = sat.name;
+        satHoverBoxNode2.textContent = sat.sccNum;
+        satHoverBoxNode3.textContent = objectManager.extractCountry(sat.country);
       } else {
         if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && settingsManager.isShowNextPass && isShowDistance) {
-          satHoverBoxNode1.textContent = sat.ON;
-          satHoverBoxNode2.textContent = sat.SCC_NUM;
+          satHoverBoxNode1.textContent = sat.name;
+          satHoverBoxNode2.textContent = sat.sccNum;
           satHoverBoxNode3.innerHTML = satellite.nextpass(sat) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
         } else if (isShowDistance) {
-          satHoverBoxNode1.textContent = sat.ON;
+          satHoverBoxNode1.textContent = sat.name;
           sat2 = satSet.getSat(objectManager.selectedSat);
           if (typeof sat2 !== 'undefined' && sat2 !== null && sat !== sat2) {
-            satHoverBoxNode2.innerHTML = `${sat.SCC_NUM}${satellite.distance(sat, sat2)}</br>ΔVel: ${Math.sqrt((sat.velocity.x - sat2.velocity.x) ** 2 + (sat.velocity.y - sat2.velocity.y) ** 2 + (sat.velocity.z - sat2.velocity.z) ** 2).toFixed(
+            satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distance(sat, sat2)}</br>ΔVel: ${Math.sqrt((sat.velocity.x - sat2.velocity.x) ** 2 + (sat.velocity.y - sat2.velocity.y) ** 2 + (sat.velocity.z - sat2.velocity.z) ** 2).toFixed(
               2
             )} km/s`;
             satHoverBoxNode3.innerHTML =
@@ -793,7 +795,7 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
               (sat.velocity.z - sat2.velocity.z).toFixed(2) +
               'km/s';
           } else {
-            satHoverBoxNode2.innerHTML = `${sat.SCC_NUM}${satellite.distance(sat, sat2)}`;
+            satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distance(sat, sat2)}`;
             satHoverBoxNode3.innerHTML =
               'X: ' +
               sat.position.x.toFixed(2) +
@@ -816,12 +818,12 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
               ' km/s';
           }
         } else if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && settingsManager.isShowNextPass) {
-          satHoverBoxNode1.textContent = sat.ON;
-          satHoverBoxNode2.textContent = sat.SCC_NUM;
+          satHoverBoxNode1.textContent = sat.name;
+          satHoverBoxNode2.textContent = sat.sccNum;
           satHoverBoxNode3.textContent = satellite.nextpass(sat);
         } else {
-          satHoverBoxNode1.textContent = sat.ON;
-          satHoverBoxNode2.textContent = sat.SCC_NUM;
+          satHoverBoxNode1.textContent = sat.name;
+          satHoverBoxNode2.textContent = sat.sccNum;
           satHoverBoxNode3.innerHTML =
             'X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>X: ' + sat.velocity.x.toFixed(2) + ' Y: ' + sat.velocity.y.toFixed(2) + ' Z: ' + sat.velocity.z.toFixed(2);
         }
@@ -875,9 +877,9 @@ export const demoMode = () => {
       if (drawManager.sat.static) continue;
       if (drawManager.sat.missile) continue;
       // if (!drawManager.sat.inView === 1) continue
-      if (drawManager.sat.OT === 1 && colorSchemeManager.objectTypeFlags.payload === false) continue;
-      if (drawManager.sat.OT === 2 && colorSchemeManager.objectTypeFlags.rocketBody === false) continue;
-      if (drawManager.sat.OT === 3 && colorSchemeManager.objectTypeFlags.debris === false) continue;
+      if (drawManager.sat.type === 1 && colorSchemeManager.objectTypeFlags.payload === false) continue;
+      if (drawManager.sat.type === 2 && colorSchemeManager.objectTypeFlags.rocketBody === false) continue;
+      if (drawManager.sat.type === 3 && colorSchemeManager.objectTypeFlags.debris === false) continue;
       if (drawManager.sat.inView === 1 && colorSchemeManager.objectTypeFlags.inFOV === false) continue;
       const satScreenPositionArray = satSet.getScreenCoords(drawManager.i, drawManager.pMatrix, mainCamera.camMatrix);
       if (satScreenPositionArray.error) continue;

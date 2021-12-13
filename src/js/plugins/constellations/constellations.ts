@@ -132,7 +132,7 @@ export const groupSelected = (groupName: string) => {
   groupsManager.selectGroup(groupsManager[groupName]);
 
   // Populate searchDOM with a search string separated by commas - minus the last one
-  searchDOM.val(groupsManager[groupName].sats.reduce((acc: string, obj: { satId: number }) => `${acc}${satSet.getSat(obj.satId).SCC_NUM},`, '').slice(0, -1));
+  searchDOM.val(groupsManager[groupName].sats.reduce((acc: string, obj: { satId: number }) => `${acc}${satSet.getSat(obj.satId).sccNum},`, '').slice(0, -1));
 
   searchBox.fillResultBox(groupsManager[groupName].sats, satSet);
   objectManager.setSelectedSat(-1); // Clear selected sat

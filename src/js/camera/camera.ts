@@ -18,7 +18,8 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants';
 import * as glm from 'gl-matrix';
-import { Camera, CameraType, DotsManager, DrawManager, ObjectManager, OrbitManager, SatObject, SensorManager, ZoomValue } from '../api/keepTrack';
+import { Camera, CameraType, DotsManager, DrawManager, ObjectManager, OrbitManager, SatObject, SensorManager, ZoomValue } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import { getDayOfYear } from '../timeManager/transforms';
 
 export const normalizeAngle = (angle: number): number => {
@@ -763,7 +764,7 @@ export const calculate = (dt: number, isSlowDown: boolean) => {
 };
 
 export const update = (
-  target: { id: number; getAltitude: () => number; position: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number }; type: string },
+  target: { id: number; getAltitude: () => number; position: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number }; type: SpaceObjectType },
   sensorPos: { lat: number; lon: number; gmst: number; x: number; y: number; z: number }
 ) => {
   camera.camMatrix = camera.camMatrixEmpty;
@@ -813,7 +814,7 @@ export const update = (
 
     // Ensure we don't zoom in past our satellite
     if (camera.cameraType.current == camera.cameraType.FixedToSat) {
-      if (target.id === -1 || target.type === 'Star') {
+      if (target.id === -1 || target.type === SpaceObjectType.STAR) {
         camera.cameraType.current = camera.cameraType.Default;
       } else {
         if (typeof target.getAltitude !== 'undefined' && getCamDist() < target.getAltitude() + RADIUS_OF_EARTH + 30) {
@@ -824,7 +825,7 @@ export const update = (
     }
 
     if (camera.cameraType.current == camera.cameraType.Satellite) {
-      if (target.id === -1 || target.type === 'Star') {
+      if (target.id === -1 || target.type === SpaceObjectType.STAR) {
         camera.cameraType.current = camera.cameraType.Default;
       }
     }

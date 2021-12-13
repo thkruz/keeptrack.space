@@ -1,5 +1,6 @@
-import { SatObject } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SatObject } from '@app/js/api/keepTrackTypes';
+import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
 
 export const defaultRules = (sat: SatObject): ColorInformation => {
@@ -9,7 +10,7 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
   let color;
 
   // Always show stars unless they are disabled
-  if (sat.static && sat.type === 'Star') {
+  if (sat.static && sat.type === SpaceObjectType.STAR) {
     if (sat.vmag >= 4.7 && colorSchemeManager.objectTypeFlags.starLow) {
       return {
         color: colorSchemeManager.colorTheme.starLow,
@@ -44,11 +45,11 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
 
   // Let's see if we can determine color based on the object type
   switch (sat.type) {
-    case 'Intergovernmental Organization':
-    case 'Suborbital Payload Operator':
-    case 'Payload Owner':
-    case 'Meteorological Rocket Launch Agency or Manufacturer':
-    case 'Payload Manufacturer':
+    case SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION:
+    case SpaceObjectType.SUBORBITAL_PAYLOAD_OPERATOR:
+    case SpaceObjectType.PAYLOAD_OWNER:
+    case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
+    case SpaceObjectType.PAYLOAD_MANUFACTURER:
       // If the facility flag is off then we don't want to show this
       if (colorSchemeManager.objectTypeFlags.facility === false || mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
         return {
@@ -62,9 +63,9 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
           pickable: Pickable.Yes,
         };
       }
-    case 'Launch Agency':
-    case 'Launch Site':
-    case 'Launch Position':
+    case SpaceObjectType.LAUNCH_AGENCY:
+    case SpaceObjectType.LAUNCH_SITE:
+    case SpaceObjectType.LAUNCH_POSITION:
       // If the facility flag is off then we don't want to show this
       if (colorSchemeManager.objectTypeFlags.facility === false || mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
         return {
@@ -122,7 +123,7 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
         pickable: Pickable.Yes,
       };
     }
-    if (sat.satId >= 0) {
+    if (parseInt(sat.sccNum) >= 0) {
       return {
         color: colorSchemeManager.colorTheme.radarDataSatellite,
         pickable: Pickable.Yes,
@@ -174,9 +175,9 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
   }
 
   if (
-    (sat.inView === 0 && sat.OT === 1 && colorSchemeManager.objectTypeFlags.payload === false) ||
-    (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.OT === 1 && colorSchemeManager.objectTypeFlags.payload === false) ||
-    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 1 && colorSchemeManager.objectTypeFlags.payload === false)
+    (sat.inView === 0 && sat.type === SpaceObjectType.PAYLOAD && colorSchemeManager.objectTypeFlags.payload === false) ||
+    (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.type === SpaceObjectType.PAYLOAD && colorSchemeManager.objectTypeFlags.payload === false) ||
+    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag == 'undefined' && sat.type === SpaceObjectType.PAYLOAD && colorSchemeManager.objectTypeFlags.payload === false)
   ) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
@@ -184,9 +185,9 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
     };
   }
   if (
-    (sat.inView === 0 && sat.OT === 2 && colorSchemeManager.objectTypeFlags.rocketBody === false) ||
-    (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.OT === 2 && colorSchemeManager.objectTypeFlags.rocketBody === false) ||
-    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 2 && colorSchemeManager.objectTypeFlags.rocketBody === false)
+    (sat.inView === 0 && sat.type === SpaceObjectType.ROCKET_BODY && colorSchemeManager.objectTypeFlags.rocketBody === false) ||
+    (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.type === SpaceObjectType.ROCKET_BODY && colorSchemeManager.objectTypeFlags.rocketBody === false) ||
+    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag == 'undefined' && sat.type === SpaceObjectType.ROCKET_BODY && colorSchemeManager.objectTypeFlags.rocketBody === false)
   ) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
@@ -194,9 +195,9 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
     };
   }
   if (
-    (sat.inView === 0 && sat.OT === 3 && colorSchemeManager.objectTypeFlags.debris === false) ||
-    (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.OT === 3 && colorSchemeManager.objectTypeFlags.debris === false) ||
-    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 3 && colorSchemeManager.objectTypeFlags.debris === false)
+    (sat.inView === 0 && sat.type === SpaceObjectType.DEBRIS && colorSchemeManager.objectTypeFlags.debris === false) ||
+    (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.type === SpaceObjectType.DEBRIS && colorSchemeManager.objectTypeFlags.debris === false) ||
+    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag == 'undefined' && sat.type === SpaceObjectType.DEBRIS && colorSchemeManager.objectTypeFlags.debris === false)
   ) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
@@ -204,9 +205,9 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
     };
   }
   if (
-    (sat.inView === 0 && sat.OT === 4 && colorSchemeManager.objectTypeFlags.trusat === false) ||
-    (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.OT === 4 && colorSchemeManager.objectTypeFlags.trusat === false) ||
-    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == 'Observer' && typeof sat.vmag == 'undefined' && sat.OT === 4 && colorSchemeManager.objectTypeFlags.trusat === false)
+    (sat.inView === 0 && sat.type === SpaceObjectType.SPECIAL && colorSchemeManager.objectTypeFlags.trusat === false) ||
+    (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.type === SpaceObjectType.SPECIAL && colorSchemeManager.objectTypeFlags.trusat === false) ||
+    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag == 'undefined' && sat.type === SpaceObjectType.SPECIAL && colorSchemeManager.objectTypeFlags.trusat === false)
   ) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
@@ -222,7 +223,7 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
   }
 
   if (sat.inView === 1 && mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
-    if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == 'Observer' && typeof sat.vmag == 'undefined') {
+    if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag == 'undefined') {
       // Intentional
     } else {
       return {
@@ -232,18 +233,18 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
     }
   }
 
-  if (sat.C === 'ANALSAT') {
+  if (sat.country === 'ANALSAT') {
     color = colorSchemeManager.colorTheme.analyst;
-  } else if (sat.OT === 1) {
+  } else if (sat.type === SpaceObjectType.PAYLOAD) {
     // Payload
     color = colorSchemeManager.colorTheme.payload;
-  } else if (sat.OT === 2) {
+  } else if (sat.type === SpaceObjectType.ROCKET_BODY) {
     // Rocket Body
     color = colorSchemeManager.colorTheme.rocketBody;
-  } else if (sat.OT === 3) {
+  } else if (sat.type === SpaceObjectType.DEBRIS) {
     // Debris
     color = colorSchemeManager.colorTheme.debris;
-  } else if (sat.OT === 4) {
+  } else if (sat.type === SpaceObjectType.SPECIAL) {
     // TruSat Object
     color = colorSchemeManager.colorTheme.trusat;
   } else {

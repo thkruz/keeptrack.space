@@ -21,14 +21,15 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { DEG2RAD, DISTANCE_TO_SUN, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, PLANETARIUM_DIST, RAD2DEG, RADIUS_OF_EARTH, TAU } from '@app/js/lib/constants';
-import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { saveCsv, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import * as Ootk from 'ootk';
 import { SatRec } from 'satellite.js';
-import { Eci, EciArr3, SatMath, SatObject, SensorManager, SensorObject, SunObject, TearrData } from '../api/keepTrack';
+import { keepTrackApi } from '../api/keepTrackApi';
+import { Eci, EciArr3, SatGroupCollection, SatMath, SatObject, SensorManager, SensorObject, SunObject, TearrData } from '../api/keepTrackTypes';
+import { SpaceObjectType } from "../api/SpaceObjectType";
+import { dateFormat } from '../lib/external/dateFormat.js';
 import { numeric } from '../lib/external/numeric';
 import { jday } from '../timeManager/transforms';
 import { getOrbitByLatLon } from './getOrbitByLatLon';
@@ -37,7 +38,7 @@ import { formatArgumentOfPerigee, formatInclination, formatMeanAnomaly, formatMe
 (<any>window)._numeric = numeric; // numeric break if it is not available globally
 
 type sccPassTimes = {
-  SCC_NUM: string;
+  sccNum: string;
   time: number;
 };
 
@@ -126,7 +127,7 @@ export const distance = (hoverSat: SatObject, selectedSat: SatObject): string =>
   if (selectedSat == null || hoverSat == null) {
     return '';
   }
-  if (selectedSat.type === 'Star' || hoverSat.type === 'Star') return '';
+  if (selectedSat.type === SpaceObjectType.STAR || hoverSat.type === SpaceObjectType.STAR) return '';
 
   let distanceApartX = Math.pow(hoverSat.position.x - selectedSat.position.x, 2);
   let distanceApartY = Math.pow(hoverSat.position.y - selectedSat.position.y, 2);
@@ -269,7 +270,7 @@ export const nextpassList = (satArray: SatObject[]): sccPassTimes[] => {
     let time = nextNpasses(satArray[s], null, 7, satellite.lookanglesInterval, settingsManager.nextNPassesCount); // Only do 1 day looks
     for (let i = 0; i < time.length; i++) {
       nextPassArray.push({
-        SCC_NUM: satArray[s].SCC_NUM,
+        sccNum: satArray[s].sccNum,
         time: time[i],
       });
     }
@@ -769,8 +770,8 @@ export const findCloseObjects = () => {
 
     // If it is still in the search area, add it to the list
     if (pos2.x < posXmax && pos2.x > posXmin && pos2.y < posYmax && pos2.y > posYmin && pos2.z < posZmax && pos2.z > posZmin) {
-      csoStrArr.push(sat1.SCC_NUM);
-      csoStrArr.push(sat2.SCC_NUM);
+      csoStrArr.push(sat1.sccNum);
+      csoStrArr.push(sat2.sccNum);
     }
   }
 
@@ -1113,7 +1114,7 @@ export const getRae = (now: Date, satrec: SatRec, sensor: SensorObject) => {
 //     for (let s = start; s < stop; s++) {
 //       if (satData[s].static) break;
 //       satEciData = [];
-//       // console.log(satData[s].SCC_NUM);
+//       // console.log(satData[s].sccNum);
 //       for (let i = 0; i < 3; i++) {
 //         satEciData[i] = [];
 //         let now = new Date(startTime.getTime() * 1 + 1000 * 60 * 2 * s * i);
@@ -1165,7 +1166,7 @@ export const getRae = (now: Date, satrec: SatRec, sensor: SensorObject) => {
 //     for (let s = start; s < stop; s++) {
 //       if (satData[s].static) break;
 //       satEciData = [];
-//       // console.log(satData[s].SCC_NUM);
+//       // console.log(satData[s].sccNum);
 //       for (let i = 0; i < 3; i++) {
 //         satEciData[i] = [];
 //         let now = new Date(startTime.getTime() * 1 + 1000 * 10 * i);
@@ -1372,7 +1373,7 @@ export const findNearbyObjectsByOrbit = (sat: SatObject) => {
 //     return false;
 //   }
 
-//   // breakupSearchString += mainsat.SCC_NUM + ',Analyst Sat';
+//   // breakupSearchString += mainsat.sccNum + ',Analyst Sat';
 //   // uiManager.doSearch(breakupSearchString);
 //   return true;
 // };
@@ -1491,8 +1492,8 @@ export const getDops = (lat: number, lon: number, alt?: number, propTime?: Date)
   const { gmst } = calculateTimeVariables(propTime);
 
   let inViewList = [];
-  groupsManager.GPSGroup.sats.forEach((satObj: { satId: SatObject }) => {
-    const sat = typeof satObj.satId.position !== 'undefined' ? satObj.satId : satSet.getSat(satObj.satId.id);
+  groupsManager.GPSGroup.sats.forEach((satObj: SatGroupCollection) => {
+    const sat = satSet.getSat(satObj.satId);
     const lookAngles = satellite.ecfToLookAngles({ lon: lon, lat: lat, alt: alt }, satellite.eciToEcf(sat.position, gmst));
     sat.az = lookAngles.az * RAD2DEG;
     sat.el = lookAngles.el * RAD2DEG;

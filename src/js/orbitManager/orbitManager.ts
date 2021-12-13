@@ -2,7 +2,7 @@
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
-import { Camera, GroupsManager, OrbitManager } from '../api/keepTrack';
+import { Camera, GroupsManager, OrbitManager } from '../api/keepTrackTypes';
 
 const NUM_SEGS = 255;
 let glBuffers = <WebGLBuffer[]>[];

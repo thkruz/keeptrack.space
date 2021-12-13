@@ -1,5 +1,5 @@
-import { SatObject } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import $ from 'jquery';
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ export const init = (): void => {
           isAnalysisMenuOpen = true;
           if (objectManager.selectedSat != -1) {
             const sat: SatObject = satSet.getSat(objectManager.selectedSat);
-            $('#anal-sat').val(sat.SCC_NUM);
+            $('#anal-sat').val(sat.sccNum);
           }
           if (sensorManager.checkSensorSelected()) {
             $('#anal-type').html(
@@ -100,7 +100,7 @@ export const init = (): void => {
     cbName: 'analysis',
     cb: (sat: any): void => {
       if (uiManager.isAnalysisMenuOpen) {
-        $('#anal-sat').val(sat.SCC_NUM);
+        $('#anal-sat').val(sat.sccNum);
       }
     },
   });

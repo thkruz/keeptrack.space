@@ -27,7 +27,8 @@
 
 import { SunCalc } from '@app/js/lib/suncalc.js';
 import * as satellite from 'satellite.js';
-import { SensorObjectCruncher } from '../api/keepTrack';
+import { SensorObjectCruncher } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import { DEG2RAD, GROUND_BUFFER_DISTANCE, MILLISECONDS_PER_DAY, PI, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN, STAR_DISTANCE, TAU } from '../lib/constants';
 import { numeric } from '../lib/external/numeric';
 import { jday } from '../timeManager/transforms';
@@ -40,7 +41,7 @@ interface SatCacheObject extends satellite.SatRec {
   isRadarData: any;
   static: boolean;
   marker: any;
-  type: string;
+  type: SpaceObjectType;
   lat: number;
   lon: number;
   alt: number;
@@ -560,7 +561,7 @@ var propagateCruncher = () => {
         if (isMultiSensor) {
           for (s = 0; s < mSensor.length; s++) {
             // Skip satellites in the sun if you are an optical sensor
-            if (!(sensor.type == 'Optical' && satInSun[i] == 0)) {
+            if (!(sensor.type == SpaceObjectType.OPTICAL && satInSun[i] == 0)) {
               if (satInView[i]) break;
               sensor = mSensor[s];
               // satellite.js requires this format - DONT use lon,lat,alt
@@ -599,7 +600,7 @@ var propagateCruncher = () => {
             }
           }
         } else {
-          if (!(sensor.type == 'Optical' && satInSun[i] == 0)) {
+          if (!(sensor.type === SpaceObjectType.OPTICAL && satInSun[i] == 0)) {
             azimuth *= RAD2DEG;
             elevation *= RAD2DEG;
 
@@ -632,7 +633,7 @@ var propagateCruncher = () => {
       satVel[i * 3 + 1] = 0;
       satVel[i * 3 + 2] = 0;
     } else if (satCache[i].static && !satCache[i].marker) {
-      if (satCache[i].type == 'Star') {
+      if (satCache[i].type === SpaceObjectType.STAR) {
         // INFO: 0 Latitude returns upside down results. Using 180 looks right, but more verification needed.
         // WARNING: 180 and 0 really matter...unclear why
         starPosition = SunCalc.getStarPosition(now, 180, 0, satCache[i]);
@@ -772,9 +773,9 @@ var propagateCruncher = () => {
 
           // Ignore Optical and Mechanical Sensors When showing Many
           if (isIgnoreNonRadar) {
-            if (mSensor.length > 1 && sensor.type === 'Optical') continue;
-            if (mSensor.length > 1 && sensor.type === 'Observer') continue;
-            if (mSensor.length > 1 && sensor.type === 'Mechanical') continue;
+            if (mSensor.length > 1 && sensor.type === SpaceObjectType.OPTICAL) continue;
+            if (mSensor.length > 1 && sensor.type === SpaceObjectType.OBSERVER) continue;
+            if (mSensor.length > 1 && sensor.type === SpaceObjectType.MECHANICAL) continue;
           }
 
           // az, el, rng, pos;

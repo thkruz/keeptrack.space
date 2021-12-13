@@ -1,5 +1,7 @@
 import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { SatObject } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import * as drawManager from './drawManager';
 
 keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
@@ -208,61 +210,73 @@ describe('drawManager.hoverBoxOnSat', () => {
   });
 
   test('2', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ static: true });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => <SatObject>{ static: true };
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ isRadarData: true, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: 0, azError: 0, elError: 0 });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => <SatObject>(<unknown>{ isRadarData: true, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: '0', azError: 0, elError: 0 });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ isRadarData: true, missileComplex: 1, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: 0, azError: 0, elError: 0 });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => <SatObject>(<unknown>{ isRadarData: true, missileComplex: 1, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: '0', azError: 0, elError: 0 });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ isRadarData: true, satId: 1, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: 0, azError: 0, elError: 0 });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => <SatObject>(<unknown>{ isRadarData: true, satId: 1, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: '0', azError: 0, elError: 0 });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('6', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ static: true, type: 'Control Facility', setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: 0, azError: 0, elError: 0, position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => <SatObject>(<unknown>{
+        static: true,
+        type: SpaceObjectType.CONTORL_FACILITY,
+        setRAE: jest.fn(),
+        rae: { range: 0, az: 0, el: 0 },
+        rcs: '0',
+        azError: 0,
+        elError: 0,
+        position: { x: 0, y: 0, z: 0 },
+        velocity: { total: 0, x: 0, y: 0, z: 0 },
+      });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('7', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({
-      static: true,
-      type: 'Star',
-      setRAE: jest.fn(),
-      rae: { range: 0, az: 0, el: 0 },
-      rcs: 0,
-      azError: 0,
-      elError: 0,
-      position: { x: 0, y: 0, z: 0 },
-      velocity: { x: 0, y: 0, z: 0 },
-      ra: 0,
-      dec: 0,
-    });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => <SatObject>(<unknown>{
+        static: true,
+        type: SpaceObjectType.STAR,
+        setRAE: jest.fn(),
+        rae: { range: 0, az: 0, el: 0 },
+        rcs: '0',
+        azError: 0,
+        elError: 0,
+        position: { x: 0, y: 0, z: 0 },
+        velocity: { total: 0, x: 0, y: 0, z: 0 },
+        ra: 0,
+        dec: 0,
+      });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('8', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ missile: true, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: 0, azError: 0, elError: 0, position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () =>
+      <SatObject>(<unknown>{ missile: true, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: '0', azError: 0, elError: 0, position: { x: 0, y: 0, z: 0 }, velocity: { total: 0, x: 0, y: 0, z: 0 } });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('8', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ satId: 1, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: 0, azError: 0, elError: 0, position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () =>
+      <SatObject>(<unknown>{ satId: 1, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: '0', azError: 0, elError: 0, position: { x: 0, y: 0, z: 0 }, velocity: { total: 0, x: 0, y: 0, z: 0 } });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });

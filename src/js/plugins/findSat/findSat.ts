@@ -1,4 +1,4 @@
-import { SatObject } from '@app/js/api/keepTrack';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import $ from 'jquery';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { RAD2DEG } from '../../lib/constants';
@@ -130,13 +130,13 @@ export const searchSats = (
   // IDEA: Intentionally doesn't clear previous searches. Could be an option later.
   const sccList = [];
   for (let i = 0; i < res.length; i++) {
-    // $('#findByLooks-results').append(res[i].SCC_NUM + '<br />');
+    // $('#findByLooks-results').append(res[i].sccNum + '<br />');
     if (i < res.length - 1) {
-      $('#search').val($('#search').val() + res[i].SCC_NUM + ',');
+      $('#search').val($('#search').val() + res[i].sccNum + ',');
     } else {
-      $('#search').val($('#search').val() + res[i].SCC_NUM);
+      $('#search').val($('#search').val() + res[i].sccNum);
     }
-    sccList.push(res[i].SCC_NUM);
+    sccList.push(res[i].sccNum);
   }
   uiManager.doSearch($('#search').val());
   // console.log(sccList);

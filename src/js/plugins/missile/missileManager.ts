@@ -1,5 +1,6 @@
-import { MissileObject, SensorObject } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { MissileObject, SensorObject } from '@app/js/api/keepTrackTypes';
+import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { jday } from '@app/js/timeManager/transforms';
 import $ from 'jquery';
@@ -599,13 +600,12 @@ export const Missile = (
     // missileObj.timeList = TimeList;
     missileObj.active = true;
     missileObj.missile = true;
-    missileObj.type = '';
+    missileObj.type = SpaceObjectType.UNKNOWN;
     missileObj.id = MissileObjectNum;
-    missileObj.ON = 'RV_' + missileObj.id;
-    missileObj.satId = MissileObjectNum;
+    missileObj.name = 'RV_' + missileObj.id;
     missileObj.maxAlt = MaxAltitude;
     missileObj.startTime = CurrentTime;
-    if (country) missileObj.C = country;
+    if (country) missileObj.country = country;
 
     if (missileObj.apogee) delete missileObj.apogee;
     if (missileObj.argPe) delete missileObj.argPe;

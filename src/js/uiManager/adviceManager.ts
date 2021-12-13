@@ -18,8 +18,8 @@ or mirrored at any other location without the express written permission of the 
 import $ from 'jquery';
 // eslint-disable-next-line sort-imports
 import 'jquery-ui-bundle';
-import { AdviceCounter, AdviceList } from '../api/keepTrack';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { AdviceCounter, AdviceList } from '../api/keepTrackTypes';
 
 let isAdviceEnabled = true;
 let helpDOM: HTMLDivElement;

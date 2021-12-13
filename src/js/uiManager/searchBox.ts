@@ -2,7 +2,8 @@
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
-import { CatalogManager, SearchBox } from '../api/keepTrack';
+import { CatalogManager, SearchBox } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import { SatGroup } from '../groupsManager/sat-group';
 
 let hoverSatId = -1;
@@ -47,10 +48,10 @@ export const hideResults = () => {
   }
 };
 
-export const doArraySearch = (array: string[]) => array.reduce((searchStr, i) => `${searchStr}${keepTrackApi.programs.satSet.satData[i].SCC_NUM},`, '').slice(0, -1);
+export const doArraySearch = (array: string[]) => array.reduce((searchStr, i) => `${searchStr}${keepTrackApi.programs.satSet.satData[i].sccNum},`, '').slice(0, -1);
 
 export const doSearch = (searchString: string, isPreventDropDown?: boolean): number[] => {
-  const { satSet, dotsManager, groupsManager, orbitManager } = keepTrackApi.programs;
+  const { satSet, dotsManager, groupsManager } = keepTrackApi.programs;
   if (satSet.satData.length === 0) throw new Error('No sat data loaded! Check if TLEs are corrupted!');
 
   if (searchString.length === 0) {
@@ -94,14 +95,14 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
       const len = searchString.length;
       if (sat.static) return true; // Skip static dots (Maybe these should be searchable?)
       if (sat.marker) return false; // Stop searching once you reach the markers
-      if (settingsManager.isSatOverflyModeOn && sat.OT > 1) return true; // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
+      if (settingsManager.isSatOverflyModeOn && sat.type !== SpaceObjectType.PAYLOAD) return true; // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
       if (sat.missile && !sat.active) return true; // Skip inactive missiles.
-      if (sat.C == 'ANALSAT' && !sat.active) return true; // Skip Fake Analyst satellites
-      if (!sat.ON) return true; // Everything has a name. If it doesn't then assume it isn't what we are searching for.
+      if (sat.country == 'ANALSAT' && !sat.active) return true; // Skip Fake Analyst satellites
+      if (!sat.name) return true; // Everything has a name. If it doesn't then assume it isn't what we are searching for.
 
-      if (sat.ON.toUpperCase().indexOf(searchString) !== -1) {
+      if (sat.name.toUpperCase().indexOf(searchString) !== -1) {
         results.push({
-          strIndex: sat.ON.indexOf(searchString),
+          strIndex: sat.name.indexOf(searchString),
           isON: true,
           patlen: len,
           satId: i,
@@ -123,9 +124,9 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
         return true; // Last check for missiles
       }
 
-      if (sat.SCC_NUM.indexOf(searchString) !== -1) {
+      if (sat.sccNum && sat.sccNum.indexOf(searchString) !== -1) {
         results.push({
-          strIndex: sat.SCC_NUM.indexOf(searchString),
+          strIndex: sat.sccNum.indexOf(searchString),
           isSccNum: true,
           patlen: len,
           satId: i,
@@ -133,7 +134,7 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
         return true; // Prevent's duplicate results
       }
 
-      if (sat.intlDes.indexOf(searchString) !== -1) {
+      if (sat.intlDes && sat.intlDes.indexOf(searchString) !== -1) {
         results.push({
           strIndex: sat.intlDes.indexOf(searchString),
           isIntlDes: true,
@@ -143,9 +144,9 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
         return true; // Prevent's duplicate results
       }
 
-      if (sat.LV.toUpperCase().indexOf(searchString) !== -1) {
+      if (sat.launchVehicle && sat.launchVehicle.toUpperCase().indexOf(searchString) !== -1) {
         results.push({
-          strIndex: sat.LV.indexOf(searchString),
+          strIndex: sat.launchVehicle.indexOf(searchString),
           isLV: true,
           patlen: len,
           satId: i,
@@ -167,7 +168,7 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
 
   const dispGroup = groupsManager.createGroup('idList', idList);
   lastResultGroup = dispGroup;
-  groupsManager.selectGroup(dispGroup, orbitManager);
+  groupsManager.selectGroup(dispGroup);
 
   if (!isPreventDropDown) searchBox.fillResultBox(results, satSet);
   return idList;
@@ -181,17 +182,17 @@ export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) =
     html += '<div class="search-result" data-sat-id="' + sat.id + '">';
     html += '<div class="truncate-search">';
     if (sat.missile) {
-      html += sat.ON;
+      html += sat.name;
     } else if (result.isON) {
       // If the name matched - highlight it
-      html += sat.ON.substring(0, result.strIndex);
+      html += sat.name.substring(0, result.strIndex);
       html += '<span class="search-hilight">';
-      html += sat.ON.substring(result.strIndex, result.strIndex + result.patlen);
+      html += sat.name.substring(result.strIndex, result.strIndex + result.patlen);
       html += '</span>';
-      html += sat.ON.substring(result.strIndex + result.patlen);
+      html += sat.name.substring(result.strIndex + result.patlen);
     } else {
       // If not, just write the name
-      html += sat.ON;
+      html += sat.name;
     }
     html += '</div>';
     html += '<div class="search-result-scc">';
@@ -202,11 +203,11 @@ export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) =
       result.strIndex = result.strIndex || 0;
       result.patlen = result.patlen || 5;
 
-      html += sat.SCC_NUM.substring(0, result.strIndex);
+      html += sat.sccNum.substring(0, result.strIndex);
       html += '<span class="search-hilight">';
-      html += sat.SCC_NUM.substring(result.strIndex, result.strIndex + result.patlen);
+      html += sat.sccNum.substring(result.strIndex, result.strIndex + result.patlen);
       html += '</span>';
-      html += sat.SCC_NUM.substring(result.strIndex + result.patlen);
+      html += sat.sccNum.substring(result.strIndex + result.patlen);
     } else if (result.isIntlDes) {
       // If the international designator matched
       result.strIndex = result.strIndex || 0;
@@ -219,7 +220,7 @@ export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) =
       html += sat.intlDes.substring(result.strIndex + result.patlen);
     } else {
       // Don't Write the lift vehicle - maybe it should?
-      html += sat.SCC_NUM;
+      html += sat.sccNum;
     }
     html += '</div></div>';
     return html;

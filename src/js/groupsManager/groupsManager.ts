@@ -13,7 +13,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ///////////////////////////////////////////////////////////////////////////// */
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { GroupsManager, SatGroupCollection } from '../api/keepTrack';
+import { GroupsManager, SatGroupCollection } from '../api/keepTrackTypes';
 import { SatGroup } from './sat-group';
 
 export const createGroup = (groupType: string, data: any): SatGroup => new SatGroup(groupType, data, keepTrackApi.programs.satSet);

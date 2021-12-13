@@ -2276,12 +2276,11 @@ Object {
     "resizeCanvas": [Function],
     "resizePostProcessingTexture": [Function],
     "sat": Object {
-      "OT": 0,
       "id": -1,
       "inView": 0,
       "missile": false,
-      "satId": -1,
       "static": false,
+      "type": 0,
     },
     "satCalculate": [Function],
     "sceneManager": null,

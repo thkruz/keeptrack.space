@@ -46,7 +46,7 @@ import { timeManager } from '@app/js/timeManager/timeManager';
 import { adviceManager } from '@app/js/uiManager/adviceManager';
 import { searchBox } from '@app/js/uiManager/searchBox';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager';
-import { MapManager, ObjectManager, OrbitManager, SensorManager } from './api/keepTrack';
+import { MapManager, ObjectManager, OrbitManager, SensorManager } from './api/keepTrackTypes';
 
 export const redirectHttpToHttps = (): void => {
   // This is necessary for some of the geolocation based functions

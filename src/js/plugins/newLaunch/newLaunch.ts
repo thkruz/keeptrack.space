@@ -190,7 +190,7 @@ export const bottomMenuClick = (iconName: string): void => {
         isNewLaunchMenuOpen = true;
 
         const sat = keepTrackApi.programs.satSet.getSatExtraOnly(keepTrackApi.programs.objectManager.selectedSat);
-        $('#nl-scc').val(sat.SCC_NUM);
+        $('#nl-scc').val(sat.sccNum);
         $('#nl-inc').val((sat.inclination * RAD2DEG).toPrecision(2));
       } else {
         aM.adviceList?.newLaunchDisabled();

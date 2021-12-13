@@ -1,5 +1,5 @@
-import { GamepadPlugin } from '@app/js/api/keepTrack';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { GamepadPlugin } from '@app/js/api/keepTrackTypes';
 
 const gamepadSettings = {
   deadzone: 0.15,

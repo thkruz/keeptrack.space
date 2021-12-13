@@ -4,9 +4,12 @@ USER root
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json ./
+COPY tsconfig.json ./
 COPY src src
 COPY scripts scripts
+
+RUN npm i
 
 RUN npm run build
 

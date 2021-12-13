@@ -672,7 +672,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
         console.debug('latLon undefined!');
         latLon = satellite.eci2ll(dragPoint[0], dragPoint[1], dragPoint[2]);
       }
-      M.toast({
+      (<any>M).toast({
         html: 'Lat: ' + latLon.lat.toFixed(3) + '<br/>Lon: ' + latLon.lon.toFixed(3),
       });
       break;
@@ -695,7 +695,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
         latLon = satellite.eci2ll(dragPoint[0], dragPoint[1], dragPoint[2]);
       }
       var gpsDOP = satellite.getDops(latLon.lat, latLon.lon, 0);
-      M.toast({
+      (<any>M).toast({
         html: 'HDOP: ' + gpsDOP.hdop + '<br/>VDOP: ' + gpsDOP.vdop + '<br/>PDOP: ' + gpsDOP.pdop + '<br/>GDOP: ' + gpsDOP.gdop + '<br/>TDOP: ' + gpsDOP.tdop,
       });
       break;

@@ -1,19 +1,22 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { EarthObject } from '@app/js/api/keepTrack';
-import { DEG2RAD, MILLISECONDS_PER_DAY, RADIUS_OF_EARTH } from '@app/js/lib/constants.js';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { Camera, DotsManager, EarthObject } from '@app/js/api/keepTrackTypes';
+import { DEG2RAD, MILLISECONDS_PER_DAY, RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { satellite } from '@app/js/satMath/satMath';
 import { jday } from '@app/js/timeManager/transforms';
-import { Camera, DotsManager } from '@app/types/types';
 import * as glm from 'gl-matrix';
 
 // TODO: #316 Implement VAO for earth
 
-let vertPosBuf, vertNormBuf, texCoordBuf, vertIndexBuf; // GPU mem buffers, data and stuff?
-let vertCount;
-let earthNow;
-let mvMatrix;
-let nMatrix;
-let texture, nightTexture;
+let vertPosBuf: WebGLBuffer;
+let vertNormBuf: WebGLBuffer;
+let texCoordBuf: WebGLBuffer;
+let vertIndexBuf: WebGLBuffer;
+let vertCount: number;
+let earthNow: Date;
+let mvMatrix: glm.mat4;
+let nMatrix: glm.mat3;
+let texture: WebGLTexture;
+let nightTexture: WebGLTexture;
 let texLoaded = false;
 let nightLoaded = false;
 

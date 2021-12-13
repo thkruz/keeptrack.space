@@ -1,12 +1,12 @@
-import { TimeManager } from '@app/types/types';
 import $ from 'jquery';
-import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApi } from '../api/keepTrackApi';
+import { TimeManager } from '../api/keepTrackTypes';
 import { getDayOfYear } from './transforms';
 
 export const changePropRate = (propRate: number) => {
   if (timeManager.propRate === propRate) return; // no change
 
-  timeManager.staticOffset = timeManager.calculateSimulationTime() - timeManager.realTime;
+  timeManager.staticOffset = timeManager.calculateSimulationTime().getTime() - timeManager.realTime;
 
   // Changing propRate or dynamicOffsetEpoch before calculating the staticOffset will give incorrect results
   timeManager.dynamicOffsetEpoch = Date.now();
@@ -50,7 +50,7 @@ export const timeManager: TimeManager = {
   setNow: null,
   setLastTime: null,
   setSelectedDate: null,
-  lastTime: null,
+  lastTime: new Date(),
   selectedDate: null,
   tDS: null,
   iText: null,
@@ -92,7 +92,6 @@ export const timeManager: TimeManager = {
       //
       // dynamicOffset = realTime - dynamicOffsetEpoch;
       // simulationTime = realTime + staticOffset + dynamicOffset * propRate;
-
       if (timeManager.propRate === 0) {
         const simulationTime = timeManager.dynamicOffsetEpoch + timeManager.staticOffset;
         timeManager.simulationTimeObj.setTime(simulationTime);
@@ -111,7 +110,7 @@ export const timeManager: TimeManager = {
       return now;
     };
 
-    timeManager.setNow = (now, dt) => {
+    timeManager.setNow = (now: number, dt: number) => {
       timeManager.realTime = now;
       timeManager.dt = dt;
 
@@ -120,23 +119,23 @@ export const timeManager: TimeManager = {
       timeManager.setSelectedDate(timeManager.simulationTimeObj);
 
       // Passing datetimeInput eliminates needing jQuery in main module
-      if (timeManager.lastTime - timeManager.simulationTimeObj.getTime() < 300 && (settingsManager.isEditTime || !settingsManager.cruncherReady)) {
+      if (timeManager.lastTime.getTime() - timeManager.simulationTimeObj.getTime() < 300 && (settingsManager.isEditTime || !settingsManager.cruncherReady)) {
         if (settingsManager.plugins.datetime) {
           timeManager.datetimeInputDOM.val(timeManager.selectedDate.toISOString().slice(0, 10) + ' ' + timeManager.selectedDate.toISOString().slice(11, 19));
         }
       }
     };
 
-    timeManager.setLastTime = (now) => {
+    timeManager.setLastTime = (now: Date): void => {
       timeManager.lastTime = now;
     };
 
-    timeManager.setSelectedDate = (selectedDate) => {
+    timeManager.setSelectedDate = (selectedDate: Date) => {
       timeManager.selectedDate = selectedDate;
 
       // This function only applies when datetime plugin is enabled
       if (settingsManager.plugins.datetime) {
-        if (timeManager.lastTime - timeManager.simulationTimeObj < 300) {
+        if (timeManager.lastTime.getTime() - timeManager.simulationTimeObj < 300) {
           timeManager.tDS = timeManager.simulationTimeObj.toJSON();
           timeManager.timeTextStr = timeManager.timeTextStrEmpty;
           for (timeManager.iText = 11; timeManager.iText < 20; timeManager.iText++) {
@@ -183,4 +182,5 @@ export const timeManager: TimeManager = {
   simulationTimeObj: null,
   calculateSimulationTime: null,
   getOffsetTimeObj: null,
+  propOffset: 0,
 };

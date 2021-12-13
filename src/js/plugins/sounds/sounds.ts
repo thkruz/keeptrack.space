@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 export const init = (): void => {
   // const { settingsManager } = keepTrackApi.programs;
@@ -18,21 +18,21 @@ export const init = (): void => {
         speak: (text: string) => {
           // Create a new instance of SpeechSynthesisUtterance.
           const msg = new SpeechSynthesisUtterance();
-    
+
           // Set the text.
           msg.text = text;
-    
+
           // Set the attributes.
           msg.volume = 0.5;
           msg.rate = 1;
           msg.pitch = 1;
-    
+
           // If a voice has been selected, find the voice and set the
           // utterance instance's voice attribute.
           msg.voice = speechSynthesis.getVoices().filter(function (voice) {
             return voice.name == 'Google UK English Female';
           })[0];
-    
+
           // Queue this utterance.
           window.speechSynthesis.speak(msg);
         },
@@ -42,6 +42,7 @@ export const init = (): void => {
         play: (sound: string) => {
           keepTrackApi.programs.soundManager.sounds[sound].play();
         },
+        voices: [],
       };
     },
   });

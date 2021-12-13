@@ -1162,27 +1162,15 @@ input:focus {
 
 #help-screen {
   position: absolute;
-  bottom: 125px;
-  left: 10%;
-  border-radius: 5px;
   z-index: 99;
-  border: 1px solid var(--colorTertiaryDarken3);
+  border: 5px solid var(--colorTertiaryDarken3);
   min-width: 200px;
   max-width: 350px;
-  margin: 50px 10px;
+  margin: 30px 10px;
   text-align: center;
   padding: 10px;
   overflow: hidden;
   background: var(--colorTertiaryDarken2);
-  /* Old browsers */
-  background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  /* FF3.6-15 */
-  background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
-  /* IE6-9 fallback on horizontal gradient */
 }
 
 #help-inner-container {

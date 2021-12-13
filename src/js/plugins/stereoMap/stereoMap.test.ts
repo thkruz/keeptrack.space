@@ -1,5 +1,5 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as stereoMap from '@app/js/plugins/stereoMap/stereoMap';
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
@@ -60,7 +60,7 @@ describe('stereoMap.bottomMenuClick', () => {
   test('1', () => {
     keepTrackApi.programs.objectManager.selectedSat = 1;
     keepTrackApi.programs.mapManager.isMapMenuOpen = false;
-    keepTrackApi.programs.settingsManager.isMobileModeEnabled = true;
+    settingsManager.isMobileModeEnabled = true;
     let result: any = stereoMap.bottomMenuClick('menu-map');
     expect(result).toMatchSnapshot();
   });

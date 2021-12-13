@@ -1,5 +1,5 @@
 import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
-import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApi } from '../api/keepTrackApi';
 import * as meshManager from './meshManager';
 
 declare const settingsManager;
@@ -228,7 +228,7 @@ describe('meshManager.update', () => {
 
   test('1', () => {
     const sat = defaultSat;
-    sat.SCC_NUM = '25544';
+    sat.sccNum = '25544';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
   });
@@ -236,7 +236,7 @@ describe('meshManager.update', () => {
   test('2', () => {
     const sat = defaultSat;
     sat.OT = 1;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     sat.ON = 'FLOCK';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
@@ -245,7 +245,7 @@ describe('meshManager.update', () => {
   test('3', () => {
     const sat = defaultSat;
     sat.OT = 1;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     sat.ON = 'STARLINK';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
@@ -254,7 +254,7 @@ describe('meshManager.update', () => {
   test('4', () => {
     const sat = defaultSat;
     sat.OT = 1;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     sat.ON = 'GLOBALSTAR';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
@@ -263,7 +263,7 @@ describe('meshManager.update', () => {
   test('5', () => {
     const sat = defaultSat;
     sat.OT = 1;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     sat.ON = 'IRIDIUM';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
@@ -272,7 +272,7 @@ describe('meshManager.update', () => {
   test('6', () => {
     const sat = defaultSat;
     sat.OT = 1;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     sat.ON = 'ORBCOMM';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
@@ -281,7 +281,7 @@ describe('meshManager.update', () => {
   test('7', () => {
     const sat = defaultSat;
     sat.OT = 1;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     sat.ON = 'O3B';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
@@ -290,7 +290,7 @@ describe('meshManager.update', () => {
   test('8', () => {
     const sat = defaultSat;
     sat.OT = 1;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     sat.ON = 'NAVSTAR';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
@@ -299,7 +299,7 @@ describe('meshManager.update', () => {
   test('9', () => {
     const sat = defaultSat;
     sat.OT = 1;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     sat.ON = 'GALILEO';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
@@ -308,7 +308,7 @@ describe('meshManager.update', () => {
   test('10', () => {
     const sat = defaultSat;
     sat.OT = 1;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     sat.ON = 'SBIRS';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
@@ -318,7 +318,7 @@ describe('meshManager.update', () => {
     const sat = defaultSat;
     sat.OT = 1;
     sat.ON = 'FAKE';
-    sat.SCC_NUM = '04630';
+    sat.sccNum = '04630';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
   });
@@ -327,7 +327,7 @@ describe('meshManager.update', () => {
     const sat = defaultSat;
     sat.OT = 1;
     sat.ON = 'FAKE';
-    sat.SCC_NUM = '36868';
+    sat.sccNum = '36868';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
   });
@@ -336,7 +336,7 @@ describe('meshManager.update', () => {
     const sat = defaultSat;
     sat.OT = 1;
     sat.ON = 'FAKE';
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     sat.R = '0.05';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
@@ -345,7 +345,7 @@ describe('meshManager.update', () => {
   test('14', () => {
     const sat = defaultSat;
     sat.OT = 1;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     sat.ON = 'FAKE';
     sat.R = '0.15';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
@@ -355,7 +355,7 @@ describe('meshManager.update', () => {
   test('15', () => {
     const sat = defaultSat;
     sat.OT = 1;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     sat.ON = 'FAKE';
     sat.R = '0.25';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
@@ -366,7 +366,7 @@ describe('meshManager.update', () => {
     const sat = defaultSat;
     sat.OT = 1;
     sat.ON = 'FAKE';
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
   });
@@ -374,7 +374,7 @@ describe('meshManager.update', () => {
   test('17', () => {
     const sat = defaultSat;
     sat.OT = 2;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
   });
@@ -382,7 +382,7 @@ describe('meshManager.update', () => {
   test('18', () => {
     const sat = defaultSat;
     sat.OT = 3;
-    sat.SCC_NUM = '1000';
+    sat.sccNum = '1000';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
   });
@@ -390,7 +390,7 @@ describe('meshManager.update', () => {
   test('19', () => {
     const sat = defaultSat;
     sat.OT = 3;
-    sat.SCC_NUM = '25000';
+    sat.sccNum = '25000';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
   });
@@ -398,7 +398,7 @@ describe('meshManager.update', () => {
   test('20', () => {
     const sat = defaultSat;
     sat.OT = 3;
-    sat.SCC_NUM = '40000';
+    sat.sccNum = '40000';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
   });
@@ -406,7 +406,7 @@ describe('meshManager.update', () => {
   test('21', () => {
     const sat = defaultSat;
     sat.OT = 4;
-    sat.SCC_NUM = '5';
+    sat.sccNum = '5';
     let result: any = meshManager.update(keepTrackApi.programs.mainCamera, keepTrackApi.programs.timeManager, sat);
     expect(result).toMatchSnapshot();
   });

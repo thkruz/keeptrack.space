@@ -1,5 +1,5 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 let isColorSchemeMenuOpen = false;
 export const hideSideMenus = (): void => {
@@ -120,8 +120,8 @@ export const bottomMenuClick = (iconName: string): void => {
   }
 };
 export const colorsMenuClick = (colorName: string) => {
-  const { ColorScheme, satSet, objectManager, uiManager } = keepTrackApi.programs;
-  objectManager.setSelectedSat(-1); // clear selected sat  
+  const { colorSchemeManager, satSet, objectManager, uiManager } = keepTrackApi.programs;
+  objectManager.setSelectedSat(-1); // clear selected sat
   if (colorName !== 'sunlight') {
     satSet.satCruncher.postMessage({
       isSunlightView: false,
@@ -130,17 +130,17 @@ export const colorsMenuClick = (colorName: string) => {
   switch (colorName) {
     case 'default':
       uiManager.legendMenuChange('default');
-      satSet.setColorScheme(ColorScheme.default, true);
+      satSet.setColorScheme(colorSchemeManager.default, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'velocity':
       uiManager.legendMenuChange('velocity');
-      satSet.setColorScheme(ColorScheme.velocity);
+      satSet.setColorScheme(colorSchemeManager.velocity);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'sunlight':
       uiManager.legendMenuChange('sunlight');
-      satSet.setColorScheme(ColorScheme.sunlight, true);
+      satSet.setColorScheme(colorSchemeManager.sunlight, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       settingsManager.isForceColorScheme = true;
       satSet.satCruncher.postMessage({
@@ -149,18 +149,18 @@ export const colorsMenuClick = (colorName: string) => {
       break;
     case 'near-earth':
       uiManager.legendMenuChange('near');
-      satSet.setColorScheme(ColorScheme.leo);
+      satSet.setColorScheme(colorSchemeManager.leo);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'deep-space':
       uiManager.legendMenuChange('deep');
-      satSet.setColorScheme(ColorScheme.geo);
+      satSet.setColorScheme(colorSchemeManager.geo);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'elset-age':
       $('#loading-screen').fadeIn(1000, function () {
         uiManager.legendMenuChange('ageOfElset');
-        satSet.setColorScheme(ColorScheme.ageOfElset);
+        satSet.setColorScheme(colorSchemeManager.ageOfElset);
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
         $('#loading-screen').fadeOut('slow');
       });
@@ -169,7 +169,7 @@ export const colorsMenuClick = (colorName: string) => {
       $('#search').val('');
       $('#loading-screen').fadeIn(1000, function () {
         settingsManager.lostSatStr = '';
-        satSet.setColorScheme(ColorScheme.lostobjects);
+        satSet.setColorScheme(colorSchemeManager.lostobjects);
         (<HTMLInputElement>document.getElementById('search')).value = settingsManager.lostSatStr;
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
         uiManager.doSearch($('#search').val());
@@ -178,17 +178,17 @@ export const colorsMenuClick = (colorName: string) => {
       break;
     case 'rcs':
       uiManager.legendMenuChange('rcs');
-      satSet.setColorScheme(ColorScheme.rcs);
+      satSet.setColorScheme(colorSchemeManager.rcs);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'smallsats':
       uiManager.legendMenuChange('small');
-      satSet.setColorScheme(ColorScheme.smallsats);
+      satSet.setColorScheme(colorSchemeManager.smallsats);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'countries':
       uiManager.legendMenuChange('countries');
-      satSet.setColorScheme(ColorScheme.countries);
+      satSet.setColorScheme(colorSchemeManager.countries);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
   }

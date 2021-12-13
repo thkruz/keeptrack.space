@@ -1,0 +1,22 @@
+export const ZOOM_EXP = 3;
+export const PI = Math.PI;
+export const TAU = 2 * Math.PI;
+export const DEG2RAD = TAU / 360;
+export const RAD2DEG = 360 / TAU;
+// export const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
+// TODO: this is really MILLISECONDS_TO_DAYS
+export const MILLISECONDS_PER_DAY = 1.15741e-8;
+export const MINUTES_PER_DAY = 1440;
+export const PLANETARIUM_DIST = 3;
+export const RADIUS_OF_DRAW_SUN = 9000;
+export const SUN_SCALAR_DISTANCE = 250000;
+export const RADIUS_OF_DRAW_MOON = 4000;
+export const MOON_SCALAR_DISTANCE = 200000;
+export const cMPerSec = 299792458;
+export const cKmPerSec = 299792458 / 1000;
+export const cKmPerMs = 299792458 / 1000 / 1000;
+export const RADIUS_OF_EARTH = 6371; // Radius of Earth in kilometers
+export const GROUND_BUFFER_DISTANCE = 1; // Distance objects are placed above earth to avoid z-buffer fighting
+export const RADIUS_OF_SUN = 695700; // Radius of the Sun in kilometers
+export const STAR_DISTANCE = 250000; // Artificial Star Distance - Lower numberrReduces webgl depth buffer
+export const DISTANCE_TO_SUN = 149597870; // Distance from Earth to the Sun in kilometers

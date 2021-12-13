@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
@@ -77,7 +77,7 @@ export const orbitReferencesLinkClick = () => {
     const sccNum = stringPad.pad0(sat.TLE1.substr(2, 5).trim(), 5);
 
     const { TLE1, TLE2 } = satellite.createTle(sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, sccNum);
-    searchStr += satSet.insertNewAnalystSatellite(TLE1, TLE2, satNum + i, (100000 + i).toString()).SCC_NUM.toString();
+    searchStr += satSet.insertNewAnalystSatellite(TLE1, TLE2, satNum + i, (100000 + i).toString()).sccNum.toString();
     if (i !== 359) searchStr += ',';
   }
 

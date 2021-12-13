@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
 export const init = (): void => {
@@ -36,7 +36,7 @@ export const init = (): void => {
           keepTrackApi.programs.uiManager.hideSideMenus();
           return;
         } else {
-          if (keepTrackApi.programs.settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
+          if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
           keepTrackApi.programs.uiManager.hideSideMenus();
           if ($('#twitter-menu').html() == '') {
             $('#twitter-menu').html(

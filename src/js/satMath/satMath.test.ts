@@ -2,40 +2,41 @@
 // should be updated to use the same time on all computers.
 
 import { defaultSat, defaultSensor, keepTrackApiStubs } from '../api/apiMocks';
-import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApi } from '../api/keepTrackApi';
+import { SatObject, SunObject, ZoomValue } from '../api/keepTrackTypes';
 import * as satMath from './satMath';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
 describe('satMath.currentEpoch', () => {
   test('0', () => {
     let inst: any = new Date('32-01-2020');
-    let result: any = satMath.currentEpoch({ prototype: inst });
+    let result: any = satMath.currentEpoch(inst);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
     let inst: any = new Date('01-01-2030');
-    let result: any = satMath.currentEpoch({ prototype: inst });
+    let result: any = satMath.currentEpoch(inst);
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
     let inst: any = new Date('01-01-2020');
-    let result: any = satMath.currentEpoch({ prototype: inst });
+    let result: any = satMath.currentEpoch(inst);
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
     let inst: any = new Date('01-13-2020');
-    let result: any = satMath.currentEpoch({ prototype: inst });
+    let result: any = satMath.currentEpoch(inst);
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
     let inst: any = new Date('');
-    let result: any = satMath.currentEpoch({ prototype: inst });
+    let result: any = satMath.currentEpoch(inst);
     expect(result).toMatchSnapshot();
   });
 });
@@ -44,12 +45,12 @@ describe('satMath.currentEpoch', () => {
 describe('satMath.distance', () => {
   test('0', () => {
     let result: any = satMath.distance(
-      {
+      <SatObject>{
         position: { x: 1, y: 550, z: 350 },
         static: true,
         TLE1: 'Foo bar',
         TLE2: 'Hello, world!',
-        SCC_NUM: 'MT',
+        sccNum: 'MT',
         active: false,
         C: 'rgb(0.1,0.2,0.3)',
         LS: 'B/.',
@@ -92,12 +93,12 @@ describe('satMath.distance', () => {
         vmag: 1,
         id: 0,
       },
-      {
+      <SatObject>{
         position: { x: 4, y: 4, z: 30 },
         static: false,
         TLE1: 'This is a Text',
         TLE2: 'Foo bar',
-        SCC_NUM: 'MT',
+        sccNum: 'MT',
         active: true,
         C: 'rgb(0.1,0.2,0.3)',
         LS: '₹',
@@ -146,12 +147,12 @@ describe('satMath.distance', () => {
 
   test('1', () => {
     let result: any = satMath.distance(
-      {
+      <SatObject>{
         position: { x: 350, y: 550, z: 1 },
         static: true,
         TLE1: 'Hello, world!',
         TLE2: 'Foo bar',
-        SCC_NUM: '₹',
+        sccNum: '₹',
         active: true,
         C: 'rgb(0.1,0.2,0.3)',
         LS: '£',
@@ -194,12 +195,12 @@ describe('satMath.distance', () => {
         vmag: 100,
         id: 0,
       },
-      {
+      <SatObject>{
         position: { x: 50, y: 70, z: 320 },
         static: true,
         TLE1: 'Foo bar',
         TLE2: 'Hello, world!',
-        SCC_NUM: 'лв',
+        sccNum: 'лв',
         active: true,
         C: 'red',
         LS: '£',
@@ -250,176 +251,188 @@ describe('satMath.distance', () => {
 // @ponicode
 describe('satMath.setobs', () => {
   test('0', () => {
-    let result: any = satMath.setobs({
-      alt: 0,
-      beamwidth: 15,
-      changeObjectInterval: -100,
-      country: 'US',
-      lat: 550,
-      linkAehf: false,
-      linkWgs: false,
-      lon: 50,
-      name: 'Pierre Edouard',
-      observerGd: { lat: 520, lon: 550, alt: -100 },
-      obsmaxaz: 1,
-      obsmaxel: -29.45,
-      obsmaxrange: 380,
-      obsminaz: 1,
-      obsminel: 0.0,
-      obsminrange: 1,
-      shortName: 333173976,
-      staticNum: 1,
-      sun: '4.0.0-beta1\t',
-      type: 'number',
-      url: 'http://base.com',
-      volume: false,
-      zoom: ['-19.3366', '-46.1477'],
-    });
+    let result: any = satMath.setobs([
+      {
+        alt: 0,
+        beamwidth: 15,
+        changeObjectInterval: -100,
+        country: 'US',
+        lat: 550,
+        linkAehf: false,
+        linkWgs: false,
+        lon: 50,
+        name: 'Pierre Edouard',
+        observerGd: { lat: 520, lon: 550, alt: -100 },
+        obsmaxaz: 1,
+        obsmaxel: -29.45,
+        obsmaxrange: 380,
+        obsminaz: 1,
+        obsminel: 0.0,
+        obsminrange: 1,
+        shortName: '333173976',
+        staticNum: 1,
+        sun: '4.0.0-beta1\t',
+        type: 'number',
+        url: 'http://base.com',
+        volume: false,
+        zoom: 'geo',
+      },
+    ]);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satMath.setobs({
-      alt: -100,
-      beamwidth: 40,
-      changeObjectInterval: 0,
-      country: 'China',
-      lat: 410,
-      linkAehf: true,
-      linkWgs: true,
-      lon: 380,
-      name: 'Edmond',
-      observerGd: { lat: 400, lon: 320, alt: 100 },
-      obsmaxaz: 100,
-      obsmaxel: -29.45,
-      obsmaxrange: 50,
-      obsminaz: -100,
-      obsminel: 10.23,
-      obsminrange: -100,
-      shortName: 'test',
-      staticNum: 1000,
-      sun: '4.0.0-beta1\t',
-      type: 'array',
-      url: 'http://base.com',
-      volume: true,
-      zoom: ['39.2233', '-78.8613'],
-    });
+    let result: any = satMath.setobs([
+      {
+        alt: -100,
+        beamwidth: 40,
+        changeObjectInterval: 0,
+        country: 'China',
+        lat: 410,
+        linkAehf: true,
+        linkWgs: true,
+        lon: 380,
+        name: 'Edmond',
+        observerGd: { lat: 400, lon: 320, alt: 100 },
+        obsmaxaz: 100,
+        obsmaxel: -29.45,
+        obsmaxrange: 50,
+        obsminaz: -100,
+        obsminel: 10.23,
+        obsminrange: -100,
+        shortName: 'test',
+        staticNum: 1000,
+        sun: '4.0.0-beta1\t',
+        type: 'array',
+        url: 'http://base.com',
+        volume: true,
+        zoom: 'leo',
+      },
+    ]);
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    let result: any = satMath.setobs({
-      alt: -100,
-      beamwidth: 30,
-      changeObjectInterval: 1,
-      country: 'France',
-      lat: 30,
-      linkAehf: true,
-      linkWgs: false,
-      lon: 30,
-      name: 'Jean-Philippe',
-      observerGd: { lat: 550, lon: 1, alt: 0 },
-      obsmaxaz: 1,
-      obsmaxel: -0.5,
-      obsmaxrange: 380,
-      obsminaz: 0,
-      obsminel: 1.0,
-      obsminrange: -5.48,
-      shortName: 'test',
-      staticNum: 10,
-      sun: '4.0.0-beta1\t',
-      type: 'number',
-      url: 'Www.GooGle.com',
-      volume: false,
-      zoom: ['-84.8577', '134.8560'],
-    });
+    let result: any = satMath.setobs([
+      {
+        alt: -100,
+        beamwidth: 30,
+        changeObjectInterval: 1,
+        country: 'France',
+        lat: 30,
+        linkAehf: true,
+        linkWgs: false,
+        lon: 30,
+        name: 'Jean-Philippe',
+        observerGd: { lat: 550, lon: 1, alt: 0 },
+        obsmaxaz: 1,
+        obsmaxel: -0.5,
+        obsmaxrange: 380,
+        obsminaz: 0,
+        obsminel: 1.0,
+        obsminrange: -5.48,
+        shortName: 'test',
+        staticNum: 10,
+        sun: '4.0.0-beta1\t',
+        type: 'number',
+        url: 'Www.GooGle.com',
+        volume: false,
+        zoom: 'leo',
+      },
+    ]);
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    let result: any = satMath.setobs({
-      alt: 0,
-      beamwidth: 16,
-      changeObjectInterval: -100,
-      country: 'China',
-      lat: 400,
-      linkAehf: true,
-      linkWgs: false,
-      lon: 30,
-      name: 'Jean-Philippe',
-      observerGd: { lat: 90, lon: 70, alt: -5.48 },
-      obsmaxaz: 0,
-      obsmaxel: 0.0,
-      obsmaxrange: 350,
-      obsminaz: -5.48,
-      obsminel: 0.0,
-      obsminrange: 1,
-      shortName: 333173976,
-      staticNum: 10,
-      sun: 'v4.0.0-rc.4',
-      type: 'array',
-      url: 'http://example.com/showcalendar.html?token=CKF50YzIHxCTKMAg',
-      volume: false,
-      zoom: ['41.1994', '-115.9206'],
-    });
+    let result: any = satMath.setobs([
+      {
+        alt: 0,
+        beamwidth: 16,
+        changeObjectInterval: -100,
+        country: 'China',
+        lat: 400,
+        linkAehf: true,
+        linkWgs: false,
+        lon: 30,
+        name: 'Jean-Philippe',
+        observerGd: { lat: 90, lon: 70, alt: -5.48 },
+        obsmaxaz: 0,
+        obsmaxel: 0.0,
+        obsmaxrange: 350,
+        obsminaz: -5.48,
+        obsminel: 0.0,
+        obsminrange: 1,
+        shortName: 'test',
+        staticNum: 10,
+        sun: 'v4.0.0-rc.4',
+        type: 'array',
+        url: 'http://example.com/showcalendar.html?token=CKF50YzIHxCTKMAg',
+        volume: false,
+        zoom: 'leo',
+      },
+    ]);
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let result: any = satMath.setobs({
-      alt: 0,
-      beamwidth: 5,
-      changeObjectInterval: -100,
-      country: 'FR',
-      lat: 520,
-      linkAehf: false,
-      linkWgs: true,
-      lon: 320,
-      name: 'Edmond',
-      observerGd: { lat: 50, lon: 50, alt: -5.48 },
-      obsmaxaz: 1,
-      obsmaxel: 10.23,
-      obsmaxrange: 70,
-      obsminaz: 100,
-      obsminel: 0.5,
-      obsminrange: -100,
-      shortName: 'test',
-      staticNum: 10,
-      sun: '4.0.0-beta1\t',
-      type: 'string',
-      url: 'https://accounts.google.com/o/oauth2/revoke?token=%s',
-      volume: true,
-      zoom: ['41.1994', '-115.9206'],
-    });
+    let result: any = satMath.setobs([
+      {
+        alt: 0,
+        beamwidth: 5,
+        changeObjectInterval: -100,
+        country: 'FR',
+        lat: 520,
+        linkAehf: false,
+        linkWgs: true,
+        lon: 320,
+        name: 'Edmond',
+        observerGd: { lat: 50, lon: 50, alt: -5.48 },
+        obsmaxaz: 1,
+        obsmaxel: 10.23,
+        obsmaxrange: 70,
+        obsminaz: 100,
+        obsminel: 0.5,
+        obsminrange: -100,
+        shortName: 'test',
+        staticNum: 10,
+        sun: '4.0.0-beta1\t',
+        type: 'string',
+        url: 'https://accounts.google.com/o/oauth2/revoke?token=%s',
+        volume: true,
+        zoom: 'leo',
+      },
+    ]);
     expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
-    let result: any = satMath.setobs({
-      alt: NaN,
-      beamwidth: NaN,
-      changeObjectInterval: NaN,
-      country: '',
-      lat: NaN,
-      linkAehf: false,
-      linkWgs: true,
-      lon: NaN,
-      name: '',
-      observerGd: { lat: NaN, lon: NaN, alt: NaN },
-      obsmaxaz: NaN,
-      obsmaxel: NaN,
-      obsmaxrange: NaN,
-      obsminaz: NaN,
-      obsminel: NaN,
-      obsminrange: NaN,
-      shortName: '',
-      staticNum: NaN,
-      sun: '',
-      type: '',
-      url: '',
-      volume: false,
-      zoom: '',
-    });
+    let result: any = satMath.setobs([
+      {
+        alt: NaN,
+        beamwidth: NaN,
+        changeObjectInterval: NaN,
+        country: '',
+        lat: NaN,
+        linkAehf: false,
+        linkWgs: true,
+        lon: NaN,
+        name: '',
+        observerGd: { lat: NaN, lon: NaN, alt: NaN },
+        obsmaxaz: NaN,
+        obsmaxel: NaN,
+        obsmaxrange: NaN,
+        obsminaz: NaN,
+        obsminel: NaN,
+        obsminrange: NaN,
+        shortName: '',
+        staticNum: NaN,
+        sun: '',
+        type: '',
+        url: '',
+        volume: false,
+        zoom: <ZoomValue>'',
+      },
+    ]);
     expect(result).toMatchSnapshot();
   });
 
@@ -448,7 +461,7 @@ describe('satMath.setobs', () => {
         type: 'string',
         url: 'https://accounts.google.com/o/oauth2/revoke?token=%s',
         volume: true,
-        zoom: ['41.1994', '-115.9206'],
+        zoom: 'leo',
       },
       {
         alt: 0,
@@ -473,7 +486,7 @@ describe('satMath.setobs', () => {
         type: 'string',
         url: 'https://accounts.google.com/o/oauth2/revoke?token=%s',
         volume: true,
-        zoom: ['41.1994', '-115.9206'],
+        zoom: 'leo',
       },
     ]);
     expect(result).toMatchSnapshot();
@@ -485,12 +498,12 @@ describe('satMath.calculateVisMag', () => {
   test('0', () => {
     let param3: any = new Date('01-13-2020');
     let result: any = satMath.calculateVisMag(
-      {
+      <SatObject>{
         position: { x: 350, y: 90, z: 550 },
         static: true,
         TLE1: 'Foo bar',
         TLE2: 'Foo bar',
-        SCC_NUM: 'MT',
+        sccNum: 'MT',
         active: true,
         C: 'red',
         LS: '₹',
@@ -559,7 +572,7 @@ describe('satMath.calculateVisMag', () => {
         zoom: 'leo',
       },
       param3,
-      { eci: { x: 0, y: 0, z: 0 } }
+      <SunObject>{ eci: { x: 0, y: 0, z: 0 } }
     );
     expect(result).toMatchSnapshot();
   });
@@ -567,12 +580,12 @@ describe('satMath.calculateVisMag', () => {
   test('1', () => {
     let param3: any = new Date('01-13-2020');
     let result: any = satMath.calculateVisMag(
-      {
+      <SatObject>{
         position: { x: 410, y: 400, z: 350 },
         static: false,
         TLE1: 'foo bar',
         TLE2: 'Hello, world!',
-        SCC_NUM: '£',
+        sccNum: '£',
         active: false,
         C: 'hsl(10%,20%,40%)',
         LS: 'B/.',
@@ -641,7 +654,7 @@ describe('satMath.calculateVisMag', () => {
         zoom: 'geo',
       },
       param3,
-      { eci: { x: 0, y: 0, z: 0 } }
+      <SunObject>{ eci: { x: 0, y: 0, z: 0 } }
     );
     expect(result).toMatchSnapshot();
   });
@@ -649,12 +662,12 @@ describe('satMath.calculateVisMag', () => {
   test('2', () => {
     let param3: any = new Date('01-13-2020');
     let result: any = satMath.calculateVisMag(
-      {
+      <SatObject>{
         position: { x: 90, y: 1, z: 550 },
         static: true,
         TLE1: 'Hello, world!',
         TLE2: 'foo bar',
-        SCC_NUM: '£',
+        sccNum: '£',
         active: true,
         C: 'rgb(0.1,0.2,0.3)',
         LS: 'B/.',
@@ -723,7 +736,7 @@ describe('satMath.calculateVisMag', () => {
         zoom: 'leo',
       },
       param3,
-      { eci: { x: 0, y: 0, z: 0 } }
+      <SunObject>{ eci: { x: 0, y: 0, z: 0 } }
     );
     expect(result).toMatchSnapshot();
   });
@@ -731,12 +744,12 @@ describe('satMath.calculateVisMag', () => {
   test('3', () => {
     let param3: any = new Date('32-01-2020');
     let result: any = satMath.calculateVisMag(
-      {
+      <SatObject>{
         position: { x: 90, y: 30, z: 520 },
         static: false,
         TLE1: 'This is a Text',
         TLE2: 'foo bar',
-        SCC_NUM: 'лв',
+        sccNum: 'лв',
         active: true,
         C: 'rgb(0,100,200)',
         LS: 'лв',
@@ -805,7 +818,7 @@ describe('satMath.calculateVisMag', () => {
         zoom: 'leo',
       },
       param3,
-      { eci: { x: 10, y: 10, z: 10 } }
+      <SunObject>{ eci: { x: 10, y: 10, z: 10 } }
     );
     expect(result).toMatchSnapshot();
   });
@@ -813,12 +826,12 @@ describe('satMath.calculateVisMag', () => {
   test('4', () => {
     let param3: any = new Date('01-01-2020');
     let result: any = satMath.calculateVisMag(
-      {
+      <SatObject>{
         position: { x: 70, y: 100, z: 550 },
         static: false,
         TLE1: 'Hello, world!',
         TLE2: 'Hello, world!',
-        SCC_NUM: 'B/.',
+        sccNum: 'B/.',
         active: true,
         C: 'rgb(0.1,0.2,0.3)',
         LS: '£',
@@ -887,7 +900,7 @@ describe('satMath.calculateVisMag', () => {
         zoom: 'leo',
       },
       param3,
-      { eci: { x: -10, y: -10, z: -10 } }
+      <SunObject>{ eci: { x: -10, y: -10, z: -10 } }
     );
     expect(result).toMatchSnapshot();
   });
@@ -909,6 +922,7 @@ describe('satMath.setTEARR', () => {
       rng: 0,
       az: 0,
       el: 0,
+      name: '',
     });
     expect(result).toMatchSnapshot();
   });
@@ -931,7 +945,7 @@ describe('satMath.nextpassList', () => {
 // @ponicode
 describe('satMath.nextpass', () => {
   test('0', () => {
-    satMath.nextpass(defaultSat, defaultSensor, 7, 5);
+    satMath.nextpass(defaultSat, [defaultSensor], 7, 5);
   });
 
   test('1', () => {
@@ -942,7 +956,7 @@ describe('satMath.nextpass', () => {
 // @ponicode
 describe('satMath.nextNpasses', () => {
   test('0', () => {
-    satMath.nextNpasses(defaultSat, defaultSensor, 7, 5, 2);
+    satMath.nextNpasses(defaultSat, [defaultSensor], 7, 5, 2);
   });
 });
 
@@ -964,11 +978,11 @@ describe('satMath.getlookangles', () => {
 // @ponicode
 describe('satMath.propagate', () => {
   test('0', () => {
-    satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), defaultSensor);
+    satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor]);
   });
 
   test('1', () => {
-    satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), defaultSensor, true);
+    satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor], true);
   });
 });
 
@@ -1000,14 +1014,14 @@ describe.skip('satMath.getOrbitByLatLon', () => {
 // @ponicode
 describe('satMath.calculateLookAngles', () => {
   test('0', () => {
-    satMath.calculateLookAngles(defaultSat, defaultSensor);
+    satMath.calculateLookAngles(defaultSat, [defaultSensor]);
   });
 });
 
 // @ponicode
-describe.skip('satMath.findBestPasses', () => {
+describe('satMath.findBestPasses', () => {
   test('0', () => {
-    let result: any = satMath.findBestPasses(defaultSat, defaultSensor);
+    let result: any = satMath.findBestPasses('25544', defaultSensor);
     expect(result).toMatchSnapshot();
   });
 });
@@ -1015,14 +1029,14 @@ describe.skip('satMath.findBestPasses', () => {
 // @ponicode
 describe('satMath.findBestPass', () => {
   test('0', () => {
-    satMath.findBestPass(defaultSat, defaultSensor);
+    satMath.findBestPass(defaultSat, [defaultSensor]);
   });
 });
 
 // @ponicode
 describe('satMath.eci2Rae', () => {
   test('0', () => {
-    satMath.eci2Rae(new Date(2020, 0, 1).getTime(), { position: { x: 10000, y: 10000, z: 10000 } }, defaultSensor);
+    satMath.eci2Rae(new Date(2020, 0, 1), [10000, 10000, 10000], defaultSensor);
   });
 });
 
@@ -1101,7 +1115,7 @@ describe('satMath.getSunTimes', () => {
   });
 
   test('1', () => {
-    let result: any = satMath.getSunTimes(defaultSat, defaultSensor);
+    let result: any = satMath.getSunTimes(defaultSat, [defaultSensor]);
     expect(result).toMatchSnapshot();
   });
 });
@@ -1131,19 +1145,6 @@ describe('satMath.eci2ll', () => {
 });
 
 // @ponicode
-describe('satMath._jday', () => {
-  test('0', () => {
-    let result: any = satMath._jday(2000, 1, 1, 0, 0, 0);
-    expect(result).toMatchSnapshot();
-  });
-
-  test('1', () => {
-    let result: any = satMath._jday(2020, 1, 1, 0, 0, 0);
-    expect(result).toMatchSnapshot();
-  });
-});
-
-// @ponicode
 describe('satMath.getLlaTimeView', () => {
   test('0', () => {
     satMath.getLlaTimeView(new Date(2020, 0, 1), defaultSat);
@@ -1168,7 +1169,7 @@ describe('satMath.map', () => {
 // @ponicode
 describe('satMath.calculateSensorPos', () => {
   test('0', () => {
-    satMath.calculateSensorPos(defaultSensor);
+    satMath.calculateSensorPos([defaultSensor]);
   });
 
   test('1', () => {

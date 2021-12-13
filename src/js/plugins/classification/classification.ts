@@ -1,9 +1,7 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 export const init = (): void => {
-  const { settingsManager } = keepTrackApi.programs;
-  // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
     cbName: 'classification',

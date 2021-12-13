@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
 let isConstellationsMenuOpen = false;
@@ -51,33 +51,25 @@ export const uiManagerInit = () => {
 };
 
 export const constellationMenuClick = (groupName: any) => {
-  const { uiManager, satSet, objectManager, groupsManager, lineManager } = keepTrackApi.programs;
+  const { satSet, objectManager, groupsManager, lineManager, uiManager } = keepTrackApi.programs;
 
   if (typeof groupsManager == 'undefined') return;
 
   switch (groupName) {
     case 'SpaceStations':
-      if (typeof groupsManager.SpaceStations == 'undefined') {
-        groupsManager.SpaceStations = groupsManager.createGroup('objNum', [25544, 41765]);
-      }
+      if (!groupsManager.SpaceStations) groupsManager.SpaceStations = groupsManager.createGroup('objNum', [25544, 41765]);
       break;
     case 'GlonassGroup':
-      if (typeof groupsManager.GlonassGroup == 'undefined') {
-        groupsManager.GlonassGroup = groupsManager.createGroup('nameRegex', /GLONASS/u);
-      }
+      if (!groupsManager.GlonassGroup) groupsManager.GlonassGroup = groupsManager.createGroup('nameRegex', /GLONASS/u);
       break;
     case 'GalileoGroup':
-      if (typeof groupsManager.GalileoGroup == 'undefined') {
-        groupsManager.GalileoGroup = groupsManager.createGroup('nameRegex', /GALILEO/u);
-      }
+      if (!groupsManager.GalileoGroup) groupsManager.GalileoGroup = groupsManager.createGroup('nameRegex', /GALILEO/u);
       break;
     case 'GPSGroup':
-      if (typeof groupsManager.GPSGroup == 'undefined') {
-        groupsManager.GPSGroup = groupsManager.createGroup('nameRegex', /NAVSTAR/u);
-      }
+      if (!groupsManager.GPSGroup) groupsManager.GPSGroup = groupsManager.createGroup('nameRegex', /NAVSTAR/u);
       break;
     case 'AmatuerRadio':
-      if (typeof groupsManager.AmatuerRadio == 'undefined') {
+      if (!groupsManager.AmatuerRadio) {
         groupsManager.AmatuerRadio = groupsManager.createGroup(
           'objNum',
           [
@@ -89,10 +81,8 @@ export const constellationMenuClick = (groupName: any) => {
       }
       break;
     case 'aehf':
-      if (typeof groupsManager.aehf == 'undefined') {
-        groupsManager.aehf = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.aehf));
-      }
-      $('#loading-screen').fadeIn(1000, function () {
+      if (!groupsManager.aehf) groupsManager.aehf = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.aehf));
+      $('#loading-screen').fadeIn(1000, () => {
         lineManager.clear();
         objectManager.satLinkManager.showLinks(lineManager, satSet, 'aehf');
         $('#loading-screen').fadeOut('slow');
@@ -100,80 +90,51 @@ export const constellationMenuClick = (groupName: any) => {
       break;
     case 'wgs':
       // WGS also selects DSCS
-      if (typeof groupsManager.wgs == 'undefined') {
-        groupsManager.wgs = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.wgs.concat(objectManager.satLinkManager.dscs)));
-      }
+      if (!groupsManager.wgs) groupsManager.wgs = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.wgs.concat(objectManager.satLinkManager.dscs)));
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
-        try {
-          objectManager.satLinkManager.showLinks(lineManager, satSet, 'wgs');
-        } catch (e) {
-          // Maybe the objectManager.satLinkManager isn't installed?
-        }
+        objectManager.satLinkManager.showLinks(lineManager, satSet, 'wgs');
         $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'starlink':
-      // WGS also selects DSCS
-      if (typeof groupsManager.starlink == 'undefined') {
-        groupsManager.starlink = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.starlink));
-      }
+      if (!groupsManager.starlink) groupsManager.starlink = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.starlink));
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
-        try {
-          objectManager.satLinkManager.showLinks(lineManager, satSet, 'starlink');
-        } catch (e) {
-          // Maybe the objectManager.satLinkManager isn't installed?
-        }
+        objectManager.satLinkManager.showLinks(lineManager, satSet, 'starlink');
         $('#loading-screen').fadeOut('slow');
       });
       break;
-    case 'sbirs':
-      // SBIRS and DSP
-      if (typeof groupsManager.sbirs == 'undefined') {
+    case 'sbirs': // SBIRS and DSP
+      if (!groupsManager.sbirs) {
         groupsManager.sbirs = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.sbirs));
       }
       $('#loading-screen').fadeIn(1000, function () {
         lineManager.clear();
-        try {
-          objectManager.satLinkManager.showLinks(lineManager, satSet, 'sbirs');
-        } catch (e) {
-          // Maybe the objectManager.satLinkManager isn't installed?
-        }
+        objectManager.satLinkManager.showLinks(lineManager, satSet, 'sbirs');
         $('#loading-screen').fadeOut('slow');
       });
       break;
     default:
       throw new Error('Unknown group name: ' + groupName);
   }
-
   groupSelected(groupName);
   uiManager.doSearch($('#search').val());
 };
 
-export const groupSelected = function (groupName: string | number) {
+export const groupSelected = (groupName: string) => {
   if (typeof groupName == 'undefined') return;
 
-  const { groupsManager, searchBox, orbitManager, uiManager, satSet, objectManager } = keepTrackApi.programs;
+  const { groupsManager, searchBox, uiManager, satSet, objectManager } = keepTrackApi.programs;
   if (typeof groupsManager[groupName] == 'undefined') throw new Error('Unknown group name: ' + groupName);
 
   const searchDOM = $('#search');
-  groupsManager.selectGroup(groupsManager[groupName], orbitManager);
-  searchDOM.val('');
+  groupsManager.selectGroup(groupsManager[groupName]);
 
-  const results = groupsManager[groupName].sats;
-  for (let i = 0; i < results.length; i++) {
-    const satId = groupsManager[groupName].sats[i].satId;
-    const scc = satSet.getSat(satId).SCC_NUM;
-    if (i === results.length - 1) {
-      searchDOM.val(searchDOM.val() + scc);
-    } else {
-      searchDOM.val(searchDOM.val() + scc + ',');
-    }
-  }
+  // Populate searchDOM with a search string separated by commas - minus the last one
+  searchDOM.val(groupsManager[groupName].sats.reduce((acc: string, obj: { satId: number }) => `${acc}${satSet.getSat(obj.satId).sccNum},`, '').slice(0, -1));
 
   searchBox.fillResultBox(groupsManager[groupName].sats, satSet);
-
   objectManager.setSelectedSat(-1); // Clear selected sat
 
   // Close Menus

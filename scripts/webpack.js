@@ -181,12 +181,11 @@ if (MAKE_MODE !== 'embed') {
       publicPath: './js/',
     },
   });
-  exportArray.push(jsConfig);
 
   const jsConfig2 = Object.assign({}, config, {
     name: 'WebWorkers',
     entry: {
-      positionCruncher: ['./src/js/webworker/positionCruncher.js'],
+      positionCruncher: ['./src/js/webworker/positionCruncher.ts'],
       orbitCruncher: ['./src/js/webworker/orbitCruncher.js'],
     },
     output: {
@@ -195,7 +194,6 @@ if (MAKE_MODE !== 'embed') {
       publicPath: './js/',
     },
   });
-  exportArray.push(jsConfig2);
 
   const jsConfig3 = Object.assign({}, config, {
     name: 'Libraries',
@@ -219,10 +217,10 @@ if (MAKE_MODE !== 'embed') {
       publicPath: './js/',
     },
   });
-  exportArray.push(jsConfig3);
 
-  // Return Array of Configurations
-  module.exports = [jsConfig, jsConfig2, jsConfig3];
+  exportArray.push(jsConfig);
+  exportArray.push(jsConfig2);
+  exportArray.push(jsConfig3);
 } else {
   const jsConfig = Object.assign({}, config, {
     name: 'MainFiles',
@@ -235,12 +233,11 @@ if (MAKE_MODE !== 'embed') {
       publicPath: './keepTrack/js/',
     },
   });
-  exportArray.push(jsConfig);
 
   const jsConfig2 = Object.assign({}, config, {
     name: 'WebWorkers',
     entry: {
-      positionCruncher: ['./src/js/webworker/positionCruncher.js'],
+      positionCruncher: ['./src/js/webworker/positionCruncher.ts'],
       orbitCruncher: ['./src/js/webworker/orbitCruncher.js'],
     },
     output: {
@@ -249,6 +246,8 @@ if (MAKE_MODE !== 'embed') {
       publicPath: './keepTrack/js/',
     },
   });
+
+  exportArray.push(jsConfig);
   exportArray.push(jsConfig2);
 }
 

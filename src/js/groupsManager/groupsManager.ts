@@ -12,100 +12,74 @@ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 ///////////////////////////////////////////////////////////////////////////// */
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { GroupsManager, SatGroupCollection } from '../api/keepTrackTypes';
 import { SatGroup } from './sat-group';
 
-export class GroupFactory {
-  _selectedGroup: SatGroup;
-  ColorScheme: any;
-  satSet: any;
-  stopUpdatingInViewSoon: boolean;
+export const createGroup = (groupType: string, data: any): SatGroup => new SatGroup(groupType, data, keepTrackApi.programs.satSet);
+export const selectGroup = (group: SatGroup): void => {
+  if (group === null || typeof group === 'undefined') return;
+  const { orbitManager } = keepTrackApi.programs;
 
-  constructor() {
-    this.satSet = keepTrackApi.programs.satSet;
-    this.ColorScheme = keepTrackApi.programs.ColorScheme;
-    this.selectedGroup = null;
-    this.stopUpdatingInViewSoon = false;
+  updateIsInGroup(groupsManager.selectedGroup, group);
+  groupsManager.selectedGroup = group;
+  group.updateOrbits(orbitManager);
+  settingsManager.setCurrentColorScheme(keepTrackApi.programs.colorSchemeManager.group);
+
+  groupsManager.stopUpdatingInViewSoon = false;
+};
+export const selectGroupNoOverlay = (group: SatGroup): void => {
+  updateIsInGroup(groupsManager.selectedGroup, group);
+  groupsManager.selectedGroup = group;
+  settingsManager.isGroupOverlayDisabled = true;
+  settingsManager.setCurrentColorScheme(keepTrackApi.programs.colorSchemeManager.group);
+};
+export const updateIsInGroup = (oldgroup: SatGroup, newgroup: SatGroup): void => {
+  const { satSet } = keepTrackApi.programs;
+  if (oldgroup !== null && typeof oldgroup !== 'undefined') {
+    oldgroup.sats.forEach((sat: SatGroupCollection) => {
+      satSet.getSatExtraOnly(sat.satId).isInGroup = false;
+    });
   }
 
-  get selectedGroup() {
-    return this._selectedGroup;
+  if (newgroup !== null && typeof newgroup !== 'undefined') {
+    newgroup.sats.forEach((sat: SatGroupCollection) => {
+      satSet.getSatExtraOnly(sat.satId).isInGroup = true;
+    });
   }
+};
+export const clearSelect = (): void => {
+  updateIsInGroup(groupsManager.selectedGroup, null);
+  groupsManager.selectedGroup = null;
+  settingsManager.isGroupOverlayDisabled = false;
+  groupsManager.stopUpdatingInViewSoon = true;
+};
 
-  set selectedGroup(val) {
-    this._selectedGroup = val;
-  }
-
-  createGroup(groupType, data) {
-    return new SatGroup(groupType, data, this.satSet);
-  }
-
-  selectGroup(group, orbitManager) {
-    if (group === null || typeof group === 'undefined') {
-      return;
-    }
-
-    this.updateIsInGroup(this.selectedGroup, group);
-    this.selectedGroup = group;
-    group.updateOrbits(orbitManager);
-    settingsManager.setCurrentColorScheme(this.ColorScheme.group);
-
-    this.stopUpdatingInViewSoon = false;
-    // this.updateInViewSoon(this);
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  // updateInViewSoon(self: any) {
-  //   if (self.stopUpdatingInViewSoon) return;
-  //   if (self._selectedGroup === null || typeof self._selectedGroup === 'undefined') {
-  //     setTimeout(self.updateInViewSoon, 1000);
-  //     return;
-  //   }
-  //   const { satellite, satSet, sensorManager, orbitManager } = keepTrackApi.programs;
-  //   orbitManager.inViewSoon = [];
-  //   self._selectedGroup.forEach((id) => {
-  //     const nextPass = satellite.nextpass(satSet.getSat(id), sensorManager.currentSensor, 1 / 24 / 6, 10); // Search 10 minutes 10 seconds at a time
-  //     if (nextPass !== 'No Passes in ' + 1 / 24 / 6 + ' Days') {
-  //       orbitManager.inViewSoon.push(id);
-  //     }
-  //   });
-  //   setTimeout(() => self.updateInViewSoon(self), 1000);
-  // }
-
-  selectGroupNoOverlay(group) {
-    if (group === null || typeof group === 'undefined') {
-      return;
-    }
-    this.updateIsInGroup(this.selectedGroup, group);
-    this.selectedGroup = group;
-    settingsManager.isGroupOverlayDisabled = true;
-    settingsManager.setCurrentColorScheme(keepTrackApi.programs.ColorScheme.group);
-  }
-
-  updateIsInGroup(oldgroup, newgroup) {
-    var sat;
-    let i;
-    if (oldgroup !== null && typeof oldgroup !== 'undefined') {
-      for (i = 0; i < oldgroup.sats.length; i++) {
-        sat = this.satSet.getSatExtraOnly(oldgroup.sats[i].satId);
-        sat.isInGroup = false;
-      }
-    }
-
-    if (newgroup === null || typeof newgroup === 'undefined') {
-      return;
-    }
-
-    for (i = 0; i < newgroup.sats.length; i++) {
-      sat = this.satSet.getSatExtraOnly(newgroup.sats[i].satId);
-      sat.isInGroup = true;
-    }
-  }
-
-  clearSelect() {
-    this.updateIsInGroup(this.selectedGroup, null);
-    this.selectedGroup = null;
-    settingsManager.isGroupOverlayDisabled = false;
-    this.stopUpdatingInViewSoon = true;
-  }
-}
+export const groupsManager: GroupsManager = {
+  selectedGroup: null,
+  stopUpdatingInViewSoon: false,
+  Canada: null,
+  China: null,
+  France: null,
+  India: null,
+  Israel: null,
+  Japan: null,
+  Russia: null,
+  UnitedKingdom: null,
+  UnitedStates: null,
+  debris: null,
+  GPSGroup: null,
+  SpaceStations: null,
+  GlonassGroup: null,
+  GalileoGroup: null,
+  AmatuerRadio: null,
+  aehf: null,
+  wgs: null,
+  starlink: null,
+  sbirs: null,
+  createGroup,
+  selectGroup,
+  selectGroupNoOverlay,
+  updateIsInGroup,
+  clearSelect,
+};

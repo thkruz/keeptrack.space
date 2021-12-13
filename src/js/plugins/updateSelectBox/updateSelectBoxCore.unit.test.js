@@ -1,9 +1,9 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { missileManager } from '@app/js/plugins/missile/missileManager';
+import { useMockWorkers } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { orbitManager } from '@app/js/orbitManager/orbitManager';
+import { missileManager } from '@app/js/plugins/missile/missileManager';
 import { satellite } from '@app/js/satMath/satMath';
 import { timeManager } from '@app/js/timeManager/timeManager';
-import { useMockWorkers } from '@app/js/api/apiMocks';
 
 useMockWorkers();
 
@@ -11,7 +11,7 @@ keepTrackApi.programs.missileManager = missileManager;
 keepTrackApi.programs.satellite = satellite;
 keepTrackApi.programs.orbitManager = orbitManager;
 keepTrackApi.programs.timeManager = timeManager;
-keepTrackApi.programs.settingsManager = {
+settingsManager = {
   plugins: {
     datetime: {},
   },

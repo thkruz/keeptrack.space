@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { SatObject } from '@app/js/api/keepTrack';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import { stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
@@ -101,7 +101,7 @@ export const uiManagerInit = (): void => {
       </div>
     `);
 
-  $('#breakup').on('submit', function (e) {
+  $('#breakup').on('submit', function (e: Event) {
     $('#loading-screen').fadeIn(1000, breakupOnSubmit);
     e.preventDefault();
   });
@@ -240,7 +240,7 @@ export const breakupOnSubmit = (): void => {
       }
     }
   }
-  breakupSearchString += mainsat.SCC_NUM + ',Analyst Sat';
+  breakupSearchString += mainsat.sccNum + ',Analyst Sat';
   uiManager.doSearch(breakupSearchString);
 
   $('#loading-screen').fadeOut('slow');
@@ -267,7 +267,7 @@ export const bottomMenuClick = (iconName: string): void => {
         isBreakupMenuOpen = true;
 
         const sat: SatObject = satSet.getSatExtraOnly(objectManager.selectedSat);
-        $('#hc-scc').val(sat.SCC_NUM);
+        $('#hc-scc').val(sat.sccNum);
       } else {
         if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.breakupDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');

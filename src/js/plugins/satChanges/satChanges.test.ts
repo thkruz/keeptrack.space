@@ -1,8 +1,9 @@
 import { keepTrackApiStubs } from '../../api/apiMocks';
-import { keepTrackApi } from '../../api/externalApi';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import * as satChanges from './satChanges';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+
 // @ponicode
 describe('satChanges.init', () => {
   test('0', () => {
@@ -32,6 +33,9 @@ describe('satChanges.hideSideMenus', () => {
 
 describe('satChanges.bottomMenuClick', () => {
   test('0', () => {
+    const fakeTable = [{ SCC: 25544, inc: 51, meanmo: 120 }];
+    window.document.body.innerHTML = `<table id="satChng-table"></table>`;
+    satChanges.getSatChngJson([{ SCC: 25544, day: 100, year: 2020, inc: 10 }], fakeTable);
     let result: any = satChanges.bottomMenuClick('menu-satChng');
     expect(result).toMatchSnapshot();
   });
@@ -42,6 +46,9 @@ describe('satChanges.bottomMenuClick', () => {
   });
 
   test('2', () => {
+    const fakeTable = [{ SCC: 25544, inc: 51, meanmo: 120 }];
+    window.document.body.innerHTML = `<table id="satChng-table"></table>`;
+    satChanges.getSatChngJson([{ SCC: 25544, day: 100, year: 2020, inc: 10 }], fakeTable);
     satChanges.bottomMenuClick('menu-satChng');
     satChanges.bottomMenuClick('menu-satChng');
     let result: any = () => {
@@ -54,16 +61,18 @@ describe('satChanges.bottomMenuClick', () => {
 describe('satChanges.satChng', () => {
   beforeAll(() => {
     keepTrackApi.programs.satChange.satChngTable = [
-      { SCC: 25544, inc: 51, meanmo: 120 },
-      { SCC: 25545, inc: 51, meanmo: 120 },
+      { SCC: 25544, inc: 51, meanmo: 120, date: new Date('2019-01-02') },
+      { SCC: 25545, inc: 51, meanmo: 120, date: new Date('2019-01-01') },
     ];
   });
   test('0', () => {
+    document.body.innerHTML = `<div id="search-results"></div>`;
     let result: any = satChanges.satChng(0);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
+    document.body.innerHTML = `<div id="search-results"></div>`;
     let result: any = satChanges.satChng(1);
     expect(result).toMatchSnapshot();
   });
@@ -89,6 +98,6 @@ describe('satChanges.getSatChngJson', () => {
   test('0', () => {
     const fakeTable = [{ SCC: 25544, inc: 51, meanmo: 120 }];
     window.document.body.innerHTML = `<table id="satChng-table"></table>`;
-    satChanges.getSatChngJson([{ day: 100, year: 2020, inc: 10 }], fakeTable);
+    satChanges.getSatChngJson([{ SCC: 25544, day: 100, year: 2020, inc: 10 }], fakeTable);
   });
 });

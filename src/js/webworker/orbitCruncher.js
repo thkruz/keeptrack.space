@@ -74,7 +74,8 @@ onmessage = function (m) {
     if (satCache[satId].missile) {
       // let timeslice = satCache[satId].altList.length / NUM_SEGS;
       while (i < len) {
-        var x = parseInt(satCache[satId].altList.length * (i / NUM_SEGS));
+        const missile = satCache[satId];
+        var x = parseInt(missile.altList.length * (i / NUM_SEGS));
 
         var missileTime = propTime();
         var j = jday(
@@ -88,14 +89,14 @@ onmessage = function (m) {
         j += missileTime.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
         var gmst = satellite.gstime(j);
 
-        var cosLat = Math.cos(satCache[satId].latList[x] * DEG2RAD);
-        var sinLat = Math.sin(satCache[satId].latList[x] * DEG2RAD);
-        var cosLon = Math.cos(satCache[satId].lonList[x] * DEG2RAD + gmst);
-        var sinLon = Math.sin(satCache[satId].lonList[x] * DEG2RAD + gmst);
+        var cosLat = Math.cos(missile.latList[x] * DEG2RAD);
+        var sinLat = Math.sin(missile.latList[x] * DEG2RAD);
+        var cosLon = Math.cos(missile.lonList[x] * DEG2RAD + gmst);
+        var sinLon = Math.sin(missile.lonList[x] * DEG2RAD + gmst);
 
-        pointsOut[i * 4] = (RADIUS_OF_EARTH + satCache[satId].altList[x]) * cosLat * cosLon;
-        pointsOut[i * 4 + 1] = (RADIUS_OF_EARTH + satCache[satId].altList[x]) * cosLat * sinLon;
-        pointsOut[i * 4 + 2] = (RADIUS_OF_EARTH + satCache[satId].altList[x]) * sinLat;
+        pointsOut[i * 4] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * cosLon;
+        pointsOut[i * 4 + 1] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * sinLon;
+        pointsOut[i * 4 + 2] = (RADIUS_OF_EARTH + missile.altList[x]) * sinLat;
         pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
         i++;
       }

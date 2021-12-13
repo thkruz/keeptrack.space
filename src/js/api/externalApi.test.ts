@@ -1,4 +1,4 @@
-import * as externalApi from '@app/js/api/externalApi';
+import * as externalApi from '@app/js/api/keepTrackApi';
 import { expect } from '@jest/globals';
 // @ponicode
 describe('externalApi.isThisJest', () => {

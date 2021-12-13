@@ -1,9 +1,9 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as externalSources from '@app/js/plugins/externalSources/externalSources';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
-keepTrackApi.programs.settingsManager = window.settingsManager;
+settingsManager = window.settingsManager;
 
 // @ponicode
 describe('externalSources.init', () => {

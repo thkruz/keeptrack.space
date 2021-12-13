@@ -24,13 +24,15 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SensorObject } from '@app/js/api/keepTrackTypes';
 import $ from 'jquery';
 
 let sensorLinks = false;
 let isSensorListMenuOpen = false;
 let isSensorInfoMenuOpen = false;
 let isLookanglesMultiSiteMenuOpen = false;
+let customSensors = <SensorObject[]>[];
 
 export const resetSensorButtonClick = () => {
   settingsManager.isForceColorScheme = false;
@@ -41,6 +43,15 @@ export const resetSensorButtonClick = () => {
   $('#menu-astronomy').addClass('bmenu-item-disabled');
   resetSensorSelected();
 };
+
+export const clearCustomSensors = () => {
+  const { sensorManager } = keepTrackApi.programs;
+  customSensors = [];
+  if (sensorManager.whichRadar === 'MULTI CUSTOM' || sensorManager.whichRadar === 'CUSTOM') {
+    resetSensorButtonClick();
+  }
+};
+
 export const csTelescopeClick = () => {
   const { sensorManager } = keepTrackApi.programs;
   if ($('#cs-telescope').is(':checked')) {
@@ -64,17 +75,17 @@ export const csTelescopeClick = () => {
     $('#cs-minrange-div').show();
     $('#cs-maxrange-div').show();
     if (sensorManager.checkSensorSelected()) {
-      $('#cs-minaz').val(sensorManager.selectedSensor.obsminaz);
-      $('#cs-maxaz').val(sensorManager.selectedSensor.obsmaxaz);
-      $('#cs-minel').val(sensorManager.selectedSensor.obsminel);
-      $('#cs-maxel').val(sensorManager.selectedSensor.obsmaxel);
-      $('#cs-minrange').val(sensorManager.selectedSensor.obsminrange);
-      $('#cs-maxrange').val(sensorManager.selectedSensor.obsmaxrange);
+      $('#cs-minaz').val(sensorManager.currentSensor[0].obsminaz);
+      $('#cs-maxaz').val(sensorManager.currentSensor[0].obsmaxaz);
+      $('#cs-minel').val(sensorManager.currentSensor[0].obsminel);
+      $('#cs-maxel').val(sensorManager.currentSensor[0].obsmaxel);
+      $('#cs-minrange').val(sensorManager.currentSensor[0].obsminrange);
+      $('#cs-maxrange').val(sensorManager.currentSensor[0].obsmaxrange);
     }
   }
 };
 export const uiManagerInit = () => {
-  const { satellite } = keepTrackApi.programs;
+  const { satellite, uiManager } = keepTrackApi.programs;
 
   (<any>$('#nav-mobile')).append(keepTrackApi.html`
     <div id="sensor-selected"></div>
@@ -271,12 +282,17 @@ export const uiManagerInit = () => {
                   <label for="cs-maxrange" class="active">Maximum Range</label>
                 </div>
                 <div class="center-align">
-                  <button id="cs-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Custom Sensor &#9658;</button>
+                  <button id="cs-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Add Custom Sensor &#9658;</button>
                   <br />
                   <br />
-                  <button id="cs-geolocation" class="btn btn-ui waves-effect waves-light" onclick="uiManager.useCurrentGeolocationAsSensor();" name="search">Use Geolocation &#9658;</button>
                 </div>
               </form>
+              <div>
+                <button id="cs-clear" class="btn btn-ui waves-effect waves-light" name="action">Clear Custom Sensors &#9658;</button>
+                <br />
+                <br />
+                <button id="cs-geolocation" class="btn btn-ui waves-effect waves-light" name="search">Use Geolocation &#9658;</button>
+              </div>
             </div>
           </div>
         </div>
@@ -425,34 +441,39 @@ export const uiManagerInit = () => {
     satellite.lookanglesInterval = parseInt(<string>$('#lookanglesInterval').val());
   });
 
-  $('#sensor-list-content > div > ul > .menu-selectable').on('click', (e) => {
+  $('#sensor-list-content > div > ul > .menu-selectable').on('click', (e: any) => {
+    if (e.target.id === 'reset-sensor-button') return;
     const sensorClick = e.currentTarget.dataset.sensor;
     sensorListContentClick(sensorClick);
   });
+
+  $('#cs-geolocation').on('click', uiManager.useCurrentGeolocationAsSensor);
+
+  $('#cs-clear').on('click', clearCustomSensors);
 
   $('#reset-sensor-button').on('click', resetSensorButtonClick);
 
   $('#cs-telescope').on('click', csTelescopeClick);
 
-  $('#customSensor').on('submit', (e) => {
+  $('#customSensor').on('submit', (e: Event) => {
     customSensorSubmit();
     e.preventDefault();
   });
 };
 
 export const resetSensorSelected = () => {
-  const { satellite, sensorManager, ColorScheme, uiManager, satSet } = keepTrackApi.programs;
+  const { satellite, sensorManager, colorSchemeManager, uiManager, satSet } = keepTrackApi.programs;
   // Return to default settings with nothing 'inview'
   satellite.setobs(null);
   sensorManager.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
   // uiManager.getsensorinfo();
-  if (settingsManager.currentColorScheme == ColorScheme.default) {
+  if (settingsManager.currentColorScheme == colorSchemeManager.default) {
     uiManager.legendMenuChange('default');
   }
   satSet.satCruncher.postMessage({
     setlatlong: true,
     resetObserverGd: true,
-    sensor: sensorManager.defaultSensor,
+    sensor: [sensorManager.defaultSensor],
   });
   satSet.satCruncher.postMessage({
     isShowFOVBubble: 'reset',
@@ -482,7 +503,7 @@ export const resetSensorSelected = () => {
 };
 
 export const sensorListContentClick = (sensorClick: string) => {
-  const { adviceManager, sensorManager, uiManager, ColorScheme } = keepTrackApi.programs;
+  const { adviceManager, sensorManager, uiManager, colorSchemeManager, mainCamera, timeManager } = keepTrackApi.programs;
   if (settingsManager.plugins.topMenu) adviceManager.adviceList.sensor();
 
   if (typeof sensorClick == 'undefined') {
@@ -516,12 +537,12 @@ export const sensorListContentClick = (sensorClick: string) => {
   uiManager.getsensorinfo();
 
   try {
-    uiManager.lookAtLatLon();
+    mainCamera.lookAtLatLon(sensorManager.selectedSensor.lat, sensorManager.selectedSensor.lon, sensorManager.selectedSensor.zoom, timeManager.selectedDate);
   } catch {
     // TODO: More intentional conditional statement
     // Multi-sensors break this
   }
-  if (settingsManager.currentColorScheme == ColorScheme.default) {
+  if (settingsManager.currentColorScheme == colorSchemeManager.default) {
     uiManager.legendMenuChange('default');
   }
 };
@@ -588,7 +609,7 @@ export const bottomMenuClick = (iconName: string): void => {
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
         uiManager.hideSideMenus();
         keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = true;
-        $('#loading-screen').fadeIn(1000, function () {
+        $('#loading-screen').fadeIn(1000, () => {
           satellite.getlookangles(sat);
           $('#menu-lookangles').addClass('bmenu-item-selected');
           $('#loading-screen').fadeOut('slow');
@@ -618,7 +639,7 @@ export const bottomMenuClick = (iconName: string): void => {
         isLookanglesMultiSiteMenuOpen = true;
         $('#menu-lookanglesmultisite').addClass('bmenu-item-selected');
         if (objectManager.selectedSat !== -1) {
-          $('#loading-screen').fadeIn(1000, function () {
+          $('#loading-screen').fadeIn(1000, () => {
             const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
             satellite.getlookanglesMultiSite(sat);
             $('#loading-screen').fadeOut('slow');
@@ -637,10 +658,11 @@ export const bottomMenuClick = (iconName: string): void => {
         uiManager.hideSideMenus();
 
         if (sensorManager.checkSensorSelected()) {
-          $('#cs-lat').val(sensorManager.selectedSensor.lat);
-          $('#cs-lon').val(sensorManager.selectedSensor.lon);
-          $('#cs-hei').val(sensorManager.selectedSensor.alt);
+          $('#cs-lat').val(sensorManager.currentSensor[0].lat);
+          $('#cs-lon').val(sensorManager.currentSensor[0].lon);
+          $('#cs-hei').val(sensorManager.currentSensor[0].alt);
         }
+
         $('#customSensor-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
         keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = true;
         $('#menu-customSensor').addClass('bmenu-item-selected');
@@ -649,9 +671,10 @@ export const bottomMenuClick = (iconName: string): void => {
   }
 };
 export const init = (): void => {
-  keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = false;
-  keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = false;
-  keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = false;
+  const { sensorManager } = keepTrackApi.programs;
+  sensorManager.isCustomSensorMenuOpen = false;
+  sensorManager.isCustomSensorMenuOpen = false;
+  sensorManager.isLookanglesMenuOpen = false;
 
   // Add HTML
   keepTrackApi.register({
@@ -719,19 +742,18 @@ export const hideSideMenus = (): void => {
   isLookanglesMultiSiteMenuOpen = false;
 };
 export const customSensorSubmit = (): void => {
-  const { sensorManager, satSet, satellite, mainCamera, timeManager } = keepTrackApi.programs;
+  const { sensorManager, satSet, satellite, mainCamera, timeManager, objectManager } = keepTrackApi.programs;
   $('#menu-sensor-info').removeClass('bmenu-item-disabled');
   $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
   $('#menu-surveillance').removeClass('bmenu-item-disabled');
   $('#menu-planetarium').removeClass('bmenu-item-disabled');
   $('#menu-astronomy').removeClass('bmenu-item-disabled');
-  sensorManager.whichRadar = 'CUSTOM';
   $('#sensor-type').html((<string>$('#cs-type').val()).replace(/</gu, '&lt;').replace(/>/gu, '&gt;'));
   $('#sensor-info-title').html('Custom Sensor');
   $('#sensor-country').html('Custom Sensor');
 
-  let lon = $('#cs-lon').val();
-  let lat = $('#cs-lat').val();
+  const lon = parseFloat(<string>$('#cs-lon').val());
+  const lat = parseFloat(<string>$('#cs-lat').val());
   const alt = $('#cs-hei').val();
   const sensorType = $('#cs-type').val();
   const minaz = $('#cs-minaz').val();
@@ -741,26 +763,9 @@ export const customSensorSubmit = (): void => {
   const minrange = $('#cs-minrange').val();
   const maxrange = $('#cs-maxrange').val();
 
-  satSet.satCruncher.postMessage({
-    // Send satSet.satCruncher File information on this radar
-    setlatlong: true,
-    sensor: {
-      lat: parseFloat(<string>lat),
-      lon: parseFloat(<string>lon),
-      alt: parseFloat(<string>alt),
-      obsminaz: parseFloat(<string>minaz),
-      obsmaxaz: parseFloat(<string>maxaz),
-      obsminel: parseFloat(<string>minel),
-      obsmaxel: parseFloat(<string>maxel),
-      obsminrange: parseFloat(<string>minrange),
-      obsmaxrange: parseFloat(<string>maxrange),
-      type: sensorType,
-    },
-  });
-
-  satellite.setobs({
-    lat: parseFloat(<string>lat),
-    lon: parseFloat(<string>lon),
+  customSensors.push(<SensorObject>{
+    lat: lat,
+    lon: lon,
     alt: parseFloat(<string>alt),
     obsminaz: parseFloat(<string>minaz),
     obsmaxaz: parseFloat(<string>maxaz),
@@ -771,13 +776,23 @@ export const customSensorSubmit = (): void => {
     type: sensorType,
   });
 
-  // objectManager.setSelectedSat(-1);
-  lat = parseFloat(<string>lat);
-  lon = parseFloat(<string>lon);
-  if (maxrange > 6000) {
-    mainCamera.changeZoom('geo');
-  } else {
-    mainCamera.changeZoom('leo');
+  sensorManager.whichRadar = customSensors.length > 1 ? 'MULTI CUSTOM' : 'CUSTOM';
+
+  satSet.satCruncher.postMessage({
+    setlatlong: true,
+    sensor: customSensors,
+    multiSensor: customSensors.length > 1,
+  });
+  satellite.setobs(customSensors);
+  objectManager.setSelectedSat(-1);
+  satSet.setColorScheme(settingsManager.currentColorScheme, true);
+
+  if (customSensors.length === 1) {
+    if (maxrange > 6000) {
+      mainCamera.changeZoom('geo');
+    } else {
+      mainCamera.changeZoom('leo');
+    }
+    mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
   }
-  mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
 };

@@ -1,103 +1,101 @@
+import { CatalogManager, MissileObject, OrbitManager, SatGroupCollection, SatObject } from '../api/keepTrackTypes';
+
 export class SatGroup {
-  sats: any;
+  sats: SatGroupCollection[];
   hasSat: any;
   updateOrbits: any;
   forEach: any;
 
-  constructor(groupType, data, satSet) {
-    var satId;
-    var i = 0;
-    this.sats = [];
-    if (groupType === 'all') {
-      data = satSet.satData;
-      for (i = 0; i < data.length; i++) {
-        if (this.sats.length > settingsManager.maxOribtsDisplayed) break;
-        if (typeof data[i].SCC_NUM == 'undefined') continue;
-        this.sats.push({
-          satId: data[i].id,
-          isIntlDes: true,
+  constructor(groupType: string, data: any[], satSet: CatalogManager) {
+    switch (groupType) {
+      case 'all':
+        this.sats = [];
+        satSet.satData.every((sat) => {
+          if (typeof sat.sccNum !== 'undefined') {
+            this.sats.push({
+              satId: sat.id,
+              isIntlDes: true,
+            });
+          }
+          return !(this.sats.length > settingsManager.maxOribtsDisplayed);
         });
-      }
-    }
-    if (groupType === 'year') {
-      data = satSet.searchYear(satSet.satData, data);
-      for (i = 0; i < data.length; i++) {
-        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
-        this.sats.push({
-          satId: data[i],
-        });
-      }
-    } else if (groupType === 'yearOrLess') {
-      data = satSet.searchYearOrLess(satSet.satData, data);
-      for (i = 0; i < data.length; i++) {
-        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
-        this.sats.push({
-          satId: data[i],
-        });
-      }
-    } else if (groupType === 'intlDes') {
-      for (i = 0; i < data.length; i++) {
-        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
-        var theSatId = satSet.getIdFromIntlDes(data[i]);
-        if (theSatId === null) continue;
-        this.sats.push({
-          satId: theSatId,
-          isIntlDes: true,
-        });
-      }
-    } else if (groupType === 'nameRegex') {
-      data = satSet.searchNameRegex(satSet.satData, data);
-      for (i = 0; i < data.length; i++) {
-        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
-        this.sats.push({
-          satId: data[i],
-        });
-      }
-    } else if (groupType === 'countryRegex') {
-      data = satSet.searchCountryRegex(satSet.satData, data);
-      for (i = 0; i < data.length; i++) {
-        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
-        this.sats.push({
-          satId: data[i],
-        });
-      }
-    } else if (groupType === 'objNum') {
-      for (i = 0; i < data.length; i++) {
-        satId = satSet.getIdFromObjNum(data[i]);
-        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
-        if (satId === null) continue;
-        this.sats.push({
-          satId: satId,
-          isObjnum: true,
-        });
-      }
-    } else if (groupType === 'idList') {
-      for (i = 0; i < data.length; i++) {
-        if (this.sats.length > settingsManager.maxOribtsDisplayed) continue;
-        this.sats.push({
-          satId: data[i],
-        });
-      }
+        break;
+      case 'year':
+        this.sats = satSet
+          .searchYear(satSet.satData, data)
+          .slice(0, settingsManager.maxOribtsDisplayed)
+          .map((sat: SatObject) => ({
+            satId: sat.id,
+          }));
+        break;
+      case 'yearOrLess':
+        this.sats = satSet
+          .searchYearOrLess(satSet.satData, data)
+          .slice(0, settingsManager.maxOribtsDisplayed)
+          .map((sat: SatObject) => ({
+            satId: sat.id,
+          }));
+        break;
+      case 'intlDes':
+        this.sats = data
+          .slice(0, settingsManager.maxOribtsDisplayed)
+          .map((intlDes: string) => satSet.getIdFromIntlDes(intlDes))
+          .filter((sccNUm: number | null) => sccNUm !== null)
+          .map((sccNUm: number) => ({
+            satId: sccNUm,
+            isIntlDes: true,
+          }));
+        break;
+      case 'nameRegex':
+        this.sats = satSet
+          .searchNameRegex(satSet.satData, data)
+          .slice(0, settingsManager.maxOribtsDisplayed)
+          .map((sat: SatObject) => ({
+            satId: sat.id,
+          }));
+        break;
+      case 'countryRegex':
+        this.sats = satSet
+          .searchCountryRegex(satSet.satData, data)
+          .slice(0, settingsManager.maxOribtsDisplayed)
+          .map((sat: SatObject) => ({
+            satId: sat.id,
+          }));
+        break;
+      case 'objNum':
+        this.sats = data
+          .slice(0, settingsManager.maxOribtsDisplayed)
+          .map((id: number) => satSet.getIdFromObjNum(id))
+          .filter((sccNUm: number | null) => sccNUm !== null)
+          .map((sccNUm: number) => ({
+            satId: sccNUm,
+            isObjnum: true,
+          }));
+        break;
+      case 'idList':
+        this.sats = data.slice(0, settingsManager.maxOribtsDisplayed).map((id: number) => ({
+          satId: id,
+        }));
+        break;
+      default:
+        throw new Error('Unknown group type');
     }
 
-    this.hasSat = (id) => {
-      var len = this.sats.length;
-      for (var i = 0; i < len; i++) {
-        if (this.sats[i].satId === id) return true;
-      }
-      return false;
-    };
-    this.updateOrbits = (orbitManager) => {
-      // What calls the orbit buffer when selected a group from the menu.
-      for (var i = 0; i < this.sats.length; i++) {
-        if (this.sats[i].missile) {
-          orbitManager.updateOrbitBuffer(this.sats[i]?.id, null, null, null, true, this.sats[i]?.latList, this.sats[i]?.lonList, this.sats[i]?.altList, this.sats[i]?.startTime);
+    this.hasSat = (id: number) => this.sats.findIndex((sat) => sat.satId === id) !== -1;
+
+    // What calls the orbit buffer when selected a group from the menu.
+    this.updateOrbits = (orbitManager: OrbitManager) => {
+      this.sats.forEach((sat) => {
+        if (sat.missile) {
+          const missile = <MissileObject>(<unknown>sat);
+          orbitManager.updateOrbitBuffer(missile.id, null, null, null, true, missile.latList, missile.lonList, missile.altList, missile.startTime);
         } else {
-          orbitManager.updateOrbitBuffer(this.sats[i]?.satId);
+          orbitManager.updateOrbitBuffer(sat.satId);
         }
-      }
+      });
     };
-    this.forEach = (callback) => {
+
+    this.forEach = (callback: any) => {
       for (var i = 0; i < this.sats.length; i++) {
         callback(this.sats[i]?.satId);
       }

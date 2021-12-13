@@ -1,52 +1,51 @@
-import * as watchlist from '@app/js/plugins/watchlist/watchlist';
 import { defaultSat, defaultSensor, keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import * as watchlist from '@app/js/plugins/watchlist/watchlist';
 import { expect } from '@jest/globals';
-import { keepTrackApi } from '@app/js/api/externalApi';
 /* eslint-disable no-undefined */
-
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
-describe("watchlist.init", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            watchlist.init()
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+describe('watchlist.init', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      watchlist.init();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
 
 // @ponicode
-describe("watchlist.updateWatchlist", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            watchlist.updateWatchlist()
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+describe('watchlist.updateWatchlist', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      watchlist.updateWatchlist();
+    };
 
-    test("1", () => {
-        const callFunction: any = () => {
-            watchlist.updateWatchlist(["ponicodeIsAwesome", -0.353, "**Hamburger**", 4653], [-1, 0.5, 1, 2, 3, 4, 5])
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+    expect(callFunction).not.toThrow();
+  });
+
+  test('1', () => {
+    const callFunction: any = () => {
+      watchlist.updateWatchlist(['ponicodeIsAwesome', -0.353, '**Hamburger**', 4653], [-1, 0.5, 1, 2, 3, 4, 5]);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
 
 // @ponicode
-describe("watchlist.uiManagerInit", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            watchlist.uiManagerInit()
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+describe('watchlist.uiManagerInit', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      watchlist.uiManagerInit();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
 
 describe('watchlist.updateLoop', () => {
   test('0', () => {
@@ -145,15 +144,15 @@ describe('watchlist.onCruncherReady', () => {
 });
 
 // @ponicode
-describe("watchlist.hideSideMenus", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            watchlist.hideSideMenus()
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+describe('watchlist.hideSideMenus', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      watchlist.hideSideMenus();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
 
 describe('watchlist.pushOverlayElement', () => {
   const nextPassArray = [defaultSat, defaultSat];
@@ -195,8 +194,8 @@ describe('watchlist.infoOverlayContentClick', () => {
     const callFunction: any = () => {
       watchlist.infoOverlayContentClick({
         currentTarget: {
-          textContent: '25544:25544'
-        }
+          textContent: '25544:25544',
+        },
       });
     };
 
@@ -206,7 +205,7 @@ describe('watchlist.infoOverlayContentClick', () => {
 
 describe('watchlist.watchlistListClick', () => {
   test('0', () => {
-    const callFunction: any = () => {      
+    const callFunction: any = () => {
       watchlist.watchlistListClick(25544);
     };
 
@@ -216,7 +215,7 @@ describe('watchlist.watchlistListClick', () => {
 
 describe('watchlist.watchlistContentEvent', () => {
   test('0', () => {
-    const callFunction: any = () => {      
+    const callFunction: any = () => {
       watchlist.watchlistContentEvent(new Event('submit'), 25544);
     };
 
@@ -224,7 +223,7 @@ describe('watchlist.watchlistContentEvent', () => {
   });
 
   test('1', () => {
-    const callFunction: any = () => {      
+    const callFunction: any = () => {
       watchlist.watchlistContentEvent(null, 25544);
     };
 
@@ -267,8 +266,8 @@ describe('watchlist.watchListReaderOnLoad', () => {
       const evt = {
         target: {
           readyState: 4,
-        }
-      }
+        },
+      };
       watchlist.watchListReaderOnLoad(evt);
     };
 
@@ -281,8 +280,8 @@ describe('watchlist.watchListReaderOnLoad', () => {
         target: {
           readyState: 2,
           error: 'error',
-        }
-      }
+        },
+      };
       watchlist.watchListReaderOnLoad(evt);
     };
 
@@ -295,8 +294,8 @@ describe('watchlist.watchListReaderOnLoad', () => {
         target: {
           readyState: 2,
           result: '[25544,25544]',
-        }
-      }
+        },
+      };
       watchlist.watchListReaderOnLoad(evt);
     };
 
@@ -309,8 +308,8 @@ describe('watchlist.watchListReaderOnLoad', () => {
         target: {
           readyState: 2,
           result: '25@@544,25544]',
-        }
-      }
+        },
+      };
       watchlist.watchListReaderOnLoad(evt);
     };
 
@@ -323,8 +322,8 @@ describe('watchlist.watchListReaderOnLoad', () => {
         target: {
           readyState: 2,
           result: '',
-        }
-      }
+        },
+      };
       watchlist.watchListReaderOnLoad(evt);
     };
 
@@ -343,147 +342,147 @@ describe('watchlist.menuSelectableClick', () => {
 });
 
 // @ponicode
-describe("watchlist.updateLoop", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            watchlist.updateLoop()
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+describe('watchlist.updateLoop', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      watchlist.updateLoop();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
 
 // @ponicode
-describe("watchlist.bottomMenuClick", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            watchlist.bottomMenuClick("Credit Card Account")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+describe('watchlist.bottomMenuClick', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      watchlist.bottomMenuClick('Credit Card Account');
+    };
 
-    test("1", () => {
-        const callFunction: any = () => {
-            watchlist.bottomMenuClick("menu-info-overlay")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+    expect(callFunction).not.toThrow();
+  });
 
-    test("2", () => {
-        const callFunction: any = () => {
-            watchlist.bottomMenuClick("menu-watchlist")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+  test('1', () => {
+    const callFunction: any = () => {
+      watchlist.bottomMenuClick('menu-info-overlay');
+    };
 
-    test("3", () => {
-        const callFunction: any = () => {
-            watchlist.bottomMenuClick("Home Loan Account")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+    expect(callFunction).not.toThrow();
+  });
 
-    test("4", () => {
-        const callFunction: any = () => {
-            watchlist.bottomMenuClick("Checking Account")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+  test('2', () => {
+    const callFunction: any = () => {
+      watchlist.bottomMenuClick('menu-watchlist');
+    };
 
-    test("5", () => {
-        const callFunction: any = () => {
-            watchlist.bottomMenuClick("")
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+    expect(callFunction).not.toThrow();
+  });
 
-// @ponicode
-describe("watchlist.onCruncherReady", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            watchlist.onCruncherReady()
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+  test('3', () => {
+    const callFunction: any = () => {
+      watchlist.bottomMenuClick('Home Loan Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('4', () => {
+    const callFunction: any = () => {
+      watchlist.bottomMenuClick('Checking Account');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('5', () => {
+    const callFunction: any = () => {
+      watchlist.bottomMenuClick('');
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
 
 // @ponicode
-describe("watchlist.watchlistListClick", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            watchlist.watchlistListClick(1)
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
+describe('watchlist.onCruncherReady', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      watchlist.onCruncherReady();
+    };
 
-    test("1", () => {
-        const callFunction: any = () => {
-            watchlist.watchlistListClick(12)
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-
-    test("2", () => {
-        const callFunction: any = () => {
-            watchlist.watchlistListClick(56784)
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-
-    test("3", () => {
-        const callFunction: any = () => {
-            watchlist.watchlistListClick(12345)
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-
-    test("4", () => {
-        const callFunction: any = () => {
-            watchlist.watchlistListClick(987650)
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-
-    test("5", () => {
-        const callFunction: any = () => {
-            watchlist.watchlistListClick(-Infinity)
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+    expect(callFunction).not.toThrow();
+  });
+});
 
 // @ponicode
-describe("watchlist.watchlistContentEvent", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            watchlist.watchlistContentEvent(undefined, -Infinity)
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+describe('watchlist.watchlistListClick', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      watchlist.watchlistListClick(1);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('1', () => {
+    const callFunction: any = () => {
+      watchlist.watchlistListClick(12);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('2', () => {
+    const callFunction: any = () => {
+      watchlist.watchlistListClick(56784);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('3', () => {
+    const callFunction: any = () => {
+      watchlist.watchlistListClick(12345);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('4', () => {
+    const callFunction: any = () => {
+      watchlist.watchlistListClick(987650);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('5', () => {
+    const callFunction: any = () => {
+      watchlist.watchlistListClick(-Infinity);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
 
 // @ponicode
-describe("watchlist.menuSelectableClick", () => {
-    test("0", () => {
-        const callFunction: any = () => {
-            watchlist.menuSelectableClick()
-        }
-    
-        expect(callFunction).not.toThrow()
-    })
-})
+describe('watchlist.watchlistContentEvent', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      watchlist.watchlistContentEvent(undefined, -Infinity);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});
+
+// @ponicode
+describe('watchlist.menuSelectableClick', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      watchlist.menuSelectableClick();
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+});

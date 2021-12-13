@@ -1,18 +1,21 @@
 /* */
 
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
+import { Camera, GroupsManager, OrbitManager } from '../api/keepTrackTypes';
 
 const NUM_SEGS = 255;
-let glBuffers = [];
-let inProgress = [];
-let pathShader;
-let selectOrbitBuf;
-let hoverOrbitBuf;
+let glBuffers = <WebGLBuffer[]>[];
+let inProgress = <boolean[]>[];
+let pathShader: any;
+let selectOrbitBuf: WebGLBuffer;
+let hoverOrbitBuf: WebGLBuffer;
 let currentHoverId = -1;
 let currentSelectId = -1;
-let currentInView = [];
-let gl, mainCamera, groupsManager;
+let currentInView = <number[]>[];
+let gl: WebGL2RenderingContext;
+let mainCamera: Camera;
+let groupsManager: GroupsManager;
 let initialized = false;
 
 export const workerOnMessage: any = (m: any) => {
@@ -22,7 +25,7 @@ export const workerOnMessage: any = (m: any) => {
   gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
   inProgress[satId] = false;
 };
-export const init = (orbitWorker?): void => {
+export const init = (orbitWorker?: Worker): void => {
   // See if we are running jest right now for testing
   if (typeof process !== 'undefined') {
     if (typeof orbitWorker !== 'undefined') {
@@ -245,7 +248,7 @@ export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFra
     //   });
     // }
     gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
-    groupsManager.selectedGroup.forEach(function (id) {
+    groupsManager.selectedGroup.forEach(function (id: number) {
       gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
       gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
       gl.enableVertexAttribArray(pathShader.aPos);
@@ -269,7 +272,7 @@ export const allocateBuffer = () => {
   return buf;
 };
 
-export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string, TLE2?: string, missile?, latList?, lonList?, altList?) => {
+export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string, TLE2?: string, missile?: boolean, latList?: number[], lonList?: number[], altList?: number[]) => {
   const { satSet, timeManager } = keepTrackApi.programs;
   const sat = satSet.getSat(satId);
   if (typeof sat === 'undefined') return;
@@ -309,11 +312,10 @@ export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string,
   }
 };
 
-export const orbitManager = {
+export const orbitManager: OrbitManager = {
   init: init,
   draw: draw,
   orbitWorker: null,
-  inViewSoon: [],
   clearHoverOrbit: clearHoverOrbit,
   setHoverOrbit: setHoverOrbit,
   clearInViewOrbit: clearInViewOrbit,
@@ -354,4 +356,10 @@ export const orbitManager = {
       }
       `,
   },
+  isTimeMachineRunning: false,
+  isTimeMachineVisible: false,
+  tempTransColor: [0, 0, 0, 0],
+  historyOfSatellitesPlay: null,
+  playNextSatellite: null,
+  historyOfSatellitesRunCount: 0,
 };

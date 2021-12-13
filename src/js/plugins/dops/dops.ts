@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
 let isDOPMenuOpen = false;
@@ -10,7 +10,7 @@ export const dopsFormSubmit = (): void => {
     const lon = parseFloat(<string>$('#dops-lon').val());
     const alt = parseFloat(<string>$('#dops-alt').val());
     const el = parseFloat(<string>$('#dops-el').val());
-    keepTrackApi.programs.settingsManager.gpsElevationMask = el;
+    settingsManager.gpsElevationMask = el;
     keepTrackApi.programs.satellite.updateDopsTable(lat, lon, alt);
     $('#menu-dops').addClass('bmenu-item-selected');
     $('#loading-screen').fadeOut('slow');
@@ -59,7 +59,7 @@ export const uiManagerInit = () => {
         </div>
       `);
 
-  $('#dops-form').on('submit', function (e) {
+  $('#dops-form').on('submit', function (e: Event) {
     dopsFormSubmit();
     e.preventDefault();
   });
@@ -107,7 +107,7 @@ export const loadingScreenFadeIn = (): void => {
   const lon = parseFloat(<string>$('#dops-lon').val());
   const alt = parseFloat(<string>$('#dops-alt').val());
   const el = parseFloat(<string>$('#dops-el').val());
-  keepTrackApi.programs.settingsManager.gpsElevationMask = el;
+  settingsManager.gpsElevationMask = el;
   keepTrackApi.programs.satellite.updateDopsTable(lat, lon, alt);
   $('#menu-dops').addClass('bmenu-item-selected');
   $('#loading-screen').fadeOut('slow');

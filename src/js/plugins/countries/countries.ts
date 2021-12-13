@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
 let isCountriesMenuOpen = false;
@@ -29,7 +29,7 @@ export const init = (): void => {
   });
 };
 export const bottomMenuClick = (iconName: string): void => {
-  const { uiManager, settingsManager } = keepTrackApi.programs;
+  const { uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-countries') {
     if (isCountriesMenuOpen) {
       uiManager.hideSideMenus();
@@ -96,81 +96,52 @@ export const uiManagerInit = () => {
   });
 };
 
-export const countryMenuClick = (groupName: any) => {
+export const countryMenuClick = (groupName: string): void => {
   const { groupsManager } = keepTrackApi.programs;
-
-  if (typeof groupsManager == 'undefined') return;
   switch (groupName) {
     case 'Canada':
-      if (typeof groupsManager.Canada == 'undefined') {
-        groupsManager.Canada = groupsManager.createGroup('countryRegex', /CA/u);
-      }
+      if (!groupsManager.Canada) groupsManager.Canada = groupsManager.createGroup('countryRegex', /CA/u);
       break;
     case 'China':
-      if (typeof groupsManager.China == 'undefined') {
-        groupsManager.China = groupsManager.createGroup('countryRegex', /PRC/u);
-      }
+      if (!groupsManager.China) groupsManager.China = groupsManager.createGroup('countryRegex', /PRC/u);
       break;
     case 'France':
-      if (typeof groupsManager.France == 'undefined') {
-        groupsManager.France = groupsManager.createGroup('countryRegex', /FR/u);
-      }
+      if (!groupsManager.France) groupsManager.France = groupsManager.createGroup('countryRegex', /FR/u);
       break;
     case 'India':
-      if (typeof groupsManager.India == 'undefined') {
-        groupsManager.India = groupsManager.createGroup('countryRegex', /IND/u);
-      }
+      if (!groupsManager.India) groupsManager.India = groupsManager.createGroup('countryRegex', /IND/u);
       break;
     case 'Israel':
-      if (typeof groupsManager.Israel == 'undefined') {
-        groupsManager.Israel = groupsManager.createGroup('countryRegex', /ISRA/u);
-      }
+      if (!groupsManager.Israel) groupsManager.Israel = groupsManager.createGroup('countryRegex', /ISRA/u);
       break;
     case 'Japan':
-      if (typeof groupsManager.Japan == 'undefined') {
-        groupsManager.Japan = groupsManager.createGroup('countryRegex', /JPN/u);
-      }
+      if (!groupsManager.Japan) groupsManager.Japan = groupsManager.createGroup('countryRegex', /JPN/u);
       break;
     case 'Russia':
-      if (typeof groupsManager.Russia == 'undefined') {
-        groupsManager.Russia = groupsManager.createGroup('countryRegex', /CIS/u);
-      }
+      if (!groupsManager.Russia) groupsManager.Russia = groupsManager.createGroup('countryRegex', /CIS/u);
       break;
     case 'UnitedKingdom':
-      if (typeof groupsManager.UnitedKingdom == 'undefined') {
-        groupsManager.UnitedKingdom = groupsManager.createGroup('countryRegex', /UK/u);
-      }
+      if (!groupsManager.UnitedKingdom) groupsManager.UnitedKingdom = groupsManager.createGroup('countryRegex', /UK/u);
       break;
     case 'UnitedStates':
-      if (typeof groupsManager.UnitedStates == 'undefined') {
-        groupsManager.UnitedStates = groupsManager.createGroup('countryRegex', /US/u);
-      }
+      if (!groupsManager.UnitedStates) groupsManager.UnitedStates = groupsManager.createGroup('countryRegex', /US/u);
       break;
+    default:
+      throw new Error('Unknown country group');
   }
   groupSelected(groupName);
 };
 
-export const groupSelected = (groupName: string | number) => {
-  const { groupsManager, orbitManager, satSet, searchBox, objectManager, uiManager } = keepTrackApi.programs;
+export const groupSelected = (groupName: string): void => {
+  const { groupsManager, satSet, searchBox, objectManager, uiManager } = keepTrackApi.programs;
   const searchDOM = $('#search');
   if (typeof groupName == 'undefined') return;
   if (typeof groupsManager[groupName] == 'undefined') return;
-  groupsManager.selectGroup(groupsManager[groupName], orbitManager);
-  searchDOM.val('');
+  groupsManager.selectGroup(groupsManager[groupName]);
 
-  const results = groupsManager[groupName].sats;
-  for (let i = 0; i < results.length; i++) {
-    const satId = groupsManager[groupName].sats[i].satId;
-    const scc = satSet.getSat(satId).SCC_NUM;
-    if (i === results.length - 1) {
-      searchDOM.val(searchDOM.val() + scc);
-    } else {
-      searchDOM.val(searchDOM.val() + scc + ',');
-    }
-  }
-
+  // Populate searchDOM with a search string separated by commas - minus the last one
+  searchDOM.val(groupsManager[groupName].sats.reduce((acc: string, obj: { satId: number }) => `${acc}${satSet.getSat(obj.satId).sccNum},`, '').slice(0, -1));
   searchBox.fillResultBox(groupsManager[groupName].sats, satSet);
-
   objectManager.setSelectedSat(-1); // Clear selected sat
 
   // Close Menus

@@ -1,160 +1,127 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { RAD2DEG } from '@app/js/lib/constants';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import $ from 'jquery';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import { RAD2DEG } from '../../lib/constants';
 
 let isFindByLooksMenuOpen = false;
-export const checkInc = (possibles: any[], minInc: number, maxInc: number) => {
-  const incRes = [];
-  for (let i = 0; i < possibles.length; i++) {
-    if (possibles[i].inclination * RAD2DEG < maxInc && possibles[i].inclination * RAD2DEG > minInc) {
-      incRes.push(possibles[i]);
-    }
-  }
-  return incRes;
+export const checkInc = (possibles: any[], min: number, max: number) => {
+  possibles = possibles.filter((possible) => possible.inclination * RAD2DEG < max && possible.inclination * RAD2DEG > min);
+  return possibles;
 };
+
+export const checkRaan = (possibles: any[], min: number, max: number) => {
+  possibles = possibles.filter((possible) => possible.raan * RAD2DEG < max && possible.raan * RAD2DEG > min);
+  return possibles;
+};
+
+export const checkArgPe = (possibles: any[], min: number, max: number) => {
+  possibles = possibles.filter((possible) => possible.argPe * RAD2DEG < max && possible.argPe * RAD2DEG > min);
+  return possibles;
+};
+
 export const checkPeriod = (possibles: any[], minPeriod: number, maxPeriod: number) => {
-  const periodRes = [];
-  for (let i = 0; i < possibles.length; i++) {
-    if (possibles[i].period < maxPeriod && possibles[i].period > minPeriod && periodRes.length <= 200) {
-      // Don't display more than 200 results - this is because LEO and GEO belt have a lot of satellites
-      periodRes.push(possibles[i]);
-    }
-  }
-  if (periodRes.length >= 200) {
-    $('#findByLooks-results').text('Limited to 200 Results!');
-  }
-  return periodRes;
+  possibles = possibles.filter((possible) => possible.period > minPeriod && possible.period < maxPeriod);
+  return limitPossibles(possibles, 200);
 };
 export const checkRcs = (possibles: any[], minRcs: number, maxRcs: number) => {
-  const rcsRes = [];
-  for (let i = 0; i < possibles.length; i++) {
-    if (parseFloat(possibles[i].R) < maxRcs && parseFloat(possibles[i].R) > minRcs && rcsRes.length <= 200) {
-      // Don't display more than 200 results - this is because LEO and GEO belt have a lot of satellites
-      rcsRes.push(possibles[i]);
-    }
-  }
-  if (rcsRes.length >= 200) {
-    $('#findByLooks-results').text('Limited to 200 Results!');
-  }
-  return rcsRes;
+  possibles = possibles.filter((possible) => parseFloat(possible.R) > minRcs && parseFloat(possible.R) < maxRcs);
+  return limitPossibles(possibles, 200);
 };
-export const searchAzElRange = (
-  azimuth: string | number,
-  elevation: string | number,
-  range: string | number,
-  inclination: string | number,
-  azMarg: string | number,
-  elMarg: string | number,
-  rangeMarg: string | number,
-  incMarg: string | number,
-  period: string | number,
-  periodMarg: string | number,
-  rcs: string | number,
-  rcsMarg: string | number,
-  objtypeStr: string
+export const searchSats = (
+  azimuth: number,
+  elevation: number,
+  range: number,
+  inclination: number,
+  azMarg: number,
+  elMarg: number,
+  rangeMarg: number,
+  incMarg: number,
+  period: number,
+  periodMarg: number,
+  rcs: number,
+  rcsMarg: number,
+  objtype: number,
+  raan: number,
+  raanMarg: number,
+  argPe: number,
+  argPeMarg: number
 ) => {
-  const isCheckAz = !isNaN(parseFloat(<string>azimuth)) && isFinite(parseFloat(<string>azimuth));
-  const isCheckEl = !isNaN(parseFloat(<string>elevation)) && isFinite(parseFloat(<string>elevation));
-  const isCheckRange = !isNaN(parseFloat(<string>range)) && isFinite(parseFloat(<string>range));
-  const isCheckInclination = !isNaN(parseFloat(<string>inclination)) && isFinite(parseFloat(<string>inclination));
-  const isCheckPeriod = !isNaN(parseFloat(<string>period)) && isFinite(parseFloat(<string>period));
-  const isCheckRcs = !isNaN(parseFloat(<string>rcs)) && isFinite(parseFloat(<string>rcs));
-  const isCheckAzMarg = !isNaN(parseFloat(<string>azMarg)) && isFinite(parseFloat(<string>azMarg));
-  const isCheckElMarg = !isNaN(parseFloat(<string>elMarg)) && isFinite(parseFloat(<string>elMarg));
-  const isCheckRangeMarg = !isNaN(parseFloat(<string>rangeMarg)) && isFinite(parseFloat(<string>rangeMarg));
-  const isCheckIncMarg = !isNaN(parseFloat(<string>incMarg)) && isFinite(parseFloat(<string>incMarg));
-  const isCheckPeriodMarg = !isNaN(parseFloat(<string>periodMarg)) && isFinite(parseFloat(<string>periodMarg));
-  const isCheckRcsMarg = !isNaN(parseFloat(<string>rcsMarg)) && isFinite(parseFloat(<string>rcsMarg));
-  const objtype = parseFloat(objtypeStr); // String to Number
+  const isValidAz = !isNaN(azimuth) && isFinite(azimuth);
+  const isValidEl = !isNaN(elevation) && isFinite(elevation);
+  const isValidRange = !isNaN(range) && isFinite(range);
+  const isValidInc = !isNaN(inclination) && isFinite(inclination);
+  const isValidRaan = !isNaN(raan) && isFinite(raan);
+  const isValidArgPe = !isNaN(argPe) && isFinite(argPe);
+  const isValidPeriod = !isNaN(period) && isFinite(period);
+  const isValidRcs = !isNaN(rcs) && isFinite(rcs);
+  azMarg = !isNaN(azMarg) && isFinite(azMarg) ? azMarg : 5;
+  elMarg = !isNaN(elMarg) && isFinite(elMarg) ? elMarg : 5;
+  rangeMarg = !isNaN(rangeMarg) && isFinite(rangeMarg) ? rangeMarg : 200;
+  incMarg = !isNaN(incMarg) && isFinite(incMarg) ? incMarg : 1;
+  periodMarg = !isNaN(periodMarg) && isFinite(periodMarg) ? periodMarg : 0.5;
+  rcsMarg = !isNaN(rcsMarg) && isFinite(rcsMarg) ? rcsMarg : rcs / 10;
+  raanMarg = !isNaN(raanMarg) && isFinite(raanMarg) ? raanMarg : 1;
+  argPeMarg = !isNaN(argPeMarg) && isFinite(argPeMarg) ? argPeMarg : 1;
 
-  if (!isCheckEl && !isCheckRange && !isCheckAz && !isCheckInclination && !isCheckPeriod && !isCheckRcs) []; // Ensure there is a number typed.
+  if (!isValidEl && !isValidRange && !isValidAz && !isValidInc && !isValidPeriod && !isValidRcs && !isValidArgPe && !isValidRaan) throw new Error('No Search Criteria Entered');
 
-  if (!isCheckAzMarg) {
-    azMarg = 5;
-  }
-  if (!isCheckElMarg) {
-    elMarg = 5;
-  }
-  if (!isCheckRangeMarg) {
-    rangeMarg = 200;
-  }
-  if (!isCheckIncMarg) {
-    incMarg = 1;
-  }
-  if (!isCheckPeriodMarg) {
-    periodMarg = 0.5;
-  }
-  if (!isCheckRcsMarg) {
-    rcsMarg = <number>rcs / 10;
-  }
-  let res = [];
+  const { satSet, satellite, uiManager } = keepTrackApi.programs;
 
-  let s = 0;
-  const satData = keepTrackApi.programs.satSet.satData;
-  for (let i = 0; i < satData.length; i++) {
-    if (satData[i].static || satData[i].missile || !satData[i].active) {
-      continue;
-    }
-    res.push(satData[i]);
-    keepTrackApi.programs.satellite.getTEARR(res[s]);
-    res[s].az = keepTrackApi.programs.satellite.currentTEARR.az;
-    res[s].el = keepTrackApi.programs.satellite.currentTEARR.el;
-    res[s].rng = keepTrackApi.programs.satellite.currentTEARR.rng;
-    res[s].inView = keepTrackApi.programs.satellite.currentTEARR.inView;
-    s++;
-  }
+  const satData = satSet.satData;
 
-  if (!isCheckInclination && !isCheckPeriod) {
-    res = checkInview(res);
-  }
+  let res = satData
+    .filter((sat: SatObject) => !sat.static && !sat.missile && sat.active)
+    .map((sat: SatObject) => {
+      const tearr = satellite.getTEARR(sat);
+      return { ...sat, az: tearr.az, el: tearr.el, rng: tearr.rng, inView: tearr.inView };
+    });
 
-  if (objtype !== 0) {
-    res = checkObjtype(res, objtype);
-  }
+  res = !isValidInc && !isValidPeriod ? checkInview(res) : res;
+  res = objtype !== 0 ? checkObjtype(res, objtype) : res;
 
-  if (isCheckAz) {
-    azimuth = parseFloat(<string>azimuth); // Convert azimuth to int
-    azMarg = parseFloat(<string>azMarg);
+  if (isValidAz) {
     const minaz = azimuth - azMarg;
     const maxaz = azimuth + azMarg;
     res = checkAz(res, minaz, maxaz);
   }
 
-  if (isCheckEl) {
-    elevation = parseFloat(<string>elevation); // Convert elevation to int
-    elMarg = parseFloat(<string>elMarg);
+  if (isValidEl) {
     const minel = elevation - elMarg;
     const maxel = elevation + elMarg;
     res = checkEl(res, minel, maxel);
   }
 
-  if (isCheckRange) {
-    range = parseFloat(<string>range); // Convert range to int
-    rangeMarg = parseFloat(<string>rangeMarg);
+  if (isValidRange) {
     const minrange = range - rangeMarg;
     const maxrange = range + rangeMarg;
     res = checkRange(res, minrange, maxrange);
   }
 
-  if (isCheckInclination) {
-    inclination = parseFloat(<string>inclination); // Convert inclination to int
-    incMarg = parseFloat(<string>incMarg);
+  if (isValidInc) {
     const minInc = inclination - incMarg;
     const maxInc = inclination + incMarg;
     res = checkInc(res, minInc, maxInc);
   }
 
-  if (isCheckPeriod) {
-    period = parseFloat(<string>period); // Convert period to int
-    periodMarg = parseFloat(<string>periodMarg);
+  if (isValidRaan) {
+    const minRaan = raan - raanMarg;
+    const maxRaan = raan + raanMarg;
+    res = checkRaan(res, minRaan, maxRaan);
+  }
+
+  if (isValidArgPe) {
+    const minArgPe = argPe - argPeMarg;
+    const maxArgPe = argPe + argPeMarg;
+    res = checkArgPe(res, minArgPe, maxArgPe);
+  }
+
+  if (isValidPeriod) {
     const minPeriod = period - periodMarg;
     const maxPeriod = period + periodMarg;
     res = checkPeriod(res, minPeriod, maxPeriod);
   }
 
-  if (isCheckRcs) {
-    rcs = parseFloat(<string>rcs); // Convert period to int
-    rcsMarg = parseFloat(<string>rcsMarg);
+  if (isValidRcs) {
     const minRcs = rcs - rcsMarg;
     const maxRcs = rcs + rcsMarg;
     res = checkRcs(res, minRcs, maxRcs);
@@ -163,83 +130,58 @@ export const searchAzElRange = (
   // IDEA: Intentionally doesn't clear previous searches. Could be an option later.
   const sccList = [];
   for (let i = 0; i < res.length; i++) {
-    // $('#findByLooks-results').append(res[i].SCC_NUM + '<br />');
+    // $('#findByLooks-results').append(res[i].sccNum + '<br />');
     if (i < res.length - 1) {
-      $('#search').val($('#search').val() + res[i].SCC_NUM + ',');
+      $('#search').val($('#search').val() + res[i].sccNum + ',');
     } else {
-      $('#search').val($('#search').val() + res[i].SCC_NUM);
+      $('#search').val($('#search').val() + res[i].sccNum);
     }
-    sccList.push(res[i].SCC_NUM);
+    sccList.push(res[i].sccNum);
   }
-  keepTrackApi.programs.uiManager.doSearch($('#search').val());
+  uiManager.doSearch($('#search').val());
   // console.log(sccList);
   return res;
 };
 
-export const checkInview = (possibles: string | any[]) => {
-  const inviewRes = [];
-  for (let i = 0; i < possibles.length; i++) {
-    if (possibles[i].inView) {
-      inviewRes.push(possibles[i]);
-    }
-  }
-  return inviewRes;
+export const checkInview = (possibles: any[]) => {
+  possibles = possibles.filter((possible) => possible.inView);
+  return possibles;
 };
 
-export const checkObjtype = (possibles: string | any[], objtype: number) => {
-  const objtypeRes = [];
-  for (let i = 0; i < possibles.length; i++) {
-    if (possibles[i].OT === objtype) {
-      objtypeRes.push(possibles[i]);
-    }
-  }
-  return objtypeRes;
+export const checkObjtype = (possibles: any[], objtype: number) => {
+  possibles = possibles.filter((possible) => possible.OT === objtype);
+  return possibles;
 };
 
-export const checkAz = (possibles: string | any[], minaz: number, maxaz: number) => {
-  const azRes = [];
-  for (let i = 0; i < possibles.length; i++) {
-    if (possibles[i].az < maxaz && possibles[i].az > minaz) {
-      azRes.push(possibles[i]);
-    }
-  }
-  return azRes;
+export const checkAz = (possibles: any[], minaz: number, maxaz: number) => {
+  possibles = possibles.filter((possible) => possible.az >= minaz && possible.az <= maxaz);
+  return possibles;
 };
-export const checkEl = (possibles: string | any[], minel: number, maxel: number) => {
-  const elRes = [];
-  for (let i = 0; i < possibles.length; i++) {
-    if (possibles[i].el < maxel && possibles[i].el > minel) {
-      elRes.push(possibles[i]);
-    }
-  }
-  return elRes;
+export const checkEl = (possibles: any[], minel: number, maxel: number) => {
+  possibles = possibles.filter((possible) => possible.el >= minel && possible.el <= maxel);
+  return possibles;
 };
-export const checkRange = (possibles: string | any[], minrange: number, maxrange: number) => {
-  const rangeRes = [];
-  for (let i = 0; i < possibles.length; i++) {
-    if (possibles[i].rng < maxrange && possibles[i].rng > minrange) {
-      rangeRes.push(possibles[i]);
-    }
-  }
-  return rangeRes;
+export const checkRange = (possibles: any[], minrange: number, maxrange: number) => {
+  possibles = possibles.filter((possible) => possible.rng >= minrange && possible.rng <= maxrange);
+  return possibles;
 };
 
 export const newLaunchSubmit = (): void => {
-  const { timeManager, mainCamera, satellite, satSet, orbitManager, uiManager } = keepTrackApi.programs;
+  const { timeManager, mainCamera, satellite, satSet, orbitManager, uiManager, objectManager } = keepTrackApi.programs;
 
   const scc = $('#nl-scc').val();
-  const satId = keepTrackApi.programs.satSet.getIdFromObjNum(scc);
-  let sat = keepTrackApi.programs.satSet.getSat(satId);
+  const satId = satSet.getIdFromObjNum(scc);
+  let sat = satSet.getSat(satId);
 
   const upOrDown = $('#nl-updown').val();
   const launchFac = $('#nl-facility').val();
   let launchLat, launchLon;
 
-  if (keepTrackApi.programs.objectManager.isLaunchSiteManagerLoaded) {
-    for (const launchSite in keepTrackApi.programs.objectManager.launchSiteManager.launchSiteList) {
-      if (keepTrackApi.programs.objectManager.launchSiteManager.launchSiteList[launchSite].name === launchFac) {
-        launchLat = keepTrackApi.programs.objectManager.launchSiteManager.launchSiteList[launchSite].lat;
-        launchLon = keepTrackApi.programs.objectManager.launchSiteManager.launchSiteList[launchSite].lon;
+  if (objectManager.isLaunchSiteManagerLoaded) {
+    for (const launchSite in objectManager.launchSiteManager.launchSiteList) {
+      if (objectManager.launchSiteManager.launchSiteList[launchSite].name === launchFac) {
+        launchLat = objectManager.launchSiteManager.launchSiteList[launchSite].lat;
+        launchLon = objectManager.launchSiteManager.launchSiteList[launchSite].lon;
       }
     }
   }
@@ -249,7 +191,7 @@ export const newLaunchSubmit = (): void => {
   }
 
   // if (sat.inclination * RAD2DEG < launchLat) {
-  //   keepTrackApi.programs.uiManager.toast(`Satellite Inclination Lower than Launch Latitude!`, 'critical');
+  //   uiManager.toast(`Satellite Inclination Lower than Launch Latitude!`, 'critical');
   //   $('#loading-screen').fadeOut('slow');
   //   return;
   // }
@@ -365,6 +307,26 @@ export const uiManagerInit = (): void => {
                     <label for="fbl-rcs-margin "class="active">Margin</label>
                   </div>
                 </div>
+                <div class="row">
+                  <div class="input-field col s12 m6 l6">
+                    <input placeholder="XX.X" id="fbl-raan" type="text">
+                    <label for="fbl-raan "class="active">Right Ascension</label>
+                  </div>
+                  <div class="input-field col s12 m6 l6">
+                    <input value="0.5" placeholder="0.5" id="fbl-raan-margin" type="text">
+                    <label for="fbl-raan-margin "class="active">Margin</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12 m6 l6">
+                    <input placeholder="XX.X" id="fbl-argPe" type="text">
+                    <label for="fbl-argPe "class="active">Arg of Perigee</label>
+                  </div>
+                  <div class="input-field col s12 m6 l6">
+                    <input value="0.5" placeholder="0.5" id="fbl-argPe-margin" type="text">
+                    <label for="fbl-argPe-margin "class="active">Margin</label>
+                  </div>
+                </div>
                 <div class="center-align">
                   <button id="findByLooks-submit" class="btn btn-ui waves-effect waves-light" type="submit"
                     name="action">Find Satellite(s) &#9658;
@@ -383,7 +345,7 @@ export const uiManagerInit = (): void => {
     $('#fbl-error').hide();
   });
 
-  $('#newLaunch').on('submit', function (e) {
+  $('#newLaunch').on('submit', function (e: Event) {
     $('#loading-screen').fadeIn(1000, newLaunchSubmit);
     e.preventDefault();
   });
@@ -407,20 +369,21 @@ export const uiManagerInit = (): void => {
         </div>     
       `);
 
-  $('#findByLooks').on('submit', function (e) {
+  $('#findByLooks').on('submit', function (e: Event) {
     findByLooksSubmit();
     e.preventDefault();
   });
 };
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-find-sat') {
+    const { uiManager } = keepTrackApi.programs;
     if (isFindByLooksMenuOpen) {
       isFindByLooksMenuOpen = false;
-      keepTrackApi.programs.uiManager.hideSideMenus();
+      uiManager.hideSideMenus();
       return;
     } else {
-      if (keepTrackApi.programs.settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
-      keepTrackApi.programs.uiManager.hideSideMenus();
+      if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+      uiManager.hideSideMenus();
       $('#findByLooks-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
       isFindByLooksMenuOpen = true;
       $('#menu-find-sat').addClass('bmenu-item-selected');
@@ -455,24 +418,39 @@ export const init = (): void => {
   });
 };
 export const findByLooksSubmit = () => {
-  const fblAzimuth = <string | number>$('#fbl-azimuth').val();
-  const fblElevation = <string | number>$('#fbl-elevation').val();
-  const fblRange = <string | number>$('#fbl-range').val();
-  const fblInc = <string | number>$('#fbl-inc').val();
-  const fblPeriod = <string | number>$('#fbl-period').val();
-  const fblRcs = <string | number>$('#fbl-rcs').val();
-  const fblAzimuthM = <string | number>$('#fbl-azimuth-margin').val();
-  const fblElevationM = <string | number>$('#fbl-elevation-margin').val();
-  const fblRangeM = <string | number>$('#fbl-range-margin').val();
-  const fblIncM = <string | number>$('#fbl-inc-margin').val();
-  const fblPeriodM = <string | number>$('#fbl-period-margin').val();
-  const fblRcsM = <string | number>$('#fbl-rcs-margin').val();
-  const fblType = <string>$('#fbl-type').val();
+  const fblAzimuth = parseFloat($('#fbl-azimuth').val());
+  const fblElevation = parseFloat($('#fbl-elevation').val());
+  const fblRange = parseFloat($('#fbl-range').val());
+  const fblInc = parseFloat($('#fbl-inc').val());
+  const fblPeriod = parseFloat($('#fbl-period').val());
+  const fblRcs = parseFloat($('#fbl-rcs').val());
+  const fblAzimuthM = parseFloat($('#fbl-azimuth-margin').val());
+  const fblElevationM = parseFloat($('#fbl-elevation-margin').val());
+  const fblRangeM = parseFloat($('#fbl-range-margin').val());
+  const fblIncM = parseFloat($('#fbl-inc-margin').val());
+  const fblPeriodM = parseFloat($('#fbl-period-margin').val());
+  const fblRcsM = parseFloat($('#fbl-rcs-margin').val());
+  const fblType = parseInt($('#fbl-type').val());
+  const fblRaan = parseFloat($('#fbl-raan').val());
+  const fblRaanM = parseFloat($('#fbl-raan-margin').val());
+  const fblArgPe = parseFloat($('#fbl-argPe').val());
+  const fblArgPeM = parseFloat($('#fbl-argPe-margin').val());
   $('#search').val(''); // Reset the search first
-  const res = searchAzElRange(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM, fblPeriod, fblPeriodM, fblRcs, fblRcsM, fblType);
-  if (typeof res === 'undefined') {
-    keepTrackApi.programs.uiManager.toast(`No Search Criteria Entered`, 'critical');
-  } else if (res.length === 0) {
-    keepTrackApi.programs.uiManager.toast(`No Satellites Found`, 'critical');
+  const { uiManager } = keepTrackApi.programs;
+  try {
+    const res = searchSats(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM, fblPeriod, fblPeriodM, fblRcs, fblRcsM, fblType, fblRaan, fblRaanM, fblArgPe, fblArgPeM);
+    if (res.length === 0) {
+      uiManager.toast(`No Satellites Found`, 'critical');
+    }
+  } catch (e) {
+    if (e.message === 'No Search Criteria Entered') {
+      uiManager.toast(`No Search Criteria Entered`, 'critical');
+    }
   }
+};
+export const limitPossibles = (possibles: any[], limit: number): any[] => {
+  const { uiManager } = keepTrackApi.programs;
+  if (possibles.length >= limit) uiManager.toast('Too many results, limited to 200', 'warning');
+  possibles = possibles.filter((_possible, i) => i > limit - 1);
+  return possibles;
 };

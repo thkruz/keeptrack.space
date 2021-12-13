@@ -1,6 +1,6 @@
-import { keepTrackApiStubs } from '../api/apiMocks';
-import { keepTrackApi } from '../api/externalApi';
 import { timeManager } from '@app/js/timeManager/timeManager.ts';
+import { keepTrackApiStubs } from '../api/apiMocks';
+import { keepTrackApi } from '../api/keepTrackApi';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
@@ -10,7 +10,7 @@ test(`Basic Functions of Time Manager`, () => {
     <div id="datetime-text"><div>
   `;
 
-  keepTrackApi.programs.settingsManager = { plugins: {} };
+  settingsManager = { plugins: {} };
   timeManager.init();
   expect(timeManager.drawDt).toBe(0);
 

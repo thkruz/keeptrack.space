@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import { stringPad } from '@app/js/lib/helpers';
-import { satVmagManager } from '@app/js/satSet/satVmagManager.js';
 
 /**
  *  @returns {Promise<any>}
@@ -62,7 +62,7 @@ export const catalogLoader = async (): Promise<any> => {
     if (settingsManager.isUseDebrisCatalog) {
       await $.get(`${settingsManager.installDirectory}tle/TLEdebris.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
     } else {
-      await $.get(`${settingsManager.installDirectory}tle/TLE.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
+      await $.get(`${settingsManager.installDirectory}tle/TLE2.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
     }
   } catch (e) {
     // console.debug(e);
@@ -90,15 +90,6 @@ export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any) => 
     fieldOfViewSetLength: objectManager.fieldOfViewSet.length,
     isLowPerf: settingsManager.lowPerf,
   });
-
-  // If No Visual Magnitudes, Add The VMag Database
-  try {
-    if (typeof satSet.getSat(satSet.getIdFromObjNum(44235)).vmag == 'undefined') {
-      satVmagManager.init(satSet);
-    }
-  } catch (e) {
-    console.debug('satVmagManager Not Loaded');
-  }
 };
 
 export const setupGetVariables = () => {
@@ -150,12 +141,13 @@ export const setupGetVariables = () => {
   return limitSatsArray;
 };
 
-export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string | any[], extraSats?: string | any[], asciiCatalog?: string | any[]) => {
+export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | any[], extraSats?: string | any[], asciiCatalog?: string | any[]) => {
   const { dotsManager, objectManager, satSet } = keepTrackApi.programs;
 
   const tempSatData = [];
-  satSet.sccIndex = {};
-  satSet.cosparIndex = {};
+
+  satSet.sccIndex = <{ [key: string]: number }>{};
+  satSet.cosparIndex = <{ [key: string]: number }>{};
 
   if (typeof limitSatsArray === 'undefined' || limitSatsArray.length == 0 || limitSatsArray[0] == null) {
     // If there are no limits then just process like normal
@@ -168,20 +160,20 @@ export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string 
 
   let i = 0;
   for (i = 0; i < resp.length; i++) {
-    resp[i].SCC_NUM = stringPad.pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
+    resp[i].sccNum = stringPad.pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
     if ((<any>settingsManager).limitSats === '') {
       // If there are no limits then just process like normal
       year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
       if (year === '') {
         resp[i].intlDes = 'none';
       } else {
-        prefix = year > 50 ? '19' : '20';
+        prefix = parseInt(year) > 50 ? '19' : '20';
         year = prefix + year;
         rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
         resp[i].intlDes = year + '-' + rest;
       }
       resp[i].id = i;
-      satSet.sccIndex[`${resp[i].SCC_NUM}`] = resp[i].id;
+      satSet.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
       satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
       resp[i].active = true;
       tempSatData.push(resp[i]);
@@ -189,18 +181,18 @@ export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string 
     } else {
       // If there are limited satellites
       for (let x = 0; x < limitSatsArray.length; x++) {
-        if (resp[i].SCC_NUM === limitSatsArray[x].SCC_NUM) {
+        if (resp[i].sccNum === limitSatsArray[x].sccNum) {
           year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
           if (year === '') {
             resp[i].intlDes = 'none';
           } else {
-            prefix = year > 50 ? '19' : '20';
+            prefix = parseInt(year) > 50 ? '19' : '20';
             year = prefix + year;
             rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
             resp[i].intlDes = year + '-' + rest;
           }
           resp[i].id = i;
-          satSet.sccIndex[`${resp[i].SCC_NUM}`] = resp[i].id;
+          satSet.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
           satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
           resp[i].active = true;
           tempSatData.push(resp[i]);
@@ -245,7 +237,7 @@ export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string 
           C: 'Unknown',
           LV: 'Unknown',
           LS: 'Unknown',
-          SCC_NUM: extraSats[s].SCC.toString(),
+          sccNum: extraSats[s].SCC.toString(),
           TLE1: extraSats[s].TLE1,
           TLE2: extraSats[s].TLE2,
           intlDes: year + '-' + rest,
@@ -294,7 +286,7 @@ export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string 
           C: 'Unknown',
           LV: 'Unknown',
           LS: 'Unknown',
-          SCC_NUM: asciiCatalog[s].SCC.toString(),
+          sccNum: asciiCatalog[s].SCC.toString(),
           TLE1: asciiCatalog[s].TLE1,
           TLE2: asciiCatalog[s].TLE2,
           intlDes: year + '-' + rest,
@@ -327,7 +319,7 @@ export const filterTLEDatabase = (resp: string | any[], limitSatsArray?: string 
   dotsManager.starIndex1 = objectManager.starIndex1 + satSet.orbitalSats;
   dotsManager.starIndex2 = objectManager.starIndex2 + satSet.orbitalSats;
 
-  if ((<any>settingsManager).isEnableGsCatalog) satSet.initGsData();
+  // if ((<any>settingsManager).isEnableGsCatalog) satSet.initGsData();
 
   for (i = 0; i < objectManager.staticSet.length; i++) {
     objectManager.staticSet[i].id = tempSatData.length;

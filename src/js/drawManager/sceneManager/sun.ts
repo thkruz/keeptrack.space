@@ -1,9 +1,10 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/lib/constants.js';
-import { A } from '@app/js/lib/external/meuusjs.js';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SunObject } from '@app/js/api/keepTrackTypes';
+import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { satellite } from '@app/js/satMath/satMath';
 import { jday } from '@app/js/timeManager/transforms';
 import * as glm from 'gl-matrix';
+import { A } from '../../lib/external/meuusjs';
 
 /* eslint-disable camelcase */
 /**
@@ -33,7 +34,7 @@ const SUN_SCALAR_DISTANCE = 220000;
 /* ***************************************************************************
  * Initialization Code
  * ***************************************************************************/
-export const init = async () => {
+export const init = async (): Promise<void> => {
   const { gl } = keepTrackApi.programs.drawManager;
 
   initProgram(gl);
@@ -44,14 +45,14 @@ export const init = async () => {
 
   sun.isLoaded = true;
 };
-export const initGodrays = (gl: WebGL2RenderingContext) => {
+export const initGodrays = (gl: WebGL2RenderingContext): void => {
   initGodraysProgram(gl);
   initGodraysBuffers(gl);
   initGodraysVao(gl);
   initGodraysTextures(gl);
   initGodraysFrameBuffer(gl);
 };
-export const initProgram = (gl: WebGL2RenderingContext) => {
+export const initProgram = (gl: WebGL2RenderingContext): void => {
   const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
   gl.shaderSource(fragShader, shaders.sun.frag);
   gl.compileShader(fragShader);
@@ -74,7 +75,7 @@ export const initProgram = (gl: WebGL2RenderingContext) => {
   sun.program.u_lightDir = gl.getUniformLocation(sun.program, 'u_lightDir');
   sun.program.u_sunDistance = gl.getUniformLocation(sun.program, 'u_sunDistance');
 };
-export const initBuffers = (gl: WebGL2RenderingContext) => {
+export const initBuffers = (gl: WebGL2RenderingContext): void => {
   // generate a uvsphere bottom up, CCW order
   const vertPos = [];
   const vertNorm = [];
@@ -161,7 +162,7 @@ export const initVao = (gl: WebGL2RenderingContext) => {
 
   gl.bindVertexArray(null);
 };
-export const initGodraysFrameBuffer = (gl: WebGL2RenderingContext) => {
+export const initGodraysFrameBuffer = (gl: WebGL2RenderingContext): void => {
   sun.godrays.frameBuffer = gl.createFramebuffer();
   gl.bindFramebuffer(gl.FRAMEBUFFER, sun.godrays.frameBuffer);
 
@@ -172,7 +173,7 @@ export const initGodraysFrameBuffer = (gl: WebGL2RenderingContext) => {
   gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, sun.godrays.textureMap.texture, 0);
   gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, sun.godrays.renderBuffer);
 };
-export const initGodraysTextures = (gl: WebGL2RenderingContext) => {
+export const initGodraysTextures = (gl: WebGL2RenderingContext): void => {
   sun.godrays.textureMap.texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, sun.godrays.textureMap.texture);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -195,7 +196,7 @@ export const initGodraysVao = (gl: WebGL2RenderingContext) => {
 
   gl.bindVertexArray(null);
 };
-export const initGodraysBuffers = (gl: WebGL2RenderingContext) => {
+export const initGodraysBuffers = (gl: WebGL2RenderingContext): void => {
   sun.godrays.buffers.vertPosBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, sun.godrays.buffers.vertPosBuf);
   const x1 = 0;
@@ -209,7 +210,7 @@ export const initGodraysBuffers = (gl: WebGL2RenderingContext) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, sun.godrays.buffers.texCoordBuf);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]), gl.STATIC_DRAW);
 };
-export const initGodraysProgram = (gl: WebGL2RenderingContext) => {
+export const initGodraysProgram = (gl: WebGL2RenderingContext): void => {
   sun.godrays.program = <any>gl.createProgram();
   const vertShader = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vertShader, shaders.godrays.vert);
@@ -248,10 +249,10 @@ export const update = () => {
   sun.sunvar.j += sun.now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
   sun.sunvar.gmst = satellite.gstime(sun.sunvar.j);
   sun.sunvar.jdo = new A.JulianDay(sun.sunvar.j); // now
-  sun.sunvar.coord = A.EclCoord.fromWgs84(0, 0, 0);
+  sun.sunvar.coord = A.EclCoordfromWgs84(0, 0, 0);
 
   // AZ / EL Calculation
-  sun.sunvar.tp = A.Solar.topocentricPosition(sun.sunvar.jdo, sun.sunvar.coord, false);
+  sun.sunvar.tp = <any>A.Solar.topocentricPosition(sun.sunvar.jdo, <any>sun.sunvar.coord, false);
   sun.sunvar.azimuth = sun.sunvar.tp.hz.az * RAD2DEG + (180 % 360);
   sun.sunvar.elevation = (sun.sunvar.tp.hz.alt * RAD2DEG) % 360;
 
@@ -460,49 +461,49 @@ const shaders = {
   `,
   },
 };
-export const sun = {
-  vao: null,
+export const sun = <SunObject>{
+  vao: <WebGLVertexArrayObject>null,
   buffers: {
     vertCount: 0,
-    vertPosBuf: null,
-    vertNormBuf: null,
-    vertIndexBuf: null,
+    vertPosBuf: <WebGLBuffer>null,
+    vertNormBuf: <WebGLBuffer>null,
+    vertIndexBuf: <WebGLBuffer>null,
   },
   program: {
-    a_position: null,
-    a_normal: null,
-    u_pMatrix: null,
-    u_camMatrix: null,
-    u_mvMatrix: null,
-    u_nMatrix: null,
-    u_sunDistance: null,
-    u_lightDir: null,
+    a_position: <number>null,
+    a_normal: <number>null,
+    u_pMatrix: <WebGLUniformLocation>null,
+    u_camMatrix: <WebGLUniformLocation>null,
+    u_mvMatrix: <WebGLUniformLocation>null,
+    u_nMatrix: <WebGLUniformLocation>null,
+    u_sunDistance: <WebGLUniformLocation>null,
+    u_lightDir: <WebGLUniformLocation>null,
   },
   godrays: {
-    vao: null,
+    vao: <WebGLVertexArrayObject>null,
     textureMap: {
-      texture: null,
+      texture: <WebGLTexture>null,
     },
-    renderBuffer: null,
-    frameBuffer: null,
+    renderBuffer: <WebGLRenderbuffer>null,
+    frameBuffer: <WebGLFramebuffer>null,
     buffers: {
       vertCount: 0,
-      vertPosBuf: null,
-      texCoordBuf: null,
-      vertNormBuf: null,
-      vertIndexBuf: null,
+      vertPosBuf: <WebGLBuffer>null,
+      texCoordBuf: <WebGLBuffer>null,
+      vertNormBuf: <WebGLBuffer>null,
+      vertIndexBuf: <WebGLBuffer>null,
     },
     program: {
-      a_position: null,
-      a_texCoord: null,
-      a_normal: null,
-      u_pMatrix: null,
-      u_camMatrix: null,
-      u_mvMatrix: null,
-      u_nMatrix: null,
-      u_sunPosition: null,
-      u_sampler: null,
-      u_resolution: null,
+      a_position: <number>null,
+      a_texCoord: <number>null,
+      a_normal: <number>null,
+      u_pMatrix: <WebGLUniformLocation>null,
+      u_camMatrix: <WebGLUniformLocation>null,
+      u_mvMatrix: <WebGLUniformLocation>null,
+      u_nMatrix: <WebGLUniformLocation>null,
+      u_sunPosition: <WebGLUniformLocation>null,
+      u_sampler: <WebGLUniformLocation>null,
+      u_resolution: <WebGLUniformLocation>null,
     },
   },
   camMatrix: glm.mat4.create(),

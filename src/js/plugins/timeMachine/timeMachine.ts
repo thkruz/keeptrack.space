@@ -1,5 +1,7 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { CatalogManager, GroupsManager, OrbitManager } from '@app/js/api/keepTrackTypes';
+import { ColorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
 import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 export const init = (): void => {
   // Add HTML
@@ -37,7 +39,7 @@ export const uiManagerInit = (): any => {
 };
 
 export const bottomMenuClick = (iconName: string): void => {
-  const { orbitManager, groupsManager, satSet, ColorScheme } = keepTrackApi.programs;
+  const { orbitManager, groupsManager, satSet, colorSchemeManager } = keepTrackApi.programs;
   if (iconName === 'menu-time-machine') {
     if (orbitManager.isTimeMachineRunning) {
       // Merge to one variable?
@@ -46,7 +48,7 @@ export const bottomMenuClick = (iconName: string): void => {
 
       settingsManager.colors.transparent = orbitManager.tempTransColor;
       groupsManager.clearSelect();
-      satSet.setColorScheme(ColorScheme.default, true); // force color recalc
+      satSet.setColorScheme(colorSchemeManager.default, true); // force color recalc
 
       $('#menu-time-machine').removeClass('bmenu-item-selected');
       return;
@@ -62,26 +64,26 @@ export const bottomMenuClick = (iconName: string): void => {
 };
 
 export const orbitManagerInit = (): void => {
-  const { orbitManager, satSet, ColorScheme, groupsManager } = keepTrackApi.programs;
+  const { orbitManager, satSet, colorSchemeManager, groupsManager } = keepTrackApi.programs;
   orbitManager.playNextSatellite = (runCount: number, year: number) => {
     if (!keepTrackApi.programs.orbitManager.isTimeMachineVisible) return;
     // Kill all old async calls if run count updates
     if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
     const yearGroup = groupsManager.createGroup('yearOrLess', year);
     // groupsManager.selectGroupNoOverlay(yearGroup);
-    groupsManager.selectGroup(yearGroup, orbitManager);
+    groupsManager.selectGroup(yearGroup);
     yearGroup.updateOrbits(orbitManager, orbitManager);
-    satSet.setColorScheme(ColorScheme.group, true); // force color recalc
+    satSet.setColorScheme(colorSchemeManager.group, true); // force color recalc
     if (year >= 59 && year < 100) {
-      keepTrackApi.programs.uiManager.toast(`Time Machine In Year 19${year}!`, 'normal');      
+      keepTrackApi.programs.uiManager.toast(`Time Machine In Year 19${year}!`, 'normal');
     } else {
       const yearStr = year < 10 ? `0${year}` : `${year}`;
-      keepTrackApi.programs.uiManager.toast(`Time Machine In Year 20${yearStr}!`, 'normal');      
+      keepTrackApi.programs.uiManager.toast(`Time Machine In Year 20${yearStr}!`, 'normal');
     }
 
     if (year == parseInt(new Date().getUTCFullYear().toString().slice(2, 4))) {
       setTimeout(function () {
-        timeMachineRemoveSatellite(runCount, orbitManager, groupsManager, satSet, ColorScheme)
+        timeMachineRemoveSatellite(runCount, orbitManager, groupsManager, satSet, colorSchemeManager);
       }, 10000); // Linger for 10 seconds
     }
   };
@@ -118,14 +120,11 @@ export const timeMachineIconClick = () => {
     $('#search-results').hide();
   }
 };
-export const timeMachineRemoveSatellite = (runCount: number, orbitManager: any, groupsManager: any, satSet: any, ColorScheme: any): void => {
-    if (runCount !== orbitManager.historyOfSatellitesRunCount)
-      return;
-    if (!orbitManager.isTimeMachineVisible)
-      return;
-    settingsManager.colors.transparent = orbitManager.tempTransColor;
-    orbitManager.isTimeMachineRunning = false;
-    groupsManager.clearSelect();
-    satSet.setColorScheme(ColorScheme.default, true);
-  };
-
+export const timeMachineRemoveSatellite = (runCount: number, orbitManager: OrbitManager, groupsManager: GroupsManager, satSet: CatalogManager, colorSchemeManager: ColorSchemeManager): void => {
+  if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
+  if (!orbitManager.isTimeMachineVisible) return;
+  settingsManager.colors.transparent = orbitManager.tempTransColor;
+  orbitManager.isTimeMachineRunning = false;
+  groupsManager.clearSelect();
+  satSet.setColorScheme(colorSchemeManager.default, true);
+};

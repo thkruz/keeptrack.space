@@ -1,8 +1,8 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as findSat from '@app/js/plugins/findSat/findSat';
+import * as apiMocks from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import * as findSat from '../../plugins/findSat/findSat';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = { ...keepTrackApi.programs, ...apiMocks.keepTrackApiStubs.programs };
 
 // @ponicode
 describe('findSat.init', () => {
@@ -74,9 +74,9 @@ describe('findSat.checkRcs', () => {
 });
 
 // @ponicode
-describe('findSat.searchAzElRange', () => {
+describe('findSat.searchSats', () => {
   test('0', () => {
-    let result: any = findSat.searchAzElRange(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+    let result: any = findSat.searchSats(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, '1');
     expect(result).toMatchSnapshot();
   });
 });
@@ -85,7 +85,7 @@ describe('findSat.searchAzElRange', () => {
 describe('findSat.checkInview', () => {
   test('0', () => {
     let param1: any = [{ inView: 0 }, { inView: 50 }];
-    let result: any = findSat.checkInview(param1, -1, 1000);
+    let result: any = findSat.checkInview(param1);
     expect(result).toMatchSnapshot();
   });
 });
@@ -94,7 +94,7 @@ describe('findSat.checkInview', () => {
 describe('findSat.checkObjtype', () => {
   test('0', () => {
     let param1: any = [{ OT: 0 }, { OT: 1 }];
-    let result: any = findSat.checkObjtype(param1, -1, 1000);
+    let result: any = findSat.checkObjtype(param1, 1);
     expect(result).toMatchSnapshot();
   });
 });

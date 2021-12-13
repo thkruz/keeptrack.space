@@ -26,14 +26,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { isThisJest, keepTrackApi } from '@app/js/api/externalApi';
+import { isThisJest, keepTrackApi } from '@app/js/api/keepTrackApi';
 import { camera } from '@app/js/camera/camera';
-import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory';
+import { colorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
 import { dotsManager } from '@app/js/drawManager/dots';
 import { drawManager } from '@app/js/drawManager/drawManager';
-import { LineFactory, sceneManager } from '@app/js/drawManager/sceneManager/sceneManager';
-import { GroupFactory } from '@app/js/groupsManager/groupsManager';
-import { objectManager } from '@app/js/objectManager/objectManager.js';
+import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager';
+import { groupsManager } from '@app/js/groupsManager/groupsManager';
+import { objectManager } from '@app/js/objectManager/objectManager';
 import { orbitManager } from '@app/js/orbitManager/orbitManager';
 import { sensorManager } from '@app/js/plugins/sensor/sensorManager';
 import { satellite } from '@app/js/satMath/satMath';
@@ -44,11 +44,9 @@ import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
 import { starManager } from '@app/js/starManager/starManager';
 import { timeManager } from '@app/js/timeManager/timeManager';
 import { adviceManager } from '@app/js/uiManager/adviceManager';
-import { searchBox } from '@app/js/uiManager/search-box.js';
+import { searchBox } from '@app/js/uiManager/searchBox';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager';
-
-// Type settingsManager
-// (<any>window).settingsManager = (<any>window).settingsManager as unknown as SettingsManager;
+import { MapManager, ObjectManager, OrbitManager, SensorManager } from './api/keepTrackTypes';
 
 export const redirectHttpToHttps = (): void => {
   // This is necessary for some of the geolocation based functions
@@ -84,25 +82,23 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     settingsManager.versionDate = VERSION_DATE;
 
     // Add all of the imported programs to the API
-    keepTrackApi.programs = {
-      adviceManager: adviceManager,
+    keepTrackApi.programs = <any>{
+      adviceManager,
       mainCamera: camera,
-      ColorScheme: ColorScheme,
-      drawManager: drawManager,
-      dotsManager: dotsManager,
-      mapManager: null,
-      objectManager: objectManager,
-      orbitManager: orbitManager,
-      satSet: satSet,
-      satellite: satellite,
-      sceneManager: sceneManager,
-      searchBox: searchBox,
-      sensorManager: sensorManager,
-      settingsManager: settingsManager,
-      starManager: starManager,
-      timeManager: timeManager,
-      uiManager: uiManager,
-      uiInput: uiInput,
+      colorSchemeManager,
+      drawManager,
+      dotsManager,
+      groupsManager,
+      mapManager: <MapManager>(<unknown>{}),
+      objectManager: <ObjectManager>(<unknown>objectManager),
+      orbitManager: <OrbitManager>(<unknown>orbitManager),
+      satSet,
+      satellite,
+      searchBox,
+      sensorManager: <SensorManager>(<unknown>sensorManager),
+      starManager,
+      timeManager,
+      uiManager,
     };
 
     uiManager.loadStr('science');
@@ -126,12 +122,6 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     uiManager.mobileManager.init();
     // We need to know if we are on a small screen before starting webgl
     await drawManager.glInit();
-    if (typeof process !== 'undefined') {
-      // NOTE: Jest fails with webgl2 so we use webgl1 during testing
-      // This means we need to mock some of the webgl2 code
-      // eslint-disable-next-line no-undef
-      keepTrackApi.programs.drawManager.gl = global.mocks.glMock;
-    }
 
     window.addEventListener('resize', drawManager.resizeCanvas);
 
@@ -141,7 +131,7 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     await satSet.init();
     await objectManager.init();
-    ColorScheme.init();
+    colorSchemeManager.init();
     drawManager.selectSatManager.init();
 
     await keepTrackApi.methods.loadCatalog(); // Needs Object Manager and gl first
@@ -149,15 +139,10 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     // eslint-disable-next-line require-atomic-updates
     keepTrackApi.programs.satCruncher = satCruncher;
 
-    keepTrackApi.programs.dotsManager.setupPickingBuffer(satSet.satData);
-    satSet.setColorScheme((<any>ColorScheme).default, true);
-
-    const groupsManager = new GroupFactory();
-    // eslint-disable-next-line require-atomic-updates
-    keepTrackApi.programs.groupsManager = groupsManager;
+    keepTrackApi.programs.dotsManager.setupPickingBuffer(satSet.satData.length);
+    satSet.setColorScheme(colorSchemeManager.default, true);
 
     orbitManager.init();
-    searchBox.init();
 
     const lineManager = new LineFactory();
     // eslint-disable-next-line require-atomic-updates
@@ -165,10 +150,10 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     starManager.init();
     uiManager.init();
-    keepTrackApi.programs.dotsManager.updateSizeBuffer(satSet.satData);
+    keepTrackApi.programs.dotsManager.updateSizeBuffer(satSet.satData.length);
     // await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
     satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
-    objectManager.satLinkManager.idToSatnum(satSet);
+    (<any>objectManager).satLinkManager.idToSatnum(satSet);
 
     uiInput.init();
 
@@ -191,65 +176,19 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 export const importCss = async (): Promise<void> => {
   try {
     if (!settingsManager.disableUI) {
-      import('@app/css/fonts.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/materialize.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/astroux/css/astro.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/materialize-local.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/js/lib/external/colorPick.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/perfect-scrollbar.min.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/jquery-ui.min.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/jquery-ui-timepicker-addon.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-      import('@app/css/style.css')
-        .then(
-          await import('@app/css/responsive.css')
-            .catch(() => {
-              // intentionally left blank
-            })
-            .then((resp) => resp)
-        )
-        .catch(() => {
-          // intentionally left blank
-        });
+      import('@app/css/fonts.css').catch(() => {});
+      import('@app/css/materialize.css').catch(() => {});
+      import('@app/css/astroux/css/astro.css').catch(() => {});
+      import('@app/css/materialize-local.css').catch(() => {});
+      import('@app/js/lib/external/colorPick.css').catch(() => {});
+      import('@app/css/perfect-scrollbar.min.css').catch(() => {});
+      import('@app/css/jquery-ui.min.css').catch(() => {});
+      import('@app/css/jquery-ui-timepicker-addon.css').catch(() => {});
+      import('@app/css/style.css').then(await import('@app/css/responsive.css').catch(() => {}).then((resp) => resp)).catch(() => {});
     } else if (settingsManager.enableLimitedUI) {
-      import('@app/css/limitedUI.css')
-        .then((resp) => resp)
-        .catch(() => {
-          // intentionally left blank
-        });
-    } else {
-      // intentionally left blank
+      import('@app/css/limitedUI.css').catch(() => {
+        // intentionally left blank
+      });
     }
   } catch (e) {
     // intentionally left blank

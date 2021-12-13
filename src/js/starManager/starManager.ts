@@ -14,13 +14,13 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { constellations } from './constellations.js';
 import { stars } from './stars.js';
 
-export const findStarsConstellation = (starName) => {
-  for (var i = 0; i < starManager.constellations.length; i++) {
-    for (var s = 0; s < starManager.constellations[i].stars.length; s++) {
+export const findStarsConstellation = (starName: string) => {
+  for (let i = 0; i < starManager.constellations.length; i++) {
+    for (let s = 0; s < starManager.constellations[i].stars.length; s++) {
       if (starManager.constellations[i].stars[s][0] === starName) {
         return starManager.constellations[i].name;
       }
@@ -34,10 +34,10 @@ export const findStarsConstellation = (starName) => {
 export const drawAllConstellations = () => {
   const getIdFromStarName = keepTrackApi.programs.satSet.getIdFromStarName;
   const { lineManager } = keepTrackApi.programs;
-  for (var i = 0; i < starManager.constellations.length; i++) {
-    for (var s = 0; s < starManager.constellations[i].stars.length; s++) {
+  for (let i = 0; i < starManager.constellations.length; i++) {
+    for (let s = 0; s < starManager.constellations[i].stars.length; s++) {
       // Verify Stars Exist
-      var star1, star2;
+      let star1, star2;
       try {
         star1 = getIdFromStarName(starManager.constellations[i].stars[s][0]);
         star2 = getIdFromStarName(starManager.constellations[i].stars[s][1]);
@@ -56,19 +56,18 @@ export const drawAllConstellations = () => {
     }
   }
 };
-export const drawConstellations = (C) => {
+export const drawConstellations = (C: string) => {
   if (typeof C === 'undefined') return;
 
   const getIdFromStarName = keepTrackApi.programs.satSet.getIdFromStarName;
   const { lineManager } = keepTrackApi.programs;
   if (starManager.currentConstellationName === C) return;
-  for (var i = 0; i < starManager.constellations.length; i++) {
+  for (let i = 0; i < starManager.constellations.length; i++) {
     if (starManager.constellations[i].name === C) {
-      for (var s = 0; s < starManager.constellations[i].stars.length; s++) {
+      for (let s = 0; s < starManager.constellations[i].stars.length; s++) {
         // Verify Stars Exist
-        var star1, star2;
-        star1 = getIdFromStarName(starManager.constellations[i].stars[s][0]);
-        star2 = getIdFromStarName(starManager.constellations[i].stars[s][1]);
+        const star1 = getIdFromStarName(starManager.constellations[i].stars[s][0]);
+        const star2 = getIdFromStarName(starManager.constellations[i].stars[s][1]);
         if (star1 == null && star2 == null) return; // TODO: Not all constellations are ready yet
         /* istanbul ignore next */
         if (typeof star1 == 'undefined' || star1 == null || typeof star2 == 'undefined' || star2 == null) {
@@ -85,8 +84,8 @@ export const clearConstellations = () => {
   const { lineManager } = keepTrackApi.programs;
   starManager.isConstellationVisible = false;
   starManager.currentConstellationName = null;
-  var isFoundStar = true;
-  var attempts = 0;
+  let isFoundStar = true;
+  let attempts = 0;
   // No idea why this took 3 tries -- maybe unnecessary now?
   while (isFoundStar && attempts < 30) {
     isFoundStar = lineManager.removeStars();

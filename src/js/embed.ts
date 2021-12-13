@@ -26,14 +26,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { camera } from '@app/js/camera/camera';
-import { ColorSchemeFactory as ColorScheme } from '@app/js/colorManager/color-scheme-factory';
+import { colorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
 import { dotsManager } from '@app/js/drawManager/dots';
 import { drawManager } from '@app/js/drawManager/drawManager';
-import { LineFactory, sceneManager } from '@app/js/drawManager/sceneManager/sceneManager';
-import { GroupFactory } from '@app/js/groupsManager/groupsManager';
-import { objectManager } from '@app/js/objectManager/objectManager.js';
+import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager';
+import { groupsManager } from '@app/js/groupsManager/groupsManager';
+import { objectManager } from '@app/js/objectManager/objectManager';
 import { orbitManager } from '@app/js/orbitManager/orbitManager';
 import { sensorManager } from '@app/js/plugins/sensor/sensorManager';
 import { satellite } from '@app/js/satMath/satMath';
@@ -43,30 +43,28 @@ import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
 import { starManager } from '@app/js/starManager/starManager';
 import { timeManager } from '@app/js/timeManager/timeManager';
 import { adviceManager } from '@app/js/uiManager/adviceManager';
-import { searchBox } from '@app/js/uiManager/search-box.js';
 import { uiInput, uiManager } from '@app/js/uiManager/uiManager';
+import { searchBox } from './uiManager/searchBox';
 
 export const initalizeKeepTrack = async (): Promise<void> => {
   try {
-    keepTrackApi.programs = {
-      adviceManager: adviceManager,
+    keepTrackApi.programs = <any>{
+      adviceManager,
       mainCamera: camera,
-      ColorScheme: ColorScheme,
-      drawManager: drawManager,
-      dotsManager: dotsManager,
+      colorSchemeManager,
+      drawManager,
+      dotsManager,
+      groupsManager,
       mapManager: null,
-      objectManager: objectManager,
-      orbitManager: orbitManager,
-      satSet: satSet,
-      satellite: satellite,
-      sceneManager: sceneManager,
-      searchBox: searchBox,
-      sensorManager: sensorManager,
-      settingsManager: settingsManager,
-      starManager: starManager,
-      timeManager: timeManager,
-      uiManager: uiManager,
-      uiInput: uiInput,
+      objectManager,
+      orbitManager,
+      satSet,
+      satellite,
+      searchBox,
+      sensorManager,
+      starManager,
+      timeManager,
+      uiManager,
     };
 
     uiManager.loadStr('science');
@@ -105,27 +103,23 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     await satSet.init();
     objectManager.init();
-    ColorScheme.init();
+    colorSchemeManager.init();
     drawManager.selectSatManager.init();
 
     const satCruncher = satSet.satCruncher;
     keepTrackApi.programs.satCruncher = satCruncher;
 
-    keepTrackApi.programs.dotsManager.setupPickingBuffer(satSet.satData);
-    satSet.setColorScheme(ColorScheme.default, true);
-
-    const groupsManager = new GroupFactory();
-    keepTrackApi.programs.groupsManager = groupsManager;
+    keepTrackApi.programs.dotsManager.setupPickingBuffer(satSet.satData.length);
+    satSet.setColorScheme(colorSchemeManager.default, true);
 
     orbitManager.init();
-    searchBox.init();
 
     const lineManager = new LineFactory();
     keepTrackApi.programs.lineManager = lineManager;
 
     starManager.init();
     uiManager.init();
-    keepTrackApi.programs.dotsManager.updateSizeBuffer(satSet.satData);
+    keepTrackApi.programs.dotsManager.updateSizeBuffer(satSet.satData.length);
     // await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
     satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
     objectManager.satLinkManager.idToSatnum(satSet);

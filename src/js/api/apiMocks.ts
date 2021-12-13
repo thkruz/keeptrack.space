@@ -1,36 +1,31 @@
-import { SatObject, SensorObject } from './keepTrack';
+// @ts-nocheck
+
+import { SatObject, SensorObject } from './keepTrackTypes';
+import { SpaceObjectType } from './SpaceObjectType';
 declare const jest: any;
 
 export const defaultSat: SatObject = {
   id: 1,
   active: true,
-  SCC_NUM: '00005',
+  sccNum: '00005',
   intlDes: '1998-AEF',
-  C: 'ISS',
-  LS: 'TTMTR',
-  LV: 'Proton-K',
-  ON: 'ISS (ZARYA)',
-  OT: 1,
+  country: 'ISS',
+  launchSite: 'TTMTR',
+  launchVehicle: 'Proton-K',
+  name: 'ISS (ZARYA)',
+  type: SpaceObjectType.PAYLOAD,
   TLE1: '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991',
   TLE2: '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053',
-  R: '99.0524',
-  URL: 'http://www.esa.int/export/esaHS/ESAI2X0VMOC_iss_0.html',
-  O: 'National Aeronautics and Space Administration (NASA)/Multinational',
-  U: 'Government',
-  P: 'Space Science',
-  LM: '',
-  DM: '',
-  Pw: '',
-  Li: 30,
-  Con: 'Boeing Satellite Systems (prime)/Multinational',
-  M: 'Final size of a Boeing 747; first component.',
-  S1: 'http://www.esa.int/export/esaHS/ESAI2X0VMOC_iss_0.html',
-  S2: '',
-  S3: 'http://www.boeing.com/defense-space/space/spacestation/overview/',
-  S4: '',
-  S5: '',
-  S6: '',
-  S7: '',
+  rcs: '99.0524',
+  owner: 'National Aeronautics and Space Administration (NASA)/Multinational',
+  user: 'Government',
+  purpose: 'Space Science',
+  launchMass: '',
+  dryMass: '',
+  power: '',
+  lifetime: 30,
+  manufacturer: 'Boeing Satellite Systems (prime)/Multinational',
+  mission: 'Final size of a Boeing 747; first component.',
   inclination: 51.6423,
   lon: 168.5744,
   perigee: 1475,
@@ -62,6 +57,7 @@ export const defaultSat: SatObject = {
     z: 0,
   },
   static: false,
+  staticNum: null,
 };
 
 export const defaultSensor: SensorObject = {
@@ -84,7 +80,7 @@ export const defaultSensor: SensorObject = {
   shortName: 'COD',
   staticNum: 0,
   sun: 'No Impact',
-  type: 'Phased Array Radar',
+  type: SpaceObjectType.PHASED_ARRAY_RADAR,
   url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
   volume: false,
   zoom: 'leo',
@@ -188,14 +184,18 @@ export const keepTrackApiStubs = {
       },
       getForwardVector: jest.fn(),
     },
-    ColorScheme: {
+    colorSchemeManager: {
       objectTypeFlags: {
         payload: true,
         rocketBody: true,
         debris: true,
         inFOV: true,
       },
+      resetObjectTypeFlags: jest.fn(),
       reloadColors: jest.fn(),
+      default: () => [0, 0, 0, 0],
+      currentColorScheme: () => [0, 0, 0, 0],
+      group: null,
     },
     drawManager: {
       pMatrix: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -207,6 +207,7 @@ export const keepTrackApiStubs = {
       },
       postProcessingManager: {
         init: jest.fn(),
+        curBuffer: null,
         programs: {
           occlusion: {
             attrSetup: jest.fn(),
@@ -267,6 +268,7 @@ export const keepTrackApiStubs = {
       draw: jest.fn(),
       drawGpuPickingFrameBuffer: jest.fn(),
       updatePositionBuffer: jest.fn(),
+      updateSizeBuffer: jest.fn(),
       updatePMvCamMatrix: jest.fn(),
       sizeBufferOneTime: null,
       sizeData: null,
@@ -291,17 +293,18 @@ export const keepTrackApiStubs = {
       UnitedKingdom: null,
       UnitedStates: null,
       SpaceStations: {
+        group: {},
         sats: [
-          { satId: 1, SCC_NUM: '25544' },
-          { satId: 1, SCC_NUM: '25544' },
+          { satId: 1, sccNum: '25544' },
+          { satId: 1, sccNum: '25544' },
         ],
         updateOrbits: jest.fn(),
       },
       clearSelect: jest.fn(),
       createGroup: () => ({
         sats: [
-          { satId: 1, SCC_NUM: '25544' },
-          { satId: 1, SCC_NUM: '25544' },
+          { satId: 1, sccNum: '25544' },
+          { satId: 1, sccNum: '25544' },
         ],
         updateOrbits: jest.fn(),
       }),
@@ -392,7 +395,7 @@ export const keepTrackApiStubs = {
       nextpassList: () => [new Date().getTime(), new Date().getTime() + 1],
       twoline2satrec: () => ({ jdsatepoch: 2458000.5, ecco: 1, nodeo: 1, argpo: 1, meana: 1, argPe: 1, argPeA: 1 }),
       getRae: () => [0, 0, 0],
-      checkIsInFOV: () => true,
+      checkIsInView: () => true,
       getlookangles: jest.fn(),
       getlookanglesMultiSite: jest.fn(),
       findCloseObjects: () => '',
@@ -410,8 +413,14 @@ export const keepTrackApiStubs = {
       }),
       updateDopsTable: jest.fn(),
       map: () => ({ lat: 0, lon: 0 }),
-      getTEARR: jest.fn(),
+      getTEARR: () => ({
+        az: 0,
+        el: 0,
+        rng: 0,
+        inView: true,
+      }),
     },
+    controlSiteManager: {},
     satSet: {
       satCruncher: {
         postMessage: jest.fn(),
@@ -419,7 +428,7 @@ export const keepTrackApiStubs = {
       },
       getIdFromEci: jest.fn(),
       selectSat: jest.fn(),
-      satData: [defaultSat, defaultSat, { type: 'Star', name: 'test' }, { type: 'Phased Array Radar', static: true, name: 'test' }],
+      satData: [{ ...defaultSat, ...{ id: 0 } }, defaultSat, { id: 2, type: SpaceObjectType.STAR, name: 'test' }, { id: 3, type: SpaceObjectType.PHASED_ARRAY_RADAR, static: true, name: 'test' }],
       convertIdArrayToSatnumArray: jest.fn(),
       getIdFromObjNum: () => 0,
       getSensorFromSensorName: () => 0,
@@ -438,7 +447,7 @@ export const keepTrackApiStubs = {
       getSatInSun: () => jest.fn(),
       getSatInViewOnly: () => defaultSat,
       default: '',
-      insertNewAnalystSatellite: () => ({ SCC_NUM: 25544 }),
+      insertNewAnalystSatellite: () => ({ sccNum: 25544 }),
       searchYear: () => [25544],
       searchYearOrLess: () => [25544],
       getIdFromIntlDes: jest.fn(),
@@ -447,6 +456,7 @@ export const keepTrackApiStubs = {
       queryStr: 'search=25544&intldes=1998-A&sat=25544&misl=0,0,0&date=1234567&rate=1&hires=true',
       cosparIndex: { '1998-AB': 5 },
       numSats: 1,
+      missileSats: 10000,
     },
     searchBox: {
       hideResults: jest.fn(),
@@ -462,12 +472,20 @@ export const keepTrackApiStubs = {
     },
     sensorManager: {
       checkSensorSelected: () => false,
-      currentSensor: {
-        alt: 0,
-        lat: 0,
-        lon: 0,
-        shortName: 'COD',
-      },
+      currentSensor: [
+        {
+          alt: 0,
+          lat: 0,
+          lon: 0,
+          shortName: 'COD',
+          obsmaxaz: 0,
+          obsmaxel: 0,
+          obsmaxrange: 0,
+          obsminaz: 0,
+          obsminel: 0,
+          obsminrange: 0,
+        },
+      ],
       sensorListUS: [defaultSensor, defaultSensor],
       setCurrentSensor: jest.fn(),
       setSensor: jest.fn(),
@@ -509,6 +527,7 @@ export const keepTrackApiStubs = {
       updateURL: jest.fn(),
       keyHandler: jest.fn(),
       getsensorinfo: jest.fn(),
+      hideLoadingScreen: jest.fn(),
     },
     watchlist: {
       updateWatchlist: jest.fn(),

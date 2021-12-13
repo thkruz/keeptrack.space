@@ -1,6 +1,6 @@
+// @ts-ignore-next-line
 import * as gremlins from 'gremlins.js';
 import $ from 'jquery';
-
 
 /*
  * Returns a random integer between min (inclusive) and max (inclusive).

@@ -1,11 +1,11 @@
 import '@app/js/settingsManager/settingsManager';
 import { expect } from '@jest/globals';
 import { keepTrackApiStubs } from '../../api/apiMocks';
-import { keepTrackApi } from '../../api/externalApi';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import * as catalogLoader from './catalogLoader';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
-keepTrackApi.programs.settingsManager = (<any>window).settingsManager;
+settingsManager = (<any>window).settingsManager;
 settingsManager.installDirectory = '/';
 
 const respMock = [
@@ -89,11 +89,11 @@ describe('catalogLoader.filterTLEDatabase', () => {
     const callFunction: any = () => {
       catalogLoader.filterTLEDatabase(respMock);
       catalogLoader.filterTLEDatabase(respMock, respMock);
-      keepTrackApi.programs.settingsManager.offline = true;
-      keepTrackApi.programs.settingsManager.limitSats = ['25544'];
+      settingsManager.offline = true;
+      settingsManager.limitSats = ['25544'];
       catalogLoader.filterTLEDatabase(respMock, respMock);
-      keepTrackApi.programs.settingsManager.limitSats = '';
-      keepTrackApi.programs.settingsManager.isExtraSatellitesAdded = true;
+      settingsManager.limitSats = '';
+      settingsManager.isExtraSatellitesAdded = true;
       document.body.innerHTML += '<div><div class="legend-trusat-box"></div></div>';
       document.body.innerHTML += '<div><div class="legend-trusat-box"></div></div>';
       document.body.innerHTML += '<div><div class="legend-trusat-box"></div></div>';

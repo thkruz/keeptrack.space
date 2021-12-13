@@ -26,27 +26,27 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { isThisJest, keepTrackApi } from '@app/js/api/keepTrackApi';
-import { camera } from '@app/js/camera/camera';
-import { colorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
-import { dotsManager } from '@app/js/drawManager/dots';
-import { drawManager } from '@app/js/drawManager/drawManager';
-import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager';
-import { groupsManager } from '@app/js/groupsManager/groupsManager';
-import { objectManager } from '@app/js/objectManager/objectManager';
-import { orbitManager } from '@app/js/orbitManager/orbitManager';
-import { sensorManager } from '@app/js/plugins/sensor/sensorManager';
-import { satellite } from '@app/js/satMath/satMath';
-// import { radarDataManager } from'@app/js/satSet/radarDataManager.js';
-import { satSet } from '@app/js/satSet/satSet';
-import { VERSION } from '@app/js/settingsManager/version.js';
-import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
-import { starManager } from '@app/js/starManager/starManager';
-import { timeManager } from '@app/js/timeManager/timeManager';
-import { adviceManager } from '@app/js/uiManager/adviceManager';
-import { searchBox } from '@app/js/uiManager/searchBox';
-import { uiInput, uiManager } from '@app/js/uiManager/uiManager';
+import { isThisJest, keepTrackApi } from './api/keepTrackApi';
 import { MapManager, ObjectManager, OrbitManager, SensorManager } from './api/keepTrackTypes';
+import { camera } from './camera/camera';
+import { colorSchemeManager } from './colorManager/colorSchemeManager';
+import { dotsManager } from './drawManager/dots';
+import { drawManager } from './drawManager/drawManager';
+import { LineFactory } from './drawManager/sceneManager/sceneManager';
+import { groupsManager } from './groupsManager/groupsManager';
+import { objectManager } from './objectManager/objectManager';
+import { orbitManager } from './orbitManager/orbitManager';
+import { sensorManager } from './plugins/sensor/sensorManager';
+import { satellite } from './satMath/satMath';
+// import { radarDataManager } from'./satSet/radarDataManager.js';
+import { satSet } from './satSet/satSet';
+import { VERSION } from './settingsManager/version.js';
+import { VERSION_DATE } from './settingsManager/versionDate.js';
+import { starManager } from './starManager/starManager';
+import { timeManager } from './timeManager/timeManager';
+import { adviceManager } from './uiManager/adviceManager';
+import { searchBox } from './uiManager/searchBox';
+import { uiInput, uiManager } from './uiManager/uiManager';
 
 export const redirectHttpToHttps = (): void => {
   // This is necessary for some of the geolocation based functions
@@ -103,12 +103,12 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     uiManager.loadStr('science');
     // Load all the plugins now that we have the API initialized
-    await import('@app/js/plugins/core')
+    await import('./plugins/core')
       .then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins))
       .catch(() => {
         // intentionally left blank
       });
-    await import('@app/js/plugins/plugins')
+    await import('./plugins/plugins')
       .then((mod) => mod.loadExtraPlugins(keepTrackApi))
       .catch(() => {
         // intentionally left blank
@@ -176,17 +176,17 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 export const importCss = async (): Promise<void> => {
   try {
     if (!settingsManager.disableUI) {
-      import('@app/css/fonts.css').catch(() => {});
-      import('@app/css/materialize.css').catch(() => {});
-      import('@app/css/astroux/css/astro.css').catch(() => {});
-      import('@app/css/materialize-local.css').catch(() => {});
-      import('@app/js/lib/external/colorPick.css').catch(() => {});
-      import('@app/css/perfect-scrollbar.min.css').catch(() => {});
-      import('@app/css/jquery-ui.min.css').catch(() => {});
-      import('@app/css/jquery-ui-timepicker-addon.css').catch(() => {});
-      import('@app/css/style.css').then(await import('@app/css/responsive.css').catch(() => {}).then((resp) => resp)).catch(() => {});
+      import('../css/fonts.css').catch(() => {});
+      import('../css/materialize.css').catch(() => {});
+      import('../css/astroux/css/astro.css').catch(() => {});
+      import('../css/materialize-local.css').catch(() => {});
+      import('./lib/external/colorPick.css').catch(() => {});
+      import('../css/perfect-scrollbar.min.css').catch(() => {});
+      import('../css/jquery-ui.min.css').catch(() => {});
+      import('../css/jquery-ui-timepicker-addon.css').catch(() => {});
+      import('../css/style.css').then(await import('../css/responsive.css').catch(() => {}).then((resp) => resp)).catch(() => {});
     } else if (settingsManager.enableLimitedUI) {
-      import('@app/css/limitedUI.css').catch(() => {
+      import('../css/limitedUI.css').catch(() => {
         // intentionally left blank
       });
     }

@@ -26,24 +26,24 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { camera } from '@app/js/camera/camera';
-import { colorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
-import { dotsManager } from '@app/js/drawManager/dots';
-import { drawManager } from '@app/js/drawManager/drawManager';
-import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager';
-import { groupsManager } from '@app/js/groupsManager/groupsManager';
-import { objectManager } from '@app/js/objectManager/objectManager';
-import { orbitManager } from '@app/js/orbitManager/orbitManager';
-import { sensorManager } from '@app/js/plugins/sensor/sensorManager';
-import { satellite } from '@app/js/satMath/satMath';
-import { satSet } from '@app/js/satSet/satSet';
-import { VERSION } from '@app/js/settingsManager/version.js';
-import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
-import { starManager } from '@app/js/starManager/starManager';
-import { timeManager } from '@app/js/timeManager/timeManager';
-import { adviceManager } from '@app/js/uiManager/adviceManager';
-import { uiInput, uiManager } from '@app/js/uiManager/uiManager';
+import { keepTrackApi } from '../js/api/keepTrackApi';
+import { camera } from '../js/camera/camera';
+import { colorSchemeManager } from '../js/colorManager/colorSchemeManager';
+import { dotsManager } from '../js/drawManager/dots';
+import { drawManager } from '../js/drawManager/drawManager';
+import { LineFactory } from '../js/drawManager/sceneManager/sceneManager';
+import { groupsManager } from '../js/groupsManager/groupsManager';
+import { objectManager } from '../js/objectManager/objectManager';
+import { orbitManager } from '../js/orbitManager/orbitManager';
+import { sensorManager } from '../js/plugins/sensor/sensorManager';
+import { satellite } from '../js/satMath/satMath';
+import { satSet } from '../js/satSet/satSet';
+import { VERSION } from '../js/settingsManager/version.js';
+import { VERSION_DATE } from '../js/settingsManager/versionDate.js';
+import { starManager } from '../js/starManager/starManager';
+import { timeManager } from '../js/timeManager/timeManager';
+import { adviceManager } from '../js/uiManager/adviceManager';
+import { uiInput, uiManager } from '../js/uiManager/uiManager';
 import { searchBox } from './uiManager/searchBox';
 
 export const initalizeKeepTrack = async (): Promise<void> => {
@@ -69,12 +69,12 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     uiManager.loadStr('science');
     // Load all the plugins now that we have the API initialized
-    await import('@app/js/plugins/core')
+    await import('../js/plugins/core')
       .then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins))
       .catch(() => {
         // intentionally left blank
       });
-    await import('@app/js/plugins/plugins')
+    await import('../js/plugins/plugins')
       .then((mod) => mod.loadExtraPlugins(keepTrackApi))
       .catch(() => {
         // intentionally left blank

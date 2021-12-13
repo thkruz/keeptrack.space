@@ -154,7 +154,7 @@
     "@types/numeric": "^1.2.2",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
-    "auto-changelog": "github:thkruz/auto-changelog",
+    "auto-changelog-thkruz": "^1.0.0",
     "babel-loader": "^8.2.2",
     "babel-plugin-istanbul": "^6.0.0",
     "child_process": "^1.0.2",
@@ -196,6 +196,7 @@
     "worker-loader": "^3.0.7"
   },
   "dependencies": {
+    "@materializecss/materialize": "^1.1.0-alpha",
     "gl-matrix": "^3.3.0",
     "gremlins.js": "^2.2.0",
     "jquery": "^3.6.0",

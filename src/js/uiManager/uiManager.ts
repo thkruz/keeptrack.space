@@ -27,7 +27,7 @@ import '@app/js/lib/external/perfect-scrollbar.min.js';
 import '@app/js/lib/external/jquery.colorbox.min.js';
 import '@app/js/lib/external/jquery-ajax.js';
 import '@app/js/lib/external/colorPick.js';
-import 'materialize-css';
+import '@materializecss/materialize';
 // eslint-disable-next-line sort-imports
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { drawManager } from '@app/js/drawManager/drawManager';
@@ -45,7 +45,7 @@ import { uiLimited } from './ui-limited.js';
 import { uiInput } from './uiInput';
 import { initUiValidation } from './uiValidation';
 
-const M = window.M;
+const M = <any>window.M;
 
 $.ajaxSetup({
   cache: false,

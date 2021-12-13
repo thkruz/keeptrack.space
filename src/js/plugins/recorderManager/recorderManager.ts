@@ -37,7 +37,7 @@ export const bottomMenuClick = (iconName: string): void => {
       try {
         recorder.start();
       } catch (e) {
-        M.toast({
+        (<any>M).toast({
           html: `Compatibility Error with Recording`,
         });
         recorder.setIsRecording(false);

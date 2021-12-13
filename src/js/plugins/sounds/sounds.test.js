@@ -1,5 +1,8 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import { init } from './sounds';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 describe('sounds', () => {
   beforeEach(() => {

@@ -3,7 +3,6 @@
   "version": "5.0.2",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
-  "types": "./src/main.d.ts",
   "contributors": [
     {
       "name": "Le-Roi Claassen",
@@ -37,8 +36,6 @@
     "http": "http-server ./dist/",
     "http:embed": "http-server ./embed/",
     "lcov": "node ./scripts/openLcov.mjs",
-    "lint": "eslint ./src/js/**/*.js ./src/js/**/*.ts",
-    "lint:fix": "eslint --fix ./src/js/**/*.js ./src/js/**/*.ts",
     "prebuild": "node ./scripts/prebuild.mjs && npm run updateVersion && npm run updateTime",
     "prebuild:embed": "node ./scripts/prebuildEmbed.mjs",
     "publish:github": "node ./scripts/githubPublish.js",
@@ -46,6 +43,7 @@
     "start:embed": "http-server ./embed/ -o example.htm -a 127.0.0.1",
     "start:ssl": "http-server ./dist/ -o index.htm -a 127.0.0.1 --ssl",
     "test": "start-server-and-test 'http-server ./dist/ --cors' http://localhost:8080 test:noserver",
+    "test:unit": "npm run test",
     "test:noserver": "cross-env NODE_ENV=development && jest --max-old-space-size=8192 --coverage",
     "updateTime": "node ./scripts/updateTime.mjs",
     "updateVersion": "const-version ./package.json src/js/settingsManager/version.js",

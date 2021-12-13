@@ -28,14 +28,14 @@ import * as Ootk from 'ootk';
 import { SatRec } from 'satellite.js';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { Eci, EciArr3, SatGroupCollection, SatMath, SatObject, SensorManager, SensorObject, SunObject, TearrData } from '../api/keepTrackTypes';
-import { SpaceObjectType } from "../api/SpaceObjectType";
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import { dateFormat } from '../lib/external/dateFormat.js';
 import { numeric } from '../lib/external/numeric';
 import { jday } from '../timeManager/transforms';
 import { getOrbitByLatLon } from './getOrbitByLatLon';
 import { formatArgumentOfPerigee, formatInclination, formatMeanAnomaly, formatMeanMotion, formatRightAscension } from './tleFormater';
 
-(<any>window)._numeric = numeric; // numeric break if it is not available globally
+window._numeric = numeric; // numeric break if it is not available globally
 
 type sccPassTimes = {
   sccNum: string;
@@ -1870,7 +1870,7 @@ export const satellite: SatMath = {
   },
 };
 
-(<any>window).satellite = satellite;
+window.satellite = satellite;
 
 const populateMultiSiteTable = (multiSiteArray: TearrData[]) => {
   // const { timeManager, sensorManager, objectManager, mainCamera, satSet } = keepTrackApi.programs;

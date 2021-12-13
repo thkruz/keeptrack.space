@@ -3,7 +3,7 @@ import { keepTrackApi } from '../../api/keepTrackApi';
 import * as missileManager from '../../plugins/missile/missileManager';
 /* eslint-disable no-undefined */
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
 describe('missileManager._Pressure', () => {

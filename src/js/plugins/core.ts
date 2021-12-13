@@ -1,16 +1,4 @@
 import { isThisJest } from '../api/keepTrackApi';
-import { SettingsManager } from '../api/keepTrackTypes';
-
-declare global {
-  // eslint-disable-next-line no-unused-vars
-  interface Window {
-    settingsManager: SettingsManager;
-    jQuery: unknown;
-    $: unknown;
-    gremlins: any;
-    randomizer: any;
-  }
-}
 
 // Register all core modules
 export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any }, plugins: any): Promise<void> => {
@@ -144,11 +132,11 @@ export const startGoogleAnalytics = (): void => {
   newScript.setAttribute('async', 'true');
   newScript.setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id=G-ENHWK6L0X7');
   document.documentElement.firstChild.appendChild(newScript);
-  (<any>window).dataLayer = (<any>window).dataLayer || [];
+  window.dataLayer = window.dataLayer || [];
   // eslint-disable-next-line no-unused-vars
   const gtag = function (_a?: string, _b?: any): void {
     // eslint-disable-next-line prefer-rest-params
-    (<any>window).dataLayer.push(arguments);
+    window.dataLayer.push(arguments);
   };
   gtag('js', new Date());
   gtag('config', 'G-ENHWK6L0X7');

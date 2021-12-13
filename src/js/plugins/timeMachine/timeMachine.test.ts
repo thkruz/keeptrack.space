@@ -1,8 +1,8 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import * as timeMachine from './timeMachine';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
 describe('timeMachine.init', () => {
@@ -83,10 +83,10 @@ describe('timeMachine.timeMachineIconClick', () => {
 });
 
 describe('timeMachine.timeMachineRemoveSatellite', () => {
-  const { orbitManager, satSet, ColorScheme, groupsManager } = keepTrackApi.programs;
+  const { orbitManager, satSet, colorSchemeManager, groupsManager } = keepTrackApi.programs;
   test('0', () => {
     const callFunction: any = () => {
-      timeMachine.timeMachineRemoveSatellite(1, orbitManager, groupsManager, satSet, ColorScheme);
+      timeMachine.timeMachineRemoveSatellite(1, orbitManager, groupsManager, satSet, colorSchemeManager);
     };
 
     expect(callFunction).not.toThrow();
@@ -94,7 +94,7 @@ describe('timeMachine.timeMachineRemoveSatellite', () => {
 
   test('1', () => {
     const callFunction: any = () => {
-      timeMachine.timeMachineRemoveSatellite(100, orbitManager, groupsManager, satSet, ColorScheme);
+      timeMachine.timeMachineRemoveSatellite(100, orbitManager, groupsManager, satSet, colorSchemeManager);
     };
 
     expect(callFunction).not.toThrow();
@@ -103,7 +103,7 @@ describe('timeMachine.timeMachineRemoveSatellite', () => {
   test('2', () => {
     const callFunction: any = () => {
       orbitManager.isTimeMachineVisible = false;
-      timeMachine.timeMachineRemoveSatellite(100, orbitManager, groupsManager, satSet, ColorScheme);
+      timeMachine.timeMachineRemoveSatellite(100, orbitManager, groupsManager, satSet, colorSchemeManager);
     };
 
     expect(callFunction).not.toThrow();

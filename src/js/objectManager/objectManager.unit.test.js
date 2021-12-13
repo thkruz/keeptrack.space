@@ -1,11 +1,14 @@
 /* eslint-disable no-undefined */
+import { keepTrackApiStubs } from '../api/apiMocks';
+import { keepTrackApi } from '../api/keepTrackApi';
 import { objectManager } from './objectManager';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 describe('ObjectManager Unit Tests', () => {
   test('ObjectManager Basic Functions', () => {
     objectManager.setSelectedSat(123);
     expect(objectManager.selectedSat).toBe(123);
-    expect(window.selectedSat).toBe(123);
 
     objectManager.setHoveringSat(123);
     expect(objectManager.hoveringSat).toBe(123);

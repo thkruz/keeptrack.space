@@ -420,6 +420,9 @@ export const keepTrackApiStubs = {
         inView: true,
       }),
     },
+    mapManager: {
+      isMapMenuOpen: false,
+    },
     controlSiteManager: {},
     satSet: {
       satCruncher: {

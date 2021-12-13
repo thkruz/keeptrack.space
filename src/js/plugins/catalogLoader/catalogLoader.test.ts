@@ -2,10 +2,11 @@ import '@app/js/settingsManager/settingsManager';
 import { expect } from '@jest/globals';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { SettingsManager } from '../../api/keepTrackTypes';
 import * as catalogLoader from './catalogLoader';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
-settingsManager = (<any>window).settingsManager;
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+const settingsManager = <SettingsManager>(<any>window).settingsManager;
 settingsManager.installDirectory = '/';
 
 const respMock = [
@@ -90,7 +91,7 @@ describe('catalogLoader.filterTLEDatabase', () => {
       catalogLoader.filterTLEDatabase(respMock);
       catalogLoader.filterTLEDatabase(respMock, respMock);
       settingsManager.offline = true;
-      settingsManager.limitSats = ['25544'];
+      settingsManager.limitSats = '25544';
       catalogLoader.filterTLEDatabase(respMock, respMock);
       settingsManager.limitSats = '';
       settingsManager.isExtraSatellitesAdded = true;

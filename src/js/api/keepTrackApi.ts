@@ -1,42 +1,54 @@
-// @ts-nocheck
+import { KeepTrackApi, SatMath, SatObject, SettingsManager } from './keepTrackTypes';
+import { html } from './templateLiterals';
 
-import { KeepTrackApi, SatObject } from './keepTrackTypes';
+declare global {
+  // eslint-disable-next-line no-unused-vars
+  interface Window {
+    settingsManager: SettingsManager;
+    jQuery: unknown;
+    $: unknown;
+    gremlins: any;
+    randomizer: any;
+    keepTrackApi: KeepTrackApi;
+    dataLayer: any; // For Google Tag Manager
+    _numeric: any;
+    satellite: SatMath;
+    M: any;
+  }
+}
+
+export const register = (params: { method: string; cbName: string; cb: any }) => {
+  // If this is a valid callback
+  if (typeof keepTrackApi.callbacks[params.method] !== 'undefined') {
+    // Add the callback
+    keepTrackApi.callbacks[params.method].push({ name: params.cbName, cb: params.cb });
+  } else {
+    throw new Error(`Invalid callback "${params.method}"!`);
+  }
+  return;
+};
+export const unregister = (params: { method: string; cbName: string }) => {
+  // If this is a valid callback
+  if (typeof keepTrackApi.callbacks[params.method] !== 'undefined') {
+    for (let i = 0; i < keepTrackApi.callbacks[params.method].length; i++) {
+      if (keepTrackApi.callbacks[params.method][i].name == params.cbName) {
+        keepTrackApi.callbacks[params.method].splice(i, 1);
+        return;
+      }
+    }
+    // If we got this far, it means we couldn't find the callback
+    throw new Error(`Callback "${params.cbName} not found"!`);
+  } else {
+    // Couldn't find the method
+    throw new Error(`Invalid callback "${params.method}"!`);
+  }
+};
+export const isThisJest = () => typeof process !== 'undefined';
 
 export const keepTrackApi: KeepTrackApi = {
-  html: (strings: TemplateStringsArray, ...placeholders: any[]) => {
-    for (const placeholder of placeholders) {
-      if (typeof placeholder !== 'string') {
-        throw Error('Invalid input');
-      }
-    }
-    return String.raw(strings, ...placeholders);
-  },
-  register: (params: { method: string; cbName: string; cb: any }) => {
-    // If this is a valid callback
-    if (typeof keepTrackApi.callbacks[params.method] !== 'undefined') {
-      // Add the callback
-      keepTrackApi.callbacks[params.method].push({ name: params.cbName, cb: params.cb });
-    } else {
-      throw new Error(`Invalid callback "${params.method}"!`);
-    }
-    return;
-  },
-  unregister: (params: { method: string; cbName: string }) => {
-    // If this is a valid callback
-    if (typeof keepTrackApi.callbacks[params.method] !== 'undefined') {
-      for (let i = 0; i < keepTrackApi.callbacks[params.method].length; i++) {
-        if (keepTrackApi.callbacks[params.method][i].name == params.cbName) {
-          keepTrackApi.callbacks[params.method].splice(i, 1);
-          return;
-        }
-      }
-      // If we got this far, it means we couldn't find the callback
-      throw new Error(`Callback "${params.cbName} not found"!`);
-    } else {
-      // Couldn't find the method
-      throw new Error(`Invalid callback "${params.method}"!`);
-    }
-  },
+  html: html,
+  register: register,
+  unregister: unregister,
   callbacks: {
     selectSatData: [],
     updateSelectBox: [],
@@ -126,28 +138,8 @@ export const keepTrackApi: KeepTrackApi = {
       keepTrackApi.callbacks.setSensor.forEach((cb: any) => cb.cb(sensor, id));
     },
   },
-  programs: {
-    timeManager: {},
-    settingsManager: {},
-    ColorScheme: {},
-    drawManager: {},
-    mapManager: {},
-    missileManager: {},
-    objectManager: {},
-    orbitManager: {},
-    photoManager: {},
-    satSet: {},
-    satellite: {},
-    searchBox: {},
-    sensorManager: {},
-    starManager: {},
-    uiManager: {},
-    uiInput: {},
-  },
+  programs: <any>{},
 };
 
-export const isThisJest = () => typeof process !== 'undefined';
-
-if (typeof (<any>window).keepTrackApi === 'undefined') {
-  (<any>window).keepTrackApi = keepTrackApi;
-}
+// First time we call this module we should make it available to the rest of the application
+!window.keepTrackApi ? (window.keepTrackApi = keepTrackApi) : null;

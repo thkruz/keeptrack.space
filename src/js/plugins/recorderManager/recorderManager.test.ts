@@ -1,10 +1,10 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import * as recorderManager from '@app/js/plugins/recorderManager/recorderManager';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import * as recorderManager from './recorderManager';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
-settingsManager.offline = true;
+window.settingsManager.offline = true;
 Object.defineProperty(global.navigator, 'getDisplayMedia', {
   value: {},
 });

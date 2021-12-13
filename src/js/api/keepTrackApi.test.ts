@@ -1,4 +1,6 @@
-import { keepTrackApi } from './keepTrackApi';
+import { expect } from '@jest/globals';
+import { isThisJest, keepTrackApi } from './keepTrackApi';
+import { SatObject } from './keepTrackTypes';
 
 test(`keepTrackApi Unit Testing`, () => {
   expect(() => {
@@ -28,7 +30,7 @@ test(`keepTrackApi Unit Testing`, () => {
   keepTrackApi.register({
     method: 'updateSelectBox',
     cbName: 'test',
-    cb: (sat) => console.log(sat),
+    cb: (sat: SatObject) => console.log(sat),
   });
 
   keepTrackApi.register({
@@ -151,12 +153,21 @@ test(`keepTrackApi Unit Testing`, () => {
   keepTrackApi.methods.uiManagerFinal();
   keepTrackApi.methods.rightBtnMenuAdd();
   keepTrackApi.methods.selectSatData('test', 'test');
+});
 
-  expect(() => {
-    keepTrackApi.html('test', [{}, 1]);
-  }).toThrow(Error);
+describe(`keepTrackApi.html`, () => {
+  test(`keepTrackApi.html Good HTML`, () => {
+    expect(() => {
+      keepTrackApi.html`<div id="about-menu" class="side-menu-parent start-hidden text-select">`;
+    }).not.toThrow(Error);
+  });
 
-  expect(() => {
-    keepTrackApi.html('test', 'test', 'test2');
-  }).toThrow(Error);
+  test(`keepTrackApi.html Bad HTML`, () => {
+    expect(() => keepTrackApi.html(<TemplateStringsArray>(<unknown>'A'))).toThrow(Error);
+  });
+});
+
+describe('externalApi.isThisJest', () => {
+  test('0', () => expect(() => isThisJest()).not.toThrow());
+  test('1', () => expect(isThisJest()).toMatchSnapshot());
 });

@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import { stringPad } from '../../lib/helpers';
 
 let isSocratesMenuOpen = false;
 let socratesOnSatCruncher: number | null = null;

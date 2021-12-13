@@ -82,7 +82,7 @@ export class CanvasRecorder {
           let types = ['video/webm', 'video/webm,codecs=vp9', 'video/vp8', 'video/webm;codecs=vp8', 'video/webm;codecs=daala', 'video/webm;codecs=h264', 'video/mpeg'];
 
           for (let i in types) {
-            if ((<any>window).MediaRecorder.isTypeSupported(types[i])) {
+            if (window.MediaRecorder.isTypeSupported(types[i])) {
               supportedType = types[i];
               break;
             }
@@ -100,7 +100,7 @@ export class CanvasRecorder {
 
           recordedBlobs = [];
           try {
-            mediaRecorder = new (<any>window).MediaRecorder(stream, options);
+            mediaRecorder = new window.MediaRecorder(stream, options);
           } catch (e) {
             // alert('MediaRecorder is not supported by this browser.');
             CanvasRecorder.isVideoRecording = false;

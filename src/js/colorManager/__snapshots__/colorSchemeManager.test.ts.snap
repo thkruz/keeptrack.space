@@ -273,6 +273,91 @@ Array [
 ]
 `;
 
+exports[`Test group ColorRules should color large stars 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": 1,
+}
+`;
+
+exports[`Test group ColorRules should color markers 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    1,
+    1,
+    1,
+  ],
+  "marker": true,
+  "pickable": 0,
+}
+`;
+
+exports[`Test group ColorRules should color medium stars 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": 1,
+}
+`;
+
+exports[`Test group ColorRules should color satellties in this group 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": 1,
+}
+`;
+
+exports[`Test group ColorRules should color small stars 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": 1,
+}
+`;
+
+exports[`Test group ColorRules should hide everything else 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.1,
+  ],
+  "pickable": 0,
+}
+`;
+
+exports[`Test group ColorRules should ignore deselected stars 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": 0,
+}
+`;
+
 exports[`calculateColorBuffers 0 1`] = `
 Array [
   1,
@@ -830,18 +915,6 @@ Object {
 `;
 
 exports[`colorSchemeManager.defaultRules 19 1`] = `
-Object {
-  "color": Array [
-    0.5,
-    0.5,
-    0.5,
-    0.85,
-  ],
-  "pickable": 1,
-}
-`;
-
-exports[`colorSchemeManager.defaultRules 20 1`] = `
 Object {
   "color": Array [
     0.5,

@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { keepTrackApiStubs } from '../api/apiMocks';
+import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { getDayOfYear } from '../timeManager/transforms';
@@ -151,6 +151,43 @@ describe('Test ColorRules', () => {
     colorSchemeManager.calculateColorBuffers(true).then(() => {
       expect(colorSchemeManager.colorData).toMatchSnapshot();
     });
+  });
+});
+
+describe('Test group ColorRules', () => {
+  beforeEach(() => {
+    colorSchemeManager.init();
+  });
+  it('should color satellties in this group', async () => {
+    const result = colorSchemeManager.group({ ...defaultSat, ...{ isInGroup: true } });
+    expect(result).toMatchSnapshot();
+  });
+  it('should color markers', async () => {
+    const result = colorSchemeManager.group({ ...defaultSat, ...{ marker: true } });
+    expect(result).toMatchSnapshot();
+  });
+  it('should color small stars', async () => {
+    const result = colorSchemeManager.group({ ...defaultSat, ...{ static: true, marker: false, isInGroup: false, type: SpaceObjectType.STAR, vmag: 4.8 } });
+    expect(result).toMatchSnapshot();
+  });
+  it('should color medium stars', async () => {
+    const result = colorSchemeManager.group({ ...defaultSat, ...{ static: true, marker: false, isInGroup: false, type: SpaceObjectType.STAR, vmag: 3.8 } });
+    expect(result).toMatchSnapshot();
+  });
+  it('should color large stars', async () => {
+    const result = colorSchemeManager.group({ ...defaultSat, ...{ static: true, marker: false, isInGroup: false, type: SpaceObjectType.STAR, vmag: 1.8 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should ignore deselected stars', async () => {
+    colorSchemeManager.objectTypeFlags.starHi = false;
+    const result = colorSchemeManager.group({ ...defaultSat, ...{ static: true, marker: false, isInGroup: false, type: SpaceObjectType.STAR, vmag: 1.8 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should hide everything else', async () => {
+    const result = colorSchemeManager.group({ ...defaultSat, ...{ static: false, marker: false, isInGroup: false } });
+    expect(result).toMatchSnapshot();
   });
 });
 

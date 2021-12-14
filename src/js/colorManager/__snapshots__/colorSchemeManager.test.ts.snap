@@ -273,7 +273,7 @@ Array [
 ]
 `;
 
-exports[`Test group ColorRules should color large stars 1`] = `
+exports[`Test group ruleset should color large stars 1`] = `
 Object {
   "color": Array [
     1,
@@ -285,7 +285,7 @@ Object {
 }
 `;
 
-exports[`Test group ColorRules should color markers 1`] = `
+exports[`Test group ruleset should color markers 1`] = `
 Object {
   "color": Array [
     0.2,
@@ -298,7 +298,7 @@ Object {
 }
 `;
 
-exports[`Test group ColorRules should color medium stars 1`] = `
+exports[`Test group ruleset should color medium stars 1`] = `
 Object {
   "color": Array [
     1,
@@ -310,7 +310,7 @@ Object {
 }
 `;
 
-exports[`Test group ColorRules should color satellties in this group 1`] = `
+exports[`Test group ruleset should color satellties in this group 1`] = `
 Object {
   "color": Array [
     1,
@@ -322,7 +322,7 @@ Object {
 }
 `;
 
-exports[`Test group ColorRules should color small stars 1`] = `
+exports[`Test group ruleset should color small stars 1`] = `
 Object {
   "color": Array [
     1,
@@ -334,7 +334,7 @@ Object {
 }
 `;
 
-exports[`Test group ColorRules should hide everything else 1`] = `
+exports[`Test group ruleset should hide everything else 1`] = `
 Object {
   "color": Array [
     1,
@@ -346,7 +346,151 @@ Object {
 }
 `;
 
-exports[`Test group ColorRules should ignore deselected stars 1`] = `
+exports[`Test group ruleset should ignore deselected stars 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": 0,
+}
+`;
+
+exports[`Test velocity ruleset should color land based objects 1`] = `
+Object {
+  "color": Array [
+    0.64,
+    0,
+    0.64,
+    1,
+  ],
+  "pickable": 1,
+}
+`;
+
+exports[`Test velocity ruleset should color large stars 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": 1,
+}
+`;
+
+exports[`Test velocity ruleset should color medium stars 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.85,
+  ],
+  "pickable": 1,
+}
+`;
+
+exports[`Test velocity ruleset should color sensors differently 1`] = `
+Object {
+  "color": Array [
+    1,
+    0,
+    0,
+    1,
+  ],
+  "pickable": 1,
+}
+`;
+
+exports[`Test velocity ruleset should color small stars 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0.65,
+  ],
+  "pickable": 1,
+}
+`;
+
+exports[`Test velocity ruleset should color things in view differently 1`] = `
+Object {
+  "color": Array [
+    0.2,
+    0.4,
+    1,
+    1,
+  ],
+  "pickable": 1,
+}
+`;
+
+exports[`Test velocity ruleset should hide everything else 1`] = `
+Object {
+  "color": Array [
+    NaN,
+    NaN,
+    0,
+    1,
+  ],
+  "pickable": 1,
+}
+`;
+
+exports[`Test velocity ruleset should hide fast objects if high velocity is disabled 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": 0,
+}
+`;
+
+exports[`Test velocity ruleset should hide med objects if med velocity is disabled 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": 0,
+}
+`;
+
+exports[`Test velocity ruleset should hide slow objects if low velocity is disabled 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": 0,
+}
+`;
+
+exports[`Test velocity ruleset should hide things in view if disabled 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": 0,
+}
+`;
+
+exports[`Test velocity ruleset should ignore deselected stars 1`] = `
 Object {
   "color": Array [
     1,

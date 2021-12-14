@@ -19,24 +19,24 @@ const TEMPLATE_INTLDES = '58001A';
 // TODO: This should be in settings.js
 const controlSiteTypeFilter = (controlSite: ControlSiteObject): boolean => {
   switch (controlSite.type) {
-    case 'Intergovernmental Organization':
-    case 'Launch Agency':
-    case 'Suborbital Payload Operator':
-    case 'Payload Owner':
-    case 'Meteorological Rocket Launch Agency or Manufacturer':
-    case 'Launch Site':
-    case 'Launch Position':
+    case SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION:
+    case SpaceObjectType.LAUNCH_AGENCY:
+    case SpaceObjectType.SUBORBITAL_PAYLOAD_OPERATOR:
+    case SpaceObjectType.PAYLOAD_OWNER:
+    case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
+    case SpaceObjectType.LAUNCH_SITE:
+    case SpaceObjectType.LAUNCH_POSITION:
       return true;
-    case 'Payload Manufacturer':
-    case 'Country':
-    case 'Astronomical Polity':
-    case 'Engine Manufacturer':
-    case 'Launch Vehicle Manufacturer':
-    case 'Parent Organization of Another Entry':
-    case 'Launch Cruise':
-    case 'Launch Zone':
-    case 'Suborbital Target Area':
-    case 'Organization Type Unknown':
+    // case 'Payload Manufacturer':
+    // case 'Country':
+    // case 'Astronomical Polity':
+    // case 'Engine Manufacturer':
+    // case 'Launch Vehicle Manufacturer':
+    // case 'Parent Organization of Another Entry':
+    // case 'Launch Cruise':
+    // case 'Launch Zone':
+    // case 'Suborbital Target Area':
+    // case 'Organization Type Unknown':
     default:
       return false;
   }
@@ -516,7 +516,7 @@ const init = () => {
         name: getStarName(star),
         static: true,
         shortName: 'STAR',
-        type: 'Star',
+        type: SpaceObjectType.STAR,
         dec: star.dec,
         ra: star.ra,
         dist: star.dist,
@@ -562,6 +562,11 @@ const init = () => {
     controlSiteList
       // Remove any control sites that are closed
       .filter((controlSite) => controlSite.TStop === '')
+      // TODO: Control sites all should have an SpaceObjectType Enum
+      // Until all the control sites have enums ignore the legacy ones
+      .filter((controlSite) => typeof controlSite.type !== 'string')
+      // Until all the control sites enums are implemented ignore the odd ones
+      .filter((controlSite) => controlSite.type <= 25)
       .filter(controlSiteTypeFilter)
       // Add the static properties to the control site objects
       .map((controlSite) => ({ ...{ static: true }, ...controlSite }))

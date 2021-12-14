@@ -154,7 +154,7 @@ describe('Test ColorRules', () => {
   });
 });
 
-describe('Test group ColorRules', () => {
+describe('Test group ruleset', () => {
   beforeEach(() => {
     colorSchemeManager.init();
   });
@@ -187,6 +187,73 @@ describe('Test group ColorRules', () => {
 
   it('should hide everything else', async () => {
     const result = colorSchemeManager.group({ ...defaultSat, ...{ static: false, marker: false, isInGroup: false } });
+    expect(result).toMatchSnapshot();
+  });
+});
+
+describe('Test velocity ruleset', () => {
+  beforeEach(() => {
+    colorSchemeManager.init();
+  });
+  it('should color small stars', async () => {
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ static: true, marker: false, isInGroup: false, type: SpaceObjectType.STAR, vmag: 4.8 } });
+    expect(result).toMatchSnapshot();
+  });
+  it('should color medium stars', async () => {
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ static: true, marker: false, isInGroup: false, type: SpaceObjectType.STAR, vmag: 3.8 } });
+    expect(result).toMatchSnapshot();
+  });
+  it('should color large stars', async () => {
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ static: true, marker: false, isInGroup: false, type: SpaceObjectType.STAR, vmag: 1.8 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should ignore deselected stars', async () => {
+    colorSchemeManager.objectTypeFlags.starHi = false;
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ static: true, marker: false, isInGroup: false, type: SpaceObjectType.STAR, vmag: 1.8 } });
+    expect(result).toMatchSnapshot();
+  });
+  it('should color land based objects', async () => {
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ type: SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION } });
+    expect(result).toMatchSnapshot();
+  });
+  it('should color sensors differently', async () => {
+    const sensor = colorSchemeManager.velocity({ ...defaultSat, ...{ static: true, type: SpaceObjectType.PHASED_ARRAY_RADAR } });
+    const facility = colorSchemeManager.velocity({ ...defaultSat, ...{ type: SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER } });
+    expect(sensor).toMatchSnapshot();
+    expect(sensor).not.toEqual(facility);
+  });
+  it('should color things in view differently', async () => {
+    colorSchemeManager.objectTypeFlags.inViewAlt = true;
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ inView: 1 } });
+    expect(result).toMatchSnapshot();
+  });
+  it('should hide things in view if disabled', async () => {
+    colorSchemeManager.objectTypeFlags.inViewAlt = false;
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ inView: 1 } });
+    colorSchemeManager.objectTypeFlags.inViewAlt = true;
+    expect(result).toMatchSnapshot();
+  });
+  it('should hide fast objects if high velocity is disabled', async () => {
+    colorSchemeManager.objectTypeFlags.velocityFast = false;
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ velocity: { total: 10 } } });
+    colorSchemeManager.objectTypeFlags.velocityFast = true;
+    expect(result).toMatchSnapshot();
+  });
+  it('should hide med objects if med velocity is disabled', async () => {
+    colorSchemeManager.objectTypeFlags.velocityMed = false;
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ velocity: { total: 5 } } });
+    colorSchemeManager.objectTypeFlags.velocityMed = true;
+    expect(result).toMatchSnapshot();
+  });
+  it('should hide slow objects if low velocity is disabled', async () => {
+    colorSchemeManager.objectTypeFlags.velocitySlow = false;
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ velocity: { total: 2 } } });
+    colorSchemeManager.objectTypeFlags.velocitySlow = true;
+    expect(result).toMatchSnapshot();
+  });
+  it('should hide everything else', async () => {
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ static: false, marker: false, isInGroup: false } });
     expect(result).toMatchSnapshot();
   });
 });

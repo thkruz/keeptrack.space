@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { LineColors, LineTypes } from '@app/js/api/keepTrackTypes';
+import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants';
 import { Line } from './line';
 
@@ -39,7 +40,7 @@ export class LineFactory {
   removeStars(): boolean {
     let starFound = false;
     for (let i = 0; i < this.drawLineList.length; i++) {
-      if ((typeof this.drawLineList[i].sat !== 'undefined' && this.drawLineList[i].sat.type == 'Star') || (typeof this.drawLineList[i].sat2 !== 'undefined' && this.drawLineList[i].sat2.type == 'Star')) {
+      if ((typeof this.drawLineList[i].sat !== 'undefined' && this.drawLineList[i].sat.type === SpaceObjectType.STAR) || (typeof this.drawLineList[i].sat2 !== 'undefined' && this.drawLineList[i].sat2.type === SpaceObjectType.STAR)) {
         this.drawLineList.splice(i, 1);
         starFound = true;
       }

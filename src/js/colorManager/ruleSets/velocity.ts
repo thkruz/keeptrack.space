@@ -54,7 +54,7 @@ export const velocityRules = (sat: SatObject): ColorInformation => {
     };
   }
   if (sat.inView === 1) {
-    if (colorSchemeManager.objectTypeFlagsinViewAlt === false) {
+    if (colorSchemeManager.objectTypeFlags.inViewAlt === false) {
       return {
         color: colorSchemeManager.colorTheme.deselected,
         pickable: Pickable.No,

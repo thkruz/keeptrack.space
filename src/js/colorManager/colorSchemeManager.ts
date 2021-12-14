@@ -54,7 +54,6 @@ export interface ColorSchemeManager {
   group: ColorRuleSet;
   calculateColorBuffers: (isForceRecolor?: boolean) => Promise<void>;
   objectTypeFlags: any;
-  objectTypeFlagsinViewAlt: boolean;
   satSet: CatalogManager;
 }
 
@@ -329,7 +328,6 @@ export const colorSchemeManager: ColorSchemeManager = {
   geo: null,
   velocity: null,
   group: null,
-  objectTypeFlagsinViewAlt: false,
   pickableBuffer: null,
   colorBuffer: null,
   colorData: null,

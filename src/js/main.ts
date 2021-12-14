@@ -50,6 +50,9 @@ import { searchBox } from './uiManager/searchBox';
 import { uiInput, uiManager } from './uiManager/uiManager';
 
 export const forceHttps = (): void => {
+  // Allow localhost testing
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
+  // Force HTTPS
   window.location.href.startsWith('http:') ? (window.location.href = window.location.href.replace('http:', 'https:')) : null;
 };
 

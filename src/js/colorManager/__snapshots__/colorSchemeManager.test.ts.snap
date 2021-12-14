@@ -483,22 +483,22 @@ Object {
 exports[`colorSchemeManager.countriesRules 0 1`] = `
 Object {
   "color": Array [
-    0,
+    1,
+    1,
     1,
     0,
-    0.6,
   ],
-  "pickable": 1,
+  "pickable": 0,
 }
 `;
 
 exports[`colorSchemeManager.countriesRules 1 1`] = `
 Object {
   "color": Array [
-    0,
+    0.2,
+    0.4,
     1,
-    0,
-    0.6,
+    1,
   ],
   "pickable": 1,
 }
@@ -507,20 +507,20 @@ Object {
 exports[`colorSchemeManager.countriesRules 2 1`] = `
 Object {
   "color": Array [
-    0,
+    1,
+    1,
     1,
     0,
-    0.6,
   ],
-  "pickable": 1,
+  "pickable": 0,
 }
 `;
 
 exports[`colorSchemeManager.countriesRules 3 1`] = `
 Object {
   "color": Array [
-    0,
     1,
+    0,
     0,
     0.6,
   ],
@@ -531,22 +531,22 @@ Object {
 exports[`colorSchemeManager.countriesRules 4 1`] = `
 Object {
   "color": Array [
-    0,
+    1,
+    1,
     1,
     0,
-    0.6,
   ],
-  "pickable": 1,
+  "pickable": 0,
 }
 `;
 
 exports[`colorSchemeManager.countriesRules 5 1`] = `
 Object {
   "color": Array [
-    0,
     1,
-    0,
-    0.6,
+    1,
+    1,
+    1,
   ],
   "pickable": 1,
 }
@@ -561,6 +561,18 @@ Object {
     0,
   ],
   "pickable": 0,
+}
+`;
+
+exports[`colorSchemeManager.countriesRules if it colors Russian Federation correctly 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    1,
+  ],
+  "pickable": 1,
 }
 `;
 
@@ -938,6 +950,30 @@ Object {
 `;
 
 exports[`colorSchemeManager.defaultRules 29 1`] = `
+Object {
+  "color": Array [
+    0.5,
+    0.5,
+    0.5,
+    0.85,
+  ],
+  "pickable": 1,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules should deselect dots in countries ColorScheme using Planetarium View 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": 0,
+}
+`;
+
+exports[`colorSchemeManager.defaultRules should deselect dots in default ColorScheme using Planetarium View 1`] = `
 Object {
   "color": Array [
     0.5,

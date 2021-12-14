@@ -345,9 +345,18 @@ describe('colorSchemeManager.defaultRules', () => {
     colorSchemeManager.objectTypeFlags.inFOV = true;
   });
 
-  test('20', () => {
+  it('should deselect dots in default ColorScheme using Planetarium View', () => {
     keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Planetarium;
     let result: any = colorSchemeManager.default({
+      inView: true,
+    });
+    expect(result).toMatchSnapshot();
+    keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Default;
+  });
+
+  it('should deselect dots in countries ColorScheme using Planetarium View', () => {
+    keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Planetarium;
+    let result: any = colorSchemeManager.countries({
       inView: true,
     });
     expect(result).toMatchSnapshot();
@@ -681,7 +690,7 @@ describe('colorSchemeManager.countriesRules', () => {
   test('0', () => {
     colorSchemeManager.objectTypeFlags.countryUS = false;
     let result: any = colorSchemeManager.countries({
-      C: 'United States of America',
+      country: 'United States of America',
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.countryUS = true;
@@ -689,7 +698,7 @@ describe('colorSchemeManager.countriesRules', () => {
 
   test('1', () => {
     let result: any = colorSchemeManager.countries({
-      C: 'United States of America',
+      country: 'United States of America',
     });
     expect(result).toMatchSnapshot();
   });
@@ -697,7 +706,7 @@ describe('colorSchemeManager.countriesRules', () => {
   test('2', () => {
     colorSchemeManager.objectTypeFlags.countryPRC = false;
     let result: any = colorSchemeManager.countries({
-      C: 'PRC',
+      country: 'China',
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.countryPRC = true;
@@ -705,7 +714,7 @@ describe('colorSchemeManager.countriesRules', () => {
 
   test('3', () => {
     let result: any = colorSchemeManager.countries({
-      C: 'PRC',
+      country: 'China',
     });
     expect(result).toMatchSnapshot();
   });
@@ -713,15 +722,22 @@ describe('colorSchemeManager.countriesRules', () => {
   test('4', () => {
     colorSchemeManager.objectTypeFlags.countryCIS = false;
     let result: any = colorSchemeManager.countries({
-      C: 'CIS',
+      country: 'CIS',
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.countryCIS = true;
   });
 
+  test('if it colors Russian Federation correctly', () => {
+    let result = colorSchemeManager.countries({
+      country: 'Russian Federation',
+    });
+    expect(result).toMatchSnapshot();
+  });
+
   test('5', () => {
     let result: any = colorSchemeManager.countries({
-      C: 'CIS',
+      country: 'CIS',
     });
     expect(result).toMatchSnapshot();
   });

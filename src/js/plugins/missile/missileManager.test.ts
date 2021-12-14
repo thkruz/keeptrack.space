@@ -1,5 +1,6 @@
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
 import * as missileManager from '../../plugins/missile/missileManager';
 /* eslint-disable no-undefined */
 

@@ -3,6 +3,7 @@
 
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
 import * as nextLaunch from './nextLaunch';
 import { nextLaunchManager } from './nextLaunch';
 

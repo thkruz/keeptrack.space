@@ -1,5 +1,6 @@
 import { keepTrackApiStubs } from './api/apiMocks';
 import { keepTrackApi } from './api/keepTrackApi';
+import { importCss } from './css';
 import * as main from './main';
 
 keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
@@ -20,10 +21,9 @@ const setUrl = (url) => {
   });
 };
 
-// @ponicode
 describe('main.importCss', () => {
   test('0', async () => {
-    const result = await main.importCss();
+    const result = await importCss();
     expect(result).toMatchSnapshot();
   });
 });
@@ -52,12 +52,6 @@ describe('main.showErrorCode', () => {
 
 // @ponicode
 describe('main.initalizeKeepTrack', () => {
-  test('0', async () => {
-    jest.setTimeout(60 * 1000);
-    keepTrackApi.methods.loadCatalog = jest.fn();
-    await main.initalizeKeepTrack();
-  });
-
   it('should be a function', () => {
     expect(main.initalizeKeepTrack).toBeInstanceOf(Function);
   });
@@ -67,6 +61,9 @@ describe('main.initalizeKeepTrack', () => {
   });
 
   it('should not throw any errors', async () => {
+    jest.setTimeout(60 * 1000);
+    keepTrackApi.methods.loadCatalog = jest.fn();
+    // Replace satSet.satData with a mock
     const spy = jest.spyOn(main, 'showErrorCode');
     const result = await main.initalizeKeepTrack();
     expect(() => result).not.toThrow();

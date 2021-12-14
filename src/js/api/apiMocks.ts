@@ -349,6 +349,7 @@ export const keepTrackApiStubs = {
         id: 0,
       },
       satLinkManager: {
+        idToSatnum: jest.fn(),
         showLinks: jest.fn(),
         aehf: [25544],
         dscs: [25544],

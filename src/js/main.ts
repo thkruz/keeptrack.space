@@ -30,6 +30,7 @@ import { isThisJest, keepTrackApi } from './api/keepTrackApi';
 import { MapManager, ObjectManager, OrbitManager, SensorManager } from './api/keepTrackTypes';
 import { camera } from './camera/camera';
 import { colorSchemeManager } from './colorManager/colorSchemeManager';
+import { importCss } from './css';
 import { dotsManager } from './drawManager/dots';
 import { drawManager } from './drawManager/drawManager';
 import { LineFactory } from './drawManager/sceneManager/sceneManager';
@@ -109,6 +110,11 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     uiManager.mobileManager.init();
     // We need to know if we are on a small screen before starting webgl
     await drawManager.glInit();
+    if (typeof process !== 'undefined') {
+      // NOTE: Jest fails with webgl2 so we use webgl1 during testing
+      // This means we need to mock some of the webgl2 code
+      keepTrackApi.programs.drawManager.gl = global.mocks.glMock;
+    }
 
     window.addEventListener('resize', drawManager.resizeCanvas);
 
@@ -126,7 +132,7 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     // eslint-disable-next-line require-atomic-updates
     keepTrackApi.programs.satCruncher = satCruncher;
 
-    keepTrackApi.programs.dotsManager.setupPickingBuffer(satSet.satData.length);
+    keepTrackApi.programs.dotsManager.setupPickingBuffer(satSet.satData?.length);
     satSet.setColorScheme(colorSchemeManager.default, true);
 
     orbitManager.init();
@@ -137,10 +143,10 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     starManager.init();
     uiManager.init();
-    keepTrackApi.programs.dotsManager.updateSizeBuffer(satSet.satData.length);
+    keepTrackApi.programs.dotsManager.updateSizeBuffer(satSet.satData?.length);
     // await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
     satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
-    (<any>objectManager).satLinkManager.idToSatnum(satSet);
+    objectManager?.satLinkManager?.idToSatnum(satSet);
 
     uiInput.init();
 
@@ -156,55 +162,6 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     keepTrackApi.methods.uiManagerFinal();
   } catch (error) {
     showErrorCode(<Error & { lineNumber: number }>error);
-  }
-};
-
-// Import CSS needed for loading screen
-export const importCss = async (): Promise<void> => {
-  try {
-    if (!settingsManager.disableUI) {
-      await import('../css/fonts.css').catch(() => {
-        throw new Error('Failed to load fonts.css');
-      });
-      await import('../css/materialize.css').catch(() => {
-        throw new Error('Failed to load materialize.css');
-      });
-      await import('../css/astroux/css/astro.css').catch(() => {
-        throw new Error('Failed to load astro.css');
-      });
-      await import('../css/materialize-local.css').catch(() => {
-        throw new Error('Failed to load materialize-local.css');
-      });
-      await import('./lib/external/colorPick.css').catch(() => {
-        throw new Error('Failed to load colorPick.css');
-      });
-      await import('../css/perfect-scrollbar.min.css').catch(() => {
-        throw new Error('Failed to load perfect-scrollbar.min.css');
-      });
-      await import('../css/jquery-ui.min.css').catch(() => {
-        throw new Error('Failed to load jquery-ui.min.css');
-      });
-      await import('../css/jquery-ui-timepicker-addon.css').catch(() => {
-        throw new Error('Failed to load jquery-ui-timepicker-addon.css');
-      });
-      await import('../css/style.css')
-        .then(
-          await import('../css/responsive.css')
-            .catch(() => {
-              throw new Error('Failed to load responsive.css');
-            })
-            .then((resp) => resp)
-        )
-        .catch(() => {
-          throw new Error('Failed to load style.css');
-        });
-    } else if (settingsManager.enableLimitedUI) {
-      await import('../css/limitedUI.css').catch(() => {
-        throw new Error('Failed to load limitedUI.css');
-      });
-    }
-  } catch (e) {
-    // intentionally left blank
   }
 };
 

@@ -25,6 +25,44 @@ import { smallsatsRules } from './ruleSets/smallsat';
 import { sunlightRules } from './ruleSets/sunlight';
 import { velocityRules } from './ruleSets/velocity';
 
+export interface ObjectTypeFlags {
+  payload: boolean;
+  radarData: boolean;
+  rocketBody: boolean;
+  debris: boolean;
+  facility: boolean;
+  sensor: boolean;
+  missile: boolean;
+  missileInview: boolean;
+  trusat: boolean;
+  inFOV: boolean;
+  inViewAlt: boolean;
+  starLow: boolean;
+  starMed: boolean;
+  starHi: boolean;
+  satLEO: boolean;
+  satGEO: boolean;
+  satLow: boolean;
+  satMed: boolean;
+  satHi: boolean;
+  satSmall: boolean;
+  rcsSmall: boolean;
+  rcsMed: boolean;
+  rcsLarge: boolean;
+  rcsUnknown: boolean;
+  velocitySlow: boolean;
+  velocityMed: boolean;
+  velocityFast: boolean;
+  ageNew: boolean;
+  ageMed: boolean;
+  ageOld: boolean;
+  ageLost: boolean;
+  countryUS: boolean;
+  countryPRC: boolean;
+  countryCIS: boolean;
+  countryOther: boolean;
+}
+
 export interface ColorSchemeManager {
   colorBufferOneTime: boolean;
   pickableBufferOneTime: boolean;
@@ -53,7 +91,7 @@ export interface ColorSchemeManager {
   velocity: ColorRuleSet;
   group: ColorRuleSet;
   calculateColorBuffers: (isForceRecolor?: boolean) => Promise<void>;
-  objectTypeFlags: any;
+  objectTypeFlags: ObjectTypeFlags;
   satSet: CatalogManager;
 }
 

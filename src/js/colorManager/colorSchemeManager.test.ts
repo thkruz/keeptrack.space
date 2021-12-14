@@ -260,74 +260,157 @@ describe('Test velocity ruleset', () => {
 
 // @ponicode
 describe('colorSchemeManager.defaultRules', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     colorSchemeManager.init();
   });
-
-  test('0', () => {
-    let result: any = colorSchemeManager.default({
-      static: true,
-      type: SpaceObjectType.STAR,
-    });
+  afterEach(() => {
+    colorSchemeManager.resetObjectTypeFlags();
+  });
+  it('should color small stars', async () => {
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ static: true, marker: false, isInGroup: false, type: SpaceObjectType.STAR, vmag: 4.8 } });
+    expect(result).toMatchSnapshot();
+  });
+  it('should color medium stars', async () => {
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ static: true, marker: false, isInGroup: false, type: SpaceObjectType.STAR, vmag: 3.8 } });
+    expect(result).toMatchSnapshot();
+  });
+  it('should color large stars', async () => {
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ static: true, marker: false, isInGroup: false, type: SpaceObjectType.STAR, vmag: 1.8 } });
     expect(result).toMatchSnapshot();
   });
 
-  test('1', () => {
-    let result: any = colorSchemeManager.default({
-      static: true,
-      vmag: 5,
-      type: SpaceObjectType.STAR,
-    });
+  it('should ignore deselected stars', async () => {
+    colorSchemeManager.objectTypeFlags.starHi = false;
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ static: true, marker: false, isInGroup: false, type: SpaceObjectType.STAR, vmag: 1.8 } });
     expect(result).toMatchSnapshot();
   });
 
-  test('2', () => {
-    let result: any = colorSchemeManager.default({
-      static: true,
-      vmag: 3.6,
-      type: SpaceObjectType.STAR,
-    });
-    expect(result).toMatchSnapshot();
-  });
-
-  test('3', () => {
-    let result: any = colorSchemeManager.default({
-      static: true,
-      vmag: 1,
-      type: SpaceObjectType.STAR,
-    });
-    expect(result).toMatchSnapshot();
-  });
-
-  test('4', () => {
+  it(`should hide everything that isn't a star in astronomy mode`, () => {
     keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Astronomy;
-    let result: any = colorSchemeManager.default({});
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD } });
     expect(result).toMatchSnapshot();
     keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Default;
   });
 
-  test('5', () => {
+  it(`should hide less important organizations when told`, () => {
     colorSchemeManager.objectTypeFlags.facility = false;
-    let result: any = colorSchemeManager.default({
-      static: true,
-      type: SpaceObjectType.LAUNCH_FACILITY,
-    });
-    expect(result).toMatchSnapshot();
-    colorSchemeManager.objectTypeFlags.facility = true;
-  });
-
-  test('6', () => {
-    let result: any = colorSchemeManager.default({
-      static: true,
-      type: SpaceObjectType.LAUNCH_FACILITY,
-    });
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION } });
     expect(result).toMatchSnapshot();
   });
 
-  test('7', () => {
-    let result: any = colorSchemeManager.default({
-      marker: true,
-    });
+  it(`should show less important organizations`, () => {
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it(`should show more important organizations`, () => {
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.LAUNCH_AGENCY } });
+    expect(result).toMatchSnapshot();
+  });
+
+  test(`that more important organizations are different than less important ones`, () => {
+    const less = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION } });
+    const more = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.LAUNCH_AGENCY } });
+    expect(more).not.toEqual(less);
+  });
+
+  it('should show markers', () => {
+    settingsManager.isSatOverflyModeOn = false;
+    colorSchemeManager.iSensor = 1;
+    keepTrackApi.programs.satSet.satSensorMarkerArray = [1, 2, 3, 4];
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ marker: true } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should change marker color when multiple sensors selected', () => {
+    settingsManager.isSatOverflyModeOn = false;
+    colorSchemeManager.iSensor = 0;
+    keepTrackApi.programs.satSet.satSensorMarkerArray = [1, 2, 3, 4];
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ id: 2, marker: true } });
+    expect(result).toMatchSnapshot();
+  });
+
+  // TODO: Eventually colorscheme should throw hard errors if it can't find a color for an object
+  it(`should not crash if there is an error in calculating marker color`, () => {
+    settingsManager.isSatOverflyModeOn = false;
+    colorSchemeManager.iSensor = -2;
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ marker: true } });
+    expect(result).toMatchSnapshot();
+    expect(result.color).toBe(colorSchemeManager.colorTheme.marker[0]);
+  });
+
+  it('should hide radar data when told to', () => {
+    colorSchemeManager.objectTypeFlags.radarData = false;
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ isRadarData: true } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should color radar data differently if it has a satellite number', () => {
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ isRadarData: true, sccNum: '25544' } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should color missiles that are out of FOV', () => {
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ missile: true, inView: 0 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should hide missiles that are out of FOV when told to', () => {
+    colorSchemeManager.objectTypeFlags.missile = false;
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ missile: true, inView: 0 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should color missiles that are in FOV', () => {
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ missile: true, inView: 1 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should hide missiles that are in FOV when told to', () => {
+    colorSchemeManager.objectTypeFlags.missileInview = false;
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ missile: true, inView: 1 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should hide payloads out of FOV when told to', () => {
+    colorSchemeManager.objectTypeFlags.payload = false;
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD, inView: 0 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should hide rocket bodies out of FOV when told to', () => {
+    colorSchemeManager.objectTypeFlags.rocketBody = false;
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.ROCKET_BODY, inView: 0 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should hide debris out of FOV when told to', () => {
+    colorSchemeManager.objectTypeFlags.debris = false;
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.DEBRIS, inView: 0 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should hide rocket bodies out of FOV when told to', () => {
+    colorSchemeManager.objectTypeFlags.trusat = false;
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.SPECIAL, inView: 0 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should hide things in FOV when told to', () => {
+    colorSchemeManager.objectTypeFlags.inFOV = false;
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD, inView: 1 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should hide satellites in view if we are in planetarium view', () => {
+    keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.PLANETARIUM;
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD, inView: 1 } });
+    expect(result).toMatchSnapshot();
+  });
+
+  it('should color satellites in view if we are not planetarium view', () => {
+    keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Default;
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD, inView: 1 } });
     expect(result).toMatchSnapshot();
   });
 

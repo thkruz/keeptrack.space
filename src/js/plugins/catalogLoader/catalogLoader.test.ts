@@ -5,7 +5,7 @@ import { keepTrackApi } from '../../api/keepTrackApi';
 import { SettingsManager } from '../../api/keepTrackTypes';
 import * as catalogLoader from './catalogLoader';
 
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 const settingsManager = <SettingsManager>(<any>window).settingsManager;
 settingsManager.installDirectory = '/';
 

@@ -3,7 +3,7 @@ import * as externalApi from '../../api/keepTrackApi';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import * as earth from '../../drawManager/sceneManager/earth';
 
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('earth.initBuffers', () => {

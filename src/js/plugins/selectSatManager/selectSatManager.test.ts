@@ -3,7 +3,7 @@ import { keepTrackApi } from '../../api/keepTrackApi';
 import { SatObject } from '../../api/keepTrackTypes';
 import { selectSatManager } from './selectSatManager';
 
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 document.body.innerHTML = global.docBody;
 

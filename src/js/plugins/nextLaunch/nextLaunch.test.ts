@@ -6,7 +6,7 @@ import { keepTrackApi } from '../../api/keepTrackApi';
 import * as nextLaunch from './nextLaunch';
 import { nextLaunchManager } from './nextLaunch';
 
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 const setUrl = (url) => {
   const host = url.split('/')[2] || '';

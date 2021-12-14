@@ -3,7 +3,7 @@ import { keepTrackApi } from '../api/keepTrackApi';
 import { controlSiteManager } from './controlSiteManager';
 import * as satLinkManager from './satlinkManager';
 
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('satLinkManager.init', () => {

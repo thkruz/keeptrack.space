@@ -3,7 +3,7 @@ import { keepTrackApi } from '../../api/keepTrackApi';
 import * as moon from './moon';
 /* eslint-disable no-undefined */
 
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('moon.init', () => {

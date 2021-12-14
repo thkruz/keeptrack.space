@@ -3,7 +3,7 @@ import { keepTrackApi } from './api/keepTrackApi';
 import { importCss } from './css';
 import * as main from './main';
 
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 const setUrl = (url) => {
   const host = url.split('/')[2] || '';

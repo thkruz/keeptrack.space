@@ -2,7 +2,7 @@ import { defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { SensorObject } from '../../api/keepTrackTypes';
 import * as sensorManager from './sensorManager';
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 declare const settingsManager;
 

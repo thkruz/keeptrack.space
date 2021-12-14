@@ -4,7 +4,7 @@ import { SatCruncherMessage, SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import * as satSet from '../satSet/satSet';
 
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 const defaultSatCruncherMessage: SatCruncherMessage = {
   data: {

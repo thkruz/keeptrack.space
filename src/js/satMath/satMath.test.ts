@@ -6,7 +6,7 @@ import { keepTrackApi } from '../api/keepTrackApi';
 import { SatObject, SunObject, ZoomValue } from '../api/keepTrackTypes';
 import * as satMath from './satMath';
 
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('satMath.currentEpoch', () => {

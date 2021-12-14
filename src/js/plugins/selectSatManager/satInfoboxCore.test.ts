@@ -249,6 +249,7 @@ describe('satInfoboxCore.nearObjectsLinkClick', () => {
   });
 
   test('1', () => {
+    document.body.innerHTML = '<input id="search" value="39208" />';
     keepTrackApi.programs.objectManager.selectedSat = 1;
     let result: any = satInfoboxCore.nearObjectsLinkClick();
     expect(result).toMatchSnapshot();

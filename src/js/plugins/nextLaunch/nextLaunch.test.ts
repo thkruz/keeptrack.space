@@ -1,12 +1,12 @@
 /* eslint-disable no-undefined */
 /* eslint-disable camelcase */
 
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import * as nextLaunch from '@app/js/plugins/nextLaunch/nextLaunch';
-import { nextLaunchManager } from '@app/js/plugins/nextLaunch/nextLaunch';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import * as nextLaunch from './nextLaunch';
+import { nextLaunchManager } from './nextLaunch';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 const setUrl = (url) => {
   const host = url.split('/')[2] || '';
@@ -1192,7 +1192,7 @@ describe('nextLaunchManager Functional Test', () => {
 
     nextLaunchManager.showTable();
 
-    settingsManager.offline = true;
+    window.settingsManager.offline = true;
     nextLaunchManager.init();
   });
 });

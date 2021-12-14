@@ -48,28 +48,15 @@ import { adviceManager } from './uiManager/adviceManager';
 import { searchBox } from './uiManager/searchBox';
 import { uiInput, uiManager } from './uiManager/uiManager';
 
-export const redirectHttpToHttps = (): void => {
-  // This is necessary for some of the geolocation based functions
-  // but it only runs on the main website
-  if (window.location.protocol === 'http:' && (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space')) {
-    const httpURL = window.location.hostname + window.location.pathname + window.location.search;
-    const httpsURL = 'https://' + httpURL;
-    // TODO: There may be a better way to do this in typescript
-    window.location = <Location>(<unknown>httpsURL);
-  }
+export const forceHttps = (): void => {
+  window.location.href.startsWith('http:') ? (window.location.href = window.location.href.replace('http:', 'https:')) : null;
 };
 
 export const showErrorCode = (error: Error & { lineNumber: number }): void => {
   let errorHtml = '';
-  if (error?.message) {
-    errorHtml += error.message + '<br>';
-  }
-  if (error?.lineNumber) {
-    errorHtml += 'Line: ' + error.lineNumber + '<br>';
-  }
-  if (error?.stack) {
-    errorHtml += error.stack + '<br>';
-  }
+  errorHtml += error?.message ? `${error.message}<br>` : '';
+  errorHtml += error?.lineNumber ? `Line: ${error.lineNumber}<br>` : '';
+  errorHtml += error?.stack ? `${error.stack}<br>` : '';
   $('#loader-text').html(errorHtml);
   // istanbul ignore next
   if (!isThisJest()) console.warn(error);
@@ -176,18 +163,44 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 export const importCss = async (): Promise<void> => {
   try {
     if (!settingsManager.disableUI) {
-      import('../css/fonts.css').catch(() => {});
-      import('../css/materialize.css').catch(() => {});
-      import('../css/astroux/css/astro.css').catch(() => {});
-      import('../css/materialize-local.css').catch(() => {});
-      import('./lib/external/colorPick.css').catch(() => {});
-      import('../css/perfect-scrollbar.min.css').catch(() => {});
-      import('../css/jquery-ui.min.css').catch(() => {});
-      import('../css/jquery-ui-timepicker-addon.css').catch(() => {});
-      import('../css/style.css').then(await import('../css/responsive.css').catch(() => {}).then((resp) => resp)).catch(() => {});
+      await import('../css/fonts.css').catch(() => {
+        throw new Error('Failed to load fonts.css');
+      });
+      await import('../css/materialize.css').catch(() => {
+        throw new Error('Failed to load materialize.css');
+      });
+      await import('../css/astroux/css/astro.css').catch(() => {
+        throw new Error('Failed to load astro.css');
+      });
+      await import('../css/materialize-local.css').catch(() => {
+        throw new Error('Failed to load materialize-local.css');
+      });
+      await import('./lib/external/colorPick.css').catch(() => {
+        throw new Error('Failed to load colorPick.css');
+      });
+      await import('../css/perfect-scrollbar.min.css').catch(() => {
+        throw new Error('Failed to load perfect-scrollbar.min.css');
+      });
+      await import('../css/jquery-ui.min.css').catch(() => {
+        throw new Error('Failed to load jquery-ui.min.css');
+      });
+      await import('../css/jquery-ui-timepicker-addon.css').catch(() => {
+        throw new Error('Failed to load jquery-ui-timepicker-addon.css');
+      });
+      await import('../css/style.css')
+        .then(
+          await import('../css/responsive.css')
+            .catch(() => {
+              throw new Error('Failed to load responsive.css');
+            })
+            .then((resp) => resp)
+        )
+        .catch(() => {
+          throw new Error('Failed to load style.css');
+        });
     } else if (settingsManager.enableLimitedUI) {
-      import('../css/limitedUI.css').catch(() => {
-        // intentionally left blank
+      await import('../css/limitedUI.css').catch(() => {
+        throw new Error('Failed to load limitedUI.css');
       });
     }
   } catch (e) {
@@ -196,7 +209,7 @@ export const importCss = async (): Promise<void> => {
 };
 
 // Force HTTPS on main website
-redirectHttpToHttps();
+forceHttps();
 // Load the CSS
 importCss();
 // Load the main website

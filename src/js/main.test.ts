@@ -4,51 +4,49 @@ import * as main from './main';
 
 keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
+const setUrl = (url) => {
+  const host = url.split('/')[2] || '';
+  let search = url.split('?')[1] || '';
+  search = search !== '' ? `?${search}` : '';
+
+  global.window = Object.create(window);
+  Object.defineProperty(window, 'location', {
+    value: {
+      href: url,
+      host: host,
+      search: search,
+    },
+    writable: true,
+  });
+};
+
 // @ponicode
 describe('main.importCss', () => {
   test('0', async () => {
-    await main.importCss();
-  });
-});
-
-// @ponicode
-describe('main.redirectHttpToHttps', () => {
-  test('0', () => {
-    let result: any = main.redirectHttpToHttps();
+    const result = await main.importCss();
     expect(result).toMatchSnapshot();
   });
 });
 
-// @ponicode
+describe('main.forceHttps', () => {
+  it('should change an http to https', () => {
+    setUrl('http://dummy.com');
+    main.forceHttps();
+    expect(window.location.href).toBe('https://dummy.com');
+  });
+  it('should not break an https request', () => {
+    setUrl('https://dummy.com');
+    main.forceHttps();
+    expect(window.location.href).toBe('https://dummy.com');
+  });
+});
+
 describe('main.showErrorCode', () => {
-  test('0', () => {
-    let result: any = main.showErrorCode({ name: 'Jean-Philippe', message: '<br>', stack: '<br>', lineNumber: 4 });
-    expect(result).toMatchSnapshot();
-  });
-
-  test('1', () => {
-    let result: any = main.showErrorCode({ name: 'Anas', message: '<br>', stack: '<br>', lineNumber: 3 });
-    expect(result).toMatchSnapshot();
-  });
-
-  test('2', () => {
-    let result: any = main.showErrorCode({ name: 'George', message: '<br>', stack: '<br>', lineNumber: 1 });
-    expect(result).toMatchSnapshot();
-  });
-
-  test('3', () => {
-    let result: any = main.showErrorCode({ name: 'Pierre Edouard', message: '<br>', stack: '<br>', lineNumber: 2 });
-    expect(result).toMatchSnapshot();
-  });
-
-  test('4', () => {
-    let result: any = main.showErrorCode({ name: 'Michael', message: '<br>', stack: '<br>', lineNumber: 1 });
-    expect(result).toMatchSnapshot();
-  });
-
-  test('5', () => {
-    let result: any = main.showErrorCode({ name: '', message: '', stack: '', lineNumber: 0 });
-    expect(result).toMatchSnapshot();
+  it('should show the error code', () => {
+    document.body.innerHTML = '<div id="loader-text"></div>';
+    const element = document.getElementById('loader-text');
+    main.showErrorCode(<Error & { lineNumber: number }>(<unknown>{ message: 'test', lineNumber: 1, stack: 'test' }));
+    expect(element.innerHTML).toMatchSnapshot();
   });
 });
 
@@ -58,5 +56,20 @@ describe('main.initalizeKeepTrack', () => {
     jest.setTimeout(60 * 1000);
     keepTrackApi.methods.loadCatalog = jest.fn();
     await main.initalizeKeepTrack();
+  });
+
+  it('should be a function', () => {
+    expect(main.initalizeKeepTrack).toBeInstanceOf(Function);
+  });
+
+  it('should return a promise', () => {
+    expect(main.initalizeKeepTrack()).toBeInstanceOf(Promise);
+  });
+
+  it('should not throw any errors', async () => {
+    const spy = jest.spyOn(main, 'showErrorCode');
+    const result = await main.initalizeKeepTrack();
+    expect(() => result).not.toThrow();
+    expect(spy).not.toBeCalled();
   });
 });

@@ -53,7 +53,7 @@ interface Star {
   vmag?: number;
 }
 
-export const lastSelectedSat = (id?: number): number => {
+const lastSelectedSat = (id?: number): number => {
   objectManager._lastSelectedSat = id ? id : objectManager._lastSelectedSat;
   return objectManager._lastSelectedSat;
 };
@@ -595,7 +595,7 @@ const init = () => {
   objectManager.satLinkManager = satLinkManager;
 };
 
-export const getStarName = (star: Star) => {
+const getStarName = (star: Star) => {
   if (star.pname != '') {
     return star.pname;
   } else if (star.bf != '') {

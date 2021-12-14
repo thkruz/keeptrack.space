@@ -1,8 +1,9 @@
 import { defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
-import { SensorObject } from '../../api/keepTrackTypes';
+import { KeepTrackPrograms, SensorObject } from '../../api/keepTrackTypes';
+import { SpaceObjectType } from '../../api/SpaceObjectType';
 import * as sensorManager from './sensorManager';
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 declare const settingsManager;
 
@@ -52,7 +53,7 @@ describe('sensorManager.setCurrentSensor', () => {
         shortName: 'test',
         staticNum: 1000,
         sun: 'v4.0.0-rc.4',
-        type: 'array',
+        type: SpaceObjectType.DEBRIS,
         url: 'https://twitter.com/path?abc',
         volume: true,
         zoom: 'leo',
@@ -83,7 +84,7 @@ describe('sensorManager.setCurrentSensor', () => {
         shortName: 'test',
         staticNum: 1,
         sun: '1.0.0',
-        type: 'array',
+        type: SpaceObjectType.ROCKET_BODY,
         url: 'http://www.croplands.org/account/confirm?t=',
         volume: true,
         zoom: 'geo',
@@ -114,7 +115,7 @@ describe('sensorManager.setCurrentSensor', () => {
         shortName: 'test',
         staticNum: 1000,
         sun: '4.0.0-beta1\t',
-        type: 'number',
+        type: SpaceObjectType.ROCKET_BODY,
         url: 'https://',
         volume: false,
         zoom: 'leo',
@@ -145,7 +146,7 @@ describe('sensorManager.setCurrentSensor', () => {
         shortName: 'fake',
         staticNum: 1000,
         sun: '4.0.0-beta1\t',
-        type: 'number',
+        type: SpaceObjectType.ROCKET_BODY,
         url: 'https://twitter.com/path?abc',
         volume: true,
         zoom: 'geo',
@@ -176,7 +177,7 @@ describe('sensorManager.setCurrentSensor', () => {
         shortName: '009008401',
         staticNum: 10,
         sun: 'v4.0.0-rc.4',
-        type: 'object',
+        type: SpaceObjectType.PAYLOAD,
         url: 'https://accounts.google.com/o/oauth2/revoke?token=%s',
         volume: true,
         zoom: 'leo',
@@ -207,10 +208,10 @@ describe('sensorManager.setCurrentSensor', () => {
         shortName: '',
         staticNum: -Infinity,
         sun: '',
-        type: '',
+        type: SpaceObjectType.LAUNCH_AGENCY,
         url: '',
         volume: false,
-        zoom: '',
+        zoom: 'leo',
       },
     ]);
     expect(result).toMatchSnapshot();
@@ -245,7 +246,7 @@ describe('sensorManager.setSensor', () => {
         shortName: 'test',
         staticNum: 1,
         sun: '1.0.0',
-        type: 'object',
+        type: SpaceObjectType.PAYLOAD,
         url: 'https://accounts.google.com/o/oauth2/revoke?token=%s',
         volume: false,
         zoom: 'geo',

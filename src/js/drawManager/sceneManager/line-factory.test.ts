@@ -1,9 +1,9 @@
 import { defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
-import { SatObject } from '../../api/keepTrackTypes';
+import { KeepTrackPrograms, SatObject } from '../../api/keepTrackTypes';
 import * as lineManager from './line-factory';
 
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 describe('drawWhenSelected', () => {
   let inst: any;

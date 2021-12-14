@@ -1,9 +1,10 @@
-import { keepTrackApiStubs } from '../../api/apiMocks';
+import { defaultSat, keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
-import { SatObject } from '../../api/keepTrackTypes';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
+import { SpaceObjectType } from '../../api/SpaceObjectType';
 import { selectSatManager } from './selectSatManager';
 
-keepTrackApi.programs = <any>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 document.body.innerHTML = global.docBody;
 
@@ -19,12 +20,12 @@ describe('selectSatManager', () => {
     selectSatManager.selectSat(5, mainCamera);
     selectSatManager.selectSat(5, mainCamera);
 
-    satSet.getSat = () => <SatObject>{ type: 'Star' };
+    satSet.getSat = () => ({ ...defaultSat, ...{ type: SpaceObjectType.STAR } });
     selectSatManager.selectSat(5, mainCamera);
 
-    satSet.getSat = () =>
-      <SatObject>{
-        type: 'Sat',
+    satSet.getSat = () => ({
+      ...defaultSat,
+      ...{
         TLE1: '1111111111111111111111111111111111111111111111111111111111',
         TLE2: '1111111111111111111111111111111111111111111111111111111111',
         active: true,
@@ -33,12 +34,13 @@ describe('selectSatManager', () => {
         inclination: 1,
         eccentricity: 1,
         period: 1,
-        OT: 0,
-      };
+        type: SpaceObjectType.UNKNOWN,
+      },
+    });
     selectSatManager.selectSat(5, mainCamera);
-    satSet.getSat = () =>
-      <SatObject>{
-        type: 'Sat',
+    satSet.getSat = () => ({
+      ...defaultSat,
+      ...{
         TLE1: '1111111111111111111111111111111111111111111111111111111111',
         TLE2: '1111111111111111111111111111111111111111111111111111111111',
         active: true,
@@ -47,12 +49,13 @@ describe('selectSatManager', () => {
         inclination: 1,
         eccentricity: 1,
         period: 1,
-        OT: 1,
-      };
+        type: SpaceObjectType.PAYLOAD,
+      },
+    });
     selectSatManager.selectSat(5, mainCamera);
-    satSet.getSat = () =>
-      <SatObject>{
-        type: 'Sat',
+    satSet.getSat = () => ({
+      ...defaultSat,
+      ...{
         TLE1: '1111111111111111111111111111111111111111111111111111111111',
         TLE2: '1111111111111111111111111111111111111111111111111111111111',
         active: true,
@@ -61,12 +64,13 @@ describe('selectSatManager', () => {
         inclination: 1,
         eccentricity: 1,
         period: 1,
-        OT: 2,
-      };
+        type: SpaceObjectType.ROCKET_BODY,
+      },
+    });
     selectSatManager.selectSat(5, mainCamera);
-    satSet.getSat = () =>
-      <SatObject>{
-        type: 'Sat',
+    satSet.getSat = () => ({
+      ...defaultSat,
+      ...{
         TLE1: '1111111111111111111111111111111111111111111111111111111111',
         TLE2: '1111111111111111111111111111111111111111111111111111111111',
         active: true,
@@ -75,12 +79,13 @@ describe('selectSatManager', () => {
         inclination: 1,
         eccentricity: 1,
         period: 1,
-        OT: 3,
-      };
+        type: SpaceObjectType.DEBRIS,
+      },
+    });
     selectSatManager.selectSat(5, mainCamera);
-    satSet.getSat = () =>
-      <SatObject>{
-        type: 'Sat',
+    satSet.getSat = () => ({
+      ...defaultSat,
+      ...{
         TLE1: '1111111111111111111111111111111111111111111111111111111111',
         TLE2: '1111111111111111111111111111111111111111111111111111111111',
         active: true,
@@ -89,12 +94,13 @@ describe('selectSatManager', () => {
         inclination: 1,
         eccentricity: 1,
         period: 1,
-        OT: 4,
-      };
+        type: SpaceObjectType.SPECIAL,
+      },
+    });
     selectSatManager.selectSat(5, mainCamera);
-    satSet.getSat = () =>
-      <SatObject>{
-        type: 'Sat',
+    satSet.getSat = () => ({
+      ...defaultSat,
+      ...{
         TLE1: '1111111111111111111111111111111111111111111111111111111111',
         TLE2: '1111111111111111111111111111111111111111111111111111111111',
         active: true,
@@ -103,12 +109,13 @@ describe('selectSatManager', () => {
         inclination: 1,
         eccentricity: 1,
         period: 1,
-        OT: 5,
-      };
+        type: SpaceObjectType.RADAR_MEASUREMENT,
+      },
+    });
     selectSatManager.selectSat(5, mainCamera);
-    satSet.getSat = () =>
-      <SatObject>{
-        type: 'Sat',
+    satSet.getSat = () => ({
+      ...defaultSat,
+      ...{
         TLE1: '1111111111111111111111111111111111111111111111111111111111',
         TLE2: '1111111111111111111111111111111111111111111111111111111111',
         active: true,
@@ -117,12 +124,13 @@ describe('selectSatManager', () => {
         inclination: 1,
         eccentricity: 1,
         period: 1,
-        OT: 6,
-      };
+        type: SpaceObjectType.RADAR_TRACK,
+      },
+    });
     selectSatManager.selectSat(5, mainCamera);
-    satSet.getSat = () =>
-      <SatObject>{
-        type: 'Sat',
+    satSet.getSat = () => ({
+      ...defaultSat,
+      ...{
         TLE1: '1111111111111111111111111111111111111111111111111111111111',
         TLE2: '1111111111111111111111111111111111111111111111111111111111',
         active: true,
@@ -161,30 +169,40 @@ describe('selectSatManager', () => {
         maneuver: '1',
         associates: '1',
         isInSun: jest.fn(),
-      };
-    selectSatManager.selectSat(5, mainCamera);
-
-    satSet.getSatExtraOnly = () => ({
-      type: 'Sat',
-      static: true,
+      },
     });
     selectSatManager.selectSat(5, mainCamera);
 
     satSet.getSatExtraOnly = () => ({
-      type: 'Star',
-      static: true,
+      ...defaultSat,
+      ...{
+        type: SpaceObjectType.PAYLOAD,
+        static: true,
+      },
+    });
+    selectSatManager.selectSat(5, mainCamera);
+
+    satSet.getSatExtraOnly = () => ({
+      ...defaultSat,
+      ...{
+        type: SpaceObjectType.STAR,
+        static: true,
+      },
     });
     objectManager.isSensorManagerLoaded = true;
     selectSatManager.selectSat(5, mainCamera);
     // objectManager.isSensorManagerLoaded = false;
 
-    satSet.getSatExtraOnly = () => false;
+    satSet.getSatExtraOnly = () => null;
     selectSatManager.selectSat(5, mainCamera);
 
     satSet.getSatExtraOnly = () => ({
-      type: 'Radar',
-      static: true,
-      staticNum: 1,
+      ...defaultSat,
+      ...{
+        type: SpaceObjectType.PHASED_ARRAY_RADAR,
+        static: true,
+        staticNum: 1,
+      },
     });
     selectSatManager.selectSat(5, mainCamera);
 
@@ -192,30 +210,38 @@ describe('selectSatManager', () => {
     selectSatManager.selectSat(5, mainCamera);
 
     satSet.getSatExtraOnly = () => ({
-      type: 'Sat',
-      TLE1: '1111111111111111111111111111111111111111111111111111111111',
-      TLE2: '1111111111111111111111111111111111111111111111111111111111',
-      active: true,
-      apogee: 1,
-      perigee: 1,
-      inclination: 1,
-      eccentricity: 1,
-      period: 1,
-      static: false,
+      ...defaultSat,
+      ...{
+        type: SpaceObjectType.PAYLOAD,
+        TLE1: '1111111111111111111111111111111111111111111111111111111111',
+        TLE2: '1111111111111111111111111111111111111111111111111111111111',
+        active: true,
+        apogee: 1,
+        perigee: 1,
+        inclination: 1,
+        eccentricity: 1,
+        period: 1,
+        static: false,
+      },
     });
     selectSatManager.selectSat(5, mainCamera);
 
     mainCamera.cameraType.current = 1;
-    satSet.getSat = () =>
-      <SatObject>{
-        type: 'Radar',
+    satSet.getSat = () => ({
+      ...defaultSat,
+      ...{
+        type: SpaceObjectType.PHASED_ARRAY_RADAR,
         static: true,
         staticNum: 1,
-      };
+      },
+    });
     satSet.getSatExtraOnly = () => ({
-      type: 'Radar',
-      static: true,
-      staticNum: 1,
+      ...defaultSat,
+      ...{
+        type: SpaceObjectType.PHASED_ARRAY_RADAR,
+        static: true,
+        staticNum: 1,
+      },
     });
     objectManager.isSensorManagerLoaded = false;
     selectSatManager.selectSat(5, mainCamera);

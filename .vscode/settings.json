@@ -1,7 +1,7 @@
 {
   "jest.jestCommandLine": "npm run test:noserver --coverage --",
   "ponicode.testSettings.testLocation.locationType": "Same folder as source file",
-  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  // "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "editor.formatOnSave": true,
   "typescript.validate.enable": true,
   "typescript.tsdk": "./node_modules/typescript/lib",

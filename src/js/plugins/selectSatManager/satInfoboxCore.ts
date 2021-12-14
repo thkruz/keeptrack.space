@@ -209,7 +209,7 @@ export const nearObjectsLinkClick = (): void => {
     }
   }
 
-  uiManager.doSearch($('#search').val());
+  uiManager.doSearch($('#search').val().toString());
 };
 export const nearOrbitsLink = () => {
   const { satSet, searchBox, satellite } = keepTrackApi.programs;
@@ -335,13 +335,13 @@ export const orbitalData = (sat: SatObject): void => {
         `);
 
     // Create a Sat Info Box Initializing Script
-    $('#sat-infobox').draggable({
+    (<any>$('#sat-infobox')).draggable({
       containment: 'window',
       drag: () => {
         $('#sat-infobox').height(600);
       },
     });
-    $('#sat-infobox').resizable({
+    (<any>$('#sat-infobox')).resizable({
       handles: 'all',
       // alsoResize: '#bottom-icons-container',
       // No larger than the stack of icons

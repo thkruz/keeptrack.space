@@ -1263,42 +1263,44 @@ export interface SocratesPlugin {
   socratesObjOne: any;
   socratesObjTwo: any;
 }
+export interface KeepTrackPrograms {
+  satCruncher: any; // depricated
+  adviceManager: AdviceManager;
+  earth: EarthObject;
+  satellite: SatMath;
+  mainCamera: Camera;
+  orbitManager: OrbitManager;
+  sensorManager: SensorManager;
+  uiManager: UiManager;
+  drawManager: DrawManager;
+  // starManager: StarManager;
+  astronomy: any;
+  planetarium: any;
+  objectManager: ObjectManager;
+  lineManager: LineFactory;
+  dotsManager: DotsManager;
+  groupsManager: GroupsManager;
+  satSet: CatalogManager;
+  timeManager: TimeManager;
+  colorSchemeManager: ColorSchemeManager;
+  watchlist: Watchlist;
+  searchBox: SearchBox;
+  soundManager: SoundManager;
+  starManager: StarManager;
+  missileManager: MissileManager;
+  photoManager: PhotoManager;
+  satChange: SatChangePlugin;
+  sensorFov: SensorFovPlugin;
+  mapManager: MapManager;
+  gamepad: GamepadPlugin;
+  socrates: SocratesPlugin;
+}
+
 export interface KeepTrackApi {
   html: (strings: TemplateStringsArray, ...placeholders: any[]) => string;
   register: (params: { method: string; cbName: string; cb: any }) => void;
   unregister: (params: { method: string; cbName: string }) => void;
   callbacks: any;
   methods: any;
-  programs: {
-    satCruncher: any; // depricated
-    adviceManager: AdviceManager;
-    earth: EarthObject;
-    satellite: SatMath;
-    mainCamera: Camera;
-    orbitManager: OrbitManager;
-    sensorManager: SensorManager;
-    uiManager: UiManager;
-    drawManager: DrawManager;
-    // starManager: StarManager;
-    astronomy: any;
-    planetarium: any;
-    objectManager: ObjectManager;
-    lineManager: LineFactory;
-    dotsManager: DotsManager;
-    groupsManager: GroupsManager;
-    satSet: CatalogManager;
-    timeManager: TimeManager;
-    colorSchemeManager: ColorSchemeManager;
-    watchlist: Watchlist;
-    searchBox: SearchBox;
-    soundManager: SoundManager;
-    starManager: StarManager;
-    missileManager: MissileManager;
-    photoManager: PhotoManager;
-    satChange: SatChangePlugin;
-    sensorFov: SensorFovPlugin;
-    mapManager: MapManager;
-    gamepad: GamepadPlugin;
-    socrates: SocratesPlugin;
-  };
+  programs: KeepTrackPrograms;
 }

@@ -26,50 +26,41 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { isThisJest, keepTrackApi } from '@app/js/api/keepTrackApi';
-import { camera } from '@app/js/camera/camera';
-import { colorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
-import { dotsManager } from '@app/js/drawManager/dots';
-import { drawManager } from '@app/js/drawManager/drawManager';
-import { LineFactory } from '@app/js/drawManager/sceneManager/sceneManager';
-import { groupsManager } from '@app/js/groupsManager/groupsManager';
-import { objectManager } from '@app/js/objectManager/objectManager';
-import { orbitManager } from '@app/js/orbitManager/orbitManager';
-import { sensorManager } from '@app/js/plugins/sensor/sensorManager';
-import { satellite } from '@app/js/satMath/satMath';
-// import { radarDataManager } from'@app/js/satSet/radarDataManager.js';
-import { satSet } from '@app/js/satSet/satSet';
-import { VERSION } from '@app/js/settingsManager/version.js';
-import { VERSION_DATE } from '@app/js/settingsManager/versionDate.js';
-import { starManager } from '@app/js/starManager/starManager';
-import { timeManager } from '@app/js/timeManager/timeManager';
-import { adviceManager } from '@app/js/uiManager/adviceManager';
-import { searchBox } from '@app/js/uiManager/searchBox';
-import { uiInput, uiManager } from '@app/js/uiManager/uiManager';
+import { isThisJest, keepTrackApi } from './api/keepTrackApi';
 import { MapManager, ObjectManager, OrbitManager, SensorManager } from './api/keepTrackTypes';
+import { camera } from './camera/camera';
+import { colorSchemeManager } from './colorManager/colorSchemeManager';
+import { importCss } from './css';
+import { dotsManager } from './drawManager/dots';
+import { drawManager } from './drawManager/drawManager';
+import { LineFactory } from './drawManager/sceneManager/sceneManager';
+import { groupsManager } from './groupsManager/groupsManager';
+import { objectManager } from './objectManager/objectManager';
+import { orbitManager } from './orbitManager/orbitManager';
+import { sensorManager } from './plugins/sensor/sensorManager';
+import { satellite } from './satMath/satMath';
+// import { radarDataManager } from'./satSet/radarDataManager.js';
+import { satSet } from './satSet/satSet';
+import { VERSION } from './settingsManager/version.js';
+import { VERSION_DATE } from './settingsManager/versionDate.js';
+import { starManager } from './starManager/starManager';
+import { timeManager } from './timeManager/timeManager';
+import { adviceManager } from './uiManager/adviceManager';
+import { searchBox } from './uiManager/searchBox';
+import { uiInput, uiManager } from './uiManager/uiManager';
 
-export const redirectHttpToHttps = (): void => {
-  // This is necessary for some of the geolocation based functions
-  // but it only runs on the main website
-  if (window.location.protocol === 'http:' && (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space')) {
-    const httpURL = window.location.hostname + window.location.pathname + window.location.search;
-    const httpsURL = 'https://' + httpURL;
-    // TODO: There may be a better way to do this in typescript
-    window.location = <Location>(<unknown>httpsURL);
-  }
+export const forceHttps = (): void => {
+  // Allow localhost testing
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
+  // Force HTTPS
+  window.location.href.startsWith('http:') ? (window.location.href = window.location.href.replace('http:', 'https:')) : null;
 };
 
 export const showErrorCode = (error: Error & { lineNumber: number }): void => {
   let errorHtml = '';
-  if (error?.message) {
-    errorHtml += error.message + '<br>';
-  }
-  if (error?.lineNumber) {
-    errorHtml += 'Line: ' + error.lineNumber + '<br>';
-  }
-  if (error?.stack) {
-    errorHtml += error.stack + '<br>';
-  }
+  errorHtml += error?.message ? `${error.message}<br>` : '';
+  errorHtml += error?.lineNumber ? `Line: ${error.lineNumber}<br>` : '';
+  errorHtml += error?.stack ? `${error.stack}<br>` : '';
   $('#loader-text').html(errorHtml);
   // istanbul ignore next
   if (!isThisJest()) console.warn(error);
@@ -103,12 +94,12 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     uiManager.loadStr('science');
     // Load all the plugins now that we have the API initialized
-    await import('@app/js/plugins/core')
+    await import('./plugins/core')
       .then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins))
       .catch(() => {
         // intentionally left blank
       });
-    await import('@app/js/plugins/plugins')
+    await import('./plugins/plugins')
       .then((mod) => mod.loadExtraPlugins(keepTrackApi))
       .catch(() => {
         // intentionally left blank
@@ -122,6 +113,11 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     uiManager.mobileManager.init();
     // We need to know if we are on a small screen before starting webgl
     await drawManager.glInit();
+    if (typeof process !== 'undefined') {
+      // NOTE: Jest fails with webgl2 so we use webgl1 during testing
+      // This means we need to mock some of the webgl2 code
+      keepTrackApi.programs.drawManager.gl = global.mocks.glMock;
+    }
 
     window.addEventListener('resize', drawManager.resizeCanvas);
 
@@ -139,7 +135,7 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     // eslint-disable-next-line require-atomic-updates
     keepTrackApi.programs.satCruncher = satCruncher;
 
-    keepTrackApi.programs.dotsManager.setupPickingBuffer(satSet.satData.length);
+    keepTrackApi.programs.dotsManager.setupPickingBuffer(satSet.satData?.length);
     satSet.setColorScheme(colorSchemeManager.default, true);
 
     orbitManager.init();
@@ -150,10 +146,10 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     starManager.init();
     uiManager.init();
-    keepTrackApi.programs.dotsManager.updateSizeBuffer(satSet.satData.length);
+    keepTrackApi.programs.dotsManager.updateSizeBuffer(satSet.satData?.length);
     // await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
     satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
-    (<any>objectManager).satLinkManager.idToSatnum(satSet);
+    objectManager?.satLinkManager?.idToSatnum(satSet);
 
     uiInput.init();
 
@@ -172,31 +168,8 @@ export const initalizeKeepTrack = async (): Promise<void> => {
   }
 };
 
-// Import CSS needed for loading screen
-export const importCss = async (): Promise<void> => {
-  try {
-    if (!settingsManager.disableUI) {
-      import('@app/css/fonts.css').catch(() => {});
-      import('@app/css/materialize.css').catch(() => {});
-      import('@app/css/astroux/css/astro.css').catch(() => {});
-      import('@app/css/materialize-local.css').catch(() => {});
-      import('@app/js/lib/external/colorPick.css').catch(() => {});
-      import('@app/css/perfect-scrollbar.min.css').catch(() => {});
-      import('@app/css/jquery-ui.min.css').catch(() => {});
-      import('@app/css/jquery-ui-timepicker-addon.css').catch(() => {});
-      import('@app/css/style.css').then(await import('@app/css/responsive.css').catch(() => {}).then((resp) => resp)).catch(() => {});
-    } else if (settingsManager.enableLimitedUI) {
-      import('@app/css/limitedUI.css').catch(() => {
-        // intentionally left blank
-      });
-    }
-  } catch (e) {
-    // intentionally left blank
-  }
-};
-
 // Force HTTPS on main website
-redirectHttpToHttps();
+forceHttps();
 // Load the CSS
 importCss();
 // Load the main website

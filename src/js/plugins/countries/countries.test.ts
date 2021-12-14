@@ -1,6 +1,7 @@
 import { expect } from '@jest/globals';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
 import * as countries from './countries';
 /* eslint-disable no-undefined */
 

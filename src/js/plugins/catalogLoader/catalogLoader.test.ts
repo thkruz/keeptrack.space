@@ -2,7 +2,7 @@ import '@app/js/settingsManager/settingsManager';
 import { expect } from '@jest/globals';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
-import { SettingsManager } from '../../api/keepTrackTypes';
+import { KeepTrackPrograms, SettingsManager } from '../../api/keepTrackTypes';
 import * as catalogLoader from './catalogLoader';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });

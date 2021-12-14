@@ -1,6 +1,7 @@
 import { expect } from '@jest/globals';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
 import * as satelliteView from './satelliteView';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });

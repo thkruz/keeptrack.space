@@ -1,5 +1,6 @@
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
 import * as moon from './moon';
 /* eslint-disable no-undefined */
 

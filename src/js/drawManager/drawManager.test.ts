@@ -1,6 +1,6 @@
 import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { SatObject } from '../api/keepTrackTypes';
+import { KeepTrackPrograms, SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import * as drawManager from './drawManager';
 

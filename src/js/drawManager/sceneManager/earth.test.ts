@@ -1,6 +1,7 @@
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import * as externalApi from '../../api/keepTrackApi';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
 import * as earth from '../../drawManager/sceneManager/earth';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });

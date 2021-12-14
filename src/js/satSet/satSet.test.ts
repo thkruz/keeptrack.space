@@ -1,6 +1,6 @@
 import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { SatCruncherMessage, SatObject } from '../api/keepTrackTypes';
+import { KeepTrackPrograms, SatCruncherMessage, SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import * as satSet from '../satSet/satSet';
 

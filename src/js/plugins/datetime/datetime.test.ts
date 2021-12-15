@@ -1,10 +1,12 @@
+// organize-imports-ignore
 import 'jquery-ui-bundle';
 import '@app/js/lib/external/jquery-ui-timepicker.js';
 import { keepTrackApiStubs } from '../../api/apiMocks';
-import { keepTrackApi } from '../../api/externalApi';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import * as datetime from '../../plugins/datetime/datetime';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 // @ponicode
 describe('datetime.init', () => {
   test('0', () => {

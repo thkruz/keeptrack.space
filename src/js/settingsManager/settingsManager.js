@@ -15,8 +15,11 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 // /////////////////////////////////////////////////////////////////////////////
 */
 
-// Settings Manager Setup
-let settingsManager = {
+/** settingsManager is a global object that manages universally accessible parameters*/
+let settingsManager = window.settingsManager; // This declaration is to ensure proper type checking
+
+// Actual Setup
+settingsManager = {
   // Classification can be "Unclassified", "Secret", "Top Secret", "Top Secret//SCI"
   classificationStr: '',
   // This controls which of the built-in plugins are loaded
@@ -87,7 +90,7 @@ let settingsManager = {
   isEditTime: null,
   fieldOfView: null,
   db: null,
-  init: async () => {
+  init: () => {
     settingsManager.pTime = [];
 
     // Install Folder Settings

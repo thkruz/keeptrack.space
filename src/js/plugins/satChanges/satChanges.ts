@@ -1,10 +1,12 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SatChngObject } from '@app/js/api/keepTrackTypes';
 import { dateFromJday } from '@app/js/timeManager/transforms';
+import { uiManager } from '@app/js/uiManager/uiManager';
 import $ from 'jquery';
 
 let issatChngMenuOpen = false;
 keepTrackApi.programs.satChange = {
-  satChngTable: [],
+  satChngTable: null,
 };
 
 export const init = (): void => {
@@ -60,31 +62,33 @@ export const uiManagerInit = () => {
     minWidth: 280,
   });
 
-  $('#satChng-menu').on('click', '.satChng-object', function (evt) {
+  $('#satChng-menu').on('click', '.satChng-object', function (evt: Event) {
     // Might be better code for this.
-    const hiddenRow = evt.currentTarget.attributes.hiddenrow.value;
+    const hiddenRow = (<any>evt.currentTarget).attributes.hiddenrow.value;
     if (hiddenRow !== null) {
       satChng(parseInt(hiddenRow));
     }
   });
 };
 
-export const satChng = (row: number) => {
-  let satChngTable: string | any[] = keepTrackApi.programs.satChange.satChngTable;
+export const satChng = (row: number): void => {
+  const { satChange } = keepTrackApi.programs;
+  let satChngTable: SatChngObject[] = satChange.satChngTable;
   if (typeof row !== 'number') throw new Error('Row must be a number');
   if (row !== -1 && typeof satChngTable[row] === 'undefined') throw new Error('Row does not exist');
 
-  if (row === -1 && satChngTable.length === 0) {
+  if (row === -1 && satChngTable?.length === 0) {
     // Only generate the table if receiving the -1 argument for the first time
-    $.get('/analysis/satchng.json?v=' + keepTrackApi.programs.settingsManager.versionNumber).done((resp) => {
+    $.get('/analysis/satchng.json?v=' + settingsManager.versionNumber).done((resp) => {
       ({ resp, satChngTable } = getSatChngJson(resp, satChngTable));
-      keepTrackApi.programs.satChange.satChngTable = satChngTable;
+      satChange.satChngTable = satChngTable;
     });
   }
   if (row !== -1) {
     // If an object was selected from the menu
-    keepTrackApi.programs.uiManager.doSearch(satChngTable[row].SCC); // Actually perform the search of the two objects
-    $('#anal-sat').val(satChngTable[row].SCC);
+    if (!satChngTable[row].SCC) return;
+    uiManager.doSearch(satChngTable[row].SCC.toString()); // Actually perform the search of the two objects
+    $('#anal-sat').val(satChngTable[row].SCC.toString());
   } // If a row was selected
 };
 
@@ -96,13 +100,14 @@ export const hideSideMenus = (): void => {
 
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-satChng') {
+    const { uiManager } = keepTrackApi.programs;
     if (issatChngMenuOpen) {
       issatChngMenuOpen = false;
-      keepTrackApi.programs.uiManager.hideSideMenus();
+      uiManager.hideSideMenus();
       return;
     } else {
-      if (keepTrackApi.programs.settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
-      keepTrackApi.programs.uiManager.hideSideMenus();
+      if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+      uiManager.hideSideMenus();
       $('#satChng-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
       issatChngMenuOpen = true;
       satChng(-1);
@@ -111,8 +116,12 @@ export const bottomMenuClick = (iconName: string): void => {
     }
   }
 };
-export const getSatChngJson = (resp: any, satChngTable: string | any[]) => {
+
+export const getSatChngJson = (resp: any, satChngTable: SatChngObject[]) => {
   resp = [...new Set(resp)];
+
+  const { satSet } = keepTrackApi.programs;
+
   for (let i = 0; i < resp.length; i++) {
     const prefix = resp[i].year > 50 ? '19' : '20';
     const year = parseInt(prefix + resp[i].year.toString());
@@ -140,8 +149,13 @@ export const getSatChngJson = (resp: any, satChngTable: string | any[]) => {
   tdPer.appendChild(document.createTextNode('Per'));
   tdPer.setAttribute('style', 'text-decoration: underline');
 
+  // 20 rows max
   for (let i = 0; i < Math.min(satChngTable.length, 20); i++) {
-    // 20 rows
+    const sat = satSet.getSat(satSet.getIdFromObjNum(satChngTable[i].SCC));
+
+    // Skip Decays
+    if (sat === null) continue;
+
     tr = tbl.insertRow();
     tr.setAttribute('class', 'satChng-object link');
     tr.setAttribute('hiddenrow', i.toString());
@@ -155,14 +169,13 @@ export const getSatChngJson = (resp: any, satChngTable: string | any[]) => {
     }
     tdT.appendChild(document.createTextNode(timeTextStr));
     tdSat = tr.insertCell();
-    tdSat.appendChild(document.createTextNode(satChngTable[i].SCC));
+    tdSat.appendChild(document.createTextNode(satChngTable[i].SCC.toString()));
     tdInc = tr.insertCell();
     tdInc.appendChild(document.createTextNode(satChngTable[i].inc.toFixed(2)));
     tdPer = tr.insertCell();
     const deltaMeanMo = satChngTable[i].meanmo;
-    const sat = keepTrackApi.programs.satSet.getSat(keepTrackApi.programs.satSet.getIdFromObjNum(satChngTable[i].SCC));
-    const origPer = 1440 / (parseFloat(sat.meanMotion) + deltaMeanMo);
-    const perDelta = 1440 / parseFloat(sat.meanMotion) - origPer;
+    const origPer = 1440 / (sat.meanMotion + deltaMeanMo);
+    const perDelta = 1440 / sat.meanMotion - origPer;
     tdPer.appendChild(document.createTextNode(perDelta.toFixed(2)));
   }
   return { resp, satChngTable };

@@ -24,8 +24,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 export const uiManagerInit = () => {
   // Bottom Icon
@@ -56,12 +56,12 @@ export const init = (): void => {
   });
 
   keepTrackApi.programs.sensorFov = {
-    enableFovView: enableFovView,
+    enableFovView,
   };
 };
 
 export const enableFovView = () => {
-  const { settingsManager, satSet } = keepTrackApi.programs;
+  const { satSet } = keepTrackApi.programs;
   // Disable Satellite Overfly
   settingsManager.isSatOverflyModeOn = false;
   $('#menu-sat-fov').removeClass('bmenu-item-selected');

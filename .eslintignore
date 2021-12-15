@@ -3,8 +3,8 @@ webpack.config.js
 README.md
 src/js/wip
 src/js/lib/external
-cypress
 **/*.min.*
 **/*.css
-suncalc.js
 dist
+src/offline/tle.js
+src/tle

@@ -15,14 +15,12 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-import '@app/js/lib/external/Chart.js';
-
 import * as $ from 'jquery';
-
-import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { satellite } from '@app/js/satMath/satMath';
-import { sensorList } from '@app/js/plugins/sensor/sensorList';
-import { jday } from '@app/js/timeManager/transforms';
+import '../../js/lib/external/Chart.js';
+import { dateFormat } from '../../js/lib/external/dateFormat.js';
+import { sensorList } from '../../js/plugins/sensor/sensorList';
+import { satellite } from '../../js/satMath/satMath';
+import { jday } from '../../js/timeManager/transforms';
 
 var requestInfo = {};
 var isDrawApogee = false;

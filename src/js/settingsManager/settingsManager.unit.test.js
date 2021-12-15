@@ -1,6 +1,6 @@
 /* eslint-disable no-undefined */
-import { keepTrackApi } from '../api/externalApi';
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '../api/keepTrackApi';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 

@@ -1,8 +1,11 @@
-import * as dots from '@app/js/drawManager/dots';
 import { keepTrackApiStubs } from '../api/apiMocks';
-import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApi } from '../api/keepTrackApi';
+import { KeepTrackPrograms } from '../api/keepTrackTypes';
+import * as dots from '../drawManager/dots';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+declare const settingsManager: any;
+
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('dots.init', () => {
@@ -32,14 +35,14 @@ describe('dots.updatePMvCamMatrix', () => {
 // @ponicode
 describe('dots.draw', () => {
   test('0', () => {
-    let result: any = dots.draw(keepTrackApi.programs.mainCamera, keepTrackApi.programs.ColorScheme, null);
+    let result: any = dots.draw(keepTrackApi.programs.mainCamera, keepTrackApi.programs.colorSchemeManager, null);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
     dots.init(keepTrackApi.programs.drawManager.gl);
     settingsManager.cruncherReady = true;
-    let result: any = dots.draw(keepTrackApi.programs.mainCamera, keepTrackApi.programs.ColorScheme, null);
+    let result: any = dots.draw(keepTrackApi.programs.mainCamera, keepTrackApi.programs.colorSchemeManager, null);
     expect(result).toMatchSnapshot();
     settingsManager.cruncherReady = false;
   });
@@ -48,14 +51,14 @@ describe('dots.draw', () => {
 // @ponicode
 describe('dots.drawGpuPickingFrameBuffer', () => {
   test('0', () => {
-    let result: any = dots.drawGpuPickingFrameBuffer(keepTrackApi.programs.mainCamera, keepTrackApi.programs.ColorScheme);
+    let result: any = dots.drawGpuPickingFrameBuffer(keepTrackApi.programs.mainCamera, keepTrackApi.programs.colorSchemeManager);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
     dots.init(keepTrackApi.programs.drawManager.gl);
     settingsManager.cruncherReady = true;
-    let result: any = dots.drawGpuPickingFrameBuffer(keepTrackApi.programs.mainCamera, keepTrackApi.programs.ColorScheme);
+    let result: any = dots.drawGpuPickingFrameBuffer(keepTrackApi.programs.mainCamera, keepTrackApi.programs.colorSchemeManager);
     expect(result).toMatchSnapshot();
     settingsManager.cruncherReady = false;
   });
@@ -88,7 +91,7 @@ describe('dots.updatePositionBuffer', () => {
 // @ponicode
 describe('dots.updateSizeBuffer', () => {
   test('0', () => {
-    let result: any = dots.updateSizeBuffer(keepTrackApi.programs.satSet.satData);
+    let result: any = dots.updateSizeBuffer(keepTrackApi.programs.satSet.satData.length);
     expect(result).toMatchSnapshot();
   });
 });
@@ -96,7 +99,7 @@ describe('dots.updateSizeBuffer', () => {
 // @ponicode
 describe('dots.setupPickingBuffer', () => {
   test('0', () => {
-    let result: any = dots.setupPickingBuffer(keepTrackApi.programs.satSet.satData);
+    let result: any = dots.setupPickingBuffer(keepTrackApi.programs.satSet.satData.length);
     expect(result).toMatchSnapshot();
   });
 });

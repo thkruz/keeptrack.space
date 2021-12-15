@@ -1,8 +1,8 @@
-import $ from 'jquery';
-import { DEG2RAD } from '@app/js/lib/constants.js';
-import { keepTrackApi } from '../api/externalApi';
+import { DEG2RAD } from '@app/js/lib/constants';
 import { timeManager } from '@app/js/timeManager/timeManager';
 import { jday } from '@app/js/timeManager/transforms';
+import $ from 'jquery';
+import { keepTrackApi } from '../api/keepTrackApi';
 
 var satellite, sensorManager, satSet, satCruncher;
 let radarDataManager = {};

@@ -1,6 +1,6 @@
 import * as orbitManager from '@app/js/orbitManager/orbitManager';
 import { keepTrackApiStubs } from '../api/apiMocks';
-import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApi } from '../api/keepTrackApi';
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 describe('orbitManager.init', () => {

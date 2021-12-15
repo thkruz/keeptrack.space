@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { parseRgba, rgbCss } from '@app/js/lib/helpers';
 import $ from 'jquery';
 /**
@@ -252,7 +252,7 @@ export const uiManagerInit = (): void => {
 };
 
 export const bottomMenuClick = (iconName: string) => {
-  const { settingsManager, uiManager } = keepTrackApi.programs;
+  const { uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-settings') {
     if (isSettingsMenuOpen) {
       isSettingsMenuOpen = false;
@@ -313,7 +313,7 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
 
 export const settingsFormSubmit = (e: any, isHOSChecked?: boolean, isDMChecked?: boolean, isSLMChecked?: boolean, isSNPChecked?: boolean) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
-  const { satSet, ColorScheme } = keepTrackApi.programs;
+  const { satSet, colorSchemeManager } = keepTrackApi.programs;
 
   isHOSChecked ??= (<HTMLInputElement>document.getElementById('settings-hos')).checked;
   isDMChecked ??= (<HTMLInputElement>document.getElementById('settings-demo-mode')).checked;
@@ -337,7 +337,7 @@ export const settingsFormSubmit = (e: any, isHOSChecked?: boolean, isDMChecked?:
   } else {
     (<any>settingsManager).colors.transparent = [1.0, 1.0, 1.0, 0.1];
   }
-  ColorScheme.reloadColors();
+  colorSchemeManager.reloadColors();
 
   if (isSNPChecked) {
     (<any>settingsManager).isShowNextPass = true;

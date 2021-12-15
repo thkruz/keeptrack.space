@@ -1,5 +1,5 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as launchCalendar from '@app/js/plugins/launchCalendar/launchCalendar';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
@@ -19,7 +19,7 @@ describe('launchCalendar.bottomMenuClick', () => {
     const callFunction: any = () => {
       launchCalendar.bottomMenuClick('menu-launches');
       launchCalendar.bottomMenuClick('menu-launches');
-      keepTrackApi.programs.settingsManager.isMobileModeEnabled = true;
+      settingsManager.isMobileModeEnabled = true;
       launchCalendar.bottomMenuClick('menu-launches');
       launchCalendar.bottomMenuClick('menu-launches');
     };

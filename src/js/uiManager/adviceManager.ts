@@ -15,18 +15,18 @@ for derivative works, or offered for sale, or used to construct any kind of data
 or mirrored at any other location without the express written permission of the author.
 
 ///////////////////////////////////////////////////////////////////////////// */
-import { AdviceCounter, AdviceList } from '@app/types/types';
 import $ from 'jquery';
 // eslint-disable-next-line sort-imports
 import 'jquery-ui-bundle';
-import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApi } from '../api/keepTrackApi';
+import { AdviceCounter, AdviceList } from '../api/keepTrackTypes';
 
 let isAdviceEnabled = true;
-let helpDOM;
-let helpCloseDOM;
-let helpHeaderDOM;
-let helpTextDOM;
-let tutIconDOM;
+let helpDOM: HTMLDivElement;
+let helpCloseDOM: HTMLDivElement;
+let helpHeaderDOM: HTMLDivElement;
+let helpTextDOM: HTMLDivElement;
+let tutIconDOM: HTMLDivElement;
 let curFocusDOM: any;
 let adviceList: AdviceList;
 let adviceCount: AdviceCounter;
@@ -331,7 +331,7 @@ export const off = () => {
   helpDOM.hide();
   tutIconDOM.removeClass('bmenu-item-selected');
 };
-export const showAdvice: any = (header, text, focusDOM, setLocation) => {
+export const showAdvice = (header: string, text: string, focusDOM: HTMLDivElement, setLocation: string) => {
   if (!isAdviceEnabled) return;
   if (typeof setLocation == 'undefined') setLocation = 'bottom-left';
   adviceManager.clearAdvice();
@@ -358,8 +358,8 @@ export const showAdvice: any = (header, text, focusDOM, setLocation) => {
       helpDOM.css({
         left: '1%',
         right: 'auto',
-        top: 'auto',
-        bottom: '120px',
+        top: '60%',
+        bottom: 'auto',
       });
       break;
     case 'bottom':
@@ -367,8 +367,8 @@ export const showAdvice: any = (header, text, focusDOM, setLocation) => {
       helpDOM.css({
         left: leftValue,
         right: 'auto',
-        top: 'auto',
-        bottom: '120px',
+        top: '60%',
+        bottom: 'auto',
       });
       break;
     case 'top-right':
@@ -391,8 +391,8 @@ export const showAdvice: any = (header, text, focusDOM, setLocation) => {
       helpDOM.css({
         left: 'auto',
         right: '1%',
-        top: 'auto',
-        bottom: '120px',
+        top: '60%',
+        bottom: 'auto',
       });
       break;
   }
@@ -445,6 +445,10 @@ export const clearAdvice = function (): void {
 };
 export const init = () => {
   helpDOM = $('#help-screen');
+  helpDOM.draggable({
+    containment: 'window',
+    scroll: false,
+  });
   helpCloseDOM = $('#help-close');
   helpHeaderDOM = $('#help-header');
   helpTextDOM = $('#help-text');

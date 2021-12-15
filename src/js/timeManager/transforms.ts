@@ -1,7 +1,7 @@
 import { MILLISECONDS_PER_DAY } from '../lib/constants';
 import { dateFormat } from '../lib/external/dateFormat';
 
-export const getDayOfYear = (date: Date) => {
+export const getDayOfYear = (date: Date): number => {
   date = date || new Date();
   const _isLeapYear = (date: Date) => {
     const year = date.getFullYear();

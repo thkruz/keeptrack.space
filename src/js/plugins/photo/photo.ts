@@ -24,8 +24,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 export const rightBtnMenuAdd = () => {
   $('#right-btn-menu-ul').append(keepTrackApi.html`   
@@ -88,8 +88,6 @@ export const init = (): void => {
     cbName: 'photo',
     cb: uiManagerInit,
   });
-
-  keepTrackApi.programs.photo = {};
 
   // Add JavaScript
   keepTrackApi.register({

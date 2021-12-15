@@ -1,8 +1,10 @@
 import { keepTrackApiStubs } from '../api/apiMocks';
-import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApi } from '../api/keepTrackApi';
+import { KeepTrackPrograms, SatObject } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import * as drawManager from './drawManager';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 declare const settingsManager;
 
@@ -16,6 +18,9 @@ describe('drawManager.init ', () => {
 
 // @ponicode
 describe('drawManager.drawLoop ', () => {
+  beforeAll(() => {
+    drawManager.glInit();
+  });
   test('0', () => {
     let result = drawManager.drawLoop(15);
     expect(result).toMatchSnapshot();
@@ -25,8 +30,7 @@ describe('drawManager.drawLoop ', () => {
 // @ponicode
 describe('drawManager.glInit ', () => {
   test('0', async () => {
-    let result = await drawManager.glInit();
-    expect(result).toMatchSnapshot();
+    drawManager.glInit().then(() => expect(drawManager.drawManager.gl).toMatchSnapshot());
   });
 });
 
@@ -38,9 +42,8 @@ describe('drawManager.startWithOrbits  ', () => {
   afterAll(() => {
     settingsManager.startWithOrbitsDisplayed = false;
   });
-  test('0', async () => {
-    let result = await drawManager.startWithOrbits();
-    expect(result).toMatchSnapshot();
+  test('0', () => {
+    drawManager.startWithOrbits().then(() => expect(drawManager).toMatchSnapshot());
   });
 });
 
@@ -63,7 +66,7 @@ describe('drawManager.satCalculate', () => {
 // @ponicode
 describe('drawManager.screenShot', () => {
   test('0', () => {
-    keepTrackApi.programs.drawManager.gl = {
+    keepTrackApi.programs.drawManager.gl = <WebGL2RenderingContext>(<unknown>{
       viewport: () => {},
       drawingBufferWidth: 0,
       drawingBufferHeight: 0,
@@ -71,7 +74,7 @@ describe('drawManager.screenShot', () => {
         width: 0,
         height: 0,
       },
-    };
+    });
     let result: any = drawManager.screenShot();
     expect(result).toMatchSnapshot();
   });
@@ -80,32 +83,22 @@ describe('drawManager.screenShot', () => {
 // @ponicode
 describe('drawManager.watermarkedDataUrl', () => {
   test('0', () => {
-    let result: any = drawManager.watermarkedDataUrl({ height: 64, width: 544 }, 'test');
+    let result: any = drawManager.watermarkedDataUrl(<HTMLCanvasElement>{ height: 64, width: 544 }, 'test');
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = drawManager.watermarkedDataUrl({ height: 24, width: 100 }, true);
+    let result: any = drawManager.watermarkedDataUrl(<HTMLCanvasElement>{ height: 24, width: 100 }, 'test2');
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    let result: any = drawManager.watermarkedDataUrl({ height: 150, width: 390 }, false);
+    let result: any = drawManager.watermarkedDataUrl(<HTMLCanvasElement>{ height: 150, width: 390 }, 'false');
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    let result: any = drawManager.watermarkedDataUrl({ height: 0.0, width: 576 }, true);
-    expect(result).toMatchSnapshot();
-  });
-
-  test('4', () => {
-    let result: any = drawManager.watermarkedDataUrl(2, 0);
-    expect(result).toMatchSnapshot();
-  });
-
-  test('5', () => {
-    let result: any = drawManager.watermarkedDataUrl(Infinity, true);
+    let result: any = drawManager.watermarkedDataUrl(<HTMLCanvasElement>{ height: 0.0, width: 576 }, 'test3');
     expect(result).toMatchSnapshot();
   });
 });
@@ -217,61 +210,73 @@ describe('drawManager.hoverBoxOnSat', () => {
   });
 
   test('2', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ static: true });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => <SatObject>{ static: true };
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ isRadarData: true, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: 0, azError: 0, elError: 0 });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => <SatObject>(<unknown>{ isRadarData: true, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: '0', azError: 0, elError: 0 });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ isRadarData: true, missileComplex: 1, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: 0, azError: 0, elError: 0 });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => <SatObject>(<unknown>{ isRadarData: true, missileComplex: 1, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: '0', azError: 0, elError: 0 });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ isRadarData: true, satId: 1, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: 0, azError: 0, elError: 0 });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => <SatObject>(<unknown>{ isRadarData: true, satId: 1, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: '0', azError: 0, elError: 0 });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('6', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ static: true, type: 'Control Facility', setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: 0, azError: 0, elError: 0, position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => <SatObject>(<unknown>{
+        static: true,
+        type: SpaceObjectType.CONTORL_FACILITY,
+        setRAE: jest.fn(),
+        rae: { range: 0, az: 0, el: 0 },
+        rcs: '0',
+        azError: 0,
+        elError: 0,
+        position: { x: 0, y: 0, z: 0 },
+        velocity: { total: 0, x: 0, y: 0, z: 0 },
+      });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('7', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({
-      static: true,
-      type: 'Star',
-      setRAE: jest.fn(),
-      rae: { range: 0, az: 0, el: 0 },
-      rcs: 0,
-      azError: 0,
-      elError: 0,
-      position: { x: 0, y: 0, z: 0 },
-      velocity: { x: 0, y: 0, z: 0 },
-      ra: 0,
-      dec: 0,
-    });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => <SatObject>(<unknown>{
+        static: true,
+        type: SpaceObjectType.STAR,
+        setRAE: jest.fn(),
+        rae: { range: 0, az: 0, el: 0 },
+        rcs: '0',
+        azError: 0,
+        elError: 0,
+        position: { x: 0, y: 0, z: 0 },
+        velocity: { total: 0, x: 0, y: 0, z: 0 },
+        ra: 0,
+        dec: 0,
+      });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('8', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ missile: true, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: 0, azError: 0, elError: 0, position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () =>
+      <SatObject>(<unknown>{ missile: true, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: '0', azError: 0, elError: 0, position: { x: 0, y: 0, z: 0 }, velocity: { total: 0, x: 0, y: 0, z: 0 } });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });
 
   test('8', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ satId: 1, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: 0, azError: 0, elError: 0, position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () =>
+      <SatObject>(<unknown>{ satId: 1, setRAE: jest.fn(), rae: { range: 0, az: 0, el: 0 }, rcs: '0', azError: 0, elError: 0, position: { x: 0, y: 0, z: 0 }, velocity: { total: 0, x: 0, y: 0, z: 0 } });
     let result: any = drawManager.hoverBoxOnSat(5, 1000, 1000);
     expect(result).toMatchSnapshot();
   });

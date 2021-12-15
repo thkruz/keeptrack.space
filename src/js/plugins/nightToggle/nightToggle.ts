@@ -1,5 +1,5 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 export const init = (): void => {
   // Add HTML
@@ -15,7 +15,7 @@ export const init = (): void => {
           <div class="status-icon"></div>
         </div>
       `);
-      keepTrackApi.programs.settingsManager.isDayNightToggle = false;
+      settingsManager.isDayNightToggle = false;
     },
   });
 
@@ -25,12 +25,12 @@ export const init = (): void => {
     cbName: 'nightToggle',
     cb: (iconName: string): void => {
       if (iconName === 'menu-day-night') {
-        if (keepTrackApi.programs.settingsManager.isDayNightToggle) {
-          keepTrackApi.programs.settingsManager.isDayNightToggle = false;
+        if (settingsManager.isDayNightToggle) {
+          settingsManager.isDayNightToggle = false;
           $('#menu-day-night').removeClass('bmenu-item-selected');
           return;
         } else {
-          keepTrackApi.programs.settingsManager.isDayNightToggle = true;
+          settingsManager.isDayNightToggle = true;
           $('#menu-day-night').addClass('bmenu-item-selected');
           return;
         }
@@ -42,7 +42,7 @@ export const init = (): void => {
     method: 'nightToggle',
     cbName: 'nightToggle',
     cb: (gl: any, nightTexture: any, texture: any): void => {
-      if (!keepTrackApi.programs.settingsManager.isDayNightToggle) {
+      if (!settingsManager.isDayNightToggle) {
         gl.bindTexture(gl.TEXTURE_2D, nightTexture);
       } else {
         gl.bindTexture(gl.TEXTURE_2D, texture);

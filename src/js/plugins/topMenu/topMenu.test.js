@@ -1,5 +1,8 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApiStubs } from '../../api/apiMocks';
 import { init } from './topMenu';
-import { keepTrackApi } from '@app/js/api/externalApi';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 describe('topMenu', () => {
   it('should be initialized', () => {
@@ -7,9 +10,6 @@ describe('topMenu', () => {
   });
 
   it('should add the top menu', () => {
-    keepTrackApi.programs.uiManager = {
-      menuController: jest.fn(),
-    };
     keepTrackApi.methods.uiManagerInit();
   });
 });

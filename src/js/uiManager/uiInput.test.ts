@@ -1,8 +1,9 @@
 import { keepTrackApiStubs } from '../api/apiMocks';
-import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApi } from '../api/keepTrackApi';
+import { KeepTrackPrograms } from '../api/keepTrackTypes';
 import * as uiInput from './uiInput';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 document.body.innerHTML = global.docBody;
 
 // Let TypeScript know that settingsManager is a global variable
@@ -219,7 +220,7 @@ describe('uiInput.getEarthScreenPoint', () => {
 
 describe('uiInput.rmbMenuActions', () => {
   beforeAll(() => {
-    (<any>window).M = {
+    window.M = {
       toast: jest.fn(),
     };
     keepTrackApi.programs.mainCamera.screenDragPoint = [0, 0, 0];

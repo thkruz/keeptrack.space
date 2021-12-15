@@ -1,8 +1,9 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as collisions from '@app/js/plugins/collisions/collisions';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
+import * as collisions from './collisions';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('collisions.uiManagerInit', () => {
@@ -131,7 +132,7 @@ describe('collisions.processSocratesHtm', () => {
         </table>
       </body>
     </html>`;
-    let result: any = collisions.processSocratesHtm(documentHtml);
+    let result: any = collisions.processSocratesHtm(<Document>(<unknown>documentHtml));
     expect(result).toMatchSnapshot();
   });
 });

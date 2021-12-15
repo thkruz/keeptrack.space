@@ -1,9 +1,10 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApiStubs } from '../../api/apiMocks';
 import { init } from './aboutManager';
-import { keepTrackApi } from '@app/js/api/externalApi';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 test('Load About Manager', () => {
-  keepTrackApi.programs.uiManager.hideSideMenus = jest.fn();
-
   init();
   keepTrackApi.methods.uiManagerInit();
   keepTrackApi.methods.bottomMenuClick('menu-about');

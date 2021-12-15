@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
-import { SatObject } from '@app/js/api/keepTrack';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import $ from 'jquery';
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ export const init = (): void => {
           isAnalysisMenuOpen = true;
           if (objectManager.selectedSat != -1) {
             const sat: SatObject = satSet.getSat(objectManager.selectedSat);
-            $('#anal-sat').val(sat.SCC_NUM);
+            $('#anal-sat').val(sat.sccNum);
           }
           if (sensorManager.checkSensorSelected()) {
             $('#anal-type').html(
@@ -85,7 +85,7 @@ export const init = (): void => {
           }
           // Reinitialize the Material CSS Code
           const elems = document.querySelectorAll('select');
-          M.FormSelect.init(elems);
+          (<any>M).FormSelect.init(elems);
 
           $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           $('#menu-analysis').addClass('bmenu-item-selected');
@@ -100,7 +100,7 @@ export const init = (): void => {
     cbName: 'analysis',
     cb: (sat: any): void => {
       if (uiManager.isAnalysisMenuOpen) {
-        $('#anal-sat').val(sat.SCC_NUM);
+        $('#anal-sat').val(sat.sccNum);
       }
     },
   });
@@ -211,11 +211,11 @@ export const uiManagerInit = () => {
         </div>
       `);
 
-  $('#analysis-form').on('submit', function (e) {
+  $('#analysis-form').on('submit', function (e: Event) {
     e.preventDefault();
     analysisFormSubmit();
   });
-  $('#analysis-bpt').on('submit', function (e) {
+  $('#analysis-bpt').on('submit', function (e: Event) {
     e.preventDefault();
     analysisBptSumbit();
   });
@@ -238,7 +238,7 @@ export const analysisFormSubmit = () => {
   const { sensorManager } = keepTrackApi.programs;
   const chartType = $('#anal-type').val();
   const sat = $('#anal-sat').val();
-  const sensor = sensorManager.currentSensor.shortName;
+  const sensor = sensorManager.currentSensor[0].shortName;
   if (typeof sensor == 'undefined') {
     $.colorbox({
       href: `analysis/index.htm?sat=${sat}&type=${chartType}`,

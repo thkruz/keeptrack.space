@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
 let isSatPhotoMenuOpen = false;
@@ -67,9 +67,9 @@ export const himawari8 = (): void => {
     imgWidth = imgHeight;
   }
 
-  keepTrackApi.programs.settingsManager.isPreventColorboxClose = true;
+  settingsManager.isPreventColorboxClose = true;
   setTimeout(function () {
-    keepTrackApi.programs.settingsManager.isPreventColorboxClose = false;
+    settingsManager.isPreventColorboxClose = false;
   }, 2000);
 
   $.colorbox({
@@ -89,9 +89,9 @@ export const himawari8 = (): void => {
   });
 };
 export const colorbox = (url: string): void => {
-  keepTrackApi.programs.settingsManager.isPreventColorboxClose = true;
+  settingsManager.isPreventColorboxClose = true;
   setTimeout(function () {
-    keepTrackApi.programs.settingsManager.isPreventColorboxClose = false;
+    settingsManager.isPreventColorboxClose = false;
   }, 2000);
 
   $.colorbox({

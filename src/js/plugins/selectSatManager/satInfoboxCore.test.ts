@@ -1,14 +1,18 @@
-import { defaultSat, keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as satInfoboxCore from '@app/js/plugins/selectSatManager/satInfoboxCore';
 import 'jquery-ui-bundle';
+import { defaultSat, defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
+import { SpaceObjectType } from '../../api/SpaceObjectType';
+import * as satInfoboxCore from './satInfoboxCore';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+declare const settingsManager;
+
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('satInfoboxCore.sensorInfo', () => {
   beforeAll(() => {
-    window.settingsManager.plugins = {
+    settingsManager.plugins = {
       sensor: true,
     };
   });
@@ -47,9 +51,12 @@ describe('satInfoboxCore.orbitalData', () => {
   test('2', () => {
     window.document.body.innerHTML = '<div id="sat-infobox"></div>';
     keepTrackApi.programs.objectManager.isSensorManagerLoaded = true;
-    keepTrackApi.programs.sensorManager.currentSensor = {
-      lat: null,
-      type: 'mech',
+    keepTrackApi.programs.sensorManager.currentSensor[0] = {
+      ...defaultSensor,
+      ...{
+        lat: null,
+        type: SpaceObjectType.MECHANICAL,
+      },
     };
     let result: any = satInfoboxCore.orbitalData({ isInSun: () => true, ...defaultSat });
     expect(result).toMatchSnapshot();
@@ -58,9 +65,12 @@ describe('satInfoboxCore.orbitalData', () => {
   test('3', () => {
     window.document.body.innerHTML = '<div id="sat-infobox"></div>';
     keepTrackApi.programs.objectManager.isSensorManagerLoaded = true;
-    keepTrackApi.programs.sensorManager.currentSensor = {
-      lat: null,
-      type: 'Optical',
+    keepTrackApi.programs.sensorManager.currentSensor[0] = {
+      ...defaultSensor,
+      ...{
+        lat: null,
+        type: SpaceObjectType.OPTICAL,
+      },
     };
     let result: any = satInfoboxCore.orbitalData({ isInSun: () => true, ...defaultSat });
     expect(result).toMatchSnapshot();
@@ -224,7 +234,7 @@ describe('satInfoboxCore.allObjectsLink', () => {
 
   test('1', () => {
     keepTrackApi.programs.objectManager.selectedSat = 1;
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ intlDes: '1234512345' });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({ ...defaultSat, ...{ intlDes: '1234512345' } });
     let result: any = satInfoboxCore.allObjectsLink();
     expect(result).toMatchSnapshot();
   });
@@ -239,6 +249,7 @@ describe('satInfoboxCore.nearObjectsLinkClick', () => {
   });
 
   test('1', () => {
+    document.body.innerHTML = '<input id="search" value="39208" />';
     keepTrackApi.programs.objectManager.selectedSat = 1;
     let result: any = satInfoboxCore.nearObjectsLinkClick();
     expect(result).toMatchSnapshot();

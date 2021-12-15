@@ -1,10 +1,10 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import * as externalApi from '@app/js/api/externalApi';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as moon from '@app/js/drawManager/sceneManager/moon';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
+import * as moon from './moon';
 /* eslint-disable no-undefined */
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('moon.init', () => {
@@ -27,7 +27,7 @@ describe('moon.update', () => {
 describe('moon.draw', () => {
   test('0', () => {
     const callFunction: any = () => {
-      moon.draw([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], externalApi.keepTrackApi.programs.drawManager.sceneManager.sun.godrays.frameBuffer);
+      moon.draw([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], keepTrackApi.programs.drawManager.sceneManager.sun.godrays.frameBuffer);
     };
 
     expect(callFunction).not.toThrow();
@@ -43,7 +43,7 @@ describe('moon.draw', () => {
 
   test('2', () => {
     const callFunction: any = () => {
-      moon.draw([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], externalApi.keepTrackApi.programs.drawManager.sceneManager.sun.godrays.frameBuffer);
+      moon.draw([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], keepTrackApi.programs.drawManager.sceneManager.sun.godrays.frameBuffer);
     };
 
     expect(callFunction).not.toThrow();
@@ -59,7 +59,7 @@ describe('moon.draw', () => {
 
   test('4', () => {
     const callFunction: any = () => {
-      moon.draw([90, 320, 550, 4, 400, 410, 380, 520, 380, 30, 90, 550, 400, 30, 320, 400], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], externalApi.keepTrackApi.programs.drawManager.sceneManager.sun.godrays.frameBuffer);
+      moon.draw([90, 320, 550, 4, 400, 410, 380, 520, 380, 30, 90, 550, 400, 30, 320, 400], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], keepTrackApi.programs.drawManager.sceneManager.sun.godrays.frameBuffer);
     };
 
     expect(callFunction).not.toThrow();
@@ -67,11 +67,7 @@ describe('moon.draw', () => {
 
   test('5', () => {
     const callFunction: any = () => {
-      moon.draw(
-        [1, 400, 70, 320, 30, 380, 550, 400, 520, 70, 100, 90, 380, 350, 350, 400],
-        [90, 320, 550, 4, 400, 410, 380, 520, 380, 30, 90, 550, 400, 30, 320, 400],
-        externalApi.keepTrackApi.programs.drawManager.sceneManager.sun.godrays.frameBuffer
-      );
+      moon.draw([1, 400, 70, 320, 30, 380, 550, 400, 520, 70, 100, 90, 380, 350, 350, 400], [90, 320, 550, 4, 400, 410, 380, 520, 380, 30, 90, 550, 400, 30, 320, 400], keepTrackApi.programs.drawManager.sceneManager.sun.godrays.frameBuffer);
     };
 
     expect(callFunction).not.toThrow();
@@ -79,7 +75,7 @@ describe('moon.draw', () => {
 
   test('6', () => {
     const callFunction: any = () => {
-      moon.draw([1, 70, 410, 50, 30, 100, 30, 410, 400, 520, 4, 520, 400, 350, 320, 520], [1, 400, 70, 320, 30, 380, 550, 400, 520, 70, 100, 90, 380, 350, 350, 400], externalApi.keepTrackApi.programs.drawManager.sceneManager.sun.godrays.frameBuffer);
+      moon.draw([1, 70, 410, 50, 30, 100, 30, 410, 400, 520, 4, 520, 400, 350, 320, 520], [1, 400, 70, 320, 30, 380, 550, 400, 520, 70, 100, 90, 380, 350, 350, 400], keepTrackApi.programs.drawManager.sceneManager.sun.godrays.frameBuffer);
     };
 
     expect(callFunction).not.toThrow();
@@ -138,7 +134,7 @@ describe('moon.onTextureLoaded', () => {
 describe('moon.initProgram', () => {
   test('0', () => {
     const callFunction: any = () => {
-      moon.initProgram(externalApi.keepTrackApi.programs.drawManager.gl);
+      moon.initProgram(keepTrackApi.programs.drawManager.gl);
     };
 
     expect(callFunction).not.toThrow();

@@ -1,5 +1,5 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
-import { keepTrackApi } from '@app/js/api/externalApi';
 
 export const init = (): void => {
   // Reset Flag
@@ -9,7 +9,7 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'aboutManager',
     cb: () => {
-      // Side Menu      
+      // Side Menu
       $('#left-menus').append(keepTrackApi.html`
         <div id="about-menu" class="side-menu-parent start-hidden text-select">
           <div id="about-content" class="side-menu">
@@ -80,7 +80,7 @@ export const init = (): void => {
           <span class="bmenu-title">About</span>
           <div class="status-icon"></div>
         </div>
-      `);      
+      `);
     },
   });
 
@@ -89,7 +89,8 @@ export const init = (): void => {
     method: 'bottomMenuClick',
     cbName: 'about',
     cb: (iconName: string): void => {
-      if (iconName === 'menu-about') { // No Keyboard Shortcut
+      if (iconName === 'menu-about') {
+        // No Keyboard Shortcut
         if (isAboutSelected) {
           isAboutSelected = false;
           keepTrackApi.programs.uiManager.hideSideMenus();
@@ -112,6 +113,6 @@ export const init = (): void => {
       $('#about-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
       $('#menu-about').removeClass('bmenu-item-selected');
       isAboutSelected = false;
-    }
+    },
   });
 };

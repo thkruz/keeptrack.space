@@ -1,14 +1,16 @@
 /* eslint-disable */
+const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
+const glob = require('glob');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
 const webpack = require('webpack');
 const WebpackBar = require('webpackbar');
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const glob = require('glob');
 
-let config;
+const isAddLoadingBar = true;
+
+let baseConfig;
 let MAKE_MODE;
-
-console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+const exportArray = [];
 
 switch (process.env.NODE_ENV) {
   case 'test':
@@ -23,10 +25,8 @@ switch (process.env.NODE_ENV) {
     break;
 }
 
-console.log(`MAKE_MODE: ${MAKE_MODE}`);
-
 if (MAKE_MODE !== 'embed') {
-  config = {
+  baseConfig = {
     mode: MAKE_MODE,
     resolve: {
       extensions: ['.ts', '.js'],
@@ -38,31 +38,38 @@ if (MAKE_MODE !== 'embed') {
       rules: [
         {
           test: /\.css$/i,
+          include: [/src/],
           use: ['style-loader', 'css-loader'],
         },
         {
           test: /\.(png|svg|jpg|jpeg|gif)$/i,
+          include: [/src/],
           type: 'asset/resource',
         },
         {
           test: /\.(woff|woff2|eot|ttf|otf)$/i,
+          include: [/src/],
           type: 'asset/resource',
         },
         // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
         {
           test: /\.tsx?$/,
           loader: 'ts-loader',
+          include: [/src/],
+          exclude: [/node_modules/, /\dist/, /\coverage/, /\.test\.tsx?$/],
           options: {
             transpileOnly: false,
           },
         },
         {
           test: /\.worker\.js$/i,
+          include: [/src/],
           use: { loader: 'worker-loader' },
         },
         {
           test: /\.m?js$/,
-          exclude: [/(node_modules|bower_components)/, /\cypress/, /\settingsManager\.js/i],
+          include: [/src/],
+          exclude: [/(node_modules|bower_components)/, /\dist/, /\coverage/, /\settingsManager\.js/i, /\.test\.jsx?$/],
           use: {
             loader: 'babel-loader',
           },
@@ -82,17 +89,16 @@ if (MAKE_MODE !== 'embed') {
         filename: '../index.htm',
         template: './src/index.htm',
       }),
-      new WebpackBar({
-        fancy: true,
-        profile: true,
+      new CleanTerminalPlugin({
+        beforeCompile: true,
       }),
     ],
     ignoreWarnings: [/asset size limit/, /combined asset size exceeds the recommended limit/],
-    stats: 'minimal',
+    stats: 'errors-warnings',
   };
 } else {
   // this is for embedding the app in a web page
-  config = {
+  baseConfig = {
     mode: 'production',
     resolve: {
       extensions: ['.ts', '.js'],
@@ -140,115 +146,142 @@ if (MAKE_MODE !== 'embed') {
       new webpack.optimize.LimitChunkCountPlugin({
         maxChunks: 1,
       }),
-      new WebpackBar({
-        fancy: true,
-        profile: true,
-      }),
     ],
     ignoreWarnings: [/asset size limit/, /combined asset size exceeds the recommended limit/],
     stats: 'minimal',
   };
 }
 
+if (isAddLoadingBar) {
+  baseConfig.plugins.push(
+    new WebpackBar({
+      fancy: true,
+      profile: true,
+    })
+  );
+}
+
+// Add source map if in these modes
 if (MAKE_MODE === 'development' || MAKE_MODE === 'test' || MAKE_MODE === 'embed2') {
-  Object.assign(config, {
-    // devtool: 'inline-source-map',
-    devtool: 'source-map',
-    optimization: {
-      minimize: false,
+  baseConfig = {
+    ...baseConfig,
+    ...{
+      // devtool: 'inline-source-map',
+      devtool: 'source-map',
+      optimization: {
+        minimize: false,
+      },
     },
-  });
+  };
 }
 
+// Minimize if in these modes
 if (MAKE_MODE === 'production' || MAKE_MODE === 'embed') {
-  Object.assign(config, {
-    optimization: {
-      minimize: true,
+  baseConfig = {
+    ...baseConfig,
+    ...{
+      optimization: {
+        minimize: true,
+      },
     },
-  });
+  };
 }
 
-const exportArray = [];
+// split entry points main, webworkers, and possibly analysis tools
 if (MAKE_MODE !== 'embed') {
-  const jsConfig = Object.assign({}, config, {
-    name: 'MainFiles',
-    entry: {
-      main: ['./src/js/main.ts'],
+  const jsConfig = {
+    ...baseConfig,
+    ...{
+      name: 'MainFiles',
+      entry: {
+        main: ['./src/js/main.ts'],
+      },
+      output: {
+        filename: '[name].[contenthash].js',
+        path: __dirname + '/../dist/js',
+        publicPath: './js/',
+      },
     },
-    output: {
-      filename: '[name].[contenthash].js',
-      path: __dirname + '/../dist/js',
-      publicPath: './js/',
-    },
-  });
-  exportArray.push(jsConfig);
+  };
 
-  const jsConfig2 = Object.assign({}, config, {
-    name: 'WebWorkers',
-    entry: {
-      positionCruncher: ['./src/js/webworker/positionCruncher.js'],
-      orbitCruncher: ['./src/js/webworker/orbitCruncher.js'],
+  const jsConfig2 = {
+    ...baseConfig,
+    ...{
+      name: 'WebWorkers',
+      entry: {
+        positionCruncher: ['./src/js/webworker/positionCruncher.ts'],
+        orbitCruncher: ['./src/js/webworker/orbitCruncher.js'],
+      },
+      output: {
+        filename: '[name].js',
+        path: __dirname + '/../dist/js',
+        publicPath: './js/',
+      },
     },
-    output: {
-      filename: '[name].js',
-      path: __dirname + '/../dist/js',
-      publicPath: './js/',
+  };
+
+  const jsConfig3 = {
+    ...baseConfig,
+    ...{
+      name: 'Libraries',
+      entry: {
+        'analysis-tools': ['./src/analysis/js/analysis-tools.js'],
+      },
+      plugins: [
+        new webpack.ProvidePlugin({
+          '$': 'jquery',
+          'jQuery': 'jquery',
+          'windows.jQuery': 'jquery',
+        }),
+        new HtmlWebpackPlugin({
+          filename: '../index.htm',
+          template: './src/analysis/index.htm',
+        }),
+      ],
+      output: {
+        filename: '[name].js',
+        path: __dirname + '/../dist/analysis/js/',
+        publicPath: './js/',
+      },
     },
-  });
+  };
+
+  exportArray.push(jsConfig);
   exportArray.push(jsConfig2);
-
-  const jsConfig3 = Object.assign({}, config, {
-    name: 'Libraries',
-    entry: {
-      'analysis-tools': ['./src/analysis/js/analysis-tools.js'],
-    },
-    plugins: [
-      new webpack.ProvidePlugin({
-        '$': 'jquery',
-        'jQuery': 'jquery',
-        'windows.jQuery': 'jquery',
-      }),
-      new HtmlWebpackPlugin({
-        filename: '../index.htm',
-        template: './src/analysis/index.htm',
-      }),
-    ],
-    output: {
-      filename: '[name].js',
-      path: __dirname + '/../dist/analysis/js/',
-      publicPath: './js/',
-    },
-  });
   exportArray.push(jsConfig3);
-
-  // Return Array of Configurations
-  module.exports = [jsConfig, jsConfig2, jsConfig3];
 } else {
-  const jsConfig = Object.assign({}, config, {
-    name: 'MainFiles',
-    entry: {
-      keepTrack: ['./src/js/embed.js'],
+  const jsConfig = {
+    ...baseConfig,
+    ...{
+      name: 'MainFiles',
+      entry: {
+        keepTrack: ['./src/js/embed.js'],
+      },
+      output: {
+        filename: '[name].js',
+        path: __dirname + '/../embed/keepTrack/js',
+        publicPath: './keepTrack/js/',
+      },
     },
-    output: {
-      filename: '[name].js',
-      path: __dirname + '/../embed/keepTrack/js',
-      publicPath: './keepTrack/js/',
-    },
-  });
-  exportArray.push(jsConfig);
+  };
 
-  const jsConfig2 = Object.assign({}, config, {
-    name: 'WebWorkers',
-    entry: {
-      positionCruncher: ['./src/js/webworker/positionCruncher.js'],
-      orbitCruncher: ['./src/js/webworker/orbitCruncher.js'],
+  const jsConfig2 = {
+    ...baseConfig,
+    ...{
+      name: 'WebWorkers',
+      entry: {
+        positionCruncher: ['./src/js/webworker/positionCruncher.ts'],
+        orbitCruncher: ['./src/js/webworker/orbitCruncher.js'],
+      },
+      output: {
+        filename: '[name].js',
+        path: __dirname + '/../embed/keepTrack/js',
+        publicPath: './keepTrack/js/',
+      },
     },
-    output: {
-      filename: '[name].js',
-      path: __dirname + '/../embed/keepTrack/js',
-      publicPath: './keepTrack/js/',
-    },
-  });
+  };
+
+  exportArray.push(jsConfig);
   exportArray.push(jsConfig2);
 }
 

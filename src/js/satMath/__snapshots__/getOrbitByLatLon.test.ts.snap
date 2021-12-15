@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getOrbitByLatLon.getOrbitByLatLon 0 1`] = `
+Array [
+  "1 00005U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991",
+  "2 00005 2958.886 205.7000 0000345 0.000000 17.10000 15.48839820    10",
+]
+`;
+
+exports[`getOrbitByLatLon.getOrbitByLatLon 1 1`] = `
+Array [
+  "1 00005U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991",
+  "2 00005 2958.886 35.36000 0000345 0.000000 208.6000 15.48839820    10",
+]
+`;
+
+exports[`getOrbitByLatLon.getOrbitByLatLon 2 1`] = `
+Array [
+  "1 00005U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991",
+  "2 00005 2958.886 217.5500 0000345 0.000000 17.10000 15.48839820    10",
+]
+`;
+
+exports[`getOrbitByLatLon.getOrbitByLatLon 3 1`] = `
+Array [
+  "Error",
+  "",
+]
+`;
+
+exports[`getOrbitByLatLon.getOrbitByLatLon 4 1`] = `
+Array [
+  "Error",
+  "",
+]
+`;
+
+exports[`getOrbitByLatLon.getOrbitByLatLon 5 1`] = `[Function]`;

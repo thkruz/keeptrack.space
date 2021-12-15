@@ -1,8 +1,9 @@
 import { keepTrackApiStubs } from '../api/apiMocks';
-import { keepTrackApi } from '../api/externalApi';
+import { keepTrackApi } from '../api/keepTrackApi';
+import { KeepTrackPrograms } from '../api/keepTrackTypes';
 import * as uiManager from './uiManager';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('uiManager.legendHoverMenuClick', () => {
@@ -168,7 +169,7 @@ describe('uiManager.legendHoverMenuClick', () => {
 describe('uiManager.legendHoverMenuClick-flagsOff', () => {
   beforeEach(() => {
     keepTrackApi.programs.satSet.setColorScheme = () => {};
-    keepTrackApi.programs.ColorScheme.objectTypeFlags = {
+    keepTrackApi.programs.colorSchemeManager.objectTypeFlags = {
       payload: false,
       radarData: false,
       rocketBody: false,
@@ -204,7 +205,7 @@ describe('uiManager.legendHoverMenuClick-flagsOff', () => {
   });
 
   afterAll(() => {
-    keepTrackApi.programs.ColorScheme.objectTypeFlags = {
+    keepTrackApi.programs.colorSchemeManager.objectTypeFlags = {
       payload: true,
       radarData: true,
       rocketBody: true,
@@ -492,55 +493,6 @@ describe('uiManager.getsensorinfo', () => {
   test('0', () => {
     let result = uiManager.getsensorinfo();
     expect(result).toMatchSnapshot();
-  });
-});
-
-// @ponicode
-describe('uiManager.keyHandler', () => {
-  test('0', () => {
-    document.body.innerHTML = `
-      <div id="datetime-text">
-        <span id="datetime-text-date">
-      </div>
-    `;
-    let result = () => {
-      uiManager.keyHandler(<KeyboardEvent>{ key: 'R' });
-      keepTrackApi.programs.mainCamera.cameraType.current = 0;
-      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
-      keepTrackApi.programs.mainCamera.cameraType.current = 1;
-      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
-      keepTrackApi.programs.mainCamera.cameraType.current = 2;
-      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
-      keepTrackApi.programs.mainCamera.cameraType.current = 3;
-      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
-      keepTrackApi.programs.mainCamera.cameraType.current = 4;
-      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
-      keepTrackApi.programs.mainCamera.cameraType.current = 5;
-      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
-      keepTrackApi.programs.mainCamera.cameraType.current = 6;
-      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
-      keepTrackApi.programs.mainCamera.cameraType.current = 7;
-      uiManager.keyHandler(<KeyboardEvent>{ key: 'C' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: 'F' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: 'H' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '!' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: ',' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: ',' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '.' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '.' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '<' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '<' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '>' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '>' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '0' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '+' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '=' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '-' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '_' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '1' });
-      uiManager.keyHandler(<KeyboardEvent>{ key: '1' });
-    };
-    expect(result).not.toThrow();
   });
 });
 

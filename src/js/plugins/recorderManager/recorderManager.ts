@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { CanvasRecorder } from '@app/js/plugins/recorderManager/CanvasRecorder';
 import $ from 'jquery';
 
@@ -37,7 +37,7 @@ export const bottomMenuClick = (iconName: string): void => {
       try {
         recorder.start();
       } catch (e) {
-        M.toast({
+        (<any>M).toast({
           html: `Compatibility Error with Recording`,
         });
         recorder.setIsRecording(false);

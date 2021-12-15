@@ -1,11 +1,11 @@
-import { RAD2DEG } from '@app/js/lib/constants.js';
+import { RAD2DEG } from '@app/js/lib/constants';
 import { saveAs } from '@app/js/lib/external/file-saver.min.js';
 import { saveCsv } from '@app/js/lib/helpers';
 
 export const exportTle2Csv = (satData: any[]) => {
   try {
     const catalogTLE2 = [];
-    satData.sort((a: { SCC_NUM: string }, b: { SCC_NUM: string }) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
+    satData.sort((a: { sccNum: string }, b: { sccNum: string }) => parseInt(a.sccNum) - parseInt(b.sccNum));
     for (let s = 0; s < satData.length; s++) {
       const sat = satData[s];
       if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
@@ -13,7 +13,7 @@ export const exportTle2Csv = (satData: any[]) => {
       }
       if (sat.C == 'ANALSAT') continue;
       catalogTLE2.push({
-        satId: sat.SCC_NUM,
+        satId: sat.sccNum,
         TLE1: sat.TLE1,
         TLE2: sat.TLE2,
         inclination: sat.inclination * RAD2DEG,
@@ -53,7 +53,7 @@ export const exportTle2Csv = (satData: any[]) => {
 export const exportTle2Txt = (satData: any[]) => {
   try {
     const catalogTLE2 = [];
-    satData.sort((a: { SCC_NUM: string }, b: { SCC_NUM: string }) => parseInt(a.SCC_NUM) - parseInt(b.SCC_NUM));
+    satData.sort((a: { sccNum: string }, b: { sccNum: string }) => parseInt(a.sccNum) - parseInt(b.sccNum));
     for (let s = 0; s < satData.length; s++) {
       const sat = satData[s];
       if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {

@@ -1,14 +1,15 @@
-import { keepTrackApi } from '@app/js/api/externalApi';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { GamepadPlugin } from '@app/js/api/keepTrackTypes';
 
 const gamepadSettings = {
   deadzone: 0.15,
 };
 
 export const init = (): void => {
-  keepTrackApi.programs.gamepad = {
+  keepTrackApi.programs.gamepad = <GamepadPlugin>{
     currentState: null,
   };
-  (<any>window).addEventListener('gamepadconnected', (evt: any) => {
+  window.addEventListener('gamepadconnected', (evt: any) => {
     if (settingsManager.cruncherReady) {
       gamepadConnected(<GamepadEvent>event);
     } else {
@@ -22,7 +23,7 @@ export const init = (): void => {
   window.addEventListener('gamepaddisconnected', () => {
     const { uiManager } = keepTrackApi.programs;
     uiManager.toast('Gamepad disconnected', 'critical');
-    keepTrackApi.programs.gamepad = {
+    keepTrackApi.programs.gamepad = <GamepadPlugin>{
       currentState: null,
     };
   });
@@ -55,7 +56,7 @@ export const updateGamepad = (index?: number): void => {
   updateButtons(controller.buttons);
 };
 
-const buttonsPressed = [];
+const buttonsPressed = <boolean[]>[];
 export const updateButtons = (buttons: readonly GamepadButton[]): void => {
   buttons.forEach((button, index) => {
     // if the button is pressed and wasnt pressed before

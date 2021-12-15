@@ -1,9 +1,10 @@
-import { defaultSensor, keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/externalApi';
-import * as lineManager from '@app/js/drawManager/sceneManager/line-factory';
-/* eslint-disable no-undefined */
+import { defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms, SatObject } from '../../api/keepTrackTypes';
+import { SpaceObjectType } from '../../api/SpaceObjectType';
+import * as lineManager from './line-factory';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 describe('drawWhenSelected', () => {
   let inst: any;
@@ -52,19 +53,19 @@ describe('removeStars', () => {
   });
 
   test('0', () => {
-    inst.drawLineList = [{ sat: { type: 'Star' } }];
+    inst.drawLineList = [{ sat: { type: SpaceObjectType.STAR } }];
     let result: any = inst.removeStars();
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    inst.drawLineList = [{ sat2: { type: 'Star' } }];
+    inst.drawLineList = [{ sat2: { type: SpaceObjectType.STAR } }];
     let result: any = inst.removeStars();
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    inst.drawLineList = [{ sat2: { type: 'Sat' } }];
+    inst.drawLineList = [{ sat2: { type: SpaceObjectType.PAYLOAD } }];
     let result: any = inst.removeStars();
     expect(result).toMatchSnapshot();
   });
@@ -238,7 +239,7 @@ describe('create', () => {
   });
 
   test('22', () => {
-    keepTrackApi.programs.satSet.getSat = () => ({});
+    keepTrackApi.programs.satSet.getSat = () => <SatObject>{};
     let result = inst.create('sat', [25544, 5]);
     expect(result).toMatchSnapshot();
     result = inst.create('sat2', [25544, 10, 10, 10]);

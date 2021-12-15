@@ -1,15 +1,4 @@
-import { isThisJest } from '../api/externalApi';
-
-declare global {
-  // eslint-disable-next-line no-unused-vars
-  interface Window {
-    settingsManager: unknown;
-    jQuery: unknown;
-    $: unknown;
-    gremlins: any;
-    randomizer: any;
-  }
-}
+import { isThisJest } from '../api/keepTrackApi';
 
 // Register all core modules
 export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any }, plugins: any): Promise<void> => {
@@ -84,14 +73,14 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
       method: 'uiManagerFinal',
       cbName: 'core',
       cb: function () {
-        uiManagerFinal(plugins, keepTrackApi);
+        uiManagerFinal(plugins);
       },
     });
   } catch (e) {
     console.debug(e);
   }
 };
-export const uiManagerFinal = (plugins: any, keepTrackApi: { programs?: any; register?: any; plugins?: any }): void => {
+export const uiManagerFinal = (plugins: any): void => {
   const bicDom = document.getElementById('bottom-icons-container');
   if (bicDom) {
     const bottomHeight = bicDom.offsetHeight;
@@ -116,21 +105,21 @@ export const uiManagerFinal = (plugins: any, keepTrackApi: { programs?: any; reg
     document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
   }
 
-  $('#versionNumber-text').html(`${keepTrackApi.programs.settingsManager.versionNumber} - ${keepTrackApi.programs.settingsManager.versionDate}`);
+  $('#versionNumber-text').html(`${settingsManager.versionNumber} - ${settingsManager.versionDate}`);
 
   // Only turn on analytics if on keeptrack.space ()
   if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
     startGoogleAnalytics();
   }
 
-  const wheel = (dom, deltaY) => {
+  const wheel = (dom: HTMLDivElement, deltaY: number) => {
     const step = 0.15;
     const pos = dom.scrollTop();
     const nextPos = pos + step * deltaY;
     dom.scrollTop(nextPos);
   };
 
-  $('#bottom-icons-container').bind('mousewheel', function (event) {
+  $('#bottom-icons-container').bind('mousewheel', function (event: any) {
     wheel($(this), event.originalEvent.deltaY);
     event.preventDefault();
   });
@@ -143,11 +132,11 @@ export const startGoogleAnalytics = (): void => {
   newScript.setAttribute('async', 'true');
   newScript.setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id=G-ENHWK6L0X7');
   document.documentElement.firstChild.appendChild(newScript);
-  (<any>window).dataLayer = (<any>window).dataLayer || [];
+  window.dataLayer = window.dataLayer || [];
   // eslint-disable-next-line no-unused-vars
   const gtag = function (_a?: string, _b?: any): void {
     // eslint-disable-next-line prefer-rest-params
-    (<any>window).dataLayer.push(arguments);
+    window.dataLayer.push(arguments);
   };
   gtag('js', new Date());
   gtag('config', 'G-ENHWK6L0X7');

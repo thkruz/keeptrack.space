@@ -23,7 +23,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 'use strict';
 
-import { searchBox } from '@app/js/uiManager/search-box';
+import { searchBox } from '@app/js/uiManager/searchBox';
 
 // Constants
 const RADIUS_OF_EARTH = 6371000; // Radius of Earth in meters

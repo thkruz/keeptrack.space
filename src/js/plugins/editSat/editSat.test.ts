@@ -1,7 +1,7 @@
 import '@app/js/settingsManager/settingsManager';
 import { expect } from '@jest/globals';
 import { defaultSat, keepTrackApiStubs } from '../../api/apiMocks';
-import { keepTrackApi } from '../../api/externalApi';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import * as editSat from './editSat';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };

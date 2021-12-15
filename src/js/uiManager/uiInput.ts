@@ -1,9 +1,9 @@
-import { Camera, UiInputInterface } from '@app/types/types.js';
 import $ from 'jquery';
-import { RADIUS_OF_EARTH } from '../lib/constants.js';
+import { keepTrackApi } from '../api/keepTrackApi';
+import { Camera, UiInputInterface } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
+import { RADIUS_OF_EARTH } from '../lib/constants';
 import * as glm from '../lib/external/gl-matrix.js';
-
-const keepTrackApi = (<any>window).keepTrackApi;
 
 type LatLon = {
   lat: number;
@@ -112,10 +112,10 @@ export const init = (): void => {
 
   // 2020 Key listener
   // TODO: Migrate most things from UI to Here
-  window.addEventListener('keydown', (e) => {
+  window.addEventListener('keydown', (e: KeyboardEvent) => {
     if (e.ctrlKey === true || e.metaKey === true) mainCamera.isCtrlPressed = true;
   });
-  window.addEventListener('keyup', (e) => {
+  window.addEventListener('keyup', (e: KeyboardEvent) => {
     if (e.ctrlKey === false || e.metaKey === false) mainCamera.isCtrlPressed = false;
   });
 
@@ -132,10 +132,10 @@ export const init = (): void => {
     // left: 37, up: 38, right: 39, down: 40,
     // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
     // var keys = { 37: 1, 38: 1, 39: 1, 40: 1 };
-    // var preventDefault = (e) => {
+    // var preventDefault = (e: Event) => {
     //   e.preventDefault();
     // };
-    // var preventDefaultForScrollKeys = (e) => {
+    // var preventDefaultForScrollKeys = (e: Event) => {
     //   if (keys[e.keyCode]) {
     //     preventDefault(e);
     //     return false;
@@ -154,7 +154,7 @@ export const init = (): void => {
     //       },
     //     })
     //   );
-    // } catch (e) {
+    // } catch (e: Event) {
     //   // Intentional
     // }
     // var wheelOpt = supportsPassive ? { passive: false } : false;
@@ -250,7 +250,7 @@ export const init = (): void => {
   }
 
   if (!settingsManager.disableCameraControls) {
-    window.addEventListener('mouseup', function (evt) {
+    window.addEventListener('mouseup', function (evt: any) {
       // Camera Manager Events
       if (evt.button === 1) {
         mainCamera.isLocalRotateRoll = false;
@@ -264,7 +264,7 @@ export const init = (): void => {
   }
 
   (function _canvasController() {
-    canvasDOM.on('touchmove', function (evt) {
+    canvasDOM.on('touchmove', function (evt: any) {
       if (settingsManager.disableNormalEvents) {
         evt.preventDefault();
       }
@@ -297,7 +297,7 @@ export const init = (): void => {
     });
 
     uiInput.mouseMoveTimeout = -1;
-    canvasDOM.on('mousemove', function (evt) {
+    canvasDOM.on('mousemove', function (evt: any) {
       if (uiInput.mouseMoveTimeout == -1) {
         uiInput.mouseMoveTimeout = window.setTimeout(() => {
           mainCamera.mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
@@ -330,7 +330,7 @@ export const init = (): void => {
       });
     }
     if (!settingsManager.disableUI) {
-      canvasDOM.on('wheel', function (evt) {
+      canvasDOM.on('wheel', function (evt: any) {
         uiInput.canvasWheel(evt);
       });
 
@@ -344,16 +344,16 @@ export const init = (): void => {
           (<any>$).colorbox.close(); // Close colorbox if it was open
         }
       };
-      canvasDOM.on('click', function (evt) {
+      canvasDOM.on('click', function (evt: any) {
         uiInput.canvasClick(evt);
       });
-      canvasDOM.on('mousedown', function (evt) {
+      canvasDOM.on('mousedown', function (evt: any) {
         uiInput.canvasMouseDown(evt);
       });
-      canvasDOM.on('touchstart', function (evt) {
+      canvasDOM.on('touchstart', function (evt: any) {
         uiInput.canvasTouchStart(evt);
       });
-      canvasDOM.on('mouseup', function (evt) {
+      canvasDOM.on('mouseup', function (evt: any) {
         uiInput.canvasMouseUp(evt);
       });
     }
@@ -401,46 +401,46 @@ export const init = (): void => {
     }
 
     if (!settingsManager.disableUI) {
-      bodyDOM.on('keypress', (e) => {
+      bodyDOM.on('keypress', (e: Event) => {
         uiManager.keyHandler(e);
       }); // On Key Press Event Run _keyHandler Function
-      bodyDOM.on('keydown', (e) => {
+      bodyDOM.on('keydown', (e: Event) => {
         if (uiManager.isCurrentlyTyping) return;
         mainCamera.keyDownHandler(e);
       }); // On Key Press Event Run _keyHandler Function
-      bodyDOM.on('keyup', (e) => {
+      bodyDOM.on('keyup', (e: Event) => {
         if (uiManager.isCurrentlyTyping) return;
         mainCamera.keyUpHandler(e);
       }); // On Key Press Event Run _keyHandler Function
 
-      rightBtnSaveMenuDOM.on('click', function (e) {
+      rightBtnSaveMenuDOM.on('click', function (e: Event) {
         uiInput.rmbMenuActions(e);
       });
-      rightBtnViewMenuDOM.on('click', function (e) {
+      rightBtnViewMenuDOM.on('click', function (e: Event) {
         uiInput.rmbMenuActions(e);
       });
-      rightBtnEditMenuDOM.on('click', function (e) {
+      rightBtnEditMenuDOM.on('click', function (e: Event) {
         uiInput.rmbMenuActions(e);
       });
-      rightBtnCreateMenuDOM.on('click', function (e) {
+      rightBtnCreateMenuDOM.on('click', function (e: Event) {
         uiInput.rmbMenuActions(e);
       });
-      rightBtnDrawMenuDOM.on('click', function (e) {
+      rightBtnDrawMenuDOM.on('click', function (e: Event) {
         uiInput.rmbMenuActions(e);
       });
-      rightBtnColorsMenuDOM.on('click', function (e) {
+      rightBtnColorsMenuDOM.on('click', function (e: Event) {
         uiInput.rmbMenuActions(e);
       });
-      rightBtnEarthMenuDOM.on('click', function (e) {
+      rightBtnEarthMenuDOM.on('click', function (e: Event) {
         uiInput.rmbMenuActions(e);
       });
-      $('#reset-camera-rmb').on('click', function (e) {
+      $('#reset-camera-rmb').on('click', function (e: Event) {
         uiInput.rmbMenuActions(e);
       });
-      $('#clear-screen-rmb').on('click', function (e) {
+      $('#clear-screen-rmb').on('click', function (e: Event) {
         uiInput.rmbMenuActions(e);
       });
-      $('#clear-lines-rmb').on('click', function (e) {
+      $('#clear-lines-rmb').on('click', function (e: Event) {
         uiInput.rmbMenuActions(e);
       });
 
@@ -654,7 +654,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
   // No Right Click Without UI
   if (settingsManager.disableUI) return;
 
-  const { uiManager, ColorScheme, starManager, sensorManager, lineManager, satSet, satellite, mainCamera, objectManager, drawManager } = keepTrackApi.programs;
+  const { uiManager, colorSchemeManager, starManager, sensorManager, lineManager, satSet, satellite, mainCamera, objectManager, drawManager } = keepTrackApi.programs;
   const gl = drawManager.gl;
   const M = window.M;
 
@@ -672,7 +672,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
         console.debug('latLon undefined!');
         latLon = satellite.eci2ll(dragPoint[0], dragPoint[1], dragPoint[2]);
       }
-      M.toast({
+      (<any>M).toast({
         html: 'Lat: ' + latLon.lat.toFixed(3) + '<br/>Lon: ' + latLon.lon.toFixed(3),
       });
       break;
@@ -695,7 +695,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
         latLon = satellite.eci2ll(dragPoint[0], dragPoint[1], dragPoint[2]);
       }
       var gpsDOP = satellite.getDops(latLon.lat, latLon.lon, 0);
-      M.toast({
+      (<any>M).toast({
         html: 'HDOP: ' + gpsDOP.hdop + '<br/>VDOP: ' + gpsDOP.vdop + '<br/>PDOP: ' + gpsDOP.pdop + '<br/>GDOP: ' + gpsDOP.gdop + '<br/>TDOP: ' + gpsDOP.tdop,
       });
       break;
@@ -746,7 +746,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
       $('#customSensor').trigger('submit');
 
       uiManager.legendMenuChange('default');
-      satSet.setColorScheme(ColorScheme.default, true);
+      satSet.setColorScheme(colorSchemeManager.default, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       settingsManager.isForceColorScheme = true;
       satSet.satCruncher.postMessage({
@@ -765,7 +765,6 @@ export const rmbMenuActions = (e: MouseEvent) => {
       break;
     case 'clear-lines-rmb':
       lineManager.clear();
-      keepTrackApi.programs.sensorManager.showAllWithFovList = [];
       if (objectManager.isStarManagerLoaded) {
         starManager.isAllConstellationVisible = false;
       }
@@ -780,7 +779,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
       break;
     case 'line-sensor-sat-rmb':
       // Sensor always has to be #2
-      lineManager.create('sat5', [clickedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor.name)], 'p');
+      lineManager.create('sat5', [clickedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name)], 'p');
       break;
     case 'line-sat-sat-rmb':
       lineManager.create('sat3', [clickedSat, objectManager.selectedSat], 'p');
@@ -801,7 +800,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
       $('#cs-type').val('Observer');
       $('#customSensor').trigger('submit');
       uiManager.legendMenuChange('sunlight');
-      satSet.setColorScheme(ColorScheme.sunlight, true);
+      satSet.setColorScheme(colorSchemeManager.sunlight, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       settingsManager.isForceColorScheme = true;
       satSet.satCruncher.postMessage({
@@ -809,17 +808,17 @@ export const rmbMenuActions = (e: MouseEvent) => {
       });
       break;
     case 'colors-default-rmb':
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null) {
+      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
         uiManager.legendMenuChange('default');
       } else {
         uiManager.legendMenuChange('default');
       }
-      satSet.setColorScheme(ColorScheme.default, true);
+      satSet.setColorScheme(colorSchemeManager.default, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'colors-sunlight-rmb':
       uiManager.legendMenuChange('sunlight');
-      satSet.setColorScheme(ColorScheme.sunlight, true);
+      satSet.setColorScheme(colorSchemeManager.sunlight, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       settingsManager.isForceColorScheme = true;
       satSet.satCruncher.postMessage({
@@ -828,17 +827,17 @@ export const rmbMenuActions = (e: MouseEvent) => {
       break;
     case 'colors-country-rmb':
       uiManager.legendMenuChange('countries');
-      satSet.setColorScheme(ColorScheme.countries);
+      satSet.setColorScheme(colorSchemeManager.countries);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'colors-velocity-rmb':
       uiManager.legendMenuChange('velocity');
-      satSet.setColorScheme(ColorScheme.velocity);
+      satSet.setColorScheme(colorSchemeManager.velocity);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'colors-ageOfElset-rmb':
       uiManager.legendMenuChange('ageOfElset');
-      satSet.setColorScheme(ColorScheme.ageOfElset);
+      satSet.setColorScheme(colorSchemeManager.ageOfElset);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'earth-blue-rmb':
@@ -998,7 +997,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
         uiManager.hideSideMenus();
         $('#menu-space-stations').removeClass('bmenu-item-selected');
 
-        if ((!objectManager.isSensorManagerLoaded || sensorManager.currentSensor.lat != null) && mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && mainCamera.cameraType.current !== mainCamera.cameraType.Astronomy) {
+        if ((!objectManager.isSensorManagerLoaded || sensorManager.currentSensor[0].lat != null) && mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && mainCamera.cameraType.current !== mainCamera.cameraType.Astronomy) {
           uiManager.legendMenuChange('default');
         }
 
@@ -1026,8 +1025,8 @@ export const unProject = (x: number, y: number): [number, number, number] => {
   glm.mat4.mul(comboPMat, drawManager.pMatrix, mainCamera.camMatrix);
   const invMat = glm.mat4.create();
   glm.mat4.invert(invMat, comboPMat);
-  const worldVec = glm.vec4.create();
-  glm.vec4.transformMat4(worldVec, screenVec, invMat);
+  const worldVec = <[number, number, number, number]>(<unknown>glm.vec4.create());
+  glm.vec4.transformMat4(<any>worldVec, screenVec, invMat);
 
   return [worldVec[0] / worldVec[3], worldVec[1] / worldVec[3], worldVec[2] / worldVec[3]];
 };
@@ -1335,7 +1334,7 @@ export const openRmbMenu = () => {
     if (typeof clickedSat == 'undefined') return;
     const sat = satSet.getSat(clickedSat);
     if (typeof sat == 'undefined' || sat == null) return;
-    if (typeof satSet.getSat(clickedSat).type == 'undefined' || satSet.getSat(clickedSat).type !== 'Star') {
+    if (typeof satSet.getSat(clickedSat).type == 'undefined' || satSet.getSat(clickedSat).type !== SpaceObjectType.STAR) {
       rightBtnViewDOM.show();
       isViewDOM = true;
       numMenuItems++;
@@ -1348,7 +1347,7 @@ export const openRmbMenu = () => {
       $('#view-sat-info-rmb').show();
       $('#view-related-sats-rmb').show();
 
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor.lat != null && sensorManager.whichRadar !== 'CUSTOM') {
+      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && sensorManager.whichRadar !== 'CUSTOM') {
         $('#line-sensor-sat-rmb').show();
       }
       $('#line-earth-sat-rmb').show();
@@ -1358,8 +1357,14 @@ export const openRmbMenu = () => {
       isDrawDOM = true;
       numMenuItems++;
     } else {
-      if (satSet.getSat(clickedSat).type === 'Optical' || satSet.getSat(clickedSat).type === 'Mechanical' || satSet.getSat(clickedSat).type === 'Ground Sensor Station' || satSet.getSat(clickedSat).type === 'Phased Array Radar') {
-        $('#view-sensor-info-rmb').show();
+      switch (satSet.getSat(clickedSat).type) {
+        case SpaceObjectType.PHASED_ARRAY_RADAR:
+        case SpaceObjectType.OPTICAL:
+        case SpaceObjectType.MECHANICAL:
+        case SpaceObjectType.GROUND_SENSOR_STATION:
+          $('#view-sensor-info-rmb').show();
+          break;
+        default:
       }
     }
   } else {

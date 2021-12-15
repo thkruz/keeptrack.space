@@ -1,12 +1,11 @@
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import { init } from './twitter';
-import { keepTrackApi } from '@app/js/api/externalApi';
+
+keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 test(`main`, async () => {
-  keepTrackApi.programs.uiManager = {
-    hideSideMenus: jest.fn(),
-    searchToggle: jest.fn(),
-  };
-  keepTrackApi.programs.settingsManager = {
+  settingsManager = {
     isMobileModeEnabled: false,
   };
 
@@ -17,7 +16,7 @@ test(`main`, async () => {
   keepTrackApi.methods.bottomMenuClick('menu-twitter');
   keepTrackApi.methods.hideSideMenus();
 
-  keepTrackApi.programs.settingsManager.isMobileModeEnabled = true;
+  settingsManager.isMobileModeEnabled = true;
   keepTrackApi.methods.bottomMenuClick('menu-twitter');
   keepTrackApi.methods.bottomMenuClick('menu-twitter');
 });

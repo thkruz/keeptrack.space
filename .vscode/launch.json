@@ -4,13 +4,22 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-    
     {
       "type": "pwa-chrome",
       "request": "launch",
       "name": "Launch Chrome against localhost",
       "url": "http://localhost:80",
       "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Current TS File",
+      "type": "node",
+      "request": "launch",
+      "args": ["${relativeFile}", "-p", ".\\src\\admin\\node\\node.tsconfig.json"],
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+      "sourceMaps": true,
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector"
     },
     {
       "type": "node",
@@ -24,7 +33,7 @@
       "outFiles": ["${workspaceFolder}/js/**/*.js"],
       "runtimeExecutable": "npm",
       "args": [
-        "test",
+        "test"
         // "--",
         // "--runInBand"
       ]

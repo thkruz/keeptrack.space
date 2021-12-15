@@ -6,13 +6,13 @@ import $ from 'jquery';
 let M = window.M;
 
 var uiLimited = {};
-var satSet, orbitManager, groupsManager, ColorScheme;
+var satSet, orbitManager, groupsManager, colorSchemeManager;
 /* istanbul ignore next */
-uiLimited.init = async (satSetRef, orbitManagerRef, groupsManagerRef, ColorSchemeRef) => {
+uiLimited.init = async (satSetRef, orbitManagerRef, groupsManagerRef, colorSchemeManagerRef) => {
   satSet = satSetRef;
   orbitManager = orbitManagerRef;
   groupsManager = groupsManagerRef;
-  ColorScheme = ColorSchemeRef;
+  colorSchemeManager = colorSchemeManagerRef;
 
   if (document.getElementById('keeptrack-canvas').tagName !== 'CANVAS') {
     console.warn('There is no canvas with id "keeptrack-canvas!!!"');
@@ -38,10 +38,10 @@ uiLimited.init = async (satSetRef, orbitManagerRef, groupsManagerRef, ColorSchem
     M.AutoInit();
     var countriesBtnDOM = $('#countries-btn');
     countriesBtnDOM.on('click', function () {
-      if (settingsManager.currentColorScheme == ColorScheme.countries) {
-        satSet.setColorScheme(ColorScheme.default);
+      if (settingsManager.currentColorScheme == colorSchemeManager.countries) {
+        satSet.setColorScheme(colorSchemeManager.default);
       } else {
-        satSet.setColorScheme(ColorScheme.countries);
+        satSet.setColorScheme(colorSchemeManager.countries);
       }
     });
     var orbitBtnDOM = $('#orbit-btn');
@@ -60,7 +60,7 @@ uiLimited.init = async (satSetRef, orbitManagerRef, groupsManagerRef, ColorSchem
         isTimeMachine = false;
         groupsManager.clearSelect();
         orbitManager.clearHoverOrbit();
-        satSet.setColorScheme(ColorScheme.default, true);
+        satSet.setColorScheme(colorSchemeManager.default, true);
         settingsManager.isOrbitOverlayVisible = false;
       }
     });
@@ -75,7 +75,7 @@ uiLimited.init = async (satSetRef, orbitManagerRef, groupsManagerRef, ColorSchem
 
         settingsManager.colors.transparent = orbitManager.tempTransColor;
         groupsManager.clearSelect();
-        satSet.setColorScheme(ColorScheme.default, true); // force color recalc
+        satSet.setColorScheme(colorSchemeManager.default, true); // force color recalc
 
         $('#menu-time-machine').removeClass('bmenu-item-selected');
       } else {

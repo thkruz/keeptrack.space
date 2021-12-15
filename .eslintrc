@@ -1,6 +1,6 @@
 {
   "env": {
-    "jest/globals": true,
+    "jest": true,
     "browser": true,
     "es2021": true
   },
@@ -11,7 +11,7 @@
     "__dirname": "readonly",
     "settingsManager": "writable"
   },
-  "ignorePatterns": ["**/**/*.min.js", "**/**/tle.js"],
+  "ignorePatterns": ["**/**/*.min.js", "**/**/tle.js", "src/js/lib/external/*"],
   "extends": ["eslint:recommended"],
   "parserOptions": {
     "sourceType": "module",

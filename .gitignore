@@ -39,7 +39,7 @@ jspm_packages/
 .npm
 
 # Package Lock
-package-lock.json
+# package-lock.json
 
 # Optional eslint cache
 .eslintcache
@@ -80,6 +80,9 @@ src/textures/earthmapclouds16k.jpg
 
 # Jest Coverage
 coverage/
+
+# Offline Only
+src/offline
 
 # Build Folder
 dist

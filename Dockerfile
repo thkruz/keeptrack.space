@@ -8,8 +8,7 @@ COPY package.json ./
 COPY tsconfig.json ./
 COPY src src
 COPY scripts scripts
-
-RUN npm i
+COPY node_modules node_modules
 
 RUN npm run build
 

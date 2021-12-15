@@ -675,8 +675,6 @@ exports[`satSet.getSensorFromSensorName 0 1`] = `3`;
 
 exports[`satSet.getSensorFromSensorName 1 1`] = `-1`;
 
-exports[`satSet.initGsData 0 1`] = `undefined`;
-
 exports[`satSet.mergeSat 0 1`] = `undefined`;
 
 exports[`satSet.onCruncherReady 0 1`] = `undefined`;

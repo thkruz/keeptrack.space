@@ -124,19 +124,9 @@ export const breakupOnSubmit = (): void => {
 
   // Launch Points are the Satellites Current Location
   // TODO: Remove TEARR References
-  //
-  // var latlon = satellite.eci2ll(mainsat.position.x,mainsat.position.y,mainsat.position.z);
-  // var launchLat = satellite.degreesLat(latlon.lat * DEG2RAD);
-  // var launchLon = satellite.degreesLong(latlon.lon * DEG2RAD);
-  // var alt = satellite.altitudeCheck(mainsat.TLE1, mainsat.TLE2, timeManager.getPropOffset());
-  // console.log(launchLat);
-  // console.log(launchLon);
-  // console.log(alt);
-  // Launch Points are the Satellites Current Location
   const TEARR = mainsat.getTEARR();
   const launchLat = satellite.degreesLat(TEARR.lat);
   const launchLon = satellite.degreesLong(TEARR.lon);
-  const alt = TEARR.alt;
 
   const simulationTimeObj = timeManager.calculateSimulationTime();
 
@@ -147,13 +137,8 @@ export const breakupOnSubmit = (): void => {
 
   keepTrackApi.programs.mainCamera.isCamSnapMode = false;
 
-  let TLEs;
-  // Ignore argument of perigee for round orbits OPTIMIZE
-  if (mainsat.apogee - mainsat.perigee < 300) {
-    TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, simulationTimeObj);
-  } else {
-    TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, simulationTimeObj, alt);
-  }
+  const alt = mainsat.apogee - mainsat.perigee < 300 ? 0 : TEARR.alt; // Ignore argument of perigee for round orbits OPTIMIZE
+  let TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, simulationTimeObj, alt);
   const TLE1 = TLEs[0];
   const TLE2 = TLEs[1];
   satSet.satCruncher.postMessage({
@@ -164,62 +149,44 @@ export const breakupOnSubmit = (): void => {
   });
   orbitManager.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
-  let breakupSearchString = '';
-
   const meanmoVariation = parseFloat(<string>$('#hc-per').val());
   const incVariation = parseFloat(<string>$('#hc-inc').val());
   const rascVariation = parseFloat(<string>$('#hc-raan').val());
+  // const eVariation = 0.001;
+  // const origEcc = mainsat.eccentricity;
 
-  const breakupCount = 100; // settingsManager.maxAnalystSats;
+  const breakupCount = 256; // settingsManager.maxAnalystSats;
   for (let i = 0; i < breakupCount; i++) {
     for (let incIterat = 0; incIterat <= 4; incIterat++) {
       for (let meanmoIterat = 0; meanmoIterat <= 4; meanmoIterat++) {
         for (let rascIterat = 0; rascIterat <= 4; rascIterat++) {
-          if (i >= breakupCount) continue;
+          if (i >= breakupCount) break;
           satId = satSet.getIdFromObjNum(80000 + i);
-          let sat: SatObject = satSet.getSat(satId);
+          let sat = satSet.getSat(satId);
           sat = origsat;
           let iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7);
 
           const rascOffset = -rascVariation / 2 + rascVariation * (rascIterat / 4);
+          // sat.eccentricity = origEcc;
+          // sat.eccentricity += -eVariation / 2 + eVariation * (eVariation / 4);
 
-          var iTLEs;
-          // Ignore argument of perigee for round orbits OPTIMIZE
-          if (sat.apogee - sat.perigee < 300) {
-            iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj, 0, rascOffset);
-          } else {
-            iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj, alt, rascOffset);
-          }
+          const alt = mainsat.apogee - mainsat.perigee < 300 ? 0 : TEARR.alt; // Ignore argument of perigee for round orbits OPTIMIZE
+          let iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj, alt, rascOffset);
+
           iTLE1 = iTLEs[0];
           let iTLE2 = iTLEs[1];
 
           // For the first 30
-          let inc: string | number | string[] = parseFloat(TLE2.substr(8, 8));
-          inc = (inc - incVariation / 2 + incVariation * (incIterat / 4)).toPrecision(7);
-          inc = inc.split('.');
-          inc[0] = inc[0].substr(-3, 3);
-          if (inc[1]) {
-            inc[1] = inc[1].substr(0, 4);
-          } else {
-            inc[1] = '0000';
-          }
-          inc = (inc[0] + '.' + inc[1]).toString();
-          inc = stringPad.padEmpty(inc, 8);
+          let inc = parseFloat(TLE2.substr(8, 8));
+          inc = inc - incVariation / 2 + incVariation * (incIterat / 4);
+          const incStr = stringPad.pad0(inc.toPrecision(7), 8);
 
           // For the second 30
-          let meanmo: string | number | string[] = parseFloat(iTLE2.substr(52, 10));
-          meanmo = (meanmo - (meanmo * meanmoVariation) / 2 + meanmo * meanmoVariation * (meanmoIterat / 4)).toPrecision(10);
-          // meanmo = parseFloat(meanmo - (0.005 / 10) + (0.01 * ((meanmoIterat + 1) / 10))).toPrecision(10);
-          meanmo = meanmo.split('.');
-          meanmo[0] = meanmo[0].substr(-2, 2);
-          if (meanmo[1]) {
-            meanmo[1] = meanmo[1].substr(0, 8);
-          } else {
-            meanmo[1] = '00000000';
-          }
-          meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
+          let meanmo = parseFloat(iTLE2.substr(52, 10));
+          meanmo = meanmo - (meanmo * meanmoVariation) / 2 + meanmo * meanmoVariation * (meanmoIterat / 4);
+          const meanmoStr = stringPad.pad0(meanmo.toPrecision(10), 8);
 
-          iTLE2 = `2 ${80000 + i} ${inc} ${iTLE2.substr(17, 35)}${meanmo}${iTLE2.substr(63)}`;
+          iTLE2 = `2 ${80000 + i} ${incStr} ${iTLE2.substr(17, 35)}${meanmoStr}${iTLE2.substr(63)}`;
           sat = satSet.getSat(satId);
           sat.TLE1 = iTLE1;
           sat.TLE2 = iTLE2;
@@ -240,9 +207,8 @@ export const breakupOnSubmit = (): void => {
       }
     }
   }
-  breakupSearchString += mainsat.sccNum + ',Analyst Sat';
-  uiManager.doSearch(breakupSearchString);
 
+  uiManager.doSearch(`${mainsat.sccNum},Analyst Sat`);
   $('#loading-screen').fadeOut('slow');
 };
 

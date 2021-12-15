@@ -35,32 +35,34 @@ const opts = {
   cover: true, // cover file when exists, default is true
 };
 
-console.log(`Removing ./dist...`);
+console.log('Starting prebuild...');
+
+// console.log(`Removing ./dist...`);
 try {
   rimraf.sync('./dist');
 } catch (error) {
   //
 }
 
-console.log(`Creating ./dist...`);
+// console.log(`Creating ./dist...`);
 try {
   mkdirp.sync('./dist');
 } catch (error) {
   //
 }
 
-console.log(`Creating ./dist/plugins...`);
+// console.log(`Creating ./dist/plugins...`);
 mkdirp.sync('./dist/plugins');
-console.log(`Creating ./dist/settings...`);
+// console.log(`Creating ./dist/settings...`);
 mkdirp.sync('./dist/settings');
-console.log(`Creating ./dist/css...`);
+// console.log(`Creating ./dist/css...`);
 mkdirp.sync('./dist/css');
-console.log(`Creating ./dist/js/lib...`);
+// console.log(`Creating ./dist/js/lib...`);
 mkdirp.sync('./dist/js/lib');
 
 dirs.forEach((dir) => {
   try {
-    console.log(`Copying ${dir}...`);
+    // console.log(`Copying ${dir}...`);
     copydir.sync(`./src/${dir}`, `./dist/${dir}`, opts);
   } catch (error) {
     // console.log(error);
@@ -68,11 +70,13 @@ dirs.forEach((dir) => {
 });
 
 files.forEach((file) => {
-  console.log(`Copying ${file}...`);
+  // console.log(`Copying ${file}...`);
   copySync(`./src/${file}`, `./dist/${file}`);
 });
 
-console.log(`Copying settings...`);
+// console.log(`Copying settings...`);
 copySync(`./src/js/settingsManager/settingsManager.js`, `./dist/settings/settings.js`);
-console.log(`Copying settingsOverride...`);
+// console.log(`Copying settingsOverride...`);
 copySync(`./src/js/settingsManager/settingsOverride.js`, `./dist/settings/settingsOverride.js`);
+
+console.log('Finished prebuild.');

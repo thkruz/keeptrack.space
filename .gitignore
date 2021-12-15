@@ -98,3 +98,4 @@ key.pem
 # dccache
 .dccache
 .dcignore
+.cache/server.pem

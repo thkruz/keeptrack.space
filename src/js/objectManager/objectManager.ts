@@ -2,7 +2,7 @@
 // This loads all of the various modules that provide objects for the screen
 
 import { keepTrackApi } from '../api/keepTrackApi';
-import { ObjectManager } from '../api/keepTrackTypes';
+import { ObjectManager, SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { stars } from '../starManager/stars.js';
 import { controlSiteManager, ControlSiteObject } from './controlSiteManager';
@@ -466,7 +466,7 @@ const init = () => {
       static: false,
       missile: true,
       active: false,
-      type: '',
+      type: SpaceObjectType.UNKNOWN,
       name: i,
       latList: [],
       lonList: [],
@@ -482,7 +482,7 @@ const init = () => {
       missile: false,
       active: false,
       isRadarData: true,
-      type: '',
+      type: SpaceObjectType.UNKNOWN,
       name: `Radar Data ${i}`,
     };
     objectManager.radarDataSet.push(radarDataInfo);
@@ -491,19 +491,19 @@ const init = () => {
   // Create a buffer of analyst satellite objects
   for (let i = 0; i < settingsManager.maxAnalystSats; i++) {
     const sccNum = (80000 + i).toString();
-    objectManager.analSatSet.push({
+    objectManager.analSatSet.push(<SatObject>{
       static: false,
       missile: false,
       active: false,
-      ON: 'Analyst Sat ' + i,
-      C: 'ANALSAT',
-      LV: 'Analyst Satellite',
-      LS: 'ANALSAT',
+      name: 'Analyst Sat ' + i,
+      country: 'ANALSAT',
+      launchVehicle: 'Analyst Satellite',
+      launchSite: 'ANALSAT',
       sccNum: sccNum,
       TLE1: `${TEMPLATE_TLE1_BEGINNING}${sccNum}${TEMPLATE_TLE1_ENDING}`,
       TLE2: `${TEMPLATE_TLE2_BEGINNING}${sccNum}${TEMPLATE_TLE2_ENDING}`,
       intlDes: TEMPLATE_INTLDES,
-      type: 'sat',
+      type: SpaceObjectType.PAYLOAD,
       id: i,
     });
   }

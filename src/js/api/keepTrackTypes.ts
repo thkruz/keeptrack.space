@@ -510,7 +510,7 @@ export interface ObjectManager {
   starIndex1: number;
   starIndex2: number;
   staticSet: any;
-  analSatSet: any;
+  analSatSet: SatObject[];
   radarDataSet: any;
   missileSet: any;
   isStarManagerLoaded: any;

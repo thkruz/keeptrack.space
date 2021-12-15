@@ -298,7 +298,7 @@ export const legendMenuChange = (menu: string) => {
     $('.legend-velocityFast-box').css('background', [0, 1, 0.0, 1.0].toString());
     colorSchemeManager.objectTypeFlags.velocityFast = true;
     $('.legend-inviewAlt-box').css('background', settingsManager.colors.inViewAlt.toString());
-    colorSchemeManager.objectTypeFlagsinViewAlt = true;
+    colorSchemeManager.objectTypeFlags.inViewAlt = true;
     $('.legend-satLEO-box').css('background', settingsManager.colors.satLEO.toString());
     colorSchemeManager.objectTypeFlags.satLEO = true;
     $('.legend-satGEO-box').css('background', settingsManager.colors.satGEO.toString());
@@ -544,13 +544,13 @@ export const legendHoverMenuClick = (legendType?: string) => {
       }
       break;
     case 'legend-inviewAlt-box':
-      if (colorSchemeManager.objectTypeFlagsinViewAlt) {
-        colorSchemeManager.objectTypeFlagsinViewAlt = false;
+      if (colorSchemeManager.objectTypeFlags.inViewAlt) {
+        colorSchemeManager.objectTypeFlags.inViewAlt = false;
         $('.legend-inviewAlt-box').css('background', 'black');
         settingsManager.isForceColorScheme = true;
         satSet.setColorScheme(settingsManager.currentColorScheme, true);
       } else {
-        colorSchemeManager.objectTypeFlagsinViewAlt = true;
+        colorSchemeManager.objectTypeFlags.inViewAlt = true;
         $('.legend-inviewAlt-box').css('background', rgbCss(settingsManager.colors.inViewAlt));
         settingsManager.isForceColorScheme = true;
         satSet.setColorScheme(settingsManager.currentColorScheme, true);

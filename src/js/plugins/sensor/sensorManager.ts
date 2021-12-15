@@ -24,6 +24,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { spaceObjType2Str } from '@app/js/lib/spaceObjType2Str';
 import $ from 'jquery';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { SensorManager, SensorObject } from '../../api/keepTrackTypes';
@@ -221,7 +222,7 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
           });
         }).catch((err) => console.warn(err));
 
-        $('#sensor-type').html(sensorManager.selectedSensor.type);
+        $('#sensor-type').html(spaceObjType2Str(sensorManager.selectedSensor.type));
         $('#sensor-country').html(sensorManager.selectedSensor.country);
         sensorManager.sensorTitle = sensorManager.selectedSensor.name;
 

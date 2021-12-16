@@ -33,8 +33,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
       # Audit Package.json
-      - name: NPM Audit Report
-        uses: wx-jayesh/actions-npm-audit-comment@v1.0.0
+      - name: NPM Audit Action
+        uses: oke-py/npm-audit-action@v1.8.2
   build:
     needs: compliance
     name: Build

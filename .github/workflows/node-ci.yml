@@ -17,12 +17,14 @@ jobs:
       with:
         file_or_dir: .github/workflows/node-ci.yaml
   compliance:
+    needs: lint-yml
     name: NPM Audit Report
     runs-on: ubuntu-latest
     steps:
     - name: NPM Audit Report
       uses: wx-jayesh/actions-npm-audit-comment@v1.0.0
   build:
+    needs: compliance
     name: Build
     runs-on: ubuntu-latest
     
@@ -55,6 +57,7 @@ jobs:
 
     - run: node ./node_modules/.bin/codecov
   unit-tests:
+    needs: build
     name: Unit Tests
     runs-on: ubuntu-latest
     
@@ -62,6 +65,7 @@ jobs:
       - name: Test
         run: npm test
   analyze:
+    needs: unit-tests
     name: Analyze
     runs-on: ubuntu-latest
 
@@ -85,6 +89,7 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
   security:
+    needs: analyze
     runs-on: ubuntu-latest
     steps:
       - name: Test for public javascript library vulnerabilities 

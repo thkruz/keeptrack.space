@@ -1,6 +1,7 @@
-name: Node.js CI
+---
+name: Build Pipeline
 
-on: 
+on:
   workflow_dispatch:
   push:
     branches:
@@ -12,7 +13,7 @@ on:
 jobs:
   lint-yml:
     name: Yaml Lint
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -57,7 +58,7 @@ jobs:
     - name: Build
       run: npm build
 
-    
+
 
     - run: node ./node_modules/.bin/codecov
   unit-tests:
@@ -65,7 +66,7 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     
-    steps:    
+    steps:
       - name: Test
         run: npm test
   analyze:
@@ -78,7 +79,7 @@ jobs:
       matrix:
         language: [ 'javascript' ]        
 
-    steps:        
+    steps:
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@v1.6
 
@@ -97,7 +98,7 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - name: Test for public javascript library vulnerabilities 
+      - name: Test for public javascript library vulnerabilities
         uses: lirantal/is-website-vulnerable@master
         with:
           scan-url: "https://thkruz.github.io/keeptrack.space/"

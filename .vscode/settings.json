@@ -13,5 +13,8 @@
       "source.fixAll.eslint": true,
       "source.addMissingImports": true
     }
+  },
+  "[yaml]": {
+    "editor.autoIndent": "advanced"
   }
 }

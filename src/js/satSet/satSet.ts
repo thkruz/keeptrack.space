@@ -90,7 +90,9 @@ export const init = async (satCruncherOveride?: any): Promise<void> => {
       } catch (error) {
         // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
         if (window.location.href.indexOf('file://') === 0) {
-          $('#loader-text').text('Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.');
+          $('#loader-text').text(
+            'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.'
+          );
         } else {
           console.debug(error);
         }
@@ -160,7 +162,11 @@ export const setHover = (i: number): void => {
   gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.lasthoveringSat !== -1 && objectManager.lasthoveringSat !== objectManager.selectedSat) {
-    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lasthoveringSat * 4 * 4, new Float32Array(colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lasthoveringSat)).color));
+    gl.bufferSubData(
+      gl.ARRAY_BUFFER,
+      objectManager.lasthoveringSat * 4 * 4,
+      new Float32Array(colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lasthoveringSat)).color)
+    );
   }
   // If New Select Sat Picked Color it
   if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
@@ -196,7 +202,11 @@ export const selectSat = (i: number): void => {
   gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.lastSelectedSat() !== -1) {
-    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lastSelectedSat() * 4 * 4, new Float32Array(colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lastSelectedSat())).color));
+    gl.bufferSubData(
+      gl.ARRAY_BUFFER,
+      objectManager.lastSelectedSat() * 4 * 4,
+      new Float32Array(colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lastSelectedSat())).color)
+    );
   }
   // If New Select Sat Picked Color it
   if (i !== -1) {
@@ -279,7 +289,10 @@ export const addSatExtraFunctions = (i: number) => {
       // var distSatEarthZ = Math.pow(-satSet.satData[i].position.z, 2);
       // var distSatEarth = Math.sqrt(distSatEarthX + distSatEarthY + distSatEarthZ);
       // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
-      const semiDiamEarth = Math.asin(RADIUS_OF_EARTH / Math.sqrt(Math.pow(-satSet.satData[i].position.x, 2) + Math.pow(-satSet.satData[i].position.y, 2) + Math.pow(-satSet.satData[i].position.z, 2))) * RAD2DEG;
+      const semiDiamEarth =
+        Math.asin(
+          RADIUS_OF_EARTH / Math.sqrt(Math.pow(-satSet.satData[i].position.x, 2) + Math.pow(-satSet.satData[i].position.y, 2) + Math.pow(-satSet.satData[i].position.z, 2))
+        ) * RAD2DEG;
 
       // Position needs to be relative to satellite NOT ECI
       // var distSatSunX = Math.pow(-satSet.satData[i].position.x + sunECI.x, 2);
@@ -287,16 +300,29 @@ export const addSatExtraFunctions = (i: number) => {
       // var distSatSunZ = Math.pow(-satSet.satData[i].position.z + sunECI.z, 2);
       // var distSatSun = Math.sqrt(distSatSunX + distSatSunY + distSatSunZ);
       // var semiDiamSun = Math.asin(RADIUS_OF_SUN/distSatSun) * RAD2DEG;
-      const semiDiamSun = Math.asin(RADIUS_OF_SUN / Math.sqrt(Math.pow(-satSet.satData[i].position.x + sunECI.x, 2) + Math.pow(-satSet.satData[i].position.y + sunECI.y, 2) + Math.pow(-satSet.satData[i].position.z + sunECI.z, 2))) * RAD2DEG;
+      const semiDiamSun =
+        Math.asin(
+          RADIUS_OF_SUN /
+            Math.sqrt(
+              Math.pow(-satSet.satData[i].position.x + sunECI.x, 2) + Math.pow(-satSet.satData[i].position.y + sunECI.y, 2) + Math.pow(-satSet.satData[i].position.z + sunECI.z, 2)
+            )
+        ) * RAD2DEG;
 
       // Angle between earth and sun
       const theta =
         Math.acos(
           <number>(
-            numeric.dot([-satSet.satData[i].position.x, -satSet.satData[i].position.y, -satSet.satData[i].position.z], [-satSet.satData[i].position.x + sunECI.x, -satSet.satData[i].position.y + sunECI.y, -satSet.satData[i].position.z + sunECI.z])
+            numeric.dot(
+              [-satSet.satData[i].position.x, -satSet.satData[i].position.y, -satSet.satData[i].position.z],
+              [-satSet.satData[i].position.x + sunECI.x, -satSet.satData[i].position.y + sunECI.y, -satSet.satData[i].position.z + sunECI.z]
+            )
           ) /
             (Math.sqrt(Math.pow(-satSet.satData[i].position.x, 2) + Math.pow(-satSet.satData[i].position.y, 2) + Math.pow(-satSet.satData[i].position.z, 2)) *
-              Math.sqrt(Math.pow(-satSet.satData[i].position.x + sunECI.x, 2) + Math.pow(-satSet.satData[i].position.y + sunECI.y, 2) + Math.pow(-satSet.satData[i].position.z + sunECI.z, 2)))
+              Math.sqrt(
+                Math.pow(-satSet.satData[i].position.x + sunECI.x, 2) +
+                  Math.pow(-satSet.satData[i].position.y + sunECI.y, 2) +
+                  Math.pow(-satSet.satData[i].position.z + sunECI.z, 2)
+              ))
         ) * RAD2DEG;
 
       // var isSun = false;
@@ -393,7 +419,15 @@ export const addSatExtraFunctions = (i: number) => {
       // TOOD: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
       const sensor = sensors[0];
 
-      let now: { getUTCFullYear: () => any; getUTCMonth: () => number; getUTCDate: () => any; getUTCHours: () => any; getUTCMinutes: () => any; getUTCSeconds: () => any; getUTCMilliseconds: () => number };
+      let now: {
+        getUTCFullYear: () => any;
+        getUTCMonth: () => number;
+        getUTCDate: () => any;
+        getUTCHours: () => any;
+        getUTCMinutes: () => any;
+        getUTCSeconds: () => any;
+        getUTCMilliseconds: () => number;
+      };
       if (typeof propTime != 'undefined' && propTime !== null) {
         now = propTime;
       } else {

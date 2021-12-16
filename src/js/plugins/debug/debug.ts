@@ -16,7 +16,9 @@ export const getRandomInt = (min: number, max: number): any => {
 };
 
 export const defaultPositionSelector = () => {
-  [getRandomInt(0, Math.max(0, document.documentElement.clientWidth - 1)), getRandomInt(Math.max(0, document.documentElement.clientHeight - 100), Math.max(0, document.documentElement.clientHeight - 1))];
+  const x = getRandomInt(0, Math.max(0, document.documentElement.clientWidth - 1));
+  const y = getRandomInt(Math.max(0, document.documentElement.clientHeight - 100), Math.max(0, document.documentElement.clientHeight - 1));
+  return [x, y];
 };
 export const canClick = (element: { parentElement: { className: string } }) => {
   if (typeof element.parentElement == 'undefined' || element.parentElement == null) return null;
@@ -38,12 +40,18 @@ export const startGremlins = () => {
   });
   gremlins
     .createHorde({
-      species: [bottomMenuGremlinClicker, bottomMenuGremlinScroller, gremlins.species.clicker(), gremlins.species.toucher(), gremlins.species.formFiller(), gremlins.species.typer()],
+      species: [
+        bottomMenuGremlinClicker,
+        bottomMenuGremlinScroller,
+        gremlins.species.clicker(),
+        gremlins.species.toucher(),
+        gremlins.species.formFiller(),
+        gremlins.species.typer(),
+      ],
       mogwais: [gremlins.mogwais.alert(), gremlins.mogwais.fps(), gremlins.mogwais.gizmo({ maxErrors: 1000 })],
       strategies: [distributionStrategy],
     })
     .unleash();
-  return;
 };
 export const runGremlins = () => {
   $('#nav-footer').height(200);

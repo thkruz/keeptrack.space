@@ -12,7 +12,7 @@ export const generateConfig = (env, isWatch) => {
 
   const webpackConfig = [];
   env = env === 'test' ? 'development' : env;
-  env ??= 'production';
+  env = typeof env === 'undefined' ? 'production' : env;
 
   let baseConfig = getBaseConfig(dirName);
 
@@ -217,7 +217,7 @@ const getWebWorkerConfig = (baseConfig, dirName, subFolder, pubPath) => ({
     name: 'WebWorkers',
     entry: {
       positionCruncher: ['./src/js/webworker/positionCruncher.ts'],
-      orbitCruncher: ['./src/js/webworker/orbitCruncher.js'],
+      orbitCruncher: ['./src/js/webworker/orbitCruncher.ts'],
     },
     output: {
       filename: '[name].js',

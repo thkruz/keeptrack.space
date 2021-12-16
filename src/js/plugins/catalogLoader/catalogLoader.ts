@@ -18,7 +18,7 @@ import { stringPad } from '@app/js/lib/helpers';
  *
  *  If all files are missing, the function will return an error.
  */
-export const catalogLoader = async (): Promise<any> => {
+export const catalogLoader = async (): Promise<void> => {
   const settingsManager: any = window.settingsManager;
 
   try {

@@ -8,22 +8,54 @@ on:
       - master
 
 jobs:
+  analyze:
+    needs: build
+    name: Analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # SonarQube
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v1.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   gh-pages:
     name: Deploy to GitHub Pages
     environment: Development
     runs-on: ubuntu-latest
     steps:
-      # Checkout Code
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2.3.1
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
-          persist-credentials: false
-
-      # Install and Build
-      - name: Install and Build 🔧
-        run: |
-          npm ci
-          npm run build:dev
+          node-version: "17"
+      # Get Node Modules from Cache
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-
+            ${{ env.cache-name }}-
+            ${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      # Ensure Node Modules Setup
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+      # Build
+      - name: Build
+        run: npm run build
 
       # Deploy to GitHub Pages
       - name: Deploy 🚀
@@ -83,7 +115,7 @@ jobs:
         with:
           sftp: true # optional
           host: ${{ secrets.FTP_HOST }}
-          port: 21
+          port: 22
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           remote_folder: ${{ secrets.FTP_REMOTE_FOLDER }}

@@ -31,7 +31,6 @@ import '@materializecss/materialize';
 // eslint-disable-next-line sort-imports
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { drawManager } from '@app/js/drawManager/drawManager';
-import { colorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
 import { DEG2RAD } from '@app/js/lib/constants';
 import { rgbCss } from '@app/js/lib/helpers';
 import { mobileManager } from '@app/js/uiManager/mobileManager';
@@ -67,7 +66,6 @@ export const init = () => {
   // These run during the draw loop
   // TODO: Move DrawLoopCallback logic to the API so that plugins can use it too!
   drawManager.setDrawLoopCallback(function () {
-    // _showSatTest();
     _updateSelectBox();
   });
 
@@ -98,12 +96,12 @@ export const init = () => {
     maxHeight: maxHeight,
     minHeight: 50,
     stop: () => {
-      const bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
+      let bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
       document.documentElement.style.setProperty('--bottom-menu-height', bottomHeight + 'px');
       if (window.getComputedStyle(document.getElementById('nav-footer')).bottom !== '0px') {
         document.documentElement.style.setProperty('--bottom-menu-top', '0px');
       } else {
-        const bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
+        bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
         document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
       }
     },
@@ -185,7 +183,7 @@ const _updateSelectBox = () => {
 };
 
 export const legendMenuChange = (menu: string) => {
-  const { objectManager, sensorManager } = keepTrackApi.programs;
+  const { objectManager, sensorManager, colorSchemeManager } = keepTrackApi.programs;
 
   $('#legend-list-default').hide();
   $('#legend-list-default-sensor').hide();
@@ -328,7 +326,6 @@ var isFooterShown = true;
 export const footerToggle = function () {
   if (isFooterShown) {
     isFooterShown = false;
-    // uiManager.hideSideMenus();
     $('#sat-infobox').addClass('sat-infobox-fullsize');
     $('#nav-footer').addClass('footer-slide-trans');
     $('#nav-footer').removeClass('footer-slide-up');
@@ -371,7 +368,7 @@ let doSearch = (searchString: string, isPreventDropDown: boolean) => {
 };
 
 export const legendHoverMenuClick = (legendType?: string) => {
-  const { satSet } = keepTrackApi.programs;
+  const { satSet, colorSchemeManager } = keepTrackApi.programs;
 
   switch (legendType) {
     case 'legend-payload-box':
@@ -923,9 +920,6 @@ uiManager.panToStar = function (c) {
   // Need to calculate the time to get the right RA offset
   // ======================================================
   mainCamera.camSnap(mainCamera.latToPitch(sat.dec) * -1, mainCamera.longToYaw(sat.ra * DEG2RAD, timeManager.selectedDate));
-  setTimeout(function () {
-    // console.log(`pitch ${camPitch * RAD2DEG} -- yaw ${camYaw * RAD2DEG}`);
-  }, 2000);
 };
 uiManager.loadStr = (str) => {
   if (str == '') {
@@ -934,24 +928,6 @@ uiManager.loadStr = (str) => {
   }
   if (str == 'math') {
     $('#loader-text').html('Attempting to Math...');
-  }
-
-  if (settingsManager.altLoadMsgs) {
-    if (typeof settingsManager.altMsgNum !== 'undefined') return;
-    settingsManager.altMsgNum = Math.random();
-    let msg = '';
-
-    if (settingsManager.altMsgNum > 0) {
-      msg = `KeepTrack is on the front page of <a style="color: #48f3e3 !important;" href="https://clearspace.today" target="_blank">ClearSpace-1's Website</a>!`;
-    }
-    if (settingsManager.altMsgNum > 0.33) {
-      msg = `KeepTrack provided visuals for Studio Roosegaarde's <a style="color: #48f3e3 !important;" href="https://www.studioroosegaarde.net/project/space-waste-lab" target="_blank">Space Waste Lab</a>!`;
-    }
-    if (settingsManager.altMsgNum > 0.66) {
-      msg = `KeepTrack was used by the <a style="color: #48f3e3 !important;" href="https://www.youtube.com/embed/OfvkKBNup5A?autoplay=0&start=521&modestbranding=1" target="_blank">Joint Space Operations Center</a>!`;
-    }
-    $('#loader-text').html(msg);
-    return;
   }
 
   switch (str) {
@@ -1012,21 +988,21 @@ uiManager.toast = (toastText: string, type: string, isLong: boolean) => {
   if (isLong) toastMsg.timeRemaining = 100000;
   switch (type) {
     case 'standby':
-      (<any>toastMsg).$el[0].style.background = 'var(--statusDarkStandby)';
+      toastMsg.$el[0].style.background = 'var(--statusDarkStandby)';
       keepTrackApi.programs.soundManager.play('standby');
       break;
     case 'normal':
-      (<any>toastMsg).$el[0].style.background = 'var(--statusDarkNormal)';
+      toastMsg.$el[0].style.background = 'var(--statusDarkNormal)';
       keepTrackApi.programs.soundManager.play('standby');
       break;
     case 'caution':
-      (<any>toastMsg).$el[0].style.background = 'var(--statusDarkCaution)';
+      toastMsg.$el[0].style.background = 'var(--statusDarkCaution)';
       break;
     case 'serious':
-      (<any>toastMsg).$el[0].style.background = 'var(--statusDarkSerious)';
+      toastMsg.$el[0].style.background = 'var(--statusDarkSerious)';
       break;
     case 'critical':
-      (<any>toastMsg).$el[0].style.background = 'var(--statusDarkCritical)';
+      toastMsg.$el[0].style.background = 'var(--statusDarkCritical)';
       break;
   }
 };
@@ -1109,6 +1085,8 @@ uiManager.colorSchemeChangeAlert = (newScheme) => {
     uiManager.lastColorScheme = newScheme;
     return;
   }
+
+  const { colorSchemeManager } = keepTrackApi.programs;
 
   // Don't make an alert unless something has really changed
   if (uiManager.lastColorScheme == newScheme) return;

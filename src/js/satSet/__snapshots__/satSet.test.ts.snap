@@ -235,10 +235,10 @@ Object {
   "type": 1,
   "user": "Government",
   "velocity": Object {
-    "total": NaN,
-    "x": undefined,
-    "y": undefined,
-    "z": undefined,
+    "total": 0,
+    "x": 0,
+    "y": 0,
+    "z": 0,
   },
 }
 `;
@@ -295,10 +295,10 @@ Object {
   "type": 1,
   "user": "Government",
   "velocity": Object {
-    "total": NaN,
-    "x": undefined,
-    "y": undefined,
-    "z": undefined,
+    "total": 0,
+    "x": 0,
+    "y": 0,
+    "z": 0,
   },
 }
 `;
@@ -355,10 +355,10 @@ Object {
   "type": 1,
   "user": "Government",
   "velocity": Object {
-    "total": NaN,
-    "x": undefined,
-    "y": undefined,
-    "z": undefined,
+    "total": 0,
+    "x": 0,
+    "y": 0,
+    "z": 0,
   },
 }
 `;
@@ -439,10 +439,10 @@ Object {
   "type": 1,
   "user": "Government",
   "velocity": Object {
-    "total": NaN,
-    "x": undefined,
-    "y": undefined,
-    "z": undefined,
+    "total": 0,
+    "x": 0,
+    "y": 0,
+    "z": 0,
   },
 }
 `;
@@ -497,10 +497,10 @@ Object {
   "type": 1,
   "user": "Government",
   "velocity": Object {
-    "total": NaN,
-    "x": undefined,
-    "y": undefined,
-    "z": undefined,
+    "total": 0,
+    "x": 0,
+    "y": 0,
+    "z": 0,
   },
 }
 `;
@@ -563,10 +563,10 @@ Object {
   "type": 1,
   "user": "Government",
   "velocity": Object {
-    "total": NaN,
-    "x": undefined,
-    "y": undefined,
-    "z": undefined,
+    "total": 0,
+    "x": 0,
+    "y": 0,
+    "z": 0,
   },
 }
 `;
@@ -621,10 +621,10 @@ Object {
   "type": 1,
   "user": "Government",
   "velocity": Object {
-    "total": NaN,
-    "x": undefined,
-    "y": undefined,
-    "z": undefined,
+    "total": 0,
+    "x": 0,
+    "y": 0,
+    "z": 0,
   },
 }
 `;

@@ -22,6 +22,8 @@ export const MassRaidPre = (time: number, simFile: string) => {
     for (let i = 0; i < missileArray.length; i++) {
       const x = satSetLen - 500 + i;
       missileArray[i].startTime = time;
+      missileArray[i].name = missileArray[i].ON;
+      missileArray[i].country = missileArray[i].C;
       satSet.setSat(x, missileArray[i]);
       const missileObj = <MissileObject>satSet.getSat(x);
       if (missileObj) {
@@ -29,13 +31,12 @@ export const MassRaidPre = (time: number, simFile: string) => {
         keepTrackApi.programs.satSet.satCruncher.postMessage({
           id: missileObj.id,
           typ: 'newMissile',
-          ON: 'M00' + missileObj.id,
+          name: 'M00' + missileObj.id,
           satId: missileObj.id,
           static: missileObj.static,
           missile: missileObj.missile,
           active: missileObj.active,
           type: missileObj.type,
-          name: missileObj.id,
           latList: missileObj.latList,
           lonList: missileObj.lonList,
           altList: missileObj.altList,
@@ -277,10 +278,41 @@ export const Missile = (
   const TimeList = [];
   let dtheta2dt, dr2dt, WeightForce, DragForce, Thrust, cD, M, c, AirDensity, Patm, Tatm, NozzleAltitude2, NozzleAltitude3;
 
-  const AngleCoefficient = _Bisection(FuelArea1, FuelArea2, FuelMass, FuelVolume, RocketArea, Altitude, RocketCasingMass1, RocketCasingMass2, RocketCasingMass3, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, ArcLength, GoalDistance);
+  const AngleCoefficient = _Bisection(
+    FuelArea1,
+    FuelArea2,
+    FuelMass,
+    FuelVolume,
+    RocketArea,
+    Altitude,
+    RocketCasingMass1,
+    RocketCasingMass2,
+    RocketCasingMass3,
+    NozzleAltitude1,
+    drdt,
+    dthetadt,
+    Distance,
+    ArcDistance,
+    MassIn,
+    ArcLength,
+    GoalDistance
+  );
 
   while (FuelMass / FuelDensity / FuelVolume > 0.4 && Altitude >= 0) {
-    const iterationFunOutput = _IterationFun(FuelArea1, FuelMass, RocketArea, Altitude, RocketCasingMass1, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient);
+    const iterationFunOutput = _IterationFun(
+      FuelArea1,
+      FuelMass,
+      RocketArea,
+      Altitude,
+      RocketCasingMass1,
+      NozzleAltitude1,
+      drdt,
+      dthetadt,
+      Distance,
+      ArcDistance,
+      MassIn,
+      AngleCoefficient
+    );
     FuelMass = iterationFunOutput[0];
     RocketMass = iterationFunOutput[1];
     Tatm = iterationFunOutput[2];
@@ -341,7 +373,20 @@ export const Missile = (
   //   var FirstStageTime = t;
 
   while (FuelMass / FuelDensity / FuelVolume > 0.19 && Altitude >= 0) {
-    const iterationFunOutput = _IterationFun(FuelArea1, FuelMass, RocketArea, Altitude, RocketCasingMass2, NozzleAltitude2, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient);
+    const iterationFunOutput = _IterationFun(
+      FuelArea1,
+      FuelMass,
+      RocketArea,
+      Altitude,
+      RocketCasingMass2,
+      NozzleAltitude2,
+      drdt,
+      dthetadt,
+      Distance,
+      ArcDistance,
+      MassIn,
+      AngleCoefficient
+    );
     FuelMass = iterationFunOutput[0];
     RocketMass = iterationFunOutput[1];
     Tatm = iterationFunOutput[2];
@@ -402,7 +447,20 @@ export const Missile = (
   //   var SecondStageTime = t;
 
   while (FuelMass / FuelDensity / FuelVolume > 0 && Altitude >= 0) {
-    const iterationFunOutput = _IterationFun(FuelArea2, FuelMass, RocketArea, Altitude, RocketCasingMass3, NozzleAltitude3, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient);
+    const iterationFunOutput = _IterationFun(
+      FuelArea2,
+      FuelMass,
+      RocketArea,
+      Altitude,
+      RocketCasingMass3,
+      NozzleAltitude3,
+      drdt,
+      dthetadt,
+      Distance,
+      ArcDistance,
+      MassIn,
+      AngleCoefficient
+    );
     FuelMass = iterationFunOutput[0];
     RocketMass = iterationFunOutput[1];
     Tatm = iterationFunOutput[2];
@@ -463,7 +521,20 @@ export const Missile = (
 
   while (Altitude > 0) {
     FuelMass = 0;
-    const iterationFunOutput = _IterationFun(FuelArea2, FuelMass, RocketArea, Altitude, RocketCasingMass3, NozzleAltitude3, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient);
+    const iterationFunOutput = _IterationFun(
+      FuelArea2,
+      FuelMass,
+      RocketArea,
+      Altitude,
+      RocketCasingMass3,
+      NozzleAltitude3,
+      drdt,
+      dthetadt,
+      Distance,
+      ArcDistance,
+      MassIn,
+      AngleCoefficient
+    );
     FuelMass = iterationFunOutput[0];
     RocketMass = iterationFunOutput[1];
     Tatm = iterationFunOutput[2];
@@ -537,7 +608,22 @@ export const Missile = (
     // Try again with 25% increase to burn rate
     const burnMultiplier = Math.min(3, minAltitudeTrue / MaxAltitude);
     // setTimeout(function () {
-    missileManager.Missile(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude, NumberWarheads, MissileObjectNum, CurrentTime, MissileDesc, Length, Diameter, NewBurnRate * burnMultiplier, MaxMissileRange, country, minAltitude);
+    missileManager.Missile(
+      CurrentLatitude,
+      CurrentLongitude,
+      TargetLatitude,
+      TargetLongitude,
+      NumberWarheads,
+      MissileObjectNum,
+      CurrentTime,
+      MissileDesc,
+      Length,
+      Diameter,
+      NewBurnRate * burnMultiplier,
+      MaxMissileRange,
+      country,
+      minAltitude
+    );
     // }, 10);
     return 0;
   }
@@ -732,8 +818,16 @@ export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[])
   // Check if satellite is in field of view of a sensor.
   if (sensor.obsminaz > sensor.obsmaxaz) {
     if (
-      ((currentTEARR.az >= sensor.obsminaz || currentTEARR.az <= sensor.obsmaxaz) && currentTEARR.el >= sensor.obsminel && currentTEARR.el <= sensor.obsmaxel && currentTEARR.rng <= sensor.obsmaxrange && currentTEARR.rng >= sensor.obsminrange) ||
-      ((currentTEARR.az >= sensor.obsminaz2 || currentTEARR.az <= sensor.obsmaxaz2) && currentTEARR.el >= sensor.obsminel2 && currentTEARR.el <= sensor.obsmaxel2 && currentTEARR.rng <= sensor.obsmaxrange2 && currentTEARR.rng >= sensor.obsminrange2)
+      ((currentTEARR.az >= sensor.obsminaz || currentTEARR.az <= sensor.obsmaxaz) &&
+        currentTEARR.el >= sensor.obsminel &&
+        currentTEARR.el <= sensor.obsmaxel &&
+        currentTEARR.rng <= sensor.obsmaxrange &&
+        currentTEARR.rng >= sensor.obsminrange) ||
+      ((currentTEARR.az >= sensor.obsminaz2 || currentTEARR.az <= sensor.obsmaxaz2) &&
+        currentTEARR.el >= sensor.obsminel2 &&
+        currentTEARR.el <= sensor.obsmaxel2 &&
+        currentTEARR.rng <= sensor.obsmaxrange2 &&
+        currentTEARR.rng >= sensor.obsminrange2)
     ) {
       currentTEARR.inView = true;
     } else {
@@ -741,8 +835,18 @@ export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[])
     }
   } else {
     if (
-      (currentTEARR.az >= sensor.obsminaz && currentTEARR.az <= sensor.obsmaxaz && currentTEARR.el >= sensor.obsminel && currentTEARR.el <= sensor.obsmaxel && currentTEARR.rng <= sensor.obsmaxrange && currentTEARR.rng >= sensor.obsminrange) ||
-      (currentTEARR.az >= sensor.obsminaz2 && currentTEARR.az <= sensor.obsmaxaz2 && currentTEARR.el >= sensor.obsminel2 && currentTEARR.el <= sensor.obsmaxel2 && currentTEARR.rng <= sensor.obsmaxrange2 && currentTEARR.rng >= sensor.obsminrange2)
+      (currentTEARR.az >= sensor.obsminaz &&
+        currentTEARR.az <= sensor.obsmaxaz &&
+        currentTEARR.el >= sensor.obsminel &&
+        currentTEARR.el <= sensor.obsmaxel &&
+        currentTEARR.rng <= sensor.obsmaxrange &&
+        currentTEARR.rng >= sensor.obsminrange) ||
+      (currentTEARR.az >= sensor.obsminaz2 &&
+        currentTEARR.az <= sensor.obsmaxaz2 &&
+        currentTEARR.el >= sensor.obsminel2 &&
+        currentTEARR.el <= sensor.obsmaxel2 &&
+        currentTEARR.rng <= sensor.obsmaxrange2 &&
+        currentTEARR.rng >= sensor.obsminrange2)
     ) {
       currentTEARR.inView = true;
     } else {
@@ -2328,7 +2432,12 @@ export const _ThrustFun = (MassOut: number, Altitude: any, FuelArea: number, Noz
   const Ve = Math.sqrt(VeSub); // Partical Exit Velocity (m/s)
   return q * Ve + (Pe - Pa) * Ae; // Thrust (N)
 };
-export const _CoordinateCalculator = (CurrentLatitude: number, CurrentLongitude: number, TargetLatitude: number, TargetLongitude: number): [number[], number[], number, number, number[], number] => {
+export const _CoordinateCalculator = (
+  CurrentLatitude: number,
+  CurrentLongitude: number,
+  TargetLatitude: number,
+  TargetLongitude: number
+): [number[], number[], number, number, number[], number] => {
   // This function calculates the path of the rocket across the earth in terms of coordinates by using
   // great-circle equations. It will also calculate which direction will be the shortest distance to the
   // target and then calculate the distance across the surface of the earth to the target. There is only
@@ -2481,7 +2590,11 @@ export const _IterationFun = (
     ThrustAngle =
       (90 -
         AngleCoefficient *
-          (1.5336118956 + 0.00443173537387 * Altitude - 9.30373890848 * Math.pow(10, -8) * Math.pow(Altitude, 2) + 8.37838197732 * Math.pow(10, -13) * Math.pow(Altitude, 3) - 2.71228576626 * Math.pow(10, -18) * Math.pow(Altitude, 4))) *
+          (1.5336118956 +
+            0.00443173537387 * Altitude -
+            9.30373890848 * Math.pow(10, -8) * Math.pow(Altitude, 2) +
+            8.37838197732 * Math.pow(10, -13) * Math.pow(Altitude, 3) -
+            2.71228576626 * Math.pow(10, -18) * Math.pow(Altitude, 4))) *
       0.0174533;
   // (Degrees)
   else ThrustAngle = 30;
@@ -2591,7 +2704,26 @@ export const _Bisection = (
   const Steps = 500;
   for (let i = 0; i < Steps; i++) {
     AngleCoefficient = (i * 1) / Steps / 2 + 0.5;
-    DistanceSteps.push(_QuickRun(FuelArea1, FuelArea2, FuelMass, FuelVolume, RocketArea, Altitude, RocketCasingMass1, RocketCasingMass2, RocketCasingMass3, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient));
+    DistanceSteps.push(
+      _QuickRun(
+        FuelArea1,
+        FuelArea2,
+        FuelMass,
+        FuelVolume,
+        RocketArea,
+        Altitude,
+        RocketCasingMass1,
+        RocketCasingMass2,
+        RocketCasingMass3,
+        NozzleAltitude1,
+        drdt,
+        dthetadt,
+        Distance,
+        ArcDistance,
+        MassIn,
+        AngleCoefficient
+      )
+    );
   }
   let DistanceClosest = DistanceSteps[0];
   let oldDistanceClosest = Math.abs(DistanceSteps[0] - GoalDistance);
@@ -2614,15 +2746,70 @@ export const _Bisection = (
   AC1 = (DistanceClosePossition - 2) / Steps / 2 + 0.5;
   AC2 = (DistanceClosePossition + 2) / Steps / 2 + 0.5;
   let ACNew: number = (AC1 + AC2) / 2;
-  const qRunACNew = _QuickRun(FuelArea1, FuelArea2, FuelMass, FuelVolume, RocketArea, Altitude, RocketCasingMass1, RocketCasingMass2, RocketCasingMass3, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, ACNew);
+  const qRunACNew = _QuickRun(
+    FuelArea1,
+    FuelArea2,
+    FuelMass,
+    FuelVolume,
+    RocketArea,
+    Altitude,
+    RocketCasingMass1,
+    RocketCasingMass2,
+    RocketCasingMass3,
+    NozzleAltitude1,
+    drdt,
+    dthetadt,
+    Distance,
+    ArcDistance,
+    MassIn,
+    ACNew
+  );
   let error = Math.abs((GoalDistance - qRunACNew) / GoalDistance) * 100;
   while (error > 0.01 && Math.abs(AC2 - AC1) >= 0.0001) {
     ACNew = (AC1 + AC2) / 2;
     error =
       Math.abs(
-        (GoalDistance - _QuickRun(FuelArea1, FuelArea2, FuelMass, FuelVolume, RocketArea, Altitude, RocketCasingMass1, RocketCasingMass2, RocketCasingMass3, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, ACNew)) / GoalDistance
+        (GoalDistance -
+          _QuickRun(
+            FuelArea1,
+            FuelArea2,
+            FuelMass,
+            FuelVolume,
+            RocketArea,
+            Altitude,
+            RocketCasingMass1,
+            RocketCasingMass2,
+            RocketCasingMass3,
+            NozzleAltitude1,
+            drdt,
+            dthetadt,
+            Distance,
+            ArcDistance,
+            MassIn,
+            ACNew
+          )) /
+          GoalDistance
       ) * 100;
-    if (_QuickRun(FuelArea1, FuelArea2, FuelMass, FuelVolume, RocketArea, Altitude, RocketCasingMass1, RocketCasingMass2, RocketCasingMass3, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, ACNew) > GoalDistance) {
+    if (
+      _QuickRun(
+        FuelArea1,
+        FuelArea2,
+        FuelMass,
+        FuelVolume,
+        RocketArea,
+        Altitude,
+        RocketCasingMass1,
+        RocketCasingMass2,
+        RocketCasingMass3,
+        NozzleAltitude1,
+        drdt,
+        dthetadt,
+        Distance,
+        ArcDistance,
+        MassIn,
+        ACNew
+      ) > GoalDistance
+    ) {
       AC2 = ACNew;
     } else {
       AC1 = ACNew;
@@ -2677,7 +2864,20 @@ export const _QuickRun = (
   const MaxAltitude = [];
 
   while (FuelMass / FuelDensity / FuelVolume > 0.4 && Altitude >= 0) {
-    iterationFunOutput = _IterationFun(FuelArea1, FuelMass, RocketArea, Altitude, RocketCasingMass1, NozzleAltitude1, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient);
+    iterationFunOutput = _IterationFun(
+      FuelArea1,
+      FuelMass,
+      RocketArea,
+      Altitude,
+      RocketCasingMass1,
+      NozzleAltitude1,
+      drdt,
+      dthetadt,
+      Distance,
+      ArcDistance,
+      MassIn,
+      AngleCoefficient
+    );
     FuelMass = iterationFunOutput[0];
     // RocketMass = iterationFunOutput[1];
     // Tatm = iterationFunOutput[2];
@@ -2701,7 +2901,20 @@ export const _QuickRun = (
     NozzleAltitude2 = Altitude;
   }
   while (FuelMass / FuelDensity / FuelVolume > 0.19 && Altitude >= 0) {
-    iterationFunOutput = _IterationFun(FuelArea1, FuelMass, RocketArea, Altitude, RocketCasingMass2, NozzleAltitude2, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient);
+    iterationFunOutput = _IterationFun(
+      FuelArea1,
+      FuelMass,
+      RocketArea,
+      Altitude,
+      RocketCasingMass2,
+      NozzleAltitude2,
+      drdt,
+      dthetadt,
+      Distance,
+      ArcDistance,
+      MassIn,
+      AngleCoefficient
+    );
     FuelMass = iterationFunOutput[0];
     // RocketMass = iterationFunOutput[1];
     // Tatm = iterationFunOutput[2];
@@ -2725,7 +2938,20 @@ export const _QuickRun = (
     NozzleAltitude3 = Altitude;
   }
   while (FuelMass / FuelDensity / FuelVolume > 0 && Altitude >= 0) {
-    iterationFunOutput = _IterationFun(FuelArea2, FuelMass, RocketArea, Altitude, RocketCasingMass3, NozzleAltitude3, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient);
+    iterationFunOutput = _IterationFun(
+      FuelArea2,
+      FuelMass,
+      RocketArea,
+      Altitude,
+      RocketCasingMass3,
+      NozzleAltitude3,
+      drdt,
+      dthetadt,
+      Distance,
+      ArcDistance,
+      MassIn,
+      AngleCoefficient
+    );
     FuelMass = iterationFunOutput[0];
     // RocketMass = iterationFunOutput[1];
     // Tatm = iterationFunOutput[2];
@@ -2749,7 +2975,20 @@ export const _QuickRun = (
   }
   while (Altitude > 0) {
     FuelMass = 0;
-    iterationFunOutput = _IterationFun(FuelArea2, FuelMass, RocketArea, Altitude, RocketCasingMass3, NozzleAltitude3, drdt, dthetadt, Distance, ArcDistance, MassIn, AngleCoefficient);
+    iterationFunOutput = _IterationFun(
+      FuelArea2,
+      FuelMass,
+      RocketArea,
+      Altitude,
+      RocketCasingMass3,
+      NozzleAltitude3,
+      drdt,
+      dthetadt,
+      Distance,
+      ArcDistance,
+      MassIn,
+      AngleCoefficient
+    );
     FuelMass = iterationFunOutput[0];
     // RocketMass = iterationFunOutput[1];
     // Tatm = iterationFunOutput[2];
@@ -2971,7 +3210,24 @@ missileManager.ChinaICBM = [
   'Type 092 Sub (JL-2)',
   8000,
 ];
-missileManager.NorthKoreanBM = [40.0, 128.3, 'Sinpo Sub (Pukkŭksŏng-1)', 2500, 40.019, 128.193, 'Sinpo (KN-14)', 8000, 39.365, 126.165, 'P`yong`an (KN-20)', 10000, 39.046, 125.667, 'Pyongyang (KN-22)', 13000];
+missileManager.NorthKoreanBM = [
+  40.0,
+  128.3,
+  'Sinpo Sub (Pukkŭksŏng-1)',
+  2500,
+  40.019,
+  128.193,
+  'Sinpo (KN-14)',
+  8000,
+  39.365,
+  126.165,
+  'P`yong`an (KN-20)',
+  10000,
+  39.046,
+  125.667,
+  'Pyongyang (KN-22)',
+  13000,
+];
 missileManager.UsaICBM = [
   48.420079,
   -101.33356,

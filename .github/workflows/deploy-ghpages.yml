@@ -8,16 +8,19 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
+      # Checkout Code
       - name: Checkout 🛎️
         uses: actions/checkout@v2.3.1
         with:
           persist-credentials: false
 
+      # Install and Build
       - name: Install and Build 🔧
         run: |
-          npm install
+          npm ci
           npm run build:dev
 
+      # Deploy to GitHub Pages
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
@@ -28,3 +31,9 @@ jobs:
           FOLDER: dist
           # Automatically remove deleted files from the deploy branch
           CLEAN: true
+
+      # Test for Vulnerabilities that snuck in
+      - name: Test for public javascript library vulnerabilities
+        uses: lirantal/is-website-vulnerable@master
+        with:
+          scan-url: "https://thkruz.github.io/keeptrack.space/"

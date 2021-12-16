@@ -15,8 +15,10 @@ jobs:
     name: Yaml Lint
     runs-on: ubuntu-latest
     steps:
+      # Checkout Code
       - name: Checkout Code
         uses: actions/checkout@v2
+      # Lint Yaml Code
       - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3.1.0
         with:
@@ -27,6 +29,10 @@ jobs:
     name: NPM Audit Report
     runs-on: ubuntu-latest
     steps:
+      # Checkout Code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # Audit Package.json
       - name: NPM Audit Report
         uses: wx-jayesh/actions-npm-audit-comment@v1.0.0
   build:
@@ -35,11 +41,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: "17"
-
+      # Get Node Modules from Cache
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -53,10 +63,10 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-
+      # Ensure Node Modules Setup
       - name: Install Dependencies
         run: npm ci --ignore-scripts
-
+      # Build
       - name: Build
         run: npm build
   unit-tests:
@@ -65,6 +75,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "17"
+      # Get Node Modules from Cache
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-
+            ${{ env.cache-name }}-
+            ${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      # Ensure Node Modules Setup
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+      # Build
+      - name: Build
+        run: npm build
+      # Unit Tests
       - name: Test
         run: npm test
   analyze:
@@ -73,9 +112,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "17"
+      # Get Node Modules from Cache
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-
+            ${{ env.cache-name }}-
+            ${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      # Ensure Node Modules Setup
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+      # Build
+      - name: Build
+        run: npm build
+      # SonarQube
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v1.6
-
+      # CodeQL
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
         with:
@@ -86,20 +154,5 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
-  code-coverage:
-    needs: analyze
-    name: Analyze
-    runs-on: ubuntu-latest
-
-    steps:
       - name: Code Coverage
         run: node ./node_modules/.bin/codecov
-  security:
-    needs: analyze
-
-    runs-on: ubuntu-latest
-    steps:
-      - name: Test for public javascript library vulnerabilities
-        uses: lirantal/is-website-vulnerable@master
-        with:
-          scan-url: "https://thkruz.github.io/keeptrack.space/"

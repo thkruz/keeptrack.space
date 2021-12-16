@@ -250,18 +250,14 @@ om.fitTles = async (epoch, svs, kps, timeManager, satellite) => {
   }
 };
 om.svs2analyst = async (svs, satSet, timeManager, satellite) => {
-  try {
-    om.iod(svs, timeManager, satellite)
-      .then((tles) => {
-        satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
-        searchBox.doSearch('100500', true);
-      })
-      .catch((error) => {
-        console.debug(error);
-      });
-  } catch (error) {
-    console.debug(error);
-  }
+  om.iod(svs, timeManager, satellite)
+    .then((tles) => {
+      satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
+      searchBox.doSearch('100500', true);
+    })
+    .catch((error) => {
+      console.debug(error);
+    });
 };
 
 om.testIod = (satSet) => {

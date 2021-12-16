@@ -138,7 +138,7 @@
     "@types/jquery.colorbox": "^1.4.32",
     "@types/jqueryui": "^1.12.16",
     "@types/materialize-css": "^1.0.11",
-    "@types/node": "^16.11.12",
+    "@types/node": "^17.0.0",
     "@types/numeric": "^1.2.2",
     "@types/webgl2": "^0.0.6",
     "@typescript-eslint/eslint-plugin": "^5.7.0",

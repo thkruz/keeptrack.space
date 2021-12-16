@@ -1,0 +1,89 @@
+---
+name: Deploy Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  gh-pages:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout Code
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2.3.1
+        with:
+          persist-credentials: false
+
+      # Install and Build
+      - name: Install and Build 🔧
+        run: |
+          npm ci
+          npm run build:dev
+
+      # Deploy to GitHub Pages
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}
+          # The branch the action should deploy to.
+          BRANCH: gh-pages
+          # The folder the action should deploy.
+          FOLDER: dist
+          # Automatically remove deleted files from the deploy branch
+          CLEAN: true
+
+      # Test for Vulnerabilities that snuck in
+      - name: Test for public javascript library vulnerabilities
+        uses: lirantal/is-website-vulnerable@master
+        with:
+          scan-url: "https://thkruz.github.io/keeptrack.space/"
+  live-server:
+    needs: gh-pages
+    name: Deploy to KeepTrack.Space
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "17"
+      # Get Node Modules from Cache
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-
+            ${{ env.cache-name }}-
+            ${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      # Ensure Node Modules Setup
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+      # Build
+      - name: Build
+        run: npm run build
+      # Deploy
+      - name: FTP Deployer
+        uses: sand4rt/ftp-deployer@v1.3
+        with:
+          sftp: true # optional
+          host: ${{ secrets.FTP_HOST }}
+          port: 21
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          remote_folder: ${{ secrets.FTP_REMOTE_FOLDER }}
+          local_folder: dist
+          cleanup: false

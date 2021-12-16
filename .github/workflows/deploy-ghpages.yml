@@ -1,3 +1,4 @@
+---
 name: Build and Deploy on Github Pages
 on:
   push:
@@ -21,6 +22,9 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: dist # The folder the action should deploy.
-          CLEAN: true # Automatically remove deleted files from the deploy branch
+          # The branch the action should deploy to.
+          BRANCH: gh-pages
+          # The folder the action should deploy.
+          FOLDER: dist
+          # Automatically remove deleted files from the deploy branch
+          CLEAN: true

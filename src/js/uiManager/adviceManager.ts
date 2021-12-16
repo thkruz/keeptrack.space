@@ -46,9 +46,17 @@ export const onReady = (wasAdviceEnabledOverride?: boolean) => {
     adviceManager.on();
 
     let adviceDisplayTime = 60 * 1000; // 60s
-    adviceManager.adviceArray = [adviceList.welcome, adviceList.useLegend, adviceList.showSensors, adviceList.findIss, adviceList.missileMenu, adviceList.toggleNight, adviceList.colorScheme, adviceList.customSensors, adviceList.countries];
-
-    keepTrackApi.methods.adviceReady();
+    adviceManager.adviceArray = [
+      adviceList.welcome,
+      adviceList.useLegend,
+      adviceList.showSensors,
+      adviceList.findIss,
+      adviceList.missileMenu,
+      adviceList.toggleNight,
+      adviceList.colorScheme,
+      adviceList.customSensors,
+      adviceList.countries,
+    ];
 
     // Queue Advice Timers
     for (let i = 0; i < adviceManager.adviceArray.length; i++) {
@@ -57,13 +65,19 @@ export const onReady = (wasAdviceEnabledOverride?: boolean) => {
   } else {
     adviceManager.off();
   }
+  keepTrackApi.methods.adviceReady();
 };
 export const welcome = (): void => {
   // Only Do this Twice
   if (adviceCount.welcome >= 3) return;
   adviceCount.welcome += 1;
 
-  adviceManager.showAdvice('Welcome', 'Welcome to KeepTrack.Space! This is the advice system. It will offer ideas on how to use the features on this site. You can enable/disable it at anytime in the top right.', $('#tutorial-icon'), 'top-left');
+  adviceManager.showAdvice(
+    'Welcome',
+    'Welcome to KeepTrack.Space! This is the advice system. It will offer ideas on how to use the features on this site. You can enable/disable it at anytime in the top right.',
+    $('#tutorial-icon'),
+    'top-left'
+  );
 };
 export const findIss = (): void => {
   // Only Do this Twice
@@ -98,14 +112,24 @@ export const missileMenu = (): void => {
   if (adviceCount.missileMenu >= 3) return;
   adviceCount.missileMenu += 1;
 
-  adviceManager.showAdvice('Missile Scenarios', 'Curious how intercontinental ballistic missiles work? Try launching a few from the missile menu.', $('#menu-missile'), 'bottom-right');
+  adviceManager.showAdvice(
+    'Missile Scenarios',
+    'Curious how intercontinental ballistic missiles work? Try launching a few from the missile menu.',
+    $('#menu-missile'),
+    'bottom-right'
+  );
 };
 export const satelliteSelected = (): void => {
   // Only Do this Twice
   if (adviceCount.satelliteView < 1) {
     adviceCount.satelliteView += 1;
 
-    adviceManager.showAdvice('Satellite Camera View', 'Did you know you can change the camera to show what a satellite sees? You have to have a satellite currently selected to use it.', $('#menu-satview'), 'bottom');
+    adviceManager.showAdvice(
+      'Satellite Camera View',
+      'Did you know you can change the camera to show what a satellite sees? You have to have a satellite currently selected to use it.',
+      $('#menu-satview'),
+      'bottom'
+    );
   } else if (adviceCount.newLaunch < 1) {
     // Only Do this Twice
     adviceCount.newLaunch += 1;
@@ -133,11 +157,21 @@ export const satelliteSelected = (): void => {
     // Only Do this Twice
     adviceCount.editSat += 1;
 
-    adviceManager.showAdvice('Edit Satellite', 'Trying to understand how orbital parameters work? Have you tried editing a satellite to see what the impact is of changing those parameters?', $('#menu-editSat'), 'bottom-right');
+    adviceManager.showAdvice(
+      'Edit Satellite',
+      'Trying to understand how orbital parameters work? Have you tried editing a satellite to see what the impact is of changing those parameters?',
+      $('#menu-editSat'),
+      'bottom-right'
+    );
   } else if (adviceCount.satelliteView < 3) {
     adviceCount.satelliteView += 1;
 
-    adviceManager.showAdvice('Satellite Camera View', 'Did you know you can change the camera to show what a satellite sees? You have to have a satellite currently selected to use it.', $('#menu-satview'), 'bottom');
+    adviceManager.showAdvice(
+      'Satellite Camera View',
+      'Did you know you can change the camera to show what a satellite sees? You have to have a satellite currently selected to use it.',
+      $('#menu-satview'),
+      'bottom'
+    );
   } else if (adviceCount.newLaunch < 3) {
     // Only Do this Twice
     adviceCount.newLaunch += 1;
@@ -165,7 +199,12 @@ export const satelliteSelected = (): void => {
     // Only Do this Twice
     adviceCount.editSat += 1;
 
-    adviceManager.showAdvice('Edit Satellite', 'Trying to understand how orbital parameters work? Have you tried editing a satellite to see what the impact is of changing those parameters?', $('#menu-editSat'), 'bottom-right');
+    adviceManager.showAdvice(
+      'Edit Satellite',
+      'Trying to understand how orbital parameters work? Have you tried editing a satellite to see what the impact is of changing those parameters?',
+      $('#menu-editSat'),
+      'bottom-right'
+    );
   }
 };
 export const colorScheme = (): void => {
@@ -173,14 +212,24 @@ export const colorScheme = (): void => {
   if (adviceCount.colorScheme >= 3) return;
   adviceCount.colorScheme += 1;
 
-  adviceManager.showAdvice('Color Schemes', 'Sometimes it is easier to visualize data by changing the color scheme. You can select from a collection of premade color schemes!', $('#menu-color-scheme'), 'bottom');
+  adviceManager.showAdvice(
+    'Color Schemes',
+    'Sometimes it is easier to visualize data by changing the color scheme. You can select from a collection of premade color schemes!',
+    $('#menu-color-scheme'),
+    'bottom'
+  );
 };
 export const countries = (): void => {
   // Only Do this Twice
   if (adviceCount.countries >= 3) return;
   adviceCount.countries += 1;
 
-  adviceManager.showAdvice('Countries Menu', 'Did you know that most orbital objects were launched by three countries! Check out the countries menu to view all the satellites launched by a coutnry.', $('#menu-countries'), 'bottom');
+  adviceManager.showAdvice(
+    'Countries Menu',
+    'Did you know that most orbital objects were launched by three countries! Check out the countries menu to view all the satellites launched by a coutnry.',
+    $('#menu-countries'),
+    'bottom'
+  );
 };
 export const cspocSensors = (): void => {
   // Only Do this Twice
@@ -199,97 +248,167 @@ export const mwSensors = (): void => {
   if (adviceCount.mwSensors >= 3) return;
   adviceCount.mwSensors += 1;
 
-  adviceManager.showAdvice('USSTRATCOM Missile Warning Sensors', 'These sensors primary function is to scan the horizon for potential ICBM launches. Their data is relayed to the Missile Warning Center in Cheyene Mountain, CO.', null, 'right');
+  adviceManager.showAdvice(
+    'USSTRATCOM Missile Warning Sensors',
+    'These sensors primary function is to scan the horizon for potential ICBM launches. Their data is relayed to the Missile Warning Center in Cheyene Mountain, CO.',
+    null,
+    'right'
+  );
 };
 export const customSensors = (): void => {
   // Only Do this Twice
   if (adviceCount.customSensors >= 3) return;
   adviceCount.customSensors += 1;
 
-  adviceManager.showAdvice('Custom Sensor', 'Trying to visualize a new sensor or what a current sensor would look like with a different configuration? Try making your own using the custom sensor menu!', $('#menu-customSensor'), 'bottom-left');
+  adviceManager.showAdvice(
+    'Custom Sensor',
+    'Trying to visualize a new sensor or what a current sensor would look like with a different configuration? Try making your own using the custom sensor menu!',
+    $('#menu-customSensor'),
+    'bottom-left'
+  );
 };
 export const planetariumDisabled = (): void => {
   // Only Do this Twice
   if (adviceCount.planetariumDisabled >= 3) return;
   adviceCount.planetariumDisabled += 1;
 
-  adviceManager.showAdvice('Planetarium View', 'Using Planetarium View requres a sensor to be selected first. Try selecting a sensor using the Sensor List to find one!', $('#menu-sensor-list'), 'bottom-right');
+  adviceManager.showAdvice(
+    'Planetarium View',
+    'Using Planetarium View requres a sensor to be selected first. Try selecting a sensor using the Sensor List to find one!',
+    $('#menu-sensor-list'),
+    'bottom-right'
+  );
 };
 export const satViewDisabled = (): void => {
   // Only Do this Twice
   if (adviceCount.satViewDisabled >= 3) return;
   adviceCount.satViewDisabled += 1;
 
-  adviceManager.showAdvice('Satellite View', 'Using Satellite View requres a satellite to be selected first. Click on any satellite on the screen and then try using this view again!', null, 'bottom-right');
+  adviceManager.showAdvice(
+    'Satellite View',
+    'Using Satellite View requres a satellite to be selected first. Click on any satellite on the screen and then try using this view again!',
+    null,
+    'bottom-right'
+  );
 };
 export const mapDIsabled = (): void => {
   // Only Do this Twice
   if (adviceCount.mapDisabled >= 3) return;
   adviceCount.mapDisabled += 1;
 
-  adviceManager.showAdvice('Stereographic Map', 'Using the Stereographic Map requres a satellite to be selected first. Click on any satellite on the screen and then try loading the map again!', null, 'bottom-right');
+  adviceManager.showAdvice(
+    'Stereographic Map',
+    'Using the Stereographic Map requres a satellite to be selected first. Click on any satellite on the screen and then try loading the map again!',
+    null,
+    'bottom-right'
+  );
 };
 export const lookanglesDisabled = (): void => {
   // Only Do this Twice
   if (adviceCount.lookanglesDisabled >= 3) return;
   adviceCount.lookanglesDisabled += 1;
 
-  adviceManager.showAdvice('Look Angles', 'Calculatiung Look Angles requres a satellite and a sensor to be selected first.Pick a sensor, then click any satellite on the screen, and then try calculating Look Angles again!', null, 'bottom-left');
+  adviceManager.showAdvice(
+    'Look Angles',
+    'Calculatiung Look Angles requres a satellite and a sensor to be selected first.Pick a sensor, then click any satellite on the screen, and then try calculating Look Angles again!',
+    null,
+    'bottom-left'
+  );
 };
 export const ssnLookanglesDisabled = (): void => {
   // Only Do this Twice
   if (adviceCount.ssnLookanglesDisabled >= 3) return;
   adviceCount.ssnLookanglesDisabled += 1;
 
-  adviceManager.showAdvice('SSN Lookangles', 'Calculatiung Look Angles for the whole SSN requres a satellite to be selected first. Click any satellite on the screen, and then try calculating Look Angles for the SSN again!', null, 'bottom-left');
+  adviceManager.showAdvice(
+    'SSN Lookangles',
+    'Calculatiung Look Angles for the whole SSN requres a satellite to be selected first. Click any satellite on the screen, and then try calculating Look Angles for the SSN again!',
+    null,
+    'bottom-left'
+  );
 };
 export const survFenceDisabled = (): void => {
   // Only Do this Twice
   if (adviceCount.survFenceDisabled >= 3) return;
   adviceCount.survFenceDisabled += 1;
 
-  adviceManager.showAdvice('Show/Hide Surveillance Fence', 'Displaying the Surveillance Fence requres a sensor to be selected first. Try picking a sensor from the Sensor List and then try again!', $('#menu-sensor-list'), 'bottom-left');
+  adviceManager.showAdvice(
+    'Show/Hide Surveillance Fence',
+    'Displaying the Surveillance Fence requres a sensor to be selected first. Try picking a sensor from the Sensor List and then try again!',
+    $('#menu-sensor-list'),
+    'bottom-left'
+  );
 };
 export const bubbleDisabled = (): void => {
   // Only Do this Twice
   if (adviceCount.bubbleDisabled >= 3) return;
   adviceCount.bubbleDisabled += 1;
 
-  adviceManager.showAdvice('Show/Hide Field Of View Bubble', 'Displaying the FOV Bubble requres a sensor to be selected first. Try picking a sensor from the Sensor List and then try again!', $('#menu-sensor-list'), 'bottom-left');
+  adviceManager.showAdvice(
+    'Show/Hide Field Of View Bubble',
+    'Displaying the FOV Bubble requres a sensor to be selected first. Try picking a sensor from the Sensor List and then try again!',
+    $('#menu-sensor-list'),
+    'bottom-left'
+  );
 };
 export const sensorInfoDisabled = (): void => {
   // Only Do this Twice
   if (adviceCount.sensorInfoDisabled >= 3) return;
   adviceCount.sensorInfoDisabled += 1;
 
-  adviceManager.showAdvice('Sensor Information', 'Displaying Sensor Information requres a sensor to be selected first. Try picking a sensor from the Sensor List and then try again!', $('#menu-sensor-list'), 'bottom-left');
+  adviceManager.showAdvice(
+    'Sensor Information',
+    'Displaying Sensor Information requres a sensor to be selected first. Try picking a sensor from the Sensor List and then try again!',
+    $('#menu-sensor-list'),
+    'bottom-left'
+  );
 };
 export const editSatDisabled = (): void => {
   // Only Do this Twice
   if (adviceCount.editSatDisabled >= 3) return;
   adviceCount.editSatDisabled += 1;
 
-  adviceManager.showAdvice('Edit Satellite', 'Editing a Satellite requres a satellite to be selected first. Try picking any satellite from the screen and then try again!', null, 'bottom-right');
+  adviceManager.showAdvice(
+    'Edit Satellite',
+    'Editing a Satellite requres a satellite to be selected first. Try picking any satellite from the screen and then try again!',
+    null,
+    'bottom-right'
+  );
 };
 export const breakupDisabled = (): void => {
   // Only Do this Twice
   if (adviceCount.breakupDisabled >= 3) return;
   adviceCount.breakupDisabled += 1;
 
-  adviceManager.showAdvice('Create Breakup', 'Creating a Breakup requres a satellite to be selected first. Pick any satellite from the screen and then try again!', null, 'bottom-right');
+  adviceManager.showAdvice(
+    'Create Breakup',
+    'Creating a Breakup requres a satellite to be selected first. Pick any satellite from the screen and then try again!',
+    null,
+    'bottom-right'
+  );
 };
 export const satFovDisabled = (): void => {
   // Only Do this Twice
   if (adviceCount.satFovDisabled >= 3) return;
   adviceCount.satFovDisabled += 1;
 
-  adviceManager.showAdvice('Satellite Field of View', "Viewing a satellite's field of view requires a satellite to be selected first. Pick any satellite from the screen and then try again!", null, 'bottom');
+  adviceManager.showAdvice(
+    'Satellite Field of View',
+    "Viewing a satellite's field of view requires a satellite to be selected first. Pick any satellite from the screen and then try again!",
+    null,
+    'bottom'
+  );
 };
 export const sensor = (): void => {
   // Only Do this Twice
   if (adviceCount.sensorFOV < 1) {
     adviceCount.sensorFOV += 1;
-    adviceManager.showAdvice('Field Of View Bubbles', 'Are you having trouble understanding what a sensor can see? Enable the Field of View Bubble to make it easier to visualize!', $('#menu-fov-bubble'), 'bottom-left');
+    adviceManager.showAdvice(
+      'Field Of View Bubbles',
+      'Are you having trouble understanding what a sensor can see? Enable the Field of View Bubble to make it easier to visualize!',
+      $('#menu-fov-bubble'),
+      'bottom-left'
+    );
   } else if (adviceCount.sensorSurv < 1) {
     adviceCount.sensorSurv += 1;
     adviceManager.showAdvice(
@@ -300,7 +419,12 @@ export const sensor = (): void => {
     );
   } else if (adviceCount.sensorFOV < 3) {
     adviceCount.sensorFOV += 1;
-    adviceManager.showAdvice('Field Of View Bubbles', 'Are you having trouble understanding what a sensor can see? Enable the Field of View Bubble to make it easier to visualize!', $('#menu-fov-bubble'), 'bottom-left');
+    adviceManager.showAdvice(
+      'Field Of View Bubbles',
+      'Are you having trouble understanding what a sensor can see? Enable the Field of View Bubble to make it easier to visualize!',
+      $('#menu-fov-bubble'),
+      'bottom-left'
+    );
   } else if (adviceCount.sensorSurv < 3) {
     adviceCount.sensorSurv += 1;
     adviceManager.showAdvice(

@@ -7,21 +7,21 @@ describe('getOrbitByLatLon.getOrbitByLatLon', () => {
     // TODO: Write better test
     let param5: any = new Date('01-01-2020');
     let result: any = getOrbitByLatLon.getOrbitByLatLon(defaultSat, 0.15, -0.85, 'S', param5);
-    expect(result).not.toThrow();
+    expect(() => result).not.toThrow();
   });
 
   test('1', () => {
     // TODO: Write better test
     let param5: any = new Date('01-01-2020');
     let result: any = getOrbitByLatLon.getOrbitByLatLon(defaultSat, 11.0, 11, 'N', param5);
-    expect(result).not.toThrow();
+    expect(() => result).not.toThrow();
   });
 
   test('2', () => {
     // TODO: Write better test
     let param5: any = new Date('01-01-2020');
     let result: any = getOrbitByLatLon.getOrbitByLatLon(defaultSat, 0.15, 11.0, 'S', param5);
-    expect(result).not.toThrow();
+    expect(() => result).not.toThrow();
   });
 
   test('3', () => {

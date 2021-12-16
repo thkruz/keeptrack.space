@@ -22,21 +22,21 @@ describe('satMath.currentEpoch', () => {
     // TODO: Write better test
     let inst: any = new Date('01-01-2030');
     let result: any = satMath.currentEpoch(inst);
-    expect(result).not.toThrow();
+    expect(() => result).not.toThrow();
   });
 
   test('2', () => {
     // TODO: Write better test
     let inst: any = new Date('01-01-2020');
     let result: any = satMath.currentEpoch(inst);
-    expect(result).not.toThrow();
+    expect(() => result).not.toThrow();
   });
 
   test('3', () => {
     // TODO: Write better test
     let inst: any = new Date('01-13-2020');
     let result: any = satMath.currentEpoch(inst);
-    expect(result).not.toThrow();
+    expect(() => result).not.toThrow();
   });
 
   test('4', () => {
